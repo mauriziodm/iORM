@@ -106,6 +106,8 @@
         <DCC_F>false</DCC_F>
         <DCC_K>false</DCC_K>
         <DCC_UsePackage>RESTComponents;$(DCC_UsePackage)</DCC_UsePackage>
+        <RuntimeOnlyPackage>true</RuntimeOnlyPackage>
+        <DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android)'!=''">
         <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
@@ -203,7 +205,6 @@
         <DCCReference Include="vcl.dcp"/>
         <DCCReference Include="vclFireDAC.dcp"/>
         <DCCReference Include="FireDACCommonODBC.dcp"/>
-        <DCCReference Include="FireDACMSSQLDriver.dcp"/>
         <DCCReference Include="FireDACSqliteDriver.dcp"/>
         <DCCReference Include="..\..\Source\iORM.Attributes.pas"/>
         <DCCReference Include="..\..\Source\iORM.CommonTypes.pas"/>

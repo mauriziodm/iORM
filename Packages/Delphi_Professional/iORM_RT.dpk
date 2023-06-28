@@ -27,7 +27,8 @@ package iORM_RT;
 {$DEFINE ioDelphiProfessional}
 {$ENDIF IMPLICITBUILDING}
 {$DESCRIPTION 'iORM Runtime'}
-{$IMPLICITBUILD ON}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
 
 requires
   rtl,
@@ -51,7 +52,9 @@ requires
   vcl,
   vclFireDAC,
   FireDACCommonODBC,
+{$IFNDEF ioDelphiProfessional}
   FireDACMSSQLDriver,
+{$ENDIF}
   FireDACSqliteDriver;
 
 contains
@@ -158,12 +161,6 @@ contains
   iORM.Abstraction in '..\..\Source\iORM.Abstraction.pas',
   iORM.Abstraction.VCL in '..\..\Source\iORM.Abstraction.VCL.pas',
   iORM.Abstraction.FMX in '..\..\Source\iORM.Abstraction.FMX.pas',
-{$IFNDEF ioDelphiProfessional}
-  iORM.DB.MSSqlServer.SqlGenerator in '..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas',
-  iORM.DB.ConnectionDef.MSSQLServer in '..\..\Source\iORM.DB.ConnectionDef.MSSQLServer.pas',
-  iORM.DB.MSSqlServer.SqlDataConverter in '..\..\Source\iORM.DB.MSSqlServer.SqlDataConverter.pas',
-  iORM.DBBuilder.SqlGenerator.MSSqlServer in '..\..\Source\iORM.DBBuilder.SqlGenerator.MSSqlServer.pas',
-{$ENDIF}
   iORM.LiveBindings.CommonBSABehavior in '..\..\Source\iORM.LiveBindings.CommonBSABehavior.pas',
   iORM.DBBuilder.Interfaces in '..\..\Source\iORM.DBBuilder.Interfaces.pas',
   iORM.DBBuilder.Schema.Field in '..\..\Source\iORM.DBBuilder.Schema.Field.pas',
@@ -200,6 +197,12 @@ contains
   iORM.Components.InterfacedDataModule in '..\..\Source\iORM.Components.InterfacedDataModule.pas',
   iORM.MVVM.VMAction in '..\..\Source\iORM.MVVM.VMAction.pas',
   iORM.DB.Query.FireDAC in '..\..\Source\iORM.DB.Query.FireDAC.pas',
+{$IFNDEF ioDelphiProfessional}
+  iORM.DB.ConnectionDef.MSSqlServer in '..\..\Source\iORM.DB.ConnectionDef.MSSQLServer.pas',
+  iORM.DB.MSSqlServer.SqlGenerator in '..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas',
+  iORM.DB.MSSqlServer.SqlDataConverter in '..\..\Source\iORM.DB.MSSqlServer.SqlDataConverter.pas',
+  iORM.DBBuilder.SqlGenerator.MSSqlServer in '..\..\Source\iORM.DBBuilder.SqlGenerator.MSSqlServer.pas',
+{$ENDIF}
   DJSON.Utils.RTTI in '..\..\ExtLibs\djson\Sources\DJSON.Utils.RTTI.pas',
   DJSON.Utils in '..\..\ExtLibs\djson\Sources\DJSON.Utils.pas',
   DJSON.TypeInfoCache in '..\..\ExtLibs\djson\Sources\DJSON.TypeInfoCache.pas',

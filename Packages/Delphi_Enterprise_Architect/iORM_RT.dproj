@@ -282,7 +282,6 @@
         <DCCReference Include="..\..\Source\iORM.DependencyInjection.Implementers.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.VMActionContainer.pas"/>
         <DCCReference Include="..\..\Source\iORM.LazyLoad.LazyLoadObject.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas"/>
         <DCCReference Include="..\..\Source\iORM.Remote.Connection.pas"/>
         <DCCReference Include="..\..\Source\iORM.Strategy.DB.pas"/>
         <DCCReference Include="..\..\Source\iORM.Strategy.Interfaces.pas"/>
@@ -309,9 +308,7 @@
         <DCCReference Include="..\..\Source\iORM.Abstraction.pas"/>
         <DCCReference Include="..\..\Source\iORM.Abstraction.VCL.pas"/>
         <DCCReference Include="..\..\Source\iORM.Abstraction.FMX.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.ConnectionDef.MSSQLServer.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.CommonBSABehavior.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.MSSqlServer.SqlDataConverter.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Field.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Table.pas"/>
@@ -322,7 +319,6 @@
         <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlGenerator.SqLite.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlGenerator.Base.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlGenerator.Firebird.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlGenerator.MSSqlServer.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Strategy.WithoutAlterTable.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Strategy.WithAlterTable.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.DBAnalyzer.pas"/>
@@ -348,6 +344,10 @@
         <DCCReference Include="..\..\Source\iORM.Components.InterfacedDataModule.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.VMAction.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.Query.FireDAC.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DB.ConnectionDef.MSSQLServer.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DB.MSSqlServer.SqlDataConverter.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlGenerator.MSSqlServer.pas"/>
         <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.Utils.RTTI.pas"/>
         <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.Utils.pas"/>
         <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.TypeInfoCache.pas"/>

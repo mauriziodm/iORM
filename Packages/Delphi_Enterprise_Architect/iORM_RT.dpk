@@ -50,7 +50,9 @@ requires
   vcl,
   vclFireDAC,
   FireDACCommonODBC,
+{$IFNDEF ioDelphiProfessional}
   FireDACMSSQLDriver,
+{$ENDIF}
   FireDACSqliteDriver;
 
 contains
@@ -131,7 +133,6 @@ contains
   iORM.DependencyInjection.Implementers in '..\..\Source\iORM.DependencyInjection.Implementers.pas',
   iORM.MVVM.VMActionContainer in '..\..\Source\iORM.MVVM.VMActionContainer.pas',
   iORM.LazyLoad.LazyLoadObject in '..\..\Source\iORM.LazyLoad.LazyLoadObject.pas',
-  iORM.DB.MSSqlServer.SqlGenerator in '..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas',
   iORM.Remote.Connection in '..\..\Source\iORM.Remote.Connection.pas',
   iORM.Strategy.DB in '..\..\Source\iORM.Strategy.DB.pas',
   iORM.Strategy.Interfaces in '..\..\Source\iORM.Strategy.Interfaces.pas',
@@ -158,9 +159,7 @@ contains
   iORM.Abstraction in '..\..\Source\iORM.Abstraction.pas',
   iORM.Abstraction.vcl in '..\..\Source\iORM.Abstraction.VCL.pas',
   iORM.Abstraction.fmx in '..\..\Source\iORM.Abstraction.FMX.pas',
-  iORM.DB.ConnectionDef.MSSqlServer in '..\..\Source\iORM.DB.ConnectionDef.MSSQLServer.pas',
   iORM.LiveBindings.CommonBSABehavior in '..\..\Source\iORM.LiveBindings.CommonBSABehavior.pas',
-  iORM.DB.MSSqlServer.SqlDataConverter in '..\..\Source\iORM.DB.MSSqlServer.SqlDataConverter.pas',
   iORM.DBBuilder.Interfaces in '..\..\Source\iORM.DBBuilder.Interfaces.pas',
   iORM.DBBuilder.Schema.Field in '..\..\Source\iORM.DBBuilder.Schema.Field.pas',
   iORM.DBBuilder.Schema.Table in '..\..\Source\iORM.DBBuilder.Schema.Table.pas',
@@ -171,7 +170,6 @@ contains
   iORM.DBBuilder.SqlGenerator.SqLite in '..\..\Source\iORM.DBBuilder.SqlGenerator.SqLite.pas',
   iORM.DBBuilder.SqlGenerator.Base in '..\..\Source\iORM.DBBuilder.SqlGenerator.Base.pas',
   iORM.DBBuilder.SqlGenerator.Firebird in '..\..\Source\iORM.DBBuilder.SqlGenerator.Firebird.pas',
-  iORM.DBBuilder.SqlGenerator.MSSqlServer in '..\..\Source\iORM.DBBuilder.SqlGenerator.MSSqlServer.pas',
   iORM.DBBuilder.Strategy.WithoutAlterTable in '..\..\Source\iORM.DBBuilder.Strategy.WithoutAlterTable.pas',
   iORM.DBBuilder.Strategy.WithAlterTable in '..\..\Source\iORM.DBBuilder.Strategy.WithAlterTable.pas',
   iORM.DBBuilder.DBAnalyzer in '..\..\Source\iORM.DBBuilder.DBAnalyzer.pas',
@@ -197,6 +195,12 @@ contains
   iORM.Components.InterfacedDataModule in '..\..\Source\iORM.Components.InterfacedDataModule.pas',
   iORM.MVVM.VMAction in '..\..\Source\iORM.MVVM.VMAction.pas',
   iORM.DB.Query.FireDAC in '..\..\Source\iORM.DB.Query.FireDAC.pas',
+{$IFNDEF ioDelphiProfessional}
+  iORM.DB.ConnectionDef.MSSqlServer in '..\..\Source\iORM.DB.ConnectionDef.MSSQLServer.pas',
+  iORM.DB.MSSqlServer.SqlGenerator in '..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas',
+  iORM.DB.MSSqlServer.SqlDataConverter in '..\..\Source\iORM.DB.MSSqlServer.SqlDataConverter.pas',
+  iORM.DBBuilder.SqlGenerator.MSSqlServer in '..\..\Source\iORM.DBBuilder.SqlGenerator.MSSqlServer.pas',
+{$ENDIF}
   DJSON.Utils.RTTI in '..\..\ExtLibs\djson\Sources\DJSON.Utils.RTTI.pas',
   DJSON.Utils in '..\..\ExtLibs\djson\Sources\DJSON.Utils.pas',
   DJSON.TypeInfoCache in '..\..\ExtLibs\djson\Sources\DJSON.TypeInfoCache.pas',
