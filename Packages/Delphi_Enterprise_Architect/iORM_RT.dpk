@@ -194,12 +194,10 @@ contains
   iORM.Components.InterfacedDataModule in '..\..\Source\iORM.Components.InterfacedDataModule.pas',
   iORM.MVVM.VMAction in '..\..\Source\iORM.MVVM.VMAction.pas',
   iORM.DB.Query.FireDAC in '..\..\Source\iORM.DB.Query.FireDAC.pas',
-{$IFNDEF ioDelphiProfessional}
   iORM.DB.ConnectionDef.MSSQLServer in '..\..\Source\iORM.DB.ConnectionDef.MSSQLServer.pas',
   iORM.DB.MSSqlServer.SqlGenerator in '..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas',
   iORM.DB.MSSqlServer.SqlDataConverter in '..\..\Source\iORM.DB.MSSqlServer.SqlDataConverter.pas',
   iORM.DBBuilder.SqlGenerator.MSSqlServer in '..\..\Source\iORM.DBBuilder.SqlGenerator.MSSqlServer.pas',
-{$ENDIF}
   DJSON.Utils.RTTI in '..\..\ExtLibs\djson\Sources\DJSON.Utils.RTTI.pas',
   DJSON.Utils in '..\..\ExtLibs\djson\Sources\DJSON.Utils.pas',
   DJSON.TypeInfoCache in '..\..\ExtLibs\djson\Sources\DJSON.TypeInfoCache.pas',

@@ -1,5 +1,22 @@
+{
+  **********************************************************************************************************
+  *                                                                                                        *
+  *                                      DELPHI PROFESSIONAL VERSION                                       *
+  *                                                                                                        *
+  * Delphi professional version lacks these units which, therefore, have been eliminated from the project. *
+  *                                                                                                        *
+  * requires                                                                                               *
+  *   FireDACMSSQLDriver,                                                                                  *
+  *                                                                                                        *
+  * contains                                                                                               *
+  * iORM.DB.ConnectionDef.MSSQLServer in '..\..\Source\iORM.DB.ConnectionDef.MSSQLServer.pas',             *
+  * iORM.DB.MSSqlServer.SqlGenerator in '..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas',               *
+  * iORM.DB.MSSqlServer.SqlDataConverter in '..\..\Source\iORM.DB.MSSqlServer.SqlDataConverter.pas',       *
+  * iORM.DBBuilder.SqlGenerator.MSSqlServer in '..\..\Source\iORM.DBBuilder.SqlGenerator.MSSqlServer.pas', *
+  *                                                                                                        *
+  **********************************************************************************************************
+}
 package iORM_RT;
-
 {$R *.res}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
