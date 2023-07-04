@@ -72,6 +72,10 @@ type
   // Object version
   TioObjVersion = type TDateTime;
 
+  // Object creation and last update DateTime
+  TioObjCreated = type TDateTime;
+  TioObjLastUpdate = type TDateTime;
+
   // Common ClassRef
   TioClassRef = class of TObject;
 
