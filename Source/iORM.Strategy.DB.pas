@@ -301,14 +301,12 @@ begin
       AQuery.Close;
     end;
   end;
-  // -----------------------------------------------------------
-{ TODO : DA SISTEMARE OBJVERSION E SIMILARI }
-  // Create and execute insert query and set the version/created/updated of the entity
+  // -----------------------------------------------------------  // Create and execute insert query and set the version/created/updated of the entity
   // (if it's not a BlindInsert and versioning is enabled for this entity type)
   TioDBFactory.QueryEngine.GetQueryInsert(AContext).ExecSQL;
+  AContext.NextObjVersion(True); // Update the ObjVersion (if exists)
   if not ABlindInsertUpdate then
   begin
-//    AContext.ObjVersionProperty := AContext.TransactionTimestamp;
     AContext.ObjCreated := AQuery.Connection.LastTransactionTimestamp;
     AContext.ObjUpdated := AQuery.Connection.LastTransactionTimestamp;
   end;
@@ -818,24 +816,16 @@ var
   LQuery: IioQuery;
 begin
   inherited;
-{ TODO : DA SISTEMARE OBJVERSION E SIMILARI }
   // Create and execute the query to update the entity into the DB cheking the version to avoid concurrency
   // conflict (if versioning is enabled for this type of entity)
   LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext);
   if not LQuery.ExecSQL > 0 then
     raise EioConcurrencyConflictException.Create(Self.ClassName, 'UpdateObject', AContext);
-  // Update the ObjVersion if enabled
-//  if AContext.ObjVersionPropertyExist then
-
-
-
-
-
+  // Increment the ObjVersion if enabled (if exists)
+  AContext.NextObjVersion(True);
+  // Update the ObjUpdated property (if exists)
   if not ABlindInsertUpdate then
-  begin
-//    AContext.ObjVersionProperty := AContext.TransactionTimestamp;
     AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;;
-  end;
 end;
 
 { TioContextCache }

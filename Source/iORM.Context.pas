@@ -64,10 +64,10 @@ type
     procedure SetObjStatus(const AValue: TioObjStatus);
     function ObjStatusPropertyExist: Boolean;
     // ObjVersion
-    procedure IncrementObjVersion;
+    function NextObjVersion(const ASetValue: Boolean): TioObjVersion;
     function ObjVersionPropertyExist: Boolean;
     function IsObjVersionProperty(const AProp: IioProperty): Boolean;
-    function GetObjVersion: TioObjVersion;
+//    function GetObjVersion: TioObjVersion;  // Codice commentato anche nella parte implementation
 //    procedure SetObjVersion(const AValue: TioObjVersion); // Codice commentato anche nella parte implementation
     // ObjCreated
     function GetObjCreated: TioObjCreated;
@@ -116,7 +116,7 @@ type
     // Properties
     property DataObject: TObject read GetDataObject write SetDataObject;
     property ObjStatus: TioObjStatus read GetObjStatus write SetObjStatus;
-    property ObjVersion: TioObjVersion read GetObjVersion; // write SetObjVersion;  // Codice commentato anche nella parte interface e implementation
+//    property ObjVersion: TioObjVersion read GetObjVersion write SetObjVersion;  // Codice commentato anche nella parte interface e implementation
     property ObjCreated: TioObjCreated read GetObjCreated write SetObjCreated;
     property ObjUpdated: TioObjUpdated read GetObjUpdated write SetObjUpdated;
     property Where: IioWhere read GetWhere write SetWhere;
@@ -233,14 +233,6 @@ begin
     Result := TRANSACTION_TIMESTAMP_NULL;
 end;
 
-function TioContext.GetObjVersion: TioObjVersion;
-begin
-  if ObjVersionPropertyExist then
-    Result := GetProperties.ObjVersionProperty.GetValue(FDataObject).AsType<TioObjVersion>
-  else
-    Result := OBJVERSION_NULL;
-end;
-
 function TioContext.GetOrderBySql: String;
 begin
   Result := FWhere.GetOrderBySql(FMap);
@@ -309,6 +301,14 @@ begin
   GetProperties.ObjUpdatedProperty.SetValue(FDataObject, LPropValue);
 end;
 
+//function TioContext.GetObjVersion: TioObjVersion;
+//begin
+//  if ObjVersionPropertyExist then
+//    Result := GetProperties.ObjVersionProperty.GetValue(FDataObject).AsType<TioObjVersion>
+//  else
+//    Result := OBJVERSION_NULL;
+//end;
+
 //procedure TioContext.SetObjVersion(const AValue: TioObjVersion);
 //var
 //  LPropValue: TValue;
@@ -349,16 +349,21 @@ begin
   Result := (not Assigned(FDataObject)) or (GetID = IO_INTEGER_NULL_VALUE);
 end;
 
-procedure TioContext.IncrementObjVersion;
+function TioContext.NextObjVersion(const ASetValue: Boolean): TioObjVersion;
 var
   LPropValue: TValue;
-  LValue: Integer;
 begin
-  if not ObjVersionPropertyExist then
-    Exit;
-  LValue := GetProperties.ObjVersionProperty.GetValue(FDataObject).AsType<TioObjVersion>;
-  LPropValue := TValue.From<TioObjVersion>(LValue + 1);
-  GetProperties.ObjVersionProperty.SetValue(FDataObject, LPropValue);
+  if ObjVersionPropertyExist then
+  begin
+    Result := GetProperties.ObjVersionProperty.GetValue(FDataObject).AsType<TioObjVersion>;
+    if ASetValue then
+    begin
+      LPropValue := TValue.From<TioObjVersion>(Result + 1);
+      GetProperties.ObjVersionProperty.SetValue(FDataObject, LPropValue);
+    end;
+  end
+  else
+    Result := OBJVERSION_NULL;
 end;
 
 function TioContext.IsObjCreatedProperty(const AProp: IioProperty): Boolean;

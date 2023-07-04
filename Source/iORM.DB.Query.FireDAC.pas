@@ -390,7 +390,7 @@ var
   LProp: IioProperty;
 begin
   LProp := AContext.GetProperties.ObjVersionProperty;
-  ParamByProp_SetValueAsIntegerNullIfZero(LProp, AContext.ObjVersion+1);
+  ParamByProp_SetValueAsIntegerNullIfZero(LProp, AContext.NextObjVersion(False));
 end;
 
 procedure TioFDQuery.WhereParamObjVersion_SetValue(const AContext: IioContext);
