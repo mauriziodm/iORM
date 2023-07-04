@@ -310,6 +310,16 @@ begin
 //  if not ABlindInsert then
 //    AContext.ObjVersion := AContext.TransactionTimestamp;
 
+
+
+//  if not ABlindInsert then
+//  begin
+//
+//  end;
+
+
+
+
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the last ID generated
   // in the last insert query.
@@ -440,12 +450,12 @@ begin
     PreProcessRelationChildOnPersist(LContext);
     // Process the current object
     // --------------------------
-    case LContext.ObjStatus of
+    case LContext.ObjStatusProperty of
       // Persist if dirty
       osDirty:
         begin
           // If SmartUpdateDetection system is not enabled or (if enabled) the object is to be persisted (according to the SmartUpdateDetection system)...
-          if LContext.ObjStatusExist or (AMasterBSPersistence = nil) or (not AMasterBSPersistence.IsSmartUpdateDetectionEnabled) or
+          if LContext.ObjStatusPropertyExist or (AMasterBSPersistence = nil) or (not AMasterBSPersistence.IsSmartUpdateDetectionEnabled) or
             AMasterBSPersistence.SmartUpdateDetection.IsToBePersisted(AObj, LContext.MasterPropertyPath) then
           begin
             // if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
@@ -453,7 +463,7 @@ begin
               UpdateObject(LContext)
             else
               InsertObject(LContext, ABlindInsert);
-            LContext.ObjStatus := osClean;
+            LContext.ObjStatusProperty := osClean;
           end;
         end;
       // Delete if deleted

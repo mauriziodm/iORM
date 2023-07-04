@@ -280,7 +280,7 @@ type
     function GetObjUpdatedProperty: IioProperty;
     procedure SetObjUpdatedProperty(const AValue: IioProperty);
     function ObjUpdatedPropertyExist: Boolean;
-    function IsObjUpdateProperty(const AProperty: IioProperty): Boolean;
+    function IsObjUpdatedProperty(const AProperty: IioProperty): Boolean;
   public
     constructor Create; reintroduce;
     destructor Destroy; override;
@@ -1050,7 +1050,7 @@ begin
   Result := Assigned(AProperty) and (AProperty = FObjCreatedProperty);
 end;
 
-function TioProperties.IsObjUpdateProperty(const AProperty: IioProperty): Boolean;
+function TioProperties.IsObjUpdatedProperty(const AProperty: IioProperty): Boolean;
 begin
   Result := Assigned(AProperty) and (AProperty = FObjUpdatedProperty);
 end;

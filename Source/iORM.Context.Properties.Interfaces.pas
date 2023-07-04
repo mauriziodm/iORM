@@ -190,9 +190,9 @@ type
     function GetObjCreatedProperty: IioProperty;
     procedure SetObjCreatedProperty(const AValue: IioProperty);
     property ObjCreatedProperty: IioProperty read GetObjCreatedProperty write SetObjCreatedProperty;
-    // ObjLastUpdate property
+    // ObjUpdated property
     function ObjUpdatedPropertyExist: Boolean;
-    function IsObjUpdateProperty(const AProperty: IioProperty): Boolean;
+    function IsObjUpdatedProperty(const AProperty: IioProperty): Boolean;
     function GetObjUpdatedProperty: IioProperty;
     procedure SetObjUpdatedProperty(const AValue: IioProperty);
     property ObjUpdatedProperty: IioProperty read GetObjUpdatedProperty write SetObjUpdatedProperty;

@@ -175,7 +175,7 @@ begin
       Continue;
 { TODO : DA SISTEMARE OBJVERSION E SIMILARI }
     // If the current property is the ObjVersionProperty and versioning is enabled for this entity type
-    if AContext.ObjVersionExist and AContext.IsObjVersionProperty(LProp) then
+    if AContext.ObjVersionPropertyExist and AContext.IsObjVersionProperty(LProp) then
     begin
       LQuery.ParamObjVer_SetValue(AContext);
       Continue;
@@ -312,7 +312,7 @@ begin
       Continue;
 { TODO : DA SISTEMARE OBJVERSION E SIMILARI }
     // If the current property is the ObjVersionProperty and versioning is enabled for this entity type
-    if AContext.ObjVersionExist and AContext.IsObjVersionProperty(LProp) then
+    if AContext.ObjVersionPropertyExist and AContext.IsObjVersionProperty(LProp) then
     begin
       LQuery.ParamObjVer_SetValue(AContext);
       Continue;
@@ -339,7 +339,7 @@ begin
     LQuery.ParamByName_SetValue(AContext.GetTrueClass.GetSqlParamName, AContext.GetTrueClass.GetValue);
   // Where conditions (with ObjVersion if exists for this entity type)
   LQuery.WhereParamObjID_SetValue(AContext);
-  if AContext.ObjVersionExist then
+  if AContext.ObjVersionPropertyExist then
     LQuery.WhereParamObjVer_SetValue(AContext);
 end;
 
