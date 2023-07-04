@@ -46,8 +46,8 @@ type
   // Strategy class for database
   TioStrategyDB = class(TioStrategyIntf)
   protected
-    class procedure InsertObject(const AContext: IioContext; const ABlindInsert: Boolean);
-    class procedure UpdateObject(const AContext: IioContext; const ABlindInsert: Boolean);
+    class procedure InsertObject(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
+    class procedure UpdateObject(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
     class procedure DeleteObject_Internal(const AContext: IioContext);
     class procedure PreProcessRelationChildOnDelete(const AMasterContext: IioContext);
     class procedure PreProcessRelationChildOnPersist(const AMasterContext: IioContext);
@@ -58,7 +58,7 @@ type
     class procedure CommitTransaction(const AConnectionName: String); override;
     class procedure RollbackTransaction(const AConnectionName: String); override;
     class function InTransaction(const AConnectionName: String): Boolean; override;
-    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
+    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsertUpdate: Boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
     class procedure PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
@@ -281,7 +281,7 @@ begin
     TioDBFactory.QueryEngine.GetQueryDelete(AContext, True).ExecSQL;
 end;
 
-class procedure TioStrategyDB.InsertObject(const AContext: IioContext; const ABlindInsert: Boolean);
+class procedure TioStrategyDB.InsertObject(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
 var
   AQuery: IioQuery;
 begin
@@ -289,7 +289,7 @@ begin
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the next ID for the inserting object
   // before the insert query (for Firebird/Interbase)
-  if (not ABlindInsert) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtBeforeInsert) and AContext.IDIsNull
+  if (not ABlindInsertUpdate) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtBeforeInsert) and AContext.IDIsNull
   then
   begin
     AQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
@@ -302,12 +302,11 @@ begin
     end;
   end;
   // -----------------------------------------------------------
-
 { TODO : DA SISTEMARE OBJVERSION E SIMILARI }
   // Create and execute insert query and set the version/created/updated of the entity
   // (if it's not a BlindInsert and versioning is enabled for this entity type)
   TioDBFactory.QueryEngine.GetQueryInsert(AContext).ExecSQL;
-  if not ABlindInsert then
+  if not ABlindInsertUpdate then
   begin
     AContext.ObjVersionProperty := AContext.TransactionTimestamp;
     AContext.ObjCreatedProperty := AContext.TransactionTimestamp;
@@ -316,7 +315,7 @@ begin
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the last ID generated
   // in the last insert query.
-  if (not ABlindInsert) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtAfterInsert) and AContext.IDIsNull then
+  if (not ABlindInsertUpdate) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtAfterInsert) and AContext.IDIsNull then
   begin
     AQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
     try
@@ -416,7 +415,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
+class procedure TioStrategyDB.PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsertUpdate: Boolean;
   const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LContext: IioContext;
@@ -452,10 +451,10 @@ begin
             AMasterBSPersistence.SmartUpdateDetection.IsToBePersisted(AObj, LContext.MasterPropertyPath) then
           begin
             // if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
-            if (not ABlindInsert) and (not LContext.IDIsNull) and Self.ObjectExists(LContext) then
-              UpdateObject(LContext, ABlindInsert)
+            if (not ABlindInsertUpdate) and (not LContext.IDIsNull) and Self.ObjectExists(LContext) then
+              UpdateObject(LContext, ABlindInsertUpdate)
             else
-              InsertObject(LContext, ABlindInsert);
+              InsertObject(LContext, ABlindInsertUpdate);
             LContext.ObjStatusProperty := osClean;
           end;
         end;
@@ -814,7 +813,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.UpdateObject(const AContext: IioContext; const ABlindInsert: Boolean);
+class procedure TioStrategyDB.UpdateObject(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
 var
   LQuery: IioQuery;
 begin
@@ -825,7 +824,7 @@ begin
   LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext);
   if not LQuery.ExecSQL > 0 then
     raise EioConcurrencyConflictException.Create(Self.ClassName, 'UpdateObject', AContext);
-  if not ABlindInsert then
+  if not ABlindInsertUpdate then
   begin
     AContext.ObjVersionProperty := AContext.TransactionTimestamp;
     AContext.ObjUpdatedProperty := AContext.TransactionTimestamp;
