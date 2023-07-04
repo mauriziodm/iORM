@@ -258,6 +258,8 @@ type
     FIdProperty: IioProperty;
     FObjStatusProperty: IioProperty;
     FObjVersionProperty: IioProperty;
+    FObjCreatedProperty: IioProperty;
+    FObjUpdatedProperty: IioProperty;
     FBlobFieldExists: Boolean;
   private
     // ObjStatus property
@@ -266,6 +268,12 @@ type
     // ObjVersion property
     function GetObjVersionProperty: IioProperty;
     procedure SetObjVersionProperty(const AValue: IioProperty);
+    // ObjCreated property
+    function GetObjCreatedProperty: IioProperty;
+    procedure SetObjCreatedProperty(const AValue: IioProperty);
+    // ObjLastUpdate property
+    function GetObjUpdatedProperty: IioProperty;
+    procedure SetObjUpdatedProperty(const AValue: IioProperty);
   public
     constructor Create; reintroduce;
     destructor Destroy; override;
@@ -280,15 +288,17 @@ type
     procedure SetTable(const ATable: IioTable);
     // Blob field present
     function BlobFieldExists: Boolean;
-    // ObjectStatus Exist
-    function ObjStatusExist: Boolean;
-    // ObjectVersion Exist
-    function ObjVersionExist: Boolean;
-    function IsObjVersionProperty(const AProperty: IioProperty): Boolean;
     // ObjStatus property
+    function ObjStatusExist: Boolean;
     property ObjStatusProperty: IioProperty read GetObjStatusProperty write SetObjStatusProperty;
     // ObjVersion property
+    function ObjVersionExist: Boolean;
+    function IsObjVersionProperty(const AProperty: IioProperty): Boolean;
     property ObjVersionProperty: IioProperty read GetObjVersionProperty write SetObjVersionProperty;
+    // ObjCreated property
+    property ObjCreatedProperty: IioProperty read GetObjCreatedProperty write SetObjCreatedProperty;
+    // ObjLastUpdate property
+    property ObjUpdatedProperty: IioProperty read GetObjUpdatedProperty write SetObjUpdatedProperty;
   end;
 
 implementation
@@ -949,6 +959,8 @@ begin
   FBlobFieldExists := False;
   FObjStatusProperty := nil;
   FObjVersionProperty := nil;
+  FObjCreatedProperty := nil;
+  FObjUpdatedProperty := nil;
   FPropertyItems := TList<IioProperty>.Create;
 end;
 
@@ -994,9 +1006,19 @@ begin
   Result := FIdProperty;
 end;
 
+function TioProperties.GetObjCreatedProperty: IioProperty;
+begin
+  Result := FObjCreatedProperty;
+end;
+
 function TioProperties.GetObjStatusProperty: IioProperty;
 begin
   Result := FObjStatusProperty;
+end;
+
+function TioProperties.GetObjUpdatedProperty: IioProperty;
+begin
+  Result := FObjUpdatedProperty;
 end;
 
 function TioProperties.GetObjVersionProperty: IioProperty;
@@ -1034,9 +1056,19 @@ begin
   Result := Assigned(FObjVersionProperty);
 end;
 
+procedure TioProperties.SetObjCreatedProperty(const AValue: IioProperty);
+begin
+  FObjCreatedProperty := AValue;
+end;
+
 procedure TioProperties.SetObjStatusProperty(const AValue: IioProperty);
 begin
   FObjStatusProperty := AValue;
+end;
+
+procedure TioProperties.SetObjUpdatedProperty(const AValue: IioProperty);
+begin
+  FObjUpdatedProperty := AValue;
 end;
 
 procedure TioProperties.SetObjVersionProperty(const AValue: IioProperty);

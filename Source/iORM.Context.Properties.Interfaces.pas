@@ -186,6 +186,14 @@ type
     function GetObjVersionProperty: IioProperty;
     procedure SetObjVersionProperty(const AValue: IioProperty);
     property ObjVersionProperty: IioProperty read GetObjVersionProperty write SetObjVersionProperty;
+    // ObjCreated property
+    function GetObjCreatedProperty: IioProperty;
+    procedure SetObjCreatedProperty(const AValue: IioProperty);
+    property ObjCreatedProperty: IioProperty read GetObjCreatedProperty write SetObjCreatedProperty;
+    // ObjLastUpdate property
+    function GetObjUpdatedProperty: IioProperty;
+    procedure SetObjUpdatedProperty(const AValue: IioProperty);
+    property ObjUpdatedProperty: IioProperty read GetObjUpdatedProperty write SetObjUpdatedProperty;
   end;
 
 implementation

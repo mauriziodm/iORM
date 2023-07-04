@@ -307,8 +307,8 @@ begin
   // Create and execute insert query and set the version of the entity
   // (if it's not a BlindInsert and versioning is enabled for this entity type)
   TioDBFactory.QueryEngine.GetQueryInsert(AContext).ExecSQL;
-  if not ABlindInsert then
-    AContext.ObjVersion := AContext.TransactionTimestamp;
+//  if not ABlindInsert then
+//    AContext.ObjVersion := AContext.TransactionTimestamp;
 
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the last ID generated
@@ -821,7 +821,7 @@ begin
   // conflict (if versioning is enabled for this type of entity)
   LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext);
   if LQuery.ExecSQL > 0 then
-    AContext.ObjVersion := AContext.TransactionTimestamp
+//    AContext.ObjVersion := AContext.TransactionTimestamp
   else
     raise EioConcurrencyConflictException.Create(Self.ClassName, 'UpdateObject', AContext);
 end;
