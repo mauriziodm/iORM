@@ -303,6 +303,7 @@ begin
   end;
   // -----------------------------------------------------------
 
+{ TODO : DA SISTEMARE OBJVERSION E SIMILARI }
   // Create and execute insert query and set the version of the entity
   // (if it's not a BlindInsert and versioning is enabled for this entity type)
   TioDBFactory.QueryEngine.GetQueryInsert(AContext).ExecSQL;
@@ -815,6 +816,7 @@ var
   LQuery: IioQuery;
 begin
   inherited;
+{ TODO : DA SISTEMARE OBJVERSION E SIMILARI }
   // Create and execute the query to update the entity into the DB cheking the version to avoid concurrrency
   // conflict (if versioning is enabled for this type of entity)
   LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext);

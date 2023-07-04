@@ -173,6 +173,7 @@ begin
     // If the current property is ReadOnly then skip it
     if not LProp.IsSqlInsertRequestCompliant(LIDIsNull) then
       Continue;
+{ TODO : DA SISTEMARE OBJVERSION E SIMILARI }
     // If the current property is the ObjVersionProperty and versioning is enabled for this entity type
     if AContext.ObjVersionExist and AContext.IsObjVersionProperty(LProp) then
     begin
@@ -309,6 +310,7 @@ begin
     // If the current property is ReadOnly then skip it
     if not LProp.IsSqlUpdateRequestCompliant then
       Continue;
+{ TODO : DA SISTEMARE OBJVERSION E SIMILARI }
     // If the current property is the ObjVersionProperty and versioning is enabled for this entity type
     if AContext.ObjVersionExist and AContext.IsObjVersionProperty(LProp) then
     begin
