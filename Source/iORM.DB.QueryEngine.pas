@@ -173,11 +173,22 @@ begin
     // If the current property is ReadOnly then skip it
     if not LProp.IsSqlInsertRequestCompliant(LIDIsNull) then
       Continue;
-{ TODO : DA SISTEMARE OBJVERSION E SIMILARI }
-    // If the current property is the ObjVersionProperty and versioning is enabled for this entity type
+    // If the current prop is ObjVersion/ObjCreated/ObjUpdated and they are enabled...
     if AContext.ObjVersionPropertyExist and AContext.IsObjVersionProperty(LProp) then
     begin
-      LQuery.ParamObjVer_SetValue(AContext);
+      LQuery.ParamObjVersion_SetValue(AContext);
+      Continue;
+    end
+    else
+    if AContext.ObjUpdatedPropertyExist and AContext.IsObjUpdatedProperty(LProp) then
+    begin
+      LQuery.ParamObjUpdated_SetValue(AContext);
+      Continue;
+    end
+    else
+    if AContext.ObjCreatedPropertyExist and AContext.IsObjCreatedProperty(LProp) then
+    begin
+      LQuery.ParamObjCreated_SetValue(AContext);
       Continue;
     end;
     // Relation type
@@ -310,11 +321,16 @@ begin
     // If the current property is ReadOnly then skip it
     if not LProp.IsSqlUpdateRequestCompliant then
       Continue;
-{ TODO : DA SISTEMARE OBJVERSION E SIMILARI }
-    // If the current property is the ObjVersionProperty and versioning is enabled for this entity type
+    // If the current prop is ObjVersion/ObjCreated/ObjUpdated and they are enabled...
     if AContext.ObjVersionPropertyExist and AContext.IsObjVersionProperty(LProp) then
     begin
-      LQuery.ParamObjVer_SetValue(AContext);
+      LQuery.ParamObjVersion_SetValue(AContext);
+      Continue;
+    end
+    else
+    if AContext.ObjUpdatedPropertyExist and AContext.IsObjUpdatedProperty(LProp) then
+    begin
+      LQuery.ParamObjUpdated_SetValue(AContext);
       Continue;
     end;
     // Relation type
@@ -340,7 +356,7 @@ begin
   // Where conditions (with ObjVersion if exists for this entity type)
   LQuery.WhereParamObjID_SetValue(AContext);
   if AContext.ObjVersionPropertyExist then
-    LQuery.WhereParamObjVer_SetValue(AContext);
+    LQuery.WhereParamObjVersion_SetValue(AContext);
 end;
 
 end.

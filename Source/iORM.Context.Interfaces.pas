@@ -55,8 +55,6 @@ type
     function WhereExist: Boolean;
     function GetID: Integer;
     function IDIsNull: Boolean;
-    // TransactionTimestamp
-    function TransactionTimestamp: TDateTime;
     // Map
     function Map: IioMap;
     // Blob field present
@@ -67,27 +65,27 @@ type
     property DataObject:TObject read GetDataObject write SetDataObject;
     // ObjectStatus
     function ObjStatusPropertyExist: Boolean;
-    procedure SetObjStatusProperty(const AValue: TioObjStatus);
-    function GetObjStatusProperty: TioObjStatus;
-    property ObjStatusProperty:TioObjStatus read GetObjStatusProperty write SetObjStatusProperty;
+    procedure SetObjStatus(const AValue: TioObjStatus);
+    function GetObjStatus: TioObjStatus;
+    property ObjStatus:TioObjStatus read GetObjStatus write SetObjStatus;
     // ObjVersion
     function ObjVersionPropertyExist: Boolean;
     function IsObjVersionProperty(const AProp: IioProperty): Boolean;
-    function GetObjVersionProperty: TioObjVersion;
-    procedure SetObjVersionProperty(const AValue: TioObjVersion);
-    property ObjVersionProperty:TioObjVersion read GetObjVersionProperty write SetObjVersionProperty;
+    function GetObjVersion: TioObjVersion;
+//    procedure SetObjVersion(const AValue: TioObjVersion);
+    property ObjVersion:TioObjVersion read GetObjVersion; // write SetObjVersion;
     // ObjCreated
     function ObjCreatedPropertyExist: Boolean;
     function IsObjCreatedProperty(const AProp: IioProperty): Boolean;
-    function GetObjCreatedProperty: TioObjCreated;
-    procedure SetObjCreatedProperty(const AValue: TioObjCreated);
-    property ObjCreatedProperty: TioObjCreated read GetObjCreatedProperty write SetObjCreatedProperty;
+    function GetObjCreated: TioObjCreated;
+    procedure SetObjCreated(const AValue: TioObjCreated);
+    property ObjCreated: TioObjCreated read GetObjCreated write SetObjCreated;
     // ObjUpdated
     function ObjUpdatedPropertyExist: Boolean;
     function IsObjUpdatedProperty(const AProp: IioProperty): Boolean;
-    function GetObjUpdatedProperty: TioObjUpdated;
-    procedure SetObjUpdatedProperty(const AValue: TioObjUpdated);
-    property ObjUpdatedProperty: TioObjUpdated read GetObjUpdatedProperty write SetObjUpdatedProperty;
+    function GetObjUpdated: TioObjUpdated;
+    procedure SetObjUpdated(const AValue: TioObjUpdated);
+    property ObjUpdated: TioObjUpdated read GetObjUpdated write SetObjUpdated;
     // Where
     procedure SetWhere(const AWhere: IioWhere);
     function GetWhere: IioWhere;

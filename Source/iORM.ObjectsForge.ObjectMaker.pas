@@ -67,7 +67,7 @@ begin
     AContext.DataObject := Self.CreateObjectByClassRef(AContext.GetClassRef);
   Result := AContext.DataObject;
   // ObjectStatus
-  AContext.ObjStatusProperty := osClean;
+  AContext.ObjStatus := osClean;
   // Load properties values
   for LProp in AContext.GetProperties do
   begin

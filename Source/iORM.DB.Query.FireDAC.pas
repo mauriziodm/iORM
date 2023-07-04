@@ -44,13 +44,15 @@ type
 
   TioFDQuery = class(TInterfacedObject, IioQuery)
   private
-    FSqlConnection: IioConnection;
+    FSqlConnection: IioConnectionDB;
     FSqlQuery: TFDQuery;
     function _ParamByName(const AParamName: String): TFDParam;
     function _ParamByProp(const AProp: IioProperty): TFDParam;
     function _WhereParamByProp(const AProp: IioProperty): TFDParam;
+    function GetConnection: IioConnectionDB;
+    function GetSQL: TStrings;
   public
-    constructor Create(const AConnection: IioConnection);
+    constructor Create(const AConnection: IioConnectionDB);
     destructor Destroy; override;
     function GetQuery: TioInternalSqlQuery;
     procedure Next;
@@ -65,11 +67,10 @@ type
     function IsSqlEmpty: Boolean;
     function IsActive: Boolean;
     function ExecSQL: integer;
-    function GetSQL: TStrings;
     function Fields: TioFields;
     procedure FillQueryWhereParams(const AContext: IioContext);
-    procedure CleanConnectionRef;
     function CreateBlobStream(const AProperty: IioProperty; const Mode: TBlobStreamMode): TStream;
+    procedure CleanConnectionRef;
 
     procedure ParamByName_SetValue(const AParamName: String; const AValue: Variant);
     procedure ParamByProp_Clear(const AProp: IioProperty; const ADataType: TFieldType);
@@ -82,13 +83,16 @@ type
     procedure ParamByProp_SetValueByContext(const AProp: IioProperty; const AContext: IioContext);
     procedure ParamByProp_SetValueAsIntegerNullIfZero(const AProp: IioProperty; const AValue: Integer);
     procedure ParamByProp_LoadAsStreamObj(const AObj: TObject; const AProperty: IioProperty);
-    procedure ParamObjVer_SetValue(const AContext: IioContext);
+    procedure ParamObjVersion_SetValue(const AContext: IioContext);
+    procedure ParamObjCreated_SetValue(const AContext: IioContext);
+    procedure ParamObjUpdated_SetValue(const AContext: IioContext);
     procedure WhereParamByProp_SetValue(const AProp: IioProperty; const AValue: Variant);
     procedure WhereParamByProp_SetValueAsDateTime(const AProp: IioProperty; const AValue: TDateTime);
     procedure WhereParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
     procedure WhereParamObjID_SetValue(const AContext: IioContext);
-    procedure WhereParamObjVer_SetValue(const AContext: IioContext);
+    procedure WhereParamObjVersion_SetValue(const AContext: IioContext);
 
+    property Connection: IioConnectionDB read GetConnection;
     property SQL: TStrings read GetSQL;
   end;
 
@@ -118,7 +122,7 @@ begin
   FSqlQuery.Close;
 end;
 
-constructor TioFDQuery.Create(const AConnection: IioConnection);
+constructor TioFDQuery.Create(const AConnection: IioConnectionDB);
 begin
   inherited Create;
   FSqlQuery := TFDQuery.Create(nil);
@@ -189,6 +193,11 @@ begin
     else
       ParamByName_SetValue(AContext.GetTrueClass.GetSqlParamName, '%' + AContext.Where.TypeName + '%');
   end;
+end;
+
+function TioFDQuery.GetConnection: IioConnectionDB;
+begin
+  Result := FSqlConnection;
 end;
 
 function TioFDQuery.GetQuery: TioInternalSqlQuery;
@@ -352,19 +361,39 @@ begin
   WhereParamByProp_SetValue(AContext.GetProperties.GetIdProperty, AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsVariant);
 end;
 
-procedure TioFDQuery.ParamObjVer_SetValue(const AContext: IioContext);
+procedure TioFDQuery.ParamObjCreated_SetValue(const AContext: IioContext);
+var
+  LProp: IioProperty;
+begin
+  LProp := AContext.GetProperties.ObjCreatedProperty;
+  // NB: SQLite NON supporta nativamente i TDateTime quindi li salvo come numeri reali
+  if FSqlConnection.GetConnectionInfo.ConnectionType = TioConnectionType.cdtSQLite then
+    ParamByProp_SetValueAsFloat(LProp, Connection.LastTransactionTimestamp)
+  else
+    ParamByProp_SetValueAsDateTime(LProp, Connection.LastTransactionTimestamp);
+end;
+
+procedure TioFDQuery.ParamObjUpdated_SetValue(const AContext: IioContext);
+var
+  LProp: IioProperty;
+begin
+  LProp := AContext.GetProperties.ObjUpdatedProperty;
+  // NB: SQLite NON supporta nativamente i TDateTime quindi li salvo come numeri reali
+  if FSqlConnection.GetConnectionInfo.ConnectionType = TioConnectionType.cdtSQLite then
+    ParamByProp_SetValueAsFloat(LProp, Connection.LastTransactionTimestamp)
+  else
+    ParamByProp_SetValueAsDateTime(LProp, Connection.LastTransactionTimestamp);
+end;
+
+procedure TioFDQuery.ParamObjVersion_SetValue(const AContext: IioContext);
 var
   LProp: IioProperty;
 begin
   LProp := AContext.GetProperties.ObjVersionProperty;
-  // NB: SQLite NON supporta nativamente i TDateTime quindi li salvo come numeri reali
-  if FSqlConnection.GetConnectionInfo.ConnectionType = TioConnectionType.cdtSQLite then
-    ParamByProp_SetValueAsFloat(LProp, AContext.TransactionTimestamp)
-  else
-    ParamByProp_SetValueAsDateTime(LProp, AContext.TransactionTimestamp);
+  ParamByProp_SetValueAsIntegerNullIfZero(LProp, AContext.ObjVersion+1);
 end;
 
-procedure TioFDQuery.WhereParamObjVer_SetValue(const AContext: IioContext);
+procedure TioFDQuery.WhereParamObjVersion_SetValue(const AContext: IioContext);
 var
   LProp: IioProperty;
 begin

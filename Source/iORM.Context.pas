@@ -60,22 +60,23 @@ type
     // MasterPropertyPath
     function GetMasterPropertyPath: String;
     // ObjStatus
-    function GetObjStatusProperty: TioObjStatus;
-    procedure SetObjStatusProperty(const AValue: TioObjStatus);
+    function GetObjStatus: TioObjStatus;
+    procedure SetObjStatus(const AValue: TioObjStatus);
     function ObjStatusPropertyExist: Boolean;
     // ObjVersion
-    function GetObjVersionProperty: TioObjVersion;
-    procedure SetObjVersionProperty(const AValue: TioObjVersion);
+    procedure IncrementObjVersion;
     function ObjVersionPropertyExist: Boolean;
     function IsObjVersionProperty(const AProp: IioProperty): Boolean;
+    function GetObjVersion: TioObjVersion;
+//    procedure SetObjVersion(const AValue: TioObjVersion); // Codice commentato anche nella parte implementation
     // ObjCreated
-    function GetObjCreatedProperty: TioObjCreated;
-    procedure SetObjCreatedProperty(const AValue: TioObjCreated);
+    function GetObjCreated: TioObjCreated;
+    procedure SetObjCreated(const AValue: TioObjCreated);
     function ObjCreatedPropertyExist: Boolean;
     function IsObjCreatedProperty(const AProp: IioProperty): Boolean;
     // ObjUpdated
-    function GetObjUpdatedProperty: TioObjUpdated;
-    procedure SetObjUpdatedProperty(const AValue: TioObjUpdated);
+    function GetObjUpdated: TioObjUpdated;
+    procedure SetObjUpdated(const AValue: TioObjUpdated);
     function ObjUpdatedPropertyExist: Boolean;
     function IsObjUpdatedProperty(const AProp: IioProperty): Boolean;
     // RelationOID
@@ -102,8 +103,6 @@ type
     function WhereExist: Boolean;
     function GetID: Integer;
     function IDIsNull: Boolean;
-    // TransactionTimestamp
-    function TransactionTimestamp: TDateTime;
     // Map
     function Map: IioMap;
     // Blob field present
@@ -116,10 +115,10 @@ type
     function GetJoin: IioJoins;
     // Properties
     property DataObject: TObject read GetDataObject write SetDataObject;
-    property ObjStatusProperty: TioObjStatus read GetObjStatusProperty write SetObjStatusProperty;
-    property ObjVersionProperty: TioObjVersion read GetObjVersionProperty write SetObjVersionProperty;
-    property ObjCreatedProperty: TioObjCreated read GetObjCreatedProperty write SetObjCreatedProperty;
-    property ObjUpdatedProperty: TioObjUpdated read GetObjUpdatedProperty write SetObjUpdatedProperty;
+    property ObjStatus: TioObjStatus read GetObjStatus write SetObjStatus;
+    property ObjVersion: TioObjVersion read GetObjVersion; // write SetObjVersion;  // Codice commentato anche nella parte interface e implementation
+    property ObjCreated: TioObjCreated read GetObjCreated write SetObjCreated;
+    property ObjUpdated: TioObjUpdated read GetObjUpdated write SetObjUpdated;
     property Where: IioWhere read GetWhere write SetWhere;
     property RelationOID: Integer read GetRelationOID write SetRelationOID;
     property MasterPropertyPath: String read GetMasterPropertyPath;
@@ -142,17 +141,6 @@ uses
 function TioContext.BlobFieldExists: Boolean;
 begin
   Result := Self.GetProperties.BlobFieldExists;
-end;
-
-function TioContext.TransactionTimestamp: TDateTime;
-var
-  LConnection: IioConnection;
-begin
-  LConnection := TioDbFactory.Connection(GetTable.GetConnectionDefName);
-  if LConnection.IsDBConnection then
-    Result := LConnection.AsDBConnection.TransactionTimestamp
-  else
-    Result := TRANSACTION_TIMESTAMP_NULL;
 end;
 
 function TioContext.GetTrueClass: IioTrueClass;
@@ -221,7 +209,7 @@ begin
   Result := FMasterPropertyPath;
 end;
 
-function TioContext.GetObjCreatedProperty: TioObjCreated;
+function TioContext.GetObjCreated: TioObjCreated;
 begin
   if ObjCreatedPropertyExist then
     Result := GetProperties.ObjCreatedProperty.GetValue(FDataObject).AsType<TioObjCreated>
@@ -229,7 +217,7 @@ begin
     Result := TRANSACTION_TIMESTAMP_NULL;
 end;
 
-function TioContext.GetObjStatusProperty: TioObjStatus;
+function TioContext.GetObjStatus: TioObjStatus;
 begin
   if ObjStatusPropertyExist then
     Result := TioObjStatus(GetProperties.ObjStatusProperty.GetValue(FDataObject).AsOrdinal)
@@ -237,7 +225,7 @@ begin
     Result := osDirty;
 end;
 
-function TioContext.GetObjUpdatedProperty: TioObjUpdated;
+function TioContext.GetObjUpdated: TioObjUpdated;
 begin
   if ObjUpdatedPropertyExist then
     Result := GetProperties.ObjUpdatedProperty.GetValue(FDataObject).AsType<TioObjUpdated>
@@ -245,12 +233,12 @@ begin
     Result := TRANSACTION_TIMESTAMP_NULL;
 end;
 
-function TioContext.GetObjVersionProperty: TioObjVersion;
+function TioContext.GetObjVersion: TioObjVersion;
 begin
   if ObjVersionPropertyExist then
     Result := GetProperties.ObjVersionProperty.GetValue(FDataObject).AsType<TioObjVersion>
   else
-    Result := TRANSACTION_TIMESTAMP_NULL;
+    Result := OBJVERSION_NULL;
 end;
 
 function TioContext.GetOrderBySql: String;
@@ -291,7 +279,7 @@ begin
   FHasManyChildVirtualPropertyValue := Value;
 end;
 
-procedure TioContext.SetObjCreatedProperty(const AValue: TioObjCreated);
+procedure TioContext.SetObjCreated(const AValue: TioObjCreated);
 var
   LPropValue: TValue;
 begin
@@ -301,7 +289,7 @@ begin
   GetProperties.ObjCreatedProperty.SetValue(FDataObject, LPropValue);
 end;
 
-procedure TioContext.SetObjStatusProperty(const AValue: TioObjStatus);
+procedure TioContext.SetObjStatus(const AValue: TioObjStatus);
 var
   LPropValue: TValue;
 begin
@@ -311,7 +299,7 @@ begin
   GetProperties.ObjStatusProperty.SetValue(FDataObject, LPropValue);
 end;
 
-procedure TioContext.SetObjUpdatedProperty(const AValue: TioObjUpdated);
+procedure TioContext.SetObjUpdated(const AValue: TioObjUpdated);
 var
   LPropValue: TValue;
 begin
@@ -321,15 +309,15 @@ begin
   GetProperties.ObjUpdatedProperty.SetValue(FDataObject, LPropValue);
 end;
 
-procedure TioContext.SetObjVersionProperty(const AValue: TioObjVersion);
-var
-  LPropValue: TValue;
-begin
-  if not ObjVersionPropertyExist then
-    Exit;
-  LPropValue := TValue.From<TioObjVersion>(AValue);
-  GetProperties.ObjVersionProperty.SetValue(FDataObject, LPropValue);
-end;
+//procedure TioContext.SetObjVersion(const AValue: TioObjVersion);
+//var
+//  LPropValue: TValue;
+//begin
+//  if not ObjVersionPropertyExist then
+//    Exit;
+//  LPropValue := TValue.From<TioObjVersion>(AValue);
+//  GetProperties.ObjVersionProperty.SetValue(FDataObject, LPropValue);
+//end;
 
 procedure TioContext.SetOriginalNonTrueClassMap(const AMap: IioMap);
 begin
@@ -359,6 +347,18 @@ end;
 function TioContext.IDIsNull: Boolean;
 begin
   Result := (not Assigned(FDataObject)) or (GetID = IO_INTEGER_NULL_VALUE);
+end;
+
+procedure TioContext.IncrementObjVersion;
+var
+  LPropValue: TValue;
+  LValue: Integer;
+begin
+  if not ObjVersionPropertyExist then
+    Exit;
+  LValue := GetProperties.ObjVersionProperty.GetValue(FDataObject).AsType<TioObjVersion>;
+  LPropValue := TValue.From<TioObjVersion>(LValue + 1);
+  GetProperties.ObjVersionProperty.SetValue(FDataObject, LPropValue);
 end;
 
 function TioContext.IsObjCreatedProperty(const AProp: IioProperty): Boolean;

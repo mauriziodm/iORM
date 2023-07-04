@@ -188,8 +188,8 @@ begin
   // ...else create a new query and insert it in the QueryContainer of the connection
   if not LConnection.AsDBConnection.QueryContainer.TryGetQuery(AQueryIdentity, Result) then
   begin
-    Result := TioFDQuery.Create(LConnection);
-    LConnection.AsDBConnection.QueryContainer.AddQuery(AQueryIdentity, Result);
+    Result := TioFDQuery.Create(LConnection.AsDBConnection);
+    Result.Connection.QueryContainer.AddQuery(AQueryIdentity, Result);
   end;
 
 end;

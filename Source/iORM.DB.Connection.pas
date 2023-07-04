@@ -93,8 +93,8 @@ type
   public
     constructor Create(const AConnection:TioInternalSqlConnection; const AQueryContainer:IioQueryContainer; const AConnectionInfo:TioConnectionInfo);
     destructor Destroy; override;
-    procedure TransactionTimestampReset;
-    function TransactionTimestamp: TDateTime;
+    procedure LastTransactionTimestampReset;
+    function LastTransactionTimestamp: TDateTime;
     function AsDBConnection: IioConnectionDB; override;
     function QueryContainer: IioQueryContainer;
     function GetConnection: TioInternalSqlConnection;
@@ -200,7 +200,7 @@ begin
 
   FConnection := AConnection;
   FQueryContainer := AQueryContainer;
-  TransactionTimestampReset;
+  LastTransactionTimestampReset;
 end;
 
 destructor TioConnectionDB.Destroy;
@@ -226,6 +226,7 @@ procedure TioConnectionDB.DoStartTransaction;
 begin
   inherited;
   FConnection.StartTransaction;
+  LastTransactionTimestampReset;
 end;
 
 function TioConnectionDB.GetConnection: TioInternalSqlConnection;
@@ -274,14 +275,14 @@ begin
   end;
 end;
 
-function TioConnectionDB.TransactionTimestamp: TDateTime;
+function TioConnectionDB.LastTransactionTimestamp: TDateTime;
 begin
   if FTransactionTimestamp = TRANSACTION_TIMESTAMP_NULL then
     FTransactionTimestamp := GetCurrentTimeStamp;
   Result := FTransactionTimestamp;
 end;
 
-procedure TioConnectionDB.TransactionTimestampReset;
+procedure TioConnectionDB.LastTransactionTimestampReset;
 begin
   FTransactionTimestamp := TRANSACTION_TIMESTAMP_NULL;
 end;

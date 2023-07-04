@@ -308,9 +308,9 @@ begin
   TioDBFactory.QueryEngine.GetQueryInsert(AContext).ExecSQL;
   if not ABlindInsertUpdate then
   begin
-    AContext.ObjVersionProperty := AContext.TransactionTimestamp;
-    AContext.ObjCreatedProperty := AContext.TransactionTimestamp;
-    AContext.ObjUpdatedProperty := AContext.ObjCreatedProperty;
+//    AContext.ObjVersionProperty := AContext.TransactionTimestamp;
+    AContext.ObjCreated := AQuery.Connection.LastTransactionTimestamp;
+    AContext.ObjUpdated := AQuery.Connection.LastTransactionTimestamp;
   end;
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the last ID generated
@@ -442,7 +442,7 @@ begin
     PreProcessRelationChildOnPersist(LContext);
     // Process the current object
     // --------------------------
-    case LContext.ObjStatusProperty of
+    case LContext.ObjStatus of
       // Persist if dirty
       osDirty:
         begin
@@ -455,7 +455,7 @@ begin
               UpdateObject(LContext, ABlindInsertUpdate)
             else
               InsertObject(LContext, ABlindInsertUpdate);
-            LContext.ObjStatusProperty := osClean;
+            LContext.ObjStatus := osClean;
           end;
         end;
       // Delete if deleted
@@ -824,10 +824,17 @@ begin
   LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext);
   if not LQuery.ExecSQL > 0 then
     raise EioConcurrencyConflictException.Create(Self.ClassName, 'UpdateObject', AContext);
+  // Update the ObjVersion if enabled
+//  if AContext.ObjVersionPropertyExist then
+
+
+
+
+
   if not ABlindInsertUpdate then
   begin
-    AContext.ObjVersionProperty := AContext.TransactionTimestamp;
-    AContext.ObjUpdatedProperty := AContext.TransactionTimestamp;
+//    AContext.ObjVersionProperty := AContext.TransactionTimestamp;
+    AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;;
   end;
 end;
 

@@ -49,6 +49,7 @@ uses
   iORM.Where.SqlItems.Interfaces, iORM.Context.Map.Interfaces;
 
 const
+  OBJVERSION_NULL = 0;
   TRANSACTION_TIMESTAMP_NULL = 0;
 
   KEY_WHERE = 'Where';
@@ -145,8 +146,8 @@ type
     ['{997CFE22-031A-468A-BF67-E076C43DC0E2}']
     function GetConnection: TioInternalSqlConnection;
     function QueryContainer: IioQueryContainer;
-    function TransactionTimestamp: TDateTime;
-    procedure TransactionTimestampReset;
+    function LastTransactionTimestamp: TDateTime;
+    procedure LastTransactionTimestampReset;
   end;
 
   IioRemoteRequestBody = interface;
@@ -178,7 +179,6 @@ type
     function IsSqlEmpty: Boolean;
     function IsActive: Boolean;
     function ExecSQL: integer;
-    function GetSQL: TStrings;
     function Fields: TioFields;
     function ExtractTrueClassName(const AContext: IioContext): String;
     procedure FillQueryWhereParams(const AContext: IioContext);
@@ -195,13 +195,22 @@ type
     procedure ParamByProp_SetValueByContext(const AProp: IioProperty; const AContext: IioContext);
     procedure ParamByProp_SetValueAsIntegerNullIfZero(const AProp: IioProperty; const AValue: integer);
     procedure ParamByProp_LoadAsStreamObj(const AObj: TObject; const AProperty: IioProperty);
-    procedure ParamObjVer_SetValue(const AContext: IioContext);
+
+    procedure ParamObjVersion_SetValue(const AContext: IioContext);
+    procedure ParamObjCreated_SetValue(const AContext: IioContext);
+    procedure ParamObjUpdated_SetValue(const AContext: IioContext);
+
     // procedure WhereParamByProp_SetValue(const AProp: IioProperty; const AValue: Variant);
     // procedure WhereParamByProp_SetValueAsDateTime(const AProp: IioProperty; const AValue: TDateTime);
     // procedure WhereParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
     procedure WhereParamObjID_SetValue(const AContext: IioContext);
-    procedure WhereParamObjVer_SetValue(const AContext: IioContext);
+    procedure WhereParamObjVersion_SetValue(const AContext: IioContext);
 
+    // Connection property
+    function GetConnection: IioConnectionDB;
+    property Connection: IioConnectionDB read GetConnection;
+    // SQL property
+    function GetSQL: TStrings;
     property SQL: TStrings read GetSQL;
   end;
 
@@ -246,7 +255,6 @@ type
     class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
     class procedure GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext); virtual;
     class procedure GenerateSqlUpdate(const AQuery: IioQuery; const AContext: IioContext); virtual;
-
     class function GenerateSqlSelectNestedWhere_OLD(const AMap: IioMap; const ANestedCriteria: IioSqlItemCriteria): String; virtual;
   end;
 
