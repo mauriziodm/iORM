@@ -265,15 +265,22 @@ type
     // ObjStatus property
     function GetObjStatusProperty: IioProperty;
     procedure SetObjStatusProperty(const AValue: IioProperty);
+    function ObjStatusPropertyExist: Boolean;
     // ObjVersion property
     function GetObjVersionProperty: IioProperty;
     procedure SetObjVersionProperty(const AValue: IioProperty);
+    function ObjVersionPropertyExist: Boolean;
+    function IsObjVersionProperty(const AProperty: IioProperty): Boolean;
     // ObjCreated property
     function GetObjCreatedProperty: IioProperty;
     procedure SetObjCreatedProperty(const AValue: IioProperty);
+    function ObjCreatedPropertyExist: Boolean;
+    function IsObjCreatedProperty(const AProperty: IioProperty): Boolean;
     // ObjLastUpdate property
     function GetObjUpdatedProperty: IioProperty;
     procedure SetObjUpdatedProperty(const AValue: IioProperty);
+    function ObjUpdatedPropertyExist: Boolean;
+    function IsObjUpdateProperty(const AProperty: IioProperty): Boolean;
   public
     constructor Create; reintroduce;
     destructor Destroy; override;
@@ -289,11 +296,8 @@ type
     // Blob field present
     function BlobFieldExists: Boolean;
     // ObjStatus property
-    function ObjStatusExist: Boolean;
     property ObjStatusProperty: IioProperty read GetObjStatusProperty write SetObjStatusProperty;
     // ObjVersion property
-    function ObjVersionExist: Boolean;
-    function IsObjVersionProperty(const AProperty: IioProperty): Boolean;
     property ObjVersionProperty: IioProperty read GetObjVersionProperty write SetObjVersionProperty;
     // ObjCreated property
     property ObjCreatedProperty: IioProperty read GetObjCreatedProperty write SetObjCreatedProperty;
@@ -979,10 +983,10 @@ begin
     if not ATrueClassVirtualMapProperties.PropertyExists(LProperty.GetName) then
       ATrueClassVirtualMapProperties.Add(LProperty);
   // Copy ObjStatus property to TrueClassVirtualMap.Properties if not already exists
-  if ObjStatusExist and not ATrueClassVirtualMapProperties.ObjStatusExist then
+  if ObjStatusPropertyExist and not ATrueClassVirtualMapProperties.ObjStatusPropertyExist then
     ATrueClassVirtualMapProperties.ObjStatusProperty := ObjStatusProperty;
   // Copy ObjVersion property to TrueClassVirtualMap.Properties if not already exists
-  if ObjVersionExist and not ATrueClassVirtualMapProperties.ObjVersionExist then
+  if ObjVersionPropertyExist and not ATrueClassVirtualMapProperties.ObjVersionPropertyExist then
     ATrueClassVirtualMapProperties.ObjVersionProperty := ObjVersionProperty;
 end;
 
@@ -1041,17 +1045,37 @@ begin
   raise EioException.Create(ClassName, 'GetSql', 'Method not to be called on this class');
 end;
 
+function TioProperties.IsObjCreatedProperty(const AProperty: IioProperty): Boolean;
+begin
+  Result := Assigned(AProperty) and (AProperty = FObjCreatedProperty);
+end;
+
+function TioProperties.IsObjUpdateProperty(const AProperty: IioProperty): Boolean;
+begin
+  Result := Assigned(AProperty) and (AProperty = FObjUpdatedProperty);
+end;
+
 function TioProperties.IsObjVersionProperty(const AProperty: IioProperty): Boolean;
 begin
   Result := Assigned(AProperty) and (AProperty = FObjVersionProperty);
 end;
 
-function TioProperties.ObjStatusExist: Boolean;
+function TioProperties.ObjCreatedPropertyExist: Boolean;
+begin
+  Result := Assigned(FObjCreatedProperty);
+end;
+
+function TioProperties.ObjStatusPropertyExist: Boolean;
 begin
   Result := Assigned(FObjStatusProperty);
 end;
 
-function TioProperties.ObjVersionExist: Boolean;
+function TioProperties.ObjUpdatedPropertyExist: Boolean;
+begin
+  Result := Assigned(FObjUpdatedProperty);
+end;
+
+function TioProperties.ObjVersionPropertyExist: Boolean;
 begin
   Result := Assigned(FObjVersionProperty);
 end;

@@ -173,24 +173,26 @@ type
     procedure SetTable(const ATable:IioTable);
     // Blob field present
     function BlobFieldExists: Boolean;
-    // ObjectStatus Exist
-    function ObjStatusExist: Boolean;
-    // ObjectVersion Exist
-    function ObjVersionExist: Boolean;
-    function IsObjVersionProperty(const AProperty: IioProperty): Boolean;
     // ObjectStatus property
+    function ObjStatusPropertyExist: Boolean;
     function GetObjStatusProperty: IioProperty;
     procedure SetObjStatusProperty(const AValue: IioProperty);
     property ObjStatusProperty:IioProperty read GetObjStatusProperty write SetObjStatusProperty;
     // ObjVersion property
+    function ObjVersionPropertyExist: Boolean;
+    function IsObjVersionProperty(const AProperty: IioProperty): Boolean;
     function GetObjVersionProperty: IioProperty;
     procedure SetObjVersionProperty(const AValue: IioProperty);
     property ObjVersionProperty: IioProperty read GetObjVersionProperty write SetObjVersionProperty;
     // ObjCreated property
+    function ObjCreatedPropertyExist: Boolean;
+    function IsObjCreatedProperty(const AProperty: IioProperty): Boolean;
     function GetObjCreatedProperty: IioProperty;
     procedure SetObjCreatedProperty(const AValue: IioProperty);
     property ObjCreatedProperty: IioProperty read GetObjCreatedProperty write SetObjCreatedProperty;
     // ObjLastUpdate property
+    function ObjUpdatedPropertyExist: Boolean;
+    function IsObjUpdateProperty(const AProperty: IioProperty): Boolean;
     function GetObjUpdatedProperty: IioProperty;
     procedure SetObjUpdatedProperty(const AValue: IioProperty);
     property ObjUpdatedProperty: IioProperty read GetObjUpdatedProperty write SetObjUpdatedProperty;

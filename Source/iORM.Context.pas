@@ -338,12 +338,12 @@ end;
 
 function TioContext.ObjStatusExist: Boolean;
 begin
-  Result := GetProperties.ObjStatusExist;
+  Result := GetProperties.ObjStatusPropertyExist;
 end;
 
 function TioContext.ObjVersionExist: Boolean;
 begin
-  Result := GetProperties.ObjVersionExist;
+  Result := GetProperties.ObjVersionPropertyExist;
 end;
 
 end.
