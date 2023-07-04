@@ -70,7 +70,7 @@ type
   TioObjStatus = (osDirty = 0, osClean, osDeleted);
 
   // Object version
-  TioObjVersion = type Integer;
+  TioObjVersion = type TDateTime;
 
   // Object creation and last update DateTime
   TioObjCreated = type TDateTime;

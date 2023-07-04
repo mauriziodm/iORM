@@ -47,7 +47,7 @@ type
   TioStrategyDB = class(TioStrategyIntf)
   protected
     class procedure InsertObject(const AContext: IioContext; const ABlindInsert: Boolean);
-    class procedure UpdateObject(const AContext: IioContext);
+    class procedure UpdateObject(const AContext: IioContext; const ABlindInsert: Boolean);
     class procedure DeleteObject_Internal(const AContext: IioContext);
     class procedure PreProcessRelationChildOnDelete(const AMasterContext: IioContext);
     class procedure PreProcessRelationChildOnPersist(const AMasterContext: IioContext);
@@ -304,22 +304,15 @@ begin
   // -----------------------------------------------------------
 
 { TODO : DA SISTEMARE OBJVERSION E SIMILARI }
-  // Create and execute insert query and set the version of the entity
+  // Create and execute insert query and set the version/created/updated of the entity
   // (if it's not a BlindInsert and versioning is enabled for this entity type)
   TioDBFactory.QueryEngine.GetQueryInsert(AContext).ExecSQL;
-//  if not ABlindInsert then
-//    AContext.ObjVersion := AContext.TransactionTimestamp;
-
-
-
-//  if not ABlindInsert then
-//  begin
-//
-//  end;
-
-
-
-
+  if not ABlindInsert then
+  begin
+    AContext.ObjVersionProperty := AContext.TransactionTimestamp;
+    AContext.ObjCreatedProperty := AContext.TransactionTimestamp;
+    AContext.ObjUpdatedProperty := AContext.ObjCreatedProperty;
+  end;
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the last ID generated
   // in the last insert query.
@@ -460,7 +453,7 @@ begin
           begin
             // if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
             if (not ABlindInsert) and (not LContext.IDIsNull) and Self.ObjectExists(LContext) then
-              UpdateObject(LContext)
+              UpdateObject(LContext, ABlindInsert)
             else
               InsertObject(LContext, ABlindInsert);
             LContext.ObjStatusProperty := osClean;
@@ -821,19 +814,22 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.UpdateObject(const AContext: IioContext);
+class procedure TioStrategyDB.UpdateObject(const AContext: IioContext; const ABlindInsert: Boolean);
 var
   LQuery: IioQuery;
 begin
   inherited;
 { TODO : DA SISTEMARE OBJVERSION E SIMILARI }
-  // Create and execute the query to update the entity into the DB cheking the version to avoid concurrrency
+  // Create and execute the query to update the entity into the DB cheking the version to avoid concurrency
   // conflict (if versioning is enabled for this type of entity)
   LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext);
-  if LQuery.ExecSQL > 0 then
-//    AContext.ObjVersion := AContext.TransactionTimestamp
-  else
+  if not LQuery.ExecSQL > 0 then
     raise EioConcurrencyConflictException.Create(Self.ClassName, 'UpdateObject', AContext);
+  if not ABlindInsert then
+  begin
+    AContext.ObjVersionProperty := AContext.TransactionTimestamp;
+    AContext.ObjUpdatedProperty := AContext.TransactionTimestamp;
+  end;
 end;
 
 { TioContextCache }
