@@ -76,13 +76,13 @@ type
 //    procedure SetObjVersion(const AValue: TioObjVersion);
     property ObjVersion:TioObjVersion read GetObjVersion; // write SetObjVersion;
     // ObjCreated
-    function ObjCreatedPropertyExist: Boolean;
+//    function ObjCreatedPropertyExist: Boolean;
 //    function IsObjCreatedProperty(const AProp: IioProperty): Boolean;
     function GetObjCreated: TioObjCreated;
     procedure SetObjCreated(const AValue: TioObjCreated);
     property ObjCreated: TioObjCreated read GetObjCreated write SetObjCreated;
     // ObjUpdated
-    function ObjUpdatedPropertyExist: Boolean;
+//    function ObjUpdatedPropertyExist: Boolean;
 //    function IsObjUpdatedProperty(const AProp: IioProperty): Boolean;
     function GetObjUpdated: TioObjUpdated;
     procedure SetObjUpdated(const AValue: TioObjUpdated);

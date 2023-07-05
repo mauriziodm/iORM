@@ -66,18 +66,14 @@ type
     // ObjVersion
     function NextObjVersion(const ASetValue: Boolean): TioObjVersion;
     function ObjVersionPropertyExist: Boolean;
-    function IsObjVersionProperty(const AProp: IioProperty): Boolean;
-    function GetObjVersion: TioObjVersion;  // Codice commentato anche nella parte implementation
-//    procedure SetObjVersion(const AValue: TioObjVersion); // Codice commentato anche nella parte implementation
+    function GetObjVersion: TioObjVersion;
     // ObjCreated
     function GetObjCreated: TioObjCreated;
     procedure SetObjCreated(const AValue: TioObjCreated);
-    function ObjCreatedPropertyExist: Boolean;
     function IsObjCreatedProperty(const AProp: IioProperty): Boolean;
     // ObjUpdated
     function GetObjUpdated: TioObjUpdated;
     procedure SetObjUpdated(const AValue: TioObjUpdated);
-    function ObjUpdatedPropertyExist: Boolean;
     function IsObjUpdatedProperty(const AProp: IioProperty): Boolean;
     // RelationOID
     function GetRelationOID: Integer;
@@ -116,7 +112,7 @@ type
     // Properties
     property DataObject: TObject read GetDataObject write SetDataObject;
     property ObjStatus: TioObjStatus read GetObjStatus write SetObjStatus;
-    property ObjVersion: TioObjVersion read GetObjVersion; // write SetObjVersion;  // Codice commentato anche nella parte interface e implementation
+    property ObjVersion: TioObjVersion read GetObjVersion;
     property ObjCreated: TioObjCreated read GetObjCreated write SetObjCreated;
     property ObjUpdated: TioObjUpdated read GetObjUpdated write SetObjUpdated;
     property Where: IioWhere read GetWhere write SetWhere;
@@ -211,7 +207,7 @@ end;
 
 function TioContext.GetObjCreated: TioObjCreated;
 begin
-  if ObjCreatedPropertyExist then
+  if GetProperties.ObjCreatedPropertyExist then
     Result := GetProperties.ObjCreatedProperty.GetValue(FDataObject).AsType<TioObjCreated>
   else
     Result := TRANSACTION_TIMESTAMP_NULL;
@@ -227,7 +223,7 @@ end;
 
 function TioContext.GetObjUpdated: TioObjUpdated;
 begin
-  if ObjUpdatedPropertyExist then
+  if GetProperties.ObjUpdatedPropertyExist then
     Result := GetProperties.ObjUpdatedProperty.GetValue(FDataObject).AsType<TioObjUpdated>
   else
     Result := TRANSACTION_TIMESTAMP_NULL;
@@ -275,7 +271,7 @@ procedure TioContext.SetObjCreated(const AValue: TioObjCreated);
 var
   LPropValue: TValue;
 begin
-  if not ObjCreatedPropertyExist then
+  if not GetProperties.ObjCreatedPropertyExist then
     Exit;
   LPropValue := TValue.From<TioObjCreated>(AValue);
   GetProperties.ObjCreatedProperty.SetValue(FDataObject, LPropValue);
@@ -295,7 +291,7 @@ procedure TioContext.SetObjUpdated(const AValue: TioObjUpdated);
 var
   LPropValue: TValue;
 begin
-  if not ObjUpdatedPropertyExist then
+  if not GetProperties.ObjUpdatedPropertyExist then
     Exit;
   LPropValue := TValue.From<TioObjUpdated>(AValue);
   GetProperties.ObjUpdatedProperty.SetValue(FDataObject, LPropValue);
@@ -308,16 +304,6 @@ begin
   else
     Result := OBJVERSION_NULL;
 end;
-
-//procedure TioContext.SetObjVersion(const AValue: TioObjVersion);
-//var
-//  LPropValue: TValue;
-//begin
-//  if not ObjVersionPropertyExist then
-//    Exit;
-//  LPropValue := TValue.From<TioObjVersion>(AValue);
-//  GetProperties.ObjVersionProperty.SetValue(FDataObject, LPropValue);
-//end;
 
 procedure TioContext.SetOriginalNonTrueClassMap(const AMap: IioMap);
 begin
@@ -376,11 +362,6 @@ begin
   Result := GetProperties.IsObjUpdatedProperty(AProp);
 end;
 
-function TioContext.IsObjVersionProperty(const AProp: IioProperty): Boolean;
-begin
-  Result := GetProperties.IsObjVersionProperty(AProp);
-end;
-
 function TioContext.IsTrueClass: Boolean;
 begin
   Result := Self.GetTable.IsTrueClass and ((not Assigned(FWhere)) or (not FWhere.GetDisableStrictlyTrueClass));
@@ -391,19 +372,9 @@ begin
   Result := FMap;
 end;
 
-function TioContext.ObjCreatedPropertyExist: Boolean;
-begin
-  Result := GetProperties.ObjCreatedPropertyExist;
-end;
-
 function TioContext.ObjStatusPropertyExist: Boolean;
 begin
   Result := GetProperties.ObjStatusPropertyExist;
-end;
-
-function TioContext.ObjUpdatedPropertyExist: Boolean;
-begin
-  Result := GetProperties.ObjUpdatedPropertyExist;
 end;
 
 function TioContext.ObjVersionPropertyExist: Boolean;
