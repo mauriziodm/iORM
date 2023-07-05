@@ -183,19 +183,16 @@ type
     property ObjStatusProperty:IioProperty read GetObjStatusProperty write SetObjStatusProperty;
     // ObjVersion property
     function ObjVersionPropertyExist: Boolean;
-    function IsObjVersionProperty(const AProperty: IioProperty): Boolean;
     function GetObjVersionProperty: IioProperty;
     procedure SetObjVersionProperty(const AValue: IioProperty);
     property ObjVersionProperty: IioProperty read GetObjVersionProperty write SetObjVersionProperty;
     // ObjCreated property
     function ObjCreatedPropertyExist: Boolean;
-    function IsObjCreatedProperty(const AProperty: IioProperty): Boolean;
     function GetObjCreatedProperty: IioProperty;
     procedure SetObjCreatedProperty(const AValue: IioProperty);
     property ObjCreatedProperty: IioProperty read GetObjCreatedProperty write SetObjCreatedProperty;
     // ObjUpdated property
     function ObjUpdatedPropertyExist: Boolean;
-    function IsObjUpdatedProperty(const AProperty: IioProperty): Boolean;
     function GetObjUpdatedProperty: IioProperty;
     procedure SetObjUpdatedProperty(const AValue: IioProperty);
     property ObjUpdatedProperty: IioProperty read GetObjUpdatedProperty write SetObjUpdatedProperty;

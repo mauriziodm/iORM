@@ -276,17 +276,14 @@ type
     function GetObjVersionProperty: IioProperty;
     procedure SetObjVersionProperty(const AValue: IioProperty);
     function ObjVersionPropertyExist: Boolean;
-    function IsObjVersionProperty(const AProperty: IioProperty): Boolean;
     // ObjCreated property
     function GetObjCreatedProperty: IioProperty;
     procedure SetObjCreatedProperty(const AValue: IioProperty);
     function ObjCreatedPropertyExist: Boolean;
-    function IsObjCreatedProperty(const AProperty: IioProperty): Boolean;
     // ObjLastUpdate property
     function GetObjUpdatedProperty: IioProperty;
     procedure SetObjUpdatedProperty(const AValue: IioProperty);
     function ObjUpdatedPropertyExist: Boolean;
-    function IsObjUpdatedProperty(const AProperty: IioProperty): Boolean;
   public
     constructor Create; reintroduce;
     destructor Destroy; override;
@@ -1067,21 +1064,6 @@ end;
 function TioProperties.GetSql: String;
 begin
   raise EioException.Create(ClassName, 'GetSql', 'Method not to be called on this class');
-end;
-
-function TioProperties.IsObjCreatedProperty(const AProperty: IioProperty): Boolean;
-begin
-  Result := Assigned(AProperty) and (AProperty = FObjCreatedProperty);
-end;
-
-function TioProperties.IsObjUpdatedProperty(const AProperty: IioProperty): Boolean;
-begin
-  Result := Assigned(AProperty) and (AProperty = FObjUpdatedProperty);
-end;
-
-function TioProperties.IsObjVersionProperty(const AProperty: IioProperty): Boolean;
-begin
-  Result := Assigned(AProperty) and (AProperty = FObjVersionProperty);
 end;
 
 function TioProperties.ObjCreatedPropertyExist: Boolean;
