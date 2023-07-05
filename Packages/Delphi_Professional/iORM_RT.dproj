@@ -372,6 +372,7 @@
         <DCCReference Include="..\..\Source\iORM.Where.SmartBuilder.pas"/>
         <DCCReference Include="..\..\Source\iORM.Abstraction.uniGUI.pas"/>
         <DCCReference Include="..\..\Source\iORM.Where.NestedProp.Resolver.pas"/>
+        <DCCReference Include="..\..\Source\iORM.ETM.Interfaces.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
