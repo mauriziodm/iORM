@@ -44,7 +44,7 @@ uses
   iORM.Context.Properties.Interfaces, iORM.Where.SmartBuilder;
 
 const
-  IORM_VERSION = 'iORM 2 (beta 2.2)';
+  IORM_VERSION = 'iORM 2 (beta 2.3)';
 
 {$REGION 'Value aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
   // TioTypeOfCollection = (tcSingleObject, tcList);
