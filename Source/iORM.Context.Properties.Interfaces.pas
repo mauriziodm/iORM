@@ -94,6 +94,9 @@ type
     function IsSqlUpdateRequestCompliant: Boolean;
     procedure SetIsID(const AValue:Boolean);
     function IsID: Boolean;
+    function IsObjVersion: Boolean;
+    function IsObjCreated: Boolean;
+    function IsObjUpdated: Boolean;
     function IsDBWriteEnabled: Boolean;
     function IsDBReadEnabled: Boolean;
     function IsInstance: Boolean;

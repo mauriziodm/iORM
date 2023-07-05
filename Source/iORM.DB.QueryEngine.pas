@@ -174,19 +174,19 @@ begin
     if not LProp.IsSqlInsertRequestCompliant(LIDIsNull) then
       Continue;
     // If the current prop is ObjVersion/ObjCreated/ObjUpdated and they are enabled...
-    if AContext.ObjVersionPropertyExist and AContext.IsObjVersionProperty(LProp) then
+    if LProp.IsObjVersion then
     begin
       LQuery.ParamObjVersion_SetValue(AContext);
       Continue;
     end
     else
-    if AContext.ObjUpdatedPropertyExist and AContext.IsObjUpdatedProperty(LProp) then
+    if LProp.IsObjUpdated then
     begin
       LQuery.ParamObjUpdated_SetValue(AContext);
       Continue;
     end
     else
-    if AContext.ObjCreatedPropertyExist and AContext.IsObjCreatedProperty(LProp) then
+    if LProp.IsObjCreated then
     begin
       LQuery.ParamObjCreated_SetValue(AContext);
       Continue;
@@ -322,15 +322,21 @@ begin
     if not LProp.IsSqlUpdateRequestCompliant then
       Continue;
     // If the current prop is ObjVersion/ObjCreated/ObjUpdated and they are enabled...
-    if AContext.ObjVersionPropertyExist and AContext.IsObjVersionProperty(LProp) then
+    if LProp.IsObjVersion then
     begin
       LQuery.ParamObjVersion_SetValue(AContext);
       Continue;
     end
     else
-    if AContext.ObjUpdatedPropertyExist and AContext.IsObjUpdatedProperty(LProp) then
+    if LProp.IsObjUpdated then
     begin
       LQuery.ParamObjUpdated_SetValue(AContext);
+      Continue;
+    end
+    else
+    if LProp.IsObjCreated then
+    begin
+      LQuery.ParamObjCreated_SetValue(AContext);
       Continue;
     end;
     // Relation type
@@ -357,6 +363,6 @@ begin
   LQuery.WhereParamObjID_SetValue(AContext);
   if AContext.ObjVersionPropertyExist then
     LQuery.WhereParamObjVersion_SetValue(AContext);
-end;
+ end;
 
 end.

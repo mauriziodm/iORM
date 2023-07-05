@@ -398,11 +398,7 @@ var
   LProp: IioProperty;
 begin
   LProp := AContext.GetProperties.ObjVersionProperty;
-  // NB: SQLite NON supporta nativamente i TDateTime quindi li salvo come numeri reali
-  if FSqlConnection.GetConnectionInfo.ConnectionType = TioConnectionType.cdtSQLite then
-    WhereParamByProp_SetValueAsFloat(LProp, LProp.GetValue(AContext.DataObject).AsVariant)
-  else
-    WhereParamByProp_SetValueAsDateTime(LProp, LProp.GetValue(AContext.DataObject).AsVariant);
+  WhereParamByProp_SetValue(LProp, LProp.GetValue(AContext.DataObject).AsVariant);
 end;
 
 procedure TioFDQuery.ParamByProp_SetValueByContext(const AProp: IioProperty; const AContext: IioContext);

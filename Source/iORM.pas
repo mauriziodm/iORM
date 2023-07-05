@@ -154,6 +154,8 @@ type
   TioLogicOp = iORM.CommonTypes.TioLogicOp;
   TioObjStatus = iORM.CommonTypes.TioObjStatus;
   TioObjVersion = iORM.CommonTypes.TioObjVersion;
+  TioObjCreated = iORM.CommonTypes.TioObjCreated;
+  TioObjUpdated = iORM.CommonTypes.TioObjUpdated;
   TioSelectionType = iORM.CommonTypes.TioSelectionType;
   TioShowWaitProc = iORM.CommonTypes.TioShowWaitProc;
   TioTypeOfCollection = iORM.CommonTypes.TioTypeOfCollection;

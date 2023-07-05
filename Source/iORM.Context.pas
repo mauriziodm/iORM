@@ -67,7 +67,7 @@ type
     function NextObjVersion(const ASetValue: Boolean): TioObjVersion;
     function ObjVersionPropertyExist: Boolean;
     function IsObjVersionProperty(const AProp: IioProperty): Boolean;
-//    function GetObjVersion: TioObjVersion;  // Codice commentato anche nella parte implementation
+    function GetObjVersion: TioObjVersion;  // Codice commentato anche nella parte implementation
 //    procedure SetObjVersion(const AValue: TioObjVersion); // Codice commentato anche nella parte implementation
     // ObjCreated
     function GetObjCreated: TioObjCreated;
@@ -116,7 +116,7 @@ type
     // Properties
     property DataObject: TObject read GetDataObject write SetDataObject;
     property ObjStatus: TioObjStatus read GetObjStatus write SetObjStatus;
-//    property ObjVersion: TioObjVersion read GetObjVersion write SetObjVersion;  // Codice commentato anche nella parte interface e implementation
+    property ObjVersion: TioObjVersion read GetObjVersion; // write SetObjVersion;  // Codice commentato anche nella parte interface e implementation
     property ObjCreated: TioObjCreated read GetObjCreated write SetObjCreated;
     property ObjUpdated: TioObjUpdated read GetObjUpdated write SetObjUpdated;
     property Where: IioWhere read GetWhere write SetWhere;
@@ -301,13 +301,13 @@ begin
   GetProperties.ObjUpdatedProperty.SetValue(FDataObject, LPropValue);
 end;
 
-//function TioContext.GetObjVersion: TioObjVersion;
-//begin
-//  if ObjVersionPropertyExist then
-//    Result := GetProperties.ObjVersionProperty.GetValue(FDataObject).AsType<TioObjVersion>
-//  else
-//    Result := OBJVERSION_NULL;
-//end;
+function TioContext.GetObjVersion: TioObjVersion;
+begin
+  if ObjVersionPropertyExist then
+    Result := GetProperties.ObjVersionProperty.GetValue(FDataObject).AsType<TioObjVersion>
+  else
+    Result := OBJVERSION_NULL;
+end;
 
 //procedure TioContext.SetObjVersion(const AValue: TioObjVersion);
 //var
@@ -355,10 +355,10 @@ var
 begin
   if ObjVersionPropertyExist then
   begin
-    Result := GetProperties.ObjVersionProperty.GetValue(FDataObject).AsType<TioObjVersion>;
+    Result := GetProperties.ObjVersionProperty.GetValue(FDataObject).AsType<TioObjVersion> + 1;
     if ASetValue then
     begin
-      LPropValue := TValue.From<TioObjVersion>(Result + 1);
+      LPropValue := TValue.From<TioObjVersion>(Result);
       GetProperties.ObjVersionProperty.SetValue(FDataObject, LPropValue);
     end;
   end

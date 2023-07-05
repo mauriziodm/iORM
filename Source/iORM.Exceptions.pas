@@ -77,8 +77,12 @@ constructor EioConcurrencyConflictException.Create(const AClassName, AMethodName
 var
   LMsg: String;
 begin
-  LMsg := Format('Concurrency conflict persisting "%s" entity with ID = %d on table "%s" using "%s" connection.',
-    [AContext.GetClassRef.ClassName, AContext.GetID, AContext.GetTable.TableName, AContext.GetTable.GetConnectionDefName]);
+  if AContext.ObjVersionPropertyExist then
+    LMsg := Format('Concurrency conflict persisting a "%s" entity with ID = %d, ObjVersion = %d on table "%s" using "%s" connection.',
+      [AContext.GetClassRef.ClassName, AContext.GetID, AContext.ObjVersion, AContext.GetTable.TableName, AContext.GetTable.GetConnectionDefName])
+  else
+    LMsg := Format('Concurrency conflict persisting a "%s" entity with ID = %d on table "%s" using "%s" connection.',
+      [AContext.GetClassRef.ClassName, AContext.GetID, AContext.GetTable.TableName, AContext.GetTable.GetConnectionDefName]);
   inherited Create(AClassName, AMethodName, LMsg);
 end;
 

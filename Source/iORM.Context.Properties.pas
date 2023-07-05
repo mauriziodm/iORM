@@ -114,6 +114,9 @@ type
       const AMetadata_Default: TValue; const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string;
       const AMetadata_FKCreate: TioFKCreate; const AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction: TioFKAction); overload;
   public
+    FIsObjVersion: Boolean;
+    FIsObjCreated: Boolean;
+    FIsObjUpdated: Boolean;
     constructor Create(const ARttiProperty: TRttiProperty; const ATable: IioTable; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String;
       const ATransient, AIsID: Boolean; const AReadWrite: TioLoadPersist; const ARelationType: TioRelationType;
       const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLazyLoad: Boolean; const ANotHasMany: Boolean;
@@ -157,6 +160,9 @@ type
     function IsSqlInsertRequestCompliant(const AIDIsNull: Boolean): Boolean;
     function IsSqlUpdateRequestCompliant: Boolean;
     function IsID: Boolean;
+    function IsObjVersion: Boolean;
+    function IsObjCreated: Boolean;
+    function IsObjUpdated: Boolean;
     function IsInterface: Boolean;
     function IsDBWriteEnabled: Boolean;
     function IsDBReadEnabled: Boolean;
@@ -339,6 +345,9 @@ begin
     AMetadata_FKCreate, AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction);
 
   FRttiProperty := ARttiProperty;
+  FIsObjVersion := FRttiProperty.PropertyType.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjVersion));
+  FIsObjCreated := FRttiProperty.PropertyType.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjCreated));
+  FIsObjUpdated := FRttiProperty.PropertyType.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjUpdated));
 end;
 
 constructor TioProperty.Create(const ATable: IioTable; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String; const ATransient, AIsID: Boolean;
@@ -705,6 +714,21 @@ end;
 function TioProperty.IsInterface: Boolean;
 begin
   Result := (Self.GetRttiType.TypeKind = tkInterface);
+end;
+
+function TioProperty.IsObjCreated: Boolean;
+begin
+  Result := FIsObjCreated;
+end;
+
+function TioProperty.IsObjUpdated: Boolean;
+begin
+  Result := FIsObjUpdated;
+end;
+
+function TioProperty.IsObjVersion: Boolean;
+begin
+  Result := FIsObjVersion;
 end;
 
 function TioProperty.IsDBReadEnabled: Boolean;
@@ -1126,6 +1150,9 @@ begin
 
   FRttiProperty := ARttiField;
   FName := Self.Remove_F_FromName(ARttiField.Name);
+  FIsObjVersion := FRttiProperty.FieldType.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjVersion));
+  FIsObjCreated := FRttiProperty.FieldType.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjCreated));
+  FIsObjUpdated := FRttiProperty.FieldType.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjUpdated));
 end;
 
 function TioField.GetName: String;

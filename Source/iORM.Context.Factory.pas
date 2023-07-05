@@ -189,7 +189,7 @@ begin
     tkFloat:
       if AQualifiedName = 'System.TDate' then
         Exit(ioMdDate)
-      else if (AQualifiedName = 'System.TDateTime') or (AQualifiedName = 'iORM.CommonTypes.TioObjVersion') then
+      else if (AQualifiedName = 'System.TDateTime') or (AQualifiedName = 'iORM.CommonTypes.TioObjCreated') or (AQualifiedName = 'iORM.CommonTypes.TioObjUpdated') then
         Exit(ioMdDateTime)
       else if AQualifiedName = 'System.TTime' then
         Exit(ioMdTime)
@@ -408,7 +408,7 @@ var
       begin
         if TioUtilities.TryGetMemberAttribute<ioField>(LMember, LAttribute) then
           LMember_FieldName := ioField(LAttribute).Value;
-        Result.ObjCreatedProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone, '', '', '',
+        Result.ObjUpdatedProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone, '', '', '',
           False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType,
           LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
         Result.Add(Result.ObjUpdatedProperty);

@@ -819,13 +819,16 @@ begin
   // Create and execute the query to update the entity into the DB cheking the version to avoid concurrency
   // conflict (if versioning is enabled for this type of entity)
   LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext);
-  if not LQuery.ExecSQL > 0 then
+  if LQuery.ExecSQL > 0 then
+  begin
+    // Increment the ObjVersion if enabled (if exists)
+    AContext.NextObjVersion(True);
+    // Update the ObjUpdated property (if exists)
+    if not ABlindInsertUpdate then
+      AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;;
+  end
+  else
     raise EioConcurrencyConflictException.Create(Self.ClassName, 'UpdateObject', AContext);
-  // Increment the ObjVersion if enabled (if exists)
-  AContext.NextObjVersion(True);
-  // Update the ObjUpdated property (if exists)
-  if not ABlindInsertUpdate then
-    AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;;
 end;
 
 { TioContextCache }
