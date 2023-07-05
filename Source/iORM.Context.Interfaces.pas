@@ -57,33 +57,23 @@ type
     function IDIsNull: Boolean;
     // Map
     function Map: IioMap;
-    // Blob field present
-    function BlobFieldExists: Boolean;
     // DataObject
     procedure SetDataObject(const AValue: TObject);
     function GetDataObject: TObject;
     property DataObject:TObject read GetDataObject write SetDataObject;
     // ObjectStatus
-    function ObjStatusPropertyExist: Boolean;
     procedure SetObjStatus(const AValue: TioObjStatus);
     function GetObjStatus: TioObjStatus;
     property ObjStatus:TioObjStatus read GetObjStatus write SetObjStatus;
     // ObjVersion
     function NextObjVersion(const ASetValue: Boolean): TioObjVersion;
-    function ObjVersionPropertyExist: Boolean;
-//    function IsObjVersionProperty(const AProp: IioProperty): Boolean;
     function GetObjVersion: TioObjVersion;
-//    procedure SetObjVersion(const AValue: TioObjVersion);
     property ObjVersion:TioObjVersion read GetObjVersion; // write SetObjVersion;
     // ObjCreated
-//    function ObjCreatedPropertyExist: Boolean;
-//    function IsObjCreatedProperty(const AProp: IioProperty): Boolean;
     function GetObjCreated: TioObjCreated;
     procedure SetObjCreated(const AValue: TioObjCreated);
     property ObjCreated: TioObjCreated read GetObjCreated write SetObjCreated;
     // ObjUpdated
-//    function ObjUpdatedPropertyExist: Boolean;
-//    function IsObjUpdatedProperty(const AProp: IioProperty): Boolean;
     function GetObjUpdated: TioObjUpdated;
     procedure SetObjUpdated(const AValue: TioObjUpdated);
     property ObjUpdated: TioObjUpdated read GetObjUpdated write SetObjUpdated;
@@ -96,7 +86,7 @@ type
     // OrderBy
     function GetOrderBySql: String;
     // Join
-    function GetJoin: IioJoins;
+//    function GetJoin: IioJoins;
     // RelationOID
     function GetRelationOID: Integer;
     procedure SetRelationOID(const Value: Integer);

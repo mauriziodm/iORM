@@ -77,7 +77,7 @@ constructor EioConcurrencyConflictException.Create(const AClassName, AMethodName
 var
   LMsg: String;
 begin
-  if AContext.ObjVersionPropertyExist then
+  if AContext.GetProperties.ObjVersionPropertyExist then
     LMsg := Format('Concurrency conflict persisting a "%s" entity with ID = %d, ObjVersion = %d on table "%s" using "%s" connection.',
       [AContext.GetClassRef.ClassName, AContext.GetID, AContext.ObjVersion, AContext.GetTable.TableName, AContext.GetTable.GetConnectionDefName])
   else

@@ -361,7 +361,7 @@ begin
     LQuery.ParamByName_SetValue(AContext.GetTrueClass.GetSqlParamName, AContext.GetTrueClass.GetValue);
   // Where conditions (with ObjVersion if exists for this entity type)
   LQuery.WhereParamObjID_SetValue(AContext);
-  if AContext.ObjVersionPropertyExist then
+  if AContext.GetProperties.ObjVersionPropertyExist then
     LQuery.WhereParamObjVersion_SetValue(AContext);
  end;
 

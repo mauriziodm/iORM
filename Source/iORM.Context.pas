@@ -62,19 +62,15 @@ type
     // ObjStatus
     function GetObjStatus: TioObjStatus;
     procedure SetObjStatus(const AValue: TioObjStatus);
-    function ObjStatusPropertyExist: Boolean;
     // ObjVersion
     function NextObjVersion(const ASetValue: Boolean): TioObjVersion;
-    function ObjVersionPropertyExist: Boolean;
     function GetObjVersion: TioObjVersion;
     // ObjCreated
     function GetObjCreated: TioObjCreated;
     procedure SetObjCreated(const AValue: TioObjCreated);
-    function IsObjCreatedProperty(const AProp: IioProperty): Boolean;
     // ObjUpdated
     function GetObjUpdated: TioObjUpdated;
     procedure SetObjUpdated(const AValue: TioObjUpdated);
-    function IsObjUpdatedProperty(const AProp: IioProperty): Boolean;
     // RelationOID
     function GetRelationOID: Integer;
     procedure SetRelationOID(const Value: Integer);
@@ -101,8 +97,6 @@ type
     function IDIsNull: Boolean;
     // Map
     function Map: IioMap;
-    // Blob field present
-    function BlobFieldExists: Boolean;
     // GroupBy
     function GetGroupBySql: String;
     // OrderBy
@@ -133,11 +127,6 @@ uses
   System.StrUtils, iORM.DB.Interfaces;
 
 { TioContext }
-
-function TioContext.BlobFieldExists: Boolean;
-begin
-  Result := Self.GetProperties.BlobFieldExists;
-end;
 
 function TioContext.GetTrueClass: IioTrueClass;
 begin
@@ -215,7 +204,7 @@ end;
 
 function TioContext.GetObjStatus: TioObjStatus;
 begin
-  if ObjStatusPropertyExist then
+  if GetProperties.ObjStatusPropertyExist then
     Result := TioObjStatus(GetProperties.ObjStatusProperty.GetValue(FDataObject).AsOrdinal)
   else
     Result := osDirty;
@@ -281,7 +270,7 @@ procedure TioContext.SetObjStatus(const AValue: TioObjStatus);
 var
   LPropValue: TValue;
 begin
-  if not ObjStatusPropertyExist then
+  if not GetProperties.ObjStatusPropertyExist then
     Exit;
   LPropValue := TValue.From<TioObjStatus>(AValue);
   GetProperties.ObjStatusProperty.SetValue(FDataObject, LPropValue);
@@ -299,7 +288,7 @@ end;
 
 function TioContext.GetObjVersion: TioObjVersion;
 begin
-  if ObjVersionPropertyExist then
+  if GetProperties.ObjVersionPropertyExist then
     Result := GetProperties.ObjVersionProperty.GetValue(FDataObject).AsType<TioObjVersion>
   else
     Result := OBJVERSION_NULL;
@@ -339,7 +328,7 @@ function TioContext.NextObjVersion(const ASetValue: Boolean): TioObjVersion;
 var
   LPropValue: TValue;
 begin
-  if ObjVersionPropertyExist then
+  if GetProperties.ObjVersionPropertyExist then
   begin
     Result := GetProperties.ObjVersionProperty.GetValue(FDataObject).AsType<TioObjVersion> + 1;
     if ASetValue then
@@ -352,16 +341,6 @@ begin
     Result := OBJVERSION_NULL;
 end;
 
-function TioContext.IsObjCreatedProperty(const AProp: IioProperty): Boolean;
-begin
-  Result := GetProperties.IsObjCreatedProperty(AProp);
-end;
-
-function TioContext.IsObjUpdatedProperty(const AProp: IioProperty): Boolean;
-begin
-  Result := GetProperties.IsObjUpdatedProperty(AProp);
-end;
-
 function TioContext.IsTrueClass: Boolean;
 begin
   Result := Self.GetTable.IsTrueClass and ((not Assigned(FWhere)) or (not FWhere.GetDisableStrictlyTrueClass));
@@ -370,16 +349,6 @@ end;
 function TioContext.Map: IioMap;
 begin
   Result := FMap;
-end;
-
-function TioContext.ObjStatusPropertyExist: Boolean;
-begin
-  Result := GetProperties.ObjStatusPropertyExist;
-end;
-
-function TioContext.ObjVersionPropertyExist: Boolean;
-begin
-  Result := GetProperties.ObjVersionPropertyExist;
 end;
 
 end.
