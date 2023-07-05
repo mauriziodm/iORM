@@ -332,12 +332,6 @@ begin
     begin
       LQuery.ParamObjUpdated_SetValue(AContext);
       Continue;
-    end
-    else
-    if LProp.IsObjCreated then
-    begin
-      LQuery.ParamObjCreated_SetValue(AContext);
-      Continue;
     end;
     // Relation type
     case LProp.GetRelationType of
