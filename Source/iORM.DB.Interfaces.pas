@@ -431,7 +431,7 @@ begin
   // Select Count From
   AQuery.SQL.Add('SELECT COUNT(*) FROM ' + AContext.GetTable.GetSQL);
   // Join
-  AQuery.SQL.Add(AContext.GetJoin.GetSQL);
+  AQuery.SQL.Add(AContext.GetTable.GetJoin.GetSQL);
   // If a Where exist then the query is an external query else
   // is an internal query.
   if AContext.WhereExist then
@@ -571,7 +571,7 @@ begin
   // From
   AQuery.SQL.Add('FROM ' + AContext.GetTable.GetSQL);
   // Join
-  AQuery.SQL.Add(AContext.GetJoin.GetSQL);
+  AQuery.SQL.Add(AContext.GetTable.GetJoin.GetSQL);
   // If a Where exist then the query is an external query else
   // is an internal query.
   if AContext.WhereExist then

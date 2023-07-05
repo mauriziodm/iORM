@@ -85,8 +85,6 @@ type
     function GetGroupBySql: String;
     // OrderBy
     function GetOrderBySql: String;
-    // Join
-//    function GetJoin: IioJoins;
     // RelationOID
     function GetRelationOID: Integer;
     procedure SetRelationOID(const Value: Integer);

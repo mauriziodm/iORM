@@ -101,8 +101,6 @@ type
     function GetGroupBySql: String;
     // OrderBy
     function GetOrderBySql: String;
-    // Join
-    function GetJoin: IioJoins;
     // Properties
     property DataObject: TObject read GetDataObject write SetDataObject;
     property ObjStatus: TioObjStatus read GetObjStatus write SetObjStatus;
@@ -177,11 +175,6 @@ begin
   if not Assigned(FDataObject) then
     raise EioException.Create(Self.ClassName + '.GetID: DataObject not assigned');
   Result := GetProperties.GetIdProperty.GetValue(FDataObject).AsInteger;
-end;
-
-function TioContext.GetJoin: IioJoins;
-begin
-  Result := Self.GetTable.GetJoin;
 end;
 
 function TioContext.GetMasterBSPersistence: TioBSPersistence;
