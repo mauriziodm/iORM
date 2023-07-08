@@ -51,6 +51,9 @@ const
   IO_CONNECTIONDEF_DEFAULTNAME = 'NO_NAME';
   IO_INTEGER_NULL_VALUE = 0;
 
+  IO_CURRENTUSERINFO_NAME_EMPTY = '';
+  IO_CURRENTUSERINFO_ID_EMPTY = 0;
+
   IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME = 'Master___ID';
 
 type
@@ -74,7 +77,11 @@ type
 
   // Object creation and last update DateTime
   TioObjCreated = type TDateTime;
+  TioObjCreatedUserID = type Integer;
+  TioObjCreatedUserName = type String;
   TioObjUpdated = type TDateTime;
+  TioObjUpdatedUserID = type Integer;
+  TioObjUpdatedUserName = type String;
 
   // Common ClassRef
   TioClassRef = class of TObject;

@@ -384,7 +384,7 @@ begin
     // If not in design or load mode the
     // NB: Messo anche qui perchè venga impostata la connessione di default anche a runtime
     if not((csDesigning in ComponentState) or (csLoading in ComponentState)) then
-      TioConnectionManager.Use(Self.Name);
+      TioConnectionManager.UseConnection(Self.Name);
   end;
 end;
 

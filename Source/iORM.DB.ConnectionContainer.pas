@@ -141,11 +141,16 @@ type
     class function GetCurrentConnectionNameIfEmpty(const AConnectionDefName: String): String;
     class function GetDatabaseFileName(const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): String;
     class function GetConnectionInfo(AConnectionName: String): TioConnectionInfo;
-    class procedure Use(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME);
     class procedure SetShowHideWaitProc(const AShowWaitProc: TProc; const AHideWaitProc: TProc);
     class procedure ShowWaitProc;
     class procedure HideWaitProc;
-    class procedure ThreadUse(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME);
+    // Use
+    class procedure UseConnection(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME);
+    class procedure UseUser(AUserID: Integer; AUserName: String = ''); overload;
+    class procedure UseUser(AUserName: String); overload;
+    class procedure ThreadUseConnection(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME);
+    class procedure ThreadUseUser(AUserID: Integer; AUserName: String = ''); overload;
+    class procedure ThreadUseUser(AUserName: String); overload;
     class procedure ThreadUseClear;
 {$IFDEF MSWINDOWS}
     class function Monitor: TioConnectionMonitorRef;
@@ -186,7 +191,7 @@ type
 implementation
 
 uses
-  System.Classes, iORM.Exceptions, iORM.Utilities;
+  System.Classes, iORM.Exceptions, iORM.Utilities, iORM.DB.Factory;
 
 { TioConnectionContainer }
 
@@ -299,6 +304,7 @@ end;
 
 class procedure TioConnectionManager.CreateInternalContainer;
 begin
+  FCurrentConnectionInfo := TioDBFactory.CurrentConnectionInfo;
   FConnectionManagerContainer := TioConnectionManagerContainer.Create;
   FPerThreadCurrentConnectionName := TioPerThreadCurrentConnectionName.Create;
 end;
@@ -366,8 +372,10 @@ class function TioConnectionManager.GetCurrentConnectionName: String;
 begin
   _Lock;
   try
-    if not FPerThreadCurrentConnectionName.TryGetValue(TioUtilities.GetThreadID, Result) then
-      Result := FCurrentConnectionName;
+    if FPerThreadCurrentConnectionName.ContainsKey(TioUtilities.GetThreadID) then
+      Result := FPerThreadCurrentConnectionName[TioUtilities.GetThreadID].CurrentConnectionName
+    else
+      Result := FCurrentConnectionInfo.CurrentConnectionName;
   finally
     _Unlock
   end;
@@ -400,14 +408,37 @@ begin
     FShowWaitProc;
 end;
 
-class procedure TioConnectionManager.ThreadUse(AConnectionName: String);
+class procedure TioConnectionManager.ThreadUseConnection(AConnectionName: String);
 begin
   _Lock;
   try
     // Verifica ed eventualmente defaultizza il parametro
     AConnectionName := CheckConnectionName(AConnectionName);
+    // If a CurrentConnectionInfo does not exists for the current thread the create it
+    if not FPerThreadCurrentConnectionName.ContainsKey(TioUtilities.GetThreadID) then
+      FPerThreadCurrentConnectionName.Add(TioUtilities.GetThreadID, TioDBFactory.CurrentConnectionInfo);
     // Set the current connection fot the currend thread
-    FPerThreadCurrentConnectionName.AddOrSetValue(TioUtilities.GetThreadID, AConnectionName);
+    FPerThreadCurrentConnectionName[TioUtilities.GetThreadID].CurrentConnectionName := AConnectionName;
+  finally
+    _Unlock;
+  end;
+end;
+
+class procedure TioConnectionManager.ThreadUseUser(AUserName: String);
+begin
+  Self.ThreadUseUser(IO_CURRENTUSERINFO_ID_EMPTY, AUserName);
+end;
+
+class procedure TioConnectionManager.ThreadUseUser(AUserID: Integer; AUserName: String);
+begin
+  _Lock;
+  try
+    // If a CurrentConnectionInfo does not exists for the current thread the create it
+    if not FPerThreadCurrentConnectionName.ContainsKey(TioUtilities.GetThreadID) then
+      FPerThreadCurrentConnectionName.Add(TioUtilities.GetThreadID, TioDBFactory.CurrentConnectionInfo);
+    // Set the current connection fot the currend thread
+    FPerThreadCurrentConnectionName[TioUtilities.GetThreadID].CurrentUserID := AUserID;
+    FPerThreadCurrentConnectionName[TioUtilities.GetThreadID].CurrentUserName := AUserName;
   finally
     _Unlock;
   end;
@@ -457,8 +488,8 @@ begin
   Result.Params.Pooled := APooled;
   // If the AsDefault param is True or this is the first ConnectionDef of the application
   // then set it as default
-  if AAsDefault or (Self.FCurrentConnectionName = '') then
-    Self.FCurrentConnectionName := AConnectionName;
+  if AAsDefault or (FCurrentConnectionInfo.CurrentConnectionName = '') then
+    FCurrentConnectionInfo.CurrentConnectionName := AConnectionName;
 end;
 
 class function TioConnectionManager.NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault: Boolean = True;
@@ -511,8 +542,8 @@ begin
   try
     // If the AsDefault param is True or this is the first ConnectionDef of the application
     // then set it as default
-    if AAsDefault or (Self.FCurrentConnectionName = '') then
-      Self.FCurrentConnectionName := AConnectionName;
+    if AAsDefault or (FCurrentConnectionInfo.CurrentConnectionName = '') then
+      FCurrentConnectionInfo.CurrentConnectionName := AConnectionName;
     // Setup the connection info
     LConnectionInfo := TioConnectionInfo.Create(AConnectionName, cdtRemote, APersistent, kgtUndefined);
     LConnectionInfo.BaseURL := ABaseURL;
@@ -559,17 +590,28 @@ begin
 end;
 {$ENDIF}
 
-class procedure TioConnectionManager.Use(AConnectionName: String);
+class procedure TioConnectionManager.UseConnection(AConnectionName: String);
 begin
   _Lock;
   try
     // Verifica ed eventualmente defaultizza il parametro
     AConnectionName := CheckConnectionName(AConnectionName);
     // Set the connection as default
-    FCurrentConnectionName := AConnectionName;
+    FCurrentConnectionInfo.CurrentConnectionName := AConnectionName;
   finally
     _Unlock;
   end;
+end;
+
+class procedure TioConnectionManager.UseUser(AUserName: String);
+begin
+  Self.UseUser(IO_CURRENTUSERINFO_ID_EMPTY, AUserName);
+end;
+
+class procedure TioConnectionManager.UseUser(AUserID: Integer; AUserName: String);
+begin
+  FCurrentConnectionInfo.CurrentUserID := AUserID;
+  FCurrentConnectionInfo.CurrentUserName := AUserName;
 end;
 
 class procedure TioConnectionManager.SetShowHideWaitProc(const AShowWaitProc: TProc; const AHideWaitProc: TProc);
