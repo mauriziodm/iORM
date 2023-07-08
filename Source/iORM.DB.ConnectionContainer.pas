@@ -103,12 +103,12 @@ type
   end;
 
   TioConnectionManagerContainer = TDictionary<String, TioConnectionInfo>;
-  TioPerThreadCurrentConnectionName = TDictionary<TThreadID, String>;
+  TioPerThreadCurrentConnectionName = TDictionary<TThreadID, IioCurrentConnectionInfo>;
   TioConnectionManagerRef = class of TioConnectionManager;
 
   TioConnectionManager = class // NB: Is thread-safe
   strict private
-    class var FCurrentConnectionName: String;
+    class var FCurrentConnectionInfo: IioCurrentConnectionInfo;
     class var FPerThreadCurrentConnectionName: TioPerThreadCurrentConnectionName;
     class var FConnectionManagerContainer: TioConnectionManagerContainer;
     // NB: Questo container in realtà contiene solo il tipo di DB (cdtFirebird, cdtSQLite ecc.ecc.) in modo da poter fare dei confronti veloci nelle factory e per non dipendere direttamente dal DriverID delle connectionDef di FireDAC
