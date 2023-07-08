@@ -145,7 +145,7 @@ end;
 
 function TioDBBuilderSchemaField.PrimaryKey: Boolean;
 begin
-  Result := FContextProperty.IsID;
+  Result := (FContextProperty.PropertyRole = prObjID);
 end;
 
 function TioDBBuilderSchemaField.FieldNotNull: Boolean;

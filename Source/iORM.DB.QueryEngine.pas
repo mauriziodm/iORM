@@ -49,7 +49,7 @@ type
   private
   protected
     /// This method compose the query identity string, if the query is not cachecable then return an empty string
-    ///  (an empty string disable the cacheability of a query)
+    /// (an empty string disable the cacheability of a query)
     class function ComposeQueryIdentity(const AContext: IioContext; const AIdentity: String; const AForceCacheable: Boolean): String;
   public
     class function GetQueryCount(const AContext: IioContext): IioQuery;
@@ -77,7 +77,7 @@ uses
 { TioQueryEngine }
 
 // This method compose the query identity string, if the query is not cachecable then return an empty string
-//  (an empty string disable the cacheability of a query)
+// (an empty string disable the cacheability of a query)
 class function TioQueryEngine.ComposeQueryIdentity(const AContext: IioContext; const AIdentity: String; const AForceCacheable: Boolean): String;
 begin
   if (AContext.WhereExist and AContext.Where.IsCacheable) or AForceCacheable then
@@ -170,42 +170,34 @@ begin
   // Iterate for all properties
   for LProp in AContext.GetProperties do
   begin
-    // If the current property is ReadOnly then skip it
-    if not LProp.IsSqlInsertRequestCompliant(LIDIsNull) then
-      Continue;
-    // If the current prop is ObjVersion/ObjCreated/ObjUpdated and they are enabled...
-    if LProp.IsObjVersion then
+    // If the current property is compliant then set the value (by property role) else skip it
+    if LProp.IsSqlInsertRequestCompliant(LIDIsNull) then
     begin
-      LQuery.ParamObjVersion_SetValue(AContext);
-      Continue;
-    end
-    else
-    if LProp.IsObjUpdated then
-    begin
-      LQuery.ParamObjUpdated_SetValue(AContext);
-      Continue;
-    end
-    else
-    if LProp.IsObjCreated then
-    begin
-      LQuery.ParamObjCreated_SetValue(AContext);
-      Continue;
-    end;
-    // Relation type
-    case LProp.GetRelationType of
-      // If RelationType = ioRTNone save the current property value normally
-      // If RelationType = ioRTEmbedded save the current property value normally (serialization is into the called method)
-      rtNone, rtEmbeddedHasMany, rtEmbeddedHasOne:
-       LQuery.ParamByProp_SetValueByContext(LProp, AContext);
-      // else if RelationType = ioRTBelongsTo then save the ID
-      rtBelongsTo:
-        LQuery.ParamByProp_SetValueAsIntegerNullIfZero(LProp, LProp.GetRelationChildObjectID(AContext.DataObject));
-      // else if RelationType = ioRTHasOne
-      rtHasOne: { Nothing }
-        ;
-      // else if RelationType = ioRTHasMany
-      rtHasMany: { Nothing }
-        ;
+      case LProp.PropertyRole of
+        prRegular, prObjID:
+          begin
+            case LProp.GetRelationType of
+              rtNone, rtEmbeddedHasMany, rtEmbeddedHasOne:
+                LQuery.ParamByProp_SetValueByContext(LProp, AContext);
+              rtBelongsTo:
+                LQuery.ParamByProp_SetValueAsIntegerNullIfZero(LProp, LProp.GetRelationChildObjectID(AContext.DataObject));
+            end;
+          end;
+        prObjVersion:
+          LQuery.ParamObjVersion_SetValue(AContext);
+        prObjUpdated:
+          LQuery.ParamObjUpdated_SetValue(AContext);
+        prObjUpdatedUserID:
+          LQuery.ParamObjUpdatedUserID_SetValue(AContext);
+        prObjUpdatedUserName:
+          LQuery.ParamObjUpdatedUserName_SetValue(AContext);
+        prObjCreated:
+          LQuery.ParamObjCreated_SetValue(AContext);
+        prObjCreatedUserID:
+          LQuery.ParamObjCreatedUserID_SetValue(AContext);
+        prObjCreatedUserName:
+          LQuery.ParamObjCreatedUserName_SetValue(AContext);
+      end;
     end;
   end;
   // Add the TrueClass value if enabled
@@ -318,36 +310,29 @@ begin
   // Iterate for all properties
   for LProp in AContext.GetProperties do
   begin
-    // If the current property is ReadOnly then skip it
-    if not LProp.IsSqlUpdateRequestCompliant then
-      Continue;
-    // If the current prop is ObjVersion/ObjCreated/ObjUpdated and they are enabled...
-    if LProp.IsObjVersion then
+    // If the current property is compliant then set the value (by property role) else skip it
+    //  NB: No prObjCreated... on updated query
+    if LProp.IsSqlUpdateRequestCompliant then
     begin
-      LQuery.ParamObjVersion_SetValue(AContext);
-      Continue;
-    end
-    else
-    if LProp.IsObjUpdated then
-    begin
-      LQuery.ParamObjUpdated_SetValue(AContext);
-      Continue;
-    end;
-    // Relation type
-    case LProp.GetRelationType of
-      // If RelationType = ioRTNone save the current property value normally
-      // If RelationType = ioRTEmbedded save the current property value normally (serialization is into the called method)
-      rtNone, rtEmbeddedHasMany, rtEmbeddedHasOne:
-        LQuery.ParamByProp_SetValueByContext(LProp, AContext);
-      // else if RelationType = ioRTBelongsTo then save the ID
-      rtBelongsTo:
-        LQuery.ParamByProp_SetValueAsIntegerNullIfZero(LProp, LProp.GetRelationChildObjectID(AContext.DataObject));
-      // else if RelationType = ioRTHasOne
-      rtHasOne: { Nothing }
-        ;
-      // else if RelationType = ioRTHasMany
-      rtHasMany: { Nothing }
-        ;
+      case LProp.PropertyRole of
+        prRegular, prObjID:
+          begin
+            case LProp.GetRelationType of
+              rtNone, rtEmbeddedHasMany, rtEmbeddedHasOne:
+                LQuery.ParamByProp_SetValueByContext(LProp, AContext);
+              rtBelongsTo:
+                LQuery.ParamByProp_SetValueAsIntegerNullIfZero(LProp, LProp.GetRelationChildObjectID(AContext.DataObject));
+            end;
+          end;
+        prObjVersion:
+          LQuery.ParamObjVersion_SetValue(AContext);
+        prObjUpdated:
+          LQuery.ParamObjUpdated_SetValue(AContext);
+        prObjUpdatedUserID:
+          LQuery.ParamObjUpdatedUserID_SetValue(AContext);
+        prObjUpdatedUserName:
+          LQuery.ParamObjUpdatedUserName_SetValue(AContext);
+      end;
     end;
   end;
   // Add the TrueClass value if enabled
@@ -357,6 +342,6 @@ begin
   LQuery.WhereParamObjID_SetValue(AContext);
   if AContext.GetProperties.ObjVersionPropertyExist then
     LQuery.WhereParamObjVersion_SetValue(AContext);
- end;
+end;
 
 end.

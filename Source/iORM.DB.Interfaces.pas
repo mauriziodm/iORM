@@ -208,11 +208,13 @@ type
     procedure ParamByProp_SetValueByContext(const AProp: IioProperty; const AContext: IioContext);
     procedure ParamByProp_SetValueAsIntegerNullIfZero(const AProp: IioProperty; const AValue: integer);
     procedure ParamByProp_LoadAsStreamObj(const AObj: TObject; const AProperty: IioProperty);
-
     procedure ParamObjVersion_SetValue(const AContext: IioContext);
     procedure ParamObjCreated_SetValue(const AContext: IioContext);
+    procedure ParamObjCreatedUserID_SetValue(const AContext: IioContext);
+    procedure ParamObjCreatedUserName_SetValue(const AContext: IioContext);
     procedure ParamObjUpdated_SetValue(const AContext: IioContext);
-
+    procedure ParamObjUpdatedUserID_SetValue(const AContext: IioContext);
+    procedure ParamObjUpdatedUserName_SetValue(const AContext: IioContext);
     // procedure WhereParamByProp_SetValue(const AProp: IioProperty; const AValue: Variant);
     // procedure WhereParamByProp_SetValueAsDateTime(const AProp: IioProperty; const AValue: TDateTime);
     // procedure WhereParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);

@@ -49,7 +49,6 @@ type
   // Classe che rappresenta una proprietà
   TioProperty = class(TInterfacedObject, IioProperty)
   strict private
-    FIsID: Boolean;
     FTransient: Boolean;
     FRttiProperty: TRttiProperty;
     FTypeAlias: String;
@@ -87,6 +86,10 @@ type
     FMetadata_FKCreate: TioFKCreate;
     FMetadata_FKOnDeleteAction: TioFKAction;
     FMetadata_FKOnUpdateAction: TioFKAction;
+
+    function IsObjCreateds: Boolean;
+    function IsObjUpdateds: Boolean;
+
     procedure SetRelationChildNameAndPath(const AQualifiedChildPropertyName: String);
     procedure SetFieldData;
     procedure SetLoadSqlData;
@@ -106,17 +109,17 @@ type
     function GetWhereNullValue: TValue;
     function GetWhereSkip: Boolean;
     function GetWhereTargetPropName: String;
+    function GetPropertyRole: TioPropertyRole;
   strict protected
+    FPropertyRole: TioPropertyRole;
     constructor Create(const ATable: IioTable; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String; const ATransient, AIsID: Boolean;
       const AReadWrite: TioLoadPersist; const ARelationType: TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias,
       ARelationChildPropertyName: String; const ARelationLazyLoad: Boolean; const ANotHasMany: Boolean; const AMetadata_FieldType: TioMetadataFieldType;
       const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer; const AMetadata_FieldScale: Integer; const AMetadata_FieldNotNull: Boolean;
       const AMetadata_Default: TValue; const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string;
       const AMetadata_FKCreate: TioFKCreate; const AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction: TioFKAction); overload;
+    function RttiTypeToPropertyRole: TioPropertyRole;
   public
-    FIsObjVersion: Boolean;
-    FIsObjCreated: Boolean;
-    FIsObjUpdated: Boolean;
     constructor Create(const ARttiProperty: TRttiProperty; const ATable: IioTable; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String;
       const ATransient, AIsID: Boolean; const AReadWrite: TioLoadPersist; const ARelationType: TioRelationType;
       const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLazyLoad: Boolean; const ANotHasMany: Boolean;
@@ -154,15 +157,10 @@ type
     function GetRelationChildObject(const Instance: Pointer; const AResolvePropertyPath: Boolean = True): TObject;
     function GetRelationChildObjectID(const Instance: Pointer): Integer;
     procedure SetTable(const ATable: IioTable);
-    procedure SetIsID(const AValue: Boolean);
 
     function IsSqlSelectRequestCompliant: Boolean;
     function IsSqlInsertRequestCompliant(const AIDIsNull: Boolean): Boolean;
     function IsSqlUpdateRequestCompliant: Boolean;
-    function IsID: Boolean;
-    function IsObjVersion: Boolean;
-    function IsObjCreated: Boolean;
-    function IsObjUpdated: Boolean;
     function IsInterface: Boolean;
     function IsDBWriteEnabled: Boolean;
     function IsDBReadEnabled: Boolean;
@@ -200,6 +198,7 @@ type
     function GetMetadata_FKOnDeleteAction: TioFKAction;
     function GetMetadata_FKOnUpdateAction: TioFKAction;
 
+    property PropertyRole: TioPropertyRole read GetPropertyRole;
     property WhereCompareOp: TioCompareOp read GetWhereCompareOp write SetWhereCompareOp;
     property WhereGroupName: String read GetWhereGroupName write SetWhereGroupName;
     property WhereGroupLogicOp: TioLogicOp read GetWhereGroupLogicOp write SetWhereGroupLogicOp;
@@ -265,7 +264,11 @@ type
     FObjStatusProperty: IioProperty;
     FObjVersionProperty: IioProperty;
     FObjCreatedProperty: IioProperty;
+    FObjCreatedUserIDProperty: IioProperty;
+    FObjCreatedUserNameProperty: IioProperty;
     FObjUpdatedProperty: IioProperty;
+    FObjUpdatedUserIDProperty: IioProperty;
+    FObjUpdatedUserNameProperty: IioProperty;
     FBlobFieldExists: Boolean;
   private
     // ObjStatus property
@@ -280,10 +283,26 @@ type
     function GetObjCreatedProperty: IioProperty;
     procedure SetObjCreatedProperty(const AValue: IioProperty);
     function ObjCreatedPropertyExist: Boolean;
+    // ObjCreatedUserID property
+    function GetObjCreatedUserIDProperty: IioProperty;
+    procedure SetObjCreatedUserIDProperty(const AValue: IioProperty);
+    function ObjCreatedUserIDPropertyExist: Boolean;
+    // ObjCreatedUserName property
+    function GetObjCreatedUserNameProperty: IioProperty;
+    procedure SetObjCreatedUserNameProperty(const AValue: IioProperty);
+    function ObjCreatedUserNamePropertyExist: Boolean;
     // ObjLastUpdate property
     function GetObjUpdatedProperty: IioProperty;
     procedure SetObjUpdatedProperty(const AValue: IioProperty);
     function ObjUpdatedPropertyExist: Boolean;
+    // ObjLastUpdateUserID property
+    function GetObjUpdatedUserIDProperty: IioProperty;
+    procedure SetObjUpdatedUserIDProperty(const AValue: IioProperty);
+    function ObjUpdatedUserIDPropertyExist: Boolean;
+    // ObjLastUpdateUserName property
+    function GetObjUpdatedUserNameProperty: IioProperty;
+    procedure SetObjUpdatedUserNameProperty(const AValue: IioProperty);
+    function ObjUpdatedUserNamePropertyExist: Boolean;
   public
     constructor Create; reintroduce;
     destructor Destroy; override;
@@ -304,8 +323,12 @@ type
     property ObjVersionProperty: IioProperty read GetObjVersionProperty write SetObjVersionProperty;
     // ObjCreated property
     property ObjCreatedProperty: IioProperty read GetObjCreatedProperty write SetObjCreatedProperty;
+    property ObjCreatedUserIDProperty: IioProperty read GetObjCreatedUserIDProperty write SetObjCreatedUserIDProperty;
+    property ObjCreatedUserNameProperty: IioProperty read GetObjCreatedUserNameProperty write SetObjCreatedUserNameProperty;
     // ObjLastUpdate property
     property ObjUpdatedProperty: IioProperty read GetObjUpdatedProperty write SetObjUpdatedProperty;
+    property ObjUpdatedUserIDProperty: IioProperty read GetObjUpdatedUserIDProperty write SetObjUpdatedUserIDProperty;
+    property ObjUpdatedUserNameProperty: IioProperty read GetObjUpdatedUserNameProperty write SetObjUpdatedUserNameProperty;
   end;
 
 implementation
@@ -340,11 +363,13 @@ begin
     ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLazyLoad, ANotHasMany, AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision,
     AMetadata_FieldScale, AMetadata_FieldNotNull, AMetadata_Default, AMetadata_FieldUnicode, AMetadata_CustomFieldType, AMetadata_FieldSubType,
     AMetadata_FKCreate, AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction);
-
+  // Set the RttiProperty
   FRttiProperty := ARttiProperty;
-  FIsObjVersion := FRttiProperty.PropertyType.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjVersion));
-  FIsObjCreated := FRttiProperty.PropertyType.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjCreated));
-  FIsObjUpdated := FRttiProperty.PropertyType.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjUpdated));
+  // Set the property role
+  if AIsID then
+    FPropertyRole := prObjID
+  else
+    FPropertyRole := RttiTypeToPropertyRole;
 end;
 
 constructor TioProperty.Create(const ATable: IioTable; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String; const ATransient, AIsID: Boolean;
@@ -360,7 +385,6 @@ begin
   FFieldDefinitionString := AFieldDefinitionString;
   FFieldType := AFieldType;
   FTransient := ATransient;
-  FIsID := AIsID;
   FReadWrite := AReadWrite;
   FLoadSql := ALoadSql;
   // Relation fields
@@ -472,7 +496,7 @@ end;
 
 function TioProperty.GetMetadata_FieldNotNull: Boolean;
 begin
-  Result := FMetadata_FieldNotNull or Self.IsID;
+  Result := FMetadata_FieldNotNull or (FPropertyRole = prObjID);
 end;
 
 function TioProperty.GetMetadata_FieldPrecision: Integer;
@@ -513,6 +537,11 @@ end;
 function TioProperty.GetName: String;
 begin
   Result := FRttiProperty.Name;
+end;
+
+function TioProperty.GetPropertyRole: TioPropertyRole;
+begin
+  Result := FPropertyRole;
 end;
 
 function TioProperty.GetRelationChildTypeAlias: String;
@@ -698,11 +727,6 @@ begin
   Result := ((FRelationType = rtNone) or (FRelationType = rtEmbeddedHasMany) or (FRelationType = rtEmbeddedHasOne)) and Self.GetFieldType.StartsWith('BLOB');
 end;
 
-function TioProperty.IsID: Boolean;
-begin
-  Result := FIsID;
-end;
-
 function TioProperty.IsInstance: Boolean;
 begin
   Result := Self.GetRttiType.IsInstance;
@@ -713,19 +737,14 @@ begin
   Result := (Self.GetRttiType.TypeKind = tkInterface);
 end;
 
-function TioProperty.IsObjCreated: Boolean;
+function TioProperty.IsObjCreateds: Boolean;
 begin
-  Result := FIsObjCreated;
+  Result := (FPropertyRole >= prObjCreated) and (FPropertyRole <= prObjCreatedUserName);
 end;
 
-function TioProperty.IsObjUpdated: Boolean;
+function TioProperty.IsObjUpdateds: Boolean;
 begin
-  Result := FIsObjUpdated;
-end;
-
-function TioProperty.IsObjVersion: Boolean;
-begin
-  Result := FIsObjVersion;
+  Result := (FPropertyRole >= prObjUpdated) and (FPropertyRole <= prObjUpdatedUserName);
 end;
 
 function TioProperty.IsDBReadEnabled: Boolean;
@@ -746,12 +765,12 @@ end;
 function TioProperty.IsSqlUpdateRequestCompliant: Boolean;
 begin
   { TODO : Una qualche sorta di parametro per poter decidere se nelle query update ci deve essere anche l'ID oppure no? }
-  Result := (FReadWrite >= lpLoadAndPersist) and (not FTransient) and (not FIsID) and (not FIsObjCreated) and not(FRelationType in [rtHasMany, rtHasOne]);
+  Result := (FReadWrite >= lpLoadAndPersist) and (not FTransient) and (FPropertyRole <> prObjID) and (not IsObjCreateds) and not(FRelationType in [rtHasMany, rtHasOne]);
 end;
 
 function TioProperty.IsSqlInsertRequestCompliant(const AIDIsNull: Boolean): Boolean;
 begin
-  Result := (FReadWrite >= lpLoadAndPersist) and (not FTransient) and (not(FRelationType in [rtHasMany, rtHasOne])) and ((not FIsID) or (not AIDIsNull));
+  Result := (FReadWrite >= lpLoadAndPersist) and (not FTransient) and (not(FRelationType in [rtHasMany, rtHasOne])) and ((FPropertyRole <> prObjID) or (not AIDIsNull));
 end;
 
 function TioProperty.IsStream: Boolean;
@@ -789,6 +808,33 @@ begin
   Result := Assigned(FRelationChildPropertyPath);
 end;
 
+function TioProperty.RttiTypeToPropertyRole: TioPropertyRole;
+begin
+  if not FRttiProperty.Name.StartsWith('TioObj') then
+    FPropertyRole := prRegular
+  else
+  if FRttiProperty.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjVersion)) then
+    FPropertyRole := prObjVersion
+  else
+  if FRttiProperty.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjUpdated)) then
+    FPropertyRole := prObjUpdated
+  else
+  if FRttiProperty.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjUpdatedUserID)) then
+    FPropertyRole := prObjUpdatedUserID
+  else
+  if FRttiProperty.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjUpdatedUserName)) then
+    FPropertyRole := prObjUpdatedUserName
+  else
+  if FRttiProperty.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjCreated)) then
+    FPropertyRole := prObjCreated
+  else
+  if FRttiProperty.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjCreatedUserID)) then
+    FPropertyRole := prObjCreatedUserID
+  else
+  if FRttiProperty.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjCreatedUserName)) then
+    FPropertyRole := prObjCreatedUserName;
+end;
+
 procedure TioProperty.SetFieldData;
 var
   LDotPos, LAsPos: Smallint;
@@ -820,11 +866,6 @@ begin
   FSqlFieldAlias := MidStr(LValue, LAsPos + 4, LValue.Length);
   if FSqlFieldAlias = '' then
     FSqlFieldAlias := FSqlFieldTableName + '_' + FSqlFieldName;
-end;
-
-procedure TioProperty.SetIsID(const AValue: Boolean);
-begin
-  FIsID := AValue;
 end;
 
 procedure TioProperty.SetLoadSqlData;
@@ -968,7 +1009,7 @@ end;
 procedure TioProperties.Add(const AProperty: IioProperty);
 begin
   FPropertyItems.Add(AProperty);
-  if AProperty.IsID then
+  if AProperty.PropertyRole = prObjID then
     FIdProperty := AProperty;
   if AProperty.IsBlob then
     FBlobFieldExists := True;
@@ -1036,6 +1077,16 @@ begin
   Result := FObjCreatedProperty;
 end;
 
+function TioProperties.GetObjCreatedUserIDProperty: IioProperty;
+begin
+  Result := FObjCreatedUserIDProperty;
+end;
+
+function TioProperties.GetObjCreatedUserNameProperty: IioProperty;
+begin
+  Result := FObjCreatedUserNameProperty;
+end;
+
 function TioProperties.GetObjStatusProperty: IioProperty;
 begin
   Result := FObjStatusProperty;
@@ -1044,6 +1095,16 @@ end;
 function TioProperties.GetObjUpdatedProperty: IioProperty;
 begin
   Result := FObjUpdatedProperty;
+end;
+
+function TioProperties.GetObjUpdatedUserIDProperty: IioProperty;
+begin
+  Result := FObjUpdatedUserIDProperty;
+end;
+
+function TioProperties.GetObjUpdatedUserNameProperty: IioProperty;
+begin
+  Result := FObjUpdatedUserNameProperty;
 end;
 
 function TioProperties.GetObjVersionProperty: IioProperty;
@@ -1071,6 +1132,16 @@ begin
   Result := Assigned(FObjCreatedProperty);
 end;
 
+function TioProperties.ObjCreatedUserIDPropertyExist: Boolean;
+begin
+  Result := Assigned(FObjCreatedUserIDProperty);
+end;
+
+function TioProperties.ObjCreatedUserNamePropertyExist: Boolean;
+begin
+  Result := Assigned(FObjCreatedUserNameProperty);
+end;
+
 function TioProperties.ObjStatusPropertyExist: Boolean;
 begin
   Result := Assigned(FObjStatusProperty);
@@ -1079,6 +1150,16 @@ end;
 function TioProperties.ObjUpdatedPropertyExist: Boolean;
 begin
   Result := Assigned(FObjUpdatedProperty);
+end;
+
+function TioProperties.ObjUpdatedUserIDPropertyExist: Boolean;
+begin
+  Result := Assigned(FObjUpdatedUserIDProperty);
+end;
+
+function TioProperties.ObjUpdatedUserNamePropertyExist: Boolean;
+begin
+  Result := Assigned(FObjUpdatedUserNameProperty);
 end;
 
 function TioProperties.ObjVersionPropertyExist: Boolean;
@@ -1091,6 +1172,16 @@ begin
   FObjCreatedProperty := AValue;
 end;
 
+procedure TioProperties.SetObjCreatedUserIDProperty(const AValue: IioProperty);
+begin
+  FObjCreatedUserIDProperty := AValue;
+end;
+
+procedure TioProperties.SetObjCreatedUserNameProperty(const AValue: IioProperty);
+begin
+  FObjCreatedUserNameProperty := AValue;
+end;
+
 procedure TioProperties.SetObjStatusProperty(const AValue: IioProperty);
 begin
   FObjStatusProperty := AValue;
@@ -1099,6 +1190,16 @@ end;
 procedure TioProperties.SetObjUpdatedProperty(const AValue: IioProperty);
 begin
   FObjUpdatedProperty := AValue;
+end;
+
+procedure TioProperties.SetObjUpdatedUserIDProperty(const AValue: IioProperty);
+begin
+  FObjUpdatedUserIDProperty := AValue;
+end;
+
+procedure TioProperties.SetObjUpdatedUserNameProperty(const AValue: IioProperty);
+begin
+  FObjUpdatedUserNameProperty := AValue;
 end;
 
 procedure TioProperties.SetObjVersionProperty(const AValue: IioProperty);
@@ -1129,12 +1230,15 @@ begin
     ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLazyLoad, ANotHasMany, AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision,
     AMetadata_FieldScale, AMetadata_FieldNotNull, AMetadata_Default, AMetadata_FieldUnicode, AMetadata_CustomFieldType, AMetadata_FieldSubType,
     AMetadata_FKCreate, AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction);
-
+  // Set the RttiProperty
   FRttiProperty := ARttiField;
+  // Clean the field name from the "T"
   FName := Self.Remove_F_FromName(ARttiField.Name);
-  FIsObjVersion := FRttiProperty.FieldType.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjVersion));
-  FIsObjCreated := FRttiProperty.FieldType.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjCreated));
-  FIsObjUpdated := FRttiProperty.FieldType.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjUpdated));
+  // Set the property role
+  if AIsID then
+    FPropertyRole := prObjID
+  else
+    FPropertyRole := RttiTypeToPropertyRole;
 end;
 
 function TioField.GetName: String;

@@ -137,6 +137,7 @@ type
     class function GetCurrentConnectionDef: IIoConnectionDef;
     class function GetConnectionDefByName(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
     class function IsEmptyConnectionName(const AConnectionName: String): Boolean;
+    class function GetCurrentConnectionInfo: IioCurrentConnectionInfo;
     class function GetCurrentConnectionName: String;
     class function GetCurrentConnectionNameIfEmpty(const AConnectionDefName: String): String;
     class function GetDatabaseFileName(const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): String;
@@ -365,6 +366,19 @@ begin
     Result := GetConnectionDefByName(GetCurrentConnectionName);
   finally
     _Unlock;
+  end;
+end;
+
+class function TioConnectionManager.GetCurrentConnectionInfo: IioCurrentConnectionInfo;
+begin
+  _Lock;
+  try
+    if FPerThreadCurrentConnectionName.ContainsKey(TioUtilities.GetThreadID) then
+      Result := FPerThreadCurrentConnectionName[TioUtilities.GetThreadID]
+    else
+      Result := FCurrentConnectionInfo;
+  finally
+    _Unlock
   end;
 end;
 

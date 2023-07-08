@@ -403,6 +403,30 @@ var
         Continue;
       end
       else
+      // ObjCreatedUserID property detection by type "TioObjCreatedUserID"
+      if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjCreatedUserID)) then
+      begin
+        if TioUtilities.TryGetMemberAttribute<ioField>(LMember, LAttribute) then
+          LMember_FieldName := ioField(LAttribute).Value;
+        Result.ObjCreatedUserIDProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone, '', '', '',
+          False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType,
+          LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
+        Result.Add(Result.ObjCreatedUserIDProperty);
+        Continue;
+      end
+      else
+      // ObjCreatedUserName property detection by type "TioObjCreatedUserName"
+      if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjCreatedUserName)) then
+      begin
+        if TioUtilities.TryGetMemberAttribute<ioField>(LMember, LAttribute) then
+          LMember_FieldName := ioField(LAttribute).Value;
+        Result.ObjCreatedUserNameProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone, '', '', '',
+          False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType,
+          LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
+        Result.Add(Result.ObjCreatedUserNameProperty);
+        Continue;
+      end
+      else
       // ObjUpdated property detection by type "TioObjUpdated"
       if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjUpdated)) then
       begin
@@ -412,6 +436,30 @@ var
           False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType,
           LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
         Result.Add(Result.ObjUpdatedProperty);
+        Continue;
+      end
+      else
+      // ObjUpdatedUserID property detection by type "TioObjUpdatedUserID"
+      if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjUpdatedUserID)) then
+      begin
+        if TioUtilities.TryGetMemberAttribute<ioField>(LMember, LAttribute) then
+          LMember_FieldName := ioField(LAttribute).Value;
+        Result.ObjUpdatedUserIDProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone, '', '', '',
+          False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType,
+          LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
+        Result.Add(Result.ObjUpdatedUserIDProperty);
+        Continue;
+      end
+      else
+      // ObjUpdatedUserName property detection by type "TioObjUpdatedUserName"
+      if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjUpdatedUserName)) then
+      begin
+        if TioUtilities.TryGetMemberAttribute<ioField>(LMember, LAttribute) then
+          LMember_FieldName := ioField(LAttribute).Value;
+        Result.ObjUpdatedUserNameProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone, '', '', '',
+          False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType,
+          LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
+        Result.Add(Result.ObjUpdatedUserNameProperty);
         Continue;
       end;
       // Loop for all attributes

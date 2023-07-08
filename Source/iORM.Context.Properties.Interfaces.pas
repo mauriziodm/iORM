@@ -92,11 +92,6 @@ type
     function IsSqlSelectRequestCompliant: Boolean;
     function IsSqlInsertRequestCompliant(const AIDIsNull: Boolean): Boolean;
     function IsSqlUpdateRequestCompliant: Boolean;
-    procedure SetIsID(const AValue:Boolean);
-    function IsID: Boolean;
-    function IsObjVersion: Boolean;
-    function IsObjCreated: Boolean;
-    function IsObjUpdated: Boolean;
     function IsDBWriteEnabled: Boolean;
     function IsDBReadEnabled: Boolean;
     function IsInstance: Boolean;
@@ -130,6 +125,9 @@ type
     function GetMetadata_FKOnDeleteAction: TioFKAction;
     function GetMetadata_FKOnUpdateAction: TioFKAction;
 
+    // PropertyRole property
+    function GetPropertyRole: TioPropertyRole;
+    property PropertyRole: TioPropertyRole read GetPropertyRole;
     // WhereCompareOp property
     procedure SetWhereCompareOp(const Value: TioCompareOp);
     function GetWhereCompareOp: TioCompareOp;
@@ -191,11 +189,31 @@ type
     function GetObjCreatedProperty: IioProperty;
     procedure SetObjCreatedProperty(const AValue: IioProperty);
     property ObjCreatedProperty: IioProperty read GetObjCreatedProperty write SetObjCreatedProperty;
+    // ObjCreatedUserID property
+    function ObjCreatedUserIDPropertyExist: Boolean;
+    function GetObjCreatedUserIDProperty: IioProperty;
+    procedure SetObjCreatedUserIDProperty(const AValue: IioProperty);
+    property ObjCreatedUserIDProperty: IioProperty read GetObjCreatedUserIDProperty write SetObjCreatedUserIDProperty;
+    // ObjCreatedUserName property
+    function ObjCreatedUserNamePropertyExist: Boolean;
+    function GetObjCreatedUserNameProperty: IioProperty;
+    procedure SetObjCreatedUserNameProperty(const AValue: IioProperty);
+    property ObjCreatedUserNameProperty: IioProperty read GetObjCreatedUserNameProperty write SetObjCreatedUserNameProperty;
     // ObjUpdated property
     function ObjUpdatedPropertyExist: Boolean;
     function GetObjUpdatedProperty: IioProperty;
     procedure SetObjUpdatedProperty(const AValue: IioProperty);
     property ObjUpdatedProperty: IioProperty read GetObjUpdatedProperty write SetObjUpdatedProperty;
+    // ObjUpdatedUserID property
+    function ObjUpdatedUserIDPropertyExist: Boolean;
+    function GetObjUpdatedUserIDProperty: IioProperty;
+    procedure SetObjUpdatedUserIDProperty(const AValue: IioProperty);
+    property ObjUpdatedUserIDProperty: IioProperty read GetObjUpdatedUserIDProperty write SetObjUpdatedUserIDProperty;
+    // ObjUpdatedUserName property
+    function ObjUpdatedUserNamePropertyExist: Boolean;
+    function GetObjUpdatedUserNameProperty: IioProperty;
+    procedure SetObjUpdatedUserNameProperty(const AValue: IioProperty);
+    property ObjUpdatedUserNameProperty: IioProperty read GetObjUpdatedUserNameProperty write SetObjUpdatedUserNameProperty;
   end;
 
 implementation

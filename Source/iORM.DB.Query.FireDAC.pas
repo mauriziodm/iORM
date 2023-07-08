@@ -85,7 +85,11 @@ type
     procedure ParamByProp_LoadAsStreamObj(const AObj: TObject; const AProperty: IioProperty);
     procedure ParamObjVersion_SetValue(const AContext: IioContext);
     procedure ParamObjCreated_SetValue(const AContext: IioContext);
+    procedure ParamObjCreatedUserID_SetValue(const AContext: IioContext);
+    procedure ParamObjCreatedUserName_SetValue(const AContext: IioContext);
     procedure ParamObjUpdated_SetValue(const AContext: IioContext);
+    procedure ParamObjUpdatedUserID_SetValue(const AContext: IioContext);
+    procedure ParamObjUpdatedUserName_SetValue(const AContext: IioContext);
     procedure WhereParamByProp_SetValue(const AProp: IioProperty; const AValue: Variant);
     procedure WhereParamByProp_SetValueAsDateTime(const AProp: IioProperty; const AValue: TDateTime);
     procedure WhereParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
@@ -102,7 +106,8 @@ uses
   iORM.Attributes, iORM.DB.Factory, iORM.Interfaces,
   iORM.Where.SqlItems.Interfaces, System.SysUtils, iORM.DuckTyped.Interfaces,
   iORM.Exceptions, iORM.DuckTyped.Factory, System.JSON, iORM.Utilities,
-  iORM.ObjectsForge.Factory, DJSON, iORM.DependencyInjection, iORM;
+  iORM.ObjectsForge.Factory, DJSON, iORM.DependencyInjection, iORM,
+  iORM.DB.ConnectionContainer;
 
 { TioFDQuery }
 
@@ -371,6 +376,26 @@ begin
     ParamByProp_SetValueAsFloat(LProp, Connection.LastTransactionTimestamp)
   else
     ParamByProp_SetValueAsDateTime(LProp, Connection.LastTransactionTimestamp);
+end;
+
+procedure TioFDQuery.ParamObjCreatedUserID_SetValue(const AContext: IioContext);
+begin
+  WhereParamByProp_SetValue(AContext.GetProperties.ObjCreatedUserIDProperty, TioConnectionManager.GetCurrentConnectionInfo.CurrentUserID);
+end;
+
+procedure TioFDQuery.ParamObjCreatedUserName_SetValue(const AContext: IioContext);
+begin
+  WhereParamByProp_SetValue(AContext.GetProperties.ObjCreatedUserNameProperty, TioConnectionManager.GetCurrentConnectionInfo.CurrentUserName);
+end;
+
+procedure TioFDQuery.ParamObjUpdatedUserID_SetValue(const AContext: IioContext);
+begin
+  WhereParamByProp_SetValue(AContext.GetProperties.ObjUpdatedUserIDProperty, TioConnectionManager.GetCurrentConnectionInfo.CurrentUserID);
+end;
+
+procedure TioFDQuery.ParamObjUpdatedUserName_SetValue(const AContext: IioContext);
+begin
+  WhereParamByProp_SetValue(AContext.GetProperties.ObjUpdatedUserNameProperty, TioConnectionManager.GetCurrentConnectionInfo.CurrentUserName);
 end;
 
 procedure TioFDQuery.ParamObjUpdated_SetValue(const AContext: IioContext);
