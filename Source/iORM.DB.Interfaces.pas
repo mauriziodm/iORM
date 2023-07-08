@@ -164,6 +164,19 @@ type
     property ResponseBody: IioRemoteResponseBody read GetResponseBody;
   end;
 
+  // Interfaccia che contiene info sulla connessione e sull'utente correnti
+  IioCurrentConnectionInfo = interface
+    function GetCurrentConnectionName: String;
+    function GetCurrentUserID: Integer;
+    function GetCurrentUserName: String;
+    procedure SetCurrentConnectionName(const Value: String);
+    procedure SetCurrentUserID(const Value: Integer);
+    procedure SetCurrentUserName(const Value: String);
+    property CurrentConnectionName: String read GetCurrentConnectionName write SetCurrentConnectionName;
+    property CurrentUserName: String read GetCurrentUserName write SetCurrentUserName;
+    property CurrentUserID: Integer read GetCurrentUserID write SetCurrentUserID;
+  end;
+
   // Interfaccia per il componente Query, cioè del componente che si
   // occuperà di eseguire il codice SQL o altro per caricare/modificare/eliminare
   // il dato

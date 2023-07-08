@@ -78,6 +78,30 @@ type
   // che non indicano una connection esplicitamente utilizzino quella di default e quindi anche che normalmente nelle applicazioni
   // che utilizzano una sola ConnectionDef non è necessario specificare nulla nella dichiarazione delle classi perchè
   // tanto utilizzano automaticamente la ConnectionDef di default (l'unica).
+
+  // NB: Mauri 08/07/2023: Modifico FCurrentConnectionName e FPerThreadCurrentConnectionName in modo che oltre al nome della connessione
+  //  corrente memorizzi anche uno "User" sotto forma di stringa e uno "UserID" sotto forma di intero più che altro. In realtà forse
+  //  sarebbe meglio creare una sorta di oggetto sessione o LogOn, magari in futuro lo sposterò ma per ora, per fare la parte ETM
+  //  e per il salvataggio eventuale di quale utente ha operato sulle entities va bene così.
+
+  TioCurrentConnectionInfo = class(TINterfacedObject, IioCurrentConnectionInfo)
+  strict private
+    FCurrentConnectionName: String;
+    FCurrentUserName: String;
+    FCurrentUserID: Integer;
+    function GetCurrentConnectionName: String;
+    function GetCurrentUserID: Integer;
+    function GetCurrentUserName: String;
+    procedure SetCurrentConnectionName(const Value: String);
+    procedure SetCurrentUserID(const Value: Integer);
+    procedure SetCurrentUserName(const Value: String);
+  public
+    constructor Create;
+    property CurrentConnectionName: String read GetCurrentConnectionName write SetCurrentConnectionName;
+    property CurrentUserName: String read GetCurrentUserName write SetCurrentUserName;
+    property CurrentUserID: Integer read GetCurrentUserID write SetCurrentUserID;
+  end;
+
   TioConnectionManagerContainer = TDictionary<String, TioConnectionInfo>;
   TioPerThreadCurrentConnectionName = TDictionary<TThreadID, String>;
   TioConnectionManagerRef = class of TioConnectionManager;
@@ -608,6 +632,45 @@ begin
 end;
 {$ENDIF}
 { TioInUseConnectionRegister }
+
+{ TioCurrentConnectionInfo }
+
+constructor TioCurrentConnectionInfo.Create;
+begin
+  FCurrentConnectionName := String.Empty;
+  FCurrentUserName := String.Empty;
+  FCurrentUserID := 0;
+end;
+
+function TioCurrentConnectionInfo.GetCurrentConnectionName: String;
+begin
+  Result := FCurrentUserName;
+end;
+
+function TioCurrentConnectionInfo.GetCurrentUserID: Integer;
+begin
+  Result := FCurrentUserID;
+end;
+
+function TioCurrentConnectionInfo.GetCurrentUserName: String;
+begin
+  Result := FCurrentUserName;
+end;
+
+procedure TioCurrentConnectionInfo.SetCurrentConnectionName(const Value: String);
+begin
+  FCurrentConnectionName := Value;
+end;
+
+procedure TioCurrentConnectionInfo.SetCurrentUserID(const Value: Integer);
+begin
+  FCurrentUserID := Value;
+end;
+
+procedure TioCurrentConnectionInfo.SetCurrentUserName(const Value: String);
+begin
+  FCurrentUserName := Value;
+end;
 
 initialization
 
