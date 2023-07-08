@@ -51,6 +51,8 @@ type
     FEntityState: String;
     FEntityStateRemote: String;
     FConflictType: TioEtmConflictType;
+    FUserName: String;
+    FUserID: Integer;
     function GetID: Integer;
     function GetDateAndTime: TDateTime;
     function GetTimeSlotType: TioEtmTimeSlotType;
@@ -60,7 +62,8 @@ type
     function GetEntityState: String;
     function GetEntityStateRemote: String;
     function GetConflictType: TioEtmConflictType;
-  protected
+    function GetUserID: Integer;
+    function GetUserName: String;
   public
     property ID: Integer read GetID;
     property DateAndTime: TDateTime read GetDateAndTime;
@@ -71,6 +74,8 @@ type
     property EntityState: String read GetEntityState;
     property EntityStateRemote: String read GetEntityStateRemote;
     property ConflictType: TioEtmConflictType read GetConflictType;
+    property UserName: String read GetUserName;
+    property UserID: Integer read GetUserID;
   end;
 
 
@@ -111,6 +116,16 @@ end;
 function TioEtmTimeSlot.GetEntityVersion: TioObjVersion;
 begin
   Result := FEntityVersion;
+end;
+
+function TioEtmTimeSlot.GetUserID: Integer;
+begin
+  Result := FUserID;
+end;
+
+function TioEtmTimeSlot.GetUserName: String;
+begin
+  Result := FUserName;
 end;
 
 function TioEtmTimeSlot.GetID: Integer;
