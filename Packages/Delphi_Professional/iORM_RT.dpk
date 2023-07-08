@@ -238,6 +238,8 @@ contains
   iORM.Where.SmartBuilder in '..\..\Source\iORM.Where.SmartBuilder.pas',
   iORM.Abstraction.uniGUI in '..\..\Source\iORM.Abstraction.uniGUI.pas',
   iORM.Where.NestedProp.Resolver in '..\..\Source\iORM.Where.NestedProp.Resolver.pas',
-  iORM.ETM.Interfaces in '..\..\Source\iORM.ETM.Interfaces.pas';
+  iORM.ETM.Interfaces in '..\..\Source\iORM.ETM.Interfaces.pas',
+  iORM.ETM.TimeSlot in '..\..\Source\iORM.ETM.TimeSlot.pas',
+  iORM.ETM.Engine in '..\..\Source\iORM.ETM.Engine.pas';
 
 end.

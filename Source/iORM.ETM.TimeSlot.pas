@@ -31,52 +31,96 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.ETM.Interfaces;
+unit iORM.ETM.TimeSlot;
 
 interface
 
 uses
-  iORM.Attributes, System.Classes, iORM;
+  iORM.ETM.Interfaces, iORM;
 
 type
 
-  [ioEnumerated('Insert, Update, Delete, Synchronization')]
-  TioEtmTimeSlotType = (tsInsert, tsUpdate, tsDelete, tsSynchronization);
-
-  [ioEnumerated('No conflict detected, Master version win, Slave version win, Last updated win, Manual conflict resolution')]
-  TioEtmConflictType = (ctNoConflict, ctMasterWin, ctSlaveWin, ctLastUpdatedWin, ctManual);
-
-  IioEtmTimeSlot = interface
-    ['{09B35E52-AF12-4F66-A8CF-D58A1CF41C7D}']
-    // ID
+  TioEtmTimeSlot = class(TInterfacedObject, IioEtmTimeSlot)
+  private
+    FID: Integer;
+    FDateAndTime: TDateTime;
+    FTimeSlotType: TioEtmTimeSlotType;
+    FEntityClassName: String;
+    FEntityID: Integer;
+    FEntityVersion: TioObjVersion;
+    FEntityState: String;
+    FEntityStateRemote: String;
+    FConflictType: TioEtmConflictType;
     function GetID: Integer;
-    property ID: Integer read GetID;
-    // DateAndTime
     function GetDateAndTime: TDateTime;
-    property DateAndTime: TDateTime read GetDateAndTime;
-    // TimeSlotType
     function GetTimeSlotType: TioEtmTimeSlotType;
-    property TimeSlotType: TioEtmTimeSlotType read GetTimeSlotType;
-    // EntityClassName
     function GetEntityClassName: String;
-    property EntityClassName: String read GetEntityClassName;
-    // EntityID
     function GetEntityID: Integer;
-    property EntityID: Integer read GetEntityID;
-    // EntityVersion
     function GetEntityVersion: TioObjVersion;
-    property EntityVersion: TioObjVersion read GetEntityVersion;
-    // EntityMasterState
     function GetEntityState: String;
-    property EntityStateLocal: String read GetEntityState;
-    // EntitySlaveState
     function GetEntityStateRemote: String;
-    property EntityStateRemote: String read GetEntityStateRemote;
-    // ConflictResolutionType
     function GetConflictType: TioEtmConflictType;
+  protected
+  public
+    property ID: Integer read GetID;
+    property DateAndTime: TDateTime read GetDateAndTime;
+    property TimeSlotType: TioEtmTimeSlotType read GetTimeSlotType;
+    property EntityClassName: String read GetEntityClassName;
+    property EntityID: Integer read GetEntityID;
+    property EntityVersion: TioObjVersion read GetEntityVersion;
+    property EntityState: String read GetEntityState;
+    property EntityStateRemote: String read GetEntityStateRemote;
     property ConflictType: TioEtmConflictType read GetConflictType;
   end;
 
+
 implementation
+
+{ TioEtmTimeSlot }
+
+function TioEtmTimeSlot.GetConflictType: TioEtmConflictType;
+begin
+  Result := FConflictType;
+end;
+
+function TioEtmTimeSlot.GetDateAndTime: TDateTime;
+begin
+  Result := FDateAndTime;
+end;
+
+function TioEtmTimeSlot.GetEntityClassName: String;
+begin
+  Result := FEntityClassName;
+end;
+
+function TioEtmTimeSlot.GetEntityID: Integer;
+begin
+  Result := FEntityID;
+end;
+
+function TioEtmTimeSlot.GetEntityState: String;
+begin
+  Result := FEntityState;
+end;
+
+function TioEtmTimeSlot.GetEntityStateRemote: String;
+begin
+  Result := FEntityStateRemote;
+end;
+
+function TioEtmTimeSlot.GetEntityVersion: TioObjVersion;
+begin
+  Result := FEntityVersion;
+end;
+
+function TioEtmTimeSlot.GetID: Integer;
+begin
+  Result := FID;
+end;
+
+function TioEtmTimeSlot.GetTimeSlotType: TioEtmTimeSlotType;
+begin
+  Result := FTimeSlotType;
+end;
 
 end.

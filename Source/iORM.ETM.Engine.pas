@@ -31,50 +31,24 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.ETM.Interfaces;
+unit iORM.ETM.Engine;
 
 interface
 
-uses
-  iORM.Attributes, System.Classes, iORM;
-
 type
 
-  [ioEnumerated('Insert, Update, Delete, Synchronization')]
-  TioEtmTimeSlotType = (tsInsert, tsUpdate, tsDelete, tsSynchronization);
+  // Esempi di chiamate:
 
-  [ioEnumerated('No conflict detected, Master version win, Slave version win, Last updated win, Manual conflict resolution')]
-  TioEtmConflictType = (ctNoConflict, ctMasterWin, ctSlaveWin, ctLastUpdatedWin, ctManual);
+  // io.etm.TimeTravelFor<TCustomer>(const AID: Integer; const AWhere: IioWhere = nil): TList<IioEtmTimeSlot>;
+  // io.etm.TimeTravelFor(const AObj: TObject; const AWhere: IioWhere = nil): TList<IioEtmTimeSlot>; // Where per filtrare per date o versioni ad esempio
+  // io.etm.TimeTravelFor(const AIntf: IInterface; const AWhere: IioWhere = nil): TList<IioEtmTimeSlot>;
+  // io.etm.TimeTravelFor<>().ToList.OfType<TList<IioEtmTimeSlot>>;
+  // io.etm.TimeTravelFor<>().ToList(const AList: TObject);
+  // io.etm.TimeTravelFor<>().ToList(const AList: IInterface);
 
-  IioEtmTimeSlot = interface
-    ['{09B35E52-AF12-4F66-A8CF-D58A1CF41C7D}']
-    // ID
-    function GetID: Integer;
-    property ID: Integer read GetID;
-    // DateAndTime
-    function GetDateAndTime: TDateTime;
-    property DateAndTime: TDateTime read GetDateAndTime;
-    // TimeSlotType
-    function GetTimeSlotType: TioEtmTimeSlotType;
-    property TimeSlotType: TioEtmTimeSlotType read GetTimeSlotType;
-    // EntityClassName
-    function GetEntityClassName: String;
-    property EntityClassName: String read GetEntityClassName;
-    // EntityID
-    function GetEntityID: Integer;
-    property EntityID: Integer read GetEntityID;
-    // EntityVersion
-    function GetEntityVersion: TioObjVersion;
-    property EntityVersion: TioObjVersion read GetEntityVersion;
-    // EntityMasterState
-    function GetEntityState: String;
-    property EntityStateLocal: String read GetEntityState;
-    // EntitySlaveState
-    function GetEntityStateRemote: String;
-    property EntityStateRemote: String read GetEntityStateRemote;
-    // ConflictResolutionType
-    function GetConflictType: TioEtmConflictType;
-    property ConflictType: TioEtmConflictType read GetConflictType;
+  TIoEtmEngine = class
+  public
+    // function TimeTravelFor(const AObj: TObject; const AWhere: IioWhere): TList<IioEtmTimeSlot>;
   end;
 
 implementation

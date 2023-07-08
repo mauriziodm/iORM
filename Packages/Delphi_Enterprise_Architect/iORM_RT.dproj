@@ -378,6 +378,8 @@
         <DCCReference Include="..\..\Source\iORM.Abstraction.uniGUI.pas"/>
         <DCCReference Include="..\..\Source\iORM.Where.NestedProp.Resolver.pas"/>
         <DCCReference Include="..\..\Source\iORM.ETM.Interfaces.pas"/>
+        <DCCReference Include="..\..\Source\iORM.ETM.TimeSlot.pas"/>
+        <DCCReference Include="..\..\Source\iORM.ETM.Engine.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
