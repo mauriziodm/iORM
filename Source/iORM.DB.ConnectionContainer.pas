@@ -402,7 +402,7 @@ begin
     // If AConnectionName param is not specified (is empty) then
     // use the default connection def
     if IsEmptyConnectionName(AConnectionDefName) then
-      Result := GetCurrentConnectionName
+       Result := GetCurrentConnectionName
     else
       Result := AConnectionDefName;
   finally

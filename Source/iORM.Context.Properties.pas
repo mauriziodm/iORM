@@ -810,28 +810,28 @@ end;
 
 function TioProperty.RttiTypeToPropertyRole: TioPropertyRole;
 begin
-  if not FRttiProperty.Name.StartsWith('TioObj') then
+  if not GetRttiType.Name.StartsWith('TioObj') then
     FPropertyRole := prRegular
   else
-  if FRttiProperty.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjVersion)) then
+  if GetRttiType.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjVersion)) then
     FPropertyRole := prObjVersion
   else
-  if FRttiProperty.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjUpdated)) then
+  if GetRttiType.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjUpdated)) then
     FPropertyRole := prObjUpdated
   else
-  if FRttiProperty.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjUpdatedUserID)) then
+  if GetRttiType.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjUpdatedUserID)) then
     FPropertyRole := prObjUpdatedUserID
   else
-  if FRttiProperty.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjUpdatedUserName)) then
+  if GetRttiType.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjUpdatedUserName)) then
     FPropertyRole := prObjUpdatedUserName
   else
-  if FRttiProperty.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjCreated)) then
+  if GetRttiType.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjCreated)) then
     FPropertyRole := prObjCreated
   else
-  if FRttiProperty.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjCreatedUserID)) then
+  if GetRttiType.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjCreatedUserID)) then
     FPropertyRole := prObjCreatedUserID
   else
-  if FRttiProperty.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjCreatedUserName)) then
+  if GetRttiType.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjCreatedUserName)) then
     FPropertyRole := prObjCreatedUserName;
 end;
 

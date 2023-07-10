@@ -70,6 +70,9 @@ type
 
 implementation
 
+uses
+  iORM.CommonTypes;
+
 { TioDBBuilderSchemaField }
 
 procedure TioDBBuilderSchemaField.AddAltered(const AAltered: TioDBBuilderFieldAlterStatus);

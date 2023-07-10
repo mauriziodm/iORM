@@ -155,7 +155,11 @@ type
   TioObjStatus = iORM.CommonTypes.TioObjStatus;
   TioObjVersion = iORM.CommonTypes.TioObjVersion;
   TioObjCreated = iORM.CommonTypes.TioObjCreated;
+  TioObjCreatedUserID = iORM.CommonTypes.TioObjCreatedUserID;
+  TioObjCreatedUserName = iORM.CommonTypes.TioObjCreatedUserName;
   TioObjUpdated = iORM.CommonTypes.TioObjUpdated;
+  TioObjUpdatedUserID = iORM.CommonTypes.TioObjUpdatedUserID;
+  TioObjUpdatedUserName = iORM.CommonTypes.TioObjUpdatedUserName;
   TioSelectionType = iORM.CommonTypes.TioSelectionType;
   TioShowWaitProc = iORM.CommonTypes.TioShowWaitProc;
   TioTypeOfCollection = iORM.CommonTypes.TioTypeOfCollection;
