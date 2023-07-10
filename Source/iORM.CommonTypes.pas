@@ -84,7 +84,7 @@ type
   TioObjUpdatedUserName = type String;
 
   // The property role
-  TioPropertyRole = (prRegular, prObjID, prObjVersion, prObjUpdated, prObjUpdatedUserID, prObjUpdatedUserName, prObjCreated, prObjCreatedUserID, prObjCreatedUserName);
+  TioPropertyRole = (prRegular, prObjID, prObjStatus, prObjVersion, prObjUpdated, prObjUpdatedUserID, prObjUpdatedUserName, prObjCreated, prObjCreatedUserID, prObjCreatedUserName);
 
   // Common ClassRef
   TioClassRef = class of TObject;

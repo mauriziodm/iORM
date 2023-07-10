@@ -118,7 +118,7 @@ type
       const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer; const AMetadata_FieldScale: Integer; const AMetadata_FieldNotNull: Boolean;
       const AMetadata_Default: TValue; const AMetadata_FieldUnicode: Boolean; const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string;
       const AMetadata_FKCreate: TioFKCreate; const AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction: TioFKAction); overload;
-    function RttiTypeToPropertyRole: TioPropertyRole;
+    procedure AssignPropertyRole(const AIsID: Boolean);
   public
     constructor Create(const ARttiProperty: TRttiProperty; const ATable: IioTable; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String;
       const ATransient, AIsID: Boolean; const AReadWrite: TioLoadPersist; const ARelationType: TioRelationType;
@@ -366,10 +366,7 @@ begin
   // Set the RttiProperty
   FRttiProperty := ARttiProperty;
   // Set the property role
-  if AIsID then
-    FPropertyRole := prObjID
-  else
-    FPropertyRole := RttiTypeToPropertyRole;
+  AssignPropertyRole(AIsID);
 end;
 
 constructor TioProperty.Create(const ATable: IioTable; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String; const ATransient, AIsID: Boolean;
@@ -808,10 +805,16 @@ begin
   Result := Assigned(FRelationChildPropertyPath);
 end;
 
-function TioProperty.RttiTypeToPropertyRole: TioPropertyRole;
+procedure TioProperty.AssignPropertyRole(const AIsID: Boolean);
 begin
-  if not GetRttiType.Name.StartsWith('TioObj') then
+  if (not AIsID) and (not GetRttiType.Name.StartsWith('TioObj')) then
     FPropertyRole := prRegular
+  else
+  if AIsID then
+    FPropertyRole := prObjID
+  else
+  if GetRttiType.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjStatus)) then
+    FPropertyRole := prObjStatus
   else
   if GetRttiType.Name = TioUtilities.TypeInfoToTypeName(TypeInfo(TioObjVersion)) then
     FPropertyRole := prObjVersion
@@ -1235,10 +1238,7 @@ begin
   // Clean the field name from the "T"
   FName := Self.Remove_F_FromName(ARttiField.Name);
   // Set the property role
-  if AIsID then
-    FPropertyRole := prObjID
-  else
-    FPropertyRole := RttiTypeToPropertyRole;
+  AssignPropertyRole(AIsID);
 end;
 
 function TioField.GetName: String;

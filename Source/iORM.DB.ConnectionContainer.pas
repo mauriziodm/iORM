@@ -700,7 +700,7 @@ end;
 
 function TioCurrentConnectionInfo.GetCurrentConnectionName: String;
 begin
-  Result := FCurrentUserName;
+  Result := FCurrentConnectionName;
 end;
 
 function TioCurrentConnectionInfo.GetCurrentUserID: Integer;

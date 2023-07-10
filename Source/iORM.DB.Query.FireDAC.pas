@@ -380,22 +380,22 @@ end;
 
 procedure TioFDQuery.ParamObjCreatedUserID_SetValue(const AContext: IioContext);
 begin
-  WhereParamByProp_SetValue(AContext.GetProperties.ObjCreatedUserIDProperty, TioConnectionManager.GetCurrentConnectionInfo.CurrentUserID);
+  ParamByProp_SetValue(AContext.GetProperties.ObjCreatedUserIDProperty, TioConnectionManager.GetCurrentConnectionInfo.CurrentUserID);
 end;
 
 procedure TioFDQuery.ParamObjCreatedUserName_SetValue(const AContext: IioContext);
 begin
-  WhereParamByProp_SetValue(AContext.GetProperties.ObjCreatedUserNameProperty, TioConnectionManager.GetCurrentConnectionInfo.CurrentUserName);
+  ParamByProp_SetValue(AContext.GetProperties.ObjCreatedUserNameProperty, TioConnectionManager.GetCurrentConnectionInfo.CurrentUserName);
 end;
 
 procedure TioFDQuery.ParamObjUpdatedUserID_SetValue(const AContext: IioContext);
 begin
-  WhereParamByProp_SetValue(AContext.GetProperties.ObjUpdatedUserIDProperty, TioConnectionManager.GetCurrentConnectionInfo.CurrentUserID);
+  ParamByProp_SetValue(AContext.GetProperties.ObjUpdatedUserIDProperty, TioConnectionManager.GetCurrentConnectionInfo.CurrentUserID);
 end;
 
 procedure TioFDQuery.ParamObjUpdatedUserName_SetValue(const AContext: IioContext);
 begin
-  WhereParamByProp_SetValue(AContext.GetProperties.ObjUpdatedUserNameProperty, TioConnectionManager.GetCurrentConnectionInfo.CurrentUserName);
+  ParamByProp_SetValue(AContext.GetProperties.ObjUpdatedUserNameProperty, TioConnectionManager.GetCurrentConnectionInfo.CurrentUserName);
 end;
 
 procedure TioFDQuery.ParamObjUpdated_SetValue(const AContext: IioContext);

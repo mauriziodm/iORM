@@ -349,7 +349,7 @@ begin
   if (csDesigning in ComponentState) then
     Exit;
   if (not FIsRegistered) then
-    RegisterConnectionDef;
+         RegisterConnectionDef;
 end;
 
 procedure TioCustomConnectionDef.RegisterConnectionDef;
@@ -357,11 +357,11 @@ begin
   inherited;
   // Mark the connection as registered in the ConnectionManager
   FIsRegistered := True;
+  // Fire the OnAfterRegister event if implemented
+  DoAfterRegister;
   // Autocreate Database if enabled
   if FAutoCreateDB.Enabled then
     CreateOrAlterDB;
-  // Fire the OnAfterRegister event if implemented
-  DoAfterRegister;
 end;
 
 procedure TioCustomConnectionDef.SetAsDefault(const Value: Boolean);
