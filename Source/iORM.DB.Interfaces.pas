@@ -288,11 +288,11 @@ type
   TioCompareOperator = class abstract
     class function CompareOpToCompareOperator(const ACompareOp: TioCompareOp): IioSqlItem; virtual;
     class function _Equal: IioSqlItem; virtual;
+    class function _NotEqual: IioSqlItem; virtual;
     class function _Greater: IioSqlItem; virtual;
     class function _Lower: IioSqlItem; virtual;
     class function _GreaterOrEqual: IioSqlItem; virtual;
     class function _LowerOrEqual: IioSqlItem; virtual;
-    class function _NotEqual: IioSqlItem; virtual;
     class function _Like: IioSqlItem; virtual;
     class function _NotLike: IioSqlItem; virtual;
     class function _IsNull: IioSqlItem; virtual;

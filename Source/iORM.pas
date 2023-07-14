@@ -107,7 +107,7 @@ const
   vcByViewContextProviderName = iORM.StdActions.Interfaces.vcByViewContextProviderName;
   vcByViewContextProvider = iORM.StdActions.Interfaces.vcByViewContextProvider;
   vcByViewContext = iORM.StdActions.Interfaces.vcByViewContext;
-//  vcNone = iORM.StdActions.Interfaces.vcNone;
+  // vcNone = iORM.StdActions.Interfaces.vcNone;
 
   // TioFKAction = (fkUnspecified, fkNoAction, fkSetNull, fkSetDefault, fkCascade);
   fkUnspecified = iORM.Attributes.fkUnspecified;
@@ -143,7 +143,7 @@ const
 
 type
 
-// Type aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
+  // Type aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
 {$REGION 'Type aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
   TioSimpleViewRegister = iORM.MVVM.ViewRegister.TioSimpleViewRegister;
 
@@ -176,10 +176,8 @@ type
   TioActionShowMode = iORM.StdActions.Interfaces.TioActionShowMode;
   TioActionViewContextBy = iORM.StdActions.Interfaces.TioActionViewContextBy;
 {$ENDREGION}
-
-// Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
+  // Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
 {$REGION 'Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
-
   // Property attributes
   ioSkip = iORM.Attributes.ioSkip;
   ioTransient = iORM.Attributes.ioTransient;
@@ -330,11 +328,15 @@ type
     class procedure DeleteList(const AListObj: TObject); overload;
     class procedure DeleteList(const AListIntf: IInterface); overload;
     // Delete (accepting generic type to delete and ciriteria)
-    class procedure Delete<T>(const AID: Integer); overload;
-    class procedure Delete<T>(const ATypeAlias: String; const AID: Integer); overload;
-    class procedure DeleteAll<T>(const ATypeAlias: String = ''); overload;
-    class procedure DeleteAll<T>(const AWhere: IioWhere); overload;
-    class procedure DeleteAll<T>(const ATypeAlias: String; const AWhere: IioWhere); overload;
+    // NB: Ho volutamente eliminato questi metodi perchè generavano direttamente una query DELETE senza
+    //      però gli oggetti vivi dietro quindi senza poi considerare eventuali oggetti child/dettaglio
+    //      relativi a eventuali relazioni. In ogni caso sarà possibile ugualmente fare la stessa cosa
+    //      usando però la fluent interface (io.RefTo<T>.Delete) oppure con io.SQL('delete...')
+//    class procedure Delete<T>(const AID: Integer); overload;
+//    class procedure Delete<T>(const ATypeAlias: String; const AID: Integer); overload;
+//    class procedure DeleteAll<T>(const ATypeAlias: String = ''); overload;
+//    class procedure DeleteAll<T>(const AWhere: IioWhere); overload;
+//    class procedure DeleteAll<T>(const ATypeAlias: String; const AWhere: IioWhere); overload;
 
     // Count (accepting generic type and ciriteria)
     class function Count(const ATypeName: String; const ATypeAlias: String = ''): Integer; overload;
@@ -364,10 +366,10 @@ type
     class procedure _PersistInternal(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); overload;
     // PersistCollection (accepting instance to persist directly)
-    class procedure PersistCollection(const ACollection: TObject; const ABlindInsert: boolean = False); overload;
-    class procedure PersistCollection(const AIntfCollection: IInterface; const ABlindInsert: boolean = False); overload;
-    class procedure _PersistCollectionInternal(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
-      const ABlindInsert: boolean; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); overload;
+    class procedure PersistList(const AList: TObject; const ABlindInsert: boolean = False); overload;
+    class procedure PersistList(const AListIntf: IInterface; const ABlindInsert: boolean = False); overload;
+    class procedure _PersistListInternal(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); overload;
 
     class procedure StartTransaction(const AConnectionName: String = '');
     class procedure CommitTransaction(const AConnectionName: String = '');
@@ -416,100 +418,164 @@ type
     class function Create<T: IInterface>(const ATypeAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
 
     // Create SimpleView instance
-    class function CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewModel: IioViewModel; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AViewModel: IioViewModel; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateSimpleView<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
-    class function CreateSimpleView<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
-    class function CreateSimpleView<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
-    class function CreateSimpleView<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewModel: IioViewModel; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
-    class function CreateSimpleView<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
-    class function CreateSimpleView<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AViewModel: IioViewModel; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
+    class function CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = '';
+      const AParams: TioConstructorParams = nil): TComponent; overload;
+    class function CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
+      const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
+    class function CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
+      const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
+    class function CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewModel: IioViewModel;
+      const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
+    class function CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
+      const AViewModel: IioViewModel; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
+    class function CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
+      const AViewModel: IioViewModel; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
+    class function CreateSimpleView<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = '';
+      const AParams: TioConstructorParams = nil): T; overload;
+    class function CreateSimpleView<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
+      const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
+    class function CreateSimpleView<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
+      const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
+    class function CreateSimpleView<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewModel: IioViewModel;
+      const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
+    class function CreateSimpleView<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
+      const AViewModel: IioViewModel; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
+    class function CreateSimpleView<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
+      const AViewModel: IioViewModel; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
     // Create View instance for a specified type of instances
-    class function CreateSimpleViewFor<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateSimpleViewFor<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateSimpleViewFor<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateSimpleViewFor<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewModel: IioViewModel; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateSimpleViewFor<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateSimpleViewFor<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AViewModel: IioViewModel; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
+    class function CreateSimpleViewFor<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = '';
+      const AParams: TioConstructorParams = nil): TComponent; overload;
+    class function CreateSimpleViewFor<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
+      const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
+    class function CreateSimpleViewFor<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
+      const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
+    class function CreateSimpleViewFor<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewModel: IioViewModel;
+      const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
+    class function CreateSimpleViewFor<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
+      const AViewModel: IioViewModel; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
+    class function CreateSimpleViewFor<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
+      const AViewModel: IioViewModel; const ASVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
 
     // Create View instance
     class function CreateView(const AViewTypeName: String; const AVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateView(const AViewTypeName: String; const AVCProvider: TioViewContextProvider; const AVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateView(const AViewTypeName: String; const AViewContext: TComponent; const AVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateView(const AViewTypeName: String; const AViewModel: IioViewModel; const AVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateView(const AViewTypeName: String; const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const AVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateView(const AViewTypeName: String; const AViewContext: TComponent; const AViewModel: IioViewModel; const AVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
+    class function CreateView(const AViewTypeName: String; const AVCProvider: TioViewContextProvider; const AVAlias: String = '';
+      const AParams: TioConstructorParams = nil): TComponent; overload;
+    class function CreateView(const AViewTypeName: String; const AViewContext: TComponent; const AVAlias: String = '';
+      const AParams: TioConstructorParams = nil): TComponent; overload;
+    class function CreateView(const AViewTypeName: String; const AViewModel: IioViewModel; const AVAlias: String = '';
+      const AParams: TioConstructorParams = nil): TComponent; overload;
+    class function CreateView(const AViewTypeName: String; const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel;
+      const AVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
+    class function CreateView(const AViewTypeName: String; const AViewContext: TComponent; const AViewModel: IioViewModel; const AVAlias: String = '';
+      const AParams: TioConstructorParams = nil): TComponent; overload;
     class function CreateView<T: IInterface>(const AVAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
-    class function CreateView<T: IInterface>(const AVCProvider: TioViewContextProvider; const AVAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
-    class function CreateView<T: IInterface>(const AViewContext: TComponent; const AVAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
-    class function CreateView<T: IInterface>(const AViewModel: IioViewModel; const AVAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
-    class function CreateView<T: IInterface>(const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const AVAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
-    class function CreateView<T: IInterface>(const AViewContext: TComponent; const AViewModel: IioViewModel; const AVAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
+    class function CreateView<T: IInterface>(const AVCProvider: TioViewContextProvider; const AVAlias: String = ''; const AParams: TioConstructorParams = nil)
+      : T; overload;
+    class function CreateView<T: IInterface>(const AViewContext: TComponent; const AVAlias: String = ''; const AParams: TioConstructorParams = nil): T;
+      overload;
+    class function CreateView<T: IInterface>(const AViewModel: IioViewModel; const AVAlias: String = ''; const AParams: TioConstructorParams = nil): T;
+      overload;
+    class function CreateView<T: IInterface>(const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const AVAlias: String = '';
+      const AParams: TioConstructorParams = nil): T; overload;
+    class function CreateView<T: IInterface>(const AViewContext: TComponent; const AViewModel: IioViewModel; const AVAlias: String = '';
+      const AParams: TioConstructorParams = nil): T; overload;
     // Create View instance for a specified type of instances
     class function CreateViewFor<T>(const AVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateViewFor<T>(const AVCProvider: TioViewContextProvider; const AVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateViewFor<T>(const AViewContext: TComponent; const AVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateViewFor<T>(const AViewModel: IioViewModel; const AVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateViewFor<T>(const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const AVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
-    class function CreateViewFor<T>(const AViewContext: TComponent; const AViewModel: IioViewModel; const AVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent; overload;
+    class function CreateViewFor<T>(const AVCProvider: TioViewContextProvider; const AVAlias: String = ''; const AParams: TioConstructorParams = nil)
+      : TComponent; overload;
+    class function CreateViewFor<T>(const AViewContext: TComponent; const AVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent;
+      overload;
+    class function CreateViewFor<T>(const AViewModel: IioViewModel; const AVAlias: String = ''; const AParams: TioConstructorParams = nil): TComponent;
+      overload;
+    class function CreateViewFor<T>(const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const AVAlias: String = '';
+      const AParams: TioConstructorParams = nil): TComponent; overload;
+    class function CreateViewFor<T>(const AViewContext: TComponent; const AViewModel: IioViewModel; const AVAlias: String = '';
+      const AParams: TioConstructorParams = nil): TComponent; overload;
 
     // Create ViewModel instance
-    class function CreateVM(const AVMTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''; const AParams: TioConstructorParams = nil): IioViewModel; overload;
-    class function CreateVM<T: IioViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
+    class function CreateVM(const AVMTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = '';
+      const AParams: TioConstructorParams = nil): IioViewModel; overload;
+    class function CreateVM<T: IioViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = '';
+      const AParams: TioConstructorParams = nil): T; overload;
     // Create ViewModel instance for a specified type of instances
-    class function CreateVMFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''; const AParams: TioConstructorParams = nil): IioViewModel; overload;
+    class function CreateVMFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''; const AParams: TioConstructorParams = nil)
+      : IioViewModel; overload;
 
     // Create View & ViewModel coupled instances
-    class procedure CreateViewVM(const AViewTypeName, AVMTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
-    class procedure CreateViewVM(const AViewTypeName, AVMTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
-    class procedure CreateViewVM(const AViewTypeName, AVMTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
-    class procedure CreateViewVM<TView: IInterface; TViewModel: IioViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
-    class procedure CreateViewVM<TView: IInterface; TViewModel: IioViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
-    class procedure CreateViewVM<TView: IInterface; TViewModel: IioViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
+    class procedure CreateViewVM(const AViewTypeName, AVMTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction;
+      const AVVMAlias: String = ''); overload;
+    class procedure CreateViewVM(const AViewTypeName, AVMTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction;
+      const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
+    class procedure CreateViewVM(const AViewTypeName, AVMTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
+      const AVVMAlias: String = ''); overload;
+    class procedure CreateViewVM<TView: IInterface; TViewModel: IioViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction;
+      const AVVMAlias: String = ''); overload;
+    class procedure CreateViewVM<TView: IInterface; TViewModel: IioViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction;
+      const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
+    class procedure CreateViewVM<TView: IInterface; TViewModel: IioViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction;
+      const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
 
     // Show instance as TObject (even passing ViewContextProvider or an already created ViewContext)
     class procedure Show(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
-    class procedure Show(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
-    class procedure Show(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
+    class procedure Show(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
+      const AVVMAlias: String = ''); overload;
+    class procedure Show(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
+      const AVVMAlias: String = ''); overload;
     // Show instance as IInterface (even passing ViewContextProvider or an already created ViewContext)
     class procedure Show(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
-    class procedure Show(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
-    class procedure Show(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
+    class procedure Show(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
+      const AVVMAlias: String = ''); overload;
+    class procedure Show(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
+      const AVVMAlias: String = ''); overload;
     // Show instance of the type specified (even passing ViewContextProvider or an already created ViewContext)
     class procedure Show(const AEntityTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
-    class procedure Show(const AEntityTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
-    class procedure Show(const AEntityTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
+    class procedure Show(const AEntityTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
+      const AVVMAlias: String = ''); overload;
+    class procedure Show(const AEntityTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
+      const AVVMAlias: String = ''); overload;
     // Show instance of generic type <T> (even passing ViewContextProvider or an already created ViewContext)
     class procedure Show<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
-    class procedure Show<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
+    class procedure Show<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
+      const AVVMAlias: String = ''); overload;
     class procedure Show<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
 
     // Show current record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
-    class procedure ShowCurrent(const ABindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
-    class procedure ShowCurrent(const ABindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
-    class procedure ShowCurrent(const ABindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
+    class procedure ShowCurrent(const ABindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
+      const AVVMAlias: String = ''); overload;
+    class procedure ShowCurrent(const ABindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
+      const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
+    class procedure ShowCurrent(const ABindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
+      const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
 
     // Show each record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
-    class procedure ShowEach(const ABindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
-    class procedure ShowEach(const ABindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
-    class procedure ShowEach(const ABindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
+    class procedure ShowEach(const ABindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
+      const AVVMAlias: String = ''); overload;
+    class procedure ShowEach(const ABindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
+      const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
+    class procedure ShowEach(const ABindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
+      const AVVMAlias: String = ''); overload;
 
     // Show selector (entity type from TargetBindSource.TypeName)
-    class procedure ShowAsSelector(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
-    class procedure ShowAsSelector(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
-    class procedure ShowAsSelector(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
+    class procedure ShowAsSelector(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
+      const AVVMAlias: String = ''); overload;
+    class procedure ShowAsSelector(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
+      const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
+    class procedure ShowAsSelector(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
+      const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
     // Show selector (entity type from AEntityTypeName parameter)
-    class procedure ShowAsSelector(const AEntityTypeName: String; const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
-    class procedure ShowAsSelector(const AEntityTypeName: String; const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
-    class procedure ShowAsSelector(const AEntityTypeName: String; const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
+    class procedure ShowAsSelector(const AEntityTypeName: String; const ATargetBindSource: IioNotifiableBindSource;
+      const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
+    class procedure ShowAsSelector(const AEntityTypeName: String; const ATargetBindSource: IioNotifiableBindSource;
+      const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
+    class procedure ShowAsSelector(const AEntityTypeName: String; const ATargetBindSource: IioNotifiableBindSource;
+      const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
     // Show selector (Entity type from generic type parameter)
-    class procedure ShowAsSelector<T>(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
-    class procedure ShowAsSelector<T>(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
-    class procedure ShowAsSelector<T>(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
+    class procedure ShowAsSelector<T>(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
+      const AVVMAlias: String = ''); overload;
+    class procedure ShowAsSelector<T>(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
+      const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
+    class procedure ShowAsSelector<T>(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
+      const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
 
     // Version
     class function Version: String;
@@ -720,9 +786,9 @@ begin
   Self.Persist(AIntfObj as TObject, ABlindInsert);
 end;
 
-class procedure io.PersistCollection(const ACollection: TObject; const ABlindInsert: boolean);
+class procedure io.PersistList(const AList: TObject; const ABlindInsert: boolean);
 begin
-  Self._PersistCollectionInternal(ACollection, '', 0, ABlindInsert, nil, '', '');
+  Self._PersistListInternal(AList, '', 0, ABlindInsert, nil, '', '');
 end;
 
 class procedure io.Persist(const AObj: TObject; const ABlindInsert: boolean);
@@ -730,9 +796,9 @@ begin
   Self._PersistInternal(AObj, '', 0, ABlindInsert, nil, '', '');
 end;
 
-class procedure io.PersistCollection(const AIntfCollection: IInterface; const ABlindInsert: boolean);
+class procedure io.PersistList(const AListIntf: IInterface; const ABlindInsert: boolean);
 begin
-  Self.PersistCollection(AIntfCollection as TObject, ABlindInsert);
+  Self.PersistList(AListIntf as TObject, ABlindInsert);
 end;
 
 class function io.RefTo(const AClassRef: TioClassRef; const ATypeAlias: String = ''): IioWhere;
@@ -839,18 +905,20 @@ begin
   TioConnectionManager.SetShowHideWaitProc(AShowWaitProc, AHideWaitProc);
 end;
 
-class procedure io.Show(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String);
+class procedure io.Show(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
+  const AVVMAlias: String);
 begin
   if di.LocateSimpleViewFor(ATargetObj, AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewfor(ATargetObj, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show
+    di.LocateSimpleViewFor(ATargetObj, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show
   else
     di.LocateViewVMfor(ATargetObj, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show;
 end;
 
-class procedure io.Show(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
+class procedure io.Show(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
+  const AVVMAlias: String);
 begin
   if di.LocateSimpleViewFor(ATargetObj, AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewfor(ATargetObj, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show
+    di.LocateSimpleViewFor(ATargetObj, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show
   else
     di.LocateViewVMfor(ATargetObj, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show;
 end;
@@ -858,15 +926,16 @@ end;
 class procedure io.Show(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 begin
   if di.LocateSimpleViewFor(ATargetObj, AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewfor(ATargetObj, AParentCloseQueryAction, AVVMAlias).Show
+    di.LocateSimpleViewFor(ATargetObj, AParentCloseQueryAction, AVVMAlias).Show
   else
     di.LocateViewVMfor(ATargetObj, AParentCloseQueryAction, AVVMAlias).Show;
 end;
 
-class procedure io.Show(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String);
+class procedure io.Show(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
+  const AVVMAlias: String);
 begin
   if di.LocateSimpleViewFor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewfor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show
+    di.LocateSimpleViewFor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show
   else
     di.LocateViewVMfor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show;
 end;
@@ -874,7 +943,7 @@ end;
 class procedure io.Show<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 begin
   if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewfor<T>(AParentCloseQueryAction, AVVMAlias).Show
+    di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Show
   else
     di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).Show;
 end;
@@ -882,7 +951,7 @@ end;
 class procedure io.Show<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
   if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewfor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show
+    di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show
   else
     di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show;
 end;
@@ -890,15 +959,16 @@ end;
 class procedure io.Show<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String);
 begin
   if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewfor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show
+    di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show
   else
     di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show;
 end;
 
-class procedure io.Show(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
+class procedure io.Show(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
+  const AVVMAlias: String);
 begin
   if di.LocateSimpleViewFor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewfor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show
+    di.LocateSimpleViewFor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show
   else
     di.LocateViewVMfor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show;
 end;
@@ -906,12 +976,13 @@ end;
 class procedure io.Show(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 begin
   if di.LocateSimpleViewFor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewfor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).Show
+    di.LocateSimpleViewFor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).Show
   else
     di.LocateViewVMfor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).Show;
 end;
 
-class procedure io.ShowCurrent(const ABindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String);
+class procedure io.ShowCurrent(const ABindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
+  const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ABindSource, True, False) then
     TioDependencyInjectionFactory.GetViewVMLocatorFor(ABindSource, AParentCloseQueryAction, AVVMAlias, False).SetViewContext(AViewContext).ShowCurrent;
@@ -923,13 +994,15 @@ begin
     TioDependencyInjectionFactory.GetViewVMLocatorFor(ABindSource, AParentCloseQueryAction, AVVMAlias, False).ShowCurrent;
 end;
 
-class procedure io.ShowCurrent(const ABindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
+class procedure io.ShowCurrent(const ABindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
+  const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ABindSource, True, False) then
     TioDependencyInjectionFactory.GetViewVMLocatorFor(ABindSource, AParentCloseQueryAction, AVVMAlias, False).VCProvider(AVCProvider).ShowCurrent;
 end;
 
-class procedure io.ShowEach(const ABindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String);
+class procedure io.ShowEach(const ABindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
+  const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ABindSource, True, False) then
     TioDependencyInjectionFactory.GetViewVMLocatorFor(ABindSource, AParentCloseQueryAction, AVVMAlias, False).SetViewContext(AViewContext).ShowEach;
@@ -946,12 +1019,14 @@ begin
   TioApplication.ShowMessage(AMessage);
 end;
 
-class procedure io.ShowAsSelector(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
+class procedure io.ShowAsSelector(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
+  const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
   ShowAsSelector(ATargetBindSource.GetTypeName, ATargetBindSource, AParentCloseQueryAction, AVCProvider, AVVMAlias);
 end;
 
-class procedure io.ShowAsSelector(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String);
+class procedure io.ShowAsSelector(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
+  const AViewContext: TComponent; const AVVMAlias: String);
 begin
   ShowAsSelector(ATargetBindSource.GetTypeName, ATargetBindSource, AParentCloseQueryAction, AViewContext, AVVMAlias);
 end;
@@ -961,7 +1036,7 @@ class procedure io.ShowAsSelector<T>(const ATargetBindSource: IioNotifiableBindS
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ATargetBindSource, False, False) then
     if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewfor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsSelectorFor(ATargetBindSource).Show
+      di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsSelectorFor(ATargetBindSource).Show
     else
       di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsSelectorFor(ATargetBindSource).Show;
 end;
@@ -972,25 +1047,28 @@ begin
   ShowAsSelector(ATargetBindSource.GetTypeName, ATargetBindSource, AParentCloseQueryAction, AVVMAlias);
 end;
 
-class procedure io.ShowAsSelector<T>(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String);
+class procedure io.ShowAsSelector<T>(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
+  const AViewContext: TComponent; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ATargetBindSource, False, False) then
     if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewfor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsSelectorFor(ATargetBindSource).Show
+      di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsSelectorFor(ATargetBindSource).Show
     else
       di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsSelectorFor(ATargetBindSource).Show;
 end;
 
-class procedure io.ShowAsSelector<T>(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
+class procedure io.ShowAsSelector<T>(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
+  const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ATargetBindSource, False, False) then
     if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewfor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ATargetBindSource).Show
+      di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ATargetBindSource).Show
     else
       di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ATargetBindSource).Show;
 end;
 
-class procedure io.ShowEach(const ABindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
+class procedure io.ShowEach(const ABindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
+  const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ABindSource, True, False) then
     TioDependencyInjectionFactory.GetViewVMLocatorFor(ABindSource, AParentCloseQueryAction, AVVMAlias, False).VCProvider(AVCProvider).ShowEach;
@@ -1083,25 +1161,29 @@ end;
 class function io.CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
   const ASVAlias: String; const AParams: TioConstructorParams): TComponent;
 begin
-  Result := di.LocateSimpleView(ASVTypeName, AParentCloseQueryAction, ASVAlias).SetViewContext(AViewContext).ConstructorParams(AParams).GetAsGeneric.OfType<TComponent>;
+  Result := di.LocateSimpleView(ASVTypeName, AParentCloseQueryAction, ASVAlias).SetViewContext(AViewContext).ConstructorParams(AParams)
+    .GetAsGeneric.OfType<TComponent>;
 end;
 
 class function io.CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewModel: IioViewModel;
   const ASVAlias: String; const AParams: TioConstructorParams): TComponent;
 begin
-  Result := di.LocateSimpleView(ASVTypeName, AParentCloseQueryAction, ASVAlias).SetViewModel(AViewModel).ConstructorParams(AParams).GetAsGeneric.OfType<TComponent>;
+  Result := di.LocateSimpleView(ASVTypeName, AParentCloseQueryAction, ASVAlias).SetViewModel(AViewModel).ConstructorParams(AParams)
+    .GetAsGeneric.OfType<TComponent>;
 end;
 
 class function io.CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
   const AViewModel: IioViewModel; const ASVAlias: String; const AParams: TioConstructorParams): TComponent;
 begin
-  Result := di.LocateSimpleView(ASVTypeName, AParentCloseQueryAction, ASVAlias).VCProvider(AVCProvider).SetViewModel(AViewModel).ConstructorParams(AParams).GetAsGeneric.OfType<TComponent>;
+  Result := di.LocateSimpleView(ASVTypeName, AParentCloseQueryAction, ASVAlias).VCProvider(AVCProvider).SetViewModel(AViewModel).ConstructorParams(AParams)
+    .GetAsGeneric.OfType<TComponent>;
 end;
 
 class function io.CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
   const AViewModel: IioViewModel; const ASVAlias: String; const AParams: TioConstructorParams): TComponent;
 begin
-  Result := di.LocateSimpleView(ASVTypeName, AParentCloseQueryAction, ASVAlias).SetViewContext(AViewContext).SetViewModel(AViewModel).ConstructorParams(AParams).GetAsGeneric.OfType<TComponent>;
+  Result := di.LocateSimpleView(ASVTypeName, AParentCloseQueryAction, ASVAlias).SetViewContext(AViewContext).SetViewModel(AViewModel).ConstructorParams(AParams)
+    .GetAsGeneric.OfType<TComponent>;
 end;
 
 class function io.CreateSimpleView<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const ASVAlias: String;
@@ -1116,8 +1198,7 @@ begin
   Result := di.LocateSimpleView<T>(AParentCloseQueryAction, ASVAlias).VCProvider(AVCProvider).ConstructorParams(AParams).Get;
 end;
 
-class function io.CreateSimpleView<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String;
-  const AParams: TioConstructorParams): T;
+class function io.CreateSimpleView<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String; const AParams: TioConstructorParams): T;
 begin
   Result := di.LocateSimpleView<T>(AParentCloseQueryAction, ASVAlias).ConstructorParams(AParams).Get;
 end;
@@ -1131,7 +1212,8 @@ end;
 class function io.CreateSimpleViewFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const ASVAlias: String;
   const AParams: TioConstructorParams): TComponent;
 begin
-  Result := io.di.LocateSimpleViewFor<T>(AParentCloseQueryAction, ASVAlias).ConstructorParams(AParams).SetViewContext(AViewContext).GetAsGeneric.OfType<TComponent>;
+  Result := io.di.LocateSimpleViewFor<T>(AParentCloseQueryAction, ASVAlias).ConstructorParams(AParams).SetViewContext(AViewContext)
+    .GetAsGeneric.OfType<TComponent>;
 end;
 
 class function io.CreateSimpleViewFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
@@ -1140,8 +1222,8 @@ begin
   Result := io.di.LocateSimpleViewFor<T>(AParentCloseQueryAction, ASVAlias).ConstructorParams(AParams).VCProvider(AVCProvider).GetAsGeneric.OfType<TComponent>;
 end;
 
-class function io.CreateSimpleViewFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String;
-  const AParams: TioConstructorParams): TComponent;
+class function io.CreateSimpleViewFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String; const AParams: TioConstructorParams)
+  : TComponent;
 begin
   Result := io.di.LocateSimpleViewFor<T>(AParentCloseQueryAction, ASVAlias).ConstructorParams(AParams).GetAsGeneric.OfType<TComponent>;
 end;
@@ -1149,13 +1231,15 @@ end;
 class function io.CreateSimpleViewFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AViewModel: IioViewModel;
   const ASVAlias: String; const AParams: TioConstructorParams): TComponent;
 begin
-  Result := io.di.LocateSimpleViewFor<T>(AParentCloseQueryAction, ASVAlias).ConstructorParams(AParams).SetViewContext(AViewContext).SetViewModel(AViewModel).GetAsGeneric.OfType<TComponent>;
+  Result := io.di.LocateSimpleViewFor<T>(AParentCloseQueryAction, ASVAlias).ConstructorParams(AParams).SetViewContext(AViewContext).SetViewModel(AViewModel)
+    .GetAsGeneric.OfType<TComponent>;
 end;
 
 class function io.CreateSimpleViewFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
   const AViewModel: IioViewModel; const ASVAlias: String; const AParams: TioConstructorParams): TComponent;
 begin
-  Result := io.di.LocateSimpleViewFor<T>(AParentCloseQueryAction, ASVAlias).ConstructorParams(AParams).VCProvider(AVCProvider).SetViewModel(AViewModel).GetAsGeneric.OfType<TComponent>;
+  Result := io.di.LocateSimpleViewFor<T>(AParentCloseQueryAction, ASVAlias).ConstructorParams(AParams).VCProvider(AVCProvider).SetViewModel(AViewModel)
+    .GetAsGeneric.OfType<TComponent>;
 end;
 
 class function io.CreateSimpleViewFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewModel: IioViewModel; const ASVAlias: String;
@@ -1176,10 +1260,11 @@ begin
   Result := di.LocateSimpleView<T>(AParentCloseQueryAction, ASVAlias).SetViewModel(AViewModel).ConstructorParams(AParams).Get;
 end;
 
-class function io.CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction;
-  const AVCProvider: TioViewContextProvider; const ASVAlias: String; const AParams: TioConstructorParams): TComponent;
+class function io.CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
+  const ASVAlias: String; const AParams: TioConstructorParams): TComponent;
 begin
-  Result := di.LocateSimpleView(ASVTypeName, AParentCloseQueryAction, ASVAlias).VCProvider(AVCProvider).ConstructorParams(AParams).GetAsGeneric.OfType<TComponent>;
+  Result := di.LocateSimpleView(ASVTypeName, AParentCloseQueryAction, ASVAlias).VCProvider(AVCProvider).ConstructorParams(AParams)
+    .GetAsGeneric.OfType<TComponent>;
 end;
 
 class function io.CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String;
@@ -1208,20 +1293,20 @@ begin
   Result := di.LocateView(AViewTypeName, AVAlias).ConstructorParams(AParams).GetAsGeneric.OfType<TComponent>;
 end;
 
-class function io.CreateView(const AViewTypeName: String; const AVCProvider: TioViewContextProvider; const AVAlias: String;
-  const AParams: TioConstructorParams): TComponent;
+class function io.CreateView(const AViewTypeName: String; const AVCProvider: TioViewContextProvider; const AVAlias: String; const AParams: TioConstructorParams)
+  : TComponent;
 begin
   Result := di.LocateView(AViewTypeName, AVAlias).VCProvider(AVCProvider).ConstructorParams(AParams).GetAsGeneric.OfType<TComponent>;
 end;
 
-class function io.CreateView(const AViewTypeName: String; const AViewContext: TComponent; const AVAlias: String;
-  const AParams: TioConstructorParams): TComponent;
+class function io.CreateView(const AViewTypeName: String; const AViewContext: TComponent; const AVAlias: String; const AParams: TioConstructorParams)
+  : TComponent;
 begin
   Result := di.LocateView(AViewTypeName, AVAlias).SetViewContext(AViewContext).ConstructorParams(AParams).GetAsGeneric.OfType<TComponent>;
 end;
 
-class function io.CreateView(const AViewTypeName: String; const AViewModel: IioViewModel; const AVAlias: String;
-  const AParams: TioConstructorParams): TComponent;
+class function io.CreateView(const AViewTypeName: String; const AViewModel: IioViewModel; const AVAlias: String; const AParams: TioConstructorParams)
+  : TComponent;
 begin
   Result := di.LocateView(AViewTypeName, AVAlias).SetViewModel(AViewModel).ConstructorParams(AParams).GetAsGeneric.OfType<TComponent>;
 end;
@@ -1235,7 +1320,8 @@ end;
 class function io.CreateView(const AViewTypeName: String; const AViewContext: TComponent; const AViewModel: IioViewModel; const AVAlias: String;
   const AParams: TioConstructorParams): TComponent;
 begin
-  Result := di.LocateView(AViewTypeName, AVAlias).SetViewContext(AViewContext).SetViewModel(AViewModel).ConstructorParams(AParams).GetAsGeneric.OfType<TComponent>;
+  Result := di.LocateView(AViewTypeName, AVAlias).SetViewContext(AViewContext).SetViewModel(AViewModel).ConstructorParams(AParams)
+    .GetAsGeneric.OfType<TComponent>;
 end;
 
 class function io.CreateView<T>(const AViewContext: TComponent; const AViewModel: IioViewModel; const AVAlias: String; const AParams: TioConstructorParams): T;
@@ -1258,12 +1344,14 @@ begin
   Result := io.di.LocateViewFor<T>(AVAlias).ConstructorParams(AParams).GetAsGeneric.OfType<TComponent>;
 end;
 
-class function io.CreateViewFor<T>(const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const AVAlias: String; const AParams: TioConstructorParams): TComponent;
+class function io.CreateViewFor<T>(const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const AVAlias: String;
+  const AParams: TioConstructorParams): TComponent;
 begin
   Result := io.di.LocateViewFor<T>(AVAlias).ConstructorParams(AParams).VCProvider(AVCProvider).SetViewModel(AViewModel).GetAsGeneric.OfType<TComponent>;
 end;
 
-class function io.CreateViewFor<T>(const AViewContext: TComponent; const AViewModel: IioViewModel; const AVAlias: String; const AParams: TioConstructorParams): TComponent;
+class function io.CreateViewFor<T>(const AViewContext: TComponent; const AViewModel: IioViewModel; const AVAlias: String; const AParams: TioConstructorParams)
+  : TComponent;
 begin
   Result := io.di.LocateViewFor<T>(AVAlias).ConstructorParams(AParams).SetViewContext(AViewContext).SetViewModel(AViewModel).GetAsGeneric.OfType<TComponent>;
 end;
@@ -1273,7 +1361,8 @@ begin
   Result := io.di.LocateViewFor<T>(AVAlias).ConstructorParams(AParams).SetViewModel(AViewModel).GetAsGeneric.OfType<TComponent>;
 end;
 
-class function io.CreateView<T>(const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const AVAlias: String; const AParams: TioConstructorParams): T;
+class function io.CreateView<T>(const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const AVAlias: String;
+  const AParams: TioConstructorParams): T;
 begin
   Result := di.LocateView<T>(AVAlias).VCProvider(AVCProvider).SetViewModel(AViewModel).ConstructorParams(AParams).Get;
 end;
@@ -1283,7 +1372,8 @@ begin
   Result := di.LocateView<T>(AVAlias).SetViewModel(AViewModel).ConstructorParams(AParams).Get;
 end;
 
-class procedure io.CreateViewVM<TView, TViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
+class procedure io.CreateViewVM<TView, TViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
+  const AVVMAlias: String);
 begin
   di.LocateViewVM<TView, TViewModel>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show;
 end;
@@ -1305,7 +1395,8 @@ begin
   di.LocateViewVM(AViewTypeName, AVMTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show;
 end;
 
-class procedure io.CreateViewVM<TView, TViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String);
+class procedure io.CreateViewVM<TView, TViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
+  const AVVMAlias: String);
 begin
   di.LocateViewVM<TView, TViewModel>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show;
 end;
@@ -1315,7 +1406,8 @@ begin
   di.LocateViewVM<TView, TViewModel>(AParentCloseQueryAction, AVVMAlias).Show;
 end;
 
-class function io.CreateVMFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String; const AParams: TioConstructorParams): IioViewModel;
+class function io.CreateVMFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String; const AParams: TioConstructorParams)
+  : IioViewModel;
 begin
   Result := io.di.LocateVMfor<T>(AParentCloseQueryAction, AVMAlias).ConstructorParams(AParams).GetAsGeneric.OfType<IioViewModel>;
 end;
@@ -1357,33 +1449,6 @@ end;
 class procedure io.Delete(const AIntfObj: IInterface);
 begin
   Self.Delete(AIntfObj as TObject);
-end;
-
-class procedure io.Delete<T>(const AID: Integer);
-begin
-  Self.Delete<T>('', AID);
-end;
-
-class procedure io.Delete<T>(const ATypeAlias: String; const AID: Integer);
-begin
-  Self.RefTo<T>(ATypeAlias).ByID(AID).Delete;
-end;
-
-class procedure io.DeleteAll<T>(const ATypeAlias: String);
-begin
-  Self.RefTo<T>(ATypeAlias).Delete;
-end;
-
-class procedure io.DeleteAll<T>(const AWhere: IioWhere);
-begin
-  Self.DeleteAll<T>('', AWhere);
-end;
-
-class procedure io.DeleteAll<T>(const ATypeAlias: String; const AWhere: IioWhere);
-begin
-  AWhere.TypeName := TioUtilities.GenericToString<T>(False);
-  AWhere.TypeAlias := ATypeAlias;
-  AWhere.Delete;
 end;
 
 class procedure io.DeleteList(const AListIntf: IInterface);
@@ -1486,13 +1551,13 @@ begin
   Result.TypeInfo := ATypeInfo;
 end;
 
-class procedure io._PersistCollectionInternal(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
-  const ABlindInsert: boolean; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
+class procedure io._PersistListInternal(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
+  const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LConnectionDefName: String;
 begin
   LConnectionDefName := TioConnectionManager.GetCurrentConnectionName;
-  TioStrategyFactory.GetStrategy(LConnectionDefName).PersistCollection(ACollection, ARelationPropertyName, ARelationOID, ABlindInsert, AMasterBSPersistence,
+  TioStrategyFactory.GetStrategy(LConnectionDefName).PersistCollection(AList, ARelationPropertyName, ARelationOID, ABlindInsert, AMasterBSPersistence,
     AMasterPropertyName, AMasterPropertyPath);
 end;
 
@@ -1596,7 +1661,7 @@ end;
 class procedure io.Show(const AEntityTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 begin
   if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Show
+    di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Show
   else
     di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Show;
 end;
@@ -1605,7 +1670,7 @@ class procedure io.Show(const AEntityTypeName: String; const AParentCloseQueryAc
   const AVVMAlias: String);
 begin
   if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show
+    di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show
   else
     di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show;
 end;
@@ -1614,7 +1679,7 @@ class procedure io.Show(const AEntityTypeName: String; const AParentCloseQueryAc
   const AVVMAlias: String);
 begin
   if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show
+    di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show
   else
     di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show;
 end;
@@ -1624,7 +1689,7 @@ class procedure io.ShowAsSelector(const AEntityTypeName: String; const ATargetBi
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ATargetBindSource, False, False) then
     if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsSelectorFor(ATargetBindSource).Show
+      di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsSelectorFor(ATargetBindSource).Show
     else
       di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsSelectorFor(ATargetBindSource).Show;
 end;
@@ -1634,7 +1699,7 @@ class procedure io.ShowAsSelector(const AEntityTypeName: String; const ATargetBi
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ATargetBindSource, False, False) then
     if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ATargetBindSource).Show
+      di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ATargetBindSource).Show
     else
       di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ATargetBindSource).Show;
 end;
@@ -1644,7 +1709,8 @@ class procedure io.ShowAsSelector(const AEntityTypeName: String; const ATargetBi
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ATargetBindSource, False, False) then
     if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsSelectorFor(ATargetBindSource).Show
+      di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext)
+        .SetBindSourceAsSelectorFor(ATargetBindSource).Show
     else
       di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsSelectorFor(ATargetBindSource).Show;
 end;

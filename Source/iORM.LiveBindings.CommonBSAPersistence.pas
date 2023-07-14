@@ -664,7 +664,7 @@ begin
   Result := function: TObject
     begin
       Result := nil;
-      io.PersistCollection(AActiveBindSourceAdapter.DataObject, False);
+      io.PersistList(AActiveBindSourceAdapter.DataObject, False);
     end;
 end;
 

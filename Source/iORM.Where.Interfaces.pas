@@ -138,12 +138,13 @@ type
     function _And(AWhereCond:IioWhere): IioWhere overload;
     // ------ Compare operators
     function _Equal: IioWhere;
+    function _NotEqual: IioWhere;
     function _Greater: IioWhere;
     function _Lower: IioWhere;
     function _GreaterOrEqual: IioWhere;
     function _LowerOrEqual: IioWhere;
-    function _NotEqual: IioWhere;
     function _Like: IioWhere;
+    function _NotLike: IioWhere;
     function _IsNull: IioWhere;
     function _IsNotNull: IioWhere;
     // ------ Compare operators with TValue
@@ -151,6 +152,10 @@ type
     function _EqualTo(AValue:TDateTime): IioWhere; overload;
     function _EqualTo(AValue:Double): IioWhere; overload;
     function _EqualTo(AValue:Integer): IioWhere; overload;
+    function _NotEqualTo(AValue:TValue): IioWhere; overload;
+    function _NotEqualTo(AValue:TDateTime): IioWhere; overload;
+    function _NotEqualTo(AValue:Double): IioWhere; overload;
+    function _NotEqualTo(AValue:Integer): IioWhere; overload;
     function _GreaterThan(AValue:TValue): IioWhere; overload;
     function _GreaterThan(AValue:TDateTime): IioWhere; overload;
     function _GreaterThan(AValue:Double): IioWhere; overload;
@@ -167,14 +172,14 @@ type
     function _LowerOrEqualThan(AValue:TDateTime): IioWhere; overload;
     function _LowerOrEqualThan(AValue:Double): IioWhere; overload;
     function _LowerOrEqualThan(AValue:Integer): IioWhere; overload;
-    function _NotEqualTo(AValue:TValue): IioWhere; overload;
-    function _NotEqualTo(AValue:TDateTime): IioWhere; overload;
-    function _NotEqualTo(AValue:Double): IioWhere; overload;
-    function _NotEqualTo(AValue:Integer): IioWhere; overload;
     function _LikeTo(AValue:TValue): IioWhere; overload;
     function _LikeTo(AValue:TDateTime): IioWhere; overload;
     function _LikeTo(AValue:Double): IioWhere; overload;
     function _LikeTo(AValue:Integer): IioWhere; overload;
+    function _NotLikeTo(AValue:TValue): IioWhere; overload;
+    function _NotLikeTo(AValue:TDateTime): IioWhere; overload;
+    function _NotLikeTo(AValue:Double): IioWhere; overload;
+    function _NotLikeTo(AValue:Integer): IioWhere; overload;
     // ------ New criteria
     function _And(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere; overload;
     function _And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere; overload;
@@ -275,12 +280,13 @@ type
     function _And(AWhereCond:IioWhere): IioWhere<T>; overload;
     // ------ Compare operators
     function _Equal: IioWhere<T>;
+    function _NotEqual: IioWhere<T>;
     function _Greater: IioWhere<T>;
     function _Lower: IioWhere<T>;
     function _GreaterOrEqual: IioWhere<T>;
     function _LowerOrEqual: IioWhere<T>;
-    function _NotEqual: IioWhere<T>;
     function _Like: IioWhere<T>;
+    function _NotLike: IioWhere<T>;
     function _IsNull: IioWhere<T>;
     function _IsNotNull: IioWhere<T>;
     // ------ Compare operators with TValue
@@ -288,6 +294,10 @@ type
     function _EqualTo(AValue:TDateTime): IioWhere<T>; overload;
     function _EqualTo(AValue:Double): IioWhere<T>; overload;
     function _EqualTo(AValue:Integer): IioWhere<T>; overload;
+    function _NotEqualTo(AValue:TValue): IioWhere<T>; overload;
+    function _NotEqualTo(AValue:TDateTime): IioWhere<T>; overload;
+    function _NotEqualTo(AValue:Double): IioWhere<T>; overload;
+    function _NotEqualTo(AValue:Integer): IioWhere<T>; overload;
     function _GreaterThan(AValue:TValue): IioWhere<T>; overload;
     function _GreaterThan(AValue:TDateTime): IioWhere<T>; overload;
     function _GreaterThan(AValue:Double): IioWhere<T>; overload;
@@ -304,14 +314,14 @@ type
     function _LowerOrEqualThan(AValue:TDateTime): IioWhere<T>; overload;
     function _LowerOrEqualThan(AValue:Double): IioWhere<T>; overload;
     function _LowerOrEqualThan(AValue:Integer): IioWhere<T>; overload;
-    function _NotEqualTo(AValue:TValue): IioWhere<T>; overload;
-    function _NotEqualTo(AValue:TDateTime): IioWhere<T>; overload;
-    function _NotEqualTo(AValue:Double): IioWhere<T>; overload;
-    function _NotEqualTo(AValue:Integer): IioWhere<T>; overload;
     function _LikeTo(AValue:TValue): IioWhere<T>; overload;
     function _LikeTo(AValue:TDateTime): IioWhere<T>; overload;
     function _LikeTo(AValue:Double): IioWhere<T>; overload;
     function _LikeTo(AValue:Integer): IioWhere<T>; overload;
+    function _NotLikeTo(AValue:TValue): IioWhere<T>; overload;
+    function _NotLikeTo(AValue:TDateTime): IioWhere<T>; overload;
+    function _NotLikeTo(AValue:Double): IioWhere<T>; overload;
+    function _NotLikeTo(AValue:Integer): IioWhere<T>; overload;
     // ------ New criteria
     function _And(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>; overload;
     function _And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>; overload;
