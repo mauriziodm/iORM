@@ -60,10 +60,10 @@ type
     class function InTransaction(const AConnectionName: String): Boolean; override;
     class procedure PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsertUpdate: Boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
-    class procedure PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
+    class procedure PersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
     class procedure DeleteObject(const AObj: TObject); override;
-    class procedure DeleteCollection(const ACollection: TObject); override;
+    class procedure DeleteList(const AList: TObject); override;
     class procedure Delete(const AWhere: IioWhere); override;
     class procedure LoadList(const AWhere: IioWhere; const AList: TObject); override;
     class function LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject; override;
@@ -203,7 +203,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.DeleteCollection(const ACollection: TObject);
+class procedure TioStrategyDB.DeleteList(const AList: TObject);
 var
   ADuckTypedList: IioDuckTypedList;
   AObj: TObject;
@@ -229,7 +229,7 @@ begin
   Self.StartTransaction('');
   try
     // Wrap the DestList into a DuckTypedList
-    ADuckTypedList := TioDuckTypedFactory.DuckTypedList(ACollection);
+    ADuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
     // Loop the list and delete objects
     for AObj in ADuckTypedList do
     begin
@@ -374,7 +374,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
+class procedure TioStrategyDB.PersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
   const ABlindInsert: Boolean; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LDuckTypedList: IioDuckTypedList;
@@ -401,7 +401,7 @@ begin
   StartTransaction('');
   try
     // Wrap the DestList into a DuckTypedList
-    LDuckTypedList := TioDuckTypedFactory.DuckTypedList(ACollection);
+    LDuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
     // Loop the list
     for LObj in LDuckTypedList do
       PersistObject(LObj, ARelationPropertyName, ARelationOID, ABlindInsert, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath);
@@ -486,7 +486,7 @@ begin
     case LMasterProp.GetRelationType of
       // If relation HasMany
       rtHasMany:
-        DeleteCollection(LMasterProp.GetRelationChildObject(AMasterContext.DataObject));
+        DeleteList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject));
       // If relation HasOne
       rtHasOne:
         DeleteObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject));
@@ -508,7 +508,7 @@ begin
     case LMasterProp.GetRelationType of
       // If relation HasMany
       rtHasMany:
-        PersistCollection(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), LMasterProp.GetRelationChildPropertyName,
+        PersistList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), LMasterProp.GetRelationChildPropertyName,
           AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, False, AMasterContext.MasterBSPersistence,
           LMasterProp.GetName, AMasterContext.MasterPropertyPath);
       // If relation HasOne

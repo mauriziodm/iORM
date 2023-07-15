@@ -71,7 +71,8 @@ type
     class function EnumToString<T>(const AEnumValue:T): String;
     class function StringToEnum<T>(const AStringValue: String): T;
     class function GetThreadID: TThreadID; static;
-    class function ExtractItemRttiType<T>: TRttiType;
+    class function ExtractItemRttiTypeByGeneric<T>: TRttiType;
+    class function ExtractItemRttiTypeFromList(const AList: TObject): TRttiType;
     class function TryGetMemberAttribute<T: class>(const ARTTIMember: TRttiMember; out OAttribute: TCustomAttribute): boolean; static;
     class function HasAttribute<T: TCustomAttribute>(const ARTTIType: TRttiType): boolean; static;
     class function HasAttributes<T1, T2: TCustomAttribute>(const ARTTIType: TRttiType): boolean; static;
@@ -187,7 +188,20 @@ begin
   Result := TRttiEnumerationType.GetValue<T>(AStringValue);
 end;
 
-class function TioUtilities.ExtractItemRttiType<T>: TRttiType;
+class function TioUtilities.ExtractItemRttiTypeFromList(const AList: TObject): TRttiType;
+var
+  LType: TRttiType;
+  LGetItemMethod: TRttiMethod;
+begin
+  LType := TioRttiFactory.GetRttiContext.GetType(AList.ClassInfo);
+  LGetItemMethod := LType.GetMethod('GetItem');
+  if Assigned(LGetItemMethod) then
+    Result := LGetItemMethod.ReturnType
+  else
+    raise EioException.Create(Self.ClassName, 'ExtractItemRttiType', Format('Method "GetItem" not found in "%s" type.', [AList.ClassName]));
+end;
+
+class function TioUtilities.ExtractItemRttiTypeByGeneric<T>: TRttiType;
 var
   LType: TRttiType;
   LGetItemMethod: TRttiMethod;
@@ -197,7 +211,7 @@ begin
   if Assigned(LGetItemMethod) then
     Result := LGetItemMethod.ReturnType
   else
-    raise EioException.Create(Self.ClassName, 'ExtractItemRttiType', Format('Method "GetItem" not found in "%s" type.', [GenericToString<T>]));
+    raise EioException.Create(Self.ClassName, 'ExtractItemRttiTypeByGeneric<T>', Format('Method "GetItem" not found in "%s" type.', [GenericToString<T>]));
 end;
 
 class function TioUtilities.ExtractPropertyName(const AFullPathPropertyName: String): String;

@@ -617,7 +617,7 @@ class function io.LoadList<TListType>(const AItemAlias: String; const AWhere: Ii
 var
   LItemRttiType: TRttiType;
 begin
-  LItemRttiType := TioUtilities.ExtractItemRttiType<TListType>;
+  LItemRttiType := TioUtilities.ExtractItemRttiTypeByGeneric<TListType>;
   Result := TListType.Create;
   AWhere.TypeName := LItemRttiType.Name;
   AWhere.TypeAlias := AItemAlias;
@@ -1461,7 +1461,7 @@ var
   LConnectionDefName: String;
 begin
   LConnectionDefName := TioConnectionManager.GetCurrentConnectionName;
-  TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteCollection(AListObj);
+  TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteList(AListObj);
 end;
 
 class function io.di: TioDependencyInjectionRef;
@@ -1557,7 +1557,7 @@ var
   LConnectionDefName: String;
 begin
   LConnectionDefName := TioConnectionManager.GetCurrentConnectionName;
-  TioStrategyFactory.GetStrategy(LConnectionDefName).PersistCollection(AList, ARelationPropertyName, ARelationOID, ABlindInsert, AMasterBSPersistence,
+  TioStrategyFactory.GetStrategy(LConnectionDefName).PersistList(AList, ARelationPropertyName, ARelationOID, ABlindInsert, AMasterBSPersistence,
     AMasterPropertyName, AMasterPropertyPath);
 end;
 

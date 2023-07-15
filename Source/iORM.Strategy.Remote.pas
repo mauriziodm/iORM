@@ -54,10 +54,10 @@ type
     class function InTransaction(const AConnectionName: String): boolean; override;
     class procedure PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
-    class procedure PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
+    class procedure PersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
     class procedure DeleteObject(const AObj: TObject); override;
-    class procedure DeleteCollection(const ACollection: TObject); override;
+    class procedure DeleteList(const AList: TObject); override;
     class procedure Delete(const AWhere: IioWhere); override;
     class procedure LoadList(const AWhere: IioWhere; const AList: TObject); override;
     class function LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject; override;
@@ -139,13 +139,13 @@ begin
   end;
 end;
 
-class procedure TioStrategyRemote.DeleteCollection(const ACollection: TObject);
+class procedure TioStrategyRemote.DeleteList(const AList: TObject);
 var
   LConnection: IioConnectionRemote;
 begin
   inherited;
   // Check
-  if not Assigned(ACollection) then
+  if not Assigned(AList) then
     Exit;
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection('').AsRemoteConnection;
@@ -156,7 +156,7 @@ begin
   LConnection.StartTransaction;
   try
     LConnection.RequestBody.Clear;
-    LConnection.RequestBody.DataObject := ACollection;
+    LConnection.RequestBody.DataObject := AList;
     LConnection.Execute('PersistCollection');
     // Commit
     LConnection.Commit;
@@ -313,14 +313,14 @@ end;
 // end;
 
 { TODO : DA AGGIUNGERE GESTIONE DEI 3 PARAMETRI AGGIUNTI ALLA FINE PER IL SUD }
-class procedure TioStrategyRemote.PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
+class procedure TioStrategyRemote.PersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LConnection: IioConnectionRemote;
 begin
   inherited;
   // Check
-  if not Assigned(ACollection) then
+  if not Assigned(AList) then
     Exit;
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection('').AsRemoteConnection;
@@ -334,11 +334,11 @@ begin
     LConnection.RequestBody.RelationPropertyName := ARelationPropertyName;
     LConnection.RequestBody.RelationOID := ARelationOID;
     LConnection.RequestBody.BlindInsert := ABlindInsert;
-    LConnection.RequestBody.DataObject := ACollection;
+    LConnection.RequestBody.DataObject := AList;
     LConnection.Execute('PersistCollection');
     // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
     if not ABlindInsert then
-      dj.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearCollection.TypeAnnotationsON.&To(ACollection);
+      dj.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearCollection.TypeAnnotationsON.&To(AList);
     // Commit
     LConnection.Commit;
   except

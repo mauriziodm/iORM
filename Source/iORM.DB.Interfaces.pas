@@ -382,10 +382,10 @@ type
     class function InTransaction(const AConnectionName: String): Boolean; virtual; abstract;
     class procedure PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: integer; const ABlindInsert: Boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); virtual; abstract;
-    class procedure PersistCollection(const ACollection: TObject; const ARelationPropertyName: String; const ARelationOID: integer; const ABlindInsert: Boolean;
+    class procedure PersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: integer; const ABlindInsert: Boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); virtual; abstract;
     class procedure DeleteObject(const AObj: TObject); virtual; abstract;
-    class procedure DeleteCollection(const ACollection: TObject); virtual; abstract;
+    class procedure DeleteList(const AList: TObject); virtual; abstract;
     class procedure Delete(const AWhere: IioWhere); virtual; abstract;
     class procedure LoadList(const AWhere: IioWhere; const AList: TObject); virtual; abstract;
     class function LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject; virtual; abstract;
