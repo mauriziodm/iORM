@@ -52,63 +52,54 @@ type
     class function CanIntercept(const AType, AALias: String; const AOpType: TioStrategyInterceptorOpType): Boolean;
     // LoadObject
     class function BeforeLoadObject(const AWhere: IioWhere; const AObj: TObject; var ADone: Boolean): TObject; virtual;
-    class function AfterLoadObject(const AWhere: IioWhere; const AObj: TObject; var AStop: Boolean): TObject; virtual;
+    class function AfterLoadObject(const AWhere: IioWhere; const AObj: TObject): TObject; virtual;
     // LoadList
     class procedure BeforeLoadList(const AWhere: IioWhere; const AList: TObject; var ADone: Boolean); virtual;
-    class procedure AfterLoadList(const AWhere: IioWhere; const AList: TObject; var AStop: Boolean); virtual;
+    class procedure AfterLoadList(const AWhere: IioWhere; const AList: TObject); virtual;
     // PersistObject
     class procedure BeforePersistObject(const AObj: TObject; var ADone: Boolean); virtual;
-    class procedure AfterPersistObject(const AObj: TObject; var AStop: Boolean); virtual;
+    class procedure AfterPersistObject(const AObj: TObject); virtual;
     // PersistList
     class procedure BeforePersistList(const AList: TObject; var ADone: Boolean); virtual;
-    class procedure AfterPersistList(const AList: TObject; var AStop: Boolean); virtual;
+    class procedure AfterPersistList(const AList: TObject); virtual;
     // DeleteObject
     class procedure BeforeDeleteObject(const AObj: TObject; var ADone: Boolean); virtual;
-    class procedure AfterDeleteObject(const AObj: TObject; var AStop: Boolean); virtual;
+    class procedure AfterDeleteObject(const AObj: TObject); virtual;
     // DeleteList
     class procedure BeforeDeleteList(const AList: TObject; var ADone: Boolean); virtual;
-    class procedure AfterDeleteList(const AList: TObject; var AStop: Boolean); virtual;
-    // Transaction
-    class procedure BeforeStartTransaction(const AConnectionName: String; var ADone: Boolean); virtual;
-    class procedure BeforeCommitTransaction(const AConnectionName: String; var ADone: Boolean); virtual;
-    class procedure BeforeRollbackTransaction(const AConnectionName: String; var ADone: Boolean); virtual;
+    class procedure AfterDeleteList(const AList: TObject); virtual;
   end;
 
 implementation
 
 { TioStrategyIncerceptor }
 
-class procedure TioCustomStrategyInterceptor.AfterDeleteList(const AList: TObject; var AStop: Boolean);
+class procedure TioCustomStrategyInterceptor.AfterDeleteList(const AList: TObject);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomStrategyInterceptor.AfterDeleteObject(const AObj: TObject; var AStop: Boolean);
+class procedure TioCustomStrategyInterceptor.AfterDeleteObject(const AObj: TObject);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomStrategyInterceptor.AfterLoadList(const AWhere: IioWhere; const AList: TObject; var AStop: Boolean);
+class procedure TioCustomStrategyInterceptor.AfterLoadList(const AWhere: IioWhere; const AList: TObject);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class function TioCustomStrategyInterceptor.AfterLoadObject(const AWhere: IioWhere; const AObj: TObject; var AStop: Boolean): TObject;
+class function TioCustomStrategyInterceptor.AfterLoadObject(const AWhere: IioWhere; const AObj: TObject): TObject;
 begin
   Result := nil;
 end;
 
-class procedure TioCustomStrategyInterceptor.AfterPersistList(const AList: TObject; var AStop: Boolean);
+class procedure TioCustomStrategyInterceptor.AfterPersistList(const AList: TObject);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomStrategyInterceptor.AfterPersistObject(const AObj: TObject; var AStop: Boolean);
-begin
-  // Nothing to do here (It must be implemented by the descendant classes)
-end;
-
-class procedure TioCustomStrategyInterceptor.BeforeCommitTransaction(const AConnectionName: String; var ADone: Boolean);
+class procedure TioCustomStrategyInterceptor.AfterPersistObject(const AObj: TObject);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
@@ -139,16 +130,6 @@ begin
 end;
 
 class procedure TioCustomStrategyInterceptor.BeforePersistObject(const AObj: TObject; var ADone: Boolean);
-begin
-  // Nothing to do here (It must be implemented by the descendant classes)
-end;
-
-class procedure TioCustomStrategyInterceptor.BeforeRollbackTransaction(const AConnectionName: String; var ADone: Boolean);
-begin
-  // Nothing to do here (It must be implemented by the descendant classes)
-end;
-
-class procedure TioCustomStrategyInterceptor.BeforeStartTransaction(const AConnectionName: String; var ADone: Boolean);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;

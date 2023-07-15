@@ -50,24 +50,20 @@ type
     class function BeforeLoadObject(const AWhere: IioWhere; const AObj: TObject; var ADone: Boolean): TObject;
     class function AfterLoadObject(const AWhere: IioWhere; const AObj: TObject): TObject; virtual;
     // LoadList
-    class procedure BeforeLoadList(const AWhere: IioWhere; const AObj: TObject; var ADone: Boolean);
-    class procedure AfterLoadList(const AWhere: IioWhere; const AObj: TObject);
+    class procedure BeforeLoadList(const AWhere: IioWhere; const AList: TObject; var ADone: Boolean);
+    class procedure AfterLoadList(const AWhere: IioWhere; const AList: TObject);
     // PersistObject
     class procedure BeforePersistObject(const AObj: TObject; var ADone: Boolean);
     class procedure AfterPersistObject(const AObj: TObject);
     // PersistList
-    class procedure BeforePersistList(const AObj: TObject; var ADone: Boolean);
-    class procedure AfterPersistList(const AObj: TObject);
+    class procedure BeforePersistList(const AList: TObject; var ADone: Boolean);
+    class procedure AfterPersistList(const AList: TObject);
     // DeleteObject
     class procedure BeforeDeleteObject(const AObj: TObject; var ADone: Boolean);
     class procedure AfterDeleteObject(const AObj: TObject);
     // DeleteList
-    class procedure BeforeDeleteList(const AObj: TObject; var ADone: Boolean);
-    class procedure AfterDeleteList(const AObj: TObject);
-    // Transaction
-    class procedure BeforeStartTransaction(const AConnectionName: String; var ADone: Boolean);
-    class procedure BeforeCommitTransaction(const AConnectionName: String; var ADone: Boolean);
-    class procedure BeforeRollbackTransaction(const AConnectionName: String; var ADone: Boolean);
+    class procedure BeforeDeleteList(const AList: TObject; var ADone: Boolean);
+    class procedure AfterDeleteList(const AList: TObject);
   end;
 
 implementation
@@ -77,127 +73,158 @@ uses
 
 { TioStrategyInterceptorRegister }
 
-class procedure TioStrategyInterceptorRegister.AfterDeleteList(const AObj: TObject);
+class procedure TioStrategyInterceptorRegister.AfterDeleteList(const AList: TObject);
 var
   LInterceptor: TioStrategyInterceptorRef;
   LTypeName: String;
-  LStop: Boolean;
 begin
-  LStop := False;
-  LTypeName := TioUtilities.ExtractItemRttiTypeFromList(AObj).Name;
+  LTypeName := TioUtilities.ExtractItemRttiTypeFromList(AList).Name;
   for LInterceptor in FInternalContainer do
-  begin
     if LInterceptor.CanIntercept(LTypeName, '', siDeleteList) then
-      LInterceptor.AfterDeleteList(AObj, LStop);
-    if LStop then
-      Break;
-  end;
+      LInterceptor.AfterDeleteList(AList);
 end;
 
 class procedure TioStrategyInterceptorRegister.AfterDeleteObject(const AObj: TObject);
 var
   LInterceptor: TioStrategyInterceptorRef;
-  LTypeName: String;
-  LStop: Boolean;
 begin
-  LStop := False;
-  LTypeName := TioUtilities.ExtractItemRttiTypeFromList(AObj).Name;
   for LInterceptor in FInternalContainer do
-  begin
-    if LInterceptor.CanIntercept(LTypeName, '', siDeleteObj) then
-      LInterceptor.AfterDeleteObject(AObj, LStop);
-    if LStop then
-      Break;
-  end;
+    if LInterceptor.CanIntercept(AObj.ClassName, '', siDeleteObj) then
+      LInterceptor.AfterDeleteObject(AObj);
 end;
 
-class procedure TioStrategyInterceptorRegister.AfterLoadList(const AWhere: IioWhere; const AObj: TObject);
+class procedure TioStrategyInterceptorRegister.AfterLoadList(const AWhere: IioWhere; const AList: TObject);
+var
+  LInterceptor: TioStrategyInterceptorRef;
 begin
-
+  for LInterceptor in FInternalContainer do
+    if LInterceptor.CanIntercept(AWhere.TypeName, AWhere.TypeAlias, siLoadList) then
+      LInterceptor.AfterLoadList(AWhere, AList);
 end;
 
 class function TioStrategyInterceptorRegister.AfterLoadObject(const AWhere: IioWhere; const AObj: TObject): TObject;
+var
+  LInterceptor: TioStrategyInterceptorRef;
 begin
-
+  for LInterceptor in FInternalContainer do
+    if LInterceptor.CanIntercept(AWhere.TypeName, AWhere.TypeAlias, siLoadObj) then
+      LInterceptor.AfterLoadObject(AWhere, AObj);
 end;
 
-class procedure TioStrategyInterceptorRegister.AfterPersistList(const AObj: TObject);
+class procedure TioStrategyInterceptorRegister.AfterPersistList(const AList: TObject);
 var
   LInterceptor: TioStrategyInterceptorRef;
   LTypeName: String;
-  LStop: Boolean;
 begin
-  LStop := False;
-  LTypeName := TioUtilities.ExtractItemRttiTypeFromList(AObj).Name;
+  LTypeName := TioUtilities.ExtractItemRttiTypeFromList(AList).Name;
   for LInterceptor in FInternalContainer do
-  begin
     if LInterceptor.CanIntercept(LTypeName, '', siPersistList) then
-      LInterceptor.AfterPersistList(AObj, LStop);
-    if LStop then
-      Break;
-  end;
+      LInterceptor.AfterPersistList(AList);
 end;
 
 class procedure TioStrategyInterceptorRegister.AfterPersistObject(const AObj: TObject);
 var
   LInterceptor: TioStrategyInterceptorRef;
-  LTypeName: String;
-  LStop: Boolean;
 begin
-  LStop := False;
-  LTypeName := TioUtilities.ExtractItemRttiTypeFromList(AObj).Name;
+  for LInterceptor in FInternalContainer do
+    if LInterceptor.CanIntercept(AObj.ClassName, '', siPersistObj) then
+      LInterceptor.AfterPersistObject(AObj);
+end;
+
+class procedure TioStrategyInterceptorRegister.BeforeDeleteList(const AList: TObject; var ADone: Boolean);
+var
+  LDone: Boolean;
+  LInterceptor: TioStrategyInterceptorRef;
+  LTypeName: String;
+begin
+  LTypeName := TioUtilities.ExtractItemRttiTypeFromList(AList).Name;
   for LInterceptor in FInternalContainer do
   begin
-    if LInterceptor.CanIntercept(LTypeName, '', siPersistObj) then
-      LInterceptor.AfterPersistObject(AObj, LStop);
-    if LStop then
-      Break;
+    LDone := False;
+    if LInterceptor.CanIntercept(LTypeName, '', siDeleteList) then
+      LInterceptor.BeforeDeleteList(AList, LDone);
+    if LDone then
+      ADone := True;
   end;
 end;
 
-class procedure TioStrategyInterceptorRegister.BeforeCommitTransaction(const AConnectionName: String; var ADone: Boolean);
-begin
-
-end;
-
-class procedure TioStrategyInterceptorRegister.BeforeDeleteList(const AObj: TObject; var ADone: Boolean);
-begin
-
-end;
-
 class procedure TioStrategyInterceptorRegister.BeforeDeleteObject(const AObj: TObject; var ADone: Boolean);
+var
+  LDone: Boolean;
+  LInterceptor: TioStrategyInterceptorRef;
 begin
-
+  for LInterceptor in FInternalContainer do
+  begin
+    LDone := False;
+    if LInterceptor.CanIntercept(AObj.ClassName, '', siDeleteObj) then
+      LInterceptor.BeforeDeleteObject(AObj, LDone);
+    if LDone then
+      ADone := True;
+  end;
 end;
 
-class procedure TioStrategyInterceptorRegister.BeforeLoadList(const AWhere: IioWhere; const AObj: TObject; var ADone: Boolean);
+class procedure TioStrategyInterceptorRegister.BeforeLoadList(const AWhere: IioWhere; const AList: TObject; var ADone: Boolean);
+var
+  LDone: Boolean;
+  LInterceptor: TioStrategyInterceptorRef;
+  LTypeName: String;
 begin
-
+  LTypeName := TioUtilities.ExtractItemRttiTypeFromList(AList).Name;
+  for LInterceptor in FInternalContainer do
+  begin
+    LDone := False;
+    if LInterceptor.CanIntercept(AWhere.TypeName, AWhere.TypeAlias, siLoadList) then
+      LInterceptor.BeforeLoadList(AWhere, AList, LDone);
+    if LDone then
+      ADone := True;
+  end;
 end;
 
 class function TioStrategyInterceptorRegister.BeforeLoadObject(const AWhere: IioWhere; const AObj: TObject; var ADone: Boolean): TObject;
+var
+  LDone: Boolean;
+  LInterceptor: TioStrategyInterceptorRef;
 begin
-
+  for LInterceptor in FInternalContainer do
+  begin
+    LDone := False;
+    if LInterceptor.CanIntercept(AWhere.TypeName, AWhere.TypeAlias, siLoadObj) then
+      LInterceptor.BeforeLoadObject(AWhere, AObj, LDone);
+    if LDone then
+      ADone := True;
+  end;
 end;
 
-class procedure TioStrategyInterceptorRegister.BeforePersistList(const AObj: TObject; var ADone: Boolean);
+class procedure TioStrategyInterceptorRegister.BeforePersistList(const AList: TObject; var ADone: Boolean);
+var
+  LDone: Boolean;
+  LInterceptor: TioStrategyInterceptorRef;
+  LTypeName: String;
 begin
-
+  LTypeName := TioUtilities.ExtractItemRttiTypeFromList(AList).Name;
+  for LInterceptor in FInternalContainer do
+  begin
+    LDone := False;
+    if LInterceptor.CanIntercept(LTypeName, '', siPersistList) then
+      LInterceptor.BeforePersistList(AList, LDone);
+    if LDone then
+      ADone := True;
+  end;
 end;
 
 class procedure TioStrategyInterceptorRegister.BeforePersistObject(const AObj: TObject; var ADone: Boolean);
+var
+  LDone: Boolean;
+  LInterceptor: TioStrategyInterceptorRef;
 begin
-
-end;
-
-class procedure TioStrategyInterceptorRegister.BeforeRollbackTransaction(const AConnectionName: String; var ADone: Boolean);
-begin
-
-end;
-
-class procedure TioStrategyInterceptorRegister.BeforeStartTransaction(const AConnectionName: String; var ADone: Boolean);
-begin
-
+  for LInterceptor in FInternalContainer do
+  begin
+    LDone := False;
+    if LInterceptor.CanIntercept(AObj.ClassName, '', siPersistObj) then
+      LInterceptor.BeforePersistObject(AObj, LDone);
+    if LDone then
+      ADone := True;
+  end;
 end;
 
 class procedure TioStrategyInterceptorRegister.RegisterInterceptor(const AStrategyInterceptor: TioStrategyInterceptorRef);
