@@ -46,8 +46,8 @@ type
   // Strategy class for database
   TioStrategyDB = class(TioStrategyIntf)
   protected
-    class procedure InsertObject(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
-    class procedure UpdateObject(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
+    class procedure InsertObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
+    class procedure UpdateObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
     class procedure DeleteObject_Internal(const AContext: IioContext);
     class procedure PreProcessRelationChildOnDelete(const AMasterContext: IioContext);
     class procedure PreProcessRelationChildOnPersist(const AMasterContext: IioContext);
@@ -281,7 +281,7 @@ begin
     TioDBFactory.QueryEngine.GetQueryDelete(AContext, True).ExecSQL;
 end;
 
-class procedure TioStrategyDB.InsertObject(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
+class procedure TioStrategyDB.InsertObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
 var
   AQuery: IioQuery;
 begin
@@ -450,9 +450,9 @@ begin
           begin
             // if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
             if (not ABlindInsertUpdate) and (not LContext.IDIsNull) and Self.ObjectExists(LContext) then
-              UpdateObject(LContext, ABlindInsertUpdate)
+              UpdateObject_Internal(LContext, ABlindInsertUpdate)
             else
-              InsertObject(LContext, ABlindInsertUpdate);
+              InsertObject_Internal(LContext, ABlindInsertUpdate);
             LContext.ObjStatus := osClean;
           end;
         end;
@@ -811,7 +811,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.UpdateObject(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
+class procedure TioStrategyDB.UpdateObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
 var
   LQuery: IioQuery;
 begin

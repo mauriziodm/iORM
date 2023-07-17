@@ -80,9 +80,9 @@ type
   // tanto utilizzano automaticamente la ConnectionDef di default (l'unica).
 
   // NB: Mauri 08/07/2023: Modifico FCurrentConnectionName e FPerThreadCurrentConnectionName in modo che oltre al nome della connessione
-  //  corrente memorizzi anche uno "User" sotto forma di stringa e uno "UserID" sotto forma di intero più che altro. In realtà forse
-  //  sarebbe meglio creare una sorta di oggetto sessione o LogOn, magari in futuro lo sposterò ma per ora, per fare la parte ETM
-  //  e per il salvataggio eventuale di quale utente ha operato sulle entities va bene così.
+  // corrente memorizzi anche uno "User" sotto forma di stringa e uno "UserID" sotto forma di intero più che altro. In realtà forse
+  // sarebbe meglio creare una sorta di oggetto sessione o LogOn, magari in futuro lo sposterò ma per ora, per fare la parte ETM
+  // e per il salvataggio eventuale di quale utente ha operato sulle entities va bene così.
 
   TioCurrentConnectionInfo = class(TINterfacedObject, IioCurrentConnectionInfo)
   strict private
@@ -402,7 +402,7 @@ begin
     // If AConnectionName param is not specified (is empty) then
     // use the default connection def
     if IsEmptyConnectionName(AConnectionDefName) then
-       Result := GetCurrentConnectionName
+      Result := GetCurrentConnectionName
     else
       Result := AConnectionDefName;
   finally
@@ -585,6 +585,7 @@ begin
 end;
 
 {$IFNDEF ioDelphiProfessional}
+
 class function TioConnectionManager.NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword: String; const AAsDefault: Boolean = True;
   const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
 begin
@@ -624,8 +625,13 @@ end;
 
 class procedure TioConnectionManager.UseUser(AUserID: Integer; AUserName: String);
 begin
-  FCurrentConnectionInfo.CurrentUserID := AUserID;
-  FCurrentConnectionInfo.CurrentUserName := AUserName;
+  _Lock;
+  try
+    FCurrentConnectionInfo.CurrentUserID := AUserID;
+    FCurrentConnectionInfo.CurrentUserName := AUserName;
+  finally
+    _Unlock;
+  end;
 end;
 
 class procedure TioConnectionManager.SetShowHideWaitProc(const AShowWaitProc: TProc; const AHideWaitProc: TProc);

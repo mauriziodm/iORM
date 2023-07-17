@@ -76,7 +76,7 @@ uses
   iORM.DB.Factory, System.Generics.Collections, iORM.Utilities,
   iORM.DuckTyped.Interfaces, iORM.Remote.Interfaces, iORM.Remote.Factory,
   iORM.Exceptions, System.SysUtils, FireDAC.Stan.Intf, FireDAC.Stan.StorageJSON,
-  iORM.Context.Container, DJSON;
+  iORM.Context.Container, DJSON, iORM.Interceptor.Strategy.Register;
 
 { TioStrategyRemote }
 
@@ -268,32 +268,42 @@ end;
 
 class function TioStrategyRemote.LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject;
 var
+  ADone: boolean;
   LConnection: IioConnectionRemote;
 begin
   inherited;
   Result := nil;
-  // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection('').AsRemoteConnection;
-  // Start transaction
-  // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
-  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any remote call to the server at this point.
-  LConnection.StartTransaction;
-  try
-    LConnection.RequestBody.Clear;
-    LConnection.RequestBody.Where := AWhere;
-    LConnection.Execute('LoadObject');
-    // Deserialize  the JSONDataValue to the result object
-    if Assigned(AObj) then
-      dj.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearCollection.TypeAnnotationsON.&To(AObj)
-    else
-      Result := dj.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearCollection.TypeAnnotationsON.ToObject;
-    // Commit
-    LConnection.Commit;
-  except
-    // Rollback
-    LConnection.Rollback;
-    raise;
+
+  // Strategy interceptors
+  ADone := False;
+  Result := TioStrategyInterceptorRegister.BeforeLoadObject(AWhere, AObj, ADone);
+  if not ADone then
+  begin
+
+    // Get the connection, set the request and execute it
+    LConnection := TioDBFactory.Connection('').AsRemoteConnection;
+    // Start transaction
+    // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+    // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+    // perform any remote call to the server at this point.
+    LConnection.StartTransaction;
+    try
+      LConnection.RequestBody.Clear;
+      LConnection.RequestBody.Where := AWhere;
+      LConnection.Execute('LoadObject');
+      // Deserialize  the JSONDataValue to the result object
+      if Assigned(AObj) then
+        dj.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearCollection.TypeAnnotationsON.&To(AObj)
+      else
+        Result := dj.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearCollection.TypeAnnotationsON.ToObject;
+      // Commit
+      LConnection.Commit;
+    except
+      // Rollback
+      LConnection.Rollback;
+      raise;
+    end;
+
   end;
 end;
 
@@ -313,8 +323,8 @@ end;
 // end;
 
 { TODO : DA AGGIUNGERE GESTIONE DEI 3 PARAMETRI AGGIUNTI ALLA FINE PER IL SUD }
-class procedure TioStrategyRemote.PersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
+class procedure TioStrategyRemote.PersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
+  const ABlindInsert: boolean; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LConnection: IioConnectionRemote;
 begin
