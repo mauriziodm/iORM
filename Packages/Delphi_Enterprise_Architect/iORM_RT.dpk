@@ -231,6 +231,6 @@ contains
   iORM.Interceptor.Strategy in '..\..\Source\iORM.Interceptor.Strategy.pas',
   iORM.Interceptor.ObjCrud in '..\..\Source\iORM.Interceptor.ObjCrud.pas',
   iORM.Interceptor.Strategy.Register in '..\..\Source\iORM.Interceptor.Strategy.Register.pas',
-  iORM.Strategy.StrategyInterceptorProxy in '..\..\Source\iORM.Strategy.StrategyInterceptorProxy.pas';
+  iORM.Interceptor.ObjCrud.Register in '..\..\Source\iORM.Interceptor.ObjCrud.Register.pas';
 
 end.

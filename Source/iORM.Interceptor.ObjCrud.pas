@@ -40,45 +40,45 @@ uses
 
 type
 
-  TioCustomObjCrudInterceptorRef = class of TioCustomObjCrudInterceptor;
+  TioObjCrudInterceptorRef = class of TioCustomObjCrudInterceptor;
 
   // Note: The CRUD interceptor is registered for specific classes (on the entity class map)
   TioCustomObjCrudInterceptor = class
   public
     // ObjCreate
     class procedure BeforeObjCreate(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
-    class procedure AfterObjCreate(const AContext: IioContext);
+    class procedure AfterObjCreate(const AContext: IioContext; const AQuery: IioQuery);
     // ObjInsert
-    class procedure BeforeObjInsert(const AContext: IioContext; var ADone: Boolean);
-    class procedure AfterObjInsert(const AContext: IioContext);
+    class procedure BeforeObjInsert(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
+    class procedure AfterObjInsert(const AContext: IioContext; const AQuery: IioQuery);
     // ObjUpdate
-    class procedure BeforeObjUpdate(const AContext: IioContext; var ADone: Boolean);
-    class procedure AfterObjUpdate(const AContext: IioContext);
+    class procedure BeforeObjUpdate(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
+    class procedure AfterObjUpdate(const AContext: IioContext; const AQuery: IioQuery);
     // ObjDelete
-    class procedure BeforeObjDelete(const AContext: IioContext; var ADone: Boolean);
-    class procedure AfterObjDelete(const AContext: IioContext);
+    class procedure BeforeObjDelete(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
+    class procedure AfterObjDelete(const AContext: IioContext; const AQuery: IioQuery);
   end;
 
 implementation
 
 { TioCustomObjCrudIncerceptor }
 
-class procedure TioCustomObjCrudInterceptor.AfterObjCreate(const AContext: IioContext);
+class procedure TioCustomObjCrudInterceptor.AfterObjCreate(const AContext: IioContext; const AQuery: IioQuery);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomObjCrudInterceptor.AfterObjDelete(const AContext: IioContext);
+class procedure TioCustomObjCrudInterceptor.AfterObjDelete(const AContext: IioContext; const AQuery: IioQuery);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomObjCrudInterceptor.AfterObjInsert(const AContext: IioContext);
+class procedure TioCustomObjCrudInterceptor.AfterObjInsert(const AContext: IioContext; const AQuery: IioQuery);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomObjCrudInterceptor.AfterObjUpdate(const AContext: IioContext);
+class procedure TioCustomObjCrudInterceptor.AfterObjUpdate(const AContext: IioContext; const AQuery: IioQuery);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
@@ -88,17 +88,17 @@ begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomObjCrudInterceptor.BeforeObjDelete(const AContext: IioContext; var ADone: Boolean);
+class procedure TioCustomObjCrudInterceptor.BeforeObjDelete(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomObjCrudInterceptor.BeforeObjInsert(const AContext: IioContext; var ADone: Boolean);
+class procedure TioCustomObjCrudInterceptor.BeforeObjInsert(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomObjCrudInterceptor.BeforeObjUpdate(const AContext: IioContext; var ADone: Boolean);
+class procedure TioCustomObjCrudInterceptor.BeforeObjUpdate(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;

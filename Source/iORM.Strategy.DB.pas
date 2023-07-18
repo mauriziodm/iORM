@@ -964,7 +964,7 @@ begin
   if not LDone then
   begin
     Result := inherited MekeObject_Internal(AContext, AQuery);
-    TioCustomObjCrudInterceptor.AfterObjCreate(AContext);
+    TioCustomObjCrudInterceptor.AfterObjCreate(AContext, AQuery);
   end;
 end;
 
@@ -973,11 +973,11 @@ var
   LDone: Boolean;
 begin
   LDone := False;
-  TioCustomObjCrudInterceptor.BeforeObjDelete(AContext, LDone);
+//  TioCustomObjCrudInterceptor.BeforeObjDelete(AContext, LDone);
   if not LDone then
   begin
     inherited DeleteObject_Internal(AContext);
-    TioCustomObjCrudInterceptor.AfterObjDelete(AContext);
+//    TioCustomObjCrudInterceptor.AfterObjDelete(AContext);
   end;
 end;
 
@@ -986,11 +986,11 @@ var
   LDone: Boolean;
 begin
   LDone := False;
-  TioCustomObjCrudInterceptor.BeforeObjInsert(AContext, LDone);
+//  TioCustomObjCrudInterceptor.BeforeObjInsert(AContext, LDone);
   if not LDone then
   begin
     inherited InsertObject_Internal(AContext, ABlindInsertUpdate);
-    TioCustomObjCrudInterceptor.AfterObjInsert(AContext);
+//    TioCustomObjCrudInterceptor.AfterObjInsert(AContext);
   end;
 end;
 
@@ -999,11 +999,11 @@ var
   LDone: Boolean;
 begin
   LDone := False;
-  TioCustomObjCrudInterceptor.BeforeObjUpdate(AContext, LDone);
+//  TioCustomObjCrudInterceptor.BeforeObjUpdate(AContext, LDone);
   if not LDone then
   begin
     inherited UpdateObject_Internal(AContext, ABlindInsertUpdate);
-    TioCustomObjCrudInterceptor.AfterObjUpdate(AContext);
+//    TioCustomObjCrudInterceptor.AfterObjUpdate(AContext);
   end;
 end;
 

@@ -48,7 +48,6 @@ type
 
   TioStrategyInterceptorRegister = class
   private
-    class var FEnabled: Boolean;
     class var FInternalContainer: TDictionary<String, PStrategyInterceptorArray>;
     class procedure Build;
     class procedure Clean;
@@ -78,7 +77,7 @@ type
 implementation
 
 uses
-  iORM.Utilities;
+  iORM.Utilities, System.SysUtils;
 
 { TioStrategyInterceptorRegister }
 
@@ -87,7 +86,7 @@ var
   LTypeName: String;
   LInterceptor: TioStrategyInterceptorRef;
 begin
-  if FEnabled then
+  if Assigned(FInternalContainer) then
   begin
     LTypeName := TioUtilities.ExtractItemRttiTypeFromList(AList).Name;
     if FInternalContainer.ContainsKey(LTypeName) then
@@ -101,7 +100,7 @@ var
   LTypeName: String;
   LInterceptor: TioStrategyInterceptorRef;
 begin
-  if FEnabled then
+  if Assigned(FInternalContainer) then
   begin
     LTypeName := AObj.ClassName;
     if FInternalContainer.ContainsKey(LTypeName) then
@@ -115,7 +114,7 @@ var
   LTypeName: String;
   LInterceptor: TioStrategyInterceptorRef;
 begin
-  if FEnabled then
+  if Assigned(FInternalContainer) then
   begin
     LTypeName := AWhere.TypeName;
     if FInternalContainer.ContainsKey(LTypeName) then
@@ -129,12 +128,13 @@ var
   LTypeName: String;
   LInterceptor: TioStrategyInterceptorRef;
 begin
-  if FEnabled then
+  Result := AObj;
+  if Assigned(FInternalContainer) then
   begin
     LTypeName := AWhere.TypeName;
     if FInternalContainer.ContainsKey(LTypeName) then
       for LInterceptor in FInternalContainer.Items[LTypeName]^ do
-        LInterceptor.AfterLoadObject(AWhere, AObj);
+        Result := LInterceptor.AfterLoadObject(AWhere, Result);
   end;
 end;
 
@@ -143,7 +143,7 @@ var
   LTypeName: String;
   LInterceptor: TioStrategyInterceptorRef;
 begin
-  if FEnabled then
+  if Assigned(FInternalContainer) then
   begin
     LTypeName := TioUtilities.ExtractItemRttiTypeFromList(AList).Name;
     if FInternalContainer.ContainsKey(LTypeName) then
@@ -157,7 +157,7 @@ var
   LTypeName: String;
   LInterceptor: TioStrategyInterceptorRef;
 begin
-  if FEnabled then
+  if Assigned(FInternalContainer) then
   begin
     LTypeName := AObj.ClassName;
     if FInternalContainer.ContainsKey(LTypeName) then
@@ -172,15 +172,18 @@ var
   LTypeName: String;
   LInterceptor: TioStrategyInterceptorRef;
 begin
-  if FEnabled then
+  if Assigned(FInternalContainer) then
   begin
     LTypeName := TioUtilities.ExtractItemRttiTypeFromList(AList).Name;
-    for LInterceptor in FInternalContainer.Items[LTypeName]^ do
+    if FInternalContainer.ContainsKey(LTypeName) then
     begin
-      LDone := False;
-      LInterceptor.BeforeDeleteList(AList, LDone);
-      if LDone then
-        ADone := True;
+      for LInterceptor in FInternalContainer.Items[LTypeName]^ do
+      begin
+        LDone := False;
+        LInterceptor.BeforeDeleteList(AList, LDone);
+        if LDone then
+          ADone := True;
+      end;
     end;
   end;
 end;
@@ -191,15 +194,18 @@ var
   LTypeName: String;
   LInterceptor: TioStrategyInterceptorRef;
 begin
-  if FEnabled then
+  if Assigned(FInternalContainer) then
   begin
     LTypeName := AObj.ClassName;
-    for LInterceptor in FInternalContainer.Items[LTypeName]^ do
+    if FInternalContainer.ContainsKey(LTypeName) then
     begin
-      LDone := False;
-      LInterceptor.BeforeDeleteObject(AObj, LDone);
-      if LDone then
-        ADone := True;
+      for LInterceptor in FInternalContainer.Items[LTypeName]^ do
+      begin
+        LDone := False;
+        LInterceptor.BeforeDeleteObject(AObj, LDone);
+        if LDone then
+          ADone := True;
+      end;
     end;
   end;
 end;
@@ -210,15 +216,18 @@ var
   LTypeName: String;
   LInterceptor: TioStrategyInterceptorRef;
 begin
-  if FEnabled then
+  if Assigned(FInternalContainer) then
   begin
     LTypeName := AWhere.TypeName;
-    for LInterceptor in FInternalContainer.Items[LTypeName]^ do
+    if FInternalContainer.ContainsKey(LTypeName) then
     begin
-      LDone := False;
-      LInterceptor.BeforeLoadList(AWhere, AList, LDone);
-      if LDone then
-        ADone := True;
+      for LInterceptor in FInternalContainer.Items[LTypeName]^ do
+      begin
+        LDone := False;
+        LInterceptor.BeforeLoadList(AWhere, AList, LDone);
+        if LDone then
+          ADone := True;
+      end;
     end;
   end;
 end;
@@ -229,15 +238,19 @@ var
   LTypeName: String;
   LInterceptor: TioStrategyInterceptorRef;
 begin
-  if FEnabled then
+  Result := AObj;
+  if Assigned(FInternalContainer) then
   begin
     LTypeName := AWhere.TypeName;
-    for LInterceptor in FInternalContainer.Items[LTypeName]^ do
+    if FInternalContainer.ContainsKey(LTypeName) then
     begin
-      LDone := False;
-      LInterceptor.BeforeLoadObject(AWhere, AObj, LDone);
-      if LDone then
-        ADone := True;
+      for LInterceptor in FInternalContainer.Items[LTypeName]^ do
+      begin
+        LDone := False;
+        Result := LInterceptor.BeforeLoadObject(AWhere, Result, LDone);
+        if LDone then
+          ADone := True;
+      end;
     end;
   end;
 end;
@@ -248,15 +261,18 @@ var
   LTypeName: String;
   LInterceptor: TioStrategyInterceptorRef;
 begin
-  if FEnabled then
+  if Assigned(FInternalContainer) then
   begin
     LTypeName := TioUtilities.ExtractItemRttiTypeFromList(AList).Name;
-    for LInterceptor in FInternalContainer.Items[LTypeName]^ do
+    if FInternalContainer.ContainsKey(LTypeName) then
     begin
-      LDone := False;
-      LInterceptor.BeforePersistList(AList, LDone);
-      if LDone then
-        ADone := True;
+      for LInterceptor in FInternalContainer.Items[LTypeName]^ do
+      begin
+        LDone := False;
+        LInterceptor.BeforePersistList(AList, LDone);
+        if LDone then
+          ADone := True;
+      end;
     end;
   end;
 end;
@@ -267,15 +283,18 @@ var
   LTypeName: String;
   LInterceptor: TioStrategyInterceptorRef;
 begin
-  if FEnabled then
+  if Assigned(FInternalContainer) then
   begin
     LTypeName := AObj.ClassName;
-    for LInterceptor in FInternalContainer.Items[LTypeName]^ do
+    if FInternalContainer.ContainsKey(LTypeName) then
     begin
-      LDone := False;
-      LInterceptor.BeforePersistObject(AObj, LDone);
-      if LDone then
-        ADone := True;
+      for LInterceptor in FInternalContainer.Items[LTypeName]^ do
+      begin
+        LDone := False;
+        LInterceptor.BeforePersistObject(AObj, LDone);
+        if LDone then
+          ADone := True;
+      end;
     end;
   end;
 end;
@@ -287,7 +306,8 @@ end;
 
 class procedure TioStrategyInterceptorRegister.Clean;
 begin
-  FInternalContainer.Free;
+  if Assigned(FInternalContainer) then
+    FreeAndNil(FInternalContainer);
 end;
 
 class procedure TioStrategyInterceptorRegister.RegisterInterceptor(const ATypeName: String; const AStrategyInterceptor: TioStrategyInterceptorRef);
@@ -296,6 +316,9 @@ var
   LInterceptorArrayPointer: PStrategyInterceptorArray;
   LNewInterceptorIndex: Byte;
 begin
+  // If the internal container is not assigned then create it
+  if not Assigned(FInternalContainer) then
+    Build;
   // If the current type name isn't registered into the internal container (there isn't previously registerd interceptors for that type) then add it
   if not FInternalContainer.ContainsKey(ATypeName) then
     FInternalContainer.Add(ATypeName, @LInterceptorArray); // Add an empty interceptor array
@@ -306,8 +329,6 @@ begin
   LNewInterceptorIndex := Length(LInterceptorArray);
   SetLength(LInterceptorArray, LNewInterceptorIndex + 1);
   LInterceptorArray[LNewInterceptorIndex] := AStrategyInterceptor;
-  // Se the enabled flag
-  FEnabled := FInternalContainer.Count > 1;
 end;
 
 class procedure TioStrategyInterceptorRegister.UnregisterInterceptor(const ATypeName: String; const AStrategyInterceptor: TioStrategyInterceptorRef);
@@ -316,19 +337,25 @@ var
   LInterceptorArray: TStrategyInterceptorArray;
   LInterceptorArrayPointer: PStrategyInterceptorArray;
 begin
+  // Only if the current type name is registered (the is almost one interceptor registered for this type)
   if FInternalContainer.ContainsKey(ATypeName) then
   begin
+    // Remove the interceptor
     LInterceptorArrayPointer := FInternalContainer.Items[ATypeName];
     LInterceptorArray := LInterceptorArrayPointer^;
     for I := High(LInterceptorArray) downto Low(LInterceptorArray) do
       if LInterceptorArray[I] = AStrategyInterceptor then
         Delete(LInterceptorArray, I, 1);
+    // If the interceptor array for this type is empty then remove also this type from the internal container
+    if Length(LInterceptorArray) = 0 then
+      FInternalContainer.Remove(ATypeName);
+    // If the internal container is empty then free it
+    if FInternalContainer.Count = 0 then
+      Clean;
   end;
 end;
 
 initialization
-
-TioStrategyInterceptorRegister.Build;
 
 finalization
 

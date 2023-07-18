@@ -42,9 +42,6 @@ type
 
   TioStrategyInterceptorRef = class of TioCustomStrategyInterceptor;
 
-  // Note: The strategy interceptor is not registered for a specific class because it
-  //  intercepts calls where the specified type may be an interface which must then be resolved.
-  //  All strategy interceptors are registered on the "StrategyInterceptorRegister"
   TioCustomStrategyInterceptor = class
   public
     // LoadObject

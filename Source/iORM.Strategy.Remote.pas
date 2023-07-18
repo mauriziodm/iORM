@@ -272,10 +272,10 @@ var
   LConnection: IioConnectionRemote;
 begin
   inherited;
-  Result := nil;
+  Result := AObj;
   // Strategy interceptors (before)
   ADone := False;
-  Result := TioStrategyInterceptorRegister.BeforeLoadObject(AWhere, AObj, ADone);
+  Result := TioStrategyInterceptorRegister.BeforeLoadObject(AWhere, Result, ADone);
   if ADone then
     Exit;
   // Get the connection, set the request and execute it
@@ -291,7 +291,7 @@ begin
     LConnection.Execute('LoadObject');
     // Deserialize  the JSONDataValue to the result object
     if Assigned(AObj) then
-      dj.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearCollection.TypeAnnotationsON.&To(AObj)
+      dj.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearCollection.TypeAnnotationsON.&To(Result)
     else
       Result := dj.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearCollection.TypeAnnotationsON.ToObject;
     // Commit
@@ -302,7 +302,7 @@ begin
     raise;
   end;
   // Strategy interceptors (after)
-  Result := TioStrategyInterceptorRegister.AfterLoadObject(AWhere, AObj);
+  Result := TioStrategyInterceptorRegister.AfterLoadObject(AWhere, Result);
 end;
 
 class function TioStrategyRemote.LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject;

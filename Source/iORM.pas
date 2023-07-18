@@ -42,7 +42,7 @@ uses
   iORM.LiveBindings.Interfaces, iORM.MVVM.ViewRegister,
   iORM.StdActions.Interfaces, iORM.Context.Container,
   iORM.Context.Properties.Interfaces, iORM.Where.SmartBuilder,
-  iORM.Interceptor.Strategy.Register;
+  iORM.Interceptor.Strategy.Register, iORM.Interceptor.ObjCrud.Register;
 
 const
   IORM_VERSION = 'iORM 2 (beta 2.3)';
@@ -579,7 +579,8 @@ type
       const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
 
     // Interceptors
-    class function StrategyInterceptorRegister: TioStrategyInterceptorRegisterRef;
+    class function StrategyInterceptors: TioStrategyInterceptorRegisterRef;
+    class function ObjCrudInterceptors: TioObjCrudInterceptorRegisterRef;
 
     // Version
     class function Version: String;
@@ -1103,9 +1104,14 @@ begin
   TioStrategyFactory.GetStrategy(AConnectionName).StartTransaction(AConnectionName);
 end;
 
-class function io.StrategyInterceptorRegister: TioStrategyInterceptorRegisterRef;
+class function io.StrategyInterceptors: TioStrategyInterceptorRegisterRef;
 begin
   Result := TioStrategyInterceptorRegister;
+end;
+
+class function io.ObjCrudInterceptors: TioObjCrudInterceptorRegisterRef;
+begin
+  Result := TioObjCrudInterceptorRegister;
 end;
 
 class procedure io.AnonymousTimer(const AIntervalMillisec: Integer; const AExecuteMethod: TFunc<boolean>);
