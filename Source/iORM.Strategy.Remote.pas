@@ -273,38 +273,36 @@ var
 begin
   inherited;
   Result := nil;
-
-  // Strategy interceptors
+  // Strategy interceptors (before)
   ADone := False;
   Result := TioStrategyInterceptorRegister.BeforeLoadObject(AWhere, AObj, ADone);
-  if not ADone then
-  begin
-
-    // Get the connection, set the request and execute it
-    LConnection := TioDBFactory.Connection('').AsRemoteConnection;
-    // Start transaction
-    // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
-    // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-    // perform any remote call to the server at this point.
-    LConnection.StartTransaction;
-    try
-      LConnection.RequestBody.Clear;
-      LConnection.RequestBody.Where := AWhere;
-      LConnection.Execute('LoadObject');
-      // Deserialize  the JSONDataValue to the result object
-      if Assigned(AObj) then
-        dj.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearCollection.TypeAnnotationsON.&To(AObj)
-      else
-        Result := dj.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearCollection.TypeAnnotationsON.ToObject;
-      // Commit
-      LConnection.Commit;
-    except
-      // Rollback
-      LConnection.Rollback;
-      raise;
-    end;
-
+  if ADone then
+    Exit;
+  // Get the connection, set the request and execute it
+  LConnection := TioDBFactory.Connection('').AsRemoteConnection;
+  // Start transaction
+  // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  // perform any remote call to the server at this point.
+  LConnection.StartTransaction;
+  try
+    LConnection.RequestBody.Clear;
+    LConnection.RequestBody.Where := AWhere;
+    LConnection.Execute('LoadObject');
+    // Deserialize  the JSONDataValue to the result object
+    if Assigned(AObj) then
+      dj.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearCollection.TypeAnnotationsON.&To(AObj)
+    else
+      Result := dj.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearCollection.TypeAnnotationsON.ToObject;
+    // Commit
+    LConnection.Commit;
+  except
+    // Rollback
+    LConnection.Rollback;
+    raise;
   end;
+  // Strategy interceptors (after)
+  Result := TioStrategyInterceptorRegister.AfterLoadObject(AWhere, AObj);
 end;
 
 class function TioStrategyRemote.LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject;

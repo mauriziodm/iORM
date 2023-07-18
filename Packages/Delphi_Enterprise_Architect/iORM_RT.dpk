@@ -230,6 +230,7 @@ contains
   iORM.ETM.Engine in '..\..\Source\iORM.ETM.Engine.pas',
   iORM.Interceptor.Strategy in '..\..\Source\iORM.Interceptor.Strategy.pas',
   iORM.Interceptor.ObjCrud in '..\..\Source\iORM.Interceptor.ObjCrud.pas',
-  iORM.Interceptor.Strategy.Register in '..\..\Source\iORM.Interceptor.Strategy.Register.pas';
+  iORM.Interceptor.Strategy.Register in '..\..\Source\iORM.Interceptor.Strategy.Register.pas',
+  iORM.Strategy.StrategyInterceptorProxy in '..\..\Source\iORM.Strategy.StrategyInterceptorProxy.pas';
 
 end.

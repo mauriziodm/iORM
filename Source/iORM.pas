@@ -42,7 +42,7 @@ uses
   iORM.LiveBindings.Interfaces, iORM.MVVM.ViewRegister,
   iORM.StdActions.Interfaces, iORM.Context.Container,
   iORM.Context.Properties.Interfaces, iORM.Where.SmartBuilder,
-  iORM.Interceptor.Strategy;
+  iORM.Interceptor.Strategy.Register;
 
 const
   IORM_VERSION = 'iORM 2 (beta 2.3)';
@@ -578,9 +578,8 @@ type
     class procedure ShowAsSelector<T>(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
       const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
 
-    // Strategy interceptors
-    class procedure RegisterStrategyInterceptor(const AStrategyInterceptor: TioStrategyInterceptorRef);
-    class procedure UnregisterStrategyInterceptor(const AStrategyInterceptor: TioStrategyInterceptorRef);
+    // Interceptors
+    class function StrategyInterceptorRegister: TioStrategyInterceptorRegisterRef;
 
     // Version
     class function Version: String;
@@ -591,8 +590,7 @@ implementation
 uses
   System.Rtti, iORM.Exceptions, iORM.Utilities, iORM.Where.Factory, iORM.Strategy.Factory, iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory, iORM.DB.Factory, iORM.Abstraction, iORM.DuckTyped.StreamObject,
-  iORM.LiveBindings.CommonBSBehavior, iORM.MVVM.ViewContextProviderContainer,
-  iORM.Interceptor.Strategy.Register;
+  iORM.LiveBindings.CommonBSBehavior, iORM.MVVM.ViewContextProviderContainer;
 
 { io }
 
@@ -820,11 +818,6 @@ end;
 class function io.RefTo<T>(const ATypeAlias: String = ''): IioWhere<T>;
 begin
   Result := Self.Load<T>(ATypeAlias);
-end;
-
-class procedure io.RegisterStrategyInterceptor(const AStrategyInterceptor: TioStrategyInterceptorRef);
-begin
-  TioStrategyInterceptorRegister.RegisterInterceptor(AStrategyInterceptor);
 end;
 
 class procedure io.Reload(const AIntfObj: IInterface; const ALazy: boolean; const ALazyProps: String);
@@ -1108,6 +1101,11 @@ end;
 class procedure io.StartTransaction(const AConnectionName: String);
 begin
   TioStrategyFactory.GetStrategy(AConnectionName).StartTransaction(AConnectionName);
+end;
+
+class function io.StrategyInterceptorRegister: TioStrategyInterceptorRegisterRef;
+begin
+  Result := TioStrategyInterceptorRegister;
 end;
 
 class procedure io.AnonymousTimer(const AIntervalMillisec: Integer; const AExecuteMethod: TFunc<boolean>);
@@ -1575,11 +1573,6 @@ end;
 class function io.TerminateApplication: boolean;
 begin
   Result := TioApplication.Terminate;
-end;
-
-class procedure io.UnregisterStrategyInterceptor(const AStrategyInterceptor: TioStrategyInterceptorRef);
-begin
-  TioStrategyInterceptorRegister.UnregisterInterceptor(AStrategyInterceptor);
 end;
 
 class function io.VCProviderByName(const AVCProviderName: String): TioViewContextProvider;

@@ -40,8 +40,6 @@ uses
 
 type
 
-  TioStrategyInterceptorOpType = (siLoadObj, siLoadList, siPersistObj, siPersistList, siDeleteObj, siDeleteList, siStartTransaction);
-
   TioStrategyInterceptorRef = class of TioCustomStrategyInterceptor;
 
   // Note: The strategy interceptor is not registered for a specific class because it
@@ -49,7 +47,6 @@ type
   //  All strategy interceptors are registered on the "StrategyInterceptorRegister"
   TioCustomStrategyInterceptor = class
   public
-    class function CanIntercept(const AType, AALias: String; const AOpType: TioStrategyInterceptorOpType): Boolean;
     // LoadObject
     class function BeforeLoadObject(const AWhere: IioWhere; const AObj: TObject; var ADone: Boolean): TObject; virtual;
     class function AfterLoadObject(const AWhere: IioWhere; const AObj: TObject): TObject; virtual;
@@ -91,8 +88,9 @@ end;
 
 class function TioCustomStrategyInterceptor.AfterLoadObject(const AWhere: IioWhere; const AObj: TObject): TObject;
 begin
-  Result := nil;
+  Result := AObj;
 end;
+
 
 class procedure TioCustomStrategyInterceptor.AfterPersistList(const AList: TObject);
 begin
@@ -121,7 +119,7 @@ end;
 
 class function TioCustomStrategyInterceptor.BeforeLoadObject(const AWhere: IioWhere; const AObj: TObject; var ADone: Boolean): TObject;
 begin
-  Result := nil;
+  Result := AObj;
 end;
 
 class procedure TioCustomStrategyInterceptor.BeforePersistList(const AList: TObject; var ADone: Boolean);
@@ -132,11 +130,6 @@ end;
 class procedure TioCustomStrategyInterceptor.BeforePersistObject(const AObj: TObject; var ADone: Boolean);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
-end;
-
-class function TioCustomStrategyInterceptor.CanIntercept(const AType, AALias: String; const AOpType: TioStrategyInterceptorOpType): Boolean;
-begin
-  Result := False;
 end;
 
 end.

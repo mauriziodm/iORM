@@ -82,7 +82,8 @@ uses
   iORM.DB.ConnectionContainer, iORM.DB.Factory, iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory, iORM.Resolver.Interfaces, iORM.ObjectsForge.Factory,
   iORM.LazyLoad.Factory, iORM.Resolver.Factory, iORM.Where.Factory,
-  iORM.Exceptions, iORM, System.SysUtils, System.Generics.Collections;
+  iORM.Exceptions, iORM, System.SysUtils, System.Generics.Collections,
+  iORM.Interceptor.ObjCrud;
 
 type
 
@@ -98,6 +99,23 @@ type
     constructor Create;
     destructor Destroy; override;
     function GetContext(const AClassName: String; const AWhere: IioWhere): IioContext;
+  end;
+
+  TioInnerStrategyDB_Ref = class of TioInnerStrategyDB;
+  TioInnerStrategyDB = class
+  public
+    class function MekeObject_Internal(const AContext: IioContext; AQuery: IioQuery): TObject; virtual;
+    class procedure InsertObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean); virtual;
+    class procedure UpdateObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean); virtual;
+    class procedure DeleteObject_Internal(const AContext: IioContext); virtual;
+  end;
+
+  TioInnerStrategyDB_WithCrudInterceptor = class(TioInnerStrategyDB)
+  public
+    class function MekeObject_Internal(const AContext: IioContext; AQuery: IioQuery): TObject; override;
+    class procedure InsertObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean); override;
+    class procedure UpdateObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean); override;
+    class procedure DeleteObject_Internal(const AContext: IioContext); override;
   end;
 
 { TioStrategyDB }
@@ -852,6 +870,141 @@ begin
   // Return the requested context and set its DataObject to nil
   Result := FContainer.Items[AClassName];
   Result.DataObject := nil;
+end;
+
+{ TioStrategyDB_Inner }
+
+class function TioInnerStrategyDB.MekeObject_Internal(const AContext: IioContext; AQuery: IioQuery): TObject;
+begin
+  Result := TioObjectMakerFactory.GetObjectMaker(AContext).MakeObject(AContext, AQuery);
+end;
+
+class procedure TioInnerStrategyDB.DeleteObject_Internal(const AContext: IioContext);
+begin
+  // If the ID is not null (object not persisted) then delete it from the DB
+  if not AContext.IDIsNull then
+    // Create and execute query
+    TioDBFactory.QueryEngine.GetQueryDelete(AContext, True).ExecSQL;
+end;
+
+class procedure TioInnerStrategyDB.InsertObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
+var
+  AQuery: IioQuery;
+begin
+  inherited;
+  // -----------------------------------------------------------
+  // Get and execute a query to retrieve the next ID for the inserting object
+  // before the insert query (for Firebird/Interbase)
+  if (not ABlindInsertUpdate) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtBeforeInsert) and AContext.IDIsNull
+  then
+  begin
+    AQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
+    try
+      AQuery.Open;
+      // Set the NextID as the ObjectID
+      AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, AQuery.Fields[0].AsInteger);
+    finally
+      AQuery.Close;
+    end;
+  end;
+  // -----------------------------------------------------------  // Create and execute insert query and set the version/created/updated of the entity
+  // (if it's not a BlindInsert and versioning is enabled for this entity type)
+  TioDBFactory.QueryEngine.GetQueryInsert(AContext).ExecSQL;
+  AContext.NextObjVersion(True); // Update the ObjVersion (if exists)
+  if not ABlindInsertUpdate then
+  begin
+    AContext.ObjCreated := AQuery.Connection.LastTransactionTimestamp;
+    AContext.ObjUpdated := AQuery.Connection.LastTransactionTimestamp;
+  end;
+  // -----------------------------------------------------------
+  // Get and execute a query to retrieve the last ID generated
+  // in the last insert query.
+  if (not ABlindInsertUpdate) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtAfterInsert) and AContext.IDIsNull then
+  begin
+    AQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
+    try
+      AQuery.Open;
+      // Set the NextID as the ObjectID
+      AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, AQuery.Fields[0].AsInteger);
+    finally
+      AQuery.Close;
+    end;
+  end;
+  // -----------------------------------------------------------
+end;
+
+class procedure TioInnerStrategyDB.UpdateObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
+var
+  LQuery: IioQuery;
+begin
+  inherited;
+  // Create and execute the query to update the entity into the DB cheking the version to avoid concurrency
+  // conflict (if versioning is enabled for this type of entity)
+  LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext);
+  if LQuery.ExecSQL > 0 then
+  begin
+    // Increment the ObjVersion if enabled (if exists)
+    AContext.NextObjVersion(True);
+    // Update the ObjUpdated property (if exists)
+    if not ABlindInsertUpdate then
+      AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;;
+  end
+  else
+    raise EioConcurrencyConflictException.Create(Self.ClassName, 'UpdateObject', AContext);
+end;
+
+{ TioInnerStrategyDB_WithCrudInterceptor }
+
+class function TioInnerStrategyDB_WithCrudInterceptor.MekeObject_Internal(const AContext: IioContext; AQuery: IioQuery): TObject;
+var
+  LDone: Boolean;
+begin
+  LDone := False;
+  TioCustomObjCrudInterceptor.BeforeObjCreate(AContext, AQuery, LDone);
+  if not LDone then
+  begin
+    Result := inherited MekeObject_Internal(AContext, AQuery);
+    TioCustomObjCrudInterceptor.AfterObjCreate(AContext);
+  end;
+end;
+
+class procedure TioInnerStrategyDB_WithCrudInterceptor.DeleteObject_Internal(const AContext: IioContext);
+var
+  LDone: Boolean;
+begin
+  LDone := False;
+  TioCustomObjCrudInterceptor.BeforeObjDelete(AContext, LDone);
+  if not LDone then
+  begin
+    inherited DeleteObject_Internal(AContext);
+    TioCustomObjCrudInterceptor.AfterObjDelete(AContext);
+  end;
+end;
+
+class procedure TioInnerStrategyDB_WithCrudInterceptor.InsertObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
+var
+  LDone: Boolean;
+begin
+  LDone := False;
+  TioCustomObjCrudInterceptor.BeforeObjInsert(AContext, LDone);
+  if not LDone then
+  begin
+    inherited InsertObject_Internal(AContext, ABlindInsertUpdate);
+    TioCustomObjCrudInterceptor.AfterObjInsert(AContext);
+  end;
+end;
+
+class procedure TioInnerStrategyDB_WithCrudInterceptor.UpdateObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
+var
+  LDone: Boolean;
+begin
+  LDone := False;
+  TioCustomObjCrudInterceptor.BeforeObjUpdate(AContext, LDone);
+  if not LDone then
+  begin
+    inherited UpdateObject_Internal(AContext, ABlindInsertUpdate);
+    TioCustomObjCrudInterceptor.AfterObjUpdate(AContext);
+  end;
 end;
 
 end.
