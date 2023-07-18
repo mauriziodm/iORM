@@ -45,7 +45,7 @@ type
 
   // Strategy class for database
   TioStrategyDB = class(TioStrategyIntf)
-  protected
+  private
     class procedure InsertObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
     class procedure UpdateObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
     class procedure DeleteObject_Internal(const AContext: IioContext);
@@ -53,20 +53,23 @@ type
     class procedure PreProcessRelationChildOnPersist(const AMasterContext: IioContext);
     class procedure PostProcessRelationChildOnPersist(const AMasterContext: IioContext);
     class function ObjectExists(const AContext: IioContext): Boolean;
+  protected
+    // ---------- Begin intercepted methods (StrategyInterceptors) ----------
+    class procedure _DoPersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsertUpdate: Boolean;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
+    class procedure _DoPersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
+    class procedure _DoDeleteObject(const AObj: TObject); override;
+    class procedure _DoDeleteList(const AList: TObject); override;
+    class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject); override;
+    class function _DoLoadObject(const AWhere: IioWhere; const AObj: TObject): TObject; override;
+    // ---------- End intercepted methods (StrategyInterceptors) ----------
   public
     class procedure StartTransaction(const AConnectionName: String); override;
     class procedure CommitTransaction(const AConnectionName: String); override;
     class procedure RollbackTransaction(const AConnectionName: String); override;
     class function InTransaction(const AConnectionName: String): Boolean; override;
-    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsertUpdate: Boolean;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
-    class procedure PersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
-    class procedure DeleteObject(const AObj: TObject); override;
-    class procedure DeleteList(const AList: TObject); override;
     class procedure Delete(const AWhere: IioWhere); override;
-    class procedure LoadList(const AWhere: IioWhere; const AList: TObject); override;
-    class function LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject; override;
     class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject; override;
     class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
     class function Count(const AWhere: IioWhere): Integer; override;
@@ -204,7 +207,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.DeleteList(const AList: TObject);
+class procedure TioStrategyDB._DoDeleteList(const AList: TObject);
 var
   ADuckTypedList: IioDuckTypedList;
   AObj: TObject;
@@ -235,7 +238,7 @@ begin
     for AObj in ADuckTypedList do
     begin
       // Persist object
-      Self.DeleteObject(AObj);
+      Self._DoDeleteObject(AObj);
     end;
     Self.CommitTransaction('');
   except
@@ -244,7 +247,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.DeleteObject(const AObj: TObject);
+class procedure TioStrategyDB._DoDeleteObject(const AObj: TObject);
 var
   LContext: IioContext;
 begin
@@ -375,7 +378,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.PersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
+class procedure TioStrategyDB._DoPersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
   const ABlindInsert: Boolean; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LDuckTypedList: IioDuckTypedList;
@@ -405,7 +408,7 @@ begin
     LDuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
     // Loop the list
     for LObj in LDuckTypedList do
-      PersistObject(LObj, ARelationPropertyName, ARelationOID, ABlindInsert, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath);
+      _DoPersistObject(LObj, ARelationPropertyName, ARelationOID, ABlindInsert, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath);
     // Commit the transaction
     CommitTransaction('');
   except
@@ -414,7 +417,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsertUpdate: Boolean;
+class procedure TioStrategyDB._DoPersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsertUpdate: Boolean;
   const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LContext: IioContext;
@@ -487,10 +490,10 @@ begin
     case LMasterProp.GetRelationType of
       // If relation HasMany
       rtHasMany:
-        DeleteList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject));
+        _DoDeleteList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject));
       // If relation HasOne
       rtHasOne:
-        DeleteObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject));
+        _DoDeleteObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject));
     end;
   end;
 end;
@@ -509,12 +512,12 @@ begin
     case LMasterProp.GetRelationType of
       // If relation HasMany
       rtHasMany:
-        PersistList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), LMasterProp.GetRelationChildPropertyName,
+        _DoPersistList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), LMasterProp.GetRelationChildPropertyName,
           AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, False, AMasterContext.MasterBSPersistence,
           LMasterProp.GetName, AMasterContext.MasterPropertyPath);
       // If relation HasOne
       rtHasOne:
-        PersistObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), LMasterProp.GetRelationChildPropertyName,
+        _DoPersistObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), LMasterProp.GetRelationChildPropertyName,
           AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, False, AMasterContext.MasterBSPersistence,
           LMasterProp.GetName, AMasterContext.MasterPropertyPath);
     end;
@@ -664,7 +667,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.LoadList(const AWhere: IioWhere; const AList: TObject);
+class procedure TioStrategyDB._DoLoadList(const AWhere: IioWhere; const AList: TObject);
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
@@ -743,7 +746,7 @@ begin
   end;
 end;
 
-class function TioStrategyDB.LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject;
+class function TioStrategyDB._DoLoadObject(const AWhere: IioWhere; const AObj: TObject): TObject;
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;

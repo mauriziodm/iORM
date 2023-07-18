@@ -46,6 +46,7 @@ type
 
   TioStrategyInterceptorRegisterRef = class of TioStrategyInterceptorRegister;
 
+  // Note: {$DEFINE ioStrategyInterceptorsOff} to disable strategy interceptors
   TioStrategyInterceptorRegister = class
   private
     class var FInternalContainer: TDictionary<String, PStrategyInterceptorArray>;

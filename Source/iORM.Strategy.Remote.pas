@@ -47,20 +47,23 @@ type
     // class var FTransactionGUID: String; NB: Hint prevention "symbol declared but never used"
     // class function NewGUIDAsString: String; NB: Hint prevention "symbol declared but never used" (codice presente sotto)
     // class function GetTransactionGUID: String;
+  protected
+    // ---------- Begin intercepted methods (StrategyInterceptors) ----------
+    class procedure _DoPersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
+    class procedure _DoPersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
+    class procedure _DoDeleteObject(const AObj: TObject); override;
+    class procedure _DoDeleteList(const AList: TObject); override;
+    class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject); override;
+    class function _DoLoadObject(const AWhere: IioWhere; const AObj: TObject): TObject; override;
+    // ---------- End intercepted methods (StrategyInterceptors) ----------
   public
     class procedure StartTransaction(const AConnectionName: String); override;
     class procedure CommitTransaction(const AConnectionName: String); override;
     class procedure RollbackTransaction(const AConnectionName: String); override;
     class function InTransaction(const AConnectionName: String): boolean; override;
-    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
-    class procedure PersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
-    class procedure DeleteObject(const AObj: TObject); override;
-    class procedure DeleteList(const AList: TObject); override;
     class procedure Delete(const AWhere: IioWhere); override;
-    class procedure LoadList(const AWhere: IioWhere; const AList: TObject); override;
-    class function LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject; override;
     class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject; override;
     class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
     class function Count(const AWhere: IioWhere): Integer; override;
@@ -139,7 +142,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyRemote.DeleteList(const AList: TObject);
+class procedure TioStrategyRemote._DoDeleteList(const AList: TObject);
 var
   LConnection: IioConnectionRemote;
 begin
@@ -167,7 +170,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyRemote.DeleteObject(const AObj: TObject);
+class procedure TioStrategyRemote._DoDeleteObject(const AObj: TObject);
 var
   LConnectionDefName: String;
   LConnection: IioConnectionRemote;
@@ -239,7 +242,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyRemote.LoadList(const AWhere: IioWhere; const AList: TObject);
+class procedure TioStrategyRemote._DoLoadList(const AWhere: IioWhere; const AList: TObject);
 var
   LConnection: IioConnectionRemote;
 begin
@@ -266,7 +269,7 @@ begin
   end;
 end;
 
-class function TioStrategyRemote.LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject;
+class function TioStrategyRemote._DoLoadObject(const AWhere: IioWhere; const AObj: TObject): TObject;
 var
   ADone: boolean;
   LConnection: IioConnectionRemote;
@@ -321,7 +324,7 @@ end;
 // end;
 
 { TODO : DA AGGIUNGERE GESTIONE DEI 3 PARAMETRI AGGIUNTI ALLA FINE PER IL SUD }
-class procedure TioStrategyRemote.PersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
+class procedure TioStrategyRemote._DoPersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
   const ABlindInsert: boolean; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LConnection: IioConnectionRemote;
@@ -357,7 +360,7 @@ begin
 end;
 
 { TODO : DA AGGIUNGERE GESTIONE DEI 3 PARAMETRI AGGIUNTI ALLA FINE PER IL SUD }
-class procedure TioStrategyRemote.PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
+class procedure TioStrategyRemote._DoPersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
   const ABlindInsert: boolean; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LConnectionDefName: String;

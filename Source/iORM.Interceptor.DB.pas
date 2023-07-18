@@ -46,17 +46,17 @@ type
   TioCustomDBInterceptor = class
   public
     // Obj load
-    class procedure BeforeLoad(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
-    class procedure AfterLoad(const AContext: IioContext; const AQuery: IioQuery);
+    class procedure BeforeLoad(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean); virtual;
+    class procedure AfterLoad(const AContext: IioContext; const AQuery: IioQuery); virtual;
     // Obj insert
-    class procedure BeforeInsert(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
-    class procedure AfterInsert(const AContext: IioContext; const AQuery: IioQuery);
+    class procedure BeforeInsert(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean); virtual;
+    class procedure AfterInsert(const AContext: IioContext; const AQuery: IioQuery); virtual;
     // Obj update
-    class procedure BeforeUpdate(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
-    class procedure AfterUpdate(const AContext: IioContext; const AQuery: IioQuery);
+    class procedure BeforeUpdate(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean); virtual;
+    class procedure AfterUpdate(const AContext: IioContext; const AQuery: IioQuery); virtual;
     // Obj delete
-    class procedure BeforeDelete(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
-    class procedure AfterDelete(const AContext: IioContext; const AQuery: IioQuery);
+    class procedure BeforeDelete(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean); virtual;
+    class procedure AfterDelete(const AContext: IioContext; const AQuery: IioQuery); virtual;
   end;
 
 implementation
