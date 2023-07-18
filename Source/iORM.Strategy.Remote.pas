@@ -79,7 +79,7 @@ uses
   iORM.DB.Factory, System.Generics.Collections, iORM.Utilities,
   iORM.DuckTyped.Interfaces, iORM.Remote.Interfaces, iORM.Remote.Factory,
   iORM.Exceptions, System.SysUtils, FireDAC.Stan.Intf, FireDAC.Stan.StorageJSON,
-  iORM.Context.Container, DJSON, iORM.Interceptor.Strategy.Register;
+  iORM.Context.Container, DJSON;
 
 { TioStrategyRemote }
 
@@ -271,16 +271,10 @@ end;
 
 class function TioStrategyRemote._DoLoadObject(const AWhere: IioWhere; const AObj: TObject): TObject;
 var
-  ADone: boolean;
   LConnection: IioConnectionRemote;
 begin
   inherited;
   Result := AObj;
-  // Strategy interceptors (before)
-  ADone := False;
-  Result := TioStrategyInterceptorRegister.BeforeLoadObject(AWhere, Result, ADone);
-  if ADone then
-    Exit;
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection('').AsRemoteConnection;
   // Start transaction
@@ -304,8 +298,6 @@ begin
     LConnection.Rollback;
     raise;
   end;
-  // Strategy interceptors (after)
-  Result := TioStrategyInterceptorRegister.AfterLoadObject(AWhere, Result);
 end;
 
 class function TioStrategyRemote.LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject;
