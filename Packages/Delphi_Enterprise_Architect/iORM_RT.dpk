@@ -229,8 +229,8 @@ contains
   iORM.ETM.TimeSlot in '..\..\Source\iORM.ETM.TimeSlot.pas',
   iORM.ETM.Engine in '..\..\Source\iORM.ETM.Engine.pas',
   iORM.Interceptor.Strategy in '..\..\Source\iORM.Interceptor.Strategy.pas',
-  iORM.Interceptor.ObjCrud in '..\..\Source\iORM.Interceptor.ObjCrud.pas',
+  iORM.Interceptor.DB in '..\..\Source\iORM.Interceptor.DB.pas',
   iORM.Interceptor.Strategy.Register in '..\..\Source\iORM.Interceptor.Strategy.Register.pas',
-  iORM.Interceptor.ObjCrud.Register in '..\..\Source\iORM.Interceptor.ObjCrud.Register.pas';
+  iORM.Interceptor.DB.Register in '..\..\Source\iORM.Interceptor.DB.Register.pas';
 
 end.

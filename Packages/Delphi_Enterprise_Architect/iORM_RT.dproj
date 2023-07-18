@@ -381,9 +381,9 @@
         <DCCReference Include="..\..\Source\iORM.ETM.TimeSlot.pas"/>
         <DCCReference Include="..\..\Source\iORM.ETM.Engine.pas"/>
         <DCCReference Include="..\..\Source\iORM.Interceptor.Strategy.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Interceptor.ObjCrud.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Interceptor.DB.pas"/>
         <DCCReference Include="..\..\Source\iORM.Interceptor.Strategy.Register.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Interceptor.ObjCrud.Register.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Interceptor.DB.Register.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
