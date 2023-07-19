@@ -86,7 +86,7 @@ uses
   iORM.DuckTyped.Factory, iORM.Resolver.Interfaces, iORM.ObjectsForge.Factory,
   iORM.LazyLoad.Factory, iORM.Resolver.Factory, iORM.Where.Factory,
   iORM.Exceptions, iORM, System.SysUtils, System.Generics.Collections,
-  iORM.Interceptor.DB;
+  iORM.Interceptor.DB, iORM.Interceptor.DB.Register;
 
 type
 
@@ -277,17 +277,24 @@ begin
 end;
 
 class procedure TioStrategyDB.DeleteObject_Internal(const AContext: IioContext);
+var
+  LDone: Boolean;
+  LQuery: IioQuery;
 begin
   inherited;
-  // If the ID is not null (object not persisted) then delete it from the DB
+  // Delete the entity (Intercepted by DBInterceptors)
+  LDone := False;
+  LQuery := TioDBFactory.QueryEngine.GetQueryDelete(AContext, True);
+  TioDBInterceptorRegister.BeforeDelete(AContext, LQuery, LDone);
   if not AContext.IDIsNull then
-    // Create and execute query
-    TioDBFactory.QueryEngine.GetQueryDelete(AContext, True).ExecSQL;
+    LQuery.ExecSQL;
+  TioDBInterceptorRegister.AfterDelete(AContext, LQuery);
 end;
 
 class procedure TioStrategyDB.InsertObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
 var
-  AQuery: IioQuery;
+  LDone: Boolean;
+  LQuery: IioQuery;
 begin
   inherited;
   // -----------------------------------------------------------
@@ -296,36 +303,43 @@ begin
   if (not ABlindInsertUpdate) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtBeforeInsert) and AContext.IDIsNull
   then
   begin
-    AQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
+    LQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
     try
-      AQuery.Open;
+      LQuery.Open;
       // Set the NextID as the ObjectID
-      AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, AQuery.Fields[0].AsInteger);
+      AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, LQuery.Fields[0].AsInteger);
     finally
-      AQuery.Close;
+      LQuery.Close;
     end;
   end;
-  // -----------------------------------------------------------  // Create and execute insert query and set the version/created/updated of the entity
-  // (if it's not a BlindInsert and versioning is enabled for this entity type)
-  TioDBFactory.QueryEngine.GetQueryInsert(AContext).ExecSQL;
-  AContext.NextObjVersion(True); // Update the ObjVersion (if exists)
-  if not ABlindInsertUpdate then
+  // -----------------------------------------------------------
+  // Create and execute insert query and set the version/created/updated of the entity (Intercepted by DBInterceptors)
+  LDone := False;
+  LQuery := TioDBFactory.QueryEngine.GetQueryInsert(AContext);
+  TioDBInterceptorRegister.BeforeInsert(AContext, LQuery, LDone);
+  if not LDone then
   begin
-    AContext.ObjCreated := AQuery.Connection.LastTransactionTimestamp;
-    AContext.ObjUpdated := AQuery.Connection.LastTransactionTimestamp;
+    LQuery.ExecSQL;
+    if not ABlindInsertUpdate then
+    begin
+      AContext.NextObjVersion(True);
+      AContext.ObjCreated := LQuery.Connection.LastTransactionTimestamp;
+      AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;
+    end;
+    TioDBInterceptorRegister.AfterInsert(AContext, LQuery);
   end;
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the last ID generated
   // in the last insert query.
   if (not ABlindInsertUpdate) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtAfterInsert) and AContext.IDIsNull then
   begin
-    AQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
+    LQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
     try
-      AQuery.Open;
+      LQuery.Open;
       // Set the NextID as the ObjectID
-      AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, AQuery.Fields[0].AsInteger);
+      AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, LQuery.Fields[0].AsInteger);
     finally
-      AQuery.Close;
+      LQuery.Close;
     end;
   end;
   // -----------------------------------------------------------
@@ -678,6 +692,7 @@ var
   // Nested
   procedure NestedLoadToList;
   var
+    LDone: Boolean;
     LQuery: IioQuery;
     LObj: TObject;
     LCurrentContext: IioContext;
@@ -701,8 +716,15 @@ var
           LCurrentContext := LOriginalContext;
         // Clean the DataObject (it contains the previous)
         LCurrentContext.DataObject := nil;
-        // Create the object as TObject
-        LObj := TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
+        // Create the object as TObject  (Intercepted by DBInterceptors)
+        LDone := False;
+        LObj := TioDBInterceptorRegister.BeforeLoad(LCurrentContext, nil, LQuery, LDone);
+        LCurrentContext.DataObject := LObj;
+        if not LDone then
+        begin
+          LObj := TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
+          LObj := TioDBInterceptorRegister.AfterLoad(LCurrentContext, LObj, LQuery);
+        end;
         // Add current object to the list
         LDuckTypedList.Add(LObj);
         // Next
@@ -755,6 +777,7 @@ var
   // Nested
   function NestedLoadToObject: TObject;
   var
+    LDone: Boolean;
     LQuery: IioQuery;
     LCurrentContext: IioContext;
   begin
@@ -773,8 +796,15 @@ var
           LCurrentContext := TioContextFactory.Context(LQuery.ExtractTrueClassName(LOriginalContext), AWhere, AObj, nil, '', '')
         else
           LCurrentContext := LOriginalContext;
-        // Create the object as TObject
-        Result := TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
+        // Create the object as TObject (Intercepted by DBInterceptors)
+        LDone := False;
+        Result := TioDBInterceptorRegister.BeforeLoad(LCurrentContext, AObj, LQuery, LDone);
+        LCurrentContext.DataObject := Result;
+        if not LDone then
+        begin
+          Result := TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
+          Result := TioDBInterceptorRegister.AfterLoad(LCurrentContext, Result, LQuery);
+        end;
       end;
     finally
       // Close query
@@ -817,22 +847,26 @@ end;
 
 class procedure TioStrategyDB.UpdateObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
 var
+  LDone: Boolean;
   LQuery: IioQuery;
 begin
   inherited;
   // Create and execute the query to update the entity into the DB cheking the version to avoid concurrency
-  // conflict (if versioning is enabled for this type of entity)
+  // conflict (if versioning is enabled for this type of entity) (Intercepted by DBInterceptors)
+  LDone := False;
   LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext);
-  if LQuery.ExecSQL > 0 then
+  TioDBInterceptorRegister.BeforeUpdate(AContext, LQuery, LDone);
+  if not LDone then
   begin
-    // Increment the ObjVersion if enabled (if exists)
-    AContext.NextObjVersion(True);
-    // Update the ObjUpdated property (if exists)
+    if LQuery.ExecSQL = 0 then
+      Exit;
     if not ABlindInsertUpdate then
+    begin
+      AContext.NextObjVersion(True);
       AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;;
-  end
-  else
-    raise EioConcurrencyConflictException.Create(Self.ClassName, 'UpdateObject', AContext);
+    end;
+    TioDBInterceptorRegister.AfterUpdate(AContext, LQuery);
+  end;
 end;
 
 { TioContextCache }

@@ -46,8 +46,8 @@ type
   TioCustomDBInterceptor = class
   public
     // Obj load
-    class procedure BeforeLoad(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean); virtual;
-    class procedure AfterLoad(const AContext: IioContext; const AQuery: IioQuery); virtual;
+    class function BeforeLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery; var ADone: Boolean): TObject; virtual;
+    class function AfterLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery): TObject; virtual;
     // Obj insert
     class procedure BeforeInsert(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean); virtual;
     class procedure AfterInsert(const AContext: IioContext; const AQuery: IioQuery); virtual;
@@ -63,9 +63,9 @@ implementation
 
 { TioCustomObjCrudIncerceptor }
 
-class procedure TioCustomDBInterceptor.AfterLoad(const AContext: IioContext; const AQuery: IioQuery);
+class function TioCustomDBInterceptor.AfterLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery): TObject;
 begin
-  // Nothing to do here (It must be implemented by the descendant classes)
+  Result := AObj;
 end;
 
 class procedure TioCustomDBInterceptor.AfterDelete(const AContext: IioContext; const AQuery: IioQuery);
@@ -83,9 +83,9 @@ begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomDBInterceptor.BeforeLoad(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
+class function TioCustomDBInterceptor.BeforeLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery; var ADone: Boolean): TObject;
 begin
-  // Nothing to do here (It must be implemented by the descendant classes)
+  Result := AObj;
 end;
 
 class procedure TioCustomDBInterceptor.BeforeDelete(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);

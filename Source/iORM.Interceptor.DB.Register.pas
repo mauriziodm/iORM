@@ -55,8 +55,8 @@ type
     class procedure RegisterInterceptor(const ATypeName: String; const ADBInterceptor: TioDBInterceptorRef);
     class procedure UnregisterInterceptor(const ATypeName: String; const ADBInterceptor: TioDBInterceptorRef);
     // Obj load
-    class procedure BeforeLoad(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
-    class procedure AfterCreate(const AContext: IioContext; const AQuery: IioQuery);
+    class function BeforeLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery; var ADone: Boolean): TObject;
+    class function AfterLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery): TObject;
     // Obj insert
     class procedure BeforeInsert(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
     class procedure AfterInsert(const AContext: IioContext; const AQuery: IioQuery);
@@ -76,13 +76,13 @@ uses
 
 { TioObjCrudInterceptorRegister }
 
-class procedure TioDBInterceptorRegister.AfterCreate(const AContext: IioContext; const AQuery: IioQuery);
+class function TioDBInterceptorRegister.AfterLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery): TObject;
 var
   LInterceptor: TioDBInterceptorRef;
 begin
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
     for LInterceptor in FInternalContainer.Items[AContext.Map.GetClassName]^ do
-      LInterceptor.AfterLoad(AContext, AQuery);
+      Result := LInterceptor.AfterLoad(AContext, AObj, AQuery);
 end;
 
 class procedure TioDBInterceptorRegister.AfterDelete(const AContext: IioContext; const AQuery: IioQuery);
@@ -112,7 +112,7 @@ begin
       LInterceptor.AfterUpdate(AContext, AQuery);
 end;
 
-class procedure TioDBInterceptorRegister.BeforeLoad(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
+class function TioDBInterceptorRegister.BeforeLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery; var ADone: Boolean): TObject;
 var
   LDone: Boolean;
   LInterceptor: TioDBInterceptorRef;
@@ -121,7 +121,7 @@ begin
     for LInterceptor in FInternalContainer.Items[AContext.Map.GetClassName]^ do
     begin
       LDone := False;
-      LInterceptor.BeforeLoad(AContext, AQuery, LDone);
+      Result := LInterceptor.BeforeLoad(AContext, AObj, AQuery, LDone);
       if LDone then
         ADone := True;
     end;
