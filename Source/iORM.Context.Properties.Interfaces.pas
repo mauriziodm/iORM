@@ -98,6 +98,9 @@ type
     function IsWritable: Boolean;
     function IsTransient: Boolean;
     function IsEnumeration: Boolean;
+    function IsObjCreateds: Boolean;
+    function IsObjUpdateds: Boolean;
+
     function HasAutodetectedHasManyRelation: Boolean;
     function isHasManyChildVirtualProperty: Boolean;
     procedure SetMetadata_FieldType(const AMetadata_FieldType: TioMetadataFieldType);

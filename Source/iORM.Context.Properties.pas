@@ -86,10 +86,6 @@ type
     FMetadata_FKCreate: TioFKCreate;
     FMetadata_FKOnDeleteAction: TioFKAction;
     FMetadata_FKOnUpdateAction: TioFKAction;
-
-    function IsObjCreateds: Boolean;
-    function IsObjUpdateds: Boolean;
-
     procedure SetRelationChildNameAndPath(const AQualifiedChildPropertyName: String);
     procedure SetFieldData;
     procedure SetLoadSqlData;
@@ -172,6 +168,8 @@ type
     function HasAutodetectedHasManyRelation: Boolean;
     function isHasManyChildVirtualProperty: Boolean; virtual;
     function IsEnumeration: Boolean; virtual;
+    function IsObjCreateds: Boolean;
+    function IsObjUpdateds: Boolean;
 
     procedure SetMetadata_FieldType(const AMetadata_FieldType: TioMetadataFieldType);
     procedure SetMetadata_FieldLength(const AMetadata_FieldLength: Integer);

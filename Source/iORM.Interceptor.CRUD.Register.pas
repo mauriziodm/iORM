@@ -31,34 +31,34 @@
   *                                                                          *
   ****************************************************************************
 }
-//  ************************************************************************
-//  * NOTE: {$DEFINE ioDBInterceptorsOff} to disable strategy interceptors *
-//  * NOTE: {$DEFINE ioDBInterceptorsOff} to disable strategy interceptors *
-//  * NOTE: {$DEFINE ioDBInterceptorsOff} to disable strategy interceptors *
-//  ************************************************************************
-unit iORM.Interceptor.DB.Register;
+//  **************************************************************************
+//  * NOTE: {$DEFINE ioCRUDInterceptorsOff} to disable strategy interceptors *
+//  * NOTE: {$DEFINE ioCRUDInterceptorsOff} to disable strategy interceptors *
+//  * NOTE: {$DEFINE ioCRUDInterceptorsOff} to disable strategy interceptors *
+//  **************************************************************************
+unit iORM.Interceptor.CRUD.Register;
 
 interface
 
 uses
-  iORM.Interceptor.DB, System.Generics.Collections,
+  iORM.Interceptor.CRUD, System.Generics.Collections,
   iORM.Context.Interfaces, iORM.DB.Interfaces;
 
 type
 
-  TDBInterceptorArray = TArray<TioDBInterceptorRef>;
-  PDBInterceptorArray = ^TDBInterceptorArray;
+  TCRUDInterceptorArray = TArray<TioCRUDInterceptorRef>;
+  PCRUDInterceptorArray = ^TCRUDInterceptorArray;
 
-  TiDBInterceptorRegisterRef = class of TioDBInterceptorRegister;
+  TioCRUDInterceptorRegisterRef = class of TioCRUDInterceptorRegister;
 
-  TioDBInterceptorRegister = class
+  TioCRUDInterceptorRegister = class
   private
-    class var FInternalContainer: TDictionary<String, PDBInterceptorArray>;
+    class var FInternalContainer: TDictionary<String, PCRUDInterceptorArray>;
     class procedure Build;
     class procedure Clean;
   public
-    class procedure RegisterInterceptor(const ATypeName: String; const ADBInterceptor: TioDBInterceptorRef);
-    class procedure UnregisterInterceptor(const ATypeName: String; const ADBInterceptor: TioDBInterceptorRef);
+    class procedure RegisterInterceptor(const ATypeName: String; const ACRUDInterceptor: TioCRUDInterceptorRef);
+    class procedure UnregisterInterceptor(const ATypeName: String; const ACRUDInterceptor: TioCRUDInterceptorRef);
     // Obj load
     class function BeforeLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery; var ADone: Boolean): TObject;
     class function AfterLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery): TObject;
@@ -81,9 +81,9 @@ uses
 
 { TioObjCrudInterceptorRegister }
 
-class function TioDBInterceptorRegister.AfterLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery): TObject;
+class function TioCRUDInterceptorRegister.AfterLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery): TObject;
 var
-  LInterceptor: TioDBInterceptorRef;
+  LInterceptor: TioCRUDInterceptorRef;
 begin
   Result := AObj;
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
@@ -91,37 +91,37 @@ begin
       Result := LInterceptor.AfterLoad(AContext, AObj, AQuery);
 end;
 
-class procedure TioDBInterceptorRegister.AfterDelete(const AContext: IioContext; const AQuery: IioQuery);
+class procedure TioCRUDInterceptorRegister.AfterDelete(const AContext: IioContext; const AQuery: IioQuery);
 var
-  LInterceptor: TioDBInterceptorRef;
+  LInterceptor: TioCRUDInterceptorRef;
 begin
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
     for LInterceptor in FInternalContainer.Items[AContext.Map.GetClassName]^ do
       LInterceptor.AfterDelete(AContext, AQuery);
 end;
 
-class procedure TioDBInterceptorRegister.AfterInsert(const AContext: IioContext; const AQuery: IioQuery);
+class procedure TioCRUDInterceptorRegister.AfterInsert(const AContext: IioContext; const AQuery: IioQuery);
 var
-  LInterceptor: TioDBInterceptorRef;
+  LInterceptor: TioCRUDInterceptorRef;
 begin
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
     for LInterceptor in FInternalContainer.Items[AContext.Map.GetClassName]^ do
       LInterceptor.AfterInsert(AContext, AQuery);
 end;
 
-class procedure TioDBInterceptorRegister.AfterUpdate(const AContext: IioContext; const AQuery: IioQuery);
+class procedure TioCRUDInterceptorRegister.AfterUpdate(const AContext: IioContext; const AQuery: IioQuery);
 var
-  LInterceptor: TioDBInterceptorRef;
+  LInterceptor: TioCRUDInterceptorRef;
 begin
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
     for LInterceptor in FInternalContainer.Items[AContext.Map.GetClassName]^ do
       LInterceptor.AfterUpdate(AContext, AQuery);
 end;
 
-class function TioDBInterceptorRegister.BeforeLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery; var ADone: Boolean): TObject;
+class function TioCRUDInterceptorRegister.BeforeLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery; var ADone: Boolean): TObject;
 var
   LDone: Boolean;
-  LInterceptor: TioDBInterceptorRef;
+  LInterceptor: TioCRUDInterceptorRef;
 begin
   Result := AObj;
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
@@ -134,10 +134,10 @@ begin
     end;
 end;
 
-class procedure TioDBInterceptorRegister.BeforeDelete(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
+class procedure TioCRUDInterceptorRegister.BeforeDelete(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
 var
   LDone: Boolean;
-  LInterceptor: TioDBInterceptorRef;
+  LInterceptor: TioCRUDInterceptorRef;
 begin
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
     for LInterceptor in FInternalContainer.Items[AContext.Map.GetClassName]^ do
@@ -149,10 +149,10 @@ begin
     end;
 end;
 
-class procedure TioDBInterceptorRegister.BeforeInsert(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
+class procedure TioCRUDInterceptorRegister.BeforeInsert(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
 var
   LDone: Boolean;
-  LInterceptor: TioDBInterceptorRef;
+  LInterceptor: TioCRUDInterceptorRef;
 begin
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
     for LInterceptor in FInternalContainer.Items[AContext.Map.GetClassName]^ do
@@ -164,10 +164,10 @@ begin
     end;
 end;
 
-class procedure TioDBInterceptorRegister.BeforeUpdate(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
+class procedure TioCRUDInterceptorRegister.BeforeUpdate(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
 var
   LDone: Boolean;
-  LInterceptor: TioDBInterceptorRef;
+  LInterceptor: TioCRUDInterceptorRef;
 begin
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
     for LInterceptor in FInternalContainer.Items[AContext.Map.GetClassName]^ do
@@ -179,21 +179,21 @@ begin
     end;
 end;
 
-class procedure TioDBInterceptorRegister.Build;
+class procedure TioCRUDInterceptorRegister.Build;
 begin
-  FInternalContainer := TDictionary<String, PDBInterceptorArray>.Create;
+  FInternalContainer := TDictionary<String, PCRUDInterceptorArray>.Create;
 end;
 
-class procedure TioDBInterceptorRegister.Clean;
+class procedure TioCRUDInterceptorRegister.Clean;
 begin
   if Assigned(FInternalContainer) then
     FreeAndNil(FInternalContainer);
 end;
 
-class procedure TioDBInterceptorRegister.RegisterInterceptor(const ATypeName: String; const ADBInterceptor: TioDBInterceptorRef);
+class procedure TioCRUDInterceptorRegister.RegisterInterceptor(const ATypeName: String; const ACRUDInterceptor: TioCRUDInterceptorRef);
 var
-  LInterceptorArray: TDBInterceptorArray;
-  LInterceptorArrayPointer: PDBInterceptorArray;
+  LInterceptorArray: TCRUDInterceptorArray;
+  LInterceptorArrayPointer: PCRUDInterceptorArray;
   LNewInterceptorIndex: Byte;
 begin
   // If the internal container is not assigned then create it
@@ -208,14 +208,14 @@ begin
   LInterceptorArray := LInterceptorArrayPointer^;
   LNewInterceptorIndex := Length(LInterceptorArray);
   SetLength(LInterceptorArray, LNewInterceptorIndex + 1);
-  LInterceptorArray[LNewInterceptorIndex] := ADBInterceptor;
+  LInterceptorArray[LNewInterceptorIndex] := ACRUDInterceptor;
 end;
 
-class procedure TioDBInterceptorRegister.UnregisterInterceptor(const ATypeName: String; const ADBInterceptor: TioDBInterceptorRef);
+class procedure TioCRUDInterceptorRegister.UnregisterInterceptor(const ATypeName: String; const ACRUDInterceptor: TioCRUDInterceptorRef);
 var
   I: Integer;
-  LInterceptorArray: TDBInterceptorArray;
-  LInterceptorArrayPointer: PDBInterceptorArray;
+  LInterceptorArray: TCRUDInterceptorArray;
+  LInterceptorArrayPointer: PCRUDInterceptorArray;
 begin
   // Only if the current type name is registered (the is almost one interceptor registered for this type)
   if FInternalContainer.ContainsKey(ATypeName) then
@@ -224,7 +224,7 @@ begin
     LInterceptorArrayPointer := FInternalContainer.Items[ATypeName];
     LInterceptorArray := LInterceptorArrayPointer^;
     for I := High(LInterceptorArray) downto Low(LInterceptorArray) do
-      if LInterceptorArray[I] = ADBInterceptor then
+      if LInterceptorArray[I] = ACRUDInterceptor then
         Delete(LInterceptorArray, I, 1);
     // If the interceptor array for this type is empty then remove also this type from the internal container
     if Length(LInterceptorArray) = 0 then
@@ -239,6 +239,6 @@ initialization
 
 finalization
 
-TioDBInterceptorRegister.Clean;
+TioCRUDInterceptorRegister.Clean;
 
 end.

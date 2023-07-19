@@ -31,12 +31,12 @@
   *                                                                          *
   ****************************************************************************
 }
-//  ************************************************************************
-//  * NOTE: {$DEFINE ioDBInterceptorsOff} to disable strategy interceptors *
-//  * NOTE: {$DEFINE ioDBInterceptorsOff} to disable strategy interceptors *
-//  * NOTE: {$DEFINE ioDBInterceptorsOff} to disable strategy interceptors *
-//  ************************************************************************
-unit iORM.Interceptor.DB;
+//  **************************************************************************
+//  * NOTE: {$DEFINE ioCRUDInterceptorsOff} to disable strategy interceptors *
+//  * NOTE: {$DEFINE ioCRUDInterceptorsOff} to disable strategy interceptors *
+//  * NOTE: {$DEFINE ioCRUDInterceptorsOff} to disable strategy interceptors *
+//  **************************************************************************
+unit iORM.Interceptor.CRUD;
 
 interface
 
@@ -45,10 +45,10 @@ uses
 
 type
 
-  TioDBInterceptorRef = class of TioCustomDBInterceptor;
+  TioCRUDInterceptorRef = class of TioCustomCRUDInterceptor;
 
   // Note: The DB interceptor is registered for specific classes and executed for every single entity instance
-  TioCustomDBInterceptor = class
+  TioCustomCRUDInterceptor = class
   public
     // Obj load
     class function BeforeLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery; var ADone: Boolean): TObject; virtual;
@@ -68,42 +68,42 @@ implementation
 
 { TioCustomObjCrudIncerceptor }
 
-class function TioCustomDBInterceptor.AfterLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery): TObject;
+class function TioCustomCRUDInterceptor.AfterLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery): TObject;
 begin
   Result := AObj;
 end;
 
-class procedure TioCustomDBInterceptor.AfterDelete(const AContext: IioContext; const AQuery: IioQuery);
+class procedure TioCustomCRUDInterceptor.AfterDelete(const AContext: IioContext; const AQuery: IioQuery);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomDBInterceptor.AfterInsert(const AContext: IioContext; const AQuery: IioQuery);
+class procedure TioCustomCRUDInterceptor.AfterInsert(const AContext: IioContext; const AQuery: IioQuery);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomDBInterceptor.AfterUpdate(const AContext: IioContext; const AQuery: IioQuery);
+class procedure TioCustomCRUDInterceptor.AfterUpdate(const AContext: IioContext; const AQuery: IioQuery);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class function TioCustomDBInterceptor.BeforeLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery; var ADone: Boolean): TObject;
+class function TioCustomCRUDInterceptor.BeforeLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery; var ADone: Boolean): TObject;
 begin
   Result := AObj;
 end;
 
-class procedure TioCustomDBInterceptor.BeforeDelete(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
+class procedure TioCustomCRUDInterceptor.BeforeDelete(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomDBInterceptor.BeforeInsert(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
+class procedure TioCustomCRUDInterceptor.BeforeInsert(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomDBInterceptor.BeforeUpdate(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
+class procedure TioCustomCRUDInterceptor.BeforeUpdate(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
