@@ -278,22 +278,33 @@ end;
 
 class procedure TioStrategyDB.DeleteObject_Internal(const AContext: IioContext);
 var
+{$IFNDEF ioDBInterceptorsOff}
   LDone: Boolean;
+{$ENDIF}
   LQuery: IioQuery;
 begin
   inherited;
   // Delete the entity (Intercepted by DBInterceptors)
-  LDone := False;
   LQuery := TioDBFactory.QueryEngine.GetQueryDelete(AContext, True);
+{$IFNDEF ioDBInterceptorsOff}
+  LDone := False;
   TioDBInterceptorRegister.BeforeDelete(AContext, LQuery, LDone);
-  if not AContext.IDIsNull then
-    LQuery.ExecSQL;
-  TioDBInterceptorRegister.AfterDelete(AContext, LQuery);
+  if not LDone then
+  begin
+{$ENDIF}
+    if not AContext.IDIsNull then
+      LQuery.ExecSQL;
+{$IFNDEF ioDBInterceptorsOff}
+    TioDBInterceptorRegister.AfterDelete(AContext, LQuery);
+  end;
+{$ENDIF}
 end;
 
 class procedure TioStrategyDB.InsertObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
 var
+{$IFNDEF ioDBInterceptorsOff}
   LDone: Boolean;
+{$ENDIF}
   LQuery: IioQuery;
 begin
   inherited;
@@ -314,11 +325,13 @@ begin
   end;
   // -----------------------------------------------------------
   // Create and execute insert query and set the version/created/updated of the entity (Intercepted by DBInterceptors)
-  LDone := False;
   LQuery := TioDBFactory.QueryEngine.GetQueryInsert(AContext);
+{$IFNDEF ioDBInterceptorsOff}
+  LDone := False;
   TioDBInterceptorRegister.BeforeInsert(AContext, LQuery, LDone);
   if not LDone then
   begin
+{$ENDIF}
     LQuery.ExecSQL;
     if not ABlindInsertUpdate then
     begin
@@ -326,8 +339,10 @@ begin
       AContext.ObjCreated := LQuery.Connection.LastTransactionTimestamp;
       AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;
     end;
+{$IFNDEF ioDBInterceptorsOff}
     TioDBInterceptorRegister.AfterInsert(AContext, LQuery);
   end;
+{$ENDIF}
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the last ID generated
   // in the last insert query.
@@ -692,7 +707,9 @@ var
   // Nested
   procedure NestedLoadToList;
   var
+{$IFNDEF ioDBInterceptorsOff}
     LDone: Boolean;
+{$ENDIF}
     LQuery: IioQuery;
     LObj: TObject;
     LCurrentContext: IioContext;
@@ -717,14 +734,18 @@ var
         // Clean the DataObject (it contains the previous)
         LCurrentContext.DataObject := nil;
         // Create the object as TObject  (Intercepted by DBInterceptors)
+{$IFNDEF ioDBInterceptorsOff}
         LDone := False;
         LObj := TioDBInterceptorRegister.BeforeLoad(LCurrentContext, nil, LQuery, LDone);
         LCurrentContext.DataObject := LObj;
         if not LDone then
         begin
+{$ENDIF}
           LObj := TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
+{$IFNDEF ioDBInterceptorsOff}
           LObj := TioDBInterceptorRegister.AfterLoad(LCurrentContext, LObj, LQuery);
         end;
+{$ENDIF}
         // Add current object to the list
         LDuckTypedList.Add(LObj);
         // Next
@@ -777,7 +798,9 @@ var
   // Nested
   function NestedLoadToObject: TObject;
   var
+{$IFNDEF ioDBInterceptorsOff}
     LDone: Boolean;
+{$ENDIF}
     LQuery: IioQuery;
     LCurrentContext: IioContext;
   begin
@@ -797,14 +820,18 @@ var
         else
           LCurrentContext := LOriginalContext;
         // Create the object as TObject (Intercepted by DBInterceptors)
+{$IFNDEF ioDBInterceptorsOff}
         LDone := False;
         Result := TioDBInterceptorRegister.BeforeLoad(LCurrentContext, AObj, LQuery, LDone);
         LCurrentContext.DataObject := Result;
         if not LDone then
         begin
+{$ENDIF}
           Result := TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
+{$IFNDEF ioDBInterceptorsOff}
           Result := TioDBInterceptorRegister.AfterLoad(LCurrentContext, Result, LQuery);
         end;
+{$ENDIF}
       end;
     finally
       // Close query
@@ -847,17 +874,21 @@ end;
 
 class procedure TioStrategyDB.UpdateObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
 var
+{$IFNDEF ioDBInterceptorsOff}
   LDone: Boolean;
+{$ENDIF}
   LQuery: IioQuery;
 begin
   inherited;
   // Create and execute the query to update the entity into the DB cheking the version to avoid concurrency
   // conflict (if versioning is enabled for this type of entity) (Intercepted by DBInterceptors)
-  LDone := False;
   LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext);
+{$IFNDEF ioDBInterceptorsOff}
+  LDone := False;
   TioDBInterceptorRegister.BeforeUpdate(AContext, LQuery, LDone);
   if not LDone then
   begin
+{$ENDIF}
     if LQuery.ExecSQL = 0 then
       Exit;
     if not ABlindInsertUpdate then
@@ -865,8 +896,10 @@ begin
       AContext.NextObjVersion(True);
       AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;;
     end;
+{$IFNDEF ioDBInterceptorsOff}
     TioDBInterceptorRegister.AfterUpdate(AContext, LQuery);
   end;
+{$ENDIF}
 end;
 
 { TioContextCache }

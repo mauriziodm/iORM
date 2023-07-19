@@ -31,6 +31,11 @@
   *                                                                          *
   ****************************************************************************
 }
+//  ******************************************************************************
+//  * NOTE: {$DEFINE ioStrategyInterceptorsOff} to disable strategy interceptors *
+//  * NOTE: {$DEFINE ioStrategyInterceptorsOff} to disable strategy interceptors *
+//  * NOTE: {$DEFINE ioStrategyInterceptorsOff} to disable strategy interceptors *
+//  ******************************************************************************
 unit iORM.Interceptor.Strategy;
 
 interface
@@ -42,7 +47,6 @@ type
 
   TioStrategyInterceptorRef = class of TioCustomStrategyInterceptor;
 
-  // Note: {$DEFINE ioStrategyInterceptorsOff} to disable strategy interceptors
   TioCustomStrategyInterceptor = class
   public
     // LoadObject

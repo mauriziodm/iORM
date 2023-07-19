@@ -31,6 +31,11 @@
   *                                                                          *
   ****************************************************************************
 }
+//  ************************************************************************
+//  * NOTE: {$DEFINE ioDBInterceptorsOff} to disable strategy interceptors *
+//  * NOTE: {$DEFINE ioDBInterceptorsOff} to disable strategy interceptors *
+//  * NOTE: {$DEFINE ioDBInterceptorsOff} to disable strategy interceptors *
+//  ************************************************************************
 unit iORM.Interceptor.DB;
 
 interface
