@@ -805,7 +805,7 @@ var
     LCurrentContext: IioContext;
   begin
     // Init
-    Result := nil;
+    Result := AObj;
     // Create & open query
     LQuery := TioDBFactory.QueryEngine.GetQuerySelectObject(LOriginalContext);
     LQuery.Open;
@@ -816,13 +816,13 @@ var
         // If TrueClassMode is tvSmart then get the specific context for the current record/object else
         //  use the original context
         if LOriginalContext.GetTrueClass.Mode = tcSmart then
-          LCurrentContext := TioContextFactory.Context(LQuery.ExtractTrueClassName(LOriginalContext), AWhere, AObj, nil, '', '')
+          LCurrentContext := TioContextFactory.Context(LQuery.ExtractTrueClassName(LOriginalContext), AWhere, Result, nil, '', '')
         else
           LCurrentContext := LOriginalContext;
         // Create the object as TObject (Intercepted by DBInterceptors)
 {$IFNDEF ioDBInterceptorsOff}
         LDone := False;
-        Result := TioDBInterceptorRegister.BeforeLoad(LCurrentContext, AObj, LQuery, LDone);
+        Result := TioDBInterceptorRegister.BeforeLoad(LCurrentContext, Result, LQuery, LDone);
         LCurrentContext.DataObject := Result;
         if not LDone then
         begin

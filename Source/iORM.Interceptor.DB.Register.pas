@@ -85,6 +85,7 @@ class function TioDBInterceptorRegister.AfterLoad(const AContext: IioContext; co
 var
   LInterceptor: TioDBInterceptorRef;
 begin
+  Result := AObj;
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
     for LInterceptor in FInternalContainer.Items[AContext.Map.GetClassName]^ do
       Result := LInterceptor.AfterLoad(AContext, AObj, AQuery);
@@ -122,6 +123,7 @@ var
   LDone: Boolean;
   LInterceptor: TioDBInterceptorRef;
 begin
+  Result := AObj;
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
     for LInterceptor in FInternalContainer.Items[AContext.Map.GetClassName]^ do
     begin

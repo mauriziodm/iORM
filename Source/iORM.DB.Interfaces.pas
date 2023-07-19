@@ -397,13 +397,13 @@ type
     class procedure SQLDest_Execute(const ASQLDestination: IioSQLDestination); virtual; abstract;
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------
     class procedure PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); static;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
     class procedure PersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); static;
-    class procedure DeleteObject(const AObj: TObject); static;
-    class procedure DeleteList(const AList: TObject); static;
-    class procedure LoadList(const AWhere: IioWhere; const AList: TObject); static;
-    class function LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject; static;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
+    class procedure DeleteObject(const AObj: TObject);
+    class procedure DeleteList(const AList: TObject);
+    class procedure LoadList(const AWhere: IioWhere; const AList: TObject);
+    class function LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject;
     // ---------- End intercepted methods (StrategyInterceptors) ----------
   end;
 
@@ -933,15 +933,16 @@ var
   LDone: Boolean;
 {$ENDIF}
 begin
+  Result := AObj;
 {$IFNDEF ioStrategyInterceptorsOff}
   LDone := False;
-  TioStrategyInterceptorRegister.BeforeLoadObject(AWhere, AObj, LDone);
+  Result := TioStrategyInterceptorRegister.BeforeLoadObject(AWhere, Result, LDone);
   if LDone then
     Exit;
 {$ENDIF}
-  _DoLoadObject(AWhere, AObj);
+  Result := _DoLoadObject(AWhere, Result);
 {$IFNDEF ioStrategyInterceptorsOff}
-  TioStrategyInterceptorRegister.AfterLoadObject(AWhere, AObj);
+  Result := TioStrategyInterceptorRegister.AfterLoadObject(AWhere, Result);
 {$ENDIF}
 end;
 
