@@ -36,7 +36,8 @@ unit iORM.ETM.Engine;
 interface
 
 uses
-  System.Classes, System.Generics.Collections, iORM.ETM.Interfaces, iORM.Where.Interfaces;
+  System.Classes, System.Generics.Collections, iORM.ETM.Interfaces, iORM.Where.Interfaces,
+  iORM.Context.Map.Interfaces;
 
 type
 
@@ -48,12 +49,16 @@ type
     class function TimeTravelFor<T: class>(const AWhere: IioWhere = nil): TList<IioEtmTimeSlot>; overload;
     class function TimeTravelFor(const AObj: TObject; const AWhere: IioWhere = nil): TList<IioEtmTimeSlot>; overload;
     class function TimeTravelFor(const AIntf: IInterface; const AWhere: IioWhere = nil): TList<IioEtmTimeSlot>; overload;
+    // Trace
+    class procedure TraceByMap(const AMap: IioMap; const AConnectionName: String);
+    class procedure Trace<T: class>(const AConnectionName: String = '');
   end;
 
 implementation
 
 uses
-  iORM, iORM.Utilities, iORM.CommonTypes;
+  iORM, iORM.Utilities, iORM.CommonTypes, iORM.Exceptions, System.SysUtils,
+  iORM.ETM.Interceptor, iORM.Context.Factory;
 
 { TIoEtmEngine }
 
@@ -70,6 +75,22 @@ end;
 class function TIoEtmEngine.TimeTravelFor<T>(const AWhere: IioWhere): TList<IioEtmTimeSlot>;
 begin
   Result := io.Load<IioEtmTimeSlot>._Where(AWhere).ToList;
+end;
+
+class procedure TIoEtmEngine.Trace<T>(const AConnectionName: String);
+begin
+  TraceByMap(TioContextFactory.Map(T), AConnectionName);
+end;
+
+class procedure TIoEtmEngine.TraceByMap(const AMap: IioMap; const AConnectionName: String);
+begin
+  // A TioObjVersion field is mandatory
+  if not AMap.GetProperties.ObjVersionPropertyExist then
+    raise EioException.Create(ClassName, 'TraceByMap', Format('Hello, I''m iORM, I''m sorry but there is a problem.' +
+      #13#13'I''m trying to register the class "%s" in the ETM (Entity Time Machine) subsystem but it doesn''t have a field of type "TioObjVersion".' +
+      #13#13'Please add a field/property of type "TioObjVersion" and try again, everything will be fine.', [AMap.GetClassName]));
+  // Register the ETMInterceptor for this class & connection
+  io.CRUDInterceptors.RegisterInterceptor(TioEtmInterceptor, AMap.GetClassName, AConnectionName);
 end;
 
 class function TIoEtmEngine.TimeTravelFor(const AObj: TObject; const AWhere: IioWhere): TList<IioEtmTimeSlot>;

@@ -50,7 +50,7 @@ type
   TioContextFactory = class
   private
     class function GetMetadata_FieldTypeByTypeKind(const ATypeKind: TTypeKind; const AQualifiedName: string): TioMetadataFieldType;
-    class function Table(const Typ: TRttiInstanceType): IioTable;
+    class function Table(const Typ: TRttiInstanceType; out OEtmTraced: Boolean; out OEtmConnectionName: String): IioTable;
     class function Properties(const Typ: TRttiInstanceType; const ATable: IioTable): IioProperties;
     class function HasManyChildVirtualProperty(const ATable: IioTable): IioProperty;
     class function TrueClass(const ATrueClassMode: TioTrueClassMode; const ASqlFieldName: String): IioTrueClass;
@@ -254,14 +254,21 @@ var
   LRttiContext: TRttiContext;
   LRttiType: TRttiInstanceType;
   LTable: IioTable;
+  LEtmTraced: Boolean;
+  LEtmConnectionName: String;
 begin
   // Rtti init
   LRttiContext := TioRttiFactory.GetRttiContext;
   LRttiType := LRttiContext.GetType(AClassRef).AsInstance;
   // Get the table
-  LTable := Self.Table(LRttiType);
+  LTable := Self.Table(LRttiType, LEtmTraced, LEtmConnectionName);
   // Create the map
   Result := TioMap.Create(AClassRef, LRttiContext, LRttiType, LTable, Properties(LRttiType, LTable));
+  // If it is etmTraced the register itself into the etmEngine
+  if LEtmTraced then
+  begin
+
+  end;
 end;
 
 class function TioContextFactory.Properties(const Typ: TRttiInstanceType; const ATable: IioTable): IioProperties;
@@ -715,7 +722,7 @@ begin
   end;
 end;
 
-class function TioContextFactory.Table(const Typ: TRttiInstanceType): IioTable;
+class function TioContextFactory.Table(const Typ: TRttiInstanceType; out OEtmTraced: Boolean; out OEtmConnectionName: String): IioTable;
 var
   LAttr: TCustomAttribute;
   LTableName, LConnectionDefName, LKeyGenerator: String;
@@ -736,6 +743,8 @@ begin
     LGroupBy := nil;
     LMapMode := DEFAULT_MAP_MODE;
     LIndexList := nil;
+    OEtmTraced := False;
+    OEtmConnectionName := '';
     // Check attributes
     for LAttr in Typ.GetAttributes do
     begin
@@ -766,6 +775,12 @@ begin
         if not Assigned(LIndexList) then
           LIndexList := TioIndexList.Create;
         LIndexList.Add(ioIndex(LAttr));
+      end;
+      // etmTrace
+      if (LAttr is etmTrace) then
+      begin
+        OEtmTraced := True;
+        OEtmConnectionName := etmTrace(LAttr).ConnectionName;
       end;
     end;
     // Create result Properties object

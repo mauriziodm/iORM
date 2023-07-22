@@ -31,52 +31,42 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.ETM.Interfaces;
+unit iORM.ETM.Interceptor;
 
 interface
 
 uses
-  iORM.Attributes, iORM.CommonTypes, System.Classes;
+  iORM.Interceptor.CRUD, iORM.Context.Interfaces, iORM.DB.Interfaces;
 
 type
 
-  [ioEnumerated('Insert, Update, Delete, Synchronization')]
-  TioEtmTimeSlotType = (tsInsert, tsUpdate, tsDelete, tsSynchronization);
-
-  [ioEnumerated('No conflict detected, Master version win, Slave version win, Last updated win, Manual conflict resolution')]
-  TioEtmConflictType = (ctNoConflict, ctMasterWin, ctSlaveWin, ctLastUpdatedWin, ctManual);
-
-  IioEtmTimeSlot = interface
-    ['{09B35E52-AF12-4F66-A8CF-D58A1CF41C7D}']
-    // ID
-    function GetID: Integer;
-    property ID: Integer read GetID;
-    // DateAndTime
-    function GetDateAndTime: TDateTime;
-    property DateAndTime: TDateTime read GetDateAndTime;
-    // TimeSlotType
-    function GetTimeSlotType: TioEtmTimeSlotType;
-    property TimeSlotType: TioEtmTimeSlotType read GetTimeSlotType;
-    // EntityClassName
-    function GetEntityClassName: String;
-    property EntityClassName: String read GetEntityClassName;
-    // EntityID
-    function GetEntityID: Integer;
-    property EntityID: Integer read GetEntityID;
-    // EntityVersion
-    function GetEntityVersion: Integer;
-    property EntityVersion: Integer read GetEntityVersion;
-    // EntityState
-    function GetEntityState: String;
-    property EntityState: String read GetEntityState;
-    // RemoteEntityState
-    function GetRemoteEntityState: String;
-    property RemoteEntityState: String read GetRemoteEntityState;
-    // ConflictResolutionType
-    function GetConflictType: TioEtmConflictType;
-    property ConflictType: TioEtmConflictType read GetConflictType;
+  TioEtmInterceptor = class(TioCustomCRUDInterceptor)
+  public
+    class procedure AfterInsert(const AContext: IioContext; const AQuery: IioQuery); override;
+    class procedure AfterUpdate(const AContext: IioContext; const AQuery: IioQuery); override;
+    class procedure AfterDelete(const AContext: IioContext; const AQuery: IioQuery); override;
   end;
 
 implementation
+
+uses
+  iORM, iORM.ETM.Interfaces, iORM.ETM.Factory;
+
+{ TioEtmInterceptor }
+
+class procedure TioEtmInterceptor.AfterDelete(const AContext: IioContext; const AQuery: IioQuery);
+begin
+  io.Persist(TioETMFactory.NewDeleteTimeSlot(AContext));
+end;
+
+class procedure TioEtmInterceptor.AfterInsert(const AContext: IioContext; const AQuery: IioQuery);
+begin
+  io.Persist(TioETMFactory.NewInsertTimeSlot(AContext));
+end;
+
+class procedure TioEtmInterceptor.AfterUpdate(const AContext: IioContext; const AQuery: IioQuery);
+begin
+  io.Persist(TioETMFactory.NewUpdateTimeSlot(AContext));
+end;
 
 end.

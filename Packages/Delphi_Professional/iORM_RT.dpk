@@ -244,6 +244,8 @@ contains
   iORM.Interceptor.CRUD in '..\..\Source\iORM.Interceptor.CRUD.pas',
   iORM.Interceptor.CRUD.Register in '..\..\Source\iORM.Interceptor.CRUD.Register.pas',
   iORM.Interceptor.Strategy in '..\..\Source\iORM.Interceptor.Strategy.pas',
-  iORM.Interceptor.Strategy.Register in '..\..\Source\iORM.Interceptor.Strategy.Register.pas';
+  iORM.Interceptor.Strategy.Register in '..\..\Source\iORM.Interceptor.Strategy.Register.pas',
+  iORM.ETM.Factory in '..\..\Source\iORM.ETM.Factory.pas',
+  iORM.ETM.Interceptor in '..\..\Source\iORM.ETM.Interceptor.pas';
 
 end.

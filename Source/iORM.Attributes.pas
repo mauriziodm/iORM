@@ -504,6 +504,19 @@ type
 {$ENDREGION} // END OF DEPENDENCY INJECTION ATTRIBUTES
 
 
+{$REGION '===== ETM ATTRIBUTES ====='}
+
+  etmTrace = class(TCustomAttribute)
+  strict private
+    FConnectionName: String;
+  public
+    constructor Create(const AConnectionName: String = '');
+    property ConnectionName: String read FConnectionName;
+  end;
+
+{$ENDREGION} // END ETM ATTRIBUTES
+
+
 {$REGION '===== OTHER ATTRIBUTES ====='}
 
   // Mark something (ex: a constructor) with a label
@@ -808,6 +821,13 @@ constructor ioWhereGroupAttribute.Create(const AGroupLogicRelation: TioLogicOp; 
 begin
   Create(AGroupName, AMasterGroupName);
   FGroupLogicOp := AGroupLogicRelation;
+end;
+
+{ etmTraceAttribute }
+
+constructor etmTrace.Create(const AConnectionName: String);
+begin
+  FConnectionName := AConnectionName;
 end;
 
 end.

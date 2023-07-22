@@ -384,6 +384,8 @@
         <DCCReference Include="..\..\Source\iORM.Interceptor.CRUD.pas"/>
         <DCCReference Include="..\..\Source\iORM.Interceptor.Strategy.Register.pas"/>
         <DCCReference Include="..\..\Source\iORM.Interceptor.CRUD.Register.pas"/>
+        <DCCReference Include="..\..\Source\iORM.ETM.Factory.pas"/>
+        <DCCReference Include="..\..\Source\iORM.ETM.Interceptor.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
