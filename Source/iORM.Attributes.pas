@@ -405,8 +405,8 @@ type
     FTargetPropName: String;
   public
     constructor Create; overload;
-    constructor Create(ATargetPropName: String; const ACompareOp: TioCompareOp = coEqual); overload;
-    constructor Create(const ALogicRelation: TioLogicOp; const ACompareOp: TioCompareOp = coEqual); overload;
+    constructor Create(ATargetPropName: String; const ACompareOp: TioCompareOp = coEquals); overload;
+    constructor Create(const ALogicRelation: TioLogicOp; const ACompareOp: TioCompareOp = coEquals); overload;
     constructor Create(const ACompareOp: TioCompareOp); overload;
     constructor Create(const ALogicRelation: TioLogicOp; ATargetPropName: String; const ACompareOp: TioCompareOp); overload;
     property CompareOp: TioCompareOp read FCompareOp;
@@ -762,7 +762,7 @@ end;
 
 constructor ioWhereAttribute.Create;
 begin
-  FCompareOp := TioCompareOp.coEqual;
+  FCompareOp := TioCompareOp.coEquals;
   FLogicOp := TioLogicOp.loAnd;
   FTargetPropName := String.Empty;
 end;

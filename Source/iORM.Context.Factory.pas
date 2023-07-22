@@ -350,7 +350,7 @@ var
       LDB_FKOnDeleteAction := fkUnspecified;
       LDB_FKOnUpdateAction := fkUnspecified;
       // Smart where initialization
-      LWhereCompareOp := TioCompareOp.coEqual;
+      LWhereCompareOp := TioCompareOp.coEquals;
       LWhereGroupLogicOp := TioLogicOp.loAnd;
       LWhereGroupName := String.Empty;
       LWhereLogicOp := TioLogicOp.loAnd;

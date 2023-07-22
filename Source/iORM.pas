@@ -42,7 +42,8 @@ uses
   iORM.LiveBindings.Interfaces, iORM.MVVM.ViewRegister,
   iORM.StdActions.Interfaces, iORM.Context.Container,
   iORM.Context.Properties.Interfaces, iORM.Where.SmartBuilder,
-  iORM.Interceptor.Strategy.Register, iORM.Interceptor.CRUD.Register;
+  iORM.Interceptor.Strategy.Register, iORM.Interceptor.CRUD.Register,
+  iORM.ETM.Factory;
 
 const
   IORM_VERSION = 'iORM 2 (beta 2.3)';
@@ -64,9 +65,9 @@ const
   osClean = iORM.CommonTypes.TioObjStatus.osClean;
   osDeleted = iORM.CommonTypes.TioObjStatus.osDeleted;
 
-  // TioCompareOp = (coEqual, coNotEqual, coGreater, coLower, coGreaterOrEqual, coLowerOrEqual, coLike, coNotLike, coIsNull, coIsNotNull)
-  coEqual = iORM.CommonTypes.TioCompareOp.coEqual;
-  coNotEqual = iORM.CommonTypes.TioCompareOp.coNotEqual;
+  // TioCompareOp = (coEquals, coNotEquals, coGreater, coLower, coGreaterOrEqual, coLowerOrEqual, coLike, coNotLike, coIsNull, coIsNotNull)
+  coEquals = iORM.CommonTypes.TioCompareOp.coEquals;
+  coNotEquals = iORM.CommonTypes.TioCompareOp.coNotEquals;
   coGreater = iORM.CommonTypes.TioCompareOp.coGreater;
   coLower = iORM.CommonTypes.TioCompareOp.coLower;
   coGreaterOrEqual = iORM.CommonTypes.TioCompareOp.coGreaterOrEqual;
@@ -581,6 +582,9 @@ type
     // Interceptors
     class function StrategyInterceptors: TioStrategyInterceptorRegisterRef;
     class function CRUDInterceptors: TioCRUDInterceptorRegisterRef;
+
+    // Entity Time Machine (ETM)
+    class function etm: TIoEtmEngineRef;
 
     // Version
     class function Version: String;
@@ -1502,6 +1506,11 @@ end;
 class function io.Enums: TioEnumContainerExRef;
 begin
   Result := TioEnumContainerEx;
+end;
+
+class function io.etm: TIoEtmEngineRef;
+begin
+  Result := TioETMFactory.ETMEngine;
 end;
 
 class function io.Exists(const ATypeName, ATypeAlias: String; const AWhere: IioWhere): boolean;

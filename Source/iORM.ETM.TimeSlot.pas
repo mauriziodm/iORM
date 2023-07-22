@@ -36,10 +36,11 @@ unit iORM.ETM.TimeSlot;
 interface
 
 uses
-  iORM.ETM.Interfaces, iORM;
+  iORM.ETM.Interfaces, iORM, iORM.Attributes;
 
 type
 
+  [ioEntity('IO_ETM')]
   TioEtmTimeSlot = class(TInterfacedObject, IioEtmTimeSlot)
   private
     FID: Integer;
@@ -60,7 +61,7 @@ type
     function GetEntityID: Integer;
     function GetEntityVersion: TioObjVersion;
     function GetEntityState: String;
-    function GetEntityStateRemote: String;
+    function GetRemoteEntityState: String;
     function GetConflictType: TioEtmConflictType;
     function GetUserID: Integer;
     function GetUserName: String;
@@ -72,7 +73,7 @@ type
     property EntityID: Integer read GetEntityID;
     property EntityVersion: TioObjVersion read GetEntityVersion;
     property EntityState: String read GetEntityState;
-    property EntityStateRemote: String read GetEntityStateRemote;
+    property RemoteEntityState: String read GetRemoteEntityState;
     property ConflictType: TioEtmConflictType read GetConflictType;
     property UserName: String read GetUserName;
     property UserID: Integer read GetUserID;
@@ -108,7 +109,7 @@ begin
   Result := FEntityState;
 end;
 
-function TioEtmTimeSlot.GetEntityStateRemote: String;
+function TioEtmTimeSlot.GetRemoteEntityState: String;
 begin
   Result := FEntityStateRemote;
 end;

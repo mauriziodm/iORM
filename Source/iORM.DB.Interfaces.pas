@@ -749,9 +749,9 @@ end;
 class function TioCompareOperator.CompareOpToCompareOperator(const ACompareOp: TioCompareOp): IioSqlItem;
 begin
   case ACompareOp of
-    coEqual:
+    coEquals:
       Result := _Equal;
-    coNotEqual:
+    coNotEquals:
       Result := _NotEqual;
     coGreater:
       Result := _Greater;

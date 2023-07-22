@@ -35,22 +35,46 @@ unit iORM.ETM.Engine;
 
 interface
 
+uses
+  System.Classes, System.Generics.Collections, iORM.ETM.Interfaces, iORM.Where.Interfaces;
+
 type
-
-  // Esempi di chiamate:
-
-  // io.etm.TimeTravelFor<TCustomer>(const AID: Integer; const AWhere: IioWhere = nil): TList<IioEtmTimeSlot>;
-  // io.etm.TimeTravelFor(const AObj: TObject; const AWhere: IioWhere = nil): TList<IioEtmTimeSlot>; // Where per filtrare per date o versioni ad esempio
-  // io.etm.TimeTravelFor(const AIntf: IInterface; const AWhere: IioWhere = nil): TList<IioEtmTimeSlot>;
-  // io.etm.TimeTravelFor<>().ToList.OfType<TList<IioEtmTimeSlot>>;
-  // io.etm.TimeTravelFor<>().ToList(const AList: TObject);
-  // io.etm.TimeTravelFor<>().ToList(const AList: IInterface);
 
   TIoEtmEngine = class
   public
-    // function TimeTravelFor(const AObj: TObject; const AWhere: IioWhere): TList<IioEtmTimeSlot>;
+    // Fluent interface
+    class function TimeTravelExFor<T: class>: IioWhere<IioEtmTimeSlot>;
+    // Non fluent interface
+    class function TimeTravelFor<T: class>(const AWhere: IioWhere = nil): TList<IioEtmTimeSlot>; overload;
+    class function TimeTravelFor(const AObj: TObject; const AWhere: IioWhere = nil): TList<IioEtmTimeSlot>; overload;
+    class function TimeTravelFor(const AIntf: IInterface; const AWhere: IioWhere = nil): TList<IioEtmTimeSlot>; overload;
   end;
 
 implementation
+
+uses
+  iORM, iORM.Utilities, iORM.CommonTypes;
+
+{ TIoEtmEngine }
+
+class function TIoEtmEngine.TimeTravelExFor<T>: IioWhere<IioEtmTimeSlot>;
+begin
+  Result := io.Load<IioEtmTimeSlot>._Where('EntityClassName', TioCompareOp.coEquals, TioUtilities.GenericToString<T>);
+end;
+
+class function TIoEtmEngine.TimeTravelFor(const AIntf: IInterface; const AWhere: IioWhere): TList<IioEtmTimeSlot>;
+begin
+  Result := io.Load<IioEtmTimeSlot>._Where('EntityClassName', TioCompareOp.coEquals, (AIntf as TObject).ClassName).ToList;
+end;
+
+class function TIoEtmEngine.TimeTravelFor<T>(const AWhere: IioWhere): TList<IioEtmTimeSlot>;
+begin
+  Result := io.Load<IioEtmTimeSlot>._Where(AWhere).ToList;
+end;
+
+class function TIoEtmEngine.TimeTravelFor(const AObj: TObject; const AWhere: IioWhere): TList<IioEtmTimeSlot>;
+begin
+  Result := io.Load<IioEtmTimeSlot>._Where('EntityClassName', TioCompareOp.coEquals, AObj.ClassName).ToList;
+end;
 
 end.

@@ -363,7 +363,7 @@ var
   LWhere: IioWhere;
 begin
   // Build where conditions
-  LWhere := io.Where(AProperty.GetRelationChildPropertyName, coEqual, AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext).AsInteger).Cacheable;
+  LWhere := io.Where(AProperty.GetRelationChildPropertyName, coEquals, AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext).AsInteger).Cacheable;
   LWhere.TypeName := AProperty.GetRelationChildTypeName;
   LWhere.TypeAlias := AProperty.GetRelationChildTypeAlias;
   // Check if there is a detail object on the DB, if it finds it it loads it otherwise it returns nil

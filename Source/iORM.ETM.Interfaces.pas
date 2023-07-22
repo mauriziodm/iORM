@@ -36,7 +36,7 @@ unit iORM.ETM.Interfaces;
 interface
 
 uses
-  iORM.Attributes, System.Classes, iORM;
+  iORM.Attributes, iORM.CommonTypes, System.Classes;
 
 type
 
@@ -66,12 +66,12 @@ type
     // EntityVersion
     function GetEntityVersion: TioObjVersion;
     property EntityVersion: TioObjVersion read GetEntityVersion;
-    // EntityMasterState
+    // EntityState
     function GetEntityState: String;
-    property EntityStateLocal: String read GetEntityState;
-    // EntitySlaveState
-    function GetEntityStateRemote: String;
-    property EntityStateRemote: String read GetEntityStateRemote;
+    property EntityState: String read GetEntityState;
+    // RemoteEntityState
+    function GetRemoteEntityState: String;
+    property RemoteEntityState: String read GetRemoteEntityState;
     // ConflictResolutionType
     function GetConflictType: TioEtmConflictType;
     property ConflictType: TioEtmConflictType read GetConflictType;
