@@ -1402,9 +1402,10 @@ var
   AItem: IioSqlItem;
 begin
   Result := Self;
-  if Assigned(AWhereCond) then
-    for AItem in AWhereCond.GetWhereItems do
-      Self.FWhereItems.Add(AItem);
+  if not Assigned(AWhereCond) then
+    Exit;
+  for AItem in AWhereCond.GetWhereItems do
+    Self.FWhereItems.Add(AItem);
   SetPagingObj(AWhereCond.GetPagingObj);
   FDetailsContainer := AWhereCond.Details;
   FOrderBy := AWhereCond.GetOrderByInstance;

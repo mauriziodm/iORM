@@ -563,10 +563,10 @@ var
   LAttribute: TCustomAttribute;
   LAttributes: TArray<TCustomAttribute>;
   LTableName: String;
-  LConnectionDefName: String;
+  LConnectionName: String;
 begin
   LTableName := ARttiInstanceType.MetaclassType.ClassName.Substring(1); // Exclude first character (usually "T")
-  LConnectionDefName := '';
+  LConnectionName := '';
   LAttributes := ARttiInstanceType.GetAttributes;
   for LAttribute in LAttributes do
   begin
@@ -576,13 +576,13 @@ begin
     if LAttribute is ioNotPersistedEntity then
       LTableName := ioNotPersistedEntity(LAttribute).TableName
     else
-    if LAttribute is ioConnectionDefName then
-      LConnectionDefName := ioConnectionDefName(LAttribute).Value;
+    if LAttribute is ioConnection then
+      LConnectionName := ioConnection(LAttribute).ConnectionName;
   end;
   // Se Table è vuota singifica che la classe attuale non è una entità (non è marcata con
   //  l'attributo ioEntity), in questo caso restituisce una stringa vuota.
   if not LTableName.IsEmpty then
-    Result := LTableName + ',' + LConnectionDefName
+    Result := LTableName + ',' + LConnectionName
   else
     Result := '';
 end;

@@ -38,7 +38,8 @@ interface
 uses
   iORM.Context.Interfaces,
   iORM.SqlItems, iORM.Context.Table.Interfaces, iORM.Attributes,
-  iORM.CommonTypes, System.Generics.Collections, System.Rtti;
+  iORM.CommonTypes, System.Generics.Collections, System.Rtti,
+  iORM.ETM.Repository;
 
 type
 
@@ -118,8 +119,8 @@ type
     function GetSqlParamName: String;
     function GetValue: String;
     function GetSqlValue: string;
-    function GetClassName: String;  // NB: I metodi ci sono anche nella parte implementation (commentati)
-    function GetQualifiedClassName: String;  // NB: I metodi ci sono anche nella parte implementation (commentati)
+    function GetClassName: String; // NB: I metodi ci sono anche nella parte implementation (commentati)
+    function GetQualifiedClassName: String; // NB: I metodi ci sono anche nella parte implementation (commentati)
     function QualifiedClassNameFromClassInfoFieldValue(const AValue: String): String;
     function ClassNameFromClassInfoFieldValue(const AValue: String): String;
     property Mode: TioTrueClassMode read GetMode write SetMode;
@@ -137,9 +138,12 @@ type
     FRttiType: TRttiInstanceType;
     FIndexList: TioIndexList;
     FContainsSomeIioListProperty: Boolean;
+    FEtmRepositoryClass: TioEtmCustomRepositoryRef;
+    FEtmTraceOnlyOnConnectionName: String;
   public
     constructor Create(const ASqlText, AKeyGenerator: String; const ATrueClass: IioTrueClass; const AJoins: IioJoins; const AGroupBy: IioGroupBy;
-      const AConnectionDefName: String; const AMapMode: TioMapModeType; const ARttiType: TRttiInstanceType); reintroduce; overload;
+      const AConnectionDefName: String; const AMapMode: TioMapModeType; const ARttiType: TRttiInstanceType;
+      const AEtmRepositoryClass: TioEtmCustomRepositoryRef; const AEtmTraceOnlyOnConnectionName: String); reintroduce; overload;
     destructor Destroy; override;
     /// This method create the TrueClassVirtualMap.Table object duplicating something of itself
     function DuplicateForTrueClassMap: IioTable;
@@ -157,6 +161,9 @@ type
     function IsNotPersistedEntity: Boolean;
     function GetClassName: String;
     function GetQualifiedClassName: String;
+    // ETM
+    function GetEtmRepositoryClass: TioEtmCustomRepositoryRef;
+    function GetEtmTraceOnlyOnConnectionName: String;
     // IndexList
     function IndexListExists: Boolean;
     function GetIndexList(AAutoCreateIfUnassigned: Boolean): TioIndexList;
@@ -171,7 +178,8 @@ uses
 { TioContextTable }
 
 constructor TioTable.Create(const ASqlText, AKeyGenerator: String; const ATrueClass: IioTrueClass; const AJoins: IioJoins; const AGroupBy: IioGroupBy;
-      const AConnectionDefName: String; const AMapMode: TioMapModeType; const ARttiType: TRttiInstanceType);
+  const AConnectionDefName: String; const AMapMode: TioMapModeType; const ARttiType: TRttiInstanceType; const AEtmRepositoryClass: TioEtmCustomRepositoryRef;
+  const AEtmTraceOnlyOnConnectionName: String);
 begin
   inherited Create(ASqlText);
   FKeyGenerator := AKeyGenerator;
@@ -191,6 +199,9 @@ begin
   FGroupBy := AGroupBy;
   if Assigned(FGroupBy) then
     FGroupBy.SetTable(Self);
+  // ETM
+  FEtmRepositoryClass := AEtmRepositoryClass;
+  FEtmTraceOnlyOnConnectionName := AEtmTraceOnlyOnConnectionName;
 end;
 
 destructor TioTable.Destroy;
@@ -202,7 +213,8 @@ end;
 
 function TioTable.DuplicateForTrueClassMap: IioTable;
 begin
-  Result := TioTable.Create(FSqlText, FKeyGenerator, FTrueClass, FJoins, FGroupBy, FConnectionDefName_DoNotCallDirectly, FMapMode, FRttiType);
+  Result := TioTable.Create(FSqlText, FKeyGenerator, FTrueClass, FJoins, FGroupBy, FConnectionDefName_DoNotCallDirectly, FMapMode, FRttiType,
+    FEtmRepositoryClass, FEtmTraceOnlyOnConnectionName);
 end;
 
 function TioTable.IsNotPersistedEntity: Boolean;
@@ -223,6 +235,16 @@ end;
 function TioTable.GetConnectionDefName: String;
 begin
   Result := TioDBFActory.ConnectionManager.GetCurrentConnectionNameIfEmpty(FConnectionDefName_DoNotCallDirectly);
+end;
+
+function TioTable.GetEtmRepositoryClass: TioEtmCustomRepositoryRef;
+begin
+  Result := FEtmRepositoryClass;
+end;
+
+function TioTable.GetEtmTraceOnlyOnConnectionName: String;
+begin
+  Result := FEtmTraceOnlyOnConnectionName;
 end;
 
 function TioTable.GetGroupBy: IioGroupBy;
@@ -287,8 +309,8 @@ begin
   // Extract the curret connection def of the context table (ask it to the table itself obviously)
   LCurrentConnectionDefName := GetConnectionDefName;
   // The table is for this connection if the current connection name of the table: is empty (no connection name is
-  //  specified for this table so this mean it is for all connections), or it's a default connection, or it's
-  //  specifically setted for the connection name received to check (AConnectionDefNameToCheck).
+  // specified for this table so this mean it is for all connections), or it's a default connection, or it's
+  // specifically setted for the connection name received to check (AConnectionDefNameToCheck).
   Result := LCurrentConnectionDefName.IsEmpty or (LCurrentConnectionDefName = IO_CONNECTIONDEF_DEFAULTNAME) or
     (LCurrentConnectionDefName = AConnectionDefNameToCheck);
 end;
@@ -311,7 +333,7 @@ var
 begin
   Result := QualifiedClassNameFromClassInfoFieldValue(AValue);
   LLastDelimiterPos := LastDelimiter('.', Result);
-  Result := Copy(Result, LLastDelimiterPos+1, 999);
+  Result := Copy(Result, LLastDelimiterPos + 1, 999);
 end;
 
 constructor TioTrueClass.Create(const ATrueClassMode: TioTrueClassMode; const ASqlFieldName: String);
@@ -440,7 +462,7 @@ var
 begin
   Result := '';
   for AJoinItem in FJoinList do
-    Result := Result + #13 + TioSqlTranslator.Translate(aJoinItem.GetSql(Self.Table.GetConnectionDefName), Table.GetClassName);
+    Result := Result + #13 + TioSqlTranslator.Translate(AJoinItem.GetSql(Self.Table.GetConnectionDefName), Table.GetClassName);
 end;
 
 { TioGroupBy }

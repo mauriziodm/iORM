@@ -112,6 +112,11 @@ type
   // ltFromBSReloadNewInstance: the bind source receives the object to bind from a source bind source and reloads it AS A NEW INSTANCE for any changes or lazy load
   TioLoadType = (ltManual, ltCreate, ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance, ltAuto);
 
+  // ETM types
+  // Note: Literal description for values added at the end of the "iORM.pas" unit (initialization)
+  TioEtmEventType = (etInsert, etUpdate, etDelete, etSynchronization);
+  TioEtmConflictType = (ctNoConflict, ctMasterWin, ctSlaveWin, ctLastUpdatedWin, ctManual);
+
   // CloseQueryAction related types
   TioBSCloseQueryConfirmationRequestEvent = procedure(Sender: TObject; var CanClose: Boolean) of object;
   TioBSCloseQueryActionUpdateScope = (usLocal, usDisableIfChilds, usGlobal);

@@ -31,52 +31,61 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.ETM.Interfaces;
+unit iORM.ETM.Repository;
 
 interface
 
 uses
-  iORM.Attributes, iORM.CommonTypes, System.Classes;
+  iORM.CommonTypes;
 
 type
 
-  [ioEnumerated('Insert, Update, Delete, Synchronization')]
-  TioEtmTimeSlotType = (tsInsert, tsUpdate, tsDelete, tsSynchronization);
+  TioEtmCustomRepositoryRef = class of TioEtmCustomRepository;
 
-  [ioEnumerated('No conflict detected, Master version win, Slave version win, Last updated win, Manual conflict resolution')]
-  TioEtmConflictType = (ctNoConflict, ctMasterWin, ctSlaveWin, ctLastUpdatedWin, ctManual);
-
-  IioEtmTimeSlot = interface
-    ['{09B35E52-AF12-4F66-A8CF-D58A1CF41C7D}']
-    // ID
-    function GetID: Integer;
-    property ID: Integer read GetID;
-    // DateAndTime
-    function GetDateAndTime: TDateTime;
-    property DateAndTime: TDateTime read GetDateAndTime;
-    // TimeSlotType
-    function GetTimeSlotType: TioEtmTimeSlotType;
-    property TimeSlotType: TioEtmTimeSlotType read GetTimeSlotType;
-    // EntityClassName
-    function GetEntityClassName: String;
-    property EntityClassName: String read GetEntityClassName;
-    // EntityID
-    function GetEntityID: Integer;
-    property EntityID: Integer read GetEntityID;
-    // EntityVersion
-    function GetEntityVersion: Integer;
-    property EntityVersion: Integer read GetEntityVersion;
-    // EntityState
-    function GetEntityState: String;
-    property EntityState: String read GetEntityState;
-    // RemoteEntityState
-    function GetRemoteEntityState: String;
-    property RemoteEntityState: String read GetRemoteEntityState;
-    // ConflictResolutionType
-    function GetConflictType: TioEtmConflictType;
-    property ConflictType: TioEtmConflictType read GetConflictType;
+  // Base class for ell ETM repositories
+  TioEtmCustomRepository = class
+  private
+    FID: Integer;
+    FDateAndTime: TioObjCreated;
+    FUserName: TioObjCreatedUserName;
+    FUserID: TioObjCreatedUserID;
+    FEntityClassName: String;
+    FEntityID: Integer;
+    FEntityVersion: Integer;
+    FEntityState: String;
+    FRemoteEntityState: String;
+    FEventType: TioEtmEventType;
+    FConflictType: TioEtmConflictType;
+  public
+    constructor Create(const AEventType: TioEtmEventType; const AConflictType: TioEtmConflictType; const AEntityID: Integer; const AEntityClassName: String;
+      const AEntityObjVersion: Integer; const AEntityState, ARemoteEntityState: String);
+    property ID: Integer read FID;
+    property DateAndTime: TioObjCreated read FDateAndTime;
+    property EventType: TioEtmEventType read FEventType;
+    property EntityClassName: String read FEntityClassName;
+    property EntityID: Integer read FEntityID;
+    property EntityVersion: Integer read FEntityVersion;
+    property EntityState: String read FEntityState;
+    property RemoteEntityState: String read FRemoteEntityState;
+    property ConflictType: TioEtmConflictType read FConflictType;
+    property UserName: TioObjCreatedUserName read FUserName;
+    property UserID: TioObjCreatedUserID read FUserID;
   end;
 
 implementation
+
+{ TioEtmTimeSlot }
+
+constructor TioEtmCustomRepository.Create(const AEventType: TioEtmEventType; const AConflictType: TioEtmConflictType; const AEntityID: Integer; const AEntityClassName: String;
+      const AEntityObjVersion: Integer; const AEntityState, ARemoteEntityState: String);
+begin
+  FEventType := AEventType;
+  FConflictType := AConflictType;
+  FEntityClassName := AEntityClassName;
+  FEntityID := AEntityID;
+  FEntityVersion := AEntityObjVersion;
+  FEntityState := AEntityState;
+  FRemoteEntityState := ARemoteEntityState;
+end;
 
 end.

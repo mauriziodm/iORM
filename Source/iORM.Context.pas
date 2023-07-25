@@ -54,6 +54,7 @@ type
     FMasterPropertyPath: String;
     FMasterBSPersistence: TioBSPersistence;
     FOriginalNonTrueClassMap: IioMap;
+    FEtmBeforeUpdateEntityState: String;
     // DataObject
     function GetDataObject: TObject;
     procedure SetDataObject(const AValue: TObject);
@@ -82,6 +83,9 @@ type
     // OriginalResolvedTypeNameNonTrueClass
     procedure SetOriginalNonTrueClassMap(const AMap: IioMap);
     function GetOriginalNonTrueClassMap: IioMap;
+    // EtmEntityStateDeforeUpdate
+    function GetEtmBeforeUpdateEntityState: String;
+    procedure SetEtmBeforeUpdateEntityState(const Value: String);
   public
     constructor Create(const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
       const AMasterPropertyName, AMasterPropertyPath: String); overload;
@@ -111,6 +115,7 @@ type
     property RelationOID: Integer read GetRelationOID write SetRelationOID;
     property MasterPropertyPath: String read GetMasterPropertyPath;
     property MasterBSPersistence: TioBSPersistence read GetMasterBSPersistence;
+    property EtmBeforeUpdateEntityState: String read GetEtmBeforeUpdateEntityState write SetEtmBeforeUpdateEntityState;
     /// Contiene il nome della classe originaria cioè, nel caso il contesto sia stato creato con
     ///  la TrueClassVirtual (select query) a partire da una resolved class name, contiene il nome
     ///  della classe originaria, quella dalla quale poi si è estratta la TrueClassVirtualMap stessa.
@@ -142,6 +147,7 @@ begin
   FMasterPropertyPath := AMasterPropertyPath + IfThen(AMasterPropertyName.IsEmpty, '', '.') + AMasterPropertyName;
   FMasterBSPersistence := AMasterBSPersistence;
   FOriginalNonTrueClassMap := nil;
+  FEtmBeforeUpdateEntityState := '';
 end;
 
 function TioContext.GetClassRef: TioClassRef;
@@ -152,6 +158,11 @@ end;
 function TioContext.GetDataObject: TObject;
 begin
   Result := FDataObject;
+end;
+
+function TioContext.GetEtmBeforeUpdateEntityState: String;
+begin
+  Result := FEtmBeforeUpdateEntityState;
 end;
 
 function TioContext.GetGroupBySql: String;
@@ -242,6 +253,11 @@ end;
 procedure TioContext.SetDataObject(const AValue: TObject);
 begin
   FDataObject := AValue;
+end;
+
+procedure TioContext.SetEtmBeforeUpdateEntityState(const Value: String);
+begin
+  FEtmBeforeUpdateEntityState := Value;
 end;
 
 procedure TioContext.SetRelationOID(const Value: Integer);

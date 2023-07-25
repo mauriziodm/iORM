@@ -36,8 +36,8 @@ unit iORM.Context.Table.Interfaces;
 interface
 
 uses
-  iORM.Interfaces, iORM.Attributes, iORM.CommonTypes,
-  System.Generics.Collections, System.Rtti;
+  iORM.CommonTypes, System.Generics.Collections, System.Rtti, iORM.Interfaces,
+  iORM.Attributes, iORM.ETM.Repository;
 
 type
 
@@ -102,6 +102,9 @@ type
     function IsNotPersistedEntity: Boolean;
     function GetClassName: String;
     function GetQualifiedClassName: String;
+    // ETM
+    function GetEtmRepositoryClass: TioEtmCustomRepositoryRef;
+    function GetEtmTraceOnlyOnConnectionName: String;
     // IndexList
     function IndexListExists: Boolean;
     function GetIndexList(AAutoCreateIfUnassigned:Boolean): TioIndexList;

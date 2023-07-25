@@ -42,31 +42,72 @@ type
 
   TioEtmInterceptor = class(TioCustomCRUDInterceptor)
   public
+    // Insert
     class procedure AfterInsert(const AContext: IioContext; const AQuery: IioQuery); override;
+    // Update
+    class procedure BeforeUpdate(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean); override;
     class procedure AfterUpdate(const AContext: IioContext; const AQuery: IioQuery); override;
+    // Delete
     class procedure AfterDelete(const AContext: IioContext; const AQuery: IioQuery); override;
   end;
 
 implementation
 
 uses
-  iORM, iORM.ETM.Interfaces, iORM.ETM.Factory;
+  iORM, DJSON, iORM.ETM.Repository, iORM.CommonTypes;
 
 { TioEtmInterceptor }
 
-class procedure TioEtmInterceptor.AfterDelete(const AContext: IioContext; const AQuery: IioQuery);
+class procedure TioEtmInterceptor.AfterInsert(const AContext: IioContext; const AQuery: IioQuery);
+var
+  LRepository: TioEtmCustomRepository;
 begin
-  io.Persist(TioETMFactory.NewDeleteTimeSlot(AContext));
+  // Create the repository item, persist it and finally free it
+  LRepository := AContext.Map.GetTable.GetEtmRepositoryClass.Create(etInsert, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, 0, '', '');
+  try
+    io.Persist(LRepository);
+  finally
+    LRepository.Free;
+  end;
 end;
 
-class procedure TioEtmInterceptor.AfterInsert(const AContext: IioContext; const AQuery: IioQuery);
+class procedure TioEtmInterceptor.BeforeUpdate(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
+var
+  LPreviousStateObj: TObject;
 begin
-  io.Persist(TioETMFactory.NewInsertTimeSlot(AContext));
+  // Gather the previous state of the entity (before update query)
+  LPreviousStateObj := io.Load(AContext.DataObject.ClassName).ByID(AContext.GetID).ToObject; // Load the previous version obj
+  AContext.EtmBeforeUpdateEntityState := dj.From(LPreviousStateObj).ToJson;
 end;
 
 class procedure TioEtmInterceptor.AfterUpdate(const AContext: IioContext; const AQuery: IioQuery);
+var
+  LRepository: TioEtmCustomRepository;
 begin
-  io.Persist(TioETMFactory.NewUpdateTimeSlot(AContext));
+  // Create the repository item, persist it and finally free it
+  LRepository := AContext.Map.GetTable.GetEtmRepositoryClass.Create(etUpdate, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, AContext.ObjVersion-1, AContext.EtmBeforeUpdateEntityState, '');
+  try
+    io.Persist(LRepository);
+  finally
+    LRepository.Free;
+  end;
+end;
+
+class procedure TioEtmInterceptor.AfterDelete(const AContext: IioContext; const AQuery: IioQuery);
+var
+  LEntityState: String;
+  LRepository: TioEtmCustomRepository;
+begin
+  // Get the state (JSON) of the entity just before delete it
+  LEntityState := dj.From(AContext.DataObject).ToJson;
+  // Create the repository item, persist it and finally free it
+  LRepository := AContext.Map.GetTable.GetEtmRepositoryClass.Create(etDelete, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, AContext.ObjVersion,
+    LEntityState, '');
+  try
+    io.Persist(LRepository);
+  finally
+    LRepository.Free;
+  end;
 end;
 
 end.

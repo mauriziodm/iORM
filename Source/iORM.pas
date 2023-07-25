@@ -43,7 +43,7 @@ uses
   iORM.StdActions.Interfaces, iORM.Context.Container,
   iORM.Context.Properties.Interfaces, iORM.Where.SmartBuilder,
   iORM.Interceptor.Strategy.Register, iORM.Interceptor.CRUD.Register,
-  iORM.ETM.Factory;
+  iORM.ETM.Engine, iORM.ETM.Repository;
 
 const
   IORM_VERSION = 'iORM 2 (beta 2.3)';
@@ -141,12 +141,27 @@ const
   rtHasOne = iORM.Attributes.rtHasOne;
   rtEmbeddedHasMany = iORM.Attributes.rtEmbeddedHasMany;
   rtEmbeddedHasOne = iORM.Attributes.rtEmbeddedHasOne;
+
+  // TioEtmEventType = (etInsert, etUpdate, etDelete, etSynchronization);
+  etInsert = iORM.CommonTypes.etInsert;
+  etUpdate = iORM.CommonTypes.etUpdate;
+  etDelete = iORM.CommonTypes.etDelete;
+  etSynchronization = iORM.CommonTypes.etSynchronization;
+
+  // TioEtmConflictType = (ctNoConflict, ctMasterWin, ctSlaveWin, ctLastUpdatedWin, ctManual);
+  ctNoConflict = iORM.CommonTypes.ctNoConflict;
+  ctMasterWin = iORM.CommonTypes.ctMasterWin;
+  ctSlaveWin = iORM.CommonTypes.ctSlaveWin;
+  ctLastUpdatedWin = iORM.CommonTypes.ctLastUpdatedWin;
+  ctManual = iORM.CommonTypes.ctManual;
+
 {$ENDREGION}
 
 type
 
   // Type aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
 {$REGION 'Type aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
+
   TioSimpleViewRegister = iORM.MVVM.ViewRegister.TioSimpleViewRegister;
 
   TioCompareOp = iORM.CommonTypes.TioCompareOp;
@@ -177,6 +192,12 @@ type
 
   TioActionShowMode = iORM.StdActions.Interfaces.TioActionShowMode;
   TioActionViewContextBy = iORM.StdActions.Interfaces.TioActionViewContextBy;
+
+  // Entity Time Machine (ETM)
+  TioEtmCustomRepository = iORM.ETM.Repository.TioEtmCustomRepository;
+  TioEtmEventType = iORM.CommonTypes.TioEtmEventType;
+  TioEtmConflictType = iORM.CommonTypes.TioEtmConflictType;
+
 {$ENDREGION}
   // Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
 {$REGION 'Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
@@ -214,7 +235,7 @@ type
   ioNotPersistedEntity = iORM.Attributes.ioNotPersistedEntity;
   ioKeyGenerator = iORM.Attributes.ioKeyGenerator;
   ioKeySequence = iORM.Attributes.ioKeySequence;
-  ioConnectionDefName = iORM.Attributes.ioConnectionDefName;
+  ioConnection = iORM.Attributes.ioConnection;
   ioTrueClass = iORM.Attributes.ioTrueClass;
   ioGroupBy = iORM.Attributes.ioGroupBy;
   ioJoin = iORM.Attributes.ioJoin;
@@ -247,6 +268,10 @@ type
   diAsSingleton = iORM.Attributes.diAsSingleton;
   ioInject = iORM.Attributes.ioInject;
 
+  // ETM attributes
+  etmRepository = iORM.Attributes.etmRepository;
+  etmTrace = iORM.Attributes.etmTrace;
+
   // Other attributes
   ioMarker = iORM.Attributes.ioMarker;
   ioEnumerated = iORM.Attributes.ioEnumerated;
@@ -261,6 +286,13 @@ type
 
     // Registered enumerated types container
     class function Enums: TioEnumContainerExRef;
+
+    // Entity Time Machine (ETM)
+    class function etm: TIoEtmEngineRef;
+
+    // Interceptors
+    class function StrategyInterceptors: TioStrategyInterceptorRegisterRef;
+    class function CRUDInterceptors: TioCRUDInterceptorRegisterRef;
 
     // Global VCProvider register
     class function DefaultVCProvider: TioViewContextProvider;
@@ -578,13 +610,6 @@ type
       const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
     class procedure ShowAsSelector<T>(const ATargetBindSource: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
       const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
-
-    // Interceptors
-    class function StrategyInterceptors: TioStrategyInterceptorRegisterRef;
-    class function CRUDInterceptors: TioCRUDInterceptorRegisterRef;
-
-    // Entity Time Machine (ETM)
-    class function etm: TIoEtmEngineRef;
 
     // Version
     class function Version: String;
@@ -1510,7 +1535,7 @@ end;
 
 class function io.etm: TIoEtmEngineRef;
 begin
-  Result := TioETMFactory.ETMEngine;
+  Result := TIoEtmEngine;
 end;
 
 class function io.Exists(const ATypeName, ATypeAlias: String; const AWhere: IioWhere): boolean;
@@ -1756,5 +1781,9 @@ io.di.RegisterClass<TioDuckTypedStreamObject>.Implements<IioDuckTypedStreamObjec
 // NB: Attualmente effettua sia il mapping delle classi per la parte ORM che la registrazione delle classi al DIC (magari meglio separare le cose?)
 TioEnumContainer._Build;
 TioMapContainer._Build;
+
+// ETM types
+io.Enums.Add<TioEtmEventType>('Insert, Update, Delete, Synchronization');
+io.Enums.Add<TioEtmConflictType>('No conflict detected, Master version win, Slave version win, Last updated win, Manual conflict resolution');
 
 end.

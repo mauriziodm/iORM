@@ -49,6 +49,7 @@ type
   TCRUDInterceptorArrayItem = record
     ConnectionName: String;
     Interceptor: TioCRUDInterceptorRef;
+    class operator Finalize (var Dest: TCRUDInterceptorArrayItem);
   end;
 
   TCRUDInterceptorArray = TArray<TCRUDInterceptorArrayItem>;
@@ -58,12 +59,14 @@ type
 
   TioCRUDInterceptorRegister = class
   private
-    class var FInternalContainer: TDictionary<String, PCRUDInterceptorArray>;
     class procedure Build;
     class procedure Clean;
   public
-    class procedure RegisterInterceptor(const ACRUDInterceptor: TioCRUDInterceptorRef; const ATypeName: String; const AConnectionName: String = '');
-    class procedure UnregisterInterceptor(const ACRUDInterceptor: TioCRUDInterceptorRef; const ATypeName: String; const AConnectionName: String = '');
+    class var FInternalContainer: TDictionary<String, PCRUDInterceptorArray>;
+    class procedure RegisterInterceptor(const ACRUDInterceptor: TioCRUDInterceptorRef; const ATypeName: String;
+      const AInterceptOnlyOnConnectionName: String = '');
+    class procedure UnregisterInterceptor(const ACRUDInterceptor: TioCRUDInterceptorRef; const ATypeName: String;
+      const AInterceptOnlyOnConnectionName: String = '');
     // Obj load
     class function BeforeLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery; var ADone: Boolean): TObject;
     class function AfterLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery): TObject;
@@ -85,7 +88,8 @@ uses
 
 { TioObjCrudInterceptorRegister }
 
-class procedure TioCRUDInterceptorRegister.RegisterInterceptor(const ACRUDInterceptor: TioCRUDInterceptorRef; const ATypeName: String; const AConnectionName: String = '');
+class procedure TioCRUDInterceptorRegister.RegisterInterceptor(const ACRUDInterceptor: TioCRUDInterceptorRef; const ATypeName: String;
+  const AInterceptOnlyOnConnectionName: String = '');
 var
   I: Integer;
   LInterceptorArray: TCRUDInterceptorArray;
@@ -103,17 +107,18 @@ begin
   LInterceptorArray := LInterceptorArrayPointer^;
   // Check if an interceptor for the same class and connection name is already registered then exit to avoid duplicate
   for I := 0 to Length(LInterceptorArray) - 1 do
-    if (LInterceptorArray[I].ConnectionName = AConnectionName) and (LInterceptorArray[I].Interceptor = ACRUDInterceptor) then
+    if (LInterceptorArray[I].ConnectionName = AInterceptOnlyOnConnectionName) and (LInterceptorArray[I].Interceptor = ACRUDInterceptor) then
       Exit;
   // Add the current interceptor to the array that contains interceptors for this type
   // Note: I know that this way there may be a reallocation of memory every time I add an element but the interceptors will be very few.
   LNewInterceptorIndex := Length(LInterceptorArray);
   SetLength(LInterceptorArray, LNewInterceptorIndex + 1);
-  LInterceptorArray[LNewInterceptorIndex].ConnectionName := AConnectionName;
+  LInterceptorArray[LNewInterceptorIndex].ConnectionName := AInterceptOnlyOnConnectionName;
   LInterceptorArray[LNewInterceptorIndex].Interceptor := ACRUDInterceptor;
 end;
 
-class procedure TioCRUDInterceptorRegister.UnregisterInterceptor(const ACRUDInterceptor: TioCRUDInterceptorRef; const ATypeName: String; const AConnectionName: String = '');
+class procedure TioCRUDInterceptorRegister.UnregisterInterceptor(const ACRUDInterceptor: TioCRUDInterceptorRef; const ATypeName: String;
+  const AInterceptOnlyOnConnectionName: String = '');
 var
   I: Integer;
   LInterceptorArray: TCRUDInterceptorArray;
@@ -127,7 +132,7 @@ begin
     LInterceptorArray := LInterceptorArrayPointer^;
     for I := High(LInterceptorArray) downto Low(LInterceptorArray) do
     begin
-      if (LInterceptorArray[I].ConnectionName = AConnectionName) and (LInterceptorArray[I].Interceptor = ACRUDInterceptor) then
+      if (LInterceptorArray[I].ConnectionName = AInterceptOnlyOnConnectionName) and (LInterceptorArray[I].Interceptor = ACRUDInterceptor) then
       begin
         Delete(LInterceptorArray, I, 1);
         // If the interceptor array for this type is empty then remove also this type from the internal container
@@ -149,7 +154,8 @@ begin
   Result := AObj;
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
   begin
-    LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName; // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
+    LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName;
+    // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName]^ do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
         Result := LItem.Interceptor.AfterLoad(AContext, AObj, AQuery);
@@ -163,7 +169,8 @@ var
 begin
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
   begin
-    LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName; // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
+    LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName;
+    // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName]^ do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
         LItem.Interceptor.AfterDelete(AContext, AQuery);
@@ -177,7 +184,8 @@ var
 begin
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
   begin
-    LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName; // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
+    LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName;
+    // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName]^ do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
         LItem.Interceptor.AfterInsert(AContext, AQuery);
@@ -191,7 +199,8 @@ var
 begin
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
   begin
-    LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName; // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
+    LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName;
+    // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName]^ do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
         LItem.Interceptor.AfterUpdate(AContext, AQuery);
@@ -207,7 +216,8 @@ begin
   Result := AObj;
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
   begin
-    LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName; // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
+    LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName;
+    // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName]^ do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
       begin
@@ -227,7 +237,8 @@ var
 begin
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
   begin
-    LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName; // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
+    LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName;
+    // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName]^ do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
       begin
@@ -247,7 +258,8 @@ var
 begin
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
   begin
-    LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName; // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
+    LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName;
+    // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName]^ do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
       begin
@@ -267,7 +279,8 @@ var
 begin
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
   begin
-    LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName; // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
+    LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName;
+    // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName]^ do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
       begin
@@ -288,6 +301,13 @@ class procedure TioCRUDInterceptorRegister.Clean;
 begin
   if Assigned(FInternalContainer) then
     FreeAndNil(FInternalContainer);
+end;
+
+{ TCRUDInterceptorArrayItem }
+
+class operator TCRUDInterceptorArrayItem.Finalize(var Dest: TCRUDInterceptorArrayItem);
+begin
+  Sleep(10);
 end;
 
 initialization

@@ -42,7 +42,7 @@ uses
   iORM.Context.Table.Interfaces, System.Rtti,
   iORM.Attributes, System.Generics.Collections,
   iORM.Context.Map.Interfaces, iORM.Where.Interfaces,
-  iORM.LiveBindings.BSPersistence;
+  iORM.LiveBindings.BSPersistence, iORM.ETM.Repository;
 
 type
 
@@ -50,7 +50,7 @@ type
   TioContextFactory = class
   private
     class function GetMetadata_FieldTypeByTypeKind(const ATypeKind: TTypeKind; const AQualifiedName: string): TioMetadataFieldType;
-    class function Table(const Typ: TRttiInstanceType; out OEtmTraced: Boolean; out OEtmConnectionName: String): IioTable;
+    class function Table(const Typ: TRttiInstanceType): IioTable;
     class function Properties(const Typ: TRttiInstanceType; const ATable: IioTable): IioProperties;
     class function HasManyChildVirtualProperty(const ATable: IioTable): IioProperty;
     class function TrueClass(const ATrueClassMode: TioTrueClassMode; const ASqlFieldName: String): IioTrueClass;
@@ -80,7 +80,8 @@ uses
   System.SysUtils, iORM.Context.Table,
   iORM.RttiContext.Factory, iORM.Context.Container, iORM.Context.Map,
   System.StrUtils, iORM.Exceptions, System.TypInfo, iORM.Utilities,
-  iORM.DuckTyped.Factory, iORM.Resolver.Interfaces, iORM.Resolver.Factory;
+  iORM.DuckTyped.Factory, iORM.Resolver.Interfaces, iORM.Resolver.Factory,
+  iORM.ETM.Engine;
 
 { TioBuilderProperties }
 
@@ -98,18 +99,18 @@ begin
   if AMasterPropertyType.IsInstance then
     Result := TioUtilities.isEntityType(AMasterPropertyType)
   else
-  // else if it isn't a class (so it is an interface) then use die DIC to verify if there are some
-  //  class (entity) registered on it
-  if AMasterPropertyType is TRttiInterfaceType then
-  begin
-    // Resolve the type and alias (if the RelationChildTypeName is relative to a class then the resolver return the class itself)
-    AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AMasterPropertyType.Name, '', rmAll, False);
-    // Returns True if there is at least one resolved type that is an entity
-    Result := AResolvedTypeList.Count > 0;
-  end
-  // else return False (not a class nor interface master property type)
-  else
-    Result := False;
+    // else if it isn't a class (so it is an interface) then use die DIC to verify if there are some
+    // class (entity) registered on it
+    if AMasterPropertyType is TRttiInterfaceType then
+    begin
+      // Resolve the type and alias (if the RelationChildTypeName is relative to a class then the resolver return the class itself)
+      AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AMasterPropertyType.Name, '', rmAll, False);
+      // Returns True if there is at least one resolved type that is an entity
+      Result := AResolvedTypeList.Count > 0;
+    end
+    // else return False (not a class nor interface master property type)
+    else
+      Result := False;
 end;
 
 class function TioContextFactory.HasManyChildVirtualProperty(const ATable: IioTable): IioProperty;
@@ -117,8 +118,8 @@ begin
   Result := TioHasManyChildVirtualProperty.Create(ATable);
 end;
 
-class function TioContextFactory.Context(const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
-      const AMasterPropertyName, AMasterPropertyPath: String): IioContext;
+class function TioContextFactory.Context(const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject;
+  const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String): IioContext;
 begin
   // Get the Context
   Result := TioContext.Create(TioMapContainer.GetMap(AClassName), AWhere, ADataObject, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath);
@@ -129,12 +130,12 @@ var
   LMap: IioMap;
 begin
   // Retrieve the map from the MapContainer and if it is in some TrueClass mode then return
-  //  the TrueClassVirtualMap passing the original resolved tur class virtual map also
+  // the TrueClassVirtualMap passing the original resolved tur class virtual map also
   LMap := TioMapContainer.GetMap(AClassName);
   if LMap.GetTable.IsTrueClass then
   begin
-   Result := TioContext.Create(LMap.GetTrueClassVirtualMap, AWhere, nil, nil, '', '');
-   Result.OriginalNonTrueClassMap := LMap;
+    Result := TioContext.Create(LMap.GetTrueClassVirtualMap, AWhere, nil, nil, '', '');
+    Result.OriginalNonTrueClassMap := LMap;
   end
   else
     Result := TioContext.Create(LMap, AWhere, nil, nil, '', '');
@@ -189,7 +190,8 @@ begin
     tkFloat:
       if AQualifiedName = 'System.TDate' then
         Exit(ioMdDate)
-      else if (AQualifiedName = 'System.TDateTime') or (AQualifiedName = 'iORM.CommonTypes.TioObjCreated') or (AQualifiedName = 'iORM.CommonTypes.TioObjUpdated') then
+      else if (AQualifiedName = 'System.TDateTime') or (AQualifiedName = 'iORM.CommonTypes.TioObjCreated') or (AQualifiedName = 'iORM.CommonTypes.TioObjUpdated')
+      then
         Exit(ioMdDateTime)
       else if AQualifiedName = 'System.TTime' then
         Exit(ioMdTime)
@@ -218,17 +220,17 @@ class function TioContextFactory.GetProperty(const ATable: IioTable; const AMemb
 begin
   if AMember is TRttiField then
   begin
-    Result := TioField.Create(AMember as TRttiField, ATable, ATypeAlias, ASqlFieldName, ALoadSql, AFieldType, ATransient, AIsID, AReadWrite,
-      ARelationType, ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLazyLoad, ANotHasMany, AMetadata_FieldType,
-      AMetadata_FieldLength, AMetadata_FieldPrecision, AMetadata_FieldScale, AMetadata_FieldNotNull, AMetadata_Default, AMetadata_FieldUnicode,
-      AMetadata_CustomFieldType, AMetadata_FieldSubType, AMetadata_FKCreate, AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction);
+    Result := TioField.Create(AMember as TRttiField, ATable, ATypeAlias, ASqlFieldName, ALoadSql, AFieldType, ATransient, AIsID, AReadWrite, ARelationType,
+      ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLazyLoad, ANotHasMany, AMetadata_FieldType, AMetadata_FieldLength,
+      AMetadata_FieldPrecision, AMetadata_FieldScale, AMetadata_FieldNotNull, AMetadata_Default, AMetadata_FieldUnicode, AMetadata_CustomFieldType,
+      AMetadata_FieldSubType, AMetadata_FKCreate, AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction);
   end
   else if AMember is TRttiProperty then
   begin
-    Result := TioProperty.Create(AMember as TRttiProperty, ATable, ATypeAlias, ASqlFieldName, ALoadSql, AFieldType, ATransient, AIsID,
-      AReadWrite, ARelationType, ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLazyLoad, ANotHasMany,
-      AMetadata_FieldType, AMetadata_FieldLength, AMetadata_FieldPrecision, AMetadata_FieldScale, AMetadata_FieldNotNull, AMetadata_Default,
-      AMetadata_FieldUnicode, AMetadata_CustomFieldType, AMetadata_FieldSubType, AMetadata_FKCreate, AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction);
+    Result := TioProperty.Create(AMember as TRttiProperty, ATable, ATypeAlias, ASqlFieldName, ALoadSql, AFieldType, ATransient, AIsID, AReadWrite,
+      ARelationType, ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLazyLoad, ANotHasMany, AMetadata_FieldType,
+      AMetadata_FieldLength, AMetadata_FieldPrecision, AMetadata_FieldScale, AMetadata_FieldNotNull, AMetadata_Default, AMetadata_FieldUnicode,
+      AMetadata_CustomFieldType, AMetadata_FieldSubType, AMetadata_FKCreate, AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction);
   end
   else
     raise EioException.Create(Self.ClassName, 'GetProperty', 'Invalid member type');
@@ -254,21 +256,17 @@ var
   LRttiContext: TRttiContext;
   LRttiType: TRttiInstanceType;
   LTable: IioTable;
-  LEtmTraced: Boolean;
-  LEtmConnectionName: String;
 begin
-  // Rtti init
+  // Init
   LRttiContext := TioRttiFactory.GetRttiContext;
   LRttiType := LRttiContext.GetType(AClassRef).AsInstance;
   // Get the table
-  LTable := Self.Table(LRttiType, LEtmTraced, LEtmConnectionName);
+  LTable := Self.Table(LRttiType);
   // Create the map
   Result := TioMap.Create(AClassRef, LRttiContext, LRttiType, LTable, Properties(LRttiType, LTable));
-  // If it is etmTraced the register itself into the etmEngine
-  if LEtmTraced then
-  begin
-
-  end;
+  // If an EtmRepositoryClass is detected then register the class into the ETMEngine
+  if Assigned(Result.GetTable.GetEtmRepositoryClass) then
+    TIoEtmEngine.TraceByMap(Result, Result.GetTable.GetEtmTraceOnlyOnConnectionName);
 end;
 
 class function TioContextFactory.Properties(const Typ: TRttiInstanceType; const ATable: IioTable): IioProperties;
@@ -281,7 +279,7 @@ var
     LRttiField: TRttiField;
     LAttribute: TCustomAttribute;
     LNewProperty: IioProperty;
-    LForeignKeyAttributeExists: boolean;
+    LForeignKeyAttributeExists: Boolean;
     // DB field metadata (DBBuilder)
     LDB_FieldType: TioMetadataFieldType;
     LDB_FieldSubType: string;
@@ -381,9 +379,9 @@ var
       // ObjStatus property detection by type "TioObjStatus"
       if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjStatus)) then
       begin
-        Result.ObjStatusProperty := Self.GetProperty(ATable, LMember, '', '', '', '', True, False, lpLoadOnly, rtNone, '', '', '', False, True,
-          LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType, LDB_FieldSubType,
-          LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
+        Result.ObjStatusProperty := Self.GetProperty(ATable, LMember, '', '', '', '', True, False, lpLoadOnly, rtNone, '', '', '', False, True, LDB_FieldType,
+          LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate,
+          LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
         Continue;
       end;
       // ObjVersion property detection by type "TioObjVersion"
@@ -391,258 +389,230 @@ var
       begin
         if TioUtilities.TryGetMemberAttribute<ioField>(LMember, LAttribute) then
           LMember_FieldName := ioField(LAttribute).Value;
-        Result.ObjVersionProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone, '', '', '',
-          False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType,
+        Result.ObjVersionProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone, '', '', '', False,
+          True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType,
           LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
         Result.Add(Result.ObjVersionProperty);
         Continue;
       end
       else
-      // ObjCreated property detection by type "TioObjCreated"
-      if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjCreated)) then
-      begin
-        if TioUtilities.TryGetMemberAttribute<ioField>(LMember, LAttribute) then
-          LMember_FieldName := ioField(LAttribute).Value;
-        Result.ObjCreatedProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone, '', '', '',
-          False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType,
-          LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
-        Result.Add(Result.ObjCreatedProperty);
-        Continue;
-      end
-      else
-      // ObjCreatedUserID property detection by type "TioObjCreatedUserID"
-      if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjCreatedUserID)) then
-      begin
-        if TioUtilities.TryGetMemberAttribute<ioField>(LMember, LAttribute) then
-          LMember_FieldName := ioField(LAttribute).Value;
-        Result.ObjCreatedUserIDProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone, '', '', '',
-          False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType,
-          LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
-        Result.Add(Result.ObjCreatedUserIDProperty);
-        Continue;
-      end
-      else
-      // ObjCreatedUserName property detection by type "TioObjCreatedUserName"
-      if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjCreatedUserName)) then
-      begin
-        if TioUtilities.TryGetMemberAttribute<ioField>(LMember, LAttribute) then
-          LMember_FieldName := ioField(LAttribute).Value;
-        Result.ObjCreatedUserNameProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone, '', '', '',
-          False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType,
-          LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
-        Result.Add(Result.ObjCreatedUserNameProperty);
-        Continue;
-      end
-      else
-      // ObjUpdated property detection by type "TioObjUpdated"
-      if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjUpdated)) then
-      begin
-        if TioUtilities.TryGetMemberAttribute<ioField>(LMember, LAttribute) then
-          LMember_FieldName := ioField(LAttribute).Value;
-        Result.ObjUpdatedProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone, '', '', '',
-          False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType,
-          LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
-        Result.Add(Result.ObjUpdatedProperty);
-        Continue;
-      end
-      else
-      // ObjUpdatedUserID property detection by type "TioObjUpdatedUserID"
-      if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjUpdatedUserID)) then
-      begin
-        if TioUtilities.TryGetMemberAttribute<ioField>(LMember, LAttribute) then
-          LMember_FieldName := ioField(LAttribute).Value;
-        Result.ObjUpdatedUserIDProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone, '', '', '',
-          False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType,
-          LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
-        Result.Add(Result.ObjUpdatedUserIDProperty);
-        Continue;
-      end
-      else
-      // ObjUpdatedUserName property detection by type "TioObjUpdatedUserName"
-      if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjUpdatedUserName)) then
-      begin
-        if TioUtilities.TryGetMemberAttribute<ioField>(LMember, LAttribute) then
-          LMember_FieldName := ioField(LAttribute).Value;
-        Result.ObjUpdatedUserNameProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone, '', '', '',
-          False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType,
-          LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
-        Result.Add(Result.ObjUpdatedUserNameProperty);
-        Continue;
-      end;
+        // ObjCreated property detection by type "TioObjCreated"
+        if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjCreated)) then
+        begin
+          if TioUtilities.TryGetMemberAttribute<ioField>(LMember, LAttribute) then
+            LMember_FieldName := ioField(LAttribute).Value;
+          Result.ObjCreatedProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone, '', '', '',
+            False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType,
+            LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
+          Result.Add(Result.ObjCreatedProperty);
+          Continue;
+        end
+        else
+          // ObjCreatedUserID property detection by type "TioObjCreatedUserID"
+          if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjCreatedUserID)) then
+          begin
+            if TioUtilities.TryGetMemberAttribute<ioField>(LMember, LAttribute) then
+              LMember_FieldName := ioField(LAttribute).Value;
+            Result.ObjCreatedUserIDProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone, '', '',
+              '', False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType,
+              LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
+            Result.Add(Result.ObjCreatedUserIDProperty);
+            Continue;
+          end
+          else
+            // ObjCreatedUserName property detection by type "TioObjCreatedUserName"
+            if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjCreatedUserName)) then
+            begin
+              if TioUtilities.TryGetMemberAttribute<ioField>(LMember, LAttribute) then
+                LMember_FieldName := ioField(LAttribute).Value;
+              Result.ObjCreatedUserNameProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone, '',
+                '', '', False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode,
+                LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
+              Result.Add(Result.ObjCreatedUserNameProperty);
+              Continue;
+            end
+            else
+              // ObjUpdated property detection by type "TioObjUpdated"
+              if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjUpdated)) then
+              begin
+                if TioUtilities.TryGetMemberAttribute<ioField>(LMember, LAttribute) then
+                  LMember_FieldName := ioField(LAttribute).Value;
+                Result.ObjUpdatedProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone, '', '',
+                  '', False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode,
+                  LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
+                Result.Add(Result.ObjUpdatedProperty);
+                Continue;
+              end
+              else
+                // ObjUpdatedUserID property detection by type "TioObjUpdatedUserID"
+                if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjUpdatedUserID)) then
+                begin
+                  if TioUtilities.TryGetMemberAttribute<ioField>(LMember, LAttribute) then
+                    LMember_FieldName := ioField(LAttribute).Value;
+                  Result.ObjUpdatedUserIDProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone,
+                    '', '', '', False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode,
+                    LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
+                  Result.Add(Result.ObjUpdatedUserIDProperty);
+                  Continue;
+                end
+                else
+                  // ObjUpdatedUserName property detection by type "TioObjUpdatedUserName"
+                  if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjUpdatedUserName)) then
+                  begin
+                    if TioUtilities.TryGetMemberAttribute<ioField>(LMember, LAttribute) then
+                      LMember_FieldName := ioField(LAttribute).Value;
+                    Result.ObjUpdatedUserNameProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist,
+                      rtNone, '', '', '', False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil,
+                      LDB_FieldUnicode, LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
+                    Result.Add(Result.ObjUpdatedUserNameProperty);
+                    Continue;
+                  end;
       // Loop for all attributes
       for LAttribute in LMember.GetAttributes do
       begin
         if LAttribute is ioOID then
           LMember_IsID := True
-        else
-        if LAttribute is ioField then
+        else if LAttribute is ioField then
         begin
           if not ioField(LAttribute).Value.IsEmpty then
             LMember_FieldName := ioField(LAttribute).Value;
           LMember_Transient := False;
         end
-        else
-        if LAttribute is ioSkip then // Leave after ioField attribute detection
+        else if LAttribute is ioSkip then // Leave after ioField attribute detection
           LMember_Transient := True
-        else
-        if LAttribute is ioTypeAlias then
+        else if LAttribute is ioTypeAlias then
           LMember_TypeAlias := ioTypeAlias(LAttribute).Value
-        else
-        if LAttribute is ioFieldType then
+        else if LAttribute is ioFieldType then
           LMember_FieldType := ioFieldType(LAttribute).Value
-        else
-        if LAttribute is ioLoadSql then
+        else if LAttribute is ioLoadSql then
           LMember_LoadSql := ioLoadSql(LAttribute).Value
-        else
-        if LAttribute is ioLoadOnly then
+        else if LAttribute is ioLoadOnly then
           LMember_LoadPersist := lpLoadOnly
-        else
-        if LAttribute is ioPersistOnly then
+        else if LAttribute is ioPersistOnly then
           LMember_LoadPersist := lpPersistOnly
         else
-        // Relations attributes
-        if LAttribute is ioEmbeddedHasMany then
-        begin
-          LMember_RelationType := rtEmbeddedHasMany;
-          LMember_RelationChildTypeName := ioEmbeddedHasMany(LAttribute).ChildTypeName;
-          LMember_RelationChildTypeAlias := ioEmbeddedHasMany(LAttribute).ChildTypeAlias;
-        end
-        else
-        if LAttribute is ioEmbeddedHasOne then
-        begin
-          LMember_RelationType := rtEmbeddedHasOne;
-          LMember_RelationChildTypeName := ioEmbeddedHasOne(LAttribute).ChildTypeName;
-          LMember_RelationChildTypeAlias := ioEmbeddedHasOne(LAttribute).ChildTypeAlias;
-        end
-        else
-        if LAttribute is ioBelongsTo then
-        begin
-          LMember_RelationType := rtBelongsTo;
-          LMember_RelationChildTypeName := ioBelongsTo(LAttribute).ChildTypeName;
-          LMember_RelationChildTypeAlias := ioBelongsTo(LAttribute).ChildTypeAlias;
-          LDB_FieldType := ioMdInteger; // If is a BelongsTo relation then the field type on DB in integer
-        end
-        else
-        if LAttribute is ioHasOne then
-        begin
-          LMember_RelationType := rtHasOne;
-          LMember_RelationChildTypeName := ioHasOne(LAttribute).ChildTypeName;
-          LMember_RelationChildTypeAlias := ioHasOne(LAttribute).ChildTypeAlias;
-          LMember_RelationChildPropertyName := ioHasOne(LAttribute).ChildPropertyName;
-        end
-        else
-        if LAttribute is ioHasMany then
-        begin
-          LMember_RelationType := rtHasMany;
-          LMember_RelationChildTypeName := ioHasMany(LAttribute).ChildTypeName;
-          LMember_RelationChildTypeAlias := ioHasMany(LAttribute).ChildTypeAlias;
-          LMember_RelationChildPropertyName := ioHasMany(LAttribute).ChildPropertyName;
-        end
-        else
-        if LAttribute is ioLazyLoad then
-          LMember_RelationChildLazyLoad := True
-        else
-        // Attribute to disable the relation auto detection
-        if LAttribute is ioDisableRelationAutodetect then
-          LMember_RelationAutodetectEnabled := False
-        else
-        // Indexes
-        if LAttribute is ioIndex then
-        begin
-          if ioIndex(LAttribute).CommaSepFieldList.IsEmpty then // If the "ACommaSepFieldList" is empty then set the current property field name
-            ioIndex(LAttribute).CommaSepFieldList := LMember_FieldName;
-          ATable.GetIndexList(True).Add(ioIndex(LAttribute)); // Add the current index attribute
-        end
-        else
-        // Smart where attributes
-        if LAttribute is ioWhereAttribute then
-        begin
-          LWhereCompareOp := ioWhereAttribute(LAttribute).CompareOp;
-          LWhereLogicOp := ioWhereAttribute(LAttribute).LogicOp;
-          if not ioWhereAttribute(LAttribute).TargetPropName.IsEmpty then
-            LWhereTargetPropName := ioWhereAttribute(LAttribute).TargetPropName;
-        end
-        else
-        if LAttribute is ioWhereGroupAttribute then
-        begin
-          LWhereGroupName := ioWhereGroupAttribute(LAttribute).GroupName;
-          LWhereGroupLogicOp := ioWhereGroupAttribute(LAttribute).GroupLogicOp;
-          LWhereMasterGroupName := ioWhereGroupAttribute(LAttribute).MasterGroupName;
-        end
-        else
-        if LAttribute is ioWhereNullValueAttribute then
-          LWhereNullValue := ioWhereNullValueAttribute(LAttribute).Value;
+          // Relations attributes
+          if LAttribute is ioEmbeddedHasMany then
+          begin
+            LMember_RelationType := rtEmbeddedHasMany;
+            LMember_RelationChildTypeName := ioEmbeddedHasMany(LAttribute).ChildTypeName;
+            LMember_RelationChildTypeAlias := ioEmbeddedHasMany(LAttribute).ChildTypeAlias;
+          end
+          else if LAttribute is ioEmbeddedHasOne then
+          begin
+            LMember_RelationType := rtEmbeddedHasOne;
+            LMember_RelationChildTypeName := ioEmbeddedHasOne(LAttribute).ChildTypeName;
+            LMember_RelationChildTypeAlias := ioEmbeddedHasOne(LAttribute).ChildTypeAlias;
+          end
+          else if LAttribute is ioBelongsTo then
+          begin
+            LMember_RelationType := rtBelongsTo;
+            LMember_RelationChildTypeName := ioBelongsTo(LAttribute).ChildTypeName;
+            LMember_RelationChildTypeAlias := ioBelongsTo(LAttribute).ChildTypeAlias;
+            LDB_FieldType := ioMdInteger; // If is a BelongsTo relation then the field type on DB in integer
+          end
+          else if LAttribute is ioHasOne then
+          begin
+            LMember_RelationType := rtHasOne;
+            LMember_RelationChildTypeName := ioHasOne(LAttribute).ChildTypeName;
+            LMember_RelationChildTypeAlias := ioHasOne(LAttribute).ChildTypeAlias;
+            LMember_RelationChildPropertyName := ioHasOne(LAttribute).ChildPropertyName;
+          end
+          else if LAttribute is ioHasMany then
+          begin
+            LMember_RelationType := rtHasMany;
+            LMember_RelationChildTypeName := ioHasMany(LAttribute).ChildTypeName;
+            LMember_RelationChildTypeAlias := ioHasMany(LAttribute).ChildTypeAlias;
+            LMember_RelationChildPropertyName := ioHasMany(LAttribute).ChildPropertyName;
+          end
+          else if LAttribute is ioLazyLoad then
+            LMember_RelationChildLazyLoad := True
+          else
+            // Attribute to disable the relation auto detection
+            if LAttribute is ioDisableRelationAutodetect then
+              LMember_RelationAutodetectEnabled := False
+            else
+              // Indexes
+              if LAttribute is ioIndex then
+              begin
+                if ioIndex(LAttribute).CommaSepFieldList.IsEmpty then // If the "ACommaSepFieldList" is empty then set the current property field name
+                  ioIndex(LAttribute).CommaSepFieldList := LMember_FieldName;
+                ATable.GetIndexList(True).Add(ioIndex(LAttribute)); // Add the current index attribute
+              end
+              else
+                // Smart where attributes
+                if LAttribute is ioWhereAttribute then
+                begin
+                  LWhereCompareOp := ioWhereAttribute(LAttribute).CompareOp;
+                  LWhereLogicOp := ioWhereAttribute(LAttribute).LogicOp;
+                  if not ioWhereAttribute(LAttribute).TargetPropName.IsEmpty then
+                    LWhereTargetPropName := ioWhereAttribute(LAttribute).TargetPropName;
+                end
+                else if LAttribute is ioWhereGroupAttribute then
+                begin
+                  LWhereGroupName := ioWhereGroupAttribute(LAttribute).GroupName;
+                  LWhereGroupLogicOp := ioWhereGroupAttribute(LAttribute).GroupLogicOp;
+                  LWhereMasterGroupName := ioWhereGroupAttribute(LAttribute).MasterGroupName;
+                end
+                else if LAttribute is ioWhereNullValueAttribute then
+                  LWhereNullValue := ioWhereNullValueAttribute(LAttribute).Value;
         if LAttribute is ioWhereSkipAttribute then
           LWhereSkip := True;
         // Metadata Used by DBBuilder (M.M. 01/08/18)
         if LAttribute is ioNotNull then
           LDB_FieldNotNull := True
-        else
-        if LAttribute is ioVarchar then
+        else if LAttribute is ioVarchar then
         begin
           LDB_FieldType := ioMdVarchar;
           LDB_FieldLength := ioVarchar(LAttribute).Length;
           LDB_FieldUnicode := ioVarchar(LAttribute).IsUnicode;
         end
-        else
-        if LAttribute is ioChar then
+        else if LAttribute is ioChar then
         begin
           LDB_FieldType := ioMdChar;
           LDB_FieldLength := ioChar(LAttribute).Length;
           LDB_FieldUnicode := ioChar(LAttribute).IsUnicode;
         end
-        else
-        if LAttribute is ioInteger then
+        else if LAttribute is ioInteger then
         begin
           LDB_FieldType := ioMdInteger;
           LDB_FieldPrecision := ioInteger(LAttribute).Precision;
         end
-        else
-        if LAttribute is ioFloat then
+        else if LAttribute is ioFloat then
           LDB_FieldType := ioMdFloat
-        else
-        if LAttribute is ioDate then
+        else if LAttribute is ioDate then
           LDB_FieldType := ioMdDate
-        else
-        if LAttribute is ioTime then
+        else if LAttribute is ioTime then
           LDB_FieldType := ioMdTime
-        else
-        if LAttribute is ioDateTime then
+        else if LAttribute is ioDateTime then
           LDB_FieldType := ioMdDateTime
-        else
-        if LAttribute is ioDecimal then
+        else if LAttribute is ioDecimal then
         begin
           LDB_FieldType := ioMdDecimal;
           LDB_FieldPrecision := ioDecimal(LAttribute).Precision;
           LDB_FieldScale := ioDecimal(LAttribute).Scale;
         end
-        else
-        if LAttribute is ioNumeric then
+        else if LAttribute is ioNumeric then
         begin
           LDB_FieldType := ioMdNumeric;
           LDB_FieldPrecision := ioNumeric(LAttribute).Precision;
           LDB_FieldScale := ioNumeric(LAttribute).Scale;
         end
-        else
-        if LAttribute is ioBoolean then
+        else if LAttribute is ioBoolean then
           LDB_FieldType := ioMdBoolean
-        else
-        if LAttribute is ioBinary then
+        else if LAttribute is ioBinary then
         begin
           LDB_FieldType := ioMdBinary;
           LDB_FieldSubType := ioBinary(LAttribute).BinarySubType
         end
-        else
-        if LAttribute is ioFTCustom then
+        else if LAttribute is ioFTCustom then
         begin
           LDB_FieldType := ioMdCustomFieldType;
           LDB_CustomFieldType := ioFTCustom(LAttribute).Value;
         end
-        else
-        if LAttribute is ioDefault then
+        else if LAttribute is ioDefault then
           LDB_Default := ioDefault(LAttribute).Value
-        else
-        if LAttribute is ioForeignKey then
+        else if LAttribute is ioForeignKey then
         begin
           LForeignKeyAttributeExists := True;
           LDB_FKAutoCreate := ioForeignKey(LAttribute).AutoCreate;
@@ -652,9 +622,8 @@ var
       end;
 
       // Automatic relation detection (only for class or interface member type)
-      if (not ATransientAsDefault) and (not LMember_Transient)
-        and LMember_RelationAutodetectEnabled and (LMember_RelationType = rtNone)
-        and (LMember_FieldValueType.IsInstance or (LMember_FieldValueType is TRttiInterfaceType)) then
+      if (not ATransientAsDefault) and (not LMember_Transient) and LMember_RelationAutodetectEnabled and (LMember_RelationType = rtNone) and
+        (LMember_FieldValueType.IsInstance or (LMember_FieldValueType is TRttiInterfaceType)) then
       begin
         // HasMany relation autodetect
         LMember_RelationChildTypeName := TioDuckTypedFactory.TryGetHasManyRelationChildTypeName(LMember_FieldValueType);
@@ -664,17 +633,17 @@ var
           LMember_RelationChildPropertyName := IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME;
         end
         else
-        // BelongsTo relation autodetect
-        if HasBelongsToRelation(LMember_FieldValueType) then
-        begin
-          LMember_RelationType := rtBelongsTo;
-          LMember_RelationChildTypeName := LMember_FieldValueType.Name;
-          LDB_FieldType := ioMdInteger; // If is a BelongsTo relation then the field type on DB in integer
-        end;
+          // BelongsTo relation autodetect
+          if HasBelongsToRelation(LMember_FieldValueType) then
+          begin
+            LMember_RelationType := rtBelongsTo;
+            LMember_RelationChildTypeName := LMember_FieldValueType.Name;
+            LDB_FieldType := ioMdInteger; // If is a BelongsTo relation then the field type on DB in integer
+          end;
       end;
 
       // If the current member has an HasMany relation and an "ioForeignKey" attribute has not been explicitly specified,
-      //  then set by default the "CASCADE" value for both the update and the delete
+      // then set by default the "CASCADE" value for both the update and the delete
       if (LMember_RelationType = rtHasMany) and not LForeignKeyAttributeExists then
       begin
         LDB_FKOnDeleteAction := fkCascade;
@@ -686,10 +655,9 @@ var
         LMember_LoadPersist := lpPersistOnly;
       // Create and add property into the map
       LNewProperty := GetProperty(ATable, LMember, LMember_TypeAlias, LMember_FieldName, LMember_LoadSql, LMember_FieldType, LMember_Transient, LMember_IsID,
-        LMember_LoadPersist, LMember_RelationType, LMember_RelationChildTypeName, LMember_RelationChildTypeAlias,
-        LMember_RelationChildPropertyName, LMember_RelationChildLazyLoad, LMember_RelationAutodetectEnabled, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision,
-        LDB_FieldScale, LDB_FieldNotNull, LDB_Default, LDB_FieldUnicode, LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnDeleteAction,
-        LDB_FKOnUpdateAction);
+        LMember_LoadPersist, LMember_RelationType, LMember_RelationChildTypeName, LMember_RelationChildTypeAlias, LMember_RelationChildPropertyName,
+        LMember_RelationChildLazyLoad, LMember_RelationAutodetectEnabled, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull,
+        LDB_Default, LDB_FieldUnicode, LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnDeleteAction, LDB_FKOnUpdateAction);
       LNewProperty.WhereCompareOp := LWhereCompareOp;
       LNewProperty.WhereGroupLogicOp := LWhereGroupLogicOp;
       LNewProperty.WhereGroupName := LWhereGroupName;
@@ -722,29 +690,31 @@ begin
   end;
 end;
 
-class function TioContextFactory.Table(const Typ: TRttiInstanceType; out OEtmTraced: Boolean; out OEtmConnectionName: String): IioTable;
+class function TioContextFactory.Table(const Typ: TRttiInstanceType): IioTable;
 var
   LAttr: TCustomAttribute;
-  LTableName, LConnectionDefName, LKeyGenerator: String;
+  LTableName, LConnectionName, LKeyGenerator: String;
   LTrueClass: IioTrueClass;
   LJoins: IioJoins;
   LGroupBy: IioGroupBy;
   LMapMode: TioMapModeType;
   LIndexList: TioIndexList;
+  LEtmRepositoryClass: TioEtmCustomRepositoryRef;
+  LEtmTraceOnlyOnConnectionName: String;
 begin
   try
     // Prop Init
     LTableName := Typ.MetaclassType.ClassName.Substring(1);
     // Elimina il primo carattere (di solito la T)
-    LConnectionDefName := '';
+    LConnectionName := '';
     LKeyGenerator := '';
     LJoins := Self.Joins;
     LTrueClass := Self.TrueClass(DEFAULT_TRUE_CLASS_MODE, IO_TRUECLASS_FIELDNAME);
     LGroupBy := nil;
     LMapMode := DEFAULT_MAP_MODE;
     LIndexList := nil;
-    OEtmTraced := False;
-    OEtmConnectionName := '';
+    LEtmRepositoryClass := nil;
+    LEtmTraceOnlyOnConnectionName := '';
     // Check attributes
     for LAttr in Typ.GetAttributes do
     begin
@@ -760,8 +730,8 @@ begin
       end;
       if LAttr is ioKeyGenerator then
         LKeyGenerator := ioKeyGenerator(LAttr).Value;
-      if LAttr is ioConnectionDefName then
-        LConnectionDefName := ioConnectionDefName(LAttr).Value;
+      if LAttr is ioConnection then
+        LConnectionName := ioConnection(LAttr).ConnectionName;
       if LAttr is ioJoin then
         LJoins.Add(Self.JoinItem(ioJoin(LAttr)));
       if (LAttr is ioGroupBy) and (not Assigned(LGroupBy)) then
@@ -779,12 +749,13 @@ begin
       // etmTrace
       if (LAttr is etmTrace) then
       begin
-        OEtmTraced := True;
-        OEtmConnectionName := etmTrace(LAttr).ConnectionName;
+        LEtmRepositoryClass := etmTrace(LAttr).RepositoryClass;
+        LEtmTraceOnlyOnConnectionName := etmTrace(LAttr).TraceOnlyOnConnectionName;
       end;
     end;
     // Create result Properties object
-    Result := TioTable.Create(LTableName, LKeyGenerator, LTrueClass, LJoins, LGroupBy, LConnectionDefName, LMapMode, Typ);
+    Result := TioTable.Create(LTableName, LKeyGenerator, LTrueClass, LJoins, LGroupBy, LConnectionName, LMapMode, Typ, LEtmRepositoryClass,
+      LEtmTraceOnlyOnConnectionName);
     // If an IndexList is present then assign it to the ioTable
     if Assigned(LIndexList) and (LIndexList.Count > 0) then
       Result.SetIndexList(LIndexList);

@@ -36,7 +36,7 @@ unit iORM.Attributes;
 interface
 
 uses
-  System.Rtti, iORM.CommonTypes, System.Classes;
+  System.Rtti, iORM.CommonTypes, System.Classes, iORM.ETM.Repository;
 
 
 {$REGION '===== TYPES & CONSTANTS ====='}
@@ -64,6 +64,7 @@ type
 
   // Join types
   TioJoinType = (jtInner, jtCross, jtLeftOuter, jtRightOuter, jtFullOuter);
+
 {$ENDREGION} // END OF TYPES & CONSTANTS
 
 
@@ -308,7 +309,12 @@ type
   ioKeySequence = ioKeyGenerator;
 
   // Link the class/entity to a specific connection
-  ioConnectionDefName = class(TioCustomStringAttribute)
+  ioConnection = class(TCustomAttribute)
+  strict private
+    FConnectionName: String;
+  public
+    constructor Create(const AConnectionName: String = '');
+    property ConnectionName: String read FConnectionName;
   end;
 
   // Set the TrueClass mode for the class
@@ -506,12 +512,16 @@ type
 
 {$REGION '===== ETM ATTRIBUTES ====='}
 
+  etmRepository = ioEntity;
+
   etmTrace = class(TCustomAttribute)
   strict private
-    FConnectionName: String;
+    FRepositoryClass: TioEtmCustomRepositoryRef;
+    FTraceOnlyOnConnectionName: String;
   public
-    constructor Create(const AConnectionName: String = '');
-    property ConnectionName: String read FConnectionName;
+    constructor Create(const ARepositoryClass: TioEtmCustomRepositoryRef; const AConnectionName: String = '');
+    property RepositoryClass: TioEtmCustomRepositoryRef read FRepositoryClass;
+    property TraceOnlyOnConnectionName: String read FTraceOnlyOnConnectionName;
   end;
 
 {$ENDREGION} // END ETM ATTRIBUTES
@@ -825,7 +835,15 @@ end;
 
 { etmTraceAttribute }
 
-constructor etmTrace.Create(const AConnectionName: String);
+constructor etmTrace.Create(const ARepositoryClass: TioEtmCustomRepositoryRef; const AConnectionName: String = '');
+begin
+  FRepositoryClass := ARepositoryClass;
+  FTraceOnlyOnConnectionName := AConnectionName;
+end;
+
+{ ioConnectionName }
+
+constructor ioConnection.Create(const AConnectionName: String);
 begin
   FConnectionName := AConnectionName;
 end;
