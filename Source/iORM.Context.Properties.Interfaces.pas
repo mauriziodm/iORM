@@ -174,7 +174,7 @@ type
     function PropertyExists(const APropertyName: String): Boolean;
     function GetIdProperty: IioProperty;
     function GetPropertyByName(const APropertyName:String): IioProperty;
-    procedure SetTable(const ATable:IioTable);
+    procedure SetTable(const ATable: IioTable);
     // Blob field present
     function BlobFieldExists: Boolean;
     // ObjectStatus property

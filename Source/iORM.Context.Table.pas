@@ -379,7 +379,7 @@ end;
 
 function TioTrueClass.GetValue: String;
 begin
-  Result := Table.GetQualifiedClassName + ';' + Self.FAncestors;
+  Result := Table.GetQualifiedClassName + ';' + FAncestors;
 end;
 
 function TioTrueClass.QualifiedClassNameFromClassInfoFieldValue(const AValue: String): String;
@@ -398,13 +398,14 @@ var
 begin
   inherited;
   LRttiType := Table.GetRttiType;
-  // Loop for all ancestors
-  repeat
-  begin
-    FAncestors := FAncestors + '<' + LRttiType.Name + '>';
-    LRttiType := LRttiType.BaseType;
-  end;
-  until not Assigned(LRttiType);
+  // Build ancestor list
+  if FAncestors.IsEmpty then // To avoid duplicates
+    repeat
+    begin
+      FAncestors := FAncestors + '<' + LRttiType.Name + '>';
+      LRttiType := LRttiType.BaseType;
+    end;
+    until not Assigned(LRttiType);
 end;
 
 { TioJoin }
