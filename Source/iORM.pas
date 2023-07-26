@@ -340,13 +340,13 @@ type
     class procedure LoadToList<TItemType>(const AListIntf: IInterface; const AItemAlias: String; const AWhere: IioWhere); overload;
 
     // Reload object as class
-    class procedure Reload(const AObj: TObject; const ALazy: boolean; const ALazyProps: String); overload;
-    class procedure Reload(const AObj: TObject; const ALazy: boolean = False); overload;
-    class procedure Reload(const AObj: TObject; const ALazyProps: String); overload;
+    class procedure ReloadObject(const AObj: TObject; const ALazy: boolean; const ALazyProps: String); overload;
+    class procedure ReloadObject(const AObj: TObject; const ALazy: boolean = False); overload;
+    class procedure ReloadObject(const AObj: TObject; const ALazyProps: String); overload;
     // Reload object as interface
-    class procedure Reload(const AIntfObj: IInterface; const ALazy: boolean; const ALazyProps: String); overload;
-    class procedure Reload(const AIntfObj: IInterface; const ALazy: boolean = False); overload;
-    class procedure Reload(const AIntfObj: IInterface; const ALazyProps: String); overload;
+    class procedure ReloadObject(const AIntfObj: IInterface; const ALazy: boolean; const ALazyProps: String); overload;
+    class procedure ReloadObject(const AIntfObj: IInterface; const ALazy: boolean = False); overload;
+    class procedure ReloadObject(const AIntfObj: IInterface; const ALazyProps: String); overload;
     // Reload list as class
     class procedure ReloadList(const AListObj: TObject; const ALazy: boolean; const ALazyProps: String); overload;
     class procedure ReloadList(const AListObj: TObject; const ALazy: boolean = False); overload;
@@ -357,8 +357,8 @@ type
     class procedure ReloadList(const AListIntf: IInterface; const ALazyProps: String); overload;
 
     // Delete (accepting instance to delete directly)
-    class procedure Delete(const AObj: TObject); overload;
-    class procedure Delete(const AIntfObj: IInterface); overload;
+    class procedure DeleteObject(const AObj: TObject); overload;
+    class procedure DeleteObject(const AIntfObj: IInterface); overload;
     class procedure DeleteList(const AListObj: TObject); overload;
     class procedure DeleteList(const AListIntf: IInterface); overload;
     // Delete (accepting generic type to delete and ciriteria)
@@ -395,8 +395,8 @@ type
     class function NotExists<T>(const ATypeAlias: String; const AWhere: IioWhere): boolean; overload;
 
     // Persist (accepting instance to persist directly)
-    class procedure Persist(const AObj: TObject; const ABlindInsert: boolean = False); overload;
-    class procedure Persist(const AIntfObj: IInterface; const ABlindInsert: boolean = False); overload;
+    class procedure PersistObject(const AObj: TObject; const ABlindInsert: boolean = False); overload;
+    class procedure PersistObject(const AIntfObj: IInterface; const ABlindInsert: boolean = False); overload;
     class procedure _PersistInternal(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); overload;
     // PersistCollection (accepting instance to persist directly)
@@ -815,9 +815,9 @@ begin
     AMasterPropertyName, AMasterPropertyPath);
 end;
 
-class procedure io.Persist(const AIntfObj: IInterface; const ABlindInsert: boolean);
+class procedure io.PersistObject(const AIntfObj: IInterface; const ABlindInsert: boolean);
 begin
-  Self.Persist(AIntfObj as TObject, ABlindInsert);
+  Self.PersistObject(AIntfObj as TObject, ABlindInsert);
 end;
 
 class procedure io.PersistList(const AList: TObject; const ABlindInsert: boolean);
@@ -825,7 +825,7 @@ begin
   Self._PersistListInternal(AList, '', 0, ABlindInsert, nil, '', '');
 end;
 
-class procedure io.Persist(const AObj: TObject; const ABlindInsert: boolean);
+class procedure io.PersistObject(const AObj: TObject; const ABlindInsert: boolean);
 begin
   Self._PersistInternal(AObj, '', 0, ABlindInsert, nil, '', '');
 end;
@@ -850,19 +850,19 @@ begin
   Result := Self.Load<T>(ATypeAlias);
 end;
 
-class procedure io.Reload(const AIntfObj: IInterface; const ALazy: boolean; const ALazyProps: String);
+class procedure io.ReloadObject(const AIntfObj: IInterface; const ALazy: boolean; const ALazyProps: String);
 begin
-  io.Reload(AIntfObj as TObject, ALazy, ALazyProps);
+  io.ReloadObject(AIntfObj as TObject, ALazy, ALazyProps);
 end;
 
-class procedure io.Reload(const AIntfObj: IInterface; const ALazy: boolean);
+class procedure io.ReloadObject(const AIntfObj: IInterface; const ALazy: boolean);
 begin
-  io.Reload(AIntfObj as TObject, ALazy, '');
+  io.ReloadObject(AIntfObj as TObject, ALazy, '');
 end;
 
-class procedure io.Reload(const AIntfObj: IInterface; const ALazyProps: String);
+class procedure io.ReloadObject(const AIntfObj: IInterface; const ALazyProps: String);
 begin
-  io.Reload(AIntfObj as TObject, False, ALazyProps);
+  io.ReloadObject(AIntfObj as TObject, False, ALazyProps);
 end;
 
 class procedure io.ReloadList(const AListObj: TObject; const ALazy: boolean);
@@ -899,7 +899,7 @@ begin
   io.StartTransaction;
   try
     for I := 0 to LDuckList.Count - 1 do
-      io.Reload(LDuckList.GetItem(I), ALazy, ALazyProps);
+      io.ReloadObject(LDuckList.GetItem(I), ALazy, ALazyProps);
     io.CommitTransaction;
   except
     io.RollbackTransaction;
@@ -907,21 +907,21 @@ begin
   end;
 end;
 
-class procedure io.Reload(const AObj: TObject; const ALazy: boolean; const ALazyProps: String);
+class procedure io.ReloadObject(const AObj: TObject; const ALazy: boolean; const ALazyProps: String);
 begin
   if not Assigned(AObj) then
     raise EioException.Create(ClassName, 'Reload', '"AObj" cannot be nil.');
   io.Load(AObj.ClassName).ByID(TioUtilities.ExtractOID(AObj)).Lazy(ALazy).LazyProps(ALazyProps).ClearListBefore.ToObject(AObj);
 end;
 
-class procedure io.Reload(const AObj: TObject; const ALazy: boolean);
+class procedure io.ReloadObject(const AObj: TObject; const ALazy: boolean);
 begin
-  io.Reload(AObj, ALazy, '');
+  io.ReloadObject(AObj, ALazy, '');
 end;
 
-class procedure io.Reload(const AObj: TObject; const ALazyProps: String);
+class procedure io.ReloadObject(const AObj: TObject; const ALazyProps: String);
 begin
-  io.Reload(AObj, False, ALazyProps);
+  io.ReloadObject(AObj, False, ALazyProps);
 end;
 
 class procedure io.RollbackTransaction(const AConnectionName: String);
@@ -1467,7 +1467,7 @@ begin
   Result := di.LocateVM<T>(AParentCloseQueryAction, AVMAlias).ConstructorParams(AParams).Get;
 end;
 
-class procedure io.Delete(const AObj: TObject);
+class procedure io.DeleteObject(const AObj: TObject);
 var
   LConnectionDefName: String;
 begin
@@ -1490,9 +1490,9 @@ begin
   Result := TioGlobalVCProviderRegister.GetInstance.DefaultVCProvider;
 end;
 
-class procedure io.Delete(const AIntfObj: IInterface);
+class procedure io.DeleteObject(const AIntfObj: IInterface);
 begin
-  Self.Delete(AIntfObj as TObject);
+  Self.DeleteObject(AIntfObj as TObject);
 end;
 
 class procedure io.DeleteList(const AListIntf: IInterface);

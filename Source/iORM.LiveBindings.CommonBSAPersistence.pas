@@ -624,19 +624,34 @@ class function TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(const 
   : TioCommonBSAPersistenceThreadExecute;
 var
   LID: Integer;
-  LClassName: String;
 begin
   // Save into local variables to avoid multithread resource access inconsistency problems
-  LClassName := ADataObj.ClassName;
   LID := TioUtilities.ExtractOID(ADataObj);
   AActiveBindSourceAdapter.BSPersistenceDeleting := True; // Look at GetDeleteTerminateMethod below
   Result := function: TObject
     begin
       Result := nil;
       if LID <> 0 then
-        io.RefTo(LClassName).ByID(LID).Cacheable.Delete;
+        io.DeleteObject(ADataObj);
     end;
 end;
+//class function TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ADataObj: TObject)
+//  : TioCommonBSAPersistenceThreadExecute;
+//var
+//  LID: Integer;
+//  LClassName: String;
+//begin
+//  // Save into local variables to avoid multithread resource access inconsistency problems
+//  LClassName := ADataObj.ClassName;
+//  LID := TioUtilities.ExtractOID(ADataObj);
+//  AActiveBindSourceAdapter.BSPersistenceDeleting := True; // Look at GetDeleteTerminateMethod below
+//  Result := function: TObject
+//    begin
+//      Result := nil;
+//      if LID <> 0 then
+//        io.RefTo(LClassName).ByID(LID).Cacheable.Delete;
+//    end;
+//end;
 
 class function TioCommonBSAAnonymousMethodsFactory.GetDeleteTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter)
   : TioCommonBSAPersistenceThreadOnTerminate;

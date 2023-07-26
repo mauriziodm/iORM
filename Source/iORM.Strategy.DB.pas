@@ -86,7 +86,7 @@ uses
   iORM.DuckTyped.Factory, iORM.Resolver.Interfaces, iORM.ObjectsForge.Factory,
   iORM.LazyLoad.Factory, iORM.Resolver.Factory, iORM.Where.Factory,
   iORM.Exceptions, iORM, System.SysUtils, System.Generics.Collections,
-  iORM.Interceptor.CRUD, iORM.Interceptor.CRUD.Register;
+  iORM.Interceptor.CRUD, iORM.Interceptor.CRUD.Register, iORM.Utilities;
 
 type
 

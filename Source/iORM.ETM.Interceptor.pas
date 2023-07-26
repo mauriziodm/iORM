@@ -72,7 +72,7 @@ begin
   // Create the repository item, persist it and finally free it
   LRepository := AContext.Map.GetTable.GetEtmRepositoryClass.Create(etInsert, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, 0, '', '');
   try
-    io.Persist(LRepository);
+    io.PersistObject(LRepository);
   finally
     LRepository.Free;
   end;
@@ -84,7 +84,11 @@ var
 begin
   // Gather the previous state of the entity (before update query)
   LPreviousStateObj := io.Load(AContext.DataObject.ClassName).ByID(AContext.GetID).ToObject; // Load the previous version obj
-  AContext.EtmBeforeUpdateEntityState := dj.From(LPreviousStateObj).ToJson;
+  try
+    AContext.EtmBeforeUpdateEntityState := dj.From(LPreviousStateObj).ToJson;
+  finally
+    LPreviousStateObj.Free;
+  end;
 end;
 
 class procedure TioEtmInterceptor.AfterUpdate(const AContext: IioContext; const AQuery: IioQuery);
@@ -94,7 +98,7 @@ begin
   // Create the repository item, persist it and finally free it
   LRepository := AContext.Map.GetTable.GetEtmRepositoryClass.Create(etUpdate, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, AContext.ObjVersion-1, AContext.EtmBeforeUpdateEntityState, '');
   try
-    io.Persist(LRepository);
+    io.PersistObject(LRepository);
   finally
     LRepository.Free;
   end;
@@ -111,7 +115,7 @@ begin
   LRepository := AContext.Map.GetTable.GetEtmRepositoryClass.Create(etDelete, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, AContext.ObjVersion,
     LEntityState, '');
   try
-    io.Persist(LRepository);
+    io.PersistObject(LRepository);
   finally
     LRepository.Free;
   end;
