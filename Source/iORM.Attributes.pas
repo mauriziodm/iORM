@@ -524,8 +524,9 @@ type
     FEntityClassName: String;
     FEntityID: Integer;
     FEntityVersion: Integer;
-    [ioVarChar(1000)]
+    [ioBinary('1')]
     FEntityState: String;
+    [ioBinary('1')]
     FRemoteEntityState: String;
     FEventType: TioEtmEventType;
     FConflictType: TioEtmConflictType;
