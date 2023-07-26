@@ -36,7 +36,7 @@ unit iORM.ETM.Repository;
 interface
 
 uses
-  iORM.CommonTypes;
+  iORM.CommonTypes, iORM.Attributes;
 
 type
 
@@ -47,8 +47,10 @@ type
   private
     FID: Integer;
     FDateAndTime: TioObjCreated;
+    [ioVarChar(30)]
     FUserName: TioObjCreatedUserName;
     FUserID: TioObjCreatedUserID;
+    [ioVarChar(100)]
     FEntityClassName: String;
     FEntityID: Integer;
     FEntityVersion: Integer;
