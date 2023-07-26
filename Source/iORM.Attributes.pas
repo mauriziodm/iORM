@@ -36,7 +36,7 @@ unit iORM.Attributes;
 interface
 
 uses
-  System.Rtti, iORM.CommonTypes, System.Classes, iORM.ETM.Repository;
+  System.Rtti, iORM.CommonTypes, System.Classes;
 
 
 {$REGION '===== TYPES & CONSTANTS ====='}
@@ -510,7 +510,40 @@ type
 {$ENDREGION} // END OF DEPENDENCY INJECTION ATTRIBUTES
 
 
-{$REGION '===== ETM ATTRIBUTES ====='}
+{$REGION '===== ETM ATTRIBUTES & REPOSITORY ====='}
+
+  // Base class for ell ETM repositories
+  TioEtmCustomRepositoryRef = class of TioEtmCustomRepository;
+  TioEtmCustomRepository = class
+  private
+    FID: Integer;
+    FDateAndTime: TioObjCreated;
+    FUserName: TioObjCreatedUserName;
+    FUserID: TioObjCreatedUserID;
+    [ioVarChar(60)]
+    FEntityClassName: String;
+    FEntityID: Integer;
+    FEntityVersion: Integer;
+    [ioVarChar(1000)]
+    FEntityState: String;
+    FRemoteEntityState: String;
+    FEventType: TioEtmEventType;
+    FConflictType: TioEtmConflictType;
+  public
+    constructor Create(const AEventType: TioEtmEventType; const AConflictType: TioEtmConflictType; const AEntityID: Integer; const AEntityClassName: String;
+      const AEntityObjVersion: Integer; const AEntityState, ARemoteEntityState: String);
+    property ID: Integer read FID;
+    property DateAndTime: TioObjCreated read FDateAndTime;
+    property EventType: TioEtmEventType read FEventType;
+    property EntityClassName: String read FEntityClassName;
+    property EntityID: Integer read FEntityID;
+    property EntityVersion: Integer read FEntityVersion;
+    property EntityState: String read FEntityState;
+    property RemoteEntityState: String read FRemoteEntityState;
+    property ConflictType: TioEtmConflictType read FConflictType;
+    property UserName: TioObjCreatedUserName read FUserName;
+    property UserID: TioObjCreatedUserID read FUserID;
+  end;
 
   etmRepository = ioEntity;
 
@@ -846,6 +879,20 @@ end;
 constructor ioConnection.Create(const AConnectionName: String);
 begin
   FConnectionName := AConnectionName;
+end;
+
+{ TioEtmCustomRepository }
+
+constructor TioEtmCustomRepository.Create(const AEventType: TioEtmEventType; const AConflictType: TioEtmConflictType; const AEntityID: Integer;
+  const AEntityClassName: String; const AEntityObjVersion: Integer; const AEntityState, ARemoteEntityState: String);
+begin
+  FEventType := AEventType;
+  FConflictType := AConflictType;
+  FEntityClassName := AEntityClassName;
+  FEntityID := AEntityID;
+  FEntityVersion := AEntityObjVersion;
+  FEntityState := AEntityState;
+  FRemoteEntityState := ARemoteEntityState;
 end;
 
 end.

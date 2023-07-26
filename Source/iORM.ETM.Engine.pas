@@ -31,13 +31,20 @@
   *                                                                          *
   ****************************************************************************
 }
+{
+  *************************************************************************************************************************************
+  * NOTE: TioEtmCustomRepository base class for all EtmRepositories is declared in iORM.Attributes unit to avoid circular refeference *
+  * NOTE: TioEtmCustomRepository base class for all EtmRepositories is declared in iORM.Attributes unit to avoid circular refeference *
+  * NOTE: TioEtmCustomRepository base class for all EtmRepositories is declared in iORM.Attributes unit to avoid circular refeference *
+  *************************************************************************************************************************************
+}
 unit iORM.ETM.Engine;
 
 interface
 
 uses
   System.Classes, System.Generics.Collections, iORM.Where.Interfaces,
-  iORM.Context.Map.Interfaces, iORM.ETM.Repository;
+  iORM.Context.Map.Interfaces, iORM.Attributes;
 
 type
 

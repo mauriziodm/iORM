@@ -225,7 +225,6 @@ contains
   iORM.Where.SmartBuilder in '..\..\Source\iORM.Where.SmartBuilder.pas',
   iORM.Abstraction.uniGUI in '..\..\Source\iORM.Abstraction.uniGUI.pas',
   iORM.Where.NestedProp.Resolver in '..\..\Source\iORM.Where.NestedProp.Resolver.pas',
-  iORM.ETM.Repository in '..\..\Source\iORM.ETM.Repository.pas',
   iORM.ETM.Engine in '..\..\Source\iORM.ETM.Engine.pas',
   iORM.Interceptor.Strategy in '..\..\Source\iORM.Interceptor.Strategy.pas',
   iORM.Interceptor.CRUD in '..\..\Source\iORM.Interceptor.CRUD.pas',

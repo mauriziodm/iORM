@@ -377,7 +377,6 @@
         <DCCReference Include="..\..\Source\iORM.Where.SmartBuilder.pas"/>
         <DCCReference Include="..\..\Source\iORM.Abstraction.uniGUI.pas"/>
         <DCCReference Include="..\..\Source\iORM.Where.NestedProp.Resolver.pas"/>
-        <DCCReference Include="..\..\Source\iORM.ETM.Repository.pas"/>
         <DCCReference Include="..\..\Source\iORM.ETM.Engine.pas"/>
         <DCCReference Include="..\..\Source\iORM.Interceptor.Strategy.pas"/>
         <DCCReference Include="..\..\Source\iORM.Interceptor.CRUD.pas"/>

@@ -56,6 +56,8 @@ const
 
   IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME = 'Master___ID';
 
+  IO_USERNAME_LENGTH = 30;
+
 type
 
   TCloseQueryEvent = procedure(Sender: TObject; var CanClose: Boolean) of object;

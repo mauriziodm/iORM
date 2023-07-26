@@ -37,7 +37,7 @@ interface
 
 uses
   iORM.CommonTypes, System.Generics.Collections, System.Rtti, iORM.Interfaces,
-  iORM.Attributes, iORM.ETM.Repository;
+  iORM.Attributes;
 
 type
 

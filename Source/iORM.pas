@@ -43,7 +43,7 @@ uses
   iORM.StdActions.Interfaces, iORM.Context.Container,
   iORM.Context.Properties.Interfaces, iORM.Where.SmartBuilder,
   iORM.Interceptor.Strategy.Register, iORM.Interceptor.CRUD.Register,
-  iORM.ETM.Engine, iORM.ETM.Repository;
+  iORM.ETM.Engine;
 
 const
   IORM_VERSION = 'iORM 2 (beta 2.3)';
@@ -194,7 +194,7 @@ type
   TioActionViewContextBy = iORM.StdActions.Interfaces.TioActionViewContextBy;
 
   // Entity Time Machine (ETM)
-  TioEtmCustomRepository = iORM.ETM.Repository.TioEtmCustomRepository;
+  TioEtmCustomRepository = iORM.Attributes.TioEtmCustomRepository;
   TioEtmEventType = iORM.CommonTypes.TioEtmEventType;
   TioEtmConflictType = iORM.CommonTypes.TioEtmConflictType;
 

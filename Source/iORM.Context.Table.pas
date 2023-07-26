@@ -38,8 +38,7 @@ interface
 uses
   iORM.Context.Interfaces,
   iORM.SqlItems, iORM.Context.Table.Interfaces, iORM.Attributes,
-  iORM.CommonTypes, System.Generics.Collections, System.Rtti,
-  iORM.ETM.Repository;
+  iORM.CommonTypes, System.Generics.Collections, System.Rtti;
 
 type
 

@@ -42,7 +42,7 @@ uses
   iORM.Context.Table.Interfaces, System.Rtti,
   iORM.Attributes, System.Generics.Collections,
   iORM.Context.Map.Interfaces, iORM.Where.Interfaces,
-  iORM.LiveBindings.BSPersistence, iORM.ETM.Repository;
+  iORM.LiveBindings.BSPersistence;
 
 type
 
@@ -426,7 +426,7 @@ var
               if TioUtilities.TryGetMemberAttribute<ioField>(LMember, LAttribute) then
                 LMember_FieldName := ioField(LAttribute).Value;
               Result.ObjCreatedUserNameProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone, '',
-                '', '', False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode,
+                '', '', False, True, LDB_FieldType, IO_USERNAME_LENGTH, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode,
                 LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
               Result.Add(Result.ObjCreatedUserNameProperty);
               Continue;
@@ -462,7 +462,7 @@ var
                     if TioUtilities.TryGetMemberAttribute<ioField>(LMember, LAttribute) then
                       LMember_FieldName := ioField(LAttribute).Value;
                     Result.ObjUpdatedUserNameProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist,
-                      rtNone, '', '', '', False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil,
+                      rtNone, '', '', '', False, True, LDB_FieldType, IO_USERNAME_LENGTH, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil,
                       LDB_FieldUnicode, LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
                     Result.Add(Result.ObjUpdatedUserNameProperty);
                     Continue;
