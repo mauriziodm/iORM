@@ -16,15 +16,6 @@ type
     class function Deserialize(const AJSONValue:TJSONValue; const AExistingValue:TValue): TValue; override;
   end;
 
-  // DelphiJDO engine custom serializer
-  TStringCustomSerializerJDO = class(TdjJDOCustomSerializer)
-  private
-    class function ReverseString(const AText:String): String;
-  public
-    class procedure Serialize(const AJSONValue:PJsonDataValue; const AValue:TValue); override;
-    class function Deserialize(const AJSONValue:PJsonDataValue; const AExistingValue:TValue): TValue; override;
-  end;
-
   // Stream engine custom serializer
   TStringCustomSerializerStream = class(TdjStreamCustomSerializer)
   private
@@ -67,37 +58,6 @@ var
 begin
   ReversedText := ReverseString(AValue.AsString);
   Result := TJSONString.Create(ReversedText);
-end;
-
-{ TStringCustomSerializerJDO }
-
-class function TStringCustomSerializerJDO.Deserialize(
-  const AJSONValue: PJsonDataValue; const AExistingValue: TValue): TValue;
-var
-  UnreversedText: String;
-begin
-  if AJSONValue.Typ <> TJsonDataType.jdtString then
-    raise Exception.Create('JDO serializer: Wrong serialization, string value expected.');
-  UnreversedText := ReverseString(AJSONValue.Value);
-  Result := UnreversedText;
-end;
-
-class function TStringCustomSerializerJDO.ReverseString(
-  const AText: String): String;
-var
-  I: Integer;
-begin
-  for I := High(AText) downto Low(AText) do
-    Result := Result + Atext[I];
-end;
-
-class procedure TStringCustomSerializerJDO.Serialize(
-  const AJSONValue: PJsonDataValue; const AValue: TValue);
-var
-  ReversedText: String;
-begin
-  ReversedText := ReverseString(AValue.AsString);
-  AJSONValue.Value := ReversedText;
 end;
 
 { TStringCustomSerializerStream }

@@ -10,10 +10,8 @@ object MainForm: TMainForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poDesktopCenter
   OnCreate = FormCreate
-  PixelsPerInch = 96
   TextHeight = 13
   object PanelTools: TPanel
     Left = 0
@@ -576,7 +574,7 @@ object MainForm: TMainForm
         Width = 40
         Height = 22
         EditLabel.Width = 73
-        EditLabel.Height = 13
+        EditLabel.Height = 22
         EditLabel.Caption = 'Date separator'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -586,6 +584,7 @@ object MainForm: TMainForm
         LabelPosition = lpLeft
         ParentFont = False
         TabOrder = 0
+        Text = ''
       end
       object EditTimePrefix: TLabeledEdit
         Left = 91
@@ -593,7 +592,7 @@ object MainForm: TMainForm
         Width = 40
         Height = 22
         EditLabel.Width = 53
-        EditLabel.Height = 13
+        EditLabel.Height = 22
         EditLabel.Caption = 'Time prefix'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -603,6 +602,7 @@ object MainForm: TMainForm
         LabelPosition = lpLeft
         ParentFont = False
         TabOrder = 1
+        Text = ''
       end
       object EditTimeSeparator: TLabeledEdit
         Left = 91
@@ -610,7 +610,7 @@ object MainForm: TMainForm
         Width = 40
         Height = 22
         EditLabel.Width = 72
-        EditLabel.Height = 13
+        EditLabel.Height = 22
         EditLabel.Caption = 'Time separator'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -620,6 +620,7 @@ object MainForm: TMainForm
         LabelPosition = lpLeft
         ParentFont = False
         TabOrder = 2
+        Text = ''
       end
       object EditMillisecSeparator: TLabeledEdit
         Left = 91
@@ -627,7 +628,7 @@ object MainForm: TMainForm
         Width = 40
         Height = 22
         EditLabel.Width = 83
-        EditLabel.Height = 13
+        EditLabel.Height = 22
         EditLabel.Caption = 'Millisec.separator'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -637,6 +638,7 @@ object MainForm: TMainForm
         LabelPosition = lpLeft
         ParentFont = False
         TabOrder = 3
+        Text = ''
       end
       object EditZulu: TLabeledEdit
         Left = 91
@@ -644,7 +646,7 @@ object MainForm: TMainForm
         Width = 40
         Height = 22
         EditLabel.Width = 20
-        EditLabel.Height = 13
+        EditLabel.Height = 22
         EditLabel.Caption = 'Zulu'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -654,6 +656,7 @@ object MainForm: TMainForm
         LabelPosition = lpLeft
         ParentFont = False
         TabOrder = 4
+        Text = ''
       end
       object CheckBoxSeconds: TCheckBox
         Left = 46
@@ -694,7 +697,7 @@ object MainForm: TMainForm
         Width = 40
         Height = 22
         EditLabel.Width = 76
-        EditLabel.Height = 13
+        EditLabel.Height = 22
         EditLabel.Caption = 'Timezone prefix'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -704,6 +707,7 @@ object MainForm: TMainForm
         LabelPosition = lpLeft
         ParentFont = False
         TabOrder = 8
+        Text = ''
       end
       object EditTimezoneSeparator: TLabeledEdit
         Left = 91
@@ -711,7 +715,7 @@ object MainForm: TMainForm
         Width = 40
         Height = 22
         EditLabel.Width = 69
-        EditLabel.Height = 13
+        EditLabel.Height = 22
         EditLabel.Caption = 'Timezone sep.'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -721,6 +725,7 @@ object MainForm: TMainForm
         LabelPosition = lpLeft
         ParentFont = False
         TabOrder = 9
+        Text = ''
       end
       object CheckBoxTimezoneIgnore: TCheckBox
         Left = 10

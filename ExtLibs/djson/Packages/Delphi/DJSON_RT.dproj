@@ -4,7 +4,7 @@
         <AppType>Package</AppType>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <FrameworkType>None</FrameworkType>
-        <MainSource>DJSON_RT_DoNotInstall.dpk</MainSource>
+        <MainSource>DJSON_RT.dpk</MainSource>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <ProjectGuid>{D8A34761-67DE-4E67-864B-A46D6C15059E}</ProjectGuid>
         <ProjectVersion>19.5</ProjectVersion>
@@ -61,7 +61,7 @@
         <DCC_S>false</DCC_S>
         <GenDll>true</GenDll>
         <GenPackage>true</GenPackage>
-        <SanitizedProjectName>DJSON_RT_DoNotInstall</SanitizedProjectName>
+        <SanitizedProjectName>DJSON_RT</SanitizedProjectName>
         <RuntimeOnlyPackage>true</RuntimeOnlyPackage>
         <DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
     </PropertyGroup>
@@ -153,7 +153,7 @@
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">DJSON_RT_DoNotInstall.dpk</Source>
+                    <Source Name="MainSource">DJSON_RT.dpk</Source>
                 </Source>
                 <Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
@@ -180,9 +180,9 @@
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\osx64\libcgsqlite3.dylib" Class="DependencyModule"/>
                 <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\DJSON_Project.bpl" Configuration="Debug" Class="ProjectOutput"/>
-                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\DJSON_RT_DoNotInstall.bpl" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\DJSON_RT.bpl" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>DJSON_RT_DoNotInstall.bpl</RemoteName>
+                        <RemoteName>DJSON_RT.bpl</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

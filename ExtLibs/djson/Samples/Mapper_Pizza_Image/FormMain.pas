@@ -95,7 +95,6 @@ begin
   case RadioGroupEngine.ItemIndex of
     ENGINE_DOM:    Result.Engine := eDelphiDOM;
     ENGINE_STREAM: Result.Engine := eDelphiStream;
-    ENGINE_JDO:    Result.Engine := eJDO;
   end;
   // Serialization Mode
   case RadioGroupSerializationMode.ItemIndex of
@@ -113,7 +112,6 @@ begin
   Result.EnableCustomSerializers := CheckBoxCustomSerializers.Checked;
   // Register the custom serializer sor string type
   Result.Serializers.Register<String>(TStringCustomSerializerDOM);
-  Result.Serializers.Register<String>(TStringCustomSerializerJDO);
   Result.Serializers.Register<String>(TStringCustomSerializerStream);
 end;
 

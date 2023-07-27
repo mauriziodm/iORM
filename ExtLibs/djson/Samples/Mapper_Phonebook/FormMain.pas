@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Model, System.Generics.Collections,
-  DJSON.Params;
+  DJSON.Params, Vcl.Mask;
 
 const
   ENGINE_DOM = 0;
@@ -124,7 +124,6 @@ begin
   case RadioGroupEngine.ItemIndex of
     ENGINE_DOM:    Result.Engine := eDelphiDOM;
     ENGINE_STREAM: Result.Engine := eDelphiStream;
-    ENGINE_JDO:    Result.Engine := eJDO;
   end;
   // Serialization Mode
   case RadioGroupSerializationMode.ItemIndex of

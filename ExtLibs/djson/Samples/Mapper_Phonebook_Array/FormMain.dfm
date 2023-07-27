@@ -10,9 +10,7 @@ object MainForm: TMainForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poDesktopCenter
-  PixelsPerInch = 96
   TextHeight = 13
   object PanelTools: TPanel
     Left = 0

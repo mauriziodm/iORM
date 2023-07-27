@@ -1,4 +1,4 @@
-package DJSON_RT_DoNotInstall;
+package DJSON_RT;
 
 {$R *.res}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}

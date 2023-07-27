@@ -15,14 +15,6 @@ type
     class function isTypeNotificationCompatible: Boolean; override;
   end;
 
-  // JDO engine custom serializer
-  TPhoneNumberCustomSerializerJDO = class(TdjJDOCustomSerializer)
-  public
-    class procedure Serialize(const AJSONValue:PJsonDataValue; const AValue:TValue); override;
-    class function Deserialize(const AJSONValue:PJsonDataValue; const AExistingValue:TValue): TValue; override;
-    class function isTypeNotificationCompatible: Boolean; override;
-  end;
-
   // DelphiStream engine custom serializer
   TPhoneNUmberCustomSerializerStream = class(TdjStreamCustomSerializer)
   public
@@ -71,47 +63,6 @@ begin
     LStringList.Add(LNumTel.MasterID.ToString);
     LStringList.Add(LNumTel.Numero);
     Result := TJSONString.Create(LStringList.CommaText);
-  finally
-    LStringList.Free;
-  end;
-end;
-
-{ TNumTelCustomSerializerJDO }
-
-class function TPhoneNumberCustomSerializerJDO.Deserialize(
-  const AJSONValue: PJsonDataValue; const AExistingValue: TValue): TValue;
-var
-  LStringList: TStrings;
-  LNumTel: TNumTel;
-begin
-  LStringList := TStringList.Create;
-  try
-    LStringList.CommaText := AJSONValue.Value;
-    LNumTel := TNumTel.Create(LStringList[0].ToInteger, LStringList[2], LStringList[1].ToInteger);
-    Result := TValue.From<TNumTel>(LNumTel);
-  finally
-    LStringList.Free;
-  end;
-end;
-
-class function TPhoneNumberCustomSerializerJDO.isTypeNotificationCompatible: Boolean;
-begin
-  Result := True;
-end;
-
-class procedure TPhoneNumberCustomSerializerJDO.Serialize(
-  const AJSONValue: PJsonDataValue; const AValue: TValue);
-var
-  LStringList: TStrings;
-  LNumTel: TNumTel;
-begin
-  LNumTel := AValue.AsType<TNumTel>;
-  LStringList := TStringList.Create;
-  try
-    LStringList.Add(LNumTel.ID.ToString);
-    LStringList.Add(LNumTel.MasterID.ToString);
-    LStringList.Add(LNumTel.Numero);
-    AJSONValue.Value := LStringList.CommaText;
   finally
     LStringList.Free;
   end;
