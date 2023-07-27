@@ -79,6 +79,7 @@ type
     function ToBsonAsBytes: TBytes;
     // Params
     function Params(const AParams:IdjParams): TdjValueDestination;
+    function OpType(const AOperationType: TdjSkipScope): TdjValueDestination;
     function IgnoreObjStatus: TdjValueDestination;
     function ItemsOfType(const AValueType: PTypeInfo): TdjValueDestination; overload;
     function ItemsOfType(const AKeyType, AValueType: PTypeInfo): TdjValueDestination; overload;
@@ -140,6 +141,7 @@ type
     procedure &To(const AInterface: IInterface); overload;
     // Params
     function Params(const AParams:IdjParams): TdjJSONDestination;
+    function OpType(const AOperationType: TdjSkipScope): TdjJSONDestination;
     function IgnoreObjStatus: TdjJSONDestination;
     function ItemsOfType(const AValueType: PTypeInfo): TdjJSONDestination; overload;
     function ItemsOfType(const AKeyType, AValueType: PTypeInfo): TdjJSONDestination; overload;
@@ -597,6 +599,12 @@ begin
   Result := Self;
 end;
 
+function TdjJSONDestination.OpType(const AOperationType: TdjSkipScope): TdjJSONDestination;
+begin
+  FParams.OpType := AOperationType;
+  Result := Self;
+end;
+
 function TdjJSONDestination.Params(
   const AParams: IdjParams): TdjJSONDestination;
 begin
@@ -779,6 +787,12 @@ end;
 function TdjValueDestination.LowerCase: TdjValueDestination;
 begin
   Self.FParams.NameCase := TdjNameCase.ncLowerCase;
+  Result := Self;
+end;
+
+function TdjValueDestination.OpType(const AOperationType: TdjSkipScope): TdjValueDestination;
+begin
+  Self.FParams.OpType := AOperationType;
   Result := Self;
 end;
 

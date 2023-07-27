@@ -478,7 +478,7 @@ var
             LMember_FieldName := ioField(LAttribute).Value;
           LMember_Transient := False;
         end
-        else if LAttribute is ioSkip then // Leave after ioField attribute detection
+        else if (LAttribute is ioSkip) and (ssMap in ioSkip(LAttribute).Scopes) then // Leave after ioField attribute detection
           LMember_Transient := True
         else if LAttribute is ioTypeAlias then
           LMember_TypeAlias := ioTypeAlias(LAttribute).Value

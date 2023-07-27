@@ -119,7 +119,7 @@ begin
   // DataObject
   LJSONValue := AJSONObject.GetValue(KEY_DATAOBJECT);
   if Assigned(LJSONValue) then
-    FDataObject := dj.FromJSON(LJSONValue).byFields.TypeAnnotationsON.ToObject;
+    FDataObject := dj.FromJSON(LJSONValue).OpType(ssHTTP).byFields.TypeAnnotationsON.ToObject;
 end;
 
 procedure TioHttpRequestBody.Clear;
@@ -247,7 +247,7 @@ begin
   // DataOject
   if Assigned(FDataObject) then
   begin
-    LJSONValue := dj.From(FDataObject).byFields.TypeAnnotationsON.ToJsonValue;
+    LJSONValue := dj.From(FDataObject).OpType(ssHTTP).byFields.TypeAnnotationsON.ToJsonValue;
     Result.AddPair(KEY_DATAOBJECT, LJSONValue);
   end;
 end;

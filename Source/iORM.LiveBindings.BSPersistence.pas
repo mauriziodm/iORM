@@ -549,7 +549,7 @@ begin
   if ARaiseIfNoChanges and (State < osChanged) then
     raise EioBindSourceObjStateException.Create(ClassName, 'Revert', 'There where no changes');
   // Execute the revert
-  dj.FromJSON(FSavedRevertPointState).byFields.TypeAnnotationsON.ClearCollection.&To(FBindSource.Current);
+  dj.FromJSON(FSavedRevertPointState).OpType(ssSaveRevertPoint).byFields.TypeAnnotationsON.ClearCollection.&To(FBindSource.Current);
   FBindSource.GetActiveBindSourceAdapter.DetailAdaptersContainer.SetMasterObject(FBindSource.Current);
 end;
 
@@ -594,7 +594,7 @@ end;
 function TioBSPersistence.GetCurrentAsString: String;
 begin
   if FBindSource.Current <> nil then
-    Result := dj.From(FBindSource.Current).byFields.TypeAnnotationsON.ToJson
+    Result := dj.From(FBindSource.Current).OpType(ssSaveRevertPoint).byFields.TypeAnnotationsON.ToJson
   else
     Result := '';
 end;

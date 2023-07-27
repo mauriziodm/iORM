@@ -43,7 +43,7 @@ uses
   iORM.StdActions.Interfaces, iORM.Context.Container,
   iORM.Context.Properties.Interfaces, iORM.Where.SmartBuilder,
   iORM.Interceptor.Strategy.Register, iORM.Interceptor.CRUD.Register,
-  iORM.ETM.Engine;
+  iORM.ETM.Engine, DJSON.Params;
 
 const
   IORM_VERSION = 'iORM 2 (beta 2.3)';
@@ -155,6 +155,15 @@ const
   ctLastUpdatedWin = iORM.CommonTypes.ctLastUpdatedWin;
   ctManual = iORM.CommonTypes.ctManual;
 
+  // TdjSkipScope = (ssMap, ssETM, ssHTTP, ssEmbeddeRelation, ssSUD, ssSaveRevertPoint, ssDJSON);
+  ssMap = DJSON.Params.TdjSkipScope.ssMap;
+  ssETM = DJSON.Params.TdjSkipScope.ssETM;
+  ssHTTP = DJSON.Params.TdjSkipScope.ssHTTP;
+  ssEmbeddeRelation = DJSON.Params.TdjSkipScope.ssEmbeddeRelation;
+  ssSUD = DJSON.Params.TdjSkipScope.ssSUD;
+  ssSaveRevertPoint = DJSON.Params.TdjSkipScope.ssSaveRevertPoint;
+  ssDJSON = DJSON.Params.TdjSkipScope.ssDJSON;
+
 {$ENDREGION}
 
 type
@@ -197,6 +206,10 @@ type
   TioEtmCustomRepository = iORM.Attributes.TioEtmCustomRepository;
   TioEtmEventType = iORM.CommonTypes.TioEtmEventType;
   TioEtmConflictType = iORM.CommonTypes.TioEtmConflictType;
+
+  // SkipScope (vedi anche sopra (const) i valori)
+  TioSkipScope = DJSON.Params.TdjSkipScope;
+  TioSkipScopeSet = DJSON.Params.TdjSkipScopeSet;
 
 {$ENDREGION}
   // Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM

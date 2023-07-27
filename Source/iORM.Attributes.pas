@@ -36,7 +36,7 @@ unit iORM.Attributes;
 interface
 
 uses
-  System.Rtti, iORM.CommonTypes, System.Classes;
+  System.Rtti, iORM.CommonTypes, System.Classes, DJSON.Attributes;
 
 
 {$REGION '===== TYPES & CONSTANTS ====='}
@@ -143,7 +143,7 @@ type
 {$REGION '===== PROPERTY ATTRIBUTES ====='}
 
   // Skip the property when mapping the class
-  ioSkip = class(TioCustomAttribute)
+  ioSkip = class(DJSON.Attributes.djSkipAttribute)
   end;
 
   // ID attribute

@@ -44,11 +44,11 @@ type
   // djSkip
   djSkipAttribute = class(TCustomAttribute)
   strict private
-    FScopes: TioSkipScopeSet;
+    FScopes: TdjSkipScopeSet;
   public
     constructor Create; overload;
-    constructor Create(const AScopes: TioSkipScopeSet); overload;
-    property Scopes: TioSkipScopeSet read FScopes;
+    constructor Create(const AScopes: TdjSkipScopeSet); overload;
+    property Scopes: TdjSkipScopeSet read FScopes;
   end;
 
   // djName
@@ -235,10 +235,10 @@ end;
 
 constructor djSkipAttribute.Create;
 begin
-  FScopes := [ooMap, ooETM, ooHTTP, ooEmbeddeRelation, ooSUD, ooSaveRevertPoint, ooDJSON];
+  FScopes := [ssMap, ssETM, ssHTTP, ssEmbeddeRelation, ssSUD, ssSaveRevertPoint, ssDJSON];
 end;
 
-constructor djSkipAttribute.Create(const AScopes: TioSkipScopeSet);
+constructor djSkipAttribute.Create(const AScopes: TdjSkipScopeSet);
 begin
   FScopes := AScopes;
 end;

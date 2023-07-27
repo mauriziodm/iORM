@@ -259,7 +259,7 @@ begin
     LConnection.RequestBody.Where := AWhere;
     LConnection.Execute('LoadList');
     // Deserialize  the JSONDataValue to the result object
-    dj.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearCollection.TypeAnnotationsON.&To(AList);
+    dj.FromJSON(LConnection.ResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(AList);
     // Commit
     LConnection.Commit;
   except
@@ -288,9 +288,9 @@ begin
     LConnection.Execute('LoadObject');
     // Deserialize  the JSONDataValue to the result object
     if Assigned(AObj) then
-      dj.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearCollection.TypeAnnotationsON.&To(Result)
+      dj.FromJSON(LConnection.ResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(Result)
     else
-      Result := dj.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearCollection.TypeAnnotationsON.ToObject;
+      Result := dj.FromJSON(LConnection.ResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.ToObject;
     // Commit
     LConnection.Commit;
   except
@@ -341,7 +341,7 @@ begin
     LConnection.Execute('PersistCollection');
     // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
     if not ABlindInsert then
-      dj.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearCollection.TypeAnnotationsON.&To(AList);
+      dj.FromJSON(LConnection.ResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(AList);
     // Commit
     LConnection.Commit;
   except
@@ -379,7 +379,7 @@ begin
     LConnection.Execute('PersistObject');
     // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
     if not ABlindInsert then
-      dj.FromJSON(LConnection.ResponseBody.JSONDataValue).byFields.ClearCollection.TypeAnnotationsON.&To(AObj);
+      dj.FromJSON(LConnection.ResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(AObj);
     // Commit
     LConnection.Commit;
   except

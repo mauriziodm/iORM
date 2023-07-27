@@ -36,7 +36,7 @@ unit iORM.CommonTypes;
 interface
 
 uses
-  System.Rtti, System.Generics.Collections, System.SysUtils;
+  System.Rtti, System.Generics.Collections, System.SysUtils, DJSON.Params;
 
 const
   // M.M. 11/08/18 Default length to 50 if no attribute is specified because Firebird has a length limit on index generation for columns of length 255.
@@ -58,7 +58,20 @@ const
 
   IO_USERNAME_LENGTH = 30;
 
+  // TdjSkipScope = (ssMap, ssETM, ssHTTP, ssEmbeddeRelation, ssSUD, ssSaveRevertPoint, ssDJSON);
+  ssMap = DJSON.Params.TdjSkipScope.ssMap;
+  ssETM = DJSON.Params.TdjSkipScope.ssETM;
+  ssHTTP = DJSON.Params.TdjSkipScope.ssHTTP;
+  ssEmbeddeRelation = DJSON.Params.TdjSkipScope.ssEmbeddeRelation;
+  ssSUD = DJSON.Params.TdjSkipScope.ssSUD;
+  ssSaveRevertPoint = DJSON.Params.TdjSkipScope.ssSaveRevertPoint;
+  ssDJSON = DJSON.Params.TdjSkipScope.ssDJSON;
+
 type
+
+  // SkipScope (vedi anche sopra (const) i valori)
+  TioSkipScope = DJSON.Params.TdjSkipScope;
+  TioSkipScopeSet = DJSON.Params.TdjSkipScopeSet;
 
   TCloseQueryEvent = procedure(Sender: TObject; var CanClose: Boolean) of object;
 
