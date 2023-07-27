@@ -37,12 +37,18 @@ unit DJSON.Attributes;
 interface
 
 uses
-  System.TypInfo, DJSON.Serializers, System.Rtti;
+  System.TypInfo, DJSON.Serializers, System.Rtti, DJSON.Params;
 
 type
 
   // djSkip
   djSkipAttribute = class(TCustomAttribute)
+  strict private
+    FScopes: TioSkipScopeSet;
+  public
+    constructor Create; overload;
+    constructor Create(const AScopes: TioSkipScopeSet); overload;
+    property Scopes: TioSkipScopeSet read FScopes;
   end;
 
   // djName
@@ -223,6 +229,18 @@ end;
 constructor djSerializerAttribute<T>.Create(const ASerializer: T);
 begin
   FSerializer := ASerializer;
+end;
+
+{ djSkipAttribute }
+
+constructor djSkipAttribute.Create;
+begin
+  FScopes := [ooMap, ooETM, ooHTTP, ooEmbeddeRelation, ooSUD, ooSaveRevertPoint, ooDJSON];
+end;
+
+constructor djSkipAttribute.Create(const AScopes: TioSkipScopeSet);
+begin
+  FScopes := AScopes;
 end;
 
 end.

@@ -51,6 +51,12 @@ type
 
   TdjSerializationType = (stProperties, stFields);
 
+  // Note: ooMap = Entity mapping (ORM only, not used by DJSON serilization)
+  // Note: ooETM = Entity Time Machine operation
+  // Note: ooSUD = Smart Update Detection operation
+  TioSkipScope = (ooMap, ooETM, ooHTTP, ooEmbeddeRelation, ooSUD, ooSaveRevertPoint, ooDJSON);
+  TioSkipScopeSet = set of TioSkipScope;
+
   TdjIgnoredProperties = array of string;
 
   TdjSerializersContainer = class;
@@ -76,6 +82,11 @@ type
     procedure SetEngine(const AValue: TdjEngine);
     function GetEngine: TdjEngine;
     property Engine: TdjEngine read GetEngine write SetEngine;
+    // OperationType
+    function IsToSkip(const APropField: System.Rtti.TRttiNamedObject): Boolean;
+    procedure SetOperationType(const AValue: TioSkipScope);
+    function GetOperationType: TioSkipScope;
+    property OperationType: TioSkipScope read GetOperationType write SetOperationType;
     // SerializationMode
     procedure SetSerializationMode(const AValue: TdjSerializationMode);
     function GetSerializationMode: TdjSerializationMode;
@@ -210,6 +221,7 @@ type
 
   TdjParams = class(TInterfacedObject, IdjParams)
   strict private
+    FOperationType: TioSkipScope;
     FEngineClass: TdjEngineRef;
     FEngineType: TdjEngine;
     FSerializationMode: TdjSerializationMode;
@@ -238,6 +250,10 @@ type
     // EngineType
     procedure SetEngine(const AValue: TdjEngine);
     function GetEngine: TdjEngine;
+    // OperationType (Skip)
+    function IsToSkip(const APropField: System.Rtti.TRttiNamedObject): Boolean;
+    procedure SetOperationType(const AValue: TioSkipScope);
+    function GetOperationType: TioSkipScope;
     // SerializationMode
     procedure SetSerializationMode(const AValue: TdjSerializationMode);
     function GetSerializationMode: TdjSerializationMode;
@@ -397,16 +413,17 @@ type
 implementation
 
 uses
-  DJSON.Utils.RTTI, DJSON.Factory;
+  DJSON.Utils.RTTI, DJSON.Factory, DJSON.Attributes;
 
 { TdjParams }
 
 constructor TdjParams.Create;
 begin
   inherited;
-  // Set the default engine
+  // Set the default engine & operation type
 //  SetEngine(TdjEngine.eDelphiDOM);
   SetEngine(TdjEngine.eDelphiStream);
+  FOperationType := ooDJSON;
 
   FTypeInfoCache := TdjTypeInfoCache.Create;
   FSerializers := TdjSerializersContainer.Create;
@@ -487,6 +504,19 @@ end;
 function TdjParams.GetTypeAnnotations: Boolean;
 begin
   Result := FTypeAnnotations;
+end;
+
+function TdjParams.IsToSkip(const APropField: System.Rtti.TRttiNamedObject): Boolean;
+var
+  LAttr: TCustomAttribute;
+begin
+  // NB: NON TOGLIERE I BEGIN..END (HA UN COMPORTAMENTO STRANO)
+  // NB: LASCIARE "(LAttr as djSkipAttribute)" NON USARE HARD CAST (DA PROBLEMI)
+  for LAttr in APropField.GetAttributes do
+  begin
+    if LAttr is djSkipAttribute then
+      Result := FOperationType in (LAttr as djSkipAttribute).Scopes;
+  end;
 end;
 
 function TdjParams.PropInfoCache: TdjPropInfoCache;
@@ -582,6 +612,11 @@ end;
 function TdjParams.GetNameCase: TdjNameCase;
 begin
   Result := FNameCase;
+end;
+
+function TdjParams.GetOperationType: TioSkipScope;
+begin
+  Result := FOperationType;
 end;
 
 function TdjParams.GetOwnJSONValue: Boolean;
@@ -762,6 +797,11 @@ end;
 procedure TdjParams.SetNameCase(const AValue: TdjNameCase);
 begin
   FNameCase := AValue;
+end;
+
+procedure TdjParams.SetOperationType(const AValue: TioSkipScope);
+begin
+  FOperationType := AValue;
 end;
 
 procedure TdjParams.SetOwnJSONValue(const AValue: Boolean);

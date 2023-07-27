@@ -203,7 +203,6 @@ type
 {$REGION 'Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
   // Property attributes
   ioSkip = iORM.Attributes.ioSkip;
-  ioTransient = iORM.Attributes.ioTransient;
   ioID = iORM.Attributes.ioID;
   ioOID = iORM.Attributes.ioOID;
   ioField = iORM.Attributes.ioField;

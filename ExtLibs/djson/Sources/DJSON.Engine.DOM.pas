@@ -870,7 +870,7 @@ begin
     begin
       // Check to continue or not
       if (not TdjDuckPropField.IsWritable(LPropField) and (TdjDuckPropField.RttiType(LPropField).TypeKind <> tkClass) and
-        (TdjDuckPropField.RttiType(LPropField).TypeKind <> tkInterface)) or (TdjRTTI.HasAttribute<djSkipAttribute>(LPropField)) or
+        (TdjDuckPropField.RttiType(LPropField).TypeKind <> tkInterface)) or (AParams.IsToSkip(LPropField)) or
         (LPropField.Name = 'FRefCount') or (LPropField.Name = 'RefCount') or TdjUtils.IsPropertyToBeIgnored(LPropField, AParams) then
         Continue;
       // Get the JSONPair KeyName
@@ -1243,7 +1243,7 @@ begin
       // f := LowerCase(_property.Name);
       LKeyName := TdjUtils.GetKeyName(LPropField, AParams);
       // Check for "DoNotSerializeAttribute" or property to ignore
-      if TdjRTTI.HasAttribute<djSkipAttribute>(LPropField) or TdjUtils.IsPropertyToBeIgnored(LPropField, AParams) then
+      if (AParams.IsToSkip(LPropField)) or TdjUtils.IsPropertyToBeIgnored(LPropField, AParams) then
         Continue;
       // Serialize the currente member and add it to the JSONBox
       LValue := TdjDuckPropField.GetValue(AObject, LPropField);

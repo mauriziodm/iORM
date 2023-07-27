@@ -698,7 +698,7 @@ begin
     or (LPropField.Name = 'FRefCount')
     or (LPropField.Name = 'RefCount')
     or (not TdjDuckPropField.IsWritable(LPropField) and (TdjDuckPropField.RttiType(LPropField).TypeKind <> tkClass) and (TdjDuckPropField.RttiType(LPropField).TypeKind <> tkInterface))
-    or (TdjRTTI.HasAttribute<djSkipAttribute>(LPropField))
+    or (AParams.IsToSkip(LPropField))
     or TdjUtils.IsPropertyToBeIgnored(LPropField, AParams)
     then
       Continue;
@@ -1307,7 +1307,7 @@ begin
     // Check for "DoNotSerializeAttribute" or property to ignore
     if (LPropField.Name = 'FRefCount')
     or (LPropField.Name = 'RefCount')
-    or TdjRTTI.HasAttribute<djSkipAttribute>(LPropField)
+    or (AParams.IsToSkip(LPropField))
     or TdjUtils.IsPropertyToBeIgnored(LPropField, AParams)
     then
       Continue;

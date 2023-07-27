@@ -44,7 +44,6 @@ uses
 
 type
   TdjDOMCustomSerializerRef = class of TdjDOMCustomSerializer;
-
   TdjDOMCustomSerializer = class abstract
   public
     class function Serialize(const AValue: TValue): TJSONValue; virtual;
@@ -53,21 +52,12 @@ type
   end;
 
   TdjStreamCustomSerializerRef = class of TdjStreamCustomSerializer;
-
   TdjStreamCustomSerializer = class abstract
   public
     class procedure Serialize(const AJSONWriter: TJSONWriter; const AValue: TValue); virtual;
     class function Deserialize(const AJSONReader: TJSONReader; const AExistingValue: TValue): TValue; virtual;
     class function isTypeNotificationCompatible: Boolean; virtual;
   end;
-
-//  TdjXMLCustomSerializerRef = class of TdjXMLCustomSerializer;
-//  TdjXMLCustomSerializer = class abstract
-//  public
-//    class function Serialize(const AXMLNode:IXMLDOMNode; const AValue:TValue): TJSONValue; virtual;
-//    class function Deserialize(const AXMLNode:IXMLDOMNode; const AExistingValue:TValue): TValue; virtual;
-//    class function isTypeNotificationCompatible: Boolean; virtual;
-//  end;
 
 implementation
 

@@ -145,7 +145,6 @@ type
   // Skip the property when mapping the class
   ioSkip = class(TioCustomAttribute)
   end;
-  ioTransient = ioSkip;
 
   // ID attribute
   ioID = class(TioCustomAttribute)
@@ -585,8 +584,6 @@ constructor TioCustomStringAttribute.Create(const AValue: String);
 begin
   FValue := AValue;
 end;
-
-{ ioSkip }
 
 { TCustomRelationAttribute }
 
