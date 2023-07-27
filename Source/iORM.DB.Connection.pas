@@ -68,9 +68,9 @@ type
   public
     constructor Create(const AConnectionInfo:TioConnectionInfo);
     function IsDBConnection: Boolean;
-    function IsRemoteConnection: Boolean;
+    function IsHttpConnection: Boolean;
     function AsDBConnection: IioConnectionDB; virtual;
-    function AsRemoteConnection: IioConnectionRemote; virtual;
+    function AsHttpConnection: IioConnectionHttp; virtual;
     function GetConnectionInfo: TioConnectionInfo;
     function InTransaction: Boolean; virtual; abstract;
     procedure StartTransaction;
@@ -114,10 +114,10 @@ begin
     raise EioException.Create(Self.ClassName + '.AsDBConnection: Operation not allowed by this connection type.');
 end;
 
-function TioConnectionBase.AsRemoteConnection: IioConnectionRemote;
+function TioConnectionBase.AsHttpConnection: IioConnectionHttp;
 begin
-  if not Self.IsRemoteConnection then
-    raise EioException.Create(Self.ClassName + '.AsRemoteConnection: Operation not allowed by this connection type.');
+  if not Self.IsHttpConnection then
+    raise EioException.Create(Self.ClassName + '.AsHttpConnection: Operation not allowed by this connection type.');
 end;
 
 procedure TioConnectionBase.Commit;
@@ -145,12 +145,12 @@ end;
 
 function TioConnectionBase.IsDBConnection: Boolean;
 begin
-  Result := (FConnectionInfo.ConnectionType <> TioConnectionType.cdtRemote);
+  Result := (FConnectionInfo.ConnectionType <> TioConnectionType.ctHTML);
 end;
 
-function TioConnectionBase.IsRemoteConnection: Boolean;
+function TioConnectionBase.IsHttpConnection: Boolean;
 begin
-  Result := (FConnectionInfo.ConnectionType = TioConnectionType.cdtRemote);
+  Result := (FConnectionInfo.ConnectionType = TioConnectionType.ctHTML);
 end;
 
 procedure TioConnectionBase.Rollback;
@@ -266,7 +266,7 @@ begin
   try
     // NB: SQLite ritorna i current_timestamp come una stringa che poi va convertita in
     //      TDateTime, invece per gli altri DB non c'è bisogno di questa conversione.
-    if GetConnectionInfo.ConnectionType = TioConnectionType.cdtSQLite then
+    if GetConnectionInfo.ConnectionType = TioConnectionType.ctSQLite then
       Result := SQLiteDateTimeToDateTime(LQuery.Fields[0].AsString)
     else
       Result := LQuery.Fields[0].AsDateTime;

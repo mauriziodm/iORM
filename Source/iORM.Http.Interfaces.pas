@@ -31,12 +31,12 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.Remote.Interfaces;
+unit iORM.Http.Interfaces;
 
 interface
 
   // All the interfaces declared here are moved on iORM.DB.Interfacex to avoi
-  //  a circular reference error (IioRemoteRequestBody, IioRemoteResponseBody)
+  //  a circular reference error (IioHttpRequestBody, IioHttpResponseBody)
 
 implementation
 

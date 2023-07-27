@@ -80,7 +80,7 @@ uses
 {$IFNDEF ioDelphiProfessional}
   iORM.DB.MSSqlServer.SqlGenerator, iORM.DB.MSSqlServer.SqlDataConverter,
 {$ENDIF}
-  iORM.DB.SQL.Destination, FireDAC.Stan.Intf, iORM.Remote.Connection, iORM.DB.Script, iORM.DB.Query.FireDAC;
+  iORM.DB.SQL.Destination, FireDAC.Stan.Intf, iORM.Http.Connection, iORM.DB.Script, iORM.DB.Query.FireDAC;
 
 { TioDbBuilder }
 
@@ -157,16 +157,16 @@ var
     // Create the ioConnection and his QueryContainer and return it
     Result := TioConnectionDB.Create(LConnection, Self.QueryContainer, TioConnectionManager.GetConnectionInfo(AConnectionName));
   end;
-  function NewConnectionRemote: IioConnectionRemote;
+  function NewConnectionHttp: IioConnectionHttp;
   begin
-    Result := TioConnectionRemote.Create(LConnectionInfo);
+    Result := TioConnectionHttp.Create(LConnectionInfo);
   end;
 
 begin
   // Get connection info
   LConnectionInfo := TioConnectionManager.GetConnectionInfo(AConnectionName);
-  if LConnectionInfo.ConnectionType = TioConnectionType.cdtRemote then
-    Result := NewConnectionRemote
+  if LConnectionInfo.ConnectionType = TioConnectionType.ctHTML then
+    Result := NewConnectionHttp
   else
     Result := NewConnectionDB;
 end;
@@ -216,12 +216,12 @@ end;
 class function TioDbFactory.SqlDataConverter(const AConnectionName: String): TioSqlDataConverterRef;
 begin
   case TioConnectionManager.GetConnectionInfo(AConnectionName).ConnectionType of
-    cdtFirebird:
+    ctFirebird:
       Result := TioSqlDataConverterFirebird;
-    cdtSQLite:
+    ctSQLite:
       Result := TioSqlDataConverterSqLite;
 {$IFNDEF ioDelphiProfessional}
-    cdtSQLServer:
+    ctSQLServer:
       Result := TioSqlDataConverterMSSqlServer;
 {$ENDIF}
   else
@@ -242,12 +242,12 @@ end;
 class function TioDbFactory.SqlGenerator(const AConnectionName: String): TioSqlGeneratorRef;
 begin
   case TioConnectionManager.GetConnectionInfo(AConnectionName).ConnectionType of
-    cdtFirebird:
+    ctFirebird:
       Result := TioSqlGeneratorFirebird;
-    cdtSQLite:
+    ctSQLite:
       Result := TioSqlGeneratorSqLite;
 {$IFNDEF ioDelphiProfessional}
-    cdtSQLServer:
+    ctSQLServer:
       Result := TioSqlGeneratorMSSqlServer;
 {$ENDIF}
   else

@@ -28,8 +28,8 @@ begin
   RegisterComponents('iORM - Abstraction layer', [TioUniGUI]);
 
   // Connection components
-  RegisterComponents('iORM - Connections', [TioRemoteConnectionDef]);
-  RegisterSelectionEditor(TioRemoteConnectionDef, TioConnectionDefSelectionEditor);
+  RegisterComponents('iORM - Connections', [TioHttpConnectionDef]);
+  RegisterSelectionEditor(TioHttpConnectionDef, TioConnectionDefSelectionEditor);
   RegisterComponents('iORM - Connections', [TioSQLiteConnectionDef]);
   RegisterSelectionEditor(TioSQLiteConnectionDef, TioConnectionDefSelectionEditor);
   RegisterComponents('iORM - Connections', [TioFirebirdConnectionDef]);

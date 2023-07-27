@@ -72,7 +72,7 @@ var
   LTable: IioDBBuilderSchemaTable;
 begin
   // Only for SQLite connection
-  if TioConnectionManager.GetConnectionInfo(FSchema.ConnectionDefName).ConnectionType <> cdtSQLite then
+  if TioConnectionManager.GetConnectionInfo(FSchema.ConnectionDefName).ConnectionType <> ctSQLite then
     Exit;
   // If even one table is to be altered then all of them are to be altered
   //  (even those that have not actually changed). Instead those that are new

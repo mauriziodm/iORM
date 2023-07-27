@@ -31,7 +31,7 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.Remote.Factory;
+unit iORM.Http.Factory;
 
 interface
 
@@ -40,41 +40,41 @@ uses
 
 type
 
-  TioRemoteFactory = class
+  TioHttpFactory = class
   public
-    class function NewRequestBody(const AOwnDataObject:Boolean=True): IioRemoteRequestBody; overload;
-    class function NewRequestBody(const AJSONString:String; const AOwnDataObject:Boolean=True): IioRemoteRequestBody; overload;
-    class function NewResponseBody(const AOwnDataObject:Boolean=True): IioRemoteResponseBody; overload;
-    class function NewResponseBody(const AJSONString:String; const AOwnDataObject:Boolean=True): IioRemoteResponseBody; overload;
+    class function NewRequestBody(const AOwnDataObject:Boolean=True): IioHttpRequestBody; overload;
+    class function NewRequestBody(const AJSONString:String; const AOwnDataObject:Boolean=True): IioHttpRequestBody; overload;
+    class function NewResponseBody(const AOwnDataObject:Boolean=True): IioHttpResponseBody; overload;
+    class function NewResponseBody(const AJSONString:String; const AOwnDataObject:Boolean=True): IioHttpResponseBody; overload;
   end;
 
 implementation
 
 uses
-  iORM.Remote.Body.Request, iORM.Remote.Body.Response;
+  iORM.Http.Body.Request, iORM.Http.Body.Response;
 
-{ TioRemoteFactory }
+{ TioHttpFactory }
 
-class function TioRemoteFactory.NewRequestBody(const AOwnDataObject:Boolean): IioRemoteRequestBody;
+class function TioHttpFactory.NewRequestBody(const AOwnDataObject:Boolean): IioHttpRequestBody;
 begin
-  Result := TioRemoteRequestBody.Create(AOwnDataObject);
+  Result := TioHttpRequestBody.Create(AOwnDataObject);
 end;
 
-class function TioRemoteFactory.NewRequestBody(
-  const AJSONString: String; const AOwnDataObject:Boolean): IioRemoteRequestBody;
+class function TioHttpFactory.NewRequestBody(
+  const AJSONString: String; const AOwnDataObject:Boolean): IioHttpRequestBody;
 begin
-  Result := TioRemoteRequestBody.Create(AJSONString, AOwnDataObject);
+  Result := TioHttpRequestBody.Create(AJSONString, AOwnDataObject);
 end;
 
-class function TioRemoteFactory.NewResponseBody(const AOwnDataObject:Boolean): IioRemoteResponseBody;
+class function TioHttpFactory.NewResponseBody(const AOwnDataObject:Boolean): IioHttpResponseBody;
 begin
-  Result := TioRemoteResponseBody.Create(AOwnDataObject);
+  Result := TioHttpResponseBody.Create(AOwnDataObject);
 end;
 
-class function TioRemoteFactory.NewResponseBody(
-  const AJSONString: String; const AOwnDataObject:Boolean): IioRemoteResponseBody;
+class function TioHttpFactory.NewResponseBody(
+  const AJSONString: String; const AOwnDataObject:Boolean): IioHttpResponseBody;
 begin
-  Result := TioRemoteResponseBody.Create(AJSONString, AOwnDataObject);
+  Result := TioHttpResponseBody.Create(AJSONString, AOwnDataObject);
 end;
 
 end.

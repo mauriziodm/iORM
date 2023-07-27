@@ -31,17 +31,17 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.Remote.Body.Request;
+unit iORM.Http.Body.Request;
 
 interface
 
 uses
-  iORM.Where.Interfaces, System.JSON, iORM.CommonTypes, iORM.Remote.Interfaces,
+  iORM.Where.Interfaces, System.JSON, iORM.CommonTypes, iORM.Http.Interfaces,
   iORM.DB.Interfaces;
 
 type
 
-  TioRemoteRequestBody = class(TInterfacedObject, IioRemoteRequestBody)
+  TioHttpRequestBody = class(TInterfacedObject, IioHttpRequestBody)
   private
     FWhere: IioWhere;
     FSQLDestination: IioSQLDestination;
@@ -76,16 +76,16 @@ implementation
 uses
   System.SysUtils, iORM, DJSON;
 
-{ TioRemoteRequestBody }
+{ TioHttpRequestBody }
 
-constructor TioRemoteRequestBody.Create(const AOwnDataObject:Boolean);
+constructor TioHttpRequestBody.Create(const AOwnDataObject:Boolean);
 begin
   inherited Create;
   Self.Clear;
   FOwnDataObject := AOwnDataObject;
 end;
 
-constructor TioRemoteRequestBody.Create(const AJSONObject: TJSONObject; const AOwnDataObject:Boolean);
+constructor TioHttpRequestBody.Create(const AJSONObject: TJSONObject; const AOwnDataObject:Boolean);
 var
   LJSONValue: TJSONValue;
 begin
@@ -122,14 +122,14 @@ begin
     FDataObject := dj.FromJSON(LJSONValue).byFields.TypeAnnotationsON.ToObject;
 end;
 
-procedure TioRemoteRequestBody.Clear;
+procedure TioHttpRequestBody.Clear;
 begin
   FWhere := nil;
   FSQLDestination := nil;
   FDataObject := nil;
 end;
 
-constructor TioRemoteRequestBody.Create(const AJSONString: String; const AOwnDataObject:Boolean);
+constructor TioHttpRequestBody.Create(const AJSONString: String; const AOwnDataObject:Boolean);
 var
   LJSONObject: TJSONObject;
 begin
@@ -141,7 +141,7 @@ begin
   end;
 end;
 
-destructor TioRemoteRequestBody.Destroy;
+destructor TioHttpRequestBody.Destroy;
 begin
   // Clean up
   if FOwnDataObject and Assigned(FDataObject) then
@@ -149,67 +149,67 @@ begin
   inherited;
 end;
 
-function TioRemoteRequestBody.GetBlindInsert: Boolean;
+function TioHttpRequestBody.GetBlindInsert: Boolean;
 begin
   Result := FBlindInsert.Value;
 end;
 
-function TioRemoteRequestBody.GetDataObject: TObject;
+function TioHttpRequestBody.GetDataObject: TObject;
 begin
   Result := FDataObject;
 end;
 
-function TioRemoteRequestBody.GetRelationOID: Integer;
+function TioHttpRequestBody.GetRelationOID: Integer;
 begin
   Result := FRelationOID.Value;
 end;
 
-function TioRemoteRequestBody.GetRelationPropertyName: String;
+function TioHttpRequestBody.GetRelationPropertyName: String;
 begin
   Result := FRelationPropertyName.Value;
 end;
 
-function TioRemoteRequestBody.GetSQLDestination: IioSQLDestination;
+function TioHttpRequestBody.GetSQLDestination: IioSQLDestination;
 begin
   Result := FSQLDestination;
 end;
 
-function TioRemoteRequestBody.GetWhere: IioWhere;
+function TioHttpRequestBody.GetWhere: IioWhere;
 begin
   Result := FWhere;
 end;
 
-procedure TioRemoteRequestBody.SetBlindInsert(const Value: Boolean);
+procedure TioHttpRequestBody.SetBlindInsert(const Value: Boolean);
 begin
   FBlindInsert.Value := Value;
 end;
 
-procedure TioRemoteRequestBody.SetDataObject(const Value: TObject);
+procedure TioHttpRequestBody.SetDataObject(const Value: TObject);
 begin
   FDataObject := Value;
 end;
 
-procedure TioRemoteRequestBody.SetRelationOID(const Value: Integer);
+procedure TioHttpRequestBody.SetRelationOID(const Value: Integer);
 begin
   FRelationOID.Value := Value;
 end;
 
-procedure TioRemoteRequestBody.SetRelationPropertyName(const Value: String);
+procedure TioHttpRequestBody.SetRelationPropertyName(const Value: String);
 begin
   FRelationPropertyName.Value := Value;
 end;
 
-procedure TioRemoteRequestBody.SetSQLDestination(const Value: IioSQLDestination);
+procedure TioHttpRequestBody.SetSQLDestination(const Value: IioSQLDestination);
 begin
   FSQLDestination := Value;
 end;
 
-procedure TioRemoteRequestBody.SetWhere(const Value: IioWhere);
+procedure TioHttpRequestBody.SetWhere(const Value: IioWhere);
 begin
   FWhere := Value;
 end;
 
-function TioRemoteRequestBody.ToJSONObject: TJSONObject;
+function TioHttpRequestBody.ToJSONObject: TJSONObject;
 var
   LJSONValue: TJSONValue;
 begin

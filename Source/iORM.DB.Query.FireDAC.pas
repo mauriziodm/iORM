@@ -372,7 +372,7 @@ var
 begin
   LProp := AContext.GetProperties.ObjCreatedProperty;
   // NB: SQLite NON supporta nativamente i TDateTime quindi li salvo come numeri reali
-  if FSqlConnection.GetConnectionInfo.ConnectionType = TioConnectionType.cdtSQLite then
+  if FSqlConnection.GetConnectionInfo.ConnectionType = TioConnectionType.ctSQLite then
     ParamByProp_SetValueAsFloat(LProp, Connection.LastTransactionTimestamp)
   else
     ParamByProp_SetValueAsDateTime(LProp, Connection.LastTransactionTimestamp);
@@ -404,7 +404,7 @@ var
 begin
   LProp := AContext.GetProperties.ObjUpdatedProperty;
   // NB: SQLite NON supporta nativamente i TDateTime quindi li salvo come numeri reali
-  if FSqlConnection.GetConnectionInfo.ConnectionType = TioConnectionType.cdtSQLite then
+  if FSqlConnection.GetConnectionInfo.ConnectionType = TioConnectionType.ctSQLite then
     ParamByProp_SetValueAsFloat(LProp, Connection.LastTransactionTimestamp)
   else
     ParamByProp_SetValueAsDateTime(LProp, Connection.LastTransactionTimestamp);

@@ -31,23 +31,23 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.Remote.Connection;
+unit iORM.Http.Connection;
 
 interface
 
 uses
-  iORM.DB.Connection, iORM.DB.Interfaces, REST.Client, iORM.Remote.Interfaces;
+  iORM.DB.Connection, iORM.DB.Interfaces, REST.Client, iORM.Http.Interfaces;
 
 type
 
-  // This is the specialized class for remote connections
-  TioConnectionRemote = class(TioConnectionBase, IioConnectionRemote)
+  // This is the specialized class for http connections
+  TioConnectionHttp = class(TioConnectionBase, IioConnectionHttp)
   strict private
     FRESTClient: TRESTClient;
     FRESTRequest: TRESTRequest;
     FRESTResponse: TRESTResponse;
-    FRemoteRequestBody: IioRemoteRequestBody;
-    FRemoteResponseBody: IioRemoteResponseBody;
+    FHttpRequestBody: IioHttpRequestBody;
+    FHttpResponseBody: IioHttpResponseBody;
     procedure Execute(const AResource:String);
   strict protected
     procedure DoStartTransaction; override;
@@ -56,28 +56,28 @@ type
   public
     constructor Create(const AConnectionInfo:TioConnectionInfo);
     destructor Destroy; override;
-    function AsRemoteConnection: IioConnectionRemote; override;
+    function AsHttpConnection: IioConnectionHttp; override;
     function InTransaction: Boolean; override;
     // ioRequestBody property
-    function GetRequestBody:IioRemoteRequestBody;
+    function GetRequestBody:IioHttpRequestBody;
     // ioResponseBody property
-    function GetResponseBody:IioRemoteResponseBody;
+    function GetResponseBody:IioHttpResponseBody;
   end;
 
 implementation
 
 uses
-  iORM.Remote.Factory, REST.Types, IPPeerClient, System.JSON;
+  iORM.Http.Factory, REST.Types, IPPeerClient, System.JSON;
 
-{ TioConnectionRemote }
+{ TioConnectionHttp }
 
-function TioConnectionRemote.AsRemoteConnection: IioConnectionRemote;
+function TioConnectionHttp.AsHttpConnection: IioConnectionHttp;
 begin
   inherited;
   Result := Self;
 end;
 
-constructor TioConnectionRemote.Create(const AConnectionInfo: TioConnectionInfo);
+constructor TioConnectionHttp.Create(const AConnectionInfo: TioConnectionInfo);
 begin
   inherited Create(AConnectionInfo);
   // Create the RESTClient
@@ -90,10 +90,10 @@ begin
   FRESTRequest.Method := TRESTRequestMethod.rmPUT;
   FRESTRequest.Response := FRESTResponse;
   // create request body (not the response body)
-  FRemoteRequestBody := TioRemoteFactory.NewRequestBody(False);
+  FHttpRequestBody := TioHttpFactory.NewRequestBody(False);
 end;
 
-destructor TioConnectionRemote.Destroy;
+destructor TioConnectionHttp.Destroy;
 begin
   FRESTResponse.Free;
   FRESTRequest.Free;
@@ -101,32 +101,32 @@ begin
   inherited;
 end;
 
-procedure TioConnectionRemote.DoCommitTransaction;
+procedure TioConnectionHttp.DoCommitTransaction;
 begin
   inherited;
   // Nothing
 end;
 
-procedure TioConnectionRemote.DoRollbackTransaction;
+procedure TioConnectionHttp.DoRollbackTransaction;
 begin
   inherited;
   // Nothing
 end;
 
-procedure TioConnectionRemote.DoStartTransaction;
+procedure TioConnectionHttp.DoStartTransaction;
 begin
   inherited;
   // Nothing
 end;
 
-procedure TioConnectionRemote.Execute(const AResource:String);
+procedure TioConnectionHttp.Execute(const AResource:String);
 var
   RequestBodyJSONObject: TJSONObject;
 begin
   // Set the requesta & execute it
   FRESTRequest.Resource := AResource;
   FRESTRequest.ClearBody;
-  RequestBodyJSONObject := FRemoteRequestBody.ToJSONObject;
+  RequestBodyJSONObject := FHttpRequestBody.ToJSONObject;
   try
     FRESTRequest.AddBody(RequestBodyJSONObject);
     FRESTRequest.Execute;
@@ -134,21 +134,21 @@ begin
     RequestBodyJSONObject.Free;
   end;
   // Create and set the ioRESTResponseBody
-  FRemoteResponseBody := TioRemoteFactory.NewResponseBody(FRESTResponse.Content, False);
+  FHttpResponseBody := TioHttpFactory.NewResponseBody(FRESTResponse.Content, False);
 end;
 
-function TioConnectionRemote.GetRequestBody: IioRemoteRequestBody;
+function TioConnectionHttp.GetRequestBody: IioHttpRequestBody;
 begin
-  Result := FRemoteRequestBody;
+  Result := FHttpRequestBody;
 end;
 
-function TioConnectionRemote.GetResponseBody: IioRemoteResponseBody;
+function TioConnectionHttp.GetResponseBody: IioHttpResponseBody;
 begin
-  Result := FRemoteResponseBody;
+  Result := FHttpResponseBody;
 end;
 
 
-function TioConnectionRemote.InTransaction: Boolean;
+function TioConnectionHttp.InTransaction: Boolean;
 begin
   inherited;
   Result := False;

@@ -129,12 +129,12 @@ end;
 class function TioDBBuilderFactory.NewSqlGenerator(const ASchema: IioDBBuilderSchema): IioDBBuilderSqlGenerator;
 begin
   case TioConnectionManager.GetConnectionInfo(ASchema.ConnectionDefName).ConnectionType of
-    cdtFirebird:
+    ctFirebird:
       Result := TioDBBuilderSqlGenFirebird.Create(ASchema);
-    cdtSQLite:
+    ctSQLite:
       Result := TioDBBuilderSqlGenSQLite.Create(ASchema);
 {$IFNDEF ioDelphiProfessional}
-    cdtSQLServer:
+    ctSQLServer:
       Result := TioDBBuilderSqlGenMSSqlServer.Create(ASchema);
 {$ENDIF}
   else
@@ -146,9 +146,9 @@ class function TioDBBuilderFactory.NewStrategy(const ASchema: IioDBBuilderSchema
   : IioDBBuilderStrategy;
 begin
   case TioConnectionManager.GetConnectionInfo(ASchema.ConnectionDefName).ConnectionType of
-    cdtFirebird {$IFNDEF ioDelphiProfessional}, cdtSQLServer {$ENDIF}:
+    ctFirebird {$IFNDEF ioDelphiProfessional}, ctSQLServer {$ENDIF}:
       Result := TioDBBuilderStrategyWithAlter.Create(ASchema, ASqlGenerator);
-    cdtSQLite:
+    ctSQLite:
       Result := TioDBBuilderStrategyWithoutAlter.Create(ASchema, ASqlGenerator);
   else
     raise EioException.Create(ClassName, 'NewStrategy', 'Connection type not found');

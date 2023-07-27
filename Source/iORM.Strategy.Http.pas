@@ -31,7 +31,7 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.Strategy.Remote;
+unit iORM.Strategy.Http;
 
 interface
 
@@ -42,7 +42,7 @@ uses
 type
 
   // Strategy class for database
-  TioStrategyRemote = class(TioStrategyIntf)
+  TioStrategyHttp = class(TioStrategyIntf)
   private
     // class var FTransactionGUID: String; NB: Hint prevention "symbol declared but never used"
     // class function NewGUIDAsString: String; NB: Hint prevention "symbol declared but never used" (codice presente sotto)
@@ -77,29 +77,29 @@ implementation
 uses
   System.JSON, iORM, System.Classes, iORM.Strategy.DB, iORM.DB.ConnectionContainer,
   iORM.DB.Factory, System.Generics.Collections, iORM.Utilities,
-  iORM.DuckTyped.Interfaces, iORM.Remote.Interfaces, iORM.Remote.Factory,
+  iORM.DuckTyped.Interfaces, iORM.Http.Interfaces, iORM.Http.Factory,
   iORM.Exceptions, System.SysUtils, FireDAC.Stan.Intf, FireDAC.Stan.StorageJSON,
   iORM.Context.Container, DJSON;
 
-{ TioStrategyRemote }
+{ TioStrategyHttp }
 
-class procedure TioStrategyRemote.CommitTransaction(const AConnectionName: String);
+class procedure TioStrategyHttp.CommitTransaction(const AConnectionName: String);
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).Commit;
 end;
 
-class function TioStrategyRemote.Count(const AWhere: IioWhere): Integer;
+class function TioStrategyHttp.Count(const AWhere: IioWhere): Integer;
 var
-  LConnection: IioConnectionRemote;
+  LConnection: IioConnectionHttp;
 begin
   inherited;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection('').AsRemoteConnection;
+  LConnection := TioDBFactory.Connection('').AsHttpConnection;
   // Start transaction
   // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any remote call to the server at this point.
+  // perform any http call to the server at this point.
   LConnection.StartTransaction;
   try
     LConnection.RequestBody.Clear;
@@ -117,17 +117,17 @@ begin
   end;
 end;
 
-class procedure TioStrategyRemote.Delete(const AWhere: IioWhere);
+class procedure TioStrategyHttp.Delete(const AWhere: IioWhere);
 var
-  LConnection: IioConnectionRemote;
+  LConnection: IioConnectionHttp;
 begin
   inherited;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection('').AsRemoteConnection;
+  LConnection := TioDBFactory.Connection('').AsHttpConnection;
   // Start transaction
   // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any remote call to the server at this point.
+  // perform any http call to the server at this point.
   LConnection.StartTransaction;
   try
     LConnection.RequestBody.Clear;
@@ -142,20 +142,20 @@ begin
   end;
 end;
 
-class procedure TioStrategyRemote._DoDeleteList(const AList: TObject);
+class procedure TioStrategyHttp._DoDeleteList(const AList: TObject);
 var
-  LConnection: IioConnectionRemote;
+  LConnection: IioConnectionHttp;
 begin
   inherited;
   // Check
   if not Assigned(AList) then
     Exit;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection('').AsRemoteConnection;
+  LConnection := TioDBFactory.Connection('').AsHttpConnection;
   // Start transaction
   // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any remote call to the server at this point.
+  // perform any http call to the server at this point.
   LConnection.StartTransaction;
   try
     LConnection.RequestBody.Clear;
@@ -170,10 +170,10 @@ begin
   end;
 end;
 
-class procedure TioStrategyRemote._DoDeleteObject(const AObj: TObject);
+class procedure TioStrategyHttp._DoDeleteObject(const AObj: TObject);
 var
   LConnectionDefName: String;
-  LConnection: IioConnectionRemote;
+  LConnection: IioConnectionHttp;
 begin
   inherited;
   // Check
@@ -181,11 +181,11 @@ begin
     Exit;
   // Get the connection, set the request and execute it
   LConnectionDefName := TioMapContainer.GetConnectionDefName(AObj.ClassName);
-  LConnection := TioDBFactory.Connection(LConnectionDefName).AsRemoteConnection;
+  LConnection := TioDBFactory.Connection(LConnectionDefName).AsHttpConnection;
   // Start transaction
   // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any remote call to the server at this point.
+  // perform any http call to the server at this point.
   LConnection.StartTransaction;
   try
     LConnection.RequestBody.Clear;
@@ -200,7 +200,7 @@ begin
   end;
 end;
 
-class function TioStrategyRemote.InTransaction(const AConnectionName: String): boolean;
+class function TioStrategyHttp.InTransaction(const AConnectionName: String): boolean;
 begin
   inherited;
   Result := TioDBFactory.Connection(AConnectionName).InTransaction;
@@ -215,17 +215,17 @@ end;
 // Result := System.Classes.TThread.CurrentThread.ThreadID.ToString + '-' + FTransactionGUID;
 // end;
 
-class procedure TioStrategyRemote.LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
+class procedure TioStrategyHttp.LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
 var
-  LConnection: IioConnectionRemote;
+  LConnection: IioConnectionHttp;
 begin
   inherited;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection('').AsRemoteConnection;
+  LConnection := TioDBFactory.Connection('').AsHttpConnection;
   // Start transaction
   // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any remote call to the server at this point.
+  // perform any http call to the server at this point.
   LConnection.StartTransaction;
   try
     LConnection.RequestBody.Clear;
@@ -242,17 +242,17 @@ begin
   end;
 end;
 
-class procedure TioStrategyRemote._DoLoadList(const AWhere: IioWhere; const AList: TObject);
+class procedure TioStrategyHttp._DoLoadList(const AWhere: IioWhere; const AList: TObject);
 var
-  LConnection: IioConnectionRemote;
+  LConnection: IioConnectionHttp;
 begin
   inherited;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection('').AsRemoteConnection;
+  LConnection := TioDBFactory.Connection('').AsHttpConnection;
   // Start transaction
   // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any remote call to the server at this point.
+  // perform any http call to the server at this point.
   LConnection.StartTransaction;
   try
     LConnection.RequestBody.Clear;
@@ -269,18 +269,18 @@ begin
   end;
 end;
 
-class function TioStrategyRemote._DoLoadObject(const AWhere: IioWhere; const AObj: TObject): TObject;
+class function TioStrategyHttp._DoLoadObject(const AWhere: IioWhere; const AObj: TObject): TObject;
 var
-  LConnection: IioConnectionRemote;
+  LConnection: IioConnectionHttp;
 begin
   inherited;
   Result := AObj;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection('').AsRemoteConnection;
+  LConnection := TioDBFactory.Connection('').AsHttpConnection;
   // Start transaction
   // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any remote call to the server at this point.
+  // perform any http call to the server at this point.
   LConnection.StartTransaction;
   try
     LConnection.RequestBody.Clear;
@@ -300,7 +300,7 @@ begin
   end;
 end;
 
-class function TioStrategyRemote.LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject;
+class function TioStrategyHttp.LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject;
 begin
   // This method is only used internally by the Object Maker,
   // and then you do not need to implement it in RESTStrategy.
@@ -316,21 +316,21 @@ end;
 // end;
 
 { TODO : DA AGGIUNGERE GESTIONE DEI 3 PARAMETRI AGGIUNTI ALLA FINE PER IL SUD }
-class procedure TioStrategyRemote._DoPersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
+class procedure TioStrategyHttp._DoPersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
   const ABlindInsert: boolean; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
-  LConnection: IioConnectionRemote;
+  LConnection: IioConnectionHttp;
 begin
   inherited;
   // Check
   if not Assigned(AList) then
     Exit;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection('').AsRemoteConnection;
+  LConnection := TioDBFactory.Connection('').AsHttpConnection;
   // Start transaction
   // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any remote call to the server at this point.
+  // perform any http call to the server at this point.
   LConnection.StartTransaction;
   try
     LConnection.RequestBody.Clear;
@@ -352,11 +352,11 @@ begin
 end;
 
 { TODO : DA AGGIUNGERE GESTIONE DEI 3 PARAMETRI AGGIUNTI ALLA FINE PER IL SUD }
-class procedure TioStrategyRemote._DoPersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
+class procedure TioStrategyHttp._DoPersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
   const ABlindInsert: boolean; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LConnectionDefName: String;
-  LConnection: IioConnectionRemote;
+  LConnection: IioConnectionHttp;
 begin
   inherited;
   // Check
@@ -364,11 +364,11 @@ begin
     Exit;
   // Get the connection, set the request and execute it
   LConnectionDefName := TioMapContainer.GetConnectionDefName(AObj.ClassName);
-  LConnection := TioDBFactory.Connection(LConnectionDefName).AsRemoteConnection;
+  LConnection := TioDBFactory.Connection(LConnectionDefName).AsHttpConnection;
   // Start transaction
   // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any remote call to the server at this point.
+  // perform any http call to the server at this point.
   LConnection.StartTransaction;
   try
     LConnection.RequestBody.Clear;
@@ -389,24 +389,24 @@ begin
   end;
 end;
 
-class procedure TioStrategyRemote.RollbackTransaction(const AConnectionName: String);
+class procedure TioStrategyHttp.RollbackTransaction(const AConnectionName: String);
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).Rollback;
 end;
 
-class procedure TioStrategyRemote.SQLDest_Execute(const ASQLDestination: IioSQLDestination);
+class procedure TioStrategyHttp.SQLDest_Execute(const ASQLDestination: IioSQLDestination);
 var
-  LConnection: IioConnectionRemote;
+  LConnection: IioConnectionHttp;
   LJSONValue: TJSONValue;
 begin
   inherited;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(ASQLDestination.GetConnectionDefName).AsRemoteConnection;
+  LConnection := TioDBFactory.Connection(ASQLDestination.GetConnectionDefName).AsHttpConnection;
   // Start transaction
   // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any remote call to the server at this point.
+  // perform any http call to the server at this point.
   LConnection.StartTransaction;
   try
     LConnection.RequestBody.Clear;
@@ -427,17 +427,17 @@ begin
   end;
 end;
 
-class procedure TioStrategyRemote.SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet);
+class procedure TioStrategyHttp.SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet);
 var
-  LConnection: IioConnectionRemote;
+  LConnection: IioConnectionHttp;
 begin
   inherited;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection('').AsRemoteConnection;
+  LConnection := TioDBFactory.Connection('').AsHttpConnection;
   // Start transaction
   // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any remote call to the server at this point.
+  // perform any http call to the server at this point.
   LConnection.StartTransaction;
   try
     LConnection.RequestBody.Clear;
@@ -454,7 +454,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyRemote.StartTransaction(const AConnectionName: String);
+class procedure TioStrategyHttp.StartTransaction(const AConnectionName: String);
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).StartTransaction;

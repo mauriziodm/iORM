@@ -71,7 +71,7 @@ type
     // del paging da parte del CommonBSAPersistence passando per l'ActiveBindSourceAdapter
     // M.M. 12/06/21
     // Aggiunto attributo per non serializzare l'oggetto TioCommonBSAPageManager
-    // Mauri 30/04/22 aggiunto campo FPagingObjExists per risolvere un problema con RemoteConnection
+    // Mauri 30/04/22 aggiunto campo FPagingObjExists per risolvere un problema con HttpConnection
     //        (dopo la deserializzazione lato server era in uno stato non ben definito)
     [djSkip] FPagingObj: TioCommonBSAPageManager;
     [djSkip] FPagingObjExists: Boolean;

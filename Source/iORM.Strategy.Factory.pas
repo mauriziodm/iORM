@@ -49,7 +49,7 @@ type
 implementation
 
 uses
-  iORM.Strategy.DB, iORM.DB.ConnectionContainer, iORM.Strategy.Remote;
+  iORM.Strategy.DB, iORM.DB.ConnectionContainer, iORM.Strategy.Http;
 
 { TioStrategyFactory }
 
@@ -57,8 +57,8 @@ class function TioStrategyFactory.ConnectionTypeToStrategy(
   const AConnectionType: TioConnectionType): TioStrategyRef;
 begin
   case AConnectionType of
-    TioConnectionType.cdtRemote:
-      Result := TioStrategyRemote;
+    TioConnectionType.ctHTML:
+      Result := TioStrategyHttp;
   else
     Result := TioStrategyDB;
   end;
