@@ -283,15 +283,9 @@
         <DCCReference Include="..\..\Source\iORM.DependencyInjection.Implementers.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.VMActionContainer.pas"/>
         <DCCReference Include="..\..\Source\iORM.LazyLoad.LazyLoadObject.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Remote.Connection.pas"/>
         <DCCReference Include="..\..\Source\iORM.Strategy.DB.pas"/>
         <DCCReference Include="..\..\Source\iORM.Strategy.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.Strategy.Factory.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Strategy.Remote.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Remote.Body.Request.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Remote.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Remote.Body.Response.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Remote.Factory.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.ViewContextProvider.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.ConnectionDef.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.CommonBSAPersistence.pas"/>
@@ -372,15 +366,18 @@
         <DCCReference Include="..\..\Source\iORM.Where.SmartBuilder.pas"/>
         <DCCReference Include="..\..\Source\iORM.Abstraction.uniGUI.pas"/>
         <DCCReference Include="..\..\Source\iORM.Where.NestedProp.Resolver.pas"/>
-        <DCCReference Include="..\..\Source\iORM.ETM.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.ETM.TimeSlot.pas"/>
         <DCCReference Include="..\..\Source\iORM.ETM.Engine.pas"/>
         <DCCReference Include="..\..\Source\iORM.Interceptor.CRUD.pas"/>
         <DCCReference Include="..\..\Source\iORM.Interceptor.CRUD.Register.pas"/>
         <DCCReference Include="..\..\Source\iORM.Interceptor.Strategy.pas"/>
         <DCCReference Include="..\..\Source\iORM.Interceptor.Strategy.Register.pas"/>
-        <DCCReference Include="..\..\Source\iORM.ETM.Factory.pas"/>
         <DCCReference Include="..\..\Source\iORM.ETM.Interceptor.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Strategy.Http.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Http.Body.Request.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Http.Body.Response.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Http.Connection.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Http.Factory.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Http.Interfaces.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
