@@ -85,7 +85,7 @@ begin
   // Gather the previous state of the entity (before update query)
   LPreviousStateObj := io.Load(AContext.DataObject.ClassName).ByID(AContext.GetID).ToObject; // Load the previous version obj
   try
-    AContext.EtmBeforeUpdateEntityState := dj.From(LPreviousStateObj).ToJson;
+    AContext.EtmBeforeUpdateEntityState := dj.From(LPreviousStateObj).byFields.TypeAnnotationsON.ToJson;
   finally
     LPreviousStateObj.Free;
   end;
@@ -110,7 +110,7 @@ var
   LRepository: TioEtmCustomRepository;
 begin
   // Get the state (JSON) of the entity just before delete it
-  LEntityState := dj.From(AContext.DataObject).ToJson;
+  LEntityState := dj.From(AContext.DataObject).byFields.TypeAnnotationsON.ToJson;
   // Create the repository item, persist it and finally free it
   LRepository := AContext.Map.GetTable.GetEtmRepositoryClass.Create(etDelete, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, AContext.ObjVersion,
     LEntityState, '');

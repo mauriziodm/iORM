@@ -165,7 +165,7 @@ begin
   // JSONDataValue
   if Assigned(FJSONDataValue) then
     Result.AddPair(KEY_JSONDATAVALUE, FJSONDataValue);
-  // DataOject
+  // DataObject
   if Assigned(FDataObject) then
   begin
     LJSONValue := dj.From(FDataObject).byFields.TypeAnnotationsON.ToJsonValue;

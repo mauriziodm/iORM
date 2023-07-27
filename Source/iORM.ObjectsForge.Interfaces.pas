@@ -473,7 +473,7 @@ begin
   // Get the JSONObject
   LJSONString := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsString;
   // Deserialize
-  dj.FromJson(LJSONString).byFields.&To(LChildObject);
+  dj.FromJson(LJSONString).byFields.TypeAnnotationsON.&To(LChildObject);
 end;
 
 class function TioObjectMakerIntf.LoadPropertyEmbeddedHasOne(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty): TObject;
