@@ -55,6 +55,7 @@ type
     FMasterBSPersistence: TioBSPersistence;
     FOriginalNonTrueClassMap: IioMap;
     FEtmBeforeUpdateEntityState: String;
+    FEtmRevertedFromVersion: Integer;
     // DataObject
     function GetDataObject: TObject;
     procedure SetDataObject(const AValue: TObject);
@@ -87,6 +88,9 @@ type
     // EtmEntityStateDeforeUpdate
     function GetEtmBeforeUpdateEntityState: String;
     procedure SetEtmBeforeUpdateEntityState(const Value: String);
+    // EtmEntityStateDeforeUpdate
+    function GetEtmRevertedFromVersion: Integer;
+    procedure SetEtmRevertedFromVersion(const Value: Integer);
   public
     constructor Create(const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
       const AMasterPropertyName, AMasterPropertyPath: String); overload;
@@ -117,6 +121,7 @@ type
     property MasterPropertyPath: String read GetMasterPropertyPath;
     property MasterBSPersistence: TioBSPersistence read GetMasterBSPersistence;
     property EtmBeforeUpdateEntityState: String read GetEtmBeforeUpdateEntityState write SetEtmBeforeUpdateEntityState;
+    property EtmRevertedFromVersion: Integer read GetEtmRevertedFromVersion write SetEtmRevertedFromVersion;
     /// Contiene il nome della classe originaria cioè, nel caso il contesto sia stato creato con
     ///  la TrueClassVirtual (select query) a partire da una resolved class name, contiene il nome
     ///  della classe originaria, quella dalla quale poi si è estratta la TrueClassVirtualMap stessa.
@@ -149,6 +154,7 @@ begin
   FMasterBSPersistence := AMasterBSPersistence;
   FOriginalNonTrueClassMap := nil;
   FEtmBeforeUpdateEntityState := '';
+  FEtmRevertedFromVersion := 0;
 end;
 
 function TioContext.GetClassRef: TioClassRef;
@@ -164,6 +170,11 @@ end;
 function TioContext.GetEtmBeforeUpdateEntityState: String;
 begin
   Result := FEtmBeforeUpdateEntityState;
+end;
+
+function TioContext.GetEtmRevertedFromVersion: Integer;
+begin
+  Result := FEtmRevertedFromVersion;
 end;
 
 function TioContext.GetGroupBySql: String;
@@ -259,6 +270,11 @@ end;
 procedure TioContext.SetEtmBeforeUpdateEntityState(const Value: String);
 begin
   FEtmBeforeUpdateEntityState := Value;
+end;
+
+procedure TioContext.SetEtmRevertedFromVersion(const Value: Integer);
+begin
+  FEtmRevertedFromVersion := Value;
 end;
 
 procedure TioContext.SetRelationOID(const Value: Integer);

@@ -86,6 +86,12 @@ begin
   LPreviousStateObj := io.Load(AContext.DataObject.ClassName).ByID(AContext.GetID).ToObject; // Load the previous version obj
   try
     AContext.EtmBeforeUpdateEntityState := dj.From(LPreviousStateObj).OpType(ssETM).byFields.TypeAnnotationsON.ToJson;
+    // If the ObjVersion is negative it means that we are trying to restore a previous version
+    if AContext.ObjVersion < 0 then
+    begin
+      AContext.EtmRevertedFromVersion := Abs(AContext.ObjVersion);
+      AContext.ObjVersion := AContext.EtmRevertedFromVersion;
+    end;
   finally
     LPreviousStateObj.Free;
   end;

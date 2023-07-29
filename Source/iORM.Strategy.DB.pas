@@ -890,7 +890,7 @@ begin
   begin
 {$ENDIF}
     if LQuery.ExecSQL = 0 then
-      Exit;
+      raise EioConcurrencyConflictException.Create(ClassName, 'UpdateObject_Internal', AContext);
     if not ABlindInsertUpdate then
     begin
       AContext.NextObjVersion(True);

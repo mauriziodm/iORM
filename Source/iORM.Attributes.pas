@@ -523,6 +523,7 @@ type
     FEntityClassName: String;
     FEntityID: Integer;
     FEntityVersion: Integer;
+    FRevertedFromVersion: Integer;
     [ioBinary('1')]
     FEntityState: String;
     [ioBinary('1')]
@@ -538,6 +539,7 @@ type
     property EntityClassName: String read FEntityClassName;
     property EntityID: Integer read FEntityID;
     property EntityVersion: Integer read FEntityVersion;
+    property RevertedFromVersion: Integer read FRevertedFromVersion;
     property EntityState: String read FEntityState;
     property RemoteEntityState: String read FRemoteEntityState;
     property ConflictType: TioEtmConflictType read FConflictType;

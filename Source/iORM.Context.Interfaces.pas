@@ -104,6 +104,10 @@ type
     function GetEtmBeforeUpdateEntityState: String;
     procedure SetEtmBeforeUpdateEntityState(const Value: String);
     property EtmBeforeUpdateEntityState: String read GetEtmBeforeUpdateEntityState write SetEtmBeforeUpdateEntityState;
+    // EtmEntityStateDeforeUpdate
+    function GetEtmRevertedFromVersion: Integer;
+    procedure SetEtmRevertedFromVersion(const Value: Integer);
+    property EtmRevertedFromVersion: Integer read GetEtmRevertedFromVersion write SetEtmRevertedFromVersion;
   end;
 
 implementation

@@ -56,6 +56,7 @@ type
   end;
 
   EioEtmException = class(EioException)
+  public
   end;
 
 
