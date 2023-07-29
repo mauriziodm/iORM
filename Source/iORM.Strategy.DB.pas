@@ -285,17 +285,17 @@ var
 begin
   inherited;
   // Delete the entity (Intercepted by CRUDInterceptors)
-  LQuery := TioDBFactory.QueryEngine.GetQueryDelete(AContext, True);
 {$IFNDEF ioCRUDInterceptorsOff}
   LDone := False;
-  TioCRUDInterceptorRegister.BeforeDelete(AContext, LQuery, LDone);
+  TioCRUDInterceptorRegister.BeforeDelete(AContext, LDone);
   if not LDone then
   begin
 {$ENDIF}
+    LQuery := TioDBFactory.QueryEngine.GetQueryDelete(AContext, True);
     if not AContext.IDIsNull then
       LQuery.ExecSQL;
 {$IFNDEF ioCRUDInterceptorsOff}
-    TioCRUDInterceptorRegister.AfterDelete(AContext, LQuery);
+    TioCRUDInterceptorRegister.AfterDelete(AContext);
   end;
 {$ENDIF}
 end;
@@ -325,13 +325,13 @@ begin
   end;
   // -----------------------------------------------------------
   // Create and execute insert query and set the version/created/updated of the entity (Intercepted by crudInterceptors)
-  LQuery := TioDBFactory.QueryEngine.GetQueryInsert(AContext);
 {$IFNDEF ioCRUDInterceptorsOff}
   LDone := False;
-  TioCRUDInterceptorRegister.BeforeInsert(AContext, LQuery, LDone);
+  TioCRUDInterceptorRegister.BeforeInsert(AContext, LDone);
   if not LDone then
   begin
 {$ENDIF}
+    LQuery := TioDBFactory.QueryEngine.GetQueryInsert(AContext);
     LQuery.ExecSQL;
     if not ABlindInsertUpdate then
     begin
@@ -340,7 +340,7 @@ begin
       AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;
     end;
 {$IFNDEF ioCRUDInterceptorsOff}
-    TioCRUDInterceptorRegister.AfterInsert(AContext, LQuery);
+    TioCRUDInterceptorRegister.AfterInsert(AContext);
   end;
 {$ENDIF}
   // -----------------------------------------------------------
@@ -736,14 +736,14 @@ var
         // Create the object as TObject  (Intercepted by CRUDInterceptors)
 {$IFNDEF ioCRUDInterceptorsOff}
         LDone := False;
-        LObj := TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext, nil, LQuery, LDone);
+        LObj := TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext, nil, LDone);
         LCurrentContext.DataObject := LObj;
         if not LDone then
         begin
 {$ENDIF}
           LObj := TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
 {$IFNDEF ioCRUDInterceptorsOff}
-          LObj := TioCRUDInterceptorRegister.AfterLoad(LCurrentContext, LObj, LQuery);
+          LObj := TioCRUDInterceptorRegister.AfterLoad(LCurrentContext, LObj);
         end;
 {$ENDIF}
         // Add current object to the list
@@ -822,14 +822,14 @@ var
         // Create the object as TObject (Intercepted by CRUDInterceptors)
 {$IFNDEF ioCRUDInterceptorsOff}
         LDone := False;
-        Result := TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext, Result, LQuery, LDone);
+        Result := TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext, Result, LDone);
         LCurrentContext.DataObject := Result;
         if not LDone then
         begin
 {$ENDIF}
           Result := TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
 {$IFNDEF ioCRUDInterceptorsOff}
-          Result := TioCRUDInterceptorRegister.AfterLoad(LCurrentContext, Result, LQuery);
+          Result := TioCRUDInterceptorRegister.AfterLoad(LCurrentContext, Result);
         end;
 {$ENDIF}
       end;
@@ -882,13 +882,13 @@ begin
   inherited;
   // Create and execute the query to update the entity into the DB cheking the version to avoid concurrency
   // conflict (if versioning is enabled for this type of entity) (Intercepted by CRUDInterceptors)
-  LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext);
 {$IFNDEF ioCRUDInterceptorsOff}
   LDone := False;
-  TioCRUDInterceptorRegister.BeforeUpdate(AContext, LQuery, LDone);
+  TioCRUDInterceptorRegister.BeforeUpdate(AContext, LDone);
   if not LDone then
   begin
 {$ENDIF}
+    LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext);
     if LQuery.ExecSQL = 0 then
       raise EioConcurrencyConflictException.Create(ClassName, 'UpdateObject_Internal', AContext);
     if not ABlindInsertUpdate then
@@ -897,7 +897,7 @@ begin
       AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;;
     end;
 {$IFNDEF ioCRUDInterceptorsOff}
-    TioCRUDInterceptorRegister.AfterUpdate(AContext, LQuery);
+    TioCRUDInterceptorRegister.AfterUpdate(AContext);
   end;
 {$ENDIF}
 end;

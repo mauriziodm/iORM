@@ -42,7 +42,7 @@ interface
 
 uses
   iORM.Interceptor.CRUD,
-  iORM.Context.Interfaces, iORM.DB.Interfaces, System.Generics.Collections;
+  iORM.Context.Interfaces, System.Generics.Collections;
 
 type
 
@@ -71,17 +71,17 @@ type
     class procedure UnregisterInterceptor(const ACRUDInterceptor: TioCRUDInterceptorRef; const ATypeName: String;
       const AInterceptOnlyOnConnectionName: String = '');
     // Obj load
-    class function BeforeLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery; var ADone: Boolean): TObject;
-    class function AfterLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery): TObject;
+    class function BeforeLoad(const AContext: IioContext; const AObj: TObject; var ADone: Boolean): TObject;
+    class function AfterLoad(const AContext: IioContext; const AObj: TObject): TObject;
     // Obj insert
-    class procedure BeforeInsert(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
-    class procedure AfterInsert(const AContext: IioContext; const AQuery: IioQuery);
+    class procedure BeforeInsert(const AContext: IioContext; var ADone: Boolean);
+    class procedure AfterInsert(const AContext: IioContext);
     // Obj update
-    class procedure BeforeUpdate(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
-    class procedure AfterUpdate(const AContext: IioContext; const AQuery: IioQuery);
+    class procedure BeforeUpdate(const AContext: IioContext; var ADone: Boolean);
+    class procedure AfterUpdate(const AContext: IioContext);
     // Obj delete
-    class procedure BeforeDelete(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
-    class procedure AfterDelete(const AContext: IioContext; const AQuery: IioQuery);
+    class procedure BeforeDelete(const AContext: IioContext; var ADone: Boolean);
+    class procedure AfterDelete(const AContext: IioContext);
   end;
 
 implementation
@@ -146,7 +146,7 @@ begin
   end;
 end;
 
-class function TioCRUDInterceptorRegister.AfterLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery): TObject;
+class function TioCRUDInterceptorRegister.AfterLoad(const AContext: IioContext; const AObj: TObject): TObject;
 var
   LItem: TioCRUDInterceptorItem;
   LCurrConnectionName: String;
@@ -158,11 +158,11 @@ begin
     LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName;
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName] do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
-        Result := LItem.Interceptor.AfterLoad(AContext, AObj, AQuery);
+        Result := LItem.Interceptor.AfterLoad(AContext, AObj);
   end;
 end;
 
-class procedure TioCRUDInterceptorRegister.AfterDelete(const AContext: IioContext; const AQuery: IioQuery);
+class procedure TioCRUDInterceptorRegister.AfterDelete(const AContext: IioContext);
 var
   LItem: TioCRUDInterceptorItem;
   LCurrConnectionName: String;
@@ -173,11 +173,11 @@ begin
     LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName;
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName] do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
-        LItem.Interceptor.AfterDelete(AContext, AQuery);
+        LItem.Interceptor.AfterDelete(AContext);
   end;
 end;
 
-class procedure TioCRUDInterceptorRegister.AfterInsert(const AContext: IioContext; const AQuery: IioQuery);
+class procedure TioCRUDInterceptorRegister.AfterInsert(const AContext: IioContext);
 var
   LItem: TioCRUDInterceptorItem;
   LCurrConnectionName: String;
@@ -188,11 +188,11 @@ begin
     LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName;
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName] do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
-        LItem.Interceptor.AfterInsert(AContext, AQuery);
+        LItem.Interceptor.AfterInsert(AContext);
   end;
 end;
 
-class procedure TioCRUDInterceptorRegister.AfterUpdate(const AContext: IioContext; const AQuery: IioQuery);
+class procedure TioCRUDInterceptorRegister.AfterUpdate(const AContext: IioContext);
 var
   LItem: TioCRUDInterceptorItem;
   LCurrConnectionName: String;
@@ -203,11 +203,11 @@ begin
     LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName;
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName] do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
-        LItem.Interceptor.AfterUpdate(AContext, AQuery);
+        LItem.Interceptor.AfterUpdate(AContext);
   end;
 end;
 
-class function TioCRUDInterceptorRegister.BeforeLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery; var ADone: Boolean): TObject;
+class function TioCRUDInterceptorRegister.BeforeLoad(const AContext: IioContext; const AObj: TObject; var ADone: Boolean): TObject;
 var
   LDone: Boolean;
   LItem: TioCRUDInterceptorItem;
@@ -222,14 +222,14 @@ begin
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
       begin
         LDone := False;
-        Result := LItem.Interceptor.BeforeLoad(AContext, AObj, AQuery, LDone);
+        Result := LItem.Interceptor.BeforeLoad(AContext, AObj, LDone);
         if LDone then
           ADone := True;
       end;
   end;
 end;
 
-class procedure TioCRUDInterceptorRegister.BeforeDelete(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
+class procedure TioCRUDInterceptorRegister.BeforeDelete(const AContext: IioContext; var ADone: Boolean);
 var
   LDone: Boolean;
   LItem: TioCRUDInterceptorItem;
@@ -243,14 +243,14 @@ begin
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
       begin
         LDone := False;
-        LItem.Interceptor.BeforeDelete(AContext, AQuery, LDone);
+        LItem.Interceptor.BeforeDelete(AContext, LDone);
         if LDone then
           ADone := True;
       end;
   end;
 end;
 
-class procedure TioCRUDInterceptorRegister.BeforeInsert(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
+class procedure TioCRUDInterceptorRegister.BeforeInsert(const AContext: IioContext; var ADone: Boolean);
 var
   LDone: Boolean;
   LItem: TioCRUDInterceptorItem;
@@ -264,14 +264,14 @@ begin
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
       begin
         LDone := False;
-        LItem.Interceptor.BeforeInsert(AContext, AQuery, LDone);
+        LItem.Interceptor.BeforeInsert(AContext, LDone);
         if LDone then
           ADone := True;
       end;
   end;
 end;
 
-class procedure TioCRUDInterceptorRegister.BeforeUpdate(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
+class procedure TioCRUDInterceptorRegister.BeforeUpdate(const AContext: IioContext; var ADone: Boolean);
 var
   LDone: Boolean;
   LItem: TioCRUDInterceptorItem;
@@ -285,7 +285,7 @@ begin
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
       begin
         LDone := False;
-        LItem.Interceptor.BeforeUpdate(AContext, AQuery, LDone);
+        LItem.Interceptor.BeforeUpdate(AContext, LDone);
         if LDone then
           ADone := True;
       end;

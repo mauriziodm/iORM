@@ -41,7 +41,7 @@ unit iORM.Interceptor.CRUD;
 interface
 
 uses
-  iORM.Context.Interfaces, iORM.DB.Interfaces;
+  iORM.Context.Interfaces;
 
 type
 
@@ -51,59 +51,59 @@ type
   TioCustomCRUDInterceptor = class
   public
     // Obj load
-    class function BeforeLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery; var ADone: Boolean): TObject; virtual;
-    class function AfterLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery): TObject; virtual;
+    class function BeforeLoad(const AContext: IioContext; const AObj: TObject; var ADone: Boolean): TObject; virtual;
+    class function AfterLoad(const AContext: IioContext; const AObj: TObject): TObject; virtual;
     // Obj insert
-    class procedure BeforeInsert(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean); virtual;
-    class procedure AfterInsert(const AContext: IioContext; const AQuery: IioQuery); virtual;
+    class procedure BeforeInsert(const AContext: IioContext; var ADone: Boolean); virtual;
+    class procedure AfterInsert(const AContext: IioContext); virtual;
     // Obj update
-    class procedure BeforeUpdate(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean); virtual;
-    class procedure AfterUpdate(const AContext: IioContext; const AQuery: IioQuery); virtual;
+    class procedure BeforeUpdate(const AContext: IioContext; var ADone: Boolean); virtual;
+    class procedure AfterUpdate(const AContext: IioContext); virtual;
     // Obj delete
-    class procedure BeforeDelete(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean); virtual;
-    class procedure AfterDelete(const AContext: IioContext; const AQuery: IioQuery); virtual;
+    class procedure BeforeDelete(const AContext: IioContext; var ADone: Boolean); virtual;
+    class procedure AfterDelete(const AContext: IioContext); virtual;
   end;
 
 implementation
 
 { TioCustomObjCrudIncerceptor }
 
-class function TioCustomCRUDInterceptor.AfterLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery): TObject;
+class function TioCustomCRUDInterceptor.AfterLoad(const AContext: IioContext; const AObj: TObject): TObject;
 begin
   Result := AObj;
 end;
 
-class procedure TioCustomCRUDInterceptor.AfterDelete(const AContext: IioContext; const AQuery: IioQuery);
+class procedure TioCustomCRUDInterceptor.AfterDelete(const AContext: IioContext);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomCRUDInterceptor.AfterInsert(const AContext: IioContext; const AQuery: IioQuery);
+class procedure TioCustomCRUDInterceptor.AfterInsert(const AContext: IioContext);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomCRUDInterceptor.AfterUpdate(const AContext: IioContext; const AQuery: IioQuery);
+class procedure TioCustomCRUDInterceptor.AfterUpdate(const AContext: IioContext);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class function TioCustomCRUDInterceptor.BeforeLoad(const AContext: IioContext; const AObj: TObject; const AQuery: IioQuery; var ADone: Boolean): TObject;
+class function TioCustomCRUDInterceptor.BeforeLoad(const AContext: IioContext; const AObj: TObject; var ADone: Boolean): TObject;
 begin
   Result := AObj;
 end;
 
-class procedure TioCustomCRUDInterceptor.BeforeDelete(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
+class procedure TioCustomCRUDInterceptor.BeforeDelete(const AContext: IioContext; var ADone: Boolean);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomCRUDInterceptor.BeforeInsert(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
+class procedure TioCustomCRUDInterceptor.BeforeInsert(const AContext: IioContext; var ADone: Boolean);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomCRUDInterceptor.BeforeUpdate(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
+class procedure TioCustomCRUDInterceptor.BeforeUpdate(const AContext: IioContext; var ADone: Boolean);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;

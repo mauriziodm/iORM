@@ -43,19 +43,19 @@ unit iORM.ETM.Interceptor;
 interface
 
 uses
-  iORM.Interceptor.CRUD, iORM.Context.Interfaces, iORM.DB.Interfaces;
+  iORM.Interceptor.CRUD, iORM.Context.Interfaces;
 
 type
 
   TioEtmInterceptor = class(TioCustomCRUDInterceptor)
   public
     // Insert
-    class procedure AfterInsert(const AContext: IioContext; const AQuery: IioQuery); override;
+    class procedure AfterInsert(const AContext: IioContext); override;
     // Update
-    class procedure BeforeUpdate(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean); override;
-    class procedure AfterUpdate(const AContext: IioContext; const AQuery: IioQuery); override;
+    class procedure BeforeUpdate(const AContext: IioContext; var ADone: Boolean); override;
+    class procedure AfterUpdate(const AContext: IioContext); override;
     // Delete
-    class procedure AfterDelete(const AContext: IioContext; const AQuery: IioQuery); override;
+    class procedure AfterDelete(const AContext: IioContext); override;
   end;
 
 implementation
@@ -65,7 +65,7 @@ uses
 
 { TioEtmInterceptor }
 
-class procedure TioEtmInterceptor.AfterInsert(const AContext: IioContext; const AQuery: IioQuery);
+class procedure TioEtmInterceptor.AfterInsert(const AContext: IioContext);
 var
   LRepository: TioEtmCustomRepository;
 begin
@@ -78,7 +78,7 @@ begin
   end;
 end;
 
-class procedure TioEtmInterceptor.BeforeUpdate(const AContext: IioContext; const AQuery: IioQuery; var ADone: Boolean);
+class procedure TioEtmInterceptor.BeforeUpdate(const AContext: IioContext; var ADone: Boolean);
 var
   LPreviousStateObj: TObject;
 begin
@@ -97,7 +97,7 @@ begin
   end;
 end;
 
-class procedure TioEtmInterceptor.AfterUpdate(const AContext: IioContext; const AQuery: IioQuery);
+class procedure TioEtmInterceptor.AfterUpdate(const AContext: IioContext);
 var
   LRepository: TioEtmCustomRepository;
 begin
@@ -110,7 +110,7 @@ begin
   end;
 end;
 
-class procedure TioEtmInterceptor.AfterDelete(const AContext: IioContext; const AQuery: IioQuery);
+class procedure TioEtmInterceptor.AfterDelete(const AContext: IioContext);
 var
   LEntityState: String;
   LRepository: TioEtmCustomRepository;
