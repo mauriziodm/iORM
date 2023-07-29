@@ -68,7 +68,8 @@ type
     // ObjVersion
     function NextObjVersion(const ASetValue: Boolean): TioObjVersion;
     function GetObjVersion: TioObjVersion;
-    property ObjVersion:TioObjVersion read GetObjVersion; // write SetObjVersion;
+    procedure SetObjVersion(const AValue: TioObjVersion);
+    property ObjVersion:TioObjVersion read GetObjVersion write SetObjVersion; // write SetObjVersion;
     // ObjCreated
     function GetObjCreated: TioObjCreated;
     procedure SetObjCreated(const AValue: TioObjCreated);

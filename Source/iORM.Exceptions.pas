@@ -53,7 +53,9 @@ type
   end;
 
   EioBindSourceObjStateException = class(EioException)
+  end;
 
+  EioEtmException = class(EioException)
   end;
 
 

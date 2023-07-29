@@ -66,6 +66,7 @@ type
     // ObjVersion
     function NextObjVersion(const ASetValue: Boolean): TioObjVersion;
     function GetObjVersion: TioObjVersion;
+    procedure SetObjVersion(const AValue: TioObjVersion);
     // ObjCreated
     function GetObjCreated: TioObjCreated;
     procedure SetObjCreated(const AValue: TioObjCreated);
@@ -108,7 +109,7 @@ type
     // Properties
     property DataObject: TObject read GetDataObject write SetDataObject;
     property ObjStatus: TioObjStatus read GetObjStatus write SetObjStatus;
-    property ObjVersion: TioObjVersion read GetObjVersion;
+    property ObjVersion: TioObjVersion read GetObjVersion write SetObjVersion;
     property ObjCreated: TioObjCreated read GetObjCreated write SetObjCreated;
     property ObjUpdated: TioObjUpdated read GetObjUpdated write SetObjUpdated;
     property Where: IioWhere read GetWhere write SetWhere;
@@ -152,7 +153,7 @@ end;
 
 function TioContext.GetClassRef: TioClassRef;
 begin
-  Result := Self.Map.GetClassRef;
+  Result := Map.GetClassRef;
 end;
 
 function TioContext.GetDataObject: TObject;
@@ -293,6 +294,14 @@ begin
     Exit;
   LPropValue := TValue.From<TioObjUpdated>(AValue);
   GetProperties.ObjUpdatedProperty.SetValue(FDataObject, LPropValue);
+end;
+
+procedure TioContext.SetObjVersion(const AValue: TioObjVersion);
+begin
+  if GetProperties.ObjVersionPropertyExist then
+    GetProperties.ObjVersionProperty.SetValue(FDataObject, AValue)
+  else
+    raise EioException.Create(ClassName, 'SetObjVersion', Format('The class "%s" has no property of type "TioObjversion".', [Map.GetClassName]));
 end;
 
 function TioContext.GetObjVersion: TioObjVersion;

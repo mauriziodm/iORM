@@ -102,13 +102,18 @@ type
     function IsNotPersistedEntity: Boolean;
     function GetClassName: String;
     function GetQualifiedClassName: String;
-    // ETM
-    function GetEtmRepositoryClass: TioEtmCustomRepositoryRef;
-    function GetEtmTraceOnlyOnConnectionName: String;
     // IndexList
     function IndexListExists: Boolean;
     function GetIndexList(AAutoCreateIfUnassigned:Boolean): TioIndexList;
     procedure SetIndexList(AIndexList:TioIndexList);
+    // EtmRepositoryClass
+    procedure SetEtmRepositoryClass(const AEtmRepositoryClass: TioEtmCustomRepositoryRef);
+    function GetEtmRepositoryClass: TioEtmCustomRepositoryRef;
+    property EtmRepositoryClass: TioEtmCustomRepositoryRef read GetEtmRepositoryClass write SetEtmRepositoryClass;
+    // EtmTraceOnlyOnConnectionName
+    procedure SetEtmTraceOnlyOnConnectionName(const AConnectionName: String);
+    function GetEtmTraceOnlyOnConnectionName: String;
+    property EtmTraceOnlyOnConnectionName: String read GetEtmTraceOnlyOnConnectionName write SetEtmTraceOnlyOnConnectionName;
   end;
 
 implementation

@@ -265,8 +265,8 @@ begin
   // Create the map
   Result := TioMap.Create(AClassRef, LRttiContext, LRttiType, LTable, Properties(LRttiType, LTable));
   // If an EtmRepositoryClass is detected then register the class into the ETMEngine
-  if Assigned(Result.GetTable.GetEtmRepositoryClass) then
-    TIoEtmEngine.TraceByMap(Result, Result.GetTable.GetEtmTraceOnlyOnConnectionName);
+  if Assigned(Result.GetTable.EtmRepositoryClass) then
+    TIoEtmEngine.TraceByMap(Result, Result.GetTable.EtmRepositoryClass, Result.GetTable.EtmTraceOnlyOnConnectionName);
 end;
 
 class function TioContextFactory.Properties(const Typ: TRttiInstanceType; const ATable: IioTable): IioProperties;
@@ -754,8 +754,12 @@ begin
       end;
     end;
     // Create result Properties object
-    Result := TioTable.Create(LTableName, LKeyGenerator, LTrueClass, LJoins, LGroupBy, LConnectionName, LMapMode, Typ, LEtmRepositoryClass,
-      LEtmTraceOnlyOnConnectionName);
+    Result := TioTable.Create(LTableName, LKeyGenerator, LTrueClass, LJoins, LGroupBy, LConnectionName, LMapMode, Typ);
+    if Assigned(LEtmRepositoryClass) then
+    begin
+      Result.EtmRepositoryClass := LEtmRepositoryClass;
+      Result.EtmTraceOnlyOnConnectionName := LEtmTraceOnlyOnConnectionName;
+    end;
     // If an IndexList is present then assign it to the ioTable
     if Assigned(LIndexList) and (LIndexList.Count > 0) then
       Result.SetIndexList(LIndexList);

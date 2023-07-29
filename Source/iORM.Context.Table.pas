@@ -139,10 +139,15 @@ type
     FContainsSomeIioListProperty: Boolean;
     FEtmRepositoryClass: TioEtmCustomRepositoryRef;
     FEtmTraceOnlyOnConnectionName: String;
+    // EtmRepositoryClass
+    procedure SetEtmRepositoryClass(const AEtmRepositoryClass: TioEtmCustomRepositoryRef);
+    function GetEtmRepositoryClass: TioEtmCustomRepositoryRef;
+    // EtmTraceOnlyOnConnectionName
+    procedure SetEtmTraceOnlyOnConnectionName(const AConnectionName: String);
+    function GetEtmTraceOnlyOnConnectionName: String;
   public
     constructor Create(const ASqlText, AKeyGenerator: String; const ATrueClass: IioTrueClass; const AJoins: IioJoins; const AGroupBy: IioGroupBy;
-      const AConnectionDefName: String; const AMapMode: TioMapModeType; const ARttiType: TRttiInstanceType;
-      const AEtmRepositoryClass: TioEtmCustomRepositoryRef; const AEtmTraceOnlyOnConnectionName: String); reintroduce; overload;
+      const AConnectionDefName: String; const AMapMode: TioMapModeType; const ARttiType: TRttiInstanceType); reintroduce; overload;
     destructor Destroy; override;
     /// This method create the TrueClassVirtualMap.Table object duplicating something of itself
     function DuplicateForTrueClassMap: IioTable;
@@ -160,13 +165,13 @@ type
     function IsNotPersistedEntity: Boolean;
     function GetClassName: String;
     function GetQualifiedClassName: String;
-    // ETM
-    function GetEtmRepositoryClass: TioEtmCustomRepositoryRef;
-    function GetEtmTraceOnlyOnConnectionName: String;
     // IndexList
     function IndexListExists: Boolean;
     function GetIndexList(AAutoCreateIfUnassigned: Boolean): TioIndexList;
     procedure SetIndexList(AIndexList: TioIndexList);
+    // Properties
+    property EtmRepositoryClass: TioEtmCustomRepositoryRef read GetEtmRepositoryClass write SetEtmRepositoryClass;
+    property EtmTraceOnlyOnConnectionName: String read GetEtmTraceOnlyOnConnectionName write SetEtmTraceOnlyOnConnectionName;
   end;
 
 implementation
@@ -177,8 +182,7 @@ uses
 { TioContextTable }
 
 constructor TioTable.Create(const ASqlText, AKeyGenerator: String; const ATrueClass: IioTrueClass; const AJoins: IioJoins; const AGroupBy: IioGroupBy;
-  const AConnectionDefName: String; const AMapMode: TioMapModeType; const ARttiType: TRttiInstanceType; const AEtmRepositoryClass: TioEtmCustomRepositoryRef;
-  const AEtmTraceOnlyOnConnectionName: String);
+      const AConnectionDefName: String; const AMapMode: TioMapModeType; const ARttiType: TRttiInstanceType);
 begin
   inherited Create(ASqlText);
   FKeyGenerator := AKeyGenerator;
@@ -199,8 +203,8 @@ begin
   if Assigned(FGroupBy) then
     FGroupBy.SetTable(Self);
   // ETM
-  FEtmRepositoryClass := AEtmRepositoryClass;
-  FEtmTraceOnlyOnConnectionName := AEtmTraceOnlyOnConnectionName;
+  FEtmRepositoryClass := nil;
+  FEtmTraceOnlyOnConnectionName := String.Empty;
 end;
 
 destructor TioTable.Destroy;
@@ -212,8 +216,7 @@ end;
 
 function TioTable.DuplicateForTrueClassMap: IioTable;
 begin
-  Result := TioTable.Create(FSqlText, FKeyGenerator, FTrueClass, FJoins, FGroupBy, FConnectionDefName_DoNotCallDirectly, FMapMode, FRttiType,
-    FEtmRepositoryClass, FEtmTraceOnlyOnConnectionName);
+  Result := TioTable.Create(FSqlText, FKeyGenerator, FTrueClass, FJoins, FGroupBy, FConnectionDefName_DoNotCallDirectly, FMapMode, FRttiType);
 end;
 
 function TioTable.IsNotPersistedEntity: Boolean;
@@ -312,6 +315,16 @@ begin
   // specifically setted for the connection name received to check (AConnectionDefNameToCheck).
   Result := LCurrentConnectionDefName.IsEmpty or (LCurrentConnectionDefName = IO_CONNECTIONDEF_DEFAULTNAME) or
     (LCurrentConnectionDefName = AConnectionDefNameToCheck);
+end;
+
+procedure TioTable.SetEtmRepositoryClass(const AEtmRepositoryClass: TioEtmCustomRepositoryRef);
+begin
+  FEtmRepositoryClass := AEtmRepositoryClass;
+end;
+
+procedure TioTable.SetEtmTraceOnlyOnConnectionName(const AConnectionName: String);
+begin
+  FEtmTraceOnlyOnConnectionName := AConnectionName;
 end;
 
 procedure TioTable.SetIndexList(AIndexList: TioIndexList);
