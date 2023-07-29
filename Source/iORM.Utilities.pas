@@ -68,6 +68,7 @@ type
     class function ResolveRttiTypeToRttiType(const ARttiType: TRttiType): TRttiType;
     class function ExtractOID(const AObj: Tobject): Integer; overload; static;
     class function ExtractOID(const AIntf: IInterface): Integer; overload; static;
+    class function ExtractObjVersion(const AObj: Tobject): Integer; overload; static;
     class function EnumToString<T>(const AEnumValue:T): String;
     class function StringToEnum<T>(const AStringValue: String): T;
     class function GetThreadID: TThreadID; static;
@@ -169,6 +170,16 @@ begin
     raise EioException.Create(ClassName, 'ExtractOID', '"AObj" parameter not assigned');
   LMap := TioMapContainer.GetMap(AObj.ClassName);
   Result := LMap.GetProperties.GetIdProperty.GetValue(AObj).AsInteger;
+end;
+
+class function TioUtilities.ExtractObjVersion(const AObj: Tobject): Integer;
+var
+  LMap: IioMap;
+begin
+  if not Assigned(AObj) then
+    raise EioException.Create(ClassName, 'ExtractObjVersion', '"AObj" parameter not assigned');
+  LMap := TioMapContainer.GetMap(AObj.ClassName);
+  Result := LMap.GetProperties.GetObjVersionProperty.GetValue(AObj).AsInteger;
 end;
 
 class function TioUtilities.ExtractOID(const AIntf: IInterface): Integer;

@@ -532,7 +532,7 @@ type
     FConflictType: TioEtmConflictType;
   public
     constructor Create(const AEventType: TioEtmEventType; const AConflictType: TioEtmConflictType; const AEntityID: Integer; const AEntityClassName: String;
-      const AEntityObjVersion: Integer; const AEntityState, ARemoteEntityState: String);
+      const AEntityObjVersion, ARevertedFromVersion: Integer; const AEntityState, ARemoteEntityState: String);
     property ID: Integer read FID;
     property DateAndTime: TioObjCreated read FDateAndTime;
     property EventType: TioEtmEventType read FEventType;
@@ -883,14 +883,15 @@ end;
 
 { TioEtmCustomRepository }
 
-constructor TioEtmCustomRepository.Create(const AEventType: TioEtmEventType; const AConflictType: TioEtmConflictType; const AEntityID: Integer;
-  const AEntityClassName: String; const AEntityObjVersion: Integer; const AEntityState, ARemoteEntityState: String);
+constructor TioEtmCustomRepository.Create(const AEventType: TioEtmEventType; const AConflictType: TioEtmConflictType; const AEntityID: Integer; const AEntityClassName: String;
+      const AEntityObjVersion, ARevertedFromVersion: Integer; const AEntityState, ARemoteEntityState: String);
 begin
   FEventType := AEventType;
   FConflictType := AConflictType;
   FEntityClassName := AEntityClassName;
   FEntityID := AEntityID;
   FEntityVersion := AEntityObjVersion;
+  FRevertedFromVersion := ARevertedFromVersion;
   FEntityState := AEntityState;
   FRemoteEntityState := ARemoteEntityState;
 end;

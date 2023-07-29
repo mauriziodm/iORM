@@ -61,7 +61,7 @@ type
 implementation
 
 uses
-  iORM, DJSON, iORM.CommonTypes;
+  iORM, DJSON, iORM.CommonTypes, iORM.Utilities;
 
 { TioEtmInterceptor }
 
@@ -70,7 +70,7 @@ var
   LRepository: TioEtmCustomRepository;
 begin
   // Create the repository item, persist it and finally free it
-  LRepository := AContext.Map.GetTable.GetEtmRepositoryClass.Create(etInsert, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, 0, '', '');
+  LRepository := AContext.Map.GetTable.GetEtmRepositoryClass.Create(etInsert, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, 0, 0, '', '');
   try
     io.PersistObject(LRepository);
   finally
@@ -90,7 +90,7 @@ begin
     if AContext.ObjVersion < 0 then
     begin
       AContext.EtmRevertedFromVersion := Abs(AContext.ObjVersion);
-      AContext.ObjVersion := AContext.EtmRevertedFromVersion;
+      AContext.ObjVersion := TioUtilities.ExtractObjVersion(LPreviousStateObj);
     end;
   finally
     LPreviousStateObj.Free;
@@ -102,7 +102,7 @@ var
   LRepository: TioEtmCustomRepository;
 begin
   // Create the repository item, persist it and finally free it
-  LRepository := AContext.Map.GetTable.GetEtmRepositoryClass.Create(etUpdate, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, AContext.ObjVersion-1, AContext.EtmBeforeUpdateEntityState, '');
+  LRepository := AContext.Map.GetTable.GetEtmRepositoryClass.Create(etUpdate, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, AContext.ObjVersion-1, AContext.EtmRevertedFromVersion, AContext.EtmBeforeUpdateEntityState, '');
   try
     io.PersistObject(LRepository);
   finally
@@ -118,7 +118,7 @@ begin
   // Get the state (JSON) of the entity just before delete it
   LEntityState := dj.From(AContext.DataObject).OpType(ssETM).byFields.TypeAnnotationsON.ToJson;
   // Create the repository item, persist it and finally free it
-  LRepository := AContext.Map.GetTable.GetEtmRepositoryClass.Create(etDelete, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, AContext.ObjVersion,
+  LRepository := AContext.Map.GetTable.GetEtmRepositoryClass.Create(etDelete, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, AContext.ObjVersion, 0,
     LEntityState, '');
   try
     io.PersistObject(LRepository);
