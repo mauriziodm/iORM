@@ -530,6 +530,7 @@ type
     FRemoteEntityState: String;
     FEventType: TioEtmEventType;
     FConflictType: TioEtmConflictType;
+    function GetSmartEntityVersion: String;
   public
     constructor Create(const AEventType: TioEtmEventType; const AConflictType: TioEtmConflictType; const AEntityID: Integer; const AEntityClassName: String;
       const AEntityObjVersion, ARevertedFromVersion: Integer; const AEntityState, ARemoteEntityState: String);
@@ -545,6 +546,7 @@ type
     property ConflictType: TioEtmConflictType read FConflictType;
     property UserName: TioObjCreatedUserName read FUserName;
     property UserID: TioObjCreatedUserID read FUserID;
+    property SmartEntityVersion: String read GetSmartEntityVersion;
   end;
 
   etmRepository = ioEntity;
@@ -894,6 +896,14 @@ begin
   FRevertedFromVersion := ARevertedFromVersion;
   FEntityState := AEntityState;
   FRemoteEntityState := ARemoteEntityState;
+end;
+
+function TioEtmCustomRepository.GetSmartEntityVersion: String;
+begin
+  if FRevertedFromVersion <> 0 then
+    Result := Format('%d (reverted from %d)', [FEntityVersion, RevertedFromVersion])
+  else
+    Result := FEntityVersion.ToString;
 end;
 
 end.
