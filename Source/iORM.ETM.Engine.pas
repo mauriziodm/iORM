@@ -203,7 +203,11 @@ var
 begin
   LWhere := _InternalBuildRevertWhere(T.ClassName, AID, AVersion);
   LRepositoryItem := LWhere.ToObject;
-  Result := RevertObject<T>(LRepositoryItem, APersistImmediately);
+  try
+    Result := RevertObject<T>(LRepositoryItem, APersistImmediately);
+  finally
+    LRepositoryItem.Free;
+  end;
 end;
 
 class procedure TIoEtmEngine.RevertToObject(const ATargetObj: TObject; const AID, AVersion: Integer; const APersistImmediately: Boolean);
@@ -213,7 +217,11 @@ var
 begin
   LWhere := _InternalBuildRevertWhere(ATargetObj.ClassName, AID, AVersion);
   LRepositoryItem := LWhere.ToObject;
-  RevertToObject(ATargetObj, LRepositoryItem, APersistImmediately);
+  try
+    RevertToObject(ATargetObj, LRepositoryItem, APersistImmediately);
+  finally
+    LRepositoryItem.Free;
+  end;
 end;
 
 class procedure TIoEtmEngine.RevertToObject(const ATargetIntf: IInterface; const AEtmRepositoryItem: TioEtmCustomRepository;
@@ -313,7 +321,11 @@ var
 begin
   LWhere := _InternalBuildRevertWhere(AEntityClassName, AID, AVersion);
   LRepositoryItem := LWhere.ToObject;
-  RevertToDB(LRepositoryItem);
+  try
+    RevertToDB(LRepositoryItem);
+  finally
+    LRepositoryItem.Free;
+  end;
 end;
 
 class procedure TIoEtmEngine.RevertToDB(const AIntf: IInterface; const AID, AVersion: Integer);
