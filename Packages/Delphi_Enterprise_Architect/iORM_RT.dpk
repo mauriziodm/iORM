@@ -230,7 +230,8 @@ contains
   iORM.Interceptor.CRUD in '..\..\Source\iORM.Interceptor.CRUD.pas',
   iORM.Interceptor.Strategy.Register in '..\..\Source\iORM.Interceptor.Strategy.Register.pas',
   iORM.Interceptor.CRUD.Register in '..\..\Source\iORM.Interceptor.CRUD.Register.pas',
-  iORM.ETM.Interceptor in '..\..\Source\iORM.ETM.Interceptor.pas';
+  iORM.ETM.Interceptor in '..\..\Source\iORM.ETM.Interceptor.pas',
+  iORM.ETM.Diff in '..\..\Source\iORM.ETM.Diff.pas';
 
 end.
 

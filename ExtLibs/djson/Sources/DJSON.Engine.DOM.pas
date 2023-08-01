@@ -45,8 +45,6 @@ uses
 
 type
 
-  TJSONBox = TJSONObject;
-
   TdjEngineDOM = class(TdjEngineIntf)
   protected
     // Serializers
@@ -60,8 +58,8 @@ type
     class function SerializeArray(const AValue: TValue; const APropField: TRttiNamedObject; const AParams: IdjParams): TJSONValue; static;
     class function SerializeClass(const AValue: TValue; const APropField: TRttiNamedObject; const AParams: IdjParams): TJSONValue; static;
     class function SerializeInterface(const AValue: TValue; const APropField: TRttiNamedObject; const AParams: IdjParams): TJSONValue; static;
-    class function SerializeObject(const AObject: TObject; const AParams: IdjParams): TJSONBox; overload; static;
-    class function SerializeObject(const AInterfacedObject: IInterface; const AParams: IdjParams): TJSONBox; overload; static;
+    class function SerializeObject(const AObject: TObject; const AParams: IdjParams): TJSONObject; overload; static;
+    class function SerializeObject(const AInterfacedObject: IInterface; const AParams: IdjParams): TJSONObject; overload; static;
     class function SerializeTValue(const AValue: TValue; const APropField: TRttiNamedObject; const AParams: IdjParams): TJSONValue; static;
     class procedure SerializeList(const ADuckList: IdjDuckList; const APropField: TRttiNamedObject; const AParams: IdjParams; out ResultJSONValue: TJSONValue); static;
     class procedure SerializeDictionary(const ADuckDictionary: IdjDuckDictionary; const APropField: TRttiNamedObject; const AParams: IdjParams; out ResultJSONValue: TJSONValue); static;
@@ -80,7 +78,7 @@ type
     class procedure DeserializeClassCommon(var AChildObj: TObject; const AJSONValue: TJSONValue; const APropField: TRttiNamedObject; const AParams: IdjParams); static;
     class function DeserializeClass(const AJSONValue: TJSONValue; const AValueType: TRttiType; const APropField: TRttiNamedObject; AMasterObj: TObject; const AParams: IdjParams): TValue; static;
     class function DeserializeInterface(const AJSONValue: TJSONValue; const AValueType: TRttiType; const APropField: TRttiNamedObject; AMasterObj: TObject; const AParams: IdjParams): TValue; static;
-    class function DeserializeObject(const AJSONBox: TJSONBox; AObject: TObject; const AParams: IdjParams): TObject; static;
+    class function DeserializeObject(const AJSONBox: TJSONObject; AObject: TObject; const AParams: IdjParams): TObject; static;
     class function DeserializeTValue(const AJSONValue: TJSONValue; const APropField: TRttiNamedObject; const AParams: IdjParams): TValue; static;
     class procedure DeserializeList(const ADuckList: IdjDuckList; const AJSONValue: TJSONValue; const APropField: TRttiNamedObject; const AParams: IdjParams); static;
     class procedure DeserializeDictionary(const ADuckDictionary: IdjDuckDictionary; const AJSONValue: TJSONValue; const APropField: TRttiNamedObject; const AParams: IdjParams); static;
@@ -831,7 +829,7 @@ begin
   Result := DeserializePropField(LJSONValue, LValueRTTIType, APropField, nil, AParams);
 end;
 
-class function TdjEngineDOM.DeserializeObject(const AJSONBox: TJSONBox; AObject: TObject; const AParams: IdjParams): TObject;
+class function TdjEngineDOM.DeserializeObject(const AJSONBox: TJSONObject; AObject: TObject; const AParams: IdjParams): TObject;
 var
   LPropField: System.Rtti.TRttiNamedObject;
   LPropsFields: TArray<System.Rtti.TRttiNamedObject>;
@@ -1214,7 +1212,7 @@ begin
   Result := TJSONNumber.Create(AValue.AsInteger)
 end;
 
-class function TdjEngineDOM.SerializeObject(const AObject: TObject; const AParams: IdjParams): TJSONBox;
+class function TdjEngineDOM.SerializeObject(const AObject: TObject; const AParams: IdjParams): TJSONObject;
 var
   LPropField: System.Rtti.TRttiNamedObject;
   LPropsFields: TArray<System.Rtti.TRttiNamedObject>;
@@ -1222,7 +1220,7 @@ var
   LJSONValue: TJSONValue;
   LValue: TValue;
 begin
-  Result := TJSONBox.Create;
+  Result := TJSONObject.Create;
   try
     // add the $dmvc.classname property to allows a strict deserialization
     if AParams.TypeAnnotations then
@@ -1256,7 +1254,7 @@ begin
   end;
 end;
 
-class function TdjEngineDOM.SerializeObject(const AInterfacedObject: IInterface; const AParams: IdjParams): TJSONBox;
+class function TdjEngineDOM.SerializeObject(const AInterfacedObject: IInterface; const AParams: IdjParams): TJSONObject;
 begin
   Result := SerializeObject(AInterfacedObject as TObject, AParams);
 end;
