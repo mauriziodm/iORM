@@ -56,7 +56,8 @@ type
       out OCurrentOld, OCurrentNew: TJSONValue): Boolean;
     function Diff_Object(const ASourceOldObj, ASourceNewObj: TObject; const ASourceOldJsonObj, ASourceNewJsonObj: TJSONObject): TJSONObject;
     function Diff_SimpleProp(const ASourceOldJsonValue, ASourceNewJsonValue: TJSONValue): TJSONObject;
-    function Diff_HasManyProp(const LProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject): TJSONArray;
+    function Diff_ObjectProp(const LProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject): TJSONObject;
+    function Diff_ListProp(const LProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject): TJSONArray;
     // protected
     // procedure NewNodePrepare(const LProp: IioProperty); virtual; abstract;
     // procedure NewConfirmOrRemove(const LProp: IioProperty); virtual; abstract;
@@ -90,7 +91,7 @@ begin
       rtNone:
         LDiffValue := Diff_SimpleProp(LSourceOldValue, LSourceNewValue);
       rtHasMany, rtEmbeddedHasMany:
-        LDiffValue := Diff_HasManyProp(LProp, ASourceOldJsonObj, ASourceNewJsonObj);
+        LDiffValue := Diff_ListProp(LProp, ASourceOldJsonObj, ASourceNewJsonObj);
       rtBelongsTo, rtHasOne, rtEmbeddedHasOne:
         ;
     end;
@@ -125,7 +126,21 @@ begin
   Result.AddPair(NEW_VALUE_PROP_NAME, ASourceNewJsonValue);
 end;
 
-function TioEtmDiff.Diff_HasManyProp(const LProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject): TJSONArray;
+function TioEtmDiff.Diff_ObjectProp(const LProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject): TJSONObject;
+var
+  LOldObj, LNewObj: TObject;
+begin
+  // Get the child object
+  LOldObj := LProp.GetRelationChildObject(ASourceOldObj);
+  LNewObj := LProp.GetRelationChildObject(ASourceNewObj);
+
+  if Assigned(LOldObj) and Assigned(LNewObj) then
+  begin
+
+  end;
+end;
+
+function TioEtmDiff.Diff_ListProp(const LProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject): TJSONArray;
 var
   LOldList, LNewList, LOldListItem, LNewListItem: TObject;
   LOldDuckList, LNewDuckList: IioDuckTypedList;
