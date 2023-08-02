@@ -39,6 +39,8 @@ uses
   System.JSON, iORM.Context.Properties.Interfaces;
 
 const
+  TYPE_PROP_NAME = '$etm_type';
+  ID_PROP_NAME = '$etm_id';
   OLD_VALUE_PROP_NAME = '$etm_old_value';
   NEW_VALUE_PROP_NAME = '$etm_new_value';
 
@@ -55,8 +57,9 @@ type
     function TryExtractCurrentValue(const LProp: IioProperty; const ASourceOldJsonObj, ASourceNewJsonObj: TJSONObject;
       out OCurrentOldJsonValue, OCurrentNewJsonValue: TJSONValue): Boolean;
     function Diff_Object(const ASourceOldObj, ASourceNewObj: TObject): TJSONObject;
-    function Diff_SimpleProp(const ASourceOldJsonValue, ASourceNewJsonValue: TJSONValue): TJSONObject;
-    function Diff_ObjectProp(const LProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const ASourceOldJsonValue, ASourceNewJsonValue: TJSONValue): TJSONObject;
+    function Diff_SimpleProp(const LProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject): TJSONObject;
+    function Diff_ObjectProp(const LProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const ASourceOldJsonValue, ASourceNewJsonValue: TJSONValue)
+      : TJSONObject;
     function Diff_ListProp(const LProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject): TJSONArray;
   public
   end;
@@ -66,7 +69,7 @@ implementation
 uses
   iORM.Context.Map.Interfaces, iORM.Context.Container, iORM.Attributes, System.SysUtils,
   iORM.DuckTyped.Interfaces, iORM.Exceptions, iORM.DuckTyped.Factory,
-  iORM.Utilities, DJSON, iORM.CommonTypes;
+  iORM.Utilities, DJSON, iORM.CommonTypes, System.Rtti;
 
 { TioEtmDiff }
 
@@ -91,7 +94,7 @@ begin
     LDiffValue := nil;
     case LProp.GetRelationType of
       rtNone:
-        LDiffValue := Diff_SimpleProp(LSourceOldValue, LSourceNewValue);
+        LDiffValue := Diff_SimpleProp(LProp, ASourceOldObj, ASourceNewObj);
       rtHasMany, rtEmbeddedHasMany:
         LDiffValue := Diff_ListProp(LProp, LSourceOldJsonObj, LSourceNewJsonObj);
       rtBelongsTo, rtHasOne, rtEmbeddedHasOne:
@@ -120,24 +123,45 @@ begin
   if Assigned(OCurrentNewJsonValue) and not Assigned(OCurrentOldJsonValue) then
     OCurrentOldJsonValue := OCurrentNewJsonValue.ClassType.Create as TJSONValue;
   // Detect if the current prop/value must be inserted in the result
-  //  note: OID property always inserted
+  // note: OID property always inserted
   Result := (OCurrentOldJsonValue.ToString <> OCurrentNewJsonValue.ToString) or (LProp.PropertyRole = prObjID);
 end;
 
-function TioEtmDiff.Diff_SimpleProp(const ASourceOldJsonValue, ASourceNewJsonValue: TJSONValue): TJSONObject;
+function TioEtmDiff.Diff_SimpleProp(const LProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject): TJSONObject;
+var
+  LValue: TValue;
+  LOldJsonValue, LNewJsonValue: TJSONValue;
 begin
+  // Get the old json value
+  if Assigned(ASourceOldObj) then
+  begin
+    LValue := LProp.GetValue(ASourceOldObj);
+    LOldJsonValue := dj.From(LValue).OpType(ssETM).byFields.ToJsonValue;
+  end
+  else
+    LOldJsonValue := TJSONNull.Create;
+  // Get the new json value
+  if Assigned(ASourceNewObj) then
+  begin
+    LValue := LProp.GetValue(ASourceNewObj);
+    LNewJsonValue := dj.From(LValue).OpType(ssETM).byFields.ToJsonValue;
+  end
+  else
+    LNewJsonValue := TJSONNull.Create;
+  // Build the result json object
   Result := TJSONObject.Create;
-  Result.AddPair(OLD_VALUE_PROP_NAME, ASourceOldJsonValue);
-  Result.AddPair(NEW_VALUE_PROP_NAME, ASourceNewJsonValue);
+  Result.AddPair(OLD_VALUE_PROP_NAME, LOldJsonValue);
+  Result.AddPair(NEW_VALUE_PROP_NAME, LNewJsonValue);
 end;
 
-function TioEtmDiff.Diff_ObjectProp(const LProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const ASourceOldJsonValue, ASourceNewJsonValue: TJSONValue): TJSONObject;
+function TioEtmDiff.Diff_ObjectProp(const LProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject;
+  const ASourceOldJsonValue, ASourceNewJsonValue: TJSONValue): TJSONObject;
 var
   LOldObj, LNewObj: TObject;
   LSourceOldJsonObj, LSourceNewJsonObj: TJSONObject;
 begin
-  LSourceOldJsonObj := ASourceOldJsonValue as TJsonObject;
-  LSourceNewJsonObj := ASourceNewJsonValue as TJsonObject;
+  LSourceOldJsonObj := ASourceOldJsonValue as TJSONObject;
+  LSourceNewJsonObj := ASourceNewJsonValue as TJSONObject;
   // If only the old one is not empty (count > 0) then return it (status := deleted)
   if (LSourceOldJsonObj.Count > 0) and (LSourceNewJsonObj.Count = 0) then
   begin
@@ -146,25 +170,25 @@ begin
     LSourceNewJsonObj.Free;
   end
   else
-  // If only the new one is not empty (count > 0) then return it (status := added)
-  if (LSourceNewJsonObj.Count > 0) and (LSourceOldJsonObj.Count = 0) then
-  begin
-    Result := LSourceNewJsonObj;
-    Result.AddPair(DIFF_STATUS_PROP_NAME, DIFF_STATUS_ADDED);
-    LSourceOldJsonObj.Free;
-  end
-  else
-  // else (if both old and new ones are not empty) then detect differences
-  begin
-    // Get the child objects
-    LOldObj := LProp.GetRelationChildObject(ASourceOldObj);
-    LNewObj := LProp.GetRelationChildObject(ASourceNewObj);
-    // Dtect differences (recursion)
-    Result := Diff_Object(LOldObj, LNewObj);
-    Result.AddPair(DIFF_STATUS_PROP_NAME, DIFF_STATUS_UPDATED);
-    LSourceOldJsonObj.Free;
-    LSourceNewJsonObj.Free;
-  end;
+    // If only the new one is not empty (count > 0) then return it (status := added)
+    if (LSourceNewJsonObj.Count > 0) and (LSourceOldJsonObj.Count = 0) then
+    begin
+      Result := LSourceNewJsonObj;
+      Result.AddPair(DIFF_STATUS_PROP_NAME, DIFF_STATUS_ADDED);
+      LSourceOldJsonObj.Free;
+    end
+    else
+    // else (if both old and new ones are not empty) then detect differences
+    begin
+      // Get the child objects
+      LOldObj := LProp.GetRelationChildObject(ASourceOldObj);
+      LNewObj := LProp.GetRelationChildObject(ASourceNewObj);
+      // Dtect differences (recursion)
+      Result := Diff_Object(LOldObj, LNewObj);
+      Result.AddPair(DIFF_STATUS_PROP_NAME, DIFF_STATUS_UPDATED);
+      LSourceOldJsonObj.Free;
+      LSourceNewJsonObj.Free;
+    end;
 end;
 
 function TioEtmDiff.Diff_ListProp(const LProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject): TJSONArray;

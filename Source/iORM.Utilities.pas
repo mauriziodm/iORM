@@ -37,7 +37,8 @@ interface
 
 uses
   System.Classes, System.TypInfo, System.Rtti, iORM.CommonTypes, iORM.MVVM.Interfaces,
-  iORM.LiveBindings.Interfaces, iORM.Context.Interfaces;
+  iORM.LiveBindings.Interfaces, iORM.Context.Interfaces,
+  iORM.Context.Properties.Interfaces;
 
 type
 
