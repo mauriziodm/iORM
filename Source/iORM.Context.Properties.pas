@@ -311,7 +311,7 @@ type
     procedure Add(const AProperty: IioProperty);
     function PropertyExists(const APropertyName: String): Boolean;
     function GetIdProperty: IioProperty;
-    function GetPropertyByName(const APropertyName: String): IioProperty;
+    function GetPropertyByName(const APropertyName: String; const ARaiseIfNotFound: Boolean = True): IioProperty;
     procedure SetTable(const ATable: IioTable);
     // Blob field present
     function BlobFieldExists: Boolean;
@@ -1113,14 +1113,16 @@ begin
   Result := FObjVersionProperty;
 end;
 
-function TioProperties.GetPropertyByName(const APropertyName: String): IioProperty;
+function TioProperties.GetPropertyByName(const APropertyName: String; const ARaiseIfNotFound: Boolean = True): IioProperty;
 var
   CurrProp: IioProperty;
 begin
+  Result := nil;
   for CurrProp in FPropertyItems do
     if CurrProp.GetName.ToUpper.Equals(APropertyName.ToUpper) then
       Exit(CurrProp);
-  raise EioException.Create(Self.ClassName + ': Context property "' + APropertyName + '" not found');
+  if ARaiseIfNotFound then
+    raise EioException.Create(Self.ClassName + ': Context property "' + APropertyName + '" not found.');
 end;
 
 function TioProperties.GetSql: String;

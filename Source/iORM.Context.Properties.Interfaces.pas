@@ -173,7 +173,7 @@ type
     procedure Add(const AProperty:IioProperty);
     function PropertyExists(const APropertyName: String): Boolean;
     function GetIdProperty: IioProperty;
-    function GetPropertyByName(const APropertyName:String): IioProperty;
+    function GetPropertyByName(const APropertyName: String; const ARaiseIfNotFound: Boolean = True): IioProperty;
     procedure SetTable(const ATable: IioTable);
     // Blob field present
     function BlobFieldExists: Boolean;
