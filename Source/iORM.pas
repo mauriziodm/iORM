@@ -1547,7 +1547,7 @@ end;
 
 class function io.etm: TIoEtmEngineRef;
 begin
-  Result := TIoEtmEngine;
+  Result := TioEtmEngine;
 end;
 
 class function io.Exists(const ATypeName, ATypeAlias: String; const AWhere: IioWhere): boolean;

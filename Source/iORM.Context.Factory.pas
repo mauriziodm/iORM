@@ -266,7 +266,7 @@ begin
   Result := TioMap.Create(AClassRef, LRttiContext, LRttiType, LTable, Properties(LRttiType, LTable));
   // If an EtmRepositoryClass is detected then register the class into the ETMEngine
   if Assigned(Result.GetTable.EtmRepositoryClass) then
-    TIoEtmEngine.TraceByMap(Result, Result.GetTable.EtmRepositoryClass, Result.GetTable.EtmTraceOnlyOnConnectionName);
+    TioEtmEngine.TraceByMap(Result, Result.GetTable.EtmRepositoryClass, Result.GetTable.EtmTraceOnlyOnConnectionName);
 end;
 
 class function TioContextFactory.Properties(const Typ: TRttiInstanceType; const ATable: IioTable): IioProperties;
