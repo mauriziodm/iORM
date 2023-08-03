@@ -31,44 +31,25 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.ETM.Diff;
+unit iORM.ETM.Diff.Oneway;
 
 interface
 
 uses
-  System.JSON, iORM.Context.Properties.Interfaces;
-
-const
-  ETM_OLD_PROP_TYPE = '$etm_old_type';
-  ETM_NEW_PROP_TYPE = '$etm_new_type';
-
-  ETM_OLD_CLASS = '$etm_old_class';
-  ETM_NEW_CLASS = '$etm_new_class';
-
-  ETM_ID = '$etm_id';
-  ETM_OLD_ID = '$etm_old_id';
-  ETM_NEW_ID = '$etm_new_id';
-
-  ETM_OLD_VALUE = '$etm_old_value';
-  ETM_NEW_VALUE = '$etm_new_value';
-
-  ETM_DIFF_STATUS = '$etm_diff_status';
-  ETM_DIFF_STATUS_NEW = 'new';
-  ETM_DIFF_STATUS_UPDATED = 'updated';
-  ETM_DIFF_STATUS_REMOVED = 'removed';
+  iORM.ETM.Interfaces, System.JSON, iORM.Context.Properties.Interfaces;
 
 type
 
-  TioEtmDiff = class
+  TioEtmOnewayDiff = class(TioEtmCustomDiff)
   private
-    function IsEmpty(const AJSONObject: TJSONObject): Boolean;
-    function Diff_Status(const AOld, ANew: Pointer): String;
-    function Diff_Object(const LPrevOldProp, LPrevNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
-    function Diff_ValueProp(const LOldProp, LNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
-    function Diff_ObjectProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
-    function Diff_ListProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AIncludeInfo: Boolean): TJSONValue;
+    class function IsEmpty(const AJSONObject: TJSONObject): Boolean;
+    class function Diff_Status(const AOld, ANew: Pointer): String;
+    class function Diff_Object(const LPrevOldProp, LPrevNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
+    class function Diff_ValueProp(const LOldProp, LNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
+    class function Diff_ObjectProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
+    class function Diff_ListProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AIncludeInfo: Boolean): TJSONValue;
   public
-    function Diff(const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
+    class function Diff(const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean): TJSONObject; override;
   end;
 
 implementation
@@ -80,7 +61,12 @@ uses
 
 { TioEtmDiff }
 
-function TioEtmDiff.IsEmpty(const AJSONObject: TJSONObject): Boolean;
+class function TioEtmOnewayDiff.Diff(const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
+begin
+  Result := Diff_Object(nil, nil, AOldObj, ANewObj, AIncludeInfo);
+end;
+
+class function TioEtmOnewayDiff.IsEmpty(const AJSONObject: TJSONObject): Boolean;
 var
   LJSONPair: TJSONPair;
 begin
@@ -90,7 +76,7 @@ begin
       Exit(False);
 end;
 
-function TioEtmDiff.Diff_Status(const AOld, ANew: Pointer): String;
+class function TioEtmOnewayDiff.Diff_Status(const AOld, ANew: Pointer): String;
 begin
   if (AOld <> nil) and (ANew <> nil) then
     Result := ETM_DIFF_STATUS_UPDATED
@@ -104,12 +90,7 @@ begin
     Result := String.Empty;
 end;
 
-function TioEtmDiff.Diff(const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
-begin
-  Result := Diff_Object(nil, nil, AOldObj, ANewObj, AIncludeInfo);
-end;
-
-function TioEtmDiff.Diff_Object(const LPrevOldProp, LPrevNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
+class function TioEtmOnewayDiff.Diff_Object(const LPrevOldProp, LPrevNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
 var
   LOldMap, LNewMap: IioMap;
   LOldProp, LNewProp: IioProperty;
@@ -203,7 +184,7 @@ begin
   // ====================================================================
 end;
 
-function TioEtmDiff.Diff_ValueProp(const LOldProp, LNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
+class function TioEtmOnewayDiff.Diff_ValueProp(const LOldProp, LNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
 var
   LValue: TValue;
   LOldJsonValue, LNewJsonValue: TJSONValue;
@@ -243,7 +224,7 @@ begin
     Result := nil;
 end;
 
-function TioEtmDiff.Diff_ObjectProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
+class function TioEtmOnewayDiff.Diff_ObjectProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
 var
   LOldObj, LNewObj: TObject;
 begin
@@ -263,7 +244,7 @@ begin
     FreeAndNil(Result);
 end;
 
-function TioEtmDiff.Diff_ListProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AIncludeInfo: Boolean): TJSONValue;
+class function TioEtmOnewayDiff.Diff_ListProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AIncludeInfo: Boolean): TJSONValue;
 var
   LOldList, LNewList, LOldListItem, LNewListItem: TObject;
   LOldDuckList, LNewDuckList: IioDuckTypedList;

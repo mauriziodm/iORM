@@ -44,7 +44,7 @@ interface
 
 uses
   System.Classes, System.Generics.Collections, iORM.Where.Interfaces,
-  iORM.Context.Map.Interfaces, iORM.Attributes;
+  iORM.Context.Map.Interfaces, iORM.Attributes, System.JSON;
 
 type
 
@@ -89,6 +89,8 @@ type
     class procedure Trace<T: class>(const AEtmRepositoryClass: TioEtmCustomRepositoryRef; const ATraceOnlyOnConnectionName: String = '');
     // Untrace
     class procedure Untrace<T: class>(const ATraceOnlyOnConnectionName: String = '');
+    // Diff
+//    class function DiffAsJSONObject(const AOlderVersionObj, ANewestVersionObj: TObject): TJSONObject;
   end;
 
 implementation
@@ -116,10 +118,10 @@ begin
   // Check repository class
   if not Assigned(AEtmRepositoryItem) then
     raise EioEtmException.Create(ClassName, 'Revert', '"AEtmRepositoryItem" parameter cannot be nil.');
-  // Insert operation has no state
-  if AEtmRepositoryItem.EventType = etInsert then
+  // Delete operation has no state
+  if AEtmRepositoryItem.EventType = etDelete then
     raise EioEtmException.Create(ClassName, 'Revert', Format('Hi, I''m iORM, I have to tell you an important thing.' +
-      #13#13'Revert is not allowed for "Insert" type operations because they have no information about the state to restore.' +
+      #13#13'Revert is not allowed for "Delete" type operations because they have no information about the state to restore.' +
       #13#13'The attempt to restore the entity of type "%s" ID %d version %d has failed.', [AEtmRepositoryItem.EntityClassName, AEtmRepositoryItem.EntityID,
       AEtmRepositoryItem.EntityVersion]));
   // Type check

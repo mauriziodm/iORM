@@ -100,11 +100,7 @@ type
     procedure SetOriginalNonTrueClassMap(const AMap: IioMap);
     function GetOriginalNonTrueClassMap: IioMap;
     property OriginalNonTrueClassMap: IioMap read GetOriginalNonTrueClassMap write SetOriginalNonTrueClassMap;
-    // EtmEntityStateDeforeUpdate
-    function GetEtmBeforeUpdateEntityState: String;
-    procedure SetEtmBeforeUpdateEntityState(const Value: String);
-    property EtmBeforeUpdateEntityState: String read GetEtmBeforeUpdateEntityState write SetEtmBeforeUpdateEntityState;
-    // EtmEntityStateDeforeUpdate
+    // EtmRevertedFromVersion
     function GetEtmRevertedFromVersion: Integer;
     procedure SetEtmRevertedFromVersion(const Value: Integer);
     property EtmRevertedFromVersion: Integer read GetEtmRevertedFromVersion write SetEtmRevertedFromVersion;

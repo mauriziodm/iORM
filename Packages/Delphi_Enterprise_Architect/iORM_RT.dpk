@@ -231,7 +231,9 @@ contains
   iORM.Interceptor.Strategy.Register in '..\..\Source\iORM.Interceptor.Strategy.Register.pas',
   iORM.Interceptor.CRUD.Register in '..\..\Source\iORM.Interceptor.CRUD.Register.pas',
   iORM.ETM.Interceptor in '..\..\Source\iORM.ETM.Interceptor.pas',
-  iORM.ETM.Diff in '..\..\Source\iORM.ETM.Diff.pas';
+  iORM.ETM.Diff.Oneway in '..\..\Source\iORM.ETM.Diff.Oneway.pas',
+  iORM.ETM.Interfaces in '..\..\Source\iORM.ETM.Interfaces.pas',
+  iORM.ETM.Factory in '..\..\Source\iORM.ETM.Factory.pas';
 
 end.
 

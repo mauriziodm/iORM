@@ -54,7 +54,6 @@ type
     FMasterPropertyPath: String;
     FMasterBSPersistence: TioBSPersistence;
     FOriginalNonTrueClassMap: IioMap;
-    FEtmBeforeUpdateEntityState: String;
     FEtmRevertedFromVersion: Integer;
     // DataObject
     function GetDataObject: TObject;
@@ -85,10 +84,7 @@ type
     // OriginalResolvedTypeNameNonTrueClass
     procedure SetOriginalNonTrueClassMap(const AMap: IioMap);
     function GetOriginalNonTrueClassMap: IioMap;
-    // EtmEntityStateDeforeUpdate
-    function GetEtmBeforeUpdateEntityState: String;
-    procedure SetEtmBeforeUpdateEntityState(const Value: String);
-    // EtmEntityStateDeforeUpdate
+    // EtmRevertedFromVersion
     function GetEtmRevertedFromVersion: Integer;
     procedure SetEtmRevertedFromVersion(const Value: Integer);
   public
@@ -120,7 +116,6 @@ type
     property RelationOID: Integer read GetRelationOID write SetRelationOID;
     property MasterPropertyPath: String read GetMasterPropertyPath;
     property MasterBSPersistence: TioBSPersistence read GetMasterBSPersistence;
-    property EtmBeforeUpdateEntityState: String read GetEtmBeforeUpdateEntityState write SetEtmBeforeUpdateEntityState;
     property EtmRevertedFromVersion: Integer read GetEtmRevertedFromVersion write SetEtmRevertedFromVersion;
     /// Contiene il nome della classe originaria cioè, nel caso il contesto sia stato creato con
     ///  la TrueClassVirtual (select query) a partire da una resolved class name, contiene il nome
@@ -153,7 +148,6 @@ begin
   FMasterPropertyPath := AMasterPropertyPath + IfThen(AMasterPropertyName.IsEmpty, '', '.') + AMasterPropertyName;
   FMasterBSPersistence := AMasterBSPersistence;
   FOriginalNonTrueClassMap := nil;
-  FEtmBeforeUpdateEntityState := '';
   FEtmRevertedFromVersion := 0;
 end;
 
@@ -165,11 +159,6 @@ end;
 function TioContext.GetDataObject: TObject;
 begin
   Result := FDataObject;
-end;
-
-function TioContext.GetEtmBeforeUpdateEntityState: String;
-begin
-  Result := FEtmBeforeUpdateEntityState;
 end;
 
 function TioContext.GetEtmRevertedFromVersion: Integer;
@@ -265,11 +254,6 @@ end;
 procedure TioContext.SetDataObject(const AValue: TObject);
 begin
   FDataObject := AValue;
-end;
-
-procedure TioContext.SetEtmBeforeUpdateEntityState(const Value: String);
-begin
-  FEtmBeforeUpdateEntityState := Value;
 end;
 
 procedure TioContext.SetEtmRevertedFromVersion(const Value: Integer);

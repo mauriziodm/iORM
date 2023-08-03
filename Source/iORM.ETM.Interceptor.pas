@@ -67,10 +67,14 @@ uses
 
 class procedure TioEtmInterceptor.AfterInsert(const AContext: IioContext);
 var
+  LEntityState: String;
   LRepository: TioEtmCustomRepository;
 begin
+  // Get the state (JSON) of the entity
+  LEntityState := dj.From(AContext.DataObject).OpType(ssETM).byFields.TypeAnnotationsON.ToJson;
   // Create the repository item, persist it and finally free it
-  LRepository := AContext.Map.GetTable.GetEtmRepositoryClass.Create(etInsert, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, 0, 0, '', '');
+  LRepository := AContext.Map.GetTable.GetEtmRepositoryClass.Create(etInsert, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, AContext.ObjVersion,
+    0, LEntityState, '');
   try
     io.PersistObject(LRepository);
   finally
@@ -81,16 +85,10 @@ end;
 class procedure TioEtmInterceptor.BeforeUpdate(const AContext: IioContext; var ADone: Boolean);
 var
   LPreviousStateObj: TObject;
-  LCurrentState: String;
 begin
   // Gather the previous state of the entity (before update query)
   LPreviousStateObj := io.Load(AContext.DataObject.ClassName).ByID(AContext.GetID).ToObject; // Load the previous version obj
   try
-    // Check if the current state has been updated, if it is then set the previous state on the context else set it as empty string
-    LCurrentState := dj.From(AContext.DataObject).OpType(ssETM).byFields.TypeAnnotationsON.ToJson;
-    AContext.EtmBeforeUpdateEntityState := dj.From(LPreviousStateObj).OpType(ssETM).byFields.TypeAnnotationsON.ToJson;
-    if LCurrentState = AContext.EtmBeforeUpdateEntityState then
-      AContext.EtmBeforeUpdateEntityState := String.Empty;
     // If the ObjVersion is negative it means that we are trying to restore a previous version
     if AContext.ObjVersion < 0 then
     begin
@@ -104,13 +102,14 @@ end;
 
 class procedure TioEtmInterceptor.AfterUpdate(const AContext: IioContext);
 var
+  LEntityState: String;
   LRepository: TioEtmCustomRepository;
 begin
-  // Check if the state has changed
-  if AContext.EtmBeforeUpdateEntityState.IsEmpty then
-    Exit;
+  // Get the state (JSON) of the entity
+  LEntityState := dj.From(AContext.DataObject).OpType(ssETM).byFields.TypeAnnotationsON.ToJson;
   // Create the repository item, persist it and finally free it
-  LRepository := AContext.Map.GetTable.GetEtmRepositoryClass.Create(etUpdate, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, AContext.ObjVersion-1, AContext.EtmRevertedFromVersion, AContext.EtmBeforeUpdateEntityState, '');
+  LRepository := AContext.Map.GetTable.GetEtmRepositoryClass.Create(etUpdate, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, AContext.ObjVersion,
+    AContext.EtmRevertedFromVersion, LEntityState, '');
   try
     io.PersistObject(LRepository);
   finally
@@ -120,14 +119,11 @@ end;
 
 class procedure TioEtmInterceptor.AfterDelete(const AContext: IioContext);
 var
-  LEntityState: String;
   LRepository: TioEtmCustomRepository;
 begin
-  // Get the state (JSON) of the entity just before delete it
-  LEntityState := dj.From(AContext.DataObject).OpType(ssETM).byFields.TypeAnnotationsON.ToJson;
-  // Create the repository item, persist it and finally free it
-  LRepository := AContext.Map.GetTable.GetEtmRepositoryClass.Create(etDelete, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, AContext.ObjVersion, 0,
-    LEntityState, '');
+  // Create the repository item, persist it and finally free it (no entity state on delete)
+  LRepository := AContext.Map.GetTable.GetEtmRepositoryClass.Create(etDelete, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, AContext.ObjVersion,
+    0, '', '');
   try
     io.PersistObject(LRepository);
   finally
