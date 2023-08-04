@@ -324,13 +324,13 @@ begin
     end;
   end;
   // -----------------------------------------------------------
-  // Create and execute insert query and set the version/created/updated of the entity (Intercepted by crudInterceptors)
 {$IFNDEF ioCRUDInterceptorsOff}
   LDone := False;
   TioCRUDInterceptorRegister.BeforeInsert(AContext, LDone);
   if not LDone then
   begin
 {$ENDIF}
+    // Create and execute insert query and set the version/created/updated of the entity (Intercepted by crudInterceptors)
     LQuery := TioDBFactory.QueryEngine.GetQueryInsert(AContext);
     LQuery.ExecSQL;
     if not ABlindInsertUpdate then
@@ -339,25 +339,25 @@ begin
       AContext.ObjCreated := LQuery.Connection.LastTransactionTimestamp;
       AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;
     end;
+    // -----------------------------------------------------------
+    // Get and execute a query to retrieve the last ID generated
+    // in the last insert query.
+    if (not ABlindInsertUpdate) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtAfterInsert) and AContext.IDIsNull then
+    begin
+      LQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
+      try
+        LQuery.Open;
+        // Set the NextID as the ObjectID
+        AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, LQuery.Fields[0].AsInteger);
+      finally
+        LQuery.Close;
+      end;
+    end;
+    // -----------------------------------------------------------
 {$IFNDEF ioCRUDInterceptorsOff}
     TioCRUDInterceptorRegister.AfterInsert(AContext);
   end;
 {$ENDIF}
-  // -----------------------------------------------------------
-  // Get and execute a query to retrieve the last ID generated
-  // in the last insert query.
-  if (not ABlindInsertUpdate) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtAfterInsert) and AContext.IDIsNull then
-  begin
-    LQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
-    try
-      LQuery.Open;
-      // Set the NextID as the ObjectID
-      AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, LQuery.Fields[0].AsInteger);
-    finally
-      LQuery.Close;
-    end;
-  end;
-  // -----------------------------------------------------------
 end;
 
 class function TioStrategyDB.InTransaction(const AConnectionName: String): Boolean;
