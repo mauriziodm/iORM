@@ -264,9 +264,9 @@ begin
   LTable := Self.Table(LRttiType);
   // Create the map
   Result := TioMap.Create(AClassRef, LRttiContext, LRttiType, LTable, Properties(LRttiType, LTable));
-  // If an EtmRepositoryClass is detected then register the class into the ETMEngine
-  if Assigned(Result.GetTable.EtmRepositoryClass) then
-    TioEtmEngine.TraceByMap(Result, Result.GetTable.EtmRepositoryClass, Result.GetTable.EtmTraceOnlyOnConnectionName);
+  // If an EtmTimeSlotClass is detected then register the class into the ETMEngine
+  if Assigned(Result.GetTable.EtmTimeSlotClass) then
+    TioEtmEngine.TraceByMap(Result, Result.GetTable.EtmTimeSlotClass, Result.GetTable.EtmTraceOnlyOnConnectionName);
 end;
 
 class function TioContextFactory.Properties(const Typ: TRttiInstanceType; const ATable: IioTable): IioProperties;
@@ -699,7 +699,7 @@ var
   LGroupBy: IioGroupBy;
   LMapMode: TioMapModeType;
   LIndexList: TioIndexList;
-  LEtmRepositoryClass: TioEtmCustomRepositoryRef;
+  LEtmTimeSlotClass: TioEtmTimeSlotRef;
   LEtmTraceOnlyOnConnectionName: String;
 begin
   try
@@ -713,7 +713,7 @@ begin
     LGroupBy := nil;
     LMapMode := DEFAULT_MAP_MODE;
     LIndexList := nil;
-    LEtmRepositoryClass := nil;
+    LEtmTimeSlotClass := nil;
     LEtmTraceOnlyOnConnectionName := '';
     // Check attributes
     for LAttr in Typ.GetAttributes do
@@ -749,15 +749,15 @@ begin
       // etmTrace
       if (LAttr is etmTrace) then
       begin
-        LEtmRepositoryClass := etmTrace(LAttr).RepositoryClass;
+        LEtmTimeSlotClass := etmTrace(LAttr).TimeSlotClass;
         LEtmTraceOnlyOnConnectionName := etmTrace(LAttr).TraceOnlyOnConnectionName;
       end;
     end;
     // Create result Properties object
     Result := TioTable.Create(LTableName, LKeyGenerator, LTrueClass, LJoins, LGroupBy, LConnectionName, LMapMode, Typ);
-    if Assigned(LEtmRepositoryClass) then
+    if Assigned(LEtmTimeSlotClass) then
     begin
-      Result.EtmRepositoryClass := LEtmRepositoryClass;
+      Result.EtmTimeSlotClass := LEtmTimeSlotClass;
       Result.EtmTraceOnlyOnConnectionName := LEtmTraceOnlyOnConnectionName;
     end;
     // If an IndexList is present then assign it to the ioTable

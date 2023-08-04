@@ -32,11 +32,11 @@
   ****************************************************************************
 }
 {
-  *************************************************************************************************************************************
-  * NOTE: TioEtmCustomRepository base class for all EtmRepositories is declared in iORM.Attributes unit to avoid circular refeference *
-  * NOTE: TioEtmCustomRepository base class for all EtmRepositories is declared in iORM.Attributes unit to avoid circular refeference *
-  * NOTE: TioEtmCustomRepository base class for all EtmRepositories is declared in iORM.Attributes unit to avoid circular refeference *
-  *************************************************************************************************************************************
+  ********************************************************************************************************************************
+  * NOTE: TioEtmCustomTimeSlot base class for all EtmTimeSlots is declared in iORM.Attributes unit to avoid circular refeference *
+  * NOTE: TioEtmCustomTimeSlot base class for all EtmTimeSlots is declared in iORM.Attributes unit to avoid circular refeference *
+  * NOTE: TioEtmCustomTimeSlot base class for all EtmTimeSlots is declared in iORM.Attributes unit to avoid circular refeference *
+  ********************************************************************************************************************************
 }
 unit iORM.ETM.Interceptor;
 
@@ -68,17 +68,17 @@ uses
 class procedure TioEtmInterceptor.AfterInsert(const AContext: IioContext);
 var
   LEntityState: String;
-  LRepository: TioEtmCustomRepository;
+  LTimeSlot: TioEtmCustomTimeSlot;
 begin
   // Get the state (JSON) of the entity
   LEntityState := dj.From(AContext.DataObject).OpType(ssETM).byFields.TypeAnnotationsON.ToJson;
-  // Create the repository item, persist it and finally free it
-  LRepository := AContext.Map.GetTable.GetEtmRepositoryClass.Create(etInsert, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, AContext.ObjVersion,
+  // Create the TimeSlot, persist it and finally free it
+  LTimeSlot := AContext.Map.GetTable.GetEtmTimeSlotClass.Create(etInsert, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, AContext.ObjVersion,
     0, LEntityState, '');
   try
-    io.PersistObject(LRepository);
+    io.PersistObject(LTimeSlot);
   finally
-    LRepository.Free;
+    LTimeSlot.Free;
   end;
 end;
 
@@ -103,31 +103,31 @@ end;
 class procedure TioEtmInterceptor.AfterUpdate(const AContext: IioContext);
 var
   LEntityState: String;
-  LRepository: TioEtmCustomRepository;
+  LTimeSlot: TioEtmCustomTimeSlot;
 begin
   // Get the state (JSON) of the entity
   LEntityState := dj.From(AContext.DataObject).OpType(ssETM).byFields.TypeAnnotationsON.ToJson;
-  // Create the repository item, persist it and finally free it
-  LRepository := AContext.Map.GetTable.GetEtmRepositoryClass.Create(etUpdate, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, AContext.ObjVersion,
+  // Create the TimeSlot, persist it and finally free it
+  LTimeSlot := AContext.Map.GetTable.GetEtmTimeSlotClass.Create(etUpdate, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, AContext.ObjVersion,
     AContext.EtmRevertedFromVersion, LEntityState, '');
   try
-    io.PersistObject(LRepository);
+    io.PersistObject(LTimeSlot);
   finally
-    LRepository.Free;
+    LTimeSlot.Free;
   end;
 end;
 
 class procedure TioEtmInterceptor.AfterDelete(const AContext: IioContext);
 var
-  LRepository: TioEtmCustomRepository;
+  LTimeSlot: TioEtmCustomTimeSlot;
 begin
-  // Create the repository item, persist it and finally free it (no entity state on delete)
-  LRepository := AContext.Map.GetTable.GetEtmRepositoryClass.Create(etDelete, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, AContext.ObjVersion,
+  // Create the TimeSlot, persist it and finally free it (no entity state on delete)
+  LTimeSlot := AContext.Map.GetTable.GetEtmTimeSlotClass.Create(etDelete, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, AContext.ObjVersion,
     0, '', '');
   try
-    io.PersistObject(LRepository);
+    io.PersistObject(LTimeSlot);
   finally
-    LRepository.Free;
+    LTimeSlot.Free;
   end;
 end;
 

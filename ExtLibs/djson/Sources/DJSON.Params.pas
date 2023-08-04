@@ -84,7 +84,7 @@ type
     function GetEngine: TdjEngine;
     property Engine: TdjEngine read GetEngine write SetEngine;
     // OperationType
-    function IsToSkip(const APropField: System.Rtti.TRttiNamedObject): Boolean;
+    function IsToBeSkipped(const APropField: System.Rtti.TRttiNamedObject): Boolean;
     procedure SetOpType(const AValue: TdjSkipScope);
     function GetOpType: TdjSkipScope;
     property OpType: TdjSkipScope read GetOpType write SetOpType;
@@ -252,7 +252,7 @@ type
     procedure SetEngine(const AValue: TdjEngine);
     function GetEngine: TdjEngine;
     // OperationType (Skip)
-    function IsToSkip(const APropField: System.Rtti.TRttiNamedObject): Boolean;
+    function IsToBeSkipped(const APropField: System.Rtti.TRttiNamedObject): Boolean;
     procedure SetOpType(const AValue: TdjSkipScope);
     function GetOpType: TdjSkipScope;
     // SerializationMode
@@ -507,7 +507,7 @@ begin
   Result := FTypeAnnotations;
 end;
 
-function TdjParams.IsToSkip(const APropField: System.Rtti.TRttiNamedObject): Boolean;
+function TdjParams.IsToBeSkipped(const APropField: System.Rtti.TRttiNamedObject): Boolean;
 var
   LAttr: TCustomAttribute;
 begin

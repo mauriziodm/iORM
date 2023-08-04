@@ -137,11 +137,11 @@ type
     FRttiType: TRttiInstanceType;
     FIndexList: TioIndexList;
     FContainsSomeIioListProperty: Boolean;
-    FEtmRepositoryClass: TioEtmCustomRepositoryRef;
+    FEtmTimeSlotClass: TioEtmTimeSlotRef;
     FEtmTraceOnlyOnConnectionName: String;
-    // EtmRepositoryClass
-    procedure SetEtmRepositoryClass(const AEtmRepositoryClass: TioEtmCustomRepositoryRef);
-    function GetEtmRepositoryClass: TioEtmCustomRepositoryRef;
+    // EtmTimeSlotClass
+    procedure SetEtmTimeSlotClass(const AEtmTimeSlotClass: TioEtmTimeSlotRef);
+    function GetEtmTimeSlotClass: TioEtmTimeSlotRef;
     // EtmTraceOnlyOnConnectionName
     procedure SetEtmTraceOnlyOnConnectionName(const AConnectionName: String);
     function GetEtmTraceOnlyOnConnectionName: String;
@@ -170,7 +170,7 @@ type
     function GetIndexList(AAutoCreateIfUnassigned: Boolean): TioIndexList;
     procedure SetIndexList(AIndexList: TioIndexList);
     // Properties
-    property EtmRepositoryClass: TioEtmCustomRepositoryRef read GetEtmRepositoryClass write SetEtmRepositoryClass;
+    property EtmTimeSlotClass: TioEtmTimeSlotRef read GetEtmTimeSlotClass write SetEtmTimeSlotClass;
     property EtmTraceOnlyOnConnectionName: String read GetEtmTraceOnlyOnConnectionName write SetEtmTraceOnlyOnConnectionName;
   end;
 
@@ -203,7 +203,7 @@ begin
   if Assigned(FGroupBy) then
     FGroupBy.SetTable(Self);
   // ETM
-  FEtmRepositoryClass := nil;
+  FEtmTimeSlotClass := nil;
   FEtmTraceOnlyOnConnectionName := String.Empty;
 end;
 
@@ -239,9 +239,9 @@ begin
   Result := TioDBFActory.ConnectionManager.GetCurrentConnectionNameIfEmpty(FConnectionDefName_DoNotCallDirectly);
 end;
 
-function TioTable.GetEtmRepositoryClass: TioEtmCustomRepositoryRef;
+function TioTable.GetEtmTimeSlotClass: TioEtmTimeSlotRef;
 begin
-  Result := FEtmRepositoryClass;
+  Result := FEtmTimeSlotClass;
 end;
 
 function TioTable.GetEtmTraceOnlyOnConnectionName: String;
@@ -317,9 +317,9 @@ begin
     (LCurrentConnectionDefName = AConnectionDefNameToCheck);
 end;
 
-procedure TioTable.SetEtmRepositoryClass(const AEtmRepositoryClass: TioEtmCustomRepositoryRef);
+procedure TioTable.SetEtmTimeSlotClass(const AEtmTimeSlotClass: TioEtmTimeSlotRef);
 begin
-  FEtmRepositoryClass := AEtmRepositoryClass;
+  FEtmTimeSlotClass := AEtmTimeSlotClass;
 end;
 
 procedure TioTable.SetEtmTraceOnlyOnConnectionName(const AConnectionName: String);

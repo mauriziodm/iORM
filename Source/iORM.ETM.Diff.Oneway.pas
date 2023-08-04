@@ -43,6 +43,7 @@ type
   TioEtmOnewayDiff = class(TioEtmCustomDiff)
   private
     class function IsEmpty(const AJSONObject: TJSONObject): Boolean;
+    class function IsToBeSkipped(const AProp: IioProperty): Boolean;
     class function Diff_Status(const AOld, ANew: Pointer): String;
     class function Diff_Object(const LPrevOldProp, LPrevNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
     class function Diff_ValueProp(const LOldProp, LNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
@@ -57,7 +58,7 @@ implementation
 uses
   iORM.Context.Map.Interfaces, iORM.Context.Container, iORM.Attributes, System.SysUtils,
   iORM.DuckTyped.Interfaces, iORM.Exceptions, iORM.DuckTyped.Factory,
-  iORM.Utilities, DJSON, iORM.CommonTypes, System.Rtti;
+  iORM.Utilities, iORM.CommonTypes, System.Rtti, DJSON, DJSON.Params;
 
 { TioEtmDiff }
 
@@ -74,6 +75,15 @@ begin
   for LJSONPair in AJSONObject do
     if not LJSONPair.JsonString.Value.StartsWith('$etm') then
       Exit(False);
+end;
+
+class function TioEtmOnewayDiff.IsToBeSkipped(const AProp: IioProperty): Boolean;
+var
+  LdjParams: IdjParams;
+begin
+  LdjParams := dj.Default;
+  LdjParams.OpType := TdjSkipScope.ssETM;
+  Result := AProp.isHasManyChildVirtualProperty or LdjParams.IsToBeSkipped(AProp.GetInternalRttiPropField);
 end;
 
 class function TioEtmOnewayDiff.Diff_Status(const AOld, ANew: Pointer): String;
@@ -132,6 +142,9 @@ begin
   begin
     for LNewProp in LNewMap.GetProperties do
     begin
+      // If the current property is to be skipped...
+      if IsToBeSkipped(LNewProp) then
+        Continue;
       // Search for the same property into the old map (nil if not found)
       LOldProp := nil;
       if Assigned(LOldMap) then
@@ -159,6 +172,9 @@ begin
   begin
     for LOldProp in LOldMap.GetProperties do
     begin
+      // If the current property is to be skipped...
+      if IsToBeSkipped(LOldProp) then
+        Continue;
       // Search for the same property into the new map (nil if not found)
       LNewProp := nil;
       if Assigned(LNewMap) then
@@ -189,6 +205,7 @@ var
   LValue: TValue;
   LOldJsonValue, LNewJsonValue: TJSONValue;
 begin
+  Result := nil;
   // Get the old json value
   if Assigned(LOldProp) then
   begin
@@ -219,9 +236,7 @@ begin
     // Values
     Result.AddPair(ETM_OLD_VALUE, LOldJsonValue);
     Result.AddPair(ETM_NEW_VALUE, LNewJsonValue);
-  end
-  else
-    Result := nil;
+  end;
 end;
 
 class function TioEtmOnewayDiff.Diff_ObjectProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;

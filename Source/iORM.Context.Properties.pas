@@ -140,6 +140,7 @@ type
     procedure SetValue(const Instance: Pointer; const AValue: TValue); virtual;
     function GetSqlValue(const ADataObject: TObject): String;
     function GetRttiType: TRttiType; virtual;
+    function GetInternalRttiPropField: System.Rtti.TRttiNamedObject; virtual;
     function GetTypeInfo: PTypeInfo; virtual;
     function GetTypeName: String;
     function GetTypeAlias: String;
@@ -247,6 +248,7 @@ type
     function GetValue(const Instance: Pointer): TValue; override;
     procedure SetValue(const Instance: Pointer; const AValue: TValue); override;
     function GetRttiType: TRttiType; override;
+    function GetInternalRttiPropField: System.Rtti.TRttiNamedObject; override;
     function GetTypeInfo: PTypeInfo; override;
     function IsWritable: Boolean; override;
     function IsEnumeration: Boolean; override;
@@ -457,6 +459,11 @@ begin
   else
     Result := 'NULL';
   end;
+end;
+
+function TioProperty.GetInternalRttiPropField: System.Rtti.TRttiNamedObject;
+begin
+  Result := FRttiProperty;
 end;
 
 function TioProperty.GetLoadSql: String;
@@ -1239,6 +1246,11 @@ begin
   FName := Self.Remove_F_FromName(ARttiField.Name);
   // Set the property role
   AssignPropertyRole(AIsID);
+end;
+
+function TioField.GetInternalRttiPropField: System.Rtti.TRttiNamedObject;
+begin
+  Result := FRttiProperty;
 end;
 
 function TioField.GetName: String;

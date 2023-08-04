@@ -75,6 +75,7 @@ type
     procedure SetValue(const Instance: Pointer; const AValue: TValue);
     function GetSqlValue(const ADataObject: TObject): String;
     function GetRttiType: TRttiType;
+    function GetInternalRttiPropField: System.Rtti.TRttiNamedObject;
     function GetTypeInfo: PTypeInfo;
     function GetTypeName: String;
     function GetTypeAlias: String;

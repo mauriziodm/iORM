@@ -106,10 +106,10 @@ type
     function IndexListExists: Boolean;
     function GetIndexList(AAutoCreateIfUnassigned:Boolean): TioIndexList;
     procedure SetIndexList(AIndexList:TioIndexList);
-    // EtmRepositoryClass
-    procedure SetEtmRepositoryClass(const AEtmRepositoryClass: TioEtmCustomRepositoryRef);
-    function GetEtmRepositoryClass: TioEtmCustomRepositoryRef;
-    property EtmRepositoryClass: TioEtmCustomRepositoryRef read GetEtmRepositoryClass write SetEtmRepositoryClass;
+    // EtmTimeSlotClass
+    procedure SetEtmTimeSlotClass(const AEtmTimeSlotClass: TioEtmTimeSlotRef);
+    function GetEtmTimeSlotClass: TioEtmTimeSlotRef;
+    property EtmTimeSlotClass: TioEtmTimeSlotRef read GetEtmTimeSlotClass write SetEtmTimeSlotClass;
     // EtmTraceOnlyOnConnectionName
     procedure SetEtmTraceOnlyOnConnectionName(const AConnectionName: String);
     function GetEtmTraceOnlyOnConnectionName: String;

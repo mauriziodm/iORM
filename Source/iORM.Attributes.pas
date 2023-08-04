@@ -36,7 +36,8 @@ unit iORM.Attributes;
 interface
 
 uses
-  System.Rtti, iORM.CommonTypes, System.Classes, DJSON.Attributes;
+  System.Rtti, iORM.CommonTypes, System.Classes, DJSON.Attributes,
+  System.Generics.Collections;
 
 
 {$REGION '===== TYPES & CONSTANTS ====='}
@@ -509,11 +510,11 @@ type
 {$ENDREGION} // END OF DEPENDENCY INJECTION ATTRIBUTES
 
 
-{$REGION '===== ETM ATTRIBUTES & REPOSITORY ====='}
+{$REGION '===== ETM ATTRIBUTES & TIMESLOT ====='}
 
   // Base class for ell ETM repositories
-  TioEtmCustomRepositoryRef = class of TioEtmCustomRepository;
-  TioEtmCustomRepository = class
+  TioEtmTimeSlotRef = class of TioEtmCustomTimeSlot;
+  TioEtmCustomTimeSlot = class
   private
     FID: Integer;
     FDateAndTime: TioObjCreated;
@@ -549,15 +550,18 @@ type
     property SmartEntityVersion: String read GetSmartEntityVersion;
   end;
 
+  // A TimeLine is a list of time slots
+  TioEtmTimeLine = TObjectList<TioEtmCustomTimeSlot>;
+
   etmRepository = ioEntity;
 
   etmTrace = class(TCustomAttribute)
   strict private
-    FRepositoryClass: TioEtmCustomRepositoryRef;
+    FTimeSlotClass: TioEtmTimeSlotRef;
     FTraceOnlyOnConnectionName: String;
   public
-    constructor Create(const ARepositoryClass: TioEtmCustomRepositoryRef; const AConnectionName: String = '');
-    property RepositoryClass: TioEtmCustomRepositoryRef read FRepositoryClass;
+    constructor Create(const ATimeSlotClass: TioEtmTimeSlotRef; const AConnectionName: String = '');
+    property TimeSlotClass: TioEtmTimeSlotRef read FTimeSlotClass;
     property TraceOnlyOnConnectionName: String read FTraceOnlyOnConnectionName;
   end;
 
@@ -870,9 +874,9 @@ end;
 
 { etmTraceAttribute }
 
-constructor etmTrace.Create(const ARepositoryClass: TioEtmCustomRepositoryRef; const AConnectionName: String = '');
+constructor etmTrace.Create(const ATimeSlotClass: TioEtmTimeSlotRef; const AConnectionName: String = '');
 begin
-  FRepositoryClass := ARepositoryClass;
+  FTimeSlotClass := ATimeSlotClass;
   FTraceOnlyOnConnectionName := AConnectionName;
 end;
 
@@ -883,9 +887,9 @@ begin
   FConnectionName := AConnectionName;
 end;
 
-{ TioEtmCustomRepository }
+{ TioEtmCustomTimeSlot }
 
-constructor TioEtmCustomRepository.Create(const AEventType: TioEtmEventType; const AConflictType: TioEtmConflictType; const AEntityID: Integer; const AEntityClassName: String;
+constructor TioEtmCustomTimeSlot.Create(const AEventType: TioEtmEventType; const AConflictType: TioEtmConflictType; const AEntityID: Integer; const AEntityClassName: String;
       const AEntityObjVersion, ARevertedFromVersion: Integer; const AEntityState, ARemoteEntityState: String);
 begin
   FEventType := AEventType;
@@ -898,7 +902,7 @@ begin
   FRemoteEntityState := ARemoteEntityState;
 end;
 
-function TioEtmCustomRepository.GetSmartEntityVersion: String;
+function TioEtmCustomTimeSlot.GetSmartEntityVersion: String;
 begin
   if FRevertedFromVersion <> 0 then
     Result := Format('%d (reverted from %d)', [FEntityVersion, RevertedFromVersion])
