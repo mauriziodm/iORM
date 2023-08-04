@@ -50,59 +50,64 @@ uses
 type
 
   TioEtmEngineRef = class of TioEtmEngine;
+
   TioEtmEngine = class
   private
     class function _InternalGetMap(const AEntityClassName: String): IioMap;
     class function _InternalBuildTimeLineWhere(const AEntityClassName: String): IioWhere<TioEtmCustomRepository>;
     class function _InternalTimeTravelFor(const AEntityClassName: String; const AEntityID: Integer; const AWhere: IioWhere = nil)
       : TObjectList<TioEtmCustomRepository>; overload;
-    class function _InternalBuildRevertWhere(const AEntityClassName: String; const AEntityID: Integer; const AEntityVersion: Integer): IioWhere<TioEtmCustomRepository>;
+    class function _InternalBuildRevertWhere(const AEntityClassName: String; const AEntityID: Integer; const AEntityVersion: Integer)
+      : IioWhere<TioEtmCustomRepository>;
     class procedure _ObjVersionToNegative(const AObj: TObject);
     class procedure _CheckRepositoryItem(const AEtmRepositoryItem: TioEtmCustomRepository; const ATargetClassName: String = '');
   public
     // Fluent interface
     class function FluentTimeLineFor<T: class>: IioWhere<TioEtmCustomRepository>; overload;
-    class function FluentTimeLineFor(const AEntityClassName: String): IioWhere<TioEtmCustomRepository>; overload;
+    class function FluentTimeLineFor(const AClassName: String): IioWhere<TioEtmCustomRepository>; overload;
     class function FluentTimeLineFor(const AObj: TObject): IioWhere<TioEtmCustomRepository>; overload;
     class function FluentTimeLineFor(const AIntf: IInterface): IioWhere<TioEtmCustomRepository>; overload;
     // Non fluent interface
     class function TimeLineFor<T: class>(const AEntityID: Integer; const AWhere: IioWhere = nil): TObjectList<TioEtmCustomRepository>; overload;
-    class function TimeLineFor(const AEntityClassName: String; const AEntityID: Integer; const AWhere: IioWhere = nil)
+    class function TimeLineFor(const AClassName: String; const AEntityID: Integer; const AWhere: IioWhere = nil)
       : TObjectList<TioEtmCustomRepository>; overload;
     class function TimeLineFor(const AObj: TObject; const AWhere: IioWhere = nil): TObjectList<TioEtmCustomRepository>; overload;
     class function TimeLineFor(const AIntf: IInterface; const AWhere: IioWhere = nil): TObjectList<TioEtmCustomRepository>; overload;
     // Revert
+    class function RevertObject(const AEtmRepositoryItem: TioEtmCustomRepository; const APersistImmediately: Boolean = False): TObject; overload;
     class function RevertObject<T: class>(const AEtmRepositoryItem: TioEtmCustomRepository; const APersistImmediately: Boolean = False): T; overload;
-    class function RevertObject<T: class>(const AID, AVersion: Integer; const APersistImmediately: Boolean = False): T; overload;
     // RevertToObject
     class procedure RevertToObject(const ATargetObj: TObject; const AEtmRepositoryItem: TioEtmCustomRepository; const APersistImmediately: Boolean = False); overload;
-    class procedure RevertToObject(const ATargetObj: TObject; const AID, AVersion: Integer; const APersistImmediately: Boolean = False); overload;
     class procedure RevertToObject(const ATargetIntf: IInterface; const AEtmRepositoryItem: TioEtmCustomRepository; const APersistImmediately: Boolean = False); overload;
-    class procedure RevertToObject(const ATargetIntf: IInterface; const AID, AVersion: Integer; const APersistImmediately: Boolean = False); overload;
     // RevertToDB
     class procedure RevertToDB(const AEtmRepositoryItem: TioEtmCustomRepository); overload;
-    class procedure RevertToDB(const AEntityClassName: String; const AID, AVersion: Integer); overload;
-    class procedure RevertToDB<T: class>(const AID, AVersion: Integer); overload;
-    class procedure RevertToDB(const AObj: TObject; const AID, AVersion: Integer); overload;
-    class procedure RevertToDB(const AIntf: IInterface; const AID, AVersion: Integer); overload;
     // Trace
     class procedure TraceByMap(const AMap: IioMap; const AEtmRepositoryClass: TioEtmCustomRepositoryRef; const ATraceOnlyOnConnectionName: String = '');
     class procedure Trace<T: class>(const AEtmRepositoryClass: TioEtmCustomRepositoryRef; const ATraceOnlyOnConnectionName: String = '');
     // Untrace
     class procedure Untrace<T: class>(const ATraceOnlyOnConnectionName: String = '');
     // DiffAsJsonObject
-    class function DiffAsJsonObject<T: class>(const AID, ANewestVersion, AOldestVersion: Integer; const AIncludeInfo: Boolean = True): TJSONObject; overload;
-    class function DiffAsJsonObject(const AEntityClassName: String; const AID, ANewestVersion, AOldestVersion: Integer; const AIncludeInfo: Boolean = True): TJSONObject; overload;
+    class function DiffAsJsonObject(const ANewestVersionObj, AOldestVersionObj: TObject; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True): TJSONObject; overload;
+    class function DiffAsJsonObject(const ANewestVersionIntf, AOldestVersionIntf: IInterface; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True): TJSONObject; overload;
 
-    class function DiffAsJsonObject(const ANewestVersionRepositoriItem, AOldestVersionRepositoryItem: TioEtmCustomRepositoryRef; const AIncludeInfo: Boolean = True): TJSONObject; overload;
+    class function DiffAsJsonObject(const ANewestVersionRepositoriItem, AOldestVersionRepositoryItem: TioEtmCustomRepository; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True): TJSONObject; overload;
+
+    class function DiffAsJsonObject(const AClassName: String; const AID, ANewestVersion, AOldestVersion: Integer; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True): TJSONObject; overload;
+    class function DiffAsJsonObject<T: class>(const AID, ANewestVersion, AOldestVersion: Integer; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True): TJSONObject; overload;
 
     class function DiffAsJsonObject(const ANewestVersionObj: TObject; const AOldestVersion: Integer; const AIncludeInfo: Boolean = True): TJSONObject; overload;
     class function DiffAsJsonObject(const ANewestVersionIntf: IInterface; const AOldestVersion: Integer; const AIncludeInfo: Boolean = True): TJSONObject; overload;
 
-    class function DiffAsJsonObject(const ANewestVersionObj: TObject; const AOldestVersionRepositoryItem: TioEtmCustomRepositoryRef; const AIncludeInfo: Boolean = True): TJSONObject; overload;
-    class function DiffAsJsonObject(const ANewestVersionIntf: IInterface; const AOldeztVersionRepositoryItem: TioEtmCustomRepositoryRef; const AIncludeInfo: Boolean = True): TJSONObject; overload;
 
-    class function DiffAsJsonObject(const ANewestVersionObj, AOldestVersionObj: TObject; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True): TJSONObject; overload;
+
+
+
+
+    class function DiffAsJsonObject(const ANewestVersionObj: TObject; const AOldestVersionRepositoryItem: TioEtmCustomRepositoryRef;
+      const AIncludeInfo: Boolean = True): TJSONObject; overload;
+    class function DiffAsJsonObject(const ANewestVersionIntf: IInterface; const AOldestVersionRepositoryItem: TioEtmCustomRepositoryRef;
+      const AIncludeInfo: Boolean = True): TJSONObject; overload;
+
   end;
 
 implementation
@@ -118,11 +123,11 @@ class function TioEtmEngine._InternalGetMap(const AEntityClassName: String): Iio
 begin
   Result := TioMapContainer.GetMap(AEntityClassName);
   if not Assigned(Result.GetTable.GetEtmRepositoryClass) then
-    raise EioEtmException.Create(ClassName, '_InternalGetMap', Format('Hi, I''m iORM, listen to me.' +
-      #13#13'The class "%s" is not registered in the ETM (Entity Time Machine) subsystem.' +
-      #13#13'You can register the class "%s" decorating its declaration with the attribute "[etmTrace(ARepositoryClass)]" or by code with a line like "io.etm.Trace<%s>(ARepositoryClass)".' +
-      #13#13'The "ARepositoryClass" parameter is the repository class that you will need to have previously declared descending it from the "TioEtmCustomRepository" base class provided by me (iORM).' +
-      #13#13'You''ll see it works.', [AEntityClassName, AEntityClassName, AEntityClassName]));
+    raise EioEtmException.Create(ClassName, '_InternalGetMap',
+      Format('Hi, I''m iORM, listen to me.' + #13#13'The class "%s" is not registered in the ETM (Entity Time Machine) subsystem.' +
+      #13#13'You can register the class "%s" decorating its declaration with the attribute "[etmTrace(ARepositoryClass)]" or by code with a line like "io.etm.Trace<%s>(ARepositoryClass)".'
+      + #13#13'The "ARepositoryClass" parameter is the repository class that you will need to have previously declared descending it from the "TioEtmCustomRepository" base class provided by me (iORM).'
+      + #13#13'You''ll see it works.', [AEntityClassName, AEntityClassName, AEntityClassName]));
 end;
 
 class procedure TioEtmEngine._CheckRepositoryItem(const AEtmRepositoryItem: TioEtmCustomRepository; const ATargetClassName: String = '');
@@ -138,18 +143,21 @@ begin
       AEtmRepositoryItem.EntityVersion]));
   // Type check
   if (not ATargetClassName.IsEmpty) and (AEtmRepositoryItem.EntityClassName <> ATargetClassName) then
-    raise EioEtmException.Create(ClassName, 'Revert', Format('Houston we have a problem.' +
+    raise EioEtmException.Create(ClassName, 'Revert',
+      Format('Houston we have a problem.' +
       #13#13'The type of the entity you asked me to revert and the one contained in the provided repositoryItem do not match.' +
-      #13#13'I can''t restore the state of type "%s" ID %d version %d to an object of type "%s".', [AEtmRepositoryItem.EntityClassName, AEtmRepositoryItem.EntityID,
-      AEtmRepositoryItem.EntityVersion, ATargetClassName]));
+      #13#13'I can''t restore the state of type "%s" ID %d version %d to an object of type "%s".', [AEtmRepositoryItem.EntityClassName,
+      AEtmRepositoryItem.EntityID, AEtmRepositoryItem.EntityVersion, ATargetClassName]));
 end;
 
-class function TioEtmEngine._InternalBuildRevertWhere(const AEntityClassName: String; const AEntityID: Integer; const AEntityVersion: Integer): IioWhere<TioEtmCustomRepository>;
+class function TioEtmEngine._InternalBuildRevertWhere(const AEntityClassName: String; const AEntityID: Integer; const AEntityVersion: Integer)
+  : IioWhere<TioEtmCustomRepository>;
 var
   LMap: IioMap;
 begin
   LMap := _InternalGetMap(AEntityClassName);
-  Result := io.Where<TioEtmCustomRepository>('EntityClassName', coEquals, AEntityClassName)._And('EntityID', coEquals, AEntityID)._And('EntityVersion', coEquals, AEntityVersion);
+  Result := io.Where<TioEtmCustomRepository>('EntityClassName', coEquals, AEntityClassName)._And('EntityID', coEquals, AEntityID)
+    ._And('EntityVersion', coEquals, AEntityVersion);
   Result.TypeName := LMap.GetTable.GetEtmRepositoryClass.ClassName;
 end;
 
@@ -180,9 +188,9 @@ begin
     LContext.ObjVersion := -LContext.ObjVersion;
 end;
 
-class function TioEtmEngine.TimeLineFor(const AEntityClassName: String; const AEntityID: Integer; const AWhere: IioWhere): TObjectList<TioEtmCustomRepository>;
+class function TioEtmEngine.TimeLineFor(const AClassName: String; const AEntityID: Integer; const AWhere: IioWhere): TObjectList<TioEtmCustomRepository>;
 begin
-  Result := _InternalTimeTravelFor(AEntityClassName, AEntityID, AWhere);
+  Result := _InternalTimeTravelFor(AClassName, AEntityID, AWhere);
 end;
 
 class function TioEtmEngine.TimeLineFor<T>(const AEntityID: Integer; const AWhere: IioWhere): TObjectList<TioEtmCustomRepository>;
@@ -200,9 +208,9 @@ begin
   Result := _InternalTimeTravelFor(AObj.ClassName, TioUtilities.ExtractOID(AObj), AWhere);
 end;
 
-class function TioEtmEngine.FluentTimeLineFor(const AEntityClassName: String): IioWhere<TioEtmCustomRepository>;
+class function TioEtmEngine.FluentTimeLineFor(const AClassName: String): IioWhere<TioEtmCustomRepository>;
 begin
-  Result := _InternalBuildTimeLineWhere(AEntityClassName);
+  Result := _InternalBuildTimeLineWhere(AClassName);
 end;
 
 class function TioEtmEngine.FluentTimeLineFor<T>: IioWhere<TioEtmCustomRepository>;
@@ -210,32 +218,17 @@ begin
   Result := _InternalBuildTimeLineWhere(T.ClassName);
 end;
 
-class function TioEtmEngine.RevertObject<T>(const AID, AVersion: Integer; const APersistImmediately: Boolean = False): T;
-var
-  LWhere: IioWhere<TioEtmCustomRepository>;
-  LRepositoryItem: TioEtmCustomRepository;
+class function TioEtmEngine.RevertObject(const AEtmRepositoryItem: TioEtmCustomRepository; const APersistImmediately: Boolean): TObject;
 begin
-  LWhere := _InternalBuildRevertWhere(T.ClassName, AID, AVersion);
-  LRepositoryItem := LWhere.ToObject;
-  try
-    Result := RevertObject<T>(LRepositoryItem, APersistImmediately);
-  finally
-    LRepositoryItem.Free;
-  end;
-end;
-
-class procedure TioEtmEngine.RevertToObject(const ATargetObj: TObject; const AID, AVersion: Integer; const APersistImmediately: Boolean);
-var
-  LWhere: IioWhere<TioEtmCustomRepository>;
-  LRepositoryItem: TioEtmCustomRepository;
-begin
-  LWhere := _InternalBuildRevertWhere(ATargetObj.ClassName, AID, AVersion);
-  LRepositoryItem := LWhere.ToObject;
-  try
-    RevertToObject(ATargetObj, LRepositoryItem, APersistImmediately);
-  finally
-    LRepositoryItem.Free;
-  end;
+  // Check repository item
+  _CheckRepositoryItem(AEtmRepositoryItem, String.Empty);
+  // Revert
+  Result := dj.FromJson(AEtmRepositoryItem.EntityState).OpType(ssETM).byFields.ClearCollection.TypeAnnotationsON.ToObject;
+  // The entity's ObjVersion property is reset with a negative value to indicate that it has been reset by the ETM
+  _ObjVersionToNegative(Result);
+  // Persist immediately
+  if APersistImmediately then
+    io.PersistObject(Result);
 end;
 
 class procedure TioEtmEngine.RevertToObject(const ATargetIntf: IInterface; const AEtmRepositoryItem: TioEtmCustomRepository;
@@ -289,20 +282,48 @@ begin
 end;
 
 class function TioEtmEngine.DiffAsJsonObject(const ANewestVersionObj: TObject; const AOldestVersion: Integer; const AIncludeInfo: Boolean): TJSONObject;
+var
+  LWhere: IioWhere<TioEtmCustomRepository>;
+  LNewestRepositoryItem, LOldestRepositoryItem: TioEtmCustomRepository;
 begin
+  // Checks
+  if not Assigned(ANewestVersionObj) then
+    raise EioEtmException.Create(ClassName, 'DiffAsJsonObject', '"ANewestVersionObj"  parameter must be assigned.');
 
+
+
+  // Get the differences
+//  Result := TioEtmFactory.Diff(ADiffMode).Diff(AOldestVersionObj, ANewestVersionObj, AIncludeInfo);
 end;
 
-class function TioEtmEngine.DiffAsJsonObject(const ANewestVersionRepositoriItem, AOldestVersionRepositoryItem: TioEtmCustomRepositoryRef;
-  const AIncludeInfo: Boolean): TJSONObject;
+class function TioEtmEngine.DiffAsJsonObject(const AClassName: String; const AID, ANewestVersion, AOldestVersion: Integer; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean)
+  : TJSONObject;
+var
+  LWhere: IioWhere<TioEtmCustomRepository>;
+  LNewestRepositoryItem, LOldestRepositoryItem: TioEtmCustomRepository;
 begin
-
+  // Init
+  LNewestRepositoryItem := nil;
+  LOldestRepositoryItem := nil;
+  try
+    // Load instances to diff from the repository items
+    LWhere := _InternalBuildRevertWhere(AClassName, AID, ANewestVersion);
+    LNewestRepositoryItem := LWhere.ToObject;
+    LWhere := _InternalBuildRevertWhere(AClassName, AID, AOldestVersion);
+    LOldestRepositoryItem := LWhere.ToObject;
+    // Diff
+    Result := DiffAsJsonObject(LNewestRepositoryItem, LOldestRepositoryItem, ADiffMode, AIncludeInfo);
+  finally
+    if Assigned(LNewestRepositoryItem) then
+      LNewestRepositoryItem.Free;
+    if Assigned(LOldestRepositoryItem) then
+      LOldestRepositoryItem.Free;
+  end;
 end;
 
-class function TioEtmEngine.DiffAsJsonObject(const AEntityClassName: String; const AID, ANewestVersion, AOldestVersion: Integer;
-  const AIncludeInfo: Boolean): TJSONObject;
+class function TioEtmEngine.DiffAsJsonObject<T>(const AID, ANewestVersion, AOldestVersion: Integer; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean): TJSONObject;
 begin
-
+  Result := DiffAsJsonObject(T.ClassName, AID, ANewestVersion, AOldestVersion, ADiffMode, AIncludeInfo);
 end;
 
 class function TioEtmEngine.DiffAsJsonObject(const ANewestVersionIntf: IInterface; const AOldestVersion: Integer; const AIncludeInfo: Boolean): TJSONObject;
@@ -310,28 +331,55 @@ begin
 
 end;
 
-class function TioEtmEngine.DiffAsJsonObject(const ANewestVersionObj, AOldestVersionObj: TObject; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean): TJSONObject;
+class function TioEtmEngine.DiffAsJsonObject(const ANewestVersionObj, AOldestVersionObj: TObject; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean)
+  : TJSONObject;
 begin
   // Check instances
   if (not Assigned(ANewestVersionObj)) or (not Assigned(AOldestVersionObj)) then
     raise EioEtmException.Create(ClassName, 'DiffAsJsonObject', '"ANewestVersionObj" and "AOldestVersionObj" parameters must be assigned.');
   // Get the differences
-  Result := TioEtmFactory.Diff(ADiffMode).Diff(AOldestVersionObj, ANewestVersionObj,AIncludeInfo);
+  Result := TioEtmFactory.Diff(ADiffMode).Diff(AOldestVersionObj, ANewestVersionObj, AIncludeInfo);
 end;
 
-class function TioEtmEngine.DiffAsJsonObject(const ANewestVersionIntf: IInterface; const AOldeztVersionRepositoryItem: TioEtmCustomRepositoryRef;
+class function TioEtmEngine.DiffAsJsonObject(const ANewestVersionIntf: IInterface; const AOldestVersionRepositoryItem: TioEtmCustomRepositoryRef;
   const AIncludeInfo: Boolean): TJSONObject;
 begin
 
+end;
+
+class function TioEtmEngine.DiffAsJsonObject(const ANewestVersionRepositoriItem, AOldestVersionRepositoryItem: TioEtmCustomRepository;
+  const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean): TJSONObject;
+var
+  LNewestObject, LOldestObject: TObject;
+begin
+  // Init
+  LNewestObject := nil;
+  LOldestObject := nil;
+  // Check repository items
+  _CheckRepositoryItem(ANewestVersionRepositoriItem);
+  _CheckRepositoryItem(AOldestVersionRepositoryItem);
+  try
+    // Get objects from the repository items
+    LNewestObject := dj.FromJson(ANewestVersionRepositoriItem.EntityState).OpType(ssETM).byFields.ClearCollection.TypeAnnotationsON.ToObject;
+    LOldestObject := dj.FromJson(ANewestVersionRepositoriItem.EntityState).OpType(ssETM).byFields.ClearCollection.TypeAnnotationsON.ToObject;
+    // Diff
+    Result := DiffAsJsonObject(LNewestObject, LOldestObject, ADiffMode, AIncludeInfo);
+  finally
+    if Assigned(LNewestObject) then
+      LNewestObject.Free;
+    if Assigned(LOldestObject) then
+      LOldestObject.Free;
+  end;
+end;
+
+class function TioEtmEngine.DiffAsJsonObject(const ANewestVersionIntf, AOldestVersionIntf: IInterface; const ADiffMode: TioEtmDiffMode;
+  const AIncludeInfo: Boolean): TJSONObject;
+begin
+  Result := DiffAsJsonObject(ANewestVersionIntf as TObject, AOldestVersionIntf as TObject, ADiffMode, AIncludeInfo);
 end;
 
 class function TioEtmEngine.DiffAsJsonObject(const ANewestVersionObj: TObject; const AOldestVersionRepositoryItem: TioEtmCustomRepositoryRef;
   const AIncludeInfo: Boolean): TJSONObject;
-begin
-
-end;
-
-class function TioEtmEngine.DiffAsJsonObject<T>(const AID, ANewestVersion, AOldestVersion: Integer; const AIncludeInfo: Boolean): TJSONObject;
 begin
 
 end;
@@ -346,7 +394,8 @@ begin
   Result := _InternalBuildTimeLineWhere(AObj.ClassName);
 end;
 
-class procedure TioEtmEngine.TraceByMap(const AMap: IioMap; const AEtmRepositoryClass: TioEtmCustomRepositoryRef; const ATraceOnlyOnConnectionName: String = '');
+class procedure TioEtmEngine.TraceByMap(const AMap: IioMap; const AEtmRepositoryClass: TioEtmCustomRepositoryRef;
+  const ATraceOnlyOnConnectionName: String = '');
 begin
   // Check Map and EtmRepositoryClass
   if not Assigned(AMap) then
@@ -374,40 +423,6 @@ end;
 class procedure TioEtmEngine.Untrace<T>(const ATraceOnlyOnConnectionName: String);
 begin
   io.CRUDInterceptors.UnregisterInterceptor(TioEtmInterceptor, TioUtilities.GenericToString<T>, ATraceOnlyOnConnectionName);
-end;
-
-class procedure TioEtmEngine.RevertToDB(const AEntityClassName: String; const AID, AVersion: Integer);
-var
-  LWhere: IioWhere<TioEtmCustomRepository>;
-  LRepositoryItem: TioEtmCustomRepository;
-begin
-  LWhere := _InternalBuildRevertWhere(AEntityClassName, AID, AVersion);
-  LRepositoryItem := LWhere.ToObject;
-  try
-    RevertToDB(LRepositoryItem);
-  finally
-    LRepositoryItem.Free;
-  end;
-end;
-
-class procedure TioEtmEngine.RevertToDB(const AIntf: IInterface; const AID, AVersion: Integer);
-begin
-  RevertToDB((AIntf as TObject).ClassName, AID, AVersion);
-end;
-
-class procedure TioEtmEngine.RevertToDB(const AObj: TObject; const AID, AVersion: Integer);
-begin
-  RevertToDB(AObj.ClassName, AID, AVersion);
-end;
-
-class procedure TioEtmEngine.RevertToDB<T>(const AID, AVersion: Integer);
-begin
-  RevertToDB(T.ClassName, AID, AVersion);
-end;
-
-class procedure TioEtmEngine.RevertToObject(const ATargetIntf: IInterface; const AID, AVersion: Integer; const APersistImmediately: Boolean);
-begin
-  RevertToObject(ATargetIntf as TObject, AID, AVersion, APersistImmediately);
 end;
 
 end.
