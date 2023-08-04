@@ -61,6 +61,7 @@ type
       : IioWhere<TioEtmCustomRepository>;
     class procedure _ObjVersionToNegative(const AObj: TObject);
     class procedure _CheckRepositoryItem(const AEtmRepositoryItem: TioEtmCustomRepository; const ATargetClassName: String = '');
+    class function _InternalDiffAsJsonObject(const ANewestVersionObj, AOldestVersionObj: TObject; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True): TJSONObject; overload;
   public
     // Fluent interface
     class function FluentTimeLineFor<T: class>: IioWhere<TioEtmCustomRepository>; overload;
@@ -87,27 +88,21 @@ type
     // Untrace
     class procedure Untrace<T: class>(const ATraceOnlyOnConnectionName: String = '');
     // DiffAsJsonObject
-    class function DiffAsJsonObject(const ANewestVersionObj, AOldestVersionObj: TObject; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True): TJSONObject; overload;
-    class function DiffAsJsonObject(const ANewestVersionIntf, AOldestVersionIntf: IInterface; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True): TJSONObject; overload;
-
-    class function DiffAsJsonObject(const ANewestVersionRepositoriItem, AOldestVersionRepositoryItem: TioEtmCustomRepository; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True): TJSONObject; overload;
-
-    class function DiffAsJsonObject(const AClassName: String; const AID, ANewestVersion, AOldestVersion: Integer; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True): TJSONObject; overload;
-    class function DiffAsJsonObject<T: class>(const AID, ANewestVersion, AOldestVersion: Integer; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True): TJSONObject; overload;
-
-    class function DiffAsJsonObject(const ANewestVersionObj: TObject; const AOldestVersion: Integer; const AIncludeInfo: Boolean = True): TJSONObject; overload;
-    class function DiffAsJsonObject(const ANewestVersionIntf: IInterface; const AOldestVersion: Integer; const AIncludeInfo: Boolean = True): TJSONObject; overload;
-
-
-
-
-
-
-    class function DiffAsJsonObject(const ANewestVersionObj: TObject; const AOldestVersionRepositoryItem: TioEtmCustomRepositoryRef;
-      const AIncludeInfo: Boolean = True): TJSONObject; overload;
-    class function DiffAsJsonObject(const ANewestVersionIntf: IInterface; const AOldestVersionRepositoryItem: TioEtmCustomRepositoryRef;
-      const AIncludeInfo: Boolean = True): TJSONObject; overload;
-
+    class function DiffAsJsonObject(const ANewestRepositoriItem, AOldestRepositoryItem: TioEtmCustomRepository; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True): TJSONObject; overload;
+    class function DiffAsJsonObject(const ANewestObj: TObject; const AOldestRepositoryItem: TioEtmCustomRepository; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True): TJSONObject; overload;
+    class function DiffAsJsonObject(const ANewestIntf: IInterface; const AOldestRepositoryItem: TioEtmCustomRepository; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True): TJSONObject; overload;
+    // DiffToStream
+    class procedure DiffToStream(const ATargetStream: TStream; const ANewestRepositoryItem, AOldestRepositoryItem: TioEtmCustomRepository; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True); overload;
+    class procedure DiffToStream(const ATargetStream: TStream; const ANewestObj: TObject; const AOldestRepositoryItem: TioEtmCustomRepository; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True); overload;
+    class procedure DiffToStream(const ATargetStream: TStream; const ANewestIntf: IInterface; const AOldestRepositoryItem: TioEtmCustomRepository; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True) overload;
+    // DiffToFile
+    class procedure DiffToFile(const AFileName: String; const ANewestRepositoryItem, AOldestRepositoryItem: TioEtmCustomRepository; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True); overload;
+    class procedure DiffToFile(const AFileName: String; const ANewestObj: TObject; const AOldestRepositoryItem: TioEtmCustomRepository; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True); overload;
+    class procedure DiffToFile(const AFileName: String; const ANewestIntf: IInterface; const AOldestRepositoryItem: TioEtmCustomRepository; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True) overload;
+    // Diff
+    class function Diff(const ANewestRepositoriItem, AOldestRepositoryItem: TioEtmCustomRepository; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True): String; overload;
+    class function Diff(const ANewestObj: TObject; const AOldestRepositoryItem: TioEtmCustomRepository; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True): String; overload;
+    class function Diff(const ANewestIntf: IInterface; const AOldestRepositoryItem: TioEtmCustomRepository; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True): String; overload;
   end;
 
 implementation
@@ -281,57 +276,7 @@ begin
   end;
 end;
 
-class function TioEtmEngine.DiffAsJsonObject(const ANewestVersionObj: TObject; const AOldestVersion: Integer; const AIncludeInfo: Boolean): TJSONObject;
-var
-  LWhere: IioWhere<TioEtmCustomRepository>;
-  LNewestRepositoryItem, LOldestRepositoryItem: TioEtmCustomRepository;
-begin
-  // Checks
-  if not Assigned(ANewestVersionObj) then
-    raise EioEtmException.Create(ClassName, 'DiffAsJsonObject', '"ANewestVersionObj"  parameter must be assigned.');
-
-
-
-  // Get the differences
-//  Result := TioEtmFactory.Diff(ADiffMode).Diff(AOldestVersionObj, ANewestVersionObj, AIncludeInfo);
-end;
-
-class function TioEtmEngine.DiffAsJsonObject(const AClassName: String; const AID, ANewestVersion, AOldestVersion: Integer; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean)
-  : TJSONObject;
-var
-  LWhere: IioWhere<TioEtmCustomRepository>;
-  LNewestRepositoryItem, LOldestRepositoryItem: TioEtmCustomRepository;
-begin
-  // Init
-  LNewestRepositoryItem := nil;
-  LOldestRepositoryItem := nil;
-  try
-    // Load instances to diff from the repository items
-    LWhere := _InternalBuildRevertWhere(AClassName, AID, ANewestVersion);
-    LNewestRepositoryItem := LWhere.ToObject;
-    LWhere := _InternalBuildRevertWhere(AClassName, AID, AOldestVersion);
-    LOldestRepositoryItem := LWhere.ToObject;
-    // Diff
-    Result := DiffAsJsonObject(LNewestRepositoryItem, LOldestRepositoryItem, ADiffMode, AIncludeInfo);
-  finally
-    if Assigned(LNewestRepositoryItem) then
-      LNewestRepositoryItem.Free;
-    if Assigned(LOldestRepositoryItem) then
-      LOldestRepositoryItem.Free;
-  end;
-end;
-
-class function TioEtmEngine.DiffAsJsonObject<T>(const AID, ANewestVersion, AOldestVersion: Integer; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean): TJSONObject;
-begin
-  Result := DiffAsJsonObject(T.ClassName, AID, ANewestVersion, AOldestVersion, ADiffMode, AIncludeInfo);
-end;
-
-class function TioEtmEngine.DiffAsJsonObject(const ANewestVersionIntf: IInterface; const AOldestVersion: Integer; const AIncludeInfo: Boolean): TJSONObject;
-begin
-
-end;
-
-class function TioEtmEngine.DiffAsJsonObject(const ANewestVersionObj, AOldestVersionObj: TObject; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean)
+class function TioEtmEngine._InternalDiffAsJsonObject(const ANewestVersionObj, AOldestVersionObj: TObject; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean)
   : TJSONObject;
 begin
   // Check instances
@@ -341,13 +286,7 @@ begin
   Result := TioEtmFactory.Diff(ADiffMode).Diff(AOldestVersionObj, ANewestVersionObj, AIncludeInfo);
 end;
 
-class function TioEtmEngine.DiffAsJsonObject(const ANewestVersionIntf: IInterface; const AOldestVersionRepositoryItem: TioEtmCustomRepositoryRef;
-  const AIncludeInfo: Boolean): TJSONObject;
-begin
-
-end;
-
-class function TioEtmEngine.DiffAsJsonObject(const ANewestVersionRepositoriItem, AOldestVersionRepositoryItem: TioEtmCustomRepository;
+class function TioEtmEngine.DiffAsJsonObject(const ANewestRepositoriItem, AOldestRepositoryItem: TioEtmCustomRepository;
   const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean): TJSONObject;
 var
   LNewestObject, LOldestObject: TObject;
@@ -356,14 +295,14 @@ begin
   LNewestObject := nil;
   LOldestObject := nil;
   // Check repository items
-  _CheckRepositoryItem(ANewestVersionRepositoriItem);
-  _CheckRepositoryItem(AOldestVersionRepositoryItem);
+  _CheckRepositoryItem(ANewestRepositoriItem);
+  _CheckRepositoryItem(AOldestRepositoryItem);
   try
     // Get objects from the repository items
-    LNewestObject := dj.FromJson(ANewestVersionRepositoriItem.EntityState).OpType(ssETM).byFields.ClearCollection.TypeAnnotationsON.ToObject;
-    LOldestObject := dj.FromJson(ANewestVersionRepositoriItem.EntityState).OpType(ssETM).byFields.ClearCollection.TypeAnnotationsON.ToObject;
+    LNewestObject := dj.FromJson(ANewestRepositoriItem.EntityState).OpType(ssETM).byFields.ClearCollection.TypeAnnotationsON.ToObject;
+    LOldestObject := dj.FromJson(ANewestRepositoriItem.EntityState).OpType(ssETM).byFields.ClearCollection.TypeAnnotationsON.ToObject;
     // Diff
-    Result := DiffAsJsonObject(LNewestObject, LOldestObject, ADiffMode, AIncludeInfo);
+    Result := _InternalDiffAsJsonObject(LNewestObject, LOldestObject, ADiffMode, AIncludeInfo);
   finally
     if Assigned(LNewestObject) then
       LNewestObject.Free;
@@ -372,16 +311,151 @@ begin
   end;
 end;
 
-class function TioEtmEngine.DiffAsJsonObject(const ANewestVersionIntf, AOldestVersionIntf: IInterface; const ADiffMode: TioEtmDiffMode;
-  const AIncludeInfo: Boolean): TJSONObject;
+class function TioEtmEngine.DiffAsJsonObject(const ANewestObj: TObject; const AOldestRepositoryItem: TioEtmCustomRepository; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean = True): TJSONObject;
+var
+  LOldestObj: TObject;
 begin
-  Result := DiffAsJsonObject(ANewestVersionIntf as TObject, AOldestVersionIntf as TObject, ADiffMode, AIncludeInfo);
+  // Init
+  LOldestObj := nil;
+  // Checks
+  _CheckRepositoryItem(AOldestRepositoryItem);
+  if not Assigned(ANewestObj) then
+    raise EioEtmException.Create(ClassName, 'DiffAsJsonObject', '"ANewestVersionObj"  parameter must be assigned.');
+  try
+    // Get oldest object from the oldest repository item
+    LOldestObj := dj.FromJson(AOldestRepositoryItem.EntityState).OpType(ssETM).byFields.ClearCollection.TypeAnnotationsON.ToObject;
+    // Diff
+    Result := _InternalDiffAsJsonObject(ANewestObj, LOldestObj, ADiffMode, AIncludeInfo);
+  finally
+    if Assigned(LOldestObj) then
+      LOldestObj.Free;
+  end;
 end;
 
-class function TioEtmEngine.DiffAsJsonObject(const ANewestVersionObj: TObject; const AOldestVersionRepositoryItem: TioEtmCustomRepositoryRef;
-  const AIncludeInfo: Boolean): TJSONObject;
+class function TioEtmEngine.Diff(const ANewestRepositoriItem, AOldestRepositoryItem: TioEtmCustomRepository; const ADiffMode: TioEtmDiffMode;
+  const AIncludeInfo: Boolean): String;
+var
+  LDiffJsonObj: TJSONObject;
 begin
+  LDiffJsonObj := DiffAsJsonObject(ANewestRepositoriItem, AOldestRepositoryItem, ADiffMode, AIncludeInfo);
+  try
+    Result := LDiffJsonObj.Format;
+  finally
+    LDiffJsonObj.Free;
+  end;
+end;
 
+class function TioEtmEngine.Diff(const ANewestObj: TObject; const AOldestRepositoryItem: TioEtmCustomRepository; const ADiffMode: TioEtmDiffMode;
+  const AIncludeInfo: Boolean): String;
+var
+  LDiffJsonObj: TJSONObject;
+begin
+  LDiffJsonObj := DiffAsJsonObject(ANewestObj, AOldestRepositoryItem, ADiffMode, AIncludeInfo);
+  try
+    Result := LDiffJsonObj.Format;
+  finally
+    LDiffJsonObj.Free;
+  end;
+end;
+
+class function TioEtmEngine.Diff(const ANewestIntf: IInterface; const AOldestRepositoryItem: TioEtmCustomRepository; const ADiffMode: TioEtmDiffMode;
+  const AIncludeInfo: Boolean): String;
+var
+  LDiffJsonObj: TJSONObject;
+begin
+  LDiffJsonObj := DiffAsJsonObject(ANewestIntf, AOldestRepositoryItem, ADiffMode, AIncludeInfo);
+  try
+    Result := LDiffJsonObj.Format;
+  finally
+    LDiffJsonObj.Free;
+  end;
+end;
+
+class function TioEtmEngine.DiffAsJsonObject(const ANewestIntf: IInterface; const AOldestRepositoryItem: TioEtmCustomRepository;
+  const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean): TJSONObject;
+begin
+  Result := DiffAsJsonObject(ANewestIntf as TObject, AOldestRepositoryItem, ADiffMode, AIncludeInfo);
+end;
+
+class procedure TioEtmEngine.DiffToStream(const ATargetStream: TStream; const ANewestRepositoryItem, AOldestRepositoryItem: TioEtmCustomRepository; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean);
+var
+  LDiff: String;
+  LStringStream: TStringStream;
+begin
+  LDiff := Diff(ANewestRepositoryItem, AOldestRepositoryItem, ADiffMode, AIncludeInfo);
+  LStringStream := TStringStream.Create(LDiff, TEncoding.UTF8);
+  try
+    ATargetStream.CopyFrom(LStringStream);
+  finally
+    LStringStream.Free;
+  end;
+end;
+
+class procedure TioEtmEngine.DiffToStream(const ATargetStream: TStream; const ANewestObj: TObject; const AOldestRepositoryItem: TioEtmCustomRepository; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean);
+var
+  LDiff: String;
+  LStringStream: TStringStream;
+begin
+  LDiff := Diff(ANewestObj, AOldestRepositoryItem, ADiffMode, AIncludeInfo);
+  LStringStream := TStringStream.Create(LDiff, TEncoding.UTF8);
+  try
+    ATargetStream.CopyFrom(LStringStream);
+  finally
+    LStringStream.Free;
+  end;
+end;
+
+class procedure TioEtmEngine.DiffToFile(const AFileName: String; const ANewestRepositoryItem, AOldestRepositoryItem: TioEtmCustomRepository;
+  const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean);
+var
+  LFileStream: TFileStream;
+begin
+  LFileStream := TFileStream.Create(AFileName, fmCreate);
+  try
+    DiffToStream(LFileStream, ANewestRepositoryItem, AOldestRepositoryItem, ADiffMode, AIncludeInfo);
+  finally
+    LFileStream.Free;
+  end;
+end;
+
+class procedure TioEtmEngine.DiffToFile(const AFileName: String; const ANewestObj: TObject; const AOldestRepositoryItem: TioEtmCustomRepository;
+  const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean);
+var
+  LFileStream: TFileStream;
+begin
+  LFileStream := TFileStream.Create(AFileName, fmCreate);
+  try
+    DiffToStream(LFileStream, ANewestObj, AOldestRepositoryItem, ADiffMode, AIncludeInfo);
+  finally
+    LFileStream.Free;
+  end;
+end;
+
+class procedure TioEtmEngine.DiffToFile(const AFileName: String; const ANewestIntf: IInterface; const AOldestRepositoryItem: TioEtmCustomRepository;
+  const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean);
+var
+  LFileStream: TFileStream;
+begin
+  LFileStream := TFileStream.Create(AFileName, fmCreate);
+  try
+    DiffToStream(LFileStream, ANewestIntf, AOldestRepositoryItem, ADiffMode, AIncludeInfo);
+  finally
+    LFileStream.Free;
+  end;
+end;
+
+class procedure TioEtmEngine.DiffToStream(const ATargetStream: TStream; const ANewestIntf: IInterface; const AOldestRepositoryItem: TioEtmCustomRepository; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean);
+var
+  LDiff: String;
+  LStringStream: TStringStream;
+begin
+  LDiff := Diff(ANewestIntf, AOldestRepositoryItem, ADiffMode, AIncludeInfo);
+  LStringStream := TStringStream.Create(LDiff, TEncoding.UTF8);
+  try
+    ATargetStream.CopyFrom(LStringStream);
+  finally
+    LStringStream.Free;
+  end;
 end;
 
 class function TioEtmEngine.FluentTimeLineFor(const AIntf: IInterface): IioWhere<TioEtmCustomRepository>;
