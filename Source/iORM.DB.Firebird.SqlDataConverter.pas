@@ -53,7 +53,8 @@ type
 implementation
 
 uses
-  System.TypInfo, System.SysUtils, FireDac.Stan.Param, Data.DB;
+  System.TypInfo, System.SysUtils, FireDac.Stan.Param, Data.DB,
+  iORM.CommonTypes;
 
 { TioSqlDataConverterFirebird }
 
@@ -64,7 +65,7 @@ var
   LValueAsDouble: Double;
 begin
   // TDateTime (NULL is zero)
-  if (AProp.GetTypeInfo = System.TypeInfo(TDateTime)) then
+  if (AProp.GetTypeInfo = System.TypeInfo(TDateTime)) or (AProp.GetTypeInfo = System.TypeInfo(TioObjUpdated)) or (AProp.GetTypeInfo = System.TypeInfo(TioObjCreated)) then
   begin
     LValueAsDouble := AProp.GetValue(AContext.DataObject).AsType<TDateTime>;
     if LValueAsDouble = 0 then
@@ -109,6 +110,7 @@ begin
     else if (AValue.TypeInfo = System.TypeInfo(TTime)) then
       Result := QuotedStr(FormatDateTime('hh:nn:ss', AValue.AsExtended))
     else if (AValue.TypeInfo = System.TypeInfo(TDateTime)) then
+    else if (AValue.TypeInfo = System.TypeInfo(TDateTime)) or (AValue.TypeInfo = System.TypeInfo(TioObjUpdated)) or (AValue.TypeInfo = System.TypeInfo(TioObjCreated)) then
       Result := QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss', AValue.AsExtended));
 end;
 

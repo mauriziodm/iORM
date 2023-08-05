@@ -518,8 +518,8 @@ type
   private
     FID: Integer;
     FDateAndTime: TioObjCreated;
-    FUserName: TioObjCreatedUserName;
     FUserID: TioObjCreatedUserID;
+    FUserName: TioObjCreatedUserName;
     [ioVarChar(60)]
     FEntityClassName: String;
     FEntityID: Integer;

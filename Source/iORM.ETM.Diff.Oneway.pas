@@ -47,7 +47,8 @@ type
     class function Diff_Status(const AOld, ANew: Pointer): String;
     class function Diff_Object(const LPrevOldProp, LPrevNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
     class function Diff_ValueProp(const LOldProp, LNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
-    class function Diff_ObjectProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
+    class function Diff_ObjectProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AIncludeInfo: Boolean)
+      : TJSONObject;
     class function Diff_ListProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AIncludeInfo: Boolean): TJSONValue;
   public
     class function Diff(const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean): TJSONObject; override;
@@ -58,7 +59,8 @@ implementation
 uses
   iORM.Context.Map.Interfaces, iORM.Context.Container, iORM.Attributes, System.SysUtils,
   iORM.DuckTyped.Interfaces, iORM.Exceptions, iORM.DuckTyped.Factory,
-  iORM.Utilities, iORM.CommonTypes, System.Rtti, DJSON, DJSON.Params;
+  iORM.Utilities, iORM.CommonTypes, System.Rtti, DJSON, DJSON.Params,
+  iORM.ETM.Factory;
 
 { TioEtmDiff }
 
@@ -90,17 +92,16 @@ class function TioEtmOnewayDiff.Diff_Status(const AOld, ANew: Pointer): String;
 begin
   if (AOld <> nil) and (ANew <> nil) then
     Result := ETM_DIFF_STATUS_UPDATED
-  else
-  if (AOld <> nil) then
+  else if (AOld <> nil) then
     Result := ETM_DIFF_STATUS_NEW
-  else
-  if (ANew <> nil) then
+  else if (ANew <> nil) then
     Result := ETM_DIFF_STATUS_REMOVED
   else
     Result := String.Empty;
 end;
 
-class function TioEtmOnewayDiff.Diff_Object(const LPrevOldProp, LPrevNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
+class function TioEtmOnewayDiff.Diff_Object(const LPrevOldProp, LPrevNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean)
+  : TJSONObject;
 var
   LOldMap, LNewMap: IioMap;
   LOldProp, LNewProp: IioProperty;
@@ -200,7 +201,8 @@ begin
   // ====================================================================
 end;
 
-class function TioEtmOnewayDiff.Diff_ValueProp(const LOldProp, LNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
+class function TioEtmOnewayDiff.Diff_ValueProp(const LOldProp, LNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean)
+  : TJSONObject;
 var
   LValue: TValue;
   LOldJsonValue, LNewJsonValue: TJSONValue;
@@ -210,7 +212,7 @@ begin
   if Assigned(LOldProp) then
   begin
     LValue := LOldProp.GetValue(AOldObj);
-    LOldJsonValue := dj.From(LValue).OpType(ssETM).byFields.ToJsonValue;
+    LOldJsonValue := dj.From(LValue, TioEtmFactory.djParamsDiff).ToJsonValue;
   end
   else
     LOldJsonValue := TJSONNull.Create;
@@ -218,7 +220,7 @@ begin
   if Assigned(LNewProp) then
   begin
     LValue := LNewProp.GetValue(ANewObj);
-    LNewJsonValue := dj.From(LValue).OpType(ssETM).byFields.ToJsonValue;
+    LNewJsonValue := dj.From(LValue, TioEtmFactory.djParamsDiff).ToJsonValue;
   end
   else
     LNewJsonValue := TJSONNull.Create;
@@ -244,7 +246,8 @@ begin
   end;
 end;
 
-class function TioEtmOnewayDiff.Diff_ObjectProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
+class function TioEtmOnewayDiff.Diff_ObjectProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AIncludeInfo: Boolean)
+  : TJSONObject;
 var
   LOldObj, LNewObj: TObject;
 begin
@@ -264,7 +267,8 @@ begin
     FreeAndNil(Result);
 end;
 
-class function TioEtmOnewayDiff.Diff_ListProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AIncludeInfo: Boolean): TJSONValue;
+class function TioEtmOnewayDiff.Diff_ListProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AIncludeInfo: Boolean)
+  : TJSONValue;
 var
   LOldList, LNewList, LOldListItem, LNewListItem: TObject;
   LOldDuckList, LNewDuckList: IioDuckTypedList;

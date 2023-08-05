@@ -61,7 +61,8 @@ type
 implementation
 
 uses
-  iORM, DJSON, iORM.CommonTypes, iORM.Utilities, System.SysUtils;
+  iORM, DJSON, iORM.CommonTypes, iORM.Utilities, System.SysUtils,
+  iORM.ETM.Factory;
 
 { TioEtmInterceptor }
 
@@ -71,7 +72,7 @@ var
   LTimeSlot: TioEtmCustomTimeSlot;
 begin
   // Get the state (JSON) of the entity
-  LEntityState := dj.From(AContext.DataObject).OpType(ssETM).byFields.TypeAnnotationsON.ToJson;
+  LEntityState := dj.From(AContext.DataObject, TioEtmFactory.djParamsEngine).ToJson;
   // Create the TimeSlot, persist it and finally free it
   LTimeSlot := AContext.Map.GetTable.GetEtmTimeSlotClass.Create(etInsert, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, AContext.ObjVersion,
     0, LEntityState, '');
@@ -106,7 +107,7 @@ var
   LTimeSlot: TioEtmCustomTimeSlot;
 begin
   // Get the state (JSON) of the entity
-  LEntityState := dj.From(AContext.DataObject).OpType(ssETM).byFields.TypeAnnotationsON.ToJson;
+  LEntityState := dj.From(AContext.DataObject, TioEtmFactory.djParamsEngine).ToJson;
   // Create the TimeSlot, persist it and finally free it
   LTimeSlot := AContext.Map.GetTable.GetEtmTimeSlotClass.Create(etUpdate, ctNoConflict, AContext.GetID, AContext.DataObject.ClassName, AContext.ObjVersion,
     AContext.EtmRevertedFromVersion, LEntityState, '');

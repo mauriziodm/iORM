@@ -509,7 +509,7 @@ begin
     Result := TValue.From<TDate>(TdjUtils.ISOStrToDate(AJSONReader.Value.AsString, AParams))
   else
   // TDateTime (string expected)
-  if (LQualifiedTypeName = 'System.TDateTime') and (AJSONReader.TokenType = TJsonToken.String) then
+  if (LQualifiedTypeName = 'System.TDateTime') or (LQualifiedTypeName = 'iORM.CommonTypes.TioObjCreated') or (LQualifiedTypeName = 'iORM.CommonTypes.TioObjUpdated') then
     Result := TValue.From<TDateTime>(TdjUtils.ISOStrToDateTime(AJSONReader.Value.AsString, AParams))
   else
   // TTime (string expected)
@@ -1197,7 +1197,7 @@ begin
     else
       AJSONWriter.WriteValue(TdjUtils.ISODateToString(AValue.AsExtended, AParams));
   end
-  else if LQualifiedTypeName = 'System.TDateTime' then
+  else if (LQualifiedTypeName = 'System.TDateTime') or (LQualifiedTypeName = 'iORM.CommonTypes.TioObjCreated') or (LQualifiedTypeName = 'iORM.CommonTypes.TioObjUpdated') then
   begin
     if AValue.AsExtended = 0 then
       AJSONWriter.WriteNull

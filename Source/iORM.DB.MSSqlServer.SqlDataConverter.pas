@@ -53,7 +53,7 @@ type
 implementation
 
 uses
-  System.TypInfo, System.SysUtils, Data.DB;
+  System.TypInfo, System.SysUtils, Data.DB, iORM.CommonTypes;
 
 { TioSqlDataConverterMSSqlServer }
 
@@ -73,7 +73,7 @@ begin
       Result := QuotedStr(FormatDateTime('yyyymmdd', AValue.AsExtended))
     else if (AValue.TypeInfo = System.TypeInfo(TTime)) then
       Result := QuotedStr(FormatDateTime('hh:nn:ss', AValue.AsExtended))
-    else if (AValue.TypeInfo = System.TypeInfo(TDateTime)) then
+    else if (AValue.TypeInfo = System.TypeInfo(TDateTime)) or (AValue.TypeInfo = System.TypeInfo(TioObjUpdated)) or (AValue.TypeInfo = System.TypeInfo(TioObjCreated)) then
       Result := QuotedStr(FormatDateTime('yyyymmdd hh:nn:ss', AValue.AsExtended));
 end;
 

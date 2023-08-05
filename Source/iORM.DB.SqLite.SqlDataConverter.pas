@@ -136,7 +136,8 @@ begin
   inherited;
   // If the property is of type TDateTime or TDate or TTime and the value is equal to
   // zero then set che ParamValue to NULL
-  if ((AProp.GetTypeInfo = System.TypeInfo(TDateTime)) or (AProp.GetTypeInfo = System.TypeInfo(TDate)) or (AProp.GetTypeInfo = System.TypeInfo(TTime))) then
+  if ((AProp.GetTypeInfo = System.TypeInfo(TDateTime)) or (AProp.GetTypeInfo = System.TypeInfo(TDate)) or (AProp.GetTypeInfo = System.TypeInfo(TTime))
+    or (AProp.GetTypeInfo = System.TypeInfo(TioObjUpdated)) or (AProp.GetTypeInfo = System.TypeInfo(TioObjCreated))) then
   begin
     if AProp.GetValue(AContext.DataObject).AsExtended = 0 then
       AQuery.ParamByProp_Clear(AProp, TFieldType.ftFloat)
@@ -195,7 +196,7 @@ begin
     // così perchè i TValue le date le esprimono come Float.
     tkFloat:
       begin
-        if AValue.TypeInfo = System.TypeInfo(TDateTime) then
+        if (AValue.TypeInfo = System.TypeInfo(TDateTime)) or (AValue.TypeInfo = System.TypeInfo(TioObjUpdated)) or (AValue.TypeInfo = System.TypeInfo(TioObjCreated)) then
           Result := Self.FloatToSQL(AValue.AsExtended)
         else
           Result := Self.FloatToSQL(AValue.AsExtended);

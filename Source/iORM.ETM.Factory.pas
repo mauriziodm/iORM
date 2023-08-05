@@ -36,21 +36,51 @@ unit iORM.ETM.Factory;
 interface
 
 uses
-  iORM.ETM.Interfaces;
+  iORM.ETM.Interfaces, DJSON.Params;
 
 type
 
   TioEtmFactory = class
+  private
+    class var FdjParamsDiff: IdjParams;
+    class var FdjParamsEngine: IdjParams;
+    class procedure Build;
   public
+    class function djParamsDiff: IdjParams;
+    class function djParamsEngine: IdjParams;
     class function Diff(const ADiffMode: TioEtmDiffMode = dmOneway): TioEtmDiffRef;
   end;
 
 implementation
 
 uses
-  iORM.ETM.Diff.Oneway, iORM.Exceptions;
+  iORM.ETM.Diff.Oneway, iORM.Exceptions, DJSON;
 
 { TioEtmFactory }
+
+class procedure TioEtmFactory.Build;
+begin
+  // djParams for etm engine operations
+  FdjParamsEngine := dj.Default;
+  FdjParamsEngine.OpType := TdjSkipScope.ssETM;
+  FdjParamsEngine.SerializationType := stFields;
+  FdjParamsEngine.SerializationMode := smJavaScript;
+  FdjParamsEngine.TypeAnnotations := True;
+  FdjParamsEngine.ClearCollection := True;
+  FdjParamsEngine.TimeMillisec := False;
+  FdjParamsEngine.TimePrefix := '';
+  FdjParamsEngine.TimeZulu := '';
+  // djParams for etm diff operations
+  FdjParamsDiff := dj.Default;
+  FdjParamsDiff.OpType := TdjSkipScope.ssETM;
+  FdjParamsDiff.SerializationType := stFields;
+  FdjParamsDiff.SerializationMode := smJavaScript;
+  FdjParamsDiff.TypeAnnotations := False;
+  FdjParamsDiff.ClearCollection := False;
+  FdjParamsDiff.TimeMillisec := False;
+  FdjParamsDiff.TimePrefix := '';
+  FdjParamsDiff.TimeZulu := '';
+end;
 
 class function TioEtmFactory.Diff(const ADiffMode: TioEtmDiffMode): TioEtmDiffRef;
 begin
@@ -63,5 +93,19 @@ begin
       raise EioEtmException.Create(ClassName, 'Diff', 'Invalid DiffMode.');
   end;
 end;
+
+class function TioEtmFactory.djParamsDiff: IdjParams;
+begin
+  Result := FdjParamsDiff;
+end;
+
+class function TioEtmFactory.djParamsEngine: IdjParams;
+begin
+  Result := FdjParamsEngine;
+end;
+
+initialization
+
+  TioEtmFactory.Build;
 
 end.

@@ -470,7 +470,7 @@ begin
   LQualifiedTypeName := AValueType.QualifiedName;
   if LQualifiedTypeName = 'System.TDate' then
     Result := TValue.From<TDate>(TdjUtils.ISOStrToDateTime(AJSONValue.Value, AParams))
-  else if LQualifiedTypeName = 'System.TDateTime' then
+  else if (LQualifiedTypeName = 'System.TDateTime') or (LQualifiedTypeName = 'iORM.CommonTypes.TioObjUpdated') or (LQualifiedTypeName = 'iORM.CommonTypes.TioObjCreated') then
     Result := TValue.From<TDateTime>(TdjUtils.ISOStrToDateTime(AJSONValue.Value, AParams))
   else if LQualifiedTypeName = 'System.TTime' then
   begin
@@ -1194,7 +1194,7 @@ begin
     else
       Result := TJSONString.Create(TdjUtils.ISODateToString(AValue.AsExtended, AParams))
   end
-  else if LQualifiedTypeName = 'System.TDateTime' then
+  else if (LQualifiedTypeName = 'System.TDateTime') or (LQualifiedTypeName = 'iORM.CommonTypes.TioObjUpdated') or (LQualifiedTypeName = 'iORM.CommonTypes.TioObjCreated') then
   begin
     if AValue.AsExtended = 0 then
       Result := TJSONNull.Create

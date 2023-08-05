@@ -208,7 +208,7 @@ begin
   // Check TimeSlot
   _CheckTimeSlot(ATimeSlot, String.Empty);
   // Revert
-  Result := dj.FromJson(ATimeSlot.EntityState).OpType(ssETM).byFields.ClearCollection.TypeAnnotationsON.ToObject;
+  Result := dj.FromJson(ATimeSlot.EntityState, TioEtmFactory.djParamsEngine).ToObject;
   // The entity's ObjVersion property is reset with a negative value to indicate that it has been reset by the ETM
   _ObjVersionToNegative(Result);
   // Persist immediately
@@ -227,7 +227,7 @@ begin
   // Check TimeSlot
   _CheckTimeSlot(ATimeSlot, T.ClassName);
   // Revert
-  Result := dj.FromJson(ATimeSlot.EntityState).OpType(ssETM).byFields.ClearCollection.TypeAnnotationsON.&To<T>;
+  Result := dj.FromJson(ATimeSlot.EntityState, TioEtmFactory.djParamsEngine).&To<T>;
   // The entity's ObjVersion property is reset with a negative value to indicate that it has been reset by the ETM
   _ObjVersionToNegative(Result);
   // Persist immediately
@@ -240,7 +240,7 @@ begin
   // Check TimeSlot
   _CheckTimeSlot(ATimeSlot, ATargetObj.ClassName);
   // Revert
-  dj.FromJson(ATimeSlot.EntityState).OpType(ssETM).byFields.ClearCollection.TypeAnnotationsON.&To(ATargetObj);
+  dj.FromJson(ATimeSlot.EntityState, TioEtmFactory.djParamsEngine).&To(ATargetObj);
   // The entity's ObjVersion property is reset with a negative value to indicate that it has been reset by the ETM
   _ObjVersionToNegative(ATargetObj);
   // Persist immediately
@@ -255,7 +255,7 @@ begin
   // Check TimeSlot
   _CheckTimeSlot(ATimeSlot);
   // Revert
-  LObj := dj.FromJson(ATimeSlot.EntityState).OpType(ssETM).byFields.ClearCollection.TypeAnnotationsON.ToObject;
+  LObj := dj.FromJson(ATimeSlot.EntityState, TioEtmFactory.djParamsEngine).ToObject;
   try
     // The entity's ObjVersion property is reset with a negative value to indicate that it has been reset by the ETM
     _ObjVersionToNegative(LObj);
@@ -289,8 +289,8 @@ begin
   _CheckTimeSlot(AOldestTimeSlot);
   try
     // Get objects from the TimeSlot
-    LNewestObject := dj.FromJson(ANewestTimeSlot.EntityState).OpType(ssETM).byFields.ClearCollection.TypeAnnotationsON.ToObject;
-    LOldestObject := dj.FromJson(ANewestTimeSlot.EntityState).OpType(ssETM).byFields.ClearCollection.TypeAnnotationsON.ToObject;
+    LNewestObject := dj.FromJson(ANewestTimeSlot.EntityState, TioEtmFactory.djParamsEngine).ToObject;
+    LOldestObject := dj.FromJson(ANewestTimeSlot.EntityState, TioEtmFactory.djParamsEngine).ToObject;
     // Diff
     Result := _InternalDiffAsJsonObject(LNewestObject, LOldestObject, ADiffMode, AIncludeInfo);
   finally
@@ -313,7 +313,7 @@ begin
     raise EioEtmException.Create(ClassName, 'DiffAsJsonObject', '"ANewestVersionObj"  parameter must be assigned.');
   try
     // Get oldest object from the oldest TimeSlot
-    LOldestObj := dj.FromJson(AOldestTimeSlot.EntityState).OpType(ssETM).byFields.ClearCollection.TypeAnnotationsON.ToObject;
+    LOldestObj := dj.FromJson(AOldestTimeSlot.EntityState, TioEtmFactory.djParamsEngine).ToObject;
     // Diff
     Result := _InternalDiffAsJsonObject(ANewestObj, LOldestObj, ADiffMode, AIncludeInfo);
   finally
