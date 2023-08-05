@@ -70,9 +70,21 @@ type
     // ObjCreated
     function GetObjCreated: TioObjCreated;
     procedure SetObjCreated(const AValue: TioObjCreated);
+    // ObjCreatedUserID
+    function GetObjCreatedUserID: TioObjCreatedUserID;
+    procedure SetObjCreatedUserID(const AValue: TioObjCreatedUserID);
+    // ObjCreatedUserName
+    function GetObjCreatedUserName: TioObjCreatedUserName;
+    procedure SetObjCreatedUserName(const AValue: TioObjCreatedUserName);
     // ObjUpdated
     function GetObjUpdated: TioObjUpdated;
     procedure SetObjUpdated(const AValue: TioObjUpdated);
+    // ObjUpdatedUserID
+    function GetObjUpdatedUserID: TioObjUpdatedUserID;
+    procedure SetObjUpdatedUserID(const AValue: TioObjUpdatedUserID);
+    // ObjUpdatedUserName
+    function GetObjUpdatedUserName: TioObjUpdatedUserName;
+    procedure SetObjUpdatedUserName(const AValue: TioObjUpdatedUserName);
     // RelationOID
     function GetRelationOID: Integer;
     procedure SetRelationOID(const Value: Integer);
@@ -111,7 +123,11 @@ type
     property ObjStatus: TioObjStatus read GetObjStatus write SetObjStatus;
     property ObjVersion: TioObjVersion read GetObjVersion write SetObjVersion;
     property ObjCreated: TioObjCreated read GetObjCreated write SetObjCreated;
+    property ObjCreatedUserID: TioObjCreatedUserID read GetObjCreatedUserID write SetObjCreatedUserID;
+    property ObjCreatedUserName: TioObjCreatedUserName read GetObjCreatedUserName write SetObjCreatedUserName;
     property ObjUpdated: TioObjUpdated read GetObjUpdated write SetObjUpdated;
+    property ObjUpdatedUserID: TioObjUpdatedUserID read GetObjUpdatedUserID write SetObjUpdatedUserID;
+    property ObjUpdatedUserName: TioObjUpdatedUserName read GetObjUpdatedUserName write SetObjUpdatedUserName;
     property Where: IioWhere read GetWhere write SetWhere;
     property RelationOID: Integer read GetRelationOID write SetRelationOID;
     property MasterPropertyPath: String read GetMasterPropertyPath;
@@ -207,6 +223,22 @@ begin
     Result := TRANSACTION_TIMESTAMP_NULL;
 end;
 
+function TioContext.GetObjCreatedUserID: TioObjCreatedUserID;
+begin
+  if GetProperties.ObjCreatedUserIDPropertyExist then
+    Result := GetProperties.ObjCreatedUserIDProperty.GetValue(FDataObject).AsType<TioObjCreatedUserID>
+  else
+    Result := IO_CURRENTUSERINFO_ID_EMPTY;
+end;
+
+function TioContext.GetObjCreatedUserName: TioObjCreatedUserName;
+begin
+  if GetProperties.ObjCreatedUserNamePropertyExist then
+    Result := GetProperties.ObjCreatedUserNameProperty.GetValue(FDataObject).AsType<TioObjCreatedUserName>
+  else
+    Result := IO_CURRENTUSERINFO_NAME_EMPTY;
+end;
+
 function TioContext.GetObjStatus: TioObjStatus;
 begin
   if GetProperties.ObjStatusPropertyExist then
@@ -221,6 +253,22 @@ begin
     Result := GetProperties.ObjUpdatedProperty.GetValue(FDataObject).AsType<TioObjUpdated>
   else
     Result := TRANSACTION_TIMESTAMP_NULL;
+end;
+
+function TioContext.GetObjUpdatedUserID: TioObjUpdatedUserID;
+begin
+  if GetProperties.ObjUpdatedUserIDPropertyExist then
+    Result := GetProperties.ObjUpdatedUserIDProperty.GetValue(FDataObject).AsType<TioObjUpdatedUserID>
+  else
+    Result := IO_CURRENTUSERINFO_ID_EMPTY;
+end;
+
+function TioContext.GetObjUpdatedUserName: TioObjUpdatedUserName;
+begin
+  if GetProperties.ObjUpdatedUserNamePropertyExist then
+    Result := GetProperties.ObjUpdatedUserNameProperty.GetValue(FDataObject).AsType<TioObjUpdatedUserName>
+  else
+    Result := IO_CURRENTUSERINFO_NAME_EMPTY;
 end;
 
 function TioContext.GetOrderBySql: String;
@@ -276,6 +324,26 @@ begin
   GetProperties.ObjCreatedProperty.SetValue(FDataObject, LPropValue);
 end;
 
+procedure TioContext.SetObjCreatedUserID(const AValue: TioObjCreatedUserID);
+var
+  LPropValue: TValue;
+begin
+  if not GetProperties.ObjCreatedUserIDPropertyExist then
+    Exit;
+  LPropValue := TValue.From<TioObjCreatedUserID>(AValue);
+  GetProperties.ObjCreatedUserIDProperty.SetValue(FDataObject, LPropValue);
+end;
+
+procedure TioContext.SetObjCreatedUserName(const AValue: TioObjCreatedUserName);
+var
+  LPropValue: TValue;
+begin
+  if not GetProperties.ObjCreatedUserNamePropertyExist then
+    Exit;
+  LPropValue := TValue.From<TioObjCreatedUserName>(AValue);
+  GetProperties.ObjCreatedUserNameProperty.SetValue(FDataObject, LPropValue);
+end;
+
 procedure TioContext.SetObjStatus(const AValue: TioObjStatus);
 var
   LPropValue: TValue;
@@ -294,6 +362,26 @@ begin
     Exit;
   LPropValue := TValue.From<TioObjUpdated>(AValue);
   GetProperties.ObjUpdatedProperty.SetValue(FDataObject, LPropValue);
+end;
+
+procedure TioContext.SetObjUpdatedUserID(const AValue: TioObjUpdatedUserID);
+var
+  LPropValue: TValue;
+begin
+  if not GetProperties.ObjUpdatedUserIDPropertyExist then
+    Exit;
+  LPropValue := TValue.From<TioObjUpdatedUserID>(AValue);
+  GetProperties.ObjUpdatedUserIDProperty.SetValue(FDataObject, LPropValue);
+end;
+
+procedure TioContext.SetObjUpdatedUserName(const AValue: TioObjUpdatedUserName);
+var
+  LPropValue: TValue;
+begin
+  if not GetProperties.ObjUpdatedUserNamePropertyExist then
+    Exit;
+  LPropValue := TValue.From<TioObjUpdatedUserName>(AValue);
+  GetProperties.ObjUpdatedUserNameProperty.SetValue(FDataObject, LPropValue);
 end;
 
 procedure TioContext.SetObjVersion(const AValue: TioObjVersion);

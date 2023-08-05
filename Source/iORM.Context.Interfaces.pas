@@ -74,6 +74,22 @@ type
     function GetObjCreated: TioObjCreated;
     procedure SetObjCreated(const AValue: TioObjCreated);
     property ObjCreated: TioObjCreated read GetObjCreated write SetObjCreated;
+    // ObjCreatedUserID
+    function GetObjCreatedUserID: TioObjCreatedUserID;
+    procedure SetObjCreatedUserID(const AValue: TioObjCreatedUserID);
+    property ObjCreatedUserID: TioObjCreatedUserID read GetObjCreatedUserID write SetObjCreatedUserID;
+    // ObjCreatedUserName
+    function GetObjCreatedUserName: TioObjCreatedUserName;
+    procedure SetObjCreatedUserName(const AValue: TioObjCreatedUserName);
+    property ObjCreatedUserName: TioObjCreatedUserName read GetObjCreatedUserName write SetObjCreatedUserName;
+    // ObjUpdatedUserID
+    function GetObjUpdatedUserID: TioObjUpdatedUserID;
+    procedure SetObjUpdatedUserID(const AValue: TioObjUpdatedUserID);
+    property ObjUpdatedUserID: TioObjUpdatedUserID read GetObjUpdatedUserID write SetObjUpdatedUserID;
+    // ObjUpdatedUserName
+    function GetObjUpdatedUserName: TioObjUpdatedUserName;
+    procedure SetObjUpdatedUserName(const AValue: TioObjUpdatedUserName);
+    property ObjUpdatedUserName: TioObjUpdatedUserName read GetObjUpdatedUserName write SetObjUpdatedUserName;
     // ObjUpdated
     function GetObjUpdated: TioObjUpdated;
     procedure SetObjUpdated(const AValue: TioObjUpdated);

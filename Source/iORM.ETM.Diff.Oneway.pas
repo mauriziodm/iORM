@@ -166,7 +166,7 @@ begin
   end;
   // ====================================================================
   // ====================================================================
-  // FIRST LOOP FOR PROPERTIES OF THE OLD OBJECT (deleted props)
+  // SECOND LOOP FOR PROPERTIES OF THE OLD OBJECT (deleted props)
   // --------------------------------------------------------------------
   if Assigned(LOldMap) then
   begin
@@ -236,6 +236,11 @@ begin
     // Values
     Result.AddPair(ETM_OLD_VALUE, LOldJsonValue);
     Result.AddPair(ETM_NEW_VALUE, LNewJsonValue);
+  end
+  else
+  begin
+    LOldJsonValue.Free;
+    LNewJsonValue.Free;
   end;
 end;
 
@@ -263,6 +268,7 @@ class function TioEtmOnewayDiff.Diff_ListProp(const LOldProp, LNewProp: IioPrope
 var
   LOldList, LNewList, LOldListItem, LNewListItem: TObject;
   LOldDuckList, LNewDuckList: IioDuckTypedList;
+  LDiffJsonObj: TJSONObject;
   LResultJsonArray: TJSONArray;
   function _FindListItem(const LDuckList: IioDuckTypedList; const AObjToSearch: TObject): TObject;
   var
@@ -275,7 +281,7 @@ var
     begin
       if not Assigned(Result) then
         Continue;
-      LCurrID := TioUtilities.ExtractOID(AObjToSearch);
+      LCurrID := TioUtilities.ExtractOID(Result);
       if (Result.ClassName = AObjToSearch.ClassName) and (LCurrID = LSearchID) then
         Exit;
     end;
@@ -283,9 +289,9 @@ var
   end;
 
 begin
-  // Get the child lists
-  LOldList := LOldProp.GetRelationChildObject(ASourceOldObj);
-  LNewList := LNewProp.GetRelationChildObject(ASourceNewObj);
+  // Init
+  LOldList := nil;
+  LNewList := nil;
   // Get list child objects
   if Assigned(LOldProp) then
     LOldList := LOldProp.GetRelationChildObject(ASourceOldObj, False);
@@ -331,8 +337,13 @@ begin
         Continue;
       // Search for the same element in the old list (same class, same id)
       LOldListItem := _FindListItem(LOldDuckList, LNewListItem);
-      // Get the diff between the two version of the same object then add it to the resul json array
-      LResultJsonArray.Add( Diff_Object(nil, nil, LOldListItem, LNewListItem, AIncludeInfo) );
+      // Get the diff between the two version of the same object
+      LDiffJsonObj := Diff_Object(nil, nil, LOldListItem, LNewListItem, AIncludeInfo);
+      // Add the diff to the resoult json array (or freeit if empty)
+      if not IsEmpty(LDiffJsonObj) then
+        LResultJsonArray.Add(LDiffJsonObj)
+      else
+        FreeAndNil(LDiffJsonObj);
     end;
   end;
   // ======================================================
@@ -348,8 +359,13 @@ begin
         Continue;
       // Search for the same element in the new list (same class, same id)
       LNewListItem := _FindListItem(LNewDuckList, LOldListItem);
-      // Get the diff between the two version of the same object then add it to the resul json array
-      LResultJsonArray.Add( Diff_Object(nil, nil, LOldListItem, LNewListItem, AIncludeInfo) );
+      // Get the diff between the two version of the same object
+      LDiffJsonObj := Diff_Object(nil, nil, LOldListItem, LNewListItem, AIncludeInfo);
+      // Add the diff to the resoult json array (or freeit if empty)
+      if not IsEmpty(LDiffJsonObj) then
+        LResultJsonArray.Add(LDiffJsonObj)
+      else
+        FreeAndNil(LDiffJsonObj);
     end;
   end;
   // ======================================================

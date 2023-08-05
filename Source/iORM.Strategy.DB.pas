@@ -250,6 +250,13 @@ end;
 class procedure TioStrategyDB._DoDeleteObject(const AObj: TObject);
 var
   LContext: IioContext;
+
+{$REGION '-----INTERCEPTORS-----'}
+{$IFNDEF ioCRUDInterceptorsOff}
+  LDone: Boolean;
+{$ENDIF}
+{$ENDREGION}
+
 begin
   inherited;
   // Check
@@ -263,10 +270,28 @@ begin
   // Start transaction
   StartTransaction(LContext.GetTable.GetConnectionDefName);
   try
-    // PreProcess (delete) relation childs (HasMany, HasOne)
-    PreProcessRelationChildOnDelete(LContext);
-    // Delete the object
-    DeleteObject_Internal(LContext);
+
+{$REGION '-----INTERCEPTORS-----'}
+{$IFNDEF ioCRUDInterceptorsOff}
+    LDone := False;
+    TioCRUDInterceptorRegister.BeforeDelete(LContext, LDone);
+    if not LDone then
+    begin
+{$ENDIF}
+{$ENDREGION}
+
+     // PreProcess (delete) relation childs (HasMany, HasOne)
+      PreProcessRelationChildOnDelete(LContext);
+      // Delete the object
+      DeleteObject_Internal(LContext);
+
+{$REGION '-----INTERCEPTORS-----'}
+{$IFNDEF ioCRUDInterceptorsOff}
+      TioCRUDInterceptorRegister.AfterDelete(LContext);
+    end;
+{$ENDIF}
+{$ENDREGION}
+
     // Commit
     CommitTransaction(LContext.GetTable.GetConnectionDefName);
   except
@@ -278,33 +303,17 @@ end;
 
 class procedure TioStrategyDB.DeleteObject_Internal(const AContext: IioContext);
 var
-{$IFNDEF ioCRUDInterceptorsOff}
-  LDone: Boolean;
-{$ENDIF}
   LQuery: IioQuery;
 begin
   inherited;
   // Delete the entity (Intercepted by CRUDInterceptors)
-{$IFNDEF ioCRUDInterceptorsOff}
-  LDone := False;
-  TioCRUDInterceptorRegister.BeforeDelete(AContext, LDone);
-  if not LDone then
-  begin
-{$ENDIF}
-    LQuery := TioDBFactory.QueryEngine.GetQueryDelete(AContext, True);
-    if not AContext.IDIsNull then
-      LQuery.ExecSQL;
-{$IFNDEF ioCRUDInterceptorsOff}
-    TioCRUDInterceptorRegister.AfterDelete(AContext);
-  end;
-{$ENDIF}
+  LQuery := TioDBFactory.QueryEngine.GetQueryDelete(AContext, True);
+  if not AContext.IDIsNull then
+    LQuery.ExecSQL;
 end;
 
 class procedure TioStrategyDB.InsertObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
 var
-{$IFNDEF ioCRUDInterceptorsOff}
-  LDone: Boolean;
-{$ENDIF}
   LQuery: IioQuery;
 begin
   inherited;
@@ -324,40 +333,34 @@ begin
     end;
   end;
   // -----------------------------------------------------------
-{$IFNDEF ioCRUDInterceptorsOff}
-  LDone := False;
-  TioCRUDInterceptorRegister.BeforeInsert(AContext, LDone);
-  if not LDone then
+  // Create and execute insert query and set the version/created/updated of the entity (Intercepted by crudInterceptors)
+  LQuery := TioDBFactory.QueryEngine.GetQueryInsert(AContext);
+  LQuery.ExecSQL;
+  if not ABlindInsertUpdate then
   begin
-{$ENDIF}
-    // Create and execute insert query and set the version/created/updated of the entity (Intercepted by crudInterceptors)
-    LQuery := TioDBFactory.QueryEngine.GetQueryInsert(AContext);
-    LQuery.ExecSQL;
-    if not ABlindInsertUpdate then
-    begin
-      AContext.NextObjVersion(True);
-      AContext.ObjCreated := LQuery.Connection.LastTransactionTimestamp;
-      AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;
-    end;
-    // -----------------------------------------------------------
-    // Get and execute a query to retrieve the last ID generated
-    // in the last insert query.
-    if (not ABlindInsertUpdate) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtAfterInsert) and AContext.IDIsNull then
-    begin
-      LQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
-      try
-        LQuery.Open;
-        // Set the NextID as the ObjectID
-        AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, LQuery.Fields[0].AsInteger);
-      finally
-        LQuery.Close;
-      end;
-    end;
-    // -----------------------------------------------------------
-{$IFNDEF ioCRUDInterceptorsOff}
-    TioCRUDInterceptorRegister.AfterInsert(AContext);
+    AContext.NextObjVersion(True);
+    AContext.ObjCreated := LQuery.Connection.LastTransactionTimestamp;
+    AContext.ObjCreatedUserID := TioConnectionManager.GetCurrentConnectionInfo.CurrentUserID;
+    AContext.ObjCreatedUserName := TioConnectionManager.GetCurrentConnectionInfo.CurrentUserName;
+    AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;
+    AContext.ObjUpdatedUserID := TioConnectionManager.GetCurrentConnectionInfo.CurrentUserID;
+    AContext.ObjUpdatedUserName := TioConnectionManager.GetCurrentConnectionInfo.CurrentUserName;
   end;
-{$ENDIF}
+  // -----------------------------------------------------------
+  // Get and execute a query to retrieve the last ID generated
+  // in the last insert query.
+  if (not ABlindInsertUpdate) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtAfterInsert) and AContext.IDIsNull then
+  begin
+    LQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
+    try
+      LQuery.Open;
+      // Set the NextID as the ObjectID
+      AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, LQuery.Fields[0].AsInteger);
+    finally
+      LQuery.Close;
+    end;
+  end;
+  // -----------------------------------------------------------
 end;
 
 class function TioStrategyDB.InTransaction(const AConnectionName: String): Boolean;
@@ -448,8 +451,56 @@ end;
 
 class procedure TioStrategyDB._DoPersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsertUpdate: Boolean;
   const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
+type
+  TioInterceptors_PersistActionType = (patInsert, patUpdate, patDelete);
 var
   LContext: IioContext;
+
+{$REGION '-----INTERCEPTORS-----'}
+{$IFNDEF ioCRUDInterceptorsOff}
+  LDone: Boolean;
+  LInterceptors_PersistActionType: TioInterceptors_PersistActionType;
+  procedure _Interceptors_DetectPersistActionType;
+  begin
+    case LContext.ObjStatus of
+      osDirty:
+        begin
+          // if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
+          if (not ABlindInsertUpdate) and (not LContext.IDIsNull) and Self.ObjectExists(LContext) then
+            LInterceptors_PersistActionType := patUpdate
+          else
+            LInterceptors_PersistActionType := patInsert;
+        end;
+      osDeleted:
+        LInterceptors_PersistActionType := patDelete;
+    end;
+  end;
+  procedure _Interceptors_InterceptBeforeAction;
+  begin
+    LDone := False;
+    case LInterceptors_PersistActionType of
+      patUpdate:
+        TioCRUDInterceptorRegister.BeforeUpdate(LContext, LDone);
+      patInsert:
+        TioCRUDInterceptorRegister.BeforeInsert(LContext, LDone);
+      patDelete:
+        TioCRUDInterceptorRegister.BeforeDelete(LContext, LDone);
+    end;
+  end;
+  procedure _Interceptors_InterceptAfterAction;
+  begin
+    case LInterceptors_PersistActionType of
+      patUpdate:
+        TioCRUDInterceptorRegister.AfterUpdate(LContext);
+      patInsert:
+        TioCRUDInterceptorRegister.AfterInsert(LContext);
+      patDelete:
+        TioCRUDInterceptorRegister.AfterDelete(LContext);
+    end;
+  end;
+{$ENDIF}
+{$ENDREGION}
+
 begin
   inherited;
   // Check
@@ -469,33 +520,58 @@ begin
     if (ARelationPropertyName <> '') and (ARelationPropertyName <> IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME) and (ARelationOID <> 0) and
       (LContext.GetProperties.GetPropertyByName(ARelationPropertyName).GetRelationType = rtNone) then
       LContext.GetProperties.GetPropertyByName(ARelationPropertyName).SetValue(LContext.DataObject, ARelationOID);
-    // PreProcess (persist) relation childs (BelongsTo)
-    PreProcessRelationChildOnPersist(LContext);
-    // Process the current object
-    // --------------------------
-    case LContext.ObjStatus of
-      // Persist if dirty
-      osDirty:
-        begin
-          // If SmartUpdateDetection system is not enabled or (if enabled) the object is to be persisted (according to the SmartUpdateDetection system)...
-          if LContext.GetProperties.ObjStatusPropertyExist or (AMasterBSPersistence = nil) or (not AMasterBSPersistence.IsSmartUpdateDetectionEnabled) or
-            AMasterBSPersistence.SmartUpdateDetection.IsToBePersisted(AObj, LContext.MasterPropertyPath) then
+
+{$REGION '-----INTERCEPTORS-----'}
+{$IFNDEF ioCRUDInterceptorsOff}
+    // Interceptors: detect the persist action type
+    _Interceptors_DetectPersistActionType;
+    // Interceptors: intercept the "before" action
+    _Interceptors_InterceptBeforeAction;
+    if not LDone then
+    begin
+{$ENDIF}
+{$ENDREGION}
+
+      // PreProcess (persist) relation childs (BelongsTo)
+      PreProcessRelationChildOnPersist(LContext);
+      // Process the current object
+      // --------------------------
+      case LContext.ObjStatus of
+        // Persist if dirty
+        osDirty:
           begin
-            // if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
-            if (not ABlindInsertUpdate) and (not LContext.IDIsNull) and Self.ObjectExists(LContext) then
-              UpdateObject_Internal(LContext, ABlindInsertUpdate)
-            else
-              InsertObject_Internal(LContext, ABlindInsertUpdate);
-            LContext.ObjStatus := osClean;
+            // If SmartUpdateDetection system is not enabled or (if enabled) the object is to be persisted (according to the SmartUpdateDetection system)...
+            if LContext.GetProperties.ObjStatusPropertyExist or (AMasterBSPersistence = nil) or (not AMasterBSPersistence.IsSmartUpdateDetectionEnabled) or
+              AMasterBSPersistence.SmartUpdateDetection.IsToBePersisted(AObj, LContext.MasterPropertyPath) then
+            begin
+              // if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
+              if (not ABlindInsertUpdate) and (not LContext.IDIsNull) and Self.ObjectExists(LContext) then
+                UpdateObject_Internal(LContext, ABlindInsertUpdate)
+              else
+                InsertObject_Internal(LContext, ABlindInsertUpdate);
+              LContext.ObjStatus := osClean;
+            end;
           end;
+        // Delete if deleted
+        osDeleted:
+        begin
+          // PreProcess (delete) relation childs (HasMany, HasOne)
+          PreProcessRelationChildOnDelete(LContext);
+          DeleteObject_Internal(LContext);
         end;
-      // Delete if deleted
-      osDeleted:
-        DeleteObject_Internal(LContext);
+      end;
+      // --------------------------
+      // PostProcess (persist) relation childs (HasMany, HasOne)
+      PostProcessRelationChildOnPersist(LContext);
+
+{$REGION '-----INTERCEPTORS-----'}
+{$IFNDEF ioCRUDInterceptorsOff}
+      // Intercept the "after" action
+      _Interceptors_InterceptAfterAction;
     end;
-    // --------------------------
-    // PostProcess (persist) relation childs (HasMany, HasOne)
-    PostProcessRelationChildOnPersist(LContext);
+{$ENDIF}
+{$ENDREGION}
+
     // Commit
     CommitTransaction(LContext.GetTable.GetConnectionDefName);
   except
@@ -707,12 +783,14 @@ var
   // Nested
   procedure NestedLoadToList;
   var
-{$IFNDEF ioCRUDInterceptorsOff}
-    LDone: Boolean;
-{$ENDIF}
     LQuery: IioQuery;
     LObj: TObject;
     LCurrentContext: IioContext;
+{$REGION '-----INTERCEPTORS-----'}
+{$IFNDEF ioCRUDInterceptorsOff}
+    LDone: Boolean;
+{$ENDIF}
+{$ENDREGION}
   begin
     // NB: Se TrueClassMode = tcSmart in pratica LCurrentContext ora contiene la VirtualMap (o SuperMap) e la usa per
     //      creare il codice SQL della query poi, una volta aperta la query, inizia a ciclare per tutti i record/oggetti
@@ -734,6 +812,7 @@ var
         // Clean the DataObject (it contains the previous)
         LCurrentContext.DataObject := nil;
         // Create the object as TObject  (Intercepted by CRUDInterceptors)
+{$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
         LDone := False;
         LObj := TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext, nil, LDone);
@@ -741,11 +820,14 @@ var
         if not LDone then
         begin
 {$ENDIF}
+{$ENDREGION}
           LObj := TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
+{$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
           LObj := TioCRUDInterceptorRegister.AfterLoad(LCurrentContext, LObj);
         end;
 {$ENDIF}
+{$ENDREGION}
         // Add current object to the list
         LDuckTypedList.Add(LObj);
         // Next
@@ -798,11 +880,15 @@ var
   // Nested
   function NestedLoadToObject: TObject;
   var
+    LQuery: IioQuery;
+    LCurrentContext: IioContext;
+
+{$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
     LDone: Boolean;
 {$ENDIF}
-    LQuery: IioQuery;
-    LCurrentContext: IioContext;
+{$ENDREGION}
+
   begin
     // Init
     Result := AObj;
@@ -820,6 +906,8 @@ var
         else
           LCurrentContext := LOriginalContext;
         // Create the object as TObject (Intercepted by CRUDInterceptors)
+
+{$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
         LDone := False;
         Result := TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext, Result, LDone);
@@ -827,11 +915,17 @@ var
         if not LDone then
         begin
 {$ENDIF}
+{$ENDREGION}
+
           Result := TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
+
+{$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
           Result := TioCRUDInterceptorRegister.AfterLoad(LCurrentContext, Result);
         end;
 {$ENDIF}
+{$ENDREGION}
+
       end;
     finally
       // Close query
@@ -874,32 +968,21 @@ end;
 
 class procedure TioStrategyDB.UpdateObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
 var
-{$IFNDEF ioCRUDInterceptorsOff}
-  LDone: Boolean;
-{$ENDIF}
   LQuery: IioQuery;
 begin
   inherited;
   // Create and execute the query to update the entity into the DB cheking the version to avoid concurrency
   // conflict (if versioning is enabled for this type of entity) (Intercepted by CRUDInterceptors)
-{$IFNDEF ioCRUDInterceptorsOff}
-  LDone := False;
-  TioCRUDInterceptorRegister.BeforeUpdate(AContext, LDone);
-  if not LDone then
+  LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext);
+  if LQuery.ExecSQL = 0 then
+    raise EioConcurrencyConflictException.Create(ClassName, 'UpdateObject_Internal', AContext);
+  if not ABlindInsertUpdate then
   begin
-{$ENDIF}
-    LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext);
-    if LQuery.ExecSQL = 0 then
-      raise EioConcurrencyConflictException.Create(ClassName, 'UpdateObject_Internal', AContext);
-    if not ABlindInsertUpdate then
-    begin
-      AContext.NextObjVersion(True);
-      AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;;
-    end;
-{$IFNDEF ioCRUDInterceptorsOff}
-    TioCRUDInterceptorRegister.AfterUpdate(AContext);
+    AContext.NextObjVersion(True);
+    AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;;
+    AContext.ObjUpdatedUserID := TioConnectionManager.GetCurrentConnectionInfo.CurrentUserID;
+    AContext.ObjUpdatedUserName := TioConnectionManager.GetCurrentConnectionInfo.CurrentUserName;
   end;
-{$ENDIF}
 end;
 
 { TioContextCache }
