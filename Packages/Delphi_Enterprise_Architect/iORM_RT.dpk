@@ -233,7 +233,8 @@ contains
   iORM.ETM.Interceptor in '..\..\Source\iORM.ETM.Interceptor.pas',
   iORM.ETM.Diff.Oneway in '..\..\Source\iORM.ETM.Diff.Oneway.pas',
   iORM.ETM.Interfaces in '..\..\Source\iORM.ETM.Interfaces.pas',
-  iORM.ETM.Factory in '..\..\Source\iORM.ETM.Factory.pas';
+  iORM.ETM.Factory in '..\..\Source\iORM.ETM.Factory.pas',
+  iORM.ETM.Diff.Twoway in '..\..\Source\iORM.ETM.Diff.Twoway.pas';
 
 end.
 

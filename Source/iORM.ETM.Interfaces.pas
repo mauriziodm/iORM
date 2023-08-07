@@ -39,20 +39,20 @@ uses
   System.JSON;
 
 const
-  ETM_OLD_PROP_TYPE = '$etm_old_type';
-  ETM_NEW_PROP_TYPE = '$etm_new_type';
+  ETM_LABEL_OLD_PROP_TYPE = '$etm_old_property_type';
+  ETM_LABEL_NEW_PROP_TYPE = '$etm_new_property_type';
 
-  ETM_OLD_CLASS = '$etm_old_class';
-  ETM_NEW_CLASS = '$etm_new_class';
+  ETM_LABEL_CLASS = '$etm_class';
+  ETM_LABEL_OLD_CLASS = '$etm_old_instance_class';
+  ETM_LABEL_NEW_CLASS = '$etm_new_instance_class';
 
-  ETM_ID = '$etm_id';
-  ETM_OLD_ID = '$etm_old_id';
-  ETM_NEW_ID = '$etm_new_id';
+  ETM_LABEL_ID = '$etm_id';
 
   ETM_OLD_VALUE = '$etm_old_value';
   ETM_NEW_VALUE = '$etm_new_value';
+  ETM_ITEMS = '$etm_items';
 
-  ETM_DIFF_STATUS = '$etm_diff_status';
+  ETM_DIFF_STATUS = '$etm_status';
   ETM_DIFF_STATUS_NEW = 'new';
   ETM_DIFF_STATUS_UPDATED = 'updated';
   ETM_DIFF_STATUS_REMOVED = 'removed';

@@ -45,13 +45,13 @@ type
     class function IsEmpty(const AJSONObject: TJSONObject): Boolean;
     class function IsToBeSkipped(const AProp: IioProperty): Boolean;
     class function Diff_Status(const AOld, ANew: Pointer): String;
-    class function Diff_Object(const LPrevOldProp, LPrevNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
-    class function Diff_ValueProp(const LOldProp, LNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
-    class function Diff_ObjectProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AIncludeInfo: Boolean)
+    class function Diff_Object(const LPrevOldProp, LPrevNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AMoreInfo: Boolean): TJSONObject;
+    class function Diff_ValueProp(const LOldProp, LNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AMoreInfo: Boolean): TJSONObject;
+    class function Diff_ObjectProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AMoreInfo: Boolean)
       : TJSONObject;
-    class function Diff_ListProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AIncludeInfo: Boolean): TJSONValue;
+    class function Diff_ListProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AMoreInfo: Boolean): TJSONValue;
   public
-    class function Diff(const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean): TJSONObject; override;
+    class function Diff(const AOldObj, ANewObj: TObject; const AMoreInfo: Boolean): TJSONObject; override;
   end;
 
 implementation
@@ -64,9 +64,9 @@ uses
 
 { TioEtmDiff }
 
-class function TioEtmOnewayDiff.Diff(const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean): TJSONObject;
+class function TioEtmOnewayDiff.Diff(const AOldObj, ANewObj: TObject; const AMoreInfo: Boolean): TJSONObject;
 begin
-  Result := Diff_Object(nil, nil, AOldObj, ANewObj, AIncludeInfo);
+  Result := Diff_Object(nil, nil, AOldObj, ANewObj, AMoreInfo);
 end;
 
 class function TioEtmOnewayDiff.IsEmpty(const AJSONObject: TJSONObject): Boolean;
@@ -74,8 +74,8 @@ var
   LJSONPair: TJSONPair;
 begin
   Result := True;
-  for LJSONPair in AJSONObject do
-    if not LJSONPair.JsonString.Value.StartsWith('$etm') then
+  for LJSONPair in AJSONObject                do
+    if not LJSONPair.JsonString.Value.StartsWith('$etm_') then
       Exit(False);
 end;
 
@@ -93,14 +93,14 @@ begin
   if (AOld <> nil) and (ANew <> nil) then
     Result := ETM_DIFF_STATUS_UPDATED
   else if (AOld <> nil) then
-    Result := ETM_DIFF_STATUS_NEW
-  else if (ANew <> nil) then
     Result := ETM_DIFF_STATUS_REMOVED
+  else if (ANew <> nil) then
+    Result := ETM_DIFF_STATUS_NEW
   else
     Result := String.Empty;
 end;
 
-class function TioEtmOnewayDiff.Diff_Object(const LPrevOldProp, LPrevNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean)
+class function TioEtmOnewayDiff.Diff_Object(const LPrevOldProp, LPrevNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AMoreInfo: Boolean)
   : TJSONObject;
 var
   LOldMap, LNewMap: IioMap;
@@ -118,24 +118,42 @@ begin
   // Create the result json object
   Result := TJSONObject.Create;
   // Include info
-  if AIncludeInfo then
+  if AMoreInfo then
   begin
+    // Status
     Result.AddPair(ETM_DIFF_STATUS, Diff_Status(LOldMap, LNewMap));
+    // Old
     if Assigned(LPrevOldProp) then
-      Result.AddPair(ETM_OLD_PROP_TYPE, LPrevOldProp.GetTypeName);
-    if Assigned(LPrevNewProp) then
-      Result.AddPair(ETM_NEW_PROP_TYPE, LPrevNewProp.GetTypeName);
+      Result.AddPair(ETM_LABEL_OLD_PROP_TYPE, LPrevOldProp.GetTypeName);
     if Assigned(LOldMap) then
-    begin
-      Result.AddPair(ETM_OLD_CLASS, AOldObj.ClassName);
-      Result.AddPair(ETM_OLD_ID, LOldMap.GetProperties.GetIdProperty.GetValue(AOldObj).AsInteger);
-    end;
+      Result.AddPair(ETM_LABEL_OLD_CLASS, AOldObj.ClassName)
+    else
+      Result.AddPair(ETM_LABEL_OLD_CLASS, TJSONNull.Create);
+    // New
+    if Assigned(LPrevNewProp) then
+      Result.AddPair(ETM_LABEL_NEW_PROP_TYPE, LPrevNewProp.GetTypeName);
     if Assigned(LNewMap) then
-    begin
-      Result.AddPair(ETM_NEW_CLASS, ANewObj.ClassName);
-      Result.AddPair(ETM_NEW_ID, LNewMap.GetProperties.GetIdProperty.GetValue(ANewObj).AsInteger);
-    end;
+      Result.AddPair(ETM_LABEL_NEW_CLASS, ANewObj.ClassName)
+    else
+      Result.AddPair(ETM_LABEL_NEW_CLASS, TJSONNull.Create);
+  end
+  else
+  // Se non vogliamo MoreInfo mette cmq il nome della classe dell'oggetto corrente e lo prende
+  //  dal nuovo o dal vecchio in base a quello che c'è
+  begin
+    if Assigned(LNewMap) then
+      Result.AddPair(ETM_LABEL_CLASS, ANewObj.ClassName)
+    else
+    if Assigned(LOldMap) then
+      Result.AddPair(ETM_LABEL_CLASS, AOldObj.ClassName)
   end;
+  // ID (sempre anche se non si vogliono le info)
+  //  NB: Una qualunque delle due ma deve esserci
+  if Assigned(LOldMap) then
+    Result.AddPair(ETM_LABEL_ID, LOldMap.GetProperties.GetIdProperty.GetValue(AOldObj).AsInteger)
+  else
+  if Assigned(LNewMap) then
+    Result.AddPair(ETM_LABEL_ID, LNewMap.GetProperties.GetIdProperty.GetValue(ANewObj).AsInteger);
   // ====================================================================
   // FIRST LOOP FOR PROPERTIES OF THE NEW OBJECT (added or updated props)
   // --------------------------------------------------------------------
@@ -154,11 +172,11 @@ begin
       LDiffValue := nil;
       case LNewProp.GetRelationType of
         rtNone:
-          LDiffValue := Diff_ValueProp(LOldProp, LNewProp, AOldObj, ANewObj, AIncludeInfo);
+          LDiffValue := Diff_ValueProp(LOldProp, LNewProp, AOldObj, ANewObj, AMoreInfo);
         rtBelongsTo, rtHasOne, rtEmbeddedHasOne:
-          LDiffValue := Diff_ObjectProp(LOldProp, LNewProp, AOldObj, ANewObj, AIncludeInfo);
+          LDiffValue := Diff_ObjectProp(LOldProp, LNewProp, AOldObj, ANewObj, AMoreInfo);
         rtHasMany, rtEmbeddedHasMany:
-          LDiffValue := Diff_ListProp(LOldProp, LNewProp, AOldObj, ANewObj, AIncludeInfo);
+          LDiffValue := Diff_ListProp(LOldProp, LNewProp, AOldObj, ANewObj, AMoreInfo);
       end;
       // If a diff is detected then add it to the result JSONObject
       if Assigned(LDiffValue) then
@@ -185,13 +203,13 @@ begin
         Continue;
       // Detect differences
       LDiffValue := nil;
-      case LNewProp.GetRelationType of
+      case LOldProp.GetRelationType of
         rtNone:
-          LDiffValue := Diff_ValueProp(LOldProp, LNewProp, AOldObj, ANewObj, AIncludeInfo);
+          LDiffValue := Diff_ValueProp(LOldProp, LNewProp, AOldObj, ANewObj, AMoreInfo);
         rtBelongsTo, rtHasOne, rtEmbeddedHasOne:
-          LDiffValue := Diff_ObjectProp(LOldProp, LNewProp, AOldObj, ANewObj, AIncludeInfo);
+          LDiffValue := Diff_ObjectProp(LOldProp, LNewProp, AOldObj, ANewObj, AMoreInfo);
         rtHasMany, rtEmbeddedHasMany:
-          LDiffValue := Diff_ListProp(LOldProp, LNewProp, AOldObj, ANewObj, AIncludeInfo);
+          LDiffValue := Diff_ListProp(LOldProp, LNewProp, AOldObj, ANewObj, AMoreInfo);
       end;
       // If a diff is detected then add it to the result JSONObject
       if Assigned(LDiffValue) then
@@ -201,7 +219,7 @@ begin
   // ====================================================================
 end;
 
-class function TioEtmOnewayDiff.Diff_ValueProp(const LOldProp, LNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AIncludeInfo: Boolean)
+class function TioEtmOnewayDiff.Diff_ValueProp(const LOldProp, LNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AMoreInfo: Boolean)
   : TJSONObject;
 var
   LValue: TValue;
@@ -228,16 +246,35 @@ begin
   if LOldJsonValue.ToJSON <> LNewJsonValue.ToJSON then
   begin
     Result := TJSONObject.Create;
-    // Include info
-    if AIncludeInfo then
-    begin
+
+    // Status
+    if AMoreInfo then
       Result.AddPair(ETM_DIFF_STATUS, Diff_Status(LOldProp, LNewProp));
-      Result.AddPair(ETM_OLD_PROP_TYPE, LOldProp.GetTypeName);
-      Result.AddPair(ETM_NEW_PROP_TYPE, LNewProp.GetTypeName);
+
+    // Old
+    if AMoreInfo then
+    begin
+      // Old type
+      if Assigned(LOldProp) then
+        Result.AddPair(ETM_LABEL_OLD_PROP_TYPE, LOldProp.GetTypeName)
+      else
+        Result.AddPair(ETM_LABEL_OLD_PROP_TYPE, TJSONNull.Create);
     end;
-    // Values
+    // Old value
     Result.AddPair(ETM_OLD_VALUE, LOldJsonValue);
+
+    // New
+    if AMoreInfo then
+    begin
+      // New type
+      if Assigned(LNewProp) then
+        Result.AddPair(ETM_LABEL_NEW_PROP_TYPE, LNewProp.GetTypeName)
+      else
+        Result.AddPair(ETM_LABEL_NEW_PROP_TYPE, TJSONNull.Create);
+    end;
+    // New value
     Result.AddPair(ETM_NEW_VALUE, LNewJsonValue);
+
   end
   else
   begin
@@ -246,7 +283,7 @@ begin
   end;
 end;
 
-class function TioEtmOnewayDiff.Diff_ObjectProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AIncludeInfo: Boolean)
+class function TioEtmOnewayDiff.Diff_ObjectProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AMoreInfo: Boolean)
   : TJSONObject;
 var
   LOldObj, LNewObj: TObject;
@@ -261,13 +298,13 @@ begin
   if Assigned(LNewProp) then
     LNewObj := LNewProp.GetRelationChildObject(ASourceNewObj, False);
   // Detect differences (recursion)
-  Result := Diff_Object(LOldProp, LNewProp, LOldObj, LNewObj, AIncludeInfo);
+  Result := Diff_Object(LOldProp, LNewProp, LOldObj, LNewObj, AMoreInfo);
   // FreeAndnil then result json object if empty
   if IsEmpty(Result) then
     FreeAndNil(Result);
 end;
 
-class function TioEtmOnewayDiff.Diff_ListProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AIncludeInfo: Boolean)
+class function TioEtmOnewayDiff.Diff_ListProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AMoreInfo: Boolean)
   : TJSONValue;
 var
   LOldList, LNewList, LOldListItem, LNewListItem: TObject;
@@ -313,19 +350,30 @@ begin
   // Create the result json array
   LResultJsonArray := TJSONArray.Create;
   // Include info
-  if AIncludeInfo then
+  if AMoreInfo then
   begin
     Result := TJSONObject.Create;
     TJSONObject(Result).AddPair(ETM_DIFF_STATUS, Diff_Status(LOldList, LNewList));
+    // Old
     if Assigned(LOldProp) then
-      TJSONObject(Result).AddPair(ETM_OLD_PROP_TYPE, LOldProp.GetTypeName);
-    if Assigned(LNewProp) then
-      TJSONObject(Result).AddPair(ETM_NEW_PROP_TYPE, LNewProp.GetTypeName);
+      TJSONObject(Result).AddPair(ETM_LABEL_OLD_PROP_TYPE, LOldProp.GetTypeName)
+    else
+      TJSONObject(Result).AddPair(ETM_LABEL_OLD_PROP_TYPE, TJSONNull.Create);
     if Assigned(LOldList) then
-      TJSONObject(Result).AddPair(ETM_OLD_CLASS, LOldList.ClassName);
+      TJSONObject(Result).AddPair(ETM_LABEL_OLD_CLASS, LOldList.ClassName)
+    else
+      TJSONObject(Result).AddPair(ETM_LABEL_OLD_CLASS, TJSONNull.Create);
+    // New
+    if Assigned(LNewProp) then
+      TJSONObject(Result).AddPair(ETM_LABEL_NEW_PROP_TYPE, LNewProp.GetTypeName)
+    else
+      TJSONObject(Result).AddPair(ETM_LABEL_NEW_PROP_TYPE, TJSONNull.Create);
     if Assigned(LNewList) then
-      TJSONObject(Result).AddPair(ETM_NEW_CLASS, LNewList.ClassName);
-    TJSONObject(Result).AddPair('items', LResultJsonArray);
+      TJSONObject(Result).AddPair(ETM_LABEL_NEW_CLASS, LNewList.ClassName)
+    else
+      TJSONObject(Result).AddPair(ETM_LABEL_NEW_CLASS, TJSONNull.Create);
+    // Items
+    TJSONObject(Result).AddPair(ETM_ITEMS, LResultJsonArray);
   end
   else
     Result := LResultJsonArray;
@@ -342,7 +390,7 @@ begin
       // Search for the same element in the old list (same class, same id)
       LOldListItem := _FindListItem(LOldDuckList, LNewListItem);
       // Get the diff between the two version of the same object
-      LDiffJsonObj := Diff_Object(nil, nil, LOldListItem, LNewListItem, AIncludeInfo);
+      LDiffJsonObj := Diff_Object(nil, nil, LOldListItem, LNewListItem, AMoreInfo);
       // Add the diff to the resoult json array (or freeit if empty)
       if not IsEmpty(LDiffJsonObj) then
         LResultJsonArray.Add(LDiffJsonObj)
@@ -364,7 +412,7 @@ begin
       // Search for the same element in the new list (same class, same id)
       LNewListItem := _FindListItem(LNewDuckList, LOldListItem);
       // Get the diff between the two version of the same object
-      LDiffJsonObj := Diff_Object(nil, nil, LOldListItem, LNewListItem, AIncludeInfo);
+      LDiffJsonObj := Diff_Object(nil, nil, LOldListItem, LNewListItem, AMoreInfo);
       // Add the diff to the resoult json array (or freeit if empty)
       if not IsEmpty(LDiffJsonObj) then
         LResultJsonArray.Add(LDiffJsonObj)

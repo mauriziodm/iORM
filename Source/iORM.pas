@@ -43,7 +43,7 @@ uses
   iORM.StdActions.Interfaces, iORM.Context.Container,
   iORM.Context.Properties.Interfaces, iORM.Where.SmartBuilder,
   iORM.Interceptor.Strategy.Register, iORM.Interceptor.CRUD.Register,
-  iORM.ETM.Engine, DJSON.Params;
+  iORM.ETM.Engine, iORM.ETM.Interfaces, DJSON.Params;
 
 const
   IORM_VERSION = 'iORM 2 (beta 2.3)';
@@ -148,6 +148,10 @@ const
   etDelete = iORM.CommonTypes.etDelete;
   etSynchronization = iORM.CommonTypes.etSynchronization;
 
+  // TioEtmDiffMode = (dmOneway, dmTwoway);
+  dmOneway = iORM.ETM.interfaces.TioEtmDiffMode.dmOneway;
+  dmTwoway = iORM.ETM.interfaces.TioEtmDiffMode.dmTwoway;
+
   // TioEtmConflictType = (ctNoConflict, ctMasterWin, ctSlaveWin, ctLastUpdatedWin, ctManual);
   ctNoConflict = iORM.CommonTypes.ctNoConflict;
   ctMasterWin = iORM.CommonTypes.ctMasterWin;
@@ -207,6 +211,7 @@ type
   TioEtmCustomTimeSlot = iORM.Attributes.TioEtmCustomTimeSlot;
   TioEtmEventType = iORM.CommonTypes.TioEtmEventType;
   TioEtmConflictType = iORM.CommonTypes.TioEtmConflictType;
+  TioEtmDiffMode = iORM.ETM.interfaces.TioEtmDiffMode;
 
   // SkipScope (vedi anche sopra (const) i valori)
   TioSkipScope = DJSON.Params.TdjSkipScope;

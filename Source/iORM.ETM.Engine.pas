@@ -59,7 +59,7 @@ type
       : TioEtmTimeLine; overload;
     class procedure _ObjVersionToNegative(const AObj: TObject);
     class procedure _CheckTimeSlot(const ATimeSlot: TioEtmCustomTimeSlot; const ATargetClassName: String = '');
-    class function _InternalDiffAsJsonObject(const ANewestVersionObj, AOldestVersionObj: TObject; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean): TJSONObject; overload;
+    class function _InternalDiffAsJsonObject(const ANewestVersionObj, AOldestVersionObj: TObject; const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean): TJSONObject; overload;
   public
     // Fluent interface
     class function FluentTimeLineFor<T: class>: IioWhere<TioEtmCustomTimeSlot>; overload;
@@ -86,21 +86,21 @@ type
     // Untrace
     class procedure Untrace<T: class>(const ATraceOnlyOnConnectionName: String = '');
     // DiffAsJsonObject
-    class function DiffAsJsonObject(const ANewestTimeSlot, AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AIncludeInfo: Boolean = False): TJSONObject; overload;
-    class function DiffAsJsonObject(const ANewestObj: TObject; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AIncludeInfo: Boolean = False): TJSONObject; overload;
-    class function DiffAsJsonObject(const ANewestIntf: IInterface; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AIncludeInfo: Boolean = False): TJSONObject; overload;
+    class function DiffAsJsonObject(const ANewestTimeSlot, AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AMoreInfo: Boolean = False): TJSONObject; overload;
+    class function DiffAsJsonObject(const ANewestObj: TObject; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AMoreInfo: Boolean = False): TJSONObject; overload;
+    class function DiffAsJsonObject(const ANewestIntf: IInterface; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AMoreInfo: Boolean = False): TJSONObject; overload;
     // DiffToStream
-    class procedure DiffToStream(const ATargetStream: TStream; const ANewestTimeSlot, AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AIncludeInfo: Boolean = False); overload;
-    class procedure DiffToStream(const ATargetStream: TStream; const ANewestObj: TObject; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AIncludeInfo: Boolean = False); overload;
-    class procedure DiffToStream(const ATargetStream: TStream; const ANewestIntf: IInterface; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AIncludeInfo: Boolean = False) overload;
+    class procedure DiffToStream(const ATargetStream: TStream; const ANewestTimeSlot, AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AMoreInfo: Boolean = False); overload;
+    class procedure DiffToStream(const ATargetStream: TStream; const ANewestObj: TObject; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AMoreInfo: Boolean = False); overload;
+    class procedure DiffToStream(const ATargetStream: TStream; const ANewestIntf: IInterface; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AMoreInfo: Boolean = False) overload;
     // DiffToFile
-    class procedure DiffToFile(const AFileName: String; const ANewestTimeSlot, AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AIncludeInfo: Boolean = False); overload;
-    class procedure DiffToFile(const AFileName: String; const ANewestObj: TObject; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AIncludeInfo: Boolean = False); overload;
-    class procedure DiffToFile(const AFileName: String; const ANewestIntf: IInterface; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AIncludeInfo: Boolean = False) overload;
+    class procedure DiffToFile(const AFileName: String; const ANewestTimeSlot, AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AMoreInfo: Boolean = False); overload;
+    class procedure DiffToFile(const AFileName: String; const ANewestObj: TObject; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AMoreInfo: Boolean = False); overload;
+    class procedure DiffToFile(const AFileName: String; const ANewestIntf: IInterface; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AMoreInfo: Boolean = False) overload;
     // Diff
-    class function Diff(const ANewestTimeSlot, AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AIncludeInfo: Boolean = False): String; overload;
-    class function Diff(const ANewestObj: TObject; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AIncludeInfo: Boolean = False): String; overload;
-    class function Diff(const ANewestIntf: IInterface; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AIncludeInfo: Boolean = False): String; overload;
+    class function Diff(const ANewestTimeSlot, AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AMoreInfo: Boolean = False): String; overload;
+    class function Diff(const ANewestObj: TObject; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AMoreInfo: Boolean = False): String; overload;
+    class function Diff(const ANewestIntf: IInterface; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode = dmOneway; const AMoreInfo: Boolean = False): String; overload;
   end;
 
 implementation
@@ -266,18 +266,18 @@ begin
   end;
 end;
 
-class function TioEtmEngine._InternalDiffAsJsonObject(const ANewestVersionObj, AOldestVersionObj: TObject; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean)
+class function TioEtmEngine._InternalDiffAsJsonObject(const ANewestVersionObj, AOldestVersionObj: TObject; const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean)
   : TJSONObject;
 begin
   // Check instances
   if (not Assigned(ANewestVersionObj)) or (not Assigned(AOldestVersionObj)) then
     raise EioEtmException.Create(ClassName, 'DiffAsJsonObject', '"ANewestVersionObj" and "AOldestVersionObj" parameters must be assigned.');
   // Get the differences
-  Result := TioEtmFactory.Diff(ADiffMode).Diff(AOldestVersionObj, ANewestVersionObj, AIncludeInfo);
+  Result := TioEtmFactory.Diff(ADiffMode).Diff(AOldestVersionObj, ANewestVersionObj, AMoreInfo);
 end;
 
 class function TioEtmEngine.DiffAsJsonObject(const ANewestTimeSlot, AOldestTimeSlot: TioEtmCustomTimeSlot;
-  const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean): TJSONObject;
+  const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean): TJSONObject;
 var
   LNewestObject, LOldestObject: TObject;
 begin
@@ -292,7 +292,7 @@ begin
     LNewestObject := dj.FromJson(ANewestTimeSlot.EntityState, TioEtmFactory.djParamsEngine).ToObject;
     LOldestObject := dj.FromJson(ANewestTimeSlot.EntityState, TioEtmFactory.djParamsEngine).ToObject;
     // Diff
-    Result := _InternalDiffAsJsonObject(LNewestObject, LOldestObject, ADiffMode, AIncludeInfo);
+    Result := _InternalDiffAsJsonObject(LNewestObject, LOldestObject, ADiffMode, AMoreInfo);
   finally
     if Assigned(LNewestObject) then
       LNewestObject.Free;
@@ -301,7 +301,7 @@ begin
   end;
 end;
 
-class function TioEtmEngine.DiffAsJsonObject(const ANewestObj: TObject; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean): TJSONObject;
+class function TioEtmEngine.DiffAsJsonObject(const ANewestObj: TObject; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean): TJSONObject;
 var
   LOldestObj: TObject;
 begin
@@ -315,7 +315,7 @@ begin
     // Get oldest object from the oldest TimeSlot
     LOldestObj := dj.FromJson(AOldestTimeSlot.EntityState, TioEtmFactory.djParamsEngine).ToObject;
     // Diff
-    Result := _InternalDiffAsJsonObject(ANewestObj, LOldestObj, ADiffMode, AIncludeInfo);
+    Result := _InternalDiffAsJsonObject(ANewestObj, LOldestObj, ADiffMode, AMoreInfo);
   finally
     if Assigned(LOldestObj) then
       LOldestObj.Free;
@@ -323,11 +323,11 @@ begin
 end;
 
 class function TioEtmEngine.Diff(const ANewestTimeSlot, AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode;
-  const AIncludeInfo: Boolean): String;
+  const AMoreInfo: Boolean): String;
 var
   LDiffJsonObj: TJSONObject;
 begin
-  LDiffJsonObj := DiffAsJsonObject(ANewestTimeSlot, AOldestTimeSlot, ADiffMode, AIncludeInfo);
+  LDiffJsonObj := DiffAsJsonObject(ANewestTimeSlot, AOldestTimeSlot, ADiffMode, AMoreInfo);
   try
     Result := LDiffJsonObj.Format;
   finally
@@ -336,11 +336,11 @@ begin
 end;
 
 class function TioEtmEngine.Diff(const ANewestObj: TObject; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode;
-  const AIncludeInfo: Boolean): String;
+  const AMoreInfo: Boolean): String;
 var
   LDiffJsonObj: TJSONObject;
 begin
-  LDiffJsonObj := DiffAsJsonObject(ANewestObj, AOldestTimeSlot, ADiffMode, AIncludeInfo);
+  LDiffJsonObj := DiffAsJsonObject(ANewestObj, AOldestTimeSlot, ADiffMode, AMoreInfo);
   try
     Result := LDiffJsonObj.Format;
   finally
@@ -349,11 +349,11 @@ begin
 end;
 
 class function TioEtmEngine.Diff(const ANewestIntf: IInterface; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode;
-  const AIncludeInfo: Boolean): String;
+  const AMoreInfo: Boolean): String;
 var
   LDiffJsonObj: TJSONObject;
 begin
-  LDiffJsonObj := DiffAsJsonObject(ANewestIntf, AOldestTimeSlot, ADiffMode, AIncludeInfo);
+  LDiffJsonObj := DiffAsJsonObject(ANewestIntf, AOldestTimeSlot, ADiffMode, AMoreInfo);
   try
     Result := LDiffJsonObj.Format;
   finally
@@ -362,17 +362,17 @@ begin
 end;
 
 class function TioEtmEngine.DiffAsJsonObject(const ANewestIntf: IInterface; const AOldestTimeSlot: TioEtmCustomTimeSlot;
-  const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean): TJSONObject;
+  const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean): TJSONObject;
 begin
-  Result := DiffAsJsonObject(ANewestIntf as TObject, AOldestTimeSlot, ADiffMode, AIncludeInfo);
+  Result := DiffAsJsonObject(ANewestIntf as TObject, AOldestTimeSlot, ADiffMode, AMoreInfo);
 end;
 
-class procedure TioEtmEngine.DiffToStream(const ATargetStream: TStream; const ANewestTimeSlot, AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean);
+class procedure TioEtmEngine.DiffToStream(const ATargetStream: TStream; const ANewestTimeSlot, AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean);
 var
   LDiff: String;
   LStringStream: TStringStream;
 begin
-  LDiff := Diff(ANewestTimeSlot, AOldestTimeSlot, ADiffMode, AIncludeInfo);
+  LDiff := Diff(ANewestTimeSlot, AOldestTimeSlot, ADiffMode, AMoreInfo);
   LStringStream := TStringStream.Create(LDiff, TEncoding.UTF8);
   try
     ATargetStream.CopyFrom(LStringStream);
@@ -381,12 +381,12 @@ begin
   end;
 end;
 
-class procedure TioEtmEngine.DiffToStream(const ATargetStream: TStream; const ANewestObj: TObject; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean);
+class procedure TioEtmEngine.DiffToStream(const ATargetStream: TStream; const ANewestObj: TObject; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean);
 var
   LDiff: String;
   LStringStream: TStringStream;
 begin
-  LDiff := Diff(ANewestObj, AOldestTimeSlot, ADiffMode, AIncludeInfo);
+  LDiff := Diff(ANewestObj, AOldestTimeSlot, ADiffMode, AMoreInfo);
   LStringStream := TStringStream.Create(LDiff, TEncoding.UTF8);
   try
     ATargetStream.CopyFrom(LStringStream);
@@ -396,50 +396,50 @@ begin
 end;
 
 class procedure TioEtmEngine.DiffToFile(const AFileName: String; const ANewestTimeSlot, AOldestTimeSlot: TioEtmCustomTimeSlot;
-  const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean);
+  const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean);
 var
   LFileStream: TFileStream;
 begin
   LFileStream := TFileStream.Create(AFileName, fmCreate);
   try
-    DiffToStream(LFileStream, ANewestTimeSlot, AOldestTimeSlot, ADiffMode, AIncludeInfo);
+    DiffToStream(LFileStream, ANewestTimeSlot, AOldestTimeSlot, ADiffMode, AMoreInfo);
   finally
     LFileStream.Free;
   end;
 end;
 
 class procedure TioEtmEngine.DiffToFile(const AFileName: String; const ANewestObj: TObject; const AOldestTimeSlot: TioEtmCustomTimeSlot;
-  const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean);
+  const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean);
 var
   LFileStream: TFileStream;
 begin
   LFileStream := TFileStream.Create(AFileName, fmCreate);
   try
-    DiffToStream(LFileStream, ANewestObj, AOldestTimeSlot, ADiffMode, AIncludeInfo);
+    DiffToStream(LFileStream, ANewestObj, AOldestTimeSlot, ADiffMode, AMoreInfo);
   finally
     LFileStream.Free;
   end;
 end;
 
 class procedure TioEtmEngine.DiffToFile(const AFileName: String; const ANewestIntf: IInterface; const AOldestTimeSlot: TioEtmCustomTimeSlot;
-  const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean);
+  const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean);
 var
   LFileStream: TFileStream;
 begin
   LFileStream := TFileStream.Create(AFileName, fmCreate);
   try
-    DiffToStream(LFileStream, ANewestIntf, AOldestTimeSlot, ADiffMode, AIncludeInfo);
+    DiffToStream(LFileStream, ANewestIntf, AOldestTimeSlot, ADiffMode, AMoreInfo);
   finally
     LFileStream.Free;
   end;
 end;
 
-class procedure TioEtmEngine.DiffToStream(const ATargetStream: TStream; const ANewestIntf: IInterface; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode; const AIncludeInfo: Boolean);
+class procedure TioEtmEngine.DiffToStream(const ATargetStream: TStream; const ANewestIntf: IInterface; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean);
 var
   LDiff: String;
   LStringStream: TStringStream;
 begin
-  LDiff := Diff(ANewestIntf, AOldestTimeSlot, ADiffMode, AIncludeInfo);
+  LDiff := Diff(ANewestIntf, AOldestTimeSlot, ADiffMode, AMoreInfo);
   LStringStream := TStringStream.Create(LDiff, TEncoding.UTF8);
   try
     ATargetStream.CopyFrom(LStringStream);
@@ -489,3 +489,4 @@ begin
 end;
 
 end.
+

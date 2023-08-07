@@ -54,7 +54,7 @@ type
 implementation
 
 uses
-  iORM.ETM.Diff.Oneway, iORM.Exceptions, DJSON;
+  iORM.ETM.Diff.Oneway, iORM.Exceptions, DJSON, iORM.ETM.Diff.Twoway;
 
 { TioEtmFactory }
 
@@ -87,8 +87,8 @@ begin
   case ADiffMode of
     dmOneway:
       Result := TioEtmOnewayDiff;
-//    dmTwoway:
-//      ;
+    dmTwoway:
+      Result := TioEtmTwowayDiff;
     else
       raise EioEtmException.Create(ClassName, 'Diff', 'Invalid DiffMode.');
   end;
