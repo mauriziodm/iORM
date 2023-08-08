@@ -117,11 +117,14 @@ begin
     LNewMap := TioMapContainer.GetMap(ANewObj.ClassName);
   // Create the result json object
   Result := TJSONObject.Create;
-  // Include info
+  // ====================================================================
+  // INFO
+  // --------------------------------------------------------------------
+  // Status (sempre)
+  Result.AddPair(ETM_DIFF_STATUS, Diff_Status(LOldMap, LNewMap));
+  // Solo se si vogliono più informazioni
   if AMoreInfo then
   begin
-    // Status
-    Result.AddPair(ETM_DIFF_STATUS, Diff_Status(LOldMap, LNewMap));
     // Old
     if Assigned(LPrevOldProp) then
       Result.AddPair(ETM_LABEL_OLD_PROP_TYPE, LPrevOldProp.GetTypeName);
@@ -154,6 +157,7 @@ begin
   else
   if Assigned(LNewMap) then
     Result.AddPair(ETM_LABEL_ID, LNewMap.GetProperties.GetIdProperty.GetValue(ANewObj).AsInteger);
+  // ====================================================================
   // ====================================================================
   // FIRST LOOP FOR PROPERTIES OF THE NEW OBJECT (added or updated props)
   // --------------------------------------------------------------------
