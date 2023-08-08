@@ -30,9 +30,9 @@ uses
 
 class procedure TioEtmTwowayDiff.Diff_EtmAnnotation(const AJSONPair: TJSONPair; const ATargetOldJsonObj, ATargetNewJsonObj: TJSONObject);
 begin
-  if AJSONPair.JsonString.Value.StartsWith('$etm_old_') then
+  if AJSONPair.JsonString.Value.StartsWith('$etm_old_') or (AJSONPair.JsonString.Value = ETM_LABEL_ID) or (AJSONPair.JsonString.Value = ETM_LABEL_CLASS) then
     ATargetOldJsonObj.AddPair(AJSONPair.Clone as TJSONPair);
-  if AJSONPair.JsonString.Value.StartsWith('$etm_new_') then
+  if AJSONPair.JsonString.Value.StartsWith('$etm_new_') or (AJSONPair.JsonString.Value = ETM_LABEL_ID) or (AJSONPair.JsonString.Value = ETM_LABEL_CLASS) then
     ATargetNewJsonObj.AddPair(AJSONPair.Clone as TJSONPair);
 end;
 
