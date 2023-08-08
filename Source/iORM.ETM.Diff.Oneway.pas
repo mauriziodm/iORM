@@ -80,12 +80,8 @@ begin
 end;
 
 class function TioEtmOnewayDiff.IsToBeSkipped(const AProp: IioProperty): Boolean;
-var
-  LdjParams: IdjParams;
 begin
-  LdjParams := dj.Default;
-  LdjParams.OpType := TdjSkipScope.ssETM;
-  Result := AProp.isHasManyChildVirtualProperty or LdjParams.IsToBeSkipped(AProp.GetInternalRttiPropField);
+  Result := AProp.isHasManyChildVirtualProperty or TioEtmFactory.djParamsDiff.IsToBeSkipped(AProp.GetInternalRttiPropField);
 end;
 
 class function TioEtmOnewayDiff.Diff_Status(const AOld, ANew: Pointer): String;

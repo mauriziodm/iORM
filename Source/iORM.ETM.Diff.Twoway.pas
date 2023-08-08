@@ -12,8 +12,7 @@ type
     class function _IsEtmAnnotation(const AJSONPair: TJSONPair): Boolean;
     class function _IsValueProp(const AJSONPair: TJSONPair): Boolean;
     class function _IsListProp(const AJSONPair: TJSONPair): Boolean;
-    class function _HasNewStatus(const AJSONValue: TJSONValue): Boolean;
-    class function _HasRemovedStatus(const AJSONValue: TJSONValue): Boolean;
+    class function _HasStatus(const AJSONValue: TJSONValue; const AStatusToCheck: String): Boolean;
     class procedure Diff_EtmAnnotation(const AJSONPair: TJSONPair; const ATargetOldJsonObj, ATargetNewJsonObj: TJSONObject);
     class procedure Diff_ValueProp(const AJSONPair: TJSONPair; const ATargetOldJsonObj, ATargetNewJsonObj: TJSONObject; const AIncludeInfo: Boolean);
     class procedure Diff_ObjectProp(const AJSONPair: TJSONPair; const ATargetOldJsonObj, ATargetNewJsonObj: TJSONObject; const AIncludeInfo: Boolean);
@@ -131,12 +130,12 @@ begin
     LOldJsonObj := nil;
     LNewJsonObj := nil;
     // Create the json objects, add they to the respective array
-    if not _HasNewStatus(LItemJsonValue) then
+    if not _HasStatus(LItemJsonValue, ETM_DIFF_STATUS_ADDED) then
     begin
       LOldJsonObj := TJSONObject.Create;
       LTargetOldJsonArray.Add(LOldJsonObj);
     end;
-    if not _HasRemovedStatus(LItemJsonValue) then
+    if not _HasStatus(LItemJsonValue, ETM_DIFF_STATUS_REMOVED) then
     begin
       LNewJsonObj := TJSONObject.Create;
       LTargetNewJsonArray.Add(LNewJsonObj);
@@ -178,31 +177,15 @@ begin
   end;
 end;
 
-class function TioEtmTwowayDiff._HasNewStatus(const AJSONValue: TJSONValue): Boolean;
+class function TioEtmTwowayDiff._HasStatus(const AJSONValue: TJSONValue; const AStatusToCheck: String): Boolean;
 var
-  LJSONObject: TJSONOBject;
   LStatusJsonValue: TJSONValue;
 begin
   Result := False;
   if AJSONValue is TJSONObject then
   begin
-    LJSONObject := AJSONValue as TJSONObject;
-    LStatusJsonValue := LJSONObject.GetValue(ETM_DIFF_STATUS);
-    Result := Assigned(LStatusJsonValue) and (LStatusJsonValue.Value = ETM_DIFF_STATUS_ADDED);
-  end;
-end;
-
-class function TioEtmTwowayDiff._HasRemovedStatus(const AJSONValue: TJSONValue): Boolean;
-var
-  LJSONObject: TJSONOBject;
-  LStatusJsonValue: TJSONValue;
-begin
-  Result := False;
-  if AJSONValue is TJSONObject then
-  begin
-    LJSONObject := AJSONValue as TJSONObject;
-    LStatusJsonValue := LJSONObject.GetValue(ETM_DIFF_STATUS);
-    Result := Assigned(LStatusJsonValue) and (LStatusJsonValue.Value = ETM_DIFF_STATUS_REMOVED);
+    LStatusJsonValue := (AJSONValue as TJSONObject).GetValue(ETM_DIFF_STATUS);
+    Result := Assigned(LStatusJsonValue) and (LStatusJsonValue.Value = AStatusToCheck);
   end;
 end;
 
