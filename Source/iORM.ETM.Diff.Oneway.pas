@@ -95,7 +95,7 @@ begin
   else if (AOld <> nil) then
     Result := ETM_DIFF_STATUS_REMOVED
   else if (ANew <> nil) then
-    Result := ETM_DIFF_STATUS_NEW
+    Result := ETM_DIFF_STATUS_ADDED
   else
     Result := String.Empty;
 end;

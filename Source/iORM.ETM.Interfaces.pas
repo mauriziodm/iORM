@@ -53,7 +53,7 @@ const
   ETM_ITEMS = '$etm_items';
 
   ETM_DIFF_STATUS = '$etm_status';
-  ETM_DIFF_STATUS_NEW = 'new';
+  ETM_DIFF_STATUS_ADDED = 'added';
   ETM_DIFF_STATUS_UPDATED = 'updated';
   ETM_DIFF_STATUS_REMOVED = 'removed';
 

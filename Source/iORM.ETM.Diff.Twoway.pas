@@ -54,7 +54,7 @@ begin
     LOldJsonObj := TJSONObject.Create;
     Result.AddPair(ETM_OLD_VALUE, LOldJsonObj);
     LNewJsonObj := TJSONObject.Create;
-    Result.AddPair(ETM_OLD_VALUE, LNewJsonObj);
+    Result.AddPair(ETM_NEW_VALUE, LNewJsonObj);
     // Diff
     Diff_Object(LSourceJSONObject, LOldJsonObj, LNewJsonObj, AIncludeInfo);
   finally
@@ -188,7 +188,7 @@ begin
   begin
     LJSONObject := AJSONValue as TJSONObject;
     LStatusJsonValue := LJSONObject.GetValue(ETM_DIFF_STATUS);
-    Result := Assigned(LStatusJsonValue) and (LStatusJsonValue.Value = ETM_DIFF_STATUS_NEW);
+    Result := Assigned(LStatusJsonValue) and (LStatusJsonValue.Value = ETM_DIFF_STATUS_ADDED);
   end;
 end;
 
