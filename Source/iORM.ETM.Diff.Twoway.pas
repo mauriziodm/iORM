@@ -83,9 +83,9 @@ var
 begin
   // Add target JSONObjects
   LOldJsonObj := TJSONObject.Create;
-  ATargetOldJsonObj.AddPair(AJSONPair.JsonString, LOldJsonObj);
+  ATargetOldJsonObj.AddPair(AJSONPair.JsonString.Value, LOldJsonObj);
   LNewJsonObj := TJSONObject.Create;
-  ATargetNewJsonObj.AddPair(AJSONPair.JsonString, LNewJsonObj);
+  ATargetNewJsonObj.AddPair(AJSONPair.JsonString.Value, LNewJsonObj);
   // Diff objects
   Diff_Object(AJSONPair.JsonValue as TJSONOBject, LOldJsonObj, LNewJsonObj, AIncludeInfo);
 end;
@@ -100,9 +100,9 @@ begin
   LSourceJsonArray := AJSONPair.JsonValue as TJSONArray;
   // Add target JSONArrays
   LTargetOldJsonArray := TJSONArray.Create;
-  ATargetOldJsonObj.AddPair(AJSONPair.JsonString, LTargetOldJsonArray);
+  ATargetOldJsonObj.AddPair(AJSONPair.JsonString.Value, LTargetOldJsonArray);
   LTargetNewJsonArray := TJSONArray.Create;
-  ATargetNewJsonObj.AddPair(AJSONPair.JsonString, LTargetNewJsonArray);
+  ATargetNewJsonObj.AddPair(AJSONPair.JsonString.Value, LTargetNewJsonArray);
   // Loop for all items
   for LItemJsonValue in LSourceJsonArray do
   begin
@@ -116,48 +116,69 @@ begin
   end;
 end;
 
+//class procedure TioEtmTwowayDiff.Diff_ValueProp(const AJSONPair: TJSONPair; const ATargetOldJsonObj, ATargetNewJsonObj: TJSONObject; const AIncludeInfo: Boolean);
+//var
+//  LSourceJsonObject: TJSONObject;
+//  procedure _RemoveOldPairs(const AJSONObject: TJSONObject);
+//  var
+//    LJSONPair: TJSONPair;
+//  begin
+//    for LJSONPair in AJSONObject do
+//      if (LJSONPair.JsonString.Value = ETM_ITEMS) or not LJSONPair.JsonString.Value.StartsWith('$etm_old_') then
+//        AJSONObject.RemovePair(LJSONPair.JsonString.Value);
+//  end;
+//  procedure _RemoveNewPairs(const AJSONObject: TJSONObject);
+//  var
+//    LJSONPair: TJSONPair;
+//  begin
+//    for LJSONPair in AJSONObject do
+//      if (LJSONPair.JsonString.Value = ETM_ITEMS) or not LJSONPair.JsonString.Value.StartsWith('$etm_new_') then
+//        AJSONObject.RemovePair(LJSONPair.JsonString.Value);
+//  end;
+//
+//begin
+//  if AIncludeInfo then
+//  begin
+//    // Add old value
+//    LSourceJsonObject := AJSONPair.JsonValue.Clone as TJSONObject;
+//    _RemoveNewPairs(LSourceJsonObject);
+//    ATargetOldJsonObj.AddPair(AJSONPair.JsonString, LSourceJsonObject);
+//    // Add new value
+//    LSourceJsonObject := AJSONPair.JsonValue.Clone as TJSONObject;
+//    _RemoveOldPairs(LSourceJsonObject);
+//    ATargetNewJsonObj.AddPair(AJSONPair.JsonString, LSourceJsonObject);
+//  end
+//  else
+//  begin
+//    ATargetOldJsonObj.AddPair(ETM_OLD_VALUE, (AJSONPair.JsonValue.Clone as TJSONObject).GetValue(ETM_OLD_VALUE));
+//    ATargetNewJsonObj.AddPair(ETM_NEW_VALUE, (AJSONPair.JsonValue.Clone as TJSONObject).GetValue(ETM_NEW_VALUE));
+//  end;
+//end;
 class procedure TioEtmTwowayDiff.Diff_ValueProp(const AJSONPair: TJSONPair; const ATargetOldJsonObj, ATargetNewJsonObj: TJSONObject; const AIncludeInfo: Boolean);
 var
-  LSourceJsonObject: TJSONObject;
-  procedure _RemoveOldPairs(const AJSONObject: TJSONObject);
-  var
-    LJSONPair: TJSONPair;
-  begin
-    for LJSONPair in AJSONObject do
-      if (LJSONPair.JsonString.Value = ETM_ITEMS) or not LJSONPair.JsonString.Value.StartsWith('$etm_old_') then
-        AJSONObject.RemovePair(LJSONPair.JsonString.Value);
-  end;
-  procedure _RemoveNewPairs(const AJSONObject: TJSONObject);
-  var
-    LJSONPair: TJSONPair;
-  begin
-    for LJSONPair in AJSONObject do
-      if (LJSONPair.JsonString.Value = ETM_ITEMS) or not LJSONPair.JsonString.Value.StartsWith('$etm_new_') then
-        AJSONObject.RemovePair(LJSONPair.JsonString.Value);
-  end;
-
+  LOldJsonObj, LNewJsonObj: TJSONOBject;
 begin
   if AIncludeInfo then
   begin
-    // Add old value
-    LSourceJsonObject := AJSONPair.JsonValue.Clone as TJSONObject;
-    _RemoveNewPairs(LSourceJsonObject);
-    ATargetOldJsonObj.AddPair(AJSONPair.JsonString, LSourceJsonObject);
-    // Add new value
-    LSourceJsonObject := AJSONPair.JsonValue.Clone as TJSONObject;
-    _RemoveOldPairs(LSourceJsonObject);
-    ATargetNewJsonObj.AddPair(AJSONPair.JsonString, LSourceJsonObject);
+    // Old
+    LOldJsonObj := TJSONObject.Create;
+    ATargetOldJsonObj.AddPair(AJSONPair.JsonString.Value, LOldJsonObj);
+    // New
+    LNewJsonObj := TJSONObject.Create;
+    ATargetNewJsonObj.AddPair(AJSONPair.JsonString.Value, LNewJsonObj);
+    // Diff
+    Diff_Object(AJSONPair.JsonValue as TJSONObject, LOldJsonObj, LNewJsonObj, AIncludeInfo);
   end
   else
   begin
-    ATargetOldJsonObj.AddPair(ETM_OLD_VALUE, (AJSONPair.JsonValue.Clone as TJSONObject).GetValue(ETM_OLD_VALUE));
-    ATargetNewJsonObj.AddPair(ETM_NEW_VALUE, (AJSONPair.JsonValue.Clone as TJSONObject).GetValue(ETM_NEW_VALUE));
+    ATargetOldJsonObj.AddPair(ETM_OLD_VALUE, (AJSONPair.JsonValue as TJSONObject).GetValue(ETM_OLD_VALUE).Clone as TJSONValue);
+    ATargetNewJsonObj.AddPair(ETM_NEW_VALUE, (AJSONPair.JsonValue as TJSONObject).GetValue(ETM_NEW_VALUE).Clone as TJSONValue);
   end;
 end;
 
 class function TioEtmTwowayDiff._IsEtmAnnotation(const AJSONPair: TJSONPair): Boolean;
 begin
-  Result := AJSONPair.JsonString.Value.StartsWith('$etm_');
+  Result := AJSONPair.JsonString.Value.StartsWith('$etm_') and (AJSONPair.JsonString.Value <> ETM_ITEMS);
 end;
 
 class function TioEtmTwowayDiff._IsListProp(const AJSONPair: TJSONPair): Boolean;
