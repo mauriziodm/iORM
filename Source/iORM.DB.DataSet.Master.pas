@@ -51,6 +51,7 @@ type
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
     FOnInsertAction: TioOnInsertAction;
     FWhereBuilderFor: IioBSPersistenceClient;
+    FEntityTimeMachineFor: IioNotifiableBindSource;
     // Events
     FBeforeWhereBuild: TioBeforeWhereBuilderEvent;
     FBeforeWhereClear: TioBeforeWhereBuilderEvent;
@@ -123,6 +124,7 @@ type
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
     property SourceBS: IioNotifiableBindSource read GetSourceBS write SetSourceBS;
     property WhereBuilderFor: IioBSPersistenceClient read FWhereBuilderFor write FWhereBuilderFor;
+    property EntityTimeMachineFor: IioNotifiableBindSource read FEntityTimeMachineFor write FEntityTimeMachineFor;
     // Published Events: selectors
     property BeforeSelectionObject;
     property OnSelectionObject;
@@ -165,6 +167,7 @@ begin
   FOnRecordChangeAction := rcPersistIfChanged;
   FPersistence := TioBSPersistence.Create(Self);
   FWhereBuilderFor := nil;
+  FEntityTimeMachineFor := nil;
 end;
 
 destructor TioDataSetMaster.Destroy;
