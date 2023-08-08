@@ -238,7 +238,7 @@ begin
       // OrderBy
       TioDIPresenterSettingsType.pstOrderBy:
         TioUtilities.GetBindSource(LViewModelOrSimpleView, LName).SetOrderBy(LPresenterSettings[I].StringParameter);
-      // MasterModelPresenter
+      // SelectorFor
       TioDIPresenterSettingsType.pstSelectorFor:
         begin
           if Supports(LPresenterSettings[I].Obj, IioNotifiableBindSource, LParamBindSource) then
