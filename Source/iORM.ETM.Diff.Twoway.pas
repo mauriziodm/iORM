@@ -171,8 +171,8 @@ begin
   end
   else
   begin
-    ATargetOldJsonObj.AddPair(ETM_OLD_VALUE, (AJSONPair.JsonValue as TJSONObject).GetValue(ETM_OLD_VALUE).Clone as TJSONValue);
-    ATargetNewJsonObj.AddPair(ETM_NEW_VALUE, (AJSONPair.JsonValue as TJSONObject).GetValue(ETM_NEW_VALUE).Clone as TJSONValue);
+    ATargetOldJsonObj.AddPair(AJSONPair.JsonString.Value, (AJSONPair.JsonValue as TJSONObject).GetValue(ETM_OLD_VALUE).Clone as TJSONValue);
+    ATargetNewJsonObj.AddPair(AJSONPair.JsonString.Value, (AJSONPair.JsonValue as TJSONObject).GetValue(ETM_NEW_VALUE).Clone as TJSONValue);
   end;
 end;
 
