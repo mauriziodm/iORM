@@ -62,6 +62,7 @@ type
     FAutoPost: Boolean;
     FPaging: TioCommonBSAPageManager;
     FVirtualFields: Boolean;
+    FETMfor: IioNotifiableBindSource;
     // Selectors
     FSelectorFor: IioNotifiableBindSource;
     FOnReceiveSelectionCloneObject: Boolean;
@@ -208,6 +209,7 @@ type
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
     property AutoRefreshOnNotification: Boolean read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default True;
     property VirtualFields: Boolean read GetVirtualFields write FVirtualFields default False;
+    property ETMfor: IioNotifiableBindSource read FETMfor write FETMfor;
     // published: Nascondere e default = false
     property TypeAlias: String read FTypeAlias write SetTypeAlias;
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection write SetTypeOfCollection default tcList;
@@ -417,6 +419,7 @@ begin
   FWhere := nil;
   FWhereDetailsFromDetailAdapters := False;
   FVirtualFields := False;
+  FETMfor := nil;
   // Selectors
   FSelectorFor := nil;
   FOnReceiveSelectionCloneObject := True;

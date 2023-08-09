@@ -64,6 +64,7 @@ type
     FAutoPost: Boolean;
     FPaging: TioCommonBSAPageManager;
     FVirtualFields: Boolean;
+    FETMfor: IioNotifiableBindSource;
     // Selectors
     FSelectorFor: IioNotifiableBindSource;
     FOnReceiveSelectionCloneObject: Boolean;
@@ -189,6 +190,7 @@ type
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection write SetTypeOfCollection default tcList;
     property VirtualFields: Boolean read GetVirtualFields write FVirtualFields default False;
+    property ETMfor: IioNotifiableBindSource read FETMfor write FETMfor;
     // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr: TStrings read FWhereStr write SetWhereStr; // published: Master
     property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False;
@@ -314,6 +316,7 @@ begin
   FWhere := nil;
   FWhereDetailsFromDetailAdapters := False;
   FVirtualFields := False;
+  FETMfor := nil;
   // Selectors
   FSelectorFor := nil;
   FOnReceiveSelectionCloneObject := True;
@@ -985,6 +988,11 @@ begin
     GetActiveBindSourceAdapter.ioWhere := AWhere;
 end;
 
+procedure TioDataSetCustom.WhereOnChangeEventHandler(Sender: TObject);
+begin
+  SetWhere(TioWhereFactory.NewWhereWithPaging(FPaging).Add(FWhereStr.Text));
+end;
+
 procedure TioDataSetCustom.SetWhereDetailsFromDetailAdapters(const Value: Boolean);
 begin
   FWhereDetailsFromDetailAdapters := Value;
@@ -1038,11 +1046,6 @@ end;
 procedure TioDataSetCustom.ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
   io.ShowEach(Self, AParentCloseQueryAction, AVCProvider, AVVMAlias);
-end;
-
-procedure TioDataSetCustom.WhereOnChangeEventHandler(Sender: TObject);
-begin
-  SetWhere(TioWhereFactory.NewWhereWithPaging(FPaging).Add(FWhereStr.Text));
 end;
 
 procedure TioDataSetCustom._CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);

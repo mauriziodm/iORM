@@ -64,6 +64,7 @@ type
     FAutoPost: Boolean;
     FPaging: TioCommonBSAPageManager;
     FVirtualFields: Boolean;
+    FETMfor: IioNotifiableBindSource;
     FPreview: Boolean;
     // Selectors
     FSelectorFor: IioNotifiableBindSource;
@@ -209,6 +210,7 @@ type
     property Lazy: Boolean read FLazy write SetLazy default False; // published: Master
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
     property VirtualFields: Boolean read GetVirtualFields write FVirtualFields default False;
+    property ETMfor: IioNotifiableBindSource read FETMfor write FETMfor;
     // published: Master (però cambiarlo in modo che, se true, persiste al cambio di record)
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection write SetTypeOfCollection default tcList;
     // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
@@ -403,6 +405,7 @@ begin
   FLazyProps := '';
   FTypeOfCollection := tcList;
   FVirtualFields := False;
+  FETMfor := nil;
   FPreview := False;
   // Selectors
   FSelectorFor := nil;
