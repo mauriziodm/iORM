@@ -150,6 +150,8 @@ type
     // Paging
     procedure SetPaging(const Value: TioCommonBSAPageManager);
     function GetPaging: TioCommonBSAPageManager;
+    // ETMfor
+    procedure SetETMfor(const AETMfor: IioNotifiableBindSource);
     // Preview
     procedure SetPreview(const Value: Boolean);
     // State
@@ -210,7 +212,7 @@ type
     property Lazy: Boolean read FLazy write SetLazy default False; // published: Master
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
     property VirtualFields: Boolean read GetVirtualFields write FVirtualFields default False;
-    property ETMfor: IioNotifiableBindSource read FETMfor write FETMfor;
+    property ETMfor: IioNotifiableBindSource read FETMfor write SetETMfor;
     // published: Master (però cambiarlo in modo che, se true, persiste al cambio di record)
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection write SetTypeOfCollection default tcList;
     // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
@@ -1059,6 +1061,15 @@ begin
       Open;
     end;
   end;
+end;
+
+procedure TioPrototypeBindSourceCustom.SetETMfor(const AETMfor: IioNotifiableBindSource);
+begin
+  // Set the private field
+  FETMFor := AETMfor;
+  // If the adapter is present then set even to it
+  if Assigned(Where) then
+    Where.SetETMfor(AETMfor);
 end;
 
 procedure TioPrototypeBindSourceCustom.SetWhere(const AWhere: IioWhere);

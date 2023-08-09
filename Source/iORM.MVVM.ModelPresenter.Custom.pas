@@ -145,6 +145,8 @@ type
     // Paging
     procedure SetPaging(const Value: TioCommonBSAPageManager);
     function GetPaging: TioCommonBSAPageManager;
+    // ETMfor
+    procedure SetETMfor(const AETMfor: IioNotifiableBindSource);
     // State
     function GetState: TBindSourceAdapterState;
     // TypeAlias
@@ -209,7 +211,7 @@ type
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
     property AutoRefreshOnNotification: Boolean read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default True;
     property VirtualFields: Boolean read GetVirtualFields write FVirtualFields default False;
-    property ETMfor: IioNotifiableBindSource read FETMfor write FETMfor;
+    property ETMfor: IioNotifiableBindSource read FETMfor write SetETMfor;
     // published: Nascondere e default = false
     property TypeAlias: String read FTypeAlias write SetTypeAlias;
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection write SetTypeOfCollection default tcList;
@@ -1210,6 +1212,18 @@ begin
 //    // Set the data object into the BSA
 //    GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject);
 // ----- OLD CODE FROM 22/04/2023 -----
+end;
+
+procedure TioModelPresenterCustom.SetETMfor(const AETMfor: IioNotifiableBindSource);
+begin
+  // Set the private field
+  FETMFor := AETMfor;
+  // If the private where field is assigned the  set even to it
+  if Assigned(FWhere) then
+    FWhere.SetETMfor(AETMfor);
+  // If the adapter is present then set even to it
+  if CheckAdapter then
+    GetActiveBindSourceAdapter.ioWhere.SetETMfor(AETMfor);
 end;
 
 procedure TioModelPresenterCustom.SetItemIndex(const Value: Integer);
