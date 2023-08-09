@@ -40,7 +40,8 @@ uses
   iORM.LiveBindings.Interfaces, iORM.LiveBindings.Notification,
   iORM.LiveBindings.CommonBSAPaging, iORM.Where.Interfaces,
   Data.Bind.ObjectScope, System.Generics.Collections,
-  iORM.MVVM.ViewContextProvider, iORM.StdActions.Interfaces;
+  iORM.MVVM.ViewContextProvider, iORM.StdActions.Interfaces,
+  iORM.LiveBindings.BSPersistence;
 
 type
 
@@ -64,7 +65,7 @@ type
     FAutoPost: Boolean;
     FPaging: TioCommonBSAPageManager;
     FVirtualFields: Boolean;
-    FETMfor: IioNotifiableBindSource;
+    FETMfor: IioBSPersistenceClient;
     // Selectors
     FSelectorFor: IioNotifiableBindSource;
     FOnReceiveSelectionCloneObject: Boolean;
@@ -131,7 +132,7 @@ type
     procedure SetPaging(const Value: TioCommonBSAPageManager);
     function GetPaging: TioCommonBSAPageManager;
     // ETMfor
-    procedure SetETMfor(const AETMfor: IioNotifiableBindSource);
+    procedure SetETMfor(const AETMfor: IioBSPersistenceClient);
     // State
     function GetState: TBindSourceAdapterState;
     // TypeAlias
@@ -192,7 +193,7 @@ type
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection write SetTypeOfCollection default tcList;
     property VirtualFields: Boolean read GetVirtualFields write FVirtualFields default False;
-    property ETMfor: IioNotifiableBindSource read FETMfor write SetETMfor;
+    property ETMfor: IioBSPersistenceClient read FETMfor write SetETMfor;
     // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr: TStrings read FWhereStr write SetWhereStr; // published: Master
     property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False;
@@ -887,7 +888,7 @@ begin
 // ----- OLD CODE FROM 22/04/2023 -----
 end;
 
-procedure TioDataSetCustom.SetETMfor(const AETMfor: IioNotifiableBindSource);
+procedure TioDataSetCustom.SetETMfor(const AETMfor: IioBSPersistenceClient);
 begin
   // Set the private field
   FETMFor := AETMfor;

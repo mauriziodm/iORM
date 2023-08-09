@@ -37,8 +37,7 @@ interface
 
 uses
   iORM.Where.Interfaces, iORM.Where, iORM.LiveBindings.CommonBSAPaging,
-  iORM.Where.SmartBuilder, iORM.Where.SqlItems.Interfaces,
-  iORM.LiveBindings.Interfaces;
+  iORM.Where.SmartBuilder, iORM.Where.SqlItems.Interfaces, iORM.LiveBindings.BSPersistence;
 
 type
 
@@ -46,7 +45,7 @@ type
   public
     class function NewWhere: IioWhere; overload;
     class function NewWhere<T>: IioWhere<T>; overload;
-    class function NewWhereWithPagingAndETMfor(const APaging: TioCommonBSAPageManager; const AETMfor: IioNotifiableBindSource): IioWhere; overload;
+    class function NewWhereWithPagingAndETMfor(const APaging: TioCommonBSAPageManager; const AETMfor: IioBSPersistenceClient): IioWhere; overload;
     class function NewWhereItems: TWhereItems;
     class function NewDetailsContainer: IioWhereDetailsContainer;
     class function NewWhereSmartBuilder: TioWhereSmartBuilderRef;
@@ -91,7 +90,7 @@ begin
   Result := TioWhereSmartBuilder;
 end;
 
-class function TioWhereFactory.NewWhereWithPagingAndETMfor(const APaging: TioCommonBSAPageManager; const AETMfor: IioNotifiableBindSource): IioWhere;
+class function TioWhereFactory.NewWhereWithPagingAndETMfor(const APaging: TioCommonBSAPageManager; const AETMfor: IioBSPersistenceClient): IioWhere;
 begin
   Result := TioWhere.Create;
   Result.SetPagingObj(APaging); // Inject paging object specified in the BindSource

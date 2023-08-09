@@ -40,7 +40,7 @@ uses
   System.Classes, iORM.LiveBindings.Notification, iORM.Where.Interfaces,
   System.SysUtils, iORM.LiveBindings.CommonBSAPaging,
   System.Generics.Collections, iORM.MVVM.ViewContextProvider,
-  iORM.StdActions.Interfaces;
+  iORM.StdActions.Interfaces, iORM.LiveBindings.BSPersistence;
 
 type
 
@@ -64,7 +64,7 @@ type
     FAutoPost: Boolean;
     FPaging: TioCommonBSAPageManager;
     FVirtualFields: Boolean;
-    FETMfor: IioNotifiableBindSource;
+    FETMfor: IioBSPersistenceClient;
     FPreview: Boolean;
     // Selectors
     FSelectorFor: IioNotifiableBindSource;
@@ -151,7 +151,7 @@ type
     procedure SetPaging(const Value: TioCommonBSAPageManager);
     function GetPaging: TioCommonBSAPageManager;
     // ETMfor
-    procedure SetETMfor(const AETMfor: IioNotifiableBindSource);
+    procedure SetETMfor(const AETMfor: IioBSPersistenceClient);
     // Preview
     procedure SetPreview(const Value: Boolean);
     // State
@@ -212,7 +212,7 @@ type
     property Lazy: Boolean read FLazy write SetLazy default False; // published: Master
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
     property VirtualFields: Boolean read GetVirtualFields write FVirtualFields default False;
-    property ETMfor: IioNotifiableBindSource read FETMfor write SetETMfor;
+    property ETMfor: IioBSPersistenceClient read FETMfor write SetETMfor;
     // published: Master (però cambiarlo in modo che, se true, persiste al cambio di record)
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection write SetTypeOfCollection default tcList;
     // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
@@ -1063,7 +1063,7 @@ begin
   end;
 end;
 
-procedure TioPrototypeBindSourceCustom.SetETMfor(const AETMfor: IioNotifiableBindSource);
+procedure TioPrototypeBindSourceCustom.SetETMfor(const AETMfor: IioBSPersistenceClient);
 begin
   // Set the private field
   FETMFor := AETMfor;
