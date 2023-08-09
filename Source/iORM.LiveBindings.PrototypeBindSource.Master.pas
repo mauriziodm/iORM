@@ -122,6 +122,8 @@ type
     property OrderBy;
     property AutoRefreshOnNotification default True;
     property VirtualFields;
+    // Published ETM for
+    property ETMfor;
     // Published properties: selectors
     property SelectorFor;
     // Published properties: paging
