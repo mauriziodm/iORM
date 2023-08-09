@@ -401,7 +401,7 @@ uses
   iORM.RttiContext.Factory, iORM, iORM.Where.SqlItems, iORM.DB.Interfaces, iORM.Resolver.Factory, iORM.Containers.Factory,
   iORM.Where.Factory, iORM.Exceptions, FireDAC.Comp.DataSet, iORM.LazyLoad.Factory, iORM.Strategy.Factory, iORM.Containers.List,
   iORM.MVVM.Interfaces, iORM.Abstraction, iORM.Context.Container, System.StrUtils,
-  iORM.ObjectsForge.Interfaces;
+  iORM.ObjectsForge.Interfaces, iORM.ETM.Engine;
 
 { TioWhere }
 
@@ -897,10 +897,13 @@ var
 begin
   // NB: NO inherited
   Result := '';
-  if FWhereItems.Count = 0 then
+  if (FWhereItems.Count = 0) and not Assigned(FETMfor) then
     Exit;
   if AddWhere then
     Result := 'WHERE ';
+  // ETMfor
+  if Assigned(FETMfor) and FETMfor.IsActive and Assigned(FETMfor.Current) then
+    Result := Result + TioEtmEngine._InternalBuildWhereTextFor(FETMfor.Current);
   // Add current SqlItem
   for CurrSqlItem in FWhereItems do
   begin

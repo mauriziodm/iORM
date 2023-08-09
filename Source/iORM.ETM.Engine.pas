@@ -61,6 +61,8 @@ type
     class procedure _CheckTimeSlot(const ATimeSlot: TioEtmCustomTimeSlot; const ATargetClassName: String = '');
     class function _InternalDiffAsJsonObject(const ANewestVersionObj, AOldestVersionObj: TObject; const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean): TJSONObject; overload;
   public
+    // Used by TioWhere.GetSql
+    class function _InternalBuildWhereTextFor(const AObj: TObject): String;
     // Fluent interface
     class function FluentTimeLineFor<T: class>: IioWhere<TioEtmCustomTimeSlot>; overload;
     class function FluentTimeLineFor(const AClassName: String): IioWhere<TioEtmCustomTimeSlot>; overload;
@@ -108,7 +110,7 @@ implementation
 uses
   iORM, iORM.Utilities, iORM.CommonTypes, iORM.Exceptions, System.SysUtils,
   iORM.ETM.Interceptor, iORM.Context.Factory, iORM.Context.Container, DJSON,
-  iORM.Context.Interfaces, iORM.ETM.Factory;
+  iORM.Context.Interfaces, iORM.ETM.Factory, iORM.SqlTranslator;
 
 { TIoEtmEngine }
 
@@ -346,6 +348,33 @@ begin
   finally
     LDiffJsonObj.Free;
   end;
+end;
+
+class function TioEtmEngine._InternalBuildWhereTextFor(const AObj: TObject): String;
+var
+  LMap: IioMap;
+  LTimeSlotClass: TioEtmTimeSlotRef;
+begin
+  Result := String.Empty;
+  // Check if the AObj is asigned
+  if not Assigned(AObj) then
+    raise EioEtmException.Create(ClassName, 'BuildETMfor', '"AObj" parameter is not assigned.');
+  // Get the map for the object (entity) and check if a TimeSlotClass is defined for it
+  LMap := TioMapContainer.GetMap(AObj.ClassName);
+  // Get the time slot class for the entity
+  LTimeSlotClass := LMap.GetTable.EtmTimeSlotClass;
+  if not Assigned(LTimeSlotClass) then
+    raise EioEtmException.Create(ClassName, 'BuildETMfor', Format('Hi, I''m iORM and we have a problem.' +
+      #13#13'You asked me a TimeLine for the class "%s" but this is not set to be traced by the ETM (Entity Time Machine) subsystem.' +
+      #13#13'Maybe you forgot to tell iORM to trace the class by an EntityTimeMachine (ETM) repository.' +
+      #13#13'Let me explain:' +
+      #13#13'1) You need to declare an ETM repository by deriving your time slot class from "TioEtmCustomTimeSlot" and decorate it with "[etmRepository(...)]" attribute, thus you have created a repository.' +
+      #13#13'2) You have to tell iORM to trace your entity class by decorating its declaration with the "[etmTrace(YourTimeSlotClass...)]" attribute indicating in the parameter the repository class on which it has to be traced.' +
+      #13'Alternatively, if you don''t want to use the attribute, you can also write a line of code like this: "io.etm.Trace<TMyEntityClass>(TMyTimeSlotClass...)".',
+      [AObj.ClassName]));
+  // Build the where text
+  Result := Format('[.EntityClassName] LIKE ''%s'' AND  [.EntityID] = %d', [AObj.ClassName, LMap.GetProperties.GetIdProperty.GetValue(AObj).AsInteger]);
+  Result := TioSqlTranslator.Translate(Result, LTimeSlotClass.ClassName, False);
 end;
 
 class function TioEtmEngine.Diff(const ANewestIntf: IInterface; const AOldestTimeSlot: TioEtmCustomTimeSlot; const ADiffMode: TioEtmDiffMode;
