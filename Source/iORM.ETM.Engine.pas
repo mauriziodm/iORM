@@ -258,8 +258,8 @@ begin
     raise EioEtmException.Create(ClassName, 'RevertToBindSource', '"ABindSource" parameter must be assigned and activated.');
   if ATargetBindSource.Current = nil then
     raise EioEtmException.Create(ClassName, 'RevertToBindSource', 'Current object of the TargetBindSource is nil.');
-  RevertToObject(ATargetBindSource.Current, ATimeSloT, APersistImmediately);
-  ATargetBindSource.Refresh;
+  RevertToObject(ATargetBindSource.ETMfor.Current, ATimeSloT, APersistImmediately);
+  ATargetBindSource.ETMfor.Refresh;
 end;
 
 class procedure TioEtmEngine.RevertToDB(const ATimeSlot: TioEtmCustomTimeSlot);

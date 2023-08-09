@@ -147,6 +147,7 @@ type
     function GetPaging: TioCommonBSAPageManager;
     // ETMfor
     procedure SetETMfor(const AETMfor: IioBSPersistenceClient);
+    function GetETMfor: IioBSPersistenceClient;
     // State
     function GetState: TBindSourceAdapterState;
     // TypeAlias
@@ -211,7 +212,7 @@ type
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
     property AutoRefreshOnNotification: Boolean read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default True;
     property VirtualFields: Boolean read GetVirtualFields write FVirtualFields default False;
-    property ETMfor: IioBSPersistenceClient read FETMfor write SetETMfor;
+    property ETMfor: IioBSPersistenceClient read GetETMfor write SetETMfor;
     // published: Nascondere e default = false
     property TypeAlias: String read FTypeAlias write SetTypeAlias;
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection write SetTypeOfCollection default tcList;
@@ -688,6 +689,11 @@ begin
     Result := FBindSourceAdapter.Eof
   else
     Result := True;
+end;
+
+function TioModelPresenterCustom.GetETMfor: IioBSPersistenceClient;
+begin
+  Result := FETMfor;
 end;
 
 function TioModelPresenterCustom.GetIsInterfacePresenting: Boolean;

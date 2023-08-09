@@ -458,6 +458,23 @@ type
     constructor Create(AOwner: TComponent); override;
   end;
 
+  TioBSEtmRevert = class(TioBSPersistenceStdActionVcl)
+  private
+    FPersistImmediately: Boolean;
+  public
+    constructor Create(AOwner: TComponent); override;
+    procedure ExecuteTarget(Target: TObject); override;
+    procedure UpdateTarget (Target: TObject); override;
+  published
+    // Properties
+    property PersistImmediately: Boolean read FPersistImmediately write FPersistImmediately default False;
+    property TargetBindSource;
+    // Events
+    property OnExecute;
+    property OnHint;
+    property OnUpdate;
+  end;
+
   TioBSCloseQuery = class(TioBSPersistenceStdActionVcl, IioBSCloseQueryAction)
   strict private
     FExecuting, FExecutingEventHandler: Boolean;
@@ -566,7 +583,8 @@ implementation
 
 uses
   System.SysUtils, iORM.Exceptions, iORM.Utilities, iORM, System.Rtti,
-  iORM.RttiContext.Factory, iORM.StdActions.CloseQueryActionRegister;
+  iORM.RttiContext.Factory, iORM.StdActions.CloseQueryActionRegister,
+  iORM.ETM.Engine;
 
 { TioBSObjStateStdAction }
 
@@ -1792,6 +1810,32 @@ begin
     if Value <> nil then
       (Value as TComponent).FreeNotification(Self);
   end;
+end;
+
+{ TioBSEtmRevert }
+
+constructor TioBSEtmRevert.Create(AOwner: TComponent);
+begin
+  inherited;
+  FPersistImmediately := False;
+end;
+
+procedure TioBSEtmRevert.ExecuteTarget(Target: TObject);
+begin
+  inherited;
+  if not (TargetBindSource.Current is TioEtmCustomTimeSlot) then
+    raise EioEtmException.Create(ClassName, 'ExecuteTarget', 'Current object if the TargetBindSource is not derived from "TioEtmCustomTimeSlot" base class.');
+  TioEtmEngine.RevertToBindSource(TargetBindSource.Current as TioEtmCustomTimeSlot, TargetBindSource, FPersistImmediately);
+end;
+
+procedure TioBSEtmRevert.UpdateTarget(Target: TObject);
+begin
+  inherited;
+  Enabled := Enabled and Assigned(TargetBindSource);
+  Enabled := Enabled and Assigned(TargetBindSource.ETMfor);
+  Enabled := Enabled and Assigned(TargetBindSource.Current);
+  Enabled := Enabled and TargetBindSource.ETMfor.IsActive;
+  Enabled := Enabled and Assigned(TargetBindSource.ETMfor.Current);
 end;
 
 end.

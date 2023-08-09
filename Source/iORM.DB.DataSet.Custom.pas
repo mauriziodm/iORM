@@ -133,6 +133,7 @@ type
     function GetPaging: TioCommonBSAPageManager;
     // ETMfor
     procedure SetETMfor(const AETMfor: IioBSPersistenceClient);
+    function GetETMfor: IioBSPersistenceClient;
     // State
     function GetState: TBindSourceAdapterState;
     // TypeAlias
@@ -193,7 +194,7 @@ type
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection write SetTypeOfCollection default tcList;
     property VirtualFields: Boolean read GetVirtualFields write FVirtualFields default False;
-    property ETMfor: IioBSPersistenceClient read FETMfor write SetETMfor;
+    property ETMfor: IioBSPersistenceClient read GetETMfor write SetETMfor;
     // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr: TStrings read FWhereStr write SetWhereStr; // published: Master
     property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False;
@@ -507,6 +508,11 @@ begin
     Result := GetActiveBindSourceAdapter.State in seEditModes
   else
     Result := False
+end;
+
+function TioDataSetCustom.GetETMfor: IioBSPersistenceClient;
+begin
+  Result := FETMfor;
 end;
 
 function TioDataSetCustom.GetIsInterfacePresenting: Boolean;

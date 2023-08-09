@@ -106,6 +106,7 @@ begin
   RegisterActions('iORM - BS', [iORM.StdActions.Vcl.TioBSSelectCurrent], nil);
   RegisterActions('iORM - BS', [iORM.StdActions.Vcl.TioBSShowOrSelect], nil);
   RegisterActions('iORM - BS', [iORM.StdActions.Vcl.TioBSCloseQuery], nil);
+  RegisterActions('iORM - BS - ETM', [iORM.StdActions.Vcl.TioBSEtmRevert], nil);
   RegisterActions('iORM - BS - Paging', [iORM.StdActions.Vcl.TioBSNextPage], nil);
   RegisterActions('iORM - BS - Paging', [iORM.StdActions.Vcl.TioBSPrevPage], nil);
   RegisterActions('iORM - BS - WhereBuilder', [iORM.StdActions.Vcl.TioBSWhereBuild], nil);

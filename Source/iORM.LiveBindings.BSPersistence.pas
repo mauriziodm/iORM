@@ -72,6 +72,10 @@ type
     function IsFromBSLoadType: Boolean;
     function GetSourceBS: IioNotifiableBindSource;
     procedure SetWhere(const AWhere: IioWhere);
+    // ETMfor
+    procedure SetETMfor(const AETMfor: IioBSPersistenceClient);
+    function GetETMfor: IioBSPersistenceClient;
+    property ETMfor: IioBSPersistenceClient read GetETMfor write SetETMfor;
     // LoadType property
     procedure SetLoadType(const Value: TioLoadType);
     function GetLoadType: TioLoadType;
