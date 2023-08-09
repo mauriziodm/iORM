@@ -84,6 +84,7 @@ begin
   RegisterComponents('iORM - MVVM - VMActions', [TioVMAction]);
   RegisterComponents('iORM - MVVM - VMActions', [TioVMActionBSShowOrSelect]);
   RegisterComponents('iORM - MVVM - VMActions', [TioVMActionBSCloseQuery]);
+  RegisterComponents('iORM - MVVM - VMActions', [TioVMActionBSEtmRevert]);
   RegisterComponents('iORM - MVVM - VMActions', [TioVMActionBSNextPage]);
   RegisterComponents('iORM - MVVM - VMActions', [TioVMActionBSPrevPage]);
   RegisterComponents('iORM - MVVM - VMActions', [TioVMActionWhereBuild]);
@@ -128,6 +129,7 @@ begin
   RegisterActions('iORM - BS', [iORM.StdActions.Fmx.TioBSSelectCurrent], nil);
   RegisterActions('iORM - BS', [iORM.StdActions.Fmx.TioBSShowOrSelect], nil);
   RegisterActions('iORM - BS', [iORM.StdActions.Fmx.TioBSCloseQuery], nil);
+  RegisterActions('iORM - BS - ETM', [iORM.StdActions.Fmx.TioBSEtmRevert], nil);
   RegisterActions('iORM - BS - Paging', [iORM.StdActions.Fmx.TioBSNextPage], nil);
   RegisterActions('iORM - BS - Paging', [iORM.StdActions.Fmx.TioBSPrevPage], nil);
   RegisterActions('iORM - BS - WhereBuilder', [iORM.StdActions.Fmx.TioBSWhereBuild], nil);
