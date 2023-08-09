@@ -592,7 +592,7 @@ begin
   // if not already assigned then create it (così lo crea solo se serve
   // davvero altrimenti no)
   if not Assigned(FWhere) then
-    FWhere := TioWhereFactory.NewWhereWithPaging(FPaging);
+    FWhere := TioWhereFactory.NewWhereWithPagingAndETMfor(FPaging, FETMfor);
   // Return the Where instance
   Result := FWhere;
 end;
@@ -917,7 +917,6 @@ begin
   LActiveBSA.LazyProps := FLazyProps;
   LActiveBSA.ioWhereDetailsFromDetailAdapters := FWhereDetailsFromDetailAdapters;
   LActiveBSA.ioWhere := GetWhere; // Do not directly access to the FWhere field here
-  // LActiveBSA.ioWhere := FWhere;
   // Register itself for notifications from BindSourceAdapter
   LActiveBSA.SetBindSource(Self);
   FTypeOfCollection := LActiveBSA.TypeOfCollection;
@@ -981,7 +980,8 @@ end;
 
 procedure TioDataSetCustom.SetWhere(const AWhere: IioWhere);
 begin
-  AWhere.SetPagingObj(FPaging); // Inject paging object spscified in BindSource or ModelPresenter
+  AWhere.SetPagingObj(FPaging); // Inject paging object specified in the BindSource
+  AWhere.SetETMfor(FETMfor); // Inject ETMfor BS specified in the BindSource
   FWhere := AWhere;
   // Update the adapter where in the BSAdapter if exist
   if CheckAdapter then
@@ -990,7 +990,7 @@ end;
 
 procedure TioDataSetCustom.WhereOnChangeEventHandler(Sender: TObject);
 begin
-  SetWhere(TioWhereFactory.NewWhereWithPaging(FPaging).Add(FWhereStr.Text));
+  SetWhere(TioWhereFactory.NewWhereWithPagingAndETMfor(FPaging, FETMfor).Add(FWhereStr.Text));
 end;
 
 procedure TioDataSetCustom.SetWhereDetailsFromDetailAdapters(const Value: Boolean);
@@ -1062,7 +1062,7 @@ begin
     SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterBindSource))
   else
   begin
-    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, Name, TypeName, TypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)
+    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, Name, TypeName, TypeAlias, TioWhereFactory.NewWhereWithPagingAndETMfor(FPaging, FETMfor).Add(WhereStr.Text)
       ._OrderBy(FOrderBy), TypeOfCollection, ADataObject, AOwnsObject));
     // Force the creation of all the detail adapters (if exists)
     // NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non

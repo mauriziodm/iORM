@@ -46,7 +46,8 @@ uses
   System.Generics.Collections, iORM.Where.Destinations,
   iORM.Context.Map.Interfaces, FireDAC.Comp.Client, System.TypInfo,
   iORM.Utilities, iORM.LiveBindings.CommonBSAPaging,
-  DJSON.Attributes, iORM.Context.Interfaces, iORM.StdActions.Interfaces;
+  DJSON.Attributes, iORM.Context.Interfaces, iORM.StdActions.Interfaces,
+  iORM.LiveBindings.Interfaces;
 
 type
 
@@ -62,6 +63,7 @@ type
     FOrderBy: IioSqlItemWhere;
     FClearListBefore: Boolean;
     FCacheable: Boolean;
+    FETMfor: IioNotifiableBindSource;
     // Contiene le clausole where specificate fino ad ora
     FWhereItems: TWhereItems;
     // Contiene le eventuali clausole where di eventuali dettagli, la chiave è una stringa
@@ -115,6 +117,7 @@ type
     function GetLimitOffset: Integer;
     function GetPagingObj: TObject; // TObject to avoid circular reference
     procedure SetPagingObj(const APagingObj: TObject); // TObject to avoid circular reference
+    procedure SetETMfor(const AETMfor: IInterface); // IInterface to avoid circular reference
     procedure SetOrderBySql(const AOrderByText: String);
     function WhereConditionExists: Boolean;
     // ------ Generic destinationz
@@ -706,6 +709,7 @@ begin
   FPagingObjExists := False;
   FClearListBefore := False;
   FCacheable := False;
+  FETMfor := nil;
 end;
 
 procedure TioWhere.CreateIndex(ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
@@ -1314,6 +1318,17 @@ begin
       raise EioException.Create(Self.ClassName, '_Show',
         Format('No View/ViewModel were found for this instance (Object class = "%s"; TypeName = "%s"; AVVMAlias = "%s")',
         [ADataObject.ClassName, TypeName, AVVMAlias]));
+end;
+
+procedure TioWhere.SetETMfor(const AETMfor: IInterface);  // IInterface to avoid circular reference
+begin
+  if AETMfor <> nil then
+  begin
+    if not Supports(AETMfor, IioNotifiableBindSource, FETMfor) then
+      raise EioEtmException.Create(ClassName, '_SetETMfor', 'The object received into the "AETMfor" parameter does not implement the interface "IioNotifiableBindSource".');
+  end
+  else
+    FETMfor := nil;
 end;
 
 procedure TioWhere._Show(const ADataObject: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const AForceTypeNameUse: Boolean);

@@ -1068,7 +1068,8 @@ begin
   // Update the adapter where
   if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
   begin
-    AWhere.SetPagingObj(FPaging); // Inject paging object spscified in BindSource or ModelPresenter
+    AWhere.SetPagingObj(FPaging); // Inject paging object specified in the BindSource
+    AWhere.SetETMfor(FETMfor); // Inject ETMfor BS specified in the BindSource
     LActiveBSA.ioWhere := AWhere;
   end;
 end;
@@ -1197,7 +1198,7 @@ end;
 
 procedure TioPrototypeBindSourceCustom.WhereOnChangeEventHandler(Sender: TObject);
 begin
-  SetWhere(TioWhereFactory.NewWhereWithPaging(FPaging).Add(FWhereStr.Text));
+  SetWhere(TioWhereFactory.NewWhereWithPagingAndETMfor(FPaging, FETMfor).Add(FWhereStr.Text));
 end;
 
 function TioPrototypeBindSourceCustom._AddRef: Integer;
@@ -1227,7 +1228,7 @@ begin
   if IsFromBSLoadType or (IsDetailBS and MasterPropertyName.IsEmpty) then
     LActiveBSA := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterBindSource)
   else
-    LActiveBSA := TioLiveBindingsFactory.GetBSA(Self, Name, TypeName, TypeAlias, TioWhereFactory.NewWhereWithPaging(FPaging).Add(WhereStr.Text)._OrderBy(FOrderBy),
+    LActiveBSA := TioLiveBindingsFactory.GetBSA(Self, Name, TypeName, TypeAlias, TioWhereFactory.NewWhereWithPagingAndETMfor(FPaging, FETMfor).Add(WhereStr.Text)._OrderBy(FOrderBy),
       TypeOfCollection, ADataObject, True);
   // If Self is a Notifiable bind source then register a reference to itself
   // in the ActiveBindSourceAdapter

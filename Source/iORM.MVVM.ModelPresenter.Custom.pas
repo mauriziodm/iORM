@@ -774,7 +774,7 @@ begin
   // if not already assigned then create it (così lo crea solo se serve
   // davvero altrimenti no)
   if not Assigned(FWhere) then
-    FWhere := TioWhereFactory.NewWhereWithPaging(FPaging);
+    FWhere := TioWhereFactory.NewWhereWithPagingAndETMfor(FPaging, FETMfor);
   // Return the Where instance
   Result := FWhere;
 end;
@@ -1305,7 +1305,8 @@ end;
 
 procedure TioModelPresenterCustom.SetWhere(const AWhere: IioWhere);
 begin
-  AWhere.SetPagingObj(FPaging); // Inject paging object spscified in BindSource or ModelPresenter
+  AWhere.SetPagingObj(FPaging); // Inject paging object specified in the BindSource
+  AWhere.SetETMfor(FETMfor); // Inject ETMfor BS specified in the BindSource
   FWhere := AWhere;
   // Update the adapter where in the BSAdapter if exist
   if CheckAdapter then
