@@ -45,7 +45,7 @@ interface
 uses
   System.Classes, System.Generics.Collections, iORM.Where.Interfaces,
   iORM.Context.Map.Interfaces, iORM.Attributes, System.JSON,
-  iORM.ETM.Interfaces;
+  iORM.ETM.Interfaces, iORM.LiveBindings.BSPersistence;
 
 type
 
@@ -82,6 +82,8 @@ type
     class procedure RevertToObject(const ATargetIntf: IInterface; const ATimeSlot: TioEtmCustomTimeSlot; const APersistImmediately: Boolean = False); overload;
     // RevertToDB
     class procedure RevertToDB(const ATimeSlot: TioEtmCustomTimeSlot); overload;
+    // RevertToBindSource
+    class procedure RevertToBindSource(const ATimeSlot: TioEtmCustomTimeSlot; const ATargetBindSource: IioBSPersistenceClient; const APersistImmediately: Boolean = False); overload;
     // Trace
     class procedure TraceByMap(const AMap: IioMap; const AEtmTimeSlotClass: TioEtmTimeSlotRef; const ATraceOnlyOnConnectionName: String = '');
     class procedure Trace<T: class>(const AEtmTimeSlotClass: TioEtmTimeSlotRef; const ATraceOnlyOnConnectionName: String = '');
@@ -248,6 +250,16 @@ begin
   // Persist immediately
   if APersistImmediately then
     io.PersistObject(ATargetObj);
+end;
+
+class procedure TioEtmEngine.RevertToBindSource(const ATimeSlot: TioEtmCustomTimeSlot; const ATargetBindSource: IioBSPersistenceClient; const APersistImmediately: Boolean = False);
+begin
+  if (not Assigned(ATargetBindSource)) or (not ATargetBindSource.IsActive) then
+    raise EioEtmException.Create(ClassName, 'RevertToBindSource', '"ABindSource" parameter must be assigned and activated.');
+  if ATargetBindSource.Current = nil then
+    raise EioEtmException.Create(ClassName, 'RevertToBindSource', 'Current object of the TargetBindSource is nil.');
+  RevertToObject(ATargetBindSource.Current, ATimeSloT, APersistImmediately);
+  ATargetBindSource.Refresh;
 end;
 
 class procedure TioEtmEngine.RevertToDB(const ATimeSlot: TioEtmCustomTimeSlot);
