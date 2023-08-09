@@ -118,6 +118,7 @@ type
     function GetPagingObj: TObject; // TObject to avoid circular reference
     procedure SetPagingObj(const APagingObj: TObject); // TObject to avoid circular reference
     procedure SetETMfor(const AETMfor: IInterface); // IInterface to avoid circular reference
+    function GetETMfor: IInterface; // IInterface to avoid circular reference
     procedure SetOrderBySql(const AOrderByText: String);
     function WhereConditionExists: Boolean;
     // ------ Generic destinationz
@@ -841,6 +842,11 @@ begin
   Result := FDisableStrictlyTrueClass;
 end;
 
+function TioWhere.GetETMfor: IInterface;
+begin
+  result := FETMfor;
+end;
+
 function TioWhere.GetItems: TWhereItems;
 begin
   Result := FWhereItems;
@@ -1422,6 +1428,7 @@ begin
   for AItem in AWhereCond.GetWhereItems do
     Self.FWhereItems.Add(AItem);
   SetPagingObj(AWhereCond.GetPagingObj);
+  SetETMfor(AWhereCond.GetETMfor);
   FDetailsContainer := AWhereCond.Details;
   FOrderBy := AWhereCond.GetOrderByInstance;
 end;
