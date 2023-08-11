@@ -83,7 +83,7 @@ type
     // RevertToDB
     class procedure RevertToDB(const ATimeSlot: TioEtmCustomTimeSlot); overload;
     // RevertToBindSource
-    class procedure RevertToBindSource(const ATimeSlot: TioEtmCustomTimeSlot; const ATargetBindSource: IioBSPersistenceClient; const APersistImmediately: Boolean = False); overload;
+    class procedure RevertToBindSource(const ATimeSlot: TioEtmCustomTimeSlot; const ATargetBindSource: IioMasterBindSource; const APersistImmediately: Boolean = False); overload;
     // Trace
     class procedure TraceByMap(const AMap: IioMap; const AEtmTimeSlotClass: TioEtmTimeSlotRef; const ATraceOnlyOnConnectionName: String = '');
     class procedure Trace<T: class>(const AEtmTimeSlotClass: TioEtmTimeSlotRef; const ATraceOnlyOnConnectionName: String = '');
@@ -252,7 +252,7 @@ begin
     io.PersistObject(ATargetObj);
 end;
 
-class procedure TioEtmEngine.RevertToBindSource(const ATimeSlot: TioEtmCustomTimeSlot; const ATargetBindSource: IioBSPersistenceClient; const APersistImmediately: Boolean = False);
+class procedure TioEtmEngine.RevertToBindSource(const ATimeSlot: TioEtmCustomTimeSlot; const ATargetBindSource: IioMasterBindSource; const APersistImmediately: Boolean = False);
 begin
   if (not Assigned(ATargetBindSource)) or (not ATargetBindSource.IsActive) then
     raise EioEtmException.Create(ClassName, 'RevertToBindSource', '"ABindSource" parameter must be assigned and activated.');

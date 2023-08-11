@@ -42,7 +42,7 @@ uses
 
 type
 
-  TioDataSetMaster = class(TioDataSetCustom, IioBSPersistenceClient, IioStdActionTargetMasterBindSource)
+  TioDataSetMaster = class(TioDataSetCustom, IioMasterBindSource, IioStdActionTargetMasterBindSource)
   private
     FPersistence: TioBSPersistence;
     FOnDeleteAction: TioBSOnDeleteAction;
@@ -50,7 +50,7 @@ type
     FOnUpdateAction: TioBSOnUpdateAction;
     FOnRecordChangeAction: TioBSOnRecordChangeAction;
     FOnInsertAction: TioOnInsertAction;
-    FWhereBuilderFor: IioBSPersistenceClient;
+    FWhereBuilderFor: IioMasterBindSource;
     // Events
     FBeforeWhereBuild: TioBeforeWhereBuilderEvent;
     FBeforeWhereClear: TioBeforeWhereBuilderEvent;
@@ -124,7 +124,7 @@ type
     property OnInsertAction: TioOnInsertAction read GetOnInsertAction write SetOnInsertAction default iaSaveRevertPoint;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
     property SourceBS: IioBindSource read GetSourceBS write SetSourceBS;
-    property WhereBuilderFor: IioBSPersistenceClient read FWhereBuilderFor write FWhereBuilderFor;
+    property WhereBuilderFor: IioMasterBindSource read FWhereBuilderFor write FWhereBuilderFor;
     // Published Events: selectors
     property BeforeSelectionObject;
     property OnSelectionObject;

@@ -45,7 +45,7 @@ type
   public
     class function NewWhere: IioWhere; overload;
     class function NewWhere<T>: IioWhere<T>; overload;
-    class function NewWhereWithPagingAndETMfor(const APaging: TioCommonBSAPageManager; const AETMfor: IioBSPersistenceClient): IioWhere; overload;
+    class function NewWhereWithPagingAndETMfor(const APaging: TioCommonBSAPageManager; const AETMfor: IioMasterBindSource): IioWhere; overload;
     class function NewWhereItems: TWhereItems;
     class function NewDetailsContainer: IioWhereDetailsContainer;
     class function NewWhereSmartBuilder: TioWhereSmartBuilderRef;
@@ -90,7 +90,7 @@ begin
   Result := TioWhereSmartBuilder;
 end;
 
-class function TioWhereFactory.NewWhereWithPagingAndETMfor(const APaging: TioCommonBSAPageManager; const AETMfor: IioBSPersistenceClient): IioWhere;
+class function TioWhereFactory.NewWhereWithPagingAndETMfor(const APaging: TioCommonBSAPageManager; const AETMfor: IioMasterBindSource): IioWhere;
 begin
   Result := TioWhere.Create;
   Result.SetPagingObj(APaging); // Inject paging object specified in the BindSource

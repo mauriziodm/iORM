@@ -119,7 +119,7 @@ end;
 procedure TioNaturalActiveInterfaceObjectBindSourceAdapter.DoBeforeDelete;
 var
   LActiveBSA: IioActiveBindSourceAdapter;
-  LMasterBS: IioBSPersistenceClient;
+  LMasterBS: IioMasterBindSource;
 begin
   // Questo è un NaturalBindSourceAdapter quindi in realtà nella quasi totalità dei casi
   //  sta esponendo ad una form anagrafica l'oggetto selezionato in un altro BindSourceAdapter
@@ -150,7 +150,7 @@ begin
     //   "IioBSPersistenceClient" estrae un riferimento di questo tipo (l'interfaccia) del suo
     //   BindSouce (relativo a SourceAdapter) fa fare a lui un vero e proprio Persistence.Delete.
     //   Se invece queste condizioni non sono soddisfatte procedete con il normale Delete del SourceAdapter (no persistence)
-    if LActiveBSA.HasBindSource and LActiveBSA.GetBindSource.IsMasterBS and Supports(LActiveBSA.GetBindSource, IioBSPersistenceClient, LMasterBS) then
+    if LActiveBSA.HasBindSource and LActiveBSA.GetBindSource.IsMasterBS and Supports(LActiveBSA.GetBindSource, IioMasterBindSource, LMasterBS) then
       LMasterBS.Persistence.Delete
     else
       LActiveBSA.Delete;

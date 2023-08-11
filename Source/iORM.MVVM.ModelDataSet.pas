@@ -116,19 +116,19 @@ end;
 
 procedure TioModelDataSet.DoBeforeOpen;
 var
-  LBSPersistenceClient: IioBSPersistenceClient;
+  LBSPersistenceClient: IioMasterBindSource;
 begin
   inherited;
-  if Supports(GetModelPresenterInstance, IioBSPersistenceClient, LBSPersistenceClient) then
+  if Supports(GetModelPresenterInstance, IioMasterBindSource, LBSPersistenceClient) then
     LBSPersistenceClient.Persistence.Clear(False);
 end;
 
 procedure TioModelDataSet.DoBeforeScroll;
 var
-  LBSPersistenceClient: IioBSPersistenceClient;
+  LBSPersistenceClient: IioMasterBindSource;
 begin
   inherited;
-  if Supports(GetModelPresenterInstance, IioBSPersistenceClient, LBSPersistenceClient) then
+  if Supports(GetModelPresenterInstance, IioMasterBindSource, LBSPersistenceClient) then
     LBSPersistenceClient.Persistence.NotifyBeforeScroll;
 end;
 

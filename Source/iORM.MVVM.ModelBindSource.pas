@@ -257,10 +257,10 @@ end;
 
 procedure TioModelBindSource.PosChanging(ABindComp: TBasicBindComponent);
 var
-  LBSPersistenceClient: IioBSPersistenceClient;
+  LBSPersistenceClient: IioMasterBindSource;
 begin
   inherited;
-  if Supports(GetModelPresenterInstance, IioBSPersistenceClient, LBSPersistenceClient) then
+  if Supports(GetModelPresenterInstance, IioMasterBindSource, LBSPersistenceClient) then
     LBSPersistenceClient.Persistence.NotifyBeforeScroll;
 end;
 
@@ -276,7 +276,7 @@ end;
 
 procedure TioModelBindSource.SetActive(const Value: Boolean);
 var
-  LBSPersistenceClient: IioBSPersistenceClient;
+  LBSPersistenceClient: IioMasterBindSource;
 begin
   // If we are in the opening of the bind source and we aren't at design-time then
   //  create the active bind source adapter
@@ -287,7 +287,7 @@ begin
 
   // If the ModelPresenter is a master model presenter then clear the
   //  relative Persistence layer
-  if (not (csDesigning in ComponentState)) and Supports(GetModelPresenterInstance, IioBSPersistenceClient, LBSPersistenceClient) then
+  if (not (csDesigning in ComponentState)) and Supports(GetModelPresenterInstance, IioMasterBindSource, LBSPersistenceClient) then
     LBSPersistenceClient.Persistence.Clear(False);
 
 // ----- OLD CODE -----

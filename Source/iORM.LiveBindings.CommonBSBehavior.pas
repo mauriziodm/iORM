@@ -67,8 +67,8 @@ type
 
     class function IsValidForDependencyInjectionLocator(const ABindSource: IioBindSource; const ACheckCurrentObj, ARaiseExceptions: Boolean): Boolean;
     // Common code for WhereBuilder purposes
-    class function BuildWhere(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean; const ABeforeWhereBuildEvent: TioBeforeWhereBuilderEvent; const AOnWhereBuildEvent: TioOnWhereBuilderEvent; const AAfterWhereBuildEvent: TioAfterWhereBuilderEvent): IioWhere;
-    class function ClearWhere(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean; const ABeforeWhereClearEvent: TioBeforeWhereBuilderEvent; const AOnWhereClearEvent: TioOnWhereBuilderEvent; const AAfterWhereClearEvent: TioAfterWhereBuilderEvent): IioWhere;
+    class function BuildWhere(const ASourceBS, ATargetBS: IioMasterBindSource; const AExecuteOnTarget: Boolean; const ABeforeWhereBuildEvent: TioBeforeWhereBuilderEvent; const AOnWhereBuildEvent: TioOnWhereBuilderEvent; const AAfterWhereBuildEvent: TioAfterWhereBuilderEvent): IioWhere;
+    class function ClearWhere(const ASourceBS, ATargetBS: IioMasterBindSource; const AExecuteOnTarget: Boolean; const ABeforeWhereClearEvent: TioBeforeWhereBuilderEvent; const AOnWhereClearEvent: TioOnWhereBuilderEvent; const AAfterWhereClearEvent: TioAfterWhereBuilderEvent): IioWhere;
   end;
 
 implementation
@@ -178,7 +178,7 @@ end;
 
 class procedure TioCommonBSBehavior.Notify(const ASender: TObject; const ATargetBS: IioBindSource; const [Ref] ANotification: TioBSNotification);
 var
-  LBSPersistenceClient: IioBSPersistenceClient;
+  LBSPersistenceClient: IioMasterBindSource;
   LNotificationPointer: PioBSNotification;
 begin
   case ANotification.NotificationType of
@@ -191,25 +191,25 @@ begin
       ATargetBS.Paging.NotifyItemIndexChanged(ATargetBS.GetActiveBindSourceAdapter.ItemIndex);
     // Actually used for BSPersistence purposes
     ntSaveRevertPoint:
-      if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
+      if Supports(ATargetBS, IioMasterBindSource, LBSPersistenceClient) then
         LBSPersistenceClient.Persistence.NotifySaveRevertPoint;
     // Set the response to True if the MasterBS has saved revert point or AutoSaveRevertPoint is possible
     ntCanReceiveSelection:
-      if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
+      if Supports(ATargetBS, IioMasterBindSource, LBSPersistenceClient) then
       begin
         LNotificationPointer := @ANotification;
         LNotificationPointer^.Response := LBSPersistenceClient.Persistence.CanReceiveSelection;
       end;
     // Set the response to True if the MasterBS has saved revert point or AutoSaveRevertPoint is possible
     ntCanInsertDetail:
-      if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
+      if Supports(ATargetBS, IioMasterBindSource, LBSPersistenceClient) then
       begin
         LNotificationPointer := @ANotification;
         LNotificationPointer^.Response := LBSPersistenceClient.Persistence.CanInsertDetail;
       end;
     // Set the response to True if the MasterBS has saved revert point or AutoSaveRevertPoint is possible
     ntCanDeleteDetail:
-      if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
+      if Supports(ATargetBS, IioMasterBindSource, LBSPersistenceClient) then
       begin
         LNotificationPointer := @ANotification;
         LNotificationPointer^.Response := LBSPersistenceClient.Persistence.CanDeleteDetail;
@@ -219,7 +219,7 @@ begin
     // It return true (Response field of the notification) if the smart delete system is enabled and the
     // operation is succesfull
     ntDeleteSmart:
-      if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
+      if Supports(ATargetBS, IioMasterBindSource, LBSPersistenceClient) then
       begin
         LNotificationPointer := @ANotification;
         LNotificationPointer^.Response := (LBSPersistenceClient.OnDeleteAction = daSetSmartDeleteSystem);
@@ -229,7 +229,7 @@ begin
     // Actually used for ActiveBindSourceAdapters delete purposes:
     // It return true (Response field of the notification) if the ObjStatus delete mode system is enabled on the MasterBS
     ntObjStatusSetDeleted:
-      if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
+      if Supports(ATargetBS, IioMasterBindSource, LBSPersistenceClient) then
       begin
         LNotificationPointer := @ANotification;
         LNotificationPointer^.Response := (LBSPersistenceClient.OnDeleteAction >= daSetObjStatusIfExists);
@@ -237,7 +237,7 @@ begin
     // Actually used for ActiveBindSourceAdapters insert/update purposes:
     // It return true (Response field of the notification) if the ObjStatus (dirty) mode system is enabled on the MasterBS
     ntObjStatusSetDirty:
-      if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) then
+      if Supports(ATargetBS, IioMasterBindSource, LBSPersistenceClient) then
       begin
         LNotificationPointer := @ANotification;
         LNotificationPointer^.Response := (LBSPersistenceClient.OnUpdateAction >= uaSetObjStatusIfExists);
@@ -245,10 +245,10 @@ begin
     // Actually used for BSPersistence purposes:
     // if enabled save a reference to the current object to register it in the SmartUpdateDetection system
     ntSUD_RegisterObjOnEdit:
-      if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) and LBSPersistenceClient.Persistence.IsSmartUpdateDetectionEnabled then
+      if Supports(ATargetBS, IioMasterBindSource, LBSPersistenceClient) and LBSPersistenceClient.Persistence.IsSmartUpdateDetectionEnabled then
         LBSPersistenceClient.Persistence.SmartUpdateDetection.NotifyEdit(ANotification.PayloadAsObject, ANotification.PayloadAsString);
     ntSUD_RegisterObjOnPost:
-      if Supports(ATargetBS, IioBSPersistenceClient, LBSPersistenceClient) and LBSPersistenceClient.Persistence.IsSmartUpdateDetectionEnabled then
+      if Supports(ATargetBS, IioMasterBindSource, LBSPersistenceClient) and LBSPersistenceClient.Persistence.IsSmartUpdateDetectionEnabled then
         LBSPersistenceClient.Persistence.SmartUpdateDetection.NotifyPost(ANotification.PayloadAsObject, ANotification.PayloadAsString);
   end;
 end;
@@ -302,7 +302,7 @@ begin
         LBindSource.SetAsDefault(False);
 end;
 
-class function TioCommonBSBehavior.BuildWhere(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean; const ABeforeWhereBuildEvent: TioBeforeWhereBuilderEvent; const AOnWhereBuildEvent: TioOnWhereBuilderEvent; const AAfterWhereBuildEvent: TioAfterWhereBuilderEvent): IioWhere;
+class function TioCommonBSBehavior.BuildWhere(const ASourceBS, ATargetBS: IioMasterBindSource; const AExecuteOnTarget: Boolean; const ABeforeWhereBuildEvent: TioBeforeWhereBuilderEvent; const AOnWhereBuildEvent: TioOnWhereBuilderEvent; const AAfterWhereBuildEvent: TioAfterWhereBuilderEvent): IioWhere;
 var
   LOnWhereBuildEventAnonymousMethod: TioOnWhereBuildEventAnonymousMethod;
   LWhere: IioWhere;
@@ -344,7 +344,7 @@ begin
     ATargetBS.Persistence.Reload;
 end;
 
-class function TioCommonBSBehavior.ClearWhere(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean; const ABeforeWhereClearEvent: TioBeforeWhereBuilderEvent; const AOnWhereClearEvent: TioOnWhereBuilderEvent; const AAfterWhereClearEvent: TioAfterWhereBuilderEvent): IioWhere;
+class function TioCommonBSBehavior.ClearWhere(const ASourceBS, ATargetBS: IioMasterBindSource; const AExecuteOnTarget: Boolean; const ABeforeWhereClearEvent: TioBeforeWhereBuilderEvent; const AOnWhereClearEvent: TioOnWhereBuilderEvent; const AAfterWhereClearEvent: TioAfterWhereBuilderEvent): IioWhere;
 begin
   // Reset the filter object (sourceBS)
   ASourceBS.Persistence.Reload;

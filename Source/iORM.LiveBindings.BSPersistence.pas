@@ -52,7 +52,7 @@ type
 
   TioBSPersistence = class;
 
-  IioBSPersistenceClient = interface
+  IioMasterBindSource = interface
     ['{8B930CF9-0EDC-483E-86A2-39C6CFD82D9D}']
     function Current: TObject;
     procedure Delete;
@@ -73,9 +73,9 @@ type
     function GetSourceBS: IioBindSource;
     procedure SetWhere(const AWhere: IioWhere);
     // ETMfor
-    procedure SetETMfor(const AETMfor: IioBSPersistenceClient);
-    function GetETMfor: IioBSPersistenceClient;
-    property ETMfor: IioBSPersistenceClient read GetETMfor write SetETMfor;
+    procedure SetETMfor(const AETMfor: IioMasterBindSource);
+    function GetETMfor: IioMasterBindSource;
+    property ETMfor: IioMasterBindSource read GetETMfor write SetETMfor;
     // LoadType property
     procedure SetLoadType(const Value: TioLoadType);
     function GetLoadType: TioLoadType;
@@ -114,7 +114,7 @@ type
   TioBSPersistence = class
   private
     [djSkip]
-    FBindSource: IioBSPersistenceClient;
+    FBindSource: IioMasterBindSource;
     [djSkip]
     FSavedRevertPointState: String;
     FSmartDeleteSystem: TioSmartDeleteSystem;
@@ -130,7 +130,7 @@ type
     procedure _InternalRevertWhenManualLoadType(const ARaiseIfRevertPointNotSaved: Boolean; const ARaiseIfNoChanges: Boolean);
     procedure _InternalRevertWhenAutoLoadType(const ARaiseIfRevertPointNotSaved: Boolean; const ARaiseIfNoChanges: Boolean);
   public
-    constructor Create(const ABSPersistenceClient: IioBSPersistenceClient);
+    constructor Create(const ABSPersistenceClient: IioMasterBindSource);
     destructor Destroy; override;
     procedure SaveRevertPoint(const ARaiseIfAlreadySavedRevertPoint: Boolean = True);
     procedure Revert(const ARaiseIfRevertPointNotSaved: Boolean = False; const ARaiseIfNoChanges: Boolean = False; const AClearAfterExecute: Boolean = True);
@@ -317,7 +317,7 @@ begin
     FSmartUpdateDetection.Clear;
 end;
 
-constructor TioBSPersistence.Create(const ABSPersistenceClient: IioBSPersistenceClient);
+constructor TioBSPersistence.Create(const ABSPersistenceClient: IioMasterBindSource);
 begin
   inherited Create;
   FBindSource := ABSPersistenceClient;
@@ -571,9 +571,9 @@ begin
         [FBindSource.GetName, FBindSource.GetName]));
     FBindSource.ClearDataObject; // In this case (FromBSLoadType) we are always with an ObjectBindSourceAdapter
     if LSourceBS.IsMasterBS then
-      (LSourceBS as IioBSPersistenceClient).Persistence.Delete
+      (LSourceBS as IioMasterBindSource).Persistence.Delete
     else
-      (LSourceBS as IioBSPersistenceClient).Delete;
+      (LSourceBS as IioMasterBindSource).Delete;
   end
   else
     _InternalRevert(ARaiseIfRevertPointNotSaved, ARaiseIfNoChanges);

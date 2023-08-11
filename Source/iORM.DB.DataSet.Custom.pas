@@ -65,7 +65,7 @@ type
     FAutoPost: Boolean;
     FPaging: TioCommonBSAPageManager;
     FVirtualFields: Boolean;
-    FETMfor: IioBSPersistenceClient;
+    FETMfor: IioMasterBindSource;
     // Selectors
     FSelectorFor: IioBindSource;
     FOnReceiveSelectionCloneObject: Boolean;
@@ -132,8 +132,8 @@ type
     procedure SetPaging(const Value: TioCommonBSAPageManager);
     function GetPaging: TioCommonBSAPageManager;
     // ETMfor
-    procedure SetETMfor(const AETMfor: IioBSPersistenceClient);
-    function GetETMfor: IioBSPersistenceClient;
+    procedure SetETMfor(const AETMfor: IioMasterBindSource);
+    function GetETMfor: IioMasterBindSource;
     // State
     function GetState: TBindSourceAdapterState;
     // TypeAlias
@@ -194,7 +194,7 @@ type
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection write SetTypeOfCollection default tcList;
     property VirtualFields: Boolean read GetVirtualFields write FVirtualFields default False;
-    property ETMfor: IioBSPersistenceClient read GetETMfor write SetETMfor;
+    property ETMfor: IioMasterBindSource read GetETMfor write SetETMfor;
     // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
     property WhereStr: TStrings read FWhereStr write SetWhereStr; // published: Master
     property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False;
@@ -510,7 +510,7 @@ begin
     Result := False
 end;
 
-function TioDataSetCustom.GetETMfor: IioBSPersistenceClient;
+function TioDataSetCustom.GetETMfor: IioMasterBindSource;
 begin
   Result := FETMfor;
 end;
@@ -894,7 +894,7 @@ begin
 // ----- OLD CODE FROM 22/04/2023 -----
 end;
 
-procedure TioDataSetCustom.SetETMfor(const AETMfor: IioBSPersistenceClient);
+procedure TioDataSetCustom.SetETMfor(const AETMfor: IioMasterBindSource);
 begin
   // Set the private field
   FETMFor := AETMfor;

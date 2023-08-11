@@ -236,10 +236,10 @@ type
     FRaiseIfRevertPointSaved: Boolean;
     FRaiseIfRevertPointNotSaved: Boolean;
     FShowOrSelectAction: IioBSSlaveAction;
-    FTargetBindSource: IioBSPersistenceClient;
+    FTargetBindSource: IioMasterBindSource;
     function Get_Version: String;
     procedure _SetTargetBindSource(const AObj: TObject);
-    procedure SetTargetBindSource(const Value: IioBSPersistenceClient);
+    procedure SetTargetBindSource(const Value: IioMasterBindSource);
     procedure SetCloseQueryAction(const Value: IioBSSlaveAction);
     procedure SetShowOrSelectAction(const Value: IioBSSlaveAction);
   strict protected
@@ -255,7 +255,7 @@ type
     property RaiseIfRevertPointSaved: Boolean read FRaiseIfRevertPointSaved write FRaiseIfRevertPointSaved default False;
     property RaiseIfRevertPointNotSaved: Boolean read FRaiseIfRevertPointNotSaved write FRaiseIfRevertPointNotSaved default False;
     property ShowOrSelectAction: IioBSSlaveAction read FShowOrSelectAction write SetShowOrSelectAction;
-    property TargetBindSource: IioBSPersistenceClient read FTargetBindSource write SetTargetBindSource;
+    property TargetBindSource: IioMasterBindSource read FTargetBindSource write SetTargetBindSource;
   public
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
@@ -614,7 +614,7 @@ end;
 
 function TioBSPersistenceStdActionVcl.HandlesTarget(Target: TObject): Boolean;
 begin
-  Result := Assigned(Target) and Supports(FTargetBindSource, IioBSPersistenceClient) and FTargetBindSource.isActive;
+  Result := Assigned(Target) and Supports(FTargetBindSource, IioMasterBindSource) and FTargetBindSource.isActive;
 end;
 
 procedure TioBSPersistenceStdActionVcl.Notification(AComponent: TComponent; Operation: TOperation);
@@ -654,7 +654,7 @@ begin
   end;
 end;
 
-procedure TioBSPersistenceStdActionVcl.SetTargetBindSource(const Value: IioBSPersistenceClient);
+procedure TioBSPersistenceStdActionVcl.SetTargetBindSource(const Value: IioMasterBindSource);
 begin
   if not(csLoading in ComponentState) and FIsSlave then
     raise EioException.Create(ClassName, 'SetTargetBindSource', 'The "TargetBindSource" property of a "..SelectCurrent" action is read-only when the action itself is nested into a "ShowOrSelect" action');
@@ -685,9 +685,9 @@ end;
 
 procedure TioBSPersistenceStdActionVcl._SetTargetBindSource(const AObj: TObject);
 var
-  LTargetBindSource: IioBSPersistenceClient;
+  LTargetBindSource: IioMasterBindSource;
 begin
-  if Assigned(AObj) and not Supports(AObj, IioBSPersistenceClient, LTargetBindSource) then
+  if Assigned(AObj) and not Supports(AObj, IioMasterBindSource, LTargetBindSource) then
     raise EioException.Create(ClassName, '_SetTargetBindSource', 'AObj does not implements IioStdActionTargetBindSource interface');
   FIsSlave := False;
   SetTargetBindSource(LTargetBindSource);

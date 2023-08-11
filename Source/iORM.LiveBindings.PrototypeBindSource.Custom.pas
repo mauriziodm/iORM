@@ -64,7 +64,7 @@ type
     FAutoPost: Boolean;
     FPaging: TioCommonBSAPageManager;
     FVirtualFields: Boolean;
-    FETMfor: IioBSPersistenceClient;
+    FETMfor: IioMasterBindSource;
     FPreview: Boolean;
     // Selectors
     FSelectorFor: IioBindSource;
@@ -151,8 +151,8 @@ type
     procedure SetPaging(const Value: TioCommonBSAPageManager);
     function GetPaging: TioCommonBSAPageManager;
     // ETMfor
-    procedure SetETMfor(const AETMfor: IioBSPersistenceClient);
-    function GetETMfor: IioBSPersistenceClient;
+    procedure SetETMfor(const AETMfor: IioMasterBindSource);
+    function GetETMfor: IioMasterBindSource;
     // Preview
     procedure SetPreview(const Value: Boolean);
     // State
@@ -213,7 +213,7 @@ type
     property Lazy: Boolean read FLazy write SetLazy default False; // published: Master
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
     property VirtualFields: Boolean read GetVirtualFields write FVirtualFields default False;
-    property ETMfor: IioBSPersistenceClient read GetETMfor write SetETMfor;
+    property ETMfor: IioMasterBindSource read GetETMfor write SetETMfor;
     // published: Master (però cambiarlo in modo che, se true, persiste al cambio di record)
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection write SetTypeOfCollection default tcList;
     // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
@@ -643,7 +643,7 @@ begin
     Result := nil;
 end;
 
-function TioPrototypeBindSourceCustom.GetETMfor: IioBSPersistenceClient;
+function TioPrototypeBindSourceCustom.GetETMfor: IioMasterBindSource;
 begin
   Result := FETMfor;
 end;
@@ -1069,7 +1069,7 @@ begin
   end;
 end;
 
-procedure TioPrototypeBindSourceCustom.SetETMfor(const AETMfor: IioBSPersistenceClient);
+procedure TioPrototypeBindSourceCustom.SetETMfor(const AETMfor: IioMasterBindSource);
 begin
   // Set the private field
   FETMFor := AETMfor;

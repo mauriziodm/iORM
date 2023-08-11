@@ -62,7 +62,7 @@ type
     FAutoPost: Boolean;
     FPaging: TioCommonBSAPageManager;
     FVirtualFields: Boolean;
-    FETMfor: IioBSPersistenceClient;
+    FETMfor: IioMasterBindSource;
     // Selectors
     FSelectorFor: IioBindSource;
     FOnReceiveSelectionCloneObject: Boolean;
@@ -146,8 +146,8 @@ type
     procedure SetPaging(const Value: TioCommonBSAPageManager);
     function GetPaging: TioCommonBSAPageManager;
     // ETMfor
-    procedure SetETMfor(const AETMfor: IioBSPersistenceClient);
-    function GetETMfor: IioBSPersistenceClient;
+    procedure SetETMfor(const AETMfor: IioMasterBindSource);
+    function GetETMfor: IioMasterBindSource;
     // State
     function GetState: TBindSourceAdapterState;
     // TypeAlias
@@ -212,7 +212,7 @@ type
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
     property AutoRefreshOnNotification: Boolean read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default True;
     property VirtualFields: Boolean read GetVirtualFields write FVirtualFields default False;
-    property ETMfor: IioBSPersistenceClient read GetETMfor write SetETMfor;
+    property ETMfor: IioMasterBindSource read GetETMfor write SetETMfor;
     // published: Nascondere e default = false
     property TypeAlias: String read FTypeAlias write SetTypeAlias;
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection write SetTypeOfCollection default tcList;
@@ -691,7 +691,7 @@ begin
     Result := True;
 end;
 
-function TioModelPresenterCustom.GetETMfor: IioBSPersistenceClient;
+function TioModelPresenterCustom.GetETMfor: IioMasterBindSource;
 begin
   Result := FETMfor;
 end;
@@ -1220,7 +1220,7 @@ begin
 // ----- OLD CODE FROM 22/04/2023 -----
 end;
 
-procedure TioModelPresenterCustom.SetETMfor(const AETMfor: IioBSPersistenceClient);
+procedure TioModelPresenterCustom.SetETMfor(const AETMfor: IioMasterBindSource);
 begin
   // Set the private field
   FETMFor := AETMfor;

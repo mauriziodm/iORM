@@ -489,13 +489,13 @@ begin
   io.AnonymousTimer(ADelayMilliseconds,
     function: Boolean
     var
-      LBindSource: IioBSPersistenceClient;
+      LBindSource: IioMasterBindSource;
     begin
       Result := False; // After the execution disable the timer and destroy it
       try
         if AActiveBindSourceAdapter.IsMasterBSA then
         begin
-          if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioBSPersistenceClient, LBindSource) and
+          if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioMasterBindSource, LBindSource) and
             LBindSource.Persistence.CanDelete then
             LBindSource.Persistence.Delete;
         end

@@ -74,7 +74,7 @@ type
     class procedure Reload(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
     class procedure ReloadNaturalBindSourceAdapter(const ANaturalBindSourceAdapter: IioNaturalActiveBindSourceAdapter); static;
     // Delete
-    class procedure BSPersistenceDelete(const ABindSource: IioBSPersistenceClient); static;
+    class procedure BSPersistenceDelete(const ABindSource: IioMasterBindSource); static;
     class procedure BeforeDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
     class procedure AfterDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
     // Post
@@ -180,7 +180,7 @@ begin
     raise EioException.Create(ClassName, 'BeforeInsert', 'Master BindSource hasn''t saved a revert point');
 end;
 
-class procedure TioCommonBSAPersistence.BSPersistenceDelete(const ABindSource: IioBSPersistenceClient);
+class procedure TioCommonBSAPersistence.BSPersistenceDelete(const ABindSource: IioMasterBindSource);
 var
   LActiveBindSourceAdapter: IioActiveBindSourceAdapter;
   LExecuteMethod: TioCommonBSAPersistenceThreadExecute;
@@ -219,10 +219,10 @@ end;
 
 class procedure TioCommonBSAPersistence.AfterDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 var
-  LBSPersistenceClient: IioBSPersistenceClient;
+  LBSPersistenceClient: IioMasterBindSource;
 begin
   // If it is a MasterBindSource then clear the BSPersistence revert point
-  if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioBSPersistenceClient, LBSPersistenceClient) then
+  if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioMasterBindSource, LBSPersistenceClient) then
     LBSPersistenceClient.Persistence.Clear(False);
   // DataSet synchro
   AActiveBindSourceAdapter.GetDataSetLinkContainer.Refresh;
@@ -324,10 +324,10 @@ end;
 
 class procedure TioCommonBSAPersistence.AfterInsert(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 var
-  LBSPersistenceClient: IioBSPersistenceClient;
+  LBSPersistenceClient: IioMasterBindSource;
 begin
   // If it is a MasterBindSource then clear the BSPersistence revert point
-  if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioBSPersistenceClient, LBSPersistenceClient) then
+  if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioMasterBindSource, LBSPersistenceClient) then
     LBSPersistenceClient.Persistence.Clear(False);
   // DataSet synchro
   AActiveBindSourceAdapter.GetDataSetLinkContainer.Refresh;
@@ -686,7 +686,7 @@ end;
 class function TioCommonBSAAnonymousMethodsFactory.GetPersistCurrentExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter)
   : TioCommonBSAPersistenceThreadExecute;
 var
-  LBSPersistenceClient: IioBSPersistenceClient;
+  LBSPersistenceClient: IioMasterBindSource;
 begin
   Result := function: TObject
     begin
@@ -694,7 +694,7 @@ begin
       io.StartTransaction;
       try
         // Persist the main obj
-        if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioBSPersistenceClient, LBSPersistenceClient) then
+        if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioMasterBindSource, LBSPersistenceClient) then
           io._PersistInternal(AActiveBindSourceAdapter.Current, '', 0, False, LBSPersistenceClient.Persistence, '', '');
         // Delete objects referenced into the SmartDeleteSystem
         LBSPersistenceClient.Persistence.SmartDeleteSystem.ForEach(
