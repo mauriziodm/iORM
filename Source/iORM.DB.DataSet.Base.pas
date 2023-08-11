@@ -1489,7 +1489,7 @@ var
   LInstance: TObject;
 begin
   LInstance := nil;
-  // Get the bind source as IioNotifiableBindSource (return an empty value if ADataSet don't implement the interface)
+  // Get the bind source as IioBindSource (return an empty value if ADataSet don't implement the interface)
   if not Supports(ADataSet, IioBindSource, LBindSource) then
   begin
     Result := TValue.Empty;

@@ -99,7 +99,7 @@ type
     function Get_Version: String;
     procedure OpenCloseDetails(const AActive: Boolean);
     // =========================================================================
-    // Part for the support of the IioNotifiableBindSource interfaces (Added by iORM)
+    // Part for the support of the IioBindSource interfaces (Added by iORM)
     // because is not implementing IInterface (NB: RefCount DISABLED)
     function QueryInterface(const IID: TGUID; out Obj): HResult; reintroduce; stdcall;
     function _AddRef: Integer; stdcall;

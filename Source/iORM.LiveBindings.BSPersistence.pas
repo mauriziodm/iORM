@@ -72,6 +72,8 @@ type
     function IsFromBSLoadType: Boolean;
     function GetSourceBS: IioBindSource;
     procedure SetWhere(const AWhere: IioWhere);
+    // TypeName
+    function GetTypeName: String;
     // WhereBuuilderFor
     function GetWhereBuilderFor: IioMasterBindSource;
     procedure SetWhereBuilderFor(const AMasterBS: IioMasterBindSource);

@@ -52,7 +52,7 @@ type
     class function NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioNaturalBindSourceAdapterSource)
       : IioActiveBindSourceAdapter;
 // ----- OLD CODE -----
-//    class function GetBSAfromMasterBindSourceAdapter(const ASenderBSName: String; const AOwner: TComponent; const AMasterBindSource: IioNotifiableBindSource;
+//    class function GetBSAfromMasterBindSourceAdapter(const ASenderBSName: String; const AOwner: TComponent; const AMasterBindSource: IioBindSource;
 //      const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
 // ----- OLD CODE -----
     class function GetNaturalBSAfromMasterBindSource(const AOwner: TComponent; const ASenderBSName: String; const AMasterBS: IioBindSource): IioActiveBindSourceAdapter;
@@ -209,7 +209,7 @@ end;
 
 // ----- OLD CODE -----
 //class function TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(const ASenderBSName: String; const AOwner: TComponent;
-//  const AMasterBindSource: IioNotifiableBindSource; const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
+//  const AMasterBindSource: IioBindSource; const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
 //begin
 //  // If the MasterPropertyName property is empty then get a NaturalActiveBindSourceAdapter
 //  // from the MasterBindSource else get a detail ActiveBindSourceAdapter even from the

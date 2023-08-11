@@ -245,7 +245,7 @@ begin
           if Supports(LPresenterSettings[I].Obj, IioBindSource, LParamBS) then
             LTargetBS.SetSelectorFor(LParamBS)
           else
-            raise EioException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioMasterBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
+            raise EioException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
         end;
       // WhereBuilderFor
       TioDIPresenterSettingsType.pstWhereBuilderFor:
@@ -253,7 +253,7 @@ begin
           if Supports(LTargetBS, IioMasterBindSource, LTargetMasterBS) and Supports(LPresenterSettings[I].Obj, IioMasterBindSource, LParamMasterBS) then
             LTargetMasterBS.SetWhereBuilderFor(LParamMasterBS)
           else
-            raise EioException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioNotifiableBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
+            raise EioException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
         end;
       // ETMfor
       TioDIPresenterSettingsType.pstETMfor:
@@ -261,7 +261,7 @@ begin
           if Supports(LTargetBS, IioMasterBindSource, LTargetMasterBS) and Supports(LPresenterSettings[I].Obj, IioMasterBindSource, LParamMasterBS) then
             LTargetMasterBS.SetETMfor(LParamMasterBS)
           else
-            raise EioException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioNotifiableBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
+            raise EioException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
         end;
     end;
   end;

@@ -1334,7 +1334,7 @@ begin
   if AETMfor <> nil then
   begin
     if not Supports(AETMfor, IioBindSource, FETMfor) then
-      raise EioEtmException.Create(ClassName, '_SetETMfor', 'The object received into the "AETMfor" parameter does not implement the interface "IioNotifiableBindSource".');
+      raise EioEtmException.Create(ClassName, '_SetETMfor', 'The object received into the "AETMfor" parameter does not implement the interface "IioBindSource".');
   end
   else
     FETMfor := nil;

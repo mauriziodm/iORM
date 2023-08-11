@@ -1673,7 +1673,7 @@ begin
         vcByViewContext:
           io.ShowCurrent(FTargetBindSource as IioBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
 //        vcNone:
-//          io.ShowCurrent(FFromBS as IioNotifiableBindSource, FParentCloseQueryAction, nil, FVVMTypeAlias);
+//          io.ShowCurrent(FFromBS as IioBindSource, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
     // smBSEach
     smBSEach:
@@ -1687,7 +1687,7 @@ begin
         vcByViewContext:
           io.ShowEach(FTargetBindSource as IioBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
 //        vcNone:
-//          io.ShowEach(FFromBS as IioNotifiableBindSource, FParentCloseQueryAction, nil, FVVMTypeAlias);
+//          io.ShowEach(FFromBS as IioBindSource, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
     // smEntityTypeName
     smEntityTypeName:
