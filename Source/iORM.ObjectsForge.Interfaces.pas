@@ -258,8 +258,8 @@ begin
       // ETMfor
       TioDIPresenterSettingsType.pstETMfor:
         begin
-          if Supports(LPresenterSettings[I].Obj, IioBindSource, LParamBS) then
-            LTargetBS.SetSelectorFor(LParamBS)
+          if Supports(LTargetBS, IioMasterBindSource, LTargetMasterBS) and Supports(LPresenterSettings[I].Obj, IioMasterBindSource, LParamMasterBS) then
+            LTargetMasterBS.SetETMfor(LParamMasterBS)
           else
             raise EioException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioNotifiableBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
         end;
