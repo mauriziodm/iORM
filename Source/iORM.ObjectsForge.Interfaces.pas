@@ -226,7 +226,7 @@ begin
               LTargetBS.Open;
           end
           else
-            raise EioException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioNotifiableBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
+            raise EioException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
         end;
       // Where
       TioDIPresenterSettingsType.pstWhere:
@@ -245,7 +245,7 @@ begin
           if Supports(LPresenterSettings[I].Obj, IioBindSource, LParamBS) then
             LTargetBS.SetSelectorFor(LParamBS)
           else
-            raise EioException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioNotifiableBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
+            raise EioException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioMasterBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
         end;
       // WhereBuilderFor
       TioDIPresenterSettingsType.pstWhereBuilderFor:
