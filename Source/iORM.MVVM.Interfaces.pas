@@ -65,11 +65,11 @@ type
     function GetVMAction(const AName: String): IioVMAction;
     property VMAction[const AName: String]: IioVMAction read GetVMAction;
     // Presenter property
-    function GetPresenter(const AName: String): IioNotifiableBindSource;
-    property Presenter[const AName: String]: IioNotifiableBindSource read GetPresenter;
+    function GetPresenter(const AName: String): IioBindSource;
+    property Presenter[const AName: String]: IioBindSource read GetPresenter;
     // DefaultPresenter property
-    function GetDefaultPresenter: IioNotifiableBindSource;
-    property DefaultPresenter: IioNotifiableBindSource read GetDefaultPresenter;
+    function GetDefaultPresenter: IioBindSource;
+    property DefaultPresenter: IioBindSource read GetDefaultPresenter;
   end;
 
   // Private interface of ViewModels for INTERNAL USE ONLY

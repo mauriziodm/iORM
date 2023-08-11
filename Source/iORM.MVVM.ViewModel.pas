@@ -60,9 +60,9 @@ type
   protected
     procedure Loaded; override;
     // DefaultPresenter
-    function GetDefaultPresenter: IioNotifiableBindSource;
+    function GetDefaultPresenter: IioBindSource;
     // Presenter
-    function GetPresenter(const AName: String): IioNotifiableBindSource;
+    function GetPresenter(const AName: String): IioBindSource;
     // VMAction
     function GetVMAction(const AName: String): IioVMAction;
     // ViewRegister
@@ -86,8 +86,8 @@ type
     procedure UnregisterVCProvider(const AVCProvider:TioViewContextProvider);
     // Properties
     property VMAction[const AName: String]: IioVMAction read GetVMAction;
-    property DefaultPresenter: IioNotifiableBindSource read GetDefaultPresenter;
-    property Presenter[const AName: String]: IioNotifiableBindSource read GetPresenter;
+    property DefaultPresenter: IioBindSource read GetDefaultPresenter;
+    property Presenter[const AName: String]: IioBindSource read GetPresenter;
   published
     // Events
     property OnCloseQuery: TCloseQueryEvent read FOnCloseQuery write FOnCloseQuery;
@@ -116,7 +116,7 @@ begin
   Result := FVMActionContainer.Get(AName, False);
 end;
 
-function TioViewModel.GetDefaultPresenter: IioNotifiableBindSource;
+function TioViewModel.GetDefaultPresenter: IioBindSource;
 var
   I: Integer;
 begin
@@ -126,7 +126,7 @@ begin
       Exit(TioModelPresenterCustom(Components[I]));
 end;
 
-function TioViewModel.GetPresenter(const AName: String): IioNotifiableBindSource;
+function TioViewModel.GetPresenter(const AName: String): IioBindSource;
 var
   LComponent: TComponent;
 begin

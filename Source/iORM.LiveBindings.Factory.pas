@@ -55,8 +55,8 @@ type
 //    class function GetBSAfromMasterBindSourceAdapter(const ASenderBSName: String; const AOwner: TComponent; const AMasterBindSource: IioNotifiableBindSource;
 //      const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
 // ----- OLD CODE -----
-    class function GetNaturalBSAfromMasterBindSource(const AOwner: TComponent; const ASenderBSName: String; const AMasterBS: IioNotifiableBindSource): IioActiveBindSourceAdapter;
-    class function GetDetailBSAfromMasterBindSource(const AOwner: TComponent; const ASenderBSName: String; const AMasterBS: IioNotifiableBindSource;
+    class function GetNaturalBSAfromMasterBindSource(const AOwner: TComponent; const ASenderBSName: String; const AMasterBS: IioBindSource): IioActiveBindSourceAdapter;
+    class function GetDetailBSAfromMasterBindSource(const AOwner: TComponent; const ASenderBSName: String; const AMasterBS: IioBindSource;
       const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
     class function GetBSA(const AOwner: TComponent; const ASenderBSName, ATypeName, ATypeAlias: String; const AWhere: IioWhere; const ATypeOfCollection: TioTypeOfCollection;
       const ADataObject: TObject; const AOwnsObject: Boolean): IioActiveBindSourceAdapter;
@@ -230,7 +230,7 @@ end;
 //end;
 // ----- OLD CODE -----
 
-class function TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(const AOwner: TComponent; const ASenderBSName: String; const AMasterBS: IioNotifiableBindSource): IioActiveBindSourceAdapter;
+class function TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(const AOwner: TComponent; const ASenderBSName: String; const AMasterBS: IioBindSource): IioActiveBindSourceAdapter;
 begin
   // Check if the MasterBS property is set
   if not Assigned(AMasterBS) then
@@ -242,7 +242,7 @@ begin
   Result := AMasterBS.GetActiveBindSourceAdapter.NewNaturalObjectBindSourceAdapter(AOwner);
 end;
 
-class function TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(const AOwner: TComponent; const ASenderBSName: String; const AMasterBS: IioNotifiableBindSource;
+class function TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(const AOwner: TComponent; const ASenderBSName: String; const AMasterBS: IioBindSource;
       const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
 begin
   // Check if the MasterPropertyName property is set

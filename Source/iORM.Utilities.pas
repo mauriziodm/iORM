@@ -89,8 +89,8 @@ type
     class function GetFarAncestorClassImplementingInterface(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): TRttiInstanceType;
     class function GetFarAncestorEntityImplementingInterfaceSameTableAndConnection(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): TRttiInstanceType;
     class function GetFarAncestorEntityWithSameTableAndConnection(AStartRttiInstanceType: TRttiInstanceType): TRttiInstanceType;
-    class function GetDefaultBindSource(const AViewOrViewModel: TComponent): IioNotifiableBindSource;
-    class function GetBindSource(const AViewOrViewModel: TComponent; const AName: String): IioNotifiableBindSource;
+    class function GetDefaultBindSource(const AViewOrViewModel: TComponent): IioBindSource;
+    class function GetBindSource(const AViewOrViewModel: TComponent; const AName: String): IioBindSource;
     // Funzioni che implementano verifiche riguardo l'essere Entità
     class function isEntityType(const ARTTIType: TRttiType): Boolean;
     class function isEntityAttribute(const AAttribute: TCustomAttribute): Boolean;
@@ -244,8 +244,8 @@ begin
   Result := TypeInfoToTypeName(TypeInfo(T), AQualified);
 end;
 
-class function TioUtilities.GetBindSource(const AViewOrViewModel: TComponent; const AName: String): IioNotifiableBindSource;
-  function _GetSimpleViewBindSource: IioNotifiableBindSource;
+class function TioUtilities.GetBindSource(const AViewOrViewModel: TComponent; const AName: String): IioBindSource;
+  function _GetSimpleViewBindSource: IioBindSource;
   var
     LComponent: TComponent;
   begin
@@ -253,7 +253,7 @@ class function TioUtilities.GetBindSource(const AViewOrViewModel: TComponent; co
     if AName.IsEmpty then
       Exit(GetDefaultBindSource(AViewOrViewModel));
     LComponent := AViewOrViewModel.FindComponent(AName);
-    if Assigned(LComponent) and Supports(LComponent, IioNotifiableBindSource, Result) then
+    if Assigned(LComponent) and Supports(LComponent, IioBindSource, Result) then
       Exit
     else
       raise EioException.Create(ClassName, 'GetBindSource', Format('BindSource named "%s" not found.', [AName]));
@@ -271,13 +271,13 @@ begin
     Result := _GetSimpleViewBindSource;
 end;
 
-class function TioUtilities.GetDefaultBindSource(const AViewOrViewModel: TComponent): IioNotifiableBindSource;
-  function _GetSimpleViewDefaultBindSource: IioNotifiableBindSource;
+class function TioUtilities.GetDefaultBindSource(const AViewOrViewModel: TComponent): IioBindSource;
+  function _GetSimpleViewDefaultBindSource: IioBindSource;
   var
     I: Integer;
   begin
     for I := 0 to AViewOrViewModel.ComponentCount - 1 do
-      if Supports(AViewOrViewModel.Components[I], IioNotifiableBindSource, Result) and Result.AsDefault then
+      if Supports(AViewOrViewModel.Components[I], IioBindSource, Result) and Result.AsDefault then
         Exit;
     Result := nil;
   end;

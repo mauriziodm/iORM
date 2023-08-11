@@ -62,7 +62,7 @@ type
     FMasterPropertyName: String;
     FMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     FDetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
-    FBindSource: IioNotifiableBindSource;
+    FBindSource: IioBindSource;
     // FNaturalBSA_MasterBindSourceAdapter: IioActiveBindSourceAdapter;
     FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     FBSPersistenceDeleting: Boolean;
@@ -145,8 +145,8 @@ type
     function MasterAdaptersContainer:IioDetailBindSourceAdaptersContainer;
     procedure SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
     procedure SetMasterProperty(AMasterProperty: IioProperty);
-    procedure SetBindSource(ANotifiableBindSource: IioNotifiableBindSource);
-    function GetBindSource: IioNotifiableBindSource;
+    procedure SetBindSource(ANotifiableBindSource: IioBindSource);
+    function GetBindSource: IioBindSource;
     function HasBindSource: boolean;
     procedure ExtractDetailObject(AMasterObj: TObject);
     procedure PersistCurrent;
@@ -425,7 +425,7 @@ begin
   Result := FLoadType = ltAuto;
 end;
 
-function TioActiveInterfaceObjectBindSourceAdapter.GetBindSource: IioNotifiableBindSource;
+function TioActiveInterfaceObjectBindSourceAdapter.GetBindSource: IioBindSource;
 begin
   Result := FBindSource;
 end;
@@ -682,7 +682,7 @@ begin
   FLoadType := Value;
 end;
 
-procedure TioActiveInterfaceObjectBindSourceAdapter.SetBindSource(ANotifiableBindSource: IioNotifiableBindSource);
+procedure TioActiveInterfaceObjectBindSourceAdapter.SetBindSource(ANotifiableBindSource: IioBindSource);
 begin
   FBindSource := ANotifiableBindSource;
 end;

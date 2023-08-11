@@ -142,7 +142,7 @@ end;
 
 function TioModelDataSet.GetModelPresenterInstance: TioModelPresenterCustom;
 var
-  LBindSource: IioNotifiableBindSource;
+  LBindSource: IioBindSource;
 begin
   Result := nil;
   LBindSource := ViewModelBridge.Presenter[ModelPresenter];

@@ -51,21 +51,21 @@ type
   TioCommonBSBehavior = class
   public
     // Common code for ABSA to manage notifications
-    class procedure Notify(const ASender: TObject; const ATargetBS: IioNotifiableBindSource; const [Ref] ANotification: TioBSNotification);
+    class procedure Notify(const ASender: TObject; const ATargetBS: IioBindSource; const [Ref] ANotification: TioBSNotification);
     // Common code for selection
-    class procedure Select<T>(const ASender: TObject; const ATargetBS: IioNotifiableBindSource; ASelected: T;
+    class procedure Select<T>(const ASender: TObject; const ATargetBS: IioBindSource; ASelected: T;
       ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     // Common code for some checks by the bind sources
-    class procedure CheckForOpen(const ABindSource: IioNotifiableBindSource; const ALoadType: TioLoadType);
-    class procedure CheckForSetDataObject(const ABindSource: IioNotifiableBindSource; const ALoadType: TioLoadType; const ADataObject: TObject);
-    class procedure CheckForSetSourceBS(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
-    class procedure CheckForSetLoadType(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
+    class procedure CheckForOpen(const ABindSource: IioBindSource; const ALoadType: TioLoadType);
+    class procedure CheckForSetDataObject(const ABindSource: IioBindSource; const ALoadType: TioLoadType; const ADataObject: TObject);
+    class procedure CheckForSetSourceBS(const ABindSource, ASourceBS: IioBindSource; const ALoadType: TioLoadType);
+    class procedure CheckForSetLoadType(const ABindSource, ASourceBS: IioBindSource; const ALoadType: TioLoadType);
     class function CheckIfLoadTypeIsFromBS(const ALoadType: TioLoadType): Boolean;
     // Common code for AsDefaulr property (for master BindSources)
     class procedure SetAsDefaultPropertyOfAllBindSourcesToFalse(const AOwner: TComponent; const AValue: Boolean);
     class procedure InitAsDefaultOnCreate(const ABindSource: TComponent; var AAsDefaultValue: Boolean);
 
-    class function IsValidForDependencyInjectionLocator(const ABindSource: IioNotifiableBindSource; const ACheckCurrentObj, ARaiseExceptions: Boolean): Boolean;
+    class function IsValidForDependencyInjectionLocator(const ABindSource: IioBindSource; const ACheckCurrentObj, ARaiseExceptions: Boolean): Boolean;
     // Common code for WhereBuilder purposes
     class function BuildWhere(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean; const ABeforeWhereBuildEvent: TioBeforeWhereBuilderEvent; const AOnWhereBuildEvent: TioOnWhereBuilderEvent; const AAfterWhereBuildEvent: TioAfterWhereBuilderEvent): IioWhere;
     class function ClearWhere(const ASourceBS, ATargetBS: IioBSPersistenceClient; const AExecuteOnTarget: Boolean; const ABeforeWhereClearEvent: TioBeforeWhereBuilderEvent; const AOnWhereClearEvent: TioOnWhereBuilderEvent; const AAfterWhereClearEvent: TioAfterWhereBuilderEvent): IioWhere;
@@ -79,7 +79,7 @@ uses
 
 { TioCommonBSBehavior }
 
-class procedure TioCommonBSBehavior.CheckForOpen(const ABindSource: IioNotifiableBindSource; const ALoadType: TioLoadType);
+class procedure TioCommonBSBehavior.CheckForOpen(const ABindSource: IioBindSource; const ALoadType: TioLoadType);
 begin
   if ABindSource.IsMasterBS and (ALoadType = ltManual) and not ABindSource.CheckActiveAdapter then
     raise EioException.Create(ClassName, 'CheckForOpen',
@@ -87,7 +87,7 @@ begin
       [ABindSource.GetName]));
 end;
 
-class procedure TioCommonBSBehavior.CheckForSetDataObject(const ABindSource: IioNotifiableBindSource; const ALoadType: TioLoadType; const ADataObject: TObject);
+class procedure TioCommonBSBehavior.CheckForSetDataObject(const ABindSource: IioBindSource; const ALoadType: TioLoadType; const ADataObject: TObject);
 begin
   // Accept the new data object only if LoadType is ltManual
   if ALoadType <> ltManual then
@@ -103,7 +103,7 @@ begin
       + #13#13'Please fix either of these two things and try again, it will work.', [ABindSource.GetName]));
 end;
 
-class procedure TioCommonBSBehavior.CheckForSetLoadType(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
+class procedure TioCommonBSBehavior.CheckForSetLoadType(const ABindSource, ASourceBS: IioBindSource; const ALoadType: TioLoadType);
 begin
   if Assigned(ASourceBS) and not CheckIfLoadTypeIsFromBS(ALoadType) then
     raise EioException.Create(ClassName, 'CheckForSetLoadType',
@@ -112,7 +112,7 @@ begin
       [ABindSource.GetName]));
 end;
 
-class procedure TioCommonBSBehavior.CheckForSetSourceBS(const ABindSource, ASourceBS: IioNotifiableBindSource; const ALoadType: TioLoadType);
+class procedure TioCommonBSBehavior.CheckForSetSourceBS(const ABindSource, ASourceBS: IioBindSource; const ALoadType: TioLoadType);
 begin
   if Assigned(ASourceBS) and not CheckIfLoadTypeIsFromBS(ALoadType) then
     raise EioException.Create(ClassName, 'CheckForSetSourceBS',
@@ -130,7 +130,7 @@ class procedure TioCommonBSBehavior.InitAsDefaultOnCreate(const ABindSource: TCo
 var
   I: Integer;
   LCurrentComponent: TObject;
-  LCurrentBindSource: IioNotifiableBindSource;
+  LCurrentBindSource: IioBindSource;
 begin
   // At DesignTime initialize the "AsDefault" property at True if it is the
   // first ModelPresenter inserted (no other presenters presents).
@@ -143,7 +143,7 @@ begin
     begin
       LCurrentComponent := ABindSource.Owner.Components[I];
       // Ovviamente salta se stesso
-      if (LCurrentComponent <> ABindSource) and Supports(LCurrentComponent, IioNotifiableBindSource, LCurrentBindSource) and LCurrentBindSource.AsDefault then
+      if (LCurrentComponent <> ABindSource) and Supports(LCurrentComponent, IioBindSource, LCurrentBindSource) and LCurrentBindSource.AsDefault then
       begin
         AAsDefaultValue := False;
         Exit;
@@ -154,7 +154,7 @@ begin
     AAsDefaultValue := False;
 end;
 
-class function TioCommonBSBehavior.IsValidForDependencyInjectionLocator(const ABindSource: IioNotifiableBindSource;
+class function TioCommonBSBehavior.IsValidForDependencyInjectionLocator(const ABindSource: IioBindSource;
   const ACheckCurrentObj, ARaiseExceptions: Boolean): Boolean;
 begin
   // Init
@@ -176,7 +176,7 @@ begin
     raise EioException.Create(Self.ClassName, 'IsValidForDependencyInjectionLocator', '"Current" object of the ModelPresenter not assigned.');
 end;
 
-class procedure TioCommonBSBehavior.Notify(const ASender: TObject; const ATargetBS: IioNotifiableBindSource; const [Ref] ANotification: TioBSNotification);
+class procedure TioCommonBSBehavior.Notify(const ASender: TObject; const ATargetBS: IioBindSource; const [Ref] ANotification: TioBSNotification);
 var
   LBSPersistenceClient: IioBSPersistenceClient;
   LNotificationPointer: PioBSNotification;
@@ -253,7 +253,7 @@ begin
   end;
 end;
 
-class procedure TioCommonBSBehavior.Select<T>(const ASender: TObject; const ATargetBS: IioNotifiableBindSource; ASelected: T;
+class procedure TioCommonBSBehavior.Select<T>(const ASender: TObject; const ATargetBS: IioBindSource; ASelected: T;
   ASelectionType: TioSelectionType = TioSelectionType.stAppend);
 var
   LDestBSA: IioActiveBindSourceAdapter;
@@ -293,12 +293,12 @@ end;
 class procedure TioCommonBSBehavior.SetAsDefaultPropertyOfAllBindSourcesToFalse(const AOwner: TComponent; const AValue: Boolean);
 var
   I: Integer;
-  LBindSource: IioNotifiableBindSource;
+  LBindSource: IioBindSource;
 begin
   // Uncheck AsDefault property for all bin sources
   if AValue then
     for I := 0 to AOwner.ComponentCount - 1 do
-      if Supports(AOwner.Components[I], IioNotifiableBindSource, LBindSource) then
+      if Supports(AOwner.Components[I], IioBindSource, LBindSource) then
         LBindSource.SetAsDefault(False);
 end;
 

@@ -184,7 +184,7 @@ var
 //  LBSA: IioActiveBindSourceAdapter;
   LWhere: IioWhere;
   LName: String;
-  LTargetBindSource, LParamBindSource: IioNotifiableBindSource;
+  LTargetBindSource, LParamBindSource: IioBindSource;
   LIntf: IInterface;
   I: Integer;
   LPresenterSettings: TioDIPresenterSettingsContainer;
@@ -217,7 +217,7 @@ begin
       // MasterModelPresenter
       TioDIPresenterSettingsType.pstMasterModelPresenter:
         begin
-          if Supports(LPresenterSettings[I].Obj, IioNotifiableBindSource, LParamBindSource) then
+          if Supports(LPresenterSettings[I].Obj, IioBindSource, LParamBindSource) then
           begin
             LTargetBindSource.SetMasterBindSource(LParamBindSource);
             LTargetBindSource.SetMasterPropertyName(LPresenterSettings[I].StringParameter);
@@ -241,7 +241,7 @@ begin
       // SelectorFor
       TioDIPresenterSettingsType.pstSelectorFor:
         begin
-          if Supports(LPresenterSettings[I].Obj, IioNotifiableBindSource, LParamBindSource) then
+          if Supports(LPresenterSettings[I].Obj, IioBindSource, LParamBindSource) then
             LTargetBindSource.SetSelectorFor(LParamBindSource)
           else
             raise EioException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioNotifiableBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));

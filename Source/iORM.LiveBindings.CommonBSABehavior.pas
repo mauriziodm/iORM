@@ -410,7 +410,7 @@ end;
 
 class procedure TioCommonBSABehavior.AddBSProperties(const ABindSourceAdapter: TBindSourceAdapter; const AFieldsList: TList<TBindSourceAdapterField>);
 var
-  LBindSource: IioNotifiableBindSource;
+  LBindSource: IioBindSource;
   // LObject: TObject;
   LGetMemberObject: IGetMemberObject;
 begin

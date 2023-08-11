@@ -60,9 +60,9 @@ type
     // VMAction
     function GetVMAction(const AName: String): IioVMAction;
     // Default presenter
-    function GetDefaultPresenter: IioNotifiableBindSource;
+    function GetDefaultPresenter: IioBindSource;
     // Presenter
-    function GetPresenter(const AName: String): IioNotifiableBindSource;
+    function GetPresenter(const AName: String): IioBindSource;
     // ViewModel
     function GetViewModel: IioViewModel;
   protected
@@ -78,8 +78,8 @@ type
     property ViewModel: IioViewModel read GetViewModel;
     property VMActions: IioVMActionContainer read GetVMActions;
     property VMAction[const AName: String]: IioVMAction read GetVMAction; default;
-    property DefaultPresenter: IioNotifiableBindSource read GetDefaultPresenter;
-    property Presenter[const AName: String]: IioNotifiableBindSource read GetPresenter;
+    property DefaultPresenter: IioBindSource read GetDefaultPresenter;
+    property Presenter[const AName: String]: IioBindSource read GetPresenter;
   published
     // Events
     property OnNeedViewModel: TioNeedViewModelEvent read FOnNeedViewModel write FOnNeedViewModel;
@@ -237,7 +237,7 @@ begin
   Result := io.Version;
 end;
 
-function TioViewModelBridge.GetDefaultPresenter: IioNotifiableBindSource;
+function TioViewModelBridge.GetDefaultPresenter: IioBindSource;
 begin
   CheckForViewModel;
   if Assigned(FViewModel) then
@@ -246,7 +246,7 @@ begin
     raise EioException.Create(Self.Name, 'GetDefaultPresenter', '"FViewModel" not assigned.');
 end;
 
-function TioViewModelBridge.GetPresenter(const AName: String): IioNotifiableBindSource;
+function TioViewModelBridge.GetPresenter(const AName: String): IioBindSource;
 begin
   CheckForViewModel;
   if Assigned(FViewModel) then

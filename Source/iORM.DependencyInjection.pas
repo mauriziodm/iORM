@@ -146,12 +146,12 @@ type
 
     function SetBindSource(const AName: String; const ADataObject: TObject): TioDependencyInjectionRegister; overload;
     // function SetBindSource(const AName:String; const ABindSourceAdapter:IioActiveBindSourceAdapter): TioDependencyInjectionRegister; overload;
-    function SetBindSource(const AName: String; const AMasterBindSource: IioNotifiableBindSource; const AMasterPropertyName: String = '')
+    function SetBindSource(const AName: String; const AMasterBindSource: IioBindSource; const AMasterPropertyName: String = '')
       : TioDependencyInjectionRegister; overload;
     function SetBindSource(const AName: String; const AWhere: IioWhere): TioDependencyInjectionRegister; overload;
     function SetBindSource(const AName: String; const AOrderBy: String): TioDependencyInjectionRegister; overload;
 
-    function SetBindSourceAsSelectorFor(const ASourcePresenterName: String; const ASelectionDest: IioNotifiableBindSource): TioDependencyInjectionRegister;
+    function SetBindSourceAsSelectorFor(const ASourcePresenterName: String; const ASelectionDest: IioBindSource): TioDependencyInjectionRegister;
 
     function AsDescendantClassOf(const AAncestorClassName: String; const AAlias: String = ''): TioDependencyInjectionRegister; overload;
 
@@ -207,7 +207,7 @@ type
     FParentCloseQueryAction: IioBSCloseQueryAction;
     // For directly passed ViewContext (TCOmponent descendant) without the use of a ViewContextProvider (or in combination with it)
     // ---------- FOR SHOW EACH FUNCTIONALITY ----------
-    FForEachModelPresenter: IioNotifiableBindSource;
+    FForEachModelPresenter: IioBindSource;
     FForEachLocateViewModel: Boolean;
     // ---------- FOR SHOW EACH FUNCTIONALITY ----------
     procedure ClearPresenterSettings;
@@ -235,7 +235,7 @@ type
     // ---------- FOR SHOW EACH FUNCTIONALITY ----------
     function ShowCurrent: TComponent;
     procedure ShowEach;
-    procedure _SetForEachModelPresenter(const AModelPresenter: IioNotifiableBindSource; const ALocateViewModel: Boolean);
+    procedure _SetForEachModelPresenter(const AModelPresenter: IioBindSource; const ALocateViewModel: Boolean);
     procedure _DuplicateLocatorForShowEachPurposeFrom(const ASourceLocator: TioDependencyInjectionLocator);
     function _GetAlias: String;
     function _GetConstructorMethod: String;
@@ -252,17 +252,17 @@ type
     // SetBindSource (passing the name of the destination presenter)
     function SetBindSource(const ATargetBSName: String; const ADataObject: TObject): IioDependencyInjectionLocator; overload;
     function SetBindSource(const ATargetBSName: String; const AInterfacedObj: IInterface): IioDependencyInjectionLocator; overload;
-    function SetBindSource(const ATargetBSName: String; const AMasterBindSource: IioNotifiableBindSource; const AMasterPropertyName: String = ''): IioDependencyInjectionLocator; overload;
+    function SetBindSource(const ATargetBSName: String; const AMasterBindSource: IioBindSource; const AMasterPropertyName: String = ''): IioDependencyInjectionLocator; overload;
     function SetBindSource(const ATargetBSName: String; const AWhere: IioWhere): IioDependencyInjectionLocator; overload;
     function SetBindSource(const ATargetBSName: String; const AOrderBy: String): IioDependencyInjectionLocator; overload;
-    function SetBindSourceAsSelectorFor(const ASourceBSName: String; const ASelectorBSName: IioNotifiableBindSource): IioDependencyInjectionLocator; overload;
+    function SetBindSourceAsSelectorFor(const ASourceBSName: String; const ASelectorBSName: IioBindSource): IioDependencyInjectionLocator; overload;
     // SetBindSource (WITHOUT passing the name of the destination presenter)
     function SetBindSource(const ADataObject: TObject): IioDependencyInjectionLocator; overload;
     function SetBindSource(const AInterfacedObj: IInterface): IioDependencyInjectionLocator; overload;
-    function SetBindSource(const AMasterBindSource: IioNotifiableBindSource; const AMasterPropertyName: String = ''): IioDependencyInjectionLocator; overload;
+    function SetBindSource(const AMasterBindSource: IioBindSource; const AMasterPropertyName: String = ''): IioDependencyInjectionLocator; overload;
     function SetBindSource(const AWhere: IioWhere): IioDependencyInjectionLocator; overload;
     function SetBindSource(const AOrderBy: String): IioDependencyInjectionLocator; overload;
-    function SetBindSourceAsSelectorFor(const ASelectorBSName: IioNotifiableBindSource): IioDependencyInjectionLocator; overload;
+    function SetBindSourceAsSelectorFor(const ASelectorBSName: IioBindSource): IioDependencyInjectionLocator; overload;
     // ---------- SETBINDSOURCE METHODS ----------
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
     function VCProvider(const AVCProvider: TioViewContextProvider): IioDependencyInjectionLocator;
@@ -289,17 +289,17 @@ type
     // SetPresenter (passing the name of the destination presenter)
     function SetBindSource(const ATargetBSName: String; const ADataObject: TObject): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSource(const ATargetBSName: String; const AInterfacedObj: IInterface): IioDependencyInjectionLocator<TI>; overload;
-    function SetBindSource(const ATargetBSName: String; const AMasterPresenter: IioNotifiableBindSource; const AMasterPropertyName: String = ''): IioDependencyInjectionLocator<TI>; overload;
+    function SetBindSource(const ATargetBSName: String; const AMasterPresenter: IioBindSource; const AMasterPropertyName: String = ''): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSource(const ATargetBSName: String; const AWhere: IioWhere): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSource(const ATargetBSName: String; const AOrderBy: String): IioDependencyInjectionLocator<TI>; overload;
-    function SetBindSourceAsSelectorFor(const ASourceBSName: String; const ASelectorBSName: IioNotifiableBindSource): IioDependencyInjectionLocator<TI>; overload;
+    function SetBindSourceAsSelectorFor(const ASourceBSName: String; const ASelectorBSName: IioBindSource): IioDependencyInjectionLocator<TI>; overload;
     // SetPresenter (WITHOUT passing the name of the destination presenter)
     function SetBindSource(const ADataObject: TObject): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSource(const AInterfacedObj: IInterface): IioDependencyInjectionLocator<TI>; overload;
-    function SetBindSource(const AMasterPresenter: IioNotifiableBindSource; const AMasterPropertyName: String = ''): IioDependencyInjectionLocator<TI>; overload;
+    function SetBindSource(const AMasterPresenter: IioBindSource; const AMasterPropertyName: String = ''): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSource(const AWhere: IioWhere): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSource(const AOrderBy: String): IioDependencyInjectionLocator<TI>; overload;
-    function SetBindSourceAsSelectorFor(const ASelectorBSName: IioNotifiableBindSource): IioDependencyInjectionLocator<TI>; overload;
+    function SetBindSourceAsSelectorFor(const ASelectorBSName: IioBindSource): IioDependencyInjectionLocator<TI>; overload;
     // ---------- VIEW MODEL METHODS ----------
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
     function VCProvider(const AVCProvider: TioViewContextProvider): IioDependencyInjectionLocator<TI>;
@@ -329,7 +329,7 @@ type
   TioDependencyInjection = class(TioDependencyInjectionBase)
   private
     class function _LocateForEachVVM_1stPhase_Browse(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function _LocateForEachVVM_2ndPhase_Create(const ASourceMP: IioNotifiableBindSource; const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String = '';
+    class function _LocateForEachVVM_2ndPhase_Create(const ASourceMP: IioBindSource; const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String = '';
       const AViewModelMarker: String = ''): IioDependencyInjectionLocator; overload;
   public
     class function Singletons: TioSingletonsFacadeRef;
@@ -345,7 +345,7 @@ type
     class function LocateSimpleViewFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): IioDependencyInjectionLocator; overload;
     class function LocateSimpleViewFor(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): IioDependencyInjectionLocator; overload;
     class function LocateSimpleViewFor(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateSimpleViewFor(const ATargetMP: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateSimpleViewFor(const ATargetMP: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): IioDependencyInjectionLocator; overload;
     // Locate View
     class function LocateView(const AInterfaceName: String; const AVAlias: String = ''): IioDependencyInjectionLocator; overload;
     class function LocateView<T: IInterface>(const AVAlias: String = ''): IioDependencyInjectionLocator<T>; overload;
@@ -354,7 +354,7 @@ type
     class function LocateViewFor<T>(const AVAlias: String = ''): IioDependencyInjectionLocator; overload;
     class function LocateViewFor(const ATargetObj: TObject; const AVAlias: String = ''): IioDependencyInjectionLocator; overload;
     class function LocateViewFor(const ATargetIntf: IInterface; const AVAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateViewFor(const ATargetMP: IioNotifiableBindSource; const AVAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateViewFor(const ATargetMP: IioBindSource; const AVAlias: String = ''): IioDependencyInjectionLocator; overload;
     // Locate ViewModel
     class function LocateVM(const AInterfaceName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): IioDependencyInjectionLocator; overload;
     class function LocateVM<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): IioDependencyInjectionLocator<T>; overload;
@@ -371,7 +371,7 @@ type
     class function LocateViewVMfor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''; const AViewModelMarker: String = ''): IioDependencyInjectionLocator; overload;
     class function LocateViewVMfor(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''): IioDependencyInjectionLocator; overload;
     class function LocateViewVMfor(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''): IioDependencyInjectionLocator; overload;
-    class function LocateViewVMfor(const ASourceMP: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''): IioDependencyInjectionLocator; overload;
+    class function LocateViewVMfor(const ASourceMP: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''): IioDependencyInjectionLocator; overload;
   end;
 
   // Dependency Injection Factory
@@ -382,9 +382,9 @@ type
     class function GetRegister(const AContainerValue: TioDIContainerImplementersItem): TioDependencyInjectionRegister;
     class function GetLocator(const AInterfaceName: String; const AAlias: String; const AOwnerRequested, AVCProviderEnabled: Boolean; const ADICObjType: TioDICObjType): IioDependencyInjectionLocator; overload;
     class function GetLocator<TI>(const AAlias: String; const AOwnerRequested, AVCProviderEnabled: Boolean; const ADICObjType: TioDICObjType): IioDependencyInjectionLocator<TI>; overload;
-    class function GetSimpleViewLocatorFor(const ATargetBS: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): IioDependencyInjectionLocator; overload;
-    class function GetViewLocatorFor(const ATargetBS: IioNotifiableBindSource; const AVAlias: String): IioDependencyInjectionLocator; overload;
-    class function GetViewVMLocatorFor(const ATargetBS: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const ACreateViewModel: Boolean)
+    class function GetSimpleViewLocatorFor(const ATargetBS: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): IioDependencyInjectionLocator; overload;
+    class function GetViewLocatorFor(const ATargetBS: IioBindSource; const AVAlias: String): IioDependencyInjectionLocator; overload;
+    class function GetViewVMLocatorFor(const ATargetBS: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const ACreateViewModel: Boolean)
       : IioDependencyInjectionLocator; overload;
     // NB: IL codice del metodo sotto commentato è anch'esso commentato
     // class function GetVMLocatorFor(const AModelPresenter:TioModelPresenter; const AAlias:String): IioDependencyInjectionLocator; overload;
@@ -541,7 +541,7 @@ begin
   Result := LocateViewFor(TioUtilities.GenericToString<T>, AVAlias);
 end;
 
-class function TioDependencyInjection.LocateViewFor(const ATargetMP: IioNotifiableBindSource; const AVAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateViewFor(const ATargetMP: IioBindSource; const AVAlias: String): IioDependencyInjectionLocator;
 begin
   // Get & set the locator
   Result := TioDependencyInjectionFactory.GetViewLocatorFor(ATargetMP, AVAlias);
@@ -616,7 +616,7 @@ begin
   Result := LocateViewFor((ATargetIntf as TObject).ClassName, AVAlias);
 end;
 
-class function TioDependencyInjection.LocateViewVMfor(const ASourceMP: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateViewVMfor(const ASourceMP: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String): IioDependencyInjectionLocator;
 begin
   // Get & set the locator
   Result := TioDependencyInjectionFactory.GetViewVMLocatorFor(ASourceMP, AParentCloseQueryAction, AVVMAlias, False);
@@ -629,7 +629,7 @@ begin
   Result := TioDependencyInjectionFactory.GetLocator(ATargetTypeName, AAlias, True, True, dotView).SetParentCloseQueryAction(AParentCloseQueryAction);
 end;
 
-class function TioDependencyInjection._LocateForEachVVM_2ndPhase_Create(const ASourceMP: IioNotifiableBindSource; const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias, AViewModelMarker: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection._LocateForEachVVM_2ndPhase_Create(const ASourceMP: IioBindSource; const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias, AViewModelMarker: String): IioDependencyInjectionLocator;
 var
   LViewModel: IioViewModel;
 begin
@@ -657,7 +657,7 @@ begin
   Result := LocateSimpleViewFor(TioUtilities.GenericToString<T>, AParentCloseQueryAction, ASVAlias);
 end;
 
-class function TioDependencyInjection.LocateSimpleViewFor(const ATargetMP: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.LocateSimpleViewFor(const ATargetMP: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): IioDependencyInjectionLocator;
 begin
   // Get & set the locator
   Result := TioDependencyInjectionFactory.GetSimpleViewLocatorFor(ATargetMP, AParentCloseQueryAction, ASVAlias);
@@ -928,7 +928,7 @@ end;
 // Result := Self;
 // end;
 
-function TioDependencyInjectionRegister.SetBindSource(const AName: String; const AMasterBindSource: IioNotifiableBindSource; const AMasterPropertyName: String)
+function TioDependencyInjectionRegister.SetBindSource(const AName: String; const AMasterBindSource: IioBindSource; const AMasterPropertyName: String)
   : TioDependencyInjectionRegister;
 var
   i: Integer;
@@ -982,7 +982,7 @@ begin
   Result := Self;
 end;
 
-function TioDependencyInjectionRegister.SetBindSourceAsSelectorFor(const ASourcePresenterName: String; const ASelectionDest: IioNotifiableBindSource)
+function TioDependencyInjectionRegister.SetBindSourceAsSelectorFor(const ASourcePresenterName: String; const ASelectionDest: IioBindSource)
   : TioDependencyInjectionRegister;
 var
   i: Integer;
@@ -1370,7 +1370,7 @@ begin
   Result := Self;
 end;
 
-function TioDependencyInjectionLocator.SetBindSource(const ATargetBSName: String; const AMasterBindSource: IioNotifiableBindSource; const AMasterPropertyName: String)
+function TioDependencyInjectionLocator.SetBindSource(const ATargetBSName: String; const AMasterBindSource: IioBindSource; const AMasterPropertyName: String)
   : IioDependencyInjectionLocator;
 var
   i: Integer;
@@ -1419,7 +1419,7 @@ begin
   Result := SetBindSource('', ADataObject);
 end;
 
-function TioDependencyInjectionLocator.SetBindSource(const AMasterBindSource: IioNotifiableBindSource; const AMasterPropertyName: String)
+function TioDependencyInjectionLocator.SetBindSource(const AMasterBindSource: IioBindSource; const AMasterPropertyName: String)
   : IioDependencyInjectionLocator;
 begin
   Result := SetBindSource('', AMasterBindSource, AMasterPropertyName);
@@ -1447,7 +1447,7 @@ begin
   Result := Self;
 end;
 
-function TioDependencyInjectionLocator.SetBindSourceAsSelectorFor(const ASourceBSName: String; const ASelectorBSName: IioNotifiableBindSource)
+function TioDependencyInjectionLocator.SetBindSourceAsSelectorFor(const ASourceBSName: String; const ASelectorBSName: IioBindSource)
   : IioDependencyInjectionLocator;
 var
   i: Integer;
@@ -1460,7 +1460,7 @@ begin
   Result := Self;
 end;
 
-function TioDependencyInjectionLocator.SetBindSourceAsSelectorFor(const ASelectorBSName: IioNotifiableBindSource): IioDependencyInjectionLocator;
+function TioDependencyInjectionLocator.SetBindSourceAsSelectorFor(const ASelectorBSName: IioBindSource): IioDependencyInjectionLocator;
 begin
   Result := SetBindSourceAsSelectorFor('', ASelectorBSName);
 end;
@@ -1714,7 +1714,7 @@ begin
   Result := FViewContext;
 end;
 
-procedure TioDependencyInjectionLocator._SetForEachModelPresenter(const AModelPresenter: IioNotifiableBindSource; const ALocateViewModel: Boolean);
+procedure TioDependencyInjectionLocator._SetForEachModelPresenter(const AModelPresenter: IioBindSource; const ALocateViewModel: Boolean);
 begin
   FForEachModelPresenter := AModelPresenter;
   FForEachLocateViewModel := ALocateViewModel;
@@ -1775,7 +1775,7 @@ begin
   Result := TioDependencyInjectionLocator.Create(LDIContainerKey, AAlias, AOwnerRequested, AVCProviderEnabled);
 end;
 
-class function TioDependencyInjectionFactory.GetViewLocatorFor(const ATargetBS: IioNotifiableBindSource; const AVAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjectionFactory.GetViewLocatorFor(const ATargetBS: IioBindSource; const AVAlias: String): IioDependencyInjectionLocator;
 begin
   // Check for ModelPresenter validity
   TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ATargetBS, True, True);
@@ -1803,7 +1803,7 @@ begin
 // ---------- OLD CODE -----------
 end;
 
-class function TioDependencyInjectionFactory.GetViewVMLocatorFor(const ATargetBS: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const ACreateViewModel: Boolean): IioDependencyInjectionLocator;
+class function TioDependencyInjectionFactory.GetViewVMLocatorFor(const ATargetBS: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const ACreateViewModel: Boolean): IioDependencyInjectionLocator;
 begin
   // Check for ModelPresenter validity
   TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ATargetBS, True, True);
@@ -1873,7 +1873,7 @@ begin
   Result := TioDependencyInjectionRegister.Create(AContainerValue);
 end;
 
-class function TioDependencyInjectionFactory.GetSimpleViewLocatorFor(const ATargetBS: IioNotifiableBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjectionFactory.GetSimpleViewLocatorFor(const ATargetBS: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): IioDependencyInjectionLocator;
 begin
   // Check for ModelPresenter validity
   TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ATargetBS, True, True);
@@ -1952,7 +1952,7 @@ begin
   TioDependencyInjectionLocator(Self).SetBindSource(ATargetBSName, ADataObject);
 end;
 
-function TioDependencyInjectionLocator<TI>.SetBindSource(const ATargetBSName: String; const AMasterPresenter: IioNotifiableBindSource;
+function TioDependencyInjectionLocator<TI>.SetBindSource(const ATargetBSName: String; const AMasterPresenter: IioBindSource;
   const AMasterPropertyName: String): IioDependencyInjectionLocator<TI>;
 begin
   Result := Self;
@@ -2170,7 +2170,7 @@ begin
   TioDependencyInjectionLocator(Self).SetBindSource(ADataObject);
 end;
 
-function TioDependencyInjectionLocator<TI>.SetBindSource(const AMasterPresenter: IioNotifiableBindSource; const AMasterPropertyName: String)
+function TioDependencyInjectionLocator<TI>.SetBindSource(const AMasterPresenter: IioBindSource; const AMasterPropertyName: String)
   : IioDependencyInjectionLocator<TI>;
 begin
   Result := Self;
@@ -2195,14 +2195,14 @@ begin
   TioDependencyInjectionLocator(Self).SetBindSource(ATargetBSName, AInterfacedObj);
 end;
 
-function TioDependencyInjectionLocator<TI>.SetBindSourceAsSelectorFor(const ASourceBSName: String; const ASelectorBSName: IioNotifiableBindSource)
+function TioDependencyInjectionLocator<TI>.SetBindSourceAsSelectorFor(const ASourceBSName: String; const ASelectorBSName: IioBindSource)
   : IioDependencyInjectionLocator<TI>;
 begin
   Result := Self;
   TioDependencyInjectionLocator(Self).SetBindSourceAsSelectorFor(ASourceBSName, ASelectorBSName);
 end;
 
-function TioDependencyInjectionLocator<TI>.SetBindSourceAsSelectorFor(const ASelectorBSName: IioNotifiableBindSource): IioDependencyInjectionLocator<TI>;
+function TioDependencyInjectionLocator<TI>.SetBindSourceAsSelectorFor(const ASelectorBSName: IioBindSource): IioDependencyInjectionLocator<TI>;
 begin
   Result := Self;
   TioDependencyInjectionLocator(Self).SetBindSourceAsSelectorFor(ASelectorBSName);

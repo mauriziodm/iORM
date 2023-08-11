@@ -45,7 +45,7 @@ uses
 
 type
 
-  TioDataSetCustom = class abstract(TioBSABaseDataSet, IioNotifiableBindSource, IioStdActionTargetBindSource)
+  TioDataSetCustom = class abstract(TioBSABaseDataSet, IioBindSource, IioStdActionTargetBindSource)
   private
     FAsDefault: Boolean;
     FTypeName: String;
@@ -55,7 +55,7 @@ type
     FLazyProps: String;
     FAsync: Boolean;
     FTypeOfCollection: TioTypeOfCollection; // Renderlo automatico??? (rilevamento se è una lista con DuckTyping)
-    FMasterBindSource: IioNotifiableBindSource;
+    FMasterBindSource: IioBindSource;
     FMasterPropertyName: String;
     FWhere: IioWhere; // Istanza temporanea solo fintanto che non c'è il BSA
     FWhereStr: TStrings;
@@ -67,7 +67,7 @@ type
     FVirtualFields: Boolean;
     FETMfor: IioBSPersistenceClient;
     // Selectors
-    FSelectorFor: IioNotifiableBindSource;
+    FSelectorFor: IioBindSource;
     FOnReceiveSelectionCloneObject: Boolean;
     FOnReceiveSelectionFreeObject: Boolean;
     // Questà è una collezione dove eventuali DataSet di dettaglio
@@ -79,7 +79,7 @@ type
     // al fatto che gli adapters di dettaglio non erano stati ancora creati (ma quello master si).
     // Ad esempio capitava che i filtri dei presenters di dettaglio impostati a
     // DesignTime (WhereStr property) non funzionassero per questo motivo.
-    FDetailBindSourceContainer: TList<IioNotifiableBindSource>;
+    FDetailBindSourceContainer: TList<IioBindSource>;
     // Selection related events
     FBeforeSelectionObject: TioBSABeforeAfterSelectionObjectEvent;
     FonSelectionObject: TioBSASelectionObjectEvent;
@@ -116,7 +116,7 @@ type
     function GetItemIndex: Integer;
     procedure SetItemIndex(const Value: Integer);
     // MasterDataSet
-    procedure SetMasterBindSource(const Value: IioNotifiableBindSource); virtual;
+    procedure SetMasterBindSource(const Value: IioBindSource); virtual;
     // MasterPropertyName
     procedure SetMasterPropertyName(const Value: String);
     function GetMasterPropertyName: String;
@@ -155,8 +155,8 @@ type
     procedure SetWhereStr(const Value: TStrings);
     procedure WhereOnChangeEventHandler(Sender: TObject);
     // SelectorFor
-    function GetSelectorFor: IioNotifiableBindSource;
-    procedure SetSelectorFor(const ATargetBindSource: IioNotifiableBindSource);
+    function GetSelectorFor: IioBindSource;
+    procedure SetSelectorFor(const ATargetBindSource: IioBindSource);
   protected
     procedure Loaded; override;
     function GetName: String;
@@ -200,12 +200,12 @@ type
     property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False;
     // published: Nascondere e default = false
     property OrderBy: String read FOrderBy Write SetOrderBy; // published: Master
-    property MasterBindSource: IioNotifiableBindSource read FMasterBindSource write SetMasterBindSource; // published: Detail
+    property MasterBindSource: IioBindSource read FMasterBindSource write SetMasterBindSource; // published: Detail
     property MasterPropertyName: String read GetMasterPropertyName write SetMasterPropertyName; // published: Detail
     property AutoRefreshOnNotification: Boolean read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default True; // published: Master+Detail
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
     // Published properties: selectors
-    property SelectorFor: IioNotifiableBindSource read GetSelectorFor write SetSelectorFor; // published: Master
+    property SelectorFor: IioBindSource read GetSelectorFor write SetSelectorFor; // published: Master
     // Published properties: paging
     property Paging: TioCommonBSAPageManager read GetPaging write SetPaging; // published: Master
     // Published properties: selectors
@@ -229,7 +229,7 @@ type
     function CheckAdapter: Boolean; overload;
     function CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean; overload;
     function CheckActiveAdapter: Boolean;
-    procedure RegisterDetailBindSource(const ADetailBindSource: IioNotifiableBindSource);
+    procedure RegisterDetailBindSource(const ADetailBindSource: IioBindSource);
     procedure ForceDetailAdaptersCreation;
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure PostIfEditing;
@@ -469,7 +469,7 @@ end;
 
 procedure TioDataSetCustom.ForceDetailAdaptersCreation;
 var
-  LDetailBindSource: IioNotifiableBindSource;
+  LDetailBindSource: IioBindSource;
 begin
   if Assigned(FDetailBindSourceContainer) then
     for LDetailBindSource in FDetailBindSourceContainer do
@@ -561,7 +561,7 @@ begin
   Result := FPaging;
 end;
 
-function TioDataSetCustom.GetSelectorFor: IioNotifiableBindSource;
+function TioDataSetCustom.GetSelectorFor: IioBindSource;
 begin
   Result := FSelectorFor;
 end;
@@ -667,7 +667,7 @@ end;
 
 procedure TioDataSetCustom.OpenCLoseDetails(const AActive: Boolean);
 var
-  LBindSource: IioNotifiableBindSource;
+  LBindSource: IioBindSource;
 begin
   if Assigned(FDetailBindSourceContainer) then
     for LBindSource in FDetailBindSourceContainer do
@@ -701,10 +701,10 @@ begin
     GetActiveBindSourceAdapter.Refresh(ANotify);
 end;
 
-procedure TioDataSetCustom.RegisterDetailBindSource(const ADetailBindSource: IioNotifiableBindSource);
+procedure TioDataSetCustom.RegisterDetailBindSource(const ADetailBindSource: IioBindSource);
 begin
   if not Assigned(FDetailBindSourceContainer) then
-    FDetailBindSourceContainer := TList<IioNotifiableBindSource>.Create;
+    FDetailBindSourceContainer := TList<IioBindSource>.Create;
   FDetailBindSourceContainer.Add(ADetailBindSource);
 end;
 
@@ -914,7 +914,7 @@ begin
     raise EioException.Create(Self.ClassName, 'SetItemindex', 'Unassigned BindSourceAdapter');
 end;
 
-procedure TioDataSetCustom.SetMasterBindSource(const Value: IioNotifiableBindSource);
+procedure TioDataSetCustom.SetMasterBindSource(const Value: IioBindSource);
 begin
   FMasterBindSource := Value;
 end;
@@ -971,7 +971,7 @@ begin
   raise EioException.Create(ClassName, 'SetPaging', 'This property "Paging" is not writable');
 end;
 
-procedure TioDataSetCustom.SetSelectorFor(const ATargetBindSource: IioNotifiableBindSource);
+procedure TioDataSetCustom.SetSelectorFor(const ATargetBindSource: IioBindSource);
 begin
   FSelectorFor := ATargetBindSource;
 end;

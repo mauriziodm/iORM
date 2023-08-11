@@ -68,7 +68,7 @@ type
     // ---------- FOR SHOW EACH FUNCTIONALITY ----------
     function ShowCurrent: TComponent;
     procedure ShowEach;
-    procedure _SetForEachModelPresenter(const AModelPresenter:IioNotifiableBindSource; const ALocateViewModel:Boolean);
+    procedure _SetForEachModelPresenter(const AModelPresenter:IioBindSource; const ALocateViewModel:Boolean);
     // ---------- FOR SHOW EACH FUNCTIONALITY ----------
     // ---------- VIEW MODEL METHODS ----------
     function SetViewModel(const AViewModel:IioViewModel; const AMarker:String=''): IioDependencyInjectionLocator;
@@ -76,18 +76,18 @@ type
     function SetBindSource(const AName:String; const ADataObject:TObject): IioDependencyInjectionLocator; overload;
     function SetBindSource(const AName:String; const AInterfacedObj:IInterface): IioDependencyInjectionLocator; overload;
 //    function SetBindSource(const AName:String; const ABindSourceAdapter:IioActiveBindSourceAdapter): IioDependencyInjectionLocator; overload;
-    function SetBindSource(const AName:String; const AMasterBindSource:IioNotifiableBindSource; const AMasterPropertyName:String=''): IioDependencyInjectionLocator; overload;
+    function SetBindSource(const AName:String; const AMasterBindSource:IioBindSource; const AMasterPropertyName:String=''): IioDependencyInjectionLocator; overload;
     function SetBindSource(const AName:String; const AWhere:IioWhere): IioDependencyInjectionLocator; overload;
     function SetBindSource(const AName:String; const AOrderBy:String): IioDependencyInjectionLocator; overload;
-    function SetBindSourceAsSelectorFor(const ASourceBSName:String; const ASelectionDest:IioNotifiableBindSource): IioDependencyInjectionLocator; overload;
+    function SetBindSourceAsSelectorFor(const ASourceBSName:String; const ASelectionDest:IioBindSource): IioDependencyInjectionLocator; overload;
     // SetPresenter (WITHOUT passing the name of the destination presenter)
     function SetBindSource(const ADataObject:TObject): IioDependencyInjectionLocator; overload;
     function SetBindSource(const AInterfacedObj:IInterface): IioDependencyInjectionLocator; overload;
 //    function SetBindSource(const ABindSourceAdapter:IioActiveBindSourceAdapter): IioDependencyInjectionLocator; overload;
-    function SetBindSource(const AMasterBindSource:IioNotifiableBindSource; const AMasterPropertyName:String=''): IioDependencyInjectionLocator; overload;
+    function SetBindSource(const AMasterBindSource:IioBindSource; const AMasterPropertyName:String=''): IioDependencyInjectionLocator; overload;
     function SetBindSource(const AWhere:IioWhere): IioDependencyInjectionLocator; overload;
     function SetBindSource(const AOrderBy:String): IioDependencyInjectionLocator; overload;
-    function SetBindSourceAsSelectorFor(const ASelectionDest:IioNotifiableBindSource): IioDependencyInjectionLocator; overload;
+    function SetBindSourceAsSelectorFor(const ASelectionDest:IioBindSource): IioDependencyInjectionLocator; overload;
     // ---------- VIEW MODEL METHODS ----------
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
     function VCProvider(const AVCProvider:TioViewContextProvider): IioDependencyInjectionLocator;
@@ -111,18 +111,18 @@ type
     function SetBindSource(const AName:String; const ADataObject:TObject): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSource(const AName:String; const AInterfacedObj:IInterface): IioDependencyInjectionLocator<TI>; overload;
 //    function SetBindSource(const AName:String; const ABindSourceAdapter:IioActiveBindSourceAdapter): IioDependencyInjectionLocator<TI>; overload;
-    function SetBindSource(const AName:String; const AMasterPresenter:IioNotifiableBindSource; const AMasterPropertyName:String=''): IioDependencyInjectionLocator<TI>; overload;
+    function SetBindSource(const AName:String; const AMasterPresenter:IioBindSource; const AMasterPropertyName:String=''): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSource(const AName:String; const AWhere:IioWhere): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSource(const AName:String; const AOrderBy:String): IioDependencyInjectionLocator<TI>; overload;
-    function SetBindSourceAsSelectorFor(const ASourcePresenterName:String; const ASelectionDest:IioNotifiableBindSource): IioDependencyInjectionLocator<TI>; overload;
+    function SetBindSourceAsSelectorFor(const ASourcePresenterName:String; const ASelectionDest:IioBindSource): IioDependencyInjectionLocator<TI>; overload;
     // SetPresenter (WITHOUT passing the name of the destination presenter)
     function SetBindSource(const ADataObject:TObject): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSource(const AInterfacedObj:IInterface): IioDependencyInjectionLocator<TI>; overload;
 //    function SetBindSource(const ABindSourceAdapter:IioActiveBindSourceAdapter): IioDependencyInjectionLocator<TI>; overload;
-    function SetBindSource(const AMasterPresenter:IioNotifiableBindSource; const AMasterPropertyName:String=''): IioDependencyInjectionLocator<TI>; overload;
+    function SetBindSource(const AMasterPresenter:IioBindSource; const AMasterPropertyName:String=''): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSource(const AWhere:IioWhere): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSource(const AOrderBy:String): IioDependencyInjectionLocator<TI>; overload;
-    function SetBindSourceAsSelectorFor(const ASelectionDest:IioNotifiableBindSource): IioDependencyInjectionLocator<TI>; overload;
+    function SetBindSourceAsSelectorFor(const ASelectionDest:IioBindSource): IioDependencyInjectionLocator<TI>; overload;
     // ---------- VIEW MODEL METHODS ----------
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
     function VCProvider(const AVCProvider:TioViewContextProvider): IioDependencyInjectionLocator<TI>;

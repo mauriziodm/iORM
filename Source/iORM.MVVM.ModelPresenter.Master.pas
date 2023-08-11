@@ -60,8 +60,8 @@ type
     FAfterWhereBuild: TioAfterWhereBuilderEvent;
     FAfterWhereClear: TioAfterWhereBuilderEvent;
     // SourceModelPresenter
-    function GetSourceBS: IioNotifiableBindSource;
-    procedure SetSourceBS(const Value: IioNotifiableBindSource);
+    function GetSourceBS: IioBindSource;
+    procedure SetSourceBS(const Value: IioBindSource);
     // Added methods
     function GetPersistence: TioBSPersistence;
     // OnDeleteAction property
@@ -88,7 +88,7 @@ type
     // LoadType
     procedure SetLoadType(const Value: TioLoadType); override;
     // MasterPresenter
-    procedure SetMasterBindSource(const Value: IioNotifiableBindSource); override;
+    procedure SetMasterBindSource(const Value: IioBindSource); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -131,7 +131,7 @@ type
     property OnUpdateAction: TioBSOnUpdateAction read GetOnUpdateAction write SetOnUpdateAction default uaSetSmartUpdateStateLess;
     property OnInsertAction: TioOnInsertAction read GetOnInsertAction write SetOnInsertAction default iaSaveRevertPoint;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
-    property SourceBS: IioNotifiableBindSource read GetSourceBS write SetSourceBS;
+    property SourceBS: IioBindSource read GetSourceBS write SetSourceBS;
     property WhereBuilderFor: IioBSPersistenceClient read FWhereBuilderFor write FWhereBuilderFor;
     // Published Events: selectors
     property BeforeSelectionObject;
@@ -220,7 +220,7 @@ begin
   Result := FPersistence;
 end;
 
-function TioModelPresenterMaster.GetSourceBS: IioNotifiableBindSource;
+function TioModelPresenterMaster.GetSourceBS: IioBindSource;
 begin
   Result := MasterBindSource;
 end;
@@ -270,14 +270,14 @@ begin
   inherited;
 end;
 
-procedure TioModelPresenterMaster.SetMasterBindSource(const Value: IioNotifiableBindSource);
+procedure TioModelPresenterMaster.SetMasterBindSource(const Value: IioBindSource);
 begin
   inherited;
   if FWannaBeActive and not Active then
     Open;
 end;
 
-procedure TioModelPresenterMaster.SetSourceBS(const Value: IioNotifiableBindSource);
+procedure TioModelPresenterMaster.SetSourceBS(const Value: IioBindSource);
 begin
   if Value = SourceBS then
     Exit;

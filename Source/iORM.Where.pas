@@ -63,7 +63,7 @@ type
     FOrderBy: IioSqlItemWhere;
     FClearListBefore: Boolean;
     FCacheable: Boolean;
-    FETMfor: IioNotifiableBindSource;
+    FETMfor: IioBindSource;
     // Contiene le clausole where specificate fino ad ora
     FWhereItems: TWhereItems;
     // Contiene le eventuali clausole where di eventuali dettagli, la chiave è una stringa
@@ -1333,7 +1333,7 @@ procedure TioWhere.SetETMfor(const AETMfor: IInterface);  // IInterface to avoid
 begin
   if AETMfor <> nil then
   begin
-    if not Supports(AETMfor, IioNotifiableBindSource, FETMfor) then
+    if not Supports(AETMfor, IioBindSource, FETMfor) then
       raise EioEtmException.Create(ClassName, '_SetETMfor', 'The object received into the "AETMfor" parameter does not implement the interface "IioNotifiableBindSource".');
   end
   else

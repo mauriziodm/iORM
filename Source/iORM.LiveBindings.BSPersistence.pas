@@ -70,7 +70,7 @@ type
     procedure PostIfEditing;
     function GetName: String;
     function IsFromBSLoadType: Boolean;
-    function GetSourceBS: IioNotifiableBindSource;
+    function GetSourceBS: IioBindSource;
     procedure SetWhere(const AWhere: IioWhere);
     // ETMfor
     procedure SetETMfor(const AETMfor: IioBSPersistenceClient);
@@ -559,7 +559,7 @@ end;
 
 procedure TioBSPersistence._InternalRevertWhenFromBSLoadType(const ARaiseIfRevertPointNotSaved: Boolean; const ARaiseIfNoChanges: Boolean);
 var
-  LSourceBS: IioNotifiableBindSource;
+  LSourceBS: IioBindSource;
 begin
   if IsInserting then
   begin

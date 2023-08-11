@@ -44,7 +44,7 @@ uses
 
 type
 
-  TioPrototypeBindSourceCustom = class abstract(TPrototypeBindSource, IioNotifiableBindSource, IioStdActionTargetBindSource)
+  TioPrototypeBindSourceCustom = class abstract(TPrototypeBindSource, IioBindSource, IioStdActionTargetBindSource)
   private
     FAsDefault: Boolean;
     FBindSourceAdapter: IioActiveBindSourceAdapter;
@@ -55,7 +55,7 @@ type
     FLazyProps: String;
     FAsync: Boolean;
     FTypeOfCollection: TioTypeOfCollection;
-    FMasterBindSource: IioNotifiableBindSource;
+    FMasterBindSource: IioBindSource;
     FMasterPropertyName: String;
     FWhereStr: TStrings;
     FWhereDetailsFromDetailAdapters: Boolean;
@@ -67,7 +67,7 @@ type
     FETMfor: IioBSPersistenceClient;
     FPreview: Boolean;
     // Selectors
-    FSelectorFor: IioNotifiableBindSource;
+    FSelectorFor: IioBindSource;
     FOnReceiveSelectionCloneObject: Boolean;
     FOnReceiveSelectionFreeObject: Boolean;
     // Questà è una collezione dove eventuali BindSource di dettaglio
@@ -80,7 +80,7 @@ type
     // Ad esempio capitava che i filtri dei presentere di dettaglio impostati a
     // DesignTime (WhereStr property) non funzionassero per questo motivo.
     // NB: Nei PrototypeBindSources non serve poi il metodo "ForceDetailAdaptersCreation" come dei DataSet o nei ModelPresenter
-    FDetailBindSourceContainer: TList<IioNotifiableBindSource>;
+    FDetailBindSourceContainer: TList<IioBindSource>;
     // FioLoaded flag for iORM DoCreateAdapter internal use only just before
     // the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
     FioLoaded: Boolean;
@@ -135,7 +135,7 @@ type
     // ItemCount
     function GetCount: Integer;
     // MasterPresenter
-    procedure SetMasterBindSource(const Value: IioNotifiableBindSource);
+    procedure SetMasterBindSource(const Value: IioBindSource);
     // MasterPropertyName
     procedure SetMasterPropertyName(const Value: String);
     function GetMasterPropertyName: String;
@@ -176,8 +176,8 @@ type
     procedure SetWhereStr(const Value: TStrings);
     procedure WhereOnChangeEventHandler(Sender: TObject);
     // SelectorFor
-    function GetSelectorFor: IioNotifiableBindSource;
-    procedure SetSelectorFor(const ATargetBindSource: IioNotifiableBindSource);
+    function GetSelectorFor: IioBindSource;
+    procedure SetSelectorFor(const ATargetBindSource: IioBindSource);
   protected
     procedure SetActive(const Value: Boolean); override;
     procedure Loaded; override;
@@ -221,11 +221,11 @@ type
     property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False;
     // published: Nascondere e default = false
     property OrderBy: String read FOrderBy Write SetOrderBy; // published: Master
-    property MasterBindSource: IioNotifiableBindSource read FMasterBindSource write SetMasterBindSource; // published: Detail
+    property MasterBindSource: IioBindSource read FMasterBindSource write SetMasterBindSource; // published: Detail
     property MasterPropertyName: String read GetMasterPropertyName write SetMasterPropertyName; // published: Detail
     property AutoRefreshOnNotification: Boolean read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default True; // published: Master+Detail
     // Published properties: selectors
-    property SelectorFor: IioNotifiableBindSource read GetSelectorFor write SetSelectorFor; // published: Master
+    property SelectorFor: IioBindSource read GetSelectorFor write SetSelectorFor; // published: Master
     // Published properties: paging
     property Paging: TioCommonBSAPageManager read GetPaging write SetPaging; // published: Master
     // Published properties: selectors
@@ -258,7 +258,7 @@ type
     procedure PostIfEditing;
     procedure CancelIfEditing;
     procedure ForEach(const AForEachMethod: TProc);
-    procedure RegisterDetailBindSource(const ADetailBindSource: IioNotifiableBindSource);
+    procedure RegisterDetailBindSource(const ADetailBindSource: IioBindSource);
     // Show current record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
     procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
     procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
@@ -752,7 +752,7 @@ begin
   Result := FPaging;
 end;
 
-function TioPrototypeBindSourceCustom.GetSelectorFor: IioNotifiableBindSource;
+function TioPrototypeBindSourceCustom.GetSelectorFor: IioBindSource;
 begin
   Result := FSelectorFor;
 end;
@@ -833,7 +833,7 @@ end;
 
 procedure TioPrototypeBindSourceCustom.OpenCloseDetails(const AActive: Boolean);
 var
-  LDetailBindSource: IioNotifiableBindSource;
+  LDetailBindSource: IioBindSource;
 begin
   if Assigned(FDetailBindSourceContainer) then
     for LDetailBindSource in FDetailBindSourceContainer do
@@ -876,10 +876,10 @@ begin
     GetActiveBindSourceAdapter.Refresh(ANotify);
 end;
 
-procedure TioPrototypeBindSourceCustom.RegisterDetailBindSource(const ADetailBindSource: IioNotifiableBindSource);
+procedure TioPrototypeBindSourceCustom.RegisterDetailBindSource(const ADetailBindSource: IioBindSource);
 begin
   if not Assigned(FDetailBindSourceContainer) then
-    FDetailBindSourceContainer := TList<IioNotifiableBindSource>.Create;
+    FDetailBindSourceContainer := TList<IioBindSource>.Create;
   FDetailBindSourceContainer.Add(ADetailBindSource);
 end;
 
@@ -991,7 +991,7 @@ begin
   FAutoRefreshOnNotification := Value;
 end;
 
-procedure TioPrototypeBindSourceCustom.SetMasterBindSource(const Value: IioNotifiableBindSource);
+procedure TioPrototypeBindSourceCustom.SetMasterBindSource(const Value: IioBindSource);
 begin
   FMasterBindSource := Value;
 end;
@@ -1175,7 +1175,7 @@ begin
   AutoActivate := FPreview and (csDesigning in ComponentState);
 end;
 
-procedure TioPrototypeBindSourceCustom.SetSelectorFor(const ATargetBindSource: IioNotifiableBindSource);
+procedure TioPrototypeBindSourceCustom.SetSelectorFor(const ATargetBindSource: IioBindSource);
 begin
   FSelectorFor := ATargetBindSource;
 end;

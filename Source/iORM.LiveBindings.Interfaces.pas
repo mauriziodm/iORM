@@ -66,7 +66,7 @@ type
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
   end;
 
-  IioNotifiableBindSource = interface(IioNotifiable)
+  IioBindSource = interface(IioNotifiable)
     ['{2DFC1B43-4AE2-4402-89B3-7A134938EFE6}']
     procedure Open;
     procedure Close;
@@ -87,11 +87,11 @@ type
     function IsFromBSLoadType: boolean;
     procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
     procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
-    procedure SetMasterBindSource(const Value: IioNotifiableBindSource);
+    procedure SetMasterBindSource(const Value: IioBindSource);
     procedure SetMasterPropertyName(const Value: String);
     procedure SetWhere(const AWhere: IioWhere);
     procedure SetOrderBy(const Value: String);
-    procedure RegisterDetailBindSource(const ADetailBindSource: IioNotifiableBindSource);
+    procedure RegisterDetailBindSource(const ADetailBindSource: IioBindSource);
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
@@ -139,9 +139,9 @@ type
     procedure SetTypeOfCollection(const Value: TioTypeOfCollection);
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection write SetTypeOfCollection;
     // SelectorFor
-    function GetSelectorFor: IioNotifiableBindSource;
-    procedure SetSelectorFor(const ATargetBindSource: IioNotifiableBindSource);
-    property SelectorFor: IioNotifiableBindSource read GetSelectorFor write SetSelectorFor; // published: Master
+    function GetSelectorFor: IioBindSource;
+    procedure SetSelectorFor(const ATargetBindSource: IioBindSource);
+    property SelectorFor: IioBindSource read GetSelectorFor write SetSelectorFor; // published: Master
   end;
 
   // Interface for standard action target bind source
@@ -192,8 +192,8 @@ type
     procedure Refresh(const ANotify: Boolean = True);
     procedure Reload;
     procedure LoadPage;
-    procedure SetBindSource(ANotifiableBindSource: IioNotifiableBindSource);
-    function GetBindSource: IioNotifiableBindSource;
+    procedure SetBindSource(ANotifiableBindSource: IioBindSource);
+    function GetBindSource: IioBindSource;
     function HasBindSource: boolean;
     procedure Insert; overload;
     procedure Insert(AObject: TObject); overload;

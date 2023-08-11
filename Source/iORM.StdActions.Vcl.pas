@@ -1606,7 +1606,7 @@ begin
   inherited;
 
   // If the TargetBindSource is a SelectorFor some other BindSource then make the selection instead
-  if Assigned(FSelectCurrentAction) and Assigned((TargetBindSource as IioNotifiableBindSource).SelectorFor) then
+  if Assigned(FSelectCurrentAction) and Assigned((TargetBindSource as IioBindSource).SelectorFor) then
   begin
     Enabled := FSelectCurrentAction._IsEnabled;
     Exit;
@@ -1653,7 +1653,7 @@ begin
   inherited;
 
   // If the TargetBindSource is a SelectorFor some other BindSource then make the selection instead
-  if Assigned(FSelectCurrentAction) and FSelectCurrentAction._IsEnabled and Assigned((TargetBindSource as IioNotifiableBindSource).SelectorFor) then
+  if Assigned(FSelectCurrentAction) and FSelectCurrentAction._IsEnabled and Assigned((TargetBindSource as IioBindSource).SelectorFor) then
   begin
     FSelectCurrentAction.Execute;
     Exit;
@@ -1665,13 +1665,13 @@ begin
     smBSCurrent:
       case FViewContextBy of
         vcByDefaultViewContextProvider:
-          io.ShowCurrent(FTargetBindSource as IioNotifiableBindSource, FParentCloseQueryAction, FVVMTypeAlias);
+          io.ShowCurrent(FTargetBindSource as IioBindSource, FParentCloseQueryAction, FVVMTypeAlias);
         vcByViewContextProviderName:
-          io.ShowCurrent(FTargetBindSource as IioNotifiableBindSource, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+          io.ShowCurrent(FTargetBindSource as IioBindSource, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
         vcByViewContextProvider:
-          io.ShowCurrent(FTargetBindSource as IioNotifiableBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+          io.ShowCurrent(FTargetBindSource as IioBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
         vcByViewContext:
-          io.ShowCurrent(FTargetBindSource as IioNotifiableBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+          io.ShowCurrent(FTargetBindSource as IioBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
 //        vcNone:
 //          io.ShowCurrent(FFromBS as IioNotifiableBindSource, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
@@ -1679,13 +1679,13 @@ begin
     smBSEach:
       case FViewContextBy of
         vcByDefaultViewContextProvider:
-          io.ShowEach(FTargetBindSource as IioNotifiableBindSource, FParentCloseQueryAction, FVVMTypeAlias);
+          io.ShowEach(FTargetBindSource as IioBindSource, FParentCloseQueryAction, FVVMTypeAlias);
         vcByViewContextProviderName:
-          io.ShowEach(FTargetBindSource as IioNotifiableBindSource, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+          io.ShowEach(FTargetBindSource as IioBindSource, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
         vcByViewContextProvider:
-          io.ShowEach(FTargetBindSource as IioNotifiableBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+          io.ShowEach(FTargetBindSource as IioBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
         vcByViewContext:
-          io.ShowEach(FTargetBindSource as IioNotifiableBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+          io.ShowEach(FTargetBindSource as IioBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
 //        vcNone:
 //          io.ShowEach(FFromBS as IioNotifiableBindSource, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
@@ -1707,13 +1707,13 @@ begin
     smEntityTypeNameAsSelector:
       case FViewContextBy of
         vcByDefaultViewContextProvider:
-          io.ShowAsSelector(FEntityTypeName, FTargetBindSource as IioNotifiableBindSource, FParentCloseQueryAction, FVVMTypeAlias);
+          io.ShowAsSelector(FEntityTypeName, FTargetBindSource as IioBindSource, FParentCloseQueryAction, FVVMTypeAlias);
         vcByViewContextProviderName:
-          io.ShowAsSelector(FEntityTypeName, FTargetBindSource as IioNotifiableBindSource, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+          io.ShowAsSelector(FEntityTypeName, FTargetBindSource as IioBindSource, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
         vcByViewContextProvider:
-          io.ShowAsSelector(FEntityTypeName, FTargetBindSource as IioNotifiableBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+          io.ShowAsSelector(FEntityTypeName, FTargetBindSource as IioBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
         vcByViewContext:
-          io.ShowAsSelector(FEntityTypeName, FTargetBindSource as IioNotifiableBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+          io.ShowAsSelector(FEntityTypeName, FTargetBindSource as IioBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
 //        vcNone:
 //          io.ShowAsSelector(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
@@ -1721,13 +1721,13 @@ begin
     smBSTypeNameAsSelector:
       case FViewContextBy of
         vcByDefaultViewContextProvider:
-          io.ShowAsSelector(FTargetBindSource as IioNotifiableBindSource, FParentCloseQueryAction, FVVMTypeAlias);
+          io.ShowAsSelector(FTargetBindSource as IioBindSource, FParentCloseQueryAction, FVVMTypeAlias);
         vcByViewContextProviderName:
-          io.ShowAsSelector(FTargetBindSource as IioNotifiableBindSource, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+          io.ShowAsSelector(FTargetBindSource as IioBindSource, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
         vcByViewContextProvider:
-          io.ShowAsSelector(FTargetBindSource as IioNotifiableBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+          io.ShowAsSelector(FTargetBindSource as IioBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
         vcByViewContext:
-          io.ShowAsSelector(FTargetBindSource as IioNotifiableBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+          io.ShowAsSelector(FTargetBindSource as IioBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
 //        vcNone:
 //          io.ShowAsSelector(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
