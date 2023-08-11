@@ -40,7 +40,7 @@ uses
   iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.Interfaces, iORM.Resolver.Interfaces, iORM.Context.Container,
   iORM.DependencyInjection.Singletons, iORM.DependencyInjection.Implementers, iORM.MVVM.ViewContextProvider,
   iORM.MVVM.ModelPresenter.Custom, iORM.Where.Interfaces, System.Classes, iORM.StdActions.Interfaces,
-  System.SysUtils;
+  System.SysUtils, iORM.LiveBindings.BSPersistence;
 
 const
   DI_ENTITY_AUTOREGISTER_SUBKEY_PREFIX = '<E>';
@@ -256,7 +256,7 @@ type
     function SetBindSource(const ABSName: String; const AWhere: IioWhere): IioDependencyInjectionLocator; overload;
     function SetBindSource(const ABSName: String; const AOrderBy: String): IioDependencyInjectionLocator; overload;
     function SetBindSourceAsSelectorFor(const ASelectorBSName: String; const ASelectionTargetBS: IioBindSource): IioDependencyInjectionLocator; overload;
-    function SetBindSourceAsWhereBuilderFor(const AWhereBuilderBSName: String; const AWhereBuilderTargetBS: IioBindSource): IioDependencyInjectionLocator; overload;
+    function SetBindSourceAsWhereBuilderFor(const AWhereBuilderBSName: String; const AWhereBuilderTargetBS: IioMasterBindSource): IioDependencyInjectionLocator; overload;
     function SetBindSourceAsETMfor(const AEtmBSName: String; const AEtmTargetBS: IioBindSource): IioDependencyInjectionLocator; overload;
     // SetBindSource (WITHOUT passing the name of the destination presenter)
     function SetBindSource(const ADataObject: TObject): IioDependencyInjectionLocator; overload;
@@ -265,7 +265,7 @@ type
     function SetBindSource(const AWhere: IioWhere): IioDependencyInjectionLocator; overload;
     function SetBindSource(const AOrderBy: String): IioDependencyInjectionLocator; overload;
     function SetBindSourceAsSelectorFor(const ASelectionTargetBS: IioBindSource): IioDependencyInjectionLocator; overload;
-    function SetBindSourceAsWhereBuilderFor(const AWhereBuilderTargetBS: IioBindSource): IioDependencyInjectionLocator; overload;
+    function SetBindSourceAsWhereBuilderFor(const AWhereBuilderTargetBS: IioMasterBindSource): IioDependencyInjectionLocator; overload;
     function SetBindSourceAsETMfor(const AEtmTargetBS: IioBindSource): IioDependencyInjectionLocator; overload;
     // ---------- SETBINDSOURCE METHODS ----------
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
@@ -297,7 +297,7 @@ type
     function SetBindSource(const ABSName: String; const AWhere: IioWhere): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSource(const ABSName: String; const AOrderBy: String): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSourceAsSelectorFor(const ASelectorBSName: String; const ASelectionTargetBS: IioBindSource): IioDependencyInjectionLocator<TI>; overload;
-    function SetBindSourceAsWhereBuilderFor(const AWhereBuilderBSName: String; const AWhereBuilderTargetBS: IioBindSource): IioDependencyInjectionLocator<TI>; overload;
+    function SetBindSourceAsWhereBuilderFor(const AWhereBuilderBSName: String; const AWhereBuilderTargetBS: IioMasterBindSource): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSourceAsETMfor(const AEtmBSName: String; const AEtmTargetBS: IioBindSource): IioDependencyInjectionLocator<TI>; overload;
     // SetPresenter (WITHOUT passing the name of the destination presenter)
     function SetBindSource(const ADataObject: TObject): IioDependencyInjectionLocator<TI>; overload;
@@ -306,7 +306,7 @@ type
     function SetBindSource(const AWhere: IioWhere): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSource(const AOrderBy: String): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSourceAsSelectorFor(const ASelectionTargetBS: IioBindSource): IioDependencyInjectionLocator<TI>; overload;
-    function SetBindSourceAsWhereBuilderFor(const AWhereBuilderTargetBS: IioBindSource): IioDependencyInjectionLocator<TI>; overload;
+    function SetBindSourceAsWhereBuilderFor(const AWhereBuilderTargetBS: IioMasterBindSource): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSourceAsETMfor(const AEtmTargetBS: IioBindSource): IioDependencyInjectionLocator<TI>; overload;
     // ---------- VIEW MODEL METHODS ----------
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
@@ -1491,7 +1491,7 @@ begin
 end;
 
 function TioDependencyInjectionLocator.SetBindSourceAsWhereBuilderFor(const AWhereBuilderBSName: String;
-  const AWhereBuilderTargetBS: IioBindSource): IioDependencyInjectionLocator;
+  const AWhereBuilderTargetBS: IioMasterBindSource): IioDependencyInjectionLocator;
 var
   i: Integer;
 begin
@@ -1503,7 +1503,7 @@ begin
   Result := Self;
 end;
 
-function TioDependencyInjectionLocator.SetBindSourceAsWhereBuilderFor(const AWhereBuilderTargetBS: IioBindSource): IioDependencyInjectionLocator;
+function TioDependencyInjectionLocator.SetBindSourceAsWhereBuilderFor(const AWhereBuilderTargetBS: IioMasterBindSource): IioDependencyInjectionLocator;
 begin
   Result := SetBindSourceAsWhereBuilderFor(String.Empty, AWhereBuilderTargetBS);
 end;
@@ -2265,13 +2265,13 @@ begin
 end;
 
 function TioDependencyInjectionLocator<TI>.SetBindSourceAsWhereBuilderFor(const AWhereBuilderBSName: String;
-  const AWhereBuilderTargetBS: IioBindSource): IioDependencyInjectionLocator<TI>;
+  const AWhereBuilderTargetBS: IioMasterBindSource): IioDependencyInjectionLocator<TI>;
 begin
   Result := Self;
   TioDependencyInjectionLocator(Self).SetBindSourceAsWhereBuilderFor(AWhereBuilderBSName, AWhereBuilderTargetBS);
 end;
 
-function TioDependencyInjectionLocator<TI>.SetBindSourceAsWhereBuilderFor(const AWhereBuilderTargetBS: IioBindSource): IioDependencyInjectionLocator<TI>;
+function TioDependencyInjectionLocator<TI>.SetBindSourceAsWhereBuilderFor(const AWhereBuilderTargetBS: IioMasterBindSource): IioDependencyInjectionLocator<TI>;
 begin
   Result := Self;
   TioDependencyInjectionLocator(Self).SetBindSourceAsWhereBuilderFor(AWhereBuilderTargetBS);

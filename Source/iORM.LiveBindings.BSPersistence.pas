@@ -72,6 +72,10 @@ type
     function IsFromBSLoadType: Boolean;
     function GetSourceBS: IioBindSource;
     procedure SetWhere(const AWhere: IioWhere);
+    // WhereBuuilderFor
+    function GetWhereBuilderFor: IioMasterBindSource;
+    procedure SetWhereBuilderFor(const AMasterBS: IioMasterBindSource);
+    property WhereBuilderFor: IioMasterBindSource read GetWhereBuilderFor write SetWhereBuilderFor;
     // ETMfor
     procedure SetETMfor(const AETMfor: IioMasterBindSource);
     function GetETMfor: IioMasterBindSource;

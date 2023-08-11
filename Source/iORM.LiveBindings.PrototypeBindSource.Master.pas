@@ -61,6 +61,9 @@ type
     // SourcePrototypeBindSource
     function GetSourceBS: IioBindSource;
     procedure SetSourceBS(const Value: IioBindSource);
+    // WhereBuilderFor
+    function GetWhereBuilderFor: IioMasterBindSource;
+    procedure SetWhereBuilderFor(const AMasterBS: IioMasterBindSource);
     // Added methods
     function GetPersistence: TioBSPersistence;
     // OnDeleteAction property
@@ -135,7 +138,7 @@ type
     property OnInsertAction: TioOnInsertAction read GetOnInsertAction write SetOnInsertAction default iaSaveRevertPoint;
     property OnRecordChangeAction: TioBSOnRecordChangeAction read GetOnRecordChangeAction write SetOnRecordChangeAction default rcPersistIfChanged;
     property SourceBS: IioBindSource read GetSourceBS write SetSourceBS;
-    property WhereBuilderFor: IioMasterBindSource read FWhereBuilderFor write FWhereBuilderFor;
+    property WhereBuilderFor: IioMasterBindSource read GetWhereBuilderFor write SetWhereBuilderFor;
     // Published Events: selectors
     property BeforeSelectionObject;
     property OnSelectionObject;
@@ -223,6 +226,11 @@ begin
   Result := MasterBindSource;
 end;
 
+function TioPrototypeBindSourceMaster.GetWhereBuilderFor: IioMasterBindSource;
+begin
+  Result := FWhereBuilderFor;
+end;
+
 function TioPrototypeBindSourceMaster.IsDetailBS: boolean;
 begin
   // Do not inherit
@@ -290,6 +298,11 @@ begin
     Exit;
   TioCommonBSBehavior.CheckForSetSourceBS(Self, Value, Self.LoadType);
   MasterBindSource := Value;
+end;
+
+procedure TioPrototypeBindSourceMaster.SetWhereBuilderFor(const AMasterBS: IioMasterBindSource);
+begin
+  FWhereBuilderFor := AMasterBS;
 end;
 
 function TioPrototypeBindSourceMaster.BuildWhere(const AExecuteOnTarget: Boolean): IioWhere;
