@@ -131,8 +131,8 @@ begin
   I := FInternalContainer.Count-1;
   while (FInternalContainer[I] <> ADestroyingCQAction) and (I >= 0) do
   begin
-    if FInternalContainer[I].ParentCloseQueryAction = ADestroyingCQAction then
-      FInternalContainer[I].ParentCloseQueryAction := ADestroyingCQAction.ParentCloseQueryAction;
+    if FInternalContainer[I].Action_ParentCloseQueryAction = ADestroyingCQAction then
+      FInternalContainer[I].Action_ParentCloseQueryAction := ADestroyingCQAction.Action_ParentCloseQueryAction;
     Dec(I);
   end;
 end;

@@ -64,9 +64,9 @@ type
     procedure SetInternalExecutionMode(const Value: TioCloseQueryActionExecutionMode);
     property InternalExecutionMode: TioCloseQueryActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
     // ParentCloseQueryAction
-    function GetParentCloseQueryAction: IioBSCloseQueryAction;
-    procedure SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
-    property ParentCloseQueryAction: IioBSCloseQueryAction read GetParentCloseQueryAction write SetParentCloseQueryAction;
+    function GetAction_ParentCloseQueryAction: IioBSCloseQueryAction;
+    procedure SetAction_ParentCloseQueryAction(const Value: IioBSCloseQueryAction);
+    property Action_ParentCloseQueryAction: IioBSCloseQueryAction read GetAction_ParentCloseQueryAction write SetAction_ParentCloseQueryAction;
   end;
 
   IioBSCloseQueryVMAction = interface(IioBSCloseQueryAction)
@@ -131,10 +131,10 @@ begin
     raise EioException.Create(ClassName, 'IsChildOf', 'The "ATargetCloseQueryAction" parameter is unassigned.' +
       #13#13'This parameter cannot be left unassigned.');
   while Assigned(AQueryingCloseQueryAction) do
-    if AQueryingCloseQueryAction.ParentCloseQueryAction = ATargetCloseQueryAction then
+    if AQueryingCloseQueryAction.Action_ParentCloseQueryAction = ATargetCloseQueryAction then
       Exit(True)
     else
-      AQueryingCloseQueryAction := AQueryingCloseQueryAction.ParentCloseQueryAction;
+      AQueryingCloseQueryAction := AQueryingCloseQueryAction.Action_ParentCloseQueryAction;
 end;
 
 end.

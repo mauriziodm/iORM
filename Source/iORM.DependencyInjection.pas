@@ -204,7 +204,7 @@ type
     FVCProviderEnabled, FOwnerRequested: Boolean;
     FViewContext: TComponent; // For directly passed ViewContext (TCOmponent descendant) without the use of a ViewContextProvider
     FViewContextFreeMethod: TProc;
-    FParentCloseQueryAction: IioBSCloseQueryAction;
+    FActionParentCloseQuery: IioBSCloseQueryAction;
     // For directly passed ViewContext (TCOmponent descendant) without the use of a ViewContextProvider (or in combination with it)
     // ---------- FOR SHOW EACH FUNCTIONALITY ----------
     FForEachModelPresenter: IioBindSource;
@@ -1306,7 +1306,7 @@ begin
   FViewContextFreeMethod := nil;
   FOwnerRequested := AOwnerRequested;
   FSingletonKey := '';
-  FParentCloseQueryAction := nil;
+  FActionParentCloseQuery := nil;
 end;
 
 function TioDependencyInjectionLocator.Exist: Boolean;
@@ -1510,7 +1510,7 @@ end;
 
 function TioDependencyInjectionLocator.SetParentCloseQueryAction(const AParentCLoseQueryAction: IioBSCloseQueryAction): IioDependencyInjectionLocator;
 begin
-  FParentCloseQueryAction := AParentCLoseQueryAction;
+  FActionParentCloseQuery := AParentCLoseQueryAction;
   Result := Self;
 end;
 
@@ -1583,7 +1583,7 @@ begin
   FConstructorParams := ASourceLocator._GetConstructorParams^;
   FVCProvider := ASourceLocator._GetVCProvider;
   FViewContext := ASourceLocator._GetViewContext;
-  FParentCloseQueryAction := ASourceLocator._GetParentCloseQueryAction;
+  FActionParentCloseQuery := ASourceLocator._GetParentCloseQueryAction;
 end;
 
 function TioDependencyInjectionLocator._Get(const AContainerItem: TioDIContainerImplementersItem): TObject;
@@ -1593,15 +1593,15 @@ var
   begin
     // Non uso l'interfaccia IioViewModel perchè mi dava dei problemi con il RefCount
     if (Result is TioViewModel) and TioViewModel(Result)._BSCloseQueryAssigned then
-      TioViewModel(Result)._GetBSCloseQuery.ParentCloseQueryAction := FParentCloseQueryAction;
+      TioViewModel(Result)._GetBSCloseQuery.Action_ParentCloseQueryAction := FActionParentCloseQuery;
   end;
   procedure NestedSetParentCloseQueryActionToSimpleView;
   var
-    LCloseQueryAction: IioBSCloseQueryAction;
+    LActionCloseQuery: IioBSCloseQueryAction;
   begin
-    LCloseQueryAction := TioBSCloseQueryCommonBehaviour.ExtractCloseQueryAction(Result as TComponent);
-    if Assigned(LCloseQueryAction) then
-      LCloseQueryAction.ParentCloseQueryAction := FParentCloseQueryAction;
+    LActionCloseQuery := TioBSCloseQueryCommonBehaviour.ExtractCloseQueryAction(Result as TComponent);
+    if Assigned(LActionCloseQuery) then
+      LActionCloseQuery.Action_ParentCloseQueryAction := FActionParentCloseQuery;
   end;
 begin
   Result := nil;
@@ -1674,7 +1674,7 @@ begin
           TioObjectMakerIntf.InitializeViewModelPresentersAfterCreate(Result, @FPresenterSettings);
         // NB: Estrae eventuale BSCloseQueryAction presente nel ViewModel oppure nella SimpleView e ne
         //      imposta la proprietà ParentCloseQueryAction
-        if Assigned(FParentCloseQueryAction) then
+        if Assigned(FActionParentCloseQuery) then
         begin
           if FInterfaceName.StartsWith(DI_VIEWMODEL_KEY_PREFIX) then
             NestedSetParentCloseQueryActionToViewModel
@@ -1744,7 +1744,7 @@ end;
 
 function TioDependencyInjectionLocator._GetParentCloseQueryAction: IioBSCloseQueryAction;
 begin
-  Result := FParentCloseQueryAction;
+  Result := FActionParentCloseQuery;
 end;
 
 function TioDependencyInjectionLocator._GetVCProvider: TioViewContextProvider;
@@ -1773,10 +1773,10 @@ begin
       '"FForEachModelPresenter" private field not assigned...'#13#13'ShowCurrent must be used with "io.ShowCurrent(AModelPrenter)" or "io.di.LocateViewVMFor(AModelPresenter)..." or other equivalent with ModelPresenter as parameter.');
   // Retrieve the correct locator
   if FInterfaceName.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX) then
-    LLocator := TioDependencyInjectionFactory.GetSimpleViewLocatorFor(FForEachModelPresenter, FParentCloseQueryAction, FAlias) as TioDependencyInjectionLocator
+    LLocator := TioDependencyInjectionFactory.GetSimpleViewLocatorFor(FForEachModelPresenter, FActionParentCloseQuery, FAlias) as TioDependencyInjectionLocator
   else
   if FForEachLocateViewModel then
-    LLocator := TioDependencyInjectionFactory.GetViewVMLocatorFor(FForEachModelPresenter, FParentCloseQueryAction, FAlias, True) as TioDependencyInjectionLocator
+    LLocator := TioDependencyInjectionFactory.GetViewVMLocatorFor(FForEachModelPresenter, FActionParentCloseQuery, FAlias, True) as TioDependencyInjectionLocator
   else
     LLocator := TioDependencyInjectionFactory.GetViewLocatorFor(FForEachModelPresenter, FAlias) as TioDependencyInjectionLocator;
   // Set the locator

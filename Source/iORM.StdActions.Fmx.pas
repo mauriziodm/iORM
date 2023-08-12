@@ -145,12 +145,12 @@ type
   // SelectCurrent action to make a selection for a Selector BindSource
   TioBSSelectCurrent = class(TioBSStdActionFmx<IioStdActionTargetBindSource>, IioBSSlaveAction)
   strict private
-    FCloseQueryAction: IioBSSlaveAction;
+    FAction_CloseQueryAction: IioBSSlaveAction;
     FIsSlave: Boolean;
     FSelectionType: TioSelectionType;
     function _IsEnabled: Boolean;
     procedure _SetTargetBindSource(const AObj: TObject);
-    procedure SetCloseQueryAction(const Value: IioBSSlaveAction);
+    procedure SetAction_CloseQueryAction(const Value: IioBSSlaveAction);
   strict protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure SetTargetBindSource(const Value: IioStdActionTargetBindSource); override;
@@ -159,7 +159,7 @@ type
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget(Target: TObject); override;
   published
-    property CloseQueryAction: IioBSSlaveAction read FCloseQueryAction write SetCloseQueryAction;
+    property Action_CloseQueryAction: IioBSSlaveAction read FAction_CloseQueryAction write SetAction_CloseQueryAction;
     property SelectionType: TioSelectionType read FSelectionType write FSelectionType default stAppend;
     property TargetBindSource;
   end;
@@ -183,13 +183,13 @@ type
   end;
 
   // BuildWhere
-  TioBSWhereBuild = class(TioBSStdActionFmx<IioStdActionTargetMasterBindSource>)
+  TioBSBuildWhere = class(TioBSStdActionFmx<IioStdActionTargetMasterBindSource>)
   strict private
-    FPersistAction: IioBSSlaveAction;
-    FCloseQueryAction: IioBSSlaveAction;
+    FAction_PersistAction: IioBSSlaveAction;
+    FAction_CloseQueryAction: IioBSSlaveAction;
     FWhereAutoExecuteOnTargetBS: Boolean;
-    procedure SetCloseQueryAction(const Value: IioBSSlaveAction);
-    procedure SetPersistAction(const Value: IioBSSlaveAction);
+    procedure SetAction_CloseQueryAction(const Value: IioBSSlaveAction);
+    procedure SetAction_PersistAction(const Value: IioBSSlaveAction);
   strict protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
@@ -197,14 +197,14 @@ type
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget(Target: TObject); override;
   published
-    property CloseQueryAction: IioBSSlaveAction read FCloseQueryAction write SetCloseQueryAction;
-    property PersistAction: IioBSSlaveAction read FPersistAction write SetPersistAction;
+    property Action_CloseQueryAction: IioBSSlaveAction read FAction_CloseQueryAction write SetAction_CloseQueryAction;
+    property Action_PersistAction: IioBSSlaveAction read FAction_PersistAction write SetAction_PersistAction;
     property TargetBindSource;
     property WhereAutoExecuteOnTargetBS: Boolean read FWhereAutoExecuteOnTargetBS write FWhereAutoExecuteOnTargetBS default True;
   end;
 
   // ClearWhere
-  TioBSWhereClear = class(TioBSStdActionFmx<IioStdActionTargetMasterBindSource>)
+  TioBSClearWhere = class(TioBSStdActionFmx<IioStdActionTargetMasterBindSource>)
   strict private
     FWhereAutoExecuteOnTargetBS: Boolean;
   public
@@ -228,7 +228,7 @@ type
   TioBSPersistenceStdActionFmx = class(Fmx.ActnList.TCustomAction, IioBSSlaveAction)
   strict private
     FClearAfterExecute: Boolean;
-    FCloseQueryAction: IioBSSlaveAction;
+    FAction_CloseQueryAction: IioBSSlaveAction;
     FDisableIfChangesDoesNotExists: Boolean;
     FDisableIfChangesExists: Boolean;
     FDisableIfSaved: Boolean;
@@ -237,19 +237,19 @@ type
     FRaiseIfChangesExists: Boolean;
     FRaiseIfRevertPointSaved: Boolean;
     FRaiseIfRevertPointNotSaved: Boolean;
-    FReloadAction: IioBSSlaveAction;
-    FShowOrSelectAction: IioBSSlaveAction;
+    FAction_ReloadAction: IioBSSlaveAction;
+    FAction_ShowOrSelectAction: IioBSSlaveAction;
     FTargetBindSource: IioMasterBindSource;
     function Get_Version: String;
     procedure _SetTargetBindSource(const AObj: TObject);
     procedure SetTargetBindSource(const Value: IioMasterBindSource);
-    procedure SetCloseQueryAction(const Value: IioBSSlaveAction);
-    procedure SetShowOrSelectAction(const Value: IioBSSlaveAction);
+    procedure SetAction_CloseQueryAction(const Value: IioBSSlaveAction);
+    procedure SetAction_ShowOrSelectAction(const Value: IioBSSlaveAction);
   strict protected
     function _IsEnabled: Boolean; virtual;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     property ClearAfterExecute: Boolean read FClearAfterExecute write FClearAfterExecute default True;
-    property CloseQueryAction: IioBSSlaveAction read FCloseQueryAction write SetCloseQueryAction;
+    property Action_CloseQueryAction: IioBSSlaveAction read FAction_CloseQueryAction write SetAction_CloseQueryAction;
     property DisableIfChangesDoesNotExists: Boolean read FDisableIfChangesDoesNotExists write FDisableIfChangesDoesNotExists default False;
     property DisableIfChangesExists: Boolean read FDisableIfChangesExists write FDisableIfChangesExists default False;
     property DisableIfSaved: Boolean read FDisableIfSaved write FDisableIfSaved default False;
@@ -257,8 +257,8 @@ type
     property RaiseIfChangesExists: Boolean read FRaiseIfChangesExists write FRaiseIfChangesExists default True;
     property RaiseIfRevertPointSaved: Boolean read FRaiseIfRevertPointSaved write FRaiseIfRevertPointSaved default False;
     property RaiseIfRevertPointNotSaved: Boolean read FRaiseIfRevertPointNotSaved write FRaiseIfRevertPointNotSaved default False;
-    property ReloadAction: IioBSSlaveAction read FReloadAction write FReloadAction;
-    property ShowOrSelectAction: IioBSSlaveAction read FShowOrSelectAction write SetShowOrSelectAction;
+    property Action_ReloadAction: IioBSSlaveAction read FAction_ReloadAction write FAction_ReloadAction;
+    property Action_ShowOrSelectAction: IioBSSlaveAction read FAction_ShowOrSelectAction write SetAction_ShowOrSelectAction;
     property TargetBindSource: IioMasterBindSource read FTargetBindSource write SetTargetBindSource;
   public
     constructor Create(AOwner: TComponent); override;
@@ -320,7 +320,7 @@ type
     procedure UpdateTarget(Target: TObject); override;
   published
     // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
-    property CloseQueryAction;
+    property Action_CloseQueryAction;
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property TargetBindSource;
@@ -336,7 +336,7 @@ type
     procedure UpdateTarget(Target: TObject); override;
   published
     // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
-    property CloseQueryAction;
+    property Action_CloseQueryAction;
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property RaiseIfRevertPointNotSaved;
@@ -357,7 +357,7 @@ type
     procedure UpdateTarget(Target: TObject); override;
   published
     // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
-    property CloseQueryAction;
+    property Action_CloseQueryAction;
     property CloseQueryActionOnDelete: Boolean read FCloseQueryActionOnDelete write FCloseQueryActionOnDelete default True;
     property CloseQueryActionOnRevert: Boolean read FCloseQueryActionOnRevert write FCloseQueryActionOnRevert default False;
     property DisableIfChangesDoesNotExists;
@@ -375,7 +375,7 @@ type
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget(Target: TObject); override;
   published
-    property CloseQueryAction;
+    property Action_CloseQueryAction;
     property DisableIfChangesExists;
     property DisableIfSaved;
     property RaiseIfChangesExists default False;
@@ -423,7 +423,7 @@ type
     property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
     property RaiseIfChangesExists default False;
     property RaiseIfRevertPointSaved;
-    property ShowOrSelectAction;
+    property Action_ShowOrSelectAction;
     property TargetBindSource;
     // events
     property OnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent read FOnNewInstanceAsObject write FOnNewInstanceAsObject;
@@ -451,7 +451,7 @@ type
     property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
     property RaiseIfChangesExists default False;
     property RaiseIfRevertPointSaved;
-    property ShowOrSelectAction;
+    property Action_ShowOrSelectAction;
     property TargetBindSource;
     // events
     property OnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent read FOnNewInstanceAsObject write FOnNewInstanceAsObject;
@@ -464,7 +464,7 @@ type
   end;
 
 
-  TioBSEtmRevert = class(TioBSPersistenceStdActionFmx)
+  TioBS_ETM_Revert = class(TioBSPersistenceStdActionFmx)
   private
     FPersistImmediately: Boolean;
   public
@@ -473,10 +473,10 @@ type
     procedure UpdateTarget(Target: TObject); override;
   published
     // Properties
-    property CloseQueryAction;
+    property Action_CloseQueryAction;
     property PersistImmediately: Boolean read FPersistImmediately write FPersistImmediately default False;
-    property ReloadAction;
-    property ShowOrSelectAction;
+    property Action_ReloadAction;
+    property Action_ShowOrSelectAction;
     property TargetBindSource;
     // Events
     property OnExecute;
@@ -495,7 +495,7 @@ type
     FOnExecuteAction: TioBSCloseQueryOnExecuteAction;
     FOnUpdateScope: TioBSCloseQueryActionUpdateScope;
     [weak]
-    FParentCloseQueryAction: IioBSCloseQueryAction;
+    FAction_ParentCloseQueryAction: IioBSCloseQueryAction;
     procedure _InjectEventHandler;
     function _CanClose: Boolean;
     function _IsChildOf(const ATargetQueryAction: IioBSCloseQueryAction): Boolean;
@@ -503,8 +503,8 @@ type
     function GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
     procedure SetInternalExecutionMode(const Value: TioCloseQueryActionExecutionMode);
     // ParentCloseQueryAction
-    function GetParentCloseQueryAction: IioBSCloseQueryAction;
-    procedure SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
+    function GetAction_ParentCloseQueryAction: IioBSCloseQueryAction;
+    procedure SetAction_ParentCloseQueryAction(const Value: IioBSCloseQueryAction);
   strict protected
     procedure _DummyOnExecute(Sender: TObject);
     function _IsEnabled: Boolean; override;
@@ -519,7 +519,7 @@ type
     function Executing: Boolean;
     procedure UpdateTarget(Target: TObject); override;
     property InternalExecutionMode: TioCloseQueryActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
-    property ParentCloseQueryAction: IioBSCloseQueryAction read GetParentCloseQueryAction write SetParentCloseQueryAction;
+    property Action_ParentCloseQueryAction: IioBSCloseQueryAction read GetAction_ParentCloseQueryAction write SetAction_ParentCloseQueryAction;
   published
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
     property InjectEventHandler: Boolean read FInjectEventHandler write FInjectEventHandler default True;
@@ -546,8 +546,8 @@ type
   strict private
     FEntityTypeName: String;
     FIsSlave: Boolean;
-    FParentCloseQueryAction: IioBSCloseQueryAction;
-    FSelectCurrentAction: IioBSSlaveAction;
+    FAction_ParentCloseQueryAction: IioBSCloseQueryAction;
+    FAction_SelectCurrentAction: IioBSSlaveAction;
     FShowMode: TioActionShowMode;
     FTargetBindSource: IioStdActionTargetBindSource;
     FVVMTypeAlias: String;
@@ -558,8 +558,8 @@ type
     function Get_Version: String;
     function _IsEnabled: Boolean;
     procedure _SetTargetBindSource(const AObj: TObject);
-    procedure SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
-    procedure SetSelectCurrentAction(const Value: IioBSSlaveAction);
+    procedure SetAction_ParentCloseQueryAction(const Value: IioBSCloseQueryAction);
+    procedure SetAction_SelectCurrentAction(const Value: IioBSSlaveAction);
     procedure SetTargetBindSource(const Value: IioStdActionTargetBindSource);
     procedure SetViewContext(const Value: TComponent);
     procedure SetViewContextProvider(const Value: TioViewContextProvider);
@@ -572,8 +572,8 @@ type
     procedure UpdateTarget (Target: TObject); override;
   published
     property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
-    property ParentCloseQueryAction: IioBSCloseQueryAction read FParentCloseQueryAction write SetParentCloseQueryAction;
-    property SelectCurrentAction: IioBSSlaveAction read FSelectCurrentAction write SetSelectCurrentAction;
+    property Action_ParentCloseQueryAction: IioBSCloseQueryAction read FAction_ParentCloseQueryAction write SetAction_ParentCloseQueryAction;
+    property Action_SelectCurrentAction: IioBSSlaveAction read FAction_SelectCurrentAction write SetAction_SelectCurrentAction;
     property ShowMode: TioActionShowMode read FShowMode write FShowMode;
     property TargetBindSource: IioStdActionTargetBindSource read FTargetBindSource write SetTargetBindSource;
     property VVMTypeAlias: String read FVVMTypeAlias write FVVMTypeAlias;
@@ -604,7 +604,7 @@ begin
   DisableIfNoHandler := False;
   // New fields
   FClearAfterExecute := True;
-  FCloseQueryAction := nil;
+  FAction_CloseQueryAction := nil;
   FDisableIfChangesDoesNotExists := False;
   FDisableIfChangesExists := False;
   FDisableIfSaved := False;
@@ -613,8 +613,8 @@ begin
   FRaiseIfChangesExists := True;
   FRaiseIfRevertPointSaved := False;
   FRaiseIfRevertPointNotSaved := False;
-  FReloadAction := nil;
-  FShowOrSelectAction := nil;
+  FAction_ReloadAction := nil;
+  FAction_ShowOrSelectAction := nil;
 end;
 
 function TioBSPersistenceStdActionFmx.Get_Version: String;
@@ -633,34 +633,34 @@ begin
   if (Operation = opRemove) and (AComponent = (FTargetBindSource as TComponent)) then
     TargetBindSource := nil
   else
-  if (Operation = opRemove) and (AComponent = (FCloseQueryAction as TComponent)) then
-    FCloseQueryAction := nil
+  if (Operation = opRemove) and (AComponent = (FAction_CloseQueryAction as TComponent)) then
+    FAction_CloseQueryAction := nil
   else
-  if (Operation = opRemove) and (AComponent = (FShowOrSelectAction as TComponent)) then
-    FShowOrSelectAction := nil;
+  if (Operation = opRemove) and (AComponent = (FAction_ShowOrSelectAction as TComponent)) then
+    FAction_ShowOrSelectAction := nil;
 end;
 
-procedure TioBSPersistenceStdActionFmx.SetCloseQueryAction(const Value: IioBSSlaveAction);
+procedure TioBSPersistenceStdActionFmx.SetAction_CloseQueryAction(const Value: IioBSSlaveAction);
 begin
-  if Value <> FCloseQueryAction then
+  if Value <> FAction_CloseQueryAction then
   begin
-    FCloseQueryAction := Value;
+    FAction_CloseQueryAction := Value;
     if Value <> nil then
       (Value as TComponent).FreeNotification(Self);
-    if Assigned(FCloseQueryAction) then
-      FCloseQueryAction._SetTargetBindSource(FTargetBindSource as TObject);
+    if Assigned(FAction_CloseQueryAction) then
+      FAction_CloseQueryAction._SetTargetBindSource(FTargetBindSource as TObject);
   end;
 end;
 
-procedure TioBSPersistenceStdActionFmx.SetShowOrSelectAction(const Value: IioBSSlaveAction);
+procedure TioBSPersistenceStdActionFmx.SetAction_ShowOrSelectAction(const Value: IioBSSlaveAction);
 begin
-  if Value <> FShowOrSelectAction then
+  if Value <> FAction_ShowOrSelectAction then
   begin
-    FShowOrSelectAction := Value;
+    FAction_ShowOrSelectAction := Value;
     if Value <> nil then
       (Value as TComponent).FreeNotification(Self);
-    if Assigned(FShowOrSelectAction) then
-      FShowOrSelectAction._SetTargetBindSource(FTargetBindSource as TObject);
+    if Assigned(FAction_ShowOrSelectAction) then
+      FAction_ShowOrSelectAction._SetTargetBindSource(FTargetBindSource as TObject);
   end;
 end;
 
@@ -673,10 +673,10 @@ begin
     FTargetBindSource := Value;
     if Value <> nil then
       (Value as TComponent).FreeNotification(Self);
-    if Assigned(FCloseQueryAction) then
-      FCloseQueryAction._SetTargetBindSource(Value as TObject);
-    if Assigned(FShowOrSelectAction) then
-      FShowOrSelectAction._SetTargetBindSource(Value as TObject);
+    if Assigned(FAction_CloseQueryAction) then
+      FAction_CloseQueryAction._SetTargetBindSource(Value as TObject);
+    if Assigned(FAction_ShowOrSelectAction) then
+      FAction_ShowOrSelectAction._SetTargetBindSource(Value as TObject);
   end;
 end;
 
@@ -684,8 +684,8 @@ procedure TioBSPersistenceStdActionFmx.UpdateTarget(Target: TObject);
 begin
   inherited;
   Enabled := True;
-  Enabled := Enabled and ((not Assigned(FCloseQueryAction)) or FCloseQueryAction._IsEnabled);
-  Enabled := Enabled and ((not Assigned(FShowOrSelectAction)) or FShowOrSelectAction._IsEnabled);
+  Enabled := Enabled and ((not Assigned(FAction_CloseQueryAction)) or FAction_CloseQueryAction._IsEnabled);
+  Enabled := Enabled and ((not Assigned(FAction_ShowOrSelectAction)) or FAction_ShowOrSelectAction._IsEnabled);
 end;
 
 function TioBSPersistenceStdActionFmx._IsEnabled: Boolean;
@@ -738,8 +738,8 @@ begin
   TargetBindSource.Refresh(True); // Otherwise, in some cases, an outdated value persisted
   TargetBindSource.Persistence.Persist(RaiseIfChangesDoesNotExists, ClearAfterExecute);
   // If assigned the "CloseQueryAction" then execute it
-  if Assigned(CloseQueryAction) and CloseQueryAction._IsEnabled then
-    CloseQueryAction.Execute;
+  if Assigned(Action_CloseQueryAction) and Action_CloseQueryAction._IsEnabled then
+    Action_CloseQueryAction.Execute;
 end;
 
 procedure TioBSPersistencePersist.UpdateTarget(Target: TObject);
@@ -755,8 +755,8 @@ procedure TioBSPersistenceRevert.ExecuteTarget(Target: TObject);
 begin
   TargetBindSource.Persistence.Revert(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists, ClearAfterExecute);
   // If assigned the "CloseQueryAction" then execute it
-  if Assigned(CloseQueryAction) and CloseQueryAction._IsEnabled then
-    CloseQueryAction.Execute;
+  if Assigned(Action_CloseQueryAction) and Action_CloseQueryAction._IsEnabled then
+    Action_CloseQueryAction.Execute;
 end;
 
 procedure TioBSPersistenceRevert.UpdateTarget(Target: TObject);
@@ -782,9 +782,9 @@ begin
   LIsDeleting := TargetBindSource.Persistence.IsInserting;
   TargetBindSource.Persistence.RevertOrDelete(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists, ClearAfterExecute);
   // If assigned the "CloseQueryAction" then execute it
-  if Assigned(CloseQueryAction) and CloseQueryAction._IsEnabled then
+  if Assigned(Action_CloseQueryAction) and Action_CloseQueryAction._IsEnabled then
     if (LIsDeleting and FCloseQueryActionOnDelete) or (not LIsDeleting and FCloseQueryActionOnRevert) then
-      CloseQueryAction.Execute;
+      Action_CloseQueryAction.Execute;
 end;
 
 procedure TioBSPersistenceRevertOrDelete.UpdateTarget(Target: TObject);
@@ -806,8 +806,8 @@ procedure TioBSPersistenceDelete.ExecuteTarget(Target: TObject);
 begin
   TargetBindSource.Persistence.Delete(RaiseIfRevertPointSaved, RaiseIfChangesExists);
   // If assigned the "CloseQueryAction" then execute it
-  if Assigned(CloseQueryAction) and CloseQueryAction._IsEnabled then
-    CloseQueryAction.Execute;
+  if Assigned(Action_CloseQueryAction) and Action_CloseQueryAction._IsEnabled then
+    Action_CloseQueryAction.Execute;
 end;
 
 procedure TioBSPersistenceDelete.UpdateTarget(Target: TObject);
@@ -909,8 +909,8 @@ begin
     TargetBindSource.Persistence.Append(RaiseIfRevertPointSaved, RaiseIfChangesExists);
     // If assigned the "ShowOrExecuteAction" then execute it
   finally
-    if Assigned(ShowOrSelectAction) and ShowOrSelectAction._IsEnabled then
-      ShowOrSelectAction.Execute;
+    if Assigned(Action_ShowOrSelectAction) and Action_ShowOrSelectAction._IsEnabled then
+      Action_ShowOrSelectAction.Execute;
   end;
 end;
 
@@ -993,8 +993,8 @@ begin
     TargetBindSource.Persistence.Insert(RaiseIfRevertPointSaved, RaiseIfChangesExists);
   finally
     // If assigned the "ShowOrExecuteAction" then execute it
-    if Assigned(ShowOrSelectAction) and ShowOrSelectAction._IsEnabled then
-      ShowOrSelectAction.Execute;
+    if Assigned(Action_ShowOrSelectAction) and Action_ShowOrSelectAction._IsEnabled then
+      Action_ShowOrSelectAction.Execute;
   end;
 end;
 
@@ -1012,7 +1012,7 @@ constructor TioBSSelectCurrent.Create(AOwner: TComponent);
 begin
   inherited;
   FIsSlave := False;
-  FCloseQueryAction := nil;
+  FAction_CloseQueryAction := nil;
   FSelectionType := stAppend;
 end;
 
@@ -1020,22 +1020,22 @@ procedure TioBSSelectCurrent.ExecuteTarget(Target: TObject);
 begin
   inherited;
   TargetBindSource.SelectCurrent(FSelectionType);
-  if Assigned(FCloseQueryAction) and FCloseQueryAction._IsEnabled then
-    FCloseQueryAction.Execute;
+  if Assigned(FAction_CloseQueryAction) and FAction_CloseQueryAction._IsEnabled then
+    FAction_CloseQueryAction.Execute;
 end;
 
 procedure TioBSSelectCurrent.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and (AComponent = (FCloseQueryAction as TComponent)) then
-    FCloseQueryAction := nil;
+  if (Operation = opRemove) and (AComponent = (FAction_CloseQueryAction as TComponent)) then
+    FAction_CloseQueryAction := nil;
 end;
 
-procedure TioBSSelectCurrent.SetCloseQueryAction(const Value: IioBSSlaveAction);
+procedure TioBSSelectCurrent.SetAction_CloseQueryAction(const Value: IioBSSlaveAction);
 begin
-  if Value <> FCloseQueryAction then
+  if Value <> FAction_CloseQueryAction then
   begin
-    FCloseQueryAction := Value;
+    FAction_CloseQueryAction := Value;
     if Value <> nil then
       (Value as TComponent).FreeNotification(Self);
   end;
@@ -1052,7 +1052,7 @@ end;
 procedure TioBSSelectCurrent.UpdateTarget(Target: TObject);
 begin
   inherited;
-  Enabled := TargetBindSource.CanDoSelection and ((not Assigned(FCloseQueryAction)) or FCloseQueryAction._IsEnabled);
+  Enabled := TargetBindSource.CanDoSelection and ((not Assigned(FAction_CloseQueryAction)) or FAction_CloseQueryAction._IsEnabled);
 end;
 
 function TioBSSelectCurrent._IsEnabled: Boolean;
@@ -1368,9 +1368,9 @@ begin
   FInternalExecutionMode := Value;
 end;
 
-procedure TioBSCloseQuery.SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
+procedure TioBSCloseQuery.SetAction_ParentCloseQueryAction(const Value: IioBSCloseQueryAction);
 begin
-  FParentCloseQueryAction := Value;
+  FAction_ParentCloseQueryAction := Value;
 end;
 
 function TioBSCloseQuery.HandlesTarget(Target: TObject): Boolean;
@@ -1444,9 +1444,9 @@ begin
   Result := FInternalExecutionMode;
 end;
 
-function TioBSCloseQuery.GetParentCloseQueryAction: IioBSCloseQueryAction;
+function TioBSCloseQuery.GetAction_ParentCloseQueryAction: IioBSCloseQueryAction;
 begin
-  Result := FParentCloseQueryAction;
+  Result := FAction_ParentCloseQueryAction;
 end;
 
 procedure TioBSCloseQuery._InjectEventHandler;
@@ -1506,76 +1506,76 @@ end;
 
 { TioBSWhereBuild }
 
-constructor TioBSWhereBuild.Create(AOwner: TComponent);
+constructor TioBSBuildWhere.Create(AOwner: TComponent);
 begin
   inherited;
-  FCloseQueryAction := nil;
-  FPersistAction := nil;
+  FAction_CloseQueryAction := nil;
+  FAction_PersistAction := nil;
   FWhereAutoExecuteOnTargetBS := True;
 end;
 
-procedure TioBSWhereBuild.ExecuteTarget(Target: TObject);
+procedure TioBSBuildWhere.ExecuteTarget(Target: TObject);
 begin
   inherited;
   TargetBindSource.BuildWhere(FWhereAutoExecuteOnTargetBS);
-  if Assigned(FPersistAction) and FPersistAction._IsEnabled then
-    FPersistAction.Execute;
-  if Assigned(FCloseQueryAction) and FCloseQueryAction._IsEnabled then
-    FCloseQueryAction.Execute;
+  if Assigned(FAction_PersistAction) and FAction_PersistAction._IsEnabled then
+    FAction_PersistAction.Execute;
+  if Assigned(FAction_CloseQueryAction) and FAction_CloseQueryAction._IsEnabled then
+    FAction_CloseQueryAction.Execute;
 end;
 
-procedure TioBSWhereBuild.Notification(AComponent: TComponent; Operation: TOperation);
+procedure TioBSBuildWhere.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) and (AComponent = (FCloseQueryAction as TComponent)) then
-    FCloseQueryAction := nil;
-  if (Operation = opRemove) and (AComponent = (FPersistAction as TComponent)) then
-    FPersistAction := nil;
+  if (Operation = opRemove) and (AComponent = (FAction_CloseQueryAction as TComponent)) then
+    FAction_CloseQueryAction := nil;
+  if (Operation = opRemove) and (AComponent = (FAction_PersistAction as TComponent)) then
+    FAction_PersistAction := nil;
 end;
 
-procedure TioBSWhereBuild.SetCloseQueryAction(const Value: IioBSSlaveAction);
+procedure TioBSBuildWhere.SetAction_CloseQueryAction(const Value: IioBSSlaveAction);
 begin
-  if Value <> FCloseQueryAction then
+  if Value <> FAction_CloseQueryAction then
   begin
-    FCloseQueryAction := Value;
+    FAction_CloseQueryAction := Value;
     if Value <> nil then
       (Value as TComponent).FreeNotification(Self);
   end;
 end;
 
-procedure TioBSWhereBuild.SetPersistAction(const Value: IioBSSlaveAction);
+procedure TioBSBuildWhere.SetAction_PersistAction(const Value: IioBSSlaveAction);
 begin
-  if Value <> FPersistAction then
+  if Value <> FAction_PersistAction then
   begin
-    FPersistAction := Value;
+    FAction_PersistAction := Value;
     if Value <> nil then
       (Value as TComponent).FreeNotification(Self);
   end;
 end;
 
-procedure TioBSWhereBuild.UpdateTarget(Target: TObject);
+procedure TioBSBuildWhere.UpdateTarget(Target: TObject);
 begin
   inherited;
   Enabled := TargetBindSource.isActive;
 //  Enabled := Enabled and ((not Assigned(FPersistAction)) or FPersistAction._IsEnabled); // To avoid incorrect disabling of the action
-  Enabled := Enabled and ((not Assigned(FCloseQueryAction)) or FCloseQueryAction._IsEnabled);
+  Enabled := Enabled and ((not Assigned(FAction_CloseQueryAction)) or FAction_CloseQueryAction._IsEnabled);
 end;
 
 { TioBSWhereClear }
 
-constructor TioBSWhereClear.Create(AOwner: TComponent);
+constructor TioBSClearWhere.Create(AOwner: TComponent);
 begin
   inherited;
   FWhereAutoExecuteOnTargetBS := False;
 end;
 
-procedure TioBSWhereClear.ExecuteTarget(Target: TObject);
+procedure TioBSClearWhere.ExecuteTarget(Target: TObject);
 begin
   inherited;
   TargetBindSource.ClearWhere(FWhereAutoExecuteOnTargetBS);
 end;
 
-procedure TioBSWhereClear.UpdateTarget(Target: TObject);
+procedure TioBSClearWhere.UpdateTarget(Target: TObject);
 begin
   inherited;
   Enabled := TargetBindSource.isActive;
@@ -1591,8 +1591,8 @@ begin
   // New fields
   FEntityTypeName := '';
   FIsSlave := False;
-  FParentCloseQueryAction := nil;
-  FSelectCurrentAction := nil;
+  FAction_ParentCloseQueryAction := nil;
+  FAction_SelectCurrentAction := nil;
   FShowMode := TioActionShowMode.smBSCurrent;
   FTargetBindSource := nil;
   FVVMTypeAlias := '';
@@ -1607,9 +1607,9 @@ begin
   inherited;
 
   // If the TargetBindSource is a SelectorFor some other BindSource then make the selection instead
-  if Assigned(FSelectCurrentAction) and FSelectCurrentAction._IsEnabled and Assigned((TargetBindSource as IioBindSource).SelectorFor) then
+  if Assigned(FAction_SelectCurrentAction) and FAction_SelectCurrentAction._IsEnabled and Assigned((TargetBindSource as IioBindSource).SelectorFor) then
   begin
-    FSelectCurrentAction.Execute;
+    FAction_SelectCurrentAction.Execute;
     Exit;
   end;
 
@@ -1619,13 +1619,13 @@ begin
     smBSCurrent:
       case FViewContextBy of
         vcByDefaultViewContextProvider:
-          io.ShowCurrent(FTargetBindSource as IioBindSource, FParentCloseQueryAction, FVVMTypeAlias);
+          io.ShowCurrent(FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, FVVMTypeAlias);
         vcByViewContextProviderName:
-          io.ShowCurrent(FTargetBindSource as IioBindSource, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+          io.ShowCurrent(FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
         vcByViewContextProvider:
-          io.ShowCurrent(FTargetBindSource as IioBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+          io.ShowCurrent(FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
         vcByViewContext:
-          io.ShowCurrent(FTargetBindSource as IioBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+          io.ShowCurrent(FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, FViewContext, FVVMTypeAlias);
 //        vcNone:
 //          io.ShowCurrent(FFromBS as IioBindSource, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
@@ -1633,13 +1633,13 @@ begin
     smBSEach:
       case FViewContextBy of
         vcByDefaultViewContextProvider:
-          io.ShowEach(FTargetBindSource as IioBindSource, FParentCloseQueryAction, FVVMTypeAlias);
+          io.ShowEach(FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, FVVMTypeAlias);
         vcByViewContextProviderName:
-          io.ShowEach(FTargetBindSource as IioBindSource, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+          io.ShowEach(FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
         vcByViewContextProvider:
-          io.ShowEach(FTargetBindSource as IioBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+          io.ShowEach(FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
         vcByViewContext:
-          io.ShowEach(FTargetBindSource as IioBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+          io.ShowEach(FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, FViewContext, FVVMTypeAlias);
 //        vcNone:
 //          io.ShowEach(FFromBS as IioBindSource, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
@@ -1647,13 +1647,13 @@ begin
     smEntityTypeName:
       case FViewContextBy of
         vcByDefaultViewContextProvider:
-          io.Show(FEntityTypeName, FParentCloseQueryAction, FVVMTypeAlias);
+          io.Show(FEntityTypeName, FAction_ParentCloseQueryAction, FVVMTypeAlias);
         vcByViewContextProviderName:
-          io.Show(FEntityTypeName, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+          io.Show(FEntityTypeName, FAction_ParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
         vcByViewContextProvider:
-          io.Show(FEntityTypeName, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+          io.Show(FEntityTypeName, FAction_ParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
         vcByViewContext:
-          io.Show(FEntityTypeName, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+          io.Show(FEntityTypeName, FAction_ParentCloseQueryAction, FViewContext, FVVMTypeAlias);
 //        vcNone:
 //          io.Show(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
@@ -1661,13 +1661,13 @@ begin
     smEntityTypeNameAsSelector:
       case FViewContextBy of
         vcByDefaultViewContextProvider:
-          io.ShowAsSelector(FEntityTypeName, FTargetBindSource as IioBindSource, FParentCloseQueryAction, FVVMTypeAlias);
+          io.ShowAsSelector(FEntityTypeName, FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, FVVMTypeAlias);
         vcByViewContextProviderName:
-          io.ShowAsSelector(FEntityTypeName, FTargetBindSource as IioBindSource, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+          io.ShowAsSelector(FEntityTypeName, FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
         vcByViewContextProvider:
-          io.ShowAsSelector(FEntityTypeName, FTargetBindSource as IioBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+          io.ShowAsSelector(FEntityTypeName, FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
         vcByViewContext:
-          io.ShowAsSelector(FEntityTypeName, FTargetBindSource as IioBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+          io.ShowAsSelector(FEntityTypeName, FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, FViewContext, FVVMTypeAlias);
 //        vcNone:
 //          io.ShowAsSelector(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
@@ -1675,13 +1675,13 @@ begin
     smBSTypeNameAsSelector:
       case FViewContextBy of
         vcByDefaultViewContextProvider:
-          io.ShowAsSelector(FTargetBindSource as IioBindSource, FParentCloseQueryAction, FVVMTypeAlias);
+          io.ShowAsSelector(FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, FVVMTypeAlias);
         vcByViewContextProviderName:
-          io.ShowAsSelector(FTargetBindSource as IioBindSource, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+          io.ShowAsSelector(FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
         vcByViewContextProvider:
-          io.ShowAsSelector(FTargetBindSource as IioBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+          io.ShowAsSelector(FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
         vcByViewContext:
-          io.ShowAsSelector(FTargetBindSource as IioBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+          io.ShowAsSelector(FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, FViewContext, FVVMTypeAlias);
 //        vcNone:
 //          io.ShowAsSelector(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
@@ -1689,13 +1689,13 @@ begin
     smEntityTypeNameAsWhereBuilder:
       case FViewContextBy of
         vcByDefaultViewContextProvider:
-          io.ShowAsWhereBuilder(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FVVMTypeAlias);
+          io.ShowAsWhereBuilder(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FVVMTypeAlias);
         vcByViewContextProviderName:
-          io.ShowAsWhereBuilder(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+          io.ShowAsWhereBuilder(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
         vcByViewContextProvider:
-          io.ShowAsWhereBuilder(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+          io.ShowAsWhereBuilder(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
         vcByViewContext:
-          io.ShowAsWhereBuilder(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+          io.ShowAsWhereBuilder(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FViewContext, FVVMTypeAlias);
 //        vcNone:
 //          io.ShowAsWhereBuilder(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
@@ -1703,13 +1703,13 @@ begin
     smBSTypeNameAsWhereBuilder:
       case FViewContextBy of
         vcByDefaultViewContextProvider:
-          io.ShowAsWhereBuilder(FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FVVMTypeAlias);
+          io.ShowAsWhereBuilder(FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FVVMTypeAlias);
         vcByViewContextProviderName:
-          io.ShowAsWhereBuilder(FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+          io.ShowAsWhereBuilder(FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
         vcByViewContextProvider:
-          io.ShowAsWhereBuilder(FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+          io.ShowAsWhereBuilder(FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
         vcByViewContext:
-          io.ShowAsWhereBuilder(FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+          io.ShowAsWhereBuilder(FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FViewContext, FVVMTypeAlias);
 //        vcNone:
 //          io.ShowAsWhereBuilder(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
@@ -1717,13 +1717,13 @@ begin
     smEntityTypeNameAsETM:
       case FViewContextBy of
         vcByDefaultViewContextProvider:
-          io.ShowAsETM(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FVVMTypeAlias);
+          io.ShowAsETM(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FVVMTypeAlias);
         vcByViewContextProviderName:
-          io.ShowAsETM(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+          io.ShowAsETM(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
         vcByViewContextProvider:
-          io.ShowAsETM(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+          io.ShowAsETM(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
         vcByViewContext:
-          io.ShowAsETM(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+          io.ShowAsETM(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FViewContext, FVVMTypeAlias);
 //        vcNone:
 //          io.ShowAsETM(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
@@ -1731,13 +1731,13 @@ begin
     smBSTypeNameAsETM:
       case FViewContextBy of
         vcByDefaultViewContextProvider:
-          io.ShowAsETM(FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FVVMTypeAlias);
+          io.ShowAsETM(FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FVVMTypeAlias);
         vcByViewContextProviderName:
-          io.ShowAsETM(FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+          io.ShowAsETM(FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
         vcByViewContextProvider:
-          io.ShowAsETM(FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+          io.ShowAsETM(FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
         vcByViewContext:
-          io.ShowAsETM(FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+          io.ShowAsETM(FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FViewContext, FVVMTypeAlias);
 //        vcNone:
 //          io.ShowAsETM(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
@@ -1762,11 +1762,11 @@ begin
     if (AComponent = (FTargetBindSource as TComponent)) then
       FTargetBindSource := nil
     else
-    if (AComponent = (FParentCloseQueryAction as TComponent)) then
-      FParentCloseQueryAction := nil
+    if (AComponent = (FAction_ParentCloseQueryAction as TComponent)) then
+      FAction_ParentCloseQueryAction := nil
     else
-    if (AComponent = (FSelectCurrentAction as TComponent)) then
-      FSelectCurrentAction := nil
+    if (AComponent = (FAction_SelectCurrentAction as TComponent)) then
+      FAction_SelectCurrentAction := nil
     else
     if (AComponent = (FViewContext as TComponent)) then
       FViewContext := nil
@@ -1785,30 +1785,30 @@ begin
     FTargetBindSource := Value;
     if Value <> nil then
       (Value as TComponent).FreeNotification(Self);
-    if Assigned(FSelectCurrentAction) then
-      FSelectCurrentAction._SetTargetBindSource(Value as TObject);
+    if Assigned(FAction_SelectCurrentAction) then
+      FAction_SelectCurrentAction._SetTargetBindSource(Value as TObject);
   end;
 end;
 
-procedure TioBSShowOrSelect.SetParentCloseQueryAction(const Value: IioBSCloseQueryAction);
+procedure TioBSShowOrSelect.SetAction_ParentCloseQueryAction(const Value: IioBSCloseQueryAction);
 begin
-  if Value <> FParentCloseQueryAction then
+  if Value <> FAction_ParentCloseQueryAction then
   begin
-    FParentCloseQueryAction := Value;
+    FAction_ParentCloseQueryAction := Value;
     if Value <> nil then
       (Value as TComponent).FreeNotification(Self);
   end;
 end;
 
-procedure TioBSShowOrSelect.SetSelectCurrentAction(const Value: IioBSSlaveAction);
+procedure TioBSShowOrSelect.SetAction_SelectCurrentAction(const Value: IioBSSlaveAction);
 begin
-  if Value <> FSelectCurrentAction then
+  if Value <> FAction_SelectCurrentAction then
   begin
-    FSelectCurrentAction := Value;
+    FAction_SelectCurrentAction := Value;
     if Value <> nil then
       (Value as TComponent).FreeNotification(Self);
-    if Assigned(FSelectCurrentAction) then
-      FSelectCurrentAction._SetTargetBindSource(FTargetBindSource as TObject);
+    if Assigned(FAction_SelectCurrentAction) then
+      FAction_SelectCurrentAction._SetTargetBindSource(FTargetBindSource as TObject);
   end;
 end;
 
@@ -1837,9 +1837,9 @@ begin
   inherited;
 
   // If the TargetBindSource is a SelectorFor some other BindSource then make the selection instead
-  if Assigned(FSelectCurrentAction) and Assigned((TargetBindSource as IioBindSource).SelectorFor) then
+  if Assigned(FAction_SelectCurrentAction) and Assigned((TargetBindSource as IioBindSource).SelectorFor) then
   begin
-    Enabled := FSelectCurrentAction._IsEnabled;
+    Enabled := FAction_SelectCurrentAction._IsEnabled;
     Exit;
   end;
 
@@ -1881,33 +1881,33 @@ end;
 
 { TioBSEtmRevert }
 
-constructor TioBSEtmRevert.Create(AOwner: TComponent);
+constructor TioBS_ETM_Revert.Create(AOwner: TComponent);
 begin
   inherited;
   FPersistImmediately := False;
 end;
 
-procedure TioBSEtmRevert.ExecuteTarget(Target: TObject);
+procedure TioBS_ETM_Revert.ExecuteTarget(Target: TObject);
 begin
   inherited;
   if not (TargetBindSource.Current is TioEtmCustomTimeSlot) then
     raise EioEtmException.Create(ClassName, 'ExecuteTarget', 'Current object if the TargetBindSource is not derived from "TioEtmCustomTimeSlot" base class.');
   TioEtmEngine.RevertToBindSource(TargetBindSource.Current as TioEtmCustomTimeSlot, TargetBindSource, FPersistImmediately);
   // If assigned the "CloseQueryAction" then execute it
-  if Assigned(CloseQueryAction) and CloseQueryAction._IsEnabled then
+  if Assigned(Action_CloseQueryAction) and Action_CloseQueryAction._IsEnabled then
   begin
-    CloseQueryAction.Execute;
+    Action_CloseQueryAction.Execute;
     Exit;
   end;
   // If assigned the "ShowOrSelectAction" then execute it
-  if Assigned(ShowOrSelectAction) and ShowOrSelectAction._IsEnabled then
-    ShowOrSelectAction.Execute;
+  if Assigned(Action_ShowOrSelectAction) and Action_ShowOrSelectAction._IsEnabled then
+    Action_ShowOrSelectAction.Execute;
   // If assigned the "ReloadAction" then execute it
-  if Assigned(ReloadAction) and ReloadAction._IsEnabled then
-    ReloadAction.Execute;
+  if Assigned(Action_ReloadAction) and Action_ReloadAction._IsEnabled then
+    Action_ReloadAction.Execute;
 end;
 
-procedure TioBSEtmRevert.UpdateTarget(Target: TObject);
+procedure TioBS_ETM_Revert.UpdateTarget(Target: TObject);
 begin
   inherited;
   Enabled := Enabled and Assigned(TargetBindSource);
