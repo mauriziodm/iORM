@@ -469,7 +469,10 @@ type
     procedure UpdateTarget (Target: TObject); override;
   published
     // Properties
+    property CloseQueryAction;
     property PersistImmediately: Boolean read FPersistImmediately write FPersistImmediately default False;
+    property ReloadAction;
+    property ShowOrSelectAction;
     property TargetBindSource;
     // Events
     property OnExecute;
@@ -1885,6 +1888,18 @@ begin
   if not (TargetBindSource.Current is TioEtmCustomTimeSlot) then
     raise EioEtmException.Create(ClassName, 'ExecuteTarget', 'Current object if the TargetBindSource is not derived from "TioEtmCustomTimeSlot" base class.');
   TioEtmEngine.RevertToBindSource(TargetBindSource.Current as TioEtmCustomTimeSlot, TargetBindSource, FPersistImmediately);
+  // If assigned the "CloseQueryAction" then execute it
+  if Assigned(CloseQueryAction) and CloseQueryAction._IsEnabled then
+  begin
+    CloseQueryAction.Execute;
+    Exit;
+  end;
+  // If assigned the "ShowOrSelectAction" then execute it
+  if Assigned(ShowOrSelectAction) and ShowOrSelectAction._IsEnabled then
+    ShowOrSelectAction.Execute;
+  // If assigned the "ReloadAction" then execute it
+  if Assigned(ReloadAction) and ReloadAction._IsEnabled then
+    ReloadAction.Execute;
 end;
 
 procedure TioBSEtmRevert.UpdateTarget(Target: TObject);
