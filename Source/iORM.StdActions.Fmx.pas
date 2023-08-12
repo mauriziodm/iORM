@@ -1682,6 +1682,62 @@ begin
 //        vcNone:
 //          io.ShowAsSelector(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
+    // smEntityTypeNameAsWhereBuilder
+    smEntityTypeNameAsWhereBuilder:
+      case FViewContextBy of
+        vcByDefaultViewContextProvider:
+          io.ShowAsWhereBuilder(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FVVMTypeAlias);
+        vcByViewContextProviderName:
+          io.ShowAsWhereBuilder(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+        vcByViewContextProvider:
+          io.ShowAsWhereBuilder(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+        vcByViewContext:
+          io.ShowAsWhereBuilder(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+//        vcNone:
+//          io.ShowAsWhereBuilder(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
+      end;
+    // smBSTypeNameAsWhereBuilder
+    smBSTypeNameAsWhereBuilder:
+      case FViewContextBy of
+        vcByDefaultViewContextProvider:
+          io.ShowAsWhereBuilder(FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FVVMTypeAlias);
+        vcByViewContextProviderName:
+          io.ShowAsWhereBuilder(FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+        vcByViewContextProvider:
+          io.ShowAsWhereBuilder(FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+        vcByViewContext:
+          io.ShowAsWhereBuilder(FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+//        vcNone:
+//          io.ShowAsWhereBuilder(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
+      end;
+    // smEntityTypeNameAsETM
+    smEntityTypeNameAsETM:
+      case FViewContextBy of
+        vcByDefaultViewContextProvider:
+          io.ShowAsETM(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FVVMTypeAlias);
+        vcByViewContextProviderName:
+          io.ShowAsETM(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+        vcByViewContextProvider:
+          io.ShowAsETM(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+        vcByViewContext:
+          io.ShowAsETM(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+//        vcNone:
+//          io.ShowAsETM(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
+      end;
+    // smBSTypeNameAsETM
+    smBSTypeNameAsETM:
+      case FViewContextBy of
+        vcByDefaultViewContextProvider:
+          io.ShowAsETM(FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FVVMTypeAlias);
+        vcByViewContextProviderName:
+          io.ShowAsETM(FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+        vcByViewContextProvider:
+          io.ShowAsETM(FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+        vcByViewContext:
+          io.ShowAsETM(FTargetBindSource as IioMasterBindSource, FParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+//        vcNone:
+//          io.ShowAsETM(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
+      end;
   end;
 end;
 
@@ -1786,11 +1842,11 @@ begin
 
   // ShowBy
   case FShowMode of
-    smBSCurrent, smBSEach, smBSTypeNameAsSelector:
+    smBSCurrent, smBSEach, smBSTypeNameAsSelector, smBSTypeNameAsWhereBuilder, smBSTypeNameAsETM:
       Enabled := assigned(FTargetBindSource) and FTargetBindSource.IsActive;
     smEntityTypeName:
       Enabled := not FEntityTypeName.Trim.IsEmpty;
-    smEntityTypeNameAsSelector:
+    smEntityTypeNameAsSelector, smEntityTypeNameAsWhereBuilder, smEntityTypeNameAsETM:
       Enabled := assigned(FTargetBindSource) and FTargetBindSource.IsActive and not FEntityTypeName.Trim.IsEmpty;
   end;
 //  // ViewContextBy
