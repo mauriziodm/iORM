@@ -349,8 +349,8 @@ type
 
   TioBSPersistenceRevertOrDelete = class(TioBSPersistenceStdActionFmx)
   private
-    FCloseQueryActionOnDelete:Boolean;
-    FCloseQueryActionOnRevert:Boolean;
+    FOnDelete_ExecuteCloseQueryAction:Boolean;
+    FOnRevert_ExecuteCloseQueryAction:Boolean;
   public
     constructor Create(AOwner: TComponent); override;
     procedure ExecuteTarget(Target: TObject); override;
@@ -358,8 +358,8 @@ type
   published
     // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property Action_CloseQueryAction;
-    property CloseQueryActionOnDelete: Boolean read FCloseQueryActionOnDelete write FCloseQueryActionOnDelete default True;
-    property CloseQueryActionOnRevert: Boolean read FCloseQueryActionOnRevert write FCloseQueryActionOnRevert default False;
+    property OnDelete_ExecuteCloseQueryAction: Boolean read FOnDelete_ExecuteCloseQueryAction write FOnDelete_ExecuteCloseQueryAction default True;
+    property OnRevert_ExecuteCloseQueryAction: Boolean read FOnRevert_ExecuteCloseQueryAction write FOnRevert_ExecuteCloseQueryAction default False;
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property RaiseIfRevertPointNotSaved;
@@ -771,8 +771,8 @@ end;
 constructor TioBSPersistenceRevertOrDelete.Create(AOwner: TComponent);
 begin
   inherited;
-  FCloseQueryActionOnDelete := True;
-  FCloseQueryActionOnRevert := False;
+  FOnDelete_ExecuteCloseQueryAction := True;
+  FOnRevert_ExecuteCloseQueryAction := False;
 end;
 
 procedure TioBSPersistenceRevertOrDelete.ExecuteTarget(Target: TObject);
@@ -783,7 +783,7 @@ begin
   TargetBindSource.Persistence.RevertOrDelete(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists, ClearAfterExecute);
   // If assigned the "CloseQueryAction" then execute it
   if Assigned(Action_CloseQueryAction) and Action_CloseQueryAction._IsEnabled then
-    if (LIsDeleting and FCloseQueryActionOnDelete) or (not LIsDeleting and FCloseQueryActionOnRevert) then
+    if (LIsDeleting and FOnDelete_ExecuteCloseQueryAction) or (not LIsDeleting and FOnRevert_ExecuteCloseQueryAction) then
       Action_CloseQueryAction.Execute;
 end;
 
