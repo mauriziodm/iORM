@@ -237,6 +237,7 @@ type
     FRaiseIfChangesExists: Boolean;
     FRaiseIfRevertPointSaved: Boolean;
     FRaiseIfRevertPointNotSaved: Boolean;
+    FReloadAction: IioBSSlaveAction;
     FShowOrSelectAction: IioBSSlaveAction;
     FTargetBindSource: IioMasterBindSource;
     function Get_Version: String;
@@ -256,6 +257,7 @@ type
     property RaiseIfChangesExists: Boolean read FRaiseIfChangesExists write FRaiseIfChangesExists default True;
     property RaiseIfRevertPointSaved: Boolean read FRaiseIfRevertPointSaved write FRaiseIfRevertPointSaved default False;
     property RaiseIfRevertPointNotSaved: Boolean read FRaiseIfRevertPointNotSaved write FRaiseIfRevertPointNotSaved default False;
+    property ReloadAction: IioBSSlaveAction read FReloadAction write FReloadAction;
     property ShowOrSelectAction: IioBSSlaveAction read FShowOrSelectAction write SetShowOrSelectAction;
     property TargetBindSource: IioMasterBindSource read FTargetBindSource write SetTargetBindSource;
   public
@@ -608,6 +610,7 @@ begin
   FRaiseIfChangesExists := True;
   FRaiseIfRevertPointSaved := False;
   FRaiseIfRevertPointNotSaved := False;
+  FReloadAction := nil;
   FShowOrSelectAction := nil;
 end;
 
