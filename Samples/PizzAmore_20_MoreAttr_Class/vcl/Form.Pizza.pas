@@ -54,7 +54,7 @@ var
 implementation
 
 uses
-  Model.Pizza;
+  Model.Pizza, System.UITypes;
 
 {$R *.dfm}
 

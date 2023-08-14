@@ -25,6 +25,8 @@ object CustomersForm: TCustomersForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 0
+    ExplicitTop = 720
+    ExplicitWidth = 380
     object ButtonAdd: TSpeedButton
       Left = 334
       Top = 0
@@ -83,7 +85,7 @@ object CustomersForm: TCustomersForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 56
+      ExplicitLeft = 44
       ExplicitTop = 6
     end
     object DBTextPageOf: TDBText
@@ -117,6 +119,7 @@ object CustomersForm: TCustomersForm
     Color = clNavy
     ParentBackground = False
     TabOrder = 1
+    ExplicitWidth = 380
     object ButtonSelect: TSpeedButton
       Left = 334
       Top = 0
@@ -219,7 +222,6 @@ object CustomersForm: TCustomersForm
     VirtualFields = True
     Paging.CurrentPageOfFormat = 'Page %d of %d'
     Paging.PageSize = 50
-    Paging.PagingType = ptHardPaging
     Left = 56
     Top = 112
     object DSCustomersID: TIntegerField

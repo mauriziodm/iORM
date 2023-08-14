@@ -16,17 +16,15 @@ type
     ioVCL1: TioVCL;
     SQLiteConn: TioSQLiteConnectionDef;
     FirebirdConn: TioFirebirdConnectionDef;
-    RemoteConn: TioRemoteConnectionDef;
     ButtonOrders: TButton;
     ButtonCustomers: TButton;
     ButtonPizzas: TButton;
     ButtonQuit: TButton;
     ActionList1: TActionList;
     acQuit: TioBSCloseQuery;
+    HttpConn: TioHttpConnectionDef;
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings);
-    procedure SQLiteConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
-      AWarnings: TStrings; var AAbort: Boolean);
     procedure ButtonCustomersClick(Sender: TObject);
     procedure ButtonPizzasClick(Sender: TObject);
     procedure ButtonOrdersClick(Sender: TObject);
@@ -43,7 +41,7 @@ var
 implementation
 
 uses
-  System.IOUtils, Utils.SampleData, Form.Customers, Form.Pizzas, Form.Orders;
+  System.IOUtils, System.UITypes, Utils.SampleData, Form.Customers, Form.Pizzas, Form.Orders;
 
 {$R *.dfm}
 
@@ -74,12 +72,6 @@ procedure TMainForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnec
   AWarnings: TStrings);
 begin
   TSampleData.CheckForSampleDataCreation;
-end;
-
-procedure TMainForm.SQLiteConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
-  AWarnings: TStrings; var AAbort: Boolean);
-begin
-  AScript.SaveToFile(TPath.Combine(TPath.GetDocumentsPath, 'iORM_Script_SQLite.txt'));
 end;
 
 end.

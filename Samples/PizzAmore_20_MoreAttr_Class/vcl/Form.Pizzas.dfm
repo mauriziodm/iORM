@@ -26,6 +26,7 @@ object PizzasForm: TPizzasForm
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
+    ExplicitWidth = 380
     object ButtonSelect: TSpeedButton
       Left = 334
       Top = 0
@@ -79,6 +80,8 @@ object PizzasForm: TPizzasForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
+    ExplicitTop = 520
+    ExplicitWidth = 380
     object ButtonAdd: TSpeedButton
       Left = 334
       Top = 0
@@ -124,6 +127,8 @@ object PizzasForm: TPizzasForm
     SelectedColor = 13828095
     ShowFocus = False
     OnDblClick = DBCtrlGrid1DblClick
+    ExplicitWidth = 380
+    ExplicitHeight = 480
     object DBTextName: TDBText
       Left = 99
       Top = 20

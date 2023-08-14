@@ -27,8 +27,10 @@ object CustomersForm: TCustomersForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 0
+    ExplicitTop = 719
+    ExplicitWidth = 376
     object ButtonAdd: TSpeedButton
-      Left = 334
+      Left = 330
       Top = 0
       Width = 50
       Height = 40
@@ -95,7 +97,7 @@ object CustomersForm: TCustomersForm
     object DBTextPageOf: TDBText
       Left = 150
       Top = 0
-      Width = 184
+      Width = 180
       Height = 40
       Align = alClient
       Alignment = taCenter
@@ -109,6 +111,7 @@ object CustomersForm: TCustomersForm
       ParentFont = False
       ExplicitLeft = 144
       ExplicitTop = 6
+      ExplicitWidth = 184
     end
   end
   object PanelTop: TPanel
@@ -121,8 +124,9 @@ object CustomersForm: TCustomersForm
     Color = clNavy
     ParentBackground = False
     TabOrder = 1
+    ExplicitWidth = 376
     object ButtonSelect: TSpeedButton
-      Left = 334
+      Left = 330
       Top = 0
       Width = 50
       Height = 40
@@ -135,6 +139,7 @@ object CustomersForm: TCustomersForm
       Font.Style = []
       ParentFont = False
       OnClick = ButtonSelectClick
+      ExplicitLeft = 334
       ExplicitTop = -6
     end
     object ButtonBack: TSpeedButton
@@ -229,6 +234,8 @@ object CustomersForm: TCustomersForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 3
+    ExplicitTop = 640
+    ExplicitWidth = 376
     DesignSize = (
       380
       79)
@@ -278,7 +285,7 @@ object CustomersForm: TCustomersForm
       ParentFont = False
     end
     object ButtonSearch: TSpeedButton
-      Left = 326
+      Left = 330
       Top = 0
       Width = 50
       Height = 45
@@ -291,10 +298,9 @@ object CustomersForm: TCustomersForm
       Font.Style = [fsBold]
       ParentFont = False
       OnClick = ButtonSearchClick
-      ExplicitLeft = 334
     end
     object ButtonClear: TSpeedButton
-      Left = 326
+      Left = 330
       Top = 49
       Width = 50
       Height = 25
@@ -307,7 +313,6 @@ object CustomersForm: TCustomersForm
       Font.Style = []
       ParentFont = False
       OnClick = ButtonClearClick
-      ExplicitLeft = 334
     end
     object DBEditWhereID: TDBEdit
       Left = 43
@@ -329,7 +334,7 @@ object CustomersForm: TCustomersForm
     object DBEditWhereName: TDBEdit
       Left = 155
       Top = 6
-      Width = 122
+      Width = 118
       Height = 25
       Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
@@ -343,12 +348,12 @@ object CustomersForm: TCustomersForm
       Font.Style = []
       ParentFont = False
       TabOrder = 1
-      ExplicitWidth = 126
+      ExplicitWidth = 114
     end
     object DBEditWhereCity: TDBEdit
       Left = 43
       Top = 37
-      Width = 234
+      Width = 230
       Height = 25
       Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
@@ -362,7 +367,7 @@ object CustomersForm: TCustomersForm
       Font.Style = []
       ParentFont = False
       TabOrder = 2
-      ExplicitWidth = 238
+      ExplicitWidth = 226
     end
   end
   object DSCustomers: TioDataSetMaster

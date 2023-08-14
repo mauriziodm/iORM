@@ -1,5 +1,5 @@
 inherited VMPizzas: TVMPizzas
-  inherited MPMaster: TioModelPresenterMaster
+  inherited BSMaster: TioModelPresenterMaster
     TypeName = 'IPizza'
     OrderBy = '[.Name]'
   end

@@ -4,8 +4,8 @@ object MainForm: TMainForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 546
-  ClientWidth = 284
+  ClientHeight = 545
+  ClientWidth = 280
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,8 +14,8 @@ object MainForm: TMainForm
   Font.Style = []
   Position = poDesktopCenter
   DesignSize = (
-    284
-    546)
+    280
+    545)
   TextHeight = 15
   object ImagePizza: TImage
     Left = 8
@@ -8480,13 +8480,14 @@ object MainForm: TMainForm
   end
   object Shape1: TShape
     Left = 0
-    Top = 323
-    Width = 284
+    Top = 322
+    Width = 280
     Height = 223
     Align = alBottom
     Brush.Color = clNavy
     Pen.Style = psClear
     ExplicitTop = 312
+    ExplicitWidth = 284
   end
   object LabelTitleAmore: TLabel
     Left = 130
@@ -8502,9 +8503,9 @@ object MainForm: TMainForm
     ParentFont = False
   end
   object ButtonOrders: TButton
-    Left = 32
-    Top = 336
-    Width = 201
+    Left = 40
+    Top = 335
+    Width = 189
     Height = 44
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'Orders'
@@ -8516,13 +8517,13 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 0
     OnClick = ButtonOrdersClick
-    ExplicitTop = 335
-    ExplicitWidth = 197
+    ExplicitTop = 334
+    ExplicitWidth = 185
   end
   object ButtonCustomers: TButton
-    Left = 32
-    Top = 387
-    Width = 201
+    Left = 40
+    Top = 386
+    Width = 189
     Height = 44
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'Customers'
@@ -8534,13 +8535,13 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 1
     OnClick = ButtonCustomersClick
-    ExplicitTop = 386
-    ExplicitWidth = 197
+    ExplicitTop = 385
+    ExplicitWidth = 185
   end
   object ButtonPizzas: TButton
-    Left = 32
-    Top = 438
-    Width = 201
+    Left = 40
+    Top = 437
+    Width = 189
     Height = 44
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'Pizzas'
@@ -8552,13 +8553,13 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 2
     OnClick = ButtonPizzasClick
-    ExplicitTop = 437
-    ExplicitWidth = 197
+    ExplicitTop = 436
+    ExplicitWidth = 185
   end
   object ButtonQuit: TButton
-    Left = 32
-    Top = 502
-    Width = 201
+    Left = 40
+    Top = 501
+    Width = 189
     Height = 32
     Action = acQuit
     Anchors = [akLeft, akRight, akBottom]
@@ -8569,8 +8570,8 @@ object MainForm: TMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 3
-    ExplicitTop = 501
-    ExplicitWidth = 197
+    ExplicitTop = 500
+    ExplicitWidth = 185
   end
   object ioVCL1: TioVCL
     Left = 8
@@ -8584,7 +8585,6 @@ object MainForm: TMainForm
     Persistent = False
     Pooled = False
     OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
-    OnBeforeCreateOrAlterDB = SQLiteConnBeforeCreateOrAlterDB
     Left = 64
     Top = 272
   end
@@ -8604,13 +8604,6 @@ object MainForm: TMainForm
     Left = 136
     Top = 272
   end
-  object RemoteConn: TioRemoteConnectionDef
-    AsDefault = False
-    BaseURL = 'http://localhost:8080'
-    Persistent = True
-    Left = 216
-    Top = 272
-  end
   object ActionList1: TActionList
     Left = 16
     Top = 56
@@ -8620,5 +8613,12 @@ object MainForm: TMainForm
       OnExecuteAction = eaTerminateApplication
       OnConfirmationRequest = acQuitConfirmationRequest
     end
+  end
+  object HttpConn: TioHttpConnectionDef
+    AsDefault = True
+    BaseURL = 'http://127.0.0.1:8080'
+    Persistent = True
+    Left = 205
+    Top = 272
   end
 end

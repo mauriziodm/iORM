@@ -57,7 +57,7 @@ implementation
 
 uses
   iORM.Context.Container, iORM.Where.Factory, System.SysUtils, iORM.Attributes,
-  iORM.DB.Factory, iORM.Exceptions, iORM.Utilities;
+  iORM.DB.Factory, iORM.Exceptions, iORM.Utilities, System.TypInfo;
 
 { TioWhereSmartBuilder }
 

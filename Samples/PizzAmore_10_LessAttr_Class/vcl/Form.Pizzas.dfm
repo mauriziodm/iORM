@@ -27,8 +27,9 @@ object PizzasForm: TPizzasForm
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
+    ExplicitWidth = 376
     object ButtonSelect: TSpeedButton
-      Left = 334
+      Left = 330
       Top = 0
       Width = 50
       Height = 40
@@ -41,6 +42,7 @@ object PizzasForm: TPizzasForm
       Font.Style = []
       ParentFont = False
       OnClick = ButtonSelectClick
+      ExplicitLeft = 334
       ExplicitTop = -6
     end
     object ButtonBack: TSpeedButton
@@ -82,8 +84,10 @@ object PizzasForm: TPizzasForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
+    ExplicitTop = 519
+    ExplicitWidth = 376
     object ButtonAdd: TSpeedButton
-      Left = 334
+      Left = 330
       Top = 0
       Width = 50
       Height = 40
@@ -125,6 +129,8 @@ object PizzasForm: TPizzasForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 3
+    ExplicitTop = 440
+    ExplicitWidth = 376
     DesignSize = (
       380
       79)
@@ -173,7 +179,7 @@ object PizzasForm: TPizzasForm
       ParentFont = False
     end
     object ButtonSearch: TSpeedButton
-      Left = 326
+      Left = 330
       Top = 0
       Width = 50
       Height = 45
@@ -186,10 +192,9 @@ object PizzasForm: TPizzasForm
       Font.Style = [fsBold]
       ParentFont = False
       OnClick = ButtonSearchClick
-      ExplicitLeft = 334
     end
     object ButtonClear: TSpeedButton
-      Left = 326
+      Left = 330
       Top = 49
       Width = 50
       Height = 25
@@ -202,7 +207,6 @@ object PizzasForm: TPizzasForm
       Font.Style = []
       ParentFont = False
       OnClick = ButtonClearClick
-      ExplicitLeft = 334
     end
     object Label4: TLabel
       Left = 179
@@ -301,6 +305,8 @@ object PizzasForm: TPizzasForm
     SelectedColor = 13828095
     ShowFocus = False
     OnDblClick = ButtonSelectClick
+    ExplicitWidth = 376
+    ExplicitHeight = 400
     object DBTextName: TDBText
       Left = 99
       Top = 20

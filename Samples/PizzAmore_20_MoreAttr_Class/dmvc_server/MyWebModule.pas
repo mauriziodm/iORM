@@ -71,7 +71,7 @@ begin
       // Max request size in bytes
       Config[TMVCConfigKey.MaxRequestSize] := IntToStr(TMVCConstants.DEFAULT_MAX_REQUEST_SIZE);
     end);
-  FMVC.AddController(TMyController);
+//  FMVC.AddController(TMyController);
   FMVC.AddController(TioDMVCController); // iORM remoting controller
 
   // Enable the following middleware declaration if you want to

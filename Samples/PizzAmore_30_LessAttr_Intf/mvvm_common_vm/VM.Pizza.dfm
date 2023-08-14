@@ -1,5 +1,5 @@
 inherited VMPizza: TVMPizza
-  inherited MPMaster: TioModelPresenterMaster
+  inherited BSMaster: TioModelPresenterMaster
     TypeName = 'IPizza'
   end
 end

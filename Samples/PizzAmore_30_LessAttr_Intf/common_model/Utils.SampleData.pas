@@ -55,25 +55,25 @@ begin
   LPizza.Name := 'Margherita pizza';
   LPizza.Price := 4.5;
   LPizza.Image.LoadFromFile(TPath.Combine(LImagesPath, 'MargheritaPizza.bmp'));
-  io.Persist(LPizza);
+  io.PersistObject(LPizza);
   //  Capricciosa pizza
   LPizza := io.Create<IPizza>;
   LPizza.Name := 'Capricciosa pizza';
   LPizza.Price := 7;
   LPizza.Image.LoadFromFile(TPath.Combine(LImagesPath, 'CapricciosaPizza.bmp'));
-  io.Persist(LPizza);
+  io.PersistObject(LPizza);
   // Pepperoni pizza
   LPizza := io.Create<IPizza>;
   LPizza.Name := 'Pepperoni pizza';
   LPizza.Price := 6.5;
   LPizza.Image.LoadFromFile(TPath.Combine(LImagesPath, 'PepperoniPizza.bmp'));
-  io.Persist(LPizza);
+  io.PersistObject(LPizza);
   // Love pizza
   LPizza := io.Create<IPizza>;
   LPizza.Name := 'Love pizza';
   LPizza.Price := 5;
   LPizza.Image.LoadFromFile(TPath.Combine(LImagesPath, 'LovePizza.bmp'));
-  io.Persist(LPizza);
+  io.PersistObject(LPizza);
 end;
 
 class procedure TSampleData.CreateRealCustomers;
@@ -86,21 +86,21 @@ begin
   LCustomer.City := 'New York';
   LCustomer.Address := '301 Park Ave';
   LCustomer.PhoneNumber := '(555) 555-1234';
-  io.Persist(LCustomer);
+  io.PersistObject(LCustomer);
   // Mr. Omar Bossoni
   LCustomer := io.Create<ICustomer>;
   LCustomer.Name := 'Omar Bossoni';
   LCustomer.City := 'New York';
   LCustomer.Address := '111 E 48th St';
   LCustomer.PhoneNumber := '(444) 444-1234';
-  io.Persist(LCustomer);
+  io.PersistObject(LCustomer);
   // Mr. Marco Mottadelli
   LCustomer := io.Create<ICustomer>;
   LCustomer.Name := 'Marco Mottadelli';
   LCustomer.City := 'Union City';
   LCustomer.Address := '3501 Bergenline Ave';
   LCustomer.PhoneNumber := '(333) 333-1234';
-  io.Persist(LCustomer);
+  io.PersistObject(LCustomer);
 end;
 
 class procedure TSampleData.CreateOtherCustomers;
@@ -115,7 +115,7 @@ begin
     LCustomer.City := Format('city %d', [LCounter]);
     LCustomer.Address := Format('address %d', [LCounter]);
     LCustomer.PhoneNumber := Format('phone number %d', [LCounter]);
-    io.Persist(LCustomer);
+    io.PersistObject(LCustomer);
   end;
 end;
 
@@ -131,7 +131,7 @@ begin
   LOrder.Rows.Add( io.Create<IOrderRow>('', [1, 'Margherita pizza', 4.5, 3]) );
   LOrder.Rows.Add( io.Create<IOrderRow>('', [2, 'Capricciosa pizza', 7, 2]) );
   LOrder.Rows.Add( io.Create<IOrderRow>('', [4, 'Love pizza', 5, 1]) );
-  io.Persist(LOrder);
+  io.PersistObject(LOrder);
   // Second order
   LOrder := io.Create<IOrder>;
   LOrder.OrderDate := Date;
@@ -139,13 +139,13 @@ begin
   LOrder.Note := 'Double cheese please';
   LOrder.Rows.Add( io.Create<IOrderRow>('', [1, 'Margherita pizza', 4.5, 1]) );
   LOrder.Rows.Add( io.Create<IOrderRow>('', [3, 'Pepperoni pizza', 6.5, 1]) );
-  io.Persist(LOrder);
+  io.PersistObject(LOrder);
   // Third order
   LOrder := io.Create<IOrder>;
   LOrder.OrderDate := Date;
   LOrder.Customer := io.LoadObject<ICustomer>(3);
   LOrder.Rows.Add( io.Create<IOrderRow>('', [4, 'Love pizza', 5, 1]) );
-  io.Persist(LOrder);
+  io.PersistObject(LOrder);
 end;
 
 end.

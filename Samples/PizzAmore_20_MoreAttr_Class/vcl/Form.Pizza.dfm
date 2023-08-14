@@ -4,8 +4,8 @@ object PizzaForm: TPizzaForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 501
-  ClientWidth = 413
+  ClientHeight = 500
+  ClientWidth = 409
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -92,15 +92,16 @@ object PizzaForm: TPizzaForm
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 413
+    Width = 409
     Height = 40
     Align = alTop
     BevelOuter = bvNone
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
+    ExplicitWidth = 413
     DesignSize = (
-      413
+      409
       40)
     object ButtonBack: TSpeedButton
       Left = 0
@@ -119,7 +120,7 @@ object PizzaForm: TPizzaForm
     object LabelTitle: TLabel
       Left = 56
       Top = 7
-      Width = 310
+      Width = 302
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -137,14 +138,16 @@ object PizzaForm: TPizzaForm
   end
   object PanelBottom: TPanel
     Left = 0
-    Top = 461
-    Width = 413
+    Top = 460
+    Width = 409
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
+    ExplicitTop = 461
+    ExplicitWidth = 413
     object ButtonRevert: TSpeedButton
       Left = 0
       Top = 0

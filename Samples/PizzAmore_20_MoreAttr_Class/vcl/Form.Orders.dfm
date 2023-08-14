@@ -25,6 +25,7 @@ object OrdersForm: TOrdersForm
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
+    ExplicitWidth = 430
     object ButtonSelect: TSpeedButton
       Left = 384
       Top = 0
@@ -79,6 +80,8 @@ object OrdersForm: TOrdersForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
+    ExplicitTop = 520
+    ExplicitWidth = 430
     object ButtonAdd: TSpeedButton
       Left = 384
       Top = 0

@@ -114,6 +114,7 @@ object OrderForm: TOrderForm
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
+    ExplicitWidth = 780
     DesignSize = (
       784
       40)
@@ -134,7 +135,7 @@ object OrderForm: TOrderForm
     object LabelTitle: TLabel
       Left = 56
       Top = 7
-      Width = 681
+      Width = 677
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -175,6 +176,8 @@ object OrderForm: TOrderForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
+    ExplicitTop = 521
+    ExplicitWidth = 780
     object ButtonRevert: TSpeedButton
       Left = 0
       Top = 0
@@ -264,6 +267,8 @@ object OrderForm: TOrderForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 2
+    ExplicitLeft = 430
+    ExplicitHeight = 481
     object DBCtrlGrid1: TDBCtrlGrid
       Left = 0
       Top = 0
@@ -280,6 +285,7 @@ object OrderForm: TOrderForm
       SelectedColor = 13828095
       ShowFocus = False
       OnDblClick = DBCtrlGrid1DblClick
+      ExplicitHeight = 481
       object DBTextName: TDBText
         Left = 99
         Top = 20
@@ -570,6 +576,7 @@ object OrderForm: TOrderForm
     Top = 312
   end
   object DSCustomer: TioDataSetDetail
+    AsDefault = False
     MasterBindSource = DSOrder
     MasterPropertyName = 'Customer'
     Left = 56
@@ -597,6 +604,7 @@ object OrderForm: TOrderForm
     Top = 376
   end
   object DSRows: TioDataSetDetail
+    AsDefault = False
     MasterBindSource = DSOrder
     MasterPropertyName = 'Rows'
     Left = 56

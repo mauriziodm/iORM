@@ -8502,7 +8502,7 @@ object MainForm: TMainForm
     ParentFont = False
   end
   object ButtonOrders: TButton
-    Left = 35
+    Left = 39
     Top = 337
     Width = 205
     Height = 44
@@ -8516,11 +8516,9 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 0
     OnClick = ButtonOrdersClick
-    ExplicitTop = 336
-    ExplicitWidth = 201
   end
   object ButtonCustomers: TButton
-    Left = 35
+    Left = 39
     Top = 387
     Width = 205
     Height = 44
@@ -8534,11 +8532,9 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 1
     OnClick = ButtonCustomersClick
-    ExplicitTop = 386
-    ExplicitWidth = 201
   end
   object ButtonPizzas: TButton
-    Left = 35
+    Left = 39
     Top = 438
     Width = 205
     Height = 44
@@ -8552,11 +8548,9 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 2
     OnClick = ButtonPizzasClick
-    ExplicitTop = 437
-    ExplicitWidth = 201
   end
   object ButtonQuit: TButton
-    Left = 35
+    Left = 39
     Top = 502
     Width = 205
     Height = 32
@@ -8570,8 +8564,6 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 3
     OnClick = ButtonQuitClick
-    ExplicitTop = 501
-    ExplicitWidth = 201
   end
   object ioVCL1: TioVCL
     Left = 8
