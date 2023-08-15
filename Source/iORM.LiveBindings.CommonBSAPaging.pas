@@ -36,7 +36,7 @@ unit iORM.LiveBindings.CommonBSAPaging;
 interface
 
 uses
-  System.Classes, System.SysUtils;
+  System.Classes, System.SysUtils, DJSON.Attributes;
 
 const
   CURRENT_PAGE_DEFAULT = 1;
@@ -116,6 +116,7 @@ type
   strict private
     FCurrentPage: Integer;
     FCurrentPageOfFormat: String;
+    [djSkip] // Mauri 15/08/2023 (fix issue winth paging when using http connection): to avoid djson serialization error
     FLoadPageMethod: TioBSAPagingLoadMethod;
     FNextPageStartOffset: Integer;
     FPageCount: Integer;

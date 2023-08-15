@@ -259,7 +259,12 @@ begin
     LConnection.RequestBody.Where := AWhere;
     LConnection.Execute('LoadList');
     // Deserialize  the JSONDataValue to the result object
-    dj.FromJSON(LConnection.ResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(AList);
+    // NB: Mauri 15/08/2023 (fix issue winth paging when using http connection):
+    //      Ho eliminato il "ClearCollection" dalla chiamata a DJSON perchè altrimenti non funzionava bene
+    //      il paging ti tipo progressive. In questo modo invece sembra funzionare bene. Spero che la cosa non causi problemi
+    //      in altri contesti. Lascio anche a vecchia versione commentata, poi vedremo.
+//    dj.FromJSON(LConnection.ResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(AList); // OLD CODE
+    dj.FromJSON(LConnection.ResponseBody.JSONDataValue).OpType(ssHTTP).byFields.TypeAnnotationsON.&To(AList);
     // Commit
     LConnection.Commit;
   except

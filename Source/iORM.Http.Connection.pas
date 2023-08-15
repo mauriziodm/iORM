@@ -121,17 +121,17 @@ end;
 
 procedure TioConnectionHttp.Execute(const AResource:String);
 var
-  RequestBodyJSONObject: TJSONObject;
+  LRequestBodyJSONObject: TJSONObject;
 begin
   // Set the requesta & execute it
   FRESTRequest.Resource := AResource;
   FRESTRequest.ClearBody;
-  RequestBodyJSONObject := FHttpRequestBody.ToJSONObject;
+  LRequestBodyJSONObject := FHttpRequestBody.ToJSONObject;
   try
-    FRESTRequest.AddBody(RequestBodyJSONObject);
+    FRESTRequest.AddBody(LRequestBodyJSONObject);
     FRESTRequest.Execute;
   finally
-    RequestBodyJSONObject.Free;
+    LRequestBodyJSONObject.Free;
   end;
   // Create and set the ioRESTResponseBody
   FHttpResponseBody := TioHttpFactory.NewResponseBody(FRESTResponse.Content, False);

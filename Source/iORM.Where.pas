@@ -46,7 +46,7 @@ uses
   System.Generics.Collections, iORM.Where.Destinations,
   iORM.Context.Map.Interfaces, FireDAC.Comp.Client, System.TypInfo,
   iORM.Utilities, iORM.LiveBindings.CommonBSAPaging,
-  DJSON.Attributes, iORM.Context.Interfaces, iORM.StdActions.Interfaces,
+  iORM.Context.Interfaces, iORM.StdActions.Interfaces,
   iORM.LiveBindings.Interfaces;
 
 type
@@ -75,8 +75,8 @@ type
     // Aggiunto attributo per non serializzare l'oggetto TioCommonBSAPageManager
     // Mauri 30/04/22 aggiunto campo FPagingObjExists per risolvere un problema con HttpConnection
     //        (dopo la deserializzazione lato server era in uno stato non ben definito)
-    [djSkip] FPagingObj: TioCommonBSAPageManager;
-    [djSkip] FPagingObjExists: Boolean;
+    FPagingObj: TioCommonBSAPageManager;
+    FPagingObjExists: Boolean;
 
     procedure _Show(const ADataObject: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;
     procedure _Show(const ADataObject: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;
