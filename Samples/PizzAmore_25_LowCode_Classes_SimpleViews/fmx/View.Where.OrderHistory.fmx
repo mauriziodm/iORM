@@ -1,0 +1,69 @@
+inherited ViewOrderHistory: TViewOrderHistory
+  inherited RectangleTitle: TRectangle
+    inherited LabelTitle: TLabel
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      Text = 'Where history'
+    end
+  end
+  inherited ListView: TListView
+    ItemIndex = 0
+    Size.Height = 520.000000000000000000
+  end
+  inherited RectangleWhere: TRectangle
+    Visible = False
+  end
+  inherited BSMaster: TioPrototypeBindSourceMaster
+    AutoActivate = True
+    FieldDefs = <
+      item
+        Name = 'OrderState'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'Note'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'FromDate'
+        FieldType = ftDate
+        Generator = 'Date'
+        ReadOnly = False
+      end
+      item
+        Name = 'ToDate'
+        FieldType = ftDate
+        Generator = 'Date'
+        ReadOnly = False
+      end>
+    Preview = True
+    TypeName = 'TWhereOrder'
+  end
+  inherited BSWhere: TioPrototypeBindSourceMaster
+    TypeName = 'TWhereOrder'
+  end
+  object BindingsList1: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 20
+    Top = 5
+    object LinkListControlToField1: TLinkListControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSMaster
+      FieldName = 'OrderState'
+      Control = ListView
+      CustomFormat = '%s + '#39' - '#39' +Owner.Note.Value'
+      FillExpressions = <
+        item
+          SourceMemberName = 'FromDate'
+          ControlMemberName = 'Detail'
+          CustomFormat = 
+            'FormatDateTime('#39'dd/mm/yyyy'#39', %s) + '#39' to '#39' + FormatDateTime('#39'dd/m' +
+            'm/yyyy'#39', Owner.ToDate.Value)'
+        end>
+      FillHeaderExpressions = <>
+      FillBreakGroups = <>
+    end
+  end
+end
