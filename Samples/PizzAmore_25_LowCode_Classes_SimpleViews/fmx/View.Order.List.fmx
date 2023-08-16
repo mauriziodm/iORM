@@ -129,6 +129,9 @@ inherited ViewOrderList: TViewOrderList
     end
   end
   inherited ActionList1: TActionList
+    inherited acBuildWhere: TioBSBuildWhere
+      Action_PersistAction = acWherePersist
+    end
     object acWhereShowHistory: TioBSShowOrSelect
       Category = 'iORM-BS'
       Text = 'History'
@@ -190,6 +193,7 @@ inherited ViewOrderList: TViewOrderList
         ReadOnly = False
       end>
     TypeName = 'TWhereOrder'
+    AfterSelectionObject = BSWhereAfterSelectionObject
     OnReceiveSelectionFreeObject = False
   end
   object BindingsList1: TBindingsList

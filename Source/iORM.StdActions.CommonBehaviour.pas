@@ -9,23 +9,22 @@ type
 
   TioStdActionCommonBehaviour = class
   public
-    class procedure ExecuteSlaveAction(const ASlaveAction: IioBSSlaveAction);
+    class function ExecuteSlaveAction(const ASlaveAction: IioBSSlaveAction; const ADelayed: Boolean = False): Boolean;
   end;
 
 implementation
 
 uses
-  iORM, iORM.Abstraction, iORM.Exceptions;
+  iORM, iORM.Abstraction, iORM.Exceptions, iORM.StdActions.Fmx;
 
 { TioStdActionCommonBehaviour }
 
-class procedure TioStdActionCommonBehaviour.ExecuteSlaveAction(const ASlaveAction: IioBSSlaveAction);
+class function TioStdActionCommonBehaviour.ExecuteSlaveAction(const ASlaveAction: IioBSSlaveAction; const ADelayed: Boolean = False): Boolean;
 begin
+  Result := False;
   if Assigned(ASlaveAction) and ASlaveAction._IsEnabled then
   begin
-    // NB: Mauri 16/08/2023: Su firemonkey c'erano dee problemi soprattutto quando si usava una ListView,
-    //  per risolvere, solo su FMX, eseguo le slave actions ritardate attraverso un timer.
-    if TioApplication.ProjectPlatform = ppFMX then
+    if ADelayed then
       io.AnonymousTimer(100,
         function: boolean
         begin
@@ -34,6 +33,7 @@ begin
       )
     else
       ASlaveAction.Execute;
+    Result := True;
   end;
 end;
 

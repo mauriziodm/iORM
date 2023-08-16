@@ -231,8 +231,10 @@ type
   // Base class for all BinsDourceObjState standard actions
   TioVMActionBSPersistenceCustom = class(TioVMActionCustom, IioBSSlaveAction)
   strict private
-    FClearAfterExecute: Boolean;
     FAction_CloseQueryAction: IioBSSlaveAction;
+    FAction_ReloadAction: IioBSSlaveAction;
+    FAction_ShowOrSelectAction: IioBSSlaveAction;
+    FClearAfterExecute: Boolean;
     FDisableIfChangesDoesNotExists: Boolean;
     FDisableIfChangesExists: Boolean;
     FDisableIfSaved: Boolean;
@@ -241,8 +243,6 @@ type
     FRaiseIfChangesExists: Boolean;
     FRaiseIfRevertPointSaved: Boolean;
     FRaiseIfRevertPointNotSaved: Boolean;
-    FAction_ReloadAction: IioBSSlaveAction;
-    FAction_ShowOrSelectAction: IioBSSlaveAction;
     FTargetBindSource: IioMasterBindSource;
     function Get_Version: String;
     procedure _SetTargetBindSource(const AObj: TObject);
@@ -250,11 +250,13 @@ type
     procedure SetAction_CloseQueryAction(const Value: IioBSSlaveAction);
     procedure SetAction_ShowOrSelectAction(const Value: IioBSSlaveAction);
   protected
+    property Action_CloseQueryAction: IioBSSlaveAction read FAction_CloseQueryAction write SetAction_CloseQueryAction;
+    property Action_ReloadAction: IioBSSlaveAction read FAction_ReloadAction write FAction_ReloadAction;
+    property Action_ShowOrSelectAction: IioBSSlaveAction read FAction_ShowOrSelectAction write SetAction_ShowOrSelectAction;
     function _IsEnabled: Boolean; virtual;
     procedure _InternalUpdateStdAction; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     property ClearAfterExecute: Boolean read FClearAfterExecute write FClearAfterExecute default True;
-    property Action_CloseQueryAction: IioBSSlaveAction read FAction_CloseQueryAction write SetAction_CloseQueryAction;
     property DisableIfChangesDoesNotExists: Boolean read FDisableIfChangesDoesNotExists write FDisableIfChangesDoesNotExists default False;
     property DisableIfChangesExists: Boolean read FDisableIfChangesExists write FDisableIfChangesExists default False;
     property DisableIfSaved: Boolean read FDisableIfSaved write FDisableIfSaved default False;
@@ -262,8 +264,6 @@ type
     property RaiseIfChangesExists: Boolean read FRaiseIfChangesExists write FRaiseIfChangesExists default True;
     property RaiseIfRevertPointSaved: Boolean read FRaiseIfRevertPointSaved write FRaiseIfRevertPointSaved default False;
     property RaiseIfRevertPointNotSaved: Boolean read FRaiseIfRevertPointNotSaved write FRaiseIfRevertPointNotSaved default False;
-    property Action_ReloadAction: IioBSSlaveAction read FAction_ReloadAction write FAction_ReloadAction;
-    property Action_ShowOrSelectAction: IioBSSlaveAction read FAction_ShowOrSelectAction write SetAction_ShowOrSelectAction;
     property TargetBindSource: IioMasterBindSource read FTargetBindSource write SetTargetBindSource;
   public
     constructor Create(AOwner: TComponent); override;
@@ -380,13 +380,13 @@ type
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
   published
+    property Action_ShowOrSelectAction;
     property DisableIfChangesExists;
     property DisableIfSaved;
     property EntityTypeAlias: String read FEntityTypeAlias write FEntityTypeAlias;
     property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
     property RaiseIfChangesExists default False;
     property RaiseIfRevertPointSaved;
-    property Action_ShowOrSelectAction;
     property TargetBindSource;
     // events
     property OnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent read FOnNewInstanceAsObject write FOnNewInstanceAsObject;
@@ -405,13 +405,13 @@ type
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
   published
+    property Action_ShowOrSelectAction;
     property DisableIfChangesExists;
     property DisableIfSaved;
     property EntityTypeAlias: String read FEntityTypeAlias write FEntityTypeAlias;
     property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
     property RaiseIfChangesExists default False;
     property RaiseIfRevertPointSaved;
-    property Action_ShowOrSelectAction;
     property TargetBindSource;
     // events
     property OnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent read FOnNewInstanceAsObject write FOnNewInstanceAsObject;
@@ -431,14 +431,16 @@ type
   published
     // Properties
     property Action_CloseQueryAction;
-    property PersistImmediately: Boolean read FPersistImmediately write FPersistImmediately default False;
     property Action_ReloadAction;
     property Action_ShowOrSelectAction;
+    property PersistImmediately: Boolean read FPersistImmediately write FPersistImmediately default False;
     property TargetBindSource;
   end;
 
   TioVMActionBSCloseQuery = class(TioVMActionBSPersistenceCustom, IioBSCloseQueryAction, IioBSCloseQueryVMAction)
   strict private
+    [weak]
+    FAction_ParentCloseQueryAction: IioBSCloseQueryAction;
     FExecuting, FExecutingEventHandler: Boolean;
     FInjectVMEventHandler: Boolean;
     FInjectViewEventHandler: Boolean;
@@ -448,8 +450,6 @@ type
     FOnEditingAction: TioBSCloseQueryOnEditingAction;
     FOnExecuteAction: TioBSCloseQueryOnExecuteAction;
     FOnUpdateScope: TioBSCloseQueryActionUpdateScope;
-    [weak]
-    FAction_ParentCloseQueryAction: IioBSCloseQueryAction;
     procedure _InjectEventHandlerOnViewModel(const AViewModelAsTComponent: TComponent); // TComponent to avoid circular reference
     procedure _InjectEventHandlerOnView(const AView: TComponent);
     function _CanClose: Boolean;
@@ -471,8 +471,8 @@ type
     function Execute: Boolean; override;
     function Executing: Boolean;
     function Update: Boolean; override;
-    property InternalExecutionMode: TioCloseQueryActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
     property Action_ParentCloseQueryAction: IioBSCloseQueryAction read GetAction_ParentCloseQueryAction write SetAction_ParentCloseQueryAction;
+    property InternalExecutionMode: TioCloseQueryActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
   published
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
     property InjectViewEventHandler: Boolean read FInjectViewEventHandler write FInjectViewEventHandler default True;
@@ -497,10 +497,10 @@ type
   // ShowCurrent action to show the current object of the BS
   TioVMActionBSShowOrSelect = class(TioVMActionCustom, IioBSSlaveAction)
   strict private
-    FEntityTypeName: String;
-    FIsSlave: Boolean;
     FAction_ParentCloseQueryAction: IioBSCloseQueryAction;
     FAction_SelectCurrentAction: IioBSSlaveAction;
+    FEntityTypeName: String;
+    FIsSlave: Boolean;
     FShowMode: TioActionShowMode;
     FTargetBindSource: IioStdActionTargetBindSource;
     FVVMTypeAlias: String;
@@ -524,12 +524,12 @@ type
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
   published
+    property Action_ParentCloseQueryAction: IioBSCloseQueryAction read FAction_ParentCloseQueryAction write SetAction_ParentCloseQueryAction;
+    property Action_SelectCurrentAction: IioBSSlaveAction read FAction_SelectCurrentAction write SetAction_SelectCurrentAction;
     property Caption;
     property Enabled;
     property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
     property Name;
-    property Action_ParentCloseQueryAction: IioBSCloseQueryAction read FAction_ParentCloseQueryAction write SetAction_ParentCloseQueryAction;
-    property Action_SelectCurrentAction: IioBSSlaveAction read FAction_SelectCurrentAction write SetAction_SelectCurrentAction;
     property ShowMode: TioActionShowMode read FShowMode write FShowMode;
     property TargetBindSource: IioStdActionTargetBindSource read FTargetBindSource write SetTargetBindSource;
     property VVMTypeAlias: String read FVVMTypeAlias write FVVMTypeAlias;
@@ -550,7 +550,7 @@ implementation
 uses
   System.SysUtils, iORM.Utilities, iORM.Exceptions, iORM, System.Rtti,
   iORM.RttiContext.Factory, iORM.StdActions.CloseQueryActionRegister,
-  iORM.Abstraction, iORM.ETM.Engine;
+  iORM.Abstraction, iORM.ETM.Engine, iORM.StdActions.CommonBehaviour;
 
 { TioVMActionCustom }
 
@@ -838,8 +838,8 @@ procedure TioVMActionBSSelectCurrent._InternalExecuteStdAction;
 begin
   inherited;
   TargetBindSource.SelectCurrent(FSelectionType);
-  if Assigned(FAction_CloseQueryAction) and FAction_CloseQueryAction._IsEnabled and FAction_CloseQueryAction._IsEnabled then
-    FAction_CloseQueryAction.Execute;
+  // Execute slave actions
+  TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_CloseQueryAction);
 end;
 
 procedure TioVMActionBSSelectCurrent._InternalUpdateStdAction;
@@ -1047,9 +1047,8 @@ procedure TioVMActionBSPersistencePersist._InternalExecuteStdAction;
 begin
   TargetBindSource.Refresh(True); // Otherwise, in some cases, an outdated value persisted
   TargetBindSource.Persistence.Persist(RaiseIfChangesDoesNotExists, ClearAfterExecute);
-  // If assigned the "CloseQueryAction" then execute it
-  if Assigned(Action_CloseQueryAction) and Action_CloseQueryAction._IsEnabled then
-    Action_CloseQueryAction.Execute;
+  // Execute slave actions
+  TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
 
 procedure TioVMActionBSPersistencePersist._InternalUpdateStdAction;
@@ -1064,9 +1063,8 @@ end;
 procedure TioVMActionBSPersistenceRevert._InternalExecuteStdAction;
 begin
   TargetBindSource.Persistence.Revert(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists, ClearAfterExecute);
-  // If assigned the "CloseQueryAction" then execute it
-  if Assigned(Action_CloseQueryAction) and Action_CloseQueryAction._IsEnabled then
-    Action_CloseQueryAction.Execute;
+  // Execute slave actions
+  TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
 
 procedure TioVMActionBSPersistenceRevert._InternalUpdateStdAction;
@@ -1091,10 +1089,9 @@ var
 begin
   LIsDeleting := TargetBindSource.Persistence.IsInserting;
   TargetBindSource.Persistence.RevertOrDelete(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists, ClearAfterExecute);
-  // If assigned the "CloseQueryAction" then execute it
-  if Assigned(Action_CloseQueryAction) and Action_CloseQueryAction._IsEnabled then
-    if (LIsDeleting and FOnDelete_ExecuteCloseQueryAction) or (not LIsDeleting and FOnRevert_ExecuteCloseQueryAction) then
-      Action_CloseQueryAction.Execute;
+  // Execute slave actions
+  if (LIsDeleting and FOnDelete_ExecuteCloseQueryAction) or (not LIsDeleting and FOnRevert_ExecuteCloseQueryAction) then
+    TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
 
 procedure TioVMActionBSPersistenceRevertOrDelete._InternalUpdateStdAction;
@@ -1115,9 +1112,8 @@ end;
 procedure TioVMActionBSPersistenceDelete._InternalExecuteStdAction;
 begin
   TargetBindSource.Persistence.Delete(RaiseIfRevertPointSaved, RaiseIfChangesExists);
-  // If assigned the "CloseQueryAction" then execute it
-  if Assigned(Action_CloseQueryAction) and Action_CloseQueryAction._IsEnabled then
-    Action_CloseQueryAction.Execute;
+  // Execute slave actions
+  TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
 
 procedure TioVMActionBSPersistenceDelete._InternalUpdateStdAction;
@@ -1218,9 +1214,8 @@ begin
     // New instance not provided (created by the ABSAdapter itself)
     TargetBindSource.Persistence.Append(RaiseIfRevertPointSaved, RaiseIfChangesExists);
   finally
-    // If assigned the "ShowOrExecuteAction" then execute it
-    if Assigned(Action_ShowOrSelectAction) and Action_ShowOrSelectAction._IsEnabled then
-      Action_ShowOrSelectAction.Execute;
+    // Execute slave actions
+    TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_ShowOrSelectAction);
   end;
 end;
 
@@ -1301,9 +1296,8 @@ begin
     // New instance not provided (created by the ABSAdapter itself)
     TargetBindSource.Persistence.Insert(RaiseIfRevertPointSaved, RaiseIfChangesExists);
   finally
-    // If assigned the "ShowOrExecuteAction" then execute it
-    if Assigned(Action_ShowOrSelectAction) and Action_ShowOrSelectAction._IsEnabled then
-      Action_ShowOrSelectAction.Execute;
+    // Execute slave actions
+    TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_ShowOrSelectAction);
   end;
 end;
 
@@ -1531,10 +1525,9 @@ procedure TioVMActionBSBuildWhere._InternalExecuteStdAction;
 begin
   inherited;
   TargetBindSource.BuildWhere(FWhereAutoExecuteOnTargetBS);
-  if Assigned(FAction_PersistAction) and FAction_PersistAction._IsEnabled then
-    FAction_PersistAction.Execute;
-  if Assigned(FAction_CloseQueryAction) and FAction_CloseQueryAction._IsEnabled then
-    FAction_CloseQueryAction.Execute;
+  // Execute slave actions
+  TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_PersistAction);
+  TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_CloseQueryAction);
 end;
 
 procedure TioVMActionBSBuildWhere._InternalUpdateStdAction;
@@ -1671,9 +1664,10 @@ begin
   inherited;
 
   // If the TargetBindSource is a SelectorFor some other BindSource then make the selection instead
-  if Assigned(FAction_SelectCurrentAction) and FAction_SelectCurrentAction._IsEnabled and Assigned((TargetBindSource as IioBindSource).SelectorFor) then
+  if Assigned(TargetBindSource) and Assigned((TargetBindSource as IioBindSource).SelectorFor) then
   begin
-    FAction_SelectCurrentAction.Execute;
+    // Execute slave actions
+    TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_SelectCurrentAction);
     Exit;
   end;
 
@@ -1869,18 +1863,11 @@ begin
   if not (TargetBindSource.Current is TioEtmCustomTimeSlot) then
     raise EioEtmException.Create(ClassName, 'ExecuteTarget', 'Current object if the TargetBindSource is not derived from "TioEtmCustomTimeSlot" base class.');
   TioEtmEngine.RevertToBindSource(TargetBindSource.Current as TioEtmCustomTimeSlot, TargetBindSource, FPersistImmediately);
-  // If assigned the "CloseQueryAction" then execute it
-  if Assigned(Action_CloseQueryAction) and Action_CloseQueryAction._IsEnabled then
-  begin
-    Action_CloseQueryAction.Execute;
+  // Execute slave actions
+  if TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction) then
     Exit;
-  end;
-  // If assigned the "ShowOrSelectAction" then execute it
-  if Assigned(Action_ShowOrSelectAction) and Action_ShowOrSelectAction._IsEnabled then
-    Action_ShowOrSelectAction.Execute;
-  // If assigned the "ReloadAction" then execute it
-  if Assigned(Action_ReloadAction) and Action_ReloadAction._IsEnabled then
-    Action_ReloadAction.Execute;
+  TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_ShowOrSelectAction);
+  TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_ReloadAction);
 end;
 
 procedure TioVMActionBS_ETM_Revert._InternalUpdateStdAction;

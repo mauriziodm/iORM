@@ -65,8 +65,8 @@ type
     acClearWhere: TioBSClearWhere;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure DSWhereAfterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType);
     procedure GridCustomersDblClick(Sender: TObject);
+    procedure DSWhereAfterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType);
   private
   public
   end;

@@ -1,4 +1,4 @@
-program PizzAmore_25_LowCode_Classes_SimpleView_Fmx;
+program PizzAmore_25_LowCode_Classes_SimpleViews_Fmx;
 
 uses
   System.StartUpCopy,

@@ -545,7 +545,7 @@ object OrderListForm: TOrderListForm
     AfterSelectionObject = DSWhereAfterSelectionObject
     OnReceiveSelectionFreeObject = False
     Left = 175
-    Top = 392
+    Top = 360
     object DSWhereOrderID: TIntegerField
       FieldName = 'OrderID'
     end
@@ -571,6 +571,6 @@ object OrderListForm: TOrderListForm
   object SourceWhere: TDataSource
     DataSet = DSWhere
     Left = 248
-    Top = 392
+    Top = 360
   end
 end

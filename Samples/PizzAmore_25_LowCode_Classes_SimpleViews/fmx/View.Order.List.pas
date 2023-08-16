@@ -34,6 +34,7 @@ type
     ButtonWhereHistory: TSpeedButton;
     acWhereShowHistory: TioBSShowOrSelect;
     acWherePersist: TioBSPersistencePersist;
+    procedure BSWhereAfterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType);
   private
   public
     constructor Create(AOwner: TComponent); override;
@@ -44,6 +45,11 @@ implementation
 {$R *.fmx}
 
 { TViewOrders }
+
+procedure TViewOrderList.BSWhereAfterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType);
+begin
+  BSWhere.BuildWhere;
+end;
 
 constructor TViewOrderList.Create(AOwner: TComponent);
 begin

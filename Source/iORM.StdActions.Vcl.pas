@@ -414,13 +414,13 @@ type
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget(Target: TObject); override;
   published
+    property Action_ShowOrSelectAction;
     property DisableIfChangesExists;
     property DisableIfSaved;
     property EntityTypeAlias: String read FEntityTypeAlias write FEntityTypeAlias;
     property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
     property RaiseIfChangesExists default False;
     property RaiseIfRevertPointSaved;
-    property Action_ShowOrSelectAction;
     property TargetBindSource;
     // events
     property OnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent read FOnNewInstanceAsObject write FOnNewInstanceAsObject;
@@ -442,13 +442,13 @@ type
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget(Target: TObject); override;
   published
+    property Action_ShowOrSelectAction;
     property DisableIfChangesExists;
     property DisableIfSaved;
     property EntityTypeAlias: String read FEntityTypeAlias write FEntityTypeAlias;
     property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
     property RaiseIfChangesExists default False;
     property RaiseIfRevertPointSaved;
-    property Action_ShowOrSelectAction;
     property TargetBindSource;
     // events
     property OnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent read FOnNewInstanceAsObject write FOnNewInstanceAsObject;
@@ -540,10 +540,10 @@ type
   // ShowCurrent action to show the current object of the BS
   TioBSShowOrSelect = class(Vcl.ActnList.TAction, IioBSSlaveAction)
   strict private
-    FEntityTypeName: String;
-    FIsSlave: Boolean;
     FAction_ParentCloseQueryAction: IioBSCloseQueryAction;
     FAction_SelectCurrentAction: IioBSSlaveAction;
+    FEntityTypeName: String;
+    FIsSlave: Boolean;
     FShowMode: TioActionShowMode;
     FTargetBindSource: IioStdActionTargetBindSource;
     FVVMTypeAlias: String;
@@ -567,9 +567,9 @@ type
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget(Target: TObject); override;
   published
-    property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
     property Action_ParentCloseQueryAction: IioBSCloseQueryAction read FAction_ParentCloseQueryAction write SetAction_ParentCloseQueryAction;
     property Action_SelectCurrentAction: IioBSSlaveAction read FAction_SelectCurrentAction write SetAction_SelectCurrentAction;
+    property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
     property ShowMode: TioActionShowMode read FShowMode write FShowMode;
     property TargetBindSource: IioStdActionTargetBindSource read FTargetBindSource write SetTargetBindSource;
     property VVMTypeAlias: String read FVVMTypeAlias write FVVMTypeAlias;
@@ -589,7 +589,7 @@ implementation
 uses
   System.SysUtils, iORM.Exceptions, iORM.Utilities, iORM, System.Rtti,
   iORM.RttiContext.Factory, iORM.StdActions.CloseQueryActionRegister,
-  iORM.ETM.Engine;
+  iORM.ETM.Engine, iORM.StdActions.CommonBehaviour;
 
 { TioBSObjStateStdAction }
 
@@ -704,9 +704,8 @@ end;
 procedure TioBSPersistenceRevert.ExecuteTarget(Target: TObject);
 begin
   TargetBindSource.Persistence.Revert(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists, ClearAfterExecute);
-  // If assigned the "CloseQueryAction" then execute it
-  if Assigned(Action_CloseQueryAction) and Action_CloseQueryAction._IsEnabled then
-    Action_CloseQueryAction.Execute;
+  // Execute slave actions
+  TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
 
 procedure TioBSPersistenceRevert.UpdateTarget(Target: TObject);
@@ -731,10 +730,9 @@ var
 begin
   LIsDeleting := TargetBindSource.Persistence.IsInserting;
   TargetBindSource.Persistence.RevertOrDelete(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists, ClearAfterExecute);
-  // If assigned the "CloseQueryAction" then execute it
-  if Assigned(Action_CloseQueryAction) and Action_CloseQueryAction._IsEnabled then
-    if (LIsDeleting and FOnDelete_ExecuteCloseQueryAction) or (not LIsDeleting and FOnRevert_ExecuteCloseQueryAction) then
-      Action_CloseQueryAction.Execute;
+  // Execute slave actions
+  if (LIsDeleting and FOnDelete_ExecuteCloseQueryAction) or (not LIsDeleting and FOnRevert_ExecuteCloseQueryAction) then
+    TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
 
 procedure TioBSPersistenceRevertOrDelete.UpdateTarget(Target: TObject);
@@ -750,9 +748,8 @@ procedure TioBSPersistencePersist.ExecuteTarget(Target: TObject);
 begin
   TargetBindSource.Refresh(True); // Otherwise, in some cases, an outdated value persisted
   TargetBindSource.Persistence.Persist(RaiseIfChangesDoesNotExists, ClearAfterExecute);
-  // If assigned the "CloseQueryAction" then execute it
-  if Assigned(Action_CloseQueryAction) and Action_CloseQueryAction._IsEnabled then
-    Action_CloseQueryAction.Execute;
+  // Execute slave actions
+  TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
 
 procedure TioBSPersistencePersist.UpdateTarget(Target: TObject);
@@ -800,9 +797,8 @@ end;
 procedure TioBSPersistenceDelete.ExecuteTarget(Target: TObject);
 begin
   TargetBindSource.Persistence.Delete(RaiseIfRevertPointSaved, RaiseIfChangesExists);
-  // If assigned the "CloseQueryAction" then execute it
-  if Assigned(Action_CloseQueryAction) and Action_CloseQueryAction._IsEnabled then
-    Action_CloseQueryAction.Execute;
+  // Execute slave actions
+  TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
 
 procedure TioBSPersistenceDelete.UpdateTarget(Target: TObject);
@@ -903,9 +899,8 @@ begin
     // New instance not provided (created by the ABSAdapter itself)
     TargetBindSource.Persistence.Append(RaiseIfRevertPointSaved, RaiseIfChangesExists);
   finally
-    // If assigned the "ShowOrExecuteAction" then execute it
-    if Assigned(Action_ShowOrSelectAction) and Action_ShowOrSelectAction._IsEnabled then
-      Action_ShowOrSelectAction.Execute;
+    // Execute slave actions
+    TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_ShowOrSelectAction);
   end;
 end;
 
@@ -986,9 +981,8 @@ begin
     // New instance not provided (created by the ABSAdapter itself)
     TargetBindSource.Persistence.Insert(RaiseIfRevertPointSaved, RaiseIfChangesExists);
   finally
-    // If assigned the "ShowOrExecuteAction" then execute it
-    if Assigned(Action_ShowOrSelectAction) and Action_ShowOrSelectAction._IsEnabled then
-      Action_ShowOrSelectAction.Execute;
+    // Execute slave actions
+    TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_ShowOrSelectAction);
   end;
 end;
 
@@ -1014,8 +1008,8 @@ procedure TioBSSelectCurrent.ExecuteTarget(Target: TObject);
 begin
   inherited;
   TargetBindSource.SelectCurrent(FSelectionType);
-  if Assigned(FAction_CloseQueryAction) and FAction_CloseQueryAction._IsEnabled then
-    FAction_CloseQueryAction.Execute;
+  // Execute slave actions
+  TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_CloseQueryAction);
 end;
 
 procedure TioBSSelectCurrent.Notification(AComponent: TComponent; Operation: TOperation);
@@ -1517,10 +1511,9 @@ procedure TioBSBuildWhere.ExecuteTarget(Target: TObject);
 begin
   inherited;
   TargetBindSource.BuildWhere(FWhereAutoExecuteOnTargetBS);
-  if Assigned(FAction_PersistAction) and FAction_PersistAction._IsEnabled then
-    FAction_PersistAction.Execute;
-  if Assigned(FAction_CloseQueryAction) and FAction_CloseQueryAction._IsEnabled then
-    FAction_CloseQueryAction.Execute;
+  // Execute slave actions
+  TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_PersistAction);
+  TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_CloseQueryAction);
 end;
 
 procedure TioBSBuildWhere.Notification(AComponent: TComponent; Operation: TOperation);
@@ -1660,9 +1653,9 @@ begin
   inherited;
 
   // If the TargetBindSource is a SelectorFor some other BindSource then make the selection instead
-  if Assigned(FAction_SelectCurrentAction) and FAction_SelectCurrentAction._IsEnabled and Assigned((TargetBindSource as IioBindSource).SelectorFor) then
+  if Assigned(TargetBindSource) and Assigned((TargetBindSource as IioBindSource).SelectorFor) then
   begin
-    FAction_SelectCurrentAction.Execute;
+    TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_SelectCurrentAction);
     Exit;
   end;
 
@@ -1890,18 +1883,11 @@ begin
   if not(TargetBindSource.Current is TioEtmCustomTimeSlot) then
     raise EioEtmException.Create(ClassName, 'ExecuteTarget', 'Current object if the TargetBindSource is not derived from "TioEtmCustomTimeSlot" base class.');
   TioEtmEngine.RevertToBindSource(TargetBindSource.Current as TioEtmCustomTimeSlot, TargetBindSource, FPersistImmediately);
-  // If assigned the "CloseQueryAction" then execute it
-  if Assigned(Action_CloseQueryAction) and Action_CloseQueryAction._IsEnabled then
-  begin
-    Action_CloseQueryAction.Execute;
+  // Execute slave actions
+  if TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction) then
     Exit;
-  end;
-  // If assigned the "ShowOrSelectAction" then execute it
-  if Assigned(Action_ShowOrSelectAction) and Action_ShowOrSelectAction._IsEnabled then
-    Action_ShowOrSelectAction.Execute;
-  // If assigned the "ReloadAction" then execute it
-  if Assigned(Action_ReloadAction) and Action_ReloadAction._IsEnabled then
-    Action_ReloadAction.Execute;
+  TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_ShowOrSelectAction);
+  TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_ReloadAction);
 end;
 
 procedure TioBS_ETM_Revert.UpdateTarget(Target: TObject);
