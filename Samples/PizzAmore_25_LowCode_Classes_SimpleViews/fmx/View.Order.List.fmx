@@ -1,4 +1,4 @@
-inherited ViewOrders: TViewOrders
+inherited ViewOrderList: TViewOrderList
   inherited RectangleBottom: TRectangle
     object ButtonWhereHistory: TSpeedButton
       Action = acWhereShowHistory
@@ -129,16 +129,9 @@ inherited ViewOrders: TViewOrders
     end
   end
   inherited ActionList1: TActionList
-    inherited acShowOrSelect: TioBSShowOrSelect
-      ParentCloseQueryAction = nil
-    end
-    inherited acWhereBuild: TioBSWhereBuild
-      PersistAction = acWherePersist
-    end
     object acWhereShowHistory: TioBSShowOrSelect
       Category = 'iORM-BS'
       Text = 'History'
-      ParentCloseQueryAction = acBack
       ShowMode = smBSTypeNameAsSelector
       TargetBindSource = BSWhere
       ViewContextBy = vcByDefaultViewContextProvider
@@ -197,7 +190,6 @@ inherited ViewOrders: TViewOrders
         ReadOnly = False
       end>
     TypeName = 'TWhereOrder'
-    AfterSelectionObject = BSWhereAfterSelectionObject
     OnReceiveSelectionFreeObject = False
   end
   object BindingsList1: TBindingsList

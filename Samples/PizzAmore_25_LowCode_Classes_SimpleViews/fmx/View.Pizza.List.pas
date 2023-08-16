@@ -1,4 +1,4 @@
-unit View.Pizzas;
+unit View.Pizza.List;
 
 interface
 
@@ -12,8 +12,10 @@ uses
 
 type
 
+  // Register the form into the dependency injection container as SimpleView for TPizza objects
+  //  (alias "LIST" to avoid an ambiguity with the one registered for a single pizza)
   [diSimpleViewFor(TPizza, 'LIST')]
-  TViewPizzas = class(TViewBaseForList)
+  TViewPizzaList = class(TViewBaseForList)
     BindingsList1: TBindingsList;
     LinkListControlToField1: TLinkListControlToField;
     Label1: TLabel;
@@ -29,9 +31,7 @@ type
     LinkControlToField3: TLinkControlToField;
     LinkControlToField4: TLinkControlToField;
   private
-    { Private declarations }
   public
-    { Public declarations }
   end;
 
 implementation

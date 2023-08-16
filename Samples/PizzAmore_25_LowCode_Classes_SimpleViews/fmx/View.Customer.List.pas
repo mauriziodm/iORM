@@ -1,4 +1,4 @@
-unit View.Customers;
+unit View.Customer.List;
 
 interface
 
@@ -12,8 +12,10 @@ uses
 
 type
 
+  // Register the form into the dependency injection container as SimpleView for TCustomer objects
+  //  (alias "LIST" to avoid an ambiguity with the one registered for a single customer)
   [diSimpleViewFor(TCustomer, 'LIST')]
-  TViewCustomers = class(TViewBaseForList)
+  TViewCustomerList = class(TViewBaseForList)
     BindingsList1: TBindingsList;
     LinkListControlToField1: TLinkListControlToField;
     ButtonPgDown: TSpeedButton;
@@ -32,9 +34,7 @@ type
     LinkControlToField2: TLinkControlToField;
     LinkControlToField3: TLinkControlToField;
   private
-    { Private declarations }
   public
-    { Public declarations }
   end;
 
 implementation

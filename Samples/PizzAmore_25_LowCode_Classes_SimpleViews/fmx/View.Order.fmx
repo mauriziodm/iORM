@@ -280,7 +280,7 @@ inherited ViewOrder: TViewOrder
       Category = 'iORM-BS'
       Text = 'Select customer'
       EntityTypeName = 'TCustomer'
-      ParentCloseQueryAction = acBack
+      Action_ParentCloseQueryAction = acBack
       ShowMode = smEntityTypeNameAsSelector
       TargetBindSource = BSCustomer
       VVMTypeAlias = 'LIST'
@@ -290,7 +290,7 @@ inherited ViewOrder: TViewOrder
       Category = 'iORM-BS'
       Text = 'Select pizza'
       EntityTypeName = 'TPizza'
-      ParentCloseQueryAction = acBack
+      Action_ParentCloseQueryAction = acBack
       ShowMode = smEntityTypeNameAsSelector
       TargetBindSource = BSMaster
       VVMTypeAlias = 'LIST'

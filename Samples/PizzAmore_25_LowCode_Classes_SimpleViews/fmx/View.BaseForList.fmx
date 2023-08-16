@@ -93,6 +93,7 @@ object ViewBaseForList: TViewBaseForList
     Size.Height = 440.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 3
+    OnDblClick = ListViewDblClick
   end
   object RectangleWhere: TRectangle
     Align = Bottom
@@ -111,7 +112,7 @@ object ViewBaseForList: TViewBaseForList
       Size.PlatformDefault = False
       Stroke.Kind = None
       object ButtonSearch: TSpeedButton
-        Action = acWhereBuild
+        Action = acBuildWhere
         Align = Top
         CanFocus = True
         Enabled = True
@@ -124,7 +125,7 @@ object ViewBaseForList: TViewBaseForList
         TextSettings.FontColor = claAliceblue
       end
       object ButtonClear: TSpeedButton
-        Action = acWhereClear
+        Action = acClearWhere
         Align = Bottom
         CanFocus = True
         Enabled = True
@@ -156,8 +157,8 @@ object ViewBaseForList: TViewBaseForList
     object acShowOrSelect: TioBSShowOrSelect
       Category = 'iORM-BS'
       Text = 'Select'
-      ParentCloseQueryAction = acBack
-      SelectCurrentAction = acSelectCurrent
+      Action_ParentCloseQueryAction = acBack
+      Action_SelectCurrentAction = acSelectCurrent
       ShowMode = smBSCurrent
       TargetBindSource = BSMaster
       ViewContextBy = vcByDefaultViewContextProvider
@@ -165,23 +166,23 @@ object ViewBaseForList: TViewBaseForList
     object acSelectCurrent: TioBSSelectCurrent
       Category = 'iORM-BS'
       Text = 'Select'
-      CloseQueryAction = acBack
+      Action_CloseQueryAction = acBack
       TargetBindSource = BSMaster
     end
     object acAdd: TioBSPersistenceAppend
       Category = 'iORM-BSPersistence'
       Text = 'Add'
-      ShowOrSelectAction = acShowOrSelect
+      Action_ShowOrSelectAction = acShowOrSelect
       TargetBindSource = BSMaster
     end
-    object acWhereBuild: TioBSWhereBuild
-      Category = 'iORM-BSWhereBuilder'
-      Text = 'acWhereBuild'
+    object acBuildWhere: TioBSBuildWhere
+      Category = 'iORM - BS - WhereBuilder'
+      Text = 'Search'
       TargetBindSource = BSWhere
     end
-    object acWhereClear: TioBSWhereClear
-      Category = 'iORM-BSWhereBuilder'
-      Text = 'acWhereClear'
+    object acClearWhere: TioBSClearWhere
+      Category = 'iORM - BS - WhereBuilder'
+      Text = 'Clear'
       TargetBindSource = BSWhere
       WhereAutoExecuteOnTargetBS = True
     end

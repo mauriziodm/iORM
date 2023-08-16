@@ -87,7 +87,7 @@ object ViewBaseForForm: TViewBaseForForm
     object acRevertOrDelete: TioBSPersistenceRevertOrDelete
       Category = 'iORM-BSPersistence'
       Text = 'Revert'
-      CloseQueryAction = acBack
+      Action_CloseQueryAction = acBack
       TargetBindSource = BSMaster
     end
   end

@@ -1,4 +1,4 @@
-program PizzAmore_25_LessAttr_Class_simpleview_fmx_mobile;
+program PizzAmore_25_LowCode_Classes_SimpleView_Fmx;
 
 uses
   System.StartUpCopy,
@@ -10,16 +10,16 @@ uses
   Model.Order in '..\common_model\Model.Order.pas',
   Model.Customer in '..\common_model\Model.Customer.pas',
   View.BaseForList in 'View.BaseForList.pas' {ViewBaseForList: TFrame},
-  View.Customers in 'View.Customers.pas' {ViewCustomers: TFrame},
+  View.Customer.List in 'View.Customer.List.pas' {ViewCustomerList: TFrame},
   View.BaseForForm in 'View.BaseForForm.pas' {ViewBaseForForm: TFrame},
   View.Customer in 'View.Customer.pas' {CustomerView: TFrame},
-  View.Pizzas in 'View.Pizzas.pas' {ViewPizzas: TFrame},
+  View.Pizza.List in 'View.Pizza.List.pas' {ViewPizzaList: TFrame},
   View.Pizza in 'View.Pizza.pas' {ViewPizza: TFrame},
   View.Order in 'View.Order.pas' {ViewOrder: TFrame},
-  View.Orders in 'View.Orders.pas' {ViewOrders: TFrame},
-  Model.Where.Pizza in '..\common_model\Model.Where.Pizza.pas',
-  Model.Where.Order in '..\common_model\Model.Where.Order.pas',
-  View.Where.OrderHistory in 'View.Where.OrderHistory.pas' {ViewOrderHistory: TFrame};
+  View.Order.List in 'View.Order.List.pas' {ViewOrderList: TFrame},
+  View.Where.OrderHistory in 'View.Where.OrderHistory.pas' {ViewOrderHistory: TFrame},
+  Where.Order in '..\common_model\Where.Order.pas',
+  Where.Pizza in '..\common_model\Where.Pizza.pas';
 
 {$R *.res}
 {$STRONGLINKTYPES ON}

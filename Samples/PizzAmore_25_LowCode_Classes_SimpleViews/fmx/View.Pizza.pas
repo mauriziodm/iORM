@@ -12,6 +12,7 @@ uses
 
 type
 
+  // Register the form into the dependency injection container as SimpleView for TPizza objects
   [diSimpleViewFor(TPizza)]
   TViewPizza = class(TViewBaseForForm)
     ListBox: TListBox;
@@ -32,9 +33,7 @@ type
     LinkControlToField3: TLinkControlToField;
     LinkControlToField4: TLinkControlToField;
   private
-    { Private declarations }
   public
-    { Public declarations }
   end;
 
 implementation

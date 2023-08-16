@@ -10,6 +10,7 @@ uses
 
 type
 
+  // Register the form into the dependency injection container as SimpleView for TCustomer objects
   [diSimpleViewFor(TCustomer)]
   TCustomerForm = class(TForm)
     PanelTop: TPanel;

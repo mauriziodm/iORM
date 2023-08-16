@@ -1,4 +1,4 @@
-inherited ViewCustomers: TViewCustomers
+inherited ViewCustomerList: TViewCustomerList
   inherited RectangleBottom: TRectangle
     object ButtonPgDown: TSpeedButton
       Action = acPrevPage

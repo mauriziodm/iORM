@@ -12,6 +12,7 @@ uses
 
 type
 
+  // Register the form into the dependency injection container as SimpleView for TOrder objects
   [diSimpleViewFor(TOrder)]
   TViewOrder = class(TViewBaseForForm)
     LayoutCustomer: TLayout;

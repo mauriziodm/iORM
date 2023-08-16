@@ -1,4 +1,4 @@
-unit View.Orders;
+unit View.Order.List;
 
 interface
 
@@ -12,8 +12,10 @@ uses
 
 type
 
+  // Register the form into the dependency injection container as SimpleView for TOrder objects
+  //  (alias "LIST" to avoid an ambiguity with the one registered for a single order)
   [diSimpleViewFor(TOrder, 'LIST')]
-  TViewOrders = class(TViewBaseForList)
+  TViewOrderList = class(TViewBaseForList)
     BindingsList1: TBindingsList;
     LinkListControlToField1: TLinkListControlToField;
     Label1: TLabel;
@@ -32,7 +34,6 @@ type
     ButtonWhereHistory: TSpeedButton;
     acWhereShowHistory: TioBSShowOrSelect;
     acWherePersist: TioBSPersistencePersist;
-    procedure BSWhereAfterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType);
   private
   public
     constructor Create(AOwner: TComponent); override;
@@ -44,12 +45,7 @@ implementation
 
 { TViewOrders }
 
-procedure TViewOrders.BSWhereAfterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType);
-begin
-  BSWhere.WhereBuild;
-end;
-
-constructor TViewOrders.Create(AOwner: TComponent);
+constructor TViewOrderList.Create(AOwner: TComponent);
 begin
   inherited;
   io.Enums.FillStrings<TOrderState>(ComboBoxWhereState.Items);

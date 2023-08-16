@@ -12,7 +12,7 @@ uses
   iORM.LiveBindings.PrototypeBindSource.Master, iORM.StdActions.Fmx,
   FMX.ActnList, System.Actions, FMX.ListView, FMX.Controls.Presentation,
   FMX.Objects, Data.Bind.GenData, System.Rtti, System.Bindings.Outputs,
-  Fmx.Bind.Editors, Data.Bind.EngExt, Fmx.Bind.DBEngExt, Model.Where.Order;
+  Fmx.Bind.Editors, Data.Bind.EngExt, Fmx.Bind.DBEngExt, Where.Order;
 
 type
 

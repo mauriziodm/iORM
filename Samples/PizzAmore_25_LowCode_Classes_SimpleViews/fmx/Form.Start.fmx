@@ -5223,7 +5223,7 @@ object StartForm: TStartForm
       Category = 'iORM-BS'
       Text = 'Customers'
       EntityTypeName = 'TCustomer'
-      ParentCloseQueryAction = acQuit
+      Action_ParentCloseQueryAction = acQuit
       ShowMode = smEntityTypeName
       VVMTypeAlias = 'LIST'
       ViewContextBy = vcByDefaultViewContextProvider
@@ -5232,7 +5232,7 @@ object StartForm: TStartForm
       Category = 'iORM-BS'
       Text = 'Pizzas'
       EntityTypeName = 'TPizza'
-      ParentCloseQueryAction = acQuit
+      Action_ParentCloseQueryAction = acQuit
       ShowMode = smEntityTypeName
       VVMTypeAlias = 'LIST'
       ViewContextBy = vcByDefaultViewContextProvider
@@ -5241,7 +5241,7 @@ object StartForm: TStartForm
       Category = 'iORM-BS'
       Text = 'Orders'
       EntityTypeName = 'TOrder'
-      ParentCloseQueryAction = acQuit
+      Action_ParentCloseQueryAction = acQuit
       ShowMode = smEntityTypeName
       VVMTypeAlias = 'LIST'
       ViewContextBy = vcByDefaultViewContextProvider

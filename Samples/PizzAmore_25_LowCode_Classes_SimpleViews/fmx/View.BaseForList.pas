@@ -10,6 +10,8 @@ uses
   iORM.LiveBindings.PrototypeBindSource.Master, Fmx.Bind.Navigator;
 
 type
+
+  // Base class flr all list views
   TViewBaseForList = class(TFrame)
     RectangleBottom: TRectangle;
     ButtonDelete: TSpeedButton;
@@ -30,9 +32,10 @@ type
     RectangleWhereButtons: TRectangle;
     ButtonSearch: TSpeedButton;
     ButtonClear: TSpeedButton;
-    acWhereBuild: TioBSWhereBuild;
-    acWhereClear: TioBSWhereClear;
     BSWhere: TioPrototypeBindSourceMaster;
+    acBuildWhere: TioBSBuildWhere;
+    acClearWhere: TioBSClearWhere;
+    procedure ListViewDblClick(Sender: TObject);
   private
   public
     constructor Create(AOwner: TComponent); override;
@@ -47,6 +50,11 @@ begin
   inherited;
   BSMaster.Open;
   BSWhere.Open;
+end;
+
+procedure TViewBaseForList.ListViewDblClick(Sender: TObject);
+begin
+  acShowOrSelect.Execute;
 end;
 
 end.

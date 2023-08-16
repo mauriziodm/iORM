@@ -8,7 +8,7 @@
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>32787</TargetedPlatforms>
         <AppType>Application</AppType>
-        <MainSource>PizzAmore_25_LessAttr_Class_simpleview_fmx_mobile.dpr</MainSource>
+        <MainSource>PizzAmore_25_LowCode_Classes_SimpleView_Fmx.dpr</MainSource>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
@@ -86,7 +86,7 @@
         <AUP_READ_PHONE_STATE>true</AUP_READ_PHONE_STATE>
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
-        <SanitizedProjectName>PizzAmore_25_LessAttr_Class_simpleview_fmx_mobile</SanitizedProjectName>
+        <SanitizedProjectName>PizzAmore_25_LowCode_Classes_SimpleView_Fmx</SanitizedProjectName>
         <DCC_Define>ioFMX;$(DCC_Define)</DCC_Define>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android)'!=''">
@@ -209,8 +209,8 @@
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="View.Customers.pas">
-            <Form>ViewCustomers</Form>
+        <DCCReference Include="View.Customer.List.pas">
+            <Form>ViewCustomerList</Form>
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
@@ -224,8 +224,8 @@
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="View.Pizzas.pas">
-            <Form>ViewPizzas</Form>
+        <DCCReference Include="View.Pizza.List.pas">
+            <Form>ViewPizzaList</Form>
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
@@ -239,18 +239,18 @@
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="View.Orders.pas">
-            <Form>ViewOrders</Form>
+        <DCCReference Include="View.Order.List.pas">
+            <Form>ViewOrderList</Form>
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="..\common_model\Model.Where.Pizza.pas"/>
-        <DCCReference Include="..\common_model\Model.Where.Order.pas"/>
         <DCCReference Include="View.Where.OrderHistory.pas">
             <Form>ViewOrderHistory</Form>
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
+        <DCCReference Include="..\common_model\Where.Order.pas"/>
+        <DCCReference Include="..\common_model\Where.Pizza.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -269,7 +269,7 @@
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">PizzAmore_25_LessAttr_Class_simpleview_fmx_mobile.dpr</Source>
+                    <Source Name="MainSource">PizzAmore_25_LowCode_Classes_SimpleView_Fmx.dpr</Source>
                 </Source>
                 <Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
@@ -501,9 +501,9 @@
                 <DeployFile LocalName="Android\Release\styles-v21.xml" Configuration="Release" Class="AndroidSplashStylesV21"/>
                 <DeployFile LocalName="Android\Release\styles.xml" Configuration="Release" Class="AndroidSplashStyles"/>
                 <DeployFile LocalName="Win32\Debug\PizzAmore_25_LessAttr_Class_simpleview_fmx_mobile.exe" Configuration="Debug" Class="ProjectOutput"/>
-                <DeployFile LocalName="Win32\Debug\PizzAmore_25_LessAttr_Class_simpleview_fmx_mobile.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="Win32\Debug\PizzAmore_25_LowCode_Classes_SimpleView_Fmx.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>PizzAmore_25_LessAttr_Class_simpleview_fmx_mobile.exe</RemoteName>
+                        <RemoteName>PizzAmore_25_LowCode_Classes_SimpleView_Fmx.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
