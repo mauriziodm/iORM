@@ -4,7 +4,7 @@ object OrderWhereHistoryForm: TOrderWhereHistoryForm
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
   ClientHeight = 461
-  ClientWidth = 563
+  ClientWidth = 678
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,7 +19,7 @@ object OrderWhereHistoryForm: TOrderWhereHistoryForm
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 563
+    Width = 678
     Height = 40
     Align = alTop
     BevelOuter = bvNone
@@ -28,7 +28,7 @@ object OrderWhereHistoryForm: TOrderWhereHistoryForm
     TabOrder = 0
     ExplicitWidth = 559
     object ButtonSelect: TSpeedButton
-      Left = 513
+      Left = 628
       Top = 0
       Width = 50
       Height = 40
@@ -58,7 +58,7 @@ object OrderWhereHistoryForm: TOrderWhereHistoryForm
       ParentFont = False
     end
     object LabelTitle: TLabel
-      Left = 239
+      Left = 269
       Top = 8
       Width = 108
       Height = 21
@@ -74,7 +74,7 @@ object OrderWhereHistoryForm: TOrderWhereHistoryForm
   object PanelBottom: TPanel
     Left = 0
     Top = 421
-    Width = 563
+    Width = 678
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
@@ -102,7 +102,7 @@ object OrderWhereHistoryForm: TOrderWhereHistoryForm
   object GridCustomers: TDBGrid
     Left = 0
     Top = 40
-    Width = 563
+    Width = 678
     Height = 381
     Align = alClient
     DataSource = SourceWhereHistory
@@ -170,13 +170,39 @@ object OrderWhereHistoryForm: TOrderWhereHistoryForm
       end
       item
         Expanded = False
+        FieldName = 'CustomerName'
+        Title.Alignment = taCenter
+        Title.Caption = 'Customer'
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clNavy
+        Title.Font.Height = -13
+        Title.Font.Name = 'Segoe UI'
+        Title.Font.Style = [fsBold]
+        Width = 100
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'RowsDescription'
+        Title.Alignment = taCenter
+        Title.Caption = 'Row desc.'
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clNavy
+        Title.Font.Height = -13
+        Title.Font.Name = 'Segoe UI'
+        Title.Font.Style = [fsBold]
+        Width = 100
+        Visible = True
+      end
+      item
+        Expanded = False
         FieldName = 'Note'
         Title.Font.Charset = DEFAULT_CHARSET
         Title.Font.Color = clNavy
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
-        Width = 600
+        Width = 138
         Visible = True
       end>
   end
@@ -206,6 +232,14 @@ object OrderWhereHistoryForm: TOrderWhereHistoryForm
     end
     object DSWhereHistoryToDate: TDateField
       FieldName = 'ToDate'
+    end
+    object DSWhereHistoryCustomerName: TStringField
+      FieldName = 'CustomerName'
+      Size = 100
+    end
+    object DSWhereHistoryRowsDescription: TStringField
+      FieldName = 'RowsDescription'
+      Size = 100
     end
   end
   object SourceWhereHistory: TDataSource

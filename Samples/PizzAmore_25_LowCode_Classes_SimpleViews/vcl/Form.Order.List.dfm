@@ -3,7 +3,7 @@ object OrderListForm: TOrderListForm
   Top = 0
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
-  Caption = '<e'
+  Caption = 'Pizz'#39'Amore'
   ClientHeight = 561
   ClientWidth = 531
   Color = clWhite
@@ -310,7 +310,7 @@ object OrderListForm: TOrderListForm
       Left = 286
       Top = 6
       Width = 1
-      Height = 57
+      Height = 89
       Pen.Color = clGray
     end
     object ButtonHistory: TSpeedButton
@@ -334,6 +334,21 @@ object OrderListForm: TOrderListForm
       Alignment = taRightJustify
       AutoSize = False
       Caption = 'Cust.name'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clGray
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object Label7: TLabel
+      Left = 9
+      Top = 73
+      Width = 86
+      Height = 25
+      Alignment = taRightJustify
+      AutoSize = False
+      Caption = 'Rows descr.'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clGray
       Font.Height = -16
@@ -446,6 +461,23 @@ object OrderListForm: TOrderListForm
       Font.Style = []
       ParentFont = False
       TabOrder = 5
+    end
+    object DBEditRowsDescription: TDBEdit
+      Left = 110
+      Top = 72
+      Width = 170
+      Height = 25
+      BorderStyle = bsNone
+      Color = clWhite
+      DataField = 'RowsDescription'
+      DataSource = SourceWhere
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 6
     end
   end
   object DSOrders: TioDataSetMaster
@@ -565,6 +597,10 @@ object OrderListForm: TOrderListForm
     end
     object DSWhereCustomerName: TStringField
       FieldName = 'CustomerName'
+      Size = 100
+    end
+    object DSWhereRowsDescription: TStringField
+      FieldName = 'RowsDescription'
       Size = 100
     end
   end

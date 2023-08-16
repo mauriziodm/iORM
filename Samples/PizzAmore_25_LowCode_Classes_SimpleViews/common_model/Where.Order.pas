@@ -23,6 +23,8 @@ type
     FToDate: TDate;
     [ioWhere('Customer.Name', coLike)]
     FCustomerName: String;
+    [ioWhere('Rows.Description', coLike)]
+    FRowsDescription: String;
   public
     constructor Create;
     property OrderID: Integer read FOrderID write FOrderID;
@@ -31,6 +33,7 @@ type
     property FromDate: TDate read FFromDate Write FFromDate;
     property ToDate: TDate read FToDate Write FToDate;
     property CustomerName: String read FCustomerName write FCustomerName;
+    property RowsDescription: String read FRowsDescription write FRowsDescription;
   end;
 
 implementation

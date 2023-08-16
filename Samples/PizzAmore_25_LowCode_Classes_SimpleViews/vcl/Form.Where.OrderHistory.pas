@@ -30,6 +30,8 @@ type
     acBack: TioBSCloseQuery;
     DSWhereHistoryToDate: TDateField;
     acSelectCurrent: TioBSSelectCurrent;
+    DSWhereHistoryCustomerName: TStringField;
+    DSWhereHistoryRowsDescription: TStringField;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure GridCustomersDblClick(Sender: TObject);

@@ -63,6 +63,9 @@ type
     DSWhereCustomerName: TStringField;
     acBuildWhere: TioBSBuildWhere;
     acClearWhere: TioBSClearWhere;
+    Label7: TLabel;
+    DBEditRowsDescription: TDBEdit;
+    DSWhereRowsDescription: TStringField;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure GridCustomersDblClick(Sender: TObject);
