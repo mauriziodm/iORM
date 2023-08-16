@@ -22,8 +22,8 @@ type
     acDelete: TioViewAction;
     acAdd: TioViewAction;
     acShowOrSelect: TioViewAction;
-    acWhereBuild: TioViewAction;
-    acWhereClear: TioViewAction;
+    acBuildWhere: TioViewAction;
+    acClearWhere: TioViewAction;
     BSMaster: TioModelDataSet;
     VMBridge: TioViewModelBridge;
     SourceMaster: TDataSource;

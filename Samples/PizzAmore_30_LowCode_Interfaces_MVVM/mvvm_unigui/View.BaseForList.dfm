@@ -128,7 +128,7 @@ object ViewBaseForList: TViewBaseForList
         Top = 0
         Width = 60
         Height = 40
-        Action = acWhereBuild
+        Action = acBuildWhere
         Align = alTop
         ParentFont = False
         Font.Color = clBlack
@@ -142,7 +142,7 @@ object ViewBaseForList: TViewBaseForList
         Top = 40
         Width = 60
         Height = 40
-        Action = acWhereClear
+        Action = acClearWhere
         Align = alBottom
         ParentFont = False
         Font.Color = clBlack
@@ -183,19 +183,19 @@ object ViewBaseForList: TViewBaseForList
       Visible = True
       VMActionName = 'acShowOrSelect'
     end
-    object acWhereBuild: TioViewAction
+    object acBuildWhere: TioViewAction
       Category = 'iORM-MVVM'
       Caption = 'Search'
       Enabled = True
       Visible = True
-      VMActionName = 'acWhereBuild'
+      VMActionName = 'acBuildWhere'
     end
-    object acWhereClear: TioViewAction
+    object acClearWhere: TioViewAction
       Category = 'iORM-MVVM'
       Caption = 'Clear'
       Enabled = True
       Visible = True
-      VMActionName = 'acWhereClear'
+      VMActionName = 'acClearWhere'
     end
   end
   object BSMaster: TioModelDataSet

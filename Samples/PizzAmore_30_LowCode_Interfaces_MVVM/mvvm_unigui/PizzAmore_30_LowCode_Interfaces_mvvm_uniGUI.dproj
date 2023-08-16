@@ -8,7 +8,7 @@
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Application</AppType>
-        <MainSource>PizzAmore_30_LessAttr_Intf_mvvm_unigui_desktop.dpr</MainSource>
+        <MainSource>PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI.dpr</MainSource>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
@@ -71,7 +71,7 @@
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
-        <SanitizedProjectName>PizzAmore_30_LessAttr_Intf_mvvm_unigui_desktop</SanitizedProjectName>
+        <SanitizedProjectName>PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI</SanitizedProjectName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android)'!=''">
         <DCC_UsePackage>iORM_Project;fmx;DbxCommonDriver;bindengine;IndyIPCommon;emsclient;FireDACCommonDriver;IndyProtocols;IndyIPClient;dbxcds;bindcompfmx;FireDACSqliteDriver;DbxClientDriver;soapmidas;fmxFireDAC;dbexpress;inet;DataSnapCommon;fmxase;dbrtl;FireDACDBXDriver;CustomIPTransport;DBXInterBaseDriver;IndySystem;bindcomp;FireDACCommon;IndyCore;RESTBackendComponents;bindcompdbx;rtl;RESTComponents;DBXSqliteDriver;IndyIPServer;dsnapxml;DataSnapClient;DataSnapProviderClient;DataSnapFireDAC;emsclientfiredac;FireDAC;FireDACDSDriver;xmlrtl;tethering;dsnap;CloudService;DataSnapNativeClient;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
@@ -146,9 +146,6 @@
         <DCCReference Include="..\common_model\Model.Order.pas"/>
         <DCCReference Include="..\common_model\Model.OrderRow.pas"/>
         <DCCReference Include="..\common_model\Model.Pizza.pas"/>
-        <DCCReference Include="..\common_model\Model.Where.Interfaces.pas"/>
-        <DCCReference Include="..\common_model\Model.Where.Order.pas"/>
-        <DCCReference Include="..\common_model\Model.Where.Pizza.pas"/>
         <DCCReference Include="..\common_model\Utils.SampleData.pas"/>
         <DCCReference Include="..\mvvm_common_vm\VM.BaseForForm.pas">
             <Form>VMBaseForForm</Form>
@@ -165,11 +162,6 @@
             <FormType>dfm</FormType>
             <DesignClass>TioViewModel</DesignClass>
         </DCCReference>
-        <DCCReference Include="..\mvvm_common_vm\VM.Customers.pas">
-            <Form>VMCustomers</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TioViewModel</DesignClass>
-        </DCCReference>
         <DCCReference Include="..\mvvm_common_vm\VM.Interfaces.pas"/>
         <DCCReference Include="..\mvvm_common_vm\VM.Order.pas">
             <Form>VMOrder</Form>
@@ -181,18 +173,8 @@
             <FormType>dfm</FormType>
             <DesignClass>TioViewModel</DesignClass>
         </DCCReference>
-        <DCCReference Include="..\mvvm_common_vm\VM.Orders.pas">
-            <Form>VMOrders</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TioViewModel</DesignClass>
-        </DCCReference>
         <DCCReference Include="..\mvvm_common_vm\VM.Pizza.pas">
             <Form>VMPizza</Form>
-            <FormType>dfm</FormType>
-            <DesignClass>TioViewModel</DesignClass>
-        </DCCReference>
-        <DCCReference Include="..\mvvm_common_vm\VM.Pizzas.pas">
-            <Form>VMPizzas</Form>
             <FormType>dfm</FormType>
             <DesignClass>TioViewModel</DesignClass>
         </DCCReference>
@@ -216,7 +198,7 @@
             <FormType>dfm</FormType>
             <DesignClass>TUniFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="View.Customers.pas">
+        <DCCReference Include="View.Customer.List.pas">
             <Form>ViewCustomers</Form>
             <FormType>dfm</FormType>
             <DesignClass>TUniFrame</DesignClass>
@@ -231,7 +213,7 @@
             <FormType>dfm</FormType>
             <DesignClass>TUniFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="View.Pizzas.pas">
+        <DCCReference Include="View.Pizza.List.pas">
             <Form>ViewPizzas</Form>
             <FormType>dfm</FormType>
             <DesignClass>TUniFrame</DesignClass>
@@ -242,7 +224,7 @@
             <FormType>dfm</FormType>
             <DesignClass>TUniFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="View.Orders.pas">
+        <DCCReference Include="View.Order.List.pas">
             <Form>ViewOrders</Form>
             <FormType>dfm</FormType>
             <DesignClass>TUniFrame</DesignClass>
@@ -257,6 +239,24 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
+        <DCCReference Include="..\mvvm_common_vm\VM.Customer.List.pas">
+            <Form>VMCustomerList</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TioViewModel</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\mvvm_common_vm\VM.Order.List.pas">
+            <Form>VMOrderList</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TioViewModel</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\mvvm_common_vm\VM.Pizza.List.pas">
+            <Form>VMPizzaList</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TioViewModel</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\common_model\Where.Interfaces.pas"/>
+        <DCCReference Include="..\common_model\Where.Order.pas"/>
+        <DCCReference Include="..\common_model\Where.Pizza.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -275,7 +275,7 @@
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">PizzAmore_30_LessAttr_Intf_mvvm_unigui_desktop.dpr</Source>
+                    <Source Name="MainSource">PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI.dpr</Source>
                 </Source>
                 <Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
@@ -283,9 +283,9 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="4">
-                <DeployFile LocalName="Win32\Debug\PizzAmore_30_LessAttr_Intf_mvvm_unigui_desktop.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="Win32\Debug\PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>PizzAmore_30_LessAttr_Intf_mvvm_unigui_desktop.exe</RemoteName>
+                        <RemoteName>PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

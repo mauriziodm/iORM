@@ -1,4 +1,4 @@
-unit View.Customers;
+unit View.Customer.List;
 
 interface
 

@@ -12,7 +12,7 @@ type
 implementation
 
 uses
-  iORM, VM.Order, VM.Order.PizzaSel, Model.Order, VM.Pizzas, Model.Interfaces;
+  iORM, VM.Order, VM.Order.PizzaSel, Model.Order, VM.Pizza.List, Model.Interfaces;
 
 { TRegisterClasses }
 
@@ -21,7 +21,7 @@ begin
   // ViewModel for TOrder
   io.di.RegisterClass<TVMOrder>.AsViewModelFor<TOrder>.Execute;
   // ViewModel for IPizza (embedded or not)
-  io.di.RegisterClass<TVMPizzas>.AsViewModelFor<IPizza>.Execute;
+  io.di.RegisterClass<TVMPizzaList>.AsViewModelFor<IPizza>.Execute;
 end;
 
 end.
