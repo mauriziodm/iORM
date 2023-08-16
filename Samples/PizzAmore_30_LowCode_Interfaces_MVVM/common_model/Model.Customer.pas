@@ -13,6 +13,7 @@ type
     FID: Integer;
     [ioWhereAttribute(coLike)]
     FName: String;
+    [ioWhereAttribute(coLike)]
     FCity: String;
     FAddress: String;
     FPhoneNumber: String;

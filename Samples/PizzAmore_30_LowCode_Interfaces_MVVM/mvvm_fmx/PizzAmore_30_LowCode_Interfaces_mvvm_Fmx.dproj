@@ -274,8 +274,8 @@
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="View.Customers.pas">
-            <Form>ViewCustomers</Form>
+        <DCCReference Include="View.Customer.List.pas">
+            <Form>ViewCustomerList</Form>
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
@@ -289,8 +289,8 @@
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="View.Pizzas.pas">
-            <Form>ViewPizzas</Form>
+        <DCCReference Include="View.Pizza.List.pas">
+            <Form>ViewPizzaList</Form>
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
@@ -300,8 +300,8 @@
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="View.Orders.pas">
-            <Form>ViewOrders</Form>
+        <DCCReference Include="View.Order.List.pas">
+            <Form>ViewOrderList</Form>
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>

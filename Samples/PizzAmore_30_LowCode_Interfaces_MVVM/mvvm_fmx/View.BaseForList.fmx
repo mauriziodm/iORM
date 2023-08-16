@@ -59,6 +59,7 @@ object ViewBaseForList: TViewBaseForList
     Size.Height = 440.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 3
+    OnDblClick = ListViewDblClick
   end
   object RectangleBottom: TRectangle
     Align = Bottom
@@ -111,7 +112,7 @@ object ViewBaseForList: TViewBaseForList
       Size.PlatformDefault = False
       Stroke.Kind = None
       object ButtonSearch: TSpeedButton
-        Action = acWhereBuild
+        Action = acBuildWhere
         Align = Top
         CanFocus = True
         CanParentFocus = True
@@ -125,7 +126,7 @@ object ViewBaseForList: TViewBaseForList
         TextSettings.FontColor = claAliceblue
       end
       object ButtonClear: TSpeedButton
-        Action = acWhereClear
+        Action = acClearWhere
         Align = Bottom
         CanFocus = True
         Enabled = True
@@ -175,21 +176,21 @@ object ViewBaseForList: TViewBaseForList
       Caption = 'Select'
       VMActionName = 'acShowOrSelect'
     end
-    object acWhereBuild: TioViewAction
+    object acBuildWhere: TioViewAction
       Category = 'iORM-MVVM'
       Text = 'Search'
       Enabled = True
       Visible = True
       Caption = 'Search'
-      VMActionName = 'acWhereBuild'
+      VMActionName = 'acBuildWhere'
     end
-    object acWhereClear: TioViewAction
+    object acClearWhere: TioViewAction
       Category = 'iORM-MVVM'
       Text = 'Clear'
       Enabled = True
       Visible = True
       Caption = 'Clear'
-      VMActionName = 'acWhereClear'
+      VMActionName = 'acClearWhere'
     end
   end
   object VMBridge: TioViewModelBridge

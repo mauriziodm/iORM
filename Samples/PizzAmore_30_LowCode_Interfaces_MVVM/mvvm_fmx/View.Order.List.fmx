@@ -1,4 +1,4 @@
-inherited ViewOrders: TViewOrders
+inherited ViewOrderList: TViewOrderList
   inherited RectangleTitle: TRectangle
     inherited LabelTitle: TLabel
       TextSettings.Font.StyleExt = {00070000000000000004000000}
@@ -165,7 +165,32 @@ inherited ViewOrders: TViewOrders
       end>
     Preview = True
   end
-  object BindingsList1: TBindingsList [7]
+  inherited BSWhere: TioModelBindSource
+    FieldDefs = <
+      item
+        Name = 'OrderState'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'Note'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'FromDate'
+        FieldType = ftDate
+        Generator = 'Date'
+        ReadOnly = False
+      end
+      item
+        Name = 'ToDate'
+        FieldType = ftDate
+        Generator = 'Date'
+        ReadOnly = False
+      end>
+  end
+  object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>
     Left = 20
@@ -219,32 +244,5 @@ inherited ViewOrders: TViewOrders
       FillHeaderExpressions = <>
       FillBreakGroups = <>
     end
-  end
-  inherited BSWhere: TioModelBindSource
-    AutoActivate = False
-    AutoPost = True
-    FieldDefs = <
-      item
-        Name = 'OrderState'
-        Generator = 'LoremIpsum'
-        ReadOnly = False
-      end
-      item
-        Name = 'Note'
-        Generator = 'LoremIpsum'
-        ReadOnly = False
-      end
-      item
-        Name = 'FromDate'
-        FieldType = ftDate
-        Generator = 'Date'
-        ReadOnly = False
-      end
-      item
-        Name = 'ToDate'
-        FieldType = ftDate
-        Generator = 'Date'
-        ReadOnly = False
-      end>
   end
 end

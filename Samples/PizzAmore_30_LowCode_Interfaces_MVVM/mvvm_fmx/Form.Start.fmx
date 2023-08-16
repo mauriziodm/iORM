@@ -5217,7 +5217,7 @@ object StartForm: TStartForm
   object SQLiteConn: TioSQLiteConnectionDef
     AsDefault = True
     AutoCreateDB.Enabled = True
-    Database = 'PizzAmore_30_mvvm_fmx.db'
+    Database = 'PizzAmore_30_LowCode_Interfaces_mvvm_Fmx.db'
     DatabaseStdFolder = sfDocuments
     Persistent = False
     Pooled = False

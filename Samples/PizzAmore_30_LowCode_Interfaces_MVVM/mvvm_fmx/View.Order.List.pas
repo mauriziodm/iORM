@@ -1,4 +1,4 @@
-unit View.Customers;
+unit View.Order.List;
 
 interface
 
@@ -8,36 +8,44 @@ uses
   FMX.ListView.Adapters.Base, iORM, iORM.Attributes, iORM.CommonTypes, iORM.MVVM.Interfaces, Data.Bind.Components, Data.Bind.ObjectScope,
   iORM.MVVM.ModelBindSource, iORM.MVVM.ViewModelBridge, System.Actions, FMX.ActnList, iORM.StdActions.Fmx, FMX.ListView, FMX.Controls.Presentation, FMX.Objects,
   Data.Bind.GenData, System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt, Fmx.Bind.DBEngExt, Model.Interfaces,
-  iORM.Where.Interfaces, iORM.LiveBindings.PrototypeBindSource.Custom,
-  iORM.LiveBindings.PrototypeBindSource.Master, FMX.Edit;
+  FMX.Edit, FMX.DateTimeCtrls, FMX.ListBox;
 
 type
 
-  [diViewFor(ICustomer)]
-  TViewCustomers = class(TViewBaseForList)
+  [diViewFor(IOrder)]
+  TViewOrderList = class(TViewBaseForList)
     BindingsList1: TBindingsList;
     LinkListControlToField1: TLinkListControlToField;
-    ButtonPrevPage: TSpeedButton;
-    ButtonNextPage: TSpeedButton;
-    LabelPageOf: TLabel;
-    LinkPropertyToFieldText: TLinkPropertyToField;
-    acNextPage: TioViewAction;
-    acPrevPage: TioViewAction;
-    Label1: TLabel;
-    EditWhereID: TEdit;
-    Label3: TLabel;
-    EditWhereName: TEdit;
+    ButtonWhereHistory: TSpeedButton;
     Label2: TLabel;
-    EditWhereCity: TEdit;
-    LinkControlToField3: TLinkControlToField;
-    LinkControlToField2: TLinkControlToField;
+    ComboBoxWhereState: TComboBox;
+    Label1: TLabel;
+    EditWhereNote: TEdit;
+    Line1: TLine;
+    Label3: TLabel;
+    DateEditWhereFromDate: TDateEdit;
+    Label4: TLabel;
+    DateEditToDate: TDateEdit;
+    acWhereShowHistory: TioViewAction;
     LinkControlToField1: TLinkControlToField;
+    LinkControlToField2: TLinkControlToField;
+    LinkControlToField3: TLinkControlToField;
+    LinkFillControlToField1: TLinkFillControlToField;
   private
   public
+    constructor Create(AOwner: TComponent); override;
   end;
 
 implementation
 
 {$R *.fmx}
+
+{ TViewOrders }
+
+constructor TViewOrderList.Create(AOwner: TComponent);
+begin
+  inherited;
+  io.Enums.FillStrings<TOrderState>(ComboBoxWhereState.Items);
+end;
 
 end.

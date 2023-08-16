@@ -33,8 +33,9 @@ type
     ButtonSearch: TSpeedButton;
     ButtonClear: TSpeedButton;
     BSWhere: TioModelBindSource;
-    acWhereBuild: TioViewAction;
-    acWhereClear: TioViewAction;
+    acBuildWhere: TioViewAction;
+    acClearWhere: TioViewAction;
+    procedure ListViewDblClick(Sender: TObject);
   private
   public
   end;
@@ -42,4 +43,9 @@ type
 implementation
 
 {$R *.fmx}
+procedure TViewBaseForList.ListViewDblClick(Sender: TObject);
+begin
+  acShowOrSelect.Execute;
+end;
+
 end.

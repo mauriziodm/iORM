@@ -11,7 +11,7 @@ uses
   iORM.MVVM.ModelBindSource, iORM.MVVM.ViewModelBridge, System.Actions,
   FMX.ActnList, iORM.StdActions.Fmx, FMX.ListView, FMX.Controls.Presentation,
   FMX.Objects, Data.Bind.GenData, Data.Bind.EngExt, Fmx.Bind.DBEngExt,
-  System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors, Model.Where.Interfaces;
+  System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors, Where.Interfaces;
 
 type
 

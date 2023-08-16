@@ -220,8 +220,8 @@ inherited ViewOrder: TViewOrder
       TabOrder = 1
       RowCount = 200
       Options = [AlternatingRowBackground, Editing, ColumnResize, ColumnMove, ColLines, RowLines, Tabs, Header, HeaderClick, AutoDisplacement]
-      Viewport.Width = 400.000000000000000000
-      Viewport.Height = 335.000000000000000000
+      Viewport.Width = 396.000000000000000000
+      Viewport.Height = 310.000000000000000000
     end
   end
   inherited ActionList1: TActionList
