@@ -1,0 +1,250 @@
+inherited ViewOrders: TViewOrders
+  inherited RectangleTitle: TRectangle
+    inherited LabelTitle: TLabel
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      Text = 'Orders'
+    end
+  end
+  inherited ListView: TListView
+    ItemIndex = 0
+  end
+  inherited RectangleBottom: TRectangle
+    object ButtonWhereHistory: TSpeedButton
+      Action = acWhereShowHistory
+      Align = Center
+      Enabled = True
+      StyledSettings = [Family, Size, Style]
+      ImageIndex = -1
+      Size.Width = 40.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'actiontoolbutton'
+      TextSettings.FontColor = claAliceblue
+    end
+  end
+  inherited RectangleWhere: TRectangle
+    object Label2: TLabel
+      StyledSettings = [Family]
+      Position.X = 8.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 49.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claDarkslategray
+      Text = 'Status'
+      TabOrder = 6
+    end
+    object ComboBoxWhereState: TComboBox
+      Position.X = 55.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 100.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 7
+    end
+    object Label1: TLabel
+      StyledSettings = [Family]
+      Position.X = 8.000000000000000000
+      Position.Y = 46.000000000000000000
+      Size.Width = 49.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claDarkslategray
+      Text = 'Note'
+      TabOrder = 4
+    end
+    object EditWhereNote: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 2
+      TextSettings.Font.Size = 14.000000000000000000
+      Position.X = 55.000000000000000000
+      Position.Y = 46.000000000000000000
+      Size.Width = 100.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      StyledSettings = [Family, Style, FontColor]
+    end
+    object Line1: TLine
+      LineType = Left
+      Position.X = 166.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 3.000000000000000000
+      Size.Height = 68.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Color = claDarkslategray
+    end
+    object Label3: TLabel
+      StyledSettings = [Family]
+      Position.X = 176.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 73.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claDarkslategray
+      Text = 'From date'
+      TabOrder = 3
+    end
+    object DateEditWhereFromDate: TDateEdit
+      Date = 45067.000000000000000000
+      Position.X = 252.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 100.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      StyledSettings = [Family, Style, FontColor]
+      TabOrder = 10
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.HorzAlign = Center
+    end
+    object Label4: TLabel
+      StyledSettings = [Family]
+      Position.X = 176.000000000000000000
+      Position.Y = 46.000000000000000000
+      Size.Width = 73.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claDarkslategray
+      Text = 'To date'
+      TabOrder = 5
+    end
+    object DateEditToDate: TDateEdit
+      Date = 45067.000000000000000000
+      Position.X = 252.000000000000000000
+      Position.Y = 46.000000000000000000
+      Size.Width = 100.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      StyledSettings = [Family, Style, FontColor]
+      TabOrder = 9
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.HorzAlign = Center
+    end
+  end
+  inherited ActionList1: TActionList
+    object acWhereShowHistory: TioViewAction
+      Category = 'iORM-MVVM'
+      Text = 'History'
+      Enabled = True
+      Visible = True
+      Caption = 'History'
+      VMActionName = 'acWhereShowHistory'
+    end
+  end
+  inherited BSMaster: TioModelBindSource
+    AutoActivate = True
+    FieldDefs = <
+      item
+        Name = 'ID'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
+      end
+      item
+        Name = 'OrderState'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'Customer.Name'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'GrandTotal'
+        FieldType = ftCurrency
+        Generator = 'Currency'
+        ReadOnly = False
+      end>
+    Preview = True
+  end
+  object BindingsList1: TBindingsList [7]
+    Methods = <>
+    OutputConverters = <>
+    Left = 20
+    Top = 5
+    object LinkListControlToField1: TLinkListControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSMaster
+      FieldName = 'Customer.Name'
+      Control = ListView
+      CustomFormat = 
+        '%s + '#39'  (order: '#39' +Owner.ID.Value + '#39'-'#39' + Owner.OrderState.Value' +
+        ' + '#39')'#39
+      FillExpressions = <
+        item
+          SourceMemberName = 'GrandTotal'
+          ControlMemberName = 'Detail'
+          CustomFormat = 'Format('#39'%%m'#39', Value)'
+        end>
+      FillHeaderExpressions = <>
+      FillBreakGroups = <>
+    end
+    object LinkControlToField1: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWhere
+      FieldName = 'ToDate'
+      Control = DateEditToDate
+      Track = False
+    end
+    object LinkControlToField2: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWhere
+      FieldName = 'Note'
+      Control = EditWhereNote
+      Track = False
+    end
+    object LinkControlToField3: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWhere
+      FieldName = 'FromDate'
+      Control = DateEditWhereFromDate
+      Track = False
+    end
+    object LinkFillControlToField1: TLinkFillControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWhere
+      FieldName = 'OrderState'
+      Control = ComboBoxWhereState
+      Track = True
+      AutoFill = True
+      FillExpressions = <>
+      FillHeaderExpressions = <>
+      FillBreakGroups = <>
+    end
+  end
+  inherited BSWhere: TioModelBindSource
+    AutoActivate = False
+    AutoPost = True
+    FieldDefs = <
+      item
+        Name = 'OrderState'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'Note'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'FromDate'
+        FieldType = ftDate
+        Generator = 'Date'
+        ReadOnly = False
+      end
+      item
+        Name = 'ToDate'
+        FieldType = ftDate
+        Generator = 'Date'
+        ReadOnly = False
+      end>
+  end
+end

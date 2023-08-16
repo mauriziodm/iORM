@@ -81,3 +81,11 @@ Samples/PizzAmore_25_LowCode_Classes_SimpleViews/fmx/Win32/
 Samples/PizzAmore_25_LowCode_Classes_SimpleViews/fmx/Win64/
 Samples/PizzAmore_25_LowCode_Classes_SimpleViews/vcl/__history/
 Samples/PizzAmore_25_LowCode_Classes_SimpleViews/vcl/Win32/
+Samples/PizzAmore_30_LowCode_Interfaces_MVVM/common_model/__history/
+Samples/PizzAmore_30_LowCode_Interfaces_MVVM/mvvm_common_vm/__history/
+Samples/PizzAmore_30_LowCode_Interfaces_MVVM/mvvm_fmx/__history/
+Samples/PizzAmore_30_LowCode_Interfaces_MVVM/mvvm_fmx/Win32/
+Samples/PizzAmore_30_LowCode_Interfaces_MVVM/mvvm_unigui/__history/
+Samples/PizzAmore_30_LowCode_Interfaces_MVVM/mvvm_unigui/Win32/
+Samples/PizzAmore_30_LowCode_Interfaces_MVVM/mvvm_vcl/__history/
+Samples/PizzAmore_30_LowCode_Interfaces_MVVM/mvvm_vcl/Win32/

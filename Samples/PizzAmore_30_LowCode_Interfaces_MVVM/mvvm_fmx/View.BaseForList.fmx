@@ -1,0 +1,217 @@
+object ViewBaseForList: TViewBaseForList
+  Size.Width = 400.000000000000000000
+  Size.Height = 600.000000000000000000
+  Size.PlatformDefault = False
+  object RectangleTitle: TRectangle
+    Align = Top
+    Fill.Color = claOrange
+    Size.Width = 400.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    Stroke.Kind = None
+    object LabelTitle: TLabel
+      Align = Client
+      StyledSettings = [Family]
+      Size.Width = 400.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'toollabel'
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claDarkslategray
+      TextSettings.HorzAlign = Center
+      Text = 'Title'
+      TabOrder = 0
+      object ButtonBack: TSpeedButton
+        Action = acBack
+        Align = Left
+        Enabled = True
+        StyledSettings = [Family, Size, Style]
+        ImageIndex = -1
+        Size.Width = 40.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'priortoolbutton'
+        TextSettings.FontColor = claAliceblue
+      end
+      object ButtonSelect: TSpeedButton
+        Action = acShowOrSelect
+        Align = Right
+        Enabled = True
+        StyledSettings = [Family, Size, Style]
+        ImageIndex = -1
+        Position.X = 350.000000000000000000
+        Size.Width = 50.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'donetoolbutton'
+        TextSettings.FontColor = claDarkslategray
+      end
+    end
+  end
+  object ListView: TListView
+    ItemAppearanceClassName = 'TListItemRightDetailAppearance'
+    ItemEditAppearanceClassName = 'TListItemRightDetailDeleteAppearance'
+    HeaderAppearanceClassName = 'TListHeaderObjects'
+    FooterAppearanceClassName = 'TListHeaderObjects'
+    Align = Client
+    Size.Width = 400.000000000000000000
+    Size.Height = 440.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 3
+  end
+  object RectangleBottom: TRectangle
+    Align = Bottom
+    Fill.Color = xFFF2F2F2
+    Position.Y = 560.000000000000000000
+    Size.Width = 400.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    Stroke.Kind = None
+    object ButtonDelete: TSpeedButton
+      Action = acDelete
+      Align = Left
+      Enabled = True
+      StyledSettings = [Family, Size, Style]
+      ImageIndex = -1
+      Size.Width = 40.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'trashtoolbutton'
+      TextSettings.FontColor = claAliceblue
+    end
+    object ButtonAdd: TSpeedButton
+      Action = acAdd
+      Align = Right
+      Enabled = True
+      StyledSettings = [Family, Size, Style]
+      ImageIndex = -1
+      Position.X = 360.000000000000000000
+      Size.Width = 40.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'addtoolbutton'
+      TextSettings.FontColor = claAliceblue
+    end
+  end
+  object RectangleWhere: TRectangle
+    Align = Bottom
+    Fill.Color = xFFF2F2F2
+    Position.Y = 480.000000000000000000
+    Size.Width = 400.000000000000000000
+    Size.Height = 80.000000000000000000
+    Size.PlatformDefault = False
+    Stroke.Kind = None
+    object RectangleWhereButtons: TRectangle
+      Align = MostRight
+      Fill.Color = xFFF2F2F2
+      Position.X = 360.000000000000000000
+      Size.Width = 40.000000000000000000
+      Size.Height = 80.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Kind = None
+      object ButtonSearch: TSpeedButton
+        Action = acWhereBuild
+        Align = Top
+        CanFocus = True
+        CanParentFocus = True
+        Enabled = True
+        StyledSettings = [Family, Size, Style]
+        ImageIndex = -1
+        Size.Width = 40.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'searchtoolbutton'
+        TextSettings.FontColor = claAliceblue
+      end
+      object ButtonClear: TSpeedButton
+        Action = acWhereClear
+        Align = Bottom
+        CanFocus = True
+        Enabled = True
+        StyledSettings = [Family, Size, Style]
+        ImageIndex = -1
+        Position.Y = 40.000000000000000000
+        Size.Width = 40.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'stoptoolbutton'
+        TextSettings.FontColor = claAliceblue
+      end
+    end
+  end
+  object ActionList1: TActionList
+    Left = 203
+    Top = 163
+    object acBack: TioViewAction
+      Category = 'iORM-MVVM'
+      Text = 'Back'
+      Enabled = True
+      Visible = True
+      Caption = 'Back'
+      VMActionName = 'acBack'
+    end
+    object acDelete: TioViewAction
+      Category = 'iORM-MVVM'
+      Text = 'Delete'
+      Enabled = True
+      Visible = True
+      Caption = 'Delete'
+      VMActionName = 'acDelete'
+    end
+    object acAdd: TioViewAction
+      Category = 'iORM-MVVM'
+      Text = 'Add'
+      Enabled = True
+      Visible = True
+      Caption = 'Add'
+      VMActionName = 'acAdd'
+    end
+    object acShowOrSelect: TioViewAction
+      Category = 'iORM-MVVM'
+      Text = 'Select'
+      Enabled = True
+      Visible = True
+      Caption = 'Select'
+      VMActionName = 'acShowOrSelect'
+    end
+    object acWhereBuild: TioViewAction
+      Category = 'iORM-MVVM'
+      Text = 'Search'
+      Enabled = True
+      Visible = True
+      Caption = 'Search'
+      VMActionName = 'acWhereBuild'
+    end
+    object acWhereClear: TioViewAction
+      Category = 'iORM-MVVM'
+      Text = 'Clear'
+      Enabled = True
+      Visible = True
+      Caption = 'Clear'
+      VMActionName = 'acWhereClear'
+    end
+  end
+  object VMBridge: TioViewModelBridge
+    Left = 202
+    Top = 218
+  end
+  object BSMaster: TioModelBindSource
+    AutoActivate = False
+    FieldDefs = <>
+    ScopeMappings = <>
+    ModelPresenter = 'BSMaster'
+    ViewModelBridge = VMBridge
+    Left = 200
+    Top = 272
+  end
+  object BSWhere: TioModelBindSource
+    AutoActivate = False
+    FieldDefs = <>
+    ScopeMappings = <>
+    ModelPresenter = 'BSWhere'
+    ViewModelBridge = VMBridge
+    Left = 200
+    Top = 424
+  end
+end

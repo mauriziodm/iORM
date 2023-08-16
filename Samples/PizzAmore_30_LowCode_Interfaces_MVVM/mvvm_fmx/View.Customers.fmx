@@ -1,0 +1,229 @@
+inherited ViewCustomers: TViewCustomers
+  inherited RectangleTitle: TRectangle
+    inherited LabelTitle: TLabel
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      Text = 'Customers'
+    end
+  end
+  inherited ListView: TListView
+    ItemIndex = 0
+  end
+  inherited RectangleBottom: TRectangle
+    object ButtonPrevPage: TSpeedButton
+      Action = acPrevPage
+      Align = Left
+      Enabled = True
+      StyledSettings = [Family, Size, Style]
+      ImageIndex = -1
+      Position.X = 40.000000000000000000
+      Size.Width = 40.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'arrowdowntoolbutton'
+      TextSettings.FontColor = claAliceblue
+    end
+    object ButtonNextPage: TSpeedButton
+      Action = acNextPage
+      Align = Left
+      Enabled = True
+      StyledSettings = [Family, Size, Style]
+      ImageIndex = -1
+      Position.X = 80.000000000000000000
+      Size.Width = 40.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'arrowuptoolbutton'
+      TextSettings.FontColor = claAliceblue
+    end
+    object LabelPageOf: TLabel
+      Align = Client
+      Size.Width = 240.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.HorzAlign = Center
+      Text = '4290283019'
+      TabOrder = 2
+    end
+  end
+  inherited RectangleWhere: TRectangle
+    object Label1: TLabel
+      StyledSettings = [Family]
+      Position.X = 8.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 40.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claDarkslategray
+      Text = 'ID'
+      TabOrder = 5
+    end
+    object EditWhereID: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 2
+      TextSettings.Font.Size = 14.000000000000000000
+      Position.X = 56.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 50.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      StyledSettings = [Family, Style, FontColor]
+    end
+    object Label3: TLabel
+      StyledSettings = [Family]
+      Position.X = 120.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 50.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claDarkslategray
+      Text = 'Name'
+      TabOrder = 4
+    end
+    object EditWhereName: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      Anchors = [akLeft, akTop, akRight]
+      TabOrder = 1
+      TextSettings.Font.Size = 14.000000000000000000
+      Position.X = 176.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 176.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      StyledSettings = [Family, Style, FontColor]
+    end
+    object Label2: TLabel
+      StyledSettings = [Family]
+      Position.X = 8.000000000000000000
+      Position.Y = 45.000000000000000000
+      Size.Width = 40.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claDarkslategray
+      Text = 'City'
+      TabOrder = 3
+    end
+    object EditWhereCity: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      Anchors = [akLeft, akTop, akRight]
+      TabOrder = 0
+      TextSettings.Font.Size = 14.000000000000000000
+      Position.X = 56.000000000000000000
+      Position.Y = 45.000000000000000000
+      Size.Width = 296.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      StyledSettings = [Family, Style, FontColor]
+    end
+  end
+  inherited ActionList1: TActionList
+    object acNextPage: TioViewAction [4]
+      Category = 'iORM-MVVM'
+      Text = 'acNextPage'
+      Enabled = True
+      Visible = True
+      Caption = 'acNextPage'
+      VMActionName = 'acNextPage'
+    end
+    object acPrevPage: TioViewAction [5]
+      Category = 'iORM-MVVM'
+      Text = 'acPrevPage'
+      Enabled = True
+      Visible = True
+      Caption = 'acPrevPage'
+      VMActionName = 'acPrevPage'
+    end
+  end
+  inherited BSMaster: TioModelBindSource
+    AutoActivate = True
+    FieldDefs = <
+      item
+        Name = 'Name'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'PhoneNumber'
+        Generator = 'ColorsNames'
+        ReadOnly = False
+      end
+      item
+        Name = '%Paging.CurrentPageOf'
+        FieldType = ftUInteger
+        Generator = 'AlphaColors'
+        ReadOnly = False
+      end>
+    Preview = True
+  end
+  inherited BSWhere: TioModelBindSource
+    FieldDefs = <
+      item
+        Name = 'ID'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
+      end
+      item
+        Name = 'Name'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'City'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end>
+  end
+  object BindingsList1: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 20
+    Top = 5
+    object LinkListControlToField1: TLinkListControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSMaster
+      FieldName = 'Name'
+      Control = ListView
+      FillExpressions = <
+        item
+          SourceMemberName = 'PhoneNumber'
+          ControlMemberName = 'Detail'
+        end>
+      FillHeaderExpressions = <>
+      FillBreakGroups = <>
+    end
+    object LinkPropertyToFieldText: TLinkPropertyToField
+      Category = 'Quick Bindings'
+      DataSource = BSMaster
+      FieldName = '%Paging.CurrentPageOf'
+      Component = LabelPageOf
+      ComponentProperty = 'Text'
+    end
+    object LinkControlToField3: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWhere
+      FieldName = 'City'
+      Control = EditWhereCity
+      Track = False
+    end
+    object LinkControlToField2: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWhere
+      FieldName = 'ID'
+      Control = EditWhereID
+      Track = False
+    end
+    object LinkControlToField1: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWhere
+      FieldName = 'Name'
+      Control = EditWhereName
+      Track = False
+    end
+  end
+end
