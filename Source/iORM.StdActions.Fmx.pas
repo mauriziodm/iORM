@@ -593,7 +593,8 @@ implementation
 uses
   iORM.Abstraction, iORM.Exceptions, System.SysUtils, iORM.Utilities, iORM,
   System.Rtti, iORM.RttiContext.Factory,
-  iORM.StdActions.CloseQueryActionRegister, Fmx.Forms, iORM.ETM.Engine;
+  iORM.StdActions.CloseQueryActionRegister, Fmx.Forms, iORM.ETM.Engine,
+  iORM.StdActions.CommonBehaviour;
 
 { TioBSObjStateStdActionFmx }
 
@@ -1020,8 +1021,8 @@ procedure TioBSSelectCurrent.ExecuteTarget(Target: TObject);
 begin
   inherited;
   TargetBindSource.SelectCurrent(FSelectionType);
-  if Assigned(FAction_CloseQueryAction) and FAction_CloseQueryAction._IsEnabled then
-    FAction_CloseQueryAction.Execute;
+  // Execute slave actions
+  TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_CloseQueryAction);
 end;
 
 procedure TioBSSelectCurrent.Notification(AComponent: TComponent; Operation: TOperation);

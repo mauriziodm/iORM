@@ -234,7 +234,8 @@ contains
   iORM.ETM.Diff.Oneway in '..\..\Source\iORM.ETM.Diff.Oneway.pas',
   iORM.ETM.Interfaces in '..\..\Source\iORM.ETM.Interfaces.pas',
   iORM.ETM.Factory in '..\..\Source\iORM.ETM.Factory.pas',
-  iORM.ETM.Diff.Twoway in '..\..\Source\iORM.ETM.Diff.Twoway.pas';
+  iORM.ETM.Diff.Twoway in '..\..\Source\iORM.ETM.Diff.Twoway.pas',
+  iORM.StdActions.CommonBehaviour in '..\..\Source\iORM.StdActions.CommonBehaviour.pas';
 
 end.
 
