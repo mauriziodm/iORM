@@ -232,17 +232,22 @@ contains
   iORM.Where.SmartBuilder in '..\..\Source\iORM.Where.SmartBuilder.pas',
   iORM.Abstraction.uniGUI in '..\..\Source\iORM.Abstraction.uniGUI.pas',
   iORM.Where.NestedProp.Resolver in '..\..\Source\iORM.Where.NestedProp.Resolver.pas',
-  iORM.ETM.Engine in '..\..\Source\iORM.ETM.Engine.pas',
   iORM.Interceptor.CRUD in '..\..\Source\iORM.Interceptor.CRUD.pas',
   iORM.Interceptor.CRUD.Register in '..\..\Source\iORM.Interceptor.CRUD.Register.pas',
   iORM.Interceptor.Strategy in '..\..\Source\iORM.Interceptor.Strategy.pas',
   iORM.Interceptor.Strategy.Register in '..\..\Source\iORM.Interceptor.Strategy.Register.pas',
-  iORM.ETM.Interceptor in '..\..\Source\iORM.ETM.Interceptor.pas',
   iORM.Strategy.Http in '..\..\Source\iORM.Strategy.Http.pas',
   iORM.Http.Body.Request in '..\..\Source\iORM.Http.Body.Request.pas',
   iORM.Http.Body.Response in '..\..\Source\iORM.Http.Body.Response.pas',
   iORM.Http.Connection in '..\..\Source\iORM.Http.Connection.pas',
   iORM.Http.Factory in '..\..\Source\iORM.Http.Factory.pas',
-  iORM.Http.Interfaces in '..\..\Source\iORM.Http.Interfaces.pas';
+  iORM.Http.Interfaces in '..\..\Source\iORM.Http.Interfaces.pas',
+  iORM.ETM.Diff.Oneway in '..\..\Source\iORM.ETM.Diff.Oneway.pas',
+  iORM.ETM.Diff.Twoway in '..\..\Source\iORM.ETM.Diff.Twoway.pas',
+  iORM.ETM.Engine in '..\..\Source\iORM.ETM.Engine.pas',
+  iORM.ETM.Factory in '..\..\Source\iORM.ETM.Factory.pas',
+  iORM.ETM.Interceptor in '..\..\Source\iORM.ETM.Interceptor.pas',
+  iORM.ETM.Interfaces in '..\..\Source\iORM.ETM.Interfaces.pas',
+  iORM.StdActions.CommonBehaviour in '..\..\Source\iORM.StdActions.CommonBehaviour.pas';
 
 end.
