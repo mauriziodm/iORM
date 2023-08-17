@@ -463,9 +463,15 @@ type
     constructor Create(AOwner: TComponent); override;
   end;
 
-  TioBS_ETM_Revert = class(TioBSPersistenceStdActionFmx)
-  private
+  TioBS_ETM_RevertToObject = class(TioBSPersistenceStdActionFmx)
+  strict private
     FAutoExecute_Persist_AfterRevert: Boolean;
+    FOwnRevertedObj: Boolean;
+    FRevertedObj: TObject;
+    // Events
+    FAfterRevertEvent: TioStdAction_ETM_AfterRevertEvent;
+    FBeforeRevertEvent: TioStdAction_ETM_BeforeRevertEvent;
+    procedure _ShowRevertedObj;
   public
     constructor Create(AOwner: TComponent); override;
     procedure ExecuteTarget(Target: TObject); override;
@@ -473,11 +479,37 @@ type
   published
     // Properties
     property Action_CloseQueryAction;
-    property Action_ReloadAction;
+    property Action_ShowOrSelectAction;
+    property AutoExecute_Persist_AfterRevert: Boolean read FAutoExecute_Persist_AfterRevert write FAutoExecute_Persist_AfterRevert default False;
+    property OwnRevertedObj: Boolean read FOwnRevertedObj write FOwnRevertedObj default True;
+    property TargetBindSource;
+    // Events
+    property AfterRevert: TioStdAction_ETM_AfterRevertEvent read FAfterRevertEvent write FAfterRevertEvent;
+    property BeforeRevert: TioStdAction_ETM_BeforeRevertEvent read FBeforeRevertEvent write FBeforeRevertEvent;
+    property OnExecute;
+    property OnHint;
+    property OnUpdate;
+  end;
+
+  TioBS_ETM_RevertToBindSource = class(TioBSPersistenceStdActionFmx)
+  strict private
+    FAutoExecute_Persist_AfterRevert: Boolean;
+    FRevertedObj: TObject;
+    // Events
+    FAfterRevertEvent: TioStdAction_ETM_AfterRevertEvent;
+    procedure _ShowRevertedObj;
+  public
+    constructor Create(AOwner: TComponent); override;
+    procedure ExecuteTarget(Target: TObject); override;
+    procedure UpdateTarget(Target: TObject); override;
+  published
+    // Properties
+    property Action_CloseQueryAction;
     property Action_ShowOrSelectAction;
     property AutoExecute_Persist_AfterRevert: Boolean read FAutoExecute_Persist_AfterRevert write FAutoExecute_Persist_AfterRevert default False;
     property TargetBindSource;
     // Events
+    property AfterRevert: TioStdAction_ETM_AfterRevertEvent read FAfterRevertEvent write FAfterRevertEvent;
     property OnExecute;
     property OnHint;
     property OnUpdate;
@@ -1873,28 +1905,35 @@ begin
   FIsSlave := True;
 end;
 
-{ TioBSEtmRevert }
+{ TioBS_ETM_RevertToBindSource }
 
-constructor TioBS_ETM_Revert.Create(AOwner: TComponent);
+constructor TioBS_ETM_RevertToBindSource.Create(AOwner: TComponent);
 begin
   inherited;
   FAutoExecute_Persist_AfterRevert := False;
+  FRevertedObj := nil;
 end;
 
-procedure TioBS_ETM_Revert.ExecuteTarget(Target: TObject);
+procedure TioBS_ETM_RevertToBindSource.ExecuteTarget(Target: TObject);
 begin
   inherited;
-  if not (TargetBindSource.Current is TioEtmCustomTimeSlot) then
-    raise EioEtmException.Create(ClassName, 'ExecuteTarget', 'Current object if the TargetBindSource is not derived from "TioEtmCustomTimeSlot" base class.');
-  TioEtmEngine.RevertToBindSource(TargetBindSource.Current as TioEtmCustomTimeSlot, TargetBindSource, FAutoExecute_Persist_AfterRevert);
+  // Some check
+  if not(TargetBindSource.Current is TioEtmCustomTimeSlot) then
+    raise EioEtmException.Create(ClassName, 'ExecuteTarget', 'Current object in the TargetBindSource is not derived from "TioEtmCustomTimeSlot" base class.');
+  // Revert
+  TioEtmEngine.RevertToBindSource(TargetBindSource.Current as TioEtmCustomTimeSlot, TargetBindSource.ETMfor, FAutoExecute_Persist_AfterRevert);
+  FRevertedObj := TargetBindSource.ETMfor.Current;
+  // AfterRevert event handler
+  if Assigned(FAfterRevertEvent) then
+    FAfterRevertEvent(Self, FRevertedObj);
   // Execute slave actions
   if TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction) then
     Exit;
-  TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_ShowOrSelectAction);
-  TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_ReloadAction);
+  if Assigned(Action_ShowOrSelectAction) and Action_ShowOrSelectAction._IsEnabled then
+    _ShowRevertedObj;
 end;
 
-procedure TioBS_ETM_Revert.UpdateTarget(Target: TObject);
+procedure TioBS_ETM_RevertToBindSource.UpdateTarget(Target: TObject);
 begin
   inherited;
   Enabled := Enabled and Assigned(TargetBindSource);
@@ -1902,6 +1941,115 @@ begin
   Enabled := Enabled and Assigned(TargetBindSource.Current);
   Enabled := Enabled and TargetBindSource.ETMfor.IsActive;
   Enabled := Enabled and Assigned(TargetBindSource.ETMfor.Current);
+end;
+
+procedure TioBS_ETM_RevertToBindSource._ShowRevertedObj;
+var
+  LShowOrSelectAction: TioBSShowOrSelect;
+begin
+  if Assigned(Action_ShowOrSelectAction) and Action_ShowOrSelectAction._IsEnabled then
+  begin
+    // Controlla se la ShowOrSelect action è realmente una action di questo tipo
+    if not (Action_ShowOrSelectAction is TioBSShowOrSelect) then
+      raise EioException.Create(ClassName, '_ShowRevertedObj',
+        Format('"Action_ShowOrSelectAction" property is of the wrong type "%s" insitead of "TioBSShowOrSelect".',
+        [(Action_ShowOrSelectAction as TObject).ClassName]));
+    // Estrae il tipo reale della ShowOrSelect action per poter poi accedere a informazioni che riguardano
+    //  soprattutto come ottenere un ViewCOntext.
+    //  NB: Questa azione in realtà non eseguirà la ShowOrSelect action impostata bensì farà una chiamata
+    //       io.Show... usando le informazioni recuperate.
+    LShowOrSelectAction := Action_ShowOrSelectAction as TioBSShowOrSelect;
+    case LShowOrSelectAction.ViewContextBy of
+      vcByDefaultViewContextProvider:
+        io.Show(FRevertedObj, LShowOrSelectAction.Action_ParentCloseQueryAction, LShowOrSelectAction.VVMTypeAlias);
+      vcByViewContextProviderName:
+        io.Show(FRevertedObj, LShowOrSelectAction.Action_ParentCloseQueryAction, io.VCProviderByName(LShowOrSelectAction.ViewContextProviderName), LShowOrSelectAction.VVMTypeAlias);
+      vcByViewContextProvider:
+        io.Show(FRevertedObj, LShowOrSelectAction.Action_ParentCloseQueryAction, LShowOrSelectAction.ViewContextProvider, LShowOrSelectAction.VVMTypeAlias);
+      vcByViewContext:
+        io.Show(FRevertedObj, LShowOrSelectAction.Action_ParentCloseQueryAction, LShowOrSelectAction.ViewContext, LShowOrSelectAction.VVMTypeAlias);
+      // vcNone:
+      //   io.Show(FRevertedObj, LShowOrSelectAction.Action_ParentCloseQueryAction, nil, LShowOrSelectAction.VVMTypeAlias);
+    end;
+  end;
+end;
+
+{ TioBS_ETM_RevertToObject }
+
+constructor TioBS_ETM_RevertToObject.Create(AOwner: TComponent);
+begin
+  inherited;
+  FAutoExecute_Persist_AfterRevert := False;
+  FRevertedObj := nil;
+  FOwnRevertedObj := True;
+end;
+
+procedure TioBS_ETM_RevertToObject.ExecuteTarget(Target: TObject);
+begin
+  inherited;
+  // Some check
+  if not(TargetBindSource.Current is TioEtmCustomTimeSlot) then
+    raise EioEtmException.Create(ClassName, 'ExecuteTarget', 'Current object in the TargetBindSource is not derived from "TioEtmCustomTimeSlot" base class.');
+  // Free previous reverted object (if OwnRevertedObj = True)
+  if FOwnRevertedObj and Assigned(FRevertedObj) then
+    FreeAndNil(FRevertedObj);
+  // BeforeRevert event handler
+  if Assigned(FBeforeRevertEvent) then
+    FBeforeRevertEvent(Self, FRevertedObj);
+  // Revert
+  if Assigned(FRevertedObj) then
+    io.etm.RevertToObject(FRevertedObj, TargetBindSource.Current as TioEtmCustomTimeSlot, FAutoExecute_Persist_AfterRevert)
+  else
+    FRevertedObj := io.etm.RevertObject(TargetBindSource.Current as TioEtmCustomTimeSlot, FAutoExecute_Persist_AfterRevert);
+  // AfterRevert event handler
+  if Assigned(FAfterRevertEvent) then
+    FAfterRevertEvent(Self, FRevertedObj);
+  // Execute slave actions
+  if TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction) then
+    Exit;
+  if Assigned(Action_ShowOrSelectAction) and Action_ShowOrSelectAction._IsEnabled then
+    _ShowRevertedObj;
+end;
+
+procedure TioBS_ETM_RevertToObject.UpdateTarget(Target: TObject);
+begin
+  inherited;
+  Enabled := Enabled and Assigned(TargetBindSource);
+  Enabled := Enabled and Assigned(TargetBindSource.ETMfor);
+  Enabled := Enabled and Assigned(TargetBindSource.Current);
+  Enabled := Enabled and TargetBindSource.ETMfor.isActive;
+  Enabled := Enabled and Assigned(TargetBindSource.ETMfor.Current);
+end;
+
+procedure TioBS_ETM_RevertToObject._ShowRevertedObj;
+var
+  LShowOrSelectAction: TioBSShowOrSelect;
+begin
+  if Assigned(Action_ShowOrSelectAction) and Action_ShowOrSelectAction._IsEnabled then
+  begin
+    // Controlla se la ShowOrSelect action è realmente una action di questo tipo
+    if not (Action_ShowOrSelectAction is TioBSShowOrSelect) then
+      raise EioException.Create(ClassName, '_ShowRevertedObj',
+        Format('"Action_ShowOrSelectAction" property is of the wrong type "%s" insitead of "TioBSShowOrSelect".',
+        [(Action_ShowOrSelectAction as TObject).ClassName]));
+    // Estrae il tipo reale della ShowOrSelect action per poter poi accedere a informazioni che riguardano
+    //  soprattutto come ottenere un ViewCOntext.
+    //  NB: Questa azione in realtà non eseguirà la ShowOrSelect action impostata bensì farà una chiamata
+    //       io.Show... usando le informazioni recuperate.
+    LShowOrSelectAction := Action_ShowOrSelectAction as TioBSShowOrSelect;
+    case LShowOrSelectAction.ViewContextBy of
+      vcByDefaultViewContextProvider:
+        io.Show(FRevertedObj, LShowOrSelectAction.Action_ParentCloseQueryAction, LShowOrSelectAction.VVMTypeAlias);
+      vcByViewContextProviderName:
+        io.Show(FRevertedObj, LShowOrSelectAction.Action_ParentCloseQueryAction, io.VCProviderByName(LShowOrSelectAction.ViewContextProviderName), LShowOrSelectAction.VVMTypeAlias);
+      vcByViewContextProvider:
+        io.Show(FRevertedObj, LShowOrSelectAction.Action_ParentCloseQueryAction, LShowOrSelectAction.ViewContextProvider, LShowOrSelectAction.VVMTypeAlias);
+      vcByViewContext:
+        io.Show(FRevertedObj, LShowOrSelectAction.Action_ParentCloseQueryAction, LShowOrSelectAction.ViewContext, LShowOrSelectAction.VVMTypeAlias);
+      // vcNone:
+      //   io.Show(FRevertedObj, LShowOrSelectAction.Action_ParentCloseQueryAction, nil, LShowOrSelectAction.VVMTypeAlias);
+    end;
+  end;
 end;
 
 end.
