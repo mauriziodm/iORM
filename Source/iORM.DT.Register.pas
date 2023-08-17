@@ -84,7 +84,8 @@ begin
   RegisterComponents('iORM - MVVM - VMActions', [TioVMAction]);
   RegisterComponents('iORM - MVVM - VMActions - BS', [TioVMActionBSShowOrSelect]);
   RegisterComponents('iORM - MVVM - VMActions - BS', [TioVMActionBSCloseQuery]);
-  RegisterComponents('iORM - MVVM - VMActions - BS - ETM', [TioVMActionBS_ETM_Revert]);
+  RegisterComponents('iORM - MVVM - VMActions - BS - ETM', [TioVMActionBS_ETM_RevertToObject]);
+  RegisterComponents('iORM - MVVM - VMActions - BS - ETM', [TioVMActionBS_ETM_RevertToBindSource]);
   RegisterComponents('iORM - MVVM - VMActions - BS - Paging', [TioVMActionBSNextPage]);
   RegisterComponents('iORM - MVVM - VMActions - BS - Paging', [TioVMActionBSPrevPage]);
   RegisterComponents('iORM - MVVM - VMActions - BS - WhereBuilder', [TioVMActionBSBuildWhere]);
@@ -107,7 +108,8 @@ begin
   RegisterActions('iORM - BS', [iORM.StdActions.Vcl.TioBSSelectCurrent], nil);
   RegisterActions('iORM - BS', [iORM.StdActions.Vcl.TioBSShowOrSelect], nil);
   RegisterActions('iORM - BS', [iORM.StdActions.Vcl.TioBSCloseQuery], nil);
-  RegisterActions('iORM - BS - ETM', [iORM.StdActions.Vcl.TioBS_ETM_Revert], nil);
+  RegisterActions('iORM - BS - ETM', [iORM.StdActions.Vcl.TioBS_ETM_RevertToObject], nil);
+  RegisterActions('iORM - BS - ETM', [iORM.StdActions.Vcl.TioBS_ETM_RevertToBindSource], nil);
   RegisterActions('iORM - BS - Paging', [iORM.StdActions.Vcl.TioBSNextPage], nil);
   RegisterActions('iORM - BS - Paging', [iORM.StdActions.Vcl.TioBSPrevPage], nil);
   RegisterActions('iORM - BS - WhereBuilder', [iORM.StdActions.Vcl.TioBSBuildWhere], nil);
@@ -129,7 +131,8 @@ begin
   RegisterActions('iORM - BS', [iORM.StdActions.Fmx.TioBSSelectCurrent], nil);
   RegisterActions('iORM - BS', [iORM.StdActions.Fmx.TioBSShowOrSelect], nil);
   RegisterActions('iORM - BS', [iORM.StdActions.Fmx.TioBSCloseQuery], nil);
-  RegisterActions('iORM - BS - ETM', [iORM.StdActions.Fmx.TioBS_ETM_Revert], nil);
+  RegisterActions('iORM - BS - ETM', [iORM.StdActions.Fmx.TioBS_ETM_RevertToObject], nil);
+  RegisterActions('iORM - BS - ETM', [iORM.StdActions.Fmx.TioBS_ETM_RevertToBindSource], nil);
   RegisterActions('iORM - BS - Paging', [iORM.StdActions.Fmx.TioBSNextPage], nil);
   RegisterActions('iORM - BS - Paging', [iORM.StdActions.Fmx.TioBSPrevPage], nil);
   RegisterActions('iORM - BS - WhereBuilder', [iORM.StdActions.Fmx.TioBSBuildWhere], nil);
