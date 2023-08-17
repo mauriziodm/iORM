@@ -10,17 +10,18 @@ uses
 {$ELSE}
   Vcl.Graphics,
 {$IFEND}
-  iORM;
+  iORM, ETM.Repository;
 
 type
 
-  [ioEntity('PIZZAS')]
+  [ioEntity('PIZZAS'), etmTrace(TEtmRepository)]
   TPizza = class
   private
     FID: Integer;
     FName: String;
     FPrice: Currency;
     FImage: TBitmap;
+    FObjVersion: TioObjVersion;
   public
     constructor Create;
     destructor Destroy; override;

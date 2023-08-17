@@ -120,9 +120,9 @@ object CustomerForm: TCustomerForm
       ParentFont = False
     end
     object LabelTitle: TLabel
-      Left = 56
+      Left = 72
       Top = 7
-      Width = 453
+      Width = 441
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -135,7 +135,6 @@ object CustomerForm: TCustomerForm
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlCenter
-      ExplicitWidth = 481
     end
   end
   object PanelBottom: TPanel

@@ -254,10 +254,17 @@ end;
 
 class procedure TioEtmEngine.RevertToBindSource(const ATimeSlot: TioEtmCustomTimeSlot; const ATargetBindSource: IioMasterBindSource; const APersistImmediately: Boolean = False);
 begin
+  // Check ATargetBindSource
   if (not Assigned(ATargetBindSource)) or (not ATargetBindSource.IsActive) then
-    raise EioEtmException.Create(ClassName, 'RevertToBindSource', '"ABindSource" parameter must be assigned and activated.');
+    raise EioEtmException.Create(ClassName, 'RevertToBindSource', '"ATargetBindSource" parameter must be assigned and activated.');
   if ATargetBindSource.Current = nil then
     raise EioEtmException.Create(ClassName, 'RevertToBindSource', 'Current object of the TargetBindSource is nil.');
+  // Check ATargetBindSource.ETMfor bind source
+  if (not Assigned(ATargetBindSource.ETMfor)) or (not ATargetBindSource.ETMfor.IsActive) then
+    raise EioEtmException.Create(ClassName, 'RevertToBindSource', '"ATargetBindSource.ETMfor" bind source must be assigned and activated.');
+  if ATargetBindSource.ETMfor.Current = nil then
+    raise EioEtmException.Create(ClassName, 'RevertToBindSource', 'Current object of the ATargetBindSource.ETMfor bind source is nil.');
+  // Execute the revert operation
   RevertToObject(ATargetBindSource.ETMfor.Current, ATimeSloT, APersistImmediately);
   ATargetBindSource.ETMfor.Refresh;
 end;

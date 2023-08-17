@@ -3,12 +3,12 @@ unit Model.Customer;
 interface
 
 uses
-  iORM;
+  iORM, ETM.Repository;
 
 type
 
   // Register the form into the dependency injection container as SimpleView for TCustomer objects
-  [ioEntity('CUSTOMERS')]
+  [ioEntity('CUSTOMERS'), etmTrace(TEtmRepository)]
   TCustomer = class
   private
     FID: Integer;
@@ -18,6 +18,7 @@ type
     FCity: String;
     FAddress: String;
     FPhoneNumber: String;
+    FObjVersion: TioObjVersion;
     function GetFullAddress: String;
   public
     property ID: Integer read FID write FID;

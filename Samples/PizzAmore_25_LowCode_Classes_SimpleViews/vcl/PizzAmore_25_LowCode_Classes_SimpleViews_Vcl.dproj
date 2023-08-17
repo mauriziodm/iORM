@@ -168,6 +168,11 @@
             <Form>OrderWhereHistoryForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\common_model\ETM.Repository.pas"/>
+        <DCCReference Include="Form.ETM.pas">
+            <Form>Form1</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

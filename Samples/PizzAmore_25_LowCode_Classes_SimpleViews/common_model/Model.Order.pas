@@ -3,14 +3,14 @@ unit Model.Order;
 interface
 
 uses
-  iORM, System.Generics.Collections, Model.Customer, Model.OrderRow, Model.Pizza;
+  iORM, ETM.Repository, System.Generics.Collections, Model.Customer, Model.OrderRow, Model.Pizza;
 
 type
 
   [ioEnumerated('All, Waiting, Preparing, Ready, Delivered')]
   TOrderState = (osUnknown, osWaiting, osPreparing, osReady, osDelivered);
 
-  [ioEntity('ORDERS')]
+  [ioEntity('ORDERS'), etmTrace(TEtmRepository)]
   TOrder = class
   private
     FID: Integer;
@@ -19,6 +19,7 @@ type
     FRows: TObjectList<TOrderRow>;
     FNote: String;
     FOrderState: TOrderState;
+    FObjVersion: TioObjVersion;
     function GetGrandTotal: Currency;
   public
     constructor Create;

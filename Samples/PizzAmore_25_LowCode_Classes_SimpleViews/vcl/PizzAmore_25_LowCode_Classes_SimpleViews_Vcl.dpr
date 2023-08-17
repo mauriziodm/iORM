@@ -16,7 +16,9 @@ uses
   Form.Order in 'Form.Order.pas' {OrderForm},
   Where.Order in '..\common_model\Where.Order.pas',
   Where.Pizza in '..\common_model\Where.Pizza.pas',
-  Form.Where.OrderHistory in 'Form.Where.OrderHistory.pas' {OrderWhereHistoryForm};
+  Form.Where.OrderHistory in 'Form.Where.OrderHistory.pas' {OrderWhereHistoryForm},
+  ETM.Repository in '..\common_model\ETM.Repository.pas',
+  Form.ETM in 'Form.ETM.pas' {Form1};
 
 {$R *.res}
 {$STRONGLINKTYPES ON}
@@ -27,5 +29,6 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TMainForm, MainForm);
+  Application.CreateForm(TForm1, Form1);
   Application.Run;
 end.
