@@ -187,7 +187,7 @@ type
   strict private
     FAction_PersistAction: IioBSSlaveAction;
     FAction_CloseQueryAction: IioBSSlaveAction;
-    FWhereAutoExecuteOnTargetBS: Boolean;
+    FAutoExecute_Where_OnTargetBS: Boolean;
     procedure SetAction_CloseQueryAction(const Value: IioBSSlaveAction);
     procedure SetAction_PersistAction(const Value: IioBSSlaveAction);
   strict protected
@@ -199,21 +199,21 @@ type
   published
     property Action_CloseQueryAction: IioBSSlaveAction read FAction_CloseQueryAction write SetAction_CloseQueryAction;
     property Action_PersistAction: IioBSSlaveAction read FAction_PersistAction write SetAction_PersistAction;
+    property AutoExecute_Where_OnTargetBS: Boolean read FAutoExecute_Where_OnTargetBS write FAutoExecute_Where_OnTargetBS default True;
     property TargetBindSource;
-    property WhereAutoExecuteOnTargetBS: Boolean read FWhereAutoExecuteOnTargetBS write FWhereAutoExecuteOnTargetBS default True;
   end;
 
   // ClearWhere
   TioBSClearWhere = class(TioBSStdActionFmx<IioStdActionTargetMasterBindSource>)
   strict private
-    FWhereAutoExecuteOnTargetBS: Boolean;
+    FAutoExecute_Where_OnTargetBS: Boolean;
   public
     constructor Create(AOwner: TComponent); override;
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget(Target: TObject); override;
   published
+    property AutoExecute_Where_OnTargetBS: Boolean read FAutoExecute_Where_OnTargetBS write FAutoExecute_Where_OnTargetBS default False;
     property TargetBindSource;
-    property WhereAutoExecuteOnTargetBS: Boolean read FWhereAutoExecuteOnTargetBS write FWhereAutoExecuteOnTargetBS default False;
   end;
 
   // =================================================================================================
@@ -349,8 +349,8 @@ type
 
   TioBSPersistenceRevertOrDelete = class(TioBSPersistenceStdActionFmx)
   private
-    FOnDelete_ExecuteCloseQueryAction:Boolean;
-    FOnRevert_ExecuteCloseQueryAction:Boolean;
+    FAutoExecute_CloseQueryAction_AfterDelete: Boolean;
+    FAutoExecute_CloseQueryAction_AfterRevert: Boolean;
   public
     constructor Create(AOwner: TComponent); override;
     procedure ExecuteTarget(Target: TObject); override;
@@ -358,8 +358,8 @@ type
   published
     // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property Action_CloseQueryAction;
-    property OnDelete_ExecuteCloseQueryAction: Boolean read FOnDelete_ExecuteCloseQueryAction write FOnDelete_ExecuteCloseQueryAction default True;
-    property OnRevert_ExecuteCloseQueryAction: Boolean read FOnRevert_ExecuteCloseQueryAction write FOnRevert_ExecuteCloseQueryAction default False;
+    property AutoExecute_CloseQueryAction_AfterDelete: Boolean read FAutoExecute_CloseQueryAction_AfterDelete write FAutoExecute_CloseQueryAction_AfterDelete default True;
+    property AutoExecute_CloseQueryAction_AfterRevert: Boolean read FAutoExecute_CloseQueryAction_AfterRevert write FAutoExecute_CloseQueryAction_AfterRevert default False;
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property RaiseIfRevertPointNotSaved;
@@ -463,10 +463,9 @@ type
     constructor Create(AOwner: TComponent); override;
   end;
 
-
   TioBS_ETM_Revert = class(TioBSPersistenceStdActionFmx)
   private
-    FPersistImmediately: Boolean;
+    FAutoExecute_Persist_AfterRevert: Boolean;
   public
     constructor Create(AOwner: TComponent); override;
     procedure ExecuteTarget(Target: TObject); override;
@@ -476,7 +475,7 @@ type
     property Action_CloseQueryAction;
     property Action_ReloadAction;
     property Action_ShowOrSelectAction;
-    property PersistImmediately: Boolean read FPersistImmediately write FPersistImmediately default False;
+    property AutoExecute_Persist_AfterRevert: Boolean read FAutoExecute_Persist_AfterRevert write FAutoExecute_Persist_AfterRevert default False;
     property TargetBindSource;
     // Events
     property OnExecute;
@@ -770,8 +769,8 @@ end;
 constructor TioBSPersistenceRevertOrDelete.Create(AOwner: TComponent);
 begin
   inherited;
-  FOnDelete_ExecuteCloseQueryAction := True;
-  FOnRevert_ExecuteCloseQueryAction := False;
+  FAutoExecute_CloseQueryAction_AfterDelete := True;
+  FAutoExecute_CloseQueryAction_AfterRevert := False;
 end;
 
 procedure TioBSPersistenceRevertOrDelete.ExecuteTarget(Target: TObject);
@@ -781,7 +780,7 @@ begin
   LIsDeleting := TargetBindSource.Persistence.IsInserting;
   TargetBindSource.Persistence.RevertOrDelete(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists, ClearAfterExecute);
   // Execute slave actions
-  if (LIsDeleting and FOnDelete_ExecuteCloseQueryAction) or (not LIsDeleting and FOnRevert_ExecuteCloseQueryAction) then
+  if (LIsDeleting and FAutoExecute_CloseQueryAction_AfterDelete) or (not LIsDeleting and FAutoExecute_CloseQueryAction_AfterRevert) then
     TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
 
@@ -1507,13 +1506,13 @@ begin
   inherited;
   FAction_CloseQueryAction := nil;
   FAction_PersistAction := nil;
-  FWhereAutoExecuteOnTargetBS := True;
+  FAutoExecute_Where_OnTargetBS := True;
 end;
 
 procedure TioBSBuildWhere.ExecuteTarget(Target: TObject);
 begin
   inherited;
-  TargetBindSource.BuildWhere(FWhereAutoExecuteOnTargetBS);
+  TargetBindSource.BuildWhere(FAutoExecute_Where_OnTargetBS);
   // Execute slave actions
   TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_PersistAction);
   TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_CloseQueryAction);
@@ -1561,13 +1560,13 @@ end;
 constructor TioBSClearWhere.Create(AOwner: TComponent);
 begin
   inherited;
-  FWhereAutoExecuteOnTargetBS := False;
+  FAutoExecute_Where_OnTargetBS := False;
 end;
 
 procedure TioBSClearWhere.ExecuteTarget(Target: TObject);
 begin
   inherited;
-  TargetBindSource.ClearWhere(FWhereAutoExecuteOnTargetBS);
+  TargetBindSource.ClearWhere(FAutoExecute_Where_OnTargetBS);
 end;
 
 procedure TioBSClearWhere.UpdateTarget(Target: TObject);
@@ -1879,7 +1878,7 @@ end;
 constructor TioBS_ETM_Revert.Create(AOwner: TComponent);
 begin
   inherited;
-  FPersistImmediately := False;
+  FAutoExecute_Persist_AfterRevert := False;
 end;
 
 procedure TioBS_ETM_Revert.ExecuteTarget(Target: TObject);
@@ -1887,7 +1886,7 @@ begin
   inherited;
   if not (TargetBindSource.Current is TioEtmCustomTimeSlot) then
     raise EioEtmException.Create(ClassName, 'ExecuteTarget', 'Current object if the TargetBindSource is not derived from "TioEtmCustomTimeSlot" base class.');
-  TioEtmEngine.RevertToBindSource(TargetBindSource.Current as TioEtmCustomTimeSlot, TargetBindSource, FPersistImmediately);
+  TioEtmEngine.RevertToBindSource(TargetBindSource.Current as TioEtmCustomTimeSlot, TargetBindSource, FAutoExecute_Persist_AfterRevert);
   // Execute slave actions
   if TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction) then
     Exit;

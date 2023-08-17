@@ -64,8 +64,8 @@ object VMBaseForList: TVMBaseForList
   end
   object acClearWhere: TioVMActionBSClearWhere
     Name = 'acClearWhere'
+    AutoExecute_Where_OnTargetBS = True
     TargetBindSource = BSWhere
-    WhereAutoExecuteOnTargetBS = True
     Left = 320
     Top = 176
   end

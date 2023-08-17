@@ -279,8 +279,8 @@ inherited ViewOrder: TViewOrder
     object acShowCustomerSelector: TioBSShowOrSelect
       Category = 'iORM-BS'
       Text = 'Select customer'
-      EntityTypeName = 'TCustomer'
       Action_ParentCloseQueryAction = acBack
+      EntityTypeName = 'TCustomer'
       ShowMode = smEntityTypeNameAsSelector
       TargetBindSource = BSCustomer
       VVMTypeAlias = 'LIST'
@@ -289,8 +289,8 @@ inherited ViewOrder: TViewOrder
     object acShowPizzaSelector: TioBSShowOrSelect
       Category = 'iORM-BS'
       Text = 'Select pizza'
-      EntityTypeName = 'TPizza'
       Action_ParentCloseQueryAction = acBack
+      EntityTypeName = 'TPizza'
       ShowMode = smEntityTypeNameAsSelector
       TargetBindSource = BSMaster
       VVMTypeAlias = 'LIST'

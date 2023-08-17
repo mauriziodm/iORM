@@ -563,8 +563,8 @@ object OrderListForm: TOrderListForm
     object acClearWhere: TioBSClearWhere
       Category = 'iORM - BS - WhereBuilder'
       Caption = 'Clear'
+      AutoExecute_Where_OnTargetBS = True
       TargetBindSource = DSWhere
-      WhereAutoExecuteOnTargetBS = True
     end
   end
   object DSWhere: TioDataSetMaster

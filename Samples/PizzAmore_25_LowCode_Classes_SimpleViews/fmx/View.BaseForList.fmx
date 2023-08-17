@@ -183,8 +183,8 @@ object ViewBaseForList: TViewBaseForList
     object acClearWhere: TioBSClearWhere
       Category = 'iORM - BS - WhereBuilder'
       Text = 'Clear'
+      AutoExecute_Where_OnTargetBS = True
       TargetBindSource = BSWhere
-      WhereAutoExecuteOnTargetBS = True
     end
   end
   object BSMaster: TioPrototypeBindSourceMaster
