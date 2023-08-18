@@ -37,8 +37,7 @@ interface
 
 uses
   System.Rtti, iORM.CommonTypes, System.Classes, DJSON.Attributes,
-  System.Generics.Collections;
-
+  System.Generics.Collections, System.SysUtils;
 
 {$REGION '===== TYPES & CONSTANTS ====='}
 
@@ -67,7 +66,6 @@ type
   TioJoinType = (jtInner, jtCross, jtLeftOuter, jtRightOuter, jtFullOuter);
 
 {$ENDREGION} // END OF TYPES & CONSTANTS
-
 
 {$REGION '===== BASE ATTRIBUTESS ====='}
 
@@ -140,7 +138,6 @@ type
 
 {$ENDREGION} // END OF BASE ATTRIBUTES
 
-
 {$REGION '===== PROPERTY ATTRIBUTES ====='}
 
   // Skip the property when mapping the class
@@ -150,6 +147,7 @@ type
   // ID attribute
   ioID = class(TioCustomAttribute)
   end;
+
   ioOID = ioID; // Deprecated
 
   // FieldName attribute
@@ -277,7 +275,6 @@ type
 
 {$ENDREGION} // END OF PROPERTY ATTRIBUTES
 
-
 {$REGION '===== CLASS ATTRIBUTES ====='}
 
   // Map the class as an entity to be persisted
@@ -306,6 +303,7 @@ type
   // Set the name of the generator/sequence for the table (on the DB) related to this class
   ioKeyGenerator = class(TioCustomStringAttribute)
   end;
+
   ioKeySequence = ioKeyGenerator;
 
   // Link the class/entity to a specific connection
@@ -363,7 +361,6 @@ type
 
 {$ENDREGION} // END OF CLASS ATTRIBUTES
 
-
 {$REGION '===== RELATION ATTRIBUTES ====='}
 
   // Disable automatic detection for HasMany relation(s)
@@ -399,7 +396,6 @@ type
   end;
 
 {$ENDREGION} // END OF EMBEDDED ATTRIBUTES
-
 
 {$REGION '===== SMART WHERE ATTRIBUTES ====='}
 
@@ -443,7 +439,6 @@ type
   end;
 
 {$ENDREGION} // END OF SMART WHERE ATTRIBUTES
-
 
 {$REGION '===== DEPENDENCY INJECTION ATTRIBUTES ====='}
 
@@ -489,6 +484,7 @@ type
   // Register the class as ViewModel (MVVM) that implements the interface
   diViewModelImplements = class(diImplements)
   end;
+
   diVMImplements = diViewModelImplements;
 
   // Register the class as ViewModel (MVVM) for the target model class name
@@ -509,18 +505,18 @@ type
 
 {$ENDREGION} // END OF DEPENDENCY INJECTION ATTRIBUTES
 
-
 {$REGION '===== ETM ATTRIBUTES & TIMESLOT ====='}
 
   // Base class for ell ETM repositories
   TioEtmTimeSlotRef = class of TioEtmCustomTimeSlot;
+
   TioEtmCustomTimeSlot = class
   private
     FID: Integer;
     FDateAndTime: TioObjCreated;
     FUserID: TioObjCreatedUserID;
     FUserName: TioObjCreatedUserName;
-    [ioVarChar(60)]
+    [ioVarchar(60)]
     FEntityClassName: String;
     FEntityID: Integer;
     FEntityVersion: Integer;
@@ -531,14 +527,24 @@ type
     FRemoteEntityState: String;
     FEventType: TioEtmEventType;
     FConflictType: TioEtmConflictType;
+    // NB: Questo è un anonymous method che viene passato dal BindSource che sta esponendo il TimeSlot stesso e che permette
+    // di risalire alla versione corrente della entità attraverso la catena "ETMBindSource.etmFor.Current"
+    FExtractCurrentEntityFunc: TFunc<TObject>;
     function GetSmartEntityVersion: String;
     function GetSmartUser: String;
     function GetSmartEventType: String;
     function GetSmartDescription: String;
     function GetSmartFullDescription: String;
+    function GetDiffOneWay: String;
+    function GetDiffOneWayMoreInfo: String;
+    function GetDiffTwoWay: String;
+    function GetDiffTwoWayMoreInfo: String;
   public
     constructor Create(const AEventType: TioEtmEventType; const AConflictType: TioEtmConflictType; const AEntityID: Integer; const AEntityClassName: String;
       const AEntityObjVersion, ARevertedFromVersion: Integer; const AEntityState, ARemoteEntityState: String);
+    // NB: Questo è un anonymous method che viene passato dal BindSource che sta esponendo il TimeSlot stesso e che permette
+    // di risalire alla versione corrente della entità attraverso la catena "ETMBindSource.etmFor.Current"
+    procedure _SetExtractCurrentEntityFunc(const AExtractCurrentEntityFunc: TFunc<TObject>);
     property ID: Integer read FID;
     property DateAndTime: TioObjCreated read FDateAndTime;
     property EventType: TioEtmEventType read FEventType;
@@ -551,11 +557,17 @@ type
     property ConflictType: TioEtmConflictType read FConflictType;
     property UserName: TioObjCreatedUserName read FUserName;
     property UserID: TioObjCreatedUserID read FUserID;
+    // Smart properties
     property SmartEntityVersion: String read GetSmartEntityVersion;
     property SmartUser: String read GetSmartUser;
     property SmartEventType: String read GetSmartEventType;
     property SmartDescription: String read GetSmartDescription;
     property SmartFullDescription: String read GetSmartFullDescription;
+    // Diff properties
+    property DiffOneWay: String read GetDiffOneWay;
+    property DiffOneWayMoreInfo: String read GetDiffOneWayMoreInfo;
+    property DiffTwoWay: String read GetDiffTwoWay;
+    property DiffTwoWayMoreInfo: String read GetDiffTwoWayMoreInfo;
   end;
 
   // A TimeLine is a list of time slots
@@ -575,7 +587,6 @@ type
 
 {$ENDREGION} // END ETM ATTRIBUTES
 
-
 {$REGION '===== OTHER ATTRIBUTES ====='}
 
   // Mark something (ex: a constructor) with a label
@@ -588,11 +599,10 @@ type
 
 {$ENDREGION} // END OTHER ATTRIBUTES
 
-
 implementation
 
 uses
-  iORM, iORM.Utilities, System.SysUtils, iORM.Exceptions, iORM.Abstraction;
+  iORM, iORM.Utilities, iORM.Exceptions, iORM.Abstraction, iORM.ETM.Engine;
 
 { TioStringAttribute }
 
@@ -897,8 +907,8 @@ end;
 
 { TioEtmCustomTimeSlot }
 
-constructor TioEtmCustomTimeSlot.Create(const AEventType: TioEtmEventType; const AConflictType: TioEtmConflictType; const AEntityID: Integer; const AEntityClassName: String;
-      const AEntityObjVersion, ARevertedFromVersion: Integer; const AEntityState, ARemoteEntityState: String);
+constructor TioEtmCustomTimeSlot.Create(const AEventType: TioEtmEventType; const AConflictType: TioEtmConflictType; const AEntityID: Integer;
+  const AEntityClassName: String; const AEntityObjVersion, ARevertedFromVersion: Integer; const AEntityState, ARemoteEntityState: String);
 begin
   FEventType := AEventType;
   FConflictType := AConflictType;
@@ -908,6 +918,7 @@ begin
   FRevertedFromVersion := ARevertedFromVersion;
   FEntityState := AEntityState;
   FRemoteEntityState := ARemoteEntityState;
+  FExtractCurrentEntityFunc := nil;
 end;
 
 function TioEtmCustomTimeSlot.GetSmartEntityVersion: String;
@@ -925,6 +936,50 @@ begin
   // Conflict type
   if FConflictType > ctNoConflict then
     Result := Format('%s (%s)', [Result, io.Enums.OrdinalToString<TioEtmEventType>(Ord(FEventType))]);
+end;
+
+function TioEtmCustomTimeSlot.GetDiffOneWay: String;
+var
+  LCurrentEntity: TObject;
+begin
+  LCurrentEntity := nil;
+  if Assigned(FExtractCurrentEntityFunc) then
+    LCurrentEntity := FExtractCurrentEntityFunc;
+  if Assigned(LCurrentEntity) then
+    Result := TioEtmEngine.Diff(LCurrentEntity, Self, TioEtmDiffMode.dmOneway, False);
+end;
+
+function TioEtmCustomTimeSlot.GetDiffOneWayMoreInfo: String;
+var
+  LCurrentEntity: TObject;
+begin
+  LCurrentEntity := nil;
+  if Assigned(FExtractCurrentEntityFunc) then
+    LCurrentEntity := FExtractCurrentEntityFunc;
+  if Assigned(LCurrentEntity) then
+    Result := TioEtmEngine.Diff(LCurrentEntity, Self, TioEtmDiffMode.dmOneway, True);
+end;
+
+function TioEtmCustomTimeSlot.GetDiffTwoWay: String;
+var
+  LCurrentEntity: TObject;
+begin
+  LCurrentEntity := nil;
+  if Assigned(FExtractCurrentEntityFunc) then
+    LCurrentEntity := FExtractCurrentEntityFunc;
+  if Assigned(LCurrentEntity) then
+    Result := TioEtmEngine.Diff(LCurrentEntity, Self, TioEtmDiffMode.dmTwoway, False);
+end;
+
+function TioEtmCustomTimeSlot.GetDiffTwoWayMoreInfo: String;
+var
+  LCurrentEntity: TObject;
+begin
+  LCurrentEntity := nil;
+  if Assigned(FExtractCurrentEntityFunc) then
+    LCurrentEntity := FExtractCurrentEntityFunc;
+  if Assigned(LCurrentEntity) then
+    Result := TioEtmEngine.Diff(LCurrentEntity, Self, TioEtmDiffMode.dmTwoway, True);
 end;
 
 function TioEtmCustomTimeSlot.GetSmartDescription: String;
@@ -959,8 +1014,13 @@ begin
   begin
     if not Result.IsEmpty then
       Result := Result + '-';
-     Result := LUserName + Result;
+    Result := LUserName + Result;
   end;
+end;
+
+procedure TioEtmCustomTimeSlot._SetExtractCurrentEntityFunc(const AExtractCurrentEntityFunc: TFunc<TObject>);
+begin
+  FExtractCurrentEntityFunc := AExtractCurrentEntityFunc;
 end;
 
 end.

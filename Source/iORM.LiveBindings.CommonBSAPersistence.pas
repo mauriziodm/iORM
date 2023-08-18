@@ -336,6 +336,22 @@ begin
 end;
 
 class procedure TioCommonBSAPersistence.AfterScroll(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
+  procedure _InjectExtractCurrentEntityFunc;
+  var
+    LMasterBindSource: IioMasterBindSource;
+  begin
+    if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioMasterBindSource, LMasterBindSource) then
+    begin
+      (AActiveBindSourceAdapter.Current as TioEtmCustomTimeSlot)._SetExtractCurrentEntityFunc(
+        function: TObject
+        begin
+          Result := nil;
+          if Assigned(LMasterBindSource.ETMfor) and LMasterBindSource.ETMfor.IsActive then
+            Result := LMasterBindSource.ETMfor.Current;
+        end
+      );
+    end;
+  end;
 begin
   // Set the new master object (only for list BSA)
   if AActiveBindSourceAdapter.TypeOfCollection = tcList then
@@ -344,6 +360,10 @@ begin
   AActiveBindSourceAdapter.GetDataSetLinkContainer.SetRecNo(AActiveBindSourceAdapter.ItemIndex);
   // Paging & BSPersistence notification
   AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(TioBSNotificationType.ntScroll));
+  // Se l'oggetto corrente è un ETM TimeSlot allora inietta il metodo anonimo attraverso il quale
+  //  il TimeSlot potrà richiedere la versione corrente della entità
+  if Assigned(AActiveBindSourceAdapter.Current) and  (AActiveBindSourceAdapter.Current is TioEtmCustomTimeSlot) then
+    _InjectExtractCurrentEntityFunc;
 end;
 
 class procedure TioCommonBSAPersistence.Reload(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
