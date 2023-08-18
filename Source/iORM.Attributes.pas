@@ -37,7 +37,7 @@ interface
 
 uses
   System.Rtti, iORM.CommonTypes, System.Classes, DJSON.Attributes,
-  System.Generics.Collections, System.SysUtils;
+  System.Generics.Collections, System.SysUtils, iORM.ETM.Interfaces;
 
 {$REGION '===== TYPES & CONSTANTS ====='}
 
@@ -535,6 +535,7 @@ type
     function GetSmartEventType: String;
     function GetSmartDescription: String;
     function GetSmartFullDescription: String;
+    function _GetDiff(const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean): String;
     function GetDiffOneWay: String;
     function GetDiffOneWayMoreInfo: String;
     function GetDiffTwoWay: String;
@@ -938,48 +939,30 @@ begin
     Result := Format('%s (%s)', [Result, io.Enums.OrdinalToString<TioEtmEventType>(Ord(FEventType))]);
 end;
 
-function TioEtmCustomTimeSlot.GetDiffOneWay: String;
-var
-  LCurrentEntity: TObject;
+function TioEtmCustomTimeSlot._GetDiff(const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean): String;
 begin
-  LCurrentEntity := nil;
   if Assigned(FExtractCurrentEntityFunc) then
-    LCurrentEntity := FExtractCurrentEntityFunc;
-  if Assigned(LCurrentEntity) then
-    Result := TioEtmEngine.Diff(LCurrentEntity, Self, TioEtmDiffMode.dmOneway, False);
+    Result := TioEtmEngine.Diff(FExtractCurrentEntityFunc, Self, ADiffMode, AMoreInfo);
+end;
+
+function TioEtmCustomTimeSlot.GetDiffOneWay: String;
+begin
+  Result := _GetDiff(TioEtmDiffMode.dmOneway, False);
 end;
 
 function TioEtmCustomTimeSlot.GetDiffOneWayMoreInfo: String;
-var
-  LCurrentEntity: TObject;
 begin
-  LCurrentEntity := nil;
-  if Assigned(FExtractCurrentEntityFunc) then
-    LCurrentEntity := FExtractCurrentEntityFunc;
-  if Assigned(LCurrentEntity) then
-    Result := TioEtmEngine.Diff(LCurrentEntity, Self, TioEtmDiffMode.dmOneway, True);
+  Result := _GetDiff(TioEtmDiffMode.dmOneway, True);
 end;
 
 function TioEtmCustomTimeSlot.GetDiffTwoWay: String;
-var
-  LCurrentEntity: TObject;
 begin
-  LCurrentEntity := nil;
-  if Assigned(FExtractCurrentEntityFunc) then
-    LCurrentEntity := FExtractCurrentEntityFunc;
-  if Assigned(LCurrentEntity) then
-    Result := TioEtmEngine.Diff(LCurrentEntity, Self, TioEtmDiffMode.dmTwoway, False);
+  Result := _GetDiff(TioEtmDiffMode.dmTwoway, False);
 end;
 
 function TioEtmCustomTimeSlot.GetDiffTwoWayMoreInfo: String;
-var
-  LCurrentEntity: TObject;
 begin
-  LCurrentEntity := nil;
-  if Assigned(FExtractCurrentEntityFunc) then
-    LCurrentEntity := FExtractCurrentEntityFunc;
-  if Assigned(LCurrentEntity) then
-    Result := TioEtmEngine.Diff(LCurrentEntity, Self, TioEtmDiffMode.dmTwoway, True);
+  Result := _GetDiff(TioEtmDiffMode.dmTwoway, True);
 end;
 
 function TioEtmCustomTimeSlot.GetSmartDescription: String;
