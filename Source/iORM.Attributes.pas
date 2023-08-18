@@ -953,6 +953,7 @@ end;
 
 function TioEtmCustomTimeSlot.DiffAsJsonObject(const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean): TJSONObject;
 begin
+  Result := nil;
   if Assigned(FExtractCurrentEntityFunc) then
     Result := TioEtmEngine.DiffAsJsonObject(FExtractCurrentEntityFunc, Self, ADiffMode, AMoreInfo);
 end;

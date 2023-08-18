@@ -345,7 +345,6 @@ class procedure TioCommonBSAPersistence.AfterScroll(const AActiveBindSourceAdapt
       (AActiveBindSourceAdapter.Current as TioEtmCustomTimeSlot)._SetExtractCurrentEntityFunc(
         function: TObject
         begin
-          Result := nil;
           if Assigned(LMasterBindSource.ETMfor) and LMasterBindSource.ETMfor.IsActive then
             Result := LMasterBindSource.ETMfor.Current
           else
