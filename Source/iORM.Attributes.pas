@@ -37,7 +37,8 @@ interface
 
 uses
   System.Rtti, iORM.CommonTypes, System.Classes, DJSON.Attributes,
-  System.Generics.Collections, System.SysUtils, iORM.ETM.Interfaces;
+  System.Generics.Collections, System.SysUtils, iORM.ETM.Interfaces,
+  System.JSON;
 
 {$REGION '===== TYPES & CONSTANTS ====='}
 
@@ -536,7 +537,6 @@ type
     function GetSmartDescription: String;
     function GetSmartFullDescription: String;
     // Diff
-    function _GetDiff(const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean): String;
     function GetDiffOneWay: String;
     function GetDiffOneWayMoreInfo: String;
     function GetDiffTwoWay: String;
@@ -565,6 +565,11 @@ type
     property SmartEventType: String read GetSmartEventType;
     property SmartDescription: String read GetSmartDescription;
     property SmartFullDescription: String read GetSmartFullDescription;
+    // Diff methods
+    function Diff(const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean): String;
+    procedure DiffToStream(const ATargetStream: TStream; const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean);
+    procedure DiffToFile(const AFileName: String; const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean);
+    function DiffAsJsonObject(const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean): TJSONObject;
     // Diff properties
     property DiffOneWay: String read GetDiffOneWay;
     property DiffOneWayMoreInfo: String read GetDiffOneWayMoreInfo;
@@ -940,30 +945,48 @@ begin
     Result := Format('%s (%s)', [Result, io.Enums.OrdinalToString<TioEtmEventType>(Ord(FEventType))]);
 end;
 
-function TioEtmCustomTimeSlot._GetDiff(const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean): String;
+function TioEtmCustomTimeSlot.Diff(const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean): String;
 begin
   if Assigned(FExtractCurrentEntityFunc) then
     Result := TioEtmEngine.Diff(FExtractCurrentEntityFunc, Self, ADiffMode, AMoreInfo);
 end;
 
+function TioEtmCustomTimeSlot.DiffAsJsonObject(const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean): TJSONObject;
+begin
+  if Assigned(FExtractCurrentEntityFunc) then
+    Result := TioEtmEngine.DiffAsJsonObject(FExtractCurrentEntityFunc, Self, ADiffMode, AMoreInfo);
+end;
+
+procedure TioEtmCustomTimeSlot.DiffToFile(const AFileName: String; const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean);
+begin
+  if Assigned(FExtractCurrentEntityFunc) then
+    TioEtmEngine.DiffToFile(AFileName, FExtractCurrentEntityFunc, Self, ADiffMode, AMoreInfo);
+end;
+
+procedure TioEtmCustomTimeSlot.DiffToStream(const ATargetStream: TStream; const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean);
+begin
+  if Assigned(FExtractCurrentEntityFunc) then
+    TioEtmEngine.DiffToStream(ATargetStream, FExtractCurrentEntityFunc, Self, ADiffMode, AMoreInfo);
+end;
+
 function TioEtmCustomTimeSlot.GetDiffOneWay: String;
 begin
-  Result := _GetDiff(TioEtmDiffMode.dmOneway, False);
+  Result := Diff(TioEtmDiffMode.dmOneway, False);
 end;
 
 function TioEtmCustomTimeSlot.GetDiffOneWayMoreInfo: String;
 begin
-  Result := _GetDiff(TioEtmDiffMode.dmOneway, True);
+  Result := Diff(TioEtmDiffMode.dmOneway, True);
 end;
 
 function TioEtmCustomTimeSlot.GetDiffTwoWay: String;
 begin
-  Result := _GetDiff(TioEtmDiffMode.dmTwoway, False);
+  Result := Diff(TioEtmDiffMode.dmTwoway, False);
 end;
 
 function TioEtmCustomTimeSlot.GetDiffTwoWayMoreInfo: String;
 begin
-  Result := _GetDiff(TioEtmDiffMode.dmTwoway, True);
+  Result := Diff(TioEtmDiffMode.dmTwoway, True);
 end;
 
 function TioEtmCustomTimeSlot.GetSmartDescription: String;
