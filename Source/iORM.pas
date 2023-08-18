@@ -146,7 +146,7 @@ const
   etInsert = iORM.CommonTypes.etInsert;
   etUpdate = iORM.CommonTypes.etUpdate;
   etDelete = iORM.CommonTypes.etDelete;
-  etSynchronization = iORM.CommonTypes.etSynchronization;
+  etSynchronization = iORM.CommonTypes.etSynchro;
 
   // TioEtmDiffMode = (dmOneway, dmTwoway);
   dmOneway = iORM.ETM.interfaces.TioEtmDiffMode.dmOneway;

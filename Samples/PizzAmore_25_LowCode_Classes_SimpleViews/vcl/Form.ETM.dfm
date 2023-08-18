@@ -21,7 +21,7 @@ object Form1: TForm1
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
-    ExplicitLeft = 1
+    ExplicitWidth = 624
     object ButtonBack: TSpeedButton
       Left = 0
       Top = 0
@@ -60,7 +60,8 @@ object Form1: TForm1
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
-    ExplicitWidth = 380
+    ExplicitTop = 443
+    ExplicitWidth = 624
     object ButtonDiff: TSpeedButton
       Left = 0
       Top = 0

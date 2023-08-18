@@ -532,6 +532,10 @@ type
     FEventType: TioEtmEventType;
     FConflictType: TioEtmConflictType;
     function GetSmartEntityVersion: String;
+    function GetSmartUser: String;
+    function GetSmartEventType: String;
+    function GetSmartDescription: String;
+    function GetSmartFullDescription: String;
   public
     constructor Create(const AEventType: TioEtmEventType; const AConflictType: TioEtmConflictType; const AEntityID: Integer; const AEntityClassName: String;
       const AEntityObjVersion, ARevertedFromVersion: Integer; const AEntityState, ARemoteEntityState: String);
@@ -548,6 +552,10 @@ type
     property UserName: TioObjCreatedUserName read FUserName;
     property UserID: TioObjCreatedUserID read FUserID;
     property SmartEntityVersion: String read GetSmartEntityVersion;
+    property SmartUser: String read GetSmartUser;
+    property SmartEventType: String read GetSmartEventType;
+    property SmartDescription: String read GetSmartDescription;
+    property SmartFullDescription: String read GetSmartFullDescription;
   end;
 
   // A TimeLine is a list of time slots
@@ -584,7 +592,7 @@ type
 implementation
 
 uses
-  iORM.Utilities, System.SysUtils, iORM.Exceptions, iORM.Abstraction, iORM;
+  iORM, iORM.Utilities, System.SysUtils, iORM.Exceptions, iORM.Abstraction;
 
 { TioStringAttribute }
 
@@ -908,6 +916,51 @@ begin
     Result := Format('%d (reverted from %d)', [FEntityVersion, RevertedFromVersion])
   else
     Result := FEntityVersion.ToString;
+end;
+
+function TioEtmCustomTimeSlot.GetSmartEventType: String;
+begin
+  // Event type
+  Result := io.Enums.OrdinalToString<TioEtmEventType>(Ord(FEventType));
+  // Conflict type
+  if FConflictType > ctNoConflict then
+    Result := Format('%s (%s)', [Result, io.Enums.OrdinalToString<TioEtmEventType>(Ord(FEventType))]);
+end;
+
+function TioEtmCustomTimeSlot.GetSmartDescription: String;
+var
+  LFormatSettings: TFormatSettings;
+  LDateAndTime: String;
+begin
+  LFormatSettings := TFormatSettings.Create;
+  LDateAndTime := DateTimeToStr(FDateAndTime, LFormatSettings);
+  Result := Format('%s %s user %s', [LDateAndTime, GetSmartEventType, GetSmartUser]);
+end;
+
+function TioEtmCustomTimeSlot.GetSmartFullDescription: String;
+begin
+  Result := Format('%s ver. %s', [GetSmartDescription, GetSmartEntityVersion]);
+end;
+
+function TioEtmCustomTimeSlot.GetSmartUser: String;
+var
+  LUserID: Integer;
+  LUserName: String;
+begin
+  Result := String.Empty;
+  // Extract user info as native type
+  LUserID := Integer(FUserID);
+  LUserName := String(FUserName);
+  // UserID
+  if LUserID <> 0 then
+    Result := LUserID.ToString;
+  // UserName
+  if not LUserName.IsEmpty then
+  begin
+    if not Result.IsEmpty then
+      Result := Result + '-';
+     Result := LUserName + Result;
+  end;
 end;
 
 end.

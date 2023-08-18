@@ -133,7 +133,7 @@ type
 
   // ETM types
   // Note: Literal description for values added at the end of the "iORM.pas" unit (initialization)
-  TioEtmEventType = (etInsert, etUpdate, etDelete, etSynchronization);
+  TioEtmEventType = (etInsert, etUpdate, etDelete, etSynchro);
   TioEtmConflictType = (ctNoConflict, ctMasterWin, ctSlaveWin, ctLastUpdatedWin, ctManual);
 
   // CloseQueryAction related types
