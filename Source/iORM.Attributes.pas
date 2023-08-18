@@ -535,6 +535,7 @@ type
     function GetSmartEventType: String;
     function GetSmartDescription: String;
     function GetSmartFullDescription: String;
+    // Diff
     function _GetDiff(const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean): String;
     function GetDiffOneWay: String;
     function GetDiffOneWayMoreInfo: String;

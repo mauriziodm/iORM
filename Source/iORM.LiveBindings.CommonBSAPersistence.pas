@@ -347,7 +347,15 @@ class procedure TioCommonBSAPersistence.AfterScroll(const AActiveBindSourceAdapt
         begin
           Result := nil;
           if Assigned(LMasterBindSource.ETMfor) and LMasterBindSource.ETMfor.IsActive then
-            Result := LMasterBindSource.ETMfor.Current;
+            Result := LMasterBindSource.ETMfor.Current
+          else
+            raise EioEtmException.Create('This is iORM speaking, we have a problem.' +
+              #13#13'You''re trying to use one of the "Diff..." properties or methods from an ETM repository (a class derived from TioEtmCustomTimeSlot).' +
+              #13#13'These properties work correctly only if the ETM repository is exposed by a MasterBindSource which has its "ETMfor" property set to ' +
+              'reference another BindSource containing the entity whose timeline you want to see (its history) and obviously both bind sources need to be active.' +
+              #13#13'If this is not possible then you can call the ETM engine "Diff..." methods directly by writing code like "io.etm.Diff(...)".' +
+              #13#13'There are several Diff methods (Diff, DiffToFile, DiffToStream, DiffAsJsonObject) each with multiple overloads available.' +
+              #13#13'You will surely find something that fits your needs.');
         end
       );
     end;
