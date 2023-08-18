@@ -170,7 +170,7 @@
         </DCCReference>
         <DCCReference Include="..\common_model\ETM.Repository.pas"/>
         <DCCReference Include="Form.ETM.pas">
-            <Form>Form1</Form>
+            <Form>EtmForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Base">

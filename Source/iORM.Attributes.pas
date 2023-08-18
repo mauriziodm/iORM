@@ -530,7 +530,9 @@ type
     FConflictType: TioEtmConflictType;
     // NB: Questo è un anonymous method che viene passato dal BindSource che sta esponendo il TimeSlot stesso e che permette
     // di risalire alla versione corrente della entità attraverso la catena "ETMBindSource.etmFor.Current"
+    [ioSkip]
     FExtractCurrentEntityFunc: TFunc<TObject>;
+    function GetSmartEntityInfo: String;
     function GetSmartEntityVersion: String;
     function GetSmartUser: String;
     function GetSmartEventType: String;
@@ -560,6 +562,7 @@ type
     property UserName: TioObjCreatedUserName read FUserName;
     property UserID: TioObjCreatedUserID read FUserID;
     // Smart properties
+    property SmartEntityInfo: String read GetSmartEntityInfo;
     property SmartEntityVersion: String read GetSmartEntityVersion;
     property SmartUser: String read GetSmartUser;
     property SmartEventType: String read GetSmartEventType;
@@ -926,6 +929,11 @@ begin
   FEntityState := AEntityState;
   FRemoteEntityState := ARemoteEntityState;
   FExtractCurrentEntityFunc := nil;
+end;
+
+function TioEtmCustomTimeSlot.GetSmartEntityInfo: String;
+begin
+  Result := Format('%s-%d', [FEntityClassName, FEntityID]);
 end;
 
 function TioEtmCustomTimeSlot.GetSmartEntityVersion: String;

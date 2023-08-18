@@ -81,10 +81,17 @@ uses
 
 class procedure TioCommonBSBehavior.CheckForOpen(const ABindSource: IioBindSource; const ALoadType: TioLoadType);
 begin
+  // ltManual
   if ABindSource.IsMasterBS and (ALoadType = ltManual) and not ABindSource.CheckActiveAdapter then
     raise EioException.Create(ClassName, 'CheckForOpen',
       Format('You are not allowed to activate the BindSource "%s" if its "LoadType" property is set to "ltManual" unless the "SetDataObject" method has been executed at least once with a valid object.',
       [ABindSource.GetName]));
+  // ltETMfor
+  if ABindSource.IsMasterBS and (ALoadType = ltETMfor) and (not Assigned((ABindSource as IioMasterBindSource).ETMfor)) and not ABindSource.CheckActiveAdapter then
+    raise EioException.Create(ClassName, 'CheckForOpen', Format('Hi, I''m iORM, pay attention.' +
+      #13#13'You are not allowed to activate the BindSource "%s" if its "LoadType" property is set to "ltETMfor".' +
+      #13#13'Remove the "%s.Open" code line, the BindSource will be opened automatically.',
+      [ABindSource.GetName, ABindSource.GetName]));
 end;
 
 class procedure TioCommonBSBehavior.CheckForSetDataObject(const ABindSource: IioBindSource; const ALoadType: TioLoadType; const ADataObject: TObject);

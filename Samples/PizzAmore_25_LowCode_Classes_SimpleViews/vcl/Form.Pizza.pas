@@ -40,6 +40,8 @@ type
     acLoadImage: TAction;
     OpenPictureDialog: TOpenPictureDialog;
     acBack: TioBSCloseQuery;
+    ButtonETM: TSpeedButton;
+    acShowETM: TioBSShowOrSelect;
     procedure acLoadImageExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private

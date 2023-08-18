@@ -369,7 +369,7 @@ begin
   case FLoadType of
     ltCreate:
       TioCommonBSAPersistence.Create(Self);
-    ltAuto:
+    ltAuto, ltETMfor:
       TioCommonBSAPersistence.Load(Self);
   end;
 end;
@@ -480,7 +480,7 @@ end;
 
 function TioActiveListBindSourceAdapter.GetAutoLoad: Boolean;
 begin
-  Result := FLoadType = ltAuto;
+  Result := (FLoadType = ltAuto) or (FLoadType = ltETMfor);
 end;
 
 function TioActiveListBindSourceAdapter.GetBaseObjectClassName: String;

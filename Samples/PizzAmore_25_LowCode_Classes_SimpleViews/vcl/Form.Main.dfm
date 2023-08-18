@@ -8516,6 +8516,8 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 0
+    ExplicitTop = 335
+    ExplicitWidth = 189
   end
   object ButtonCustomers: TButton
     Left = 43
@@ -8531,6 +8533,8 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 1
+    ExplicitTop = 385
+    ExplicitWidth = 189
   end
   object ButtonPizzas: TButton
     Left = 43
@@ -8546,6 +8550,8 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 2
+    ExplicitTop = 435
+    ExplicitWidth = 189
   end
   object ButtonQuit: TButton
     Left = 43
@@ -8561,6 +8567,8 @@ object MainForm: TMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 3
+    ExplicitTop = 500
+    ExplicitWidth = 189
   end
   object ioVCL1: TioVCL
     Left = 8
@@ -8589,8 +8597,8 @@ object MainForm: TMainForm
     object acShowCustomers: TioBSShowOrSelect
       Category = 'iORM-BS'
       Caption = 'Customers'
-      EntityTypeName = 'TCustomer'
       Action_ParentCloseQueryAction = acQuit
+      EntityTypeName = 'TCustomer'
       ShowMode = smEntityTypeName
       VVMTypeAlias = 'LIST'
       ViewContextBy = vcByDefaultViewContextProvider
@@ -8598,8 +8606,8 @@ object MainForm: TMainForm
     object acShowPizzas: TioBSShowOrSelect
       Category = 'iORM-BS'
       Caption = 'Pizzas'
-      EntityTypeName = 'TPizza'
       Action_ParentCloseQueryAction = acQuit
+      EntityTypeName = 'TPizza'
       ShowMode = smEntityTypeName
       VVMTypeAlias = 'LIST'
       ViewContextBy = vcByDefaultViewContextProvider
@@ -8607,8 +8615,8 @@ object MainForm: TMainForm
     object acShowOrders: TioBSShowOrSelect
       Category = 'iORM-BS'
       Caption = 'Orders'
-      EntityTypeName = 'TOrder'
       Action_ParentCloseQueryAction = acQuit
+      EntityTypeName = 'TOrder'
       ShowMode = smEntityTypeName
       VVMTypeAlias = 'LIST'
       ViewContextBy = vcByDefaultViewContextProvider

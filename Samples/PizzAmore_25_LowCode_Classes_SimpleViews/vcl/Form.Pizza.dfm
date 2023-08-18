@@ -120,7 +120,7 @@ object PizzaForm: TPizzaForm
     object LabelTitle: TLabel
       Left = 56
       Top = 7
-      Width = 298
+      Width = 286
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -134,6 +134,21 @@ object PizzaForm: TPizzaForm
       ParentFont = False
       Layout = tlCenter
       ExplicitWidth = 481
+    end
+    object ButtonETM: TSpeedButton
+      Left = 353
+      Top = 0
+      Width = 60
+      Height = 40
+      Action = acShowETM
+      Align = alRight
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clNavy
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      ExplicitLeft = 358
     end
   end
   object PanelBottom: TPanel
@@ -296,6 +311,15 @@ object PizzaForm: TPizzaForm
       Caption = 'Back'
       OnUpdateScope = usGlobal
       TargetBindSource = DSPizza
+    end
+    object acShowETM: TioBSShowOrSelect
+      Category = 'iORM - BS'
+      Caption = 'Time line'
+      Action_ParentCloseQueryAction = acBack
+      EntityTypeName = 'TEtmRepository'
+      ShowMode = smEntityTypeNameAsETM
+      TargetBindSource = DSPizza
+      ViewContextBy = vcByDefaultViewContextProvider
     end
   end
   object OpenPictureDialog: TOpenPictureDialog

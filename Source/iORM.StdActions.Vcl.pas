@@ -1794,7 +1794,7 @@ begin
         // vcNone:
         // io.ShowAsWhereBuilder(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
-    // smEntityTypeNameAsWhereBuilder
+    // smEntityTypeNameAsETM
     smEntityTypeNameAsETM:
       case FViewContextBy of
         vcByDefaultViewContextProvider:
@@ -1809,7 +1809,7 @@ begin
         // vcNone:
         // io.ShowAsETM(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
-    // smBSTypeNameAsWhereBuilder
+    // smBSTypeNameAsETM
     smBSTypeNameAsETM:
       case FViewContextBy of
         vcByDefaultViewContextProvider:
