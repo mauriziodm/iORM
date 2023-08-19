@@ -13,6 +13,7 @@ object EtmForm: TEtmForm
   Position = poMainFormCenter
   Visible = True
   OnClose = FormClose
+  OnShow = FormShow
   TextHeight = 15
   object Splitter1: TSplitter
     Left = 0
@@ -237,10 +238,8 @@ object EtmForm: TEtmForm
     BevelOuter = bvNone
     Caption = 'PanelDiff'
     TabOrder = 3
-    ExplicitLeft = 384
-    ExplicitTop = 240
-    ExplicitWidth = 185
-    ExplicitHeight = 41
+    ExplicitWidth = 584
+    ExplicitHeight = 340
     object Label3: TLabel
       Left = 0
       Top = 0
@@ -267,8 +266,8 @@ object EtmForm: TEtmForm
       DataField = 'DiffOneWay'
       DataSource = SourceETM
       TabOrder = 0
-      ExplicitTop = 116
-      ExplicitHeight = 225
+      ExplicitWidth = 584
+      ExplicitHeight = 320
     end
   end
   object DS_ETM: TioDataSetMaster
