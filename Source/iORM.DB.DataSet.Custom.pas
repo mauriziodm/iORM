@@ -917,7 +917,12 @@ begin
     raise EioException.Create(Self.ClassName, 'SetETMfor', Format('The "ETMfor" property of the "%s" bind source must be different from itself.', [Name]));
   // Se è aperto e stiamo cambiando l'ETMfor (già verificato all'inizio) allora si chiude (se è il caso si riaprirà alla fine del metodo)
   if IsActive then
-    Close;
+    raise EioException.Create(ClassName, 'SetETMfor',
+      Format('Hi, I''m iORM, I have to explain something to you.' +
+      #13#13'When a BindSource (%s) has its "ETMfor" property pointing to another BindSource then it acts as a "time machine" (ETM repository) for the latter''s current entity, in which case its activation will be done automatically.' +
+      #13#13'For this reason, setting the "ETMfor" property of a BindSource while it is active IS NOT PERMITTED.' +
+      #13#13'If you really need to do that then you need to close the BindSource first and then set its property "ETMfor" (which will cause the BindSource to open immediately).' +
+      #13#13'Did you understand?', [Name]));
   // If the private where field is assigned the set even to it
   if Assigned(FWhere) then
     FWhere.SetETMfor(AETMfor);

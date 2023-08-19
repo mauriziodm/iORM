@@ -39,7 +39,6 @@ type
     Diff: TDBMemo;
     Label3: TLabel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure FormShow(Sender: TObject);
   private
   public
   end;
@@ -51,11 +50,6 @@ implementation
 procedure TEtmForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Action := caFree;
-end;
-
-procedure TEtmForm.FormShow(Sender: TObject);
-begin
-//  DS_ETM.Open;
 end;
 
 end.

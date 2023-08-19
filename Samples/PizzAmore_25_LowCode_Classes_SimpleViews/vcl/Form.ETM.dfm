@@ -13,7 +13,6 @@ object EtmForm: TEtmForm
   Position = poMainFormCenter
   Visible = True
   OnClose = FormClose
-  OnShow = FormShow
   TextHeight = 15
   object Splitter1: TSplitter
     Left = 0
