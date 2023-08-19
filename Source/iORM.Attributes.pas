@@ -546,9 +546,6 @@ type
   public
     constructor Create(const AEventType: TioEtmEventType; const AConflictType: TioEtmConflictType; const AEntityID: Integer; const AEntityClassName: String;
       const AEntityObjVersion, ARevertedFromVersion: Integer; const AEntityState, ARemoteEntityState: String);
-    // NB: Questo è un anonymous method che viene passato dal BindSource che sta esponendo il TimeSlot stesso e che permette
-    // di risalire alla versione corrente della entità attraverso la catena "ETMBindSource.etmFor.Current"
-    procedure _SetExtractCurrentEntityFunc(const AExtractCurrentEntityFunc: TFunc<TObject>);
     property ID: Integer read FID;
     property DateAndTime: TioObjCreated read FDateAndTime;
     property EventType: TioEtmEventType read FEventType;
@@ -578,6 +575,10 @@ type
     property DiffOneWayMoreInfo: String read GetDiffOneWayMoreInfo;
     property DiffTwoWay: String read GetDiffTwoWay;
     property DiffTwoWayMoreInfo: String read GetDiffTwoWayMoreInfo;
+    // ExtractCurrentEntityFunc anonymous method
+    // NB: Questo è un anonymous method che viene passato dal BindSource che sta esponendo il TimeSlot stesso e che permette
+    //      di risalire alla versione corrente della entità attraverso la catena "ETMBindSource.etmFor.Current"
+    property _ExtractCurrentEntityFunc: TFunc<TObject> read FExtractCurrentEntityFunc write FExtractCurrentEntityFunc;
   end;
 
   // A TimeLine is a list of time slots
@@ -1032,11 +1033,6 @@ begin
       Result := Result + '-';
     Result := LUserName + Result;
   end;
-end;
-
-procedure TioEtmCustomTimeSlot._SetExtractCurrentEntityFunc(const AExtractCurrentEntityFunc: TFunc<TObject>);
-begin
-  FExtractCurrentEntityFunc := AExtractCurrentEntityFunc;
 end;
 
 end.

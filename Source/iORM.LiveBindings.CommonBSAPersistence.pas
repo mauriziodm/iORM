@@ -342,7 +342,7 @@ class procedure TioCommonBSAPersistence.AfterScroll(const AActiveBindSourceAdapt
   begin
     if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioMasterBindSource, LMasterBindSource) then
     begin
-      (AActiveBindSourceAdapter.Current as TioEtmCustomTimeSlot)._SetExtractCurrentEntityFunc(
+      TioEtmCustomTimeSlot(AActiveBindSourceAdapter.Current)._ExtractCurrentEntityFunc :=
         function: TObject
         begin
           if Assigned(LMasterBindSource.ETMfor) and LMasterBindSource.ETMfor.IsActive then
@@ -355,8 +355,7 @@ class procedure TioCommonBSAPersistence.AfterScroll(const AActiveBindSourceAdapt
               #13#13'If this is not possible then you can call the ETM engine "Diff..." methods directly by writing code like "io.etm.Diff(...)".' +
               #13#13'There are several Diff methods (Diff, DiffToFile, DiffToStream, DiffAsJsonObject) each with multiple overloads available.' +
               #13#13'You will surely find something that fits your needs.');
-        end
-      );
+        end;
     end;
   end;
 begin
@@ -369,8 +368,12 @@ begin
   AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(TioBSNotificationType.ntScroll));
   // Se l'oggetto corrente è un ETM TimeSlot allora inietta il metodo anonimo attraverso il quale
   //  il TimeSlot potrà richiedere la versione corrente della entità
-  if Assigned(AActiveBindSourceAdapter.Current) and  (AActiveBindSourceAdapter.Current is TioEtmCustomTimeSlot) then
+  if Assigned(AActiveBindSourceAdapter.Current) and (AActiveBindSourceAdapter.Current is TioEtmCustomTimeSlot) and
+    not Assigned(TioEtmCustomTimeSlot(AActiveBindSourceAdapter.Current)._ExtractCurrentEntityFunc) then
+  begin
     _InjectExtractCurrentEntityFunc;
+    AActiveBindSourceAdapter.Refresh(False);
+  end;
 end;
 
 class procedure TioCommonBSAPersistence.Reload(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
