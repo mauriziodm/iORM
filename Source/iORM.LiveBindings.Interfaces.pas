@@ -92,6 +92,7 @@ type
     procedure SetWhere(const AWhere: IioWhere);
     procedure SetOrderBy(const Value: String);
     procedure RegisterDetailBindSource(const ADetailBindSource: IioBindSource);
+    procedure UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
     // Selectors related event for TObject selection
     procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;

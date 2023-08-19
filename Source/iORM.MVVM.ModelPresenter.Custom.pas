@@ -254,6 +254,7 @@ type
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     // procedure SetMasterBindSourceAdapter(const AMasterBindSourceAdapter:IioActiveBindSourceAdapter; const AMasterPropertyName:String='');
     procedure RegisterDetailBindSource(const ADetailBindSource: IioBindSource);
+    procedure UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
 
     // ViewBindSource remote open/close management (ModelBindSource/ModelDataSet)
     procedure RegisterViewBindSource(const AModelBindSourceOrModelDataSet: IInterface);
@@ -1381,6 +1382,11 @@ end;
 procedure TioModelPresenterCustom.ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 begin
   io.ShowEach(Self, AParentCloseQueryAction, AVVMAlias);
+end;
+
+procedure TioModelPresenterCustom.UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
+begin
+
 end;
 
 procedure TioModelPresenterCustom.UnregisterViewBindSource(const AModelBindSourceOrModelDataSet: IInterface);

@@ -49,8 +49,6 @@ type
     Button1: TButton;
     procedure acLoadImageExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure Button1Click(Sender: TObject);
-    procedure DSPizzaAfterOpen(DataSet: TDataSet);
   private
   public
   end;
@@ -67,16 +65,6 @@ begin
     DSPizza.CurrentAs<TPizza>.Image.LoadFromFile(OpenPictureDialog.FileName);
     DSPizza.Refresh(False);
   end;
-end;
-
-procedure TPizzaForm.Button1Click(Sender: TObject);
-begin
-  DS_ETM.Open;
-end;
-
-procedure TPizzaForm.DSPizzaAfterOpen(DataSet: TDataSet);
-begin
-  DS_ETM.Open;
 end;
 
 procedure TPizzaForm.FormClose(Sender: TObject; var Action: TCloseAction);

@@ -259,6 +259,7 @@ type
     procedure CancelIfEditing;
     procedure ForEach(const AForEachMethod: TProc);
     procedure RegisterDetailBindSource(const ADetailBindSource: IioBindSource);
+    procedure UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
     // Show current record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
     procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
     procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
@@ -1130,6 +1131,11 @@ end;
 procedure TioPrototypeBindSourceCustom.ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AAlias: String);
 begin
   io.ShowEach(Self, AParentCloseQueryAction, AViewContext, AAlias);
+end;
+
+procedure TioPrototypeBindSourceCustom.UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
+begin
+
 end;
 
 procedure TioPrototypeBindSourceCustom.ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction;const AVCProvider: TioViewContextProvider; const AVVMAlias: String);

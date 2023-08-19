@@ -120,7 +120,7 @@ object PizzaForm: TPizzaForm
     object LabelTitle: TLabel
       Left = 56
       Top = 7
-      Width = 262
+      Width = 254
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -297,7 +297,6 @@ object PizzaForm: TPizzaForm
     Height = 25
     Caption = 'Button1'
     TabOrder = 7
-    OnClick = Button1Click
   end
   object DSPizza: TioDataSetMaster
     AsDefault = True
@@ -306,7 +305,6 @@ object PizzaForm: TPizzaForm
     TypeOfCollection = tcSingleObject
     OrderBy = '[TPizza.Name]'
     Paging.CurrentPageOfFormat = '%d/%d'
-    AfterOpen = DSPizzaAfterOpen
     Left = 32
     Top = 224
     object DSPizzaID: TIntegerField

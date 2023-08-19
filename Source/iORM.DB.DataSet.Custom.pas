@@ -230,6 +230,7 @@ type
     function CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean; overload;
     function CheckActiveAdapter: Boolean;
     procedure RegisterDetailBindSource(const ADetailBindSource: IioBindSource);
+    procedure UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
     procedure ForceDetailAdaptersCreation;
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure PostIfEditing;
@@ -408,6 +409,9 @@ end;
 destructor TioDataSetCustom.Destroy;
 begin
   FWhereStr.Free;
+  // If the new AETMfor is assigned then unregister itself
+  if Assigned(FETMFor) then
+    FETMfor.UnregisterDetailBindSource(Self);
   // If the DetailDataSetContainer was created then destroy it
   if Assigned(FDetailBindSourceContainer) then
     FDetailBindSourceContainer.Free;
@@ -705,7 +709,16 @@ procedure TioDataSetCustom.RegisterDetailBindSource(const ADetailBindSource: Iio
 begin
   if not Assigned(FDetailBindSourceContainer) then
     FDetailBindSourceContainer := TList<IioBindSource>.Create;
-  FDetailBindSourceContainer.Add(ADetailBindSource);
+  if not FDetailBindSourceContainer.Contains(ADetailBindSource) then
+    FDetailBindSourceContainer.Add(ADetailBindSource);
+end;
+
+procedure TioDataSetCustom.UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
+begin
+  if not Assigned(FDetailBindSourceContainer) then
+    FDetailBindSourceContainer := TList<IioBindSource>.Create;
+  if not FDetailBindSourceContainer.Contains(ADetailBindSource) then
+    FDetailBindSourceContainer.Remove(ADetailBindSource);
 end;
 
 procedure TioDataSetCustom.SelectCurrent(ASelectionType: TioSelectionType);
@@ -896,19 +909,32 @@ end;
 
 procedure TioDataSetCustom.SetETMfor(const AETMfor: IioMasterBindSource);
 begin
+  // Controlla che non sia già assegnato (lo stesso)
+  if AETMFor = FETMfor then
+    Exit;
   // ETMfor must be different from itself
   if Assigned(AETMfor) and (AETMfor as TObject).Equals(Self) then
     raise EioException.Create(Self.ClassName, 'SetETMfor', Format('The "ETMfor" property of the "%s" bind source must be different from itself.', [Name]));
-  // Set the private field
-  FETMFor := AETMfor;
+  // Se è aperto e stiamo cambiando l'ETMfor (già verificato all'inizio) allora si chiude (se è il caso si riaprirà alla fine del metodo)
+  if IsActive then
+    Close;
   // If the private where field is assigned the set even to it
   if Assigned(FWhere) then
     FWhere.SetETMfor(AETMfor);
   // If the adapter is present then set even to it
   if CheckAdapter then
     GetActiveBindSourceAdapter.ioWhere.SetETMfor(AETMfor);
-  // If it's not activated then activate it autmatically
-  if not((csDesigning in ComponentState) or (csLoading in ComponentState)) and not IsActive then
+  // Register itself into the DetailBindSourceContainer of the AETMfor bind source
+  if Assigned(AETMfor) then
+    AETMfor.RegisterDetailBindSource(Self);
+  // If the new AETMfor is nil and the previous FETMFor was assigned then unregister the old one
+  // NB: All'inizio abbiamo già verificatoche sono diversi
+  if Assigned(FETMFor) then
+    FETMfor.UnregisterDetailBindSource(Self);
+  // Set the private field
+  FETMFor := AETMfor;
+  // Se il BS ETMfor è già attivo allora attiva automaticamente anche per se stesso
+  if not((csDesigning in ComponentState) or (csLoading in ComponentState)) and Assigned(AETMfor) and AETMfor.IsActive then
     Open;
 end;
 
