@@ -896,6 +896,9 @@ end;
 
 procedure TioDataSetCustom.SetETMfor(const AETMfor: IioMasterBindSource);
 begin
+  // ETMfor must be different from itself
+  if Assigned(AETMfor) and (AETMfor as TObject).Equals(Self) then
+    raise EioException.Create(Self.ClassName, 'SetETMfor', Format('The "ETMfor" property of the "%s" bind source must be different from itself.', [Name]));
   // Set the private field
   FETMFor := AETMfor;
   // If the private where field is assigned the set even to it
@@ -905,7 +908,7 @@ begin
   if CheckAdapter then
     GetActiveBindSourceAdapter.ioWhere.SetETMfor(AETMfor);
   // If it's not activated then activate it autmatically
-  if not IsActive then
+  if not((csDesigning in ComponentState) or (csLoading in ComponentState)) and not IsActive then
     Open;
 end;
 
