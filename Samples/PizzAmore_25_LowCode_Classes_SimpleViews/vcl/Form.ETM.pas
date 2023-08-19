@@ -28,7 +28,6 @@ type
     Label2: TLabel;
     GridCustomers: TDBGrid;
     Splitter1: TSplitter;
-    Diff: TDBMemo;
     SourceETM: TDataSource;
     DBTextEntityClassName: TDBText;
     DBTextEntityID: TDBText;
@@ -36,6 +35,9 @@ type
     acBack: TioBSCloseQuery;
     ButtonRevert: TSpeedButton;
     DS_ETMDiffOneWay: TStringField;
+    PanelDiff: TPanel;
+    Diff: TDBMemo;
+    Label3: TLabel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
   public

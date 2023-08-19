@@ -129,7 +129,7 @@ type
   // ltFromBSAsIs:              the bind source receives the object to bind from a source bind source AS IS, the object isn't reloaded
   // ltFromBSReload:            the bind source receives the object to bind from a source bind source and reloads it for any changes or lazy load
   // ltFromBSReloadNewInstance: the bind source receives the object to bind from a source bind source and reloads it AS A NEW INSTANCE for any changes or lazy load
-  TioLoadType = (ltManual, ltCreate, ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance, ltETMfor, ltAuto);
+  TioLoadType = (ltManual, ltCreate, ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance, ltAuto);
 
   // ETM types
   // Note: Literal description for values added at the end of the "iORM.pas" unit (initialization)

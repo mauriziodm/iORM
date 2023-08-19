@@ -55,7 +55,7 @@ object EtmForm: TEtmForm
     object LabelTitle: TLabel
       Left = 88
       Top = 7
-      Width = 401
+      Width = 397
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -160,6 +160,7 @@ object EtmForm: TEtmForm
     Width = 588
     Height = 137
     Align = alTop
+    BorderStyle = bsNone
     Ctl3D = False
     DataSource = SourceETM
     ParentCtl3D = False
@@ -227,17 +228,48 @@ object EtmForm: TEtmForm
         Visible = True
       end>
   end
-  object Diff: TDBMemo
+  object PanelDiff: TPanel
     Left = 0
     Top = 221
     Width = 588
     Height = 341
     Align = alClient
-    DataField = 'DiffOneWay'
-    DataSource = SourceETM
+    BevelOuter = bvNone
+    Caption = 'PanelDiff'
     TabOrder = 3
-    ExplicitWidth = 584
-    ExplicitHeight = 340
+    ExplicitLeft = 384
+    ExplicitTop = 240
+    ExplicitWidth = 185
+    ExplicitHeight = 41
+    object Label3: TLabel
+      Left = 0
+      Top = 0
+      Width = 588
+      Height = 20
+      Align = alTop
+      Alignment = taCenter
+      AutoSize = False
+      Caption = 'differences between the actual version and the selected one'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clNavy
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object Diff: TDBMemo
+      Left = 0
+      Top = 20
+      Width = 588
+      Height = 321
+      Align = alClient
+      BorderStyle = bsNone
+      DataField = 'DiffOneWay'
+      DataSource = SourceETM
+      TabOrder = 0
+      ExplicitTop = 116
+      ExplicitHeight = 225
+    end
   end
   object DS_ETM: TioDataSetMaster
     AsDefault = True
