@@ -55,7 +55,7 @@ object EtmForm: TEtmForm
     object LabelTitle: TLabel
       Left = 88
       Top = 7
-      Width = 369
+      Width = 365
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -74,8 +74,8 @@ object EtmForm: TEtmForm
       Top = 0
       Width = 50
       Height = 40
+      Action = acEtmRevertToVersion
       Align = alRight
-      Caption = 'Revert'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clNavy
       Font.Height = -13
@@ -315,6 +315,14 @@ object EtmForm: TEtmForm
       Category = 'iORM-BS'
       Caption = 'Back'
       OnUpdateScope = usGlobal
+    end
+    object acEtmRevertToVersion: TioBS_ETM_RevertToBindSource
+      Category = 'iORM - BS - ETM'
+      Caption = 'Revert'
+      AutoExec_OnETMfor_AfterRevert = doRefresh
+      AutoExec_OnTargetBS_AfterRevert = doReload
+      AutoExec_Persist_AfterRevert = True
+      TargetBindSource = DS_ETM
     end
   end
 end
