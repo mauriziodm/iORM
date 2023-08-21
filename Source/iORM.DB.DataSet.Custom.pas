@@ -132,7 +132,7 @@ type
     procedure SetPaging(const Value: TioCommonBSAPageManager);
     function GetPaging: TioCommonBSAPageManager;
     // ETMfor
-    procedure _InternalSetETMforPrivateField(const AETMFor: IioMasterBindSource);
+    procedure _InternalSetETMforPrivateField(const AETMFor: IioBindSource);
     procedure SetETMfor(const AETMfor: IioMasterBindSource);
     function GetETMfor: IioMasterBindSource;
     // State
@@ -1101,9 +1101,9 @@ begin
   end;
 end;
 
-procedure TioDataSetCustom._InternalSetETMforPrivateField(const AETMFor: IioMasterBindSource);
+procedure TioDataSetCustom._InternalSetETMforPrivateField(const AETMFor: IioBindSource);
 begin
-  FETMfor := AETMfor;
+  FETMfor := AETMfor as IioMasterBindSource;
 end;
 
 end.

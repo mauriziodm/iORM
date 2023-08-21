@@ -87,7 +87,7 @@ type
     procedure SetWhereBuilderFor(const AMasterBS: IioMasterBindSource);
     property WhereBuilderFor: IioMasterBindSource read GetWhereBuilderFor write SetWhereBuilderFor;
     // ETMfor
-    procedure _InternalSetETMforPrivateField(const AETMFor: IioMasterBindSource);
+    procedure _InternalSetETMforPrivateField(const AETMFor: IioBindSource);
     procedure SetETMfor(const AETMfor: IioMasterBindSource);
     function GetETMfor: IioMasterBindSource;
     property ETMfor: IioMasterBindSource read GetETMfor write SetETMfor;

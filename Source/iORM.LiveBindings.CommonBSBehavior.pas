@@ -334,7 +334,7 @@ begin
   if Assigned(LMasterBindSource.ETMFor) then
     LMasterBindSource.ETMfor.UnregisterDetailBindSource(ABindSource);
   // Set the private field
-  LMasterBindSource._InternalSetETMforPrivateField(AETMfor);
+  LMasterBindSource._InternalSetETMforPrivateField(AETMfor as IioBindSource);
   // Se il BS ETMfor è già attivo allora attiva automaticamente anche per se stesso
   if not((csDesigning in AComponentState) or (csLoading in AComponentState)) and Assigned(AETMfor) and AETMfor.IsActive then
     LMasterBindSource.Open;

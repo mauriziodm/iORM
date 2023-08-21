@@ -146,7 +146,7 @@ type
     procedure SetPaging(const Value: TioCommonBSAPageManager);
     function GetPaging: TioCommonBSAPageManager;
     // ETMfor
-    procedure _InternalSetETMforPrivateField(const AETMFor: IioMasterBindSource);
+    procedure _InternalSetETMforPrivateField(const AETMFor: IioBindSource);
     procedure SetETMfor(const AETMfor: IioMasterBindSource);
     function GetETMfor: IioMasterBindSource;
     // State
@@ -489,6 +489,9 @@ end;
 destructor TioModelPresenterCustom.Destroy;
 begin
   FWhereStr.Free;
+  // If the new AETMfor is assigned then unregister itself
+  if Assigned(FETMFor) then
+    FETMfor.UnregisterDetailBindSource(Self);
   // Destroy the BindSourceAdapter was created then destroy it
   if CheckAdapter and not(csDestroying in TComponent(FBindSourceAdapter).ComponentState) then
     FBindSourceAdapter.Free;
@@ -963,7 +966,16 @@ procedure TioModelPresenterCustom.RegisterDetailBindSource(const ADetailBindSour
 begin
   if not Assigned(FDetailBindSourceContainer) then
     FDetailBindSourceContainer := TList<IioBindSource>.Create;
-  FDetailBindSourceContainer.Add(ADetailBindSource);
+  if not FDetailBindSourceContainer.Contains(ADetailBindSource) then
+    FDetailBindSourceContainer.Add(ADetailBindSource);
+end;
+
+procedure TioModelPresenterCustom.UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
+begin
+  if not Assigned(FDetailBindSourceContainer) then
+    FDetailBindSourceContainer := TList<IioBindSource>.Create;
+  if not FDetailBindSourceContainer.Contains(ADetailBindSource) then
+    FDetailBindSourceContainer.Remove(ADetailBindSource);
 end;
 
 procedure TioModelPresenterCustom.RegisterViewBindSource(const AModelBindSourceOrModelDataSet: IInterface);
@@ -1378,11 +1390,6 @@ begin
   io.ShowEach(Self, AParentCloseQueryAction, AVVMAlias);
 end;
 
-procedure TioModelPresenterCustom.UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
-begin
-
-end;
-
 procedure TioModelPresenterCustom.UnregisterViewBindSource(const AModelBindSourceOrModelDataSet: IInterface);
 begin
   if not Supports(AModelBindSourceOrModelDataSet, IioVMBridgeClientComponent) then
@@ -1437,9 +1444,9 @@ begin
   FBindSourceAdapter.ioAutoPost := FAutoPost;
 end;
 
-procedure TioModelPresenterCustom._InternalSetETMforPrivateField(const AETMFor: IioMasterBindSource);
+procedure TioModelPresenterCustom._InternalSetETMforPrivateField(const AETMFor: IioBindSource);
 begin
-  FETMfor := AETMfor;
+  FETMfor := AETMfor as IioMasterBindSource;
 end;
 
 procedure TioModelPresenterCustom.Insert(AObject: IInterface);

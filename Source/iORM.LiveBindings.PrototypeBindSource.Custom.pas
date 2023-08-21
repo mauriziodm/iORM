@@ -151,7 +151,7 @@ type
     procedure SetPaging(const Value: TioCommonBSAPageManager);
     function GetPaging: TioCommonBSAPageManager;
     // ETMfor
-    procedure _InternalSetETMforPrivateField(const AETMFor: IioMasterBindSource);
+    procedure _InternalSetETMforPrivateField(const AETMFor: IioBindSource);
     procedure SetETMfor(const AETMfor: IioMasterBindSource);
     function GetETMfor: IioMasterBindSource;
     // Preview
@@ -446,6 +446,9 @@ end;
 destructor TioPrototypeBindSourceCustom.Destroy;
 begin
   FWhereStr.Free;
+  // If the new AETMfor is assigned then unregister itself
+  if Assigned(FETMFor) then
+    FETMfor.UnregisterDetailBindSource(Self);
   // If the DetailPresenterContainer was created then destroy it
   if Assigned(FDetailBindSourceContainer) then
     FDetailBindSourceContainer.Free;
@@ -882,7 +885,16 @@ procedure TioPrototypeBindSourceCustom.RegisterDetailBindSource(const ADetailBin
 begin
   if not Assigned(FDetailBindSourceContainer) then
     FDetailBindSourceContainer := TList<IioBindSource>.Create;
-  FDetailBindSourceContainer.Add(ADetailBindSource);
+  if not FDetailBindSourceContainer.Contains(ADetailBindSource) then
+    FDetailBindSourceContainer.Add(ADetailBindSource);
+end;
+
+procedure TioPrototypeBindSourceCustom.UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
+begin
+  if not Assigned(FDetailBindSourceContainer) then
+    FDetailBindSourceContainer := TList<IioBindSource>.Create;
+  if not FDetailBindSourceContainer.Contains(ADetailBindSource) then
+    FDetailBindSourceContainer.Remove(ADetailBindSource);
 end;
 
 procedure TioPrototypeBindSourceCustom.SelectCurrent(ASelectionType: TioSelectionType);
@@ -1130,11 +1142,6 @@ begin
   io.ShowEach(Self, AParentCloseQueryAction, AViewContext, AAlias);
 end;
 
-procedure TioPrototypeBindSourceCustom.UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
-begin
-
-end;
-
 procedure TioPrototypeBindSourceCustom.ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction;const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
   io.ShowEach(Self, AParentCloseQueryAction, AVCProvider, AVVMAlias);
@@ -1267,9 +1274,9 @@ begin
   end;
 end;
 
-procedure TioPrototypeBindSourceCustom._InternalSetETMforPrivateField(const AETMFor: IioMasterBindSource);
+procedure TioPrototypeBindSourceCustom._InternalSetETMforPrivateField(const AETMFor: IioBindSource);
 begin
-  FETMfor := AETMfor;
+  FETMfor := AETMfor as IioMasterBindSource;
 end;
 
 function TioPrototypeBindSourceCustom._Release: Integer;
