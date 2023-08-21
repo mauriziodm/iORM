@@ -449,7 +449,7 @@ object CustomerListForm: TCustomerListForm
     object acClearWhere: TioBSClearWhere
       Category = 'iORM - BS - WhereBuilder'
       Caption = 'Clear'
-      AutoExecute_Where_OnTargetBS = True
+      AutoExec_Where_OnTargetBS = True
       TargetBindSource = DSWhere
     end
   end
