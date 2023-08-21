@@ -1224,14 +1224,7 @@ end;
 
 procedure TioModelPresenterCustom.SetETMfor(const AETMfor: IioMasterBindSource);
 begin
-  // Set the private field
-  FETMFor := AETMfor;
-  // If the private where field is assigned the  set even to it
-  if Assigned(FWhere) then
-    FWhere.SetETMfor(AETMfor);
-  // If the adapter is present then set even to it
-  if CheckAdapter then
-    GetActiveBindSourceAdapter.ioWhere.SetETMfor(AETMfor);
+  TioCommonBSBehavior.SetETMfor(Self, AETMfor, ComponentState);
 end;
 
 procedure TioModelPresenterCustom.SetItemIndex(const Value: Integer);

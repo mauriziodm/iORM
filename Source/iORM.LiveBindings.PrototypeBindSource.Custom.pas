@@ -1073,11 +1073,7 @@ end;
 
 procedure TioPrototypeBindSourceCustom.SetETMfor(const AETMfor: IioMasterBindSource);
 begin
-  // Set the private field
-  FETMFor := AETMfor;
-  // If the adapter is present then set even to it
-  if Assigned(Where) then
-    Where.SetETMfor(AETMfor);
+  TioCommonBSBehavior.SetETMfor(Self, AETMfor, ComponentState);
 end;
 
 procedure TioPrototypeBindSourceCustom.SetWhere(const AWhere: IioWhere);
