@@ -120,7 +120,7 @@ object PizzaForm: TPizzaForm
     object LabelTitle: TLabel
       Left = 56
       Top = 7
-      Width = 254
+      Width = 250
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -259,45 +259,6 @@ object PizzaForm: TPizzaForm
     Stretch = True
     TabOrder = 5
   end
-  object GridCustomers: TDBGrid
-    Left = 212
-    Top = 318
-    Width = 193
-    Height = 137
-    BorderStyle = bsNone
-    Ctl3D = False
-    DataSource = SourceETM
-    ParentCtl3D = False
-    TabOrder = 6
-    TitleFont.Charset = DEFAULT_CHARSET
-    TitleFont.Color = clWindowText
-    TitleFont.Height = -12
-    TitleFont.Name = 'Segoe UI'
-    TitleFont.Style = []
-    Columns = <
-      item
-        Alignment = taCenter
-        Expanded = False
-        FieldName = 'DateAndTime'
-        Title.Alignment = taCenter
-        Title.Caption = 'when'
-        Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clNavy
-        Title.Font.Height = -13
-        Title.Font.Name = 'Segoe UI'
-        Title.Font.Style = [fsBold]
-        Width = 158
-        Visible = True
-      end>
-  end
-  object Button1: TButton
-    Left = 272
-    Top = 144
-    Width = 75
-    Height = 25
-    Caption = 'Button1'
-    TabOrder = 7
-  end
   object DSPizza: TioDataSetMaster
     AsDefault = True
     TypeName = 'TPizza'
@@ -364,22 +325,5 @@ object PizzaForm: TPizzaForm
   object OpenPictureDialog: TOpenPictureDialog
     Left = 232
     Top = 352
-  end
-  object DS_ETM: TioDataSetMaster
-    AsDefault = False
-    TypeName = 'TEtmRepository'
-    ETMfor = DSPizza
-    Paging.CurrentPageOfFormat = '%d/%d'
-    Left = 32
-    Top = 344
-    object DS_ETMDateAndTime: TDateTimeField
-      FieldName = 'DateAndTime'
-    end
-  end
-  object SourceETM: TDataSource
-    AutoEdit = False
-    DataSet = DS_ETM
-    Left = 32
-    Top = 400
   end
 end

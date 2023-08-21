@@ -1996,7 +1996,7 @@ begin
   if not(TargetBindSource.Current is TioEtmCustomTimeSlot) then
     raise EioEtmException.Create(ClassName, 'ExecuteTarget', 'Current object in the TargetBindSource is not derived from "TioEtmCustomTimeSlot" base class.');
   // Revert
-  TioEtmEngine.RevertToBindSource(TargetBindSource.Current as TioEtmCustomTimeSlot, TargetBindSource.ETMfor, FAutoExecute_Persist_AfterRevert);
+  TioEtmEngine.RevertToBindSource(TargetBindSource.Current as TioEtmCustomTimeSlot, TargetBindSource, FAutoExecute_Persist_AfterRevert);
   FRevertedObj := TargetBindSource.ETMfor.Current;
   // AfterRevert event handler
   if Assigned(FAfterRevertEvent) then

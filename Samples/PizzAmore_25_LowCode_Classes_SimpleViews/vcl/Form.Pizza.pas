@@ -42,11 +42,6 @@ type
     acBack: TioBSCloseQuery;
     ButtonETM: TSpeedButton;
     acShowETM: TioBSShowOrSelect;
-    DS_ETM: TioDataSetMaster;
-    SourceETM: TDataSource;
-    DS_ETMDateAndTime: TDateTimeField;
-    GridCustomers: TDBGrid;
-    Button1: TButton;
     procedure acLoadImageExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private

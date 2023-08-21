@@ -6,29 +6,13 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.Mask, Vcl.DBCtrls, iORM, iORM.Attributes, iORM.CommonTypes,
   iORM.Where.Interfaces, Data.DB, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom, iORM.DB.DataSet.Master, iORM.StdActions.Vcl, System.Actions, Vcl.ActnList,
-  Model.Customer;
+  Model.Customer, Vcl.ComCtrls, Vcl.Grids, Vcl.DBGrids;
 
 type
 
   // Register the form into the dependency injection container as SimpleView for TCustomer objects
   [diSimpleViewFor(TCustomer)]
   TCustomerForm = class(TForm)
-    PanelTop: TPanel;
-    ButtonBack: TSpeedButton;
-    LabelTitle: TLabel;
-    PanelBottom: TPanel;
-    ButtonRevert: TSpeedButton;
-    ButtonPersist: TSpeedButton;
-    DBEditID: TDBEdit;
-    Label1: TLabel;
-    Label2: TLabel;
-    DBEditName: TDBEdit;
-    Label3: TLabel;
-    DBEditPhone: TDBEdit;
-    Label4: TLabel;
-    DBEditCity: TDBEdit;
-    Label5: TLabel;
-    DBEditAddress: TDBEdit;
     DSCustomer: TioDataSetMaster;
     DSCustomerID: TIntegerField;
     DSCustomerName: TStringField;
@@ -40,6 +24,39 @@ type
     acPersist: TioBSPersistencePersist;
     acRevertOrDelete: TioBSPersistenceRevertOrDelete;
     acBack: TioBSCloseQuery;
+    DBEditAddress: TDBEdit;
+    PanelBottom: TPanel;
+    ButtonRevert: TSpeedButton;
+    ButtonPersist: TSpeedButton;
+    Label5: TLabel;
+    DBEditCity: TDBEdit;
+    Label4: TLabel;
+    DBEditPhone: TDBEdit;
+    Label3: TLabel;
+    DBEditName: TDBEdit;
+    Label2: TLabel;
+    DBEditID: TDBEdit;
+    Label1: TLabel;
+    PanelTop: TPanel;
+    ButtonBack: TSpeedButton;
+    LabelTitle: TLabel;
+    PanelETM: TPanel;
+    PageControl1: TPageControl;
+    TabSheet1: TTabSheet;
+    GridCustomers: TDBGrid;
+    TabSheet2: TTabSheet;
+    Diff: TDBMemo;
+    SourceETM: TDataSource;
+    DS_ETM: TioDataSetMaster;
+    DS_ETMDateAndTime: TDateTimeField;
+    DS_ETMEntityClassName: TStringField;
+    DS_ETMEntityID: TIntegerField;
+    DS_ETMSmartEntityVersion: TStringField;
+    DS_ETMSmartUser: TStringField;
+    DS_ETMSmartEventType: TStringField;
+    DS_ETMDiffOneWay: TStringField;
+    Button1: TButton;
+    acEtmRevertToVersion: TioBS_ETM_RevertToBindSource;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
   public

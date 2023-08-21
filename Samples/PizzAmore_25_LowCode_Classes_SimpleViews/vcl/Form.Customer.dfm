@@ -4,8 +4,8 @@ object CustomerForm: TCustomerForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 303
-  ClientWidth = 584
+  ClientHeight = 562
+  ClientWidth = 588
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,70 +15,13 @@ object CustomerForm: TCustomerForm
   Position = poMainFormCenter
   Visible = True
   OnClose = FormClose
+  DesignSize = (
+    588
+    562)
   TextHeight = 15
-  object Label1: TLabel
-    Left = 10
-    Top = 61
-    Width = 100
-    Height = 25
-    Alignment = taRightJustify
-    AutoSize = False
-    Caption = 'ID'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clNavy
-    Font.Height = -16
-    Font.Name = 'Segoe UI'
-    Font.Style = [fsBold]
-    ParentFont = False
-  end
-  object Label2: TLabel
-    Left = 10
-    Top = 101
-    Width = 100
-    Height = 25
-    Alignment = taRightJustify
-    AutoSize = False
-    Caption = 'Name'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clNavy
-    Font.Height = -16
-    Font.Name = 'Segoe UI'
-    Font.Style = [fsBold]
-    ParentFont = False
-  end
-  object Label3: TLabel
-    Left = 10
-    Top = 140
-    Width = 100
-    Height = 25
-    Alignment = taRightJustify
-    AutoSize = False
-    Caption = 'Phone'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clNavy
-    Font.Height = -16
-    Font.Name = 'Segoe UI'
-    Font.Style = [fsBold]
-    ParentFont = False
-  end
-  object Label4: TLabel
-    Left = 10
-    Top = 179
-    Width = 100
-    Height = 25
-    Alignment = taRightJustify
-    AutoSize = False
-    Caption = 'City'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clNavy
-    Font.Height = -16
-    Font.Name = 'Segoe UI'
-    Font.Style = [fsBold]
-    ParentFont = False
-  end
   object Label5: TLabel
     Left = 8
-    Top = 218
+    Top = 202
     Width = 100
     Height = 25
     Alignment = taRightJustify
@@ -91,56 +34,87 @@ object CustomerForm: TCustomerForm
     Font.Style = [fsBold]
     ParentFont = False
   end
-  object PanelTop: TPanel
-    Left = 0
-    Top = 0
-    Width = 584
-    Height = 40
-    Align = alTop
-    BevelOuter = bvNone
-    Color = clNavy
-    ParentBackground = False
+  object Label4: TLabel
+    Left = 10
+    Top = 163
+    Width = 100
+    Height = 25
+    Alignment = taRightJustify
+    AutoSize = False
+    Caption = 'City'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clNavy
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label3: TLabel
+    Left = 10
+    Top = 124
+    Width = 100
+    Height = 25
+    Alignment = taRightJustify
+    AutoSize = False
+    Caption = 'Phone'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clNavy
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label2: TLabel
+    Left = 10
+    Top = 85
+    Width = 100
+    Height = 25
+    Alignment = taRightJustify
+    AutoSize = False
+    Caption = 'Name'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clNavy
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label1: TLabel
+    Left = 10
+    Top = 45
+    Width = 100
+    Height = 25
+    Alignment = taRightJustify
+    AutoSize = False
+    Caption = 'ID'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clNavy
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object DBEditAddress: TDBEdit
+    Left = 120
+    Top = 202
+    Width = 449
+    Height = 25
+    BorderStyle = bsNone
+    Color = clInactiveBorder
+    DataField = 'Address'
+    DataSource = SourceCustomer
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
     TabOrder = 0
-    ExplicitWidth = 580
-    DesignSize = (
-      584
-      40)
-    object ButtonBack: TSpeedButton
-      Left = 0
-      Top = 0
-      Width = 50
-      Height = 40
-      Action = acBack
-      Align = alLeft
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clNavy
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
-    end
-    object LabelTitle: TLabel
-      Left = 72
-      Top = 7
-      Width = 441
-      Height = 21
-      Alignment = taCenter
-      Anchors = [akLeft, akTop, akRight]
-      AutoSize = False
-      Caption = ' Customer'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
-      Font.Height = -16
-      Font.Name = 'Segoe UI'
-      Font.Style = [fsBold]
-      ParentFont = False
-      Layout = tlCenter
-    end
   end
   object PanelBottom: TPanel
     Left = 0
-    Top = 263
-    Width = 584
+    Top = 522
+    Width = 588
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
@@ -166,7 +140,7 @@ object CustomerForm: TCustomerForm
       ExplicitTop = -6
     end
     object ButtonPersist: TSpeedButton
-      Left = 534
+      Left = 538
       Top = 0
       Width = 50
       Height = 40
@@ -182,60 +156,9 @@ object CustomerForm: TCustomerForm
       ExplicitTop = -6
     end
   end
-  object DBEditID: TDBEdit
-    Left = 122
-    Top = 61
-    Width = 55
-    Height = 25
-    BorderStyle = bsNone
-    Color = clInactiveBorder
-    DataField = 'ID'
-    DataSource = SourceCustomer
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -16
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
-    TabOrder = 2
-  end
-  object DBEditName: TDBEdit
-    Left = 122
-    Top = 101
-    Width = 447
-    Height = 25
-    BorderStyle = bsNone
-    Color = clInactiveBorder
-    DataField = 'Name'
-    DataSource = SourceCustomer
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -16
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
-    TabOrder = 3
-  end
-  object DBEditPhone: TDBEdit
-    Left = 122
-    Top = 140
-    Width = 447
-    Height = 25
-    BorderStyle = bsNone
-    Color = clInactiveBorder
-    DataField = 'PhoneNumber'
-    DataSource = SourceCustomer
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -16
-    Font.Name = 'Segoe UI'
-    Font.Style = []
-    ParentFont = False
-    TabOrder = 4
-  end
   object DBEditCity: TDBEdit
     Left = 122
-    Top = 179
+    Top = 163
     Width = 447
     Height = 25
     BorderStyle = bsNone
@@ -248,16 +171,16 @@ object CustomerForm: TCustomerForm
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentFont = False
-    TabOrder = 5
+    TabOrder = 2
   end
-  object DBEditAddress: TDBEdit
-    Left = 120
-    Top = 218
-    Width = 449
+  object DBEditPhone: TDBEdit
+    Left = 122
+    Top = 124
+    Width = 447
     Height = 25
     BorderStyle = bsNone
     Color = clInactiveBorder
-    DataField = 'Address'
+    DataField = 'PhoneNumber'
     DataSource = SourceCustomer
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -265,7 +188,235 @@ object CustomerForm: TCustomerForm
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentFont = False
+    TabOrder = 3
+  end
+  object DBEditName: TDBEdit
+    Left = 122
+    Top = 85
+    Width = 447
+    Height = 25
+    BorderStyle = bsNone
+    Color = clInactiveBorder
+    DataField = 'Name'
+    DataSource = SourceCustomer
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 4
+  end
+  object DBEditID: TDBEdit
+    Left = 122
+    Top = 45
+    Width = 55
+    Height = 25
+    BorderStyle = bsNone
+    Color = clInactiveBorder
+    DataField = 'ID'
+    DataSource = SourceCustomer
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 5
+  end
+  object PanelTop: TPanel
+    Left = 0
+    Top = 0
+    Width = 588
+    Height = 40
+    Align = alTop
+    BevelOuter = bvNone
+    Color = clNavy
+    ParentBackground = False
     TabOrder = 6
+    ExplicitLeft = 8
+    ExplicitTop = 8
+    ExplicitWidth = 580
+    DesignSize = (
+      588
+      40)
+    object ButtonBack: TSpeedButton
+      Left = 0
+      Top = 0
+      Width = 50
+      Height = 40
+      Action = acBack
+      Align = alLeft
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clNavy
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+    end
+    object LabelTitle: TLabel
+      Left = 72
+      Top = 7
+      Width = 449
+      Height = 21
+      Alignment = taCenter
+      Anchors = [akLeft, akTop, akRight]
+      AutoSize = False
+      Caption = ' Customer'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWhite
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Layout = tlCenter
+      ExplicitWidth = 441
+    end
+  end
+  object PanelETM: TPanel
+    Left = 0
+    Top = 240
+    Width = 588
+    Height = 282
+    Align = alBottom
+    BevelOuter = bvNone
+    Caption = 'PanelETM'
+    Color = clMenu
+    ParentBackground = False
+    TabOrder = 7
+    ExplicitTop = 50
+    object PageControl1: TPageControl
+      Left = 0
+      Top = 0
+      Width = 588
+      Height = 282
+      ActivePage = TabSheet1
+      Align = alClient
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clNavy
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 0
+      ExplicitHeight = 220
+      object TabSheet1: TTabSheet
+        Caption = 'Timeline'
+        object GridCustomers: TDBGrid
+          Left = 0
+          Top = 0
+          Width = 580
+          Height = 250
+          Align = alClient
+          BorderStyle = bsNone
+          Color = clMenu
+          Ctl3D = False
+          DataSource = SourceETM
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -12
+          Font.Name = 'Segoe UI'
+          Font.Style = []
+          ParentCtl3D = False
+          ParentFont = False
+          TabOrder = 0
+          TitleFont.Charset = DEFAULT_CHARSET
+          TitleFont.Color = clNavy
+          TitleFont.Height = -13
+          TitleFont.Name = 'Segoe UI'
+          TitleFont.Style = [fsBold]
+          Columns = <
+            item
+              Alignment = taCenter
+              Expanded = False
+              FieldName = 'DateAndTime'
+              Title.Alignment = taCenter
+              Title.Caption = 'when'
+              Title.Font.Charset = DEFAULT_CHARSET
+              Title.Font.Color = clNavy
+              Title.Font.Height = -13
+              Title.Font.Name = 'Segoe UI'
+              Title.Font.Style = [fsBold]
+              Width = 120
+              Visible = True
+            end
+            item
+              Alignment = taCenter
+              Expanded = False
+              FieldName = 'SmartEventType'
+              Title.Alignment = taCenter
+              Title.Caption = 'event type'
+              Title.Font.Charset = DEFAULT_CHARSET
+              Title.Font.Color = clNavy
+              Title.Font.Height = -13
+              Title.Font.Name = 'Segoe UI'
+              Title.Font.Style = [fsBold]
+              Width = 200
+              Visible = True
+            end
+            item
+              Alignment = taCenter
+              Expanded = False
+              FieldName = 'SmartEntityVersion'
+              Title.Alignment = taCenter
+              Title.Caption = 'version'
+              Title.Font.Charset = DEFAULT_CHARSET
+              Title.Font.Color = clNavy
+              Title.Font.Height = -13
+              Title.Font.Name = 'Segoe UI'
+              Title.Font.Style = [fsBold]
+              Width = 130
+              Visible = True
+            end
+            item
+              Alignment = taCenter
+              Expanded = False
+              FieldName = 'SmartUser'
+              Title.Alignment = taCenter
+              Title.Caption = 'user'
+              Title.Font.Charset = DEFAULT_CHARSET
+              Title.Font.Color = clNavy
+              Title.Font.Height = -13
+              Title.Font.Name = 'Segoe UI'
+              Title.Font.Style = [fsBold]
+              Width = 90
+              Visible = True
+            end>
+        end
+      end
+      object TabSheet2: TTabSheet
+        Caption = 'Diff'
+        ImageIndex = 1
+        object Diff: TDBMemo
+          Left = 0
+          Top = 0
+          Width = 580
+          Height = 250
+          Align = alClient
+          BorderStyle = bsNone
+          DataField = 'DiffOneWay'
+          DataSource = SourceETM
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -12
+          Font.Name = 'Segoe UI'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          ExplicitWidth = 578
+          ExplicitHeight = 252
+        end
+      end
+    end
+  end
+  object Button1: TButton
+    Left = 439
+    Top = 242
+    Width = 121
+    Height = 20
+    Action = acEtmRevertToVersion
+    Anchors = [akTop, akRight]
+    TabOrder = 8
   end
   object DSCustomer: TioDataSetMaster
     AsDefault = True
@@ -321,6 +472,51 @@ object CustomerForm: TCustomerForm
       Caption = 'Back'
       OnUpdateScope = usGlobal
       TargetBindSource = DSCustomer
+    end
+    object acEtmRevertToVersion: TioBS_ETM_RevertToBindSource
+      Category = 'iORM - BS - ETM'
+      Caption = 'Revert to version'
+      TargetBindSource = DS_ETM
+    end
+  end
+  object SourceETM: TDataSource
+    AutoEdit = False
+    DataSet = DS_ETM
+    Left = 32
+    Top = 400
+  end
+  object DS_ETM: TioDataSetMaster
+    AsDefault = False
+    TypeName = 'TEtmRepository'
+    ETMfor = DSCustomer
+    Paging.CurrentPageOfFormat = '%d/%d'
+    Left = 32
+    Top = 344
+    object DS_ETMDateAndTime: TDateTimeField
+      FieldName = 'DateAndTime'
+    end
+    object DS_ETMEntityClassName: TStringField
+      FieldName = 'EntityClassName'
+      Size = 60
+    end
+    object DS_ETMEntityID: TIntegerField
+      FieldName = 'EntityID'
+    end
+    object DS_ETMSmartEntityVersion: TStringField
+      FieldName = 'SmartEntityVersion'
+      Size = 100
+    end
+    object DS_ETMSmartUser: TStringField
+      FieldName = 'SmartUser'
+      Size = 100
+    end
+    object DS_ETMSmartEventType: TStringField
+      FieldName = 'SmartEventType'
+      Size = 100
+    end
+    object DS_ETMDiffOneWay: TStringField
+      FieldName = 'DiffOneWay'
+      Size = 65535
     end
   end
 end
