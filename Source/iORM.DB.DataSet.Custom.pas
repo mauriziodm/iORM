@@ -132,6 +132,7 @@ type
     procedure SetPaging(const Value: TioCommonBSAPageManager);
     function GetPaging: TioCommonBSAPageManager;
     // ETMfor
+    procedure _InternalSetETMforPrivateField(const AETMFor: IioMasterBindSource);
     procedure SetETMfor(const AETMfor: IioMasterBindSource);
     function GetETMfor: IioMasterBindSource;
     // State
@@ -909,38 +910,7 @@ end;
 
 procedure TioDataSetCustom.SetETMfor(const AETMfor: IioMasterBindSource);
 begin
-  // Controlla che non sia già assegnato (lo stesso)
-  if AETMFor = FETMfor then
-    Exit;
-  // ETMfor must be different from itself
-  if Assigned(AETMfor) and (AETMfor as TObject).Equals(Self) then
-    raise EioException.Create(Self.ClassName, 'SetETMfor', Format('The "ETMfor" property of the "%s" bind source must be different from itself.', [Name]));
-  // Se è aperto e stiamo cambiando l'ETMfor (già verificato all'inizio) allora si chiude (se è il caso si riaprirà alla fine del metodo)
-  if IsActive then
-    raise EioException.Create(ClassName, 'SetETMfor',
-      Format('Hi, I''m iORM, I have to explain something to you.' +
-      #13#13'When a BindSource (%s) has its "ETMfor" property pointing to another BindSource then it acts as a "time machine" (ETM repository) for the latter''s current entity, in which case its activation will be done automatically.' +
-      #13#13'For this reason, setting the "ETMfor" property of a BindSource while it is active IS NOT PERMITTED.' +
-      #13#13'If you really need to do that then you need to close the BindSource first and then set its property "ETMfor" (which will cause the BindSource to open immediately).' +
-      #13#13'Did you understand?', [Name]));
-  // If the private where field is assigned the set even to it
-  if Assigned(FWhere) then
-    FWhere.SetETMfor(AETMfor);
-  // If the adapter is present then set even to it
-  if CheckAdapter then
-    GetActiveBindSourceAdapter.ioWhere.SetETMfor(AETMfor);
-  // Register itself into the DetailBindSourceContainer of the AETMfor bind source
-  if Assigned(AETMfor) then
-    AETMfor.RegisterDetailBindSource(Self);
-  // If the new AETMfor is nil and the previous FETMFor was assigned then unregister the old one
-  // NB: All'inizio abbiamo già verificatoche sono diversi
-  if Assigned(FETMFor) then
-    FETMfor.UnregisterDetailBindSource(Self);
-  // Set the private field
-  FETMFor := AETMfor;
-  // Se il BS ETMfor è già attivo allora attiva automaticamente anche per se stesso
-  if not((csDesigning in ComponentState) or (csLoading in ComponentState)) and Assigned(AETMfor) and AETMfor.IsActive then
-    Open;
+  TioCommonBSBehavior.SetETMfor(Self, AETMfor, ComponentState);
 end;
 
 procedure TioDataSetCustom.SetItemIndex(const Value: Integer);
@@ -1129,6 +1099,11 @@ begin
     // del Master.
     ForceDetailAdaptersCreation;
   end;
+end;
+
+procedure TioDataSetCustom._InternalSetETMforPrivateField(const AETMFor: IioMasterBindSource);
+begin
+  FETMfor := AETMfor;
 end;
 
 end.

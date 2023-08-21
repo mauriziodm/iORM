@@ -151,6 +151,7 @@ type
     procedure SetPaging(const Value: TioCommonBSAPageManager);
     function GetPaging: TioCommonBSAPageManager;
     // ETMfor
+    procedure _InternalSetETMforPrivateField(const AETMFor: IioMasterBindSource);
     procedure SetETMfor(const AETMfor: IioMasterBindSource);
     function GetETMfor: IioMasterBindSource;
     // Preview
@@ -1268,6 +1269,11 @@ begin
     SetRuntimeAdapter(LActiveBSA.AsTBindSourceAdapter);
     FBindSourceAdapter := LActiveBSA;
   end;
+end;
+
+procedure TioPrototypeBindSourceCustom._InternalSetETMforPrivateField(const AETMFor: IioMasterBindSource);
+begin
+  FETMfor := AETMfor;
 end;
 
 function TioPrototypeBindSourceCustom._Release: Integer;

@@ -54,6 +54,9 @@ type
 
   IioMasterBindSource = interface
     ['{8B930CF9-0EDC-483E-86A2-39C6CFD82D9D}']
+    procedure Open;
+    procedure Close;
+    function CheckAdapter: Boolean;
     function Current: TObject;
     procedure Delete;
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
@@ -71,16 +74,20 @@ type
     function GetName: String;
     function IsFromBSLoadType: Boolean;
     function GetSourceBS: IioBindSource;
-    procedure SetWhere(const AWhere: IioWhere);
     procedure RegisterDetailBindSource(const ADetailBindSource: IioBindSource);
     procedure UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
     // TypeName
     function GetTypeName: String;
-    // WhereBuuilderFor
+    // Where
+    procedure SetWhere(const AWhere: IioWhere);
+    function GetWhere: IioWhere;
+    property Where: IioWhere read GetWhere write SetWhere;
+    // WhereBuilderFor
     function GetWhereBuilderFor: IioMasterBindSource;
     procedure SetWhereBuilderFor(const AMasterBS: IioMasterBindSource);
     property WhereBuilderFor: IioMasterBindSource read GetWhereBuilderFor write SetWhereBuilderFor;
     // ETMfor
+    procedure _InternalSetETMforPrivateField(const AETMFor: IioMasterBindSource);
     procedure SetETMfor(const AETMfor: IioMasterBindSource);
     function GetETMfor: IioMasterBindSource;
     property ETMfor: IioMasterBindSource read GetETMfor write SetETMfor;

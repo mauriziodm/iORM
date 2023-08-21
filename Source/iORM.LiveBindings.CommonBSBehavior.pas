@@ -69,6 +69,8 @@ type
     // Common code for WhereBuilder purposes
     class function BuildWhere(const ASourceBS, ATargetBS: IioMasterBindSource; const AExecuteOnTarget: Boolean; const ABeforeWhereBuildEvent: TioBeforeWhereBuilderEvent; const AOnWhereBuildEvent: TioOnWhereBuilderEvent; const AAfterWhereBuildEvent: TioAfterWhereBuilderEvent): IioWhere;
     class function ClearWhere(const ASourceBS, ATargetBS: IioMasterBindSource; const AExecuteOnTarget: Boolean; const ABeforeWhereClearEvent: TioBeforeWhereBuilderEvent; const AOnWhereClearEvent: TioOnWhereBuilderEvent; const AAfterWhereClearEvent: TioAfterWhereBuilderEvent): IioWhere;
+    // Common code for ETMfor
+    class procedure SetETMfor(const ABindSource: IioBindSource; const AETMfor: IioMasterBindSource; const AComponentState: TComponentState);
   end;
 
 implementation
@@ -294,6 +296,48 @@ begin
     for I := 0 to AOwner.ComponentCount - 1 do
       if Supports(AOwner.Components[I], IioBindSource, LBindSource) then
         LBindSource.SetAsDefault(False);
+end;
+
+class procedure TioCommonBSBehavior.SetETMfor(const ABindSource: IioBindSource; const AETMfor: IioMasterBindSource; const AComponentState: TComponentState);
+var
+  LMasterBindSource: IioMasterBindSource;
+begin
+  // Estract the bind source as IioMasterBindSource
+  if not Supports(ABindSource, IioMasterBindSource, LMasterBindSOurce) then
+    raise EioException.Create(ClassName, 'SetETMfor',
+      Format('The "%s" bind source received by the "ABindSource" parameter does not implement the "IioMasterBindSource".', [ABindSource.GetName]));
+  // Controlla che non sia già assegnato (lo stesso)
+  if AETMFor = LMasterBindSource.ETMfor then
+    Exit;
+  // ETMfor must be different from itself
+  if Assigned(AETMfor) and (AETMfor as TObject).Equals(LMasterBindSource as TObject) then
+    raise EioException.Create(Self.ClassName, 'SetETMfor', Format('The "ETMfor" property of the "%s" bind source must be different from itself.', [LMasterBindSource.GetName]));
+  // Se è aperto e stiamo cambiando l'ETMfor (già verificato all'inizio) allora si chiude (se è il caso si riaprirà alla fine del metodo)
+  if LMasterBindSource.IsActive then
+    raise EioException.Create(ClassName, 'SetETMfor',
+      Format('Hi, I''m iORM, I have to explain something to you.' +
+      #13#13'When a BindSource (%s) has its "ETMfor" property pointing to another BindSource then it acts as a "time machine" (ETM repository) for the latter''s current entity, in which case its activation will be done automatically.' +
+      #13#13'For this reason, setting the "ETMfor" property of a BindSource while it is active IS NOT PERMITTED.' +
+      #13#13'If you really need to do that then you need to close the BindSource first and then set its property "ETMfor" (which will cause the BindSource to open immediately).' +
+      #13#13'Did you understand?', [LMasterBindSource.GetName]));
+  // If the private where field is assigned the set even to it
+  if Assigned(LMasterBindSource.Where) then
+    LMasterBindSource.Where.SetETMfor(AETMfor);
+  // If the adapter is present then set even to it
+  if LMasterBindSource.CheckAdapter then
+    LMasterBindSource.GetActiveBindSourceAdapter.ioWhere.SetETMfor(AETMfor);
+  // Register itself into the DetailBindSourceContainer of the AETMfor bind source
+  if Assigned(AETMfor) then
+    AETMfor.RegisterDetailBindSource(ABindSource);
+  // If the new AETMfor is nil and the previous FETMFor was assigned then unregister the old one
+  // NB: All'inizio abbiamo già verificatoche sono diversi
+  if Assigned(LMasterBindSource.ETMFor) then
+    LMasterBindSource.ETMfor.UnregisterDetailBindSource(ABindSource);
+  // Set the private field
+  LMasterBindSource._InternalSetETMforPrivateField(AETMfor);
+  // Se il BS ETMfor è già attivo allora attiva automaticamente anche per se stesso
+  if not((csDesigning in AComponentState) or (csLoading in AComponentState)) and Assigned(AETMfor) and AETMfor.IsActive then
+    LMasterBindSource.Open;
 end;
 
 class function TioCommonBSBehavior.BuildWhere(const ASourceBS, ATargetBS: IioMasterBindSource; const AExecuteOnTarget: Boolean; const ABeforeWhereBuildEvent: TioBeforeWhereBuilderEvent; const AOnWhereBuildEvent: TioOnWhereBuilderEvent; const AAfterWhereBuildEvent: TioAfterWhereBuilderEvent): IioWhere;
