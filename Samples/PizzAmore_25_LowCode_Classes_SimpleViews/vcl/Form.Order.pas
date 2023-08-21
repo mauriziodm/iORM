@@ -76,6 +76,8 @@ type
     DSOrderOrderState: TStringField;
     SpeedButton1: TSpeedButton;
     acShowCustomer: TioBSShowOrSelect;
+    acShowETM: TioBSShowOrSelect;
+    ButtonETM: TSpeedButton;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure DSOrderSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);

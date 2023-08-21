@@ -143,6 +143,7 @@ object OrderForm: TOrderForm
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
+    ExplicitWidth = 776
     DesignSize = (
       780
       40)
@@ -163,7 +164,7 @@ object OrderForm: TOrderForm
     object LabelTitle: TLabel
       Left = 56
       Top = 7
-      Width = 633
+      Width = 306
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -176,7 +177,6 @@ object OrderForm: TOrderForm
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlCenter
-      ExplicitWidth = 481
     end
     object ButtonAdd: TSpeedButton
       Left = 730
@@ -193,6 +193,20 @@ object OrderForm: TOrderForm
       ParentFont = False
       ExplicitLeft = 712
     end
+    object ButtonETM: TSpeedButton
+      Left = 368
+      Top = 0
+      Width = 60
+      Height = 40
+      Action = acShowETM
+      Anchors = [akTop, akRight]
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clNavy
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+    end
   end
   object PanelBottom: TPanel
     Left = 0
@@ -204,6 +218,8 @@ object OrderForm: TOrderForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
+    ExplicitTop = 520
+    ExplicitWidth = 776
     object ButtonRevert: TSpeedButton
       Left = 0
       Top = 0
@@ -294,6 +310,8 @@ object OrderForm: TOrderForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 2
+    ExplicitLeft = 426
+    ExplicitHeight = 480
     object DBCtrlGridPizzas: TDBCtrlGrid
       Left = 0
       Top = 0
@@ -310,6 +328,7 @@ object OrderForm: TOrderForm
       SelectedColor = 13828095
       ShowFocus = False
       OnDblClick = DBCtrlGridPizzasDblClick
+      ExplicitHeight = 480
       object DBTextName: TDBText
         Left = 99
         Top = 20
@@ -725,6 +744,15 @@ object OrderForm: TOrderForm
       Action_ParentCloseQueryAction = acBack
       ShowMode = smBSCurrent
       TargetBindSource = DSCustomer
+      ViewContextBy = vcByDefaultViewContextProvider
+    end
+    object acShowETM: TioBSShowOrSelect
+      Category = 'iORM - BS'
+      Caption = 'Time line'
+      Action_ParentCloseQueryAction = acBack
+      EntityTypeName = 'TEtmRepository'
+      ShowMode = smEntityTypeNameAsETM
+      TargetBindSource = DSOrder
       ViewContextBy = vcByDefaultViewContextProvider
     end
   end
