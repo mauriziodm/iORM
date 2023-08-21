@@ -82,6 +82,9 @@ type
   TioStdAction_ETM_BeforeRevertEvent = procedure(const ASender: TObject; out ATargetObj: TObject) of object;
   TioStdAction_ETM_AfterRevertEvent = procedure(const ASender: TObject; const ARevertedObj: TObject) of object;
 
+  // StdActions types
+  TioStdAction_ETM_AutoExec_AfterRevert = (doNothing, doRefresh, doReload);
+
   // Compare operators
   TioCompareOp = (coEquals, coNotEquals, coGreater, coLower, coGreaterOrEqual, coLowerOrEqual, coLike, coNotLike, coIsNull, coIsNotNull);
 

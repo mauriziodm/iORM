@@ -4,8 +4,8 @@ object PizzaListForm: TPizzaListForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 660
-  ClientWidth = 380
+  ClientHeight = 659
+  ClientWidth = 376
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,16 +20,15 @@ object PizzaListForm: TPizzaListForm
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 380
+    Width = 376
     Height = 40
     Align = alTop
     BevelOuter = bvNone
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 376
     object ButtonSelect: TSpeedButton
-      Left = 330
+      Left = 326
       Top = 0
       Width = 50
       Height = 40
@@ -74,18 +73,16 @@ object PizzaListForm: TPizzaListForm
   end
   object PanelBottom: TPanel
     Left = 0
-    Top = 620
-    Width = 380
+    Top = 619
+    Width = 376
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
-    ExplicitTop = 619
-    ExplicitWidth = 376
     object ButtonAdd: TSpeedButton
-      Left = 330
+      Left = 326
       Top = 0
       Width = 50
       Height = 40
@@ -118,19 +115,17 @@ object PizzaListForm: TPizzaListForm
   object DBCtrlGridPizzas: TDBCtrlGrid
     Left = 0
     Top = 40
-    Width = 380
-    Height = 501
+    Width = 376
+    Height = 500
     Align = alClient
     DataSource = SourcePizzas
     PanelHeight = 100
-    PanelWidth = 363
+    PanelWidth = 359
     TabOrder = 2
     RowCount = 5
     SelectedColor = 13828095
     ShowFocus = False
     OnDblClick = DBCtrlGridPizzasDblClick
-    ExplicitWidth = 376
-    ExplicitHeight = 500
     object DBTextName: TDBText
       Left = 99
       Top = 20
@@ -178,16 +173,14 @@ object PizzaListForm: TPizzaListForm
   end
   object PanelWhere: TPanel
     Left = 0
-    Top = 541
-    Width = 380
+    Top = 540
+    Width = 376
     Height = 79
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 3
-    ExplicitTop = 540
-    ExplicitWidth = 376
     object Label1: TLabel
       Left = 8
       Top = 7

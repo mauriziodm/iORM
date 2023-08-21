@@ -4,8 +4,8 @@ object OrderListForm: TOrderListForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 561
-  ClientWidth = 531
+  ClientHeight = 560
+  ClientWidth = 527
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,16 +20,15 @@ object OrderListForm: TOrderListForm
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 531
+    Width = 527
     Height = 40
     Align = alTop
     BevelOuter = bvNone
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 527
     object ButtonSelect: TSpeedButton
-      Left = 481
+      Left = 477
       Top = 0
       Width = 50
       Height = 40
@@ -74,18 +73,16 @@ object OrderListForm: TOrderListForm
   end
   object PanelBottom: TPanel
     Left = 0
-    Top = 521
-    Width = 531
+    Top = 520
+    Width = 527
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
-    ExplicitTop = 520
-    ExplicitWidth = 527
     object ButtonAdd: TSpeedButton
-      Left = 481
+      Left = 477
       Top = 0
       Width = 50
       Height = 40
@@ -118,8 +115,8 @@ object OrderListForm: TOrderListForm
   object GridCustomers: TDBGrid
     Left = 0
     Top = 40
-    Width = 531
-    Height = 385
+    Width = 527
+    Height = 384
     Align = alClient
     DataSource = SourceOrders
     TabOrder = 2
@@ -195,16 +192,14 @@ object OrderListForm: TOrderListForm
   end
   object PanelWhere: TPanel
     Left = 0
-    Top = 425
-    Width = 531
+    Top = 424
+    Width = 527
     Height = 96
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 3
-    ExplicitTop = 424
-    ExplicitWidth = 527
     object Label1: TLabel
       Left = 9
       Top = 7

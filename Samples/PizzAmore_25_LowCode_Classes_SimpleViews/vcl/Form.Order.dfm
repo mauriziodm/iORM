@@ -4,8 +4,8 @@ object OrderForm: TOrderForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 562
-  ClientWidth = 784
+  ClientHeight = 561
+  ClientWidth = 780
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -136,16 +136,15 @@ object OrderForm: TOrderForm
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 784
+    Width = 780
     Height = 40
     Align = alTop
     BevelOuter = bvNone
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 780
     DesignSize = (
-      784
+      780
       40)
     object ButtonBack: TSpeedButton
       Left = 0
@@ -164,7 +163,7 @@ object OrderForm: TOrderForm
     object LabelTitle: TLabel
       Left = 56
       Top = 7
-      Width = 649
+      Width = 633
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -180,7 +179,7 @@ object OrderForm: TOrderForm
       ExplicitWidth = 481
     end
     object ButtonAdd: TSpeedButton
-      Left = 734
+      Left = 730
       Top = 0
       Width = 50
       Height = 40
@@ -197,16 +196,14 @@ object OrderForm: TOrderForm
   end
   object PanelBottom: TPanel
     Left = 0
-    Top = 522
-    Width = 784
+    Top = 521
+    Width = 780
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
-    ExplicitTop = 521
-    ExplicitWidth = 780
     object ButtonRevert: TSpeedButton
       Left = 0
       Top = 0
@@ -224,7 +221,7 @@ object OrderForm: TOrderForm
       ExplicitTop = -6
     end
     object ButtonPersist: TSpeedButton
-      Left = 734
+      Left = 730
       Top = 0
       Width = 50
       Height = 40
@@ -236,6 +233,7 @@ object OrderForm: TOrderForm
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
+      ExplicitLeft = 734
       ExplicitTop = 8
     end
     object Label6: TLabel
@@ -287,22 +285,20 @@ object OrderForm: TOrderForm
     end
   end
   object PanelPizzas: TPanel
-    Left = 434
+    Left = 430
     Top = 40
     Width = 350
-    Height = 482
+    Height = 481
     Align = alRight
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 2
-    ExplicitLeft = 430
-    ExplicitHeight = 481
     object DBCtrlGridPizzas: TDBCtrlGrid
       Left = 0
       Top = 0
       Width = 350
-      Height = 482
+      Height = 481
       Align = alClient
       AllowDelete = False
       AllowInsert = False
@@ -314,7 +310,6 @@ object OrderForm: TOrderForm
       SelectedColor = 13828095
       ShowFocus = False
       OnDblClick = DBCtrlGridPizzasDblClick
-      ExplicitHeight = 481
       object DBTextName: TDBText
         Left = 99
         Top = 20
@@ -717,8 +712,8 @@ object OrderForm: TOrderForm
     object acShowCustomerSelector: TioBSShowOrSelect
       Category = 'iORM-BS'
       Caption = '...'
-      EntityTypeName = 'TCustomer'
       Action_ParentCloseQueryAction = acBack
+      EntityTypeName = 'TCustomer'
       ShowMode = smEntityTypeNameAsSelector
       TargetBindSource = DSCustomer
       VVMTypeAlias = 'LIST'

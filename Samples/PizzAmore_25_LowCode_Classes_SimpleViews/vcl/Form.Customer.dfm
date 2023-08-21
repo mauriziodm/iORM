@@ -121,8 +121,8 @@ object CustomerForm: TCustomerForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
-    ExplicitTop = 262
-    ExplicitWidth = 580
+    ExplicitTop = 521
+    ExplicitWidth = 584
     object ButtonRevert: TSpeedButton
       Left = 0
       Top = 0
@@ -234,9 +234,7 @@ object CustomerForm: TCustomerForm
     Color = clNavy
     ParentBackground = False
     TabOrder = 6
-    ExplicitLeft = 8
-    ExplicitTop = 8
-    ExplicitWidth = 580
+    ExplicitWidth = 584
     DesignSize = (
       588
       40)
@@ -257,7 +255,7 @@ object CustomerForm: TCustomerForm
     object LabelTitle: TLabel
       Left = 72
       Top = 7
-      Width = 449
+      Width = 433
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -284,7 +282,8 @@ object CustomerForm: TCustomerForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 7
-    ExplicitTop = 50
+    ExplicitTop = 239
+    ExplicitWidth = 584
     object PageControl1: TPageControl
       Left = 0
       Top = 0
@@ -299,7 +298,7 @@ object CustomerForm: TCustomerForm
       Font.Style = [fsBold]
       ParentFont = False
       TabOrder = 0
-      ExplicitHeight = 220
+      ExplicitWidth = 584
       object TabSheet1: TTabSheet
         Caption = 'Timeline'
         object GridCustomers: TDBGrid
@@ -332,11 +331,6 @@ object CustomerForm: TCustomerForm
               FieldName = 'DateAndTime'
               Title.Alignment = taCenter
               Title.Caption = 'when'
-              Title.Font.Charset = DEFAULT_CHARSET
-              Title.Font.Color = clNavy
-              Title.Font.Height = -13
-              Title.Font.Name = 'Segoe UI'
-              Title.Font.Style = [fsBold]
               Width = 120
               Visible = True
             end
@@ -346,11 +340,6 @@ object CustomerForm: TCustomerForm
               FieldName = 'SmartEventType'
               Title.Alignment = taCenter
               Title.Caption = 'event type'
-              Title.Font.Charset = DEFAULT_CHARSET
-              Title.Font.Color = clNavy
-              Title.Font.Height = -13
-              Title.Font.Name = 'Segoe UI'
-              Title.Font.Style = [fsBold]
               Width = 200
               Visible = True
             end
@@ -360,11 +349,6 @@ object CustomerForm: TCustomerForm
               FieldName = 'SmartEntityVersion'
               Title.Alignment = taCenter
               Title.Caption = 'version'
-              Title.Font.Charset = DEFAULT_CHARSET
-              Title.Font.Color = clNavy
-              Title.Font.Height = -13
-              Title.Font.Name = 'Segoe UI'
-              Title.Font.Style = [fsBold]
               Width = 130
               Visible = True
             end
@@ -374,11 +358,6 @@ object CustomerForm: TCustomerForm
               FieldName = 'SmartUser'
               Title.Alignment = taCenter
               Title.Caption = 'user'
-              Title.Font.Charset = DEFAULT_CHARSET
-              Title.Font.Color = clNavy
-              Title.Font.Height = -13
-              Title.Font.Name = 'Segoe UI'
-              Title.Font.Style = [fsBold]
               Width = 90
               Visible = True
             end>
@@ -403,20 +382,19 @@ object CustomerForm: TCustomerForm
           Font.Style = []
           ParentFont = False
           TabOrder = 0
-          ExplicitWidth = 578
-          ExplicitHeight = 252
         end
       end
     end
   end
   object Button1: TButton
-    Left = 439
+    Left = 423
     Top = 242
     Width = 121
     Height = 20
     Action = acEtmRevertToVersion
     Anchors = [akTop, akRight]
     TabOrder = 8
+    ExplicitLeft = 419
   end
   object DSCustomer: TioDataSetMaster
     AsDefault = True
@@ -476,6 +454,7 @@ object CustomerForm: TCustomerForm
     object acEtmRevertToVersion: TioBS_ETM_RevertToBindSource
       Category = 'iORM - BS - ETM'
       Caption = 'Revert to version'
+      AutoExec_Persist_AfterRevert = True
       TargetBindSource = DS_ETM
     end
   end

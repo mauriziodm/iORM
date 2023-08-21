@@ -266,7 +266,6 @@ begin
     raise EioEtmException.Create(ClassName, 'RevertToBindSource', 'Current object of the ATargetBindSource.ETMfor bind source is nil.');
   // Execute the revert operation
   RevertToObject(ATargetBindSource.ETMfor.Current, ATimeSloT, APersistImmediately);
-  ATargetBindSource.ETMfor.Refresh;
 end;
 
 class procedure TioEtmEngine.RevertToDB(const ATimeSlot: TioEtmCustomTimeSlot);
