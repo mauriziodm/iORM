@@ -454,6 +454,7 @@ object CustomerForm: TCustomerForm
     object acEtmRevertToVersion: TioBS_ETM_RevertToBindSource
       Category = 'iORM - BS - ETM'
       Caption = 'Revert to version'
+      AutoExec_OnETMfor_AfterRevert = doRefresh
       AutoExec_Persist_AfterRevert = True
       TargetBindSource = DS_ETM
     end
