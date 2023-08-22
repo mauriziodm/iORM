@@ -4,9 +4,6 @@ Coordinates=209,155,60,33
 [ActionList1]
 Coordinates=130,173,70,33
 
-[ButtonBack]
-Coordinates=139,232,72,51
-
 [LabelTitle]
 Coordinates=320,232,62,51
 
@@ -79,7 +76,7 @@ Coordinates=10,10,116,177
 Coordinates=10,300,46,51
 
 []
-Coordinates=495,188,91,36
+Coordinates=139,232,72,51
 
 [BindingsList1]
 Coordinates=145,80,82,33

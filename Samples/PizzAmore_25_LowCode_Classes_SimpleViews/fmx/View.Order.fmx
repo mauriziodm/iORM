@@ -271,12 +271,12 @@ inherited ViewOrder: TViewOrder
     end
   end
   inherited ActionList1: TActionList
-    object acDeleteRow: TFMXBindNavigateDelete
+    object acDeleteRow: TFMXBindNavigateDelete [3]
       Category = 'LiveBindings'
       Text = 'Delete'
       DataSource = BSRows
     end
-    object acShowCustomerSelector: TioBSShowOrSelect
+    object acShowCustomerSelector: TioBSShowOrSelect [4]
       Category = 'iORM-BS'
       Text = 'Select customer'
       Action_ParentCloseQueryAction = acBack
@@ -286,7 +286,7 @@ inherited ViewOrder: TViewOrder
       VVMTypeAlias = 'LIST'
       ViewContextBy = vcByDefaultViewContextProvider
     end
-    object acShowPizzaSelector: TioBSShowOrSelect
+    object acShowPizzaSelector: TioBSShowOrSelect [5]
       Category = 'iORM-BS'
       Text = 'Select pizza'
       Action_ParentCloseQueryAction = acBack

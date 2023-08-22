@@ -16,11 +16,14 @@ type
     ButtonSave: TSpeedButton;
     RectangleTitle: TRectangle;
     LabelTitle: TLabel;
-    ButtonBack: TSpeedButton;
     acPersist: TioBSPersistencePersist;
     BSMaster: TioPrototypeBindSourceMaster;
     acBack: TioBSCloseQuery;
     acRevertOrDelete: TioBSPersistenceRevertOrDelete;
+    ButtonBack: TSpeedButton;
+    ButtonETM: TSpeedButton;
+    acShowETM: TioBSShowOrSelect;
+    procedure acShowETMExecute(Sender: TObject);
   private
   public
   end;
@@ -28,5 +31,10 @@ type
 implementation
 
 {$R *.fmx}
+
+procedure TViewBaseForForm.acShowETMExecute(Sender: TObject);
+begin
+  ShowMessage('Ciao');
+end;
 
 end.

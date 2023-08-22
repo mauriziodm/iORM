@@ -324,7 +324,7 @@ begin
   if Assigned(LMasterBindSource.Where) then
     LMasterBindSource.Where.SetETMfor(AETMfor);
   // If the adapter is present then set even to it
-  if LMasterBindSource.CheckAdapter then
+  if LMasterBindSource.CheckAdapter and Assigned(LMasterBindSource.GetActiveBindSourceAdapter) then
     LMasterBindSource.GetActiveBindSourceAdapter.ioWhere.SetETMfor(AETMfor);
   // Register itself into the DetailBindSourceContainer of the AETMfor bind source
   if Assigned(AETMfor) then

@@ -19,7 +19,9 @@ uses
   View.Order.List in 'View.Order.List.pas' {ViewOrderList: TFrame},
   View.Where.OrderHistory in 'View.Where.OrderHistory.pas' {ViewOrderHistory: TFrame},
   Where.Order in '..\common_model\Where.Order.pas',
-  Where.Pizza in '..\common_model\Where.Pizza.pas';
+  Where.Pizza in '..\common_model\Where.Pizza.pas',
+  ETM.Repository in '..\common_model\ETM.Repository.pas',
+  View.ETM in 'View.ETM.pas' {EtmView: TFrame};
 
 {$R *.res}
 {$STRONGLINKTYPES ON}

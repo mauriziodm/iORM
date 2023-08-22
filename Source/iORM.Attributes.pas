@@ -951,7 +951,7 @@ begin
   Result := io.Enums.OrdinalToString<TioEtmEventType>(Ord(FEventType));
   // Conflict type
   if FConflictType > ctNoConflict then
-    Result := Format('%s (%s)', [Result, io.Enums.OrdinalToString<TioEtmEventType>(Ord(FEventType))]);
+    Result := Format('%s (%s)', [Result, io.Enums.OrdinalToString<TioEtmConflictType>(Ord(FConflictType))]);
 end;
 
 function TioEtmCustomTimeSlot.Diff(const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean): String;
@@ -1003,10 +1003,15 @@ function TioEtmCustomTimeSlot.GetSmartDescription: String;
 var
   LFormatSettings: TFormatSettings;
   LDateAndTime: String;
+  LSmartUser: String;
 begin
   LFormatSettings := TFormatSettings.Create;
   LDateAndTime := DateTimeToStr(FDateAndTime, LFormatSettings);
-  Result := Format('%s %s user %s', [LDateAndTime, GetSmartEventType, GetSmartUser]);
+  Result := Format('%s %s', [LDateAndTime, GetSmartEventType]);
+  // User
+  LSmartUser := GetSmartUser;
+  if not LSmartUser.IsEmpty then
+    Result := Format('%s user %s', [Result, GetSmartUser]);
 end;
 
 function TioEtmCustomTimeSlot.GetSmartFullDescription: String;

@@ -36,7 +36,7 @@ type
     ButtonRevert: TSpeedButton;
     DS_ETMDiffOneWay: TStringField;
     PanelDiff: TPanel;
-    Diff: TDBMemo;
+    DiffMemo: TDBMemo;
     Label3: TLabel;
     acEtmRevertToVersion: TioBS_ETM_RevertToBindSource;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);

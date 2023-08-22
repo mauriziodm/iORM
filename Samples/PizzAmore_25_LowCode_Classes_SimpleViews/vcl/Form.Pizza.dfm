@@ -99,6 +99,7 @@ object PizzaForm: TPizzaForm
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
+    ExplicitWidth = 405
     DesignSize = (
       409
       40)
@@ -119,7 +120,7 @@ object PizzaForm: TPizzaForm
     object LabelTitle: TLabel
       Left = 56
       Top = 7
-      Width = 238
+      Width = 234
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -160,6 +161,8 @@ object PizzaForm: TPizzaForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
+    ExplicitTop = 459
+    ExplicitWidth = 405
     object ButtonRevert: TSpeedButton
       Left = 0
       Top = 0
@@ -311,7 +314,7 @@ object PizzaForm: TPizzaForm
     end
     object acShowETM: TioBSShowOrSelect
       Category = 'iORM - BS'
-      Caption = 'Time line'
+      Caption = 'Timeline'
       Action_ParentCloseQueryAction = acBack
       EntityTypeName = 'TEtmRepository'
       ShowMode = smEntityTypeNameAsETM

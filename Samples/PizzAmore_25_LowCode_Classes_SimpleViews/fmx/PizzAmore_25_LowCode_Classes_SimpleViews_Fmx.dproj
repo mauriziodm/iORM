@@ -251,6 +251,12 @@
         </DCCReference>
         <DCCReference Include="..\common_model\Where.Order.pas"/>
         <DCCReference Include="..\common_model\Where.Pizza.pas"/>
+        <DCCReference Include="..\common_model\ETM.Repository.pas"/>
+        <DCCReference Include="View.ETM.pas">
+            <Form>EtmView</Form>
+            <FormType>fmx</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

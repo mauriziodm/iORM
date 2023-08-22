@@ -1,0 +1,263 @@
+object EtmView: TEtmView
+  Size.Width = 400.000000000000000000
+  Size.Height = 600.000000000000000000
+  Size.PlatformDefault = False
+  object RectangleTitle: TRectangle
+    Align = Top
+    Fill.Color = claOrange
+    Size.Width = 400.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    Stroke.Kind = None
+    object LabelTitle: TLabel
+      Align = Client
+      StyledSettings = [Family]
+      Size.Width = 310.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'toollabel'
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claDarkslategray
+      TextSettings.HorzAlign = Center
+      Text = 'Entity Time Machine'
+      TabOrder = 0
+    end
+    object ButtonRevert: TSpeedButton
+      Action = acEtmRevertToVersion
+      Align = Right
+      Enabled = True
+      StyledSettings = [Family, Size, Style]
+      ImageIndex = -1
+      Position.X = 350.000000000000000000
+      Size.Width = 50.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'donetoolbutton'
+      TextSettings.FontColor = claDarkslategray
+    end
+    object ButtonBack: TSpeedButton
+      Action = acBack
+      Align = Left
+      Enabled = True
+      StyledSettings = [Family, Size, Style]
+      ImageIndex = -1
+      Size.Width = 40.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'priortoolbutton'
+      TextSettings.FontColor = claAliceblue
+    end
+  end
+  object Rectangle1: TRectangle
+    Align = Top
+    Fill.Color = claOrange
+    Position.Y = 40.000000000000000000
+    Size.Width = 400.000000000000000000
+    Size.Height = 30.000000000000000000
+    Size.PlatformDefault = False
+    Stroke.Kind = None
+    object Label1: TLabel
+      Align = Left
+      StyledSettings = [Family]
+      Margins.Left = 5.000000000000000000
+      Position.X = 5.000000000000000000
+      Size.Width = 76.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'toollabel'
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claDarkslategray
+      Text = 'Timeline for'
+      TabOrder = 3
+    end
+    object LabelTimeLineFor: TLabel
+      Align = Left
+      StyledSettings = [Family]
+      Margins.Left = 5.000000000000000000
+      Position.X = 86.000000000000000000
+      Size.Width = 35.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'toollabel'
+      TextSettings.FontColor = claDarkslategray
+      Text = '- - -'
+      TabOrder = 1
+    end
+    object LabelID: TLabel
+      Align = Right
+      StyledSettings = [Family]
+      Margins.Left = 5.000000000000000000
+      Position.X = 365.000000000000000000
+      Size.Width = 35.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'toollabel'
+      TextSettings.FontColor = claDarkslategray
+      Text = '- - -'
+      TabOrder = 0
+    end
+    object Label3: TLabel
+      Align = Right
+      StyledSettings = [Family]
+      Margins.Left = 5.000000000000000000
+      Position.X = 340.000000000000000000
+      Size.Width = 20.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'toollabel'
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claDarkslategray
+      Text = 'ID'
+      TabOrder = 2
+    end
+  end
+  object LayoutDiff: TLayout
+    Align = Bottom
+    Position.Y = 250.000000000000000000
+    Size.Width = 400.000000000000000000
+    Size.Height = 350.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    object Label2: TLabel
+      Align = Top
+      StyledSettings = [Family]
+      Margins.Left = 5.000000000000000000
+      Position.X = 5.000000000000000000
+      Size.Width = 395.000000000000000000
+      Size.Height = 20.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'toollabel'
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claDarkslategray
+      TextSettings.HorzAlign = Center
+      Text = 'differences between the actual version and the selected one'
+      TabOrder = 3
+    end
+    object DiffMemo: TMemo
+      Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+      DataDetectorTypes = []
+      StyledSettings = [Family, Style, FontColor]
+      TextSettings.Font.Size = 10.000000000000000000
+      Align = Client
+      Size.Width = 400.000000000000000000
+      Size.Height = 330.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 4
+      Viewport.Width = 396.000000000000000000
+      Viewport.Height = 326.000000000000000000
+    end
+  end
+  object GridETM: TStringGrid
+    Align = Client
+    CanFocus = True
+    ClipChildren = True
+    Size.Width = 400.000000000000000000
+    Size.Height = 180.000000000000000000
+    Size.PlatformDefault = False
+    TextSettings.HorzAlign = Center
+    TabOrder = 3
+    Viewport.Width = 380.000000000000000000
+    Viewport.Height = 155.000000000000000000
+  end
+  object BS_ETM: TioPrototypeBindSourceMaster
+    FieldDefs = <
+      item
+        Name = 'EntityID'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
+      end
+      item
+        Name = 'EntityClassName'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'SmartDescription'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'SmartEntityVersion'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'DiffOneWay'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end>
+    ScopeMappings = <>
+    AsDefault = True
+    TypeName = 'TEtmRepository'
+    Paging.CurrentPageOfFormat = '%d/%d'
+    Left = 64
+    Top = 162
+  end
+  object BindingsList1: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 20
+    Top = 101
+    object LinkGridToDataSourceBS_ETM: TLinkGridToDataSource
+      Category = 'Quick Bindings'
+      DataSource = BS_ETM
+      GridControl = GridETM
+      Columns = <
+        item
+          MemberName = 'SmartDescription'
+          ReadOnly = True
+          Header = 'Time slot'
+          Width = 250
+          Alignment = taLeftJustify
+        end
+        item
+          MemberName = 'SmartEntityVersion'
+          ReadOnly = True
+          Header = 'Version'
+          Width = 120
+          Alignment = taCenter
+        end>
+    end
+    object LinkControlToField1: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BS_ETM
+      FieldName = 'DiffOneWay'
+      Control = DiffMemo
+      Track = False
+    end
+    object LinkPropertyToFieldText: TLinkPropertyToField
+      Category = 'Quick Bindings'
+      DataSource = BS_ETM
+      FieldName = 'EntityID'
+      Component = LabelID
+      ComponentProperty = 'Text'
+    end
+    object LinkPropertyToFieldText2: TLinkPropertyToField
+      Category = 'Quick Bindings'
+      DataSource = BS_ETM
+      FieldName = 'EntityClassName'
+      Component = LabelTimeLineFor
+      ComponentProperty = 'Text'
+    end
+  end
+  object ActionList1: TActionList
+    Left = 160
+    Top = 162
+    object acBack: TioBSCloseQuery
+      Category = 'iORM - BS'
+      Text = 'acBack'
+      OnUpdateScope = usGlobal
+      TargetBindSource = BS_ETM
+    end
+    object acEtmRevertToVersion: TioBS_ETM_RevertToBindSource
+      Category = 'iORM - BS - ETM'
+      Text = 'Revert'
+      AutoExec_OnETMfor_AfterRevert = doRefresh
+      AutoExec_OnTargetBS_AfterRevert = doReload
+      AutoExec_Persist_AfterRevert = True
+      TargetBindSource = BS_ETM
+    end
+  end
+end

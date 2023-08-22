@@ -55,7 +55,7 @@ object EtmForm: TEtmForm
     object LabelTitle: TLabel
       Left = 88
       Top = 7
-      Width = 365
+      Width = 409
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -67,7 +67,6 @@ object EtmForm: TEtmForm
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
-      ExplicitWidth = 409
     end
     object ButtonRevert: TSpeedButton
       Left = 538
@@ -96,13 +95,13 @@ object EtmForm: TEtmForm
     TabOrder = 1
     ExplicitWidth = 584
     object Label1: TLabel
-      Left = -1
+      Left = -5
       Top = 10
       Width = 110
       Height = 25
       Alignment = taRightJustify
       AutoSize = False
-      Caption = 'Time line for'
+      Caption = 'Timeline for'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clNavy
       Font.Height = -16
@@ -126,9 +125,9 @@ object EtmForm: TEtmForm
       ParentFont = False
     end
     object DBTextEntityClassName: TDBText
-      Left = 128
+      Left = 121
       Top = 10
-      Width = 257
+      Width = 262
       Height = 25
       DataField = 'EntityClassName'
       DataSource = SourceETM
@@ -255,7 +254,7 @@ object EtmForm: TEtmForm
       Font.Style = [fsBold]
       ParentFont = False
     end
-    object Diff: TDBMemo
+    object DiffMemo: TDBMemo
       Left = 0
       Top = 20
       Width = 588
