@@ -18,7 +18,7 @@ type
     FCity: String;
     FAddress: String;
     FPhoneNumber: String;
-    FObjVersion: TioObjVersion;
+    FObjVersion: TioObjVersion; // The ObjVersion is mandatory if you want to use the ETM
     function GetFullAddress: String;
   public
     property ID: Integer read FID write FID;

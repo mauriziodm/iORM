@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, View.BaseForForm, iORM, iORM.Attributes, iORM.CommonTypes, iORM.MVVM.Interfaces, Data.DB, iORM.MVVM.ViewModelBridge,
   iORM.DB.DataSet.Base, iORM.MVVM.ModelDataSet, System.Actions, Vcl.ActnList, iORM.StdActions.Vcl, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.Mask,
-  Vcl.DBCtrls, Model.Customer;
+  Vcl.DBCtrls, Model.Customer, Vcl.Grids, Vcl.DBGrids, Vcl.ComCtrls;
 
 type
 
@@ -27,6 +27,23 @@ type
     MDSMasterPhoneNumber: TStringField;
     MDSMasterCity: TStringField;
     MDSMasterAddress: TStringField;
+    PanelETM: TPanel;
+    PageControl1: TPageControl;
+    TabSheet1: TTabSheet;
+    GridCustomers: TDBGrid;
+    TabSheet2: TTabSheet;
+    DiffMemo: TDBMemo;
+    BS_ETM: TioModelDataSet;
+    SourceETM: TDataSource;
+    ButtonRevertToVersion: TButton;
+    BS_ETMDateAndTime: TDateTimeField;
+    BS_ETMEntityClassName: TStringField;
+    BS_ETMEntityID: TIntegerField;
+    BS_ETMSmartEntityVersion: TStringField;
+    BS_ETMSmartUser: TStringField;
+    BS_ETMSmartEventType: TStringField;
+    BS_ETMDiffOneWay: TStringField;
+    acEtmRevertToVersion: TioViewAction;
   private
   public
   end;

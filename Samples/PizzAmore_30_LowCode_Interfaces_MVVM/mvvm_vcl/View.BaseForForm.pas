@@ -23,6 +23,8 @@ type
     BSMaster: TioModelDataSet;
     VMBridge: TioViewModelBridge;
     SourceMaster: TDataSource;
+    ButtonETM: TSpeedButton;
+    acShowETM: TioViewAction;
   private
   public
   end;

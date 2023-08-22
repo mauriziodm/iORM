@@ -45,7 +45,7 @@ type
     TabSheet1: TTabSheet;
     GridCustomers: TDBGrid;
     TabSheet2: TTabSheet;
-    Diff: TDBMemo;
+    DiffMemo: TDBMemo;
     SourceETM: TDataSource;
     DS_ETM: TioDataSetMaster;
     DS_ETMDateAndTime: TDateTimeField;
@@ -55,7 +55,7 @@ type
     DS_ETMSmartUser: TStringField;
     DS_ETMSmartEventType: TStringField;
     DS_ETMDiffOneWay: TStringField;
-    Button1: TButton;
+    ButtonRevertToVersion: TButton;
     acEtmRevertToVersion: TioBS_ETM_RevertToBindSource;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private

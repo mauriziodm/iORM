@@ -31,4 +31,14 @@ object VMBaseForForm: TVMBaseForForm
     Left = 192
     Top = 184
   end
+  object acShowETM: TioVMActionBSShowOrSelect
+    Name = 'acShowETM'
+    Action_ParentCloseQueryAction = acBack
+    EntityTypeName = 'TEtmRepository'
+    ShowMode = smEntityTypeNameAsETM
+    TargetBindSource = BSMaster
+    ViewContextBy = vcByDefaultViewContextProvider
+    Left = 336
+    Top = 48
+  end
 end

@@ -19,7 +19,7 @@ type
     FRows: TObjectList<TOrderRow>;
     FNote: String;
     FOrderState: TOrderState;
-    FObjVersion: TioObjVersion;
+    FObjVersion: TioObjVersion; // The ObjVersion is mandatory if you want to use the ETM
     function GetGrandTotal: Currency;
   public
     constructor Create;

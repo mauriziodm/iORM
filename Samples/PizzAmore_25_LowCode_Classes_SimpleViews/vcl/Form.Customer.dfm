@@ -255,7 +255,7 @@ object CustomerForm: TCustomerForm
     object LabelTitle: TLabel
       Left = 72
       Top = 7
-      Width = 433
+      Width = 429
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -366,7 +366,7 @@ object CustomerForm: TCustomerForm
       object TabSheet2: TTabSheet
         Caption = 'Diff'
         ImageIndex = 1
-        object Diff: TDBMemo
+        object DiffMemo: TDBMemo
           Left = 0
           Top = 0
           Width = 580
@@ -386,15 +386,15 @@ object CustomerForm: TCustomerForm
       end
     end
   end
-  object Button1: TButton
-    Left = 423
+  object ButtonRevertToVersion: TButton
+    Left = 419
     Top = 242
     Width = 121
     Height = 20
     Action = acEtmRevertToVersion
     Anchors = [akTop, akRight]
     TabOrder = 8
-    ExplicitLeft = 419
+    ExplicitLeft = 415
   end
   object DSCustomer: TioDataSetMaster
     AsDefault = True

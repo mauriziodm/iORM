@@ -11,6 +11,8 @@ type
 
   [diViewModelFor(TCustomer)]
   TVMCustomer = class(TVMBaseForForm)
+    BS_ETM: TioModelPresenterMaster;
+    AcEtmRevertToVersion: TioVMActionBS_ETM_RevertToBindSource;
   private
   public
   end;

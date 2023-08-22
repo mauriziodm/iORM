@@ -34,7 +34,10 @@ uses
   Where.Order in '..\common_model\Where.Order.pas',
   Where.Pizza in '..\common_model\Where.Pizza.pas',
   VM.Where.OrderHistory in '..\mvvm_common_vm\VM.Where.OrderHistory.pas' {VMWhereOrderHistory: TioViewModel},
-  View.Where.OrderHistory in 'View.Where.OrderHistory.pas' {ViewWhereOrderHistory: TFrame};
+  View.Where.OrderHistory in 'View.Where.OrderHistory.pas' {ViewWhereOrderHistory: TFrame},
+  ETM.Repository in '..\common_model\ETM.Repository.pas',
+  VM.ETM in '..\mvvm_common_vm\VM.ETM.pas' {VM_ETM: TioViewModel},
+  View.ETM in 'View.ETM.pas' {ViewETM: TFrame};
 
 {$R *.res}
 {$STRONGLINKTYPES ON}

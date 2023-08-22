@@ -60,6 +60,21 @@ object ViewBaseForForm: TViewBaseForForm
         Layout = tlCenter
         ExplicitWidth = 689
       end
+      object ButtonETM: TSpeedButton
+        Left = 739
+        Top = 0
+        Width = 60
+        Height = 40
+        Action = acShowETM
+        Align = alRight
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clNavy
+        Font.Height = -13
+        Font.Name = 'Segoe UI'
+        Font.Style = []
+        ParentFont = False
+        ExplicitLeft = 749
+      end
     end
     object PanelBottom: TPanel
       Left = 0
@@ -128,6 +143,13 @@ object ViewBaseForForm: TViewBaseForForm
       Enabled = True
       Visible = True
       VMActionName = 'acRevert'
+    end
+    object acShowETM: TioViewAction
+      Category = 'iORM - MVVM'
+      Caption = 'Timeline'
+      Enabled = True
+      Visible = True
+      VMActionName = 'acShowETM'
     end
   end
   object BSMaster: TioModelDataSet

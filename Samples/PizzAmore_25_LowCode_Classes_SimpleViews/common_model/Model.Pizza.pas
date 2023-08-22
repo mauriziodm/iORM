@@ -22,7 +22,7 @@ type
     FPrice: Currency;
     [ioSkip([ssETM])]
     FImage: TBitmap;
-    FObjVersion: TioObjVersion;
+    FObjVersion: TioObjVersion; // The ObjVersion is mandatory if you want to use the ETM
   public
     constructor Create;
     destructor Destroy; override;

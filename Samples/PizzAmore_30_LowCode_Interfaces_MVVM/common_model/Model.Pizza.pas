@@ -10,11 +10,11 @@ uses
 {$ELSE}
   Vcl.Graphics,
 {$IFEND}
-  iORM, Model.Interfaces, DJSON.Attributes;
+  iORM, Model.Interfaces, DJSON.Attributes, ETM.Repository;
 
 type
 
-  [ioEntity('PIZZAS'), diImplements(IPizza)]
+  [ioEntity('PIZZAS'), diImplements(IPizza), etmTrace(TEtmRepository)]
   TPizza = class(TInterfacedObject, IPizza)
   private
     FID: Integer;
@@ -22,6 +22,7 @@ type
     FPrice: Currency;
     [ioSkip([ssETM])]
     FImage: TBitmap;
+    FObjVersion: TioObjVersion; // The ObjVersion is mandatory if you want to use the ETM
     // ID property
     function GetID: Integer;
     // Name property

@@ -19,6 +19,7 @@ type
     acPersist: TioVMActionBSPersistencePersist;
     acBack: TioVMActionBSCloseQuery;
     acRevert: TioVMActionBSPersistenceRevertOrDelete;
+    acShowETM: TioVMActionBSShowOrSelect;
   private
   public
   end;

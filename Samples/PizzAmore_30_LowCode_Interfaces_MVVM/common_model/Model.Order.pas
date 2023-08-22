@@ -3,11 +3,11 @@ unit Model.Order;
 interface
 
 uses
-  iORM, Model.Interfaces, System.Generics.Collections;
+  iORM, Model.Interfaces, System.Generics.Collections, ETM.Repository;
 
 type
 
-  [ioEntity('ORDERS'), diImplements(IOrder)]
+  [ioEntity('ORDERS'), diImplements(IOrder), etmTrace(TEtmRepository)]
   TOrder = class(TInterfacedObject, IOrder)
   private
     FID: Integer;
@@ -16,6 +16,7 @@ type
     FCustomer: ICustomer;
     FRows: TList<IOrderRow>;
     FNote: String;
+    FObjVersion: TioObjVersion; // The ObjVersion is mandatory if you want to use the ETM
     // ID property
     function GetID: Integer;
     // OrderDate property

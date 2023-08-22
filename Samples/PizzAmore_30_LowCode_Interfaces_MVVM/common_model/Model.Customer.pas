@@ -3,11 +3,11 @@ unit Model.Customer;
 interface
 
 uses
-  iORM, iORM.Attributes, Model.Interfaces;
+  iORM, iORM.Attributes, Model.Interfaces, ETM.Repository;
 
 type
 
-  [ioEntity('CUSTOMERS'), diImplements(ICustomer)]
+  [ioEntity('CUSTOMERS'), diImplements(ICustomer), etmTrace(TEtmRepository)]
   TCustomer = class(TInterfacedObject, ICustomer)
   private
     FID: Integer;
@@ -17,6 +17,7 @@ type
     FCity: String;
     FAddress: String;
     FPhoneNumber: String;
+    FObjVersion: TioObjVersion;
     // ID property
     procedure SetID(const AValue: Integer);
     function GetID: Integer;

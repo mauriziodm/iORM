@@ -10,12 +10,6 @@ Coordinates=363,111,66,36
 [acPersist]
 Coordinates=363,166,68,36
 
-[ButtonRevert]
-Coordinates=100,256,90,36
-
-[PanelBottom]
-Coordinates=455,10,88,58
-
 [MDSMaster]
 Coordinates=10,10,86,168
 Visible=True
@@ -59,9 +53,6 @@ Coordinates=549,188,88,36
 [DBEditID]
 Coordinates=472,188,67,36
 
-[ButtonPersist]
-Coordinates=371,188,91,36
-
 [MDSMasterPhoneNumber]
 Coordinates=491,166,164,36
 
@@ -87,5 +78,5 @@ Coordinates=374,10,71,58
 Coordinates=73,188,75,58
 
 []
-Coordinates=505,331,91,36
+Coordinates=455,10,88,58
 
