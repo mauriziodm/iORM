@@ -20,7 +20,7 @@ type
     FID: Integer;
     FName: String;
     FPrice: Currency;
-    [djSkip]
+    [ioSkip([ssETM])]
     FImage: TBitmap;
     // ID property
     function GetID: Integer;

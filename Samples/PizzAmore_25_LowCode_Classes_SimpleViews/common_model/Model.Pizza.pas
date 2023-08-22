@@ -20,6 +20,7 @@ type
     FID: Integer;
     FName: String;
     FPrice: Currency;
+    [ioSkip([ssETM])]
     FImage: TBitmap;
     FObjVersion: TioObjVersion;
   public

@@ -168,6 +168,11 @@ const
   ssSaveRevertPoint = DJSON.Params.TdjSkipScope.ssSaveRevertPoint;
   ssDJSON = DJSON.Params.TdjSkipScope.ssDJSON;
 
+  // TioStdAction_ETM_AutoExec_AfterRevert = (doNothing, doRefresh, doReload);
+  doNothing = iORM.CommonTypes.doNothing;
+  doRefresh = iORM.CommonTypes.doRefresh;
+  doReload = iORM.CommonTypes.doReload;
+
 {$ENDREGION}
 
 type

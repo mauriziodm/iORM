@@ -298,7 +298,7 @@ object EtmForm: TEtmForm
     end
     object DS_ETMDiffOneWay: TStringField
       FieldName = 'DiffOneWay'
-      Size = 65535
+      Size = 99999
     end
   end
   object SourceETM: TDataSource

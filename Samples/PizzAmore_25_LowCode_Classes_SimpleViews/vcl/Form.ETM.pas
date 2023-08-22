@@ -34,11 +34,11 @@ type
     ActionList1: TActionList;
     acBack: TioBSCloseQuery;
     ButtonRevert: TSpeedButton;
-    DS_ETMDiffOneWay: TStringField;
     PanelDiff: TPanel;
     DiffMemo: TDBMemo;
     Label3: TLabel;
     acEtmRevertToVersion: TioBS_ETM_RevertToBindSource;
+    DS_ETMDiffOneWay: TStringField;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
   public
