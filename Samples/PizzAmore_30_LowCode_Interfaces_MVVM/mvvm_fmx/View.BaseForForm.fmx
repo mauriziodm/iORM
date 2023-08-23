@@ -34,6 +34,19 @@ object ViewBaseForForm: TViewBaseForForm
         StyleLookup = 'priortoolbutton'
         TextSettings.FontColor = claAliceblue
       end
+      object ButtonETM: TSpeedButton
+        Action = acShowETM
+        Align = Right
+        Enabled = True
+        StyledSettings = [Family, Size, Style]
+        ImageIndex = -1
+        Position.X = 340.000000000000000000
+        Size.Width = 60.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'donetoolbutton'
+        TextSettings.FontColor = claDarkslategray
+      end
     end
   end
   object Rectangle1: TRectangle
@@ -96,6 +109,14 @@ object ViewBaseForForm: TViewBaseForForm
       Visible = True
       Caption = 'Revert'
       VMActionName = 'acRevert'
+    end
+    object acShowETM: TioViewAction
+      Category = 'iORM - MVVM'
+      Text = 'Timeline'
+      Enabled = True
+      Visible = True
+      Caption = 'Timeline'
+      VMActionName = 'acShowETM'
     end
   end
   object VMBridge: TioViewModelBridge

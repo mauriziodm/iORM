@@ -23,6 +23,8 @@ type
     acRevert: TioViewAction;
     VMBridge: TioViewModelBridge;
     BSMaster: TioModelBindSource;
+    ButtonETM: TSpeedButton;
+    acShowETM: TioViewAction;
   private
   public
   end;

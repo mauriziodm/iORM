@@ -257,6 +257,7 @@
         <DCCReference Include="..\common_model\Where.Interfaces.pas"/>
         <DCCReference Include="..\common_model\Where.Order.pas"/>
         <DCCReference Include="..\common_model\Where.Pizza.pas"/>
+        <DCCReference Include="..\common_model\ETM.Repository.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

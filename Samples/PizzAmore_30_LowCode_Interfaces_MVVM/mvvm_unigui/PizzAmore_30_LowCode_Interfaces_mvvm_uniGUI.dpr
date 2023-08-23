@@ -36,7 +36,8 @@ uses
   VM.Pizza.List in '..\mvvm_common_vm\VM.Pizza.List.pas' {VMPizzaList: TioViewModel},
   Where.Interfaces in '..\common_model\Where.Interfaces.pas',
   Where.Order in '..\common_model\Where.Order.pas',
-  Where.Pizza in '..\common_model\Where.Pizza.pas';
+  Where.Pizza in '..\common_model\Where.Pizza.pas',
+  ETM.Repository in '..\common_model\ETM.Repository.pas';
 
 {$R *.res}
 {$STRONGLINKTYPES ON}
