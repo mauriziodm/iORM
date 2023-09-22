@@ -55,7 +55,7 @@ object EtmForm: TEtmForm
     object LabelTitle: TLabel
       Left = 88
       Top = 7
-      Width = 405
+      Width = 397
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]

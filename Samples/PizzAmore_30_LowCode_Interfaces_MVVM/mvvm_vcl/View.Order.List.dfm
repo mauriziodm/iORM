@@ -1,8 +1,7 @@
 inherited ViewOrderList: TViewOrderList
-  inherited PanelTop: TPanel
-    inherited LabelTitle: TLabel
+  inherited PanelTop: TUniPanel
+    inherited LabelTitle: TUniLabel
       Caption = 'Orders'
-      ExplicitWidth = 50
     end
   end
   object GridOrders: TDBGrid [2]
@@ -105,12 +104,12 @@ inherited ViewOrderList: TViewOrderList
         Visible = True
       end>
   end
-  inherited PanelWhere: TPanel
+  inherited PanelWhere: TUniPanel
     Top = 464
     Height = 96
-    ExplicitTop = 458
+    ExplicitTop = 464
     ExplicitHeight = 96
-    object ButtonHistory: TSpeedButton [1]
+    object ButtonHistory: TSpeedButton [0]
       Left = 750
       Top = 44
       Width = 50
@@ -124,7 +123,7 @@ inherited ViewOrderList: TViewOrderList
       Font.Style = []
       ParentFont = False
     end
-    object Label1: TLabel [2]
+    object Label1: TLabel [1]
       Left = 9
       Top = 7
       Width = 17
@@ -139,7 +138,7 @@ inherited ViewOrderList: TViewOrderList
       Font.Style = [fsBold]
       ParentFont = False
     end
-    object Label3: TLabel [3]
+    object Label3: TLabel [2]
       Left = 105
       Top = 7
       Width = 54
@@ -154,7 +153,7 @@ inherited ViewOrderList: TViewOrderList
       Font.Style = [fsBold]
       ParentFont = False
     end
-    object Label5: TLabel [4]
+    object Label5: TLabel [3]
       Left = -5
       Top = 41
       Width = 51
@@ -169,7 +168,7 @@ inherited ViewOrderList: TViewOrderList
       Font.Style = [fsBold]
       ParentFont = False
     end
-    object Shape1: TShape [5]
+    object Shape1: TShape [4]
       Left = 528
       Top = 6
       Width = 1
@@ -177,7 +176,7 @@ inherited ViewOrderList: TViewOrderList
       Anchors = [akTop, akRight]
       Pen.Color = clGray
     end
-    object Label4: TLabel [6]
+    object Label4: TLabel [5]
       Left = 551
       Top = 41
       Width = 63
@@ -193,7 +192,7 @@ inherited ViewOrderList: TViewOrderList
       Font.Style = [fsBold]
       ParentFont = False
     end
-    object Label2: TLabel [7]
+    object Label2: TLabel [6]
       Left = 535
       Top = 7
       Width = 79
@@ -209,11 +208,7 @@ inherited ViewOrderList: TViewOrderList
       Font.Style = [fsBold]
       ParentFont = False
     end
-    inherited ButtonClear: TSpeedButton
-      Top = 68
-      ExplicitTop = 68
-    end
-    object Label6: TLabel
+    object Label6: TLabel [7]
       Left = 278
       Top = 41
       Width = 86
@@ -228,7 +223,7 @@ inherited ViewOrderList: TViewOrderList
       Font.Style = [fsBold]
       ParentFont = False
     end
-    object Label7: TLabel
+    object Label7: TLabel [8]
       Left = 9
       Top = 73
       Width = 86
@@ -242,6 +237,14 @@ inherited ViewOrderList: TViewOrderList
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
+    end
+    inherited PanelWhereButtons: TUniPanel
+      Height = 96
+      TabOrder = 8
+      inherited ButtonClear: TUniSpeedButton
+        Top = 56
+        ExplicitTop = 56
+      end
     end
     object DBEditWhereID: TDBEdit
       Left = 54

@@ -255,7 +255,7 @@ object CustomerForm: TCustomerForm
     object LabelTitle: TLabel
       Left = 72
       Top = 7
-      Width = 429
+      Width = 425
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -387,14 +387,14 @@ object CustomerForm: TCustomerForm
     end
   end
   object ButtonRevertToVersion: TButton
-    Left = 419
+    Left = 415
     Top = 242
     Width = 121
     Height = 20
     Action = acEtmRevertToVersion
     Anchors = [akTop, akRight]
     TabOrder = 8
-    ExplicitLeft = 415
+    ExplicitLeft = 411
   end
   object DSCustomer: TioDataSetMaster
     AsDefault = True

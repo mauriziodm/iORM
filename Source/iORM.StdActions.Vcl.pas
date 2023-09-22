@@ -53,10 +53,10 @@ type
     FVisibleLinkedToVMAction: Boolean;
     FVMAction: IioVMAction;
     FVMActionName: String;
-    FOnBeforeExecute: TNotifyEvent;
-    FOnAfterExecute: TNotifyEvent;
-    FOnBeforeUpdate: TNotifyEvent;
-    FOnAfterUpdate: TNotifyEvent;
+    FBeforeExecute: TNotifyEvent;
+    FAfterExecute: TNotifyEvent;
+    FBeforeUpdate: TNotifyEvent;
+    FAfterUpdate: TNotifyEvent;
     function Get_Version: String;
   strict protected
     procedure _ExecuteEmbeddedEvendHandler(Sender: TObject);
@@ -110,10 +110,10 @@ type
     property VMActionName: String read GetVMActionName write SetVMActionName;
     property _Version: String read Get_Version;
     // Events
-    property OnAfterExecute: TNotifyEvent read FOnAfterExecute write FOnAfterExecute;
-    property OnAfterUpdate: TNotifyEvent read FOnAfterUpdate write FOnAfterUpdate;
-    property OnBeforeExecute: TNotifyEvent read FOnBeforeExecute write FOnBeforeExecute;
-    property OnBeforeUpdate: TNotifyEvent read FOnBeforeUpdate write FOnBeforeUpdate;
+    property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;
+    property AfterUpdate: TNotifyEvent read FAfterUpdate write FAfterUpdate;
+    property BeforeExecute: TNotifyEvent read FBeforeExecute write FBeforeExecute;
+    property BeforeUpdate: TNotifyEvent read FBeforeUpdate write FBeforeUpdate;
   end;
 
   // =================================================================================================
@@ -1200,26 +1200,26 @@ end;
 
 procedure TioViewAction.DoAfterExecute;
 begin
-  if Assigned(FOnAfterExecute) then
-    FOnAfterExecute(Self);
+  if Assigned(FAfterExecute) then
+    FAfterExecute(Self);
 end;
 
 procedure TioViewAction.DoAfterUpdate;
 begin
-  if Assigned(FOnAfterUpdate) then
-    FOnAfterUpdate(Self);
+  if Assigned(FAfterUpdate) then
+    FAfterUpdate(Self);
 end;
 
 procedure TioViewAction.DoBeforeExecute;
 begin
-  if Assigned(FOnBeforeExecute) then
-    FOnBeforeExecute(Self);
+  if Assigned(FBeforeExecute) then
+    FBeforeExecute(Self);
 end;
 
 procedure TioViewAction.DoBeforeUpdate;
 begin
-  if Assigned(FOnBeforeUpdate) then
-    FOnBeforeUpdate(Self);
+  if Assigned(FBeforeUpdate) then
+    FBeforeUpdate(Self);
 end;
 
 procedure TioViewAction._ExecuteEmbeddedEvendHandler(Sender: TObject);
