@@ -51,8 +51,12 @@ type
     FBindedViewActionsContainer: TList<IioViewAction>;
     FCaption: String;
     FEnabled: Boolean;
+    FExecutionMode: TioActionExecutionMode;
     FVisible: Boolean;
-    FOnExecute: TNotifyEvent;
+    // events
+    FAfterExecute: TNotifyEvent;
+    FBeforeExecute: TNotifyEvent;
+    FCanExecute: TioStdActionCanExecuteEvent;
     FOnUpdate: TNotifyEvent;
     function Get_Version: String;
     procedure _InternalExecute; virtual;
@@ -73,6 +77,10 @@ type
     procedure SetEnabled(const Value: Boolean);
     function GetEnabled: Boolean;
     property Enabled: Boolean read GetEnabled write SetEnabled default True;
+    // ExecutionMode
+    function GetExecutionMode: TioActionExecutionMode;
+    procedure SetExecutionMode(const Value: TioActionExecutionMode);
+    property ExecutionMode: TioActionExecutionMode read GetExecutionMode write SetExecutionMode;
     // Name property
     procedure SetName(const Value: TComponentName); reintroduce;
     function GetName: TComponentName;
@@ -85,7 +93,9 @@ type
     function GetVisible: Boolean;
     property Visible: Boolean read GetVisible write SetVisible default True;
     // Events
-    property OnExecute: TNotifyEvent read FOnExecute write FOnExecute;
+    property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;
+    property BeforeExecute: TNotifyEvent read FBeforeExecute write FBeforeExecute;
+    property CanExecute: TioStdActionCanExecuteEvent read FCanExecute write FCanExecute;
     property OnUpdate: TNotifyEvent read FOnUpdate write FOnUpdate;
   public
     constructor Create(AOwner: TComponent); override;
@@ -107,7 +117,9 @@ type
     property Name;
     property Visible;
     // Events
-    property OnExecute;
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
     property OnUpdate;
   end;
 
@@ -141,7 +153,9 @@ type
     property Visible;
     property _Version: String read Get_Version;
     // Events
-    property OnExecute;
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
     property OnUpdate;
   end;
 
@@ -483,9 +497,9 @@ end;
     FExecuting, FExecutingEventHandler: Boolean;
     FInjectVMEventHandler: Boolean;
     FInjectViewEventHandler: Boolean;
-    FInternalExecutionMode: TioCloseQueryActionExecutionMode;
+    FInternalExecutionMode: TioActionExecutionMode;
     FOnCloseQuery: TCloseQueryEvent;
-    FOnConfirmationRequest: TioBSCloseQueryConfirmationRequestEvent;
+    FOnConfirmationRequest: TioStdActionCanExecuteEvent;
     FOnEditingAction: TioBSCloseQueryOnEditingAction;
     FOnExecuteAction: TioBSCloseQueryOnExecuteAction;
     FOnUpdateScope: TioBSCloseQueryActionUpdateScope;
@@ -494,8 +508,8 @@ end;
     function _CanClose: Boolean;
     function _IsChildOf(const ATargetQueryAction: IioBSCloseQueryAction): Boolean;
     // InternalExecutionMode
-    function GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
-    procedure SetInternalExecutionMode(const Value: TioCloseQueryActionExecutionMode);
+    function GetInternalExecutionMode: TioActionExecutionMode;
+    procedure SetInternalExecutionMode(const Value: TioActionExecutionMode);
     // ParentCloseQueryAction
     function GetAction_ParentCloseQueryAction: IioBSCloseQueryAction;
     procedure SetAction_ParentCloseQueryAction(const Value: IioBSCloseQueryAction);
@@ -511,7 +525,7 @@ end;
     function Executing: Boolean;
     function Update: Boolean; override;
     property Action_ParentCloseQueryAction: IioBSCloseQueryAction read GetAction_ParentCloseQueryAction write SetAction_ParentCloseQueryAction;
-    property InternalExecutionMode: TioCloseQueryActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
+    property InternalExecutionMode: TioActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
   published
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
     property InjectViewEventHandler: Boolean read FInjectViewEventHandler write FInjectViewEventHandler default True;
@@ -522,7 +536,7 @@ end;
     property TargetBindSource;
     // Events
     property OnCloseQuery: TCloseQueryEvent read FOnCloseQuery write FOnCloseQuery;
-    property OnConfirmationRequest: TioBSCloseQueryConfirmationRequestEvent read FOnConfirmationRequest write FOnConfirmationRequest;
+    property OnConfirmationRequest: TioStdActionCanExecuteEvent read FOnConfirmationRequest write FOnConfirmationRequest;
   end;
 
   // =================================================================================================
@@ -596,6 +610,7 @@ uses
 constructor TioVMActionCustom.Create(AOwner: TComponent);
 begin
   inherited;
+  FExecutionMode := emActive;
   FEnabled := True;
   FVisible := True;
   FBindedViewActionsContainer := TList<IioViewAction>.Create;
@@ -633,6 +648,11 @@ begin
   Result := FEnabled;
 end;
 
+function TioVMActionCustom.GetExecutionMode: TioActionExecutionMode;
+begin
+  Result := FExecutionMode;
+end;
+
 function TioVMActionCustom.GetName: TComponentName;
 begin
   Result := inherited Name;
@@ -660,13 +680,26 @@ end;
 
 procedure TioVMActionCustom._ExecuteOriginal;
 var
+  LCanExecute: Boolean;
   LViewAction: IioViewAction;
 begin
-   // Execute the ViewAction.onBeforeExecute event
+  // Execute the CanExecute event (ActiveMode only)
+  LCanExecute := True;
+  if (FExecutionMode = emActive) and Assigned(FCanExecute) then
+    FCanExecute(Self, LCanExecute);
+  if not LCanExecute then
+    Exit;
+  // Execute the ViewAction.BeforeExecute event
   for LViewAction in FBindedViewActionsContainer do
     LViewAction.DoBeforeExecute;
+  // Execute the BeforeExecute event
+  if Assigned(FBeforeExecute) then
+    FBeforeExecute(Self);
   // Execute the VMAction.onExecute event if assigned (or a standard action)
   _InternalExecute;
+  // Execute the AfterExecute event
+  if Assigned(FAfterExecute) then
+    FAfterExecute(Self);
   // Execute the ViewAction.onAfterExecute event
   // NB: If we are on an uniGUI application then doesn't use the timers but runs the code right away
   if TioApplication.ProjectPlatform <> ppUniGUI then
@@ -767,6 +800,11 @@ begin
       if LViewAction.EnabledLinkedToVMAction then
         LViewAction.Enabled := Value;
   end;
+end;
+
+procedure TioVMActionCustom.SetExecutionMode(const Value: TioActionExecutionMode);
+begin
+  FExecutionMode := Value;
 end;
 
 procedure TioVMActionCustom.SetName(const Value: TComponentName);
@@ -1377,7 +1415,7 @@ begin
     FOnConfirmationRequest(Self, Result);
 end;
 
-procedure TioVMActionBSCloseQuery.SetInternalExecutionMode(const Value: TioCloseQueryActionExecutionMode);
+procedure TioVMActionBSCloseQuery.SetInternalExecutionMode(const Value: TioActionExecutionMode);
 begin
   FInternalExecutionMode := Value;
 end;
@@ -1398,7 +1436,7 @@ begin
   Result := FExecuting;
 end;
 
-function TioVMActionBSCloseQuery.GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
+function TioVMActionBSCloseQuery.GetInternalExecutionMode: TioActionExecutionMode;
 begin
   Result := FInternalExecutionMode;
 end;

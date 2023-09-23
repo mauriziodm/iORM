@@ -139,8 +139,8 @@ type
   TioEtmEventType = (etInsert, etUpdate, etDelete, etSynchro);
   TioEtmConflictType = (ctNoConflict, ctMasterWin, ctSlaveWin, ctLastUpdatedWin, ctManual);
 
-  // CloseQueryAction related types
-  TioBSCloseQueryConfirmationRequestEvent = procedure(Sender: TObject; var CanClose: Boolean) of object;
+  // StdActions related types
+  TioStdActionCanExecuteEvent = procedure(Sender: TObject; var CanExecute: Boolean) of object;
   TioBSCloseQueryActionUpdateScope = (usLocal, usDisableIfChilds, usGlobal);
   TioBSCloseQueryOnEditingAction = (eaDisable, eaAutoPersist, eaAutoRevert);
   TioBSCloseQueryOnExecuteAction = (eaClose, eaTerminateApplication);

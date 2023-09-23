@@ -527,9 +527,9 @@ type
   strict private
     FExecuting, FExecutingEventHandler: Boolean;
     FInjectEventHandler: Boolean;
-    FInternalExecutionMode: TioCloseQueryActionExecutionMode;
+    FInternalExecutionMode: TioActionExecutionMode;
     FOnCloseQuery: TCloseQueryEvent;
-    FOnConfirmationRequest: TioBSCloseQueryConfirmationRequestEvent;
+    FOnConfirmationRequest: TioStdActionCanExecuteEvent;
     FOnEditingAction: TioBSCloseQueryOnEditingAction;
     FOnExecuteAction: TioBSCloseQueryOnExecuteAction;
     FOnUpdateScope: TioBSCloseQueryActionUpdateScope;
@@ -539,8 +539,8 @@ type
     function _CanClose: Boolean;
     function _IsChildOf(const ATargetQueryAction: IioBSCloseQueryAction): Boolean;
     // InternalExecutionMode
-    function GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
-    procedure SetInternalExecutionMode(const Value: TioCloseQueryActionExecutionMode);
+    function GetInternalExecutionMode: TioActionExecutionMode;
+    procedure SetInternalExecutionMode(const Value: TioActionExecutionMode);
     // ParentCloseQueryAction
     function GetAction_ParentCloseQueryAction: IioBSCloseQueryAction;
     procedure SetAction_ParentCloseQueryAction(const Value: IioBSCloseQueryAction);
@@ -557,7 +557,7 @@ type
     function Execute: Boolean; override;
     function Executing: Boolean;
     procedure UpdateTarget(Target: TObject); override;
-    property InternalExecutionMode: TioCloseQueryActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
+    property InternalExecutionMode: TioActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
     property Action_ParentCloseQueryAction: IioBSCloseQueryAction read GetAction_ParentCloseQueryAction write SetAction_ParentCloseQueryAction;
   published
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
@@ -568,7 +568,7 @@ type
     property TargetBindSource;
     // Events
     property OnCloseQuery: TCloseQueryEvent read FOnCloseQuery write FOnCloseQuery;
-    property OnConfirmationRequest: TioBSCloseQueryConfirmationRequestEvent read FOnConfirmationRequest write FOnConfirmationRequest;
+    property OnConfirmationRequest: TioStdActionCanExecuteEvent read FOnConfirmationRequest write FOnConfirmationRequest;
     property OnHint;
   end;
 
@@ -1398,7 +1398,7 @@ begin
   _InjectEventHandler;
 end;
 
-procedure TioBSCloseQuery.SetInternalExecutionMode(const Value: TioCloseQueryActionExecutionMode);
+procedure TioBSCloseQuery.SetInternalExecutionMode(const Value: TioActionExecutionMode);
 begin
   FInternalExecutionMode := Value;
 end;
@@ -1474,7 +1474,7 @@ begin
   Result := FExecuting;
 end;
 
-function TioBSCloseQuery.GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
+function TioBSCloseQuery.GetInternalExecutionMode: TioActionExecutionMode;
 begin
   Result := FInternalExecutionMode;
 end;

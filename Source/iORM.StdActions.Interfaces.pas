@@ -43,13 +43,17 @@ type
   TioActionShowMode = (smBSCurrent, smBSEach, smEntityTypeName, smEntityTypeNameAsSelector, smBSTypeNameAsSelector, smEntityTypeNameAsWhereBuilder, smBSTypeNameAsWhereBuilder, smEntityTypeNameAsETM, smBSTypeNameAsETM);
   TioActionViewContextBy = (vcByDefaultViewContextProvider, vcByViewContextProviderName, vcByViewContextProvider, vcByViewContext);//, vcNone);
 
-  TioCloseQueryActionExecutionMode = (emActive, emPassive);
+  TioActionExecutionMode = (emActive, emPassive);
 
   IioBSSlaveAction = interface
     ['{2755E391-FB7A-47D2-8A24-93C2F2EF8654}']
     function _IsEnabled: Boolean;
     procedure _SetTargetBindSource(const AObj: TObject);
     function Execute: Boolean;
+    // ExecutionMode
+    function GetExecutionMode: TioActionExecutionMode;
+    procedure SetExecutionMode(const Value: TioActionExecutionMode);
+    property ExecutionMode: TioActionExecutionMode read GetExecutionMode write SetExecutionMode;
   end;
 
   IioBSCloseQueryAction = interface
@@ -60,9 +64,9 @@ type
     function Execute: Boolean;
     function Executing: Boolean;
     // InternalExecutionMode
-    function GetInternalExecutionMode: TioCloseQueryActionExecutionMode;
-    procedure SetInternalExecutionMode(const Value: TioCloseQueryActionExecutionMode);
-    property InternalExecutionMode: TioCloseQueryActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
+    function GetInternalExecutionMode: TioActionExecutionMode;
+    procedure SetInternalExecutionMode(const Value: TioActionExecutionMode);
+    property InternalExecutionMode: TioActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
     // ParentCloseQueryAction
     function GetAction_ParentCloseQueryAction: IioBSCloseQueryAction;
     procedure SetAction_ParentCloseQueryAction(const Value: IioBSCloseQueryAction);
