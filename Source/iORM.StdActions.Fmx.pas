@@ -131,11 +131,16 @@ type
   strict private
     FExecutionMode: TioActionExecutionMode;
     FTargetBindSource: T;
+    // events
+    FAfterExecute: TNotifyEvent;
+    FBeforeExecute: TNotifyEvent;
+    FCanExecute: TioStdActionCanExecuteEvent;
     function Get_Version: String;
   strict protected
+    procedure _InternalExecuteStdAction; virtual;
+    procedure _InternalUpdateStdAction; virtual;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure SetTargetBindSource(const Value: T); virtual;
-    property TargetBindSource: T read FTargetBindSource write SetTargetBindSource;
     // ExecutionMode
     function GetExecutionMode: TioActionExecutionMode;
     procedure SetExecutionMode(const Value: TioActionExecutionMode);
@@ -143,7 +148,14 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
+    procedure ExecuteTarget(Target: TObject); override;
+    procedure UpdateTarget(Target: TObject); override;
   published
+    // Events
+    property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;
+    property BeforeExecute: TNotifyEvent read FBeforeExecute write FBeforeExecute;
+    property CanExecute: TioStdActionCanExecuteEvent read FCanExecute write FCanExecute;
+    property TargetBindSource: T read FTargetBindSource write SetTargetBindSource;
     property _Version: String read Get_Version;
   end;
 
@@ -157,34 +169,29 @@ type
     procedure _SetTargetBindSource(const AObj: TObject);
     procedure SetAction_CloseQueryAction(const Value: IioBSSlaveAction);
   strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure SetTargetBindSource(const Value: IioStdActionTargetBindSource); override;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget(Target: TObject); override;
   published
     property Action_CloseQueryAction: IioBSSlaveAction read FAction_CloseQueryAction write SetAction_CloseQueryAction;
     property SelectionType: TioSelectionType read FSelectionType write FSelectionType default stAppend;
-    property TargetBindSource;
   end;
 
   // Paging NextPage action
   TioBSNextPage = class(TioBSStdActionFmx<IioStdActionTargetMasterBindSource>)
-  public
-    procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget(Target: TObject); override;
-  published
-    property TargetBindSource;
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
   end;
 
   // Paging PreviousPage action
   TioBSPrevPage = class(TioBSStdActionFmx<IioStdActionTargetMasterBindSource>)
-  public
-    procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget(Target: TObject); override;
-  published
-    property TargetBindSource;
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
   end;
 
   // BuildWhere
@@ -196,29 +203,28 @@ type
     procedure SetAction_CloseQueryAction(const Value: IioBSSlaveAction);
     procedure SetAction_PersistAction(const Value: IioBSSlaveAction);
   strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget(Target: TObject); override;
   published
     property Action_CloseQueryAction: IioBSSlaveAction read FAction_CloseQueryAction write SetAction_CloseQueryAction;
     property Action_PersistAction: IioBSSlaveAction read FAction_PersistAction write SetAction_PersistAction;
     property AutoExec_Where_OnTargetBS: Boolean read FAutoExec_Where_OnTargetBS write FAutoExec_Where_OnTargetBS default True;
-    property TargetBindSource;
   end;
 
   // ClearWhere
   TioBSClearWhere = class(TioBSStdActionFmx<IioStdActionTargetMasterBindSource>)
   strict private
     FAutoExec_Where_OnTargetBS: Boolean;
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget(Target: TObject); override;
   published
     property AutoExec_Where_OnTargetBS: Boolean read FAutoExec_Where_OnTargetBS write FAutoExec_Where_OnTargetBS default False;
-    property TargetBindSource;
   end;
 
   // =================================================================================================
@@ -246,12 +252,18 @@ type
     FRaiseIfRevertPointSaved: Boolean;
     FRaiseIfRevertPointNotSaved: Boolean;
     FTargetBindSource: IioMasterBindSource;
+    // events
+    FAfterExecute: TNotifyEvent;
+    FBeforeExecute: TNotifyEvent;
+    FCanExecute: TioStdActionCanExecuteEvent;
     function Get_Version: String;
     procedure _SetTargetBindSource(const AObj: TObject);
     procedure SetTargetBindSource(const Value: IioMasterBindSource);
     procedure SetAction_CloseQueryAction(const Value: IioBSSlaveAction);
     procedure SetAction_ShowOrSelectAction(const Value: IioBSSlaveAction);
   strict protected
+    procedure _InternalExecuteStdAction; virtual;
+    procedure _InternalUpdateStdAction; virtual;
     function _IsEnabled: Boolean; virtual;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     property ClearAfterExecute: Boolean read FClearAfterExecute write FClearAfterExecute default True;
@@ -273,6 +285,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
+    procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget (Target: TObject); override;
   published
     property _Version: String read Get_Version;
@@ -293,6 +306,9 @@ type
     property UnsupportedArchitectures;
     property UnsupportedPlatforms;
     // Events
+    property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;
+    property BeforeExecute: TNotifyEvent read FBeforeExecute write FBeforeExecute;
+    property CanExecute: TioStdActionCanExecuteEvent read FCanExecute write FCanExecute;
     // property OnExecute;
     // property OnHint;
     // property OnUpdate;
@@ -605,6 +621,10 @@ type
     FViewContextBy: TioActionViewContextBy;
     FViewContextProvider: TioViewContextProvider;
     FViewContextProviderName: String;
+    // events
+    FAfterExecute: TNotifyEvent;
+    FBeforeExecute: TNotifyEvent;
+    FCanExecute: TioStdActionCanExecuteEvent;
     function Get_Version: String;
     function _IsEnabled: Boolean;
     procedure _SetTargetBindSource(const AObj: TObject);
@@ -614,6 +634,8 @@ type
     procedure SetViewContext(const Value: TComponent);
     procedure SetViewContextProvider(const Value: TioViewContextProvider);
   strict protected
+    procedure _InternalExecuteStdAction; virtual;
+    procedure _InternalUpdateStdAction; virtual;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     // ExecutionMode
     function GetExecutionMode: TioActionExecutionMode;
@@ -636,6 +658,10 @@ type
     property ViewContextProvider: TioViewContextProvider read FViewContextProvider write SetViewContextProvider;
     property ViewContextProviderName: String read FViewContextProviderName write FViewContextProviderName;
     property _Version: String read Get_Version;
+    // Events
+    property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;
+    property BeforeExecute: TNotifyEvent read FBeforeExecute write FBeforeExecute;
+    property CanExecute: TioStdActionCanExecuteEvent read FCanExecute write FCanExecute;
   end;
 
   // =================================================================================================
@@ -671,6 +697,27 @@ begin
   FRaiseIfRevertPointNotSaved := False;
   FAction_ReloadAction := nil;
   FAction_ShowOrSelectAction := nil;
+end;
+
+procedure TioBSPersistenceStdActionFmx.ExecuteTarget(Target: TObject);
+var
+  LCanExecute: Boolean;
+begin
+  inherited;
+  // Execute the CanExecute event (ActiveMode only)
+  LCanExecute := True;
+  if (FExecutionMode = emActive) and Assigned(FCanExecute) then
+    FCanExecute(Self, LCanExecute);
+  if not LCanExecute then
+    Exit;
+  // Execute the BeforeExecute event
+  if Assigned(FBeforeExecute) then
+    FBeforeExecute(Self);
+  // Execute the VMAction.onExecute event if assigned (or a standard action)
+  _InternalExecuteStdAction;
+  // Execute the AfterExecute event
+  if Assigned(FAfterExecute) then
+    FAfterExecute(Self);
 end;
 
 function TioBSPersistenceStdActionFmx.GetExecutionMode: TioActionExecutionMode;
@@ -747,6 +794,17 @@ begin
 end;
 
 procedure TioBSPersistenceStdActionFmx.UpdateTarget(Target: TObject);
+begin
+  inherited;
+  _InternalUpdateStdAction;
+end;
+
+procedure TioBSPersistenceStdActionFmx._InternalExecuteStdAction;
+begin
+  // Nothing to do here
+end;
+
+procedure TioBSPersistenceStdActionFmx._InternalUpdateStdAction;
 begin
   inherited;
   Enabled := True;
@@ -1077,14 +1135,6 @@ begin
   FSelectionType := stAppend;
 end;
 
-procedure TioBSSelectCurrent.ExecuteTarget(Target: TObject);
-begin
-  inherited;
-  TargetBindSource.SelectCurrent(FSelectionType);
-  // Execute slave actions
-  TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_CloseQueryAction, True);
-end;
-
 procedure TioBSSelectCurrent.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
@@ -1110,7 +1160,15 @@ begin
     inherited;
 end;
 
-procedure TioBSSelectCurrent.UpdateTarget(Target: TObject);
+procedure TioBSSelectCurrent._InternalExecuteStdAction;
+begin
+  inherited;
+  TargetBindSource.SelectCurrent(FSelectionType);
+  // Execute slave actions
+  TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_CloseQueryAction, True);
+end;
+
+procedure TioBSSelectCurrent._InternalUpdateStdAction;
 begin
   inherited;
   Enabled := TargetBindSource.CanDoSelection and ((not Assigned(FAction_CloseQueryAction)) or FAction_CloseQueryAction._IsEnabled);
@@ -1142,6 +1200,27 @@ begin
   DisableIfNoHandler := False;
   // New fields
   FTargetBindSource := nil;
+end;
+
+procedure TioBSStdActionFmx<T>.ExecuteTarget(Target: TObject);
+var
+  LCanExecute: Boolean;
+begin
+  inherited;
+  // Execute the CanExecute event (ActiveMode only)
+  LCanExecute := True;
+  if (FExecutionMode = emActive) and Assigned(FCanExecute) then
+    FCanExecute(Self, LCanExecute);
+  if not LCanExecute then
+    Exit;
+  // Execute the BeforeExecute event
+  if Assigned(FBeforeExecute) then
+    FBeforeExecute(Self);
+  // Execute the VMAction.onExecute event if assigned (or a standard action)
+  _InternalExecuteStdAction;
+  // Execute the AfterExecute event
+  if Assigned(FAfterExecute) then
+    FAfterExecute(Self);
 end;
 
 function TioBSStdActionFmx<T>.GetExecutionMode: TioActionExecutionMode;
@@ -1181,15 +1260,31 @@ begin
   end;
 end;
 
+procedure TioBSStdActionFmx<T>.UpdateTarget(Target: TObject);
+begin
+  inherited;
+  _InternalUpdateStdAction;
+end;
+
+procedure TioBSStdActionFmx<T>._InternalExecuteStdAction;
+begin
+  // Nothing to do here
+end;
+
+procedure TioBSStdActionFmx<T>._InternalUpdateStdAction;
+begin
+  // Nothing to do here
+end;
+
 { TioBSNextPage }
 
-procedure TioBSNextPage.ExecuteTarget(Target: TObject);
+procedure TioBSNextPage._InternalExecuteStdAction;
 begin
   inherited;
   TargetBindSource.Paging.NextPage;
 end;
 
-procedure TioBSNextPage.UpdateTarget(Target: TObject);
+procedure TioBSNextPage._InternalUpdateStdAction;
 begin
   inherited;
   Enabled := TargetBindSource.isActive and TargetBindSource.Paging.Enabled and not TargetBindSource.Paging.IsLastPage;
@@ -1197,13 +1292,13 @@ end;
 
 { TioBSPrevPage }
 
-procedure TioBSPrevPage.ExecuteTarget(Target: TObject);
+procedure TioBSPrevPage._InternalExecuteStdAction;
 begin
   inherited;
   TargetBindSource.Paging.PrevPage;
 end;
 
-procedure TioBSPrevPage.UpdateTarget(Target: TObject);
+procedure TioBSPrevPage._InternalUpdateStdAction;
 begin
   inherited;
   Enabled := TargetBindSource.isActive and TargetBindSource.Paging.Enabled and not TargetBindSource.Paging.IsFirstPage;
@@ -1586,15 +1681,6 @@ begin
   FAutoExec_Where_OnTargetBS := True;
 end;
 
-procedure TioBSBuildWhere.ExecuteTarget(Target: TObject);
-begin
-  inherited;
-  TargetBindSource.BuildWhere(FAutoExec_Where_OnTargetBS);
-  // Execute slave actions
-  TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_PersistAction);
-  TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_CloseQueryAction);
-end;
-
 procedure TioBSBuildWhere.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
@@ -1624,7 +1710,16 @@ begin
   end;
 end;
 
-procedure TioBSBuildWhere.UpdateTarget(Target: TObject);
+procedure TioBSBuildWhere._InternalExecuteStdAction;
+begin
+  inherited;
+  TargetBindSource.BuildWhere(FAutoExec_Where_OnTargetBS);
+  // Execute slave actions
+  TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_PersistAction);
+  TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_CloseQueryAction);
+end;
+
+procedure TioBSBuildWhere._InternalUpdateStdAction;
 begin
   inherited;
   Enabled := TargetBindSource.isActive;
@@ -1640,13 +1735,13 @@ begin
   FAutoExec_Where_OnTargetBS := False;
 end;
 
-procedure TioBSClearWhere.ExecuteTarget(Target: TObject);
+procedure TioBSClearWhere._InternalExecuteStdAction;
 begin
   inherited;
   TargetBindSource.ClearWhere(FAutoExec_Where_OnTargetBS);
 end;
 
-procedure TioBSClearWhere.UpdateTarget(Target: TObject);
+procedure TioBSClearWhere._InternalUpdateStdAction;
 begin
   inherited;
   Enabled := TargetBindSource.isActive;
@@ -1675,6 +1770,131 @@ begin
 end;
 
 procedure TioBSShowOrSelect.ExecuteTarget(Target: TObject);
+var
+  LCanExecute: Boolean;
+begin
+  inherited;
+  // Execute the CanExecute event (ActiveMode only)
+  LCanExecute := True;
+  if (FExecutionMode = emActive) and Assigned(FCanExecute) then
+    FCanExecute(Self, LCanExecute);
+  if not LCanExecute then
+    Exit;
+  // Execute the BeforeExecute event
+  if Assigned(FBeforeExecute) then
+    FBeforeExecute(Self);
+  // Execute the VMAction.onExecute event if assigned (or a standard action)
+  _InternalExecuteStdAction;
+  // Execute the AfterExecute event
+  if Assigned(FAfterExecute) then
+    FAfterExecute(Self);
+end;
+
+function TioBSShowOrSelect.GetExecutionMode: TioActionExecutionMode;
+begin
+  Result := FExecutionMode;
+end;
+
+function TioBSShowOrSelect.Get_Version: String;
+begin
+  Result := io.Version;
+end;
+
+function TioBSShowOrSelect.HandlesTarget(Target: TObject): Boolean;
+begin
+  Result := Assigned(Target);
+end;
+
+procedure TioBSShowOrSelect.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) then
+  begin
+    if (AComponent = (FTargetBindSource as TComponent)) then
+      FTargetBindSource := nil
+    else
+    if (AComponent = (FAction_ParentCloseQueryAction as TComponent)) then
+      FAction_ParentCloseQueryAction := nil
+    else
+    if (AComponent = (FAction_SelectCurrentAction as TComponent)) then
+      FAction_SelectCurrentAction := nil
+    else
+    if (AComponent = (FViewContext as TComponent)) then
+      FViewContext := nil
+    else
+    if (AComponent = (FViewContextProvider as TComponent)) then
+      FViewContextProvider:= nil;
+  end;
+end;
+
+procedure TioBSShowOrSelect.SetTargetBindSource(const Value: IioStdActionTargetBindSource);
+begin
+  if not(csLoading in ComponentState) and FIsSlave then
+    raise EioException.Create(ClassName, 'SetTargetBindSource', 'The "TargetBindSource" property of a "..SelectCurrent" action is read-only when the action itself is nested into a "ShowOrSelect" action');
+  if Value <> FTargetBindSource then
+  begin
+    FTargetBindSource := Value;
+    if Value <> nil then
+      (Value as TComponent).FreeNotification(Self);
+    if Assigned(FAction_SelectCurrentAction) then
+      FAction_SelectCurrentAction._SetTargetBindSource(Value as TObject);
+  end;
+end;
+
+procedure TioBSShowOrSelect.SetAction_ParentCloseQueryAction(const Value: IioBSCloseQueryAction);
+begin
+  if Value <> FAction_ParentCloseQueryAction then
+  begin
+    FAction_ParentCloseQueryAction := Value;
+    if Value <> nil then
+      (Value as TComponent).FreeNotification(Self);
+  end;
+end;
+
+procedure TioBSShowOrSelect.SetAction_SelectCurrentAction(const Value: IioBSSlaveAction);
+begin
+  if Value <> FAction_SelectCurrentAction then
+  begin
+    FAction_SelectCurrentAction := Value;
+    if Value <> nil then
+      (Value as TComponent).FreeNotification(Self);
+    if Assigned(FAction_SelectCurrentAction) then
+      FAction_SelectCurrentAction._SetTargetBindSource(FTargetBindSource as TObject);
+  end;
+end;
+
+procedure TioBSShowOrSelect.SetExecutionMode(const Value: TioActionExecutionMode);
+begin
+  FExecutionMode := Value;
+end;
+
+procedure TioBSShowOrSelect.SetViewContext(const Value: TComponent);
+begin
+  if Value <> FViewContext then
+  begin
+    FViewContext := Value;
+    if Value <> nil then
+      (Value as TComponent).FreeNotification(Self);
+  end;
+end;
+
+procedure TioBSShowOrSelect.SetViewContextProvider(const Value: TioViewContextProvider);
+begin
+  if Value <> FViewContextProvider then
+  begin
+    FViewContextProvider := Value;
+    if Value <> nil then
+      (Value as TComponent).FreeNotification(Self);
+  end;
+end;
+
+procedure TioBSShowOrSelect.UpdateTarget(Target: TObject);
+begin
+  inherited;
+  _InternalUpdateStdAction;
+end;
+
+procedure TioBSShowOrSelect._InternalExecuteStdAction;
 begin
   inherited;
 
@@ -1816,105 +2036,7 @@ begin
   end;
 end;
 
-function TioBSShowOrSelect.GetExecutionMode: TioActionExecutionMode;
-begin
-  Result := FExecutionMode;
-end;
-
-function TioBSShowOrSelect.Get_Version: String;
-begin
-  Result := io.Version;
-end;
-
-function TioBSShowOrSelect.HandlesTarget(Target: TObject): Boolean;
-begin
-  Result := Assigned(Target);
-end;
-
-procedure TioBSShowOrSelect.Notification(AComponent: TComponent; Operation: TOperation);
-begin
-  inherited Notification(AComponent, Operation);
-  if (Operation = opRemove) then
-  begin
-    if (AComponent = (FTargetBindSource as TComponent)) then
-      FTargetBindSource := nil
-    else
-    if (AComponent = (FAction_ParentCloseQueryAction as TComponent)) then
-      FAction_ParentCloseQueryAction := nil
-    else
-    if (AComponent = (FAction_SelectCurrentAction as TComponent)) then
-      FAction_SelectCurrentAction := nil
-    else
-    if (AComponent = (FViewContext as TComponent)) then
-      FViewContext := nil
-    else
-    if (AComponent = (FViewContextProvider as TComponent)) then
-      FViewContextProvider:= nil;
-  end;
-end;
-
-procedure TioBSShowOrSelect.SetTargetBindSource(const Value: IioStdActionTargetBindSource);
-begin
-  if not(csLoading in ComponentState) and FIsSlave then
-    raise EioException.Create(ClassName, 'SetTargetBindSource', 'The "TargetBindSource" property of a "..SelectCurrent" action is read-only when the action itself is nested into a "ShowOrSelect" action');
-  if Value <> FTargetBindSource then
-  begin
-    FTargetBindSource := Value;
-    if Value <> nil then
-      (Value as TComponent).FreeNotification(Self);
-    if Assigned(FAction_SelectCurrentAction) then
-      FAction_SelectCurrentAction._SetTargetBindSource(Value as TObject);
-  end;
-end;
-
-procedure TioBSShowOrSelect.SetAction_ParentCloseQueryAction(const Value: IioBSCloseQueryAction);
-begin
-  if Value <> FAction_ParentCloseQueryAction then
-  begin
-    FAction_ParentCloseQueryAction := Value;
-    if Value <> nil then
-      (Value as TComponent).FreeNotification(Self);
-  end;
-end;
-
-procedure TioBSShowOrSelect.SetAction_SelectCurrentAction(const Value: IioBSSlaveAction);
-begin
-  if Value <> FAction_SelectCurrentAction then
-  begin
-    FAction_SelectCurrentAction := Value;
-    if Value <> nil then
-      (Value as TComponent).FreeNotification(Self);
-    if Assigned(FAction_SelectCurrentAction) then
-      FAction_SelectCurrentAction._SetTargetBindSource(FTargetBindSource as TObject);
-  end;
-end;
-
-procedure TioBSShowOrSelect.SetExecutionMode(const Value: TioActionExecutionMode);
-begin
-  FExecutionMode := Value;
-end;
-
-procedure TioBSShowOrSelect.SetViewContext(const Value: TComponent);
-begin
-  if Value <> FViewContext then
-  begin
-    FViewContext := Value;
-    if Value <> nil then
-      (Value as TComponent).FreeNotification(Self);
-  end;
-end;
-
-procedure TioBSShowOrSelect.SetViewContextProvider(const Value: TioViewContextProvider);
-begin
-  if Value <> FViewContextProvider then
-  begin
-    FViewContextProvider := Value;
-    if Value <> nil then
-      (Value as TComponent).FreeNotification(Self);
-  end;
-end;
-
-procedure TioBSShowOrSelect.UpdateTarget(Target: TObject);
+procedure TioBSShowOrSelect._InternalUpdateStdAction;
 begin
   inherited;
 
