@@ -129,12 +129,17 @@ type
   // Base class for all BindSource standard actions
   TioBSStdActionFmx<T: IioStdActionTargetBindSource> = class(Fmx.ActnList.TAction)
   strict private
+    FExecutionMode: TioActionExecutionMode;
     FTargetBindSource: T;
     function Get_Version: String;
   strict protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure SetTargetBindSource(const Value: T); virtual;
     property TargetBindSource: T read FTargetBindSource write SetTargetBindSource;
+    // ExecutionMode
+    function GetExecutionMode: TioActionExecutionMode;
+    procedure SetExecutionMode(const Value: TioActionExecutionMode);
+    property ExecutionMode: TioActionExecutionMode read GetExecutionMode write SetExecutionMode;
   public
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
@@ -234,6 +239,7 @@ type
     FDisableIfChangesDoesNotExists: Boolean;
     FDisableIfChangesExists: Boolean;
     FDisableIfSaved: Boolean;
+    FExecutionMode: TioActionExecutionMode;
     FIsSlave: Boolean;
     FRaiseIfChangesDoesNotExists: Boolean;
     FRaiseIfChangesExists: Boolean;
@@ -260,6 +266,10 @@ type
     property Action_ReloadAction: IioBSSlaveAction read FAction_ReloadAction write FAction_ReloadAction;
     property Action_ShowOrSelectAction: IioBSSlaveAction read FAction_ShowOrSelectAction write SetAction_ShowOrSelectAction;
     property TargetBindSource: IioMasterBindSource read FTargetBindSource write SetTargetBindSource;
+    // ExecutionMode
+    function GetExecutionMode: TioActionExecutionMode;
+    procedure SetExecutionMode(const Value: TioActionExecutionMode);
+    property ExecutionMode: TioActionExecutionMode read GetExecutionMode write SetExecutionMode;
   public
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
@@ -586,6 +596,7 @@ type
     FAction_ParentCloseQueryAction: IioBSCloseQueryAction;
     FAction_SelectCurrentAction: IioBSSlaveAction;
     FEntityTypeName: String;
+    FExecutionMode: TioActionExecutionMode;
     FIsSlave: Boolean;
     FShowMode: TioActionShowMode;
     FTargetBindSource: IioStdActionTargetBindSource;
@@ -604,6 +615,10 @@ type
     procedure SetViewContextProvider(const Value: TioViewContextProvider);
   strict protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    // ExecutionMode
+    function GetExecutionMode: TioActionExecutionMode;
+    procedure SetExecutionMode(const Value: TioActionExecutionMode);
+    property ExecutionMode: TioActionExecutionMode read GetExecutionMode write SetExecutionMode;
   public
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
@@ -648,6 +663,7 @@ begin
   FDisableIfChangesDoesNotExists := False;
   FDisableIfChangesExists := False;
   FDisableIfSaved := False;
+  FExecutionMode := emActive;
   FIsSlave := False;
   FRaiseIfChangesDoesNotExists := False;
   FRaiseIfChangesExists := True;
@@ -655,6 +671,11 @@ begin
   FRaiseIfRevertPointNotSaved := False;
   FAction_ReloadAction := nil;
   FAction_ShowOrSelectAction := nil;
+end;
+
+function TioBSPersistenceStdActionFmx.GetExecutionMode: TioActionExecutionMode;
+begin
+  Result := FExecutionMode;
 end;
 
 function TioBSPersistenceStdActionFmx.Get_Version: String;
@@ -702,6 +723,11 @@ begin
     if Assigned(FAction_ShowOrSelectAction) then
       FAction_ShowOrSelectAction._SetTargetBindSource(FTargetBindSource as TObject);
   end;
+end;
+
+procedure TioBSPersistenceStdActionFmx.SetExecutionMode(const Value: TioActionExecutionMode);
+begin
+  FExecutionMode := Value;
 end;
 
 procedure TioBSPersistenceStdActionFmx.SetTargetBindSource(const Value: IioMasterBindSource);
@@ -1111,10 +1137,16 @@ end;
 constructor TioBSStdActionFmx<T>.Create(AOwner: TComponent);
 begin
   inherited;
+  FExecutionMode := emActive;
   // Copied from TAction.Create
   DisableIfNoHandler := False;
   // New fields
   FTargetBindSource := nil;
+end;
+
+function TioBSStdActionFmx<T>.GetExecutionMode: TioActionExecutionMode;
+begin
+  Result := FExecutionMode;
 end;
 
 function TioBSStdActionFmx<T>.Get_Version: String;
@@ -1132,6 +1164,11 @@ begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and (AComponent = (FTargetBindSource as TComponent)) then
     FTargetBindSource := nil;
+end;
+
+procedure TioBSStdActionFmx<T>.SetExecutionMode(const Value: TioActionExecutionMode);
+begin
+  FExecutionMode := Value;
 end;
 
 procedure TioBSStdActionFmx<T>.SetTargetBindSource(const Value: T);
@@ -1623,10 +1660,11 @@ begin
   // Copied from TAction.Create
   DisableIfNoHandler := False;
   // New fields
-  FEntityTypeName := '';
-  FIsSlave := False;
   FAction_ParentCloseQueryAction := nil;
   FAction_SelectCurrentAction := nil;
+  FEntityTypeName := '';
+  FExecutionMode := emActive;
+  FIsSlave := False;
   FShowMode := TioActionShowMode.smBSCurrent;
   FTargetBindSource := nil;
   FVVMTypeAlias := '';
@@ -1778,6 +1816,11 @@ begin
   end;
 end;
 
+function TioBSShowOrSelect.GetExecutionMode: TioActionExecutionMode;
+begin
+  Result := FExecutionMode;
+end;
+
 function TioBSShowOrSelect.Get_Version: String;
 begin
   Result := io.Version;
@@ -1844,6 +1887,11 @@ begin
     if Assigned(FAction_SelectCurrentAction) then
       FAction_SelectCurrentAction._SetTargetBindSource(FTargetBindSource as TObject);
   end;
+end;
+
+procedure TioBSShowOrSelect.SetExecutionMode(const Value: TioActionExecutionMode);
+begin
+  FExecutionMode := Value;
 end;
 
 procedure TioBSShowOrSelect.SetViewContext(const Value: TComponent);

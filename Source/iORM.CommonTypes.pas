@@ -75,6 +75,7 @@ type
 
   // Event handlers type
   TioStdActionCanExecuteEvent = procedure(Sender: TObject; var CanExecute: Boolean) of object;
+  TCloseQueryEvent = procedure(Sender: TObject; var CanClose: Boolean) of object;
 
   TioStdActionNewInstanceAsObjectEvent = procedure(const ASender: TObject; out NewInstance: TObject) of object;
   TioStdActionNewInstanceAsInterfaceEvent = procedure(const ASender: TObject; out NewInstance: IInterface) of object;

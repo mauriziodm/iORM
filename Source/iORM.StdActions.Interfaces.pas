@@ -63,10 +63,10 @@ type
     function _IsEnabled: Boolean;
     function Execute: Boolean;
     function Executing: Boolean;
-    // InternalExecutionMode
-    function GetInternalExecutionMode: TioActionExecutionMode;
-    procedure SetInternalExecutionMode(const Value: TioActionExecutionMode);
-    property InternalExecutionMode: TioActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
+    // ExecutionMode
+    function GetExecutionMode: TioActionExecutionMode;
+    procedure SetExecutionMode(const Value: TioActionExecutionMode);
+    property ExecutionMode: TioActionExecutionMode read GetExecutionMode write SetExecutionMode;
     // ParentCloseQueryAction
     function GetAction_ParentCloseQueryAction: IioBSCloseQueryAction;
     procedure SetAction_ParentCloseQueryAction(const Value: IioBSCloseQueryAction);

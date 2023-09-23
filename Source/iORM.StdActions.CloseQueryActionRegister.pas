@@ -89,11 +89,11 @@ begin
   begin
     if FInternalContainer[I]._IsChildOf(Sender) then
     begin
-      FInternalContainer[I].InternalExecutionMode := emPassive; // That way it doesn't ask for confirmation
+      FInternalContainer[I].ExecutionMode := emPassive; // That way it doesn't ask for confirmation
       try
         FInternalContainer[I].Execute;
       finally
-        FInternalContainer[I].InternalExecutionMode := emActive;
+        FInternalContainer[I].ExecutionMode := emActive;
       end;
     end;
     Dec(I);
