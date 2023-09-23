@@ -127,16 +127,33 @@ type
   // Base class for all BindSource standard actions
   TioBSStdActionVcl<T: IioStdActionTargetBindSource> = class(Vcl.ActnList.TAction)
   strict private
+    FExecutionMode: TioActionExecutionMode;
     FTargetBindSource: T;
+    // events
+    FAfterExecute: TNotifyEvent;
+    FBeforeExecute: TNotifyEvent;
+    FCanExecute: TioStdActionCanExecuteEvent;
     function Get_Version: String;
   strict protected
+    procedure _InternalExecuteStdAction; virtual;
+    procedure _InternalUpdateStdAction; virtual;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure SetTargetBindSource(const Value: T); virtual;
-    property TargetBindSource: T read FTargetBindSource write SetTargetBindSource;
+    // ExecutionMode
+    function GetExecutionMode: TioActionExecutionMode;
+    procedure SetExecutionMode(const Value: TioActionExecutionMode);
+    property ExecutionMode: TioActionExecutionMode read GetExecutionMode write SetExecutionMode;
   public
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
+    procedure ExecuteTarget(Target: TObject); override;
+    procedure UpdateTarget(Target: TObject); override;
   published
+    // Events
+    property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;
+    property BeforeExecute: TNotifyEvent read FBeforeExecute write FBeforeExecute;
+    property CanExecute: TioStdActionCanExecuteEvent read FCanExecute write FCanExecute;
+    property TargetBindSource: T read FTargetBindSource write SetTargetBindSource;
     property _Version: String read Get_Version;
   end;
 
@@ -150,34 +167,29 @@ type
     procedure _SetTargetBindSource(const AObj: TObject);
     procedure SetAction_CloseQueryAction(const Value: IioBSSlaveAction);
   strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure SetTargetBindSource(const Value: IioStdActionTargetBindSource); override;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget(Target: TObject); override;
   published
     property Action_CloseQueryAction: IioBSSlaveAction read FAction_CloseQueryAction write SetAction_CloseQueryAction;
     property SelectionType: TioSelectionType read FSelectionType write FSelectionType default stAppend;
-    property TargetBindSource;
   end;
 
   // Paging NextPage action
   TioBSNextPage = class(TioBSStdActionVcl<IioStdActionTargetMasterBindSource>)
-  public
-    procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget(Target: TObject); override;
-  published
-    property TargetBindSource;
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
   end;
 
   // Paging PreviousPage action
   TioBSPrevPage = class(TioBSStdActionVcl<IioStdActionTargetMasterBindSource>)
-  public
-    procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget(Target: TObject); override;
-  published
-    property TargetBindSource;
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
   end;
 
   // BuildWhere
@@ -189,29 +201,28 @@ type
     procedure SetAction_CloseQueryAction(const Value: IioBSSlaveAction);
     procedure SetAction_PersistAction(const Value: IioBSSlaveAction);
   strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget(Target: TObject); override;
   published
     property Action_CloseQueryAction: IioBSSlaveAction read FAction_CloseQueryAction write SetAction_CloseQueryAction;
     property Action_PersistAction: IioBSSlaveAction read FAction_PersistAction write SetAction_PersistAction;
     property AutoExec_Where_OnTargetBS: Boolean read FAutoExec_Where_OnTargetBS write FAutoExec_Where_OnTargetBS default True;
-    property TargetBindSource;
   end;
 
   // ClearWhere
   TioBSClearWhere = class(TioBSStdActionVcl<IioStdActionTargetMasterBindSource>)
   strict private
     FAutoExec_Where_OnTargetBS: Boolean;
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget(Target: TObject); override;
   published
     property AutoExec_Where_OnTargetBS: Boolean read FAutoExec_Where_OnTargetBS write FAutoExec_Where_OnTargetBS default False;
-    property TargetBindSource;
   end;
 
   // =================================================================================================
@@ -1044,14 +1055,6 @@ begin
   FSelectionType := stAppend;
 end;
 
-procedure TioBSSelectCurrent.ExecuteTarget(Target: TObject);
-begin
-  inherited;
-  TargetBindSource.SelectCurrent(FSelectionType);
-  // Execute slave actions
-  TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_CloseQueryAction);
-end;
-
 procedure TioBSSelectCurrent.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
@@ -1078,7 +1081,15 @@ begin
     inherited;
 end;
 
-procedure TioBSSelectCurrent.UpdateTarget(Target: TObject);
+procedure TioBSSelectCurrent._InternalExecuteStdAction;
+begin
+  inherited;
+  TargetBindSource.SelectCurrent(FSelectionType);
+  // Execute slave actions
+  TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_CloseQueryAction);
+end;
+
+procedure TioBSSelectCurrent._InternalUpdateStdAction;
 begin
   inherited;
   Enabled := TargetBindSource.CanDoSelection and ((not Assigned(FAction_CloseQueryAction)) or FAction_CloseQueryAction._IsEnabled);
@@ -1105,10 +1116,32 @@ end;
 constructor TioBSStdActionVcl<T>.Create(AOwner: TComponent);
 begin
   inherited;
+  FExecutionMode := emActive;
   // Copied from TAction.Create
   DisableIfNoHandler := False;
   // New fields
   FTargetBindSource := nil;
+end;
+
+procedure TioBSStdActionVcl<T>.ExecuteTarget(Target: TObject);
+var
+  LCanExecute: Boolean;
+begin
+  inherited;
+  // Execute the CanExecute event (ActiveMode only)
+  LCanExecute := True;
+  if (FExecutionMode = emActive) and Assigned(FCanExecute) then
+    FCanExecute(Self, LCanExecute);
+  if not LCanExecute then
+    Exit;
+  // Execute the BeforeExecute event
+  if Assigned(FBeforeExecute) then
+    FBeforeExecute(Self);
+  // Execute the VMAction.onExecute event if assigned (or a standard action)
+  _InternalExecuteStdAction;
+  // Execute the AfterExecute event
+  if Assigned(FAfterExecute) then
+    FAfterExecute(Self);
 end;
 
 function TioBSStdActionVcl<T>.Get_Version: String;
@@ -1138,29 +1171,46 @@ begin
   end;
 end;
 
+procedure TioBSStdActionVcl<T>.UpdateTarget(Target: TObject);
+begin
+  inherited;
+  _InternalUpdateStdAction;
+end;
+
+procedure TioBSStdActionVcl<T>._InternalExecuteStdAction;
+begin
+  // Nothing to do here
+end;
+
+procedure TioBSStdActionVcl<T>._InternalUpdateStdAction;
+begin
+  // Nothing to do here
+end;
+
 { TioBSNextPage }
 
-procedure TioBSNextPage.ExecuteTarget(Target: TObject);
+procedure TioBSNextPage._InternalExecuteStdAction;
 begin
   inherited;
   TargetBindSource.Paging.NextPage;
 end;
 
-procedure TioBSNextPage.UpdateTarget(Target: TObject);
+procedure TioBSNextPage._InternalUpdateStdAction;
 begin
   inherited;
   Enabled := TargetBindSource.isActive and TargetBindSource.Paging.Enabled and not TargetBindSource.Paging.IsLastPage;
+
 end;
 
 { TioBSPreviousPage }
 
-procedure TioBSPrevPage.ExecuteTarget(Target: TObject);
+procedure TioBSPrevPage._InternalExecuteStdAction;
 begin
   inherited;
   TargetBindSource.Paging.PrevPage;
 end;
 
-procedure TioBSPrevPage.UpdateTarget(Target: TObject);
+procedure TioBSPrevPage._InternalUpdateStdAction;
 begin
   inherited;
   Enabled := TargetBindSource.isActive and TargetBindSource.Paging.Enabled and not TargetBindSource.Paging.IsFirstPage;
@@ -1547,15 +1597,6 @@ begin
   FAutoExec_Where_OnTargetBS := True;
 end;
 
-procedure TioBSBuildWhere.ExecuteTarget(Target: TObject);
-begin
-  inherited;
-  TargetBindSource.BuildWhere(FAutoExec_Where_OnTargetBS);
-  // Execute slave actions
-  TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_PersistAction);
-  TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_CloseQueryAction);
-end;
-
 procedure TioBSBuildWhere.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
@@ -1585,7 +1626,16 @@ begin
   end;
 end;
 
-procedure TioBSBuildWhere.UpdateTarget(Target: TObject);
+procedure TioBSBuildWhere._InternalExecuteStdAction;
+begin
+  inherited;
+  TargetBindSource.BuildWhere(FAutoExec_Where_OnTargetBS);
+  // Execute slave actions
+  TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_PersistAction);
+  TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_CloseQueryAction);
+end;
+
+procedure TioBSBuildWhere._InternalUpdateStdAction;
 begin
   inherited;
   Enabled := TargetBindSource.isActive;
@@ -1601,13 +1651,13 @@ begin
   FAutoExec_Where_OnTargetBS := False;
 end;
 
-procedure TioBSClearWhere.ExecuteTarget(Target: TObject);
+procedure TioBSClearWhere._InternalExecuteStdAction;
 begin
   inherited;
   TargetBindSource.ClearWhere(FAutoExec_Where_OnTargetBS);
 end;
 
-procedure TioBSClearWhere.UpdateTarget(Target: TObject);
+procedure TioBSClearWhere._InternalUpdateStdAction;
 begin
   inherited;
   Enabled := TargetBindSource.isActive;

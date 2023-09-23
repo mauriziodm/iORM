@@ -74,7 +74,7 @@ type
   TioSkipScopeSet = DJSON.Params.TdjSkipScopeSet;
 
   // Event handlers type
-  TCloseQueryEvent = procedure(Sender: TObject; var CanClose: Boolean) of object;
+  TioStdActionCanExecuteEvent = procedure(Sender: TObject; var CanExecute: Boolean) of object;
 
   TioStdActionNewInstanceAsObjectEvent = procedure(const ASender: TObject; out NewInstance: TObject) of object;
   TioStdActionNewInstanceAsInterfaceEvent = procedure(const ASender: TObject; out NewInstance: IInterface) of object;
@@ -140,7 +140,6 @@ type
   TioEtmConflictType = (ctNoConflict, ctMasterWin, ctSlaveWin, ctLastUpdatedWin, ctManual);
 
   // StdActions related types
-  TioStdActionCanExecuteEvent = procedure(Sender: TObject; var CanExecute: Boolean) of object;
   TioBSCloseQueryActionUpdateScope = (usLocal, usDisableIfChilds, usGlobal);
   TioBSCloseQueryOnEditingAction = (eaDisable, eaAutoPersist, eaAutoRevert);
   TioBSCloseQueryOnExecuteAction = (eaClose, eaTerminateApplication);

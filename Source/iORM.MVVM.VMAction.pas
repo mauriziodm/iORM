@@ -497,9 +497,7 @@ end;
     FExecuting, FExecutingEventHandler: Boolean;
     FInjectVMEventHandler: Boolean;
     FInjectViewEventHandler: Boolean;
-    FInternalExecutionMode: TioActionExecutionMode;
     FOnCloseQuery: TCloseQueryEvent;
-    FOnConfirmationRequest: TioStdActionCanExecuteEvent;
     FOnEditingAction: TioBSCloseQueryOnEditingAction;
     FOnExecuteAction: TioBSCloseQueryOnExecuteAction;
     FOnUpdateScope: TioBSCloseQueryActionUpdateScope;
@@ -507,9 +505,6 @@ end;
     procedure _InjectEventHandlerOnView(const AView: TComponent);
     function _CanClose: Boolean;
     function _IsChildOf(const ATargetQueryAction: IioBSCloseQueryAction): Boolean;
-    // InternalExecutionMode
-    function GetInternalExecutionMode: TioActionExecutionMode;
-    procedure SetInternalExecutionMode(const Value: TioActionExecutionMode);
     // ParentCloseQueryAction
     function GetAction_ParentCloseQueryAction: IioBSCloseQueryAction;
     procedure SetAction_ParentCloseQueryAction(const Value: IioBSCloseQueryAction);
@@ -517,7 +512,6 @@ end;
     function _IsEnabled: Boolean; override;
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
-    function DoOnConfirmationRequest: Boolean;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -525,7 +519,6 @@ end;
     function Executing: Boolean;
     function Update: Boolean; override;
     property Action_ParentCloseQueryAction: IioBSCloseQueryAction read GetAction_ParentCloseQueryAction write SetAction_ParentCloseQueryAction;
-    property InternalExecutionMode: TioActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
   published
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
     property InjectViewEventHandler: Boolean read FInjectViewEventHandler write FInjectViewEventHandler default True;
@@ -536,7 +529,6 @@ end;
     property TargetBindSource;
     // Events
     property OnCloseQuery: TCloseQueryEvent read FOnCloseQuery write FOnCloseQuery;
-    property OnConfirmationRequest: TioStdActionCanExecuteEvent read FOnConfirmationRequest write FOnConfirmationRequest;
   end;
 
   // =================================================================================================
@@ -709,10 +701,12 @@ end;
 
 procedure TioVMActionCustom._InternalExecute;
 begin
+  // NB: Mauri 23/09/2023: Ho eliminato l'evento "OnExecute" da tutte le StdActions quindi in pratica
+  //      questo codice non serve più (per ora lo lascio commentato)
   // Execute the VMAction.onExecute event if assigned
-  if Assigned(FOnExecute) then
-    FOnExecute(Self)
-  else
+//  if Assigned(FOnExecute) then
+//    FOnExecute(Self)
+//  else
     _InternalExecuteStdAction;
 end;
 
@@ -1395,7 +1389,6 @@ begin
   FExecutingEventHandler := False;
   FInjectViewEventHandler := True;
   FInjectVMEventHandler := True;
-  FInternalExecutionMode := emActive;
   FOnEditingAction := eaDisable;
   FOnExecuteAction := eaClose;
   FOnUpdateScope := usLocal;
@@ -1408,18 +1401,6 @@ begin
   inherited;
 end;
 
-function TioVMActionBSCloseQuery.DoOnConfirmationRequest: Boolean;
-begin
-  Result := True;
-  if Assigned(FOnConfirmationRequest) then
-    FOnConfirmationRequest(Self, Result);
-end;
-
-procedure TioVMActionBSCloseQuery.SetInternalExecutionMode(const Value: TioActionExecutionMode);
-begin
-  FInternalExecutionMode := Value;
-end;
-
 procedure TioVMActionBSCloseQuery.SetAction_ParentCloseQueryAction(const Value: IioBSCloseQueryAction);
 begin
   FAction_ParentCloseQueryAction := Value;
@@ -1427,18 +1408,13 @@ end;
 
 function TioVMActionBSCloseQuery.Execute: Boolean;
 begin
-  _ExecuteOriginal;  // Ritorna all'implementazione originale
+  _ExecuteOriginal;  // Ritorna all'implementazione originale (cioè esegue la action anche se il TargetBindSource non è assegnato)
   Result := False;
 end;
 
 function TioVMActionBSCloseQuery.Executing: Boolean;
 begin
   Result := FExecuting;
-end;
-
-function TioVMActionBSCloseQuery.GetInternalExecutionMode: TioActionExecutionMode;
-begin
-  Result := FInternalExecutionMode;
 end;
 
 function TioVMActionBSCloseQuery.GetAction_ParentCloseQueryAction: IioBSCloseQueryAction;
@@ -1515,7 +1491,9 @@ begin
     //      cioè è la prima BSCloseQueryAction della catena di esecuzione delle CloseQueryActions. HO
     //      fatto in questo modo sia perchè altrimenti ci sarebbero potute essere varie richieste di conferma
     //      sia perchè altrimenti avevo un AV error.
-    if _CanClose and ((FInternalExecutionMode = emPassive) or DoOnConfirmationRequest) then
+    // NB: Mauri 23/09/2023: Non c'è più dil DoOnConfirmationRequest perchè rimosso perchè ho aggiunto l'evento
+    //      "CanExecute" a tutte le StdActions.
+    if _CanClose then
     begin
       // Se è il caso fa l'Execute anche sulle ChildCQA
       // NB: Le esegue sempre a partire da quella creata più recentemente (child) e andando all'indietro
