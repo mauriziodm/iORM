@@ -315,9 +315,9 @@ type
   end;
 
   TioBSPersistenceSaveRevertPoint = class(TioBSPersistenceStdActionFmx)
-  public
-    procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget(Target: TObject); override;
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
   published
     property TargetBindSource;
     // Events
@@ -327,9 +327,9 @@ type
   end;
 
   TioBSPersistenceClear = class(TioBSPersistenceStdActionFmx)
-  public
-    procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget(Target: TObject); override;
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
   published
     property DisableIfChangesExists;
     property RaiseIfChangesExists;
@@ -341,9 +341,9 @@ type
   end;
 
   TioBSPersistencePersist = class(TioBSPersistenceStdActionFmx)
-  public
-    procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget(Target: TObject); override;
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
   published
     // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property Action_CloseQueryAction;
@@ -357,9 +357,9 @@ type
   end;
 
   TioBSPersistenceRevert = class(TioBSPersistenceStdActionFmx)
-  public
-    procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget(Target: TObject); override;
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
   published
     // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property Action_CloseQueryAction;
@@ -377,10 +377,11 @@ type
   private
     FAutoExec_CloseQueryAction_AfterDelete: Boolean;
     FAutoExec_CloseQueryAction_AfterRevert: Boolean;
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget(Target: TObject); override;
   published
     // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property Action_CloseQueryAction;
@@ -397,9 +398,9 @@ type
   end;
 
   TioBSPersistenceDelete = class(TioBSPersistenceStdActionFmx)
-  public
-    procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget(Target: TObject); override;
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
   published
     property Action_CloseQueryAction;
     property DisableIfChangesExists;
@@ -416,9 +417,9 @@ type
   end;
 
   TioBSPersistenceReload = class(TioBSPersistenceStdActionFmx)
-  public
-    procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget(Target: TObject); override;
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
   published
     property DisableIfChangesExists;
     property DisableIfSaved;
@@ -439,9 +440,9 @@ type
     FEntityTypeName: String;
     FOnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent;
     FOnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent;
-  public
-    procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget(Target: TObject); override;
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
   published
     property Action_ShowOrSelectAction;
     property DisableIfChangesExists;
@@ -467,9 +468,9 @@ type
     FEntityTypeName: String;
     FOnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent;
     FOnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent;
-  public
-    procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget(Target: TObject); override;
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
   published
     property Action_ShowOrSelectAction;
     property DisableIfChangesExists;
@@ -500,10 +501,11 @@ type
     FAfterRevertEvent: TioStdAction_ETM_AfterRevertEvent;
     FBeforeRevertEvent: TioStdAction_ETM_BeforeRevertEvent;
     procedure _ShowRevertedObj;
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget(Target: TObject); override;
   published
     // Properties
     property Action_CloseQueryAction;
@@ -530,10 +532,11 @@ type
     // Events
     FAfterRevertEvent: TioStdAction_ETM_AfterRevertEvent;
     procedure _ShowRevertedObj;
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget(Target: TObject); override;
   published
     // Properties
     property Action_CloseQueryAction;
@@ -571,6 +574,8 @@ type
     function GetAction_ParentCloseQueryAction: IioBSCloseQueryAction;
     procedure SetAction_ParentCloseQueryAction(const Value: IioBSCloseQueryAction);
   strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
     procedure _DummyOnExecute(Sender: TObject);
     function _IsEnabled: Boolean; override;
     procedure Loaded; override;
@@ -579,10 +584,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     function HandlesTarget(Target: TObject): Boolean; override;
-    procedure ExecuteTarget(Target: TObject); override;
     function Execute: Boolean; override;
     function Executing: Boolean;
-    procedure UpdateTarget(Target: TObject); override;
     property InternalExecutionMode: TioActionExecutionMode read GetInternalExecutionMode write SetInternalExecutionMode;
     property Action_ParentCloseQueryAction: IioBSCloseQueryAction read GetAction_ParentCloseQueryAction write SetAction_ParentCloseQueryAction;
   published
@@ -830,12 +833,12 @@ end;
 
 { TioBSObjStateSave }
 
-procedure TioBSPersistenceSaveRevertPoint.ExecuteTarget(Target: TObject);
+procedure TioBSPersistenceSaveRevertPoint._InternalExecuteStdAction;
 begin
   TargetBindSource.Persistence.SaveRevertPoint(True);
 end;
 
-procedure TioBSPersistenceSaveRevertPoint.UpdateTarget(Target: TObject);
+procedure TioBSPersistenceSaveRevertPoint._InternalUpdateStdAction;
 begin
   inherited;
   Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanSaveRevertPoint;
@@ -843,12 +846,12 @@ end;
 
 { TioBSObjStateClear }
 
-procedure TioBSPersistenceClear.ExecuteTarget(Target: TObject);
+procedure TioBSPersistenceClear._InternalExecuteStdAction;
 begin
   TargetBindSource.Persistence.Clear(RaiseIfChangesExists);
 end;
 
-procedure TioBSPersistenceClear.UpdateTarget(Target: TObject);
+procedure TioBSPersistenceClear._InternalUpdateStdAction;
 begin
   inherited;
   Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanClear;
@@ -857,7 +860,7 @@ end;
 
 { TioBSObjStatePersist }
 
-procedure TioBSPersistencePersist.ExecuteTarget(Target: TObject);
+procedure TioBSPersistencePersist._InternalExecuteStdAction;
 begin
   TargetBindSource.Refresh(True); // Otherwise, in some cases, an outdated value persisted
   TargetBindSource.Persistence.Persist(RaiseIfChangesDoesNotExists, ClearAfterExecute);
@@ -865,7 +868,7 @@ begin
   TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
 
-procedure TioBSPersistencePersist.UpdateTarget(Target: TObject);
+procedure TioBSPersistencePersist._InternalUpdateStdAction;
 begin
   Enabled := True;
   Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanPersist;
@@ -874,14 +877,14 @@ end;
 
 { TioBSObjStateRevert }
 
-procedure TioBSPersistenceRevert.ExecuteTarget(Target: TObject);
+procedure TioBSPersistenceRevert._InternalExecuteStdAction;
 begin
   TargetBindSource.Persistence.Revert(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists, ClearAfterExecute);
   // Execute slave actions
   TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
 
-procedure TioBSPersistenceRevert.UpdateTarget(Target: TObject);
+procedure TioBSPersistenceRevert._InternalUpdateStdAction;
 begin
   Enabled := True;
   Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanRevert;
@@ -897,7 +900,7 @@ begin
   FAutoExec_CloseQueryAction_AfterRevert := False;
 end;
 
-procedure TioBSPersistenceRevertOrDelete.ExecuteTarget(Target: TObject);
+procedure TioBSPersistenceRevertOrDelete._InternalExecuteStdAction;
 var
   LIsDeleting: Boolean;
 begin
@@ -908,7 +911,7 @@ begin
     TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
 
-procedure TioBSPersistenceRevertOrDelete.UpdateTarget(Target: TObject);
+procedure TioBSPersistenceRevertOrDelete._InternalUpdateStdAction;
 begin
   Enabled := True;
   Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanRevertOrDelete;
@@ -923,14 +926,14 @@ begin
   RaiseIfChangesExists := False;
 end;
 
-procedure TioBSPersistenceDelete.ExecuteTarget(Target: TObject);
+procedure TioBSPersistenceDelete._InternalExecuteStdAction;
 begin
   TargetBindSource.Persistence.Delete(RaiseIfRevertPointSaved, RaiseIfChangesExists);
   // Execute slave actions
   TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
 
-procedure TioBSPersistenceDelete.UpdateTarget(Target: TObject);
+procedure TioBSPersistenceDelete._InternalUpdateStdAction;
 begin
   inherited;
   Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanDelete;
@@ -946,12 +949,12 @@ begin
   RaiseIfChangesExists := False;
 end;
 
-procedure TioBSPersistenceReload.ExecuteTarget(Target: TObject);
+procedure TioBSPersistenceReload._InternalExecuteStdAction;
 begin
   TargetBindSource.Persistence.Reload(RaiseIfRevertPointSaved, RaiseIfChangesExists);
 end;
 
-procedure TioBSPersistenceReload.UpdateTarget(Target: TObject);
+procedure TioBSPersistenceReload._InternalUpdateStdAction;
 begin
   inherited;
   Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanReload;
@@ -969,7 +972,7 @@ begin
   RaiseIfChangesExists := False;
 end;
 
-procedure TioBSPersistenceAppend.ExecuteTarget(Target: TObject);
+procedure TioBSPersistenceAppend._InternalExecuteStdAction;
 var
   LNewInstanceAsObject: TObject;
   LNewInstanceAsInterface: IInterface;
@@ -1034,7 +1037,7 @@ begin
   end;
 end;
 
-procedure TioBSPersistenceAppend.UpdateTarget(Target: TObject);
+procedure TioBSPersistenceAppend._InternalUpdateStdAction;
 begin
   inherited;
   Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
@@ -1053,7 +1056,7 @@ begin
   RaiseIfChangesExists := False;
 end;
 
-procedure TioBSPersistenceInsert.ExecuteTarget(Target: TObject);
+procedure TioBSPersistenceInsert._InternalExecuteStdAction;
 var
   LNewInstanceAsObject: TObject;
   LNewInstanceAsInterface: IInterface;
@@ -1117,7 +1120,7 @@ begin
   end;
 end;
 
-procedure TioBSPersistenceInsert.UpdateTarget(Target: TObject);
+procedure TioBSPersistenceInsert._InternalUpdateStdAction;
 begin
   inherited;
   Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
@@ -1545,18 +1548,41 @@ begin
   Result := True;
 end;
 
-procedure TioBSCloseQuery.UpdateTarget(Target: TObject);
-begin
-  Enabled := _CanClose;
-end;
-
 function TioBSCloseQuery.Execute: Boolean;
 begin
   inherited;
   Result := False;
 end;
 
-procedure TioBSCloseQuery.ExecuteTarget(Target: TObject);
+function TioBSCloseQuery.Executing: Boolean;
+begin
+  Result := FExecuting;
+end;
+
+function TioBSCloseQuery.GetInternalExecutionMode: TioActionExecutionMode;
+begin
+  Result := FInternalExecutionMode;
+end;
+
+function TioBSCloseQuery.GetAction_ParentCloseQueryAction: IioBSCloseQueryAction;
+begin
+  Result := FAction_ParentCloseQueryAction;
+end;
+
+procedure TioBSCloseQuery._InjectEventHandler;
+var
+  LEventHandlerToInject: TMethod;
+begin
+  // On runtime only and only if enabled
+  if (csDesigning in ComponentState) or not FInjectEventHandler then
+    Exit;
+  // Set the TMethod Code and Data for the event handloer to be assigned to the View/ViewContext
+  LEventHandlerToInject.Code := ClassType.MethodAddress('_OnCloseQueryEventHandler');
+  LEventHandlerToInject.Data := Self;
+  TioBSCloseQueryCommonBehaviour.InjectOnCloseQueryEventHandler(Owner, LEventHandlerToInject, False);
+end;
+
+procedure TioBSCloseQuery._InternalExecuteStdAction;
 begin
   FExecuting := True;
   try
@@ -1601,32 +1627,9 @@ begin
   end;
 end;
 
-function TioBSCloseQuery.Executing: Boolean;
+procedure TioBSCloseQuery._InternalUpdateStdAction;
 begin
-  Result := FExecuting;
-end;
-
-function TioBSCloseQuery.GetInternalExecutionMode: TioActionExecutionMode;
-begin
-  Result := FInternalExecutionMode;
-end;
-
-function TioBSCloseQuery.GetAction_ParentCloseQueryAction: IioBSCloseQueryAction;
-begin
-  Result := FAction_ParentCloseQueryAction;
-end;
-
-procedure TioBSCloseQuery._InjectEventHandler;
-var
-  LEventHandlerToInject: TMethod;
-begin
-  // On runtime only and only if enabled
-  if (csDesigning in ComponentState) or not FInjectEventHandler then
-    Exit;
-  // Set the TMethod Code and Data for the event handloer to be assigned to the View/ViewContext
-  LEventHandlerToInject.Code := ClassType.MethodAddress('_OnCloseQueryEventHandler');
-  LEventHandlerToInject.Data := Self;
-  TioBSCloseQueryCommonBehaviour.InjectOnCloseQueryEventHandler(Owner, LEventHandlerToInject, False);
+  Enabled := _CanClose;
 end;
 
 function TioBSCloseQuery._IsChildOf(const ATargetQueryAction: IioBSCloseQueryAction): Boolean;
@@ -2094,7 +2097,7 @@ begin
   FRevertedObj := nil;
 end;
 
-procedure TioBS_ETM_RevertToBindSource.ExecuteTarget(Target: TObject);
+procedure TioBS_ETM_RevertToBindSource._InternalExecuteStdAction;
 begin
   inherited;
   // Some check
@@ -2127,7 +2130,7 @@ begin
     _ShowRevertedObj;
 end;
 
-procedure TioBS_ETM_RevertToBindSource.UpdateTarget(Target: TObject);
+procedure TioBS_ETM_RevertToBindSource._InternalUpdateStdAction;
 begin
   inherited;
   Enabled := Enabled and Assigned(TargetBindSource);
@@ -2180,7 +2183,7 @@ begin
   FOwnRevertedObj := True;
 end;
 
-procedure TioBS_ETM_RevertToObject.ExecuteTarget(Target: TObject);
+procedure TioBS_ETM_RevertToObject._InternalExecuteStdAction;
 begin
   inherited;
   // Some check
@@ -2221,7 +2224,7 @@ begin
     _ShowRevertedObj;
 end;
 
-procedure TioBS_ETM_RevertToObject.UpdateTarget(Target: TObject);
+procedure TioBS_ETM_RevertToObject._InternalUpdateStdAction;
 begin
   inherited;
   Enabled := Enabled and Assigned(TargetBindSource);
