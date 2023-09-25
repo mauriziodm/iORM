@@ -140,24 +140,22 @@ type
     procedure _InternalExecuteStdAction; virtual;
     procedure _InternalUpdateStdAction; virtual;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-    procedure SetTargetBindSource(const Value: T); virtual;
-    // ExecutionMode
     function GetExecutionMode: TioActionExecutionMode;
     procedure SetExecutionMode(const Value: TioActionExecutionMode);
+    procedure SetTargetBindSource(const Value: T); virtual;
+    // properties
     property ExecutionMode: TioActionExecutionMode read GetExecutionMode write SetExecutionMode;
-  public
-    constructor Create(AOwner: TComponent); override;
-    function HandlesTarget(Target: TObject): Boolean; override;
-    procedure ExecuteTarget(Target: TObject); override;
-    procedure UpdateTarget(Target: TObject); override;
-  published
-    // Properties
     property TargetBindSource: T read FTargetBindSource write SetTargetBindSource;
     property _Version: String read Get_Version;
     // Events
     property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;
     property BeforeExecute: TNotifyEvent read FBeforeExecute write FBeforeExecute;
     property CanExecute: TioStdActionCanExecuteEvent read FCanExecute write FCanExecute;
+  public
+    constructor Create(AOwner: TComponent); override;
+    function HandlesTarget(Target: TObject): Boolean; override;
+    procedure ExecuteTarget(Target: TObject); override;
+    procedure UpdateTarget(Target: TObject); override;
   end;
 
   // SelectCurrent action to make a selection for a Selector BindSource
@@ -177,6 +175,15 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   published
+    // properties
+    property ExecutionMode;
+    property TargetBindSource;
+    property _Version;
+    // Events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
+
     property Action_CloseQueryAction: IioBSSlaveAction read FAction_CloseQueryAction write SetAction_CloseQueryAction;
     property SelectionType: TioSelectionType read FSelectionType write FSelectionType default stAppend;
   end;
@@ -186,6 +193,16 @@ type
   strict protected
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
+  published
+    // properties
+    property ExecutionMode;
+    property TargetBindSource;
+    property _Version;
+    // Events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
+
   end;
 
   // Paging PreviousPage action
@@ -193,6 +210,16 @@ type
   strict protected
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
+  published
+    // properties
+    property ExecutionMode;
+    property TargetBindSource;
+    property _Version;
+    // Events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
+
   end;
 
   // BuildWhere
@@ -210,10 +237,18 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   published
+    // properties
+    property ExecutionMode;
+    property TargetBindSource;
+    property _Version;
+    // Events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
+
     property Action_CloseQueryAction: IioBSSlaveAction read FAction_CloseQueryAction write SetAction_CloseQueryAction;
     property Action_PersistAction: IioBSSlaveAction read FAction_PersistAction write SetAction_PersistAction;
     property AutoExec_Where_OnTargetBS: Boolean read FAutoExec_Where_OnTargetBS write FAutoExec_Where_OnTargetBS default True;
-    property TargetBindSource;
   end;
 
   // ClearWhere
@@ -226,8 +261,16 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   published
-    property AutoExec_Where_OnTargetBS: Boolean read FAutoExec_Where_OnTargetBS write FAutoExec_Where_OnTargetBS default False;
+    // properties
+    property ExecutionMode;
     property TargetBindSource;
+    property _Version;
+    // Events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
+
+    property AutoExec_Where_OnTargetBS: Boolean read FAutoExec_Where_OnTargetBS write FAutoExec_Where_OnTargetBS default False;
   end;
 
   // =================================================================================================

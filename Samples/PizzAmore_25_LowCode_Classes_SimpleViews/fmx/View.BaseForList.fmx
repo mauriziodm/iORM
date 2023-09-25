@@ -166,6 +166,8 @@ object ViewBaseForList: TViewBaseForList
     object acSelectCurrent: TioBSSelectCurrent
       Category = 'iORM-BS'
       Text = 'Select'
+      ExecutionMode = emActive
+      TargetBindSource = BSMaster
       Action_CloseQueryAction = acBack
     end
     object acAdd: TioBSPersistenceAppend
@@ -177,10 +179,14 @@ object ViewBaseForList: TViewBaseForList
     object acBuildWhere: TioBSBuildWhere
       Category = 'iORM - BS - WhereBuilder'
       Text = 'Search'
+      ExecutionMode = emActive
+      TargetBindSource = BSWhere
     end
     object acClearWhere: TioBSClearWhere
       Category = 'iORM - BS - WhereBuilder'
       Text = 'Clear'
+      ExecutionMode = emActive
+      TargetBindSource = BSWhere
       AutoExec_Where_OnTargetBS = True
     end
   end
