@@ -125,12 +125,10 @@ inherited ViewCustomerList: TViewCustomerList
     object acNextPage: TioBSNextPage
       Category = 'iORM-BSPaging'
       Text = 'PgUp'
-      TargetBindSource = BSMaster
     end
     object acPrevPage: TioBSPrevPage
       Category = 'iORM-BSPaging'
       Text = 'PgDn'
-      TargetBindSource = BSMaster
     end
   end
   inherited BSMaster: TioPrototypeBindSourceMaster

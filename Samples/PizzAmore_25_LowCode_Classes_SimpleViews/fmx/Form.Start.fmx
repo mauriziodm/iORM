@@ -8,7 +8,7 @@ object StartForm: TStartForm
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
-  DesignerMasterStyle = 3
+  DesignerMasterStyle = 0
   object TabControlStart: TTabControl
     Align = Client
     FullSize = True
@@ -63,7 +63,7 @@ object StartForm: TStartForm
             StyledSettings = [Family, Size, Style]
             ImageIndex = -1
             Size.Width = 48.000000000000000000
-            Size.Height = 48.000000000000000000
+            Size.Height = 40.000000000000000000
             Size.PlatformDefault = False
             StyleLookup = 'escapetoolbutton'
             TextSettings.FontColor = claAliceblue
@@ -145,7 +145,7 @@ object StartForm: TStartForm
             Position.X = 129.000000000000000000
             Position.Y = 5.000000000000000000
             Size.Width = 152.000000000000000000
-            Size.Height = 44.000000000000000000
+            Size.Height = 48.000000000000000000
             Size.PlatformDefault = False
             TextSettings.Font.Size = 36.000000000000000000
             TextSettings.Font.StyleExt = {00040000000100000004000000}
@@ -158,7 +158,7 @@ object StartForm: TStartForm
             Position.X = 21.000000000000000000
             Position.Y = 4.000000000000000000
             Size.Width = 108.000000000000000000
-            Size.Height = 44.000000000000000000
+            Size.Height = 48.000000000000000000
             Size.PlatformDefault = False
             TextSettings.Font.Size = 36.000000000000000000
             TextSettings.Font.StyleExt = {00070000000000000004000000}

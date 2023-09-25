@@ -151,12 +151,13 @@ type
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget(Target: TObject); override;
   published
+    // Properties
+    property TargetBindSource: T read FTargetBindSource write SetTargetBindSource;
+    property _Version: String read Get_Version;
     // Events
     property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;
     property BeforeExecute: TNotifyEvent read FBeforeExecute write FBeforeExecute;
     property CanExecute: TioStdActionCanExecuteEvent read FCanExecute write FCanExecute;
-    property TargetBindSource: T read FTargetBindSource write SetTargetBindSource;
-    property _Version: String read Get_Version;
   end;
 
   // SelectCurrent action to make a selection for a Selector BindSource
@@ -212,6 +213,7 @@ type
     property Action_CloseQueryAction: IioBSSlaveAction read FAction_CloseQueryAction write SetAction_CloseQueryAction;
     property Action_PersistAction: IioBSSlaveAction read FAction_PersistAction write SetAction_PersistAction;
     property AutoExec_Where_OnTargetBS: Boolean read FAutoExec_Where_OnTargetBS write FAutoExec_Where_OnTargetBS default True;
+    property TargetBindSource;
   end;
 
   // ClearWhere
@@ -225,6 +227,7 @@ type
     constructor Create(AOwner: TComponent); override;
   published
     property AutoExec_Where_OnTargetBS: Boolean read FAutoExec_Where_OnTargetBS write FAutoExec_Where_OnTargetBS default False;
+    property TargetBindSource;
   end;
 
   // =================================================================================================
@@ -558,7 +561,6 @@ type
     FInjectEventHandler: Boolean;
     FInternalExecutionMode: TioActionExecutionMode;
     FOnCloseQuery: TCloseQueryEvent;
-    FOnConfirmationRequest: TioStdActionCanExecuteEvent;
     FOnEditingAction: TioBSCloseQueryOnEditingAction;
     FOnExecuteAction: TioBSCloseQueryOnExecuteAction;
     FOnUpdateScope: TioBSCloseQueryActionUpdateScope;
@@ -579,7 +581,6 @@ type
     procedure _DummyOnExecute(Sender: TObject);
     function _IsEnabled: Boolean; override;
     procedure Loaded; override;
-    function DoOnConfirmationRequest: Boolean;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -597,7 +598,6 @@ type
     property TargetBindSource;
     // Events
     property OnCloseQuery: TCloseQueryEvent read FOnCloseQuery write FOnCloseQuery;
-    property OnConfirmationRequest: TioStdActionCanExecuteEvent read FOnConfirmationRequest write FOnConfirmationRequest;
     property OnHint;
   end;
 
@@ -1520,13 +1520,6 @@ begin
   inherited;
 end;
 
-function TioBSCloseQuery.DoOnConfirmationRequest: Boolean;
-begin
-  Result := True;
-  if Assigned(FOnConfirmationRequest) then
-    FOnConfirmationRequest(Self, Result);
-end;
-
 procedure TioBSCloseQuery.Loaded;
 begin
   inherited;
@@ -1590,7 +1583,9 @@ begin
     // cioè è la prima BSCloseQueryAction della catena di esecuzione delle CloseQueryActions. HO
     // fatto in questo modo sia perchè altrimenti ci sarebbero potute essere varie richieste di conferma
     // sia perchè altrimenti avevo un AV error.
-    if _CanClose and ((FInternalExecutionMode = emPassive) or DoOnConfirmationRequest) then
+    // NB: Mauri 23/09/2023: Non c'è più dil DoOnConfirmationRequest perchè rimosso perchè ho aggiunto l'evento
+    //      "CanExecute" a tutte le StdActions.
+    if _CanClose then
     begin
       // Se è il caso fa l'Execute anche sulle ChildCQA
       // NB: Le esegue sempre a partire da quella creata più recentemente (child) e andando all'indietro

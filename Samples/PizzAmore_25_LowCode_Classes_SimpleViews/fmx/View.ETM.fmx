@@ -157,7 +157,7 @@ object EtmView: TEtmView
     Size.PlatformDefault = False
     TextSettings.HorzAlign = Center
     TabOrder = 3
-    Viewport.Width = 380.000000000000000000
+    Viewport.Width = 396.000000000000000000
     Viewport.Height = 155.000000000000000000
   end
   object BS_ETM: TioPrototypeBindSourceMaster

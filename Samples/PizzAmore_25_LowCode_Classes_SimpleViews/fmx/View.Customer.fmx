@@ -80,8 +80,8 @@ inherited CustomerView: TCustomerView
         TabOrder = 40
         Text = '-33'
         TextSettings.Font.StyleExt = {00070000000000000004000000}
-        Position.X = 5.000000000000000000
-        Position.Y = 15.000000000000000000
+        Position.X = 9.000000000000000000
+        Position.Y = 11.000000000000000000
         Margins.Left = 5.000000000000000000
         Margins.Right = 5.000000000000000000
         Margins.Bottom = 5.000000000000000000
