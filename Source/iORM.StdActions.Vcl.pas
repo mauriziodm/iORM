@@ -138,23 +138,22 @@ type
     procedure _InternalExecuteStdAction; virtual;
     procedure _InternalUpdateStdAction; virtual;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
-    procedure SetTargetBindSource(const Value: T); virtual;
-    // ExecutionMode
     function GetExecutionMode: TioActionExecutionMode;
     procedure SetExecutionMode(const Value: TioActionExecutionMode);
+    procedure SetTargetBindSource(const Value: T); virtual;
+    // properties
     property ExecutionMode: TioActionExecutionMode read GetExecutionMode write SetExecutionMode;
+    property TargetBindSource: T read FTargetBindSource write SetTargetBindSource;
+    property _Version: String read Get_Version;
+    // Events
+    property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;
+    property BeforeExecute: TNotifyEvent read FBeforeExecute write FBeforeExecute;
+    property CanExecute: TioStdActionCanExecuteEvent read FCanExecute write FCanExecute;
   public
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget(Target: TObject); override;
-  published
-    // Events
-    property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;
-    property BeforeExecute: TNotifyEvent read FBeforeExecute write FBeforeExecute;
-    property CanExecute: TioStdActionCanExecuteEvent read FCanExecute write FCanExecute;
-    property TargetBindSource: T read FTargetBindSource write SetTargetBindSource;
-    property _Version: String read Get_Version;
   end;
 
   // SelectCurrent action to make a selection for a Selector BindSource
@@ -174,6 +173,15 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   published
+    // inherited properties
+    property ExecutionMode;
+    property TargetBindSource;
+    property _Version;
+    // inherited events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
+    // properties
     property Action_CloseQueryAction: IioBSSlaveAction read FAction_CloseQueryAction write SetAction_CloseQueryAction;
     property SelectionType: TioSelectionType read FSelectionType write FSelectionType default stAppend;
   end;
@@ -183,6 +191,15 @@ type
   strict protected
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
+  published
+    // inherited properties
+    property ExecutionMode;
+    property TargetBindSource;
+    property _Version;
+    // inherited Events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
   end;
 
   // Paging PreviousPage action
@@ -190,6 +207,15 @@ type
   strict protected
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
+  published
+    // inherited properties
+    property ExecutionMode;
+    property TargetBindSource;
+    property _Version;
+    //inherited  Events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
   end;
 
   // BuildWhere
@@ -207,6 +233,15 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   published
+    // inherited properties
+    property ExecutionMode;
+    property TargetBindSource;
+    property _Version;
+    // inherited Events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
+    // properties
     property Action_CloseQueryAction: IioBSSlaveAction read FAction_CloseQueryAction write SetAction_CloseQueryAction;
     property Action_PersistAction: IioBSSlaveAction read FAction_PersistAction write SetAction_PersistAction;
     property AutoExec_Where_OnTargetBS: Boolean read FAutoExec_Where_OnTargetBS write FAutoExec_Where_OnTargetBS default True;
@@ -222,6 +257,15 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   published
+    // inherited properties
+    property ExecutionMode;
+    property TargetBindSource;
+    property _Version;
+    // inherited events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
+    // properties
     property AutoExec_Where_OnTargetBS: Boolean read FAutoExec_Where_OnTargetBS write FAutoExec_Where_OnTargetBS default False;
   end;
 
@@ -263,30 +307,35 @@ type
     procedure _InternalExecuteStdAction; virtual;
     procedure _InternalUpdateStdAction; virtual;
     function _IsEnabled: Boolean; virtual;
+    function GetExecutionMode: TioActionExecutionMode;
+    procedure SetExecutionMode(const Value: TioActionExecutionMode);
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    // properties
     property Action_CloseQueryAction: IioBSSlaveAction read FAction_CloseQueryAction write SetAction_CloseQueryAction;
     property Action_ReloadAction: IioBSSlaveAction read FAction_ReloadAction write FAction_ReloadAction;
     property Action_ShowOrSelectAction: IioBSSlaveAction read FAction_ShowOrSelectAction write SetAction_ShowOrSelectAction;
-    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     property ClearAfterExecute: Boolean read FClearAfterExecute write FClearAfterExecute default True;
     property DisableIfChangesDoesNotExists: Boolean read FDisableIfChangesDoesNotExists write FDisableIfChangesDoesNotExists default False;
     property DisableIfChangesExists: Boolean read FDisableIfChangesExists write FDisableIfChangesExists default False;
     property DisableIfSaved: Boolean read FDisableIfSaved write FDisableIfSaved default False;
+    property ExecutionMode: TioActionExecutionMode read GetExecutionMode write SetExecutionMode;
     property RaiseIfChangesDoesNotExists: Boolean read FRaiseIfChangesDoesNotExists write FRaiseIfChangesDoesNotExists default False;
     property RaiseIfChangesExists: Boolean read FRaiseIfChangesExists write FRaiseIfChangesExists default True;
     property RaiseIfRevertPointSaved: Boolean read FRaiseIfRevertPointSaved write FRaiseIfRevertPointSaved default False;
     property RaiseIfRevertPointNotSaved: Boolean read FRaiseIfRevertPointNotSaved write FRaiseIfRevertPointNotSaved default False;
-    // ExecutionMode
-    function GetExecutionMode: TioActionExecutionMode;
-    procedure SetExecutionMode(const Value: TioActionExecutionMode);
-    property ExecutionMode: TioActionExecutionMode read GetExecutionMode write SetExecutionMode;
+    property TargetBindSource: IioMasterBindSource read FTargetBindSource write SetTargetBindSource;
+    property _Version: String read Get_Version;
+    // events
+    property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;
+    property BeforeExecute: TNotifyEvent read FBeforeExecute write FBeforeExecute;
+    property CanExecute: TioStdActionCanExecuteEvent read FCanExecute write FCanExecute;
   public
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget(Target: TObject); override;
   published
-    property _Version: String read Get_Version;
-    // Publishing ancestor properties
+    // inherited properties
     property AutoCheck;
     property Caption;
     property Checked;
@@ -300,15 +349,7 @@ type
     property ImageName;
     property SecondaryShortCuts;
     property ShortCut default 0;
-    property TargetBindSource: IioMasterBindSource read FTargetBindSource write SetTargetBindSource;
     property Visible;
-    // Events
-    property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;
-    property BeforeExecute: TNotifyEvent read FBeforeExecute write FBeforeExecute;
-    property CanExecute: TioStdActionCanExecuteEvent read FCanExecute write FCanExecute;
-    // property OnExecute;
-    // property OnHint;
-    // property OnUpdate;
   end;
 
   TioBSPersistenceSaveRevertPoint = class(TioBSPersistenceStdActionVcl)
@@ -316,7 +357,12 @@ type
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
   published
-    // Events
+    // inherited properties
+    property TargetBindSource;
+    // inherited events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
     property OnHint;
     property OnUpdate;
   end;
@@ -326,9 +372,14 @@ type
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
   published
+    // inherited properties
     property DisableIfChangesExists;
     property RaiseIfChangesExists;
-    // Events
+    property TargetBindSource;
+    // inherited events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
     property OnHint;
     property OnUpdate;
   end;
@@ -338,11 +389,16 @@ type
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
   published
-    // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
+    // inherited properties
     property Action_CloseQueryAction;
+    // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
-    // Events
+    property TargetBindSource;
+    // inherited events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
     property OnHint;
     property OnUpdate;
   end;
@@ -352,12 +408,17 @@ type
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
   published
-    // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
+    // inherited properties
     property Action_CloseQueryAction;
+    // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property RaiseIfRevertPointNotSaved;
-    // Events
+    property TargetBindSource;
+    // inherited events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
     property OnHint;
     property OnUpdate;
   end;
@@ -372,14 +433,19 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   published
-    // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
+    // inherited properties
     property Action_CloseQueryAction;
     property AutoExec_CloseQueryAction_AfterDelete: Boolean read FAutoExec_CloseQueryAction_AfterDelete write FAutoExec_CloseQueryAction_AfterDelete default True;
     property AutoExec_CloseQueryAction_AfterRevert: Boolean read FAutoExec_CloseQueryAction_AfterRevert write FAutoExec_CloseQueryAction_AfterRevert default False;
+    // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property RaiseIfRevertPointNotSaved;
-    // Events
+    property TargetBindSource;
+    // inherited events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
     property OnHint;
     property OnUpdate;
   end;
@@ -388,33 +454,43 @@ type
   strict protected
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
+  public
+    constructor Create(AOwner: TComponent); override;
   published
+    // inherited properties
     property Action_CloseQueryAction;
     property DisableIfChangesExists;
     property DisableIfSaved;
     property RaiseIfChangesExists default False;
     property RaiseIfRevertPointSaved;
-    // Events
+    property TargetBindSource;
+    // inherited events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
     property OnHint;
     property OnUpdate;
-  public
-    constructor Create(AOwner: TComponent); override;
   end;
 
   TioBSPersistenceReload = class(TioBSPersistenceStdActionVcl)
   strict protected
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
+  public
+    constructor Create(AOwner: TComponent); override;
   published
+    // inherited properties
     property DisableIfChangesExists;
     property DisableIfSaved;
     property RaiseIfChangesExists default False;
     property RaiseIfRevertPointSaved;
-    // Events
+    property TargetBindSource;
+    // inherited events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
     property OnHint;
     property OnUpdate;
-  public
-    constructor Create(AOwner: TComponent); override;
   end;
 
   TioBSPersistenceAppend = class(TioBSPersistenceStdActionVcl)
@@ -426,21 +502,28 @@ type
   strict protected
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
+  public
+    constructor Create(AOwner: TComponent); override;
   published
+    // inherited properties
     property Action_ShowOrSelectAction;
     property DisableIfChangesExists;
     property DisableIfSaved;
-    property EntityTypeAlias: String read FEntityTypeAlias write FEntityTypeAlias;
-    property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
     property RaiseIfChangesExists default False;
     property RaiseIfRevertPointSaved;
+    property TargetBindSource;
+    // inherited events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
+    property OnHint;
+    property OnUpdate;
+    // properties
+    property EntityTypeAlias: String read FEntityTypeAlias write FEntityTypeAlias;
+    property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
     // events
     property OnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent read FOnNewInstanceAsObject write FOnNewInstanceAsObject;
     property OnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent read FOnNewInstanceAsInterface write FOnNewInstanceAsInterface;
-    property OnHint;
-    property OnUpdate;
-  public
-    constructor Create(AOwner: TComponent); override;
   end;
 
   TioBSPersistenceInsert = class(TioBSPersistenceStdActionVcl)
@@ -452,21 +535,28 @@ type
   strict protected
     procedure _InternalExecuteStdAction; override;
     procedure _InternalUpdateStdAction; override;
+  public
+    constructor Create(AOwner: TComponent); override;
   published
+    // inherited properties
     property Action_ShowOrSelectAction;
     property DisableIfChangesExists;
     property DisableIfSaved;
-    property EntityTypeAlias: String read FEntityTypeAlias write FEntityTypeAlias;
-    property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
     property RaiseIfChangesExists default False;
     property RaiseIfRevertPointSaved;
+    property TargetBindSource;
+    // inherited events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
+    property OnHint;
+    property OnUpdate;
+    // properties
+    property EntityTypeAlias: String read FEntityTypeAlias write FEntityTypeAlias;
+    property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
     // events
     property OnNewInstanceAsObject: TioStdActionNewInstanceAsObjectEvent read FOnNewInstanceAsObject write FOnNewInstanceAsObject;
     property OnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent read FOnNewInstanceAsInterface write FOnNewInstanceAsInterface;
-    property OnHint;
-    property OnUpdate;
-  public
-    constructor Create(AOwner: TComponent); override;
   end;
 
   TioBS_ETM_RevertToObject = class(TioBSPersistenceStdActionVcl)
@@ -486,9 +576,17 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   published
-    // Properties
+    // inherited properties
     property Action_CloseQueryAction;
     property Action_ShowOrSelectAction;
+    property TargetBindSource;
+    // inherited events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
+    property OnHint;
+    property OnUpdate;
+    // Properties
     property AutoExec_OnETMfor_AfterRevert: TioStdAction_ETM_AutoExec_AfterRevert read FAutoExec_OnETMfor_AfterRevert write FAutoExec_OnETMfor_AfterRevert default doNothing;
     property AutoExec_OnTargetBS_AfterRevert: TioStdAction_ETM_AutoExec_AfterRevert read FAutoExec_OnTargetBS_AfterRevert write FAutoExec_OnTargetBS_AfterRevert default doNothing;
     property AutoExec_Persist_AfterRevert: Boolean read FAutoExec_Persist_AfterRevert write FAutoExec_Persist_AfterRevert default False;
@@ -496,8 +594,6 @@ type
     // Events
     property AfterRevert: TioStdAction_ETM_AfterRevertEvent read FAfterRevertEvent write FAfterRevertEvent;
     property BeforeRevert: TioStdAction_ETM_BeforeRevertEvent read FBeforeRevertEvent write FBeforeRevertEvent;
-    property OnHint;
-    property OnUpdate;
   end;
 
   TioBS_ETM_RevertToBindSource = class(TioBSPersistenceStdActionVcl)
@@ -515,16 +611,22 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   published
-    // Properties
+    // inherited properties
     property Action_CloseQueryAction;
     property Action_ShowOrSelectAction;
+    property TargetBindSource;
+    // inherited events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
+    property OnHint;
+    property OnUpdate;
+    // Properties
     property AutoExec_OnETMfor_AfterRevert: TioStdAction_ETM_AutoExec_AfterRevert read FAutoExec_OnETMfor_AfterRevert write FAutoExec_OnETMfor_AfterRevert default doNothing;
     property AutoExec_OnTargetBS_AfterRevert: TioStdAction_ETM_AutoExec_AfterRevert read FAutoExec_OnTargetBS_AfterRevert write FAutoExec_OnTargetBS_AfterRevert default doNothing;
     property AutoExec_Persist_AfterRevert: Boolean read FAutoExec_Persist_AfterRevert write FAutoExec_Persist_AfterRevert default False;
     // Events
     property AfterRevert: TioStdAction_ETM_AfterRevertEvent read FAfterRevertEvent write FAfterRevertEvent;
-    property OnHint;
-    property OnUpdate;
   end;
 
   TioBSCloseQuery = class(TioBSPersistenceStdActionVcl, IioBSCloseQueryAction)
@@ -563,13 +665,21 @@ type
     property Action_ParentCloseQueryAction: IioBSCloseQueryAction read GetAction_ParentCloseQueryAction write SetAction_ParentCloseQueryAction;
   published
     procedure _OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean); // Must be published
+    // inherited properties
+    property TargetBindSource;
+    // inherited events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
+    property OnHint;
+    // property OnUpdate; // Lasciarla non visibile, può fare casino in questa particolare action
+    // properties
     property InjectEventHandler: Boolean read FInjectEventHandler write FInjectEventHandler default True;
     property OnEditingAction: TioBSCloseQueryOnEditingAction read FOnEditingAction write FOnEditingAction default eaDisable;
     property OnExecuteAction: TioBSCloseQueryOnExecuteAction read FOnExecuteAction write FOnExecuteAction default eaClose;
     property OnUpdateScope: TioBSCloseQueryActionUpdateScope read FOnUpdateScope write FOnUpdateScope default usLocal;
     // Events
     property OnCloseQuery: TCloseQueryEvent read FOnCloseQuery write FOnCloseQuery;
-    property OnHint;
   end;
 
   // =================================================================================================

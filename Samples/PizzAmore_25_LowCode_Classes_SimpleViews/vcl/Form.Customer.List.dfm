@@ -104,10 +104,8 @@ object CustomerListForm: TCustomerListForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 154
-      ExplicitTop = 12
-      ExplicitWidth = 176
-      ExplicitHeight = 17
+      ExplicitLeft = 144
+      ExplicitTop = 1
     end
   end
   object PanelTop: TPanel
@@ -279,7 +277,7 @@ object CustomerListForm: TCustomerListForm
       ParentFont = False
     end
     object ButtonSearch: TSpeedButton
-      Left = 306
+      Left = 258
       Top = 0
       Width = 50
       Height = 45
@@ -294,7 +292,7 @@ object CustomerListForm: TCustomerListForm
       ExplicitLeft = 330
     end
     object ButtonClear: TSpeedButton
-      Left = 306
+      Left = 258
       Top = 49
       Width = 50
       Height = 25
@@ -328,7 +326,7 @@ object CustomerListForm: TCustomerListForm
     object DBEditWhereName: TDBEdit
       Left = 155
       Top = 6
-      Width = 94
+      Width = 46
       Height = 25
       Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
@@ -342,12 +340,12 @@ object CustomerListForm: TCustomerListForm
       Font.Style = []
       ParentFont = False
       TabOrder = 1
-      ExplicitWidth = 90
+      ExplicitWidth = 42
     end
     object DBEditWhereCity: TDBEdit
       Left = 43
       Top = 37
-      Width = 206
+      Width = 158
       Height = 25
       Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
@@ -361,7 +359,7 @@ object CustomerListForm: TCustomerListForm
       Font.Style = []
       ParentFont = False
       TabOrder = 2
-      ExplicitWidth = 202
+      ExplicitWidth = 154
     end
   end
   object DSCustomers: TioDataSetMaster
@@ -386,7 +384,6 @@ object CustomerListForm: TCustomerListForm
       Size = 100
     end
     object DSCustomersPagingCurrentPageOf: TStringField
-      Alignment = taCenter
       FieldName = '%Paging.CurrentPageOf'
       Size = 100
     end
@@ -407,18 +404,20 @@ object CustomerListForm: TCustomerListForm
     object acNextPage: TioBSNextPage
       Category = 'iORM-BSPaging'
       Caption = 'Pg.Up'
+      ExecutionMode = emActive
       TargetBindSource = DSCustomers
     end
     object acPrevPage: TioBSPrevPage
       Category = 'iORM-BSPaging'
       Caption = 'Pg.Dn'
+      ExecutionMode = emActive
       TargetBindSource = DSCustomers
     end
     object acBack: TioBSCloseQuery
       Category = 'iORM-BS'
       Caption = 'Back'
-      OnUpdateScope = usGlobal
       TargetBindSource = DSCustomers
+      OnUpdateScope = usGlobal
     end
     object acShowOrSelect: TioBSShowOrSelect
       Category = 'iORM-BS'
@@ -432,25 +431,28 @@ object CustomerListForm: TCustomerListForm
     object acAdd: TioBSPersistenceAppend
       Category = 'iORM-BSPersistence'
       Caption = 'Add'
-      Action_ShowOrSelectAction = acShowOrSelect
       TargetBindSource = DSCustomers
+      Action_ShowOrSelectAction = acShowOrSelect
     end
     object acSelectCurrent: TioBSSelectCurrent
       Category = 'iORM-BS'
       Caption = 'Select'
-      Action_CloseQueryAction = acBack
+      ExecutionMode = emActive
       TargetBindSource = DSCustomers
+      Action_CloseQueryAction = acBack
     end
     object acBuildWhere: TioBSBuildWhere
       Category = 'iORM - BS - WhereBuilder'
       Caption = 'Search'
+      ExecutionMode = emActive
       TargetBindSource = DSWhere
     end
     object acClearWhere: TioBSClearWhere
       Category = 'iORM - BS - WhereBuilder'
       Caption = 'Clear'
-      AutoExec_Where_OnTargetBS = True
+      ExecutionMode = emActive
       TargetBindSource = DSWhere
+      AutoExec_Where_OnTargetBS = True
     end
   end
   object DSWhere: TioDataSetMaster

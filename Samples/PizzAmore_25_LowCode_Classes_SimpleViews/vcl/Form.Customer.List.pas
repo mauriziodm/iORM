@@ -15,8 +15,6 @@ type
   [diSimpleViewFor(TCustomer, 'LIST')]
   TCustomerListForm = class(TForm)
     DSCustomers: TioDataSetMaster;
-    DSCustomersID: TIntegerField;
-    DSCustomersName: TStringField;
     SourceCustomers: TDataSource;
     PanelBottom: TPanel;
     ButtonAdd: TSpeedButton;
@@ -27,10 +25,8 @@ type
     LabelTitle: TLabel;
     ButtonDelete: TSpeedButton;
     ButtonPageDown: TSpeedButton;
-    DSCustomersPhoneNumber: TStringField;
     GridCustomers: TDBGrid;
     DBTextPageOf: TDBText;
-    DSCustomersPagingCurrentPageOf: TStringField;
     ActionList1: TActionList;
     acDelete: TioBSPersistenceDelete;
     acNextPage: TioBSNextPage;
@@ -41,9 +37,6 @@ type
     acSelectCurrent: TioBSSelectCurrent;
     PanelWhere: TPanel;
     DSWhere: TioDataSetMaster;
-    DSWhereID: TIntegerField;
-    DSWhereName: TStringField;
-    DSWhereCity: TStringField;
     Label1: TLabel;
     DBEditWhereID: TDBEdit;
     Label2: TLabel;
@@ -55,6 +48,13 @@ type
     SourceWhere: TDataSource;
     acBuildWhere: TioBSBuildWhere;
     acClearWhere: TioBSClearWhere;
+    DSCustomersID: TIntegerField;
+    DSCustomersName: TStringField;
+    DSCustomersPhoneNumber: TStringField;
+    DSCustomersPagingCurrentPageOf: TStringField;
+    DSWhereID: TIntegerField;
+    DSWhereName: TStringField;
+    DSWhereCity: TStringField;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure GridCustomersDblClick(Sender: TObject);

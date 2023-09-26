@@ -27,6 +27,7 @@ object PizzaListForm: TPizzaListForm
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
+    ExplicitWidth = 372
     object ButtonSelect: TSpeedButton
       Left = 326
       Top = 0
@@ -81,6 +82,8 @@ object PizzaListForm: TPizzaListForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
+    ExplicitTop = 618
+    ExplicitWidth = 372
     object ButtonAdd: TSpeedButton
       Left = 326
       Top = 0
@@ -126,6 +129,8 @@ object PizzaListForm: TPizzaListForm
     SelectedColor = 13828095
     ShowFocus = False
     OnDblClick = DBCtrlGridPizzasDblClick
+    ExplicitWidth = 372
+    ExplicitHeight = 499
     object DBTextName: TDBText
       Left = 99
       Top = 20
@@ -181,6 +186,8 @@ object PizzaListForm: TPizzaListForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 3
+    ExplicitTop = 539
+    ExplicitWidth = 372
     object Label1: TLabel
       Left = 8
       Top = 7
@@ -369,8 +376,8 @@ object PizzaListForm: TPizzaListForm
     object acBack: TioBSCloseQuery
       Category = 'iORM-BS'
       Caption = 'Back'
-      OnUpdateScope = usGlobal
       TargetBindSource = DSPizzas
+      OnUpdateScope = usGlobal
     end
     object acShowOrSelect: TioBSShowOrSelect
       Category = 'iORM-BS'
@@ -383,19 +390,21 @@ object PizzaListForm: TPizzaListForm
     object acAdd: TioBSPersistenceAppend
       Category = 'iORM-BSPersistence'
       Caption = 'Add'
-      Action_ShowOrSelectAction = acShowOrSelect
       TargetBindSource = DSPizzas
+      Action_ShowOrSelectAction = acShowOrSelect
     end
     object acBuildWhere: TioBSBuildWhere
       Category = 'iORM - BS - WhereBuilder'
       Caption = 'Search'
+      ExecutionMode = emActive
       TargetBindSource = DSWhere
     end
     object acClearWhere: TioBSClearWhere
       Category = 'iORM - BS - WhereBuilder'
       Caption = 'Clear'
-      AutoExec_Where_OnTargetBS = True
+      ExecutionMode = emActive
       TargetBindSource = DSWhere
+      AutoExec_Where_OnTargetBS = True
     end
   end
   object DSWhere: TioDataSetMaster
