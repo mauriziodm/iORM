@@ -3,6 +3,9 @@ inherited VMOrder: TVMOrder
     TypeName = 'IOrder'
     OnSelectionInterface = MPMasterSelectionInterface
   end
+  inherited acShowETM: TioVMActionBSShowOrSelect
+    Left = 464
+  end
   object BSCustomer: TioModelPresenterDetail
     AsDefault = False
     MasterBindSource = BSMaster
@@ -39,7 +42,7 @@ inherited VMOrder: TVMOrder
   end
   object acDeleteRow: TioVMAction
     Name = 'acDeleteRow'
-    OnExecute = acDeleteRowExecute
+    BeforeExecute = acDeleteRowBeforeExecute
     Left = 328
     Top = 48
   end

@@ -18,8 +18,8 @@ object VMBaseForList: TVMBaseForList
   end
   object acBack: TioVMActionBSCloseQuery
     Name = 'acBack'
-    OnUpdateScope = usGlobal
     TargetBindSource = BSMaster
+    OnUpdateScope = usGlobal
     Left = 160
     Top = 48
   end
@@ -42,8 +42,8 @@ object VMBaseForList: TVMBaseForList
   end
   object acSelectCurrent: TioVMActionBSSelectCurrent
     Name = 'acSelectCurrent'
-    Action_CloseQueryAction = acBack
     TargetBindSource = BSMaster
+    Action_CloseQueryAction = acBack
     Left = 160
     Top = 176
   end
@@ -64,8 +64,8 @@ object VMBaseForList: TVMBaseForList
   end
   object acClearWhere: TioVMActionBSClearWhere
     Name = 'acClearWhere'
-    AutoExec_Where_OnTargetBS = True
     TargetBindSource = BSWhere
+    AutoExec_Where_OnTargetBS = True
     Left = 320
     Top = 176
   end

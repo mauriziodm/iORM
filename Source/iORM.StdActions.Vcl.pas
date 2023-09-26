@@ -162,7 +162,6 @@ type
     // properties
     property ExecutionMode: TioActionExecutionMode read GetExecutionMode write SetExecutionMode;
     property TargetBindSource: T read FTargetBindSource write SetTargetBindSource;
-    property _Version: String read Get_Version;
     // Events
     property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;
     property BeforeExecute: TNotifyEvent read FBeforeExecute write FBeforeExecute;
@@ -188,6 +187,8 @@ type
     property SecondaryShortCuts;
     property ShortCut default 0;
     property Visible;
+    // properties
+    property _Version: String read Get_Version;
   end;
 
   // SelectCurrent action to make a selection for a Selector BindSource
@@ -208,9 +209,7 @@ type
     constructor Create(AOwner: TComponent); override;
   published
     // inherited properties
-    property ExecutionMode;
     property TargetBindSource;
-    property _Version;
     // inherited events
     property AfterExecute;
     property BeforeExecute;
@@ -229,9 +228,7 @@ type
     procedure _InternalUpdateStdAction; override;
   published
     // inherited properties
-    property ExecutionMode;
     property TargetBindSource;
-    property _Version;
     // inherited Events
     property AfterExecute;
     property BeforeExecute;
@@ -247,9 +244,7 @@ type
     procedure _InternalUpdateStdAction; override;
   published
     // inherited properties
-    property ExecutionMode;
     property TargetBindSource;
-    property _Version;
     //inherited  Events
     property AfterExecute;
     property BeforeExecute;
@@ -274,9 +269,7 @@ type
     constructor Create(AOwner: TComponent); override;
   published
     // inherited properties
-    property ExecutionMode;
     property TargetBindSource;
-    property _Version;
     // inherited Events
     property AfterExecute;
     property BeforeExecute;
@@ -300,9 +293,7 @@ type
     constructor Create(AOwner: TComponent); override;
   published
     // inherited properties
-    property ExecutionMode;
     property TargetBindSource;
-    property _Version;
     // inherited events
     property AfterExecute;
     property BeforeExecute;
@@ -368,7 +359,6 @@ type
     property RaiseIfRevertPointNotSaved: Boolean read FRaiseIfRevertPointNotSaved write FRaiseIfRevertPointNotSaved default False;
     property RaiseIfRevertPointSaved: Boolean read FRaiseIfRevertPointSaved write FRaiseIfRevertPointSaved default False;
     property TargetBindSource: IioMasterBindSource read FTargetBindSource write SetTargetBindSource;
-    property _Version: String read Get_Version;
     // events
     property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;
     property BeforeExecute: TNotifyEvent read FBeforeExecute write FBeforeExecute;
@@ -394,6 +384,8 @@ type
     property SecondaryShortCuts;
     property ShortCut default 0;
     property Visible;
+    // properties
+    property _Version: String read Get_Version;
   end;
 
   TioBSPersistenceSaveRevertPoint = class(TioBSPersistenceStdActionVcl)
@@ -435,7 +427,7 @@ type
   published
     // inherited properties
     property Action_CloseQueryAction;
-    // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
+    //property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property TargetBindSource;
@@ -454,7 +446,7 @@ type
   published
     // inherited properties
     property Action_CloseQueryAction;
-    // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
+    //property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property RaiseIfRevertPointNotSaved;
@@ -479,7 +471,7 @@ type
   published
     // inherited properties
     property Action_CloseQueryAction;
-    // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
+    //property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property RaiseIfRevertPointNotSaved;

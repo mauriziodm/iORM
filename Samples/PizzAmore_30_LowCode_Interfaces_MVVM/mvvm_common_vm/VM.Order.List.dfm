@@ -9,7 +9,10 @@ inherited VMOrderList: TVMOrderList
     TypeName = 'IWhereOrder'
     AfterSelectionInterface = BSWhereAfterSelectionInterface
   end
-  object acWhereShowHistory: TioVMActionBSShowOrSelect [7]
+  inherited acBuildWhere: TioVMActionBSBuildWhere
+    Action_PersistAction = acWherePersist
+  end
+  object acWhereShowHistory: TioVMActionBSShowOrSelect
     Name = 'acWhereShowHistory'
     Action_ParentCloseQueryAction = acBack
     ShowMode = smBSTypeNameAsSelector
@@ -18,13 +21,10 @@ inherited VMOrderList: TVMOrderList
     Left = 320
     Top = 304
   end
-  object acWherePersist: TioVMActionBSPersistencePersist [8]
+  object acWherePersist: TioVMActionBSPersistencePersist
     Name = 'acWherePersist'
     TargetBindSource = BSWhere
     Left = 320
     Top = 240
-  end
-  inherited acBuildWhere: TioVMActionBSBuildWhere
-    Action_PersistAction = acWherePersist
   end
 end

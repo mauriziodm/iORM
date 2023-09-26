@@ -1,7 +1,8 @@
 inherited ViewOrderList: TViewOrderList
-  inherited PanelTop: TUniPanel
-    inherited LabelTitle: TUniLabel
+  inherited PanelTop: TPanel
+    inherited LabelTitle: TLabel
       Caption = 'Orders'
+      ExplicitWidth = 50
     end
   end
   object GridOrders: TDBGrid [2]
@@ -104,7 +105,7 @@ inherited ViewOrderList: TViewOrderList
         Visible = True
       end>
   end
-  inherited PanelWhere: TUniPanel
+  inherited PanelWhere: TPanel
     Top = 464
     Height = 96
     ExplicitTop = 464
@@ -237,14 +238,6 @@ inherited ViewOrderList: TViewOrderList
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
-    end
-    inherited PanelWhereButtons: TUniPanel
-      Height = 96
-      TabOrder = 8
-      inherited ButtonClear: TUniSpeedButton
-        Top = 56
-        ExplicitTop = 56
-      end
     end
     object DBEditWhereID: TDBEdit
       Left = 54
