@@ -146,50 +146,44 @@ object ViewBaseForList: TViewBaseForList
     Top = 163
     object acBack: TioViewAction
       Category = 'iORM-MVVM'
-      Text = 'Back'
+      Caption = 'Back'
       Enabled = True
       Visible = True
-      Caption = 'Back'
       VMActionName = 'acBack'
     end
     object acDelete: TioViewAction
       Category = 'iORM-MVVM'
-      Text = 'Delete'
+      Caption = 'Delete'
       Enabled = True
       Visible = True
-      Caption = 'Delete'
       VMActionName = 'acDelete'
     end
     object acAdd: TioViewAction
       Category = 'iORM-MVVM'
-      Text = 'Add'
+      Caption = 'Add'
       Enabled = True
       Visible = True
-      Caption = 'Add'
       VMActionName = 'acAdd'
     end
     object acShowOrSelect: TioViewAction
       Category = 'iORM-MVVM'
-      Text = 'Select'
+      Caption = 'Select'
       Enabled = True
       Visible = True
-      Caption = 'Select'
       VMActionName = 'acShowOrSelect'
     end
     object acBuildWhere: TioViewAction
       Category = 'iORM-MVVM'
-      Text = 'Search'
+      Caption = 'Search'
       Enabled = True
       Visible = True
-      Caption = 'Search'
       VMActionName = 'acBuildWhere'
     end
     object acClearWhere: TioViewAction
       Category = 'iORM-MVVM'
-      Text = 'Clear'
+      Caption = 'Clear'
       Enabled = True
       Visible = True
-      Caption = 'Clear'
       VMActionName = 'acClearWhere'
     end
   end

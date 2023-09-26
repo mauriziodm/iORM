@@ -131,10 +131,9 @@ inherited ViewOrderList: TViewOrderList
   inherited ActionList1: TActionList
     object acWhereShowHistory: TioViewAction
       Category = 'iORM-MVVM'
-      Text = 'History'
+      Caption = 'History'
       Enabled = True
       Visible = True
-      Caption = 'History'
       VMActionName = 'acWhereShowHistory'
     end
   end

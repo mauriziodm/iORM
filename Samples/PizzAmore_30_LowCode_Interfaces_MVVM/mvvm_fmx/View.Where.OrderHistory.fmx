@@ -39,10 +39,6 @@ inherited ViewWhereOrderHistory: TViewWhereOrderHistory
       end>
     Preview = True
   end
-  inherited BSWhere: TioModelBindSource
-    AutoActivate = False
-    AutoPost = True
-  end
   object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>

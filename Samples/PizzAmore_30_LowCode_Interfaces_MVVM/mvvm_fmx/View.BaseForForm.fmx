@@ -88,34 +88,30 @@ object ViewBaseForForm: TViewBaseForForm
     Top = 163
     object acBack: TioViewAction
       Category = 'iORM-MVVM'
-      Text = 'Back'
+      Caption = 'Back'
       Enabled = True
       Visible = True
-      Caption = 'Back'
       VMActionName = 'acBack'
     end
     object acPersist: TioViewAction
       Category = 'iORM-MVVM'
-      Text = 'Persist'
+      Caption = 'Persist'
       Enabled = True
       Visible = True
-      Caption = 'Persist'
       VMActionName = 'acPersist'
     end
     object acRevert: TioViewAction
       Category = 'iORM-MVVM'
-      Text = 'Revert'
+      Caption = 'Revert'
       Enabled = True
       Visible = True
-      Caption = 'Revert'
       VMActionName = 'acRevert'
     end
     object acShowETM: TioViewAction
       Category = 'iORM - MVVM'
-      Text = 'Timeline'
+      Caption = 'Timeline'
       Enabled = True
       Visible = True
-      Caption = 'Timeline'
       VMActionName = 'acShowETM'
     end
   end

@@ -120,7 +120,7 @@ object ViewETM: TViewETM
     Size.Height = 180.000000000000000000
     Size.PlatformDefault = False
     TextSettings.HorzAlign = Center
-    TabOrder = 4
+    TabOrder = 3
     RowCount = 200
     Viewport.Width = 400.000000000000000000
     Viewport.Height = 180.000000000000000000
@@ -188,8 +188,7 @@ object ViewETM: TViewETM
     Top = 96
   end
   object BS_ETM: TioModelBindSource
-    AutoActivate = True
-    AutoPost = False
+    AutoActivate = False
     FieldDefs = <
       item
         Name = 'EntityID'
@@ -228,18 +227,16 @@ object ViewETM: TViewETM
     Top = 174
     object acBack: TioViewAction
       Category = 'iORM - MVVM'
-      Text = 'Back'
+      Caption = 'Back'
       Enabled = True
       Visible = True
-      Caption = 'Back'
       VMActionName = 'acBack'
     end
     object acEtmRevertToVersion: TioViewAction
       Category = 'iORM - MVVM'
-      Text = 'Revert'
+      Caption = 'Revert'
       Enabled = True
       Visible = True
-      Caption = 'Revert'
       VMActionName = 'acEtmRevertToVersion'
     end
   end

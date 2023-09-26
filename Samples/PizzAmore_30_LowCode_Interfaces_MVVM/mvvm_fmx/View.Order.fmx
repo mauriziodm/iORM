@@ -220,8 +220,8 @@ inherited ViewOrder: TViewOrder
       TabOrder = 1
       RowCount = 200
       Options = [AlternatingRowBackground, Editing, ColumnResize, ColumnMove, ColLines, RowLines, Tabs, Header, HeaderClick, AutoDisplacement]
-      Viewport.Width = 396.000000000000000000
-      Viewport.Height = 310.000000000000000000
+      Viewport.Width = 400.000000000000000000
+      Viewport.Height = 335.000000000000000000
     end
   end
   inherited ActionList1: TActionList
@@ -229,26 +229,23 @@ inherited ViewOrder: TViewOrder
     Top = 280
     object acShowCustomerSelector: TioViewAction
       Category = 'iORM-MVVM'
-      Text = 'acShowCustomerSelector'
+      Caption = 'acShowCustomerSelector'
       Enabled = True
       Visible = True
-      Caption = 'acShowCustomerSelector'
       VMActionName = 'acShowCustomerSelector'
     end
     object acShowPizzaSelector: TioViewAction
       Category = 'iORM-MVVM'
-      Text = 'acShowPizzaSelector'
+      Caption = 'acShowPizzaSelector'
       Enabled = True
       Visible = True
-      Caption = 'acShowPizzaSelector'
       VMActionName = 'acShowPizzaSelector'
     end
     object acDeleteRow: TioViewAction
       Category = 'iORM-MVVM'
-      Text = 'acDeleteRow'
+      Caption = 'acDeleteRow'
       Enabled = True
       Visible = True
-      Caption = 'acDeleteRow'
       VMActionName = 'acDeleteRow'
     end
   end
