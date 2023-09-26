@@ -145,9 +145,6 @@ begin
   RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Fmx.TioBSPersistenceRevertOrDelete], nil);
   RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Fmx.TioBSPersistenceSaveRevertPoint], nil);
   RegisterActions('iORM - MVVM', [iORM.StdActions.Fmx.TioViewAction], nil);
-  UnlistPublishedProperty(iORM.StdActions.Fmx.TioViewAction, 'Text');
-  UnlistPublishedProperty(iORM.StdActions.Fmx.TioViewAction, 'OnExecute');
-  UnlistPublishedProperty(iORM.StdActions.Fmx.TioViewAction, 'OnUpdate');
 
   // StdActions common
   RegisterComponents('iORM - Other', [TioCloseQueryRepeater]);

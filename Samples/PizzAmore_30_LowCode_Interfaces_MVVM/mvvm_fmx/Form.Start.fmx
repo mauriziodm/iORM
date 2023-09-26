@@ -5243,34 +5243,30 @@ object StartForm: TStartForm
     Top = 392
     object acQuit: TioViewAction
       Category = 'iORM-MVVM'
-      Text = 'Quit'
+      Caption = 'Quit'
       Enabled = True
       Visible = True
-      Caption = 'Quit'
       VMActionName = 'acQuit'
     end
     object acShowOrders: TioViewAction
       Category = 'iORM-MVVM'
-      Text = 'Orders'
+      Caption = 'Orders'
       Enabled = True
       Visible = True
-      Caption = 'Orders'
       VMActionName = 'acShowOrders'
     end
     object acShowCustomers: TioViewAction
       Category = 'iORM-MVVM'
-      Text = 'Customers'
+      Caption = 'Customers'
       Enabled = True
       Visible = True
-      Caption = 'Customers'
       VMActionName = 'acShowCustomers'
     end
     object acShowPizzas: TioViewAction
       Category = 'iORM-MVVM'
-      Text = 'Pizzas'
+      Caption = 'Pizzas'
       Enabled = True
       Visible = True
-      Caption = 'Pizzas'
       VMActionName = 'acShowPizzas'
     end
   end

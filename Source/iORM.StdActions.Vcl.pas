@@ -102,9 +102,9 @@ type
   published
     // inherited properties
     property AutoCheck;
-//    property Caption; // ridichiarata sotto
+    //property Caption; // ridichiarata sotto
     property Checked;
-//    property Enabled; // ridichiarata sotto
+    //property Enabled; // ridichiarata sotto
     property GroupIndex;
     property HelpContext;
     property HelpKeyword;
@@ -114,10 +114,10 @@ type
     property ImageName;
     property SecondaryShortCuts;
     property ShortCut default 0;
-//    property Visible; // ridichiarata sotto
+    //property Visible; // ridichiarata sotto
     // inherited events
     property OnHint;
-    // property OnUpdate; // Lasciarla non visibile, può fare casino in questa particolare action
+    //property OnUpdate; // Lasciarla non visibile, può fare casino in questa particolare action
     // properties
     property Caption: string read GetCaption write SetCaption;
     property CaptionLinkedToVMAction: Boolean read GetCaptionLinkedToVMAction write SetCaptionLinkedToVMAction default False;
@@ -351,9 +351,9 @@ type
     procedure _InternalExecuteStdAction; virtual;
     procedure _InternalUpdateStdAction; virtual;
     function _IsEnabled: Boolean; virtual;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     function GetExecutionMode: TioActionExecutionMode;
     procedure SetExecutionMode(const Value: TioActionExecutionMode);
-    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     // properties
     property Action_CloseQueryAction: IioBSSlaveAction read FAction_CloseQueryAction write SetAction_CloseQueryAction;
     property Action_ReloadAction: IioBSSlaveAction read FAction_ReloadAction write FAction_ReloadAction;
@@ -363,10 +363,10 @@ type
     property DisableIfChangesExists: Boolean read FDisableIfChangesExists write FDisableIfChangesExists default False;
     property DisableIfSaved: Boolean read FDisableIfSaved write FDisableIfSaved default False;
     property ExecutionMode: TioActionExecutionMode read GetExecutionMode write SetExecutionMode;
-    property RaiseIfChangesDoesNotExists: Boolean read FRaiseIfChangesDoesNotExists write FRaiseIfChangesDoesNotExists default False;
     property RaiseIfChangesExists: Boolean read FRaiseIfChangesExists write FRaiseIfChangesExists default True;
-    property RaiseIfRevertPointSaved: Boolean read FRaiseIfRevertPointSaved write FRaiseIfRevertPointSaved default False;
+    property RaiseIfChangesDoesNotExists: Boolean read FRaiseIfChangesDoesNotExists write FRaiseIfChangesDoesNotExists default False;
     property RaiseIfRevertPointNotSaved: Boolean read FRaiseIfRevertPointNotSaved write FRaiseIfRevertPointNotSaved default False;
+    property RaiseIfRevertPointSaved: Boolean read FRaiseIfRevertPointSaved write FRaiseIfRevertPointSaved default False;
     property TargetBindSource: IioMasterBindSource read FTargetBindSource write SetTargetBindSource;
     property _Version: String read Get_Version;
     // events
