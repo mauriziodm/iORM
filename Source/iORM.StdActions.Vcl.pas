@@ -800,11 +800,11 @@ type
     property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
     property ShowMode: TioActionShowMode read FShowMode write FShowMode;
     property TargetBindSource: IioStdActionTargetBindSource read FTargetBindSource write SetTargetBindSource;
-    property VVMTypeAlias: String read FVVMTypeAlias write FVVMTypeAlias;
     property ViewContext: TComponent read FViewContext write SetViewContext;
     property ViewContextBy: TioActionViewContextBy read FViewContextBy write FViewContextBy;
     property ViewContextProvider: TioViewContextProvider read FViewContextProvider write SetViewContextProvider;
     property ViewContextProviderName: String read FViewContextProviderName write FViewContextProviderName;
+    property VVMTypeAlias: String read FVVMTypeAlias write FVVMTypeAlias;
     property _Version: String read Get_Version;
     // Events
     property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;

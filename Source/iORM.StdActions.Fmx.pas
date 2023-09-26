@@ -383,7 +383,7 @@ type
     procedure UpdateTarget (Target: TObject); override;
   published
     property _Version: String read Get_Version;
-    // Publishing ancestor properties
+    // inherited properties
     property AutoCheck;
     property Text;
     property Checked;
@@ -741,7 +741,7 @@ type
   // =================================================================================================
 
   // ShowCurrent action to show the current object of the BS
-  TioBSShowOrSelect = class(Fmx.ActnList.TAction, IioBSSlaveAction)
+  TioBSShowOrSelect = class(Fmx.ActnList.TCustomAction, IioBSSlaveAction)
   strict private
     FAction_ParentCloseQueryAction: IioBSCloseQueryAction;
     FAction_SelectCurrentAction: IioBSSlaveAction;
@@ -781,16 +781,36 @@ type
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget (Target: TObject); override;
   published
+    // inherited properties
+    property AutoCheck;
+    property Text;
+    property Checked;
+    property Enabled;
+    property GroupIndex;
+    property HelpContext;
+    property HelpKeyword;
+    property HelpType;
+    property Hint;
+    property ImageIndex;
+    property ShortCut default 0;
+    property SecondaryShortCuts;
+    property Visible;
+    property UnsupportedArchitectures;
+    property UnsupportedPlatforms;
+    // inherited events
+    property OnHint;
+    property OnUpdate;
+    // properties
     property Action_ParentCloseQueryAction: IioBSCloseQueryAction read FAction_ParentCloseQueryAction write SetAction_ParentCloseQueryAction;
     property Action_SelectCurrentAction: IioBSSlaveAction read FAction_SelectCurrentAction write SetAction_SelectCurrentAction;
     property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
     property ShowMode: TioActionShowMode read FShowMode write FShowMode;
     property TargetBindSource: IioStdActionTargetBindSource read FTargetBindSource write SetTargetBindSource;
-    property VVMTypeAlias: String read FVVMTypeAlias write FVVMTypeAlias;
     property ViewContext: TComponent read FViewContext write SetViewContext;
     property ViewContextBy: TioActionViewContextBy read FViewContextBy write FViewContextBy;
     property ViewContextProvider: TioViewContextProvider read FViewContextProvider write SetViewContextProvider;
     property ViewContextProviderName: String read FViewContextProviderName write FViewContextProviderName;
+    property VVMTypeAlias: String read FVVMTypeAlias write FVVMTypeAlias;
     property _Version: String read Get_Version;
     // Events
     property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;
