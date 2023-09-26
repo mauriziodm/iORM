@@ -735,7 +735,7 @@ type
   // =================================================================================================
 
   // ShowCurrent action to show the current object of the BS
-  TioBSShowOrSelect = class(Vcl.ActnList.TAction, IioBSSlaveAction)
+  TioBSShowOrSelect = class(Vcl.ActnList.TCustomAction, IioBSSlaveAction)
   strict private
     FAction_ParentCloseQueryAction: IioBSCloseQueryAction;
     FAction_SelectCurrentAction: IioBSSlaveAction;
@@ -775,6 +775,25 @@ type
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget(Target: TObject); override;
   published
+    // inherited properties
+    property AutoCheck;
+    property Caption;
+    property Checked;
+    property Enabled;
+    property GroupIndex;
+    property HelpContext;
+    property HelpKeyword;
+    property HelpType;
+    property Hint;
+    property ImageIndex;
+    property ImageName;
+    property SecondaryShortCuts;
+    property ShortCut default 0;
+    property Visible;
+    // inherited events
+    property OnHint;
+    property OnUpdate;
+    // properties
     property Action_ParentCloseQueryAction: IioBSCloseQueryAction read FAction_ParentCloseQueryAction write SetAction_ParentCloseQueryAction;
     property Action_SelectCurrentAction: IioBSSlaveAction read FAction_SelectCurrentAction write SetAction_SelectCurrentAction;
     property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
