@@ -479,8 +479,6 @@ type
   published
     // inherited properties
     property Action_CloseQueryAction;
-    property AutoExec_CloseQueryAction_AfterDelete: Boolean read FAutoExec_CloseQueryAction_AfterDelete write FAutoExec_CloseQueryAction_AfterDelete default True;
-    property AutoExec_CloseQueryAction_AfterRevert: Boolean read FAutoExec_CloseQueryAction_AfterRevert write FAutoExec_CloseQueryAction_AfterRevert default False;
     // property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
@@ -492,6 +490,9 @@ type
     property CanExecute;
     property OnHint;
     property OnUpdate;
+    // properties
+    property AutoExec_CloseQueryAction_AfterDelete: Boolean read FAutoExec_CloseQueryAction_AfterDelete write FAutoExec_CloseQueryAction_AfterDelete default True;
+    property AutoExec_CloseQueryAction_AfterRevert: Boolean read FAutoExec_CloseQueryAction_AfterRevert write FAutoExec_CloseQueryAction_AfterRevert default False;
   end;
 
   TioBSPersistenceDelete = class(TioBSPersistenceStdActionVcl)
@@ -716,7 +717,7 @@ type
     property BeforeExecute;
     property CanExecute;
     property OnHint;
-    // property OnUpdate; // Lasciarla non visibile, può fare casino in questa particolare action
+    //OnUpdate; // Lasciarla non visibile, può fare casino in questa particolare action
     // properties
     property InjectEventHandler: Boolean read FInjectEventHandler write FInjectEventHandler default True;
     property OnEditingAction: TioBSCloseQueryOnEditingAction read FOnEditingAction write FOnEditingAction default eaDisable;
