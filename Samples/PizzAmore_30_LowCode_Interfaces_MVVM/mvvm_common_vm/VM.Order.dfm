@@ -42,7 +42,7 @@ inherited VMOrder: TVMOrder
   end
   object acDeleteRow: TioVMAction
     Name = 'acDeleteRow'
-    BeforeExecute = acDeleteRowBeforeExecute
+    OnExecute = acDeleteRowExecute
     Left = 328
     Top = 48
   end

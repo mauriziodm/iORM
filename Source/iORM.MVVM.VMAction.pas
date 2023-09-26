@@ -102,6 +102,11 @@ type
   end;
 
   TioVMAction = class(TioVMActionCustom)
+  strict private
+    FOnExecute: TNotifyEvent;
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
   public
     // inherited properties
     property Owner;
@@ -117,6 +122,8 @@ type
     property BeforeExecute;
     property CanExecute;
     property OnUpdate;
+    // events
+    property OnExecute: TNotifyEvent read FOnExecute write FOnExecute;
   end;
 
   // =================================================================================================
@@ -2183,6 +2190,21 @@ begin
       //   io.Show(FRevertedObj, LShowOrSelectAction.Action_ParentCloseQueryAction, nil, LShowOrSelectAction.VVMTypeAlias);
     end;
   end;
+end;
+
+{ TioVMAction }
+
+procedure TioVMAction._InternalExecuteStdAction;
+begin
+  inherited;
+  if Assigned(FOnExecute) then
+    FOnExecute(Self);
+end;
+
+procedure TioVMAction._InternalUpdateStdAction;
+begin
+  inherited;
+  Enabled := Assigned(FOnExecute);
 end;
 
 end.

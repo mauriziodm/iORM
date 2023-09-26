@@ -16,7 +16,7 @@ type
     acShowPizzaSelector: TioVMActionBSShowOrSelect;
     acDeleteRow: TioVMAction;
     procedure MPMasterSelectionInterface(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
-    procedure acDeleteRowBeforeExecute(Sender: TObject);
+    procedure acDeleteRowExecute(Sender: TObject);
   private
   public
   end;
@@ -30,7 +30,7 @@ uses
 
 {$R *.dfm}
 
-procedure TVMOrder.acDeleteRowBeforeExecute(Sender: TObject);
+procedure TVMOrder.acDeleteRowExecute(Sender: TObject);
 begin
   inherited;
   BSRows.Delete;

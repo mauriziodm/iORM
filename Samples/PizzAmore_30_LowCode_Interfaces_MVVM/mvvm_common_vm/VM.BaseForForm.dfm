@@ -19,8 +19,8 @@ object VMBaseForForm: TVMBaseForForm
   end
   object acBack: TioVMActionBSCloseQuery
     Name = 'acBack'
-    OnUpdateScope = usGlobal
     TargetBindSource = BSMaster
+    OnUpdateScope = usGlobal
     Left = 192
     Top = 48
   end
