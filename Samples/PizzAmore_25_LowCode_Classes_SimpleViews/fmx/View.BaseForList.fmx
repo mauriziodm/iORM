@@ -151,8 +151,8 @@ object ViewBaseForList: TViewBaseForList
     object acBack: TioBSCloseQuery
       Category = 'iORM-BS'
       Text = 'Back'
-      OnUpdateScope = usGlobal
       TargetBindSource = BSMaster
+      OnUpdateScope = usGlobal
     end
     object acShowOrSelect: TioBSShowOrSelect
       Category = 'iORM-BS'
