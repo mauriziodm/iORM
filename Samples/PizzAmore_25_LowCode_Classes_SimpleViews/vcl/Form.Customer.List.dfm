@@ -277,7 +277,7 @@ object CustomerListForm: TCustomerListForm
       ParentFont = False
     end
     object ButtonSearch: TSpeedButton
-      Left = 258
+      Left = 242
       Top = 0
       Width = 50
       Height = 45
@@ -292,7 +292,7 @@ object CustomerListForm: TCustomerListForm
       ExplicitLeft = 330
     end
     object ButtonClear: TSpeedButton
-      Left = 258
+      Left = 242
       Top = 49
       Width = 50
       Height = 25
@@ -326,7 +326,7 @@ object CustomerListForm: TCustomerListForm
     object DBEditWhereName: TDBEdit
       Left = 155
       Top = 6
-      Width = 46
+      Width = 30
       Height = 25
       Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
@@ -340,12 +340,12 @@ object CustomerListForm: TCustomerListForm
       Font.Style = []
       ParentFont = False
       TabOrder = 1
-      ExplicitWidth = 42
+      ExplicitWidth = 26
     end
     object DBEditWhereCity: TDBEdit
       Left = 43
       Top = 37
-      Width = 158
+      Width = 142
       Height = 25
       Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
@@ -359,7 +359,7 @@ object CustomerListForm: TCustomerListForm
       Font.Style = []
       ParentFont = False
       TabOrder = 2
-      ExplicitWidth = 154
+      ExplicitWidth = 138
     end
   end
   object DSCustomers: TioDataSetMaster
@@ -431,8 +431,8 @@ object CustomerListForm: TCustomerListForm
     object acAdd: TioBSPersistenceAppend
       Category = 'iORM-BSPersistence'
       Caption = 'Add'
-      TargetBindSource = DSCustomers
       Action_ShowOrSelectAction = acShowOrSelect
+      TargetBindSource = DSCustomers
     end
     object acSelectCurrent: TioBSSelectCurrent
       Category = 'iORM-BS'

@@ -124,8 +124,6 @@ begin
   RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Vcl.TioBSPersistenceRevertOrDelete], nil);
   RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Vcl.TioBSPersistenceSaveRevertPoint], nil);
   RegisterActions('iORM - MVVM', [iORM.StdActions.Vcl.TioViewAction], nil);
-  UnlistPublishedProperty(iORM.StdActions.Vcl.TioViewAction, 'OnExecute');
-  UnlistPublishedProperty(iORM.StdActions.Vcl.TioViewAction, 'OnUpdate');
 
   // FMX standard actions
   RegisterActions('iORM - BS', [iORM.StdActions.Fmx.TioBSSelectCurrent], nil);

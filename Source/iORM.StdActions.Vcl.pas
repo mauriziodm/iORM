@@ -46,7 +46,7 @@ type
   // =================================================================================================
 
   // Standard action for MVVM view use
-  TioViewAction = class(Vcl.ActnList.TAction, IioViewAction)
+  TioViewAction = class(Vcl.ActnList.TCustomAction, IioViewAction)
   strict private
     FCaptionLinkedToVMAction: Boolean;
     FEnabledLinkedToVMAction: Boolean;
@@ -100,7 +100,25 @@ type
     destructor Destroy; override;
     function HandlesTarget(Target: TObject): Boolean; override;
   published
-    // Properties
+    // inherited properties
+    property AutoCheck;
+//    property Caption; // ridichiarata sotto
+    property Checked;
+//    property Enabled; // ridichiarata sotto
+    property GroupIndex;
+    property HelpContext;
+    property HelpKeyword;
+    property HelpType;
+    property Hint;
+    property ImageIndex;
+    property ImageName;
+    property SecondaryShortCuts;
+    property ShortCut default 0;
+//    property Visible; // ridichiarata sotto
+    // inherited events
+    property OnHint;
+    // property OnUpdate; // Lasciarla non visibile, può fare casino in questa particolare action
+    // properties
     property Caption: string read GetCaption write SetCaption;
     property CaptionLinkedToVMAction: Boolean read GetCaptionLinkedToVMAction write SetCaptionLinkedToVMAction default False;
     property Enabled: Boolean read GetEnabled write SetEnabled;
@@ -109,7 +127,7 @@ type
     property VisibleLinkedToVMAction: Boolean read GetVisibleLinkedToVMAction write SetVisibleLinkedToVMAction default True;
     property VMActionName: String read GetVMActionName write SetVMActionName;
     property _Version: String read Get_Version;
-    // Events
+    // events
     property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;
     property AfterUpdate: TNotifyEvent read FAfterUpdate write FAfterUpdate;
     property BeforeExecute: TNotifyEvent read FBeforeExecute write FBeforeExecute;
@@ -125,7 +143,7 @@ type
   // =================================================================================================
 
   // Base class for all BindSource standard actions
-  TioBSStdActionVcl<T: IioStdActionTargetBindSource> = class(Vcl.ActnList.TAction)
+  TioBSStdActionVcl<T: IioStdActionTargetBindSource> = class(Vcl.ActnList.TCustomAction)
   strict private
     FExecutionMode: TioActionExecutionMode;
     FTargetBindSource: T;
@@ -154,6 +172,22 @@ type
     function HandlesTarget(Target: TObject): Boolean; override;
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget(Target: TObject); override;
+  published
+    // inherited properties
+    property AutoCheck;
+    property Caption;
+    property Checked;
+    property Enabled;
+    property GroupIndex;
+    property HelpContext;
+    property HelpKeyword;
+    property HelpType;
+    property Hint;
+    property ImageIndex;
+    property ImageName;
+    property SecondaryShortCuts;
+    property ShortCut default 0;
+    property Visible;
   end;
 
   // SelectCurrent action to make a selection for a Selector BindSource
@@ -181,6 +215,8 @@ type
     property AfterExecute;
     property BeforeExecute;
     property CanExecute;
+    property OnHint;
+    property OnUpdate;
     // properties
     property Action_CloseQueryAction: IioBSSlaveAction read FAction_CloseQueryAction write SetAction_CloseQueryAction;
     property SelectionType: TioSelectionType read FSelectionType write FSelectionType default stAppend;
@@ -200,6 +236,8 @@ type
     property AfterExecute;
     property BeforeExecute;
     property CanExecute;
+    property OnHint;
+    property OnUpdate;
   end;
 
   // Paging PreviousPage action
@@ -216,6 +254,8 @@ type
     property AfterExecute;
     property BeforeExecute;
     property CanExecute;
+    property OnHint;
+    property OnUpdate;
   end;
 
   // BuildWhere
@@ -241,6 +281,8 @@ type
     property AfterExecute;
     property BeforeExecute;
     property CanExecute;
+    property OnHint;
+    property OnUpdate;
     // properties
     property Action_CloseQueryAction: IioBSSlaveAction read FAction_CloseQueryAction write SetAction_CloseQueryAction;
     property Action_PersistAction: IioBSSlaveAction read FAction_PersistAction write SetAction_PersistAction;
@@ -265,6 +307,8 @@ type
     property AfterExecute;
     property BeforeExecute;
     property CanExecute;
+    property OnHint;
+    property OnUpdate;
     // properties
     property AutoExec_Where_OnTargetBS: Boolean read FAutoExec_Where_OnTargetBS write FAutoExec_Where_OnTargetBS default False;
   end;
