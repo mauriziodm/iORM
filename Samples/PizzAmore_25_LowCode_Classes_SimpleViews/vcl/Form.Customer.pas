@@ -57,6 +57,9 @@ type
     DS_ETMDiffOneWay: TStringField;
     ButtonRevertToVersion: TButton;
     acEtmRevertToVersion: TioBS_ETM_RevertToBindSource;
+    DS_ETMDiffTwoWay: TStringField;
+    DS_ETMDiffOnewayMoreInfo: TStringField;
+    DS_ETMDiffTwowayMoreInfo: TStringField;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
   public

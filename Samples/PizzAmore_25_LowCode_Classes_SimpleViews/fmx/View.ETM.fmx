@@ -248,16 +248,16 @@ object EtmView: TEtmView
     object acBack: TioBSCloseQuery
       Category = 'iORM - BS'
       Text = 'acBack'
-      OnUpdateScope = usGlobal
       TargetBindSource = BS_ETM
+      OnUpdateScope = usGlobal
     end
     object acEtmRevertToVersion: TioBS_ETM_RevertToBindSource
       Category = 'iORM - BS - ETM'
       Text = 'Revert'
+      TargetBindSource = BS_ETM
       AutoExec_OnETMfor_AfterRevert = doRefresh
       AutoExec_OnTargetBS_AfterRevert = doReload
       AutoExec_Persist_AfterRevert = True
-      TargetBindSource = BS_ETM
     end
   end
 end

@@ -56,7 +56,7 @@ type
     class function _InternalGetMap(const AEntityClassName: String): IioMap;
     class function _InternalBuildTimeLineWhere(const AEntityClassName: String; const AEntityID: Integer = 0): IioWhere<TioEtmCustomTimeSlot>;
     class function _InternalTimeLineFor(const AEntityClassName: String; const AEntityID: Integer; const AWhere: IioWhere = nil)
-      : TioEtmTimeLine; overload;
+      : TioEtmTimeline; overload;
     class procedure _ObjVersionToNegative(const AObj: TObject);
     class procedure _CheckTimeSlot(const ATimeSlot: TioEtmCustomTimeSlot; const ATargetClassName: String = '');
     class function _InternalDiffAsJsonObject(const ANewestVersionObj, AOldestVersionObj: TObject; const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean): TJSONObject; overload;
@@ -64,16 +64,16 @@ type
     // Used by TioWhere.GetSql
     class function _InternalBuildWhereTextFor(const AObj: TObject): String;
     // Fluent interface
-    class function FluentTimeLineFor<T: class>: IioWhere<TioEtmCustomTimeSlot>; overload;
-    class function FluentTimeLineFor(const AClassName: String): IioWhere<TioEtmCustomTimeSlot>; overload;
-    class function FluentTimeLineFor(const AObj: TObject): IioWhere<TioEtmCustomTimeSlot>; overload;
-    class function FluentTimeLineFor(const AIntf: IInterface): IioWhere<TioEtmCustomTimeSlot>; overload;
+    class function FluentTimelineFor<T: class>: IioWhere<TioEtmCustomTimeSlot>; overload;
+    class function FluentTimeiineFor(const AClassName: String): IioWhere<TioEtmCustomTimeSlot>; overload;
+    class function FluentTimelineFor(const AObj: TObject): IioWhere<TioEtmCustomTimeSlot>; overload;
+    class function FluentTimelineFor(const AIntf: IInterface): IioWhere<TioEtmCustomTimeSlot>; overload;
     // Non fluent interface
-    class function TimeLineFor<T: class>(const AEntityID: Integer; const AWhere: IioWhere = nil): TioEtmTimeLine; overload;
-    class function TimeLineFor(const AClassName: String; const AEntityID: Integer; const AWhere: IioWhere = nil)
-      : TioEtmTimeLine; overload;
-    class function TimeLineFor(const AObj: TObject; const AWhere: IioWhere = nil): TioEtmTimeLine; overload;
-    class function TimeLineFor(const AIntf: IInterface; const AWhere: IioWhere = nil): TioEtmTimeLine; overload;
+    class function TimelineFor<T: class>(const AEntityID: Integer; const AWhere: IioWhere = nil): TioEtmTimeline; overload;
+    class function TimelineFor(const AClassName: String; const AEntityID: Integer; const AWhere: IioWhere = nil)
+      : TioEtmTimeline; overload;
+    class function TimelineFor(const AObj: TObject; const AWhere: IioWhere = nil): TioEtmTimeline; overload;
+    class function TimelineFor(const AIntf: IInterface; const AWhere: IioWhere = nil): TioEtmTimeline; overload;
     // Revert
     class function RevertObject(const ATimeSlot: TioEtmCustomTimeSlot; const APersistImmediately: Boolean = False): TObject; overload;
     class function RevertObject<T: class>(const ATimeSlot: TioEtmCustomTimeSlot; const APersistImmediately: Boolean = False): T; overload;
@@ -81,9 +81,9 @@ type
     class procedure RevertToObject(const ATargetObj: TObject; const ATimeSlot: TioEtmCustomTimeSlot; const APersistImmediately: Boolean = False); overload;
     class procedure RevertToObject(const ATargetIntf: IInterface; const ATimeSlot: TioEtmCustomTimeSlot; const APersistImmediately: Boolean = False); overload;
     // RevertToDB
-    class procedure RevertToDB(const ATimeSlot: TioEtmCustomTimeSlot); overload;
+    class procedure RevertToDB(const ATimeSlot: TioEtmCustomTimeSlot);
     // RevertToBindSource
-    class procedure RevertToBindSource(const ATimeSlot: TioEtmCustomTimeSlot; const ATargetBindSource: IioMasterBindSource; const APersistImmediately: Boolean = False); overload;
+    class procedure RevertToBindSource(const ATimeSlot: TioEtmCustomTimeSlot; const ATargetBindSource: IioMasterBindSource; const APersistImmediately: Boolean = False);
     // Trace
     class procedure TraceByMap(const AMap: IioMap; const AEtmTimeSlotClass: TioEtmTimeSlotRef; const ATraceOnlyOnConnectionName: String = '');
     class procedure Trace<T: class>(const AEtmTimeSlotClass: TioEtmTimeSlotRef; const ATraceOnlyOnConnectionName: String = '');
@@ -160,12 +160,12 @@ begin
 end;
 
 class function TioEtmEngine._InternalTimeLineFor(const AEntityClassName: String; const AEntityID: Integer; const AWhere: IioWhere = nil)
-  : TioEtmTimeLine;
+  : TioEtmTimeline;
 var
   LWhere: IioWhere<TioEtmCustomTimeSlot>;
 begin
   LWhere := _InternalBuildTimeLineWhere(AEntityClassName, AEntityID);
-  Result := LWhere._And(AWhere).ToGenericList.OfType<TioEtmTimeLine>;
+  Result := LWhere._And(AWhere).ToGenericList.OfType<TioEtmTimeline>;
 end;
 
 class procedure TioEtmEngine._ObjVersionToNegative(const AObj: TObject);
@@ -177,32 +177,32 @@ begin
     LContext.ObjVersion := -LContext.ObjVersion;
 end;
 
-class function TioEtmEngine.TimeLineFor(const AClassName: String; const AEntityID: Integer; const AWhere: IioWhere): TioEtmTimeLine;
+class function TioEtmEngine.TimelineFor(const AClassName: String; const AEntityID: Integer; const AWhere: IioWhere): TioEtmTimeline;
 begin
   Result := _InternalTimeLineFor(AClassName, AEntityID, AWhere);
 end;
 
-class function TioEtmEngine.TimeLineFor<T>(const AEntityID: Integer; const AWhere: IioWhere): TioEtmTimeLine;
+class function TioEtmEngine.TimelineFor<T>(const AEntityID: Integer; const AWhere: IioWhere): TioEtmTimeline;
 begin
   Result := _InternalTimeLineFor(T.ClassName, AEntityID, AWhere);
 end;
 
-class function TioEtmEngine.TimeLineFor(const AIntf: IInterface; const AWhere: IioWhere): TioEtmTimeLine;
+class function TioEtmEngine.TimelineFor(const AIntf: IInterface; const AWhere: IioWhere): TioEtmTimeline;
 begin
   Result := _InternalTimeLineFor((AIntf as TObject).ClassName, TioUtilities.ExtractOID(AIntf), AWhere);
 end;
 
-class function TioEtmEngine.TimeLineFor(const AObj: TObject; const AWhere: IioWhere): TioEtmTimeLine;
+class function TioEtmEngine.TimelineFor(const AObj: TObject; const AWhere: IioWhere): TioEtmTimeline;
 begin
   Result := _InternalTimeLineFor(AObj.ClassName, TioUtilities.ExtractOID(AObj), AWhere);
 end;
 
-class function TioEtmEngine.FluentTimeLineFor(const AClassName: String): IioWhere<TioEtmCustomTimeSlot>;
+class function TioEtmEngine.FluentTimeiineFor(const AClassName: String): IioWhere<TioEtmCustomTimeSlot>;
 begin
   Result := _InternalBuildTimeLineWhere(AClassName);
 end;
 
-class function TioEtmEngine.FluentTimeLineFor<T>: IioWhere<TioEtmCustomTimeSlot>;
+class function TioEtmEngine.FluentTimelineFor<T>: IioWhere<TioEtmCustomTimeSlot>;
 begin
   Result := _InternalBuildTimeLineWhere(T.ClassName);
 end;
@@ -495,12 +495,12 @@ begin
   end;
 end;
 
-class function TioEtmEngine.FluentTimeLineFor(const AIntf: IInterface): IioWhere<TioEtmCustomTimeSlot>;
+class function TioEtmEngine.FluentTimelineFor(const AIntf: IInterface): IioWhere<TioEtmCustomTimeSlot>;
 begin
   Result := _InternalBuildTimeLineWhere((AIntf as TObject).ClassName);
 end;
 
-class function TioEtmEngine.FluentTimeLineFor(const AObj: TObject): IioWhere<TioEtmCustomTimeSlot>;
+class function TioEtmEngine.FluentTimelineFor(const AObj: TObject): IioWhere<TioEtmCustomTimeSlot>;
 begin
   Result := _InternalBuildTimeLineWhere(AObj.ClassName);
 end;

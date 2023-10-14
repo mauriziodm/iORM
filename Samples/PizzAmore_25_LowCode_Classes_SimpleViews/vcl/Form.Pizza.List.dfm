@@ -390,19 +390,17 @@ object PizzaListForm: TPizzaListForm
     object acAdd: TioBSPersistenceAppend
       Category = 'iORM-BSPersistence'
       Caption = 'Add'
-      TargetBindSource = DSPizzas
       Action_ShowOrSelectAction = acShowOrSelect
+      TargetBindSource = DSPizzas
     end
     object acBuildWhere: TioBSBuildWhere
       Category = 'iORM - BS - WhereBuilder'
       Caption = 'Search'
-      ExecutionMode = emActive
       TargetBindSource = DSWhere
     end
     object acClearWhere: TioBSClearWhere
       Category = 'iORM - BS - WhereBuilder'
       Caption = 'Clear'
-      ExecutionMode = emActive
       TargetBindSource = DSWhere
       AutoExec_Where_OnTargetBS = True
     end
@@ -434,5 +432,9 @@ object PizzaListForm: TPizzaListForm
     DataSet = DSWhere
     Left = 176
     Top = 481
+  end
+  object ioViewModelBridge1: TioViewModelBridge
+    Left = 50
+    Top = 50
   end
 end

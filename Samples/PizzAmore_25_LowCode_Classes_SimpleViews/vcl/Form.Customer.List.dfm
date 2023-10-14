@@ -404,13 +404,11 @@ object CustomerListForm: TCustomerListForm
     object acNextPage: TioBSNextPage
       Category = 'iORM-BSPaging'
       Caption = 'Pg.Up'
-      ExecutionMode = emActive
       TargetBindSource = DSCustomers
     end
     object acPrevPage: TioBSPrevPage
       Category = 'iORM-BSPaging'
       Caption = 'Pg.Dn'
-      ExecutionMode = emActive
       TargetBindSource = DSCustomers
     end
     object acBack: TioBSCloseQuery
@@ -437,20 +435,17 @@ object CustomerListForm: TCustomerListForm
     object acSelectCurrent: TioBSSelectCurrent
       Category = 'iORM-BS'
       Caption = 'Select'
-      ExecutionMode = emActive
       TargetBindSource = DSCustomers
       Action_CloseQueryAction = acBack
     end
     object acBuildWhere: TioBSBuildWhere
       Category = 'iORM - BS - WhereBuilder'
       Caption = 'Search'
-      ExecutionMode = emActive
       TargetBindSource = DSWhere
     end
     object acClearWhere: TioBSClearWhere
       Category = 'iORM - BS - WhereBuilder'
       Caption = 'Clear'
-      ExecutionMode = emActive
       TargetBindSource = DSWhere
       AutoExec_Where_OnTargetBS = True
     end

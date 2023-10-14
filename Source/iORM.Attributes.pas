@@ -582,7 +582,7 @@ type
   end;
 
   // A TimeLine is a list of time slots
-  TioEtmTimeLine = TObjectList<TioEtmCustomTimeSlot>;
+  TioEtmTimeline = TObjectList<TioEtmCustomTimeSlot>;
 
   etmRepository = ioEntity;
 

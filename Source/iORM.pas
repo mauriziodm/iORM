@@ -212,7 +212,7 @@ type
   TioActionViewContextBy = iORM.StdActions.Interfaces.TioActionViewContextBy;
 
   // Entity Time Machine (ETM)
-  TioEtmTimeLine = iORM.Attributes.TioEtmTimeLine;
+  TioEtmTimeLine = iORM.Attributes.TioEtmTimeline;
   TioEtmCustomTimeSlot = iORM.Attributes.TioEtmCustomTimeSlot;
   TioEtmEventType = iORM.CommonTypes.TioEtmEventType;
   TioEtmConflictType = iORM.CommonTypes.TioEtmConflictType;

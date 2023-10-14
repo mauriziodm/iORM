@@ -255,7 +255,7 @@ object CustomerForm: TCustomerForm
     object LabelTitle: TLabel
       Left = 72
       Top = 7
-      Width = 425
+      Width = 417
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -373,7 +373,7 @@ object CustomerForm: TCustomerForm
           Height = 250
           Align = alClient
           BorderStyle = bsNone
-          DataField = 'DiffOneWay'
+          DataField = 'DiffTwoWay'
           DataSource = SourceETM
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -387,14 +387,14 @@ object CustomerForm: TCustomerForm
     end
   end
   object ButtonRevertToVersion: TButton
-    Left = 415
+    Left = 407
     Top = 242
     Width = 121
     Height = 20
     Action = acEtmRevertToVersion
     Anchors = [akTop, akRight]
     TabOrder = 8
-    ExplicitLeft = 411
+    ExplicitLeft = 403
   end
   object DSCustomer: TioDataSetMaster
     AsDefault = True
@@ -448,15 +448,16 @@ object CustomerForm: TCustomerForm
     object acBack: TioBSCloseQuery
       Category = 'iORM-BS'
       Caption = 'Back'
-      OnUpdateScope = usGlobal
       TargetBindSource = DSCustomer
+      OnUpdateScope = usGlobal
     end
     object acEtmRevertToVersion: TioBS_ETM_RevertToBindSource
       Category = 'iORM - BS - ETM'
       Caption = 'Revert to version'
-      AutoExec_OnETMfor_AfterRevert = doRefresh
-      AutoExec_Persist_AfterRevert = True
       TargetBindSource = DS_ETM
+      AutoExec_OnETMfor_AfterRevert = doRefresh
+      AutoExec_OnTargetBS_AfterRevert = doReload
+      AutoExec_Persist_AfterRevert = True
     end
   end
   object SourceETM: TDataSource
@@ -496,6 +497,18 @@ object CustomerForm: TCustomerForm
     end
     object DS_ETMDiffOneWay: TStringField
       FieldName = 'DiffOneWay'
+      Size = 65535
+    end
+    object DS_ETMDiffOnewayMoreInfo: TStringField
+      FieldName = 'DiffOnewayMoreInfo'
+      Size = 65535
+    end
+    object DS_ETMDiffTwoWay: TStringField
+      FieldName = 'DiffTwoWay'
+      Size = 65535
+    end
+    object DS_ETMDiffTwowayMoreInfo: TStringField
+      FieldName = 'DiffTwowayMoreInfo'
       Size = 65535
     end
   end

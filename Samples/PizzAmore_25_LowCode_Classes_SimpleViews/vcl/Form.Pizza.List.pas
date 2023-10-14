@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.DBCtrls, Vcl.DBCGrids, iORM, iORM.Attributes, iORM.CommonTypes,
   iORM.Where.Interfaces, Data.DB, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom, iORM.DB.DataSet.Master, System.Actions, Vcl.ActnList, iORM.StdActions.Vcl,
-  Model.Pizza, Vcl.Mask;
+  Model.Pizza, Vcl.Mask, iORM.MVVM.Interfaces, iORM.MVVM.ViewModelBridge;
 
 type
 
@@ -54,6 +54,7 @@ type
     DSWhereName: TStringField;
     DSWhereFromPrice: TCurrencyField;
     DSWhereToPrice: TCurrencyField;
+    ioViewModelBridge1: TioViewModelBridge;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure DBCtrlGridPizzasDblClick(Sender: TObject);
