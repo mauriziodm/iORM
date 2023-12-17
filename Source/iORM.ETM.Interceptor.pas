@@ -88,6 +88,7 @@ var
   LPreviousStateObj: TObject;
 begin
   // Gather the previous state of the entity (before update query)
+  { TODO : OTTIMIZZAZIONE: si potrebbe fare in modo che venga caricato solo l'ObjVersion senza caricare tutto l'oggetto }
   LPreviousStateObj := io.Load(AContext.DataObject.ClassName).ByID(AContext.GetID).ToObject; // Load the previous version obj
   try
     // If the ObjVersion is negative it means that we are trying to restore a previous version

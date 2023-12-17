@@ -120,7 +120,7 @@ object PizzaForm: TPizzaForm
     object LabelTitle: TLabel
       Left = 56
       Top = 7
-      Width = 234
+      Width = 230
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -309,8 +309,8 @@ object PizzaForm: TPizzaForm
     object acBack: TioBSCloseQuery
       Category = 'iORM-BS'
       Caption = 'Back'
-      OnUpdateScope = usGlobal
       TargetBindSource = DSPizza
+      OnUpdateScope = usGlobal
     end
     object acShowETM: TioBSShowOrSelect
       Category = 'iORM - BS'

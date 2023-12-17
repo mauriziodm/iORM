@@ -255,7 +255,7 @@ object CustomerForm: TCustomerForm
     object LabelTitle: TLabel
       Left = 72
       Top = 7
-      Width = 417
+      Width = 413
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -373,7 +373,7 @@ object CustomerForm: TCustomerForm
           Height = 250
           Align = alClient
           BorderStyle = bsNone
-          DataField = 'DiffTwoWay'
+          DataField = 'DiffOneWay'
           DataSource = SourceETM
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
@@ -387,14 +387,14 @@ object CustomerForm: TCustomerForm
     end
   end
   object ButtonRevertToVersion: TButton
-    Left = 407
+    Left = 403
     Top = 242
     Width = 121
     Height = 20
     Action = acEtmRevertToVersion
     Anchors = [akTop, akRight]
     TabOrder = 8
-    ExplicitLeft = 403
+    ExplicitLeft = 399
   end
   object DSCustomer: TioDataSetMaster
     AsDefault = True

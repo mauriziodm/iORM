@@ -8505,7 +8505,7 @@ object MainForm: TMainForm
   object ButtonOrders: TButton
     Left = 43
     Top = 336
-    Width = 169
+    Width = 165
     Height = 44
     Action = acShowOrders
     Anchors = [akLeft, akRight, akBottom]
@@ -8517,12 +8517,12 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 0
     ExplicitTop = 335
-    ExplicitWidth = 165
+    ExplicitWidth = 161
   end
   object ButtonCustomers: TButton
     Left = 43
     Top = 386
-    Width = 169
+    Width = 165
     Height = 44
     Action = acShowCustomers
     Anchors = [akLeft, akRight, akBottom]
@@ -8534,12 +8534,12 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 1
     ExplicitTop = 385
-    ExplicitWidth = 165
+    ExplicitWidth = 161
   end
   object ButtonPizzas: TButton
     Left = 43
     Top = 436
-    Width = 169
+    Width = 165
     Height = 44
     Action = acShowPizzas
     Anchors = [akLeft, akRight, akBottom]
@@ -8551,12 +8551,12 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 2
     ExplicitTop = 435
-    ExplicitWidth = 165
+    ExplicitWidth = 161
   end
   object ButtonQuit: TButton
     Left = 43
     Top = 501
-    Width = 169
+    Width = 165
     Height = 32
     Action = acQuit
     Anchors = [akLeft, akRight, akBottom]
@@ -8568,7 +8568,7 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 3
     ExplicitTop = 500
-    ExplicitWidth = 165
+    ExplicitWidth = 161
   end
   object ioVCL1: TioVCL
     Left = 8
@@ -8600,8 +8600,8 @@ object MainForm: TMainForm
       Action_ParentCloseQueryAction = acQuit
       EntityTypeName = 'TCustomer'
       ShowMode = smEntityTypeName
-      VVMTypeAlias = 'LIST'
       ViewContextBy = vcByDefaultViewContextProvider
+      VVMTypeAlias = 'LIST'
     end
     object acShowPizzas: TioBSShowOrSelect
       Category = 'iORM-BS'
@@ -8609,8 +8609,8 @@ object MainForm: TMainForm
       Action_ParentCloseQueryAction = acQuit
       EntityTypeName = 'TPizza'
       ShowMode = smEntityTypeName
-      VVMTypeAlias = 'LIST'
       ViewContextBy = vcByDefaultViewContextProvider
+      VVMTypeAlias = 'LIST'
     end
     object acShowOrders: TioBSShowOrSelect
       Category = 'iORM-BS'
@@ -8618,8 +8618,8 @@ object MainForm: TMainForm
       Action_ParentCloseQueryAction = acQuit
       EntityTypeName = 'TOrder'
       ShowMode = smEntityTypeName
-      VVMTypeAlias = 'LIST'
       ViewContextBy = vcByDefaultViewContextProvider
+      VVMTypeAlias = 'LIST'
     end
   end
 end
