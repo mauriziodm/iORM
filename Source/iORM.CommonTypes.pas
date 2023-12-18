@@ -140,6 +140,9 @@ type
   TioEtmEventType = (etInsert, etUpdate, etDelete, etSynchro);
   TioEtmConflictType = (ctNoConflict, ctMasterWin, ctSlaveWin, ctLastUpdatedWin, ctManual);
 
+  // Persistence conflict resolver mode
+  TioConflictResolverMode = (crmRaiseException, crmLatestWin, crmOldestWin, crmServerWin, crmClientWin);
+
   // StdActions related types
   TioBSCloseQueryActionUpdateScope = (usLocal, usDisableIfChilds, usGlobal);
   TioBSCloseQueryOnEditingAction = (eaDisable, eaAutoPersist, eaAutoRevert);

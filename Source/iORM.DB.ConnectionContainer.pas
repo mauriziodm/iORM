@@ -72,7 +72,7 @@ type
   // se richiesto.
   // In realtà questa classe utilizza il TFDManager fornito da FireDAC e non fa molto altro
   // se non aggiungere un campo per mantenere un riferimento al nome della ConnectionDef
-  // di default. Una gestione di una connessione di default mi serviva perchè volevo fare in modo che
+  // di default. Una gestione di una connessione di default mi serviva perchè volevo fare in modo che NON
   // fosse necessario specificare esplicitamente una ConnectionDef (con un attribute) per ogni classe/entità
   // e quindi ho deciso di mantenere un riferimento al nome della connectionDef di dafault in modo che per tutte le classi
   // che non indicano una connection esplicitamente utilizzino quella di default e quindi anche che normalmente nelle applicazioni
