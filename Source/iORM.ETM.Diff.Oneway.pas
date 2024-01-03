@@ -47,8 +47,7 @@ type
     class function Diff_Status(const AOld, ANew: Pointer): String;
     class function Diff_Object(const LPrevOldProp, LPrevNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AMoreInfo: Boolean): TJSONObject;
     class function Diff_ValueProp(const LOldProp, LNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AMoreInfo: Boolean): TJSONObject;
-    class function Diff_ObjectProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AMoreInfo: Boolean)
-      : TJSONObject;
+    class function Diff_ObjectProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AMoreInfo: Boolean): TJSONObject;
     class function Diff_ListProp(const LOldProp, LNewProp: IioProperty; const ASourceOldObj, ASourceNewObj: TObject; const AMoreInfo: Boolean): TJSONValue;
   public
     class function Diff(const AOldObj, ANewObj: TObject; const AMoreInfo: Boolean): TJSONObject; override;
@@ -74,7 +73,7 @@ var
   LJSONPair: TJSONPair;
 begin
   Result := True;
-  for LJSONPair in AJSONObject                do
+  for LJSONPair in AJSONObject do
     if not LJSONPair.JsonString.Value.StartsWith('$etm_') then
       Exit(False);
 end;
@@ -138,21 +137,21 @@ begin
   end
   else
   // Se non vogliamo MoreInfo mette cmq il nome della classe dell'oggetto corrente e lo prende
-  //  dal nuovo o dal vecchio in base a quello che c'è
+  // dal nuovo o dal vecchio in base a quello che c'è
   begin
     if Assigned(LNewMap) then
       Result.AddPair(ETM_LABEL_CLASS, ANewObj.ClassName)
-    else
-    if Assigned(LOldMap) then
+    else if Assigned(LOldMap) then
       Result.AddPair(ETM_LABEL_CLASS, AOldObj.ClassName)
   end;
   // ID (sempre anche se non si vogliono le info)
-  //  NB: Una qualunque delle due ma deve esserci
+  // NB: Una qualunque delle due ma deve esserci
+  // NB: Come parametro del metodo AddPair ho creato un TJSONNumber al posto di usare direttamente
+  // l'overload (sempre di AddPair) perchè quast'ultimo non era presente nelle versioni di Delphi 11
   if Assigned(LOldMap) then
-    Result.AddPair(ETM_LABEL_ID, LOldMap.GetProperties.GetIdProperty.GetValue(AOldObj).AsInteger)
-  else
-  if Assigned(LNewMap) then
-    Result.AddPair(ETM_LABEL_ID, LNewMap.GetProperties.GetIdProperty.GetValue(ANewObj).AsInteger);
+    Result.AddPair(ETM_LABEL_ID, TJSONNumber.Create(LOldMap.GetProperties.GetIdProperty.GetValue(AOldObj).AsInteger))
+  else if Assigned(LNewMap) then
+    Result.AddPair(ETM_LABEL_ID, TJSONNumber.Create(LNewMap.GetProperties.GetIdProperty.GetValue(ANewObj).AsInteger));
   // ====================================================================
   // ====================================================================
   // FIRST LOOP FOR PROPERTIES OF THE NEW OBJECT (added or updated props)
@@ -219,8 +218,7 @@ begin
   // ====================================================================
 end;
 
-class function TioEtmOnewayDiff.Diff_ValueProp(const LOldProp, LNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AMoreInfo: Boolean)
-  : TJSONObject;
+class function TioEtmOnewayDiff.Diff_ValueProp(const LOldProp, LNewProp: IioProperty; const AOldObj, ANewObj: TObject; const AMoreInfo: Boolean): TJSONObject;
 var
   LValue: TValue;
   LOldJsonValue, LNewJsonValue: TJSONValue;
