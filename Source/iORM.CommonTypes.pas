@@ -111,6 +111,7 @@ type
 
   // Common ClassRef
   TioClassRef = class of TObject;
+  TCustomAttributeRef = class of TCustomAttribute;
 
   // DB index orientation
   TioIndexOrientation = (ioAscending = 0, ioDescending);

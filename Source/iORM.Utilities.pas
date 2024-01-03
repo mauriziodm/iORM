@@ -45,7 +45,7 @@ type
   TioUtilities = class
   private
     class function _ExtractAttributeInfoSign(const ARttiInstanceType: TRttiInstanceType): String;
-  public
+ public
     class function ObjectAsIInterface(const AObj: Tobject): IInterface; static;
     class function ObjectAsIioViewModel(const AObj: Tobject): IioViewModel; static;
     class function IsAnInterface<T>: Boolean; static;
@@ -76,8 +76,6 @@ type
     class function ExtractItemRttiTypeByGeneric<T>: TRttiType;
     class function ExtractItemRttiTypeFromList(const AList: TObject): TRttiType;
     class function TryGetMemberAttribute<T: class>(const ARTTIMember: TRttiMember; out OAttribute: TCustomAttribute): boolean; static;
-    class function HasAttribute<T: TCustomAttribute>(const ARTTIType: TRttiType): boolean; static;
-    class function HasAttributes<T1, T2: TCustomAttribute>(const ARTTIType: TRttiType): boolean; static;
     class function ClassNameToClassRef(const AClassName: String): TioClassRef;
     class function IsList(const AObj: TObject): Boolean;
     class procedure ClearList(const AList: TObject);
@@ -91,6 +89,10 @@ type
     class function GetFarAncestorEntityWithSameTableAndConnection(AStartRttiInstanceType: TRttiInstanceType): TRttiInstanceType;
     class function GetDefaultBindSource(const AViewOrViewModel: TComponent): IioBindSource;
     class function GetBindSource(const AViewOrViewModel: TComponent; const AName: String): IioBindSource;
+    // Metodi per per i CustomAttributes
+    class function GetAttribute(const ARTTIType: TRttiType; const AAttrClass: TCustomAttributeRef): TCustomAttribute; static;
+    class function HasAttribute(const ARTTIType: TRttiType; const AAttrClass: TCustomAttributeRef): boolean; static;
+    class function HasAttributes(const ARTTIType: TRttiType; const AAttrClass1, AAttrClass2: TCustomAttributeRef): boolean; static;
     // Funzioni che implementano verifiche riguardo l'essere Entità
     class function isEntityType(const ARTTIType: TRttiType): Boolean;
     class function isEntityAttribute(const AAttribute: TCustomAttribute): Boolean;
@@ -101,8 +103,7 @@ implementation
 uses
   System.SysUtils, System.Types, iORM, iORM.Exceptions, iORM.Context.Container, iORM.RttiContext.Factory, iORM.DuckTyped.Factory, iORM.Context.Map.Interfaces,
   iORM.DependencyInjection.Implementers, DJSON, iORM.Resolver.Factory,
-  iORM.Resolver.Interfaces, iORM.DependencyInjection, iORM.MVVM.ViewModel,
-  iORM.Attributes;
+  iORM.Resolver.Interfaces, iORM.DependencyInjection, iORM.MVVM.ViewModel;
 
 { TioRttiUtilities }
 
@@ -244,6 +245,36 @@ begin
   Result := TypeInfoToTypeName(TypeInfo(T), AQualified);
 end;
 
+class function TioUtilities.GetAttribute(const ARTTIType: TRttiType; const AAttrClass: TCustomAttributeRef): TCustomAttribute;
+var
+  LAttr: TCustomAttribute;
+begin
+  for LAttr in ARTTIType.GetAttributes do
+    if LAttr is AAttrClass then
+      Exit(LAttr);
+  Result := nil;
+end;
+
+class function TioUtilities.HasAttribute(const ARTTIType: TRttiType; const AAttrClass: TCustomAttributeRef): boolean;
+var
+  LAttr: TCustomAttribute;
+begin
+  for LAttr in ARTTIType.GetAttributes do
+    if LAttr is AAttrClass then
+      Exit(True);
+  Result := False;
+end;
+
+class function TioUtilities.HasAttributes(const ARTTIType: TRttiType; const AAttrClass1, AAttrClass2: TCustomAttributeRef): boolean;
+var
+  LAttr: TCustomAttribute;
+begin
+  for LAttr in ARTTIType.GetAttributes do
+    if (LAttr is AAttrClass1) or (LAttr is AAttrClass2) then
+      Exit(True);
+  Result := False;
+end;
+
 class function TioUtilities.GetBindSource(const AViewOrViewModel: TComponent; const AName: String): IioBindSource;
   function _GetSimpleViewBindSource: IioBindSource;
   var
@@ -369,18 +400,6 @@ begin
   raise EioException.Create('TioRttiUtilities.GUIDtoTypeInfo: IID is not an interface.');
 end;
 
-class function TioUtilities.HasAttributes<T1, T2>(const ARTTIType: TRttiType): boolean;
-var
-  LAttributes: TArray<TCustomAttribute>;
-  LAttribute: TCustomAttribute;
-begin
-  Result := False;
-  LAttributes := ARTTIType.GetAttributes;
-  for LAttribute in LAttributes do
-    if (LAttribute is T1) or (LAttribute is T2) then
-      Exit(true);
-end;
-
 class function TioUtilities.isEntityAttribute(const AAttribute: TCustomAttribute): Boolean;
 begin
   Result := (AAttribute is ioEntity) or (AAttribute is ioNotPersistedEntity);
@@ -388,19 +407,7 @@ end;
 
 class function TioUtilities.isEntityType(const ARTTIType: TRttiType): Boolean;
 begin
-  Result := HasAttributes<ioEntity, ioNotPersistedEntity>(ARTTIType);
-end;
-
-class function TioUtilities.HasAttribute<T>(const ARTTIType: TRttiType): boolean;
-var
-  LAttributes: TArray<TCustomAttribute>;
-  LAttribute: TCustomAttribute;
-begin
-  Result := False;
-  LAttributes := ARTTIType.GetAttributes;
-  for LAttribute in LAttributes do
-    if LAttribute is T then
-      Exit(true);
+  Result := HasAttributes(ARTTIType, ioEntity, ioNotPersistedEntity);
 end;
 
 class procedure TioUtilities.TrimStrings(const AStrings: TStrings);
