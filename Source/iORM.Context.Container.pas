@@ -39,7 +39,7 @@ uses
   System.Rtti,
   iORM.CommonTypes,
   iORM.Context.Map.Interfaces, iORM.Context.Properties.Interfaces,
-  System.Classes, System.TypInfo, System.Generics.Collections;
+  System.Classes, System.TypInfo, System.Generics.Collections, iORM.Utilities;
 
 type
 
@@ -159,8 +159,7 @@ implementation
 
 uses
   iORM.Context.Factory, iORM.Exceptions,
-  iORM.RttiContext.Factory, iORM.Attributes, iORM, System.SysUtils,
-  iORM.Utilities, iORM.DependencyInjection;
+  iORM.RttiContext.Factory, iORM.Attributes, iORM, System.SysUtils, iORM.DependencyInjection;
 
 { TioContextContainer }
 
@@ -510,7 +509,7 @@ begin
     if LRttiType.IsInstance and TioUtilities.isEntityType(LRttiType) then
       AddClassRef(LRttiType.AsInstance.MetaclassType)
     else
-    if (LRttiType is TRttiEnumerationType) and LRttiType.HasAttribute(ioEnumerated) then
+    if (LRttiType is TRttiEnumerationType) and TioUtilities.HasAttribute(LRttiType, ioEnumerated) then
       TioEnumContainer._AddByAttribute(TRttiEnumerationType(LRttiType));
   end;
 end;
@@ -622,7 +621,7 @@ class function TioEnumContainer._LoadValuesByAttribute(const ARttiEnumerationTyp
 var
   LEnumeratedAttribute: ioEnumerated;
 begin
-  LEnumeratedAttribute := ARttiEnumerationType.GetAttribute<ioEnumerated>;
+  LEnumeratedAttribute := TioUtilities.GetAttribute(ARttiEnumerationType, ioEnumerated) as ioEnumerated;
   // Check the presence of the [ioEnumerated] attribute
   //  NB: Se arriva qui significa che dovrebbe esserci l'attributo  , se non c'è significa che c'è un errore
   //       da qualche parte, molto probabilmente  su iORM

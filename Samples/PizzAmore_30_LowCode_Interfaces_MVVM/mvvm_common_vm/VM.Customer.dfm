@@ -1,4 +1,5 @@
 inherited VMCustomer: TVMCustomer
+  OnViewPairing = ioViewModelViewPairing
   inherited BSMaster: TioModelPresenterMaster
     TypeName = 'ICustomer'
   end
@@ -7,15 +8,15 @@ inherited VMCustomer: TVMCustomer
     TypeName = 'TEtmRepository'
     ETMfor = BSMaster
     Paging.CurrentPageOfFormat = '%d/%d'
-    Left = 344
-    Top = 48
+    Left = 328
+    Top = 128
   end
   object AcEtmRevertToVersion: TioVMActionBS_ETM_RevertToBindSource
     Name = 'AcEtmRevertToVersion'
+    TargetBindSource = BS_ETM
     AutoExec_OnETMfor_AfterRevert = doRefresh
     AutoExec_OnTargetBS_AfterRevert = doReload
     AutoExec_Persist_AfterRevert = True
-    TargetBindSource = BS_ETM
     Left = 472
     Top = 48
   end
