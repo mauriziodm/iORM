@@ -40,7 +40,11 @@ uses
   iORM.DB.Interfaces,
   FireDAC.Stan.Def,
   FireDAC.Phys.SQLite,
-  FireDAC.Phys.SQLiteWrapper.Stat, // Static link for SQLite
+{$IF CompilerVersion >= 34.0}
+  // Static link for SQLite (from Delphi 10.4 only)
+  // https://docwiki.embarcadero.com/RADStudio/Sydney/en/New_features_and_customer_reported_issues_fixed_in_RAD_Studio_10.4#FireDAC_SQLite_driver_offers_both_static_and_dynamic_linkage
+  FireDAC.Phys.SQLiteWrapper.Stat,
+{$IFEND}
   FireDAC.Phys.FB,
   FireDAC.Stan.ExprFuncs,
   FireDAC.Stan.Intf,
