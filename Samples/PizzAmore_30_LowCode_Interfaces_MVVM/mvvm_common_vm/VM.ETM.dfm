@@ -10,17 +10,16 @@ object VM_ETM: TVM_ETM
   end
   object acBack: TioVMActionBSCloseQuery
     Name = 'acBack'
-    Caption = 'Back'
     TargetBindSource = BS_ETM
     Left = 232
     Top = 56
   end
   object acEtmRevertToVersion: TioVMActionBS_ETM_RevertToBindSource
     Name = 'acEtmRevertToVersion'
+    TargetBindSource = BS_ETM
     AutoExec_OnETMfor_AfterRevert = doRefresh
     AutoExec_OnTargetBS_AfterRevert = doReload
     AutoExec_Persist_AfterRevert = True
-    TargetBindSource = BS_ETM
     Left = 232
     Top = 136
   end

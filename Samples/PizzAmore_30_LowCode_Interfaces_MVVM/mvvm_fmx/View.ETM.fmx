@@ -122,8 +122,8 @@ object ViewETM: TViewETM
     TextSettings.HorzAlign = Center
     TabOrder = 3
     RowCount = 200
-    Viewport.Width = 400.000000000000000000
-    Viewport.Height = 180.000000000000000000
+    Viewport.Width = 396.000000000000000000
+    Viewport.Height = 155.000000000000000000
   end
   object LayoutDiff: TLayout
     Align = Bottom
@@ -179,8 +179,8 @@ object ViewETM: TViewETM
       Size.Height = 330.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 4
-      Viewport.Width = 400.000000000000000000
-      Viewport.Height = 330.000000000000000000
+      Viewport.Width = 396.000000000000000000
+      Viewport.Height = 310.000000000000000000
     end
   end
   object ioViewModelBridge1: TioViewModelBridge
@@ -227,14 +227,14 @@ object ViewETM: TViewETM
     Top = 174
     object acBack: TioViewAction
       Category = 'iORM - MVVM'
-      Caption = 'Back'
+      Text = 'Back'
       Enabled = True
       Visible = True
       VMActionName = 'acBack'
     end
     object acEtmRevertToVersion: TioViewAction
       Category = 'iORM - MVVM'
-      Caption = 'Revert'
+      Text = 'Revert'
       Enabled = True
       Visible = True
       VMActionName = 'acEtmRevertToVersion'

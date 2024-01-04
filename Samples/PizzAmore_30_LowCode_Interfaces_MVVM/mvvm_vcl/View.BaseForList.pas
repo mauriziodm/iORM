@@ -32,6 +32,7 @@ type
     SourceWhere: TDataSource;
     acBuildWhere: TioViewAction;
     acClearWhere: TioViewAction;
+    Action1: TAction;
   private
   public
   end;

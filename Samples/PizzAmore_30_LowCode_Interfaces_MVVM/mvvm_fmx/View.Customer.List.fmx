@@ -124,14 +124,14 @@ inherited ViewCustomerList: TViewCustomerList
   inherited ActionList1: TActionList
     object acNextPage: TioViewAction [4]
       Category = 'iORM-MVVM'
-      Caption = 'acNextPage'
+      Text = 'acNextPage'
       Enabled = True
       Visible = True
       VMActionName = 'acNextPage'
     end
     object acPrevPage: TioViewAction [5]
       Category = 'iORM-MVVM'
-      Caption = 'acPrevPage'
+      Text = 'acPrevPage'
       Enabled = True
       Visible = True
       VMActionName = 'acPrevPage'

@@ -193,6 +193,9 @@ object ViewBaseForList: TViewBaseForList
       Visible = True
       VMActionName = 'acClearWhere'
     end
+    object Action1: TAction
+      Caption = 'Action1'
+    end
   end
   object BSMaster: TioModelDataSet
     ViewModelBridge = VMBridge
