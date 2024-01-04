@@ -1117,34 +1117,51 @@ procedure TioModelPresenterCustom.SetDataObject(const ADataObject: TObject; cons
 begin
   // Check if the operation (SetDataObject) is allowed
   TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType, ADataObject);
-  // If the BS is active then set the DataObject
-  if IsActive then
+  // If the ADataObject is assigned then set it as the BSA DataObject...else ClearDataObject
+  if Assigned(ADataObject) then
   begin
-    // If the new Dataobject is nil then clear it into the BSA and close the BindSource
-    if not Assigned(ADataObject) then
-      ClearDataObject;
-    // Get che ABSA
-    if not CheckAdapter then
-      _CreateAdapter(ADataObject, AOwnsObject)
+    if CheckActiveAdapter then
+      GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
     else
-      GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject);
-  end
-  // If the BindSource is not active it checks if the new DataObject is assigned,
-  //  if it is assigned then automatically activated the BindSource otherwise exits immediately
-  //  because it does not need to do anything (the BindSource is already closed and if the new
-  //  DataObject is being set to nil...)
-  // NB: Ho dovuto attivare automaticamnete il BindSource (nel caso non lo fosse già) perchè
-  //  altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
-  // NB: Se il BS non è mai stato attivo prima allora crea anche il relativo ActiveBindSourceAdapter
-  else
-  begin
-    if Assigned(ADataObject) then
-    begin
-      if GetActiveBindSourceAdapter = nil then
-        _CreateAdapter(ADataObject, AOwnsObject);
+      _CreateAdapter(ADataObject, AOwnsObject);
+    // NB: Ho dovuto attivare automaticamnete il BindSource (nel caso non lo fosse già) perchè
+    //  altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
+    if not IsActive then
       Open;
-    end;
-  end;
+  end
+  else
+    ClearDataObject;
+// ----- OLD CODE FROM 04/01/2024 -----
+//  // Check if the operation (SetDataObject) is allowed
+//  TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType, ADataObject);
+//  // If the BS is active then set the DataObject
+//  if IsActive then
+//  begin
+//    // If the new Dataobject is nil then clear it into the BSA and close the BindSource
+//    if not Assigned(ADataObject) then
+//      ClearDataObject;
+//    // Get che ABSA
+//    if not CheckAdapter then
+//      _CreateAdapter(ADataObject, AOwnsObject)
+//    else
+//      GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject);
+//  end
+//  // If the BindSource is not active it checks if the new DataObject is assigned,
+//  //  if it is assigned then automatically activated the BindSource otherwise exits immediately
+//  //  because it does not need to do anything (the BindSource is already closed and if the new
+//  //  DataObject is being set to nil...)
+//  // NB: Ho dovuto attivare automaticamnete il BindSource (nel caso non lo fosse già) perchè
+//  //  altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
+//  // NB: Se il BS non è mai stato attivo prima allora crea anche il relativo ActiveBindSourceAdapter
+//  else
+//  begin
+//    if Assigned(ADataObject) then
+//    begin
+//      if GetActiveBindSourceAdapter = nil then
+//        _CreateAdapter(ADataObject, AOwnsObject);
+//      Open;
+//    end;
+//  end;
 // ----- OLD CODE FROM 22/04/2023 -----
 //  // If the BindSource is not active it checks if the new DataObject is assigned,
 //  // if it is assigned then automatically activated the BindSource otherwise exits immediately
@@ -1176,34 +1193,51 @@ procedure TioModelPresenterCustom.SetDataObject(const ADataObject: IInterface; c
 begin
   // Check if the operation (SetDataObject) is allowed
   TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType, ADataObject as TObject);
-  // If the BS is active then set the DataObject
-  if IsActive then
+  // If the ADataObject is assigned then set it as the BSA DataObject...else ClearDataObject
+  if Assigned(ADataObject) then
   begin
-    // If the new Dataobject is nil then clear it into the BSA and close the BindSource
-    if not Assigned(ADataObject) then
-      ClearDataObject;
-    // Get che ABSA
-    if not CheckAdapter then
-      _CreateAdapter(ADataObject as TObject, AOwnsObject)
+    if CheckActiveAdapter then
+      GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
     else
-      GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject);
-  end
-  // If the BindSource is not active it checks if the new DataObject is assigned,
-  //  if it is assigned then automatically activated the BindSource otherwise exits immediately
-  //  because it does not need to do anything (the BindSource is already closed and if the new
-  //  DataObject is being set to nil...)
-  // NB: Ho dovuto attivare automaticamnete il BindSource (nel caso non lo fosse già) perchè
-  //  altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
-  // NB: Se il BS non è mai stato attivo prima allora crea anche il relativo ActiveBindSourceAdapter
-  else
-  begin
-    if Assigned(ADataObject) then
-    begin
-      if GetActiveBindSourceAdapter = nil then
-        _CreateAdapter(ADataObject as TObject, AOwnsObject);
+      _CreateAdapter(ADataObject as TObject, AOwnsObject);
+    // NB: Ho dovuto attivare automaticamnete il BindSource (nel caso non lo fosse già) perchè
+    //  altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
+    if not IsActive then
       Open;
-    end;
-  end;
+  end
+  else
+    ClearDataObject;
+// ----- OLD CODE FROM 04/01/2024 -----
+//  // Check if the operation (SetDataObject) is allowed
+//  TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType, ADataObject as TObject);
+//  // If the BS is active then set the DataObject
+//  if IsActive then
+//  begin
+//    // If the new Dataobject is nil then clear it into the BSA and close the BindSource
+//    if not Assigned(ADataObject) then
+//      ClearDataObject;
+//    // Get che ABSA
+//    if not CheckAdapter then
+//      _CreateAdapter(ADataObject as TObject, AOwnsObject)
+//    else
+//      GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject);
+//  end
+//  // If the BindSource is not active it checks if the new DataObject is assigned,
+//  //  if it is assigned then automatically activated the BindSource otherwise exits immediately
+//  //  because it does not need to do anything (the BindSource is already closed and if the new
+//  //  DataObject is being set to nil...)
+//  // NB: Ho dovuto attivare automaticamnete il BindSource (nel caso non lo fosse già) perchè
+//  //  altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
+//  // NB: Se il BS non è mai stato attivo prima allora crea anche il relativo ActiveBindSourceAdapter
+//  else
+//  begin
+//    if Assigned(ADataObject) then
+//    begin
+//      if GetActiveBindSourceAdapter = nil then
+//        _CreateAdapter(ADataObject as TObject, AOwnsObject);
+//      Open;
+//    end;
+//  end;
 // ----- OLD CODE FROM 22/04/2023 -----
 //  // If the BindSource is not active it checks if the new DataObject is assigned,
 //  // if it is assigned then automatically activated the BindSource otherwise exits immediately

@@ -1,5 +1,4 @@
 inherited VMCustomer: TVMCustomer
-  OnViewPairing = ioViewModelViewPairing
   inherited BSMaster: TioModelPresenterMaster
     TypeName = 'ICustomer'
   end

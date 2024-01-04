@@ -60,9 +60,7 @@ type
     DS_ETMDiffTwoWay: TStringField;
     DS_ETMDiffOnewayMoreInfo: TStringField;
     DS_ETMDiffTwowayMoreInfo: TStringField;
-    Button1: TButton;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure Button1Click(Sender: TObject);
   private
   public
   end;
@@ -70,19 +68,6 @@ type
 implementation
 
 {$R *.dfm}
-
-procedure TCustomerForm.Button1Click(Sender: TObject);
-var
-  LCustomer: TCustomer;
-begin
-  DSCustomer.Close;
-  DSCustomer.SourceBS := nil;
-  DSCustomer.LoadType := ltManual;
-  LCustomer := TCustomer.Create;
-  LCustomer.Name := 'XXXXXXX';
-  DSCustomer.SetDataObject(LCustomer);
-//  DSCustomer.Open;
-end;
 
 procedure TCustomerForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
