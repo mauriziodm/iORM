@@ -49,7 +49,6 @@ type
   TioVMActionCustom = class (TComponent, IioVMAction)
   strict private
     FBindedViewActionsContainer: TList<IioViewAction>;
-    FCaption: String;
     FEnabled: Boolean;
     FExecutionMode: TioActionExecutionMode;
     FVisible: Boolean;
