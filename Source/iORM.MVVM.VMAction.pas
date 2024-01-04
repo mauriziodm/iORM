@@ -69,19 +69,16 @@ type
     procedure BindViewAction(const AViewAction: IioViewAction);
     procedure UnbindViewAction(const AViewAction: IioViewAction);
     procedure UnbindAllViewActions;
-    function GetCaption: String;
     function GetEnabled: Boolean;
     function GetExecutionMode: TioActionExecutionMode;
     function GetName: TComponentName;
     function GetOwnerComponent: TComponent;
     function GetVisible: Boolean;
-    procedure SetCaption(const Value: String);
     procedure SetEnabled(const Value: Boolean);
     procedure SetExecutionMode(const Value: TioActionExecutionMode);
     procedure SetName(const Value: TComponentName); reintroduce;
     procedure SetVisible(const Value: Boolean);
     // properties
-    property Caption: String read GetCaption write SetCaption;
     property Enabled: Boolean read GetEnabled write SetEnabled default True;
     property ExecutionMode: TioActionExecutionMode read GetExecutionMode write SetExecutionMode;
     property Name: TComponentName read GetName write SetName;
@@ -112,7 +109,6 @@ type
     property Owner;
   published
     // inherited properties
-    property Caption;
     property Enabled;
     property Name;
     property Visible;
@@ -151,7 +147,6 @@ type
     property Owner;
   published
     // inherited properties
-    property Caption;
     property Enabled;
     property Name;
     property Visible;
@@ -320,7 +315,6 @@ type
     property Owner;
   published
     // inherited properties
-    property Caption;
     property Enabled;
     property Name;
     property Visible;
@@ -681,7 +675,6 @@ end;
     function HandlesTarget(Target: TObject): Boolean; override;
   published
     // inherited properties
-    property Caption;
     property Enabled;
     property Name;
     property Visible;
@@ -747,11 +740,6 @@ function TioVMActionCustom.Update: Boolean;
 begin
   _UpdateOriginal;
   Result := False;
-end;
-
-function TioVMActionCustom.GetCaption: String;
-begin
-  Result := FCaption;
 end;
 
 function TioVMActionCustom.GetEnabled: Boolean;
@@ -866,9 +854,7 @@ procedure TioVMActionCustom.BindViewAction(const AViewAction: IioViewAction);
 begin
   FBindedViewActionsContainer.Add(AViewAction);
   AViewAction.VMAction := Self;
-  // Propagate Caption/Enabled/Visible to the new registered ViewAction if linked
-  if AViewAction.CaptionLinkedToVMAction then
-    AViewAction.Caption := FCaption;
+  // Propagate Enabled/Visible to the new registered ViewAction if linked
   if AViewAction.EnabledLinkedToVMAction then
     AViewAction.Enabled := FEnabled;
   if AViewAction.VisibleLinkedToVMAction then
@@ -887,19 +873,6 @@ var
 begin
   for I := FBindedViewActionsContainer.Count-1 downto 0 do
     UnbindViewAction(FBindedViewActionsContainer[I]);
-end;
-
-procedure TioVMActionCustom.SetCaption(const Value: String);
-var
-  LViewAction: IioViewAction;
-begin
-  if Value <> FCaption then
-  begin
-    FCaption := Value;
-    for LViewAction in FBindedViewActionsContainer do
-      if LViewAction.CaptionLinkedToVMAction then
-        LViewAction.Caption := Value;
-  end;
 end;
 
 procedure TioVMActionCustom.SetEnabled(const Value: Boolean);

@@ -48,7 +48,6 @@ type
   // Standard action for MVVM view use
   TioViewAction = class(Vcl.ActnList.TCustomAction, IioViewAction)
   strict private
-    FCaptionLinkedToVMAction: Boolean;
     FEnabledLinkedToVMAction: Boolean;
     FVisibleLinkedToVMAction: Boolean;
     FVMAction: IioVMAction;
@@ -66,12 +65,6 @@ type
     procedure DoAfterExecute;
     procedure DoBeforeUpdate;
     procedure DoAfterUpdate;
-    // Caption property
-    procedure SetCaption(const Value: string); override;
-    function GetCaption: String;
-    // CaptionLinkedToAction property
-    procedure SetCaptionLinkedToVMAction(Value: Boolean);
-    function GetCaptionLinkedToVMAction: Boolean;
     // Enabled property
     procedure SetEnabled(Value: Boolean); override;
     function GetEnabled: Boolean;
@@ -102,7 +95,7 @@ type
   published
     // inherited properties
     property AutoCheck;
-    //property Caption; // ridichiarata sotto
+    property Caption;
     property Checked;
     //property Enabled; // ridichiarata sotto
     property GroupIndex;
@@ -119,8 +112,6 @@ type
     property OnHint;
     //property OnUpdate; // Lasciarla non visibile, può fare casino in questa particolare action
     // properties
-    property Caption: string read GetCaption write SetCaption;
-    property CaptionLinkedToVMAction: Boolean read GetCaptionLinkedToVMAction write SetCaptionLinkedToVMAction default False;
     property Enabled: Boolean read GetEnabled write SetEnabled;
     property EnabledLinkedToVMAction: Boolean read GetEnabledLinkedToVMAction write SetEnabledLinkedToVMAction default True;
     property Visible: Boolean read GetVisible write SetVisible;
@@ -1460,7 +1451,6 @@ begin
   // Copied from TAction.Create
   DisableIfNoHandler := False;
   // New fields
-  FCaptionLinkedToVMAction := False;
   FEnabledLinkedToVMAction := True;
   FVisibleLinkedToVMAction := True;
   FVMAction := nil;
@@ -1512,16 +1502,6 @@ begin
   FVMAction.Update;
 end;
 
-function TioViewAction.GetCaption: String;
-begin
-  Result := inherited Caption;
-end;
-
-function TioViewAction.GetCaptionLinkedToVMAction: Boolean;
-begin
-  Result := FCaptionLinkedToVMAction;
-end;
-
 function TioViewAction.GetEnabled: Boolean;
 begin
   Result := inherited Enabled;
@@ -1545,24 +1525,6 @@ end;
 function TioViewAction.GetVisibleLinkedToVMAction: Boolean;
 begin
   Result := FVisibleLinkedToVMAction;
-end;
-
-procedure TioViewAction.SetCaption(const Value: string);
-begin
-  if Value <> GetCaption then
-  begin
-    inherited SetCaption(Value);
-    if FCaptionLinkedToVMAction and not(csDesigning in ComponentState) then
-    begin
-      CheckVMAction('SetCaption');
-      FVMAction.Caption := Value;
-    end;
-  end;
-end;
-
-procedure TioViewAction.SetCaptionLinkedToVMAction(Value: Boolean);
-begin
-  FCaptionLinkedToVMAction := Value;
 end;
 
 procedure TioViewAction.SetEnabled(Value: Boolean);

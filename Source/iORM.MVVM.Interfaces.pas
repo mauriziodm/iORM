@@ -111,10 +111,6 @@ type
     procedure UnbindViewAction(const AViewAction: IioViewAction);
     function Update: Boolean;
     function Execute: Boolean;
-    // Caption property
-    procedure SetCaption(const Value: string);
-    function GetCaption: String;
-    property Caption: string read GetCaption write SetCaption;
     // Enabled property
     procedure SetEnabled(const Value: Boolean);
     function GetEnabled: Boolean;
@@ -139,14 +135,6 @@ type
     procedure DoAfterExecute;
     procedure DoBeforeUpdate;
     procedure DoAfterUpdate;
-    // Caption property
-    procedure SetCaption(const Value: string);
-    function GetCaption: String;
-    property Caption: string read GetCaption write SetCaption;
-    // CaptionLinkedToAction property
-    procedure SetCaptionLinkedToVMAction(Value: Boolean);
-    function GetCaptionLinkedToVMAction: Boolean;
-    property CaptionLinkedToVMAction: Boolean read GetCaptionLinkedToVMAction write SetCaptionLinkedToVMAction;
     // Enabled
     procedure SetEnabled(Value: Boolean);
     function GetEnabled: Boolean;
