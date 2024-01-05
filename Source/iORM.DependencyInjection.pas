@@ -1693,9 +1693,6 @@ begin
     begin
       // Set the ViewContext as parent view
       TioControl.SetParent(Result, FViewContext);
-      // Fire the onAfterRequest event handler of the ViewContextProvider component
-      if Assigned(FVCProvider) then
-        FVCProvider.DoOnAfterRequest(TComponent(Result), FViewContext);
       // If at this point the FViewModel is not already assigned then try to extract
       //   it from the View.VMBridge. Indeed it may have been that it was created by
       //   the VMBridge itself is its properties DI_VMInterface and DI_VMAlias are
@@ -1714,6 +1711,46 @@ begin
       //      Normalmente le viste infatti venivano registrate solo qui, ora anche nel metodo di cui sopra se necessario.
       if Assigned(FViewModel) then
         FViewModel.ViewRegister.AddOrUpdate(TComponent(Result), FViewContext, FVCProvider, FViewContextFreeMethod);
+      // if the ViewModel is present then UnLock it (MVVM)
+      if Self.ViewModelExist then
+        TioViewModelShuttleContainer.DeleteViewModel(FViewModelMarker);
+      // Fire the onAfterRequest event handler of the ViewContextProvider component
+      // NB: Questo è stato spostato alla fine perchè in caso di form modale entra in un ciclo dal quale non
+      //      esce e in pratica poi non passava per righe che prima erano dopo o meglio ci passava ma solo
+      //      quando poi veniva chiusa la form modale stessa.
+      if Assigned(FVCProvider) then
+        FVCProvider.DoOnAfterRequest(TComponent(Result), FViewContext);
+      // Esce subito da qui perchè dopo lo spostamento di  cui sopra (DoOnAfterRequest + TioViewModelShuttleContainer.DeleteViewModel(...)
+      //  poi altrimenti all'uscita richiamaerebbe il DeleteViewModel della sezione finally di nuovo. Ho lasciato cmq
+      //  anche la chiamata a DeleteViewModel nella sezione finally nel caso non si sia usato un VCProvider (non entrerebbe in questo blocco).
+      Exit;
+// ----------
+// Mauri 05/01/2024: Rivista la sequenza per problemi con l'uso di form modali (come ViewContext)
+// su segnalazione di Carlo Marona di oggi (questo è il vecchio codice)
+//      // Set the ViewContext as parent view
+//      TioControl.SetParent(Result, FViewContext);
+//      // Fire the onAfterRequest event handler of the ViewContextProvider component
+//      if Assigned(FVCProvider) then
+//        FVCProvider.DoOnAfterRequest(TComponent(Result), FViewContext);
+//      // If at this point the FViewModel is not already assigned then try to extract
+//      //   it from the View.VMBridge. Indeed it may have been that it was created by
+//      //   the VMBridge itself is its properties DI_VMInterface and DI_VMAlias are
+//      //   setted properly.
+//      if not Assigned(FViewModel) then
+//        FViewModel := ExtractVMFromView(TComponent(Result));
+//      // Register View, ViewContext and ViewContextProvider in the ViewRegister of the ViewModel or in the SimpleViewRegster
+//      //  if a SimpleView was required
+//      if FInterfaceName.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX) then
+//        TioSimpleViewRegister.AddOrUpdate(TComponent(Result), FViewContext, FVCProvider, FViewContextFreeMethod)
+//      else
+//      // NB: Mauri 04/12/2022: Oltre a registrare la nuova View (e il relativo ViewContext) qui ora le viste vengono registrare
+//      //      nel ViewRegister del ViewModel anche nel metodo TioViewModel.BindView (se non già registrata da qui.
+//      //      Ho aggiunto questo perchè per far funzionare correttamente le BSCloseQueryActions avevo bisogno
+//      //      che tutte le viste fossero registrate, anche quelle che non sono state create dal DIC o che cmq non venivano registrate.
+//      //      Normalmente le viste infatti venivano registrate solo qui, ora anche nel metodo di cui sopra se necessario.
+//      if Assigned(FViewModel) then
+//        FViewModel.ViewRegister.AddOrUpdate(TComponent(Result), FViewContext, FVCProvider, FViewContextFreeMethod);
+// ----------
     end
   finally
     // if the ViewModel is present then UnLock it (MVVM)
