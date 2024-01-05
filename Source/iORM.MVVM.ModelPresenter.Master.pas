@@ -259,6 +259,11 @@ begin
 //        in questo modo funziona.
 //    ltManual:
 //      Result := FWannaBeActive and ((DataObject <> nil) or (ANewDataObject <> nil));
+// Note Mauri 05/01/2024: Ho rimesso le due righe che avevo commentato modificandole perchè altrimenti
+//   avevo problemi quando facevo SetDataObject(AObj) con LoadType=ltManual la prima volta (la seconda poi invece andava bene).
+//   così sembra andare bene
+    ltManual:
+      Result := (FWannaBeActive and (DataObject <> nil)) or (ANewDataObject <> nil);
     ltFromBSAsIs .. ltFromBSReloadNewInstance:
       Result := FWannaBeActive and Assigned(SourceBS);
   else

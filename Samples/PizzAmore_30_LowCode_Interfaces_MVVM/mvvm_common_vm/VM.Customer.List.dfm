@@ -13,13 +13,13 @@ inherited VMCustomerList: TVMCustomerList
   inherited BSWhere: TioModelPresenterMaster
     TypeName = 'ICustomer'
   end
-  object acNextPage: TioVMActionBSNextPage [7]
+  object acNextPage: TioVMActionBSNextPage
     Name = 'acNextPage'
     TargetBindSource = BSMaster
     Left = 160
     Top = 368
   end
-  object acPrevPage: TioVMActionBSPrevPage [8]
+  object acPrevPage: TioVMActionBSPrevPage
     Name = 'acPrevPage'
     TargetBindSource = BSMaster
     Left = 160

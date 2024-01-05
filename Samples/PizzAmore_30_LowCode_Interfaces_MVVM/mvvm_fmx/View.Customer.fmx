@@ -197,6 +197,7 @@ inherited ViewCustomer: TViewCustomer
     end
   end
   inherited BSMaster: TioModelBindSource
+    AutoActivate = True
     FieldDefs = <
       item
         Name = 'ID'
@@ -224,6 +225,7 @@ inherited ViewCustomer: TViewCustomer
         Generator = 'Integers'
         ReadOnly = False
       end>
+    Preview = True
   end
   object BindingsList1: TBindingsList
     Methods = <>
