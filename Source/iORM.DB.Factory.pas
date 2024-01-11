@@ -165,7 +165,7 @@ var
 begin
   // Get connection info
   LConnectionInfo := TioConnectionManager.GetConnectionInfo(AConnectionName);
-  if LConnectionInfo.ConnectionType = TioConnectionType.ctHTML then
+  if LConnectionInfo.ConnectionType = TioConnectionType.ctHTTP then
     Result := NewConnectionHttp
   else
     Result := NewConnectionDB;

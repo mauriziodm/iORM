@@ -299,7 +299,7 @@ begin
   else
     raise EioException.Create(Self.ClassName + ': ConnectionInfo (TioConnectionInfo) for "' + Result + '" not found!');
   // if the connection is of type then also check if it is present in the FireDAC's ConnectionDefs
-  if (LConnectionInfo.ConnectionType <> TioConnectionType.ctHTML) and not Assigned(FDManager.ConnectionDefs.FindConnectionDef(Result)) then
+  if (LConnectionInfo.ConnectionType <> TioConnectionType.ctHTTP) and not Assigned(FDManager.ConnectionDefs.FindConnectionDef(Result)) then
     raise EioException.Create(Self.ClassName + ': Connection params definition "' + Result + '" not found!');
 end;
 
@@ -559,7 +559,7 @@ begin
     if AAsDefault or (FCurrentConnectionInfo.CurrentConnectionName = '') then
       FCurrentConnectionInfo.CurrentConnectionName := AConnectionName;
     // Setup the connection info
-    LConnectionInfo := TioConnectionInfo.Create(AConnectionName, ctHTML, APersistent, kgtUndefined);
+    LConnectionInfo := TioConnectionInfo.Create(AConnectionName, ctHTTP, APersistent, kgtUndefined);
     LConnectionInfo.BaseURL := ABaseURL;
     // Add the connection type to the internal container
     FConnectionManagerContainer.AddOrSetValue(AConnectionName, LConnectionInfo);

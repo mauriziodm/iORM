@@ -57,7 +57,7 @@ class function TioStrategyFactory.ConnectionTypeToStrategy(
   const AConnectionType: TioConnectionType): TioStrategyRef;
 begin
   case AConnectionType of
-    TioConnectionType.ctHTML:
+    TioConnectionType.ctHTTP:
       Result := TioStrategyHttp;
   else
     Result := TioStrategyDB;

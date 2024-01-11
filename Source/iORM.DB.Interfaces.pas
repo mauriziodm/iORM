@@ -76,7 +76,7 @@ type
 {$IFNDEF ioDelphiProfessional}
     ctSQLServer,
 {$ENDIF}
-    ctMySQL, ctHTML);
+    ctMySQL, ctHTTP);
 
   TioKeyGenerationTime = (kgtUndefined, kgtAfterInsert, kgtBeforeInsert);
 

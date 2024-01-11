@@ -145,12 +145,12 @@ end;
 
 function TioConnectionBase.IsDBConnection: Boolean;
 begin
-  Result := (FConnectionInfo.ConnectionType <> TioConnectionType.ctHTML);
+  Result := (FConnectionInfo.ConnectionType <> TioConnectionType.ctHTTP);
 end;
 
 function TioConnectionBase.IsHttpConnection: Boolean;
 begin
-  Result := (FConnectionInfo.ConnectionType = TioConnectionType.ctHTML);
+  Result := (FConnectionInfo.ConnectionType = TioConnectionType.ctHTTP);
 end;
 
 procedure TioConnectionBase.Rollback;
