@@ -31,69 +31,35 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.DT.CompAutoUses;
+unit iORM.DT.Editors.VMAction;
 
 interface
 
 uses
-  DesignEditors, System.Classes;
+  DesignEditors, DesignIntf;
 
 type
 
-  TioSelectionEditor = class(TSelectionEditor)
-  public
-    procedure RequiresUnits(Proc: TGetStrProc); override;
-  end;
-
-  TioBindSourceSelectionEditor = class(TioSelectionEditor)
-  public
-    procedure RequiresUnits(Proc: TGetStrProc); override;
-  end;
-
-  TioConnectionDefSelectionEditor = class(TioSelectionEditor)
-  public
-    procedure RequiresUnits(Proc: TGetStrProc); override;
-  end;
-
-  TioMVVMSelectionEditor = class(TioSelectionEditor)
-  public
-    procedure RequiresUnits(Proc: TGetStrProc); override;
+  // This editor is used to ensure that when you double-click on a VMAction component the OnExecute event handler opens (otherwise the AfterExecue would open)
+  TioVMActionEditor = class(TDefaultEditor)
+  protected
+    procedure EditProperty(const Prop: IProperty; var Continue: Boolean); override;
   end;
 
 implementation
 
-{ TioSelectionEditor }
+uses
+  System.SysUtils;
 
-procedure TioSelectionEditor.RequiresUnits(Proc: TGetStrProc);
+{ TioVMActionEditor }
+
+procedure TioVMActionEditor.EditProperty(const Prop: IProperty; var Continue: Boolean);
 begin
-  inherited;
-  Proc('iORM');
-  Proc('iORM.Attributes');
-  Proc('iORM.CommonTypes');
-end;
-
-{ TioBindSourceSelectionEditor }
-
-procedure TioBindSourceSelectionEditor.RequiresUnits(Proc: TGetStrProc);
-begin
-  inherited;
-  Proc('iORM.Where.Interfaces');
-end;
-
-{ TConnectionDefSelectionEditor }
-
-procedure TioConnectionDefSelectionEditor.RequiresUnits(Proc: TGetStrProc);
-begin
-  inherited;
-  Proc('iORM.DBBuilder.Interfaces');
-end;
-
-{ TioViewModelBridgeSelectionEditor }
-
-procedure TioMVVMSelectionEditor.RequiresUnits(Proc: TGetStrProc);
-begin
-  inherited;
-  Proc('iORM.MVVM.Interfaces');
+  if CompareText(Prop.GetName, 'ONEXECUTE') = 0 then
+  begin
+    Continue := False;
+    Prop.Edit;
+  end;
 end;
 
 end.

@@ -107,6 +107,7 @@
         <DCCReference Include="..\..\Source\iORM.DT.Register.pas"/>
         <DCCReference Include="..\..\Source\iORM.DT.Wizard.Utils.pas"/>
         <DCCReference Include="..\..\Source\iORM.DT.CompAutoUses.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DT.Editors.VMAction.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

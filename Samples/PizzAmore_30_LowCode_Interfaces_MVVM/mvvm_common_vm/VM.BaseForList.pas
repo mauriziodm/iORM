@@ -24,6 +24,7 @@ type
     BSWhere: TioModelPresenterMaster;
     acBuildWhere: TioVMActionBSBuildWhere;
     acClearWhere: TioVMActionBSClearWhere;
+    ioVMAction1: TioVMAction;
     procedure ioViewModelViewPairing(const Sender: TioViewModel);
   private
   public

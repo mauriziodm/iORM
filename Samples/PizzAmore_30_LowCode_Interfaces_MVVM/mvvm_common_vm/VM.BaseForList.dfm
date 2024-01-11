@@ -69,4 +69,9 @@ object VMBaseForList: TVMBaseForList
     Left = 320
     Top = 176
   end
+  object ioVMAction1: TioVMAction
+    Name = 'ioVMAction1'
+    Left = 368
+    Top = 280
+  end
 end

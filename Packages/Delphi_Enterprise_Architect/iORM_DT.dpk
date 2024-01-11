@@ -40,6 +40,7 @@ contains
   iORM.DT.ViewModel.Wizard.Creator in '..\..\Source\iORM.DT.ViewModel.Wizard.Creator.pas',
   iORM.DT.Register in '..\..\Source\iORM.DT.Register.pas',
   iORM.DT.Wizard.Utils in '..\..\Source\iORM.DT.Wizard.Utils.pas',
-  iORM.DT.CompAutoUses in '..\..\Source\iORM.DT.CompAutoUses.pas';
+  iORM.DT.CompAutoUses in '..\..\Source\iORM.DT.CompAutoUses.pas',
+  iORM.DT.Editors.VMAction in '..\..\Source\iORM.DT.Editors.VMAction.pas';
 
 end.
