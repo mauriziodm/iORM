@@ -31,26 +31,35 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.ConflictStrategy.Interfaces;
+unit iORM.ConflictStrategy.NewestWin;
 
 interface
 
 uses
-  iORM.Context.Interfaces;
+  iORM.ConflictStrategy.Interfaces, iORM.Context.Interfaces;
 
 type
 
-  // Base class for all ConflictStrategies
-  TioCustomConflictStrategy = class abstract
+  TioNewestWinConflictStrategy = class(TioCustomConflictStrategy)
   public
-    // Check/detect (or prepare) if there is a conflict persisting the DataObject contained into the context
-    class procedure CheckConflict(const AContext: IioContext; var AConflictDetected: Boolean); virtual; abstract;
-    // If a conflict is detected then this method is called from the persistence strategy to try to resolve the conflict
-    class procedure ResolveConflict(const AContext: IioContext); virtual; abstract;
+    class procedure CheckConflict(const AContext: IioContext; var AConflictDetected: Boolean); override;
+    class procedure ResolveConflict(const AContext: IioContext); override;
   end;
-  // Class reference for conflict strategies
-  TioCustomConflictStrategyRef = class of TioCustomConflictStrategy;
 
 implementation
+
+{ TioNewestWinConflictStrategy }
+
+class procedure TioNewestWinConflictStrategy.CheckConflict(const AContext: IioContext; var AConflictDetected: Boolean);
+begin
+  inherited;
+  // To be implemented
+end;
+
+class procedure TioNewestWinConflictStrategy.ResolveConflict(const AContext: IioContext);
+begin
+  inherited;
+  // To be implemented
+end;
 
 end.

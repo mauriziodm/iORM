@@ -389,6 +389,8 @@
         <DCCReference Include="..\..\Source\iORM.ETM.Diff.Twoway.pas"/>
         <DCCReference Include="..\..\Source\iORM.StdActions.CommonBehaviour.pas"/>
         <DCCReference Include="..\..\Source\iORM.ConflictStrategy.Interfaces.pas"/>
+        <DCCReference Include="..\..\Source\iORM.ConflictStrategy.RaiseManual.pas"/>
+        <DCCReference Include="..\..\Source\iORM.ConflictStrategy.NewestWin.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
