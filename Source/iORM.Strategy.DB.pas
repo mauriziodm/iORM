@@ -303,13 +303,27 @@ end;
 
 class procedure TioStrategyDB.DeleteObject_Internal(const AContext: IioContext);
 var
+  LConflictDetected: Boolean;
   LQuery: IioQuery;
 begin
   inherited;
-  // Delete the entity (Intercepted by CRUDInterceptors)
-  LQuery := TioDBFactory.QueryEngine.GetQueryDelete(AContext, True);
-  if not AContext.IDIsNull then
-    LQuery.ExecSQL;
+  // If the ID is null then exit because the entity was not persisted
+  if AContext.IDIsNull then
+    Exit;
+  // Conflict strategy: check if there is a persistence conflict or prepare the where object of the context
+  //  to consider the version property (or some other property useful for conflict detection)
+  LConflictDetected := False;
+  AContext.CheckConflict(AContext, LConflictDetected);
+  // Create and execute the query to delete the entity on DB cheking the version to avoid concurrency
+  // conflict (if versioning is enabled for this type of entity)
+  if not LConflictDetected then
+  begin
+    LQuery := TioDBFactory.QueryEngine.GetQueryDelete(AContext, True);
+    LConflictDetected := LQuery.ExecSQL = 0;
+  end;
+  // Conflict strategy: if a conclict is detected then resolve it
+  if LConflictDetected then
+    AContext.ResolveConflict(AContext);
 end;
 
 class procedure TioStrategyDB.InsertObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
@@ -972,18 +986,21 @@ var
   LQuery: IioQuery;
 begin
   inherited;
-
-
   // Conflict strategy: check if there is a persistence conflict or prepare the where object of the context
   //  to consider the version property (or some other property useful for conflict detection)
   LConflictDetected := False;
-//  AContext.Map.
-
-  // Create and execute the query to update the entity into the DB cheking the version to avoid concurrency
-  // conflict (if versioning is enabled for this type of entity) (Intercepted by CRUDInterceptors)
-  LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext);
-  if LQuery.ExecSQL = 0 then
-    raise EioConcurrencyConflictException.Create(ClassName, 'UpdateObject_Internal', AContext);
+  AContext.CheckConflict(AContext, LConflictDetected);
+  // Create and execute the query to update the entity on DB cheking the version to avoid concurrency
+  // conflict (if versioning is enabled for this type of entity)
+  if not LConflictDetected then
+  begin
+    LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext);
+    LConflictDetected := LQuery.ExecSQL = 0;
+  end;
+  // Conflict strategy: if a conclict is detected then resolve it
+  if LConflictDetected then
+    AContext.ResolveConflict(AContext)
+  else
   // If this isn't a blind insert/update then update special proprerties if exists
   if not ABlindInsertUpdate then
   begin

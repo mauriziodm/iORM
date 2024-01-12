@@ -48,6 +48,7 @@ type
     // If a conflict is detected then this method is called from the persistence strategy to try to resolve the conflict
     class procedure ResolveConflict(const AContext: IioContext); virtual; abstract;
   end;
+
   // Class reference for conflict strategies
   TioCustomConflictStrategyRef = class of TioCustomConflictStrategy;
 

@@ -36,8 +36,8 @@ unit iORM.Context.Table.Interfaces;
 interface
 
 uses
-  iORM.CommonTypes, System.Generics.Collections, System.Rtti, iORM.Interfaces,
-  iORM.Attributes, iORM.ConflictStrategy.Interfaces;
+  System.Generics.Collections, System.Rtti, iORM.Interfaces,
+  iORM.Attributes, iORM.CommonTypes;
 
 type
 
@@ -90,7 +90,7 @@ type
     /// This method create the TrueClassVirtualMap.Table object duplicating something of itself
     function DuplicateForTrueClassMap: IioTable;
     function GetClassName: String;
-    function GetConflictStrategy: TioCustomConflictStrategyRef;
+    function GetConflictStrategy: TClass; // TClass instead of TioCustomConflictStrategyRef to avoid circular reference
     function GetConnectionDefName: String;
     function GetGroupBy: IioGroupBy;
     function GetJoin: IioJoins;

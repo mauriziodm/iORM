@@ -49,6 +49,9 @@ type
 
 implementation
 
+uses
+  iORM.Exceptions;
+
 { TioRaiseManualConflictStrategy }
 
 class procedure TioRaiseManualConflictStrategy.CheckConflict(const AContext: IioContext; var AConflictDetected: Boolean);
@@ -59,8 +62,7 @@ end;
 
 class procedure TioRaiseManualConflictStrategy.ResolveConflict(const AContext: IioContext);
 begin
-  inherited;
-  // To be implemented
+  raise EioConcurrencyConflictException.Create(ClassName, 'ResolveConflict', AContext);
 end;
 
 end.

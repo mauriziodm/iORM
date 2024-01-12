@@ -38,8 +38,7 @@ interface
 uses
   iORM.Context.Interfaces,
   iORM.SqlItems, iORM.Context.Table.Interfaces, iORM.Attributes,
-  iORM.CommonTypes, System.Generics.Collections, System.Rtti,
-  iORM.ConflictStrategy.Interfaces;
+  iORM.CommonTypes, System.Generics.Collections, System.Rtti;
 
 type
 
@@ -129,7 +128,7 @@ type
   // Classe che incapsula le info sulla tabella
   TioTable = class(TioSqlItem, IioTable)
   strict private
-    FConflictStrategy: TioCustomConflictStrategyRef;
+    FConflictStrategy: TClass; // TClass instead of TioCustomConflictStrategyRef to avoid circular reference
     FConnectionDefName_DoNotCallDirectly: String;
     FContainsSomeIioListProperty: Boolean;
     FEtmTimeSlotClass: TioEtmTimeSlotRef;
@@ -155,7 +154,7 @@ type
     /// This method create the TrueClassVirtualMap.Table object duplicating something of itself
     function DuplicateForTrueClassMap: IioTable;
     function GetClassName: String;
-    function GetConflictStrategy: TioCustomConflictStrategyRef;
+    function GetConflictStrategy: TClass; // TClass instead of TioCustomConflictStrategyRef to avoid circular reference
     function GetConnectionDefName: String;
     function GetGroupBy: IioGroupBy;
     function GetJoin: IioJoins;
@@ -239,7 +238,7 @@ begin
   Result := FRttiType.Name;
 end;
 
-function TioTable.GetConflictStrategy: TioCustomConflictStrategyRef;
+function TioTable.GetConflictStrategy: TClass;
 begin
   Result := FConflictStrategy;
 end;

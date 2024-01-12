@@ -103,15 +103,18 @@ type
     constructor Create(const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
       const AMasterPropertyName, AMasterPropertyPath: String); overload;
     function GetClassRef: TioClassRef;
-    function GetTable: IioTable;
+    function GetID: Integer;
     function GetProperties: IioProperties;
+    function GetTable: IioTable;
     function GetTrueClass: IioTrueClass;
+    function IDIsNull: Boolean;
     function IsTrueClass: Boolean;
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
     function WhereExist: Boolean;
-    function GetID: Integer;
-    function IDIsNull: Boolean;
+    // Conflict strategy methods (to avoid circular reference)
+    procedure CheckConflict(const AContext: IioContext; var AConflictDetected: Boolean); inline;
+    procedure ResolveConflict(const AContext: IioContext); inline;
     // Map
     function Map: IioMap;
     // GroupBy
@@ -144,13 +147,23 @@ implementation
 uses
   iORM.Context.Factory, iORM.DB.Factory, System.TypInfo,
   iORM.Context.Container, System.SysUtils, iORM.Exceptions,
-  System.StrUtils, iORM.DB.Interfaces;
+  System.StrUtils, iORM.DB.Interfaces, iORM.ConflictStrategy.Interfaces;
 
 { TioContext }
 
 function TioContext.GetTrueClass: IioTrueClass;
 begin
   Result := Self.Map.GetTable.GetTrueClass;
+end;
+
+procedure TioContext.CheckConflict(const AContext: IioContext; var AConflictDetected: Boolean);
+begin
+  TioCustomConflictStrategy(GetTable.GetConflictStrategy).CheckConflict(AContext, AConflictDetected);
+end;
+
+procedure TioContext.ResolveConflict(const AContext: IioContext);
+begin
+  TioCustomConflictStrategy(GetTable.GetConflictStrategy).ResolveConflict(AContext);
 end;
 
 constructor TioContext.Create(const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
