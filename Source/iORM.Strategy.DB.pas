@@ -976,6 +976,7 @@ begin
   LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext);
   if LQuery.ExecSQL = 0 then
     raise EioConcurrencyConflictException.Create(ClassName, 'UpdateObject_Internal', AContext);
+  // If this isn't a blind insert/update then update special proprerties if exists
   if not ABlindInsertUpdate then
   begin
     AContext.NextObjVersion(True);
