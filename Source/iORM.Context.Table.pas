@@ -38,7 +38,8 @@ interface
 uses
   iORM.Context.Interfaces,
   iORM.SqlItems, iORM.Context.Table.Interfaces, iORM.Attributes,
-  iORM.CommonTypes, System.Generics.Collections, System.Rtti;
+  iORM.CommonTypes, System.Generics.Collections, System.Rtti,
+  iORM.ConflictStrategy.Interfaces;
 
 type
 
@@ -128,17 +129,18 @@ type
   // Classe che incapsula le info sulla tabella
   TioTable = class(TioSqlItem, IioTable)
   strict private
-    FMapMode: TioMapModeType;
-    FTrueClass: IioTrueClass;
-    FJoins: IioJoins;
-    FGroupBy: IioGroupBy;
+    FConflictStrategy: TioCustomConflictStrategyRef;
     FConnectionDefName_DoNotCallDirectly: String;
-    FKeyGenerator: String;
-    FRttiType: TRttiInstanceType;
-    FIndexList: TioIndexList;
     FContainsSomeIioListProperty: Boolean;
     FEtmTimeSlotClass: TioEtmTimeSlotRef;
     FEtmTraceOnlyOnConnectionName: String;
+    FGroupBy: IioGroupBy;
+    FIndexList: TioIndexList;
+    FJoins: IioJoins;
+    FKeyGenerator: String;
+    FMapMode: TioMapModeType;
+    FRttiType: TRttiInstanceType;
+    FTrueClass: IioTrueClass;
     // EtmTimeSlotClass
     procedure SetEtmTimeSlotClass(const AEtmTimeSlotClass: TioEtmTimeSlotRef);
     function GetEtmTimeSlotClass: TioEtmTimeSlotRef;
@@ -146,25 +148,27 @@ type
     procedure SetEtmTraceOnlyOnConnectionName(const AConnectionName: String);
     function GetEtmTraceOnlyOnConnectionName: String;
   public
+    { TODO : CONFLICTS - Aggiungere parametro AConclictStrategy al costruttore }
     constructor Create(const ASqlText, AKeyGenerator: String; const ATrueClass: IioTrueClass; const AJoins: IioJoins; const AGroupBy: IioGroupBy;
       const AConnectionDefName: String; const AMapMode: TioMapModeType; const ARttiType: TRttiInstanceType); reintroduce; overload;
     destructor Destroy; override;
     /// This method create the TrueClassVirtualMap.Table object duplicating something of itself
     function DuplicateForTrueClassMap: IioTable;
+    function GetClassName: String;
+    function GetConflictStrategy: TioCustomConflictStrategyRef;
+    function GetConnectionDefName: String;
+    function GetGroupBy: IioGroupBy;
+    function GetJoin: IioJoins;
+    function GetKeyGenerator: String;
+    function GetMapMode: TioMapModeType;
+    function GetQualifiedClassName: String;
+    function GetRttiType: TRttiInstanceType;
     function GetSql: String; override;
     function GetTrueClass: IioTrueClass;
+    function IsForThisConnection(AConnectionDefNameToCheck: String): Boolean;
+    function IsNotPersistedEntity: Boolean;
     function IsTrueClass: Boolean;
     function TableName: String;
-    function GetKeyGenerator: String;
-    function GetJoin: IioJoins;
-    function GetGroupBy: IioGroupBy;
-    function GetConnectionDefName: String;
-    function IsForThisConnection(AConnectionDefNameToCheck: String): Boolean;
-    function GetMapMode: TioMapModeType;
-    function GetRttiType: TRttiInstanceType;
-    function IsNotPersistedEntity: Boolean;
-    function GetClassName: String;
-    function GetQualifiedClassName: String;
     // IndexList
     function IndexListExists: Boolean;
     function GetIndexList(AAutoCreateIfUnassigned: Boolean): TioIndexList;
@@ -191,6 +195,7 @@ begin
   FRttiType := ARttiType;
   FIndexList := nil;
   FContainsSomeIioListProperty := False;
+  FConflictStrategy := nil; // DA SISTEMARE QUANDO AGGIUNGERO' IL PARAMETRO
   // Set TrueClass
   FTrueClass := ATrueClass;
   if Assigned(FTrueClass) then
@@ -232,6 +237,11 @@ end;
 function TioTable.GetClassName: String;
 begin
   Result := FRttiType.Name;
+end;
+
+function TioTable.GetConflictStrategy: TioCustomConflictStrategyRef;
+begin
+  Result := FConflictStrategy;
 end;
 
 function TioTable.GetConnectionDefName: String;

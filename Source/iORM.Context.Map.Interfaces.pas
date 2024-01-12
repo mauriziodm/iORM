@@ -54,9 +54,9 @@ type
     function GetClassName: String;
     function GetTable: IioTable;
     function GetProperties: IioProperties;
-    function TrueClass: IioTrueClass;
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
+    function TrueClass: IioTrueClass;
     // Blob field present
     function BlobFieldExists: Boolean;
     // DIContainerImplementersItem reference

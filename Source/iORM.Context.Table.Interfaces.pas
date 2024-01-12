@@ -37,7 +37,7 @@ interface
 
 uses
   iORM.CommonTypes, System.Generics.Collections, System.Rtti, iORM.Interfaces,
-  iORM.Attributes;
+  iORM.Attributes, iORM.ConflictStrategy.Interfaces;
 
 type
 
@@ -89,19 +89,20 @@ type
     ['{715BFF11-0A82-4B39-B002-451854729DC2}']
     /// This method create the TrueClassVirtualMap.Table object duplicating something of itself
     function DuplicateForTrueClassMap: IioTable;
+    function GetClassName: String;
+    function GetConflictStrategy: TioCustomConflictStrategyRef;
+    function GetConnectionDefName: String;
+    function GetGroupBy: IioGroupBy;
+    function GetJoin: IioJoins;
+    function GetKeyGenerator: String;
+    function GetMapMode: TioMapModeType;
+    function GetQualifiedClassName: String;
+    function GetRttiType: TRttiInstanceType;
     function GetTrueClass: IioTrueClass;
+    function IsForThisConnection(AConnectionDefNameToCheck: String): Boolean;
+    function IsNotPersistedEntity: Boolean;
     function IsTrueClass: Boolean;
     function TableName: String;
-    function GetKeyGenerator: String;
-    function GetJoin: IioJoins;
-    function GetGroupBy: IioGroupBy;
-    function GetConnectionDefName: String;
-    function IsForThisConnection(AConnectionDefNameToCheck: String): Boolean;
-    function GetMapMode: TioMapModeType;
-    function GetRttiType: TRttiInstanceType;
-    function IsNotPersistedEntity: Boolean;
-    function GetClassName: String;
-    function GetQualifiedClassName: String;
     // IndexList
     function IndexListExists: Boolean;
     function GetIndexList(AAutoCreateIfUnassigned:Boolean): TioIndexList;

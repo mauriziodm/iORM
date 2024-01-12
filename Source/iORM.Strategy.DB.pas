@@ -968,9 +968,17 @@ end;
 
 class procedure TioStrategyDB.UpdateObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
 var
+  LConflictDetected: Boolean;
   LQuery: IioQuery;
 begin
   inherited;
+
+
+  // Conflict strategy: check if there is a persistence conflict or prepare the where object of the context
+  //  to consider the version property (or some other property useful for conflict detection)
+  LConflictDetected := False;
+//  AContext.Map.
+
   // Create and execute the query to update the entity into the DB cheking the version to avoid concurrency
   // conflict (if versioning is enabled for this type of entity) (Intercepted by CRUDInterceptors)
   LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext);

@@ -46,15 +46,15 @@ type
   IioContext = interface
     ['{6B512CDA-23C6-42A3-AC44-905344B019E9}']
     function GetClassRef: TioClassRef;
-    function GetTable: IioTable;
+    function GetID: Integer;
     function GetProperties: IioProperties;
+    function GetTable: IioTable;
     function GetTrueClass: IioTrueClass;
+    function IDIsNull: Boolean;
     function IsTrueClass: Boolean;
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
     function WhereExist: Boolean;
-    function GetID: Integer;
-    function IDIsNull: Boolean;
     // Map
     function Map: IioMap;
     // DataObject
