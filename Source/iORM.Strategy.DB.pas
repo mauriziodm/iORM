@@ -46,8 +46,8 @@ type
   // Strategy class for database
   TioStrategyDB = class(TioStrategyIntf)
   private
-    class procedure InsertObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
-    class procedure UpdateObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
+    class procedure InsertObject_Internal(const AContext: IioContext; const ABlindInsert: Boolean);
+    class procedure UpdateObject_Internal(const AContext: IioContext);
     class procedure DeleteObject_Internal(const AContext: IioContext);
     class procedure PreProcessRelationChildOnDelete(const AMasterContext: IioContext);
     class procedure PreProcessRelationChildOnPersist(const AMasterContext: IioContext);
@@ -55,7 +55,7 @@ type
     class function ObjectExists(const AContext: IioContext): Boolean;
   protected
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------
-    class procedure _DoPersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsertUpdate: Boolean;
+    class procedure _DoPersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
     class procedure _DoPersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
@@ -322,11 +322,12 @@ begin
     LConflictDetected := LQuery.ExecSQL = 0;
   end;
   // Conflict strategy: if a conclict is detected then resolve it
+  // Note: the conflict strategy MUST RESOLVE the conflict or raise an exception
   if LConflictDetected then
     AContext.ResolveDeleteConflict(AContext);
 end;
 
-class procedure TioStrategyDB.InsertObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
+class procedure TioStrategyDB.InsertObject_Internal(const AContext: IioContext; const ABlindInsert: Boolean);
 var
   LQuery: IioQuery;
 begin
@@ -334,7 +335,7 @@ begin
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the next ID for the inserting object
   // before the insert query (for Firebird/Interbase)
-  if (not ABlindInsertUpdate) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtBeforeInsert) and AContext.IDIsNull
+  if (not ABlindInsert) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtBeforeInsert) and AContext.IDIsNull
   then
   begin
     LQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
@@ -350,7 +351,7 @@ begin
   // Create and execute insert query and set the version/created/updated of the entity (Intercepted by crudInterceptors)
   LQuery := TioDBFactory.QueryEngine.GetQueryInsert(AContext);
   LQuery.ExecSQL;
-  if not ABlindInsertUpdate then
+  if not ABlindInsert then
   begin
     AContext.NextObjVersion(True);
     AContext.ObjCreated := LQuery.Connection.LastTransactionTimestamp;
@@ -363,7 +364,7 @@ begin
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the last ID generated
   // in the last insert query.
-  if (not ABlindInsertUpdate) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtAfterInsert) and AContext.IDIsNull then
+  if (not ABlindInsert) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtAfterInsert) and AContext.IDIsNull then
   begin
     LQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
     try
@@ -463,7 +464,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB._DoPersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsertUpdate: Boolean;
+class procedure TioStrategyDB._DoPersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
   const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 type
   TioInterceptors_PersistActionType = (patInsert, patUpdate, patDelete);
@@ -480,7 +481,7 @@ var
       osDirty:
         begin
           // if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
-          if (not ABlindInsertUpdate) and (not LContext.IDIsNull) and Self.ObjectExists(LContext) then
+          if (not ABlindInsert) and (not LContext.IDIsNull) and Self.ObjectExists(LContext) then
             LInterceptors_PersistActionType := patUpdate
           else
             LInterceptors_PersistActionType := patInsert;
@@ -559,10 +560,11 @@ begin
               AMasterBSPersistence.SmartUpdateDetection.IsToBePersisted(AObj, LContext.MasterPropertyPath) then
             begin
               // if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
-              if (not ABlindInsertUpdate) and (not LContext.IDIsNull) and Self.ObjectExists(LContext) then
-                UpdateObject_Internal(LContext, ABlindInsertUpdate)
+              if ABlindInsert or LContext.IDIsNull or not Self.ObjectExists(LContext) then
+                InsertObject_Internal(LContext, ABlindInsert)
               else
-                InsertObject_Internal(LContext, ABlindInsertUpdate);
+                UpdateObject_Internal(LContext);
+              // Reset the ObjStatus
               LContext.ObjStatus := osClean;
             end;
           end;
@@ -980,7 +982,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.UpdateObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
+class procedure TioStrategyDB.UpdateObject_Internal(const AContext: IioContext);
 var
   LConflictDetected: Boolean;
   LQuery: IioQuery;
@@ -998,11 +1000,11 @@ begin
     LConflictDetected := LQuery.ExecSQL = 0;
   end;
   // Conflict strategy: if a conclict is detected then resolve it
+  // Note: the conflict strategy MUST RESOLVE the conflict or raise an exception
   if LConflictDetected then
     AContext.ResolveUpdateConflict(AContext)
   else
-  // If this isn't a blind insert/update then update special proprerties if exists
-  if not ABlindInsertUpdate then
+  // Update special proprerties if exists
   begin
     AContext.NextObjVersion(True);
     AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;;

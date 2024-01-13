@@ -47,6 +47,7 @@ type
     class procedure CheckDeleteConflict(const AContext: IioContext; var AConflictDetected: Boolean); virtual; abstract;
     class procedure CheckUpdateConflict(const AContext: IioContext; var AConflictDetected: Boolean); virtual; abstract;
     // If a conflict is detected then this method is called from the persistence strategy to try to resolve the conflict
+    // Note: the conflict strategy MUST RESOLVE the conflict or raise an exception
     class procedure ResolveDeleteConflict(const AContext: IioContext); virtual; abstract;
     class procedure ResolveUpdateConflict(const AContext: IioContext); virtual; abstract;
   end;
