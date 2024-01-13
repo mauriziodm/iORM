@@ -506,6 +506,16 @@ type
 
 {$ENDREGION} // END OF DEPENDENCY INJECTION ATTRIBUTES
 
+{$REGION '===== CONFLICT STRATEGY ATTRIBUTES ====='}
+
+  // Base String attribute
+  // NOTE: THIS ATTRIBUTE IS DECLARED INTO iORM.ConflictStrategy.Interfaces (not here) TO AVOID CIRCULAR REFERENCE
+  // NOTE: THIS ATTRIBUTE IS DECLARED HERE (not in iORM.Attributes unit) TO AVOID CIRCULAR REFERENCE
+  // NOTE: THIS ATTRIBUTE IS DECLARED HERE (not in iORM.Attributes unit) TO AVOID CIRCULAR REFERENCE
+//  ioConflictStrategy = class(TCustomAttribute)
+
+{$ENDREGION} // END ETM ATTRIBUTES
+
 {$REGION '===== ETM ATTRIBUTES & TIMESLOT ====='}
 
   // Base class for ell ETM repositories
@@ -1039,5 +1049,7 @@ begin
     Result := LUserName + Result;
   end;
 end;
+
+{ ioConflictStrategy }
 
 end.

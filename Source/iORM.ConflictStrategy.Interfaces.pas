@@ -52,6 +52,35 @@ type
   // Class reference for conflict strategies
   TioCustomConflictStrategyRef = class of TioCustomConflictStrategy;
 
+  // NOTE: THIS ATTRIBUTE IS DECLARED HERE (not in iORM.Attributes unit) TO AVOID CIRCULAR REFERENCE
+  // NOTE: THIS ATTRIBUTE IS DECLARED HERE (not in iORM.Attributes unit) TO AVOID CIRCULAR REFERENCE
+  // NOTE: THIS ATTRIBUTE IS DECLARED HERE (not in iORM.Attributes unit) TO AVOID CIRCULAR REFERENCE
+  // Base String attribute
+  ioConflictStrategy = class(TCustomAttribute)
+  strict private
+    FDeleteStrategy: TioCustomConflictStrategyRef;
+    FUpdateStrategy: TioCustomConflictStrategyRef;
+  public
+    constructor Create(const AUpdateAndDeleteStrategy: TioCustomConflictStrategyRef); overload;
+    constructor Create(const AUpdateStrategy, ADeleteStrategy: TioCustomConflictStrategyRef); overload;
+    property DeleteStrategy: TioCustomConflictStrategyRef read FDeleteStrategy;
+    property UpdateStrategy: TioCustomConflictStrategyRef read FUpdateStrategy;
+  end;
+
 implementation
+
+{ ioConflictStrategy }
+
+constructor ioConflictStrategy.Create(const AUpdateStrategy, ADeleteStrategy: TioCustomConflictStrategyRef);
+begin
+  FDeleteStrategy := ADeleteStrategy;
+  FUpdateStrategy := AUpdateStrategy;
+end;
+
+constructor ioConflictStrategy.Create(const AUpdateAndDeleteStrategy: TioCustomConflictStrategyRef);
+begin
+  FDeleteStrategy := AUpdateAndDeleteStrategy;
+  FUpdateStrategy := AUpdateAndDeleteStrategy;
+end;
 
 end.

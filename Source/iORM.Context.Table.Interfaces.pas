@@ -90,7 +90,6 @@ type
     /// This method create the TrueClassVirtualMap.Table object duplicating something of itself
     function DuplicateForTrueClassMap: IioTable;
     function GetClassName: String;
-    function GetConflictStrategy: TClass; // TClass instead of TioCustomConflictStrategyRef to avoid circular reference
     function GetConnectionDefName: String;
     function GetGroupBy: IioGroupBy;
     function GetJoin: IioJoins;
@@ -107,6 +106,11 @@ type
     function IndexListExists: Boolean;
     function GetIndexList(AAutoCreateIfUnassigned:Boolean): TioIndexList;
     procedure SetIndexList(AIndexList:TioIndexList);
+    // Conflict strategies (TClass instead of TioCustomConflictStrategyRef to avoid circular reference)
+    procedure SetDeleteConflictStrategy(const AConflictStrategy: TClass);
+    procedure SetUpdateConflictStrategy(const AConflictStrategy: TClass);
+    function GetDeleteConflictStrategy: TClass;
+    function GetupdateConflictStrategy: TClass;
     // EtmTimeSlotClass
     procedure SetEtmTimeSlotClass(const AEtmTimeSlotClass: TioEtmTimeSlotRef);
     function GetEtmTimeSlotClass: TioEtmTimeSlotRef;

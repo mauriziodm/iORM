@@ -128,7 +128,6 @@ type
   // Classe che incapsula le info sulla tabella
   TioTable = class(TioSqlItem, IioTable)
   strict private
-    FConflictStrategy: TClass; // TClass instead of TioCustomConflictStrategyRef to avoid circular reference
     FConnectionDefName_DoNotCallDirectly: String;
     FContainsSomeIioListProperty: Boolean;
     FEtmTimeSlotClass: TioEtmTimeSlotRef;
@@ -140,6 +139,9 @@ type
     FMapMode: TioMapModeType;
     FRttiType: TRttiInstanceType;
     FTrueClass: IioTrueClass;
+    // Conflict strategies
+    FDeleteConflictStrategy: TClass; // TClass instead of TioCustomConflictStrategyRef to avoid circular reference
+    FUpdateConflictStrategy: TClass; // TClass instead of TioCustomConflictStrategyRef to avoid circular reference
     // EtmTimeSlotClass
     procedure SetEtmTimeSlotClass(const AEtmTimeSlotClass: TioEtmTimeSlotRef);
     function GetEtmTimeSlotClass: TioEtmTimeSlotRef;
@@ -154,7 +156,6 @@ type
     /// This method create the TrueClassVirtualMap.Table object duplicating something of itself
     function DuplicateForTrueClassMap: IioTable;
     function GetClassName: String;
-    function GetConflictStrategy: TClass; // TClass instead of TioCustomConflictStrategyRef to avoid circular reference
     function GetConnectionDefName: String;
     function GetGroupBy: IioGroupBy;
     function GetJoin: IioJoins;
@@ -168,6 +169,11 @@ type
     function IsNotPersistedEntity: Boolean;
     function IsTrueClass: Boolean;
     function TableName: String;
+    // Conflict strategies (TClass instead of TioCustomConflictStrategyRef to avoid circular reference)
+    procedure SetDeleteConflictStrategy(const AConflictStrategy: TClass);
+    procedure SetUpdateConflictStrategy(const AConflictStrategy: TClass);
+    function GetDeleteConflictStrategy: TClass;
+    function GetUpdateConflictStrategy: TClass;
     // IndexList
     function IndexListExists: Boolean;
     function GetIndexList(AAutoCreateIfUnassigned: Boolean): TioIndexList;
@@ -180,7 +186,7 @@ type
 implementation
 
 uses
-  iORM.DB.Factory, System.SysUtils, iORM.Exceptions, iORM.SqlTranslator, System.StrUtils;
+  iORM.DB.Factory, System.SysUtils, iORM.Exceptions, iORM.SqlTranslator, System.StrUtils, iORM.ConflictStrategy.NewestWin;
 
 { TioContextTable }
 
@@ -194,7 +200,6 @@ begin
   FRttiType := ARttiType;
   FIndexList := nil;
   FContainsSomeIioListProperty := False;
-  FConflictStrategy := nil; // DA SISTEMARE QUANDO AGGIUNGERO' IL PARAMETRO
   // Set TrueClass
   FTrueClass := ATrueClass;
   if Assigned(FTrueClass) then
@@ -206,6 +211,9 @@ begin
   FGroupBy := AGroupBy;
   if Assigned(FGroupBy) then
     FGroupBy.SetTable(Self);
+  // Conflict strategies
+  FDeleteConflictStrategy := TioNewestWinConflictStrategy;
+  FUpdateConflictStrategy := TioNewestWinConflictStrategy;
   // ETM
   FEtmTimeSlotClass := nil;
   FEtmTraceOnlyOnConnectionName := String.Empty;
@@ -220,7 +228,7 @@ end;
 
 function TioTable.DuplicateForTrueClassMap: IioTable;
 begin
-  Result := TioTable.Create(FSqlText, FKeyGenerator, FTrueClass, FJoins, FGroupBy, FConnectionDefName_DoNotCallDirectly, FMapMode, FRttiType);
+  Result := TioTable.Create(FSqlText, FKeyGenerator, FTrueClass, FJoins, FGroupBy, FConnectionDefName_DoNotCallDirectly, FMapMode, FRttiType, FConflictStrategy);
 end;
 
 function TioTable.IsNotPersistedEntity: Boolean;
@@ -238,9 +246,14 @@ begin
   Result := FRttiType.Name;
 end;
 
-function TioTable.GetConflictStrategy: TClass;
+function TioTable.GetDeleteConflictStrategy: TClass;
 begin
-  Result := FConflictStrategy;
+  Result := FDeleteConflictStrategy;
+end;
+
+function TioTable.GetUpdateConflictStrategy: TClass;
+begin
+  Result := FUpdateConflictStrategy;
 end;
 
 function TioTable.GetConnectionDefName: String;
@@ -339,6 +352,16 @@ end;
 procedure TioTable.SetIndexList(AIndexList: TioIndexList);
 begin
   FIndexList := AIndexList;
+end;
+
+procedure TioTable.SetDeleteConflictStrategy(const AConflictStrategy: TClass);
+begin
+  FDeleteConflictStrategy := AConflictStrategy;
+end;
+
+procedure TioTable.SetUpdateConflictStrategy(const AConflictStrategy: TClass);
+begin
+  FUpdateConflictStrategy := AConflictStrategy;
 end;
 
 function TioTable.TableName: String;

@@ -43,7 +43,8 @@ uses
   iORM.StdActions.Interfaces, iORM.Context.Container,
   iORM.Context.Properties.Interfaces, iORM.Where.SmartBuilder,
   iORM.Interceptor.Strategy.Register, iORM.Interceptor.CRUD.Register,
-  iORM.ETM.Engine, iORM.ETM.Interfaces, DJSON.Params;
+  iORM.ETM.Engine, iORM.ETM.Interfaces, DJSON.Params,
+  iORM.ConflictStrategy.Interfaces;
 
 const
   IORM_VERSION = 'iORM 2 (beta 3.3)';
@@ -290,6 +291,9 @@ type
   diDoNotRegisterAsInterfacedEntity = iORM.Attributes.diDoNotRegisterAsInterfacedEntity;
   diAsSingleton = iORM.Attributes.diAsSingleton;
   ioInject = iORM.Attributes.ioInject;
+
+  // Conflict strategies attributes
+  ioConflictStrategy = iORM.ConflictStrategy.Interfaces.ioConflictStrategy;
 
   // ETM attributes
   etmRepository = iORM.Attributes.etmRepository;

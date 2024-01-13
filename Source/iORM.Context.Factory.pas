@@ -81,7 +81,7 @@ uses
   iORM.RttiContext.Factory, iORM.Context.Container, iORM.Context.Map,
   System.StrUtils, iORM.Exceptions, System.TypInfo, iORM.Utilities,
   iORM.DuckTyped.Factory, iORM.Resolver.Interfaces, iORM.Resolver.Factory,
-  iORM.ETM.Engine;
+  iORM.ETM.Engine, iORM.ConflictStrategy.Interfaces;
 
 { TioBuilderProperties }
 
@@ -701,12 +701,12 @@ var
   LIndexList: TioIndexList;
   LEtmTimeSlotClass: TioEtmTimeSlotRef;
   LEtmTraceOnlyOnConnectionName: String;
+  LDeleteConflictStrategy, LUpdateConflictStrategy: TClass;
 begin
   try
     // Prop Init
     LTableName := Typ.MetaclassType.ClassName.Substring(1);
-    // Elimina il primo carattere (di solito la T)
-    LConnectionName := '';
+    LConnectionName := ''; // Elimina il primo carattere (di solito la T)
     LKeyGenerator := '';
     LJoins := Self.Joins;
     LTrueClass := Self.TrueClass(DEFAULT_TRUE_CLASS_MODE, IO_TRUECLASS_FIELDNAME);
@@ -715,36 +715,50 @@ begin
     LIndexList := nil;
     LEtmTimeSlotClass := nil;
     LEtmTraceOnlyOnConnectionName := '';
+    LDeleteConflictStrategy := nil;
+    LUpdateConflictStrategy := nil;
     // Check attributes
     for LAttr in Typ.GetAttributes do
     begin
+      // io Entity
       if (LAttr is ioEntity) then
       begin
         LTableName := ioEntity(LAttr).TableName;
         LMapMode := ioEntity(LAttr).MapMode;
       end;
+      // ioNotPersistedEntity
       if (LAttr is ioNotPersistedEntity) then
       begin
         LTableName := ioNotPersistedEntity(LAttr).TableName;
         LMapMode := ioNotPersistedEntity(LAttr).MapMode;
       end;
+      // ioKeyGenerator
       if LAttr is ioKeyGenerator then
         LKeyGenerator := ioKeyGenerator(LAttr).Value;
+      // ioConnection
       if LAttr is ioConnection then
         LConnectionName := ioConnection(LAttr).ConnectionName;
+      // ioJoin
       if LAttr is ioJoin then
         LJoins.Add(Self.JoinItem(ioJoin(LAttr)));
+      // ioGroupBy
       if (LAttr is ioGroupBy) and (not Assigned(LGroupBy)) then
         LGroupBy := Self.GroupBy(ioGroupBy(LAttr).Value);
-      // TrueClass attribute
+      // ioTrueClass
       if LAttr is ioTrueClass then
         LTrueClass.Mode := ioTrueClass(LAttr).TrueClassMode;
-      // Index attribute (NB: costruisce la lista di indici solo se serve e così anche nella mappa)
+      // ioIndex (NB: costruisce la lista di indici solo se serve e così anche nella mappa)
       if LAttr is ioIndex then
       begin
         if not Assigned(LIndexList) then
           LIndexList := TioIndexList.Create;
         LIndexList.Add(ioIndex(LAttr));
+      end;
+      // ioConflictStrategy
+      if LAttr is ioConflictStrategy then
+      begin
+        LDeleteConflictStrategy := ioConflictStrategy(LAttr).DeleteStrategy;
+        LUpdateConflictStrategy := ioConflictStrategy(LAttr).UpdateStrategy;
       end;
       // etmTrace
       if (LAttr is etmTrace) then
@@ -755,6 +769,12 @@ begin
     end;
     // Create result Properties object
     Result := TioTable.Create(LTableName, LKeyGenerator, LTrueClass, LJoins, LGroupBy, LConnectionName, LMapMode, Typ);
+    // Set conflict strategies
+    if Assigned(LDeleteConflictStrategy) then
+      Result.SetDeleteConflictStrategy(LDeleteConflictStrategy);
+    if Assigned(LUpdateConflictStrategy) then
+      Result.SetUpdateConflictStrategy(LUpdateConflictStrategy);
+    // Set ETM
     if Assigned(LEtmTimeSlotClass) then
     begin
       Result.EtmTimeSlotClass := LEtmTimeSlotClass;
