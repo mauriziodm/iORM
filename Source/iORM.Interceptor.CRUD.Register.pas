@@ -79,9 +79,11 @@ type
     // Obj update
     class procedure BeforeUpdate(const AContext: IioContext; var ADone: Boolean);
     class procedure AfterUpdate(const AContext: IioContext);
+    class procedure OnUpdateConflict(const AContext: IioContext);
     // Obj delete
     class procedure BeforeDelete(const AContext: IioContext; var ADone: Boolean);
     class procedure AfterDelete(const AContext: IioContext);
+    class procedure OnDeleteConflict(const AContext: IioContext);
   end;
 
 implementation
@@ -301,6 +303,36 @@ class procedure TioCRUDInterceptorRegister.Clean;
 begin
   if Assigned(FInternalContainer) then
     FreeAndNil(FInternalContainer);
+end;
+
+class procedure TioCRUDInterceptorRegister.OnDeleteConflict(const AContext: IioContext);
+var
+  LItem: TioCRUDInterceptorItem;
+  LCurrConnectionName: String;
+begin
+  if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
+  begin
+    // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
+    LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName;
+    for LItem in FInternalContainer.Items[AContext.Map.GetClassName] do
+      if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
+        LItem.Interceptor.OnDeleteConflict(AContext);
+  end;
+end;
+
+class procedure TioCRUDInterceptorRegister.OnUpdateConflict(const AContext: IioContext);
+var
+  LItem: TioCRUDInterceptorItem;
+  LCurrConnectionName: String;
+begin
+  if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
+  begin
+    // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
+    LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName;
+    for LItem in FInternalContainer.Items[AContext.Map.GetClassName] do
+      if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
+        LItem.Interceptor.OnUpdateConflict(AContext);
+  end;
 end;
 
 { TioCRUDInterceptorItem }

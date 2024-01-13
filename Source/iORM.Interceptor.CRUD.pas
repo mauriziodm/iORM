@@ -59,9 +59,11 @@ type
     // Obj update
     class procedure BeforeUpdate(const AContext: IioContext; var ADone: Boolean); virtual;
     class procedure AfterUpdate(const AContext: IioContext); virtual;
+    class procedure OnUpdateConflict(const AContext: IioContext); virtual;
     // Obj delete
     class procedure BeforeDelete(const AContext: IioContext; var ADone: Boolean); virtual;
     class procedure AfterDelete(const AContext: IioContext); virtual;
+    class procedure OnDeleteConflict(const AContext: IioContext); virtual;
   end;
 
 implementation
@@ -104,6 +106,16 @@ begin
 end;
 
 class procedure TioCustomCRUDInterceptor.BeforeUpdate(const AContext: IioContext; var ADone: Boolean);
+begin
+  // Nothing to do here (It must be implemented by the descendant classes)
+end;
+
+class procedure TioCustomCRUDInterceptor.OnDeleteConflict(const AContext: IioContext);
+begin
+  // Nothing to do here (It must be implemented by the descendant classes)
+end;
+
+class procedure TioCustomCRUDInterceptor.OnUpdateConflict(const AContext: IioContext);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;

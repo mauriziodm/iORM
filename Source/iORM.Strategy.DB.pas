@@ -253,7 +253,7 @@ var
 
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-  LDone: Boolean;
+  LDoneByInterceptor: Boolean;
 {$ENDIF}
 {$ENDREGION}
 
@@ -273,9 +273,9 @@ begin
 
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-    LDone := False;
-    TioCRUDInterceptorRegister.BeforeDelete(LContext, LDone);
-    if not LDone then
+    LDoneByInterceptor := False;
+    TioCRUDInterceptorRegister.BeforeDelete(LContext, LDoneByInterceptor);
+    if not LDoneByInterceptor then
     begin
 {$ENDIF}
 {$ENDREGION}
@@ -294,10 +294,22 @@ begin
 
     // Commit
     CommitTransaction(LContext.GetTable.GetConnectionDefName);
+
   except
-    // Rollback
-    RollbackTransaction(LContext.GetTable.GetConnectionDefName);
-    raise;
+    on E : EioConcurrencyConflictException do
+    begin
+      RollbackTransaction(LContext.GetTable.GetConnectionDefName);
+{$IFNDEF ioCRUDInterceptorsOff}
+      TioCRUDInterceptorRegister.OnDeleteConflict(LContext);
+{$ENDIF}
+      raise;
+    end
+    else
+    begin
+      // Rollback
+      RollbackTransaction(LContext.GetTable.GetConnectionDefName);
+      raise;
+    end;
   end;
 end;
 
@@ -376,6 +388,7 @@ begin
     end;
   end;
   // -----------------------------------------------------------
+  AContext.ObjStatus := osClean;
 end;
 
 class function TioStrategyDB.InTransaction(const AConnectionName: String): Boolean;
@@ -467,48 +480,64 @@ end;
 class procedure TioStrategyDB._DoPersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
   const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 type
-  TioInterceptors_PersistActionType = (patInsert, patUpdate, patDelete);
+  TioPersistActionType = (patInsert, patUpdate, patDelete, patDoNotPersist);
 var
   LContext: IioContext;
+  LPersistActionType: TioPersistActionType;
+  LDoneByInterceptor: Boolean;
 
-{$REGION '-----INTERCEPTORS-----'}
-{$IFNDEF ioCRUDInterceptorsOff}
-  LDone: Boolean;
-  LInterceptors_PersistActionType: TioInterceptors_PersistActionType;
-  procedure _Interceptors_DetectPersistActionType;
+  procedure _DetectPersistActionType;
   begin
+    LPersistActionType := patDoNotPersist;
     case LContext.ObjStatus of
       osDirty:
         begin
-          // if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
-          if (not ABlindInsert) and (not LContext.IDIsNull) and Self.ObjectExists(LContext) then
-            LInterceptors_PersistActionType := patUpdate
-          else
-            LInterceptors_PersistActionType := patInsert;
+          // note: if SmartUpdateDetection system is not enabled or (if enabled) the object is to be persisted (according to the SmartUpdateDetection system)...
+          if LContext.GetProperties.ObjStatusPropertyExist or (AMasterBSPersistence = nil) or (not AMasterBSPersistence.IsSmartUpdateDetectionEnabled) or
+            AMasterBSPersistence.SmartUpdateDetection.IsToBePersisted(AObj, LContext.MasterPropertyPath) then
+          begin
+            // old code: if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
+            if ABlindInsert or LContext.IDIsNull or not Self.ObjectExists(LContext) then
+              LPersistActionType := patInsert
+            else
+              LPersistActionType := patUpdate;
+          end;
         end;
       osDeleted:
-        LInterceptors_PersistActionType := patDelete;
+        LPersistActionType := patDelete;
     end;
   end;
+
+{$REGION '-----INTERCEPTORS-----'}
+{$IFNDEF ioCRUDInterceptorsOff}
   procedure _Interceptors_InterceptBeforeAction;
   begin
-    LDone := False;
-    case LInterceptors_PersistActionType of
+    LDoneByInterceptor := False;
+    case LPersistActionType of
       patUpdate:
-        TioCRUDInterceptorRegister.BeforeUpdate(LContext, LDone);
+        TioCRUDInterceptorRegister.BeforeUpdate(LContext, LDoneByInterceptor);
       patInsert:
-        TioCRUDInterceptorRegister.BeforeInsert(LContext, LDone);
+        TioCRUDInterceptorRegister.BeforeInsert(LContext, LDoneByInterceptor);
       patDelete:
-        TioCRUDInterceptorRegister.BeforeDelete(LContext, LDone);
+        TioCRUDInterceptorRegister.BeforeDelete(LContext, LDoneByInterceptor);
     end;
   end;
   procedure _Interceptors_InterceptAfterAction;
   begin
-    case LInterceptors_PersistActionType of
+    case LPersistActionType of
       patUpdate:
         TioCRUDInterceptorRegister.AfterUpdate(LContext);
       patInsert:
         TioCRUDInterceptorRegister.AfterInsert(LContext);
+      patDelete:
+        TioCRUDInterceptorRegister.AfterDelete(LContext);
+    end;
+  end;
+  procedure _Interceptors_InterceptConflict;
+  begin
+    case LPersistActionType of
+      patUpdate:
+        TioCRUDInterceptorRegister.AfterUpdate(LContext);
       patDelete:
         TioCRUDInterceptorRegister.AfterDelete(LContext);
     end;
@@ -536,13 +565,14 @@ begin
       (LContext.GetProperties.GetPropertyByName(ARelationPropertyName).GetRelationType = rtNone) then
       LContext.GetProperties.GetPropertyByName(ARelationPropertyName).SetValue(LContext.DataObject, ARelationOID);
 
+    // Detect the persist action type
+    _DetectPersistActionType;
+
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-    // Interceptors: detect the persist action type
-    _Interceptors_DetectPersistActionType;
     // Interceptors: intercept the "before" action
     _Interceptors_InterceptBeforeAction;
-    if not LDone then
+    if not LDoneByInterceptor then
     begin
 {$ENDIF}
 {$ENDREGION}
@@ -551,30 +581,17 @@ begin
       PreProcessRelationChildOnPersist(LContext);
       // Process the current object
       // --------------------------
-      case LContext.ObjStatus of
-        // Persist if dirty
-        osDirty:
+      case LPersistActionType of
+        patInsert:
+          InsertObject_Internal(LContext, ABlindInsert);
+        patUpdate:
+          UpdateObject_Internal(LContext);
+        patDelete:
           begin
-            // If SmartUpdateDetection system is not enabled or (if enabled) the object is to be persisted (according to the SmartUpdateDetection system)...
-            if LContext.GetProperties.ObjStatusPropertyExist or (AMasterBSPersistence = nil) or (not AMasterBSPersistence.IsSmartUpdateDetectionEnabled) or
-              AMasterBSPersistence.SmartUpdateDetection.IsToBePersisted(AObj, LContext.MasterPropertyPath) then
-            begin
-              // if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
-              if ABlindInsert or LContext.IDIsNull or not Self.ObjectExists(LContext) then
-                InsertObject_Internal(LContext, ABlindInsert)
-              else
-                UpdateObject_Internal(LContext);
-              // Reset the ObjStatus
-              LContext.ObjStatus := osClean;
-            end;
+            // PreProcess (delete) relation childs (HasMany, HasOne)
+            PreProcessRelationChildOnDelete(LContext);
+            DeleteObject_Internal(LContext);
           end;
-        // Delete if deleted
-        osDeleted:
-        begin
-          // PreProcess (delete) relation childs (HasMany, HasOne)
-          PreProcessRelationChildOnDelete(LContext);
-          DeleteObject_Internal(LContext);
-        end;
       end;
       // --------------------------
       // PostProcess (persist) relation childs (HasMany, HasOne)
@@ -590,10 +607,22 @@ begin
 
     // Commit
     CommitTransaction(LContext.GetTable.GetConnectionDefName);
+
   except
-    // Rollback
-    RollbackTransaction(LContext.GetTable.GetConnectionDefName);
-    raise;
+    on E : EioConcurrencyConflictException do
+    begin
+      RollbackTransaction(LContext.GetTable.GetConnectionDefName);
+{$IFNDEF ioCRUDInterceptorsOff}
+      _Interceptors_InterceptConflict;
+{$ENDIF}
+      raise;
+    end
+    else
+    begin
+      // Rollback
+      RollbackTransaction(LContext.GetTable.GetConnectionDefName);
+      raise;
+    end;
   end;
 end;
 
@@ -1004,12 +1033,12 @@ begin
   if LConflictDetected then
     AContext.ResolveUpdateConflict(AContext)
   else
-  // Update special proprerties if exists
   begin
     AContext.NextObjVersion(True);
     AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;;
     AContext.ObjUpdatedUserID := TioConnectionManager.GetCurrentConnectionInfo.CurrentUserID;
     AContext.ObjUpdatedUserName := TioConnectionManager.GetCurrentConnectionInfo.CurrentUserName;
+    AContext.ObjStatus := osClean;
   end;
 end;
 
