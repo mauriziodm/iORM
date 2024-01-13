@@ -56,8 +56,10 @@ type
     function RttiType: TRttiInstanceType;
     function WhereExist: Boolean;
     // Conflict strategy methods (to avoid circular reference)
-    procedure CheckConflict(const AContext: IioContext; var AConflictDetected: Boolean);
-    procedure ResolveConflict(const AContext: IioContext);
+    procedure CheckDeleteConflict(const AContext: IioContext; var AConflictDetected: Boolean);
+    procedure CheckUpdateConflict(const AContext: IioContext; var AConflictDetected: Boolean);
+    procedure ResolveDeleteConflict(const AContext: IioContext);
+    procedure ResolveUpdateConflict(const AContext: IioContext);
     // Map
     function Map: IioMap;
     // DataObject

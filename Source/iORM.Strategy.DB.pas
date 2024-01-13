@@ -313,7 +313,7 @@ begin
   // Conflict strategy: check if there is a persistence conflict or prepare the where object of the context
   //  to consider the version property (or some other property useful for conflict detection)
   LConflictDetected := False;
-  AContext.CheckConflict(AContext, LConflictDetected);
+  AContext.CheckDeleteConflict(AContext, LConflictDetected);
   // Create and execute the query to delete the entity on DB cheking the version to avoid concurrency
   // conflict (if versioning is enabled for this type of entity)
   if not LConflictDetected then
@@ -323,7 +323,7 @@ begin
   end;
   // Conflict strategy: if a conclict is detected then resolve it
   if LConflictDetected then
-    AContext.ResolveConflict(AContext);
+    AContext.ResolveDeleteConflict(AContext);
 end;
 
 class procedure TioStrategyDB.InsertObject_Internal(const AContext: IioContext; const ABlindInsertUpdate: Boolean);
@@ -989,7 +989,7 @@ begin
   // Conflict strategy: check if there is a persistence conflict or prepare the where object of the context
   //  to consider the version property (or some other property useful for conflict detection)
   LConflictDetected := False;
-  AContext.CheckConflict(AContext, LConflictDetected);
+  AContext.CheckUpdateConflict(AContext, LConflictDetected);
   // Create and execute the query to update the entity on DB cheking the version to avoid concurrency
   // conflict (if versioning is enabled for this type of entity)
   if not LConflictDetected then
@@ -999,7 +999,7 @@ begin
   end;
   // Conflict strategy: if a conclict is detected then resolve it
   if LConflictDetected then
-    AContext.ResolveConflict(AContext)
+    AContext.ResolveUpdateConflict(AContext)
   else
   // If this isn't a blind insert/update then update special proprerties if exists
   if not ABlindInsertUpdate then

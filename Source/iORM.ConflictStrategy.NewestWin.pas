@@ -42,21 +42,35 @@ type
 
   TioNewestWinConflictStrategy = class(TioCustomConflictStrategy)
   public
-    class procedure CheckConflict(const AContext: IioContext; var AConflictDetected: Boolean); override;
-    class procedure ResolveConflict(const AContext: IioContext); override;
+    class procedure CheckDeleteConflict(const AContext: IioContext; var AConflictDetected: Boolean); override;
+    class procedure CheckUpdateConflict(const AContext: IioContext; var AConflictDetected: Boolean); override;
+    class procedure ResolveDeleteConflict(const AContext: IioContext); override;
+    class procedure ResolveUpdateConflict(const AContext: IioContext); override;
   end;
 
 implementation
 
 { TioNewestWinConflictStrategy }
 
-class procedure TioNewestWinConflictStrategy.CheckConflict(const AContext: IioContext; var AConflictDetected: Boolean);
+class procedure TioNewestWinConflictStrategy.CheckDeleteConflict(const AContext: IioContext; var AConflictDetected: Boolean);
 begin
   inherited;
   // To be implemented
 end;
 
-class procedure TioNewestWinConflictStrategy.ResolveConflict(const AContext: IioContext);
+class procedure TioNewestWinConflictStrategy.CheckUpdateConflict(const AContext: IioContext; var AConflictDetected: Boolean);
+begin
+  inherited;
+  // To be implemented
+end;
+
+class procedure TioNewestWinConflictStrategy.ResolveDeleteConflict(const AContext: IioContext);
+begin
+  inherited;
+  // To be implemented
+end;
+
+class procedure TioNewestWinConflictStrategy.ResolveUpdateConflict(const AContext: IioContext);
 begin
   inherited;
   // To be implemented

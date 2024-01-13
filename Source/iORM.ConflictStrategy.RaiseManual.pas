@@ -42,8 +42,10 @@ type
 
   TioRaiseManualConflictStrategy = class(TioCustomConflictStrategy)
   public
-    class procedure CheckConflict(const AContext: IioContext; var AConflictDetected: Boolean); override;
-    class procedure ResolveConflict(const AContext: IioContext); override;
+    class procedure CheckDeleteConflict(const AContext: IioContext; var AConflictDetected: Boolean); override;
+    class procedure CheckUpdateConflict(const AContext: IioContext; var AConflictDetected: Boolean); override;
+    class procedure ResolveDeleteConflict(const AContext: IioContext); override;
+    class procedure ResolveUpdateConflict(const AContext: IioContext); override;
   end;
 
 
@@ -54,15 +56,28 @@ uses
 
 { TioRaiseManualConflictStrategy }
 
-class procedure TioRaiseManualConflictStrategy.CheckConflict(const AContext: IioContext; var AConflictDetected: Boolean);
+class procedure TioRaiseManualConflictStrategy.CheckDeleteConflict(const AContext: IioContext; var AConflictDetected: Boolean);
 begin
   inherited;
   // To be implemented
 end;
 
-class procedure TioRaiseManualConflictStrategy.ResolveConflict(const AContext: IioContext);
+class procedure TioRaiseManualConflictStrategy.CheckUpdateConflict(const AContext: IioContext; var AConflictDetected: Boolean);
 begin
-  raise EioConcurrencyConflictException.Create(ClassName, 'ResolveConflict', AContext);
+  inherited;
+  // To be implemented
+end;
+
+class procedure TioRaiseManualConflictStrategy.ResolveDeleteConflict(const AContext: IioContext);
+begin
+  inherited;
+  raise EioConcurrencyConflictException.Create(ClassName, 'ResolveDeleteConflict', AContext);
+end;
+
+class procedure TioRaiseManualConflictStrategy.ResolveUpdateConflict(const AContext: IioContext);
+begin
+  inherited;
+  raise EioConcurrencyConflictException.Create(ClassName, 'ResolveUpdateConflict', AContext);
 end;
 
 end.

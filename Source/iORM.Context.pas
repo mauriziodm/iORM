@@ -113,8 +113,10 @@ type
     function RttiType: TRttiInstanceType;
     function WhereExist: Boolean;
     // Conflict strategy methods (to avoid circular reference)
-    procedure CheckConflict(const AContext: IioContext; var AConflictDetected: Boolean); inline;
-    procedure ResolveConflict(const AContext: IioContext); inline;
+    procedure CheckDeleteConflict(const AContext: IioContext; var AConflictDetected: Boolean); inline;
+    procedure CheckUpdateConflict(const AContext: IioContext; var AConflictDetected: Boolean); inline;
+    procedure ResolveDeleteConflict(const AContext: IioContext); inline;
+    procedure ResolveUpdateConflict(const AContext: IioContext); inline;
     // Map
     function Map: IioMap;
     // GroupBy
@@ -156,14 +158,24 @@ begin
   Result := Self.Map.GetTable.GetTrueClass;
 end;
 
-procedure TioContext.CheckConflict(const AContext: IioContext; var AConflictDetected: Boolean);
+procedure TioContext.CheckDeleteConflict(const AContext: IioContext; var AConflictDetected: Boolean);
 begin
-  TioCustomConflictStrategy(GetTable.GetConflictStrategy).CheckConflict(AContext, AConflictDetected);
+  TioCustomConflictStrategy(GetTable.GetDeleteConflictStrategy).CheckDeleteConflict(AContext, AConflictDetected);
 end;
 
-procedure TioContext.ResolveConflict(const AContext: IioContext);
+procedure TioContext.CheckUpdateConflict(const AContext: IioContext; var AConflictDetected: Boolean);
 begin
-  TioCustomConflictStrategy(GetTable.GetConflictStrategy).ResolveConflict(AContext);
+  TioCustomConflictStrategy(GetTable.GetUpdateConflictStrategy).CheckUpdateConflict(AContext, AConflictDetected);
+end;
+
+procedure TioContext.ResolveDeleteConflict(const AContext: IioContext);
+begin
+  TioCustomConflictStrategy(GetTable.GetDeleteConflictStrategy).ResolveDeleteConflict(AContext);
+end;
+
+procedure TioContext.ResolveUpdateConflict(const AContext: IioContext);
+begin
+  TioCustomConflictStrategy(GetTable.GetUpdateConflictStrategy).ResolveUpdateConflict(AContext);
 end;
 
 constructor TioContext.Create(const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
