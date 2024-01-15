@@ -482,7 +482,6 @@ var
   LContext: IioContext;
   LPersistActionType: TioPersistActionType;
   LDoneByInterceptor: Boolean;
-
   procedure _DetectPersistActionType;
   begin
     LPersistActionType := patDoNotPersist;
