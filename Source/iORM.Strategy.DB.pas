@@ -828,7 +828,7 @@ var
     LCurrentContext: IioContext;
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-    LDone: Boolean;
+    LDoneByInterceptor: Boolean;
 {$ENDIF}
 {$ENDREGION}
   begin
@@ -854,10 +854,10 @@ var
         // Create the object as TObject  (Intercepted by CRUDInterceptors)
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-        LDone := False;
-        LObj := TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext, nil, LDone);
+        LDoneByInterceptor := False;
+        LObj := TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext, nil, LDoneByInterceptor);
         LCurrentContext.DataObject := LObj;
-        if not LDone then
+        if not LDoneByInterceptor then
         begin
 {$ENDIF}
 {$ENDREGION}
@@ -937,7 +937,7 @@ var
 
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-    LDone: Boolean;
+    LDoneByInterceptor: Boolean;
 {$ENDIF}
 {$ENDREGION}
 
@@ -961,10 +961,10 @@ var
 
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-        LDone := False;
-        Result := TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext, Result, LDone);
+        LDoneByInterceptor := False;
+        Result := TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext, Result, LDoneByInterceptor);
         LCurrentContext.DataObject := Result;
-        if not LDone then
+        if not LDoneByInterceptor then
         begin
 {$ENDIF}
 {$ENDREGION}
