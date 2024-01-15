@@ -44,8 +44,8 @@ type
   TioCustomConflictStrategy = class abstract
   public
     // Check/detect (or prepare the "query") if there is a conflict persisting the DataObject contained into the context
-    class procedure CheckDeleteConflict(const AContext: IioContext; var AConflictDetected: Boolean); virtual; abstract;
-    class procedure CheckUpdateConflict(const AContext: IioContext; var AConflictDetected: Boolean); virtual; abstract;
+    class procedure CheckDeleteConflict(const AContext: IioContext); virtual; abstract;
+    class procedure CheckUpdateConflict(const AContext: IioContext); virtual; abstract;
     // If a conflict is detected then this method is called from the persistence strategy to try to resolve the conflict
     // Note: the conflict strategy MUST RESOLVE the conflict or raise an exception
     class procedure ResolveDeleteConflict(const AContext: IioContext); virtual; abstract;

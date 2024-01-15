@@ -340,8 +340,10 @@ begin
     LQuery.ParamByName_SetValue(AContext.GetTrueClass.GetSqlParamName, AContext.GetTrueClass.GetValue);
   // Where conditions (with ObjVersion if exists for this entity type)
   LQuery.WhereParamObjID_SetValue(AContext);
-  if AContext.GetProperties.ObjVersionPropertyExist then
-    LQuery.WhereParamObjVersion_SetValue(AContext);
+// Mauri 15/01/2024: Con la nuova conflict detection l'aggiunta dell'eventuale condizione relativa alla versione dell'oggetto
+//                    viene aggiunta nella relatica conflict strategy
+//  if AContext.GetProperties.ObjVersionPropertyExist then
+//    LQuery.WhereParamObjVersion_SetValue(AContext);
 end;
 
 end.

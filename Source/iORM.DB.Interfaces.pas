@@ -215,7 +215,10 @@ type
     // procedure WhereParamByProp_SetValueAsDateTime(const AProp: IioProperty; const AValue: TDateTime);
     // procedure WhereParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
     procedure WhereParamObjID_SetValue(const AContext: IioContext);
-    procedure WhereParamObjVersion_SetValue(const AContext: IioContext);
+    // Mauri 15/01/2024: Con la nuova conflict detection l'aggiunta dell'eventuale condizione relativa alla versione dell'oggetto
+    //                    viene aggiunta nella relativa conflict strategy e questo metodo "WhereParamObjVersion_SetValue" non serve più
+    //                    lo lascio commentato qui e anche nell'implementazione nel caso possa servire di nuovo in futuro
+    // procedure WhereParamObjVersion_SetValue(const AContext: IioContext);
 
     // Connection property
     function GetConnection: IioConnectionDB;
@@ -539,10 +542,12 @@ begin
   // Add the ioTrueClass if enabled
   if AContext.IsTrueClass then
     AQuery.SQL.Add(',' + AContext.GetTrueClass.GetSqlFieldName + '=:' + AContext.GetTrueClass.GetSqlParamName);
-  // Where conditions (with ObjVersion if exists for this entity type)
+  // Where conditions
   AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName);
-  if AContext.GetProperties.ObjVersionPropertyExist then
-    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + '=:' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
+// Mauri 15/01/2024: Con la nuova conflict detection l'aggiunta dell'eventuale condizione relativa alla versione dell'oggetto
+//                    viene aggiunta nella relatica conflict strategy
+//  if AContext.GetProperties.ObjVersionPropertyExist then
+//    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + '=:' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
   // -----------------------------------------------------------------
 end;
 

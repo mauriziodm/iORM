@@ -55,6 +55,7 @@ type
     FMasterBSPersistence: TioBSPersistence;
     FOriginalNonTrueClassMap: IioMap;
     FEtmRevertedFromVersion: Integer;
+    FPersistenceConflictDetected: Boolean;
     // DataObject
     function GetDataObject: TObject;
     procedure SetDataObject(const AValue: TObject);
@@ -99,6 +100,9 @@ type
     // EtmRevertedFromVersion
     function GetEtmRevertedFromVersion: Integer;
     procedure SetEtmRevertedFromVersion(const Value: Integer);
+    // PersistenceConflictDetected
+    function GetPersistenceConflictDetected: Boolean;
+    procedure SetPersistenceConflictDetected(const Value: Boolean);
   public
     constructor Create(const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
       const AMasterPropertyName, AMasterPropertyPath: String); overload;
@@ -113,8 +117,8 @@ type
     function RttiType: TRttiInstanceType;
     function WhereExist: Boolean;
     // Conflict strategy methods (to avoid circular reference)
-    procedure CheckDeleteConflict(const AContext: IioContext; var AConflictDetected: Boolean); inline;
-    procedure CheckUpdateConflict(const AContext: IioContext; var AConflictDetected: Boolean); inline;
+    procedure CheckDeleteConflict(const AContext: IioContext); inline;
+    procedure CheckUpdateConflict(const AContext: IioContext); inline;
     procedure ResolveDeleteConflict(const AContext: IioContext); inline;
     procedure ResolveUpdateConflict(const AContext: IioContext); inline;
     // Map
@@ -138,6 +142,7 @@ type
     property MasterPropertyPath: String read GetMasterPropertyPath;
     property MasterBSPersistence: TioBSPersistence read GetMasterBSPersistence;
     property EtmRevertedFromVersion: Integer read GetEtmRevertedFromVersion write SetEtmRevertedFromVersion;
+    property PersistenceConflictDetected: Boolean read GetPersistenceConflictDetected write SetPersistenceConflictDetected;
     /// Contiene il nome della classe originaria cioè, nel caso il contesto sia stato creato con
     ///  la TrueClassVirtual (select query) a partire da una resolved class name, contiene il nome
     ///  della classe originaria, quella dalla quale poi si è estratta la TrueClassVirtualMap stessa.
@@ -158,14 +163,14 @@ begin
   Result := Self.Map.GetTable.GetTrueClass;
 end;
 
-procedure TioContext.CheckDeleteConflict(const AContext: IioContext; var AConflictDetected: Boolean);
+procedure TioContext.CheckDeleteConflict(const AContext: IioContext);
 begin
-  TioCustomConflictStrategy(GetTable.GetDeleteConflictStrategy).CheckDeleteConflict(AContext, AConflictDetected);
+  TioCustomConflictStrategy(GetTable.GetDeleteConflictStrategy).CheckDeleteConflict(AContext);
 end;
 
-procedure TioContext.CheckUpdateConflict(const AContext: IioContext; var AConflictDetected: Boolean);
+procedure TioContext.CheckUpdateConflict(const AContext: IioContext);
 begin
-  TioCustomConflictStrategy(GetTable.GetUpdateConflictStrategy).CheckUpdateConflict(AContext, AConflictDetected);
+  TioCustomConflictStrategy(GetTable.GetUpdateConflictStrategy).CheckUpdateConflict(AContext);
 end;
 
 procedure TioContext.ResolveDeleteConflict(const AContext: IioContext);
@@ -190,6 +195,7 @@ begin
   FMasterBSPersistence := AMasterBSPersistence;
   FOriginalNonTrueClassMap := nil;
   FEtmRevertedFromVersion := 0;
+  FPersistenceConflictDetected := False;
 end;
 
 function TioContext.GetClassRef: TioClassRef;
@@ -307,6 +313,11 @@ begin
     Result := FOriginalNonTrueClassMap
   else
     Result := FMap;
+end;
+
+function TioContext.GetPersistenceConflictDetected: Boolean;
+begin
+  Result := FPersistenceConflictDetected;
 end;
 
 function TioContext.GetProperties: IioProperties;
@@ -428,6 +439,11 @@ end;
 procedure TioContext.SetOriginalNonTrueClassMap(const AMap: IioMap);
 begin
   FOriginalNonTrueClassMap := AMap;
+end;
+
+procedure TioContext.SetPersistenceConflictDetected(const Value: Boolean);
+begin
+  FPersistenceConflictDetected := Value;
 end;
 
 procedure TioContext.SetWhere(const AWhere: IioWhere);

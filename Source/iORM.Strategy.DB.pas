@@ -312,7 +312,6 @@ end;
 
 class procedure TioStrategyDB.DeleteObject_Internal(const AContext: IioContext);
 var
-  LConflictDetected: Boolean;
   LQuery: IioQuery;
 begin
   inherited;
@@ -321,18 +320,17 @@ begin
     Exit;
   // Conflict strategy: check if there is a persistence conflict or prepare the where object of the context
   //  to consider the version property (or some other property useful for conflict detection)
-  LConflictDetected := False;
-  AContext.CheckDeleteConflict(AContext, LConflictDetected);
+  AContext.CheckDeleteConflict(AContext);
   // Create and execute the query to delete the entity on DB cheking the version to avoid concurrency
   // conflict (if versioning is enabled for this type of entity)
-  if not LConflictDetected then
+  if not AContext.PersistenceConflictDetected then
   begin
     LQuery := TioDBFactory.QueryEngine.GetQueryDelete(AContext, True);
-    LConflictDetected := LQuery.ExecSQL = 0;
+    AContext.PersistenceConflictDetected := LQuery.ExecSQL = 0;
   end;
   // Conflict strategy: if a conclict is detected then resolve it
   // Note: the conflict strategy MUST RESOLVE the conflict or raise an exception
-  if LConflictDetected then
+  if AContext.PersistenceConflictDetected then
     AContext.ResolveDeleteConflict(AContext);
 end;
 
@@ -1032,24 +1030,22 @@ end;
 
 class procedure TioStrategyDB.UpdateObject_Internal(const AContext: IioContext);
 var
-  LConflictDetected: Boolean;
   LQuery: IioQuery;
 begin
   inherited;
   // Conflict strategy: check if there is a persistence conflict or prepare the where object of the context
   //  to consider the version property (or some other property useful for conflict detection)
-  LConflictDetected := False;
-  AContext.CheckUpdateConflict(AContext, LConflictDetected);
+  AContext.CheckUpdateConflict(AContext);
   // Create and execute the query to update the entity on DB cheking the version to avoid concurrency
   // conflict (if versioning is enabled for this type of entity)
-  if not LConflictDetected then
+  if not AContext.PersistenceConflictDetected then
   begin
     LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext);
-    LConflictDetected := LQuery.ExecSQL = 0;
+    AContext.PersistenceConflictDetected := LQuery.ExecSQL = 0;
   end;
   // Conflict strategy: if a conclict is detected then resolve it
   // Note: the conflict strategy MUST RESOLVE the conflict or raise an exception
-  if LConflictDetected then
+  if AContext.PersistenceConflictDetected then
     AContext.ResolveUpdateConflict(AContext)
   else
   begin

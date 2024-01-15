@@ -43,8 +43,8 @@ type
   TioNewestWinConflictStrategy = class(TioCustomConflictStrategy)
   public
     // Check/detect (or prepare the "query") if there is a conflict persisting the DataObject contained into the context
-    class procedure CheckDeleteConflict(const AContext: IioContext; var AConflictDetected: Boolean); override;
-    class procedure CheckUpdateConflict(const AContext: IioContext; var AConflictDetected: Boolean); override;
+    class procedure CheckDeleteConflict(const AContext: IioContext); override;
+    class procedure CheckUpdateConflict(const AContext: IioContext); override;
     // If a conflict is detected then this method is called from the persistence strategy to try to resolve the conflict
     // Note: the conflict strategy MUST RESOLVE the conflict or raise an exception
     class procedure ResolveDeleteConflict(const AContext: IioContext); override;
@@ -55,13 +55,13 @@ implementation
 
 { TioNewestWinConflictStrategy }
 
-class procedure TioNewestWinConflictStrategy.CheckDeleteConflict(const AContext: IioContext; var AConflictDetected: Boolean);
+class procedure TioNewestWinConflictStrategy.CheckDeleteConflict(const AContext: IioContext);
 begin
   inherited;
   // To be implemented
 end;
 
-class procedure TioNewestWinConflictStrategy.CheckUpdateConflict(const AContext: IioContext; var AConflictDetected: Boolean);
+class procedure TioNewestWinConflictStrategy.CheckUpdateConflict(const AContext: IioContext);
 begin
   inherited;
   // To be implemented

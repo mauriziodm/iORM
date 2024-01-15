@@ -56,8 +56,8 @@ type
     function RttiType: TRttiInstanceType;
     function WhereExist: Boolean;
     // Conflict strategy methods (to avoid circular reference)
-    procedure CheckDeleteConflict(const AContext: IioContext; var AConflictDetected: Boolean);
-    procedure CheckUpdateConflict(const AContext: IioContext; var AConflictDetected: Boolean);
+    procedure CheckDeleteConflict(const AContext: IioContext);
+    procedure CheckUpdateConflict(const AContext: IioContext);
     procedure ResolveDeleteConflict(const AContext: IioContext);
     procedure ResolveUpdateConflict(const AContext: IioContext);
     // Map
@@ -125,6 +125,10 @@ type
     function GetEtmRevertedFromVersion: Integer;
     procedure SetEtmRevertedFromVersion(const Value: Integer);
     property EtmRevertedFromVersion: Integer read GetEtmRevertedFromVersion write SetEtmRevertedFromVersion;
+    // PersistenceConflictDetected
+    function GetPersistenceConflictDetected: Boolean;
+    procedure SetPersistenceConflictDetected(const Value: Boolean);
+    property PersistenceConflictDetected: Boolean read GetPersistenceConflictDetected write SetPersistenceConflictDetected;
   end;
 
 implementation
