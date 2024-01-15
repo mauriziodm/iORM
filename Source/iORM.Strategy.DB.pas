@@ -296,18 +296,15 @@ begin
     CommitTransaction(LContext.GetTable.GetConnectionDefName);
 
   except
-    on E : EioConcurrencyConflictException do
-    begin
-      RollbackTransaction(LContext.GetTable.GetConnectionDefName);
-{$IFNDEF ioCRUDInterceptorsOff}
-      TioCRUDInterceptorRegister.OnDeleteConflict(LContext);
-{$ENDIF}
-      raise;
-    end
-    else
+    on E : Exception do
     begin
       // Rollback
       RollbackTransaction(LContext.GetTable.GetConnectionDefName);
+{$REGION '-----INTERCEPTORS-----'}
+{$IFNDEF ioCRUDInterceptorsOff}
+      TioCRUDInterceptorRegister.OnDeleteException(LContext, E);
+{$ENDIF}
+{$ENDREGION}
       raise;
     end;
   end;
@@ -533,13 +530,15 @@ var
         TioCRUDInterceptorRegister.AfterDelete(LContext);
     end;
   end;
-  procedure _Interceptors_InterceptConflict;
+  procedure _Interceptors_InterceptException(const AException: Exception);
   begin
     case LPersistActionType of
       patUpdate:
-        TioCRUDInterceptorRegister.AfterUpdate(LContext);
+        TioCRUDInterceptorRegister.OnUpdateException(LContext, AException);
+      patInsert:
+        TioCRUDInterceptorRegister.OnInsertException(LContext, AException);
       patDelete:
-        TioCRUDInterceptorRegister.AfterDelete(LContext);
+        TioCRUDInterceptorRegister.OnDeleteException(LContext, AException);
     end;
   end;
 {$ENDIF}
@@ -609,18 +608,15 @@ begin
     CommitTransaction(LContext.GetTable.GetConnectionDefName);
 
   except
-    on E : EioConcurrencyConflictException do
-    begin
-      RollbackTransaction(LContext.GetTable.GetConnectionDefName);
-{$IFNDEF ioCRUDInterceptorsOff}
-      _Interceptors_InterceptConflict;
-{$ENDIF}
-      raise;
-    end
-    else
+    on E : Exception do
     begin
       // Rollback
       RollbackTransaction(LContext.GetTable.GetConnectionDefName);
+{$REGION '-----INTERCEPTORS-----'}
+{$IFNDEF ioCRUDInterceptorsOff}
+      _Interceptors_InterceptException(E);
+{$ENDIF}
+{$ENDREGION}
       raise;
     end;
   end;
@@ -844,7 +840,7 @@ var
     // Create & open query
     LQuery := TioDBFactory.QueryEngine.GetQuerySelectList(LOriginalContext);
     LQuery.Open;
-    try
+    try try
       // Loop for all records (objects) of the query
       while not LQuery.Eof do
       begin
@@ -881,6 +877,18 @@ var
     finally
       // Close query
       LQuery.Close;
+    end;
+    except
+      on E : Exception do
+      begin
+        // Note: Rollback in the except section of the main method (_DoLoadList)s
+{$REGION '-----INTERCEPTORS-----'}
+{$IFNDEF ioCRUDInterceptorsOff}
+        TioCRUDInterceptorRegister.OnDeleteException(LCurrentContext, E);
+{$ENDIF}
+{$ENDREGION}
+        raise;
+      end;
     end;
   end;
 begin
@@ -940,7 +948,7 @@ var
     // Create & open query
     LQuery := TioDBFactory.QueryEngine.GetQuerySelectObject(LOriginalContext);
     LQuery.Open;
-    try
+    try try
       // If a record is fuìound then load the object and return True
       if not LQuery.Eof then
       begin
@@ -975,6 +983,18 @@ var
     finally
       // Close query
       LQuery.Close;
+    end;
+    except
+      on E : Exception do
+      begin
+        // Note: Rollback in the except section of the main method (_DoLoadList)s
+{$REGION '-----INTERCEPTORS-----'}
+{$IFNDEF ioCRUDInterceptorsOff}
+        TioCRUDInterceptorRegister.OnLoadException(LCurrentContext, E);
+{$ENDIF}
+{$ENDREGION}
+        raise;
+      end;
     end;
   end;
 

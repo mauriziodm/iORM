@@ -42,7 +42,7 @@ interface
 
 uses
   iORM.Interceptor.CRUD,
-  iORM.Context.Interfaces, System.Generics.Collections;
+  iORM.Context.Interfaces, System.Generics.Collections, System.SysUtils;
 
 type
 
@@ -73,23 +73,22 @@ type
     // Obj load
     class function BeforeLoad(const AContext: IioContext; const AObj: TObject; var ADone: Boolean): TObject;
     class function AfterLoad(const AContext: IioContext; const AObj: TObject): TObject;
+    class procedure OnLoadException(const AContext: IioContext; const AException: Exception);
     // Obj insert
     class procedure BeforeInsert(const AContext: IioContext; var ADone: Boolean);
     class procedure AfterInsert(const AContext: IioContext);
+    class procedure OnInsertException(const AContext: IioContext; const AException: Exception);
     // Obj update
     class procedure BeforeUpdate(const AContext: IioContext; var ADone: Boolean);
     class procedure AfterUpdate(const AContext: IioContext);
-    class procedure OnUpdateConflict(const AContext: IioContext);
+    class procedure OnUpdateException(const AContext: IioContext; const AException: Exception);
     // Obj delete
     class procedure BeforeDelete(const AContext: IioContext; var ADone: Boolean);
     class procedure AfterDelete(const AContext: IioContext);
-    class procedure OnDeleteConflict(const AContext: IioContext);
+    class procedure OnDeleteException(const AContext: IioContext; const AException: Exception);
   end;
 
 implementation
-
-uses
-  System.SysUtils;
 
 { TioObjCrudInterceptorRegister }
 
@@ -305,7 +304,7 @@ begin
     FreeAndNil(FInternalContainer);
 end;
 
-class procedure TioCRUDInterceptorRegister.OnDeleteConflict(const AContext: IioContext);
+class procedure TioCRUDInterceptorRegister.OnDeleteException(const AContext: IioContext; const AException: Exception);
 var
   LItem: TioCRUDInterceptorItem;
   LCurrConnectionName: String;
@@ -316,11 +315,11 @@ begin
     LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName;
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName] do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
-        LItem.Interceptor.OnDeleteConflict(AContext);
+        LItem.Interceptor.OnDeleteException(AContext, AException);
   end;
 end;
 
-class procedure TioCRUDInterceptorRegister.OnUpdateConflict(const AContext: IioContext);
+class procedure TioCRUDInterceptorRegister.OnInsertException(const AContext: IioContext; const AException: Exception);
 var
   LItem: TioCRUDInterceptorItem;
   LCurrConnectionName: String;
@@ -331,7 +330,37 @@ begin
     LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName;
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName] do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
-        LItem.Interceptor.OnUpdateConflict(AContext);
+        LItem.Interceptor.OnInsertException(AContext, AException);
+  end;
+end;
+
+class procedure TioCRUDInterceptorRegister.OnLoadException(const AContext: IioContext; const AException: Exception);
+var
+  LItem: TioCRUDInterceptorItem;
+  LCurrConnectionName: String;
+begin
+  if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
+  begin
+    // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
+    LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName;
+    for LItem in FInternalContainer.Items[AContext.Map.GetClassName] do
+      if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
+        LItem.Interceptor.OnLoadException(AContext, AException);
+  end;
+end;
+
+class procedure TioCRUDInterceptorRegister.OnUpdateException(const AContext: IioContext; const AException: Exception);
+var
+  LItem: TioCRUDInterceptorItem;
+  LCurrConnectionName: String;
+begin
+  if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
+  begin
+    // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
+    LCurrConnectionName := AContext.Map.GetTable.GetConnectionDefName;
+    for LItem in FInternalContainer.Items[AContext.Map.GetClassName] do
+      if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
+        LItem.Interceptor.OnUpdateException(AContext, AException);
   end;
 end;
 

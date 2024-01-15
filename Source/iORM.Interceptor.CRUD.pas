@@ -41,7 +41,7 @@ unit iORM.Interceptor.CRUD;
 interface
 
 uses
-  iORM.Context.Interfaces;
+  iORM.Context.Interfaces, System.SysUtils;
 
 type
 
@@ -53,17 +53,19 @@ type
     // Obj load
     class function BeforeLoad(const AContext: IioContext; const AObj: TObject; var ADone: Boolean): TObject; virtual;
     class function AfterLoad(const AContext: IioContext; const AObj: TObject): TObject; virtual;
+    class procedure OnLoadException(const AContext: IioContext; const AException: Exception); virtual;
     // Obj insert
     class procedure BeforeInsert(const AContext: IioContext; var ADone: Boolean); virtual;
     class procedure AfterInsert(const AContext: IioContext); virtual;
+    class procedure OnInsertException(const AContext: IioContext; const AException: Exception); virtual;
     // Obj update
     class procedure BeforeUpdate(const AContext: IioContext; var ADone: Boolean); virtual;
     class procedure AfterUpdate(const AContext: IioContext); virtual;
-    class procedure OnUpdateConflict(const AContext: IioContext); virtual;
+    class procedure OnUpdateException(const AContext: IioContext; const AException: Exception); virtual;
     // Obj delete
     class procedure BeforeDelete(const AContext: IioContext; var ADone: Boolean); virtual;
     class procedure AfterDelete(const AContext: IioContext); virtual;
-    class procedure OnDeleteConflict(const AContext: IioContext); virtual;
+    class procedure OnDeleteException(const AContext: IioContext; const AException: Exception); virtual;
   end;
 
 implementation
@@ -110,12 +112,22 @@ begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomCRUDInterceptor.OnDeleteConflict(const AContext: IioContext);
+class procedure TioCustomCRUDInterceptor.OnDeleteException(const AContext: IioContext; const AException: Exception);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomCRUDInterceptor.OnUpdateConflict(const AContext: IioContext);
+class procedure TioCustomCRUDInterceptor.OnInsertException(const AContext: IioContext; const AException: Exception);
+begin
+  // Nothing to do here (It must be implemented by the descendant classes)
+end;
+
+class procedure TioCustomCRUDInterceptor.OnLoadException(const AContext: IioContext; const AException: Exception);
+begin
+  // Nothing to do here (It must be implemented by the descendant classes)
+end;
+
+class procedure TioCustomCRUDInterceptor.OnUpdateException(const AContext: IioContext; const AException: Exception);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
