@@ -94,10 +94,7 @@ type
     procedure WhereParamByProp_SetValueAsDateTime(const AProp: IioProperty; const AValue: TDateTime);
     procedure WhereParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
     procedure WhereParamObjID_SetValue(const AContext: IioContext);
-    // Mauri 15/01/2024: Con la nuova conflict detection l'aggiunta dell'eventuale condizione relativa alla versione dell'oggetto
-    //                    viene aggiunta nella relativa conflict strategy e questo metodo "WhereParamObjVersion_SetValue" non serve più
-    //                    lo lascio commentato qui e anche nell'implementazione nel caso possa servire di nuovo in futuro
-    //procedure WhereParamObjVersion_SetValue(const AContext: IioContext);
+    procedure WhereParamObjVersion_SetValue(const AContext: IioContext);
 
     property Connection: IioConnectionDB read GetConnection;
     property SQL: TStrings read GetSQL;
@@ -421,16 +418,13 @@ begin
   ParamByProp_SetValueAsIntegerNullIfZero(LProp, AContext.NextObjVersion(False));
 end;
 
-// Mauri 15/01/2024: Con la nuova conflict detection l'aggiunta dell'eventuale condizione relativa alla versione dell'oggetto
-//                    viene aggiunta nella relativa conflict strategy e questo metodo "WhereParamObjVersion_SetValue" non serve più
-//                    lo lascio commentato qui e anche nell'implementazione nel caso possa servire di nuovo in futuro
-//procedure TioFDQuery.WhereParamObjVersion_SetValue(const AContext: IioContext);
-//var
-//  LProp: IioProperty;
-//begin
-//  LProp := AContext.GetProperties.ObjVersionProperty;
-//  WhereParamByProp_SetValue(LProp, LProp.GetValue(AContext.DataObject).AsVariant);
-//end;
+procedure TioFDQuery.WhereParamObjVersion_SetValue(const AContext: IioContext);
+var
+  LProp: IioProperty;
+begin
+  LProp := AContext.GetProperties.ObjVersionProperty;
+  WhereParamByProp_SetValue(LProp, LProp.GetValue(AContext.DataObject).AsVariant);
+end;
 
 procedure TioFDQuery.ParamByProp_SetValueByContext(const AProp: IioProperty; const AContext: IioContext);
 var

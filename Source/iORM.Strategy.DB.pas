@@ -171,11 +171,11 @@ var
   // Nested
   procedure NestedDelete;
   var
-    AQuery: IioQuery;
+    LQuery: IioQuery;
   begin
     // Create & execute query
-    AQuery := TioDBFactory.QueryEngine.GetQueryDelete(AContext, False);
-    AQuery.ExecSQL;
+    LQuery := TioDBFactory.QueryEngine.GetQueryDelete(AContext, False);
+    LQuery.ExecSQL;
   end;
 
 begin

@@ -215,11 +215,7 @@ type
     // procedure WhereParamByProp_SetValueAsDateTime(const AProp: IioProperty; const AValue: TDateTime);
     // procedure WhereParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
     procedure WhereParamObjID_SetValue(const AContext: IioContext);
-    // Mauri 15/01/2024: Con la nuova conflict detection l'aggiunta dell'eventuale condizione relativa alla versione dell'oggetto
-    //                    viene aggiunta nella relativa conflict strategy e questo metodo "WhereParamObjVersion_SetValue" non serve più
-    //                    lo lascio commentato qui e anche nell'implementazione nel caso possa servire di nuovo in futuro
-    // procedure WhereParamObjVersion_SetValue(const AContext: IioContext);
-
+    procedure WhereParamObjVersion_SetValue(const AContext: IioContext);
     // Connection property
     function GetConnection: IioConnectionDB;
     property Connection: IioConnectionDB read GetConnection;
@@ -481,7 +477,11 @@ begin
     // AQuery.SQL.Add(AContext.Where.GetSql(AContext.Map))
     AQuery.SQL.Add(AContext.Where.GetSqlWithTrueClass(AContext.Map, AContext.IsTrueClass, AContext.GetTrueClass))
   else
+  begin
     AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName);
+    if AContext.GetProperties.ObjVersionPropertyExist then
+      AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + ' = :' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
+  end;
   // -----------------------------------------------------------------
 
 
@@ -562,34 +562,11 @@ begin
     end;
   // Add the ioTrueClass if enabled
   if AContext.IsTrueClass then
-    AQuery.SQL.Add(',' + AContext.GetTrueClass.GetSqlFieldName + '=:' + AContext.GetTrueClass.GetSqlParamName);
+    AQuery.SQL.Add(',' + AContext.GetTrueClass.GetSqlFieldName + ' = :' + AContext.GetTrueClass.GetSqlParamName);
   // Where conditions
-  AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName);
+  AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + ' = :' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName);
   if AContext.GetProperties.ObjVersionPropertyExist then
-    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + '=:' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
-
-
-
-
-
-
-  // Mauri 15/01/2024: Con la nuova conflict detection l'aggiunta dell'eventuale condizione relativa alla versione dell'oggetto
-  //                    viene aggiunta nella relatica conflict strategy
-
-  // Verifica ObjVersion
-  if AContext.GetProperties.ObjVersionPropertyExist then
-    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + '=:' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
-
-  // ipotesi per lastupdate conflict strategy = NewestWin (sincronizzazione)
-  // (update solo se quello sul DB è più vecchio) NB: se non siamo in sincronizzazione non mettere nessuna condizione perchè tanto vincerebbe sempre
-  if AContext.GetProperties.ObjUpdatedPropertyExist then
-    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjUpdatedProperty.GetSqlFieldName + '<=' + AContext.GetProperties.ObjUpdatedProperty.GetSqlWhereParamName);
-
-  // ipotesi per lastupdate conflict strategy = OldestWin (sincronizzazione)
-  // (update solo se quello sul DB è più vecchio) NB: se non siamo in sincronizzazione mettere una condizione che è sempre false perchè non vincerebbe mai
-  if AContext.GetProperties.ObjUpdatedPropertyExist then
-    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjUpdatedProperty.GetSqlFieldName + '>' + AContext.GetProperties.ObjUpdatedProperty.GetSqlWhereParamName);
-
+    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + ' = :' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
   // -----------------------------------------------------------------
 end;
 

@@ -101,9 +101,15 @@ begin
     TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlDelete(LQuery, AContext);
   // Where
   if AContext.WhereExist then
+    // Where condition to delete by type, without obj instance (NO ETM)
     LQuery.FillQueryWhereParams(AContext)
   else
+  begin
+    // Where conditions for obj instance delete (with ObjVersion if exists for this entity type)
     LQuery.WhereParamObjID_SetValue(AContext);
+    if AContext.GetProperties.ObjVersionPropertyExist then
+      LQuery.WhereParamObjVersion_SetValue(AContext);
+  end;
 end;
 
 class function TioQueryEngine.GetQueryCreateIndex(const AContext: IioContext; const AIndexName, ACommaSepFieldList: String;
@@ -340,10 +346,8 @@ begin
     LQuery.ParamByName_SetValue(AContext.GetTrueClass.GetSqlParamName, AContext.GetTrueClass.GetValue);
   // Where conditions (with ObjVersion if exists for this entity type)
   LQuery.WhereParamObjID_SetValue(AContext);
-// Mauri 15/01/2024: Con la nuova conflict detection l'aggiunta dell'eventuale condizione relativa alla versione dell'oggetto
-//                    viene aggiunta nella relatica conflict strategy
-//  if AContext.GetProperties.ObjVersionPropertyExist then
-//    LQuery.WhereParamObjVersion_SetValue(AContext);
+  if AContext.GetProperties.ObjVersionPropertyExist then
+    LQuery.WhereParamObjVersion_SetValue(AContext);
 end;
 
 end.
