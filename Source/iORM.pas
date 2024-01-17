@@ -44,7 +44,7 @@ uses
   iORM.Context.Properties.Interfaces, iORM.Where.SmartBuilder,
   iORM.Interceptor.Strategy.Register, iORM.Interceptor.CRUD.Register,
   iORM.ETM.Engine, iORM.ETM.Interfaces, DJSON.Params,
-  iORM.ConflictStrategy.Interfaces;
+  iORM.ConflictStrategy.Interfaces, iORM.ConflictStrategy.SameVersionWin, iORM.ConflictStrategy.LastUpdateWin;
 
 const
   IORM_VERSION = 'iORM 2 (beta 3.3)';
@@ -212,6 +212,10 @@ type
   TioActionShowMode = iORM.StdActions.Interfaces.TioActionShowMode;
   TioActionViewContextBy = iORM.StdActions.Interfaces.TioActionViewContextBy;
 
+  // Conflict Strategy
+  TioSameVersionWin = iORM.ConflictStrategy.SameVersionWin.TioSameVersionWin;
+  TioLastUpdateWin = iORM.ConflictStrategy.LastUpdateWin.TioLastUpdateWin;
+
   // Entity Time Machine (ETM)
   TioEtmTimeLine = iORM.Attributes.TioEtmTimeline;
   TioEtmCustomTimeSlot = iORM.Attributes.TioEtmCustomTimeSlot;
@@ -293,7 +297,8 @@ type
   ioInject = iORM.Attributes.ioInject;
 
   // Conflict strategies attributes
-  ioConflictStrategy = iORM.ConflictStrategy.Interfaces.ioConflictStrategy;
+  ioDeleteConflictStrategy = iORM.ConflictStrategy.Interfaces.ioDeleteConflictStrategy;
+  ioUpdateConflictStrategy = iORM.ConflictStrategy.Interfaces.ioUpdateConflictStrategy;
 
   // ETM attributes
   etmRepository = iORM.Attributes.etmRepository;

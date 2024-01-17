@@ -237,8 +237,8 @@ contains
   iORM.ETM.Diff.Twoway in '..\..\Source\iORM.ETM.Diff.Twoway.pas',
   iORM.StdActions.CommonBehaviour in '..\..\Source\iORM.StdActions.CommonBehaviour.pas',
   iORM.ConflictStrategy.Interfaces in '..\..\Source\iORM.ConflictStrategy.Interfaces.pas',
-  iORM.ConflictStrategy.RaiseManual in '..\..\Source\iORM.ConflictStrategy.RaiseManual.pas',
-  iORM.ConflictStrategy.NewestWin in '..\..\Source\iORM.ConflictStrategy.NewestWin.pas';
+  iORM.ConflictStrategy.SameVersionWin in '..\..\Source\iORM.ConflictStrategy.SameVersionWin.pas',
+  iORM.ConflictStrategy.LastUpdateWin in '..\..\Source\iORM.ConflictStrategy.LastUpdateWin.pas';
 
 end.
 

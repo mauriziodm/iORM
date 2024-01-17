@@ -521,6 +521,9 @@ type
   // Base class for ell ETM repositories
   TioEtmTimeSlotRef = class of TioEtmCustomTimeSlot;
 
+  // NB: Per la nuova gestione dei conflitti servirà la possibilità di memorizzare due data e ora, una che sarà il momento
+  //      quando è stata fatto l'update sul DB remoto (es: mobile) e l'altra la data e ora di quanto è stato fatto l'update
+  //      sul database centrale durante la fase di sincronizzazione.
   TioEtmCustomTimeSlot = class
   private
     FID: Integer;

@@ -141,7 +141,9 @@ type
     FTrueClass: IioTrueClass;
     // Conflict strategies
     FDeleteConflictStrategy: TClass; // TClass instead of TioCustomConflictStrategyRef to avoid circular reference
+    FDeleteConflictStrategy_RaiseOnConflict: Boolean;
     FUpdateConflictStrategy: TClass; // TClass instead of TioCustomConflictStrategyRef to avoid circular reference
+    FUpdateConflictStrategy_RaiseOnConflict: Boolean;
     // EtmTimeSlotClass
     procedure SetEtmTimeSlotClass(const AEtmTimeSlotClass: TioEtmTimeSlotRef);
     function GetEtmTimeSlotClass: TioEtmTimeSlotRef;
@@ -172,8 +174,12 @@ type
     // Conflict strategies (TClass instead of TioCustomConflictStrategyRef to avoid circular reference)
     procedure SetDeleteConflictStrategy(const AConflictStrategy: TClass);
     procedure SetUpdateConflictStrategy(const AConflictStrategy: TClass);
+    procedure SetDeleteConflictStrategy_RaiseOnConflict(const Value: Boolean);
+    procedure SetUpdateConflictStrategy_RaiseOnConflict(const Value: Boolean);
     function GetDeleteConflictStrategy: TClass;
     function GetUpdateConflictStrategy: TClass;
+    function GetDeleteConflictStrategy_RaiseOnConflict: Boolean;
+    function GetUpdateConflictStrategy_RaiseOnConflict: Boolean;
     // IndexList
     function IndexListExists: Boolean;
     function GetIndexList(AAutoCreateIfUnassigned: Boolean): TioIndexList;
@@ -186,7 +192,8 @@ type
 implementation
 
 uses
-  iORM.DB.Factory, System.SysUtils, iORM.Exceptions, iORM.SqlTranslator, System.StrUtils, iORM.ConflictStrategy.NewestWin;
+  iORM.DB.Factory, System.SysUtils, iORM.Exceptions, iORM.SqlTranslator, System.StrUtils,
+  iORM.ConflictStrategy.SameVersionWin;
 
 { TioContextTable }
 
@@ -212,8 +219,10 @@ begin
   if Assigned(FGroupBy) then
     FGroupBy.SetTable(Self);
   // Conflict strategies
-  FDeleteConflictStrategy := TioNewestWinConflictStrategy;
-  FUpdateConflictStrategy := TioNewestWinConflictStrategy;
+  FDeleteConflictStrategy := TioSameVersionWin;
+  FUpdateConflictStrategy := TioSameVersionWin;
+  FDeleteConflictStrategy_RaiseOnConflict := False;
+  FUpdateConflictStrategy_RaiseOnConflict := False;
   // ETM
   FEtmTimeSlotClass := nil;
   FEtmTraceOnlyOnConnectionName := String.Empty;
@@ -251,9 +260,19 @@ begin
   Result := FDeleteConflictStrategy;
 end;
 
+function TioTable.GetDeleteConflictStrategy_RaiseOnConflict: Boolean;
+begin
+  Result := FDeleteConflictStrategy_RaiseOnConflict;
+end;
+
 function TioTable.GetUpdateConflictStrategy: TClass;
 begin
   Result := FUpdateConflictStrategy;
+end;
+
+function TioTable.GetUpdateConflictStrategy_RaiseOnConflict: Boolean;
+begin
+  Result := FUpdateConflictStrategy_RaiseOnConflict;
 end;
 
 function TioTable.GetConnectionDefName: String;
@@ -359,9 +378,19 @@ begin
   FDeleteConflictStrategy := AConflictStrategy;
 end;
 
+procedure TioTable.SetDeleteConflictStrategy_RaiseOnConflict(const Value: Boolean);
+begin
+  FDeleteConflictStrategy_RaiseOnConflict := Value;
+end;
+
 procedure TioTable.SetUpdateConflictStrategy(const AConflictStrategy: TClass);
 begin
   FUpdateConflictStrategy := AConflictStrategy;
+end;
+
+procedure TioTable.SetUpdateConflictStrategy_RaiseOnConflict(const Value: Boolean);
+begin
+  FUpdateConflictStrategy_RaiseOnConflict := Value;
 end;
 
 function TioTable.TableName: String;

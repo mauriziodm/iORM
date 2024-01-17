@@ -44,46 +44,74 @@ type
   TioCustomConflictStrategy = class abstract
   public
     // Check/detect (or prepare the "query") if there is a conflict persisting the DataObject contained into the context
-    class procedure CheckDeleteConflict(const AContext: IioContext); virtual; abstract;
-    class procedure CheckUpdateConflict(const AContext: IioContext); virtual; abstract;
+    class procedure CheckDeleteConflict(const AContext: IioContext); virtual;
+    class procedure CheckUpdateConflict(const AContext: IioContext); virtual;
     // If a conflict is detected then this method is called from the persistence strategy to try to resolve the conflict
     // Note: the conflict strategy MUST RESOLVE the conflict or raise an exception
-    class procedure ResolveDeleteConflict(const AContext: IioContext); virtual; abstract;
-    class procedure ResolveUpdateConflict(const AContext: IioContext); virtual; abstract;
+    class procedure ResolveDeleteConflict(const AContext: IioContext); virtual;
+    class procedure ResolveUpdateConflict(const AContext: IioContext); virtual;
   end;
 
   // Class reference for conflict strategies
   TioCustomConflictStrategyRef = class of TioCustomConflictStrategy;
 
-  // NOTE: THIS ATTRIBUTE IS DECLARED HERE (not in iORM.Attributes unit) TO AVOID CIRCULAR REFERENCE
-  // NOTE: THIS ATTRIBUTE IS DECLARED HERE (not in iORM.Attributes unit) TO AVOID CIRCULAR REFERENCE
-  // NOTE: THIS ATTRIBUTE IS DECLARED HERE (not in iORM.Attributes unit) TO AVOID CIRCULAR REFERENCE
-  // Base String attribute
-  ioConflictStrategy = class(TCustomAttribute)
+  // NOTE: THESE ATTRIBUTES IS DECLARED HERE (not in iORM.Attributes unit) TO AVOID CIRCULAR REFERENCE
+  // NOTE: THESE ATTRIBUTES IS DECLARED HERE (not in iORM.Attributes unit) TO AVOID CIRCULAR REFERENCE
+  // NOTE: THESE ATTRIBUTES IS DECLARED HERE (not in iORM.Attributes unit) TO AVOID CIRCULAR REFERENCE
+
+  // ioDeleteConflictStrategy attribute
+  ioDeleteConflictStrategy = class(TCustomAttribute)
   strict private
-    FDeleteStrategy: TioCustomConflictStrategyRef;
-    FUpdateStrategy: TioCustomConflictStrategyRef;
+    FStrategy: TioCustomConflictStrategyRef;
+    FRaiseOnConflict: Boolean;
   public
-    constructor Create(const AUpdateAndDeleteStrategy: TioCustomConflictStrategyRef); overload;
-    constructor Create(const AUpdateStrategy, ADeleteStrategy: TioCustomConflictStrategyRef); overload;
-    property DeleteStrategy: TioCustomConflictStrategyRef read FDeleteStrategy;
-    property UpdateStrategy: TioCustomConflictStrategyRef read FUpdateStrategy;
+    constructor Create(const AStrategy: TioCustomConflictStrategyRef; const ARaiseOnConflict: Boolean = False); overload;
+    property RaiseOnConflict: Boolean read FRaiseOnConflict;
+    property Strategy: TioCustomConflictStrategyRef read FStrategy;
   end;
+
+  // ioUpdateConflictStrategy attribute
+  ioUpdateConflictStrategy = type ioDeleteConflictStrategy;
 
 implementation
 
-{ ioConflictStrategy }
+uses
+  iORM.Exceptions;
 
-constructor ioConflictStrategy.Create(const AUpdateStrategy, ADeleteStrategy: TioCustomConflictStrategyRef);
+{ TioCustomConflictStrategy }
+
+class procedure TioCustomConflictStrategy.CheckDeleteConflict(const AContext: IioContext);
 begin
-  FDeleteStrategy := ADeleteStrategy;
-  FUpdateStrategy := AUpdateStrategy;
+  // To be implemented on derived classes if necessary
 end;
 
-constructor ioConflictStrategy.Create(const AUpdateAndDeleteStrategy: TioCustomConflictStrategyRef);
+class procedure TioCustomConflictStrategy.CheckUpdateConflict(const AContext: IioContext);
 begin
-  FDeleteStrategy := AUpdateAndDeleteStrategy;
-  FUpdateStrategy := AUpdateAndDeleteStrategy;
+  // To be implemented on derived classes if necessary
+end;
+
+class procedure TioCustomConflictStrategy.ResolveDeleteConflict(const AContext: IioContext);
+begin
+  // Note: if you derive your own ConflictStrategy class and override this method then
+  //        I suggest you to put the inherited at the bottom of the method
+  if AContext.PersistenceConflictDetected and AContext.Map.GetTable.DeleteConflictStrategy_RaiseOnConflict then
+    raise EioConcurrencyConflictException.Create(ClassName, 'ResolveDeleteConflict', AContext);
+end;
+
+class procedure TioCustomConflictStrategy.ResolveUpdateConflict(const AContext: IioContext);
+begin
+  // Note: if you derive your own ConflictStrategy class and override this method then
+  //        I suggest you to put the inherited at the bottom of the method
+  if AContext.PersistenceConflictDetected and AContext.Map.GetTable.UpdateConflictStrategy_RaiseOnConflict then
+    raise EioConcurrencyConflictException.Create(ClassName, 'ResolveUpdateConflict', AContext);
+end;
+
+{ ioDeleteConflictStrategy }
+
+constructor ioDeleteConflictStrategy.Create(const AStrategy: TioCustomConflictStrategyRef; const ARaiseOnConflict: Boolean);
+begin
+  FRaiseOnConflict := ARaiseOnConflict;
+  FStrategy := AStrategy;
 end;
 
 end.

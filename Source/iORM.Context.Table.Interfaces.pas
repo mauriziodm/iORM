@@ -109,8 +109,16 @@ type
     // Conflict strategies (TClass instead of TioCustomConflictStrategyRef to avoid circular reference)
     procedure SetDeleteConflictStrategy(const AConflictStrategy: TClass);
     procedure SetUpdateConflictStrategy(const AConflictStrategy: TClass);
+    procedure SetDeleteConflictStrategy_RaiseOnConflict(const Value: Boolean);
+    procedure SetUpdateConflictStrategy_RaiseOnConflict(const Value: Boolean);
     function GetDeleteConflictStrategy: TClass;
     function GetupdateConflictStrategy: TClass;
+    function GetDeleteConflictStrategy_RaiseOnConflict: Boolean;
+    function GetUpdateConflictStrategy_RaiseOnConflict: Boolean;
+    property DeleteConflictStrategy: TClass read GetDeleteConflictStrategy write SetDeleteConflictStrategy;
+    property UpdateConflictStrategy: TClass read GetUpdateConflictStrategy write SetUpdateConflictStrategy;
+    property DeleteConflictStrategy_RaiseOnConflict: Boolean read GetDeleteConflictStrategy_RaiseOnConflict write SetDeleteConflictStrategy_RaiseOnConflict;
+    property UpdateConflictStrategy_RaiseOnConflict: Boolean read GetUpdateConflictStrategy_RaiseOnConflict write SetUpdateConflictStrategy_RaiseOnConflict;
     // EtmTimeSlotClass
     procedure SetEtmTimeSlotClass(const AEtmTimeSlotClass: TioEtmTimeSlotRef);
     function GetEtmTimeSlotClass: TioEtmTimeSlotRef;

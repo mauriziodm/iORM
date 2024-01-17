@@ -170,12 +170,12 @@ end;
 
 procedure TioContext.CheckUpdateConflict(const AContext: IioContext);
 begin
-  TioCustomConflictStrategy(GetTable.GetUpdateConflictStrategy).CheckUpdateConflict(AContext);
+  TioCustomConflictStrategyRef(GetTable.GetUpdateConflictStrategy).CheckUpdateConflict(AContext);
 end;
 
 procedure TioContext.ResolveDeleteConflict(const AContext: IioContext);
 begin
-  TioCustomConflictStrategy(GetTable.GetDeleteConflictStrategy).ResolveDeleteConflict(AContext);
+  TioCustomConflictStrategyRef(GetTable.GetDeleteConflictStrategy).ResolveDeleteConflict(AContext);
 end;
 
 procedure TioContext.ResolveUpdateConflict(const AContext: IioContext);

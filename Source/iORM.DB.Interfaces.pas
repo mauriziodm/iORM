@@ -483,6 +483,27 @@ begin
   else
     AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName);
   // -----------------------------------------------------------------
+
+
+
+
+
+  // Mauri 15/01/2024: Con la nuova conflict detection l'aggiunta dell'eventuale condizione relativa alla versione dell'oggetto
+  //                    viene aggiunta nella relatica conflict strategy
+
+  // Conflict detection: same obj version win
+  if AContext.GetProperties.ObjVersionPropertyExist then
+    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + '=:' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
+
+  // Conflict detection: longest story win
+  if AContext.GetProperties.ObjVersionPropertyExist then
+    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + '<' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
+
+  // Conflict detection: newest win
+  // (update solo se quello sul DB è più vecchio) NB: se non siamo in sincronizzazione non mettere nessuna condizione perchè tanto vincerebbe sempre
+  if AContext.GetProperties.ObjUpdatedPropertyExist then
+    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjUpdatedProperty.GetSqlFieldName + '<' + AContext.GetProperties.ObjUpdatedProperty.GetSqlWhereParamName);
+
 end;
 
 class procedure TioSqlGenerator.GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext);
@@ -544,10 +565,31 @@ begin
     AQuery.SQL.Add(',' + AContext.GetTrueClass.GetSqlFieldName + '=:' + AContext.GetTrueClass.GetSqlParamName);
   // Where conditions
   AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName);
-// Mauri 15/01/2024: Con la nuova conflict detection l'aggiunta dell'eventuale condizione relativa alla versione dell'oggetto
-//                    viene aggiunta nella relatica conflict strategy
-//  if AContext.GetProperties.ObjVersionPropertyExist then
-//    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + '=:' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
+  if AContext.GetProperties.ObjVersionPropertyExist then
+    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + '=:' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
+
+
+
+
+
+
+  // Mauri 15/01/2024: Con la nuova conflict detection l'aggiunta dell'eventuale condizione relativa alla versione dell'oggetto
+  //                    viene aggiunta nella relatica conflict strategy
+
+  // Verifica ObjVersion
+  if AContext.GetProperties.ObjVersionPropertyExist then
+    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + '=:' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
+
+  // ipotesi per lastupdate conflict strategy = NewestWin (sincronizzazione)
+  // (update solo se quello sul DB è più vecchio) NB: se non siamo in sincronizzazione non mettere nessuna condizione perchè tanto vincerebbe sempre
+  if AContext.GetProperties.ObjUpdatedPropertyExist then
+    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjUpdatedProperty.GetSqlFieldName + '<=' + AContext.GetProperties.ObjUpdatedProperty.GetSqlWhereParamName);
+
+  // ipotesi per lastupdate conflict strategy = OldestWin (sincronizzazione)
+  // (update solo se quello sul DB è più vecchio) NB: se non siamo in sincronizzazione mettere una condizione che è sempre false perchè non vincerebbe mai
+  if AContext.GetProperties.ObjUpdatedPropertyExist then
+    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjUpdatedProperty.GetSqlFieldName + '>' + AContext.GetProperties.ObjUpdatedProperty.GetSqlWhereParamName);
+
   // -----------------------------------------------------------------
 end;
 

@@ -31,7 +31,7 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.ConflictStrategy.NewestWin;
+unit iORM.ConflictStrategy.LastUpdateWin;
 
 interface
 
@@ -40,11 +40,10 @@ uses
 
 type
 
-  TioNewestWinConflictStrategy = class(TioCustomConflictStrategy)
+  TioLastUpdateWin = class(TioCustomConflictStrategy)
+  private
+    class function ConflictConfirmed(const AContext: IioContext): Boolean;
   public
-    // Check/detect (or prepare the "query") if there is a conflict persisting the DataObject contained into the context
-    class procedure CheckDeleteConflict(const AContext: IioContext); override;
-    class procedure CheckUpdateConflict(const AContext: IioContext); override;
     // If a conflict is detected then this method is called from the persistence strategy to try to resolve the conflict
     // Note: the conflict strategy MUST RESOLVE the conflict or raise an exception
     class procedure ResolveDeleteConflict(const AContext: IioContext); override;
@@ -53,30 +52,30 @@ type
 
 implementation
 
-{ TioNewestWinConflictStrategy }
+uses
+  iORM, iORM.Where.Interfaces, iORM.Where.Factory, iORM.CommonTypes;
 
-class procedure TioNewestWinConflictStrategy.CheckDeleteConflict(const AContext: IioContext);
+{ TioLastUpdateWin }
+
+class function TioLastUpdateWin.ConflictConfirmed(const AContext: IioContext): Boolean;
 begin
-  inherited;
-  // To be implemented
+  // If the obj in the DB is newer than the one being persisted then the conflict is confirmed, otherwise the conflict is considered resolved
+  Result := io.Exists(AContext.Map.GetClassName, io.Where(AContext.GetProperties.GetIdProperty.GetName, coEquals, AContext.GetID)
+    ._And(AContext.GetProperties.ObjUpdatedProperty.GetName, coGreater, AContext.ObjUpdated));
 end;
 
-class procedure TioNewestWinConflictStrategy.CheckUpdateConflict(const AContext: IioContext);
+class procedure TioLastUpdateWin.ResolveDeleteConflict(const AContext: IioContext);
 begin
-  inherited;
-  // To be implemented
+  AContext.PersistenceConflictDetected := ConflictConfirmed(AContext);
+  if AContext.PersistenceConflictDetected then
+    inherited;
 end;
 
-class procedure TioNewestWinConflictStrategy.ResolveDeleteConflict(const AContext: IioContext);
+class procedure TioLastUpdateWin.ResolveUpdateConflict(const AContext: IioContext);
 begin
-  inherited;
-  // To be implemented
-end;
-
-class procedure TioNewestWinConflictStrategy.ResolveUpdateConflict(const AContext: IioContext);
-begin
-  inherited;
-  // To be implemented
+  AContext.PersistenceConflictDetected := ConflictConfirmed(AContext);
+  if AContext.PersistenceConflictDetected then
+    inherited;
 end;
 
 end.

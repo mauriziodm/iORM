@@ -31,58 +31,19 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.ConflictStrategy.RaiseManual;
+unit iORM.ConflictStrategy.SameVersionWin;
 
 interface
 
 uses
-  iORM.ConflictStrategy.Interfaces, iORM.Context.Interfaces;
+  iORM.ConflictStrategy.Interfaces;
 
 type
 
-  TioRaiseManualConflictStrategy = class(TioCustomConflictStrategy)
-  public
-    // Check/detect (or prepare the "query") if there is a conflict persisting the DataObject contained into the context
-    class procedure CheckDeleteConflict(const AContext: IioContext); override;
-    class procedure CheckUpdateConflict(const AContext: IioContext); override;
-    // If a conflict is detected then this method is called from the persistence strategy to try to resolve the conflict
-    // Note: the conflict strategy MUST RESOLVE the conflict or raise an exception
-    class procedure ResolveDeleteConflict(const AContext: IioContext); override;
-    class procedure ResolveUpdateConflict(const AContext: IioContext); override;
+  TioSameVersionWin = class(TioCustomConflictStrategy)
+
   end;
 
 implementation
-
-uses
-  iORM.Exceptions, iORM.CommonTypes;
-
-{ TioRaiseManualConflictStrategy }
-
-class procedure TioRaiseManualConflictStrategy.CheckDeleteConflict(const AContext: IioContext);
-begin
-  inherited;
-  CheckUpdateConflict(AContext);
-end;
-
-class procedure TioRaiseManualConflictStrategy.CheckUpdateConflict(const AContext: IioContext);
-begin
-  inherited;
-  // If the ObjVersion property exists for this class entity then add it to the update query to
-  // detect the possible conflict (conflict exists if the update query affected 0 records)
-  if AContext.GetProperties.ObjVersionPropertyExist then
-    AContext.Where._and(AContext.GetProperties.ObjVersionProperty.GetName, coEquals, AContext.GetProperties.ObjVersionProperty.GetValue(AContext.DataObject).AsVariant);
-end;
-
-class procedure TioRaiseManualConflictStrategy.ResolveDeleteConflict(const AContext: IioContext);
-begin
-  inherited;
-  raise EioConcurrencyConflictException.Create(ClassName, 'ResolveDeleteConflict', AContext);
-end;
-
-class procedure TioRaiseManualConflictStrategy.ResolveUpdateConflict(const AContext: IioContext);
-begin
-  inherited;
-  raise EioConcurrencyConflictException.Create(ClassName, 'ResolveUpdateConflict', AContext);
-end;
 
 end.
