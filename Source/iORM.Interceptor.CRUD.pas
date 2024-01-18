@@ -53,19 +53,19 @@ type
     // Obj load
     class function BeforeLoad(const AContext: IioContext; const AObj: TObject; var ADone: Boolean): TObject; virtual;
     class function AfterLoad(const AContext: IioContext; const AObj: TObject): TObject; virtual;
-    class procedure OnLoadException(const AContext: IioContext; const AException: Exception); virtual;
+    class function OnLoadException(const AContext: IioContext; const AException: Exception): Boolean; virtual;
     // Obj insert
     class procedure BeforeInsert(const AContext: IioContext; var ADone: Boolean); virtual;
     class procedure AfterInsert(const AContext: IioContext); virtual;
-    class procedure OnInsertException(const AContext: IioContext; const AException: Exception); virtual;
+    class function OnInsertException(const AContext: IioContext; const AException: Exception): Boolean; virtual;
     // Obj update
     class procedure BeforeUpdate(const AContext: IioContext; var ADone: Boolean); virtual;
     class procedure AfterUpdate(const AContext: IioContext); virtual;
-    class procedure OnUpdateException(const AContext: IioContext; const AException: Exception); virtual;
+    class function OnUpdateException(const AContext: IioContext; const AException: Exception): Boolean; virtual;
     // Obj delete
     class procedure BeforeDelete(const AContext: IioContext; var ADone: Boolean); virtual;
     class procedure AfterDelete(const AContext: IioContext); virtual;
-    class procedure OnDeleteException(const AContext: IioContext; const AException: Exception); virtual;
+    class function OnDeleteException(const AContext: IioContext; const AException: Exception): Boolean; virtual;
   end;
 
 implementation
@@ -112,24 +112,28 @@ begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomCRUDInterceptor.OnDeleteException(const AContext: IioContext; const AException: Exception);
+class function TioCustomCRUDInterceptor.OnDeleteException(const AContext: IioContext; const AException: Exception): Boolean;
 begin
-  // Nothing to do here (It must be implemented by the descendant classes)
+  // Return true if the exception must be re-raised
+  Result := True;
 end;
 
-class procedure TioCustomCRUDInterceptor.OnInsertException(const AContext: IioContext; const AException: Exception);
+class function TioCustomCRUDInterceptor.OnInsertException(const AContext: IioContext; const AException: Exception): Boolean;
 begin
-  // Nothing to do here (It must be implemented by the descendant classes)
+  // Return true if the exception must be re-raised
+  Result := True;
 end;
 
-class procedure TioCustomCRUDInterceptor.OnLoadException(const AContext: IioContext; const AException: Exception);
+class function TioCustomCRUDInterceptor.OnLoadException(const AContext: IioContext; const AException: Exception): Boolean;
 begin
-  // Nothing to do here (It must be implemented by the descendant classes)
+  // Return true if the exception must be re-raised
+  Result := True;
 end;
 
-class procedure TioCustomCRUDInterceptor.OnUpdateException(const AContext: IioContext; const AException: Exception);
+class function TioCustomCRUDInterceptor.OnUpdateException(const AContext: IioContext; const AException: Exception): Boolean;
 begin
-  // Nothing to do here (It must be implemented by the descendant classes)
+  // Return true if the exception must be re-raised
+  Result := True;
 end;
 
 end.

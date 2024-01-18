@@ -766,7 +766,6 @@ end;
 
 function TioProperty.IsSqlUpdateRequestCompliant: Boolean;
 begin
-  { TODO : Una qualche sorta di parametro per poter decidere se nelle query update ci deve essere anche l'ID oppure no? }
   Result := (FReadWrite >= lpLoadAndPersist) and (not FTransient) and (FPropertyRole <> prObjID) and (not IsObjCreateds) and not(FRelationType in [rtHasMany, rtHasOne]);
 end;
 

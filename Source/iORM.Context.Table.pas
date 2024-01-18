@@ -151,7 +151,6 @@ type
     procedure SetEtmTraceOnlyOnConnectionName(const AConnectionName: String);
     function GetEtmTraceOnlyOnConnectionName: String;
   public
-    { TODO : CONFLICTS - Aggiungere parametro AConclictStrategy al costruttore }
     constructor Create(const ASqlText, AKeyGenerator: String; const ATrueClass: IioTrueClass; const AJoins: IioJoins; const AGroupBy: IioGroupBy;
       const AConnectionDefName: String; const AMapMode: TioMapModeType; const ARttiType: TRttiInstanceType); reintroduce; overload;
     destructor Destroy; override;

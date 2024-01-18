@@ -302,10 +302,10 @@ begin
       RollbackTransaction(LContext.GetTable.GetConnectionDefName);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-      TioCRUDInterceptorRegister.OnDeleteException(LContext, E);
+      if TioCRUDInterceptorRegister.OnDeleteException(LContext, E) then
 {$ENDIF}
 {$ENDREGION}
-      raise;
+        raise;
     end;
   end;
 end;
@@ -479,31 +479,11 @@ type
 var
   LContext: IioContext;
   LPersistActionType: TioPersistActionType;
-  LDoneByInterceptor: Boolean;
-  procedure _DetectPersistActionType;
-  begin
-    LPersistActionType := patDoNotPersist;
-    case LContext.ObjStatus of
-      osDirty:
-        begin
-          // note: if SmartUpdateDetection system is not enabled or (if enabled) the object is to be persisted (according to the SmartUpdateDetection system)...
-          if LContext.GetProperties.ObjStatusPropertyExist or (AMasterBSPersistence = nil) or (not AMasterBSPersistence.IsSmartUpdateDetectionEnabled) or
-            AMasterBSPersistence.SmartUpdateDetection.IsToBePersisted(AObj, LContext.MasterPropertyPath) then
-          begin
-            // old code: if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
-            if ABlindInsert or LContext.IDIsNull or not Self.ObjectExists(LContext) then
-              LPersistActionType := patInsert
-            else
-              LPersistActionType := patUpdate;
-          end;
-        end;
-      osDeleted:
-        LPersistActionType := patDelete;
-    end;
-  end;
 
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
+  LDoneByInterceptor: Boolean;
+
   procedure _Interceptors_InterceptBeforeAction;
   begin
     LDoneByInterceptor := False;
@@ -527,19 +507,43 @@ var
         TioCRUDInterceptorRegister.AfterDelete(LContext);
     end;
   end;
-  procedure _Interceptors_InterceptException(const AException: Exception);
+  function _Interceptors_InterceptException(const AException: Exception): Boolean;
   begin
     case LPersistActionType of
       patUpdate:
-        TioCRUDInterceptorRegister.OnUpdateException(LContext, AException);
+        Result := TioCRUDInterceptorRegister.OnUpdateException(LContext, AException);
       patInsert:
-        TioCRUDInterceptorRegister.OnInsertException(LContext, AException);
+        Result := TioCRUDInterceptorRegister.OnInsertException(LContext, AException);
       patDelete:
-        TioCRUDInterceptorRegister.OnDeleteException(LContext, AException);
+        Result := TioCRUDInterceptorRegister.OnDeleteException(LContext, AException);
+    else
+      Result := True; // Per sicurezza
     end;
   end;
 {$ENDIF}
 {$ENDREGION}
+
+  procedure _DetectPersistActionType;
+  begin
+    LPersistActionType := patDoNotPersist;
+    case LContext.ObjStatus of
+      osDirty:
+        begin
+          // note: if SmartUpdateDetection system is not enabled or (if enabled) the object is to be persisted (according to the SmartUpdateDetection system)...
+          if LContext.GetProperties.ObjStatusPropertyExist or (AMasterBSPersistence = nil) or (not AMasterBSPersistence.IsSmartUpdateDetectionEnabled) or
+            AMasterBSPersistence.SmartUpdateDetection.IsToBePersisted(AObj, LContext.MasterPropertyPath) then
+          begin
+            // old code: if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
+            if ABlindInsert or LContext.IDIsNull or not Self.ObjectExists(LContext) then
+              LPersistActionType := patInsert
+            else
+              LPersistActionType := patUpdate;
+          end;
+        end;
+      osDeleted:
+        LPersistActionType := patDelete;
+    end;
+  end;
 
 begin
   inherited;
@@ -611,10 +615,10 @@ begin
       RollbackTransaction(LContext.GetTable.GetConnectionDefName);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-      _Interceptors_InterceptException(E);
+      if _Interceptors_InterceptException(E) then
 {$ENDIF}
 {$ENDREGION}
-      raise;
+        raise;
     end;
   end;
 end;
@@ -881,10 +885,10 @@ var
         // Note: Rollback in the except section of the main method (_DoLoadList)s
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-        TioCRUDInterceptorRegister.OnDeleteException(LCurrentContext, E);
+        if TioCRUDInterceptorRegister.OnLoadException(LCurrentContext, E) then
 {$ENDIF}
 {$ENDREGION}
-        raise;
+          raise;
       end;
     end;
   end;
@@ -984,13 +988,12 @@ var
     except
       on E : Exception do
       begin
-        // Note: Rollback in the except section of the main method (_DoLoadList)s
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-        TioCRUDInterceptorRegister.OnLoadException(LCurrentContext, E);
+        if TioCRUDInterceptorRegister.OnLoadException(LCurrentContext, E) then
 {$ENDIF}
 {$ENDREGION}
-        raise;
+          raise;
       end;
     end;
   end;
