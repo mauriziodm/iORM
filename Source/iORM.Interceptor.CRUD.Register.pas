@@ -353,8 +353,6 @@ begin
   begin
     // In caso di più interceptor registrati basta che uno solo ritorni True che il risultato sarà True
     Result := False;
-    // In caso di più interceptor registrati basta che uno solo ritorni True che il risultato sarà True
-    Result := False;
     // Cicla per tutti gli interceptor registrati per la classe e li invoca
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName] do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then

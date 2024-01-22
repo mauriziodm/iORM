@@ -60,6 +60,7 @@ type
     procedure CheckUpdateConflict(const AContext: IioContext);
     procedure ResolveDeleteConflict(const AContext: IioContext);
     procedure ResolveUpdateConflict(const AContext: IioContext);
+    function GetCurrentStrategyName: String;
     // Map
     function Map: IioMap;
     // DataObject
@@ -121,14 +122,26 @@ type
     procedure SetOriginalNonTrueClassMap(const AMap: IioMap);
     function GetOriginalNonTrueClassMap: IioMap;
     property OriginalNonTrueClassMap: IioMap read GetOriginalNonTrueClassMap write SetOriginalNonTrueClassMap;
-    // EtmRevertedFromVersion
-    function GetEtmRevertedFromVersion: Integer;
-    procedure SetEtmRevertedFromVersion(const Value: Integer);
-    property EtmRevertedFromVersion: Integer read GetEtmRevertedFromVersion write SetEtmRevertedFromVersion;
+    // EtmEntityFromVersion
+    function GetEtmEntityFromVersion: Integer;
+    procedure SetEtmEntityFromVersion(const Value: Integer);
+    property EtmEntityFromVersion: Integer read GetEtmEntityFromVersion write SetEtmEntityFromVersion;
+    // PersistenceActionType
+    function GetPersistenceActionType: TioPersistenceActionType;
+    procedure SetPersistenceActionType(const Value: TioPersistenceActionType);
+    property PersistenceActionType: TioPersistenceActionType read GetPersistenceActionType write SetPersistenceActionType;
+    // PersistenceIntentType
+    function GetPersistenceIntentType: TioPersistenceIntentType;
+    procedure SetPersistenceIntentType(const Value: TioPersistenceIntentType);
+    property PersistenceIntentType: TioPersistenceIntentType read GetPersistenceIntentType write SetPersistenceIntentType;
     // PersistenceConflictDetected
     function GetPersistenceConflictDetected: Boolean;
     procedure SetPersistenceConflictDetected(const Value: Boolean);
     property PersistenceConflictDetected: Boolean read GetPersistenceConflictDetected write SetPersistenceConflictDetected;
+    // PersistenceConflictState
+    function GetPersistenceConflictState: TioPersistenceConflictState;
+    procedure SetPersistenceConflictState(const Value: TioPersistenceConflictState);
+    property PersistenceConflictState: TioPersistenceConflictState read GetPersistenceConflictState write SetPersistenceConflictState;
   end;
 
 implementation

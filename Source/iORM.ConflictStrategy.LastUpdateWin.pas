@@ -44,6 +44,9 @@ type
   private
     class function ConflictConfirmed(const AContext: IioContext): Boolean;
   public
+    // This method return a name for this conflict strategy, by default it returns the type name of the class itself but you can override it
+    //  and return a more readable name. It is used for logging purposes or similar.
+    class function Name: String; override;
     // If a conflict is detected then this method is called from the persistence strategy to try to resolve the conflict
     // Note: the conflict strategy MUST RESOLVE the conflict or raise an exception
     class procedure ResolveDeleteConflict(const AContext: IioContext); override;
@@ -62,6 +65,11 @@ begin
   // If the obj in the DB is newer than the one being persisted then the conflict is confirmed, otherwise the conflict is considered resolved
   Result := io.Exists(AContext.Map.GetClassName, io.Where(AContext.GetProperties.GetIdProperty.GetName, coEquals, AContext.GetID)
     ._And(AContext.GetProperties.ObjUpdatedProperty.GetName, coGreater, AContext.ObjUpdated));
+end;
+
+class function TioLastUpdateWin.Name: String;
+begin
+  Result := 'Last update win';
 end;
 
 class procedure TioLastUpdateWin.ResolveDeleteConflict(const AContext: IioContext);

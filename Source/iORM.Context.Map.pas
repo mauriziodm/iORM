@@ -38,8 +38,7 @@ interface
 uses
   iORM.CommonTypes, iORM.Context.Table.Interfaces,
   iORM.Context.Properties.Interfaces, System.Rtti,
-  iORM.Context.Map.Interfaces, iORM.DependencyInjection.Implementers,
-  iORM.ConflictStrategy.Interfaces;
+  iORM.Context.Map.Interfaces, iORM.DependencyInjection.Implementers;
 
 type
 

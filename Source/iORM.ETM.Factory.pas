@@ -31,6 +31,13 @@
   *                                                                          *
   ****************************************************************************
 }
+{
+  ********************************************************************************************************************************
+  * NOTE: TioEtmCustomTimeSlot base class for all EtmTimeSlots is declared in iORM.Attributes unit to avoid circular refeference *
+  * NOTE: TioEtmCustomTimeSlot base class for all EtmTimeSlots is declared in iORM.Attributes unit to avoid circular refeference *
+  * NOTE: TioEtmCustomTimeSlot base class for all EtmTimeSlots is declared in iORM.Attributes unit to avoid circular refeference *
+  ********************************************************************************************************************************
+}
 unit iORM.ETM.Factory;
 
 interface

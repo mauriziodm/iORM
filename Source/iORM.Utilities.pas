@@ -174,6 +174,13 @@ begin
   Result := LMap.GetProperties.GetIdProperty.GetValue(AObj).AsInteger;
 end;
 
+class function TioUtilities.ExtractOID(const AIntf: IInterface): Integer;
+begin
+  if not Assigned(AIntf) then
+    raise EioException.Create(ClassName, 'ExtractOID', '"AIntf" cannot be nil.');
+  Result := ExtractOID(AIntf as Tobject);
+end;
+
 class function TioUtilities.ExtractObjVersion(const AObj: Tobject): Integer;
 var
   LMap: IioMap;
@@ -182,13 +189,6 @@ begin
     raise EioException.Create(ClassName, 'ExtractObjVersion', '"AObj" parameter not assigned');
   LMap := TioMapContainer.GetMap(AObj.ClassName);
   Result := LMap.GetProperties.GetObjVersionProperty.GetValue(AObj).AsInteger;
-end;
-
-class function TioUtilities.ExtractOID(const AIntf: IInterface): Integer;
-begin
-  if not Assigned(AIntf) then
-    raise EioException.Create(ClassName, 'ExtractOID', '"AIntf" cannot be nil.');
-  Result := ExtractOID(AIntf as Tobject);
 end;
 
 class function TioUtilities.EnumToString<T>(const AEnumValue: T): String;

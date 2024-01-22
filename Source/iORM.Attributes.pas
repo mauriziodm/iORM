@@ -528,19 +528,29 @@ type
   private
     FID: Integer;
     FDateAndTime: TioObjCreated;
-    FUserID: TioObjCreatedUserID;
-    FUserName: TioObjCreatedUserName;
+    // Entity related props
     [ioVarchar(60)]
     FEntityClassName: String;
     FEntityID: Integer;
     FEntityVersion: Integer;
-    FRevertedFromVersion: Integer;
+    FEntityFromVersion: Integer;
+    FEntityUpdated: TDateTime;
     [ioBinary('1')]
     FEntityState: String;
-    [ioBinary('1')]
-    FRemoteEntityState: String;
-    FEventType: TioEtmEventType;
-    FConflictType: TioEtmConflictType;
+    // User related props
+    FUserID: TioObjCreatedUserID;
+    FUserName: TioObjCreatedUserName;
+    // Persistence related props
+    FActionType: TioPersistenceActionType;
+    FIntentType: TioPersistenceIntentType;
+    FConflictDetected: Boolean;
+    FConflictState: TioPersistenceConflictState;
+    FConflictStrategyName: String;
+    // Conflict check by human related props
+    FConflictCheckedByHuman: Boolean;
+    FConflictCheckedByHuman_ID: Integer;
+    FConflictCheckedByHuman_Name: String;
+    FConflictCheckedByHuman_DateTime: TDateTime;
     // NB: Questo è un anonymous method che viene passato dal BindSource che sta esponendo il TimeSlot stesso e che permette
     // di risalire alla versione corrente della entità attraverso la catena "ETMBindSource.etmFor.Current"
     [ioSkip]
@@ -548,7 +558,7 @@ type
     function GetSmartEntityInfo: String;
     function GetSmartEntityVersion: String;
     function GetSmartUser: String;
-    function GetSmartEventType: String;
+    function GetSmartActionType: String;
     function GetSmartDescription: String;
     function GetSmartFullDescription: String;
     // Diff
@@ -557,25 +567,35 @@ type
     function GetDiffTwoWay: String;
     function GetDiffTwoWayMoreInfo: String;
   public
-    constructor Create(const AEventType: TioEtmEventType; const AConflictType: TioEtmConflictType; const AEntityID: Integer; const AEntityClassName: String;
-      const AEntityObjVersion, ARevertedFromVersion: Integer; const AEntityState, ARemoteEntityState: String);
+    constructor Create(const AContextAsIInterface: IInterface); // IInterface to avoid circular reference
     property ID: Integer read FID;
     property DateAndTime: TioObjCreated read FDateAndTime;
-    property EventType: TioEtmEventType read FEventType;
+    // Entity related props
     property EntityClassName: String read FEntityClassName;
     property EntityID: Integer read FEntityID;
     property EntityVersion: Integer read FEntityVersion;
-    property RevertedFromVersion: Integer read FRevertedFromVersion;
+    property EntityFromVersion: Integer read FEntityFromVersion;
+    property EntityUpdated: TDateTime read FEntityUpdated;
     property EntityState: String read FEntityState;
-    property RemoteEntityState: String read FRemoteEntityState;
-    property ConflictType: TioEtmConflictType read FConflictType;
-    property UserName: TioObjCreatedUserName read FUserName;
+    // User related props
     property UserID: TioObjCreatedUserID read FUserID;
+    property UserName: TioObjCreatedUserName read FUserName;
+    // Persistence related props
+    property ActionType: TioPersistenceActionType read FActionType;
+    property IntentType: TioPersistenceIntentType read FIntentType;
+    property ConflictDetected: Boolean read FConflictDetected;
+    property ConflictState: TioPersistenceConflictState read FConflictState;
+    property ConflictStrategyName: String read FConflictStrategyName;
+    // Conflict check by human related props
+    property ConflictCheckedByHuman: Boolean read FConflictCheckedByHuman;
+    property ConflictCheckedByHuman_ID: Integer read FConflictCheckedByHuman_ID;
+    property ConflictCheckedByHuman_Name: String read FConflictCheckedByHuman_Name;
+    property ConflictCheckedByHuman_DateTime: TDateTime read FConflictCheckedByHuman_DateTime;
     // Smart properties
     property SmartEntityInfo: String read GetSmartEntityInfo;
     property SmartEntityVersion: String read GetSmartEntityVersion;
     property SmartUser: String read GetSmartUser;
-    property SmartEventType: String read GetSmartEventType;
+    property SmartEventType: String read GetSmartActionType;
     property SmartDescription: String read GetSmartDescription;
     property SmartFullDescription: String read GetSmartFullDescription;
     // Diff methods
@@ -626,7 +646,8 @@ type
 implementation
 
 uses
-  iORM, iORM.Utilities, iORM.Exceptions, iORM.Abstraction, iORM.ETM.Engine;
+  iORM, iORM.Utilities, iORM.Exceptions, iORM.Abstraction, iORM.ETM.Engine,
+  iORM.Context.Interfaces, DJSON, iORM.ETM.Factory;
 
 { TioStringAttribute }
 
@@ -931,17 +952,35 @@ end;
 
 { TioEtmCustomTimeSlot }
 
-constructor TioEtmCustomTimeSlot.Create(const AEventType: TioEtmEventType; const AConflictType: TioEtmConflictType; const AEntityID: Integer;
-  const AEntityClassName: String; const AEntityObjVersion, ARevertedFromVersion: Integer; const AEntityState, ARemoteEntityState: String);
+constructor TioEtmCustomTimeSlot.Create(const AContextAsIInterface: IInterface);
+var
+  LContext: IioContext;
 begin
-  FEventType := AEventType;
-  FConflictType := AConflictType;
-  FEntityClassName := AEntityClassName;
-  FEntityID := AEntityID;
-  FEntityVersion := AEntityObjVersion;
-  FRevertedFromVersion := ARevertedFromVersion;
-  FEntityState := AEntityState;
-  FRemoteEntityState := ARemoteEntityState;
+  if not Supports(AContextAsIInterface, IioContext, LContext) then
+    raise EioException.Create(ClassName, 'Create', 'The object received by the "AContextAsIInterface" parameter does not implements "IioContext" interface.');
+  // Entity related props
+  FEntityClassName := LContext.DataObject.ClassName;
+  FEntityID := LContext.GetID;
+  FEntityVersion := LContext.ObjVersion;
+  FEntityFromVersion := LContext.EtmEntityFromVersion;
+  FEntityUpdated := LContext.ObjUpdated;
+  FEntityState := dj.From(LContext.DataObject, TioEtmFactory.djParamsEngine).ToJson;
+  // User related props
+  FUserID := IO_INTEGER_NULL_VALUE;
+  FUserName := IO_STRING_NULL_VALUE;
+  // Persistence related props
+  FActionType := LContext.PersistenceActionType;
+  FIntentType := LContext.PersistenceIntentType;
+  FConflictDetected := LContext.PersistenceConflictDetected;
+  FConflictState := LContext.PersistenceConflictState;
+  FConflictStrategyName := LContext.GetCurrentStrategyName;
+  // Conflict check by human related props
+  FConflictCheckedByHuman := False;
+  FConflictCheckedByHuman_ID := IO_INTEGER_NULL_VALUE;
+  FConflictCheckedByHuman_Name := IO_STRING_NULL_VALUE;
+  FConflictCheckedByHuman_DateTime := IO_DATETIME_NULL_VALUE;
+  // NB: Questo è un anonymous method che viene passato dal BindSource che sta esponendo il TimeSlot stesso e che permette
+  // di risalire alla versione corrente della entità attraverso la catena "ETMBindSource.etmFor.Current"
   FExtractCurrentEntityFunc := nil;
 end;
 
@@ -952,19 +991,27 @@ end;
 
 function TioEtmCustomTimeSlot.GetSmartEntityVersion: String;
 begin
-  if FRevertedFromVersion <> 0 then
-    Result := Format('%d (reverted from %d)', [FEntityVersion, RevertedFromVersion])
+  case FIntentType of
+    itRevert:
+      Result := Format('%d (reverted from %d)', [FEntityVersion, FEntityFromVersion]);
+    itSynchronization:
+      Result := Format('%d (synchronized from %d)', [FEntityVersion, FEntityFromVersion]);
   else
     Result := FEntityVersion.ToString;
+  end;
 end;
 
-function TioEtmCustomTimeSlot.GetSmartEventType: String;
+function TioEtmCustomTimeSlot.GetSmartActionType: String;
 begin
   // Event type
-  Result := io.Enums.OrdinalToString<TioEtmEventType>(Ord(FEventType));
-  // Conflict type
-  if FConflictType > ctNoConflict then
-    Result := Format('%s (%s)', [Result, io.Enums.OrdinalToString<TioEtmConflictType>(Ord(FConflictType))]);
+  Result := io.Enums.OrdinalToString<TioPersistenceActionType>(Ord(FActionType));
+  // Intent type
+  case FIntentType of
+    itRevert:
+      Result := Result + '%s (revert)';
+    itSynchronization:
+      Result := Result + '%s (synchronization)';
+  end;
 end;
 
 function TioEtmCustomTimeSlot.Diff(const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean): String;
@@ -1020,7 +1067,7 @@ var
 begin
   LFormatSettings := TFormatSettings.Create;
   LDateAndTime := DateTimeToStr(FDateAndTime, LFormatSettings);
-  Result := Format('%s %s', [LDateAndTime, GetSmartEventType]);
+  Result := Format('%s %s', [LDateAndTime, GetSmartActionType]);
   // User
   LSmartUser := GetSmartUser;
   if not LSmartUser.IsEmpty then

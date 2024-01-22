@@ -41,9 +41,19 @@ uses
 type
 
   TioSameVersionWin = class(TioCustomConflictStrategy)
-
+  public
+    // This method return a name for this conflict strategy, by default it returns the type name of the class itself but you can override it
+    //  and return a more readable name. It is used for logging purposes or similar.
+    class function Name: String; override;
   end;
 
 implementation
+
+{ TioSameVersionWin }
+
+class function TioSameVersionWin.Name: String;
+begin
+  Result := 'Same version win';
+end;
 
 end.

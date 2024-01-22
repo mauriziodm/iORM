@@ -43,6 +43,9 @@ type
   // Base class for all ConflictStrategies
   TioCustomConflictStrategy = class abstract
   public
+    // This method return a name for this conflict strategy, by default it returns the type name of the class itself but you can override it
+    //  and return a more readable name. It is used for logging purposes or similar.
+    class function Name: String; virtual;
     // Check/detect (or prepare the "query") if there is a conflict persisting the DataObject contained into the context
     class procedure CheckDeleteConflict(const AContext: IioContext); virtual;
     class procedure CheckUpdateConflict(const AContext: IioContext); virtual;
@@ -88,6 +91,11 @@ end;
 class procedure TioCustomConflictStrategy.CheckUpdateConflict(const AContext: IioContext);
 begin
   // To be implemented on derived classes if necessary
+end;
+
+class function TioCustomConflictStrategy.Name: String;
+begin
+  Result := Self.Name;
 end;
 
 class procedure TioCustomConflictStrategy.ResolveDeleteConflict(const AContext: IioContext);

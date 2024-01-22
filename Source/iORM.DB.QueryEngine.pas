@@ -63,6 +63,8 @@ type
     class function GetQueryNextID(const AContext: IioContext): IioQuery;
     class function GetQuerySelectList(const AContext: IioContext): IioQuery;
     class function GetQuerySelectObject(const AContext: IioContext): IioQuery;
+    class function GetQuerySelectLastObjVersionFromEntity(const AContext: IioContext): IioQuery;
+    class function GetQuerySelectLastObjVersionFromEtm(const AObjContext: IioContext): IioQuery;
     class function GetQueryUpdate(const AContext: IioContext): IioQuery;
   end;
 
@@ -72,7 +74,7 @@ uses
   iORM.DB.Factory, FireDac.Stan.Param, System.Rtti,
   iORM.Attributes, Data.DB, iORM.Interfaces, SysUtils,
   iORM.Where.SqlItems.Interfaces, iORM.DB.ConnectionContainer,
-  System.ioUtils;
+  System.ioUtils, iORM.Exceptions, iORM.Context.Factory;
 
 { TioQueryEngine }
 
@@ -297,6 +299,44 @@ begin
     LQuery.FillQueryWhereParams(AContext)
   else
     LQuery.WhereParamObjID_SetValue(AContext);
+end;
+
+class function TioQueryEngine.GetQuerySelectLastObjVersionFromEntity(const AContext: IioContext): IioQuery;
+var
+  LQueryIdentity: String;
+  LQuery: IioQuery;
+begin
+  // Compose query identity
+  LQueryIdentity := ComposeQueryIdentity(AContext, 'SELVERETY', True);
+  // Get the query object and if does not contain an SQL text (come from QueryContainer)
+  // then call the sql query generator
+  LQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, LQueryIdentity);
+  Result := LQuery;
+  if LQuery.IsSqlEmpty then
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlSelectLastObjVersionFromEntity(LQuery, AContext);
+  // Where
+  LQuery.WhereParamObjID_SetValue(AContext);
+end;
+
+class function TioQueryEngine.GetQuerySelectLastObjVersionFromEtm(const AObjContext: IioContext): IioQuery;
+var
+  LEtmContext: IioContext;
+  LQueryIdentity: String;
+  LQuery: IioQuery;
+begin
+  // Get the context for the ETM TimeSlotClass
+  LEtmContext := TioContextFactory.Context(AObjContext.GetTable.EtmTimeSlotClass.ClassName, nil, nil, nil, '', '');
+  // Compose query identity
+  LQueryIdentity := ComposeQueryIdentity(LEtmContext, 'SELVERETM', True);
+  // Get the query object and if does not contain an SQL text (come from QueryContainer)
+  // then call the sql query generator
+  LQuery := TioDbFactory.Query(LEtmContext.GetTable.GetConnectionDefName, LQueryIdentity);
+  Result := LQuery;
+  if LQuery.IsSqlEmpty then
+    TioDbFactory.SqlGenerator(LEtmContext.GetTable.GetConnectionDefName).GenerateSqlSelectLastObjVersionFromETM(LQuery, LEtmContext);
+  // Where
+  LQuery.WhereParamByProp_SetValue(LEtmContext.GetProperties.GetPropertyByName('EntityClassName'), AObjContext.Map.GetClassName);
+  LQuery.WhereParamByProp_SetValue(LEtmContext.GetProperties.GetPropertyByName('EntityID'), AObjContext.GetID);
 end;
 
 class function TioQueryEngine.GetQueryUpdate(const AContext: IioContext): IioQuery;

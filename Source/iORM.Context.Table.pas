@@ -184,6 +184,10 @@ type
     function GetIndexList(AAutoCreateIfUnassigned: Boolean): TioIndexList;
     procedure SetIndexList(AIndexList: TioIndexList);
     // Properties
+    property DeleteConflictStrategy: TClass read GetDeleteConflictStrategy write SetDeleteConflictStrategy;
+    property UpdateConflictStrategy: TClass read GetUpdateConflictStrategy write SetUpdateConflictStrategy;
+    property DeleteConflictStrategy_RaiseOnConflict: Boolean read GetDeleteConflictStrategy_RaiseOnConflict write SetDeleteConflictStrategy_RaiseOnConflict;
+    property UpdateConflictStrategy_RaiseOnConflict: Boolean read GetUpdateConflictStrategy_RaiseOnConflict write SetUpdateConflictStrategy_RaiseOnConflict;
     property EtmTimeSlotClass: TioEtmTimeSlotRef read GetEtmTimeSlotClass write SetEtmTimeSlotClass;
     property EtmTraceOnlyOnConnectionName: String read GetEtmTraceOnlyOnConnectionName write SetEtmTraceOnlyOnConnectionName;
   end;

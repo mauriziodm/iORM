@@ -81,6 +81,7 @@ type
     procedure ParamByProp_SetValueAsTime(const AProp: IioProperty; const AValue: TTime);
     procedure ParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
     procedure ParamByProp_SetValueByContext(const AProp: IioProperty; const AContext: IioContext);
+    procedure ParamByProp_SetValueAsInteger(const AProp: IioProperty; const AValue: Integer);
     procedure ParamByProp_SetValueAsIntegerNullIfZero(const AProp: IioProperty; const AValue: Integer);
     procedure ParamByProp_LoadAsStreamObj(const AObj: TObject; const AProperty: IioProperty);
     procedure ParamObjVersion_SetValue(const AContext: IioContext);
@@ -351,6 +352,11 @@ begin
     end;
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
+end;
+
+procedure TioFDQuery.ParamByProp_SetValueAsInteger(const AProp: IioProperty; const AValue: Integer);
+begin
+  _ParamByProp(AProp).AsInteger := AValue;
 end;
 
 procedure TioFDQuery.ParamByProp_SetValueAsIntegerNullIfZero(const AProp: IioProperty; const AValue: Integer);

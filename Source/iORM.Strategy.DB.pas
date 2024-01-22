@@ -53,6 +53,8 @@ type
     class procedure PreProcessRelationChildOnPersist(const AMasterContext: IioContext);
     class procedure PostProcessRelationChildOnPersist(const AMasterContext: IioContext);
     class function ObjectExists(const AContext: IioContext): Boolean;
+    class function LoadObjVersion_FromEntity_Internal(const AContext: IioContext): Integer;
+    class function LoadObjVersion_FromETM_Internal(const AContext: IioContext): Integer;
   protected
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------
     class procedure _DoPersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
@@ -72,6 +74,7 @@ type
     class procedure Delete(const AWhere: IioWhere); override;
     class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject; override;
     class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
+    class function LoadObjVersion(const AContext: IioContext): Integer; override;
     class function Count(const AWhere: IioWhere): Integer; override;
     // SQLDestinations
     class procedure SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); override;
@@ -418,18 +421,75 @@ begin
   end;
 end;
 
+class function TioStrategyDB.LoadObjVersion(const AContext: IioContext): Integer;
+begin
+  // NB: Ho riflettuto bene sul come ottenere l'ultima ObjVersion (la più alta) assegnata
+  //      per poi aggiungere 1 e ottenere la prossima e ho idnividuato 3 metodi:
+  //      1) SENZA ETM: fa una query che prende l'ObjVersion dell'oggetto dal DB (normale tabella della classe della entity);
+  //          siccome possono verificarsi "salti" tra la versione in memoria e quella sul DB
+  //          (es: due utenti con stesso oggetto in memoria ver. 5, il primo salva e non ci sono conflitti, ora sul DB c'è la ver. 6, il secondo salva
+  //          successivamente e la nuova versione deve essere la 7) in questo caso l'unico modo è di interrogare il DB e farsi dare la versione più alta presente.
+  //          Se un oggetto viene eliminato sul DB e poi qualcuno lo ripersiste (magari lo aveva in memoria da prima del delete) l'ObjVersion ricomincia da 1
+  //          e non vedo soluzione a questa cosa.
+  //      2) CON ETM: se c'è l'ETM per la classe dell'oggetto che si vuole persistere si farà la stessa cosa del punto uno ma in più, se non riuscisse
+  //          ad avere l'ObjVersion perchè l'entità è stata eliminata nel frattempo, allora si eseguirà una seconda query per chiedere all'ETM
+  //          l'ultimo ObjVersion (il maggiore) registrato. In questo modo se l'oggetto era stato eliminato risolviamo il problema del punto 1 ma
+  //          questa penso sarà una cosa non frequente, negli altri casi invece (quindi normalmente) continuiamo a usare il punto 1 che dovrebbe essere
+  //          leggermente più efficiente.
+  inherited;
+  // Step 1: Prova a caricare l'ObjVersion dalla tabella su cui è mappata l'entità
+  Result := LoadObjVersion_FromEntity_Internal(AContext);
+  // Step 2: Se lo step precedente non ha avuto successo prova a caricare l'ObjVersion dall'ETM (se c'è)
+  if (Result = OBJVERSION_NULL) and Assigned(AContext.GetTable.EtmTimeSlotClass) then
+    Result := LoadObjVersion_FromETM_Internal(AContext);
+end;
+
+class function TioStrategyDB.LoadObjVersion_FromEntity_Internal(const AContext: IioContext): Integer;
+var
+  LQuery: IioQuery;
+begin
+  // Create & open query
+  LQuery := TioDBFactory.QueryEngine.GetQuerySelectLastObjVersionFromEntity(AContext);
+  LQuery.Open;
+  try
+    if not LQuery.Eof then
+      Result := LQuery.Fields[0].AsInteger
+    else
+      Result := OBJVERSION_NULL;
+  finally
+    LQuery.Close;
+  end;
+end;
+
+class function TioStrategyDB.LoadObjVersion_FromETM_Internal(const AContext: IioContext): Integer;
+var
+  LQuery: IioQuery;
+begin
+  // Create & open query
+  LQuery := TioDBFactory.QueryEngine.GetQuerySelectLastObjVersionFromEtm(AContext);
+  LQuery.Open;
+  try
+    if not LQuery.Eof then
+      Result := LQuery.Fields[0].AsInteger
+    else
+      Result := OBJVERSION_NULL;
+  finally
+    LQuery.Close;
+  end;
+end;
+
 class function TioStrategyDB.ObjectExists(const AContext: IioContext): Boolean;
 var
-  AQuery: IioQuery;
+  LQuery: IioQuery;
 begin
   inherited;
   // Generate and open the query
-  AQuery := TioDBFactory.QueryEngine.GetQueryExists(AContext);
-  AQuery.Open;
+  LQuery := TioDBFactory.QueryEngine.GetQueryExists(AContext);
+  LQuery.Open;
   try
-    Result := AQuery.Fields[0].AsInteger <> 0;
+    Result := LQuery.Fields[0].AsInteger <> 0;
   finally
-    AQuery.Close;
+    LQuery.Close;
   end;
 end;
 
@@ -474,11 +534,9 @@ end;
 
 class procedure TioStrategyDB._DoPersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
   const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
-type
-  TioPersistActionType = (patInsert, patUpdate, patDelete, patDoNotPersist);
 var
   LContext: IioContext;
-  LPersistActionType: TioPersistActionType;
+  LPersistActionType: TioPersistenceActionType;
 
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
@@ -488,33 +546,33 @@ var
   begin
     LDoneByInterceptor := False;
     case LPersistActionType of
-      patUpdate:
+      atUpdate:
         TioCRUDInterceptorRegister.BeforeUpdate(LContext, LDoneByInterceptor);
-      patInsert:
+      atInsert:
         TioCRUDInterceptorRegister.BeforeInsert(LContext, LDoneByInterceptor);
-      patDelete:
+      atDelete:
         TioCRUDInterceptorRegister.BeforeDelete(LContext, LDoneByInterceptor);
     end;
   end;
   procedure _Interceptors_InterceptAfterAction;
   begin
     case LPersistActionType of
-      patUpdate:
+      atUpdate:
         TioCRUDInterceptorRegister.AfterUpdate(LContext);
-      patInsert:
+      atInsert:
         TioCRUDInterceptorRegister.AfterInsert(LContext);
-      patDelete:
+      atDelete:
         TioCRUDInterceptorRegister.AfterDelete(LContext);
     end;
   end;
   function _Interceptors_InterceptException(const AException: Exception): Boolean;
   begin
     case LPersistActionType of
-      patUpdate:
+      atUpdate:
         Result := TioCRUDInterceptorRegister.OnUpdateException(LContext, AException);
-      patInsert:
+      atInsert:
         Result := TioCRUDInterceptorRegister.OnInsertException(LContext, AException);
-      patDelete:
+      atDelete:
         Result := TioCRUDInterceptorRegister.OnDeleteException(LContext, AException);
     else
       Result := True; // Per sicurezza
@@ -525,7 +583,6 @@ var
 
   procedure _DetectPersistActionType;
   begin
-    LPersistActionType := patDoNotPersist;
     case LContext.ObjStatus of
       osDirty:
         begin
@@ -535,13 +592,14 @@ var
           begin
             // old code: if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
             if ABlindInsert or LContext.IDIsNull or not Self.ObjectExists(LContext) then
-              LPersistActionType := patInsert
+              LPersistActionType := atInsert
             else
-              LPersistActionType := patUpdate;
+              LPersistActionType := atUpdate;
           end;
         end;
       osDeleted:
-        LPersistActionType := patDelete;
+    else
+      LPersistActionType := atDoNotPersist;
     end;
   end;
 
@@ -582,11 +640,11 @@ begin
       // Process the current object
       // --------------------------
       case LPersistActionType of
-        patInsert:
+        atInsert:
           InsertObject_Internal(LContext, ABlindInsert);
-        patUpdate:
+        atUpdate:
           UpdateObject_Internal(LContext);
-        patDelete:
+        atDelete:
           begin
             // PreProcess (delete) relation childs (HasMany, HasOne)
             PreProcessRelationChildOnDelete(LContext);
@@ -950,7 +1008,7 @@ var
     LQuery := TioDBFactory.QueryEngine.GetQuerySelectObject(LOriginalContext);
     LQuery.Open;
     try try
-      // If a record is fuìound then load the object and return True
+      // If a record is found then load the object and return True
       if not LQuery.Eof then
       begin
         // If TrueClassMode is tvSmart then get the specific context for the current record/object else

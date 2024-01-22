@@ -50,6 +50,8 @@ const
 
   IO_CONNECTIONDEF_DEFAULTNAME = 'NO_NAME';
   IO_INTEGER_NULL_VALUE = 0;
+  IO_STRING_NULL_VALUE = '';
+  IO_DATETIME_NULL_VALUE = 0;
 
   IO_CURRENTUSERINFO_NAME_EMPTY = '';
   IO_CURRENTUSERINFO_ID_EMPTY = 0;
@@ -136,13 +138,11 @@ type
   // ltFromBSReloadNewInstance: the bind source receives the object to bind from a source bind source and reloads it AS A NEW INSTANCE for any changes or lazy load
   TioLoadType = (ltManual, ltCreate, ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance, ltAuto);
 
-  // ETM types
+  // Persistence related types
   // Note: Literal description for values added at the end of the "iORM.pas" unit (initialization)
-  TioEtmEventType = (etInsert, etUpdate, etDelete, etSynchro);
-  TioEtmConflictType = (ctNoConflict, ctMasterWin, ctSlaveWin, ctLastUpdatedWin, ctManual);
-
-  // Persistence conflict resolver mode
-  TioConflictResolverMode = (crmRaiseException, crmLatestWin, crmOldestWin, crmServerWin, crmClientWin);
+  TioPersistenceActionType = (atDoNotPersist, atInsert, atUpdate, atDelete);
+  TioPersistenceIntentType = (itRegular, itRevert, itSynchronization);
+  TioPersistenceConflictState = (csUndefined, csResolved, csRejected, csRejectedRaise);
 
   // StdActions related types
   TioBSCloseQueryActionUpdateScope = (usLocal, usDisableIfChilds, usGlobal);

@@ -41,7 +41,7 @@ uses
   iORM.CommonTypes,
   iORM.Where, iORM.Context.Table.Interfaces, System.Rtti,
   iORM.Context.Map.Interfaces, iORM.Where.Interfaces,
-  iORM.LiveBindings.BSPersistence;
+  iORM.LiveBindings.BSPersistence, iORM.ConflictStrategy.Interfaces;
 
 type
 
@@ -54,8 +54,11 @@ type
     FMasterPropertyPath: String;
     FMasterBSPersistence: TioBSPersistence;
     FOriginalNonTrueClassMap: IioMap;
-    FEtmRevertedFromVersion: Integer;
+    FEtmEntityFromVersion: Integer;
+    FPersistenceActionType: TioPersistenceActionType;
+    FPersistenceIntentType: TioPersistenceIntentType;
     FPersistenceConflictDetected: Boolean;
+    FPersistenceConflictState: TioPersistenceConflictState;
     // DataObject
     function GetDataObject: TObject;
     procedure SetDataObject(const AValue: TObject);
@@ -97,12 +100,21 @@ type
     // OriginalResolvedTypeNameNonTrueClass
     procedure SetOriginalNonTrueClassMap(const AMap: IioMap);
     function GetOriginalNonTrueClassMap: IioMap;
-    // EtmRevertedFromVersion
-    function GetEtmRevertedFromVersion: Integer;
-    procedure SetEtmRevertedFromVersion(const Value: Integer);
+    // EtmEntityFromVersion
+    function GetEtmEntityFromVersion: Integer;
+    procedure SetEtmEntityFromVersion(const Value: Integer);
+    // PersistenceActionType
+    function GetPersistenceActionType: TioPersistenceActionType;
+    procedure SetPersistenceActionType(const Value: TioPersistenceActionType);
+    // PersistenceIntentType
+    function GetPersistenceIntentType: TioPersistenceIntentType;
+    procedure SetPersistenceIntentType(const Value: TioPersistenceIntentType);
     // PersistenceConflictDetected
     function GetPersistenceConflictDetected: Boolean;
     procedure SetPersistenceConflictDetected(const Value: Boolean);
+    // PersistenceConflictState
+    function GetPersistenceConflictState: TioPersistenceConflictState;
+    procedure SetPersistenceConflictState(const Value: TioPersistenceConflictState);
   public
     constructor Create(const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
       const AMasterPropertyName, AMasterPropertyPath: String); overload;
@@ -121,6 +133,7 @@ type
     procedure CheckUpdateConflict(const AContext: IioContext); inline;
     procedure ResolveDeleteConflict(const AContext: IioContext); inline;
     procedure ResolveUpdateConflict(const AContext: IioContext); inline;
+    function GetCurrentStrategyName: String;
     // Map
     function Map: IioMap;
     // GroupBy
@@ -141,8 +154,11 @@ type
     property RelationOID: Integer read GetRelationOID write SetRelationOID;
     property MasterPropertyPath: String read GetMasterPropertyPath;
     property MasterBSPersistence: TioBSPersistence read GetMasterBSPersistence;
-    property EtmRevertedFromVersion: Integer read GetEtmRevertedFromVersion write SetEtmRevertedFromVersion;
+    property EtmEntityFromVersion: Integer read GetEtmEntityFromVersion write SetEtmEntityFromVersion;
+    property PersistenceActionType: TioPersistenceActionType read GetPersistenceActionType write SetPersistenceActionType;
+    property PersistenceIntentType: TioPersistenceIntentType read GetPersistenceIntentType write SetPersistenceIntentType;
     property PersistenceConflictDetected: Boolean read GetPersistenceConflictDetected write SetPersistenceConflictDetected;
+    property PersistenceConflictState: TioPersistenceConflictState read GetPersistenceConflictState write SetPersistenceConflictState;
     /// Contiene il nome della classe originaria cioè, nel caso il contesto sia stato creato con
     ///  la TrueClassVirtual (select query) a partire da una resolved class name, contiene il nome
     ///  della classe originaria, quella dalla quale poi si è estratta la TrueClassVirtualMap stessa.
@@ -154,7 +170,7 @@ implementation
 uses
   iORM.Context.Factory, iORM.DB.Factory, System.TypInfo,
   iORM.Context.Container, System.SysUtils, iORM.Exceptions,
-  System.StrUtils, iORM.DB.Interfaces, iORM.ConflictStrategy.Interfaces;
+  System.StrUtils, iORM.DB.Interfaces;
 
 { TioContext }
 
@@ -194,8 +210,11 @@ begin
   FMasterPropertyPath := AMasterPropertyPath + IfThen(AMasterPropertyName.IsEmpty, '', '.') + AMasterPropertyName;
   FMasterBSPersistence := AMasterBSPersistence;
   FOriginalNonTrueClassMap := nil;
-  FEtmRevertedFromVersion := 0;
+  FEtmEntityFromVersion := 0;
+  FPersistenceActionType := atDoNotPersist;
+  FPersistenceIntentType := itRegular;
   FPersistenceConflictDetected := False;
+  FPersistenceConflictState := csUndefined;
 end;
 
 function TioContext.GetClassRef: TioClassRef;
@@ -208,9 +227,9 @@ begin
   Result := FDataObject;
 end;
 
-function TioContext.GetEtmRevertedFromVersion: Integer;
+function TioContext.GetEtmEntityFromVersion: Integer;
 begin
-  Result := FEtmRevertedFromVersion;
+  Result := FEtmEntityFromVersion;
 end;
 
 function TioContext.GetGroupBySql: String;
@@ -227,6 +246,18 @@ end;
 function TioContext.GetRelationOID: Integer;
 begin
   Result := FHasManyChildVirtualPropertyValue;
+end;
+
+function TioContext.GetCurrentStrategyName: String;
+begin
+  case FPersistenceActionType of
+    atUpdate:
+      Result := TioCustomConflictStrategy(GetTable.UpdateConflictStrategy).Name;
+    atDelete:
+      Result := TioCustomConflictStrategy(GetTable.DeleteConflictStrategy).Name;
+  else
+    EioException.Create(ClassName, 'GetCurrentStrategyName', 'Undefined action type.');
+  end;  
 end;
 
 function TioContext.GetID: Integer;
@@ -315,9 +346,24 @@ begin
     Result := FMap;
 end;
 
+function TioContext.GetPersistenceActionType: TioPersistenceActionType;
+begin
+  Result := FPersistenceActionType;
+end;
+
 function TioContext.GetPersistenceConflictDetected: Boolean;
 begin
   Result := FPersistenceConflictDetected;
+end;
+
+function TioContext.GetPersistenceConflictState: TioPersistenceConflictState;
+begin
+  Result := FPersistenceConflictState;
+end;
+
+function TioContext.GetPersistenceIntentType: TioPersistenceIntentType;
+begin
+  Result := FPersistenceIntentType;
 end;
 
 function TioContext.GetProperties: IioProperties;
@@ -340,9 +386,9 @@ begin
   FDataObject := AValue;
 end;
 
-procedure TioContext.SetEtmRevertedFromVersion(const Value: Integer);
+procedure TioContext.SetEtmEntityFromVersion(const Value: Integer);
 begin
-  FEtmRevertedFromVersion := Value;
+  FEtmEntityFromVersion := Value;
 end;
 
 procedure TioContext.SetRelationOID(const Value: Integer);
@@ -441,9 +487,24 @@ begin
   FOriginalNonTrueClassMap := AMap;
 end;
 
+procedure TioContext.SetPersistenceActionType(const Value: TioPersistenceActionType);
+begin
+  FPersistenceActionType := Value;
+end;
+
 procedure TioContext.SetPersistenceConflictDetected(const Value: Boolean);
 begin
   FPersistenceConflictDetected := Value;
+end;
+
+procedure TioContext.SetPersistenceConflictState(const Value: TioPersistenceConflictState);
+begin
+  FPersistenceConflictState := Value;
+end;
+
+procedure TioContext.SetPersistenceIntentType(const Value: TioPersistenceIntentType);
+begin
+  FPersistenceIntentType := Value;
 end;
 
 procedure TioContext.SetWhere(const AWhere: IioWhere);

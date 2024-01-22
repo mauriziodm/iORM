@@ -133,7 +133,7 @@ begin
   if not Assigned(ATimeSlot) then
     raise EioEtmException.Create(ClassName, 'Revert', '"ATimeSlot" parameter cannot be nil.');
   // Delete operation has no state
-  if ATimeSlot.EventType = etDelete then
+  if ATimeSlot.ActionType = atDelete then
     raise EioEtmException.Create(ClassName, 'Revert', Format('Hi, I''m iORM, I have to tell you an important thing.' +
       #13#13'Revert is not allowed for "Delete" type operations because they have no information about the state to restore.' +
       #13#13'The attempt to restore the entity of type "%s" ID %d version %d has failed.', [ATimeSlot.EntityClassName, ATimeSlot.EntityID,

@@ -44,7 +44,8 @@ uses
   iORM.Context.Properties.Interfaces, iORM.Where.SmartBuilder,
   iORM.Interceptor.Strategy.Register, iORM.Interceptor.CRUD.Register,
   iORM.ETM.Engine, iORM.ETM.Interfaces, DJSON.Params,
-  iORM.ConflictStrategy.Interfaces, iORM.ConflictStrategy.SameVersionWin, iORM.ConflictStrategy.LastUpdateWin;
+  iORM.ConflictStrategy.Interfaces, iORM.ConflictStrategy.SameVersionWin, iORM.ConflictStrategy.LastUpdateWin,
+  iORM.Context.Interfaces;
 
 const
   IORM_VERSION = 'iORM 2 (beta 3.3)';
@@ -143,22 +144,24 @@ const
   rtEmbeddedHasMany = iORM.Attributes.rtEmbeddedHasMany;
   rtEmbeddedHasOne = iORM.Attributes.rtEmbeddedHasOne;
 
-  // TioEtmEventType = (etInsert, etUpdate, etDelete, etSynchronization);
-  etInsert = iORM.CommonTypes.etInsert;
-  etUpdate = iORM.CommonTypes.etUpdate;
-  etDelete = iORM.CommonTypes.etDelete;
-  etSynchronization = iORM.CommonTypes.etSynchro;
+  // TioPersistenceActionType = (atDoNotPersist, atInsert, atUpdate, atDelete);
+  atDoNotPersist = iORM.CommonTypes.atDoNotPersist;
+  atInsert = iORM.CommonTypes.atInsert;
+  atUpdate = iORM.CommonTypes.atUpdate;
+  atDelete = iORM.CommonTypes.atDelete;
+  // TioPersistenceIntentType = (itRegular, itRevert, itSynchronization);
+  itRegular = iORM.CommonTypes.itRegular;
+  itRevert = iORM.CommonTypes.itRevert;
+  itSynchronization = iORM.CommonTypes.itSynchronization;
+  // TioPersistenceConflictState = (csUndefined, csResolved, csRejected, csRejectedRaise);
+  csUndefined = iORM.CommonTypes.csUndefined;
+  csResolved = iORM.CommonTypes.csResolved;
+  csRejected = iORM.CommonTypes.csRejected;
+  csRejectedRaise = iORM.CommonTypes.csRejectedRaise;
 
   // TioEtmDiffMode = (dmOneway, dmTwoway);
   dmOneway = iORM.ETM.interfaces.TioEtmDiffMode.dmOneway;
   dmTwoway = iORM.ETM.interfaces.TioEtmDiffMode.dmTwoway;
-
-  // TioEtmConflictType = (ctNoConflict, ctMasterWin, ctSlaveWin, ctLastUpdatedWin, ctManual);
-  ctNoConflict = iORM.CommonTypes.ctNoConflict;
-  ctMasterWin = iORM.CommonTypes.ctMasterWin;
-  ctSlaveWin = iORM.CommonTypes.ctSlaveWin;
-  ctLastUpdatedWin = iORM.CommonTypes.ctLastUpdatedWin;
-  ctManual = iORM.CommonTypes.ctManual;
 
   // TdjSkipScope = (ssMap, ssETM, ssHTTP, ssEmbeddeRelation, ssSUD, ssSaveRevertPoint, ssDJSON);
   ssMap = DJSON.Params.TdjSkipScope.ssMap;
@@ -212,6 +215,11 @@ type
   TioActionShowMode = iORM.StdActions.Interfaces.TioActionShowMode;
   TioActionViewContextBy = iORM.StdActions.Interfaces.TioActionViewContextBy;
 
+  // Persistence types
+  TioPersistenceActionType = iORM.CommonTypes.TioPersistenceActionType;
+  TioPersistenceIntentType = iORM.CommonTypes.TioPersistenceIntentType;
+  TioPersistenceConflictState = iORM.CommonTypes.TioPersistenceConflictState;
+
   // Conflict Strategy
   TioSameVersionWin = iORM.ConflictStrategy.SameVersionWin.TioSameVersionWin;
   TioLastUpdateWin = iORM.ConflictStrategy.LastUpdateWin.TioLastUpdateWin;
@@ -219,8 +227,6 @@ type
   // Entity Time Machine (ETM)
   TioEtmTimeLine = iORM.Attributes.TioEtmTimeline;
   TioEtmCustomTimeSlot = iORM.Attributes.TioEtmCustomTimeSlot;
-  TioEtmEventType = iORM.CommonTypes.TioEtmEventType;
-  TioEtmConflictType = iORM.CommonTypes.TioEtmConflictType;
   TioEtmDiffMode = iORM.ETM.interfaces.TioEtmDiffMode;
 
   // SkipScope (vedi anche sopra (const) i valori)
@@ -387,6 +393,8 @@ type
     class procedure ReloadList(const AListIntf: IInterface; const ALazy: boolean; const ALazyProps: String); overload;
     class procedure ReloadList(const AListIntf: IInterface; const ALazy: boolean = False); overload;
     class procedure ReloadList(const AListIntf: IInterface; const ALazyProps: String); overload;
+    // LoadObjVersion (internal use)
+    class function LoadObjVersion(const AContext: IioContext): Integer;
 
     // Delete (accepting instance to delete directly)
     class procedure DeleteObject(const AObj: TObject); overload;
@@ -471,7 +479,9 @@ type
     class function DBBuilder(const AConnectionDefName: String; const AAddIndexes: boolean = True; const AAddForeignKeys: boolean = True)
       : IioDBBuilderEngine; overload;
 
+    // Dependency Injection Container (DIC)
     class function di: TioDependencyInjectionRef;
+
     class function ExtractOID(const AObj: TObject): Integer; overload;
     class function ExtractOID(const AIntfObj: IInterface): Integer; overload;
     class function GlobalFactory: TioGlobalFactoryRef;
@@ -479,7 +489,7 @@ type
     class procedure ShowMessage(const AMessage: String);
     class function TerminateApplication: boolean;
 
-    // Create instance
+    // Create instance by DIC
     class function Create(const ATypeName: String; const ATypeAlias: String = ''; const AParams: TioConstructorParams = nil): TObject; overload;
     class function Create<T: IInterface>(const ATypeAlias: String = ''; const AParams: TioConstructorParams = nil): T; overload;
 
@@ -716,6 +726,14 @@ begin
   // ----- OLD CODE -----
   // Result := io.Load<T>._Where(AWhere).ToObject;
   // ----- OLD CODE -----
+end;
+
+class function io.LoadObjVersion(const AContext: IioContext): Integer;
+var
+  LConnectionDefName: String;
+begin
+  LConnectionDefName := AContext.GetTable.GetConnectionDefName;
+  Result := TioStrategyFactory.GetStrategy(LConnectionDefName).LoadObjVersion(AContext);
 end;
 
 class procedure io.LoadToList<TItemType>(const AListObj: TObject; const AItemAlias: String);
@@ -1985,8 +2003,9 @@ io.di.RegisterClass<TioDuckTypedStreamObject>.Implements<IioDuckTypedStreamObjec
 TioEnumContainer._Build;
 TioMapContainer._Build;
 
-// ETM types
-io.Enums.Add<TioEtmEventType>('Insert, Update, Delete, Synchronization');
-io.Enums.Add<TioEtmConflictType>('No conflict detected, Master version win, Slave version win, Last updated win, Manual conflict resolution');
+// Enums UI translations
+io.Enums.Add<TioPersistenceActionType>('Do not persist, Insert, Update, Delete');
+io.Enums.Add<TioPersistenceIntentType>('Regular, Revert, Synchronization');
+io.Enums.Add<TioPersistenceConflictState>('Undefined, Resolved, Rejected, Rejected raise');
 
 end.

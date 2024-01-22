@@ -196,12 +196,13 @@ type
     procedure ParamByName_SetValue(const AParamName: String; const AValue: Variant);
     procedure ParamByProp_Clear(const AProp: IioProperty; const ADataType: TFieldType);
     procedure ParamByProp_SetValue(const AProp: IioProperty; const AValue: Variant);
-    // procedure ParamByProp_SetValueAsString(const AProp: IioProperty; const AValue: String);
+    procedure ParamByProp_SetValueAsString(const AProp: IioProperty; const AValue: String);
     procedure ParamByProp_SetValueAsDateTime(const AProp: IioProperty; const AValue: TDateTime);
     procedure ParamByProp_SetValueAsDate(const AProp: IioProperty; const AValue: TDate);
     procedure ParamByProp_SetValueAsTime(const AProp: IioProperty; const AValue: TTime);
-    // procedure ParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
+    procedure ParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
     procedure ParamByProp_SetValueByContext(const AProp: IioProperty; const AContext: IioContext);
+    procedure ParamByProp_SetValueAsInteger(const AProp: IioProperty; const AValue: Integer);
     procedure ParamByProp_SetValueAsIntegerNullIfZero(const AProp: IioProperty; const AValue: Integer);
     procedure ParamByProp_LoadAsStreamObj(const AObj: TObject; const AProperty: IioProperty);
     procedure ParamObjVersion_SetValue(const AContext: IioContext);
@@ -211,9 +212,9 @@ type
     procedure ParamObjUpdated_SetValue(const AContext: IioContext);
     procedure ParamObjUpdatedUserID_SetValue(const AContext: IioContext);
     procedure ParamObjUpdatedUserName_SetValue(const AContext: IioContext);
-    // procedure WhereParamByProp_SetValue(const AProp: IioProperty; const AValue: Variant);
-    // procedure WhereParamByProp_SetValueAsDateTime(const AProp: IioProperty; const AValue: TDateTime);
-    // procedure WhereParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
+    procedure WhereParamByProp_SetValue(const AProp: IioProperty; const AValue: Variant);
+    procedure WhereParamByProp_SetValueAsDateTime(const AProp: IioProperty; const AValue: TDateTime);
+    procedure WhereParamByProp_SetValueAsFloat(const AProp: IioProperty; const AValue: Double);
     procedure WhereParamObjID_SetValue(const AContext: IioContext);
     procedure WhereParamObjVersion_SetValue(const AContext: IioContext);
     // Connection property
@@ -261,11 +262,12 @@ type
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); virtual; abstract;
     class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
     class procedure GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext); virtual;
-    class function GenerateSqlJoinSectionItem(const AJoinItem: IioJoinItem): String; virtual;
     class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
     class procedure GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext); virtual;
     class procedure GenerateSqlUpdate(const AQuery: IioQuery; const AContext: IioContext); virtual;
-    class function GenerateSqlSelectNestedWhere_OLD(const AMap: IioMap; const ANestedCriteria: IioSqlItemCriteria): String; virtual;
+    class procedure GenerateSqlSelectLastObjVersionFromEntity(const AQuery: IioQuery; const AContext: IioContext); virtual;
+    class procedure GenerateSqlSelectLastObjVersionFromETM(const AQuery: IioQuery; const AEtmContext: IioContext); virtual;
+    class function GenerateSqlJoinSectionItem(const AJoinItem: IioJoinItem): String; virtual;
   end;
 
   // Interfaccia per le classi che devono generare le LogicRelations
@@ -388,8 +390,9 @@ type
     class procedure RollbackTransaction(const AConnectionName: String); virtual; abstract;
     class function InTransaction(const AConnectionName: String): Boolean; virtual; abstract;
     class procedure Delete(const AWhere: IioWhere); virtual; abstract;
-    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject; virtual; abstract;
     class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); virtual; abstract;
+    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject; virtual; abstract;
+    class function LoadObjVersion(const AContext: IioContext): Integer; virtual; abstract;
     class function Count(const AWhere: IioWhere): Integer; virtual; abstract;
     // SQLDestinations
     class procedure SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); virtual; abstract;
@@ -412,7 +415,8 @@ uses
   iORM.SqlTranslator, iORM.Strategy.Factory, System.SysUtils, iORM.Attributes,
   iORM.Exceptions, iORM.Utilities, iORM.SqlItems,
   System.StrUtils, iORM.Context.Container, iORM.Resolver.Interfaces,
-  iORM.Resolver.Factory, iORM.Interceptor.Strategy.Register;
+  iORM.Resolver.Factory, iORM.Interceptor.Strategy.Register,
+  iORM.Context.Factory;
 
 { TioSqlGenerator }
 
@@ -480,7 +484,8 @@ begin
   begin
     AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName);
     if AContext.GetProperties.ObjVersionPropertyExist then
-      AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + ' = :' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
+      AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + ' = :' +
+        AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
   end;
   // -----------------------------------------------------------------
 end;
@@ -545,7 +550,8 @@ begin
   // Where conditions
   AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + ' = :' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName);
   if AContext.GetProperties.ObjVersionPropertyExist then
-    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + ' = :' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
+    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + ' = :' +
+      AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
   // -----------------------------------------------------------------
 end;
 
@@ -571,6 +577,28 @@ begin
   // Conditions
   if AJoinItem.GetJoinType <> jtCross then
     Result := Result + ' ON (' + AJoinItem.GetJoinCondition + ')';
+end;
+
+class procedure TioSqlGenerator.GenerateSqlSelectLastObjVersionFromEntity(const AQuery: IioQuery; const AContext: IioContext);
+begin
+  // Build the query text
+  // -----------------------------------------------------------------
+  // Select
+  AQuery.SQL.Add(Format('SELECT %s FROM %s WHERE %s = :%s', [AContext.GetProperties.ObjVersionProperty.GetSqlFieldName, AContext.GetTable.GetSQL,
+    AContext.GetProperties.GetIdProperty.GetSqlFieldName, AContext.GetProperties.GetIdProperty.GetSqlWhereParamName]));
+  // -----------------------------------------------------------------
+end;
+
+class procedure TioSqlGenerator.GenerateSqlSelectLastObjVersionFromETM(const AQuery: IioQuery; const AEtmContext: IioContext);
+begin
+  // Build the query text
+  // -----------------------------------------------------------------
+  // Select
+  AQuery.SQL.Add(Format('SELECT MAX(%s) FROM %s WHERE %s = :%s AND %s = :%s', [AEtmContext.GetProperties.GetPropertyByName('EntityVersion').GetSqlFieldName,
+    AEtmContext.GetTable.GetSQL, AEtmContext.GetProperties.GetPropertyByName('EntityClassName').GetSqlFieldName,
+    AEtmContext.GetProperties.GetPropertyByName('EntityClassName').GetSqlWhereParamName, AEtmContext.GetProperties.GetPropertyByName('EntityID').GetSqlFieldName,
+    AEtmContext.GetProperties.GetPropertyByName('EntityID').GetSqlWhereParamName]));
+  // -----------------------------------------------------------------
 end;
 
 class procedure TioSqlGenerator.GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext);
@@ -610,119 +638,6 @@ begin
   AQuery.SQL.Add(AContext.GetGroupBySql);
   // OrderBy
   AQuery.SQL.Add(AContext.GetOrderBySql);
-end;
-
-class function TioSqlGenerator.GenerateSqlSelectNestedWhere_OLD(const AMap: IioMap; const ANestedCriteria: IioSqlItemCriteria): String;
-var
-  LDotPos: Integer;
-  FQualifiedStartingPropertyName: String;
-  procedure _RecursiveGenerateNestedWhere(const NMasterMap: IioMap; const NNestedPropName: String; const NPreviousBuildingResult: String;
-    var NFinalResult: String; const NIsFirstLoop: Boolean);
-  var
-    LFirstDotPos, LSecondDotPos: Integer;
-    LMasterPropName, LDetailPropName, LRemainingPropName, LTempPropName: String;
-    LDetailMap: IioMap;
-    LMasterProp, LDetailProp, LRelationChildProp: IioProperty;
-    LResolvedTypeList: IioResolvedTypeList;
-    LResolvedTypeName: String;
-    LCurrentBuildingResult: String;
-    LIsFinalLoop: Boolean;
-  begin
-    // Extract the position of the first and second dots in the ANestedPropName string parameter
-    // and set the RemainingPropName for the next recursion if needed,
-    // if the second dot does not exists then set its position to the length of the whole string and stop the recursion
-    LFirstDotPos := Pos('.', NNestedPropName);
-    LSecondDotPos := PosEx('.', NNestedPropName, LFirstDotPos + 1);
-    LRemainingPropName := String.Empty;
-    if LSecondDotPos > 0 then
-      LRemainingPropName := Copy(NNestedPropName, LFirstDotPos + 1, Length(NNestedPropName))
-    else
-      LSecondDotPos := NNestedPropName.Length + 1;
-    // Get the master and detail prop name
-    LMasterPropName := Copy(NNestedPropName, 1, LFirstDotPos - 1);
-    LDetailPropName := Copy(NNestedPropName, LFirstDotPos + 1, LSecondDotPos - LFirstDotPos - 1);
-    // Get the master property
-    LMasterProp := NMasterMap.GetProperties.GetPropertyByName(LMasterPropName);
-    // Resolve the type and alias then loop for all classes in the resolved type list
-    LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(LMasterProp.GetRelationChildTypeName,
-      LMasterProp.GetRelationChildTypeAlias, rmAllDistinctByConnectionAndTable);
-    for LResolvedTypeName in LResolvedTypeList do
-    begin
-      // Get the detail Map but if the current resolved class is not a persisted entity then skip it
-      LDetailMap := TioMapContainer.GetMap(LResolvedTypeName);
-      if LDetailMap.GetTable.IsNotPersistedEntity then
-        Continue;
-      // Get the detail Property but if not exists in the current resolved class then skip it
-      if not LDetailMap.GetProperties.PropertyExists(LDetailPropName) then
-        Continue;
-      LDetailProp := LDetailMap.GetProperties.GetPropertyByName(LDetailPropName);
-      // If the current resolved type is not for the same connection the skip it
-      if not LDetailMap.GetTable.IsForThisConnection(NMasterMap.GetTable.GetConnectionDefName) then
-        Continue;
-      // If the LRemainingPropName is empty then we are in the final loop (recursion is ending)
-      LIsFinalLoop := LRemainingPropName.IsEmpty;
-      // Get the relation type
-      // NB: If the relation type of the DetailProp is rtHasMany/rtHasOne then use it else use those of the MasterProp
-      // if (LDetailProp.GetRelationType = rtHasMany) or (LDetailProp.GetRelationType = rtHasOne) then
-      // LRelationType := LDetailProp.GetRelationType
-      // else
-      // LRelationType := LMasterProp.GetRelationType;
-      // Depending on relation type...
-      case LMasterProp.GetRelationType of
-        // BelongsTo relation type...
-        rtBelongsTo:
-          if LIsFinalLoop then
-            NFinalResult := Format('%s%s(SELECT %s FROM %s WHERE %s = %s)%s%s', [NFinalResult, IfThen(NFinalResult.IsEmpty, '', ' OR '),
-              LDetailProp.GetSqlQualifiedFieldName, LDetailMap.GetTable.GetSQL, LDetailMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName,
-              NPreviousBuildingResult, ANestedCriteria.CompareOpSqlItem.GetSQL, ANestedCriteria.ValueSqlItem.GetSQL(LDetailMap)])
-          else
-          begin
-            if (LDetailProp.GetRelationType = rtHasMany) or (LDetailProp.GetRelationType = rtHasOne) then
-              LTempPropName := LDetailMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName
-            else
-              LTempPropName := LDetailProp.GetSqlQualifiedFieldName;
-            LCurrentBuildingResult := Format('(SELECT %s FROM %s WHERE %s = %s)', [LTempPropName, LDetailMap.GetTable.GetSQL,
-              LDetailMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName, NPreviousBuildingResult]);
-            _RecursiveGenerateNestedWhere(LDetailMap, LRemainingPropName, LCurrentBuildingResult, NFinalResult, False); // Recursion
-          end;
-        // HasOne or HasMany relation type
-        rtHasMany, rtHasOne:
-          begin
-            LRelationChildProp := LDetailMap.GetProperties.GetPropertyByName(LMasterProp.GetRelationChildPropertyName);
-            if LIsFinalLoop then
-              NFinalResult := Format('%s%sEXISTS (SELECT 1 FROM %s WHERE %s = %s AND %s %s %s)', [NFinalResult, IfThen(NFinalResult.IsEmpty, '', ' OR '),
-                LDetailMap.GetTable.GetSQL, LRelationChildProp.GetSqlQualifiedFieldName,
-                IfThen(NIsFirstLoop, NMasterMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName, NPreviousBuildingResult),
-                LDetailProp.GetSqlQualifiedFieldName, ANestedCriteria.CompareOpSqlItem.GetSQL, ANestedCriteria.ValueSqlItem.GetSQL(LDetailMap)])
-            else
-            begin
-              LCurrentBuildingResult := Format('(SELECT %s FROM %s WHERE %s = %s)', [LDetailMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName,
-                LDetailMap.GetTable.GetSQL, LRelationChildProp.GetSqlQualifiedFieldName, NMasterMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName]);
-              _RecursiveGenerateNestedWhere(LDetailMap, LRemainingPropName, LCurrentBuildingResult, NFinalResult, False); // Recursion
-            end;
-          end;
-      else
-        raise EioException.Create(ClassName, 'GenerateSqlSelectNestedWhere', Format('Wrong relation type (%s) on property "%s" of class "%s"',
-          [TioUtilities.EnumToString<TioRelationType>(LMasterProp.GetRelationType), LMasterProp.GetName, NMasterMap.GetClassName]));
-      end;
-    end;
-  end;
-
-begin
-  Result := String.Empty;
-  LDotPos := Pos('.', ANestedCriteria.PropertyName);
-  if LDotPos > 0 then
-  begin
-    // Ricorda che il parametro "NPreviousBuildingResult" deve essere valorizzato con il GetSqlQualifiedFieldName della proprietà di inizio (es: ORDER.CUSTOMER)
-    // Extract the qualified name of the first property in the nested property name
-    FQualifiedStartingPropertyName := Copy(ANestedCriteria.PropertyName, 1, LDotPos - 1);
-    FQualifiedStartingPropertyName := AMap.GetProperties.GetPropertyByName(FQualifiedStartingPropertyName).GetSqlQualifiedFieldName;
-    // Recursion entry point and final build of the result
-    _RecursiveGenerateNestedWhere(AMap, ANestedCriteria.PropertyName, FQualifiedStartingPropertyName, Result, True);
-    Result := Format('(%s)', [Result]);
-  end
-  else
-    raise EioException.Create(ClassName, 'GenerateSqlSelectNestedWhere', 'Dot char not found on nested property name.');
 end;
 
 class procedure TioSqlGenerator.LoadSqlParamsFromContext(const AQuery: IioQuery; const AContext: IioContext);
