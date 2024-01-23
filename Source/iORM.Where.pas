@@ -130,7 +130,7 @@ type
     function _ToLazyObject(const AObj: TObject = nil): TObject; overload;
     function _ToLazyObject(const AIntf: IInterface): TObject; overload;
 
-    function _ToObjectInternalByClassOnly(const AObj: TObject = nil): TObject;
+    function _ToObjectInternalByClassOnly(const AIntent: TioPersistenceIntentType; const AObj: TObject = nil): TObject;
     function ToObject(const AObj: TObject = nil): TObject; overload;
     function ToObject(const AIntf: IInterface): TObject; overload;
 
@@ -1372,9 +1372,9 @@ begin
   Result := _ToLazyObject(AIntf as TObject);
 end;
 
-function TioWhere._ToObjectInternalByClassOnly(const AObj: TObject = nil): TObject;
+function TioWhere._ToObjectInternalByClassOnly(const AIntent: TioPersistenceIntentType; const AObj: TObject = nil): TObject;
 begin
-  Result := TioStrategyFactory.GetStrategy('').LoadObjectByClassOnly(Self, AObj);
+  Result := TioStrategyFactory.GetStrategy('').LoadObjectByClassOnly(Self, AObj, AIntent);
 end;
 
 function TioWhere._Value(AValue: IInterface): IioWhere;

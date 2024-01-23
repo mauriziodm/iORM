@@ -39,7 +39,7 @@ uses
   iORM.Context.Interfaces,
   iORM.Context.Properties.Interfaces, iORM.Where.Interfaces,
   iORM.DB.Interfaces, FireDAC.Comp.DataSet, Data.DB,
-  iORM.LiveBindings.BSPersistence;
+  iORM.LiveBindings.BSPersistence, iORM.CommonTypes;
 
 type
 
@@ -57,14 +57,14 @@ type
     class function LoadObjVersion_FromETM_Internal(const AContext: IioContext): Integer;
   protected
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------
-    class procedure _DoPersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
+    class procedure _DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
-    class procedure _DoPersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
+    class procedure _DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
-    class procedure _DoDeleteObject(const AObj: TObject); override;
-    class procedure _DoDeleteList(const AList: TObject); override;
-    class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject); override;
-    class function _DoLoadObject(const AWhere: IioWhere; const AObj: TObject): TObject; override;
+    class procedure _DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType); override;
+    class procedure _DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType); override;
+    class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType); override;
+    class function _DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
     // ---------- End intercepted methods (StrategyInterceptors) ----------
   public
     class procedure StartTransaction(const AConnectionName: String); override;
@@ -72,7 +72,7 @@ type
     class procedure RollbackTransaction(const AConnectionName: String); override;
     class function InTransaction(const AConnectionName: String): Boolean; override;
     class procedure Delete(const AWhere: IioWhere); override;
-    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject; override;
+    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
     class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
     class function LoadObjVersion(const AContext: IioContext): Integer; override;
     class function Count(const AWhere: IioWhere): Integer; override;
@@ -84,7 +84,7 @@ type
 implementation
 
 uses
-  iORM.Context.Factory, iORM.CommonTypes, iORM.Attributes,
+  iORM.Context.Factory, iORM.Attributes,
   iORM.DB.ConnectionContainer, iORM.DB.Factory, iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory, iORM.Resolver.Interfaces, iORM.ObjectsForge.Factory,
   iORM.LazyLoad.Factory, iORM.Resolver.Factory, iORM.Where.Factory,
@@ -104,7 +104,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    function GetContext(const AClassName: String; const AWhere: IioWhere): IioContext;
+    function GetContext(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere): IioContext;
   end;
 
 { TioStrategyDB }
@@ -147,7 +147,7 @@ begin
     for AResolvedTypeName in AResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(AResolvedTypeName, AWhere, nil, nil, '', '');
+      AContext := TioContextFactory.Context(itRegular, AResolvedTypeName, AWhere, nil, nil, '', '');
       // If the object is of a class mapped as NotPersisted then continue
       if AContext.Map.GetTable.IsNotPersistedEntity then
         Exit;
@@ -192,7 +192,7 @@ begin
     for AResolvedTypeName in AResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(AResolvedTypeName, AWhere, nil, nil, '', '');
+      AContext := TioContextFactory.Context(itRegular, AResolvedTypeName, AWhere, nil, nil, '', '');
       // If the object is of a class mapped as NotPersisted then skip it
       if AContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
@@ -210,7 +210,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB._DoDeleteList(const AList: TObject);
+class procedure TioStrategyDB._DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType);
 var
   ADuckTypedList: IioDuckTypedList;
   AObj: TObject;
@@ -241,7 +241,7 @@ begin
     for AObj in ADuckTypedList do
     begin
       // Persist object
-      Self._DoDeleteObject(AObj);
+      Self._DoDeleteObject(AObj, AIntent);
     end;
     Self.CommitTransaction('');
   except
@@ -250,7 +250,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB._DoDeleteObject(const AObj: TObject);
+class procedure TioStrategyDB._DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType);
 var
   LContext: IioContext;
 
@@ -266,7 +266,7 @@ begin
   if not Assigned(AObj) then
     Exit;
   // Create Context (Create a dummy ioWhere first to pass ConnectionName parameter only).
-  LContext := TioContextFactory.Context(AObj.ClassName, nil, AObj, nil, '', '');
+  LContext := TioContextFactory.Context(AIntent, AObj.ClassName, nil, AObj, nil, '', '');
   // If the object is of a class mapped as NotPersisted then exit
   if LContext.Map.GetTable.IsNotPersistedEntity then
     Exit;
@@ -395,7 +395,7 @@ begin
   Result := TioDBFactory.Connection(AConnectionName).InTransaction;
 end;
 
-class function TioStrategyDB.LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject;
+class function TioStrategyDB.LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
 var
   LContext: IioContext;
   LQuery: IioQuery;
@@ -404,7 +404,7 @@ begin
   // Init
   Result := AObj;
   // Get the Context
-  LContext := TioContextFactory.Context(AWhere.TypeName, AWhere, Result, nil, '', '');
+  LContext := TioContextFactory.Context(AIntent, AWhere.TypeName, AWhere, Result, nil, '', '');
   // If the object is of a class mapped as NotPersisted then skip it
   if LContext.Map.GetTable.IsNotPersistedEntity then
     Exit;
@@ -493,8 +493,8 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB._DoPersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
-  const ABlindInsert: Boolean; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
+class procedure TioStrategyDB._DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LDuckTypedList: IioDuckTypedList;
   LObj: TObject;
@@ -523,7 +523,7 @@ begin
     LDuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
     // Loop the list
     for LObj in LDuckTypedList do
-      _DoPersistObject(LObj, ARelationPropertyName, ARelationOID, ABlindInsert, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath);
+      _DoPersistObject(LObj, AIntent, ARelationPropertyName, ARelationOID, ABlindInsert, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath);
     // Commit the transaction
     CommitTransaction('');
   except
@@ -532,11 +532,10 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB._DoPersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
-  const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
+class procedure TioStrategyDB._DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LContext: IioContext;
-  LPersistActionType: TioPersistenceActionType;
 
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
@@ -545,7 +544,7 @@ var
   procedure _Interceptors_InterceptBeforeAction;
   begin
     LDoneByInterceptor := False;
-    case LPersistActionType of
+    case LContext.PersistenceActionType of
       atUpdate:
         TioCRUDInterceptorRegister.BeforeUpdate(LContext, LDoneByInterceptor);
       atInsert:
@@ -556,7 +555,7 @@ var
   end;
   procedure _Interceptors_InterceptAfterAction;
   begin
-    case LPersistActionType of
+    case LContext.PersistenceActionType of
       atUpdate:
         TioCRUDInterceptorRegister.AfterUpdate(LContext);
       atInsert:
@@ -567,7 +566,7 @@ var
   end;
   function _Interceptors_InterceptException(const AException: Exception): Boolean;
   begin
-    case LPersistActionType of
+    case LContext.PersistenceActionType of
       atUpdate:
         Result := TioCRUDInterceptorRegister.OnUpdateException(LContext, AException);
       atInsert:
@@ -592,14 +591,14 @@ var
           begin
             // old code: if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
             if ABlindInsert or LContext.IDIsNull or not Self.ObjectExists(LContext) then
-              LPersistActionType := atInsert
+              LContext.PersistenceActionType := atInsert
             else
-              LPersistActionType := atUpdate;
+              LContext.PersistenceActionType := atUpdate;
           end;
         end;
       osDeleted:
     else
-      LPersistActionType := atDoNotPersist;
+      LContext.PersistenceActionType := atDoNotPersist;
     end;
   end;
 
@@ -609,7 +608,7 @@ begin
   if not Assigned(AObj) then
     Exit;
   // Create Context
-  LContext := TioContextFactory.Context(AObj.ClassName, nil, AObj, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath);
+  LContext := TioContextFactory.Context(AIntent, AObj.ClassName, nil, AObj, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath);
   // If the object is of a class mapped as NotPersisted then exit
   if LContext.Map.GetTable.IsNotPersistedEntity then
     Exit;
@@ -639,7 +638,7 @@ begin
       PreProcessRelationChildOnPersist(LContext);
       // Process the current object
       // --------------------------
-      case LPersistActionType of
+      case LContext.PersistenceActionType of
         atInsert:
           InsertObject_Internal(LContext, ABlindInsert);
         atUpdate:
@@ -854,7 +853,7 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LContext := TioContextFactory.Context(LResolvedTypeName, AWhere, nil, nil, '', '');
+      LContext := TioContextFactory.Context(itRegular, LResolvedTypeName, AWhere, nil, nil, '', '');
       // If the object is of a class mapped as NotPersisted then skip it
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
@@ -872,7 +871,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB._DoLoadList(const AWhere: IioWhere; const AList: TObject);
+class procedure TioStrategyDB._DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType);
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
@@ -906,7 +905,7 @@ var
         // If TrueClassMode is tvSmart then get the specific context for the current record/object else
         //  use the original context
         if LOriginalContext.GetTrueClass.Mode = tcSmart then
-          LCurrentContext := LContextCache.GetContext(LQuery.ExtractTrueClassName(LOriginalContext), AWhere)
+          LCurrentContext := LContextCache.GetContext(AIntent, LQuery.ExtractTrueClassName(LOriginalContext), AWhere)
         else
           LCurrentContext := LOriginalContext;
         // Clean the DataObject (it contains the previous)
@@ -965,7 +964,7 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LOriginalContext := TioContextFactory.TrueClassVirtualContextIfEnabled(LResolvedTypeName, AWhere);
+      LOriginalContext := TioContextFactory.TrueClassVirtualContextIfEnabled(AIntent, LResolvedTypeName, AWhere);
       // If the object is of a class mapped as NotPersisted then skip it
       if LOriginalContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
@@ -983,7 +982,7 @@ begin
   end;
 end;
 
-class function TioStrategyDB._DoLoadObject(const AWhere: IioWhere; const AObj: TObject): TObject;
+class function TioStrategyDB._DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
@@ -1014,7 +1013,7 @@ var
         // If TrueClassMode is tvSmart then get the specific context for the current record/object else
         //  use the original context
         if LOriginalContext.GetTrueClass.Mode = tcSmart then
-          LCurrentContext := TioContextFactory.Context(LQuery.ExtractTrueClassName(LOriginalContext), AWhere, Result, nil, '', '')
+          LCurrentContext := TioContextFactory.Context(AIntent, LQuery.ExtractTrueClassName(LOriginalContext), AWhere, Result, nil, '', '')
         else
           LCurrentContext := LOriginalContext;
         // Create the object as TObject (Intercepted by CRUDInterceptors)
@@ -1068,7 +1067,7 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LOriginalContext := TioContextFactory.TrueClassVirtualContextIfEnabled(LResolvedTypeName, AWhere);
+      LOriginalContext := TioContextFactory.TrueClassVirtualContextIfEnabled(AIntent, LResolvedTypeName, AWhere);
       // If the object is of a class mapped as NotPersisted then skip it
       if LOriginalContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
@@ -1131,11 +1130,11 @@ begin
   inherited;
 end;
 
-function TioContextCache.GetContext(const AClassName: String; const AWhere: IioWhere): IioContext;
+function TioContextCache.GetContext(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere): IioContext;
 begin
   // If the map is not already present in the cache then create and add it
   if not FContainer.ContainsKey(AClassName) then
-    FContainer.Add(AClassName, TioContextFactory.Context(AClassName, AWhere, nil, nil, '', ''));
+    FContainer.Add(AClassName, TioContextFactory.Context(AIntent, AClassName, AWhere, nil, nil, '', ''));
   // Return the requested context and set its DataObject to nil
   Result := FContainer.Items[AClassName];
   Result.DataObject := nil;

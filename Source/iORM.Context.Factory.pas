@@ -67,9 +67,9 @@ type
       const AMetadata_FKOnDeleteAction: TioFKAction; const AMetadata_FKOnUpdateAction: TioFKAction): IioProperty;
   public
     class function Map(const AClassRef: TioClassRef): IioMap;
-    class function Context(const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
+    class function Context(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
       const AMasterPropertyName, AMasterPropertyPath: String): IioContext;
-    class function TrueClassVirtualContextIfEnabled(const AClassName: String; const AWhere: IioWhere): IioContext;
+    class function TrueClassVirtualContextIfEnabled(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere): IioContext;
     class procedure GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
   end;
 
@@ -118,14 +118,14 @@ begin
   Result := TioHasManyChildVirtualProperty.Create(ATable);
 end;
 
-class function TioContextFactory.Context(const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject;
-  const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String): IioContext;
+class function TioContextFactory.Context(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
+      const AMasterPropertyName, AMasterPropertyPath: String): IioContext;
 begin
   // Get the Context
-  Result := TioContext.Create(TioMapContainer.GetMap(AClassName), AWhere, ADataObject, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath);
+  Result := TioContext.Create(AIntent, TioMapContainer.GetMap(AClassName), AWhere, ADataObject, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath);
 end;
 
-class function TioContextFactory.TrueClassVirtualContextIfEnabled(const AClassName: String; const AWhere: IioWhere): IioContext;
+class function TioContextFactory.TrueClassVirtualContextIfEnabled(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere): IioContext;
 var
   LMap: IioMap;
 begin
@@ -134,11 +134,11 @@ begin
   LMap := TioMapContainer.GetMap(AClassName);
   if LMap.GetTable.IsTrueClass then
   begin
-    Result := TioContext.Create(LMap.GetTrueClassVirtualMap, AWhere, nil, nil, '', '');
+    Result := TioContext.Create(AIntent, LMap.GetTrueClassVirtualMap, AWhere, nil, nil, '', '');
     Result.OriginalNonTrueClassMap := LMap;
   end
   else
-    Result := TioContext.Create(LMap, AWhere, nil, nil, '', '');
+    Result := TioContext.Create(AIntent, LMap, AWhere, nil, nil, '', '');
 end;
 
 class procedure TioContextFactory.GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;

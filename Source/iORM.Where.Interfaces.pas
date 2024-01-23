@@ -89,7 +89,7 @@ type
     function ToMemTable: TFDMemTable; overload;
     procedure ToMemTable(const AMemTable:TFDMemTable); overload;
 
-    function _ToObjectInternalByClassOnly(const AObj:TObject=nil): TObject;
+    function _ToObjectInternalByClassOnly(const AIntent: TioPersistenceIntentType; const AObj:TObject=nil): TObject;
     function ToObject(const AObj:TObject=nil): TObject; overload;
     function ToObject(const AIntf:IInterface): TObject; overload;
 

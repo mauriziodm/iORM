@@ -375,14 +375,14 @@ type
   TioStrategyIntf = class abstract
   protected
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------
-    class procedure _DoPersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
+    class procedure _DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); virtual; abstract;
-    class procedure _DoPersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
+    class procedure _DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); virtual; abstract;
-    class procedure _DoDeleteObject(const AObj: TObject); virtual; abstract;
-    class procedure _DoDeleteList(const AList: TObject); virtual; abstract;
-    class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject); virtual; abstract;
-    class function _DoLoadObject(const AWhere: IioWhere; const AObj: TObject): TObject; virtual; abstract;
+    class procedure _DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType); virtual; abstract;
+    class procedure _DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType); virtual; abstract;
+    class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType); virtual; abstract;
+    class function _DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; virtual; abstract;
     // ---------- End intercepted methods (StrategyInterceptors) ----------
   public
     class procedure StartTransaction(const AConnectionName: String); virtual; abstract;
@@ -391,7 +391,7 @@ type
     class function InTransaction(const AConnectionName: String): Boolean; virtual; abstract;
     class procedure Delete(const AWhere: IioWhere); virtual; abstract;
     class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); virtual; abstract;
-    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject; virtual; abstract;
+    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; virtual; abstract;
     class function LoadObjVersion(const AContext: IioContext): Integer; virtual; abstract;
     class function Count(const AWhere: IioWhere): Integer; virtual; abstract;
     // SQLDestinations
@@ -808,7 +808,7 @@ begin
 {$ENDIF}
 {$ENDREGION}
 
-  _DoDeleteList(AList);
+  _DoDeleteList(AList, AIntent);
 
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
@@ -834,7 +834,7 @@ begin
 {$ENDIF}
 {$ENDREGION}
 
-  _DoDeleteObject(AObj);
+  _DoDeleteObject(AObj, AIntent);
 
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
@@ -860,7 +860,7 @@ begin
 {$ENDIF}
 {$ENDREGION}
 
-  _DoLoadList(AWhere, AList);
+  _DoLoadList(AWhere, AList, AIntent);
 
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
@@ -887,7 +887,7 @@ begin
 {$ENDIF}
 {$ENDREGION}
 
-  Result := _DoLoadObject(AWhere, Result);
+  Result := _DoLoadObject(AWhere, Result, AIntent);
 
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
@@ -914,7 +914,7 @@ begin
 {$ENDIF}
 {$ENDREGION}
 
-  _DoPersistList(AList, ARelationPropertyName, ARelationOID, ABlindInsert, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath);
+  _DoPersistList(AList, AIntent, ARelationPropertyName, ARelationOID, ABlindInsert, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath);
 
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
@@ -941,7 +941,7 @@ begin
 {$ENDIF}
 {$ENDREGION}
 
-  _DoPersistObject(AObj, ARelationPropertyName, ARelationOID, ABlindInsert, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath);
+  _DoPersistObject(AObj, AIntent, ARelationPropertyName, ARelationOID, ABlindInsert, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath);
 
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}

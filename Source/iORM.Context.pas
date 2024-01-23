@@ -116,7 +116,7 @@ type
     function GetPersistenceConflictState: TioPersistenceConflictState;
     procedure SetPersistenceConflictState(const Value: TioPersistenceConflictState);
   public
-    constructor Create(const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
+    constructor Create(const AIntent: TioPersistenceIntentType; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
       const AMasterPropertyName, AMasterPropertyPath: String); overload;
     function GetClassRef: TioClassRef;
     function GetID: Integer;
@@ -199,8 +199,8 @@ begin
   TioCustomConflictStrategy(GetTable.GetUpdateConflictStrategy).ResolveUpdateConflict(AContext);
 end;
 
-constructor TioContext.Create(const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
-  const AMasterPropertyName, AMasterPropertyPath: String);
+constructor TioContext.Create(const AIntent: TioPersistenceIntentType; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
+      const AMasterPropertyName, AMasterPropertyPath: String);
 begin
   inherited Create;
   FMap := AMap;
@@ -211,8 +211,8 @@ begin
   FMasterBSPersistence := AMasterBSPersistence;
   FOriginalNonTrueClassMap := nil;
   FEtmEntityFromVersion := 0;
+  FPersistenceIntentType := AIntent;
   FPersistenceActionType := atDoNotPersist;
-  FPersistenceIntentType := itRegular;
   FPersistenceConflictDetected := False;
   FPersistenceConflictState := csUndefined;
 end;

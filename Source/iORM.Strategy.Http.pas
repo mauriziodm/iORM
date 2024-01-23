@@ -37,7 +37,7 @@ interface
 
 uses
   iORM.Strategy.Interfaces, iORM.Where.Interfaces, iORM.DB.Interfaces,
-  FireDAC.Comp.DataSet, iORM.LiveBindings.BSPersistence;
+  FireDAC.Comp.DataSet, iORM.LiveBindings.BSPersistence, iORM.CommonTypes;
 
 type
 
@@ -49,14 +49,14 @@ type
     // class function GetTransactionGUID: String;
   protected
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------
-    class procedure _DoPersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
+    class procedure _DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
-    class procedure _DoPersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
+    class procedure _DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
-    class procedure _DoDeleteObject(const AObj: TObject); override;
-    class procedure _DoDeleteList(const AList: TObject); override;
-    class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject); override;
-    class function _DoLoadObject(const AWhere: IioWhere; const AObj: TObject): TObject; override;
+    class procedure _DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType); override;
+    class procedure _DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType); override;
+    class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType); override;
+    class function _DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
     // ---------- End intercepted methods (StrategyInterceptors) ----------
   public
     class procedure StartTransaction(const AConnectionName: String); override;
@@ -64,7 +64,7 @@ type
     class procedure RollbackTransaction(const AConnectionName: String); override;
     class function InTransaction(const AConnectionName: String): boolean; override;
     class procedure Delete(const AWhere: IioWhere); override;
-    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject; override;
+    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
     class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
     class function Count(const AWhere: IioWhere): Integer; override;
     // SQLDestinations
@@ -142,7 +142,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyHttp._DoDeleteList(const AList: TObject);
+class procedure TioStrategyHttp._DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType);
 var
   LConnection: IioConnectionHttp;
 begin
@@ -170,7 +170,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyHttp._DoDeleteObject(const AObj: TObject);
+class procedure TioStrategyHttp._DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType);
 var
   LConnectionDefName: String;
   LConnection: IioConnectionHttp;
@@ -242,7 +242,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyHttp._DoLoadList(const AWhere: IioWhere; const AList: TObject);
+class procedure TioStrategyHttp._DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType);
 var
   LConnection: IioConnectionHttp;
 begin
@@ -274,7 +274,7 @@ begin
   end;
 end;
 
-class function TioStrategyHttp._DoLoadObject(const AWhere: IioWhere; const AObj: TObject): TObject;
+class function TioStrategyHttp._DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
 var
   LConnection: IioConnectionHttp;
 begin
@@ -305,7 +305,7 @@ begin
   end;
 end;
 
-class function TioStrategyHttp.LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject): TObject;
+class function TioStrategyHttp.LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
 begin
   // This method is only used internally by the Object Maker,
   // and then you do not need to implement it in RESTStrategy.
@@ -321,8 +321,8 @@ end;
 // end;
 
 { TODO : DA AGGIUNGERE GESTIONE DEI 3 PARAMETRI AGGIUNTI ALLA FINE PER IL SUD }
-class procedure TioStrategyHttp._DoPersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
-  const ABlindInsert: boolean; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
+class procedure TioStrategyHttp._DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LConnection: IioConnectionHttp;
 begin
@@ -357,8 +357,8 @@ begin
 end;
 
 { TODO : DA AGGIUNGERE GESTIONE DEI 3 PARAMETRI AGGIUNTI ALLA FINE PER IL SUD }
-class procedure TioStrategyHttp._DoPersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
-  const ABlindInsert: boolean; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
+class procedure TioStrategyHttp._DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LConnectionDefName: String;
   LConnection: IioConnectionHttp;
