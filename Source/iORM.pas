@@ -396,11 +396,14 @@ type
     // LoadObjVersion (internal use)
     class function LoadObjVersion(const AContext: IioContext): Integer;
 
-    // Delete (accepting instance to delete directly)
+    // DeleteObject (accepting instance to delete directly)
     class procedure DeleteObject(const AObj: TObject); overload;
     class procedure DeleteObject(const AIntfObj: IInterface); overload;
+    class procedure _DeleteObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType); static;
+    // DeleteList (accepting instance to delete directly)
     class procedure DeleteList(const AListObj: TObject); overload;
     class procedure DeleteList(const AListIntf: IInterface); overload;
+    class procedure _DeleteListInternal(const AListObj: TObject; const AIntent: TioPersistenceIntentType); static;
     // Delete (accepting generic type to delete and ciriteria)
     // NB: Ho volutamente eliminato questi metodi perchè generavano direttamente una query DELETE senza
     //      però gli oggetti vivi dietro quindi senza poi considerare eventuali oggetti child/dettaglio
@@ -434,7 +437,7 @@ type
     class function NotExists<T>(const AWhere: IioWhere): boolean; overload;
     class function NotExists<T>(const ATypeAlias: String; const AWhere: IioWhere): boolean; overload;
 
-    // Persist (accepting instance to persist directly)
+    // PersistObject (accepting instance to persist directly)
     class procedure PersistObject(const AObj: TObject; const ABlindInsert: boolean = False); overload;
     class procedure PersistObject(const AIntfObj: IInterface; const ABlindInsert: boolean = False); overload;
     class procedure _PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindInsert: boolean = False); static;
@@ -1620,11 +1623,8 @@ begin
 end;
 
 class procedure io.DeleteObject(const AObj: TObject);
-var
-  LConnectionDefName: String;
 begin
-  LConnectionDefName := TioMapContainer.GetConnectionDefName(AObj.ClassName);
-  TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteObject(AObj, itRegular);
+  _DeleteObjectInternal(AObj, itRegular);
 end;
 
 class function io.DBBuilder(const AConnectionDefName: String; const AAddIndexes, AAddForeignKeys: boolean): IioDBBuilderEngine;
@@ -1644,20 +1644,17 @@ end;
 
 class procedure io.DeleteObject(const AIntfObj: IInterface);
 begin
-  Self.DeleteObject(AIntfObj as TObject);
+  _DeleteObjectInternal(AIntfObj as TObject, itRegular);
 end;
 
 class procedure io.DeleteList(const AListIntf: IInterface);
 begin
-  Self.DeleteList(AListIntf as TObject);
+  _DeleteListInternal(AListIntf as TObject, itRegular)
 end;
 
 class procedure io.DeleteList(const AListObj: TObject);
-var
-  LConnectionDefName: String;
 begin
-  LConnectionDefName := TioConnectionManager.GetCurrentConnectionName;
-  TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteList(AListObj, itRegular);
+  _DeleteListInternal(AListObj, itRegular)
 end;
 
 class function io.di: TioDependencyInjectionRef;
@@ -1750,6 +1747,22 @@ begin
   Result.TypeName := TioUtilities.TypeInfoToTypeName(ATypeInfo);
   Result.TypeAlias := ATypeAlias;
   Result.TypeInfo := ATypeInfo;
+end;
+
+class procedure io._DeleteListInternal(const AListObj: TObject; const AIntent: TioPersistenceIntentType);
+var
+  LConnectionDefName: String;
+begin
+  LConnectionDefName := TioConnectionManager.GetCurrentConnectionName;
+  TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteList(AListObj, AIntent);
+end;
+
+class procedure io._DeleteObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType);
+var
+  LConnectionDefName: String;
+begin
+  LConnectionDefName := TioMapContainer.GetConnectionDefName(AObj.ClassName);
+  TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteObject(AObj, AIntent);
 end;
 
 class procedure io._PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindInsert: boolean = False);
