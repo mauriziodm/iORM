@@ -398,14 +398,14 @@ type
     class procedure SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); virtual; abstract;
     class procedure SQLDest_Execute(const ASQLDestination: IioSQLDestination); virtual; abstract;
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------
-    class procedure PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
+    class procedure PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
-    class procedure PersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
+    class procedure PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
-    class procedure DeleteObject(const AObj: TObject);
-    class procedure DeleteList(const AList: TObject);
-    class procedure LoadList(const AWhere: IioWhere; const AList: TObject);
-    class function LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject;
+    class procedure DeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType);
+    class procedure DeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType);
+    class procedure LoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType);
+    class function LoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
     // ---------- End intercepted methods (StrategyInterceptors) ----------
   end;
 
@@ -791,7 +791,7 @@ end;
 
 { TioStrategyIntf }
 
-class procedure TioStrategyIntf.DeleteList(const AList: TObject);
+class procedure TioStrategyIntf.DeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
 var
@@ -817,7 +817,7 @@ begin
 {$ENDREGION}
 end;
 
-class procedure TioStrategyIntf.DeleteObject(const AObj: TObject);
+class procedure TioStrategyIntf.DeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
 var
@@ -843,7 +843,7 @@ begin
 {$ENDREGION}
 end;
 
-class procedure TioStrategyIntf.LoadList(const AWhere: IioWhere; const AList: TObject);
+class procedure TioStrategyIntf.LoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
 var
@@ -869,7 +869,7 @@ begin
 {$ENDREGION}
 end;
 
-class function TioStrategyIntf.LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject;
+class function TioStrategyIntf.LoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
 var
@@ -896,8 +896,8 @@ begin
 {$ENDREGION}
 end;
 
-class procedure TioStrategyIntf.PersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
-  const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
+class procedure TioStrategyIntf.PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
 var
@@ -923,8 +923,8 @@ begin
 {$ENDREGION}
 end;
 
-class procedure TioStrategyIntf.PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
-  const ABlindInsert: Boolean; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
+class procedure TioStrategyIntf.PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
 var
