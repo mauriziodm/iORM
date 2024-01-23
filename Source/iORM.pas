@@ -435,15 +435,17 @@ type
     class function NotExists<T>(const ATypeAlias: String; const AWhere: IioWhere): boolean; overload;
 
     // Persist (accepting instance to persist directly)
-    class procedure PersistObject(const AObj: TObject; const ABlindInsert: boolean = False); overload;
-    class procedure PersistObject(const AIntfObj: IInterface; const ABlindInsert: boolean = False); overload;
-    class procedure _PersistInternal(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); overload;
+    class procedure PersistObject(const AObj: TObject; const ABlindInsert: boolean = False); overload; static; inline;
+    class procedure PersistObject(const AIntfObj: IInterface; const ABlindInsert: boolean = False); overload; static; inline;
+    class procedure _PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindInsert: boolean = False); static; inline;
+    class procedure _PersistObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); static;
     // PersistCollection (accepting instance to persist directly)
-    class procedure PersistList(const AList: TObject; const ABlindInsert: boolean = False); overload;
-    class procedure PersistList(const AListIntf: IInterface; const ABlindInsert: boolean = False); overload;
-    class procedure _PersistListInternal(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); overload;
+    class procedure PersistList(const AList: TObject; const ABlindInsert: boolean = False); overload; static; inline;
+    class procedure PersistList(const AListIntf: IInterface; const ABlindInsert: boolean = False); overload; static; inline;
+    class procedure _PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindInsert: boolean = False); static; inline;
+    class procedure _PersistListInternal(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); overload; static;
 
     class procedure StartTransaction(const AConnectionName: String = '');
     class procedure CommitTransaction(const AConnectionName: String = '');
@@ -871,35 +873,40 @@ begin
   Result := AWhere.NotExists;
 end;
 
-class procedure io._PersistInternal(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
-  const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
+class procedure io._PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindInsert: boolean);
+begin
+  _PersistObjectInternal(AObj, AIntent, '', 0, ABlindInsert, nil, '', '');
+end;
+
+class procedure io._PersistObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LConnectionDefName: String;
 begin
   LConnectionDefName := TioMapContainer.GetConnectionDefName(AObj.ClassName);
   // Get the strategy and call the proper funtionality
-  TioStrategyFactory.GetStrategy(LConnectionDefName).PersistObject(AObj, ARelationPropertyName, ARelationOID, ABlindInsert, AMasterBSPersistence,
+  TioStrategyFactory.GetStrategy(LConnectionDefName).PersistObject(AObj, AIntent, ARelationPropertyName, ARelationOID, ABlindInsert, AMasterBSPersistence,
     AMasterPropertyName, AMasterPropertyPath);
 end;
 
 class procedure io.PersistObject(const AIntfObj: IInterface; const ABlindInsert: boolean);
 begin
-  Self.PersistObject(AIntfObj as TObject, ABlindInsert);
+  _PersistObjectInternal(AIntfObj as TObject, itRegular, '', 0, ABlindInsert, nil, '', '');
 end;
 
 class procedure io.PersistList(const AList: TObject; const ABlindInsert: boolean);
 begin
-  Self._PersistListInternal(AList, '', 0, ABlindInsert, nil, '', '');
+  _PersistListInternal(AList, itRegular, '', 0, ABlindInsert, nil, '', '');
 end;
 
 class procedure io.PersistObject(const AObj: TObject; const ABlindInsert: boolean);
 begin
-  Self._PersistInternal(AObj, '', 0, ABlindInsert, nil, '', '');
+  _PersistObjectInternal(AObj, itRegular, '', 0, ABlindInsert, nil, '', '');
 end;
 
 class procedure io.PersistList(const AListIntf: IInterface; const ABlindInsert: boolean);
 begin
-  Self.PersistList(AListIntf as TObject, ABlindInsert);
+  _PersistListInternal(AListIntf as TObject, itRegular, '', 0, ABlindInsert, nil, '', '');
 end;
 
 class function io.RefTo(const AClassRef: TioClassRef; const ATypeAlias: String = ''): IioWhere;
@@ -1617,7 +1624,7 @@ var
   LConnectionDefName: String;
 begin
   LConnectionDefName := TioMapContainer.GetConnectionDefName(AObj.ClassName);
-  TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteObject(AObj);
+  TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteObject(AObj, itRegular);
 end;
 
 class function io.DBBuilder(const AConnectionDefName: String; const AAddIndexes, AAddForeignKeys: boolean): IioDBBuilderEngine;
@@ -1650,7 +1657,7 @@ var
   LConnectionDefName: String;
 begin
   LConnectionDefName := TioConnectionManager.GetCurrentConnectionName;
-  TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteList(AListObj);
+  TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteList(AListObj, itRegular);
 end;
 
 class function io.di: TioDependencyInjectionRef;
@@ -1745,13 +1752,18 @@ begin
   Result.TypeInfo := ATypeInfo;
 end;
 
-class procedure io._PersistListInternal(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
-  const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
+class procedure io._PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindInsert: boolean = False);
+begin
+  _PersistListInternal(AList, AIntent, '', 0, ABlindInsert, nil, '', '');
+end;
+
+class procedure io._PersistListInternal(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LConnectionDefName: String;
 begin
   LConnectionDefName := TioConnectionManager.GetCurrentConnectionName;
-  TioStrategyFactory.GetStrategy(LConnectionDefName).PersistList(AList, ARelationPropertyName, ARelationOID, ABlindInsert, AMasterBSPersistence,
+  TioStrategyFactory.GetStrategy(LConnectionDefName).PersistList(AList, AIntent, ARelationPropertyName, ARelationOID, ABlindInsert, AMasterBSPersistence,
     AMasterPropertyName, AMasterPropertyPath);
 end;
 
