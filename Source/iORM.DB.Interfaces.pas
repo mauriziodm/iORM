@@ -792,114 +792,162 @@ end;
 { TioStrategyIntf }
 
 class procedure TioStrategyIntf.DeleteList(const AList: TObject);
+{$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
 var
   LDone: Boolean;
 {$ENDIF}
+{$ENDREGION}
 begin
+{$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
   LDone := False;
   TioStrategyInterceptorRegister.BeforeDeleteList(AList, LDone);
   if LDone then
     Exit;
 {$ENDIF}
+{$ENDREGION}
+
   _DoDeleteList(AList);
+
+{$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
   TioStrategyInterceptorRegister.AfterDeleteList(AList);
 {$ENDIF}
+{$ENDREGION}
 end;
 
 class procedure TioStrategyIntf.DeleteObject(const AObj: TObject);
+{$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
 var
   LDone: Boolean;
 {$ENDIF}
+{$ENDREGION}
 begin
+{$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
   LDone := False;
   TioStrategyInterceptorRegister.BeforeDeleteObject(AObj, LDone);
   if LDone then
     Exit;
 {$ENDIF}
+{$ENDREGION}
+
   _DoDeleteObject(AObj);
+
+{$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
   TioStrategyInterceptorRegister.AfterDeleteObject(AObj);
 {$ENDIF}
+{$ENDREGION}
 end;
 
 class procedure TioStrategyIntf.LoadList(const AWhere: IioWhere; const AList: TObject);
+{$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
 var
   LDone: Boolean;
 {$ENDIF}
+{$ENDREGION}
 begin
+{$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
   LDone := False;
   TioStrategyInterceptorRegister.BeforeLoadList(AWhere, AList, LDone);
   if LDone then
     Exit;
 {$ENDIF}
+{$ENDREGION}
+
   _DoLoadList(AWhere, AList);
+
+{$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
   TioStrategyInterceptorRegister.AfterLoadList(AWhere, AList);
 {$ENDIF}
+{$ENDREGION}
 end;
 
 class function TioStrategyIntf.LoadObject(const AWhere: IioWhere; const AObj: TObject): TObject;
+{$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
 var
   LDone: Boolean;
 {$ENDIF}
+{$ENDREGION}
 begin
   Result := AObj;
+{$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
   LDone := False;
   Result := TioStrategyInterceptorRegister.BeforeLoadObject(AWhere, Result, LDone);
   if LDone then
     Exit;
 {$ENDIF}
+{$ENDREGION}
+
   Result := _DoLoadObject(AWhere, Result);
+
+{$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
   Result := TioStrategyInterceptorRegister.AfterLoadObject(AWhere, Result);
 {$ENDIF}
+{$ENDREGION}
 end;
 
 class procedure TioStrategyIntf.PersistList(const AList: TObject; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
   const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
+{$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
 var
   LDone: Boolean;
 {$ENDIF}
+{$ENDREGION}
 begin
+{$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
   LDone := False;
   TioStrategyInterceptorRegister.BeforePersistList(AList, LDone);
   if LDone then
     Exit;
 {$ENDIF}
+{$ENDREGION}
+
   _DoPersistList(AList, ARelationPropertyName, ARelationOID, ABlindInsert, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath);
+
+{$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
   TioStrategyInterceptorRegister.AfterPersistList(AList);
 {$ENDIF}
+{$ENDREGION}
 end;
 
 class procedure TioStrategyIntf.PersistObject(const AObj: TObject; const ARelationPropertyName: String; const ARelationOID: Integer;
   const ABlindInsert: Boolean; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
+{$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
 var
   LDone: Boolean;
 {$ENDIF}
+{$ENDREGION}
 begin
+{$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
   LDone := False;
   TioStrategyInterceptorRegister.BeforePersistObject(AObj, LDone);
   if LDone then
     Exit;
 {$ENDIF}
+{$ENDREGION}
+
   _DoPersistObject(AObj, ARelationPropertyName, ARelationOID, ABlindInsert, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath);
+
+{$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
   TioStrategyInterceptorRegister.AfterPersistObject(AObj);
 {$ENDIF}
+{$ENDREGION}
 end;
 
 end.
