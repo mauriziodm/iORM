@@ -725,7 +725,7 @@ begin
       try
         // Persist the main obj
         if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioMasterBindSource, LBSPersistenceClient) then
-          io._PersistObjectInternal(AActiveBindSourceAdapter.Current, '', 0, False, LBSPersistenceClient.Persistence, '', '');
+          io._PersistObjectInternal(AActiveBindSourceAdapter.Current, itRegular, '', 0, False, LBSPersistenceClient.Persistence, '', '');
         // Delete objects referenced into the SmartDeleteSystem
         LBSPersistenceClient.Persistence.SmartDeleteSystem.ForEach(
           procedure(ASmartDeleteSystemItem: TioSmartDeleteSystemItem)

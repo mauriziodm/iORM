@@ -435,17 +435,17 @@ type
     class function NotExists<T>(const ATypeAlias: String; const AWhere: IioWhere): boolean; overload;
 
     // Persist (accepting instance to persist directly)
-    class procedure PersistObject(const AObj: TObject; const ABlindInsert: boolean = False); overload; static; inline;
-    class procedure PersistObject(const AIntfObj: IInterface; const ABlindInsert: boolean = False); overload; static; inline;
-    class procedure _PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindInsert: boolean = False); static; inline;
+    class procedure PersistObject(const AObj: TObject; const ABlindInsert: boolean = False); overload;
+    class procedure PersistObject(const AIntfObj: IInterface; const ABlindInsert: boolean = False); overload;
+    class procedure _PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindInsert: boolean = False); static;
     class procedure _PersistObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); static;
     // PersistCollection (accepting instance to persist directly)
-    class procedure PersistList(const AList: TObject; const ABlindInsert: boolean = False); overload; static; inline;
-    class procedure PersistList(const AListIntf: IInterface; const ABlindInsert: boolean = False); overload; static; inline;
-    class procedure _PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindInsert: boolean = False); static; inline;
+    class procedure PersistList(const AList: TObject; const ABlindInsert: boolean = False); overload;
+    class procedure PersistList(const AListIntf: IInterface; const ABlindInsert: boolean = False); overload;
+    class procedure _PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindInsert: boolean = False); static;
     class procedure _PersistListInternal(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); overload; static;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); static;
 
     class procedure StartTransaction(const AConnectionName: String = '');
     class procedure CommitTransaction(const AConnectionName: String = '');

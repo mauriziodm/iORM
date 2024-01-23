@@ -125,6 +125,7 @@ type
     function LimitExists: Boolean;
     function Cacheable: IioWhere;
     function IsCacheable: Boolean;
+    function Intent(const AIntent: TioPersistenceIntentType): IioWhere;
     // --------------------------------------------------------------
     // ------ Logic relations
     function _And: IioWhere; overload;
@@ -268,6 +269,7 @@ type
     function LazyProps(const ALazyProps: String): IioWhere<T>;
     function _Limit(const ARows: Integer; const AOffset: Integer = 0): IioWhere<T>;
     function Cacheable: IioWhere<T>;
+    function Intent(const AIntent: TioPersistenceIntentType): IioWhere<T>;
     // ------ Logic relations
     function _And: IioWhere<T>; overload;
     function _Or: IioWhere<T>; overload;

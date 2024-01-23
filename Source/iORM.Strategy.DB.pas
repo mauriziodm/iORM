@@ -95,7 +95,7 @@ type
 
   IioContextCache = interface
     ['{FAFBB27B-3E84-4D23-8801-3C863FA3556B}']
-    function GetContext(const AClassName: String; const AWhere: IioWhere): IioContext;
+    function GetContext(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere): IioContext;
   end;
 
   TioContextCache = class(TInterfacedObject, IioContextCache)
@@ -694,10 +694,10 @@ begin
     case LMasterProp.GetRelationType of
       // If relation HasMany
       rtHasMany:
-        _DoDeleteList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject));
+        _DoDeleteList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.PersistenceIntentType);
       // If relation HasOne
       rtHasOne:
-        _DoDeleteObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject));
+        _DoDeleteObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.PersistenceIntentType);
     end;
   end;
 end;
@@ -716,12 +716,12 @@ begin
     case LMasterProp.GetRelationType of
       // If relation HasMany
       rtHasMany:
-        _DoPersistList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), LMasterProp.GetRelationChildPropertyName,
+        _DoPersistList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.PersistenceIntentType, LMasterProp.GetRelationChildPropertyName,
           AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, False, AMasterContext.MasterBSPersistence,
           LMasterProp.GetName, AMasterContext.MasterPropertyPath);
       // If relation HasOne
       rtHasOne:
-        _DoPersistObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), LMasterProp.GetRelationChildPropertyName,
+        _DoPersistObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.PersistenceIntentType, LMasterProp.GetRelationChildPropertyName,
           AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, False, AMasterContext.MasterBSPersistence,
           LMasterProp.GetName, AMasterContext.MasterPropertyPath);
     end;

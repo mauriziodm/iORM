@@ -55,6 +55,7 @@ type
   TioWhere = class(TioSqlItem, IioWhere, IioWhereInternal)
   strict protected
     FTypeName, FTypeAlias: String;
+    FIntent: TioPersistenceIntentType;
     FTypeInfo: PTypeInfo;
     FDisableStrictlyTrueClass: Boolean;
     FLazyLoad: Boolean;
@@ -166,6 +167,7 @@ type
     function LimitExists: Boolean;
     function Cacheable: IioWhere;
     function IsCacheable: Boolean;
+    function Intent(const AIntent: TioPersistenceIntentType): IioWhere;
     // --------------------------------------------------------------
     // ------ Logic relations
     function _And: IioWhere; overload;
@@ -298,6 +300,7 @@ type
     function LazyProps(const ALazyProps: String): IioWhere<T>;
     function _Limit(const ARows: Integer; const AOffset: Integer = 0): IioWhere<T>;
     function Cacheable: IioWhere<T>;
+    function Intent(const AIntent: TioPersistenceIntentType): IioWhere<T>;
     // ------ Logic relations
     function _And: IioWhere<T>; overload;
     function _Or: IioWhere<T>; overload;
@@ -698,6 +701,7 @@ end;
 constructor TioWhere.Create;
 begin
   TioApplication.CheckIfAbstractionLayerComponentExists;
+  FIntent := itRegular;
   FDisableStrictlyTrueClass := False;
   FLazyLoad := False;
   FLazyProps := '';
@@ -959,6 +963,12 @@ begin
   FPagingObjExists := Assigned(FPagingObj);
 end;
 
+function TioWhere.Intent(const AIntent: TioPersistenceIntentType): IioWhere;
+begin
+  Result := Self;
+  FIntent := AIntent;
+end;
+
 function TioWhere.IsCacheable: Boolean;
 begin
   Result := FCacheable;
@@ -1097,7 +1107,7 @@ begin
     raise EioException.Create(ClassName, 'ToList', '"AList" parameter not assigned');
   if FClearListBefore then
     TioUtilities.ClearList(AList);
-  TioStrategyFactory.GetStrategy('').LoadList(Self, AList);
+  TioStrategyFactory.GetStrategy('').LoadList(Self, AList, FIntent);
 end;
 
 function TioWhere.ToList(const AInterfacedListTypeName, AAlias: String; const AOwnsObjects: Boolean): TObject;
@@ -1131,7 +1141,7 @@ end;
 
 function TioWhere.ToObject(const AObj: TObject): TObject;
 begin
-  Result := TioStrategyFactory.GetStrategy('').LoadObject(Self, AObj);
+  Result := TioStrategyFactory.GetStrategy('').LoadObject(Self, AObj, FIntent);
 end;
 
 function TioWhere.ToObject(const AIntf: IInterface): TObject;
@@ -1530,6 +1540,12 @@ function TioWhere<T>.DisableStrictlyTrueClass: IioWhere<T>;
 begin
   Result := Self;
   TioWhere(Self).DisableStrictlyTrueClass;
+end;
+
+function TioWhere<T>.Intent(const AIntent: TioPersistenceIntentType): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self).Intent(AIntent);
 end;
 
 function TioWhere<T>.Lazy(const ALazyEnabled: Boolean): IioWhere<T>;
