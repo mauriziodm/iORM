@@ -79,9 +79,14 @@ type
 implementation
 
 uses
-  iORM.Exceptions;
+  iORM.Exceptions, iORM.CommonTypes;
 
 { TioCustomConflictStrategy }
+
+class function TioCustomConflictStrategy.Name: String;
+begin
+  Result := Self.Name;
+end;
 
 class procedure TioCustomConflictStrategy.CheckDeleteConflict(const AContext: IioContext);
 begin
@@ -93,25 +98,42 @@ begin
   // To be implemented on derived classes if necessary
 end;
 
-class function TioCustomConflictStrategy.Name: String;
-begin
-  Result := Self.Name;
-end;
-
 class procedure TioCustomConflictStrategy.ResolveDeleteConflict(const AContext: IioContext);
 begin
   // Note: if you derive your own ConflictStrategy class and override this method then
   //        I suggest you to put the inherited at the bottom of the method
-  if AContext.PersistenceConflictDetected and AContext.Map.GetTable.DeleteConflictStrategy_RaiseOnConflict then
-    raise EioConcurrencyConflictException.Create(ClassName, 'ResolveDeleteConflict', AContext);
+  if AContext.PersistenceConflictDetected then
+  begin
+    // By default, in the event of a conflict, if you have chosen to raise an exception then the changes
+    //  are considered rejected but if you have chosen not to raise the exception then I prefer
+    //  the conflict status to be csResolved.
+    if AContext.Map.GetTable.DeleteConflictStrategy_RaiseOnConflict then
+    begin
+      AContext.PersistenceConflictState := csRejectedRaise;
+      raise EioConcurrencyConflictException.Create(ClassName, 'ResolveDeleteConflict', AContext);
+    end
+    else
+      AContext.PersistenceConflictState := csResolved;
+  end;
 end;
 
 class procedure TioCustomConflictStrategy.ResolveUpdateConflict(const AContext: IioContext);
 begin
   // Note: if you derive your own ConflictStrategy class and override this method then
   //        I suggest you to put the inherited at the bottom of the method
-  if AContext.PersistenceConflictDetected and AContext.Map.GetTable.UpdateConflictStrategy_RaiseOnConflict then
-    raise EioConcurrencyConflictException.Create(ClassName, 'ResolveUpdateConflict', AContext);
+  if AContext.PersistenceConflictDetected then
+  begin
+    // By default, in the event of a conflict, if you have chosen to raise an exception then the changes
+    //  are considered rejected but if you have chosen not to raise the exception then I prefer
+    //  the conflict status to be csResolved.
+    if AContext.Map.GetTable.UpdateConflictStrategy_RaiseOnConflict then
+    begin
+      AContext.PersistenceConflictState := csRejectedRaise;
+      raise EioConcurrencyConflictException.Create(ClassName, 'ResolveUpdateConflict', AContext);
+    end
+    else
+      AContext.PersistenceConflictState := csResolved;
+  end;
 end;
 
 { ioDeleteConflictStrategy }
