@@ -65,7 +65,7 @@ type
     class function GetQuerySelectObject(const AContext: IioContext): IioQuery;
     class function GetQuerySelectLastObjVersionFromEntity(const AContext: IioContext): IioQuery;
     class function GetQuerySelectLastObjVersionFromEtm(const AObjContext: IioContext): IioQuery;
-    class function GetQueryUpdate(const AContext: IioContext): IioQuery;
+    class function GetQueryUpdate(const AContext: IioContext; const ACheckObjVersion: Boolean): IioQuery;
   end;
 
 implementation
@@ -98,9 +98,9 @@ begin
     LQueryIdentity := ComposeQueryIdentity(AContext, 'DEL_WHERE', AForceCacheable)
   else
   if ACheckObjVersion then
-    LQueryIdentity := ComposeQueryIdentity(AContext, 'DEL_ID_OBJVER', AForceCacheable)
+    LQueryIdentity := ComposeQueryIdentity(AContext, 'DEL_OBJVER', AForceCacheable)
   else
-    LQueryIdentity := ComposeQueryIdentity(AContext, 'DEL_ID', AForceCacheable);
+    LQueryIdentity := ComposeQueryIdentity(AContext, 'DEL', AForceCacheable);
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
   LQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, LQueryIdentity);
@@ -345,20 +345,23 @@ begin
   LQuery.WhereParamByProp_SetValue(LEtmContext.GetProperties.GetPropertyByName('EntityID'), AObjContext.GetID);
 end;
 
-class function TioQueryEngine.GetQueryUpdate(const AContext: IioContext): IioQuery;
+class function TioQueryEngine.GetQueryUpdate(const AContext: IioContext; const ACheckObjVersion: Boolean): IioQuery;
 var
   LQueryIdentity: String;
   LProp: IioProperty;
   LQuery: IioQuery;
 begin
   // Compose query identity
-  LQueryIdentity := ComposeQueryIdentity(AContext, 'UPD', True);
+  if ACheckObjVersion then
+    LQueryIdentity := ComposeQueryIdentity(AContext, 'UPD_OBJVER', True)
+  else
+    LQueryIdentity := ComposeQueryIdentity(AContext, 'UPD', True);
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
   LQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, LQueryIdentity);
   Result := LQuery;
   if LQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlUpdate(LQuery, AContext);
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlUpdate(LQuery, AContext, ACheckObjVersion);
   // Iterate for all properties
   for LProp in AContext.GetProperties do
   begin
@@ -392,7 +395,7 @@ begin
     LQuery.ParamByName_SetValue(AContext.GetTrueClass.GetSqlParamName, AContext.GetTrueClass.GetValue);
   // Where conditions (with ObjVersion if exists for this entity type)
   LQuery.WhereParamObjID_SetValue(AContext);
-  if AContext.GetProperties.ObjVersionPropertyExist then
+  if ACheckObjVersion and AContext.GetProperties.ObjVersionPropertyExist then
     LQuery.WhereParamObjVersion_SetValue(AContext);
 end;
 

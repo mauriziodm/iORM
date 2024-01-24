@@ -264,7 +264,7 @@ type
     class procedure GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext); virtual;
     class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
     class procedure GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext); virtual;
-    class procedure GenerateSqlUpdate(const AQuery: IioQuery; const AContext: IioContext); virtual;
+    class procedure GenerateSqlUpdate(const AQuery: IioQuery; const AContext: IioContext; const ACheckObjVersion: Boolean); virtual;
     class procedure GenerateSqlSelectLastObjVersionFromEntity(const AQuery: IioQuery; const AContext: IioContext); virtual;
     class procedure GenerateSqlSelectLastObjVersionFromETM(const AQuery: IioQuery; const AEtmContext: IioContext); virtual;
     class function GenerateSqlJoinSectionItem(const AJoinItem: IioJoinItem): String; virtual;
@@ -527,7 +527,7 @@ begin
   // -----------------------------------------------------------------
 end;
 
-class procedure TioSqlGenerator.GenerateSqlUpdate(const AQuery: IioQuery; const AContext: IioContext);
+class procedure TioSqlGenerator.GenerateSqlUpdate(const AQuery: IioQuery; const AContext: IioContext; const ACheckObjVersion: Boolean);
 var
   LProp: IioProperty;
   LComma: String;
@@ -548,9 +548,8 @@ begin
     AQuery.SQL.Add(',' + AContext.GetTrueClass.GetSqlFieldName + ' = :' + AContext.GetTrueClass.GetSqlParamName);
   // Where conditions
   AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + ' = :' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName);
-  if AContext.GetProperties.ObjVersionPropertyExist then
-    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + ' = :' +
-      AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
+  if ACheckObjVersion and AContext.GetProperties.ObjVersionPropertyExist then
+    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + ' = :' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
   // -----------------------------------------------------------------
 end;
 

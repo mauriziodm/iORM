@@ -57,10 +57,12 @@ type
     class function LoadObjVersion_FromETM_Internal(const AContext: IioContext): Integer;
   protected
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------
-    class procedure _DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
-    class procedure _DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); override;
+    class procedure _DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
+      const ARelationOID: Integer; const ABlindInsert: Boolean; const AMasterBSPersistence: TioBSPersistence;
+      const AMasterPropertyName, AMasterPropertyPath: String); override;
+    class procedure _DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
+      const ARelationOID: Integer; const ABlindInsert: Boolean; const AMasterBSPersistence: TioBSPersistence;
+      const AMasterPropertyName, AMasterPropertyPath: String); override;
     class procedure _DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType); override;
     class procedure _DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType); override;
     class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType); override;
@@ -107,7 +109,7 @@ type
     function GetContext(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere): IioContext;
   end;
 
-{ TioStrategyDB }
+  { TioStrategyDB }
 
 class procedure TioStrategyDB.CommitTransaction(const AConnectionName: String);
 begin
@@ -259,7 +261,6 @@ var
   LDoneByInterceptor: Boolean;
 {$ENDIF}
 {$ENDREGION}
-
 begin
   inherited;
   // Check
@@ -282,7 +283,6 @@ begin
     begin
 {$ENDIF}
 {$ENDREGION}
-
       // PreProcess (delete) relation childs (HasMany, HasOne)
       PreProcessRelationChildOnDelete(LContext);
       // Delete the object
@@ -294,12 +294,11 @@ begin
     end;
 {$ENDIF}
 {$ENDREGION}
-
     // Commit
     CommitTransaction(LContext.GetTable.GetConnectionDefName);
 
   except
-    on E : Exception do
+    on E: Exception do
     begin
       // Rollback
       RollbackTransaction(LContext.GetTable.GetConnectionDefName);
@@ -322,7 +321,7 @@ begin
   if AContext.IDIsNull then
     Exit;
   // Conflict strategy: check if there is a persistence conflict or prepare the where object of the context
-  //  to consider the version property (or some other property useful for conflict detection)
+  // to consider the version property (or some other property useful for conflict detection)
   AContext.CheckDeleteConflict(AContext);
   // Create and execute the query to delete the entity on DB cheking the version to avoid concurrency
   // conflict (if versioning is enabled for this type of entity)
@@ -333,7 +332,7 @@ begin
   end;
   // Conflict strategy: if a conclict is detected then resolve it
   // note: if the ConflictStrategy resolves the conflict then it must try to run the query again
-  //        but without checking the ObjVersion (otherwise it would obviously fail again)
+  // but without checking the ObjVersion (otherwise it would obviously fail again)
   if AContext.PersistenceConflictDetected then
   begin
     AContext.ResolveDeleteConflict(AContext);
@@ -379,7 +378,8 @@ begin
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the last ID generated
   // in the last insert query.
-  if (not ABlindInsert) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtAfterInsert) and AContext.IDIsNull then
+  if (not ABlindInsert) and (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtAfterInsert) and AContext.IDIsNull
+  then
   begin
     LQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
     try
@@ -429,18 +429,18 @@ end;
 class function TioStrategyDB.LoadObjVersion(const AContext: IioContext): Integer;
 begin
   // NB: Ho riflettuto bene sul come ottenere l'ultima ObjVersion (la più alta) assegnata
-  //      per poi aggiungere 1 e ottenere la prossima e ho idnividuato 3 metodi:
-  //      1) SENZA ETM: fa una query che prende l'ObjVersion dell'oggetto dal DB (normale tabella della classe della entity);
-  //          siccome possono verificarsi "salti" tra la versione in memoria e quella sul DB
-  //          (es: due utenti con stesso oggetto in memoria ver. 5, il primo salva e non ci sono conflitti, ora sul DB c'è la ver. 6, il secondo salva
-  //          successivamente e la nuova versione deve essere la 7) in questo caso l'unico modo è di interrogare il DB e farsi dare la versione più alta presente.
-  //          Se un oggetto viene eliminato sul DB e poi qualcuno lo ripersiste (magari lo aveva in memoria da prima del delete) l'ObjVersion ricomincia da 1
-  //          e non vedo soluzione a questa cosa.
-  //      2) CON ETM: se c'è l'ETM per la classe dell'oggetto che si vuole persistere si farà la stessa cosa del punto uno ma in più, se non riuscisse
-  //          ad avere l'ObjVersion perchè l'entità è stata eliminata nel frattempo, allora si eseguirà una seconda query per chiedere all'ETM
-  //          l'ultimo ObjVersion (il maggiore) registrato. In questo modo se l'oggetto era stato eliminato risolviamo il problema del punto 1 ma
-  //          questa penso sarà una cosa non frequente, negli altri casi invece (quindi normalmente) continuiamo a usare il punto 1 che dovrebbe essere
-  //          leggermente più efficiente.
+  // per poi aggiungere 1 e ottenere la prossima e ho idnividuato 3 metodi:
+  // 1) SENZA ETM: fa una query che prende l'ObjVersion dell'oggetto dal DB (normale tabella della classe della entity);
+  // siccome possono verificarsi "salti" tra la versione in memoria e quella sul DB
+  // (es: due utenti con stesso oggetto in memoria ver. 5, il primo salva e non ci sono conflitti, ora sul DB c'è la ver. 6, il secondo salva
+  // successivamente e la nuova versione deve essere la 7) in questo caso l'unico modo è di interrogare il DB e farsi dare la versione più alta presente.
+  // Se un oggetto viene eliminato sul DB e poi qualcuno lo ripersiste (magari lo aveva in memoria da prima del delete) l'ObjVersion ricomincia da 1
+  // e non vedo soluzione a questa cosa.
+  // 2) CON ETM: se c'è l'ETM per la classe dell'oggetto che si vuole persistere si farà la stessa cosa del punto uno ma in più, se non riuscisse
+  // ad avere l'ObjVersion perchè l'entità è stata eliminata nel frattempo, allora si eseguirà una seconda query per chiedere all'ETM
+  // l'ultimo ObjVersion (il maggiore) registrato. In questo modo se l'oggetto era stato eliminato risolviamo il problema del punto 1 ma
+  // questa penso sarà una cosa non frequente, negli altri casi invece (quindi normalmente) continuiamo a usare il punto 1 che dovrebbe essere
+  // leggermente più efficiente.
   inherited;
   // Step 1: Prova a caricare l'ObjVersion dalla tabella su cui è mappata l'entità
   Result := LoadObjVersion_FromEntity_Internal(AContext);
@@ -498,8 +498,9 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB._DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
+class procedure TioStrategyDB._DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
+  const ARelationOID: Integer; const ABlindInsert: Boolean; const AMasterBSPersistence: TioBSPersistence;
+  const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LDuckTypedList: IioDuckTypedList;
   LObj: TObject;
@@ -537,8 +538,9 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB._DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: Boolean;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
+class procedure TioStrategyDB._DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
+  const ARelationOID: Integer; const ABlindInsert: Boolean; const AMasterBSPersistence: TioBSPersistence;
+  const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LContext: IioContext;
 
@@ -584,7 +586,6 @@ var
   end;
 {$ENDIF}
 {$ENDREGION}
-
   procedure _DetectPersistActionType;
   begin
     case LContext.ObjStatus of
@@ -602,8 +603,8 @@ var
           end;
         end;
       osDeleted:
-    else
-      LContext.PersistenceActionType := atDoNotPersist;
+      else
+        LContext.PersistenceActionType := atDoNotPersist;
     end;
   end;
 
@@ -638,7 +639,6 @@ begin
     begin
 {$ENDIF}
 {$ENDREGION}
-
       // PreProcess (persist) relation childs (BelongsTo)
       PreProcessRelationChildOnPersist(LContext);
       // Process the current object
@@ -666,12 +666,11 @@ begin
     end;
 {$ENDIF}
 {$ENDREGION}
-
     // Commit
     CommitTransaction(LContext.GetTable.GetConnectionDefName);
 
   except
-    on E : Exception do
+    on E: Exception do
     begin
       // Rollback
       RollbackTransaction(LContext.GetTable.GetConnectionDefName);
@@ -721,29 +720,29 @@ begin
     case LMasterProp.GetRelationType of
       // If relation HasMany
       rtHasMany:
-        _DoPersistList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.PersistenceIntentType, LMasterProp.GetRelationChildPropertyName,
-          AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, False, AMasterContext.MasterBSPersistence,
-          LMasterProp.GetName, AMasterContext.MasterPropertyPath);
+        _DoPersistList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.PersistenceIntentType,
+          LMasterProp.GetRelationChildPropertyName, AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, False,
+          AMasterContext.MasterBSPersistence, LMasterProp.GetName, AMasterContext.MasterPropertyPath);
       // If relation HasOne
       rtHasOne:
-        _DoPersistObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.PersistenceIntentType, LMasterProp.GetRelationChildPropertyName,
-          AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, False, AMasterContext.MasterBSPersistence,
-          LMasterProp.GetName, AMasterContext.MasterPropertyPath);
+        _DoPersistObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.PersistenceIntentType,
+          LMasterProp.GetRelationChildPropertyName, AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, False,
+          AMasterContext.MasterBSPersistence, LMasterProp.GetName, AMasterContext.MasterPropertyPath);
     end;
   end;
 end;
 
 class procedure TioStrategyDB.PreProcessRelationChildOnPersist(const AMasterContext: IioContext);
-//ar
+// ar
 // LMasterProp: IioProperty;
 begin
-//  inherited;
-//   // Loop for all properties
-//   for LMasterProp in AMasterContext.GetProperties do
-//     // If the property is write enabled and has a BelongsTo relation...
-//     if LMasterProp.IsDBWriteEnabled and (LMasterProp.GetRelationType = rtBelongsTo) then
-//       PersistObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), '', 0, False, AMasterContext.MasterBSPersistence, LMasterProp.GetName,
-//         AMasterContext.MasterPropertyPath);
+  // inherited;
+  // // Loop for all properties
+  // for LMasterProp in AMasterContext.GetProperties do
+  // // If the property is write enabled and has a BelongsTo relation...
+  // if LMasterProp.IsDBWriteEnabled and (LMasterProp.GetRelationType = rtBelongsTo) then
+  // PersistObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), '', 0, False, AMasterContext.MasterBSPersistence, LMasterProp.GetName,
+  // AMasterContext.MasterPropertyPath);
 end;
 
 class procedure TioStrategyDB.RollbackTransaction(const AConnectionName: String);
@@ -897,52 +896,53 @@ var
 {$ENDREGION}
   begin
     // NB: Se TrueClassMode = tcSmart in pratica LCurrentContext ora contiene la VirtualMap (o SuperMap) e la usa per
-    //      creare il codice SQL della query poi, una volta aperta la query, inizia a ciclare per tutti i record/oggetti
-    //      trovati dalla query stessa e per ognuno di essi si fa dare la mappa/context specifica della classe specifica
-    //      dell'oggetto corrente.
+    // creare il codice SQL della query poi, una volta aperta la query, inizia a ciclare per tutti i record/oggetti
+    // trovati dalla query stessa e per ognuno di essi si fa dare la mappa/context specifica della classe specifica
+    // dell'oggetto corrente.
     // Create & open query
     LQuery := TioDBFactory.QueryEngine.GetQuerySelectList(LOriginalContext);
     LQuery.Open;
-    try try
-      // Loop for all records (objects) of the query
-      while not LQuery.Eof do
-      begin
-        // If TrueClassMode is tvSmart then get the specific context for the current record/object else
-        //  use the original context
-        if LOriginalContext.GetTrueClass.Mode = tcSmart then
-          LCurrentContext := LContextCache.GetContext(AIntent, LQuery.ExtractTrueClassName(LOriginalContext), AWhere)
-        else
-          LCurrentContext := LOriginalContext;
-        // Clean the DataObject (it contains the previous)
-        LCurrentContext.DataObject := nil;
-        // Create the object as TObject  (Intercepted by CRUDInterceptors)
-{$REGION '-----INTERCEPTORS-----'}
-{$IFNDEF ioCRUDInterceptorsOff}
-        LDoneByInterceptor := False;
-        LObj := TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext, nil, LDoneByInterceptor);
-        LCurrentContext.DataObject := LObj;
-        if not LDoneByInterceptor then
+    try
+      try
+        // Loop for all records (objects) of the query
+        while not LQuery.Eof do
         begin
-{$ENDIF}
-{$ENDREGION}
-          LObj := TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
+          // If TrueClassMode is tvSmart then get the specific context for the current record/object else
+          // use the original context
+          if LOriginalContext.GetTrueClass.Mode = tcSmart then
+            LCurrentContext := LContextCache.GetContext(AIntent, LQuery.ExtractTrueClassName(LOriginalContext), AWhere)
+          else
+            LCurrentContext := LOriginalContext;
+          // Clean the DataObject (it contains the previous)
+          LCurrentContext.DataObject := nil;
+          // Create the object as TObject  (Intercepted by CRUDInterceptors)
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-          LObj := TioCRUDInterceptorRegister.AfterLoad(LCurrentContext, LObj);
-        end;
+          LDoneByInterceptor := False;
+          LObj := TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext, nil, LDoneByInterceptor);
+          LCurrentContext.DataObject := LObj;
+          if not LDoneByInterceptor then
+          begin
 {$ENDIF}
 {$ENDREGION}
-        // Add current object to the list
-        LDuckTypedList.Add(LObj);
-        // Next
-        LQuery.Next;
+            LObj := TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
+{$REGION '-----INTERCEPTORS-----'}
+{$IFNDEF ioCRUDInterceptorsOff}
+            LObj := TioCRUDInterceptorRegister.AfterLoad(LCurrentContext, LObj);
+          end;
+{$ENDIF}
+{$ENDREGION}
+          // Add current object to the list
+          LDuckTypedList.Add(LObj);
+          // Next
+          LQuery.Next;
+        end;
+      finally
+        // Close query
+        LQuery.Close;
       end;
-    finally
-      // Close query
-      LQuery.Close;
-    end;
     except
-      on E : Exception do
+      on E: Exception do
       begin
         // Note: Rollback in the except section of the main method (_DoLoadList)s
 {$REGION '-----INTERCEPTORS-----'}
@@ -954,6 +954,7 @@ var
       end;
     end;
   end;
+
 begin
   inherited;
   // Resolve the type and alias
@@ -1004,51 +1005,49 @@ var
     LDoneByInterceptor: Boolean;
 {$ENDIF}
 {$ENDREGION}
-
   begin
     // Init
     Result := AObj;
     // Create & open query
     LQuery := TioDBFactory.QueryEngine.GetQuerySelectObject(LOriginalContext);
     LQuery.Open;
-    try try
-      // If a record is found then load the object and return True
-      if not LQuery.Eof then
-      begin
-        // If TrueClassMode is tvSmart then get the specific context for the current record/object else
-        //  use the original context
-        if LOriginalContext.GetTrueClass.Mode = tcSmart then
-          LCurrentContext := TioContextFactory.Context(AIntent, LQuery.ExtractTrueClassName(LOriginalContext), AWhere, Result, nil, '', '')
-        else
-          LCurrentContext := LOriginalContext;
-        // Create the object as TObject (Intercepted by CRUDInterceptors)
-
-{$REGION '-----INTERCEPTORS-----'}
-{$IFNDEF ioCRUDInterceptorsOff}
-        LDoneByInterceptor := False;
-        Result := TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext, Result, LDoneByInterceptor);
-        LCurrentContext.DataObject := Result;
-        if not LDoneByInterceptor then
+    try
+      try
+        // If a record is found then load the object and return True
+        if not LQuery.Eof then
         begin
-{$ENDIF}
-{$ENDREGION}
-
-          Result := TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
+          // If TrueClassMode is tvSmart then get the specific context for the current record/object else
+          // use the original context
+          if LOriginalContext.GetTrueClass.Mode = tcSmart then
+            LCurrentContext := TioContextFactory.Context(AIntent, LQuery.ExtractTrueClassName(LOriginalContext), AWhere, Result, nil, '', '')
+          else
+            LCurrentContext := LOriginalContext;
+          // Create the object as TObject (Intercepted by CRUDInterceptors)
 
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-          Result := TioCRUDInterceptorRegister.AfterLoad(LCurrentContext, Result);
-        end;
+          LDoneByInterceptor := False;
+          Result := TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext, Result, LDoneByInterceptor);
+          LCurrentContext.DataObject := Result;
+          if not LDoneByInterceptor then
+          begin
 {$ENDIF}
 {$ENDREGION}
+            Result := TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
 
+{$REGION '-----INTERCEPTORS-----'}
+{$IFNDEF ioCRUDInterceptorsOff}
+            Result := TioCRUDInterceptorRegister.AfterLoad(LCurrentContext, Result);
+          end;
+{$ENDIF}
+{$ENDREGION}
+        end;
+      finally
+        // Close query
+        LQuery.Close;
       end;
-    finally
-      // Close query
-      LQuery.Close;
-    end;
     except
-      on E : Exception do
+      on E: Exception do
       begin
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
@@ -1099,20 +1098,26 @@ var
 begin
   inherited;
   // Conflict strategy: check if there is a persistence conflict or prepare the where object of the context
-  //  to consider the version property (or some other property useful for conflict detection)
+  // to consider the version property (or some other property useful for conflict detection)
   AContext.CheckUpdateConflict(AContext);
   // Create and execute the query to update the entity on DB cheking the version to avoid concurrency
   // conflict (if versioning is enabled for this type of entity)
   if not AContext.PersistenceConflictDetected then
   begin
-    LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext);
+    LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext, True);
     AContext.PersistenceConflictDetected := LQuery.ExecSQL = 0;
   end;
   // Conflict strategy: if a conclict is detected then resolve it
-  // Note: the conflict strategy MUST RESOLVE the conflict or raise an exception
+  // note: if the ConflictStrategy resolves the conflict then it must try to run the query again
+  // but without checking the ObjVersion (otherwise it would obviously fail again)
   if AContext.PersistenceConflictDetected then
-    AContext.ResolveUpdateConflict(AContext)
-  else
+  begin
+    AContext.ResolveDeleteConflict(AContext);
+    if AContext.PersistenceConflictState = csResolved then
+      TioDBFactory.QueryEngine.GetQueryUpdate(AContext, False).ExecSQL;
+  end;
+  // If there is no conflict or there is a conflict but it has been resolved…
+  if (not AContext.PersistenceConflictDetected) or (AContext.PersistenceConflictState <= csResolved) then
   begin
     AContext.NextObjVersion(True);
     AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;;
