@@ -177,7 +177,7 @@ var
     LQuery: IioQuery;
   begin
     // Create & execute query
-    LQuery := TioDBFactory.QueryEngine.GetQueryDelete(AContext, False);
+    LQuery := TioDBFactory.QueryEngine.GetQueryDelete(AContext, False, False);
     LQuery.ExecSQL;
   end;
 
@@ -328,13 +328,18 @@ begin
   // conflict (if versioning is enabled for this type of entity)
   if not AContext.PersistenceConflictDetected then
   begin
-    LQuery := TioDBFactory.QueryEngine.GetQueryDelete(AContext, True);
+    LQuery := TioDBFactory.QueryEngine.GetQueryDelete(AContext, True, True);
     AContext.PersistenceConflictDetected := LQuery.ExecSQL = 0;
   end;
   // Conflict strategy: if a conclict is detected then resolve it
-  // Note: the conflict strategy MUST RESOLVE the conflict or raise an exception
+  // note: if the ConflictStrategy resolves the conflict then it must try to run the query again
+  //        but without checking the ObjVersion (otherwise it would obviously fail again)
   if AContext.PersistenceConflictDetected then
+  begin
     AContext.ResolveDeleteConflict(AContext);
+    if AContext.PersistenceConflictState = csResolved then
+      TioDBFactory.QueryEngine.GetQueryDelete(AContext, False, True).ExecSQL;
+  end;
 end;
 
 class procedure TioStrategyDB.InsertObject_Internal(const AContext: IioContext; const ABlindInsert: Boolean);

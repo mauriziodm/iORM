@@ -141,9 +141,9 @@ type
     FTrueClass: IioTrueClass;
     // Conflict strategies
     FDeleteConflictStrategy: TClass; // TClass instead of TioCustomConflictStrategyRef to avoid circular reference
-    FDeleteConflictStrategy_RaiseOnConflict: Boolean;
+    FDeleteConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState;
     FUpdateConflictStrategy: TClass; // TClass instead of TioCustomConflictStrategyRef to avoid circular reference
-    FUpdateConflictStrategy_RaiseOnConflict: Boolean;
+    FUpdateConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState;
     // EtmTimeSlotClass
     procedure SetEtmTimeSlotClass(const AEtmTimeSlotClass: TioEtmTimeSlotRef);
     function GetEtmTimeSlotClass: TioEtmTimeSlotRef;
@@ -173,12 +173,12 @@ type
     // Conflict strategies (TClass instead of TioCustomConflictStrategyRef to avoid circular reference)
     procedure SetDeleteConflictStrategy(const AConflictStrategy: TClass);
     procedure SetUpdateConflictStrategy(const AConflictStrategy: TClass);
-    procedure SetDeleteConflictStrategy_RaiseOnConflict(const Value: Boolean);
-    procedure SetUpdateConflictStrategy_RaiseOnConflict(const Value: Boolean);
+    procedure SetDeleteConflictStrategy_OnConflictSetStateAs(const Value: TioPersistenceConflictState);
+    procedure SetUpdateConflictStrategy_OnConflictSetStateAs(const Value: TioPersistenceConflictState);
     function GetDeleteConflictStrategy: TClass;
     function GetUpdateConflictStrategy: TClass;
-    function GetDeleteConflictStrategy_RaiseOnConflict: Boolean;
-    function GetUpdateConflictStrategy_RaiseOnConflict: Boolean;
+    function GetDeleteConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState;
+    function GetUpdateConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState;
     // IndexList
     function IndexListExists: Boolean;
     function GetIndexList(AAutoCreateIfUnassigned: Boolean): TioIndexList;
@@ -186,8 +186,8 @@ type
     // Properties
     property DeleteConflictStrategy: TClass read GetDeleteConflictStrategy write SetDeleteConflictStrategy;
     property UpdateConflictStrategy: TClass read GetUpdateConflictStrategy write SetUpdateConflictStrategy;
-    property DeleteConflictStrategy_RaiseOnConflict: Boolean read GetDeleteConflictStrategy_RaiseOnConflict write SetDeleteConflictStrategy_RaiseOnConflict;
-    property UpdateConflictStrategy_RaiseOnConflict: Boolean read GetUpdateConflictStrategy_RaiseOnConflict write SetUpdateConflictStrategy_RaiseOnConflict;
+    property DeleteConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState read GetDeleteConflictStrategy_OnConflictSetStateAs write SetDeleteConflictStrategy_OnConflictSetStateAs;
+    property UpdateConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState read GetUpdateConflictStrategy_OnConflictSetStateAs write SetUpdateConflictStrategy_OnConflictSetStateAs;
     property EtmTimeSlotClass: TioEtmTimeSlotRef read GetEtmTimeSlotClass write SetEtmTimeSlotClass;
     property EtmTraceOnlyOnConnectionName: String read GetEtmTraceOnlyOnConnectionName write SetEtmTraceOnlyOnConnectionName;
   end;
@@ -224,8 +224,8 @@ begin
   // Conflict strategies
   FDeleteConflictStrategy := TioSameVersionWin;
   FUpdateConflictStrategy := TioSameVersionWin;
-  FDeleteConflictStrategy_RaiseOnConflict := False;
-  FUpdateConflictStrategy_RaiseOnConflict := False;
+  FDeleteConflictStrategy_OnConflictSetStateAs := csResolved;
+  FUpdateConflictStrategy_OnConflictSetStateAs := csResolved;
   // ETM
   FEtmTimeSlotClass := nil;
   FEtmTraceOnlyOnConnectionName := String.Empty;
@@ -263,9 +263,9 @@ begin
   Result := FDeleteConflictStrategy;
 end;
 
-function TioTable.GetDeleteConflictStrategy_RaiseOnConflict: Boolean;
+function TioTable.GetDeleteConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState;
 begin
-  Result := FDeleteConflictStrategy_RaiseOnConflict;
+  Result := FDeleteConflictStrategy_OnConflictSetStateAs;
 end;
 
 function TioTable.GetUpdateConflictStrategy: TClass;
@@ -273,9 +273,9 @@ begin
   Result := FUpdateConflictStrategy;
 end;
 
-function TioTable.GetUpdateConflictStrategy_RaiseOnConflict: Boolean;
+function TioTable.GetUpdateConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState;
 begin
-  Result := FUpdateConflictStrategy_RaiseOnConflict;
+  Result := FUpdateConflictStrategy_OnConflictSetStateAs;
 end;
 
 function TioTable.GetConnectionDefName: String;
@@ -381,9 +381,9 @@ begin
   FDeleteConflictStrategy := AConflictStrategy;
 end;
 
-procedure TioTable.SetDeleteConflictStrategy_RaiseOnConflict(const Value: Boolean);
+procedure TioTable.SetDeleteConflictStrategy_OnConflictSetStateAs(const Value: TioPersistenceConflictState);
 begin
-  FDeleteConflictStrategy_RaiseOnConflict := Value;
+  FDeleteConflictStrategy_OnConflictSetStateAs := Value;
 end;
 
 procedure TioTable.SetUpdateConflictStrategy(const AConflictStrategy: TClass);
@@ -391,9 +391,9 @@ begin
   FUpdateConflictStrategy := AConflictStrategy;
 end;
 
-procedure TioTable.SetUpdateConflictStrategy_RaiseOnConflict(const Value: Boolean);
+procedure TioTable.SetUpdateConflictStrategy_OnConflictSetStateAs(const Value: TioPersistenceConflictState);
 begin
-  FUpdateConflictStrategy_RaiseOnConflict := Value;
+  FUpdateConflictStrategy_OnConflictSetStateAs := Value;
 end;
 
 function TioTable.TableName: String;

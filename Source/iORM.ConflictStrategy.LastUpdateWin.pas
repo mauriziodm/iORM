@@ -75,15 +75,13 @@ end;
 class procedure TioLastUpdateWin.ResolveDeleteConflict(const AContext: IioContext);
 begin
   AContext.PersistenceConflictDetected := ConflictConfirmed(AContext);
-  if AContext.PersistenceConflictDetected then
-    inherited;
+  inherited;
 end;
 
 class procedure TioLastUpdateWin.ResolveUpdateConflict(const AContext: IioContext);
 begin
   AContext.PersistenceConflictDetected := ConflictConfirmed(AContext);
-  if AContext.PersistenceConflictDetected then
-    inherited;
+  inherited;
 end;
 
 end.

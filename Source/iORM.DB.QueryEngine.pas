@@ -56,7 +56,7 @@ type
     class function GetQueryCreateIndex(const AContext: IioContext; const AIndexName: String; const ACommaSepFieldList: String;
       const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): IioQuery;
     class function GetQueryCurrentTimestamp(const AConnectionDefName: String): IioQuery;
-    class function GetQueryDelete(const AContext: IioContext; const AForceCacheable: Boolean): IioQuery;
+    class function GetQueryDelete(const AContext: IioContext; const ACheckObjVersion: Boolean; const AForceCacheable: Boolean): IioQuery;
     class function GetQueryDropIndex(const AContext: IioContext; const AIndexName: String): IioQuery;
     class function GetQueryExists(const AContext: IioContext): IioQuery;
     class function GetQueryInsert(const AContext: IioContext): IioQuery;
@@ -88,19 +88,25 @@ begin
     Result := String.Empty;
 end;
 
-class function TioQueryEngine.GetQueryDelete(const AContext: IioContext; const AForceCacheable: Boolean): IioQuery;
+class function TioQueryEngine.GetQueryDelete(const AContext: IioContext; const ACheckObjVersion: Boolean; const AForceCacheable: Boolean): IioQuery;
 var
   LQueryIdentity: String;
   LQuery: IioQuery;
 begin
   // Compose the query identity
-  LQueryIdentity := ComposeQueryIdentity(AContext, 'DEL', AForceCacheable);
+  if AContext.WhereExist then
+    LQueryIdentity := ComposeQueryIdentity(AContext, 'DEL_WHERE', AForceCacheable)
+  else
+  if ACheckObjVersion then
+    LQueryIdentity := ComposeQueryIdentity(AContext, 'DEL_ID_OBJVER', AForceCacheable)
+  else
+    LQueryIdentity := ComposeQueryIdentity(AContext, 'DEL_ID', AForceCacheable);
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
   LQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, LQueryIdentity);
   Result := LQuery;
   if LQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlDelete(LQuery, AContext);
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlDelete(LQuery, AContext, ACheckObjVersion);
   // Where
   if AContext.WhereExist then
     // Where condition to delete by type, without obj instance (NO ETM)
@@ -109,7 +115,7 @@ begin
   begin
     // Where conditions for obj instance delete (with ObjVersion if exists for this entity type)
     LQuery.WhereParamObjID_SetValue(AContext);
-    if AContext.GetProperties.ObjVersionPropertyExist then
+    if ACheckObjVersion and AContext.GetProperties.ObjVersionPropertyExist then
       LQuery.WhereParamObjVersion_SetValue(AContext);
   end;
 end;

@@ -36,7 +36,7 @@ unit iORM.ConflictStrategy.Interfaces;
 interface
 
 uses
-  iORM.Context.Interfaces;
+  iORM.Context.Interfaces, iORM.CommonTypes;
 
 type
 
@@ -65,11 +65,11 @@ type
   // ioDeleteConflictStrategy attribute
   ioDeleteConflictStrategy = class(TCustomAttribute)
   strict private
+    FOnConflictSetStateAs: TioPersistenceConflictState;
     FStrategy: TioCustomConflictStrategyRef;
-    FRaiseOnConflict: Boolean;
   public
-    constructor Create(const AStrategy: TioCustomConflictStrategyRef; const ARaiseOnConflict: Boolean = False); overload;
-    property RaiseOnConflict: Boolean read FRaiseOnConflict;
+    constructor Create(const AStrategy: TioCustomConflictStrategyRef; const AOnConflictSetStateAs: TioPersistenceConflictState = csResolved); overload;
+    property OnConflictSetStateAs: TioPersistenceConflictState read FOnConflictSetStateAs;
     property Strategy: TioCustomConflictStrategyRef read FStrategy;
   end;
 
@@ -79,7 +79,7 @@ type
 implementation
 
 uses
-  iORM.Exceptions, iORM.CommonTypes;
+  iORM.Exceptions;
 
 { TioCustomConflictStrategy }
 
@@ -102,45 +102,25 @@ class procedure TioCustomConflictStrategy.ResolveDeleteConflict(const AContext: 
 begin
   // Note: if you derive your own ConflictStrategy class and override this method then
   //        I suggest you to put the inherited at the bottom of the method
-  if AContext.PersistenceConflictDetected then
-  begin
-    // By default, in the event of a conflict, if you have chosen to raise an exception then the changes
-    //  are considered rejected but if you have chosen not to raise the exception then I prefer
-    //  the conflict status to be csResolved.
-    if AContext.Map.GetTable.DeleteConflictStrategy_RaiseOnConflict then
-    begin
-      AContext.PersistenceConflictState := csRejectedRaise;
-      raise EioConcurrencyConflictException.Create(ClassName, 'ResolveDeleteConflict', AContext);
-    end
-    else
-      AContext.PersistenceConflictState := csResolved;
-  end;
+  AContext.PersistenceConflictState := AContext.Map.GetTable.DeleteConflictStrategy_OnConflictSetStateAs;
+  if AContext.PersistenceConflictState = csRejectedRaise then
+    raise EioConcurrencyConflictException.Create(ClassName, 'ResolveDeleteConflict', AContext);
 end;
 
 class procedure TioCustomConflictStrategy.ResolveUpdateConflict(const AContext: IioContext);
 begin
   // Note: if you derive your own ConflictStrategy class and override this method then
   //        I suggest you to put the inherited at the bottom of the method
-  if AContext.PersistenceConflictDetected then
-  begin
-    // By default, in the event of a conflict, if you have chosen to raise an exception then the changes
-    //  are considered rejected but if you have chosen not to raise the exception then I prefer
-    //  the conflict status to be csResolved.
-    if AContext.Map.GetTable.UpdateConflictStrategy_RaiseOnConflict then
-    begin
-      AContext.PersistenceConflictState := csRejectedRaise;
-      raise EioConcurrencyConflictException.Create(ClassName, 'ResolveUpdateConflict', AContext);
-    end
-    else
-      AContext.PersistenceConflictState := csResolved;
-  end;
+  AContext.PersistenceConflictState := AContext.Map.GetTable.UpdateConflictStrategy_OnConflictSetStateAs;
+  if AContext.PersistenceConflictState = csRejectedRaise then
+    raise EioConcurrencyConflictException.Create(ClassName, 'ResolveUpdateConflict', AContext);
 end;
 
 { ioDeleteConflictStrategy }
 
-constructor ioDeleteConflictStrategy.Create(const AStrategy: TioCustomConflictStrategyRef; const ARaiseOnConflict: Boolean);
+constructor ioDeleteConflictStrategy.Create(const AStrategy: TioCustomConflictStrategyRef; const AOnConflictSetStateAs: TioPersistenceConflictState = csResolved);
 begin
-  FRaiseOnConflict := ARaiseOnConflict;
+  FOnConflictSetStateAs := AOnConflictSetStateAs;
   FStrategy := AStrategy;
 end;
 

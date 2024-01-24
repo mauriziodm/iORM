@@ -702,7 +702,7 @@ var
   LEtmTimeSlotClass: TioEtmTimeSlotRef;
   LEtmTraceOnlyOnConnectionName: String;
   LDeleteConflictStrategy, LUpdateConflictStrategy: TClass;
-  LDeleteConflictStrategy_RaiseOnException, LUpdateConflictStrategy_RaiseOnException: Boolean;
+  LDeleteConflictStrategy_OnConflictSetStateAs, LUpdateConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState;
 begin
   try
     // Prop Init
@@ -718,8 +718,8 @@ begin
     LEtmTraceOnlyOnConnectionName := '';
     LDeleteConflictStrategy := nil;
     LUpdateConflictStrategy := nil;
-    LDeleteConflictStrategy_RaiseOnException := False;
-    LUpdateConflictStrategy_RaiseOnException := False;
+    LDeleteConflictStrategy_OnConflictSetStateAs := csUndefined;
+    LUpdateConflictStrategy_OnConflictSetStateAs := csUndefined;
     // Check attributes
     for LAttr in Typ.GetAttributes do
     begin
@@ -761,12 +761,12 @@ begin
       if LAttr is ioDeleteConflictStrategy then
       begin
         LDeleteConflictStrategy := ioDeleteConflictStrategy(LAttr).Strategy;
-        LDeleteConflictStrategy_RaiseOnException := ioDeleteConflictStrategy(LAttr).RaiseOnConflict;
+        LDeleteConflictStrategy_OnConflictSetStateAs := ioDeleteConflictStrategy(LAttr).OnConflictSetStateAs;
       end;
       if LAttr is ioUpdateConflictStrategy then
       begin
         LUpdateConflictStrategy := ioUpdateConflictStrategy(LAttr).Strategy;
-        LUpdateConflictStrategy_RaiseOnException := ioUpdateConflictStrategy(LAttr).RaiseOnConflict;
+        LUpdateConflictStrategy_OnConflictSetStateAs := ioUpdateConflictStrategy(LAttr).OnConflictSetStateAs;
       end;
       // etmTrace
       if (LAttr is etmTrace) then
@@ -781,12 +781,12 @@ begin
     if Assigned(LDeleteConflictStrategy) then
     begin
       Result.DeleteConflictStrategy := LDeleteConflictStrategy;
-      Result.DeleteConflictStrategy_RaiseOnConflict := LDeleteConflictStrategy_RaiseOnException;
+      Result.DeleteConflictStrategy_OnConflictSetStateAs := LDeleteConflictStrategy_OnConflictSetStateAs;
     end;
     if Assigned(LUpdateConflictStrategy) then
     begin
       Result.UpdateConflictStrategy := LUpdateConflictStrategy;
-      Result.UpdateConflictStrategy_RaiseOnConflict := LUpdateConflictStrategy_RaiseOnException;
+      Result.UpdateConflictStrategy_OnConflictSetStateAs := LUpdateConflictStrategy_OnConflictSetStateAs;
     end;
     // Set ETM
     if Assigned(LEtmTimeSlotClass) then

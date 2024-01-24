@@ -258,7 +258,7 @@ type
     class procedure GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String; const ACommaSepFieldList: String;
       const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean); virtual; abstract;
     class procedure GenerateSqlCurrentTimestamp(const AQuery: IioQuery); virtual; abstract;
-    class procedure GenerateSqlDelete(const AQuery: IioQuery; const AContext: IioContext); virtual;
+    class procedure GenerateSqlDelete(const AQuery: IioQuery; const AContext: IioContext; const ACheckObjVersion: Boolean); virtual;
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); virtual; abstract;
     class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
     class procedure GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext); virtual;
@@ -470,7 +470,7 @@ begin
   AQuery.SQL.Add(AContext.GetGroupBySql);
 end;
 
-class procedure TioSqlGenerator.GenerateSqlDelete(const AQuery: IioQuery; const AContext: IioContext);
+class procedure TioSqlGenerator.GenerateSqlDelete(const AQuery: IioQuery; const AContext: IioContext; const ACheckObjVersion: Boolean);
 begin
   // Build the query text
   // -----------------------------------------------------------------
@@ -483,9 +483,8 @@ begin
   else
   begin
     AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName);
-    if AContext.GetProperties.ObjVersionPropertyExist then
-      AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + ' = :' +
-        AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
+    if ACheckObjVersion and AContext.GetProperties.ObjVersionPropertyExist then
+      AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + ' = :' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
   end;
   // -----------------------------------------------------------------
 end;
