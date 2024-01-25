@@ -380,7 +380,7 @@ begin
             end;
           end;
         prObjVersion:
-          LQuery.ParamObjVersion_SetValue(AContext);
+          LQuery.ParamObjVersion_SetValue(AContext);  // Qua sta prendendo ObjVersion dall'oggetto + 1
         prObjUpdated:
           LQuery.ParamObjUpdated_SetValue(AContext);
         prObjUpdatedUserID:
@@ -396,7 +396,7 @@ begin
   // Where conditions (with ObjVersion if exists for this entity type)
   LQuery.WhereParamObjID_SetValue(AContext);
   if ACheckObjVersion and AContext.GetProperties.ObjVersionPropertyExist then
-    LQuery.WhereParamObjVersion_SetValue(AContext);
+    LQuery.WhereParamObjVersion_SetValue(AContext); // Qua prende l'Objversion dall'oggetto così come è
 end;
 
 end.

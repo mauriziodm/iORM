@@ -53,6 +53,7 @@ type
     FWhere: IioWhere;
     FMasterPropertyPath: String;
     FMasterBSPersistence: TioBSPersistence;
+    FObjNextVersion: TioObjVersion;
     FOriginalNonTrueClassMap: IioMap;
     FEtmEntityFromVersion: Integer;
     FPersistenceActionType: TioPersistenceActionType;
@@ -68,9 +69,10 @@ type
     function GetObjStatus: TioObjStatus;
     procedure SetObjStatus(const AValue: TioObjStatus);
     // ObjVersion
-    function NextObjVersion(const ASetValue: Boolean): TioObjVersion;
     function GetObjVersion: TioObjVersion;
     procedure SetObjVersion(const AValue: TioObjVersion);
+    // ObjNextVersion
+    function GetObjNextVersion: TioObjVersion;
     // ObjCreated
     function GetObjCreated: TioObjCreated;
     procedure SetObjCreated(const AValue: TioObjCreated);
@@ -144,6 +146,7 @@ type
     property DataObject: TObject read GetDataObject write SetDataObject;
     property ObjStatus: TioObjStatus read GetObjStatus write SetObjStatus;
     property ObjVersion: TioObjVersion read GetObjVersion write SetObjVersion;
+    property ObjNextVersion: TioObjVersion read GetObjNextVersion;
     property ObjCreated: TioObjCreated read GetObjCreated write SetObjCreated;
     property ObjCreatedUserID: TioObjCreatedUserID read GetObjCreatedUserID write SetObjCreatedUserID;
     property ObjCreatedUserName: TioObjCreatedUserName read GetObjCreatedUserName write SetObjCreatedUserName;
@@ -170,7 +173,7 @@ implementation
 uses
   iORM.Context.Factory, iORM.DB.Factory, System.TypInfo,
   iORM.Context.Container, System.SysUtils, iORM.Exceptions,
-  System.StrUtils, iORM.DB.Interfaces;
+  System.StrUtils, iORM.DB.Interfaces, iORM;
 
 { TioContext }
 
@@ -209,6 +212,7 @@ begin
   FHasManyChildVirtualPropertyValue := 0;
   FMasterPropertyPath := AMasterPropertyPath + IfThen(AMasterPropertyName.IsEmpty, '', '.') + AMasterPropertyName;
   FMasterBSPersistence := AMasterBSPersistence;
+  FObjNextVersion := OBJVERSION_NULL;
   FOriginalNonTrueClassMap := nil;
   FEtmEntityFromVersion := 0;
   FPersistenceIntentType := AIntent;
@@ -532,18 +536,13 @@ begin
   Result := (not Assigned(FDataObject)) or (GetID = IO_INTEGER_NULL_VALUE);
 end;
 
-function TioContext.NextObjVersion(const ASetValue: Boolean): TioObjVersion;
-var
-  LPropValue: TValue;
+function TioContext.GetObjNextVersion: TioObjVersion;
 begin
   if GetProperties.ObjVersionPropertyExist then
   begin
-    Result := GetProperties.ObjVersionProperty.GetValue(FDataObject).AsType<TioObjVersion> + 1;
-    if ASetValue then
-    begin
-      LPropValue := TValue.From<TioObjVersion>(Result);
-      GetProperties.ObjVersionProperty.SetValue(FDataObject, LPropValue);
-    end;
+    if FObjNextVersion = OBJVERSION_NULL then
+      FObjNextVersion := io.LoadObjVersion(Self) + 1;
+    Result := FObjNextVersion;
   end
   else
     Result := OBJVERSION_NULL;

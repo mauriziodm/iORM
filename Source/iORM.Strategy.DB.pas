@@ -367,7 +367,7 @@ begin
   LQuery.ExecSQL;
   if not ABlindInsert then
   begin
-    AContext.NextObjVersion(True);
+    AContext.ObjVersion := AContext.ObjNextVersion;
     AContext.ObjCreated := LQuery.Connection.LastTransactionTimestamp;
     AContext.ObjCreatedUserID := TioConnectionManager.GetCurrentConnectionInfo.CurrentUserID;
     AContext.ObjCreatedUserName := TioConnectionManager.GetCurrentConnectionInfo.CurrentUserName;
@@ -1119,7 +1119,7 @@ begin
   // If there is no conflict or there is a conflict but it has been resolved…
   if (not AContext.PersistenceConflictDetected) or (AContext.PersistenceConflictState <= csResolved) then
   begin
-    AContext.NextObjVersion(True);
+    AContext.ObjVersion := AContext.ObjNextVersion;
     AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;;
     AContext.ObjUpdatedUserID := TioConnectionManager.GetCurrentConnectionInfo.CurrentUserID;
     AContext.ObjUpdatedUserName := TioConnectionManager.GetCurrentConnectionInfo.CurrentUserName;
