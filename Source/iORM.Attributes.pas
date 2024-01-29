@@ -962,7 +962,7 @@ begin
   FEntityClassName := LContext.DataObject.ClassName;
   FEntityID := LContext.GetID;
   FEntityVersion := LContext.ObjVersion;
-  FEntityFromVersion := LContext.EtmEntityFromVersion;
+  FEntityFromVersion := LContext.EntityFromVersion;
   FEntityUpdated := LContext.ObjUpdated;
   FEntityState := dj.From(LContext.DataObject, TioEtmFactory.djParamsEngine).ToJson;
   // User related props

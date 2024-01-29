@@ -76,8 +76,8 @@ type
     procedure SetObjVersion(const AValue: TioObjVersion);
     property ObjVersion:TioObjVersion read GetObjVersion write SetObjVersion; // write SetObjVersion;
     // ObjNextVersion
-    function GetObjNextVersion: TioObjVersion;
-    property ObjNextVersion: TioObjVersion read GetObjNextVersion;
+    function GetObjNextVersion: Integer; // Con tipo TioObjVersion ci sono problemi
+    property ObjNextVersion: Integer read GetObjNextVersion; // Con tipo TioObjVersion ci sono problemi
     // ObjCreated
     function GetObjCreated: TioObjCreated;
     procedure SetObjCreated(const AValue: TioObjCreated);
@@ -124,10 +124,10 @@ type
     procedure SetOriginalNonTrueClassMap(const AMap: IioMap);
     function GetOriginalNonTrueClassMap: IioMap;
     property OriginalNonTrueClassMap: IioMap read GetOriginalNonTrueClassMap write SetOriginalNonTrueClassMap;
-    // EtmEntityFromVersion
-    function GetEtmEntityFromVersion: Integer;
-    procedure SetEtmEntityFromVersion(const Value: Integer);
-    property EtmEntityFromVersion: Integer read GetEtmEntityFromVersion write SetEtmEntityFromVersion;
+    // EntityFromVersion
+    function GetEntityFromVersion: Integer;
+    procedure SetEntityFromVersion(const Value: Integer);
+    property EntityFromVersion: Integer read GetEntityFromVersion write SetEntityFromVersion;
     // PersistenceActionType
     function GetPersistenceActionType: TioPersistenceActionType;
     procedure SetPersistenceActionType(const Value: TioPersistenceActionType);

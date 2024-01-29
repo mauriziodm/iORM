@@ -474,10 +474,11 @@ begin
   LQuery := TioDBFactory.QueryEngine.GetQuerySelectLastObjVersionFromEtm(AContext);
   LQuery.Open;
   try
-    if not LQuery.Eof then
-      Result := LQuery.Fields[0].AsInteger
+    // note: ho provato a usare "AsInteger" sul campo ma dava problemi quindi ho deciso di testare "IsNull"
+    if LQuery.Eof or LQuery.Fields[0].IsNull then
+      Result := OBJVERSION_NULL
     else
-      Result := OBJVERSION_NULL;
+      Result := LQuery.Fields[0].AsInteger
   finally
     LQuery.Close;
   end;

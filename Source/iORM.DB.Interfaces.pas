@@ -547,6 +547,7 @@ begin
   if AContext.IsTrueClass then
     AQuery.SQL.Add(',' + AContext.GetTrueClass.GetSqlFieldName + ' = :' + AContext.GetTrueClass.GetSqlParamName);
   // Where conditions
+  // note:
   AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + ' = :' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName);
   if ACheckObjVersion and AContext.GetProperties.ObjVersionPropertyExist then
     AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + ' = :' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);

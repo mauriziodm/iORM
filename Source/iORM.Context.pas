@@ -55,7 +55,7 @@ type
     FMasterBSPersistence: TioBSPersistence;
     FObjNextVersion: TioObjVersion;
     FOriginalNonTrueClassMap: IioMap;
-    FEtmEntityFromVersion: Integer;
+    FEntityFromVersion: Integer;
     FPersistenceActionType: TioPersistenceActionType;
     FPersistenceIntentType: TioPersistenceIntentType;
     FPersistenceConflictDetected: Boolean;
@@ -72,7 +72,8 @@ type
     function GetObjVersion: TioObjVersion;
     procedure SetObjVersion(const AValue: TioObjVersion);
     // ObjNextVersion
-    function GetObjNextVersion: TioObjVersion;
+    function GetObjNextVersion: Integer; // Con tipo TioObjVersion ci sono problemi
+    function IsObjVersionToBeInWhereConditions: Boolean;
     // ObjCreated
     function GetObjCreated: TioObjCreated;
     procedure SetObjCreated(const AValue: TioObjCreated);
@@ -102,9 +103,9 @@ type
     // OriginalResolvedTypeNameNonTrueClass
     procedure SetOriginalNonTrueClassMap(const AMap: IioMap);
     function GetOriginalNonTrueClassMap: IioMap;
-    // EtmEntityFromVersion
-    function GetEtmEntityFromVersion: Integer;
-    procedure SetEtmEntityFromVersion(const Value: Integer);
+    // EtmEntityVersion
+    function GetEntityFromVersion: Integer;
+    procedure SetEntityFromVersion(const Value: Integer);
     // PersistenceActionType
     function GetPersistenceActionType: TioPersistenceActionType;
     procedure SetPersistenceActionType(const Value: TioPersistenceActionType);
@@ -146,7 +147,7 @@ type
     property DataObject: TObject read GetDataObject write SetDataObject;
     property ObjStatus: TioObjStatus read GetObjStatus write SetObjStatus;
     property ObjVersion: TioObjVersion read GetObjVersion write SetObjVersion;
-    property ObjNextVersion: TioObjVersion read GetObjNextVersion;
+    property ObjNextVersion: Integer read GetObjNextVersion; // Con tipo TioObjVersion ci sono problemi
     property ObjCreated: TioObjCreated read GetObjCreated write SetObjCreated;
     property ObjCreatedUserID: TioObjCreatedUserID read GetObjCreatedUserID write SetObjCreatedUserID;
     property ObjCreatedUserName: TioObjCreatedUserName read GetObjCreatedUserName write SetObjCreatedUserName;
@@ -157,7 +158,7 @@ type
     property RelationOID: Integer read GetRelationOID write SetRelationOID;
     property MasterPropertyPath: String read GetMasterPropertyPath;
     property MasterBSPersistence: TioBSPersistence read GetMasterBSPersistence;
-    property EtmEntityFromVersion: Integer read GetEtmEntityFromVersion write SetEtmEntityFromVersion;
+    property EntityFromVersion: Integer read GetEntityFromVersion write SetEntityFromVersion;
     property PersistenceActionType: TioPersistenceActionType read GetPersistenceActionType write SetPersistenceActionType;
     property PersistenceIntentType: TioPersistenceIntentType read GetPersistenceIntentType write SetPersistenceIntentType;
     property PersistenceConflictDetected: Boolean read GetPersistenceConflictDetected write SetPersistenceConflictDetected;
@@ -184,7 +185,7 @@ end;
 
 procedure TioContext.CheckDeleteConflict(const AContext: IioContext);
 begin
-  TioCustomConflictStrategy(GetTable.GetDeleteConflictStrategy).CheckDeleteConflict(AContext);
+  TioCustomConflictStrategyRef(GetTable.GetDeleteConflictStrategy).CheckDeleteConflict(AContext);
 end;
 
 procedure TioContext.CheckUpdateConflict(const AContext: IioContext);
@@ -199,7 +200,7 @@ end;
 
 procedure TioContext.ResolveUpdateConflict(const AContext: IioContext);
 begin
-  TioCustomConflictStrategy(GetTable.GetUpdateConflictStrategy).ResolveUpdateConflict(AContext);
+  TioCustomConflictStrategyRef(GetTable.GetUpdateConflictStrategy).ResolveUpdateConflict(AContext);
 end;
 
 constructor TioContext.Create(const AIntent: TioPersistenceIntentType; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
@@ -214,7 +215,7 @@ begin
   FMasterBSPersistence := AMasterBSPersistence;
   FObjNextVersion := OBJVERSION_NULL;
   FOriginalNonTrueClassMap := nil;
-  FEtmEntityFromVersion := 0;
+  FEntityFromVersion := 0;
   FPersistenceIntentType := AIntent;
   FPersistenceActionType := atDoNotPersist;
   FPersistenceConflictDetected := False;
@@ -231,9 +232,9 @@ begin
   Result := FDataObject;
 end;
 
-function TioContext.GetEtmEntityFromVersion: Integer;
+function TioContext.GetEntityFromVersion: Integer;
 begin
-  Result := FEtmEntityFromVersion;
+  Result := FEntityFromVersion;
 end;
 
 function TioContext.GetGroupBySql: String;
@@ -256,9 +257,9 @@ function TioContext.GetCurrentStrategyName: String;
 begin
   case FPersistenceActionType of
     atUpdate:
-      Result := TioCustomConflictStrategy(GetTable.UpdateConflictStrategy).Name;
+      Result := TioCustomConflictStrategyRef(GetTable.UpdateConflictStrategy).Name;
     atDelete:
-      Result := TioCustomConflictStrategy(GetTable.DeleteConflictStrategy).Name;
+      Result := TioCustomConflictStrategyRef(GetTable.DeleteConflictStrategy).Name;
   else
     EioException.Create(ClassName, 'GetCurrentStrategyName', 'Undefined action type.');
   end;  
@@ -390,9 +391,9 @@ begin
   FDataObject := AValue;
 end;
 
-procedure TioContext.SetEtmEntityFromVersion(const Value: Integer);
+procedure TioContext.SetEntityFromVersion(const Value: Integer);
 begin
-  FEtmEntityFromVersion := Value;
+  FEntityFromVersion := Value;
 end;
 
 procedure TioContext.SetRelationOID(const Value: Integer);
@@ -472,10 +473,9 @@ end;
 
 procedure TioContext.SetObjVersion(const AValue: TioObjVersion);
 begin
+  // note: if the ObjVersion property does not exist it should not raise any exceptions.
   if GetProperties.ObjVersionPropertyExist then
-    GetProperties.ObjVersionProperty.SetValue(FDataObject, AValue)
-  else
-    raise EioException.Create(ClassName, 'SetObjVersion', Format('The class "%s" has no property of type "TioObjversion".', [Map.GetClassName]));
+    GetProperties.ObjVersionProperty.SetValue(FDataObject, AValue);
 end;
 
 function TioContext.GetObjVersion: TioObjVersion;
@@ -536,16 +536,16 @@ begin
   Result := (not Assigned(FDataObject)) or (GetID = IO_INTEGER_NULL_VALUE);
 end;
 
-function TioContext.GetObjNextVersion: TioObjVersion;
+function TioContext.GetObjNextVersion: Integer;
 begin
-  if GetProperties.ObjVersionPropertyExist then
-  begin
-    if FObjNextVersion = OBJVERSION_NULL then
-      FObjNextVersion := io.LoadObjVersion(Self) + 1;
-    Result := FObjNextVersion;
-  end
-  else
-    Result := OBJVERSION_NULL;
+  // If the ObjVersion property does not exists then return the OBJVERSION_NULL (zero)
+  if not GetProperties.ObjVersionPropertyExist then
+    Exit(OBJVERSION_NULL);
+  // If the ObjVersion is not already loaded then load it (once)
+  if FObjNextVersion = OBJVERSION_NULL then
+    FObjNextVersion := io.LoadObjVersion(Self) + 1;
+  // Return the value
+  Result := FObjNextVersion;
 end;
 
 function TioContext.IsTrueClass: Boolean;

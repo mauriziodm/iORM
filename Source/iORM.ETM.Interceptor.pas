@@ -83,7 +83,7 @@ end;
 class procedure TioEtmInterceptor.BeforeUpdate(const AContext: IioContext; var ADone: Boolean);
 begin
   // Save the before update ObjVersion of the object into the AContext (will use it in the constructor of TimeSlot class)
-  AContext.EtmEntityFromVersion := Abs(AContext.ObjVersion);
+  AContext.EntityFromVersion := Abs(AContext.ObjVersion);
 end;
 
 class procedure TioEtmInterceptor.AfterUpdate(const AContext: IioContext);
