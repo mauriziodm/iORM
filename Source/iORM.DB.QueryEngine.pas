@@ -56,7 +56,7 @@ type
     class function GetQueryCreateIndex(const AContext: IioContext; const AIndexName: String; const ACommaSepFieldList: String;
       const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): IioQuery;
     class function GetQueryCurrentTimestamp(const AConnectionDefName: String): IioQuery;
-    class function GetQueryDelete(const AContext: IioContext; const ACheckObjVersion: Boolean; const AForceCacheable: Boolean): IioQuery;
+    class function GetQueryDelete(const AContext: IioContext; const AForceCacheable: Boolean): IioQuery;
     class function GetQueryDropIndex(const AContext: IioContext; const AIndexName: String): IioQuery;
     class function GetQueryExists(const AContext: IioContext): IioQuery;
     class function GetQueryInsert(const AContext: IioContext): IioQuery;
@@ -65,7 +65,7 @@ type
     class function GetQuerySelectObject(const AContext: IioContext): IioQuery;
     class function GetQuerySelectLastObjVersionFromEntity(const AContext: IioContext): IioQuery;
     class function GetQuerySelectLastObjVersionFromEtm(const AObjContext: IioContext): IioQuery;
-    class function GetQueryUpdate(const AContext: IioContext; const ACheckObjVersion: Boolean): IioQuery;
+    class function GetQueryUpdate(const AContext: IioContext): IioQuery;
   end;
 
 implementation
@@ -88,7 +88,7 @@ begin
     Result := String.Empty;
 end;
 
-class function TioQueryEngine.GetQueryDelete(const AContext: IioContext; const ACheckObjVersion: Boolean; const AForceCacheable: Boolean): IioQuery;
+class function TioQueryEngine.GetQueryDelete(const AContext: IioContext; const AForceCacheable: Boolean): IioQuery;
 var
   LQueryIdentity: String;
   LQuery: IioQuery;
@@ -97,7 +97,7 @@ begin
   if AContext.WhereExist then
     LQueryIdentity := ComposeQueryIdentity(AContext, 'DEL_WHERE', AForceCacheable)
   else
-  if ACheckObjVersion then
+  if TioBlindLevel.Do_DetectConflicts(AContext.BlindLevel) then
     LQueryIdentity := ComposeQueryIdentity(AContext, 'DEL_OBJVER', AForceCacheable)
   else
     LQueryIdentity := ComposeQueryIdentity(AContext, 'DEL', AForceCacheable);
@@ -106,7 +106,7 @@ begin
   LQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, LQueryIdentity);
   Result := LQuery;
   if LQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlDelete(LQuery, AContext, ACheckObjVersion);
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlDelete(LQuery, AContext);
   // Where
   if AContext.WhereExist then
     // Where condition to delete by type, without obj instance (NO ETM)
@@ -115,7 +115,7 @@ begin
   begin
     // Where conditions for obj instance delete (with ObjVersion if exists for this entity type)
     LQuery.WhereParamObjID_SetValue(AContext);
-    if ACheckObjVersion and AContext.GetProperties.ObjVersionPropertyExist then
+    if TioBlindLevel.Do_DetectConflicts(AContext.BlindLevel) and AContext.GetProperties.ObjVersionPropertyExist then
       LQuery.WhereParamObjVersion_SetValue(AContext);
   end;
 end;
@@ -331,7 +331,7 @@ var
   LQuery: IioQuery;
 begin
   // Get the context for the ETM TimeSlotClass
-  LEtmContext := TioContextFactory.Context(AObjContext.PersistenceIntentType, AObjContext.GetTable.EtmTimeSlotClass.ClassName, nil, nil, nil, '', '');
+  LEtmContext := TioContextFactory.Context(AObjContext.IntentType, AObjContext.GetTable.EtmTimeSlotClass.ClassName, nil, nil, nil, '', '', AObjContext.BlindLevel);
   // Compose query identity
   LQueryIdentity := ComposeQueryIdentity(LEtmContext, 'SELVERETM', True);
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
@@ -345,14 +345,14 @@ begin
   LQuery.WhereParamByProp_SetValue(LEtmContext.GetProperties.GetPropertyByName('EntityID'), AObjContext.GetID);
 end;
 
-class function TioQueryEngine.GetQueryUpdate(const AContext: IioContext; const ACheckObjVersion: Boolean): IioQuery;
+class function TioQueryEngine.GetQueryUpdate(const AContext: IioContext): IioQuery;
 var
   LQueryIdentity: String;
   LProp: IioProperty;
   LQuery: IioQuery;
 begin
   // Compose query identity
-  if ACheckObjVersion then
+  if TioBlindLevel.Do_DetectConflicts(AContext.BlindLevel) then
     LQueryIdentity := ComposeQueryIdentity(AContext, 'UPD_OBJVER', True)
   else
     LQueryIdentity := ComposeQueryIdentity(AContext, 'UPD', True);
@@ -361,7 +361,7 @@ begin
   LQuery := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, LQueryIdentity);
   Result := LQuery;
   if LQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlUpdate(LQuery, AContext, ACheckObjVersion);
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlUpdate(LQuery, AContext);
   // Iterate for all properties
   for LProp in AContext.GetProperties do
   begin
@@ -395,7 +395,7 @@ begin
     LQuery.ParamByName_SetValue(AContext.GetTrueClass.GetSqlParamName, AContext.GetTrueClass.GetValue);
   // Where conditions (with ObjVersion if exists for this entity type)
   LQuery.WhereParamObjID_SetValue(AContext);
-  if ACheckObjVersion and AContext.GetProperties.ObjVersionPropertyExist then
+  if TioBlindLevel.Do_DetectConflicts(AContext.BlindLevel) and AContext.GetProperties.ObjVersionPropertyExist then
     LQuery.WhereParamObjVersion_SetValue(AContext); // Qua prende l'Objversion dall'oggetto così come è
 end;
 

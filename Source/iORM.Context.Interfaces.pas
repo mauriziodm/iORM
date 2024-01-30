@@ -128,22 +128,26 @@ type
     function GetEntityFromVersion: Integer;
     procedure SetEntityFromVersion(const Value: Integer);
     property EntityFromVersion: Integer read GetEntityFromVersion write SetEntityFromVersion;
-    // PersistenceActionType
-    function GetPersistenceActionType: TioPersistenceActionType;
-    procedure SetPersistenceActionType(const Value: TioPersistenceActionType);
-    property PersistenceActionType: TioPersistenceActionType read GetPersistenceActionType write SetPersistenceActionType;
-    // PersistenceIntentType
-    function GetPersistenceIntentType: TioPersistenceIntentType;
-    procedure SetPersistenceIntentType(const Value: TioPersistenceIntentType);
-    property PersistenceIntentType: TioPersistenceIntentType read GetPersistenceIntentType write SetPersistenceIntentType;
-    // PersistenceConflictDetected
-    function GetPersistenceConflictDetected: Boolean;
-    procedure SetPersistenceConflictDetected(const Value: Boolean);
-    property PersistenceConflictDetected: Boolean read GetPersistenceConflictDetected write SetPersistenceConflictDetected;
-    // PersistenceConflictState
-    function GetPersistenceConflictState: TioPersistenceConflictState;
-    procedure SetPersistenceConflictState(const Value: TioPersistenceConflictState);
-    property PersistenceConflictState: TioPersistenceConflictState read GetPersistenceConflictState write SetPersistenceConflictState;
+    // ActionType
+    function GetActionType: TioPersistenceActionType;
+    procedure SetActionType(const Value: TioPersistenceActionType);
+    property ActionType: TioPersistenceActionType read GetActionType write SetActionType;
+    // IntentType
+    function GetIntentType: TioPersistenceIntentType;
+    procedure SetIntentType(const Value: TioPersistenceIntentType);
+    property IntentType: TioPersistenceIntentType read GetIntentType write SetIntentType;
+    // BlindLevel
+    function GetBlindLevel: Byte;
+    procedure SetBlindLevel(const Value: Byte);
+    property BlindLevel: Byte read GetBlindLevel write SetBlindLevel;
+    // ConflictDetected
+    function GetConflictDetected: Boolean;
+    procedure SetConflictDetected(const Value: Boolean);
+    property ConflictDetected: Boolean read GetConflictDetected write SetConflictDetected;
+    // ConflictState
+    function GetConflictState: TioPersistenceConflictState;
+    procedure SetConflictState(const Value: TioPersistenceConflictState);
+    property ConflictState: TioPersistenceConflictState read GetConflictState write SetConflictState;
   end;
 
 implementation

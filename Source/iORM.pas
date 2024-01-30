@@ -397,13 +397,13 @@ type
     class function LoadObjVersion(const AContext: IioContext): Integer;
 
     // DeleteObject (accepting instance to delete directly)
-    class procedure DeleteObject(const AObj: TObject); overload;
-    class procedure DeleteObject(const AIntfObj: IInterface); overload;
-    class procedure _DeleteObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType); static;
+    class procedure DeleteObject(const AObj: TObject; const ABlindLevel: Byte = BL_DEFAULT); overload;
+    class procedure DeleteObject(const AIntfObj: IInterface; const ABlindLevel: Byte = BL_DEFAULT); overload;
+    class procedure _DeleteObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
     // DeleteList (accepting instance to delete directly)
-    class procedure DeleteList(const AListObj: TObject); overload;
-    class procedure DeleteList(const AListIntf: IInterface); overload;
-    class procedure _DeleteListInternal(const AListObj: TObject; const AIntent: TioPersistenceIntentType); static;
+    class procedure DeleteList(const AListObj: TObject; const ABlindLevel: Byte = BL_DEFAULT); overload;
+    class procedure DeleteList(const AListIntf: IInterface; const ABlindLevel: Byte = BL_DEFAULT); overload;
+    class procedure _DeleteListInternal(const AListObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
     // Delete (accepting generic type to delete and ciriteria)
     // NB: Ho volutamente eliminato questi metodi perchè generavano direttamente una query DELETE senza
     //      però gli oggetti vivi dietro quindi senza poi considerare eventuali oggetti child/dettaglio
@@ -438,17 +438,17 @@ type
     class function NotExists<T>(const ATypeAlias: String; const AWhere: IioWhere): boolean; overload;
 
     // PersistObject (accepting instance to persist directly)
-    class procedure PersistObject(const AObj: TObject; const ABlindInsert: boolean = False); overload;
-    class procedure PersistObject(const AIntfObj: IInterface; const ABlindInsert: boolean = False); overload;
-    class procedure _PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindInsert: boolean = False); static;
-    class procedure _PersistObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); static;
+    class procedure PersistObject(const AObj: TObject; const ABlindLevel: Byte = BL_DEFAULT); overload;
+    class procedure PersistObject(const AIntfObj: IInterface; const ABlindLevel: Byte = BL_DEFAULT); overload;
+    class procedure _PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte = BL_DEFAULT); static;
+    class procedure _PersistObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte); static;
     // PersistCollection (accepting instance to persist directly)
-    class procedure PersistList(const AList: TObject; const ABlindInsert: boolean = False); overload;
-    class procedure PersistList(const AListIntf: IInterface; const ABlindInsert: boolean = False); overload;
-    class procedure _PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindInsert: boolean = False); static;
-    class procedure _PersistListInternal(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String); static;
+    class procedure PersistList(const AList: TObject; const ABlindLevel: Byte = BL_DEFAULT); overload;
+    class procedure PersistList(const AListIntf: IInterface; const ABlindLevel: Byte = BL_DEFAULT); overload;
+    class procedure _PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte = BL_DEFAULT); static;
+    class procedure _PersistListInternal(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte); static;
 
     class procedure StartTransaction(const AConnectionName: String = '');
     class procedure CommitTransaction(const AConnectionName: String = '');
@@ -876,40 +876,40 @@ begin
   Result := AWhere.NotExists;
 end;
 
-class procedure io._PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindInsert: boolean);
+class procedure io._PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 begin
-  _PersistObjectInternal(AObj, AIntent, '', 0, ABlindInsert, nil, '', '');
+  _PersistObjectInternal(AObj, AIntent, '', 0, nil, '', '', ABlindLevel);
 end;
 
-class procedure io._PersistObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
+class procedure io._PersistObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
 var
   LConnectionDefName: String;
 begin
   LConnectionDefName := TioMapContainer.GetConnectionDefName(AObj.ClassName);
   // Get the strategy and call the proper funtionality
-  TioStrategyFactory.GetStrategy(LConnectionDefName).PersistObject(AObj, AIntent, ARelationPropertyName, ARelationOID, ABlindInsert, AMasterBSPersistence,
-    AMasterPropertyName, AMasterPropertyPath);
+  TioStrategyFactory.GetStrategy(LConnectionDefName).PersistObject(AObj, AIntent, ARelationPropertyName, ARelationOID, AMasterBSPersistence,
+    AMasterPropertyName, AMasterPropertyPath, ABlindLevel);
 end;
 
-class procedure io.PersistObject(const AIntfObj: IInterface; const ABlindInsert: boolean);
+class procedure io.PersistObject(const AIntfObj: IInterface; const ABlindLevel: Byte);
 begin
-  _PersistObjectInternal(AIntfObj as TObject, itRegular, '', 0, ABlindInsert, nil, '', '');
+  _PersistObjectInternal(AIntfObj as TObject, itRegular, '', 0, nil, '', '', ABlindLevel);
 end;
 
-class procedure io.PersistList(const AList: TObject; const ABlindInsert: boolean);
+class procedure io.PersistList(const AList: TObject; const ABlindLevel: Byte);
 begin
-  _PersistListInternal(AList, itRegular, '', 0, ABlindInsert, nil, '', '');
+  _PersistListInternal(AList, itRegular, '', 0, nil, '', '', ABlindLevel);
 end;
 
-class procedure io.PersistObject(const AObj: TObject; const ABlindInsert: boolean);
+class procedure io.PersistObject(const AObj: TObject; const ABlindLevel: Byte);
 begin
-  _PersistObjectInternal(AObj, itRegular, '', 0, ABlindInsert, nil, '', '');
+  _PersistObjectInternal(AObj, itRegular, '', 0, nil, '', '', ABlindLevel);
 end;
 
-class procedure io.PersistList(const AListIntf: IInterface; const ABlindInsert: boolean);
+class procedure io.PersistList(const AListIntf: IInterface; const ABlindLevel: Byte);
 begin
-  _PersistListInternal(AListIntf as TObject, itRegular, '', 0, ABlindInsert, nil, '', '');
+  _PersistListInternal(AListIntf as TObject, itRegular, '', 0, nil, '', '', ABlindLevel);
 end;
 
 class function io.RefTo(const AClassRef: TioClassRef; const ATypeAlias: String = ''): IioWhere;
@@ -1622,9 +1622,9 @@ begin
   Result := di.LocateVM<T>(AParentCloseQueryAction, AVMAlias).ConstructorParams(AParams).Get;
 end;
 
-class procedure io.DeleteObject(const AObj: TObject);
+class procedure io.DeleteObject(const AObj: TObject; const ABlindLevel: Byte);
 begin
-  _DeleteObjectInternal(AObj, itRegular);
+  _DeleteObjectInternal(AObj, itRegular, ABlindLevel);
 end;
 
 class function io.DBBuilder(const AConnectionDefName: String; const AAddIndexes, AAddForeignKeys: boolean): IioDBBuilderEngine;
@@ -1642,19 +1642,19 @@ begin
   Result := TioGlobalVCProviderRegister.GetInstance.DefaultVCProvider;
 end;
 
-class procedure io.DeleteObject(const AIntfObj: IInterface);
+class procedure io.DeleteObject(const AIntfObj: IInterface; const ABlindLevel: Byte);
 begin
-  _DeleteObjectInternal(AIntfObj as TObject, itRegular);
+  _DeleteObjectInternal(AIntfObj as TObject, itRegular, ABlindLevel);
 end;
 
-class procedure io.DeleteList(const AListIntf: IInterface);
+class procedure io.DeleteList(const AListIntf: IInterface; const ABlindLevel: Byte);
 begin
-  _DeleteListInternal(AListIntf as TObject, itRegular)
+  _DeleteListInternal(AListIntf as TObject, itRegular, ABlindLevel)
 end;
 
-class procedure io.DeleteList(const AListObj: TObject);
+class procedure io.DeleteList(const AListObj: TObject; const ABlindLevel: Byte);
 begin
-  _DeleteListInternal(AListObj, itRegular)
+  _DeleteListInternal(AListObj, itRegular, ABlindLevel)
 end;
 
 class function io.di: TioDependencyInjectionRef;
@@ -1749,35 +1749,35 @@ begin
   Result.TypeInfo := ATypeInfo;
 end;
 
-class procedure io._DeleteListInternal(const AListObj: TObject; const AIntent: TioPersistenceIntentType);
+class procedure io._DeleteListInternal(const AListObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 var
   LConnectionDefName: String;
 begin
   LConnectionDefName := TioConnectionManager.GetCurrentConnectionName;
-  TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteList(AListObj, AIntent);
+  TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteList(AListObj, AIntent, ABlindLevel);
 end;
 
-class procedure io._DeleteObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType);
+class procedure io._DeleteObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 var
   LConnectionDefName: String;
 begin
   LConnectionDefName := TioMapContainer.GetConnectionDefName(AObj.ClassName);
-  TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteObject(AObj, AIntent);
+  TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteObject(AObj, AIntent, ABlindLevel);
 end;
 
-class procedure io._PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindInsert: boolean = False);
+class procedure io._PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte = BL_DEFAULT);
 begin
-  _PersistListInternal(AList, AIntent, '', 0, ABlindInsert, nil, '', '');
+  _PersistListInternal(AList, AIntent, '', 0, nil, '', '', ABlindLevel);
 end;
 
-class procedure io._PersistListInternal(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer; const ABlindInsert: boolean;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
+class procedure io._PersistListInternal(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
 var
   LConnectionDefName: String;
 begin
   LConnectionDefName := TioConnectionManager.GetCurrentConnectionName;
-  TioStrategyFactory.GetStrategy(LConnectionDefName).PersistList(AList, AIntent, ARelationPropertyName, ARelationOID, ABlindInsert, AMasterBSPersistence,
-    AMasterPropertyName, AMasterPropertyPath);
+  TioStrategyFactory.GetStrategy(LConnectionDefName).PersistList(AList, AIntent, ARelationPropertyName, ARelationOID, AMasterBSPersistence,
+    AMasterPropertyName, AMasterPropertyPath, ABlindLevel);
 end;
 
 class function io.TerminateApplication: boolean;

@@ -56,10 +56,11 @@ type
     FObjNextVersion: TioObjVersion;
     FOriginalNonTrueClassMap: IioMap;
     FEntityFromVersion: Integer;
-    FPersistenceActionType: TioPersistenceActionType;
-    FPersistenceIntentType: TioPersistenceIntentType;
-    FPersistenceConflictDetected: Boolean;
-    FPersistenceConflictState: TioPersistenceConflictState;
+    FActionType: TioPersistenceActionType;
+    FIntentType: TioPersistenceIntentType;
+    FBlindLevel: Byte;
+    FConflictDetected: Boolean;
+    FConflictState: TioPersistenceConflictState;
     // DataObject
     function GetDataObject: TObject;
     procedure SetDataObject(const AValue: TObject);
@@ -73,7 +74,6 @@ type
     procedure SetObjVersion(const AValue: TioObjVersion);
     // ObjNextVersion
     function GetObjNextVersion: Integer; // Con tipo TioObjVersion ci sono problemi
-    function IsObjVersionToBeInWhereConditions: Boolean;
     // ObjCreated
     function GetObjCreated: TioObjCreated;
     procedure SetObjCreated(const AValue: TioObjCreated);
@@ -106,21 +106,24 @@ type
     // EtmEntityVersion
     function GetEntityFromVersion: Integer;
     procedure SetEntityFromVersion(const Value: Integer);
-    // PersistenceActionType
-    function GetPersistenceActionType: TioPersistenceActionType;
-    procedure SetPersistenceActionType(const Value: TioPersistenceActionType);
-    // PersistenceIntentType
-    function GetPersistenceIntentType: TioPersistenceIntentType;
-    procedure SetPersistenceIntentType(const Value: TioPersistenceIntentType);
-    // PersistenceConflictDetected
-    function GetPersistenceConflictDetected: Boolean;
-    procedure SetPersistenceConflictDetected(const Value: Boolean);
-    // PersistenceConflictState
-    function GetPersistenceConflictState: TioPersistenceConflictState;
-    procedure SetPersistenceConflictState(const Value: TioPersistenceConflictState);
+    // ActionType
+    function GetActionType: TioPersistenceActionType;
+    procedure SetActionType(const Value: TioPersistenceActionType);
+    // IntentType
+    function GetIntentType: TioPersistenceIntentType;
+    procedure SetIntentType(const Value: TioPersistenceIntentType);
+    // BlindLevel
+    function GetBlindLevel: Byte;
+    procedure SetBlindLevel(const Value: Byte);
+    // ConflictDetected
+    function GetConflictDetected: Boolean;
+    procedure SetConflictDetected(const Value: Boolean);
+    // ConflictState
+    function GetConflictState: TioPersistenceConflictState;
+    procedure SetConflictState(const Value: TioPersistenceConflictState);
   public
     constructor Create(const AIntent: TioPersistenceIntentType; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
-      const AMasterPropertyName, AMasterPropertyPath: String); overload;
+      const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte); overload;
     function GetClassRef: TioClassRef;
     function GetID: Integer;
     function GetProperties: IioProperties;
@@ -159,10 +162,11 @@ type
     property MasterPropertyPath: String read GetMasterPropertyPath;
     property MasterBSPersistence: TioBSPersistence read GetMasterBSPersistence;
     property EntityFromVersion: Integer read GetEntityFromVersion write SetEntityFromVersion;
-    property PersistenceActionType: TioPersistenceActionType read GetPersistenceActionType write SetPersistenceActionType;
-    property PersistenceIntentType: TioPersistenceIntentType read GetPersistenceIntentType write SetPersistenceIntentType;
-    property PersistenceConflictDetected: Boolean read GetPersistenceConflictDetected write SetPersistenceConflictDetected;
-    property PersistenceConflictState: TioPersistenceConflictState read GetPersistenceConflictState write SetPersistenceConflictState;
+    property PersistenceActionType: TioPersistenceActionType read GetActionType write SetActionType;
+    property PersistenceIntentType: TioPersistenceIntentType read GetIntentType write SetIntentType;
+    property PersistenceBlindLevel: Byte read GetBlindLevel write SetBlindLevel;
+    property PersistenceConflictDetected: Boolean read GetConflictDetected write SetConflictDetected;
+    property PersistenceConflictState: TioPersistenceConflictState read GetConflictState write SetConflictState;
     /// Contiene il nome della classe originaria cioè, nel caso il contesto sia stato creato con
     ///  la TrueClassVirtual (select query) a partire da una resolved class name, contiene il nome
     ///  della classe originaria, quella dalla quale poi si è estratta la TrueClassVirtualMap stessa.
@@ -204,7 +208,7 @@ begin
 end;
 
 constructor TioContext.Create(const AIntent: TioPersistenceIntentType; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
-      const AMasterPropertyName, AMasterPropertyPath: String);
+      const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
 begin
   inherited Create;
   FMap := AMap;
@@ -216,10 +220,11 @@ begin
   FObjNextVersion := OBJVERSION_NULL;
   FOriginalNonTrueClassMap := nil;
   FEntityFromVersion := 0;
-  FPersistenceIntentType := AIntent;
-  FPersistenceActionType := atDoNotPersist;
-  FPersistenceConflictDetected := False;
-  FPersistenceConflictState := csUndefined;
+  FIntentType := AIntent;
+  FActionType := atDoNotPersist;
+  FBlindLevel := ABlindLevel;
+  FConflictDetected := False;
+  FConflictState := csUndefined;
 end;
 
 function TioContext.GetClassRef: TioClassRef;
@@ -255,7 +260,7 @@ end;
 
 function TioContext.GetCurrentStrategyName: String;
 begin
-  case FPersistenceActionType of
+  case FActionType of
     atUpdate:
       Result := TioCustomConflictStrategyRef(GetTable.UpdateConflictStrategy).Name;
     atDelete:
@@ -351,24 +356,29 @@ begin
     Result := FMap;
 end;
 
-function TioContext.GetPersistenceActionType: TioPersistenceActionType;
+function TioContext.GetActionType: TioPersistenceActionType;
 begin
-  Result := FPersistenceActionType;
+  Result := FActionType;
 end;
 
-function TioContext.GetPersistenceConflictDetected: Boolean;
+function TioContext.GetBlindLevel: Byte;
 begin
-  Result := FPersistenceConflictDetected;
+  Result := FBlindLevel;
 end;
 
-function TioContext.GetPersistenceConflictState: TioPersistenceConflictState;
+function TioContext.GetConflictDetected: Boolean;
 begin
-  Result := FPersistenceConflictState;
+  Result := FConflictDetected;
 end;
 
-function TioContext.GetPersistenceIntentType: TioPersistenceIntentType;
+function TioContext.GetConflictState: TioPersistenceConflictState;
 begin
-  Result := FPersistenceIntentType;
+  Result := FConflictState;
+end;
+
+function TioContext.GetIntentType: TioPersistenceIntentType;
+begin
+  Result := FIntentType;
 end;
 
 function TioContext.GetProperties: IioProperties;
@@ -491,24 +501,29 @@ begin
   FOriginalNonTrueClassMap := AMap;
 end;
 
-procedure TioContext.SetPersistenceActionType(const Value: TioPersistenceActionType);
+procedure TioContext.SetActionType(const Value: TioPersistenceActionType);
 begin
-  FPersistenceActionType := Value;
+  FActionType := Value;
 end;
 
-procedure TioContext.SetPersistenceConflictDetected(const Value: Boolean);
+procedure TioContext.SetBlindLevel(const Value: Byte);
 begin
-  FPersistenceConflictDetected := Value;
+  FBlindLevel := Value;
 end;
 
-procedure TioContext.SetPersistenceConflictState(const Value: TioPersistenceConflictState);
+procedure TioContext.SetConflictDetected(const Value: Boolean);
 begin
-  FPersistenceConflictState := Value;
+  FConflictDetected := Value;
 end;
 
-procedure TioContext.SetPersistenceIntentType(const Value: TioPersistenceIntentType);
+procedure TioContext.SetConflictState(const Value: TioPersistenceConflictState);
 begin
-  FPersistenceIntentType := Value;
+  FConflictState := Value;
+end;
+
+procedure TioContext.SetIntentType(const Value: TioPersistenceIntentType);
+begin
+  FIntentType := Value;
 end;
 
 procedure TioContext.SetWhere(const AWhere: IioWhere);

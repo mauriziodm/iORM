@@ -69,7 +69,30 @@ const
   ssSaveRevertPoint = DJSON.Params.TdjSkipScope.ssSaveRevertPoint;
   ssDJSON = DJSON.Params.TdjSkipScope.ssDJSON;
 
+  // BlindLevel bit value
+  BL_BIT_OBJECT_EXISTS = 1;
+  BL_BIT_AUTO_UPDATE_PROPS = 2;
+  BL_BIT_DETECT_CONFLICTS = 4;
+  // BlindLevel constant values
+  BL_DEFAULT = 7;
+  BL_ALL = 7;
+  BL_NONE = 0;
+
 type
+
+  // BlindLevel helper
+  TioBlindLevel = class
+  public
+    class function Do_DetectObjectExists(const ABlindLevel: Byte): boolean; static; inline;
+    class function Do_AutoUpdateProps(const ABlindLevel: Byte): boolean; static; inline;
+    class function Do_DetectConflicts(const ABlindLevel: Byte): boolean; static; inline;
+    class procedure Set_DetectObjectExists(var ABlindLevel: Byte); static; inline;
+    class procedure Set_AutoUpdateProps(var ABlindLevel: Byte); static; inline;
+    class procedure Set_DetectConflicts(var ABlindLevel: Byte); static; inline;
+    class procedure Reset_DetectObjectExists(var ABlindLevel: Byte); static; inline;
+    class procedure Reset_AutoUpdateProps(var ABlindLevel: Byte); static; inline;
+    class procedure Reset_DetectConflicts(var ABlindLevel: Byte); static; inline;
+  end;
 
   // SkipScope (vedi anche sopra (const) i valori)
   TioSkipScope = DJSON.Params.TdjSkipScope;
@@ -210,6 +233,59 @@ procedure TioNullable<T>.SetValue(const Value: T);
 begin
   FValue := Value;
   FIsNull := ISNULL_VALUE;
+end;
+
+{ TioBlindLevel }
+
+class function TioBlindLevel.Do_DetectConflicts(const ABlindLevel: Byte): boolean;
+begin
+  Result := (ABlindLevel AND BL_BIT_DETECT_CONFLICTS) <> 0;
+end;
+
+class function TioBlindLevel.Do_DetectObjectExists(const ABlindLevel: Byte): boolean;
+begin
+  Result := (ABlindLevel AND BL_BIT_OBJECT_EXISTS) <> 0;
+end;
+
+class function TioBlindLevel.Do_AutoUpdateProps(const ABlindLevel: Byte): boolean;
+begin
+  Result := (ABlindLevel AND BL_BIT_AUTO_UPDATE_PROPS) <> 0;
+end;
+
+class procedure TioBlindLevel.Reset_DetectConflicts(var ABlindLevel: Byte);
+begin
+  if Do_DetectConflicts(ABlindLevel) then
+    Dec(ABlindLevel, BL_BIT_DETECT_CONFLICTS);
+end;
+
+class procedure TioBlindLevel.Reset_DetectObjectExists(var ABlindLevel: Byte);
+begin
+  if Do_DetectObjectExists(ABlindLevel) then
+    Dec(ABlindLevel, BL_BIT_OBJECT_EXISTS);
+end;
+
+class procedure TioBlindLevel.Reset_AutoUpdateProps(var ABlindLevel: Byte);
+begin
+  if Do_AutoUpdateProps(ABlindLevel) then
+    Dec(ABlindLevel, BL_BIT_AUTO_UPDATE_PROPS);
+end;
+
+class procedure TioBlindLevel.Set_DetectConflicts(var ABlindLevel: Byte);
+begin
+  if not Do_DetectConflicts(ABlindLevel) then
+    Inc(ABlindLevel, BL_BIT_DETECT_CONFLICTS);
+end;
+
+class procedure TioBlindLevel.Set_DetectObjectExists(var ABlindLevel: Byte);
+begin
+  if not Do_DetectObjectExists(ABlindLevel) then
+    Inc(ABlindLevel, BL_BIT_OBJECT_EXISTS);
+end;
+
+class procedure TioBlindLevel.Set_AutoUpdateProps(var ABlindLevel: Byte);
+begin
+  if not Do_AutoUpdateProps(ABlindLevel) then
+    Inc(ABlindLevel, BL_BIT_AUTO_UPDATE_PROPS);
 end;
 
 end.

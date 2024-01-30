@@ -748,7 +748,7 @@ begin
     for AResolvedTypeName in AResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(itRegular, AResolvedTypeName, Self, nil, nil, '', '');
+      AContext := TioContextFactory.Context(itRegular, AResolvedTypeName, Self, nil, nil, '', '', BL_DEFAULT);
       // Start transaction
       ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
       // Load the current class data into the list
@@ -806,7 +806,7 @@ begin
     for AResolvedTypeName in AResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(itRegular, AResolvedTypeName, Self, nil, nil, '', '');
+      AContext := TioContextFactory.Context(itRegular, AResolvedTypeName, Self, nil, nil, '', '', BL_DEFAULT);
       // Start transaction
       ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
       // Load the current class data into the list

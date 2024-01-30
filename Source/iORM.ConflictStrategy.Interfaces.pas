@@ -102,8 +102,8 @@ class procedure TioCustomConflictStrategy.ResolveDeleteConflict(const AContext: 
 begin
   // Note: if you derive your own ConflictStrategy class and override this method then
   //        I suggest you to put the inherited at the bottom of the method
-  AContext.PersistenceConflictState := AContext.Map.GetTable.DeleteConflictStrategy_OnConflictSetStateAs;
-  if AContext.PersistenceConflictState = csRejectedRaise then
+  AContext.ConflictState := AContext.Map.GetTable.DeleteConflictStrategy_OnConflictSetStateAs;
+  if AContext.ConflictState = csRejectedRaise then
     raise EioConcurrencyConflictException.Create(ClassName, 'ResolveDeleteConflict', AContext);
 end;
 
@@ -111,8 +111,8 @@ class procedure TioCustomConflictStrategy.ResolveUpdateConflict(const AContext: 
 begin
   // Note: if you derive your own ConflictStrategy class and override this method then
   //        I suggest you to put the inherited at the bottom of the method
-  AContext.PersistenceConflictState := AContext.Map.GetTable.UpdateConflictStrategy_OnConflictSetStateAs;
-  if AContext.PersistenceConflictState = csRejectedRaise then
+  AContext.ConflictState := AContext.Map.GetTable.UpdateConflictStrategy_OnConflictSetStateAs;
+  if AContext.ConflictState = csRejectedRaise then
     raise EioConcurrencyConflictException.Create(ClassName, 'ResolveUpdateConflict', AContext);
 end;
 
