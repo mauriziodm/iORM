@@ -543,6 +543,7 @@ type
     // Persistence related props
     FActionType: TioPersistenceActionType;
     FIntentType: TioPersistenceIntentType;
+    FBlindLevel: Byte;
     FConflictDetected: Boolean;
     FConflictState: TioPersistenceConflictState;
     FConflictStrategyName: String;
@@ -561,6 +562,9 @@ type
     function GetSmartActionType: String;
     function GetSmartDescription: String;
     function GetSmartFullDescription: String;
+    function GetBlindLevel_AutoUpdateProps: Boolean;
+    function GetBlindLevel_DetectObjExists: Boolean;
+    function GetBlindLevel_DetectConflicts: Boolean;
     // Diff
     function GetDiffOneWay: String;
     function GetDiffOneWayMoreInfo: String;
@@ -586,6 +590,11 @@ type
     property ConflictDetected: Boolean read FConflictDetected;
     property ConflictState: TioPersistenceConflictState read FConflictState;
     property ConflictStrategyName: String read FConflictStrategyName;
+    // BlindLevel props
+    property BlindLevel: Byte read FBlindLevel;
+    property BlindLevel_AutoUpdateProps: Boolean read GetBlindLevel_AutoUpdateProps;
+    property BlindLevel_DetectObjExists: Boolean read GetBlindLevel_DetectObjExists;
+    property BlindLevel_DetectConflicts: Boolean read GetBlindLevel_DetectConflicts;
     // Conflict check by human related props
     property ConflictCheckedByHuman: Boolean read FConflictCheckedByHuman;
     property ConflictCheckedByHuman_ID: Integer read FConflictCheckedByHuman_ID;
@@ -971,6 +980,7 @@ begin
   // Persistence related props
   FActionType := LContext.ActionType;
   FIntentType := LContext.IntentType;
+  FBlindLevel := LContext.BlindLevel;
   FConflictDetected := LContext.ConflictDetected;
   FConflictState := LContext.ConflictState;
   FConflictStrategyName := LContext.GetCurrentStrategyName;
@@ -1037,6 +1047,21 @@ procedure TioEtmCustomTimeSlot.DiffToStream(const ATargetStream: TStream; const 
 begin
   if Assigned(FExtractCurrentEntityFunc) then
     TioEtmEngine.DiffToStream(ATargetStream, FExtractCurrentEntityFunc, Self, ADiffMode, AMoreInfo);
+end;
+
+function TioEtmCustomTimeSlot.GetBlindLevel_AutoUpdateProps: Boolean;
+begin
+  Result := (FBlindLevel AND BL_BIT_AUTO_UPDATE_PROPS) <> 0;
+end;
+
+function TioEtmCustomTimeSlot.GetBlindLevel_DetectConflicts: Boolean;
+begin
+  Result := (FBlindLevel AND BL_BIT_DETECT_CONFLICTS) <> 0;
+end;
+
+function TioEtmCustomTimeSlot.GetBlindLevel_DetectObjExists: Boolean;
+begin
+  Result := (FBlindLevel AND BL_BIT_DETECT_OBJ_EXISTS) <> 0;
 end;
 
 function TioEtmCustomTimeSlot.GetDiffOneWay: String;

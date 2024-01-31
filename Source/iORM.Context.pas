@@ -141,13 +141,13 @@ type
     procedure ResolveUpdateConflict(const AContext: IioContext); inline;
     function GetCurrentStrategyName: String;
     // BlindLevel helper methods
-    function BlindLevel_Do_DetectObjectExists: boolean; inline;
+    function BlindLevel_Do_DetectObjExists: boolean; inline;
     function BlindLevel_Do_AutoUpdateProps: boolean; inline;
     function BlindLevel_Do_DetectConflicts: boolean; inline;
-    procedure BlindLevel_Set_DetectObjectExists; inline;
+    procedure BlindLevel_Set_DetectObjExists; inline;
     procedure BlindLevel_Set_AutoUpdateProps; inline;
     procedure BlindLevel_Set_DetectConflicts; inline;
-    procedure BlindLevel_Reset_DetectObjectExists; inline;
+    procedure BlindLevel_Reset_DetectObjExists; inline;
     procedure BlindLevel_Reset_AutoUpdateProps; inline;
     procedure BlindLevel_Reset_DetectConflicts; inline;
     // Map
@@ -207,7 +207,7 @@ begin
   Result := (FBlindLevel AND BL_BIT_DETECT_CONFLICTS) <> 0;
 end;
 
-function TioContext.BlindLevel_Do_DetectObjectExists: boolean;
+function TioContext.BlindLevel_Do_DetectObjExists: boolean;
 begin
   Result := (FBlindLevel AND BL_BIT_DETECT_OBJ_EXISTS) <> 0;
 end;
@@ -224,9 +224,9 @@ begin
     Dec(FBlindLevel, BL_BIT_DETECT_CONFLICTS);
 end;
 
-procedure TioContext.BlindLevel_Reset_DetectObjectExists;
+procedure TioContext.BlindLevel_Reset_DetectObjExists;
 begin
-  if BlindLevel_Do_DetectObjectExists then
+  if BlindLevel_Do_DetectObjExists then
     Dec(FBlindLevel, BL_BIT_DETECT_OBJ_EXISTS);
 end;
 
@@ -242,9 +242,9 @@ begin
     Inc(FBlindLevel, BL_BIT_DETECT_CONFLICTS);
 end;
 
-procedure TioContext.BlindLevel_Set_DetectObjectExists;
+procedure TioContext.BlindLevel_Set_DetectObjExists;
 begin
-  if not BlindLevel_Do_DetectObjectExists then
+  if not BlindLevel_Do_DetectObjExists then
     Inc(FBlindLevel, BL_BIT_DETECT_OBJ_EXISTS);
 end;
 

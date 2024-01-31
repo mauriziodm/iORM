@@ -599,7 +599,7 @@ var
             AMasterBSPersistence.SmartUpdateDetection.IsToBePersisted(AObj, LContext.MasterPropertyPath) then
           begin
             // old code: if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
-            if LContext.IDIsNull or (LContext.BlindLevel_Do_DetectObjectExists and not ObjectExists(LContext)) then
+            if LContext.IDIsNull or (LContext.BlindLevel_Do_DetectObjExists and not ObjectExists(LContext)) then
               LContext.ActionType := atInsert
             else
               LContext.ActionType := atUpdate;
