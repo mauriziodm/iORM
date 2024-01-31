@@ -215,37 +215,37 @@ end;
 procedure TioContext.BlindLevel_Reset_AutoUpdateProps;
 begin
   if BlindLevel_Do_AutoUpdateProps then
-    Dec(ABlindLevel, BL_BIT_AUTO_UPDATE_PROPS);
+    Dec(FBlindLevel, BL_BIT_AUTO_UPDATE_PROPS);
 end;
 
 procedure TioContext.BlindLevel_Reset_DetectConflicts;
 begin
   if BlindLevel_Do_DetectConflicts then
-    Dec(ABlindLevel, BL_BIT_DETECT_CONFLICTS);
+    Dec(FBlindLevel, BL_BIT_DETECT_CONFLICTS);
 end;
 
 procedure TioContext.BlindLevel_Reset_DetectObjectExists;
 begin
   if BlindLevel_Do_DetectObjectExists then
-    Dec(ABlindLevel, BL_BIT_DETECT_OBJ_EXISTS);
+    Dec(FBlindLevel, BL_BIT_DETECT_OBJ_EXISTS);
 end;
 
 procedure TioContext.BlindLevel_Set_AutoUpdateProps;
 begin
   if not BlindLevel_Do_AutoUpdateProps then
-    Inc(ABlindLevel, BL_BIT_AUTO_UPDATE_PROPS);
+    Inc(FBlindLevel, BL_BIT_AUTO_UPDATE_PROPS);
 end;
 
 procedure TioContext.BlindLevel_Set_DetectConflicts;
 begin
   if not BlindLevel_Do_DetectConflicts then
-    Inc(ABlindLevel, BL_BIT_DETECT_CONFLICTS);
+    Inc(FBlindLevel, BL_BIT_DETECT_CONFLICTS);
 end;
 
 procedure TioContext.BlindLevel_Set_DetectObjectExists;
 begin
   if not BlindLevel_Do_DetectObjectExists then
-    Inc(ABlindLevel, BL_BIT_DETECT_OBJ_EXISTS);
+    Inc(FBlindLevel, BL_BIT_DETECT_OBJ_EXISTS);
 end;
 
 procedure TioContext.CheckDeleteConflict(const AContext: IioContext);
