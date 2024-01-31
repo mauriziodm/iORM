@@ -709,7 +709,7 @@ begin
   Result := function: TObject
     begin
       Result := nil;
-      io.PersistList(AActiveBindSourceAdapter.DataObject, False);
+      io.PersistList(AActiveBindSourceAdapter.DataObject, BL_DEFAULT);
     end;
 end;
 
@@ -725,7 +725,7 @@ begin
       try
         // Persist the main obj
         if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioMasterBindSource, LBSPersistenceClient) then
-          io._PersistObjectInternal(AActiveBindSourceAdapter.Current, itRegular, '', 0, False, LBSPersistenceClient.Persistence, '', '');
+          io._PersistObjectInternal(AActiveBindSourceAdapter.Current, itRegular, '', 0, LBSPersistenceClient.Persistence, '', '', BL_DEFAULT);
         // Delete objects referenced into the SmartDeleteSystem
         LBSPersistenceClient.Persistence.SmartDeleteSystem.ForEach(
           procedure(ASmartDeleteSystemItem: TioSmartDeleteSystemItem)

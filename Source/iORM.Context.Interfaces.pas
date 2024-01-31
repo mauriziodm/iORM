@@ -61,6 +61,16 @@ type
     procedure ResolveDeleteConflict(const AContext: IioContext);
     procedure ResolveUpdateConflict(const AContext: IioContext);
     function GetCurrentStrategyName: String;
+    // BlindLevel helper methods
+    function BlindLevel_Do_DetectObjectExists: boolean;
+    function BlindLevel_Do_AutoUpdateProps: boolean;
+    function BlindLevel_Do_DetectConflicts: boolean;
+    procedure BlindLevel_Set_DetectObjectExists;
+    procedure BlindLevel_Set_AutoUpdateProps;
+    procedure BlindLevel_Set_DetectConflicts;
+    procedure BlindLevel_Reset_DetectObjectExists;
+    procedure BlindLevel_Reset_AutoUpdateProps;
+    procedure BlindLevel_Reset_DetectConflicts;
     // Map
     function Map: IioMap;
     // DataObject

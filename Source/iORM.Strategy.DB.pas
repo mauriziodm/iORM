@@ -320,13 +320,13 @@ begin
     Exit;
   // Conflict strategy: check if there is a persistence conflict or prepare the where object of the context
   // to consider the version property (or some other property useful for conflict detection)
-  if TioBlindLevel.Do_DetectConflicts(AContext.BlindLevel) then
+  if AContext.BlindLevel_Do_DetectConflicts then
     AContext.CheckDeleteConflict(AContext);
   // Create and execute the query to delete the entity on DB cheking the version to avoid concurrency
   // conflict (if versioning is enabled for this type of entity)
   if not AContext.ConflictDetected then
   begin
-    LQuery := TioDBFactory.QueryEngine.GetQueryDelete(AContext, TioBlindLevel.Do_DetectConflicts(AContext.BlindLevel));
+    LQuery := TioDBFactory.QueryEngine.GetQueryDelete(AContext, AContext.BlindLevel_Do_DetectConflicts);
     AContext.ConflictDetected := LQuery.ExecSQL = 0;
   end;
   // Conflict strategy: if a conclict is detected then resolve it
@@ -337,7 +337,7 @@ begin
     AContext.ResolveDeleteConflict(AContext);
     if AContext.ConflictState = csResolved then
     begin
-      TioBlindLevel.Reset_DetectConflicts(AContext.BlindLevel);
+      AContext.BlindLevel_Reset_DetectConflicts;
       TioDBFactory.QueryEngine.GetQueryDelete(AContext, True).ExecSQL;
     end;
   end;
@@ -352,7 +352,7 @@ begin
   // Get and execute a query to retrieve the next ID for the inserting object
   // before the insert query (for Firebird/Interbase)
   if (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtBeforeInsert)
-  and TioBlindLevel.Do_AutoUpdateProps(AContext.BlindLevel)
+  and AContext.BlindLevel_Do_AutoUpdateProps
   and AContext.IDIsNull then
   begin
     LQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
@@ -368,7 +368,7 @@ begin
   // Create and execute insert query and set the version/created/updated of the entity (Intercepted by crudInterceptors)
   LQuery := TioDBFactory.QueryEngine.GetQueryInsert(AContext);
   LQuery.ExecSQL;
-  if TioBlindLevel.Do_AutoUpdateProps(AContext.BlindLevel) then
+  if AContext.BlindLevel_Do_AutoUpdateProps then
   begin
     AContext.ObjVersion := AContext.ObjNextVersion;
     AContext.ObjCreated := LQuery.Connection.LastTransactionTimestamp;
@@ -382,7 +382,7 @@ begin
   // Get and execute a query to retrieve the last ID generated
   // in the last insert query.
   if (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtAfterInsert)
-  and TioBlindLevel.Do_AutoUpdateProps(AContext.BlindLevel)
+  and AContext.BlindLevel_Do_AutoUpdateProps
   and AContext.IDIsNull then
   begin
     LQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
@@ -554,7 +554,7 @@ var
   procedure _Interceptors_InterceptBeforeAction;
   begin
     LDoneByInterceptor := False;
-    case LContext.PersistenceActionType of
+    case LContext.ActionType of
       atUpdate:
         TioCRUDInterceptorRegister.BeforeUpdate(LContext, LDoneByInterceptor);
       atInsert:
@@ -565,7 +565,7 @@ var
   end;
   procedure _Interceptors_InterceptAfterAction;
   begin
-    case LContext.PersistenceActionType of
+    case LContext.ActionType of
       atUpdate:
         TioCRUDInterceptorRegister.AfterUpdate(LContext);
       atInsert:
@@ -576,7 +576,7 @@ var
   end;
   function _Interceptors_InterceptException(const AException: Exception): Boolean;
   begin
-    case LContext.PersistenceActionType of
+    case LContext.ActionType of
       atUpdate:
         Result := TioCRUDInterceptorRegister.OnUpdateException(LContext, AException);
       atInsert:
@@ -599,15 +599,15 @@ var
             AMasterBSPersistence.SmartUpdateDetection.IsToBePersisted(AObj, LContext.MasterPropertyPath) then
           begin
             // old code: if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
-            if LContext.IDIsNull or (TioBlindLevel.Do_DetectObjectExists(ABlindLevel) and not ObjectExists(LContext)) then
-              LContext.PersistenceActionType := atInsert
+            if LContext.IDIsNull or (LContext.BlindLevel_Do_DetectObjectExists and not ObjectExists(LContext)) then
+              LContext.ActionType := atInsert
             else
-              LContext.PersistenceActionType := atUpdate;
+              LContext.ActionType := atUpdate;
           end;
         end;
       osDeleted:
       else
-        LContext.PersistenceActionType := atDoNotPersist;
+        LContext.ActionType := atDoNotPersist;
     end;
   end;
 
@@ -646,7 +646,7 @@ begin
       PreProcessRelationChildOnPersist(LContext);
       // Process the current object
       // --------------------------
-      case LContext.PersistenceActionType of
+      case LContext.ActionType of
         atInsert:
           InsertObject_Internal(LContext);
         atUpdate:
@@ -701,10 +701,10 @@ begin
     case LMasterProp.GetRelationType of
       // If relation HasMany
       rtHasMany:
-        _DoDeleteList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.PersistenceIntentType, AMasterContext.BlindLevel);
+        _DoDeleteList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.IntentType, AMasterContext.BlindLevel);
       // If relation HasOne
       rtHasOne:
-        _DoDeleteObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.PersistenceIntentType, AMasterContext.BlindLevel);
+        _DoDeleteObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.IntentType, AMasterContext.BlindLevel);
     end;
   end;
 end;
@@ -723,12 +723,12 @@ begin
     case LMasterProp.GetRelationType of
       // If relation HasMany
       rtHasMany:
-        _DoPersistList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.PersistenceIntentType,
+        _DoPersistList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.IntentType,
           LMasterProp.GetRelationChildPropertyName, AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger,
           AMasterContext.MasterBSPersistence, LMasterProp.GetName, AMasterContext.MasterPropertyPath, AMasterContext.BlindLevel);
       // If relation HasOne
       rtHasOne:
-        _DoPersistObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.PersistenceIntentType,
+        _DoPersistObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.IntentType,
           LMasterProp.GetRelationChildPropertyName, AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger,
           AMasterContext.MasterBSPersistence, LMasterProp.GetName, AMasterContext.MasterPropertyPath, AMasterContext.BlindLevel);
     end;
@@ -860,7 +860,7 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LContext := TioContextFactory.Context(itRegular, LResolvedTypeName, AWhere, nil, nil, '', '');
+      LContext := TioContextFactory.Context(itRegular, LResolvedTypeName, AWhere, nil, nil, '', '', BL_DEFAULT);
       // If the object is of a class mapped as NotPersisted then skip it
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
@@ -913,7 +913,7 @@ var
           // If TrueClassMode is tvSmart then get the specific context for the current record/object else
           // use the original context
           if LOriginalContext.GetTrueClass.Mode = tcSmart then
-            LCurrentContext := LContextCache.GetContext(AIntent, LQuery.ExtractTrueClassName(LOriginalContext), AWhere)
+            LCurrentContext := LContextCache.GetContext(AIntent, LQuery.ExtractTrueClassName(LOriginalContext), AWhere, BL_DEFAULT)
           else
             LCurrentContext := LOriginalContext;
           // Clean the DataObject (it contains the previous)
@@ -973,7 +973,7 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LOriginalContext := TioContextFactory.TrueClassVirtualContextIfEnabled(AIntent, LResolvedTypeName, AWhere);
+      LOriginalContext := TioContextFactory.TrueClassVirtualContextIfEnabled(AIntent, LResolvedTypeName, AWhere, BL_DEFAULT);
       // If the object is of a class mapped as NotPersisted then skip it
       if LOriginalContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
@@ -1022,7 +1022,7 @@ var
           // If TrueClassMode is tvSmart then get the specific context for the current record/object else
           // use the original context
           if LOriginalContext.GetTrueClass.Mode = tcSmart then
-            LCurrentContext := TioContextFactory.Context(AIntent, LQuery.ExtractTrueClassName(LOriginalContext), AWhere, Result, nil, '', '')
+            LCurrentContext := TioContextFactory.Context(AIntent, LQuery.ExtractTrueClassName(LOriginalContext), AWhere, Result, nil, '', '', BL_DEFAULT)
           else
             LCurrentContext := LOriginalContext;
           // Create the object as TObject (Intercepted by CRUDInterceptors)
@@ -1074,7 +1074,7 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LOriginalContext := TioContextFactory.TrueClassVirtualContextIfEnabled(AIntent, LResolvedTypeName, AWhere);
+      LOriginalContext := TioContextFactory.TrueClassVirtualContextIfEnabled(AIntent, LResolvedTypeName, AWhere, BL_DEFAULT);
       // If the object is of a class mapped as NotPersisted then skip it
       if LOriginalContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
@@ -1102,13 +1102,13 @@ begin
   inherited;
   // Conflict strategy: check if there is a persistence conflict or prepare the where object of the context
   // to consider the version property (or some other property useful for conflict detection)
-  if TioBlindLevel.Do_DetectConflicts(AContext.BlindLevel) then
+  if AContext.BlindLevel_Do_DetectConflicts then
     AContext.CheckUpdateConflict(AContext);
   // Create and execute the query to update the entity on DB cheking the version to avoid concurrency
   // conflict (if versioning is enabled for this type of entity)
   if not AContext.ConflictDetected then
   begin
-    LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext, TioBlindLevel.Do_DetectConflicts(AContext.BlindLevel));
+    LQuery := TioDBFactory.QueryEngine.GetQueryUpdate(AContext);
     AContext.ConflictDetected := LQuery.ExecSQL = 0;
   end;
   // Conflict strategy: if a conclict is detected then resolve it
@@ -1119,12 +1119,12 @@ begin
     AContext.ResolveUpdateConflict(AContext);
     if AContext.ConflictState = csResolved then
     begin
-      TioBlindLevel.Reset_DetectConflicts(AContext.BlindLevel);
+      AContext.BlindLevel_Reset_DetectConflicts;
       TioDBFactory.QueryEngine.GetQueryUpdate(AContext).ExecSQL;
     end;
   end;
   // If there is no conflict or there is a conflict but it has been resolved…
-  if TioBlindLevel.Do_AutoUpdateProps(AContext.BlindLevel) and ((not AContext.ConflictDetected) or (AContext.ConflictState <= csResolved)) then
+  if AContext.BlindLevel_Do_AutoUpdateProps and ((not AContext.ConflictDetected) or (AContext.ConflictState <= csResolved)) then
   begin
     AContext.ObjVersion := AContext.ObjNextVersion;
     AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;;

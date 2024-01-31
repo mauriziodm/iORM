@@ -97,7 +97,7 @@ begin
   if AContext.WhereExist then
     LQueryIdentity := ComposeQueryIdentity(AContext, 'DEL_WHERE', AForceCacheable)
   else
-  if TioBlindLevel.Do_DetectConflicts(AContext.BlindLevel) then
+  if AContext.BlindLevel_Do_DetectConflicts then
     LQueryIdentity := ComposeQueryIdentity(AContext, 'DEL_OBJVER', AForceCacheable)
   else
     LQueryIdentity := ComposeQueryIdentity(AContext, 'DEL', AForceCacheable);
@@ -115,7 +115,7 @@ begin
   begin
     // Where conditions for obj instance delete (with ObjVersion if exists for this entity type)
     LQuery.WhereParamObjID_SetValue(AContext);
-    if TioBlindLevel.Do_DetectConflicts(AContext.BlindLevel) and AContext.GetProperties.ObjVersionPropertyExist then
+    if AContext.BlindLevel_Do_DetectConflicts and AContext.GetProperties.ObjVersionPropertyExist then
       LQuery.WhereParamObjVersion_SetValue(AContext);
   end;
 end;
@@ -352,7 +352,7 @@ var
   LQuery: IioQuery;
 begin
   // Compose query identity
-  if TioBlindLevel.Do_DetectConflicts(AContext.BlindLevel) then
+  if AContext.BlindLevel_Do_DetectConflicts then
     LQueryIdentity := ComposeQueryIdentity(AContext, 'UPD_OBJVER', True)
   else
     LQueryIdentity := ComposeQueryIdentity(AContext, 'UPD', True);
@@ -395,7 +395,7 @@ begin
     LQuery.ParamByName_SetValue(AContext.GetTrueClass.GetSqlParamName, AContext.GetTrueClass.GetValue);
   // Where conditions (with ObjVersion if exists for this entity type)
   LQuery.WhereParamObjID_SetValue(AContext);
-  if TioBlindLevel.Do_DetectConflicts(AContext.BlindLevel) and AContext.GetProperties.ObjVersionPropertyExist then
+  if AContext.BlindLevel_Do_DetectConflicts and AContext.GetProperties.ObjVersionPropertyExist then
     LQuery.WhereParamObjVersion_SetValue(AContext); // Qua prende l'Objversion dall'oggetto così come è
 end;
 

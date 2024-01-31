@@ -205,12 +205,12 @@ end;
 
 class procedure TioCommonBSABehavior.SetObjStatus(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AObjStatus: TioObjStatus);
 begin
-  TioContextFactory.Context(itRegular, AActiveBindSourceAdapter.Current.ClassName, nil, AActiveBindSourceAdapter.Current, nil, '', '').ObjStatus := AObjStatus;
+  TioContextFactory.Context(itRegular, AActiveBindSourceAdapter.Current.ClassName, nil, AActiveBindSourceAdapter.Current, nil, '', '', BL_DEFAULT).ObjStatus := AObjStatus;
 end;
 
 class function TioCommonBSABehavior.UseObjStatus(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): Boolean;
 begin
-  Result := TioContextFactory.Context(itRegular, AActiveBindSourceAdapter.Current.ClassName, nil, AActiveBindSourceAdapter.Current, nil, '', '')
+  Result := TioContextFactory.Context(itRegular, AActiveBindSourceAdapter.Current.ClassName, nil, AActiveBindSourceAdapter.Current, nil, '', '', BL_DEFAULT)
     .GetProperties.ObjStatusPropertyExist;
 end;
 

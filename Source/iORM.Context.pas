@@ -140,6 +140,16 @@ type
     procedure ResolveDeleteConflict(const AContext: IioContext); inline;
     procedure ResolveUpdateConflict(const AContext: IioContext); inline;
     function GetCurrentStrategyName: String;
+    // BlindLevel helper methods
+    function BlindLevel_Do_DetectObjectExists: boolean; inline;
+    function BlindLevel_Do_AutoUpdateProps: boolean; inline;
+    function BlindLevel_Do_DetectConflicts: boolean; inline;
+    procedure BlindLevel_Set_DetectObjectExists; inline;
+    procedure BlindLevel_Set_AutoUpdateProps; inline;
+    procedure BlindLevel_Set_DetectConflicts; inline;
+    procedure BlindLevel_Reset_DetectObjectExists; inline;
+    procedure BlindLevel_Reset_AutoUpdateProps; inline;
+    procedure BlindLevel_Reset_DetectConflicts; inline;
     // Map
     function Map: IioMap;
     // GroupBy
@@ -162,11 +172,11 @@ type
     property MasterPropertyPath: String read GetMasterPropertyPath;
     property MasterBSPersistence: TioBSPersistence read GetMasterBSPersistence;
     property EntityFromVersion: Integer read GetEntityFromVersion write SetEntityFromVersion;
-    property PersistenceActionType: TioPersistenceActionType read GetActionType write SetActionType;
-    property PersistenceIntentType: TioPersistenceIntentType read GetIntentType write SetIntentType;
-    property PersistenceBlindLevel: Byte read GetBlindLevel write SetBlindLevel;
-    property PersistenceConflictDetected: Boolean read GetConflictDetected write SetConflictDetected;
-    property PersistenceConflictState: TioPersistenceConflictState read GetConflictState write SetConflictState;
+    property ActionType: TioPersistenceActionType read GetActionType write SetActionType;
+    property IntentType: TioPersistenceIntentType read GetIntentType write SetIntentType;
+    property BlindLevel: Byte read GetBlindLevel write SetBlindLevel;
+    property ConflictDetected: Boolean read GetConflictDetected write SetConflictDetected;
+    property ConflictState: TioPersistenceConflictState read GetConflictState write SetConflictState;
     /// Contiene il nome della classe originaria cioè, nel caso il contesto sia stato creato con
     ///  la TrueClassVirtual (select query) a partire da una resolved class name, contiene il nome
     ///  della classe originaria, quella dalla quale poi si è estratta la TrueClassVirtualMap stessa.
@@ -185,6 +195,57 @@ uses
 function TioContext.GetTrueClass: IioTrueClass;
 begin
   Result := Self.Map.GetTable.GetTrueClass;
+end;
+
+function TioContext.BlindLevel_Do_AutoUpdateProps: boolean;
+begin
+  Result := (FBlindLevel AND BL_BIT_AUTO_UPDATE_PROPS) <> 0;
+end;
+
+function TioContext.BlindLevel_Do_DetectConflicts: boolean;
+begin
+  Result := (FBlindLevel AND BL_BIT_DETECT_CONFLICTS) <> 0;
+end;
+
+function TioContext.BlindLevel_Do_DetectObjectExists: boolean;
+begin
+  Result := (FBlindLevel AND BL_BIT_DETECT_OBJ_EXISTS) <> 0;
+end;
+
+procedure TioContext.BlindLevel_Reset_AutoUpdateProps;
+begin
+  if BlindLevel_Do_AutoUpdateProps then
+    Dec(ABlindLevel, BL_BIT_AUTO_UPDATE_PROPS);
+end;
+
+procedure TioContext.BlindLevel_Reset_DetectConflicts;
+begin
+  if BlindLevel_Do_DetectConflicts then
+    Dec(ABlindLevel, BL_BIT_DETECT_CONFLICTS);
+end;
+
+procedure TioContext.BlindLevel_Reset_DetectObjectExists;
+begin
+  if BlindLevel_Do_DetectObjectExists then
+    Dec(ABlindLevel, BL_BIT_DETECT_OBJ_EXISTS);
+end;
+
+procedure TioContext.BlindLevel_Set_AutoUpdateProps;
+begin
+  if not BlindLevel_Do_AutoUpdateProps then
+    Inc(ABlindLevel, BL_BIT_AUTO_UPDATE_PROPS);
+end;
+
+procedure TioContext.BlindLevel_Set_DetectConflicts;
+begin
+  if not BlindLevel_Do_DetectConflicts then
+    Inc(ABlindLevel, BL_BIT_DETECT_CONFLICTS);
+end;
+
+procedure TioContext.BlindLevel_Set_DetectObjectExists;
+begin
+  if not BlindLevel_Do_DetectObjectExists then
+    Inc(ABlindLevel, BL_BIT_DETECT_OBJ_EXISTS);
 end;
 
 procedure TioContext.CheckDeleteConflict(const AContext: IioContext);

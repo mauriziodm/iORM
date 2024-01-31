@@ -483,7 +483,7 @@ begin
   else
   begin
     AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName);
-    if TioBlindLevel.Do_DetectConflicts(AContext.BlindLevel) and AContext.GetProperties.ObjVersionPropertyExist then
+    if AContext.BlindLevel_Do_DetectConflicts and AContext.GetProperties.ObjVersionPropertyExist then
       AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + ' = :' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
   end;
   // -----------------------------------------------------------------
@@ -549,7 +549,7 @@ begin
   // Where conditions
   // note:
   AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + ' = :' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName);
-  if TioBlindLevel.Do_DetectConflicts(AContext.BlindLevel) and AContext.GetProperties.ObjVersionPropertyExist then
+  if AContext.BlindLevel_Do_DetectConflicts and AContext.GetProperties.ObjVersionPropertyExist then
     AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + ' = :' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
   // -----------------------------------------------------------------
 end;

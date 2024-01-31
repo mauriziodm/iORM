@@ -341,11 +341,11 @@ begin
     LConnection.RequestBody.Clear;
     LConnection.RequestBody.RelationPropertyName := ARelationPropertyName;
     LConnection.RequestBody.RelationOID := ARelationOID;
-    LConnection.RequestBody.BlindInsert := ABlindInsert;
+//    LConnection.RequestBody.BlindInsert := ABlindInsert;
     LConnection.RequestBody.DataObject := AList;
     LConnection.Execute('PersistCollection');
     // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
-    if not ABlindInsert then
+//    if not ABlindInsert then
       dj.FromJSON(LConnection.ResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(AList);
     // Commit
     LConnection.Commit;
@@ -379,11 +379,11 @@ begin
     LConnection.RequestBody.Clear;
     LConnection.RequestBody.RelationPropertyName := ARelationPropertyName;
     LConnection.RequestBody.RelationOID := ARelationOID;
-    LConnection.RequestBody.BlindInsert := ABlindInsert;
+//    LConnection.RequestBody.BlindInsert := ABlindInsert;
     LConnection.RequestBody.DataObject := AObj;
     LConnection.Execute('PersistObject');
     // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
-    if not ABlindInsert then
+//    if not ABlindInsert then
       dj.FromJSON(LConnection.ResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(AObj);
     // Commit
     LConnection.Commit;

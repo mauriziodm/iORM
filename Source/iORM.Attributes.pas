@@ -969,10 +969,10 @@ begin
   FUserID := IO_INTEGER_NULL_VALUE;
   FUserName := IO_STRING_NULL_VALUE;
   // Persistence related props
-  FActionType := LContext.PersistenceActionType;
-  FIntentType := LContext.PersistenceIntentType;
-  FConflictDetected := LContext.PersistenceConflictDetected;
-  FConflictState := LContext.PersistenceConflictState;
+  FActionType := LContext.ActionType;
+  FIntentType := LContext.IntentType;
+  FConflictDetected := LContext.ConflictDetected;
+  FConflictState := LContext.ConflictState;
   FConflictStrategyName := LContext.GetCurrentStrategyName;
   // Conflict check by human related props
   FConflictCheckedByHuman := False;
