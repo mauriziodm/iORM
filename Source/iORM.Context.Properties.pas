@@ -270,6 +270,7 @@ type
     FObjUpdatedUserIDProperty: IioProperty;
     FObjUpdatedUserNameProperty: IioProperty;
     FBlobFieldExists: Boolean;
+    FContainsHasManyOrHasOneProperties: Boolean;
   private
     // ObjStatus property
     function GetObjStatusProperty: IioProperty;
@@ -303,6 +304,9 @@ type
     function GetObjUpdatedUserNameProperty: IioProperty;
     procedure SetObjUpdatedUserNameProperty(const AValue: IioProperty);
     function ObjUpdatedUserNamePropertyExist: Boolean;
+    // ContainsHasManyOrHasOneProperties property
+    function GetContainsHasManyOrHasOneProperties: Boolean;
+    procedure SetContainsHasManyOrHasOneProperties(const AValue: Boolean);
   public
     constructor Create; reintroduce;
     destructor Destroy; override;
@@ -329,6 +333,8 @@ type
     property ObjUpdatedProperty: IioProperty read GetObjUpdatedProperty write SetObjUpdatedProperty;
     property ObjUpdatedUserIDProperty: IioProperty read GetObjUpdatedUserIDProperty write SetObjUpdatedUserIDProperty;
     property ObjUpdatedUserNameProperty: IioProperty read GetObjUpdatedUserNameProperty write SetObjUpdatedUserNameProperty;
+    // ContainsHasManyOrHasOneProperties property
+    property ContainsHasManyOrHasOneProperties: Boolean read GetContainsHasManyOrHasOneProperties write SetContainsHasManyOrHasOneProperties;
   end;
 
 implementation
@@ -1035,6 +1041,7 @@ begin
   FObjCreatedProperty := nil;
   FObjUpdatedProperty := nil;
   FPropertyItems := TList<IioProperty>.Create;
+  FContainsHasManyOrHasOneProperties := False;
 end;
 
 destructor TioProperties.Destroy;
@@ -1067,6 +1074,11 @@ begin
     if CurrProp.GetName.ToUpper.Equals(APropertyName.ToUpper) then
       Exit(True);
   Result := False;
+end;
+
+function TioProperties.GetContainsHasManyOrHasOneProperties: Boolean;
+begin
+  Result := FContainsHasManyOrHasOneProperties;
 end;
 
 function TioProperties.GetEnumerator: TEnumerator<IioProperty>;
@@ -1174,6 +1186,11 @@ end;
 function TioProperties.ObjVersionPropertyExist: Boolean;
 begin
   Result := Assigned(FObjVersionProperty);
+end;
+
+procedure TioProperties.SetContainsHasManyOrHasOneProperties(const AValue: Boolean);
+begin
+  FContainsHasManyOrHasOneProperties := AValue;
 end;
 
 procedure TioProperties.SetObjCreatedProperty(const AValue: IioProperty);

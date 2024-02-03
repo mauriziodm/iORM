@@ -967,6 +967,12 @@ var
 begin
   if not Supports(AContextAsIInterface, IioContext, LContext) then
     raise EioException.Create(ClassName, 'Create', 'The object received by the "AContextAsIInterface" parameter does not implements "IioContext" interface.');
+  // Se l'entità non ha un ID valido non è possibile che l'ETM funzioni
+  if LContext.IDIsNull then
+    raise EioETMException.Create(ClassName, 'Create', Format('Hi, I''m iORM, we have a problem.' +
+      #13#13'You asked me to persist an entity of type "%s" but this doesn''t have a valid ID.' +
+      #13#13'You probably set the "BlindLevel" so as not to set the object ID immediately after the insert operation but this is incompatible with using the ETM.' +
+      #13#13'Please try to set the BlindLevel to a correct value and try again, it will work.', [LContext.DataObject.ClassName]));
   // Entity related props
   FEntityClassName := LContext.DataObject.ClassName;
   FEntityID := LContext.GetID;

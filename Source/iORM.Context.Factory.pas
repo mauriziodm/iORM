@@ -667,6 +667,9 @@ var
       LNewProperty.WhereSkip := LWhereSkip;
       LNewProperty.WhereTargetPropName := LWhereTargetPropName;
       Result.Add(LNewProperty);
+      // Set "ContainsHasManyOrHasOneProperties" to True if there is some property with HasMany or HasOne relation
+      if (LNewProperty.GetRelationType = rtHasMany) or (LNewProperty.GetRelationType = rtHasOne)  then
+        Result.ContainsHasManyOrHasOneProperties := True;
       // If the current property is a virtual property (autodetected has many relation) then
       // add it to the AutodetectedHasManyRelationVirtualProperties of the ContextContainer
       if LNewProperty.HasAutodetectedHasManyRelation then

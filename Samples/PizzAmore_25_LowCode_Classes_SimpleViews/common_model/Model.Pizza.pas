@@ -15,6 +15,7 @@ uses
 type
 
   [ioEntity('PIZZAS'), etmTrace(TEtmRepository)]
+  [ioUpdateConflictStrategy(TioSameVersionWin, csResolved), ioDeleteConflictStrategy(TioSameVersionWin, csResolved)]
   TPizza = class
   private
     FID: Integer;

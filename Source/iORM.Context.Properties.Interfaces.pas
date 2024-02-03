@@ -218,6 +218,10 @@ type
     function GetObjUpdatedUserNameProperty: IioProperty;
     procedure SetObjUpdatedUserNameProperty(const AValue: IioProperty);
     property ObjUpdatedUserNameProperty: IioProperty read GetObjUpdatedUserNameProperty write SetObjUpdatedUserNameProperty;
+    // ContainsHasManyOrHasOneProperties property
+    function GetContainsHasManyOrHasOneProperties: Boolean;
+    procedure SetContainsHasManyOrHasOneProperties(const AValue: Boolean);
+    property ContainsHasManyOrHasOneProperties: Boolean read GetContainsHasManyOrHasOneProperties write SetContainsHasManyOrHasOneProperties;
   end;
 
 implementation

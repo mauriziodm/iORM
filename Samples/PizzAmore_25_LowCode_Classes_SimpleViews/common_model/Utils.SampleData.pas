@@ -29,7 +29,7 @@ begin
     try
       CreatePizzas;
       CreateRealCustomers;
-      CreateOtherCustomers;
+//      CreateOtherCustomers;
       CreateOrders;
       io.CommitTransaction;
     except
@@ -54,28 +54,28 @@ begin
   LPizza.Name := 'Margherita pizza';
   LPizza.Price := 4.5;
   LPizza.Image.LoadFromFile(TPath.Combine(LImagesPath, 'MargheritaPizza.bmp'));
-  io.PersistObject(LPizza);
+  io.PersistObject(LPizza, BL_BIT_AUTO_UPDATE_PROPS);
   FreeAndnil(LPizza);
   //  Capricciosa pizza
   LPizza := TPizza.Create;
   LPizza.Name := 'Capricciosa pizza';
   LPizza.Price := 7;
   LPizza.Image.LoadFromFile(TPath.Combine(LImagesPath, 'CapricciosaPizza.bmp'));
-  io.PersistObject(LPizza);
+  io.PersistObject(LPizza, BL_BIT_AUTO_UPDATE_PROPS);
   FreeAndnil(LPizza);
   // Pepperoni pizza
   LPizza := TPizza.Create;
   LPizza.Name := 'Pepperoni pizza';
   LPizza.Price := 6.5;
   LPizza.Image.LoadFromFile(TPath.Combine(LImagesPath, 'PepperoniPizza.bmp'));
-  io.PersistObject(LPizza);
+  io.PersistObject(LPizza, BL_BIT_AUTO_UPDATE_PROPS);
   FreeAndnil(LPizza);
   // Love pizza
   LPizza := TPizza.Create;
   LPizza.Name := 'Love pizza';
   LPizza.Price := 5;
   LPizza.Image.LoadFromFile(TPath.Combine(LImagesPath, 'LovePizza.bmp'));
-  io.PersistObject(LPizza);
+  io.PersistObject(LPizza, BL_BIT_AUTO_UPDATE_PROPS);
   FreeAndnil(LPizza);
 end;
 
@@ -89,7 +89,7 @@ begin
   LCustomer.City := 'New York City';
   LCustomer.Address := '301 Park Ave';
   LCustomer.PhoneNumber := '(555) 555-1234';
-  io.PersistObject(LCustomer);
+  io.PersistObject(LCustomer, BL_BIT_AUTO_UPDATE_PROPS);
   FreeAndnil(LCustomer);
   // Mr. Omar Bossoni
   LCustomer := TCustomer.Create;
@@ -97,7 +97,7 @@ begin
   LCustomer.City := 'New York City';
   LCustomer.Address := '111 E 48th St';
   LCustomer.PhoneNumber := '(444) 444-1234';
-  io.PersistObject(LCustomer);
+  io.PersistObject(LCustomer, BL_BIT_AUTO_UPDATE_PROPS);
   FreeAndnil(LCustomer);
   // Mr. Marco Mottadelli
   LCustomer := TCustomer.Create;
@@ -105,7 +105,7 @@ begin
   LCustomer.City := 'Union City';
   LCustomer.Address := '3501 Bergenline Ave';
   LCustomer.PhoneNumber := '(333) 333-1234';
-  io.PersistObject(LCustomer);
+  io.PersistObject(LCustomer, BL_BIT_AUTO_UPDATE_PROPS);
   FreeAndnil(LCustomer);
 end;
 
@@ -121,7 +121,7 @@ begin
     LCustomer.City := Format('city %d', [LCounter]);
     LCustomer.Address := Format('address %d', [LCounter]);
     LCustomer.PhoneNumber := Format('phone number %d', [LCounter]);
-    io.PersistObject(LCustomer);
+    io.PersistObject(LCustomer, BL_BIT_AUTO_UPDATE_PROPS);
     FreeAndnil(LCustomer);
   end;
 end;
@@ -139,7 +139,7 @@ begin
   LOrder.Rows.Add( TOrderRow.Create(2, 'Capricciosa pizza', 7, 2) );
   LOrder.Rows.Add( TOrderRow.Create(4, 'Love pizza', 5, 1) );
   LOrder.OrderState := osReady;
-  io.PersistObject(LOrder);
+  io.PersistObject(LOrder, BL_BIT_AUTO_UPDATE_PROPS);
   FreeAndnil(LOrder);
   // Second order
   LOrder := TOrder.Create;
@@ -149,7 +149,7 @@ begin
   LOrder.Rows.Add( TOrderRow.Create(1, 'Margherita pizza', 4.5, 1) );
   LOrder.Rows.Add( TOrderRow.Create(3, 'Pepperoni pizza', 6.5, 1) );
   LOrder.OrderState := osPreparing;
-  io.PersistObject(LOrder);
+  io.PersistObject(LOrder, BL_BIT_AUTO_UPDATE_PROPS);
   FreeAndnil(LOrder);
   // Third order
   LOrder := TOrder.Create;
@@ -157,7 +157,7 @@ begin
   LOrder.Customer := io.LoadObject<TCustomer>(3);
   LOrder.Rows.Add( TOrderRow.Create(4, 'Love pizza', 5, 1) );
   LOrder.OrderState := osWaiting;
-  io.PersistObject(LOrder);
+  io.PersistObject(LOrder, BL_BIT_AUTO_UPDATE_PROPS);
   FreeAndnil(LOrder);
 end;
 

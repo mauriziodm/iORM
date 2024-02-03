@@ -76,6 +76,7 @@ const
   // BlindLevel constant values
   BL_DEFAULT = 7; // All
   BL_ALL = 7; // All
+  BL_ETM_PERSIST_TIMESLOT = 0; // None
   BL_ETM_REVERT_TO_OBJ = 3; // BL_BIT_DETECT_OBJ_EXISTS + BL_BIT_AUTO_UPDATE_PROPS
   BL_ETM_REVERT_TO_DB = 1; // BL_BIT_DETECT_OBJ_EXISTS
   BL_NONE = 0;

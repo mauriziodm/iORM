@@ -266,6 +266,7 @@ begin
     Exit;
   // Create Context (Create a dummy ioWhere first to pass ConnectionName parameter only).
   LContext := TioContextFactory.Context(AIntent, AObj.ClassName, nil, AObj, nil, '', '', ABlindLevel);
+  LContext.ActionType := atDelete;
   // If the object is of a class mapped as NotPersisted then exit
   if LContext.Map.GetTable.IsNotPersistedEntity then
     Exit;
@@ -352,7 +353,7 @@ begin
   // Get and execute a query to retrieve the next ID for the inserting object
   // before the insert query (for Firebird/Interbase)
   if (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtBeforeInsert)
-  and AContext.BlindLevel_Do_AutoUpdateProps
+  and (AContext.BlindLevel_Do_AutoUpdateProps or AContext.GetProperties.ContainsHasManyOrHasOneProperties)
   and AContext.IDIsNull then
   begin
     LQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
@@ -382,7 +383,7 @@ begin
   // Get and execute a query to retrieve the last ID generated
   // in the last insert query.
   if (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtAfterInsert)
-  and AContext.BlindLevel_Do_AutoUpdateProps
+  and (AContext.BlindLevel_Do_AutoUpdateProps or AContext.GetProperties.ContainsHasManyOrHasOneProperties)
   and AContext.IDIsNull then
   begin
     LQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
