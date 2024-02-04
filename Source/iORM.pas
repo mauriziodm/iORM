@@ -311,8 +311,8 @@ type
   ioInject = iORM.Attributes.ioInject;
 
   // Conflict strategies attributes
-  ioDeleteConflictStrategy = iORM.ConflictStrategy.Interfaces.ioDeleteConflictStrategy;
-  ioUpdateConflictStrategy = iORM.ConflictStrategy.Interfaces.ioUpdateConflictStrategy;
+  ioDeleteConflictStrategy = iORM.ConflictStrategy.Interfaces.ioDeleteConflictStrategyAttribute;
+  ioUpdateConflictStrategy = iORM.ConflictStrategy.Interfaces.ioUpdateConflictStrategyAttribute;
 
   // ETM attributes
   etmRepository = iORM.Attributes.etmRepository;

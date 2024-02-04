@@ -63,7 +63,7 @@ type
   // NOTE: THESE ATTRIBUTES IS DECLARED HERE (not in iORM.Attributes unit) TO AVOID CIRCULAR REFERENCE
 
   // ioDeleteConflictStrategy attribute
-  ioDeleteConflictStrategy = class(TCustomAttribute)
+  ioDeleteConflictStrategyAttribute = class(TCustomAttribute)
   strict private
     FOnConflictSetStateAs: TioPersistenceConflictState;
     FStrategy: TioCustomConflictStrategyRef;
@@ -74,7 +74,7 @@ type
   end;
 
   // ioUpdateConflictStrategy attribute
-  ioUpdateConflictStrategy = type ioDeleteConflictStrategy;
+  ioUpdateConflictStrategyAttribute = type ioDeleteConflictStrategyAttribute;
 
 implementation
 
@@ -116,9 +116,9 @@ begin
     raise EioConcurrencyConflictException.Create(ClassName, 'ResolveUpdateConflict', AContext);
 end;
 
-{ ioDeleteConflictStrategy }
+{ ioDeleteConflictStrategyAttribute }
 
-constructor ioDeleteConflictStrategy.Create(const AStrategy: TioCustomConflictStrategyRef; const AOnConflictSetStateAs: TioPersistenceConflictState = csResolved);
+constructor ioDeleteConflictStrategyAttribute.Create(const AStrategy: TioCustomConflictStrategyRef; const AOnConflictSetStateAs: TioPersistenceConflictState = csResolved);
 begin
   FOnConflictSetStateAs := AOnConflictSetStateAs;
   FStrategy := AStrategy;

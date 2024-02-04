@@ -761,15 +761,15 @@ begin
         LIndexList.Add(ioIndex(LAttr));
       end;
       //Conflict strategies
-      if LAttr is ioDeleteConflictStrategy then
+      if LAttr is ioDeleteConflictStrategyAttribute then
       begin
-        LDeleteConflictStrategy := ioDeleteConflictStrategy(LAttr).Strategy;
-        LDeleteConflictStrategy_OnConflictSetStateAs := ioDeleteConflictStrategy(LAttr).OnConflictSetStateAs;
+        LDeleteConflictStrategy := ioDeleteConflictStrategyAttribute(LAttr).Strategy;
+        LDeleteConflictStrategy_OnConflictSetStateAs := ioDeleteConflictStrategyAttribute(LAttr).OnConflictSetStateAs;
       end;
-      if LAttr is ioUpdateConflictStrategy then
+      if LAttr is ioUpdateConflictStrategyAttribute then
       begin
-        LUpdateConflictStrategy := ioUpdateConflictStrategy(LAttr).Strategy;
-        LUpdateConflictStrategy_OnConflictSetStateAs := ioUpdateConflictStrategy(LAttr).OnConflictSetStateAs;
+        LUpdateConflictStrategy := ioUpdateConflictStrategyAttribute(LAttr).Strategy;
+        LUpdateConflictStrategy_OnConflictSetStateAs := ioUpdateConflictStrategyAttribute(LAttr).OnConflictSetStateAs;
       end;
       // etmTrace
       if (LAttr is etmTrace) then

@@ -60,16 +60,16 @@ uses
 
 { TioLastUpdateWin }
 
+class function TioLastUpdateWin.Name: String;
+begin
+  Result := 'Last update win';
+end;
+
 class function TioLastUpdateWin.ConflictConfirmed(const AContext: IioContext): Boolean;
 begin
   // If the obj in the DB is newer than the one being persisted then the conflict is confirmed, otherwise the conflict is considered resolved
   Result := io.Exists(AContext.Map.GetClassName, io.Where(AContext.GetProperties.GetIdProperty.GetName, coEquals, AContext.GetID)
     ._And(AContext.GetProperties.ObjUpdatedProperty.GetName, coGreater, AContext.ObjUpdated));
-end;
-
-class function TioLastUpdateWin.Name: String;
-begin
-  Result := 'Last update win';
 end;
 
 class procedure TioLastUpdateWin.ResolveDeleteConflict(const AContext: IioContext);
