@@ -55,7 +55,7 @@ object EtmForm: TEtmForm
     object LabelTitle: TLabel
       Left = 88
       Top = 7
-      Width = 397
+      Width = 393
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -188,9 +188,9 @@ object EtmForm: TEtmForm
       item
         Alignment = taCenter
         Expanded = False
-        FieldName = 'SmartEventType'
+        FieldName = 'SmartActionType'
         Title.Alignment = taCenter
-        Title.Caption = 'event type'
+        Title.Caption = 'action type'
         Title.Font.Charset = DEFAULT_CHARSET
         Title.Font.Color = clNavy
         Title.Font.Height = -13
@@ -294,7 +294,8 @@ object EtmForm: TEtmForm
       Size = 100
     end
     object DS_ETMSmartEventType: TStringField
-      FieldName = 'SmartEventType'
+      DisplayLabel = 'SmartEventType'
+      FieldName = 'SmartActionType'
       Size = 100
     end
     object DS_ETMDiffOneWay: TStringField
@@ -319,10 +320,10 @@ object EtmForm: TEtmForm
     object acEtmRevertToVersion: TioBS_ETM_RevertToBindSource
       Category = 'iORM - BS - ETM'
       Caption = 'Revert'
+      TargetBindSource = DS_ETM
       AutoExec_OnETMfor_AfterRevert = doRefresh
       AutoExec_OnTargetBS_AfterRevert = doReload
       AutoExec_Persist_AfterRevert = True
-      TargetBindSource = DS_ETM
     end
   end
 end

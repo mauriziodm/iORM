@@ -556,15 +556,19 @@ type
     // di risalire alla versione corrente della entità attraverso la catena "ETMBindSource.etmFor.Current"
     [ioSkip]
     FExtractCurrentEntityFunc: TFunc<TObject>;
+    // BlindLevel props
+    function GetBlindLevel_AutoUpdateProps: Boolean;
+    function GetBlindLevel_DetectObjExists: Boolean;
+    function GetBlindLevel_DetectConflicts: Boolean;
+    // Smart properties
     function GetSmartEntityInfo: String;
     function GetSmartEntityVersion: String;
     function GetSmartUser: String;
     function GetSmartActionType: String;
+    function GetSmartConflictDetected: String;
+    function GetSmartConflictCheckedByHuman: String;
     function GetSmartDescription: String;
     function GetSmartFullDescription: String;
-    function GetBlindLevel_AutoUpdateProps: Boolean;
-    function GetBlindLevel_DetectObjExists: Boolean;
-    function GetBlindLevel_DetectConflicts: Boolean;
     // Diff
     function GetDiffOneWay: String;
     function GetDiffOneWayMoreInfo: String;
@@ -604,7 +608,9 @@ type
     property SmartEntityInfo: String read GetSmartEntityInfo;
     property SmartEntityVersion: String read GetSmartEntityVersion;
     property SmartUser: String read GetSmartUser;
-    property SmartEventType: String read GetSmartActionType;
+    property SmartActionType: String read GetSmartActionType;
+    property SmartConflictDetected: String read GetSmartConflictDetected;
+    property SmartConflictCheckedByHuman: String read GetSmartConflictCheckedByHuman;
     property SmartDescription: String read GetSmartDescription;
     property SmartFullDescription: String read GetSmartFullDescription;
     // Diff methods
@@ -1008,26 +1014,62 @@ end;
 function TioEtmCustomTimeSlot.GetSmartEntityVersion: String;
 begin
   case FIntentType of
+    itRegular:
+      if FActionType = atUpdate then
+        Result := Format('%d (updated from %d)', [FEntityVersion, FEntityFromVersion])
+      else
+        FEntityVersion.ToString;
     itRevert:
       Result := Format('%d (reverted from %d)', [FEntityVersion, FEntityFromVersion]);
     itSynchronization:
       Result := Format('%d (synchronized from %d)', [FEntityVersion, FEntityFromVersion]);
   else
-    Result := FEntityVersion.ToString;
+    raise EioException.Create(ClassName,  'GetSmartEntityVersion', 'IntentType not valid.');
   end;
 end;
 
 function TioEtmCustomTimeSlot.GetSmartActionType: String;
 begin
-  // Event type
+  // Action type
   Result := io.Enums.OrdinalToString<TioPersistenceActionType>(Ord(FActionType));
   // Intent type
   case FIntentType of
     itRevert:
-      Result := Result + '%s (revert)';
+      Result := Result + ' (revert)';
     itSynchronization:
-      Result := Result + '%s (synchronization)';
+      Result := Result + ' (synchronization)';
   end;
+end;
+
+function TioEtmCustomTimeSlot.GetSmartConflictDetected: String;
+begin
+  if FConflictDetected then
+    Result := Format('Conflict (%s)', [io.Enums.OrdinalToString<TioPersistenceConflictState>(Ord(FConflictState))])
+  else
+    Result := String.Empty;
+end;
+
+function TioEtmCustomTimeSlot.GetSmartConflictCheckedByHuman: String;
+begin
+  // If not checked by human then return an empty string
+  if FConflictCheckedByHuman  then
+    Exit(String.Empty);
+  // If human checked build the result string
+  Result := 'Checked';
+  // human name & human ID
+  if not FConflictCheckedByHuman_Name.IsEmpty then
+  begin
+    Result := Result + ' by ' + FConflictCheckedByHuman_Name;
+    if FConflictCheckedByHuman_ID <> IO_INTEGER_NULL_VALUE then
+      Result := Result + ' (id ' + FConflictCheckedByHuman_ID.ToString + ')';
+  end
+  else
+  // human id only
+  if FConflictCheckedByHuman_ID <> IO_INTEGER_NULL_VALUE then
+    Result := Result + ' by id ' + FConflictCheckedByHuman_ID.ToString;
+  // date time
+  if FConflictCheckedByHuman_DateTime <> IO_DATETIME_NULL_VALUE then
+    Result := Result + ' on ' + DateTimeToStr(FConflictCheckedByHuman_DateTime, TFormatSettings.Create);
 end;
 
 function TioEtmCustomTimeSlot.Diff(const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean): String;
@@ -1096,6 +1138,7 @@ var
   LDateAndTime: String;
   LSmartUser: String;
 begin
+  // Es: '31/12/2023 10:15:35 Update (revert) user Maurizio'
   LFormatSettings := TFormatSettings.Create;
   LDateAndTime := DateTimeToStr(FDateAndTime, LFormatSettings);
   Result := Format('%s %s', [LDateAndTime, GetSmartActionType]);
@@ -1107,6 +1150,7 @@ end;
 
 function TioEtmCustomTimeSlot.GetSmartFullDescription: String;
 begin
+  // Es: '31/12/2023 10:15:35 Update (revert) user Maurizio ver. 5 (updated from 4)'
   Result := Format('%s ver. %s', [GetSmartDescription, GetSmartEntityVersion]);
 end;
 
