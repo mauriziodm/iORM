@@ -87,6 +87,10 @@ type
     FBeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     FonSelectionInterface: TioBSASelectionInterfaceEvent;
     FAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
+    // Persistence conflict events
+    FOnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent;
+    FOnUpdateConflictException: TioBSOnPersistenceConflictExceptionEvent;
+
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
     function IsActive: Boolean; // IioStdActionTargetBindSource
     procedure OpenCLoseDetails(const AActive: Boolean);
@@ -158,6 +162,11 @@ type
     // SelectorFor
     function GetSelectorFor: IioBindSource;
     procedure SetSelectorFor(const ATargetBindSource: IioBindSource);
+    // Persistence concurrency conflicts
+    function GetOnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent;
+    function GetOnUpdateConflictException: TioBSOnPersistenceConflictExceptionEvent;
+    procedure SetOnDeleteConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
+    procedure SetOnUpdateConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
   protected
     procedure Loaded; override;
     function GetName: String;
@@ -221,6 +230,9 @@ type
     property BeforeSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FBeforeSelectionInterface write FBeforeSelectionInterface;
     property OnSelectionInterface: TioBSASelectionInterfaceEvent read FonSelectionInterface write FonSelectionInterface;
     property AfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FAfterSelectionInterface write FAfterSelectionInterface;
+    // Published Events: persistence concurrency conflicts
+    property OnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent read GetOnDeleteConflictException write SetOnDeleteConflictException;
+    property OnUpdateConflictException: TioBSOnPersistenceConflictExceptionEvent read GetOnUpdateConflictException write SetOnUpdateConflictException;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -549,6 +561,16 @@ end;
 function TioDataSetCustom.GetName: String;
 begin
   Result := Name;
+end;
+
+function TioDataSetCustom.GetOnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent;
+begin
+  Result := FOnDeleteConflictException;
+end;
+
+function TioDataSetCustom.GetOnUpdateConflictException: TioBSOnPersistenceConflictExceptionEvent;
+begin
+  Result := FOnUpdateConflictException;
 end;
 
 function TioDataSetCustom.GetOnReceiveSelectionCloneObject: Boolean;
@@ -987,6 +1009,16 @@ begin
   // Register itself for notifications from BindSourceAdapter
   LActiveBSA.SetBindSource(Self);
   FTypeOfCollection := LActiveBSA.TypeOfCollection;
+end;
+
+procedure TioDataSetCustom.SetOnDeleteConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
+begin
+  FOnDeleteConflictException := APersistenceConflictEventHandler;
+end;
+
+procedure TioDataSetCustom.SetOnUpdateConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
+begin
+  FOnUpdateConflictException := APersistenceConflictEventHandler;
 end;
 
 procedure TioDataSetCustom.SetOnReceiveSelectionCloneObject(const Value: Boolean);

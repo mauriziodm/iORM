@@ -58,6 +58,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure GridCustomersDblClick(Sender: TObject);
+    procedure DSCustomersDeleteConflictException(const ASender, ADataObject: TObject; var AConflictResolved: Boolean);
   private
   public
   end;
@@ -65,6 +66,11 @@ type
 implementation
 
 {$R *.dfm}
+
+procedure TCustomerListForm.DSCustomersDeleteConflictException(const ASender, ADataObject: TObject; var AConflictResolved: Boolean);
+begin
+//  AConflictResolved := True;
+end;
 
 procedure TCustomerListForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin

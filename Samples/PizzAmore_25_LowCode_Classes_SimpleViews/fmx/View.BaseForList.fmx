@@ -191,8 +191,9 @@ object ViewBaseForList: TViewBaseForList
     FieldDefs = <>
     ScopeMappings = <>
     AsDefault = True
+    Async = True
     Paging.CurrentPageOfFormat = '%d/%d'
-    Left = 67
+    Left = 59
     Top = 164
   end
   object BSWhere: TioPrototypeBindSourceMaster

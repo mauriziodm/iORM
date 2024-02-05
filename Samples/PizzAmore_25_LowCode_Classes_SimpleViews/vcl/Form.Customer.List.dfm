@@ -277,7 +277,7 @@ object CustomerListForm: TCustomerListForm
       ParentFont = False
     end
     object ButtonSearch: TSpeedButton
-      Left = 230
+      Left = 218
       Top = 0
       Width = 50
       Height = 45
@@ -292,7 +292,7 @@ object CustomerListForm: TCustomerListForm
       ExplicitLeft = 330
     end
     object ButtonClear: TSpeedButton
-      Left = 230
+      Left = 218
       Top = 49
       Width = 50
       Height = 25
@@ -326,7 +326,7 @@ object CustomerListForm: TCustomerListForm
     object DBEditWhereName: TDBEdit
       Left = 155
       Top = 6
-      Width = 18
+      Width = 6
       Height = 25
       Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
@@ -340,12 +340,12 @@ object CustomerListForm: TCustomerListForm
       Font.Style = []
       ParentFont = False
       TabOrder = 1
-      ExplicitWidth = 14
+      ExplicitWidth = 2
     end
     object DBEditWhereCity: TDBEdit
       Left = 43
       Top = 37
-      Width = 130
+      Width = 118
       Height = 25
       Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
@@ -359,7 +359,7 @@ object CustomerListForm: TCustomerListForm
       Font.Style = []
       ParentFont = False
       TabOrder = 2
-      ExplicitWidth = 126
+      ExplicitWidth = 114
     end
   end
   object DSCustomers: TioDataSetMaster
@@ -370,6 +370,7 @@ object CustomerListForm: TCustomerListForm
     Paging.CurrentPageOfFormat = 'Page %d of %d'
     Paging.PageSize = 50
     Paging.PagingType = ptHardPaging
+    OnDeleteConflictException = DSCustomersDeleteConflictException
     Left = 56
     Top = 112
     object DSCustomersID: TIntegerField

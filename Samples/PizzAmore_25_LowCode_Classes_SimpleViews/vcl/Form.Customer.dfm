@@ -255,7 +255,7 @@ object CustomerForm: TCustomerForm
     object LabelTitle: TLabel
       Left = 72
       Top = 7
-      Width = 397
+      Width = 393
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -337,9 +337,9 @@ object CustomerForm: TCustomerForm
             item
               Alignment = taCenter
               Expanded = False
-              FieldName = 'SmartEventType'
+              FieldName = 'SmartActionType'
               Title.Alignment = taCenter
-              Title.Caption = 'event type'
+              Title.Caption = 'action type'
               Width = 200
               Visible = True
             end
@@ -387,14 +387,14 @@ object CustomerForm: TCustomerForm
     end
   end
   object ButtonRevertToVersion: TButton
-    Left = 387
+    Left = 383
     Top = 242
     Width = 121
     Height = 20
     Action = acEtmRevertToVersion
     Anchors = [akTop, akRight]
     TabOrder = 8
-    ExplicitLeft = 383
+    ExplicitLeft = 379
   end
   object DSCustomer: TioDataSetMaster
     AsDefault = True
@@ -492,7 +492,7 @@ object CustomerForm: TCustomerForm
       Size = 100
     end
     object DS_ETMSmartEventType: TStringField
-      FieldName = 'SmartEventType'
+      FieldName = 'SmartActionType'
       Size = 100
     end
     object DS_ETMDiffOneWay: TStringField

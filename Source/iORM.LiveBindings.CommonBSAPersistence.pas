@@ -97,7 +97,7 @@ uses System.Classes, System.SysUtils, iORM.Exceptions, iORM, iORM.LiveBindings.F
   iORM.Context.Properties.Interfaces, Data.Bind.ObjectScope, System.Generics.Collections,
   iORM.LiveBindings.CommonBSAPaging, iORM.LiveBindings.Notification,
   iORM.Utilities, iORM.LiveBindings.BSPersistence.SmartDeleteSystem,
-  iORM.Where.Factory;
+  iORM.Where.Factory, iORM.Abstraction;
 
 type
 
@@ -120,7 +120,7 @@ type
 
   TioCommonBSAPersistenceThread = class(TThread)
   strict private
-    FExceptionText: String;
+    FExceptionMessage: String;
     FExecuteFunc: TioCommonBSAPersistenceThreadExecute;
     FOnTerminateProc: TioCommonBSAPersistenceThreadOnTerminate;
     FResultValue: TObject;
@@ -609,7 +609,7 @@ begin
   inherited Create(True);
   FExecuteFunc := AExecuteFunc;
   FOnTerminateProc := AOnTerminateProc;
-  FExceptionText := String.Empty;
+  FExceptionMessage := String.Empty;
   FResultValue := nil;
   Self.OnTerminate := OnTerminateEventHandler;
   Self.FreeOnTerminate := True;
@@ -622,20 +622,35 @@ begin
     FResultValue := FExecuteFunc;
   except
     on E: Exception do
-      FExceptionText := E.Message;
+    begin
+      FExceptionMessage := E.Message;
+      raise;
+    end;
   end;
 end;
 
 procedure TioCommonBSAPersistenceThread.OnTerminateEventHandler(Sender: TObject);
+var
+  LExceptionMessage: String;
 begin
   try
-    // Se durante l'esecuzione del thread c'è stata una eccezione...
-    if not FExceptionText.IsEmpty then
+    // If an exception was raised during the execution of the thread then load the error message into a local variable
+    //  (otherwise I had problems) and then raise a new exception with the same message so that it comes out to the user too.
+    // note: The new exception is raised decoupled with a Timer because I had problems otherwise.
+    if not FExceptionMessage.IsEmpty then
     begin
       io.HideWait;
-      raise EioException.Create('(' + Self.ClassName + ') - ' + FExceptionText);
+      LExceptionMessage := FExceptionMessage;
+      // TODO: Probabilmente ci sranno dei problemi con uniGUI, controllare
+      TioAnonymousTimer.Create(100, function: Boolean
+        begin
+          Result := False;
+          raise EioException.Create(LExceptionMessage);
+        end);
     end
-    else if Assigned(FOnTerminateProc) then
+    else
+    // If everything went well, it executes the terminate anonymous method
+    if Assigned(FOnTerminateProc) then
       FOnTerminateProc(FResultValue);
   finally
     io.HideWait;
@@ -653,6 +668,7 @@ class function TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(const 
 var
   LID: Integer;
   LDataObj: TObject;
+  LConflictResolved: Boolean;
 begin
   // Save into local variables to avoid multithread resource access inconsistency problems
   LDataObj := AActiveBindSourceAdapter.Current;
@@ -662,7 +678,27 @@ begin
     begin
       Result := nil;
       if LID <> 0 then
-        io.DeleteObject(LDataObj);
+      begin
+        try
+          io.DeleteObject(LDataObj);
+        except
+          // Try to resolve the unresolved conflict (raise) invoking the BindSource.OnDeleteConflictException event handler if assigned
+          on E: EioDeleteConflictException do
+          begin
+            if AActiveBindSourceAdapter.HasBindSource and Assigned(AActiveBindSourceAdapter.GetBindSource.OnDeleteConflictException) then
+            begin
+              LConflictResolved := False;
+              AActiveBindSourceAdapter.GetBindSource.OnDeleteConflictException(AActiveBindSourceAdapter.GetBindSource as TObject, LDataObj, LConflictResolved);
+              if not LConflictResolved then
+                raise;
+            end
+            else
+              raise;
+          end
+          else
+            raise;
+        end;
+      end;
     end;
 end;
 //class function TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ADataObj: TObject)

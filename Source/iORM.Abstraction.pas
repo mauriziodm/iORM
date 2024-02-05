@@ -346,9 +346,12 @@ end;
 procedure TioAnonymousTimer.OnTimerEventHandler(Sender: TObject);
 begin
   FTimer.Enabled := False;
-  FTimer.Enabled := FExecuteMethod;
-  if not FTimer.Enabled then
-    Self.Free;
+  try
+    FTimer.Enabled := FExecuteMethod;
+  finally
+    if not FTimer.Enabled then
+      Self.Free;
+  end;
 end;
 
 end.

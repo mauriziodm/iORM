@@ -158,6 +158,9 @@ type
     property OnWhereClear: TioOnWhereBuilderEvent read FOnWhereClear write FOnWhereClear;
     property AfterWhereBuild: TioAfterWhereBuilderEvent read FAfterWhereBuild write FAfterWhereBuild;
     property AfterWhereClear: TioAfterWhereBuilderEvent read FAfterWhereClear write FAfterWhereClear;
+    // Published Events: persistence concurrency conflicts
+    property OnDeleteConflictException;
+    property OnUpdateConflictException;
   end;
 
 implementation

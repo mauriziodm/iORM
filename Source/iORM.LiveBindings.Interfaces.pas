@@ -39,7 +39,7 @@ uses
   System.Generics.Collections, Data.Bind.ObjectScope,
   iORM.Context.Properties.Interfaces, iORM.CommonTypes, System.Classes,
   iORM.Where.Interfaces, Data.DB, System.Rtti, iORM.LiveBindings.Notification,
-  iORM.LiveBindings.CommonBSAPaging;
+  iORM.LiveBindings.CommonBSAPaging, System.SysUtils;
 
 type
 
@@ -49,6 +49,9 @@ type
 
   TioBSABeforeAfterSelectionInterfaceEvent = procedure(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType) of object;
   TioBSASelectionInterfaceEvent = procedure(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean)
+    of object;
+
+  TioBSOnPersistenceConflictExceptionEvent = procedure(const ASender, ADataObject: TObject; var AConflictResolved: Boolean)
     of object;
 
   // Forward declaration
@@ -70,7 +73,7 @@ type
     ['{2DFC1B43-4AE2-4402-89B3-7A134938EFE6}']
     procedure Open;
     procedure Close;
-//    function AdapterExists: Boolean;
+    // function AdapterExists: Boolean;
     procedure First;
     procedure Next;
     function CheckAdapter: Boolean; overload;
@@ -79,12 +82,12 @@ type
     function Current: TObject;
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetMasterPropertyName: String;
-    function IsMasterBS: boolean;
-    function IsDetailBS: boolean;
+    function IsMasterBS: Boolean;
+    function IsDetailBS: Boolean;
     procedure Refresh(const ANotify: Boolean = True);
     function GetName: String;
     function IsActive: Boolean;
-    function IsFromBSLoadType: boolean;
+    function IsFromBSLoadType: Boolean;
     procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
     procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
     procedure SetMasterBindSource(const Value: IioBindSource);
@@ -110,7 +113,7 @@ type
     procedure SetOnReceiveSelectionFreeObject(const Value: Boolean);
     function GetOnReceiveSelectionFreeObject: Boolean;
     property OnReceiveSelectionFreeObject: Boolean read GetOnReceiveSelectionFreeObject write SetOnReceiveSelectionFreeObject; // published: Master+Detail
-    //  AsDefault
+    // AsDefault
     function GetAsDefault: Boolean;
     procedure SetAsDefault(const Value: Boolean);
     property AsDefault: Boolean read GetAsDefault write SetAsDefault; // Published: Master
@@ -145,6 +148,13 @@ type
     function GetSelectorFor: IioBindSource;
     procedure SetSelectorFor(const ATargetBindSource: IioBindSource);
     property SelectorFor: IioBindSource read GetSelectorFor write SetSelectorFor; // published: Master
+    // Published Events: persistence concurrency conflicts
+    function GetOnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent;
+    function GetOnUpdateConflictException: TioBSOnPersistenceConflictExceptionEvent;
+    procedure SetOnDeleteConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
+    procedure SetOnUpdateConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
+    property OnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent read GetOnDeleteConflictException write SetOnDeleteConflictException;
+    property OnUpdateConflictException: TioBSOnPersistenceConflictExceptionEvent read GetOnUpdateConflictException write SetOnUpdateConflictException;
   end;
 
   // Interface for standard action target bind source
@@ -154,6 +164,7 @@ type
     function CanDoSelection: Boolean;
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
   end;
+
   // Interface for standard action target master bind source
   IioStdActionTargetMasterBindSource = interface(IioStdActionTargetBindSource)
     ['{758D5C34-B4CF-4530-86FF-F8ED5E99E2E8}']
@@ -197,7 +208,7 @@ type
     procedure LoadPage;
     procedure SetBindSource(ANotifiableBindSource: IioBindSource);
     function GetBindSource: IioBindSource;
-    function HasBindSource: boolean;
+    function HasBindSource: Boolean;
     procedure Insert; overload;
     procedure Insert(AObject: TObject); overload;
     procedure Insert(AObject: IInterface); overload;
@@ -213,7 +224,7 @@ type
     function NewNaturalObjectBindSourceAdapter(const AOwner: TComponent): IioActiveBindSourceAdapter;
     function GetDetailBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
-    function MasterAdaptersContainer:IioDetailBindSourceAdaptersContainer;
+    function MasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     function DetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     function DataObject: TObject;
     // procedure InternalSetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
@@ -323,7 +334,7 @@ type
     property Items[const AIndex: Integer]: TObject read GetItems write SetItems;
     property Reloading: Boolean read GetReloading write SetReloading;
     property State: TBindSourceAdapterState read GetState;
-    property BSPersistenceDeleting: boolean read GetBSPersistenceDeleting write SetBSPersistenceDeleting;
+    property BSPersistenceDeleting: Boolean read GetBSPersistenceDeleting write SetBSPersistenceDeleting;
   end;
 
   // Bind source adapter container
@@ -333,7 +344,7 @@ type
     procedure SetMasterObject(const AMasterObj: TObject);
     function NewDetailBindSourceAdapter(const AOwner: TComponent; const AMasterClassName, AMasterPropertyName: String; const AWhere: IioWhere)
       : IioActiveBindSourceAdapter;
-    function NewNaturalBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter:IioNaturalBindSourceAdapterSource): IioActiveBindSourceAdapter;
+    function NewNaturalBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioNaturalBindSourceAdapterSource): IioActiveBindSourceAdapter;
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure RemoveDetailBindSourceAdapter(const ABindSourceAdapter: IioContainedBindSourceAdapter);
     procedure RemoveNaturalBindSourceAdapter(const ANaturalBindSourceAdapter: IioNaturalActiveBindSourceAdapter);
