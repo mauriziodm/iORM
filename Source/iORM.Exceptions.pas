@@ -41,22 +41,36 @@ uses
 
 type
 
+  // Generic iORM exceptions -----------------------------------------------------------------------
   EioException = class(Exception)
   public
     constructor Create(const AClassName, AMethodName, AMsg: string); overload;
     constructor Create(const AClassName, AMsg: string); overload;
   end;
+  // -----------------------------------------------------------------------------------------------
 
+  // Persistence concurrency conflict exceptions ---------------------------------------------------
   EioConcurrencyConflictException = class(EioException)
   public
     constructor Create(const AClassName, AMethodName: string; const AContext: IioContext); overload;
   end;
 
-  EioBindSourceObjStateException = class(EioException)
+  EioDeleteConflictException = class(EioConcurrencyConflictException)
   end;
 
+  EioUpdateConflictException = class(EioConcurrencyConflictException)
+  end;
+  // -----------------------------------------------------------------------------------------------
+
+  // BindSource ObjState exceptions ----------------------------------------------------------------
+  EioBindSourceObjStateException = class(EioException)
+  end;
+  // -----------------------------------------------------------------------------------------------
+
+  // ETM exceptions --------------------------------------------------------------------------------
   EioEtmException = class(EioException)
   end;
+  // -----------------------------------------------------------------------------------------------
 
 
 implementation

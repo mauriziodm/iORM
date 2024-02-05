@@ -104,7 +104,7 @@ begin
   //        I suggest you to put the inherited at the bottom of the method
   AContext.ConflictState := AContext.Map.GetTable.DeleteConflictStrategy_OnConflictSetStateAs;
   if AContext.ConflictState = csRejectedRaise then
-    raise EioConcurrencyConflictException.Create(ClassName, 'ResolveDeleteConflict', AContext);
+    raise EioDeleteConflictException.Create(ClassName, 'ResolveDeleteConflict', AContext);
 end;
 
 class procedure TioCustomConflictStrategy.ResolveUpdateConflict(const AContext: IioContext);
@@ -113,7 +113,7 @@ begin
   //        I suggest you to put the inherited at the bottom of the method
   AContext.ConflictState := AContext.Map.GetTable.UpdateConflictStrategy_OnConflictSetStateAs;
   if AContext.ConflictState = csRejectedRaise then
-    raise EioConcurrencyConflictException.Create(ClassName, 'ResolveUpdateConflict', AContext);
+    raise EioUpdateConflictException.Create(ClassName, 'ResolveUpdateConflict', AContext);
 end;
 
 { ioDeleteConflictStrategyAttribute }

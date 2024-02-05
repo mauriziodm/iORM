@@ -107,8 +107,7 @@ type
     class function GetPersistCurrentExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadExecute;
     class function GetPersistAllExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadExecute;
     // Delete
-    class function GetDeleteExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ADataObj: TObject)
-      : TioCommonBSAPersistenceThreadExecute;
+    class function GetDeleteExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadExecute;
     class function GetDeleteTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadOnTerminate;
     // Refresh/Reload
     class function GetReloadTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean)
@@ -191,7 +190,7 @@ begin
   if not Assigned(LActiveBindSourceAdapter.Current) then
     Exit;
   // Set anonimous methods
-  LExecuteMethod := TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(LActiveBindSourceAdapter, LActiveBindSourceAdapter.Current);
+  LExecuteMethod := TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(LActiveBindSourceAdapter);
   LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetDeleteTerminateMethod(LActiveBindSourceAdapter);
   // Execute synchronous or asynchronous
   _Execute(LActiveBindSourceAdapter.ioAsync, LExecuteMethod, LTerminateMethod);
@@ -650,19 +649,20 @@ end;
 
 { TioCommonBSAAnonymousMethodsFactory }
 
-class function TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ADataObj: TObject)
-  : TioCommonBSAPersistenceThreadExecute;
+class function TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadExecute;
 var
   LID: Integer;
+  LDataObj: TObject;
 begin
   // Save into local variables to avoid multithread resource access inconsistency problems
-  LID := TioUtilities.ExtractOID(ADataObj);
+  LDataObj := AActiveBindSourceAdapter.Current;
+  LID := TioUtilities.ExtractOID(LDataObj);
   AActiveBindSourceAdapter.BSPersistenceDeleting := True; // Look at GetDeleteTerminateMethod below
   Result := function: TObject
     begin
       Result := nil;
       if LID <> 0 then
-        io.DeleteObject(ADataObj);
+        io.DeleteObject(LDataObj);
     end;
 end;
 //class function TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ADataObj: TObject)
