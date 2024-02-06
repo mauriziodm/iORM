@@ -641,7 +641,7 @@ begin
     begin
       io.HideWait;
       LExceptionMessage := FExceptionMessage;
-      // TODO: Probabilmente ci sranno dei problemi con uniGUI, controllare
+      // TODO: Probabilmente ci saranno dei problemi con uniGUI, controllare
       TioAnonymousTimer.Create(100, function: Boolean
         begin
           Result := False;
