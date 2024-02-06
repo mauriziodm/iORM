@@ -644,7 +644,6 @@ begin
       // TODO: Probabilmente ci saranno dei problemi con uniGUI, controllare
       TioAnonymousTimer.Create(100, function: Boolean
         begin
-          Result := False;
           raise EioException.Create(LExceptionMessage);
         end);
     end
