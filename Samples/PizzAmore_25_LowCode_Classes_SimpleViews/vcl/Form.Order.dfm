@@ -725,8 +725,8 @@ object OrderForm: TOrderForm
     object acBack: TioBSCloseQuery
       Category = 'iORM-BS'
       Caption = 'Back'
-      OnUpdateScope = usGlobal
       TargetBindSource = DSOrder
+      OnUpdateScope = usGlobal
     end
     object acShowCustomerSelector: TioBSShowOrSelect
       Category = 'iORM-BS'
@@ -735,8 +735,8 @@ object OrderForm: TOrderForm
       EntityTypeName = 'TCustomer'
       ShowMode = smEntityTypeNameAsSelector
       TargetBindSource = DSCustomer
-      VVMTypeAlias = 'LIST'
       ViewContextBy = vcByDefaultViewContextProvider
+      VVMTypeAlias = 'LIST'
     end
     object acShowCustomer: TioBSShowOrSelect
       Category = 'iORM-BS'

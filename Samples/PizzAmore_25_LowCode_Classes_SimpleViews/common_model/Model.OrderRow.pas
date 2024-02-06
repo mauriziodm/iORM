@@ -31,6 +31,9 @@ type
 
 implementation
 
+uses
+  Winapi.Windows;
+
 { TOrderRow }
 
 constructor TOrderRow.Create(APizzaID: Integer; ADescription: String; AUnitPrice: Currency; AQty: Integer);

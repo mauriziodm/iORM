@@ -440,7 +440,7 @@ end;
 
 class procedure TioConnectionManager.ThreadUseUser(AUserName: String);
 begin
-  Self.ThreadUseUser(IO_CURRENTUSERINFO_ID_EMPTY, AUserName);
+  Self.ThreadUseUser(IO_INTEGER_NULL_VALUE, AUserName);
 end;
 
 class procedure TioConnectionManager.ThreadUseUser(AUserID: Integer; AUserName: String);
@@ -620,7 +620,7 @@ end;
 
 class procedure TioConnectionManager.UseUser(AUserName: String);
 begin
-  Self.UseUser(IO_CURRENTUSERINFO_ID_EMPTY, AUserName);
+  Self.UseUser(IO_INTEGER_NULL_VALUE, AUserName);
 end;
 
 class procedure TioConnectionManager.UseUser(AUserID: Integer; AUserName: String);

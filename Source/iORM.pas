@@ -36,7 +36,8 @@ unit iORM;
 interface
 
 uses
-  System.Classes, System.SysUtils, System.TypInfo, DJSON, iORM.CommonTypes, iORM.Where.Interfaces, iORM.Attributes, iORM.LiveBindings.BSPersistence,
+  System.Classes, System.SysUtils, System.TypInfo, System.Generics.Collections, DJSON,
+  iORM.CommonTypes, iORM.Where.Interfaces, iORM.Attributes, iORM.LiveBindings.BSPersistence,
   iORM.DB.ConnectionContainer, iORM.DB.Interfaces, iORM.DBBuilder.Interfaces, iORM.DependencyInjection, iORM.Global.Factory,
   iORM.DependencyInjection.Interfaces, iORM.MVVM.ViewContextProvider, iORM.MVVM.Interfaces, iORM.MVVM.ModelPresenter.Custom,
   iORM.LiveBindings.Interfaces, iORM.MVVM.ViewRegister,
@@ -51,6 +52,11 @@ const
   IORM_VERSION = 'iORM 2 (beta 3.3)';
 
 {$REGION 'Value aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
+  // NULL value constants
+  IO_INTEGER_NULL_VALUE = iORM.CommonTypes.IO_INTEGER_NULL_VALUE;
+  IO_STRING_NULL_VALUE = iORM.CommonTypes.IO_STRING_NULL_VALUE;
+  IO_DATETIME_NULL_VALUE = iORM.CommonTypes.IO_DATETIME_NULL_VALUE;
+
   // BlindLevel bit value
   BL_BIT_DETECT_OBJ_EXISTS = iORM.CommonTypes.BL_BIT_DETECT_OBJ_EXISTS;
   BL_BIT_AUTO_UPDATE_PROPS = iORM.CommonTypes.BL_BIT_AUTO_UPDATE_PROPS;
@@ -145,6 +151,11 @@ const
   mmProperties = iORM.Attributes.mmProperties;
   mmFields = iORM.Attributes.mmFields;
 
+  // TioTrueClassMode = (tcDisabled, tcSmart, tcmStrictly);
+  tcDisabled = iORM.Attributes.tcDisabled;
+  tcSmart = iORM.Attributes.tcSmart;
+  tcmStrictly = iORM.Attributes.tcmStrictly;
+
   // TioRelationType = (rtNone, rtBelongsTo, rtHasMany, rtHasOne, rtEmbeddedHasMany, rtEmbeddedHasOne);
   rtNone = iORM.Attributes.rtNone;
   rtBelongsTo = iORM.Attributes.rtBelongsTo;
@@ -186,6 +197,24 @@ const
   doRefresh = iORM.CommonTypes.doRefresh;
   doReload = iORM.CommonTypes.doReload;
 
+  // TioBSCloseQueryActionUpdateScope = (usLocal, usDisableIfChilds, usGlobal);
+  usLocal = iORM.CommonTypes.usLocal;
+  usDisableIfChilds = iORM.CommonTypes.usDisableIfChilds;
+  usGlobal = iORM.CommonTypes.usGlobal;
+
+  // TioBSCloseQueryOnEditingAction = (eaDisable, eaAutoPersist, eaAutoRevert);
+  eaDisable = iORM.CommonTypes.eaDisable;
+  eaAutoPersist = iORM.CommonTypes.eaAutoPersist;
+  eaAutoRevert = iORM.CommonTypes.eaAutoRevert;
+
+  // TioBSCloseQueryOnExecuteAction = (eaClose, eaTerminateApplication);
+  eaClose = iORM.CommonTypes.eaClose;
+  eaTerminateApplication = iORM.CommonTypes.eaTerminateApplication;
+
+  // TioBSCloseQueryRepeaterScope = (rsFirstLevelChilds, rsDeepChilds);
+  rsFirstLevelChilds = iORM.CommonTypes.rsFirstLevelChilds;
+  rsDeepChilds = iORM.CommonTypes.rsDeepChilds;
+
 {$ENDREGION}
 
 type
@@ -215,6 +244,8 @@ type
   IioProperty = iORM.Context.Properties.Interfaces.IioProperty;
 
   TioMapModeType = iORM.Attributes.TioMapModeType;
+  TioTrueClassMode = iORM.Attributes.TioTrueClassMode;
+
   TioRelationType = iORM.Attributes.TioRelationType;
   TioFKAction = iORM.Attributes.TioFKAction;
   TioFKCreate = iORM.Attributes.TioFKCreate;
@@ -223,12 +254,16 @@ type
   TioActionShowMode = iORM.StdActions.Interfaces.TioActionShowMode;
   TioActionViewContextBy = iORM.StdActions.Interfaces.TioActionViewContextBy;
 
+  // FD monitor and trace mode
+  TioMonitorMode = iORM.CommonTypes.TioMonitorMode;
+
   // Persistence types
   TioPersistenceActionType = iORM.CommonTypes.TioPersistenceActionType;
   TioPersistenceIntentType = iORM.CommonTypes.TioPersistenceIntentType;
   TioPersistenceConflictState = iORM.CommonTypes.TioPersistenceConflictState;
 
   // Conflict Strategy
+  TioCustomConflictStrategy = iORM.ConflictStrategy.Interfaces.TioCustomConflictStrategy;
   TioSameVersionWin = iORM.ConflictStrategy.SameVersionWin.TioSameVersionWin;
   TioLastUpdateWin = iORM.ConflictStrategy.LastUpdateWin.TioLastUpdateWin;
 
@@ -240,6 +275,13 @@ type
   // SkipScope (vedi anche sopra (const) i valori)
   TioSkipScope = DJSON.Params.TdjSkipScope;
   TioSkipScopeSet = DJSON.Params.TdjSkipScopeSet;
+
+  // StdActions types
+  TioStdAction_ETM_AutoExec_AfterRevert = iORM.CommonTypes.TioStdAction_ETM_AutoExec_AfterRevert;
+  TioBSCloseQueryActionUpdateScope = iORM.CommonTypes.TioBSCloseQueryActionUpdateScope;
+  TioBSCloseQueryOnEditingAction = iORM.CommonTypes.TioBSCloseQueryOnEditingAction;
+  TioBSCloseQueryOnExecuteAction = iORM.CommonTypes.TioBSCloseQueryOnExecuteAction;
+  TioBSCloseQueryRepeaterScope = iORM.CommonTypes.TioBSCloseQueryRepeaterScope;
 
 {$ENDREGION}
   // Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
@@ -305,6 +347,7 @@ type
   diViewImplements = iORM.Attributes.diViewImplements;
   diViewFor = iORM.Attributes.diViewFor;
   diViewModelImplements = iORM.Attributes.diViewModelImplements;
+  diVMImplements = iORM.Attributes.diVMImplements;
   diViewModelFor = iORM.Attributes.diViewModelFor;
   diDoNotRegisterAsInterfacedEntity = iORM.Attributes.diDoNotRegisterAsInterfacedEntity;
   diAsSingleton = iORM.Attributes.diAsSingleton;
@@ -413,15 +456,12 @@ type
     class procedure DeleteList(const AListIntf: IInterface; const ABlindLevel: Byte = BL_DEFAULT); overload;
     class procedure _DeleteListInternal(const AListObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
     // Delete (accepting generic type to delete and ciriteria)
-    // NB: Ho volutamente eliminato questi metodi perchè generavano direttamente una query DELETE senza
-    // però gli oggetti vivi dietro quindi senza poi considerare eventuali oggetti child/dettaglio
-    // relativi a eventuali relazioni. In ogni caso sarà possibile ugualmente fare la stessa cosa
-    // usando però la fluent interface (io.RefTo<T>.Delete) oppure con io.SQL('delete...')
-    // class procedure Delete<T>(const AID: Integer); overload;
-    // class procedure Delete<T>(const ATypeAlias: String; const AID: Integer); overload;
-    // class procedure DeleteAll<T>(const ATypeAlias: String = ''); overload;
-    // class procedure DeleteAll<T>(const AWhere: IioWhere); overload;
-    // class procedure DeleteAll<T>(const ATypeAlias: String; const AWhere: IioWhere); overload;
+    // NB: I metodi Delete qui sotto prima caricano gli oggetti vivi e poi li eliminano in modo che funzioni anche ETM e ConflictStrategy
+    class procedure Delete<T>(const AID: Integer); overload;
+    class procedure Delete<T>(const ATypeAlias: String; const AID: Integer); overload;
+    class procedure DeleteAll<T>(const ATypeAlias: String = ''); overload;
+    class procedure DeleteAll<T>(const AWhere: IioWhere); overload;
+    class procedure DeleteAll<T>(const ATypeAlias: String; const AWhere: IioWhere); overload;
 
     // Count (accepting generic type and ciriteria)
     class function Count(const ATypeName: String; const ATypeAlias: String = ''): Integer; overload;
@@ -1683,6 +1723,34 @@ begin
   _DeleteObjectInternal(AIntfObj as TObject, itRegular, ABlindLevel);
 end;
 
+class procedure io.Delete<T>(const AID: Integer);
+begin
+  Self.Delete<T>(String.Empty, AID);
+end;
+
+class procedure io.Delete<T>(const ATypeAlias: String; const AID: Integer);
+var
+  LTypeName: String;
+  LObj: TObject;
+  LIntf: IInterface;
+begin
+  LTypeName := TioUtilities.GenericToString<T>(False);
+  if TioUtilities.IsAnInterfaceTypeName(LTypeName) then
+  begin
+    Supports(Self.Load(LTypeName, ATypeAlias).ByID(AID).ToObject, IInterface, LIntf);
+    Self.DeleteObject(LIntf);
+  end
+  else
+  begin
+    LObj := Self.Load(LTypeName, ATypeAlias).ByID(AID).ToObject;
+    try
+      Self.DeleteObject(LObj);
+    finally
+      LObj.Free;
+    end;
+  end;
+end;
+
 class procedure io.DeleteList(const AListIntf: IInterface; const ABlindLevel: Byte);
 begin
   _DeleteListInternal(AListIntf as TObject, itRegular, ABlindLevel)
@@ -2044,6 +2112,32 @@ begin
         .SetBindSourceAsSelectorFor(ASelectionTargetBS).Show
     else
       di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsSelectorFor(ASelectionTargetBS).Show;
+end;
+
+class procedure io.DeleteAll<T>(const ATypeAlias: String);
+begin
+  Self.DeleteAll<T>(ATypeAlias, nil);
+end;
+
+class procedure io.DeleteAll<T>(const AWhere: IioWhere);
+begin
+  Self.DeleteAll<T>(string.Empty, AWhere);
+end;
+
+class procedure io.DeleteAll<T>(const ATypeAlias: String; const AWhere: IioWhere);
+var
+  LList: TObject;
+begin
+  if TioUtilities.IsAnInterface<T> then
+    LList := Self.Load<T>(ATypeAlias).Add(AWhere).ToGenericList.OfType<TList<IInterface>>
+  else
+    LList := Self.Load<T>(ATypeAlias).Add(AWhere).ToGenericList.OfType<TObjectList<TObject>>;
+
+  try
+    Self.DeleteList(LList);
+  finally
+    LList.Free;
+  end;
 end;
 
 initialization

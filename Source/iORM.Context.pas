@@ -361,7 +361,7 @@ begin
   if GetProperties.ObjCreatedUserIDPropertyExist then
     Result := GetProperties.ObjCreatedUserIDProperty.GetValue(FDataObject).AsType<TioObjCreatedUserID>
   else
-    Result := IO_CURRENTUSERINFO_ID_EMPTY;
+    Result := IO_INTEGER_NULL_VALUE;
 end;
 
 function TioContext.GetObjCreatedUserName: TioObjCreatedUserName;
@@ -369,7 +369,7 @@ begin
   if GetProperties.ObjCreatedUserNamePropertyExist then
     Result := GetProperties.ObjCreatedUserNameProperty.GetValue(FDataObject).AsType<TioObjCreatedUserName>
   else
-    Result := IO_CURRENTUSERINFO_NAME_EMPTY;
+    Result := IO_STRING_NULL_VALUE;
 end;
 
 function TioContext.GetObjStatus: TioObjStatus;
@@ -393,7 +393,7 @@ begin
   if GetProperties.ObjUpdatedUserIDPropertyExist then
     Result := GetProperties.ObjUpdatedUserIDProperty.GetValue(FDataObject).AsType<TioObjUpdatedUserID>
   else
-    Result := IO_CURRENTUSERINFO_ID_EMPTY;
+    Result := IO_INTEGER_NULL_VALUE;
 end;
 
 function TioContext.GetObjUpdatedUserName: TioObjUpdatedUserName;
@@ -401,7 +401,7 @@ begin
   if GetProperties.ObjUpdatedUserNamePropertyExist then
     Result := GetProperties.ObjUpdatedUserNameProperty.GetValue(FDataObject).AsType<TioObjUpdatedUserName>
   else
-    Result := IO_CURRENTUSERINFO_NAME_EMPTY;
+    Result := IO_STRING_NULL_VALUE;
 end;
 
 function TioContext.GetOrderBySql: String;

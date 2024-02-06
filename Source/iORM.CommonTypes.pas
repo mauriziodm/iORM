@@ -53,9 +53,6 @@ const
   IO_STRING_NULL_VALUE = '';
   IO_DATETIME_NULL_VALUE = 0;
 
-  IO_CURRENTUSERINFO_NAME_EMPTY = '';
-  IO_CURRENTUSERINFO_ID_EMPTY = 0;
-
   IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME = 'Master___ID';
 
   IO_USERNAME_LENGTH = 30;
@@ -96,9 +93,6 @@ type
 
   TioStdAction_ETM_BeforeRevertEvent = procedure(const ASender: TObject; out ATargetObj: TObject) of object;
   TioStdAction_ETM_AfterRevertEvent = procedure(const ASender: TObject; const ARevertedObj: TObject) of object;
-
-  // StdActions types
-  TioStdAction_ETM_AutoExec_AfterRevert = (doNothing, doRefresh, doReload);
 
   // Compare operators
   TioCompareOp = (coEquals, coNotEquals, coGreater, coLower, coGreaterOrEqual, coLowerOrEqual, coLike, coNotLike, coIsNull, coIsNotNull);
@@ -157,6 +151,7 @@ type
   TioPersistenceConflictState = (csUndefined, csResolved, csRejected, csRejectedRaise);
 
   // StdActions related types
+  TioStdAction_ETM_AutoExec_AfterRevert = (doNothing, doRefresh, doReload);
   TioBSCloseQueryActionUpdateScope = (usLocal, usDisableIfChilds, usGlobal);
   TioBSCloseQueryOnEditingAction = (eaDisable, eaAutoPersist, eaAutoRevert);
   TioBSCloseQueryOnExecuteAction = (eaClose, eaTerminateApplication);
