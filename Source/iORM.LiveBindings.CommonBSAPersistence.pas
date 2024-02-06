@@ -671,14 +671,18 @@ var
   LConflictResolved: Boolean;
 begin
   // Save into local variables to avoid multithread resource access inconsistency problems
+  // TODO: Per LDataObjects che è un puntatore non protegge nulla, da rivedere?
   LDataObj := AActiveBindSourceAdapter.Current;
   LID := TioUtilities.ExtractOID(LDataObj);
   AActiveBindSourceAdapter.BSPersistenceDeleting := True; // Look at GetDeleteTerminateMethod below
+  // Build the anonimous method
   Result := function: TObject
     begin
       Result := nil;
       if LID <> 0 then
       begin
+        // Delete the DataObj and if a conflict exception is raised then invoke the BindSOurce onDeleteConflictException
+        //  event handler (if the event handler is assigned)
         try
           io.DeleteObject(LDataObj);
         except
@@ -752,27 +756,78 @@ end;
 class function TioCommonBSAAnonymousMethodsFactory.GetPersistCurrentExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter)
   : TioCommonBSAPersistenceThreadExecute;
 var
-  LBSPersistenceClient: IioMasterBindSource;
+  LMasterBindSource: IioMasterBindSource;
+  LDataObj: TObject;
+  LConflictResolved: Boolean;
 begin
+  // Save into local variables to avoid multithread resource access inconsistency problems
+  // TODO: da rivedere pqerhè essendo un puntatore non protegge un bel niente
+  LDataObj := AActiveBindSourceAdapter.Current;
+  // Build the anonimous method
   Result := function: TObject
     begin
       Result := nil;
-      io.StartTransaction;
-      try
-        // Persist the main obj
-        if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioMasterBindSource, LBSPersistenceClient) then
-          io._PersistObjectInternal(AActiveBindSourceAdapter.Current, itRegular, '', 0, LBSPersistenceClient.Persistence, '', '', BL_DEFAULT);
-        // Delete objects referenced into the SmartDeleteSystem
-        LBSPersistenceClient.Persistence.SmartDeleteSystem.ForEach(
-          procedure(ASmartDeleteSystemItem: TioSmartDeleteSystemItem)
-          begin
-            io.RefTo(ASmartDeleteSystemItem.TypeName).ByID(ASmartDeleteSystemItem.ID).Cacheable.Delete;
-          end);
-        // commit
-        io.CommitTransaction;
-      except
-        io.RollbackTransaction;
-        raise;
+      // Continues only if there is a BindSource connected and it is a MasterBindSource
+      if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioMasterBindSource, LMasterBindSource) then
+      begin
+        io.StartTransaction;
+        try
+          // Persist the current obj and if a conflict exception is raised then invoke the BindSOurce onDeleteConflictException/onUpdateConflictException
+          //  event handler (if the event handler is assigned)
+          // ----------------------------------------------------------------------------------------------------------------------------
+          try
+            io._PersistObjectInternal(LDataObj, itRegular, '', 0, LMasterBindSource.Persistence, '', '', BL_DEFAULT);
+          except
+            // Try to resolve the unresolved conflict (raise) invoking the BindSource.OnDeleteConflictException/OnUpdateConflictException
+            //  event handler if assigned
+            // ----------------------------
+            // BS.OnDeleteConclictException
+            on E: EioDeleteConflictException do
+            begin
+              if AActiveBindSourceAdapter.HasBindSource and Assigned(AActiveBindSourceAdapter.GetBindSource.OnDeleteConflictException) then
+              begin
+                LConflictResolved := False;
+                AActiveBindSourceAdapter.GetBindSource.OnDeleteConflictException(AActiveBindSourceAdapter.GetBindSource as TObject, LDataObj, LConflictResolved);
+                if not LConflictResolved then
+                  raise;
+              end
+              else
+                raise;
+            end;
+            // ----------------------------
+            // BS.OnUpdateConclictException
+            on E: EioUpdateConflictException do
+            begin
+              if AActiveBindSourceAdapter.HasBindSource and Assigned(AActiveBindSourceAdapter.GetBindSource.OnUpdateConflictException) then
+              begin
+                LConflictResolved := False;
+                AActiveBindSourceAdapter.GetBindSource.OnUpdateConflictException(AActiveBindSourceAdapter.GetBindSource as TObject, LDataObj, LConflictResolved);
+                if not LConflictResolved then
+                  raise;
+              end
+              else
+                raise;
+            end;
+            // ----------------------------
+          else
+            raise;
+          end;
+          // ----------------------------------------------------------------------------------------------------------------------------
+          // Delete objects referenced into the SmartDeleteSystem (details I think)
+          LMasterBindSource.Persistence.SmartDeleteSystem.ForEach(
+            procedure(ASmartDeleteSystemItem: TioSmartDeleteSystemItem)
+            begin
+              io.RefTo(ASmartDeleteSystemItem.TypeName).ByID(ASmartDeleteSystemItem.ID).Cacheable.Delete;
+            end);
+          // ----------------------------------------------------------------------------------------------------------------------------
+          // commit
+          io.CommitTransaction;
+          // Clear saved state
+          LMasterBindSource.Persistence.Clear(False);
+        except
+          io.RollbackTransaction;
+          raise;
+        end;
       end;
     end;
 end;

@@ -61,6 +61,7 @@ type
     DS_ETMDiffOnewayMoreInfo: TStringField;
     DS_ETMDiffTwowayMoreInfo: TStringField;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure DSCustomerUpdateConflictException(const ASender, ADataObject: TObject; var AConflictResolved: Boolean);
   private
   public
   end;
@@ -68,6 +69,11 @@ type
 implementation
 
 {$R *.dfm}
+
+procedure TCustomerForm.DSCustomerUpdateConflictException(const ASender, ADataObject: TObject; var AConflictResolved: Boolean);
+begin
+  AConflictResolved := False;
+end;
 
 procedure TCustomerForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin

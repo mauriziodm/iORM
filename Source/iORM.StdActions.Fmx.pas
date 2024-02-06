@@ -313,7 +313,6 @@ type
     FAction_ReloadAction: IioBSSlaveAction;
     FAction_ShowOrSelectAction: IioBSSlaveAction;
     FAction_CloseQueryAction: IioBSSlaveAction;
-    FClearAfterExecute: Boolean;
     FDisableIfChangesDoesNotExists: Boolean;
     FDisableIfChangesExists: Boolean;
     FDisableIfSaved: Boolean;
@@ -344,7 +343,6 @@ type
     property Action_CloseQueryAction: IioBSSlaveAction read FAction_CloseQueryAction write SetAction_CloseQueryAction;
     property Action_ReloadAction: IioBSSlaveAction read FAction_ReloadAction write FAction_ReloadAction;
     property Action_ShowOrSelectAction: IioBSSlaveAction read FAction_ShowOrSelectAction write SetAction_ShowOrSelectAction;
-    property ClearAfterExecute: Boolean read FClearAfterExecute write FClearAfterExecute default True;
     property DisableIfChangesExists: Boolean read FDisableIfChangesExists write FDisableIfChangesExists default False;
     property DisableIfChangesDoesNotExists: Boolean read FDisableIfChangesDoesNotExists write FDisableIfChangesDoesNotExists default False;
     property DisableIfSaved: Boolean read FDisableIfSaved write FDisableIfSaved default False;
@@ -423,7 +421,6 @@ type
   published
     // inherited properties
     property Action_CloseQueryAction;
-    //property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property TargetBindSource;
@@ -442,7 +439,6 @@ type
   published
     // inherited properties
     property Action_CloseQueryAction;
-    //property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property RaiseIfRevertPointNotSaved;
@@ -467,7 +463,6 @@ type
   published
     // inherited properties
     property Action_CloseQueryAction;
-    //property ClearAfterExecute; // Eliminata perchè poteva interferire con TioVMActionBSCloseQuery
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property RaiseIfRevertPointNotSaved;
@@ -821,7 +816,6 @@ begin
   // Copied from TAction.Create
   DisableIfNoHandler := False;
   // New fields
-  FClearAfterExecute := True;
   FAction_CloseQueryAction := nil;
   FDisableIfChangesDoesNotExists := False;
   FDisableIfChangesExists := False;
@@ -997,7 +991,7 @@ end;
 procedure TioBSPersistencePersist._InternalExecuteStdAction;
 begin
   TargetBindSource.Refresh(True); // Otherwise, in some cases, an outdated value persisted
-  TargetBindSource.Persistence.Persist(RaiseIfChangesDoesNotExists, ClearAfterExecute);
+  TargetBindSource.Persistence.Persist(RaiseIfChangesDoesNotExists);
   // Execute slave actions
   TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
@@ -1013,7 +1007,7 @@ end;
 
 procedure TioBSPersistenceRevert._InternalExecuteStdAction;
 begin
-  TargetBindSource.Persistence.Revert(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists, ClearAfterExecute);
+  TargetBindSource.Persistence.Revert(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists);
   // Execute slave actions
   TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
@@ -1039,7 +1033,7 @@ var
   LIsDeleting: Boolean;
 begin
   LIsDeleting := TargetBindSource.Persistence.IsInserting;
-  TargetBindSource.Persistence.RevertOrDelete(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists, ClearAfterExecute);
+  TargetBindSource.Persistence.RevertOrDelete(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists);
   // Execute slave actions
   if (LIsDeleting and FAutoExec_CloseQueryAction_AfterDelete) or (not LIsDeleting and FAutoExec_CloseQueryAction_AfterRevert) then
     TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);

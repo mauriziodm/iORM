@@ -196,7 +196,7 @@ begin
 //      Così mi piace meno perchè se si va in modifica dell'order (in questo esempio) ma poi non si conferma
 //      (quindi si fa un cancel) facendo così si causa la persistenza ugualmente (anche se non si è confermato
 //      ma annullato). Cmq alla fine non è che cambia molto perchè si parla di Edit/Post/Cancel e non di SaveRP/Persist/Revert.
-//      Nel caso di voglia un sistema più accurato si può impostare la proprietà a "uaSetSmartUpdateStateFull" che funziona bene
+//      Nel caso si voglia un sistema più accurato si può impostare la proprietà a "uaSetSmartUpdateStateFull" che funziona bene
 //      oppure anche a "uaSetObjStatusIfExists".
   Add(ACurrentObj, AMasterPropertyPath);
 end;
@@ -212,7 +212,7 @@ begin
 //      Così mi piace meno perchè se si va in modifica dell'order (in questo esempio) ma poi non si conferma
 //      (quindi si fa un cancel) facendo così si causa la persistenza ugualmente (anche se non si è confermato
 //      ma annullato). Cmq alla fine non è che cambia molto perchè si parla di Edit/Post/Cancel e non di SaveRP/Persist/Revert.
-//      Nel caso di voglia un sistema più accurato si può impostare la proprietà a "uaSetSmartUpdateStateFull" che funziona bene
+//      Nel caso si voglia un sistema più accurato si può impostare la proprietà a "uaSetSmartUpdateStateFull" che funziona bene
 //      oppure anche a "uaSetObjStatusIfExists".
 end;
 
