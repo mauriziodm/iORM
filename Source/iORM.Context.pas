@@ -322,12 +322,14 @@ end;
 function TioContext.GetCurrentStrategyName: String;
 begin
   case FActionType of
+    atInsert:
+      Result := String.Empty;
     atUpdate:
       Result := TioCustomConflictStrategyRef(GetTable.UpdateConflictStrategy).Name;
     atDelete:
       Result := TioCustomConflictStrategyRef(GetTable.DeleteConflictStrategy).Name;
   else
-    EioException.Create(ClassName, 'GetCurrentStrategyName', 'Undefined action type.');
+    raise EioException.Create(ClassName, 'GetCurrentStrategyName', 'Undefined action type.');
   end;  
 end;
 

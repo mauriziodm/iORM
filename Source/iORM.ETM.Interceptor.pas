@@ -63,8 +63,7 @@ type
 implementation
 
 uses
-  iORM, DJSON, iORM.CommonTypes, iORM.Utilities, System.SysUtils,
-  iORM.ETM.Factory;
+  iORM, iORM.CommonTypes;
 
 { TioEtmInterceptor }
 

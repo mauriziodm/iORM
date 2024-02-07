@@ -510,9 +510,10 @@ type
 
   // Base String attribute
   // NOTE: THIS ATTRIBUTE IS DECLARED INTO iORM.ConflictStrategy.Interfaces (not here) TO AVOID CIRCULAR REFERENCE
-  // NOTE: THIS ATTRIBUTE IS DECLARED HERE (not in iORM.Attributes unit) TO AVOID CIRCULAR REFERENCE
-  // NOTE: THIS ATTRIBUTE IS DECLARED HERE (not in iORM.Attributes unit) TO AVOID CIRCULAR REFERENCE
-//  ioConflictStrategy = class(TCustomAttribute)
+  // NOTE: THIS ATTRIBUTE IS DECLARED INTO iORM.ConflictStrategy.Interfaces (not here) TO AVOID CIRCULAR REFERENCE
+  // NOTE: THIS ATTRIBUTE IS DECLARED INTO iORM.ConflictStrategy.Interfaces (not here) TO AVOID CIRCULAR REFERENCE
+  // ioDeleteConflictStrategyAttribute = class(TCustomAttribute)
+  // ioUpdateConflictStrategyAttribute = type ioDeleteConflictStrategyAttribute;
 
 {$ENDREGION} // END ETM ATTRIBUTES
 
