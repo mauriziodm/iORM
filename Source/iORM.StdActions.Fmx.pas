@@ -1688,7 +1688,7 @@ begin
     begin
       // Se è il caso fa l'Execute anche sulle ChildCQA
       // NB: Le esegue sempre a partire da quella creata più recentemente (child) e andando all'indietro
-      //      quindi esegue prima le ChildCQA e poi se stessa
+      // quindi esegue prima le ChildCQA e poi se stessa
       if FOnUpdateScope in [usGlobal] then
         TioBSCloseQueryActionRegister.Execute(Self);
       // In base a come impostata esegue l'azione
