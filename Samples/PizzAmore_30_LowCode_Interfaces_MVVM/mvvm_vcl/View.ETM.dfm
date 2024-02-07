@@ -111,9 +111,9 @@ object ViewETM: TViewETM
       item
         Alignment = taCenter
         Expanded = False
-        FieldName = 'SmartEventType'
+        FieldName = 'SmartActionType'
         Title.Alignment = taCenter
-        Title.Caption = 'event type'
+        Title.Caption = 'action type'
         Title.Font.Charset = DEFAULT_CHARSET
         Title.Font.Color = clNavy
         Title.Font.Height = -13
@@ -279,8 +279,8 @@ object ViewETM: TViewETM
       FieldName = 'SmartUser'
       Size = 100
     end
-    object BS_ETMSmartEventType: TStringField
-      FieldName = 'SmartEventType'
+    object BS_ETMSmartActionType: TStringField
+      FieldName = 'SmartActionType'
       Size = 100
     end
     object BS_ETMDiffOneWay: TStringField

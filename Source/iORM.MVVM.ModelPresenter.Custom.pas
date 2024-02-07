@@ -47,7 +47,8 @@ type
     FAsDefault: Boolean;
     FBindSourceAdapter: IioActiveBindSourceAdapter;
     FTypeName, FTypeAlias: String;
-    FAsync: Boolean;
+    FAsyncLoad: Boolean;
+    FAsyncPersist: Boolean;
     FLoadType: TioLoadType;
     FLazy: Boolean;
     FLazyProps: String;
@@ -109,8 +110,10 @@ type
     function GetAsDefault: Boolean;
     procedure SetAsDefault(const Value: Boolean);
     procedure InitAsDefaultOnCreate;
-    // Async
-    procedure SetAsync(const Value: Boolean);
+    // AsyncLoad
+    procedure SetAsyncLoad(const Value: Boolean);
+    // AsyncPersist
+    procedure SetAsyncPersist(const Value: Boolean);
     // Lazy
     procedure SetLazy(const Value: Boolean);
     // LazyProps
@@ -214,7 +217,8 @@ type
     property Bof: Boolean read GetBOF; // Public: Master+Detail
     property Eof: Boolean read GetEOF; // Public: Master+Detail
     // Published properties
-    property Async: Boolean read FAsync write SetAsync default False; // Published: Master
+    property AsyncLoad: Boolean read FAsyncLoad write SetAsyncLoad default False; // Published: Master
+    property AsyncPersist: Boolean read FAsyncPersist write SetAsyncPersist default False; // Published: Master
     property LoadType: TioLoadType read GetLoadType write SetLoadType default ltManual; // Published: Master
     property Lazy: Boolean read FLazy write SetLazy default False; // published: Master
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
@@ -427,7 +431,8 @@ begin
   inherited;
   FAutoPost := True;
   FAutoRefreshOnNotification := True;
-  FAsync := False;
+  FAsyncLoad := False;
+  FAsyncPersist := False;
   FLoadType := ltManual;
   FLazy := False;
   FLazyProps := '';
@@ -1067,13 +1072,22 @@ begin
   FAsDefault := Value;
 end;
 
-procedure TioModelPresenterCustom.SetAsync(const Value: Boolean);
+procedure TioModelPresenterCustom.SetAsyncLoad(const Value: Boolean);
 begin
-  FAsync := Value;
+  FAsyncLoad := Value;
   // If the adapter is created and is an ActiveBindSourceAdapter then
   // update the where of the adapter also
   if CheckAdapter then
-    FBindSourceAdapter.ioAsync := Value;
+    FBindSourceAdapter.AsyncLoad := Value;
+end;
+
+procedure TioModelPresenterCustom.SetAsyncPersist(const Value: Boolean);
+begin
+  FAsyncPersist := Value;
+  // If the adapter is created and is an ActiveBindSourceAdapter then
+  // update the where of the adapter also
+  if CheckAdapter then
+    FBindSourceAdapter.AsyncPersist := Value;
 end;
 
 procedure TioModelPresenterCustom.SetLazy(const Value: Boolean);
@@ -1107,7 +1121,8 @@ begin
     Exit;
   FBindSourceAdapter := Value;
   // Set some properties
-  FBindSourceAdapter.ioAsync := FAsync;
+  FBindSourceAdapter.AsyncLoad := FAsyncLoad;
+  FBindSourceAdapter.AsyncPersist := FAsyncPersist;
   FBindSourceAdapter.ioWhereDetailsFromDetailAdapters := FWhereDetailsFromDetailAdapters;
   FBindSourceAdapter.ioWhere := GetWhere; // Do not directly access to the FWhere field here
   FBindSourceAdapter.LoadType := FLoadType;
@@ -1365,7 +1380,7 @@ begin
   // If the adapter is created and is an ActiveBindSourceAdapter then
   // update the where of the adapter also
   if CheckAdapter then
-    FBindSourceAdapter.ioTypeAlias := Value;
+    FBindSourceAdapter.TypeAlias := Value;
 end;
 
 procedure TioModelPresenterCustom.SetTypeName(const Value: String);
@@ -1374,7 +1389,7 @@ begin
   // If the adapter is created and is an ActiveBindSourceAdapter then
   // update the where of the adapter also
   if CheckAdapter then
-    FBindSourceAdapter.ioTypeName := Value;
+    FBindSourceAdapter.TypeName := Value;
 end;
 
 procedure TioModelPresenterCustom.SetTypeOfCollection(const Value: TioTypeOfCollection);

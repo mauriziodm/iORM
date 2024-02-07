@@ -191,7 +191,6 @@ object ViewBaseForList: TViewBaseForList
     FieldDefs = <>
     ScopeMappings = <>
     AsDefault = True
-    Async = True
     Paging.CurrentPageOfFormat = '%d/%d'
     Left = 59
     Top = 164

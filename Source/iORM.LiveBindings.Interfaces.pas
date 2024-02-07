@@ -267,18 +267,21 @@ type
     function GetAutoLoad: Boolean;
     // Current property
     function GetCurrent: TObject;
-    // Async property
-    procedure SetIoAsync(const Value: Boolean);
-    function GetIoAsync: Boolean;
+    // AsyncLoad property
+    procedure SetAsyncLoad(const Value: Boolean);
+    function GetAsyncLoad: Boolean;
+    // AsyncPersist property
+    procedure SetAsyncPersist(const Value: Boolean);
+    function GetAsyncPersist: Boolean;
     // AutoPost property
     procedure SetioAutoPost(const Value: Boolean);
     function GetioAutoPost: Boolean;
     // WhereStr property
-    procedure SetIoWhere(const Value: IioWhere);
-    function GetioWhere: IioWhere;
+    procedure SetWhere(const Value: IioWhere);
+    function GetWhere: IioWhere;
     // ioWhereDetailsFromDetailAdapters property
-    function GetioWhereDetailsFromDetailAdapters: Boolean;
-    procedure SetioWhereDetailsFromDetailAdapters(const Value: Boolean);
+    function GetWhereDetailsFromDetailAdapters: Boolean;
+    procedure SetWhereDetailsFromDetailAdapters(const Value: Boolean);
     // ioViewDataType
     function GetTypeOfCollection: TioTypeOfCollection;
     // ioOwnsObjects
@@ -317,17 +320,18 @@ type
     property Current: TObject read GetCurrent;
     property EOF: Boolean read GetEOF;
     property Fields: TList<TBindSourceAdapterField> read GetFields;
-    property ioAsync: Boolean read GetIoAsync write SetIoAsync;
+    property AsyncLoad: Boolean read GetAsyncLoad write SetAsyncLoad;
+    property AsyncPersist: Boolean read GetAsyncPersist write SetAsyncPersist;
     property Lazy: Boolean read GetLazy write SetLazy;
     property LazyProps: String read GetLazyProps write SetLazyProps;
     property LoadType: TioLoadType read GetLoadType write SetLoadType;
     property AutoLoad: Boolean read GetAutoLoad;
-    property ioAutoPost: Boolean read GetioAutoPost write SetioAutoPost;
-    property ioOwnsObjects: Boolean read GetOwnsObjects;
-    property ioTypeAlias: String read GetTypeAlias write SetTypeAlias;
-    property ioTypeName: String read GetTypeName write SetTypeName;
-    property ioWhere: IioWhere read GetioWhere write SetIoWhere;
-    property ioWhereDetailsFromDetailAdapters: Boolean read GetioWhereDetailsFromDetailAdapters write SetioWhereDetailsFromDetailAdapters;
+    property ioAutoPost: Boolean read GetioAutoPost write SetioAutoPost; // Lascio il nome a ioAutoPost perchè c'è già un AutoPost negli antenati
+    property ioOwnsObjects: Boolean read GetOwnsObjects; // Lascio il nome a ioAutoPost perchè c'è già un AutoPost negli antenati
+    property TypeAlias: String read GetTypeAlias write SetTypeAlias;
+    property TypeName: String read GetTypeName write SetTypeName;
+    property ioWhere: IioWhere read GetWhere write SetWhere;
+    property ioWhereDetailsFromDetailAdapters: Boolean read GetWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters;
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection;
     property ItemCount: Integer read GetCount;
     property ItemIndex: Integer read GetItemIndex write SetItemIndex;
@@ -364,7 +368,7 @@ type
     function GetMasterPropertyName: String;
     function AsActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     // WhereStr property
-    function GetioWhere: IioWhere;
+    function GetWhere: IioWhere;
   end;
 
   IioNaturalBindSourceAdapterSource = interface

@@ -41,7 +41,7 @@ type
     BS_ETMEntityID: TIntegerField;
     BS_ETMSmartEntityVersion: TStringField;
     BS_ETMSmartUser: TStringField;
-    BS_ETMSmartEventType: TStringField;
+    BS_ETMSmartActionType: TStringField;
     BS_ETMDiffOneWay: TStringField;
     acEtmRevertToVersion: TioViewAction;
   private

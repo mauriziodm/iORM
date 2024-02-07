@@ -167,7 +167,7 @@ begin
   begin
     if not Assigned(LBindSourceAdapter) then
       Continue;
-    AWhereDetailsContainer.AddOrUpdate(LBindSourceAdapter.GetMasterPropertyName, LBindSourceAdapter.GetioWhere);
+    AWhereDetailsContainer.AddOrUpdate(LBindSourceAdapter.GetMasterPropertyName, LBindSourceAdapter.GetWhere);
   end;
 end;
 

@@ -105,7 +105,8 @@ type
     property AsDefault; // non mettere default
     property TypeName;
     property TypeAlias;
-    property Async default False;
+    property AsyncLoad default False;
+    property AsyncPersist default False;
     property LoadType default ltAuto;
     property Lazy default False;
     property LazyProps;

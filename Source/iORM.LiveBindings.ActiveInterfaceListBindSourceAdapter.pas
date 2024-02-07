@@ -51,7 +51,8 @@ type
   TioActiveInterfaceListBindSourceAdapter = class(TInterfaceListBindSourceAdapter, IioContainedBindSourceAdapter, IioActiveBindSourceAdapter,
     IioNaturalBindSourceAdapterSource)
   private
-    FAsync: Boolean;
+    FAsyncLoad: Boolean;
+    FAsyncPersist: Boolean;
     FWhere: IioWhere;
     FWhereDetailsFromDetailAdapters: Boolean;
     FTypeName, FTypeAlias: String;
@@ -70,18 +71,21 @@ type
     FBSPersistenceDeleting: Boolean;
     // Reference to the same instance contained by FList field, this reference is only to keep live the list instance
     FInterfacedList: IInterface;
-    // Async property
-    function GetIoAsync: Boolean;
-    procedure SetIoAsync(const Value: Boolean);
+    // AsyncLoad property
+    function GetAsyncLoad: Boolean;
+    procedure SetAsyncLoad(const Value: Boolean);
+    // AsyncPersist property
+    function GetAsyncPersist: Boolean;
+    procedure SetAsyncPersist(const Value: Boolean);
     // AutoPost property
     procedure SetioAutoPost(const Value: Boolean);
     function GetioAutoPost: Boolean;
     // WhereStr property
-    procedure SetIoWhere(const Value: IioWhere);
-    function GetioWhere: IioWhere;
+    procedure SetWhere(const Value: IioWhere);
+    function GetWhere: IioWhere;
     // ioWhereDetailsFromDetailAdapters property
-    function GetioWhereDetailsFromDetailAdapters: Boolean;
-    procedure SetioWhereDetailsFromDetailAdapters(const Value: Boolean);
+    function GetWhereDetailsFromDetailAdapters: Boolean;
+    procedure SetWhereDetailsFromDetailAdapters(const Value: Boolean);
     // ioViewDataType
     function GetTypeOfCollection: TioTypeOfCollection;
     // ioOwnsObjects
@@ -496,9 +500,14 @@ begin
   Result := Self.Fields;
 end;
 
-function TioActiveInterfaceListBindSourceAdapter.GetIoAsync: Boolean;
+function TioActiveInterfaceListBindSourceAdapter.GetAsyncLoad: Boolean;
 begin
-  Result := FAsync;
+  Result := FAsyncLoad;
+end;
+
+function TioActiveInterfaceListBindSourceAdapter.GetAsyncPersist: Boolean;
+begin
+  Result := FAsyncPersist;
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.NewDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere)
@@ -519,7 +528,7 @@ begin
   Result := TYPE_OF_COLLECTION;
 end;
 
-function TioActiveInterfaceListBindSourceAdapter.GetioWhere: IioWhere;
+function TioActiveInterfaceListBindSourceAdapter.GetWhere: IioWhere;
 begin
   Result := FWhere;
   // Fill the WhereDetails from the DetailAdapters container if enabled
@@ -532,7 +541,7 @@ begin
   end;
 end;
 
-function TioActiveInterfaceListBindSourceAdapter.GetioWhereDetailsFromDetailAdapters: Boolean;
+function TioActiveInterfaceListBindSourceAdapter.GetWhereDetailsFromDetailAdapters: Boolean;
 begin
   Result := FWhereDetailsFromDetailAdapters;
 end;
@@ -611,7 +620,8 @@ begin
   FLoadType := ltAuto;
   FLazy := False;
   FLazyProps := '';
-  FAsync := False;
+  FAsyncLoad := False;
+  FAsyncPersist := False;
   FReloading := False;
   FBSPersistenceDeleting := False;
   // inherited Create(AOwner, ADataObject, ATypeAlias, ATypeName, AOwnsObject);
@@ -835,9 +845,14 @@ begin
   Self._InternalSetDataObject<TObject>(ADataObject, AOwnsObject);
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter.SetIoAsync(const Value: Boolean);
+procedure TioActiveInterfaceListBindSourceAdapter.SetAsyncLoad(const Value: Boolean);
 begin
-  FAsync := Value;
+  FAsyncLoad := Value;
+end;
+
+procedure TioActiveInterfaceListBindSourceAdapter.SetAsyncPersist(const Value: Boolean);
+begin
+  FAsyncPersist := Value;
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.SetioAutoPost(const Value: Boolean);
@@ -845,12 +860,12 @@ begin
   Self.AutoPost := Value;
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter.SetIoWhere(const Value: IioWhere);
+procedure TioActiveInterfaceListBindSourceAdapter.SetWhere(const Value: IioWhere);
 begin
   FWhere := Value;
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter.SetioWhereDetailsFromDetailAdapters(const Value: Boolean);
+procedure TioActiveInterfaceListBindSourceAdapter.SetWhereDetailsFromDetailAdapters(const Value: Boolean);
 begin
   FWhereDetailsFromDetailAdapters := Value;
 end;

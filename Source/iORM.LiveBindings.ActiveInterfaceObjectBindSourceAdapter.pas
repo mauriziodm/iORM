@@ -50,7 +50,8 @@ type
   TioActiveInterfaceObjectBindSourceAdapter = class(TInterfaceObjectBindSourceAdapter, IioContainedBindSourceAdapter, IioActiveBindSourceAdapter,
     IioNaturalBindSourceAdapterSource)
   private
-    FAsync: Boolean;
+    FAsyncLoad: Boolean;
+    FAsyncPersist: Boolean;
     FWhere: IioWhere;
     FWhereDetailsFromDetailAdapters: Boolean;
     // FTypeName, FTypeAlias: String;
@@ -66,18 +67,21 @@ type
     // FNaturalBSA_MasterBindSourceAdapter: IioActiveBindSourceAdapter;
     FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     FBSPersistenceDeleting: Boolean;
-    // Async property
-    function GetIoAsync: Boolean;
-    procedure SetIoAsync(const Value: Boolean);
+    // AsyncLoad property
+    function GetAsyncLoad: Boolean;
+    procedure SetAsyncLoad(const Value: Boolean);
+    // AsyncPersist property
+    function GetAsyncPersist: Boolean;
+    procedure SetAsyncPersist(const Value: Boolean);
     // AutoPost property
     procedure SetioAutoPost(const Value: Boolean);
     function GetioAutoPost: Boolean;
     // WhereStr property
-    procedure SetIoWhere(const Value: IioWhere);
-    function GetioWhere: IioWhere;
+    procedure SetWhere(const Value: IioWhere);
+    function GetWhere: IioWhere;
     // ioWhereDetailsFromDetailAdapters property
-    function GetioWhereDetailsFromDetailAdapters: Boolean;
-    procedure SetioWhereDetailsFromDetailAdapters(const Value: Boolean);
+    function GetWhereDetailsFromDetailAdapters: Boolean;
+    procedure SetWhereDetailsFromDetailAdapters(const Value: Boolean);
     // ioViewDataType
     function GetTypeOfCollection: TioTypeOfCollection;
     // ioOwnsObjects
@@ -239,7 +243,8 @@ begin
   FLoadType := ltAuto;
   FLazy := False;
   FLazyProps := '';
-  FAsync := False;
+  FAsyncLoad := False;
+  FAsyncPersist := False;
   FReloading := False;
   FBSPersistenceDeleting := False;
   inherited Create(AOwner, ADataObject, ATypeAlias, ATypeName);
@@ -472,9 +477,14 @@ begin
   Result := Self.Fields;
 end;
 
-function TioActiveInterfaceObjectBindSourceAdapter.GetIoAsync: Boolean;
+function TioActiveInterfaceObjectBindSourceAdapter.GetAsyncLoad: Boolean;
 begin
-  Result := FAsync;
+  Result := FAsyncLoad;
+end;
+
+function TioActiveInterfaceObjectBindSourceAdapter.GetAsyncPersist: Boolean;
+begin
+  Result := FAsyncPersist;
 end;
 
 function TioActiveInterfaceObjectBindSourceAdapter.NewDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String;
@@ -495,7 +505,7 @@ begin
   Result := TYPE_OF_COLLECTION;
 end;
 
-function TioActiveInterfaceObjectBindSourceAdapter.GetioWhere: IioWhere;
+function TioActiveInterfaceObjectBindSourceAdapter.GetWhere: IioWhere;
 begin
   Result := FWhere;
   // Fill the WhereDetails from the DetailAdapters container if enabled
@@ -508,7 +518,7 @@ begin
   end;
 end;
 
-function TioActiveInterfaceObjectBindSourceAdapter.GetioWhereDetailsFromDetailAdapters: Boolean;
+function TioActiveInterfaceObjectBindSourceAdapter.GetWhereDetailsFromDetailAdapters: Boolean;
 begin
   Result := FWhereDetailsFromDetailAdapters;
 end;
@@ -752,9 +762,14 @@ begin
   raise EioException.Create(Self.ClassName, 'InternalSetDataObject', 'This ActiveBindSourceAdapter is for interface referenced instances only.');
 end;
 
-procedure TioActiveInterfaceObjectBindSourceAdapter.SetIoAsync(const Value: Boolean);
+procedure TioActiveInterfaceObjectBindSourceAdapter.SetAsyncLoad(const Value: Boolean);
 begin
-  FAsync := Value;
+  FAsyncLoad := Value;
+end;
+
+procedure TioActiveInterfaceObjectBindSourceAdapter.SetAsyncPersist(const Value: Boolean);
+begin
+  FAsyncPersist := Value;
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetioAutoPost(const Value: Boolean);
@@ -762,12 +777,12 @@ begin
   Self.AutoPost := Value;
 end;
 
-procedure TioActiveInterfaceObjectBindSourceAdapter.SetIoWhere(const Value: IioWhere);
+procedure TioActiveInterfaceObjectBindSourceAdapter.SetWhere(const Value: IioWhere);
 begin
   FWhere := Value;
 end;
 
-procedure TioActiveInterfaceObjectBindSourceAdapter.SetioWhereDetailsFromDetailAdapters(const Value: Boolean);
+procedure TioActiveInterfaceObjectBindSourceAdapter.SetWhereDetailsFromDetailAdapters(const Value: Boolean);
 begin
   FWhereDetailsFromDetailAdapters := Value;
 end;

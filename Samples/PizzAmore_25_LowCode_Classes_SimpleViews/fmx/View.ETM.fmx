@@ -144,8 +144,8 @@ object EtmView: TEtmView
       Size.Height = 330.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 4
-      Viewport.Width = 396.000000000000000000
-      Viewport.Height = 326.000000000000000000
+      Viewport.Width = 400.000000000000000000
+      Viewport.Height = 330.000000000000000000
     end
   end
   object GridETM: TStringGrid
@@ -157,8 +157,8 @@ object EtmView: TEtmView
     Size.PlatformDefault = False
     TextSettings.HorzAlign = Center
     TabOrder = 3
-    Viewport.Width = 396.000000000000000000
-    Viewport.Height = 155.000000000000000000
+    Viewport.Width = 400.000000000000000000
+    Viewport.Height = 180.000000000000000000
   end
   object BS_ETM: TioPrototypeBindSourceMaster
     FieldDefs = <

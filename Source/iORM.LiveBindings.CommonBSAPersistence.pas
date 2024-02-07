@@ -193,7 +193,7 @@ begin
   LExecuteMethod := TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(LActiveBindSourceAdapter);
   LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetDeleteTerminateMethod(LActiveBindSourceAdapter);
   // Execute synchronous or asynchronous
-  _Execute(LActiveBindSourceAdapter.ioAsync, LExecuteMethod, LTerminateMethod);
+  _Execute(LActiveBindSourceAdapter.AsyncPersist, LExecuteMethod, LTerminateMethod);
 end;
 
 class procedure TioCommonBSAPersistence.BeforeDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
@@ -237,7 +237,7 @@ begin
   case AActiveBindSourceAdapter.TypeOfCollection of
     TioTypeOfCollection.tcSingleObject:
       begin
-        LObj := io.di.Locate(AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias).Get;
+        LObj := io.di.Locate(AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias).Get;
         if AActiveBindSourceAdapter.IsInterfaceBSA and Supports(LObj, IInterface, LIntf) then
           AActiveBindSourceAdapter.InternalSetDataObject(LIntf, AActiveBindSourceAdapter.ioOwnsObjects)
         else
@@ -276,10 +276,10 @@ begin
   // Load
   case AActiveBindSourceAdapter.TypeOfCollection of
     TioTypeOfCollection.tcSingleObject:
-      _LoadObject(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.Lazy,
+      _LoadObject(AActiveBindSourceAdapter.AsyncLoad, AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias, AActiveBindSourceAdapter.Lazy,
         AActiveBindSourceAdapter.LazyProps, AActiveBindSourceAdapter.ioWhere, LTerminateMethod);
     TioTypeOfCollection.tcList:
-      _LoadList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.Lazy,
+      _LoadList(AActiveBindSourceAdapter.AsyncLoad, AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias, AActiveBindSourceAdapter.Lazy,
         AActiveBindSourceAdapter.LazyProps, AActiveBindSourceAdapter.ioWhere, LTargetClass, LTerminateMethod);
   else
     raise EioException.Create('TioCommonBSAPersistence.Load: wrong TypeOfCollection');
@@ -302,7 +302,7 @@ begin
     // If the pagination is progressive then it loads the next page and adds it to the
     // internal list of the BSA and then does a Refresh(False)
     LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetProgressiveLoadPageTerminateMethod(AActiveBindSourceAdapter);
-    _LoadToList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.Lazy,
+    _LoadToList(AActiveBindSourceAdapter.AsyncLoad, AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias, AActiveBindSourceAdapter.Lazy,
       AActiveBindSourceAdapter.LazyProps, AActiveBindSourceAdapter.ioWhere, AActiveBindSourceAdapter.DataObject, LTerminateMethod);
   end
   else
@@ -384,11 +384,11 @@ begin
   // Checks
   if AActiveBindSourceAdapter.GetBindSource = nil then
     raise EioException.Create(ClassName, 'Reload', Format('Unassigned bind source (TypeName = "%s", TypeAlias = "%s")',
-      [AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias]));
+      [AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias]));
   if not AActiveBindSourceAdapter.GetBindSource.IsMasterBS then
     raise EioException.Create(ClassName, 'Reload',
       Format('This is isn''t a master bind source  (TypeName = "%s", TypeAlias = "%s").'#13'Reload is for master bind source only.',
-      [AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias]));
+      [AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias]));
 
   LTargetClass := nil;
   // Prevent AutoLoadData when activating the BSA
@@ -404,14 +404,14 @@ begin
   // Load
   case AActiveBindSourceAdapter.TypeOfCollection of
     TioTypeOfCollection.tcSingleObject:
-      _LoadObject(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.Lazy,
+      _LoadObject(AActiveBindSourceAdapter.AsyncLoad, AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias, AActiveBindSourceAdapter.Lazy,
         AActiveBindSourceAdapter.LazyProps, AActiveBindSourceAdapter.ioWhere, LTerminateMethod);
     TioTypeOfCollection.tcList:
-      _LoadList(AActiveBindSourceAdapter.ioAsync, AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias, AActiveBindSourceAdapter.Lazy,
+      _LoadList(AActiveBindSourceAdapter.AsyncLoad, AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias, AActiveBindSourceAdapter.Lazy,
         AActiveBindSourceAdapter.LazyProps, AActiveBindSourceAdapter.ioWhere, LTargetClass, LTerminateMethod);
   else
     raise EioException.Create(ClassName, 'Reload', Format('Wrong "TypeOfCollection" property value (TypeName = "%s", TypeAlias = "%s")',
-      [AActiveBindSourceAdapter.ioTypeName, AActiveBindSourceAdapter.ioTypeAlias]));
+      [AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias]));
   end;
 end;
 
@@ -428,11 +428,11 @@ begin
   // Checks
   if LActiveBindSourceAdapter.GetBindSource = nil then
     raise EioException.Create(ClassName, 'ReloadNaturalBindSourceAdapter', Format('Unassigned bind source (TypeName = "%s", TypeAlias = "%s")',
-      [LActiveBindSourceAdapter.ioTypeName, LActiveBindSourceAdapter.ioTypeAlias]));
+      [LActiveBindSourceAdapter.TypeName, LActiveBindSourceAdapter.TypeAlias]));
   if not LActiveBindSourceAdapter.GetBindSource.IsMasterBS then
     raise EioException.Create(ClassName, 'ReloadNaturalBindSourceAdapter',
       Format('This is isn''t a master bind source  (TypeName = "%s", TypeAlias = "%s").'#13'Reload is for master bind source only.',
-      [LActiveBindSourceAdapter.ioTypeName, LActiveBindSourceAdapter.ioTypeAlias]));
+      [LActiveBindSourceAdapter.TypeName, LActiveBindSourceAdapter.TypeAlias]));
   // Extract the current DataObject and the where condition to reload it
   LDataObject := LActiveBindSourceAdapter.Current;
   LWhere := TioWhereFactory.NewWhere.ByID( TioUtilities.ExtractOID(LDataObject) );
@@ -442,7 +442,7 @@ begin
     ltFromBSAsIs, ltFromBSReload:
       begin
         LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetNotifyTerminateMethod(LActiveBindSourceAdapter);
-        _LoadToObject(LActiveBindSourceAdapter.ioAsync, LDataObject.ClassName, '', LActiveBindSourceAdapter.Lazy, LActiveBindSourceAdapter.LazyProps, LWhere,
+        _LoadToObject(LActiveBindSourceAdapter.AsyncLoad, LDataObject.ClassName, '', LActiveBindSourceAdapter.Lazy, LActiveBindSourceAdapter.LazyProps, LWhere,
           LDataObject, LTerminateMethod);
       end;
     // Reload on a new instance
@@ -450,12 +450,12 @@ begin
       begin
         LActiveBindSourceAdapter.Reloading := True;
         LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetReloadTerminateMethod(LActiveBindSourceAdapter, False); // Notify = false (verificare)
-        _LoadObject(LActiveBindSourceAdapter.ioAsync, LDataObject.ClassName, '', LActiveBindSourceAdapter.Lazy, LActiveBindSourceAdapter.LazyProps, LWhere,
+        _LoadObject(LActiveBindSourceAdapter.AsyncLoad, LDataObject.ClassName, '', LActiveBindSourceAdapter.Lazy, LActiveBindSourceAdapter.LazyProps, LWhere,
           LTerminateMethod);
       end
   else
     raise EioException.Create(ClassName, 'ReloadNaturalBindSourceAdapter', Format('Wrong "LoadType" property value (TypeName = "%s", TypeAlias = "%s")',
-      [LActiveBindSourceAdapter.ioTypeName, LActiveBindSourceAdapter.ioTypeAlias]));
+      [LActiveBindSourceAdapter.TypeName, LActiveBindSourceAdapter.TypeAlias]));
   end;
 end;
 
@@ -476,7 +476,7 @@ begin
   // Set anonimous methods then execute
   LExecuteMethod := TioCommonBSAAnonymousMethodsFactory.GetPersistAllExecuteMethod(AActiveBindSourceAdapter);
   LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetNotifyTerminateMethod(AActiveBindSourceAdapter);
-  _Execute(AActiveBindSourceAdapter.ioAsync, LExecuteMethod, LTerminateMethod);
+  _Execute(AActiveBindSourceAdapter.AsyncPersist, LExecuteMethod, LTerminateMethod);
 end;
 
 class procedure TioCommonBSAPersistence.PersistCurrent(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
@@ -490,7 +490,7 @@ begin
   // Set anonimous methods then execute
   LExecuteMethod := TioCommonBSAAnonymousMethodsFactory.GetPersistCurrentExecuteMethod(AActiveBindSourceAdapter);
   LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetNotifyTerminateMethod(AActiveBindSourceAdapter);
-  _Execute(AActiveBindSourceAdapter.ioAsync, LExecuteMethod, LTerminateMethod);
+  _Execute(AActiveBindSourceAdapter.AsyncPersist, LExecuteMethod, LTerminateMethod);
 end;
 
 class procedure TioCommonBSAPersistence.Post(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);

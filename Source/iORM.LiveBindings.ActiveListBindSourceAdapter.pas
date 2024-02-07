@@ -50,7 +50,8 @@ type
 
   TioActiveListBindSourceAdapter = class(TListBindSourceAdapter, IioContainedBindSourceAdapter, IioActiveBindSourceAdapter, IioNaturalBindSourceAdapterSource)
   private
-    FAsync: Boolean;
+    FAsyncLoad: Boolean;
+    FAsyncPersist: Boolean;
     FWhere: IioWhere;
     FWhereDetailsFromDetailAdapters: Boolean;
     // FClassRef: TioClassRef;
@@ -76,18 +77,21 @@ type
     // TypeAlias
     procedure SetTypeAlias(const AValue: String);
     function GetTypeAlias: String;
-    // Async property
-    function GetIoAsync: Boolean;
-    procedure SetIoAsync(const Value: Boolean);
+    // AsyncLoad property
+    function GetAsyncLoad: Boolean;
+    procedure SetAsyncLoad(const Value: Boolean);
+    // AsyncPersist property
+    function GetAsyncPersist: Boolean;
+    procedure SetAsyncPersist(const Value: Boolean);
     // AutoPost property
     procedure SetioAutoPost(const Value: Boolean);
     function GetioAutoPost: Boolean;
     // WhereStr property
-    procedure SetIoWhere(const Value: IioWhere);
-    function GetioWhere: IioWhere;
+    procedure SetWhere(const Value: IioWhere);
+    function GetWhere: IioWhere;
     // ioWhereDetailsFromDetailAdapters property
-    function GetioWhereDetailsFromDetailAdapters: Boolean;
-    procedure SetioWhereDetailsFromDetailAdapters(const Value: Boolean);
+    function GetWhereDetailsFromDetailAdapters: Boolean;
+    procedure SetWhereDetailsFromDetailAdapters(const Value: Boolean);
     // ioViewDataType
     function GetTypeOfCollection: TioTypeOfCollection;
     // ioOwnsObjects
@@ -523,9 +527,14 @@ begin
   Result := Self.Fields;
 end;
 
-function TioActiveListBindSourceAdapter.GetIoAsync: Boolean;
+function TioActiveListBindSourceAdapter.GetAsyncLoad: Boolean;
 begin
-  Result := FAsync;
+  Result := FAsyncLoad;
+end;
+
+function TioActiveListBindSourceAdapter.GetAsyncPersist: Boolean;
+begin
+  Result := FAsyncPersist;
 end;
 
 function TioActiveListBindSourceAdapter.NewDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere)
@@ -547,7 +556,7 @@ begin
   Result := TYPE_OF_COLLECTION;
 end;
 
-function TioActiveListBindSourceAdapter.GetioWhere: IioWhere;
+function TioActiveListBindSourceAdapter.GetWhere: IioWhere;
 begin
   // Fill the WhereDetails from the DetailAdapters container if enabled
   // NB: Create it if not assigned
@@ -560,7 +569,7 @@ begin
   Result := FWhere;
 end;
 
-function TioActiveListBindSourceAdapter.GetioWhereDetailsFromDetailAdapters: Boolean;
+function TioActiveListBindSourceAdapter.GetWhereDetailsFromDetailAdapters: Boolean;
 begin
   Result := FWhereDetailsFromDetailAdapters;
 end;
@@ -646,7 +655,8 @@ begin
   FLoadType := ltAuto;
   FLazy := False;
   FLazyProps := '';
-  FAsync := False;
+  FAsyncLoad := False;
+  FAsyncPersist := False;
   FReloading := False;
   FBSPersistenceDeleting := False;
   // inherited Create(AOwner, ADataObject, AClassRef, AOwnsObject);
@@ -811,9 +821,14 @@ begin
   Self._InternalSetDataObject<TObject>(ADataObject, AOwnsObject);
 end;
 
-procedure TioActiveListBindSourceAdapter.SetIoAsync(const Value: Boolean);
+procedure TioActiveListBindSourceAdapter.SetAsyncLoad(const Value: Boolean);
 begin
-  FAsync := Value;
+  FAsyncLoad := Value;
+end;
+
+procedure TioActiveListBindSourceAdapter.SetAsyncPersist(const Value: Boolean);
+begin
+  FAsyncPersist := Value;
 end;
 
 procedure TioActiveListBindSourceAdapter.SetioAutoPost(const Value: Boolean);
@@ -821,12 +836,12 @@ begin
   Self.AutoPost := Value;
 end;
 
-procedure TioActiveListBindSourceAdapter.SetIoWhere(const Value: IioWhere);
+procedure TioActiveListBindSourceAdapter.SetWhere(const Value: IioWhere);
 begin
   FWhere := Value;
 end;
 
-procedure TioActiveListBindSourceAdapter.SetioWhereDetailsFromDetailAdapters(const Value: Boolean);
+procedure TioActiveListBindSourceAdapter.SetWhereDetailsFromDetailAdapters(const Value: Boolean);
 begin
   FWhereDetailsFromDetailAdapters := Value;
 end;

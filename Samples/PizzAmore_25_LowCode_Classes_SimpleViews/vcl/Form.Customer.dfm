@@ -255,7 +255,7 @@ object CustomerForm: TCustomerForm
     object LabelTitle: TLabel
       Left = 72
       Top = 7
-      Width = 385
+      Width = 381
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -387,14 +387,14 @@ object CustomerForm: TCustomerForm
     end
   end
   object ButtonRevertToVersion: TButton
-    Left = 375
+    Left = 371
     Top = 242
     Width = 121
     Height = 20
     Action = acEtmRevertToVersion
     Anchors = [akTop, akRight]
     TabOrder = 8
-    ExplicitLeft = 371
+    ExplicitLeft = 367
   end
   object DSCustomer: TioDataSetMaster
     AsDefault = True
@@ -404,7 +404,6 @@ object CustomerForm: TCustomerForm
     VirtualFields = True
     Paging.CurrentPageOfFormat = '%d/%d'
     Paging.PageSize = 10
-    OnUpdateConflictException = DSCustomerUpdateConflictException
     Left = 320
     Top = 48
     object DSCustomerID: TIntegerField

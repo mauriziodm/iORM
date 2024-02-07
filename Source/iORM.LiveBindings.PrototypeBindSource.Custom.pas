@@ -53,7 +53,8 @@ type
     FLoadType: TioLoadType;
     FLazy: Boolean;
     FLazyProps: String;
-    FAsync: Boolean;
+    FAsyncLoad: Boolean;
+    FAsyncPersist: Boolean;
     FTypeOfCollection: TioTypeOfCollection;
     FMasterBindSource: IioBindSource;
     FMasterPropertyName: String;
@@ -118,8 +119,10 @@ type
     function GetAsDefault: Boolean;
     procedure SetAsDefault(const Value: Boolean);
     procedure InitAsDefaultOnCreate;
-    // Async
-    procedure SetAsync(const Value: Boolean);
+    // AsyncLoad
+    procedure SetAsyncLoad(const Value: Boolean);
+    // AsyncPersist
+    procedure SetAsyncPersist(const Value: Boolean);
     // AutoActivate
     function GetAutoActivate: Boolean;
     procedure SetAutoActivate(const Value: Boolean);
@@ -217,7 +220,8 @@ type
     property AsDefault: Boolean read GetAsDefault write SetAsDefault; // Published: Master // non mettere default
     property TypeName: String read GetTypeName write SetTypeName; // published: Master
     property TypeAlias: String read FTypeAlias write SetTypeAlias; // published: Master
-    property Async: Boolean read FAsync write SetAsync default False; // published: Master
+    property AsyncLoad: Boolean read FAsyncLoad write SetAsyncLoad default False; // published: Master
+    property AsyncPersist: Boolean read FAsyncPersist write SetAsyncPersist default False; // published: Master
     property LoadType: TioLoadType read GetLoadType write SetLoadType default ltManual; // published: Master
     property Lazy: Boolean read FLazy write SetLazy default False; // published: Master
     property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
@@ -415,7 +419,8 @@ begin
   FAutoPost := True;
   FioLoaded := False;
   FAutoRefreshOnNotification := True;
-  FAsync := False;
+  FAsyncLoad := False;
+  FAsyncPersist := False;
   FLoadType := ltManual;
   FLazy := False;
   FLazyProps := '';
@@ -972,14 +977,24 @@ begin
   FAsDefault := Value;
 end;
 
-procedure TioPrototypeBindSourceCustom.SetAsync(const Value: Boolean);
+procedure TioPrototypeBindSourceCustom.SetAsyncLoad(const Value: Boolean);
 var
   LActiveBSA: IioActiveBindSourceAdapter;
 begin
-  FAsync := Value;
+  FAsyncLoad := Value;
   // Update the adapter
   if CheckActiveAdapter then
-    LActiveBSA.ioAsync := Value;
+    LActiveBSA.AsyncLoad := Value;
+end;
+
+procedure TioPrototypeBindSourceCustom.SetAsyncPersist(const Value: Boolean);
+var
+  LActiveBSA: IioActiveBindSourceAdapter;
+begin
+  FAsyncPersist := Value;
+  // Update the adapter
+  if CheckActiveAdapter then
+    LActiveBSA.AsyncPersist := Value;
 end;
 
 procedure TioPrototypeBindSourceCustom.SetLazy(const Value: Boolean);
@@ -1261,7 +1276,7 @@ begin
   // If the adapter is created and is an ActiveBindSourceAdapter then
   // update the where of the adapter also
   if CheckActiveAdapter then
-    GetActiveBindSourceAdapter.ioTypeAlias := Value;
+    GetActiveBindSourceAdapter.TypeAlias := Value;
 end;
 
 procedure TioPrototypeBindSourceCustom.SetTypeName(const Value: String);
@@ -1270,7 +1285,7 @@ begin
   // If the adapter is created and is an ActiveBindSourceAdapter then
   // update the where of the adapter also
   if CheckActiveAdapter then
-    GetActiveBindSourceAdapter.ioTypeName := Value;
+    GetActiveBindSourceAdapter.TypeName := Value;
 end;
 
 procedure TioPrototypeBindSourceCustom.SetTypeOfCollection(const Value: TioTypeOfCollection);
@@ -1327,7 +1342,8 @@ begin
   // PS: Set ioAsync also (and other properties)
   if Assigned(LActiveBSA) then
   begin
-    LActiveBSA.ioAsync := FAsync;
+    LActiveBSA.AsyncLoad := FAsyncLoad;
+    LActiveBSA.AsyncPersist := FAsyncPersist;
     LActiveBSA.ioAutoPost := FAutoPost;
     LActiveBSA.LoadType := FLoadType;
     LActiveBSA.Lazy := FLazy;

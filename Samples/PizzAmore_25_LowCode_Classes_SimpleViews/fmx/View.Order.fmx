@@ -156,7 +156,7 @@ inherited ViewOrder: TViewOrder
       Touch.InteractiveGestures = [LongTap, DoubleTap]
       StyleLookup = 'transparentedit'
       TabOrder = 41
-      Text = '01/11/2023 00:58:00'
+      Text = '31/10/2024 00:58:00'
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       Position.X = 50.000000000000000000
       Position.Y = 20.000000000000000000
@@ -266,8 +266,8 @@ inherited ViewOrder: TViewOrder
       TabOrder = 1
       RowCount = 200
       Options = [AlternatingRowBackground, Editing, ColumnResize, ColumnMove, ColLines, RowLines, Tabs, Header, HeaderClick, AutoDisplacement]
-      Viewport.Width = 380.000000000000000000
-      Viewport.Height = 310.000000000000000000
+      Viewport.Width = 400.000000000000000000
+      Viewport.Height = 335.000000000000000000
     end
   end
   inherited ActionList1: TActionList
@@ -283,8 +283,8 @@ inherited ViewOrder: TViewOrder
       EntityTypeName = 'TCustomer'
       ShowMode = smEntityTypeNameAsSelector
       TargetBindSource = BSCustomer
-      VVMTypeAlias = 'LIST'
       ViewContextBy = vcByDefaultViewContextProvider
+      VVMTypeAlias = 'LIST'
     end
     object acShowPizzaSelector: TioBSShowOrSelect [5]
       Category = 'iORM-BS'
@@ -293,8 +293,8 @@ inherited ViewOrder: TViewOrder
       EntityTypeName = 'TPizza'
       ShowMode = smEntityTypeNameAsSelector
       TargetBindSource = BSMaster
-      VVMTypeAlias = 'LIST'
       ViewContextBy = vcByDefaultViewContextProvider
+      VVMTypeAlias = 'LIST'
     end
   end
   inherited BSMaster: TioPrototypeBindSourceMaster

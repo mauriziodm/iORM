@@ -7,7 +7,8 @@ uses
   FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.StdCtrls, View.BaseForForm, iORM, iORM.Attributes, iORM.CommonTypes, iORM.MVVM.Interfaces,
   Data.Bind.Components, Data.Bind.ObjectScope, iORM.MVVM.ModelBindSource, iORM.MVVM.ViewModelBridge, System.Actions, FMX.ActnList, iORM.StdActions.Fmx,
   FMX.Controls.Presentation, FMX.Objects, FMX.Edit, FMX.ListBox, FMX.Layouts, Data.Bind.GenData, System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors,
-  Data.Bind.EngExt, Fmx.Bind.DBEngExt, Model.Customer;
+  Data.Bind.EngExt, Fmx.Bind.DBEngExt, Model.Customer, iORM.Where.Interfaces, iORM.LiveBindings.PrototypeBindSource.Custom,
+  iORM.LiveBindings.PrototypeBindSource.Master;
 
 type
 
