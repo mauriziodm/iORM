@@ -43,27 +43,30 @@ type
   TioResolverFactory = class
   public
     class function GetResolvedTypeList: IioResolvedTypeList;
-    class function GetResolver(const AResolverMode:TioResolverStrategy): TioResolverRef;
+    class function GetResolver(const AResolverMode: TioResolverStrategy): TioResolverRef;
   end;
 
 implementation
 
 uses
-  iORM.Containers.List, iORM.Resolver.ByDependencyInjection, iORM.Exceptions;
+  iORM.Resolver.ResolvedTypeList, iORM.Resolver.ByDependencyInjection, iORM.Exceptions;
 
 { TioResolverFactory }
 
 class function TioResolverFactory.GetResolvedTypeList: IioResolvedTypeList;
 begin
-  Result := TioInterfacedList<String>.Create;
+  Result := TioResolvedTypeList.Create;
 end;
 
 class function TioResolverFactory.GetResolver(const AResolverMode: TioResolverStrategy): TioResolverRef;
 begin
   case AResolverMode of
-    rsByDependencyInjection: Result := TioResolverByDependencyInjection;
-    rsByRtti: raise EioException.Create(Self.ClassName + ': "rtByRtti" resolver mode not yet implemented.');
-    rsByMaps: raise EioException.Create(Self.ClassName + ': "rtByMaps" resolver mode not yet implemented.');
+    rsByDependencyInjection:
+      Result := TioResolverByDependencyInjection;
+    rsByRtti:
+      raise EioException.Create(Self.ClassName + ': "rtByRtti" resolver mode not yet implemented.');
+    rsByMaps:
+      raise EioException.Create(Self.ClassName + ': "rtByMaps" resolver mode not yet implemented.');
   else
     raise EioException.Create(Self.ClassName + '.GetResolver: Invalid AResolverMode.');
   end;

@@ -258,10 +258,6 @@
         <DCCReference Include="..\..\Source\iORM.DB.QueryContainer.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.QueryEngine.pas"/>
         <DCCReference Include="..\..\Source\iORM.Where.SqlItems.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Containers.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Containers.List.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Containers.Factory.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Containers.ObjectList.pas"/>
         <DCCReference Include="..\..\Source\iORM.Resolver.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.Utilities.pas"/>
         <DCCReference Include="..\..\Source\iORM.Resolver.Factory.pas"/>
@@ -391,6 +387,7 @@
         <DCCReference Include="..\..\Source\iORM.ConflictStrategy.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.ConflictStrategy.SameVersionWin.pas"/>
         <DCCReference Include="..\..\Source\iORM.ConflictStrategy.LastUpdateWin.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Resolver.ResolvedTypeList.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

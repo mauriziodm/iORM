@@ -37,7 +37,7 @@ interface
 
 uses
   Data.Bind.ObjectScope, System.Classes, System.Rtti,
-  System.Generics.Collections, iORM.Containers.Interfaces,
+  System.Generics.Collections,
   iORM.LiveBindings.Interfaces, iORM.CommonTypes;
 
 type
@@ -98,7 +98,7 @@ type
   TInterfaceListBindSourceAdapter =  class(TInterfaceListBindSourceAdapter<IInterface>)
   public
     constructor Create(const AOwner: TComponent; const ADataObject:TObject; const ATypeAlias:String=''; const ATypeName:String=''; const AOwnsObject: Boolean = True); reintroduce; overload; virtual;
-    constructor Create(const AOwner: TComponent; const ADataObject:IInterface; const ATypeAlias:String=''; const ATypeName:String=''; const AOwnsObject: Boolean = True); reintroduce; overload; virtual;
+//    constructor Create(const AOwner: TComponent; const ADataObject:IInterface; const ATypeAlias:String=''; const ATypeName:String=''; const AOwnsObject: Boolean = True); reintroduce; overload; virtual;
   end;
 
 
@@ -439,14 +439,14 @@ begin
   Create(AOwner, LListInternal, ATypeAlias, ATypeName, AOwnsObject);
 end;
 
-constructor TInterfaceListBindSourceAdapter.Create(const AOwner: TComponent; const ADataObject: IInterface; const ATypeAlias,
-  ATypeName: String; const AOwnsObject: Boolean);
-var
-  LListInternal: IioList<IInterface>;
-begin
-  if not Supports(ADataObject, IioList<IInterface>, LListInternal) then
-    raise EioException.Create(Self.ClassName, 'Create', 'ADataObject does not support IioList<IInterce>.');
-  Create(AOwner, LListInternal, ATypeAlias, ATypeName, AOwnsObject);
-end;
+//constructor TInterfaceListBindSourceAdapter.Create(const AOwner: TComponent; const ADataObject: IInterface; const ATypeAlias,
+//  ATypeName: String; const AOwnsObject: Boolean);
+//var
+//  LListInternal: IioList<IInterface>;
+//begin
+//  if not Supports(ADataObject, IioList<IInterface>, LListInternal) then
+//    raise EioException.Create(Self.ClassName, 'Create', 'ADataObject does not support IioList<IInterce>.');
+//  Create(AOwner, LListInternal, ATypeAlias, ATypeName, AOwnsObject);
+//end;
 
 end.

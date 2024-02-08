@@ -42,7 +42,7 @@ uses
   iORM.SqlItems,
   iORM.Context.Properties.Interfaces, iORM.Context.Table.Interfaces,
   System.Classes, iORM.Where.SqlItems.Interfaces,
-  iORM.Resolver.Interfaces, iORM.Containers.Interfaces, iORM.Where.Interfaces,
+  iORM.Resolver.Interfaces, iORM.Where.Interfaces,
   System.Generics.Collections, iORM.Where.Destinations,
   iORM.Context.Map.Interfaces, FireDAC.Comp.Client, System.TypInfo,
   iORM.Utilities, iORM.LiveBindings.CommonBSAPaging,
@@ -281,9 +281,6 @@ type
     // ------ Destination methods
     function ToObject(const AObj: TObject = nil): T; reintroduce; overload;
     function ToList: TList<T>; overload;
-    // function ToObjectList(const AOwnsObjects:Boolean=True): TObjectList<TObject>;
-    function ToInterfacedList: IioList<T>; overload;
-    // function ToInterfacedObjectList(const AOwnsObjects:Boolean=True): IioList<T>; overload;
     function ClearListBefore(const AClearListBefore: Boolean = True): IioWhere<T>;
 
     // procedure Show(const AVVMAlias:String=''; const AForceTypeNameUse:Boolean=False); override;
@@ -401,8 +398,8 @@ implementation
 
 uses
   iORM.DB.Factory, iORM.Context.Factory, System.SysUtils, iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, iORM.ObjectsForge.Factory,
-  iORM.RttiContext.Factory, iORM, iORM.Where.SqlItems, iORM.DB.Interfaces, iORM.Resolver.Factory, iORM.Containers.Factory,
-  iORM.Where.Factory, iORM.Exceptions, FireDAC.Comp.DataSet, iORM.LazyLoad.Factory, iORM.Strategy.Factory, iORM.Containers.List,
+  iORM.RttiContext.Factory, iORM, iORM.Where.SqlItems, iORM.DB.Interfaces, iORM.Resolver.Factory,
+  iORM.Where.Factory, iORM.Exceptions, FireDAC.Comp.DataSet, iORM.LazyLoad.Factory, iORM.Strategy.Factory,
   iORM.MVVM.Interfaces, iORM.Abstraction, iORM.Context.Container, System.StrUtils,
   iORM.ObjectsForge.Interfaces, iORM.ETM.Engine;
 
@@ -1572,33 +1569,6 @@ begin
   TioWhere(Self).SetDetailsContainer(ADetailsContainer);
 end;
 
-// procedure TioWhere<T>.Show(const AVVMAlias: String; const AForceTypeNameUse:Boolean);
-// var
-// LIntfInstance: IInterface;
-// LClassInstance: TObject;
-// begin
-// LClassInstance := TioWhere(Self).ToObject;
-// if TioRttiUtilities.IsAnInterface<T> then
-// begin
-// Supports(LClassInstance, IInterface, LIntfInstance);
-// _Show(LIntfInstance, AVVMAlias, AForceTypeNameUse);
-// end
-// else
-// _Show(LClassInstance, AVVMAlias, AForceTypeNameUse);
-// end;
-
-function TioWhere<T>.ToInterfacedList: IioList<T>;
-begin
-  Result := TioContainersFactory.GetInterfacedList<T>;
-  Self.ToList(TObject(Result));
-end;
-
-// function TioWhere<T>.ToInterfacedObjectList(const AOwnsObjects:Boolean): IioList<T>;
-// begin
-// Result := TioContainersFactory.GetInterfacedObjectList<T>(AOwnsObjects);
-// Self.ToList(   TObject(Result)   );
-// end;
-
 function TioWhere<T>.ToList: TList<T>;
 begin
   Result := TList<T>.Create;
@@ -1609,12 +1579,6 @@ function TioWhere<T>.ToObject(const AObj: TObject): T;
 begin
   Result := TioUtilities.CastObjectToGeneric<T>(TioWhere(Self).ToObject(AObj));
 end;
-
-// function TioWhere<T>.ToObjectList(const AOwnsObjects: Boolean): TObjectList<TObject>;
-// begin
-// Result := TObjectList<T>.Create(AOwnsObjects);
-// Self.ToList(Result);
-// end;
 
 function TioWhere<T>._And(ATextCondition: String): IioWhere<T>;
 begin

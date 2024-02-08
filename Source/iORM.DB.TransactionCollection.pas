@@ -36,17 +36,18 @@ unit iORM.DB.TransactionCollection;
 interface
 
 uses
-  iORM.DB.Interfaces, iORM.Containers.Interfaces;
+  iORM.DB.Interfaces, System.Generics.Collections;
 
 type
 
   TioTransactionCollection = class(TInterfacedObject, IioTransactionCollection)
   private
-    FTransactionList: IioList<String>;
+    FTransactionList: TList<String>;
   protected
     function Exists(AConnectionName:String): Boolean;
   public
     constructor Create;
+    destructor Destroy; override;
     procedure StartTransaction(AConnectionName:String='');
     procedure CommitAll;
     procedure RollbackAll;
@@ -55,7 +56,7 @@ type
 implementation
 
 uses
-  iORM.Containers.Factory, iORM.DB.Factory;
+  iORM.DB.Factory;
 
 { TioTransactionCollection }
 
@@ -71,7 +72,13 @@ end;
 constructor TioTransactionCollection.Create;
 begin
   inherited;
-  FTransactionList := TioContainersFactory.GetInterfacedList<String>;
+  FTransactionList := TList<String>.Create;
+end;
+
+destructor TioTransactionCollection.Destroy;
+begin
+  FTransactionList.Free;
+  inherited;
 end;
 
 function TioTransactionCollection.Exists(AConnectionName: String): Boolean;

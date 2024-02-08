@@ -70,6 +70,7 @@ type
     FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     FBSPersistenceDeleting: Boolean;
     // Reference to the same instance contained by FList field, this reference is only to keep live the list instance
+    // TODO: Dopo aver eliminato le IioList<T> interne è da eliminare? Opppure la teniamo e ripristiniamo anche i costruttori per le liste di Spring4D
     FInterfacedList: IInterface;
     // TypeName
     procedure SetTypeName(const AValue: String);
@@ -163,8 +164,8 @@ type
   public
     constructor Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TList<TObject>;
       const AOwnsObject: Boolean = True); overload;
-    constructor Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface;
-      const AOwnsObject: Boolean = False); overload;
+//    constructor Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface;
+//      const AOwnsObject: Boolean = False); overload;
     destructor Destroy; override;
     function MasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     procedure SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
@@ -212,7 +213,7 @@ implementation
 
 uses
   iORM, iORM.LiveBindings.Factory, iORM.Context.Interfaces, System.SysUtils, iORM.LazyLoad.Interfaces, iORM.Exceptions, iORM.Utilities,
-  iORM.Context.Map.Interfaces, iORM.Where.Factory, iORM.LiveBindings.CommonBSAPersistence, iORM.Abstraction, iORM.Containers.Interfaces,
+  iORM.Context.Map.Interfaces, iORM.Where.Factory, iORM.LiveBindings.CommonBSAPersistence, iORM.Abstraction,
   iORM.LiveBindings.CommonBSABehavior, iORM.Context.Container, iORM.Context.Factory;
 
 { TioActiveListBindSourceAdapter<T> }
@@ -229,6 +230,50 @@ begin
   // Nothing (event the "inherited")
 end;
 {$ENDIF}
+
+constructor TioActiveListBindSourceAdapter.InternalCreate(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent;
+  const AOwnsObject: Boolean = True);
+begin
+  FInterfacedList := nil;
+  FLoadType := ltAuto;
+  FLazy := False;
+  FLazyProps := '';
+  FAsyncLoad := False;
+  FAsyncPersist := False;
+  FReloading := False;
+  FBSPersistenceDeleting := False;
+  // inherited Create(AOwner, ADataObject, AClassRef, AOwnsObject);
+  FLocalOwnsObject := AOwnsObject;
+  FWhere := AWhere;
+  FWhereDetailsFromDetailAdapters := False;
+  FTypeName := AClassRef.ClassName;
+  FTypeAlias := ''; // NB: TypeAlias has no effect in this adapter (only used by interfaced BSA)
+  FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
+  // Set Master & Details adapters reference
+  FMasterAdaptersContainer := nil;
+  FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
+  // Init InsertObj subsystem values
+  FInsertObj_Enabled := False;
+  FInsertObj_NewObj := nil;
+end;
+
+constructor TioActiveListBindSourceAdapter.Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent;
+  const ADataObject: TList<TObject>; const AOwnsObject: Boolean);
+begin
+  inherited Create(AOwner, ADataObject, AClassRef, AOwnsObject);
+  InternalCreate(AClassRef, AWhere, AOwner, AOwnsObject);
+end;
+
+//constructor TioActiveListBindSourceAdapter.Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface;
+//  const AOwnsObject: Boolean);
+//var
+//  LDataObject: TObject;
+//begin
+//  LDataObject := ADataObject as TObject;
+//  inherited Create(AOwner, TList<TObject>(LDataObject), AClassRef, AOwnsObject);
+//  InternalCreate(AClassRef, AWhere, AOwner, AOwnsObject);
+//  FInterfacedList := ADataObject; // To keep che interfaced list live
+//end;
 
 procedure TioActiveListBindSourceAdapter.Append(AObject: TObject);
 begin
@@ -270,24 +315,6 @@ end;
 procedure TioActiveListBindSourceAdapter.ClearDataObject;
 begin
   Self.InternalSetDataObject(nil, False);
-end;
-
-constructor TioActiveListBindSourceAdapter.Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface;
-  const AOwnsObject: Boolean);
-var
-  LDataObject: TObject;
-begin
-  LDataObject := ADataObject as TObject;
-  inherited Create(AOwner, TList<TObject>(LDataObject), AClassRef, AOwnsObject);
-  InternalCreate(AClassRef, AWhere, AOwner, AOwnsObject);
-  FInterfacedList := ADataObject; // To keep che interfaced list live
-end;
-
-constructor TioActiveListBindSourceAdapter.Create(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent;
-  const ADataObject: TList<TObject>; const AOwnsObject: Boolean);
-begin
-  inherited Create(AOwner, ADataObject, AClassRef, AOwnsObject);
-  InternalCreate(AClassRef, AWhere, AOwner, AOwnsObject);
 end;
 
 procedure TioActiveListBindSourceAdapter.DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer);
@@ -646,32 +673,6 @@ end;
 procedure TioActiveListBindSourceAdapter.Insert(AObject: IInterface);
 begin
   raise EioException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for class referenced instances only.');
-end;
-
-constructor TioActiveListBindSourceAdapter.InternalCreate(const AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent;
-  const AOwnsObject: Boolean = True);
-begin
-  FInterfacedList := nil;
-  FLoadType := ltAuto;
-  FLazy := False;
-  FLazyProps := '';
-  FAsyncLoad := False;
-  FAsyncPersist := False;
-  FReloading := False;
-  FBSPersistenceDeleting := False;
-  // inherited Create(AOwner, ADataObject, AClassRef, AOwnsObject);
-  FLocalOwnsObject := AOwnsObject;
-  FWhere := AWhere;
-  FWhereDetailsFromDetailAdapters := False;
-  FTypeName := AClassRef.ClassName;
-  FTypeAlias := ''; // NB: TypeAlias has no effect in this adapter (only used by interfaced BSA)
-  FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
-  // Set Master & Details adapters reference
-  FMasterAdaptersContainer := nil;
-  FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
-  // Init InsertObj subsystem values
-  FInsertObj_Enabled := False;
-  FInsertObj_NewObj := nil;
 end;
 
 function TioActiveListBindSourceAdapter.HasBindSource: Boolean;

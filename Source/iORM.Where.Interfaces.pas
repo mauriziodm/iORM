@@ -38,7 +38,7 @@ interface
 uses
   iORM.Context.Properties.Interfaces, iORM.Context.Table.Interfaces,
   iORM.Where.SqlItems.Interfaces, System.Generics.Collections,
-  iORM.Interfaces, iORM.Containers.Interfaces, System.Rtti,
+  iORM.Interfaces, System.Rtti,
   iORM.CommonTypes, iORM.Resolver.Interfaces, System.Classes,
   Data.Bind.ObjectScope, iORM.Where.Destinations,
   iORM.Context.Map.Interfaces, FireDAC.Comp.Client, System.TypInfo,
@@ -253,9 +253,6 @@ type
     // ------ Destination methods
     function ToObject(const AObj:TObject=nil): T; overload;
     function ToList: TList<T>; overload;
-//    function ToObjectList(const AOwnsObjects:Boolean=True): TObjectList<TObject>;
-    function ToInterfacedList: IioList<T>; overload;
-//    function ToInterfacedObjectList(const AOwnsObjects:Boolean=True): IioList<T>; overload;
     function ClearListBefore(const AClearListBefore: Boolean = True): IioWhere<T>;
     // ------ Conditions
     function ByID(const AID:Integer): IioWhere<T>;

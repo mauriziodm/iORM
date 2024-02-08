@@ -52,7 +52,7 @@ type
 implementation
 
 uses
-  iORM.COntext.Container, iORM.COntext.Properties.Interfaces, iORM.Attributes, iORM.DBBuilder.Factory, iORM.Containers.Interfaces,
+  iORM.COntext.Container, iORM.COntext.Properties.Interfaces, iORM.Attributes, iORM.DBBuilder.Factory,
   iORM.Resolver.Factory, iORM.Resolver.Interfaces, iORM.Exceptions, System.SysUtils;
 
 { TioDBBuilderSchemaBuilder }
@@ -75,7 +75,7 @@ var
   // LSchemaTable: IioDBBuilderSchemaTable;
   LProperty: IioProperty;
   LDependentProperty: IioProperty;
-  LResolvedChildTypeList: IioList<string>;
+  LResolvedChildTypeList: IioResolvedTypeList;
   LResolvedChildTypeName: String;
   LResolvedChildTypeMap: IioMap;
   LSchemaTable: IioDBBuilderSchemaTable;

@@ -106,10 +106,6 @@ contains
   iORM.DB.QueryContainer in '..\..\Source\iORM.DB.QueryContainer.pas',
   iORM.DB.QueryEngine in '..\..\Source\iORM.DB.QueryEngine.pas',
   iORM.Where.SqlItems.Interfaces in '..\..\Source\iORM.Where.SqlItems.Interfaces.pas',
-  iORM.Containers.Interfaces in '..\..\Source\iORM.Containers.Interfaces.pas',
-  iORM.Containers.List in '..\..\Source\iORM.Containers.List.pas',
-  iORM.Containers.Factory in '..\..\Source\iORM.Containers.Factory.pas',
-  iORM.Containers.ObjectList in '..\..\Source\iORM.Containers.ObjectList.pas',
   iORM.Resolver.Interfaces in '..\..\Source\iORM.Resolver.Interfaces.pas',
   iORM.Utilities in '..\..\Source\iORM.Utilities.pas',
   iORM.Resolver.Factory in '..\..\Source\iORM.Resolver.Factory.pas',
@@ -238,7 +234,8 @@ contains
   iORM.StdActions.CommonBehaviour in '..\..\Source\iORM.StdActions.CommonBehaviour.pas',
   iORM.ConflictStrategy.Interfaces in '..\..\Source\iORM.ConflictStrategy.Interfaces.pas',
   iORM.ConflictStrategy.SameVersionWin in '..\..\Source\iORM.ConflictStrategy.SameVersionWin.pas',
-  iORM.ConflictStrategy.LastUpdateWin in '..\..\Source\iORM.ConflictStrategy.LastUpdateWin.pas';
+  iORM.ConflictStrategy.LastUpdateWin in '..\..\Source\iORM.ConflictStrategy.LastUpdateWin.pas',
+  iORM.Resolver.ResolvedTypeList in '..\..\Source\iORM.Resolver.ResolvedTypeList.pas';
 
 end.
 

@@ -36,7 +36,7 @@ unit iORM.Resolver.Interfaces;
 interface
 
 uses
-  iORM.Containers.Interfaces, System.Rtti;
+  System.Rtti, System.Generics.Collections;
 
 type
 
@@ -47,7 +47,17 @@ type
   TioResolverStrategy = (rsByDependencyInjection, rsByRtti, rsByMaps);
 
   // Interface for the resolved type list
-  IioResolvedTypeList = IioList<String>;
+  IioResolvedTypeList = interface
+    ['{545F419F-2E17-45F2-A815-EE20D9AAF93E}']
+    procedure Add(const ATypeName: String);
+    function GetEnumerator: TEnumerator<String>;
+    // Count
+    function GetCount: Integer;
+    property Count: Integer read GetCount;
+    // Items
+    function GetItem(Index: Integer): String;
+    property Items[Index: Integer]: String read GetItem; default;
+  end;
 
   // Interface for the resolvers
   // NB: FOR ENTITY PERSISTENCE PURPOSES ONLY
@@ -63,9 +73,5 @@ type
   end;
 
 implementation
-
-uses SysUtils;
-
-{ TioResolver }
 
 end.
