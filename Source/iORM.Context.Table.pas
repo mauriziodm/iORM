@@ -132,6 +132,7 @@ type
     FContainsSomeIioListProperty: Boolean;
     FEtmTimeSlotClass: TioEtmTimeSlotRef;
     FEtmTraceOnlyOnConnectionName: String;
+    FEtmPropToPropList: TEtmPropToPropList;
     FGroupBy: IioGroupBy;
     FIndexList: TioIndexList;
     FJoins: IioJoins;
@@ -154,7 +155,7 @@ type
     constructor Create(const ASqlText, AKeyGenerator: String; const ATrueClass: IioTrueClass; const AJoins: IioJoins; const AGroupBy: IioGroupBy;
       const AConnectionDefName: String; const AMapMode: TioMapModeType; const ARttiType: TRttiInstanceType); reintroduce; overload;
     destructor Destroy; override;
-    /// This method create the TrueClassVirtualMap.Table object duplicating something of itself
+    // This method create the TrueClassVirtualMap.Table object duplicating something of itself
     function DuplicateForTrueClassMap: IioTable;
     function GetClassName: String;
     function GetConnectionDefName: String;
@@ -183,6 +184,10 @@ type
     function IndexListExists: Boolean;
     function GetIndexList(AAutoCreateIfUnassigned: Boolean): TioIndexList;
     procedure SetIndexList(AIndexList: TioIndexList);
+    // ETM prop to prop list
+    function EtmPropToPropListExists: Boolean;
+    function GetEtmPropToPropList(AAutoCreateIfUnassigned: Boolean): TEtmPropToPropList;
+    procedure SetEtmPropToPropList(AEtmPropToPropList: TEtmPropToPropList);
     // Properties
     property DeleteConflictStrategy: TClass read GetDeleteConflictStrategy write SetDeleteConflictStrategy;
     property UpdateConflictStrategy: TClass read GetUpdateConflictStrategy write SetUpdateConflictStrategy;
@@ -229,18 +234,33 @@ begin
   // ETM
   FEtmTimeSlotClass := nil;
   FEtmTraceOnlyOnConnectionName := String.Empty;
+  FEtmPropToPropList := nil;
 end;
 
 destructor TioTable.Destroy;
 begin
-  if Self.IndexListExists then
+  if Assigned(FIndexList) then
     FIndexList.Free;
+  if Assigned(FEtmPropToPropList) then
+    FEtmPropToPropList.Free;
   inherited;
 end;
 
 function TioTable.DuplicateForTrueClassMap: IioTable;
 begin
   Result := TioTable.Create(FSqlText, FKeyGenerator, FTrueClass, FJoins, FGroupBy, FConnectionDefName_DoNotCallDirectly, FMapMode, FRttiType);
+end;
+
+function TioTable.GetEtmPropToPropList(AAutoCreateIfUnassigned: Boolean): TEtmPropToPropList;
+begin
+  if AAutoCreateIfUnassigned and not Assigned(FEtmPropToPropList) then
+    FEtmPropToPropList := TEtmPropToPropList.Create;
+  Result := FEtmPropToPropList;
+end;
+
+function TioTable.EtmPropToPropListExists: Boolean;
+begin
+  Result := Assigned(FEtmPropToPropList);
 end;
 
 function TioTable.IsNotPersistedEntity: Boolean;
@@ -300,7 +320,7 @@ end;
 
 function TioTable.GetIndexList(AAutoCreateIfUnassigned: Boolean): TioIndexList;
 begin
-  if AAutoCreateIfUnassigned and (not Self.IndexListExists) then
+  if AAutoCreateIfUnassigned and not Assigned(FIndexList) then
     FIndexList := TioIndexList.Create;
   Result := FIndexList;
 end;
@@ -374,6 +394,11 @@ end;
 procedure TioTable.SetIndexList(AIndexList: TioIndexList);
 begin
   FIndexList := AIndexList;
+end;
+
+procedure TioTable.SetEtmPropToPropList(AEtmPropToPropList: TEtmPropToPropList);
+begin
+  FEtmPropToPropList := AEtmPropToPropList;
 end;
 
 procedure TioTable.SetDeleteConflictStrategy(const AConflictStrategy: TClass);

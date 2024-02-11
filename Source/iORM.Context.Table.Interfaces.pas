@@ -84,6 +84,7 @@ type
   end;
 
   TioIndexList = TList<ioIndex>;
+  TEtmPropToPropList = TList<etmProperty>; // etmProperty attribute
 
   IioTable = interface(IioSqlItem)
     ['{715BFF11-0A82-4B39-B002-451854729DC2}']
@@ -119,6 +120,10 @@ type
     property UpdateConflictStrategy: TClass read GetUpdateConflictStrategy write SetUpdateConflictStrategy;
     property DeleteConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState read GetDeleteConflictStrategy_OnConflictSetStateAs write SetDeleteConflictStrategy_OnConflictSetStateAs;
     property UpdateConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState read GetUpdateConflictStrategy_OnConflictSetStateAs write SetUpdateConflictStrategy_OnConflictSetStateAs;
+    // ETM prop to prop list
+    function EtmPropToPropListExists: Boolean;
+    function GetEtmPropToPropList(AAutoCreateIfUnassigned: Boolean): TEtmPropToPropList;
+    procedure SetEtmPropToPropList(AEtmPropToPropList: TEtmPropToPropList);
     // EtmTimeSlotClass
     procedure SetEtmTimeSlotClass(const AEtmTimeSlotClass: TioEtmTimeSlotRef);
     function GetEtmTimeSlotClass: TioEtmTimeSlotRef;

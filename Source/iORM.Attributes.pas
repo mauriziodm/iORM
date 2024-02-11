@@ -645,6 +645,20 @@ type
     property TraceOnlyOnConnectionName: String read FTraceOnlyOnConnectionName;
   end;
 
+  etmProperty = class(TCustomAttribute)
+  strict private
+    FEntityPropName: String;
+    FEtmPropName: String;
+  public
+    constructor Create(const AEntityPropName, AEtmPropName: String); overload;
+    constructor Create(const AEtmPropName: String); overload;
+    constructor Create; overload;
+    procedure SetEntityPropNameIfEmpty(const AValue: String);
+    procedure SetEtmPropNameIfEmpty(const AValue: String);
+    property EntityPropName: String read FEntityPropName;
+    property EtmPropName: String read FEtmPropName;
+  end;
+
 {$ENDREGION} // END ETM ATTRIBUTES
 
 {$REGION '===== OTHER ATTRIBUTES ====='}
@@ -1177,5 +1191,37 @@ begin
 end;
 
 { ioConflictStrategy }
+
+{ etmProperty }
+
+constructor etmProperty.Create(const AEntityPropName, AEtmPropName: String);
+begin
+  FEntityPropName := AEntityPropName.Trim;
+  FEtmPropName := AEtmPropName.Trim;
+end;
+
+constructor etmProperty.Create(const AEtmPropName: String);
+begin
+  FEntityPropName := AEtmPropName.Trim;
+  FEtmPropName := IO_STRING_NULL_VALUE;
+end;
+
+constructor etmProperty.Create;
+begin
+  FEntityPropName := IO_STRING_NULL_VALUE;
+  FEtmPropName := IO_STRING_NULL_VALUE;
+end;
+
+procedure etmProperty.SetEtmPropNameIfEmpty(const AValue: String);
+begin
+  if FEtmPropName = IO_STRING_NULL_VALUE then
+    FEtmPropName := AValue.Trim;
+end;
+
+procedure etmProperty.SetEntityPropNameIfEmpty(const AValue: String);
+begin
+  if FEntityPropName = IO_STRING_NULL_VALUE then
+    FEntityPropName := AValue.Trim;
+end;
 
 end.

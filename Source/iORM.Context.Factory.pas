@@ -67,9 +67,10 @@ type
       const AMetadata_FKOnDeleteAction: TioFKAction; const AMetadata_FKOnUpdateAction: TioFKAction): IioProperty;
   public
     class function Map(const AClassRef: TioClassRef): IioMap;
-    class function Context(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
-      const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte): IioContext;
-    class function TrueClassVirtualContextIfEnabled(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ABlindLevel: Byte): IioContext;
+    class function Context(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte): IioContext;
+    class function TrueClassVirtualContextIfEnabled(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere;
+      const ABlindLevel: Byte): IioContext;
     class procedure GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
   end;
 
@@ -118,14 +119,16 @@ begin
   Result := TioHasManyChildVirtualProperty.Create(ATable);
 end;
 
-class function TioContextFactory.Context(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
-      const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte): IioContext;
+class function TioContextFactory.Context(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject;
+  const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte): IioContext;
 begin
   // Get the Context
-  Result := TioContext.Create(AIntent, TioMapContainer.GetMap(AClassName), AWhere, ADataObject, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath, ABlindLevel);
+  Result := TioContext.Create(AIntent, TioMapContainer.GetMap(AClassName), AWhere, ADataObject, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath,
+    ABlindLevel);
 end;
 
-class function TioContextFactory.TrueClassVirtualContextIfEnabled(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ABlindLevel: Byte): IioContext;
+class function TioContextFactory.TrueClassVirtualContextIfEnabled(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere;
+  const ABlindLevel: Byte): IioContext;
 var
   LMap: IioMap;
 begin
@@ -303,6 +306,7 @@ var
     LWhereSkip: Boolean;
     LWhereTargetPropName: String;
     // Map metadata
+    LMember_Name: String;
     LMember_IsID: Boolean;
     LMember_TypeAlias: String;
     LMember_FieldName: String;
@@ -327,14 +331,16 @@ var
         LRttiField := LMember as TRttiField;
         LMember_FieldValueType := LRttiField.FieldType;
         LDB_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiField.FieldType.TypeKind, LRttiField.FieldType.QualifiedName);
-        LMember_FieldName := TioField.Remove_F_FromName(LMember.Name);
+        LMember_Name := TioField.Remove_F_FromName(LMember.Name);
+        LMember_FieldName := LMember_Name;
       end
       else if LMember is TRttiProperty then
       begin
         LRttiProperty := LMember as TRttiProperty;
         LMember_FieldValueType := LRttiProperty.PropertyType;
         LDB_FieldType := GetMetadata_FieldTypeByTypeKind(LRttiProperty.PropertyType.TypeKind, LRttiProperty.PropertyType.QualifiedName);
-        LMember_FieldName := LMember.Name;
+        LMember_Name := LMember.Name;
+        LMember_FieldName := LMember_Name;
       end
       else
         raise EioException.Create(Self.ClassName, 'Properties', 'Invalid property/field type.');
@@ -540,22 +546,30 @@ var
                 ATable.GetIndexList(True).Add(ioIndex(LAttribute)); // Add the current index attribute
               end
               else
-                // Smart where attributes
-                if LAttribute is ioWhereAttribute then
+                // EtmPropToPropList
+                if LAttribute is etmProperty then
                 begin
-                  LWhereCompareOp := ioWhereAttribute(LAttribute).CompareOp;
-                  LWhereLogicOp := ioWhereAttribute(LAttribute).LogicOp;
-                  if not ioWhereAttribute(LAttribute).TargetPropName.IsEmpty then
-                    LWhereTargetPropName := ioWhereAttribute(LAttribute).TargetPropName;
+                  etmProperty(LAttribute).SetEntityPropNameIfEmpty(LMember_Name);
+                  etmProperty(LAttribute).SetEtmPropNameIfEmpty(LMember_Name);
+                  ATable.GetEtmPropToPropList(True).Add(etmProperty(LAttribute)); // Add the current etmProperty attribute
                 end
-                else if LAttribute is ioWhereGroupAttribute then
-                begin
-                  LWhereGroupName := ioWhereGroupAttribute(LAttribute).GroupName;
-                  LWhereGroupLogicOp := ioWhereGroupAttribute(LAttribute).GroupLogicOp;
-                  LWhereMasterGroupName := ioWhereGroupAttribute(LAttribute).MasterGroupName;
-                end
-                else if LAttribute is ioWhereNullValueAttribute then
-                  LWhereNullValue := ioWhereNullValueAttribute(LAttribute).Value;
+                else
+                  // Smart where attributes
+                  if LAttribute is ioWhereAttribute then
+                  begin
+                    LWhereCompareOp := ioWhereAttribute(LAttribute).CompareOp;
+                    LWhereLogicOp := ioWhereAttribute(LAttribute).LogicOp;
+                    if not ioWhereAttribute(LAttribute).TargetPropName.IsEmpty then
+                      LWhereTargetPropName := ioWhereAttribute(LAttribute).TargetPropName;
+                  end
+                  else if LAttribute is ioWhereGroupAttribute then
+                  begin
+                    LWhereGroupName := ioWhereGroupAttribute(LAttribute).GroupName;
+                    LWhereGroupLogicOp := ioWhereGroupAttribute(LAttribute).GroupLogicOp;
+                    LWhereMasterGroupName := ioWhereGroupAttribute(LAttribute).MasterGroupName;
+                  end
+                  else if LAttribute is ioWhereNullValueAttribute then
+                    LWhereNullValue := ioWhereNullValueAttribute(LAttribute).Value;
         if LAttribute is ioWhereSkipAttribute then
           LWhereSkip := True;
         // Metadata Used by DBBuilder (M.M. 01/08/18)
@@ -668,7 +682,7 @@ var
       LNewProperty.WhereTargetPropName := LWhereTargetPropName;
       Result.Add(LNewProperty);
       // Set "ContainsHasManyOrHasOneProperties" to True if there is some property with HasMany or HasOne relation
-      if (LNewProperty.GetRelationType = rtHasMany) or (LNewProperty.GetRelationType = rtHasOne)  then
+      if (LNewProperty.GetRelationType = rtHasMany) or (LNewProperty.GetRelationType = rtHasOne) then
         Result.ContainsHasManyOrHasOneProperties := True;
       // If the current property is a virtual property (autodetected has many relation) then
       // add it to the AutodetectedHasManyRelationVirtualProperties of the ContextContainer
@@ -704,6 +718,7 @@ var
   LIndexList: TioIndexList;
   LEtmTimeSlotClass: TioEtmTimeSlotRef;
   LEtmTraceOnlyOnConnectionName: String;
+  LEtmPropToPropList: TEtmPropToPropList;
   LDeleteConflictStrategy, LUpdateConflictStrategy: TClass;
   LDeleteConflictStrategy_OnConflictSetStateAs, LUpdateConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState;
 begin
@@ -719,6 +734,7 @@ begin
     LIndexList := nil;
     LEtmTimeSlotClass := nil;
     LEtmTraceOnlyOnConnectionName := '';
+    LEtmPropToPropList := nil;
     LDeleteConflictStrategy := nil;
     LUpdateConflictStrategy := nil;
     LDeleteConflictStrategy_OnConflictSetStateAs := csUndefined;
@@ -760,7 +776,7 @@ begin
           LIndexList := TioIndexList.Create;
         LIndexList.Add(ioIndex(LAttr));
       end;
-      //Conflict strategies
+      // Conflict strategies
       if LAttr is ioDeleteConflictStrategyAttribute then
       begin
         LDeleteConflictStrategy := ioDeleteConflictStrategyAttribute(LAttr).Strategy;
@@ -777,9 +793,18 @@ begin
         LEtmTimeSlotClass := etmTrace(LAttr).TimeSlotClass;
         LEtmTraceOnlyOnConnectionName := etmTrace(LAttr).TraceOnlyOnConnectionName;
       end;
+      // etmProperty (NB: costruisce la lista solo se serve e così anche nella mappa)
+      if LAttr is etmProperty then
+      begin
+        if not Assigned(LEtmPropToPropList) then
+          LEtmPropToPropList := TEtmPropToPropList.Create;
+        LEtmPropToPropList.Add(etmProperty(LAttr));
+      end;
     end;
+
     // Create result Properties object
     Result := TioTable.Create(LTableName, LKeyGenerator, LTrueClass, LJoins, LGroupBy, LConnectionName, LMapMode, Typ);
+
     // Set conflict strategies
     if Assigned(LDeleteConflictStrategy) then
     begin
@@ -797,10 +822,16 @@ begin
       Result.EtmTimeSlotClass := LEtmTimeSlotClass;
       Result.EtmTraceOnlyOnConnectionName := LEtmTraceOnlyOnConnectionName;
     end;
-    // If an IndexList is present then assign it to the ioTable
-    if Assigned(LIndexList) and (LIndexList.Count > 0) then
+    // If the EtmPropToPropList is assigned then assign it to the ioTable
+    if Assigned(LEtmPropToPropList) then
+      Result.SetEtmPropToPropList(LEtmPropToPropList);
+    // If the IndexList is assigned then assign it to the ioTable
+    if Assigned(LIndexList) then
       Result.SetIndexList(LIndexList);
   finally
+    // Free the EtmPropToPropList if necessary
+    if Assigned(LEtmPropToPropList) and (LEtmPropToPropList.Count = 0) then
+      FreeAndNil(LEtmPropToPropList);
     // Free the IndexList if necessary
     if Assigned(LIndexList) and (LIndexList.Count = 0) then
       FreeAndNil(LIndexList);
