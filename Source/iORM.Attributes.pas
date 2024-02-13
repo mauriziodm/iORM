@@ -656,6 +656,7 @@ type
   public
     constructor Create(const AEntityPropName, AEtmPropName: String); overload;
     constructor Create; overload;
+    destructor Destroy; override;
     procedure SetMemberName(const AMemberName: String);
     // properties
     property EntityFinalPropName: String read GetEntityFinalPropName;
@@ -1221,6 +1222,15 @@ begin
   FEntityChildObjPath := nil;
   FEtmFinalPropName := String.Empty;
   FEtmChildObjPath := nil;
+end;
+
+destructor etmPropertyAttribute.Destroy;
+begin
+  if Assigned(FEntityChildObjPath) then
+    FEntityChildObjPath.Free;
+  if Assigned(FEtmChildObjPath) then
+    FEtmChildObjPath.Free;
+  inherited;
 end;
 
 function etmPropertyAttribute.GetEntityFinalPropName: String;
