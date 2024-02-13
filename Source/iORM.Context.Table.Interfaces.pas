@@ -84,7 +84,7 @@ type
   end;
 
   TioIndexList = TList<ioIndex>;
-  TEtmPropToPropList = TList<etmProperty>; // etmProperty attribute
+  TEtmPropToPropList = TList<etmPropertyAttribute>; // etmProperty attribute
 
   IioTable = interface(IioSqlItem)
     ['{715BFF11-0A82-4B39-B002-451854729DC2}']

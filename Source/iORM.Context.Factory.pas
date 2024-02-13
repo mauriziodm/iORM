@@ -547,11 +547,10 @@ var
               end
               else
                 // EtmPropToPropList
-                if LAttribute is etmProperty then
+                if LAttribute is etmPropertyAttribute then
                 begin
-                  etmProperty(LAttribute).SetEntityPropNameIfEmpty(LMember_Name);
-                  etmProperty(LAttribute).SetEtmPropNameIfEmpty(LMember_Name);
-                  ATable.GetEtmPropToPropList(True).Add(etmProperty(LAttribute)); // Add the current etmProperty attribute
+                  etmPropertyAttribute(LAttribute).SetMemberName(LMember_Name); // Add the current member name if necessary
+                  ATable.GetEtmPropToPropList(True).Add(etmPropertyAttribute(LAttribute)); // Add the current etmProperty attribute
                 end
                 else
                   // Smart where attributes
@@ -794,11 +793,11 @@ begin
         LEtmTraceOnlyOnConnectionName := etmTrace(LAttr).TraceOnlyOnConnectionName;
       end;
       // etmProperty (NB: costruisce la lista solo se serve e così anche nella mappa)
-      if LAttr is etmProperty then
+      if LAttr is etmPropertyAttribute then
       begin
         if not Assigned(LEtmPropToPropList) then
           LEtmPropToPropList := TEtmPropToPropList.Create;
-        LEtmPropToPropList.Add(etmProperty(LAttr));
+        LEtmPropToPropList.Add(etmPropertyAttribute(LAttr));
       end;
     end;
 

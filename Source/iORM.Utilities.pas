@@ -38,7 +38,7 @@ interface
 uses
   System.Classes, System.TypInfo, System.Rtti, iORM.CommonTypes, iORM.MVVM.Interfaces,
   iORM.LiveBindings.Interfaces, iORM.Context.Interfaces,
-  iORM.Context.Properties.Interfaces;
+  iORM.Context.Properties.Interfaces, iORM.RttiContext.Factory;
 
 type
 
@@ -55,7 +55,6 @@ type
     class function GenericToString<T>(const AQualified: Boolean = False): String; static;
     class function ClassRefToRttiType(const AClassRef: TioClassRef): TRttiInstanceType; static;
     class function GetRttiProperty(const AClassRef: TioClassRef; APropName: String): TRttiProperty; static;
-    class function ResolveChildPropertyPath(const ARootObj: Tobject; const AChildPropertyPath: TStrings): Tobject; static;
     class function TypeInfoToTypeName(const ATypeInfo: PTypeInfo; const AQualified: Boolean = False): String; static;
     class function SameObject(const AObj1, AObj2: Tobject): Boolean; static;
     class function GetImplementedInterfaceName(const AClassType: TRttiInstanceType; const IID: TGUID): String; static;
@@ -96,12 +95,19 @@ type
     // Funzioni che implementano verifiche riguardo l'essere Entità
     class function isEntityType(const ARTTIType: TRttiType): Boolean;
     class function isEntityAttribute(const AAttribute: TCustomAttribute): Boolean;
+    // ResolvePropertyPath
+    class procedure ResolveChildPropertyPath_SplitPropNameAndPath(const AQualifiedPropertyPath: String; out OPath: TStrings; out OPropName: String); static;
+    class function ResolveChildPropertyPath_GetFinalObj(const ARootObj: Tobject; const AChildObjPath: TStrings): Tobject; static;
+    class function ResolveChildPropertySplitPath_GetValue(const ARootObj: Tobject; const AChildObjPath: TStrings; const AFinalPropName: String): TValue; static;
+    class procedure ResolveChildPropertySplitPath_SetValue(const ARootObj: Tobject; const AChildObjPath: TStrings; const AFinalPropName: String; const AValue: TValue); static;
+    class function ResolveChildPropertyPath_GetValue(const ARootObj: Tobject; AQualifiedPropertyPath: String): TValue; static;
+    class procedure ResolveChildPropertyPath_SetValue(const ARootObj: Tobject; AQualifiedPropertyPath: String; const AValue: TValue); static;
   end;
 
 implementation
 
 uses
-  System.SysUtils, System.Types, iORM, iORM.Exceptions, iORM.Context.Container, iORM.RttiContext.Factory, iORM.DuckTyped.Factory, iORM.Context.Map.Interfaces,
+  System.SysUtils, System.Types, iORM, iORM.Exceptions, iORM.Context.Container, iORM.DuckTyped.Factory, iORM.Context.Map.Interfaces,
   iORM.DependencyInjection.Implementers, DJSON, iORM.Resolver.Factory,
   iORM.Resolver.Interfaces, iORM.DependencyInjection, iORM.MVVM.ViewModel;
 
@@ -459,41 +465,121 @@ end;
 
 // Questa funzione, a partire dal RootObject, restituisce l'oggetto a relativo al ChildPropertyPath navigando le proprietà
 // dei vari livelli di oggetti.
-class function TioUtilities.ResolveChildPropertyPath(const ARootObj: Tobject; const AChildPropertyPath: TStrings): Tobject;
+class function TioUtilities.ResolveChildPropertyPath_GetFinalObj(const ARootObj: Tobject; const AChildObjPath: TStrings): Tobject;
 var
-  Ctx: TRttiContext;
-  ACurrPropName: String;
-  function GetChildObject(const AMasterObj: Tobject; const AMasterPropertyName: String): Tobject;
+  LCtx: TRttiContext;
+  LCurrPropName: String;
+  function _GetChildObject(const AMasterObj: Tobject; const AMasterPropertyName: String): Tobject;
   var
-    Typ: TRttiType;
-    Prop: TRttiProperty;
-    AValue: TValue;
+    LTyp: TRttiType;
+    LProp: TRttiProperty;
+    LValue: TValue;
   begin
     // Get the object RttiType
-    Typ := Ctx.GetType(AMasterObj.ClassType);
+    LTyp := LCtx.GetType(AMasterObj.ClassType);
     // Get the RttiProperty
-    Prop := Typ.GetProperty(AMasterPropertyName);
+    LProp := LTyp.GetProperty(AMasterPropertyName);
     // Extract the object/interface (it must be an object or an interface)
-    AValue := Prop.GetValue(AMasterObj);
+    LValue := LProp.GetValue(AMasterObj);
     // Return the resolved child object
-    Result := TValueToObject(AValue, True);
+    Result := TValueToObject(LValue, True);
   end;
 
 begin
   // Init
   Result := ARootObj;
   // If the AChildPropertyPath is not assigned then Exit
-  if not Assigned(AChildPropertyPath) then
+  if not Assigned(AChildObjPath) then
     Exit;
   // Get the RttiContext
-  Ctx := TioRttiFactory.GetRttiContext;
+  LCtx := TioRttiFactory.GetRttiContext;
   // Loop for properties on the path
-  for ACurrPropName in AChildPropertyPath do
+  for LCurrPropName in AChildObjPath do
   begin
+    // If the current child object is not assigned then return nil because I couldn't reach the goal
     if not Assigned(Result) then
-      Exit;
-    Result := GetChildObject(Result, ACurrPropName);
+      Exit(nil);
+    Result := _GetChildObject(Result, LCurrPropName);
   end;
+end;
+
+class function TioUtilities.ResolveChildPropertyPath_GetValue(const ARootObj: Tobject; AQualifiedPropertyPath: String): TValue;
+var
+  LChildObjPath: TStrings;
+  LFinalPropName: String;
+begin
+  ResolveChildPropertyPath_SplitPropNameAndPath(AQualifiedPropertyPath, LChildObjPath, LFinalPropName);
+  Result := ResolveChildPropertySplitPath_GetValue(ARootObj, LChildObjPath, LFinalPropName);
+end;
+
+class procedure TioUtilities.ResolveChildPropertyPath_SetValue(const ARootObj: Tobject; AQualifiedPropertyPath: String; const AValue: TValue);
+var
+  LChildObjPath: TStrings;
+  LFinalPropName: String;
+begin
+  ResolveChildPropertyPath_SplitPropNameAndPath(AQualifiedPropertyPath, LChildObjPath, LFinalPropName);
+  ResolveChildPropertySplitPath_SetValue(ARootObj, LChildObjPath, LFinalPropName, AValue);
+end;
+
+class procedure TioUtilities.ResolveChildPropertyPath_SplitPropNameAndPath(const AQualifiedPropertyPath: String; out OPath: TStrings; out OPropName: String);
+begin
+  // Init
+  OPropName := String.Empty;
+  OPath := nil;
+  // If the AQualifiedChildPropertyName is empty then exit
+  if AQualifiedPropertyPath.IsEmpty then
+    raise EioException.Create(ClassName, 'ResolveChildPropertyPath_SplitPropNameAndPath', '"AQualifiedPropertyPath" is empty.');
+  // Create the StringList, set the Delimiter and DelimitedText
+  OPath := TStringList.Create;
+  OPath.Delimiter := '.';
+  OPath.DelimitedText := AQualifiedPropertyPath;
+  // The last element is the ChildPropertyName
+  OPropName := OPath[OPath.Count - 1];
+  // Remove the last element
+  OPath.Delete(OPath.Count - 1);
+  // If the remaining list is empty then free it (optimization)
+  if OPath.Count = 0 then
+    FreeAndNil(OPath);
+end;
+
+class function TioUtilities.ResolveChildPropertySplitPath_GetValue(const ARootObj: Tobject; const AChildObjPath: TStrings; const AFinalPropName: String): TValue;
+var
+  LFinalChildObj: TObject;
+  LFinalProp: TRttiProperty;
+begin
+  // Get the instance on which to extract the property value
+  if Assigned(AChildObjPath) then
+    LFinalChildObj := ResolveChildPropertyPath_GetFinalObj(ARootObj, AChildObjPath)
+  else
+    LFinalChildObj := ARootObj;
+  // Extract the property value
+  if Assigned(LFinalChildObj) then
+  begin
+    LFinalProp := TioRttiFactory.GetRttiPropertyByClass(LFinalChildObj.ClassType, AFinalPropName, True);
+    Result := LFinalProp.GetValue(LFinalChildObj);
+  end
+  else
+    Result := TValue.Empty;
+end;
+
+class procedure TioUtilities.ResolveChildPropertySplitPath_SetValue(const ARootObj: Tobject; const AChildObjPath: TStrings; const AFinalPropName: String; const AValue: TValue);
+var
+  LFinalChildObj: TObject;
+  LFinalProp: TRttiProperty;
+begin
+  // Get the instance on which to extract the property value
+  if Assigned(AChildObjPath) then
+    LFinalChildObj := ResolveChildPropertyPath_GetFinalObj(ARootObj, AChildObjPath)
+  else
+    LFinalChildObj := ARootObj;
+  // Extract the property value
+  if Assigned(LFinalChildObj) then
+  begin
+    LFinalProp := TioRttiFactory.GetRttiPropertyByClass(LFinalChildObj.ClassType, AFinalPropName, True);
+    LFinalProp.SetValue(LFinalChildObj, AValue);
+  end
+  else
+    raise EioException.Create(ClassName, 'ResolveChildPropertyPath_SetValue', '"FinalChildObj" is not assigned.');
 end;
 
 class function TioUtilities.ResolveRttiTypeToRttiType(const ARttiType: TRttiType): TRttiType;

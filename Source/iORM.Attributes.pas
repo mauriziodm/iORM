@@ -645,18 +645,23 @@ type
     property TraceOnlyOnConnectionName: String read FTraceOnlyOnConnectionName;
   end;
 
-  etmProperty = class(TCustomAttribute)
+  etmPropertyAttribute = class(TCustomAttribute) // NB: Lasciarlo con "Attribute" alla fine del nome della classe così è più chiaro nelle eventuali exceptions
   strict private
-    FEntityPropName: String;
-    FEtmPropName: String;
+    FEntityFinalPropName: String;
+    FEntityChildObjPath: TStrings;
+    FEtmFinalPropName: String;
+    FEtmChildObjPath: TStrings;
+    function GetEntityFinalPropName: String;
+    function GetEtmFinalPropName: String;
   public
     constructor Create(const AEntityPropName, AEtmPropName: String); overload;
-    constructor Create(const AEtmPropName: String); overload;
     constructor Create; overload;
-    procedure SetEntityPropNameIfEmpty(const AValue: String);
-    procedure SetEtmPropNameIfEmpty(const AValue: String);
-    property EntityPropName: String read FEntityPropName;
-    property EtmPropName: String read FEtmPropName;
+    procedure SetMemberName(const AMemberName: String);
+    // properties
+    property EntityFinalPropName: String read GetEntityFinalPropName;
+    property EntityChildObjPath: TStrings read FEntityChildObjPath;
+    property EtmFinalPropName: String read GetEtmFinalPropName;
+    property EtmChildObjPath: TStrings read FEtmChildObjPath;
   end;
 
 {$ENDREGION} // END ETM ATTRIBUTES
@@ -985,6 +990,18 @@ end;
 constructor TioEtmCustomTimeSlot.Create(const AContextAsIInterface: IInterface);
 var
   LContext: IioContext;
+  LValue: TValue;
+  procedure _LoadCustomPropValues;
+  var
+    LEtmPropAttribute: etmPropertyAttribute;
+  begin
+    for LEtmPropAttribute in LContext.GetTable.GetEtmPropToPropList(False) do
+    begin
+      LValue := TioUtilities.ResolveChildPropertySplitPath_GetValue(LContext.DataObject, LEtmPropAttribute.EntityChildObjPath, LEtmPropAttribute.EntityFinalPropName);
+      TioUtilities.ResolveChildPropertySplitPath_SetValue(Self, LEtmPropAttribute.EtmChildObjPath, LEtmPropAttribute.EtmFinalPropName, LValue);
+    end;
+  end;
+
 begin
   if not Supports(AContextAsIInterface, IioContext, LContext) then
     raise EioException.Create(ClassName, 'Create', 'The object received by the "AContextAsIInterface" parameter does not implements "IioContext" interface.');
@@ -1019,6 +1036,9 @@ begin
   // NB: Questo è un anonymous method che viene passato dal BindSource che sta esponendo il TimeSlot stesso e che permette
   // di risalire alla versione corrente della entità attraverso la catena "ETMBindSource.etmFor.Current"
   FExtractCurrentEntityFunc := nil;
+  // Load custom property values (if exists)
+  if LContext.GetTable.EtmPropToPropListExists then
+    _LoadCustomPropValues;
 end;
 
 function TioEtmCustomTimeSlot.GetSmartEntityInfo: String;
@@ -1194,34 +1214,45 @@ end;
 
 { etmProperty }
 
-constructor etmProperty.Create(const AEntityPropName, AEtmPropName: String);
+constructor etmPropertyAttribute.Create;
 begin
-  FEntityPropName := AEntityPropName.Trim;
-  FEtmPropName := AEtmPropName.Trim;
+  // Init
+  FEntityFinalPropName := String.Empty;
+  FEntityChildObjPath := nil;
+  FEtmFinalPropName := String.Empty;
+  FEtmChildObjPath := nil;
 end;
 
-constructor etmProperty.Create(const AEtmPropName: String);
+function etmPropertyAttribute.GetEntityFinalPropName: String;
 begin
-  FEntityPropName := AEtmPropName.Trim;
-  FEtmPropName := IO_STRING_NULL_VALUE;
+  if not FEntityFinalPropName.Trim.IsEmpty then
+    Result := FEntityFinalPropName
+  else
+    raise EioException.Create(ClassName, 'GetEntityFinalPropName', '"EntityFinalPropName" property cannot be empty.');
 end;
 
-constructor etmProperty.Create;
+function etmPropertyAttribute.GetEtmFinalPropName: String;
 begin
-  FEntityPropName := IO_STRING_NULL_VALUE;
-  FEtmPropName := IO_STRING_NULL_VALUE;
+  if not FEtmFinalPropName.Trim.IsEmpty then
+    Result := FEtmFinalPropName
+  else
+    raise EioException.Create(ClassName, 'GetEtmFinalPropName', '"EtmFinalPropName" property cannot be empty.');
 end;
 
-procedure etmProperty.SetEtmPropNameIfEmpty(const AValue: String);
+constructor etmPropertyAttribute.Create(const AEntityPropName, AEtmPropName: String);
 begin
-  if FEtmPropName = IO_STRING_NULL_VALUE then
-    FEtmPropName := AValue.Trim;
+  TioUtilities.ResolveChildPropertyPath_SplitPropNameAndPath(AEntityPropName, FEntityChildObjPath, FEntityFinalPropName);
+  TioUtilities.ResolveChildPropertyPath_SplitPropNameAndPath(AEtmPropName, FEtmChildObjPath, FEtmFinalPropName);
 end;
 
-procedure etmProperty.SetEntityPropNameIfEmpty(const AValue: String);
+procedure etmPropertyAttribute.SetMemberName(const AMemberName: String);
 begin
-  if FEntityPropName = IO_STRING_NULL_VALUE then
-    FEntityPropName := AValue.Trim;
+  // If the FEntityFinalPropName is empty then set it to AMemberName param value
+  if FEntityFinalPropName.IsEmpty then
+    FEntityFinalPropName := AMemberName;
+  // If the FEtmFinalPropName is empty then set it to AMemberName param value
+  if FEtmFinalPropName.IsEmpty then
+    FEtmFinalPropName := AMemberName;
 end;
 
 end.

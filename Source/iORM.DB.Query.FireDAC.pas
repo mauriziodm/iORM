@@ -454,7 +454,7 @@ begin
   // If a RelationChildPropertyPath is assigned then resolve it
   LObj := AProp.GetValueAsObject(AContext.DataObject);
   if AProp.RelationChildPropertyPathAssigned then
-    LObj := TioUtilities.ResolveChildPropertyPath(LObj, AProp.GetRelationChildPropertyPath);
+    LObj := TioUtilities.ResolveChildPropertyPath_GetFinalObj(LObj, AProp.GetRelationChildPropertyPath);
   if not Assigned(LObj) then
   begin
     ParamByProp_Clear(AProp, ftBlob);

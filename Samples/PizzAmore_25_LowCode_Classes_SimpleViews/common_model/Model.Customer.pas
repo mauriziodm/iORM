@@ -15,7 +15,7 @@ type
     FID: Integer;
     [ioWhere(coLike)]
     FName: String;
-    [ioWhere(coLike)]
+    [ioWhere(coLike), etmProperty]
     FCity: String;
     FAddress: String;
     FPhoneNumber: String;

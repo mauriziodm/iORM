@@ -15,6 +15,7 @@ type
   private
     FID: Integer;
     FOrderDate: TDate;
+    [etmProperty('Customer.ID', 'CustomerID')]
     FCustomer: TCustomer;
     FRows: TObjectList<TOrderRow>;
     FNote: String;

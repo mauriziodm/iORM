@@ -360,6 +360,7 @@ type
   // ETM attributes
   etmRepository = iORM.Attributes.etmRepository;
   etmTrace = iORM.Attributes.etmTrace;
+  etmProperty = iORM.Attributes.etmPropertyAttribute;
 
   // Other attributes
   ioMarker = iORM.Attributes.ioMarker;

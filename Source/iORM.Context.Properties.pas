@@ -571,7 +571,7 @@ begin
   Result := TioUtilities.TValueToObject(AValue, True);
   // If a RelationChildPropertyPath is assigned then resolve it
   if Self.RelationChildPropertyPathAssigned and AResolvePropertyPath then
-    Result := TioUtilities.ResolveChildPropertyPath(Result, FRelationChildPropertyPath);
+    Result := TioUtilities.ResolveChildPropertyPath_GetFinalObj(Result, FRelationChildPropertyPath);
 end;
 
 function TioProperty.GetRelationChildObjectID(const Instance: Pointer): Integer;
@@ -950,20 +950,8 @@ end;
 
 procedure TioProperty.SetRelationChildNameAndPath(const AQualifiedChildPropertyName: String);
 begin
-  // If the AQualifiedChildPropertyName is empty then exit
-  if AQualifiedChildPropertyName.IsEmpty then
-    Exit;
-  // Create the StringList, set the Delimiter and DelimitedText
-  FRelationChildPropertyPath := TStringList.Create;
-  FRelationChildPropertyPath.Delimiter := '.';
-  FRelationChildPropertyPath.DelimitedText := AQualifiedChildPropertyName;
-  // The last element is the ChildPropertyName
-  FRelationChildPropertyName := FRelationChildPropertyPath[FRelationChildPropertyPath.Count - 1];
-  // Remove the last element
-  FRelationChildPropertyPath.Delete(FRelationChildPropertyPath.Count - 1);
-  // If the remaining list is empty then free it (optimization)
-  if FRelationChildPropertyPath.Count = 0 then
-    FreeAndNil(FRelationChildPropertyPath);
+  if not AQualifiedChildPropertyName.IsEmpty then
+    TioUtilities.ResolveChildPropertyPath_SplitPropNameAndPath(AQualifiedChildPropertyName, FRelationChildPropertyPath, FRelationChildPropertyName);
 end;
 
 procedure TioProperty.SetTable(const ATable: IioTable);
