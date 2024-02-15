@@ -48,10 +48,12 @@ type
     class function Name: String; virtual;
     // Check/detect (or prepare the "query") if there is a conflict persisting the DataObject contained into the context
     class procedure CheckDeleteConflict(const AContext: IioContext); virtual;
+    class procedure CheckInsertConflict(const AContext: IioContext); virtual;
     class procedure CheckUpdateConflict(const AContext: IioContext); virtual;
     // If a conflict is detected then this method is called from the persistence strategy to try to resolve the conflict
     // Note: the conflict strategy MUST RESOLVE the conflict or raise an exception
     class procedure ResolveDeleteConflict(const AContext: IioContext); virtual;
+    class procedure ResolveInsertConflict(const AContext: IioContext); virtual;
     class procedure ResolveUpdateConflict(const AContext: IioContext); virtual;
   end;
 
@@ -62,8 +64,24 @@ type
   // NOTE: THESE ATTRIBUTES IS DECLARED HERE (not in iORM.Attributes unit) TO AVOID CIRCULAR REFERENCE
   // NOTE: THESE ATTRIBUTES IS DECLARED HERE (not in iORM.Attributes unit) TO AVOID CIRCULAR REFERENCE
 
-  // ioDeleteConflictStrategy attribute
-  ioDeleteConflictStrategyAttribute = class(TCustomAttribute)
+  // ioConflictStrategy attribute
+  ioConflictStrategyAttribute = class(TCustomAttribute)
+  strict private
+    FOnDeleteConflictSetStateAs: TioPersistenceConflictState;
+    FOnInsertConflictSetStateAs: TioPersistenceConflictState;
+    FOnUpdateConflictSetStateAs: TioPersistenceConflictState;
+    FStrategy: TioCustomConflictStrategyRef;
+  public
+    constructor Create(const AStrategy: TioCustomConflictStrategyRef; const AOnAllConflictSetStateAs: TioPersistenceConflictState = csResolved); overload;
+    constructor Create(const AStrategy: TioCustomConflictStrategyRef; const AOnInsertConflictSetStateAs, AOnUpdateConflictSetStateAs, AOnDeleteConflictSetStateAs: TioPersistenceConflictState); overload;
+    property OnDeleteConflictSetStateAs: TioPersistenceConflictState read FOnDeleteConflictSetStateAs;
+    property OnInsertConflictSetStateAs: TioPersistenceConflictState read FOnInsertConflictSetStateAs;
+    property OnUpdateConflictSetStateAs: TioPersistenceConflictState read FOnUpdateConflictSetStateAs;
+    property Strategy: TioCustomConflictStrategyRef read FStrategy;
+  end;
+
+  // ioConflictStrategy attribute
+  _ioCustomConflictStrategyAttribute = class(TCustomAttribute)
   strict private
     FOnConflictSetStateAs: TioPersistenceConflictState;
     FStrategy: TioCustomConflictStrategyRef;
@@ -73,8 +91,17 @@ type
     property Strategy: TioCustomConflictStrategyRef read FStrategy;
   end;
 
+  // ioDeleteConflictStrategy attribute
+  ioDeleteConflictStrategyAttribute = class(_ioCustomConflictStrategyAttribute)
+  end;
+
+  // ioInsertConflictStrategy attribute
+  ioInsertConflictStrategyAttribute = class(_ioCustomConflictStrategyAttribute)
+  end;
+
   // ioUpdateConflictStrategy attribute
-  ioUpdateConflictStrategyAttribute = type ioDeleteConflictStrategyAttribute;
+  ioUpdateConflictStrategyAttribute = class(_ioCustomConflictStrategyAttribute)
+  end;
 
 implementation
 
@@ -93,6 +120,11 @@ begin
   // To be implemented on derived classes if necessary
 end;
 
+class procedure TioCustomConflictStrategy.CheckInsertConflict(const AContext: IioContext);
+begin
+  // To be implemented on derived classes if necessary
+end;
+
 class procedure TioCustomConflictStrategy.CheckUpdateConflict(const AContext: IioContext);
 begin
   // To be implemented on derived classes if necessary
@@ -101,8 +133,17 @@ end;
 class procedure TioCustomConflictStrategy.ResolveDeleteConflict(const AContext: IioContext);
 begin
   // Note: if you derive your own ConflictStrategy class and override this method then
-  //        I suggest you to put the inherited at the bottom of the method
+  //        I suggest you to put the "inherited" at the bottom of the method
   AContext.ConflictState := AContext.Map.GetTable.DeleteConflictStrategy_OnConflictSetStateAs;
+  if AContext.ConflictState = csRejectedRaise then
+    raise EioDeleteConflictException.Create(ClassName, 'ResolveDeleteConflict', AContext);
+end;
+
+class procedure TioCustomConflictStrategy.ResolveInsertConflict(const AContext: IioContext);
+begin
+  // Note: if you derive your own ConflictStrategy class and override this method then
+  //        I suggest you to put the "inherited" at the bottom of the method
+  AContext.ConflictState := AContext.Map.GetTable.InsertConflictStrategy_OnConflictSetStateAs;
   if AContext.ConflictState = csRejectedRaise then
     raise EioDeleteConflictException.Create(ClassName, 'ResolveDeleteConflict', AContext);
 end;
@@ -110,15 +151,34 @@ end;
 class procedure TioCustomConflictStrategy.ResolveUpdateConflict(const AContext: IioContext);
 begin
   // Note: if you derive your own ConflictStrategy class and override this method then
-  //        I suggest you to put the inherited at the bottom of the method
+  //        I suggest you to put the "inherited" at the bottom of the method
   AContext.ConflictState := AContext.Map.GetTable.UpdateConflictStrategy_OnConflictSetStateAs;
   if AContext.ConflictState = csRejectedRaise then
     raise EioUpdateConflictException.Create(ClassName, 'ResolveUpdateConflict', AContext);
 end;
 
-{ ioDeleteConflictStrategyAttribute }
+{ ioConflictStrategyAttribute }
 
-constructor ioDeleteConflictStrategyAttribute.Create(const AStrategy: TioCustomConflictStrategyRef; const AOnConflictSetStateAs: TioPersistenceConflictState = csResolved);
+constructor ioConflictStrategyAttribute.Create(const AStrategy: TioCustomConflictStrategyRef; const AOnAllConflictSetStateAs: TioPersistenceConflictState);
+begin
+  FOnDeleteConflictSetStateAs := AOnAllConflictSetStateAs;
+  FOnInsertConflictSetStateAs := AOnAllConflictSetStateAs;
+  FOnUpdateConflictSetStateAs := AOnAllConflictSetStateAs;
+  FStrategy := AStrategy;
+end;
+
+constructor ioConflictStrategyAttribute.Create(const AStrategy: TioCustomConflictStrategyRef; const AOnInsertConflictSetStateAs, AOnUpdateConflictSetStateAs,
+  AOnDeleteConflictSetStateAs: TioPersistenceConflictState);
+begin
+  FOnInsertConflictSetStateAs := AOnInsertConflictSetStateAs;
+  FOnUpdateConflictSetStateAs := AOnUpdateConflictSetStateAs;
+  FOnDeleteConflictSetStateAs := AOnDeleteConflictSetStateAs;
+  FStrategy := AStrategy;
+end;
+
+{ ioCustomConflictStrategyAttribute }
+
+constructor _ioCustomConflictStrategyAttribute.Create(const AStrategy: TioCustomConflictStrategyRef; const AOnConflictSetStateAs: TioPersistenceConflictState);
 begin
   FOnConflictSetStateAs := AOnConflictSetStateAs;
   FStrategy := AStrategy;

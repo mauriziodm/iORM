@@ -143,6 +143,8 @@ type
     // Conflict strategies
     FDeleteConflictStrategy: TClass; // TClass instead of TioCustomConflictStrategyRef to avoid circular reference
     FDeleteConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState;
+    FInsertConflictStrategy: TClass; // TClass instead of TioCustomConflictStrategyRef to avoid circular reference
+    FInsertConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState;
     FUpdateConflictStrategy: TClass; // TClass instead of TioCustomConflictStrategyRef to avoid circular reference
     FUpdateConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState;
     // EtmTimeSlotClass
@@ -173,12 +175,16 @@ type
     function TableName: String;
     // Conflict strategies (TClass instead of TioCustomConflictStrategyRef to avoid circular reference)
     procedure SetDeleteConflictStrategy(const AConflictStrategy: TClass);
+    procedure SetInsertConflictStrategy(const AConflictStrategy: TClass);
     procedure SetUpdateConflictStrategy(const AConflictStrategy: TClass);
     procedure SetDeleteConflictStrategy_OnConflictSetStateAs(const Value: TioPersistenceConflictState);
+    procedure SetInsertConflictStrategy_OnConflictSetStateAs(const Value: TioPersistenceConflictState);
     procedure SetUpdateConflictStrategy_OnConflictSetStateAs(const Value: TioPersistenceConflictState);
     function GetDeleteConflictStrategy: TClass;
+    function GetInsertConflictStrategy: TClass;
     function GetUpdateConflictStrategy: TClass;
     function GetDeleteConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState;
+    function GetInsertConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState;
     function GetUpdateConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState;
     // IndexList
     function IndexListExists: Boolean;
@@ -188,13 +194,6 @@ type
     function EtmPropToPropListExists: Boolean;
     function GetEtmPropToPropList(AAutoCreateIfUnassigned: Boolean): TEtmPropToPropList;
     procedure SetEtmPropToPropList(AEtmPropToPropList: TEtmPropToPropList);
-    // Properties
-    property DeleteConflictStrategy: TClass read GetDeleteConflictStrategy write SetDeleteConflictStrategy;
-    property UpdateConflictStrategy: TClass read GetUpdateConflictStrategy write SetUpdateConflictStrategy;
-    property DeleteConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState read GetDeleteConflictStrategy_OnConflictSetStateAs write SetDeleteConflictStrategy_OnConflictSetStateAs;
-    property UpdateConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState read GetUpdateConflictStrategy_OnConflictSetStateAs write SetUpdateConflictStrategy_OnConflictSetStateAs;
-    property EtmTimeSlotClass: TioEtmTimeSlotRef read GetEtmTimeSlotClass write SetEtmTimeSlotClass;
-    property EtmTraceOnlyOnConnectionName: String read GetEtmTraceOnlyOnConnectionName write SetEtmTraceOnlyOnConnectionName;
   end;
 
 implementation
@@ -228,8 +227,10 @@ begin
     FGroupBy.SetTable(Self);
   // Conflict strategies
   FDeleteConflictStrategy := TioSameVersionWin;
+  FInsertConflictStrategy := TioSameVersionWin;
   FUpdateConflictStrategy := TioSameVersionWin;
   FDeleteConflictStrategy_OnConflictSetStateAs := csResolved;
+  FInsertConflictStrategy_OnConflictSetStateAs := csResolved;
   FUpdateConflictStrategy_OnConflictSetStateAs := csResolved;
   // ETM
   FEtmTimeSlotClass := nil;
@@ -325,6 +326,16 @@ begin
   Result := FIndexList;
 end;
 
+function TioTable.GetInsertConflictStrategy: TClass;
+begin
+  Result := FInsertConflictStrategy;
+end;
+
+function TioTable.GetInsertConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState;
+begin
+  Result := FInsertConflictStrategy_OnConflictSetStateAs;
+end;
+
 function TioTable.GetJoin: IioJoins;
 begin
   Result := FJoins;
@@ -394,6 +405,16 @@ end;
 procedure TioTable.SetIndexList(AIndexList: TioIndexList);
 begin
   FIndexList := AIndexList;
+end;
+
+procedure TioTable.SetInsertConflictStrategy(const AConflictStrategy: TClass);
+begin
+  FInsertConflictStrategy := AConflictStrategy;
+end;
+
+procedure TioTable.SetInsertConflictStrategy_OnConflictSetStateAs(const Value: TioPersistenceConflictState);
+begin
+  FInsertConflictStrategy_OnConflictSetStateAs := Value;
 end;
 
 procedure TioTable.SetEtmPropToPropList(AEtmPropToPropList: TEtmPropToPropList);

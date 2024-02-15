@@ -136,8 +136,10 @@ type
     function WhereExist: Boolean;
     // Conflict strategy methods (to avoid circular reference)
     procedure CheckDeleteConflict(const AContext: IioContext); inline;
+    procedure CheckInsertConflict(const AContext: IioContext); inline;
     procedure CheckUpdateConflict(const AContext: IioContext); inline;
     procedure ResolveDeleteConflict(const AContext: IioContext); inline;
+    procedure ResolveInsertConflict(const AContext: IioContext); inline;
     procedure ResolveUpdateConflict(const AContext: IioContext); inline;
     function GetCurrentStrategyName: String;
     // BlindLevel helper methods
@@ -253,6 +255,11 @@ begin
   TioCustomConflictStrategyRef(GetTable.GetDeleteConflictStrategy).CheckDeleteConflict(AContext);
 end;
 
+procedure TioContext.CheckInsertConflict(const AContext: IioContext);
+begin
+  TioCustomConflictStrategyRef(GetTable.GetInsertConflictStrategy).CheckInsertConflict(AContext);
+end;
+
 procedure TioContext.CheckUpdateConflict(const AContext: IioContext);
 begin
   TioCustomConflictStrategyRef(GetTable.GetUpdateConflictStrategy).CheckUpdateConflict(AContext);
@@ -261,6 +268,11 @@ end;
 procedure TioContext.ResolveDeleteConflict(const AContext: IioContext);
 begin
   TioCustomConflictStrategyRef(GetTable.GetDeleteConflictStrategy).ResolveDeleteConflict(AContext);
+end;
+
+procedure TioContext.ResolveInsertConflict(const AContext: IioContext);
+begin
+  TioCustomConflictStrategyRef(GetTable.GetInsertConflictStrategy).ResolveInsertConflict(AContext);
 end;
 
 procedure TioContext.ResolveUpdateConflict(const AContext: IioContext);

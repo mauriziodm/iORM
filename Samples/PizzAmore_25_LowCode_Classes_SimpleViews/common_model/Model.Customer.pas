@@ -8,8 +8,7 @@ uses
 type
 
   // Register the form into the dependency injection container as SimpleView for TCustomer objects
-  [ioEntity('CUSTOMERS'), etmTrace(TEtmRepository)]
-  [ioUpdateConflictStrategy(TioSameVersionWin, csRejectedRaise), ioDeleteConflictStrategy(TioSameVersionWin, csRejectedRaise)]
+  [ioEntity('CUSTOMERS'), etmTrace(TEtmRepository), ioConflictStrategy(TioSameVersionWin, csRejectedRaise)]
   TCustomer = class
   private
     FID: Integer;

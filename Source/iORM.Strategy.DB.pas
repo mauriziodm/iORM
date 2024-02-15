@@ -349,6 +349,16 @@ var
   LQuery: IioQuery;
 begin
   inherited;
+  // Conflict strategy: check if there is a persistence conflict
+  if AContext.BlindLevel_Do_DetectConflicts then
+    AContext.CheckInsertConflict(AContext);
+  // Conflict strategy: if a conclict is detected then resolve it
+  if AContext.ConflictDetected then
+  begin
+    AContext.ResolveInsertConflict(AContext);
+    if AContext.ConflictState > csResolved then // if Rejected or RejectedRaise
+      Exit;
+  end;
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the next ID for the inserting object
   // before the insert query (for Firebird/Interbase)

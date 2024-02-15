@@ -57,8 +57,10 @@ type
     function WhereExist: Boolean;
     // Conflict strategy methods (to avoid circular reference)
     procedure CheckDeleteConflict(const AContext: IioContext);
+    procedure CheckInsertConflict(const AContext: IioContext);
     procedure CheckUpdateConflict(const AContext: IioContext);
     procedure ResolveDeleteConflict(const AContext: IioContext);
+    procedure ResolveInsertConflict(const AContext: IioContext);
     procedure ResolveUpdateConflict(const AContext: IioContext);
     function GetCurrentStrategyName: String;
     // BlindLevel helper methods

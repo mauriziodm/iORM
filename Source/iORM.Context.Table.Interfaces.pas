@@ -109,16 +109,22 @@ type
     procedure SetIndexList(AIndexList:TioIndexList);
     // Conflict strategies (TClass instead of TioCustomConflictStrategyRef to avoid circular reference)
     procedure SetDeleteConflictStrategy(const AConflictStrategy: TClass);
+    procedure SetInsertConflictStrategy(const AConflictStrategy: TClass);
     procedure SetUpdateConflictStrategy(const AConflictStrategy: TClass);
     procedure SetDeleteConflictStrategy_OnConflictSetStateAs(const Value: TioPersistenceConflictState);
+    procedure SetInsertConflictStrategy_OnConflictSetStateAs(const Value: TioPersistenceConflictState);
     procedure SetUpdateConflictStrategy_OnConflictSetStateAs(const Value: TioPersistenceConflictState);
     function GetDeleteConflictStrategy: TClass;
+    function GetInsertConflictStrategy: TClass;
     function GetupdateConflictStrategy: TClass;
     function GetDeleteConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState;
+    function GetInsertConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState;
     function GetUpdateConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState;
     property DeleteConflictStrategy: TClass read GetDeleteConflictStrategy write SetDeleteConflictStrategy;
+    property InsertConflictStrategy: TClass read GetInsertConflictStrategy write SetInsertConflictStrategy;
     property UpdateConflictStrategy: TClass read GetUpdateConflictStrategy write SetUpdateConflictStrategy;
     property DeleteConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState read GetDeleteConflictStrategy_OnConflictSetStateAs write SetDeleteConflictStrategy_OnConflictSetStateAs;
+    property InsertConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState read GetInsertConflictStrategy_OnConflictSetStateAs write SetInsertConflictStrategy_OnConflictSetStateAs;
     property UpdateConflictStrategy_OnConflictSetStateAs: TioPersistenceConflictState read GetUpdateConflictStrategy_OnConflictSetStateAs write SetUpdateConflictStrategy_OnConflictSetStateAs;
     // ETM prop to prop list
     function EtmPropToPropListExists: Boolean;
