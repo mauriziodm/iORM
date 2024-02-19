@@ -193,7 +193,7 @@ begin
   LDefaultConnectionDef := io.Connections.GetCurrentConnectionDef;
   // Create a new connection in database master
   io.Connections.NewSQLServerConnectionDef(LDefaultConnectionDef.AsString['Server'], 'master', LDefaultConnectionDef.Params.UserName,
-    LDefaultConnectionDef.Params.Password, False, False, False, CONNECTION_NAME_MSSQL_MASTER);
+    LDefaultConnectionDef.Params.Password, False, False, False, False, CONNECTION_NAME_MSSQL_MASTER);
   // Create the query to retrieve if DB exists
   // M.M. 12/06/21
   LQuery := OpenQuery(CONNECTION_NAME_MSSQL_MASTER, Format('select db_id(''%s'')', [FSchema.DatabaseFileName]));

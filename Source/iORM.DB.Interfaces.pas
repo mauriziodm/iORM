@@ -89,8 +89,9 @@ type
     Persistent: Boolean;
     Strategy: TioPersistenceStrategyRef;
     UserName: String;
+    IsLocalSynchronizableConnection: Boolean;
     constructor Create(const AConnectionName: String; const AConnectionType: TioConnectionType; const APersistent: Boolean;
-      const AKeyGenerationTime: TioKeyGenerationTime);
+      const AKeyGenerationTime: TioKeyGenerationTime; const AIsLocalSynchronizableConnection: Boolean);
   end;
 
   TioCompareOperatorRef = class of TioCompareOperator;
@@ -652,12 +653,13 @@ end;
 { TioConnectionInfo }
 
 constructor TioConnectionInfo.Create(const AConnectionName: String; const AConnectionType: TioConnectionType; const APersistent: Boolean;
-  const AKeyGenerationTime: TioKeyGenerationTime);
+      const AKeyGenerationTime: TioKeyGenerationTime; const AIsLocalSynchronizableConnection: Boolean);
 begin
   ConnectionName := AConnectionName;
   ConnectionType := AConnectionType;
   KeyGenerationTime := AKeyGenerationTime;
   Persistent := APersistent;
+  IsLocalSynchronizableConnection := AIsLocalSynchronizableConnection;
   Strategy := TioPersistenceStrategyFactory.ConnectionTypeToStrategy(AConnectionType);
 end;
 

@@ -55,6 +55,7 @@ type
     property Database;
     property DatabaseStdFolder;
     property Encrypt;
+    property IsLocalSynchronizableConnection default False;
     property OSAuthent;
     property Password;
     property Persistent;
@@ -83,7 +84,7 @@ procedure TioSQLServerConnectionDef.RegisterConnectionDef;
 begin
   inherited;
   ConnectionDef := TioConnectionManager.NewSQLServerConnectionDef(Server,
-    GetFullPathDatabase, UserName, Password, AsDefault,
+    GetFullPathDatabase, UserName, Password, AsDefault, IsLocalSynchronizableConnection,
     Persistent, Pooled, Name);
   // Encript
   if not Encrypt.IsEmpty then

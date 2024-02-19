@@ -94,6 +94,7 @@ type
     FServer: String;
     FSQLDialect: TioSQLDialect;
     FUserName: String;
+    FIsLocalSynchronizableConnection: Boolean;
     function Get_Version: String;
     procedure SetAsDefault(const Value: Boolean);
   protected
@@ -118,6 +119,7 @@ type
     property Server: String read FServer write FServer;
     property SQLDialect: TioSQLDialect read FSQLDialect write FSQLDialect;
     property UserName: String read FUserName write FUserName;
+    property IsLocalSynchronizableConnection: Boolean read FIsLocalSynchronizableConnection write FIsLocalSynchronizableConnection default False;
     // Events
     property OnAfterCreateOrAlterDB: TioDBBuilderAfterCreateOrAlterDBEvent read FOnAfterCreateOrAlterDBEvent
       write FOnAfterCreateOrAlterDBEvent;
@@ -165,6 +167,7 @@ type
     property Database;
     property DatabaseStdFolder;
     property Encrypt;
+    property IsLocalSynchronizableConnection default False;
     property NewPassword;
     property Password;
     property Persistent;
@@ -189,6 +192,7 @@ type
     property CharSet;
     property Database;
     property DatabaseStdFolder;
+    property IsLocalSynchronizableConnection default False;
     property OSAuthent;
     property Password;
     property Persistent;
@@ -218,6 +222,7 @@ type
     property CharSet;
     property Database;
     property DatabaseStdFolder;
+    property IsLocalSynchronizableConnection default False;
     property Password;
     property Persistent;
     property Pooled;
@@ -271,6 +276,7 @@ begin
   FSQLDialect := TioSQLDialect.sqlDialect3;
   FUserName := '';
   FAutoCreateDB := TioDBBuilderProperty.Create;
+  FIsLocalSynchronizableConnection := False;
 end;
 
 function TioCustomConnectionDef.DBBuilder: IioDBBuilderEngine;
@@ -419,7 +425,7 @@ begin
   // Fire the OnBeforeRegister event if implemented
   DoBeforeRegister;
   // Register the ConnectionDef
-  ConnectionDef := TioConnectionManager.NewSQLiteConnectionDef(GetFullPathDatabase, AsDefault, Persistent, Pooled, Name);
+  ConnectionDef := TioConnectionManager.NewSQLiteConnectionDef(GetFullPathDatabase, AsDefault, IsLocalSynchronizableConnection, Persistent, Pooled, Name);
   // Encript
   if not Encrypt.IsEmpty then
     ConnectionDef.Params.Values['Encrypt'] := Encrypt;
@@ -453,7 +459,7 @@ begin
   DoBeforeRegister;
   // Register the ConnectionDef
   ConnectionDef := TioConnectionManager.NewFirebirdConnectionDef(Server, GetFullPathDatabase, UserName, Password, CharSet,
-    AsDefault, Persistent, Pooled, Name);
+    AsDefault, IsLocalSynchronizableConnection, Persistent, Pooled, Name);
   // OSAuthent
   case OSAuthent of
     TioOSAuthent.oaNo:
@@ -512,7 +518,7 @@ begin
   DoBeforeRegister;
   // Register the ConnectionDef
   ConnectionDef := TioConnectionManager.NewMySQLConnectionDef(Server, GetFullPathDatabase, UserName, Password, CharSet,
-    AsDefault, Persistent, Pooled, Name);
+    AsDefault, IsLocalSynchronizableConnection, Persistent, Pooled, Name);
   // Port
   ConnectionDef.Params.Values['Port'] := Port.ToString;
   // NB: Inherited must be the last line (set FIsRegistered)

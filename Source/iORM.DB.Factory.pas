@@ -127,35 +127,35 @@ var
   LConnectionInfo: TioConnectionInfo;
   function NewConnectionDB: IioConnectionDB;
   var
-    LConnection: TioInternalSqlConnection;
+    LInternalConnection: TioInternalSqlConnection;
     // DBPath: String;
   begin
     // Create the internal connection
-    LConnection := TioInternalSqlConnection.Create(nil);
+    LInternalConnection := TioInternalSqlConnection.Create(nil);
     // Load and set the connection parameters (from the connection manager)
-    LConnection.ConnectionDefName := AConnectionName;
+    LInternalConnection.ConnectionDefName := AConnectionName;
     // Disable Firedac MACRO
-    LConnection.ResourceOptions.MacroCreate := False;
-    LConnection.ResourceOptions.MacroExpand := False;
+    LInternalConnection.ResourceOptions.MacroCreate := False;
+    LInternalConnection.ResourceOptions.MacroExpand := False;
     // LConnection.ResourceOptions.PreprocessCmdText := False;
     // Set the monitor mode for the connection
 {$IFDEF MSWINDOWS}
     case TioConnectionMonitor.mode of
       mmDisabled:
-        LConnection.Params.MonitorBy := mbNone;
+        LInternalConnection.Params.MonitorBy := mbNone;
       mmRemote:
-        LConnection.Params.MonitorBy := mbRemote;
+        LInternalConnection.Params.MonitorBy := mbRemote;
       mmFlatFile:
-        LConnection.Params.MonitorBy := mbFlatFile;
+        LInternalConnection.Params.MonitorBy := mbFlatFile;
     end;
 {$ENDIF}
     // Extract the file path and create the directory if not exists
     // DBPath := ExtractFilePath(   Self.ConnectionManager.GetConnectionDefByName(AConnectionName).Params.Values['Database']   );
     // if not TDirectory.Exists(DBPath) then TDirectory.CreateDirectory(DBPath);
     // Open the connection
-    LConnection.Open;
+    LInternalConnection.Open;
     // Create the ioConnection and his QueryContainer and return it
-    Result := TioConnectionDB.Create(LConnection, Self.QueryContainer, TioConnectionManager.GetConnectionInfo(AConnectionName));
+    Result := TioConnectionDB.Create(LInternalConnection, Self.QueryContainer, TioConnectionManager.GetConnectionInfo(AConnectionName));
   end;
   function NewConnectionHttp: IioConnectionHttp;
   begin
