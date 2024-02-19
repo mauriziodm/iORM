@@ -129,10 +129,10 @@ contains
   iORM.MVVM.VMActionContainer in '..\..\Source\iORM.MVVM.VMActionContainer.pas',
   iORM.LazyLoad.LazyLoadObject in '..\..\Source\iORM.LazyLoad.LazyLoadObject.pas',
   iORM.Http.Connection in '..\..\Source\iORM.Http.Connection.pas',
-  iORM.Strategy.DB in '..\..\Source\iORM.Strategy.DB.pas',
-  iORM.Strategy.Interfaces in '..\..\Source\iORM.Strategy.Interfaces.pas',
-  iORM.Strategy.Factory in '..\..\Source\iORM.Strategy.Factory.pas',
-  iORM.Strategy.Http in '..\..\Source\iORM.Strategy.Http.pas',
+  iORM.PersistenceStrategy.DB in '..\..\Source\iORM.PersistenceStrategy.DB.pas',
+  iORM.PersistenceStrategy.Interfaces in '..\..\Source\iORM.PersistenceStrategy.Interfaces.pas',
+  iORM.PersistenceStrategy.Factory in '..\..\Source\iORM.PersistenceStrategy.Factory.pas',
+  iORM.PersistenceStrategy.Http in '..\..\Source\iORM.PersistenceStrategy.Http.pas',
   iORM.Http.Body.Request in '..\..\Source\iORM.Http.Body.Request.pas',
   iORM.Http.Interfaces in '..\..\Source\iORM.Http.Interfaces.pas',
   iORM.Http.Body.Response in '..\..\Source\iORM.Http.Body.Response.pas',
@@ -235,7 +235,8 @@ contains
   iORM.ConflictStrategy.Interfaces in '..\..\Source\iORM.ConflictStrategy.Interfaces.pas',
   iORM.ConflictStrategy.SameVersionWin in '..\..\Source\iORM.ConflictStrategy.SameVersionWin.pas',
   iORM.ConflictStrategy.LastUpdateWin in '..\..\Source\iORM.ConflictStrategy.LastUpdateWin.pas',
-  iORM.Resolver.ResolvedTypeList in '..\..\Source\iORM.Resolver.ResolvedTypeList.pas';
+  iORM.Resolver.ResolvedTypeList in '..\..\Source\iORM.Resolver.ResolvedTypeList.pas',
+  iORM.SynchroStrategy.Interfaces in '..\..\Source\iORM.SynchroStrategy.Interfaces.pas';
 
 end.
 

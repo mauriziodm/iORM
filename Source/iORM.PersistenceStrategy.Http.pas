@@ -31,18 +31,18 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.Strategy.Http;
+unit iORM.PersistenceStrategy.Http;
 
 interface
 
 uses
-  iORM.Strategy.Interfaces, iORM.Where.Interfaces, iORM.DB.Interfaces,
+  iORM.PersistenceStrategy.Interfaces, iORM.Where.Interfaces, iORM.DB.Interfaces,
   FireDAC.Comp.DataSet, iORM.LiveBindings.BSPersistence, iORM.CommonTypes;
 
 type
 
   // Strategy class for database
-  TioStrategyHttp = class(TioStrategyIntf)
+  TioPersistenceStrategyHttp = class(TioPersistenceStrategyIntf)
   private
     // class var FTransactionGUID: String; NB: Hint prevention "symbol declared but never used"
     // class function NewGUIDAsString: String; NB: Hint prevention "symbol declared but never used" (codice presente sotto)
@@ -75,7 +75,7 @@ type
 implementation
 
 uses
-  System.JSON, iORM, System.Classes, iORM.Strategy.DB, iORM.DB.ConnectionContainer,
+  System.JSON, iORM, System.Classes, iORM.PersistenceStrategy.DB, iORM.DB.ConnectionContainer,
   iORM.DB.Factory, System.Generics.Collections, iORM.Utilities,
   iORM.DuckTyped.Interfaces, iORM.Http.Interfaces, iORM.Http.Factory,
   iORM.Exceptions, System.SysUtils, FireDAC.Stan.Intf, FireDAC.Stan.StorageJSON,
@@ -83,13 +83,13 @@ uses
 
 { TioStrategyHttp }
 
-class procedure TioStrategyHttp.CommitTransaction(const AConnectionName: String);
+class procedure TioPersistenceStrategyHttp.CommitTransaction(const AConnectionName: String);
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).Commit;
 end;
 
-class function TioStrategyHttp.Count(const AWhere: IioWhere): Integer;
+class function TioPersistenceStrategyHttp.Count(const AWhere: IioWhere): Integer;
 var
   LConnection: IioConnectionHttp;
 begin
@@ -117,7 +117,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyHttp.Delete(const AWhere: IioWhere);
+class procedure TioPersistenceStrategyHttp.Delete(const AWhere: IioWhere);
 var
   LConnection: IioConnectionHttp;
 begin
@@ -142,7 +142,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyHttp._DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
+class procedure TioPersistenceStrategyHttp._DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 var
   LConnection: IioConnectionHttp;
 begin
@@ -170,7 +170,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyHttp._DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
+class procedure TioPersistenceStrategyHttp._DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 var
   LConnectionDefName: String;
   LConnection: IioConnectionHttp;
@@ -200,7 +200,7 @@ begin
   end;
 end;
 
-class function TioStrategyHttp.InTransaction(const AConnectionName: String): boolean;
+class function TioPersistenceStrategyHttp.InTransaction(const AConnectionName: String): boolean;
 begin
   inherited;
   Result := TioDBFactory.Connection(AConnectionName).InTransaction;
@@ -215,7 +215,7 @@ end;
 // Result := System.Classes.TThread.CurrentThread.ThreadID.ToString + '-' + FTransactionGUID;
 // end;
 
-class procedure TioStrategyHttp.LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
+class procedure TioPersistenceStrategyHttp.LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
 var
   LConnection: IioConnectionHttp;
 begin
@@ -242,7 +242,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyHttp._DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType);
+class procedure TioPersistenceStrategyHttp._DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType);
 var
   LConnection: IioConnectionHttp;
 begin
@@ -274,7 +274,7 @@ begin
   end;
 end;
 
-class function TioStrategyHttp._DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
+class function TioPersistenceStrategyHttp._DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
 var
   LConnection: IioConnectionHttp;
 begin
@@ -305,7 +305,7 @@ begin
   end;
 end;
 
-class function TioStrategyHttp.LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
+class function TioPersistenceStrategyHttp.LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
 begin
   // This method is only used internally by the Object Maker,
   // and then you do not need to implement it in RESTStrategy.
@@ -321,7 +321,7 @@ end;
 // end;
 
 { TODO : DA AGGIUNGERE GESTIONE DEI 3 PARAMETRI AGGIUNTI ALLA FINE PER IL SUD }
-class procedure TioStrategyHttp._DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
+class procedure TioPersistenceStrategyHttp._DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
 var
   LConnection: IioConnectionHttp;
@@ -357,7 +357,7 @@ begin
 end;
 
 { TODO : DA AGGIUNGERE GESTIONE DEI 3 PARAMETRI AGGIUNTI ALLA FINE PER IL SUD }
-class procedure TioStrategyHttp._DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
+class procedure TioPersistenceStrategyHttp._DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
 var
   LConnectionDefName: String;
@@ -394,13 +394,13 @@ begin
   end;
 end;
 
-class procedure TioStrategyHttp.RollbackTransaction(const AConnectionName: String);
+class procedure TioPersistenceStrategyHttp.RollbackTransaction(const AConnectionName: String);
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).Rollback;
 end;
 
-class procedure TioStrategyHttp.SQLDest_Execute(const ASQLDestination: IioSQLDestination);
+class procedure TioPersistenceStrategyHttp.SQLDest_Execute(const ASQLDestination: IioSQLDestination);
 var
   LConnection: IioConnectionHttp;
   LJSONValue: TJSONValue;
@@ -432,7 +432,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyHttp.SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet);
+class procedure TioPersistenceStrategyHttp.SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet);
 var
   LConnection: IioConnectionHttp;
 begin
@@ -459,7 +459,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyHttp.StartTransaction(const AConnectionName: String);
+class procedure TioPersistenceStrategyHttp.StartTransaction(const AConnectionName: String);
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).StartTransaction;

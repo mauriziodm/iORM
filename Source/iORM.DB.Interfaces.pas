@@ -70,7 +70,7 @@ type
   TioParams = TFDParams;
 
   // Strategy class reference
-  TioStrategyRef = class of TioStrategyIntf;
+  TioPersistenceStrategyRef = class of TioPersistenceStrategyIntf;
 
   TioConnectionType = (ctFirebird, ctSQLite,
 {$IFNDEF ioDelphiProfessional}
@@ -87,7 +87,7 @@ type
     KeyGenerationTime: TioKeyGenerationTime;
     Password: String;
     Persistent: Boolean;
-    Strategy: TioStrategyRef;
+    Strategy: TioPersistenceStrategyRef;
     UserName: String;
     constructor Create(const AConnectionName: String; const AConnectionType: TioConnectionType; const APersistent: Boolean;
       const AKeyGenerationTime: TioKeyGenerationTime);
@@ -372,7 +372,7 @@ type
 
   // Base class for strategy (Static class as an interface)
   // Note: {$DEFINE ioStrategyInterceptorsOff} to disable strategy interceptors
-  TioStrategyIntf = class abstract
+  TioPersistenceStrategyIntf = class abstract
   protected
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------
     class procedure _DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
@@ -412,7 +412,7 @@ type
 implementation
 
 uses
-  iORM.SqlTranslator, iORM.Strategy.Factory, System.SysUtils, iORM.Attributes,
+  iORM.SqlTranslator, iORM.PersistenceStrategy.Factory, System.SysUtils, iORM.Attributes,
   iORM.Exceptions, iORM.Utilities, iORM.SqlItems,
   System.StrUtils, iORM.Context.Container, iORM.Resolver.Interfaces,
   iORM.Resolver.Factory, iORM.Interceptor.Strategy.Register,
@@ -658,7 +658,7 @@ begin
   ConnectionType := AConnectionType;
   KeyGenerationTime := AKeyGenerationTime;
   Persistent := APersistent;
-  Strategy := TioStrategyFactory.ConnectionTypeToStrategy(AConnectionType);
+  Strategy := TioPersistenceStrategyFactory.ConnectionTypeToStrategy(AConnectionType);
 end;
 
 { TioCompareOperator }
@@ -790,7 +790,7 @@ end;
 
 { TioStrategyIntf }
 
-class procedure TioStrategyIntf.DeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
+class procedure TioPersistenceStrategyIntf.DeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
 var
@@ -816,7 +816,7 @@ begin
 {$ENDREGION}
 end;
 
-class procedure TioStrategyIntf.DeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
+class procedure TioPersistenceStrategyIntf.DeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
 var
@@ -842,7 +842,7 @@ begin
 {$ENDREGION}
 end;
 
-class procedure TioStrategyIntf.LoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType);
+class procedure TioPersistenceStrategyIntf.LoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
 var
@@ -868,7 +868,7 @@ begin
 {$ENDREGION}
 end;
 
-class function TioStrategyIntf.LoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
+class function TioPersistenceStrategyIntf.LoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
 var
@@ -895,7 +895,7 @@ begin
 {$ENDREGION}
 end;
 
-class procedure TioStrategyIntf.PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
+class procedure TioPersistenceStrategyIntf.PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
@@ -922,7 +922,7 @@ begin
 {$ENDREGION}
 end;
 
-class procedure TioStrategyIntf.PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
+class procedure TioPersistenceStrategyIntf.PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}

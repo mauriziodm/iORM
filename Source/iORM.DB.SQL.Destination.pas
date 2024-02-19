@@ -73,7 +73,7 @@ type
 implementation
 
 uses
-  iORM.SqlTranslator, iORM.DB.Factory, iORM.Exceptions, iORM.Strategy.Factory, iORM.Abstraction;
+  iORM.SqlTranslator, iORM.DB.Factory, iORM.Exceptions, iORM.PersistenceStrategy.Factory, iORM.Abstraction;
 
 { TioSQLDestination }
 
@@ -131,7 +131,7 @@ end;
 procedure TioSQLDestination.Execute(const AIgnoreObjNotExists:Boolean);
 begin
   FIgnoreObjNotExists := AIgnoreObjNotExists;
-  TioStrategyFactory.GetStrategy(FConnectionDefName).SQLDest_Execute(Self);
+  TioPersistenceStrategyFactory.GetStrategy(FConnectionDefName).SQLDest_Execute(Self);
 end;
 
 function TioSQLDestination.GetConnectionDefName: String;
@@ -173,7 +173,7 @@ end;
 
 procedure TioSQLDestination.ToMemTable(const AMemTable: TFDMemTable);
 begin
-  TioStrategyFactory.GetStrategy(FConnectionDefName).SQLDest_LoadDataSet(Self, AMemTable);
+  TioPersistenceStrategyFactory.GetStrategy(FConnectionDefName).SQLDest_LoadDataSet(Self, AMemTable);
 end;
 
 end.

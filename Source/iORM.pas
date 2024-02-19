@@ -760,7 +760,7 @@ type
 implementation
 
 uses
-  System.Rtti, iORM.Exceptions, iORM.Utilities, iORM.Where.Factory, iORM.Strategy.Factory, iORM.DuckTyped.Interfaces,
+  System.Rtti, iORM.Exceptions, iORM.Utilities, iORM.Where.Factory, iORM.PersistenceStrategy.Factory, iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory, iORM.DB.Factory, iORM.Abstraction, iORM.DuckTyped.StreamObject,
   iORM.LiveBindings.CommonBSBehavior, iORM.MVVM.ViewContextProviderContainer;
 
@@ -816,7 +816,7 @@ var
   LConnectionDefName: String;
 begin
   LConnectionDefName := AContext.GetTable.GetConnectionDefName;
-  Result := TioStrategyFactory.GetStrategy(LConnectionDefName).LoadObjVersion(AContext);
+  Result := TioPersistenceStrategyFactory.GetStrategy(LConnectionDefName).LoadObjVersion(AContext);
 end;
 
 class procedure io.LoadToList<TItemType>(const AListObj: TObject; const AItemAlias: String);
@@ -966,7 +966,7 @@ var
 begin
   LConnectionDefName := TioMapContainer.GetConnectionDefName(AObj.ClassName);
   // Get the strategy and call the proper funtionality
-  TioStrategyFactory.GetStrategy(LConnectionDefName).PersistObject(AObj, AIntent, ARelationPropertyName, ARelationOID, AMasterBSPersistence,
+  TioPersistenceStrategyFactory.GetStrategy(LConnectionDefName).PersistObject(AObj, AIntent, ARelationPropertyName, ARelationOID, AMasterBSPersistence,
     AMasterPropertyName, AMasterPropertyPath, ABlindLevel);
 end;
 
@@ -1081,7 +1081,7 @@ end;
 
 class procedure io.RollbackTransaction(const AConnectionName: String);
 begin
-  TioStrategyFactory.GetStrategy(AConnectionName).RollbackTransaction(AConnectionName);
+  TioPersistenceStrategyFactory.GetStrategy(AConnectionName).RollbackTransaction(AConnectionName);
 end;
 
 class function io.SQL(const ASQL: String): IioSQLDestination;
@@ -1364,7 +1364,7 @@ end;
 
 class procedure io.StartTransaction(const AConnectionName: String);
 begin
-  TioStrategyFactory.GetStrategy(AConnectionName).StartTransaction(AConnectionName);
+  TioPersistenceStrategyFactory.GetStrategy(AConnectionName).StartTransaction(AConnectionName);
 end;
 
 class function io.StrategyInterceptors: TioStrategyInterceptorRegisterRef;
@@ -1384,7 +1384,7 @@ end;
 
 class procedure io.CommitTransaction(const AConnectionName: String);
 begin
-  TioStrategyFactory.GetStrategy(AConnectionName).CommitTransaction(AConnectionName);
+  TioPersistenceStrategyFactory.GetStrategy(AConnectionName).CommitTransaction(AConnectionName);
 end;
 
 class function io.Connections: TioConnectionManagerRef;
@@ -1840,7 +1840,7 @@ end;
 
 class function io.InTransaction(const AConnectionName: String): boolean;
 begin
-  Result := TioStrategyFactory.GetStrategy(AConnectionName).InTransaction(AConnectionName);
+  Result := TioPersistenceStrategyFactory.GetStrategy(AConnectionName).InTransaction(AConnectionName);
 end;
 
 class function io.Load(const AClassRef: TioClassRef; const ATypeAlias: String): IioWhere;
@@ -1861,7 +1861,7 @@ var
   LConnectionDefName: String;
 begin
   LConnectionDefName := TioConnectionManager.GetCurrentConnectionName;
-  TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteList(AListObj, AIntent, ABlindLevel);
+  TioPersistenceStrategyFactory.GetStrategy(LConnectionDefName).DeleteList(AListObj, AIntent, ABlindLevel);
 end;
 
 class procedure io._DeleteObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
@@ -1869,7 +1869,7 @@ var
   LConnectionDefName: String;
 begin
   LConnectionDefName := TioMapContainer.GetConnectionDefName(AObj.ClassName);
-  TioStrategyFactory.GetStrategy(LConnectionDefName).DeleteObject(AObj, AIntent, ABlindLevel);
+  TioPersistenceStrategyFactory.GetStrategy(LConnectionDefName).DeleteObject(AObj, AIntent, ABlindLevel);
 end;
 
 class procedure io._PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
@@ -1883,7 +1883,7 @@ var
   LConnectionDefName: String;
 begin
   LConnectionDefName := TioConnectionManager.GetCurrentConnectionName;
-  TioStrategyFactory.GetStrategy(LConnectionDefName).PersistList(AList, AIntent, ARelationPropertyName, ARelationOID, AMasterBSPersistence, AMasterPropertyName,
+  TioPersistenceStrategyFactory.GetStrategy(LConnectionDefName).PersistList(AList, AIntent, ARelationPropertyName, ARelationOID, AMasterBSPersistence, AMasterPropertyName,
     AMasterPropertyPath, ABlindLevel);
 end;
 

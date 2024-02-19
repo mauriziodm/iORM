@@ -399,7 +399,7 @@ implementation
 uses
   iORM.DB.Factory, iORM.Context.Factory, System.SysUtils, iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, iORM.ObjectsForge.Factory,
   iORM.RttiContext.Factory, iORM, iORM.Where.SqlItems, iORM.DB.Interfaces, iORM.Resolver.Factory,
-  iORM.Where.Factory, iORM.Exceptions, FireDAC.Comp.DataSet, iORM.LazyLoad.Factory, iORM.Strategy.Factory,
+  iORM.Where.Factory, iORM.Exceptions, FireDAC.Comp.DataSet, iORM.LazyLoad.Factory, iORM.PersistenceStrategy.Factory,
   iORM.MVVM.Interfaces, iORM.Abstraction, iORM.Context.Container, System.StrUtils,
   iORM.ObjectsForge.Interfaces, iORM.ETM.Engine;
 
@@ -762,7 +762,7 @@ end;
 
 procedure TioWhere.Delete;
 begin
-  TioStrategyFactory.GetStrategy('').Delete(Self);
+  TioPersistenceStrategyFactory.GetStrategy('').Delete(Self);
 end;
 
 destructor TioWhere.Destroy;
@@ -825,7 +825,7 @@ end;
 
 function TioWhere.Count: Integer;
 begin
-  Result := TioStrategyFactory.GetStrategy('').Count(Self);
+  Result := TioPersistenceStrategyFactory.GetStrategy('').Count(Self);
 end;
 
 function TioWhere.GetClearListBefore: Boolean;
@@ -1104,7 +1104,7 @@ begin
     raise EioException.Create(ClassName, 'ToList', '"AList" parameter not assigned');
   if FClearListBefore then
     TioUtilities.ClearList(AList);
-  TioStrategyFactory.GetStrategy('').LoadList(Self, AList, FIntent);
+  TioPersistenceStrategyFactory.GetStrategy('').LoadList(Self, AList, FIntent);
 end;
 
 function TioWhere.ToList(const AInterfacedListTypeName, AAlias: String; const AOwnsObjects: Boolean): TObject;
@@ -1133,12 +1133,12 @@ end;
 
 procedure TioWhere.ToMemTable(const AMemTable: TFDMemTable);
 begin
-  TioStrategyFactory.GetStrategy('').LoadDataSet(Self, AMemTable);
+  TioPersistenceStrategyFactory.GetStrategy('').LoadDataSet(Self, AMemTable);
 end;
 
 function TioWhere.ToObject(const AObj: TObject): TObject;
 begin
-  Result := TioStrategyFactory.GetStrategy('').LoadObject(Self, AObj, FIntent);
+  Result := TioPersistenceStrategyFactory.GetStrategy('').LoadObject(Self, AObj, FIntent);
 end;
 
 function TioWhere.ToObject(const AIntf: IInterface): TObject;
@@ -1381,7 +1381,7 @@ end;
 
 function TioWhere._ToObjectInternalByClassOnly(const AIntent: TioPersistenceIntentType; const AObj: TObject = nil): TObject;
 begin
-  Result := TioStrategyFactory.GetStrategy('').LoadObjectByClassOnly(Self, AObj, AIntent);
+  Result := TioPersistenceStrategyFactory.GetStrategy('').LoadObjectByClassOnly(Self, AObj, AIntent);
 end;
 
 function TioWhere._Value(AValue: IInterface): IioWhere;

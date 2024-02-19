@@ -31,43 +31,37 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.Strategy.Factory;
+unit iORM.SynchroStrategy.Interfaces;
 
 interface
 
-uses
-  iORM.DB.Interfaces, iORM.Strategy.Interfaces;
-
 type
 
-  TioStrategyFactory = class
+//  TioCustomSynchroLogItem
+
+  // Base class for all synchro strategies
+  TioCustomSynchroStrategy = class abstract
   public
-    class function GetStrategy(const AConnectionName: String): TioStrategyRef;
-    class function ConnectionTypeToStrategy(const AConnectionType: TioConnectionType): TioStrategyRef;
+    // This method return a name for this synchro strategy, by default it returns the type name of the class itself but you can override it
+    //  and return a more readable name. It is used for logging purposes or similar.
+    class function Name: String; virtual;
+    // Synchro strategy methods to be override on descendant classes
+    function Step1_Client_LoadEntitiesToSend: String; virtual; abstract;
+    procedure Step2_Server_PersistReceivedEntities(const AReceived: String); virtual; abstract;
+    function Step3_Server_LoadEntitiesToSendBack: String; virtual; abstract;
+    procedure Step4_Client_PersistReceivedBackEntities(const AReceived: String); virtual; abstract;
   end;
+
+  // Class reference for synchro strategies
+  TioCustomSynchroStrategyRef = class of TioCustomSynchroStrategy;
 
 implementation
 
-uses
-  iORM.Strategy.DB, iORM.DB.ConnectionContainer, iORM.Strategy.Http;
+{ TioCustomSynchroStrategy }
 
-{ TioStrategyFactory }
-
-class function TioStrategyFactory.ConnectionTypeToStrategy(
-  const AConnectionType: TioConnectionType): TioStrategyRef;
+class function TioCustomSynchroStrategy.Name: String;
 begin
-  case AConnectionType of
-    TioConnectionType.ctHTTP:
-      Result := TioStrategyHttp;
-  else
-    Result := TioStrategyDB;
-  end;
-end;
-
-class function TioStrategyFactory.GetStrategy(
-  const AConnectionName: String): TioStrategyRef;
-begin
-  Result := TioConnectionManager.GetConnectionInfo(AConnectionName).Strategy;
+  Result := Self.Name;
 end;
 
 end.

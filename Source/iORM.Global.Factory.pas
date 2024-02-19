@@ -40,7 +40,7 @@ uses
   iORM.DuckTyped.Factory, iORM.LazyLoad.Factory,
   iORM.LiveBindings.Factory, iORM.ObjectsForge.Factory,
   iORM.RttiContext.Factory, iORM.MVVM.Factory,
-  iORM.Where.Factory, iORM.Strategy.Interfaces, iORM.Strategy.Factory,
+  iORM.Where.Factory, iORM.PersistenceStrategy.Interfaces, iORM.PersistenceStrategy.Factory,
   iORM.DBBuilder.Factory;
 
 Type
@@ -55,7 +55,7 @@ Type
   TioRttiContextFactoryRef = class of TioRttiFactory;
   TioMVVMFactoryRef = class of TioMVVMFactory;
   TioWhereFactoryRef = class of TioWhereFactory;
-  TioStrategyFactoryRef = class of TioStrategyFactory;
+  TioStrategyFactoryRef = class of TioPersistenceStrategyFactory;
 
   TioGlobalFactory = class
   public
@@ -125,7 +125,7 @@ end;
 
 class function TioGlobalFactory.StrategyFactory: TioStrategyFactoryRef;
 begin
-  Result := TioStrategyFactory;
+  Result := TioPersistenceStrategyFactory;
 end;
 
 class function TioGlobalFactory.WhereFactory: TioWhereFactoryRef;

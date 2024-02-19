@@ -31,13 +31,41 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.Strategy.Interfaces;
+unit iORM.PersistenceStrategy.Factory;
 
 interface
 
-  // NB: Interfaces declared here are moved into iORM.DB.Interfaces to avoid
-  //      circular unit reference error
+uses
+  iORM.DB.Interfaces, iORM.PersistenceStrategy.Interfaces;
+
+type
+
+  TioPersistenceStrategyFactory = class
+  public
+    class function GetStrategy(const AConnectionName: String): TioPersistenceStrategyRef;
+    class function ConnectionTypeToStrategy(const AConnectionType: TioConnectionType): TioPersistenceStrategyRef;
+  end;
 
 implementation
+
+uses
+  iORM.PersistenceStrategy.DB, iORM.PersistenceStrategy.Http, iORM.DB.ConnectionContainer;
+
+{ TioStrategyFactory }
+
+class function TioPersistenceStrategyFactory.ConnectionTypeToStrategy(const AConnectionType: TioConnectionType): TioPersistenceStrategyRef;
+begin
+  case AConnectionType of
+    TioConnectionType.ctHTTP:
+      Result := TioPersistenceStrategyHttp;
+  else
+    Result := TioPersistenceStrategyDB;
+  end;
+end;
+
+class function TioPersistenceStrategyFactory.GetStrategy(const AConnectionName: String): TioPersistenceStrategyRef;
+begin
+  Result := TioConnectionManager.GetConnectionInfo(AConnectionName).Strategy;
+end;
 
 end.

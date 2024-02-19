@@ -31,7 +31,7 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.Strategy.DB;
+unit iORM.PersistenceStrategy.DB;
 
 interface
 
@@ -44,7 +44,7 @@ uses
 type
 
   // Strategy class for database
-  TioStrategyDB = class(TioStrategyIntf)
+  TioPersistenceStrategyDB = class(TioPersistenceStrategyIntf)
   private
     class procedure InsertObject_Internal(const AContext: IioContext);
     class procedure UpdateObject_Internal(const AContext: IioContext);
@@ -109,13 +109,13 @@ type
 
   { TioStrategyDB }
 
-class procedure TioStrategyDB.CommitTransaction(const AConnectionName: String);
+class procedure TioPersistenceStrategyDB.CommitTransaction(const AConnectionName: String);
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).Commit;
 end;
 
-class function TioStrategyDB.Count(const AWhere: IioWhere): Integer;
+class function TioPersistenceStrategyDB.Count(const AWhere: IioWhere): Integer;
 var
   AResolvedTypeList: IioResolvedTypeList;
   AResolvedTypeName: String;
@@ -165,7 +165,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.Delete(const AWhere: IioWhere);
+class procedure TioPersistenceStrategyDB.Delete(const AWhere: IioWhere);
 var
   AResolvedTypeList: IioResolvedTypeList;
   AResolvedTypeName: String;
@@ -210,7 +210,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB._DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
+class procedure TioPersistenceStrategyDB._DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 var
   ADuckTypedList: IioDuckTypedList;
   AObj: TObject;
@@ -250,7 +250,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB._DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
+class procedure TioPersistenceStrategyDB._DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 var
   LContext: IioContext;
 
@@ -311,7 +311,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.DeleteObject_Internal(const AContext: IioContext);
+class procedure TioPersistenceStrategyDB.DeleteObject_Internal(const AContext: IioContext);
 var
   LQuery: IioQuery;
 begin
@@ -344,7 +344,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.InsertObject_Internal(const AContext: IioContext);
+class procedure TioPersistenceStrategyDB.InsertObject_Internal(const AContext: IioContext);
 var
   LQuery: IioQuery;
 begin
@@ -409,13 +409,13 @@ begin
   AContext.ObjStatus := osClean;
 end;
 
-class function TioStrategyDB.InTransaction(const AConnectionName: String): Boolean;
+class function TioPersistenceStrategyDB.InTransaction(const AConnectionName: String): Boolean;
 begin
   inherited;
   Result := TioDBFactory.Connection(AConnectionName).InTransaction;
 end;
 
-class function TioStrategyDB.LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
+class function TioPersistenceStrategyDB.LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
 var
   LContext: IioContext;
   LQuery: IioQuery;
@@ -441,7 +441,7 @@ begin
   end;
 end;
 
-class function TioStrategyDB.LoadObjVersion(const AContext: IioContext): Integer;
+class function TioPersistenceStrategyDB.LoadObjVersion(const AContext: IioContext): Integer;
 begin
   // NB: Ho riflettuto bene sul come ottenere l'ultima ObjVersion (la più alta) assegnata
   // per poi aggiungere 1 e ottenere la prossima e ho idnividuato 3 metodi:
@@ -464,7 +464,7 @@ begin
     Result := LoadObjVersion_FromETM_Internal(AContext);
 end;
 
-class function TioStrategyDB.LoadObjVersion_FromEntity_Internal(const AContext: IioContext): Integer;
+class function TioPersistenceStrategyDB.LoadObjVersion_FromEntity_Internal(const AContext: IioContext): Integer;
 var
   LQuery: IioQuery;
 begin
@@ -481,7 +481,7 @@ begin
   end;
 end;
 
-class function TioStrategyDB.LoadObjVersion_FromETM_Internal(const AContext: IioContext): Integer;
+class function TioPersistenceStrategyDB.LoadObjVersion_FromETM_Internal(const AContext: IioContext): Integer;
 var
   LQuery: IioQuery;
 begin
@@ -499,7 +499,7 @@ begin
   end;
 end;
 
-class function TioStrategyDB.ObjectExists(const AContext: IioContext): Boolean;
+class function TioPersistenceStrategyDB.ObjectExists(const AContext: IioContext): Boolean;
 var
   LQuery: IioQuery;
 begin
@@ -514,7 +514,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB._DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
+class procedure TioPersistenceStrategyDB._DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
       const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
 var
   LDuckTypedList: IioDuckTypedList;
@@ -553,7 +553,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB._DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
+class procedure TioPersistenceStrategyDB._DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
       const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
 var
   LContext: IioContext;
@@ -698,7 +698,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.PreProcessRelationChildOnDelete(const AMasterContext: IioContext);
+class procedure TioPersistenceStrategyDB.PreProcessRelationChildOnDelete(const AMasterContext: IioContext);
 var
   LMasterProp: IioProperty;
 begin
@@ -720,7 +720,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.PostProcessRelationChildOnPersist(const AMasterContext: IioContext);
+class procedure TioPersistenceStrategyDB.PostProcessRelationChildOnPersist(const AMasterContext: IioContext);
 var
   LMasterProp: IioProperty;
 begin
@@ -746,7 +746,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.PreProcessRelationChildOnPersist(const AMasterContext: IioContext);
+class procedure TioPersistenceStrategyDB.PreProcessRelationChildOnPersist(const AMasterContext: IioContext);
 // ar
 // LMasterProp: IioProperty;
 begin
@@ -759,13 +759,13 @@ begin
   // AMasterContext.MasterPropertyPath);
 end;
 
-class procedure TioStrategyDB.RollbackTransaction(const AConnectionName: String);
+class procedure TioPersistenceStrategyDB.RollbackTransaction(const AConnectionName: String);
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).Rollback;
 end;
 
-class procedure TioStrategyDB.SQLDest_Execute(const ASQLDestination: IioSQLDestination);
+class procedure TioPersistenceStrategyDB.SQLDest_Execute(const ASQLDestination: IioSQLDestination);
 var
   LQry: IioQuery;
 begin
@@ -787,7 +787,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet);
+class procedure TioPersistenceStrategyDB.SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet);
 var
   LQry: IioQuery;
 begin
@@ -818,13 +818,13 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.StartTransaction(const AConnectionName: String);
+class procedure TioPersistenceStrategyDB.StartTransaction(const AConnectionName: String);
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).StartTransaction;
 end;
 
-class procedure TioStrategyDB.LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
+class procedure TioPersistenceStrategyDB.LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
@@ -889,7 +889,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB._DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType);
+class procedure TioPersistenceStrategyDB._DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType);
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
@@ -1002,7 +1002,7 @@ begin
   end;
 end;
 
-class function TioStrategyDB._DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
+class function TioPersistenceStrategyDB._DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
@@ -1106,7 +1106,7 @@ begin
   end;
 end;
 
-class procedure TioStrategyDB.UpdateObject_Internal(const AContext: IioContext);
+class procedure TioPersistenceStrategyDB.UpdateObject_Internal(const AContext: IioContext);
 var
   LQuery: IioQuery;
 begin
