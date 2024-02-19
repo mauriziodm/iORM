@@ -144,6 +144,7 @@ type
     class function GetCurrentConnectionNameIfEmpty(const AConnectionDefName: String): String;
     class function GetDatabaseFileName(const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): String;
     class function GetConnectionInfo(AConnectionName: String): TioConnectionInfo;
+    class function IsLocalSynchronizableConnection(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): Boolean;
     class procedure SetShowHideWaitProc(const AShowWaitProc: TProc; const AHideWaitProc: TProc);
     class procedure ShowWaitProc;
     class procedure HideWaitProc;
@@ -344,6 +345,24 @@ begin
     // Return the desired connection type
     if not FConnectionManagerContainer.TryGetValue(AConnectionName, Result) then
       raise EioException.Create(Self.ClassName, 'GetConnectionInfo',
+        Format('Connection named "%s" not found.'#13#13'It could be that It has not been defined or that its registration in the "connection manager" has not yet taken place (sequence problem, you are trying to use the connection before this has registered).',
+        [AConnectionName]));
+  finally
+    _Unlock;
+  end;
+end;
+
+class function TioConnectionManager.IsLocalSynchronizableConnection(AConnectionName: String): Boolean;
+begin
+  _Lock;
+  try
+    // If desired ConnectionName is empty then get then Default one.
+    AConnectionName := GetCurrentConnectionNameIfEmpty(AConnectionName);
+    // Return the desired info or raise an exception if the connection name was not found
+    if FConnectionManagerContainer.ContainsKey(AConnectionName) then
+      Result := FConnectionManagerContainer.Items[AConnectionName].IsLocalSynchronizableConnection
+    else
+      raise EioException.Create(Self.ClassName, 'IsLocalSynchronizableConnection',
         Format('Connection named "%s" not found.'#13#13'It could be that It has not been defined or that its registration in the "connection manager" has not yet taken place (sequence problem, you are trying to use the connection before this has registered).',
         [AConnectionName]));
   finally

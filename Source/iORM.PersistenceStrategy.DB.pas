@@ -349,6 +349,13 @@ var
   LQuery: IioQuery;
 begin
   inherited;
+
+
+
+//  AContext.GetTable.conne
+
+
+
   // Conflict strategy: check if there is a persistence conflict
   if AContext.BlindLevel_Do_DetectConflicts then
     AContext.CheckInsertConflict(AContext);

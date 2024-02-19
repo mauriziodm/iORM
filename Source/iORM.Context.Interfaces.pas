@@ -55,6 +55,7 @@ type
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
     function WhereExist: Boolean;
+    function IsLocalSynchronizableConnection: Boolean;
     // Conflict strategy methods (to avoid circular reference)
     procedure CheckDeleteConflict(const AContext: IioContext);
     procedure CheckInsertConflict(const AContext: IioContext);

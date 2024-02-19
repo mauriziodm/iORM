@@ -134,7 +134,9 @@ type
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
     function WhereExist: Boolean;
+    function IsLocalSynchronizableConnection: Boolean; inline;
     // Conflict strategy methods (to avoid circular reference)
+    // TODO: Eliminare il parametro AContext? Mi sembra che viene sempre richiamato tipo "AContext.Check...Conflict(AContext) quindi...
     procedure CheckDeleteConflict(const AContext: IioContext); inline;
     procedure CheckInsertConflict(const AContext: IioContext); inline;
     procedure CheckUpdateConflict(const AContext: IioContext); inline;
@@ -190,7 +192,7 @@ implementation
 uses
   iORM.Context.Factory, iORM.DB.Factory, System.TypInfo,
   iORM.Context.Container, System.SysUtils, iORM.Exceptions,
-  System.StrUtils, iORM.DB.Interfaces, iORM;
+  System.StrUtils, iORM.DB.Interfaces, iORM, iORM.DB.ConnectionContainer;
 
 { TioContext }
 
@@ -636,6 +638,11 @@ begin
     FObjNextVersion := io.LoadObjVersion(Self) + 1;
   // Return the value
   Result := FObjNextVersion;
+end;
+
+function TioContext.IsLocalSynchronizableConnection: Boolean;
+begin
+  Result := TioConnectionManager.IsLocalSynchronizableConnection(GetTable.GetConnectionDefName);
 end;
 
 function TioContext.IsTrueClass: Boolean;
