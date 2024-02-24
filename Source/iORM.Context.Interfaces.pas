@@ -46,7 +46,6 @@ type
   IioContext = interface
     ['{6B512CDA-23C6-42A3-AC44-905344B019E9}']
     function GetClassRef: TioClassRef;
-    function GetID: Integer;
     function GetProperties: IioProperties;
     function GetTable: IioTable;
     function GetTrueClass: IioTrueClass;
@@ -55,7 +54,6 @@ type
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
     function WhereExist: Boolean;
-    function IsLocalSynchronizableConnection: Boolean;
     // Conflict strategy methods (to avoid circular reference)
     procedure CheckDeleteConflict(const AContext: IioContext);
     procedure CheckInsertConflict(const AContext: IioContext);
@@ -80,6 +78,10 @@ type
     procedure SetDataObject(const AValue: TObject);
     function GetDataObject: TObject;
     property DataObject:TObject read GetDataObject write SetDataObject;
+    // ObjID
+    function GetObjID: Integer;
+    procedure SetObjID(const AValue: Integer);
+    property ObjID: Integer read GetObjID write SetObjID;
     // ObjectStatus
     procedure SetObjStatus(const AValue: TioObjStatus);
     function GetObjStatus: TioObjStatus;

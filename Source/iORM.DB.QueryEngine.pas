@@ -342,7 +342,7 @@ begin
     TioDbFactory.SqlGenerator(LEtmContext.GetTable.GetConnectionDefName).GenerateSqlSelectLastObjVersionFromETM(LQuery, LEtmContext);
   // Where
   LQuery.WhereParamByProp_SetValue(LEtmContext.GetProperties.GetPropertyByName('EntityClassName'), AObjContext.Map.GetClassName);
-  LQuery.WhereParamByProp_SetValue(LEtmContext.GetProperties.GetPropertyByName('EntityID'), AObjContext.GetID);
+  LQuery.WhereParamByProp_SetValue(LEtmContext.GetProperties.GetPropertyByName('EntityID'), AObjContext.ObjID);
 end;
 
 class function TioQueryEngine.GetQueryUpdate(const AContext: IioContext): IioQuery;

@@ -1016,7 +1016,7 @@ begin
       #13#13'Please try to set the BlindLevel to a correct value and try again, it will work.', [LContext.DataObject.ClassName]));
   // Entity related props
   FEntityClassName := LContext.DataObject.ClassName;
-  FEntityID := LContext.GetID;
+  FEntityID := LContext.ObjID;
   FEntityVersion := LContext.ObjVersion;
   FEntityFromVersion := LContext.EntityFromVersion;
   FEntityUpdated := LContext.ObjUpdated;

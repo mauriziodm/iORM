@@ -55,6 +55,11 @@ type
     procedure RequiresUnits(Proc: TGetStrProc); override;
   end;
 
+  TioSynchroStrategySelectionEditor = class(TioSelectionEditor)
+  public
+    procedure RequiresUnits(Proc: TGetStrProc); override;
+  end;
+
   TioMVVMSelectionEditor = class(TioSelectionEditor)
   public
     procedure RequiresUnits(Proc: TGetStrProc); override;
@@ -94,6 +99,14 @@ procedure TioMVVMSelectionEditor.RequiresUnits(Proc: TGetStrProc);
 begin
   inherited;
   Proc('iORM.MVVM.Interfaces');
+end;
+
+{ TioSynchroStrategySelectionEditor }
+
+procedure TioSynchroStrategySelectionEditor.RequiresUnits(Proc: TGetStrProc);
+begin
+  inherited;
+  Proc('iORM.SynchroStrategy.Interfaces');
 end;
 
 end.

@@ -236,7 +236,9 @@ contains
   iORM.ConflictStrategy.SameVersionWin in '..\..\Source\iORM.ConflictStrategy.SameVersionWin.pas',
   iORM.ConflictStrategy.LastUpdateWin in '..\..\Source\iORM.ConflictStrategy.LastUpdateWin.pas',
   iORM.Resolver.ResolvedTypeList in '..\..\Source\iORM.Resolver.ResolvedTypeList.pas',
-  iORM.SynchroStrategy.Interfaces in '..\..\Source\iORM.SynchroStrategy.Interfaces.pas';
+  iORM.SynchroStrategy.Interfaces in '..\..\Source\iORM.SynchroStrategy.Interfaces.pas',
+  iORM.SynchroStrategy.EtmBased in '..\..\Source\iORM.SynchroStrategy.EtmBased.pas',
+  iORM.SynchroStrategy.Custom in '..\..\Source\iORM.SynchroStrategy.Custom.pas';
 
 end.
 

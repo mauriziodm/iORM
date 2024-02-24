@@ -41,7 +41,8 @@ uses
   iORM.CommonTypes,
   iORM.Where, iORM.Context.Table.Interfaces, System.Rtti,
   iORM.Context.Map.Interfaces, iORM.Where.Interfaces,
-  iORM.LiveBindings.BSPersistence, iORM.ConflictStrategy.Interfaces;
+  iORM.LiveBindings.BSPersistence, iORM.ConflictStrategy.Interfaces,
+  iORM.SynchroStrategy.Interfaces;
 
 type
 
@@ -66,6 +67,9 @@ type
     procedure SetDataObject(const AValue: TObject);
     // MasterPropertyPath
     function GetMasterPropertyPath: String;
+    // ObjID
+    function GetObjID: Integer;
+    procedure SetObjID(const AValue: Integer);
     // ObjStatus
     function GetObjStatus: TioObjStatus;
     procedure SetObjStatus(const AValue: TioObjStatus);
@@ -125,7 +129,6 @@ type
     constructor Create(const AIntent: TioPersistenceIntentType; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
       const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte); overload;
     function GetClassRef: TioClassRef;
-    function GetID: Integer;
     function GetProperties: IioProperties;
     function GetTable: IioTable;
     function GetTrueClass: IioTrueClass;
@@ -134,7 +137,8 @@ type
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
     function WhereExist: Boolean;
-    function IsLocalSynchronizableConnection: Boolean; inline;
+    // TODO: Da eliminare
+    function SynchroStrategy_Client: IioSynchroStrategy_Client; inline;
     // Conflict strategy methods (to avoid circular reference)
     // TODO: Eliminare il parametro AContext? Mi sembra che viene sempre richiamato tipo "AContext.Check...Conflict(AContext) quindi...
     procedure CheckDeleteConflict(const AContext: IioContext); inline;
@@ -162,6 +166,7 @@ type
     function GetOrderBySql: String;
     // Properties
     property DataObject: TObject read GetDataObject write SetDataObject;
+    property ObjID: Integer read GetObjID write SetObjID;
     property ObjStatus: TioObjStatus read GetObjStatus write SetObjStatus;
     property ObjVersion: TioObjVersion read GetObjVersion write SetObjVersion;
     property ObjNextVersion: Integer read GetObjNextVersion; // Con tipo TioObjVersion ci sono problemi
@@ -347,7 +352,7 @@ begin
   end;  
 end;
 
-function TioContext.GetID: Integer;
+function TioContext.GetObjID: Integer;
 begin
   if not Assigned(FDataObject) then
     raise EioException.Create(Self.ClassName + '.GetID: DataObject not assigned');
@@ -518,6 +523,14 @@ begin
   GetProperties.ObjCreatedUserNameProperty.SetValue(FDataObject, LPropValue);
 end;
 
+procedure TioContext.SetObjID(const AValue: Integer);
+var
+  LPropValue: TValue;
+begin
+  LPropValue := TValue.From<Integer>(AValue);
+  GetProperties.GetIdProperty.SetValue(FDataObject, LPropValue);
+end;
+
 procedure TioContext.SetObjStatus(const AValue: TioObjStatus);
 var
   LPropValue: TValue;
@@ -625,7 +638,7 @@ end;
 
 function TioContext.IDIsNull: Boolean;
 begin
-  Result := (not Assigned(FDataObject)) or (GetID = IO_INTEGER_NULL_VALUE);
+  Result := (not Assigned(FDataObject)) or (GetObjID = IO_INTEGER_NULL_VALUE);
 end;
 
 function TioContext.GetObjNextVersion: Integer;
@@ -640,9 +653,9 @@ begin
   Result := FObjNextVersion;
 end;
 
-function TioContext.IsLocalSynchronizableConnection: Boolean;
+function TioContext.SynchroStrategy_Client: IioSynchroStrategy_Client;
 begin
-  Result := TioConnectionManager.IsLocalSynchronizableConnection(GetTable.GetConnectionDefName);
+  Result := TioConnectionManager.GetSynchroStrategy_Client(GetTable.GetConnectionDefName);
 end;
 
 function TioContext.IsTrueClass: Boolean;

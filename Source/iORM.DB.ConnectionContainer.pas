@@ -44,7 +44,7 @@ uses
   System.Generics.Collections,
   FireDAC.Comp.Client,
   iORM.DB.Interfaces,
-  iORM.CommonTypes, System.SysUtils;
+  iORM.CommonTypes, System.SysUtils, iORM.SynchroStrategy.Interfaces;
 
 type
 {$IFDEF MSWINDOWS}
@@ -114,7 +114,7 @@ type
     // NB: Questo container in realtà contiene solo il tipo di DB (cdtFirebird, cdtSQLite ecc.ecc.) in modo da poter fare dei confronti veloci nelle factory e per non dipendere direttamente dal DriverID delle connectionDef di FireDAC
     class var FShowWaitProc: TProc;
     class var FHideWaitProc: TProc;
-    class function NewCustomConnectionDef(const AConnectionName: String; const APooled: Boolean; const AAsDefault: Boolean): IIoConnectionDef;
+    class function NewCustomConnectionDef(const AConnectionName: String; const APooled: Boolean; const AAsDefault: Boolean): IIoStanConnectionDef;
     class function CheckConnectionName(AConnectionName: String): String;
     class procedure _Lock;
     class procedure _Unlock;
@@ -123,28 +123,28 @@ type
     class procedure FreeInternalContainer;
   public
     // ---------- Start of connectionDef creation methods ----------
-    class function NewSQLiteConnectionDef(const ADatabase: String; const AAsDefault: Boolean = True; const AIsLocalSynchronizableConnection: Boolean = False; const APersistent: Boolean = False;
-      const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
-    class function NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault: Boolean = True; const AIsLocalSynchronizableConnection: Boolean = False;
-      const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+    class function NewSQLiteConnectionDef(const ADatabase: String; const AAsDefault: Boolean = True; const ASynchroStrategy_Client: IioSynchroStrategy_Client = nil; const APersistent: Boolean = False;
+      const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoStanConnectionDef;
+    class function NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault: Boolean = True; const ASynchroStrategy_Client: IioSynchroStrategy_Client = nil;
+      const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoStanConnectionDef;
 {$IFNDEF ioDelphiProfessional}
-    class function NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword: String; const AAsDefault: Boolean = True; const AIsLocalSynchronizableConnection: Boolean = False;
-      const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+    class function NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword: String; const AAsDefault: Boolean = True; const ASynchroStrategy_Client: IioSynchroStrategy_Client = nil;
+      const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoStanConnectionDef;
 {$ENDIF}
-    class function NewMySQLConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault: Boolean = True; const AIsLocalSynchronizableConnection: Boolean = False;
-      const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
-    class procedure NewHttpConnection(const ABaseURL: String; const AAsDefault: Boolean = True; const APersistent: Boolean = True;
+    class function NewMySQLConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault: Boolean = True; const ASynchroStrategy_Client: IioSynchroStrategy_Client = nil;
+      const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoStanConnectionDef;
+    class procedure NewHttpConnection(const ABaseURL: String; const AAsDefault: Boolean = True; const ASynchroStrategy_Client: IioSynchroStrategy_Client = nil; const APersistent: Boolean = True;
       const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME);
     // ---------- END of connectionDef creation methods ----------
-    class function GetCurrentConnectionDef: IIoConnectionDef;
-    class function GetConnectionDefByName(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+    class function GetCurrentConnectionDef: IIoStanConnectionDef;
+    class function GetConnectionDefByName(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoStanConnectionDef;
     class function IsEmptyConnectionName(const AConnectionName: String): Boolean;
     class function GetCurrentConnectionInfo: IioCurrentConnectionInfo;
     class function GetCurrentConnectionName: String;
     class function GetCurrentConnectionNameIfEmpty(const AConnectionDefName: String): String;
     class function GetDatabaseFileName(const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): String;
     class function GetConnectionInfo(AConnectionName: String): TioConnectionInfo;
-    class function IsLocalSynchronizableConnection(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): Boolean;
+    class function GetSynchroStrategy_Client(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IioSynchroStrategy_Client;
     class procedure SetShowHideWaitProc(const AShowWaitProc: TProc; const AHideWaitProc: TProc);
     class procedure ShowWaitProc;
     class procedure HideWaitProc;
@@ -319,7 +319,7 @@ begin
   FPerThreadCurrentConnectionName.Free;
 end;
 
-class function TioConnectionManager.GetConnectionDefByName(AConnectionName: String): IIoConnectionDef;
+class function TioConnectionManager.GetConnectionDefByName(AConnectionName: String): IIoStanConnectionDef;
 begin
   _Lock;
   try
@@ -352,7 +352,7 @@ begin
   end;
 end;
 
-class function TioConnectionManager.IsLocalSynchronizableConnection(AConnectionName: String): Boolean;
+class function TioConnectionManager.GetSynchroStrategy_Client(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IioSynchroStrategy_Client;
 begin
   _Lock;
   try
@@ -360,9 +360,9 @@ begin
     AConnectionName := GetCurrentConnectionNameIfEmpty(AConnectionName);
     // Return the desired info or raise an exception if the connection name was not found
     if FConnectionManagerContainer.ContainsKey(AConnectionName) then
-      Result := FConnectionManagerContainer.Items[AConnectionName].IsLocalSynchronizableConnection
+      Result := FConnectionManagerContainer.Items[AConnectionName].SynchroStrategy
     else
-      raise EioException.Create(Self.ClassName, 'IsLocalSynchronizableConnection',
+      raise EioException.Create(Self.ClassName, 'GetSynchroStrategy_Client',
         Format('Connection named "%s" not found.'#13#13'It could be that It has not been defined or that its registration in the "connection manager" has not yet taken place (sequence problem, you are trying to use the connection before this has registered).',
         [AConnectionName]));
   finally
@@ -380,7 +380,7 @@ begin
   end;
 end;
 
-class function TioConnectionManager.GetCurrentConnectionDef: IIoConnectionDef;
+class function TioConnectionManager.GetCurrentConnectionDef: IIoStanConnectionDef;
 begin
   _Lock;
   try
@@ -512,7 +512,7 @@ begin
 end;
 {$ENDIF}
 
-class function TioConnectionManager.NewCustomConnectionDef(const AConnectionName: String; const APooled: Boolean; const AAsDefault: Boolean): IIoConnectionDef;
+class function TioConnectionManager.NewCustomConnectionDef(const AConnectionName: String; const APooled: Boolean; const AAsDefault: Boolean): IIoStanConnectionDef;
 begin
   // Create the ConnectionDef object and set his name
   // NB: The name of the connectionDef should never be changed after
@@ -527,8 +527,8 @@ begin
     FCurrentConnectionInfo.CurrentConnectionName := AConnectionName;
 end;
 
-class function TioConnectionManager.NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault: Boolean = True; const AIsLocalSynchronizableConnection: Boolean = False;
-      const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+class function TioConnectionManager.NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault: Boolean = True; const ASynchroStrategy_Client: IioSynchroStrategy_Client = nil;
+      const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoStanConnectionDef;
 begin
   _Lock;
   try
@@ -542,14 +542,14 @@ begin
     if ACharSet <> '' then
       Result.Params.Values['CharacterSet'] := ACharSet;
     // Add the connection type to the internal container
-    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, ctFirebird, APersistent, kgtBeforeInsert, AIsLocalSynchronizableConnection));
+    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, ctFirebird, APersistent, kgtBeforeInsert, ASynchroStrategy_Client));
   finally
     _Unlock
   end;
 end;
 
-class function TioConnectionManager.NewMySQLConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault: Boolean = True; const AIsLocalSynchronizableConnection: Boolean = False;
-      const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+class function TioConnectionManager.NewMySQLConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault: Boolean = True; const ASynchroStrategy_Client: IioSynchroStrategy_Client = nil;
+      const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoStanConnectionDef;
 begin
   _Lock;
   try
@@ -562,14 +562,14 @@ begin
     if ACharSet <> '' then
       Result.Params.Values['CharacterSet'] := ACharSet;
     // Add the connection type to the internal container
-    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, ctMySQL, APersistent, kgtUndefined, AIsLocalSynchronizableConnection));
+    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, ctMySQL, APersistent, kgtUndefined, ASynchroStrategy_Client));
   finally
     _Unlock;
   end;
 end;
 
-class procedure TioConnectionManager.NewHttpConnection(const ABaseURL: String; const AAsDefault: Boolean = True; const APersistent: Boolean = True;
-  const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME);
+class procedure TioConnectionManager.NewHttpConnection(const ABaseURL: String; const AAsDefault: Boolean = True; const ASynchroStrategy_Client: IioSynchroStrategy_Client = nil; const APersistent: Boolean = True;
+      const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME);
 var
   LConnectionInfo: TioConnectionInfo;
 begin
@@ -580,7 +580,7 @@ begin
     if AAsDefault or (FCurrentConnectionInfo.CurrentConnectionName = '') then
       FCurrentConnectionInfo.CurrentConnectionName := AConnectionName;
     // Setup the connection info
-    LConnectionInfo := TioConnectionInfo.Create(AConnectionName, ctHTTP, APersistent, kgtUndefined, False);
+    LConnectionInfo := TioConnectionInfo.Create(AConnectionName, ctHTTP, APersistent, kgtUndefined, ASynchroStrategy_Client);
     LConnectionInfo.BaseURL := ABaseURL;
     // Add the connection type to the internal container
     FConnectionManagerContainer.AddOrSetValue(AConnectionName, LConnectionInfo);
@@ -589,8 +589,8 @@ begin
   end;
 end;
 
-class function TioConnectionManager.NewSQLiteConnectionDef(const ADatabase: String; const AAsDefault: Boolean = True; const AIsLocalSynchronizableConnection: Boolean = False; const APersistent: Boolean = False;
-      const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+class function TioConnectionManager.NewSQLiteConnectionDef(const ADatabase: String; const AAsDefault: Boolean = True; const ASynchroStrategy_Client: IioSynchroStrategy_Client = nil; const APersistent: Boolean = False;
+      const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoStanConnectionDef;
 begin
   _Lock;
   try
@@ -599,7 +599,7 @@ begin
     Result.Params.Database := ADatabase;
     Result.Params.Values['FailIfMissing'] := 'False';
     // Add the connection type to the internal container
-    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, ctSQLite, APersistent, kgtAfterInsert, AIsLocalSynchronizableConnection));
+    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, ctSQLite, APersistent, kgtAfterInsert, ASynchroStrategy_Client));
   finally
     _Unlock;
   end;
@@ -607,8 +607,8 @@ end;
 
 {$IFNDEF ioDelphiProfessional}
 
-class function TioConnectionManager.NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword: String; const AAsDefault: Boolean = True; const AIsLocalSynchronizableConnection: Boolean = False;
-      const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoConnectionDef;
+class function TioConnectionManager.NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword: String; const AAsDefault: Boolean = True; const ASynchroStrategy_Client: IioSynchroStrategy_Client = nil;
+      const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoStanConnectionDef;
 begin
   _Lock;
   try
@@ -619,7 +619,7 @@ begin
     Result.Params.UserName := AUserName;
     Result.Params.Password := APassword;
     // Add the connection type to the internal container
-    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, ctSQLServer, APersistent, kgtAfterInsert, AIsLocalSynchronizableConnection));
+    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, ctSQLServer, APersistent, kgtAfterInsert, ASynchroStrategy_Client));
   finally
     _Unlock;
   end;

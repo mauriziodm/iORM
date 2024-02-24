@@ -35,33 +35,32 @@ unit iORM.SynchroStrategy.Interfaces;
 
 interface
 
+uses
+  iORM.Context.Interfaces, System.Classes;
+
 type
 
-//  TioCustomSynchroLogItem
-
-  // Base class for all synchro strategies
-  TioCustomSynchroStrategy = class abstract
-  public
-    // This method return a name for this synchro strategy, by default it returns the type name of the class itself but you can override it
-    //  and return a more readable name. It is used for logging purposes or similar.
-    class function Name: String; virtual;
-    // Synchro strategy methods to be override on descendant classes
-    function Step1_Client_LoadEntitiesToSend: String; virtual; abstract;
-    procedure Step2_Server_PersistReceivedEntities(const AReceived: String); virtual; abstract;
-    function Step3_Server_LoadEntitiesToSendBack: String; virtual; abstract;
-    procedure Step4_Client_PersistReceivedBackEntities(const AReceived: String); virtual; abstract;
+  IioSynchroStrategy_Client = interface
+    ['{2295C6BF-1A5B-475B-BBC5-CF1A1C90B5B4}']
+    function GenerateLocalID(const AContext: IioContext): Integer;
+    procedure FreeNotification(AComponent: TComponent);
+    procedure RemoveFreeNotification(AComponent: TComponent);
   end;
 
-  // Class reference for synchro strategies
-  TioCustomSynchroStrategyRef = class of TioCustomSynchroStrategy;
+  IioSynchroStrategy_Server = interface
+    ['{6FD4DECC-1989-4838-8368-78F0F3C95427}']
+    function GetPayload: String;
+    procedure LoadPayload;
+    procedure PersistPayload;
+  end;
+
+  IioSynchroStrategy_TargetConnectionDef = interface
+    ['{7CCD8D05-60F3-4AAF-AEA8-91DCA5E80D5B}']
+    function DoSynchronization(const APayload: String): String;
+    procedure FreeNotification(AComponent: TComponent);
+    procedure RemoveFreeNotification(AComponent: TComponent);
+  end;
 
 implementation
-
-{ TioCustomSynchroStrategy }
-
-class function TioCustomSynchroStrategy.Name: String;
-begin
-  Result := Self.Name;
-end;
 
 end.

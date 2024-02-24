@@ -46,7 +46,8 @@ uses
   Data.DB, FireDAC.Stan.Intf, iORM.CommonTypes,
   System.JSON, iORM.Where.Interfaces,
   FireDAC.Comp.DataSet, iORM.LiveBindings.BSPersistence,
-  iORM.Where.SqlItems.Interfaces, iORM.Context.Map.Interfaces;
+  iORM.Where.SqlItems.Interfaces, iORM.Context.Map.Interfaces,
+  iORM.SynchroStrategy.Interfaces;
 
 const
   OBJVERSION_NULL = 0;
@@ -89,9 +90,9 @@ type
     Persistent: Boolean;
     Strategy: TioPersistenceStrategyRef;
     UserName: String;
-    IsLocalSynchronizableConnection: Boolean;
+    SynchroStrategy: IioSynchroStrategy_Client;
     constructor Create(const AConnectionName: String; const AConnectionType: TioConnectionType; const APersistent: Boolean;
-      const AKeyGenerationTime: TioKeyGenerationTime; const AIsLocalSynchronizableConnection: Boolean);
+      const AKeyGenerationTime: TioKeyGenerationTime; const ASynchroStrategy: IioSynchroStrategy_Client);
   end;
 
   TioCompareOperatorRef = class of TioCompareOperator;
@@ -104,7 +105,7 @@ type
   // -Interfaccia per oggetti contenenti i parametri di una connessione da inserire
   // nel connection manager
   // In pratica utilizzo l'interfaccia "IFDStanConnectionDef" fornita da FireDAC
-  IIoConnectionDef = IFDStanConnectionDef;
+  IIoStanConnectionDef = IFDStanConnectionDef;
 
   // Forward declaration
   IioQuery = interface;
@@ -653,13 +654,13 @@ end;
 { TioConnectionInfo }
 
 constructor TioConnectionInfo.Create(const AConnectionName: String; const AConnectionType: TioConnectionType; const APersistent: Boolean;
-      const AKeyGenerationTime: TioKeyGenerationTime; const AIsLocalSynchronizableConnection: Boolean);
+      const AKeyGenerationTime: TioKeyGenerationTime; const ASynchroStrategy: IioSynchroStrategy_Client);
 begin
   ConnectionName := AConnectionName;
   ConnectionType := AConnectionType;
   KeyGenerationTime := AKeyGenerationTime;
   Persistent := APersistent;
-  IsLocalSynchronizableConnection := AIsLocalSynchronizableConnection;
+  SynchroStrategy := ASynchroStrategy;
   Strategy := TioPersistenceStrategyFactory.ConnectionTypeToStrategy(AConnectionType);
 end;
 

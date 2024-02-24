@@ -48,7 +48,7 @@ uses
   iORM.LiveBindings.PrototypeBindSource.Detail, DesignIntf, iORM.MVVM.ModelPresenter.Master, iORM.MVVM.ModelPresenter.Detail, iORM.MVVM.ModelDataSet,
   iORM.MVVM.ModelBindSource, iORM.MVVM.ViewModelBridge, iORM.MVVM.ViewContextProvider, System.Actions, iORM.StdActions.VCL, iORM.StdActions.FMX,
   iORM.DT.ViewModel.Wizard, iORM.MVVM.ViewModel, DesignEditors, iORM.StdActions.CloseQueryRepeater, iORM.Abstraction.uniGUI,
-  iORM.DT.CompAutoUses, iORM.MVVM.VMAction, iORM.DT.Editors.VMAction;
+  iORM.DT.CompAutoUses, iORM.MVVM.VMAction, iORM.DT.Editors.VMAction, iORM.SynchroStrategy.EtmBased;
 
 
 
@@ -72,6 +72,10 @@ begin
   RegisterSelectionEditor(TioSQLServerConnectionDef, TioConnectionDefSelectionEditor);
 {$ENDIF}
   RegisterComponents('iORM - Connections', [TioSQLMonitor]);
+
+  // Synchronization strategies
+  RegisterComponents('iORM - Synchronization strategies', [TioEtmBasedSynchroStrategy]);
+  RegisterSelectionEditor(TioEtmBasedSynchroStrategy, TioSynchroStrategySelectionEditor);
 
   // DataSet components
   RegisterComponents('iORM - DataSet', [TioMemTable]);

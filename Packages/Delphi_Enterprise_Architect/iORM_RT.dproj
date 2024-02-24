@@ -389,6 +389,8 @@
         <DCCReference Include="..\..\Source\iORM.ConflictStrategy.LastUpdateWin.pas"/>
         <DCCReference Include="..\..\Source\iORM.Resolver.ResolvedTypeList.pas"/>
         <DCCReference Include="..\..\Source\iORM.SynchroStrategy.Interfaces.pas"/>
+        <DCCReference Include="..\..\Source\iORM.SynchroStrategy.EtmBased.pas"/>
+        <DCCReference Include="..\..\Source\iORM.SynchroStrategy.Custom.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

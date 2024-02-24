@@ -89,7 +89,8 @@ uses
   iORM.DuckTyped.Factory, iORM.Resolver.Interfaces, iORM.ObjectsForge.Factory,
   iORM.LazyLoad.Factory, iORM.Resolver.Factory, iORM.Where.Factory,
   iORM.Exceptions, iORM, System.SysUtils, System.Generics.Collections,
-  iORM.Interceptor.CRUD, iORM.Interceptor.CRUD.Register, iORM.Utilities;
+  iORM.Interceptor.CRUD, iORM.Interceptor.CRUD.Register, iORM.Utilities,
+  iORM.SynchroStrategy.Interfaces;
 
 type
 
@@ -347,15 +348,11 @@ end;
 class procedure TioPersistenceStrategyDB.InsertObject_Internal(const AContext: IioContext);
 var
   LQuery: IioQuery;
+  LSynchroStrategy_Client: IioSynchroStrategy_Client;
 begin
   inherited;
-
-
-
-//  AContext.GetTable.conne
-
-
-
+  // -----------------------------------------------------------
+  // Detection and resolution of any conflicts (if not disabled by BlindLevel).
   // Conflict strategy: check if there is a persistence conflict
   if AContext.BlindLevel_Do_DetectConflicts then
     AContext.CheckInsertConflict(AContext);
@@ -367,16 +364,25 @@ begin
       Exit;
   end;
   // -----------------------------------------------------------
+  // If a SynchroStrategy is assigned and active (local remote and not connected device) and the object ID
+  //  is not assigned then it asks the SynchroStrategy for a temporary local ID.
+  // Note: Obviously if a new ID is assigned by SynchroStrategy this will disable normal ID generation (if generated ID is not NULL)
+  LSynchroStrategy_Client := TioConnectionManager.GetSynchroStrategy_Client(AContext.GetTable.GetConnectionDefName);
+  if (LSynchroStrategy_Client <> nil) and AContext.IDIsNull then
+    AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, LSynchroStrategy_Client.GenerateLocalID(AContext));
+  // -----------------------------------------------------------
   // Get and execute a query to retrieve the next ID for the inserting object
-  // before the insert query (for Firebird/Interbase)
+  //  before the insert query (for Firebird/Interbase)
+  // Note: If KeyGenerationTime = kgtBeforeInsert and the ID is not assigned then I always request
+  //        a new ID even if the BlindLevel is set to disable the assignment to the object,
+  //        this is because the ID MUST be assigned (always if it is null)
+  //        otherwise the object would persist on the DB with ID zero.
   if (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtBeforeInsert)
-  and (AContext.BlindLevel_Do_AutoUpdateProps or AContext.GetProperties.ContainsHasManyOrHasOneProperties)
   and AContext.IDIsNull then
   begin
     LQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
     try
       LQuery.Open;
-      // Set the NextID as the ObjectID
       AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, LQuery.Fields[0].AsInteger);
     finally
       LQuery.Close;
@@ -398,7 +404,10 @@ begin
   end;
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the last ID generated
-  // in the last insert query.
+  //  in the last insert query.
+  // Note: If KeyGenerationTime = kgtAfterInsert and the ID is not assigned then it requests a new ID
+  //        only if the BlindLevel enables reloading of the assigned ID or if the object contains at least
+  //        one property with a HasMany or HasOne relation.
   if (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtAfterInsert)
   and (AContext.BlindLevel_Do_AutoUpdateProps or AContext.GetProperties.ContainsHasManyOrHasOneProperties)
   and AContext.IDIsNull then
@@ -406,7 +415,6 @@ begin
     LQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
     try
       LQuery.Open;
-      // Set the NextID as the ObjectID
       AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, LQuery.Fields[0].AsInteger);
     finally
       LQuery.Close;

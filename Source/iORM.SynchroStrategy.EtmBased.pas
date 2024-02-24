@@ -31,71 +31,22 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.DB.ConnectionDef.MSSQLServer;
+unit iORM.SynchroStrategy.EtmBased;
 
 interface
 
 uses
-  FireDAC.Phys.MSSQL,  // For compatibility with FireDAC without need to put then Phys driver in the project
-  iORM.DB.ConnectionDef, System.SysUtils, iORM.DBBuilder.Interfaces;
+  iORM.SynchroStrategy.Custom, iORM.Context.Interfaces;
 
 type
 
-  // Class for MSSQLServer connection
-  TioSQLServerConnectionDef = class(TioCustomConnectionDef)
+  TioEtmBasedSynchroStrategy = class(TioCustomSynchroStrategy_Client)
+  private
+  protected
   public
-    procedure RegisterConnectionDef; override;
-    function DBBuilder: IioDBBuilderEngine; override;
-    // Properties
-    property ConnectionDef;
   published
-    // Properties
-    property AsDefault;
-    property AutoCreateDB;
-    property Database;
-    property DatabaseStdFolder;
-    property Encrypt;
-    property OSAuthent;
-    property Password;
-    property Persistent;
-    property Pooled;
-    property Server;
-    property UserName;
-    property SynchroStrategy_Client;
-    // Events
-    property OnAfterCreateOrAlterDB;
-    property OnBeforeCreateOrAlterDB;
   end;
 
 implementation
-
-uses
-  iORM.DB.ConnectionContainer;
-
-{ TioSQLServerConnectionDef }
-
-function TioSQLServerConnectionDef.DBBuilder: IioDBBuilderEngine;
-begin
-  inherited;
-  // Only to elevate the method visibility
-end;
-
-procedure TioSQLServerConnectionDef.RegisterConnectionDef;
-begin
-  inherited;
-  ConnectionDef := TioConnectionManager.NewSQLServerConnectionDef(Server,
-    GetFullPathDatabase, UserName, Password, AsDefault, SynchroStrategy_Client,
-    Persistent, Pooled, Name);
-  // Encript
-  if not Encrypt.IsEmpty then
-    ConnectionDef.Params.Values['Encrypt'] := Encrypt;
-  // OSAuthent
-  case OSAuthent of
-    TioOSAuthent.oaNo:  ConnectionDef.Params.Values['OSAuthent'] := 'No';
-    TioOSAuthent.oaYes: ConnectionDef.Params.Values['OSAuthent'] := 'Yes';
-  end;
-  // NB: Inherited must be the last line (set FIsRegistered)
-  inherited;
-end;
 
 end.
