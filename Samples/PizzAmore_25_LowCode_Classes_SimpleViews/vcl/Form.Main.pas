@@ -25,7 +25,6 @@ type
     acShowCustomers: TioBSShowOrSelect;
     acShowPizzas: TioBSShowOrSelect;
     acShowOrders: TioBSShowOrSelect;
-    ioEtmBasedSynchroStrategy1: TioEtmBasedSynchroStrategy;
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings);
   private

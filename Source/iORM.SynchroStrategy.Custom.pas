@@ -75,6 +75,30 @@ type
     property Payload: String read GetPayload;
   end;
 
+  TioCustomSynchroStrategy_LogItem = class(TInterfacedObject, IioSynchroStrategy_LogItem)
+  private
+    FID: Integer;
+    FDateAndTime_Start: TDateTime;
+    FDateAndTime_End: TDateTime;
+    FDateAndTime_ElapsedSec: Integer;
+    FUserID: Integer;
+    FUserName: String;
+    function GetID: Integer;
+    function GetDateAndTime_Start: TDateTime;
+    function GetDateAndTime_End: TDateTime;
+    function GetDateAndTime_ElapsedSec: Integer;
+    function GetUserID: Integer;
+    function GetUserName: String;
+  public
+    property ID: Integer read GetID;
+    property DateAndTime_Start: TDateTime read GetDateAndTime_Start;
+    property DateAndTime_End: TDateTime read GetDateAndTime_End;
+    property DateAndTime_ElapsedSec: Integer read GetDateAndTime_ElapsedSec;
+    property UserID: Integer read GetUserID;
+    property UserName: String read GetUserName;
+  end;
+
+
 implementation
 
 { TioCustomSynchroStrategy }
@@ -134,6 +158,38 @@ begin
 end;
 
 procedure TioCustomSynchroStrategy_Server.PersistPayload;
+begin
+  // TODO: To be implemented
+end;
+
+{ TioSynchroStrategy_LogItem }
+
+function TioCustomSynchroStrategy_LogItem.GetDateAndTime_ElapsedSec: Integer;
+begin
+  // TODO: To be implemented
+end;
+
+function TioCustomSynchroStrategy_LogItem.GetDateAndTime_End: TDateTime;
+begin
+  // TODO: To be implemented
+end;
+
+function TioCustomSynchroStrategy_LogItem.GetDateAndTime_Start: TDateTime;
+begin
+  // TODO: To be implemented
+end;
+
+function TioCustomSynchroStrategy_LogItem.GetID: Integer;
+begin
+  // TODO: To be implemented
+end;
+
+function TioCustomSynchroStrategy_LogItem.GetUserID: Integer;
+begin
+  // TODO: To be implemented
+end;
+
+function TioCustomSynchroStrategy_LogItem.GetUserName: String;
 begin
   // TODO: To be implemented
 end;

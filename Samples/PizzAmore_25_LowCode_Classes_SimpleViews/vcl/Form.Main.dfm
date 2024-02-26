@@ -8622,8 +8622,8 @@ object MainForm: TMainForm
       VVMTypeAlias = 'LIST'
     end
   end
-  object ioEtmBasedSynchroStrategy1: TioEtmBasedSynchroStrategy
-    Left = 136
-    Top = 160
+  object ioEtmBasedSynchroStrategy_Client1: TioEtmBasedSynchroStrategy_Client
+    Left = 144
+    Top = 176
   end
 end

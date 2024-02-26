@@ -61,6 +61,28 @@ type
     procedure RemoveFreeNotification(AComponent: TComponent);
   end;
 
+  IioSynchroStrategy_LogItem = interface
+    ['{34A39FEB-FAF8-4B71-9F1F-0D03BF3CE0E7}']
+    // ID
+    function GetID: Integer;
+    property ID: Integer read GetID;
+    // DateAndTime_Start
+    function GetDateAndTime_Start: TDateTime;
+    property DateAndTime_Start: TDateTime read GetDateAndTime_Start;
+    // DateAndTime_End
+    function GetDateAndTime_End: TDateTime;
+    property DateAndTime_End: TDateTime read GetDateAndTime_End;
+    // DateAndTime_ElapsedSec
+    function GetDateAndTime_ElapsedSec: Integer;
+    property DateAndTime_ElapsedSec: Integer read GetDateAndTime_ElapsedSec;
+    // UserID
+    function GetUserID: Integer;
+    property UserID: Integer read GetUserID;
+    // UserName
+    function GetUserName: String;
+    property UserName: String read GetUserName;
+  end;
+
 implementation
 
 end.
