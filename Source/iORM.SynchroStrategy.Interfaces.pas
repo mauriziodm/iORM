@@ -36,9 +36,15 @@ unit iORM.SynchroStrategy.Interfaces;
 interface
 
 uses
-  iORM.Context.Interfaces, System.Classes;
+  iORM.Context.Interfaces, System.Classes, System.Generics.Collections;
 
 type
+
+  TioSynchroLevel = (slUndefined, slFull, slIncremental);
+
+  TioSynchroStatus = (ssInitialization, ssLoadFromClient, ssPersistToServer, ssReloadFromServer, ssPersistToClient, ssCompleted);
+
+  TioSynchroStrategy_ClassList = TList<String>;
 
   IioSynchroStrategy_Client = interface
     ['{2295C6BF-1A5B-475B-BBC5-CF1A1C90B5B4}']

@@ -296,7 +296,7 @@ begin
     Result := IO_CONNECTIONDEF_DEFAULTNAME
   else
     Result := AConnectionName;
-  // Check and get the ConnectionIfo instance relative to the ConnectionName
+  // Check and get the ConnectionInfo instance relative to the ConnectionName
   if FConnectionManagerContainer.ContainsKey(Result) then
     LConnectionInfo := FConnectionManagerContainer.Items[Result]
   else

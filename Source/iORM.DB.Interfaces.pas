@@ -47,7 +47,7 @@ uses
   System.JSON, iORM.Where.Interfaces,
   FireDAC.Comp.DataSet, iORM.LiveBindings.BSPersistence,
   iORM.Where.SqlItems.Interfaces, iORM.Context.Map.Interfaces,
-  iORM.SynchroStrategy.Interfaces;
+  iORM.SynchroStrategy.Interfaces, iORM.SynchroStrategy.Custom;
 
 const
   OBJVERSION_NULL = 0;
@@ -396,6 +396,8 @@ type
     class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; virtual; abstract;
     class function LoadObjVersion(const AContext: IioContext): Integer; virtual; abstract;
     class function Count(const AWhere: IioWhere): Integer; virtual; abstract;
+    // SynchroStrategy
+    class function DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload): TioCustomSynchroStrategy_Payload; virtual; abstract;
     // SQLDestinations
     class procedure SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); virtual; abstract;
     class procedure SQLDest_Execute(const ASQLDestination: IioSQLDestination); virtual; abstract;

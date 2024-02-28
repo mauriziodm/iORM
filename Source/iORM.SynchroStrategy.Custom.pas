@@ -36,32 +36,132 @@ unit iORM.SynchroStrategy.Custom;
 interface
 
 uses
-  System.Classes, iORM.Context.Interfaces, iORM.SynchroStrategy.Interfaces;
+  System.Classes, iORM.Context.Interfaces, iORM.SynchroStrategy.Interfaces, iORM.Attributes, DJSON.Attributes;
 
 type
 
-  TioCustomSynchroStrategy_Client = class abstract(TComponent, IioSynchroStrategy_Client)
+  [ioEntity('SYNCHRO_LOG')]
+  TioCustomSynchroStrategy_LogItem = class
   strict private
+    FID: Integer;
+    FSynchroLevel: TioSynchroLevel;
+    FSynchroName: String;
+    FSynchroStatus: TioSynchroStatus;
+    FUserID: Integer;
+    FUserName: String;
+    // Timing
+    FStart: TDateTime;
+    FLoadFromClient: TDateTime;
+    FPersistToServer: TDateTime;
+    FReloadFromServer: TDateTime;
+    FPersistToClient: TDateTime;
+    FCompleted: TDateTime;
+  public
+    constructor Create; virtual;
+    property ID: Integer read FID write FID;
+    property SynchroLevel: TioSynchroLevel read FSynchroLevel write FSynchroLevel;
+    property SynchroName: String read FSynchroName write FSynchroName;
+    property SynchroStatus: TioSynchroStatus read FSynchroStatus write FSynchroStatus;
+    property UserID: Integer read FUserID write FUserID;
+    property UserName: String read FUserName write FUserName;
+    // Timing
+    property Start: TDateTime read FStart write FStart;
+    property LoadFromClient: TDateTime read FLoadFromClient write FLoadFromClient;
+    property PersistToServer: TDateTime read FPersistToServer write FPersistToServer;
+    property ReloadFromServer: TDateTime read FReloadFromServer write FReloadFromServer;
+    property PersistToClient: TDateTime read FPersistToClient write FPersistToClient;
+    property Completed: TDateTime read FCompleted write FCompleted;
+  end;
+
+  TioCustomSynchroStrategy_Payload = class abstract
+  strict private
+    FClassBlackList: TioSynchroStrategy_ClassList; // TList because it will be serialized by djson
+    FClassWhiteList: TioSynchroStrategy_ClassList; // TList because it will be serialized by djson
+    FSynchroLevel: TioSynchroLevel;
+    FSynchroLogItem_Last: TioCustomSynchroStrategy_LogItem;
+    FSynchroLogItem_New: TioCustomSynchroStrategy_LogItem;
+    FSynchroName: String;
+    FUserID: Integer;
+    FUserName: String;
+    [djSkip] // Non viene serializzato (in caso di connessione HTTP) in questo modo poi capisco se siamo remotizzati e quindi se devo fare lo "use" o no.
+    FTargetConnectionDefName: String;
+  strict protected
+    // ---------- Methods to override on descendant classes ----------
+    // Connection
+    procedure _SwitchToTargetConnection; virtual;
+    procedure _ReturnToLocalConnection; virtual;
+    // SynchroLogItem
+    procedure _DoLastSynchroLogItem_LoadFromClient; virtual;
+    procedure _DoNewSynchroLogItem_Create; virtual;
+    procedure _DoNewSynchroLogItem_Initialize; virtual;
+    procedure _DoNewSynchroLogItem_SetStatus_LoadFromClient; virtual;
+    procedure _DoNewSynchroLogItem_SetStatus_PersistToServer; virtual;
+    procedure _DoNewSynchroLogItem_SetStatus_ReloadFromServer; virtual;
+    procedure _DoNewSynchroLogItem_SetStatus_PersistToClient; virtual;
+    procedure _DoNewSynchroLogItem_SetStatus_Completed; virtual;
+    procedure _DoNewSynchroLogItem_Persist; virtual;
+    // Payload
+    procedure _DoLoadPayloadFromClient; virtual; abstract;
+    procedure _DoPersistPayloadToServer; virtual; abstract;
+    procedure _DoReloadPayloadFromServer; virtual; abstract;
+    procedure _DoPersistPayloadToClient; virtual; abstract;
+    // ---------- Methods to override on descendant classes ----------
+  public
+    constructor Create; virtual;
+    destructor Destroy; override;
+    // ---------- Methods to be called by the persistence strategy ----------
+    procedure Initialize;
+    procedure LoadFromClient;
+    procedure PersistAndReloadFromServer;
+    procedure PersistToClient;
+    procedure Finalize;
+    // ---------- Methods to be called by the persistence strategy ----------
+    property ClassBlackList: TioSynchroStrategy_ClassList read FClassBlackList; // TList because it will be serialized by djson
+    property ClassWhiteList: TioSynchroStrategy_ClassList read FClassWhiteList; // TList because it will be serialized by djson
+    property SynchroLevel: TioSynchroLevel read FSynchroLevel write FSynchroLevel;
+    property SynchroName: String read FSynchroName write FSynchroName;
+    property UserID: Integer read FUserID write FUserID;
+    property UserName: String read FUserName write FUserName;
+  end;
+
+
+
+
+
+
+
+
+
+  TioCustomSynchroStrategy_Client<TPayload: TioCustomSynchroStrategy_Payload, constructor> = class abstract(TComponent)//, IioSynchroStrategy_Client)
+  strict private
+    FClassBlackList: TioSynchroStrategy_ClassList; // TList because it will be serialized by djson
+    FClassWhiteList: TioSynchroStrategy_ClassList; // TList because it will be serialized by djson
     FTargetConnectionDef: IioSynchroStrategy_TargetConnectionDef;
     procedure SetTargetConnectionDef(const ATargetConnectionDef: IioSynchroStrategy_TargetConnectionDef);
   strict protected
     // ---------- Synchro strategy methods to override on descendant classes ----------
     function _DoGenerateLocalID(const AContext: IioContext): Integer; virtual; abstract;
-    function _DoLoadPayload: String; virtual; abstract;
-    procedure _DoPersistPayload(const AReceived: String); virtual; abstract;
     // ---------- Synchro strategy methods to override on descendant classes ----------
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure DoSynchronization(const ASynchroLevel: TioSynchroLevel);
     function GenerateLocalID(const AContext: IioContext): Integer;
-    procedure DoSynchronization;
   published
     property TargetConnectionDef: IioSynchroStrategy_TargetConnectionDef read FTargetConnectionDef write FTargetConnectionDef default nil;
+    property ClassBlackList: TioSynchroStrategy_ClassList read FClassBlackList; // TList because it will be serialized by djson
+    property ClassWhiteList: TioSynchroStrategy_ClassList read FClassWhiteList; // TList because it will be serialized by djson
   end;
 
-  TioCustomSynchroStrategy_Server = class abstract(TInterfacedObject, IioSynchroStrategy_Server)
+
+
+
+
+
+
+  TioCustomSynchroStrategy_Server = class abstract(TComponent)//, IioSynchroStrategy_Server)
   strict private
-    FPayload: String;
+    FPayload: TioCustomSynchroStrategy_Payload;
     function GetPayload: String;
   strict protected
     // ---------- Synchro strategy methods to override on descendant classes ----------
@@ -75,46 +175,33 @@ type
     property Payload: String read GetPayload;
   end;
 
-  TioCustomSynchroStrategy_LogItem = class(TInterfacedObject, IioSynchroStrategy_LogItem)
-  private
-    FID: Integer;
-    FDateAndTime_Start: TDateTime;
-    FDateAndTime_End: TDateTime;
-    FDateAndTime_ElapsedSec: Integer;
-    FUserID: Integer;
-    FUserName: String;
-    function GetID: Integer;
-    function GetDateAndTime_Start: TDateTime;
-    function GetDateAndTime_End: TDateTime;
-    function GetDateAndTime_ElapsedSec: Integer;
-    function GetUserID: Integer;
-    function GetUserName: String;
-  public
-    property ID: Integer read GetID;
-    property DateAndTime_Start: TDateTime read GetDateAndTime_Start;
-    property DateAndTime_End: TDateTime read GetDateAndTime_End;
-    property DateAndTime_ElapsedSec: Integer read GetDateAndTime_ElapsedSec;
-    property UserID: Integer read GetUserID;
-    property UserName: String read GetUserName;
-  end;
-
 
 implementation
 
+uses
+  iORM.CommonTypes, iORM, System.SysUtils, iORM.PersistenceStrategy.Factory;
+
 { TioCustomSynchroStrategy }
 
-constructor TioCustomSynchroStrategy_Client.Create(AOwner: TComponent);
+constructor TioCustomSynchroStrategy_Client<TPayload>.Create(AOwner: TComponent);
 begin
   inherited;
   FTargetConnectionDef := nil;
 end;
 
-function TioCustomSynchroStrategy_Client.GenerateLocalID(const AContext: IioContext): Integer;
+destructor TioCustomSynchroStrategy_Client<TPayload>.Destroy;
 begin
-  // TODO: To be implemented
+  if FTargetConnectionDef <> nil then
+    FTargetConnectionDef.RemoveFreeNotification(Self);
+  inherited;
 end;
 
-procedure TioCustomSynchroStrategy_Client.SetTargetConnectionDef(const ATargetConnectionDef: IioSynchroStrategy_TargetConnectionDef);
+function TioCustomSynchroStrategy_Client<TPayload>.GenerateLocalID(const AContext: IioContext): Integer;
+begin
+  Result := _DoGenerateLocalID(AContext);
+end;
+
+procedure TioCustomSynchroStrategy_Client<TPayload>.SetTargetConnectionDef(const ATargetConnectionDef: IioSynchroStrategy_TargetConnectionDef);
 begin
   if ATargetConnectionDef <> FTargetConnectionDef then
   begin
@@ -128,16 +215,29 @@ begin
   end;
 end;
 
-destructor TioCustomSynchroStrategy_Client.Destroy;
+procedure TioCustomSynchroStrategy_Client<TPayload>.DoSynchronization(const ASynchroLevel: TioSynchroLevel);
+var
+  LPayload: TPayload;
 begin
-  if FTargetConnectionDef <> nil then
-    FTargetConnectionDef.RemoveFreeNotification(Self);
-  inherited;
-end;
+  // Create and initialize the payload
+  LPayload := TPayload.Create;
+  try
+    LPayload.SynchroLevel := ASynchroLevel;
+    LPayload.ClassBlackList.AddRange(FClassBlackList);
+    LPayload.ClassWhiteList.AddRange(FClassWhiteList);
+//    LPayLoad.UserID :=
+//    LPayLoad.UserName :=
+    // Load the client payload
+    LPayload.LoadFromClient;
 
-procedure TioCustomSynchroStrategy_Client.DoSynchronization;
-begin
-  // TODO: To be implemented
+    // Send the client payload to the server and wait for the payload received back from the server
+    // TODO: Send the payload to the target connection (server) and wait for the server return payload
+
+    // Persist the server returned payload
+    LPayload.PersistToClient;
+  finally
+    LPayload.Free;
+  end;
 end;
 
 { TioCustomSynchroStrategy_Server }
@@ -162,36 +262,235 @@ begin
   // TODO: To be implemented
 end;
 
-{ TioSynchroStrategy_LogItem }
+{ TioCustomSynchroStrategy_Payload }
 
-function TioCustomSynchroStrategy_LogItem.GetDateAndTime_ElapsedSec: Integer;
+constructor TioCustomSynchroStrategy_Payload.Create;
 begin
-  // TODO: To be implemented
+  FClassWhiteList := TioSynchroStrategy_ClassList.Create;
+  FClassBlackList := TioSynchroStrategy_ClassList.Create;
+  FSynchroLogItem_Last := nil;
+  FSynchroLogItem_New := nil;
+  FSynchroLevel := TioSynchroLevel.slUndefined;
+  FSynchroName := IO_STRING_NULL_VALUE;
+  FUserID := IO_INTEGER_NULL_VALUE;
+  FUserName := IO_STRING_NULL_VALUE;
 end;
 
-function TioCustomSynchroStrategy_LogItem.GetDateAndTime_End: TDateTime;
+destructor TioCustomSynchroStrategy_Payload.Destroy;
 begin
-  // TODO: To be implemented
+  FClassWhiteList.Free;
+  FClassBlackList.Free;
+  if Assigned(FSynchroLogItem_Last) then
+    FSynchroLogItem_Last.Free;
+  if Assigned(FSynchroLogItem_New) then
+    FSynchroLogItem_New.Free;
+  inherited;
 end;
 
-function TioCustomSynchroStrategy_LogItem.GetDateAndTime_Start: TDateTime;
+procedure TioCustomSynchroStrategy_Payload.Finalize;
 begin
-  // TODO: To be implemented
+  // Set the new SynchroLogitem progress status and persist it server side,
+  //  it will be persisted on the client only when the operation is completed successfully
+  _DoNewSynchroLogItem_SetStatus_Completed;
+  _SwitchToTargetConnection;
+  try
+    _DoNewSynchroLogItem_Persist;
+  finally
+    _ReturnToLocalConnection;
+  end;
 end;
 
-function TioCustomSynchroStrategy_LogItem.GetID: Integer;
+procedure TioCustomSynchroStrategy_Payload.Initialize;
 begin
-  // TODO: To be implemented
+  // Load the last SynchroLogItem from which to obtain information on the last synchronization operation performed
+  _DoLastSynchroLogItem_LoadFromClient;
+  // Create and initialize a new SynchroLogitem on which to store the information and status of the synchronization in progress
+  _DoNewSynchroLogItem_Create;
+  _DoNewSynchroLogItem_Initialize;
+  // Set the new SynchroLogitem progress status and persist it to the server,
+  //  it will be persisted on the client only when the operation is completed successfully
+  _SwitchToTargetConnection;
+  try
+    _DoNewSynchroLogItem_Persist;
+  finally
+    _ReturnToLocalConnection;
+  end;
 end;
 
-function TioCustomSynchroStrategy_LogItem.GetUserID: Integer;
+procedure TioCustomSynchroStrategy_Payload.LoadFromClient;
 begin
-  // TODO: To be implemented
+  // Set the new SynchroLogitem progress status and persist it server side,
+  //  it will be persisted on the client only when the operation is completed successfully
+  _DoNewSynchroLogItem_SetStatus_LoadFromClient;
+  _SwitchToTargetConnection;
+  try
+    _DoNewSynchroLogItem_Persist;
+  finally
+    _ReturnToLocalConnection;
+  end;
+  // Load the payload from the client
+  _DoLoadPayloadFromClient;
 end;
 
-function TioCustomSynchroStrategy_LogItem.GetUserName: String;
+procedure TioCustomSynchroStrategy_Payload.PersistAndReloadFromServer;
 begin
-  // TODO: To be implemented
+  // This entire part of the operation must be performed server side
+  //  so swith to che server connection
+  _SwitchToTargetConnection;
+  try
+    // Set the new SynchroLogitem progress status and persist it server side,
+    //  it will be persisted on the client only when the operation is completed successfully
+    _DoNewSynchroLogItem_SetStatus_PersistToServer;
+    _DoNewSynchroLogItem_Persist;
+    // Persist the payload to server
+    _DoPersistPayloadToServer;
+    // Set the new SynchroLogitem progress status and persist it server side,
+    //  it will be persisted on the client only when the operation is completed successfully
+    _DoNewSynchroLogItem_SetStatus_ReloadFromServer;
+    _DoNewSynchroLogItem_Persist;
+    // Reload payload from the server
+    _DoReloadPayloadFromServer;
+  finally
+    _ReturnToLocalConnection;
+  end;
+end;
+
+procedure TioCustomSynchroStrategy_Payload.PersistToClient;
+begin
+  // Set the new SynchroLogitem progress status and persist it server side,
+  //  it will be persisted on the client only when the operation is completed successfully
+  _DoNewSynchroLogItem_SetStatus_PersistToClient;
+  _SwitchToTargetConnection;
+  try
+    _DoNewSynchroLogItem_Persist;
+  finally
+    _ReturnToLocalConnection;
+  end;
+  // Persist the payload to the client
+  _DoPersistPayloadToClient;
+end;
+
+procedure TioCustomSynchroStrategy_Payload._DoNewSynchroLogItem_Create;
+begin
+  // Create a new instance as current SynchroLogItem of the right classs
+  FSynchroLogItem_New := TioCustomSynchroStrategy_LogItem.Create;
+end;
+
+procedure TioCustomSynchroStrategy_Payload._DoNewSynchroLogItem_Initialize;
+begin
+  // Initialize the new SynchroLogItem after its creation
+  FSynchroLogItem_New.SynchroStatus := TioSynchroStatus.ssInitialization;
+  FSynchroLogItem_New.Start := Now;
+  FSynchroLogItem_New.SynchroLevel := FSynchroLevel;
+end;
+
+procedure TioCustomSynchroStrategy_Payload._DoLastSynchroLogItem_LoadFromClient;
+var
+  LWhere: IioWhere;
+begin
+  // Load last SynchroLogItem from the local client connection as current new SynchroLogItem using the right class
+//  ----- old code -----
+//  LWhere := io.Where('SynchroStatus', coEquals, TioSynchroStatus.ssCompleted);
+//  LWhere._And('ID = SELECT MAX(SUB.ID) FROM [TioCustomSynchroStrategy_LogItem] SUB WHERE SUB.SYNCHROSTATUS = SYNCHROSTATUS AND SUB.SYNCHRONAME = SYNCHRONAME');
+//  ----- old code -----
+  LWhere := io.Where('ID = SELECT MAX(SUB.ID) FROM [TioCustomSynchroStrategy_LogItem] SUB WHERE SUB.SYNCHRONAME = SYNCHRONAME');
+  FSynchroLogItem_Last := io.LoadObject<TioCustomSynchroStrategy_LogItem>(LWhere);
+end;
+
+procedure TioCustomSynchroStrategy_Payload._DoNewSynchroLogItem_Persist;
+begin
+  // Persist the new SynchroLogItem
+  io.PersistObject(FSynchroLogItem_New);
+end;
+
+procedure TioCustomSynchroStrategy_Payload._DoNewSynchroLogItem_SetStatus_Completed;
+begin
+  // Set the new SynchroLogitem progress status
+  FSynchroLogItem_New.SynchroStatus := TioSynchroStatus.ssCompleted;
+  FSynchroLogItem_New.Completed := Now;
+end;
+
+procedure TioCustomSynchroStrategy_Payload._DoNewSynchroLogItem_SetStatus_LoadFromClient;
+begin
+  // Set the new SynchroLogitem progress status
+  FSynchroLogItem_New.SynchroStatus := TioSynchroStatus.ssLoadFromClient;
+  FSynchroLogItem_New.LoadFromClient := Now;
+end;
+
+procedure TioCustomSynchroStrategy_Payload._DoNewSynchroLogItem_SetStatus_PersistToClient;
+begin
+  // Set the new SynchroLogitem progress status
+  FSynchroLogItem_New.SynchroStatus := TioSynchroStatus.ssPersistToClient;
+  FSynchroLogItem_New.PersistToClient := Now;
+end;
+
+procedure TioCustomSynchroStrategy_Payload._DoNewSynchroLogItem_SetStatus_PersistToServer;
+begin
+  // Set the new SynchroLogitem progress status
+  FSynchroLogItem_New.SynchroStatus := TioSynchroStatus.ssPersistToServer;
+  FSynchroLogItem_New.PersistToServer := Now;
+end;
+
+procedure TioCustomSynchroStrategy_Payload._DoNewSynchroLogItem_SetStatus_ReloadFromServer;
+begin
+  // Set the new SynchroLogitem progress status
+  FSynchroLogItem_New.SynchroStatus := TioSynchroStatus.ssReloadFromServer;
+  FSynchroLogItem_New.ReloadFromServer := Now;
+end;
+
+procedure TioCustomSynchroStrategy_Payload._ReturnToLocalConnection;
+begin
+  // If you are synchronizing with an http connection as the target and we are running on the client side
+  //  (FTargetConnectionDefName is not empty) or the target connection is a normal non-http connection
+  //  (so all the synchronization steps are performed on the client side) then select the connection specified
+  //  precisely by the FTargetConnectionDefName field so that the object is persisted on this connection
+  //  (normally it would persist on the local default connection, the normal client connection).
+  //  If, however, you are synchronizing with an http connection as the target and we are running
+  //  on the server side (FTargetConnectionDefName is empty) then it does not select any connection
+  //  in particular but lets each object be loaded/persisted normally as set on the server.
+  // Note: If FTargetConnectionDefName is empty then it means that we are on the server side of the synchronization,
+  //        this is because the FTargetConnectionDefName field is set not to be serialized by DJSON so when synchronization
+  //        is being done towards an HTTP connection (target) and the payload is passed to the server FTargetConnectionDefName
+  //        becomes empty (while on the client side it is always valued).
+  if not FTargetConnectionDefName.IsEmpty then
+    io.Connections.ThreadUseClear;
+end;
+
+procedure TioCustomSynchroStrategy_Payload._SwitchToTargetConnection;
+begin
+  // If you are synchronizing with an http connection as the target and we are running on the client side
+  //  (FTargetConnectionDefName is not empty) or the target connection is a normal non-http connection
+  //  (so all the synchronization steps are performed on the client side) then select the connection specified
+  //  precisely by the FTargetConnectionDefName field so that the object is persisted on this connection
+  //  (normally it would persist on the local default connection, the normal client connection).
+  //  If, however, you are synchronizing with an http connection as the target and we are running
+  //  on the server side (FTargetConnectionDefName is empty) then it does not select any connection
+  //  in particular but lets each object be loaded/persisted normally as set on the server.
+  // Note: If FTargetConnectionDefName is empty then it means that we are on the server side of the synchronization,
+  //        this is because the FTargetConnectionDefName field is set not to be serialized by DJSON so when synchronization
+  //        is being done towards an HTTP connection (target) and the payload is passed to the server FTargetConnectionDefName
+  //        becomes empty (while on the client side it is always valued).
+  if not FTargetConnectionDefName.IsEmpty then
+    io.Connections.ThreadUseConnection(FTargetConnectionDefName);
+end;
+
+{ TioCustomSynchroStrategy_LogItem }
+
+constructor TioCustomSynchroStrategy_LogItem.Create;
+begin
+  FID := IO_INTEGER_NULL_VALUE;
+  FSynchroName := IO_STRING_NULL_VALUE;
+  FUserID := IO_INTEGER_NULL_VALUE;
+  FUserName := IO_STRING_NULL_VALUE;
+  FSynchroLevel := TioSynchroLevel.slUndefined;
+  FSynchroStatus := TioSynchroStatus.ssInitialization;
+  // Timing
+  FStart := IO_DATETIME_NULL_VALUE;
+  FLoadFromClient := IO_DATETIME_NULL_VALUE;
+  FPersistToServer := IO_DATETIME_NULL_VALUE;
+  FReloadFromServer := IO_DATETIME_NULL_VALUE;
+  FPersistToClient := IO_DATETIME_NULL_VALUE;
+  FCompleted := IO_DATETIME_NULL_VALUE;
 end;
 
 end.
