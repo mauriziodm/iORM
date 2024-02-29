@@ -150,11 +150,6 @@ type
     property UserName: String read FUserName write FUserName;
   end;
 
-  TProva<T: TioCustomSynchroStrategy_Payload, constructor; T2: TComponent, constructor> = class
-  public
-    procedure Prova;
-  end;
-
   TioCustomSynchroStrategy_Client<T: TioCustomSynchroStrategy_Payload, constructor> = class abstract(TComponent)//, IioSynchroStrategy_Client)
   strict private
     FClassBlackList: TioSynchroStrategy_ClassList; // TList because it will be serialized by djson
@@ -208,7 +203,7 @@ type
 implementation
 
 uses
-  iORM.CommonTypes, iORM, System.SysUtils, iORM.PersistenceStrategy.Factory;
+  iORM, System.SysUtils, iORM.PersistenceStrategy.Factory;
 
 { TioCustomSynchroStrategy }
 
@@ -252,7 +247,7 @@ end;
 
 procedure TioCustomSynchroStrategy_Client<T>._DoPayload_Initialize(const APayload: T);
 begin
-  APayload.SynchroLevel := ASynchroLevel;
+  APayload.SynchroLevel := FSynchroLevel;
   APayload.ClassBlackList.AddRange(FClassBlackList);
   APayload.ClassWhiteList.AddRange(FClassWhiteList);
 //  LPayLoad.UserID :=
@@ -263,24 +258,15 @@ procedure TioCustomSynchroStrategy_Client<T>.DoSynchronization(const ASynchroLev
 var
   LPayload: T;
 begin
-  // Create and initialize the payload
+  // Create the payload
   // Note: Use a local variable and not a global one for the component because
   //        the synchronization must also be possible to perform asynchronously.
   LPayload := T.Create;
   try
-    LPayload.SynchroLevel := ASynchroLevel;
-    LPayload.ClassBlackList.AddRange(FClassBlackList);
-    LPayload.ClassWhiteList.AddRange(FClassWhiteList);
-//    LPayLoad.UserID :=
-//    LPayLoad.UserName :=
-    // Load the client payload
-    LPayload.LoadFromClient;
-
-    // Send the client payload to the server and wait for the payload received back from the server
-    // TODO: Send the payload to the target connection (server) and wait for the server return payload
-
-    // Persist the server returned payload
-    LPayload.PersistToClient;
+    // Initialize the payload
+    _DoPayload_Initialize(LPayload);
+    // Start the sychronization on the target connection
+    io.Connections.GetConnectionDefByName();
   finally
     LPayload.Free;
   end;
