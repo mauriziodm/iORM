@@ -40,6 +40,13 @@ uses
 
 type
 
+  // This class contains and persists information on the synchronization operations that have
+  //   taken place over time and is used for two things:
+  //   1) on the client side as a reference
+  //      to when the last synchronization was performed and at what point it has reached
+  //      (e.g. which EtmTimeSlot was the last one synchronized)
+  //   2) on the server side as a history of the synchronizations that occurred over time
+  //      (also on the client side if desired).
   [ioEntity('SYNCHRO_LOG')]
   TioCustomSynchroStrategy_LogItem = class
   strict private
@@ -73,6 +80,25 @@ type
     property Completed: TDateTime read FCompleted write FCompleted;
   end;
 
+  // This class represents the payload of the synchronization operation in the sense that
+  //   it is responsible for "transporting" the objects and information that must be synchronized
+  //   from the client to the server and vice versa. However, this class also implements the
+  //   behavioral and executive part of the synchronization through a whole series of methods
+  //   that must/can be overridden in the concrete classes that will derive from it;
+  //   in this way, especially if the target connection is an http connection,
+  //   it will be this class (with the SynchroLogItem inside) that will be serialized and
+  //   sent/received from the client to the server and vice versa and will carry out the various
+  //   synchronization phases through its methods on the right side.
+  // Note: In this class I wanted to use a generics so as to be able to abstract from the real
+  //        SynchroLogItem class, in fact both will have to be derived (therefore changed)
+  //        to create a concrete synchro strategy. But I already use a generics in the
+  //        SynchroStrategy_Client<T: TioCustomSynchroStrategy_Payload> component which already
+  //        has a constraint so I would then have had to use a double generics here with
+  //        two different constraints and Delphi doesn't allow this or at least I haven't found
+  //        a way to do it. So I decided not to use generics on the Payload class and to declare
+  //        on it a whole series of virtual methods that can be overridden to create and manage
+  //        different types of SynchroLogItem which however must be derived from the
+  //        TioCustomSynchroStrategy_LogItem base class
   TioCustomSynchroStrategy_Payload = class abstract
   strict private
     FClassBlackList: TioSynchroStrategy_ClassList; // TList because it will be serialized by djson
@@ -124,23 +150,24 @@ type
     property UserName: String read FUserName write FUserName;
   end;
 
+  TProva<T: TioCustomSynchroStrategy_Payload, constructor; T2: TComponent, constructor> = class
+  public
+    procedure Prova;
+  end;
 
-
-
-
-
-
-
-
-  TioCustomSynchroStrategy_Client<TPayload: TioCustomSynchroStrategy_Payload, constructor> = class abstract(TComponent)//, IioSynchroStrategy_Client)
+  TioCustomSynchroStrategy_Client<T: TioCustomSynchroStrategy_Payload, constructor> = class abstract(TComponent)//, IioSynchroStrategy_Client)
   strict private
     FClassBlackList: TioSynchroStrategy_ClassList; // TList because it will be serialized by djson
     FClassWhiteList: TioSynchroStrategy_ClassList; // TList because it will be serialized by djson
+    FPayload: T;
+    FSynchroLevel: TioSynchroLevel;
+    FSynchroName: String;
     FTargetConnectionDef: IioSynchroStrategy_TargetConnectionDef;
     procedure SetTargetConnectionDef(const ATargetConnectionDef: IioSynchroStrategy_TargetConnectionDef);
   strict protected
     // ---------- Synchro strategy methods to override on descendant classes ----------
     function _DoGenerateLocalID(const AContext: IioContext): Integer; virtual; abstract;
+    procedure _DoPayload_Initialize(const APayload: T); virtual;
     // ---------- Synchro strategy methods to override on descendant classes ----------
   public
     constructor Create(AOwner: TComponent); override;
@@ -148,9 +175,11 @@ type
     procedure DoSynchronization(const ASynchroLevel: TioSynchroLevel);
     function GenerateLocalID(const AContext: IioContext): Integer;
   published
-    property TargetConnectionDef: IioSynchroStrategy_TargetConnectionDef read FTargetConnectionDef write FTargetConnectionDef default nil;
     property ClassBlackList: TioSynchroStrategy_ClassList read FClassBlackList; // TList because it will be serialized by djson
     property ClassWhiteList: TioSynchroStrategy_ClassList read FClassWhiteList; // TList because it will be serialized by djson
+    property SynchroLevel: TioSynchroLevel read FSynchroLevel write FSynchroLevel default slIncremental;
+    property SynchroName: String read FSynchroName write FSynchroName;
+    property TargetConnectionDef: IioSynchroStrategy_TargetConnectionDef read FTargetConnectionDef write FTargetConnectionDef default nil;
   end;
 
 
@@ -183,25 +212,31 @@ uses
 
 { TioCustomSynchroStrategy }
 
-constructor TioCustomSynchroStrategy_Client<TPayload>.Create(AOwner: TComponent);
+constructor TioCustomSynchroStrategy_Client<T>.Create(AOwner: TComponent);
 begin
   inherited;
+  FClassBlackList := TioSynchroStrategy_ClassList.Create;
+  FClassWhiteList := TioSynchroStrategy_ClassList.Create;
+  FSynchroLevel := TioSynchroLevel.slIncremental;
+  FSynchroName := IO_STRING_NULL_VALUE;
   FTargetConnectionDef := nil;
 end;
 
-destructor TioCustomSynchroStrategy_Client<TPayload>.Destroy;
+destructor TioCustomSynchroStrategy_Client<T>.Destroy;
 begin
+  FClassBlackList.Free;
+  FClassWhiteList.Free;
   if FTargetConnectionDef <> nil then
     FTargetConnectionDef.RemoveFreeNotification(Self);
   inherited;
 end;
 
-function TioCustomSynchroStrategy_Client<TPayload>.GenerateLocalID(const AContext: IioContext): Integer;
+function TioCustomSynchroStrategy_Client<T>.GenerateLocalID(const AContext: IioContext): Integer;
 begin
   Result := _DoGenerateLocalID(AContext);
 end;
 
-procedure TioCustomSynchroStrategy_Client<TPayload>.SetTargetConnectionDef(const ATargetConnectionDef: IioSynchroStrategy_TargetConnectionDef);
+procedure TioCustomSynchroStrategy_Client<T>.SetTargetConnectionDef(const ATargetConnectionDef: IioSynchroStrategy_TargetConnectionDef);
 begin
   if ATargetConnectionDef <> FTargetConnectionDef then
   begin
@@ -215,12 +250,23 @@ begin
   end;
 end;
 
-procedure TioCustomSynchroStrategy_Client<TPayload>.DoSynchronization(const ASynchroLevel: TioSynchroLevel);
+procedure TioCustomSynchroStrategy_Client<T>._DoPayload_Initialize(const APayload: T);
+begin
+  APayload.SynchroLevel := ASynchroLevel;
+  APayload.ClassBlackList.AddRange(FClassBlackList);
+  APayload.ClassWhiteList.AddRange(FClassWhiteList);
+//  LPayLoad.UserID :=
+//  LPayLoad.UserName :=
+end;
+
+procedure TioCustomSynchroStrategy_Client<T>.DoSynchronization(const ASynchroLevel: TioSynchroLevel);
 var
-  LPayload: TPayload;
+  LPayload: T;
 begin
   // Create and initialize the payload
-  LPayload := TPayload.Create;
+  // Note: Use a local variable and not a global one for the component because
+  //        the synchronization must also be possible to perform asynchronously.
+  LPayload := T.Create;
   try
     LPayload.SynchroLevel := ASynchroLevel;
     LPayload.ClassBlackList.AddRange(FClassBlackList);
