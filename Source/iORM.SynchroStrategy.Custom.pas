@@ -157,7 +157,7 @@ type
     FPayload: T;
     FSynchroLevel: TioSynchroLevel;
     FSynchroName: String;
-    FTargetConnectionDef: IioSynchroStrategy_TargetConnectionDef;
+    FTargetConnectionDef: IioSynchroStrategy_TargetConnectionDef; // IioSynchroStrategy_TargetConnectionDef instead of TioPersistenceStrategyRef to avoid circular reference
     procedure SetTargetConnectionDef(const ATargetConnectionDef: IioSynchroStrategy_TargetConnectionDef);
   strict protected
     // ---------- Synchro strategy methods to override on descendant classes ----------
@@ -177,33 +177,15 @@ type
     property TargetConnectionDef: IioSynchroStrategy_TargetConnectionDef read FTargetConnectionDef write FTargetConnectionDef default nil;
   end;
 
+  TioCustomSynchroStrategy_Server = class(TComponent)
 
-
-
-
-
-
-  TioCustomSynchroStrategy_Server = class abstract(TComponent)//, IioSynchroStrategy_Server)
-  strict private
-    FPayload: TioCustomSynchroStrategy_Payload;
-    function GetPayload: String;
-  strict protected
-    // ---------- Synchro strategy methods to override on descendant classes ----------
-    procedure _DoLoadPayload; virtual; abstract;
-    procedure _DoPersistPayload; virtual; abstract;
-    // ---------- Synchro strategy methods to override on descendant classes ----------
-  public
-    constructor Create(const APayload: String);
-    procedure LoadPayload;
-    procedure PersistPayload;
-    property Payload: String read GetPayload;
   end;
 
 
 implementation
 
 uses
-  iORM, System.SysUtils, iORM.PersistenceStrategy.Factory;
+  iORM, System.SysUtils, iORM.PersistenceStrategy.Factory, iORM.DB.Interfaces;
 
 { TioCustomSynchroStrategy }
 
@@ -248,6 +230,7 @@ end;
 procedure TioCustomSynchroStrategy_Client<T>._DoPayload_Initialize(const APayload: T);
 begin
   APayload.SynchroLevel := FSynchroLevel;
+  APayload.SynchroName := FSynchroName;
   APayload.ClassBlackList.AddRange(FClassBlackList);
   APayload.ClassWhiteList.AddRange(FClassWhiteList);
 //  LPayLoad.UserID :=
@@ -257,6 +240,7 @@ end;
 procedure TioCustomSynchroStrategy_Client<T>.DoSynchronization(const ASynchroLevel: TioSynchroLevel);
 var
   LPayload: T;
+  LPersistenceStrategy: TioPersistenceStrategyRef;
 begin
   // Create the payload
   // Note: Use a local variable and not a global one for the component because
@@ -265,33 +249,12 @@ begin
   try
     // Initialize the payload
     _DoPayload_Initialize(LPayload);
-    // Start the sychronization on the target connection
-    io.Connections.GetConnectionDefByName();
+    // Start the sychronization on the target persistence strategy
+    LPersistenceStrategy := TioPersistenceStrategyFactory.GetStrategy(FTargetConnectionDef.GetName);
+    LPersistenceStrategy.DoSynchronization(LPayload);
   finally
     LPayload.Free;
   end;
-end;
-
-{ TioCustomSynchroStrategy_Server }
-
-constructor TioCustomSynchroStrategy_Server.Create(const APayload: String);
-begin
-  // TODO: To be implemented
-end;
-
-function TioCustomSynchroStrategy_Server.GetPayload: String;
-begin
-  // TODO: To be implemented
-end;
-
-procedure TioCustomSynchroStrategy_Server.LoadPayload;
-begin
-  // TODO: To be implemented
-end;
-
-procedure TioCustomSynchroStrategy_Server.PersistPayload;
-begin
-  // TODO: To be implemented
 end;
 
 { TioCustomSynchroStrategy_Payload }
@@ -414,13 +377,14 @@ begin
   FSynchroLogItem_New.SynchroStatus := TioSynchroStatus.ssInitialization;
   FSynchroLogItem_New.Start := Now;
   FSynchroLogItem_New.SynchroLevel := FSynchroLevel;
+  FSynchroLogItem_New.SynchroName := FSynchroName;
 end;
 
 procedure TioCustomSynchroStrategy_Payload._DoLastSynchroLogItem_LoadFromClient;
 var
   LWhere: IioWhere;
 begin
-  // Load last SynchroLogItem from the local client connection as current new SynchroLogItem using the right class
+  // Load last SynchroLogItem from the local client connection
 //  ----- old code -----
 //  LWhere := io.Where('SynchroStatus', coEquals, TioSynchroStatus.ssCompleted);
 //  LWhere._And('ID = SELECT MAX(SUB.ID) FROM [TioCustomSynchroStrategy_LogItem] SUB WHERE SUB.SYNCHROSTATUS = SYNCHROSTATUS AND SUB.SYNCHRONAME = SYNCHRONAME');

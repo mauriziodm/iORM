@@ -100,7 +100,7 @@ type
     procedure SetAsDefault(const Value: Boolean);
     procedure SetSynchroStrategy_Client(const ASynchroStrategy_Client: IioSynchroStrategy_Client);
     // IioSynchroStrategy_TargetConnectionDef
-    function DoSynchronization(const APayload: String): String;
+    function GetName: String;
   protected
     function DBBuilder: IioDBBuilderEngine; virtual;
     procedure DoAfterRegister;
@@ -309,11 +309,6 @@ begin
     FOnBeforeRegister(Self);
 end;
 
-function TioCustomConnectionDef.DoSynchronization(const APayload: String): String;
-begin
-  // TODO: To be implemented
-end;
-
 procedure TioCustomConnectionDef.CreateOrAlterDB(const AForce: Boolean = False);
 var
   LAbort: Boolean;
@@ -353,6 +348,11 @@ begin
     Result := TPath.GetFullPath(TPath.Combine(LDBFolder, FDatabase))
   else
     Result := FDatabase;
+end;
+
+function TioCustomConnectionDef.GetName: String;
+begin
+  Result := Self.Name;
 end;
 
 function TioCustomConnectionDef.Get_Version: String;

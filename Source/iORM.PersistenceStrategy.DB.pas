@@ -39,7 +39,8 @@ uses
   iORM.Context.Interfaces,
   iORM.Context.Properties.Interfaces, iORM.Where.Interfaces,
   iORM.DB.Interfaces, FireDAC.Comp.DataSet, Data.DB,
-  iORM.LiveBindings.BSPersistence, iORM.CommonTypes;
+  iORM.LiveBindings.BSPersistence, iORM.CommonTypes,
+  iORM.SynchroStrategy.Custom;
 
 type
 
@@ -76,6 +77,8 @@ type
     class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
     class function LoadObjVersion(const AContext: IioContext): Integer; override;
     class function Count(const AWhere: IioWhere): Integer; override;
+    // SynchroStrategy
+    class procedure DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload); override;
     // SQLDestinations
     class procedure SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); override;
     class procedure SQLDest_Execute(const ASQLDestination: IioSQLDestination); override;
@@ -343,6 +346,16 @@ begin
       TioDBFactory.QueryEngine.GetQueryDelete(AContext, True).ExecSQL;
     end;
   end;
+end;
+
+class procedure TioPersistenceStrategyDB.DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload);
+begin
+  inherited;
+  APayload.Initialize;
+  APayload.LoadFromClient;
+  APayload.PersistAndReloadFromServer;
+  APayload.PersistToClient;
+  APayload.Finalize;
 end;
 
 class procedure TioPersistenceStrategyDB.InsertObject_Internal(const AContext: IioContext);
