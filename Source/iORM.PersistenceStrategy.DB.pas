@@ -472,7 +472,7 @@ end;
 class function TioPersistenceStrategyDB.LoadObjVersion(const AContext: IioContext): Integer;
 begin
   // NB: Ho riflettuto bene sul come ottenere l'ultima ObjVersion (la più alta) assegnata
-  // per poi aggiungere 1 e ottenere la prossima e ho idnividuato 3 metodi:
+  // per poi aggiungere 1 e ottenere la prossima e ho individuato 2 metodi:
   // 1) SENZA ETM: fa una query che prende l'ObjVersion dell'oggetto dal DB (normale tabella della classe della entity);
   // siccome possono verificarsi "salti" tra la versione in memoria e quella sul DB
   // (es: due utenti con stesso oggetto in memoria ver. 5, il primo salva e non ci sono conflitti, ora sul DB c'è la ver. 6, il secondo salva

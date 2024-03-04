@@ -104,8 +104,8 @@ type
     FClassBlackList: TioSynchroStrategy_ClassList; // TList because it will be serialized by djson
     FClassWhiteList: TioSynchroStrategy_ClassList; // TList because it will be serialized by djson
     FSynchroLevel: TioSynchroLevel;
-    FSynchroLogItem_Last: TioCustomSynchroStrategy_LogItem;
     FSynchroLogItem_New: TioCustomSynchroStrategy_LogItem;
+    FSynchroLogItem_Old: TioCustomSynchroStrategy_LogItem;
     FSynchroName: String;
     FUserID: Integer;
     FUserName: String;
@@ -132,6 +132,8 @@ type
     procedure _DoReloadPayloadFromServer; virtual; abstract;
     procedure _DoPersistPayloadToClient; virtual; abstract;
     // ---------- Methods to override on descendant classes ----------
+    property SynchroLogItem_New: TioCustomSynchroStrategy_LogItem read FSynchroLogItem_New write FSynchroLogItem_New;
+    property SynchroLogItem_Old: TioCustomSynchroStrategy_LogItem read FSynchroLogItem_Old write FSynchroLogItem_Old;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -150,11 +152,10 @@ type
     property UserName: String read FUserName write FUserName;
   end;
 
-  TioCustomSynchroStrategy_Client<T: TioCustomSynchroStrategy_Payload, constructor> = class abstract(TComponent)//, IioSynchroStrategy_Client)
+  TioCustomSynchroStrategy_Client<T: TioCustomSynchroStrategy_Payload, constructor> = class abstract(TComponent)
   strict private
     FClassBlackList: TioSynchroStrategy_ClassList; // TList because it will be serialized by djson
     FClassWhiteList: TioSynchroStrategy_ClassList; // TList because it will be serialized by djson
-    FPayload: T;
     FSynchroLevel: TioSynchroLevel;
     FSynchroName: String;
     FTargetConnectionDef: IioSynchroStrategy_TargetConnectionDef; // IioSynchroStrategy_TargetConnectionDef instead of TioPersistenceStrategyRef to avoid circular reference
@@ -187,7 +188,7 @@ implementation
 uses
   iORM, System.SysUtils, iORM.PersistenceStrategy.Factory, iORM.DB.Interfaces;
 
-{ TioCustomSynchroStrategy }
+{ TioCustomSynchroStrategy_Client }
 
 constructor TioCustomSynchroStrategy_Client<T>.Create(AOwner: TComponent);
 begin
@@ -263,10 +264,10 @@ constructor TioCustomSynchroStrategy_Payload.Create;
 begin
   FClassWhiteList := TioSynchroStrategy_ClassList.Create;
   FClassBlackList := TioSynchroStrategy_ClassList.Create;
-  FSynchroLogItem_Last := nil;
+  FSynchroLogItem_Old := nil;
   FSynchroLogItem_New := nil;
   FSynchroLevel := TioSynchroLevel.slUndefined;
-  FSynchroName := IO_STRING_NULL_VALUE;
+  FSynchroName := String.Empty;
   FUserID := IO_INTEGER_NULL_VALUE;
   FUserName := IO_STRING_NULL_VALUE;
 end;
@@ -275,8 +276,8 @@ destructor TioCustomSynchroStrategy_Payload.Destroy;
 begin
   FClassWhiteList.Free;
   FClassBlackList.Free;
-  if Assigned(FSynchroLogItem_Last) then
-    FSynchroLogItem_Last.Free;
+  if Assigned(FSynchroLogItem_Old) then
+    FSynchroLogItem_Old.Free;
   if Assigned(FSynchroLogItem_New) then
     FSynchroLogItem_New.Free;
   inherited;
@@ -374,8 +375,8 @@ end;
 procedure TioCustomSynchroStrategy_Payload._DoNewSynchroLogItem_Initialize;
 begin
   // Initialize the new SynchroLogItem after its creation
-  FSynchroLogItem_New.SynchroStatus := TioSynchroStatus.ssInitialization;
   FSynchroLogItem_New.Start := Now;
+  FSynchroLogItem_New.SynchroStatus := TioSynchroStatus.ssInitialization;
   FSynchroLogItem_New.SynchroLevel := FSynchroLevel;
   FSynchroLogItem_New.SynchroName := FSynchroName;
 end;
@@ -385,12 +386,10 @@ var
   LWhere: IioWhere;
 begin
   // Load last SynchroLogItem from the local client connection
-//  ----- old code -----
-//  LWhere := io.Where('SynchroStatus', coEquals, TioSynchroStatus.ssCompleted);
-//  LWhere._And('ID = SELECT MAX(SUB.ID) FROM [TioCustomSynchroStrategy_LogItem] SUB WHERE SUB.SYNCHROSTATUS = SYNCHROSTATUS AND SUB.SYNCHRONAME = SYNCHRONAME');
-//  ----- old code -----
-  LWhere := io.Where('ID = SELECT MAX(SUB.ID) FROM [TioCustomSynchroStrategy_LogItem] SUB WHERE SUB.SYNCHRONAME = SYNCHRONAME');
-  FSynchroLogItem_Last := io.LoadObject<TioCustomSynchroStrategy_LogItem>(LWhere);
+  LWhere := io.Where('SynchroName', coEquals, SynchroName);
+  LWhere._And('SynchroStatus', coEquals, TioSynchroStatus.ssCompleted);
+  LWhere._And('ID = SELECT MAX(SUB.ID) FROM [TioCustomSynchroStrategy_LogItem] SUB WHERE SUB.SYNCHRONAME = SYNCHRONAME');
+  FSynchroLogItem_Old := io.LoadObject<TioCustomSynchroStrategy_LogItem>(LWhere);
 end;
 
 procedure TioCustomSynchroStrategy_Payload._DoNewSynchroLogItem_Persist;

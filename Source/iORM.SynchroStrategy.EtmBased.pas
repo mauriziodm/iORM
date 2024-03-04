@@ -37,52 +37,247 @@ interface
 
 uses
   iORM.SynchroStrategy.Custom, iORM.Context.Interfaces, iORM.Attributes,
-  iORM.SynchroStrategy.Interfaces;
+  iORM.SynchroStrategy.Interfaces, iORM.Where.Interfaces, System.Classes;
 
 type
 
   [ioEntity('SYNCHRO_LOG')]
-  TioEtmBasetSynchroStrategy_LogItem = class(TioCustomSynchroStrategy_LogItem)
+  TioEtmSynchroStrategy_LogItem = class(TioCustomSynchroStrategy_LogItem)
   strict private
-    FTimeSlotID_First: Integer;
-    FTimeSlotID_Last: Integer;
+    FEtmTimeSlotClassName: String;
+    FTimeSlotID_From: Integer;
+    FTimeSlotID_To: Integer;
   public
     constructor Create; override;
-    property TimeSlotID_First: Integer read FTimeSlotID_First write FTimeSlotID_First;
-    property TimeSlotID_Last: Integer read FTimeSlotID_Last write FTimeSlotID_Last;
+    property EtmTimeSlotClassName: String read FEtmTimeSlotClassName write FEtmTimeSlotClassName;
+    property TimeSlotID_From: Integer read FTimeSlotID_From write FTimeSlotID_From;
+    property TimeSlotID_To: Integer read FTimeSlotID_To write FTimeSlotID_To;
   end;
 
-  TioEtmBasedSynchroStrategy_Payload = class(TioCustomSynchroStrategy_Payload)
+  TioEtmSynchroStrategy_Payload = class(TioCustomSynchroStrategy_Payload)
+  strict private
+    FEtmTimeSlotClassName: String;
+    FPayloadData: TioEtmTimeline;
+    procedure _BuildBlackAndWhiteListWhere(const AWhere: IioWhere);
+    procedure _ClearPayloadData;
   strict protected
+    // ---------- Methods to override on descendant classes ----------
     // SynchroLogItem
     procedure _DoLastSynchroLogItem_LoadFromClient; override;
+    procedure _DoNewSynchroLogItem_Create; override;
+    procedure _DoNewSynchroLogItem_Initialize; override;
+    // Payload
+    procedure _DoLoadPayloadFromClient; override;
+    procedure _DoPersistPayloadToServer; override;
+    procedure _DoReloadPayloadFromServer; override;
+    procedure _DoPersistPayloadToClient; override;
+    // ---------- Methods to override on descendant classes ----------
   public
+    constructor Create; override;
+    destructor Destroy; override;
+    property EtmTimeSlotClassName: String read FEtmTimeSlotClassName write FEtmTimeSlotClassName;
+  end;
+
+  TioEtmSynchroStrategy_Client = class(TioCustomSynchroStrategy_Client<TioEtmSynchroStrategy_Payload>)
+  strict private
+    FEtmTimeSlotClassName: String;
+  strict protected
+    procedure _DoPayload_Initialize(const APayload: T); override;
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property EtmTimeSlotClassName: String read FEtmTimeSlotClassName write FEtmTimeSlotClassName;
   end;
 
 implementation
 
 uses
-  iORM.CommonTypes, iORM;
+  iORM.CommonTypes, iORM, System.SysUtils, System.Generics.Collections;
 
 { TioEtmBasetSynchroStrategy_LogItem }
 
-constructor TioEtmBasetSynchroStrategy_LogItem.Create;
+constructor TioEtmSynchroStrategy_LogItem.Create;
 begin
   inherited;
-  FTimeSlotID_First := IO_INTEGER_NULL_VALUE;
-  FTimeSlotID_Last := IO_INTEGER_NULL_VALUE;
+  FEtmTimeSlotClassName := String.Empty;
+  FTimeSlotID_From := IO_INTEGER_NULL_VALUE;
+  FTimeSlotID_To := IO_INTEGER_NULL_VALUE;
 end;
 
 { TioEtmBasedSynchroStrategy_Payload }
 
-procedure TioEtmBasedSynchroStrategy_Payload._DoLastSynchroLogItem_LoadFromClient;
+constructor TioEtmSynchroStrategy_Payload.Create;
+begin
+  inherited;
+  FEtmTimeSlotClassName := String.Empty;
+  FPayloadData := TioEtmTimeline.Create;
+end;
+
+destructor TioEtmSynchroStrategy_Payload.Destroy;
+begin
+  FPayloadData.Free;
+  inherited;
+end;
+
+procedure TioEtmSynchroStrategy_Payload._BuildBlackAndWhiteListWhere(const AWhere: IioWhere);
+var
+  LEntityClassName: String;
+begin
+  // WhiteList
+  AWhere._And._OpenPar;
+  for LEntityClassName in ClassWhiteList do
+    AWhere._Or('EntityClassName', coEquals, LEntityClassName);
+  AWhere._ClosePar;
+  // BlackList
+  AWhere._And._OpenPar;
+  for LEntityClassName in ClassBlackList do
+    AWhere._And('EntityClassName', coNotEquals, LEntityClassName);
+  AWhere._ClosePar;
+end;
+
+procedure TioEtmSynchroStrategy_Payload._ClearPayloadData;
+begin
+  FPayloadData.Count := 0;
+end;
+
+procedure TioEtmSynchroStrategy_Payload._DoLastSynchroLogItem_LoadFromClient;
 var
   LWhere: IioWhere;
 begin
-  // inherited; // Do not inherit here
   // Load last SynchroLogItem from the local client connection
-  LWhere := io.Where('ID = SELECT MAX(SUB.ID) FROM [TioCustomSynchroStrategy_LogItem] SUB WHERE SUB.SYNCHRONAME = SYNCHRONAME');
-  SynchroLogItem_Last := io.LoadObject<TioCustomSynchroStrategy_LogItem>(LWhere);
+  LWhere := io.Where('SynchroName', coEquals, SynchroName);
+  LWhere._And('SynchroStatus', coEquals, TioSynchroStatus.ssCompleted);
+  LWhere._And('ID = SELECT MAX(SUB.ID) FROM [TioEtmBasedSynchroStrategy_LogItem] SUB WHERE SUB.SYNCHRONAME = SYNCHRONAME');
+  Self.SynchroLogItem_Old := io.LoadObject<TioEtmSynchroStrategy_LogItem>(LWhere);
+end;
+
+procedure TioEtmSynchroStrategy_Payload._DoLoadPayloadFromClient;
+var
+  LWhere: IioWhere;
+begin
+  inherited;
+  // Build where
+  LWhere := io.Where('ID', coLower, 0); // The ID of the TimeSlots created on the client device is always negative
+  // Where: black & white class list
+  _BuildBlackAndWhiteListWhere(LWhere);
+  // Where: last timeslot for any object only
+  LWhere._And(Format('ID = SELECT MIN(SUB.ID) FROM [%s] SUB WHERE SUB.ID = ID', [FEtmTimeSlotClassName]));
+  // OrderBy (DESC because it load timeslots with negative ID)
+  LWhere._OrderBy('ID DESC');
+  // Load objects to be synchronized
+  LWhere.TypeName := FEtmTimeSlotClassName;
+  LWhere.ToList(FPayloadData);
+end;
+
+procedure TioEtmSynchroStrategy_Payload._DoNewSynchroLogItem_Create;
+begin
+  // Create a new instance as current SynchroLogItem of the right classs
+  Self.SynchroLogItem_New := TioEtmSynchroStrategy_LogItem.Create;
+end;
+
+procedure TioEtmSynchroStrategy_Payload._DoNewSynchroLogItem_Initialize;
+var
+  LSynchroLogItem_New: TioEtmSynchroStrategy_LogItem;
+  LSynchroLogItem_Old: TioEtmSynchroStrategy_LogItem;
+begin
+  inherited;
+  // Cast the SynchroLogItem to the specialized etm based class
+  LSynchroLogItem_New := Self.SynchroLogItem_New as TioEtmSynchroStrategy_LogItem;
+  LSynchroLogItem_Old := Self.SynchroLogItem_Old as TioEtmSynchroStrategy_LogItem;
+  // Initialize the new SynchroLogItem after its creation
+  LSynchroLogItem_New.EtmTimeSlotClassName := FEtmTimeSlotClassName;
+  LSynchroLogItem_New.TimeSlotID_From := LSynchroLogItem_Old.TimeSlotID_To + 1;
+end;
+
+procedure TioEtmSynchroStrategy_Payload._DoPersistPayloadToClient;
+var
+  LObj: TObject;
+  LEtmTimeSlot: TioEtmCustomTimeSlot;
+begin
+  inherited;
+  // Loop for all TimeSlots to be synchronized and revert and finally persist each of them
+  io.StartTransaction;
+  try
+    LObj := nil;
+    for LEtmTimeSlot in FPayloadData do
+    begin
+      LObj := io.ETM.RevertObject(LEtmTimeSlot, False);
+      try
+        if LObj <> nil then
+          io._PersistObject(LObj, TioPersistenceIntentType.itSynchronization, BL_SYNCHRO_PERSIST_PAYLOAD);
+      finally
+        FreeAndNil(LObj);
+      end;
+    end;
+    io.CommitTransaction;
+  except
+    io.RollbackTransaction;
+    raise;
+  end;
+end;
+
+procedure TioEtmSynchroStrategy_Payload._DoPersistPayloadToServer;
+var
+  LObj: TObject;
+  LEtmTimeSlot: TioEtmCustomTimeSlot;
+begin
+  inherited;
+  // Loop for all TimeSlots to be synchronized and revert and finally persist each of them
+  io.StartTransaction;
+  try
+    LObj := nil;
+    for LEtmTimeSlot in FPayloadData do
+    begin
+      LObj := io.ETM.RevertObject(LEtmTimeSlot, False);
+      try
+        if LObj <> nil then
+          io._PersistObject(LObj, TioPersistenceIntentType.itSynchronization, BL_SYNCHRO_PERSIST_PAYLOAD);
+      finally
+        FreeAndNil(LObj);
+      end;
+    end;
+    io.CommitTransaction;
+  except
+    io.RollbackTransaction;
+    raise;
+  end;
+end;
+
+procedure TioEtmSynchroStrategy_Payload._DoReloadPayloadFromServer;
+var
+  LSynchroLogItem_New: TioEtmSynchroStrategy_LogItem;
+  LWhere: IioWhere;
+begin
+  inherited;
+  // Clear the payload data
+  _ClearPayloadData;
+  // Cast the SynchroLogItem to the specialized etm based class
+  LSynchroLogItem_New := Self.SynchroLogItem_New as TioEtmSynchroStrategy_LogItem;
+  // Build where
+  LWhere := io.Where('ID', coGreaterOrEqual, LSynchroLogItem_New.TimeSlotID_From);
+  // Where: black & white class list
+  _BuildBlackAndWhiteListWhere(LWhere);
+  // Where: last timeslot for any object only
+  LWhere._And(Format('ID = SELECT MAX(SUB.ID) FROM [%s] SUB WHERE SUB.ID = ID', [FEtmTimeSlotClassName]));
+  // OrderBy (DESC because it load timeslots with negative ID)
+  LWhere._OrderBy('ID ASC');
+  // Load objects to be synchronized
+  LWhere.TypeName := FEtmTimeSlotClassName;
+  LWhere.ToList(FPayloadData);
+end;
+
+{ TioEtmSynchroStrategy_Client }
+
+constructor TioEtmSynchroStrategy_Client.Create(AOwner: TComponent);
+begin
+  inherited;
+  FEtmTimeSlotClassName := String.Empty;
+end;
+
+procedure TioEtmSynchroStrategy_Client._DoPayload_Initialize(const APayload: T);
+begin
+  inherited;
+
 end;
 
 end.
