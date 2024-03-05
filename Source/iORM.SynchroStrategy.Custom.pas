@@ -36,7 +36,8 @@ unit iORM.SynchroStrategy.Custom;
 interface
 
 uses
-  System.Classes, iORM.Context.Interfaces, iORM.SynchroStrategy.Interfaces, iORM.Attributes, DJSON.Attributes;
+  System.Classes, iORM.Context.Interfaces, iORM.SynchroStrategy.Interfaces, iORM.Attributes, DJSON.Attributes,
+  System.SysUtils;
 
 type
 
@@ -152,18 +153,22 @@ type
     property UserName: String read FUserName write FUserName;
   end;
 
-  TioCustomSynchroStrategy_Client<T: TioCustomSynchroStrategy_Payload, constructor> = class abstract(TComponent)
+  TioCustomSynchroStrategy = class abstract(TComponent, IioSynchroStrategy)
   strict private
+    FAsync: Boolean;
     FClassBlackList: TioSynchroStrategy_ClassList; // TList because it will be serialized by djson
     FClassWhiteList: TioSynchroStrategy_ClassList; // TList because it will be serialized by djson
     FSynchroLevel: TioSynchroLevel;
     FSynchroName: String;
     FTargetConnectionDef: IioSynchroStrategy_TargetConnectionDef; // IioSynchroStrategy_TargetConnectionDef instead of TioPersistenceStrategyRef to avoid circular reference
+    procedure _SyncExecute(AExecuteMethod: TProc; ATerminateMethod: TProc);
+    procedure _AsyncExecute(AExecuteMethod: TProc; ATerminateMethod: TProc);
     procedure SetTargetConnectionDef(const ATargetConnectionDef: IioSynchroStrategy_TargetConnectionDef);
   strict protected
     // ---------- Synchro strategy methods to override on descendant classes ----------
     function _DoGenerateLocalID(const AContext: IioContext): Integer; virtual; abstract;
-    procedure _DoPayload_Initialize(const APayload: T); virtual;
+    function _DoPayload_Create: TioCustomSynchroStrategy_Payload; virtual; abstract;
+    procedure _DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload); virtual;
     // ---------- Synchro strategy methods to override on descendant classes ----------
   public
     constructor Create(AOwner: TComponent); override;
@@ -171,28 +176,38 @@ type
     procedure DoSynchronization(const ASynchroLevel: TioSynchroLevel);
     function GenerateLocalID(const AContext: IioContext): Integer;
   published
+    property Async: Boolean read FAsync write FAsync default False;
     property ClassBlackList: TioSynchroStrategy_ClassList read FClassBlackList; // TList because it will be serialized by djson
     property ClassWhiteList: TioSynchroStrategy_ClassList read FClassWhiteList; // TList because it will be serialized by djson
     property SynchroLevel: TioSynchroLevel read FSynchroLevel write FSynchroLevel default slIncremental;
     property SynchroName: String read FSynchroName write FSynchroName;
-    property TargetConnectionDef: IioSynchroStrategy_TargetConnectionDef read FTargetConnectionDef write FTargetConnectionDef default nil;
+    property TargetConnectionDef: IioSynchroStrategy_TargetConnectionDef read FTargetConnectionDef write SetTargetConnectionDef default nil;
   end;
 
-  TioCustomSynchroStrategy_Server = class(TComponent)
-
+  TioCustomSynchroStrategy_Thread = class(TThread)
+  strict private
+    FExceptionMessage: String;
+    FExecuteMethod: TProc;
+    FTerminateMethod: TProc;
+  strict protected
+    procedure Execute; override;
+    procedure OnTerminateEventHandler(Sender: TObject);
+  public
+    constructor Create(AExecuteMethod: TProc; ATerminateMethod: TProc); overload;
   end;
-
 
 implementation
 
 uses
-  iORM, System.SysUtils, iORM.PersistenceStrategy.Factory, iORM.DB.Interfaces;
+  iORM, iORM.PersistenceStrategy.Factory, iORM.DB.Interfaces, iORM.Abstraction,
+  iORM.Exceptions;
 
 { TioCustomSynchroStrategy_Client }
 
-constructor TioCustomSynchroStrategy_Client<T>.Create(AOwner: TComponent);
+constructor TioCustomSynchroStrategy.Create(AOwner: TComponent);
 begin
   inherited;
+  FAsync := False;
   FClassBlackList := TioSynchroStrategy_ClassList.Create;
   FClassWhiteList := TioSynchroStrategy_ClassList.Create;
   FSynchroLevel := TioSynchroLevel.slIncremental;
@@ -200,7 +215,7 @@ begin
   FTargetConnectionDef := nil;
 end;
 
-destructor TioCustomSynchroStrategy_Client<T>.Destroy;
+destructor TioCustomSynchroStrategy.Destroy;
 begin
   FClassBlackList.Free;
   FClassWhiteList.Free;
@@ -209,12 +224,12 @@ begin
   inherited;
 end;
 
-function TioCustomSynchroStrategy_Client<T>.GenerateLocalID(const AContext: IioContext): Integer;
+function TioCustomSynchroStrategy.GenerateLocalID(const AContext: IioContext): Integer;
 begin
   Result := _DoGenerateLocalID(AContext);
 end;
 
-procedure TioCustomSynchroStrategy_Client<T>.SetTargetConnectionDef(const ATargetConnectionDef: IioSynchroStrategy_TargetConnectionDef);
+procedure TioCustomSynchroStrategy.SetTargetConnectionDef(const ATargetConnectionDef: IioSynchroStrategy_TargetConnectionDef);
 begin
   if ATargetConnectionDef <> FTargetConnectionDef then
   begin
@@ -228,7 +243,7 @@ begin
   end;
 end;
 
-procedure TioCustomSynchroStrategy_Client<T>._DoPayload_Initialize(const APayload: T);
+procedure TioCustomSynchroStrategy._DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload);
 begin
   APayload.SynchroLevel := FSynchroLevel;
   APayload.SynchroName := FSynchroName;
@@ -238,24 +253,57 @@ begin
 //  LPayLoad.UserName :=
 end;
 
-procedure TioCustomSynchroStrategy_Client<T>.DoSynchronization(const ASynchroLevel: TioSynchroLevel);
-var
-  LPayload: T;
-  LPersistenceStrategy: TioPersistenceStrategyRef;
+procedure TioCustomSynchroStrategy._AsyncExecute(AExecuteMethod, ATerminateMethod: TProc);
 begin
-  // Create the payload
+  io.ShowWait;
+  // Create and execute the thread
+  TioCustomSynchroStrategy_Thread.Create(AExecuteMethod, ATerminateMethod).Start;
+end;
+
+procedure TioCustomSynchroStrategy._SyncExecute(AExecuteMethod, ATerminateMethod: TProc);
+begin
+  io.ShowWait;
+  try
+    // Execute core code
+    AExecuteMethod;
+    // Execute OnTerminate code
+    if Assigned(ATerminateMethod) then
+      ATerminateMethod;
+  finally
+    io.HideWait;
+  end;
+end;
+
+procedure TioCustomSynchroStrategy.DoSynchronization(const ASynchroLevel: TioSynchroLevel);
+var
+  LPayload: TioCustomSynchroStrategy_Payload;
+  LPersistenceStrategy: TioPersistenceStrategyRef;
+  LExecuteMethod: TProc;
+  LTerminateMethod: TProc;
+begin
+  // Create the payload and initialize it
   // Note: Use a local variable and not a global one for the component because
   //        the synchronization must also be possible to perform asynchronously.
-  LPayload := T.Create;
-  try
-    // Initialize the payload
-    _DoPayload_Initialize(LPayload);
-    // Start the sychronization on the target persistence strategy
-    LPersistenceStrategy := TioPersistenceStrategyFactory.GetStrategy(FTargetConnectionDef.GetName);
+  LPayload := _DoPayload_Create;
+  _DoPayload_Initialize(LPayload);
+  // Get the right target persistence strategy
+  LPersistenceStrategy := TioPersistenceStrategyFactory.GetStrategy(FTargetConnectionDef.GetName);
+  // Build the execute method that start the synchronization
+  LExecuteMethod := procedure
+  begin
     LPersistenceStrategy.DoSynchronization(LPayload);
-  finally
-    LPayload.Free;
   end;
+  // Build the terminate method
+  LTerminateMethod := procedure
+  begin
+    LPayload.Free;
+    io.HideWait;
+  end;
+  // Execute the synchronization
+  if FASync then
+    _AsyncExecute(LExecuteMethod, LTerminateMethod)
+  else
+    _SyncExecute(LExecuteMethod, LTerminateMethod);
 end;
 
 { TioCustomSynchroStrategy_Payload }
@@ -486,6 +534,53 @@ begin
   FReloadFromServer := IO_DATETIME_NULL_VALUE;
   FPersistToClient := IO_DATETIME_NULL_VALUE;
   FCompleted := IO_DATETIME_NULL_VALUE;
+end;
+
+{ TioCustomSynchroStrategy_Thread }
+
+constructor TioCustomSynchroStrategy_Thread.Create(AExecuteMethod, ATerminateMethod: TProc);
+begin
+  inherited Create(True);
+  FExecuteMethod := AExecuteMethod;
+  FTerminateMethod := ATerminateMethod;
+  FExceptionMessage := String.Empty;
+  Self.OnTerminate := OnTerminateEventHandler;
+  Self.FreeOnTerminate := True;
+end;
+
+procedure TioCustomSynchroStrategy_Thread.Execute;
+begin
+  inherited;
+  try
+    FExecuteMethod;
+  except
+    on E: Exception do
+    begin
+      FExceptionMessage := E.Message;
+      raise;
+    end;
+  end;
+end;
+
+procedure TioCustomSynchroStrategy_Thread.OnTerminateEventHandler(Sender: TObject);
+var
+  LExceptionMessage: String;
+begin
+  // Execute the terminate anonymous method
+  if Assigned(FTerminateMethod) then
+    FTerminateMethod;
+  // If an exception was raised during the execution of the thread then load the error message into a local variable
+  //  (otherwise I had problems) and then raise a new exception with the same message so that it comes out to the user too.
+  // note: The new exception is raised decoupled with a Timer because I had problems otherwise.
+  if not FExceptionMessage.IsEmpty then
+  begin
+    LExceptionMessage := FExceptionMessage;
+    // TODO: Probabilmente ci saranno dei problemi con uniGUI, controllare
+    TioAnonymousTimer.Create(100, function: Boolean
+      begin
+        raise EioException.Create(LExceptionMessage);
+      end);
+  end;
 end;
 
 end.

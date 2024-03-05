@@ -78,11 +78,14 @@ type
     property EtmTimeSlotClassName: String read FEtmTimeSlotClassName write FEtmTimeSlotClassName;
   end;
 
-  TioEtmSynchroStrategy_Client = class(TioCustomSynchroStrategy_Client<TioEtmSynchroStrategy_Payload>)
+  TioEtmSynchroStrategy = class(TioCustomSynchroStrategy)
   strict private
     FEtmTimeSlotClassName: String;
   strict protected
-    procedure _DoPayload_Initialize(const APayload: T); override;
+    // ---------- Synchro strategy methods to override on descendant classes ----------
+    function _DoPayload_Create: TioCustomSynchroStrategy_Payload; override;
+    procedure _DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload); override;
+    // ---------- Synchro strategy methods to override on descendant classes ----------
   public
     constructor Create(AOwner: TComponent); override;
   published
@@ -268,16 +271,26 @@ end;
 
 { TioEtmSynchroStrategy_Client }
 
-constructor TioEtmSynchroStrategy_Client.Create(AOwner: TComponent);
+constructor TioEtmSynchroStrategy.Create(AOwner: TComponent);
 begin
   inherited;
   FEtmTimeSlotClassName := String.Empty;
 end;
 
-procedure TioEtmSynchroStrategy_Client._DoPayload_Initialize(const APayload: T);
+function TioEtmSynchroStrategy._DoPayload_Create: TioCustomSynchroStrategy_Payload;
+begin
+  Result := TioEtmSynchroStrategy_Payload.Create;
+end;
+
+procedure TioEtmSynchroStrategy._DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload);
+var
+  LPayload: TioEtmSynchroStrategy_Payload;
 begin
   inherited;
-
+  // Cast the payload to the specialized etm based class
+  LPayload := APayload as TioEtmSynchroStrategy_Payload;
+  // Initialize the new payload after its creation
+  LPayload.EtmTimeSlotClassName := FEtmTimeSlotClassName;
 end;
 
 end.

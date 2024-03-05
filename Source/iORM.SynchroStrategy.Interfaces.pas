@@ -46,19 +46,12 @@ type
 
   TioSynchroStrategy_ClassList = TList<String>;
 
-  IioSynchroStrategy_Client = interface
+  IioSynchroStrategy = interface
     ['{2295C6BF-1A5B-475B-BBC5-CF1A1C90B5B4}']
     function GenerateLocalID(const AContext: IioContext): Integer;
     procedure FreeNotification(AComponent: TComponent);
     procedure RemoveFreeNotification(AComponent: TComponent);
   end;
-
-//  IioSynchroStrategy_Server = interface
-//    ['{6FD4DECC-1989-4838-8368-78F0F3C95427}']
-//    function GetPayload: String;
-//    procedure LoadPayload;
-//    procedure PersistPayload;
-//  end;
 
   IioSynchroStrategy_TargetConnectionDef = interface
     ['{7CCD8D05-60F3-4AAF-AEA8-91DCA5E80D5B}']

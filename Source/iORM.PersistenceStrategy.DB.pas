@@ -361,7 +361,7 @@ end;
 class procedure TioPersistenceStrategyDB.InsertObject_Internal(const AContext: IioContext);
 var
   LQuery: IioQuery;
-  LSynchroStrategy_Client: IioSynchroStrategy_Client;
+  LSynchroStrategy_Client: IioSynchroStrategy;
 begin
   inherited;
   // -----------------------------------------------------------

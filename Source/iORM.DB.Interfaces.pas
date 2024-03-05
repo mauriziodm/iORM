@@ -90,9 +90,9 @@ type
     Persistent: Boolean;
     Strategy: TioPersistenceStrategyRef;
     UserName: String;
-    SynchroStrategy: IioSynchroStrategy_Client;
+    SynchroStrategy: IioSynchroStrategy;
     constructor Create(const AConnectionName: String; const AConnectionType: TioConnectionType; const APersistent: Boolean;
-      const AKeyGenerationTime: TioKeyGenerationTime; const ASynchroStrategy: IioSynchroStrategy_Client);
+      const AKeyGenerationTime: TioKeyGenerationTime; const ASynchroStrategy: IioSynchroStrategy);
   end;
 
   TioCompareOperatorRef = class of TioCompareOperator;
@@ -656,7 +656,7 @@ end;
 { TioConnectionInfo }
 
 constructor TioConnectionInfo.Create(const AConnectionName: String; const AConnectionType: TioConnectionType; const APersistent: Boolean;
-      const AKeyGenerationTime: TioKeyGenerationTime; const ASynchroStrategy: IioSynchroStrategy_Client);
+      const AKeyGenerationTime: TioKeyGenerationTime; const ASynchroStrategy: IioSynchroStrategy);
 begin
   ConnectionName := AConnectionName;
   ConnectionType := AConnectionType;

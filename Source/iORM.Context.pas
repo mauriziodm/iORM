@@ -138,7 +138,7 @@ type
     function RttiType: TRttiInstanceType;
     function WhereExist: Boolean;
     // TODO: Da eliminare
-    function SynchroStrategy_Client: IioSynchroStrategy_Client; inline;
+    function SynchroStrategy_Client: IioSynchroStrategy; inline;
     // Conflict strategy methods (to avoid circular reference)
     // TODO: Eliminare il parametro AContext? Mi sembra che viene sempre richiamato tipo "AContext.Check...Conflict(AContext) quindi...
     procedure CheckDeleteConflict(const AContext: IioContext); inline;
@@ -653,7 +653,7 @@ begin
   Result := FObjNextVersion;
 end;
 
-function TioContext.SynchroStrategy_Client: IioSynchroStrategy_Client;
+function TioContext.SynchroStrategy_Client: IioSynchroStrategy;
 begin
   Result := TioConnectionManager.GetSynchroStrategy_Client(GetTable.GetConnectionDefName);
 end;

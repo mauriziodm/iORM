@@ -95,10 +95,10 @@ type
     FServer: String;
     FSQLDialect: TioSQLDialect;
     FUserName: String;
-    FSynchroStrategy_Client: IioSynchroStrategy_Client;
+    FSynchroStrategy_Client: IioSynchroStrategy;
     function Get_Version: String;
     procedure SetAsDefault(const Value: Boolean);
-    procedure SetSynchroStrategy_Client(const ASynchroStrategy_Client: IioSynchroStrategy_Client);
+    procedure SetSynchroStrategy_Client(const ASynchroStrategy_Client: IioSynchroStrategy);
     // IioSynchroStrategy_TargetConnectionDef
     function GetName: String;
   protected
@@ -123,7 +123,7 @@ type
     property Server: String read FServer write FServer;
     property SQLDialect: TioSQLDialect read FSQLDialect write FSQLDialect;
     property UserName: String read FUserName write FUserName;
-    property SynchroStrategy_Client: IioSynchroStrategy_Client read FSynchroStrategy_Client write SetSynchroStrategy_Client default nil;
+    property SynchroStrategy_Client: IioSynchroStrategy read FSynchroStrategy_Client write SetSynchroStrategy_Client default nil;
     // Events
     property OnAfterCreateOrAlterDB: TioDBBuilderAfterCreateOrAlterDBEvent read FOnAfterCreateOrAlterDBEvent
       write FOnAfterCreateOrAlterDBEvent;
@@ -406,7 +406,7 @@ begin
   end;
 end;
 
-procedure TioCustomConnectionDef.SetSynchroStrategy_Client(const ASynchroStrategy_Client: IioSynchroStrategy_Client);
+procedure TioCustomConnectionDef.SetSynchroStrategy_Client(const ASynchroStrategy_Client: IioSynchroStrategy);
 begin
   if ASynchroStrategy_Client <> FSynchroStrategy_Client then
   begin
