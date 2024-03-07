@@ -4,8 +4,8 @@ object MainForm: TMainForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 545
-  ClientWidth = 280
+  ClientHeight = 543
+  ClientWidth = 272
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,8 +14,8 @@ object MainForm: TMainForm
   Font.Style = []
   Position = poDesktopCenter
   DesignSize = (
-    280
-    545)
+    272
+    543)
   TextHeight = 15
   object ImagePizza: TImage
     Left = 8
@@ -8480,8 +8480,8 @@ object MainForm: TMainForm
   end
   object Shape1: TShape
     Left = 0
-    Top = 322
-    Width = 280
+    Top = 320
+    Width = 272
     Height = 223
     Align = alBottom
     Brush.Color = clNavy
@@ -8504,8 +8504,8 @@ object MainForm: TMainForm
   end
   object ButtonOrders: TButton
     Left = 43
-    Top = 336
-    Width = 153
+    Top = 334
+    Width = 133
     Height = 44
     Action = acShowOrders
     Anchors = [akLeft, akRight, akBottom]
@@ -8516,13 +8516,11 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 0
-    ExplicitTop = 335
-    ExplicitWidth = 149
   end
   object ButtonCustomers: TButton
     Left = 43
-    Top = 386
-    Width = 153
+    Top = 384
+    Width = 133
     Height = 44
     Action = acShowCustomers
     Anchors = [akLeft, akRight, akBottom]
@@ -8533,13 +8531,11 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 1
-    ExplicitTop = 385
-    ExplicitWidth = 149
   end
   object ButtonPizzas: TButton
     Left = 43
-    Top = 436
-    Width = 153
+    Top = 434
+    Width = 133
     Height = 44
     Action = acShowPizzas
     Anchors = [akLeft, akRight, akBottom]
@@ -8550,13 +8546,11 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 2
-    ExplicitTop = 435
-    ExplicitWidth = 149
   end
   object ButtonQuit: TButton
     Left = 43
-    Top = 501
-    Width = 153
+    Top = 499
+    Width = 133
     Height = 32
     Action = acQuit
     Anchors = [akLeft, akRight, akBottom]
@@ -8567,8 +8561,6 @@ object MainForm: TMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 3
-    ExplicitTop = 500
-    ExplicitWidth = 149
   end
   object ioVCL1: TioVCL
     Left = 8
@@ -8621,9 +8613,5 @@ object MainForm: TMainForm
       ViewContextBy = vcByDefaultViewContextProvider
       VVMTypeAlias = 'LIST'
     end
-  end
-  object ioEtmBasedSynchroStrategy_Client1: TioEtmBasedSynchroStrategy_Client
-    Left = 144
-    Top = 176
   end
 end

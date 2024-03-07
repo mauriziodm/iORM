@@ -8,7 +8,8 @@ uses
   System.Actions, FMX.ActnList, iORM.Abstraction.FMX, iORM, iORM.Attributes, iORM.CommonTypes, iORM.DBBuilder.Interfaces, iORM.DB.ConnectionDef,
   iORM.MVVM.Interfaces, iORM.MVVM.ViewContextProvider, iORM.StdActions.Fmx, Data.Bind.GenData, Fmx.Bind.GenData, iORM.Where.Interfaces, Data.Bind.Components,
   Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.PrototypeBindSource.Master,
-  FireDAC.Phys.SQLiteWrapper.Stat, FMX.Edit;
+  FireDAC.Phys.SQLiteWrapper.Stat, FMX.Edit, iORM.SynchroStrategy.Interfaces, System.Generics.Collections, iORM.SynchroStrategy.Custom,
+  iORM.SynchroStrategy.EtmBased;
 
 type
 
@@ -34,11 +35,14 @@ type
     acShowCustomers: TioBSShowOrSelect;
     acShowPizzas: TioBSShowOrSelect;
     acShowOrders: TioBSShowOrSelect;
+    ServerConn: TioSQLiteConnectionDef;
+    SynchroStrategy: TioEtmSynchroStrategy;
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings);
     procedure VCProviderRequest(const Sender: TObject; out ResultViewContext: TComponent);
     procedure VCProviderRelease(const Sender: TObject; const AView, AViewContext: TComponent);
     procedure VCProviderAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
+    procedure ImageLogoDblClick(Sender: TObject);
   private
   public
   end;
@@ -53,10 +57,15 @@ uses
 
 {$R *.fmx}
 
+procedure TStartForm.ImageLogoDblClick(Sender: TObject);
+begin
+  SynchroStrategy.DoSynchronization(TioSynchroLevel.slIncremental);
+end;
+
 procedure TStartForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
   AWarnings: TStrings);
 begin
-  TSampleData.CheckForSampleDataCreation;
+//  TSampleData.CheckForSampleDataCreation;
 end;
 
 procedure TStartForm.VCProviderRequest(const Sender: TObject; out ResultViewContext: TComponent);

@@ -118,7 +118,7 @@ type
     procedure _SwitchToTargetConnection; virtual;
     procedure _ReturnToLocalConnection; virtual;
     // SynchroLogItem
-    procedure _DoLastSynchroLogItem_LoadFromClient; virtual;
+    procedure _DoOldSynchroLogItem_LoadFromClient; virtual;
     procedure _DoNewSynchroLogItem_Create; virtual;
     procedure _DoNewSynchroLogItem_Initialize; virtual;
     procedure _DoNewSynchroLogItem_SetStatus_LoadFromClient; virtual;
@@ -149,6 +149,7 @@ type
     property ClassWhiteList: TioSynchroStrategy_ClassList read FClassWhiteList; // TList because it will be serialized by djson
     property SynchroLevel: TioSynchroLevel read FSynchroLevel write FSynchroLevel;
     property SynchroName: String read FSynchroName write FSynchroName;
+    property TargetConnectionDefName: String read FTargetConnectionDefName write FTargetConnectionDefName;
     property UserID: Integer read FUserID write FUserID;
     property UserName: String read FUserName write FUserName;
   end;
@@ -249,6 +250,11 @@ begin
   APayload.SynchroName := FSynchroName;
   APayload.ClassBlackList.AddRange(FClassBlackList);
   APayload.ClassWhiteList.AddRange(FClassWhiteList);
+  if Assigned(FTargetConnectionDef) then
+    APayload.TargetConnectionDefName := FTargetConnectionDef.GetName
+  else
+    raise EioSynchroStrategyException.Create(ClassName, '_DoPayload_Initialize',
+      Format('The "TargetConnectionDef" property of the "%s" component is not set correctly.', [Name]));
 //  LPayLoad.UserID :=
 //  LPayLoad.UserName :=
 end;
@@ -316,6 +322,7 @@ begin
   FSynchroLogItem_New := nil;
   FSynchroLevel := TioSynchroLevel.slUndefined;
   FSynchroName := String.Empty;
+  FTargetConnectionDefName := String.Empty;
   FUserID := IO_INTEGER_NULL_VALUE;
   FUserName := IO_STRING_NULL_VALUE;
 end;
@@ -347,7 +354,7 @@ end;
 procedure TioCustomSynchroStrategy_Payload.Initialize;
 begin
   // Load the last SynchroLogItem from which to obtain information on the last synchronization operation performed
-  _DoLastSynchroLogItem_LoadFromClient;
+  _DoOldSynchroLogItem_LoadFromClient;
   // Create and initialize a new SynchroLogitem on which to store the information and status of the synchronization in progress
   _DoNewSynchroLogItem_Create;
   _DoNewSynchroLogItem_Initialize;
@@ -429,7 +436,7 @@ begin
   FSynchroLogItem_New.SynchroName := FSynchroName;
 end;
 
-procedure TioCustomSynchroStrategy_Payload._DoLastSynchroLogItem_LoadFromClient;
+procedure TioCustomSynchroStrategy_Payload._DoOldSynchroLogItem_LoadFromClient;
 var
   LWhere: IioWhere;
 begin

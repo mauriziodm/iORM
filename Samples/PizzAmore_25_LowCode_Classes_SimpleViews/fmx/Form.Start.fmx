@@ -5205,6 +5205,7 @@ object StartForm: TStartForm
             Size.Width = 264.000000000000000000
             Size.Height = 250.000000000000000000
             Size.PlatformDefault = False
+            OnDblClick = ImageLogoDblClick
           end
         end
       end
@@ -5225,8 +5226,8 @@ object StartForm: TStartForm
       Action_ParentCloseQueryAction = acQuit
       EntityTypeName = 'TCustomer'
       ShowMode = smEntityTypeName
-      VVMTypeAlias = 'LIST'
       ViewContextBy = vcByDefaultViewContextProvider
+      VVMTypeAlias = 'LIST'
     end
     object acShowPizzas: TioBSShowOrSelect
       Category = 'iORM-BS'
@@ -5234,8 +5235,8 @@ object StartForm: TStartForm
       Action_ParentCloseQueryAction = acQuit
       EntityTypeName = 'TPizza'
       ShowMode = smEntityTypeName
-      VVMTypeAlias = 'LIST'
       ViewContextBy = vcByDefaultViewContextProvider
+      VVMTypeAlias = 'LIST'
     end
     object acShowOrders: TioBSShowOrSelect
       Category = 'iORM-BS'
@@ -5243,8 +5244,8 @@ object StartForm: TStartForm
       Action_ParentCloseQueryAction = acQuit
       EntityTypeName = 'TOrder'
       ShowMode = smEntityTypeName
-      VVMTypeAlias = 'LIST'
       ViewContextBy = vcByDefaultViewContextProvider
+      VVMTypeAlias = 'LIST'
     end
   end
   object ioFMX1: TioFMX
@@ -5258,9 +5259,10 @@ object StartForm: TStartForm
     DatabaseStdFolder = sfDocuments
     Persistent = False
     Pooled = False
+    SynchroStrategy_Client = SynchroStrategy
     OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
     Left = 32
-    Top = 504
+    Top = 512
   end
   object VCProvider: TioViewContextProvider
     AsDefault = True
@@ -5269,5 +5271,20 @@ object StartForm: TStartForm
     OnRequest = VCProviderRequest
     Left = 96
     Top = 448
+  end
+  object ServerConn: TioSQLiteConnectionDef
+    AsDefault = False
+    Database = 'PizzAmore_25_LowCode_Classes_SimpleViews_Vcl.db'
+    DatabaseStdFolder = sfDocuments
+    Persistent = False
+    Pooled = False
+    Left = 256
+    Top = 304
+  end
+  object SynchroStrategy: TioEtmSynchroStrategy
+    TargetConnectionDef = ServerConn
+    EtmTimeSlotClassName = 'TEtmRepository'
+    Left = 131
+    Top = 304
   end
 end

@@ -264,6 +264,8 @@ type
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); virtual; abstract;
     class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
     class procedure GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext); virtual;
+    class procedure GenerateSqlMaxID(const AQuery: IioQuery; const AContext: IioContext); virtual;
+    class procedure GenerateSqlMinID(const AQuery: IioQuery; const AContext: IioContext); virtual;
     class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
     class procedure GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext); virtual;
     class procedure GenerateSqlUpdate(const AQuery: IioQuery; const AContext: IioContext); virtual;
@@ -580,6 +582,24 @@ begin
   // Conditions
   if AJoinItem.GetJoinType <> jtCross then
     Result := Result + ' ON (' + AJoinItem.GetJoinCondition + ')';
+end;
+
+class procedure TioSqlGenerator.GenerateSqlMaxID(const AQuery: IioQuery; const AContext: IioContext);
+begin
+  // Build the query that returns the highest ID
+  // -----------------------------------------------------------------
+  // Select
+  AQuery.SQL.Add(Format('SELECT COALESCE(MAX(%s),0) FROM %s', [AContext.GetProperties.GetIdProperty.GetSqlFieldName, AContext.GetTable.GetSQL]));
+  // -----------------------------------------------------------------
+end;
+
+class procedure TioSqlGenerator.GenerateSqlMinID(const AQuery: IioQuery; const AContext: IioContext);
+begin
+  // Build the query that returns the lowest ID
+  // -----------------------------------------------------------------
+  // Select
+  AQuery.SQL.Add(Format('SELECT COALESCE(MIN(%s),0) FROM %s', [AContext.GetProperties.GetIdProperty.GetSqlFieldName, AContext.GetTable.GetSQL]));
+  // -----------------------------------------------------------------
 end;
 
 class procedure TioSqlGenerator.GenerateSqlSelectLastObjVersionFromEntity(const AQuery: IioQuery; const AContext: IioContext);

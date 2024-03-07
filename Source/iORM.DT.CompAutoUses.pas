@@ -106,7 +106,9 @@ end;
 procedure TioSynchroStrategySelectionEditor.RequiresUnits(Proc: TGetStrProc);
 begin
   inherited;
+  Proc('iORM');
   Proc('iORM.SynchroStrategy.Interfaces');
+  Proc('iORM.SynchroStrategy.Custom');
 end;
 
 end.

@@ -63,7 +63,7 @@ type
   strict protected
     // ---------- Methods to override on descendant classes ----------
     // SynchroLogItem
-    procedure _DoLastSynchroLogItem_LoadFromClient; override;
+    procedure _DoOldSynchroLogItem_LoadFromClient; override;
     procedure _DoNewSynchroLogItem_Create; override;
     procedure _DoNewSynchroLogItem_Initialize; override;
     // Payload
@@ -83,6 +83,7 @@ type
     FEtmTimeSlotClassName: String;
   strict protected
     // ---------- Synchro strategy methods to override on descendant classes ----------
+    function _DoGenerateLocalID(const AContext: IioContext): Integer; override;
     function _DoPayload_Create: TioCustomSynchroStrategy_Payload; override;
     procedure _DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload); override;
     // ---------- Synchro strategy methods to override on descendant classes ----------
@@ -95,7 +96,8 @@ type
 implementation
 
 uses
-  iORM.CommonTypes, iORM, System.SysUtils, System.Generics.Collections;
+  iORM.CommonTypes, iORM, System.SysUtils, System.Generics.Collections,
+  iORM.DB.Interfaces, iORM.DB.Factory;
 
 { TioEtmBasetSynchroStrategy_LogItem }
 
@@ -127,15 +129,21 @@ var
   LEntityClassName: String;
 begin
   // WhiteList
-  AWhere._And._OpenPar;
-  for LEntityClassName in ClassWhiteList do
-    AWhere._Or('EntityClassName', coEquals, LEntityClassName);
-  AWhere._ClosePar;
+  if ClassWhiteList.Count > 0 then
+  begin
+    AWhere._And._OpenPar;
+    for LEntityClassName in ClassWhiteList do
+      AWhere._Or('EntityClassName', coEquals, LEntityClassName);
+    AWhere._ClosePar;
+  end;
   // BlackList
-  AWhere._And._OpenPar;
-  for LEntityClassName in ClassBlackList do
-    AWhere._And('EntityClassName', coNotEquals, LEntityClassName);
-  AWhere._ClosePar;
+  if ClassBlackList.Count > 0 then
+  begin
+    AWhere._And._OpenPar;
+    for LEntityClassName in ClassBlackList do
+      AWhere._And('EntityClassName', coNotEquals, LEntityClassName);
+    AWhere._ClosePar;
+  end;
 end;
 
 procedure TioEtmSynchroStrategy_Payload._ClearPayloadData;
@@ -143,14 +151,14 @@ begin
   FPayloadData.Count := 0;
 end;
 
-procedure TioEtmSynchroStrategy_Payload._DoLastSynchroLogItem_LoadFromClient;
+procedure TioEtmSynchroStrategy_Payload._DoOldSynchroLogItem_LoadFromClient;
 var
   LWhere: IioWhere;
 begin
   // Load last SynchroLogItem from the local client connection
   LWhere := io.Where('SynchroName', coEquals, SynchroName);
   LWhere._And('SynchroStatus', coEquals, TioSynchroStatus.ssCompleted);
-  LWhere._And('ID = SELECT MAX(SUB.ID) FROM [TioEtmBasedSynchroStrategy_LogItem] SUB WHERE SUB.SYNCHRONAME = SYNCHRONAME');
+  LWhere._And('ID = (SELECT MAX(SUB.ID) FROM [TioEtmSynchroStrategy_LogItem] SUB WHERE SUB.SYNCHRONAME = SYNCHRONAME)');
   Self.SynchroLogItem_Old := io.LoadObject<TioEtmSynchroStrategy_LogItem>(LWhere);
 end;
 
@@ -164,7 +172,7 @@ begin
   // Where: black & white class list
   _BuildBlackAndWhiteListWhere(LWhere);
   // Where: last timeslot for any object only
-  LWhere._And(Format('ID = SELECT MIN(SUB.ID) FROM [%s] SUB WHERE SUB.ID = ID', [FEtmTimeSlotClassName]));
+  LWhere._And(Format('ID = (SELECT MIN(SUB.ID) FROM [%s] SUB WHERE SUB.ID = ID)', [FEtmTimeSlotClassName]));
   // OrderBy (DESC because it load timeslots with negative ID)
   LWhere._OrderBy('ID DESC');
   // Load objects to be synchronized
@@ -189,7 +197,10 @@ begin
   LSynchroLogItem_Old := Self.SynchroLogItem_Old as TioEtmSynchroStrategy_LogItem;
   // Initialize the new SynchroLogItem after its creation
   LSynchroLogItem_New.EtmTimeSlotClassName := FEtmTimeSlotClassName;
-  LSynchroLogItem_New.TimeSlotID_From := LSynchroLogItem_Old.TimeSlotID_To + 1;
+  if LSynchroLogItem_Old <> nil then
+    LSynchroLogItem_New.TimeSlotID_From := LSynchroLogItem_Old.TimeSlotID_To + 1
+  else
+    LSynchroLogItem_New.TimeSlotID_From := 1;
 end;
 
 procedure TioEtmSynchroStrategy_Payload._DoPersistPayloadToClient;
@@ -261,7 +272,7 @@ begin
   // Where: black & white class list
   _BuildBlackAndWhiteListWhere(LWhere);
   // Where: last timeslot for any object only
-  LWhere._And(Format('ID = SELECT MAX(SUB.ID) FROM [%s] SUB WHERE SUB.ID = ID', [FEtmTimeSlotClassName]));
+  LWhere._And(Format('ID = (SELECT MAX(SUB.ID) FROM [%s] SUB WHERE SUB.ID = ID)', [FEtmTimeSlotClassName]));
   // OrderBy (DESC because it load timeslots with negative ID)
   LWhere._OrderBy('ID ASC');
   // Load objects to be synchronized
@@ -275,6 +286,19 @@ constructor TioEtmSynchroStrategy.Create(AOwner: TComponent);
 begin
   inherited;
   FEtmTimeSlotClassName := String.Empty;
+end;
+
+function TioEtmSynchroStrategy._DoGenerateLocalID(const AContext: IioContext): Integer;
+var
+  LQuery: IioQuery;
+begin
+  LQuery := TioDBFactory.QueryEngine.GetQueryMinID(AContext);
+  try
+    LQuery.Open;
+    AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, LQuery.Fields[0].AsInteger - 1);
+  finally
+    LQuery.Close;
+  end;
 end;
 
 function TioEtmSynchroStrategy._DoPayload_Create: TioCustomSynchroStrategy_Payload;

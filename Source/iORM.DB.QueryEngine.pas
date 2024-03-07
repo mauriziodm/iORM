@@ -60,6 +60,8 @@ type
     class function GetQueryDropIndex(const AContext: IioContext; const AIndexName: String): IioQuery;
     class function GetQueryExists(const AContext: IioContext): IioQuery;
     class function GetQueryInsert(const AContext: IioContext): IioQuery;
+    class function GetQueryMaxID(const AContext: IioContext): IioQuery;
+    class function GetQueryMinID(const AContext: IioContext): IioQuery;
     class function GetQueryNextID(const AContext: IioContext): IioQuery;
     class function GetQuerySelectList(const AContext: IioContext): IioQuery;
     class function GetQuerySelectObject(const AContext: IioContext): IioQuery;
@@ -219,18 +221,29 @@ begin
     LQuery.ParamByName_SetValue(AContext.GetTrueClass.GetSqlParamName, AContext.GetTrueClass.GetValue);
 end;
 
+class function TioQueryEngine.GetQueryMaxID(const AContext: IioContext): IioQuery;
+begin
+  // Get the query object and if does not contain an SQL text (come from QueryContainer)
+  //   then call the sql query generator
+  Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'MAX_ID', True));
+  if Result.IsSqlEmpty then
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlMaxID(Result, AContext);
+end;
+
+class function TioQueryEngine.GetQueryMinID(const AContext: IioContext): IioQuery;
+begin
+  // Get the query object and if does not contain an SQL text (come from QueryContainer)
+  //   then call the sql query generator
+  Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'MIN_ID', True));
+  if Result.IsSqlEmpty then
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlMinID(Result, AContext);
+end;
+
 class function TioQueryEngine.GetQueryNextID(const AContext: IioContext): IioQuery;
 begin
-  // NB: Ho dovuto togliere la QueryIdentity (messa = '' prima era = 'LID') perchè la query per farsi
-  // dare il prossimo ID dal genertore (firebird) e di questo tipo "SELECT GEN_ID(GeneratorName, 1) FROM RDB$DATABASE"
-  // dove "GeneratorName" non può essere un parametro perchè da un errore (ci ho provato) e quindi ho dovuto fare
-  // che il generatore di SQL genera la query con il nome del generatore hard-coded. Per quanto sopra scritto ho quindi
-  // dovuto eliminare la QueryIdentity e quindi per questa query non usa il QueryContainer e viene "preparata" ogni volta
-  // senza parametri.
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
-  // then call the sql query generator
-  // Result := TioDbFactory.Query(AContext.GetConnectionDefName, ComposeQueryIdentity(AContext, 'LID'));
-  Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName); // NoQueryIdentity
+  //   then call the sql query generator
+  Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'NEXT_ID', True));
   if Result.IsSqlEmpty then
     TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlNextID(Result, AContext);
 end;
