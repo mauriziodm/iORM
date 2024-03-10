@@ -158,7 +158,7 @@ begin
   // Load last SynchroLogItem from the local client connection
   LWhere := io.Where('SynchroName', coEquals, SynchroName);
   LWhere._And('SynchroStatus', coEquals, TioSynchroStatus.ssCompleted);
-  LWhere._And('ID = (SELECT MAX(SUB.ID) FROM [TioEtmSynchroStrategy_LogItem] SUB WHERE SUB.SYNCHRONAME = SYNCHRONAME)');
+  LWhere._And('[.ID] = (SELECT MAX(SUB.ID) FROM [TioEtmSynchroStrategy_LogItem] SUB WHERE SUB.SYNCHRONAME = [.SYNCHRONAME])');
   Self.SynchroLogItem_Old := io.LoadObject<TioEtmSynchroStrategy_LogItem>(LWhere);
 end;
 
@@ -172,9 +172,34 @@ begin
   // Where: black & white class list
   _BuildBlackAndWhiteListWhere(LWhere);
   // Where: last timeslot for any object only
-  LWhere._And(Format('ID = (SELECT MIN(SUB.ID) FROM [%s] SUB WHERE SUB.ID = ID)', [FEtmTimeSlotClassName]));
+  LWhere._And(Format('[.ID] = (SELECT MIN(SUB.ID) FROM [%s] SUB WHERE SUB.EntityClassName = [.EntityClassName] AND SUB.EntityID = [.EntityID])',
+    [FEtmTimeSlotClassName]));
   // OrderBy (DESC because it load timeslots with negative ID)
-  LWhere._OrderBy('ID DESC');
+  LWhere._OrderBy('[.ID] DESC');
+  // Load objects to be synchronized
+  LWhere.TypeName := FEtmTimeSlotClassName;
+  LWhere.ToList(FPayloadData);
+end;
+
+procedure TioEtmSynchroStrategy_Payload._DoReloadPayloadFromServer;
+var
+  LSynchroLogItem_New: TioEtmSynchroStrategy_LogItem;
+  LWhere: IioWhere;
+begin
+  inherited;
+  // Clear the payload data
+  _ClearPayloadData;
+  // Cast the SynchroLogItem to the specialized etm based class
+  LSynchroLogItem_New := Self.SynchroLogItem_New as TioEtmSynchroStrategy_LogItem;
+  // Build where
+  LWhere := io.Where('ID', coGreaterOrEqual, LSynchroLogItem_New.TimeSlotID_From);
+  // Where: black & white class list
+  _BuildBlackAndWhiteListWhere(LWhere);
+  // Where: last timeslot for any object only
+  LWhere._And(Format('[.ID] = (SELECT MAX(SUB.ID) FROM [%s] SUB WHERE SUB.EntityClassName = [.EntityClassName] AND SUB.EntityID = [.EntityID])',
+    [FEtmTimeSlotClassName]));
+  // OrderBy (DESC because it load timeslots with negative ID)
+  LWhere._OrderBy('[.ID] ASC');
   // Load objects to be synchronized
   LWhere.TypeName := FEtmTimeSlotClassName;
   LWhere.ToList(FPayloadData);
@@ -257,29 +282,6 @@ begin
   end;
 end;
 
-procedure TioEtmSynchroStrategy_Payload._DoReloadPayloadFromServer;
-var
-  LSynchroLogItem_New: TioEtmSynchroStrategy_LogItem;
-  LWhere: IioWhere;
-begin
-  inherited;
-  // Clear the payload data
-  _ClearPayloadData;
-  // Cast the SynchroLogItem to the specialized etm based class
-  LSynchroLogItem_New := Self.SynchroLogItem_New as TioEtmSynchroStrategy_LogItem;
-  // Build where
-  LWhere := io.Where('ID', coGreaterOrEqual, LSynchroLogItem_New.TimeSlotID_From);
-  // Where: black & white class list
-  _BuildBlackAndWhiteListWhere(LWhere);
-  // Where: last timeslot for any object only
-  LWhere._And(Format('ID = (SELECT MAX(SUB.ID) FROM [%s] SUB WHERE SUB.ID = ID)', [FEtmTimeSlotClassName]));
-  // OrderBy (DESC because it load timeslots with negative ID)
-  LWhere._OrderBy('ID ASC');
-  // Load objects to be synchronized
-  LWhere.TypeName := FEtmTimeSlotClassName;
-  LWhere.ToList(FPayloadData);
-end;
-
 { TioEtmSynchroStrategy_Client }
 
 constructor TioEtmSynchroStrategy.Create(AOwner: TComponent);
@@ -295,7 +297,7 @@ begin
   LQuery := TioDBFactory.QueryEngine.GetQueryMinID(AContext);
   try
     LQuery.Open;
-    AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, LQuery.Fields[0].AsInteger - 1);
+    Result := LQuery.Fields[0].AsInteger - 1;
   finally
     LQuery.Close;
   end;

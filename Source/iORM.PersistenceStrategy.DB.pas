@@ -379,7 +379,7 @@ begin
   // -----------------------------------------------------------
   // If a SynchroStrategy is assigned and active (local remote and not connected device) and the object ID
   //  is not assigned then it asks the SynchroStrategy for a temporary local ID.
-  // Note: Obviously if a new ID is assigned by SynchroStrategy this will disable normal ID generation (if generated ID is not NULL)
+  // Note: Obviously if a new ID is assigned by SynchroStrategy this will disable the normal ID generation (if generated ID is not NULL)
   LSynchroStrategy_Client := TioConnectionManager.GetSynchroStrategy_Client(AContext.GetTable.GetConnectionDefName);
   if (LSynchroStrategy_Client <> nil) and AContext.IDIsNull then
     AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, LSynchroStrategy_Client.GenerateLocalID(AContext));

@@ -349,6 +349,8 @@ begin
   finally
     _ReturnToLocalConnection;
   end;
+  // Persist even locally
+  _DoNewSynchroLogItem_Persist;
 end;
 
 procedure TioCustomSynchroStrategy_Payload.Initialize;
