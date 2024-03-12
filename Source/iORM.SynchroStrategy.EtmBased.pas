@@ -203,6 +203,8 @@ begin
   // Load objects to be synchronized
   LWhere.TypeName := FEtmTimeSlotClassName;
   LWhere.ToList(FPayloadData);
+  // Update the SynchroLogItem
+  LSynchroLogItem_New.TimeSlotID_To := FPayloadData.Last.ID;
 end;
 
 procedure TioEtmSynchroStrategy_Payload._DoNewSynchroLogItem_Create;
