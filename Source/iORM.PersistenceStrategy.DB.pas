@@ -381,7 +381,7 @@ begin
   //  is not assigned then it asks the SynchroStrategy for a temporary local ID.
   // Note: Obviously if a new ID is assigned by SynchroStrategy this will disable the normal ID generation (if generated ID is not NULL)
   LSynchroStrategy_Client := TioConnectionManager.GetSynchroStrategy_Client(AContext.GetTable.GetConnectionDefName);
-  if (LSynchroStrategy_Client <> nil) and AContext.IDIsNull then
+  if (LSynchroStrategy_Client <> nil) and AContext.IDIsNull and LSynchroStrategy_Client.CanSynchronize(AContext) then
     AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, LSynchroStrategy_Client.GenerateLocalID(AContext));
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the next ID for the inserting object
