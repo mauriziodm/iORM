@@ -48,7 +48,7 @@ type
 
   IioSynchroStrategy = interface
     ['{2295C6BF-1A5B-475B-BBC5-CF1A1C90B5B4}']
-    function CanSynchronize(const AContext: IioContext): Boolean;
+    function IsToBeSynchronized(const AContext: IioContext): Boolean;
     function GenerateLocalID(const AContext: IioContext): Integer;
     procedure FreeNotification(AComponent: TComponent);
     procedure RemoveFreeNotification(AComponent: TComponent);

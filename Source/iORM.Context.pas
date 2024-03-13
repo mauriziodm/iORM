@@ -137,8 +137,11 @@ type
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
     function WhereExist: Boolean;
-    // TODO: Da eliminare
-    function SynchroStrategy_Client: IioSynchroStrategy; inline;
+    // Synchronization Strategy methods
+    function SynchroStrategy_GetClient: IioSynchroStrategy; inline;
+    procedure SynchroStrategy_GenerateLocalID;
+    // TODO: Da togliere se non usato
+    function SynchroStrategy_IsToBeSynchronized: Boolean;
     // Conflict strategy methods (to avoid circular reference)
     // TODO: Eliminare il parametro AContext? Mi sembra che viene sempre richiamato tipo "AContext.Check...Conflict(AContext) quindi...
     procedure CheckDeleteConflict(const AContext: IioContext); inline;
@@ -653,9 +656,33 @@ begin
   Result := FObjNextVersion;
 end;
 
-function TioContext.SynchroStrategy_Client: IioSynchroStrategy;
+procedure TioContext.SynchroStrategy_GenerateLocalID;
+var
+  LSynchroStrategy_Client: IioSynchroStrategy;
+begin
+  // If a SynchroStrategy is assigned and active (local remote and not connected device) and the object ID
+  //  is not assigned then it asks the SynchroStrategy for a temporary local ID.
+  // Note: Obviously if a new ID is assigned by SynchroStrategy this will disable the normal ID generation (if generated ID is not NULL)
+  LSynchroStrategy_Client := SynchroStrategy_GetClient;
+  // If is to be synchronized...
+  if (LSynchroStrategy_Client <> nil) and IDIsNull and LSynchroStrategy_Client.IsToBeSynchronized(Self) then
+    GetProperties.GetIdProperty.SetValue(DataObject, LSynchroStrategy_Client.GenerateLocalID(Self));
+end;
+
+function TioContext.SynchroStrategy_GetClient: IioSynchroStrategy;
 begin
   Result := TioConnectionManager.GetSynchroStrategy_Client(GetTable.GetConnectionDefName);
+end;
+
+function TioContext.SynchroStrategy_IsToBeSynchronized: Boolean;
+var
+  LSynchroStrategy_Client: IioSynchroStrategy;
+begin
+  // If a SynchroStrategy is assigned and active (local remote and not connected device) and the object ID
+  //  is not assigned then it asks the SynchroStrategy for a temporary local ID.
+  // Note: Obviously if a new ID is assigned by SynchroStrategy this will disable the normal ID generation (if generated ID is not NULL)
+  LSynchroStrategy_Client := SynchroStrategy_GetClient;
+  Result := (LSynchroStrategy_Client <> nil) and IDIsNull and LSynchroStrategy_Client.IsToBeSynchronized(Self);
 end;
 
 function TioContext.IsTrueClass: Boolean;

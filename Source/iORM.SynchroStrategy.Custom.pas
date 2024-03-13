@@ -166,7 +166,7 @@ type
     procedure _AsyncExecute(AExecuteMethod: TProc; ATerminateMethod: TProc);
     procedure SetTargetConnectionDef(const ATargetConnectionDef: IioSynchroStrategy_TargetConnectionDef);
   strict protected
-    function CanSynchronize(const AContext: IioContext): Boolean; virtual;
+    function IsToBeSynchronized(const AContext: IioContext): Boolean; virtual;
     // ---------- Synchro strategy methods to override on descendant classes ----------
     function _DoGenerateLocalID(const AContext: IioContext): Integer; virtual; abstract;
     function _DoPayload_Create: TioCustomSynchroStrategy_Payload; virtual; abstract;
@@ -273,7 +273,7 @@ begin
   TioCustomSynchroStrategy_Thread.Create(AExecuteMethod, ATerminateMethod).Start;
 end;
 
-function TioCustomSynchroStrategy.CanSynchronize(const AContext: IioContext): Boolean;
+function TioCustomSynchroStrategy.IsToBeSynchronized(const AContext: IioContext): Boolean;
 begin
   // Detect if the current DataObject is to be synchronized or not (Black & White class list)
   Result := ( (FClassWhiteList.Count = 0) or (FClassWhiteList.IndexOf(AContext.DataObject.ClassName) <> -1) )

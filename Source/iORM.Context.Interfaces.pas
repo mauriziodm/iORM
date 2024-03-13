@@ -62,6 +62,8 @@ type
     procedure ResolveInsertConflict(const AContext: IioContext);
     procedure ResolveUpdateConflict(const AContext: IioContext);
     function GetCurrentStrategyName: String;
+    // Synchronization Strategy methods
+    procedure SynchroStrategy_GenerateLocalID;
     // BlindLevel helper methods
     function BlindLevel_Do_DetectObjExists: boolean;
     function BlindLevel_Do_AutoUpdateProps: boolean;
