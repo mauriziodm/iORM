@@ -287,10 +287,20 @@ begin
 end;
 
 function TioCustomSynchroStrategy.IsToBeSynchronized(const AContext: IioContext): Boolean;
+var
+  LClassName: String;
 begin
+  // If we are persisting a TimeSlot then to understand if it needs to be synchronized
+  //  (which for EtmSynchroStrategy simply means that it must assign a negative ID)
+  //  is based on the name of the class of the entity to which the TimeSlot refers;
+  //  otherwise it is based on the name of the class that is being persisted.
+  if AContext.DataObject is TioEtmCustomTimeSlot then
+    LClassName := TioEtmCustomTimeSlot(AContext.DataObject).EntityClassName
+  else
+    LClassName := AContext.DataObject.ClassName;
   // Detect if the current DataObject is to be synchronized or not (Black & White class list)
-  Result := ( (FClassWhiteList.Count = 0) or (FClassWhiteList.IndexOf(AContext.DataObject.ClassName) <> -1) )
-        and ( (FClassBlackList.Count = 0) or (FClassBlackList.IndexOf(AContext.DataObject.ClassName) = -1) );
+  Result := ( (FClassWhiteList.Count = 0) or (FClassWhiteList.IndexOf(LClassName) <> -1) )
+        and ( (FClassBlackList.Count = 0) or (FClassBlackList.IndexOf(LClassName) = -1) );
 end;
 
 procedure TioCustomSynchroStrategy._SyncExecute(AExecuteMethod, ATerminateMethod: TProc);

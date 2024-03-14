@@ -300,6 +300,8 @@ begin
   try
     LQuery.Open;
     Result := LQuery.Fields[0].AsInteger - 1;
+    if Result > -1 then
+      Result := -1;
   finally
     LQuery.Close;
   end;
