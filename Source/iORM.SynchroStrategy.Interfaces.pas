@@ -40,7 +40,7 @@ uses
 
 type
 
-  TioSynchroLevel = (slUndefined, slFull, slIncremental);
+  TioSynchroLevel = (slIncremental, slFull);
 
   TioSynchroStatus = (ssInitialization, ssLoadFromClient, ssPersistToServer, ssReloadFromServer, ssPersistToClient, ssCompleted);
 

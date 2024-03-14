@@ -80,24 +80,33 @@ type
 
   TioEtmSynchroStrategy = class(TioCustomSynchroStrategy)
   strict private
-    FEtmTimeSlotClassName: String;
+    FEtmTimeSlot_ClassName: String;
+    FEtmTimeSlot_Persist_Received: Boolean;
+    FEtmTimeSlot_Persist_Regular: Boolean;
+    FEtmTimeSlot_Persist_Sent: Boolean;
+    procedure _CheckEtmTimeSlotClassName;
+    procedure SetEtmTimeSlot_ClassName(const Value: String);
   strict protected
     // ---------- Synchro strategy methods to override on descendant classes ----------
     function _DoGenerateLocalID(const AContext: IioContext): Integer; override;
     function _DoPayload_Create: TioCustomSynchroStrategy_Payload; override;
-    procedure _DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload); override;
+    procedure _DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload; const ASynchroLevel: TioSynchroLevel); override;
     // ---------- Synchro strategy methods to override on descendant classes ----------
   public
     constructor Create(AOwner: TComponent); override;
   published
-    property EtmTimeSlotClassName: String read FEtmTimeSlotClassName write FEtmTimeSlotClassName;
+    property EtmTimeSlot_ClassName: String read FEtmTimeSlot_ClassName write SetEtmTimeSlot_ClassName;
+    property EtmTimeSlot_Persist_Received: Boolean read FEtmTimeSlot_Persist_Received write FEtmTimeSlot_Persist_Received default False;
+    property EtmTimeSlot_Persist_Regular: Boolean read FEtmTimeSlot_Persist_Regular write FEtmTimeSlot_Persist_Regular default False;
+    property EtmTimeSlot_Persist_Sent: Boolean read FEtmTimeSlot_Persist_Sent write FEtmTimeSlot_Persist_Sent default False;
   end;
 
 implementation
 
 uses
   iORM.CommonTypes, iORM, System.SysUtils, System.Generics.Collections,
-  iORM.DB.Interfaces, iORM.DB.Factory;
+  iORM.DB.Interfaces, iORM.DB.Factory, iORM.Exceptions,
+  iORM.Context.Map.Interfaces, iORM.Context.Container;
 
 { TioEtmBasetSynchroStrategy_LogItem }
 
@@ -289,7 +298,41 @@ end;
 constructor TioEtmSynchroStrategy.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FEtmTimeSlotClassName := String.Empty;
+  FEtmTimeSlot_ClassName := String.Empty;
+  FEtmTimeSlot_Persist_Received := False;
+  FEtmTimeSlot_Persist_Regular := False;
+  FEtmTimeSlot_Persist_Sent := False;
+end;
+
+procedure TioEtmSynchroStrategy.SetEtmTimeSlot_ClassName(const Value: String);
+begin
+  FEtmTimeSlot_ClassName := Value.Trim;
+end;
+
+procedure TioEtmSynchroStrategy._CheckEtmTimeSlotClassName;
+var
+  LMap: IioMap;
+begin
+  // Check property is not empty
+  if FEtmTimeSlot_ClassName.Trim.IsEmpty then
+    raise EioSynchroStrategyException.Create(ClassName, '_CheckEtmTimeSlotClassName', Format('Hi, I''m iORM and I have something to tell you.' +
+      #13#13'The "EtmTimeSlot_ClassName" property of the SynchroStrategy component called "%s" was not set.' +
+      #13#13'Please Set the property to an ETM Repository/Timeslot class name and try again.' +
+      #13#13'It will work.', [Name]));
+  // Check if the FEtmTimeSlotClassName is mapped
+  if not TioMapContainer.Exist(FEtmTimeSlot_ClassName) then
+    raise EioException.Create(ClassName, '_CheckEtmTimeSlotClassName', Format('Hi, I''m iORM and I have something to tell you.' +
+      #13#13'I cannot find the map of the ETM Repository/TimeSlot class named "%s" specified in the "EtmTimeSlot_ClassName" property of the SynchroStrategy component called "%s".' +
+      #13#13'May be that you forgot to decorate the class with the "[etmRepository]" attribute on it.' +
+      #13#13'Also make sure that you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit where the class is declared.' +
+      #13#13'Check and try again please, it will work.', [FEtmTimeSlot_ClassName, Name]));
+  // Check if the property is set to a EtmTimeSlotClass
+  LMap := TioMapContainer.GetMap(FEtmTimeSlot_ClassName);
+  if not LMap.GetTable.GetRttiType.MetaclassType.InheritsFrom(TioEtmCustomTimeSlot) then
+    raise EioException.Create(ClassName, '_CheckEtmTimeSlotClassName', Format('Hi, I''m iORM and I have something to tell you.' +
+      #13#13'The class "%s" specified in the "EtmTimeSlot_ClassName" property of the SynchroStrategy component named "%s" is not an ETM Repository/TimeSlot class.' +
+      #13#13'Make sure that the property is set to an ETM Repository/TimeSlot class name and try again.' +
+      #13#13'It will work.', [FEtmTimeSlot_ClassName, Name]));
 end;
 
 function TioEtmSynchroStrategy._DoGenerateLocalID(const AContext: IioContext): Integer;
@@ -312,7 +355,7 @@ begin
   Result := TioEtmSynchroStrategy_Payload.Create;
 end;
 
-procedure TioEtmSynchroStrategy._DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload);
+procedure TioEtmSynchroStrategy._DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload; const ASynchroLevel: TioSynchroLevel);
 var
   LPayload: TioEtmSynchroStrategy_Payload;
 begin
@@ -320,7 +363,8 @@ begin
   // Cast the payload to the specialized etm based class
   LPayload := APayload as TioEtmSynchroStrategy_Payload;
   // Initialize the new payload after its creation
-  LPayload.EtmTimeSlotClassName := FEtmTimeSlotClassName;
+  _CheckEtmTimeSlotClassName;
+  LPayload.EtmTimeSlotClassName := FEtmTimeSlot_ClassName
 end;
 
 end.

@@ -157,22 +157,21 @@ type
   TioCustomSynchroStrategy = class abstract(TComponent, IioSynchroStrategy)
   strict private
     FAsync: Boolean;
-    FClassBlackList: TStrings;
-    FClassWhiteList: TStrings;
-    FSynchroLevel: TioSynchroLevel;
+    FEntities_BlackList: TStrings;
+    FEntities_WhiteList: TStrings;
     FSynchroName: String;
     FTargetConnectionDef: IioSynchroStrategy_TargetConnectionDef; // IioSynchroStrategy_TargetConnectionDef instead of TioPersistenceStrategyRef to avoid circular reference
     procedure _SyncExecute(AExecuteMethod: TProc; ATerminateMethod: TProc);
     procedure _AsyncExecute(AExecuteMethod: TProc; ATerminateMethod: TProc);
     procedure SetTargetConnectionDef(const ATargetConnectionDef: IioSynchroStrategy_TargetConnectionDef);
-    procedure SetClassBlackList(const Value: TStrings);
-    procedure SetClassWhiteList(const Value: TStrings);
+    procedure SetEntities_BlackList(const Value: TStrings);
+    procedure SetEntities_WhiteList(const Value: TStrings);
     strict protected
     function IsToBeSynchronized(const AContext: IioContext): Boolean; virtual;
     // ---------- Synchro strategy methods to override on descendant classes ----------
     function _DoGenerateLocalID(const AContext: IioContext): Integer; virtual; abstract;
     function _DoPayload_Create: TioCustomSynchroStrategy_Payload; virtual; abstract;
-    procedure _DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload); virtual;
+    procedure _DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload; const ASynchroLevel: TioSynchroLevel); virtual;
     // ---------- Synchro strategy methods to override on descendant classes ----------
   public
     constructor Create(AOwner: TComponent); override;
@@ -182,9 +181,8 @@ type
   published
     property Async: Boolean read FAsync write FAsync default False;
     // TODO: Togliere la parte write
-    property ClassBlackList: TStrings read FClassBlackList write SetClassBlackList;
-    property ClassWhiteList: TStrings read FClassWhiteList write SetClassWhiteList;
-    property SynchroLevel: TioSynchroLevel read FSynchroLevel write FSynchroLevel default slIncremental;
+    property Entities_BlackList: TStrings read FEntities_BlackList write SetEntities_BlackList;
+    property Entities_WhiteList: TStrings read FEntities_WhiteList write SetEntities_WhiteList;
     property SynchroName: String read FSynchroName write FSynchroName;
     property TargetConnectionDef: IioSynchroStrategy_TargetConnectionDef read FTargetConnectionDef write SetTargetConnectionDef default nil;
   end;
@@ -213,17 +211,16 @@ constructor TioCustomSynchroStrategy.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FAsync := False;
-  FClassBlackList := TStringList.Create;
-  FClassWhiteList := TStringList.Create;
-  FSynchroLevel := TioSynchroLevel.slIncremental;
+  FEntities_BlackList := TStringList.Create;
+  FEntities_WhiteList := TStringList.Create;
   FSynchroName := IO_STRING_NULL_VALUE;
   FTargetConnectionDef := nil;
 end;
 
 destructor TioCustomSynchroStrategy.Destroy;
 begin
-  FClassBlackList.Free;
-  FClassWhiteList.Free;
+  FEntities_BlackList.Free;
+  FEntities_WhiteList.Free;
   inherited;
 end;
 
@@ -232,15 +229,15 @@ begin
   Result := _DoGenerateLocalID(AContext);
 end;
 
-procedure TioCustomSynchroStrategy.SetClassBlackList(const Value: TStrings);
+procedure TioCustomSynchroStrategy.SetEntities_BlackList(const Value: TStrings);
 begin
-  FClassBlackList.Text := Value.Text.Trim;
+  FEntities_BlackList.Text := Value.Text.Trim;
 //  FClassBlackList.Assign(Value);
 end;
 
-procedure TioCustomSynchroStrategy.SetClassWhiteList(const Value: TStrings);
+procedure TioCustomSynchroStrategy.SetEntities_WhiteList(const Value: TStrings);
 begin
-  FClassWhiteList.Text := Value.Text.Trim;
+  FEntities_WhiteList.Text := Value.Text.Trim;
 //  FClassWhiteList.Assign(Value);
 end;
 
@@ -258,16 +255,16 @@ begin
   end;
 end;
 
-procedure TioCustomSynchroStrategy._DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload);
+procedure TioCustomSynchroStrategy._DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload; const ASynchroLevel: TioSynchroLevel);
 var
   LClassName: String;
 begin
-  APayload.SynchroLevel := FSynchroLevel;
+  APayload.SynchroLevel := ASynchroLevel;
   APayload.SynchroName := FSynchroName;
   // Black & White class list
-  for LClassName in FClassBlackList do
+  for LClassName in FEntities_BlackList do
     APayload.ClassBlackList.Add(LClassName);
-  for LClassName in FClassWhiteList do
+  for LClassName in FEntities_WhiteList do
     APayload.ClassWhiteList.Add(LClassName);
   // TargetConnectionDef
   if Assigned(FTargetConnectionDef) then
@@ -299,8 +296,8 @@ begin
   else
     LClassName := AContext.DataObject.ClassName;
   // Detect if the current DataObject is to be synchronized or not (Black & White class list)
-  Result := ( (FClassWhiteList.Count = 0) or (FClassWhiteList.IndexOf(LClassName) <> -1) )
-        and ( (FClassBlackList.Count = 0) or (FClassBlackList.IndexOf(LClassName) = -1) );
+  Result := ( (FEntities_WhiteList.Count = 0) or (FEntities_WhiteList.IndexOf(LClassName) <> -1) )
+        and ( (FEntities_BlackList.Count = 0) or (FEntities_BlackList.IndexOf(LClassName) = -1) );
 end;
 
 procedure TioCustomSynchroStrategy._SyncExecute(AExecuteMethod, ATerminateMethod: TProc);
@@ -328,7 +325,7 @@ begin
   // Note: Use a local variable and not a global one for the component because
   //        the synchronization must also be possible to perform asynchronously.
   LPayload := _DoPayload_Create;
-  _DoPayload_Initialize(LPayload);
+  _DoPayload_Initialize(LPayload, ASynchroLevel);
   // Get the right target persistence strategy
   LPersistenceStrategy := TioPersistenceStrategyFactory.GetStrategy(FTargetConnectionDef.GetName);
   // Build the execute method that start the synchronization
@@ -357,7 +354,7 @@ begin
   FClassBlackList := TioSynchroStrategy_ClassList.Create;
   FSynchroLogItem_Old := nil;
   FSynchroLogItem_New := nil;
-  FSynchroLevel := TioSynchroLevel.slUndefined;
+  FSynchroLevel := TioSynchroLevel.slIncremental;
   FSynchroName := String.Empty;
   FTargetConnectionDefName := String.Empty;
   FUserID := IO_INTEGER_NULL_VALUE;
@@ -571,7 +568,7 @@ begin
   FSynchroName := IO_STRING_NULL_VALUE;
   FUserID := IO_INTEGER_NULL_VALUE;
   FUserName := IO_STRING_NULL_VALUE;
-  FSynchroLevel := TioSynchroLevel.slUndefined;
+  FSynchroLevel := TioSynchroLevel.slIncremental;
   FSynchroStatus := TioSynchroStatus.ssInitialization;
   // Timing
   FStart := IO_DATETIME_NULL_VALUE;
