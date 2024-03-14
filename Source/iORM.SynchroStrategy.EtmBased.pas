@@ -288,7 +288,7 @@ end;
 
 constructor TioEtmSynchroStrategy.Create(AOwner: TComponent);
 begin
-  inherited;
+  inherited Create(AOwner);
   FEtmTimeSlotClassName := String.Empty;
 end;
 

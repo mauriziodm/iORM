@@ -157,15 +157,17 @@ type
   TioCustomSynchroStrategy = class abstract(TComponent, IioSynchroStrategy)
   strict private
     FAsync: Boolean;
-    FClassBlackList: TStrings; // TList because it will be serialized by djson
-    FClassWhiteList: TStrings; // TList because it will be serialized by djson
+    FClassBlackList: TStrings;
+    FClassWhiteList: TStrings;
     FSynchroLevel: TioSynchroLevel;
     FSynchroName: String;
     FTargetConnectionDef: IioSynchroStrategy_TargetConnectionDef; // IioSynchroStrategy_TargetConnectionDef instead of TioPersistenceStrategyRef to avoid circular reference
     procedure _SyncExecute(AExecuteMethod: TProc; ATerminateMethod: TProc);
     procedure _AsyncExecute(AExecuteMethod: TProc; ATerminateMethod: TProc);
     procedure SetTargetConnectionDef(const ATargetConnectionDef: IioSynchroStrategy_TargetConnectionDef);
-  strict protected
+    procedure SetClassBlackList(const Value: TStrings);
+    procedure SetClassWhiteList(const Value: TStrings);
+    strict protected
     function IsToBeSynchronized(const AContext: IioContext): Boolean; virtual;
     // ---------- Synchro strategy methods to override on descendant classes ----------
     function _DoGenerateLocalID(const AContext: IioContext): Integer; virtual; abstract;
@@ -179,8 +181,9 @@ type
     function GenerateLocalID(const AContext: IioContext): Integer;
   published
     property Async: Boolean read FAsync write FAsync default False;
-    property ClassBlackList: TStrings read FClassBlackList; // TList because it will be serialized by djson
-    property ClassWhiteList: TStrings read FClassWhiteList; // TList because it will be serialized by djson
+    // TODO: Togliere la parte write
+    property ClassBlackList: TStrings read FClassBlackList write SetClassBlackList;
+    property ClassWhiteList: TStrings read FClassWhiteList write SetClassWhiteList;
     property SynchroLevel: TioSynchroLevel read FSynchroLevel write FSynchroLevel default slIncremental;
     property SynchroName: String read FSynchroName write FSynchroName;
     property TargetConnectionDef: IioSynchroStrategy_TargetConnectionDef read FTargetConnectionDef write SetTargetConnectionDef default nil;
@@ -208,7 +211,7 @@ uses
 
 constructor TioCustomSynchroStrategy.Create(AOwner: TComponent);
 begin
-  inherited;
+  inherited Create(AOwner);
   FAsync := False;
   FClassBlackList := TStringList.Create;
   FClassWhiteList := TStringList.Create;
@@ -221,14 +224,24 @@ destructor TioCustomSynchroStrategy.Destroy;
 begin
   FClassBlackList.Free;
   FClassWhiteList.Free;
-  if FTargetConnectionDef <> nil then
-    FTargetConnectionDef.RemoveFreeNotification(Self);
   inherited;
 end;
 
 function TioCustomSynchroStrategy.GenerateLocalID(const AContext: IioContext): Integer;
 begin
   Result := _DoGenerateLocalID(AContext);
+end;
+
+procedure TioCustomSynchroStrategy.SetClassBlackList(const Value: TStrings);
+begin
+  FClassBlackList.Text := Value.Text.Trim;
+//  FClassBlackList.Assign(Value);
+end;
+
+procedure TioCustomSynchroStrategy.SetClassWhiteList(const Value: TStrings);
+begin
+  FClassWhiteList.Text := Value.Text.Trim;
+//  FClassWhiteList.Assign(Value);
 end;
 
 procedure TioCustomSynchroStrategy.SetTargetConnectionDef(const ATargetConnectionDef: IioSynchroStrategy_TargetConnectionDef);
@@ -277,7 +290,7 @@ function TioCustomSynchroStrategy.IsToBeSynchronized(const AContext: IioContext)
 begin
   // Detect if the current DataObject is to be synchronized or not (Black & White class list)
   Result := ( (FClassWhiteList.Count = 0) or (FClassWhiteList.IndexOf(AContext.DataObject.ClassName) <> -1) )
-    and ( (FClassBlackList.Count = 0) or (FClassWhiteList.IndexOf(AContext.DataObject.ClassName) = -1) );
+        and ( (FClassBlackList.Count = 0) or (FClassBlackList.IndexOf(AContext.DataObject.ClassName) = -1) );
 end;
 
 procedure TioCustomSynchroStrategy._SyncExecute(AExecuteMethod, ATerminateMethod: TProc);
@@ -607,3 +620,4 @@ begin
 end;
 
 end.
+
