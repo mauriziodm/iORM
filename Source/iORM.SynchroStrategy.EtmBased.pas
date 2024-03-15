@@ -85,7 +85,17 @@ type
     FEtmTimeSlot_Persist_Regular: Boolean;
     FEtmTimeSlot_Persist_Sent: Boolean;
     procedure _CheckEtmTimeSlotClassName;
+    // EtmTimeSlot_ClassName
     procedure SetEtmTimeSlot_ClassName(const Value: String);
+    // EtmTimeSlot_Persist_Received
+    procedure SetEtmTimeSlot_Persist_Received(const Value: Boolean);
+    function GetEtmTimeSlot_Persist_Received: Boolean;
+    // EtmTimeSlot_Persist_Regular
+    procedure SetEtmTimeSlot_Persist_Regular(const Value: Boolean);
+    function GetEtmTimeSlot_Persist_Regular: Boolean;
+    // EtmTimeSlot_Persist_Sent
+    procedure SetEtmTimeSlot_Persist_Sent(const Value: Boolean);
+    function GetEtmTimeSlot_Persist_Sent: Boolean;
   strict protected
     // ---------- Synchro strategy methods to override on descendant classes ----------
     function _DoGenerateLocalID(const AContext: IioContext): Integer; override;
@@ -96,9 +106,9 @@ type
     constructor Create(AOwner: TComponent); override;
   published
     property EtmTimeSlot_ClassName: String read FEtmTimeSlot_ClassName write SetEtmTimeSlot_ClassName;
-    property EtmTimeSlot_Persist_Received: Boolean read FEtmTimeSlot_Persist_Received write FEtmTimeSlot_Persist_Received default False;
-    property EtmTimeSlot_Persist_Regular: Boolean read FEtmTimeSlot_Persist_Regular write FEtmTimeSlot_Persist_Regular default False;
-    property EtmTimeSlot_Persist_Sent: Boolean read FEtmTimeSlot_Persist_Sent write FEtmTimeSlot_Persist_Sent default False;
+    property EtmTimeSlot_Persist_Received: Boolean read GetEtmTimeSlot_Persist_Received write SetEtmTimeSlot_Persist_Received default False;
+    property EtmTimeSlot_Persist_Regular: Boolean read GetEtmTimeSlot_Persist_Regular write SetEtmTimeSlot_Persist_Regular default False;
+    property EtmTimeSlot_Persist_Sent: Boolean read GetEtmTimeSlot_Persist_Sent write SetEtmTimeSlot_Persist_Sent default False;
   end;
 
 implementation
@@ -254,7 +264,7 @@ begin
       LObj := io.ETM.RevertObject(LEtmTimeSlot, False);
       try
         if LObj <> nil then
-          io._PersistObject(LObj, TioPersistenceIntentType.itSynchronization, BL_SYNCHRO_PERSIST_PAYLOAD);
+          io._PersistObject(LObj, itSynchro_PersistToClient, BL_SYNCHRO_PERSIST_PAYLOAD);
       finally
         FreeAndNil(LObj);
       end;
@@ -281,7 +291,7 @@ begin
       LObj := io.ETM.RevertObject(LEtmTimeSlot, False);
       try
         if LObj <> nil then
-          io._PersistObject(LObj, TioPersistenceIntentType.itSynchronization, BL_SYNCHRO_PERSIST_PAYLOAD);
+          io._PersistObject(LObj, itSynchro_PersistToServer, BL_SYNCHRO_PERSIST_PAYLOAD);
       finally
         FreeAndNil(LObj);
       end;
@@ -304,9 +314,39 @@ begin
   FEtmTimeSlot_Persist_Sent := False;
 end;
 
+function TioEtmSynchroStrategy.GetEtmTimeSlot_Persist_Received: Boolean;
+begin
+  Result := FEtmTimeSlot_Persist_Received;
+end;
+
+function TioEtmSynchroStrategy.GetEtmTimeSlot_Persist_Regular: Boolean;
+begin
+  Result := FEtmTimeSlot_Persist_Regular;
+end;
+
+function TioEtmSynchroStrategy.GetEtmTimeSlot_Persist_Sent: Boolean;
+begin
+  Result := FEtmTimeSlot_Persist_Sent;
+end;
+
 procedure TioEtmSynchroStrategy.SetEtmTimeSlot_ClassName(const Value: String);
 begin
   FEtmTimeSlot_ClassName := Value.Trim;
+end;
+
+procedure TioEtmSynchroStrategy.SetEtmTimeSlot_Persist_Received(const Value: Boolean);
+begin
+  FEtmTimeSlot_Persist_Received := Value;
+end;
+
+procedure TioEtmSynchroStrategy.SetEtmTimeSlot_Persist_Regular(const Value: Boolean);
+begin
+  FEtmTimeSlot_Persist_Regular := Value;
+end;
+
+procedure TioEtmSynchroStrategy.SetEtmTimeSlot_Persist_Sent(const Value: Boolean);
+begin
+  FEtmTimeSlot_Persist_Sent := Value;
 end;
 
 procedure TioEtmSynchroStrategy._CheckEtmTimeSlotClassName;

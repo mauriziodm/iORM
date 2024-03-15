@@ -74,8 +74,8 @@ begin
   RegisterComponents('iORM - Connections', [TioSQLMonitor]);
 
   // Synchronization strategies
-  RegisterComponents('iORM - Synchronization strategies', [TioEtmSynchroStrategy]);
-  RegisterSelectionEditor(TioEtmSynchroStrategy, TioSynchroStrategySelectionEditor);
+//  RegisterComponents('iORM - Synchronization strategies', [TioEtmSynchroStrategy_Client]);
+//  RegisterSelectionEditor(TioEtmSynchroStrategy_Client, TioSynchroStrategySelectionEditor);
 
   // DataSet components
   RegisterComponents('iORM - DataSet', [TioMemTable]);

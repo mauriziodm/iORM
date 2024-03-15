@@ -1059,7 +1059,7 @@ begin
         FEntityVersion.ToString;
     itRevert:
       Result := Format('%d (reverted from %d)', [FEntityVersion, FEntityFromVersion]);
-    itSynchronization:
+    itSynchro_PersistToServer, itSynchro_PersistToClient:
       Result := Format('%d (synchronized from %d)', [FEntityVersion, FEntityFromVersion]);
   else
     raise EioException.Create(ClassName,  'GetSmartEntityVersion', 'IntentType not valid.');
@@ -1074,7 +1074,7 @@ begin
   case FIntentType of
     itRevert:
       Result := Result + ' (revert)';
-    itSynchronization:
+    itSynchro_PersistToServer, itSynchro_PersistToClient:
       Result := Result + ' (synchronization)';
   end;
 end;

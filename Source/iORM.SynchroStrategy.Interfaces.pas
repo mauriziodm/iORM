@@ -54,6 +54,22 @@ type
     procedure RemoveFreeNotification(AComponent: TComponent);
   end;
 
+  IioEtmSynchroStrategy = interface(IioSynchroStrategy)
+    ['{0451D514-6C82-4C0E-AA5E-A0DC06AE3FC2}']
+    // EtmTimeSlot_Persist_Received
+    procedure SetEtmTimeSlot_Persist_Received(const Value: Boolean);
+    function GetEtmTimeSlot_Persist_Received: Boolean;
+    property EtmTimeSlot_Persist_Received: Boolean read GetEtmTimeSlot_Persist_Received write SetEtmTimeSlot_Persist_Received;
+    // EtmTimeSlot_Persist_Regular
+    procedure SetEtmTimeSlot_Persist_Regular(const Value: Boolean);
+    function GetEtmTimeSlot_Persist_Regular: Boolean;
+    property EtmTimeSlot_Persist_Regular: Boolean read GetEtmTimeSlot_Persist_Regular write SetEtmTimeSlot_Persist_Regular;
+    // EtmTimeSlot_Persist_Sent
+    procedure SetEtmTimeSlot_Persist_Sent(const Value: Boolean);
+    function GetEtmTimeSlot_Persist_Sent: Boolean;
+    property EtmTimeSlot_Persist_Sent: Boolean read GetEtmTimeSlot_Persist_Sent write SetEtmTimeSlot_Persist_Sent;
+  end;
+
   IioSynchroStrategy_TargetConnectionDef = interface
     ['{7CCD8D05-60F3-4AAF-AEA8-91DCA5E80D5B}']
     function GetName: String;

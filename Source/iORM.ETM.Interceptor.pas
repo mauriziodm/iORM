@@ -50,6 +50,7 @@ type
   TioEtmInterceptor = class(TioCustomCRUDInterceptor)
   private
     class procedure CreateAndPersistNewTimeSlot_Internal(const AContext: IioContext); static; inline;
+    class function SynchroCanPersistTimeSlot(const AContext: IioContext): Boolean; static; inline;
   public
     // Insert
     class procedure AfterInsert(const AContext: IioContext); override;
@@ -63,9 +64,20 @@ type
 implementation
 
 uses
-  iORM, iORM.CommonTypes;
+  iORM, iORM.CommonTypes, iORM.SynchroStrategy.Interfaces;
 
 { TioEtmInterceptor }
+
+class function TioEtmInterceptor.SynchroCanPersistTimeSlot(const AContext: IioContext): Boolean;
+var
+  LSynchroStrategy_Client: IioSynchroStrategy;
+begin
+//  LSynchroStrategy_Client := AContext.SynchroStrategy_GetClient;
+
+
+  LSynchroStrategy_Client := nil;
+  Result := True;
+end;
 
 class procedure TioEtmInterceptor.CreateAndPersistNewTimeSlot_Internal(const AContext: IioContext);
 var

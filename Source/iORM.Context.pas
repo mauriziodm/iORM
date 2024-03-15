@@ -47,7 +47,7 @@ uses
 type
 
   TioContext = class(TInterfacedObject, IioContext)
-  strict private
+  private
     FDataObject: TObject;
     FHasManyChildVirtualPropertyValue: Integer;
     FMap: IioMap;
@@ -62,6 +62,7 @@ type
     FBlindLevel: Byte;
     FConflictDetected: Boolean;
     FConflictState: TioPersistenceConflictState;
+    FSynchroStrategy_Client_NoDirectCall: IioSynchroStrategy;
     // DataObject
     function GetDataObject: TObject;
     procedure SetDataObject(const AValue: TObject);
@@ -137,11 +138,6 @@ type
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
     function WhereExist: Boolean;
-    // Synchronization Strategy methods
-    function SynchroStrategy_GetClient: IioSynchroStrategy; inline;
-    procedure SynchroStrategy_GenerateLocalID;
-    // TODO: Da togliere se non usato
-    function SynchroStrategy_IsToBeSynchronized: Boolean;
     // Conflict strategy methods (to avoid circular reference)
     // TODO: Eliminare il parametro AContext? Mi sembra che viene sempre richiamato tipo "AContext.Check...Conflict(AContext) quindi...
     procedure CheckDeleteConflict(const AContext: IioContext); inline;
@@ -151,6 +147,11 @@ type
     procedure ResolveInsertConflict(const AContext: IioContext); inline;
     procedure ResolveUpdateConflict(const AContext: IioContext); inline;
     function GetCurrentStrategyName: String;
+    // Synchronization Strategy methods
+    function SynchroStrategy_Client: IioSynchroStrategy; inline;
+    procedure SynchroStrategy_GenerateLocalID;
+    // TODO: Da togliere se non usato
+    function SynchroStrategy_IsToBeSynchronized: Boolean;
     // BlindLevel helper methods
     function BlindLevel_Do_DetectObjExists: boolean; inline;
     function BlindLevel_Do_AutoUpdateProps: boolean; inline;
@@ -308,6 +309,7 @@ begin
   FBlindLevel := ABlindLevel;
   FConflictDetected := False;
   FConflictState := csUndefined;
+  FSynchroStrategy_Client_NoDirectCall := nil;
 end;
 
 function TioContext.GetClassRef: TioClassRef;
@@ -663,15 +665,17 @@ begin
   // If a SynchroStrategy is assigned and active (local remote and not connected device) and the object ID
   //  is not assigned then it asks the SynchroStrategy for a temporary local ID.
   // Note: Obviously if a new ID is assigned by SynchroStrategy this will disable the normal ID generation (if generated ID is not NULL)
-  LSynchroStrategy_Client := SynchroStrategy_GetClient;
+  LSynchroStrategy_Client := SynchroStrategy_Client;
   // If is to be synchronized...
   if (LSynchroStrategy_Client <> nil) and IDIsNull and LSynchroStrategy_Client.IsToBeSynchronized(Self) then
     GetProperties.GetIdProperty.SetValue(DataObject, LSynchroStrategy_Client.GenerateLocalID(Self));
 end;
 
-function TioContext.SynchroStrategy_GetClient: IioSynchroStrategy;
+function TioContext.SynchroStrategy_Client: IioSynchroStrategy;
 begin
-  Result := TioConnectionManager.GetSynchroStrategy_Client(GetTable.GetConnectionDefName);
+  if not Assigned(FSynchroStrategy_Client_NoDirectCall) then
+    FSynchroStrategy_Client_NoDirectCall := TioConnectionManager.GetSynchroStrategy_Client(GetTable.GetConnectionDefName);
+  Result := FSynchroStrategy_Client_NoDirectCall;
 end;
 
 function TioContext.SynchroStrategy_IsToBeSynchronized: Boolean;
@@ -681,7 +685,7 @@ begin
   // If a SynchroStrategy is assigned and active (local remote and not connected device) and the object ID
   //  is not assigned then it asks the SynchroStrategy for a temporary local ID.
   // Note: Obviously if a new ID is assigned by SynchroStrategy this will disable the normal ID generation (if generated ID is not NULL)
-  LSynchroStrategy_Client := SynchroStrategy_GetClient;
+  LSynchroStrategy_Client := SynchroStrategy_Client;
   Result := (LSynchroStrategy_Client <> nil) and IDIsNull and LSynchroStrategy_Client.IsToBeSynchronized(Self);
 end;
 
