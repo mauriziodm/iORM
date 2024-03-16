@@ -81,22 +81,29 @@ type
 
   TioKeyGenerationTime = (kgtUndefined, kgtAfterInsert, kgtBeforeInsert);
 
-  TioConnectionInfo = record
-  private
+  TioConnectionInfo = class
+  strict private
+    FBaseURL: String;
+    FConnectionName: String;
+    FConnectionType: TioConnectionType;
+    FKeyGenerationTime: TioKeyGenerationTime;
+    FPassword: String;
+    FPersistent: Boolean;
+    FPersistenceStrategy: TioPersistenceStrategyRef;
+    FUserName: String;
     FSynchroStrategy: IioSynchroStrategy_Client;
-    procedure SetSynchroStrategy(const Value: IioSynchroStrategy_Client);
   public
-    BaseURL: String;
-    ConnectionName: String;
-    ConnectionType: TioConnectionType;
-    KeyGenerationTime: TioKeyGenerationTime;
-    Password: String;
-    Persistent: Boolean;
-    PersistenceStrategy: TioPersistenceStrategyRef;
-    UserName: String;
     constructor Create(const AConnectionName: String; const AConnectionType: TioConnectionType; const APersistent: Boolean;
       const AKeyGenerationTime: TioKeyGenerationTime; const ASynchroStrategy: IioSynchroStrategy_Client);
-    property SynchroStrategy: IioSynchroStrategy_Client read FSynchroStrategy write SetSynchroStrategy;
+    property BaseURL: String read FBaseURL write FBaseURL;
+    property ConnectionName: String read FConnectionName write FConnectionName;
+    property ConnectionType: TioConnectionType read FConnectionType write FConnectionType;
+    property KeyGenerationTime: TioKeyGenerationTime read FKeyGenerationTime write FKeyGenerationTime;
+    property Password: String read FPassword write FPassword;
+    property Persistent: Boolean read FPersistent write FPersistent;
+    property PersistenceStrategy: TioPersistenceStrategyRef read FPersistenceStrategy write FPersistenceStrategy;
+    property UserName: String read FUserName write FUserName;
+    property SynchroStrategy: IioSynchroStrategy_Client read FSynchroStrategy write FSynchroStrategy;
   end;
 
   TioCompareOperatorRef = class of TioCompareOperator;
@@ -677,24 +684,6 @@ begin
       AQuery.ParamByProp_LoadAsStreamObj(Prop.GetValue(AContext.DataObject).AsObject, Prop);
 end;
 
-{ TioConnectionInfo }
-
-constructor TioConnectionInfo.Create(const AConnectionName: String; const AConnectionType: TioConnectionType; const APersistent: Boolean;
-      const AKeyGenerationTime: TioKeyGenerationTime; const ASynchroStrategy: IioSynchroStrategy_Client);
-begin
-  ConnectionName := AConnectionName;
-  ConnectionType := AConnectionType;
-  KeyGenerationTime := AKeyGenerationTime;
-  Persistent := APersistent;
-  SynchroStrategy := ASynchroStrategy;
-  PersistenceStrategy := TioPersistenceStrategyFactory.ConnectionTypeToStrategy(AConnectionType);
-end;
-
-procedure TioConnectionInfo.SetSynchroStrategy(const Value: IioSynchroStrategy_Client);
-begin
-  FSynchroStrategy := Value;
-end;
-
 { TioCompareOperator }
 
 class function TioCompareOperator.CompareOpToCompareOperator(const ACompareOp: TioCompareOp): IioSqlItem;
@@ -981,6 +970,19 @@ begin
   TioStrategyInterceptorRegister.AfterPersistObject(AObj);
 {$ENDIF}
 {$ENDREGION}
+end;
+
+{ TioConnectionInfo }
+
+constructor TioConnectionInfo.Create(const AConnectionName: String; const AConnectionType: TioConnectionType; const APersistent: Boolean;
+  const AKeyGenerationTime: TioKeyGenerationTime; const ASynchroStrategy: IioSynchroStrategy_Client);
+begin
+  FConnectionName := AConnectionName;
+  FConnectionType := AConnectionType;
+  FKeyGenerationTime := AKeyGenerationTime;
+  FPersistent := APersistent;
+  FSynchroStrategy := ASynchroStrategy;
+  FPersistenceStrategy := TioPersistenceStrategyFactory.ConnectionTypeToStrategy(AConnectionType);
 end;
 
 end.

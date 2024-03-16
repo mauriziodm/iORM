@@ -167,6 +167,7 @@ type
     procedure SetEntities_BlackList(const Value: TStrings);
     procedure SetEntities_WhiteList(const Value: TStrings);
     strict protected
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     function IsToBeSynchronized(const AContext: IioContext): Boolean; virtual;
     // ---------- Synchro strategy methods to override on descendant classes ----------
     function _DoGenerateLocalID(const AContext: IioContext): Integer; virtual; abstract;
@@ -298,6 +299,15 @@ begin
   // Detect if the current DataObject is to be synchronized or not (Black & White class list)
   Result := ( (FEntities_WhiteList.Count = 0) or (FEntities_WhiteList.IndexOf(LClassName) <> -1) )
         and ( (FEntities_BlackList.Count = 0) or (FEntities_BlackList.IndexOf(LClassName) = -1) );
+end;
+
+procedure TioCustomSynchroStrategy_Client.Notification(AComponent: TComponent; Operation: TOperation);
+var
+  LTargetConnectionDef: IioSynchroStrategy_TargetConnectionDef;
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and Supports(AComponent, IioSynchroStrategy_TargetConnectionDef, LTargetConnectionDef) and (LTargetConnectionDef = FTargetConnectionDef) then
+    SetTargetConnectionDef(nil);
 end;
 
 procedure TioCustomSynchroStrategy_Client._SyncExecute(AExecuteMethod, ATerminateMethod: TProc);

@@ -102,7 +102,7 @@ type
     property CurrentUserID: Integer read GetCurrentUserID write SetCurrentUserID;
   end;
 
-  TioConnectionManagerContainer = TDictionary<String, TioConnectionInfo>;
+  TioConnectionManagerContainer = TObjectDictionary<String, TioConnectionInfo>;
   TioPerThreadCurrentConnectionName = TDictionary<TThreadID, IioCurrentConnectionInfo>;
   TioConnectionManagerRef = class of TioConnectionManager;
 
@@ -326,7 +326,7 @@ end;
 class procedure TioConnectionManager.CreateInternalContainer;
 begin
   FCurrentConnectionInfo := TioDBFactory.CurrentConnectionInfo;
-  FConnectionManagerContainer := TioConnectionManagerContainer.Create;
+  FConnectionManagerContainer := TioConnectionManagerContainer.Create([doOwnsValues]);
   FPerThreadCurrentConnectionName := TioPerThreadCurrentConnectionName.Create;
 end;
 
