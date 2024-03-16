@@ -46,7 +46,7 @@ type
 
   TioSynchroStrategy_ClassList = TList<String>;
 
-  IioSynchroStrategy = interface
+  IioSynchroStrategy_Client = interface
     ['{2295C6BF-1A5B-475B-BBC5-CF1A1C90B5B4}']
     function IsToBeSynchronized(const AContext: IioContext): Boolean;
     function GenerateLocalID(const AContext: IioContext): Integer;
@@ -54,7 +54,7 @@ type
     procedure RemoveFreeNotification(AComponent: TComponent);
   end;
 
-  IioEtmSynchroStrategy = interface(IioSynchroStrategy)
+  IioEtmSynchroStrategy_Client = interface(IioSynchroStrategy_Client)
     ['{0451D514-6C82-4C0E-AA5E-A0DC06AE3FC2}']
     // EtmTimeSlot_Persist_Received
     procedure SetEtmTimeSlot_Persist_Received(const Value: Boolean);

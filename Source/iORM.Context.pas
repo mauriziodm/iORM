@@ -62,7 +62,7 @@ type
     FBlindLevel: Byte;
     FConflictDetected: Boolean;
     FConflictState: TioPersistenceConflictState;
-    FSynchroStrategy_Client_NoDirectCall: IioSynchroStrategy;
+    FSynchroStrategy_Client_NoDirectCall: IioSynchroStrategy_Client;
     // DataObject
     function GetDataObject: TObject;
     procedure SetDataObject(const AValue: TObject);
@@ -148,7 +148,7 @@ type
     procedure ResolveUpdateConflict(const AContext: IioContext); inline;
     function GetCurrentStrategyName: String;
     // Synchronization Strategy methods
-    function SynchroStrategy_Client: IioSynchroStrategy; inline;
+    function SynchroStrategy_Client: IioSynchroStrategy_Client; inline;
     procedure SynchroStrategy_GenerateLocalID;
     // TODO: Da togliere se non usato
     function SynchroStrategy_IsToBeSynchronized: Boolean;
@@ -660,7 +660,7 @@ end;
 
 procedure TioContext.SynchroStrategy_GenerateLocalID;
 var
-  LSynchroStrategy_Client: IioSynchroStrategy;
+  LSynchroStrategy_Client: IioSynchroStrategy_Client;
 begin
   // If a SynchroStrategy is assigned and active (local remote and not connected device) and the object ID
   //  is not assigned then it asks the SynchroStrategy for a temporary local ID.
@@ -671,7 +671,7 @@ begin
     GetProperties.GetIdProperty.SetValue(DataObject, LSynchroStrategy_Client.GenerateLocalID(Self));
 end;
 
-function TioContext.SynchroStrategy_Client: IioSynchroStrategy;
+function TioContext.SynchroStrategy_Client: IioSynchroStrategy_Client;
 begin
   if not Assigned(FSynchroStrategy_Client_NoDirectCall) then
     FSynchroStrategy_Client_NoDirectCall := TioConnectionManager.GetSynchroStrategy_Client(GetTable.GetConnectionDefName);
@@ -680,7 +680,7 @@ end;
 
 function TioContext.SynchroStrategy_IsToBeSynchronized: Boolean;
 var
-  LSynchroStrategy_Client: IioSynchroStrategy;
+  LSynchroStrategy_Client: IioSynchroStrategy_Client;
 begin
   // If a SynchroStrategy is assigned and active (local remote and not connected device) and the object ID
   //  is not assigned then it asks the SynchroStrategy for a temporary local ID.

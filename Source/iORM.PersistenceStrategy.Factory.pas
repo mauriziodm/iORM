@@ -65,7 +65,7 @@ end;
 
 class function TioPersistenceStrategyFactory.GetStrategy(const AConnectionName: String): TioPersistenceStrategyRef;
 begin
-  Result := TioConnectionManager.GetConnectionInfo(AConnectionName).Strategy;
+  Result := TioConnectionManager.GetConnectionInfo(AConnectionName).PersistenceStrategy;
 end;
 
 end.

@@ -70,7 +70,7 @@ uses
 
 class function TioEtmInterceptor.SynchroCanPersistTimeSlot(const AContext: IioContext): Boolean;
 var
-  LSynchroStrategy_Client: IioSynchroStrategy;
+  LSynchroStrategy_Client: IioSynchroStrategy_Client;
 begin
 //  LSynchroStrategy_Client := AContext.SynchroStrategy_GetClient;
 

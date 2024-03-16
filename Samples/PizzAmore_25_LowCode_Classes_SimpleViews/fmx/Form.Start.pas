@@ -36,7 +36,7 @@ type
     acShowPizzas: TioBSShowOrSelect;
     acShowOrders: TioBSShowOrSelect;
     ServerConn: TioSQLiteConnectionDef;
-    SynchroStrategy: TioEtmSynchroStrategy;
+    SynchroStrategy: TioEtmSynchroStrategy_Client;
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings);
     procedure VCProviderRequest(const Sender: TObject; out ResultViewContext: TComponent);
@@ -59,7 +59,7 @@ uses
 
 procedure TStartForm.ImageLogoDblClick(Sender: TObject);
 begin
-  SynchroStrategy.DoSynchronization(TioSynchroLevel.slIncremental);
+//  SynchroStrategy.DoSynchronization(TioSynchroLevel.slIncremental);
 end;
 
 procedure TStartForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,

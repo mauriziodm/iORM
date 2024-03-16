@@ -82,17 +82,21 @@ type
   TioKeyGenerationTime = (kgtUndefined, kgtAfterInsert, kgtBeforeInsert);
 
   TioConnectionInfo = record
+  private
+    FSynchroStrategy: IioSynchroStrategy_Client;
+    procedure SetSynchroStrategy(const Value: IioSynchroStrategy_Client);
+  public
     BaseURL: String;
     ConnectionName: String;
     ConnectionType: TioConnectionType;
     KeyGenerationTime: TioKeyGenerationTime;
     Password: String;
     Persistent: Boolean;
-    Strategy: TioPersistenceStrategyRef;
+    PersistenceStrategy: TioPersistenceStrategyRef;
     UserName: String;
-    SynchroStrategy: IioSynchroStrategy;
     constructor Create(const AConnectionName: String; const AConnectionType: TioConnectionType; const APersistent: Boolean;
-      const AKeyGenerationTime: TioKeyGenerationTime; const ASynchroStrategy: IioSynchroStrategy);
+      const AKeyGenerationTime: TioKeyGenerationTime; const ASynchroStrategy: IioSynchroStrategy_Client);
+    property SynchroStrategy: IioSynchroStrategy_Client read FSynchroStrategy write SetSynchroStrategy;
   end;
 
   TioCompareOperatorRef = class of TioCompareOperator;
@@ -676,14 +680,19 @@ end;
 { TioConnectionInfo }
 
 constructor TioConnectionInfo.Create(const AConnectionName: String; const AConnectionType: TioConnectionType; const APersistent: Boolean;
-      const AKeyGenerationTime: TioKeyGenerationTime; const ASynchroStrategy: IioSynchroStrategy);
+      const AKeyGenerationTime: TioKeyGenerationTime; const ASynchroStrategy: IioSynchroStrategy_Client);
 begin
   ConnectionName := AConnectionName;
   ConnectionType := AConnectionType;
   KeyGenerationTime := AKeyGenerationTime;
   Persistent := APersistent;
   SynchroStrategy := ASynchroStrategy;
-  Strategy := TioPersistenceStrategyFactory.ConnectionTypeToStrategy(AConnectionType);
+  PersistenceStrategy := TioPersistenceStrategyFactory.ConnectionTypeToStrategy(AConnectionType);
+end;
+
+procedure TioConnectionInfo.SetSynchroStrategy(const Value: IioSynchroStrategy_Client);
+begin
+  FSynchroStrategy := Value;
 end;
 
 { TioCompareOperator }

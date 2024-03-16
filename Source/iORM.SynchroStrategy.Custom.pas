@@ -154,7 +154,7 @@ type
     property UserName: String read FUserName write FUserName;
   end;
 
-  TioCustomSynchroStrategy = class abstract(TComponent, IioSynchroStrategy)
+  TioCustomSynchroStrategy_Client = class abstract(TComponent, IioSynchroStrategy_Client)
   strict private
     FAsync: Boolean;
     FEntities_BlackList: TStrings;
@@ -207,7 +207,7 @@ uses
 
 { TioCustomSynchroStrategy_Client }
 
-constructor TioCustomSynchroStrategy.Create(AOwner: TComponent);
+constructor TioCustomSynchroStrategy_Client.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FAsync := False;
@@ -217,31 +217,31 @@ begin
   FTargetConnectionDef := nil;
 end;
 
-destructor TioCustomSynchroStrategy.Destroy;
+destructor TioCustomSynchroStrategy_Client.Destroy;
 begin
   FEntities_BlackList.Free;
   FEntities_WhiteList.Free;
   inherited;
 end;
 
-function TioCustomSynchroStrategy.GenerateLocalID(const AContext: IioContext): Integer;
+function TioCustomSynchroStrategy_Client.GenerateLocalID(const AContext: IioContext): Integer;
 begin
   Result := _DoGenerateLocalID(AContext);
 end;
 
-procedure TioCustomSynchroStrategy.SetEntities_BlackList(const Value: TStrings);
+procedure TioCustomSynchroStrategy_Client.SetEntities_BlackList(const Value: TStrings);
 begin
   FEntities_BlackList.Text := Value.Text.Trim;
 //  FClassBlackList.Assign(Value);
 end;
 
-procedure TioCustomSynchroStrategy.SetEntities_WhiteList(const Value: TStrings);
+procedure TioCustomSynchroStrategy_Client.SetEntities_WhiteList(const Value: TStrings);
 begin
   FEntities_WhiteList.Text := Value.Text.Trim;
 //  FClassWhiteList.Assign(Value);
 end;
 
-procedure TioCustomSynchroStrategy.SetTargetConnectionDef(const ATargetConnectionDef: IioSynchroStrategy_TargetConnectionDef);
+procedure TioCustomSynchroStrategy_Client.SetTargetConnectionDef(const ATargetConnectionDef: IioSynchroStrategy_TargetConnectionDef);
 begin
   if ATargetConnectionDef <> FTargetConnectionDef then
   begin
@@ -255,7 +255,7 @@ begin
   end;
 end;
 
-procedure TioCustomSynchroStrategy._DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload; const ASynchroLevel: TioSynchroLevel);
+procedure TioCustomSynchroStrategy_Client._DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload; const ASynchroLevel: TioSynchroLevel);
 var
   LClassName: String;
 begin
@@ -276,14 +276,14 @@ begin
 //  LPayLoad.UserName :=
 end;
 
-procedure TioCustomSynchroStrategy._AsyncExecute(AExecuteMethod, ATerminateMethod: TProc);
+procedure TioCustomSynchroStrategy_Client._AsyncExecute(AExecuteMethod, ATerminateMethod: TProc);
 begin
   io.ShowWait;
   // Create and execute the thread
   TioCustomSynchroStrategy_Thread.Create(AExecuteMethod, ATerminateMethod).Start;
 end;
 
-function TioCustomSynchroStrategy.IsToBeSynchronized(const AContext: IioContext): Boolean;
+function TioCustomSynchroStrategy_Client.IsToBeSynchronized(const AContext: IioContext): Boolean;
 var
   LClassName: String;
 begin
@@ -300,7 +300,7 @@ begin
         and ( (FEntities_BlackList.Count = 0) or (FEntities_BlackList.IndexOf(LClassName) = -1) );
 end;
 
-procedure TioCustomSynchroStrategy._SyncExecute(AExecuteMethod, ATerminateMethod: TProc);
+procedure TioCustomSynchroStrategy_Client._SyncExecute(AExecuteMethod, ATerminateMethod: TProc);
 begin
   io.ShowWait;
   try
@@ -314,7 +314,7 @@ begin
   end;
 end;
 
-procedure TioCustomSynchroStrategy.DoSynchronization(const ASynchroLevel: TioSynchroLevel);
+procedure TioCustomSynchroStrategy_Client.DoSynchronization(const ASynchroLevel: TioSynchroLevel);
 var
   LPayload: TioCustomSynchroStrategy_Payload;
   LPersistenceStrategy: TioPersistenceStrategyRef;

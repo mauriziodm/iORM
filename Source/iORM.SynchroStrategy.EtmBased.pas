@@ -78,7 +78,7 @@ type
     property EtmTimeSlotClassName: String read FEtmTimeSlotClassName write FEtmTimeSlotClassName;
   end;
 
-  TioEtmSynchroStrategy = class(TioCustomSynchroStrategy)
+  TioEtmSynchroStrategy_Client = class(TioCustomSynchroStrategy_Client)
   strict private
     FEtmTimeSlot_ClassName: String;
     FEtmTimeSlot_Persist_Received: Boolean;
@@ -305,7 +305,7 @@ end;
 
 { TioEtmSynchroStrategy_Client }
 
-constructor TioEtmSynchroStrategy.Create(AOwner: TComponent);
+constructor TioEtmSynchroStrategy_Client.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FEtmTimeSlot_ClassName := String.Empty;
@@ -314,42 +314,42 @@ begin
   FEtmTimeSlot_Persist_Sent := False;
 end;
 
-function TioEtmSynchroStrategy.GetEtmTimeSlot_Persist_Received: Boolean;
+function TioEtmSynchroStrategy_Client.GetEtmTimeSlot_Persist_Received: Boolean;
 begin
   Result := FEtmTimeSlot_Persist_Received;
 end;
 
-function TioEtmSynchroStrategy.GetEtmTimeSlot_Persist_Regular: Boolean;
+function TioEtmSynchroStrategy_Client.GetEtmTimeSlot_Persist_Regular: Boolean;
 begin
   Result := FEtmTimeSlot_Persist_Regular;
 end;
 
-function TioEtmSynchroStrategy.GetEtmTimeSlot_Persist_Sent: Boolean;
+function TioEtmSynchroStrategy_Client.GetEtmTimeSlot_Persist_Sent: Boolean;
 begin
   Result := FEtmTimeSlot_Persist_Sent;
 end;
 
-procedure TioEtmSynchroStrategy.SetEtmTimeSlot_ClassName(const Value: String);
+procedure TioEtmSynchroStrategy_Client.SetEtmTimeSlot_ClassName(const Value: String);
 begin
   FEtmTimeSlot_ClassName := Value.Trim;
 end;
 
-procedure TioEtmSynchroStrategy.SetEtmTimeSlot_Persist_Received(const Value: Boolean);
+procedure TioEtmSynchroStrategy_Client.SetEtmTimeSlot_Persist_Received(const Value: Boolean);
 begin
   FEtmTimeSlot_Persist_Received := Value;
 end;
 
-procedure TioEtmSynchroStrategy.SetEtmTimeSlot_Persist_Regular(const Value: Boolean);
+procedure TioEtmSynchroStrategy_Client.SetEtmTimeSlot_Persist_Regular(const Value: Boolean);
 begin
   FEtmTimeSlot_Persist_Regular := Value;
 end;
 
-procedure TioEtmSynchroStrategy.SetEtmTimeSlot_Persist_Sent(const Value: Boolean);
+procedure TioEtmSynchroStrategy_Client.SetEtmTimeSlot_Persist_Sent(const Value: Boolean);
 begin
   FEtmTimeSlot_Persist_Sent := Value;
 end;
 
-procedure TioEtmSynchroStrategy._CheckEtmTimeSlotClassName;
+procedure TioEtmSynchroStrategy_Client._CheckEtmTimeSlotClassName;
 var
   LMap: IioMap;
 begin
@@ -375,7 +375,7 @@ begin
       #13#13'It will work.', [FEtmTimeSlot_ClassName, Name]));
 end;
 
-function TioEtmSynchroStrategy._DoGenerateLocalID(const AContext: IioContext): Integer;
+function TioEtmSynchroStrategy_Client._DoGenerateLocalID(const AContext: IioContext): Integer;
 var
   LQuery: IioQuery;
 begin
@@ -390,12 +390,12 @@ begin
   end;
 end;
 
-function TioEtmSynchroStrategy._DoPayload_Create: TioCustomSynchroStrategy_Payload;
+function TioEtmSynchroStrategy_Client._DoPayload_Create: TioCustomSynchroStrategy_Payload;
 begin
   Result := TioEtmSynchroStrategy_Payload.Create;
 end;
 
-procedure TioEtmSynchroStrategy._DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload; const ASynchroLevel: TioSynchroLevel);
+procedure TioEtmSynchroStrategy_Client._DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload; const ASynchroLevel: TioSynchroLevel);
 var
   LPayload: TioEtmSynchroStrategy_Payload;
 begin

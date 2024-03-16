@@ -95,10 +95,10 @@ type
     FServer: String;
     FSQLDialect: TioSQLDialect;
     FUserName: String;
-    FSynchroStrategy_Client: IioSynchroStrategy;
+    FSynchroStrategy_Client: IioSynchroStrategy_Client;
     function Get_Version: String;
     procedure SetAsDefault(const Value: Boolean);
-    procedure SetSynchroStrategy_Client(const ASynchroStrategy_Client: IioSynchroStrategy);
+    procedure SetSynchroStrategy_Client(const ASynchroStrategy_Client: IioSynchroStrategy_Client);
     // IioSynchroStrategy_TargetConnectionDef
     function GetName: String;
   protected
@@ -107,6 +107,7 @@ type
     procedure DoBeforeRegister;
     function GetFullPathDatabase: String;
     procedure Loaded; override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     // Properties
     property AutoCreateDB: TioDBBuilderProperty read FAutoCreateDB write FAutoCreateDB;
     property BaseURL: String read FBaseURL write FBaseURL;
@@ -123,7 +124,7 @@ type
     property Server: String read FServer write FServer;
     property SQLDialect: TioSQLDialect read FSQLDialect write FSQLDialect;
     property UserName: String read FUserName write FUserName;
-    property SynchroStrategy_Client: IioSynchroStrategy read FSynchroStrategy_Client write SetSynchroStrategy_Client default nil;
+    property SynchroStrategy_Client: IioSynchroStrategy_Client read FSynchroStrategy_Client write SetSynchroStrategy_Client default nil;
     // Events
     property OnAfterCreateOrAlterDB: TioDBBuilderAfterCreateOrAlterDBEvent read FOnAfterCreateOrAlterDBEvent
       write FOnAfterCreateOrAlterDBEvent;
@@ -291,8 +292,8 @@ end;
 
 destructor TioCustomConnectionDef.Destroy;
 begin
-  if FSynchroStrategy_Client <> nil then
-    FSynchroStrategy_Client.RemoveFreeNotification(Self);
+//  if FSynchroStrategy_Client <> nil then
+//    FSynchroStrategy_Client.RemoveFreeNotification(Self);
   FAutoCreateDB.Free;
   inherited;
 end;
@@ -370,6 +371,15 @@ begin
          RegisterConnectionDef;
 end;
 
+procedure TioCustomConnectionDef.Notification(AComponent: TComponent; Operation: TOperation);
+var
+  LSynchroStrategy_Client: IioSynchroStrategy_Client;
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and Supports(AComponent, IioSynchroStrategy_Client, LSynchroStrategy_Client) and (LSynchroStrategy_Client = FSynchroStrategy_Client) then
+    SetSynchroStrategy_Client(nil);
+end;
+
 procedure TioCustomConnectionDef.RegisterConnectionDef;
 begin
   inherited;
@@ -406,12 +416,15 @@ begin
   end;
 end;
 
-procedure TioCustomConnectionDef.SetSynchroStrategy_Client(const ASynchroStrategy_Client: IioSynchroStrategy);
+procedure TioCustomConnectionDef.SetSynchroStrategy_Client(const ASynchroStrategy_Client: IioSynchroStrategy_Client);
 begin
   if ASynchroStrategy_Client <> FSynchroStrategy_Client then
   begin
     if FSynchroStrategy_Client <> nil then
+    begin
       FSynchroStrategy_Client.RemoveFreeNotification(Self);
+      TioConnectionManager.ClearConnectionInfoSynchroStrategy(Name);
+    end;
 
     FSynchroStrategy_Client := ASynchroStrategy_Client;
 
