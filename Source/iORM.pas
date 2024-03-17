@@ -174,7 +174,6 @@ const
   itRevert = iORM.CommonTypes.itRevert;
   itSynchro_PersistToServer = iORM.CommonTypes.itSynchro_PersistToServer;
   itSynchro_PersistToClient = iORM.CommonTypes.itSynchro_PersistToClient;
-  itSynchro_PersistSentTimeSlot = iORM.CommonTypes.itSynchro_PersistSentTimeSlot;
   // TioPersistenceConflictState = (csUndefined, csResolved, csRejected, csRejectedRaise);
   csUndefined = iORM.CommonTypes.csUndefined;
   csResolved = iORM.CommonTypes.csResolved;
@@ -2165,7 +2164,7 @@ TioMapContainer._Build;
 
 // Enums UI translations
 io.Enums.Add<TioPersistenceActionType>('Do not persist, Insert, Update, Delete');
-io.Enums.Add<TioPersistenceIntentType>('Regular, Revert, Synchro (svr), Synchro (cli), Synchro (snt)');
+io.Enums.Add<TioPersistenceIntentType>('Regular, Revert, Synchro (svr), Synchro (cli)');
 io.Enums.Add<TioPersistenceConflictState>('Undefined, Resolved, Rejected, Rejected raise');
 
 end.

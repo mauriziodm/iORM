@@ -64,6 +64,7 @@ type
     function GetCurrentStrategyName: String;
     // Synchronization Strategy methods
     procedure SynchroStrategy_GenerateLocalID;
+    function SynchroStrategy_IsToBeSynchronized: Boolean;
     // BlindLevel helper methods
     function BlindLevel_Do_DetectObjExists: boolean;
     function BlindLevel_Do_AutoUpdateProps: boolean;

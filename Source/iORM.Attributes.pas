@@ -521,12 +521,15 @@ type
 
 {$REGION '===== ETM ATTRIBUTES & TIMESLOT ====='}
 
+  // TimeSlot Synchro State
+  TioEtmTimeSlotSynchroState = (tsRegular, tsToBeSynchronized, tsSynchronized_ReceivedFromClient, tsSynchronized_ReceivedFromServer, tsSynchronized_SentToServer);
+
   // Base class for ell ETM repositories
   TioEtmTimeSlotRef = class of TioEtmCustomTimeSlot;
 
   // NB: Per la nuova gestione dei conflitti servirà la possibilità di memorizzare due data e ora, una che sarà il momento
-  //      quando è stata fatto l'update sul DB remoto (es: mobile) e l'altra la data e ora di quanto è stato fatto l'update
-  //      sul database centrale durante la fase di sincronizzazione.
+  // quando è stata fatto l'update sul DB remoto (es: mobile) e l'altra la data e ora di quanto è stato fatto l'update
+  // sul database centrale durante la fase di sincronizzazione.
   TioEtmCustomTimeSlot = class
   private
     FID: Integer;
@@ -555,6 +558,8 @@ type
     FConflictCheckedByHuman_ID: Integer;
     FConflictCheckedByHuman_Name: String;
     FConflictCheckedByHuman_DateTime: TDateTime;
+    // Synchronization
+    FTimeSlotSynchroState: TioEtmTimeSlotSynchroState;
     // NB: Questo è un anonymous method che viene passato dal BindSource che sta esponendo il TimeSlot stesso e che permette
     // di risalire alla versione corrente della entità attraverso la catena "ETMBindSource.etmFor.Current"
     [ioSkip]
@@ -607,6 +612,8 @@ type
     property ConflictCheckedByHuman_ID: Integer read FConflictCheckedByHuman_ID;
     property ConflictCheckedByHuman_Name: String read FConflictCheckedByHuman_Name;
     property ConflictCheckedByHuman_DateTime: TDateTime read FConflictCheckedByHuman_DateTime;
+    // Synchronization
+    property TimeSlotSynchroState: TioEtmTimeSlotSynchroState read FTimeSlotSynchroState;
     // Smart properties
     property SmartEntityInfo: String read GetSmartEntityInfo;
     property SmartEntityVersion: String read GetSmartEntityVersion;
@@ -628,7 +635,7 @@ type
     property DiffTwoWayMoreInfo: String read GetDiffTwoWayMoreInfo;
     // ExtractCurrentEntityFunc anonymous method
     // NB: Questo è un anonymous method che viene passato dal BindSource che sta esponendo il TimeSlot stesso e che permette
-    //      di risalire alla versione corrente della entità attraverso la catena "ETMBindSource.etmFor.Current"
+    // di risalire alla versione corrente della entità attraverso la catena "ETMBindSource.etmFor.Current"
     property _ExtractCurrentEntityFunc: TFunc<TObject> read FExtractCurrentEntityFunc write FExtractCurrentEntityFunc;
   end;
 
@@ -993,14 +1000,15 @@ end;
 constructor TioEtmCustomTimeSlot.Create(const AContextAsIInterface: IInterface);
 var
   LContext: IioContext;
-  LValue: TValue;
   procedure _LoadCustomPropValues;
   var
     LEtmPropAttribute: etmPropertyAttribute;
+    LValue: TValue;
   begin
     for LEtmPropAttribute in LContext.GetTable.GetEtmPropToPropList(False) do
     begin
-      LValue := TioUtilities.ResolveChildPropertySplitPath_GetValue(LContext.DataObject, LEtmPropAttribute.EntityChildObjPath, LEtmPropAttribute.EntityFinalPropName);
+      LValue := TioUtilities.ResolveChildPropertySplitPath_GetValue(LContext.DataObject, LEtmPropAttribute.EntityChildObjPath,
+        LEtmPropAttribute.EntityFinalPropName);
       TioUtilities.ResolveChildPropertySplitPath_SetValue(Self, LEtmPropAttribute.EtmChildObjPath, LEtmPropAttribute.EtmFinalPropName, LValue);
     end;
   end;
@@ -1010,10 +1018,10 @@ begin
     raise EioException.Create(ClassName, 'Create', 'The object received by the "AContextAsIInterface" parameter does not implements "IioContext" interface.');
   // Se l'entità non ha un ID valido non è possibile che l'ETM funzioni
   if LContext.IDIsNull then
-    raise EioETMException.Create(ClassName, 'Create', Format('Hi, I''m iORM, we have a problem.' +
-      #13#13'You asked me to persist an entity of type "%s" but this doesn''t have a valid ID.' +
-      #13#13'You probably set the "BlindLevel" so as not to set the object ID immediately after the insert operation but this is incompatible with using the ETM.' +
-      #13#13'Please try to set the BlindLevel to a correct value and try again, it will work.', [LContext.DataObject.ClassName]));
+    raise EioETMException.Create(ClassName, 'Create',
+      Format('Hi, I''m iORM, we have a problem.' + #13#13'You asked me to persist an entity of type "%s" but this doesn''t have a valid ID.' +
+      #13#13'You probably set the "BlindLevel" so as not to set the object ID immediately after the insert operation but this is incompatible with using the ETM.'
+      + #13#13'Please try to set the BlindLevel to a correct value and try again, it will work.', [LContext.DataObject.ClassName]));
   // Entity related props
   FEntityClassName := LContext.DataObject.ClassName;
   FEntityID := LContext.ObjID;
@@ -1036,6 +1044,21 @@ begin
   FConflictCheckedByHuman_ID := IO_INTEGER_NULL_VALUE;
   FConflictCheckedByHuman_Name := IO_STRING_NULL_VALUE;
   FConflictCheckedByHuman_DateTime := IO_DATETIME_NULL_VALUE;
+  // Synchronization
+  case LContext.IntentType of
+    itRegular, itRevert:
+      if LContext.SynchroStrategy_IsToBeSynchronized then
+        FTimeSlotSynchroState := tsToBeSynchronized
+      else
+        FTimeSlotSynchroState := tsRegular;
+    itSynchro_PersistToServer:
+      if LContext.SynchroStrategy_IsToBeSynchronized then
+        FTimeSlotSynchroState := tsToBeSynchronized
+      else
+        FTimeSlotSynchroState := tsSynchronized_ReceivedFromClient;
+    itSynchro_PersistToClient:
+      FTimeSlotSynchroState := tsSynchronized_ReceivedFromServer;
+  end;
   // NB: Questo è un anonymous method che viene passato dal BindSource che sta esponendo il TimeSlot stesso e che permette
   // di risalire alla versione corrente della entità attraverso la catena "ETMBindSource.etmFor.Current"
   FExtractCurrentEntityFunc := nil;
@@ -1062,7 +1085,7 @@ begin
     itSynchro_PersistToServer, itSynchro_PersistToClient:
       Result := Format('%d (synchronized from %d)', [FEntityVersion, FEntityFromVersion]);
   else
-    raise EioException.Create(ClassName,  'GetSmartEntityVersion', 'IntentType not valid.');
+    raise EioException.Create(ClassName, 'GetSmartEntityVersion', 'IntentType not valid.');
   end;
 end;
 
@@ -1090,7 +1113,7 @@ end;
 function TioEtmCustomTimeSlot.GetSmartConflictCheckedByHuman: String;
 begin
   // If not checked by human then return an empty string
-  if FConflictCheckedByHuman  then
+  if FConflictCheckedByHuman then
     Exit(String.Empty);
   // If human checked build the result string
   Result := 'Checked';
@@ -1102,9 +1125,9 @@ begin
       Result := Result + ' (id ' + FConflictCheckedByHuman_ID.ToString + ')';
   end
   else
-  // human id only
-  if FConflictCheckedByHuman_ID <> IO_INTEGER_NULL_VALUE then
-    Result := Result + ' by id ' + FConflictCheckedByHuman_ID.ToString;
+    // human id only
+    if FConflictCheckedByHuman_ID <> IO_INTEGER_NULL_VALUE then
+      Result := Result + ' by id ' + FConflictCheckedByHuman_ID.ToString;
   // date time
   if FConflictCheckedByHuman_DateTime <> IO_DATETIME_NULL_VALUE then
     Result := Result + ' on ' + DateTimeToStr(FConflictCheckedByHuman_DateTime, TFormatSettings.Create);

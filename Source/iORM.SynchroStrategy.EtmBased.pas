@@ -78,24 +78,12 @@ type
     property EtmTimeSlotClassName: String read FEtmTimeSlotClassName write FEtmTimeSlotClassName;
   end;
 
-  TioEtmSynchroStrategy_Client = class(TioCustomSynchroStrategy_Client, IioEtmSynchroStrategy_Client)
+  TioEtmSynchroStrategy_Client = class(TioCustomSynchroStrategy_Client)
   strict private
     FEtmTimeSlot_ClassName: String;
-    FEtmTimeSlot_Persist_Received: Boolean;
-    FEtmTimeSlot_Persist_Regular: Boolean;
-    FEtmTimeSlot_Persist_Sent: Boolean;
     procedure _CheckEtmTimeSlotClassName;
     // EtmTimeSlot_ClassName
     procedure SetEtmTimeSlot_ClassName(const Value: String);
-    // EtmTimeSlot_Persist_Received
-    procedure SetEtmTimeSlot_Persist_Received(const Value: Boolean);
-    function GetEtmTimeSlot_Persist_Received: Boolean;
-    // EtmTimeSlot_Persist_Regular
-    procedure SetEtmTimeSlot_Persist_Regular(const Value: Boolean);
-    function GetEtmTimeSlot_Persist_Regular: Boolean;
-    // EtmTimeSlot_Persist_Sent
-    procedure SetEtmTimeSlot_Persist_Sent(const Value: Boolean);
-    function GetEtmTimeSlot_Persist_Sent: Boolean;
   strict protected
     // ---------- Synchro strategy methods to override on descendant classes ----------
     function _DoGenerateLocalID(const AContext: IioContext): Integer; override;
@@ -106,9 +94,11 @@ type
     constructor Create(AOwner: TComponent); override;
   published
     property EtmTimeSlot_ClassName: String read FEtmTimeSlot_ClassName write SetEtmTimeSlot_ClassName;
-    property EtmTimeSlot_Persist_Received: Boolean read GetEtmTimeSlot_Persist_Received write SetEtmTimeSlot_Persist_Received default False;
-    property EtmTimeSlot_Persist_Regular: Boolean read GetEtmTimeSlot_Persist_Regular write SetEtmTimeSlot_Persist_Regular default False;
-    property EtmTimeSlot_Persist_Sent: Boolean read GetEtmTimeSlot_Persist_Sent write SetEtmTimeSlot_Persist_Sent default False;
+    property EtmTimeSlot_Delete_SentToServer default True;
+    property EtmTimeSlot_Persist_ReceivedFromServer default False;
+    property EtmTimeSlot_Persist_Regular default False;
+    property EtmTimeSlot_Persist_ToBeSynchronized default True;
+    property EtmTimeSlot_Update_SentToServer default False;
   end;
 
 implementation
@@ -309,44 +299,17 @@ constructor TioEtmSynchroStrategy_Client.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FEtmTimeSlot_ClassName := String.Empty;
-  FEtmTimeSlot_Persist_Received := False;
-  FEtmTimeSlot_Persist_Regular := False;
-  FEtmTimeSlot_Persist_Sent := False;
-end;
-
-function TioEtmSynchroStrategy_Client.GetEtmTimeSlot_Persist_Received: Boolean;
-begin
-  Result := FEtmTimeSlot_Persist_Received;
-end;
-
-function TioEtmSynchroStrategy_Client.GetEtmTimeSlot_Persist_Regular: Boolean;
-begin
-  Result := FEtmTimeSlot_Persist_Regular;
-end;
-
-function TioEtmSynchroStrategy_Client.GetEtmTimeSlot_Persist_Sent: Boolean;
-begin
-  Result := FEtmTimeSlot_Persist_Sent;
+  // Initialize TimeSlot persist/update/delete properties
+  EtmTimeSlot_Delete_SentToServer := True;
+  EtmTimeSlot_Persist_ReceivedFromServer := False;
+  EtmTimeSlot_Persist_Regular := False;
+  EtmTimeSlot_Persist_ToBeSynchronized := True;
+  EtmTimeSlot_Update_SentToServer := False;
 end;
 
 procedure TioEtmSynchroStrategy_Client.SetEtmTimeSlot_ClassName(const Value: String);
 begin
   FEtmTimeSlot_ClassName := Value.Trim;
-end;
-
-procedure TioEtmSynchroStrategy_Client.SetEtmTimeSlot_Persist_Received(const Value: Boolean);
-begin
-  FEtmTimeSlot_Persist_Received := Value;
-end;
-
-procedure TioEtmSynchroStrategy_Client.SetEtmTimeSlot_Persist_Regular(const Value: Boolean);
-begin
-  FEtmTimeSlot_Persist_Regular := Value;
-end;
-
-procedure TioEtmSynchroStrategy_Client.SetEtmTimeSlot_Persist_Sent(const Value: Boolean);
-begin
-  FEtmTimeSlot_Persist_Sent := Value;
 end;
 
 procedure TioEtmSynchroStrategy_Client._CheckEtmTimeSlotClassName;

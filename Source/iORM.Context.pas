@@ -150,7 +150,6 @@ type
     // Synchronization Strategy methods
     function SynchroStrategy_Client: IioSynchroStrategy_Client; inline;
     procedure SynchroStrategy_GenerateLocalID;
-    // TODO: Da togliere se non usato
     function SynchroStrategy_IsToBeSynchronized: Boolean;
     // BlindLevel helper methods
     function BlindLevel_Do_DetectObjExists: boolean; inline;
@@ -686,7 +685,7 @@ begin
   //  is not assigned then it asks the SynchroStrategy for a temporary local ID.
   // Note: Obviously if a new ID is assigned by SynchroStrategy this will disable the normal ID generation (if generated ID is not NULL)
   LSynchroStrategy_Client := SynchroStrategy_Client;
-  Result := (LSynchroStrategy_Client <> nil) and IDIsNull and LSynchroStrategy_Client.IsToBeSynchronized(Self);
+  Result := (LSynchroStrategy_Client <> nil) and LSynchroStrategy_Client.IsToBeSynchronized(Self);
 end;
 
 function TioContext.IsTrueClass: Boolean;

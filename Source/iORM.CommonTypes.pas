@@ -149,7 +149,7 @@ type
   // Persistence related types
   // Note: Literal description for values added at the end of the "iORM.pas" unit (initialization)
   TioPersistenceActionType = (atDoNotPersist, atInsert, atUpdate, atDelete);
-  TioPersistenceIntentType = (itRegular, itRevert, itSynchro_PersistToServer, itSynchro_PersistToClient, itSynchro_PersistSentTimeSlot);
+  TioPersistenceIntentType = (itRegular, itRevert, itSynchro_PersistToServer, itSynchro_PersistToClient);
   TioPersistenceConflictState = (csUndefined, csResolved, csRejected, csRejectedRaise);
 
   // StdActions related types

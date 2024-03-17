@@ -52,22 +52,26 @@ type
     function GenerateLocalID(const AContext: IioContext): Integer;
     procedure FreeNotification(AComponent: TComponent);
     procedure RemoveFreeNotification(AComponent: TComponent);
-  end;
-
-  IioEtmSynchroStrategy_Client = interface(IioSynchroStrategy_Client)
-    ['{0451D514-6C82-4C0E-AA5E-A0DC06AE3FC2}']
+    // EtmTimeSlot_Delete_SentToServer
+    procedure SetEtmTimeSlot_Delete_SentToServer(const Value: Boolean);
+    function GetEtmTimeSlot_Delete_SentToServer: Boolean;
+    property EtmTimeSlot_Delete_SentToServer: Boolean read GetEtmTimeSlot_Delete_SentToServer write SetEtmTimeSlot_Delete_SentToServer;
     // EtmTimeSlot_Persist_Received
-    procedure SetEtmTimeSlot_Persist_Received(const Value: Boolean);
-    function GetEtmTimeSlot_Persist_Received: Boolean;
-    property EtmTimeSlot_Persist_Received: Boolean read GetEtmTimeSlot_Persist_Received write SetEtmTimeSlot_Persist_Received;
+    procedure SetEtmTimeSlot_Persist_ReceivedFromServer(const Value: Boolean);
+    function GetEtmTimeSlot_Persist_ReceivedFromServer: Boolean;
+    property EtmTimeSlot_Persist_ReceivedFromServer: Boolean read GetEtmTimeSlot_Persist_ReceivedFromServer write SetEtmTimeSlot_Persist_ReceivedFromServer;
     // EtmTimeSlot_Persist_Regular
     procedure SetEtmTimeSlot_Persist_Regular(const Value: Boolean);
     function GetEtmTimeSlot_Persist_Regular: Boolean;
     property EtmTimeSlot_Persist_Regular: Boolean read GetEtmTimeSlot_Persist_Regular write SetEtmTimeSlot_Persist_Regular;
-    // EtmTimeSlot_Persist_Sent
-    procedure SetEtmTimeSlot_Persist_Sent(const Value: Boolean);
-    function GetEtmTimeSlot_Persist_Sent: Boolean;
-    property EtmTimeSlot_Persist_Sent: Boolean read GetEtmTimeSlot_Persist_Sent write SetEtmTimeSlot_Persist_Sent;
+    // EtmTimeSlot_Persist_ToBeSynchronized
+    procedure SetEtmTimeSlot_Persist_ToBeSynchronized(const Value: Boolean);
+    function GetEtmTimeSlot_Persist_ToBeSynchronized: Boolean;
+    property EtmTimeSlot_Persist_ToBeSynchronized: Boolean read GetEtmTimeSlot_Persist_Regular write SetEtmTimeSlot_Persist_Regular;
+    // EtmTimeSlot_Update_SentToServer
+    procedure SetEtmTimeSlot_Update_SentToServer(const Value: Boolean);
+    function GetEtmTimeSlot_Update_SentToServer: Boolean;
+    property EtmTimeSlot_Update_SentToServer: Boolean read GetEtmTimeSlot_Update_SentToServer write SetEtmTimeSlot_Update_SentToServer;
   end;
 
   IioSynchroStrategy_TargetConnectionDef = interface

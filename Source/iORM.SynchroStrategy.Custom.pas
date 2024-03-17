@@ -159,6 +159,11 @@ type
     FAsync: Boolean;
     FEntities_BlackList: TStrings;
     FEntities_WhiteList: TStrings;
+    FEtmTimeSlot_Delete_SentToServer: Boolean;
+    FEtmTimeSlot_Persist_ReceivedFromServer: Boolean;
+    FEtmTimeSlot_Persist_Regular: Boolean;
+    FEtmTimeSlot_Persist_ToBeSynchronized: Boolean;
+    FEtmTimeSlot_Update_SentToServer: Boolean;
     FSynchroName: String;
     FTargetConnectionDef: IioSynchroStrategy_TargetConnectionDef; // IioSynchroStrategy_TargetConnectionDef instead of TioPersistenceStrategyRef to avoid circular reference
     procedure _SyncExecute(AExecuteMethod: TProc; ATerminateMethod: TProc);
@@ -169,11 +174,32 @@ type
     strict protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     function IsToBeSynchronized(const AContext: IioContext): Boolean; virtual;
+    // EtmTimeSlot_Delete_SentToServer
+    procedure SetEtmTimeSlot_Delete_SentToServer(const Value: Boolean);
+    function GetEtmTimeSlot_Delete_SentToServer: Boolean;
+    // EtmTimeSlot_Persist_Received
+    procedure SetEtmTimeSlot_Persist_ReceivedFromServer(const Value: Boolean);
+    function GetEtmTimeSlot_Persist_ReceivedFromServer: Boolean;
+    // EtmTimeSlot_Persist_Regular
+    procedure SetEtmTimeSlot_Persist_Regular(const Value: Boolean);
+    function GetEtmTimeSlot_Persist_Regular: Boolean;
+    // EtmTimeSlot_Persist_ToBeSynchronized
+    procedure SetEtmTimeSlot_Persist_ToBeSynchronized(const Value: Boolean);
+    function GetEtmTimeSlot_Persist_ToBeSynchronized: Boolean;
+    // EtmTimeSlot_Update_Sent
+    procedure SetEtmTimeSlot_Update_SentToServer(const Value: Boolean);
+    function GetEtmTimeSlot_Update_SentToServer: Boolean;
     // ---------- Synchro strategy methods to override on descendant classes ----------
     function _DoGenerateLocalID(const AContext: IioContext): Integer; virtual; abstract;
     function _DoPayload_Create: TioCustomSynchroStrategy_Payload; virtual; abstract;
     procedure _DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload; const ASynchroLevel: TioSynchroLevel); virtual;
     // ---------- Synchro strategy methods to override on descendant classes ----------
+  strict protected
+    property EtmTimeSlot_Delete_SentToServer: Boolean read GetEtmTimeSlot_Delete_SentToServer write SetEtmTimeSlot_Delete_SentToServer default False;
+    property EtmTimeSlot_Persist_ReceivedFromServer: Boolean read GetEtmTimeSlot_Persist_ReceivedFromServer write SetEtmTimeSlot_Persist_ReceivedFromServer default False;
+    property EtmTimeSlot_Persist_Regular: Boolean read GetEtmTimeSlot_Persist_Regular write SetEtmTimeSlot_Persist_Regular default False;
+    property EtmTimeSlot_Persist_ToBeSynchronized: Boolean read GetEtmTimeSlot_Persist_ToBeSynchronized write SetEtmTimeSlot_Persist_ToBeSynchronized default False;
+    property EtmTimeSlot_Update_SentToServer: Boolean read GetEtmTimeSlot_Update_SentToServer write SetEtmTimeSlot_Update_SentToServer default False;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -214,6 +240,11 @@ begin
   FAsync := False;
   FEntities_BlackList := TStringList.Create;
   FEntities_WhiteList := TStringList.Create;
+  FEtmTimeSlot_Delete_SentToServer := False;
+  FEtmTimeSlot_Persist_ReceivedFromServer := False;
+  FEtmTimeSlot_Persist_Regular := False;
+  FEtmTimeSlot_Persist_ToBeSynchronized := False;
+  FEtmTimeSlot_Update_SentToServer := False;
   FSynchroName := IO_STRING_NULL_VALUE;
   FTargetConnectionDef := nil;
 end;
@@ -230,6 +261,31 @@ begin
   Result := _DoGenerateLocalID(AContext);
 end;
 
+function TioCustomSynchroStrategy_Client.GetEtmTimeSlot_Delete_SentToServer: Boolean;
+begin
+  Result := FEtmTimeSlot_Delete_SentToServer;
+end;
+
+function TioCustomSynchroStrategy_Client.GetEtmTimeSlot_Persist_ReceivedFromServer: Boolean;
+begin
+  Result := FEtmTimeSlot_Persist_ReceivedFromServer;
+end;
+
+function TioCustomSynchroStrategy_Client.GetEtmTimeSlot_Persist_Regular: Boolean;
+begin
+  Result := FEtmTimeSlot_Persist_Regular;
+end;
+
+function TioCustomSynchroStrategy_Client.GetEtmTimeSlot_Persist_ToBeSynchronized: Boolean;
+begin
+  Result := FEtmTimeSlot_Persist_ToBeSynchronized;
+end;
+
+function TioCustomSynchroStrategy_Client.GetEtmTimeSlot_Update_SentToServer: Boolean;
+begin
+  Result := FEtmTimeSlot_Update_SentToServer;
+end;
+
 procedure TioCustomSynchroStrategy_Client.SetEntities_BlackList(const Value: TStrings);
 begin
   FEntities_BlackList.Text := Value.Text.Trim;
@@ -240,6 +296,31 @@ procedure TioCustomSynchroStrategy_Client.SetEntities_WhiteList(const Value: TSt
 begin
   FEntities_WhiteList.Text := Value.Text.Trim;
 //  FClassWhiteList.Assign(Value);
+end;
+
+procedure TioCustomSynchroStrategy_Client.SetEtmTimeSlot_Delete_SentToServer(const Value: Boolean);
+begin
+  FEtmTimeSlot_Delete_SentToServer := Value;
+end;
+
+procedure TioCustomSynchroStrategy_Client.SetEtmTimeSlot_Persist_ReceivedFromServer(const Value: Boolean);
+begin
+  FEtmTimeSlot_Persist_ReceivedFromServer := Value;
+end;
+
+procedure TioCustomSynchroStrategy_Client.SetEtmTimeSlot_Persist_Regular(const Value: Boolean);
+begin
+  FEtmTimeSlot_Persist_Regular := Value;
+end;
+
+procedure TioCustomSynchroStrategy_Client.SetEtmTimeSlot_Persist_ToBeSynchronized(const Value: Boolean);
+begin
+  FEtmTimeSlot_Persist_ToBeSynchronized := Value;
+end;
+
+procedure TioCustomSynchroStrategy_Client.SetEtmTimeSlot_Update_SentToServer(const Value: Boolean);
+begin
+  FEtmTimeSlot_Update_SentToServer := Value;
 end;
 
 procedure TioCustomSynchroStrategy_Client.SetTargetConnectionDef(const ATargetConnectionDef: IioSynchroStrategy_TargetConnectionDef);
@@ -292,9 +373,10 @@ begin
   //  (which for EtmSynchroStrategy simply means that it must assign a negative ID)
   //  is based on the name of the class of the entity to which the TimeSlot refers;
   //  otherwise it is based on the name of the class that is being persisted.
-  if AContext.DataObject is TioEtmCustomTimeSlot then
-    LClassName := TioEtmCustomTimeSlot(AContext.DataObject).EntityClassName
-  else
+// TODO: Eliminare le parti commentate perchè con il nuovo modo con id dei timeslots sempre positivi probabilmente non serve più
+//  if AContext.DataObject is TioEtmCustomTimeSlot then
+//    LClassName := TioEtmCustomTimeSlot(AContext.DataObject).EntityClassName
+//  else
     LClassName := AContext.DataObject.ClassName;
   // Detect if the current DataObject is to be synchronized or not (Black & White class list)
   Result := ( (FEntities_WhiteList.Count = 0) or (FEntities_WhiteList.IndexOf(LClassName) <> -1) )

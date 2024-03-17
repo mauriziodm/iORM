@@ -69,14 +69,14 @@ uses
 { TioEtmInterceptor }
 
 class function TioEtmInterceptor.SynchroCanPersistTimeSlot(const AContext: IioContext): Boolean;
-var
-  LSynchroStrategy_Client: IioEtmSynchroStrategy_Client;
+//var
+//  LSynchroStrategy_Client: IioEtmSynchroStrategy_Client;
 begin
 //  LSynchroStrategy_Client := AContext.SynchroStrategy_GetClient;
 
 
-  LSynchroStrategy_Client := nil;
-  Result := True;
+//  LSynchroStrategy_Client := nil;
+//  Result := True;
 
 
 
