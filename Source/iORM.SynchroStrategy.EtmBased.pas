@@ -86,19 +86,23 @@ type
     procedure SetEtmTimeSlot_ClassName(const Value: String);
   strict protected
     // ---------- Synchro strategy methods to override on descendant classes ----------
-    function _DoGenerateLocalID(const AContext: IioContext): Integer; override;
     function _DoPayload_Create: TioCustomSynchroStrategy_Payload; override;
     procedure _DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload; const ASynchroLevel: TioSynchroLevel); override;
     // ---------- Synchro strategy methods to override on descendant classes ----------
   public
     constructor Create(AOwner: TComponent); override;
   published
+    property Async;
+    property Entities_BlackList;
+    property Entities_WhiteList;
     property EtmTimeSlot_ClassName: String read FEtmTimeSlot_ClassName write SetEtmTimeSlot_ClassName;
     property EtmTimeSlot_Delete_SentToServer default True;
     property EtmTimeSlot_Persist_ReceivedFromServer default False;
     property EtmTimeSlot_Persist_Regular default False;
     property EtmTimeSlot_Persist_ToBeSynchronized default True;
     property EtmTimeSlot_Update_SentToServer default False;
+    property SynchroName;
+    property TargetConnectionDef;
   end;
 
 implementation
@@ -336,21 +340,6 @@ begin
       #13#13'The class "%s" specified in the "EtmTimeSlot_ClassName" property of the SynchroStrategy component named "%s" is not an ETM Repository/TimeSlot class.' +
       #13#13'Make sure that the property is set to an ETM Repository/TimeSlot class name and try again.' +
       #13#13'It will work.', [FEtmTimeSlot_ClassName, Name]));
-end;
-
-function TioEtmSynchroStrategy_Client._DoGenerateLocalID(const AContext: IioContext): Integer;
-var
-  LQuery: IioQuery;
-begin
-  LQuery := TioDBFactory.QueryEngine.GetQueryMinID(AContext);
-  try
-    LQuery.Open;
-    Result := LQuery.Fields[0].AsInteger - 1;
-    if Result > -1 then
-      Result := -1;
-  finally
-    LQuery.Close;
-  end;
 end;
 
 function TioEtmSynchroStrategy_Client._DoPayload_Create: TioCustomSynchroStrategy_Payload;

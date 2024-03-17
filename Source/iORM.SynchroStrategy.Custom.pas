@@ -190,28 +190,27 @@ type
     procedure SetEtmTimeSlot_Update_SentToServer(const Value: Boolean);
     function GetEtmTimeSlot_Update_SentToServer: Boolean;
     // ---------- Synchro strategy methods to override on descendant classes ----------
-    function _DoGenerateLocalID(const AContext: IioContext): Integer; virtual; abstract;
+    function _DoGenerateLocalID(const AContext: IioContext): Integer; virtual;
     function _DoPayload_Create: TioCustomSynchroStrategy_Payload; virtual; abstract;
     procedure _DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload; const ASynchroLevel: TioSynchroLevel); virtual;
     // ---------- Synchro strategy methods to override on descendant classes ----------
   strict protected
+    property Async: Boolean read FAsync write FAsync default False;
+    property Entities_BlackList: TStrings read FEntities_BlackList write SetEntities_BlackList;
+    property Entities_WhiteList: TStrings read FEntities_WhiteList write SetEntities_WhiteList;
     property EtmTimeSlot_Delete_SentToServer: Boolean read GetEtmTimeSlot_Delete_SentToServer write SetEtmTimeSlot_Delete_SentToServer default False;
     property EtmTimeSlot_Persist_ReceivedFromServer: Boolean read GetEtmTimeSlot_Persist_ReceivedFromServer write SetEtmTimeSlot_Persist_ReceivedFromServer default False;
     property EtmTimeSlot_Persist_Regular: Boolean read GetEtmTimeSlot_Persist_Regular write SetEtmTimeSlot_Persist_Regular default False;
     property EtmTimeSlot_Persist_ToBeSynchronized: Boolean read GetEtmTimeSlot_Persist_ToBeSynchronized write SetEtmTimeSlot_Persist_ToBeSynchronized default False;
     property EtmTimeSlot_Update_SentToServer: Boolean read GetEtmTimeSlot_Update_SentToServer write SetEtmTimeSlot_Update_SentToServer default False;
+    property SynchroName: String read FSynchroName write FSynchroName;
+    property TargetConnectionDef: IioSynchroStrategy_TargetConnectionDef read FTargetConnectionDef write SetTargetConnectionDef default nil;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure DoSynchronization(const ASynchroLevel: TioSynchroLevel);
     function GenerateLocalID(const AContext: IioContext): Integer;
   published
-    property Async: Boolean read FAsync write FAsync default False;
-    // TODO: Togliere la parte write
-    property Entities_BlackList: TStrings read FEntities_BlackList write SetEntities_BlackList;
-    property Entities_WhiteList: TStrings read FEntities_WhiteList write SetEntities_WhiteList;
-    property SynchroName: String read FSynchroName write FSynchroName;
-    property TargetConnectionDef: IioSynchroStrategy_TargetConnectionDef read FTargetConnectionDef write SetTargetConnectionDef default nil;
   end;
 
   TioCustomSynchroStrategy_Thread = class(TThread)
@@ -230,7 +229,7 @@ implementation
 
 uses
   iORM, iORM.PersistenceStrategy.Factory, iORM.DB.Interfaces, iORM.Abstraction,
-  iORM.Exceptions;
+  iORM.Exceptions, iORM.DB.Factory;
 
 { TioCustomSynchroStrategy_Client }
 
@@ -334,6 +333,22 @@ begin
 
     if FTargetConnectionDef <> nil then
       FTargetConnectionDef.FreeNotification(Self);
+  end;
+end;
+
+function TioCustomSynchroStrategy_Client._DoGenerateLocalID(const AContext: IioContext): Integer;
+var
+  LQuery: IioQuery;
+begin
+  // Generate negative ID as local temporary ID (tonbe changed during synchronization process)
+  LQuery := TioDBFactory.QueryEngine.GetQueryMinID(AContext);
+  try
+    LQuery.Open;
+    Result := LQuery.Fields[0].AsInteger - 1;
+    if Result > -1 then
+      Result := -1;
+  finally
+    LQuery.Close;
   end;
 end;
 
