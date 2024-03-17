@@ -42,7 +42,7 @@ uses
   iORM.Where, iORM.Context.Table.Interfaces, System.Rtti,
   iORM.Context.Map.Interfaces, iORM.Where.Interfaces,
   iORM.LiveBindings.BSPersistence, iORM.ConflictStrategy.Interfaces,
-  iORM.SynchroStrategy.Interfaces;
+  iORM.SynchroStrategy.Interfaces, iORM.Attributes;
 
 type
 
@@ -148,8 +148,10 @@ type
     procedure ResolveUpdateConflict(const AContext: IioContext); inline;
     function GetCurrentStrategyName: String;
     // Synchronization Strategy methods
+    function SynchroStrategy_CanPersistEtmTimeSlot: Boolean;
     function SynchroStrategy_Client: IioSynchroStrategy_Client; inline;
     procedure SynchroStrategy_GenerateLocalID;
+    function SynchroStrategy_GetTimeSlotSynchroState: TioEtmTimeSlotSynchroState;
     function SynchroStrategy_IsToBeSynchronized: Boolean;
     // BlindLevel helper methods
     function BlindLevel_Do_DetectObjExists: boolean; inline;
@@ -668,6 +670,51 @@ begin
   // If is to be synchronized...
   if (LSynchroStrategy_Client <> nil) and IDIsNull and LSynchroStrategy_Client.IsToBeSynchronized(Self) then
     GetProperties.GetIdProperty.SetValue(DataObject, LSynchroStrategy_Client.GenerateLocalID(Self));
+end;
+
+function TioContext.SynchroStrategy_GetTimeSlotSynchroState: TioEtmTimeSlotSynchroState;
+begin
+  // Determines the TimeSlotSynchroState based on the intent and whether or not it is a class to synchronize
+  case FIntentType of
+    itRegular, itRevert:
+      if SynchroStrategy_IsToBeSynchronized then
+        Result := tsToBeSynchronized
+      else
+        Result := tsRegular;
+    itSynchro_PersistToServer:
+      if SynchroStrategy_IsToBeSynchronized then
+        Result := tsToBeSynchronized
+      else
+        Result := tsSynchronized_ReceivedFromClient;
+    itSynchro_PersistToClient:
+      Result := tsSynchronized_ReceivedFromServer;
+  else
+    Result := tsRegular;
+  end;
+end;
+
+function TioContext.SynchroStrategy_CanPersistEtmTimeSlot: Boolean;
+var
+  LSynchroStrategy_Client: IioSynchroStrategy_Client;
+begin
+  // Get the SynchroStrategy if exists
+  LSynchroStrategy_Client := SynchroStrategy_Client;
+  // If there is a SinchroStrategy, it determines whether the TimeSlot should be created
+  //  and persisted based on the intent of the operation and the properties of th
+  //  SynchroStrategy itself.
+  Result := True;
+  if Assigned(LSynchroStrategy_Client) then
+  begin
+    case FIntentType of
+      itRegular, itRevert, itSynchro_PersistToServer:
+        if SynchroStrategy_IsToBeSynchronized then
+          Result := LSynchroStrategy_Client.EtmTimeSlot_Persist_ToBeSynchronized
+        else
+          Result := LSynchroStrategy_Client.EtmTimeSlot_Persist_Regular;
+      itSynchro_PersistToClient:
+        Result := LSynchroStrategy_Client.EtmTimeSlot_Persist_ReceivedFromServer;
+    end;
+  end;
 end;
 
 function TioContext.SynchroStrategy_Client: IioSynchroStrategy_Client;

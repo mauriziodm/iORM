@@ -67,7 +67,7 @@ type
     // EtmTimeSlot_Persist_ToBeSynchronized
     procedure SetEtmTimeSlot_Persist_ToBeSynchronized(const Value: Boolean);
     function GetEtmTimeSlot_Persist_ToBeSynchronized: Boolean;
-    property EtmTimeSlot_Persist_ToBeSynchronized: Boolean read GetEtmTimeSlot_Persist_Regular write SetEtmTimeSlot_Persist_Regular;
+    property EtmTimeSlot_Persist_ToBeSynchronized: Boolean read GetEtmTimeSlot_Persist_ToBeSynchronized write SetEtmTimeSlot_Persist_ToBeSynchronized;
     // EtmTimeSlot_Update_SentToServer
     procedure SetEtmTimeSlot_Update_SentToServer(const Value: Boolean);
     function GetEtmTimeSlot_Update_SentToServer: Boolean;

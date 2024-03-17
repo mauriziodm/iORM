@@ -38,7 +38,8 @@ interface
 uses
   iORM.CommonTypes, iORM.Context.Table.Interfaces,
   iORM.Context.Properties.Interfaces, System.Rtti, iORM.Where.Interfaces,
-  iORM.Context.Map.Interfaces, iORM.LiveBindings.BSPersistence;
+  iORM.Context.Map.Interfaces, iORM.LiveBindings.BSPersistence,
+  iORM.Attributes;
 
 type
 
@@ -63,8 +64,9 @@ type
     procedure ResolveUpdateConflict(const AContext: IioContext);
     function GetCurrentStrategyName: String;
     // Synchronization Strategy methods
+    function SynchroStrategy_CanPersistEtmTimeSlot: Boolean;
     procedure SynchroStrategy_GenerateLocalID;
-    function SynchroStrategy_IsToBeSynchronized: Boolean;
+    function SynchroStrategy_GetTimeSlotSynchroState: TioEtmTimeSlotSynchroState;
     // BlindLevel helper methods
     function BlindLevel_Do_DetectObjExists: boolean;
     function BlindLevel_Do_AutoUpdateProps: boolean;

@@ -49,8 +49,7 @@ type
 
   TioEtmInterceptor = class(TioCustomCRUDInterceptor)
   private
-    class procedure CreateAndPersistNewTimeSlot_Internal(const AContext: IioContext); static; inline;
-    class function SynchroCanPersistTimeSlot(const AContext: IioContext): Boolean; static; inline;
+    class procedure CreateAndPersistNewTimeSlot_Internal(const AContext: IioContext);// static; inline;
   public
     // Insert
     class procedure AfterInsert(const AContext: IioContext); override;
@@ -68,31 +67,18 @@ uses
 
 { TioEtmInterceptor }
 
-class function TioEtmInterceptor.SynchroCanPersistTimeSlot(const AContext: IioContext): Boolean;
-//var
-//  LSynchroStrategy_Client: IioEtmSynchroStrategy_Client;
-begin
-//  LSynchroStrategy_Client := AContext.SynchroStrategy_GetClient;
-
-
-//  LSynchroStrategy_Client := nil;
-//  Result := True;
-
-
-
-//    function SynchroStrategy_Client: IioSynchroStrategy_Client; inline;
-
-end;
-
 class procedure TioEtmInterceptor.CreateAndPersistNewTimeSlot_Internal(const AContext: IioContext);
 var
   LTimeSlot: TioEtmCustomTimeSlot;
 begin
-  LTimeSlot := AContext.Map.GetTable.GetEtmTimeSlotClass.Create(AContext);
-  try
-    io._PersistObject(LTimeSlot, itRegular, BL_ETM_PERSIST_TIMESLOT); // Intent is itRegular for the TimeSlot class and not depending from AContext
-  finally
-    LTimeSlot.Free;
+  if AContext.SynchroStrategy_CanPersistEtmTimeSlot then
+  begin
+    LTimeSlot := AContext.Map.GetTable.GetEtmTimeSlotClass.Create(AContext);
+    try
+      io._PersistObject(LTimeSlot, itRegular, BL_ETM_PERSIST_TIMESLOT); // Intent is itRegular for the TimeSlot class and not depending from AContext
+    finally
+      LTimeSlot.Free;
+    end;
   end;
 end;
 

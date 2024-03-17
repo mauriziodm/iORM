@@ -1045,20 +1045,7 @@ begin
   FConflictCheckedByHuman_Name := IO_STRING_NULL_VALUE;
   FConflictCheckedByHuman_DateTime := IO_DATETIME_NULL_VALUE;
   // Synchronization
-  case LContext.IntentType of
-    itRegular, itRevert:
-      if LContext.SynchroStrategy_IsToBeSynchronized then
-        FTimeSlotSynchroState := tsToBeSynchronized
-      else
-        FTimeSlotSynchroState := tsRegular;
-    itSynchro_PersistToServer:
-      if LContext.SynchroStrategy_IsToBeSynchronized then
-        FTimeSlotSynchroState := tsToBeSynchronized
-      else
-        FTimeSlotSynchroState := tsSynchronized_ReceivedFromClient;
-    itSynchro_PersistToClient:
-      FTimeSlotSynchroState := tsSynchronized_ReceivedFromServer;
-  end;
+  FTimeSlotSynchroState := LContext.SynchroStrategy_GetTimeSlotSynchroState;
   // NB: Questo è un anonymous method che viene passato dal BindSource che sta esponendo il TimeSlot stesso e che permette
   // di risalire alla versione corrente della entità attraverso la catena "ETMBindSource.etmFor.Current"
   FExtractCurrentEntityFunc := nil;
