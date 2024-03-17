@@ -78,7 +78,7 @@ type
     property EtmTimeSlotClassName: String read FEtmTimeSlotClassName write FEtmTimeSlotClassName;
   end;
 
-  TioEtmSynchroStrategy_Client = class(TioCustomSynchroStrategy_Client)
+  TioEtmSynchroStrategy_Client = class(TioCustomSynchroStrategy_Client, IioEtmSynchroStrategy_Client)
   strict private
     FEtmTimeSlot_ClassName: String;
     FEtmTimeSlot_Persist_Received: Boolean;
