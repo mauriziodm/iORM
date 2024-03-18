@@ -186,6 +186,7 @@ end;
 
 procedure TioEtmSynchroStrategy_Payload._DoLoadPayloadFromClient;
 var
+  LSynchroLogItem_New: TioEtmSynchroStrategy_LogItem;
   LWhere: IioWhere;
 begin
   inherited;
@@ -201,6 +202,14 @@ begin
   // Load objects to be synchronized
   LWhere.TypeName := FEtmTimeSlotClassName;
   LWhere.ToList(FPayloadData);
+  // Update SynchroLogItem (cast the SynchroLogItem to the specialized etm based class)
+  LSynchroLogItem_New := Self.SynchroLogItem_New as TioEtmSynchroStrategy_LogItem;
+  LSynchroLogItem_New.CliToSrv_Count := FPayloadData.Count;
+  if FPayloadData.Count > 0 then
+  begin
+    LSynchroLogItem_New.CliToSrv_TimeSlotID_From := FPayloadData.First.ID;
+    LSynchroLogItem_New.CliToSrv_TimeSlotID_To := FPayloadData.Last.ID;
+  end;
 end;
 
 procedure TioEtmSynchroStrategy_Payload._DoReloadPayloadFromServer;
@@ -211,8 +220,6 @@ begin
   inherited;
   // Clear the payload data
   _ClearPayloadData;
-  // Cast the SynchroLogItem to the specialized etm based class
-  LSynchroLogItem_New := Self.SynchroLogItem_New as TioEtmSynchroStrategy_LogItem;
   // Build where
   LWhere := io.Where('ID', coGreaterOrEqual, LSynchroLogItem_New.SrvToCli_TimeSlotID_From);
   // Where: black & white class list
@@ -225,7 +232,9 @@ begin
   // Load objects to be synchronized
   LWhere.TypeName := FEtmTimeSlotClassName;
   LWhere.ToList(FPayloadData);
-  // Update the SynchroLogItem
+  // Update SynchroLogItem (cast the SynchroLogItem to the specialized etm based class)
+  LSynchroLogItem_New := Self.SynchroLogItem_New as TioEtmSynchroStrategy_LogItem;
+  LSynchroLogItem_New.SrvToCli_Count := FPayloadData.Count;
   if FPayloadData.Count > 0 then
     LSynchroLogItem_New.SrvToCli_TimeSlotID_To := FPayloadData.Last.ID
   else
