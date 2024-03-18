@@ -57,6 +57,9 @@ type
     FSynchroStatus: TioSynchroStatus;
     FUserID: Integer;
     FUserName: String;
+    // Count
+    FCliToSrv_Count: Integer;
+    FSrvToCli_Count: Integer;
     // Timing
     FStart: TDateTime;
     FLoadFromClient: TDateTime;
@@ -72,6 +75,9 @@ type
     property SynchroStatus: TioSynchroStatus read FSynchroStatus write FSynchroStatus;
     property UserID: Integer read FUserID write FUserID;
     property UserName: String read FUserName write FUserName;
+    // Count
+    property CliToSrv_Count: Integer read FCliToSrv_Count write FCliToSrv_Count;
+    property SrvToCli_Count: Integer read FSrvToCli_Count write FSrvToCli_Count;
     // Timing
     property Start: TDateTime read FStart write FStart;
     property LoadFromClient: TDateTime read FLoadFromClient write FLoadFromClient;
@@ -381,21 +387,25 @@ begin
 end;
 
 function TioCustomSynchroStrategy_Client.IsToBeSynchronized(const AContext: IioContext): Boolean;
-var
-  LClassName: String;
 begin
-  // If we are persisting a TimeSlot then to understand if it needs to be synchronized
-  //  (which for EtmSynchroStrategy simply means that it must assign a negative ID)
-  //  is based on the name of the class of the entity to which the TimeSlot refers;
-  //  otherwise it is based on the name of the class that is being persisted.
-// TODO: Eliminare le parti commentate perchè con il nuovo modo con id dei timeslots sempre positivi probabilmente non serve più
+  Result := (not (AContext.DataObject is TioEtmCustomTimeSlot))
+    and ( (FEntities_WhiteList.Count = 0) or (FEntities_WhiteList.IndexOf(AContext.DataObject.ClassName) <> -1) )
+    and ( (FEntities_BlackList.Count = 0) or (FEntities_BlackList.IndexOf(AContext.DataObject.ClassName) = -1) );
+
+// ========================== OLD CODE ===========================
+// TODO: Eliminare old code perchè con i nuovo TimeSlot con ID sempre positivi probabilmente non serve più
+//  // If we are persisting a TimeSlot then to understand if it needs to be synchronized
+//  //  (which for EtmSynchroStrategy simply means that it must assign a negative ID)
+//  //  is based on the name of the class of the entity to which the TimeSlot refers;
+//  //  otherwise it is based on the name of the class that is being persisted.
 //  if AContext.DataObject is TioEtmCustomTimeSlot then
 //    LClassName := TioEtmCustomTimeSlot(AContext.DataObject).EntityClassName
 //  else
-    LClassName := AContext.DataObject.ClassName;
-  // Detect if the current DataObject is to be synchronized or not (Black & White class list)
-  Result := ( (FEntities_WhiteList.Count = 0) or (FEntities_WhiteList.IndexOf(LClassName) <> -1) )
-        and ( (FEntities_BlackList.Count = 0) or (FEntities_BlackList.IndexOf(LClassName) = -1) );
+//    LClassName := AContext.DataObject.ClassName;
+//  // Detect if the current DataObject is to be synchronized or not (Black & White class list)
+//  Result := ( (FEntities_WhiteList.Count = 0) or (FEntities_WhiteList.IndexOf(LClassName) <> -1) )
+//        and ( (FEntities_BlackList.Count = 0) or (FEntities_BlackList.IndexOf(LClassName) = -1) );
+// ========================== OLD CODE ===========================
 end;
 
 procedure TioCustomSynchroStrategy_Client.Notification(AComponent: TComponent; Operation: TOperation);
@@ -677,6 +687,9 @@ begin
   FUserName := IO_STRING_NULL_VALUE;
   FSynchroLevel := TioSynchroLevel.slIncremental;
   FSynchroStatus := TioSynchroStatus.ssInitialization;
+  // Count
+  FCliToSrv_Count := IO_INTEGER_NULL_VALUE;
+  FSrvToCli_Count := IO_INTEGER_NULL_VALUE;
   // Timing
   FStart := IO_DATETIME_NULL_VALUE;
   FLoadFromClient := IO_DATETIME_NULL_VALUE;
