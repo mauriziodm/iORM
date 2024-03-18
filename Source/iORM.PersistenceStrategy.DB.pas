@@ -627,24 +627,24 @@ var
 {$ENDREGION}
   procedure _DetectPersistActionType;
   begin
-    case LContext.ObjStatus of
-      osDirty:
-        begin
-          // note: if SmartUpdateDetection system is not enabled or (if enabled) the object is to be persisted (according to the SmartUpdateDetection system)...
-          if LContext.GetProperties.ObjStatusPropertyExist or (AMasterBSPersistence = nil) or (not AMasterBSPersistence.IsSmartUpdateDetectionEnabled) or
-            AMasterBSPersistence.SmartUpdateDetection.IsToBePersisted(AObj, LContext.MasterPropertyPath) then
-          begin
-            // old code: if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
-            if LContext.IDIsNull or (LContext.BlindLevel_Do_DetectObjExists and not ObjectExists(LContext)) then
-              LContext.ActionType := atInsert
-            else
-              LContext.ActionType := atUpdate;
-          end;
-        end;
-      osDeleted:
-      else
-        LContext.ActionType := atDoNotPersist;
-    end;
+    // If the ObjStatus is osDirty (or not exists) or IntentType is for revert or synchro operation then persist the object
+    if (LContext.ObjStatus = osDirty) or (LContext.IntentType > itRegular)  then
+    begin
+      // note: if SmartUpdateDetection system is not enabled or (if enabled) the object is to be persisted (according to the SmartUpdateDetection system)...
+      if LContext.GetProperties.ObjStatusPropertyExist or (AMasterBSPersistence = nil) or (not AMasterBSPersistence.IsSmartUpdateDetectionEnabled) or
+        AMasterBSPersistence.SmartUpdateDetection.IsToBePersisted(AObj, LContext.MasterPropertyPath) then
+      begin
+        // old code: if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
+        if LContext.IDIsNull or (LContext.BlindLevel_Do_DetectObjExists and not ObjectExists(LContext)) then
+          LContext.ActionType := atInsert
+        else
+          LContext.ActionType := atUpdate;
+      end;
+    end
+    // Else if ObjStatus is osDelete then delete the obj
+    else
+    if LContext.ObjStatus = osDeleted then
+      LContext.ActionType := atDoNotPersist;
   end;
 
 begin
@@ -772,8 +772,8 @@ begin
 end;
 
 class procedure TioPersistenceStrategyDB.PreProcessRelationChildOnPersist(const AMasterContext: IioContext);
-// ar
-// LMasterProp: IioProperty;
+// var
+//   LMasterProp: IioProperty;
 begin
   // inherited;
   // // Loop for all properties

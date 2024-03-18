@@ -816,7 +816,7 @@ begin
           LMasterBindSource.Persistence.SmartDeleteSystem.ForEach(
             procedure(ASmartDeleteSystemItem: TioSmartDeleteSystemItem)
             begin
-              // TODO: Qui si è salvato il tipo e l'ID dell'oggetto da elimina ma così salta ETM e conflitct strategy
+              // TODO: Qui si è salvato il tipo e l'ID dell'oggetto da eliminare ma così salta ETM e conflict strategy
               io.RefTo(ASmartDeleteSystemItem.TypeName).ByID(ASmartDeleteSystemItem.ID).Cacheable.Delete;
             end);
           // ----------------------------------------------------------------------------------------------------------------------------
