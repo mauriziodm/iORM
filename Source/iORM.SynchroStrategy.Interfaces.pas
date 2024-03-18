@@ -42,7 +42,7 @@ type
 
   TioSynchroLevel = (slIncremental, slFull);
 
-  TioSynchroStatus = (ssInitialization, ssLoadFromClient, ssPersistToServer, ssReloadFromServer, ssPersistToClient, ssCompleted);
+  TioSynchroStatus = (ssInitialization, ssLoadFromClient, ssPersistToServer, ssReloadFromServer, ssPersistToClient, ssFinalization, ssCompleted);
 
   TioSynchroStrategy_ClassList = TList<String>;
 

@@ -77,6 +77,7 @@ type
     procedure _DoPersistPayloadToServer; override;
     procedure _DoReloadPayloadFromServer; override;
     procedure _DoPersistPayloadToClient; override;
+    procedure _DoFinalizePayload; override;
     // ---------- Methods to override on descendant classes ----------
   public
     constructor Create; override;
@@ -116,7 +117,8 @@ implementation
 uses
   iORM.CommonTypes, iORM, System.SysUtils, System.Generics.Collections,
   iORM.DB.Interfaces, iORM.DB.Factory, iORM.Exceptions,
-  iORM.Context.Map.Interfaces, iORM.Context.Container;
+  iORM.Context.Map.Interfaces, iORM.Context.Container,
+  iORM.DB.ConnectionContainer;
 
 { TioEtmBasetSynchroStrategy_LogItem }
 
@@ -184,6 +186,20 @@ begin
   Self.SynchroLogItem_Old := io.LoadObject<TioEtmSynchroStrategy_LogItem>(LWhere);
 end;
 
+procedure TioEtmSynchroStrategy_Payload._DoFinalizePayload;
+begin
+  inherited;
+  // Delete sent TimeSlots if enabled...
+  if EtmTimeSlot_Delete_SentToServer then
+    io.SQL(Format('DELETE FROM [%s] WHERE [.TimeSlotSynchroState] = %d', [FEtmTimeSlotClassName, Ord(tsToBeSynchronized)]))
+      .SelfClass(FEtmTimeSlotClassName).Execute
+  else
+  // Change the TimeSlotSynchroState value of the synchronized TimeSlots from "tsToBeSynchronized" to "tsSynchronized_SentToServer" if enabled...
+  if EtmTimeSlot_Update_SentToServer then
+    io.SQL(Format('UPDATE [%s] SET [.TimeSlotSynchroState] = %d WHERE [.TimeSlotSynchroState] = %d', [FEtmTimeSlotClassName, Ord(tsSynchronized_SentToServer),
+      Ord(tsToBeSynchronized)])).SelfClass(FEtmTimeSlotClassName).Execute;
+end;
+
 procedure TioEtmSynchroStrategy_Payload._DoLoadPayloadFromClient;
 var
   LSynchroLogItem_New: TioEtmSynchroStrategy_LogItem;
@@ -191,14 +207,12 @@ var
 begin
   inherited;
   // Build where
-  LWhere := io.Where('ID', coLower, 0); // The ID of the TimeSlots created on the client device is always negative
-  // Where: black & white class list
-  _BuildBlackAndWhiteListWhere(LWhere);
+  LWhere := io.Where('TimeSlotSynchroState', coEquals, tsToBeSynchronized);
   // Where: last timeslot for any object only
-  LWhere._And(Format('[.ID] = (SELECT MIN(SUB.ID) FROM [%s] SUB WHERE SUB.EntityClassName = [.EntityClassName] AND SUB.EntityID = [.EntityID])',
+  LWhere._And(Format('[.ID] = (SELECT MAX(SUB.ID) FROM [%s] SUB WHERE SUB.EntityClassName = [.EntityClassName] AND SUB.EntityID = [.EntityID])',
     [FEtmTimeSlotClassName]));
   // OrderBy (DESC because it load timeslots with negative ID)
-  LWhere._OrderBy('[.ID] DESC');
+  LWhere._OrderBy('[.ID] ASC');
   // Load objects to be synchronized
   LWhere.TypeName := FEtmTimeSlotClassName;
   LWhere.ToList(FPayloadData);
@@ -220,6 +234,8 @@ begin
   inherited;
   // Clear the payload data
   _ClearPayloadData;
+  // Cast the SynchroLogItem to the specialized Etm based one
+  LSynchroLogItem_New := Self.SynchroLogItem_New as TioEtmSynchroStrategy_LogItem;
   // Build where
   LWhere := io.Where('ID', coGreaterOrEqual, LSynchroLogItem_New.SrvToCli_TimeSlotID_From);
   // Where: black & white class list
@@ -233,7 +249,6 @@ begin
   LWhere.TypeName := FEtmTimeSlotClassName;
   LWhere.ToList(FPayloadData);
   // Update SynchroLogItem (cast the SynchroLogItem to the specialized etm based class)
-  LSynchroLogItem_New := Self.SynchroLogItem_New as TioEtmSynchroStrategy_LogItem;
   LSynchroLogItem_New.SrvToCli_Count := FPayloadData.Count;
   if FPayloadData.Count > 0 then
     LSynchroLogItem_New.SrvToCli_TimeSlotID_To := FPayloadData.Last.ID
@@ -343,24 +358,26 @@ var
 begin
   // Check property is not empty
   if FEtmTimeSlot_ClassName.Trim.IsEmpty then
-    raise EioSynchroStrategyException.Create(ClassName, '_CheckEtmTimeSlotClassName', Format('Hi, I''m iORM and I have something to tell you.' +
+    raise EioSynchroStrategyException.Create(ClassName, '_CheckEtmTimeSlotClassName',
+      Format('Hi, I''m iORM and I have something to tell you.' +
       #13#13'The "EtmTimeSlot_ClassName" property of the SynchroStrategy component called "%s" was not set.' +
-      #13#13'Please Set the property to an ETM Repository/Timeslot class name and try again.' +
-      #13#13'It will work.', [Name]));
+      #13#13'Please Set the property to an ETM Repository/Timeslot class name and try again.' + #13#13'It will work.', [Name]));
   // Check if the FEtmTimeSlotClassName is mapped
   if not TioMapContainer.Exist(FEtmTimeSlot_ClassName) then
-    raise EioException.Create(ClassName, '_CheckEtmTimeSlotClassName', Format('Hi, I''m iORM and I have something to tell you.' +
-      #13#13'I cannot find the map of the ETM Repository/TimeSlot class named "%s" specified in the "EtmTimeSlot_ClassName" property of the SynchroStrategy component called "%s".' +
-      #13#13'May be that you forgot to decorate the class with the "[etmRepository]" attribute on it.' +
+    raise EioException.Create(ClassName, '_CheckEtmTimeSlotClassName',
+      Format('Hi, I''m iORM and I have something to tell you.' +
+      #13#13'I cannot find the map of the ETM Repository/TimeSlot class named "%s" specified in the "EtmTimeSlot_ClassName" property of the SynchroStrategy component called "%s".'
+      + #13#13'May be that you forgot to decorate the class with the "[etmRepository]" attribute on it.' +
       #13#13'Also make sure that you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit where the class is declared.' +
       #13#13'Check and try again please, it will work.', [FEtmTimeSlot_ClassName, Name]));
   // Check if the property is set to a EtmTimeSlotClass
   LMap := TioMapContainer.GetMap(FEtmTimeSlot_ClassName);
   if not LMap.GetTable.GetRttiType.MetaclassType.InheritsFrom(TioEtmCustomTimeSlot) then
-    raise EioException.Create(ClassName, '_CheckEtmTimeSlotClassName', Format('Hi, I''m iORM and I have something to tell you.' +
-      #13#13'The class "%s" specified in the "EtmTimeSlot_ClassName" property of the SynchroStrategy component named "%s" is not an ETM Repository/TimeSlot class.' +
-      #13#13'Make sure that the property is set to an ETM Repository/TimeSlot class name and try again.' +
-      #13#13'It will work.', [FEtmTimeSlot_ClassName, Name]));
+    raise EioException.Create(ClassName, '_CheckEtmTimeSlotClassName',
+      Format('Hi, I''m iORM and I have something to tell you.' +
+      #13#13'The class "%s" specified in the "EtmTimeSlot_ClassName" property of the SynchroStrategy component named "%s" is not an ETM Repository/TimeSlot class.'
+      + #13#13'Make sure that the property is set to an ETM Repository/TimeSlot class name and try again.' + #13#13'It will work.',
+      [FEtmTimeSlot_ClassName, Name]));
 end;
 
 function TioEtmSynchroStrategy_Client._DoPayload_Create: TioCustomSynchroStrategy_Payload;

@@ -522,7 +522,7 @@ type
 {$REGION '===== ETM ATTRIBUTES & TIMESLOT ====='}
 
   // TimeSlot Synchro State
-  TioEtmTimeSlotSynchroState = (tsRegular, tsToBeSynchronized, tsSynchronized_ReceivedFromClient, tsSynchronized_ReceivedFromServer, tsSynchronized_SentToServer);
+  TioEtmTimeSlotSynchroState = (tsRegular, tsToBeSynchronized, tsSynchronized_SentToServer, tsSynchronized_ReceivedFromServer, tsSynchronized_ReceivedFromClient);
 
   // Base class for ell ETM repositories
   TioEtmTimeSlotRef = class of TioEtmCustomTimeSlot;

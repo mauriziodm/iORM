@@ -5282,8 +5282,10 @@ object StartForm: TStartForm
     Top = 304
   end
   object SynchroStrategy: TioEtmSynchroStrategy_Client
-    TargetConnectionDef = ServerConn
     EtmTimeSlot_ClassName = 'TEtmRepository'
+    EtmTimeSlot_Delete_SentToServer = False
+    EtmTimeSlot_Update_SentToServer = True
+    TargetConnectionDef = ServerConn
     Left = 83
     Top = 304
   end

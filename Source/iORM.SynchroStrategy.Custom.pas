@@ -66,6 +66,7 @@ type
     FPersistToServer: TDateTime;
     FReloadFromServer: TDateTime;
     FPersistToClient: TDateTime;
+    FFinalize: TDateTime;
     FCompleted: TDateTime;
   public
     constructor Create; virtual;
@@ -84,6 +85,7 @@ type
     property PersistToServer: TDateTime read FPersistToServer write FPersistToServer;
     property ReloadFromServer: TDateTime read FReloadFromServer write FReloadFromServer;
     property PersistToClient: TDateTime read FPersistToClient write FPersistToClient;
+    property Finalize: TDateTime read FFinalize write FFinalize;
     property Completed: TDateTime read FCompleted write FCompleted;
   end;
 
@@ -118,6 +120,9 @@ type
     FUserName: String;
     [djSkip] // Non viene serializzato (in caso di connessione HTTP) in questo modo poi capisco se siamo remotizzati e quindi se devo fare lo "use" o no.
     FTargetConnectionDefName: String;
+    // TimeSlot finalization mode
+    FEtmTimeSlot_Update_SentToServer: Boolean;
+    FEtmTimeSlot_Delete_SentToServer: Boolean;
   strict protected
     // ---------- Methods to override on descendant classes ----------
     // Connection
@@ -131,6 +136,7 @@ type
     procedure _DoNewSynchroLogItem_SetStatus_PersistToServer; virtual;
     procedure _DoNewSynchroLogItem_SetStatus_ReloadFromServer; virtual;
     procedure _DoNewSynchroLogItem_SetStatus_PersistToClient; virtual;
+    procedure _DoNewSynchroLogItem_SetStatus_Finalize; virtual;
     procedure _DoNewSynchroLogItem_SetStatus_Completed; virtual;
     procedure _DoNewSynchroLogItem_Persist; virtual;
     // Payload
@@ -138,6 +144,7 @@ type
     procedure _DoPersistPayloadToServer; virtual; abstract;
     procedure _DoReloadPayloadFromServer; virtual; abstract;
     procedure _DoPersistPayloadToClient; virtual; abstract;
+    procedure _DoFinalizePayload; virtual; abstract;
     // ---------- Methods to override on descendant classes ----------
     property SynchroLogItem_New: TioCustomSynchroStrategy_LogItem read FSynchroLogItem_New write FSynchroLogItem_New;
     property SynchroLogItem_Old: TioCustomSynchroStrategy_LogItem read FSynchroLogItem_Old write FSynchroLogItem_Old;
@@ -158,6 +165,9 @@ type
     property TargetConnectionDefName: String read FTargetConnectionDefName write FTargetConnectionDefName;
     property UserID: Integer read FUserID write FUserID;
     property UserName: String read FUserName write FUserName;
+    // TimeSlot finalization mode
+    property EtmTimeSlot_Delete_SentToServer: Boolean read FEtmTimeSlot_Delete_SentToServer write FEtmTimeSlot_Delete_SentToServer;
+    property EtmTimeSlot_Update_SentToServer: Boolean read FEtmTimeSlot_Update_SentToServer write FEtmTimeSlot_Update_SentToServer;
   end;
 
   TioCustomSynchroStrategy_Client = class abstract(TComponent, IioSynchroStrategy_Client)
@@ -216,7 +226,6 @@ type
     destructor Destroy; override;
     procedure DoSynchronization(const ASynchroLevel: TioSynchroLevel);
     function GenerateLocalID(const AContext: IioContext): Integer;
-  published
   end;
 
   TioCustomSynchroStrategy_Thread = class(TThread)
@@ -375,6 +384,10 @@ begin
   else
     raise EioSynchroStrategyException.Create(ClassName, '_DoPayload_Initialize',
       Format('The "TargetConnectionDef" property of the "%s" component is not set correctly.', [Name]));
+  // TimeSlot finalization mode
+  APayload.EtmTimeSlot_Delete_SentToServer := FEtmTimeSlot_Delete_SentToServer;
+  APayload.EtmTimeSlot_Update_SentToServer := FEtmTimeSlot_Update_SentToServer;
+  // User
 //  LPayLoad.UserID :=
 //  LPayLoad.UserName :=
 end;
@@ -476,6 +489,9 @@ begin
   FTargetConnectionDefName := String.Empty;
   FUserID := IO_INTEGER_NULL_VALUE;
   FUserName := IO_STRING_NULL_VALUE;
+  // TimeSlot finalization mode
+  FEtmTimeSlot_Delete_SentToServer := False;
+  FEtmTimeSlot_Update_SentToServer := False;
 end;
 
 destructor TioCustomSynchroStrategy_Payload.Destroy;
@@ -491,6 +507,18 @@ end;
 
 procedure TioCustomSynchroStrategy_Payload.Finalize;
 begin
+  // ---------- Finalize ----------
+  // Set the new SynchroLogitem progress status and persist it server side
+  _DoNewSynchroLogItem_SetStatus_Finalize;
+  _SwitchToTargetConnection;
+  try
+    _DoNewSynchroLogItem_Persist;
+  finally
+    _ReturnToLocalConnection;
+  end;
+  // Finalize the payload
+  _DoFinalizePayload;
+  // ---------- Completed ----------
   // Set the new SynchroLogitem progress status and persist it server side,
   //  it will be persisted on the client only when the operation is completed successfully
   _DoNewSynchroLogItem_SetStatus_Completed;
@@ -611,6 +639,13 @@ begin
   // Set the new SynchroLogitem progress status
   FSynchroLogItem_New.SynchroStatus := TioSynchroStatus.ssCompleted;
   FSynchroLogItem_New.Completed := Now;
+end;
+
+procedure TioCustomSynchroStrategy_Payload._DoNewSynchroLogItem_SetStatus_Finalize;
+begin
+  // Set the new SynchroLogitem progress status
+  FSynchroLogItem_New.SynchroStatus := TioSynchroStatus.ssFinalization;
+  FSynchroLogItem_New.Finalize := Now;
 end;
 
 procedure TioCustomSynchroStrategy_Payload._DoNewSynchroLogItem_SetStatus_LoadFromClient;
