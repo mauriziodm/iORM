@@ -59,9 +59,11 @@ type
   protected
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------
     class procedure _DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
-      const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte); override;
+      const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
+      const ABlindLevel: Byte); override;
     class procedure _DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
-      const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte); override;
+      const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
+      const ABlindLevel: Byte); override;
     class procedure _DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); override;
     class procedure _DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); override;
     class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType); override;
@@ -377,18 +379,17 @@ begin
   end;
   // -----------------------------------------------------------
   // If a SynchroStrategy is assigned and active (local remote and not connected device) and the object ID
-  //  is not assigned then it asks the SynchroStrategy for a temporary local ID.
+  // is not assigned then it asks the SynchroStrategy for a temporary local ID.
   // Note: Obviously if a new ID is assigned by SynchroStrategy this will disable the normal ID generation (if generated ID is not NULL)
   AContext.SynchroStrategy_GenerateLocalID;
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the next ID for the inserting object
-  //  before the insert query (for Firebird/Interbase)
+  // before the insert query (for Firebird/Interbase)
   // Note: If KeyGenerationTime = kgtBeforeInsert and the ID is not assigned then I always request
-  //        a new ID even if the BlindLevel is set to disable the assignment to the object,
-  //        this is because the ID MUST be assigned (always if it is null)
-  //        otherwise the object would persist on the DB with ID zero.
-  if (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtBeforeInsert)
-  and AContext.IDIsNull then
+  // a new ID even if the BlindLevel is set to disable the assignment to the object,
+  // this is because the ID MUST be assigned (always if it is null)
+  // otherwise the object would persist on the DB with ID zero.
+  if (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtBeforeInsert) and AContext.IDIsNull then
   begin
     LQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
     try
@@ -414,13 +415,12 @@ begin
   end;
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the last ID generated
-  //  in the last insert query.
+  // in the last insert query.
   // Note: If KeyGenerationTime = kgtAfterInsert and the ID is not assigned then it requests a new ID
-  //        only if the BlindLevel enables reloading of the assigned ID or if the object contains at least
-  //        one property with a HasMany or HasOne relation.
-  if (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtAfterInsert)
-  and (AContext.BlindLevel_Do_AutoUpdateProps or AContext.GetProperties.ContainsHasManyOrHasOneProperties)
-  and AContext.IDIsNull then
+  // only if the BlindLevel enables reloading of the assigned ID or if the object contains at least
+  // one property with a HasMany or HasOne relation.
+  if (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtAfterInsert) and
+    (AContext.BlindLevel_Do_AutoUpdateProps or AContext.GetProperties.ContainsHasManyOrHasOneProperties) and AContext.IDIsNull then
   begin
     LQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
     try
@@ -540,7 +540,7 @@ begin
 end;
 
 class procedure TioPersistenceStrategyDB._DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
-      const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
+  const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
 var
   LDuckTypedList: IioDuckTypedList;
   LObj: TObject;
@@ -579,7 +579,7 @@ begin
 end;
 
 class procedure TioPersistenceStrategyDB._DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
-      const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
+  const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
 var
   LContext: IioContext;
 
@@ -628,7 +628,7 @@ var
   procedure _DetectPersistActionType;
   begin
     // If the ObjStatus is osDirty (or not exists) or IntentType is for revert or synchro operation then persist the object
-    if (LContext.ObjStatus = osDirty) or (LContext.IntentType > itRegular)  then
+    if (LContext.ObjStatus = osDirty) or (LContext.IntentType > itRegular) then
     begin
       // note: if SmartUpdateDetection system is not enabled or (if enabled) the object is to be persisted (according to the SmartUpdateDetection system)...
       if LContext.GetProperties.ObjStatusPropertyExist or (AMasterBSPersistence = nil) or (not AMasterBSPersistence.IsSmartUpdateDetectionEnabled) or
@@ -642,8 +642,7 @@ var
       end;
     end
     // Else if ObjStatus is osDelete then delete the obj
-    else
-    if LContext.ObjStatus = osDeleted then
+    else if LContext.ObjStatus = osDeleted then
       LContext.ActionType := atDoNotPersist;
   end;
 
@@ -735,6 +734,12 @@ begin
     if not LMasterProp.IsDBWriteEnabled then
       Continue;
     case LMasterProp.GetRelationType of
+      // TODO: Non sono sicuro che così vada bene perchè in questo modo elimina gli oggetti child presenti attualmente nella lista
+      // quindi se prima di aver chiamato il DELETE avessi eliminato qualche oggetto child della lista stessa da codice
+      // (quindi non dal binding che ha un meccanismo dedicato) questo oggetto che ho eliminato dalla lista ma che magari
+      // non ho candellato dal DB non verrebbe eliminato apppunto dal DM. Quindi mi rimane il dubbio (anche in altre parti)
+      // che non sia meglio fare un DELETE di quelli non con gli oggetti in modo da eliminare tutti i child direttamente
+      // sul DB senza passare dagli oggetti (però questo salterebbe ETM ad esempio).
       // If relation HasMany
       rtHasMany:
         _DoDeleteList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.IntentType, AMasterContext.BlindLevel);
@@ -759,29 +764,41 @@ begin
     case LMasterProp.GetRelationType of
       // If relation HasMany
       rtHasMany:
-        _DoPersistList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.IntentType,
-          LMasterProp.GetRelationChildPropertyName, AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger,
-          AMasterContext.MasterBSPersistence, LMasterProp.GetName, AMasterContext.MasterPropertyPath, AMasterContext.BlindLevel);
+        _DoPersistList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.IntentType, LMasterProp.GetRelationChildPropertyName,
+          AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, AMasterContext.MasterBSPersistence, LMasterProp.GetName,
+          AMasterContext.MasterPropertyPath, AMasterContext.BlindLevel);
       // If relation HasOne
       rtHasOne:
-        _DoPersistObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.IntentType,
-          LMasterProp.GetRelationChildPropertyName, AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger,
-          AMasterContext.MasterBSPersistence, LMasterProp.GetName, AMasterContext.MasterPropertyPath, AMasterContext.BlindLevel);
+        _DoPersistObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.IntentType, LMasterProp.GetRelationChildPropertyName,
+          AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, AMasterContext.MasterBSPersistence, LMasterProp.GetName,
+          AMasterContext.MasterPropertyPath, AMasterContext.BlindLevel);
     end;
   end;
 end;
 
 class procedure TioPersistenceStrategyDB.PreProcessRelationChildOnPersist(const AMasterContext: IioContext);
-// var
-//   LMasterProp: IioProperty;
+var
+  LMasterProp: IioProperty;
 begin
-  // inherited;
-  // // Loop for all properties
-  // for LMasterProp in AMasterContext.GetProperties do
-  // // If the property is write enabled and has a BelongsTo relation...
-  // if LMasterProp.IsDBWriteEnabled and (LMasterProp.GetRelationType = rtBelongsTo) then
-  // PersistObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), '', 0, False, AMasterContext.MasterBSPersistence, LMasterProp.GetName,
-  // AMasterContext.MasterPropertyPath);
+  inherited;
+  // Loop for all properties
+  for LMasterProp in AMasterContext.GetProperties do
+  begin
+    // If the property is not WriteEnabled then skip it
+    if not LMasterProp.IsDBWriteEnabled then
+      Continue;
+    case LMasterProp.GetRelationType of
+      // HasMany or HasOne: if the intent is Revert or Synchro then delete all HasMany details before persist
+      rtHasMany, rtHasOne:
+        if AMasterContext.IntentType > itRegular then
+          io.RefTo(LMasterProp.GetRelationChildTypeName, LMasterProp.GetRelationChildTypeAlias)._Where(LMasterProp.GetRelationChildPropertyName, coEquals,
+            AMasterContext.ObjID).Delete;
+      // BelongsTo
+      rtBelongsTo:
+        ;
+      // Do nothing  for the moment;
+    end;
+  end;
 end;
 
 class procedure TioPersistenceStrategyDB.RollbackTransaction(const AConnectionName: String);
@@ -1183,7 +1200,8 @@ begin
   inherited;
 end;
 
-function TioContextCache.GetContext(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ABlindLevel: Byte): IioContext;
+function TioContextCache.GetContext(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ABlindLevel: Byte)
+  : IioContext;
 begin
   // If the map is not already present in the cache then create and add it
   if not FContainer.ContainsKey(AClassName) then

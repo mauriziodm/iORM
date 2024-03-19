@@ -2136,7 +2136,6 @@ begin
     LList := Self.Load<T>(ATypeAlias).Add(AWhere).ToGenericList.OfType<TList<IInterface>>
   else
     LList := Self.Load<T>(ATypeAlias).Add(AWhere).ToGenericList.OfType<TObjectList<TObject>>;
-
   try
     Self.DeleteList(LList);
   finally
