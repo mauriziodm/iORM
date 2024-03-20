@@ -37,7 +37,8 @@ interface
 
 uses
   iORM.SynchroStrategy.Custom, iORM.Context.Interfaces, iORM.Attributes,
-  iORM.SynchroStrategy.Interfaces, iORM.Where.Interfaces, System.Classes;
+  iORM.SynchroStrategy.Interfaces, iORM.Where.Interfaces, System.Classes,
+  System.Generics.Collections;
 
 type
 
@@ -60,12 +61,26 @@ type
     property SrvToCli_TimeSlotID_To: Integer read FSrvToCli_TimeSlotID_To write FSrvToCli_TimeSlotID_To;
   end;
 
+  TioEtmSynchroStrategy_TempIdContainer = class
+  strict private
+    FInternalContainer: TDictionary<string, Integer>;
+    function _ComposeKey(const AClassName: String; const AOldID: Integer): String;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure Add(const AClassName: String; const AOldID, ANewID: Integer);
+    function Contains(const AClassName: String; const AOldID: Integer): Boolean;
+    function GetNewID(const AClassName: String; const AOldID: Integer): Integer;
+  end;
+
   TioEtmSynchroStrategy_Payload = class(TioCustomSynchroStrategy_Payload)
   strict private
     FEtmTimeSlotClassName: String;
     FPayloadData: TioEtmTimeline;
+    FTempIdContainer: TioEtmSynchroStrategy_TempIdContainer;
     procedure _BuildBlackAndWhiteListWhere(const AWhere: IioWhere);
     procedure _ClearPayloadData;
+    procedure _InternalPersistObjToServer(const AObj: TObject);
   strict protected
     // ---------- Methods to override on descendant classes ----------
     // SynchroLogItem
@@ -93,6 +108,7 @@ type
     procedure SetEtmTimeSlot_ClassName(const Value: String);
   strict protected
     // ---------- Synchro strategy methods to override on descendant classes ----------
+    function _DoGenerateLocalID(const AContext: IioContext): Integer; override;
     function _DoPayload_Create: TioCustomSynchroStrategy_Payload; override;
     procedure _DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload; const ASynchroLevel: TioSynchroLevel); override;
     // ---------- Synchro strategy methods to override on descendant classes ----------
@@ -115,7 +131,7 @@ type
 implementation
 
 uses
-  iORM.CommonTypes, iORM, System.SysUtils, System.Generics.Collections,
+  iORM.CommonTypes, iORM, System.SysUtils,
   iORM.DB.Interfaces, iORM.DB.Factory, iORM.Exceptions,
   iORM.Context.Map.Interfaces, iORM.Context.Container,
   iORM.DB.ConnectionContainer;
@@ -140,11 +156,13 @@ begin
   inherited;
   FEtmTimeSlotClassName := String.Empty;
   FPayloadData := TioEtmTimeline.Create;
+  FTempIdContainer := TioEtmSynchroStrategy_TempIdContainer.Create;
 end;
 
 destructor TioEtmSynchroStrategy_Payload.Destroy;
 begin
   FPayloadData.Free;
+  FTempIdContainer.Free;
   inherited;
 end;
 
@@ -167,6 +185,70 @@ begin
     for LEntityClassName in ClassBlackList do
       AWhere._And('EntityClassName', coNotEquals, LEntityClassName);
     AWhere._ClosePar;
+  end;
+end;
+
+procedure TioEtmSynchroStrategy_Payload._InternalPersistObjToServer(const AObj: TObject);
+var
+  LMap: IioMap;
+  LNewID, LOldID: Integer;
+  procedure _CheckForTemoraryBelongsToID;
+  var
+    LChildMap: IioMap;
+    LChildObj: TObject;
+    LChildObjID: Integer;
+    LProperty: IioProperty;
+  begin
+    // It loops through all the properties to search for the one with the BelongdsTo relationship,
+    // if it finds one it extracts the child object and if it has a temporary ID it replaces it
+    // with the one that should now be contained in the appropriate container for the temporary IDs.
+    for LProperty in LMap.GetProperties do
+    begin
+      if LProperty.GetRelationType <> rtBelongsTo then
+        Continue;
+      LChildObj := LProperty.GetRelationChildObject(AObj);
+      if LChildObj = nil then
+        Continue;
+      LChildMap := TioMapContainer.GetMap(LChildObj.ClassName);
+      LChildObjID := LChildMap.GetProperties.GetIdProperty.GetValue(LChildObj).AsInteger;
+      if LChildObjID < 0 then
+      begin
+        if FTempIdContainer.Contains(LChildObj.ClassName, LChildObjID) then
+          LChildMap.GetProperties.GetIdProperty.SetValue(LChildObj, FTempIdContainer.GetNewID(LChildObj.ClassName, LChildObjID))
+        else
+          raise EioEtmException.Create(ClassName, '_InternalPersistObjToServer', Format('The new definitive ID cannot be negative (child class "%s", ID=%d).',
+            [LChildObj.ClassName, LChildObjID]));
+      end;
+    end;
+  end;
+
+begin
+  // Obj cannot be nil
+  if AObj = nil then
+    Exit;
+  // Get map for the object
+  LMap := TioMapContainer.GetMap(AObj.ClassName);
+  // Check for temporary ID in properties with BelongsTo relation
+  _CheckForTemoraryBelongsToID;
+  // Extract the current ID
+  LOldID := LMap.GetProperties.GetIdProperty.GetValue(AObj).AsInteger;
+  // If the object ID is temporary (negative) then set it to NULL to ensure
+  // that a new definitive one is assigned during persistence on the server.
+  if LOldID < 0 then
+    LMap.GetProperties.GetIdProperty.SetValue(AObj, IO_INTEGER_NULL_VALUE);
+  // Persist the current object
+  io._PersistObject(AObj, itSynchro_PersistToClient, BL_SYNCHRO_PERSIST_PAYLOAD);
+  // At this point if the object's ID was temporary (negative) then during persistence
+  // it must have been assigned a new one so it re-reads it and add it
+  // in the appropriate temporary ID container.
+  // NB: Obviously the new permanent ID can no longer be negative
+  if LOldID < 0 then
+  begin
+    LNewID := LMap.GetProperties.GetIdProperty.GetValue(AObj).AsInteger;
+    if LNewID < 0 then
+      raise EioEtmException.Create(ClassName, '_InternalPersistObjToServer',
+        Format('The new definitive ID cannot be negative (class "%s", OldID=%d, NewID=%d).', [AObj.ClassName, LOldID, LNewID]));
+    FTempIdContainer.Add(AObj.ClassName, LOldID, LNewID);
   end;
 end;
 
@@ -194,10 +276,10 @@ begin
     io.SQL(Format('DELETE FROM [%s] WHERE [.TimeSlotSynchroState] = %d', [FEtmTimeSlotClassName, Ord(tsToBeSynchronized)]))
       .SelfClass(FEtmTimeSlotClassName).Execute
   else
-  // Change the TimeSlotSynchroState value of the synchronized TimeSlots from "tsToBeSynchronized" to "tsSynchronized_SentToServer" if enabled...
-  if EtmTimeSlot_Update_SentToServer then
-    io.SQL(Format('UPDATE [%s] SET [.TimeSlotSynchroState] = %d WHERE [.TimeSlotSynchroState] = %d', [FEtmTimeSlotClassName, Ord(tsSynchronized_SentToServer),
-      Ord(tsToBeSynchronized)])).SelfClass(FEtmTimeSlotClassName).Execute;
+    // Change the TimeSlotSynchroState value of the synchronized TimeSlots from "tsToBeSynchronized" to "tsSynchronized_SentToServer" if enabled...
+    if EtmTimeSlot_Update_SentToServer then
+      io.SQL(Format('UPDATE [%s] SET [.TimeSlotSynchroState] = %d WHERE [.TimeSlotSynchroState] = %d', [FEtmTimeSlotClassName, Ord(tsSynchronized_SentToServer),
+        Ord(tsToBeSynchronized)])).SelfClass(FEtmTimeSlotClassName).Execute;
 end;
 
 procedure TioEtmSynchroStrategy_Payload._DoLoadPayloadFromClient;
@@ -208,9 +290,12 @@ begin
   inherited;
   // Build where
   LWhere := io.Where('TimeSlotSynchroState', coEquals, tsToBeSynchronized);
-  // Where: last timeslot for any object only
-  LWhere._And(Format('[.ID] = (SELECT MAX(SUB.ID) FROM [%s] SUB WHERE SUB.EntityClassName = [.EntityClassName] AND SUB.EntityID = [.EntityID])',
+  // Where: last timeslot for any object only and/or insert timeslot for the same entity
+  LWhere._And._OpenPar;
+  LWhere.Add(Format('[.ID] = (SELECT MAX(SUB.ID) FROM [%s] SUB WHERE SUB.EntityClassName = [.EntityClassName] AND SUB.EntityID = [.EntityID])',
     [FEtmTimeSlotClassName]));
+  LWhere._Or('ActionType', coEquals, TioPersistenceActionType.atInsert);
+  LWhere._ClosePar;
   // OrderBy (DESC because it load timeslots with negative ID)
   LWhere._OrderBy('[.ID] ASC');
   // Load objects to be synchronized
@@ -330,7 +415,7 @@ begin
           Continue;
         case LEtmTimeSlot.ActionType of
           atInsert, atUpdate:
-            io._PersistObject(LObj, itSynchro_PersistToClient, BL_SYNCHRO_PERSIST_PAYLOAD);
+            _InternalPersistObjToServer(LObj);
           atDelete:
             io._DeleteObjectInternal(LObj, itSynchro_PersistToClient, BL_SYNCHRO_PERSIST_PAYLOAD);
         end;
@@ -392,6 +477,23 @@ begin
       [FEtmTimeSlot_ClassName, Name]));
 end;
 
+function TioEtmSynchroStrategy_Client._DoGenerateLocalID(const AContext: IioContext): Integer;
+var
+  LQuery: IioQuery;
+begin
+  inherited;
+  // Generate negative ID as local temporary ID (tonbe changed during synchronization process)
+  LQuery := TioDBFactory.QueryEngine.GetQueryMinID(AContext);
+  try
+    LQuery.Open;
+    Result := LQuery.Fields[0].AsInteger - 1;
+    if Result > -1 then
+      Result := -1;
+  finally
+    LQuery.Close;
+  end;
+end;
+
 function TioEtmSynchroStrategy_Client._DoPayload_Create: TioCustomSynchroStrategy_Payload;
 begin
   Result := TioEtmSynchroStrategy_Payload.Create;
@@ -407,6 +509,41 @@ begin
   // Initialize the new payload after its creation
   _CheckEtmTimeSlotClassName;
   LPayload.EtmTimeSlotClassName := FEtmTimeSlot_ClassName
+end;
+
+{ TioEtmSynchroStrategy_TempIdContainer }
+
+constructor TioEtmSynchroStrategy_TempIdContainer.Create;
+begin
+  FInternalContainer := TDictionary<string, Integer>.Create;
+end;
+
+destructor TioEtmSynchroStrategy_TempIdContainer.Destroy;
+begin
+  FInternalContainer.Free;
+  inherited;
+end;
+
+function TioEtmSynchroStrategy_TempIdContainer.Contains(const AClassName: String; const AOldID: Integer): Boolean;
+begin
+  Result := FInternalContainer.ContainsKey(_ComposeKey(AClassName, AOldID));
+end;
+
+procedure TioEtmSynchroStrategy_TempIdContainer.Add(const AClassName: String; const AOldID, ANewID: Integer);
+begin
+  if not FInternalContainer.TryAdd(_ComposeKey(AClassName, AOldID), ANewID) then
+    raise EioEtmException.Create(ClassName, 'Add', Format('Object of class "%s" with ID = %d is already extsts in the container.', [AClassName, AOldID]));
+end;
+
+function TioEtmSynchroStrategy_TempIdContainer.GetNewID(const AClassName: String; const AOldID: Integer): Integer;
+begin
+  if not FInternalContainer.TryGetValue(_ComposeKey(AClassName, AOldID), Result) then
+    raise EioEtmException.Create(ClassName, 'GetNewID', Format('Object of class "%s" with ID = %d not found in the container.', [AClassName, AOldID]));
+end;
+
+function TioEtmSynchroStrategy_TempIdContainer._ComposeKey(const AClassName: String; const AOldID: Integer): String;
+begin
+  Result := Format('%s:%d', [AClassName, AOldID]);
 end;
 
 end.

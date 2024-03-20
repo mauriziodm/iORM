@@ -206,7 +206,7 @@ type
     procedure SetEtmTimeSlot_Update_SentToServer(const Value: Boolean);
     function GetEtmTimeSlot_Update_SentToServer: Boolean;
     // ---------- Synchro strategy methods to override on descendant classes ----------
-    function _DoGenerateLocalID(const AContext: IioContext): Integer; virtual;
+    function _DoGenerateLocalID(const AContext: IioContext): Integer; virtual; abstract;
     function _DoPayload_Create: TioCustomSynchroStrategy_Payload; virtual; abstract;
     procedure _DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload; const ASynchroLevel: TioSynchroLevel); virtual;
     // ---------- Synchro strategy methods to override on descendant classes ----------
@@ -348,22 +348,6 @@ begin
 
     if FTargetConnectionDef <> nil then
       FTargetConnectionDef.FreeNotification(Self);
-  end;
-end;
-
-function TioCustomSynchroStrategy_Client._DoGenerateLocalID(const AContext: IioContext): Integer;
-var
-  LQuery: IioQuery;
-begin
-  // Generate negative ID as local temporary ID (tonbe changed during synchronization process)
-  LQuery := TioDBFactory.QueryEngine.GetQueryMinID(AContext);
-  try
-    LQuery.Open;
-    Result := LQuery.Fields[0].AsInteger - 1;
-    if Result > -1 then
-      Result := -1;
-  finally
-    LQuery.Close;
   end;
 end;
 
