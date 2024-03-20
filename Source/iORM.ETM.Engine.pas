@@ -133,16 +133,16 @@ begin
   if not Assigned(ATimeSlot) then
     raise EioEtmException.Create(ClassName, 'Revert', '"ATimeSlot" parameter cannot be nil.');
   // Delete operation has no state
-  if ATimeSlot.ActionType = atDelete then
-    raise EioEtmException.Create(ClassName, 'Revert', Format('Hi, I''m iORM, I have to tell you an important thing.' +
-      #13#13'Revert is not allowed for "Delete" type operations because they have no information about the state to restore.' +
-      #13#13'The attempt to restore the entity of type "%s" ID %d version %d has failed.', [ATimeSlot.EntityClassName, ATimeSlot.EntityID,
-      ATimeSlot.EntityVersion]));
+//  if ATimeSlot.ActionType = atDelete then
+//    raise EioEtmException.Create(ClassName, 'Revert', Format('Hi, I''m iORM, I have to tell you an important thing.' +
+//      #13#13'Revert is not allowed for "Delete" type operations because they have no information about the state to restore.' +
+//      #13#13'The attempt to restore the entity of type "%s" ID %d version %d has failed.', [ATimeSlot.EntityClassName, ATimeSlot.EntityID,
+//      ATimeSlot.EntityVersion]));
   // Type check
   if (not ATargetClassName.IsEmpty) and (ATimeSlot.EntityClassName <> ATargetClassName) then
     raise EioEtmException.Create(ClassName, 'Revert',
       Format('Houston we have a problem.' +
-      #13#13'The type of the entity you asked me to revert and the one contained in the provided TimeSlot do not match.' +
+      #13#13'The type of the entity you asked me to revert and the one contained in the provided TimeSlot does not match.' +
       #13#13'I can''t restore the state of type "%s" ID %d version %d to an object of type "%s".', [ATimeSlot.EntityClassName,
       ATimeSlot.EntityID, ATimeSlot.EntityVersion, ATargetClassName]));
 end;

@@ -293,8 +293,14 @@ begin
     begin
       LObj := io.ETM.RevertObject(LEtmTimeSlot, False);
       try
-        if LObj <> nil then
-          io._PersistObject(LObj, itSynchro_PersistToClient, BL_SYNCHRO_PERSIST_PAYLOAD);
+        if LObj = nil then
+          Continue;
+        case LEtmTimeSlot.ActionType of
+          atInsert, atUpdate:
+            io._PersistObject(LObj, itSynchro_PersistToClient, BL_SYNCHRO_PERSIST_PAYLOAD);
+          atDelete:
+            io._DeleteObjectInternal(LObj, itSynchro_PersistToClient, BL_SYNCHRO_PERSIST_PAYLOAD);
+        end;
       finally
         FreeAndNil(LObj);
       end;
@@ -320,8 +326,14 @@ begin
     begin
       LObj := io.ETM.RevertObject(LEtmTimeSlot, False);
       try
-        if LObj <> nil then
-          io._PersistObject(LObj, itSynchro_PersistToServer, BL_SYNCHRO_PERSIST_PAYLOAD);
+        if LObj = nil then
+          Continue;
+        case LEtmTimeSlot.ActionType of
+          atInsert, atUpdate:
+            io._PersistObject(LObj, itSynchro_PersistToClient, BL_SYNCHRO_PERSIST_PAYLOAD);
+          atDelete:
+            io._DeleteObjectInternal(LObj, itSynchro_PersistToClient, BL_SYNCHRO_PERSIST_PAYLOAD);
+        end;
       finally
         FreeAndNil(LObj);
       end;
