@@ -429,7 +429,7 @@ var
   LProp: IioProperty;
 begin
   LProp := AContext.GetProperties.ObjVersionProperty;
-  WhereParamByProp_SetValue(LProp, LProp.GetValue(AContext.DataObject).AsVariant);
+  WhereParamByProp_SetValue(LProp, Abs(LProp.GetValue(AContext.DataObject).AsVariant));
 end;
 
 procedure TioFDQuery.ParamByProp_SetValueByContext(const AProp: IioProperty; const AContext: IioContext);

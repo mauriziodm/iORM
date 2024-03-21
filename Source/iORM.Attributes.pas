@@ -1025,7 +1025,7 @@ begin
   // Entity related props
   FEntityClassName := LContext.DataObject.ClassName;
   FEntityID := LContext.ObjID;
-  FEntityVersion := LContext.ObjVersion;
+  FEntityVersion := Abs(LContext.ObjVersion);
   FEntityFromVersion := LContext.EntityFromVersion;
   FEntityUpdated := LContext.ObjUpdated;
   FEntityState := dj.From(LContext.DataObject, TioEtmFactory.djParamsEngine).ToJson;

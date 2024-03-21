@@ -334,7 +334,7 @@ begin
   if not AContext.ConflictDetected then
   begin
     LQuery := TioDBFactory.QueryEngine.GetQueryDelete(AContext, AContext.BlindLevel_Do_DetectConflicts);
-    AContext.ConflictDetected := LQuery.ExecSQL = 0;
+    AContext.ConflictDetected := (LQuery.ExecSQL = 0) and AContext.BlindLevel_Do_DetectConflicts;
   end;
   // Conflict strategy: if a conclict is detected then resolve it
   // note: if the ConflictStrategy resolves the conflict then it must try to run the query again
