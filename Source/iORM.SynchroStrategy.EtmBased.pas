@@ -89,6 +89,8 @@ type
   TioEtmSynchroStrategy_Payload = class(TioCustomSynchroStrategy_Payload)
   strict private
     FEtmTimeSlotClassName: String;
+    FEtmTimeSlot_Where_Client: IioWhere;
+    FEtmTimeSlot_Where_Server: IioWhere;
     FPayloadData: TioEtmTimeline;
     FTempIdContainer: TioEtmSynchroStrategy_TempIdContainer;
     procedure _BuildBlackAndWhiteListWhere(const AWhere: IioWhere);
@@ -111,15 +113,25 @@ type
     constructor Create; override;
     destructor Destroy; override;
     property EtmTimeSlotClassName: String read FEtmTimeSlotClassName write FEtmTimeSlotClassName;
+    property EtmTimeSlot_Where_Client: IioWhere read FEtmTimeSlot_Where_Client write FEtmTimeSlot_Where_Client;
+    property EtmTimeSlot_Where_Server: IioWhere read FEtmTimeSlot_Where_Server write FEtmTimeSlot_Where_Server;
   end;
 
   TioEtmSynchroStrategy_Client = class(TioCustomSynchroStrategy_Client)
   strict private
     FEtmTimeSlot_ClassName: String;
+    FEtmTimeSlot_Where_Client: IioWhere;
+    FEtmTimeSlot_Where_Server: IioWhere;
+    FEtmTimeSlot_WhereStr_Client: TStrings;
+    FEtmTimeSlot_WhereStr_Server: TStrings;
     procedure _CheckEtmTimeSlotClassName;
     // EtmTimeSlot_ClassName
     procedure SetEtmTimeSlot_ClassName(const Value: String);
-  strict protected
+    // EtmTimeSlot_WhereStr_Client
+    procedure SetEtmTimeSlot_WhereStr_Client(const Value: TStrings);
+    // EtmTimeSlot_WhereStr_Server
+    procedure SetEtmTimeSlot_WhereStr_Server(const Value: TStrings);
+    strict protected
     // ---------- Synchro strategy methods to override on descendant classes ----------
     function _DoGenerateLocalID(const AContext: IioContext): Integer; override;
     function _DoPayload_Create: TioCustomSynchroStrategy_Payload; override;
@@ -127,6 +139,9 @@ type
     // ---------- Synchro strategy methods to override on descendant classes ----------
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    property EtmTimeSlot_Where_Client: IioWhere read FEtmTimeSlot_Where_Client write FEtmTimeSlot_Where_Client;
+    property EtmTimeSlot_Where_Server: IioWhere read FEtmTimeSlot_Where_Server write FEtmTimeSlot_Where_Server;
   published
     property Async;
     property Entities_BlackList;
@@ -137,6 +152,8 @@ type
     property EtmTimeSlot_Persist_Regular default False;
     property EtmTimeSlot_Persist_ToBeSynchronized default True;
     property EtmTimeSlot_Update_SentToServer default False;
+    property EtmTimeSlot_WhereStr_Client: TStrings read FEtmTimeSlot_WhereStr_Client write SetEtmTimeSlot_WhereStr_Client;
+    property EtmTimeSlot_WhereStr_Server: TStrings read FEtmTimeSlot_WhereStr_Server write SetEtmTimeSlot_WhereStr_Server;
     property SynchroName;
     property TargetConnectionDef;
   end;
@@ -147,7 +164,7 @@ uses
   iORM.CommonTypes, iORM, System.SysUtils,
   iORM.DB.Interfaces, iORM.DB.Factory, iORM.Exceptions,
   iORM.Context.Map.Interfaces, iORM.Context.Container,
-  iORM.DB.ConnectionContainer;
+  iORM.DB.ConnectionContainer, iORM.Where.Factory;
 
 { TioEtmBasetSynchroStrategy_LogItem }
 
@@ -168,6 +185,8 @@ constructor TioEtmSynchroStrategy_Payload.Create;
 begin
   inherited;
   FEtmTimeSlotClassName := String.Empty;
+  FEtmTimeSlot_Where_Client := nil;
+  FEtmTimeSlot_Where_Server := nil;
   FPayloadData := TioEtmTimeline.Create;
   FTempIdContainer := TioEtmSynchroStrategy_TempIdContainer.Create;
 end;
@@ -309,6 +328,9 @@ begin
     [FEtmTimeSlotClassName]));
   LWhere._Or('ActionType', coEquals, TioPersistenceActionType.atInsert);
   LWhere._ClosePar;
+  // EtmTimeSlot_Where if exists
+  if Assigned(FEtmTimeSlot_Where_Client) then
+    LWhere._And(FEtmTimeSlot_Where_Client);
   // OrderBy (DESC because it load timeslots with negative ID)
   LWhere._OrderBy('[.ID] ASC');
   // Load objects to be synchronized
@@ -341,6 +363,9 @@ begin
   // Where: last timeslot for any object only
   LWhere._And(Format('[.ID] = (SELECT MAX(SUB.ID) FROM [%s] SUB WHERE SUB.EntityClassName = [.EntityClassName] AND SUB.EntityID = [.EntityID])',
     [FEtmTimeSlotClassName]));
+  // EtmTimeSlot_Where if exists
+  if Assigned(FEtmTimeSlot_Where_Server) then
+    LWhere._And(FEtmTimeSlot_Where_Server);
   // OrderBy (DESC because it load timeslots with negative ID)
   LWhere._OrderBy('[.ID] ASC');
   // Load objects to be synchronized
@@ -457,11 +482,33 @@ begin
   EtmTimeSlot_Persist_Regular := False;
   EtmTimeSlot_Persist_ToBeSynchronized := True;
   EtmTimeSlot_Update_SentToServer := False;
+  // Initialize where conditions properties
+  FEtmTimeSlot_Where_Client := nil;
+  FEtmTimeSlot_Where_Server := nil;
+  FEtmTimeSlot_WhereStr_Client := TStringList.Create;
+  FEtmTimeSlot_WhereStr_Server := TStringList.Create;
+end;
+
+destructor TioEtmSynchroStrategy_Client.Destroy;
+begin
+  FEtmTimeSlot_WhereStr_Client.Free;
+  FEtmTimeSlot_WhereStr_Server.Free;
+  inherited;
 end;
 
 procedure TioEtmSynchroStrategy_Client.SetEtmTimeSlot_ClassName(const Value: String);
 begin
   FEtmTimeSlot_ClassName := Value.Trim;
+end;
+
+procedure TioEtmSynchroStrategy_Client.SetEtmTimeSlot_WhereStr_Client(const Value: TStrings);
+begin
+  FEtmTimeSlot_WhereStr_Client.Text := Value.Text.Trim;
+end;
+
+procedure TioEtmSynchroStrategy_Client.SetEtmTimeSlot_WhereStr_Server(const Value: TStrings);
+begin
+  FEtmTimeSlot_WhereStr_Server.Text := Value.Text.Trim;
 end;
 
 procedure TioEtmSynchroStrategy_Client._CheckEtmTimeSlotClassName;
@@ -523,7 +570,23 @@ begin
   LPayload := APayload as TioEtmSynchroStrategy_Payload;
   // Initialize the new payload after its creation
   _CheckEtmTimeSlotClassName;
-  LPayload.EtmTimeSlotClassName := FEtmTimeSlot_ClassName
+  LPayload.EtmTimeSlotClassName := FEtmTimeSlot_ClassName;
+  // EtmTimeSlot_Where_Client
+  if not FEtmTimeSlot_WhereStr_Client.Text.IsEmpty then
+  begin
+    if not Assigned(FEtmTimeSlot_Where_Client) then
+      FEtmTimeSlot_Where_Client := TioWhereFactory.NewWhere;
+    FEtmTimeSlot_Where_Client.Add(FEtmTimeSlot_WhereStr_Client.Text);
+  end;
+  LPayload.EtmTimeSlot_Where_Client := FEtmTimeSlot_Where_Client;
+  // EtmTimeSlot_Where_Server
+  if not FEtmTimeSlot_WhereStr_Server.Text.IsEmpty then
+  begin
+    if not Assigned(FEtmTimeSlot_Where_Server) then
+      FEtmTimeSlot_Where_Server := TioWhereFactory.NewWhere;
+    FEtmTimeSlot_Where_Server.Add(FEtmTimeSlot_WhereStr_Server.Text);
+  end;
+  LPayload.EtmTimeSlot_Where_Server := FEtmTimeSlot_Where_Server;
 end;
 
 { TioEtmSynchroStrategy_TempIdContainer }
