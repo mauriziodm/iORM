@@ -125,6 +125,11 @@ type
     FEtmTimeSlot_WhereStr_Client: TStrings;
     FEtmTimeSlot_WhereStr_Server: TStrings;
     procedure _CheckEtmTimeSlotClassName;
+
+    // Events
+//    CanPersistObjectFromServer
+//    CanSendObjectToServer
+
     // EtmTimeSlot_ClassName
     procedure SetEtmTimeSlot_ClassName(const Value: String);
     // EtmTimeSlot_WhereStr_Client
@@ -157,6 +162,10 @@ type
     property SynchroName;
     property TargetConnectionDef;
   end;
+
+//  TioEtmSynchroStrategy_Server
+//    CanPersistObjectFromClient
+//    CanSendObjectToClient
 
 implementation
 

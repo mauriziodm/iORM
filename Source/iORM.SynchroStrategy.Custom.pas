@@ -180,6 +180,7 @@ type
     FEtmTimeSlot_Persist_Regular: Boolean;
     FEtmTimeSlot_Persist_ToBeSynchronized: Boolean;
     FEtmTimeSlot_Update_SentToServer: Boolean;
+    FInProgress: Boolean;
     FSynchroName: String;
     FTargetConnectionDef: IioSynchroStrategy_TargetConnectionDef; // IioSynchroStrategy_TargetConnectionDef instead of TioPersistenceStrategyRef to avoid circular reference
     procedure _SyncExecute(AExecuteMethod: TProc; ATerminateMethod: TProc);
@@ -219,6 +220,7 @@ type
     property EtmTimeSlot_Persist_Regular: Boolean read GetEtmTimeSlot_Persist_Regular write SetEtmTimeSlot_Persist_Regular default False;
     property EtmTimeSlot_Persist_ToBeSynchronized: Boolean read GetEtmTimeSlot_Persist_ToBeSynchronized write SetEtmTimeSlot_Persist_ToBeSynchronized default False;
     property EtmTimeSlot_Update_SentToServer: Boolean read GetEtmTimeSlot_Update_SentToServer write SetEtmTimeSlot_Update_SentToServer default False;
+    property InProgress: Boolean read FInProgress;
     property SynchroName: String read FSynchroName write FSynchroName;
     property TargetConnectionDef: IioSynchroStrategy_TargetConnectionDef read FTargetConnectionDef write SetTargetConnectionDef default nil;
   public
@@ -259,6 +261,7 @@ begin
   FEtmTimeSlot_Persist_Regular := False;
   FEtmTimeSlot_Persist_ToBeSynchronized := False;
   FEtmTimeSlot_Update_SentToServer := False;
+  FInProgress := False;
   FSynchroName := IO_STRING_NULL_VALUE;
   FTargetConnectionDef := nil;
 end;
@@ -451,9 +454,11 @@ begin
   LTerminateMethod := procedure
   begin
     LPayload.Free;
-    io.HideWait;
+    io.HideWait            ;
+    FInProgress := False;
   end;
   // Execute the synchronization
+  FInProgress := True;
   if FASync then
     _AsyncExecute(LExecuteMethod, LTerminateMethod)
   else
