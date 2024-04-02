@@ -188,7 +188,7 @@ type
     procedure SetTargetConnectionDef(const ATargetConnectionDef: IioSynchroStrategy_TargetConnectionDef);
     procedure SetEntities_BlackList(const Value: TStrings);
     procedure SetEntities_WhiteList(const Value: TStrings);
-    strict protected
+  strict protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     function IsToBeSynchronized(const AContext: IioContext): Boolean; virtual;
     // EtmTimeSlot_Delete_SentToServer
@@ -206,12 +206,15 @@ type
     // EtmTimeSlot_Update_Sent
     procedure SetEtmTimeSlot_Update_SentToServer(const Value: Boolean);
     function GetEtmTimeSlot_Update_SentToServer: Boolean;
+    // InProgress
+    function GetInProgress: Boolean;
+    // IsReady
+    function GetIsReady: Boolean; virtual;
     // ---------- Synchro strategy methods to override on descendant classes ----------
     function _DoGenerateLocalID(const AContext: IioContext): Integer; virtual; abstract;
     function _DoPayload_Create: TioCustomSynchroStrategy_Payload; virtual; abstract;
     procedure _DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload; const ASynchroLevel: TioSynchroLevel); virtual;
     // ---------- Synchro strategy methods to override on descendant classes ----------
-  strict protected
     property Async: Boolean read FAsync write FAsync default False;
     property Entities_BlackList: TStrings read FEntities_BlackList write SetEntities_BlackList;
     property Entities_WhiteList: TStrings read FEntities_WhiteList write SetEntities_WhiteList;
@@ -220,7 +223,8 @@ type
     property EtmTimeSlot_Persist_Regular: Boolean read GetEtmTimeSlot_Persist_Regular write SetEtmTimeSlot_Persist_Regular default False;
     property EtmTimeSlot_Persist_ToBeSynchronized: Boolean read GetEtmTimeSlot_Persist_ToBeSynchronized write SetEtmTimeSlot_Persist_ToBeSynchronized default False;
     property EtmTimeSlot_Update_SentToServer: Boolean read GetEtmTimeSlot_Update_SentToServer write SetEtmTimeSlot_Update_SentToServer default False;
-    property InProgress: Boolean read FInProgress;
+    property InProgress: Boolean read GetInProgress;
+    property IsReady: Boolean read GetIsReady;
     property SynchroName: String read FSynchroName write FSynchroName;
     property TargetConnectionDef: IioSynchroStrategy_TargetConnectionDef read FTargetConnectionDef write SetTargetConnectionDef default nil;
   public
@@ -301,6 +305,16 @@ end;
 function TioCustomSynchroStrategy_Client.GetEtmTimeSlot_Update_SentToServer: Boolean;
 begin
   Result := FEtmTimeSlot_Update_SentToServer;
+end;
+
+function TioCustomSynchroStrategy_Client.GetInProgress: Boolean;
+begin
+  Result := FInProgress;
+end;
+
+function TioCustomSynchroStrategy_Client.GetIsReady: Boolean;
+begin
+  Result := Assigned(FTargetConnectionDef) and not FInProgress
 end;
 
 procedure TioCustomSynchroStrategy_Client.SetEntities_BlackList(const Value: TStrings);

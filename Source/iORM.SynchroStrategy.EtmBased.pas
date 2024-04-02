@@ -131,17 +131,21 @@ type
     procedure SetEtmTimeSlot_WhereStr_Client(const Value: TStrings);
     // EtmTimeSlot_WhereStr_Server
     procedure SetEtmTimeSlot_WhereStr_Server(const Value: TStrings);
-    strict protected
+  strict protected
     // ---------- Synchro strategy methods to override on descendant classes ----------
     function _DoGenerateLocalID(const AContext: IioContext): Integer; override;
     function _DoPayload_Create: TioCustomSynchroStrategy_Payload; override;
     procedure _DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload; const ASynchroLevel: TioSynchroLevel); override;
     // ---------- Synchro strategy methods to override on descendant classes ----------
+    // IsReady
+    function GetIsReady: Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     property EtmTimeSlot_Where_Client: IioWhere read FEtmTimeSlot_Where_Client write FEtmTimeSlot_Where_Client;
     property EtmTimeSlot_Where_Server: IioWhere read FEtmTimeSlot_Where_Server write FEtmTimeSlot_Where_Server;
+    property InProgress;
+    property IsReady;
   published
     property Async;
     property Entities_BlackList;
@@ -494,6 +498,11 @@ begin
   FEtmTimeSlot_WhereStr_Client.Free;
   FEtmTimeSlot_WhereStr_Server.Free;
   inherited;
+end;
+
+function TioEtmSynchroStrategy_Client.GetIsReady: Boolean;
+begin
+  Result := inherited and not FEtmTimeSlot_ClassName.Trim.IsEmpty;
 end;
 
 procedure TioEtmSynchroStrategy_Client.SetEtmTimeSlot_ClassName(const Value: String);

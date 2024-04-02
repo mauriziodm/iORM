@@ -72,6 +72,9 @@ type
     procedure SetEtmTimeSlot_Update_SentToServer(const Value: Boolean);
     function GetEtmTimeSlot_Update_SentToServer: Boolean;
     property EtmTimeSlot_Update_SentToServer: Boolean read GetEtmTimeSlot_Update_SentToServer write SetEtmTimeSlot_Update_SentToServer;
+    // InProgress
+    function GetInProgress: Boolean;
+    property InProgress: Boolean read GetInProgress;
   end;
 
   IioSynchroStrategy_TargetConnectionDef = interface
