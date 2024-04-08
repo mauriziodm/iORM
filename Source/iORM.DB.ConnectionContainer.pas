@@ -84,7 +84,7 @@ type
   // sarebbe meglio creare una sorta di oggetto sessione o LogOn, magari in futuro lo sposterò ma per ora, per fare la parte ETM
   // e per il salvataggio eventuale di quale utente ha operato sulle entities va bene così.
 
-  TioCurrentConnectionInfo = class(TINterfacedObject, IioCurrentConnectionInfo)
+  TioCurrentConnectionInfo = class(TInterfacedObject, IioCurrentConnectionInfo)
   strict private
     FCurrentConnectionName: String;
     FCurrentUserName: String;

@@ -83,11 +83,22 @@ uses
 
 { TioStrategyHttp }
 
-class procedure TioPersistenceStrategyHttp.CommitTransaction(const AConnectionName: String);
-begin
-  inherited;
-  TioDBFactory.Connection(AConnectionName).Commit;
-end;
+// class function TioStrategyREST.GetTransactionGUID: String;
+// begin
+// // Set the fixed part of the TransactionGUID if empty
+// if FTransactionGUID.IsEmpty then
+// FTransactionGUID := Self.NewGUIDAsString;
+// // Generate a TransactionGUID (Fixed GUID + Current thread ID
+// Result := System.Classes.TThread.CurrentThread.ThreadID.ToString + '-' + FTransactionGUID;
+// end;
+
+// class function TioStrategyREST.NewGUIDAsString: String;
+// var
+// LGUID: TGUID;
+// begin
+// CreateGUID(LGUID);
+// Result := GUIDToString(LGUID);
+// end;
 
 class function TioPersistenceStrategyHttp.Count(const AWhere: IioWhere): Integer;
 var
@@ -97,17 +108,16 @@ begin
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection('').AsHttpConnection;
   // Start transaction
-  // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  // NB: In this strategy (HTTP) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
   // perform any http call to the server at this point.
   LConnection.StartTransaction;
   try
-    LConnection.RequestBody.Clear;
-    LConnection.RequestBody.Where := AWhere;
+    LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.Where := AWhere;
     LConnection.Execute('Count');
     // Deserialize the JSONDataValue to the result object
-    // M.M. 12/06/21
-    Result := LConnection.ResponseBody.JSONDataValue.AsType<Integer>;
+    Result := LConnection.ioResponseBody.JSONDataValue.AsType<Integer>;
     // Commit
     LConnection.Commit;
   except
@@ -125,13 +135,13 @@ begin
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection('').AsHttpConnection;
   // Start transaction
-  // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
+  // Note: In this strategy (HTTP) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
   // perform any http call to the server at this point.
   LConnection.StartTransaction;
   try
-    LConnection.RequestBody.Clear;
-    LConnection.RequestBody.Where := AWhere;
+    LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.Where := AWhere;
     LConnection.Execute('Delete');
     // Commit
     LConnection.Commit;
@@ -158,8 +168,8 @@ begin
   // perform any http call to the server at this point.
   LConnection.StartTransaction;
   try
-    LConnection.RequestBody.Clear;
-    LConnection.RequestBody.DataObject := AList;
+    LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.JSONDataValueAsObject := AList;
     LConnection.Execute('PersistCollection');
     // Commit
     LConnection.Commit;
@@ -188,8 +198,8 @@ begin
   // perform any http call to the server at this point.
   LConnection.StartTransaction;
   try
-    LConnection.RequestBody.Clear;
-    LConnection.RequestBody.DataObject := AObj;
+    LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.JSONDataValueAsObject := AObj;
     LConnection.Execute('DeleteObject');
     // Commit
     LConnection.Commit;
@@ -199,21 +209,6 @@ begin
     raise;
   end;
 end;
-
-class function TioPersistenceStrategyHttp.InTransaction(const AConnectionName: String): boolean;
-begin
-  inherited;
-  Result := TioDBFactory.Connection(AConnectionName).InTransaction;
-end;
-
-// class function TioStrategyREST.GetTransactionGUID: String;
-// begin
-// // Set the fixed part of the TransactionGUID if empty
-// if FTransactionGUID.IsEmpty then
-// FTransactionGUID := Self.NewGUIDAsString;
-// // Generate a TransactionGUID (Fixed GUID + Current thread ID
-// Result := System.Classes.TThread.CurrentThread.ThreadID.ToString + '-' + FTransactionGUID;
-// end;
 
 class procedure TioPersistenceStrategyHttp.LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
 var
@@ -228,11 +223,11 @@ begin
   // perform any http call to the server at this point.
   LConnection.StartTransaction;
   try
-    LConnection.RequestBody.Clear;
-    LConnection.RequestBody.Where := AWhere;
+    LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.Where := AWhere;
     LConnection.Execute('LoadDataSet');
     // Load the dataset
-    ADestDataSet.LoadFromStream(LConnection.ResponseBody.Stream, TFDStorageFormat.sfJSON);
+    ADestDataSet.LoadFromStream(LConnection.ioResponseBody.Stream, TFDStorageFormat.sfJSON);
     // Commit
     LConnection.Commit;
   except
@@ -255,16 +250,16 @@ begin
   // perform any http call to the server at this point.
   LConnection.StartTransaction;
   try
-    LConnection.RequestBody.Clear;
-    LConnection.RequestBody.Where := AWhere;
-    LConnection.Execute('LoadList');
+    LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.Where := AWhere;
+    LConnection.Execute(HTTP_METHOD_NAME_LOADLIST);
     // Deserialize  the JSONDataValue to the result object
     // NB: Mauri 15/08/2023 (fix issue winth paging when using http connection):
     //      Ho eliminato il "ClearCollection" dalla chiamata a DJSON perchè altrimenti non funzionava bene
     //      il paging ti tipo progressive. In questo modo invece sembra funzionare bene. Spero che la cosa non causi problemi
     //      in altri contesti. Lascio anche a vecchia versione commentata, poi vedremo.
 //    dj.FromJSON(LConnection.ResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(AList); // OLD CODE
-    dj.FromJSON(LConnection.ResponseBody.JSONDataValue).OpType(ssHTTP).byFields.TypeAnnotationsON.&To(AList);
+    dj.FromJSON(LConnection.ioResponseBody.JSONDataValue).OpType(ssHTTP).byFields.TypeAnnotationsON.&To(AList);
     // Commit
     LConnection.Commit;
   except
@@ -288,14 +283,14 @@ begin
   // perform any http call to the server at this point.
   LConnection.StartTransaction;
   try
-    LConnection.RequestBody.Clear;
-    LConnection.RequestBody.Where := AWhere;
+    LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.Where := AWhere;
     LConnection.Execute('LoadObject');
     // Deserialize  the JSONDataValue to the result object
     if Assigned(AObj) then
-      dj.FromJSON(LConnection.ResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(Result)
+      dj.FromJSON(LConnection.ioResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(Result)
     else
-      Result := dj.FromJSON(LConnection.ResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.ToObject;
+      Result := dj.FromJSON(LConnection.ioResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.ToObject;
     // Commit
     LConnection.Commit;
   except
@@ -311,14 +306,6 @@ begin
   // and then you do not need to implement it in RESTStrategy.
   raise EioException.Create(Self.ClassName + ': "LoadObjectByClassOnly", method not implemented in this strategy.');
 end;
-
-// class function TioStrategyREST.NewGUIDAsString: String;
-// var
-// LGUID: TGUID;
-// begin
-// CreateGUID(LGUID);
-// Result := GUIDToString(LGUID);
-// end;
 
 { TODO : DA AGGIUNGERE GESTIONE DEI 3 PARAMETRI AGGIUNTI ALLA FINE PER IL SUD }
 class procedure TioPersistenceStrategyHttp._DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
@@ -338,15 +325,15 @@ begin
   // perform any http call to the server at this point.
   LConnection.StartTransaction;
   try
-    LConnection.RequestBody.Clear;
-    LConnection.RequestBody.RelationPropertyName := ARelationPropertyName;
-    LConnection.RequestBody.RelationOID := ARelationOID;
-//    LConnection.RequestBody.BlindInsert := ABlindInsert;
-    LConnection.RequestBody.DataObject := AList;
+    LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.RelationPropertyName := ARelationPropertyName;
+    LConnection.ioRequestBody.RelationOID := ARelationOID;
+    LConnection.ioRequestBody.BlindLevel := ABlindLevel;
+    LConnection.ioRequestBody.JSONDataValueAsObject := AList;
     LConnection.Execute('PersistCollection');
     // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
-//    if not ABlindInsert then
-      dj.FromJSON(LConnection.ResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(AList);
+    if TioUtilities.BlindLevel_Do_AutoUpdateProps(ABlindLevel) then
+      dj.FromJSON(LConnection.ioResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(AList);
     // Commit
     LConnection.Commit;
   except
@@ -376,15 +363,15 @@ begin
   // perform any http call to the server at this point.
   LConnection.StartTransaction;
   try
-    LConnection.RequestBody.Clear;
-    LConnection.RequestBody.RelationPropertyName := ARelationPropertyName;
-    LConnection.RequestBody.RelationOID := ARelationOID;
-//    LConnection.RequestBody.BlindInsert := ABlindInsert;
-    LConnection.RequestBody.DataObject := AObj;
+    LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.RelationPropertyName := ARelationPropertyName;
+    LConnection.ioRequestBody.RelationOID := ARelationOID;
+    LConnection.ioRequestBody.BlindLevel := ABlindLevel;
+    LConnection.ioRequestBody.JSONDataValueAsObject := AObj;
     LConnection.Execute('PersistObject');
     // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
-//    if not ABlindInsert then
-      dj.FromJSON(LConnection.ResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(AObj);
+    if TioUtilities.BlindLevel_Do_AutoUpdateProps(ABlindLevel) then
+      dj.FromJSON(LConnection.ioResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(AObj);
     // Commit
     LConnection.Commit;
   except
@@ -394,16 +381,9 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyHttp.RollbackTransaction(const AConnectionName: String);
-begin
-  inherited;
-  TioDBFactory.Connection(AConnectionName).Rollback;
-end;
-
 class procedure TioPersistenceStrategyHttp.SQLDest_Execute(const ASQLDestination: IioSQLDestination);
 var
   LConnection: IioConnectionHttp;
-  LJSONValue: TJSONValue;
 begin
   inherited;
   // Get the connection, set the request and execute it
@@ -414,15 +394,9 @@ begin
   // perform any http call to the server at this point.
   LConnection.StartTransaction;
   try
-    LConnection.RequestBody.Clear;
-    LConnection.RequestBody.SQLDestination := ASQLDestination;
+    LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.SQLDestination := ASQLDestination;
     LConnection.Execute('SQLDestExecute');
-    // Get the number of records affected by the SQL command
-    LJSONValue := LConnection.ResponseBody.JSONDataValue;
-    if Assigned(LJSONValue) and (LJSONValue is TJSONNumber) then
-      // Result := TJSONNumber(LJSONValue).AsInt
-    else
-      raise EioException.Create(Self.ClassName + ': wrong JSONValue (SQLDest_Execute).');
     // Commit
     LConnection.Commit;
   except
@@ -445,11 +419,11 @@ begin
   // perform any http call to the server at this point.
   LConnection.StartTransaction;
   try
-    LConnection.RequestBody.Clear;
-    LConnection.RequestBody.SQLDestination := ASQLDestination;
+    LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.SQLDestination := ASQLDestination;
     LConnection.Execute('SQLDestLoadDataSet');
     // Load the dataset
-    ADestDataSet.LoadFromStream(LConnection.ResponseBody.Stream, TFDStorageFormat.sfJSON);
+    ADestDataSet.LoadFromStream(LConnection.ioResponseBody.Stream, TFDStorageFormat.sfJSON);
     // Commit
     LConnection.Commit;
   except
@@ -463,6 +437,24 @@ class procedure TioPersistenceStrategyHttp.StartTransaction(const AConnectionNam
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).StartTransaction;
+end;
+
+class procedure TioPersistenceStrategyHttp.CommitTransaction(const AConnectionName: String);
+begin
+  inherited;
+  TioDBFactory.Connection(AConnectionName).Commit;
+end;
+
+class procedure TioPersistenceStrategyHttp.RollbackTransaction(const AConnectionName: String);
+begin
+  inherited;
+  TioDBFactory.Connection(AConnectionName).Rollback;
+end;
+
+class function TioPersistenceStrategyHttp.InTransaction(const AConnectionName: String): boolean;
+begin
+  inherited;
+  Result := TioDBFactory.Connection(AConnectionName).InTransaction;
 end;
 
 end.

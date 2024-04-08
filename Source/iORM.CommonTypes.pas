@@ -183,6 +183,7 @@ type
 
   TioNullableString = TioNullable<String>;
   TioNullableInteger = TioNullable<Integer>;
+  TioNullableByte = TioNullable<Byte>;
   TioNullableFloat = TioNullable<Extended>;
   TioNullableBoolean = TioNullable<Boolean>;
   TioNullableDateTime = TioNullable<TDateTime>;

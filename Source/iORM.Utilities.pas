@@ -102,6 +102,10 @@ type
     class procedure ResolveChildPropertySplitPath_SetValue(const ARootObj: Tobject; const AChildObjPath: TStrings; const AFinalPropName: String; const AValue: TValue); static;
     class function ResolveChildPropertyPath_GetValue(const ARootObj: Tobject; AQualifiedPropertyPath: String): TValue; static;
     class procedure ResolveChildPropertyPath_SetValue(const ARootObj: Tobject; AQualifiedPropertyPath: String; const AValue: TValue); static;
+    // BlindLevel helper methods
+    class function BlindLevel_Do_DetectObjExists(const ABlindLevel: Byte): boolean; static;
+    class function BlindLevel_Do_AutoUpdateProps(const ABlindLevel: Byte): boolean; static;
+    class function BlindLevel_Do_DetectConflicts(const ABlindLevel: Byte): boolean; static;
   end;
 
 implementation
@@ -112,6 +116,21 @@ uses
   iORM.Resolver.Interfaces, iORM.DependencyInjection, iORM.MVVM.ViewModel;
 
 { TioRttiUtilities }
+
+class function TioUtilities.BlindLevel_Do_AutoUpdateProps(const ABlindLevel: Byte): boolean;
+begin
+  Result := (ABlindLevel AND BL_BIT_AUTO_UPDATE_PROPS) <> 0;
+end;
+
+class function TioUtilities.BlindLevel_Do_DetectConflicts(const ABlindLevel: Byte): boolean;
+begin
+  Result := (ABlindLevel AND BL_BIT_DETECT_CONFLICTS) <> 0;
+end;
+
+class function TioUtilities.BlindLevel_Do_DetectObjExists(const ABlindLevel: Byte): boolean;
+begin
+  Result := (ABlindLevel AND BL_BIT_DETECT_OBJ_EXISTS) <> 0;
+end;
 
 class function TioUtilities.CastObjectToGeneric<T>(const AObj: Tobject; IID: TGUID): T;
 begin

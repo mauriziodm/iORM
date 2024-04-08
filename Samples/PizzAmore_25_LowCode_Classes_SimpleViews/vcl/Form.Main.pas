@@ -25,6 +25,7 @@ type
     acShowCustomers: TioBSShowOrSelect;
     acShowPizzas: TioBSShowOrSelect;
     acShowOrders: TioBSShowOrSelect;
+    HttpConn: TioHttpConnectionDef;
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings);
   private

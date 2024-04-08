@@ -53,14 +53,17 @@ const
   OBJVERSION_NULL = 0;
   TRANSACTION_TIMESTAMP_NULL = 0;
 
-  KEY_WHERE = 'Where';
-  KEY_SQLDESTINATION = 'SQLDestination';
-  KEY_DATAOBJECT = 'DataObj';
+  KEY_BLINDLEVEL = 'BlindLevel';
+  KEY_INTENTTYPE = 'IntentType';
   KEY_JSONDATAVALUE = 'JSONDataValue';
-  KEY_RELATIONPROPERTYNAME = 'RelPropName';
-  KEY_RELATIONOID = 'RelOID';
-  KEY_BLINDINSERT = 'Blind';
+  KEY_RELATIONOID = 'RelationOID';
+  KEY_RELATIONPROPERTYNAME = 'RelationPropertyName';
+  KEY_SQLDESTINATION = 'SQLDestination';
   KEY_STREAM = 'Stream';
+  KEY_USERID = 'UserID';
+  KEY_USERNAME = 'UserName';
+  KEY_USERTOKEN  = 'UserToken';
+  KEY_WHERE = 'Where';
 
 type
 
@@ -166,11 +169,11 @@ type
     ['{E29F952A-E7E5-44C7-A3BE-09C4F2939060}']
     procedure Execute(const AResource: String);
     // ioRequestBody property
-    function GetRequestBody: IioHttpRequestBody;
-    property RequestBody: IioHttpRequestBody read GetRequestBody;
+    function GetioRequestBody: IioHttpRequestBody;
+    property ioRequestBody: IioHttpRequestBody read GetioRequestBody;
     // ioResponseBody property
-    function GetResponseBody: IioHttpResponseBody;
-    property ResponseBody: IioHttpResponseBody read GetResponseBody;
+    function GetioResponseBody: IioHttpResponseBody;
+    property ioResponseBody: IioHttpResponseBody read GetioResponseBody;
   end;
 
   // Interfaccia che contiene info sulla connessione e sull'utente correnti
@@ -342,44 +345,68 @@ type
   IioHttpRequestBody = interface
     ['{83DE9ECE-47EA-4814-B40E-3E39FAA210A2}']
     procedure Clear;
-    function ToJSONObject: TJSONObject;
-    // Where
-    procedure SetWhere(const Value: IioWhere);
-    function GetWhere: IioWhere;
-    property Where: IioWhere read GetWhere write SetWhere;
-    // SQLDestination
-    procedure SetSQLDestination(const Value: IioSQLDestination);
-    function GetSQLDestination: IioSQLDestination;
-    property SQLDestination: IioSQLDestination read GetSQLDestination write SetSQLDestination;
-    // DataObject
-    procedure SetDataObject(const Value: TObject);
-    function GetDataObject: TObject;
-    property DataObject: TObject read GetDataObject write SetDataObject;
-    // RelationPropertyName
-    procedure SetRelationPropertyName(const Value: String);
-    function GetRelationPropertyName: String;
-    property RelationPropertyName: String read GetRelationPropertyName write SetRelationPropertyName;
-    // RelationOID
-    procedure SetRelationOID(const Value: Integer);
-    function GetRelationOID: Integer;
-    property RelationOID: Integer read GetRelationOID write SetRelationOID;
-    // BlindInsert
-    procedure SetBlindInsert(const Value: Boolean);
-    function GetBlindInsert: Boolean;
-    property BlindInsert: Boolean read GetBlindInsert write SetBlindInsert;
-  end;
-
-  IioHttpResponseBody = interface
-    ['{E5A14525-308F-4877-99B7-C270D691FC6D}']
-    function ToJSONObject: TJSONObject;
+    function ToJsonText: String;
+    // BlindLevel
+    procedure SetBlindLevel(const Value: Byte);
+    function GetBlindLevel: Byte;
+    property BlindLevel: Byte read GetBlindLevel write SetBlindLevel;
+    // IntentType
+    procedure SetIntentType(const Value: TioPersistenceIntentType);
+    function GetIntentType: TioPersistenceIntentType;
+    property IntentType: TioPersistenceIntentType read GetIntentType write SetIntentType;
     // JSONDataValue
     procedure SetJSONDataValue(const Value: TJSONValue);
     function GetJSONDataValue: TJSONValue;
     property JSONDataValue: TJSONValue read GetJSONDataValue write SetJSONDataValue;
-    // DataObject
-    procedure SetDataObject(const Value: TObject);
-    function GetDataObject: TObject;
-    property DataObject: TObject read GetDataObject write SetDataObject;
+    // JSONDataValueAsObject
+    procedure SetJSONDataValueAsObject(const AObj: TObject);
+    function GetJSONDataValueAsObject: TObject;
+    property JSONDataValueAsObject: TObject read GetJSONDataValueAsObject write SetJSONDataValueAsObject;
+    // MethodName
+    procedure SetMethodName(const Value: String);
+    function GetMethodName: String;
+    property MethodName: String read GetMethodName write SetMethodName;
+    // RelationOID
+    procedure SetRelationOID(const Value: Integer);
+    function GetRelationOID: Integer;
+    property RelationOID: Integer read GetRelationOID write SetRelationOID;
+    // RelationPropertyName
+    procedure SetRelationPropertyName(const Value: String);
+    function GetRelationPropertyName: String;
+    property RelationPropertyName: String read GetRelationPropertyName write SetRelationPropertyName;
+    // SQLDestination
+    procedure SetSQLDestination(const Value: IioSQLDestination);
+    function GetSQLDestination: IioSQLDestination;
+    property SQLDestination: IioSQLDestination read GetSQLDestination write SetSQLDestination;
+    // UserID
+    procedure SetUserID(const Value: Integer);
+    function GetUserID: Integer;
+    property UserID: Integer read GetUserID write SetUserID;
+    // UserName
+    procedure SetUserName(const Value: String);
+    function GetUserName: String;
+    property UserName: String read GetUserName write SetUserName;
+    // UserToken
+    procedure SetUserToken(const Value: String);
+    function GetUserToken: String;
+    property UserToken: String read GetUserToken write SetUserToken;
+    // Where
+    procedure SetWhere(const Value: IioWhere);
+    function GetWhere: IioWhere;
+    property Where: IioWhere read GetWhere write SetWhere;
+  end;
+
+  IioHttpResponseBody = interface
+    ['{E5A14525-308F-4877-99B7-C270D691FC6D}']
+    function ToJSONText: String;
+    // JSONDataValue
+    procedure SetJSONDataValue(const Value: TJSONValue);
+    function GetJSONDataValue: TJSONValue;
+    property JSONDataValue: TJSONValue read GetJSONDataValue write SetJSONDataValue;
+    // JSONDataValueAsObject
+    procedure SetJSONDataValueAsObject(const AObj: TObject);
+    function GetJSONDataValueAsObject: TObject;
+    property JSONDataValueAsObject: TObject read GetJSONDataValueAsObject write SetJSONDataValueAsObject;
     // Stream
     function GetStream: TStream;
     property Stream: TStream read GetStream;

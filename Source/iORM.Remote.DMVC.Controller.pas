@@ -39,11 +39,19 @@ unit iORM.Remote.DMVC.Controller;
 
 interface
 
-uses 
+uses
   MVCFramework,
-  MVCFramework.Commons;
+  MVCFramework.Commons,
+  MVCFramework.JSONRPC,
+  iORM.DB.Interfaces;
 
 type
+
+  TioDmvcJsonRpcController = class(TMVCJSONRPCController)
+  public
+    function LoadList(const AioRequestBodyAsString: String): String;
+    function LoadObject(const AioRequestBodyAsString: String): String;
+  end;
 
   [MVCPath('/')]
   TioDMVCController = class(TMVCController)
@@ -131,9 +139,9 @@ implementation
 
 { TioDMVCController }
 
-uses iORM, iORM.Http.Factory, System.Generics.Collections, iORM.DB.Interfaces,
+uses iORM, iORM.Http.Factory, System.Generics.Collections,
   FireDAC.Comp.Client, FireDAC.Stan.Intf, FireDAC.Stan.StorageJSON, System.JSON,
-  DJSON;
+  DJSON, iORM.Utilities;
 
 // M.M. 12/06/21
 procedure TioDMVCController.Count;
@@ -149,7 +157,7 @@ begin
   // Create the IioRESTResponseBody and return it to the client
   LResponseBody := TioHttpFactory.NewResponseBody;
   LResponseBody.JSONDataValue := TJSONNumber.Create(LCount);
-  Render(LResponseBody.ToJSONObject, False);
+  Render(LResponseBody.ToJSONText);
 end;
 
 procedure TioDMVCController.Delete;
@@ -163,7 +171,7 @@ begin
   io.RefTo(LRequestBody.Where).Delete;
   // Create the IioRESTResponseBody and return it to the client
   LResponseBody := TioHttpFactory.NewResponseBody;
-  Render(LResponseBody.ToJSONObject, False);
+  Render(LResponseBody.ToJSONText);
 end;
 
 procedure TioDMVCController.DeleteObject;
@@ -177,7 +185,7 @@ begin
   io.DeleteObject(LRequestBody.DataObject);  // ConnectionName
   // Create the IioRESTResponseBody and return it to the client
   LResponseBody := TioHttpFactory.NewResponseBody;
-  Render(LResponseBody.ToJSONObject, False);
+  Render(LResponseBody.ToJSONText);
 end;
 
 procedure TioDMVCController.Index;
@@ -200,7 +208,7 @@ begin
     // Create the IioRESTResponseBody and return it to the client
     LResponseBody := TioHttpFactory.NewResponseBody;
     LMemTable.SaveToStream(LResponseBody.Stream, TFDStorageFormat.sfJSON);
-    Render(LResponseBody.ToJSONObject, False);
+    Render(LResponseBody.ToJSONText);
   finally
     // Clean up
     LMemTable.Free;
@@ -223,7 +231,7 @@ begin
     // Create the IioRESTResponseBody and return it to the client
     LResponseBody := TioHttpFactory.NewResponseBody;
     LResponseBody.JSONDataValue := dj.From(LObj).byFields.TypeAnnotationsON.ToJsonValue;
-    Render(LResponseBody.ToJSONObject, False);
+    Render(LResponseBody.ToJSONText);
   finally
     // Clean up
     LObj.Free;
@@ -243,7 +251,7 @@ begin
   // Create the IioRESTResponseBody and return it to the client
   LResponseBody := TioHttpFactory.NewResponseBody;
   LResponseBody.JSONDataValue := dj.From(LObj).byFields.TypeAnnotationsON.ToJsonValue;
-  Render(LResponseBody.ToJSONObject, False);
+  Render(LResponseBody.ToJSONText);
 end;
 
 procedure TioDMVCController.OnAfterAction(Context: TWebContext;
@@ -270,13 +278,13 @@ begin
   // Get the IioRESTRequestBody
   LRequestBody := TioHttpFactory.NewRequestBody(Context.Request.Body, True);  // NB: OwnDataObject := True
   // Execute iORM call
-  io.PersistList(LRequestBody.DataObject, LRequestBody.BlindInsert);
+  io._PersistList(LRequestBody.DataObject, LRequestBody.IntentType, LRequestBody.BlindLevel);
   // Return the updated/inserted DataObject back to the client for new IDs
   // Create the IioRESTResponseBody and return it to the client
   LResponseBody := TioHttpFactory.NewResponseBody;
-  if not LRequestBody.BlindInsert then
+  if TioUtilities.BlindLevel_Do_AutoUpdateProps(LRequestBody.BlindLevel) then
     LResponseBody.JSONDataValue := dj.From(LRequestBody.DataObject).byFields.TypeAnnotationsON.ToJsonValue;
-  Render(LResponseBody.ToJSONObject, False);
+  Render(LResponseBody.ToJSONText);
 end;
 
 procedure TioDMVCController.PersistObject;
@@ -291,20 +299,19 @@ begin
   //      perchè il sistema SUD serve per capire se l'oggetto deve effettivamente essere persistito o no
   //      ma se arriva qui è già stato controllato ed è già stato deciso che deve essere persistito;
   //      passandolo vuoto semplicemente, a destinazione, sarà persistito senza più ulteriori controlli.
-  io._PersistInternal(LRequestBody.DataObject, LRequestBody.RelationPropertyName, LRequestBody.RelationOID, LRequestBody.BlindInsert, nil, '', '');
+  io._PersistObjectInternal(LRequestBody.DataObject, LRequestBody.IntentType, LRequestBody.RelationPropertyName, LRequestBody.RelationOID, nil, '', '', LRequestBody.BlindLevel);
   // Return the updated/inserted DataObject back to the client for new IDs
   // Create the IioRESTResponseBody and return it to the client
   LResponseBody := TioHttpFactory.NewResponseBody;
-  if not LRequestBody.BlindInsert then
+  if TioUtilities.BlindLevel_Do_AutoUpdateProps(LRequestBody.BlindLevel) then
     LResponseBody.JSONDataValue := dj.From(LRequestBody.DataObject).byFields.TypeAnnotationsON.ToJsonValue;
-  Render(LResponseBody.ToJSONObject, False);
+  Render(LResponseBody.ToJSONText);
 end;
 
 procedure TioDMVCController.SQLDestExecute;
 var
   LRequestBody: IioHttpRequestBody;
   LResponseBody: IioHttpResponseBody;
-  LRecordsAffected: Integer;
 begin
   // Get the IioRESTRequestBody
   LRequestBody := TioHttpFactory.NewRequestBody(Context.Request.Body);
@@ -312,8 +319,7 @@ begin
   io.SQL(LRequestBody.SQLDestination).Execute(LRequestBody.SQLDestination.GetIgnoreObjNotExists);
   // Create the IioRESTResponseBody and return it to the client
   LResponseBody := TioHttpFactory.NewResponseBody;
-  LResponseBody.JSONDataValue := TJSONNumber.Create(LRecordsAffected);
-  Render(LResponseBody.ToJSONObject, False);
+  Render(LResponseBody.ToJSONText);
 end;
 
 procedure TioDMVCController.SQLDestLoadDataSet;
@@ -330,11 +336,52 @@ begin
     // Create the IioRESTResponseBody and return it to the client
     LResponseBody := TioHttpFactory.NewResponseBody;
     LMemTable.SaveToStream(LResponseBody.Stream, TFDStorageFormat.sfJSON);
-    Render(LResponseBody.ToJSONObject, False);
+    Render(LResponseBody.ToJSONText);
   finally
     // Clean up
     LMemTable.Free;
   end;
+end;
+
+{ TioDmvcJsonRpcController }
+
+function TioDmvcJsonRpcController.LoadList(const AioRequestBodyAsString: String): String;
+var
+  LRequestBody: IioHttpRequestBody;
+  LResponseBody: IioHttpResponseBody;
+  LObj: TList<TObject>;
+begin
+  // Create a dummy list
+  LObj := TList<TObject>.Create;
+  try
+    // Get the IioRESTRequestBody
+    LRequestBody := TioHttpFactory.NewRequestBody(AioRequestBodyAsString);
+    // Execute iORM call
+    LRequestBody.Where.ToList(LObj);
+    // Create the IioRESTResponseBody and return it to the client
+    LResponseBody := TioHttpFactory.NewResponseBody;
+    LResponseBody.JSONDataValue := dj.From(LObj).byFields.TypeAnnotationsON.ToJsonValue;
+    Result := LResponseBody.ToJSONText;
+  finally
+    // Clean up
+    LObj.Free;
+  end;
+end;
+
+function TioDmvcJsonRpcController.LoadObject(const AioRequestBodyAsString: String): String;
+var
+  LRequestBody: IioHttpRequestBody;
+  LResponseBody: IioHttpResponseBody;
+  LObj: TObject;
+begin
+  // Get the IioRESTRequestBody as instance
+  LRequestBody := TioHttpFactory.NewRequestBody(AioRequestBodyAsString);
+  // Execute iORM call
+  LObj := LRequestBody.Where.ToObject;
+  // Create the IioRESTResponseBody and return it to the client
+  LResponseBody := TioHttpFactory.NewResponseBody;
+  LResponseBody.JSONDataValue := dj.From(LObj).byFields.TypeAnnotationsON.ToJsonValue;
+  Result := LResponseBody.ToJSONText;
 end;
 
 end.

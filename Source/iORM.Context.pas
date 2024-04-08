@@ -202,7 +202,8 @@ implementation
 uses
   iORM.Context.Factory, iORM.DB.Factory, System.TypInfo,
   iORM.Context.Container, System.SysUtils, iORM.Exceptions,
-  System.StrUtils, iORM.DB.Interfaces, iORM, iORM.DB.ConnectionContainer;
+  System.StrUtils, iORM.DB.Interfaces, iORM, iORM.DB.ConnectionContainer,
+  iORM.Utilities;
 
 { TioContext }
 
@@ -213,17 +214,17 @@ end;
 
 function TioContext.BlindLevel_Do_AutoUpdateProps: boolean;
 begin
-  Result := (FBlindLevel AND BL_BIT_AUTO_UPDATE_PROPS) <> 0;
+  Result := TioUtilities.BlindLevel_Do_AutoUpdateProps(FBlindLevel);
 end;
 
 function TioContext.BlindLevel_Do_DetectConflicts: boolean;
 begin
-  Result := (FBlindLevel AND BL_BIT_DETECT_CONFLICTS) <> 0;
+  Result := TioUtilities.BlindLevel_Do_DetectConflicts(FBlindLevel);
 end;
 
 function TioContext.BlindLevel_Do_DetectObjExists: boolean;
 begin
-  Result := (FBlindLevel AND BL_BIT_DETECT_OBJ_EXISTS) <> 0;
+  Result := TioUtilities.BlindLevel_Do_DetectObjExists(FBlindLevel);
 end;
 
 procedure TioContext.BlindLevel_Reset_AutoUpdateProps;

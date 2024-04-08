@@ -37,126 +37,166 @@ interface
 
 uses
   iORM.Where.Interfaces, System.JSON, iORM.CommonTypes, iORM.Http.Interfaces,
-  iORM.DB.Interfaces;
+  iORM.DB.Interfaces, iORM;
 
 type
 
+  // TODO: Servono proprio i nullable? Si potrebbe toglierli e tornare a tipi normali?
   TioHttpRequestBody = class(TInterfacedObject, IioHttpRequestBody)
   private
-    FWhere: IioWhere;
-    FSQLDestination: IioSQLDestination;
-    FDataObject: TObject;
-    FOwnDataObject: Boolean;
-    FRelationPropertyName: TioNullableString;
+    FBlindLevel: TioNullableByte;
+    FIntentType: TioPersistenceIntentType;
+    FJSONDataValue: TJSONValue;
+    FMethodName: String;
     FRelationOID: TioNullableInteger;
-    FBlindInsert: TioNullableBoolean;
-    function GetBlindInsert: Boolean;
-    function GetDataObject: TObject;
+    FRelationPropertyName: TioNullableString;
+    FSQLDestination: IioSQLDestination;
+    FUserID: TioNullableInteger;
+    FUserName: TioNullableString;
+    FUserToken: TioNullableString;
+    FWhere: IioWhere;
+    function GetBlindLevel: Byte;
+    function GetIntentType: TioPersistenceIntentType;
+    function GetJSONDataValue: TJSONValue;
+    function GetJSONDataValueAsObject: TObject;
+    function GetMethodName: String;
     function GetRelationOID: Integer;
     function GetRelationPropertyName: String;
-    function GetWhere: IioWhere;
     function GetSQLDestination: IioSQLDestination;
-    procedure SetBlindInsert(const Value: Boolean);
-    procedure SetDataObject(const Value: TObject);
+    function GetUserID: Integer;
+    function GetUserName: String;
+    function GetUserToken: String;
+    function GetWhere: IioWhere;
+    procedure SetBlindLevel(const Value: Byte);
+    procedure SetIntentType(const Value: TioPersistenceIntentType);
+    procedure SetJSONDataValue(const Value: TJSONValue);
+    procedure SetJSONDataValueAsObject(const AObj: TObject);
+    procedure SetMethodName(const Value: String);
     procedure SetRelationOID(const Value: Integer);
     procedure SetRelationPropertyName(const Value: String);
-    procedure SetWhere(const Value: IioWhere);
     procedure SetSQLDestination(const Value: IioSQLDestination);
-    function ToJSONObject:TJSONObject;
+    procedure SetUserID(const Value: Integer);
+    procedure SetUserName(const Value: String);
+    procedure SetUserToken(const Value: String);
+    procedure SetWhere(const Value: IioWhere);
+    function ToJSONText: String;
     procedure Clear;
   public
-    constructor Create(const AOwnDataObject:Boolean); overload;
-    constructor Create(const AJSONObject:TJSONObject; const AOwnDataObject:Boolean); overload;
-    constructor Create(const AJSONString:String; const AOwnDataObject:Boolean); overload;
-    destructor Destroy; override;
+    constructor Create;
+    constructor CreateByJSONString(const AJSONString:String);
   end;
 
 implementation
 
 uses
-  System.SysUtils, iORM, DJSON;
+  System.SysUtils, DJSON;
 
 { TioHttpRequestBody }
 
-constructor TioHttpRequestBody.Create(const AOwnDataObject:Boolean);
+constructor TioHttpRequestBody.Create;
 begin
   inherited Create;
-  Self.Clear;
-  FOwnDataObject := AOwnDataObject;
+  Clear;
 end;
 
-constructor TioHttpRequestBody.Create(const AJSONObject: TJSONObject; const AOwnDataObject:Boolean);
-var
-  LJSONValue: TJSONValue;
-begin
-  Self.Create(AOwnDataObject);
-  // RelationPropertyName
-  LJSONValue := AJSONObject.GetValue(KEY_RELATIONPROPERTYNAME);
-  if Assigned(LJSONValue) then
-    FRelationPropertyName.Value := dj.FromJSON(LJSONValue).&To<String>;
-  // RelationOID
-  LJSONValue := AJSONObject.GetValue(KEY_RELATIONOID);
-  if Assigned(LJSONValue) then
-    FRelationOID.Value := dj.FromJSON(LJSONValue).&To<Integer>;
-  // BlindInsert
-  LJSONValue := AJSONObject.GetValue(KEY_BLINDINSERT);
-  if Assigned(LJSONValue) then
-    FBlindInsert.Value := dj.FromJSON(LJSONValue).&To<Boolean>;
-  // IioWhere
-  LJSONValue := AJSONObject.GetValue(KEY_WHERE);
-  if Assigned(LJSONValue) then
-  begin
-    FWhere := io.GlobalFactory.WhereFactory.NewWhere;
-    dj.FromJSON(LJSONValue).byFields.TypeAnnotationsON.&To(FWhere);
-  end;
-  // IioSQLDestination
-  LJSONValue := AJSONObject.GetValue(KEY_SQLDESTINATION);
-  if Assigned(LJSONValue) then
-  begin
-    FSQLDestination := io.GlobalFactory.DBFactory.SQLDestination('');
-    dj.FromJSON(LJSONValue).byFields.TypeAnnotationsON.&To(FSQLDestination);
-  end;
-  // DataObject
-  LJSONValue := AJSONObject.GetValue(KEY_DATAOBJECT);
-  if Assigned(LJSONValue) then
-    FDataObject := dj.FromJSON(LJSONValue).OpType(ssHTTP).byFields.TypeAnnotationsON.ToObject;
-end;
-
-procedure TioHttpRequestBody.Clear;
-begin
-  FWhere := nil;
-  FSQLDestination := nil;
-  FDataObject := nil;
-end;
-
-constructor TioHttpRequestBody.Create(const AJSONString: String; const AOwnDataObject:Boolean);
+constructor TioHttpRequestBody.CreateByJSONString(const AJSONString: String);
 var
   LJSONObject: TJSONObject;
+  LJSONValue: TJSONValue;
 begin
+  Self.Create;
   LJSONObject := TJSONObject.ParseJSONValue(AJSONString) as TJSONObject;
   try
-    Self.Create(LJSONObject, AOwnDataObject);
+    // BlindLevel
+    LJSONValue := LJSONObject.GetValue(KEY_BLINDLEVEL);
+    if Assigned(LJSONValue) then
+      FBlindLevel.Value := dj.FromJSON(LJSONValue).&To<Byte>;
+    // IntentType
+    LJSONValue := LJSONObject.GetValue(KEY_INTENTTYPE);
+    if Assigned(LJSONValue) then
+      FIntentType := TioPersistenceIntentType((LJSONValue as TJSONNumber).AsInt);
+    // JSONDataValue
+    LJSONValue := LJSONObject.GetValue(KEY_JSONDATAVALUE);
+    // RelationOID
+    LJSONValue := LJSONObject.GetValue(KEY_RELATIONOID);
+    if Assigned(LJSONValue) then
+      FRelationOID.Value := dj.FromJSON(LJSONValue).&To<Integer>;
+    // RelationPropertyName
+    LJSONValue := LJSONObject.GetValue(KEY_RELATIONPROPERTYNAME);
+    if Assigned(LJSONValue) then
+      FRelationPropertyName.Value := dj.FromJSON(LJSONValue).&To<String>;
+    // SQLDestination
+    LJSONValue := LJSONObject.GetValue(KEY_SQLDESTINATION);
+    if Assigned(LJSONValue) then
+    begin
+      FSQLDestination := io.GlobalFactory.DBFactory.SQLDestination('');
+      dj.FromJSON(LJSONValue).byFields.TypeAnnotationsON.&To(FSQLDestination);
+    end;
+    // UserID
+    LJSONValue := LJSONObject.GetValue(KEY_USERID);
+    if Assigned(LJSONValue) then
+      FUserID.Value := (LJSONValue as TJSONNumber).AsInt;
+    // UserName
+    LJSONValue := LJSONObject.GetValue(KEY_USERNAME);
+    if Assigned(LJSONValue) then
+      FUserName.Value := LJSONValue.Value;
+    // UserToken
+    LJSONValue := LJSONObject.GetValue(KEY_USERTOKEN);
+    if Assigned(LJSONValue) then
+      FUserToken.Value := LJSONValue.Value;
+    // Where
+    LJSONValue := LJSONObject.GetValue(KEY_WHERE);
+    if Assigned(LJSONValue) then
+    begin
+      FWhere := io.GlobalFactory.WhereFactory.NewWhere;
+      dj.FromJSON(LJSONValue).byFields.TypeAnnotationsON.&To(FWhere);
+    end;
   finally
     LJSONObject.Free;
   end;
 end;
 
-destructor TioHttpRequestBody.Destroy;
+procedure TioHttpRequestBody.Clear;
 begin
-  // Clean up
-  if FOwnDataObject and Assigned(FDataObject) then
-    FDataObject.Free;
-  inherited;
+  FBlindLevel.Clear;
+  FIntentType := itRegular;
+  FJSONDataValue := nil;
+  FMethodName := String.Empty;
+  FRelationOID.Clear;
+  FRelationPropertyName.Clear;
+  FSQLDestination := nil;
+  FUserID.Clear;
+  FUserName.Clear;
+  FUserToken.Clear;
+  FWhere := nil;
 end;
 
-function TioHttpRequestBody.GetBlindInsert: Boolean;
+function TioHttpRequestBody.GetBlindLevel: Byte;
 begin
-  Result := FBlindInsert.Value;
+  Result := FBlindLevel.Value;
 end;
 
-function TioHttpRequestBody.GetDataObject: TObject;
+function TioHttpRequestBody.GetIntentType: TioPersistenceIntentType;
 begin
-  Result := FDataObject;
+  Result := FIntentType;
+end;
+
+function TioHttpRequestBody.GetJSONDataValue: TJSONValue;
+begin
+  Result := FJSONDataValue;
+end;
+
+function TioHttpRequestBody.GetJSONDataValueAsObject: TObject;
+begin
+  if Assigned(FJSONDataValue) then
+    Result := dj.FromJSON(FJSONDataValue).OpType(ssHTTP).byFields.TypeAnnotationsON.ToObject
+  else
+    Result := nil;
+end;
+
+function TioHttpRequestBody.GetMethodName: String;
+begin
+  Result := FMethodName;
 end;
 
 function TioHttpRequestBody.GetRelationOID: Integer;
@@ -174,19 +214,52 @@ begin
   Result := FSQLDestination;
 end;
 
+function TioHttpRequestBody.GetUserID: Integer;
+begin
+  Result := FUserID.Value;
+end;
+
+function TioHttpRequestBody.GetUserName: String;
+begin
+  Result := FUserName.Value;
+end;
+
+function TioHttpRequestBody.GetUserToken: String;
+begin
+  Result := FUserToken.Value;
+end;
+
 function TioHttpRequestBody.GetWhere: IioWhere;
 begin
   Result := FWhere;
 end;
 
-procedure TioHttpRequestBody.SetBlindInsert(const Value: Boolean);
+procedure TioHttpRequestBody.SetBlindLevel(const Value: Byte);
 begin
-  FBlindInsert.Value := Value;
+  FBlindLevel.Value := Value;
 end;
 
-procedure TioHttpRequestBody.SetDataObject(const Value: TObject);
+procedure TioHttpRequestBody.SetIntentType(const Value: TioPersistenceIntentType);
 begin
-  FDataObject := Value;
+  FIntentType := Value;
+end;
+
+procedure TioHttpRequestBody.SetJSONDataValue(const Value: TJSONValue);
+begin
+  FJSONDataValue := Value;
+end;
+
+procedure TioHttpRequestBody.SetJSONDataValueAsObject(const AObj: TObject);
+begin
+  if Assigned(FJSONDataValue) then
+    FreeAndNil(FJSONDataValue);
+  if Assigned(AObj) then
+    FJSONDataValue := dj.From(AObj).OpType(ssHTTP).byFields.TypeAnnotationsON.ToJsonValue;
+end;
+
+procedure TioHttpRequestBody.SetMethodName(const Value: String);
+begin
+  FMethodName := Value;
 end;
 
 procedure TioHttpRequestBody.SetRelationOID(const Value: Integer);
@@ -204,51 +277,90 @@ begin
   FSQLDestination := Value;
 end;
 
+procedure TioHttpRequestBody.SetUserID(const Value: Integer);
+begin
+  FUserID.Value := Value;
+end;
+
+procedure TioHttpRequestBody.SetUserName(const Value: String);
+begin
+  FUserName.Value := Value;
+end;
+
+procedure TioHttpRequestBody.SetUserToken(const Value: String);
+begin
+  FUserToken.Value := Value;
+end;
+
 procedure TioHttpRequestBody.SetWhere(const Value: IioWhere);
 begin
   FWhere := Value;
 end;
 
-function TioHttpRequestBody.ToJSONObject: TJSONObject;
+function TioHttpRequestBody.ToJSONText: String;
 var
+  LJSONObject: TJSONObject;
   LJSONValue: TJSONValue;
 begin
-  Result := TJSONObject.Create;
-  // RelationPropertyName
-  if FRelationPropertyName.HasValue then
-  begin
-    LJSONValue := TJSONString.Create(FRelationPropertyName.Value);
-    Result.AddPair(KEY_RELATIONPROPERTYNAME, LJSONValue);
-  end;
-  // RelationOID
-  if FRelationOID.HasValue then
-  begin
-    LJSONValue := TJSONNumber.Create(FRelationOID.Value);
-    Result.AddPair(KEY_RELATIONOID, LJSONValue);
-  end;
-  // BlindInsert
-  if FBlindInsert.HasValue then
-  begin
-    LJSONValue := TJSONBool.Create(FBlindInsert.Value);
-    Result.AddPair(KEY_BLINDINSERT, LJSONValue);
-  end;
-  // IioWhere
-  if Assigned(FWhere) then
-  begin
-    LJSONValue := dj.From(FWhere).byFields.TypeAnnotationsON.ToJsonValue;
-    Result.AddPair(KEY_WHERE, LJSONValue);
-  end;
-  // SQLDestination
-  if Assigned(FSQLDestination) then
-  begin
-    LJSONValue := dj.From(FSQLDestination).byFields.TypeAnnotationsON.ToJsonValue;
-    Result.AddPair(KEY_SQLDESTINATION, LJSONValue);
-  end;
-  // DataOject
-  if Assigned(FDataObject) then
-  begin
-    LJSONValue := dj.From(FDataObject).OpType(ssHTTP).byFields.TypeAnnotationsON.ToJsonValue;
-    Result.AddPair(KEY_DATAOBJECT, LJSONValue);
+  LJSONObject := TJSONObject.Create;
+  try
+    // BlindLevel
+    if FBlindLevel.HasValue then
+    begin
+      LJSONValue := TJSONNumber.Create(FBlindLevel.Value);
+      LJSONObject.AddPair(KEY_BLINDLEVEL, LJSONValue);
+    end;
+    // IntentType
+    LJSONValue := TJSONNumber.Create(Ord(FIntentType));
+    LJSONObject.AddPair(KEY_INTENTTYPE, LJSONValue);
+    // JSONDataValue
+    LJSONObject.AddPair(KEY_JSONDATAVALUE, FJSONDataValue);
+    // RelationOID
+    if FRelationOID.HasValue then
+    begin
+      LJSONValue := TJSONNumber.Create(FRelationOID.Value);
+      LJSONObject.AddPair(KEY_RELATIONOID, LJSONValue);
+    end;
+    // RelationPropertyName
+    if FRelationPropertyName.HasValue then
+    begin
+      LJSONValue := TJSONString.Create(FRelationPropertyName.Value);
+      LJSONObject.AddPair(KEY_RELATIONPROPERTYNAME, LJSONValue);
+    end;
+    // SQLDestination
+    if Assigned(FSQLDestination) then
+    begin
+      LJSONValue := dj.From(FSQLDestination).byFields.TypeAnnotationsON.ToJsonValue;
+      LJSONObject.AddPair(KEY_SQLDESTINATION, LJSONValue);
+    end;
+    // UserID
+    if FUserID.HasValue then
+    begin
+      LJSONValue := TJSONNumber.Create(FUserID.Value);
+      LJSONObject.AddPair(KEY_USERID, LJSONValue);
+    end;
+    // UserName
+    if FUserName.HasValue then
+    begin
+      LJSONValue := TJSONString.Create(FUserName.Value);
+      LJSONObject.AddPair(KEY_USERNAME, LJSONValue);
+    end;
+    // UserToken
+    if FUserToken.HasValue then
+    begin
+      LJSONValue := TJSONString.Create(FUserToken.Value);
+      LJSONObject.AddPair(KEY_USERTOKEN, LJSONValue);
+    end;
+    // Where
+    if Assigned(FWhere) then
+    begin
+      LJSONValue := dj.From(FWhere).byFields.TypeAnnotationsON.ToJsonValue;
+      LJSONObject.AddPair(KEY_WHERE, LJSONValue);
+    end;
+    // Result JSONObject as string
+    Result := LJSONObject.ToString;
+  finally
+    LJSONObject.Free;
   end;
 end;
 

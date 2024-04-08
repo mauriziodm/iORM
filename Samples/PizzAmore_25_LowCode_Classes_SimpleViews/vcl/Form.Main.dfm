@@ -8505,7 +8505,7 @@ object MainForm: TMainForm
   object ButtonOrders: TButton
     Left = 43
     Top = 334
-    Width = 133
+    Width = 129
     Height = 44
     Action = acShowOrders
     Anchors = [akLeft, akRight, akBottom]
@@ -8516,11 +8516,13 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 0
+    ExplicitTop = 333
+    ExplicitWidth = 125
   end
   object ButtonCustomers: TButton
     Left = 43
     Top = 384
-    Width = 133
+    Width = 129
     Height = 44
     Action = acShowCustomers
     Anchors = [akLeft, akRight, akBottom]
@@ -8531,11 +8533,13 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 1
+    ExplicitTop = 383
+    ExplicitWidth = 125
   end
   object ButtonPizzas: TButton
     Left = 43
     Top = 434
-    Width = 133
+    Width = 129
     Height = 44
     Action = acShowPizzas
     Anchors = [akLeft, akRight, akBottom]
@@ -8546,11 +8550,13 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 2
+    ExplicitTop = 433
+    ExplicitWidth = 125
   end
   object ButtonQuit: TButton
     Left = 43
     Top = 499
-    Width = 133
+    Width = 129
     Height = 32
     Action = acQuit
     Anchors = [akLeft, akRight, akBottom]
@@ -8561,14 +8567,15 @@ object MainForm: TMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 3
+    ExplicitTop = 498
+    ExplicitWidth = 125
   end
   object ioVCL1: TioVCL
     Left = 8
     Top = 272
   end
   object SQLiteConn: TioSQLiteConnectionDef
-    AsDefault = True
-    AutoCreateDB.Enabled = True
+    AsDefault = False
     Database = 'PizzAmore_25_LowCode_Classes_SimpleViews_Vcl.db'
     DatabaseStdFolder = sfDocuments
     Persistent = False
@@ -8613,5 +8620,12 @@ object MainForm: TMainForm
       ViewContextBy = vcByDefaultViewContextProvider
       VVMTypeAlias = 'LIST'
     end
+  end
+  object HttpConn: TioHttpConnectionDef
+    AsDefault = True
+    BaseURL = 'http://localhost:8080/jsonrpc'
+    Persistent = True
+    Left = 48
+    Top = 200
   end
 end

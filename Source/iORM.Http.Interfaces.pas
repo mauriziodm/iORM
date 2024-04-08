@@ -35,6 +35,20 @@ unit iORM.Http.Interfaces;
 
 interface
 
+const
+
+  HTTP_RESOURCE_OR_METHOD_NAME = 'iorm_execute';
+
+  HTTP_METHOD_NAME_COUNT = 'Count';
+  HTTP_METHOD_NAME_DELETE = 'Delete';
+  HTTP_METHOD_NAME_DELETEOBJECT = 'DeleteObject';
+  HTTP_METHOD_NAME_LOADDATASET = 'LoadDataSet';
+  HTTP_METHOD_NAME_LOADLIST = 'LoadList';
+  HTTP_METHOD_NAME_LOADOBJECT = 'LoadObject';
+  HTTP_METHOD_NAME_PERSISTLIST = 'PersistList';
+
+  HTTP_METHOD_NAME_TEST = 'Test';
+
   // All the interfaces declared here are moved on iORM.DB.Interfacex to avoi
   //  a circular reference error (IioHttpRequestBody, IioHttpResponseBody)
 

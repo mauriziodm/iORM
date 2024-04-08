@@ -42,10 +42,10 @@ type
 
   TioHttpFactory = class
   public
-    class function NewRequestBody(const AOwnDataObject:Boolean=True): IioHttpRequestBody; overload;
-    class function NewRequestBody(const AJSONString:String; const AOwnDataObject:Boolean=True): IioHttpRequestBody; overload;
-    class function NewResponseBody(const AOwnDataObject:Boolean=True): IioHttpResponseBody; overload;
-    class function NewResponseBody(const AJSONString:String; const AOwnDataObject:Boolean=True): IioHttpResponseBody; overload;
+    class function NewRequestBody: IioHttpRequestBody; inline; static;
+    class function NewRequestBodyByJSONString(const AJSONString:String): IioHttpRequestBody; inline; static;
+    class function NewResponseBody: IioHttpResponseBody; inline; static;
+    class function NewResponseBodyByJSONString(const AJSONString:String): IioHttpResponseBody; inline; static;
   end;
 
 implementation
@@ -55,26 +55,24 @@ uses
 
 { TioHttpFactory }
 
-class function TioHttpFactory.NewRequestBody(const AOwnDataObject:Boolean): IioHttpRequestBody;
+class function TioHttpFactory.NewRequestBody: IioHttpRequestBody;
 begin
-  Result := TioHttpRequestBody.Create(AOwnDataObject);
+  Result := TioHttpRequestBody.Create;
 end;
 
-class function TioHttpFactory.NewRequestBody(
-  const AJSONString: String; const AOwnDataObject:Boolean): IioHttpRequestBody;
+class function TioHttpFactory.NewRequestBodyByJSONString(const AJSONString: String): IioHttpRequestBody;
 begin
-  Result := TioHttpRequestBody.Create(AJSONString, AOwnDataObject);
+  Result := TioHttpRequestBody.CreateByJSONString(AJSONString);
 end;
 
-class function TioHttpFactory.NewResponseBody(const AOwnDataObject:Boolean): IioHttpResponseBody;
+class function TioHttpFactory.NewResponseBody: IioHttpResponseBody;
 begin
-  Result := TioHttpResponseBody.Create(AOwnDataObject);
+  Result := TioHttpResponseBody.Create;
 end;
 
-class function TioHttpFactory.NewResponseBody(
-  const AJSONString: String; const AOwnDataObject:Boolean): IioHttpResponseBody;
+class function TioHttpFactory.NewResponseBodyByJSONString(const AJSONString: String): IioHttpResponseBody;
 begin
-  Result := TioHttpResponseBody.Create(AJSONString, AOwnDataObject);
+  Result := TioHttpResponseBody.CreateByJSONString(AJSONString);
 end;
 
 end.
