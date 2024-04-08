@@ -37,8 +37,6 @@ interface
 
 const
 
-  HTTP_RESOURCE_OR_METHOD_NAME = 'iorm_execute';
-
   HTTP_METHOD_NAME_COUNT = 'Count';
   HTTP_METHOD_NAME_DELETE = 'Delete';
   HTTP_METHOD_NAME_DELETELIST = 'DeleteList';
@@ -50,7 +48,6 @@ const
   HTTP_METHOD_NAME_PERSISTOBJECT = 'PersistObject';
   HTTP_METHOD_NAME_SQLDESTEXECUTE = 'SQLDestExecute';
   HTTP_METHOD_NAME_SQLDESTLOADDATASET = 'SQLDestLoadDataSet';
-
   HTTP_METHOD_NAME_TEST = 'Test';
 
   // All the interfaces declared here are moved on iORM.DB.Interfacex to avoi

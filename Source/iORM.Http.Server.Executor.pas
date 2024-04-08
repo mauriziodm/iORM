@@ -55,6 +55,7 @@ type
     class procedure _SQLLoadDataSet(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
   public
     class function Execute(const ARequestBodyAsString: String): String; inline; static;
+    class function Test: String; inline; static;
   end;
 
 implementation
@@ -62,7 +63,7 @@ implementation
 uses
   iORM, DJSON, iORM.Http.Factory, iORM.Http.Interfaces, iORM.Exceptions,
   System.SysUtils, System.JSON, FireDAC.Comp.Client, FireDAC.Stan.Intf,
-  System.Generics.Collections, iORM.Utilities;
+  System.Generics.Collections, iORM.Utilities, System.DateUtils;
 
 { TioHttpServerExecutor }
 
@@ -101,6 +102,11 @@ begin
     raise EioHttpException.Create(ClassName, 'Execute', Format('Method "%s" not found.', [LioRequestBody.MethodName]));
   // Return the response
   Result := LioResponseBody.ToJSONText;
+end;
+
+class function TioHttpServerExecutor.Test: String;
+begin
+  Result := Format('iORM http server executor connected succesfully now %s.', [Now.ToString]);
 end;
 
 class procedure TioHttpServerExecutor._Count(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);

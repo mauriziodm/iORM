@@ -47,92 +47,21 @@ uses
 
 type
 
-  TioDmvcJsonRpcController = class(TMVCJSONRPCController)
-  public
-    function LoadList(const AioRequestBodyAsString: String): String;
-    function LoadObject(const AioRequestBodyAsString: String): String;
-  end;
-
-  [MVCPath('/')]
+  [MVCPath('/iorm')]
   TioDMVCController = class(TMVCController)
   public
+    [MVCPath('/execute'), MVCHTTPMethod([httpPUT]), MVCProduce('application/json'), MVCConsumes('application/json')]
+    [MVCDoc('Execute an iORM action using DMVC framework as http transport layer.')]
+    procedure Execute;
+    [MVCPath('/test'), MVCHTTPMethod([httpGET])]
+    [MVCDoc('Execute a connection test.')]
+    procedure Test;
+  end;
 
-    [MVCPath('/test')]
-    [MVCHTTPMethod([httpGET])]
-    procedure Index;
-
-    [MVCPath('/LoadList')]
-    [MVCProduce('application/json')]
-    [MVCConsumes('application/json')]
-    [MVCHTTPMethod([httpPUT])]
-    [MVCDoc('Load an object or interfaces list')]
-    procedure LoadList;
-
-    [MVCPath('/LoadObject')]
-    [MVCProduce('application/json')]
-    [MVCConsumes('application/json')]
-    [MVCHTTPMethod([httpPUT])]
-    [MVCDoc('Load an object or interface')]
-    procedure LoadObject;
-
-    [MVCPath('/LoadDataSet')]
-    [MVCProduce('application/json')]
-    [MVCConsumes('application/json')]
-    [MVCHTTPMethod([httpPUT])]
-    [MVCDoc('Load a DataSet')]
-    procedure LoadDataSet;
-
-    [MVCPath('/PersistObject')]
-    [MVCProduce('application/json')]
-    [MVCConsumes('application/json')]
-    [MVCHTTPMethod([httpPUT])]
-    [MVCDoc('Persist an object or interface')]
-    procedure PersistObject;
-
-    [MVCPath('/PersistCollection')]
-    [MVCProduce('application/json')]
-    [MVCConsumes('application/json')]
-    [MVCHTTPMethod([httpPUT])]
-    [MVCDoc('Persist a collection of objects or interfaces')]
-    procedure PersistCollection;
-
-    [MVCPath('/DeleteObject')]
-    [MVCProduce('application/json')]
-    [MVCConsumes('application/json')]
-    [MVCHTTPMethod([httpPUT])]
-    [MVCDoc('Delete an object or interface')]
-    procedure DeleteObject;
-
-    [MVCPath('/Delete')]
-    [MVCProduce('application/json')]
-    [MVCConsumes('application/json')]
-    [MVCHTTPMethod([httpPUT])]
-    [MVCDoc('Delete objects or interfaces')]
-    procedure Delete;
-
-    [MVCPath('/SQLDestExecute')]
-    [MVCProduce('application/json')]
-    [MVCConsumes('application/json')]
-    [MVCHTTPMethod([httpPUT])]
-    [MVCDoc('Execute a SQL command')]
-    procedure SQLDestExecute;
-
-    [MVCPath('/SQLDestLoadDataSet')]
-    [MVCProduce('application/json')]
-    [MVCConsumes('application/json')]
-    [MVCHTTPMethod([httpPUT])]
-    [MVCDoc('Execute a SQL command to load a DataSet')]
-    procedure SQLDestLoadDataSet;
-
-    // M.M. 12/06/21
-    [MVCPath('/count')]
-    [MVCHTTPMethod([httpPUT])]
-    procedure Count;
-
-    // Other
-    procedure OnBeforeAction(Context: TWebContext; const AActionName: string; var Handled: Boolean); override;
-    procedure OnAfterAction(Context: TWebContext; const AActionName: string); override;
-
+  TioDmvcJsonRpcController = class(TMVCJSONRPCController)
+  public
+    function Execute(const AioRequestBodyAsString: String): String;
+    function Test: String;
   end;
 
 implementation
@@ -143,245 +72,32 @@ uses iORM, iORM.Http.Factory, System.Generics.Collections,
   FireDAC.Comp.Client, FireDAC.Stan.Intf, FireDAC.Stan.StorageJSON, System.JSON,
   DJSON, iORM.Utilities;
 
-// M.M. 12/06/21
-procedure TioDMVCController.Count;
+procedure TioDMVCController.Execute;
 var
-  LRequestBody: IioHttpRequestBody;
-  LResponseBody: IioHttpResponseBody;
-  LCount: integer;
+  LResponse: String;
 begin
-  // Get the IioRESTRequestBody
-  LRequestBody := TioHttpFactory.NewRequestBody(Context.Request.Body);
-  // Execute iORM call
-  LCount := io.RefTo(LRequestBody.Where).Count;
-  // Create the IioRESTResponseBody and return it to the client
-  LResponseBody := TioHttpFactory.NewResponseBody;
-  LResponseBody.JSONDataValue := TJSONNumber.Create(LCount);
-  Render(LResponseBody.ToJSONText);
+  LResponse := TioHttpServerExecutor.Execute(Context.Request.Body);
+  Render(LResponse);
 end;
 
-procedure TioDMVCController.Delete;
+procedure TioDMVCController.Test;
 var
-  LRequestBody: IioHttpRequestBody;
-  LResponseBody: IioHttpResponseBody;
+  LResponse: String;
 begin
-  // Get the IioRESTRequestBody
-  LRequestBody := TioHttpFactory.NewRequestBody(Context.Request.Body);
-  // Execute iORM call
-  io.RefTo(LRequestBody.Where).Delete;
-  // Create the IioRESTResponseBody and return it to the client
-  LResponseBody := TioHttpFactory.NewResponseBody;
-  Render(LResponseBody.ToJSONText);
-end;
-
-procedure TioDMVCController.DeleteObject;
-var
-  LRequestBody: IioHttpRequestBody;
-  LResponseBody: IioHttpResponseBody;
-begin
-  // Get the IioRESTRequestBody
-  LRequestBody := TioHttpFactory.NewRequestBody(Context.Request.Body, True);  // NB: OwnDataObject := True
-  // Execute iORM call
-  io.DeleteObject(LRequestBody.DataObject);  // ConnectionName
-  // Create the IioRESTResponseBody and return it to the client
-  LResponseBody := TioHttpFactory.NewResponseBody;
-  Render(LResponseBody.ToJSONText);
-end;
-
-procedure TioDMVCController.Index;
-begin
-  //use Context property to access to the HTTP request and response
-  Render('TioDMVCController: Test passed.');
-end;
-
-procedure TioDMVCController.LoadDataSet;
-var
-  LRequestBody: IioHttpRequestBody;
-  LResponseBody: IioHttpResponseBody;
-  LMemTable: TFDMemTable;
-begin
-  // Get the IioRESTRequestBody
-  LRequestBody := TioHttpFactory.NewRequestBody(Context.Request.Body);
-  try
-    // Execute iORM call
-    LMemTable := io.Load(LRequestBody.Where).ToMemTable;
-    // Create the IioRESTResponseBody and return it to the client
-    LResponseBody := TioHttpFactory.NewResponseBody;
-    LMemTable.SaveToStream(LResponseBody.Stream, TFDStorageFormat.sfJSON);
-    Render(LResponseBody.ToJSONText);
-  finally
-    // Clean up
-    LMemTable.Free;
-  end;
-end;
-
-procedure TioDMVCController.LoadList;
-var
-  LRequestBody: IioHttpRequestBody;
-  LResponseBody: IioHttpResponseBody;
-  LObj: TList<TObject>;
-begin
-  // Create a dummy list
-  LObj := TList<TObject>.Create;
-  try
-    // Get the IioRESTRequestBody
-    LRequestBody := TioHttpFactory.NewRequestBody(Context.Request.Body);
-    // Execute iORM call
-    io.Load(LRequestBody.Where).ToList(LObj);
-    // Create the IioRESTResponseBody and return it to the client
-    LResponseBody := TioHttpFactory.NewResponseBody;
-    LResponseBody.JSONDataValue := dj.From(LObj).byFields.TypeAnnotationsON.ToJsonValue;
-    Render(LResponseBody.ToJSONText);
-  finally
-    // Clean up
-    LObj.Free;
-  end;
-end;
-
-procedure TioDMVCController.LoadObject;
-var
-  LRequestBody: IioHttpRequestBody;
-  LResponseBody: IioHttpResponseBody;
-  LObj: TObject;
-begin
-  // Get the IioRESTRequestBody
-  LRequestBody := TioHttpFactory.NewRequestBody(Context.Request.Body);
-  // Execute iORM call
-  LObj := io.Load(LRequestBody.Where).ToObject;
-  // Create the IioRESTResponseBody and return it to the client
-  LResponseBody := TioHttpFactory.NewResponseBody;
-  LResponseBody.JSONDataValue := dj.From(LObj).byFields.TypeAnnotationsON.ToJsonValue;
-  Render(LResponseBody.ToJSONText);
-end;
-
-procedure TioDMVCController.OnAfterAction(Context: TWebContext;
-  const AActionName: string);
-begin
-  { Executed after each action }
-  inherited;
-end;
-
-procedure TioDMVCController.OnBeforeAction(Context: TWebContext;
-  const AActionName: string; var Handled: Boolean);
-begin
-  { Executed before each action
-    if handled is true (or an exception is raised) the actual
-    action will not be called }
-  inherited;
-end;
-
-procedure TioDMVCController.PersistCollection;
-var
-  LRequestBody: IioHttpRequestBody;
-  LResponseBody: IioHttpResponseBody;
-begin
-  // Get the IioRESTRequestBody
-  LRequestBody := TioHttpFactory.NewRequestBody(Context.Request.Body, True);  // NB: OwnDataObject := True
-  // Execute iORM call
-  io._PersistList(LRequestBody.DataObject, LRequestBody.IntentType, LRequestBody.BlindLevel);
-  // Return the updated/inserted DataObject back to the client for new IDs
-  // Create the IioRESTResponseBody and return it to the client
-  LResponseBody := TioHttpFactory.NewResponseBody;
-  if TioUtilities.BlindLevel_Do_AutoUpdateProps(LRequestBody.BlindLevel) then
-    LResponseBody.JSONDataValue := dj.From(LRequestBody.DataObject).byFields.TypeAnnotationsON.ToJsonValue;
-  Render(LResponseBody.ToJSONText);
-end;
-
-procedure TioDMVCController.PersistObject;
-var
-  LRequestBody: IioHttpRequestBody;
-  LResponseBody: IioHttpResponseBody;
-begin
-  // Get the IioRESTRequestBody
-  LRequestBody := TioHttpFactory.NewRequestBody(Context.Request.Body, True);  // NB: OwnDataObject := True
-  // Execute iORM call
-  // NB: Gli ultimi 3 parametri (quelli aggiunti per lo Smart Update Detection S.U.D.) li passo vuoti
-  //      perchè il sistema SUD serve per capire se l'oggetto deve effettivamente essere persistito o no
-  //      ma se arriva qui è già stato controllato ed è già stato deciso che deve essere persistito;
-  //      passandolo vuoto semplicemente, a destinazione, sarà persistito senza più ulteriori controlli.
-  io._PersistObjectInternal(LRequestBody.DataObject, LRequestBody.IntentType, LRequestBody.RelationPropertyName, LRequestBody.RelationOID, nil, '', '', LRequestBody.BlindLevel);
-  // Return the updated/inserted DataObject back to the client for new IDs
-  // Create the IioRESTResponseBody and return it to the client
-  LResponseBody := TioHttpFactory.NewResponseBody;
-  if TioUtilities.BlindLevel_Do_AutoUpdateProps(LRequestBody.BlindLevel) then
-    LResponseBody.JSONDataValue := dj.From(LRequestBody.DataObject).byFields.TypeAnnotationsON.ToJsonValue;
-  Render(LResponseBody.ToJSONText);
-end;
-
-procedure TioDMVCController.SQLDestExecute;
-var
-  LRequestBody: IioHttpRequestBody;
-  LResponseBody: IioHttpResponseBody;
-begin
-  // Get the IioRESTRequestBody
-  LRequestBody := TioHttpFactory.NewRequestBody(Context.Request.Body);
-  // Execute iORM call
-  io.SQL(LRequestBody.SQLDestination).Execute(LRequestBody.SQLDestination.GetIgnoreObjNotExists);
-  // Create the IioRESTResponseBody and return it to the client
-  LResponseBody := TioHttpFactory.NewResponseBody;
-  Render(LResponseBody.ToJSONText);
-end;
-
-procedure TioDMVCController.SQLDestLoadDataSet;
-var
-  LRequestBody: IioHttpRequestBody;
-  LResponseBody: IioHttpResponseBody;
-  LMemTable: TFDMemTable;
-begin
-  // Get the IioRESTRequestBody
-  LRequestBody := TioHttpFactory.NewRequestBody(Context.Request.Body);
-  // Execute iORM call
-  LMemTable := io.SQL(LRequestBody.SQLDestination).ToMemTable;
-  try
-    // Create the IioRESTResponseBody and return it to the client
-    LResponseBody := TioHttpFactory.NewResponseBody;
-    LMemTable.SaveToStream(LResponseBody.Stream, TFDStorageFormat.sfJSON);
-    Render(LResponseBody.ToJSONText);
-  finally
-    // Clean up
-    LMemTable.Free;
-  end;
+  LResponse := TioHttpServerExecutor.Test;
+  Render(LResponse);
 end;
 
 { TioDmvcJsonRpcController }
 
-function TioDmvcJsonRpcController.LoadList(const AioRequestBodyAsString: String): String;
-var
-  LRequestBody: IioHttpRequestBody;
-  LResponseBody: IioHttpResponseBody;
-  LObj: TList<TObject>;
+function TioDmvcJsonRpcController.execute(const AioRequestBodyAsString: String): String;
 begin
-  // Create a dummy list
-  LObj := TList<TObject>.Create;
-  try
-    // Get the IioRESTRequestBody
-    LRequestBody := TioHttpFactory.NewRequestBody(AioRequestBodyAsString);
-    // Execute iORM call
-    LRequestBody.Where.ToList(LObj);
-    // Create the IioRESTResponseBody and return it to the client
-    LResponseBody := TioHttpFactory.NewResponseBody;
-    LResponseBody.JSONDataValue := dj.From(LObj).byFields.TypeAnnotationsON.ToJsonValue;
-    Result := LResponseBody.ToJSONText;
-  finally
-    // Clean up
-    LObj.Free;
-  end;
+  Result := TioHttpServerExecutor.Execute(AioRequestBodyAsString);
 end;
 
-function TioDmvcJsonRpcController.LoadObject(const AioRequestBodyAsString: String): String;
-var
-  LRequestBody: IioHttpRequestBody;
-  LResponseBody: IioHttpResponseBody;
-  LObj: TObject;
+function TioDmvcJsonRpcController.test: String;
 begin
-  // Get the IioRESTRequestBody as instance
-  LRequestBody := TioHttpFactory.NewRequestBody(AioRequestBodyAsString);
-  // Execute iORM call
-  LObj := LRequestBody.Where.ToObject;
-  // Create the IioRESTResponseBody and return it to the client
-  LResponseBody := TioHttpFactory.NewResponseBody;
-  LResponseBody.JSONDataValue := dj.From(LObj).byFields.TypeAnnotationsON.ToJsonValue;
-  Result := LResponseBody.ToJSONText;
+  Result := TioHttpServerExecutor.Test;
 end;
 
 end.

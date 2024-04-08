@@ -91,7 +91,7 @@ begin
   FRESTRequest := TRESTRequest.Create(nil);
   FRESTRequest.Client := FRESTClient;
   FRESTRequest.Method := TRESTRequestMethod.rmPUT;
-  FRESTRequest.Resource := HTTP_RESOURCE_OR_METHOD_NAME;
+  FRESTRequest.Resource := '/';
   FRESTRequest.Response := FRESTResponse;
   // create request body (not the response body)
   FioHttpRequestBody := TioHttpFactory.NewRequestBody;
