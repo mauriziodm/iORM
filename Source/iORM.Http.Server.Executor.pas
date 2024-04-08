@@ -42,15 +42,19 @@ type
 
   TioHttpServerExecutor = class
   private
-    class procedure _Count(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
-    class procedure _Delete(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
-    class procedure _DeleteObject(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
-    class procedure _LoadDataSet(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
-    class procedure _LoadList(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
-    class procedure _LoadObject(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
-    class procedure _PersistList(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
+    class procedure _Count(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _Delete(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _DeleteList(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _DeleteObject(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _LoadDataSet(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _LoadList(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _LoadObject(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _PersistList(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _PersistObject(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _SQLDestExecute(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _SQLLoadDataSet(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
   public
-    class function Execute(const ARequestBodyAsString: String): String;
+    class function Execute(const ARequestBodyAsString: String): String; inline; static;
   end;
 
 implementation
@@ -70,21 +74,29 @@ begin
   // Create ioRequestBody and ioResponseBody instances
   LioRequestBody := TioHttpFactory.NewRequestBodyByJSONString(ARequestBodyAsString);
   LioResponseBody := TioHttpFactory.NewResponseBody;
-  // Execute the right method/action
-  if LioRequestBody.MethodName = HTTP_METHOD_NAME_COUNT then
+  // Execute the right method/action (in ordine di prevista frequenza)
+  if LioRequestBody.MethodName = HTTP_METHOD_NAME_LOADOBJECT then
+    _LoadObject(LioRequestBody, LioResponseBody)
+  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_PERSISTOBJECT then
+    _PersistObject(LioRequestBody, LioResponseBody)
+  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_DELETEOBJECT then
+    _DeleteObject(LioRequestBody, LioResponseBody)
+  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_LOADLIST then
+    _LoadList(LioRequestBody, LioResponseBody)
+  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_PERSISTLIST then
+    _PersistList(LioRequestBody, LioResponseBody)
+  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_DELETELIST then
+    _DeleteList(LioRequestBody, LioResponseBody)
+  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_COUNT then
     _Count(LioRequestBody, LioResponseBody)
   else if LioRequestBody.MethodName = HTTP_METHOD_NAME_DELETE then
     _Delete(LioRequestBody, LioResponseBody)
-  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_DELETEOBJECT then
-    _DeleteObject(LioRequestBody, LioResponseBody)
   else if LioRequestBody.MethodName = HTTP_METHOD_NAME_LOADDATASET then
     _LoadDataSet(LioRequestBody, LioResponseBody)
-  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_LOADLIST then
-    _LoadList(LioRequestBody, LioResponseBody)
-  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_LOADOBJECT then
-    _LoadObject(LioRequestBody, LioResponseBody)
-  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_PERSISTLIST then
-    _PersistList(LioRequestBody, LioResponseBody)
+  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_SQLDESTEXECUTE then
+    _SQLDestExecute(LioRequestBody, LioResponseBody)
+  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_SQLDESTLOADDATASET then
+    _SQLLoadDataSet(LioRequestBody, LioResponseBody)
   else
     raise EioHttpException.Create(ClassName, 'Execute', Format('Method "%s" not found.', [LioRequestBody.MethodName]));
   // Return the response
@@ -102,6 +114,14 @@ end;
 class procedure TioHttpServerExecutor._Delete(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
 begin
   AioRequestBody.Where.Delete;
+end;
+
+class procedure TioHttpServerExecutor._DeleteList(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
+var
+  LList: TObject;
+begin
+  LList := AioRequestBody.JSONDataValueAsObject;
+  io._DeleteListInternal(LList, AioRequestBody.IntentType, AioRequestBody.BlindLevel);
 end;
 
 class procedure TioHttpServerExecutor._DeleteObject(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
@@ -139,14 +159,47 @@ var
   LObj: TObject;
 begin
   LObj := AioRequestBody.Where.ToObject;
-  AioResponseBody.JSONDataValue := dj.From(LObj).byFields.TypeAnnotationsON.ToJsonValue;
+  if Assigned(LObj) then
+    AioResponseBody.JSONDataValue := dj.From(LObj).byFields.TypeAnnotationsON.ToJsonValue;
 end;
 
 class procedure TioHttpServerExecutor._PersistList(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
+var
+  LList: TObject;
 begin
-  io._PersistList(AioRequestBody.JSONDataValueAsObject, AioRequestBody.IntentType, AioRequestBody.BlindLevel);
+  LList := AioRequestBody.JSONDataValueAsObject;
+  io._PersistListInternal(LList, AioRequestBody.IntentType, AioRequestBody.RelationPropertyName, AioRequestBody.RelationOID, nil, '', '',
+    AioRequestBody.BlindLevel);
   if TioUtilities.BlindLevel_Do_AutoUpdateProps(AioRequestBody.BlindLevel) then
-    AioResponseBody.JSONDataValue := dj.From(AioRequestBody.JSONDataValueAsObject).byFields.TypeAnnotationsON.ToJsonValue;
+    AioResponseBody.JSONDataValueAsObject := LList;
+end;
+
+class procedure TioHttpServerExecutor._PersistObject(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
+var
+  LObj: TObject;
+begin
+  LObj := AioRequestBody.JSONDataValueAsObject;
+  io._PersistObjectInternal(LObj, AioRequestBody.IntentType, AioRequestBody.RelationPropertyName, AioRequestBody.RelationOID, nil, '', '',
+    AioRequestBody.BlindLevel);
+  if TioUtilities.BlindLevel_Do_AutoUpdateProps(AioRequestBody.BlindLevel) then
+    AioResponseBody.JSONDataValueAsObject := LObj;
+end;
+
+class procedure TioHttpServerExecutor._SQLDestExecute(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
+begin
+  io.SQL(AioRequestBody.SQLDestination).Execute(AioRequestBody.SQLDestination.GetIgnoreObjNotExists);
+end;
+
+class procedure TioHttpServerExecutor._SQLLoadDataSet(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
+var
+  LMemTable: TFDMemTable;
+begin
+  LMemTable := io.SQL(AioRequestBody.SQLDestination).ToMemTable;
+  try
+    LMemTable.SaveToStream(AioResponseBody.Stream, TFDStorageFormat.sfJSON);
+  finally
+    LMemTable.Free;
+  end;
 end;
 
 end.
