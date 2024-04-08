@@ -155,7 +155,6 @@ end;
 function TioHttpResponseBody.ToJSONText: String;
 var
   LJSONObject: TJSONObject;
-  LJSONValue: TJSONValue;
   procedure _SaveStream;
   var
     LStringStream: TStringStream;

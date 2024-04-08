@@ -42,10 +42,10 @@ type
 
   TioHttpFactory = class
   public
-    class function NewRequestBody: IioHttpRequestBody; inline; static;
-    class function NewRequestBodyByJSONString(const AJSONString:String): IioHttpRequestBody; inline; static;
-    class function NewResponseBody: IioHttpResponseBody; inline; static;
-    class function NewResponseBodyByJSONString(const AJSONString:String): IioHttpResponseBody; inline; static;
+    class function NewRequestBody: IioHttpRequestBody; static;
+    class function NewRequestBodyByJSONString(const AJSONString:String): IioHttpRequestBody; static;
+    class function NewResponseBody: IioHttpResponseBody; static;
+    class function NewResponseBodyByJSONString(const AJSONString:String): IioHttpResponseBody; static;
   end;
 
 implementation
