@@ -43,10 +43,6 @@ type
 
   // Strategy class for database
   TioPersistenceStrategyHttp = class(TioPersistenceStrategyIntf)
-  private
-    // class var FTransactionGUID: String; NB: Hint prevention "symbol declared but never used"
-    // class function NewGUIDAsString: String; NB: Hint prevention "symbol declared but never used" (codice presente sotto)
-    // class function GetTransactionGUID: String;
   protected
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------
     class procedure _DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
@@ -82,23 +78,6 @@ uses
   iORM.Context.Container, DJSON;
 
 { TioStrategyHttp }
-
-// class function TioStrategyREST.GetTransactionGUID: String;
-// begin
-// // Set the fixed part of the TransactionGUID if empty
-// if FTransactionGUID.IsEmpty then
-// FTransactionGUID := Self.NewGUIDAsString;
-// // Generate a TransactionGUID (Fixed GUID + Current thread ID
-// Result := System.Classes.TThread.CurrentThread.ThreadID.ToString + '-' + FTransactionGUID;
-// end;
-
-// class function TioStrategyREST.NewGUIDAsString: String;
-// var
-// LGUID: TGUID;
-// begin
-// CreateGUID(LGUID);
-// Result := GUIDToString(LGUID);
-// end;
 
 class function TioPersistenceStrategyHttp.Count(const AWhere: IioWhere): Integer;
 var
