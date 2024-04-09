@@ -422,8 +422,8 @@ constructor TdjParams.Create;
 begin
   inherited;
   // Set the default engine & operation type
-  SetEngine(TdjEngine.eDelphiDOM);
-//  SetEngine(TdjEngine.eDelphiStream);
+//  SetEngine(TdjEngine.eDelphiDOM);
+  SetEngine(TdjEngine.eDelphiStream);
   FOperationType := ssDJSON;
 
   FTypeInfoCache := TdjTypeInfoCache.Create;

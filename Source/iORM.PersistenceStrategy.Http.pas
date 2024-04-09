@@ -41,6 +41,8 @@ uses
 
 type
 
+  // TODO: Con la http connection le eccezioni (almeno alcune come l'eliminazione del cliente dell'ordine delle pizze che causa un fk error) non vengono fuori ma le ritorno solo come errore 505 o similare.
+
   // Strategy class for database
   TioPersistenceStrategyHttp = class(TioPersistenceStrategyIntf)
   protected
