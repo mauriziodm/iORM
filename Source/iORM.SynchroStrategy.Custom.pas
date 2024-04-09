@@ -405,21 +405,6 @@ begin
   Result := (not (AContext.DataObject is TioEtmCustomTimeSlot))
     and ( (FEntities_WhiteList.Count = 0) or (FEntities_WhiteList.IndexOf(AContext.DataObject.ClassName) <> -1) )
     and ( (FEntities_BlackList.Count = 0) or (FEntities_BlackList.IndexOf(AContext.DataObject.ClassName) = -1) );
-
-// ========================== OLD CODE ===========================
-// TODO: Eliminare old code perchè con i nuovo TimeSlot con ID sempre positivi probabilmente non serve più
-//  // If we are persisting a TimeSlot then to understand if it needs to be synchronized
-//  //  (which for EtmSynchroStrategy simply means that it must assign a negative ID)
-//  //  is based on the name of the class of the entity to which the TimeSlot refers;
-//  //  otherwise it is based on the name of the class that is being persisted.
-//  if AContext.DataObject is TioEtmCustomTimeSlot then
-//    LClassName := TioEtmCustomTimeSlot(AContext.DataObject).EntityClassName
-//  else
-//    LClassName := AContext.DataObject.ClassName;
-//  // Detect if the current DataObject is to be synchronized or not (Black & White class list)
-//  Result := ( (FEntities_WhiteList.Count = 0) or (FEntities_WhiteList.IndexOf(LClassName) <> -1) )
-//        and ( (FEntities_BlackList.Count = 0) or (FEntities_BlackList.IndexOf(LClassName) = -1) );
-// ========================== OLD CODE ===========================
 end;
 
 procedure TioCustomSynchroStrategy_Client.Notification(AComponent: TComponent; Operation: TOperation);
@@ -776,7 +761,7 @@ begin
   if not FExceptionMessage.IsEmpty then
   begin
     LExceptionMessage := FExceptionMessage;
-    // TODO: Probabilmente ci saranno dei problemi con uniGUI, controllare
+    // TODO: uniGUI - Probabilmente ci saranno dei problemi con uniGUI, controllare
     TioAnonymousTimer.Create(100, function: Boolean
       begin
         raise EioException.Create(LExceptionMessage);

@@ -41,7 +41,7 @@ uses
 
 type
 
-  // TODO: Con la http connection le eccezioni (almeno alcune come l'eliminazione del cliente dell'ordine delle pizze che causa un fk error) non vengono fuori ma le ritorno solo come errore 505 o similare.
+  // TODO: HTTP connection - le eccezioni (almeno alcune come l'eliminazione del cliente dell'ordine delle pizze che causa un fk error) non vengono fuori ma le ritorno solo come errore 505 o similare.
 
   // Strategy class for database
   TioPersistenceStrategyHttp = class(TioPersistenceStrategyIntf)
@@ -294,7 +294,6 @@ begin
   raise EioException.Create(Self.ClassName + ': "LoadObjectByClassOnly", method not implemented in this strategy.');
 end;
 
-{ TODO : DA AGGIUNGERE GESTIONE DEI 3 PARAMETRI AGGIUNTI ALLA FINE PER IL SUD }
 class procedure TioPersistenceStrategyHttp._DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
 var
@@ -331,7 +330,6 @@ begin
   end;
 end;
 
-{ TODO : DA AGGIUNGERE GESTIONE DEI 3 PARAMETRI AGGIUNTI ALLA FINE PER IL SUD }
 class procedure TioPersistenceStrategyHttp._DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
 var

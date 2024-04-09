@@ -56,12 +56,12 @@ type
     function RttiType: TRttiInstanceType;
     function WhereExist: Boolean;
     // Conflict strategy methods (to avoid circular reference)
-    procedure CheckDeleteConflict(const AContext: IioContext);
-    procedure CheckInsertConflict(const AContext: IioContext);
-    procedure CheckUpdateConflict(const AContext: IioContext);
-    procedure ResolveDeleteConflict(const AContext: IioContext);
-    procedure ResolveInsertConflict(const AContext: IioContext);
-    procedure ResolveUpdateConflict(const AContext: IioContext);
+    procedure CheckDeleteConflict;
+    procedure CheckInsertConflict;
+    procedure CheckUpdateConflict;
+    procedure ResolveDeleteConflict;
+    procedure ResolveInsertConflict;
+    procedure ResolveUpdateConflict;
     function GetCurrentStrategyName: String;
     // Synchronization Strategy methods
     function SynchroStrategy_CanPersistEtmTimeSlot: Boolean;

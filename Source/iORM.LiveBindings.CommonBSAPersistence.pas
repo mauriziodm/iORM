@@ -641,7 +641,7 @@ begin
     begin
       io.HideWait;
       LExceptionMessage := FExceptionMessage;
-      // TODO: Probabilmente ci saranno dei problemi con uniGUI, controllare
+      // TODO: uniGUI - Probabilmente ci saranno dei problemi con uniGUI, controllare
       TioAnonymousTimer.Create(100, function: Boolean
         begin
           raise EioException.Create(LExceptionMessage);
@@ -670,7 +670,7 @@ var
   LConflictResolved: Boolean;
 begin
   // Save into local variables to avoid multithread resource access inconsistency problems
-  // TODO: Per LDataObjects che è un puntatore non protegge nulla, da rivedere?
+  // TODO: Multithread - Accesso all'oggetto da eliminare non protetto in caso di Async = True
   LDataObj := AActiveBindSourceAdapter.Current;
   LID := TioUtilities.ExtractOID(LDataObj);
   AActiveBindSourceAdapter.BSPersistenceDeleting := True; // Look at GetDeleteTerminateMethod below
@@ -760,7 +760,7 @@ var
   LConflictResolved: Boolean;
 begin
   // Save into local variables to avoid multithread resource access inconsistency problems
-  // TODO: da rivedere pqerhè essendo un puntatore non protegge un bel niente
+  // TODO:  Multithread - Accesso all'oggetto da persistere non protetto in caso di Async = True
   LDataObj := AActiveBindSourceAdapter.Current;
   // Build the anonimous method
   Result := function: TObject
@@ -816,7 +816,7 @@ begin
           LMasterBindSource.Persistence.SmartDeleteSystem.ForEach(
             procedure(ASmartDeleteSystemItem: TioSmartDeleteSystemItem)
             begin
-              // TODO: Qui si è salvato il tipo e l'ID dell'oggetto da eliminare ma così salta ETM e conflict strategy
+              // TODO: ETM: Qui si è salvato il tipo e l'ID dell'oggetto da eliminare ma così salta ETM e conflict strategy
               io.RefTo(ASmartDeleteSystemItem.TypeName).ByID(ASmartDeleteSystemItem.ID).Cacheable.Delete;
             end);
           // ----------------------------------------------------------------------------------------------------------------------------

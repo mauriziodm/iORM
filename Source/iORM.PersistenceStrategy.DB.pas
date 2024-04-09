@@ -327,7 +327,7 @@ begin
   // Conflict strategy: check if there is a persistence conflict or prepare the where object of the context
   // to consider the version property (or some other property useful for conflict detection)
   if AContext.BlindLevel_Do_DetectConflicts then
-    AContext.CheckDeleteConflict(AContext);
+    AContext.CheckDeleteConflict;
   // Create and execute the query to delete the entity on DB cheking the version to avoid concurrency
   // conflict (if versioning is enabled for this type of entity)
   if not AContext.ConflictDetected then
@@ -340,7 +340,7 @@ begin
   // but without checking the ObjVersion (otherwise it would obviously fail again)
   if AContext.ConflictDetected then
   begin
-    AContext.ResolveDeleteConflict(AContext);
+    AContext.ResolveDeleteConflict;
     if AContext.ConflictState = csResolved then
     begin
       AContext.BlindLevel_Reset_DetectConflicts;
@@ -368,11 +368,11 @@ begin
   // Detection and resolution of any conflicts (if not disabled by BlindLevel).
   // Conflict strategy: check if there is a persistence conflict
   if AContext.BlindLevel_Do_DetectConflicts then
-    AContext.CheckInsertConflict(AContext);
+    AContext.CheckInsertConflict;
   // Conflict strategy: if a conclict is detected then resolve it
   if AContext.ConflictDetected then
   begin
-    AContext.ResolveInsertConflict(AContext);
+    AContext.ResolveInsertConflict;
     if AContext.ConflictState > csResolved then // if Rejected or RejectedRaise
       Exit;
   end;
@@ -1155,7 +1155,7 @@ begin
   // Conflict strategy: check if there is a persistence conflict or prepare the where object of the context
   // to consider the version property (or some other property useful for conflict detection)
   if AContext.BlindLevel_Do_DetectConflicts then
-    AContext.CheckUpdateConflict(AContext);
+    AContext.CheckUpdateConflict;
   // Create and execute the query to update the entity on DB cheking the version to avoid concurrency
   // conflict (if versioning is enabled for this type of entity)
   if not AContext.ConflictDetected then
@@ -1168,7 +1168,7 @@ begin
   // but without checking the ObjVersion (otherwise it would obviously fail again)
   if AContext.ConflictDetected then
   begin
-    AContext.ResolveUpdateConflict(AContext);
+    AContext.ResolveUpdateConflict;
     if AContext.ConflictState = csResolved then
     begin
       AContext.BlindLevel_Reset_DetectConflicts;

@@ -139,13 +139,12 @@ type
     function RttiType: TRttiInstanceType;
     function WhereExist: Boolean;
     // Conflict strategy methods (to avoid circular reference)
-    // TODO: Eliminare il parametro AContext? Mi sembra che viene sempre richiamato tipo "AContext.Check...Conflict(AContext) quindi...
-    procedure CheckDeleteConflict(const AContext: IioContext); inline;
-    procedure CheckInsertConflict(const AContext: IioContext); inline;
-    procedure CheckUpdateConflict(const AContext: IioContext); inline;
-    procedure ResolveDeleteConflict(const AContext: IioContext); inline;
-    procedure ResolveInsertConflict(const AContext: IioContext); inline;
-    procedure ResolveUpdateConflict(const AContext: IioContext); inline;
+    procedure CheckDeleteConflict; inline;
+    procedure CheckInsertConflict; inline;
+    procedure CheckUpdateConflict; inline;
+    procedure ResolveDeleteConflict; inline;
+    procedure ResolveInsertConflict; inline;
+    procedure ResolveUpdateConflict; inline;
     function GetCurrentStrategyName: String;
     // Synchronization Strategy methods
     function SynchroStrategy_CanPersistEtmTimeSlot: Boolean;
@@ -263,34 +262,34 @@ begin
     Inc(FBlindLevel, BL_BIT_DETECT_OBJ_EXISTS);
 end;
 
-procedure TioContext.CheckDeleteConflict(const AContext: IioContext);
+procedure TioContext.CheckDeleteConflict;
 begin
-  TioCustomConflictStrategyRef(GetTable.GetDeleteConflictStrategy).CheckDeleteConflict(AContext);
+  TioCustomConflictStrategyRef(GetTable.GetDeleteConflictStrategy).CheckDeleteConflict(Self);
 end;
 
-procedure TioContext.CheckInsertConflict(const AContext: IioContext);
+procedure TioContext.CheckInsertConflict;
 begin
-  TioCustomConflictStrategyRef(GetTable.GetInsertConflictStrategy).CheckInsertConflict(AContext);
+  TioCustomConflictStrategyRef(GetTable.GetInsertConflictStrategy).CheckInsertConflict(Self);
 end;
 
-procedure TioContext.CheckUpdateConflict(const AContext: IioContext);
+procedure TioContext.CheckUpdateConflict;
 begin
-  TioCustomConflictStrategyRef(GetTable.GetUpdateConflictStrategy).CheckUpdateConflict(AContext);
+  TioCustomConflictStrategyRef(GetTable.GetUpdateConflictStrategy).CheckUpdateConflict(Self);
 end;
 
-procedure TioContext.ResolveDeleteConflict(const AContext: IioContext);
+procedure TioContext.ResolveDeleteConflict;
 begin
-  TioCustomConflictStrategyRef(GetTable.GetDeleteConflictStrategy).ResolveDeleteConflict(AContext);
+  TioCustomConflictStrategyRef(GetTable.GetDeleteConflictStrategy).ResolveDeleteConflict(Self);
 end;
 
-procedure TioContext.ResolveInsertConflict(const AContext: IioContext);
+procedure TioContext.ResolveInsertConflict;
 begin
-  TioCustomConflictStrategyRef(GetTable.GetInsertConflictStrategy).ResolveInsertConflict(AContext);
+  TioCustomConflictStrategyRef(GetTable.GetInsertConflictStrategy).ResolveInsertConflict(Self);
 end;
 
-procedure TioContext.ResolveUpdateConflict(const AContext: IioContext);
+procedure TioContext.ResolveUpdateConflict;
 begin
-  TioCustomConflictStrategyRef(GetTable.GetUpdateConflictStrategy).ResolveUpdateConflict(AContext);
+  TioCustomConflictStrategyRef(GetTable.GetUpdateConflictStrategy).ResolveUpdateConflict(Self);
 end;
 
 constructor TioContext.Create(const AIntent: TioPersistenceIntentType; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
