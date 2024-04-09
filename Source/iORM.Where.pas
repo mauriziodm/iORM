@@ -64,8 +64,6 @@ type
     FOrderBy: IioSqlItemWhere;
     FClearListBefore: Boolean;
     FCacheable: Boolean;
-    [djSkip]
-    FETMfor: IioBindSource;
     // Contiene le clausole where specificate fino ad ora
     FWhereItems: TWhereItems;
     // Contiene le eventuali clausole where di eventuali dettagli, la chiave è una stringa
@@ -79,6 +77,21 @@ type
     //        (dopo la deserializzazione lato server era in uno stato non ben definito)
     FPagingObj: TioCommonBSAPageManager;
     FPagingObjExists: Boolean;
+    // ETM related fields
+    //  NB: Dall'esterno viene impostato solo il campo "FETMfor" (BindSource) che però poi mi dava dei problemi con
+    //       la connessione http perchè non poteva essere serializzato in modo corretto visto che è un BindSource
+    //       che però serve a ricavare la classe e l'ID dell'oggetto corrente del BindSource puntato appunto da
+    //       "FETMFor" per ricavare la sua classe e il suo ID e poi impostare la condizione where (come testo) per filtrare
+    //       i TimeSlots dell'ETM.
+    //       Quindi per non andare a rifare tutto il discorso dell'ETM qui sull'oggetto where ho deciso di aggiungere
+    //       anche il campo "FETMFor_Sql", questo verrà valorizzato dal metodo "FillETM_Sql" prima
+    //       di essere usato per la creazione della query e, nel caso di una connessione http, prima della serializzazione
+    //       (nella HttpPersistenceStrategy) in modo che sia poi serializzato normalmente (è una stringa).
+    [djSkip]
+    FETMfor: IioBindSource;
+    FETMFor_Sql: String;
+    procedure ClearETM_Sql; inline;
+    procedure FillETM_Sql;  inline;
 
     procedure _Show(const ADataObject: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;
     procedure _Show(const ADataObject: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const AForceTypeNameUse: Boolean); overload;
@@ -688,6 +701,18 @@ begin
   FWhereItems.Clear;
   if AClearWhereDetails then
     FDetailsContainer.Clear;
+  ClearETM_Sql;
+end;
+
+procedure TioWhere.ClearETM_Sql;
+begin
+  FETMFor_Sql := IO_STRING_NULL_VALUE;
+end;
+
+procedure TioWhere.FillETM_Sql;
+begin
+  if Assigned(FETMfor) and FETMfor.IsActive and Assigned(FETMfor.Current) then
+    FETMFor_Sql := TioEtmEngine._InternalBuildWhereTextFor(FETMfor.Current);
 end;
 
 function TioWhere.ClearListBefore(const AClearListBefore: Boolean = True): IioWhere;
@@ -713,6 +738,7 @@ begin
   FClearListBefore := False;
   FCacheable := False;
   FETMfor := nil;
+  ClearETM_Sql;
 end;
 
 procedure TioWhere.CreateIndex(ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
@@ -899,13 +925,15 @@ var
 begin
   // NB: NO inherited
   Result := '';
-  if (FWhereItems.Count = 0) and not Assigned(FETMfor) then
+  if (FWhereItems.Count = 0) and (FETMFor_Sql = IO_STRING_NULL_VALUE) then
     Exit;
   if AddWhere then
     Result := 'WHERE ';
-  // ETMfor
-  if Assigned(FETMfor) and FETMfor.IsActive and Assigned(FETMfor.Current) then
-    Result := Result + TioEtmEngine._InternalBuildWhereTextFor(FETMfor.Current);
+  // ETMfor: NB: le due righe qui sotto erano il vecchio codice che dava problemi con la connessione http (vedi commento in dichiarazione variabili)
+//  if Assigned(FETMfor) and FETMfor.IsActive and Assigned(FETMfor.Current) then
+//    Result := Result + TioEtmEngine._InternalBuildWhereTextFor(FETMfor.Current);
+  if FETMFor_Sql <> IO_STRING_NULL_VALUE then
+    Result := Result + FETMFor_Sql;
   // Add current SqlItem
   for CurrSqlItem in FWhereItems do
   begin

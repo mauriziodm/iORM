@@ -80,6 +80,7 @@ type
     function GetLimitOffset: Integer;
     function GetPagingObj: TObject;  // TObject to avoid circular reference
     procedure SetPagingObj(const APagingObj: TObject);  // TObject to avoid circular reference
+    procedure FillETM_Sql;
     procedure SetETMfor(const AETMfor: IInterface); // IInterface to avoid circular reference
     function GetETMfor: IInterface; // IInterface to avoid circular reference
     function WhereConditionExists: Boolean;

@@ -75,8 +75,8 @@ type
     class procedure RollbackTransaction(const AConnectionName: String); override;
     class function InTransaction(const AConnectionName: String): Boolean; override;
     class procedure Delete(const AWhere: IioWhere); override;
-    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
     class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
+    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
     class function LoadObjVersion(const AContext: IioContext): Integer; override;
     class function Count(const AWhere: IioWhere): Integer; override;
     // SynchroStrategy
@@ -143,7 +143,6 @@ var
 
 begin
   inherited;
-  Result := 0;
   // Resolve the type and alias
   AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
   // Get the transaction collection

@@ -63,7 +63,7 @@ const
   KEY_STREAM = 'Stream';
   KEY_USERID = 'UserID';
   KEY_USERNAME = 'UserName';
-  KEY_USERTOKEN  = 'UserToken';
+  KEY_USERTOKEN = 'UserToken';
   KEY_WHERE = 'Where';
 
 type
@@ -399,7 +399,7 @@ type
 
   IioHttpResponseBody = interface
     ['{E5A14525-308F-4877-99B7-C270D691FC6D}']
-    function ToJSONText: String;
+    function ToJsonText: String;
     // JSONDataValue
     procedure SetJSONDataValue(const Value: TJSONValue);
     function GetJSONDataValue: TJSONValue;
@@ -417,34 +417,40 @@ type
   // Note: {$DEFINE ioStrategyInterceptorsOff} to disable strategy interceptors
   TioPersistenceStrategyIntf = class abstract
   protected
-    // ---------- Begin intercepted methods (StrategyInterceptors) ----------
-    class procedure _DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte); virtual; abstract;
-    class procedure _DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte); virtual; abstract;
+    // ========== BEGIN OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
+    // ---------- Begin intercepted methods (CRUDInterceptors) ----------
+    class procedure _DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
+      const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
+      const ABlindLevel: Byte); virtual; abstract;
+    class procedure _DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
+      const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
+      const ABlindLevel: Byte); virtual; abstract;
     class procedure _DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); virtual; abstract;
     class procedure _DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); virtual; abstract;
     class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType); virtual; abstract;
     class function _DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; virtual; abstract;
-    // ---------- End intercepted methods (StrategyInterceptors) ----------
+    // ---------- End intercepted methods (CRUDInterceptors) ----------
   public
     class procedure StartTransaction(const AConnectionName: String); virtual; abstract;
     class procedure CommitTransaction(const AConnectionName: String); virtual; abstract;
     class procedure RollbackTransaction(const AConnectionName: String); virtual; abstract;
     class function InTransaction(const AConnectionName: String): Boolean; virtual; abstract;
-    class procedure Delete(const AWhere: IioWhere); virtual; abstract;
-    class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); virtual; abstract;
-    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; virtual; abstract;
+    class procedure Delete(const AWhere: IioWhere); virtual;
+    class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); virtual;
+    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; virtual;
     class function LoadObjVersion(const AContext: IioContext): Integer; virtual; abstract;
-    class function Count(const AWhere: IioWhere): Integer; virtual; abstract;
+    class function Count(const AWhere: IioWhere): Integer; virtual;
     // SynchroStrategy
     class procedure DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload); virtual; abstract;
     // SQLDestinations
     class procedure SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); virtual; abstract;
     class procedure SQLDest_Execute(const ASQLDestination: IioSQLDestination); virtual; abstract;
+    // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
+
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------
-    class procedure PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
+    class procedure PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
+      const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
+      const ABlindLevel: Byte);
     class procedure PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
     class procedure DeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
@@ -529,7 +535,8 @@ begin
   begin
     AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName);
     if AContext.BlindLevel_Do_DetectConflicts and AContext.GetProperties.ObjVersionPropertyExist then
-      AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + ' = :' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
+      AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + ' = :' +
+        AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
   end;
   // -----------------------------------------------------------------
 end;
@@ -595,7 +602,8 @@ begin
   // note:
   AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + ' = :' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName);
   if AContext.BlindLevel_Do_DetectConflicts and AContext.GetProperties.ObjVersionPropertyExist then
-    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + ' = :' + AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
+    AQuery.SQL.Add('AND ' + AContext.GetProperties.ObjVersionProperty.GetSqlFieldName + ' = :' +
+      AContext.GetProperties.ObjVersionProperty.GetSqlWhereParamName);
   // -----------------------------------------------------------------
 end;
 
@@ -658,8 +666,8 @@ begin
   // Select
   AQuery.SQL.Add(Format('SELECT MAX(%s) FROM %s WHERE %s = :%s AND %s = :%s', [AEtmContext.GetProperties.GetPropertyByName('EntityVersion').GetSqlFieldName,
     AEtmContext.GetTable.GetSQL, AEtmContext.GetProperties.GetPropertyByName('EntityClassName').GetSqlFieldName,
-    AEtmContext.GetProperties.GetPropertyByName('EntityClassName').GetSqlWhereParamName, AEtmContext.GetProperties.GetPropertyByName('EntityID').GetSqlFieldName,
-    AEtmContext.GetProperties.GetPropertyByName('EntityID').GetSqlWhereParamName]));
+    AEtmContext.GetProperties.GetPropertyByName('EntityClassName').GetSqlWhereParamName, AEtmContext.GetProperties.GetPropertyByName('EntityID')
+    .GetSqlFieldName, AEtmContext.GetProperties.GetPropertyByName('EntityID').GetSqlWhereParamName]));
   // -----------------------------------------------------------------
 end;
 
@@ -841,6 +849,28 @@ end;
 
 { TioStrategyIntf }
 
+class function TioPersistenceStrategyIntf.Count(const AWhere: IioWhere): Integer;
+begin
+  Result := 0;
+  AWhere.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
+end;
+
+class procedure TioPersistenceStrategyIntf.Delete(const AWhere: IioWhere);
+begin
+  AWhere.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
+end;
+
+class procedure TioPersistenceStrategyIntf.LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
+begin
+  AWhere.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
+end;
+
+class function TioPersistenceStrategyIntf.LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
+begin
+  Result := nil;
+  AWhere.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
+end;
+
 class procedure TioPersistenceStrategyIntf.DeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
@@ -857,9 +887,7 @@ begin
     Exit;
 {$ENDIF}
 {$ENDREGION}
-
   _DoDeleteList(AList, AIntent, ABlindLevel);
-
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
   TioStrategyInterceptorRegister.AfterDeleteList(AList);
@@ -883,9 +911,7 @@ begin
     Exit;
 {$ENDIF}
 {$ENDREGION}
-
   _DoDeleteObject(AObj, AIntent, ABlindLevel);
-
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
   TioStrategyInterceptorRegister.AfterDeleteObject(AObj);
@@ -901,6 +927,7 @@ var
 {$ENDIF}
 {$ENDREGION}
 begin
+  AWhere.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
   LDone := False;
@@ -909,9 +936,7 @@ begin
     Exit;
 {$ENDIF}
 {$ENDREGION}
-
   _DoLoadList(AWhere, AList, AIntent);
-
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
   TioStrategyInterceptorRegister.AfterLoadList(AWhere, AList);
@@ -927,6 +952,7 @@ var
 {$ENDIF}
 {$ENDREGION}
 begin
+  AWhere.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
   Result := AObj;
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
@@ -936,9 +962,7 @@ begin
     Exit;
 {$ENDIF}
 {$ENDREGION}
-
   Result := _DoLoadObject(AWhere, Result, AIntent);
-
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
   Result := TioStrategyInterceptorRegister.AfterLoadObject(AWhere, Result);
@@ -946,8 +970,8 @@ begin
 {$ENDREGION}
 end;
 
-class procedure TioPersistenceStrategyIntf.PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
+class procedure TioPersistenceStrategyIntf.PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
+  const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
 var
@@ -963,9 +987,7 @@ begin
     Exit;
 {$ENDIF}
 {$ENDREGION}
-
   _DoPersistList(AList, AIntent, ARelationPropertyName, ARelationOID, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath, ABlindLevel);
-
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
   TioStrategyInterceptorRegister.AfterPersistList(AList);
@@ -973,8 +995,8 @@ begin
 {$ENDREGION}
 end;
 
-class procedure TioPersistenceStrategyIntf.PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
+class procedure TioPersistenceStrategyIntf.PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
+  const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
 var
@@ -990,9 +1012,7 @@ begin
     Exit;
 {$ENDIF}
 {$ENDREGION}
-
   _DoPersistObject(AObj, AIntent, ARelationPropertyName, ARelationOID, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath, ABlindLevel);
-
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
   TioStrategyInterceptorRegister.AfterPersistObject(AObj);

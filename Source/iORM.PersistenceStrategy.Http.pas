@@ -60,8 +60,8 @@ type
     class procedure RollbackTransaction(const AConnectionName: String); override;
     class function InTransaction(const AConnectionName: String): boolean; override;
     class procedure Delete(const AWhere: IioWhere); override;
-    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
     class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
+    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
     class function Count(const AWhere: IioWhere): Integer; override;
     // SQLDestinations
     class procedure SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); override;

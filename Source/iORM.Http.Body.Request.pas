@@ -116,7 +116,9 @@ begin
     if Assigned(LJSONValue) then
       FIntentType := TioPersistenceIntentType((LJSONValue as TJSONNumber).AsInt);
     // JSONDataValue
-    FJSONDataValue := LJSONObject.GetValue(KEY_JSONDATAVALUE);
+    LJSONValue := LJSONObject.GetValue(KEY_INTENTTYPE);
+    if Assigned(LJSONValue) then
+      FJSONDataValue := LJSONValue.Clone as TJSONValue;
     // MethodName
     LJSONValue := LJSONObject.GetValue(KEY_METHODNAME);
     if Assigned(LJSONValue) then
