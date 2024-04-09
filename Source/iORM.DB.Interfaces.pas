@@ -299,7 +299,6 @@ type
     class function _ClosePar: IioSqlItem; virtual;
   end;
 
-  { TODO : Si potrebbe lasciare solo il metodo NewCompareOperator ed eliminare tutto il resto (anche le LogicRelations) }
   // Interfaccia per le classi che devono generare operatori di comparazione
   TioCompareOperator = class abstract
     class function CompareOpToCompareOperator(const ACompareOp: TioCompareOp): IioSqlItem; virtual;
