@@ -148,6 +148,8 @@ begin
   LConnection.StartTransaction;
   try
     LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.BlindLevel := ABlindLevel;
+    LConnection.ioRequestBody.IntentType := AIntent;
     LConnection.ioRequestBody.JSONDataValueAsObject := AList;
     LConnection.Execute('PersistCollection');
     // Commit
@@ -178,6 +180,8 @@ begin
   LConnection.StartTransaction;
   try
     LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.BlindLevel := ABlindLevel;
+    LConnection.ioRequestBody.IntentType := AIntent;
     LConnection.ioRequestBody.JSONDataValueAsObject := AObj;
     LConnection.Execute('DeleteObject');
     // Commit
@@ -230,6 +234,7 @@ begin
   LConnection.StartTransaction;
   try
     LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.IntentType := AIntent;
     LConnection.ioRequestBody.Where := AWhere;
     LConnection.Execute(HTTP_METHOD_NAME_LOADLIST);
     // Deserialize  the JSONDataValue to the result object
@@ -263,6 +268,7 @@ begin
   LConnection.StartTransaction;
   try
     LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.IntentType := AIntent;
     LConnection.ioRequestBody.Where := AWhere;
     LConnection.Execute('LoadObject');
     // Deserialize  the JSONDataValue to the result object
@@ -305,9 +311,10 @@ begin
   LConnection.StartTransaction;
   try
     LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.BlindLevel := ABlindLevel;
+    LConnection.ioRequestBody.IntentType := AIntent;
     LConnection.ioRequestBody.RelationPropertyName := ARelationPropertyName;
     LConnection.ioRequestBody.RelationOID := ARelationOID;
-    LConnection.ioRequestBody.BlindLevel := ABlindLevel;
     LConnection.ioRequestBody.JSONDataValueAsObject := AList;
     LConnection.Execute('PersistCollection');
     // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
@@ -343,9 +350,10 @@ begin
   LConnection.StartTransaction;
   try
     LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.BlindLevel := ABlindLevel;
+    LConnection.ioRequestBody.IntentType := AIntent;
     LConnection.ioRequestBody.RelationPropertyName := ARelationPropertyName;
     LConnection.ioRequestBody.RelationOID := ARelationOID;
-    LConnection.ioRequestBody.BlindLevel := ABlindLevel;
     LConnection.ioRequestBody.JSONDataValueAsObject := AObj;
     LConnection.Execute('PersistObject');
     // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
