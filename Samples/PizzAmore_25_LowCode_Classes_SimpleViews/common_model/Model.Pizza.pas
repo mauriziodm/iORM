@@ -20,7 +20,7 @@ type
     FID: Integer;
     FName: String;
     FPrice: Currency;
-//    [ioSkip([ssETM])]
+    [ioSkip([ssETM])]
     FImage: TBitmap;
     FObjVersion: TioObjVersion; // The ObjVersion is mandatory if you want to use the ETM
   public

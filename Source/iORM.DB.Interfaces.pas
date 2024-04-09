@@ -56,6 +56,7 @@ const
   KEY_BLINDLEVEL = 'BlindLevel';
   KEY_INTENTTYPE = 'IntentType';
   KEY_JSONDATAVALUE = 'JSONDataValue';
+  KEY_METHODNAME = 'MethodName';
   KEY_RELATIONOID = 'RelationOID';
   KEY_RELATIONPROPERTYNAME = 'RelationPropertyName';
   KEY_SQLDESTINATION = 'SQLDestination';

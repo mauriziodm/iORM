@@ -52,7 +52,6 @@ type
     function ToJSONText: String;
   public
     constructor Create;
-    constructor CreateByJSONObject(const AJSONObject: TJSONObject);
     constructor CreateByJSONString(const AJSONString: String);
     destructor Destroy; override;
   end;
@@ -71,8 +70,9 @@ begin
   FStream := nil;
 end;
 
-constructor TioHttpResponseBody.CreateByJSONObject(const AJSONObject: TJSONObject);
+constructor TioHttpResponseBody.CreateByJSONString(const AJSONString: String);
 var
+  LJSONObject: TJSONObject;
   LJSONValue: TJSONValue;
   procedure _LoadStream;
   var
@@ -90,21 +90,16 @@ var
 
 begin
   Self.Create;
-  // JSONDataValue
-  FJSONDataValue := AJSONObject.GetValue(KEY_JSONDATAVALUE);
-  // Stream
-  LJSONValue := AJSONObject.GetValue(KEY_STREAM);
-  if Assigned(LJSONValue) then
-    _LoadStream;
-end;
-
-constructor TioHttpResponseBody.CreateByJSONString(const AJSONString: String);
-var
-  LJSONObject: TJSONObject;
-begin
   LJSONObject := TJSONObject.ParseJSONValue(AJSONString) as TJSONObject;
   try
-    Self.CreateByJSONObject(LJSONObject);
+    // JSONDataValue
+    LJSONValue := LJSONObject.GetValue(KEY_JSONDATAVALUE);
+    if Assigned(LJSONValue) then
+      FJSONDataValue := LJSONValue.Clone as TJSONValue;
+    // Stream
+    LJSONValue := LJSONObject.GetValue(KEY_STREAM);
+    if Assigned(LJSONValue) then
+      _LoadStream;
   finally
     LJSONObject.Free;
   end;
@@ -175,7 +170,7 @@ begin
   try
     // JSONDataValue
     if Assigned(FJSONDataValue) then
-      LJSONObject.AddPair(KEY_JSONDATAVALUE, FJSONDataValue);
+      LJSONObject.AddPair(KEY_JSONDATAVALUE, FJSONDataValue.Clone as TJSONValue);
     // Stream
     if Assigned(FStream) then
       _SaveStream;

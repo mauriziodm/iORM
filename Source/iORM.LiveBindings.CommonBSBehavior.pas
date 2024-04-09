@@ -4,7 +4,7 @@
   *           iORM - (interfaced ORM)                                        *
   *                                                                          *
   *           Copyright (C) 2015-2023 Maurizio Del Magno                     *
-  *                                                                          *
+  *                                                                          *                                    fv
   *           mauriziodm@levantesw.it                                        *
   *           mauriziodelmagno@gmail.com                                     *
   *           https://github.com/mauriziodm/iORM.git                         *
@@ -303,7 +303,7 @@ var
   LMasterBindSource: IioMasterBindSource;
 begin
   // Estract the bind source as IioMasterBindSource
-  if not Supports(ABindSource, IioMasterBindSource, LMasterBindSOurce) then
+  if not Supports(ABindSource, IioMasterBindSource, LMasterBindSource) then
     raise EioException.Create(ClassName, 'SetETMfor',
       Format('The "%s" bind source received by the "ABindSource" parameter does not implement the "IioMasterBindSource".', [ABindSource.GetName]));
   // Controlla che non sia già assegnato (lo stesso)
@@ -320,7 +320,7 @@ begin
       #13#13'For this reason, setting the "ETMfor" property of a BindSource while it is active IS NOT PERMITTED.' +
       #13#13'If you really need to do that then you need to close the BindSource first and then set its property "ETMfor" (which will cause the BindSource to open immediately).' +
       #13#13'Did you understand?', [LMasterBindSource.GetName]));
-  // If the private where field is assigned the set even to it
+  // If the private where field is assigned then set even to it
   if Assigned(LMasterBindSource.Where) then
     LMasterBindSource.Where.SetETMfor(AETMfor);
   // If the adapter is present then set even to it

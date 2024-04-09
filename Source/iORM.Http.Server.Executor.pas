@@ -36,7 +36,7 @@ unit iORM.Http.Server.Executor;
 interface
 
 uses
-  iORM.DB.Interfaces;
+  iORM.DB.Interfaces, System.DateUtils;
 
 type
 
@@ -54,8 +54,8 @@ type
     class procedure _SQLDestExecute(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
     class procedure _SQLLoadDataSet(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
   public
-    class function Execute(const ARequestBodyAsString: String): String; inline; static;
-    class function Test: String; inline; static;
+    class function Execute(const ARequestBodyAsString: String): String; static;
+    class function Test: String; static;
   end;
 
 implementation
@@ -63,7 +63,7 @@ implementation
 uses
   iORM, DJSON, iORM.Http.Factory, iORM.Http.Interfaces, iORM.Exceptions,
   System.SysUtils, System.JSON, FireDAC.Comp.Client, FireDAC.Stan.Intf,
-  System.Generics.Collections, iORM.Utilities, System.DateUtils;
+  System.Generics.Collections, iORM.Utilities;
 
 { TioHttpServerExecutor }
 
@@ -106,7 +106,7 @@ end;
 
 class function TioHttpServerExecutor.Test: String;
 begin
-  Result := Format('iORM http server executor connected succesfully now %s.', [Now.ToString]);
+  Result := Format('Hi, I''m iORM, I''m proud to tell you that my http server executor is successfully connected now %s.', [Now.ToString]);
 end;
 
 class procedure TioHttpServerExecutor._Count(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);

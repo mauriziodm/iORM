@@ -12,9 +12,7 @@ uses
   Web.WebBroker,
   IdContext,
   IdHTTPWebBrokerBridge,
-  Controller in 'Controller.pas',
   WebModule in 'WebModule.pas' {MyWebModule: TWebModule},
-  iORM.Remote.DMVC.Controller in '..\..\..\Source\iORM.Remote.DMVC.Controller.pas',
   ETM.Repository in '..\common_model\ETM.Repository.pas',
   Model.Customer in '..\common_model\Model.Customer.pas',
   Model.Order in '..\common_model\Model.Order.pas',
@@ -22,7 +20,8 @@ uses
   Model.Pizza in '..\common_model\Model.Pizza.pas',
   Utils.SampleData in '..\common_model\Utils.SampleData.pas',
   Where.Order in '..\common_model\Where.Order.pas',
-  Where.Pizza in '..\common_model\Where.Pizza.pas';
+  Where.Pizza in '..\common_model\Where.Pizza.pas',
+  iORM.Http.Server.DMVC.Controller in '..\..\..\Source\http_server_units\iORM.Http.Server.DMVC.Controller.pas';
 
 {$R *.res}
 

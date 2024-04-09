@@ -8505,7 +8505,7 @@ object MainForm: TMainForm
   object ButtonOrders: TButton
     Left = 43
     Top = 334
-    Width = 129
+    Width = 121
     Height = 44
     Action = acShowOrders
     Anchors = [akLeft, akRight, akBottom]
@@ -8517,12 +8517,12 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 0
     ExplicitTop = 333
-    ExplicitWidth = 125
+    ExplicitWidth = 117
   end
   object ButtonCustomers: TButton
     Left = 43
     Top = 384
-    Width = 129
+    Width = 121
     Height = 44
     Action = acShowCustomers
     Anchors = [akLeft, akRight, akBottom]
@@ -8534,12 +8534,12 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 1
     ExplicitTop = 383
-    ExplicitWidth = 125
+    ExplicitWidth = 117
   end
   object ButtonPizzas: TButton
     Left = 43
     Top = 434
-    Width = 129
+    Width = 121
     Height = 44
     Action = acShowPizzas
     Anchors = [akLeft, akRight, akBottom]
@@ -8551,12 +8551,12 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 2
     ExplicitTop = 433
-    ExplicitWidth = 125
+    ExplicitWidth = 117
   end
   object ButtonQuit: TButton
     Left = 43
     Top = 499
-    Width = 129
+    Width = 121
     Height = 32
     Action = acQuit
     Anchors = [akLeft, akRight, akBottom]
@@ -8568,7 +8568,7 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 3
     ExplicitTop = 498
-    ExplicitWidth = 125
+    ExplicitWidth = 117
   end
   object ioVCL1: TioVCL
     Left = 8
@@ -8623,7 +8623,7 @@ object MainForm: TMainForm
   end
   object HttpConn: TioHttpConnectionDef
     AsDefault = True
-    BaseURL = 'http://localhost:8080/jsonrpc'
+    BaseURL = 'http://localhost:8080/iorm'
     Persistent = True
     Left = 48
     Top = 200

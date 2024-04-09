@@ -114,13 +114,11 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="Controller.pas"/>
         <DCCReference Include="WebModule.pas">
             <Form>MyWebModule</Form>
             <FormType>dfm</FormType>
             <DesignClass>TWebModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="..\..\..\Source\iORM.Remote.DMVC.Controller.pas"/>
         <DCCReference Include="..\common_model\ETM.Repository.pas"/>
         <DCCReference Include="..\common_model\Model.Customer.pas"/>
         <DCCReference Include="..\common_model\Model.Order.pas"/>
@@ -129,6 +127,7 @@
         <DCCReference Include="..\common_model\Utils.SampleData.pas"/>
         <DCCReference Include="..\common_model\Where.Order.pas"/>
         <DCCReference Include="..\common_model\Where.Pizza.pas"/>
+        <DCCReference Include="..\..\..\Source\http_server_units\iORM.Http.Server.DMVC.Controller.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

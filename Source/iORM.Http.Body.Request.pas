@@ -47,7 +47,7 @@ type
     FBlindLevel: TioNullableByte;
     FIntentType: TioPersistenceIntentType;
     FJSONDataValue: TJSONValue;
-    FMethodName: String;
+    FMethodName: TioNullableString;
     FRelationOID: TioNullableInteger;
     FRelationPropertyName: TioNullableString;
     FSQLDestination: IioSQLDestination;
@@ -117,6 +117,10 @@ begin
       FIntentType := TioPersistenceIntentType((LJSONValue as TJSONNumber).AsInt);
     // JSONDataValue
     FJSONDataValue := LJSONObject.GetValue(KEY_JSONDATAVALUE);
+    // MethodName
+    LJSONValue := LJSONObject.GetValue(KEY_METHODNAME);
+    if Assigned(LJSONValue) then
+      FMethodName.Value := LJSONValue.Value;
     // RelationOID
     LJSONValue := LJSONObject.GetValue(KEY_RELATIONOID);
     if Assigned(LJSONValue) then
@@ -161,7 +165,7 @@ begin
   FBlindLevel.Clear;
   FIntentType := itRegular;
   FJSONDataValue := nil;
-  FMethodName := String.Empty;
+  FMethodName.Clear;
   FRelationOID.Clear;
   FRelationPropertyName.Clear;
   FSQLDestination := nil;
@@ -196,7 +200,7 @@ end;
 
 function TioHttpRequestBody.GetMethodName: String;
 begin
-  Result := FMethodName;
+  Result := FMethodName.Value;
 end;
 
 function TioHttpRequestBody.GetRelationOID: Integer;
@@ -259,7 +263,7 @@ end;
 
 procedure TioHttpRequestBody.SetMethodName(const Value: String);
 begin
-  FMethodName := Value;
+  FMethodName.Value := Value;
 end;
 
 procedure TioHttpRequestBody.SetRelationOID(const Value: Integer);
@@ -315,6 +319,12 @@ begin
     LJSONObject.AddPair(KEY_INTENTTYPE, LJSONValue);
     // JSONDataValue
     LJSONObject.AddPair(KEY_JSONDATAVALUE, FJSONDataValue);
+    // MethodName
+    if FMethodName.HasValue then
+    begin
+      LJSONValue := TJSONString.Create(FMethodName.Value);
+      LJSONObject.AddPair(KEY_METHODNAME, LJSONValue);
+    end;
     // RelationOID
     if FRelationOID.HasValue then
     begin

@@ -47,7 +47,7 @@ uses
   iORM.Context.Map.Interfaces, FireDAC.Comp.Client, System.TypInfo,
   iORM.Utilities, iORM.LiveBindings.CommonBSAPaging,
   iORM.Context.Interfaces, iORM.StdActions.Interfaces,
-  iORM.LiveBindings.Interfaces;
+  iORM.LiveBindings.Interfaces, DJSON.Attributes;
 
 type
 
@@ -64,6 +64,7 @@ type
     FOrderBy: IioSqlItemWhere;
     FClearListBefore: Boolean;
     FCacheable: Boolean;
+    [djSkip]
     FETMfor: IioBindSource;
     // Contiene le clausole where specificate fino ad ora
     FWhereItems: TWhereItems;

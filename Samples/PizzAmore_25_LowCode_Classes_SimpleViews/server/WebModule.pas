@@ -6,11 +6,13 @@ uses
   System.SysUtils,
   System.Classes,
   Web.HTTPApp,
-  MVCFramework, iORM, iORM.Attributes, iORM.CommonTypes, iORM.DBBuilder.Interfaces, iORM.DB.ConnectionDef;
+  MVCFramework, iORM, iORM.Attributes, iORM.CommonTypes, iORM.DBBuilder.Interfaces, iORM.DB.ConnectionDef, iORM.Abstraction.VCL;
 
 type
   TMyWebModule = class(TWebModule)
     FirebirdConn: TioFirebirdConnectionDef;
+    ioVCL1: TioVCL;
+    SQLiteConn: TioSQLiteConnectionDef;
     procedure WebModuleCreate(Sender: TObject);
     procedure WebModuleDestroy(Sender: TObject);
     procedure FirebirdConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
@@ -28,13 +30,12 @@ implementation
 
 {$R *.dfm}
 
-uses 
-  Controller,
+uses
   System.IOUtils, 
   MVCFramework.Commons, 
   MVCFramework.Middleware.StaticFiles, 
-  MVCFramework.Middleware.Compression, iORM.Remote.DMVC.Controller,
-  Utils.SampleData;
+  MVCFramework.Middleware.Compression,
+  Utils.SampleData, iORM.Http.Server.DMVC.Controller;
 
 procedure TMyWebModule.FirebirdConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
   AWarnings: TStrings);
@@ -70,9 +71,8 @@ begin
       // Max request size in bytes
       Config[TMVCConfigKey.MaxRequestSize] := IntToStr(TMVCConstants.DEFAULT_MAX_REQUEST_SIZE);
     end);
-  FMVC.AddController(TMyController);
   FMVC.AddController(TioDMVCController);
-  FMVC.AddController(TioDmvcJsonRpcController, '/jsonrpc');
+//  FMVC.AddController(TioDmvcJsonRpcController, '/jsonrpc');
 
   // Enable the following middleware declaration if you want to
   // serve static files from this dmvcframework service.

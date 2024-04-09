@@ -36,7 +36,7 @@ unit iORM.Http.Connection;
 interface
 
 uses
-  iORM.DB.Connection, iORM.DB.Interfaces, REST.Client, iORM.Http.Interfaces;
+  iORM.DB.Connection, iORM.DB.Interfaces, iORM.Http.Interfaces, REST.Client;
 
 type
 
@@ -70,7 +70,7 @@ type
 implementation
 
 uses
-  iORM.Http.Factory, REST.Types, IPPeerClient, System.JSON, System.SysUtils;
+  iORM.Http.Factory, REST.Types, System.SysUtils;
 
 { TioConnectionHttp }
 
@@ -91,7 +91,7 @@ begin
   FRESTRequest := TRESTRequest.Create(nil);
   FRESTRequest.Client := FRESTClient;
   FRESTRequest.Method := TRESTRequestMethod.rmPUT;
-  FRESTRequest.Resource := '/execute';
+  FRESTRequest.Resource := '/execute_action';
   FRESTRequest.Response := FRESTResponse;
   // create request body (not the response body)
   FioHttpRequestBody := TioHttpFactory.NewRequestBody;

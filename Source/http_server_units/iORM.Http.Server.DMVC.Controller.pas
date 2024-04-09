@@ -43,7 +43,7 @@ type
   [MVCPath('/iorm')]
   TioDMVCController = class(TMVCController)
   public
-    [MVCPath('/execute'), MVCHTTPMethod([httpPUT]), MVCProduce('application/json'), MVCConsumes('application/json')]
+    [MVCPath('/execute_action'), MVCHTTPMethod([httpPUT]), MVCProduce('application/json'), MVCConsumes('application/json')]
     [MVCDoc('Execute an iORM action using DMVC framework as http transport layer.')]
     procedure Execute;
     [MVCPath('/test'), MVCHTTPMethod([httpGET])]
