@@ -2,7 +2,7 @@ object MyWebModule: TMyWebModule
   OnCreate = WebModuleCreate
   OnDestroy = WebModuleDestroy
   Actions = <>
-  Height = 230
+  Height = 225
   Width = 415
   object FirebirdConn: TioFirebirdConnectionDef
     AsDefault = False

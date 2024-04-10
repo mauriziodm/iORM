@@ -344,6 +344,8 @@ object PizzaListForm: TPizzaListForm
   object DSPizzas: TioDataSetMaster
     AsDefault = True
     TypeName = 'TPizza'
+    AsyncLoad = True
+    AsyncPersist = True
     OrderBy = '[.Name]'
     Paging.CurrentPageOfFormat = '%d/%d'
     Left = 80

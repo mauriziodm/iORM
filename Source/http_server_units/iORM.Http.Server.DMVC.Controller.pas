@@ -45,7 +45,7 @@ type
   public
     [MVCPath('/execute_action'), MVCHTTPMethod([httpPUT]), MVCProduce('application/json'), MVCConsumes('application/json')]
     [MVCDoc('Execute an iORM action using DMVC framework as http transport layer.')]
-    procedure Execute;
+    procedure ExecuteAction;
     [MVCPath('/test'), MVCHTTPMethod([httpGET])]
     [MVCDoc('Execute a connection test.')]
     procedure Test;
@@ -64,7 +64,7 @@ uses
 
 { TioDMVCController }
 
-procedure TioDMVCController.Execute;
+procedure TioDMVCController.ExecuteAction;
 var
   LResponse: String;
 begin

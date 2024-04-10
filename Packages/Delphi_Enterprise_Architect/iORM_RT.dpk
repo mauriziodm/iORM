@@ -239,7 +239,8 @@ contains
   iORM.SynchroStrategy.Interfaces in '..\..\Source\iORM.SynchroStrategy.Interfaces.pas',
   iORM.SynchroStrategy.EtmBased in '..\..\Source\iORM.SynchroStrategy.EtmBased.pas',
   iORM.SynchroStrategy.Custom in '..\..\Source\iORM.SynchroStrategy.Custom.pas',
-  iORM.Http.Server.Executor in '..\..\Source\iORM.Http.Server.Executor.pas';
+  iORM.Http.Server.Executor in '..\..\Source\iORM.Http.Server.Executor.pas',
+  iORM.Http.WebBroker.Producer in '..\..\Source\iORM.Http.WebBroker.Producer.pas';
 
 end.
 
