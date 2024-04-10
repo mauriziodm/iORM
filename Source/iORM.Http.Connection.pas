@@ -40,6 +40,8 @@ uses
 
 type
 
+  // TODO: HTTP-JSONRPC: ho fatto un tentativo anche con json-rpc ma per il momento non funziona ancora
+
   // This is the specialized class for http connections
   TioConnectionHttp = class(TioConnectionBase, IioConnectionHttp)
   strict private
@@ -51,6 +53,7 @@ type
     FAsJsonRpc: Boolean;
     procedure Execute(const AMethodName:String);
     function WrapBodyAsJsonRpcRequest(const AJSONText: String): String;
+    function UnwrapBodyAsJsonRpcResponse(const AJSONText: String): String;
   strict protected
     procedure DoStartTransaction; override;
     procedure DoCommitTransaction; override;
@@ -70,7 +73,7 @@ type
 implementation
 
 uses
-  iORM.Http.Factory, REST.Types, System.SysUtils;
+  iORM.Http.Factory, REST.Types, System.SysUtils, System.JSON, iORM.Exceptions;
 
 { TioConnectionHttp }
 
@@ -109,16 +112,20 @@ end;
 
 procedure TioConnectionHttp.Execute(const AMethodName:String);
 begin
-  // Set the request & execute it
+  // Set the request
   FRESTRequest.ClearBody;
   FioHttpRequestBody.MethodName := AMethodName;
   if FAsJsonRpc then
     FRESTRequest.AddBody(WrapBodyAsJsonRpcRequest(FioHttpRequestBody.ToJSONText), ctAPPLICATION_JSON)
   else
     FRESTRequest.AddBody(FioHttpRequestBody.ToJSONText, ctAPPLICATION_JSON);
+  // Send/Execute the request
   FRESTRequest.Execute;
   // Create and set the ioRESTResponseBody
-  FioHttpResponseBody := TioHttpFactory.NewResponseBodyByJSONString(FRESTResponse.Content);
+  if FAsJsonRpc then
+    FioHttpResponseBody := TioHttpFactory.NewResponseBodyByJSONString(UnwrapBodyAsJsonRpcResponse(FRESTResponse.Content))
+  else
+    FioHttpResponseBody := TioHttpFactory.NewResponseBodyByJSONString(FRESTResponse.Content);
 end;
 
 procedure TioConnectionHttp.DoCommitTransaction;
@@ -156,9 +163,28 @@ begin
   Result := False;
 end;
 
+function TioConnectionHttp.UnwrapBodyAsJsonRpcResponse(const AJSONText: String): String;
+var
+  LJSONObject: TJSONObject;
+  LJSONValue: TJSONValue;
+begin
+  LJSONObject := TJSONObject.ParseJSONValue(AJSONText) as TJSONObject;
+  try
+    LJSONValue := LJSONObject.FindValue('result');
+    if LJSONValue <> nil then
+      Exit(LJSONValue.ToJSON);
+    LJSONValue := LJSONObject.FindValue('error');
+    if LJSONValue <> nil then
+      raise EioHTTPException.Create(ClassName, 'UnwrapBodyAsJsonRpcResponse', LJSONValue.ToString);
+    raise EioHTTPException.Create(ClassName, 'UnwrapBodyAsJsonRpcResponse', Format('Invalid JSON-RPC response: "%s"', [AJSONText]));
+  finally
+    LJSONObject.Free;
+  end;
+end;
+
 function TioConnectionHttp.WrapBodyAsJsonRpcRequest(const AJSONText: String): String;
 begin
-  Result := Format('{"jsonrpc": "2.0", "method": "execute", "params": ["%s"], "id": %d}', [FioHttpRequestBody.ToJSONText, Random(1000)]);
+  Result := Format('{"jsonrpc": "2.0", "method": "execute_action", "params": ["%s"], "id": %d}', [FioHttpRequestBody.ToJSONText, Random(1000)]);
 end;
 
 end.

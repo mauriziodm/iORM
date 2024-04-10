@@ -53,8 +53,8 @@ type
 
   TioDmvcJsonRpcController = class(TMVCJSONRPCController)
   public
-    function Execute(const AioRequestBodyAsString: String): String;
-    function Test: String;
+    function execute_action(const AioRequestBodyAsString: String): String;
+    function test: String;
   end;
 
 implementation
@@ -82,7 +82,7 @@ end;
 
 { TioDmvcJsonRpcController }
 
-function TioDmvcJsonRpcController.execute(const AioRequestBodyAsString: String): String;
+function TioDmvcJsonRpcController.execute_action(const AioRequestBodyAsString: String): String;
 begin
   Result := TioHttpServerExecutor.Execute(AioRequestBodyAsString);
 end;

@@ -72,7 +72,7 @@ begin
       Config[TMVCConfigKey.MaxRequestSize] := IntToStr(TMVCConstants.DEFAULT_MAX_REQUEST_SIZE);
     end);
   FMVC.AddController(TioDMVCController);
-//  FMVC.AddController(TioDmvcJsonRpcController, '/jsonrpc');
+//  FMVC.AddController(TioDmvcJsonRpcController, '/iorm');
 
   // Enable the following middleware declaration if you want to
   // serve static files from this dmvcframework service.
