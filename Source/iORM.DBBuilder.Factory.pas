@@ -138,7 +138,7 @@ begin
       Result := TioDBBuilderSqlGenMSSqlServer.Create(ASchema);
 {$ENDIF}
   else
-    raise EioException.Create(ClassName, 'NewSqlGenerator', 'Connection type not found');
+    raise EioGenericException.Create(ClassName, 'NewSqlGenerator', 'Connection type not found');
   end;
 end;
 
@@ -151,7 +151,7 @@ begin
     ctSQLite:
       Result := TioDBBuilderStrategyWithoutAlter.Create(ASchema, ASqlGenerator);
   else
-    raise EioException.Create(ClassName, 'NewStrategy', 'Connection type not found');
+    raise EioGenericException.Create(ClassName, 'NewStrategy', 'Connection type not found');
   end;
 end;
 

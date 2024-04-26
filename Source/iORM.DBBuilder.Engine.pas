@@ -83,7 +83,7 @@ begin
   if (Status > dbUptodate) or AForce then
   begin
     if Status = dbWarningExists then
-      raise EioException.Create(ClassName, 'GenerateDB', 'Database to be updated but WARNINGS exists');
+      raise EioGenericException.Create(ClassName, 'GenerateDB', 'Database to be updated but WARNINGS exists');
     if Status = dbNotExists then
       FSqlGenerator.CreateDatabase;
     TioDBFactory.Script(FSchema.ConnectionDefName, Script).Execute;

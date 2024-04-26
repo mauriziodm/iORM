@@ -135,7 +135,7 @@ begin
     // If FDI_VMInterface property is not empty but the ViewModel is already assigned the raise an exception.
     //   else try to locate the correct ViewModel through this property value
     if Assigned(FViewModel) then
-      raise EioException.Create(ClassName, 'CheckForViewModel', Format('Hi, I am the ViewModelBridge component named "%s" on view "%s" and I have a problem.' +
+      raise EioGenericException.Create(ClassName, 'CheckForViewModel', Format('Hi, I am the ViewModelBridge component named "%s" on view "%s" and I have a problem.' +
         #13#13'My property "DI_VMInterface" is set but a ViewModel was already found.' +
         #13#13'I remind you that the "DI_VMInterface" property should normally be left empty, it can be used in the rare cases in which a ViewModel cannot be found normally.' +
         #13#13'Through this property the ViewModelBridge can directly and autonomously request the ViewModel that implements the specified interface from the Dependency Injection Container (e.g. the main form of a Delphi application if you want to consider it a view).' +
@@ -144,7 +144,7 @@ begin
     else
       LObj := io.di.LocateVM(FDI_VMInterface, nil, FDI_VMAlias).Get;
       if not Supports(LObj, IioViewModel, FViewModel) then
-        raise EioException.Create(Self.ClassName, 'CheckForViewModel', Format('"IioViewModel" interface is not implemented by the object of class "%s".', [LObj.ClassName]));
+        raise EioGenericException.Create(Self.ClassName, 'CheckForViewModel', Format('"IioViewModel" interface is not implemented by the object of class "%s".', [LObj.ClassName]));
   end;
   // ===============================================================================================================================
   // onNeedViewModel just after it has been assigned (for any changes/additions to the ViewModel itself)
@@ -221,7 +221,7 @@ begin
   if Assigned(FViewModel) then
     Result := FViewModel.VMAction[AName]
   else
-    raise EioException.Create(Self.Name, 'GetVMAction', '"FViewModel" not assigned.');
+    raise EioGenericException.Create(Self.Name, 'GetVMAction', '"FViewModel" not assigned.');
 end;
 
 function TioViewModelBridge.GetVMActions: IioVMActionContainer;
@@ -229,7 +229,7 @@ begin
   if Assigned(FViewModel) then
     Result := FViewModel.VMActions
   else
-    raise EioException.Create(Self.Name, 'GetVMActions', '"FViewModel" not assigned.');
+    raise EioGenericException.Create(Self.Name, 'GetVMActions', '"FViewModel" not assigned.');
 end;
 
 function TioViewModelBridge.Get_Version: String;
@@ -243,7 +243,7 @@ begin
   if Assigned(FViewModel) then
     Result := FViewModel.DefaultPresenter
   else
-    raise EioException.Create(Self.Name, 'GetDefaultPresenter', '"FViewModel" not assigned.');
+    raise EioGenericException.Create(Self.Name, 'GetDefaultPresenter', '"FViewModel" not assigned.');
 end;
 
 function TioViewModelBridge.GetPresenter(const AName: String): IioBindSource;
@@ -252,13 +252,13 @@ begin
   if Assigned(FViewModel) then
     Result := FViewModel.Presenter[AName]
   else
-    raise EioException.Create(Self.Name, 'GetPresenter', '"FViewModel" not assigned.');
+    raise EioGenericException.Create(Self.Name, 'GetPresenter', '"FViewModel" not assigned.');
 end;
 
 function TioViewModelBridge.GetViewModel: IioViewModel;
 begin
   if not Assigned(FViewModel) then
-    raise EioException.Create(Self.ClassName, 'GetViewModel', 'ViewModel not assigned.');
+    raise EioGenericException.Create(Self.ClassName, 'GetViewModel', 'ViewModel not assigned.');
   Result := FViewModel;
 end;
 
@@ -269,7 +269,7 @@ begin
   Result := nil;
   LIID := TioUtilities.TypeInfoToGUID(TypeInfo(T));
   if not Supports(FViewModel, LIID, Result) then
-    raise EioException.Create(Self.ClassName + ': Interface not implemented by the ViewModel.');
+    raise EioGenericException.Create(Self.ClassName + ': Interface not implemented by the ViewModel.');
 end;
 
 function TioViewModelBridge.ViewModelIsAssigned: Boolean;

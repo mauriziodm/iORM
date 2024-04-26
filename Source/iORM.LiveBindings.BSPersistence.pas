@@ -488,7 +488,7 @@ procedure TioBSPersistence.Reload(const ARaiseIfSavedRevertPointExists: Boolean;
 begin
   // Reload from a bind source is possible only is ALoadType is NOT set to ftManual
   if FBindSource.LoadType = ltManual then
-    raise EioException.Create(ClassName, 'Reload',
+    raise EioGenericException.Create(ClassName, 'Reload',
       Format('Invoking the "Reload" method is NOT allowed if the "LoadType" property is set to "ltManual".'#13#13'Please set the property "LoadType" of the bind source "%s" (maybe a DataSet or BindSource) to a value other than "ltManual" and try again.',
       [FBindSource.GetName]));
   // Il primo "CheckUnassigned" viene usato per verificare solamente se un BindSOurce è assegnato
@@ -580,7 +580,7 @@ begin
   begin
     LSourceBS := FBindSource.GetSourceBS;
     if not Assigned(LSourceBS) then
-      raise EioException.Create(ClassName, '_InternalRevertWhenFromBSLoadType',
+      raise EioGenericException.Create(ClassName, '_InternalRevertWhenFromBSLoadType',
         Format('In component "%s" the "LoadType" property has been set to one of this values ("ltFromBSAsIs" or "ltFromBSReload" or "ltFromBSReloadNewInstance") but the "SourceXXX" property (maybe SourceDataSet, SourcePBS or SourcePresenter) has been left blank.'
         + #13#13'iORM is therefore unable to continue.'#13#13'Please set the "SourceXXX" property of bind source "%s" and then try again.',
         [FBindSource.GetName, FBindSource.GetName]));

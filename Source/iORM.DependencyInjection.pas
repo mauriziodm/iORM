@@ -1123,13 +1123,13 @@ begin
     begin
       AKey := Copy(AKey, 5, 99);
       if ASubKey.IsEmpty then
-        raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+        raise EioGenericException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
           #13#13'A ViewModel for "%s" is required but I cannot find any registered.' +
           #13#13'Perhaps you forgot to register it, to do so you can decorate the ViewModel class with the attribute "[diViewModelFor(%s)]" or you can write some code like: "io.di.RegisterClass<TMyViewModel>.AsViewModelFor<%s>.Execute".' +
           #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
           #13#13'This will work.', [AKey, AKey, AKey]))
       else
-        raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+        raise EioGenericException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
           #13#13'A ViewModel for "%s" (alias "%s") is required but I cannot find any registered.' +
           #13#13'Perhaps you forgot to register it, to do so you can decorate the ViewModel class with the attribute "[diViewModelFor(%s,"%s")]" or you can write some code like: "io.di.RegisterClass<TMyViewModel>.AsViewModelFor<%s>("%s").Execute".' +
           #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
@@ -1141,13 +1141,13 @@ begin
     begin
       AKey := Copy(AKey, 4, 99);
       if ASubKey.IsEmpty then
-        raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+        raise EioGenericException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
           #13#13'A View for "%s" is required but I cannot find any registered.' +
           #13#13'Perhaps you forgot to register it, to do so you can decorate the View class with the attribute "[diViewFor(%s)]" or you can write some code like: "io.di.RegisterClass<TMyViewModel>.AsViewFor<%s>.Execute".' +
           #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
           #13#13'This will work.', [AKey, AKey, AKey]))
       else
-        raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+        raise EioGenericException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
           #13#13'A View for "%s" (alias "%s") is required but I cannot find any registered.' +
           #13#13'Perhaps you forgot to register it, to do so you can decorate the View class with the attribute "[diViewFor(%s,"%s")]" or you can write some code like: "io.di.RegisterClass<TMyViewModel>.AsViewFor<%s>("%s").Execute".' +
           #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
@@ -1159,13 +1159,13 @@ begin
     begin
       AKey := Copy(AKey, 5, 99);
       if ASubKey.IsEmpty then
-        raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+        raise EioGenericException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
           #13#13'A SimpleView for "%s" is required but I cannot find any registered.' +
           #13#13'Perhaps you forgot to register it, to do so you can decorate the SimpleView class with the attribute "[diSimpleViewFor(%s)]" or you can write some code like: "io.di.RegisterClass<TMyViewModel>.AsSimpleViewFor<%s>.Execute".' +
           #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
           #13#13'This will work.', [AKey, AKey, AKey]))
       else
-        raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+        raise EioGenericException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
           #13#13'A SimpleView for "%s" (alias "%s") is required but I cannot find any registered.' +
           #13#13'Perhaps you forgot to register it, to do so you can decorate the SimpleView class with the attribute "[diSimpleViewFor(%s,"%s")]" or you can write some code like: "io.di.RegisterClass<TMyViewModel>.AsSimpleViewFor<%s>("%s").Execute".' +
           #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
@@ -1175,13 +1175,13 @@ begin
     else
     begin
       if ASubKey.IsEmpty then
-        raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+        raise EioGenericException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
           #13#13'Services of the "%s" interface are required but I cannot find any registered class that implements it.' +
           #13#13'Maybe you forgot to register the class, to do so you can decorate it with the "[diImplements(%s)]" attribute or you can write some code like: "io.di.RegisterClass<TMyClass>.Implements<%s>.Execute".' +
           #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
           #13#13'This will work.', [AKey, AKey, AKey]))
       else
-        raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+        raise EioGenericException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
           #13#13'Services of the "%s" interface (alias "%s") are required but I cannot find any registered class that implements it.' +
           #13#13'Maybe you forgot to register the class, to do so you can decorate it with the "[diImplements(%s, ''%s'')]" attribute or you can write some code like: "io.di.RegisterClass<TMyClass>.Implements<%s>(''%s'').Execute".' +
           #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
@@ -1194,7 +1194,7 @@ class function TioDependencyInjectionContainer.GetInterfaceImplementers(AKey: Ti
 begin
   AKey := Uppercase(AKey);
   if not Self.ImplementersExists(AKey) then
-    raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+    raise EioGenericException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
       #13#13'I was looking for a list of all registered classes implementing "%s" but couldn''t find any.' +
       #13#13'I remind you that you can register a class as an implementer of an interface by decorating it with the attribute "[diImplements (%s)]" or you can write some code like: "io.di.RegisterClass<TMyClass>.Implements<%s>.Execute".' +
       #13#13'If you decide to use the attribute, make sure you put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
@@ -1543,7 +1543,7 @@ begin
   Result := nil;
   // Check if FForEachModelPresenter is assigned
   if not Assigned(FForEachModelPresenter) then
-    raise EioException.Create(Self.ClassName, 'ShowCurrent',
+    raise EioGenericException.Create(Self.ClassName, 'ShowCurrent',
       '"FForEachModelPresenter" private field not assigned...'#13#13'ShowCurrent must be used with "io.ShowCurrent(AModelPrenter)" or "io.di.LocateViewVMFor(AModelPresenter)..." or other equivalent with ModelPresenter as parameter.');
   // Check for BindSourceAdapter and not empty
   FForEachModelPresenter.CheckAdapter(True);
@@ -1559,7 +1559,7 @@ var
 begin
   // Check if FForEachModelPresenter is assigned
   if not Assigned(FForEachModelPresenter) then
-    raise EioException.Create(Self.ClassName, 'ShowCurrent',
+    raise EioGenericException.Create(Self.ClassName, 'ShowCurrent',
       '"FForEachModelPresenter" private field not assigned...'#13#13'ShowCurrent must be used with "io.ShowCurrent(AModelPrenter)" or "io.di.LocateViewVMFor(AModelPresenter)..." or other equivalent with ModelPresenter as parameter.');
   // Check for BindSourceAdapter and not empty
   FForEachModelPresenter.CheckAdapter(True);
@@ -1806,7 +1806,7 @@ var
 begin
   // Check if FForEachModelPresenter is assigned
   if not Assigned(FForEachModelPresenter) then
-    raise EioException.Create(Self.ClassName, 'ShowCurrent',
+    raise EioGenericException.Create(Self.ClassName, 'ShowCurrent',
       '"FForEachModelPresenter" private field not assigned...'#13#13'ShowCurrent must be used with "io.ShowCurrent(AModelPrenter)" or "io.di.LocateViewVMFor(AModelPresenter)..." or other equivalent with ModelPresenter as parameter.');
   // Retrieve the correct locator
   if FInterfaceName.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX) then
@@ -1903,11 +1903,11 @@ begin
   end
   else
     if AVVMAlias.IsEmpty then
-      raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+      raise EioGenericException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
         #13#13'A View+ViewModel or a SimpleView for the "%s" class is required but I cannot find any registered.',
         [ATargetBS.Current.ClassName]))
     else
-      raise EioException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+      raise EioGenericException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
         #13#13'A View+ViewModel or a SimpleView for the "%s" class (alias "%s") is required but I cannot find any registered.',
         [ATargetBS.Current.ClassName, AVVMAlias]));
 
@@ -2141,7 +2141,7 @@ begin
   LResolvedTypeList := Resolve(ATypeName, AAlias, TioResolverMode.rmAllDistinctByConnectionAndTable, True);
   // Se non trova nemmeno una classe solleva un'eccezione
   if LResolvedTypeList.Count = 0 then
-    raise EioException.Create(Self.ClassName, 'ResolveInaccurateAsRttiType', Format('No class was found that implements the interface ("%s" alias "%s").',
+    raise EioGenericException.Create(Self.ClassName, 'ResolveInaccurateAsRttiType', Format('No class was found that implements the interface ("%s" alias "%s").',
       [ATypeName, AAlias]));
   // Get the first resolved class name
   LFirstResolvedClassName := LResolvedTypeList[0];
@@ -2202,7 +2202,7 @@ begin
     if LKeyEnumerator.MoveNext then
       Result := LKeyEnumerator.Current
     else
-      raise EioException.Create(ClassName, 'GetFirstAlias', 'There are no implementing classes registered.');
+      raise EioGenericException.Create(ClassName, 'GetFirstAlias', 'There are no implementing classes registered.');
   finally
     LKeyEnumerator.Free;
   end;

@@ -1007,7 +1007,7 @@ end;
 procedure TioModelPresenterCustom.RegisterViewBindSource(const AModelBindSourceOrModelDataSet: IInterface);
 begin
   if not Supports(AModelBindSourceOrModelDataSet, IioVMBridgeClientComponent) then
-    raise EioException.Create(Self.ClassName, 'RegisterVewBindSource',
+    raise EioGenericException.Create(Self.ClassName, 'RegisterVewBindSource',
       '"AModelBindSourceOrModelDataSet" parameter must be a "IioVMBridgeClientComponent" implementer');
   if not FViewBindSourceContainer.Contains(AModelBindSourceOrModelDataSet) then
   begin
@@ -1314,7 +1314,7 @@ begin
   if CheckAdapter then
     FBindSourceAdapter.ItemIndex := Value
   else
-    raise EioException.Create(Self.ClassName, 'SetItemindex', 'Unassigned BindSourceAdapter');
+    raise EioGenericException.Create(Self.ClassName, 'SetItemindex', 'Unassigned BindSourceAdapter');
 end;
 
 procedure TioModelPresenterCustom.SetMasterBindSource(const Value: IioBindSource);
@@ -1366,7 +1366,7 @@ begin
   // then it no longer writes me the values of the sub-properties in the DFM file.
   // So I also put the set method where, however, I raise an exception if someone
   // tries to set a value.
-  raise EioException.Create(ClassName, 'SetPaging', 'This property "Paging" is not writable');
+  raise EioGenericException.Create(ClassName, 'SetPaging', 'This property "Paging" is not writable');
 end;
 
 procedure TioModelPresenterCustom.SetSelectorFor(const ATargetBindSource: IioBindSource);
@@ -1473,7 +1473,7 @@ end;
 procedure TioModelPresenterCustom.UnregisterViewBindSource(const AModelBindSourceOrModelDataSet: IInterface);
 begin
   if not Supports(AModelBindSourceOrModelDataSet, IioVMBridgeClientComponent) then
-    raise EioException.Create(Self.ClassName, 'RegisterVewBindSource',
+    raise EioGenericException.Create(Self.ClassName, 'RegisterVewBindSource',
       '"AModelBindSourceOrModelDataSet" parameter must be a "IioVMBridgeClientComponent" implementer');
   if FViewBindSourceContainer.Contains(AModelBindSourceOrModelDataSet) then
   begin
@@ -1500,7 +1500,7 @@ procedure TioModelPresenterCustom._CreateAdapter(const ADataObject: TObject; con
 begin
   // If an adapter already exists then raise an exception
   if Assigned(FBindSourceAdapter) then
-    raise EioException.Create(ClassName, '_CreateAdapter', Format('ActiveBindSourceAdapter already exists in component "%s".', [Name]));
+    raise EioGenericException.Create(ClassName, '_CreateAdapter', Format('ActiveBindSourceAdapter already exists in component "%s".', [Name]));
 
   // If it is a detail bind source then get the detail BSA from the master bind source,
   // else if it is a master bind source but load type property is set to ltFromBSAsIs, ltFromBSReload or ltFromBSReloadNewInstance
@@ -1564,18 +1564,18 @@ begin
   // Check the ModelPresenter
   Result := Result and Assigned(AModelPresenter);
   if ARaiseExceptions and not Result then
-    raise EioException.Create(Self.ClassName, 'IsValidForDependencyInjectionLocator', 'Parameter "AModelPresenter" not assigned.');
+    raise EioGenericException.Create(Self.ClassName, 'IsValidForDependencyInjectionLocator', 'Parameter "AModelPresenter" not assigned.');
   // Check the bind source adapter
   Result := Result and AModelPresenter.CheckAdapter;
   if ARaiseExceptions and not Result then
-    raise EioException.Create(Self.ClassName, 'IsValidForDependencyInjectionLocator',
+    raise EioGenericException.Create(Self.ClassName, 'IsValidForDependencyInjectionLocator',
       'ActiveBindSourceAdapter not assigned in the "AModelPresenter" parameter.');
   // Check the ModelPresenter.Current object
   if not ACheckCurrentObj then
     Exit;
   Result := Result and (AModelPresenter.Current <> nil);
   if ARaiseExceptions and not Result then
-    raise EioException.Create(Self.ClassName, 'IsValidForDependencyInjectionLocator', '"Current" object of the ModelPresenter not assigned.');
+    raise EioGenericException.Create(Self.ClassName, 'IsValidForDependencyInjectionLocator', '"Current" object of the ModelPresenter not assigned.');
 end;
 
 end.

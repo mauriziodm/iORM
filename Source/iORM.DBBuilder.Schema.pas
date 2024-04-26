@@ -149,7 +149,7 @@ end;
 procedure TioDBBuilderSchema.SequenceAddIfNotExists(const ASequenceName: String);
 begin
   if ASequenceName.Trim.IsEmpty then
-    raise EioException.Create(ClassName, 'SequenceAddIfNotExists', Format('Invalid sequence name "%s"', [ASequenceName]));
+    raise EioGenericException.Create(ClassName, 'SequenceAddIfNotExists', Format('Invalid sequence name "%s"', [ASequenceName]));
   if FSequences.IndexOf(ASequenceName) = -1 then
     FSequences.Add(ASequenceName);
 end;

@@ -184,7 +184,7 @@ begin
   if LBindSource is TioModelPresenterCustom then
     Result := LBindSource as TioModelPresenterCustom
   else
-    EioException.Create(ClassName, 'GetModelPresenterInstance', 'The requested BindSource is not a ModelPresenter');
+    EioGenericException.Create(ClassName, 'GetModelPresenterInstance', 'The requested BindSource is not a ModelPresenter');
 end;
 
 function TioModelBindSource.GetViewModelBridge: TioViewModelBridge;
@@ -342,7 +342,7 @@ begin
     Exit;
   // If an adapter already exists then raise an exception
   if Assigned(FBindSourceAdapter) then
-    raise EioException.Create(ClassName, '_CreateAdapter', Format('ActiveBindSourceAdapter already exists in component "%s".', [Name]));
+    raise EioGenericException.Create(ClassName, '_CreateAdapter', Format('ActiveBindSourceAdapter already exists in component "%s".', [Name]));
   // Get the BindSourceAdapter from the ModelPresenter from the ViewModel
   // NB: If the 'CrossViewMasterSource' property is assigned the take the BindSourceAdapter
   // from it (for cross view with microviews)

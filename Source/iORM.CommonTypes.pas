@@ -213,7 +213,7 @@ end;
 function TioNullable<T>.GetValue: T;
 begin
   if IsNull then
-    raise EioException.Create('ioNullable: Value is null.');
+    raise EioGenericException.Create('ioNullable: Value is null.');
   result := FValue;
 end;
 

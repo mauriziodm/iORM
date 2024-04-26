@@ -236,7 +236,7 @@ begin
       AMetadata_CustomFieldType, AMetadata_FieldSubType, AMetadata_FKCreate, AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction);
   end
   else
-    raise EioException.Create(Self.ClassName, 'GetProperty', 'Invalid member type');
+    raise EioGenericException.Create(Self.ClassName, 'GetProperty', 'Invalid member type');
 end;
 
 class function TioContextFactory.GroupBy(const ASqlText: String): IioGroupBy;
@@ -343,7 +343,7 @@ var
         LMember_FieldName := LMember_Name;
       end
       else
-        raise EioException.Create(Self.ClassName, 'Properties', 'Invalid property/field type.');
+        raise EioGenericException.Create(Self.ClassName, 'Properties', 'Invalid property/field type.');
       // Skip if this member is the RefCount or Disposed property (TInterfacedObject) or it's an already exist member
       if (LMember_FieldName = 'RefCount') or (LMember_FieldName = 'Disposed') or Result.PropertyExists(LMember_FieldName) then
         Continue;

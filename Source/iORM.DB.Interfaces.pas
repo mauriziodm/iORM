@@ -54,6 +54,8 @@ const
   TRANSACTION_TIMESTAMP_NULL = 0;
 
   KEY_BLINDLEVEL = 'BlindLevel';
+  KEY_EXCEPTIONCLASSNAME = 'ExceptionClassName';
+  KEY_EXCEPTIONMESSAGE = 'ExceptionMessage';
   KEY_INTENTTYPE = 'IntentType';
   KEY_JSONDATAVALUE = 'JSONDataValue';
   KEY_METHODNAME = 'MethodName';
@@ -398,7 +400,16 @@ type
 
   IioHttpResponseBody = interface
     ['{E5A14525-308F-4877-99B7-C270D691FC6D}']
+    function ExceptionOccurred: Boolean;
     function ToJsonText: String;
+    // ExceptionClassName
+    procedure SetExceptionClassName(const Value: String);
+    function GetExceptionClassName: String;
+    property ExceptionClassName: String read GetExceptionClassName write SetExceptionClassName;
+    // ExceptionMessage
+    procedure SetExceptionMessage(const Value: String);
+    function GetExceptionMessage: String;
+    property ExceptionMessage: String read GetExceptionMessage write SetExceptionMessage;
     // JSONDataValue
     procedure SetJSONDataValue(const Value: TJSONValue);
     function GetJSONDataValue: TJSONValue;
@@ -621,7 +632,7 @@ begin
     jtFullOuter:
       Result := 'FULL OUTER JOIN ';
   else
-    raise EioException.Create(Self.ClassName + ': Join type not valid.');
+    raise EioGenericException.Create(Self.ClassName + ': Join type not valid.');
   end;
   // Joined table name
   Result := Result + '[' + AJoinItem.GetJoinClassRef.ClassName + ']';
@@ -745,7 +756,7 @@ begin
     coIsNotNull:
       Result := _IsNotNull;
   else
-    raise EioException.Create(Self.ClassName, 'CompareOpToCompareOperator', Format('Invalid CompareOp value "%s"',
+    raise EioGenericException.Create(Self.ClassName, 'CompareOpToCompareOperator', Format('Invalid CompareOp value "%s"',
       [TioUtilities.EnumToString<TioCompareOp>(ACompareOp)]));
   end;
 end;
@@ -816,7 +827,7 @@ begin
     loClosePar:
       Result := _ClosePar;
   else
-    raise EioException.Create(Self.ClassName, 'LogicOpToLogicRelation', Format('Invalid LogicOp value "%s"',
+    raise EioGenericException.Create(Self.ClassName, 'LogicOpToLogicRelation', Format('Invalid LogicOp value "%s"',
       [TioUtilities.EnumToString<TioLogicOp>(ALogicOp)]));
   end;
 end;

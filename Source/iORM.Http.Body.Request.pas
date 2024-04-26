@@ -55,6 +55,7 @@ type
     FUserName: TioNullableString;
     FUserToken: TioNullableString;
     FWhere: IioWhere;
+    procedure Clear;
     function GetBlindLevel: Byte;
     function GetIntentType: TioPersistenceIntentType;
     function GetJSONDataValue: TJSONValue;
@@ -80,7 +81,6 @@ type
     procedure SetUserToken(const Value: String);
     procedure SetWhere(const Value: IioWhere);
     function ToJSONText: String;
-    procedure Clear;
   public
     constructor Create;
     constructor CreateByJSONString(const AJSONString:String);

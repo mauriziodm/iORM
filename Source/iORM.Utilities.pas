@@ -143,10 +143,10 @@ begin
     begin
       IID := TypeInfoToGUID(TypeInfo(T));
       if IID = GUID_NULL then
-        raise EioException.Create('TioRttiUtilities.CastObjectToGeneric: The interface does not have the GUID.');
+        raise EioGenericException.Create('TioRttiUtilities.CastObjectToGeneric: The interface does not have the GUID.');
     end;
     if not Supports(AObj, IID, Result) then
-      raise EioException.Create('TioRttiUtilities.CastObjectToGeneric: Interface not supported.');
+      raise EioGenericException.Create('TioRttiUtilities.CastObjectToGeneric: Interface not supported.');
   end
   else
     Result := TValue.From<Tobject>(AObj).AsType<T>;
@@ -175,7 +175,7 @@ end;
 class procedure TioUtilities.ClearList(const AList: TObject);
 begin
   if not Assigned(AList) then
-    raise EioException.Create(ClassName, 'ClearList', '"AList" parameter not assigned');
+    raise EioGenericException.Create(ClassName, 'ClearList', '"AList" parameter not assigned');
   TioDuckTypedFactory.DuckTypedList(AList).Clear;
 end;
 
@@ -195,7 +195,7 @@ var
   LMap: IioMap;
 begin
   if not Assigned(AObj) then
-    raise EioException.Create(ClassName, 'ExtractOID', '"AObj" parameter not assigned');
+    raise EioGenericException.Create(ClassName, 'ExtractOID', '"AObj" parameter not assigned');
   LMap := TioMapContainer.GetMap(AObj.ClassName);
   Result := LMap.GetProperties.GetIdProperty.GetValue(AObj).AsInteger;
 end;
@@ -203,7 +203,7 @@ end;
 class function TioUtilities.ExtractOID(const AIntf: IInterface): Integer;
 begin
   if not Assigned(AIntf) then
-    raise EioException.Create(ClassName, 'ExtractOID', '"AIntf" cannot be nil.');
+    raise EioGenericException.Create(ClassName, 'ExtractOID', '"AIntf" cannot be nil.');
   Result := ExtractOID(AIntf as Tobject);
 end;
 
@@ -212,7 +212,7 @@ var
   LMap: IioMap;
 begin
   if not Assigned(AObj) then
-    raise EioException.Create(ClassName, 'ExtractObjVersion', '"AObj" parameter not assigned');
+    raise EioGenericException.Create(ClassName, 'ExtractObjVersion', '"AObj" parameter not assigned');
   LMap := TioMapContainer.GetMap(AObj.ClassName);
   Result := LMap.GetProperties.GetObjVersionProperty.GetValue(AObj).AsInteger;
 end;
@@ -245,7 +245,7 @@ begin
   if Assigned(LGetItemMethod) then
     Result := LGetItemMethod.ReturnType
   else
-    raise EioException.Create(Self.ClassName, 'ExtractItemRttiType', Format('Method "GetItem" not found in "%s" type.', [AList.ClassName]));
+    raise EioGenericException.Create(Self.ClassName, 'ExtractItemRttiType', Format('Method "GetItem" not found in "%s" type.', [AList.ClassName]));
 end;
 
 class function TioUtilities.ExtractItemRttiTypeByGeneric<T>: TRttiType;
@@ -258,7 +258,7 @@ begin
   if Assigned(LGetItemMethod) then
     Result := LGetItemMethod.ReturnType
   else
-    raise EioException.Create(Self.ClassName, 'ExtractItemRttiTypeByGeneric<T>', Format('Method "GetItem" not found in "%s" type.', [GenericToString<T>]));
+    raise EioGenericException.Create(Self.ClassName, 'ExtractItemRttiTypeByGeneric<T>', Format('Method "GetItem" not found in "%s" type.', [GenericToString<T>]));
 end;
 
 class function TioUtilities.ExtractPropertyName(const AFullPathPropertyName: String): String;
@@ -321,7 +321,7 @@ class function TioUtilities.GetBindSource(const AViewOrViewModel: TComponent; co
     if Assigned(LComponent) and Supports(LComponent, IioBindSource, Result) then
       Exit
     else
-      raise EioException.Create(ClassName, 'GetBindSource', Format('BindSource named "%s" not found.', [AName]));
+      raise EioGenericException.Create(ClassName, 'GetBindSource', Format('BindSource named "%s" not found.', [AName]));
   end;
 begin
   if AViewOrViewModel is TioViewModel then
@@ -360,7 +360,7 @@ begin
   for LRttiInterfaceType in AClassType.GetImplementedInterfaces do
     if LRttiInterfaceType.GUID = IID then
       Exit(LRttiInterfaceType.Name);
-  raise EioException.Create('TioRttiUtilities.GetImplementedInterfaceName: Interface non implemented by the class.');
+  raise EioGenericException.Create('TioRttiUtilities.GetImplementedInterfaceName: Interface non implemented by the class.');
 end;
 
 class function TioUtilities.GetQualifiedTypeName(const ATypeInfo: Pointer): String;
@@ -421,7 +421,7 @@ begin
   for LType in TioRttiFactory.GetRttiContext.GetTypes do
     if LType is TRttiInterfaceType and (TRttiInterfaceType(LType).GUID = IID) then
       Exit(TRttiInterfaceType(LType).Name);
-  raise EioException.Create('TioRttiUtilities.GUIDtoInterfaceName: IID is not an interface.');
+  raise EioGenericException.Create('TioRttiUtilities.GUIDtoInterfaceName: IID is not an interface.');
 end;
 
 class function TioUtilities.GUIDtoTypeInfo(const IID: TGUID): PTypeInfo;
@@ -431,7 +431,7 @@ begin
   for LType in TioRttiFactory.GetRttiContext.GetTypes do
     if LType is TRttiInterfaceType and (TRttiInterfaceType(LType).GUID = IID) then
       Exit(TRttiInterfaceType(LType).Handle);
-  raise EioException.Create('TioRttiUtilities.GUIDtoTypeInfo: IID is not an interface.');
+  raise EioGenericException.Create('TioRttiUtilities.GUIDtoTypeInfo: IID is not an interface.');
 end;
 
 class function TioUtilities.isEntityAttribute(const AAttribute: TCustomAttribute): Boolean;
@@ -482,13 +482,13 @@ end;
 class function TioUtilities.ObjectAsIInterface(const AObj: Tobject): IInterface;
 begin
   if not Supports(AObj, IInterface, Result) then
-    raise EioException.Create('TioRttiUtilities: IInterface not implemented by the object (' + AObj.ClassName + ').');
+    raise EioGenericException.Create('TioRttiUtilities: IInterface not implemented by the object (' + AObj.ClassName + ').');
 end;
 
 class function TioUtilities.ObjectAsIioViewModel(const AObj: Tobject): IioViewModel;
 begin
   if not Supports(AObj, IioViewModel, Result) then
-    raise EioException.Create('TioRttiUtilities: IioViewModel not implemented by the object (' + AObj.ClassName + ').');
+    raise EioGenericException.Create('TioRttiUtilities: IioViewModel not implemented by the object (' + AObj.ClassName + ').');
 end;
 
 // Questa funzione, a partire dal RootObject, restituisce l'oggetto a relativo al ChildPropertyPath navigando le proprietà
@@ -556,7 +556,7 @@ begin
   OPath := nil;
   // If the AQualifiedChildPropertyName is empty then exit
   if AQualifiedPropertyPath.IsEmpty then
-    raise EioException.Create(ClassName, 'ResolveChildPropertyPath_SplitPropNameAndPath', '"AQualifiedPropertyPath" is empty.');
+    raise EioGenericException.Create(ClassName, 'ResolveChildPropertyPath_SplitPropNameAndPath', '"AQualifiedPropertyPath" is empty.');
   // Create the StringList, set the Delimiter and DelimitedText
   OPath := TStringList.Create;
   OPath.Delimiter := '.';
@@ -607,7 +607,7 @@ begin
     LFinalProp.SetValue(LFinalChildObj, AValue);
   end
   else
-    raise EioException.Create(ClassName, 'ResolveChildPropertyPath_SetValue', '"FinalChildObj" is not assigned.');
+    raise EioGenericException.Create(ClassName, 'ResolveChildPropertyPath_SetValue', '"FinalChildObj" is not assigned.');
 end;
 
 class function TioUtilities.ResolveRttiTypeToRttiType(const ARttiType: TRttiType): TRttiType;
@@ -623,7 +623,7 @@ begin
     Result := TioResolverFactory.GetResolver(rsByDependencyInjection).ResolveInaccurateAsRttiType(ARttiType.Name, '');
   end
   else
-    raise EioException.Create(Self.ClassName, 'RttiTypeToClassRef', '"ARttiType" parameter must be a TRttiInstanceType or TRttiInterfaceType.');
+    raise EioGenericException.Create(Self.ClassName, 'RttiTypeToClassRef', '"ARttiType" parameter must be a TRttiInstanceType or TRttiInterfaceType.');
 end;
 
 class function TioUtilities.SameObject(const AObj1, AObj2: Tobject): Boolean;
@@ -652,7 +652,7 @@ begin
       Result := AValue.AsObject;
   else
     if not ASilentException then
-      raise EioException.Create('TioRttiUtilities.TValueToObject: The TValue does not contain an object or interfaced object.');
+      raise EioGenericException.Create('TioRttiUtilities.TValueToObject: The TValue does not contain an object or interfaced object.');
   end;
 end;
 
@@ -661,10 +661,10 @@ var
   LTyp: TRttiType;
 begin
   if ATypeInfo.Kind <> tkInterface then
-    raise EioException.Create('TioRttiUtilities.TypeInfoToGUID: ATypeInfo is not relative to an interface.');
+    raise EioGenericException.Create('TioRttiUtilities.TypeInfoToGUID: ATypeInfo is not relative to an interface.');
   LTyp := TioRttiFactory.GetRttiContext.GetType(ATypeInfo);
   if not Assigned(LTyp) then
-    raise EioException.Create
+    raise EioGenericException.Create
       ('TioRttiUtilities.TypeInfoToGUID: RTTI type info not found, derive it from IInvokable or insert the {M+} directive before its declaration to solve the problem.');
   Result := TRttiInterfaceType(LTyp).GUID;
 end;

@@ -258,7 +258,7 @@ begin
   if Self.Exist(AClassName) then
     Result := FInternalContainer.Items[AClassName.ToUpper].GetClassRef
   else
-    raise EioException.Create(Self.ClassName + ': class "' + AClassName + '" not found.');
+    raise EioGenericException.Create(Self.ClassName + ': class "' + AClassName + '" not found.');
 end;
 
 class function TioMapContainer.GetConnectionDefName(const AClassName: String): String;
@@ -266,7 +266,7 @@ begin
   if Self.Exist(AClassName) then
     Result := FInternalContainer.Items[AClassName.ToUpper].GetMap.GetTable.GetConnectionDefName
   else
-    raise EioException.Create(Self.ClassName + ': class "' + AClassName + '" not found.');
+    raise EioGenericException.Create(Self.ClassName + ': class "' + AClassName + '" not found.');
 end;
 
 class function TioMapContainer.GetContainer: TioMapContainerInstance;
@@ -280,7 +280,7 @@ begin
   if Exist(AClassName) then
     Result := FInternalContainer.Items[AClassName.ToUpper].GetMap
   else if RaiseAnExceptionIfNotFound then
-    raise EioException.Create(ClassName, 'GetMap', Format('Oops!'#13#13'Hi, I''m iORM, I''m sorry but there is a problem.' +
+    raise EioGenericException.Create(ClassName, 'GetMap', Format('Oops!'#13#13'Hi, I''m iORM, I''m sorry but there is a problem.' +
       #13#13'I would need the map of class "%s" but can''t find it in my collection of mapped classes/entities.' +
       #13#13'May be that you forgot to decorate the class with the "[ioEntity]" attribute on it.' +
       #13#13'Also make sure that you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit where the class is declared.' +
@@ -579,7 +579,7 @@ begin
   if AOrdinalValue <= ARttiEnumerationType.MaxValue then
     Result := FInternalContainer.Items[ARttiEnumerationType][AOrdinalValue]
   else
-    raise EioException.Create(ClassName, 'OrdinalToString',
+    raise EioGenericException.Create(ClassName, 'OrdinalToString',
       Format('Ordinal value %d is out of range for %s enumerated type', [AOrdinalValue, ARttiEnumerationType.Name]));
 end;
 
@@ -601,7 +601,7 @@ begin
   if LIndexOf > -1 then
     Result := LIndexOf
   else
-    raise EioException.Create(ClassName, 'StringToOrdinal',
+    raise EioGenericException.Create(ClassName, 'StringToOrdinal',
       Format('"%s" string value not found for %s enumerated type', [AStringValue, ARttiEnumerationType.Name]));
 end;
 
@@ -629,7 +629,7 @@ begin
   //  NB: Se arriva qui significa che dovrebbe esserci l'attributo  , se non c'è significa che c'è un errore
   //       da qualche parte, molto probabilmente  su iORM
   if not Assigned(LEnumeratedAttribute) then
-    raise EioException.Create(ClassName, 'LoadValues',
+    raise EioGenericException.Create(ClassName, 'LoadValues',
       Format('Attribute [ioEnumerated] not found on type "%s".',
         [ARttiEnumerationType.Name]));
   // Create and fill the StringList
@@ -652,7 +652,7 @@ begin
     ATargetStrings.DelimitedText := ACommaSepValues;
     // Check the number of string values in the attribute
     if (ATargetStrings.Count > 0) and (ATargetStrings.Count <> ARttiEnumerationType.MaxValue+1) then
-      raise EioException.Create(ClassName, '_LoadValuesByString',
+      raise EioGenericException.Create(ClassName, '_LoadValuesByString',
         Format('The number of elements specified in the comma separated string does not match the number of values allowed in the enumerated type "%s"',
           [ARttiEnumerationType.Name]));
   end
@@ -674,7 +674,7 @@ begin
   if LRttiType is TRttiEnumerationType then
     Result := TRttiEnumerationType(LRttiType)
   else
-    raise EioException.Create(ClassName, '_GetRttiEnumerationTypeByGeneric', Format('"%s" (T) is not an enumerated type', [TioUtilities.GenericToString<T>]));
+    raise EioGenericException.Create(ClassName, '_GetRttiEnumerationTypeByGeneric', Format('"%s" (T) is not an enumerated type', [TioUtilities.GenericToString<T>]));
   case ARaiseTrigger of
     ecrtExists:
       _RaiseIfRttiEnumerationTypeAlreadyExists(Result);
@@ -691,7 +691,7 @@ begin
   if LRttiType is TRttiEnumerationType then
     Result := TRttiEnumerationType(LRttiType)
   else
-    raise EioException.Create(ClassName, '_GetRttiEnumerationTypeByTypeInfo', Format('"%s" is not an enumerated type', [TioUtilities.TypeInfoToTypeName(ATypeInfo)]));
+    raise EioGenericException.Create(ClassName, '_GetRttiEnumerationTypeByTypeInfo', Format('"%s" is not an enumerated type', [TioUtilities.TypeInfoToTypeName(ATypeInfo)]));
 end;
 
 class function TioEnumContainerEx._GetRttiEnumerationTypeByTypeName(const AQualifiedTypeName: String; const ARaiseTrigger: TioEnumsContainerRaiseTrigger): TRttiEnumerationType;
@@ -702,20 +702,20 @@ begin
   if LRttiType is TRttiEnumerationType then
     Result := TRttiEnumerationType(LRttiType)
   else
-    raise EioException.Create(ClassName, '_GetRttiEnumerationTypeByTypeName', Format('"%s" is not an enumerated type', [AQualifiedTypeName]));
+    raise EioGenericException.Create(ClassName, '_GetRttiEnumerationTypeByTypeName', Format('"%s" is not an enumerated type', [AQualifiedTypeName]));
 end;
 
 class procedure TioEnumContainerEx._RaiseIfRttiEnumerationTypeAlreadyExists(const ARttiEnumerationType: TRttiEnumerationType);
 begin
   if TioEnumContainer._Contains(ARttiEnumerationType) then
-    raise EioException.Create(ClassName, '_RaiseIfRttiEnumerationTypeAlreadyExists',
+    raise EioGenericException.Create(ClassName, '_RaiseIfRttiEnumerationTypeAlreadyExists',
       Format('"%s" enumerated type already registered in the iORM EnumsCountainer', [ARttiEnumerationType.Name]));
 end;
 
 class procedure TioEnumContainerEx._RaiseIfRttiEnumerationTypeDoesNotExists(const ARttiEnumerationType: TRttiEnumerationType);
 begin
   if not TioEnumContainer._Contains(ARttiEnumerationType) then
-    raise EioException.Create(ClassName, '_RaiseIfRttiEnumerationTypeDoesNotExists',
+    raise EioGenericException.Create(ClassName, '_RaiseIfRttiEnumerationTypeDoesNotExists',
       Format('"%s" enumerated type does not exists in the iORM EnumsCountainer', [ARttiEnumerationType.Name]));
 end;
 

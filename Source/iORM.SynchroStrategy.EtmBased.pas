@@ -536,7 +536,7 @@ begin
       #13#13'Please Set the property to an ETM Repository/Timeslot class name and try again.' + #13#13'It will work.', [Name]));
   // Check if the FEtmTimeSlotClassName is mapped
   if not TioMapContainer.Exist(FEtmTimeSlot_ClassName) then
-    raise EioException.Create(ClassName, '_CheckEtmTimeSlotClassName',
+    raise EioGenericException.Create(ClassName, '_CheckEtmTimeSlotClassName',
       Format('Hi, I''m iORM and I have something to tell you.' +
       #13#13'I cannot find the map of the ETM Repository/TimeSlot class named "%s" specified in the "EtmTimeSlot_ClassName" property of the SynchroStrategy component called "%s".'
       + #13#13'May be that you forgot to decorate the class with the "[etmRepository]" attribute on it.' +
@@ -545,7 +545,7 @@ begin
   // Check if the property is set to a EtmTimeSlotClass
   LMap := TioMapContainer.GetMap(FEtmTimeSlot_ClassName);
   if not LMap.GetTable.GetRttiType.MetaclassType.InheritsFrom(TioEtmCustomTimeSlot) then
-    raise EioException.Create(ClassName, '_CheckEtmTimeSlotClassName',
+    raise EioGenericException.Create(ClassName, '_CheckEtmTimeSlotClassName',
       Format('Hi, I''m iORM and I have something to tell you.' +
       #13#13'The class "%s" specified in the "EtmTimeSlot_ClassName" property of the SynchroStrategy component named "%s" is not an ETM Repository/TimeSlot class.'
       + #13#13'Make sure that the property is set to an ETM Repository/TimeSlot class name and try again.' + #13#13'It will work.',
@@ -672,6 +672,5 @@ initialization
 
   TioUtilities.StopLinkerRemoval(TioEtmSynchroStrategy_LogItem);
   TioUtilities.StopLinkerRemoval(TioEtmSynchroStrategy_Payload);
-
 
 end.

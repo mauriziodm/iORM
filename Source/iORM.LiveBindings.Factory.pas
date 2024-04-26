@@ -131,7 +131,7 @@ var
 begin
   // Check for type name
   if ATypeName.IsEmpty then
-    raise EioException.Create(ClassName, 'GetBSA',
+    raise EioGenericException.Create(ClassName, 'GetBSA',
       Format('In component "%s" the "LoadType" property has been set to "ltAuto" or "ltManual" but the "TypeName" property has been left blank.'
       + #13#13'iORM is therefore unable to load (from the RDBMS) the instance to expose for binding.'#13#13'Please set the property and then try again.',
       [ASenderBSName]));
@@ -170,7 +170,7 @@ begin
         if TioUtilities.IsAnInterfaceTypeName(ATypeName) then
         begin
           if Assigned(ADataObject) and not Supports(ADataObject, IInterface, LIntfDataObject) then
-            raise EioException.Create(Self.ClassName, 'GetBSA', 'TypeName is an interface but ADataObject does not implement any interface.');
+            raise EioGenericException.Create(Self.ClassName, 'GetBSA', 'TypeName is an interface but ADataObject does not implement any interface.');
           Result := TioActiveInterfaceObjectBindSourceAdapter.Create(ATypeName, ATypeAlias, AWhere, AOwner, LIntfDataObject);
         end
         // Class
@@ -234,7 +234,7 @@ class function TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(const AO
 begin
   // Check if the MasterBS property is set
   if not Assigned(AMasterBS) then
-    raise EioException.Create(ClassName, 'GetNaturalBSAfromMasterBindSource',
+    raise EioGenericException.Create(ClassName, 'GetNaturalBSAfromMasterBindSource',
       Format('In component "%s" the "LoadType" property has been set to one of this values ("ltFromBSAsIs" or "ltFromBSReload" or "ltFromBSReloadNewInstance") but the "SourceXXX" property (maybe SourceDataSet, SourcePBS or SourcePresenter) has been left blank.'
       + #13#13'iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the "SourceXXX" property of bind source "%s" and then try again.',
       [ASenderBSName, ASenderBSName]));
@@ -247,7 +247,7 @@ class function TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(const AOw
 begin
   // Check if the MasterPropertyName property is set
   if AMasterPropertyName.IsEmpty then
-   raise EioException.Create(ClassName, 'GetDetailBSAfromMasterBindSource',
+   raise EioGenericException.Create(ClassName, 'GetDetailBSAfromMasterBindSource',
      Format('The "MasterPropertyName" property has not been set in the component "%s".'
       + #13#13'iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.',
      [ASenderBSName]));

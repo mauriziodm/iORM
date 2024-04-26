@@ -41,16 +41,21 @@ uses
 
 type
 
-  // Generic iORM exceptions -----------------------------------------------------------------------
-  EioException = class(Exception)
+  // Base class for all iORM exceptions ------------------------------------------------------------
+  EioCustomException = class(Exception)
   public
     constructor Create(const AClassName, AMethodName, AMsg: string); overload;
     constructor Create(const AClassName, AMsg: string); overload;
   end;
   // -----------------------------------------------------------------------------------------------
 
+  // Generic iORM exceptions -----------------------------------------------------------------------
+  EioGenericException = class(EioCustomException)
+  end;
+  // -----------------------------------------------------------------------------------------------
+
   // Persistence concurrency conflict exceptions ---------------------------------------------------
-  EioConcurrencyConflictException = class(EioException)
+  EioConcurrencyConflictException = class(EioCustomException)
   public
     constructor Create(const AClassName, AMethodName: string; const AContext: IioContext); overload;
   end;
@@ -63,22 +68,27 @@ type
   // -----------------------------------------------------------------------------------------------
 
   // BindSource ObjState exceptions ----------------------------------------------------------------
-  EioBindSourceObjStateException = class(EioException)
+  EioBindSourceObjStateException = class(EioCustomException)
   end;
   // -----------------------------------------------------------------------------------------------
 
   // ETM exceptions --------------------------------------------------------------------------------
-  EioEtmException = class(EioException)
+  EioEtmException = class(EioCustomException)
   end;
   // -----------------------------------------------------------------------------------------------
 
   // SynchroStrategy exceptions --------------------------------------------------------------------
-  EioSynchroStrategyException = class(EioException)
+  EioSynchroStrategyException = class(EioCustomException)
   end;
   // -----------------------------------------------------------------------------------------------
 
-  // Http exceptions --------------------------------------------------------------------
-  EioHttpException = class(EioException)
+  // Http exceptions -------------------------------------------------------------------------------
+  EioHttpLocalException = class(EioCustomException)
+  end;
+
+  EioHttpRemoteException = class(EioCustomException)
+  public
+    constructor Create(const AClassName, AMethodName, ARemoteExceptionClassName, ARemoteExceptionMessage: string); overload;
   end;
   // -----------------------------------------------------------------------------------------------
 
@@ -86,14 +96,14 @@ implementation
 
 { EioException }
 
-constructor EioException.Create(const AClassName, AMethodName, AMsg: string);
+constructor EioCustomException.Create(const AClassName, AMethodName, AMsg: string);
 begin
-  inherited Create(Format(#13'iORM exception on "%s.%s":'#13#13'%s', [AClassName, AMethodName, AMsg]));
+  inherited Create(Format(#13#13'iORM exception on "%s.%s" method:'#13#13'%s', [AClassName, AMethodName, AMsg]));
 end;
 
-constructor EioException.Create(const AClassName, AMsg: string);
+constructor EioCustomException.Create(const AClassName, AMsg: string);
 begin
-  inherited Create(Format(#13'iORM exception on "%s":'#13#13'%s', [AClassName, AMsg]));
+  inherited Create(Format(#13#13'iORM exception on "%s" class:'#13#13'%s', [AClassName, AMsg]));
 end;
 
 { EioConcurrencyConflictException }
@@ -109,6 +119,14 @@ begin
     LMsg := Format('Concurrency conflict persisting a "%s" entity with ID = %d on table "%s" using "%s" connection.',
       [AContext.GetClassRef.ClassName, AContext.ObjID, AContext.GetTable.TableName, AContext.GetTable.GetConnectionDefName]);
   inherited Create(AClassName, AMethodName, LMsg);
+end;
+
+{ EioHttpRemoteException }
+
+constructor EioHttpRemoteException.Create(const AClassName, AMethodName, ARemoteExceptionClassName, ARemoteExceptionMessage: string);
+begin
+  inherited Create(Format(#13#13'iORM local exception on "%s.%s" method'#13'RELAYING remote "%s" exception:'#13'%s',
+    [AClassName, AMethodName, ARemoteExceptionClassName, ARemoteExceptionMessage]));
 end;
 
 end.

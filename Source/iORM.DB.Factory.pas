@@ -189,7 +189,7 @@ begin
   LConnection := Connection(AConnectionDefName);
   // Operation allowed only for DB connections
   if not LConnection.IsDBConnection then
-    raise EioException.Create(ClassName, 'Query', 'Operation not allowed by this type of connection.');
+    raise EioGenericException.Create(ClassName, 'Query', 'Operation not allowed by this type of connection.');
   // If the query is already present in the QueryContainer of the connection then get it and return...
   // ...else create a new query and insert it in the QueryContainer of the connection
   if not LConnection.AsDBConnection.QueryContainer.TryGetQuery(AQueryIdentity, Result) then
@@ -208,7 +208,7 @@ begin
   LConnection := Self.Connection(AConnectionDefName);
   // Operation allowed only for DB connections
   if not LConnection.IsDBConnection then
-    raise EioException.Create(Self.ClassName, 'Script' + 'Operation not allowed by this type of connection');
+    raise EioGenericException.Create(Self.ClassName, 'Script' + 'Operation not allowed by this type of connection');
   // Create the script component instance
   Result := TioScript.Create(LConnection, AScript);
 end;
@@ -225,7 +225,7 @@ begin
       Result := TioSqlDataConverterMSSqlServer;
 {$ENDIF}
   else
-    raise EioException.Create(ClassName + ': Connection type not found (SqlDataConverter).');
+    raise EioGenericException.Create(ClassName + ': Connection type not found (SqlDataConverter).');
   end;
 end;
 
@@ -251,7 +251,7 @@ begin
       Result := TioSqlGeneratorMSSqlServer;
 {$ENDIF}
   else
-    raise EioException.Create(ClassName + ': Connection type not found (SqlGenerator).');
+    raise EioGenericException.Create(ClassName + ': Connection type not found (SqlGenerator).');
   end;
 end;
 

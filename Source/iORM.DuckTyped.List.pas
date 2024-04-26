@@ -121,30 +121,30 @@ begin
   // Count Property
   FCountProperty := LRttiType.GetProperty('Count');
   if not Assigned(FCountProperty) then
-    raise EioException.Create('DuckTypedList: "Count" property not found in the object');
+    raise EioGenericException.Create('DuckTypedList: "Count" property not found in the object');
   // Add method
   FAddMethod := LRttiType.GetMethod('Add');
   if not Assigned(FAddMethod) then
-    raise EioException.Create('DuckTypedList: "Add" method not found in the object');
+    raise EioGenericException.Create('DuckTypedList: "Add" method not found in the object');
   // Clear
   FClearMethod := LRttiType.GetMethod('Clear');
   if not Assigned(FClearMethod) then
-    raise EioException.Create('DuckTypedList: "Clear" method not found in the object');
+    raise EioGenericException.Create('DuckTypedList: "Clear" method not found in the object');
   // Delete
   FDelete := LRttiType.GetMethod('Delete');
   if not Assigned(FDelete) then
-    raise EioException.Create('DuckTypedList: "Delete" method not found in the object');
+    raise EioGenericException.Create('DuckTypedList: "Delete" method not found in the object');
   // GetItem method
   LItemsProperty := LRttiType.GetIndexedProperty('Items');
   if not Assigned(LItemsProperty) then
-    raise EioException.Create('DuckTypedList: "Items" indexed property not found in the object');
+    raise EioGenericException.Create('DuckTypedList: "Items" indexed property not found in the object');
   FGetItemMethod := LItemsProperty.ReadMethod;
   if not Assigned(FGetItemMethod) then
-    raise EioException.Create(Self.ClassName + ': "GetItem" method not found in the object');
+    raise EioGenericException.Create(Self.ClassName + ': "GetItem" method not found in the object');
   // IndexOf
   FIndexOf := LRttiType.GetMethod('IndexOf');
   if not Assigned(FIndexOf) then
-    raise EioException.Create('DuckTypedList: "FIndexOf" method not found in the object');
+    raise EioGenericException.Create('DuckTypedList: "FIndexOf" method not found in the object');
 end;
 
 procedure TioDuckTypedList.Delete(Index: Integer);
@@ -243,7 +243,7 @@ begin
   if FPosition > -1 then
     Result := FDuckTypedList.GetItem(FPosition)
   else
-    raise EioException.Create(Self.ClassName + ': Call MoveNext first');
+    raise EioGenericException.Create(Self.ClassName + ': Call MoveNext first');
 end;
 
 function TioDuckTypedListEnumerator.MoveNext: Boolean;

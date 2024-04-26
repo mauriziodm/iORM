@@ -472,7 +472,7 @@ begin
     ioMdCustomFieldType:
       Result := AField.FieldCustomType;
   else
-    raise EioException.Create(ClassName, 'TranslateFieldType', 'Wrong Metadata_FieldType');
+    raise EioGenericException.Create(ClassName, 'TranslateFieldType', 'Wrong Metadata_FieldType');
   end;
 end;
 

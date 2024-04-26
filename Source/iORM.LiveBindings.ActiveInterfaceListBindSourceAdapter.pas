@@ -273,7 +273,7 @@ end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.Append(AObject: TObject);
 begin
-  raise EioException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for interface referenced instances only.');
+  raise EioGenericException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for interface referenced instances only.');
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.AsActiveBindSourceAdapter: IioActiveBindSourceAdapter;
@@ -642,7 +642,7 @@ end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.Insert(AObject: TObject);
 begin
-  raise EioException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for interface referenced instances only.');
+  raise EioGenericException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for interface referenced instances only.');
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.HasBindSource: Boolean;
@@ -709,7 +709,7 @@ begin
   if Supports(ASelected, IInterface, LSelectedAsIntf) then
     ReceiveSelection(LSelectedAsIntf, ASelectionType)
   else
-    raise EioException.Create(Self.ClassName, 'ReceiveSelection', 'Selected instance does not support any interface.');
+    raise EioGenericException.Create(Self.ClassName, 'ReceiveSelection', 'Selected instance does not support any interface.');
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType);
@@ -883,7 +883,7 @@ begin
   if Supports(Value, IInterface, LIntf) then
     Self.List.Items[AIndex] := LIntf
   else
-    raise EioException.Create(Self.ClassName, 'SetItems', 'Value object does not implement any interface.');
+    raise EioGenericException.Create(Self.ClassName, 'SetItems', 'Value object does not implement any interface.');
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);

@@ -301,7 +301,7 @@ begin
     ioMdCustomFieldType:
       Result := AField.FieldCustomType;
   else
-    raise EioException.Create(ClassName, 'TranslateFieldType', 'Wrong Metadata_FieldType');
+    raise EioGenericException.Create(ClassName, 'TranslateFieldType', 'Wrong Metadata_FieldType');
   end;
 end;
 
@@ -322,7 +322,7 @@ end;
 procedure TioDBBuilderSqlGenSQLite.AddField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
 begin
   // Nothing to do
-  raise EioException.Create(ClassName, 'AddField', MSG_METHOD_NOT_IMPLEMENTED);
+  raise EioGenericException.Create(ClassName, 'AddField', MSG_METHOD_NOT_IMPLEMENTED);
 end;
 
 procedure TioDBBuilderSqlGenSQLite.AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK);
@@ -342,7 +342,7 @@ end;
 procedure TioDBBuilderSqlGenSQLite.AddPrimaryKey(ATable: IioDBBuilderSchemaTable);
 begin
   // Nothing to do
-  raise EioException.Create(ClassName, 'AddPrimaryKey', MSG_METHOD_NOT_IMPLEMENTED);
+  raise EioGenericException.Create(ClassName, 'AddPrimaryKey', MSG_METHOD_NOT_IMPLEMENTED);
 end;
 
 procedure TioDBBuilderSqlGenSQLite.AddSequence(const ASequenceName: String; const ACreatingNewDatabase: Boolean);
@@ -353,7 +353,7 @@ end;
 procedure TioDBBuilderSqlGenSQLite.AlterField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
 begin
   // Nothing to do
-  raise EioException.Create(ClassName, 'AlterField', MSG_METHOD_NOT_IMPLEMENTED);
+  raise EioGenericException.Create(ClassName, 'AlterField', MSG_METHOD_NOT_IMPLEMENTED);
 end;
 
 procedure TioDBBuilderSqlGenSQLite.BeginAlterTable(const ATable: IioDBBuilderSchemaTable);

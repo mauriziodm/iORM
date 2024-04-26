@@ -126,6 +126,9 @@ begin
     FioHttpResponseBody := TioHttpFactory.NewResponseBodyByJSONString(UnwrapBodyAsJsonRpcResponse(FRESTResponse.Content))
   else
     FioHttpResponseBody := TioHttpFactory.NewResponseBodyByJSONString(FRESTResponse.Content);
+  // Check for response exceptions
+  if FioHttpResponseBody.ExceptionOccurred then
+    raise EioHttpRemoteException.Create(ClassName, 'Execute', FioHttpResponseBody.ExceptionClassName, FioHttpResponseBody.ExceptionMessage);
 end;
 
 procedure TioConnectionHttp.DoCommitTransaction;
@@ -175,8 +178,8 @@ begin
       Exit(LJSONValue.ToJSON);
     LJSONValue := LJSONObject.FindValue('error');
     if LJSONValue <> nil then
-      raise EioHTTPException.Create(ClassName, 'UnwrapBodyAsJsonRpcResponse', LJSONValue.ToString);
-    raise EioHTTPException.Create(ClassName, 'UnwrapBodyAsJsonRpcResponse', Format('Invalid JSON-RPC response: "%s"', [AJSONText]));
+      raise EioHttpLocalException.Create(ClassName, 'UnwrapBodyAsJsonRpcResponse', LJSONValue.ToString);
+    raise EioHttpLocalException.Create(ClassName, 'UnwrapBodyAsJsonRpcResponse', Format('Invalid JSON-RPC response: "%s"', [AJSONText]));
   finally
     LJSONObject.Free;
   end;

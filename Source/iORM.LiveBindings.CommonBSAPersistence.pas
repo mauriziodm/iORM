@@ -176,7 +176,7 @@ begin
   if AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject, TioBSNotification.Create(TioBSNotificationType.ntCanInsertDetail)) then
     AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject, TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint))
   else
-    raise EioException.Create(ClassName, 'BeforeInsert', 'Master BindSource hasn''t saved a revert point');
+    raise EioGenericException.Create(ClassName, 'BeforeInsert', 'Master BindSource hasn''t saved a revert point');
 end;
 
 class procedure TioCommonBSAPersistence.BSPersistenceDelete(const ABindSource: IioMasterBindSource);
@@ -202,7 +202,7 @@ begin
   if AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject, TioBSNotification.Create(TioBSNotificationType.ntCanDeleteDetail)) then
     AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject, TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint))
   else
-    raise EioException.Create(ClassName, 'Delete', 'Master BindSource hasn''t saved a revert point');
+    raise EioGenericException.Create(ClassName, 'Delete', 'Master BindSource hasn''t saved a revert point');
   // If it is during a BSPersistenceDeleting operation or current is nil or if daSetSmartDeleteSystem is selected as OnDeleteAction on the MasterBS
   if AActiveBindSourceAdapter.BSPersistenceDeleting or (AActiveBindSourceAdapter.Current = nil) or
     AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.CreateDeleteSmartNotification(AActiveBindSourceAdapter.Current)) then
@@ -244,9 +244,9 @@ begin
           AActiveBindSourceAdapter.InternalSetDataObject(LObj, AActiveBindSourceAdapter.ioOwnsObjects);
       end;
     TioTypeOfCollection.tcList:
-      raise EioException.Create(ClassName, 'Create', '"ltCreate" value for "LoadType" property is valid only if "TypeOfCollection" is set to "tcSingleObject"');
+      raise EioGenericException.Create(ClassName, 'Create', '"ltCreate" value for "LoadType" property is valid only if "TypeOfCollection" is set to "tcSingleObject"');
   else
-    raise EioException.Create(ClassName, 'Create', 'Wrong TypeOfCollection');
+    raise EioGenericException.Create(ClassName, 'Create', 'Wrong TypeOfCollection');
   end;
 end;
 
@@ -282,7 +282,7 @@ begin
       _LoadList(AActiveBindSourceAdapter.AsyncLoad, AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias, AActiveBindSourceAdapter.Lazy,
         AActiveBindSourceAdapter.LazyProps, AActiveBindSourceAdapter.ioWhere, LTargetClass, LTerminateMethod);
   else
-    raise EioException.Create('TioCommonBSAPersistence.Load: wrong TypeOfCollection');
+    raise EioGenericException.Create('TioCommonBSAPersistence.Load: wrong TypeOfCollection');
   end;
 end;
 
@@ -383,10 +383,10 @@ var
 begin
   // Checks
   if AActiveBindSourceAdapter.GetBindSource = nil then
-    raise EioException.Create(ClassName, 'Reload', Format('Unassigned bind source (TypeName = "%s", TypeAlias = "%s")',
+    raise EioGenericException.Create(ClassName, 'Reload', Format('Unassigned bind source (TypeName = "%s", TypeAlias = "%s")',
       [AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias]));
   if not AActiveBindSourceAdapter.GetBindSource.IsMasterBS then
-    raise EioException.Create(ClassName, 'Reload',
+    raise EioGenericException.Create(ClassName, 'Reload',
       Format('This is isn''t a master bind source  (TypeName = "%s", TypeAlias = "%s").'#13'Reload is for master bind source only.',
       [AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias]));
 
@@ -410,7 +410,7 @@ begin
       _LoadList(AActiveBindSourceAdapter.AsyncLoad, AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias, AActiveBindSourceAdapter.Lazy,
         AActiveBindSourceAdapter.LazyProps, AActiveBindSourceAdapter.ioWhere, LTargetClass, LTerminateMethod);
   else
-    raise EioException.Create(ClassName, 'Reload', Format('Wrong "TypeOfCollection" property value (TypeName = "%s", TypeAlias = "%s")',
+    raise EioGenericException.Create(ClassName, 'Reload', Format('Wrong "TypeOfCollection" property value (TypeName = "%s", TypeAlias = "%s")',
       [AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias]));
   end;
 end;
@@ -424,13 +424,13 @@ var
 begin
   // Extract the IioActiveBindSourceAdapter interface
   if not Supports(ANaturalBindSourceAdapter, IioActiveBindSourceAdapter, LActiveBindSourceAdapter) then
-    raise EioException.Create(ClassName, 'ReloadNaturalBindSourceAdapter', 'ANaturalBindSourceAdapter does not implement IioActiveBindSOurceAdapter interface');
+    raise EioGenericException.Create(ClassName, 'ReloadNaturalBindSourceAdapter', 'ANaturalBindSourceAdapter does not implement IioActiveBindSOurceAdapter interface');
   // Checks
   if LActiveBindSourceAdapter.GetBindSource = nil then
-    raise EioException.Create(ClassName, 'ReloadNaturalBindSourceAdapter', Format('Unassigned bind source (TypeName = "%s", TypeAlias = "%s")',
+    raise EioGenericException.Create(ClassName, 'ReloadNaturalBindSourceAdapter', Format('Unassigned bind source (TypeName = "%s", TypeAlias = "%s")',
       [LActiveBindSourceAdapter.TypeName, LActiveBindSourceAdapter.TypeAlias]));
   if not LActiveBindSourceAdapter.GetBindSource.IsMasterBS then
-    raise EioException.Create(ClassName, 'ReloadNaturalBindSourceAdapter',
+    raise EioGenericException.Create(ClassName, 'ReloadNaturalBindSourceAdapter',
       Format('This is isn''t a master bind source  (TypeName = "%s", TypeAlias = "%s").'#13'Reload is for master bind source only.',
       [LActiveBindSourceAdapter.TypeName, LActiveBindSourceAdapter.TypeAlias]));
   // Extract the current DataObject and the where condition to reload it
@@ -454,7 +454,7 @@ begin
           LTerminateMethod);
       end
   else
-    raise EioException.Create(ClassName, 'ReloadNaturalBindSourceAdapter', Format('Wrong "LoadType" property value (TypeName = "%s", TypeAlias = "%s")',
+    raise EioGenericException.Create(ClassName, 'ReloadNaturalBindSourceAdapter', Format('Wrong "LoadType" property value (TypeName = "%s", TypeAlias = "%s")',
       [LActiveBindSourceAdapter.TypeName, LActiveBindSourceAdapter.TypeAlias]));
   end;
 end;
@@ -644,7 +644,7 @@ begin
       // TODO: uniGUI - Probabilmente ci saranno dei problemi con uniGUI, controllare
       TioAnonymousTimer.Create(100, function: Boolean
         begin
-          raise EioException.Create(LExceptionMessage);
+          raise EioGenericException.Create(LExceptionMessage);
         end);
     end
     else

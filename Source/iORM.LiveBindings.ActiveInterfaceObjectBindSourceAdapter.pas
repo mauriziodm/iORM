@@ -259,7 +259,7 @@ end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.DeleteListViewItem(const AItemIndex, ADelayMilliseconds: Integer);
 begin
-  raise EioException.Create(Self.ClassName, 'DeleteListViewItem', 'Method not available in ObjectBindSourceAdapters.');
+  raise EioGenericException.Create(Self.ClassName, 'DeleteListViewItem', 'Method not available in ObjectBindSourceAdapters.');
 end;
 
 destructor TioActiveInterfaceObjectBindSourceAdapter.Destroy;
@@ -379,7 +379,7 @@ begin
     if LMasterProperty.IsInterface then
       LDetailIntf := LValue.AsInterface
     else
-      raise EioException.Create(Self.ClassName, 'ExtractDetailObject', 'Master property (in the master object) is not of interface type.');
+      raise EioGenericException.Create(Self.ClassName, 'ExtractDetailObject', 'Master property (in the master object) is not of interface type.');
   // Set it to the Adapter itself
   Self.InternalSetDataObject(LDetailIntf, False); // 2° parameter false ABSOLUTELY!!!!!!!
 end;
@@ -616,7 +616,7 @@ end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.LoadPage;
 begin
-  raise EioException.Create(Self.ClassName, 'LoadPage', 'Method not available in ObjectBindSourceAdapters.');
+  raise EioGenericException.Create(Self.ClassName, 'LoadPage', 'Method not available in ObjectBindSourceAdapters.');
 end;
 
 function TioActiveInterfaceObjectBindSourceAdapter.MasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
@@ -653,7 +653,7 @@ begin
   if Supports(ASelected, IInterface, LSelectedAsIntf) then
     ReceiveSelection(LSelectedAsIntf, ASelectionType)
   else
-    raise EioException.Create(Self.ClassName, 'ReceiveSelection', 'Selected instance does not support any interface.');
+    raise EioGenericException.Create(Self.ClassName, 'ReceiveSelection', 'Selected instance does not support any interface.');
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType);
@@ -704,7 +704,7 @@ end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
-  raise EioException.Create(Self.ClassName, 'SetDataObject', 'This ActiveBindSourceAdapter is for interface referenced instances only.');
+  raise EioGenericException.Create(Self.ClassName, 'SetDataObject', 'This ActiveBindSourceAdapter is for interface referenced instances only.');
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
@@ -759,7 +759,7 @@ end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
-  raise EioException.Create(Self.ClassName, 'InternalSetDataObject', 'This ActiveBindSourceAdapter is for interface referenced instances only.');
+  raise EioGenericException.Create(Self.ClassName, 'InternalSetDataObject', 'This ActiveBindSourceAdapter is for interface referenced instances only.');
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetAsyncLoad(const Value: Boolean);

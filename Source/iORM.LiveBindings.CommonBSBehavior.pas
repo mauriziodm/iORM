@@ -85,7 +85,7 @@ class procedure TioCommonBSBehavior.CheckForOpen(const ABindSource: IioBindSourc
 begin
   // ltManual
   if ABindSource.IsMasterBS and (ALoadType = ltManual) and not ABindSource.CheckActiveAdapter then
-    raise EioException.Create(ClassName, 'CheckForOpen',
+    raise EioGenericException.Create(ClassName, 'CheckForOpen',
       Format('You are not allowed to activate the BindSource "%s" if its "LoadType" property is set to "ltManual" unless the "SetDataObject" method has been executed at least once with a valid object.',
       [ABindSource.GetName]));
 end;
@@ -94,7 +94,7 @@ class procedure TioCommonBSBehavior.CheckForSetDataObject(const ABindSource: Iio
 begin
   // Accept the new data object only if LoadType is ltManual
   if ALoadType <> ltManual then
-    raise EioException.Create(ClassName, 'CheckForSetDataObject',
+    raise EioGenericException.Create(ClassName, 'CheckForSetDataObject',
       Format('Invoking the "SetDataObject" method is allowed only if the "LoadType" property is set to "ltManual".'#13#13'Please set the property "LoadType" of the bind source "%s" (maybe a DataSet or BindSource) to "ltManual" and try again.',
       [ABindSource.GetName]));
 end;
@@ -102,7 +102,7 @@ end;
 class procedure TioCommonBSBehavior.CheckForSetLoadType(const ABindSource, ASourceBS: IioBindSource; const ALoadType: TioLoadType);
 begin
   if Assigned(ASourceBS) and not CheckIfLoadTypeIsFromBS(ALoadType) then
-    raise EioException.Create(ClassName, 'CheckForSetLoadType',
+    raise EioGenericException.Create(ClassName, 'CheckForSetLoadType',
       Format('In order to set the "LoadType" property to a value other than "ltFromBSAsIs" or "ltFromBSReload" or "ltFromBSReloadNewInstance", you must first set the "SourceXXX" property to blank (nil).'
       + #13#13'Please set the "SourceXXX" property of the bind source "%s" (maybe a DataSet or BindSource) to blank and then try again.',
       [ABindSource.GetName]));
@@ -111,7 +111,7 @@ end;
 class procedure TioCommonBSBehavior.CheckForSetSourceBS(const ABindSource, ASourceBS: IioBindSource; const ALoadType: TioLoadType);
 begin
   if Assigned(ASourceBS) and not CheckIfLoadTypeIsFromBS(ALoadType) then
-    raise EioException.Create(ClassName, 'CheckForSetSourceBS',
+    raise EioGenericException.Create(ClassName, 'CheckForSetSourceBS',
       Format('In order to set the "SourceXXX" property, you must first set the "LoadType" property to one of the values "ltFromBSAsIs" or "ltFromBSReload" or "ltFromBSReloadNewInstance".'
       + #13#13'Please set the "LoadType" property of the bind source "%s" (maybe a DataSet or BindSource) to one of the above values and then try again.',
       [ABindSource.GetName]));
@@ -158,18 +158,18 @@ begin
   // Check the ModelPresenter
   Result := Result and Assigned(ABindSource);
   if ARaiseExceptions and not Result then
-    raise EioException.Create(Self.ClassName, 'IsValidForDependencyInjectionLocator', 'Parameter "AModelPresenter" not assigned.');
+    raise EioGenericException.Create(Self.ClassName, 'IsValidForDependencyInjectionLocator', 'Parameter "AModelPresenter" not assigned.');
   // Check the bind source adapter
   Result := Result and ABindSource.CheckAdapter;
   if ARaiseExceptions and not Result then
-    raise EioException.Create(Self.ClassName, 'IsValidForDependencyInjectionLocator',
+    raise EioGenericException.Create(Self.ClassName, 'IsValidForDependencyInjectionLocator',
       'ActiveBindSourceAdapter not assigned in the "AModelPresenter" parameter.');
   // Check the ModelPresenter.Current object
   if not ACheckCurrentObj then
     Exit;
   Result := Result and (ABindSource.Current <> nil);
   if ARaiseExceptions and not Result then
-    raise EioException.Create(Self.ClassName, 'IsValidForDependencyInjectionLocator', '"Current" object of the ModelPresenter not assigned.');
+    raise EioGenericException.Create(Self.ClassName, 'IsValidForDependencyInjectionLocator', '"Current" object of the ModelPresenter not assigned.');
 end;
 
 class procedure TioCommonBSBehavior.Notify(const ASender: TObject; const ATargetBS: IioBindSource; const [Ref] ANotification: TioBSNotification);
@@ -257,12 +257,12 @@ var
 begin
   // Some checks
   if not Assigned(ATargetBS) then
-    raise EioException.Create(ClassName, 'Select<T>',
+    raise EioGenericException.Create(ClassName, 'Select<T>',
       Format('You have tried to make a selection by invoking the "SelectCurrent" method of the "%s" component but its "SelectorFor" property was left blank.' +
       #13#13'iORM does not know which target component to forward the selection to.'#13#13'Please set the property and try again.',
       [(ASender as TComponent).Name]));
   if not ATargetBS.IsActive then
-    raise EioException.Create(ClassName, 'Select<T>',
+    raise EioGenericException.Create(ClassName, 'Select<T>',
       Format('You have tried to make a selection by invoking the "SelectCurrent" method of component "%s" but the target component of the selection ("%s") is not active.'
       + #13#13'iORM cannot forward the selection.'#13#13'Please make sure that the target component of the selection is active as well and try again.',
       [(ASender as TComponent).Name, ATargetBS.GetName]));
@@ -272,7 +272,7 @@ begin
   if LDestBSA.Notify(ASender, TioBSNotification.Create(TioBSNotificationType.ntCanReceiveSelection)) then
     LDestBSA.Notify(ASender, TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint))
   else
-    raise EioException.Create(ClassName, 'Select<T>', 'Master BindSource hasn''t saved a revert point');
+    raise EioGenericException.Create(ClassName, 'Select<T>', 'Master BindSource hasn''t saved a revert point');
   // Encapsulate the SelectedInstance into a TValue then assign it
   // as selection in a proper way
   // NB: Lasciare assolutamente così perchè ho già provato in vari modi ma mi dava sempre un errore
@@ -283,7 +283,7 @@ begin
   else if LValue.Kind = TTypeKind.tkClass then
     LDestBSA.ReceiveSelection(LValue.AsObject, ASelectionType)
   else
-    raise EioException.Create(ClassName, 'Select<T>', 'Wrong LValue kind.');
+    raise EioGenericException.Create(ClassName, 'Select<T>', 'Wrong LValue kind.');
 end;
 
 class procedure TioCommonBSBehavior.SetAsDefaultPropertyOfAllBindSourcesToFalse(const AOwner: TComponent; const AValue: Boolean);
@@ -304,17 +304,17 @@ var
 begin
   // Estract the bind source as IioMasterBindSource
   if not Supports(ABindSource, IioMasterBindSource, LMasterBindSource) then
-    raise EioException.Create(ClassName, 'SetETMfor',
+    raise EioGenericException.Create(ClassName, 'SetETMfor',
       Format('The "%s" bind source received by the "ABindSource" parameter does not implement the "IioMasterBindSource".', [ABindSource.GetName]));
   // Controlla che non sia già assegnato (lo stesso)
   if AETMFor = LMasterBindSource.ETMfor then
     Exit;
   // ETMfor must be different from itself
   if Assigned(AETMfor) and (AETMfor as TObject).Equals(LMasterBindSource as TObject) then
-    raise EioException.Create(Self.ClassName, 'SetETMfor', Format('The "ETMfor" property of the "%s" bind source must be different from itself.', [LMasterBindSource.GetName]));
+    raise EioGenericException.Create(Self.ClassName, 'SetETMfor', Format('The "ETMfor" property of the "%s" bind source must be different from itself.', [LMasterBindSource.GetName]));
   // Se è aperto e stiamo cambiando l'ETMfor (già verificato all'inizio) allora si chiude (se è il caso si riaprirà alla fine del metodo)
   if LMasterBindSource.IsActive then
-    raise EioException.Create(ClassName, 'SetETMfor',
+    raise EioGenericException.Create(ClassName, 'SetETMfor',
       Format('Hi, I''m iORM, I have to explain something to you.' +
       #13#13'When a BindSource (%s) has its "ETMfor" property pointing to another BindSource then it acts as a "time machine" (ETM repository) for the latter''s current entity, in which case its activation will be done automatically.' +
       #13#13'For this reason, setting the "ETMfor" property of a BindSource while it is active IS NOT PERMITTED.' +
@@ -347,12 +347,12 @@ var
 begin
   // Some checks
   if not Assigned(ATargetBS) then
-    raise EioException.Create(ClassName, 'BuildWhere', Format('"BuildWhere" method is not invokable if the "WhereBuilderFor" property is unassigned (%s))',
+    raise EioGenericException.Create(ClassName, 'BuildWhere', Format('"BuildWhere" method is not invokable if the "WhereBuilderFor" property is unassigned (%s))',
       [ASourceBS.GetName]));
   if not ASourceBS.IsActive then
-    raise EioException.Create(ClassName, 'BuildWhere', Format('"BuildWhere" method is not invokable on closed BindSources (%s)', [ASourceBS.GetName]));
+    raise EioGenericException.Create(ClassName, 'BuildWhere', Format('"BuildWhere" method is not invokable on closed BindSources (%s)', [ASourceBS.GetName]));
   if not Assigned(ASourceBS.Current) then
-    raise EioException.Create(ClassName, 'BuildWhereuild',
+    raise EioGenericException.Create(ClassName, 'BuildWhereuild',
       Format('"BuildWhere" method is not invokable if the current object of the source BindSource "%s" is nil)', [ASourceBS.GetName]));
   // Post pending changes
   ASourceBS.PostIfEditing;

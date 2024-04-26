@@ -166,7 +166,7 @@ begin
   LMethod := Self.FindConstructor(ARttiType, AConstructorParams, AConstructorMarkerText, AConstructorMethodName);
   // If constructor not found...
   if not Assigned(LMethod) then
-    raise EioException.Create(Self.ClassName, 'CreateObjectByRttiTypeEx', 'Constructor not found for class "' + ARttiType.Name + '"');
+    raise EioGenericException.Create(Self.ClassName, 'CreateObjectByRttiTypeEx', 'Constructor not found for class "' + ARttiType.Name + '"');
   // Execute
    Result := LMethod.Invoke(ARttiType.AsInstance.MetaclassType, AConstructorParams).AsObject;
   // Inject Properties/Fields: if the received ContainerItem is not assigned then
@@ -200,7 +200,7 @@ begin
   if AViewModelOrSimpleView is TComponent then
     LViewModelOrSimpleView := TComponent(AViewModelOrSimpleView)
   else
-    raise EioException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('Class "%s" is not a TComponent descendant.', [AViewModelOrSimpleView.ClassName]));
+    raise EioGenericException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('Class "%s" is not a TComponent descendant.', [AViewModelOrSimpleView.ClassName]));
   // Extract PresenterSettings
   LPresenterSettings := APresenterSettingsPointer^;
   // Loop for all settings
@@ -226,14 +226,14 @@ begin
               LTargetBS.Open;
           end
           else
-            raise EioException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
+            raise EioGenericException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
         end;
       // Where
       TioDIPresenterSettingsType.pstWhere:
         begin
           LIntf := LPresenterSettings[I].InterfacedObj;
           if not Supports(LIntf, IioWhere, LWhere) then
-            raise EioException.Create(Self.ClassName, 'InitializeViewModelPresentersAfterCreate', 'Interface "IioWhere" not implemented by object.');
+            raise EioGenericException.Create(Self.ClassName, 'InitializeViewModelPresentersAfterCreate', 'Interface "IioWhere" not implemented by object.');
           LTargetBS.SetWhere(LWhere);
         end;
       // OrderBy
@@ -245,7 +245,7 @@ begin
           if Supports(LPresenterSettings[I].Obj, IioBindSource, LParamBS) then
             LTargetBS.SetSelectorFor(LParamBS)
           else
-            raise EioException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
+            raise EioGenericException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
         end;
       // WhereBuilderFor
       TioDIPresenterSettingsType.pstWhereBuilderFor:
@@ -253,7 +253,7 @@ begin
           if Supports(LTargetBS, IioMasterBindSource, LTargetMasterBS) and Supports(LPresenterSettings[I].Obj, IioMasterBindSource, LParamMasterBS) then
             LTargetMasterBS.SetWhereBuilderFor(LParamMasterBS)
           else
-            raise EioException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
+            raise EioGenericException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
         end;
       // ETMfor
       TioDIPresenterSettingsType.pstETMfor:
@@ -261,7 +261,7 @@ begin
           if Supports(LTargetBS, IioMasterBindSource, LTargetMasterBS) and Supports(LPresenterSettings[I].Obj, IioMasterBindSource, LParamMasterBS) then
             LTargetMasterBS.SetETMfor(LParamMasterBS)
           else
-            raise EioException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
+            raise EioGenericException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
         end;
     end;
   end;
@@ -339,7 +339,7 @@ begin
       Exit(AMethod);
   end;
   // If method/constructor not found...
-  raise EioException.Create(Self.ClassName + ': Method "' + AMethodName + '" not found');
+  raise EioGenericException.Create(Self.ClassName + ': Method "' + AMethodName + '" not found');
 end;
 
 class function TioObjectMakerIntf.CreateObjectFromBlobField(AQuery: IioQuery; AProperty: IioProperty): TObject;
@@ -451,7 +451,7 @@ begin
   LChildObject := AProperty.GetRelationChildObject(AContext.DataObject);
   // If the related child object not exists then exit (return 'NULL')
   if not Assigned(LChildObject) then
-    raise EioException.Create(ClassName, 'LoadPropertyHasMany', Format('Houston we have a problem.' +
+    raise EioGenericException.Create(ClassName, 'LoadPropertyHasMany', Format('Houston we have a problem.' +
         #13#13'I am loading an object of class "%s" with ID = %d.' +
         #13#13'The object of type "%s" in property "%s", on which there is an "HasMany" relationship, was not created.' +
         #13#13'This instance is usually created by the constructor method, in this case in the "%s" class.' +
@@ -481,7 +481,7 @@ begin
   LChildObject := AProperty.GetRelationChildObject(AContext.DataObject);
   // If the related child object not exists then exit (return 'NULL')
   if not Assigned(LChildObject) then
-    raise EioException.Create(ClassName, 'LoadPropertyEmbeddedHasMany', Format('Houston we have a problem.' +
+    raise EioGenericException.Create(ClassName, 'LoadPropertyEmbeddedHasMany', Format('Houston we have a problem.' +
         #13#13'I am loading an object of class "%s" with ID = %d.' +
         #13#13'The object of type "%s" in property "%s", on which there is an "EmbeddedHasMany" relationship, was not created.' +
         #13#13'This instance is usually created by the constructor method, in this case in the "%s" class.' +
@@ -529,7 +529,7 @@ begin
   // Get the stream from the DataObject property
   LChildObject := AProperty.GetValue(AContext.DataObject).AsObject;
   if not Assigned(LChildObject) then
-    raise EioException.Create(Self.ClassName, 'LoadPropertyStream', Format('Stream child object non assigned on property "%s", class "%s"',
+    raise EioGenericException.Create(Self.ClassName, 'LoadPropertyStream', Format('Stream child object non assigned on property "%s", class "%s"',
       [AProperty.GetName, AContext.Map.GetClassName]));
   LChildStream := LChildObject as TStream;
   // Get the BlobStream
@@ -555,7 +555,7 @@ begin
   LChildObject := AProperty.GetRelationChildObject(AContext.DataObject);
   // If the related child object not exists then exit (return 'NULL')
   if not Assigned(LChildObject) then
-    raise EioException.Create(Self.ClassName, 'LoadPropertyStreamable', Format('Streamable child object not assigned on property "%s", class "%s"',
+    raise EioGenericException.Create(Self.ClassName, 'LoadPropertyStreamable', Format('Streamable child object not assigned on property "%s", class "%s"',
       [AProperty.GetName, AContext.Map.GetClassName]));
   // Wrap the object into a DuckTypedStreamObject
   LDuckTypedStreamObject := TioDuckTypedFactory.DuckTypedStreamObject(LChildObject);

@@ -303,10 +303,10 @@ begin
   if FConnectionManagerContainer.ContainsKey(Result) then
     LConnectionInfo := FConnectionManagerContainer.Items[Result]
   else
-    raise EioException.Create(Self.ClassName + ': ConnectionInfo (TioConnectionInfo) for "' + Result + '" not found!');
+    raise EioGenericException.Create(Self.ClassName + ': ConnectionInfo (TioConnectionInfo) for "' + Result + '" not found!');
   // if the connection is of type then also check if it is present in the FireDAC's ConnectionDefs
   if (LConnectionInfo.ConnectionType <> TioConnectionType.ctHTTP) and not Assigned(FDManager.ConnectionDefs.FindConnectionDef(Result)) then
-    raise EioException.Create(Self.ClassName + ': Connection params definition "' + Result + '" not found!');
+    raise EioGenericException.Create(Self.ClassName + ': Connection params definition "' + Result + '" not found!');
 end;
 
 class procedure TioConnectionManager.ClearConnectionInfoSynchroStrategy(AConnectionName: String);
@@ -347,7 +347,7 @@ begin
     Result := FDManager.ConnectionDefs.FindConnectionDef(AConnectionName);
     // Connection not found
     if not Assigned(Result) then
-      raise EioException.Create(Self.ClassName + ': ConnectionDef not found.');
+      raise EioGenericException.Create(Self.ClassName + ': ConnectionDef not found.');
   finally
     _Unlock;
   end;
@@ -361,7 +361,7 @@ begin
     AConnectionName := GetCurrentConnectionNameIfEmpty(AConnectionName);
     // Return the desired connection type
     if not FConnectionManagerContainer.TryGetValue(AConnectionName, Result) then
-      raise EioException.Create(Self.ClassName, 'GetConnectionInfo',
+      raise EioGenericException.Create(Self.ClassName, 'GetConnectionInfo',
         Format('Connection named "%s" not found.'#13#13'It could be that It has not been defined or that its registration in the "connection manager" has not yet taken place (sequence problem, you are trying to use the connection before this has registered).',
         [AConnectionName]));
   finally
@@ -379,7 +379,7 @@ begin
     if FConnectionManagerContainer.ContainsKey(AConnectionName) then
       Result := FConnectionManagerContainer.Items[AConnectionName].SynchroStrategy
     else
-      raise EioException.Create(Self.ClassName, 'GetSynchroStrategy_Client',
+      raise EioGenericException.Create(Self.ClassName, 'GetSynchroStrategy_Client',
         Format('Connection named "%s" not found.'#13#13'It could be that It has not been defined or that its registration in the "connection manager" has not yet taken place (sequence problem, you are trying to use the connection before this has registered).',
         [AConnectionName]));
   finally

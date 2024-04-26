@@ -1046,7 +1046,7 @@ function TioWhere.SetDetailsContainer(ADetailsContainer: IioWhereDetailsContaine
 begin
   Result := Self;
   if not Assigned(ADetailsContainer) then
-    raise EioException.Create(Self.ClassName + '.SetDetailsContainer: The ADetailsContainer parameter is not valid.');
+    raise EioGenericException.Create(Self.ClassName + '.SetDetailsContainer: The ADetailsContainer parameter is not valid.');
   Self.FDetailsContainer := ADetailsContainer;
 end;
 
@@ -1131,7 +1131,7 @@ end;
 procedure TioWhere.ToList(const AList: TObject);
 begin
   if not Assigned(AList) then
-    raise EioException.Create(ClassName, 'ToList', '"AList" parameter not assigned');
+    raise EioGenericException.Create(ClassName, 'ToList', '"AList" parameter not assigned');
   if FClearListBefore then
     TioUtilities.ClearList(AList);
   TioPersistenceStrategyFactory.GetStrategy('').LoadList(Self, AList, FIntent);
@@ -1347,7 +1347,7 @@ end;
 procedure TioWhere._Show(const ADataObject: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const AForceTypeNameUse: Boolean);
 begin
   if not Assigned(ADataObject) then
-    raise EioException.Create(Self.ClassName, '_Show', 'ADataObject non assigned.');
+    raise EioGenericException.Create(Self.ClassName, '_Show', 'ADataObject non assigned.');
   // If specific View/ViewModel were found for the instance then use them...
   // NB: But only if AForceTypeNameUse = False
   if io.di.LocateViewFor(ADataObject, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
@@ -1361,7 +1361,7 @@ begin
     then
       io.di.LocateViewVMFor(TypeName, AParentCloseQueryAction, AVVMAlias).SetBindSource(ADataObject).Show
     else
-      raise EioException.Create(Self.ClassName, '_Show',
+      raise EioGenericException.Create(Self.ClassName, '_Show',
         Format('No View/ViewModel were found for this instance (Object class = "%s"; TypeName = "%s"; AVVMAlias = "%s")',
         [ADataObject.ClassName, TypeName, AVVMAlias]));
 end;
@@ -1380,7 +1380,7 @@ end;
 procedure TioWhere._Show(const ADataObject: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const AForceTypeNameUse: Boolean);
 begin
   if not Assigned(ADataObject) then
-    raise EioException.Create(Self.ClassName, '_Show', 'ADataObject non assigned.');
+    raise EioGenericException.Create(Self.ClassName, '_Show', 'ADataObject non assigned.');
   // If specific View/ViewModel were found for the instance then use them...
   // NB: But only if AForceTypeNameUse = False
   if io.di.LocateViewFor(ADataObject, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
@@ -1394,7 +1394,7 @@ begin
     then
       io.di.LocateViewVMFor(TypeName, AParentCloseQueryAction, AVVMAlias).SetBindSource(ADataObject).Show
     else
-      raise EioException.Create(Self.ClassName, '_Show',
+      raise EioGenericException.Create(Self.ClassName, '_Show',
         Format('No View/ViewModel were found for this instance (Object class = "%s"; TypeName = "%s"; AVVMAlias = "%s")',
         [(ADataObject as TObject).ClassName, TypeName, AVVMAlias]));
 end;

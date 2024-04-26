@@ -42,11 +42,18 @@ type
 
   TioHttpResponseBody = class(TInterfacedObject, IioHttpResponseBody)
   private
+    FExceptionClassName: String;
+    FExceptionMessage: String;
     FJSONDataValue: TJSONValue;
     FStream: TStream;
+    function ExceptionOccurred: Boolean;
+    function GetExceptionClassName: String;
+    function GetExceptionMessage: String;
     function GetJSONDataValue: TJSONValue;
     function GetJSONDataValueAsObject: TObject;
     function GetStream: TStream;
+    procedure SetExceptionClassName(const Value: String);
+    procedure SetExceptionMessage(const Value: String);
     procedure SetJSONDataValue(const Value: TJSONValue);
     procedure SetJSONDataValueAsObject(const AObj: TObject);
     function ToJSONText: String;
@@ -66,6 +73,8 @@ uses
 constructor TioHttpResponseBody.Create;
 begin
   inherited Create;
+  FExceptionClassName := String.Empty;
+  FExceptionMessage := String.Empty;
   FJSONDataValue := nil;
   FStream := nil;
 end;
@@ -92,6 +101,14 @@ begin
   Self.Create;
   LJSONObject := TJSONObject.ParseJSONValue(AJSONString) as TJSONObject;
   try
+    // ExceptionClassName
+    LJSONValue := LJSONObject.GetValue(KEY_EXCEPTIONCLASSNAME);
+    if Assigned(LJSONValue) then
+      FExceptionClassName := LJSONValue.Value;
+    // ExceptionClassMessage
+    LJSONValue := LJSONObject.GetValue(KEY_EXCEPTIONMESSAGE);
+    if Assigned(LJSONValue) then
+      FExceptionMessage := LJSONValue.Value;
     // JSONDataValue
     LJSONValue := LJSONObject.GetValue(KEY_JSONDATAVALUE);
     if Assigned(LJSONValue) then
@@ -114,6 +131,21 @@ begin
   inherited;
 end;
 
+function TioHttpResponseBody.ExceptionOccurred: Boolean;
+begin
+  Result := not (FExceptionClassName.IsEmpty and FExceptionMessage.IsEmpty);
+end;
+
+function TioHttpResponseBody.GetExceptionClassName: String;
+begin
+   Result := FExceptionClassName;
+end;
+
+function TioHttpResponseBody.GetExceptionMessage: String;
+begin
+   Result := FExceptionMessage;
+end;
+
 function TioHttpResponseBody.GetJSONDataValue: TJSONValue;
 begin
   Result := FJSONDataValue;
@@ -132,6 +164,16 @@ begin
   if not Assigned(FStream) then
     FStream := TMemoryStream.Create;
   Result := FStream;
+end;
+
+procedure TioHttpResponseBody.SetExceptionClassName(const Value: String);
+begin
+  FExceptionClassName := Value;
+end;
+
+procedure TioHttpResponseBody.SetExceptionMessage(const Value: String);
+begin
+  FExceptionMessage := Value;
 end;
 
 procedure TioHttpResponseBody.SetJSONDataValue(const Value: TJSONValue);
@@ -168,6 +210,10 @@ var
 begin
   LJSONObject := TJSONObject.Create;
   try
+    // ExceptionClassName
+    LJSONObject.AddPair(KEY_EXCEPTIONCLASSNAME, FExceptionClassName);
+    // ExceptionClassMessage
+    LJSONObject.AddPair(KEY_EXCEPTIONMESSAGE, FExceptionMessage);
     // JSONDataValue
     if Assigned(FJSONDataValue) then
       LJSONObject.AddPair(KEY_JSONDATAVALUE, FJSONDataValue.Clone as TJSONValue);

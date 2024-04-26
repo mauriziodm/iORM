@@ -161,7 +161,7 @@ begin
               [LDetailMap.GetTable.GetSql, LRelationChildProp.GetSqlQualifiedFieldName, AMasterMap.GetProperties.GetIdProperty.GetSqlQualifiedFieldName]))
         end
     else
-      raise EioException.Create(ClassName, '_GenerateMiddleJoins', Format('Wrong relation type (%s) on property "%s" of class "%s"',
+      raise EioGenericException.Create(ClassName, '_GenerateMiddleJoins', Format('Wrong relation type (%s) on property "%s" of class "%s"',
         [TioUtilities.EnumToString<TioRelationType>(AMasterProp.GetRelationType), AMasterProp.GetName, AMasterMap.GetClassName]));
     end;
     // If this is the last recursion (there no other remaining nested properties) then call the generation of the final
@@ -188,7 +188,7 @@ begin
   if not Result.IsEmpty then
     Result := Format('(%s)', [Result])
   else
-    raise EioException.Create(ClassName, 'GenerateSqlNestedWhere', 'The resulting where text is empty');
+    raise EioGenericException.Create(ClassName, 'GenerateSqlNestedWhere', 'The resulting where text is empty');
 end;
 
 function TioWhereNestedPropResolver._IsFirstLoop(const ABuildingResult: String): Boolean;

@@ -714,7 +714,7 @@ begin
   FBindedViewActionsContainer := TList<IioViewAction>.Create;
   // Solleva una eccezione se non siamo su un ViewModel
   if not Supports(Owner, IioViewModel) then
-    raise EioException.Create(ClassName, 'Create', Format('Component "%s" can only be used on class "TioViewModel" or its descendants.', [ClassName]));
+    raise EioGenericException.Create(ClassName, 'Create', Format('Component "%s" can only be used on class "TioViewModel" or its descendants.', [ClassName]));
 end;
 
 destructor TioVMActionCustom.Destroy;
@@ -981,7 +981,7 @@ end;
 procedure TioVMActionBSSelectCurrent.SetTargetBindSource(const Value: IioStdActionTargetBindSource);
 begin
   if not(csLoading in ComponentState) and FIsSlave then
-    raise EioException.Create(ClassName, 'SetTargetBindSource', 'The "TargetBindSource" property of a "..SelectCurrent" action is read-only when the action itself is nested into a "ShowOrSelect" action')
+    raise EioGenericException.Create(ClassName, 'SetTargetBindSource', 'The "TargetBindSource" property of a "..SelectCurrent" action is read-only when the action itself is nested into a "ShowOrSelect" action')
   else
     inherited;
 end;
@@ -1010,7 +1010,7 @@ var
   LTargetBindSource: IioStdActionTargetBindSource;
 begin
   if Assigned(AObj) and not Supports(AObj, IioStdActionTargetBindSource, LTargetBindSource) then
-    raise EioException.Create(ClassName, '_SetTargetBindSource', 'AObj does not implements IioStdActionTargetBindSource interface');
+    raise EioGenericException.Create(ClassName, '_SetTargetBindSource', 'AObj does not implements IioStdActionTargetBindSource interface');
   FIsSlave := False;
   SetTargetBindSource(LTargetBindSource);
   FIsSlave := True;
@@ -1114,7 +1114,7 @@ end;
 procedure TioVMActionBSPersistenceCustom.SetTargetBindSource(const Value: IioMasterBindSource);
 begin
   if not(csLoading in ComponentState) and FIsSlave then
-    raise EioException.Create(ClassName, 'SetTargetBindSource', 'The "TargetBindSource" property of a "..SelectCurrent" action is read-only when the action itself is nested into a "ShowOrSelect" action');
+    raise EioGenericException.Create(ClassName, 'SetTargetBindSource', 'The "TargetBindSource" property of a "..SelectCurrent" action is read-only when the action itself is nested into a "ShowOrSelect" action');
   if Value <> FTargetBindSource then
   begin
     FTargetBindSource := Value;
@@ -1154,7 +1154,7 @@ var
   LTargetBindSource: IioMasterBindSource;
 begin
   if Assigned(AObj) and not Supports(AObj, IioMasterBindSource, LTargetBindSource) then
-    raise EioException.Create(ClassName, '_SetTargetBindSource', 'AObj does not implements IioStdActionTargetBindSource interface');
+    raise EioGenericException.Create(ClassName, '_SetTargetBindSource', 'AObj does not implements IioStdActionTargetBindSource interface');
   FIsSlave := False;
   SetTargetBindSource(LTargetBindSource);
   FIsSlave := True;
@@ -1318,7 +1318,7 @@ begin
         Exit;
       end
       else
-        raise EioException.Create(Self.ClassName, '_InternalExecuteStdAction', 'Invalid new instance (nil)');
+        raise EioGenericException.Create(Self.ClassName, '_InternalExecuteStdAction', 'Invalid new instance (nil)');
     end;
     // New instance as Interface (OnNewInstanceAsInterface event handler)
     if Assigned(FOnNewInstanceAsInterface) then
@@ -1330,7 +1330,7 @@ begin
         Exit;
       end
       else
-        raise EioException.Create(Self.ClassName, '_InternalExecuteStdAction', 'Invalid new instance (nil)');
+        raise EioGenericException.Create(Self.ClassName, '_InternalExecuteStdAction', 'Invalid new instance (nil)');
     end;
     // New instance ny EntityType/Alias
     if not FEntityTypeName.IsEmpty and io.di.Locate(FEntityTypeName, FEntityTypeAlias).Exist then
@@ -1355,7 +1355,7 @@ begin
         end;
       end
       else
-        raise EioException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
+        raise EioGenericException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
     end;
     // New instance not provided (created by the ABSAdapter itself)
     TargetBindSource.Persistence.Append(RaiseIfRevertPointSaved, RaiseIfChangesExists);
@@ -1400,7 +1400,7 @@ begin
         Exit;
       end
       else
-        raise EioException.Create(Self.ClassName, '_InternalExecuteStdAction', 'Invalid new instance (nil)');
+        raise EioGenericException.Create(Self.ClassName, '_InternalExecuteStdAction', 'Invalid new instance (nil)');
     end;
     // New instance as Interface (OnNewInstanceAsInterface event handler)
     if Assigned(FOnNewInstanceAsInterface) then
@@ -1412,7 +1412,7 @@ begin
         Exit;
       end
       else
-        raise EioException.Create(Self.ClassName, '_InternalExecuteStdAction', 'Invalid new instance (nil)');
+        raise EioGenericException.Create(Self.ClassName, '_InternalExecuteStdAction', 'Invalid new instance (nil)');
     end;
     // New instance ny EntityType/Alias
     if not FEntityTypeName.IsEmpty and io.di.Locate(FEntityTypeName, FEntityTypeAlias).Exist then
@@ -1437,7 +1437,7 @@ begin
         end;
       end
       else
-        raise EioException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
+        raise EioGenericException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
     end;
     // New instance not provided (created by the ABSAdapter itself)
     TargetBindSource.Persistence.Insert(RaiseIfRevertPointSaved, RaiseIfChangesExists);
@@ -1593,7 +1593,7 @@ begin
         end;
       end
       else
-        raise EioException.Create(ClassName, '_InternalExecuteStdAction', 'Owner does not implement the "IioViewModelInternal" interface.');
+        raise EioGenericException.Create(ClassName, '_InternalExecuteStdAction', 'Owner does not implement the "IioViewModelInternal" interface.');
     end;
   finally
     FExecuting := False;
@@ -1736,7 +1736,7 @@ end;
 procedure TioVMActionBSShowOrSelect.SetTargetBindSource(const Value: IioStdActionTargetBindSource);
 begin
   if not(csLoading in ComponentState) and FIsSlave then
-    raise EioException.Create(ClassName, 'SetTargetBindSource', 'The "TargetBindSource" property of a "..SelectCurrent" action is read-only when the action itself is nested into a "ShowOrSelect" action');
+    raise EioGenericException.Create(ClassName, 'SetTargetBindSource', 'The "TargetBindSource" property of a "..SelectCurrent" action is read-only when the action itself is nested into a "ShowOrSelect" action');
   if Value <> FTargetBindSource then
   begin
     FTargetBindSource := Value;
@@ -1973,7 +1973,7 @@ var
   LTargetBindSource: IioStdActionTargetBindSource;
 begin
   if Assigned(AObj) and not Supports(AObj, IioStdActionTargetBindSource, LTargetBindSource) then
-    raise EioException.Create(ClassName, '_SetTargetBindSource', 'AObj does not implements IioStdActionTargetBindSource interface');
+    raise EioGenericException.Create(ClassName, '_SetTargetBindSource', 'AObj does not implements IioStdActionTargetBindSource interface');
   FIsSlave := False;
   SetTargetBindSource(LTargetBindSource);
   FIsSlave := True;
@@ -2041,7 +2041,7 @@ begin
   begin
     // Controlla se la ShowOrSelect action è realmente una action di questo tipo
     if not (Action_ShowOrSelectAction is TioVMActionBSShowOrSelect) then
-      raise EioException.Create(ClassName, '_ShowRevertedObj',
+      raise EioGenericException.Create(ClassName, '_ShowRevertedObj',
         Format('"Action_ShowOrSelectAction" property is of the wrong type "%s" insitead of "TioBSShowOrSelect".',
         [(Action_ShowOrSelectAction as TObject).ClassName]));
     // Estrae il tipo reale della ShowOrSelect action per poter poi accedere a informazioni che riguardano
@@ -2135,7 +2135,7 @@ begin
   begin
     // Controlla se la ShowOrSelect action è realmente una action di questo tipo
     if not (Action_ShowOrSelectAction is TioVMActionBSShowOrSelect) then
-      raise EioException.Create(ClassName, '_ShowRevertedObj',
+      raise EioGenericException.Create(ClassName, '_ShowRevertedObj',
         Format('"Action_ShowOrSelectAction" property is of the wrong type "%s" insitead of "TioBSShowOrSelect".',
         [(Action_ShowOrSelectAction as TObject).ClassName]));
     // Estrae il tipo reale della ShowOrSelect action per poter poi accedere a informazioni che riguardano

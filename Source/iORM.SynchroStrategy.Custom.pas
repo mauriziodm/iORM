@@ -768,7 +768,7 @@ begin
     // TODO: uniGUI - Probabilmente ci saranno dei problemi con uniGUI, controllare
     TioAnonymousTimer.Create(100, function: Boolean
       begin
-        raise EioException.Create(LExceptionMessage);
+        raise EioGenericException.Create(LExceptionMessage);
       end);
   end;
 end;

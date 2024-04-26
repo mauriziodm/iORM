@@ -1015,7 +1015,7 @@ var
 
 begin
   if not Supports(AContextAsIInterface, IioContext, LContext) then
-    raise EioException.Create(ClassName, 'Create', 'The object received by the "AContextAsIInterface" parameter does not implements "IioContext" interface.');
+    raise EioGenericException.Create(ClassName, 'Create', 'The object received by the "AContextAsIInterface" parameter does not implements "IioContext" interface.');
   // Se l'entità non ha un ID valido non è possibile che l'ETM funzioni
   if LContext.IDIsNull then
     raise EioETMException.Create(ClassName, 'Create',
@@ -1072,7 +1072,7 @@ begin
     itSynchro_PersistToServer, itSynchro_PersistToClient:
       Result := Format('%d (synchronized from %d)', [FEntityVersion, FEntityFromVersion]);
   else
-    raise EioException.Create(ClassName, 'GetSmartEntityVersion', 'IntentType not valid.');
+    raise EioGenericException.Create(ClassName, 'GetSmartEntityVersion', 'IntentType not valid.');
   end;
 end;
 
@@ -1250,7 +1250,7 @@ begin
   if not FEntityFinalPropName.Trim.IsEmpty then
     Result := FEntityFinalPropName
   else
-    raise EioException.Create(ClassName, 'GetEntityFinalPropName', '"EntityFinalPropName" property cannot be empty.');
+    raise EioGenericException.Create(ClassName, 'GetEntityFinalPropName', '"EntityFinalPropName" property cannot be empty.');
 end;
 
 function etmPropertyAttribute.GetEtmFinalPropName: String;
@@ -1258,7 +1258,7 @@ begin
   if not FEtmFinalPropName.Trim.IsEmpty then
     Result := FEtmFinalPropName
   else
-    raise EioException.Create(ClassName, 'GetEtmFinalPropName', '"EtmFinalPropName" property cannot be empty.');
+    raise EioGenericException.Create(ClassName, 'GetEtmFinalPropName', '"EtmFinalPropName" property cannot be empty.');
 end;
 
 constructor etmPropertyAttribute.Create(const AEntityPropName, AEtmPropName: String);

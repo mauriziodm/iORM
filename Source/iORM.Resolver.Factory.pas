@@ -64,11 +64,11 @@ begin
     rsByDependencyInjection:
       Result := TioResolverByDependencyInjection;
     rsByRtti:
-      raise EioException.Create(Self.ClassName + ': "rtByRtti" resolver mode not yet implemented.');
+      raise EioGenericException.Create(Self.ClassName + ': "rtByRtti" resolver mode not yet implemented.');
     rsByMaps:
-      raise EioException.Create(Self.ClassName + ': "rtByMaps" resolver mode not yet implemented.');
+      raise EioGenericException.Create(Self.ClassName + ': "rtByMaps" resolver mode not yet implemented.');
   else
-    raise EioException.Create(Self.ClassName + '.GetResolver: Invalid AResolverMode.');
+    raise EioGenericException.Create(Self.ClassName + '.GetResolver: Invalid AResolverMode.');
   end;
 end;
 

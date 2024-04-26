@@ -87,7 +87,7 @@ begin
   or Result.IsEmpty
   then
     if FSelfClassName.IsEmpty then
-      raise EioException.Create(Self.ClassName + ': Invalid Self or Interface specification.')
+      raise EioGenericException.Create(Self.ClassName + ': Invalid Self or Interface specification.')
     else
       Result := FSelfClassName;
 end;

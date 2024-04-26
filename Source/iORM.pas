@@ -1066,7 +1066,7 @@ end;
 class procedure io.ReloadObject(const AObj: TObject; const ALazy: boolean; const ALazyProps: String);
 begin
   if not Assigned(AObj) then
-    raise EioException.Create(ClassName, 'Reload', '"AObj" cannot be nil.');
+    raise EioGenericException.Create(ClassName, 'Reload', '"AObj" cannot be nil.');
   io.Load(AObj.ClassName).ByID(TioUtilities.ExtractOID(AObj)).Lazy(ALazy).LazyProps(ALazyProps).ClearListBefore.ToObject(AObj);
 end;
 

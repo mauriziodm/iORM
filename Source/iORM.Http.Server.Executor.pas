@@ -73,38 +73,48 @@ var
   LioRequestBody: IioHttpRequestBody;
   LioResponseBody: IioHttpResponseBody;
 begin
-  // Create ioRequestBody and ioResponseBody instances
-  LioRequestBody := TioHttpFactory.NewRequestBodyByJSONString(ARequestBodyAsString);
-  LioResponseBody := TioHttpFactory.NewResponseBody;
-  // Execute the right method/action (in ordine di prevista frequenza)
-  if LioRequestBody.MethodName = HTTP_METHOD_NAME_LOADOBJECT then
-    _LoadObject(LioRequestBody, LioResponseBody)
-  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_PERSISTOBJECT then
-    _PersistObject(LioRequestBody, LioResponseBody)
-  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_DELETEOBJECT then
-    _DeleteObject(LioRequestBody, LioResponseBody)
-  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_LOADLIST then
-    _LoadList(LioRequestBody, LioResponseBody)
-  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_PERSISTLIST then
-    _PersistList(LioRequestBody, LioResponseBody)
-  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_DELETELIST then
-    _DeleteList(LioRequestBody, LioResponseBody)
-  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_COUNT then
-    _Count(LioRequestBody, LioResponseBody)
-  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_DELETE then
-    _Delete(LioRequestBody, LioResponseBody)
-  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_LOADDATASET then
-    _LoadDataSet(LioRequestBody, LioResponseBody)
-  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_SQLDESTEXECUTE then
-    _SQLDestExecute(LioRequestBody, LioResponseBody)
-  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_SQLDESTLOADDATASET then
-    _SQLLoadDataSet(LioRequestBody, LioResponseBody)
-  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_DOSYNCHRONIZATION then
-    _DoSynchronization(LioRequestBody, LioResponseBody)
-  else
-    raise EioHttpException.Create(ClassName, 'Execute', Format('Method "%s" not found.', [LioRequestBody.MethodName]));
-  // Return the response
-  Result := LioResponseBody.ToJSONText;
+  try
+    // Create ioRequestBody and ioResponseBody instances
+    LioRequestBody := TioHttpFactory.NewRequestBodyByJSONString(ARequestBodyAsString);
+    LioResponseBody := TioHttpFactory.NewResponseBody;
+    // Execute the right method/action (in ordine di prevista frequenza)
+    if LioRequestBody.MethodName = HTTP_METHOD_NAME_LOADOBJECT then
+      _LoadObject(LioRequestBody, LioResponseBody)
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_PERSISTOBJECT then
+      _PersistObject(LioRequestBody, LioResponseBody)
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_DELETEOBJECT then
+      _DeleteObject(LioRequestBody, LioResponseBody)
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_LOADLIST then
+      _LoadList(LioRequestBody, LioResponseBody)
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_PERSISTLIST then
+      _PersistList(LioRequestBody, LioResponseBody)
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_DELETELIST then
+      _DeleteList(LioRequestBody, LioResponseBody)
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_COUNT then
+      _Count(LioRequestBody, LioResponseBody)
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_DELETE then
+      _Delete(LioRequestBody, LioResponseBody)
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_LOADDATASET then
+      _LoadDataSet(LioRequestBody, LioResponseBody)
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_SQLDESTEXECUTE then
+      _SQLDestExecute(LioRequestBody, LioResponseBody)
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_SQLDESTLOADDATASET then
+      _SQLLoadDataSet(LioRequestBody, LioResponseBody)
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_DOSYNCHRONIZATION then
+      _DoSynchronization(LioRequestBody, LioResponseBody)
+    else
+      raise EioHttpLocalException.Create(ClassName, 'Execute', Format('Method "%s" not found.', [LioRequestBody.MethodName]));
+    // Return the response
+    Result := LioResponseBody.ToJSONText;
+  except
+    on E: Exception do
+    begin
+      LioResponseBody.ExceptionClassName := E.ClassName;
+      LioResponseBody.ExceptionMessage := E.Message;
+      // Return the response
+      Result := LioResponseBody.ToJSONText;
+    end;
+  end;
 end;
 
 class function TioHttpServerExecutor.Test: String;

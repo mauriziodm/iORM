@@ -100,7 +100,7 @@ begin
       WarningMessage := Format('Trying to destroy an owned TInterfacedDataModule of class %s named %s that still has %d interface references left',
         [ClassName, Name, RefCount]);
       // OutputDebugString(PChar(WarningMessage));
-      raise EioException.Create(ClassName, 'BeforeDestruction', WarningMessage);
+      raise EioGenericException.Create(ClassName, 'BeforeDestruction', WarningMessage);
     end;
 {$ENDIF DEBUG}
   end;

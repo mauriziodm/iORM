@@ -241,7 +241,7 @@ end;
 
 procedure TioActiveObjectBindSourceAdapter.Append(AObject: IInterface);
 begin
-  raise EioException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for class referenced instances only.');
+  raise EioGenericException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for class referenced instances only.');
 end;
 
 function TioActiveObjectBindSourceAdapter.AsActiveBindSourceAdapter: IioActiveBindSourceAdapter;
@@ -289,7 +289,7 @@ end;
 
 procedure TioActiveObjectBindSourceAdapter.DeleteListViewItem(const AItemIndex, ADelayMilliseconds: Integer);
 begin
-  raise EioException.Create(Self.ClassName, 'DeleteListViewItem', 'Method not available in ObjectBindSourceAdapters.');
+  raise EioGenericException.Create(Self.ClassName, 'DeleteListViewItem', 'Method not available in ObjectBindSourceAdapters.');
 end;
 
 destructor TioActiveObjectBindSourceAdapter.Destroy;
@@ -392,7 +392,7 @@ begin
   // if not empty extract the detail object
   if not AValue.IsEmpty then
     if FMasterProperty.IsInterface then
-      raise EioException.Create(Self.ClassName, 'ExtractDetailObject', 'Master property (in the master object) is an interface type.')
+      raise EioGenericException.Create(Self.ClassName, 'ExtractDetailObject', 'Master property (in the master object) is an interface type.')
     else
       LDetailObj := AValue.AsObject;
   // Set it to the Adapter itself
@@ -608,7 +608,7 @@ end;
 
 procedure TioActiveObjectBindSourceAdapter.Insert(AObject: IInterface);
 begin
-  raise EioException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for class referenced instances only.');
+  raise EioGenericException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for class referenced instances only.');
 end;
 
 function TioActiveObjectBindSourceAdapter.HasBindSource: Boolean;
@@ -638,7 +638,7 @@ end;
 
 procedure TioActiveObjectBindSourceAdapter.LoadPage;
 begin
-  raise EioException.Create(Self.ClassName, 'LoadPage', 'Method not available in ObjectBindSourceAdapters.');
+  raise EioGenericException.Create(Self.ClassName, 'LoadPage', 'Method not available in ObjectBindSourceAdapters.');
 end;
 
 function TioActiveObjectBindSourceAdapter.MasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
@@ -755,12 +755,12 @@ end;
 
 procedure TioActiveObjectBindSourceAdapter.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
-  raise EioException.Create(Self.ClassName, 'SetDataObject', 'This ActiveBindSourceAdapter is for class referenced instances only (not interfaced).');
+  raise EioGenericException.Create(Self.ClassName, 'SetDataObject', 'This ActiveBindSourceAdapter is for class referenced instances only (not interfaced).');
 end;
 
 procedure TioActiveObjectBindSourceAdapter.InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
-  raise EioException.Create(Self.ClassName, 'InternalSetDataObject', 'This ActiveBindSourceAdapter is for class referenced instances only (not interfaced).');
+  raise EioGenericException.Create(Self.ClassName, 'InternalSetDataObject', 'This ActiveBindSourceAdapter is for class referenced instances only (not interfaced).');
 end;
 
 procedure TioActiveObjectBindSourceAdapter.InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);

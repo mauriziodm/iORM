@@ -78,11 +78,11 @@ begin
   // LoadFromStreamMethod method
   FLoadFromStreamMethod := Typ.GetMethod('LoadFromStream');
   if not Assigned(FLoadFromStreamMethod) then
-    raise EioException.Create(ClassName, 'TioDuckTypedStreamObject', Format('"LoadFromStream" method not found in the object of "%s" class.', [AObj.ClassName]));
+    raise EioGenericException.Create(ClassName, 'TioDuckTypedStreamObject', Format('"LoadFromStream" method not found in the object of "%s" class.', [AObj.ClassName]));
   // SaveFromStreamMethod method
   FSaveToStreamMethod := Typ.GetMethod('SaveToStream');
   if not Assigned(FSaveToStreamMethod) then
-    raise EioException.Create(ClassName, 'TioDuckTypedStreamObject', Format('"SaveToStream" method not found in the object of "%s" class.', [AObj.ClassName]));
+    raise EioGenericException.Create(ClassName, 'TioDuckTypedStreamObject', Format('"SaveToStream" method not found in the object of "%s" class.', [AObj.ClassName]));
   // IsEmpty method
   FIsEmptyMethod := Typ.GetMethod('IsEmpty');
   if not Assigned(FIsEmptyMethod) then

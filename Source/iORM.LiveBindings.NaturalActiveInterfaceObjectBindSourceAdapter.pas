@@ -77,7 +77,7 @@ var
   LCurrentAsInterface: IInterface;
 begin
   if not Supports(ASourceAdapter.GetCurrent, IInterface, LCurrentAsInterface) then
-    raise EioException.Create(ClassName, 'Create', '"ASourceAdapter" object parameter does not implements "IInterface".');
+    raise EioGenericException.Create(ClassName, 'Create', '"ASourceAdapter" object parameter does not implements "IInterface".');
   inherited Create(
                    ASourceAdapter.GetTypeName,
                    ASourceAdapter.GetTypeAlias,

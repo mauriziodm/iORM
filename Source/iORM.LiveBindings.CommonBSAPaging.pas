@@ -550,7 +550,7 @@ end;
 procedure TioCommonBSAPageManagerConcrete.CheckStrategy;
 begin
   if not Assigned(FStrategy) then
-    raise EioException.Create(Self.ClassName, 'CheckStrategy', 'Paging is not active.')
+    raise EioGenericException.Create(Self.ClassName, 'CheckStrategy', 'Paging is not active.')
 end;
 
 constructor TioCommonBSAPageManagerConcrete.Create(const ALoadPageMethod: TioBSAPagingLoadMethod);
@@ -655,7 +655,7 @@ begin
   if Value > 0 then
     FPageSize := Value
   else
-    raise EioException.Create(Self.ClassName, 'SetPageSize', '"PageSize" property must be greater than zero.');
+    raise EioGenericException.Create(Self.ClassName, 'SetPageSize', '"PageSize" property must be greater than zero.');
 end;
 
 procedure TioCommonBSAPageManagerConcrete.SetPagingType(const Value: TioBSAPagingType);

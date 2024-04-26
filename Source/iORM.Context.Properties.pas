@@ -1128,12 +1128,12 @@ begin
     if CurrProp.GetName.ToUpper.Equals(APropertyName.ToUpper) then
       Exit(CurrProp);
   if ARaiseIfNotFound then
-    raise EioException.Create(Self.ClassName + ': Context property "' + APropertyName + '" not found.');
+    raise EioGenericException.Create(Self.ClassName + ': Context property "' + APropertyName + '" not found.');
 end;
 
 function TioProperties.GetSql: String;
 begin
-  raise EioException.Create(ClassName, 'GetSql', 'Method not to be called on this class');
+  raise EioGenericException.Create(ClassName, 'GetSql', 'Method not to be called on this class');
 end;
 
 function TioProperties.ObjCreatedPropertyExist: Boolean;
@@ -1374,7 +1374,7 @@ end;
 function TioHasManyChildVirtualProperty.GetValue(const Instance: Pointer): TValue;
 begin
   // No inherited
-  raise EioException.Create(ClassName, 'GetValue', 'Method not implemented on this class');
+  raise EioGenericException.Create(ClassName, 'GetValue', 'Method not implemented on this class');
 end;
 
 function TioHasManyChildVirtualProperty.IsEnumeration: Boolean;
@@ -1398,7 +1398,7 @@ end;
 procedure TioHasManyChildVirtualProperty.SetValue(const Instance: Pointer; const AValue: TValue);
 begin
   // No inherited
-  raise EioException.Create(ClassName, 'GetValue', 'Method not implemented on this class');
+  raise EioGenericException.Create(ClassName, 'GetValue', 'Method not implemented on this class');
 end;
 
 end.

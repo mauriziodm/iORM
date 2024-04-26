@@ -77,7 +77,7 @@ var
 begin
   LName := Uppercase(AVMAction.Name);
   if Contains(LName) then
-    raise EioException.Create(Self.ClassName, 'Add',
+    raise EioGenericException.Create(Self.ClassName, 'Add',
       Format('You are trying to register the VMAction named "%s" (owned by "%s") on the ViewModel "%s" but an action with the same name already exists (owned by "%s").'
       + #13#13'Have you considered the possibility of prefixing the name of the action with the name of the object that owns it? (ex: ''VMCustomer.acSave'')',
       [AVMAction.Name, AVMAction.Owner.Name, (FViewModel as TComponent).Name, Get(LName).Owner.Name]));
@@ -89,7 +89,7 @@ begin
   if Contains(AViewAction.VMActionName) then
     Get(AViewAction.VMActionName).BindViewAction(AViewAction)
   else
-    raise EioException.Create(ClassName, 'BindViewAction',
+    raise EioGenericException.Create(ClassName, 'BindViewAction',
       Format('Sorry, I can''t bind ViewAction "%s" with corresponding VMAction "%s" because I can''t find any VMAction with this name on ViewModel "%s".',
       [AViewAction.Name, AViewAction.VMActionName, (FViewModel as TComponent).Name]));
 end;
@@ -148,7 +148,7 @@ begin
   Result := nil;
   if FContainer.TryGetValue(Uppercase(AName), Result) or ANoException then
     Exit;
-  raise EioException.Create(Self.ClassName, 'Get', Format('I''m sorry, I can''t find any VMAction named "%s" on ViewModel "%s".', [AName, (FViewModel as TComponent).Name]));
+  raise EioGenericException.Create(Self.ClassName, 'Get', Format('I''m sorry, I can''t find any VMAction named "%s" on ViewModel "%s".', [AName, (FViewModel as TComponent).Name]));
 end;
 
 procedure TioVMActionContainer._InternalLoadVMActions(const AViewModel: TComponent);
@@ -167,7 +167,7 @@ begin
     if Supports(AViewModel.Components[i], IioBSCloseQueryAction, LBSCloseQueryAction) then
     begin
       if Assigned(FBSCloseQueryAction) then
-        raise EioException.Create(ClassName, '_InternalLoadVMActions', Format('Hi, I''m iORM.' +
+        raise EioGenericException.Create(ClassName, '_InternalLoadVMActions', Format('Hi, I''m iORM.' +
           #13#13'On ViewModel "%s" there can be only one "TioVMActionBSCloseQuery" action.' +
           #13#13'Please make sure there''s only one left and you''ll see that everything will be fine.',
           [(FViewModel as TComponent).Name]));

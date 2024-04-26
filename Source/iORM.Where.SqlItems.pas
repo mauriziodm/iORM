@@ -156,7 +156,7 @@ end;
 
 constructor TioSqlItemsWhereTValue.Create(const ASqlText: String);
 begin
-  raise EioException.Create('TioSqlItemsWhereValue wrong constructor called');
+  raise EioGenericException.Create('TioSqlItemsWhereValue wrong constructor called');
 end;
 
 function TioSqlItemsWhereTValue.GetSql(const AMap: IioMap): String;
@@ -217,7 +217,7 @@ end;
 
 constructor TioSqlItemsWherePropertyEqualsTo.Create(const ASqlText: String);
 begin
-  raise EioException.Create(Self.ClassName + ': wrong constructor called');
+  raise EioGenericException.Create(Self.ClassName + ': wrong constructor called');
 end;
 
 constructor TioSqlItemsWherePropertyEqualsTo.Create(const ASqlText: String; const AValue: TValue);
@@ -254,7 +254,7 @@ end;
 
 constructor TioSqlItemsWherePropertyIDEqualsTo.Create(const ASqlText: String);
 begin
-  raise EioException.Create(Self.ClassName + ': wrong constructor called');
+  raise EioGenericException.Create(Self.ClassName + ': wrong constructor called');
 end;
 
 constructor TioSqlItemsWherePropertyIDEqualsTo.Create(const AValue: TValue);
@@ -310,7 +310,7 @@ end;
 
 constructor TioSqlItemsCriteria.Create(const ASqlText: String);
 begin
-  raise EioException.Create(Self.ClassName + ': wrong constructor called');
+  raise EioGenericException.Create(Self.ClassName + ': wrong constructor called');
 end;
 
 constructor TioSqlItemsCriteria.Create(const APropertyName: String; const ACompareOperator: TioCompareOp; AValue: TValue);

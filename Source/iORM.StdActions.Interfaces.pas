@@ -121,7 +121,7 @@ begin
     LEventProperty.SetValue(ATarget, LEventHandlerAsTValue);
   end
   else
-    raise EioException.Create(ClassName, '_InjectOnCloseEventHandler',
+    raise EioGenericException.Create(ClassName, '_InjectOnCloseEventHandler',
       Format('An "OnCloseQuery" event handler is already present in the class "%s".' +
       #13#13'Concurrent use of "%s" action and the "OnCloseQuery" event handler is not allowed.' +
       #13#13'If you need to both handle the "OnCloseQuery" event and have the standard action "%s" then you can handle the "OnCloseQuery" event on the action itself instead of the one on the class "%s".',
@@ -132,7 +132,7 @@ class function TioBSCloseQueryCommonBehaviour.IsChildOf(AQueryingCloseQueryActio
 begin
   Result := False;
   if not Assigned(ATargetCloseQueryAction) then
-    raise EioException.Create(ClassName, 'IsChildOf', 'The "ATargetCloseQueryAction" parameter is unassigned.' +
+    raise EioGenericException.Create(ClassName, 'IsChildOf', 'The "ATargetCloseQueryAction" parameter is unassigned.' +
       #13#13'This parameter cannot be left unassigned.');
   while Assigned(AQueryingCloseQueryAction) do
     if AQueryingCloseQueryAction.Action_ParentCloseQueryAction = ATargetCloseQueryAction then

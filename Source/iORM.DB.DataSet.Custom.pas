@@ -652,7 +652,7 @@ begin
   // Check if the operation (Open) is allowed
   TioCommonBSBehavior.CheckForOpen(Self, LoadType);
   if not CheckAdapter(True) then
-    raise EioException.Create(ClassName, 'InternalPreOpen', 'There was some problem creating the ActiveBindSourceAdapter');
+    raise EioGenericException.Create(ClassName, 'InternalPreOpen', 'There was some problem creating the ActiveBindSourceAdapter');
   GetActiveBindSourceAdapter.Active := True;
   inherited;
 end;
@@ -992,7 +992,7 @@ begin
   if CheckAdapter then
     GetActiveBindSourceAdapter.ItemIndex := Value
   else
-    raise EioException.Create(Self.ClassName, 'SetItemindex', 'Unassigned BindSourceAdapter');
+    raise EioGenericException.Create(Self.ClassName, 'SetItemindex', 'Unassigned BindSourceAdapter');
 end;
 
 procedure TioDataSetCustom.SetMasterBindSource(const Value: IioBindSource);
@@ -1060,7 +1060,7 @@ begin
   // then it no longer writes me the values of the sub-properties in the DFM file.
   // So I also put the set method where, however, I raise an exception if someone
   // tries to set a value.
-  raise EioException.Create(ClassName, 'SetPaging', 'This property "Paging" is not writable');
+  raise EioGenericException.Create(ClassName, 'SetPaging', 'This property "Paging" is not writable');
 end;
 
 procedure TioDataSetCustom.SetSelectorFor(const ATargetBindSource: IioBindSource);
@@ -1165,7 +1165,7 @@ procedure TioDataSetCustom._CreateAdapter(const ADataObject: TObject; const AOwn
 begin
   // If an adapter already exists then raise an exception
   if CheckAdapter then
-    raise EioException.Create(ClassName, '_CreateAdapter', Format('ActiveBindSourceAdapter already exists in component "%s".', [Name]));
+    raise EioGenericException.Create(ClassName, '_CreateAdapter', Format('ActiveBindSourceAdapter already exists in component "%s".', [Name]));
   // If it is a detail bind source then get the detail BSA from the master bind source,
   // else if it is a master bind source but load type property is set to ltFromBSAsIs, ltFromBSReload or ltFromBSReloadNewInstance
   // then get the natural BSA from the source bind source else it is a master bind source then get the normal BSA.

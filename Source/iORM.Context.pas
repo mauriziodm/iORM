@@ -354,14 +354,14 @@ begin
     atDelete:
       Result := TioCustomConflictStrategyRef(GetTable.DeleteConflictStrategy).Name;
   else
-    raise EioException.Create(ClassName, 'GetCurrentStrategyName', 'Undefined action type.');
+    raise EioGenericException.Create(ClassName, 'GetCurrentStrategyName', 'Undefined action type.');
   end;  
 end;
 
 function TioContext.GetObjID: Integer;
 begin
   if not Assigned(FDataObject) then
-    raise EioException.Create(Self.ClassName + '.GetID: DataObject not assigned');
+    raise EioGenericException.Create(Self.ClassName + '.GetID: DataObject not assigned');
   Result := GetProperties.GetIdProperty.GetValue(FDataObject).AsInteger;
 end;
 

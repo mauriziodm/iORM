@@ -213,7 +213,7 @@ end;
 class procedure TioSingletonsContainer.InternalResetKey(AKey: String);
 begin
   // For this procedure the AKey parameter must be passed (<>'')
-  if AKey.IsEmpty then raise EioException.Create(Self.ClassName + ': AKey parameter not valid!');
+  if AKey.IsEmpty then raise EioGenericException.Create(Self.ClassName + ': AKey parameter not valid!');
   // Remove the key
   Self.Container.Remove(AKey);
 end;

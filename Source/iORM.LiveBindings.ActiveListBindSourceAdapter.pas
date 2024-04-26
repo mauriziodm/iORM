@@ -299,7 +299,7 @@ end;
 
 procedure TioActiveListBindSourceAdapter.Append(AObject: IInterface);
 begin
-  raise EioException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for class referenced instances only.');
+  raise EioGenericException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for class referenced instances only.');
 end;
 
 function TioActiveListBindSourceAdapter.AsActiveBindSourceAdapter: IioActiveBindSourceAdapter;
@@ -672,7 +672,7 @@ end;
 
 procedure TioActiveListBindSourceAdapter.Insert(AObject: IInterface);
 begin
-  raise EioException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for class referenced instances only.');
+  raise EioGenericException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for class referenced instances only.');
 end;
 
 function TioActiveListBindSourceAdapter.HasBindSource: Boolean;

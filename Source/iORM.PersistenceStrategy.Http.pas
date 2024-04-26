@@ -316,7 +316,7 @@ class function TioPersistenceStrategyHttp.LoadObjectByClassOnly(const AWhere: Ii
 begin
   // This method is only used internally by the Object Maker,
   // and then you do not need to implement it in RESTStrategy.
-  raise EioException.Create(Self.ClassName + ': "LoadObjectByClassOnly", method not implemented in this strategy.');
+  raise EioGenericException.Create(Self.ClassName + ': "LoadObjectByClassOnly", method not implemented in this strategy.');
 end;
 
 class procedure TioPersistenceStrategyHttp._DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;

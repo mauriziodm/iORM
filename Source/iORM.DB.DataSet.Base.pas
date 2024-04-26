@@ -312,7 +312,7 @@ begin
   if (ReqBookmark >= BofCrack) and (ReqBookmark <= InternalRecordCount) then
     FCurrentRecord := ReqBookmark
   else
-    raise EioException.Create(Self.ClassName, 'InternalGotoBookmark', 'Bookmark ' + ReqBookmark.ToString + ' not found');
+    raise EioGenericException.Create(Self.ClassName, 'InternalGotoBookmark', 'Bookmark ' + ReqBookmark.ToString + ' not found');
 end;
 
 procedure TioBaseDataSet.InternalGotoBookmark(Bookmark: TBookmark);
@@ -323,7 +323,7 @@ begin
   if (ReqBookmark >= BofCrack) and (ReqBookmark <= InternalRecordCount) then
     FCurrentRecord := ReqBookmark
   else
-    raise EioException.Create(Self.ClassName, 'InternalGotoBookmark', 'Bookmark ' + ReqBookmark.ToString + ' not found');
+    raise EioGenericException.Create(Self.ClassName, 'InternalGotoBookmark', 'Bookmark ' + ReqBookmark.ToString + ' not found');
 end;
 
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -472,7 +472,7 @@ begin
   if Result = grOK then
     InternalLoadCurrentRecord(Buffer)
   else if (Result = grError) and DoCheck then
-    raise EioException.Create(Self.ClassName, 'GetRecord', 'Invalid record');
+    raise EioGenericException.Create(Self.ClassName, 'GetRecord', 'Invalid record');
 end;
 
 // III: Initialize the record (set to 0)
@@ -503,7 +503,7 @@ end;
 procedure TioBaseDataSet.InternalDelete;
 begin
   // not supported in this generic version
-  raise EioException.Create(Self.ClassName, 'InternalDelete', 'Operation not supported');
+  raise EioGenericException.Create(Self.ClassName, 'InternalDelete', 'Operation not supported');
 end;
 
 // default exception handling
@@ -517,13 +517,13 @@ end;
 procedure TioBaseDataSet.InternalAddRecord(Buffer: TRecBuf; Append: Boolean);
 begin
   // not supported in this generic version
-  raise EioException.Create(Self.ClassName, 'InternalAddRecord', 'Operation not supported');
+  raise EioGenericException.Create(Self.ClassName, 'InternalAddRecord', 'Operation not supported');
 end;
 
 procedure TioBaseDataSet.InternalPost;
 begin
   // not supported in this generic version
-  raise EioException.Create(Self.ClassName, 'InternalPost', 'Operation not supported');
+  raise EioGenericException.Create(Self.ClassName, 'InternalPost', 'Operation not supported');
 end;
 
 procedure TioBaseDataSet.InternalAfterOpen;
@@ -551,7 +551,7 @@ begin
     // AnActiveBSA.Refresh(False);
   end
   else
-    raise EioException.Create(ClassName, 'Append(IInterface)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
+    raise EioGenericException.Create(ClassName, 'Append(IInterface)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
 end;
 
 procedure TioBSABaseDataSet.Append(AObject: TObject);
@@ -567,7 +567,7 @@ begin
     // AnActiveBSA.Refresh(False);
   end
   else
-    raise EioException.Create(ClassName, 'Append(TObject)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
+    raise EioGenericException.Create(ClassName, 'Append(TObject)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
 end;
 
 function TioBSABaseDataSet.CheckAdapter: Boolean;
@@ -593,7 +593,7 @@ begin
     TFieldType.ftBlob:
       Result := TioStreamableObjBlobStream.Create(Field as TBlobField, Mode);
   else
-    raise EioException.Create(Self.ClassName, '.CreateBlobStream: Invalid FieldType (blob)');
+    raise EioGenericException.Create(Self.ClassName, '.CreateBlobStream: Invalid FieldType (blob)');
   end;
 end;
 
@@ -634,7 +634,7 @@ begin
     // AnActiveBSA.Refresh(False);
   end
   else
-    raise EioException.Create(ClassName, 'Insert(IInterface)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
+    raise EioGenericException.Create(ClassName, 'Insert(IInterface)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
 end;
 
 procedure TioBSABaseDataSet.Insert(AObject: TObject);
@@ -650,7 +650,7 @@ begin
     // AnActiveBSA.Refresh(False);
   end
   else
-    raise EioException.Create(ClassName, 'Insert(TObject)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
+    raise EioGenericException.Create(ClassName, 'Insert(TObject)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
 end;
 
 procedure TioBSABaseDataSet.InternalCancel;
@@ -723,7 +723,7 @@ procedure TioBSABaseDataSet.InternalInitFieldDefs;
 
 begin
   if not Assigned(FMap) then
-    raise EioException.Create(Self.ClassName, 'InternalInitFieldDefs', 'Unassigned class map.');
+    raise EioGenericException.Create(Self.ClassName, 'InternalInitFieldDefs', 'Unassigned class map.');
   // Clear field definitions
   FieldDefs.Clear;
   // If some field is specified in the FieldsEditor then create che InternalFieldDefs
@@ -866,7 +866,7 @@ end;
 procedure TioBSABaseDataSet.SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);
 begin
   if not Assigned(AActiveBindSourceAdpter) then
-    raise EioException.Create(ClassName, 'SetInternalAdapter', 'Invalid BindSourceAdapter (nil).');
+    raise EioGenericException.Create(ClassName, 'SetInternalAdapter', 'Invalid BindSourceAdapter (nil).');
   if AActiveBindSourceAdpter = FBindSourceAdapter then
     Exit;
   // Set the Map of the BaseObject of the ActiveBindSourceAdapter
@@ -1349,7 +1349,7 @@ begin
     Self.Position := 0;
   end
   else
-    raise EioException.Create(Self.ClassName, 'WriteBlobData', 'Streamable object not assigned.');
+    raise EioGenericException.Create(Self.ClassName, 'WriteBlobData', 'Streamable object not assigned.');
 end;
 
 { TioFullPathPropertyReadWrite }
@@ -1406,7 +1406,7 @@ begin
     LMidPathProperty := TioMapContainer.GetMap(AOutObj.ClassName).GetProperties.GetPropertyByName(LPropName);
     // If it is not the last property of the path then it must have a  BelongsTo, HasOne or EmbeddedHasOne relationship
     if not(LMidPathProperty.GetRelationType in [rtBelongsTo, rtHasOne, rtEmbeddedHasOne]) then
-      raise EioException.Create(ClassName, '_ResolvePath', Format('Property "%s.%s" must have a BelongsTo, HasOne or EmbeddedHasOne relationship.',
+      raise EioGenericException.Create(ClassName, '_ResolvePath', Format('Property "%s.%s" must have a BelongsTo, HasOne or EmbeddedHasOne relationship.',
         [AOutObj.ClassName, LPropName]));
     AOutObj := LMidPathProperty.GetRelationChildObject(AOutObj);
     // Recursion: If the child object is not assigned, the recursion stops and the function returns false
@@ -1453,7 +1453,7 @@ begin
       begin
         Result := TioEnumContainer._OrdinalToStringAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType), LRttiProperty.GetValue(AObj).AsOrdinal).AsString;
         if not (AField is TStringField) then
-          raise EioException.Create(ClassName, 'GetValue', Format('Hi, I''m iORM and there is a problem.' +
+          raise EioGenericException.Create(ClassName, 'GetValue', Format('Hi, I''m iORM and there is a problem.' +
             #13#13'The property "%s" of the class "%s" is of the enumerated type "%s" and you have chosen to bind it as a string decorating it '+
             '(the enum type) with the attribute [ioEnumerated], however the field "%s" of the dataset called "%s" is of type "%s" while it should be "TStringField".'+
             #13#13'NOTE: if you prefer to bind this enumerated type as integer instead then you can remove the [ioEnumerated] attribute from its declaration.' +
@@ -1465,7 +1465,7 @@ begin
       begin
         Result := Byte(LRttiProperty.GetValue(AObj).GetReferenceToRawData^);
         if not (AField is TIntegerField) then
-          raise EioException.Create(ClassName, 'GetValue', Format('Hi, I''m iORM and there is a problem.' +
+          raise EioGenericException.Create(ClassName, 'GetValue', Format('Hi, I''m iORM and there is a problem.' +
             #13#13'The property "%s" of the class "%s" is of the enumerated type "%s" and you have chosen to bind it as integer, ' +
             'however the field "%s" of the dataset called "%s" is of type "%s" while it should be "TIntegerField".'+
             #13#13'NOTE: if you prefer to bind this enumerated type as a string instead, then you can decorate it with the [ioEnumerated] attribute.' +
@@ -1497,7 +1497,7 @@ begin
   end;
   // Check if the VirtualFields are enabled
   if not LBindSource.VirtualFields then
-    raise EioException.Create(Self.ClassName, '_GetValueForBSProp',
+    raise EioGenericException.Create(Self.ClassName, '_GetValueForBSProp',
       Format('iORM trying to read the value of the "%s" virtual field declared in the component "%s".' +
       #13#13'I''m sorry but the "VirtualFields" property of that component is set to "False" so they are disabled.' +
       #13#13'Set the property to "True" and try again, it will work.', [APropName, LBindSource.GetName]));
@@ -1542,7 +1542,7 @@ begin
   // NB: If it's a property relative to the BindSource then raise an exception because
   //      these type of properties are ReadOnly
   if AFullPathPropName.StartsWith('%') then
-    raise EioException.Create(Self.ClassName, 'SetValue',
+    raise EioGenericException.Create(Self.ClassName, 'SetValue',
       Format('Ooops, I see you have set some virtual fields in some BindSource or DataSet (FieldDefs property), they are the ones whose name starts with the character "%%".' +
       #13#13'Note that these type of virtual fields are read-only by design; iORM cannot assign the new value to the field named "%s".' +
       #13#13'Please, try to Assign the value to the DataSet property directly by code.', [AFullPathPropName]));
@@ -1564,7 +1564,7 @@ begin
       LRttiProperty.SetValue(AObj, AValue)
   end
   else
-    raise EioException.Create(Self.ClassName, 'SetValue',
+    raise EioGenericException.Create(Self.ClassName, 'SetValue',
       Format('I am unable to resolve the property path "%s".'#13#13'It could be that one of the objects along the way is nil.', [AFullPathPropName]));
 end;
 

@@ -71,7 +71,7 @@ begin
   if Assigned(AConnection) and AConnection.IsDBConnection then
     FScriptComponent.Connection := AConnection.AsDBConnection.GetConnection
   else
-    raise EioException.Create(ClassName, 'Create', '"AConnection" parameter must be a DB connection type');
+    raise EioGenericException.Create(ClassName, 'Create', '"AConnection" parameter must be a DB connection type');
 end;
 
 destructor TioScript.Destroy;

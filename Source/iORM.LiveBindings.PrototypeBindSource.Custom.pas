@@ -357,7 +357,7 @@ begin
     // AnActiveBSA.Refresh(False);
   end
   else
-    raise EioException.Create(ClassName, 'Append(TObject)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
+    raise EioGenericException.Create(ClassName, 'Append(TObject)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
 end;
 
 procedure TioPrototypeBindSourceCustom.Append(AObject: IInterface);
@@ -373,7 +373,7 @@ begin
     // AnActiveBSA.Refresh(False);
   end
   else
-    raise EioException.Create(ClassName, 'Append(IInterface)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
+    raise EioGenericException.Create(ClassName, 'Append(IInterface)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
 end;
 
 procedure TioPrototypeBindSourceCustom.CancelIfEditing;
@@ -706,7 +706,7 @@ begin
     // AnActiveBSA.Refresh(False);
   end
   else
-    raise EioException.Create(ClassName, 'Insert(IInterface)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
+    raise EioGenericException.Create(ClassName, 'Insert(IInterface)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
 end;
 
 function TioPrototypeBindSourceCustom.IsActive: Boolean;
@@ -732,7 +732,7 @@ begin
     // AnActiveBSA.Refresh(False);
   end
   else
-    raise EioException.Create(ClassName, 'Insert(TObject)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
+    raise EioGenericException.Create(ClassName, 'Insert(TObject)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
 end;
 
 function TioPrototypeBindSourceCustom.GetIsInterfacePresenting: Boolean;
@@ -1254,7 +1254,7 @@ begin
   // then it no longer writes me the values of the sub-properties in the DFM file.
   // So I also put the set method where, however, I raise an exception if someone
   // tries to set a value.
-  raise EioException.Create(ClassName, 'SetPaging', 'This property "Paging" is not writable');
+  raise EioGenericException.Create(ClassName, 'SetPaging', 'This property "Paging" is not writable');
 end;
 
 procedure TioPrototypeBindSourceCustom.SetPreview(const Value: Boolean);
@@ -1325,7 +1325,7 @@ begin
     Exit;
   // If an adapter already exists then raise an exception
   if Assigned(FBindSourceAdapter) then
-    raise EioException.Create(ClassName, '_CreateAdapter', Format('ActiveBindSourceAdapter already exists in component "%s".', [Name]));
+    raise EioGenericException.Create(ClassName, '_CreateAdapter', Format('ActiveBindSourceAdapter already exists in component "%s".', [Name]));
   // If it is a detail bind source then get the detail BSA from the master bind source,
   // else if it is a master bind source but load type property is set to ltFromBSAsIs, ltFromBSReload or ltFromBSReloadNewInstance
   // then get the natural BSA from the source bind source else it is a master bind source then get the normal BSA.

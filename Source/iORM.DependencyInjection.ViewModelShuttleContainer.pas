@@ -107,7 +107,7 @@ begin
   Self.CriticalSection.Acquire;
   try
     if Self.Container.ContainsKey(AMarker) then
-      raise EioException.Create(Self.ClassName + ': ViewModel marker already exist!');
+      raise EioGenericException.Create(Self.ClassName + ': ViewModel marker already exist!');
     Self.Container.Add(AMarker, AViewModel);
   finally
     Self.CriticalSection.Release;

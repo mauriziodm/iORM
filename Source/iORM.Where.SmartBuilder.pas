@@ -68,7 +68,7 @@ begin
     Exit;
   // Check all other types
   if not AProp.WhereNullValue.IsType(AProp.GetTypeInfo, True) then
-    raise EioException.Create(ClassName, 'CheckWhereNullValueAffinity',
+    raise EioGenericException.Create(ClassName, 'CheckWhereNullValueAffinity',
       Format('Oops, there''s a type incompatibility problem.' +
       #13#13'"WhereNullValue" for property named "%s" is of type "%s" while property is of type "%s".',
       [AProp.GetName, TioUtilities.TypeInfoToTypeName(AProp.WhereNullValue.TypeInfo), AProp.GetTypeName]));

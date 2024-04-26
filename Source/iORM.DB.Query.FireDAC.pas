@@ -305,7 +305,7 @@ begin
   AParam := Self.FSqlQuery.ParamByName(AProperty.GetSqlParamName);
 //  AParam := (FSqlQuery as IProviderSupportNG).PSGetParams.ParamByName(AProperty.GetSqlParamName);
   if not Assigned(AParam) then
-    raise EioException.Create(Self.ClassName + ': ' + AProperty.GetSqlParamName + ' Sql parameter not found');
+    raise EioGenericException.Create(Self.ClassName + ': ' + AProperty.GetSqlParamName + ' Sql parameter not found');
 
   // If AObj is a TStream then use it directly else wrap it with a
   // DuckTypedSTreamObject wrapper, extract the stream and then use it.

@@ -161,7 +161,7 @@ end;
 
 procedure TioGlobalVCProviderRegister.BindView(const AView: TComponent);
 begin
-  raise EioException.Create(ClassName, 'BindView', 'This method should NOT be called on this class.');
+  raise EioGenericException.Create(ClassName, 'BindView', 'This method should NOT be called on this class.');
 end;
 
 procedure TioGlobalVCProviderRegister.CheckActiveVCProviderAfterUnregister(const AUnregisteredProvider: TioViewContextProvider);
@@ -234,7 +234,7 @@ procedure TioGlobalVCProviderRegister.SetDefaultVCProvider(const AVCProvider: Ti
 begin
   // The provider must be registered
   if not IsRegistered(AVCProvider) then
-    raise EioException.Create(Format('TioGlobalVCProviderRegister.SetDefaultProvider: Provider not registered (%s).', [AVCProvider.Name]));
+    raise EioGenericException.Create(Format('TioGlobalVCProviderRegister.SetDefaultProvider: Provider not registered (%s).', [AVCProvider.Name]));
   // Activate the provider nly if the provider is not already the active provider
   if not IsDefaultVCProvider(AVCProvider) then
     FInternalActiveStack.Push(AVCProvider);

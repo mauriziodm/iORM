@@ -149,7 +149,7 @@ begin
   if LBindSource is TioModelPresenterCustom then
     Result := LBindSource as TioModelPresenterCustom
   else
-    EioException.Create(ClassName, 'GetModelPresenterInstance', 'The requested BindSource is not a ModelPresenter');
+    EioGenericException.Create(ClassName, 'GetModelPresenterInstance', 'The requested BindSource is not a ModelPresenter');
 end;
 
 function TioModelDataSet.GetViewModelBridge: TioViewModelBridge;
@@ -163,11 +163,11 @@ var
 begin
   // Checks
   if not Assigned(FViewModelBridge) then
-    raise EioException.Create(Self.ClassName, 'InternalPreOpen', 'ViewModelBridge not assigned.');
+    raise EioGenericException.Create(Self.ClassName, 'InternalPreOpen', 'ViewModelBridge not assigned.');
   if not FViewModelBridge.ViewModelIsAssigned then
-    raise EioException.Create(Self.ClassName, 'InternalPreOpen', 'ViewModel not assigned.');
+    raise EioGenericException.Create(Self.ClassName, 'InternalPreOpen', 'ViewModel not assigned.');
   if ModelPresenter.IsEmpty then // Note: Do not use FModelPresenter here
-    raise EioException.Create(Self.ClassName, 'InternalPreOpen', 'Model presenter not specified.');
+    raise EioGenericException.Create(Self.ClassName, 'InternalPreOpen', 'Model presenter not specified.');
   // Get the BindSourceAdapter from ViewModel and open it
   // Note: If the 'CrossViewMasterSource' property is assigned then get the BindSourceAdapter
   // from it (for cross view with microviews)

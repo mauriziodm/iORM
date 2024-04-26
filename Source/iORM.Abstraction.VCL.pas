@@ -148,9 +148,9 @@ class procedure TioControlVCL._SetParent(const AControl, AParent: TObject);
 begin
   inherited;
   if not (AControl is TControl) then
-    raise EioException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TControl.');
+    raise EioGenericException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TControl.');
   if not (AParent is TWinControl) then
-    raise EioException.Create(Self.ClassName, '_SetParent', 'AParent must descend from TWinControl.');
+    raise EioGenericException.Create(Self.ClassName, '_SetParent', 'AParent must descend from TWinControl.');
   TControl(AControl).Parent := TWinControl(AParent);
 end;
 
@@ -362,7 +362,7 @@ class procedure TioControlVCL._SetVisible(const AControl: TObject; const AVisibl
 begin
   inherited;
   if not (AControl is TControl) then
-    raise EioException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TControl.');
+    raise EioGenericException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TControl.');
   TControl(AControl).Visible := AVisible;
 end;
 
