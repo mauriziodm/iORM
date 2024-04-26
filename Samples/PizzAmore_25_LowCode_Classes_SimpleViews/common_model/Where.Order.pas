@@ -39,7 +39,7 @@ type
 implementation
 
 uses
-  System.DateUtils;
+  System.DateUtils, iORM.Utilities;
 
 { TWhereOrder }
 
@@ -49,5 +49,9 @@ begin
   FFromDate := StartOfTheYear(Today);
   FToDate := EndOfTheYear(Today);
 end;
+
+initialization
+
+  TioUtilities.StopLinkerRemoval(TWhereOrder);
 
 end.

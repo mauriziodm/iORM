@@ -37,6 +37,7 @@ type
     acShowOrders: TioBSShowOrSelect;
     ServerConn: TioSQLiteConnectionDef;
     SynchroStrategy: TioEtmSynchroStrategy_Client;
+    HttpConn: TioHttpConnectionDef;
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings);
     procedure VCProviderRequest(const Sender: TObject; out ResultViewContext: TComponent);

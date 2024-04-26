@@ -55,15 +55,22 @@ type
     procedure RequiresUnits(Proc: TGetStrProc); override;
   end;
 
-  TioSynchroStrategySelectionEditor = class(TioSelectionEditor)
-  public
-    procedure RequiresUnits(Proc: TGetStrProc); override;
-  end;
-
   TioMVVMSelectionEditor = class(TioSelectionEditor)
   public
     procedure RequiresUnits(Proc: TGetStrProc); override;
   end;
+
+  // ---------- Synchro strategy selection editors ----------
+  TioCustomSynchroStrategySelectionEditor = class(TioSelectionEditor)
+  public
+    procedure RequiresUnits(Proc: TGetStrProc); override;
+  end;
+
+  TioEtmSynchroStrategySelectionEditor = class(TioCustomSynchroStrategySelectionEditor)
+  public
+    procedure RequiresUnits(Proc: TGetStrProc); override;
+  end;
+  // ---------- Synchro strategy selection editors ----------
 
 implementation
 
@@ -103,12 +110,20 @@ end;
 
 { TioSynchroStrategySelectionEditor }
 
-procedure TioSynchroStrategySelectionEditor.RequiresUnits(Proc: TGetStrProc);
+procedure TioCustomSynchroStrategySelectionEditor.RequiresUnits(Proc: TGetStrProc);
 begin
   inherited;
   Proc('iORM');
   Proc('iORM.SynchroStrategy.Interfaces');
   Proc('iORM.SynchroStrategy.Custom');
+end;
+
+{ TioEtmSynchroStrategySelectionEditor }
+
+procedure TioEtmSynchroStrategySelectionEditor.RequiresUnits(Proc: TGetStrProc);
+begin
+  inherited;
+  Proc('iORM.SynchroStrategy.EtmBased');
 end;
 
 end.

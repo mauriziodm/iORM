@@ -125,9 +125,6 @@ type
     FEtmTimeSlot_Delete_SentToServer: Boolean;
   strict protected
     // ---------- Methods to override on descendant classes ----------
-    // Connection
-    procedure _SwitchToTargetConnection; virtual;
-    procedure _ReturnToLocalConnection; virtual;
     // SynchroLogItem
     procedure _DoOldSynchroLogItem_LoadFromClient; virtual;
     procedure _DoNewSynchroLogItem_Create; virtual;
@@ -151,6 +148,9 @@ type
   public
     constructor Create; virtual;
     destructor Destroy; override;
+    // Connection
+    procedure SwitchToTargetConnection; virtual;
+    procedure SwitchToLocalConnection; virtual;
     // ---------- Methods to be called by the persistence strategy ----------
     procedure Initialize;
     procedure LoadFromClient;
@@ -232,6 +232,10 @@ type
     destructor Destroy; override;
     procedure DoSynchronization(const ASynchroLevel: TioSynchroLevel);
     function GenerateLocalID(const AContext: IioContext): Integer;
+  end;
+
+  TioCustomSynchroStrategy_Server = class abstract(TComponent, IioSynchroStrategy_Server)
+
   end;
 
   TioCustomSynchroStrategy_Thread = class(TThread)
@@ -498,11 +502,11 @@ begin
   // ---------- Finalize ----------
   // Set the new SynchroLogitem progress status and persist it server side
   _DoNewSynchroLogItem_SetStatus_Finalize;
-  _SwitchToTargetConnection;
+  SwitchToTargetConnection;
   try
     _DoNewSynchroLogItem_Persist;
   finally
-    _ReturnToLocalConnection;
+    SwitchToLocalConnection;
   end;
   // Finalize the payload
   _DoFinalizePayload;
@@ -510,11 +514,11 @@ begin
   // Set the new SynchroLogitem progress status and persist it server side,
   //  it will be persisted on the client only when the operation is completed successfully
   _DoNewSynchroLogItem_SetStatus_Completed;
-  _SwitchToTargetConnection;
+  SwitchToTargetConnection;
   try
     _DoNewSynchroLogItem_Persist;
   finally
-    _ReturnToLocalConnection;
+    SwitchToLocalConnection;
   end;
   // Persist even locally
   _DoNewSynchroLogItem_Persist;
@@ -529,11 +533,11 @@ begin
   _DoNewSynchroLogItem_Initialize;
   // Set the new SynchroLogitem progress status and persist it to the server,
   //  it will be persisted on the client only when the operation is completed successfully
-  _SwitchToTargetConnection;
+  SwitchToTargetConnection;
   try
     _DoNewSynchroLogItem_Persist;
   finally
-    _ReturnToLocalConnection;
+    SwitchToLocalConnection;
   end;
 end;
 
@@ -542,11 +546,11 @@ begin
   // Set the new SynchroLogitem progress status and persist it server side,
   //  it will be persisted on the client only when the operation is completed successfully
   _DoNewSynchroLogItem_SetStatus_LoadFromClient;
-  _SwitchToTargetConnection;
+  SwitchToTargetConnection;
   try
     _DoNewSynchroLogItem_Persist;
   finally
-    _ReturnToLocalConnection;
+    SwitchToLocalConnection;
   end;
   // Load the payload from the client
   _DoLoadPayloadFromClient;
@@ -556,7 +560,7 @@ procedure TioCustomSynchroStrategy_Payload.PersistAndReloadFromServer;
 begin
   // This entire part of the operation must be performed server side
   //  so swith to che server connection
-  _SwitchToTargetConnection;
+  SwitchToTargetConnection;
   try
     // Set the new SynchroLogitem progress status and persist it server side,
     //  it will be persisted on the client only when the operation is completed successfully
@@ -571,7 +575,7 @@ begin
     // Reload payload from the server
     _DoReloadPayloadFromServer;
   finally
-    _ReturnToLocalConnection;
+    SwitchToLocalConnection;
   end;
 end;
 
@@ -580,11 +584,11 @@ begin
   // Set the new SynchroLogitem progress status and persist it server side,
   //  it will be persisted on the client only when the operation is completed successfully
   _DoNewSynchroLogItem_SetStatus_PersistToClient;
-  _SwitchToTargetConnection;
+  SwitchToTargetConnection;
   try
     _DoNewSynchroLogItem_Persist;
   finally
-    _ReturnToLocalConnection;
+    SwitchToLocalConnection;
   end;
   // Persist the payload to the client
   _DoPersistPayloadToClient;
@@ -664,7 +668,7 @@ begin
   FSynchroLogItem_New.ReloadFromServer := Now;
 end;
 
-procedure TioCustomSynchroStrategy_Payload._ReturnToLocalConnection;
+procedure TioCustomSynchroStrategy_Payload.SwitchToLocalConnection;
 begin
   // If you are synchronizing with an http connection as the target and we are running on the client side
   //  (FTargetConnectionDefName is not empty) or the target connection is a normal non-http connection
@@ -682,7 +686,7 @@ begin
     io.Connections.ThreadUseClear;
 end;
 
-procedure TioCustomSynchroStrategy_Payload._SwitchToTargetConnection;
+procedure TioCustomSynchroStrategy_Payload.SwitchToTargetConnection;
 begin
   // If you are synchronizing with an http connection as the target and we are running on the client side
   //  (FTargetConnectionDefName is not empty) or the target connection is a normal non-http connection

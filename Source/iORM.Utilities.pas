@@ -80,6 +80,7 @@ type
     class procedure ClearList(const AList: TObject);
     class procedure TrimStrings(const AStrings: TStrings);
     class function CloneObject(const ASourceObj: TObject): TObject;
+    class procedure StopLinkerRemoval(const AClass: TClass);
     /// Ricava la classe più in alto nella gerarchia (quello più vicina a TObject) che implementa la stessa interfaccia
     /// Questo serve a impostare correttamente la query select in modo che filtri correttamente in base anche
     ///  ai vincoli di ereditarietà.
@@ -219,6 +220,14 @@ end;
 class function TioUtilities.EnumToString<T>(const AEnumValue: T): String;
 begin
   Result := TRttiEnumerationType.GetName<T>(AEnumValue);
+end;
+
+class procedure TioUtilities.StopLinkerRemoval(const AClass: TClass);
+begin
+  // This method does nothing, it only serves to ensure that the linker
+  //  does not remove the class whose pointer is received and therefore
+  //  that the RTTI information is generated even for classes for which
+  //  there is no reference in the code.
 end;
 
 class function TioUtilities.StringToEnum<T>(const AStringValue: String): T;

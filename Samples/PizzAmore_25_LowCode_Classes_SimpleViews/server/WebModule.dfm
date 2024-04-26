@@ -35,4 +35,8 @@ object MyWebModule: TMyWebModule
     Left = 72
     Top = 102
   end
+  object ioEtmSynchroStrategy_Server1: TioEtmSynchroStrategy_Server
+    Left = 232
+    Top = 128
+  end
 end

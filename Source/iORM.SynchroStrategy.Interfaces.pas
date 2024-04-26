@@ -77,6 +77,10 @@ type
     property InProgress: Boolean read GetInProgress;
   end;
 
+  IioSynchroStrategy_Server = interface
+    ['{876E6EBC-2520-44EB-8D48-04AB10CC426A}']
+  end;
+
   IioSynchroStrategy_TargetConnectionDef = interface
     ['{7CCD8D05-60F3-4AAF-AEA8-91DCA5E80D5B}']
     function GetName: String;

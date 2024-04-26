@@ -6,13 +6,15 @@ uses
   System.SysUtils,
   System.Classes,
   Web.HTTPApp,
-  MVCFramework, iORM, iORM.Attributes, iORM.CommonTypes, iORM.DBBuilder.Interfaces, iORM.DB.ConnectionDef, iORM.Abstraction.VCL;
+  MVCFramework, iORM, iORM.DBBuilder.Interfaces, iORM.DB.ConnectionDef, iORM.Abstraction.VCL,
+  iORM.SynchroStrategy.Interfaces, iORM.SynchroStrategy.Custom, iORM.SynchroStrategy.EtmBased, iORM.Attributes, iORM.CommonTypes;
 
 type
   TMyWebModule = class(TWebModule)
     FirebirdConn: TioFirebirdConnectionDef;
     ioVCL1: TioVCL;
     SQLiteConn: TioSQLiteConnectionDef;
+    ioEtmSynchroStrategy_Server1: TioEtmSynchroStrategy_Server;
     procedure WebModuleCreate(Sender: TObject);
     procedure WebModuleDestroy(Sender: TObject);
     procedure FirebirdConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,

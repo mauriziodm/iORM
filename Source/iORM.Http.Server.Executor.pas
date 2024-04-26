@@ -46,6 +46,7 @@ type
     class procedure _Delete(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
     class procedure _DeleteList(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
     class procedure _DeleteObject(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _DoSynchronization(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
     class procedure _LoadDataSet(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
     class procedure _LoadList(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
     class procedure _LoadObject(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
@@ -63,7 +64,7 @@ implementation
 uses
   iORM, DJSON, iORM.Http.Factory, iORM.Http.Interfaces, iORM.Exceptions,
   System.SysUtils, System.JSON, FireDAC.Comp.Client, FireDAC.Stan.Intf,
-  System.Generics.Collections, iORM.Utilities;
+  System.Generics.Collections, iORM.Utilities, iORM.SynchroStrategy.Custom;
 
 { TioHttpServerExecutor }
 
@@ -98,6 +99,8 @@ begin
     _SQLDestExecute(LioRequestBody, LioResponseBody)
   else if LioRequestBody.MethodName = HTTP_METHOD_NAME_SQLDESTLOADDATASET then
     _SQLLoadDataSet(LioRequestBody, LioResponseBody)
+  else if LioRequestBody.MethodName = HTTP_METHOD_NAME_DOSYNCHRONIZATION then
+    _DoSynchronization(LioRequestBody, LioResponseBody)
   else
     raise EioHttpException.Create(ClassName, 'Execute', Format('Method "%s" not found.', [LioRequestBody.MethodName]));
   // Return the response
@@ -135,6 +138,23 @@ begin
   io._DeleteObjectInternal(AioRequestBody.JSONDataValueAsObject, AioRequestBody.IntentType, AioRequestBody.BlindLevel);
 end;
 
+class procedure TioHttpServerExecutor._DoSynchronization(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
+var
+  LPayload: TioCustomSynchroStrategy_Payload;
+begin
+  // Get the server-side local copy of the payload from the client request
+  LPayload := AioRequestBody.JSONDataValueAsObject as TioCustomSynchroStrategy_Payload;
+  try
+    // Server-side operations
+    LPayload.PersistAndReloadFromServer;
+    // Return the updated payload object back to the client
+    AioResponseBody.JSONDataValueAsObject := LPayload;
+  finally
+    // Free the server-side local copy of the payload object
+    LPayload.Free;
+  end;
+end;
+
 class procedure TioHttpServerExecutor._LoadDataSet(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
 var
   LMemTable: TFDMemTable;
@@ -154,7 +174,7 @@ begin
   LList := TObjectList<TObject>.Create; // Create a dummy list (note: TObjectLIst even for interface type items)
   try
     AioRequestBody.Where.ToList(LList);
-    AioResponseBody.JSONDataValue := dj.From(LList).byFields.TypeAnnotationsON.ToJsonValue;
+    AioResponseBody.JSONDataValueAsObject := LList;
   finally
     LList.Free;
   end;
@@ -166,7 +186,7 @@ var
 begin
   LObj := AioRequestBody.Where.ToObject;
   if Assigned(LObj) then
-    AioResponseBody.JSONDataValue := dj.From(LObj).byFields.TypeAnnotationsON.ToJsonValue;
+    AioResponseBody.JSONDataValueAsObject := LObj;
 end;
 
 class procedure TioHttpServerExecutor._PersistList(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);

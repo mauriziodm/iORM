@@ -142,8 +142,8 @@ type
     function ToMemTable: TFDMemTable; overload;
     procedure ToMemTable(const AMemTable: TFDMemTable); overload;
 
-    function _ToLazyObject(const AObj: TObject = nil): TObject; overload;
-    function _ToLazyObject(const AIntf: IInterface): TObject; overload;
+    function ToLazyObject(const AObj: TObject = nil): TObject; overload;
+    function ToLazyObject(const AIntf: IInterface): TObject; overload;
 
     function _ToObjectInternalByClassOnly(const AIntent: TioPersistenceIntentType; const AObj: TObject = nil): TObject;
     function ToObject(const AObj: TObject = nil): TObject; overload;
@@ -293,6 +293,7 @@ type
   TioWhere<T> = class(TioWhere, IioWhere<T>)
   public
     // ------ Destination methods
+    function ToLazyObject(const AObj: TObject = nil): T; reintroduce; overload;
     function ToObject(const AObj: TObject = nil): T; reintroduce; overload;
     function ToList: TList<T>; overload;
     function ClearListBefore(const AClearListBefore: Boolean = True): IioWhere<T>;
@@ -1398,14 +1399,14 @@ begin
         [(ADataObject as TObject).ClassName, TypeName, AVVMAlias]));
 end;
 
-function TioWhere._ToLazyObject(const AObj: TObject): TObject;
+function TioWhere.ToLazyObject(const AObj: TObject): TObject;
 begin
   Result := TioLazyLoadFactory.LazyLoadObject(Self.TypeInfo, Self.TypeName, Self.TypeAlias, '', 0, Self) as TObject;
 end;
 
-function TioWhere._ToLazyObject(const AIntf: IInterface): TObject;
+function TioWhere.ToLazyObject(const AIntf: IInterface): TObject;
 begin
-  Result := _ToLazyObject(AIntf as TObject);
+  Result := ToLazyObject(AIntf as TObject);
 end;
 
 function TioWhere._ToObjectInternalByClassOnly(const AIntent: TioPersistenceIntentType; const AObj: TObject = nil): TObject;
@@ -1596,6 +1597,11 @@ function TioWhere<T>.SetDetailsContainer(ADetailsContainer: IioWhereDetailsConta
 begin
   Result := Self;
   TioWhere(Self).SetDetailsContainer(ADetailsContainer);
+end;
+
+function TioWhere<T>.ToLazyObject(const AObj: TObject): T;
+begin
+  Result := TioUtilities.CastObjectToGeneric<T>(TioWhere(Self).ToLazyObject(AObj));
 end;
 
 function TioWhere<T>.ToList: TList<T>;

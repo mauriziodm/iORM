@@ -90,6 +90,9 @@ type
     function ToMemTable: TFDMemTable; overload;
     procedure ToMemTable(const AMemTable:TFDMemTable); overload;
 
+    function ToLazyObject(const AObj: TObject = nil): TObject; overload;
+    function ToLazyObject(const AIntf: IInterface): TObject; overload;
+
     function _ToObjectInternalByClassOnly(const AIntent: TioPersistenceIntentType; const AObj:TObject=nil): TObject;
     function ToObject(const AObj:TObject=nil): TObject; overload;
     function ToObject(const AIntf:IInterface): TObject; overload;
@@ -252,6 +255,7 @@ type
   IioWhere<T> = interface(IioWhere)
     ['{EB4137B9-D4F7-41EE-AD24-F3B12BA35CAC}']
     // ------ Destination methods
+    function ToLazyObject(const AObj:TObject=nil): T; overload;
     function ToObject(const AObj:TObject=nil): T; overload;
     function ToList: TList<T>; overload;
     function ClearListBefore(const AClearListBefore: Boolean = True): IioWhere<T>;

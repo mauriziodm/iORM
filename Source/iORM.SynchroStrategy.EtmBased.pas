@@ -162,13 +162,17 @@ type
     property TargetConnectionDef;
   end;
 
+  TioEtmSynchroStrategy_Server = class(TioCustomSynchroStrategy_Server)
+
+  end;
+
 implementation
 
 uses
   iORM.CommonTypes, iORM, System.SysUtils,
   iORM.DB.Interfaces, iORM.DB.Factory, iORM.Exceptions,
   iORM.Context.Map.Interfaces, iORM.Context.Container,
-  iORM.DB.ConnectionContainer, iORM.Where.Factory;
+  iORM.DB.ConnectionContainer, iORM.Where.Factory, iORM.Utilities;
 
 { TioEtmBasetSynchroStrategy_LogItem }
 
@@ -335,7 +339,7 @@ begin
   // EtmTimeSlot_Where if exists
   if Assigned(FEtmTimeSlot_Where_Client) then
     LWhere._And(FEtmTimeSlot_Where_Client);
-  // OrderBy (DESC because it load timeslots with negative ID)
+  // OrderBy
   LWhere._OrderBy('[.ID] ASC');
   // Load objects to be synchronized
   LWhere.TypeName := FEtmTimeSlotClassName;
@@ -663,5 +667,11 @@ begin
   FNewID := ANewID;
   FOldID := AOldID;
 end;
+
+initialization
+
+  TioUtilities.StopLinkerRemoval(TioEtmSynchroStrategy_LogItem);
+  TioUtilities.StopLinkerRemoval(TioEtmSynchroStrategy_Payload);
+
 
 end.

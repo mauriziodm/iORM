@@ -37,7 +37,8 @@ interface
 
 uses
   iORM.PersistenceStrategy.Interfaces, iORM.Where.Interfaces, iORM.DB.Interfaces,
-  FireDAC.Comp.DataSet, iORM.LiveBindings.BSPersistence, iORM.CommonTypes;
+  FireDAC.Comp.DataSet, iORM.LiveBindings.BSPersistence, iORM.CommonTypes,
+  iORM.SynchroStrategy.Custom;
 
 type
 
@@ -65,6 +66,8 @@ type
     class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
     class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
     class function Count(const AWhere: IioWhere): Integer; override;
+    // SynchroStrategy
+    class procedure DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload); override;
     // SQLDestinations
     class procedure SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); override;
     class procedure SQLDest_Execute(const ASQLDestination: IioSQLDestination); override;
@@ -96,7 +99,7 @@ begin
   try
     LConnection.ioRequestBody.Clear;
     LConnection.ioRequestBody.Where := AWhere;
-    LConnection.Execute('Count');
+    LConnection.Execute(HTTP_METHOD_NAME_COUNT);
     // Deserialize the JSONDataValue to the result object
     Result := LConnection.ioResponseBody.JSONDataValue.AsType<Integer>;
     // Commit
@@ -123,7 +126,7 @@ begin
   try
     LConnection.ioRequestBody.Clear;
     LConnection.ioRequestBody.Where := AWhere;
-    LConnection.Execute('Delete');
+    LConnection.Execute(HTTP_METHOD_NAME_DELETE);
     // Commit
     LConnection.Commit;
   except
@@ -131,6 +134,28 @@ begin
     LConnection.Rollback;
     raise;
   end;
+end;
+
+class procedure TioPersistenceStrategyHttp.DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload);
+var
+  LConnection: IioConnectionHttp;
+begin
+  inherited;
+  // Initialization
+  APayload.Initialize;
+  // Client-side operations
+  APayload.LoadFromClient;
+  APayload.SwitchToTargetConnection; // Otherwise after the "LoadFromClient" it remain to local connection and the next line of code raise an exception
+  // Server-side operations (APayload.PersistAndReloadFromServer)
+  LConnection := TioDBFactory.Connection('').AsHttpConnection;
+  LConnection.ioRequestBody.Clear;
+  LConnection.ioRequestBody.JSONDataValueAsObject := APayload;
+  LConnection.Execute(HTTP_METHOD_NAME_DOSYNCHRONIZATION);
+  dj.FromJSON(LConnection.ioResponseBody.JSONDataValue).OpType(ssHTTP).byFields.TypeAnnotationsON.&To(APayload);
+  // Client-side operations
+  APayload.PersistToClient;
+  // Finalization
+  APayload.Finalize;
 end;
 
 class procedure TioPersistenceStrategyHttp._DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
@@ -153,7 +178,7 @@ begin
     LConnection.ioRequestBody.BlindLevel := ABlindLevel;
     LConnection.ioRequestBody.IntentType := AIntent;
     LConnection.ioRequestBody.JSONDataValueAsObject := AList;
-    LConnection.Execute('PersistCollection');
+    LConnection.Execute(HTTP_METHOD_NAME_PERSISTLIST);
     // Commit
     LConnection.Commit;
   except
@@ -185,7 +210,7 @@ begin
     LConnection.ioRequestBody.BlindLevel := ABlindLevel;
     LConnection.ioRequestBody.IntentType := AIntent;
     LConnection.ioRequestBody.JSONDataValueAsObject := AObj;
-    LConnection.Execute('DeleteObject');
+    LConnection.Execute(HTTP_METHOD_NAME_DELETEOBJECT);
     // Commit
     LConnection.Commit;
   except
@@ -210,7 +235,7 @@ begin
   try
     LConnection.ioRequestBody.Clear;
     LConnection.ioRequestBody.Where := AWhere;
-    LConnection.Execute('LoadDataSet');
+    LConnection.Execute(HTTP_METHOD_NAME_LOADDATASET);
     // Load the dataset
     ADestDataSet.LoadFromStream(LConnection.ioResponseBody.Stream, TFDStorageFormat.sfJSON);
     // Commit
@@ -272,7 +297,7 @@ begin
     LConnection.ioRequestBody.Clear;
     LConnection.ioRequestBody.IntentType := AIntent;
     LConnection.ioRequestBody.Where := AWhere;
-    LConnection.Execute('LoadObject');
+    LConnection.Execute(HTTP_METHOD_NAME_LOADOBJECT);
     // Deserialize  the JSONDataValue to the result object
     if Assigned(AObj) then
       dj.FromJSON(LConnection.ioResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(Result)
@@ -317,7 +342,7 @@ begin
     LConnection.ioRequestBody.RelationPropertyName := ARelationPropertyName;
     LConnection.ioRequestBody.RelationOID := ARelationOID;
     LConnection.ioRequestBody.JSONDataValueAsObject := AList;
-    LConnection.Execute('PersistCollection');
+    LConnection.Execute(HTTP_METHOD_NAME_PERSISTLIST);
     // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
     if TioUtilities.BlindLevel_Do_AutoUpdateProps(ABlindLevel) then
       dj.FromJSON(LConnection.ioResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(AList);
@@ -355,7 +380,7 @@ begin
     LConnection.ioRequestBody.RelationPropertyName := ARelationPropertyName;
     LConnection.ioRequestBody.RelationOID := ARelationOID;
     LConnection.ioRequestBody.JSONDataValueAsObject := AObj;
-    LConnection.Execute('PersistObject');
+    LConnection.Execute(HTTP_METHOD_NAME_PERSISTOBJECT);
     // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
     if TioUtilities.BlindLevel_Do_AutoUpdateProps(ABlindLevel) then
       dj.FromJSON(LConnection.ioResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(AObj);
@@ -408,7 +433,7 @@ begin
   try
     LConnection.ioRequestBody.Clear;
     LConnection.ioRequestBody.SQLDestination := ASQLDestination;
-    LConnection.Execute('SQLDestLoadDataSet');
+    LConnection.Execute(HTTP_METHOD_NAME_SQLDESTEXECUTE);
     // Load the dataset
     ADestDataSet.LoadFromStream(LConnection.ioResponseBody.Stream, TFDStorageFormat.sfJSON);
     // Commit
