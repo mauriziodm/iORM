@@ -48,6 +48,7 @@ type
 
   IioSynchroStrategy_Client = interface
     ['{2295C6BF-1A5B-475B-BBC5-CF1A1C90B5B4}']
+    procedure DoSynchronization(const ASynchroLevel: TioSynchroLevel);
     function IsToBeSynchronized(const AContext: IioContext): Boolean;
     function GenerateLocalID(const AContext: IioContext): Integer;
     procedure FreeNotification(AComponent: TComponent);
@@ -75,6 +76,9 @@ type
     // InProgress
     function GetInProgress: Boolean;
     property InProgress: Boolean read GetInProgress;
+    // IsReady
+    function GetIsReady: Boolean;
+    property IsReady: Boolean read GetIsReady;
   end;
 
   IioSynchroStrategy_Server = interface

@@ -38,7 +38,7 @@ interface
 uses
   System.Classes, System.Generics.Collections, iORM.MVVM.Interfaces, iORM.LiveBindings.Interfaces,
   iORM.CommonTypes, iORM.LiveBindings.BSPersistence, iORM.StdActions.Interfaces,
-  iORM.MVVM.ViewContextProvider;
+  iORM.MVVM.ViewContextProvider, iORM.SynchroStrategy.Interfaces;
 
 type
 
@@ -694,6 +694,49 @@ end;
 
   // =================================================================================================
   // END: MVVM STANDARD ACTIONS TO SHOW AN OBJECT
+  // =================================================================================================
+
+  // =================================================================================================
+  // BEGIN: MVVM STANDARD ACTIONS FOR SYNCHRONIZATION PURPOSES
+  // =================================================================================================
+
+  // DoSynchronization action
+  TioVMDoSynchronization = class(TioVMActionCustom)
+  strict private
+    // fields
+    FSynchroLevel: TioSynchroLevel;
+    FTargetSynchroStrategy: IioSynchroStrategy_Client;
+    // methods
+    procedure SetTargetSynchroStrategy(const Value: IioSynchroStrategy_Client);
+  strict protected
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure _InternalExecuteStdAction; override;
+    procedure _InternalUpdateStdAction; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    function HandlesTarget(Target: TObject): Boolean; override;
+    function Execute: Boolean; override;
+    function Update: Boolean; override;
+    // inherited properties
+    property Owner;
+  published
+    // inherited properties
+    property Enabled;
+    property Name;
+    property Visible;
+    property _Version;
+    // properties
+    property SynchroLevel: TioSynchroLevel read FSynchroLevel write FSynchroLevel default slIncremental;
+    property TargetSynchroStrategy: IioSynchroStrategy_Client read FTargetSynchroStrategy write SetTargetSynchroStrategy;
+    // Events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
+    property OnUpdate;
+  end;
+
+  // =================================================================================================
+  // END: MVVM STANDARD ACTIONS FOR SYNCHRONIZATION PURPOSES
   // =================================================================================================
 
 implementation
@@ -2171,6 +2214,67 @@ procedure TioVMAction._InternalUpdateStdAction;
 begin
   inherited;
   Enabled := Assigned(FOnExecute);
+end;
+
+{ TioVMDoSynchronization }
+
+constructor TioVMDoSynchronization.Create(AOwner: TComponent);
+begin
+  inherited;
+  FSynchroLevel := slIncremental;
+  FTargetSynchroStrategy := nil;
+end;
+
+function TioVMDoSynchronization.Execute: Boolean;
+begin
+  Result := False;
+  if Assigned(FTargetSynchroStrategy) then
+    inherited;
+end;
+
+function TioVMDoSynchronization.HandlesTarget(Target: TObject): Boolean;
+begin
+  Result := Assigned(Target);
+//  Result := Assigned(Target) and Supports(FTargetSynchroStrategy, IioSynchroStrategy_Client) and
+//    FTargetSynchroStrategy.isReady;
+end;
+
+procedure TioVMDoSynchronization.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and (AComponent = (FTargetSynchroStrategy as TComponent)) then
+    FTargetSynchroStrategy := nil;
+end;
+
+procedure TioVMDoSynchronization.SetTargetSynchroStrategy(const Value: IioSynchroStrategy_Client);
+begin
+  if @Value <> @FTargetSynchroStrategy then
+  begin
+    FTargetSynchroStrategy := Value;
+    if Value <> nil then
+      (Value as TComponent).FreeNotification(Self);
+  end;
+end;
+
+function TioVMDoSynchronization.Update: Boolean;
+begin
+  Result := False;
+  if Assigned(FTargetSynchroStrategy) then
+    inherited
+  else
+    Enabled := False;
+end;
+
+procedure TioVMDoSynchronization._InternalExecuteStdAction;
+begin
+  inherited;
+  FTargetSynchroStrategy.DoSynchronization(FSynchroLevel);
+end;
+
+procedure TioVMDoSynchronization._InternalUpdateStdAction;
+begin
+  inherited;
+  Enabled := Assigned(FTargetSynchroStrategy) and FTargetSynchroStrategy.isReady;
 end;
 
 end.

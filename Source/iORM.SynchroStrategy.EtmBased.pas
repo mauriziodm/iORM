@@ -160,10 +160,12 @@ type
     property EtmTimeSlot_WhereStr_Server: TStrings read FEtmTimeSlot_WhereStr_Server write SetEtmTimeSlot_WhereStr_Server;
     property SynchroName;
     property TargetConnectionDef;
+    property _Version;
   end;
 
   TioEtmSynchroStrategy_Server = class(TioCustomSynchroStrategy_Server)
-
+  published
+    property _Version;
   end;
 
 implementation

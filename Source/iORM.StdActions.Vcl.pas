@@ -37,7 +37,8 @@ interface
 
 uses
   System.Classes, Vcl.ActnList, iORM.CommonTypes, iORM.LiveBindings.Interfaces, iORM.MVVM.Interfaces, iORM.LiveBindings.BSPersistence,
-  Vcl.Forms, iORM.StdActions.Interfaces, iORM.MVVM.ViewContextProvider;
+  Vcl.Forms, iORM.StdActions.Interfaces, iORM.MVVM.ViewContextProvider,
+  iORM.SynchroStrategy.Interfaces;
 
 type
 
@@ -792,6 +793,60 @@ type
 
   // =================================================================================================
   // END: VCL STANDARD ACTIONS TO SHOW AN OBJECT
+  // =================================================================================================
+
+  // =================================================================================================
+  // BEGIN: VCL STANDARD ACTIONS FOR SYNCHRONIZATION PURPOSES
+  // =================================================================================================
+
+  // DoSynchronization action
+  TioDoSynchronization = class(Vcl.ActnList.TCustomAction)
+  strict private
+    // fields
+    FSynchroLevel: TioSynchroLevel;
+    FTargetSynchroStrategy: IioSynchroStrategy_Client;
+    // events
+    FAfterExecute: TNotifyEvent;
+    FBeforeExecute: TNotifyEvent;
+    FCanExecute: TioStdActionCanExecuteEvent;
+    // methods
+    function Get_Version: String;
+    procedure SetTargetSynchroStrategy(const Value: IioSynchroStrategy_Client);
+  strict protected
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    function HandlesTarget(Target: TObject): Boolean; override;
+    procedure ExecuteTarget(Target: TObject); override;
+    procedure UpdateTarget(Target: TObject); override;
+  published
+    // inherited properties
+    property AutoCheck;
+    property Caption;
+    property Checked;
+    property Enabled;
+    property GroupIndex;
+    property HelpContext;
+    property HelpKeyword;
+    property HelpType;
+    property Hint;
+    property ImageIndex;
+    property ImageName;
+    property SecondaryShortCuts;
+    property ShortCut default 0;
+    property Visible;
+    // properties
+    property SynchroLevel: TioSynchroLevel read FSynchroLevel write FSynchroLevel default slIncremental;
+    property TargetSynchroStrategy: IioSynchroStrategy_Client read FTargetSynchroStrategy write SetTargetSynchroStrategy;
+    property _Version: String read Get_Version;
+    // Events
+    property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;
+    property BeforeExecute: TNotifyEvent read FBeforeExecute write FBeforeExecute;
+    property CanExecute: TioStdActionCanExecuteEvent read FCanExecute write FCanExecute;
+  end;
+
+  // =================================================================================================
+  // END: VCL STANDARD ACTIONS FOR SYNCHRONIZATION PURPOSES
   // =================================================================================================
 
 implementation
@@ -2354,6 +2409,71 @@ begin
       //   io.Show(FRevertedObj, LShowOrSelectAction.Action_ParentCloseQueryAction, nil, LShowOrSelectAction.VVMTypeAlias);
     end;
   end;
+end;
+
+{ TioDoSynchronizationAction }
+
+constructor TioDoSynchronization.Create(AOwner: TComponent);
+begin
+  inherited;
+  FSynchroLevel := slIncremental;
+  FTargetSynchroStrategy := nil;
+end;
+
+procedure TioDoSynchronization.ExecuteTarget(Target: TObject);
+var
+  LCanExecute: Boolean;
+begin
+  inherited;
+  // Execute the CanExecute event (ActiveMode only)
+  LCanExecute := True;
+  if Assigned(FCanExecute) then
+    FCanExecute(Self, LCanExecute);
+  if not LCanExecute then
+    Exit;
+  // Execute the BeforeExecute event
+  if Assigned(FBeforeExecute) then
+    FBeforeExecute(Self);
+  // Execute the action
+  FTargetSynchroStrategy.DoSynchronization(FSynchroLevel);
+  // Execute the AfterExecute event
+  if Assigned(FAfterExecute) then
+    FAfterExecute(Self);
+end;
+
+function TioDoSynchronization.Get_Version: String;
+begin
+  Result := io.Version;
+end;
+
+function TioDoSynchronization.HandlesTarget(Target: TObject): Boolean;
+begin
+  Result := Assigned(Target);
+//  Result := Assigned(Target) and Supports(FTargetSynchroStrategy, IioSynchroStrategy_Client) and
+//    FTargetSynchroStrategy.isReady;
+end;
+
+procedure TioDoSynchronization.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and (AComponent = (FTargetSynchroStrategy as TComponent)) then
+    FTargetSynchroStrategy := nil;
+end;
+
+procedure TioDoSynchronization.SetTargetSynchroStrategy(const Value: IioSynchroStrategy_Client);
+begin
+  if @Value <> @FTargetSynchroStrategy then
+  begin
+    FTargetSynchroStrategy := Value;
+    if Value <> nil then
+      (Value as TComponent).FreeNotification(Self);
+  end;
+end;
+
+procedure TioDoSynchronization.UpdateTarget(Target: TObject);
+begin
+  inherited;
+  Enabled := Assigned(FTargetSynchroStrategy) and FTargetSynchroStrategy.isReady;
 end;
 
 end.

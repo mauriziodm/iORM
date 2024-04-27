@@ -38,6 +38,8 @@ type
     ServerConn: TioSQLiteConnectionDef;
     SynchroStrategy: TioEtmSynchroStrategy_Client;
     HttpConn: TioHttpConnectionDef;
+    ButtonDoSynchronization: TButton;
+    DoSynchronization: TioDoSynchronization;
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings);
     procedure VCProviderRequest(const Sender: TObject; out ResultViewContext: TComponent);

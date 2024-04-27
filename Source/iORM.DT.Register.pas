@@ -143,6 +143,7 @@ begin
   RegisterSelectionEditor(TioVMActionBSPersistenceAppend, TioMVVMSelectionEditor);
   RegisterComponents('iORM - MVVM - VMActions - BS - Persistence', [TioVMActionBSPersistenceInsert]);
   RegisterSelectionEditor(TioVMActionBSPersistenceInsert, TioMVVMSelectionEditor);
+  RegisterComponents('iORM - MVVM - VMActions - Synchronization', [TioVMDoSynchronization]);
 
   // VCL standard actions
   RegisterActions('iORM - BS', [iORM.StdActions.Vcl.TioBSSelectCurrent], nil);
@@ -164,6 +165,7 @@ begin
   RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Vcl.TioBSPersistenceRevertOrDelete], nil);
   RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Vcl.TioBSPersistenceSaveRevertPoint], nil);
   RegisterActions('iORM - MVVM', [iORM.StdActions.Vcl.TioViewAction], nil);
+  RegisterActions('iORM - Synchronization', [iORM.StdActions.Vcl.TioDoSynchronization], nil);
 
   // FMX standard actions
   RegisterActions('iORM - BS', [iORM.StdActions.Fmx.TioBSSelectCurrent], nil);
@@ -185,6 +187,7 @@ begin
   RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Fmx.TioBSPersistenceRevertOrDelete], nil);
   RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Fmx.TioBSPersistenceSaveRevertPoint], nil);
   RegisterActions('iORM - MVVM', [iORM.StdActions.Fmx.TioViewAction], nil);
+  RegisterActions('iORM - Synchronization', [iORM.StdActions.Fmx.TioDoSynchronization], nil);
 
   // StdActions common
   RegisterComponents('iORM - Other', [TioCloseQueryRepeater]);

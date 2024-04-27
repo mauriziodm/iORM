@@ -210,11 +210,14 @@ type
     function GetInProgress: Boolean;
     // IsReady
     function GetIsReady: Boolean; virtual;
+    // _Version
+    function Get_Version: String;
     // ---------- Synchro strategy methods to override on descendant classes ----------
     function _DoGenerateLocalID(const AContext: IioContext): Integer; virtual; abstract;
     function _DoPayload_Create: TioCustomSynchroStrategy_Payload; virtual; abstract;
     procedure _DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload; const ASynchroLevel: TioSynchroLevel); virtual;
     // ---------- Synchro strategy methods to override on descendant classes ----------
+    // Properties
     property Async: Boolean read FAsync write FAsync default False;
     property Entities_BlackList: TStrings read FEntities_BlackList write SetEntities_BlackList;
     property Entities_WhiteList: TStrings read FEntities_WhiteList write SetEntities_WhiteList;
@@ -227,6 +230,7 @@ type
     property IsReady: Boolean read GetIsReady;
     property SynchroName: String read FSynchroName write FSynchroName;
     property TargetConnectionDef: IioSynchroStrategy_TargetConnectionDef read FTargetConnectionDef write SetTargetConnectionDef default nil;
+    property _Version: String read Get_Version;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -235,7 +239,10 @@ type
   end;
 
   TioCustomSynchroStrategy_Server = class abstract(TComponent, IioSynchroStrategy_Server)
-
+  strict protected
+    // _Version
+    function Get_Version: String;
+    property _Version: String read Get_Version;
   end;
 
   TioCustomSynchroStrategy_Thread = class(TThread)
@@ -319,6 +326,11 @@ end;
 function TioCustomSynchroStrategy_Client.GetIsReady: Boolean;
 begin
   Result := Assigned(FTargetConnectionDef) and not FInProgress
+end;
+
+function TioCustomSynchroStrategy_Client.Get_Version: String;
+begin
+  Result := io.Version;
 end;
 
 procedure TioCustomSynchroStrategy_Client.SetEntities_BlackList(const Value: TStrings);
@@ -426,11 +438,10 @@ begin
   try
     // Execute core code
     AExecuteMethod;
+  finally
     // Execute OnTerminate code
     if Assigned(ATerminateMethod) then
       ATerminateMethod;
-  finally
-    io.HideWait;
   end;
 end;
 
@@ -457,7 +468,7 @@ begin
   LTerminateMethod := procedure
   begin
     LPayload.Free;
-    io.HideWait            ;
+    io.HideWait;
     FInProgress := False;
   end;
   // Execute the synchronization
@@ -771,6 +782,13 @@ begin
         raise EioGenericException.Create(LExceptionMessage);
       end);
   end;
+end;
+
+{ TioCustomSynchroStrategy_Server }
+
+function TioCustomSynchroStrategy_Server.Get_Version: String;
+begin
+  Result := io.Version;
 end;
 
 end.
