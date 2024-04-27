@@ -61,7 +61,7 @@ type
     FCliToSrv_Count: Integer;
     FSrvToCli_Count: Integer;
     // Timing
-    FStart: TDateTime;
+    FStartSynchro: TDateTime;
     FLoadFromClient: TDateTime;
     FPersistToServer: TDateTime;
     FReloadFromServer: TDateTime;
@@ -80,7 +80,7 @@ type
     property CliToSrv_Count: Integer read FCliToSrv_Count write FCliToSrv_Count;
     property SrvToCli_Count: Integer read FSrvToCli_Count write FSrvToCli_Count;
     // Timing
-    property Start: TDateTime read FStart write FStart;
+    property Start: TDateTime read FStartSynchro write FStartSynchro;
     property LoadFromClient: TDateTime read FLoadFromClient write FLoadFromClient;
     property PersistToServer: TDateTime read FPersistToServer write FPersistToServer;
     property ReloadFromServer: TDateTime read FReloadFromServer write FReloadFromServer;
@@ -718,7 +718,7 @@ begin
   FCliToSrv_Count := IO_INTEGER_NULL_VALUE;
   FSrvToCli_Count := IO_INTEGER_NULL_VALUE;
   // Timing
-  FStart := IO_DATETIME_NULL_VALUE;
+  FStartSynchro := IO_DATETIME_NULL_VALUE;
   FLoadFromClient := IO_DATETIME_NULL_VALUE;
   FPersistToServer := IO_DATETIME_NULL_VALUE;
   FReloadFromServer := IO_DATETIME_NULL_VALUE;

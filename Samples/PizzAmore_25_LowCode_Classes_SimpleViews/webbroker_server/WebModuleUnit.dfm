@@ -18,7 +18,6 @@ object WebModule2: TWebModule2
   end
   object SQLiteConn: TioSQLiteConnectionDef
     AsDefault = False
-    AutoCreateDB.Enabled = True
     Database = 'PizzAmore_25_LowCode_Classes_SimpleViews_Vcl.db'
     DatabaseStdFolder = sfDocuments
     Persistent = False
@@ -43,5 +42,9 @@ object WebModule2: TWebModule2
     OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
     Left = 72
     Top = 24
+  end
+  object ioEtmSynchroStrategy_Server1: TioEtmSynchroStrategy_Server
+    Left = 312
+    Top = 64
   end
 end

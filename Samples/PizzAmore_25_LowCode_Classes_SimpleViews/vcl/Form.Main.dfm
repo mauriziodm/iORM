@@ -19,7 +19,7 @@ object MainForm: TMainForm
   TextHeight = 15
   object ImagePizza: TImage
     Left = 8
-    Top = 64
+    Top = 65
     Width = 268
     Height = 249
     Picture.Data = {
@@ -8505,7 +8505,7 @@ object MainForm: TMainForm
   object ButtonOrders: TButton
     Left = 43
     Top = 334
-    Width = 109
+    Width = 105
     Height = 44
     Action = acShowOrders
     Anchors = [akLeft, akRight, akBottom]
@@ -8517,12 +8517,12 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 0
     ExplicitTop = 333
-    ExplicitWidth = 105
+    ExplicitWidth = 101
   end
   object ButtonCustomers: TButton
     Left = 43
     Top = 384
-    Width = 109
+    Width = 105
     Height = 44
     Action = acShowCustomers
     Anchors = [akLeft, akRight, akBottom]
@@ -8534,12 +8534,12 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 1
     ExplicitTop = 383
-    ExplicitWidth = 105
+    ExplicitWidth = 101
   end
   object ButtonPizzas: TButton
     Left = 43
     Top = 434
-    Width = 109
+    Width = 105
     Height = 44
     Action = acShowPizzas
     Anchors = [akLeft, akRight, akBottom]
@@ -8551,12 +8551,12 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 2
     ExplicitTop = 433
-    ExplicitWidth = 105
+    ExplicitWidth = 101
   end
   object ButtonQuit: TButton
     Left = 43
     Top = 499
-    Width = 109
+    Width = 105
     Height = 32
     Action = acQuit
     Anchors = [akLeft, akRight, akBottom]
@@ -8568,7 +8568,7 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 3
     ExplicitTop = 498
-    ExplicitWidth = 105
+    ExplicitWidth = 101
   end
   object ioVCL1: TioVCL
     Left = 8
@@ -8627,5 +8627,21 @@ object MainForm: TMainForm
     Persistent = False
     Left = 48
     Top = 200
+  end
+  object FirebirdConn: TioFirebirdConnectionDef
+    AsDefault = False
+    Database = 'PizzAmore_25_LowCode_Classes_SimpleViews_Vcl.FDB'
+    DatabaseStdFolder = sfDocuments
+    OSAuthent = oaNo
+    Password = 'masterkey'
+    Persistent = False
+    Pooled = False
+    Port = 3050
+    Protocol = pLocal
+    SQLDialect = sqlDialect3
+    UserName = 'SYSDBA'
+    OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
+    Left = 128
+    Top = 272
   end
 end
