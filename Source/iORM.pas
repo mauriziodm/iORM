@@ -1067,7 +1067,7 @@ class procedure io.ReloadObject(const AObj: TObject; const ALazy: boolean; const
 begin
   if not Assigned(AObj) then
     raise EioGenericException.Create(ClassName, 'Reload', '"AObj" cannot be nil.');
-  io.Load(AObj.ClassName).ByID(TioUtilities.ExtractOID(AObj)).Lazy(ALazy).LazyProps(ALazyProps).ClearListBefore.ToObject(AObj);
+  io.Load(AObj.ClassName).ByID(TioUtilities.ObjToID(AObj)).Lazy(ALazy).LazyProps(ALazyProps).ClearListBefore.ToObject(AObj);
 end;
 
 class procedure io.ReloadObject(const AObj: TObject; const ALazy: boolean);
@@ -1816,12 +1816,12 @@ end;
 
 class function io.ExtractOID(const AIntfObj: IInterface): Integer;
 begin
-  Result := TioUtilities.ExtractOID(AIntfObj);
+  Result := TioUtilities.IntfToID(AIntfObj);
 end;
 
 class function io.ExtractOID(const AObj: TObject): Integer;
 begin
-  Result := TioUtilities.ExtractOID(AObj);
+  Result := TioUtilities.ObjToID(AObj);
 end;
 
 class function io.GlobalFactory: TioGlobalFactoryRef;

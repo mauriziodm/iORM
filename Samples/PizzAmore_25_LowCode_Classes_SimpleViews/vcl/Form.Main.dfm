@@ -8624,7 +8624,7 @@ object MainForm: TMainForm
   object HttpConn: TioHttpConnectionDef
     AsDefault = True
     BaseURL = 'http://localhost:8080/iorm'
-    Persistent = False
+    Persistent = True
     Left = 48
     Top = 200
   end

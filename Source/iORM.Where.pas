@@ -1418,7 +1418,7 @@ function TioWhere._Value(AValue: IInterface): IioWhere;
 var
   LID: Integer;
 begin
-  LID := TioUtilities.ExtractOID(AValue);
+  LID := TioUtilities.IntfToID(AValue);
   Result := Self._Value(TValue.From<Integer>(LID));
 end;
 
@@ -2099,7 +2099,7 @@ function TioWhere._Value(AValue: TObject): IioWhere;
 var
   LID: Integer;
 begin
-  LID := TioUtilities.ExtractOID(AValue);
+  LID := TioUtilities.ObjToID(AValue);
   Result := Self._Value(TValue.From<Integer>(LID));
 end;
 

@@ -422,7 +422,7 @@ end;
 
 function TioBSPersistence.IsInserting: Boolean;
 begin
-  Result := (FBindSource.Current <> nil) and (FIsInserting or (TioUtilities.ExtractOID(FBindSource.Current) = 0));
+  Result := (FBindSource.Current <> nil) and (FIsInserting or (TioUtilities.ObjToID(FBindSource.Current) = 0));
 end;
 
 function TioBSPersistence.IsSavedRevertPoint: Boolean;

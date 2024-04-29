@@ -176,7 +176,7 @@ begin
   StopAtTheFirstMasterBS := True;
   // Payload
   PayloadAsString := ADeletedObj.ClassName;
-  PayloadAsInteger := TioUtilities.ExtractOID(ADeletedObj);
+  PayloadAsInteger := TioUtilities.ObjToID(ADeletedObj);
 end;
 
 constructor TioBSNotification.CreateSUDRegisterObjOnEdit(const ACurrentObj: TObject; const AMasterPropertyPath: String);

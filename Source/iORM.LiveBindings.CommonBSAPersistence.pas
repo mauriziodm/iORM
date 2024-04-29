@@ -435,7 +435,9 @@ begin
       [LActiveBindSourceAdapter.TypeName, LActiveBindSourceAdapter.TypeAlias]));
   // Extract the current DataObject and the where condition to reload it
   LDataObject := LActiveBindSourceAdapter.Current;
-  LWhere := TioWhereFactory.NewWhere.ByID( TioUtilities.ExtractOID(LDataObject) );
+  if TioUtilities.IsNullOID(LDataObject) then
+    Exit;
+  LWhere := TioWhereFactory.NewWhere.ByID( TioUtilities.ObjToID(LDataObject) );
   // Reload
   case LActiveBindSourceAdapter.LoadType of
     // Reload to the same instance
@@ -672,7 +674,7 @@ begin
   // Save into local variables to avoid multithread resource access inconsistency problems
   // TODO: Multithread - Accesso all'oggetto da eliminare non protetto in caso di Async = True
   LDataObj := AActiveBindSourceAdapter.Current;
-  LID := TioUtilities.ExtractOID(LDataObj);
+  LID := TioUtilities.ObjToID(LDataObj);
   AActiveBindSourceAdapter.BSPersistenceDeleting := True; // Look at GetDeleteTerminateMethod below
   // Build the anonimous method
   Result := function: TObject

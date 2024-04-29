@@ -859,8 +859,8 @@ type
     property UnsupportedPlatforms;
     // properties
     property Autoexec_Enabled: Boolean read FAutoexec_Enabled write SetAutoexec_Enabled default False;
-    property Autoexec_Interval: Integer read FAutoexec_Interval write FAutoexec_Interval default 60;
-    property Autoexec_StartDelay: Integer read FAutoexec_StartDelay write FAutoexec_StartDelay default 3;
+    property Autoexec_Interval: Integer read FAutoexec_Interval write SetAutoexec_Interval default 60;
+    property Autoexec_StartDelay: Integer read FAutoexec_StartDelay write SetAutoexec_StartDelay default 3;
     property SynchroLevel: TioSynchroLevel read FSynchroLevel write FSynchroLevel default slIncremental;
     property TargetSynchroStrategy: IioSynchroStrategy_Client read FTargetSynchroStrategy write SetTargetSynchroStrategy;
     property _Version: String read Get_Version;

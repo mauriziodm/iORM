@@ -315,12 +315,12 @@ var
   begin
     if (not Assigned(LDuckList)) or (not Assigned(AObjToSearch)) then
       Exit(nil);
-    LSearchID := TioUtilities.ExtractOID(AObjToSearch);
+    LSearchID := TioUtilities.ObjToID(AObjToSearch);
     for Result in LDuckList do
     begin
       if not Assigned(Result) then
         Continue;
-      LCurrID := TioUtilities.ExtractOID(Result);
+      LCurrID := TioUtilities.ObjToID(Result);
       if (Result.ClassName = AObjToSearch.ClassName) and (LCurrID = LSearchID) then
         Exit;
     end;

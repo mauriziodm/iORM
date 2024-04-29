@@ -322,9 +322,9 @@ begin
   // Value
   case AValue.Kind of
     tkClass:
-      AValue := TValue.From<Integer>(TioUtilities.ExtractOID(AValue.AsObject));
+      AValue := TValue.From<Integer>(TioUtilities.ObjToID(AValue.AsObject));
     tkInterface:
-      AValue := TValue.From<Integer>(TioUtilities.ExtractOID(AValue.AsInterface));
+      AValue := TValue.From<Integer>(TioUtilities.IntfToID(AValue.AsInterface));
   end;
   FValueSqlItem := TioDBFactory.WhereItemTValue(AValue);
 end;

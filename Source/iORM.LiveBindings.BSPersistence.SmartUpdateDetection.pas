@@ -146,7 +146,7 @@ function TioSmartUpdateDetectionBase.EncodeKey(const ACurrentObj: TObject; const
 var
   LID: Integer;
 begin
-  LID := TioUtilities.ExtractOID(ACurrentObj);
+  LID := TioUtilities.ObjToID(ACurrentObj);
   if LID <> 0 then
     Result := AMasterPropertyPath + '.' + ACurrentObj.ClassName + '.' + LID.ToString
   else

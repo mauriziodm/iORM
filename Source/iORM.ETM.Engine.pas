@@ -189,12 +189,12 @@ end;
 
 class function TioEtmEngine.TimelineFor(const AIntf: IInterface; const AWhere: IioWhere): TioEtmTimeline;
 begin
-  Result := _InternalTimeLineFor((AIntf as TObject).ClassName, TioUtilities.ExtractOID(AIntf), AWhere);
+  Result := _InternalTimeLineFor((AIntf as TObject).ClassName, TioUtilities.IntfToID(AIntf), AWhere);
 end;
 
 class function TioEtmEngine.TimelineFor(const AObj: TObject; const AWhere: IioWhere): TioEtmTimeline;
 begin
-  Result := _InternalTimeLineFor(AObj.ClassName, TioUtilities.ExtractOID(AObj), AWhere);
+  Result := _InternalTimeLineFor(AObj.ClassName, TioUtilities.ObjToID(AObj), AWhere);
 end;
 
 class function TioEtmEngine.FluentTimeiineFor(const AClassName: String): IioWhere<TioEtmCustomTimeSlot>;

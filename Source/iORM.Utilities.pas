@@ -66,9 +66,14 @@ type
     class function GetQualifiedTypeName(const ATypeInfo: Pointer): String; static;
     class function ExtractPropertyName(const AFullPathPropertyName: String): String;
     class function ResolveRttiTypeToRttiType(const ARttiType: TRttiType): TRttiType;
-    class function ExtractOID(const AObj: Tobject): Integer; overload; static;
-    class function ExtractOID(const AIntf: IInterface): Integer; overload; static;
-    class function ExtractObjVersion(const AObj: Tobject): Integer; overload; static;
+    class function ObjToID(const AObj: Tobject): Integer; static;
+    class function IntfToID(const AIntf: IInterface): Integer; static;
+
+
+    class function IsNullOID(const AObj: Tobject): Boolean; static;
+
+
+    class function ExtractObjVersion(const AObj: Tobject): Integer; static;
     class function EnumToString<T>(const AEnumValue:T): String;
     class function StringToEnum<T>(const AStringValue: String): T;
     class function GetThreadID: TThreadID; static;
@@ -190,7 +195,7 @@ begin
 // ----- OLD CODE -----
 end;
 
-class function TioUtilities.ExtractOID(const AObj: Tobject): Integer;
+class function TioUtilities.ObjToID(const AObj: Tobject): Integer;
 var
   LMap: IioMap;
 begin
@@ -200,11 +205,11 @@ begin
   Result := LMap.GetProperties.GetIdProperty.GetValue(AObj).AsInteger;
 end;
 
-class function TioUtilities.ExtractOID(const AIntf: IInterface): Integer;
+class function TioUtilities.IntfToID(const AIntf: IInterface): Integer;
 begin
   if not Assigned(AIntf) then
     raise EioGenericException.Create(ClassName, 'ExtractOID', '"AIntf" cannot be nil.');
-  Result := ExtractOID(AIntf as Tobject);
+  Result := ObjToID(AIntf as Tobject);
 end;
 
 class function TioUtilities.ExtractObjVersion(const AObj: Tobject): Integer;
@@ -477,6 +482,11 @@ end;
 class function TioUtilities.IsList(const AObj: TObject): Boolean;
 begin
   Result := TioDuckTypedFactory.IsList(AObj);
+end;
+
+class function TioUtilities.IsNullOID(const AObj: Tobject): Boolean;
+begin
+  Result := TioMapContainer.GetMap(AObj.ClassName).GetProperties.GetIdProperty.GetValue(AObj).AsInteger = IO_INTEGER_NULL_VALUE;
 end;
 
 class function TioUtilities.ObjectAsIInterface(const AObj: Tobject): IInterface;
