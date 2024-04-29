@@ -192,6 +192,7 @@ begin
   raise EioGenericException.Create(ClassName, 'Create', 'Feature not implemented for then uniGUI platform.');
   // inherited;
   // FInternalTimer := TUniTimer.Create(UniApplication);
+  // FInternalTimer.Enabled := False;
   // FInternalTimer.ChainMode := True;
 end;
 

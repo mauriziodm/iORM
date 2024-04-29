@@ -160,6 +160,7 @@ constructor TioTimerVCL.Create;
 begin
   inherited;
   FInternalTimer := TTimer.Create(nil);
+  FInternalTimer.Enabled := False;
 end;
 
 destructor TioTimerVCL.Destroy;

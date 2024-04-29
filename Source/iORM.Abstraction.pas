@@ -92,7 +92,7 @@ type
   public
     class function CreateNewTimer: TioTimer;
     constructor Create; virtual;
-    property Enabled: Boolean read GetEnabled write SetEnabled default True;
+    property Enabled: Boolean read GetEnabled write SetEnabled default False;
     property Interval: Cardinal read GetInterval write SetInterval default 1000;
     property OnTimer: TNotifyEvent read GetOnTimer write SetOnTimer;
     property Tag:Integer read GetTag write SetTag;

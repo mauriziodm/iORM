@@ -5209,7 +5209,7 @@ object StartForm: TStartForm
           end
         end
         object ButtonDoSynchronization: TButton
-          Action = DoSynchronization
+          Action = acDoSynchronization
           Enabled = True
           ImageIndex = -1
           Position.X = 8.000000000000000000
@@ -5255,9 +5255,13 @@ object StartForm: TStartForm
       ViewContextBy = vcByDefaultViewContextProvider
       VVMTypeAlias = 'LIST'
     end
-    object DoSynchronization: TioDoSynchronization
+    object acDoSynchronization: TioDoSynchronization
       Category = 'iORM - Synchronization strategies'
+      AutoCheck = True
       Text = 'Synchronize'
+      Autoexec_Enabled = True
+      Autoexec_Interval = 3
+      Autoexec_StartDelay = 1
       TargetSynchroStrategy = SynchroStrategy
     end
   end
