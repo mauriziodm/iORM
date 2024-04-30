@@ -2445,7 +2445,7 @@ begin
   begin
     if FTargetSynchroStrategy.IsReady then
     begin
-      FAutoexec_Timer.Interval := FAutoexec_Interval * 1000;
+      FAutoexec_Timer.Interval := FAutoexec_Interval * 1000; // Seconds
       Self.Execute;
     end;
   end

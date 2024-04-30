@@ -38,7 +38,7 @@ interface
 uses
   System.Classes, Vcl.ActnList, iORM.CommonTypes, iORM.LiveBindings.Interfaces, iORM.MVVM.Interfaces, iORM.LiveBindings.BSPersistence,
   Vcl.Forms, iORM.StdActions.Interfaces, iORM.MVVM.ViewContextProvider,
-  iORM.SynchroStrategy.Interfaces;
+  iORM.SynchroStrategy.Interfaces, iORM.Abstraction;
 
 type
 
@@ -803,6 +803,10 @@ type
   TioDoSynchronization = class(Vcl.ActnList.TCustomAction)
   strict private
     // fields
+    FAutoexec_Enabled: Boolean;
+    FAutoexec_Interval: Integer;
+    FAutoexec_StartDelay: Integer;
+    FAutoexec_Timer: TioTimer;
     FSynchroLevel: TioSynchroLevel;
     FTargetSynchroStrategy: IioSynchroStrategy_Client;
     // events
@@ -810,12 +814,17 @@ type
     FBeforeExecute: TNotifyEvent;
     FCanExecute: TioStdActionCanExecuteEvent;
     // methods
+    procedure Autoexec_OnTimerEventHandler(Sender: TObject);
     function Get_Version: String;
+    procedure SetAutoexec_Enabled(const Value: Boolean);
+    procedure SetAutoexec_Interval(const ASeconds: Integer);
+    procedure SetAutoexec_StartDelay(const ASeconds: Integer);
     procedure SetTargetSynchroStrategy(const Value: IioSynchroStrategy_Client);
   strict protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     function HandlesTarget(Target: TObject): Boolean; override;
     procedure ExecuteTarget(Target: TObject); override;
     procedure UpdateTarget(Target: TObject); override;
@@ -836,6 +845,9 @@ type
     property ShortCut default 0;
     property Visible;
     // properties
+    property Autoexec_Enabled: Boolean read FAutoexec_Enabled write SetAutoexec_Enabled default False;
+    property Autoexec_Interval: Integer read FAutoexec_Interval write SetAutoexec_Interval default 60;
+    property Autoexec_StartDelay: Integer read FAutoexec_StartDelay write SetAutoexec_StartDelay default 3;
     property SynchroLevel: TioSynchroLevel read FSynchroLevel write FSynchroLevel default slIncremental;
     property TargetSynchroStrategy: IioSynchroStrategy_Client read FTargetSynchroStrategy write SetTargetSynchroStrategy;
     property _Version: String read Get_Version;
@@ -2413,11 +2425,40 @@ end;
 
 { TioDoSynchronizationAction }
 
+procedure TioDoSynchronization.Autoexec_OnTimerEventHandler(Sender: TObject);
+begin
+  if FAutoexec_Enabled and Assigned(FTargetSynchroStrategy) then
+  begin
+    if FTargetSynchroStrategy.IsReady then
+    begin
+      FAutoexec_Timer.Interval := FAutoexec_Interval * 1000; // Seconds
+      Self.Execute;
+    end;
+  end
+  else
+    SetAutoexec_Enabled(False);
+end;
+
 constructor TioDoSynchronization.Create(AOwner: TComponent);
 begin
   inherited;
+  FAutoexec_Enabled := False;
+  FAutoexec_Interval := 60;
+  FAutoexec_StartDelay := 3;
   FSynchroLevel := slIncremental;
   FTargetSynchroStrategy := nil;
+  // Autoexec internal timer
+  if not(csDesigning in ComponentState) then
+    FAutoexec_Timer := TioTimer.CreateNewTimer
+  else
+    FAutoexec_Timer := nil;
+end;
+
+destructor TioDoSynchronization.Destroy;
+begin
+  if Assigned(FAutoexec_Timer) then
+    FAutoexec_Timer.Free;
+  inherited;
 end;
 
 procedure TioDoSynchronization.ExecuteTarget(Target: TObject);
@@ -2460,6 +2501,49 @@ begin
     FTargetSynchroStrategy := nil;
 end;
 
+procedure TioDoSynchronization.SetAutoexec_Enabled(const Value: Boolean);
+begin
+  if Value = FAutoexec_Enabled then
+    Exit;
+  if Assigned(FAutoexec_Timer) then //aka "if not at designtime"
+  begin
+    if Value then
+    begin
+      FAutoexec_Timer.Interval := FAutoexec_StartDelay * 1000; // Seconds
+      FAutoexec_Timer.OnTimer := Autoexec_OnTimerEventHandler;
+    end
+    else
+      FAutoexec_Timer.Enabled := False;
+  end;
+  FAutoexec_Enabled := Value;
+end;
+
+procedure TioDoSynchronization.SetAutoexec_Interval(const ASeconds: Integer);
+begin
+  if ASeconds = FAutoexec_Interval then
+    Exit;
+  FAutoexec_Interval := ASeconds;
+  // if Autoexec_Enabled is true then disable ad re-enable it to force the load af the new value
+  if FAutoexec_Enabled then
+  begin
+    SetAutoexec_Enabled(False);
+    SetAutoexec_Enabled(True);
+  end;
+end;
+
+procedure TioDoSynchronization.SetAutoexec_StartDelay(const ASeconds: Integer);
+begin
+  if ASeconds = FAutoexec_StartDelay then
+    Exit;
+  FAutoexec_StartDelay := ASeconds;
+  // if Autoexec_Enabled is true then disable ad re-enable it to force the load af the new value
+  if FAutoexec_Enabled then
+  begin
+    SetAutoexec_Enabled(False);
+    SetAutoexec_Enabled(True);
+  end;
+end;
+
 procedure TioDoSynchronization.SetTargetSynchroStrategy(const Value: IioSynchroStrategy_Client);
 begin
   if @Value <> @FTargetSynchroStrategy then
@@ -2474,6 +2558,10 @@ procedure TioDoSynchronization.UpdateTarget(Target: TObject);
 begin
   inherited;
   Enabled := Assigned(FTargetSynchroStrategy) and FTargetSynchroStrategy.isReady;
+  // Autoenable/disable the Autoexec_Timer depending on Autoexec_Enabled property value, TargetSynchroStrategy and FAutoexec_Timer both assigned
+  if FAutoexec_Enabled and Assigned(FTargetSynchroStrategy) and Assigned(FAutoexec_Timer) and not FAutoexec_Timer.Enabled then
+    FAutoexec_Timer.Enabled := Enabled;
+
 end;
 
 end.

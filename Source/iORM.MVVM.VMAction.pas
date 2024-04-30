@@ -38,7 +38,8 @@ interface
 uses
   System.Classes, System.Generics.Collections, iORM.MVVM.Interfaces, iORM.LiveBindings.Interfaces,
   iORM.CommonTypes, iORM.LiveBindings.BSPersistence, iORM.StdActions.Interfaces,
-  iORM.MVVM.ViewContextProvider, iORM.SynchroStrategy.Interfaces;
+  iORM.MVVM.ViewContextProvider, iORM.SynchroStrategy.Interfaces,
+  iORM.Abstraction;
 
 type
 
@@ -704,9 +705,17 @@ end;
   TioVMDoSynchronization = class(TioVMActionCustom)
   strict private
     // fields
+    FAutoexec_Enabled: Boolean;
+    FAutoexec_Interval: Integer;
+    FAutoexec_StartDelay: Integer;
+    FAutoexec_Timer: TioTimer;
     FSynchroLevel: TioSynchroLevel;
     FTargetSynchroStrategy: IioSynchroStrategy_Client;
     // methods
+    procedure Autoexec_OnTimerEventHandler(Sender: TObject);
+    procedure SetAutoexec_Enabled(const Value: Boolean);
+    procedure SetAutoexec_Interval(const ASeconds: Integer);
+    procedure SetAutoexec_StartDelay(const ASeconds: Integer);
     procedure SetTargetSynchroStrategy(const Value: IioSynchroStrategy_Client);
   strict protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -714,6 +723,7 @@ end;
     procedure _InternalUpdateStdAction; override;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     function HandlesTarget(Target: TObject): Boolean; override;
     function Execute: Boolean; override;
     function Update: Boolean; override;
@@ -726,6 +736,9 @@ end;
     property Visible;
     property _Version;
     // properties
+    property Autoexec_Enabled: Boolean read FAutoexec_Enabled write SetAutoexec_Enabled default False;
+    property Autoexec_Interval: Integer read FAutoexec_Interval write SetAutoexec_Interval default 60;
+    property Autoexec_StartDelay: Integer read FAutoexec_StartDelay write SetAutoexec_StartDelay default 3;
     property SynchroLevel: TioSynchroLevel read FSynchroLevel write FSynchroLevel default slIncremental;
     property TargetSynchroStrategy: IioSynchroStrategy_Client read FTargetSynchroStrategy write SetTargetSynchroStrategy;
     // Events
@@ -743,8 +756,7 @@ implementation
 
 uses
   System.SysUtils, iORM.Utilities, iORM.Exceptions, iORM, System.Rtti,
-  iORM.RttiContext.Factory, iORM.StdActions.CloseQueryActionRegister,
-  iORM.Abstraction, iORM.ETM.Engine, iORM.StdActions.CommonBehaviour;
+  iORM.RttiContext.Factory, iORM.StdActions.CloseQueryActionRegister, iORM.ETM.Engine, iORM.StdActions.CommonBehaviour;
 
 { TioVMActionCustom }
 
@@ -2218,11 +2230,40 @@ end;
 
 { TioVMDoSynchronization }
 
+procedure TioVMDoSynchronization.Autoexec_OnTimerEventHandler(Sender: TObject);
+begin
+  if FAutoexec_Enabled and Assigned(FTargetSynchroStrategy) then
+  begin
+    if FTargetSynchroStrategy.IsReady then
+    begin
+      FAutoexec_Timer.Interval := FAutoexec_Interval * 1000; // Seconds
+      Self.Execute;
+    end;
+  end
+  else
+    SetAutoexec_Enabled(False);
+end;
+
 constructor TioVMDoSynchronization.Create(AOwner: TComponent);
 begin
   inherited;
+  FAutoexec_Enabled := False;
+  FAutoexec_Interval := 60;
+  FAutoexec_StartDelay := 3;
   FSynchroLevel := slIncremental;
   FTargetSynchroStrategy := nil;
+  // Autoexec internal timer
+  if not(csDesigning in ComponentState) then
+    FAutoexec_Timer := TioTimer.CreateNewTimer
+  else
+    FAutoexec_Timer := nil;
+end;
+
+destructor TioVMDoSynchronization.Destroy;
+begin
+  if Assigned(FAutoexec_Timer) then
+    FAutoexec_Timer.Free;
+  inherited;
 end;
 
 function TioVMDoSynchronization.Execute: Boolean;
@@ -2244,6 +2285,49 @@ begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and (AComponent = (FTargetSynchroStrategy as TComponent)) then
     FTargetSynchroStrategy := nil;
+end;
+
+procedure TioVMDoSynchronization.SetAutoexec_Enabled(const Value: Boolean);
+begin
+  if Value = FAutoexec_Enabled then
+    Exit;
+  if Assigned(FAutoexec_Timer) then //aka "if not at designtime"
+  begin
+    if Value then
+    begin
+      FAutoexec_Timer.Interval := FAutoexec_StartDelay * 1000; // Seconds
+      FAutoexec_Timer.OnTimer := Autoexec_OnTimerEventHandler;
+    end
+    else
+      FAutoexec_Timer.Enabled := False;
+  end;
+  FAutoexec_Enabled := Value;
+end;
+
+procedure TioVMDoSynchronization.SetAutoexec_Interval(const ASeconds: Integer);
+begin
+  if ASeconds = FAutoexec_Interval then
+    Exit;
+  FAutoexec_Interval := ASeconds;
+  // if Autoexec_Enabled is true then disable ad re-enable it to force the load af the new value
+  if FAutoexec_Enabled then
+  begin
+    SetAutoexec_Enabled(False);
+    SetAutoexec_Enabled(True);
+  end;
+end;
+
+procedure TioVMDoSynchronization.SetAutoexec_StartDelay(const ASeconds: Integer);
+begin
+  if ASeconds = FAutoexec_StartDelay then
+    Exit;
+  FAutoexec_StartDelay := ASeconds;
+  // if Autoexec_Enabled is true then disable ad re-enable it to force the load af the new value
+  if FAutoexec_Enabled then
+  begin
+    SetAutoexec_Enabled(False);
+    SetAutoexec_Enabled(True);
+  end;
 end;
 
 procedure TioVMDoSynchronization.SetTargetSynchroStrategy(const Value: IioSynchroStrategy_Client);
@@ -2275,6 +2359,9 @@ procedure TioVMDoSynchronization._InternalUpdateStdAction;
 begin
   inherited;
   Enabled := Assigned(FTargetSynchroStrategy) and FTargetSynchroStrategy.isReady;
+  // Autoenable/disable the Autoexec_Timer depending on Autoexec_Enabled property value, TargetSynchroStrategy and FAutoexec_Timer both assigned
+  if FAutoexec_Enabled and Assigned(FTargetSynchroStrategy) and Assigned(FAutoexec_Timer) and not FAutoexec_Timer.Enabled then
+    FAutoexec_Timer.Enabled := Enabled;
 end;
 
 end.
