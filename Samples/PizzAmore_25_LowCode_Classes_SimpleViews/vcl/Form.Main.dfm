@@ -8505,7 +8505,7 @@ object MainForm: TMainForm
   object ButtonOrders: TButton
     Left = 43
     Top = 334
-    Width = 105
+    Width = 101
     Height = 44
     Action = acShowOrders
     Anchors = [akLeft, akRight, akBottom]
@@ -8517,12 +8517,12 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 0
     ExplicitTop = 333
-    ExplicitWidth = 101
+    ExplicitWidth = 97
   end
   object ButtonCustomers: TButton
     Left = 43
     Top = 384
-    Width = 105
+    Width = 101
     Height = 44
     Action = acShowCustomers
     Anchors = [akLeft, akRight, akBottom]
@@ -8534,12 +8534,12 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 1
     ExplicitTop = 383
-    ExplicitWidth = 101
+    ExplicitWidth = 97
   end
   object ButtonPizzas: TButton
     Left = 43
     Top = 434
-    Width = 105
+    Width = 101
     Height = 44
     Action = acShowPizzas
     Anchors = [akLeft, akRight, akBottom]
@@ -8551,12 +8551,12 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 2
     ExplicitTop = 433
-    ExplicitWidth = 101
+    ExplicitWidth = 97
   end
   object ButtonQuit: TButton
     Left = 43
     Top = 499
-    Width = 105
+    Width = 101
     Height = 32
     Action = acQuit
     Anchors = [akLeft, akRight, akBottom]
@@ -8568,14 +8568,15 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 3
     ExplicitTop = 498
-    ExplicitWidth = 101
+    ExplicitWidth = 97
   end
   object ioVCL1: TioVCL
     Left = 8
     Top = 272
   end
   object SQLiteConn: TioSQLiteConnectionDef
-    AsDefault = False
+    AsDefault = True
+    AutoCreateDB.Enabled = True
     Database = 'PizzAmore_25_LowCode_Classes_SimpleViews_Vcl.db'
     DatabaseStdFolder = sfDocuments
     Persistent = False
@@ -8622,7 +8623,7 @@ object MainForm: TMainForm
     end
   end
   object HttpConn: TioHttpConnectionDef
-    AsDefault = True
+    AsDefault = False
     BaseURL = 'http://localhost:8080/iorm'
     Persistent = True
     Left = 48

@@ -67,7 +67,7 @@ type
     FNewID: Integer;
     FOldID: Integer;
   public
-    constructor Create(const AEntityClassName: String; const AOldID, ANewID: Integer);
+    constructor InternalCreate(const AEntityClassName: String; const AOldID, ANewID: Integer); // Do not chancge method name to "Create" (Create is used by DJSON)
     property EntityClassName: String read FEntityClassName;
     property NewID: Integer read FNewID write FNewID;
     property OldID: Integer read FOldID;
@@ -76,14 +76,24 @@ type
   TioEtmSynchroStrategy_TempIdContainer = class
   strict private
     FInternalContainer: TObjectList<TioEtmSynchroStrategy_TempIdContainerItem>;
+    function GetCount: Integer; // implemented just to be recognized by the DuckList (http serialization)
+    function GetItem(Index: Integer): TioEtmSynchroStrategy_TempIdContainerItem; // implemented just to be recognized by the DuckList (http serialization)
+    procedure SetCount(const Value: Integer); // implemented just to be recognized by the DuckList (http serialization)
+    procedure SetItem(Index: Integer; const Value: TioEtmSynchroStrategy_TempIdContainerItem); // implemented just to be recognized by the DuckList (http serialization)
   public
     constructor Create;
     destructor Destroy; override;
-    procedure Add(const AEntityClassName: String; const AOldID, ANewID: Integer);
+    function Add(const Value: TioEtmSynchroStrategy_TempIdContainerItem): Integer; // implemented just to be recognized by the DuckList (http serialization)
+    procedure AddByValues(const AEntityClassName: String; const AOldID, ANewID: Integer);
+    procedure Clear; // implemented just to be recognized by the DuckList (http serialization)
     function Contains(const AEntityClassName: String; const AOldID: Integer): Boolean;
-    function GetNewID(const AEntityClassName: String; const AOldID: Integer): Integer;
+    procedure Delete(const Index: Integer); // implemented just to be recognized by the DuckList (http serialization)
     procedure DeleteObjectsWithTemporaryID;
+    function GetNewID(const AEntityClassName: String; const AOldID: Integer): Integer;
+    function IndexOf(const Value: TioEtmSynchroStrategy_TempIdContainerItem): Integer; // implemented just to be recognized by the DuckList (http serialization)
     procedure UpdateEtmTimeSlotsWithTemporaryID(const AEtmTimeSlotClassname: String);
+    property Count: Integer read GetCount write SetCount; // implemented just to be recognized by the DuckList (http serialization)
+    property Items[Index: Integer]: TioEtmSynchroStrategy_TempIdContainerItem read GetItem write SetItem; default; // implemented just to be recognized by the DuckList (http serialization)
   end;
 
   TioEtmSynchroStrategy_Payload = class(TioCustomSynchroStrategy_Payload)
@@ -290,7 +300,7 @@ begin
     if LNewID < 0 then
       raise EioEtmException.Create(ClassName, '_InternalPersistObjToServer',
         Format('The new definitive ID cannot be negative (class "%s", OldID=%d, NewID=%d).', [AObj.ClassName, LOldID, LNewID]));
-    FTempIdContainer.Add(AObj.ClassName, LOldID, LNewID);
+    FTempIdContainer.AddByValues(AObj.ClassName, LOldID, LNewID);
   end;
 end;
 
@@ -611,6 +621,11 @@ begin
   FInternalContainer := TObjectList<TioEtmSynchroStrategy_TempIdContainerItem>.Create;
 end;
 
+procedure TioEtmSynchroStrategy_TempIdContainer.Delete(const Index: Integer);
+begin
+  FInternalContainer.Delete(Index);
+end;
+
 procedure TioEtmSynchroStrategy_TempIdContainer.DeleteObjectsWithTemporaryID;
 var
   I: Integer;
@@ -625,6 +640,11 @@ begin
   inherited;
 end;
 
+procedure TioEtmSynchroStrategy_TempIdContainer.Clear;
+begin
+  FInternalContainer.Clear;
+end;
+
 function TioEtmSynchroStrategy_TempIdContainer.Contains(const AEntityClassName: String; const AOldID: Integer): Boolean;
 var
   LTempIdContainer: TioEtmSynchroStrategy_TempIdContainerItem;
@@ -635,11 +655,26 @@ begin
   Result := False;
 end;
 
-procedure TioEtmSynchroStrategy_TempIdContainer.Add(const AEntityClassName: String; const AOldID, ANewID: Integer);
+function TioEtmSynchroStrategy_TempIdContainer.Add(const Value: TioEtmSynchroStrategy_TempIdContainerItem): Integer;
+begin
+  FInternalContainer.Add(Value);
+end;
+
+procedure TioEtmSynchroStrategy_TempIdContainer.AddByValues(const AEntityClassName: String; const AOldID, ANewID: Integer);
 begin
   if Contains(AEntityClassName, AOldID) then
     raise EioEtmException.Create(ClassName, 'Add', Format('Object of class "%s" with ID = %d is already extsts in the container.', [AEntityClassName, AOldID]));
-  FInternalContainer.Add(TioEtmSynchroStrategy_TempIdContainerItem.Create(AEntityClassName, AOldID, ANewID));
+  FInternalContainer.Add(TioEtmSynchroStrategy_TempIdContainerItem.InternalCreate(AEntityClassName, AOldID, ANewID));
+end;
+
+function TioEtmSynchroStrategy_TempIdContainer.GetCount: Integer;
+begin
+  Result := FInternalContainer.Count;
+end;
+
+function TioEtmSynchroStrategy_TempIdContainer.GetItem(Index: Integer): TioEtmSynchroStrategy_TempIdContainerItem;
+begin
+  Result := FInternalContainer.Items[Index];
 end;
 
 function TioEtmSynchroStrategy_TempIdContainer.GetNewID(const AEntityClassName: String; const AOldID: Integer): Integer;
@@ -652,18 +687,32 @@ begin
   raise EioEtmException.Create(ClassName, 'GetNewID', Format('Object of class "%s" with ID = %d not found in the container.', [AEntityClassName, AOldID]));
 end;
 
+function TioEtmSynchroStrategy_TempIdContainer.IndexOf(const Value: TioEtmSynchroStrategy_TempIdContainerItem): Integer;
+begin
+  Result := FInternalContainer.IndexOf(Value);
+end;
+
+procedure TioEtmSynchroStrategy_TempIdContainer.SetCount(const Value: Integer);
+begin
+  FInternalContainer.Count := Value;
+end;
+
+procedure TioEtmSynchroStrategy_TempIdContainer.SetItem(Index: Integer; const Value: TioEtmSynchroStrategy_TempIdContainerItem);
+begin
+  FInternalContainer.Items[Index] := Value;
+end;
+
 procedure TioEtmSynchroStrategy_TempIdContainer.UpdateEtmTimeSlotsWithTemporaryID(const AEtmTimeSlotClassname: String);
 var
   LTempIdContainer: TioEtmSynchroStrategy_TempIdContainerItem;
 begin
   for LTempIdContainer in FInternalContainer do
-    io.SQL(Format('UPDATE [%s] SET [.EntityID] = %d WHERE [.EntityClassName] = ''%s'' AND [.EntityID] = %d', [AEtmTimeSlotClassname, LTempIdContainer.NewID,
-      LTempIdContainer.EntityClassName, LTempIdContainer.OldID])).SelfClass(AEtmTimeSlotClassname).Execute;
+    io.SQL(Format('UPDATE [%s] SET [.EntityID] = %d WHERE [.EntityClassName] = ''%s'' AND [.EntityID] = %d', [AEtmTimeSlotClassname, LTempIdContainer.NewID, LTempIdContainer.EntityClassName, LTempIdContainer.OldID])).SelfClass(AEtmTimeSlotClassname).Execute;
 end;
 
 { TioEtmSynchroStrategy_TempIdContainerItem }
 
-constructor TioEtmSynchroStrategy_TempIdContainerItem.Create(const AEntityClassName: String; const AOldID, ANewID: Integer);
+constructor TioEtmSynchroStrategy_TempIdContainerItem.InternalCreate(const AEntityClassName: String; const AOldID, ANewID: Integer);
 begin
   FEntityClassName := AEntityClassName;
   FNewID := ANewID;

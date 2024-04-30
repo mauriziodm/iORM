@@ -151,7 +151,7 @@ begin
   LConnection.ioRequestBody.Clear;
   LConnection.ioRequestBody.JSONDataValueAsObject := APayload;
   LConnection.Execute(HTTP_METHOD_NAME_DOSYNCHRONIZATION);
-  dj.FromJSON(LConnection.ioResponseBody.JSONDataValue).OpType(ssHTTP).byFields.TypeAnnotationsON.&To(APayload);
+  dj.FromJSON(LConnection.ioResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(APayload);
   // Client-side operations
   APayload.PersistToClient;
   // Finalization

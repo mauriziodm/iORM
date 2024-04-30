@@ -5259,7 +5259,6 @@ object StartForm: TStartForm
       Category = 'iORM - Synchronization strategies'
       AutoCheck = True
       Text = 'Synchronize'
-      Autoexec_Enabled = True
       Autoexec_Interval = 3
       Autoexec_StartDelay = 1
       TargetSynchroStrategy = SynchroStrategy
