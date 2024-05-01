@@ -3,7 +3,7 @@
         <ProjectGuid>{EDA76E4A-4BD0-4BDC-A9E0-03FA00D3B650}</ProjectGuid>
         <MainSource>iORM_RT.dpk</MainSource>
         <ProjectVersion>19.5</ProjectVersion>
-        <FrameworkType>None</FrameworkType>
+        <FrameworkType>FMX</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>

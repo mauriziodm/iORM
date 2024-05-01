@@ -57,9 +57,21 @@ uses
 type
   TioUniGUI = class(TComponent)
   strict private
+    // Events
+    FHideWait: TNotifyEvent;
+    FShowWait: TNotifyEvent;
+    // Methods
     function Get_Version: String;
+    procedure SetHideWait(const Value: TNotifyEvent);
+    procedure SetShowWait(const Value: TNotifyEvent);
+  public
+    constructor Create(AOwner: TComponent); override;
   published
+    // properties
     property _Version: String read Get_Version;
+    // Events
+    property HideWait: TNotifyEvent read FHideWait write SetHideWait;
+    property ShowWait: TNotifyEvent read FShowWait write SetShowWait;
   end;
 
   // Note: TioApplication features not implemented for uniGUI platform
@@ -134,13 +146,47 @@ type
 implementation
 
 uses
-  iORM, Vcl.Forms, Vcl.Dialogs, iORM.Exceptions, Vcl.Controls;
+  iORM, Vcl.Forms, Vcl.Dialogs, iORM.Exceptions, Vcl.Controls,
+  iORM.DB.ConnectionContainer;
 
 { TioUniGUI }
+
+constructor TioUniGUI.Create(AOwner: TComponent);
+begin
+  inherited;
+  FShowWait := nil;
+  FHideWait := nil;
+end;
 
 function TioUniGUI.Get_Version: String;
 begin
   Result := io.Version;
+end;
+
+procedure TioUniGUI.SetHideWait(const Value: TNotifyEvent);
+begin
+  FHideWait := Value;
+  if Assigned(FHideWait) then
+    TioConnectionManager.SetHideWaitProc(
+      procedure
+      begin
+        FHideWait(Self);
+      end)
+  else
+    TioConnectionManager.SetHideWaitProc(nil);
+end;
+
+procedure TioUniGUI.SetShowWait(const Value: TNotifyEvent);
+begin
+  FShowWait := Value;
+  if Assigned(FShowWait) then
+    TioConnectionManager.SetShowWaitProc(
+      procedure
+      begin
+        FShowWait(Self);
+      end)
+  else
+    TioConnectionManager.SetShowWaitProc(nil);
 end;
 
 { TioApplicationUniGUI }

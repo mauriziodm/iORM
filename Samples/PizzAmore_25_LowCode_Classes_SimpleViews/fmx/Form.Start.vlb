@@ -8,9 +8,6 @@ Coordinates=166,173,80,36
 Coordinates=10,10,79,58
 Visible=True
 
-[Label1]
-Coordinates=10,78,53,58
-
 [acShowPizzas]
 Coordinates=67,173,98,36
 
@@ -64,4 +61,7 @@ Coordinates=10,146,81,36
 
 []
 Coordinates=0,215,91,36
+
+[Z]
+Coordinates=10,78,53,58
 

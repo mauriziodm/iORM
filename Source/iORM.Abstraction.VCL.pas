@@ -36,15 +36,27 @@ unit iORM.Abstraction.VCL;
 interface
 
 uses
-  iORM.Abstraction, Vcl.ActnList, Vcl.ExtCtrls, System.Rtti, System.Classes, FireDAC.VCLUI.Wait; // For FireDAC compatibility without original component
+  iORM.Abstraction, VCL.ActnList, VCL.ExtCtrls, System.Rtti, System.Classes, FireDAC.VCLUI.Wait; // For FireDAC compatibility without original component
 
 type
 
   TioVCL = class(TComponent)
   strict private
+    // Events
+    FHideWait: TNotifyEvent;
+    FShowWait: TNotifyEvent;
+    // Methods
     function Get_Version: String;
+    procedure SetHideWait(const Value: TNotifyEvent);
+    procedure SetShowWait(const Value: TNotifyEvent);
+  public
+    constructor Create(AOwner: TComponent); override;
   published
+    // properties
     property _Version: String read Get_Version;
+    // Events
+    property HideWait: TNotifyEvent read FHideWait write SetHideWait;
+    property ShowWait: TNotifyEvent read FShowWait write SetShowWait;
   end;
 
   TioApplicationVCL = class(TioApplication)
@@ -82,28 +94,28 @@ type
   private
     FInternalAction: TAction;
   protected
-    class function _CreateNewAction(const AOwner:TComponent): TioAction; override;
-    class function _CreateNewAction(const AOwner:TComponent; const AAction: TObject): TioAction; override;
+    class function _CreateNewAction(const AOwner: TComponent): TioAction; override;
+    class function _CreateNewAction(const AOwner: TComponent; const AAction: TObject): TioAction; override;
     class function _IsValid(const AField: TRttiField): Boolean; override;
     function GetCaption: string; override;
-    function GetChecked: boolean; override;
-    function GetEnabled: boolean; override;
-    function GetGroupIndex: integer; override;
+    function GetChecked: Boolean; override;
+    function GetEnabled: Boolean; override;
+    function GetGroupIndex: Integer; override;
     function GetHint: string; override;
-    function GetImageIndex: integer; override;
+    function GetImageIndex: Integer; override;
     function GetName: TComponentName; override;
-    function GetVisible: boolean; override;
+    function GetVisible: Boolean; override;
     function GetOnExecute: TNotifyEvent; override;
     function GetOnHint: THintEvent; override;
     function GetOnUpdate: TNotifyEvent; override;
     procedure SetCaption(const Value: string); override;
-    procedure SetChecked(const Value: boolean); override;
-    procedure SetEnabled(const Value: boolean); override;
-    procedure SetGroupIndex(const Value: integer); override;
+    procedure SetChecked(const Value: Boolean); override;
+    procedure SetEnabled(const Value: Boolean); override;
+    procedure SetGroupIndex(const Value: Integer); override;
     procedure SetHint(const Value: string); override;
-    procedure SetImageIndex(const Value: integer); override;
+    procedure SetImageIndex(const Value: Integer); override;
     procedure SetName(const Value: TComponentName); override;
-    procedure SetVisible(const Value: boolean); override;
+    procedure SetVisible(const Value: Boolean); override;
     procedure SetOnExecute(const Value: TNotifyEvent); override;
     procedure SetOnHint(const Value: THintEvent); override;
     procedure SetOnUpdate(const Value: TNotifyEvent); override;
@@ -117,7 +129,8 @@ type
 implementation
 
 uses
-  Vcl.Forms, Vcl.Dialogs, Vcl.Controls, iORM.Exceptions, iORM;
+  VCL.Forms, VCL.Dialogs, VCL.Controls, iORM.Exceptions, iORM,
+  iORM.DB.ConnectionContainer;
 
 { TioApplicationVCL }
 
@@ -133,7 +146,7 @@ end;
 
 class procedure TioApplicationVCL._ShowMessage(const AMessage: string);
 begin
-  Vcl.Dialogs.ShowMessage(AMessage);
+  VCL.Dialogs.ShowMessage(AMessage);
 end;
 
 class function TioApplicationVCL._Terminate: Boolean;
@@ -147,9 +160,9 @@ end;
 class procedure TioControlVCL._SetParent(const AControl, AParent: TObject);
 begin
   inherited;
-  if not (AControl is TControl) then
+  if not(AControl is TControl) then
     raise EioGenericException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TControl.');
-  if not (AParent is TWinControl) then
+  if not(AParent is TWinControl) then
     raise EioGenericException.Create(Self.ClassName, '_SetParent', 'AParent must descend from TWinControl.');
   TControl(AControl).Parent := TWinControl(AParent);
 end;
@@ -238,17 +251,17 @@ begin
   Result := FInternalAction.Caption;
 end;
 
-function TioActionVCL.GetChecked: boolean;
+function TioActionVCL.GetChecked: Boolean;
 begin
   Result := FInternalAction.Checked;
 end;
 
-function TioActionVCL.GetEnabled: boolean;
+function TioActionVCL.GetEnabled: Boolean;
 begin
   Result := FInternalAction.Enabled;
 end;
 
-function TioActionVCL.GetGroupIndex: integer;
+function TioActionVCL.GetGroupIndex: Integer;
 begin
   Result := FInternalAction.GroupIndex;
 end;
@@ -258,7 +271,7 @@ begin
   Result := FInternalAction.Hint;
 end;
 
-function TioActionVCL.GetImageIndex: integer;
+function TioActionVCL.GetImageIndex: Integer;
 begin
   Result := FInternalAction.ImageIndex;
 end;
@@ -283,7 +296,7 @@ begin
   Result := FInternalAction.OnUpdate;
 end;
 
-function TioActionVCL.GetVisible: boolean;
+function TioActionVCL.GetVisible: Boolean;
 begin
   Result := FInternalAction.Visible;
 end;
@@ -293,17 +306,17 @@ begin
   FInternalAction.Caption := Value;
 end;
 
-procedure TioActionVCL.SetChecked(const Value: boolean);
+procedure TioActionVCL.SetChecked(const Value: Boolean);
 begin
   FInternalAction.Checked := Value;
 end;
 
-procedure TioActionVCL.SetEnabled(const Value: boolean);
+procedure TioActionVCL.SetEnabled(const Value: Boolean);
 begin
   FInternalAction.Enabled := Value;
 end;
 
-procedure TioActionVCL.SetGroupIndex(const Value: integer);
+procedure TioActionVCL.SetGroupIndex(const Value: Integer);
 begin
   FInternalAction.GroupIndex := Value;
 end;
@@ -313,7 +326,7 @@ begin
   FInternalAction.Hint := Value;
 end;
 
-procedure TioActionVCL.SetImageIndex(const Value: integer);
+procedure TioActionVCL.SetImageIndex(const Value: Integer);
 begin
   FInternalAction.ImageIndex := Value;
 end;
@@ -338,7 +351,7 @@ begin
   FInternalAction.OnUpdate := Value;
 end;
 
-procedure TioActionVCL.SetVisible(const Value: boolean);
+procedure TioActionVCL.SetVisible(const Value: Boolean);
 begin
   FInternalAction.Visible := Value;
 end;
@@ -362,23 +375,56 @@ end;
 class procedure TioControlVCL._SetVisible(const AControl: TObject; const AVisible: Boolean);
 begin
   inherited;
-  if not (AControl is TControl) then
+  if not(AControl is TControl) then
     raise EioGenericException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TControl.');
   TControl(AControl).Visible := AVisible;
 end;
 
 { TioVCL }
 
+constructor TioVCL.Create(AOwner: TComponent);
+begin
+  inherited;
+  FShowWait := nil;
+  FHideWait := nil;
+end;
+
 function TioVCL.Get_Version: String;
 begin
   Result := io.Version;
 end;
 
+procedure TioVCL.SetHideWait(const Value: TNotifyEvent);
+begin
+  FHideWait := Value;
+  if Assigned(FHideWait) then
+    TioConnectionManager.SetHideWaitProc(
+      procedure
+      begin
+        FHideWait(Self);
+      end)
+  else
+    TioConnectionManager.SetHideWaitProc(nil);
+end;
+
+procedure TioVCL.SetShowWait(const Value: TNotifyEvent);
+begin
+  FShowWait := Value;
+  if Assigned(FShowWait) then
+    TioConnectionManager.SetShowWaitProc(
+      procedure
+      begin
+        FShowWait(Self);
+      end)
+  else
+    TioConnectionManager.SetShowWaitProc(nil);
+end;
+
 initialization
 
-  TioApplicationVCL.SetConcreteClass(TioApplicationVCL);
-  TioControlVCL.SetConcreteClass(TioControlVCL);
-  TioTimerVCL.SetConcreteClass(TioTimerVCL);
-  TioActionVCL.SetConcreteClass(TioActionVCL);
+TioApplicationVCL.SetConcreteClass(TioApplicationVCL);
+TioControlVCL.SetConcreteClass(TioControlVCL);
+TioTimerVCL.SetConcreteClass(TioTimerVCL);
+TioActionVCL.SetConcreteClass(TioActionVCL);
 
 end.

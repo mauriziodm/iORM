@@ -68,6 +68,13 @@ object StartForm: TStartForm
             StyleLookup = 'escapetoolbutton'
             TextSettings.FontColor = claAliceblue
           end
+          object SynchroAnim: TAniIndicator
+            Position.X = 67.000000000000000000
+            Position.Y = 3.000000000000000000
+            Size.Width = 34.000000000000000000
+            Size.Height = 34.000000000000000000
+            Size.PlatformDefault = False
+          end
         end
       end
       object ButtonGoToOrderList: TButton
@@ -152,7 +159,7 @@ object StartForm: TStartForm
             Text = 'Amore'
             TabOrder = 0
           end
-          object Label1: TLabel
+          object Z: TLabel
             AutoSize = True
             StyledSettings = [Family]
             Position.X = 21.000000000000000000
@@ -5265,6 +5272,8 @@ object StartForm: TStartForm
     end
   end
   object ioFMX1: TioFMX
+    HideWait = ioFMX1HideWait
+    ShowWait = ioFMX1ShowWait
     Left = 32
     Top = 448
   end
@@ -5301,6 +5310,8 @@ object StartForm: TStartForm
     Async = True
     EtmTimeSlot_ClassName = 'TEtmRepository'
     TargetConnectionDef = HttpConn
+    AfterSynchronization = SynchroStrategyAfterSynchronization
+    BeforeSynchronization = SynchroStrategyBeforeSynchronization
     Left = 83
     Top = 304
   end

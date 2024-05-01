@@ -148,9 +148,12 @@ type
     class procedure ClearConnectionInfoSynchroStrategy(AConnectionName: String);
 
     class function GetSynchroStrategy_Client(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IioSynchroStrategy_Client;
-    class procedure SetShowHideWaitProc(const AShowWaitProc: TProc; const AHideWaitProc: TProc);
-    class procedure ShowWaitProc;
-    class procedure HideWaitProc;
+
+    class procedure SetShowWaitProc(const AShowWaitProc: TProc); static;
+    class procedure SetHideWaitProc(const AHideWaitProc: TProc); static;
+    class procedure SetShowHideWaitProc(const AShowWaitProc: TProc; const AHideWaitProc: TProc); static;
+    class procedure ShowWaitProc; static;
+    class procedure HideWaitProc; static;
     // Use
     class procedure UseConnection(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME);
     class procedure UseUser(AUserID: Integer; AUserName: String = ''); overload;
@@ -672,10 +675,20 @@ begin
   end;
 end;
 
+class procedure TioConnectionManager.SetHideWaitProc(const AHideWaitProc: TProc);
+begin
+  FHideWaitProc := AHideWaitProc;
+end;
+
 class procedure TioConnectionManager.SetShowHideWaitProc(const AShowWaitProc: TProc; const AHideWaitProc: TProc);
 begin
   FShowWaitProc := AShowWaitProc;
   FHideWaitProc := AHideWaitProc;
+end;
+
+class procedure TioConnectionManager.SetShowWaitProc(const AShowWaitProc: TProc);
+begin
+  FShowWaitProc := AShowWaitProc;
 end;
 
 { TioConnectionMonitor }

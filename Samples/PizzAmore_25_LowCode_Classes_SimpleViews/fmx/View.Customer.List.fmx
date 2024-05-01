@@ -162,7 +162,6 @@ inherited ViewCustomerList: TViewCustomerList
     VirtualFields = True
     Paging.CurrentPageOfFormat = 'Page %d of %d'
     Paging.PageSize = 50
-    Paging.PagingType = ptHardPaging
   end
   inherited BSWhere: TioPrototypeBindSourceMaster
     FieldDefs = <

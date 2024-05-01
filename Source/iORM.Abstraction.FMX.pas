@@ -43,9 +43,22 @@ uses
 type
 
   TioFMX = class(TComponent)
+  strict private
+    // Events
+    FHideWait: TNotifyEvent;
+    FShowWait: TNotifyEvent;
+    // Methods
     function Get_Version: String;
+    procedure SetHideWait(const Value: TNotifyEvent);
+    procedure SetShowWait(const Value: TNotifyEvent);
+  public
+    constructor Create(AOwner: TComponent); override;
   published
+    // properties
     property _Version: String read Get_Version;
+    // Events
+    property HideWait: TNotifyEvent read FHideWait write SetHideWait;
+    property ShowWait: TNotifyEvent read FShowWait write SetShowWait;
   end;
 
   TioApplicationFMX = class(TioApplication)
@@ -118,7 +131,8 @@ type
 implementation
 
 uses
-  FMX.Forms, FMX.Dialogs, iORM.Exceptions, FMX.Controls, iORM;
+  FMX.Forms, FMX.Dialogs, iORM.Exceptions, FMX.Controls, iORM,
+  iORM.DB.ConnectionContainer;
 
 { TioTimerFMX }
 
@@ -369,9 +383,42 @@ end;
 
 { TioFMX }
 
+constructor TioFMX.Create(AOwner: TComponent);
+begin
+  inherited;
+  FShowWait := nil;
+  FHideWait := nil;
+end;
+
 function TioFMX.Get_Version: String;
 begin
   Result := io.Version;
+end;
+
+procedure TioFMX.SetHideWait(const Value: TNotifyEvent);
+begin
+  FHideWait := Value;
+  if Assigned(FHideWait) then
+    TioConnectionManager.SetHideWaitProc(
+      procedure
+      begin
+        FHideWait(Self);
+      end)
+  else
+    TioConnectionManager.SetHideWaitProc(nil);
+end;
+
+procedure TioFMX.SetShowWait(const Value: TNotifyEvent);
+begin
+  FShowWait := Value;
+  if Assigned(FShowWait) then
+    TioConnectionManager.SetShowWaitProc(
+      procedure
+      begin
+        FShowWait(Self);
+      end)
+  else
+    TioConnectionManager.SetShowWaitProc(nil);
 end;
 
 initialization
