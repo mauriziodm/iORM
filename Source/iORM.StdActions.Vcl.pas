@@ -1221,7 +1221,11 @@ begin
     TargetBindSource.Persistence.Append(RaiseIfRevertPointSaved, RaiseIfChangesExists);
   finally
     // Execute slave actions
-    TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_ShowOrSelectAction);
+    if Assigned(Action_ShowOrSelectAction) then
+    begin
+      TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_ShowOrSelectAction);
+      TargetBindSource.Persistence.Clear;
+    end;
   end;
 end;
 
@@ -1303,7 +1307,11 @@ begin
     TargetBindSource.Persistence.Insert(RaiseIfRevertPointSaved, RaiseIfChangesExists);
   finally
     // Execute slave actions
-    TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_ShowOrSelectAction);
+    if Assigned(Action_ShowOrSelectAction) then
+    begin
+      TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_ShowOrSelectAction);
+      TargetBindSource.Persistence.Clear;
+    end;
   end;
 end;
 

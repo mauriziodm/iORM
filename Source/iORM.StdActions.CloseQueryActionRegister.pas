@@ -72,7 +72,7 @@ begin
   while (FInternalContainer[I] <> Sender) and (I >= 0) do
   begin
     if FInternalContainer[I]._IsChildOf(Sender) and (ADisableIfChildExists or not FInternalContainer[I]._CanClose) then
-        Exit(False);
+      Exit(False);
     Dec(I);
   end;
 end;
