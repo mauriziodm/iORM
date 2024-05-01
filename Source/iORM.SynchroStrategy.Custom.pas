@@ -37,7 +37,7 @@ interface
 
 uses
   System.Classes, iORM.Context.Interfaces, iORM.SynchroStrategy.Interfaces, iORM.Attributes, DJSON.Attributes,
-  System.SysUtils;
+  System.SysUtils, iORM.CommonTypes;
 
 type
 
@@ -172,6 +172,7 @@ type
 
   TioCustomSynchroStrategy_Client = class abstract(TComponent, IioSynchroStrategy_Client)
   strict private
+    // Fields
     FAsync: Boolean;
     FEntities_BlackList: TStrings;
     FEntities_WhiteList: TStrings;
@@ -183,8 +184,16 @@ type
     FInProgress: Boolean;
     FSynchroName: String;
     FTargetConnectionDef: IioSynchroStrategy_TargetConnectionDef; // IioSynchroStrategy_TargetConnectionDef instead of TioPersistenceStrategyRef to avoid circular reference
+    // Events
+    FAfterSynchronization: TioSynchronizationBeforeAfterEvent;
+    FBeforeSynchronization: TioSynchronizationBeforeAfterEvent;
+    FCanExecute: TioCanExecuteEvent;
+    // Methods
     procedure _SyncExecute(AExecuteMethod: TProc; ATerminateMethod: TProc);
     procedure _AsyncExecute(AExecuteMethod: TProc; ATerminateMethod: TProc);
+    procedure DoAfterSynchronizationEvent;
+    procedure DoBeforeSynchronizationEvent;
+    function DoCanExecuteEvent: Boolean;
     procedure SetTargetConnectionDef(const ATargetConnectionDef: IioSynchroStrategy_TargetConnectionDef);
     procedure SetEntities_BlackList(const Value: TStrings);
     procedure SetEntities_WhiteList(const Value: TStrings);
@@ -231,6 +240,10 @@ type
     property SynchroName: String read FSynchroName write FSynchroName;
     property TargetConnectionDef: IioSynchroStrategy_TargetConnectionDef read FTargetConnectionDef write SetTargetConnectionDef default nil;
     property _Version: String read Get_Version;
+    // Events
+    property AfterSynchronization: TioSynchronizationBeforeAfterEvent read FAfterSynchronization write FAfterSynchronization;
+    property BeforeSynchronization: TioSynchronizationBeforeAfterEvent read FBeforeSynchronization write FBeforeSynchronization;
+    property CanExecute: TioCanExecuteEvent read FCanExecute write FCanExecute;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -268,6 +281,7 @@ uses
 constructor TioCustomSynchroStrategy_Client.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  // Fields
   FAsync := False;
   FEntities_BlackList := TStringList.Create;
   FEntities_WhiteList := TStringList.Create;
@@ -279,6 +293,10 @@ begin
   FInProgress := False;
   FSynchroName := IO_STRING_NULL_VALUE;
   FTargetConnectionDef := nil;
+  // Events
+  FAfterSynchronization := nil;
+  FBeforeSynchronization := nil;
+  FCanExecute := nil;
 end;
 
 destructor TioCustomSynchroStrategy_Client.Destroy;
@@ -411,7 +429,8 @@ end;
 
 procedure TioCustomSynchroStrategy_Client._AsyncExecute(AExecuteMethod, ATerminateMethod: TProc);
 begin
-  io.ShowWait;
+  // Before synchronization event, show wait
+  DoBeforeSynchronizationEvent;
   // Create and execute the thread
   TioCustomSynchroStrategy_Thread.Create(AExecuteMethod, ATerminateMethod).Start;
 end;
@@ -434,8 +453,9 @@ end;
 
 procedure TioCustomSynchroStrategy_Client._SyncExecute(AExecuteMethod, ATerminateMethod: TProc);
 begin
-  io.ShowWait;
   try
+    // Before synchronization event, show wait
+    DoBeforeSynchronizationEvent;
     // Execute core code
     AExecuteMethod;
   finally
@@ -445,6 +465,35 @@ begin
   end;
 end;
 
+procedure TioCustomSynchroStrategy_Client.DoAfterSynchronizationEvent;
+var
+  LHideGlobalWait: Boolean;
+begin
+  LHideGlobalWait := True;
+  if Assigned(FAfterSynchronization) then
+    FAfterSynchronization(Self, LHideGlobalWait);
+  if LHideGlobalWait then
+    io.HideWait;
+end;
+
+procedure TioCustomSynchroStrategy_Client.DoBeforeSynchronizationEvent;
+var
+  LShowGlobalWait: Boolean;
+begin
+  LShowGlobalWait := True;
+  if Assigned(FBeforeSynchronization) then
+    FBeforeSynchronization(Self, LShowGlobalWait);
+  if LShowGlobalWait then
+    io.ShowWait;
+end;
+
+function TioCustomSynchroStrategy_Client.DoCanExecuteEvent: Boolean;
+begin
+  Result := True;
+  if Assigned(FCanExecute) then
+    FCanExecute(Self, Result);
+end;
+
 procedure TioCustomSynchroStrategy_Client.DoSynchronization(const ASynchroLevel: TioSynchroLevel);
 var
   LPayload: TioCustomSynchroStrategy_Payload;
@@ -452,11 +501,21 @@ var
   LExecuteMethod: TProc;
   LTerminateMethod: TProc;
 begin
+  // CanExeute
+  if not DoCanExecuteEvent then
+    Exit;
   // Create the payload and initialize it
   // Note: Use a local variable and not a global one for the component because
   //        the synchronization must also be possible to perform asynchronously.
-  LPayload := _DoPayload_Create;
-  _DoPayload_Initialize(LPayload, ASynchroLevel);
+  LPayload := nil;
+  try
+    LPayload := _DoPayload_Create;
+    _DoPayload_Initialize(LPayload, ASynchroLevel);
+  except
+    if Assigned(LPayload) then
+      LPayload.Free; // To avoid memory leak even if an error occur
+    raise;
+  end;
   // Get the right target persistence strategy
   LPersistenceStrategy := TioPersistenceStrategyFactory.GetStrategy(FTargetConnectionDef.GetName);
   // Build the execute method that start the synchronization
@@ -468,7 +527,8 @@ begin
   LTerminateMethod := procedure
   begin
     LPayload.Free;
-    io.HideWait;
+    // After synchronization event, hide wait
+    DoAfterSynchronizationEvent;
     FInProgress := False;
   end;
   // Execute the synchronization

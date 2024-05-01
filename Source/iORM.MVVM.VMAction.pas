@@ -56,7 +56,7 @@ type
     // events
     FAfterExecute: TNotifyEvent;
     FBeforeExecute: TNotifyEvent;
-    FCanExecute: TioStdActionCanExecuteEvent;
+    FCanExecute: TioCanExecuteEvent;
     FOnUpdate: TNotifyEvent;
     function Get_Version: String;
     procedure _InternalExecute; virtual;
@@ -88,7 +88,7 @@ type
     // Events
     property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;
     property BeforeExecute: TNotifyEvent read FBeforeExecute write FBeforeExecute;
-    property CanExecute: TioStdActionCanExecuteEvent read FCanExecute write FCanExecute;
+    property CanExecute: TioCanExecuteEvent read FCanExecute write FCanExecute;
     property OnUpdate: TNotifyEvent read FOnUpdate write FOnUpdate;
   public
     constructor Create(AOwner: TComponent); override;

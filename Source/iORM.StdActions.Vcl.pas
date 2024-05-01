@@ -142,7 +142,7 @@ type
     // events
     FAfterExecute: TNotifyEvent;
     FBeforeExecute: TNotifyEvent;
-    FCanExecute: TioStdActionCanExecuteEvent;
+    FCanExecute: TioCanExecuteEvent;
     function Get_Version: String;
   strict protected
     procedure _InternalExecuteStdAction; virtual;
@@ -157,7 +157,7 @@ type
     // Events
     property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;
     property BeforeExecute: TNotifyEvent read FBeforeExecute write FBeforeExecute;
-    property CanExecute: TioStdActionCanExecuteEvent read FCanExecute write FCanExecute;
+    property CanExecute: TioCanExecuteEvent read FCanExecute write FCanExecute;
   public
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
@@ -323,7 +323,7 @@ type
     // events
     FAfterExecute: TNotifyEvent;
     FBeforeExecute: TNotifyEvent;
-    FCanExecute: TioStdActionCanExecuteEvent;
+    FCanExecute: TioCanExecuteEvent;
     function Get_Version: String;
     procedure _SetTargetBindSource(const AObj: TObject);
     procedure SetTargetBindSource(const Value: IioMasterBindSource);
@@ -352,7 +352,7 @@ type
     // events
     property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;
     property BeforeExecute: TNotifyEvent read FBeforeExecute write FBeforeExecute;
-    property CanExecute: TioStdActionCanExecuteEvent read FCanExecute write FCanExecute;
+    property CanExecute: TioCanExecuteEvent read FCanExecute write FCanExecute;
   public
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
@@ -732,7 +732,7 @@ type
     // events
     FAfterExecute: TNotifyEvent;
     FBeforeExecute: TNotifyEvent;
-    FCanExecute: TioStdActionCanExecuteEvent;
+    FCanExecute: TioCanExecuteEvent;
     function Get_Version: String;
     function _IsEnabled: Boolean;
     procedure _SetTargetBindSource(const AObj: TObject);
@@ -788,7 +788,7 @@ type
     // Events
     property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;
     property BeforeExecute: TNotifyEvent read FBeforeExecute write FBeforeExecute;
-    property CanExecute: TioStdActionCanExecuteEvent read FCanExecute write FCanExecute;
+    property CanExecute: TioCanExecuteEvent read FCanExecute write FCanExecute;
   end;
 
   // =================================================================================================
@@ -812,7 +812,7 @@ type
     // events
     FAfterExecute: TNotifyEvent;
     FBeforeExecute: TNotifyEvent;
-    FCanExecute: TioStdActionCanExecuteEvent;
+    FCanExecute: TioCanExecuteEvent;
     // methods
     procedure Autoexec_OnTimerEventHandler(Sender: TObject);
     function Get_Version: String;
@@ -854,7 +854,7 @@ type
     // Events
     property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;
     property BeforeExecute: TNotifyEvent read FBeforeExecute write FBeforeExecute;
-    property CanExecute: TioStdActionCanExecuteEvent read FCanExecute write FCanExecute;
+    property CanExecute: TioCanExecuteEvent read FCanExecute write FCanExecute;
   end;
 
   // =================================================================================================

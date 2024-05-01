@@ -157,6 +157,7 @@ type
     property InProgress;
     property IsReady;
   published
+    // Properties
     property Async;
     property Entities_BlackList;
     property Entities_WhiteList;
@@ -171,6 +172,11 @@ type
     property SynchroName;
     property TargetConnectionDef;
     property _Version;
+    // Events
+    // Events
+    property AfterSynchronization;
+    property BeforeSynchronization;
+    property CanExecute;
   end;
 
   TioEtmSynchroStrategy_Server = class(TioCustomSynchroStrategy_Server)

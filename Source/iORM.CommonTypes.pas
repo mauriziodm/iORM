@@ -88,14 +88,13 @@ type
   TioSkipScopeSet = DJSON.Params.TdjSkipScopeSet;
 
   // Event handlers type
-  TioStdActionCanExecuteEvent = procedure(Sender: TObject; var CanExecute: Boolean) of object;
   TCloseQueryEvent = procedure(Sender: TObject; var CanClose: Boolean) of object;
-
+  TioCanExecuteEvent = procedure(Sender: TObject; var CanExecute: Boolean) of object;
   TioStdActionNewInstanceAsObjectEvent = procedure(const ASender: TObject; out NewInstance: TObject) of object;
   TioStdActionNewInstanceAsInterfaceEvent = procedure(const ASender: TObject; out NewInstance: IInterface) of object;
-
   TioStdAction_ETM_BeforeRevertEvent = procedure(const ASender: TObject; out ATargetObj: TObject) of object;
   TioStdAction_ETM_AfterRevertEvent = procedure(const ASender: TObject; const ARevertedObj: TObject) of object;
+  TioSynchronizationBeforeAfterEvent = procedure(const ASender: TObject; var AShowHideGlobalWait: Boolean) of object;
 
   // Compare operators
   TioCompareOp = (coEquals, coNotEquals, coGreater, coLower, coGreaterOrEqual, coLowerOrEqual, coLike, coNotLike, coIsNull, coIsNotNull);
