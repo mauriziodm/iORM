@@ -657,7 +657,7 @@ end;
 
 function TioEtmSynchroStrategy_TempIdContainer.Add(const Value: TioEtmSynchroStrategy_TempIdContainerItem): Integer;
 begin
-  FInternalContainer.Add(Value);
+  Result := FInternalContainer.Add(Value);
 end;
 
 procedure TioEtmSynchroStrategy_TempIdContainer.AddByValues(const AEntityClassName: String; const AOldID, ANewID: Integer);
