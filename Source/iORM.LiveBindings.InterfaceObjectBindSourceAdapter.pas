@@ -115,6 +115,7 @@ end;
 
 function TInterfaceObjectBindSourceAdapter<T>.AppendAt: Integer;
 begin
+  Result := 0;
   Assert(False);
 end;
 
@@ -142,6 +143,7 @@ end;
 
 function TInterfaceObjectBindSourceAdapter<T>.DeleteAt(AIndex: Integer): Boolean;
 begin
+  Result := False;
   Assert(False);
 end;
 
@@ -231,6 +233,7 @@ end;
 
 function TInterfaceObjectBindSourceAdapter<T>.InsertAt(AIndex: Integer): Integer;
 begin
+  Result := 0;
   Assert(False);
 end;
 
