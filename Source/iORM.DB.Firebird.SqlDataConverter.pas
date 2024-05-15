@@ -109,7 +109,6 @@ begin
       Result := QuotedStr(FormatDateTime('mm/dd/yyyy', AValue.AsExtended))
     else if (AValue.TypeInfo = System.TypeInfo(TTime)) then
       Result := QuotedStr(FormatDateTime('hh:nn:ss', AValue.AsExtended))
-    else if (AValue.TypeInfo = System.TypeInfo(TDateTime)) then
     else if (AValue.TypeInfo = System.TypeInfo(TDateTime)) or (AValue.TypeInfo = System.TypeInfo(TioObjUpdated)) or (AValue.TypeInfo = System.TypeInfo(TioObjCreated)) then
       Result := QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss', AValue.AsExtended));
 end;

@@ -57,7 +57,8 @@ type
   public
     constructor Create(PIID: PTypeInfo);
     destructor Destroy; override;
-    procedure SetRelationInfo(const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName:String; const ARelationChildID:Integer; const ARelationChildWhere:IioWhere);
+    procedure SetRelationInfo(const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationChildID: Integer;
+      const ARelationChildWhere: IioWhere);
     function GetInternalObject: TObject;
   end;
 
@@ -71,8 +72,8 @@ uses
 
 constructor TioLazyObject.Create(PIID: PTypeInfo);
 begin
- inherited Create(PIID, DoInvoke);
- FFirstTimeRefCountToZero := True;
+  inherited Create(PIID, DoInvoke);
+  FFirstTimeRefCountToZero := True;
 end;
 
 procedure TioLazyObject.CreateInternalObj;
@@ -82,9 +83,7 @@ begin
   if not FRelationChildPropertyName.IsEmpty then
     FRelationChildWhere._PropertyEqualsTo(FRelationChildPropertyName, FRelationChildID);
   // Load the instance
-  FInternalObj := io.Load(FRelationChildTypeName, FRelationChildTypeAlias)
-                         ._Where(   FRelationChildWhere   )
-                         .ToObject;
+  FInternalObj := io.Load(FRelationChildTypeName, FRelationChildTypeAlias)._Where(FRelationChildWhere).ToObject;
 end;
 
 destructor TioLazyObject.Destroy;
@@ -94,8 +93,7 @@ begin
   inherited;
 end;
 
-procedure TioLazyObject.DoInvoke(Method: TRttiMethod;
-  const Args: TArray<TValue>; out Result: TValue);
+procedure TioLazyObject.DoInvoke(Method: TRttiMethod; const Args: TArray<TValue>; out Result: TValue);
 var
   LDestMethod: TRttiMethod;
   LArgs: TArray<TValue>;
@@ -110,8 +108,8 @@ end;
 
 function TioLazyObject.GetInternalObject: TObject;
 begin
-  if not Assigned(FInternalObj)
-    then Self.CreateInternalObj;
+  if not Assigned(FInternalObj) then
+    Self.CreateInternalObj;
   Result := FInternalObj;
 end;
 
@@ -127,10 +125,10 @@ end;
 
 function TioLazyObject._Release: Integer;
 begin
-// Ritorno il risultato come TObject e questo farebbe si che verrebbe distrutto se non avessi
-//  alterato artificiosamente la gestione del RefCount. In pratica l'override del metodo _Release
-//  fa si che la prima volta che il RefCount diventa zero questo venga ignorato (il comportamento
-//  ritorna normale successivamente).
+  // Ritorno il risultato come TObject e questo farebbe si che verrebbe distrutto se non avessi
+  // alterato artificiosamente la gestione del RefCount. In pratica l'override del metodo _Release
+  // fa si che la prima volta che il RefCount diventa zero questo venga ignorato (il comportamento
+  // ritorna normale successivamente).
 {$IFNDEF AUTOREFCOUNT}
   if FFirstTimeRefCountToZero then
   begin
