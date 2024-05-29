@@ -2226,5 +2226,5 @@ TioMapContainer._Build;
 io.Enums.Add<TioPersistenceActionType>('Do not persist, Insert, Update, Delete');
 io.Enums.Add<TioPersistenceIntentType>('Regular, Revert, Synchro (svr), Synchro (cli)');
 io.Enums.Add<TioPersistenceConflictState>('Undefined, Resolved, Rejected, Rejected raise');
-io.Enums.Add<TioEtmTimeSlotSynchroState>('Regular, To be synchronized, Sent to server, Received from server, Received from client, ');
+io.Enums.Add<TioEtmTimeSlotSynchroState>('Regular, To be synchronized, Sent to server, Received from server, Received from client');
 end.
