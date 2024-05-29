@@ -522,7 +522,7 @@ type
 {$REGION '===== ETM ATTRIBUTES & TIMESLOT ====='}
 
   // TimeSlot Synchro State
-  TioEtmTimeSlotSynchroState = (tsRegular, tsToBeSynchronized, tsSynchronized_SentToServer, tsSynchronized_ReceivedFromServer, tsSynchronized_ReceivedFromClient);
+  TioEtmTimeSlotSynchroState = (stRegular, stToBeSynchronized, stSynchronized_SentToServer, stSynchronized_ReceivedFromServer, stSynchronized_ReceivedFromClient);
 
   // Base class for ell ETM repositories
   TioEtmTimeSlotRef = class of TioEtmCustomTimeSlot;
@@ -538,8 +538,8 @@ type
     [ioVarchar(60)]
     FEntityClassName: String;
     FEntityID: Integer;
-    FEntityVersion: Integer;
     FEntityFromVersion: Integer;
+    FEntityToVersion: Integer;
     FEntityUpdated: TDateTime;
     [ioBinary('1')]
     FEntityState: String;
@@ -573,7 +573,7 @@ type
     function GetSmartEntityVersion: String;
     function GetSmartUser: String;
     function GetSmartActionType: String;
-    function GetSmartConflictDetected: String;
+    function GetSmartConflictInfo: String;
     function GetSmartConflictCheckedByHuman: String;
     function GetSmartDescription: String;
     function GetSmartFullDescription: String;
@@ -589,8 +589,8 @@ type
     // Entity related props
     property EntityClassName: String read FEntityClassName;
     property EntityID: Integer read FEntityID;
-    property EntityVersion: Integer read FEntityVersion;
     property EntityFromVersion: Integer read FEntityFromVersion;
+    property EntityToVersion: Integer read FEntityToVersion;
     property EntityUpdated: TDateTime read FEntityUpdated;
     property EntityState: String read FEntityState;
     // User related props
@@ -619,7 +619,7 @@ type
     property SmartEntityVersion: String read GetSmartEntityVersion;
     property SmartUser: String read GetSmartUser;
     property SmartActionType: String read GetSmartActionType;
-    property SmartConflictDetected: String read GetSmartConflictDetected;
+    property SmartConflictInfo: String read GetSmartConflictInfo;
     property SmartConflictCheckedByHuman: String read GetSmartConflictCheckedByHuman;
     property SmartDescription: String read GetSmartDescription;
     property SmartFullDescription: String read GetSmartFullDescription;
@@ -1025,7 +1025,7 @@ begin
   // Entity related props
   FEntityClassName := LContext.DataObject.ClassName;
   FEntityID := LContext.ObjID;
-  FEntityVersion := Abs(LContext.ObjVersion);
+  FEntityToVersion := Abs(LContext.ObjVersion);
   FEntityFromVersion := LContext.EntityFromVersion;
   FEntityUpdated := LContext.ObjUpdated;
   FEntityState := dj.From(LContext.DataObject, TioEtmFactory.djParamsEngine).ToJson;
@@ -1064,13 +1064,13 @@ begin
   case FIntentType of
     itRegular:
       if FActionType = atUpdate then
-        Result := Format('%d (updated from %d)', [FEntityVersion, FEntityFromVersion])
+        Result := Format('%d (updated from %d)', [FEntityToVersion, FEntityFromVersion])
       else
-        FEntityVersion.ToString;
+        FEntityToVersion.ToString;
     itRevert:
-      Result := Format('%d (reverted from %d)', [FEntityVersion, FEntityFromVersion]);
+      Result := Format('%d (reverted from %d)', [FEntityToVersion, FEntityFromVersion]);
     itSynchro_PersistToServer, itSynchro_PersistToClient:
-      Result := Format('%d (synchronized from %d)', [FEntityVersion, FEntityFromVersion]);
+      Result := Format('%d (synchronized from %d)', [FEntityToVersion, FEntityFromVersion]);
   else
     raise EioGenericException.Create(ClassName, 'GetSmartEntityVersion', 'IntentType not valid.');
   end;
@@ -1089,10 +1089,10 @@ begin
   end;
 end;
 
-function TioEtmCustomTimeSlot.GetSmartConflictDetected: String;
+function TioEtmCustomTimeSlot.GetSmartConflictInfo: String;
 begin
   if FConflictDetected then
-    Result := Format('Conflict (%s)', [io.Enums.OrdinalToString<TioPersistenceConflictState>(Ord(FConflictState))])
+    Result := Format('%s (%s)', [io.Enums.OrdinalToString<TioPersistenceConflictState>(Ord(FConflictState)), FConflictStrategyName])
   else
     Result := String.Empty;
 end;
@@ -1100,7 +1100,7 @@ end;
 function TioEtmCustomTimeSlot.GetSmartConflictCheckedByHuman: String;
 begin
   // If not checked by human then return an empty string
-  if FConflictCheckedByHuman then
+  if not FConflictCheckedByHuman then
     Exit(String.Empty);
   // If human checked build the result string
   Result := 'Checked';

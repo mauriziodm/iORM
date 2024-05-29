@@ -274,7 +274,7 @@ implementation
 
 uses
   iORM, iORM.PersistenceStrategy.Factory, iORM.DB.Interfaces, iORM.Abstraction,
-  iORM.Exceptions, iORM.DB.Factory;
+  iORM.Exceptions, iORM.DB.Factory, iORM.LiveBindings.BSPersistence;
 
 { TioCustomSynchroStrategy_Client }
 

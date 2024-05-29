@@ -65,6 +65,12 @@ const
   BL_DEFAULT = iORM.CommonTypes.BL_DEFAULT;
   BL_ALL = iORM.CommonTypes.BL_ALL;
   BL_NONE = iORM.CommonTypes.BL_NONE;
+  BL_ETM_PERSIST_TIMESLOT = iORM.CommonTypes.BL_ETM_PERSIST_TIMESLOT;
+  BL_ETM_REVERT_TO_OBJ = iORM.CommonTypes.BL_ETM_REVERT_TO_OBJ;
+  BL_ETM_REVERT_TO_DB = iORM.CommonTypes.BL_ETM_REVERT_TO_DB;
+  BL_SYNCHRO_PERSIST_LOGITEM = iORM.CommonTypes.BL_SYNCHRO_PERSIST_LOGITEM;
+  BL_SYNCHRO_PERSIST_PAYLOAD_TOCLIENT = iORM.CommonTypes.BL_SYNCHRO_PERSIST_PAYLOAD_TOCLIENT;
+  BL_SYNCHRO_PERSIST_PAYLOAD_TOSERVER = iORM.CommonTypes.BL_SYNCHRO_PERSIST_PAYLOAD_TOSERVER;
 
   // TioTypeOfCollection = (tcSingleObject, tcList);
   tcSingleObject = iORM.CommonTypes.TioTypeOfCollection.tcSingleObject;
@@ -179,6 +185,10 @@ const
   csResolved = iORM.CommonTypes.csResolved;
   csRejected = iORM.CommonTypes.csRejected;
   csRejectedRaise = iORM.CommonTypes.csRejectedRaise;
+  // TioFreeObjAfterPersistOrDelete = (foKeepAlive, foFree, foFreeAndNil);
+  foKeepAlive = iORM.CommonTypes.foKeepAlive;
+  foFree = iORM.CommonTypes.foFree;
+  foFreeAndNil = iORM.CommonTypes.foFreeAndNil;
 
   // TioEtmDiffMode = (dmOneway, dmTwoway);
   dmOneway = iORM.ETM.Interfaces.TioEtmDiffMode.dmOneway;
@@ -215,6 +225,13 @@ const
   // TioBSCloseQueryRepeaterScope = (rsFirstLevelChilds, rsDeepChilds);
   rsFirstLevelChilds = iORM.CommonTypes.rsFirstLevelChilds;
   rsDeepChilds = iORM.CommonTypes.rsDeepChilds;
+
+  // TioEtmTimeSlotSynchroState = (stRegular, stToBeSynchronized, stSynchronized_SentToServer, stSynchronized_ReceivedFromServer, stSynchronized_ReceivedFromClient);
+  stRegular = iORM.Attributes.stRegular;
+  stToBeSynchronized = iORM.Attributes.stToBeSynchronized;
+  stSynchronized_SentToServer = iORM.Attributes.stSynchronized_SentToServer;
+  stSynchronized_ReceivedFromServer = iORM.Attributes.stSynchronized_ReceivedFromServer;
+  stSynchronized_ReceivedFromClient = iORM.Attributes.stSynchronized_ReceivedFromClient;
 
 {$ENDREGION}
 
@@ -262,6 +279,7 @@ type
   TioPersistenceActionType = iORM.CommonTypes.TioPersistenceActionType;
   TioPersistenceIntentType = iORM.CommonTypes.TioPersistenceIntentType;
   TioPersistenceConflictState = iORM.CommonTypes.TioPersistenceConflictState;
+  TioFreeObjAfterPersistOrDelete = iORM.CommonTypes.TioFreeObjAfterPersistOrDelete;
 
   // Conflict Strategy
   TioCustomConflictStrategy = iORM.ConflictStrategy.Interfaces.TioCustomConflictStrategy;
@@ -283,6 +301,9 @@ type
   TioBSCloseQueryOnEditingAction = iORM.CommonTypes.TioBSCloseQueryOnEditingAction;
   TioBSCloseQueryOnExecuteAction = iORM.CommonTypes.TioBSCloseQueryOnExecuteAction;
   TioBSCloseQueryRepeaterScope = iORM.CommonTypes.TioBSCloseQueryRepeaterScope;
+
+  // TimeSlot Synchro State
+  TioEtmTimeSlotSynchroState = iORM.Attributes.TioEtmTimeSlotSynchroState;
 
 {$ENDREGION}
   // Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
@@ -373,6 +394,8 @@ type
 
   // iORM facade
   io = class
+  private
+    class procedure _FreeObjAfterPersistOrDelete(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete); static; inline;
   public
     // AnonymousTimer
     class procedure AnonymousTimer(const AIntervalMillisec: Integer; const AExecuteMethod: TFunc<boolean>);
@@ -452,11 +475,13 @@ type
     class function LoadObjVersion(const AContext: IioContext): Integer;
 
     // DeleteObject (accepting instance to delete directly)
-    class procedure DeleteObject(const AObj: TObject; const ABlindLevel: Byte = BL_DEFAULT); overload;
+    class procedure DeleteObject(const [ref] AObj: TObject; const ABlindLevel: Byte = BL_DEFAULT; const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
+    class procedure DeleteObject(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete); overload;
     class procedure DeleteObject(const AIntfObj: IInterface; const ABlindLevel: Byte = BL_DEFAULT); overload;
     class procedure _DeleteObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
     // DeleteList (accepting instance to delete directly)
-    class procedure DeleteList(const AListObj: TObject; const ABlindLevel: Byte = BL_DEFAULT); overload;
+    class procedure DeleteList(const [ref] AListObj: TObject; const ABlindLevel: Byte = BL_DEFAULT; const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
+    class procedure DeleteList(const [ref] AListObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete); overload;
     class procedure DeleteList(const AListIntf: IInterface; const ABlindLevel: Byte = BL_DEFAULT); overload;
     class procedure _DeleteListInternal(const AListObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
     // Delete (accepting generic type to delete and ciriteria)
@@ -490,14 +515,16 @@ type
     class function NotExists<T>(const ATypeAlias: String; const AWhere: IioWhere): boolean; overload;
 
     // PersistObject (accepting instance to persist directly)
-    class procedure PersistObject(const AObj: TObject; const ABlindLevel: Byte = BL_DEFAULT); overload;
+    class procedure PersistObject(const [ref] AObj: TObject; const ABlindLevel: Byte = BL_DEFAULT; const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
+    class procedure PersistObject(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete); overload;
     class procedure PersistObject(const AIntfObj: IInterface; const ABlindLevel: Byte = BL_DEFAULT); overload;
     class procedure _PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
     class procedure _PersistObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
       const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
       const ABlindLevel: Byte); static;
     // PersistCollection (accepting instance to persist directly)
-    class procedure PersistList(const AList: TObject; const ABlindLevel: Byte = BL_DEFAULT); overload;
+    class procedure PersistList(const [ref] AList: TObject; const ABlindLevel: Byte = BL_DEFAULT; const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
+    class procedure PersistList(const [ref] AList: TObject; const AFree: TioFreeObjAfterPersistOrDelete); overload;
     class procedure PersistList(const AListIntf: IInterface; const ABlindLevel: Byte = BL_DEFAULT); overload;
     class procedure _PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
     class procedure _PersistListInternal(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
@@ -971,24 +998,36 @@ begin
     AMasterPropertyName, AMasterPropertyPath, ABlindLevel);
 end;
 
+class procedure io.PersistList(const [ref] AList: TObject; const AFree: TioFreeObjAfterPersistOrDelete);
+begin
+  PersistList(AList, BL_DEFAULT, AFree);
+end;
+
 class procedure io.PersistObject(const AIntfObj: IInterface; const ABlindLevel: Byte);
 begin
   _PersistObjectInternal(AIntfObj as TObject, itRegular, '', 0, nil, '', '', ABlindLevel);
 end;
 
-class procedure io.PersistList(const AList: TObject; const ABlindLevel: Byte);
+class procedure io.PersistList(const [ref] AList: TObject; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete);
 begin
   _PersistListInternal(AList, itRegular, '', 0, nil, '', '', ABlindLevel);
+  _FreeObjAfterPersistOrDelete(AList, AFree);
 end;
 
-class procedure io.PersistObject(const AObj: TObject; const ABlindLevel: Byte);
+class procedure io.PersistObject(const [ref] AObj: TObject; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete);
 begin
   _PersistObjectInternal(AObj, itRegular, '', 0, nil, '', '', ABlindLevel);
+  _FreeObjAfterPersistOrDelete(AObj, AFree);
 end;
 
 class procedure io.PersistList(const AListIntf: IInterface; const ABlindLevel: Byte);
 begin
   _PersistListInternal(AListIntf as TObject, itRegular, '', 0, nil, '', '', ABlindLevel);
+end;
+
+class procedure io.PersistObject(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete);
+begin
+  PersistObject(AObj, BL_DEFAULT, AFree);
 end;
 
 class function io.RefTo(const AClassRef: TioClassRef; const ATypeAlias: String = ''): IioWhere;
@@ -1702,9 +1741,10 @@ begin
   Result := di.LocateVM<T>(AParentCloseQueryAction, AVMAlias).ConstructorParams(AParams).Get;
 end;
 
-class procedure io.DeleteObject(const AObj: TObject; const ABlindLevel: Byte);
+class procedure io.DeleteObject(const [ref] AObj: TObject; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete);
 begin
   _DeleteObjectInternal(AObj, itRegular, ABlindLevel);
+  _FreeObjAfterPersistOrDelete(AObj, AFree);
 end;
 
 class function io.DBBuilder(const AConnectionDefName: String; const AAddIndexes, AAddForeignKeys: boolean): IioDBBuilderEngine;
@@ -1760,9 +1800,20 @@ begin
   _DeleteListInternal(AListIntf as TObject, itRegular, ABlindLevel)
 end;
 
-class procedure io.DeleteList(const AListObj: TObject; const ABlindLevel: Byte);
+class procedure io.DeleteList(const [ref] AListObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete);
 begin
-  _DeleteListInternal(AListObj, itRegular, ABlindLevel)
+  DeleteList(AListObj, BL_DEFAULT, AFree);
+end;
+
+class procedure io.DeleteObject(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete);
+begin
+  DeleteObject(AObj, BL_DEFAULT, AFree);
+end;
+
+class procedure io.DeleteList(const [ref] AListObj: TObject; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete);
+begin
+  _DeleteListInternal(AListObj, itRegular, ABlindLevel);
+  _FreeObjAfterPersistOrDelete(AListObj, AFree);
 end;
 
 class function io.di: TioDependencyInjectionRef;
@@ -1871,6 +1922,16 @@ var
 begin
   LConnectionDefName := TioMapContainer.GetConnectionDefName(AObj.ClassName);
   TioPersistenceStrategyFactory.GetStrategy(LConnectionDefName).DeleteObject(AObj, AIntent, ABlindLevel);
+end;
+
+class procedure io._FreeObjAfterPersistOrDelete(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete);
+begin
+  case AFree of
+    foFree:
+      AObj.Free;
+    foFreeAndNil:
+      FreeAndNil(AObj);
+  end;
 end;
 
 class procedure io._PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
@@ -2165,5 +2226,5 @@ TioMapContainer._Build;
 io.Enums.Add<TioPersistenceActionType>('Do not persist, Insert, Update, Delete');
 io.Enums.Add<TioPersistenceIntentType>('Regular, Revert, Synchro (svr), Synchro (cli)');
 io.Enums.Add<TioPersistenceConflictState>('Undefined, Resolved, Rejected, Rejected raise');
-
+io.Enums.Add<TioEtmTimeSlotSynchroState>('Regular, To be synchronized, Sent to server, Received from server, Received from client, ');
 end.

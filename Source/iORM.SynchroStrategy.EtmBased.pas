@@ -190,7 +190,8 @@ uses
   iORM.CommonTypes, iORM, System.SysUtils,
   iORM.DB.Interfaces, iORM.DB.Factory, iORM.Exceptions,
   iORM.Context.Map.Interfaces, iORM.Context.Container,
-  iORM.DB.ConnectionContainer, iORM.Where.Factory, iORM.Utilities;
+  iORM.DB.ConnectionContainer, iORM.Where.Factory, iORM.Utilities,
+  iORM.LiveBindings.BSPersistence;
 
 { TioEtmBasetSynchroStrategy_LogItem }
 
@@ -331,13 +332,13 @@ begin
   inherited;
   // Delete sent TimeSlots if enabled...
   if EtmTimeSlot_Delete_SentToServer then
-    io.SQL(Format('DELETE FROM [%s] WHERE [.TimeSlotSynchroState] = %d', [FEtmTimeSlotClassName, Ord(tsToBeSynchronized)]))
+    io.SQL(Format('DELETE FROM [%s] WHERE [.TimeSlotSynchroState] = %d', [FEtmTimeSlotClassName, Ord(stToBeSynchronized)]))
       .SelfClass(FEtmTimeSlotClassName).Execute
   else
     // Change the TimeSlotSynchroState value of the synchronized TimeSlots from "tsToBeSynchronized" to "tsSynchronized_SentToServer" if enabled...
     if EtmTimeSlot_Update_SentToServer then
-      io.SQL(Format('UPDATE [%s] SET [.TimeSlotSynchroState] = %d WHERE [.TimeSlotSynchroState] = %d', [FEtmTimeSlotClassName, Ord(tsSynchronized_SentToServer),
-        Ord(tsToBeSynchronized)])).SelfClass(FEtmTimeSlotClassName).Execute;
+      io.SQL(Format('UPDATE [%s] SET [.TimeSlotSynchroState] = %d WHERE [.TimeSlotSynchroState] = %d', [FEtmTimeSlotClassName, Ord(stSynchronized_SentToServer),
+        Ord(stToBeSynchronized)])).SelfClass(FEtmTimeSlotClassName).Execute;
 end;
 
 procedure TioEtmSynchroStrategy_Payload._DoLoadPayloadFromClient;
@@ -347,7 +348,7 @@ var
 begin
   inherited;
   // Build where
-  LWhere := io.Where('TimeSlotSynchroState', coEquals, tsToBeSynchronized);
+  LWhere := io.Where('TimeSlotSynchroState', coEquals, stToBeSynchronized);
   // Where: last timeslot for any object only and/or insert timeslot for the same entity
   LWhere._And._OpenPar;
   LWhere.Add(Format('[.ID] = (SELECT MAX(SUB.ID) FROM [%s] SUB WHERE SUB.EntityClassName = [.EntityClassName] AND SUB.EntityID = [.EntityID])',

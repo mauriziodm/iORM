@@ -63,7 +63,7 @@ type
 implementation
 
 uses
-  iORM, iORM.CommonTypes, iORM.SynchroStrategy.Interfaces;
+  iORM, iORM.CommonTypes, iORM.SynchroStrategy.Interfaces, iORM.LiveBindings.BSPersistence;
 
 { TioEtmInterceptor }
 

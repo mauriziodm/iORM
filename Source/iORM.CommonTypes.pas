@@ -151,6 +151,7 @@ type
   TioPersistenceActionType = (atDoNotPersist, atInsert, atUpdate, atDelete);
   TioPersistenceIntentType = (itRegular, itRevert, itSynchro_PersistToServer, itSynchro_PersistToClient);
   TioPersistenceConflictState = (csUndefined, csResolved, csRejected, csRejectedRaise);
+  TioFreeObjAfterPersistOrDelete = (foKeepAlive, foFree, foFreeAndNil);
 
   // StdActions related types
   TioStdAction_ETM_AutoExec_AfterRevert = (doNothing, doRefresh, doReload);

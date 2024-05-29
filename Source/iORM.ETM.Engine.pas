@@ -137,24 +137,24 @@ begin
 //    raise EioEtmException.Create(ClassName, 'Revert', Format('Hi, I''m iORM, I have to tell you an important thing.' +
 //      #13#13'Revert is not allowed for "Delete" type operations because they have no information about the state to restore.' +
 //      #13#13'The attempt to restore the entity of type "%s" ID %d version %d has failed.', [ATimeSlot.EntityClassName, ATimeSlot.EntityID,
-//      ATimeSlot.EntityVersion]));
+//      ATimeSlot.EntityToVersion]));
   // Type check
   if (not ATargetClassName.IsEmpty) and (ATimeSlot.EntityClassName <> ATargetClassName) then
     raise EioEtmException.Create(ClassName, 'Revert',
       Format('Houston we have a problem.' +
       #13#13'The type of the entity you asked me to revert and the one contained in the provided TimeSlot does not match.' +
       #13#13'I can''t restore the state of type "%s" ID %d version %d to an object of type "%s".', [ATimeSlot.EntityClassName,
-      ATimeSlot.EntityID, ATimeSlot.EntityVersion, ATargetClassName]));
+      ATimeSlot.EntityID, ATimeSlot.EntityToVersion, ATargetClassName]));
 end;
 
 class function TioEtmEngine._InternalBuildTimeLineWhere(const AEntityClassName: String; const AEntityID: Integer = 0): IioWhere<TioEtmCustomTimeSlot>;
 var
   LMap: IioMap;
 begin
-  Result := io.Where<TioEtmCustomTimeSlot>('EntityClassName', coEquals, AEntityClassName)._OrderBy('[.EntityVersion]');
+  Result := io.Where<TioEtmCustomTimeSlot>('EntityClassName', coEquals, AEntityClassName)._OrderBy('[.EntityToVersion]');
   if AEntityID <> 0 then
     Result._And('EntityID', coEquals, AEntityID);
-  Result._OrderBy('[.EntityVersion]');
+  Result._OrderBy('[.EntityToVersion]');
   LMap := _InternalGetMap(AEntityClassName);
   Result.TypeName := LMap.GetTable.GetEtmTimeSlotClass.ClassName;
 end;

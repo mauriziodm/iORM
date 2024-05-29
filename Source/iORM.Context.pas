@@ -678,18 +678,18 @@ begin
   case FIntentType of
     itRegular, itRevert:
       if SynchroStrategy_IsToBeSynchronized then
-        Result := tsToBeSynchronized
+        Result := stToBeSynchronized
       else
-        Result := tsRegular;
+        Result := stRegular;
     itSynchro_PersistToServer:
       if SynchroStrategy_IsToBeSynchronized then
-        Result := tsToBeSynchronized
+        Result := stToBeSynchronized
       else
-        Result := tsSynchronized_ReceivedFromClient;
+        Result := stSynchronized_ReceivedFromClient;
     itSynchro_PersistToClient:
-      Result := tsSynchronized_ReceivedFromServer;
+      Result := stSynchronized_ReceivedFromServer;
   else
-    Result := tsRegular;
+    Result := stRegular;
   end;
 end;
 

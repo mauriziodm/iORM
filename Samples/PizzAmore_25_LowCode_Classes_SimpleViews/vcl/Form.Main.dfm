@@ -8575,7 +8575,7 @@ object MainForm: TMainForm
     Top = 272
   end
   object SQLiteConn: TioSQLiteConnectionDef
-    AsDefault = True
+    AsDefault = False
     AutoCreateDB.Enabled = True
     Database = 'PizzAmore_25_LowCode_Classes_SimpleViews_Vcl.db'
     DatabaseStdFolder = sfDocuments
@@ -8623,7 +8623,7 @@ object MainForm: TMainForm
     end
   end
   object HttpConn: TioHttpConnectionDef
-    AsDefault = False
+    AsDefault = True
     BaseURL = 'http://localhost:8080/iorm'
     Persistent = True
     Left = 48
