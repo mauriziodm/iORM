@@ -63,6 +63,7 @@ type
     FConflictDetected: Boolean;
     FConflictState: TioPersistenceConflictState;
     FSynchroStrategy_Client_NoDirectCall: IioSynchroStrategy_Client;
+    FSynchroStrategy_Payload: TObject; // TObject to avoid circular reference
     // DataObject
     function GetDataObject: TObject;
     procedure SetDataObject(const AValue: TObject);
@@ -128,7 +129,7 @@ type
     procedure SetConflictState(const Value: TioPersistenceConflictState);
   public
     constructor Create(const AIntent: TioPersistenceIntentType; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
-      const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte); overload;
+      const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte; const ASynchroStrategy_Payload: TObject); overload;
     function GetClassRef: TioClassRef;
     function GetProperties: IioProperties;
     function GetTable: IioTable;
@@ -152,6 +153,7 @@ type
     procedure SynchroStrategy_GenerateLocalID;
     function SynchroStrategy_GetTimeSlotSynchroState: TioEtmTimeSlotSynchroState;
     function SynchroStrategy_IsToBeSynchronized: Boolean;
+    function SynchroStrategy_GetPayloadAsTObject: TObject; // TObject to avoid circular reference
     // BlindLevel helper methods
     function BlindLevel_Do_DetectObjExists: boolean; inline;
     function BlindLevel_Do_AutoUpdateProps: boolean; inline;
@@ -202,7 +204,7 @@ uses
   iORM.Context.Factory, iORM.DB.Factory, System.TypInfo,
   iORM.Context.Container, System.SysUtils, iORM.Exceptions,
   System.StrUtils, iORM.DB.Interfaces, iORM, iORM.DB.ConnectionContainer,
-  iORM.Utilities;
+  iORM.Utilities, iORM.SynchroStrategy.Custom;
 
 { TioContext }
 
@@ -293,7 +295,7 @@ begin
 end;
 
 constructor TioContext.Create(const AIntent: TioPersistenceIntentType; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
-      const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
+      const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte; const ASynchroStrategy_Payload: TObject);
 begin
   inherited Create;
   FMap := AMap;
@@ -311,6 +313,11 @@ begin
   FConflictDetected := False;
   FConflictState := csUndefined;
   FSynchroStrategy_Client_NoDirectCall := nil;
+  // I leave the cast even if it is not needed (TObject to avoid dicrular reference) because
+  //  this way if by mistake an object that does not derive from TPippo is passed it gives me
+  //  an error
+  if Assigned(ASynchroStrategy_Payload) then
+    FSynchroStrategy_Payload := ASynchroStrategy_Payload as TioCustomSynchroStrategy_Payload;
 end;
 
 function TioContext.GetClassRef: TioClassRef;
@@ -670,6 +677,11 @@ begin
   // If is to be synchronized...
   if (LSynchroStrategy_Client <> nil) and IDIsNull and LSynchroStrategy_Client.IsToBeSynchronized(Self) then
     GetProperties.GetIdProperty.SetValue(DataObject, LSynchroStrategy_Client.GenerateLocalID(Self));
+end;
+
+function TioContext.SynchroStrategy_GetPayloadAsTObject: TObject;
+begin
+  Result := FSynchroStrategy_Payload;
 end;
 
 function TioContext.SynchroStrategy_GetTimeSlotSynchroState: TioEtmTimeSlotSynchroState;

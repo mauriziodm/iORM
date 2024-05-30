@@ -49,11 +49,11 @@ type
   protected
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------
     class procedure _DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte); override;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte; const ASynchroStrategy_Payload: TObject); override;
     class procedure _DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte); override;
-    class procedure _DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); override;
-    class procedure _DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); override;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte; const ASynchroStrategy_Payload: TObject); override;
+    class procedure _DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ASynchroStrategy_Payload: TObject); override;
+    class procedure _DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ASynchroStrategy_Payload: TObject); override;
     class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType); override;
     class function _DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
     // ---------- End intercepted methods (StrategyInterceptors) ----------
@@ -158,7 +158,7 @@ begin
   APayload.Finalize;
 end;
 
-class procedure TioPersistenceStrategyHttp._DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
+class procedure TioPersistenceStrategyHttp._DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ASynchroStrategy_Payload: TObject);
 var
   LConnection: IioConnectionHttp;
 begin
@@ -188,7 +188,7 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyHttp._DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
+class procedure TioPersistenceStrategyHttp._DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ASynchroStrategy_Payload: TObject);
 var
   LConnectionDefName: String;
   LConnection: IioConnectionHttp;
@@ -320,7 +320,7 @@ begin
 end;
 
 class procedure TioPersistenceStrategyHttp._DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte; const ASynchroStrategy_Payload: TObject);
 var
   LConnection: IioConnectionHttp;
 begin
@@ -356,7 +356,7 @@ begin
 end;
 
 class procedure TioPersistenceStrategyHttp._DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte; const ASynchroStrategy_Payload: TObject);
 var
   LConnectionDefName: String;
   LConnection: IioConnectionHttp;

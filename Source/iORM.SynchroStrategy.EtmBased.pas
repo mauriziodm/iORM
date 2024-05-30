@@ -451,7 +451,7 @@ begin
           atInsert, atUpdate:
             io._PersistObject(LObj, itSynchro_PersistToClient, BL_SYNCHRO_PERSIST_PAYLOAD_TOCLIENT);
           atDelete:
-            io._DeleteObjectInternal(LObj, itSynchro_PersistToClient, BL_SYNCHRO_PERSIST_PAYLOAD_TOCLIENT);
+            io._DeleteObjectInternal(LObj, itSynchro_PersistToClient, BL_SYNCHRO_PERSIST_PAYLOAD_TOCLIENT, Self);
         end;
       finally
         FreeAndNil(LObj);
@@ -484,7 +484,7 @@ begin
           atInsert, atUpdate:
             _InternalPersistObjToServer(LObj);
           atDelete:
-            io._DeleteObjectInternal(LObj, itSynchro_PersistToServer, BL_SYNCHRO_PERSIST_PAYLOAD_TOSERVER);
+            io._DeleteObjectInternal(LObj, itSynchro_PersistToServer, BL_SYNCHRO_PERSIST_PAYLOAD_TOSERVER, Self);
         end;
       finally
         FreeAndNil(LObj);

@@ -36,8 +36,8 @@ unit iORM.SynchroStrategy.Custom;
 interface
 
 uses
-  System.Classes, iORM.Context.Interfaces, iORM.SynchroStrategy.Interfaces, iORM.Attributes, DJSON.Attributes,
-  System.SysUtils, iORM.CommonTypes;
+  System.Classes, iORM.SynchroStrategy.Interfaces, iORM.Attributes, DJSON.Attributes,
+  System.SysUtils, iORM.CommonTypes, iORM.Context.Interfaces;
 
 type
 
