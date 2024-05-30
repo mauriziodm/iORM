@@ -143,7 +143,6 @@ type
     procedure _DoPersistPayloadToClient; virtual; abstract;
     procedure _DoFinalizePayload; virtual; abstract;
     // ---------- Methods to override on descendant classes ----------
-    property SynchroLogItem_New: TioCustomSynchroStrategy_LogItem read FSynchroLogItem_New write FSynchroLogItem_New;
     property SynchroLogItem_Old: TioCustomSynchroStrategy_LogItem read FSynchroLogItem_Old write FSynchroLogItem_Old;
   public
     constructor Create; virtual;
@@ -161,6 +160,7 @@ type
     property ClassBlackList: TioSynchroStrategy_ClassList read FClassBlackList; // TList because it will be serialized by djson
     property ClassWhiteList: TioSynchroStrategy_ClassList read FClassWhiteList; // TList because it will be serialized by djson
     property SynchroLevel: TioSynchroLevel read FSynchroLevel write FSynchroLevel;
+    property SynchroLogItem_New: TioCustomSynchroStrategy_LogItem read FSynchroLogItem_New write FSynchroLogItem_New;
     property SynchroName: String read FSynchroName write FSynchroName;
     property TargetConnectionDefName: String read FTargetConnectionDefName write FTargetConnectionDefName;
     property UserID: Integer read FUserID write FUserID;

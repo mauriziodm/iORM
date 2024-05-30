@@ -154,6 +154,7 @@ type
     function SynchroStrategy_GetTimeSlotSynchroState: TioEtmTimeSlotSynchroState;
     function SynchroStrategy_IsToBeSynchronized: Boolean;
     function SynchroStrategy_GetPayloadAsTObject: TObject; // TObject to avoid circular reference
+    function SynchroStrategy_GetSynchroLogItemID: Integer;
     // BlindLevel helper methods
     function BlindLevel_Do_DetectObjExists: boolean; inline;
     function BlindLevel_Do_AutoUpdateProps: boolean; inline;
@@ -682,6 +683,14 @@ end;
 function TioContext.SynchroStrategy_GetPayloadAsTObject: TObject;
 begin
   Result := FSynchroStrategy_Payload;
+end;
+
+function TioContext.SynchroStrategy_GetSynchroLogItemID: Integer;
+begin
+  if Assigned(FSynchroStrategy_Payload) then
+    Result := TioCustomSynchroStrategy_Payload(FSynchroStrategy_Payload).SynchroLogItem_New.ID
+  else
+    Result := IO_INTEGER_NULL_VALUE;
 end;
 
 function TioContext.SynchroStrategy_GetTimeSlotSynchroState: TioEtmTimeSlotSynchroState;

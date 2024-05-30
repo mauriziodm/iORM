@@ -68,6 +68,7 @@ type
     procedure SynchroStrategy_GenerateLocalID;
     function SynchroStrategy_GetTimeSlotSynchroState: TioEtmTimeSlotSynchroState;
     function SynchroStrategy_GetPayloadAsTObject: TObject; // TObject to avoid circular reference
+    function SynchroStrategy_GetSynchroLogItemID: Integer;
     // BlindLevel helper methods
     function BlindLevel_Do_DetectObjExists: boolean;
     function BlindLevel_Do_AutoUpdateProps: boolean;

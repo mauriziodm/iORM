@@ -560,6 +560,7 @@ type
     FConflictCheckedByHuman_DateTime: TDateTime;
     // Synchronization
     FTimeSlotSynchroState: TioEtmTimeSlotSynchroState;
+    FSynchroLogItem: Integer;
     // NB: Questo è un anonymous method che viene passato dal BindSource che sta esponendo il TimeSlot stesso e che permette
     // di risalire alla versione corrente della entità attraverso la catena "ETMBindSource.etmFor.Current"
     [ioSkip]
@@ -614,6 +615,7 @@ type
     property ConflictCheckedByHuman_DateTime: TDateTime read FConflictCheckedByHuman_DateTime;
     // Synchronization
     property TimeSlotSynchroState: TioEtmTimeSlotSynchroState read FTimeSlotSynchroState;
+    property SynchroLogItem: Integer read FSynchroLogItem;
     // Smart properties
     property SmartEntityInfo: String read GetSmartEntityInfo;
     property SmartEntityVersion: String read GetSmartEntityVersion;
@@ -1046,6 +1048,7 @@ begin
   FConflictCheckedByHuman_DateTime := IO_DATETIME_NULL_VALUE;
   // Synchronization
   FTimeSlotSynchroState := LContext.SynchroStrategy_GetTimeSlotSynchroState;
+  FSynchroLogItem := LContext.SynchroStrategy_GetSynchroLogItemID;
   // NB: Questo è un anonymous method che viene passato dal BindSource che sta esponendo il TimeSlot stesso e che permette
   // di risalire alla versione corrente della entità attraverso la catena "ETMBindSource.etmFor.Current"
   FExtractCurrentEntityFunc := nil;
