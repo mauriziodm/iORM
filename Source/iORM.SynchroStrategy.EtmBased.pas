@@ -51,29 +51,28 @@ type
     FCliToSrv_TimeSlotID_To: Integer;
     FSrvToCli_TimeSlotID_From: Integer;
     FSrvToCli_TimeSlotID_To: Integer;
-    // EtmTimeSlot_Where_Server
+    // Server-side etm where criteria and time-slots
     FEtmWhereSrvStr_DoNotAccessDirectly: String;
-    // Synchronized time slots
-    FTimeSlots: TObjectList<TioEtmCustomTimeSlot>;
+    FEtmTimeslotsSrv_DoNotAccessDirectly: TObjectList<TioEtmCustomTimeSlot>;
     // Methods
-    function GetTimeSlots: TObjectList<TioEtmCustomTimeSlot>;
     function GetSmartCliToSrv_TimeSlotID: String;
     function GetSmartSrvToCli_TimeSlotID: String;
-    // EtmWhereSrv
+    // Server-side etm where criteria and time-slots
+    function GetEtmTimeslotsSrv: TObjectList<TioEtmCustomTimeSlot>;
     function GetEtmWhereSrv: IioWhere;
     procedure SetEtmWhereSrv(const Value: IioWhere);
   public
     constructor Create; override;
     destructor Destroy; override;
     property EtmTimeSlot_ClassName: String read FEtmTimeSlot_ClassName write FEtmTimeSlot_ClassName;
-    [ioSkip, ioHasMany(TioEtmCustomTimeSlot, 'SynchroLogItemID'), ioForeignKey(fkDoNotCreate), ioLoadOnly, ioPersistOnly]
-    property TimeSlots: TObjectList<TioEtmCustomTimeSlot> read GetTimeSlots;
     // Count
     property CliToSrv_TimeSlotID_From: Integer read FCliToSrv_TimeSlotID_From write FCliToSrv_TimeSlotID_From;
     property CliToSrv_TimeSlotID_To: Integer read FCliToSrv_TimeSlotID_To write FCliToSrv_TimeSlotID_To;
     property SrvToCli_TimeSlotID_From: Integer read FSrvToCli_TimeSlotID_From write FSrvToCli_TimeSlotID_From;
     property SrvToCli_TimeSlotID_To: Integer read FSrvToCli_TimeSlotID_To write FSrvToCli_TimeSlotID_To;
-    // EtmWhereSrv
+    // Server-side etm where criteria and time-slots
+    [ioSkip, ioHasMany(TioEtmCustomTimeSlot, 'SynchroLogItemID'), ioForeignKey(fkDoNotCreate), ioLoadOnly, ioPersistOnly]
+    property EtmTimeslotsSrv: TObjectList<TioEtmCustomTimeSlot> read GetEtmTimeslotsSrv;
     [ioBinary('1')]
     property EtmWhereSrvStr: String read FEtmWhereSrvStr_DoNotAccessDirectly write FEtmWhereSrvStr_DoNotAccessDirectly;
     [ioSkip]
@@ -754,8 +753,8 @@ end;
 
 destructor TioEtmSynchroStrategy_LogItem.Destroy;
 begin
-  if Assigned(FTimeSlots) then
-    FTimeSlots.Free;
+  if Assigned(FEtmTimeslotsSrv_DoNotAccessDirectly) then
+    FEtmTimeslotsSrv_DoNotAccessDirectly.Free;
   inherited;
 end;
 
@@ -783,16 +782,16 @@ begin
   Result := Format('%d > %d', [FSrvToCli_TimeSlotID_From, FSrvToCli_TimeSlotID_To]);
 end;
 
-function TioEtmSynchroStrategy_LogItem.GetTimeSlots: TObjectList<TioEtmCustomTimeSlot>;
+function TioEtmSynchroStrategy_LogItem.GetEtmTimeslotsSrv: TObjectList<TioEtmCustomTimeSlot>;
 var
   LWhere: IioWhere;
 begin
-  if (not Assigned(FTimeSlots)) and (not FEtmWhereSrvStr_DoNotAccessDirectly.IsEmpty) then
+  if (not Assigned(FEtmTimeslotsSrv_DoNotAccessDirectly)) and (not FEtmWhereSrvStr_DoNotAccessDirectly.IsEmpty) then
   begin
     LWhere := EtmWhereSrv;
-    FTimeSlots := LWhere.ToGenericList.OfType<TObjectList<TioEtmCustomTimeSlot>>;
+    FEtmTimeslotsSrv_DoNotAccessDirectly := LWhere.ToGenericList.OfType<TObjectList<TioEtmCustomTimeSlot>>;
   end;
-  Result := FTimeSlots;
+  Result := FEtmTimeslotsSrv_DoNotAccessDirectly;
 end;
 
 procedure TioEtmSynchroStrategy_LogItem.SetEtmWhereSrv(const Value: IioWhere);
