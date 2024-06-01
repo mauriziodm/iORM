@@ -46,7 +46,7 @@ uses
   iORM.Interceptor.Strategy.Register, iORM.Interceptor.CRUD.Register,
   iORM.ETM.Engine, iORM.ETM.Interfaces, DJSON.Params,
   iORM.ConflictStrategy.Interfaces, iORM.ConflictStrategy.SameVersionWin, iORM.ConflictStrategy.LastUpdateWin,
-  iORM.Context.Interfaces;
+  iORM.Context.Interfaces, iORM.SynchroStrategy.Interfaces;
 
 const
   IORM_VERSION = 'iORM 2 (beta 3.3)';
@@ -233,6 +233,18 @@ const
   stSynchronized_ReceivedFromServer = iORM.Attributes.stSynchronized_ReceivedFromServer;
   stSynchronized_ReceivedFromClient = iORM.Attributes.stSynchronized_ReceivedFromClient;
 
+  // TioSynchroLevel = (slIncremental, slFull);
+  slIncremental = iORM.SynchroStrategy.Interfaces.slIncremental;
+  slFull = iORM.SynchroStrategy.Interfaces.slFull;
+  // TioSynchroStatus = (ssInitialization, ssLoadFromClient, ssPersistToServer, ssReloadFromServer, ssPersistToClient, ssFinalization, ssCompleted);
+  ssInitialization = iORM.SynchroStrategy.Interfaces.ssInitialization;
+  ssLoadFromClient = iORM.SynchroStrategy.Interfaces.ssLoadFromClient;
+  ssPersistToServer = iORM.SynchroStrategy.Interfaces.ssPersistToServer;
+  ssReloadFromServer = iORM.SynchroStrategy.Interfaces.ssReloadFromServer;
+  ssPersistToClient = iORM.SynchroStrategy.Interfaces.ssPersistToClient;
+  ssFinalization = iORM.SynchroStrategy.Interfaces.ssFinalization;
+  ssCompleted = iORM.SynchroStrategy.Interfaces.ssCompleted;
+
 {$ENDREGION}
 
 type
@@ -290,6 +302,7 @@ type
   TioEtmTimeLine = iORM.Attributes.TioEtmTimeLine;
   TioEtmCustomTimeSlot = iORM.Attributes.TioEtmCustomTimeSlot;
   TioEtmDiffMode = iORM.ETM.Interfaces.TioEtmDiffMode;
+  TioEtmTimeSlotSynchroState = iORM.Attributes.TioEtmTimeSlotSynchroState;
 
   // SkipScope (vedi anche sopra (const) i valori)
   TioSkipScope = DJSON.Params.TdjSkipScope;
@@ -302,8 +315,9 @@ type
   TioBSCloseQueryOnExecuteAction = iORM.CommonTypes.TioBSCloseQueryOnExecuteAction;
   TioBSCloseQueryRepeaterScope = iORM.CommonTypes.TioBSCloseQueryRepeaterScope;
 
-  // TimeSlot Synchro State
-  TioEtmTimeSlotSynchroState = iORM.Attributes.TioEtmTimeSlotSynchroState;
+  // Synchro strategies
+  TioSynchroLevel = iORM.SynchroStrategy.Interfaces.TioSynchroLevel;
+  TioSynchroStatus = iORM.SynchroStrategy.Interfaces.TioSynchroStatus;
 
 {$ENDREGION}
   // Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
@@ -2208,25 +2222,28 @@ end;
 
 initialization
 
-// Initialize the dependency injection container
-// NB: Crea semplicemente il dictionary, la registrazione delle classi avviene più sotto chiamando TioMapContainer.Build
-TioDependencyInjectionContainer.Build;
+  // Initialize the dependency injection container
+  // NB: Crea semplicemente il dictionary, la registrazione delle classi avviene più sotto chiamando TioMapContainer.Build
+  TioDependencyInjectionContainer.Build;
 
-// Register as default DuckTypedStreamObject invoker
-// NB: L'ho messo qui perchè altrimenti nella unit dove è dichiarata la classe non
-// venive eseguito
-// NB:  Evita un AV error probabilmente causato dal fatto che i vari containers della parte ORM non sono ancora a posto
-io.di.RegisterClass<TioDuckTypedStreamObject>.Implements<IioDuckTypedStreamObject>.DisableMapImplemetersRef.Execute;
+  // Register as default DuckTypedStreamObject invoker
+  // NB: L'ho messo qui perchè altrimenti nella unit dove è dichiarata la classe non
+  // venive eseguito
+  // NB:  Evita un AV error probabilmente causato dal fatto che i vari containers della parte ORM non sono ancora a posto
+  io.di.RegisterClass<TioDuckTypedStreamObject>.Implements<IioDuckTypedStreamObject>.DisableMapImplemetersRef.Execute;
 
-// Create the ContextContainer Instance and Init it by loading
-// all entities declarated in the application
-// NB: Attualmente effettua sia il mapping delle classi per la parte ORM che la registrazione delle classi al DIC (magari meglio separare le cose?)
-TioEnumContainer._Build;
-TioMapContainer._Build;
+  // Create the ContextContainer Instance and Init it by loading
+  // all entities declarated in the application
+  // NB: Attualmente effettua sia il mapping delle classi per la parte ORM che la registrazione delle classi al DIC (magari meglio separare le cose?)
+  TioEnumContainer._Build;
+  TioMapContainer._Build;
 
-// Enums UI translations
-io.Enums.Add<TioPersistenceActionType>('Do not persist, Insert, Update, Delete');
-io.Enums.Add<TioPersistenceIntentType>('Regular, Revert, Synchro (svr), Synchro (cli)');
-io.Enums.Add<TioPersistenceConflictState>('Undefined, Resolved, Rejected, Rejected raise');
-io.Enums.Add<TioEtmTimeSlotSynchroState>('Regular, To be synchronized, Sent to server, Received from server, Received from client');
+  // Enums UI translations
+  io.Enums.Add<TioPersistenceActionType>('do not persist, insert, update, delete');
+  io.Enums.Add<TioPersistenceIntentType>('regular, revert, synchro (svr), synchro (cli)');
+  io.Enums.Add<TioPersistenceConflictState>('undefined, resolved, rejected, rejected raise');
+  io.Enums.Add<TioEtmTimeSlotSynchroState>('regular, to be synchronized, sent to server, received from server, received from client');
+  io.Enums.Add<TioSynchroLevel>('incremental, full');
+  io.Enums.Add<TioSynchroStatus>('0-initialization, 1-load from client, 2-save to server, 3-reload from client, 4-save to client, 5-finalization, 6-completed');
+
 end.

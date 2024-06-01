@@ -42,23 +42,37 @@ uses
 
 type
 
-  [ioEntity('SYNCHRO_LOG')]
+  [ioEntity('SYNCHRO_LOG', mmProperties)]
   TioEtmSynchroStrategy_LogItem = class(TioCustomSynchroStrategy_LogItem)
   strict private
-    FEtmTimeSlotClassName: String;
+    FEtmTimeSlot_ClassName: String;
     // Count
     FCliToSrv_TimeSlotID_From: Integer;
     FCliToSrv_TimeSlotID_To: Integer;
     FSrvToCli_TimeSlotID_From: Integer;
     FSrvToCli_TimeSlotID_To: Integer;
+    // Synchronized time slots
+    FTimeSlots: TObjectList<TioEtmCustomTimeSlot>;
+  private
+    function GetTimeSlots: TObjectList<TioEtmCustomTimeSlot>;
+    function GetSmartCliToSrv_TimeSlotID: String;
+    function GetSmartSrvToCli_TimeSlotID: String;
   public
     constructor Create; override;
-    property EtmTimeSlotClassName: String read FEtmTimeSlotClassName write FEtmTimeSlotClassName;
-    // COunt
+    destructor Destroy; override;
+    property EtmTimeSlot_ClassName: String read FEtmTimeSlot_ClassName write FEtmTimeSlot_ClassName;
+    [ioSkip, ioHasMany(TioEtmCustomTimeSlot, 'SynchroLogItemID'), ioForeignKey(fkDoNotCreate), ioLoadOnly, ioPersistOnly]
+    property TimeSlots: TObjectList<TioEtmCustomTimeSlot> read GetTimeSlots;
+    // Count
     property CliToSrv_TimeSlotID_From: Integer read FCliToSrv_TimeSlotID_From write FCliToSrv_TimeSlotID_From;
     property CliToSrv_TimeSlotID_To: Integer read FCliToSrv_TimeSlotID_To write FCliToSrv_TimeSlotID_To;
     property SrvToCli_TimeSlotID_From: Integer read FSrvToCli_TimeSlotID_From write FSrvToCli_TimeSlotID_From;
     property SrvToCli_TimeSlotID_To: Integer read FSrvToCli_TimeSlotID_To write FSrvToCli_TimeSlotID_To;
+    // Smart properties
+    [ioSkip]
+    property SmartCliToSrv_TimeSlotID: String read GetSmartCliToSrv_TimeSlotID;
+    [ioSkip]
+    property SmartSrvToCli_TimeSlotID: String read GetSmartSrvToCli_TimeSlotID;
   end;
 
   TioEtmSynchroStrategy_TempIdContainerItem = class
@@ -98,7 +112,7 @@ type
 
   TioEtmSynchroStrategy_Payload = class(TioCustomSynchroStrategy_Payload)
   strict private
-    FEtmTimeSlotClassName: String;
+    FEtmTimeSlot_ClassName: String;
     FEtmTimeSlot_Where_Client: IioWhere;
     FEtmTimeSlot_Where_Server: IioWhere;
     FPayloadData: TioEtmTimeline;
@@ -122,7 +136,7 @@ type
   public
     constructor Create; override;
     destructor Destroy; override;
-    property EtmTimeSlotClassName: String read FEtmTimeSlotClassName write FEtmTimeSlotClassName;
+    property EtmTimeSlot_ClassName: String read FEtmTimeSlot_ClassName write FEtmTimeSlot_ClassName;
     property EtmTimeSlot_Where_Client: IioWhere read FEtmTimeSlot_Where_Client write FEtmTimeSlot_Where_Client;
     property EtmTimeSlot_Where_Server: IioWhere read FEtmTimeSlot_Where_Server write FEtmTimeSlot_Where_Server;
   end;
@@ -169,7 +183,7 @@ type
     property EtmTimeSlot_Update_SentToServer default False;
     property EtmTimeSlot_WhereStr_Client: TStrings read FEtmTimeSlot_WhereStr_Client write SetEtmTimeSlot_WhereStr_Client;
     property EtmTimeSlot_WhereStr_Server: TStrings read FEtmTimeSlot_WhereStr_Server write SetEtmTimeSlot_WhereStr_Server;
-    property SynchroName;
+    property SynchroLogName;
     property TargetConnectionDef;
     property _Version;
     // Events
@@ -198,7 +212,7 @@ uses
 constructor TioEtmSynchroStrategy_LogItem.Create;
 begin
   inherited;
-  FEtmTimeSlotClassName := String.Empty;
+  FEtmTimeSlot_ClassName := String.Empty;
   // Count
   FCliToSrv_TimeSlotID_From := IO_INTEGER_NULL_VALUE;
   FCliToSrv_TimeSlotID_To := IO_INTEGER_NULL_VALUE;
@@ -211,7 +225,7 @@ end;
 constructor TioEtmSynchroStrategy_Payload.Create;
 begin
   inherited;
-  FEtmTimeSlotClassName := String.Empty;
+  FEtmTimeSlot_ClassName := String.Empty;
   FEtmTimeSlot_Where_Client := nil;
   FEtmTimeSlot_Where_Server := nil;
   FPayloadData := TioEtmTimeline.Create;
@@ -321,9 +335,9 @@ var
   LWhere: IioWhere;
 begin
   // Load last SynchroLogItem from the local client connection
-  LWhere := io.Where('SynchroName', coEquals, SynchroName);
+  LWhere := io.Where('SynchroLogName', coEquals, SynchroLogName);
   LWhere._And('SynchroStatus', coEquals, TioSynchroStatus.ssCompleted);
-  LWhere._And('[.ID] = (SELECT MAX(SUB.ID) FROM [TioEtmSynchroStrategy_LogItem] SUB WHERE SUB.SYNCHRONAME = [.SYNCHRONAME])');
+  LWhere._And('[.ID] = (SELECT MAX(SUB.ID) FROM [TioEtmSynchroStrategy_LogItem] SUB WHERE SUB.SYNCHROLOGNAME = [.SYNCHROLOGNAME])');
   Self.SynchroLogItem_Old := io.LoadObject<TioEtmSynchroStrategy_LogItem>(LWhere);
 end;
 
@@ -332,13 +346,13 @@ begin
   inherited;
   // Delete sent TimeSlots if enabled...
   if EtmTimeSlot_Delete_SentToServer then
-    io.SQL(Format('DELETE FROM [%s] WHERE [.TimeSlotSynchroState] = %d', [FEtmTimeSlotClassName, Ord(stToBeSynchronized)]))
-      .SelfClass(FEtmTimeSlotClassName).Execute
+    io.SQL(Format('DELETE FROM [%s] WHERE [.TimeSlotSynchroState] = %d', [FEtmTimeSlot_ClassName, Ord(stToBeSynchronized)]))
+      .SelfClass(FEtmTimeSlot_ClassName).Execute
   else
     // Change the TimeSlotSynchroState value of the synchronized TimeSlots from "tsToBeSynchronized" to "tsSynchronized_SentToServer" if enabled...
     if EtmTimeSlot_Update_SentToServer then
-      io.SQL(Format('UPDATE [%s] SET [.TimeSlotSynchroState] = %d WHERE [.TimeSlotSynchroState] = %d', [FEtmTimeSlotClassName, Ord(stSynchronized_SentToServer),
-        Ord(stToBeSynchronized)])).SelfClass(FEtmTimeSlotClassName).Execute;
+      io.SQL(Format('UPDATE [%s] SET [.TimeSlotSynchroState] = %d WHERE [.TimeSlotSynchroState] = %d', [FEtmTimeSlot_ClassName, Ord(stSynchronized_SentToServer),
+        Ord(stToBeSynchronized)])).SelfClass(FEtmTimeSlot_ClassName).Execute;
 end;
 
 procedure TioEtmSynchroStrategy_Payload._DoLoadPayloadFromClient;
@@ -352,7 +366,7 @@ begin
   // Where: last timeslot for any object only and/or insert timeslot for the same entity
   LWhere._And._OpenPar;
   LWhere.Add(Format('[.ID] = (SELECT MAX(SUB.ID) FROM [%s] SUB WHERE SUB.EntityClassName = [.EntityClassName] AND SUB.EntityID = [.EntityID])',
-    [FEtmTimeSlotClassName]));
+    [FEtmTimeSlot_ClassName]));
   LWhere._Or('ActionType', coEquals, TioPersistenceActionType.atInsert);
   LWhere._ClosePar;
   // EtmTimeSlot_Where if exists
@@ -361,7 +375,7 @@ begin
   // OrderBy
   LWhere._OrderBy('[.ID] ASC');
   // Load objects to be synchronized
-  LWhere.TypeName := FEtmTimeSlotClassName;
+  LWhere.TypeName := FEtmTimeSlot_ClassName;
   LWhere.ToList(FPayloadData);
   // Update SynchroLogItem (cast the SynchroLogItem to the specialized etm based class)
   LSynchroLogItem_New := Self.SynchroLogItem_New as TioEtmSynchroStrategy_LogItem;
@@ -389,14 +403,14 @@ begin
   _BuildBlackAndWhiteListWhere(LWhere);
   // Where: last timeslot for any object only
   LWhere._And(Format('[.ID] = (SELECT MAX(SUB.ID) FROM [%s] SUB WHERE SUB.EntityClassName = [.EntityClassName] AND SUB.EntityID = [.EntityID])',
-    [FEtmTimeSlotClassName]));
+    [FEtmTimeSlot_ClassName]));
   // EtmTimeSlot_Where if exists
   if Assigned(FEtmTimeSlot_Where_Server) then
     LWhere._And(FEtmTimeSlot_Where_Server);
   // OrderBy (DESC because it load timeslots with negative ID)
   LWhere._OrderBy('[.ID] ASC');
   // Load objects to be synchronized
-  LWhere.TypeName := FEtmTimeSlotClassName;
+  LWhere.TypeName := FEtmTimeSlot_ClassName;
   LWhere.ToList(FPayloadData);
   // Update SynchroLogItem (cast the SynchroLogItem to the specialized etm based class)
   LSynchroLogItem_New.SrvToCli_Count := FPayloadData.Count;
@@ -422,7 +436,7 @@ begin
   LSynchroLogItem_New := Self.SynchroLogItem_New as TioEtmSynchroStrategy_LogItem;
   LSynchroLogItem_Old := Self.SynchroLogItem_Old as TioEtmSynchroStrategy_LogItem;
   // Initialize the new SynchroLogItem after its creation
-  LSynchroLogItem_New.EtmTimeSlotClassName := FEtmTimeSlotClassName;
+  LSynchroLogItem_New.EtmTimeSlot_ClassName := FEtmTimeSlot_ClassName;
   if LSynchroLogItem_Old <> nil then
      LSynchroLogItem_New.SrvToCli_TimeSlotID_From := LSynchroLogItem_Old.SrvToCli_TimeSlotID_From + LSynchroLogItem_Old.SrvToCli_Count // don't use LSynchroLogItem_Old.SrvToCli_TimeSlotID_To + 1
   else
@@ -439,7 +453,7 @@ begin
   try
     // Delete all temporary new inserted objects (negative ID)
     FTempIdContainer.DeleteObjectsWithTemporaryID;
-    FTempIdContainer.UpdateEtmTimeSlotsWithTemporaryID(FEtmTimeSlotClassName);
+    FTempIdContainer.UpdateEtmTimeSlotsWithTemporaryID(FEtmTimeSlot_ClassName);
     // Loop for all TimeSlots to be synchronized and revert and finally persist each of them
     for LEtmTimeSlot in FPayloadData do
     begin
@@ -602,7 +616,7 @@ begin
   LPayload := APayload as TioEtmSynchroStrategy_Payload;
   // Initialize the new payload after its creation
   _CheckEtmTimeSlotClassName;
-  LPayload.EtmTimeSlotClassName := FEtmTimeSlot_ClassName;
+  LPayload.EtmTimeSlot_ClassName := FEtmTimeSlot_ClassName;
   // EtmTimeSlot_Where_Client
   if not FEtmTimeSlot_WhereStr_Client.Text.IsEmpty then
   begin
@@ -724,6 +738,33 @@ begin
   FEntityClassName := AEntityClassName;
   FNewID := ANewID;
   FOldID := AOldID;
+end;
+
+destructor TioEtmSynchroStrategy_LogItem.Destroy;
+begin
+  if Assigned(FTimeSlots) then
+    FTimeSlots.Free;
+  inherited;
+end;
+
+function TioEtmSynchroStrategy_LogItem.GetSmartCliToSrv_TimeSlotID: String;
+begin
+  Result := Format('%d > %d', [FCliToSrv_TimeSlotID_From, FCliToSrv_TimeSlotID_To]);
+end;
+
+function TioEtmSynchroStrategy_LogItem.GetSmartSrvToCli_TimeSlotID: String;
+begin
+  Result := Format('%d > %d', [FSrvToCli_TimeSlotID_From, FSrvToCli_TimeSlotID_To]);
+end;
+
+function TioEtmSynchroStrategy_LogItem.GetTimeSlots: TObjectList<TioEtmCustomTimeSlot>;
+begin
+  if (ID <> 0) and (not FEtmTimeSlot_ClassName.IsEmpty) and (not Assigned(FTimeSlots)) then
+  begin
+//    FTimeSlots := io.Load(FEtmTimeSlot_ClassName)._Where('SynchroLogItemID', coEquals, ID).ToGenericList.OfType<TObjectList<TioEtmCustomTimeSlot>>;
+    FTimeSlots := io.Load(FEtmTimeSlot_ClassName).ToGenericList.OfType<TObjectList<TioEtmCustomTimeSlot>>;
+  end;
+  Result := FTimeSlots;
 end;
 
 initialization

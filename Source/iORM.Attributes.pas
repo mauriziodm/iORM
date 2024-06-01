@@ -530,6 +530,7 @@ type
   // NB: Per la nuova gestione dei conflitti servirà la possibilità di memorizzare due data e ora, una che sarà il momento
   // quando è stata fatto l'update sul DB remoto (es: mobile) e l'altra la data e ora di quanto è stato fatto l'update
   // sul database centrale durante la fase di sincronizzazione.
+  [ioNotPersistedEntity]
   TioEtmCustomTimeSlot = class
   private
     FID: Integer;
@@ -560,7 +561,7 @@ type
     FConflictCheckedByHuman_DateTime: TDateTime;
     // Synchronization
     FTimeSlotSynchroState: TioEtmTimeSlotSynchroState;
-    FSynchroLogItem: Integer;
+    FSynchroLogItemID: Integer;
     // NB: Questo è un anonymous method che viene passato dal BindSource che sta esponendo il TimeSlot stesso e che permette
     // di risalire alla versione corrente della entità attraverso la catena "ETMBindSource.etmFor.Current"
     [ioSkip]
@@ -615,7 +616,7 @@ type
     property ConflictCheckedByHuman_DateTime: TDateTime read FConflictCheckedByHuman_DateTime;
     // Synchronization
     property TimeSlotSynchroState: TioEtmTimeSlotSynchroState read FTimeSlotSynchroState;
-    property SynchroLogItem: Integer read FSynchroLogItem;
+    property SynchroLogItemID: Integer read FSynchroLogItemID;
     // Smart properties
     property SmartEntityInfo: String read GetSmartEntityInfo;
     property SmartEntityVersion: String read GetSmartEntityVersion;
@@ -1048,7 +1049,7 @@ begin
   FConflictCheckedByHuman_DateTime := IO_DATETIME_NULL_VALUE;
   // Synchronization
   FTimeSlotSynchroState := LContext.SynchroStrategy_GetTimeSlotSynchroState;
-  FSynchroLogItem := LContext.SynchroStrategy_GetSynchroLogItemID;
+  FSynchroLogItemID := LContext.SynchroStrategy_GetSynchroLogItemID;
   // NB: Questo è un anonymous method che viene passato dal BindSource che sta esponendo il TimeSlot stesso e che permette
   // di risalire alla versione corrente della entità attraverso la catena "ETMBindSource.etmFor.Current"
   FExtractCurrentEntityFunc := nil;

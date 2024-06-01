@@ -48,12 +48,12 @@ type
   //      (e.g. which EtmTimeSlot was the last one synchronized)
   //   2) on the server side as a history of the synchronizations that occurred over time
   //      (also on the client side if desired).
-  [ioEntity('SYNCHRO_LOG')]
+  [ioEntity('SYNCHRO_LOG', mmProperties)]
   TioCustomSynchroStrategy_LogItem = class
   strict private
     FID: Integer;
     FSynchroLevel: TioSynchroLevel;
-    FSynchroName: String;
+    FSynchroLogName: String;
     FSynchroStatus: TioSynchroStatus;
     FUserID: Integer;
     FUserName: String;
@@ -68,11 +68,14 @@ type
     FPersistToClient: TDateTime;
     FFinalize: TDateTime;
     FCompleted: TDateTime;
+  private
+    function GetSmartCount: String;
+    function GetSmartUser: String;
   public
     constructor Create; virtual;
     property ID: Integer read FID write FID;
     property SynchroLevel: TioSynchroLevel read FSynchroLevel write FSynchroLevel;
-    property SynchroName: String read FSynchroName write FSynchroName;
+    property SynchroLogName: String read FSynchroLogName write FSynchroLogName;
     property SynchroStatus: TioSynchroStatus read FSynchroStatus write FSynchroStatus;
     property UserID: Integer read FUserID write FUserID;
     property UserName: String read FUserName write FUserName;
@@ -87,6 +90,11 @@ type
     property PersistToClient: TDateTime read FPersistToClient write FPersistToClient;
     property Finalize: TDateTime read FFinalize write FFinalize;
     property Completed: TDateTime read FCompleted write FCompleted;
+    // Smart properties
+    [ioSkip]
+    property SmartCount: String read GetSmartCount;
+    [ioSkip]
+    property SmartUser: String read GetSmartUser;
   end;
 
   // This class represents the payload of the synchronization operation in the sense that
@@ -115,7 +123,7 @@ type
     FSynchroLevel: TioSynchroLevel;
     FSynchroLogItem_New: TioCustomSynchroStrategy_LogItem;
     FSynchroLogItem_Old: TioCustomSynchroStrategy_LogItem;
-    FSynchroName: String;
+    FSynchroLogName: String;
     FUserID: Integer;
     FUserName: String;
     [djSkip] // Non viene serializzato (in caso di connessione HTTP) in questo modo poi capisco se siamo remotizzati e quindi se devo fare lo "use" o no.
@@ -161,7 +169,7 @@ type
     property ClassWhiteList: TioSynchroStrategy_ClassList read FClassWhiteList; // TList because it will be serialized by djson
     property SynchroLevel: TioSynchroLevel read FSynchroLevel write FSynchroLevel;
     property SynchroLogItem_New: TioCustomSynchroStrategy_LogItem read FSynchroLogItem_New write FSynchroLogItem_New;
-    property SynchroName: String read FSynchroName write FSynchroName;
+    property SynchroLogName: String read FSynchroLogName write FSynchroLogName;
     property TargetConnectionDefName: String read FTargetConnectionDefName write FTargetConnectionDefName;
     property UserID: Integer read FUserID write FUserID;
     property UserName: String read FUserName write FUserName;
@@ -182,7 +190,7 @@ type
     FEtmTimeSlot_Persist_ToBeSynchronized: Boolean;
     FEtmTimeSlot_Update_SentToServer: Boolean;
     FInProgress: Boolean;
-    FSynchroName: String;
+    FSynchroLogName: String;
     FTargetConnectionDef: IioSynchroStrategy_TargetConnectionDef; // IioSynchroStrategy_TargetConnectionDef instead of TioPersistenceStrategyRef to avoid circular reference
     // Events
     FAfterSynchronization: TioSynchronizationBeforeAfterEvent;
@@ -219,6 +227,9 @@ type
     function GetInProgress: Boolean;
     // IsReady
     function GetIsReady: Boolean; virtual;
+    // SynchroLogName
+    procedure SetSynchroLogName(Value: String);
+    function GetSynchroLogName: String;
     // _Version
     function Get_Version: String;
     // ---------- Synchro strategy methods to override on descendant classes ----------
@@ -237,7 +248,7 @@ type
     property EtmTimeSlot_Update_SentToServer: Boolean read GetEtmTimeSlot_Update_SentToServer write SetEtmTimeSlot_Update_SentToServer default False;
     property InProgress: Boolean read GetInProgress;
     property IsReady: Boolean read GetIsReady;
-    property SynchroName: String read FSynchroName write FSynchroName;
+    property SynchroLogName: String read GetSynchroLogName write SetSynchroLogName;
     property TargetConnectionDef: IioSynchroStrategy_TargetConnectionDef read FTargetConnectionDef write SetTargetConnectionDef default nil;
     property _Version: String read Get_Version;
     // Events
@@ -291,7 +302,7 @@ begin
   FEtmTimeSlot_Persist_ToBeSynchronized := False;
   FEtmTimeSlot_Update_SentToServer := False;
   FInProgress := False;
-  FSynchroName := IO_STRING_NULL_VALUE;
+  FSynchroLogName := IO_STRING_NULL_VALUE;
   FTargetConnectionDef := nil;
   // Events
   FAfterSynchronization := nil;
@@ -346,6 +357,14 @@ begin
   Result := Assigned(FTargetConnectionDef) and not FInProgress
 end;
 
+function TioCustomSynchroStrategy_Client.GetSynchroLogName: String;
+begin
+  if FSynchroLogName.IsEmpty then
+    Result := Name
+  else
+    Result := FSynchroLogName;
+end;
+
 function TioCustomSynchroStrategy_Client.Get_Version: String;
 begin
   Result := io.Version;
@@ -388,6 +407,15 @@ begin
   FEtmTimeSlot_Update_SentToServer := Value;
 end;
 
+procedure TioCustomSynchroStrategy_Client.SetSynchroLogName(Value: String);
+begin
+  Value := Value.Trim;
+  if Value <> Name then
+    FSynchroLogName := Value
+  else
+    FSynchroLogName := IO_STRING_NULL_VALUE;
+end;
+
 procedure TioCustomSynchroStrategy_Client.SetTargetConnectionDef(const ATargetConnectionDef: IioSynchroStrategy_TargetConnectionDef);
 begin
   if ATargetConnectionDef <> FTargetConnectionDef then
@@ -407,7 +435,7 @@ var
   LClassName: String;
 begin
   APayload.SynchroLevel := ASynchroLevel;
-  APayload.SynchroName := FSynchroName;
+  APayload.SynchroLogName := FSynchroLogName;
   // Black & White class list
   for LClassName in FEntities_BlackList do
     APayload.ClassBlackList.Add(LClassName);
@@ -548,7 +576,7 @@ begin
   FSynchroLogItem_Old := nil;
   FSynchroLogItem_New := nil;
   FSynchroLevel := TioSynchroLevel.slIncremental;
-  FSynchroName := String.Empty;
+  FSynchroLogName := String.Empty;
   FTargetConnectionDefName := String.Empty;
   FUserID := IO_INTEGER_NULL_VALUE;
   FUserName := IO_STRING_NULL_VALUE;
@@ -677,7 +705,7 @@ begin
   FSynchroLogItem_New.Start := Now;
   FSynchroLogItem_New.SynchroStatus := TioSynchroStatus.ssInitialization;
   FSynchroLogItem_New.SynchroLevel := FSynchroLevel;
-  FSynchroLogItem_New.SynchroName := FSynchroName;
+  FSynchroLogItem_New.SynchroLogName := FSynchroLogName;
 end;
 
 procedure TioCustomSynchroStrategy_Payload._DoOldSynchroLogItem_LoadFromClient;
@@ -685,9 +713,9 @@ var
   LWhere: IioWhere;
 begin
   // Load last SynchroLogItem from the local client connection
-  LWhere := io.Where('SynchroName', coEquals, SynchroName);
+  LWhere := io.Where('SynchroLogName', coEquals, SynchroLogName);
   LWhere._And('SynchroStatus', coEquals, TioSynchroStatus.ssCompleted);
-  LWhere._And('ID = SELECT MAX(SUB.ID) FROM [TioCustomSynchroStrategy_LogItem] SUB WHERE SUB.SYNCHRONAME = SYNCHRONAME');
+  LWhere._And('ID = SELECT MAX(SUB.ID) FROM [TioCustomSynchroStrategy_LogItem] SUB WHERE SUB.SYNCHROLOGNAME = SYNCHROLOGNAME');
   FSynchroLogItem_Old := io.LoadObject<TioCustomSynchroStrategy_LogItem>(LWhere);
 end;
 
@@ -780,7 +808,7 @@ end;
 constructor TioCustomSynchroStrategy_LogItem.Create;
 begin
   FID := IO_INTEGER_NULL_VALUE;
-  FSynchroName := IO_STRING_NULL_VALUE;
+  FSynchroLogName := IO_STRING_NULL_VALUE;
   FUserID := IO_INTEGER_NULL_VALUE;
   FUserName := IO_STRING_NULL_VALUE;
   FSynchroLevel := TioSynchroLevel.slIncremental;
@@ -795,6 +823,32 @@ begin
   FReloadFromServer := IO_DATETIME_NULL_VALUE;
   FPersistToClient := IO_DATETIME_NULL_VALUE;
   FCompleted := IO_DATETIME_NULL_VALUE;
+end;
+
+function TioCustomSynchroStrategy_LogItem.GetSmartCount: String;
+begin
+  Result := Format('ToSrv=%d; ToCli=%d', [FCliToSrv_Count, FSrvToCli_Count]);
+end;
+
+function TioCustomSynchroStrategy_LogItem.GetSmartUser: String;
+var
+  LUserID: Integer;
+  LUserName: String;
+begin
+  Result := String.Empty;
+  // Extract user info as native type
+  LUserID := Integer(FUserID);
+  LUserName := String(FUserName);
+  // UserID
+  if LUserID <> 0 then
+    Result := LUserID.ToString;
+  // UserName
+  if not LUserName.IsEmpty then
+  begin
+    if not Result.IsEmpty then
+      Result := Result + '-';
+    Result := LUserName + Result;
+  end;
 end;
 
 { TioCustomSynchroStrategy_Thread }
