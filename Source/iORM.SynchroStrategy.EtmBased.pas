@@ -786,9 +786,13 @@ function TioEtmSynchroStrategy_LogItem.GetEtmTimeslotsSrv: TObjectList<TioEtmCus
 var
   LWhere: IioWhere;
 begin
+  // Use the where stored in itself (the one used to do server-to-client reload) to load the same time-slots as details.
+  //  To do this, however, he must add the upper limit (the last synchronized time slot) because it is not there in the
+  //  original where clause.
   if (not Assigned(FEtmTimeslotsSrv_DoNotAccessDirectly)) and (not FEtmWhereSrvStr_DoNotAccessDirectly.IsEmpty) then
   begin
     LWhere := EtmWhereSrv;
+    LWhere._and('ID', coLowerOrEqual, FSrvToCli_TimeSlotID_To);
     FEtmTimeslotsSrv_DoNotAccessDirectly := LWhere.ToGenericList.OfType<TObjectList<TioEtmCustomTimeSlot>>;
   end;
   Result := FEtmTimeslotsSrv_DoNotAccessDirectly;
