@@ -52,6 +52,7 @@ type
   TioCustomSynchroStrategy_LogItem = class
   strict private
     FID: Integer;
+    FDateAndTime: TDateTime;
     FSynchroLevel: TioSynchroLevel;
     FSynchroLogName: String;
     FSynchroStatus: TioSynchroStatus;
@@ -61,19 +62,20 @@ type
     FCliToSrv_Count: Integer;
     FSrvToCli_Count: Integer;
     // Timing
-    FStartSynchro: TDateTime;
-    FLoadFromClient: TDateTime;
-    FPersistToServer: TDateTime;
-    FReloadFromServer: TDateTime;
-    FPersistToClient: TDateTime;
-    FFinalize: TDateTime;
-    FCompleted: TDateTime;
+    FStartSynchro: TTime;
+    FLoadFromClient: TTime;
+    FPersistToServer: TTime;
+    FReloadFromServer: TTime;
+    FPersistToClient: TTime;
+    FFinalize: TTime;
+    FCompleted: TTime;
   private
     function GetSmartCount: String;
     function GetSmartUser: String;
   public
     constructor Create; virtual;
     property ID: Integer read FID write FID;
+    property DateAndTime: TDateTime read FDateAndTime write FDateAndTime;
     property SynchroLevel: TioSynchroLevel read FSynchroLevel write FSynchroLevel;
     property SynchroLogName: String read FSynchroLogName write FSynchroLogName;
     property SynchroStatus: TioSynchroStatus read FSynchroStatus write FSynchroStatus;
@@ -83,13 +85,13 @@ type
     property CliToSrv_Count: Integer read FCliToSrv_Count write FCliToSrv_Count;
     property SrvToCli_Count: Integer read FSrvToCli_Count write FSrvToCli_Count;
     // Timing
-    property Start: TDateTime read FStartSynchro write FStartSynchro;
-    property LoadFromClient: TDateTime read FLoadFromClient write FLoadFromClient;
-    property PersistToServer: TDateTime read FPersistToServer write FPersistToServer;
-    property ReloadFromServer: TDateTime read FReloadFromServer write FReloadFromServer;
-    property PersistToClient: TDateTime read FPersistToClient write FPersistToClient;
-    property Finalize: TDateTime read FFinalize write FFinalize;
-    property Completed: TDateTime read FCompleted write FCompleted;
+    property Start: TTime read FStartSynchro write FStartSynchro;
+    property LoadFromClient: TTime read FLoadFromClient write FLoadFromClient;
+    property PersistToServer: TTime read FPersistToServer write FPersistToServer;
+    property ReloadFromServer: TTime read FReloadFromServer write FReloadFromServer;
+    property PersistToClient: TTime read FPersistToClient write FPersistToClient;
+    property Finalize: TTime read FFinalize write FFinalize;
+    property Completed: TTime read FCompleted write FCompleted;
     // Smart properties
     [ioSkip]
     property SmartCount: String read GetSmartCount;
@@ -808,6 +810,7 @@ end;
 constructor TioCustomSynchroStrategy_LogItem.Create;
 begin
   FID := IO_INTEGER_NULL_VALUE;
+  FDateAndTime := Now;
   FSynchroLogName := IO_STRING_NULL_VALUE;
   FUserID := IO_INTEGER_NULL_VALUE;
   FUserName := IO_STRING_NULL_VALUE;
