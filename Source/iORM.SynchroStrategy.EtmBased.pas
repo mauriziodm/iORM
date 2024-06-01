@@ -51,12 +51,17 @@ type
     FCliToSrv_TimeSlotID_To: Integer;
     FSrvToCli_TimeSlotID_From: Integer;
     FSrvToCli_TimeSlotID_To: Integer;
+    // EtmTimeSlot_Where_Server
+    FEtmWhereSrvStr_DoNotAccessDirectly: String;
     // Synchronized time slots
     FTimeSlots: TObjectList<TioEtmCustomTimeSlot>;
-  private
+    // Methods
     function GetTimeSlots: TObjectList<TioEtmCustomTimeSlot>;
     function GetSmartCliToSrv_TimeSlotID: String;
     function GetSmartSrvToCli_TimeSlotID: String;
+    // EtmWhereSrv
+    function GetEtmWhereSrv: IioWhere;
+    procedure SetEtmWhereSrv(const Value: IioWhere);
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -68,6 +73,11 @@ type
     property CliToSrv_TimeSlotID_To: Integer read FCliToSrv_TimeSlotID_To write FCliToSrv_TimeSlotID_To;
     property SrvToCli_TimeSlotID_From: Integer read FSrvToCli_TimeSlotID_From write FSrvToCli_TimeSlotID_From;
     property SrvToCli_TimeSlotID_To: Integer read FSrvToCli_TimeSlotID_To write FSrvToCli_TimeSlotID_To;
+    // EtmWhereSrv
+    [ioBinary('1')]
+    property EtmWhereSrvStr: String read FEtmWhereSrvStr_DoNotAccessDirectly write FEtmWhereSrvStr_DoNotAccessDirectly;
+    [ioSkip]
+    property EtmWhereSrv: IioWhere read GetEtmWhereSrv write SetEtmWhereSrv;
     // Smart properties
     [ioSkip]
     property SmartCliToSrv_TimeSlotID: String read GetSmartCliToSrv_TimeSlotID;
@@ -205,7 +215,7 @@ uses
   iORM.DB.Interfaces, iORM.DB.Factory, iORM.Exceptions,
   iORM.Context.Map.Interfaces, iORM.Context.Container,
   iORM.DB.ConnectionContainer, iORM.Where.Factory, iORM.Utilities,
-  iORM.LiveBindings.BSPersistence;
+  iORM.LiveBindings.BSPersistence, DJSON, DJSON.Params;
 
 { TioEtmBasetSynchroStrategy_LogItem }
 
@@ -213,6 +223,7 @@ constructor TioEtmSynchroStrategy_LogItem.Create;
 begin
   inherited;
   FEtmTimeSlot_ClassName := String.Empty;
+  FEtmWhereSrvStr_DoNotAccessDirectly := String.Empty;
   // Count
   FCliToSrv_TimeSlotID_From := IO_INTEGER_NULL_VALUE;
   FCliToSrv_TimeSlotID_To := IO_INTEGER_NULL_VALUE;
@@ -413,6 +424,7 @@ begin
   LWhere.TypeName := FEtmTimeSlot_ClassName;
   LWhere.ToList(FPayloadData);
   // Update SynchroLogItem (cast the SynchroLogItem to the specialized etm based class)
+  LSynchroLogItem_New.EtmWhereSrv := LWhere;
   LSynchroLogItem_New.SrvToCli_Count := FPayloadData.Count;
   if FPayloadData.Count > 0 then
     LSynchroLogItem_New.SrvToCli_TimeSlotID_To := FPayloadData.Last.ID
@@ -747,6 +759,20 @@ begin
   inherited;
 end;
 
+function TioEtmSynchroStrategy_LogItem.GetEtmWhereSrv: IioWhere;
+begin
+  if not FEtmWhereSrvStr_DoNotAccessDirectly.IsEmpty then
+  begin
+    // Returns the where object as an instance (deserialization) so you can reload the same server-side time.slots that were used for sync.
+    Result := dj.FromJson(FEtmWhereSrvStr_DoNotAccessDirectly).Engine(eDelphiDOM).byFields.TypeAnnotationsON.&To<IioWhere>;
+    // At this point the PagingObj is not nil and this led to a memory leak, so I destroy it manually
+    Result.GetPagingObj.Free;
+    Result.SetPagingObj(nil);
+  end
+  else
+    Result := nil;
+end;
+
 function TioEtmSynchroStrategy_LogItem.GetSmartCliToSrv_TimeSlotID: String;
 begin
   Result := Format('%d > %d', [FCliToSrv_TimeSlotID_From, FCliToSrv_TimeSlotID_To]);
@@ -758,13 +784,26 @@ begin
 end;
 
 function TioEtmSynchroStrategy_LogItem.GetTimeSlots: TObjectList<TioEtmCustomTimeSlot>;
+var
+  LWhere: IioWhere;
 begin
-  if (ID <> 0) and (not FEtmTimeSlot_ClassName.IsEmpty) and (not Assigned(FTimeSlots)) then
+  if (not Assigned(FTimeSlots)) and (not FEtmWhereSrvStr_DoNotAccessDirectly.IsEmpty) then
   begin
-//    FTimeSlots := io.Load(FEtmTimeSlot_ClassName)._Where('SynchroLogItemID', coEquals, ID).ToGenericList.OfType<TObjectList<TioEtmCustomTimeSlot>>;
-    FTimeSlots := io.Load(FEtmTimeSlot_ClassName).ToGenericList.OfType<TObjectList<TioEtmCustomTimeSlot>>;
+    LWhere := EtmWhereSrv;
+    FTimeSlots := LWhere.ToGenericList.OfType<TObjectList<TioEtmCustomTimeSlot>>;
   end;
   Result := FTimeSlots;
+end;
+
+procedure TioEtmSynchroStrategy_LogItem.SetEtmWhereSrv(const Value: IioWhere);
+begin
+  // Set the where object for loading the server-side time-slots as JSON text so that you can save it with the SymchroLogItem
+  //  and later reload the same time.slots on the server side that were used for the server-side reload of the synchronization
+  //  and be able to to exhibit
+  if Value <> nil then
+    FEtmWhereSrvStr_DoNotAccessDirectly := dj.From(Value).Engine(eDelphiDOM).byFields.TypeAnnotationsON.ToJson // use DelphiDOM engine to avoid an error
+  else
+    FEtmWhereSrvStr_DoNotAccessDirectly := String.Empty;
 end;
 
 initialization
