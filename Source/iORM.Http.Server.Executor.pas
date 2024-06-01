@@ -140,12 +140,12 @@ var
   LList: TObject;
 begin
   LList := AioRequestBody.JSONDataValueAsObject;
-  io._DeleteListInternal(LList, AioRequestBody.IntentType, AioRequestBody.BlindLevel, nil);
+  io._DeleteListInternal(LList, AioRequestBody.IntentType, AioRequestBody.BlindLevel);
 end;
 
 class procedure TioHttpServerExecutor._DeleteObject(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
 begin
-  io._DeleteObjectInternal(AioRequestBody.JSONDataValueAsObject, AioRequestBody.IntentType, AioRequestBody.BlindLevel, nil);
+  io._DeleteObjectInternal(AioRequestBody.JSONDataValueAsObject, AioRequestBody.IntentType, AioRequestBody.BlindLevel);
 end;
 
 class procedure TioHttpServerExecutor._DoSynchronization(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
@@ -205,7 +205,7 @@ var
 begin
   LList := AioRequestBody.JSONDataValueAsObject;
   io._PersistListInternal(LList, AioRequestBody.IntentType, AioRequestBody.RelationPropertyName, AioRequestBody.RelationOID, nil, '', '',
-    AioRequestBody.BlindLevel, nil);
+    AioRequestBody.BlindLevel);
   if TioUtilities.BlindLevel_Do_AutoUpdateProps(AioRequestBody.BlindLevel) then
     AioResponseBody.JSONDataValueAsObject := LList;
 end;
@@ -216,7 +216,7 @@ var
 begin
   LObj := AioRequestBody.JSONDataValueAsObject;
   io._PersistObjectInternal(LObj, AioRequestBody.IntentType, AioRequestBody.RelationPropertyName, AioRequestBody.RelationOID, nil, '', '',
-    AioRequestBody.BlindLevel, nil);
+    AioRequestBody.BlindLevel);
   if TioUtilities.BlindLevel_Do_AutoUpdateProps(AioRequestBody.BlindLevel) then
     AioResponseBody.JSONDataValueAsObject := LObj;
 end;

@@ -777,7 +777,7 @@ begin
           //  event handler (if the event handler is assigned)
           // ----------------------------------------------------------------------------------------------------------------------------
           try
-            io._PersistObjectInternal(LDataObj, itRegular, '', 0, LMasterBindSource.Persistence, '', '', BL_DEFAULT, nil);
+            io._PersistObjectInternal(LDataObj, itRegular, '', 0, LMasterBindSource.Persistence, '', '', BL_DEFAULT);
           except
             // Try to resolve the unresolved conflict (raise) invoking the BindSource.OnDeleteConflictException/OnUpdateConflictException
             //  event handler if assigned

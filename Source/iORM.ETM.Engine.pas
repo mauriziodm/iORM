@@ -172,7 +172,7 @@ class procedure TioEtmEngine._ObjVersionToNegativeRevertIntent(const AObj: TObje
 var
   LContext: IioContext;
 begin
-  LContext := TioContextFactory.Context(itRevert, AObj.ClassName, nil, AObj, nil, '', '', BL_DEFAULT, nil);
+  LContext := TioContextFactory.Context(itRevert, AObj.ClassName, nil, AObj, nil, '', '', BL_DEFAULT);
   if LContext.ObjVersion > 0 then
     LContext.ObjVersion := -LContext.ObjVersion;
 end;

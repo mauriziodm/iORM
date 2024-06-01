@@ -344,7 +344,7 @@ var
   LQuery: IioQuery;
 begin
   // Get the context for the ETM TimeSlotClass
-  LEtmContext := TioContextFactory.Context(AObjContext.IntentType, AObjContext.GetTable.EtmTimeSlotClass.ClassName, nil, nil, nil, '', '', AObjContext.BlindLevel, nil);
+  LEtmContext := TioContextFactory.Context(AObjContext.IntentType, AObjContext.GetTable.EtmTimeSlotClass.ClassName, nil, nil, nil, '', '', AObjContext.BlindLevel);
   // Compose query identity
   LQueryIdentity := ComposeQueryIdentity(LEtmContext, 'SELVERETM', True);
   // Get the query object and if does not contain an SQL text (come from QueryContainer)

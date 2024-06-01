@@ -60,14 +60,12 @@ type
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------
     class procedure _DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
       const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
-      const ABlindLevel: Byte; const ASynchroStrategy_Payload: TObject); override;
+      const ABlindLevel: Byte); override;
     class procedure _DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
       const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
-      const ABlindLevel: Byte; const ASynchroStrategy_Payload: TObject); override;
-    class procedure _DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
-      const ASynchroStrategy_Payload: TObject); override;
-    class procedure _DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
-      const ASynchroStrategy_Payload: TObject); override;
+      const ABlindLevel: Byte); override;
+    class procedure _DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); override;
+    class procedure _DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); override;
     class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType); override;
     class function _DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
     // ---------- End intercepted methods (StrategyInterceptors) ----------
@@ -154,7 +152,7 @@ begin
     for AResolvedTypeName in AResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(itRegular, AResolvedTypeName, AWhere, nil, nil, '', '', BL_DEFAULT, nil);
+      AContext := TioContextFactory.Context(itRegular, AResolvedTypeName, AWhere, nil, nil, '', '', BL_DEFAULT);
       // If the object is of a class mapped as NotPersisted then continue
       if AContext.Map.GetTable.IsNotPersistedEntity then
         Exit;
@@ -199,7 +197,7 @@ begin
     for AResolvedTypeName in AResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(itRegular, AResolvedTypeName, AWhere, nil, nil, '', '', BL_DEFAULT, nil);
+      AContext := TioContextFactory.Context(itRegular, AResolvedTypeName, AWhere, nil, nil, '', '', BL_DEFAULT);
       // If the object is of a class mapped as NotPersisted then skip it
       if AContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
@@ -217,8 +215,7 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyDB._DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
-  const ASynchroStrategy_Payload: TObject);
+class procedure TioPersistenceStrategyDB._DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 var
   ADuckTypedList: IioDuckTypedList;
   AObj: TObject;
@@ -249,7 +246,7 @@ begin
     for AObj in ADuckTypedList do
     begin
       // Persist object
-      Self._DoDeleteObject(AObj, AIntent, ABlindLevel, ASynchroStrategy_Payload);
+      Self._DoDeleteObject(AObj, AIntent, ABlindLevel);
     end;
     Self.CommitTransaction('');
   except
@@ -258,8 +255,7 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyDB._DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
-  const ASynchroStrategy_Payload: TObject);
+class procedure TioPersistenceStrategyDB._DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 var
   LContext: IioContext;
 
@@ -274,7 +270,7 @@ begin
   if not Assigned(AObj) then
     Exit;
   // Create Context (Create a dummy ioWhere first to pass ConnectionName parameter only).
-  LContext := TioContextFactory.Context(AIntent, AObj.ClassName, nil, AObj, nil, '', '', ABlindLevel, ASynchroStrategy_Payload);
+  LContext := TioContextFactory.Context(AIntent, AObj.ClassName, nil, AObj, nil, '', '', ABlindLevel);
   LContext.ActionType := atDelete;
   // If the object is of a class mapped as NotPersisted then exit
   if LContext.Map.GetTable.IsNotPersistedEntity then
@@ -452,7 +448,7 @@ begin
   // Init
   Result := AObj;
   // Get the Context
-  LContext := TioContextFactory.Context(AIntent, AWhere.TypeName, AWhere, Result, nil, '', '', BL_DEFAULT, nil);
+  LContext := TioContextFactory.Context(AIntent, AWhere.TypeName, AWhere, Result, nil, '', '', BL_DEFAULT);
   // If the object is of a class mapped as NotPersisted then skip it
   if LContext.Map.GetTable.IsNotPersistedEntity then
     Exit;
@@ -543,8 +539,8 @@ begin
 end;
 
 class procedure TioPersistenceStrategyDB._DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
-  const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte;
-  const ASynchroStrategy_Payload: TObject);
+      const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
+      const ABlindLevel: Byte);
 var
   LDuckTypedList: IioDuckTypedList;
   LObj: TObject;
@@ -573,8 +569,7 @@ begin
     LDuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
     // Loop the list
     for LObj in LDuckTypedList do
-      _DoPersistObject(LObj, AIntent, ARelationPropertyName, ARelationOID, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath, ABlindLevel,
-        ASynchroStrategy_Payload);
+      _DoPersistObject(LObj, AIntent, ARelationPropertyName, ARelationOID, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath, ABlindLevel);
     // Commit the transaction
     CommitTransaction('');
   except
@@ -584,8 +579,8 @@ begin
 end;
 
 class procedure TioPersistenceStrategyDB._DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
-  const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte;
-  const ASynchroStrategy_Payload: TObject);
+      const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
+      const ABlindLevel: Byte);
 var
   LContext: IioContext;
 
@@ -658,8 +653,7 @@ begin
   if not Assigned(AObj) then
     Exit;
   // Create Context
-  LContext := TioContextFactory.Context(AIntent, AObj.ClassName, nil, AObj, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath, ABlindLevel,
-    ASynchroStrategy_Payload);
+  LContext := TioContextFactory.Context(AIntent, AObj.ClassName, nil, AObj, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath, ABlindLevel);
   // If the object is of a class mapped as NotPersisted then exit
   if LContext.Map.GetTable.IsNotPersistedEntity then
     Exit;
@@ -749,12 +743,10 @@ begin
       // sul DB senza passare dagli oggetti (però questo salterebbe ETM ad esempio).
       // If relation HasMany
       rtHasMany:
-        _DoDeleteList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.IntentType, AMasterContext.BlindLevel,
-          AMasterContext.SynchroStrategy_GetPayloadAsTObject);
+        _DoDeleteList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.IntentType, AMasterContext.BlindLevel);
       // If relation HasOne
       rtHasOne:
-        _DoDeleteObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.IntentType, AMasterContext.BlindLevel,
-          AMasterContext.SynchroStrategy_GetPayloadAsTObject);
+        _DoDeleteObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.IntentType, AMasterContext.BlindLevel);
     end;
   end;
 end;
@@ -775,12 +767,12 @@ begin
       rtHasMany:
         _DoPersistList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.IntentType, LMasterProp.GetRelationChildPropertyName,
           AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, AMasterContext.MasterBSPersistence, LMasterProp.GetName,
-          AMasterContext.MasterPropertyPath, AMasterContext.BlindLevel, AMasterContext.SynchroStrategy_GetPayloadAsTObject);
+          AMasterContext.MasterPropertyPath, AMasterContext.BlindLevel);
       // If relation HasOne
       rtHasOne:
         _DoPersistObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.IntentType, LMasterProp.GetRelationChildPropertyName,
           AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, AMasterContext.MasterBSPersistence, LMasterProp.GetName,
-          AMasterContext.MasterPropertyPath, AMasterContext.BlindLevel, AMasterContext.SynchroStrategy_GetPayloadAsTObject);
+          AMasterContext.MasterPropertyPath, AMasterContext.BlindLevel);
     end;
   end;
 end;
@@ -922,7 +914,7 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LContext := TioContextFactory.Context(itRegular, LResolvedTypeName, AWhere, nil, nil, '', '', BL_DEFAULT, nil);
+      LContext := TioContextFactory.Context(itRegular, LResolvedTypeName, AWhere, nil, nil, '', '', BL_DEFAULT);
       // If the object is of a class mapped as NotPersisted then skip it
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
@@ -1084,7 +1076,7 @@ var
           // If TrueClassMode is tvSmart then get the specific context for the current record/object else
           // use the original context
           if LOriginalContext.GetTrueClass.Mode = tcSmart then
-            LCurrentContext := TioContextFactory.Context(AIntent, LQuery.ExtractTrueClassName(LOriginalContext), AWhere, Result, nil, '', '', BL_DEFAULT, nil)
+            LCurrentContext := TioContextFactory.Context(AIntent, LQuery.ExtractTrueClassName(LOriginalContext), AWhere, Result, nil, '', '', BL_DEFAULT)
           else
             LCurrentContext := LOriginalContext;
           // Create the object as TObject (Intercepted by CRUDInterceptors)
@@ -1214,7 +1206,7 @@ function TioContextCache.GetContext(const AIntent: TioPersistenceIntentType; con
 begin
   // If the map is not already present in the cache then create and add it
   if not FContainer.ContainsKey(AClassName) then
-    FContainer.Add(AClassName, TioContextFactory.Context(AIntent, AClassName, AWhere, nil, nil, '', '', ABlindLevel, nil));
+    FContainer.Add(AClassName, TioContextFactory.Context(AIntent, AClassName, AWhere, nil, nil, '', '', ABlindLevel));
   // Return the requested context and set its DataObject to nil
   Result := FContainer.Items[AClassName];
   Result.DataObject := nil;

@@ -320,7 +320,7 @@ begin
   if LOldID < 0 then
     LMap.GetProperties.GetIdProperty.SetValue(AObj, IO_INTEGER_NULL_VALUE);
   // Persist the current object
-  io._PersistObjectInternal(AObj, itSynchro_PersistToServer, '', 0, nil, '', '', BL_SYNCHRO_PERSIST_PAYLOAD_TOSERVER, Self);
+  io._PersistObjectInternal(AObj, itSynchro_PersistToServer, '', 0, nil, '', '', BL_SYNCHRO_PERSIST_PAYLOAD_TOSERVER);
   // At this point if the object's ID was temporary (negative) then during persistence
   // it must have been assigned a new one so it re-reads it and add it
   // in the appropriate temporary ID container.
@@ -474,9 +474,9 @@ begin
           Continue;
         case LEtmTimeSlot.ActionType of
           atInsert, atUpdate:
-            io._PersistObjectInternal(LObj, itSynchro_PersistToClient, '', 0, nil, '', '', BL_SYNCHRO_PERSIST_PAYLOAD_TOCLIENT, Self);
+            io._PersistObjectInternal(LObj, itSynchro_PersistToClient, '', 0, nil, '', '', BL_SYNCHRO_PERSIST_PAYLOAD_TOCLIENT);
           atDelete:
-            io._DeleteObjectInternal(LObj, itSynchro_PersistToClient, BL_SYNCHRO_PERSIST_PAYLOAD_TOCLIENT, Self);
+            io._DeleteObjectInternal(LObj, itSynchro_PersistToClient, BL_SYNCHRO_PERSIST_PAYLOAD_TOCLIENT);
         end;
       finally
         FreeAndNil(LObj);
@@ -509,7 +509,7 @@ begin
           atInsert, atUpdate:
             _InternalPersistObjToServer(LObj);
           atDelete:
-            io._DeleteObjectInternal(LObj, itSynchro_PersistToServer, BL_SYNCHRO_PERSIST_PAYLOAD_TOSERVER, Self);
+            io._DeleteObjectInternal(LObj, itSynchro_PersistToServer, BL_SYNCHRO_PERSIST_PAYLOAD_TOSERVER);
         end;
       finally
         FreeAndNil(LObj);
