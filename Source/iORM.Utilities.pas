@@ -68,11 +68,7 @@ type
     class function ResolveRttiTypeToRttiType(const ARttiType: TRttiType): TRttiType;
     class function ObjToID(const AObj: Tobject): Integer; static;
     class function IntfToID(const AIntf: IInterface): Integer; static;
-
-
     class function IsNullOID(const AObj: Tobject): Boolean; static;
-
-
     class function ExtractObjVersion(const AObj: Tobject): Integer; static;
     class function EnumToString<T>(const AEnumValue:T): String;
     class function StringToEnum<T>(const AStringValue: String): T;

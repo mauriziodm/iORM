@@ -400,6 +400,7 @@ end;
 procedure TioEtmSynchroStrategy_Payload._DoReloadPayloadFromServer;
 var
   LSynchroLogItem_New: TioEtmSynchroStrategy_LogItem;
+  LTimeSlotMaxID: Integer;
   LWhere: IioWhere;
 begin
   inherited;
@@ -412,8 +413,9 @@ begin
   // Where: black & white class list
   _BuildBlackAndWhiteListWhere(LWhere);
   // Where: last timeslot for any object only
-  LWhere._And(Format('[.ID] = (SELECT MAX(SUB.ID) FROM [%s] SUB WHERE SUB.EntityClassName = [.EntityClassName] AND SUB.EntityID = [.EntityID])',
-    [FEtmTimeSlot_ClassName]));
+  LTimeSlotMaxID := io.Max(FEtmTimeSlot_ClassName, 'ID');
+  LWhere._And(Format('[.ID] = (SELECT MAX(SUB.ID) FROM [%s] SUB WHERE SUB.ID <= %d AND SUB.EntityClassName = [.EntityClassName] AND SUB.EntityID = [.EntityID])',
+    [FEtmTimeSlot_ClassName, LTimeSlotMaxID]));
   // EtmTimeSlot_Where if exists
   if Assigned(FEtmTimeSlot_Where_Server) then
     LWhere._And(FEtmTimeSlot_Where_Server);
@@ -449,7 +451,8 @@ begin
   // Initialize the new SynchroLogItem after its creation
   LSynchroLogItem_New.EtmTimeSlot_ClassName := FEtmTimeSlot_ClassName;
   if LSynchroLogItem_Old <> nil then
-     LSynchroLogItem_New.SrvToCli_TimeSlotID_From := LSynchroLogItem_Old.SrvToCli_TimeSlotID_From + LSynchroLogItem_Old.SrvToCli_Count // don't use LSynchroLogItem_Old.SrvToCli_TimeSlotID_To + 1
+//    LSynchroLogItem_New.SrvToCli_TimeSlotID_From := LSynchroLogItem_Old.SrvToCli_TimeSlotID_From + LSynchroLogItem_Old.SrvToCli_Count // don't use LSynchroLogItem_Old.SrvToCli_TimeSlotID_To + 1
+    LSynchroLogItem_New.SrvToCli_TimeSlotID_From := LSynchroLogItem_Old.SrvToCli_TimeSlotID_To + 1
   else
     LSynchroLogItem_New.SrvToCli_TimeSlotID_From := 1;
 end;
