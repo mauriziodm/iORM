@@ -79,6 +79,8 @@ type
     class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
     class function LoadObjVersion(const AContext: IioContext): Integer; override;
     class function Count(const AWhere: IioWhere): Integer; override;
+    class function Max(const AWhere: IioWhere; const APropertyName: String): Integer; override;
+    class function Min(const AWhere: IioWhere; const APropertyName: String): Integer; override;
     // SynchroStrategy
     class procedure DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload); override;
     // SQLDestinations
@@ -113,7 +115,7 @@ type
     function GetContext(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ABlindLevel: Byte): IioContext;
   end;
 
-  { TioStrategyDB }
+{ TioStrategyDB }
 
 class procedure TioPersistenceStrategyDB.CommitTransaction(const AConnectionName: String);
 begin
@@ -123,16 +125,16 @@ end;
 
 class function TioPersistenceStrategyDB.Count(const AWhere: IioWhere): Integer;
 var
-  AResolvedTypeList: IioResolvedTypeList;
-  AResolvedTypeName: String;
-  AContext: IioContext;
-  ATransactionCollection: IioTransactionCollection;
+  LResolvedTypeList: IioResolvedTypeList;
+  LResolvedTypeName: String;
+  LContext: IioContext;
+  LTransactionCollection: IioTransactionCollection;
   // Nested
   procedure NestedCount;
   var
     AQuery: IioQuery;
   begin
-    AQuery := TioDBFactory.QueryEngine.GetQueryCount(AContext);
+    AQuery := TioDBFactory.QueryEngine.GetQueryCount(LContext);
     AQuery.Open;
     try
       Result := Result + AQuery.Fields[0].AsInteger;
@@ -144,81 +146,81 @@ var
 begin
   inherited;
   // Resolve the type and alias
-  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
+  LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
   // Get the transaction collection
-  ATransactionCollection := TioDBFactory.TransactionCollection;
+  LTransactionCollection := TioDBFactory.TransactionCollection;
   try
     // Loop for all classes in the sesolved type list
-    for AResolvedTypeName in AResolvedTypeList do
+    for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(itRegular, AResolvedTypeName, AWhere, nil, nil, '', '', BL_DEFAULT);
+      LContext := TioContextFactory.Context(itRegular, LResolvedTypeName, AWhere, nil, nil, '', '', BL_DEFAULT);
       // If the object is of a class mapped as NotPersisted then continue
-      if AContext.Map.GetTable.IsNotPersistedEntity then
+      if LContext.Map.GetTable.IsNotPersistedEntity then
         Exit;
       // Start transaction
-      ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
+      LTransactionCollection.StartTransaction(LContext.GetTable.GetConnectionDefName);
       // Get the count value for the current resolved type
       NestedCount;
     end;
     // Commit ALL transactions
-    ATransactionCollection.CommitAll;
+    LTransactionCollection.CommitAll;
   except
     // Rollback ALL transactions
-    ATransactionCollection.RollbackAll;
+    LTransactionCollection.RollbackAll;
     raise;
   end;
 end;
 
 class procedure TioPersistenceStrategyDB.Delete(const AWhere: IioWhere);
 var
-  AResolvedTypeList: IioResolvedTypeList;
-  AResolvedTypeName: String;
-  AContext: IioContext;
-  ATransactionCollection: IioTransactionCollection;
+  LResolvedTypeList: IioResolvedTypeList;
+  LResolvedTypeName: String;
+  LContext: IioContext;
+  LTransactionCollection: IioTransactionCollection;
   // Nested
   procedure NestedDelete;
   var
     LQuery: IioQuery;
   begin
     // Create & execute query
-    LQuery := TioDBFactory.QueryEngine.GetQueryDelete(AContext, False);
+    LQuery := TioDBFactory.QueryEngine.GetQueryDelete(LContext, False);
     LQuery.ExecSQL;
   end;
 
 begin
   inherited;
   // Resolve the type and alias
-  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
+  LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
   // Get the transaction collection
-  ATransactionCollection := TioDBFactory.TransactionCollection;
+  LTransactionCollection := TioDBFactory.TransactionCollection;
   try
     // Loop for all classes in the sesolved type list
-    for AResolvedTypeName in AResolvedTypeList do
+    for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(itRegular, AResolvedTypeName, AWhere, nil, nil, '', '', BL_DEFAULT);
+      LContext := TioContextFactory.Context(itRegular, LResolvedTypeName, AWhere, nil, nil, '', '', BL_DEFAULT);
       // If the object is of a class mapped as NotPersisted then skip it
-      if AContext.Map.GetTable.IsNotPersistedEntity then
+      if LContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
       // Start transaction
-      ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
+      LTransactionCollection.StartTransaction(LContext.GetTable.GetConnectionDefName);
       // Load the current class data into the list
       NestedDelete;
     end;
     // Commit ALL transactions
-    ATransactionCollection.CommitAll;
+    LTransactionCollection.CommitAll;
   except
     // Rollback ALL transactions
-    ATransactionCollection.RollbackAll;
+    LTransactionCollection.RollbackAll;
     raise;
   end;
 end;
 
 class procedure TioPersistenceStrategyDB._DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 var
-  ADuckTypedList: IioDuckTypedList;
-  AObj: TObject;
+  LDuckTypedList: IioDuckTypedList;
+  LObj: TObject;
 begin
   inherited;
   // NB: Qui avvio la transazione per fare in modo che tutto il Persist di tutti gli oggetti contenuti
@@ -241,12 +243,12 @@ begin
   Self.StartTransaction('');
   try
     // Wrap the DestList into a DuckTypedList
-    ADuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
+    LDuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
     // Loop the list and delete objects
-    for AObj in ADuckTypedList do
+    for LObj in LDuckTypedList do
     begin
       // Persist object
-      Self._DoDeleteObject(AObj, AIntent, ABlindLevel);
+      Self._DoDeleteObject(LObj, AIntent, ABlindLevel);
     end;
     Self.CommitTransaction('');
   except
@@ -520,6 +522,110 @@ begin
       Result := LQuery.Fields[0].AsInteger
   finally
     LQuery.Close;
+  end;
+end;
+
+class function TioPersistenceStrategyDB.Max(const AWhere: IioWhere; const APropertyName: String): Integer;
+var
+  LResolvedTypeList: IioResolvedTypeList;
+  LResolvedTypeName: String;
+  LContext: IioContext;
+  LTransactionCollection: IioTransactionCollection;
+  // Nested
+  procedure NestedMax;
+  var
+    LProperty: IioProperty;
+    AQuery: IioQuery;
+  begin
+    LProperty := LContext.GetProperties.GetPropertyByName(APropertyName, True);
+    AQuery := TioDBFactory.QueryEngine.GetQueryMax(LContext, LProperty);
+    AQuery.Open;
+    try
+      if AQuery.Fields[0].AsInteger > Result then
+        Result := AQuery.Fields[0].AsInteger;
+    finally
+      AQuery.Close;
+    end;
+  end;
+
+begin
+  inherited;
+  // Resolve the type and alias
+  LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
+  // Get the transaction collection
+  LTransactionCollection := TioDBFactory.TransactionCollection;
+  try
+    // Loop for all classes in the sesolved type list
+    for LResolvedTypeName in LResolvedTypeList do
+    begin
+      // Get the Context for the current ResolverTypeName
+      LContext := TioContextFactory.Context(itRegular, LResolvedTypeName, AWhere, nil, nil, '', '', BL_DEFAULT);
+      // If the object is of a class mapped as NotPersisted then continue
+      if LContext.Map.GetTable.IsNotPersistedEntity then
+        Exit;
+      // Start transaction
+      LTransactionCollection.StartTransaction(LContext.GetTable.GetConnectionDefName);
+      // Get the count value for the current resolved type
+      NestedMax;
+    end;
+    // Commit ALL transactions
+    LTransactionCollection.CommitAll;
+  except
+    // Rollback ALL transactions
+    LTransactionCollection.RollbackAll;
+    raise;
+  end;
+end;
+
+class function TioPersistenceStrategyDB.Min(const AWhere: IioWhere; const APropertyName: String): Integer;
+var
+  LResolvedTypeList: IioResolvedTypeList;
+  LResolvedTypeName: String;
+  LContext: IioContext;
+  LTransactionCollection: IioTransactionCollection;
+  // Nested
+  procedure NestedMin;
+  var
+    LProperty: IioProperty;
+    AQuery: IioQuery;
+  begin
+    LProperty := LContext.GetProperties.GetPropertyByName(APropertyName, True);
+    AQuery := TioDBFactory.QueryEngine.GetQueryMin(LContext, LProperty);
+    AQuery.Open;
+    try
+      if AQuery.Fields[0].AsInteger < Result then
+        Result := AQuery.Fields[0].AsInteger;
+    finally
+      AQuery.Close;
+    end;
+  end;
+
+begin
+  inherited;
+  // Resolve the type and alias
+  LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
+  // Get the transaction collection
+  LTransactionCollection := TioDBFactory.TransactionCollection;
+  try
+    // Loop for all classes in the sesolved type list
+    for LResolvedTypeName in LResolvedTypeList do
+    begin
+      // Get the Context for the current ResolverTypeName
+      LContext := TioContextFactory.Context(itRegular, LResolvedTypeName, AWhere, nil, nil, '', '', BL_DEFAULT);
+      // If the object is of a class mapped as NotPersisted then continue
+      if LContext.Map.GetTable.IsNotPersistedEntity then
+        Exit;
+      // Start transaction
+      LTransactionCollection.StartTransaction(LContext.GetTable.GetConnectionDefName);
+      // Get the count value for the current resolved type
+      NestedMin;
+    end;
+    // Commit ALL transactions
+    LTransactionCollection.CommitAll;
+  except
+    // Rollback ALL transactions
+    LTransactionCollection.RollbackAll;
+    raise;
   end;
 end;
 

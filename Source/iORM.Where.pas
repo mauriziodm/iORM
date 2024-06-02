@@ -158,6 +158,8 @@ type
     function Count: Integer;
     function Exists: Boolean;
     function IsEmpty: Boolean;
+    function Max(const APropertyName: String): Integer;
+    function Min(const APropertyName: String): Integer;
     function NotExists: Boolean;
 
     procedure Delete;
@@ -1035,6 +1037,16 @@ end;
 function TioWhere.LimitExists: Boolean;
 begin
   Result := GetLimitRows > 0;
+end;
+
+function TioWhere.Max(const APropertyName: String): Integer;
+begin
+  Result := TioPersistenceStrategyFactory.GetStrategy('').Max(Self, APropertyName);
+end;
+
+function TioWhere.Min(const APropertyName: String): Integer;
+begin
+  Result := TioPersistenceStrategyFactory.GetStrategy('').Min(Self, APropertyName);
 end;
 
 function TioWhere.NotExists: Boolean;

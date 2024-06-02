@@ -281,8 +281,8 @@ type
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); virtual; abstract;
     class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
     class procedure GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext); virtual;
-    class procedure GenerateSqlMaxID(const AQuery: IioQuery; const AContext: IioContext); virtual;
-    class procedure GenerateSqlMinID(const AQuery: IioQuery; const AContext: IioContext); virtual;
+    class procedure GenerateSqlMax(const AQuery: IioQuery; const AContext: IioContext; const AProperty: IioProperty); virtual;
+    class procedure GenerateSqlMin(const AQuery: IioQuery; const AContext: IioContext; const AProperty: IioProperty); virtual;
     class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
     class procedure GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext); virtual;
     class procedure GenerateSqlUpdate(const AQuery: IioQuery; const AContext: IioContext); virtual;
@@ -450,6 +450,8 @@ type
     class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; virtual;
     class function LoadObjVersion(const AContext: IioContext): Integer; virtual; abstract;
     class function Count(const AWhere: IioWhere): Integer; virtual;
+    class function Max(const AWhere: IioWhere; const APropertyName: String): Integer; virtual;
+    class function Min(const AWhere: IioWhere; const APropertyName: String): Integer; virtual;
     // SynchroStrategy
     class procedure DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload); virtual; abstract;
     // SQLDestinations
@@ -641,21 +643,21 @@ begin
     Result := Result + ' ON (' + AJoinItem.GetJoinCondition + ')';
 end;
 
-class procedure TioSqlGenerator.GenerateSqlMaxID(const AQuery: IioQuery; const AContext: IioContext);
+class procedure TioSqlGenerator.GenerateSqlMax(const AQuery: IioQuery; const AContext: IioContext; const AProperty: IioProperty);
 begin
-  // Build the query that returns the highest ID
+  // Build the query that returns the highest value for the property
   // -----------------------------------------------------------------
   // Select
-  AQuery.SQL.Add(Format('SELECT COALESCE(MAX(%s),0) FROM %s', [AContext.GetProperties.GetIdProperty.GetSqlFieldName, AContext.GetTable.GetSQL]));
+  AQuery.SQL.Add(Format('SELECT COALESCE(MAX(%s),0) FROM %s', [AProperty.GetSqlFieldName, AContext.GetTable.GetSQL]));
   // -----------------------------------------------------------------
 end;
 
-class procedure TioSqlGenerator.GenerateSqlMinID(const AQuery: IioQuery; const AContext: IioContext);
+class procedure TioSqlGenerator.GenerateSqlMin(const AQuery: IioQuery; const AContext: IioContext; const AProperty: IioProperty);
 begin
-  // Build the query that returns the lowest ID
+  // Build the query that returns the lowest value for the property
   // -----------------------------------------------------------------
   // Select
-  AQuery.SQL.Add(Format('SELECT COALESCE(MIN(%s),0) FROM %s', [AContext.GetProperties.GetIdProperty.GetSqlFieldName, AContext.GetTable.GetSQL]));
+  AQuery.SQL.Add(Format('SELECT COALESCE(MIN(%s),0) FROM %s', [AProperty.GetSqlFieldName, AContext.GetTable.GetSQL]));
   // -----------------------------------------------------------------
 end;
 
@@ -878,6 +880,18 @@ end;
 class function TioPersistenceStrategyIntf.LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
 begin
   Result := nil;
+  AWhere.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
+end;
+
+class function TioPersistenceStrategyIntf.Max(const AWhere: IioWhere; const APropertyName: String): Integer;
+begin
+  Result := 0;
+  AWhere.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
+end;
+
+class function TioPersistenceStrategyIntf.Min(const AWhere: IioWhere; const APropertyName: String): Integer;
+begin
+  Result := 0;
   AWhere.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
 

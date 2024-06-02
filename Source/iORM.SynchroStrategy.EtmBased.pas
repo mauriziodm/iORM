@@ -602,7 +602,7 @@ var
 begin
   inherited;
   // Generate negative ID as local temporary ID (tonbe changed during synchronization process)
-  LQuery := TioDBFactory.QueryEngine.GetQueryMinID(AContext);
+  LQuery := TioDBFactory.QueryEngine.GetQueryMin(AContext, AContext.GetProperties.GetIDProperty);
   try
     LQuery.Open;
     Result := LQuery.Fields[0].AsInteger - 1;

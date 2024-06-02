@@ -513,6 +513,20 @@ type
     class function Count<T>(const ATypeAlias: String = ''): Integer; overload;
     class function Count<T>(const AWhere: IioWhere): Integer; overload;
     class function Count<T>(const ATypeAlias: String; const AWhere: IioWhere): Integer; overload;
+    // Max (accepting generic type and ciriteria)
+    class function Max(const ATypeName, APropertyName: String; const ATypeAlias: String = ''): Integer; overload;
+    class function Max(const ATypeName, APropertyName: String; const AWhere: IioWhere): Integer; overload;
+    class function Max(const ATypeName, APropertyName: String; const ATypeAlias: String; const AWhere: IioWhere): Integer; overload;
+    class function Max<T>(const APropertyName: String; const ATypeAlias: String = ''): Integer; overload;
+    class function Max<T>(const APropertyName: String; const AWhere: IioWhere): Integer; overload;
+    class function Max<T>(const APropertyName: String; const ATypeAlias: String; const AWhere: IioWhere): Integer; overload;
+    // Min (accepting generic type and ciriteria)
+    class function Min(const ATypeName, APropertyName: String; const ATypeAlias: String = ''): Integer; overload;
+    class function Min(const ATypeName, APropertyName: String; const AWhere: IioWhere): Integer; overload;
+    class function Min(const ATypeName, APropertyName: String; const ATypeAlias: String; const AWhere: IioWhere): Integer; overload;
+    class function Min<T>(const APropertyName: String; const ATypeAlias: String = ''): Integer; overload;
+    class function Min<T>(const APropertyName: String; const AWhere: IioWhere): Integer; overload;
+    class function Min<T>(const APropertyName: String; const ATypeAlias: String; const AWhere: IioWhere): Integer; overload;
     // Exists (accepting generic type and ciriteria)
     class function Exists(const ATypeName: String; const ATypeAlias: String = ''): boolean; overload;
     class function Exists(const ATypeName: String; const AWhere: IioWhere): boolean; overload;
@@ -2060,6 +2074,74 @@ end;
 class procedure io.LoadToObject<T>(const AIntfObj: IInterface; const AWhere: IioWhere);
 begin
   Self.LoadToObject<T>(AIntfObj as TObject, AWhere);
+end;
+
+class function io.Max(const ATypeName, APropertyName, ATypeAlias: String): Integer;
+begin
+  Result := Self.RefTo(ATypeName, ATypeAlias).Max(APropertyName);
+end;
+
+class function io.Max(const ATypeName, APropertyName: String; const AWhere: IioWhere): Integer;
+begin
+  Result := Self.Max(ATypeName, APropertyName, '', AWhere);
+end;
+
+class function io.Max(const ATypeName, APropertyName, ATypeAlias: String; const AWhere: IioWhere): Integer;
+begin
+  AWhere.TypeName := ATypeName;
+  AWhere.TypeAlias := ATypeAlias;
+  Result := AWhere.Max(APropertyName);
+end;
+
+class function io.Max<T>(const APropertyName, ATypeAlias: String): Integer;
+begin
+  Result := Self.RefTo<T>(ATypeAlias).Max(APropertyName);
+end;
+
+class function io.Max<T>(const APropertyName: String; const AWhere: IioWhere): Integer;
+begin
+  Result := Self.Max<T>(APropertyName, '', AWhere);
+end;
+
+class function io.Max<T>(const APropertyName, ATypeAlias: String; const AWhere: IioWhere): Integer;
+begin
+  AWhere.TypeName := TioUtilities.GenericToString<T>(False);
+  AWhere.TypeAlias := ATypeAlias;
+  Result := AWhere.Max(APropertyName);
+end;
+
+class function io.Min(const ATypeName, APropertyName, ATypeAlias: String): Integer;
+begin
+  Result := Self.RefTo(ATypeName, ATypeAlias).Min(APropertyName);
+end;
+
+class function io.Min(const ATypeName, APropertyName: String; const AWhere: IioWhere): Integer;
+begin
+  Result := Self.Min(ATypeName, APropertyName, '', AWhere);
+end;
+
+class function io.Min(const ATypeName, APropertyName, ATypeAlias: String; const AWhere: IioWhere): Integer;
+begin
+  AWhere.TypeName := ATypeName;
+  AWhere.TypeAlias := ATypeAlias;
+  Result := AWhere.Min(APropertyName);
+end;
+
+class function io.Min<T>(const APropertyName, ATypeAlias: String): Integer;
+begin
+  Result := Self.RefTo<T>(ATypeAlias).Min(APropertyName);
+end;
+
+class function io.Min<T>(const APropertyName: String; const AWhere: IioWhere): Integer;
+begin
+  Result := Self.Min<T>(APropertyName, '', AWhere);
+end;
+
+class function io.Min<T>(const APropertyName, ATypeAlias: String; const AWhere: IioWhere): Integer;
+begin
+  AWhere.TypeName := TioUtilities.GenericToString<T>(False);
+  AWhere.TypeAlias := ATypeAlias;
+  Result := AWhere.Min(APropertyName);
 end;
 
 class procedure io.Show(const AEntityTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);

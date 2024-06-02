@@ -106,6 +106,8 @@ type
     function Count: Integer;
     function Exists: Boolean;
     function IsEmpty: Boolean;
+    function Max(const APropertyName: String): Integer;
+    function Min(const APropertyName: String): Integer;
     function NotExists: Boolean;
 
     procedure Delete;

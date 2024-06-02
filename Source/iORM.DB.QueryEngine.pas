@@ -60,8 +60,8 @@ type
     class function GetQueryDropIndex(const AContext: IioContext; const AIndexName: String): IioQuery;
     class function GetQueryExists(const AContext: IioContext): IioQuery;
     class function GetQueryInsert(const AContext: IioContext): IioQuery;
-    class function GetQueryMaxID(const AContext: IioContext): IioQuery;
-    class function GetQueryMinID(const AContext: IioContext): IioQuery;
+    class function GetQueryMax(const AContext: IioContext; const AProperty: IioProperty): IioQuery;
+    class function GetQueryMin(const AContext: IioContext; const AProperty: IioProperty): IioQuery;
     class function GetQueryNextID(const AContext: IioContext): IioQuery;
     class function GetQuerySelectList(const AContext: IioContext): IioQuery;
     class function GetQuerySelectObject(const AContext: IioContext): IioQuery;
@@ -221,22 +221,22 @@ begin
     LQuery.ParamByName_SetValue(AContext.GetTrueClass.GetSqlParamName, AContext.GetTrueClass.GetValue);
 end;
 
-class function TioQueryEngine.GetQueryMaxID(const AContext: IioContext): IioQuery;
+class function TioQueryEngine.GetQueryMax(const AContext: IioContext; const AProperty: IioProperty): IioQuery;
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   //   then call the sql query generator
-  Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'MAX_ID', True));
+  Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'MAX_'+AProperty.GetName, True));
   if Result.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlMaxID(Result, AContext);
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlMax(Result, AContext, AProperty);
 end;
 
-class function TioQueryEngine.GetQueryMinID(const AContext: IioContext): IioQuery;
+class function TioQueryEngine.GetQueryMin(const AContext: IioContext; const AProperty: IioProperty): IioQuery;
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   //   then call the sql query generator
-  Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'MIN_ID', True));
+  Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, ComposeQueryIdentity(AContext, 'MIN_'+AProperty.GetName, True));
   if Result.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlMinID(Result, AContext);
+    TioDbFactory.SqlGenerator(AContext.GetTable.GetConnectionDefName).GenerateSqlMin(Result, AContext, AProperty);
 end;
 
 class function TioQueryEngine.GetQueryNextID(const AContext: IioContext): IioQuery;
