@@ -451,7 +451,6 @@ begin
   // Initialize the new SynchroLogItem after its creation
   LSynchroLogItem_New.EtmTimeSlot_ClassName := FEtmTimeSlot_ClassName;
   if LSynchroLogItem_Old <> nil then
-//    LSynchroLogItem_New.SrvToCli_TimeSlotID_From := LSynchroLogItem_Old.SrvToCli_TimeSlotID_From + LSynchroLogItem_Old.SrvToCli_Count // don't use LSynchroLogItem_Old.SrvToCli_TimeSlotID_To + 1
     LSynchroLogItem_New.SrvToCli_TimeSlotID_From := LSynchroLogItem_Old.SrvToCli_TimeSlotID_To + 1
   else
     LSynchroLogItem_New.SrvToCli_TimeSlotID_From := 1;

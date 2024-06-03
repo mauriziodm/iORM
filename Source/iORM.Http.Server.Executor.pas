@@ -50,6 +50,8 @@ type
     class procedure _LoadDataSet(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
     class procedure _LoadList(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
     class procedure _LoadObject(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _Max(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _Min(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
     class procedure _PersistList(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
     class procedure _PersistObject(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
     class procedure _SQLDestExecute(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
@@ -90,6 +92,10 @@ begin
       _PersistList(LioRequestBody, LioResponseBody)
     else if LioRequestBody.MethodName = HTTP_METHOD_NAME_DELETELIST then
       _DeleteList(LioRequestBody, LioResponseBody)
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_MAX then
+      _Max(LioRequestBody, LioResponseBody)
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_MIN then
+      _Min(LioRequestBody, LioResponseBody)
     else if LioRequestBody.MethodName = HTTP_METHOD_NAME_COUNT then
       _Count(LioRequestBody, LioResponseBody)
     else if LioRequestBody.MethodName = HTTP_METHOD_NAME_DELETE then
@@ -197,6 +203,22 @@ begin
   LObj := AioRequestBody.Where.ToObject;
   if Assigned(LObj) then
     AioResponseBody.JSONDataValueAsObject := LObj;
+end;
+
+class procedure TioHttpServerExecutor._Max(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
+var
+  LMax: integer;
+begin
+  LMax := AioRequestBody.Where.Max(AioRequestBody.RelationPropertyName);
+  AioResponseBody.JSONDataValue := TJSONNumber.Create(LMax);
+end;
+
+class procedure TioHttpServerExecutor._Min(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
+var
+  LMin: integer;
+begin
+  LMin := AioRequestBody.Where.Min(AioRequestBody.RelationPropertyName);
+  AioResponseBody.JSONDataValue := TJSONNumber.Create(LMin);
 end;
 
 class procedure TioHttpServerExecutor._PersistList(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);

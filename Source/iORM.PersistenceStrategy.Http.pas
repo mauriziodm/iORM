@@ -66,6 +66,8 @@ type
     class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
     class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
     class function Count(const AWhere: IioWhere): Integer; override;
+    class function Max(const AWhere: IioWhere; const APropertyName: String): Integer; override;
+    class function Min(const AWhere: IioWhere; const APropertyName: String): Integer; override;
     // SynchroStrategy
     class procedure DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload); override;
     // SQLDestinations
@@ -317,6 +319,62 @@ begin
   // This method is only used internally by the Object Maker,
   // and then you do not need to implement it in RESTStrategy.
   raise EioGenericException.Create(Self.ClassName + ': "LoadObjectByClassOnly", method not implemented in this strategy.');
+end;
+
+class function TioPersistenceStrategyHttp.Max(const AWhere: IioWhere; const APropertyName: String): Integer;
+var
+  LConnection: IioConnectionHttp;
+begin
+  inherited;
+  // Get the connection, set the request and execute it
+  LConnection := TioDBFactory.Connection('').AsHttpConnection;
+  // Start transaction
+  // NB: In this strategy (HTTP) call the Connection.StartTransaction (not the Self.StartTransaction
+  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  // perform any http call to the server at this point.
+  LConnection.StartTransaction;
+  try
+    LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.Where := AWhere;
+    LConnection.ioRequestBody.RelationPropertyName := APropertyName;
+    LConnection.Execute(HTTP_METHOD_NAME_MAX);
+    // Deserialize the JSONDataValue to the result object
+    Result := LConnection.ioResponseBody.JSONDataValue.AsType<Integer>;
+    // Commit
+    LConnection.Commit;
+  except
+    // Rollback
+    LConnection.Rollback;
+    raise;
+  end;
+end;
+
+class function TioPersistenceStrategyHttp.Min(const AWhere: IioWhere; const APropertyName: String): Integer;
+var
+  LConnection: IioConnectionHttp;
+begin
+  inherited;
+  // Get the connection, set the request and execute it
+  LConnection := TioDBFactory.Connection('').AsHttpConnection;
+  // Start transaction
+  // NB: In this strategy (HTTP) call the Connection.StartTransaction (not the Self.StartTransaction
+  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  // perform any http call to the server at this point.
+  LConnection.StartTransaction;
+  try
+    LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.Where := AWhere;
+    LConnection.ioRequestBody.RelationPropertyName := APropertyName;
+    LConnection.Execute(HTTP_METHOD_NAME_MIN);
+    // Deserialize the JSONDataValue to the result object
+    Result := LConnection.ioResponseBody.JSONDataValue.AsType<Integer>;
+    // Commit
+    LConnection.Commit;
+  except
+    // Rollback
+    LConnection.Rollback;
+    raise;
+  end;
 end;
 
 class procedure TioPersistenceStrategyHttp._DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
