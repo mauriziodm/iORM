@@ -51,6 +51,7 @@ type
     procedure DoSynchronization(const ASynchroLevel: TioSynchroLevel);
     function IsToBeSynchronized(const AContext: IioContext): Boolean;
     function GenerateLocalID(const AContext: IioContext): Integer;
+    function GetNextObjVersion(const AContext: IioContext): Integer;
     procedure FreeNotification(AComponent: TComponent);
     procedure RemoveFreeNotification(AComponent: TComponent);
     // EtmTimeSlot_Delete_SentToServer

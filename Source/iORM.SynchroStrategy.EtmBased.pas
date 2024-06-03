@@ -167,6 +167,7 @@ type
   strict protected
     // ---------- Synchro strategy methods to override on descendant classes ----------
     function _DoGenerateLocalID(const AContext: IioContext): Integer; override;
+    function _DoGetNextObjVersion(const AContext: IioContext): Integer; override;
     function _DoPayload_Create: TioCustomSynchroStrategy_Payload; override;
     procedure _DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload; const ASynchroLevel: TioSynchroLevel); override;
     // ---------- Synchro strategy methods to override on descendant classes ----------
@@ -613,6 +614,18 @@ begin
   finally
     LQuery.Close;
   end;
+end;
+
+function TioEtmSynchroStrategy_Client._DoGetNextObjVersion(const AContext: IioContext): Integer;
+begin
+  // If a SynchroStrategy is assigned and active (local remote and not connected device) then
+  //  the ObjVersion must NEVER BE INCREMENTED because the ObjVersionaintained on the local (remote)
+  //  DB will have to be compared wjth that of the centra DB (main server) to detect any conflicts
+  // NOTE: If the intent is SYnchronization then returnas absolute value to avoid the normal
+  //        negative value after the Revert operation from the synchronizing time-slot
+  Result := AContext.ObjVersion;
+  if AContext.IntentType = itSynchro_PersistToClient then
+    Result := Abs(Result);
 end;
 
 function TioEtmSynchroStrategy_Client._DoPayload_Create: TioCustomSynchroStrategy_Payload;

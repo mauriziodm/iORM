@@ -648,13 +648,25 @@ begin
 end;
 
 function TioContext.GetObjNextVersion: Integer;
+var
+  LSynchroStrategy_Client: IioSynchroStrategy_Client;
 begin
   // If the ObjVersion property does not exists then return the OBJVERSION_NULL (zero)
   if not GetProperties.ObjVersionPropertyExist then
     Exit(OBJVERSION_NULL);
+  // If a SynchroStrategy is assigned and active (local remote and not connected device) then ask to it
+  //  the next ObjVersion (normally the Objversion increment is disable if the current device is a remote device with synchronization).
+  //  Else if a SynchroStrategy is NOT assigned then load the last ObjVersion from the DB (from the db because someone else in the
+  //  meantime could have saved a new version)
   // If the ObjVersion is not already loaded then load it (once)
   if FObjNextVersion = OBJVERSION_NULL then
-    FObjNextVersion := io.LoadObjVersion(Self) + 1;
+  begin
+    LSynchroStrategy_Client := SynchroStrategy_Client;
+    if (LSynchroStrategy_Client <> nil) then
+      FObjNextVersion := LSynchroStrategy_Client.GetNextObjVersion(Self)
+    else
+      FObjNextVersion := io.LoadObjVersion(Self) + 1;
+  end;
   // Return the value
   Result := FObjNextVersion;
 end;

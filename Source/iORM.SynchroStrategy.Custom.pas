@@ -236,6 +236,7 @@ type
     function Get_Version: String;
     // ---------- Synchro strategy methods to override on descendant classes ----------
     function _DoGenerateLocalID(const AContext: IioContext): Integer; virtual; abstract;
+    function _DoGetNextObjVersion(const AContext: IioContext): Integer; virtual; abstract;
     function _DoPayload_Create: TioCustomSynchroStrategy_Payload; virtual; abstract;
     procedure _DoPayload_Initialize(const APayload: TioCustomSynchroStrategy_Payload; const ASynchroLevel: TioSynchroLevel); virtual;
     // ---------- Synchro strategy methods to override on descendant classes ----------
@@ -262,6 +263,7 @@ type
     destructor Destroy; override;
     procedure DoSynchronization(const ASynchroLevel: TioSynchroLevel);
     function GenerateLocalID(const AContext: IioContext): Integer;
+    function GetNextObjVersion(const AContext: IioContext): Integer;
   end;
 
   TioCustomSynchroStrategy_Server = class abstract(TComponent, IioSynchroStrategy_Server)
@@ -357,6 +359,11 @@ end;
 function TioCustomSynchroStrategy_Client.GetIsReady: Boolean;
 begin
   Result := Assigned(FTargetConnectionDef) and not FInProgress
+end;
+
+function TioCustomSynchroStrategy_Client.GetNextObjVersion(const AContext: IioContext): Integer;
+begin
+  Result := _DoGetNextObjVersion(AContext);
 end;
 
 function TioCustomSynchroStrategy_Client.GetSynchroLogName: String;
