@@ -393,7 +393,7 @@ begin
             end;
           end;
         prObjVersion:
-          LQuery.ParamObjVersion_SetValue(AContext);  // Qua sta prendendo ObjVersion dall'oggetto + 1
+          LQuery.ParamObjVersion_SetValue(AContext);
         prObjUpdated:
           LQuery.ParamObjUpdated_SetValue(AContext);
         prObjUpdatedUserID:

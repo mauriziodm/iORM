@@ -1062,19 +1062,30 @@ end;
 
 function TioEtmCustomTimeSlot.GetSmartEntityVersion: String;
 begin
-  case FIntentType of
-    itRegular:
-      if FActionType = atUpdate then
-        Result := Format('%d (updated from %d)', [FEntityToVersion, FEntityFromVersion])
+  case FActionType of
+    atInsert, atUpdate:
+      if FEntityFromVersion > 0 then
+        Result := Format('%d (from %d)', [FEntityToVersion, FEntityFromVersion])
       else
-        FEntityToVersion.ToString;
-    itRevert:
-      Result := Format('%d (reverted from %d)', [FEntityToVersion, FEntityFromVersion]);
-    itSynchro_PersistToServer, itSynchro_PersistToClient:
-      Result := Format('%d (synchronized from %d)', [FEntityToVersion, FEntityFromVersion]);
-  else
-    raise EioGenericException.Create(ClassName, 'GetSmartEntityVersion', 'IntentType not valid.');
+        Result := FEntityToVersion.ToString;
+    atDelete:
+      Result := FEntityToVersion.ToString;
   end;
+// ===== OLD CODE =====
+//  case FIntentType of
+//    itRegular:
+//      if FActionType = atUpdate then
+//        Result := Format('%d (updated from %d)', [FEntityToVersion, FEntityFromVersion])
+//      else
+//        Result := FEntityToVersion.ToString;
+//    itRevert:
+//      Result := Format('%d (reverted from %d)', [FEntityToVersion, FEntityFromVersion]);
+//    itSynchro_PersistToServer, itSynchro_PersistToClient:
+//      Result := Format('%d (synchronized from %d)', [FEntityToVersion, FEntityFromVersion]);
+//  else
+//    raise EioGenericException.Create(ClassName, 'GetSmartEntityVersion', 'IntentType not valid.');
+//  end;
+// ===== OLD CODE =====
 end;
 
 function TioEtmCustomTimeSlot.GetSmartActionType: String;

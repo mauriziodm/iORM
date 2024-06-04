@@ -49,9 +49,11 @@ type
 
   TioEtmInterceptor = class(TioCustomCRUDInterceptor)
   private
-    class procedure CreateAndPersistNewTimeSlot_Internal(const AContext: IioContext);// static; inline;
+    class procedure _SetEntityFromVersion(const AContext: IioContext); inline;
+    class procedure _CreateAndPersistNewTimeSlot_Internal(const AContext: IioContext); inline;
   public
     // Insert
+    class procedure BeforeInsert(const AContext: IioContext; var ADone: Boolean); override;
     class procedure AfterInsert(const AContext: IioContext); override;
     // Update
     class procedure BeforeUpdate(const AContext: IioContext; var ADone: Boolean); override;
@@ -67,7 +69,7 @@ uses
 
 { TioEtmInterceptor }
 
-class procedure TioEtmInterceptor.CreateAndPersistNewTimeSlot_Internal(const AContext: IioContext);
+class procedure TioEtmInterceptor._CreateAndPersistNewTimeSlot_Internal(const AContext: IioContext);
 var
   LTimeSlot: TioEtmCustomTimeSlot;
 begin
@@ -82,25 +84,35 @@ begin
   end;
 end;
 
-class procedure TioEtmInterceptor.BeforeUpdate(const AContext: IioContext; var ADone: Boolean);
+class procedure TioEtmInterceptor._SetEntityFromVersion(const AContext: IioContext);
 begin
   // Save the before update ObjVersion of the object into the AContext (will use it in the constructor of TimeSlot class)
   AContext.EntityFromVersion := Abs(AContext.ObjVersion);
 end;
 
+class procedure TioEtmInterceptor.BeforeInsert(const AContext: IioContext; var ADone: Boolean);
+begin
+  _SetEntityFromVersion(AContext);
+end;
+
+class procedure TioEtmInterceptor.BeforeUpdate(const AContext: IioContext; var ADone: Boolean);
+begin
+  _SetEntityFromVersion(AContext);
+end;
+
 class procedure TioEtmInterceptor.AfterUpdate(const AContext: IioContext);
 begin
-  CreateAndPersistNewTimeSlot_Internal(AContext);
+  _CreateAndPersistNewTimeSlot_Internal(AContext);
 end;
 
 class procedure TioEtmInterceptor.AfterInsert(const AContext: IioContext);
 begin
-  CreateAndPersistNewTimeSlot_Internal(AContext);
+  _CreateAndPersistNewTimeSlot_Internal(AContext);
 end;
 
 class procedure TioEtmInterceptor.AfterDelete(const AContext: IioContext);
 begin
-  CreateAndPersistNewTimeSlot_Internal(AContext);
+  _CreateAndPersistNewTimeSlot_Internal(AContext);
 end;
 
 end.

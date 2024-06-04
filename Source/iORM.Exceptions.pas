@@ -114,7 +114,7 @@ var
 begin
   if AContext.GetProperties.ObjVersionPropertyExist then
     LMsg := Format('Concurrency conflict persisting a "%s" entity with ID = %d, ObjVersion = %d on table "%s" using "%s" connection.',
-      [AContext.GetClassRef.ClassName, AContext.ObjID, AContext.ObjVersion, AContext.GetTable.TableName, AContext.GetTable.GetConnectionDefName])
+      [AContext.GetClassRef.ClassName, AContext.ObjID, Abs(AContext.ObjVersion), AContext.GetTable.TableName, AContext.GetTable.GetConnectionDefName])
   else
     LMsg := Format('Concurrency conflict persisting a "%s" entity with ID = %d on table "%s" using "%s" connection.',
       [AContext.GetClassRef.ClassName, AContext.ObjID, AContext.GetTable.TableName, AContext.GetTable.GetConnectionDefName]);
