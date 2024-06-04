@@ -69,7 +69,10 @@ type
     FPersistToClient: TTime;
     FFinalize: TTime;
     FCompleted: TTime;
-  private
+    // Error
+    FErrorState: TioSynchroErrorState;
+    FErrorMsg: String;
+    // Methods
     function GetSmartCount: String;
     function GetSmartUser: String;
   public
@@ -77,9 +80,11 @@ type
     property ID: Integer read FID write FID;
     property DateAndTime: TDateTime read FDateAndTime write FDateAndTime;
     property SynchroLevel: TioSynchroLevel read FSynchroLevel write FSynchroLevel;
+    [ioVarChar(100)]
     property SynchroLogName: String read FSynchroLogName write FSynchroLogName;
     property SynchroStatus: TioSynchroStatus read FSynchroStatus write FSynchroStatus;
     property UserID: Integer read FUserID write FUserID;
+    [ioVarChar(100)]
     property UserName: String read FUserName write FUserName;
     // Count
     property CliToSrv_Count: Integer read FCliToSrv_Count write FCliToSrv_Count;
@@ -97,6 +102,10 @@ type
     property SmartCount: String read GetSmartCount;
     [ioSkip]
     property SmartUser: String read GetSmartUser;
+    // Error
+    property ErrorState: TioSynchroErrorState read FErrorState write FErrorState;
+    [ioVarChar(1000)]
+    property ErrorMsg: String read FErrorMsg write FErrorMsg;
   end;
 
   // This class represents the payload of the synchronization operation in the sense that
@@ -146,6 +155,7 @@ type
     procedure _DoNewSynchroLogItem_SetStatus_Finalize; virtual;
     procedure _DoNewSynchroLogItem_SetStatus_Completed; virtual;
     procedure _DoNewSynchroLogItem_Persist; virtual;
+    procedure _DoNewSynchroLogItem_ExceptionRaised(const AException: Exception); virtual;
     // Payload
     procedure _DoLoadPayloadFromClient; virtual; abstract;
     procedure _DoPersistPayloadToServer; virtual; abstract;
@@ -166,6 +176,7 @@ type
     procedure PersistAndReloadFromServer;
     procedure PersistToClient;
     procedure Finalize;
+    procedure ExceptionRaised(const AException: Exception);
     // ---------- Methods to be called by the persistence strategy ----------
     property ClassBlackList: TioSynchroStrategy_ClassList read FClassBlackList; // TList because it will be serialized by djson
     property ClassWhiteList: TioSynchroStrategy_ClassList read FClassWhiteList; // TList because it will be serialized by djson
@@ -558,7 +569,15 @@ begin
   // Build the execute method that start the synchronization
   LExecuteMethod := procedure
   begin
-    LPersistenceStrategy.DoSynchronization(LPayload);
+    try
+      LPersistenceStrategy.DoSynchronization(LPayload);
+    except
+      on E: Exception do
+      begin
+        LPayload.ExceptionRaised(E);
+        raise;
+      end;
+    end;
   end;
   // Build the terminate method
   LTerminateMethod := procedure
@@ -603,6 +622,18 @@ begin
   if Assigned(FSynchroLogItem_New) then
     FSynchroLogItem_New.Free;
   inherited;
+end;
+
+procedure TioCustomSynchroStrategy_Payload.ExceptionRaised(const AException: Exception);
+begin
+  // Load raised exception info and persist it server side
+  _DoNewSynchroLogItem_ExceptionRaised(AException);
+  SwitchToTargetConnection;
+  try
+    _DoNewSynchroLogItem_Persist;
+  finally
+    SwitchToLocalConnection;
+  end;
 end;
 
 procedure TioCustomSynchroStrategy_Payload.Finalize;
@@ -708,6 +739,16 @@ begin
   FSynchroLogItem_New := TioCustomSynchroStrategy_LogItem.Create;
 end;
 
+procedure TioCustomSynchroStrategy_Payload._DoNewSynchroLogItem_ExceptionRaised(const AException: Exception);
+begin
+  // Set the state and message
+  if AException is EioConcurrencyConflictException then
+    FSynchroLogItem_New.ErrorState := esConflict
+  else
+    FSynchroLogItem_New.ErrorState := esError;
+  FSynchroLogItem_New.ErrorMsg := AException.Message;
+end;
+
 procedure TioCustomSynchroStrategy_Payload._DoNewSynchroLogItem_Initialize;
 begin
   // Initialize the new SynchroLogItem after its creation
@@ -738,6 +779,8 @@ procedure TioCustomSynchroStrategy_Payload._DoNewSynchroLogItem_SetStatus_Comple
 begin
   // Set the new SynchroLogitem progress status
   FSynchroLogItem_New.SynchroStatus := TioSynchroStatus.ssCompleted;
+  FSynchroLogItem_New.ErrorState := esOK;
+  FSynchroLogItem_New.ErrorMsg := String.Empty;
   FSynchroLogItem_New.Completed := Now;
 end;
 
@@ -833,6 +876,9 @@ begin
   FReloadFromServer := IO_DATETIME_NULL_VALUE;
   FPersistToClient := IO_DATETIME_NULL_VALUE;
   FCompleted := IO_DATETIME_NULL_VALUE;
+  // Error
+  FErrorState := esNotCompleted;
+  FErrorMsg := 'The sync process did NOT COMPLETE';
 end;
 
 function TioCustomSynchroStrategy_LogItem.GetSmartCount: String;

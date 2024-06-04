@@ -244,6 +244,10 @@ const
   ssPersistToClient = iORM.SynchroStrategy.Interfaces.ssPersistToClient;
   ssFinalization = iORM.SynchroStrategy.Interfaces.ssFinalization;
   ssCompleted = iORM.SynchroStrategy.Interfaces.ssCompleted;
+  // TioSynchroErrorState = (esOK, esNotCompleted, esError);
+  esOK = iORM.SynchroStrategy.Interfaces.esOK;
+  esNotCompleted = iORM.SynchroStrategy.Interfaces.esNotCompleted;
+  esError = iORM.SynchroStrategy.Interfaces.esError;
 
 {$ENDREGION}
 
@@ -318,6 +322,7 @@ type
   // Synchro strategies
   TioSynchroLevel = iORM.SynchroStrategy.Interfaces.TioSynchroLevel;
   TioSynchroStatus = iORM.SynchroStrategy.Interfaces.TioSynchroStatus;
+  TioSynchroErrorState = iORM.SynchroStrategy.Interfaces.TioSynchroErrorState;
 
 {$ENDREGION}
   // Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
@@ -2327,5 +2332,6 @@ initialization
   io.Enums.Add<TioEtmTimeSlotSynchroState>('regular, to be synchronized, sent to server, received from server, received from client');
   io.Enums.Add<TioSynchroLevel>('incremental, full');
   io.Enums.Add<TioSynchroStatus>('0-initialization, 1-load from client, 2-save to server, 3-reload from client, 4-save to client, 5-finalization, 6-completed');
+  io.Enums.Add<TioSynchroErrorState>(', NOT COMPLETED, CONFLICT, ERROR');
 
 end.

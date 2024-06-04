@@ -44,6 +44,8 @@ type
 
   TioSynchroStatus = (ssInitialization, ssLoadFromClient, ssPersistToServer, ssReloadFromServer, ssPersistToClient, ssFinalization, ssCompleted);
 
+  TioSynchroErrorState = (esOK, esNotCompleted, esConflict, esError);
+
   TioSynchroStrategy_ClassList = TList<String>;
 
   IioSynchroStrategy_Client = interface
