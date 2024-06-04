@@ -145,7 +145,7 @@ begin
   //        I suggest you to put the "inherited" at the bottom of the method
   AContext.ConflictState := AContext.Map.GetTable.InsertConflictStrategy_OnConflictSetStateAs;
   if AContext.ConflictState = csRejectedRaise then
-    raise EioDeleteConflictException.Create(ClassName, 'ResolveDeleteConflict', AContext);
+    raise EioInsertConflictException.Create(ClassName, 'ResolveInsertConflict', AContext);
 end;
 
 class procedure TioCustomConflictStrategy.ResolveUpdateConflict(const AContext: IioContext);

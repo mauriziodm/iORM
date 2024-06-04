@@ -65,6 +65,9 @@ type
 
   EioUpdateConflictException = class(EioConcurrencyConflictException)
   end;
+
+  EioInsertConflictException = class(EioConcurrencyConflictException)
+  end;
   // -----------------------------------------------------------------------------------------------
 
   // BindSource ObjState exceptions ----------------------------------------------------------------

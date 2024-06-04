@@ -161,6 +161,7 @@ type
     property AfterWhereClear: TioAfterWhereBuilderEvent read FAfterWhereClear write FAfterWhereClear;
     // Published Events: persistence concurrency conflicts
     property OnDeleteConflictException;
+    property OnInsertConflictException;
     property OnUpdateConflictException;
   end;
 

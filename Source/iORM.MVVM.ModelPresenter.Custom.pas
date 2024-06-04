@@ -95,6 +95,7 @@ type
     FAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     // Persistence conflict events
     FOnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent;
+    FOnInsertConflictException: TioBSOnPersistenceConflictExceptionEvent;
     FOnUpdateConflictException: TioBSOnPersistenceConflictExceptionEvent;
     // Events
     FAfterClose: TNotifyEvent;
@@ -179,8 +180,10 @@ type
     procedure SetSelectorFor(const ATargetBindSource: IioBindSource);
     // Persistence concurrency conflicts
     function GetOnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent;
+    function GetOnInsertConflictException: TioBSOnPersistenceConflictExceptionEvent;
     function GetOnUpdateConflictException: TioBSOnPersistenceConflictExceptionEvent;
     procedure SetOnDeleteConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
+    procedure SetOnInsertConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
     procedure SetOnUpdateConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
   protected
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean); virtual;
@@ -248,6 +251,7 @@ type
     property AfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FAfterSelectionInterface write FAfterSelectionInterface;
     // Published Events: persistence concurrency conflicts
     property OnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent read GetOnDeleteConflictException write SetOnDeleteConflictException;
+    property OnInsertConflictException: TioBSOnPersistenceConflictExceptionEvent read GetOnInsertConflictException write SetOnInsertConflictException;
     property OnUpdateConflictException: TioBSOnPersistenceConflictExceptionEvent read GetOnUpdateConflictException write SetOnUpdateConflictException;
     // published events
     property AfterClose: TNotifyEvent read FAfterClose write FAfterClose;
@@ -751,6 +755,11 @@ end;
 function TioModelPresenterCustom.GetOnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent;
 begin
   Result := FOnDeleteConflictException;
+end;
+
+function TioModelPresenterCustom.GetOnInsertConflictException: TioBSOnPersistenceConflictExceptionEvent;
+begin
+  Result := FOnInsertConflictException;
 end;
 
 function TioModelPresenterCustom.GetOnReceiveSelectionCloneObject: Boolean;
@@ -1330,6 +1339,11 @@ end;
 procedure TioModelPresenterCustom.SetOnDeleteConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
 begin
   FOnDeleteConflictException := APersistenceConflictEventHandler;
+end;
+
+procedure TioModelPresenterCustom.SetOnInsertConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
+begin
+  FOnInsertConflictException := APersistenceConflictEventHandler;
 end;
 
 procedure TioModelPresenterCustom.SetOnReceiveSelectionCloneObject(const Value: Boolean);

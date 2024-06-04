@@ -90,6 +90,7 @@ type
     FAfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent;
     // Persistence conflict events
     FOnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent;
+    FOnInsertConflictException: TioBSOnPersistenceConflictExceptionEvent;
     FOnUpdateConflictException: TioBSOnPersistenceConflictExceptionEvent;
 
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
@@ -167,8 +168,10 @@ type
     procedure SetSelectorFor(const ATargetBindSource: IioBindSource);
     // Persistence concurrency conflicts
     function GetOnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent;
+    function GetOnInsertConflictException: TioBSOnPersistenceConflictExceptionEvent;
     function GetOnUpdateConflictException: TioBSOnPersistenceConflictExceptionEvent;
     procedure SetOnDeleteConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
+    procedure SetOnInsertConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
     procedure SetOnUpdateConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
   protected
     procedure Loaded; override;
@@ -236,6 +239,7 @@ type
     property AfterSelectionInterface: TioBSABeforeAfterSelectionInterfaceEvent read FAfterSelectionInterface write FAfterSelectionInterface;
     // Published Events: persistence concurrency conflicts
     property OnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent read GetOnDeleteConflictException write SetOnDeleteConflictException;
+    property OnInsertConflictException: TioBSOnPersistenceConflictExceptionEvent read GetOnInsertConflictException write SetOnInsertConflictException;
     property OnUpdateConflictException: TioBSOnPersistenceConflictExceptionEvent read GetOnUpdateConflictException write SetOnUpdateConflictException;
   public
     constructor Create(AOwner: TComponent); override;
@@ -571,6 +575,11 @@ end;
 function TioDataSetCustom.GetOnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent;
 begin
   Result := FOnDeleteConflictException;
+end;
+
+function TioDataSetCustom.GetOnInsertConflictException: TioBSOnPersistenceConflictExceptionEvent;
+begin
+  Result := FOnInsertConflictException;
 end;
 
 function TioDataSetCustom.GetOnUpdateConflictException: TioBSOnPersistenceConflictExceptionEvent;
@@ -1028,6 +1037,11 @@ end;
 procedure TioDataSetCustom.SetOnDeleteConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
 begin
   FOnDeleteConflictException := APersistenceConflictEventHandler;
+end;
+
+procedure TioDataSetCustom.SetOnInsertConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
+begin
+  FOnInsertConflictException := APersistenceConflictEventHandler;
 end;
 
 procedure TioDataSetCustom.SetOnUpdateConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);

@@ -796,6 +796,20 @@ begin
                 raise;
             end;
             // ----------------------------
+            // BS.OnInsertConclictException
+            on E: EioInsertConflictException do
+            begin
+              if AActiveBindSourceAdapter.HasBindSource and Assigned(AActiveBindSourceAdapter.GetBindSource.OnInsertConflictException) then
+              begin
+                LConflictResolved := False;
+                AActiveBindSourceAdapter.GetBindSource.OnInsertConflictException(AActiveBindSourceAdapter.GetBindSource as TObject, LDataObj, LConflictResolved);
+                if not LConflictResolved then
+                  raise;
+              end
+              else
+                raise;
+            end;
+            // ----------------------------
             // BS.OnUpdateConclictException
             on E: EioUpdateConflictException do
             begin
