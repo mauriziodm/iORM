@@ -609,10 +609,10 @@ type
     property BlindLevel_DetectObjExists: Boolean read GetBlindLevel_DetectObjExists;
     property BlindLevel_DetectConflicts: Boolean read GetBlindLevel_DetectConflicts;
     // Conflict check by human related props
-    property ConflictCheckedByHuman: Boolean read FConflictCheckedByHuman;
-    property ConflictCheckedByHuman_ID: Integer read FConflictCheckedByHuman_ID;
-    property ConflictCheckedByHuman_Name: String read FConflictCheckedByHuman_Name;
-    property ConflictCheckedByHuman_DateTime: TDateTime read FConflictCheckedByHuman_DateTime;
+    property ConflictCheckedByHuman: Boolean read FConflictCheckedByHuman write FConflictCheckedByHuman;
+    property ConflictCheckedByHuman_ID: Integer read FConflictCheckedByHuman_ID write FConflictCheckedByHuman_ID;
+    property ConflictCheckedByHuman_Name: String read FConflictCheckedByHuman_Name write FConflictCheckedByHuman_Name;
+    property ConflictCheckedByHuman_DateTime: TDateTime read FConflictCheckedByHuman_DateTime write FConflictCheckedByHuman_DateTime;
     // Synchronization
     property TimeSlotSynchroState: TioEtmTimeSlotSynchroState read FTimeSlotSynchroState;
     // Smart properties
