@@ -55,9 +55,11 @@ type
     DSWhereFromPrice: TCurrencyField;
     DSWhereToPrice: TCurrencyField;
     ioViewModelBridge1: TioViewModelBridge;
+    Label5: TLabel;
+    DBEditWhereIngredient: TDBEdit;
+    DSWhereIngredientName: TStringField;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure DBCtrlGridPizzasDblClick(Sender: TObject);
   private
   public
   end;
@@ -65,11 +67,6 @@ type
 implementation
 
 {$R *.dfm}
-
-procedure TPizzaListForm.DBCtrlGridPizzasDblClick(Sender: TObject);
-begin
-  acShowOrSelect.Execute;
-end;
 
 procedure TPizzaListForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin

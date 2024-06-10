@@ -9,6 +9,15 @@
         <Projects Include="PizzAmore_25_LowCode_Classes_SimpleViews\fmx\PizzAmore_25_LowCode_Classes_SimpleViews_Fmx.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="PizzAmore_25_LowCode_Classes_SimpleViews\server_dmvc\PizzAmore_25_LowCode_Classes_Server_DMVC.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="PizzAmore_25_LowCode_Classes_SimpleViews\server_wirl\PizzAmore_25_LowCode_Classes_Server_WiRL.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="PizzAmore_25_LowCode_Classes_SimpleViews\server_webbroker\PizzAmore_25_LowCode_Classes_WebBroker_Server.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="PizzAmore_30_LowCode_Interfaces_MVVM\mvvm_vcl\PizzAmore_30_LowCode_Interfaces_mvvm_Vcl.dproj">
             <Dependencies/>
         </Projects>
@@ -44,6 +53,33 @@
     <Target Name="PizzAmore_25_LowCode_Classes_SimpleViews_Fmx:Make">
         <MSBuild Projects="PizzAmore_25_LowCode_Classes_SimpleViews\fmx\PizzAmore_25_LowCode_Classes_SimpleViews_Fmx.dproj" Targets="Make"/>
     </Target>
+    <Target Name="PizzAmore_25_LowCode_Classes_Server_DMVC">
+        <MSBuild Projects="PizzAmore_25_LowCode_Classes_SimpleViews\server_dmvc\PizzAmore_25_LowCode_Classes_Server_DMVC.dproj"/>
+    </Target>
+    <Target Name="PizzAmore_25_LowCode_Classes_Server_DMVC:Clean">
+        <MSBuild Projects="PizzAmore_25_LowCode_Classes_SimpleViews\server_dmvc\PizzAmore_25_LowCode_Classes_Server_DMVC.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PizzAmore_25_LowCode_Classes_Server_DMVC:Make">
+        <MSBuild Projects="PizzAmore_25_LowCode_Classes_SimpleViews\server_dmvc\PizzAmore_25_LowCode_Classes_Server_DMVC.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="PizzAmore_25_LowCode_Classes_Server_WiRL">
+        <MSBuild Projects="PizzAmore_25_LowCode_Classes_SimpleViews\server_wirl\PizzAmore_25_LowCode_Classes_Server_WiRL.dproj"/>
+    </Target>
+    <Target Name="PizzAmore_25_LowCode_Classes_Server_WiRL:Clean">
+        <MSBuild Projects="PizzAmore_25_LowCode_Classes_SimpleViews\server_wirl\PizzAmore_25_LowCode_Classes_Server_WiRL.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PizzAmore_25_LowCode_Classes_Server_WiRL:Make">
+        <MSBuild Projects="PizzAmore_25_LowCode_Classes_SimpleViews\server_wirl\PizzAmore_25_LowCode_Classes_Server_WiRL.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="PizzAmore_25_LowCode_Classes_WebBroker_Server">
+        <MSBuild Projects="PizzAmore_25_LowCode_Classes_SimpleViews\server_webbroker\PizzAmore_25_LowCode_Classes_WebBroker_Server.dproj"/>
+    </Target>
+    <Target Name="PizzAmore_25_LowCode_Classes_WebBroker_Server:Clean">
+        <MSBuild Projects="PizzAmore_25_LowCode_Classes_SimpleViews\server_webbroker\PizzAmore_25_LowCode_Classes_WebBroker_Server.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PizzAmore_25_LowCode_Classes_WebBroker_Server:Make">
+        <MSBuild Projects="PizzAmore_25_LowCode_Classes_SimpleViews\server_webbroker\PizzAmore_25_LowCode_Classes_WebBroker_Server.dproj" Targets="Make"/>
+    </Target>
     <Target Name="PizzAmore_30_LowCode_Interfaces_mvvm_Vcl">
         <MSBuild Projects="PizzAmore_30_LowCode_Interfaces_MVVM\mvvm_vcl\PizzAmore_30_LowCode_Interfaces_mvvm_Vcl.dproj"/>
     </Target>
@@ -72,13 +108,13 @@
         <MSBuild Projects="PizzAmore_30_LowCode_Interfaces_MVVM\mvvm_unigui\PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="PizzAmore_25_LowCode_Classes_SimpleViews_Vcl;PizzAmore_25_LowCode_Classes_SimpleViews_Fmx;PizzAmore_30_LowCode_Interfaces_mvvm_Vcl;PizzAmore_30_LowCode_Interfaces_mvvm_Fmx;PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI"/>
+        <CallTarget Targets="PizzAmore_25_LowCode_Classes_SimpleViews_Vcl;PizzAmore_25_LowCode_Classes_SimpleViews_Fmx;PizzAmore_25_LowCode_Classes_Server_DMVC;PizzAmore_25_LowCode_Classes_Server_WiRL;PizzAmore_25_LowCode_Classes_WebBroker_Server;PizzAmore_30_LowCode_Interfaces_mvvm_Vcl;PizzAmore_30_LowCode_Interfaces_mvvm_Fmx;PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="PizzAmore_25_LowCode_Classes_SimpleViews_Vcl:Clean;PizzAmore_25_LowCode_Classes_SimpleViews_Fmx:Clean;PizzAmore_30_LowCode_Interfaces_mvvm_Vcl:Clean;PizzAmore_30_LowCode_Interfaces_mvvm_Fmx:Clean;PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI:Clean"/>
+        <CallTarget Targets="PizzAmore_25_LowCode_Classes_SimpleViews_Vcl:Clean;PizzAmore_25_LowCode_Classes_SimpleViews_Fmx:Clean;PizzAmore_25_LowCode_Classes_Server_DMVC:Clean;PizzAmore_25_LowCode_Classes_Server_WiRL:Clean;PizzAmore_25_LowCode_Classes_WebBroker_Server:Clean;PizzAmore_30_LowCode_Interfaces_mvvm_Vcl:Clean;PizzAmore_30_LowCode_Interfaces_mvvm_Fmx:Clean;PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="PizzAmore_25_LowCode_Classes_SimpleViews_Vcl:Make;PizzAmore_25_LowCode_Classes_SimpleViews_Fmx:Make;PizzAmore_30_LowCode_Interfaces_mvvm_Vcl:Make;PizzAmore_30_LowCode_Interfaces_mvvm_Fmx:Make;PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI:Make"/>
+        <CallTarget Targets="PizzAmore_25_LowCode_Classes_SimpleViews_Vcl:Make;PizzAmore_25_LowCode_Classes_SimpleViews_Fmx:Make;PizzAmore_25_LowCode_Classes_Server_DMVC:Make;PizzAmore_25_LowCode_Classes_Server_WiRL:Make;PizzAmore_25_LowCode_Classes_WebBroker_Server:Make;PizzAmore_30_LowCode_Interfaces_mvvm_Vcl:Make;PizzAmore_30_LowCode_Interfaces_mvvm_Fmx:Make;PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

@@ -4,8 +4,8 @@ object OrderForm: TOrderForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 561
-  ClientWidth = 780
+  ClientHeight = 560
+  ClientWidth = 776
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -128,7 +128,7 @@ object OrderForm: TOrderForm
     Action = acShowCustomer
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
-    Font.Height = -13
+    Font.Height = -16
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentFont = False
@@ -136,16 +136,22 @@ object OrderForm: TOrderForm
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 780
+    Width = 776
     Height = 40
     Align = alTop
     BevelOuter = bvNone
     Color = clNavy
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = []
     ParentBackground = False
+    ParentFont = False
     TabOrder = 0
-    ExplicitWidth = 776
+    ExplicitWidth = 772
     DesignSize = (
-      780
+      776
       40)
     object ButtonBack: TSpeedButton
       Left = 0
@@ -156,7 +162,7 @@ object OrderForm: TOrderForm
       Align = alLeft
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clNavy
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
@@ -164,7 +170,7 @@ object OrderForm: TOrderForm
     object LabelTitle: TLabel
       Left = 56
       Top = 7
-      Width = 306
+      Width = 266
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -177,9 +183,10 @@ object OrderForm: TOrderForm
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlCenter
+      ExplicitWidth = 306
     end
     object ButtonAdd: TSpeedButton
-      Left = 730
+      Left = 726
       Top = 0
       Width = 50
       Height = 40
@@ -187,39 +194,40 @@ object OrderForm: TOrderForm
       Align = alRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clNavy
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
       ExplicitLeft = 712
     end
     object ButtonETM: TSpeedButton
-      Left = 368
+      Left = 328
       Top = 0
-      Width = 60
+      Width = 85
       Height = 40
       Action = acShowETM
       Anchors = [akTop, akRight]
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clNavy
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      ExplicitLeft = 332
     end
   end
   object PanelBottom: TPanel
     Left = 0
-    Top = 521
-    Width = 780
+    Top = 520
+    Width = 776
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
-    ExplicitTop = 520
-    ExplicitWidth = 776
+    ExplicitTop = 519
+    ExplicitWidth = 772
     object ButtonRevert: TSpeedButton
       Left = 0
       Top = 0
@@ -229,7 +237,7 @@ object OrderForm: TOrderForm
       Align = alLeft
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clRed
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
@@ -237,7 +245,7 @@ object OrderForm: TOrderForm
       ExplicitTop = -6
     end
     object ButtonPersist: TSpeedButton
-      Left = 730
+      Left = 726
       Top = 0
       Width = 50
       Height = 40
@@ -245,7 +253,7 @@ object OrderForm: TOrderForm
       Align = alRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clGreen
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
@@ -269,13 +277,13 @@ object OrderForm: TOrderForm
     object ButtonDeleteRow: TSpeedButton
       Left = 50
       Top = 0
-      Width = 79
+      Width = 111
       Height = 40
       Action = acDeleteRow
       Align = alLeft
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
@@ -301,22 +309,22 @@ object OrderForm: TOrderForm
     end
   end
   object PanelPizzas: TPanel
-    Left = 430
+    Left = 426
     Top = 40
     Width = 350
-    Height = 481
+    Height = 480
     Align = alRight
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 2
-    ExplicitLeft = 426
-    ExplicitHeight = 480
+    ExplicitLeft = 422
+    ExplicitHeight = 479
     object DBCtrlGridPizzas: TDBCtrlGrid
       Left = 0
       Top = 0
       Width = 350
-      Height = 481
+      Height = 480
       Align = alClient
       AllowDelete = False
       AllowInsert = False
@@ -328,7 +336,7 @@ object OrderForm: TOrderForm
       SelectedColor = 13828095
       ShowFocus = False
       OnDblClick = DBCtrlGridPizzasDblClick
-      ExplicitHeight = 480
+      ExplicitHeight = 479
       object DBTextName: TDBText
         Left = 99
         Top = 20
@@ -495,15 +503,21 @@ object OrderForm: TOrderForm
     TabOrder = 9
   end
   object GridRows: TDBGrid
-    Left = 5
-    Top = 239
-    Width = 423
+    Left = 8
+    Top = 238
+    Width = 416
     Height = 277
     BorderStyle = bsNone
     DataSource = SourceRows
     FixedColor = clInactiveBorder
     GradientEndColor = clInactiveBorder
     GradientStartColor = clInactiveBorder
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
     TabOrder = 10
     TitleFont.Charset = DEFAULT_CHARSET
     TitleFont.Color = clWindowText
@@ -513,8 +527,9 @@ object OrderForm: TOrderForm
     Columns = <
       item
         Expanded = False
-        FieldName = 'Description'
+        FieldName = 'Pizza.Name'
         Title.Alignment = taCenter
+        Title.Caption = 'Pizza name'
         Title.Font.Charset = DEFAULT_CHARSET
         Title.Font.Color = clNavy
         Title.Font.Height = -13
@@ -525,8 +540,9 @@ object OrderForm: TOrderForm
       end
       item
         Expanded = False
-        FieldName = 'UnitPrice'
+        FieldName = 'Pizza.Price'
         Title.Alignment = taCenter
+        Title.Caption = 'Price'
         Title.Font.Charset = DEFAULT_CHARSET
         Title.Font.Color = clNavy
         Title.Font.Height = -13
@@ -677,12 +693,12 @@ object OrderForm: TOrderForm
     MasterPropertyName = 'Rows'
     Left = 56
     Top = 440
-    object DSRowsDescription: TStringField
-      FieldName = 'Description'
+    object DSRowsPizzaName: TStringField
+      FieldName = 'Pizza.Name'
       Size = 100
     end
-    object DSRowsPrice: TCurrencyField
-      FieldName = 'Price'
+    object DSRowsPizzaPrice: TCurrencyField
+      FieldName = 'Pizza.Price'
     end
     object DSRowsQty: TIntegerField
       FieldName = 'Qty'
@@ -754,6 +770,7 @@ object OrderForm: TOrderForm
       ShowMode = smEntityTypeNameAsETM
       TargetBindSource = DSOrder
       ViewContextBy = vcByDefaultViewContextProvider
+      VVMTypeAlias = 'LIST'
     end
   end
 end

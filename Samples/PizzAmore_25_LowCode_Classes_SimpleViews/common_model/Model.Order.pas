@@ -26,7 +26,7 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure AddPizza(const APizza: TPizza);
-    property ID: Integer read FID write FID;  // ReadOnly if you want
+    property ID: Integer read FID write FID; // ReadOnly if you want
     property OrderDate: TDate read FOrderDate Write FOrderDate;
     property Customer: TCustomer read FCustomer write FCustomer;
     property Rows: TObjectList<TOrderRow> read FRows; // ReadOnly
@@ -49,7 +49,7 @@ begin
   // If a row with the same pizza is present then increment its qty
   for LRow in Rows do
   begin
-    if LRow.PizzaID = APizza.ID then
+    if LRow.Pizza.ID = APizza.ID then
     begin
       LRow.Qty := LRow.Qty + 1;
       Exit;

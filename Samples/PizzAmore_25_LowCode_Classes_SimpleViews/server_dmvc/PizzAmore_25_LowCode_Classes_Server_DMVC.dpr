@@ -1,4 +1,4 @@
-program PizzAmore_25_LowCode_Classes_Server;
+program PizzAmore_25_LowCode_Classes_Server_DMVC;
 
 {$APPTYPE CONSOLE}
 
@@ -13,15 +13,17 @@ uses
   IdContext,
   IdHTTPWebBrokerBridge,
   WebModule in 'WebModule.pas' {MyWebModule: TWebModule},
-  ETM.Repository in '..\common_model\ETM.Repository.pas',
-  Model.Customer in '..\common_model\Model.Customer.pas',
-  Model.Order in '..\common_model\Model.Order.pas',
-  Model.OrderRow in '..\common_model\Model.OrderRow.pas',
-  Model.Pizza in '..\common_model\Model.Pizza.pas',
-  Utils.SampleData in '..\common_model\Utils.SampleData.pas',
-  Where.Order in '..\common_model\Where.Order.pas',
+  iORM.Http.Server.DMVC.Controller in 'C:\delphi\tools\iORM\Source\http_server_units\iORM.Http.Server.DMVC.Controller.pas',
   Where.Pizza in '..\common_model\Where.Pizza.pas',
-  iORM.Http.Server.DMVC.Controller in '..\..\..\Source\http_server_units\iORM.Http.Server.DMVC.Controller.pas';
+  Where.Order in '..\common_model\Where.Order.pas',
+  Utils.SampleData in '..\common_model\Utils.SampleData.pas',
+  Model.Pizza in '..\common_model\Model.Pizza.pas',
+  Model.Pizza.IngredientRow in '..\common_model\Model.Pizza.IngredientRow.pas',
+  Model.OrderRow in '..\common_model\Model.OrderRow.pas',
+  Model.Order in '..\common_model\Model.Order.pas',
+  Model.Ingredient in '..\common_model\Model.Ingredient.pas',
+  Model.Customer in '..\common_model\Model.Customer.pas',
+  ETM.Repository in '..\common_model\ETM.Repository.pas';
 
 {$R *.res}
 

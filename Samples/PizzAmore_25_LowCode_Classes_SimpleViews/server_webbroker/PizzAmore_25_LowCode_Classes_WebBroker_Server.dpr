@@ -15,8 +15,10 @@ uses
   Where.Order in '..\common_model\Where.Order.pas',
   Utils.SampleData in '..\common_model\Utils.SampleData.pas',
   Model.Pizza in '..\common_model\Model.Pizza.pas',
+  Model.Pizza.IngredientRow in '..\common_model\Model.Pizza.IngredientRow.pas',
   Model.OrderRow in '..\common_model\Model.OrderRow.pas',
   Model.Order in '..\common_model\Model.Order.pas',
+  Model.Ingredient in '..\common_model\Model.Ingredient.pas',
   Model.Customer in '..\common_model\Model.Customer.pas',
   ETM.Repository in '..\common_model\ETM.Repository.pas';
 

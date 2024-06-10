@@ -4,7 +4,7 @@ object CustomerListForm: TCustomerListForm
   BorderIcons = [biSystemMenu, biMinimize]
   Caption = 'Pizz'#39'Amore'
   ClientHeight = 760
-  ClientWidth = 380
+  ClientWidth = 496
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,7 +19,7 @@ object CustomerListForm: TCustomerListForm
   object PanelBottom: TPanel
     Left = 0
     Top = 720
-    Width = 380
+    Width = 496
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
@@ -27,9 +27,9 @@ object CustomerListForm: TCustomerListForm
     ParentBackground = False
     TabOrder = 0
     ExplicitTop = 719
-    ExplicitWidth = 376
+    ExplicitWidth = 492
     object ButtonAdd: TSpeedButton
-      Left = 330
+      Left = 446
       Top = 0
       Width = 50
       Height = 40
@@ -37,26 +37,25 @@ object CustomerListForm: TCustomerListForm
       Align = alRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clGreen
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
       ExplicitLeft = 264
     end
     object ButtonPageUp: TSpeedButton
-      Left = 100
+      Left = 120
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
       Action = acNextPage
       Align = alLeft
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 94
     end
     object ButtonDelete: TSpeedButton
       Left = 0
@@ -67,7 +66,7 @@ object CustomerListForm: TCustomerListForm
       Align = alLeft
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clRed
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
@@ -76,23 +75,21 @@ object CustomerListForm: TCustomerListForm
     object ButtonPageDown: TSpeedButton
       Left = 50
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
       Action = acPrevPage
       Align = alLeft
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 56
-      ExplicitTop = 6
     end
     object DBTextPageOf: TDBText
-      Left = 150
+      Left = 190
       Top = 0
-      Width = 180
+      Width = 256
       Height = 40
       Align = alClient
       Alignment = taCenter
@@ -100,27 +97,28 @@ object CustomerListForm: TCustomerListForm
       DataSource = SourceCustomers
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
       ExplicitLeft = 144
       ExplicitTop = 1
+      ExplicitWidth = 180
     end
   end
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 380
+    Width = 496
     Height = 40
     Align = alTop
     BevelOuter = bvNone
     Color = clNavy
     ParentBackground = False
     TabOrder = 1
-    ExplicitWidth = 376
+    ExplicitWidth = 492
     object ButtonSelect: TSpeedButton
-      Left = 330
+      Left = 446
       Top = 0
       Width = 50
       Height = 40
@@ -128,7 +126,7 @@ object CustomerListForm: TCustomerListForm
       Align = alRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clNavy
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
@@ -144,13 +142,13 @@ object CustomerListForm: TCustomerListForm
       Align = alLeft
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clNavy
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
     end
     object LabelTitle: TLabel
-      Left = 150
+      Left = 198
       Top = 7
       Width = 80
       Height = 21
@@ -166,17 +164,22 @@ object CustomerListForm: TCustomerListForm
   object GridCustomers: TDBGrid
     Left = 0
     Top = 40
-    Width = 380
+    Width = 496
     Height = 601
     Align = alClient
     DataSource = SourceCustomers
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
     TabOrder = 2
     TitleFont.Charset = DEFAULT_CHARSET
     TitleFont.Color = clWindowText
     TitleFont.Height = -12
     TitleFont.Name = 'Segoe UI'
     TitleFont.Style = []
-    OnDblClick = GridCustomersDblClick
     Columns = <
       item
         Expanded = False
@@ -187,7 +190,7 @@ object CustomerListForm: TCustomerListForm
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
-        Width = 40
+        Width = 57
         Visible = True
       end
       item
@@ -199,7 +202,7 @@ object CustomerListForm: TCustomerListForm
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
-        Width = 200
+        Width = 222
         Visible = True
       end
       item
@@ -212,14 +215,14 @@ object CustomerListForm: TCustomerListForm
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
-        Width = 100
+        Width = 166
         Visible = True
       end>
   end
   object PanelWhere: TPanel
     Left = 0
     Top = 641
-    Width = 380
+    Width = 496
     Height = 79
     Align = alBottom
     BevelOuter = bvNone
@@ -227,9 +230,9 @@ object CustomerListForm: TCustomerListForm
     ParentBackground = False
     TabOrder = 3
     ExplicitTop = 640
-    ExplicitWidth = 376
+    ExplicitWidth = 492
     DesignSize = (
-      380
+      496
       79)
     object Label1: TLabel
       Left = 8
@@ -277,7 +280,7 @@ object CustomerListForm: TCustomerListForm
       ParentFont = False
     end
     object ButtonSearch: TSpeedButton
-      Left = 186
+      Left = 442
       Top = 0
       Width = 50
       Height = 45
@@ -285,14 +288,14 @@ object CustomerListForm: TCustomerListForm
       Anchors = [akTop, akRight]
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
-      ExplicitLeft = 330
+      ExplicitLeft = 446
     end
     object ButtonClear: TSpeedButton
-      Left = 186
+      Left = 442
       Top = 49
       Width = 50
       Height = 25
@@ -300,11 +303,11 @@ object CustomerListForm: TCustomerListForm
       Anchors = [akTop, akRight]
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 330
+      ExplicitLeft = 446
     end
     object DBEditWhereID: TDBEdit
       Left = 43
@@ -326,7 +329,7 @@ object CustomerListForm: TCustomerListForm
     object DBEditWhereName: TDBEdit
       Left = 155
       Top = 6
-      Width = 4
+      Width = 261
       Height = 25
       Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
@@ -340,12 +343,12 @@ object CustomerListForm: TCustomerListForm
       Font.Style = []
       ParentFont = False
       TabOrder = 1
-      ExplicitWidth = 0
+      ExplicitWidth = 257
     end
     object DBEditWhereCity: TDBEdit
       Left = 43
       Top = 37
-      Width = 86
+      Width = 166
       Height = 25
       Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
@@ -359,7 +362,7 @@ object CustomerListForm: TCustomerListForm
       Font.Style = []
       ParentFont = False
       TabOrder = 2
-      ExplicitWidth = 82
+      ExplicitWidth = 162
     end
   end
   object DSCustomers: TioDataSetMaster
@@ -369,7 +372,7 @@ object CustomerListForm: TCustomerListForm
     VirtualFields = True
     Paging.CurrentPageOfFormat = 'Page %d of %d'
     Paging.PageSize = 50
-    Paging.PagingType = ptProgressiveAuto
+    Paging.PagingType = ptHardPaging
     Left = 56
     Top = 112
     object DSCustomersID: TIntegerField

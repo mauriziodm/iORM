@@ -5,7 +5,7 @@ Coordinates=191,71,50,33
 Coordinates=191,123,57,33
 
 [BSMaster]
-Coordinates=10,140,61,123
+Coordinates=10,140,61,141
 Visible=True
 
 [ButtonBack]
@@ -82,7 +82,7 @@ Coordinates=321,420,100,51
 Coordinates=10,497,46,51
 
 [BSRows]
-Coordinates=544,10,57,123
+Coordinates=544,10,61,123
 
 [EditGrandTotal]
 Coordinates=151,10,88,51
@@ -108,4 +108,23 @@ Coordinates=342,80,82,33
 
 [acDeleteRow]
 Coordinates=72,52,78,33
+
+[acShowETM]
+Coordinates=277,1,75,33
+
+[ButtonETM]
+Coordinates=0,0,69,51
+
+[acRevertOrDelete]
+Coordinates=462,191,100,33
+
+[acShowPizzaSelector]
+Coordinates=462,243,119,33
+
+[acShowCustomerSelector]
+Coordinates=462,295,141,33
+
+[ComboBoxOrderState]
+Coordinates=340,230,121,123
+Visible=True
 

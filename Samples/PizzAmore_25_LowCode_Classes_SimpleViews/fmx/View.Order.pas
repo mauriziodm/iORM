@@ -8,7 +8,7 @@ uses
   Data.Bind.Components, Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.PrototypeBindSource.Master, iORM.StdActions.Fmx,
   System.Actions, FMX.ActnList, FMX.Controls.Presentation, FMX.Objects, System.Rtti, FMX.Grid.Style, FMX.ScrollBox, FMX.Grid, FMX.Edit, FMX.Layouts,
   Data.Bind.GenData, iORM.LiveBindings.PrototypeBindSource.Detail, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt, Fmx.Bind.DBEngExt,
-  Fmx.Bind.Grid, Data.Bind.Grid, Model.Order, Fmx.Bind.Navigator;
+  Fmx.Bind.Grid, Data.Bind.Grid, Model.Order, Fmx.Bind.Navigator, FMX.ListBox;
 
 type
 
@@ -48,9 +48,13 @@ type
     acDeleteRow: TFMXBindNavigateDelete;
     acShowCustomerSelector: TioBSShowOrSelect;
     acShowPizzaSelector: TioBSShowOrSelect;
+    ComboBoxOrderState: TComboBox;
+    LinkFillControlToField1: TLinkFillControlToField;
+    Label7: TLabel;
     procedure BSMasterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
   private
   public
+    constructor Create(AOwner: TComponent); override;
   end;
 
 implementation
@@ -66,6 +70,12 @@ begin
   BSMaster.CurrentAs<TOrder>.AddPizza(ASelected as TPizza);
   BSMaster.Refresh;
   ADone := True;
+end;
+
+constructor TViewOrder.Create(AOwner: TComponent);
+begin
+  inherited;
+  io.Enums.FillStrings<TOrderState>(ComboBoxOrderState.Items);
 end;
 
 end.

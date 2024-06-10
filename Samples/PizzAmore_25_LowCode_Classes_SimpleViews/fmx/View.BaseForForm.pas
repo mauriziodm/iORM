@@ -23,7 +23,6 @@ type
     ButtonBack: TSpeedButton;
     ButtonETM: TSpeedButton;
     acShowETM: TioBSShowOrSelect;
-    procedure acShowETMExecute(Sender: TObject);
   private
   public
   end;
@@ -31,10 +30,5 @@ type
 implementation
 
 {$R *.fmx}
-
-procedure TViewBaseForForm.acShowETMExecute(Sender: TObject);
-begin
-  ShowMessage('Ciao');
-end;
 
 end.

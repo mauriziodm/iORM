@@ -21,8 +21,17 @@ inherited ViewOrderList: TViewOrderList
   end
   inherited ListView: TListView
     ItemIndex = 0
+    Size.Height = 365.000000000000000000
   end
   inherited RectangleWhere: TRectangle
+    Position.Y = 405.000000000000000000
+    Size.Height = 155.000000000000000000
+    inherited RectangleWhereButtons: TRectangle
+      Size.Height = 155.000000000000000000
+      inherited ButtonClear: TSpeedButton
+        Position.Y = 115.000000000000000000
+      end
+    end
     object Label1: TLabel
       StyledSettings = [Family]
       Position.X = 8.000000000000000000
@@ -34,11 +43,11 @@ inherited ViewOrderList: TViewOrderList
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       TextSettings.FontColor = claDarkslategray
       Text = 'Note'
-      TabOrder = 4
+      TabOrder = 10
     end
     object EditWhereNote: TEdit
       Touch.InteractiveGestures = [LongTap, DoubleTap]
-      TabOrder = 2
+      TabOrder = 6
       TextSettings.Font.Size = 14.000000000000000000
       Position.X = 55.000000000000000000
       Position.Y = 46.000000000000000000
@@ -58,7 +67,7 @@ inherited ViewOrderList: TViewOrderList
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       TextSettings.FontColor = claDarkslategray
       Text = 'From date'
-      TabOrder = 3
+      TabOrder = 9
     end
     object Label2: TLabel
       StyledSettings = [Family]
@@ -71,7 +80,7 @@ inherited ViewOrderList: TViewOrderList
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       TextSettings.FontColor = claDarkslategray
       Text = 'Status'
-      TabOrder = 6
+      TabOrder = 12
     end
     object ComboBoxWhereState: TComboBox
       Position.X = 55.000000000000000000
@@ -79,7 +88,7 @@ inherited ViewOrderList: TViewOrderList
       Size.Width = 100.000000000000000000
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 7
+      TabOrder = 13
     end
     object DateEditWhereFromDate: TDateEdit
       Date = 45067.000000000000000000
@@ -89,7 +98,7 @@ inherited ViewOrderList: TViewOrderList
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
       StyledSettings = [Family, Style, FontColor]
-      TabOrder = 10
+      TabOrder = 16
       TextSettings.Font.Size = 14.000000000000000000
       TextSettings.HorzAlign = Center
     end
@@ -104,7 +113,7 @@ inherited ViewOrderList: TViewOrderList
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       TextSettings.FontColor = claDarkslategray
       Text = 'To date'
-      TabOrder = 5
+      TabOrder = 11
     end
     object DateEditToDate: TDateEdit
       Date = 45067.000000000000000000
@@ -114,7 +123,7 @@ inherited ViewOrderList: TViewOrderList
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
       StyledSettings = [Family, Style, FontColor]
-      TabOrder = 9
+      TabOrder = 15
       TextSettings.Font.Size = 14.000000000000000000
       TextSettings.HorzAlign = Center
     end
@@ -126,6 +135,78 @@ inherited ViewOrderList: TViewOrderList
       Size.Height = 68.000000000000000000
       Size.PlatformDefault = False
       Stroke.Color = claDarkslategray
+    end
+    object EditWhereCustomerName: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 4
+      TextSettings.Font.Size = 14.000000000000000000
+      Position.X = 81.000000000000000000
+      Position.Y = 84.000000000000000000
+      Size.Width = 95.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      StyledSettings = [Family, Style, FontColor]
+    end
+    object Label5: TLabel
+      StyledSettings = [Family]
+      Position.X = 8.000000000000000000
+      Position.Y = 84.000000000000000000
+      Size.Width = 71.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claDarkslategray
+      Text = 'Cust.name'
+      TabOrder = 8
+    end
+    object EditWherePizzaName: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 2
+      TextSettings.Font.Size = 14.000000000000000000
+      Position.X = 261.000000000000000000
+      Position.Y = 84.000000000000000000
+      Size.Width = 91.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      StyledSettings = [Family, Style, FontColor]
+    end
+    object Label6: TLabel
+      StyledSettings = [Family]
+      Position.X = 182.000000000000000000
+      Position.Y = 84.000000000000000000
+      Size.Width = 81.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claDarkslategray
+      Text = 'Pizza name'
+      TabOrder = 5
+    end
+    object Label7: TLabel
+      StyledSettings = [Family]
+      Position.X = 8.000000000000000000
+      Position.Y = 122.000000000000000000
+      Size.Width = 71.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claDarkslategray
+      Text = 'Ingred.'
+      TabOrder = 7
+    end
+    object EditWhereIngredientName: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 3
+      TextSettings.Font.Size = 14.000000000000000000
+      Position.X = 81.000000000000000000
+      Position.Y = 122.000000000000000000
+      Size.Width = 271.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      StyledSettings = [Family, Style, FontColor]
     end
   end
   inherited ActionList1: TActionList
@@ -191,10 +272,27 @@ inherited ViewOrderList: TViewOrderList
         FieldType = ftDate
         Generator = 'Date'
         ReadOnly = False
+      end
+      item
+        Name = 'CustomerName'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'PizzaName'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'IngredientName'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
       end>
     TypeName = 'TWhereOrder'
     AfterSelectionObject = BSWhereAfterSelectionObject
     OnReceiveSelectionFreeObject = False
+    Left = 123
+    Top = 484
   end
   object BindingsList1: TBindingsList
     Methods = <>
@@ -248,6 +346,27 @@ inherited ViewOrderList: TViewOrderList
       DataSource = BSWhere
       FieldName = 'ToDate'
       Control = DateEditToDate
+      Track = False
+    end
+    object LinkControlToField4: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWhere
+      FieldName = 'CustomerName'
+      Control = EditWhereCustomerName
+      Track = False
+    end
+    object LinkControlToField5: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWhere
+      FieldName = 'IngredientName'
+      Control = EditWhereIngredientName
+      Track = False
+    end
+    object LinkControlToField6: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWhere
+      FieldName = 'PizzaName'
+      Control = EditWherePizzaName
       Track = False
     end
   end

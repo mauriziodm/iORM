@@ -57,7 +57,6 @@ type
     DSWhereCity: TStringField;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure GridCustomersDblClick(Sender: TObject);
   private
   public
   end;
@@ -75,11 +74,6 @@ procedure TCustomerListForm.FormShow(Sender: TObject);
 begin
   DSCustomers.Open;
   DSWhere.Open;
-end;
-
-procedure TCustomerListForm.GridCustomersDblClick(Sender: TObject);
-begin
-  acShowOrSelect.Execute;
 end;
 
 end.

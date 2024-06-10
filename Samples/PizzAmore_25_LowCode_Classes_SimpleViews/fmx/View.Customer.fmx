@@ -25,7 +25,7 @@ inherited CustomerView: TCustomerView
       object EditID: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         StyleLookup = 'transparentedit'
-        TabOrder = 40
+        TabOrder = 41
         Text = '-33'
         TextSettings.Font.StyleExt = {00070000000000000004000000}
         Position.X = 5.000000000000000000
@@ -48,7 +48,7 @@ inherited CustomerView: TCustomerView
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         Anchors = [akLeft, akTop, akRight]
         StyleLookup = 'transparentedit'
-        TabOrder = 39
+        TabOrder = 40
         Text = 'Mark Anderson'
         TextSettings.Font.StyleExt = {00070000000000000004000000}
         Position.X = 56.000000000000000000
@@ -77,7 +77,7 @@ inherited CustomerView: TCustomerView
       object EditPhoneNumber: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         StyleLookup = 'transparentedit'
-        TabOrder = 39
+        TabOrder = 40
         Text = '-33'
         TextSettings.Font.StyleExt = {00070000000000000004000000}
         Position.X = 9.000000000000000000
@@ -106,7 +106,7 @@ inherited CustomerView: TCustomerView
       object EditCity: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         StyleLookup = 'transparentedit'
-        TabOrder = 39
+        TabOrder = 40
         Text = 
           'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
           'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
@@ -155,7 +155,7 @@ inherited CustomerView: TCustomerView
       object EditAddress: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         StyleLookup = 'transparentedit'
-        TabOrder = 39
+        TabOrder = 40
         Text = 
           'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
           'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +

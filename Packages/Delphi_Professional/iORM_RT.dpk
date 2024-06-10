@@ -123,10 +123,6 @@ contains
   iORM.DB.QueryContainer in '..\..\Source\iORM.DB.QueryContainer.pas',
   iORM.DB.QueryEngine in '..\..\Source\iORM.DB.QueryEngine.pas',
   iORM.Where.SqlItems.Interfaces in '..\..\Source\iORM.Where.SqlItems.Interfaces.pas',
-  iORM.Containers.Interfaces in '..\..\Source\iORM.Containers.Interfaces.pas',
-  iORM.Containers.List in '..\..\Source\iORM.Containers.List.pas',
-  iORM.Containers.Factory in '..\..\Source\iORM.Containers.Factory.pas',
-  iORM.Containers.ObjectList in '..\..\Source\iORM.Containers.ObjectList.pas',
   iORM.Resolver.Interfaces in '..\..\Source\iORM.Resolver.Interfaces.pas',
   iORM.Utilities in '..\..\Source\iORM.Utilities.pas',
   iORM.Resolver.Factory in '..\..\Source\iORM.Resolver.Factory.pas',
@@ -149,9 +145,6 @@ contains
   iORM.DependencyInjection.Implementers in '..\..\Source\iORM.DependencyInjection.Implementers.pas',
   iORM.MVVM.VMActionContainer in '..\..\Source\iORM.MVVM.VMActionContainer.pas',
   iORM.LazyLoad.LazyLoadObject in '..\..\Source\iORM.LazyLoad.LazyLoadObject.pas',
-  iORM.Strategy.DB in '..\..\Source\iORM.Strategy.DB.pas',
-  iORM.Strategy.Interfaces in '..\..\Source\iORM.Strategy.Interfaces.pas',
-  iORM.Strategy.Factory in '..\..\Source\iORM.Strategy.Factory.pas',
   iORM.MVVM.ViewContextProvider in '..\..\Source\iORM.MVVM.ViewContextProvider.pas',
   iORM.DB.ConnectionDef in '..\..\Source\iORM.DB.ConnectionDef.pas',
   iORM.LiveBindings.CommonBSAPersistence in '..\..\Source\iORM.LiveBindings.CommonBSAPersistence.pas',
@@ -236,7 +229,6 @@ contains
   iORM.Interceptor.CRUD.Register in '..\..\Source\iORM.Interceptor.CRUD.Register.pas',
   iORM.Interceptor.Strategy in '..\..\Source\iORM.Interceptor.Strategy.pas',
   iORM.Interceptor.Strategy.Register in '..\..\Source\iORM.Interceptor.Strategy.Register.pas',
-  iORM.Strategy.Http in '..\..\Source\iORM.Strategy.Http.pas',
   iORM.Http.Body.Request in '..\..\Source\iORM.Http.Body.Request.pas',
   iORM.Http.Body.Response in '..\..\Source\iORM.Http.Body.Response.pas',
   iORM.Http.Connection in '..\..\Source\iORM.Http.Connection.pas',
@@ -248,6 +240,10 @@ contains
   iORM.ETM.Factory in '..\..\Source\iORM.ETM.Factory.pas',
   iORM.ETM.Interceptor in '..\..\Source\iORM.ETM.Interceptor.pas',
   iORM.ETM.Interfaces in '..\..\Source\iORM.ETM.Interfaces.pas',
-  iORM.StdActions.CommonBehaviour in '..\..\Source\iORM.StdActions.CommonBehaviour.pas';
+  iORM.StdActions.CommonBehaviour in '..\..\Source\iORM.StdActions.CommonBehaviour.pas',
+  iORM.PersistenceStrategy.DB in '..\..\Source\iORM.PersistenceStrategy.DB.pas',
+  iORM.PersistenceStrategy.Factory in '..\..\Source\iORM.PersistenceStrategy.Factory.pas',
+  iORM.PersistenceStrategy.Http in '..\..\Source\iORM.PersistenceStrategy.Http.pas',
+  iORM.PersistenceStrategy.Interfaces in '..\..\Source\iORM.PersistenceStrategy.Interfaces.pas';
 
 end.

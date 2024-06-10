@@ -26,7 +26,10 @@ type
     acShowPizzas: TioBSShowOrSelect;
     acShowOrders: TioBSShowOrSelect;
     HttpConn: TioHttpConnectionDef;
-    FirebirdConn: TioFirebirdConnectionDef;
+    ButtonIngredients: TButton;
+    acShowIngredients: TioBSShowOrSelect;
+    ButtonSynchroLogs: TButton;
+    acShowSynchroLogs: TioBSShowOrSelect;
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings);
   private
@@ -39,7 +42,7 @@ var
 implementation
 
 uses
-  Utils.SampleData, System.IOUtils;
+  Utils.SampleData;
 
 {$R *.dfm}
 

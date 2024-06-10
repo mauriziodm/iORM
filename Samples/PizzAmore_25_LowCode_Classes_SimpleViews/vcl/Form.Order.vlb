@@ -25,9 +25,6 @@ Coordinates=488,485,125,36
 [Label5]
 Coordinates=505,10,53,58
 
-[DSRowsDescription]
-Coordinates=654,1,129,36
-
 [Label1]
 Coordinates=344,10,53,58
 
@@ -110,9 +107,6 @@ Coordinates=654,551,78,36
 [DSCustomerName]
 Coordinates=654,606,122,36
 
-[DSRowsPrice]
-Coordinates=555,681,94,36
-
 [acDeleteRow]
 Coordinates=456,681,91,36
 
@@ -162,7 +156,7 @@ Coordinates=838,276,106,36
 Coordinates=407,10,88,58
 
 []
-Coordinates=654,166,119,36
+Coordinates=654,1,129,36
 
 [acRevertOrDelete]
 Coordinates=488,320,66,36
@@ -172,4 +166,7 @@ Coordinates=504,234,143,36
 
 [DBCtrlGridPizzas]
 Coordinates=560,302,84,36
+
+[DSRowsPizzaPrice]
+Coordinates=555,681,94,36
 

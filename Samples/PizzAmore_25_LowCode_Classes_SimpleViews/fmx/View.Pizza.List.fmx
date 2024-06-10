@@ -9,8 +9,17 @@ inherited ViewPizzaList: TViewPizzaList
     ItemAppearanceClassName = 'TImageListItemBottomDetailAppearance'
     ItemEditAppearanceClassName = 'TImageListItemBottomDetailShowCheckAppearance'
     ItemIndex = 0
+    Size.Height = 405.000000000000000000
   end
   inherited RectangleWhere: TRectangle
+    Position.Y = 445.000000000000000000
+    Size.Height = 115.000000000000000000
+    inherited RectangleWhereButtons: TRectangle
+      Size.Height = 115.000000000000000000
+      inherited ButtonClear: TSpeedButton
+        Position.Y = 75.000000000000000000
+      end
+    end
     object Label1: TLabel
       StyledSettings = [Family]
       Position.X = 8.000000000000000000
@@ -22,11 +31,11 @@ inherited ViewPizzaList: TViewPizzaList
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       TextSettings.FontColor = claDarkslategray
       Text = 'ID'
-      TabOrder = 7
+      TabOrder = 9
     end
     object EditWhereID: TEdit
       Touch.InteractiveGestures = [LongTap, DoubleTap]
-      TabOrder = 3
+      TabOrder = 4
       Text = '-33'
       TextSettings.Font.Size = 14.000000000000000000
       Position.X = 56.000000000000000000
@@ -47,12 +56,12 @@ inherited ViewPizzaList: TViewPizzaList
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       TextSettings.FontColor = claDarkslategray
       Text = 'Name'
-      TabOrder = 6
+      TabOrder = 8
     end
     object EditWhereName: TEdit
       Touch.InteractiveGestures = [LongTap, DoubleTap]
       Anchors = [akLeft, akTop, akRight]
-      TabOrder = 2
+      TabOrder = 3
       Text = 
         'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
         'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
@@ -93,11 +102,11 @@ inherited ViewPizzaList: TViewPizzaList
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       TextSettings.FontColor = claDarkslategray
       Text = 'From price'
-      TabOrder = 5
+      TabOrder = 7
     end
     object EditWhereFromPrice: TEdit
       Touch.InteractiveGestures = [LongTap, DoubleTap]
-      TabOrder = 1
+      TabOrder = 2
       Text = '67,67 '#8364
       TextSettings.Font.Size = 14.000000000000000000
       Position.X = 92.000000000000000000
@@ -118,7 +127,7 @@ inherited ViewPizzaList: TViewPizzaList
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       TextSettings.FontColor = claDarkslategray
       Text = 'to price'
-      TabOrder = 4
+      TabOrder = 5
     end
     object EditWhereToPrice: TEdit
       Touch.InteractiveGestures = [LongTap, DoubleTap]
@@ -128,6 +137,51 @@ inherited ViewPizzaList: TViewPizzaList
       Position.X = 262.000000000000000000
       Position.Y = 46.000000000000000000
       Size.Width = 90.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      StyledSettings = [Family, Style, FontColor]
+    end
+    object Label5: TLabel
+      StyledSettings = [Family]
+      Position.X = 8.000000000000000000
+      Position.Y = 83.000000000000000000
+      Size.Width = 80.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claDarkslategray
+      Text = 'Ingredient'
+      TabOrder = 6
+    end
+    object EditWhereIngredient: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 1
+      Text = 
+        'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
+        'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
+        'mollis id viverra a, pulvinar non diam. Praesent ornare mauris a' +
+        'c magna placerat rutrum.Curabitur volutpat urna fermentum sem ia' +
+        'culis ultrices. Maecenas adipiscing sapien risus, nec consectetu' +
+        'r arcu. Sed in arcu iaculis felis placerat elementum vitae porta' +
+        ' libero. Donec quis purus nisi, ac ultrices lorem. Proin vitae d' +
+        'iam id turpis rhoncus vestibulum scelerisque vel leo. Nulla quis' +
+        ' scelerisque sem. Etiam imperdiet lacinia nulla sit amet varius.' +
+        ' Aliquam in interdum mauris. Praesent placerat, libero vel biben' +
+        'dum malesuada, velit libero vestibulum erat, vel porttitor diam ' +
+        'urna et nibh. Nullam fringilla cursus tempor. Cras eleifend male' +
+        'suada lacus quis consectetur. Cum sociis natoque penatibus et ma' +
+        'gnis dis parturient montes, nascetur ridiculus mus. Sed vestibul' +
+        'um bibendum sodales.Mauris consectetur ipsum ac turpis aliquam i' +
+        'd placerat justo ornare. Donec nisl arcu, faucibus vel dictum vi' +
+        'tae, dapibus vel mauris. Sed lacinia, elit ut commodo tempor, ma' +
+        'uris felis consequat nisl, sit amet laoreet est quam et tortor. ' +
+        'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
+        'por, velit sit'
+      TextSettings.Font.Size = 14.000000000000000000
+      Position.X = 92.000000000000000000
+      Position.Y = 84.000000000000000000
+      Size.Width = 260.000000000000000000
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
       StyledSettings = [Family, Style, FontColor]
@@ -180,6 +234,11 @@ inherited ViewPizzaList: TViewPizzaList
         Name = 'ToPrice'
         FieldType = ftCurrency
         Generator = 'Currency'
+        ReadOnly = False
+      end
+      item
+        Name = 'IngredientName'
+        Generator = 'LoremIpsum'
         ReadOnly = False
       end>
     Preview = True
@@ -237,6 +296,13 @@ inherited ViewPizzaList: TViewPizzaList
       Control = EditWhereToPrice
       Track = False
       CustomFormat = 'Format('#39'%%m'#39', Value)'
+    end
+    object LinkControlToField5: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWhere
+      FieldName = 'IngredientName'
+      Control = EditWhereIngredient
+      Track = False
     end
   end
 end

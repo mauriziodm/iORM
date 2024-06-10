@@ -4,8 +4,8 @@ object CustomerForm: TCustomerForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 562
-  ClientWidth = 588
+  ClientHeight = 561
+  ClientWidth = 640
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,8 +16,8 @@ object CustomerForm: TCustomerForm
   Visible = True
   OnClose = FormClose
   DesignSize = (
-    588
-    562)
+    640
+    561)
   TextHeight = 15
   object Label5: TLabel
     Left = 8
@@ -97,7 +97,7 @@ object CustomerForm: TCustomerForm
   object DBEditAddress: TDBEdit
     Left = 120
     Top = 202
-    Width = 449
+    Width = 505
     Height = 25
     BorderStyle = bsNone
     Color = clInactiveBorder
@@ -113,16 +113,14 @@ object CustomerForm: TCustomerForm
   end
   object PanelBottom: TPanel
     Left = 0
-    Top = 522
-    Width = 588
+    Top = 521
+    Width = 640
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
-    ExplicitTop = 521
-    ExplicitWidth = 584
     object ButtonRevert: TSpeedButton
       Left = 0
       Top = 0
@@ -132,7 +130,7 @@ object CustomerForm: TCustomerForm
       Align = alLeft
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clRed
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
@@ -140,7 +138,7 @@ object CustomerForm: TCustomerForm
       ExplicitTop = -6
     end
     object ButtonPersist: TSpeedButton
-      Left = 538
+      Left = 590
       Top = 0
       Width = 50
       Height = 40
@@ -148,7 +146,7 @@ object CustomerForm: TCustomerForm
       Align = alRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clGreen
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
@@ -159,7 +157,7 @@ object CustomerForm: TCustomerForm
   object DBEditCity: TDBEdit
     Left = 122
     Top = 163
-    Width = 447
+    Width = 503
     Height = 25
     BorderStyle = bsNone
     Color = clInactiveBorder
@@ -176,7 +174,7 @@ object CustomerForm: TCustomerForm
   object DBEditPhone: TDBEdit
     Left = 122
     Top = 124
-    Width = 447
+    Width = 503
     Height = 25
     BorderStyle = bsNone
     Color = clInactiveBorder
@@ -193,7 +191,7 @@ object CustomerForm: TCustomerForm
   object DBEditName: TDBEdit
     Left = 122
     Top = 85
-    Width = 447
+    Width = 503
     Height = 25
     BorderStyle = bsNone
     Color = clInactiveBorder
@@ -227,16 +225,15 @@ object CustomerForm: TCustomerForm
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 588
+    Width = 640
     Height = 40
     Align = alTop
     BevelOuter = bvNone
     Color = clNavy
     ParentBackground = False
     TabOrder = 6
-    ExplicitWidth = 584
     DesignSize = (
-      588
+      640
       40)
     object ButtonBack: TSpeedButton
       Left = 0
@@ -247,15 +244,15 @@ object CustomerForm: TCustomerForm
       Align = alLeft
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clNavy
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
     end
     object LabelTitle: TLabel
-      Left = 72
+      Left = 104
       Top = 7
-      Width = 381
+      Width = 413
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -268,13 +265,13 @@ object CustomerForm: TCustomerForm
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlCenter
-      ExplicitWidth = 441
+      ExplicitWidth = 369
     end
   end
   object PanelETM: TPanel
     Left = 0
-    Top = 240
-    Width = 588
+    Top = 239
+    Width = 640
     Height = 282
     Align = alBottom
     BevelOuter = bvNone
@@ -282,12 +279,10 @@ object CustomerForm: TCustomerForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 7
-    ExplicitTop = 239
-    ExplicitWidth = 584
     object PageControl1: TPageControl
       Left = 0
       Top = 0
-      Width = 588
+      Width = 640
       Height = 282
       ActivePage = TabSheet1
       Align = alClient
@@ -298,13 +293,12 @@ object CustomerForm: TCustomerForm
       Font.Style = [fsBold]
       ParentFont = False
       TabOrder = 0
-      ExplicitWidth = 584
       object TabSheet1: TTabSheet
         Caption = 'Timeline'
         object GridCustomers: TDBGrid
           Left = 0
           Top = 0
-          Width = 580
+          Width = 632
           Height = 250
           Align = alClient
           BorderStyle = bsNone
@@ -313,7 +307,7 @@ object CustomerForm: TCustomerForm
           DataSource = SourceETM
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
-          Font.Height = -12
+          Font.Height = -16
           Font.Name = 'Segoe UI'
           Font.Style = []
           ParentCtl3D = False
@@ -331,7 +325,7 @@ object CustomerForm: TCustomerForm
               FieldName = 'DateAndTime'
               Title.Alignment = taCenter
               Title.Caption = 'when'
-              Width = 120
+              Width = 160
               Visible = True
             end
             item
@@ -369,7 +363,7 @@ object CustomerForm: TCustomerForm
         object DiffMemo: TDBMemo
           Left = 0
           Top = 0
-          Width = 580
+          Width = 636
           Height = 250
           Align = alClient
           BorderStyle = bsNone
@@ -377,24 +371,31 @@ object CustomerForm: TCustomerForm
           DataSource = SourceETM
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clBlack
-          Font.Height = -12
+          Font.Height = -16
           Font.Name = 'Segoe UI'
           Font.Style = []
           ParentFont = False
+          ScrollBars = ssBoth
           TabOrder = 0
+          ExplicitWidth = 580
         end
       end
     end
   end
   object ButtonRevertToVersion: TButton
-    Left = 371
-    Top = 242
-    Width = 121
-    Height = 20
+    Left = 474
+    Top = 241
+    Width = 139
+    Height = 23
     Action = acEtmRevertToVersion
     Anchors = [akTop, akRight]
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
     TabOrder = 8
-    ExplicitLeft = 367
   end
   object DSCustomer: TioDataSetMaster
     AsDefault = True

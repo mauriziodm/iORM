@@ -55,8 +55,43 @@ Coordinates=339,197,46,51
 Coordinates=278,10,46,51
 
 []
-Coordinates=190,141,70,33
+Coordinates=510,350,160,33
+Visible=True
 
 [BindingsList1]
 Coordinates=145,152,82,33
+
+[acShowETM]
+Coordinates=306,150,75,33
+
+[acRevertOrDelete]
+Coordinates=531,80,100,33
+
+[ButtonBack]
+Coordinates=306,267,72,51
+
+[acBack]
+Coordinates=419,80,50,33
+
+[acPersist]
+Coordinates=419,132,60,33
+
+[ButtonETM]
+Coordinates=306,80,69,51
+
+[ActionList1]
+Coordinates=451,249,70,33
+
+[Label5]
+Coordinates=419,301,46,51
+
+[ListBoxItemIngredients]
+Coordinates=531,132,128,33
+
+[BSIngredients]
+Coordinates=287,329,124,105
+
+[Grid1]
+Coordinates=238,356,41,51
+Visible=True
 

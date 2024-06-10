@@ -4,8 +4,8 @@ object MainForm: TMainForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 543
-  ClientWidth = 272
+  ClientHeight = 541
+  ClientWidth = 288
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,8 +14,8 @@ object MainForm: TMainForm
   Font.Style = []
   Position = poDesktopCenter
   DesignSize = (
-    272
-    543)
+    288
+    541)
   TextHeight = 15
   object ImagePizza: TImage
     Left = 8
@@ -8480,14 +8480,14 @@ object MainForm: TMainForm
   end
   object Shape1: TShape
     Left = 0
-    Top = 320
-    Width = 272
+    Top = 318
+    Width = 288
     Height = 223
     Align = alBottom
     Brush.Color = clNavy
     Pen.Style = psClear
-    ExplicitTop = 312
-    ExplicitWidth = 284
+    ExplicitLeft = 8
+    ExplicitTop = 320
   end
   object LabelTitleAmore: TLabel
     Left = 130
@@ -8503,10 +8503,10 @@ object MainForm: TMainForm
     ParentFont = False
   end
   object ButtonOrders: TButton
-    Left = 43
-    Top = 334
-    Width = 101
-    Height = 44
+    Left = 42
+    Top = 329
+    Width = 190
+    Height = 40
     Action = acShowOrders
     Anchors = [akLeft, akRight, akBottom]
     Font.Charset = DEFAULT_CHARSET
@@ -8516,14 +8516,14 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 0
-    ExplicitTop = 333
-    ExplicitWidth = 97
+    ExplicitTop = 328
+    ExplicitWidth = 186
   end
   object ButtonCustomers: TButton
-    Left = 43
-    Top = 384
-    Width = 101
-    Height = 44
+    Left = 42
+    Top = 374
+    Width = 190
+    Height = 40
     Action = acShowCustomers
     Anchors = [akLeft, akRight, akBottom]
     Font.Charset = DEFAULT_CHARSET
@@ -8533,14 +8533,14 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 1
-    ExplicitTop = 383
-    ExplicitWidth = 97
+    ExplicitTop = 373
+    ExplicitWidth = 186
   end
   object ButtonPizzas: TButton
-    Left = 43
-    Top = 434
-    Width = 101
-    Height = 44
+    Left = 42
+    Top = 419
+    Width = 190
+    Height = 40
     Action = acShowPizzas
     Anchors = [akLeft, akRight, akBottom]
     Font.Charset = DEFAULT_CHARSET
@@ -8550,14 +8550,14 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 2
-    ExplicitTop = 433
-    ExplicitWidth = 97
+    ExplicitTop = 418
+    ExplicitWidth = 186
   end
   object ButtonQuit: TButton
-    Left = 43
-    Top = 499
-    Width = 101
-    Height = 32
+    Left = 42
+    Top = 500
+    Width = 190
+    Height = 30
     Action = acQuit
     Anchors = [akLeft, akRight, akBottom]
     Font.Charset = DEFAULT_CHARSET
@@ -8567,27 +8567,57 @@ object MainForm: TMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 3
-    ExplicitTop = 498
-    ExplicitWidth = 97
+    ExplicitTop = 499
+    ExplicitWidth = 186
+  end
+  object ButtonIngredients: TButton
+    Left = 42
+    Top = 464
+    Width = 79
+    Height = 31
+    Action = acShowIngredients
+    Anchors = [akLeft, akRight, akBottom]
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 4
+  end
+  object ButtonSynchroLogs: TButton
+    Left = 127
+    Top = 464
+    Width = 105
+    Height = 31
+    Action = acShowSynchroLogs
+    Anchors = [akLeft, akRight, akBottom]
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 5
   end
   object ioVCL1: TioVCL
-    Left = 8
-    Top = 272
+    Left = 18
+    Top = 265
   end
   object SQLiteConn: TioSQLiteConnectionDef
-    AsDefault = False
+    AsDefault = True
     AutoCreateDB.Enabled = True
     Database = 'PizzAmore_25_LowCode_Classes_SimpleViews_Vcl.db'
     DatabaseStdFolder = sfDocuments
     Persistent = False
     Pooled = False
     OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
-    Left = 64
-    Top = 272
+    Left = 84
+    Top = 265
   end
   object ActionList1: TActionList
-    Left = 216
-    Top = 272
+    Left = 228
+    Top = 265
     object acQuit: TioBSCloseQuery
       Category = 'iORM-BS'
       Caption = 'Quit'
@@ -8621,28 +8651,30 @@ object MainForm: TMainForm
       ViewContextBy = vcByDefaultViewContextProvider
       VVMTypeAlias = 'LIST'
     end
+    object acShowIngredients: TioBSShowOrSelect
+      Category = 'iORM - BS'
+      Caption = 'Ingreds'
+      Action_ParentCloseQueryAction = acQuit
+      EntityTypeName = 'TIngredient'
+      ShowMode = smEntityTypeName
+      ViewContextBy = vcByDefaultViewContextProvider
+      VVMTypeAlias = 'LIST'
+    end
+    object acShowSynchroLogs: TioBSShowOrSelect
+      Category = 'iORM - BS'
+      Caption = 'Synchro log'
+      Action_ParentCloseQueryAction = acQuit
+      EntityTypeName = 'TioEtmSynchroStrategy_LogItem'
+      ShowMode = smEntityTypeName
+      ViewContextBy = vcByDefaultViewContextProvider
+      VVMTypeAlias = 'LIST'
+    end
   end
   object HttpConn: TioHttpConnectionDef
-    AsDefault = True
+    AsDefault = False
     BaseURL = 'http://localhost:8080/iorm'
     Persistent = True
-    Left = 48
-    Top = 200
-  end
-  object FirebirdConn: TioFirebirdConnectionDef
-    AsDefault = False
-    Database = 'PizzAmore_25_LowCode_Classes_SimpleViews_Vcl.FDB'
-    DatabaseStdFolder = sfDocuments
-    OSAuthent = oaNo
-    Password = 'masterkey'
-    Persistent = False
-    Pooled = False
-    Port = 3050
-    Protocol = pLocal
-    SQLDialect = sqlDialect3
-    UserName = 'SYSDBA'
-    OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
-    Left = 128
-    Top = 272
+    Left = 157
+    Top = 265
   end
 end

@@ -22,7 +22,8 @@ uses
   Where.Pizza in '..\common_model\Where.Pizza.pas',
   ETM.Repository in '..\common_model\ETM.Repository.pas',
   View.ETM in 'View.ETM.pas' {EtmView: TFrame},
-  Wait in 'Wait.pas' {ViewWait: TFrame};
+  Model.Pizza.IngredientRow in '..\common_model\Model.Pizza.IngredientRow.pas',
+  Model.Ingredient in '..\common_model\Model.Ingredient.pas';
 
 {$R *.res}
 {$STRONGLINKTYPES ON}

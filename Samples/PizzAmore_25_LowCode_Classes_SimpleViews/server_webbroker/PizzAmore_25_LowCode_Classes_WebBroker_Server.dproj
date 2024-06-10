@@ -123,8 +123,10 @@
         <DCCReference Include="..\common_model\Where.Order.pas"/>
         <DCCReference Include="..\common_model\Utils.SampleData.pas"/>
         <DCCReference Include="..\common_model\Model.Pizza.pas"/>
+        <DCCReference Include="..\common_model\Model.Pizza.IngredientRow.pas"/>
         <DCCReference Include="..\common_model\Model.OrderRow.pas"/>
         <DCCReference Include="..\common_model\Model.Order.pas"/>
+        <DCCReference Include="..\common_model\Model.Ingredient.pas"/>
         <DCCReference Include="..\common_model\Model.Customer.pas"/>
         <DCCReference Include="..\common_model\ETM.Repository.pas"/>
         <BuildConfiguration Include="Base">

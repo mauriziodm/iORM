@@ -8,7 +8,8 @@ uses
   Data.Bind.Components, Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.PrototypeBindSource.Master, iORM.StdActions.Fmx,
   System.Actions, FMX.ActnList, FMX.Controls.Presentation, FMX.Objects, FMX.Edit, FMX.ListBox, FMX.Layouts, Data.Bind.GenData, Fmx.Bind.GenData, System.Rtti,
   System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt, Fmx.Bind.DBEngExt, Model.Pizza,
-  iORM.MVVM.Interfaces, iORM.MVVM.ModelBindSource, iORM.MVVM.ViewModelBridge;
+  iORM.MVVM.Interfaces, iORM.MVVM.ModelBindSource, iORM.MVVM.ViewModelBridge, FMX.Grid.Style, FMX.ScrollBox, FMX.Grid,
+  iORM.LiveBindings.PrototypeBindSource.Detail, Fmx.Bind.Grid, Data.Bind.Grid;
 
 type
 
@@ -32,6 +33,11 @@ type
     LinkControlToField2: TLinkControlToField;
     LinkControlToField3: TLinkControlToField;
     LinkControlToField4: TLinkControlToField;
+    ListBoxItemIngredients: TListBoxItem;
+    Label5: TLabel;
+    Grid1: TGrid;
+    BSIngredients: TioPrototypeBindSourceDetail;
+    LinkGridToDataSourceBSIngredients: TLinkGridToDataSource;
   private
   public
   end;

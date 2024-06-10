@@ -34,6 +34,15 @@ type
     ButtonWhereHistory: TSpeedButton;
     acWhereShowHistory: TioBSShowOrSelect;
     acWherePersist: TioBSPersistencePersist;
+    EditWhereCustomerName: TEdit;
+    Label5: TLabel;
+    EditWherePizzaName: TEdit;
+    Label6: TLabel;
+    Label7: TLabel;
+    EditWhereIngredientName: TEdit;
+    LinkControlToField4: TLinkControlToField;
+    LinkControlToField5: TLinkControlToField;
+    LinkControlToField6: TLinkControlToField;
     procedure BSWhereAfterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType);
   private
   public

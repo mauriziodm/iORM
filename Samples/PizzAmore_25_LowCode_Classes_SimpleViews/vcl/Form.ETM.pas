@@ -1,44 +1,97 @@
-unit Form.ETM;
+unit Form.Etm;
 
 interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, iORM, iORM.Attributes, iORM.CommonTypes, iORM.Where.Interfaces, Data.DB,
-  iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom, iORM.DB.DataSet.Master, Vcl.Mask, Vcl.DBCtrls, Vcl.Grids, Vcl.DBGrids, ETM.Repository, iORM.StdActions.Vcl,
-  Vcl.ActnList, System.Actions;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.Mask, Vcl.DBCtrls, Vcl.ComCtrls, iORM, iORM.Attributes, iORM.CommonTypes,
+  iORM.Where.Interfaces, iORM.StdActions.Vcl, System.Actions, Vcl.ActnList, Data.DB, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom, iORM.DB.DataSet.Master,
+  ETM.Repository;
 
 type
 
-  // Register the form into the dependency injection container as SimpleView for TEtmRepository objects
   [diSimpleViewFor(TEtmRepository)]
-  TEtmForm = class(TForm)
+  TFormEtm = class(TForm)
     PanelTop: TPanel;
     ButtonBack: TSpeedButton;
     LabelTitle: TLabel;
-    DS_ETM: TioDataSetMaster;
-    DS_ETMDateAndTime: TDateTimeField;
-    DS_ETMEntityClassName: TStringField;
-    DS_ETMEntityID: TIntegerField;
-    DS_ETMSmartEntityVersion: TStringField;
-    DS_ETMSmartUser: TStringField;
-    DS_ETMSmartEventType: TStringField;
-    PanelEntityInfo: TPanel;
-    Label1: TLabel;
-    Label2: TLabel;
-    GridCustomers: TDBGrid;
-    Splitter1: TSplitter;
-    SourceETM: TDataSource;
-    DBTextEntityClassName: TDBText;
-    DBTextEntityID: TDBText;
-    ActionList1: TActionList;
-    acBack: TioBSCloseQuery;
+    PanelBottom: TPanel;
     ButtonRevert: TSpeedButton;
-    PanelDiff: TPanel;
-    DiffMemo: TDBMemo;
-    Label3: TLabel;
-    acEtmRevertToVersion: TioBS_ETM_RevertToBindSource;
-    DS_ETMDiffOneWay: TStringField;
+    ButtonPersist: TSpeedButton;
+    Label1: TLabel;
+    DBEditID: TDBEdit;
+    Label2: TLabel;
+    DBEditName: TDBEdit;
+    Label6: TLabel;
+    DBEdit1: TDBEdit;
+    DBEdit2: TDBEdit;
+    PageControl1: TPageControl;
+    TabSheetTimeSlotData: TTabSheet;
+    TabSheetEneityState: TTabSheet;
+    DBMemoEntityState: TDBMemo;
+    Label7: TLabel;
+    DBEdit3: TDBEdit;
+    Label8: TLabel;
+    DBEdit4: TDBEdit;
+    Label9: TLabel;
+    DBEdit5: TDBEdit;
+    Label10: TLabel;
+    DBEdit6: TDBEdit;
+    DBEdit7: TDBEdit;
+    Label11: TLabel;
+    DBEdit8: TDBEdit;
+    Label12: TLabel;
+    DBEdit9: TDBEdit;
+    Label13: TLabel;
+    DBCheckBox1: TDBCheckBox;
+    Label14: TLabel;
+    DBEdit10: TDBEdit;
+    Label15: TLabel;
+    DBEdit11: TDBEdit;
+    Label16: TLabel;
+    DBEdit12: TDBEdit;
+    DBCheckBox2: TDBCheckBox;
+    DBCheckBox3: TDBCheckBox;
+    DBCheckBox4: TDBCheckBox;
+    Label17: TLabel;
+    DBCheckBox5: TDBCheckBox;
+    Label18: TLabel;
+    DBEdit13: TDBEdit;
+    DBEdit14: TDBEdit;
+    Label19: TLabel;
+    DBEdit15: TDBEdit;
+    Label20: TLabel;
+    DBEdit16: TDBEdit;
+    DSTimeSlot: TioDataSetMaster;
+    DSTimeSlotID: TIntegerField;
+    SourceTimeSlot: TDataSource;
+    ActionList1: TActionList;
+    acPersist: TioBSPersistencePersist;
+    acBack: TioBSCloseQuery;
+    DSTimeSlotDateAndTime: TDateTimeField;
+    DSTimeSlotEntityClassname: TStringField;
+    DSTimeSlotEntityID: TIntegerField;
+    DSTimeSlotEntityVersion: TIntegerField;
+    DSTimeSlotEntityFromVersion: TIntegerField;
+    DSTimeSlotEntityUpdated: TDateTimeField;
+    DSTimeSlotUserID: TIntegerField;
+    DSTimeSlotUserName: TStringField;
+    DSTimeSlotActionType: TStringField;
+    DSTimeSlotIntentType: TStringField;
+    DSTimeSlotConflictDetected: TBooleanField;
+    DSTimeSlotConflictState: TStringField;
+    DSTimeSlotConflictStrategyName: TStringField;
+    DSTimeSlotBlindLevel: TByteField;
+    DSTimeSlotBlindLevel_AutoUpdateProps: TBooleanField;
+    DSTimeSlotBlindLevel_DetectObjExists: TBooleanField;
+    DSTimeSlotBlindLevel_DetectConflicts: TBooleanField;
+    DSTimeSlotConflictCheckedByHuman: TBooleanField;
+    DSTimeSlotConflictCheckedByHuman_ID: TIntegerField;
+    DSTimeSlotConflictCheckedByHuman_Name: TStringField;
+    DSTimeSlotConflictCheckedByHuman_DateTime: TDateTimeField;
+    DSTimeSlotTimeSlotSynchroState: TStringField;
+    acRevert: TioBSPersistenceRevert;
+    DSTimeSlotEntityState: TStringField;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
   public
@@ -48,7 +101,7 @@ implementation
 
 {$R *.dfm}
 
-procedure TEtmForm.FormClose(Sender: TObject; var Action: TCloseAction);
+procedure TFormEtm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Action := caFree;
 end;

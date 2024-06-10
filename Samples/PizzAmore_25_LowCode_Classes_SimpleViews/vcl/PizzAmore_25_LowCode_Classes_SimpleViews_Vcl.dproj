@@ -169,8 +169,26 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\common_model\ETM.Repository.pas"/>
-        <DCCReference Include="Form.ETM.pas">
-            <Form>EtmForm</Form>
+        <DCCReference Include="Form.Etm.List.pas">
+            <Form>EtmListForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\common_model\Model.Ingredient.pas"/>
+        <DCCReference Include="..\common_model\Model.Pizza.IngredientRow.pas"/>
+        <DCCReference Include="Form.Ingredient.List.pas">
+            <Form>IngredientListForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Form.Ingredient.pas">
+            <Form>IngredientForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Form.Etm.pas">
+            <Form>FormEtm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Form.SynchroLog.List.pas">
+            <Form>SynchroLogListForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Base">

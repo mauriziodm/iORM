@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.Mask, Vcl.DBCtrls, iORM, iORM.Attributes, iORM.CommonTypes,
   iORM.Where.Interfaces, Data.DB, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom, iORM.DB.DataSet.Master, Vcl.ExtDlgs, System.Actions, Vcl.ActnList,
-  iORM.StdActions.Vcl, Model.Pizza, Vcl.Grids, Vcl.DBGrids;
+  iORM.StdActions.Vcl, Model.Pizza, Vcl.Grids, Vcl.DBGrids, iORM.DB.DataSet.Detail, Vcl.DBActns;
 
 type
 
@@ -42,13 +42,28 @@ type
     acBack: TioBSCloseQuery;
     ButtonETM: TSpeedButton;
     acShowETM: TioBSShowOrSelect;
+    GridCustomers: TDBGrid;
+    Label5: TLabel;
+    DSIngredients: TioDataSetDetail;
+    SourceIngredients: TDataSource;
+    DSIngredientsIngredientName: TStringField;
+    DSIngredientsIngredientUnitOfMeasure: TStringField;
+    DSIngredientsQty: TFloatField;
+    ButtonAddIngredient: TSpeedButton;
+    ButtonDeleteIngredient: TSpeedButton;
+    acShowIngredientSelector: TioBSShowOrSelect;
+    acDeleteIngredient: TDataSetDelete;
     procedure acLoadImageExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure DSIngredientsSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
   private
   public
   end;
 
 implementation
+
+uses
+  Model.Ingredient, Model.Pizza.IngredientRow;
 
 {$R *.dfm}
 
@@ -60,6 +75,11 @@ begin
     DSPizza.CurrentAs<TPizza>.Image.LoadFromFile(OpenPictureDialog.FileName);
     DSPizza.Refresh(False);
   end;
+end;
+
+procedure TPizzaForm.DSIngredientsSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
+begin
+  ASelected := TPizzaIngredientRow.Create( ASelected as TIngredient, 0 );
 end;
 
 procedure TPizzaForm.FormClose(Sender: TObject; var Action: TCloseAction);

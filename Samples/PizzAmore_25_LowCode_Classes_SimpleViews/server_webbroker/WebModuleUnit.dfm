@@ -17,7 +17,8 @@ object WebModule2: TWebModule2
     Top = 32
   end
   object SQLiteConn: TioSQLiteConnectionDef
-    AsDefault = False
+    AsDefault = True
+    AutoCreateDB.Enabled = True
     Database = 'PizzAmore_25_LowCode_Classes_SimpleViews_Vcl.db'
     DatabaseStdFolder = sfDocuments
     Persistent = False
@@ -27,8 +28,7 @@ object WebModule2: TWebModule2
     Top = 102
   end
   object FirebirdConn: TioFirebirdConnectionDef
-    AsDefault = True
-    AutoCreateDB.Enabled = True
+    AsDefault = False
     Database = 'PizzAmore_25_LowCode_Classes_SimpleViews_Vcl.FDB'
     DatabaseStdFolder = sfDocuments
     OSAuthent = oaNo

@@ -18,7 +18,13 @@ uses
   Where.Pizza in '..\common_model\Where.Pizza.pas',
   Form.Where.OrderHistory in 'Form.Where.OrderHistory.pas' {OrderWhereHistoryForm},
   ETM.Repository in '..\common_model\ETM.Repository.pas',
-  Form.ETM in 'Form.ETM.pas' {EtmForm};
+  Form.Etm.List in 'Form.Etm.List.pas' {EtmListForm},
+  Model.Ingredient in '..\common_model\Model.Ingredient.pas',
+  Model.Pizza.IngredientRow in '..\common_model\Model.Pizza.IngredientRow.pas',
+  Form.Ingredient.List in 'Form.Ingredient.List.pas' {IngredientListForm},
+  Form.Ingredient in 'Form.Ingredient.pas' {IngredientForm},
+  Form.Etm in 'Form.Etm.pas' {FormEtm},
+  Form.SynchroLog.List in 'Form.SynchroLog.List.pas' {SynchroLogListForm};
 
 {$R *.res}
 {$STRONGLINKTYPES ON}

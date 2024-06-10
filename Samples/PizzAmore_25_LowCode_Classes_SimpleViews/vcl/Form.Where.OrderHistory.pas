@@ -31,7 +31,8 @@ type
     DSWhereHistoryToDate: TDateField;
     acSelectCurrent: TioBSSelectCurrent;
     DSWhereHistoryCustomerName: TStringField;
-    DSWhereHistoryRowsDescription: TStringField;
+    DSWhereHistoryPizzaName: TStringField;
+    DSWhereHistoryIngredientName: TStringField;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure GridCustomersDblClick(Sender: TObject);

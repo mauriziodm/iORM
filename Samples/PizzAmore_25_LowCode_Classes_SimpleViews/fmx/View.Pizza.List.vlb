@@ -69,7 +69,7 @@ Coordinates=389,53,45,33
 Coordinates=440,53,83,33
 
 [BSWhere]
-Coordinates=10,140,60,123
+Coordinates=10,140,79,141
 
 [acWhereBuild]
 Coordinates=440,105,83,33
@@ -100,4 +100,17 @@ Coordinates=10,497,46,51
 
 [Label1]
 Coordinates=82,497,46,51
+
+[acBuildWhere]
+Coordinates=0,0,83,33
+
+[acClearWhere]
+Coordinates=19,55,83,33
+
+[Label5]
+Coordinates=437,275,46,51
+
+[EditWhereIngredient]
+Coordinates=478,198,115,51
+Visible=True
 

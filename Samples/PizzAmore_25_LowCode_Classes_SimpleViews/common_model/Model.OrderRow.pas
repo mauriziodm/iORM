@@ -11,20 +11,16 @@ type
   TOrderRow = class
   private
     FID: Integer;
-    FPizzaID: Integer;
-    FDescription: String;
-    FPrice: Currency;
+    FPizza: TPizza;
     FQty: Integer;
     FObjStatus: TioObjStatus;
     function GetRowTotal: Currency;
     procedure SetQty(const Value: Integer);
   public
-    constructor Create(APizzaID: Integer; ADescription: String; AUnitPrice: Currency; AQty: Integer); overload;
-    constructor Create(APizza: TPizza); overload;
+    constructor Create(const APizza: TPizza; const AQty: Integer = 1); overload;
+    destructor Destroy; override;
     property ID: Integer read FID;  // ReadOnly if you want
-    property PizzaID: Integer read FPizzaID;  // ReadOnly if you want
-    property Description: String read FDescription write FDescription;
-    property Price: Currency read FPrice write FPrice;
+    property Pizza: TPizza read FPizza;  // ReadOnly if you want
     property Qty: Integer read FQty write SetQty;
     property RowTotal: Currency read GetRowTotal;  // ReadOnly
   end;
@@ -36,25 +32,21 @@ uses
 
 { TOrderRow }
 
-constructor TOrderRow.Create(APizzaID: Integer; ADescription: String; AUnitPrice: Currency; AQty: Integer);
+constructor TOrderRow.Create(const APizza: TPizza; const AQty: Integer = 1);
 begin
- FPizzaID := APizzaID;
- FDescription := ADescription;
- FPrice := AUnitPrice;
+ FPizza := APizza;
  FQty := AQty;
 end;
 
-constructor TOrderRow.Create(APizza: TPizza);
+destructor TOrderRow.Destroy;
 begin
- FPizzaID := APizza.ID;
- FDescription := APizza.Name;
- FPrice := APizza.Price;
- FQty := 1;
+  FPizza.Free;
+  inherited;
 end;
 
 function TOrderRow.GetRowTotal: Currency;
 begin
-  Result := FPrice * FQty;
+  Result := FPizza.Price * FQty;
 end;
 
 procedure TOrderRow.SetQty(const Value: Integer);

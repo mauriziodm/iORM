@@ -3,7 +3,7 @@ unit Form.Order.List;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Winapi.Windows, Winapi.Messages, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.DBCtrls, Data.DB, Vcl.Grids, Vcl.DBGrids, iORM, iORM.Attributes,
   iORM.CommonTypes, iORM.Where.Interfaces, iORM.StdActions.Vcl, System.Actions, Vcl.ActnList, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom,
   iORM.DB.DataSet.Master, Model.Order, Vcl.Mask;
@@ -64,17 +64,23 @@ type
     acBuildWhere: TioBSBuildWhere;
     acClearWhere: TioBSClearWhere;
     Label7: TLabel;
-    DBEditRowsDescription: TDBEdit;
-    DSWhereRowsDescription: TStringField;
+    DBEditWherePizzaName: TDBEdit;
+    DSWherePizzaName: TStringField;
+    Label8: TLabel;
+    DBEditWhereIngredient: TDBEdit;
+    DSWhereIngredientName: TStringField;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure GridCustomersDblClick(Sender: TObject);
     procedure DSWhereAfterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType);
   private
   public
   end;
 
 implementation
+
+uses
+  Model.Customer,
+  System.Generics.Collections, System.SysUtils;
 
 {$R *.dfm}
 
@@ -89,15 +95,27 @@ begin
 end;
 
 procedure TOrderListForm.FormCreate(Sender: TObject);
+var
+  LOrders: TObjectList<TOrder>;
 begin
   io.Enums.FillStrings<TOrderState>(DBComboBoxWhereOrderState.Items);
   DSOrders.Open;
   DSWhere.Open;
-end;
 
-procedure TOrderListForm.GridCustomersDblClick(Sender: TObject);
-begin
-  acShowOrSelect.Execute;
+//  LOrders := TObjectList<TOrder>.Create;
+//  io.Load<TOrder>.ToList(LOrders);
+//  io.Load<TOrder>._Where('OrderState', coEquals, osReady).ToList(LOrders);
+//  io.Load<TOrder>._Where('Rows.Pizza.Ingredients.Ingredient.Name', coLike, 'Love').ToList(LOrders);
+
+//  var LCustomer: TCustomer := io.LoadObject<TCustomer>(1);
+//  try
+//    io.Load<TOrder>._Where('Customer', coEquals, LCustomer).ToList(LOrders);
+//  finally
+//    LCustomer.Free;
+//  end;
+
+//  DSOrders.LoadType := ltManual;
+//  DSOrders.SetDataObject(LOrders);
 end;
 
 end.

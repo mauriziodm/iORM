@@ -30,6 +30,9 @@ type
     LinkControlToField2: TLinkControlToField;
     LinkControlToField3: TLinkControlToField;
     LinkControlToField4: TLinkControlToField;
+    Label5: TLabel;
+    EditWhereIngredient: TEdit;
+    LinkControlToField5: TLinkControlToField;
   private
   public
   end;

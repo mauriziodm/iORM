@@ -35,8 +35,6 @@ type
     LinkControlToField3: TLinkControlToField;
     LinkControlToField4: TLinkControlToField;
     LinkControlToField5: TLinkControlToField;
-    procedure Button1Click(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
   private
   public
   end;
@@ -44,24 +42,5 @@ type
 implementation
 
 {$R *.fmx}
-
-procedure TCustomerView.Button1Click(Sender: TObject);
-var
-  LCustomer: TCustomer;
-begin
-//  BSMaster.Close;
-  BSMaster.SourceBS := nil;
-  BSMaster.LoadType := ltManual;
-  LCustomer := TCustomer.Create;
-  LCustomer.Name := 'XXXXXXX';
-  BSMaster.SetDataObject(LCustomer);
-//  BSMaster.Open;
-end;
-
-procedure TCustomerView.Button2Click(Sender: TObject);
-begin
-//  BSMaster.SetDataObject(nil);
-  BSMaster.ClearDataObject;
-end;
 
 end.

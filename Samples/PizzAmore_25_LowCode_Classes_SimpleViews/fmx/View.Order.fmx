@@ -1,14 +1,26 @@
 inherited ViewOrder: TViewOrder
+  Size.Width = 401.000000000000000000
+  inherited Rectangle1: TRectangle
+    Size.Width = 401.000000000000000000
+    inherited ButtonSave: TSpeedButton
+      Position.X = 361.000000000000000000
+    end
+  end
   inherited RectangleTitle: TRectangle
+    Size.Width = 401.000000000000000000
     inherited LabelTitle: TLabel
+      Size.Width = 301.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       Text = 'Order'
+    end
+    inherited ButtonETM: TSpeedButton
+      Position.X = 341.000000000000000000
     end
   end
   object LayoutCustomer: TLayout [2]
     Align = Top
     Position.Y = 90.000000000000000000
-    Size.Width = 400.000000000000000000
+    Size.Width = 401.000000000000000000
     Size.Height = 75.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 4
@@ -76,7 +88,7 @@ inherited ViewOrder: TViewOrder
       Align = MostRight
       Enabled = True
       ImageIndex = -1
-      Position.X = 370.000000000000000000
+      Position.X = 371.000000000000000000
       Size.Width = 30.000000000000000000
       Size.Height = 75.000000000000000000
       Size.PlatformDefault = False
@@ -86,7 +98,7 @@ inherited ViewOrder: TViewOrder
   object LayoutGrandTotal: TLayout [3]
     Align = Bottom
     Position.Y = 530.000000000000000000
-    Size.Width = 400.000000000000000000
+    Size.Width = 401.000000000000000000
     Size.Height = 30.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 6
@@ -100,7 +112,7 @@ inherited ViewOrder: TViewOrder
       TextSettings.Font.Size = 14.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       TextSettings.HorzAlign = Trailing
-      Position.X = 315.000000000000000000
+      Position.X = 316.000000000000000000
       Position.Y = 5.000000000000000000
       Margins.Left = 5.000000000000000000
       Margins.Top = 5.000000000000000000
@@ -126,7 +138,7 @@ inherited ViewOrder: TViewOrder
   object LayoutOrderData: TLayout [4]
     Align = Top
     Position.Y = 40.000000000000000000
-    Size.Width = 400.000000000000000000
+    Size.Width = 401.000000000000000000
     Size.Height = 50.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 7
@@ -206,10 +218,10 @@ inherited ViewOrder: TViewOrder
       Margins.Left = 5.000000000000000000
       Margins.Right = 5.000000000000000000
       Margins.Bottom = 5.000000000000000000
-      Size.Width = 235.000000000000000000
+      Size.Width = 146.000000000000000000
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
-      TextPrompt = 'Type the name here'
+      TextPrompt = 'note here'
       StyledSettings = [Family, Size, FontColor]
       object Label6: TLabel
         Position.Y = -16.000000000000000000
@@ -217,10 +229,24 @@ inherited ViewOrder: TViewOrder
         TabOrder = 0
       end
     end
+    object ComboBoxOrderState: TComboBox
+      Position.X = 289.000000000000000000
+      Position.Y = 23.000000000000000000
+      Size.Width = 104.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 43
+    end
+    object Label7: TLabel
+      Position.X = 291.000000000000000000
+      Position.Y = 4.000000000000000000
+      Text = 'Order state'
+      TabOrder = 0
+    end
   end
   object LayoutRows: TLayout [5]
     Align = Client
-    Size.Width = 400.000000000000000000
+    Size.Width = 401.000000000000000000
     Size.Height = 365.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 5
@@ -228,7 +254,7 @@ inherited ViewOrder: TViewOrder
       Align = Top
       Margins.Left = 5.000000000000000000
       Position.X = 5.000000000000000000
-      Size.Width = 395.000000000000000000
+      Size.Width = 396.000000000000000000
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
       Text = 'Rows'
@@ -238,7 +264,7 @@ inherited ViewOrder: TViewOrder
         Align = MostRight
         Enabled = True
         ImageIndex = -1
-        Position.X = 365.000000000000000000
+        Position.X = 366.000000000000000000
         Size.Width = 30.000000000000000000
         Size.Height = 30.000000000000000000
         Size.PlatformDefault = False
@@ -249,7 +275,7 @@ inherited ViewOrder: TViewOrder
         Align = Right
         Enabled = True
         ImageIndex = -1
-        Position.X = 335.000000000000000000
+        Position.X = 336.000000000000000000
         Size.Width = 30.000000000000000000
         Size.Height = 30.000000000000000000
         Size.PlatformDefault = False
@@ -260,14 +286,14 @@ inherited ViewOrder: TViewOrder
       Align = Client
       CanFocus = True
       ClipChildren = True
-      Size.Width = 400.000000000000000000
+      Size.Width = 401.000000000000000000
       Size.Height = 335.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 1
       RowCount = 200
       Options = [AlternatingRowBackground, Editing, ColumnResize, ColumnMove, ColLines, RowLines, Tabs, Header, HeaderClick, AutoDisplacement]
-      Viewport.Width = 400.000000000000000000
-      Viewport.Height = 335.000000000000000000
+      Viewport.Width = 381.000000000000000000
+      Viewport.Height = 310.000000000000000000
     end
   end
   inherited ActionList1: TActionList
@@ -310,6 +336,11 @@ inherited ViewOrder: TViewOrder
         Name = 'OrderDate'
         FieldType = ftDateTime
         Generator = 'DateTime'
+        ReadOnly = False
+      end
+      item
+        Name = 'OrderState'
+        Generator = 'LoremIpsum'
         ReadOnly = False
       end
       item
@@ -359,12 +390,12 @@ inherited ViewOrder: TViewOrder
     AutoActivate = True
     FieldDefs = <
       item
-        Name = 'Description'
+        Name = 'Pizza.Name'
         Generator = 'LoremIpsum'
         ReadOnly = False
       end
       item
-        Name = 'Price'
+        Name = 'Pizza.Price'
         FieldType = ftCurrency
         Generator = 'Currency'
         ReadOnly = False
@@ -443,11 +474,11 @@ inherited ViewOrder: TViewOrder
       GridControl = StringGrid1
       Columns = <
         item
-          MemberName = 'Description'
+          MemberName = 'Pizza.Name'
           Width = 180
         end
         item
-          MemberName = 'Price'
+          MemberName = 'Pizza.Price'
           Width = 70
           CustomFormat = 'Format('#39'%%m'#39', Value)'
         end
@@ -460,6 +491,17 @@ inherited ViewOrder: TViewOrder
           Width = 80
           CustomFormat = 'Format('#39'%%m'#39', Value)'
         end>
+    end
+    object LinkFillControlToField1: TLinkFillControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSMaster
+      FieldName = 'OrderState'
+      Control = ComboBoxOrderState
+      Track = True
+      AutoFill = True
+      FillExpressions = <>
+      FillHeaderExpressions = <>
+      FillBreakGroups = <>
     end
   end
 end

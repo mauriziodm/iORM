@@ -25,7 +25,7 @@ inherited ViewPizza: TViewPizza
       object EditID: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         StyleLookup = 'transparentedit'
-        TabOrder = 40
+        TabOrder = 41
         Text = '-33'
         TextSettings.Font.StyleExt = {00070000000000000004000000}
         Position.X = 5.000000000000000000
@@ -48,7 +48,7 @@ inherited ViewPizza: TViewPizza
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         Anchors = [akLeft, akTop, akRight]
         StyleLookup = 'transparentedit'
-        TabOrder = 39
+        TabOrder = 40
         Text = 'Darkgoldenrod'
         TextSettings.Font.StyleExt = {00070000000000000004000000}
         Position.X = 53.000000000000000000
@@ -78,7 +78,7 @@ inherited ViewPizza: TViewPizza
         Touch.InteractiveGestures = [LongTap, DoubleTap]
         Anchors = [akLeft, akTop, akRight]
         StyleLookup = 'transparentedit'
-        TabOrder = 39
+        TabOrder = 40
         Text = '67,67 '#8364
         TextSettings.Font.StyleExt = {00070000000000000004000000}
         Position.X = 5.000000000000000000
@@ -101,7 +101,7 @@ inherited ViewPizza: TViewPizza
     object ListBoxItemImage: TListBoxItem
       Position.Y = 100.000000000000000000
       Size.Width = 396.000000000000000000
-      Size.Height = 357.000000000000000000
+      Size.Height = 85.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 2
       object Image: TImage
@@ -206,17 +206,43 @@ inherited ViewPizza: TViewPizza
               AED375EFC2B241B40BAB0BCB06011BB7762DCB06ACFF0303094D3AE1BEB78900
               00000049454E44AE426082}
           end>
-        Anchors = [akLeft, akTop, akRight, akBottom]
         Position.X = 5.000000000000000000
         Position.Y = 21.000000000000000000
-        Size.Width = 386.000000000000000000
-        Size.Height = 328.000000000000000000
+        Size.Width = 60.000000000000000000
+        Size.Height = 60.000000000000000000
         Size.PlatformDefault = False
         object Label4: TLabel
           Position.Y = -23.000000000000000000
           Text = 'Image'
           TabOrder = 0
         end
+      end
+    end
+    object ListBoxItemIngredients: TListBoxItem
+      Position.Y = 185.000000000000000000
+      Size.Width = 396.000000000000000000
+      Size.Height = 325.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 3
+      Text = 'ListBoxItemIngredients'
+      object Label5: TLabel
+        Align = Top
+        Size.Width = 396.000000000000000000
+        Size.Height = 21.000000000000000000
+        Size.PlatformDefault = False
+        Text = ' Ingredients'
+        TabOrder = 0
+      end
+      object Grid1: TGrid
+        Align = Client
+        CanFocus = True
+        ClipChildren = True
+        Size.Width = 396.000000000000000000
+        Size.Height = 304.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 40
+        Viewport.Width = 376.000000000000000000
+        Viewport.Height = 279.000000000000000000
       end
     end
   end
@@ -281,5 +307,51 @@ inherited ViewPizza: TViewPizza
       Control = Image
       Track = False
     end
+    object LinkGridToDataSourceBSIngredients: TLinkGridToDataSource
+      Category = 'Quick Bindings'
+      DataSource = BSIngredients
+      GridControl = Grid1
+      Columns = <
+        item
+          MemberName = 'Ingredient.Name'
+          Header = 'Ingredient name'
+          Width = 250
+        end
+        item
+          MemberName = 'Ingredient.UnitOfMeasure'
+          Header = 'UM'
+          Width = 45
+        end
+        item
+          MemberName = 'Qty'
+          Width = 60
+        end>
+    end
+  end
+  object BSIngredients: TioPrototypeBindSourceDetail
+    AutoPost = False
+    FieldDefs = <
+      item
+        Name = 'Ingredient.Name'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'Ingredient.UnitOfMeasure'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'Qty'
+        FieldType = ftSingle
+        Generator = 'Floats'
+        ReadOnly = False
+      end>
+    ScopeMappings = <>
+    AsDefault = False
+    MasterBindSource = BSMaster
+    MasterPropertyName = 'Ingredients'
+    Left = 66
+    Top = 304
   end
 end

@@ -4,8 +4,8 @@ object PizzaListForm: TPizzaListForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 659
-  ClientWidth = 376
+  ClientHeight = 658
+  ClientWidth = 372
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,16 +20,15 @@ object PizzaListForm: TPizzaListForm
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 376
+    Width = 372
     Height = 40
     Align = alTop
     BevelOuter = bvNone
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 372
     object ButtonSelect: TSpeedButton
-      Left = 326
+      Left = 322
       Top = 0
       Width = 50
       Height = 40
@@ -37,7 +36,7 @@ object PizzaListForm: TPizzaListForm
       Align = alRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clNavy
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
@@ -53,7 +52,7 @@ object PizzaListForm: TPizzaListForm
       Align = alLeft
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clNavy
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
@@ -74,18 +73,16 @@ object PizzaListForm: TPizzaListForm
   end
   object PanelBottom: TPanel
     Left = 0
-    Top = 619
-    Width = 376
+    Top = 618
+    Width = 372
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
-    ExplicitTop = 618
-    ExplicitWidth = 372
     object ButtonAdd: TSpeedButton
-      Left = 326
+      Left = 322
       Top = 0
       Width = 50
       Height = 40
@@ -93,7 +90,7 @@ object PizzaListForm: TPizzaListForm
       Align = alRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clGreen
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
@@ -108,7 +105,7 @@ object PizzaListForm: TPizzaListForm
       Align = alLeft
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clRed
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
@@ -118,19 +115,16 @@ object PizzaListForm: TPizzaListForm
   object DBCtrlGridPizzas: TDBCtrlGrid
     Left = 0
     Top = 40
-    Width = 376
-    Height = 500
+    Width = 372
+    Height = 481
     Align = alClient
     DataSource = SourcePizzas
-    PanelHeight = 100
-    PanelWidth = 359
+    PanelHeight = 96
+    PanelWidth = 355
     TabOrder = 2
     RowCount = 5
     SelectedColor = 13828095
     ShowFocus = False
-    OnDblClick = DBCtrlGridPizzasDblClick
-    ExplicitWidth = 372
-    ExplicitHeight = 499
     object DBTextName: TDBText
       Left = 99
       Top = 20
@@ -144,7 +138,6 @@ object PizzaListForm: TPizzaListForm
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
-      OnDblClick = DBCtrlGridPizzasDblClick
     end
     object DBTextPrice: TDBText
       Left = 99
@@ -159,7 +152,6 @@ object PizzaListForm: TPizzaListForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      OnDblClick = DBCtrlGridPizzasDblClick
     end
     object DBImage: TDBImage
       Left = 7
@@ -173,21 +165,21 @@ object PizzaListForm: TPizzaListForm
       Proportional = True
       Stretch = True
       TabOrder = 0
-      OnDblClick = DBCtrlGridPizzasDblClick
     end
   end
   object PanelWhere: TPanel
     Left = 0
-    Top = 540
-    Width = 376
-    Height = 79
+    Top = 521
+    Width = 372
+    Height = 97
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 3
-    ExplicitTop = 539
-    ExplicitWidth = 372
+    DesignSize = (
+      372
+      97)
     object Label1: TLabel
       Left = 8
       Top = 7
@@ -233,30 +225,34 @@ object PizzaListForm: TPizzaListForm
       ParentFont = False
     end
     object ButtonSearch: TSpeedButton
-      Left = 330
+      Left = 318
       Top = 0
       Width = 50
       Height = 45
       Action = acBuildWhere
+      Anchors = [akTop, akRight]
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
+      ExplicitLeft = 326
     end
     object ButtonClear: TSpeedButton
-      Left = 330
+      Left = 318
       Top = 49
       Width = 50
       Height = 25
       Action = acClearWhere
+      Anchors = [akTop, akRight]
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      ExplicitLeft = 326
     end
     object Label4: TLabel
       Left = 179
@@ -265,6 +261,21 @@ object PizzaListForm: TPizzaListForm
       Height = 21
       Alignment = taRightJustify
       Caption = 'to price'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clGray
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object Label5: TLabel
+      Left = 7
+      Top = 69
+      Width = 81
+      Height = 25
+      Alignment = taRightJustify
+      AutoSize = False
+      Caption = 'Ingred.'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clGray
       Font.Height = -16
@@ -339,6 +350,23 @@ object PizzaListForm: TPizzaListForm
       Font.Style = []
       ParentFont = False
       TabOrder = 3
+    end
+    object DBEditWhereIngredient: TDBEdit
+      Left = 94
+      Top = 68
+      Width = 226
+      Height = 25
+      BorderStyle = bsNone
+      Color = clWhite
+      DataField = 'IngredientName'
+      DataSource = SourceWhere
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 4
     end
   end
   object DSPizzas: TioDataSetMaster
@@ -428,6 +456,10 @@ object PizzaListForm: TPizzaListForm
     end
     object DSWhereToPrice: TCurrencyField
       FieldName = 'ToPrice'
+    end
+    object DSWhereIngredientName: TStringField
+      FieldName = 'IngredientName'
+      Size = 100
     end
   end
   object SourceWhere: TDataSource

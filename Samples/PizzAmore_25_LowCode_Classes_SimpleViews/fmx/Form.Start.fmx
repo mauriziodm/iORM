@@ -68,13 +68,6 @@ object StartForm: TStartForm
             StyleLookup = 'escapetoolbutton'
             TextSettings.FontColor = claAliceblue
           end
-          object SynchroAnim: TAniIndicator
-            Position.X = 67.000000000000000000
-            Position.Y = 3.000000000000000000
-            Size.Width = 34.000000000000000000
-            Size.Height = 34.000000000000000000
-            Size.PlatformDefault = False
-          end
         end
       end
       object ButtonGoToOrderList: TButton
@@ -88,13 +81,13 @@ object StartForm: TStartForm
         Margins.Right = 5.000000000000000000
         Margins.Bottom = 5.000000000000000000
         Position.X = 5.000000000000000000
-        Position.Y = 365.000000000000000000
+        Position.Y = 380.000000000000000000
         Size.Width = 390.000000000000000000
-        Size.Height = 70.000000000000000000
+        Size.Height = 65.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 3
         TextSettings.Font.Size = 18.000000000000000000
-        TextSettings.Font.StyleExt = {00060000000000000004000000}
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
       end
       object ButtonGoToPizzaList: TButton
         Action = acShowPizzas
@@ -107,13 +100,13 @@ object StartForm: TStartForm
         Margins.Right = 5.000000000000000000
         Margins.Bottom = 5.000000000000000000
         Position.X = 5.000000000000000000
-        Position.Y = 525.000000000000000000
+        Position.Y = 530.000000000000000000
         Size.Width = 390.000000000000000000
-        Size.Height = 70.000000000000000000
+        Size.Height = 65.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 2
         TextSettings.Font.Size = 18.000000000000000000
-        TextSettings.Font.StyleExt = {00060000000000000004000000}
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
       end
       object ButtonGoToCustomerList: TButton
         Action = acShowCustomers
@@ -126,18 +119,18 @@ object StartForm: TStartForm
         Margins.Right = 5.000000000000000000
         Margins.Bottom = 5.000000000000000000
         Position.X = 5.000000000000000000
-        Position.Y = 445.000000000000000000
+        Position.Y = 455.000000000000000000
         Size.Width = 390.000000000000000000
-        Size.Height = 70.000000000000000000
+        Size.Height = 65.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 1
         TextSettings.Font.Size = 18.000000000000000000
-        TextSettings.Font.StyleExt = {00060000000000000004000000}
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
       end
       object LayoutMain: TLayout
         Align = Client
         Size.Width = 400.000000000000000000
-        Size.Height = 315.000000000000000000
+        Size.Height = 330.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 4
         object Layout1: TLayout
@@ -150,7 +143,7 @@ object StartForm: TStartForm
             AutoSize = True
             StyledSettings = [Family]
             Position.X = 129.000000000000000000
-            Position.Y = 5.000000000000000000
+            Position.Y = 29.000000000000000000
             Size.Width = 152.000000000000000000
             Size.Height = 48.000000000000000000
             Size.PlatformDefault = False
@@ -163,7 +156,7 @@ object StartForm: TStartForm
             AutoSize = True
             StyledSettings = [Family]
             Position.X = 21.000000000000000000
-            Position.Y = 4.000000000000000000
+            Position.Y = 28.000000000000000000
             Size.Width = 108.000000000000000000
             Size.Height = 48.000000000000000000
             Size.PlatformDefault = False
@@ -5208,20 +5201,25 @@ object StartForm: TStartForm
                 FileName = 'C:\delphi\tools\iORM\Samples\common_images\LovePizza.bmp'
               end>
             Position.X = 8.000000000000000000
-            Position.Y = 45.000000000000000000
+            Position.Y = 69.000000000000000000
             Size.Width = 264.000000000000000000
             Size.Height = 250.000000000000000000
             Size.PlatformDefault = False
-            OnDblClick = ImageLogoDblClick
           end
         end
         object ButtonDoSynchronization: TButton
           Action = acDoSynchronization
+          Anchors = [akLeft, akTop, akRight]
           Enabled = True
+          StyledSettings = [Family, FontColor]
           ImageIndex = -1
-          Position.X = 8.000000000000000000
-          Position.Y = 8.000000000000000000
+          Position.X = 5.000000000000000000
+          Size.Width = 390.000000000000000000
+          Size.Height = 33.000000000000000000
+          Size.PlatformDefault = False
           TabOrder = 1
+          TextSettings.Font.Size = 14.000000000000000000
+          TextSettings.Font.StyleExt = {00060000000000000004000000}
         end
       end
     end
@@ -5272,8 +5270,6 @@ object StartForm: TStartForm
     end
   end
   object ioFMX1: TioFMX
-    HideWait = ioFMX1HideWait
-    ShowWait = ioFMX1ShowWait
     Left = 32
     Top = 448
   end
@@ -5285,7 +5281,6 @@ object StartForm: TStartForm
     Persistent = False
     Pooled = False
     SynchroStrategy_Client = SynchroStrategy
-    OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
     Left = 32
     Top = 512
   end
@@ -5303,23 +5298,22 @@ object StartForm: TStartForm
     DatabaseStdFolder = sfDocuments
     Persistent = False
     Pooled = False
-    Left = 256
+    Left = 88
     Top = 304
   end
   object SynchroStrategy: TioEtmSynchroStrategy_Client
     Async = True
     EtmTimeSlot_ClassName = 'TEtmRepository'
-    TargetConnectionDef = HttpConn
-    AfterSynchronization = SynchroStrategyAfterSynchronization
-    BeforeSynchronization = SynchroStrategyBeforeSynchronization
-    Left = 83
+    SynchroLogName = 'from mobile app'
+    TargetConnectionDef = ServerConn
+    Left = 187
     Top = 304
   end
   object HttpConn: TioHttpConnectionDef
     AsDefault = False
     BaseURL = 'http://localhost:8080/iorm'
     Persistent = True
-    Left = 256
-    Top = 240
+    Left = 280
+    Top = 304
   end
 end

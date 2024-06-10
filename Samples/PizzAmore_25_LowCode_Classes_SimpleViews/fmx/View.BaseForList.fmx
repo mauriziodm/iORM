@@ -93,7 +93,6 @@ object ViewBaseForList: TViewBaseForList
     Size.Height = 440.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 3
-    OnDblClick = ListViewDblClick
   end
   object RectangleWhere: TRectangle
     Align = Bottom

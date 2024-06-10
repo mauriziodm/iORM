@@ -56,8 +56,7 @@ type
     DSCustomerPhoneNumber: TStringField;
     SourceCustomer: TDataSource;
     DSRows: TioDataSetDetail;
-    DSRowsDescription: TStringField;
-    DSRowsPrice: TCurrencyField;
+    DSRowsPizzaPrice: TCurrencyField;
     DSRowsQty: TIntegerField;
     DSRowsRowTotal: TCurrencyField;
     SourceRows: TDataSource;
@@ -78,6 +77,7 @@ type
     acShowCustomer: TioBSShowOrSelect;
     acShowETM: TioBSShowOrSelect;
     ButtonETM: TSpeedButton;
+    DSRowsPizzaName: TStringField;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure DSOrderSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
