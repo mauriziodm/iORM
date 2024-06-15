@@ -111,6 +111,10 @@ type
     procedure UnbindViewAction(const AViewAction: IioViewAction);
     function Update: Boolean;
     function Execute: Boolean;
+    // Checked property (Carlo Marona 2024/05/29)
+    procedure SetChecked(const Value: Boolean);
+    function GetChecked: Boolean;
+    property Checked: Boolean read GetChecked write SetChecked;
     // Enabled property
     procedure SetEnabled(const Value: Boolean);
     function GetEnabled: Boolean;
@@ -135,7 +139,15 @@ type
     procedure DoAfterExecute;
     procedure DoBeforeUpdate;
     procedure DoAfterUpdate;
-    // Enabled
+    // Checked property
+    procedure SetChecked(Value: Boolean);
+    function GetChecked: Boolean;
+    property Checked: Boolean read GetChecked write SetChecked;
+    // CheckedLinkedToVMAction property
+    procedure SetCheckedLinkedToVMAction(Value: Boolean);
+    function GetCheckedLinkedToVMAction: Boolean;
+    property CheckedLinkedToVMAction: Boolean read GetCheckedLinkedToVMAction write SetCheckedLinkedToVMAction;
+    // Enabled property
     procedure SetEnabled(Value: Boolean);
     function GetEnabled: Boolean;
     property Enabled: Boolean read GetEnabled write SetEnabled;

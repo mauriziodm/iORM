@@ -52,6 +52,7 @@ type
   // Standard action for MVVM view use
   TioViewAction = class(Fmx.ActnList.TCustomAction, IioViewAction)
   strict private
+    FCheckedLinkedToVMAction: Boolean;
     FEnabledLinkedToVMAction: Boolean;
     FVisibleLinkedToVMAction: Boolean;
     FVMAction: IioVMAction;
@@ -69,6 +70,12 @@ type
     procedure DoAfterExecute;
     procedure DoBeforeUpdate;
     procedure DoAfterUpdate;
+    // Checked property
+    function GetChecked: Boolean;
+    procedure SetChecked(Value: Boolean);
+    // CheckedLinkedToVMAction property
+    procedure SetCheckedLinkedToVMAction(Value: Boolean);
+    function GetCheckedLinkedToVMAction: Boolean;
     // Enabled property
     procedure SetEnabled(Value: Boolean); override;
     function GetEnabled: Boolean;
@@ -98,7 +105,7 @@ type
   published
     // inherited properties
     property AutoCheck;
-    property Checked;
+    // property Checked; // ridichiarata sotto Carlo Marona 2024/05/29
     // property Enabled; // ridichiarata sotto
     property GroupIndex;
     property HelpContext;
@@ -116,6 +123,8 @@ type
     property OnHint;
     // property OnUpdate; // Lasciarla non visibile, può fare casino in questa particolare action
     // Properties
+    property Checked: Boolean read GetChecked write SetChecked default False;
+    property CheckedLinkedToVMAction: Boolean read GetCheckedLinkedToVMAction write SetCheckedLinkedToVMAction default True;
     property Enabled: Boolean read GetEnabled write SetEnabled;
     property EnabledLinkedToVMAction: Boolean read GetEnabledLinkedToVMAction write SetEnabledLinkedToVMAction default True;
     property Visible: Boolean read GetVisible write SetVisible;
@@ -1530,6 +1539,7 @@ end;
 constructor TioViewAction.Create(AOwner: TComponent);
 begin
   inherited;
+  FCheckedLinkedToVMAction := True;
   FEnabledLinkedToVMAction := True;
   FVisibleLinkedToVMAction := True;
   FVMAction := nil;
@@ -1567,6 +1577,16 @@ procedure TioViewAction.DoBeforeUpdate;
 begin
   if Assigned(FBeforeUpdate) then
     FBeforeUpdate(Self);
+end;
+
+function TioViewAction.GetChecked: Boolean;
+begin
+  Result := inherited Checked;
+end;
+
+function TioViewAction.GetCheckedLinkedToVMAction: Boolean;
+begin
+  Result := FCheckedLinkedToVMAction;
 end;
 
 function TioViewAction.GetEnabled: Boolean;
@@ -1610,6 +1630,24 @@ end;
 function TioViewAction.Get_Version: String;
 begin
   Result := io.Version;
+end;
+
+procedure TioViewAction.SetChecked(Value: Boolean);
+begin
+  if Value <> GetChecked then
+  begin
+    inherited SetChecked(Value);
+    if FCheckedLinkedToVMAction and not(csDesigning in ComponentState) then
+    begin
+      CheckVMAction('SetChecked');
+      FVMAction.Checked := Value;
+    end;
+  end;
+end;
+
+procedure TioViewAction.SetCheckedLinkedToVMAction(Value: Boolean);
+begin
+  FCheckedLinkedToVMAction := Value;
 end;
 
 procedure TioViewAction.SetEnabled(Value: Boolean);

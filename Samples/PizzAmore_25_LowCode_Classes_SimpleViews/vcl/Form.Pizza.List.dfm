@@ -27,6 +27,7 @@ object PizzaListForm: TPizzaListForm
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
+    ExplicitWidth = 368
     object ButtonSelect: TSpeedButton
       Left = 322
       Top = 0
@@ -81,6 +82,8 @@ object PizzaListForm: TPizzaListForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
+    ExplicitTop = 617
+    ExplicitWidth = 368
     object ButtonAdd: TSpeedButton
       Left = 322
       Top = 0
@@ -125,6 +128,8 @@ object PizzaListForm: TPizzaListForm
     RowCount = 5
     SelectedColor = 13828095
     ShowFocus = False
+    ExplicitWidth = 368
+    ExplicitHeight = 480
     object DBTextName: TDBText
       Left = 99
       Top = 20
@@ -177,6 +182,8 @@ object PizzaListForm: TPizzaListForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 3
+    ExplicitTop = 520
+    ExplicitWidth = 368
     DesignSize = (
       372
       97)
@@ -225,7 +232,7 @@ object PizzaListForm: TPizzaListForm
       ParentFont = False
     end
     object ButtonSearch: TSpeedButton
-      Left = 318
+      Left = 314
       Top = 0
       Width = 50
       Height = 45
@@ -240,7 +247,7 @@ object PizzaListForm: TPizzaListForm
       ExplicitLeft = 326
     end
     object ButtonClear: TSpeedButton
-      Left = 318
+      Left = 314
       Top = 49
       Width = 50
       Height = 25
@@ -374,7 +381,7 @@ object PizzaListForm: TPizzaListForm
     TypeName = 'TPizza'
     AsyncLoad = True
     AsyncPersist = True
-    OrderBy = '[.Name]'
+    OrderBy = '[.Name] DESC'
     Paging.CurrentPageOfFormat = '%d/%d'
     Left = 80
     Top = 176

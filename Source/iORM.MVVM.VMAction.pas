@@ -50,6 +50,7 @@ type
   TioVMActionCustom = class (TComponent, IioVMAction)
   strict private
     FBindedViewActionsContainer: TList<IioViewAction>;
+    FChecked: Boolean;
     FEnabled: Boolean;
     FExecutionMode: TioActionExecutionMode;
     FVisible: Boolean;
@@ -69,16 +70,19 @@ type
     procedure BindViewAction(const AViewAction: IioViewAction);
     procedure UnbindViewAction(const AViewAction: IioViewAction);
     procedure UnbindAllViewActions;
+    function GetChecked: Boolean;                     // Carlo Marona 2024/05/29
     function GetEnabled: Boolean;
     function GetExecutionMode: TioActionExecutionMode;
     function GetName: TComponentName;
     function GetOwnerComponent: TComponent;
     function GetVisible: Boolean;
+    procedure SetChecked(const Value: Boolean);       // Carlo Marona 2024/05/29
     procedure SetEnabled(const Value: Boolean);
     procedure SetExecutionMode(const Value: TioActionExecutionMode);
     procedure SetName(const Value: TComponentName); reintroduce;
     procedure SetVisible(const Value: Boolean);
     // properties
+    property Checked: Boolean read GetChecked write SetChecked default False;
     property Enabled: Boolean read GetEnabled write SetEnabled default True;
     property ExecutionMode: TioActionExecutionMode read GetExecutionMode write SetExecutionMode;
     property Name: TComponentName read GetName write SetName;
@@ -109,6 +113,7 @@ type
     property Owner;
   published
     // inherited properties
+    property Checked;
     property Enabled;
     property Name;
     property Visible;
@@ -764,6 +769,7 @@ constructor TioVMActionCustom.Create(AOwner: TComponent);
 begin
   inherited;
   FExecutionMode := emActive;
+  FChecked := False;
   FEnabled := True;
   FVisible := True;
   FBindedViewActionsContainer := TList<IioViewAction>.Create;
@@ -789,6 +795,10 @@ function TioVMActionCustom.Update: Boolean;
 begin
   _UpdateOriginal;
   Result := False;
+end;
+function TioVMActionCustom.GetChecked: Boolean;
+begin
+  Result := FChecked;
 end;
 
 function TioVMActionCustom.GetEnabled: Boolean;
@@ -904,6 +914,8 @@ begin
   FBindedViewActionsContainer.Add(AViewAction);
   AViewAction.VMAction := Self;
   // Propagate Enabled/Visible to the new registered ViewAction if linked
+  if AViewAction.CheckedLinkedToVMAction then             // Carlo Marona 2024/05/29
+    AViewAction.Checked := FChecked;
   if AViewAction.EnabledLinkedToVMAction then
     AViewAction.Enabled := FEnabled;
   if AViewAction.VisibleLinkedToVMAction then
@@ -922,6 +934,19 @@ var
 begin
   for I := FBindedViewActionsContainer.Count-1 downto 0 do
     UnbindViewAction(FBindedViewActionsContainer[I]);
+end;
+
+procedure TioVMActionCustom.SetChecked(const Value: Boolean);
+var
+  LViewAction: IioViewAction;
+begin
+  if Value <> FChecked then
+  begin
+    FChecked := Value;
+    for LViewAction in FBindedViewActionsContainer do
+      if LViewAction.CheckedLinkedToVMAction then
+        LViewAction.Checked := Value;
+  end;
 end;
 
 procedure TioVMActionCustom.SetEnabled(const Value: Boolean);
