@@ -8505,7 +8505,7 @@ object MainForm: TMainForm
   object ButtonOrders: TButton
     Left = 42
     Top = 329
-    Width = 190
+    Width = 186
     Height = 40
     Action = acShowOrders
     Anchors = [akLeft, akRight, akBottom]
@@ -8517,12 +8517,12 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 0
     ExplicitTop = 328
-    ExplicitWidth = 186
+    ExplicitWidth = 182
   end
   object ButtonCustomers: TButton
     Left = 42
     Top = 374
-    Width = 190
+    Width = 186
     Height = 40
     Action = acShowCustomers
     Anchors = [akLeft, akRight, akBottom]
@@ -8534,12 +8534,12 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 1
     ExplicitTop = 373
-    ExplicitWidth = 186
+    ExplicitWidth = 182
   end
   object ButtonPizzas: TButton
     Left = 42
     Top = 419
-    Width = 190
+    Width = 186
     Height = 40
     Action = acShowPizzas
     Anchors = [akLeft, akRight, akBottom]
@@ -8551,12 +8551,12 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 2
     ExplicitTop = 418
-    ExplicitWidth = 186
+    ExplicitWidth = 182
   end
   object ButtonQuit: TButton
     Left = 42
     Top = 500
-    Width = 190
+    Width = 186
     Height = 30
     Action = acQuit
     Anchors = [akLeft, akRight, akBottom]
@@ -8568,12 +8568,12 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 3
     ExplicitTop = 499
-    ExplicitWidth = 186
+    ExplicitWidth = 182
   end
   object ButtonIngredients: TButton
     Left = 42
     Top = 464
-    Width = 79
+    Width = 75
     Height = 31
     Action = acShowIngredients
     Anchors = [akLeft, akRight, akBottom]
@@ -8584,11 +8584,13 @@ object MainForm: TMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 4
+    ExplicitTop = 463
+    ExplicitWidth = 71
   end
   object ButtonSynchroLogs: TButton
     Left = 127
     Top = 464
-    Width = 105
+    Width = 101
     Height = 31
     Action = acShowSynchroLogs
     Anchors = [akLeft, akRight, akBottom]
@@ -8599,14 +8601,15 @@ object MainForm: TMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 5
+    ExplicitTop = 463
+    ExplicitWidth = 97
   end
   object ioVCL1: TioVCL
     Left = 18
     Top = 265
   end
   object SQLiteConn: TioSQLiteConnectionDef
-    AsDefault = True
-    AutoCreateDB.Enabled = True
+    AsDefault = False
     Database = 'PizzAmore_25_LowCode_Classes_SimpleViews_Vcl.db'
     DatabaseStdFolder = sfDocuments
     Persistent = False
@@ -8671,7 +8674,7 @@ object MainForm: TMainForm
     end
   end
   object HttpConn: TioHttpConnectionDef
-    AsDefault = False
+    AsDefault = True
     BaseURL = 'http://localhost:8080/iorm'
     Persistent = True
     Left = 157

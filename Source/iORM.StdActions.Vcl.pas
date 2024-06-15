@@ -69,7 +69,7 @@ type
     procedure DoAfterUpdate;
     // Checked property
     function GetChecked: Boolean;
-    procedure SetChecked(Value: Boolean);
+    procedure SetChecked(Value: Boolean); reintroduce;
     // CheckedLinkedToVMAction property
     procedure SetCheckedLinkedToVMAction(Value: Boolean);
     function GetCheckedLinkedToVMAction: Boolean;

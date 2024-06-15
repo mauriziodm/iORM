@@ -5,7 +5,8 @@ object MyWebModule: TMyWebModule
   Height = 225
   Width = 415
   object FirebirdConn: TioFirebirdConnectionDef
-    AsDefault = False
+    AsDefault = True
+    AutoCreateDB.Enabled = True
     Database = 'PizzAmore_25_LowCode_Classes_SimpleViews_Vcl.FDB'
     DatabaseStdFolder = sfDocuments
     OSAuthent = oaNo
@@ -25,8 +26,7 @@ object MyWebModule: TMyWebModule
     Top = 48
   end
   object SQLiteConn: TioSQLiteConnectionDef
-    AsDefault = True
-    AutoCreateDB.Enabled = True
+    AsDefault = False
     Database = 'PizzAmore_25_LowCode_Classes_SimpleViews_Vcl.db'
     DatabaseStdFolder = sfDocuments
     Persistent = False

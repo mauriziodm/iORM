@@ -114,6 +114,7 @@ end;
 
 class procedure TioSqlGeneratorSqLite.GenerateSqlCurrentTimestamp(const AQuery: IioQuery);
 begin
+  // Sembra che venga ritornato l'orario UTC e non del fuso orario locale
   AQuery.SQL.Add('SELECT STRFTIME("%Y-%m-%d %H:%M:%f", "now")');
 end;
 

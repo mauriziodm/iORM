@@ -157,6 +157,7 @@ end;
 class procedure TioSqlGeneratorFirebird.GenerateSqlCurrentTimestamp(const AQuery: IioQuery);
 begin
   inherited;
+  // Sembra che venga ritornato l'orario UTC e non del fuso orario locale
   AQuery.SQL.Add('SELECT CURRENT_TIMESTAMP FROM RDB$DATABASE');
 end;
 
