@@ -24,7 +24,7 @@ object EtmView: TEtmView
       TabOrder = 0
     end
     object ButtonRevert: TSpeedButton
-      Action = acEtmRevertToVersion
+      Action = acRevertToObject
       Align = Right
       Enabled = True
       StyledSettings = [Family, Size, Style]
@@ -258,6 +258,12 @@ object EtmView: TEtmView
       AutoExec_OnETMfor_AfterRevert = doRefresh
       AutoExec_OnTargetBS_AfterRevert = doReload
       AutoExec_Persist_AfterRevert = True
+    end
+    object acRevertToObject: TioBS_ETM_RevertToObject
+      Category = 'iORM - BS - ETM'
+      Text = 'Revert to obj'
+      TargetBindSource = BS_ETM
+      AfterRevert = acRevertToObjectAfterRevert
     end
   end
 end

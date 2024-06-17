@@ -1,0 +1,19 @@
+diff a/Source/iORM.LiveBindings.PrototypeBindSource.Custom.pas b/Source/iORM.LiveBindings.PrototypeBindSource.Custom.pas	(rejected hunks)
+@@ -1206,14 +1206,15 @@
+ end;
+ 
+ procedure TioPrototypeBindSourceCustom.SetPreview(const Value: Boolean);
+ begin
+   // Se stiamo abilitando la preview e siamo a design time attiva
+   //  la propriet� "AutoActivate" per mostrare i dati anche a design-time
+-  FPreview := Value;
+-  AutoActivate := FPreview and (csDesigning in ComponentState);
++  //  NB: A runtime Preview � sempre false (non mi paicevano i dati fake visibili a runtime)
++  FPreview := Value and (csDesigning in ComponentState);
++  SetAutoActivate(FPreview);
+ end;
+ 
+ procedure TioPrototypeBindSourceCustom.SetSelectorFor(const ATargetBindSource: IioBindSource);
+ begin
+   FSelectorFor := ATargetBindSource;
+ end;

@@ -57,7 +57,7 @@ object EtmListForm: TEtmListForm
     object LabelTitle: TLabel
       Left = 120
       Top = 7
-      Width = 697
+      Width = 693
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -158,7 +158,7 @@ object EtmListForm: TEtmListForm
       ParentFont = False
     end
     object ButtonRevertTo: TSpeedButton
-      Left = 892
+      Left = 888
       Top = 6
       Width = 76
       Height = 28
@@ -171,6 +171,20 @@ object EtmListForm: TEtmListForm
       Font.Style = []
       ParentFont = False
       ExplicitLeft = 904
+    end
+    object SpeedButton1: TSpeedButton
+      Left = 720
+      Top = 6
+      Width = 123
+      Height = 28
+      Action = acEtmRevertToObject
+      Anchors = [akTop, akRight]
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
     end
   end
   object GridCustomers: TDBGrid
@@ -417,6 +431,12 @@ object EtmListForm: TEtmListForm
       ShowMode = smBSCurrent
       TargetBindSource = DS_ETM
       ViewContextBy = vcByDefaultViewContextProvider
+    end
+    object acEtmRevertToObject: TioBS_ETM_RevertToObject
+      Category = 'iORM - BS - ETM'
+      Caption = 'Revert to Obj'
+      TargetBindSource = DS_ETM
+      AfterRevert = acEtmRevertToObjectAfterRevert
     end
   end
 end

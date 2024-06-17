@@ -4,7 +4,7 @@
   *           iORM - (interfaced ORM)                                        *
   *                                                                          *
   *           Copyright (C) 2015-2023 Maurizio Del Magno                     *
-  *                                                                          *                                    fv
+  *                                                                          *
   *           mauriziodm@levantesw.it                                        *
   *           mauriziodelmagno@gmail.com                                     *
   *           https://github.com/mauriziodm/iORM.git                         *
@@ -57,7 +57,6 @@ type
       ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     // Common code for some checks by the bind sources
     class procedure CheckForOpen(const ABindSource: IioBindSource; const ALoadType: TioLoadType);
-    class procedure CheckForSetDataObject(const ABindSource: IioBindSource; const ALoadType: TioLoadType; const ADataObject: TObject);
     class procedure CheckForSetSourceBS(const ABindSource, ASourceBS: IioBindSource; const ALoadType: TioLoadType);
     class procedure CheckForSetLoadType(const ABindSource, ASourceBS: IioBindSource; const ALoadType: TioLoadType);
     class function CheckIfLoadTypeIsFromBS(const ALoadType: TioLoadType): Boolean;
@@ -87,15 +86,6 @@ begin
   if ABindSource.IsMasterBS and (ALoadType = ltManual) and not ABindSource.CheckActiveAdapter then
     raise EioGenericException.Create(ClassName, 'CheckForOpen',
       Format('You are not allowed to activate the BindSource "%s" if its "LoadType" property is set to "ltManual" unless the "SetDataObject" method has been executed at least once with a valid object.',
-      [ABindSource.GetName]));
-end;
-
-class procedure TioCommonBSBehavior.CheckForSetDataObject(const ABindSource: IioBindSource; const ALoadType: TioLoadType; const ADataObject: TObject);
-begin
-  // Accept the new data object only if LoadType is ltManual
-  if ALoadType <> ltManual then
-    raise EioGenericException.Create(ClassName, 'CheckForSetDataObject',
-      Format('Invoking the "SetDataObject" method is allowed only if the "LoadType" property is set to "ltManual".'#13#13'Please set the property "LoadType" of the bind source "%s" (maybe a DataSet or BindSource) to "ltManual" and try again.',
       [ABindSource.GetName]));
 end;
 

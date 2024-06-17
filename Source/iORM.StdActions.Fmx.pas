@@ -604,7 +604,6 @@ type
     FAutoExec_OnETMfor_AfterRevert: TioStdAction_ETM_AutoExec_AfterRevert;
     FAutoExec_OnTargetBS_AfterRevert: TioStdAction_ETM_AutoExec_AfterRevert;
     FAutoExec_Persist_AfterRevert: Boolean;
-    FOwnRevertedObj: Boolean;
     FRevertedObj: TObject;
     // Events
     FAfterRevertEvent: TioStdAction_ETM_AfterRevertEvent;
@@ -632,7 +631,6 @@ type
     property AutoExec_OnTargetBS_AfterRevert: TioStdAction_ETM_AutoExec_AfterRevert read FAutoExec_OnTargetBS_AfterRevert write FAutoExec_OnTargetBS_AfterRevert
       default doNothing;
     property AutoExec_Persist_AfterRevert: Boolean read FAutoExec_Persist_AfterRevert write FAutoExec_Persist_AfterRevert default False;
-    property OwnRevertedObj: Boolean read FOwnRevertedObj write FOwnRevertedObj default True;
     // events
     property AfterRevert: TioStdAction_ETM_AfterRevertEvent read FAfterRevertEvent write FAfterRevertEvent;
     property BeforeRevert: TioStdAction_ETM_BeforeRevertEvent read FBeforeRevertEvent write FBeforeRevertEvent;
@@ -2397,22 +2395,20 @@ begin
   FAutoExec_OnTargetBS_AfterRevert := doNothing;
   FAutoExec_Persist_AfterRevert := False;
   FRevertedObj := nil;
-  FOwnRevertedObj := True;
 end;
 
 procedure TioBS_ETM_RevertToObject._InternalExecuteStdAction;
 begin
   inherited;
+  // Reset
+  FRevertedObj := nil;
   // Some check
   if not(TargetBindSource.Current is TioEtmCustomTimeSlot) then
     raise EioEtmException.Create(ClassName, 'ExecuteTarget', 'Current object in the TargetBindSource is not derived from "TioEtmCustomTimeSlot" base class.');
-  // Free previous reverted object (if OwnRevertedObj = True)
-  if FOwnRevertedObj and Assigned(FRevertedObj) then
-    FreeAndNil(FRevertedObj);
   // BeforeRevert event handler
   if Assigned(FBeforeRevertEvent) then
     FBeforeRevertEvent(Self, FRevertedObj);
-  // Revert
+  // Revert (if FRevertedObj is assigned by BeforeRevertEvent then reverto to it)
   if Assigned(FRevertedObj) then
     io.ETM.RevertToObject(FRevertedObj, TargetBindSource.Current as TioEtmCustomTimeSlot, FAutoExec_Persist_AfterRevert)
   else

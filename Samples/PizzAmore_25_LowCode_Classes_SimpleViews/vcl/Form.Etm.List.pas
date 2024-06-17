@@ -44,7 +44,10 @@ type
     acShowTimeSlot: TioBSShowOrSelect;
     ButtonRevertTo: TSpeedButton;
     DS_ETMID: TIntegerField;
+    SpeedButton1: TSpeedButton;
+    acEtmRevertToObject: TioBS_ETM_RevertToObject;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure acEtmRevertToObjectAfterRevert(const ASender, ARevertedObj: TObject);
   private
   public
   end;
@@ -52,6 +55,11 @@ type
 implementation
 
 {$R *.dfm}
+
+procedure TEtmListForm.acEtmRevertToObjectAfterRevert(const ASender, ARevertedObj: TObject);
+begin
+  io.Show(ARevertedObj, acBack);
+end;
 
 procedure TEtmListForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin

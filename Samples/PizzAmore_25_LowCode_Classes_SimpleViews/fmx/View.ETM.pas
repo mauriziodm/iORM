@@ -36,6 +36,8 @@ type
     ActionList1: TActionList;
     acBack: TioBSCloseQuery;
     acEtmRevertToVersion: TioBS_ETM_RevertToBindSource;
+    acRevertToObject: TioBS_ETM_RevertToObject;
+    procedure acRevertToObjectAfterRevert(const ASender, ARevertedObj: TObject);
   private
   public
   end;
@@ -43,5 +45,10 @@ type
 implementation
 
 {$R *.fmx}
+
+procedure TEtmView.acRevertToObjectAfterRevert(const ASender, ARevertedObj: TObject);
+begin
+  io.Show(ARevertedObj, acBack);
+end;
 
 end.

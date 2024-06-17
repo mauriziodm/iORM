@@ -850,7 +850,7 @@ begin
   //  e se la proprietà Preview = True scatena il relativo metodo set per far si
   //  che venga posta a true anche la proprietà AutoActivate e rendere visibile
   //  i dati a desig-time
-  SetPreview(Preview);
+  SetPreview(FPreview);
 
   // FioLoaded flag for iORM DoCreateAdapter internal use only just before
   // the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
@@ -1062,8 +1062,6 @@ end;
 
 procedure TioPrototypeBindSourceCustom.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
-  // Check if the operation (SetDataObject) is allowed
-  TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType, ADataObject);
   // If the ADataObject is assigned then set it as the BSA DataObject...else ClearDataObject
   if Assigned(ADataObject) then
   begin
@@ -1078,43 +1076,10 @@ begin
   end
   else
     ClearDataObject;
-// ----- OLD CODE FROM 04/01/2024 -----
-//  // Check if the operation (SetDataObject) is allowed
-//  TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType, ADataObject);
-//  // If the BS is active then set the DataObject
-//  if IsActive then
-//  begin
-//    // NB: Lasciare commentate le righe qua sotto perchè altrimenti quando
-//    // si faceva un SetDataObject dava un errore perchè la funzione
-//    // CheckActiveAdapter restituiva sempre False perchè non avendo il DataObject
-//    // assegnato (se prima avevo chiamato il  ClearDataObject)
-//    // if CheckActiveAdapter then
-//    GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
-//    // else
-//    // raise EioException.Create(Self.ClassName + ': invalid internal adapter.');
-//  end
-//  // If the BindSource is not active it checks if the new DataObject is assigned,
-//  //  if it is assigned then automatically activated the BindSource otherwise exits immediately
-//  //  because it does not need to do anything (the BindSource is already closed and if the new
-//  //  DataObject is being set to nil...)
-//  // NB: Ho dovuto attivare automaticamnete il BindSource (nel caso non lo fosse già) perchè
-//  //  altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
-//  // NB: Se il BS non è mai stato attivo prima allora crea anche il relativo ActiveBindSourceAdapter
-//  else
-//  begin
-//    if Assigned(ADataObject) then
-//    begin
-//      if GetActiveBindSourceAdapter = nil then
-//        _CreateAdapter(ADataObject, AOwnsObject);
-//      Open;
-//    end;
-//  end;
 end;
 
 procedure TioPrototypeBindSourceCustom.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
-  // Check if the operation (SetDataObject) is allowed
-  TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType, ADataObject as TObject);
   // If the ADataObject is assigned then set it as the BSA DataObject...else ClearDataObject
   if Assigned(ADataObject) then
   begin
@@ -1129,37 +1094,6 @@ begin
   end
   else
     ClearDataObject;
-// ----- OLD CODE FROM 04/01/2024 -----
-//  // Check if the operation (SetDataObject) is allowed
-//  TioCommonBSBehavior.CheckForSetDataObject(Self, LoadType, ADataObject as TObject);
-//  // If the BS is active then set the DataObject
-//  if IsActive then
-//  begin
-//    // NB: Lasciare commentate le righe qua sotto perchè altrimenti quando
-//    // si faceva un SetDataObject dava un errore perchè la funzione
-//    // CheckActiveAdapter restituiva sempre False perchè non avendo il DataObject
-//    // assegnato (se prima avevo chiamato il  ClearDataObject)
-//    // if CheckActiveAdapter then
-//    GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
-//    // else
-//    // raise EioException.Create(Self.ClassName + ': invalid internal adapter.');
-//  end
-//  // If the BindSource is not active it checks if the new DataObject is assigned,
-//  //  if it is assigned then automatically activated the BindSource otherwise exits immediately
-//  //  because it does not need to do anything (the BindSource is already closed and if the new
-//  //  DataObject is being set to nil...)
-//  // NB: Ho dovuto attivare automaticamnete il BindSource (nel caso non lo fosse già) perchè
-//  //  altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
-//  // NB: Se il BS non è mai stato attivo prima allora crea anche il relativo ActiveBindSourceAdapter
-//  else
-//  begin
-//    if Assigned(ADataObject) then
-//    begin
-//      if GetActiveBindSourceAdapter = nil then
-//        _CreateAdapter(ADataObject as TObject, AOwnsObject);
-//      Open;
-//    end;
-//  end;
 end;
 
 procedure TioPrototypeBindSourceCustom.SetETMfor(const AETMfor: IioMasterBindSource);
@@ -1275,8 +1209,9 @@ procedure TioPrototypeBindSourceCustom.SetPreview(const Value: Boolean);
 begin
   // Se stiamo abilitando la preview e siamo a design time attiva
   //  la proprietà "AutoActivate" per mostrare i dati anche a design-time
-  FPreview := Value;
-  AutoActivate := FPreview and (csDesigning in ComponentState);
+  //  NB: A runtime Preview è sempre false (non mi paicevano i dati fake visibili a runtime)
+  FPreview := Value and (csDesigning in ComponentState);
+  SetAutoActivate(FPreview);
 end;
 
 procedure TioPrototypeBindSourceCustom.SetSelectorFor(const ATargetBindSource: IioBindSource);
