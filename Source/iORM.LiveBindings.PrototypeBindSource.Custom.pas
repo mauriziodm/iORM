@@ -948,9 +948,15 @@ end;
 
 procedure TioPrototypeBindSourceCustom.SetActive(const Value: Boolean);
 begin
+  // Check if the value is changing
   if Value = IsActive then
     Exit;
 
+  // If the LoadType is ltManual but the BSA is not assinged (DataObject not assigned) then exit
+  if IsMasterBS and (FLoadType = ltManual) and not CheckActiveAdapter then
+    Exit;
+
+  // Activate the BindSOurce
   if not (csDesigning in ComponentState) then
   begin
     if Value then
