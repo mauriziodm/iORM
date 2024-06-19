@@ -90,7 +90,7 @@ type
     property CliToSrv_Count: Integer read FCliToSrv_Count write FCliToSrv_Count;
     property SrvToCli_Count: Integer read FSrvToCli_Count write FSrvToCli_Count;
     // Timing
-    property Start: TTime read FStartSynchro write FStartSynchro;
+    property StartSynchro: TTime read FStartSynchro write FStartSynchro;
     property LoadFromClient: TTime read FLoadFromClient write FLoadFromClient;
     property PersistToServer: TTime read FPersistToServer write FPersistToServer;
     property ReloadFromServer: TTime read FReloadFromServer write FReloadFromServer;
@@ -752,7 +752,7 @@ end;
 procedure TioCustomSynchroStrategy_Payload._DoNewSynchroLogItem_Initialize;
 begin
   // Initialize the new SynchroLogItem after its creation
-  FSynchroLogItem_New.Start := Now;
+  FSynchroLogItem_New.StartSynchro := Now;
   FSynchroLogItem_New.SynchroStatus := TioSynchroStatus.ssInitialization;
   FSynchroLogItem_New.SynchroLevel := FSynchroLevel;
   FSynchroLogItem_New.SynchroLogName := FSynchroLogName;
