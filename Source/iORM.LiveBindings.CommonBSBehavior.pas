@@ -56,7 +56,7 @@ type
     class procedure Select<T>(const ASender: TObject; const ATargetBS: IioBindSource; ASelected: T;
       ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     // Common code for some checks by the bind sources
-    class procedure CheckForOpen(const ABindSource: IioBindSource; const ALoadType: TioLoadType);
+    class procedure CheckForOpen(const ABindSource, ASourceBS: IioBindSource; const ALoadType: TioLoadType);
     class procedure CheckForSetSourceBS(const ABindSource, ASourceBS: IioBindSource; const ALoadType: TioLoadType);
     class procedure CheckForSetLoadType(const ABindSource, ASourceBS: IioBindSource; const ALoadType: TioLoadType);
     class function CheckIfLoadTypeIsFromBS(const ALoadType: TioLoadType): Boolean;
@@ -80,12 +80,18 @@ uses
 
 { TioCommonBSBehavior }
 
-class procedure TioCommonBSBehavior.CheckForOpen(const ABindSource: IioBindSource; const ALoadType: TioLoadType);
+class procedure TioCommonBSBehavior.CheckForOpen(const ABindSource, ASourceBS: IioBindSource; const ALoadType: TioLoadType);
 begin
   // ltManual
   if ABindSource.IsMasterBS and (ALoadType = ltManual) and not ABindSource.CheckActiveAdapter then
     raise EioGenericException.Create(ClassName, 'CheckForOpen',
       Format('You are not allowed to activate the BindSource "%s" if its "LoadType" property is set to "ltManual" unless the "SetDataObject" method has been executed at least once with a valid object.',
+      [ABindSource.GetName]));
+  // ltFromBSxxx
+  if ABindSource.IsMasterBS and CheckIfLoadTypeIsFromBS(ALoadType) and not Assigned(ASourceBS) then
+    raise EioGenericException.Create(ClassName, 'CheckForOpen',
+      Format('Hi, I''m iORM and we have a problem.'#13#13'I cannot open a BindSource (maybe a DataSet or BindSource) having the "LoadType" property equal to "ltFromBSAsIs" or "ltFromBSReload" or "ltFromBSReloadNewInstance" unless the "SourceBS" property is also set.'
+      + #13#13'Please set the property "SourceBS" of the BindSource (maybe a DataSet or BindSource) called "%s" and try again.',
       [ABindSource.GetName]));
 end;
 

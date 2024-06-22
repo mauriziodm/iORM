@@ -962,7 +962,7 @@ begin
     if Value then
     begin
       // Check if the operation (Open) is allowed
-      TioCommonBSBehavior.CheckForOpen(Self, LoadType);
+      TioCommonBSBehavior.CheckForOpen(Self, FMasterBindSource, LoadType);
       // If we are in the opening of the bind source and we are NOT at design-time then
       //  create the active bind source adapter
       if not Assigned(FBindSourceAdapter) then
@@ -1071,6 +1071,7 @@ begin
   // If the ADataObject is assigned then set it as the BSA DataObject...else ClearDataObject
   if Assigned(ADataObject) then
   begin
+    FLoadType := ltManual;
     if CheckActiveAdapter then
       GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
     else
@@ -1089,6 +1090,7 @@ begin
   // If the ADataObject is assigned then set it as the BSA DataObject...else ClearDataObject
   if Assigned(ADataObject) then
   begin
+    FLoadType := ltManual;
     if CheckActiveAdapter then
       GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
     else
@@ -1217,7 +1219,7 @@ begin
   //  la proprietà "AutoActivate" per mostrare i dati anche a design-time
   //  NB: A runtime Preview è sempre false (non mi paicevano i dati fake visibili a runtime)
   FPreview := Value and (csDesigning in ComponentState);
-  SetAutoActivate(FPreview);
+  AutoActivate := FPreview;
 end;
 
 procedure TioPrototypeBindSourceCustom.SetSelectorFor(const ATargetBindSource: IioBindSource);

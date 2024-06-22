@@ -1030,15 +1030,21 @@ end;
 
 procedure TioModelPresenterCustom.SetActive(const Value: Boolean);
 begin
+  // Check if the value is changing
   if Value = IsActive then
     Exit;
 
+  // If the LoadType is ltManual but the BSA is not assinged (DataObject not assigned) then exit
+  if IsMasterBS and (FLoadType = ltManual) and not CheckActiveAdapter then
+    Exit;
+
+  // Activate the BindSOurce
   if not(csDesigning in ComponentState) then
   begin
     if Value then
     begin
       // Check if the operation (Open) is allowed
-      TioCommonBSBehavior.CheckForOpen(Self, LoadType);
+      TioCommonBSBehavior.CheckForOpen(Self, FMasterBindSource, LoadType);
       // If we are in the opening of the bind source and we are NOT at design-time then
       // create the active bind source adapter
       CheckAdapter(True);
@@ -1062,17 +1068,6 @@ begin
     else
       DoAfterClose;
   end;
-
-  // ----- OLD CODE -----
-  // if CheckAdapter(True) then
-  // begin
-  // GetActiveBindSourceAdapter.Active := Value;
-  // // Open/Close all ModelBindSOurce/ModelDataSet registered on this ModelPresenter
-  // OpenCloseViewBindSources(Value);
-  // // Open/Close registered details model presenters
-  // OpenCloseDetails(Value);
-  // end;
-  // ----- OLD CODE -----
 end;
 
 procedure TioModelPresenterCustom.SetAsDefault(const Value: Boolean);
@@ -1163,6 +1158,7 @@ begin
   // If the ADataObject is assigned then set it as the BSA DataObject...else ClearDataObject
   if Assigned(ADataObject) then
   begin
+    FLoadType := ltManual;
     if CheckActiveAdapter then
       GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
     else
@@ -1181,6 +1177,7 @@ begin
   // If the ADataObject is assigned then set it as the BSA DataObject...else ClearDataObject
   if Assigned(ADataObject) then
   begin
+    FLoadType := ltManual;
     if CheckActiveAdapter then
       GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
     else

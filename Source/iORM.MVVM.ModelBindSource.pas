@@ -224,7 +224,7 @@ begin
   //  e se la proprietà Preview = True scatena il relativo metodo set per far si
   //  che venga posta a true anche la proprietà AutoActivate e rendere visibile
   //  i dati a desig-time
-  SetPreview(Preview);
+  SetPreview(FPreview);
 
   // FioLoaded flag for iORM DoCreateAdapter internal use only just before
   // the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
@@ -320,8 +320,9 @@ procedure TioModelBindSource.SetPreview(const Value: Boolean);
 begin
   // Se stiamo abilitando la preview e siamo a design time attiva
   //  la proprietà "AutoActivate" per mostrare i dati anche a design-time
-  FPreview := Value;
-  AutoActivate := FPreview and (csDesigning in ComponentState);
+  //  NB: A runtime Preview è sempre false (non mi paicevano i dati fake visibili a runtime)
+  FPreview := Value and (csDesigning in ComponentState);
+  AutoActivate := FPreview;
 end;
 
 procedure TioModelBindSource.SetViewModelBridge(const AVMBridge: TioViewModelBridge);

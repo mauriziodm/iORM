@@ -178,6 +178,7 @@ type
     function GetName: String;
     procedure DoAfterOpen; override;
     procedure DoBeforeClose; override;
+    procedure SetActive(Value: Boolean); override;
     // InternalAdapter (there is a setter but the property must be ReadOnly)
     procedure SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter); override;
     // Selectors related event for TObject selection
@@ -659,7 +660,7 @@ end;
 procedure TioDataSetCustom.InternalPreOpen;
 begin
   // Check if the operation (Open) is allowed
-  TioCommonBSBehavior.CheckForOpen(Self, LoadType);
+  TioCommonBSBehavior.CheckForOpen(Self, FMasterBindSource, LoadType);
   if not CheckAdapter(True) then
     raise EioGenericException.Create(ClassName, 'InternalPreOpen', 'There was some problem creating the ActiveBindSourceAdapter');
   GetActiveBindSourceAdapter.Active := True;
@@ -836,6 +837,7 @@ begin
   // If the ADataObject is assigned then set it as the BSA DataObject...else ClearDataObject
   if Assigned(ADataObject) then
   begin
+    FLoadType := ltManual;
     if CheckActiveAdapter then
       GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
     else
@@ -854,6 +856,7 @@ begin
   // If the ADataObject is assigned then set it as the BSA DataObject...else ClearDataObject
   if Assigned(ADataObject) then
   begin
+    FLoadType := ltManual;
     if CheckActiveAdapter then
       GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
     else
@@ -888,6 +891,19 @@ end;
 procedure TioDataSetCustom.SetMasterPropertyName(const Value: String);
 begin
   FMasterPropertyName := Trim(Value);
+end;
+
+procedure TioDataSetCustom.SetActive(Value: Boolean);
+begin
+  // Check if the value is changing
+  if Value = IsActive then
+    Exit;
+
+  // If the LoadType is ltManual but the BSA is not assinged (DataObject not assigned) then exit
+  if IsMasterBS and (FLoadType = ltManual) and not CheckActiveAdapter then
+    Exit;
+
+  inherited;
 end;
 
 procedure TioDataSetCustom.SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);
