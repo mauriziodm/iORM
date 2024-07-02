@@ -97,7 +97,9 @@ end;
 
 class procedure TioCommonBSBehavior.CheckForSetLoadType(const ABindSource, ASourceBS: IioBindSource; const ALoadType: TioLoadType);
 begin
-  if Assigned(ASourceBS) and not CheckIfLoadTypeIsFromBS(ALoadType) then
+  // Mauri 23/06/2024: se sto impostando il LoadType a ltManual non controllo e non sollevo l'eccezione (anche se la proprietà "SourceBS" è assegnata)
+  //  questo perchè non dovrebbe essere influente e inoltre mi risolve alcuni problemini
+  if Assigned(ASourceBS) and not CheckIfLoadTypeIsFromBS(ALoadType) and (ALoadType <> ltManual) then
     raise EioGenericException.Create(ClassName, 'CheckForSetLoadType',
       Format('In order to set the "LoadType" property to a value other than "ltFromBSAsIs" or "ltFromBSReload" or "ltFromBSReloadNewInstance", you must first set the "SourceXXX" property to blank (nil).'
       + #13#13'Please set the "SourceXXX" property of the bind source "%s" (maybe a DataSet or BindSource) to blank and then try again.',

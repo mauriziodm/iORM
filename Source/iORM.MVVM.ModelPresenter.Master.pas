@@ -99,6 +99,8 @@ type
     procedure Close; override;
     function IsMasterBS: Boolean; override;
     function IsDetailBS: Boolean; override;
+    procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
+    procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
 
     // WhereBuilder
     function BuildWhere(const AExecuteOnTarget: Boolean = True): IioWhere;
@@ -280,6 +282,36 @@ procedure TioModelPresenterMaster.SetActive(const Value: Boolean);
 begin
   FWannaBeActive := Value;
   inherited;
+end;
+
+procedure TioModelPresenterMaster.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
+begin
+  inherited;
+  // Mauri 23/06/2024: per risolvere in modo semplice il problema con i ModelPresenters (MVVM) che non si vedevano i dettagli delle
+  //  relazioni se nel (ModelPresenterDetail) se il master aveva LoadType = ltManual e si faceva un SetDataObject.
+  //  HO provato a cercare altre soluzioni più carine ma poi venivano fuori problemi in altro contesti quindi
+  //  deciso di fare così e di non toccare altro.
+//  if Assigned(ADataObject) and (LoadType = ltManual) then
+  if Assigned(ADataObject) and (LoadType = ltManual) and (GetActiveBindSourceAdapter <> nil) then
+  begin
+    Close;
+    Open;
+  end;
+end;
+
+procedure TioModelPresenterMaster.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
+begin
+  inherited;
+  // Mauri 23/06/2024: per risolvere in modo semplice il problema con i ModelPresenters (MVVM) che non si vedevano i dettagli delle
+  //  relazioni se nel (ModelPresenterDetail) se il master aveva LoadType = ltManual e si faceva un SetDataObject.
+  //  HO provato a cercare altre soluzioni più carine ma poi venivano fuori problemi in altro contesti quindi
+  //  deciso di fare così e di non toccare altro.
+//  if Assigned(ADataObject) and (LoadType = ltManual) then
+  if Assigned(ADataObject) and (LoadType = ltManual) and (GetActiveBindSourceAdapter <> nil) then
+  begin
+    Close;
+    Open;
+  end;
 end;
 
 procedure TioModelPresenterMaster.SetLoadType(const Value: TioLoadType);

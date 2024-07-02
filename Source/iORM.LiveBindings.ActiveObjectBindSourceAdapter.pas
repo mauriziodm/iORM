@@ -677,12 +677,12 @@ var
   LPreviousCurrentObj: TObject;
 begin
   // Initialization and save previous current object to delete it if
-  //  OnReceiveSelectionFreeObject property of the BindSource is True
+  // OnReceiveSelectionFreeObject property of the BindSource is True
   LDone := False;
   LPreviousCurrentObj := Current;
 
   // Clone the selected object if the OnReceiveSelectionCloneObject property
-  //  of the BindSource is true
+  // of the BindSource is true
   if FBindSource.OnReceiveSelectionCloneObject then
     ASelected := TioUtilities.CloneObject(ASelected);
 
@@ -694,7 +694,7 @@ begin
   DoAfterSelection(ASelected, ASelectionType);
 
   // Free the previous current object if OnReceiveSelectionFreeObject property
-  //  of the BindSource is True
+  // of the BindSource is True
   if FBindSource.OnReceiveSelectionFreeObject and (LPreviousCurrentObj <> nil) then
     LPreviousCurrentObj.Free;
 end;
@@ -760,7 +760,8 @@ end;
 
 procedure TioActiveObjectBindSourceAdapter.InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
-  raise EioGenericException.Create(Self.ClassName, 'InternalSetDataObject', 'This ActiveBindSourceAdapter is for class referenced instances only (not interfaced).');
+  raise EioGenericException.Create(Self.ClassName, 'InternalSetDataObject',
+    'This ActiveBindSourceAdapter is for class referenced instances only (not interfaced).');
 end;
 
 procedure TioActiveObjectBindSourceAdapter.InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
@@ -794,10 +795,10 @@ begin
     inherited SetDataObject(nil, AOwnsObject);
     // Fix the "Couldn't find Value" or "Couldn't find Owner" or similar using "CustomFormat" links property
     // NB: Questo "AddFields" che sembrerebbe non aver senso in questo punto in realtà risolve un errore che mi ha segnalato
-    //      Carlo Marona; questo errore (vedi sopra) si verificava se si impostava nil come DataObject (SetDataObject(nil))
-    //      ed era dovuto perchè nell'inherited viene richiamato "ClearFields" che evidentemente eliminava dal sistema di LookUp
-    //      di LiveBindings non solo i links relativi al DataObject precedente ma anche appunto "Value" e "Owner" e chissà quali
-    //      altri. Con questa riga evidentemente si registrano di nuovo questi IScope nel sistema di LookUp stesso.
+    // Carlo Marona; questo errore (vedi sopra) si verificava se si impostava nil come DataObject (SetDataObject(nil))
+    // ed era dovuto perchè nell'inherited viene richiamato "ClearFields" che evidentemente eliminava dal sistema di LookUp
+    // di LiveBindings non solo i links relativi al DataObject precedente ma anche appunto "Value" e "Owner" e chissà quali
+    // altri. Con questa riga evidentemente si registrano di nuovo questi IScope nel sistema di LookUp stesso.
     AddFields;
     FDetailAdaptersContainer.SetMasterObject(nil);
   end;

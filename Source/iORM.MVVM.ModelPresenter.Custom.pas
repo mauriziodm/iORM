@@ -896,7 +896,7 @@ begin
   // C'era un problema se il target è un BS che espone un singolo oggetto e in
   // precedenza era stato impostato il suo dataObject a nil perchè in questo caso negli
   // ObjectBSA il ABSA si disattiva (Active = False) e quindi poi quando faceva
-  // il SetDataObject sul TargetBSA dava un errore perchè non era attivo.
+  // il SetDataObject< sul TargetBSA dava un errore perchè non era attivo.
   if not FSelectorFor.IsActive then
     FSelectorFor.Open;
   if IsInterfacePresenting then
@@ -1158,7 +1158,7 @@ begin
   // If the ADataObject is assigned then set it as the BSA DataObject...else ClearDataObject
   if Assigned(ADataObject) then
   begin
-    FLoadType := ltManual;
+    LoadType := ltManual;
     if CheckActiveAdapter then
       GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
     else
@@ -1177,7 +1177,7 @@ begin
   // If the ADataObject is assigned then set it as the BSA DataObject...else ClearDataObject
   if Assigned(ADataObject) then
   begin
-    FLoadType := ltManual;
+    LoadType := ltManual;
     if CheckActiveAdapter then
       GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
     else

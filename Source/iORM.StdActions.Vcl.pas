@@ -1199,7 +1199,7 @@ begin
       else
         raise EioGenericException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
     end;
-    // New instance ny EntityType/Alias
+    // New instance by EntityType/Alias
     if not FEntityTypeName.IsEmpty and io.di.Locate(FEntityTypeName, FEntityTypeAlias).Exist then
     begin
       LNewInstanceAsObject := io.Create(FEntityTypeName, FEntityTypeAlias);
