@@ -155,7 +155,7 @@ type
     function Get_Version: String;
   strict protected
     procedure _InternalExecuteStdAction; virtual;
-    procedure _InternalUpdateStdAction; virtual;
+    function _InternalUpdateStdAction: Boolean; virtual;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     function GetExecutionMode: TioActionExecutionMode;
     procedure SetExecutionMode(const Value: TioActionExecutionMode);
@@ -203,7 +203,7 @@ type
     procedure SetAction_CloseQueryAction(const Value: IioBSSlaveAction);
   strict protected
     procedure _InternalExecuteStdAction; override;
-    procedure _InternalUpdateStdAction; override;
+    function _InternalUpdateStdAction: Boolean; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure SetTargetBindSource(const Value: IioStdActionTargetBindSource); override;
   public
@@ -226,7 +226,7 @@ type
   TioBSNextPage = class(TioBSStdActionVcl<IioStdActionTargetMasterBindSource>)
   strict protected
     procedure _InternalExecuteStdAction; override;
-    procedure _InternalUpdateStdAction; override;
+    function _InternalUpdateStdAction: Boolean; override;
   published
     // inherited properties
     property TargetBindSource;
@@ -242,7 +242,7 @@ type
   TioBSPrevPage = class(TioBSStdActionVcl<IioStdActionTargetMasterBindSource>)
   strict protected
     procedure _InternalExecuteStdAction; override;
-    procedure _InternalUpdateStdAction; override;
+    function _InternalUpdateStdAction: Boolean; override;
   published
     // inherited properties
     property TargetBindSource;
@@ -264,7 +264,7 @@ type
     procedure SetAction_PersistAction(const Value: IioBSSlaveAction);
   strict protected
     procedure _InternalExecuteStdAction; override;
-    procedure _InternalUpdateStdAction; override;
+    function _InternalUpdateStdAction: Boolean; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -289,7 +289,7 @@ type
     FAutoExec_Where_OnTargetBS: Boolean;
   strict protected
     procedure _InternalExecuteStdAction; override;
-    procedure _InternalUpdateStdAction; override;
+    function _InternalUpdateStdAction: Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
   published
@@ -340,7 +340,7 @@ type
     procedure SetAction_ShowOrSelectAction(const Value: IioBSSlaveAction);
   strict protected
     procedure _InternalExecuteStdAction; virtual;
-    procedure _InternalUpdateStdAction; virtual;
+    function _InternalUpdateStdAction: Boolean; virtual;
     function _IsEnabled: Boolean; virtual;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     function GetExecutionMode: TioActionExecutionMode;
@@ -390,7 +390,7 @@ type
   TioBSPersistenceSaveRevertPoint = class(TioBSPersistenceStdActionVcl)
   strict protected
     procedure _InternalExecuteStdAction; override;
-    procedure _InternalUpdateStdAction; override;
+    function _InternalUpdateStdAction: Boolean; override;
   published
     // inherited properties
     property TargetBindSource;
@@ -405,7 +405,7 @@ type
   TioBSPersistenceClear = class(TioBSPersistenceStdActionVcl)
   strict protected
     procedure _InternalExecuteStdAction; override;
-    procedure _InternalUpdateStdAction; override;
+    function _InternalUpdateStdAction: Boolean; override;
   published
     // inherited properties
     property DisableIfChangesExists;
@@ -422,7 +422,7 @@ type
   TioBSPersistencePersist = class(TioBSPersistenceStdActionVcl)
   strict protected
     procedure _InternalExecuteStdAction; override;
-    procedure _InternalUpdateStdAction; override;
+    function _InternalUpdateStdAction: Boolean; override;
   published
     // inherited properties
     property Action_CloseQueryAction;
@@ -440,7 +440,7 @@ type
   TioBSPersistenceRevert = class(TioBSPersistenceStdActionVcl)
   strict protected
     procedure _InternalExecuteStdAction; override;
-    procedure _InternalUpdateStdAction; override;
+    function _InternalUpdateStdAction: Boolean; override;
   published
     // inherited properties
     property Action_CloseQueryAction;
@@ -462,7 +462,7 @@ type
     FAutoExec_CloseQueryAction_AfterRevert: Boolean;
   strict protected
     procedure _InternalExecuteStdAction; override;
-    procedure _InternalUpdateStdAction; override;
+    function _InternalUpdateStdAction: Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
   published
@@ -486,7 +486,7 @@ type
   TioBSPersistenceDelete = class(TioBSPersistenceStdActionVcl)
   strict protected
     procedure _InternalExecuteStdAction; override;
-    procedure _InternalUpdateStdAction; override;
+    function _InternalUpdateStdAction: Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
   published
@@ -508,7 +508,7 @@ type
   TioBSPersistenceReload = class(TioBSPersistenceStdActionVcl)
   strict protected
     procedure _InternalExecuteStdAction; override;
-    procedure _InternalUpdateStdAction; override;
+    function _InternalUpdateStdAction: Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
   published
@@ -534,7 +534,7 @@ type
     FOnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent;
   strict protected
     procedure _InternalExecuteStdAction; override;
-    procedure _InternalUpdateStdAction; override;
+    function _InternalUpdateStdAction: Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
   published
@@ -567,7 +567,7 @@ type
     FOnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent;
   strict protected
     procedure _InternalExecuteStdAction; override;
-    procedure _InternalUpdateStdAction; override;
+    function _InternalUpdateStdAction: Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
   published
@@ -604,7 +604,7 @@ type
     procedure _ShowRevertedObj;
   strict protected
     procedure _InternalExecuteStdAction; override;
-    procedure _InternalUpdateStdAction; override;
+    function _InternalUpdateStdAction: Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
   published
@@ -638,7 +638,7 @@ type
     procedure _ShowRevertedObj;
   strict protected
     procedure _InternalExecuteStdAction; override;
-    procedure _InternalUpdateStdAction; override;
+    function _InternalUpdateStdAction: Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
   published
@@ -682,7 +682,7 @@ type
     procedure SetAction_ParentCloseQueryAction(const Value: IioBSCloseQueryAction);
   strict protected
     procedure _InternalExecuteStdAction; override;
-    procedure _InternalUpdateStdAction; override;
+    function _InternalUpdateStdAction: Boolean; override;
     procedure _DummyOnExecute(Sender: TObject);
     function _IsEnabled: Boolean; override;
     procedure Loaded; override;
@@ -750,7 +750,7 @@ type
     procedure SetViewContextProvider(const Value: TioViewContextProvider);
   strict protected
     procedure _InternalExecuteStdAction; virtual;
-    procedure _InternalUpdateStdAction; virtual;
+    function _InternalUpdateStdAction: Boolean; virtual;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     // ExecutionMode
     function GetExecutionMode: TioActionExecutionMode;
@@ -991,9 +991,14 @@ begin
 end;
 
 procedure TioBSPersistenceStdActionVcl.UpdateTarget(Target: TObject);
+var
+  LEnabled: Boolean;
 begin
   inherited;
-  _InternalUpdateStdAction;
+  // LEnabled to avoid flickering
+  LEnabled := _InternalUpdateStdAction;
+  if LEnabled <> Enabled then
+    Enabled := LEnabled;
 end;
 
 procedure TioBSPersistenceStdActionVcl._InternalExecuteStdAction;
@@ -1001,11 +1006,11 @@ begin
   // Nothing to do here
 end;
 
-procedure TioBSPersistenceStdActionVcl._InternalUpdateStdAction;
+function TioBSPersistenceStdActionVcl._InternalUpdateStdAction: Boolean;
 begin
-  Enabled := True;
-  Enabled := Enabled and ((not Assigned(FAction_CloseQueryAction)) or FAction_CloseQueryAction._IsEnabled);
-  Enabled := Enabled and ((not Assigned(FAction_ShowOrSelectAction)) or FAction_ShowOrSelectAction._IsEnabled);
+  Result := True;
+  Result := Result and ((not Assigned(FAction_CloseQueryAction)) or FAction_CloseQueryAction._IsEnabled);
+  Result := Result and ((not Assigned(FAction_ShowOrSelectAction)) or FAction_ShowOrSelectAction._IsEnabled);
 end;
 
 function TioBSPersistenceStdActionVcl._IsEnabled: Boolean;
@@ -1033,11 +1038,11 @@ begin
   TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
 
-procedure TioBSPersistenceRevert._InternalUpdateStdAction;
+function TioBSPersistenceRevert._InternalUpdateStdAction: Boolean;
 begin
-  Enabled := True;
-  Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanRevert;
-  Enabled := Enabled and ((not DisableIfChangesDoesNotExists) or TargetBindSource.Persistence.IsChanged);
+  Result := True;
+  Result := Result and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanRevert;
+  Result := Result and ((not DisableIfChangesDoesNotExists) or TargetBindSource.Persistence.IsChanged);
 end;
 
 { TioBSPersistenceRevertOrDelete }
@@ -1060,11 +1065,11 @@ begin
     TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
 
-procedure TioBSPersistenceRevertOrDelete._InternalUpdateStdAction;
+function TioBSPersistenceRevertOrDelete._InternalUpdateStdAction: Boolean;
 begin
-  Enabled := True;
-  Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanRevertOrDelete;
-  Enabled := Enabled and ((not DisableIfChangesDoesNotExists) or TargetBindSource.Persistence.IsChanged or TargetBindSource.Persistence.IsInserting);
+  Result := True;
+  Result := Result and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanRevertOrDelete;
+  Result := Result and ((not DisableIfChangesDoesNotExists) or TargetBindSource.Persistence.IsChanged or TargetBindSource.Persistence.IsInserting);
 end;
 
 { TioBSObjStatePersist }
@@ -1078,11 +1083,11 @@ begin
   TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
 
-procedure TioBSPersistencePersist._InternalUpdateStdAction;
+function TioBSPersistencePersist._InternalUpdateStdAction: Boolean;
 begin
-  Enabled := True;
-  Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanPersist;
-  Enabled := Enabled and ((not DisableIfChangesDoesNotExists) or TargetBindSource.Persistence.IsChanged);
+  Result := True;
+  Result := Result and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanPersist;
+  Result := Result and ((not DisableIfChangesDoesNotExists) or TargetBindSource.Persistence.IsChanged);
 end;
 
 { TioBSObjStateSave }
@@ -1093,10 +1098,9 @@ begin
   TargetBindSource.Persistence.SaveRevertPoint(True);
 end;
 
-procedure TioBSPersistenceSaveRevertPoint._InternalUpdateStdAction;
+function TioBSPersistenceSaveRevertPoint._InternalUpdateStdAction: Boolean;
 begin
-  inherited;
-  Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanSaveRevertPoint;
+  Result := inherited and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanSaveRevertPoint;
 end;
 
 { TioBSObjStateClear }
@@ -1107,11 +1111,10 @@ begin
   TargetBindSource.Persistence.Clear(RaiseIfChangesExists);
 end;
 
-procedure TioBSPersistenceClear._InternalUpdateStdAction;
+function TioBSPersistenceClear._InternalUpdateStdAction: Boolean;
 begin
-  inherited;
-  Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanClear;
-  Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
+  Result := inherited and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanClear;
+  Result := Result and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
 end;
 
 { TioBSPersistenceDelete }
@@ -1129,12 +1132,11 @@ begin
   TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
 
-procedure TioBSPersistenceDelete._InternalUpdateStdAction;
+function TioBSPersistenceDelete._InternalUpdateStdAction: Boolean;
 begin
-  inherited;
-  Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanDelete;
-  Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
-  Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
+  Result := inherited and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanDelete;
+  Result := Result and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
+  Result := Result and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
 end;
 
 { TioBSPersistenceReload }
@@ -1150,12 +1152,11 @@ begin
   TargetBindSource.Persistence.Reload(RaiseIfRevertPointSaved, RaiseIfChangesExists);
 end;
 
-procedure TioBSPersistenceReload._InternalUpdateStdAction;
+function TioBSPersistenceReload._InternalUpdateStdAction: Boolean;
 begin
-  inherited;
-  Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanReload;
-  Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
-  Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
+  Result := inherited and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanReload;
+  Result := Result and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
+  Result := Result and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
 end;
 
 { TioBSPersistenceAppend }
@@ -1236,12 +1237,11 @@ begin
   end;
 end;
 
-procedure TioBSPersistenceAppend._InternalUpdateStdAction;
+function TioBSPersistenceAppend._InternalUpdateStdAction: Boolean;
 begin
-  inherited;
-  Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
-  Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
-  Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
+  Result := inherited and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
+  Result := Result and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
+  Result := Result and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
 end;
 
 { TioBSPersistenceInsert }
@@ -1322,12 +1322,11 @@ begin
   end;
 end;
 
-procedure TioBSPersistenceInsert._InternalUpdateStdAction;
+function TioBSPersistenceInsert._InternalUpdateStdAction: Boolean;
 begin
-  inherited;
-  Enabled := Enabled and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
-  Enabled := Enabled and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
-  Enabled := Enabled and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
+  Result := inherited and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
+  Result := Result and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
+  Result := Result and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
 end;
 
 { TioBSSelectCurrent }
@@ -1374,10 +1373,9 @@ begin
   TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_CloseQueryAction);
 end;
 
-procedure TioBSSelectCurrent._InternalUpdateStdAction;
+function TioBSSelectCurrent._InternalUpdateStdAction: Boolean;
 begin
-  inherited;
-  Enabled := TargetBindSource.CanDoSelection and ((not Assigned(FAction_CloseQueryAction)) or FAction_CloseQueryAction._IsEnabled);
+  Result := TargetBindSource.CanDoSelection and ((not Assigned(FAction_CloseQueryAction)) or FAction_CloseQueryAction._IsEnabled);
 end;
 
 function TioBSSelectCurrent._IsEnabled: Boolean;
@@ -1430,9 +1428,14 @@ begin
 end;
 
 procedure TioBSStdActionVcl<T>.UpdateTarget(Target: TObject);
+var
+  LEnabled: Boolean;
 begin
   inherited;
-  _InternalUpdateStdAction;
+  // LEnabled to avoid flickering
+  LEnabled := _InternalUpdateStdAction;
+  if LEnabled <> Enabled then
+    Enabled := LEnabled;
 end;
 
 function TioBSStdActionVcl<T>.GetExecutionMode: TioActionExecutionMode;
@@ -1477,9 +1480,9 @@ begin
   // Nothing to do here
 end;
 
-procedure TioBSStdActionVcl<T>._InternalUpdateStdAction;
+function TioBSStdActionVcl<T>._InternalUpdateStdAction: Boolean;
 begin
-  // Nothing to do here
+  Result := True;
 end;
 
 { TioBSNextPage }
@@ -1490,11 +1493,9 @@ begin
   TargetBindSource.Paging.NextPage;
 end;
 
-procedure TioBSNextPage._InternalUpdateStdAction;
+function TioBSNextPage._InternalUpdateStdAction: Boolean;
 begin
-  inherited;
-  Enabled := TargetBindSource.isActive and TargetBindSource.Paging.Enabled and not TargetBindSource.Paging.IsLastPage;
-
+  Result := TargetBindSource.isActive and TargetBindSource.Paging.Enabled and not TargetBindSource.Paging.IsLastPage;
 end;
 
 { TioBSPreviousPage }
@@ -1505,10 +1506,9 @@ begin
   TargetBindSource.Paging.PrevPage;
 end;
 
-procedure TioBSPrevPage._InternalUpdateStdAction;
+function TioBSPrevPage._InternalUpdateStdAction: Boolean;
 begin
-  inherited;
-  Enabled := TargetBindSource.isActive and TargetBindSource.Paging.Enabled and not TargetBindSource.Paging.IsFirstPage;
+  Result := TargetBindSource.isActive and TargetBindSource.Paging.Enabled and not TargetBindSource.Paging.IsFirstPage;
 end;
 
 { TioViewAction }
@@ -1834,9 +1834,9 @@ begin
   end;
 end;
 
-procedure TioBSCloseQuery._InternalUpdateStdAction;
+function TioBSCloseQuery._InternalUpdateStdAction: Boolean;
 begin
-  Enabled := _CanClose;
+  Result := _CanClose;
 end;
 
 function TioBSCloseQuery._IsChildOf(const ATargetQueryAction: IioBSCloseQueryAction): Boolean;
@@ -1925,12 +1925,11 @@ begin
   TioStdActionCommonBehaviour.ExecuteSlaveAction(FAction_CloseQueryAction);
 end;
 
-procedure TioBSBuildWhere._InternalUpdateStdAction;
+function TioBSBuildWhere._InternalUpdateStdAction: Boolean;
 begin
-  inherited;
-  Enabled := TargetBindSource.isActive;
-  // Enabled := Enabled and ((not Assigned(FPersistAction)) or FPersistAction._IsEnabled); // To avoid incorrect disabling of the action
-  Enabled := Enabled and ((not Assigned(FAction_CloseQueryAction)) or FAction_CloseQueryAction._IsEnabled);
+  Result := TargetBindSource.isActive;
+  // Result := Result and ((not Assigned(FPersistAction)) or FPersistAction._IsEnabled); // To avoid incorrect disabling of the action
+  Result := Result and ((not Assigned(FAction_CloseQueryAction)) or FAction_CloseQueryAction._IsEnabled);
 end;
 
 { TioBSWhereClear }
@@ -1947,10 +1946,9 @@ begin
   TargetBindSource.ClearWhere(FAutoExec_Where_OnTargetBS);
 end;
 
-procedure TioBSClearWhere._InternalUpdateStdAction;
+function TioBSClearWhere._InternalUpdateStdAction: Boolean;
 begin
-  inherited;
-  Enabled := TargetBindSource.isActive;
+  Result := TargetBindSource.isActive;
 end;
 
 { TioShowAction }
@@ -1988,9 +1986,14 @@ begin
 end;
 
 procedure TioBSShowOrSelect.UpdateTarget(Target: TObject);
+var
+  LEnabled: Boolean;
 begin
   inherited;
-  _InternalUpdateStdAction;
+  // LEnabled to avoid flickering
+  LEnabled := _InternalUpdateStdAction;
+  if LEnabled <> Enabled then
+    Enabled := LEnabled;
 end;
 
 procedure TioBSShowOrSelect._InternalExecuteStdAction;
@@ -2139,34 +2142,32 @@ begin
   end;
 end;
 
-procedure TioBSShowOrSelect._InternalUpdateStdAction;
+function TioBSShowOrSelect._InternalUpdateStdAction: Boolean;
 begin
-  inherited;
-
   // If the TargetBindSource is a SelectorFor some other BindSource then make the selection instead
   if Assigned(FAction_SelectCurrentAction) and Assigned((TargetBindSource as IioBindSource).SelectorFor) then
   begin
-    Enabled := FAction_SelectCurrentAction._IsEnabled;
+    Result := FAction_SelectCurrentAction._IsEnabled;
     Exit;
   end;
 
   // ShowBy
   case FShowMode of
     smBSCurrent, smBSEach, smBSTypeNameAsSelector, smBSTypeNameAsWhereBuilder, smBSTypeNameAsETM:
-      Enabled := Assigned(FTargetBindSource) and FTargetBindSource.isActive;
+      Result := Assigned(FTargetBindSource) and FTargetBindSource.isActive;
     smEntityTypeName:
-      Enabled := not FEntityTypeName.Trim.IsEmpty;
+      Result := not FEntityTypeName.Trim.IsEmpty;
     smEntityTypeNameAsSelector, smEntityTypeNameAsWhereBuilder, smEntityTypeNameAsETM:
-      Enabled := Assigned(FTargetBindSource) and FTargetBindSource.isActive and not FEntityTypeName.Trim.IsEmpty;
+      Result := Assigned(FTargetBindSource) and FTargetBindSource.isActive and not FEntityTypeName.Trim.IsEmpty;
   end;
   // // ViewContextBy
   // case FViewContextBy of
   // vcByViewContextProviderName:
-  // Enabled := Enabled and not FViewContextProviderName.Trim.IsEmpty;
+  // Result := Result and not FViewContextProviderName.Trim.IsEmpty;
   // vcByViewContextProvider:
-  // Enabled := Enabled and Assigned(FViewContextProvider);
+  // Result := Result and Assigned(FViewContextProvider);
   // vcByViewContext:
-  // Enabled := Enabled and Assigned(FViewContext);
+  // Result := Result and Assigned(FViewContext);
   // end;
 end;
 
@@ -2339,14 +2340,13 @@ begin
     _ShowRevertedObj;
 end;
 
-procedure TioBS_ETM_RevertToObject._InternalUpdateStdAction;
+function TioBS_ETM_RevertToObject._InternalUpdateStdAction: Boolean;
 begin
-  inherited;
-  Enabled := Enabled and Assigned(TargetBindSource);
-  Enabled := Enabled and Assigned(TargetBindSource.ETMfor);
-  Enabled := Enabled and Assigned(TargetBindSource.Current);
-  Enabled := Enabled and TargetBindSource.ETMfor.isActive;
-  Enabled := Enabled and Assigned(TargetBindSource.ETMfor.Current);
+  Result := inherited and Assigned(TargetBindSource);
+  Result := Result and Assigned(TargetBindSource.ETMfor);
+  Result := Result and Assigned(TargetBindSource.Current);
+  Result := Result and TargetBindSource.ETMfor.isActive;
+  Result := Result and Assigned(TargetBindSource.ETMfor.Current);
 end;
 
 procedure TioBS_ETM_RevertToObject._ShowRevertedObj;
@@ -2424,14 +2424,13 @@ begin
     _ShowRevertedObj;
 end;
 
-procedure TioBS_ETM_RevertToBindSource._InternalUpdateStdAction;
+function TioBS_ETM_RevertToBindSource._InternalUpdateStdAction: Boolean;
 begin
-  inherited;
-  Enabled := Enabled and Assigned(TargetBindSource);
-  Enabled := Enabled and Assigned(TargetBindSource.ETMfor);
-  Enabled := Enabled and Assigned(TargetBindSource.Current);
-  Enabled := Enabled and TargetBindSource.ETMfor.isActive;
-  Enabled := Enabled and Assigned(TargetBindSource.ETMfor.Current);
+  Result := inherited and Assigned(TargetBindSource);
+  Result := Result and Assigned(TargetBindSource.ETMfor);
+  Result := Result and Assigned(TargetBindSource.Current);
+  Result := Result and TargetBindSource.ETMfor.isActive;
+  Result := Result and Assigned(TargetBindSource.ETMfor.Current);
 end;
 
 procedure TioBS_ETM_RevertToBindSource._ShowRevertedObj;
