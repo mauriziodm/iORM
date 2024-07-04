@@ -419,6 +419,9 @@ type
   private
     class procedure _FreeObjAfterPersistOrDelete(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete); static; inline;
   public
+    // KeepClass
+    class procedure KeepClass(const AClass: TClass);
+
     // AnonymousTimer
     class procedure AnonymousTimer(const AIntervalMillisec: Integer; const AExecuteMethod: TFunc<boolean>);
 
@@ -1930,6 +1933,14 @@ end;
 class function io.InTransaction(const AConnectionName: String): boolean;
 begin
   Result := TioPersistenceStrategyFactory.GetStrategy(AConnectionName).InTransaction(AConnectionName);
+end;
+
+class procedure io.KeepClass(const AClass: TClass);
+begin
+  // This method does nothing, it only serves to ensure that the linker
+  //  does not remove the class whose pointer is received and therefore
+  //  that the RTTI information is generated even for classes for which
+  //  there is no reference in the code.
 end;
 
 class function io.Load(const AClassRef: TioClassRef; const ATypeAlias: String): IioWhere;

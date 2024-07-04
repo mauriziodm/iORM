@@ -209,7 +209,7 @@ begin
     raise EdjException.Create(Format(#13'iORM/DJSON exception on "%s.%s":'#13#13'Hi, I''m iORM/DJSON.' +
       #13#13'I''m sorry but I can''t find any RTTI information about the type "%s".' +
       #13#13'You''ve probably declared a class (or an interface) but there''s no direct reference to it in the code (anyway it means you''ve done a good job of abstraction and decoupling).' +
-      #13#13'To solve the problem you could insert the {$STRONGLINKTYPES ON} directive somewhere (the project file is fine) or a fake reference to the class, for this purpose iORM provides the "TioUtilities.StopLinkerRemoval" method in the "iORM. Utilities" unit.' +
+      #13#13'To solve the problem you could insert the {$STRONGLINKTYPES ON} directive somewhere (the project file is fine) or a fake reference to the class, for this purpose iORM provides the "io.KeepClass(const AClass: TClass)" method in the "iORM" unit.' +
       #13#13'It will work', [ClassName, 'QualifiedTypeNameToRttiTypeWithDefault', AQualifiedTypeName]));
 end;
 

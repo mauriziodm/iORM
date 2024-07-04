@@ -286,7 +286,7 @@ begin
       #13#13'Also make sure that you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit where the class is declared.' +
       #13#13'Or it could also be that you have declared a class (or an interface) but there are no direct references to it in the code (it means that you have done a good job of abstraction and decoupling).' +
       #13#13'In this case you can solve the problem by inserting the {$STRONGLINKTYPES ON} directive somewhere in the code (project file is fine) or a fake reference to the class, for this purpose iORM provides the ' +
-      '"TioUtilities.StopLinkerRemoval" method in the "iORM.Utilities" unit.' +
+      '"io.KeepClass(const AClass: TClass)" method in the "iORM" unit.' +
       #13#13'Check and try again please, it will work.', [AClassName]));
 end;
 

@@ -211,11 +211,11 @@ type
 implementation
 
 uses
-  iORM.CommonTypes, iORM, System.SysUtils,
+  iORM, iORM.CommonTypes, System.SysUtils,
   iORM.DB.Interfaces, iORM.DB.Factory, iORM.Exceptions,
   iORM.Context.Map.Interfaces, iORM.Context.Container,
   iORM.DB.ConnectionContainer, iORM.Where.Factory, iORM.Utilities,
-  iORM.LiveBindings.BSPersistence, DJSON, DJSON.Params;
+  iORM.LiveBindings.BSPersistence, DJSON, DJSON.Params, iORM.Resolver.Factory;
 
 { TioEtmBasetSynchroStrategy_LogItem }
 
@@ -826,7 +826,7 @@ end;
 
 initialization
 
-  TioUtilities.StopLinkerRemoval(TioEtmSynchroStrategy_LogItem);
-  TioUtilities.StopLinkerRemoval(TioEtmSynchroStrategy_Payload);
+  io.KeepClass(TioEtmSynchroStrategy_LogItem);
+  io.KeepClass(TioEtmSynchroStrategy_Payload);
 
 end.
