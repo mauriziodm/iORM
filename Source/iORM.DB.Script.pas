@@ -85,6 +85,7 @@ procedure TioScript.Execute;
 begin
   FConnectionComponent.StartTransaction;
   try
+    FScriptComponent.ScriptOptions.BreakOnError := True;
     FScriptComponent.ExecuteScript(FScript);
     FConnectionComponent.Commit;
   except

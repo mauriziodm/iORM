@@ -37,7 +37,7 @@ interface
 
 uses
   System.Classes, iORM.DB.Interfaces, iORM.CommonTypes, iORM.DBBuilder.Interfaces,
-  iORM.SynchroStrategy.Interfaces;
+  iORM.SynchroStrategy.Interfaces, System.SysUtils;
 
 type
 
@@ -52,6 +52,8 @@ type
     const AScript, AWarnings: TStrings; var AAbort: Boolean) of object;
   TioDBBuilderAfterCreateOrAlterDBEvent = procedure(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
     const AScript, AWarnings: TStrings) of object;
+  TioDBBuilderExceptionOnCreateOrAlterDBEvent = procedure(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
+    const AScript, AWarnings: TStrings; const AException: Exception; var AReRaise: Boolean) of object;
 
   TioDBBuilderProperty = class(TPersistent)
   strict private
@@ -71,10 +73,11 @@ type
   TioCustomConnectionDef = class(TComponent, IioSynchroStrategy_TargetConnectionDef)
   strict private
     // Events
-    FOnAfterCreateOrAlterDBEvent: TioDBBuilderAfterCreateOrAlterDBEvent;
-    FOnAfterRegister: TNotifyEvent;
-    FOnBeforeCreateOrAlterDBEvent: TioDBBuilderBeforeCreateOrAlterDBEvent;
-    FOnBeforeRegister: TNotifyEvent;
+    FAfterCreateOrAlterDBEvent: TioDBBuilderAfterCreateOrAlterDBEvent;
+    FAfterRegister: TNotifyEvent;
+    FBeforeCreateOrAlterDBEvent: TioDBBuilderBeforeCreateOrAlterDBEvent;
+    FBeforeRegister: TNotifyEvent;
+    FExceptionOnCreateOrAlterDB: TioDBBuilderExceptionOnCreateOrAlterDBEvent;
     // Fields
     FAutoCreateDB: TioDBBuilderProperty;
     FBaseURL: String;
@@ -126,10 +129,11 @@ type
     property UserName: String read FUserName write FUserName;
     property SynchroStrategy_Client: IioSynchroStrategy_Client read FSynchroStrategy_Client write SetSynchroStrategy_Client default nil;
     // Events
-    property OnAfterCreateOrAlterDB: TioDBBuilderAfterCreateOrAlterDBEvent read FOnAfterCreateOrAlterDBEvent
-      write FOnAfterCreateOrAlterDBEvent;
-    property OnBeforeCreateOrAlterDB: TioDBBuilderBeforeCreateOrAlterDBEvent read FOnBeforeCreateOrAlterDBEvent
-      write FOnBeforeCreateOrAlterDBEvent;
+    property AfterCreateOrAlterDB: TioDBBuilderAfterCreateOrAlterDBEvent read FAfterCreateOrAlterDBEvent write FAfterCreateOrAlterDBEvent;
+    property AfterRegister: TNotifyEvent read FAfterRegister write FAfterRegister;
+    property BeforeCreateOrAlterDB: TioDBBuilderBeforeCreateOrAlterDBEvent read FBeforeCreateOrAlterDBEvent write FBeforeCreateOrAlterDBEvent;
+    property BeforeRegister: TNotifyEvent read FBeforeRegister write FBeforeRegister;
+    property ExceptionOnCreateOrAlterDB: TioDBBuilderExceptionOnCreateOrAlterDBEvent read FExceptionOnCreateOrAlterDB write FExceptionOnCreateOrAlterDB;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -142,9 +146,6 @@ type
     property Persistent: Boolean read FPersistent write FPersistent;
   published
     property _Version: String read Get_Version;
-    // Events
-    property OnAfterRegister: TNotifyEvent read FOnAfterRegister write FOnAfterRegister;
-    property OnBeforeRegister: TNotifyEvent read FOnBeforeRegister write FOnBeforeRegister;
   end;
 
   // Class for http connection
@@ -157,6 +158,9 @@ type
     property BaseURL;
     property Persistent;
     property SynchroStrategy_Client;
+    // Events
+    property AfterRegister;
+    property BeforeRegister;
   end;
 
   // Class for SQLite connection
@@ -179,8 +183,11 @@ type
     property Pooled;
     property SynchroStrategy_Client;
     // Events
-    property OnAfterCreateOrAlterDB;
-    property OnBeforeCreateOrAlterDB;
+    property AfterCreateOrAlterDB;
+    property AfterRegister;
+    property BeforeCreateOrAlterDB;
+    property BeforeRegister;
+    property ExceptionOnCreateOrAlterDB;
   end;
 
   // Class for Firebird connection
@@ -209,8 +216,11 @@ type
     property UserName;
     property SynchroStrategy_Client;
     // Events
-    property OnAfterCreateOrAlterDB;
-    property OnBeforeCreateOrAlterDB;
+    property AfterCreateOrAlterDB;
+    property AfterRegister;
+    property BeforeCreateOrAlterDB;
+    property BeforeRegister;
+    property ExceptionOnCreateOrAlterDB;
   end;
 
   // Class for MySQL connection
@@ -236,8 +246,11 @@ type
     property UserName;
     property SynchroStrategy_Client;
     // Events
-    property OnAfterCreateOrAlterDB;
-    property OnBeforeCreateOrAlterDB;
+    property AfterCreateOrAlterDB;
+    property AfterRegister;
+    property BeforeCreateOrAlterDB;
+    property BeforeRegister;
+    property ExceptionOnCreateOrAlterDB;
   end;
 
   // Class for SQL Monitor functionalities
@@ -256,7 +269,7 @@ type
 implementation
 
 uses
-  System.IOUtils, iORM.DB.ConnectionContainer, System.SysUtils,
+  System.IOUtils, iORM.DB.ConnectionContainer,
   iORM, iORM.DBBuilder.Factory;
 
 { TioCustomConnectionDef }
@@ -300,30 +313,45 @@ end;
 
 procedure TioCustomConnectionDef.DoAfterRegister;
 begin
-  if Assigned(FOnAfterRegister) then
-    FOnAfterRegister(Self);
+  if Assigned(FAfterRegister) then
+    FAfterRegister(Self);
 end;
 
 procedure TioCustomConnectionDef.DoBeforeRegister;
 begin
-  if Assigned(FOnBeforeRegister) then
-    FOnBeforeRegister(Self);
+  if Assigned(FBeforeRegister) then
+    FBeforeRegister(Self);
 end;
 
 procedure TioCustomConnectionDef.CreateOrAlterDB(const AForce: Boolean = False);
 var
   LAbort: Boolean;
+  LReRaise: Boolean;
   LDBBuilderEngine: IioDBBuilderEngine;
 begin
   LAbort := False;
+  LReRaise := True;
   LDBBuilderEngine := TioDBBuilderFactory.NewEngine(Name, FAutoCreateDB.Indexes, FAutoCreateDB.ForeignKeys);
-  if Assigned(FOnBeforeCreateOrAlterDBEvent) then
-    FOnBeforeCreateOrAlterDBEvent(Self, LDBBuilderEngine.Status, LDBBuilderEngine.Script, LDBBuilderEngine.Warnings, LAbort);
+  // BeforeCreateOrAlterDBEvent
+  if Assigned(FBeforeCreateOrAlterDBEvent) then
+    FBeforeCreateOrAlterDBEvent(Self, LDBBuilderEngine.Status, LDBBuilderEngine.Script, LDBBuilderEngine.Warnings, LAbort);
   if not LAbort then
   begin
-    LDBBuilderEngine.CreateOrAlterDB(AForce);
-    if Assigned(FOnAfterCreateOrAlterDBEvent) then
-      FOnAfterCreateOrAlterDBEvent(Self, LDBBuilderEngine.Status, LDBBuilderEngine.Script, LDBBuilderEngine.Warnings);
+    try
+      // CreateOrAlterDB
+      LDBBuilderEngine.CreateOrAlterDB(AForce);
+    except
+      on E: Exception do
+      begin
+        if Assigned(FExceptionOnCreateOrAlterDB) then
+          FExceptionOnCreateOrAlterDB(Self, LDBBuilderEngine.Status, LDBBuilderEngine.Script, LDBBuilderEngine.Warnings, E, LReRaise);
+        if LReRaise then
+          raise;
+      end;
+    end;
+    // AfterCreateOrAlterDBEvent
+    if Assigned(FAfterCreateOrAlterDBEvent) then
+      FAfterCreateOrAlterDBEvent(Self, LDBBuilderEngine.Status, LDBBuilderEngine.Script, LDBBuilderEngine.Warnings);
   end;
 end;
 

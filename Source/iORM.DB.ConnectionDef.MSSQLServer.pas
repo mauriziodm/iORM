@@ -63,8 +63,11 @@ type
     property UserName;
     property SynchroStrategy_Client;
     // Events
-    property OnAfterCreateOrAlterDB;
-    property OnBeforeCreateOrAlterDB;
+    property AfterCreateOrAlterDB;
+    property AfterRegister;
+    property BeforeCreateOrAlterDB;
+    property BeforeRegister;
+    property ExceptionOnCreateOrAlterDB;
   end;
 
 implementation
