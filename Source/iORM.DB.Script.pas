@@ -89,6 +89,7 @@ begin
     FConnectionComponent.Commit;
   except
     FConnectionComponent.Rollback;
+    raise;
   end;
 end;
 
