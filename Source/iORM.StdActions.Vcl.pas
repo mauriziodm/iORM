@@ -2144,6 +2144,8 @@ end;
 
 function TioBSShowOrSelect._InternalUpdateStdAction: Boolean;
 begin
+  Result := True;
+
   // If the TargetBindSource is a SelectorFor some other BindSource then make the selection instead
   if Assigned(FAction_SelectCurrentAction) and Assigned((TargetBindSource as IioBindSource).SelectorFor) then
   begin
