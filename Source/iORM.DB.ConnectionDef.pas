@@ -53,7 +53,7 @@ type
   TioDBBuilderAfterCreateOrAlterDBEvent = procedure(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
     const AScript, AWarnings: TStrings) of object;
   TioDBBuilderExceptionOnCreateOrAlterDBEvent = procedure(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
-    const AScript, AWarnings: TStrings; const AException: Exception; var AReRaise: Boolean) of object;
+    const AScript, AWarnings: TStrings; const AException: Exception; var ReRaise: Boolean) of object;
 
   TioDBBuilderProperty = class(TPersistent)
   strict private
