@@ -62,6 +62,7 @@ type
     FBeforeUpdate: TNotifyEvent;
     FAfterUpdate: TNotifyEvent;
     function Get_Version: String;
+    function _InternalGetName: TComponentName;
   strict protected
     procedure _ExecuteEmbeddedEvendHandler(Sender: TObject);
     procedure _UpdateEmbeddedEvendHandler(Sender: TObject);
@@ -82,10 +83,6 @@ type
     // EnabledLinkedToAction property
     procedure SetEnabledLinkedToVMAction(Value: Boolean);
     function GetEnabledLinkedToVMAction: Boolean;
-    // Name property
-    procedure SetName(const Value: TComponentName); reintroduce;
-    function GetName: TComponentName;
-    property Name: TComponentName read GetName write SetName stored False;
     // Visible property
     procedure SetVisible(Value: Boolean); override;
     function GetVisible: Boolean;
@@ -1596,11 +1593,6 @@ begin
   Result := FEnabledLinkedToVMAction;
 end;
 
-function TioViewAction.GetName: TComponentName;
-begin
-  Result := inherited Name;
-end;
-
 function TioViewAction.GetVisible: Boolean;
 begin
   Result := inherited Visible;
@@ -1665,11 +1657,6 @@ begin
   FEnabledLinkedToVMAction := Value;
 end;
 
-procedure TioViewAction.SetName(const Value: TComponentName);
-begin
-  inherited SetName(Value);
-end;
-
 procedure TioViewAction.SetVisible(Value: Boolean);
 begin
   if Value <> GetVisible then
@@ -1705,6 +1692,11 @@ procedure TioViewAction._ExecuteEmbeddedEvendHandler(Sender: TObject);
 begin
   CheckVMAction('Execute');
   FVMAction.Execute;
+end;
+
+function TioViewAction._InternalGetName: TComponentName;
+begin
+  Result := Name;
 end;
 
 procedure TioViewAction._UpdateEmbeddedEvendHandler(Sender: TObject);

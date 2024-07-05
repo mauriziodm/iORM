@@ -119,10 +119,8 @@ type
     procedure SetEnabled(const Value: Boolean);
     function GetEnabled: Boolean;
     property Enabled: Boolean read GetEnabled write SetEnabled;
-    // Name property
-    procedure SetName(const NewName: TComponentName);
-    function GetName: TComponentName;
-    property Name: TComponentName read GetName write SetName;
+    // Name property (note: _InternalGetName instead peoperty Name to avoid problem with name property on the designer when copy and paste)
+    function _InternalGetName: TComponentName;
     // Owner
     function GetOwnerComponent: TComponent;
     property Owner: TComponent read GetOwnerComponent;
@@ -155,10 +153,8 @@ type
     procedure SetEnabledLinkedToVMAction(Value: Boolean);
     function GetEnabledLinkedToVMAction: Boolean;
     property EnabledLinkedToVMAction: Boolean read GetEnabledLinkedToVMAction write SetEnabledLinkedToVMAction;
-    // Name property
-    procedure SetName(const NewName: TComponentName);
-    function GetName: TComponentName;
-    property Name: TComponentName read GetName write SetName;
+    // Name property (note: _InternalGetName instead peoperty Name to avoid problem with name property on the designer when copy and paste)
+    function _InternalGetName: TComponentName;
     // Visible
     procedure SetVisible(Value: Boolean);
     function GetVisible: Boolean;

@@ -62,6 +62,7 @@ type
     function Get_Version: String;
     procedure _InternalExecute; virtual;
     procedure _InternalUpdate; virtual;
+    function _InternalGetName: TComponentName;
   strict protected
     procedure _InternalExecuteStdAction; virtual;
     function _InternalUpdateStdAction: Boolean; virtual;
@@ -73,19 +74,16 @@ type
     function GetChecked: Boolean;                     // Carlo Marona 2024/05/29
     function GetEnabled: Boolean;
     function GetExecutionMode: TioActionExecutionMode;
-    function GetName: TComponentName;
     function GetOwnerComponent: TComponent;
     function GetVisible: Boolean;
     procedure SetChecked(const Value: Boolean);       // Carlo Marona 2024/05/29
     procedure SetEnabled(const Value: Boolean);
     procedure SetExecutionMode(const Value: TioActionExecutionMode);
-    procedure SetName(const Value: TComponentName); reintroduce;
     procedure SetVisible(const Value: Boolean);
     // properties
     property Checked: Boolean read GetChecked write SetChecked default False;
     property Enabled: Boolean read GetEnabled write SetEnabled default True;
     property ExecutionMode: TioActionExecutionMode read GetExecutionMode write SetExecutionMode;
-    property Name: TComponentName read GetName write SetName;
     property Owner: TComponent read GetOwnerComponent;
     property Visible: Boolean read GetVisible write SetVisible default True;
     property _Version: String read Get_Version;
@@ -809,11 +807,6 @@ begin
   Result := FExecutionMode;
 end;
 
-function TioVMActionCustom.GetName: TComponentName;
-begin
-  Result := inherited Name;
-end;
-
 function TioVMActionCustom.GetOwnerComponent: TComponent;
 begin
   Result := inherited Owner;
@@ -877,6 +870,11 @@ end;
 procedure TioVMActionCustom._InternalExecuteStdAction;
 begin
   // Nothing to do here
+end;
+
+function TioVMActionCustom._InternalGetName: TComponentName;
+begin
+  Result := Name;
 end;
 
 procedure TioVMActionCustom._InternalUpdate;
@@ -970,11 +968,6 @@ end;
 procedure TioVMActionCustom.SetExecutionMode(const Value: TioActionExecutionMode);
 begin
   FExecutionMode := Value;
-end;
-
-procedure TioVMActionCustom.SetName(const Value: TComponentName);
-begin
-  inherited SetName(Value);
 end;
 
 procedure TioVMActionCustom.SetVisible(const Value: Boolean);

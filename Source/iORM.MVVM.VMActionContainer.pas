@@ -75,12 +75,12 @@ procedure TioVMActionContainer.Add(const AVMAction: IioVMAction);
 var
   LName: String;
 begin
-  LName := Uppercase(AVMAction.Name);
+  LName := Uppercase(AVMAction._InternalGetName);
   if Contains(LName) then
     raise EioGenericException.Create(Self.ClassName, 'Add',
       Format('You are trying to register the VMAction named "%s" (owned by "%s") on the ViewModel "%s" but an action with the same name already exists (owned by "%s").'
       + #13#13'Have you considered the possibility of prefixing the name of the action with the name of the object that owns it? (ex: ''VMCustomer.acSave'')',
-      [AVMAction.Name, AVMAction.Owner.Name, (FViewModel as TComponent).Name, Get(LName).Owner.Name]));
+      [AVMAction._InternalGetName, AVMAction.Owner.Name, (FViewModel as TComponent).Name, Get(LName).Owner.Name]));
   FContainer.Add(LName, AVMAction);
 end;
 
@@ -91,7 +91,7 @@ begin
   else
     raise EioGenericException.Create(ClassName, 'BindViewAction',
       Format('Sorry, I can''t bind ViewAction "%s" with corresponding VMAction "%s" because I can''t find any VMAction with this name on ViewModel "%s".',
-      [AViewAction.Name, AViewAction.VMActionName, (FViewModel as TComponent).Name]));
+      [AViewAction._InternalGetName, AViewAction.VMActionName, (FViewModel as TComponent).Name]));
 end;
 
 function TioVMActionContainer.BSCloseQueryAction: IioBSCloseQueryVMAction;
