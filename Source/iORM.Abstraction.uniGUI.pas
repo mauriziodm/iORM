@@ -38,7 +38,7 @@
   *                         A T T E N T I O N !!!                            *
   *                                                                          *
   * 1) If you use iORM TDataSets with TUniDBGrids, remember to set the Grid's*
-  *    "BufferdStore.Enabled" property to True.                              *
+  *    "BufferedStore.Enabled" property to True.                              *
   *                                                                          *
   * 2) Do not use the TioTimer (alias TioTimerUniGUI), it doesn't work.      *
   *                                                                          *
