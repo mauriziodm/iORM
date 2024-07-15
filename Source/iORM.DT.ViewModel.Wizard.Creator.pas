@@ -38,9 +38,6 @@ interface
 uses
   ToolsAPI;
 
-resourcestring
-  SImplFileName = 'ioViewModel1';
-
 type
 
   TioViewModelWizardCreator = class(TNotifierObject, IOTACreator, IOTAModuleCreator)
@@ -101,11 +98,18 @@ end;
 
 function TioViewModelWizardCreator.GetAncestorName: string;
 begin
-  // If the name starts with "T" character (class) then skip the first char
-  if FAncestorName.StartsWith('T') then
-    Result := Copy(FAncestorName, 2, Length(FAncestorName))
-  else
-    Result := FAncestorName;
+  // To solve the "FMX module not supported for DataModules" error,
+  //  return Ancestor directly as 'DataModule' so that the
+  //  IDE understands that it is a DataModule and not a form.
+  //  Thanks to Claudio Piffer (july 15, 2024)
+  Result := 'DataModule';
+// ---------- OLD CODE ----------
+//  // If the name starts with "T" character (class) then skip the first char
+//  if FAncestorName.StartsWith('T') then
+//    Result := Copy(FAncestorName, 2, Length(FAncestorName))
+//  else
+//    Result := FAncestorName;
+// ---------- OLD CODE ----------
 end;
 
 function TioViewModelWizardCreator.GetCreatorType: string;
