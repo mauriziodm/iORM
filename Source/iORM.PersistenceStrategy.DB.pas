@@ -408,11 +408,11 @@ begin
   begin
     AContext.ObjVersion := AContext.ObjNextVersion;
     AContext.ObjCreated := LQuery.Connection.LastTransactionTimestamp;
-    AContext.ObjCreatedUserID := TioConnectionManager.GetCurrentConnectionInfo.CurrentUserID;
-    AContext.ObjCreatedUserName := TioConnectionManager.GetCurrentConnectionInfo.CurrentUserName;
+    AContext.ObjCreatedUserID := TioConnectionManager.GetCurrentSession.UserID;
+    AContext.ObjCreatedUserName := TioConnectionManager.GetCurrentSession.UserName;
     AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;
-    AContext.ObjUpdatedUserID := TioConnectionManager.GetCurrentConnectionInfo.CurrentUserID;
-    AContext.ObjUpdatedUserName := TioConnectionManager.GetCurrentConnectionInfo.CurrentUserName;
+    AContext.ObjUpdatedUserID := TioConnectionManager.GetCurrentSession.UserID;
+    AContext.ObjUpdatedUserName := TioConnectionManager.GetCurrentSession.UserName;
   end;
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the last ID generated
@@ -1288,8 +1288,8 @@ begin
   begin
     AContext.ObjVersion := AContext.ObjNextVersion;
     AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;;
-    AContext.ObjUpdatedUserID := TioConnectionManager.GetCurrentConnectionInfo.CurrentUserID;
-    AContext.ObjUpdatedUserName := TioConnectionManager.GetCurrentConnectionInfo.CurrentUserName;
+    AContext.ObjUpdatedUserID := TioConnectionManager.GetCurrentSession.UserID;
+    AContext.ObjUpdatedUserName := TioConnectionManager.GetCurrentSession.UserName;
     AContext.ObjStatus := osClean;
   end;
 end;

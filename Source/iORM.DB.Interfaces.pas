@@ -179,17 +179,17 @@ type
     property ioResponseBody: IioHttpResponseBody read GetioResponseBody;
   end;
 
-  // Interfaccia che contiene info sulla connessione e sull'utente correnti
-  IioCurrentConnectionInfo = interface
-    function GetCurrentConnectionName: String;
-    function GetCurrentUserID: Integer;
-    function GetCurrentUserName: String;
-    procedure SetCurrentConnectionName(const Value: String);
-    procedure SetCurrentUserID(const Value: Integer);
-    procedure SetCurrentUserName(const Value: String);
-    property CurrentConnectionName: String read GetCurrentConnectionName write SetCurrentConnectionName;
-    property CurrentUserName: String read GetCurrentUserName write SetCurrentUserName;
-    property CurrentUserID: Integer read GetCurrentUserID write SetCurrentUserID;
+  // Interfaccia che contiene info sulla connessione e sull'utente correnti, in generale sulle sessione
+  IioSession = interface
+    function GetConnectionName: String;
+    function GetUserID: Integer;
+    function GetUserName: String;
+    procedure SetConnectionName(const Value: String);
+    procedure SetUserID(const Value: Integer);
+    procedure SetUserName(const Value: String);
+    property ConnectionName: String read GetConnectionName write SetConnectionName;
+    property UserName: String read GetUserName write SetUserName;
+    property UserID: Integer read GetUserID write SetUserID;
   end;
 
   // Interfaccia per il componente Query, cioè del componente che si

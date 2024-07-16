@@ -84,43 +84,44 @@ type
   // sarebbe meglio creare una sorta di oggetto sessione o LogOn, magari in futuro lo sposterò ma per ora, per fare la parte ETM
   // e per il salvataggio eventuale di quale utente ha operato sulle entities va bene così.
 
-  TioCurrentConnectionInfo = class(TInterfacedObject, IioCurrentConnectionInfo)
+  TioSession = class(TInterfacedObject, IioSession)
   strict private
-    FCurrentConnectionName: String;
-    FCurrentUserName: String;
-    FCurrentUserID: Integer;
-    function GetCurrentConnectionName: String;
-    function GetCurrentUserID: Integer;
-    function GetCurrentUserName: String;
-    procedure SetCurrentConnectionName(const Value: String);
-    procedure SetCurrentUserID(const Value: Integer);
-    procedure SetCurrentUserName(const Value: String);
+    FConnectionName: String;
+    FUserName: String;
+    FUserID: Integer;
+    function GetConnectionName: String;
+    function GetUserID: Integer;
+    function GetUserName: String;
+    procedure SetConnectionName(const Value: String);
+    procedure SetUserID(const Value: Integer);
+    procedure SetUserName(const Value: String);
   public
     constructor Create;
-    property CurrentConnectionName: String read GetCurrentConnectionName write SetCurrentConnectionName;
-    property CurrentUserName: String read GetCurrentUserName write SetCurrentUserName;
-    property CurrentUserID: Integer read GetCurrentUserID write SetCurrentUserID;
+    constructor CreateThreadSession(const AGlobalConnectionName: String);
+    property ConnectionName: String read GetConnectionName write SetConnectionName;
+    property UserName: String read GetUserName write SetUserName;
+    property UserID: Integer read GetUserID write SetUserID;
   end;
 
   TioConnectionManagerContainer = TObjectDictionary<String, TioConnectionInfo>;
-  TioPerThreadCurrentConnectionName = TDictionary<TThreadID, IioCurrentConnectionInfo>;
+  TioPerThreadSessionCollection = TDictionary<TThreadID, IioSession>;
   TioConnectionManagerRef = class of TioConnectionManager;
 
   TioConnectionManager = class // NB: Is thread-safe
   strict private
-    class var FCurrentConnectionInfo: IioCurrentConnectionInfo;
-    class var FPerThreadCurrentConnectionName: TioPerThreadCurrentConnectionName;
+    class var FGlobalSession: IioSession;
+    class var FPerThreadSessionCollection: TioPerThreadSessionCollection;
     class var FConnectionManagerContainer: TioConnectionManagerContainer;
     // NB: Questo container in realtà contiene solo il tipo di DB (cdtFirebird, cdtSQLite ecc.ecc.) in modo da poter fare dei confronti veloci nelle factory e per non dipendere direttamente dal DriverID delle connectionDef di FireDAC
     class var FShowWaitProc: TProc;
     class var FHideWaitProc: TProc;
-    class function NewCustomConnectionDef(const AConnectionName: String; const APooled: Boolean; const AAsDefault: Boolean): IIoStanConnectionDef;
+    class function NewCustomConnectionDef(const AConnectionName: String; const APooled: Boolean; const AAsDefault: Boolean): IIoStanConnectionDef; inline;
     class function CheckConnectionName(AConnectionName: String): String;
-    class procedure _Lock;
-    class procedure _Unlock;
+    class procedure _Lock; inline;
+    class procedure _Unlock; inline;
   protected
-    class procedure CreateInternalContainer;
-    class procedure FreeInternalContainer;
+    class procedure CreateInternalContainer; inline;
+    class procedure FreeInternalContainer; inline;
   public
     // ---------- Start of connectionDef creation methods ----------
     class function NewSQLiteConnectionDef(const ADatabase: String; const AAsDefault: Boolean = True; const ASynchroStrategy_Client: IioSynchroStrategy_Client = nil; const APersistent: Boolean = False;
@@ -139,7 +140,7 @@ type
     class function GetCurrentConnectionDef: IIoStanConnectionDef;
     class function GetConnectionDefByName(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoStanConnectionDef;
     class function IsEmptyConnectionName(const AConnectionName: String): Boolean;
-    class function GetCurrentConnectionInfo: IioCurrentConnectionInfo;
+    class function GetCurrentSession: IioSession;
     class function GetCurrentConnectionName: String;
     class function GetCurrentConnectionNameIfEmpty(const AConnectionDefName: String): String;
     class function GetDatabaseFileName(const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): String;
@@ -328,15 +329,15 @@ end;
 
 class procedure TioConnectionManager.CreateInternalContainer;
 begin
-  FCurrentConnectionInfo := TioDBFactory.CurrentConnectionInfo;
+  FGlobalSession := TioDBFactory.NewGlobalSession;
   FConnectionManagerContainer := TioConnectionManagerContainer.Create([doOwnsValues]);
-  FPerThreadCurrentConnectionName := TioPerThreadCurrentConnectionName.Create;
+  FPerThreadSessionCollection := TioPerThreadSessionCollection.Create;
 end;
 
 class procedure TioConnectionManager.FreeInternalContainer;
 begin
   FConnectionManagerContainer.Free;
-  FPerThreadCurrentConnectionName.Free;
+  FPerThreadSessionCollection.Free;
 end;
 
 class function TioConnectionManager.GetConnectionDefByName(AConnectionName: String): IIoStanConnectionDef;
@@ -410,14 +411,14 @@ begin
   end;
 end;
 
-class function TioConnectionManager.GetCurrentConnectionInfo: IioCurrentConnectionInfo;
+class function TioConnectionManager.GetCurrentSession: IioSession;
 begin
   _Lock;
   try
-    if FPerThreadCurrentConnectionName.ContainsKey(TioUtilities.GetThreadID) then
-      Result := FPerThreadCurrentConnectionName[TioUtilities.GetThreadID]
+    if FPerThreadSessionCollection.ContainsKey(TioUtilities.GetThreadID) then
+      Result := FPerThreadSessionCollection[TioUtilities.GetThreadID]
     else
-      Result := FCurrentConnectionInfo;
+      Result := FGlobalSession;
   finally
     _Unlock
   end;
@@ -427,10 +428,10 @@ class function TioConnectionManager.GetCurrentConnectionName: String;
 begin
   _Lock;
   try
-    if FPerThreadCurrentConnectionName.ContainsKey(TioUtilities.GetThreadID) then
-      Result := FPerThreadCurrentConnectionName[TioUtilities.GetThreadID].CurrentConnectionName
+    if FPerThreadSessionCollection.ContainsKey(TioUtilities.GetThreadID) then
+      Result := FPerThreadSessionCollection[TioUtilities.GetThreadID].ConnectionName
     else
-      Result := FCurrentConnectionInfo.CurrentConnectionName;
+      Result := FGlobalSession.ConnectionName;
   finally
     _Unlock
   end;
@@ -470,10 +471,10 @@ begin
     // Verifica ed eventualmente defaultizza il parametro
     AConnectionName := CheckConnectionName(AConnectionName);
     // If a CurrentConnectionInfo does not exists for the current thread the create it
-    if not FPerThreadCurrentConnectionName.ContainsKey(TioUtilities.GetThreadID) then
-      FPerThreadCurrentConnectionName.Add(TioUtilities.GetThreadID, TioDBFactory.CurrentConnectionInfo);
+    if not FPerThreadSessionCollection.ContainsKey(TioUtilities.GetThreadID) then
+      FPerThreadSessionCollection.Add(TioUtilities.GetThreadID, TioDBFactory.NewThreadSession(FGlobalSession.ConnectionName));
     // Set the current connection fot the currend thread
-    FPerThreadCurrentConnectionName[TioUtilities.GetThreadID].CurrentConnectionName := AConnectionName;
+    FPerThreadSessionCollection[TioUtilities.GetThreadID].ConnectionName := AConnectionName;
   finally
     _Unlock;
   end;
@@ -489,11 +490,11 @@ begin
   _Lock;
   try
     // If a CurrentConnectionInfo does not exists for the current thread the create it
-    if not FPerThreadCurrentConnectionName.ContainsKey(TioUtilities.GetThreadID) then
-      FPerThreadCurrentConnectionName.Add(TioUtilities.GetThreadID, TioDBFactory.CurrentConnectionInfo);
+    if not FPerThreadSessionCollection.ContainsKey(TioUtilities.GetThreadID) then
+      FPerThreadSessionCollection.Add(TioUtilities.GetThreadID, TioDBFactory.NewThreadSession(FGlobalSession.ConnectionName));
     // Set the current connection fot the currend thread
-    FPerThreadCurrentConnectionName[TioUtilities.GetThreadID].CurrentUserID := AUserID;
-    FPerThreadCurrentConnectionName[TioUtilities.GetThreadID].CurrentUserName := AUserName;
+    FPerThreadSessionCollection[TioUtilities.GetThreadID].UserID := AUserID;
+    FPerThreadSessionCollection[TioUtilities.GetThreadID].UserName := AUserName;
   finally
     _Unlock;
   end;
@@ -503,7 +504,7 @@ class procedure TioConnectionManager.ThreadUseClear;
 begin
   _Lock;
   try
-    FPerThreadCurrentConnectionName.Remove(TioUtilities.GetThreadID);
+    FPerThreadSessionCollection.Remove(TioUtilities.GetThreadID);
   finally
     _Unlock;
   end;
@@ -543,8 +544,8 @@ begin
   Result.Params.Pooled := APooled;
   // If the AsDefault param is True or this is the first ConnectionDef of the application
   // then set it as default
-  if AAsDefault or (FCurrentConnectionInfo.CurrentConnectionName = '') then
-    FCurrentConnectionInfo.CurrentConnectionName := AConnectionName;
+  if AAsDefault or (FGlobalSession.ConnectionName = '') then
+    FGlobalSession.ConnectionName := AConnectionName;
 end;
 
 class function TioConnectionManager.NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault: Boolean = True; const ASynchroStrategy_Client: IioSynchroStrategy_Client = nil;
@@ -597,8 +598,8 @@ begin
   try
     // If the AsDefault param is True or this is the first ConnectionDef of the application
     // then set it as default
-    if AAsDefault or (FCurrentConnectionInfo.CurrentConnectionName = '') then
-      FCurrentConnectionInfo.CurrentConnectionName := AConnectionName;
+    if AAsDefault or (FGlobalSession.ConnectionName = '') then
+      FGlobalSession.ConnectionName := AConnectionName;
     // Setup the connection info
     LConnectionInfo := TioConnectionInfo.Create(AConnectionName, ctHTTP, APersistent, kgtUndefined, ASynchroStrategy_Client);
     LConnectionInfo.BaseURL := ABaseURL;
@@ -653,7 +654,7 @@ begin
     // Verifica ed eventualmente defaultizza il parametro
     AConnectionName := CheckConnectionName(AConnectionName);
     // Set the connection as default
-    FCurrentConnectionInfo.CurrentConnectionName := AConnectionName;
+    FGlobalSession.ConnectionName := AConnectionName;
   finally
     _Unlock;
   end;
@@ -668,8 +669,8 @@ class procedure TioConnectionManager.UseUser(AUserID: Integer; AUserName: String
 begin
   _Lock;
   try
-    FCurrentConnectionInfo.CurrentUserID := AUserID;
-    FCurrentConnectionInfo.CurrentUserName := AUserName;
+    FGlobalSession.UserID := AUserID;
+    FGlobalSession.UserName := AUserName;
   finally
     _Unlock;
   end;
@@ -748,41 +749,47 @@ end;
 
 { TioCurrentConnectionInfo }
 
-constructor TioCurrentConnectionInfo.Create;
+constructor TioSession.Create;
 begin
-  FCurrentConnectionName := String.Empty;
-  FCurrentUserName := String.Empty;
-  FCurrentUserID := 0;
+  FConnectionName := String.Empty;
+  FUserName := String.Empty;
+  FUserID := 0;
 end;
 
-function TioCurrentConnectionInfo.GetCurrentConnectionName: String;
+constructor TioSession.CreateThreadSession(const AGlobalConnectionName: String);
 begin
-  Result := FCurrentConnectionName;
+  Create;
+  FConnectionName := AGlobalConnectionName;
 end;
 
-function TioCurrentConnectionInfo.GetCurrentUserID: Integer;
+function TioSession.GetConnectionName: String;
 begin
-  Result := FCurrentUserID;
+  Result := FConnectionName;
 end;
 
-function TioCurrentConnectionInfo.GetCurrentUserName: String;
+function TioSession.GetUserID: Integer;
 begin
-  Result := FCurrentUserName;
+  Result := FUserID;
 end;
 
-procedure TioCurrentConnectionInfo.SetCurrentConnectionName(const Value: String);
+function TioSession.GetUserName: String;
 begin
-  FCurrentConnectionName := Value;
+  Result := FUserName;
 end;
 
-procedure TioCurrentConnectionInfo.SetCurrentUserID(const Value: Integer);
+procedure TioSession.SetConnectionName(const Value: String);
 begin
-  FCurrentUserID := Value;
+  FConnectionName := Value;
 end;
 
-procedure TioCurrentConnectionInfo.SetCurrentUserName(const Value: String);
+procedure TioSession.SetUserID(const Value: Integer);
 begin
-  FCurrentUserName := Value;
+  FUserID := Value;
+end;
+
+procedure TioSession.SetUserName(const Value: String);
+begin
+  FUserName := Value;
 end;
 
 initialization

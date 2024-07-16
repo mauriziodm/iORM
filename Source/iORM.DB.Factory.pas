@@ -65,7 +65,8 @@ type
     class function Script(const AConnectionDefName: String; const AScript: TStrings): IioScript;
     class function ConnectionContainer: TioConnectionContainerRef;
     class function ConnectionManager: TioConnectionManagerRef;
-    class function CurrentConnectionInfo: IioCurrentConnectionInfo;
+    class function NewGlobalSession: IioSession;
+    class function NewThreadSession(const AGlobalConnectionName: String): IioSession;
     class function QueryContainer: IioQueryContainer;
     class function QueryEngine: TioQueryEngineRef;
     class function SQLDestination(const ASQL: String): IioSQLDestination; overload;
@@ -112,9 +113,14 @@ begin
   Result := TioConnectionManager;
 end;
 
-class function TioDbFactory.CurrentConnectionInfo: IioCurrentConnectionInfo;
+class function TioDbFactory.NewGlobalSession: IioSession;
 begin
-  Result := TioCurrentConnectionInfo.Create;
+  Result := TioSession.Create;
+end;
+
+class function TioDbFactory.NewThreadSession(const AGlobalConnectionName: String): IioSession;
+begin
+  Result := TioSession.CreateThreadSession(AGlobalConnectionName);
 end;
 
 class function TioDbFactory.LogicRelation: TioLogicRelationRef;
