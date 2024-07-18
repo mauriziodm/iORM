@@ -643,7 +643,7 @@ begin
   // if not already assigned then create it (così lo crea solo se serve
   // davvero altrimenti no)
   if not Assigned(FWhere) then
-    FWhere := TioWhereFactory.NewWhereWithPagingAndETMfor(FPaging, FETMfor);
+    FWhere := TioWhereFactory.NewWhereWithPagingAndETMfor(FPaging, FETMfor).Add(WhereStr.Text)._OrderBy(FOrderBy);
   // Return the Where instance
   Result := FWhere;
 end;
@@ -1081,8 +1081,7 @@ begin
     SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterBindSource))
   else
   begin
-    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, Name, TypeName, TypeAlias, TioWhereFactory.NewWhereWithPagingAndETMfor(FPaging, FETMfor).Add(WhereStr.Text)
-      ._OrderBy(FOrderBy), TypeOfCollection, ADataObject, AOwnsObject));
+    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(nil, Name, TypeName, TypeAlias, GetWhere, TypeOfCollection, ADataObject, AOwnsObject));
     // Force the creation of all the detail adapters (if exists)
     // NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
     // funzionavano perchè al momento di apertura del MasterAdapter i DetailAdapters non erano ancora nemmeno

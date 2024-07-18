@@ -81,7 +81,7 @@ type
     // AutoPost property
     procedure SetioAutoPost(const Value: Boolean);
     function GetioAutoPost: Boolean;
-    // WhereStr property
+    // Where property
     procedure SetWhere(const Value: IioWhere);
     function GetWhere: IioWhere;
     // ioWhereDetailsFromDetailAdapters property

@@ -58,6 +58,7 @@ type
     FTypeOfCollection: TioTypeOfCollection;
     FMasterBindSource: IioBindSource;
     FMasterPropertyName: String;
+    FWhere: IioWhere; // Istanza temporanea solo fintanto che non c'è il BSA
     FWhereStr: TStrings;
     FWhereDetailsFromDetailAdapters: Boolean;
     FOrderBy: String;
@@ -394,6 +395,7 @@ end;
 
 function TioPrototypeBindSourceCustom.CheckActiveAdapter: Boolean;
 begin
+  // Return true only if the current adapter is an ActiveBindSourceAdapter (maybe it is the fake data adapter)
   Result := GetActiveBindSourceAdapter <> nil;
 end;
 
@@ -432,14 +434,15 @@ begin
   FVirtualFields := False;
   FETMfor := nil;
   FPreview := False;
+  FWhere := nil;
+  // Set even an onChange event handler
+  FWhereDetailsFromDetailAdapters := False;
+  SetWhereStr(FWhereStr); // set TStringList.onChange event handler
+  FWhereStr := TStringList.Create;
   // Selectors
   FSelectorFor := nil;
   FOnReceiveSelectionCloneObject := True;
   FOnReceiveSelectionFreeObject := True;
-  // Set even an onChange event handler
-  FWhereDetailsFromDetailAdapters := False;
-  FWhereStr := TStringList.Create;
-  SetWhereStr(FWhereStr); // set TStringList.onChange event handler
   // Questà è una collezione dove eventuali BindSources di dettaglio
   // si registrano per rendere nota la loro esistenza al Master. Sarà poi
   // usata dal Master per fare in modo che, quando viene richiesta la creazione
@@ -593,13 +596,9 @@ end;
 
 function TioPrototypeBindSourceCustom.GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
 begin
+  // Return the current adapter if it is an ActiveBindSourceAdapter (maybe it is the fake data adapter)
   if not Supports(Self.InternalAdapter, IioActiveBindSourceAdapter, Result) then
     Result := nil;
-// ----- OLD CODE FROM 22/04/2023 -----
-//  if not Supports(Self.InternalAdapter, IioActiveBindSourceAdapter, Result) then
-//    raise EioException.Create(Self.ClassName, 'GetActiveBindSourceAdapter',
-//      Format('Interface "IioActiveBindSourceAdapter" not implemented from the actual internal adapter (%s)', [Name]));
-// ----- OLD CODE FROM 22/04/2023 -----
 end;
 
 function TioPrototypeBindSourceCustom.GetAsDefault: Boolean;
@@ -674,13 +673,20 @@ begin
 end;
 
 function TioPrototypeBindSourceCustom.GetWhere: IioWhere;
-var
-  LActiveBSA: IioActiveBindSourceAdapter;
 begin
-  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
-    Result := LActiveBSA.ioWhere
-  else
-    Result := nil;
+  // If the adapter exists the return the property of the adapter
+  // else return the Self.FWhere
+  if CheckActiveAdapter then
+  begin
+    Result := GetActiveBindSourceAdapter.ioWhere;
+    Exit;
+  end;
+  // if not already assigned then create it (così lo crea solo se serve
+  // davvero altrimenti no)
+  if not Assigned(FWhere) then
+    FWhere := TioWhereFactory.NewWhereWithPagingAndETMfor(FPaging, FETMfor).Add(WhereStr.Text)._OrderBy(FOrderBy);
+  // Return the Where instance
+  Result := FWhere;
 end;
 
 function TioPrototypeBindSourceCustom.Get_Version: String;
@@ -1110,16 +1116,13 @@ begin
 end;
 
 procedure TioPrototypeBindSourceCustom.SetWhere(const AWhere: IioWhere);
-var
-  LActiveBSA: IioActiveBindSourceAdapter;
 begin
-  // Update the adapter where
-  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
-  begin
-    AWhere.SetPagingObj(FPaging); // Inject paging object specified in the BindSource
-    AWhere.SetETMfor(FETMfor); // Inject ETMfor BS specified in the BindSource
-    LActiveBSA.ioWhere := AWhere;
-  end;
+  AWhere.SetPagingObj(FPaging); // Inject paging object specified in the BindSource
+  AWhere.SetETMfor(FETMfor); // Inject ETMfor BS specified in the BindSource
+  FWhere := AWhere;
+  // Update the adapter where in the BSAdapter if exist
+  if CheckActiveAdapter then
+    GetActiveBindSourceAdapter.ioWhere := AWhere;
 end;
 
 procedure TioPrototypeBindSourceCustom.SetWhereStr(const Value: TStrings);
@@ -1292,8 +1295,7 @@ begin
   if IsFromBSLoadType or (IsDetailBS and MasterPropertyName.IsEmpty) then
     LActiveBSA := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterBindSource)
   else
-    LActiveBSA := TioLiveBindingsFactory.GetBSA(Self, Name, TypeName, TypeAlias, TioWhereFactory.NewWhereWithPagingAndETMfor(FPaging, FETMfor).Add(WhereStr.Text)._OrderBy(FOrderBy),
-      TypeOfCollection, ADataObject, True);
+    LActiveBSA := TioLiveBindingsFactory.GetBSA(Self, Name, TypeName, TypeAlias, GetWhere, TypeOfCollection, ADataObject, True);
   // If Self is a Notifiable bind source then register a reference to itself
   // in the ActiveBindSourceAdapter
   // PS: Set ioAsync also (and other properties)
