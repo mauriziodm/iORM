@@ -393,6 +393,10 @@
         <DCCReference Include="..\..\Source\iORM.SynchroStrategy.Custom.pas"/>
         <DCCReference Include="..\..\Source\iORM.Http.Server.Executor.pas"/>
         <DCCReference Include="..\..\Source\iORM.Http.WebBroker.Producer.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Session.Manager.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Session.Interfaces.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Session.Model.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Session.Factory.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

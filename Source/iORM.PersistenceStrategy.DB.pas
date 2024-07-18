@@ -749,8 +749,16 @@ var
       end;
     end
     // Else if ObjStatus is osDelete then delete the obj
+    // Mauri 18/07/2024: Verificando su una app. che stava facendo Omar Bossoni dove aveva il problema che mettendo l'ObjStatus
+    //                    degli oggetti di dettaglio di una relazione HasMany a osDelete poi quando si chiamava il Persist non venivano
+    //                    eliminati, ho visto che (forse per mio errore) nelle righe sotto se l'ObjStatus rilevato era appunto
+    //                    osDeleted non impostava LContext.ActionType a atDelete bensì a atDoNotPersist. Solo che non sono sicuro che sia
+    //                    un errore quanto invece mi sembra di ricordare di avere fatto una modifica del genere che o è andata perduta
+    //                    oppure in qualche caso particolare (delete da BindSource?) andata settato così altrimenti dava problemi.
+    //                    Quindi ora lo metto a atDelete perchè è più sensato e risolve il problema di Omar ma scrivo questo commento
+    //                    così ricordo il caso.
     else if LContext.ObjStatus = osDeleted then
-      LContext.ActionType := atDoNotPersist;
+      LContext.ActionType := atDelete;
   end;
 
 begin
