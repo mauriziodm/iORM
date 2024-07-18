@@ -181,7 +181,6 @@ end;
 class procedure TioObjectMakerIntf.InitializeViewModelPresentersAfterCreate(const AViewModelOrSimpleView: TObject; const APresenterSettingsPointer: PioDIPresenterSettingsContainer);
 var
   LViewModelOrSimpleView: TComponent;
-//  LBSA: IioActiveBindSourceAdapter;
   LWhere: IioWhere;
   LName: String;
   LTargetBS, LParamBS: IioBindSource;
@@ -206,8 +205,23 @@ begin
   // Loop for all settings
   for I := 0 to Length(LPresenterSettings) - 1 do
   begin
+    // Extract the target BindSource name (empty = default BindSource of the SimpleView or ViewModel)
     LName := LPresenterSettings[I].Name;
+    // Extract the BindSource by name
     LTargetBS := TioUtilities.GetBindSource(LViewModelOrSimpleView, LName);
+    // If no BindSource was found then raise an exception
+    if not Assigned(LTargetBS) then
+    begin
+      if LName.isEmpty then
+        raise EioGenericException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate',
+          Format('There is no default BindSource in the SimpleView or ViewModel of class "%s" and named "%s".',
+          [LViewModelOrSimpleView.ClassName, LViewModelOrSimpleView.Name]))
+      else
+        raise EioGenericException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate',
+          Format('There is no BindSource named "%s" in the SimpleView or ViewModel of class "%s" and named "%s".',
+          [LName, LViewModelOrSimpleView.ClassName, LViewModelOrSimpleView.Name]));
+    end;
+    // Initialize the BindSource based on SettingsType
     case LPresenterSettings[I].SettingsType of
       // DataObject
       TioDIPresenterSettingsType.pstDataObject:
