@@ -236,9 +236,6 @@ begin
             raise EioGenericException.Create(Self.ClassName, 'InitializeViewModelPresentersAfterCreate', 'Interface "IioWhere" not implemented by object.');
           LTargetBS.SetWhere(LWhere);
         end;
-      // OrderBy
-      TioDIPresenterSettingsType.pstOrderBy:
-        TioUtilities.GetBindSource(LViewModelOrSimpleView, LName).SetOrderBy(LPresenterSettings[I].StringParameter);
       // SelectorFor
       TioDIPresenterSettingsType.pstSelectorFor:
         begin

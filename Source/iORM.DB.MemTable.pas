@@ -42,17 +42,13 @@ type
 
   TioMemTable = class (TFDMemTable)
   private
-    FioWhereStr: TStrings;
     FioWhere: IioWhere;
     FioAutoLoadDataWhenActivated: Boolean;
-    FioOrderBy: String;
     FioTypeAlias: String;
     FioTypeName: String;
     FioLoadingData: Boolean;
     FioComponentLoaded: Boolean;
     function Get_Version: String;
-    procedure SetIoWhereStr(const Value: TStrings);
-    procedure WhereOnChangeEventHandler(Sender: TObject);
   protected
     procedure DoBeforeOpen; override;
     procedure DoAfterOpen; override;
@@ -67,8 +63,6 @@ type
     property ioTypeName:String read FioTypeName write FioTypeName;
     property ioTypeAlias:String read FioTypeAlias write FioTypeAlias;
     property ioAutoLoadDataWhenActivated:Boolean read FioAutoLoadDataWhenActivated write FioAutoLoadDataWhenActivated;
-    property ioWhereStr:TStrings read FioWhereStr write SetIoWhereStr;
-    property ioOrderBy:String read FioOrderBy Write FioOrderBy;
     property _Version: String read Get_Version;
   end;
 
@@ -86,14 +80,10 @@ begin
   FioComponentLoaded := False;
   FioLoadingData := False;
   FioAutoLoadDataWhenActivated := True;
-  // Set even an onChange event handler
-  FioWhereStr := TStringList.Create;
-  SetIoWhereStr(FioWhereStr);  // set TStringList.onChange event handler
 end;
 
 destructor TioMemTable.Destroy;
 begin
-  FioWhereStr.Free;
   inherited;
 end;
 
@@ -127,7 +117,6 @@ begin
     try
       io.Load(FioTypeName, FioTypeAlias)
              ._Where(FioWhere)
-             ._OrderBy(FioOrderBy)
              .ToMemTable(Self);
     finally
       ioLoadingData := False;
@@ -141,20 +130,6 @@ begin
   FioComponentLoaded := True;
   if Active and FioAutoLoadDataWhenActivated then
     ioLoadData;
-end;
-
-procedure TioMemTable.SetIoWhereStr(const Value: TStrings);
-begin
-  FioWhereStr.Assign(Value);
-  // Set the onChange event handler
-  (FioWhereStr as TStringList).OnChange := WhereOnChangeEventHandler;
-  // Update the adapter where property
-  WhereOnChangeEventHandler(Self);
-end;
-
-procedure TioMemTable.WhereOnChangeEventHandler(Sender: TObject);
-begin
-  Self.ioWhere := TioWhereFactory.NewWhere.Add(Self.FioWhereStr.Text);
 end;
 
 end.

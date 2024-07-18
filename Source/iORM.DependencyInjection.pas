@@ -149,7 +149,6 @@ type
     function SetBindSource(const AName: String; const AMasterBindSource: IioBindSource; const AMasterPropertyName: String = '')
       : TioDependencyInjectionRegister; overload;
     function SetBindSource(const AName: String; const AWhere: IioWhere): TioDependencyInjectionRegister; overload;
-    function SetBindSource(const AName: String; const AOrderBy: String): TioDependencyInjectionRegister; overload;
 
     function SetBindSourceAsSelectorFor(const ASourcePresenterName: String; const ASelectionDest: IioBindSource): TioDependencyInjectionRegister;
 
@@ -254,7 +253,6 @@ type
     function SetBindSource(const ABSName: String; const AInterfacedObj: IInterface): IioDependencyInjectionLocator; overload;
     function SetBindSource(const ABSName: String; const AMasterBindSource: IioBindSource; const AMasterPropertyName: String = ''): IioDependencyInjectionLocator; overload;
     function SetBindSource(const ABSName: String; const AWhere: IioWhere): IioDependencyInjectionLocator; overload;
-    function SetBindSource(const ABSName: String; const AOrderBy: String): IioDependencyInjectionLocator; overload;
     function SetBindSourceAsSelectorFor(const ASelectorBSName: String; const ASelectionTargetBS: IioBindSource): IioDependencyInjectionLocator; overload;
     function SetBindSourceAsWhereBuilderFor(const AWhereBuilderBSName: String; const AWhereBuilderTargetBS: IioMasterBindSource): IioDependencyInjectionLocator; overload;
     function SetBindSourceAsETMfor(const AEtmBSName: String; const AEtmTargetBS: IioMasterBindSource): IioDependencyInjectionLocator; overload;
@@ -263,7 +261,6 @@ type
     function SetBindSource(const AInterfacedObj: IInterface): IioDependencyInjectionLocator; overload;
     function SetBindSource(const AMasterBindSource: IioBindSource; const AMasterPropertyName: String = ''): IioDependencyInjectionLocator; overload;
     function SetBindSource(const AWhere: IioWhere): IioDependencyInjectionLocator; overload;
-    function SetBindSource(const AOrderBy: String): IioDependencyInjectionLocator; overload;
     function SetBindSourceAsSelectorFor(const ASelectionTargetBS: IioBindSource): IioDependencyInjectionLocator; overload;
     function SetBindSourceAsWhereBuilderFor(const AWhereBuilderTargetBS: IioMasterBindSource): IioDependencyInjectionLocator; overload;
     function SetBindSourceAsETMfor(const AEtmTargetBS: IioMasterBindSource): IioDependencyInjectionLocator; overload;
@@ -295,7 +292,6 @@ type
     function SetBindSource(const ABSName: String; const AInterfacedObj: IInterface): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSource(const ABSName: String; const AMasterPresenter: IioBindSource; const AMasterPropertyName: String = ''): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSource(const ABSName: String; const AWhere: IioWhere): IioDependencyInjectionLocator<TI>; overload;
-    function SetBindSource(const ABSName: String; const AOrderBy: String): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSourceAsSelectorFor(const ASelectorBSName: String; const ASelectionTargetBS: IioBindSource): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSourceAsWhereBuilderFor(const AWhereBuilderBSName: String; const AWhereBuilderTargetBS: IioMasterBindSource): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSourceAsETMfor(const AEtmBSName: String; const AEtmTargetBS: IioMasterBindSource): IioDependencyInjectionLocator<TI>; overload;
@@ -304,7 +300,6 @@ type
     function SetBindSource(const AInterfacedObj: IInterface): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSource(const AMasterPresenter: IioBindSource; const AMasterPropertyName: String = ''): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSource(const AWhere: IioWhere): IioDependencyInjectionLocator<TI>; overload;
-    function SetBindSource(const AOrderBy: String): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSourceAsSelectorFor(const ASelectionTargetBS: IioBindSource): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSourceAsWhereBuilderFor(const AWhereBuilderTargetBS: IioMasterBindSource): IioDependencyInjectionLocator<TI>; overload;
     function SetBindSourceAsETMfor(const AEtmTargetBS: IioMasterBindSource): IioDependencyInjectionLocator<TI>; overload;
@@ -978,18 +973,6 @@ begin
   Result := Self;
 end;
 
-function TioDependencyInjectionRegister.SetBindSource(const AName, AOrderBy: String): TioDependencyInjectionRegister;
-var
-  i: Integer;
-begin
-  i := Length(FContainerValue.PresenterSettings);
-  SetLength(FContainerValue.PresenterSettings, i + 1);
-  FContainerValue.PresenterSettings[i].SettingsType := TioDIPresenterSettingsType.pstOrderBy;
-  FContainerValue.PresenterSettings[i].Name := AName;
-  FContainerValue.PresenterSettings[i].StringParameter := AOrderBy;
-  Result := Self;
-end;
-
 function TioDependencyInjectionRegister.SetBindSourceAsSelectorFor(const ASourcePresenterName: String; const ASelectionDest: IioBindSource)
   : TioDependencyInjectionRegister;
 var
@@ -1392,18 +1375,6 @@ begin
   Result := Self;
 end;
 
-function TioDependencyInjectionLocator.SetBindSource(const ABSName, AOrderBy: String): IioDependencyInjectionLocator;
-var
-  i: Integer;
-begin
-  i := Length(FPresenterSettings);
-  SetLength(FPresenterSettings, i + 1);
-  FPresenterSettings[i].SettingsType := TioDIPresenterSettingsType.pstOrderBy;
-  FPresenterSettings[i].Name := ABSName;
-  FPresenterSettings[i].StringParameter := AOrderBy;
-  Result := Self;
-end;
-
 function TioDependencyInjectionLocator.SetBindSource(const ABSName: String; const AWhere: IioWhere): IioDependencyInjectionLocator;
 var
   i: Integer;
@@ -1431,11 +1402,6 @@ function TioDependencyInjectionLocator.SetBindSource(const AMasterBindSource: Ii
   : IioDependencyInjectionLocator;
 begin
   Result := SetBindSource('', AMasterBindSource, AMasterPropertyName);
-end;
-
-function TioDependencyInjectionLocator.SetBindSource(const AOrderBy: String): IioDependencyInjectionLocator;
-begin
-  Result := SetBindSource('', AOrderBy);
 end;
 
 function TioDependencyInjectionLocator.SetBindSource(const AInterfacedObj: IInterface): IioDependencyInjectionLocator;
@@ -2039,12 +2005,6 @@ begin
   TioDependencyInjectionLocator(Self).SetBindSource(ABSName, AMasterPresenter, AMasterPropertyName);
 end;
 
-function TioDependencyInjectionLocator<TI>.SetBindSource(const ABSName, AOrderBy: String): IioDependencyInjectionLocator<TI>;
-begin
-  Result := Self;
-  TioDependencyInjectionLocator(Self).SetBindSource(ABSName, AOrderBy);
-end;
-
 function TioDependencyInjectionLocator<TI>.SetBindSource(const ABSName: String; const AWhere: IioWhere): IioDependencyInjectionLocator<TI>;
 begin
   Result := Self;
@@ -2255,12 +2215,6 @@ function TioDependencyInjectionLocator<TI>.SetBindSource(const AMasterPresenter:
 begin
   Result := Self;
   TioDependencyInjectionLocator(Self).SetBindSource(AMasterPresenter, AMasterPropertyName);
-end;
-
-function TioDependencyInjectionLocator<TI>.SetBindSource(const AOrderBy: String): IioDependencyInjectionLocator<TI>;
-begin
-  Result := Self;
-  TioDependencyInjectionLocator(Self).SetBindSource(AOrderBy);
 end;
 
 function TioDependencyInjectionLocator<TI>.SetBindSource(const AInterfacedObj: IInterface): IioDependencyInjectionLocator<TI>;

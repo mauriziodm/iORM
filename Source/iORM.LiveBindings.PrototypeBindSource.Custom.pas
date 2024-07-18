@@ -59,9 +59,6 @@ type
     FMasterBindSource: IioBindSource;
     FMasterPropertyName: String;
     FWhere: IioWhere; // Istanza temporanea solo fintanto che non c'è il BSA
-    FWhereStr: TStrings;
-    FWhereDetailsFromDetailAdapters: Boolean;
-    FOrderBy: String;
     FAutoRefreshOnNotification: Boolean;
     FAutoPost: Boolean;
     FPaging: TioCommonBSAPageManager;
@@ -80,7 +77,7 @@ type
     // registrati). In questo modo evito alcuni problemi di "sequenza" dovuti
     // al fatto che gli adapters di dettaglio non erano stati ancora creati (ma quello master si).
     // Ad esempio capitava che i filtri dei presentere di dettaglio impostati a
-    // DesignTime (WhereStr property) non funzionassero per questo motivo.
+    // DesignTime (WhereStrssss property) non funzionassero per questo motivo.
     // NB: Nei PrototypeBindSources non serve poi il metodo "ForceDetailAdaptersCreation" come dei DataSet o nei ModelPresenter
     FDetailBindSourceContainer: TList<IioBindSource>;
     // FioLoaded flag for iORM DoCreateAdapter internal use only just before
@@ -153,8 +150,6 @@ type
     // GetOnReceiveSelectionFreeObject
     function GetOnReceiveSelectionFreeObject: Boolean;
     procedure SetOnReceiveSelectionFreeObject(const Value: Boolean);
-    // OrderBy
-    procedure SetOrderBy(const Value: String);
     // Paging
     procedure SetPaging(const Value: TioCommonBSAPageManager);
     function GetPaging: TioCommonBSAPageManager;
@@ -179,11 +174,6 @@ type
     // Where
     procedure SetWhere(const AWhere: IioWhere);
     function GetWhere: IioWhere;
-    // WhereDetailsFromDetailAdapters
-    procedure SetWhereDetailsFromDetailAdapters(const Value: Boolean);
-    // WhereStr
-    procedure SetWhereStr(const Value: TStrings);
-    procedure WhereOnChangeEventHandler(Sender: TObject);
     // SelectorFor
     function GetSelectorFor: IioBindSource;
     procedure SetSelectorFor(const ATargetBindSource: IioBindSource);
@@ -233,11 +223,7 @@ type
     property ETMfor: IioMasterBindSource read GetETMfor write SetETMfor;
     // published: Master (però cambiarlo in modo che, se true, persiste al cambio di record)
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection write SetTypeOfCollection default tcList;
-    // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
-    property WhereStr: TStrings read FWhereStr write SetWhereStr; // published: Master
-    property WhereDetailsFromDetailAdapters: Boolean read FWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters default False;
     // published: Nascondere e default = false
-    property OrderBy: String read FOrderBy Write SetOrderBy; // published: Master
     property MasterBindSource: IioBindSource read FMasterBindSource write SetMasterBindSource; // published: Detail
     property MasterPropertyName: String read GetMasterPropertyName write SetMasterPropertyName; // published: Detail
     property AutoRefreshOnNotification: Boolean read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default True; // published: Master+Detail
@@ -435,10 +421,6 @@ begin
   FETMfor := nil;
   FPreview := False;
   FWhere := nil;
-  // Set even an onChange event handler
-  FWhereDetailsFromDetailAdapters := False;
-  SetWhereStr(FWhereStr); // set TStringList.onChange event handler
-  FWhereStr := TStringList.Create;
   // Selectors
   FSelectorFor := nil;
   FOnReceiveSelectionCloneObject := True;
@@ -468,7 +450,6 @@ end;
 
 destructor TioPrototypeBindSourceCustom.Destroy;
 begin
-  FWhereStr.Free;
   // If the new AETMfor is assigned then unregister itself
   if Assigned(FETMFor) then
     FETMfor.UnregisterDetailBindSource(Self);
@@ -684,7 +665,7 @@ begin
   // if not already assigned then create it (così lo crea solo se serve
   // davvero altrimenti no)
   if not Assigned(FWhere) then
-    FWhere := TioWhereFactory.NewWhereWithPagingAndETMfor(FPaging, FETMfor).Add(WhereStr.Text)._OrderBy(FOrderBy);
+    FWhere := TioWhereFactory.NewWhereWithPagingAndETMfor(FPaging, FETMfor);
   // Return the Where instance
   Result := FWhere;
 end;
@@ -1125,22 +1106,6 @@ begin
     GetActiveBindSourceAdapter.ioWhere := AWhere;
 end;
 
-procedure TioPrototypeBindSourceCustom.SetWhereStr(const Value: TStrings);
-begin
-  FWhereStr.Assign(Value);
-  // If in DesignTime then Exit
-  // NB: Mettendo questa linea di codice ho risolto il problema che i ioPBS
-  // anche se erano con "AutoActivate=False" quando veniva aperta (caricata)
-  // la form che li conteneva a design time apparivano cmq con i dati finti di
-  // prova anzichè rimanere vuoti.
-  if (csDesigning in ComponentState) then
-    Exit;
-  // Set the onChange event handler
-  (FWhereStr as TStringList).OnChange := WhereOnChangeEventHandler;
-  // Update the adapter where property
-  WhereOnChangeEventHandler(Self);
-end;
-
 procedure TioPrototypeBindSourceCustom.ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String);
 begin
   io.ShowCurrent(Self, AParentCloseQueryAction, AViewContext, AVVMAlias);
@@ -1196,17 +1161,6 @@ begin
   FOnUpdateConflictException := APersistenceConflictEventHandler;
 end;
 
-procedure TioPrototypeBindSourceCustom.SetOrderBy(const Value: String);
-var
-  LActiveBSA: IioActiveBindSourceAdapter;
-begin
-  FOrderBy := Value;
-  // If the adapter is created and is an ActiveBindSourceAdapter then
-  // update the where of the adapter also
-  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
-    LActiveBSA.ioWhere.SetOrderBySql(Value);
-end;
-
 procedure TioPrototypeBindSourceCustom.SetPaging(const Value: TioCommonBSAPageManager);
 begin
   // In reality this property would be read-only but if I left it read-only
@@ -1253,21 +1207,6 @@ begin
   FTypeOfCollection := Value;
 end;
 
-procedure TioPrototypeBindSourceCustom.SetWhereDetailsFromDetailAdapters(const Value: Boolean);
-var
-  LActiveBSA: IioActiveBindSourceAdapter;
-begin
-  FWhereDetailsFromDetailAdapters := Value;
-  // Update the adapter
-  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
-    LActiveBSA.ioWhereDetailsFromDetailAdapters := Value;
-end;
-
-procedure TioPrototypeBindSourceCustom.WhereOnChangeEventHandler(Sender: TObject);
-begin
-  SetWhere(TioWhereFactory.NewWhereWithPagingAndETMfor(FPaging, FETMfor).Add(FWhereStr.Text));
-end;
-
 function TioPrototypeBindSourceCustom._AddRef: Integer;
 begin
   // Nothing, the interfaces support is intended only as LazyLoadable support flag
@@ -1307,7 +1246,6 @@ begin
     LActiveBSA.LoadType := FLoadType;
     LActiveBSA.Lazy := FLazy;
     LActiveBSA.LazyProps := FLazyProps;
-    LActiveBSA.ioWhereDetailsFromDetailAdapters := FWhereDetailsFromDetailAdapters;
     LActiveBSA.SetBindSource(Self);
     SetRuntimeAdapter(LActiveBSA.AsTBindSourceAdapter);
     FBindSourceAdapter := LActiveBSA;

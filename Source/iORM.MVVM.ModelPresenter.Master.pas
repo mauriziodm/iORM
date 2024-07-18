@@ -121,8 +121,6 @@ type
     property Lazy default False;
     property LazyProps;
     property TypeOfCollection; // published: Master+Detail (si potrebbe fare una rilevazione automatica?)
-    property WhereStr; // published: Master
-    property OrderBy;
     property AutoRefreshOnNotification default True;
     property VirtualFields;
     // Published ETM for

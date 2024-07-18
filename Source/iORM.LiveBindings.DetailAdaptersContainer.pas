@@ -58,7 +58,6 @@ type
     procedure RemoveNaturalBindSourceAdapter(const ANaturalBindSourceAdapter: IioNaturalActiveBindSourceAdapter);
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetBindSourceAdapterByMasterPropertyName(const AMasterPropertyName:String): IioActiveBindSourceAdapter;
-    function FillWhereDetails(const AWhereDetailsContainer: IioWhereDetailsContainer): IioWhereDetailsContainer;
 
     // =========================================================================
     // Part for the support of the IioBindSource interfaces (Added by iORM)
@@ -156,19 +155,6 @@ end;
 function TioDetailAdaptersContainer.GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
 begin
   Supports(Self.FMasterAdapter, IioActiveBindSourceAdapter, Result);
-end;
-
-function TioDetailAdaptersContainer.FillWhereDetails(const AWhereDetailsContainer: IioWhereDetailsContainer): IioWhereDetailsContainer;
-var
-  LBindSourceAdapter: IioContainedBindSourceAdapter;
-begin
-  AWhereDetailsContainer.Clear;
-  for LBindSourceAdapter in FDetailAdapters.Values do
-  begin
-    if not Assigned(LBindSourceAdapter) then
-      Continue;
-    AWhereDetailsContainer.AddOrUpdate(LBindSourceAdapter.GetMasterPropertyName, LBindSourceAdapter.GetWhere);
-  end;
 end;
 
 procedure TioDetailAdaptersContainer.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);

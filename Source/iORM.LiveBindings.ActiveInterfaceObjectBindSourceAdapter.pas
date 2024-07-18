@@ -53,7 +53,6 @@ type
     FAsyncLoad: Boolean;
     FAsyncPersist: Boolean;
     FWhere: IioWhere;
-    FWhereDetailsFromDetailAdapters: Boolean;
     // FTypeName, FTypeAlias: String;
     FLocalOwnsObject: Boolean;
     FLazy: Boolean;
@@ -79,9 +78,6 @@ type
     // Where property
     procedure SetWhere(const Value: IioWhere);
     function GetWhere: IioWhere;
-    // ioWhereDetailsFromDetailAdapters property
-    function GetWhereDetailsFromDetailAdapters: Boolean;
-    procedure SetWhereDetailsFromDetailAdapters(const Value: Boolean);
     // ioViewDataType
     function GetTypeOfCollection: TioTypeOfCollection;
     // ioOwnsObjects
@@ -250,7 +246,6 @@ begin
   inherited Create(AOwner, ADataObject, ATypeAlias, ATypeName);
   FLocalOwnsObject := False; // Always false because it's a BSA for an interface (AutoRefCount)
   FWhere := AWhere;
-  FWhereDetailsFromDetailAdapters := False;
   FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
   // Set Master & Details adapters reference
   FMasterAdaptersContainer := nil;
@@ -508,19 +503,6 @@ end;
 function TioActiveInterfaceObjectBindSourceAdapter.GetWhere: IioWhere;
 begin
   Result := FWhere;
-  // Fill the WhereDetails from the DetailAdapters container if enabled
-  // NB: Create it if not assigned
-  if FWhereDetailsFromDetailAdapters then
-  begin
-    if not Assigned(FWhere) then
-      FWhere := TioWhereFactory.NewWhere;
-    FDetailAdaptersContainer.FillWhereDetails(FWhere.Details);
-  end;
-end;
-
-function TioActiveInterfaceObjectBindSourceAdapter.GetWhereDetailsFromDetailAdapters: Boolean;
-begin
-  Result := FWhereDetailsFromDetailAdapters;
 end;
 
 function TioActiveInterfaceObjectBindSourceAdapter.GetItemIndex: Integer;
@@ -780,11 +762,6 @@ end;
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetWhere(const Value: IioWhere);
 begin
   FWhere := Value;
-end;
-
-procedure TioActiveInterfaceObjectBindSourceAdapter.SetWhereDetailsFromDetailAdapters(const Value: Boolean);
-begin
-  FWhereDetailsFromDetailAdapters := Value;
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetItemIndex(const Value: Integer);

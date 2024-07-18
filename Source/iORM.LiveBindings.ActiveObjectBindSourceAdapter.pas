@@ -52,7 +52,6 @@ type
     FAsyncLoad: Boolean;
     FAsyncPersist: Boolean;
     FWhere: IioWhere;
-    FWhereDetailsFromDetailAdapters: Boolean;
     // FClassRef: TioClassRef;
     FTypeName, FTypeAlias: String; // NB: TypeAlias has no effect in this adapter (only used by interfaced BSA)
     FLocalOwnsObject: Boolean;
@@ -85,9 +84,6 @@ type
     // Where property
     procedure SetWhere(const Value: IioWhere);
     function GetWhere: IioWhere;
-    // ioWhereDetailsFromDetailAdapters property
-    function GetWhereDetailsFromDetailAdapters: Boolean;
-    procedure SetWhereDetailsFromDetailAdapters(const Value: Boolean);
     // ioViewDataType
     function GetTypeOfCollection: TioTypeOfCollection;
     // ioOwnsObjects
@@ -278,7 +274,6 @@ begin
 
   FLocalOwnsObject := AOwnsObject;
   FWhere := AWhere;
-  FWhereDetailsFromDetailAdapters := False;
   FTypeName := AClassRef.ClassName;
   FTypeAlias := ''; // NB: TypeAlias has no effect in this adapter (only used by interfaced BSA)
   FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
@@ -526,19 +521,6 @@ end;
 function TioActiveObjectBindSourceAdapter.GetWhere: IioWhere;
 begin
   Result := FWhere;
-  // Fill the WhereDetails from the DetailAdapters container if enabled
-  // NB: Create it if not assigned
-  if FWhereDetailsFromDetailAdapters then
-  begin
-    if not Assigned(FWhere) then
-      FWhere := TioWhereFactory.NewWhere;
-    FDetailAdaptersContainer.FillWhereDetails(FWhere.Details);
-  end;
-end;
-
-function TioActiveObjectBindSourceAdapter.GetWhereDetailsFromDetailAdapters: Boolean;
-begin
-  Result := FWhereDetailsFromDetailAdapters;
 end;
 
 function TioActiveObjectBindSourceAdapter.GetItemIndex: Integer;
@@ -824,11 +806,6 @@ end;
 procedure TioActiveObjectBindSourceAdapter.SetWhere(const Value: IioWhere);
 begin
   FWhere := Value;
-end;
-
-procedure TioActiveObjectBindSourceAdapter.SetWhereDetailsFromDetailAdapters(const Value: Boolean);
-begin
-  FWhereDetailsFromDetailAdapters := Value;
 end;
 
 procedure TioActiveObjectBindSourceAdapter.SetItemIndex(const Value: Integer);

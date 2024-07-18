@@ -93,7 +93,6 @@ type
     procedure SetMasterBindSource(const Value: IioBindSource);
     procedure SetMasterPropertyName(const Value: String);
     procedure SetWhere(const AWhere: IioWhere);
-    procedure SetOrderBy(const Value: String);
     procedure RegisterDetailBindSource(const ADetailBindSource: IioBindSource);
     procedure UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
     // ETMfor
@@ -279,12 +278,9 @@ type
     // AutoPost property
     procedure SetioAutoPost(const Value: Boolean);
     function GetioAutoPost: Boolean;
-    // WhereStr property
+    // Where property
     procedure SetWhere(const Value: IioWhere);
     function GetWhere: IioWhere;
-    // ioWhereDetailsFromDetailAdapters property
-    function GetWhereDetailsFromDetailAdapters: Boolean;
-    procedure SetWhereDetailsFromDetailAdapters(const Value: Boolean);
     // ioViewDataType
     function GetTypeOfCollection: TioTypeOfCollection;
     // ioOwnsObjects
@@ -334,7 +330,6 @@ type
     property TypeAlias: String read GetTypeAlias write SetTypeAlias;
     property TypeName: String read GetTypeName write SetTypeName;
     property ioWhere: IioWhere read GetWhere write SetWhere;
-    property ioWhereDetailsFromDetailAdapters: Boolean read GetWhereDetailsFromDetailAdapters write SetWhereDetailsFromDetailAdapters;
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection;
     property ItemCount: Integer read GetCount;
     property ItemIndex: Integer read GetItemIndex write SetItemIndex;
@@ -357,7 +352,6 @@ type
     procedure RemoveNaturalBindSourceAdapter(const ANaturalBindSourceAdapter: IioNaturalActiveBindSourceAdapter);
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
-    function FillWhereDetails(const AWhereDetailsContainer: IioWhereDetailsContainer): IioWhereDetailsContainer;
   end;
 
   IioContainedBindSourceAdapter = interface
@@ -370,7 +364,7 @@ type
     function Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
     function GetMasterPropertyName: String;
     function AsActiveBindSourceAdapter: IioActiveBindSourceAdapter;
-    // WhereStr property
+    // Where property
     function GetWhere: IioWhere;
   end;
 

@@ -53,7 +53,7 @@ type
   end;
 
   // Default settings creating ViewModels.Presenters
-  TioDIPresenterSettingsType = (pstDataObject, pstInterfacedObj, pstMasterModelPresenter, pstWhere, pstOrderBy, pstSelectorFor, pstWhereBuilderFor, pstETMfor);
+  TioDIPresenterSettingsType = (pstDataObject, pstInterfacedObj, pstMasterModelPresenter, pstWhere, pstSelectorFor, pstWhereBuilderFor, pstETMfor);
   TioDIPresenterSettings = record
     SettingsType:TioDIPresenterSettingsType;
     Name: String;

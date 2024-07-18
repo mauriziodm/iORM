@@ -54,7 +54,6 @@ type
     FAsyncLoad: Boolean;
     FAsyncPersist: Boolean;
     FWhere: IioWhere;
-    FWhereDetailsFromDetailAdapters: Boolean;
     FTypeName, FTypeAlias: String;
     FLocalOwnsObject: Boolean;
     FLazy: Boolean;
@@ -84,9 +83,6 @@ type
     // Where property
     procedure SetWhere(const Value: IioWhere);
     function GetWhere: IioWhere;
-    // ioWhereDetailsFromDetailAdapters property
-    function GetWhereDetailsFromDetailAdapters: Boolean;
-    procedure SetWhereDetailsFromDetailAdapters(const Value: Boolean);
     // ioViewDataType
     function GetTypeOfCollection: TioTypeOfCollection;
     // ioOwnsObjects
@@ -235,7 +231,6 @@ begin
   // inherited Create(AOwner, ADataObject, ATypeAlias, ATypeName, AOwnsObject);
   FLocalOwnsObject := AOwnsObject;
   FWhere := AWhere;
-  FWhereDetailsFromDetailAdapters := False;
   FTypeName := ATypeName;
   FTypeAlias := ATypeAlias;
   FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
@@ -558,19 +553,6 @@ end;
 function TioActiveInterfaceListBindSourceAdapter.GetWhere: IioWhere;
 begin
   Result := FWhere;
-  // Fill the WhereDetails from the DetailAdapters container if enabled
-  // NB: Create it if not assigned
-  if FWhereDetailsFromDetailAdapters then
-  begin
-    if not Assigned(FWhere) then
-      FWhere := TioWhereFactory.NewWhere;
-    FDetailAdaptersContainer.FillWhereDetails(FWhere.Details);
-  end;
-end;
-
-function TioActiveInterfaceListBindSourceAdapter.GetWhereDetailsFromDetailAdapters: Boolean;
-begin
-  Result := FWhereDetailsFromDetailAdapters;
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.GetItemIndex: Integer;
@@ -864,11 +846,6 @@ end;
 procedure TioActiveInterfaceListBindSourceAdapter.SetWhere(const Value: IioWhere);
 begin
   FWhere := Value;
-end;
-
-procedure TioActiveInterfaceListBindSourceAdapter.SetWhereDetailsFromDetailAdapters(const Value: Boolean);
-begin
-  FWhereDetailsFromDetailAdapters := Value;
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.SetItemIndex(const Value: Integer);
