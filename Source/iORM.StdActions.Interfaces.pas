@@ -40,7 +40,7 @@ uses
 
 type
 
-  TioActionShowMode = (smBSCurrent, smBSEach, smEntityTypeName, smEntityTypeNameAsSelector, smBSTypeNameAsSelector, smEntityTypeNameAsWhereBuilder, smBSTypeNameAsWhereBuilder, smEntityTypeNameAsETM, smBSTypeNameAsETM);
+  TioActionShowMode = (smBSCurrent, smBSEach, smEntityTypeName, smEntityTypeNameAsSelector, smEntityTypeNameAsWhereBuilder, smEntityTypeNameAsETM);
   TioActionViewContextBy = (vcByDefaultViewContextProvider, vcByViewContextProviderName, vcByViewContextProvider, vcByViewContext);//, vcNone);
 
   TioActionExecutionMode = (emActive, emPassive);
