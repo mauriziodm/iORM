@@ -39,7 +39,7 @@ uses
   System.Classes, System.Generics.Collections, iORM.MVVM.Interfaces, iORM.LiveBindings.Interfaces,
   iORM.CommonTypes, iORM.LiveBindings.BSPersistence, iORM.StdActions.Interfaces,
   iORM.MVVM.ViewContextProvider, iORM.SynchroStrategy.Interfaces,
-  iORM.Abstraction;
+  iORM.Abstraction, iORM.Where.Interfaces;
 
 type
 
@@ -654,6 +654,7 @@ type
     FViewContextBy: TioActionViewContextBy;
     FViewContextProvider: TioViewContextProvider;
     FViewContextProviderName: String;
+    FWhere: IioWhere;
 //    function Get_Version: String;
     function _IsEnabled: Boolean;
     procedure _SetTargetBindSource(const AObj: TObject);
@@ -669,6 +670,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
+    // properties
+    property Where: IioWhere read FWhere write FWhere;
   published
     // inherited properties
     property Enabled;
@@ -1778,6 +1781,7 @@ begin
   FViewContextBy := TioActionViewContextBy.vcByDefaultViewContextProvider;
   FViewContextProvider := nil;
   FViewContextProviderName := '';
+  FWhere := nil;
 end;
 
 function TioVMActionBSShowOrSelect.HandlesTarget(Target: TObject): Boolean;
@@ -1905,61 +1909,61 @@ begin
 //        vcNone:
 //          io.ShowEach(FFromBS as IioBindSource, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
-    // smEntityTypeName
+    // smEntityTypeName + where
     smEntityTypeName:
       case FViewContextBy of
         vcByDefaultViewContextProvider:
-          io.Show(FEntityTypeName, FAction_ParentCloseQueryAction, FVVMTypeAlias);
+          io.Show(FEntityTypeName, FWhere, FAction_ParentCloseQueryAction, FVVMTypeAlias);
         vcByViewContextProviderName:
-          io.Show(FEntityTypeName, FAction_ParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+          io.Show(FEntityTypeName, FWhere, FAction_ParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
         vcByViewContextProvider:
-          io.Show(FEntityTypeName, FAction_ParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+          io.Show(FEntityTypeName, FWhere, FAction_ParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
         vcByViewContext:
-          io.Show(FEntityTypeName, FAction_ParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+          io.Show(FEntityTypeName, FWhere, FAction_ParentCloseQueryAction, FViewContext, FVVMTypeAlias);
 //        vcNone:
-//          io.Show(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
+//          io.Show(FEntityTypeName, FWhere, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
-    // smEntityTypeNameAsSelector
+    // smEntityTypeNameAsSelector + where
     smEntityTypeNameAsSelector:
       case FViewContextBy of
         vcByDefaultViewContextProvider:
-          io.ShowAsSelector(FEntityTypeName, FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, FVVMTypeAlias);
+          io.ShowAsSelector(FEntityTypeName, FWhere, FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, FVVMTypeAlias);
         vcByViewContextProviderName:
-          io.ShowAsSelector(FEntityTypeName, FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+          io.ShowAsSelector(FEntityTypeName, FWhere, FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
         vcByViewContextProvider:
-          io.ShowAsSelector(FEntityTypeName, FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+          io.ShowAsSelector(FEntityTypeName, FWhere, FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
         vcByViewContext:
-          io.ShowAsSelector(FEntityTypeName, FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+          io.ShowAsSelector(FEntityTypeName, FWhere, FTargetBindSource as IioBindSource, FAction_ParentCloseQueryAction, FViewContext, FVVMTypeAlias);
 //        vcNone:
-//          io.ShowAsSelector(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
+//          io.ShowAsSelector(FEntityTypeName, FWhere, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
-    // smEntityTypeNameAsWhereBuilder
+    // smEntityTypeNameAsWhereBuilder + where
     smEntityTypeNameAsWhereBuilder:
       case FViewContextBy of
         vcByDefaultViewContextProvider:
-          io.ShowAsWhereBuilder(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FVVMTypeAlias);
+          io.ShowAsWhereBuilder(FEntityTypeName, FWhere, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FVVMTypeAlias);
         vcByViewContextProviderName:
-          io.ShowAsWhereBuilder(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+          io.ShowAsWhereBuilder(FEntityTypeName, FWhere, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
         vcByViewContextProvider:
-          io.ShowAsWhereBuilder(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+          io.ShowAsWhereBuilder(FEntityTypeName, FWhere, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
         vcByViewContext:
-          io.ShowAsWhereBuilder(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+          io.ShowAsWhereBuilder(FEntityTypeName, FWhere, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FViewContext, FVVMTypeAlias);
 //        vcNone:
-//          io.ShowAsWhereBuilder(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
+//          io.ShowAsWhereBuilder(FEntityTypeName, FWhere, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
-    // smEntityTypeNameAsETM
+    // smEntityTypeNameAsETM + where
     smEntityTypeNameAsETM:
       case FViewContextBy of
         vcByDefaultViewContextProvider:
-          io.ShowAsETM(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FVVMTypeAlias);
+          io.ShowAsETM(FEntityTypeName, FWhere, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FVVMTypeAlias);
         vcByViewContextProviderName:
-          io.ShowAsETM(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
+          io.ShowAsETM(FEntityTypeName, FWhere, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, io.VCProviderByName(FViewContextProviderName), FVVMTypeAlias);
         vcByViewContextProvider:
-          io.ShowAsETM(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
+          io.ShowAsETM(FEntityTypeName, FWhere, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FViewContextProvider, FVVMTypeAlias);
         vcByViewContext:
-          io.ShowAsETM(FEntityTypeName, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FViewContext, FVVMTypeAlias);
+          io.ShowAsETM(FEntityTypeName, FWhere, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FViewContext, FVVMTypeAlias);
 //        vcNone:
-//          io.ShowAsETM(FEntityTypeName, FParentCloseQueryAction, nil, FVVMTypeAlias);
+//          io.ShowAsETM(FEntityTypeName, FWhere, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
   end;
 end;

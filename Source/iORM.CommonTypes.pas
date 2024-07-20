@@ -36,7 +36,7 @@ unit iORM.CommonTypes;
 interface
 
 uses
-  System.Rtti, System.Generics.Collections, System.SysUtils, DJSON.Params;
+  System.SysUtils, DJSON.Params;
 
 const
   // M.M. 11/08/18 Default length to 50 if no attribute is specified because Firebird has a length limit on index generation for columns of length 255.
@@ -159,9 +159,6 @@ type
   TioBSCloseQueryOnEditingAction = (eaDisable, eaAutoPersist, eaAutoRevert);
   TioBSCloseQueryOnExecuteAction = (eaClose, eaTerminateApplication);
   TioBSCloseQueryRepeaterScope = (rsFirstLevelChilds, rsDeepChilds);
-
-  // Some pointers to TValue
-  PValue = ^TValue;
 
   // Nullables
   TioNullable<T> = record

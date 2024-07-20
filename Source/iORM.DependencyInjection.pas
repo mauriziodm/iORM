@@ -172,16 +172,6 @@ type
     function AsViewModelFor(const ATargetIID: TGUID; const AAlias: String = ''): TioDependencyInjectionRegister; overload;
     function AsViewModelFor<T>(const AAlias: String = ''): TioDependencyInjectionRegister; overload;
 
-    // function AsSelectorViewFor(const ATargetTypeName:String; const AAlias:String=''): TioDependencyInjectionRegister; overload;
-    // function AsSelectorViewFor(const ATargetClassRef:TioClassRef; const AAlias:String=''): TioDependencyInjectionRegister; overload;
-    // function AsSelectorViewFor(const ATargetIID:TGUID; const AAlias:String=''): TioDependencyInjectionRegister; overload;
-    // function AsSelectorViewFor<T>(const AAlias:String=''): TioDependencyInjectionRegister; overload;
-
-    // function AsSelectorViewModelFor(const ATargetTypeName:String; const AAlias:String=''): TioDependencyInjectionRegister; overload;
-    // function AsSelectorViewModelFor(const ATargetClassRef:TioClassRef; const AAlias:String=''): TioDependencyInjectionRegister; overload;
-    // function AsSelectorViewModelFor(const ATargetIID:TGUID; const AAlias:String=''): TioDependencyInjectionRegister; overload;
-    // function AsSelectorViewModelFor<T>(const AAlias:String=''): TioDependencyInjectionRegister; overload;
-
   end;
   // ===========================================================================
 
