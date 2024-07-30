@@ -60,7 +60,7 @@ type
     class function LoadPropertyEmbeddedHasOne(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty): TObject;
     class function InternalFindMethod(ARttiType: TRttiType; AMethodName, AMarkerText: String; IsConstructor: Boolean; const AParameters: Array of TValue)
       : TRttiMethod;
-    class function FindConstructor(ARttiType: TRttiType; const AParameters: Array of TValue; AMarkerText: String = ''; AMethodName: String = ''): TRttiMethod;
+    class function FindConstructor(ARttiType: TRttiType; const AParameters: Array of TValue): TRttiMethod;
     class function FindMethod(ARttiType: TRttiType; AMethodName: String; const AParameters: Array of TValue; AMarkerText: String = ''): TRttiMethod;
   public
     class procedure InitializeViewModelPresentersAfterCreate(const AViewModelOrSimpleView: TObject; const APresenterSettingsPointer: PioDIPresenterSettingsContainer);
@@ -69,8 +69,7 @@ type
     class function CreateObjectByClassRefEx(AClassRef: TClass; const AConstructorParams: array of TValue; AConstructorMarkerText: String = '';
       AConstructorMethodName: String = ''; AContainerItem: TioDIContainerImplementersItem = nil): TObject;
     class function CreateObjectByRttiType(ARttiType: TRttiType): TObject;
-    class function CreateObjectByRttiTypeEx(ARttiType: TRttiType; const AConstructorParams: array of TValue; AConstructorMarkerText: String;
-      AConstructorMethodName: String; AContainerItem: TioDIContainerImplementersItem = nil): TObject;
+    class function CreateObjectByRttiTypeEx(ARttiType: TRttiType; const AConstructorParams: array of TValue; AContainerItem: TioDIContainerImplementersItem = nil): TObject;
     class function CreateListByClassRef(AClassRef: TClass; AOwnsObjects: Boolean = True): TObject;
     class function CreateListByRttiType(const ARttiType: TRttiType; const AOwnsObject: Boolean = True): TObject;
     class function MakeObject(const AContext: IioContext; const AQuery: IioQuery): TObject; virtual; abstract;
@@ -146,24 +145,23 @@ class function TioObjectMakerIntf.CreateObjectByClassRefEx(AClassRef: TClass; co
   AConstructorMarkerText, AConstructorMethodName: String; AContainerItem: TioDIContainerImplementersItem): TObject;
 begin
   // Create object
-  Result := Self.CreateObjectByRttiTypeEx(TioRttiFactory.GetRttiContext.GetType(AClassRef), AConstructorParams, AConstructorMarkerText, AConstructorMethodName,
-    AContainerItem);
+  Result := Self.CreateObjectByRttiTypeEx(TioRttiFactory.GetRttiContext.GetType(AClassRef), AConstructorParams, AContainerItem);
 end;
 
 class function TioObjectMakerIntf.CreateObjectByRttiType(ARttiType: TRttiType): TObject;
 begin
-  Result := Self.CreateObjectByRttiTypeEx(ARttiType, [], '', '');
+  Result := Self.CreateObjectByRttiTypeEx(ARttiType, []);
 end;
 
 class function TioObjectMakerIntf.CreateObjectByRttiTypeEx(ARttiType: TRttiType; const AConstructorParams: array of TValue;
-  AConstructorMarkerText, AConstructorMethodName: String; AContainerItem: TioDIContainerImplementersItem = nil): TObject;
+  AContainerItem: TioDIContainerImplementersItem = nil): TObject;
 var
   LMethod: TRttiMethod;
 begin
   // init
   // Result := nil;
   // Find the constructor
-  LMethod := Self.FindConstructor(ARttiType, AConstructorParams, AConstructorMarkerText, AConstructorMethodName);
+  LMethod := Self.FindConstructor(ARttiType, AConstructorParams);
   // If constructor not found...
   if not Assigned(LMethod) then
     raise EioGenericException.Create(Self.ClassName, 'CreateObjectByRttiTypeEx', 'Constructor not found for class "' + ARttiType.Name + '"');

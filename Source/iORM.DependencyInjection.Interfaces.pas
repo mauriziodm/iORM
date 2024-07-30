@@ -62,9 +62,6 @@ type
     function Show: TComponent;
     function GetItem: TioDIContainerImplementersItem;
     function Alias(const AAlias:String): IioDependencyInjectionLocator;
-    function ConstructorParams(const AParams: TioConstructorParams): IioDependencyInjectionLocator;
-    function ConstructorMethod(const AConstructorMethod: String): IioDependencyInjectionLocator;
-    function ConstructorMarker(const AConstructorMarker: String): IioDependencyInjectionLocator;
     // ---------- FOR SHOW EACH FUNCTIONALITY ----------
     function ShowCurrent: TComponent;
     procedure ShowEach;
@@ -104,9 +101,6 @@ type
     ['{EA9F3CAD-B9A2-4607-8D80-881EF4C36EDE}']
     function Get: TI; overload;
     function Alias(const AAlias:String): IioDependencyInjectionLocator<TI>;
-    function ConstructorParams(const AParams: TioConstructorParams): IioDependencyInjectionLocator<TI>;
-    function ConstructorMethod(const AConstructorMethod: String): IioDependencyInjectionLocator<TI>;
-    function ConstructorMarker(const AConstructorMarker: String): IioDependencyInjectionLocator<TI>;
     // ---------- VIEW MODEL METHODS ----------
     function SetViewModel(const AViewModel:IioViewModel; const AMarker:String=''): IioDependencyInjectionLocator<TI>;
     // ---------- VIEWMODEL METHODS ----------

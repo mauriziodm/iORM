@@ -124,7 +124,6 @@ type
     FAlias: String;
     FSetMapImplementersRef: Boolean;
     FDICType: TioDICObjType;
-    procedure LoadInjectAttributes;
     procedure SetMapImplementersRef;
   public
     constructor Create(const AContainerValue: TioDIContainerImplementersItem);
@@ -133,24 +132,9 @@ type
     function Implements<T: IInterface>(const AAlias: String = ''): TioDependencyInjectionRegister; overload;
     function Implements(const IID: TGUID; const AAlias: String = ''): TioDependencyInjectionRegister; overload;
     function Alias(const AAlias: String): TioDependencyInjectionRegister;
-    function InjectProperty(const APropertyName: String; const AValue: TValue): TioDependencyInjectionRegister; overload;
-    function InjectProperty(const APropertyName, ATypeName: String; const ATypeAlias: String = ''): TioDependencyInjectionRegister; overload;
-    function InjectField(const AFieldName: String; const AValue: TValue): TioDependencyInjectionRegister; overload;
-    function InjectField(const AFieldName, ATypeName: String; const ATypeAlias: String = ''): TioDependencyInjectionRegister; overload;
     function AsSingleton(const AIsSingleton: Boolean = True): TioDependencyInjectionRegister;
     function AsEntity: TioDependencyInjectionRegister;
-    function DefaultConstructorMethod(const AValue: String): TioDependencyInjectionRegister;
-    function DefaultConstructorMarker(const AValue: String): TioDependencyInjectionRegister;
-    function DefaultConstructorParams(const AParams: array of TValue): TioDependencyInjectionRegister;
     function DisableMapImplemetersRef: TioDependencyInjectionRegister;
-
-    function SetBindSource(const AName: String; const ADataObject: TObject): TioDependencyInjectionRegister; overload;
-    // function SetBindSource(const AName:String; const ABindSourceAdapter:IioActiveBindSourceAdapter): TioDependencyInjectionRegister; overload;
-    function SetBindSource(const AName: String; const AMasterBindSource: IioBindSource; const AMasterPropertyName: String = '')
-      : TioDependencyInjectionRegister; overload;
-    function SetBindSource(const AName: String; const AWhere: IioWhere): TioDependencyInjectionRegister; overload;
-
-    function SetBindSourceAsSelectorFor(const ASourcePresenterName: String; const ASelectionDest: IioBindSource): TioDependencyInjectionRegister;
 
     function AsDescendantClassOf(const AAncestorClassName: String; const AAlias: String = ''): TioDependencyInjectionRegister; overload;
 
@@ -182,9 +166,6 @@ type
   strict private
     FInterfaceName: String;
     FAlias: String;
-    FConstructorMethod: String;
-    FConstructorMarker: String;
-    FConstructorParams: TioConstructorParams;
     FPresenterSettings: TArray<TioDIPresenterSettings>;
     FViewModel: IioViewModelInternal;
     FViewModelMarker: String;
@@ -203,7 +184,6 @@ type
     function PresenterSettingsExists: Boolean;
     function ViewModelExist: Boolean;
     function ExtractVMFromView(const AView: TComponent): IioViewModelInternal;
-    procedure CheckConstructorInfo(const AContainerItem: TioDIContainerImplementersItem);
   strict protected
     function _ShowCurrent: TComponent;
     function _Get(const AContainerItem: TioDIContainerImplementersItem): TObject;
@@ -213,9 +193,6 @@ type
     constructor Create(const AInterfaceName: String; const AAlias: String; const AOwnerRequested, AVCProviderEnabled: Boolean); virtual;
     function Exist: Boolean; virtual;
     function Alias(const AAlias: String): IioDependencyInjectionLocator;
-    function ConstructorParams(const AParams: TioConstructorParams): IioDependencyInjectionLocator; virtual;
-    function ConstructorMethod(const AConstructorMethod: String): IioDependencyInjectionLocator; virtual;
-    function ConstructorMarker(const AConstructorMarker: String): IioDependencyInjectionLocator; virtual;
     function SingletonKey(const ASingletonKey: String): IioDependencyInjectionLocator; virtual;
     function Get: TObject; virtual;
     function GetAsGeneric: TioDILocatorDestination;
@@ -227,9 +204,6 @@ type
     procedure _SetForEachModelPresenter(const AModelPresenter: IioBindSource; const ALocateViewModel: Boolean);
     procedure _DuplicateLocatorForShowEachPurposeFrom(const ASourceLocator: TioDependencyInjectionLocator);
     function _GetAlias: String;
-    function _GetConstructorMethod: String;
-    function _GetConstructorMarker: String;
-    function _GetConstructorParams: PioConstructorParams;
     function _GetVCProvider: TioViewContextProvider;
     function _GetViewContext: TComponent;
     function _GetParentCloseQueryAction: IioBSCloseQueryAction;
@@ -269,9 +243,6 @@ type
   public
     function Get: TI; reintroduce; overload;
     function Alias(const AAlias: String): IioDependencyInjectionLocator<TI>;
-    function ConstructorParams(const AParams: TioConstructorParams): IioDependencyInjectionLocator<TI>; reintroduce; overload;
-    function ConstructorMethod(const AConstructorMethod: String): IioDependencyInjectionLocator<TI>; reintroduce; overload;
-    function ConstructorMarker(const AConstructorMarker: String): IioDependencyInjectionLocator<TI>; reintroduce; overload;
     function SingletonKey(const ASingletonKey: String): IioDependencyInjectionLocator<TI>; reintroduce; overload;
     // ---------- VIEWMODEL METHODS ----------
     function SetViewModel(const AViewModel: IioViewModel; const AMarker: String = ''): IioDependencyInjectionLocator<TI>;
@@ -719,29 +690,6 @@ begin
   FDICType := dotRegular;
 end;
 
-function TioDependencyInjectionRegister.DefaultConstructorMarker(const AValue: String): TioDependencyInjectionRegister;
-begin
-  Self.FContainerValue.DefaultConstructorMarker := AValue;
-  Result := Self;
-end;
-
-function TioDependencyInjectionRegister.DefaultConstructorMethod(const AValue: String): TioDependencyInjectionRegister;
-begin
-  Self.FContainerValue.DefaultConstructorMethod := AValue;
-  Result := Self;
-end;
-
-function TioDependencyInjectionRegister.DefaultConstructorParams(const AParams: array of TValue): TioDependencyInjectionRegister;
-var
-  i: Integer;
-begin
-  // Solo così sembra andare bene
-  SetLength(FContainerValue.DefaultConstructorParams, Length(AParams));
-  for i := 0 to High(AParams) do
-    FContainerValue.DefaultConstructorParams[i] := AParams[i];
-  Result := Self;
-end;
-
 function TioDependencyInjectionRegister.DisableMapImplemetersRef: TioDependencyInjectionRegister;
 begin
   Self.FSetMapImplementersRef := False;
@@ -752,11 +700,8 @@ procedure TioDependencyInjectionRegister.Execute;
 var
   LDIContainerKey: String;
 begin
-  LoadInjectAttributes;
-
   if FSetMapImplementersRef then
     SetMapImplementersRef;
-
   // Register into the DIC
   LDIContainerKey := BuildContainerKey(FInterfaceName, FDICType);
   Container.Add(LDIContainerKey, FAlias, FContainerValue);
@@ -801,80 +746,6 @@ begin
   Result := Self;
 end;
 
-function TioDependencyInjectionRegister.InjectField(const AFieldName: String; const AValue: TValue): TioDependencyInjectionRegister;
-var
-  i: Integer;
-begin
-  i := Length(FContainerValue.PropertiesOnCreate);
-  SetLength(FContainerValue.PropertiesOnCreate, i + 1);
-  FContainerValue.PropertiesOnCreate[i].PropFieldType := itField;
-  FContainerValue.PropertiesOnCreate[i].PropFieldValue := ivByValue;
-  FContainerValue.PropertiesOnCreate[i].Name := AFieldName;
-  FContainerValue.PropertiesOnCreate[i].Value := AValue;
-  Result := Self;
-end;
-
-function TioDependencyInjectionRegister.InjectProperty(const APropertyName: String; const AValue: TValue): TioDependencyInjectionRegister;
-var
-  i: Integer;
-begin
-  i := Length(FContainerValue.PropertiesOnCreate);
-  SetLength(FContainerValue.PropertiesOnCreate, i + 1);
-  FContainerValue.PropertiesOnCreate[i].PropFieldType := itProperty;
-  FContainerValue.PropertiesOnCreate[i].PropFieldValue := ivByValue;
-  FContainerValue.PropertiesOnCreate[i].Name := APropertyName;
-  FContainerValue.PropertiesOnCreate[i].Value := AValue;
-  Result := Self;
-end;
-
-procedure TioDependencyInjectionRegister.LoadInjectAttributes;
-var
-  LAttr: TCustomAttribute;
-  LProp: TRttiProperty;
-  LField: TRttiField;
-  LTypeName: String;
-begin
-  // ===========================================================================
-  // LOAD PROPERTIES "ioInject" ATTRIBUTES
-  // ---------------------------------------------------------------------------
-  // Loop for all properties
-  for LProp in FContainerValue.RttiType.GetProperties do
-    // Loop for all attributes
-    for LAttr in LProp.GetAttributes do
-      // I'm searching ioInject attribute
-      if LAttr is ioInject then
-      begin
-        // If the TypeName property of the ioInject attribute is specified then use it else
-        // use the type of the property
-        if ioInject(LAttr).TypeName.IsEmpty then
-          LTypeName := LProp.PropertyType.Name
-        else
-          LTypeName := ioInject(LAttr).TypeName;
-        // Register injection info
-        Self.InjectProperty(LProp.Name, LTypeName, ioInject(LAttr).TypeAlias);
-      end;
-  // ===========================================================================
-  // LOAD FIELDS "ioInject" ATTRIBUTES
-  // ---------------------------------------------------------------------------
-  // Loop for all fields
-  for LField in FContainerValue.RttiType.GetFields do
-    // Loop for all attributes
-    for LAttr in LField.GetAttributes do
-      // I'm searching ioInject attribute
-      if LAttr is ioInject then
-      begin
-        // If the TypeName property of the ioInject attribute is specified then use it else
-        // use the type of the field
-        if ioInject(LAttr).TypeName.IsEmpty then
-          LTypeName := LField.FieldType.Name
-        else
-          LTypeName := ioInject(LAttr).TypeName;
-        // Regster injection info
-        Self.InjectField(LField.Name, LTypeName, ioInject(LAttr).TypeAlias);
-      end;
-  // ===========================================================================
-end;
-
 procedure TioDependencyInjectionRegister.SetMapImplementersRef;
 begin
   // Set a reference to the DIImplementersItem in the IioMap of the class
@@ -882,98 +753,6 @@ begin
   // is created by an ORM load.
   if TioMapContainer.Exist(FContainerValue.ClassName) then
     TioMapContainer.GetMap(FContainerValue.ClassName, False).SetDIContainerImplementersItem(FContainerValue);
-end;
-
-function TioDependencyInjectionRegister.SetBindSource(const AName: String; const AWhere: IioWhere): TioDependencyInjectionRegister;
-var
-  i: Integer;
-begin
-  i := Length(FContainerValue.PresenterSettings);
-  SetLength(FContainerValue.PresenterSettings, i + 1);
-  FContainerValue.PresenterSettings[i].SettingsType := TioDIPresenterSettingsType.pstWhere;
-  FContainerValue.PresenterSettings[i].Name := AName;
-  FContainerValue.PresenterSettings[i].InterfacedObj := AWhere;
-  Result := Self;
-end;
-
-function TioDependencyInjectionRegister.SetBindSource(const AName: String; const ADataObject: TObject): TioDependencyInjectionRegister;
-var
-  i: Integer;
-begin
-  i := Length(FContainerValue.PresenterSettings);
-  SetLength(FContainerValue.PresenterSettings, i + 1);
-  FContainerValue.PresenterSettings[i].SettingsType := TioDIPresenterSettingsType.pstDataObject;
-  FContainerValue.PresenterSettings[i].Name := AName;
-  FContainerValue.PresenterSettings[i].Obj := ADataObject;
-  Result := Self;
-end;
-
-// function TioDependencyInjectionRegister.SetBindSource(const AName: String;
-// const ABindSourceAdapter: IioActiveBindSourceAdapter): TioDependencyInjectionRegister;
-// var
-// I: Integer;
-// begin
-// I := Length(FContainerValue.PresenterSettings);
-// SetLength(FContainerValue.PresenterSettings, I+1);
-// FContainerValue.PresenterSettings[I].SettingsType := TioDIPresenterSettingsType.pstBindSourceAdapter;
-// FContainerValue.PresenterSettings[I].Name := AName;
-// FContainerValue.PresenterSettings[I].InterfacedObj  := ABindSourceAdapter;
-// Result := Self;
-// end;
-
-function TioDependencyInjectionRegister.SetBindSource(const AName: String; const AMasterBindSource: IioBindSource; const AMasterPropertyName: String)
-  : TioDependencyInjectionRegister;
-var
-  i: Integer;
-begin
-  i := Length(FContainerValue.PresenterSettings);
-  SetLength(FContainerValue.PresenterSettings, i + 1);
-  FContainerValue.PresenterSettings[i].SettingsType := TioDIPresenterSettingsType.pstMasterModelPresenter;
-  FContainerValue.PresenterSettings[i].Name := AName;
-  FContainerValue.PresenterSettings[i].Obj := (AMasterBindSource as TObject);
-  FContainerValue.PresenterSettings[i].StringParameter := AMasterPropertyName;
-  Result := Self;
-end;
-
-function TioDependencyInjectionRegister.InjectField(const AFieldName, ATypeName, ATypeAlias: String): TioDependencyInjectionRegister;
-var
-  i: Integer;
-begin
-  i := Length(FContainerValue.PropertiesOnCreate);
-  SetLength(FContainerValue.PropertiesOnCreate, i + 1);
-  FContainerValue.PropertiesOnCreate[i].PropFieldType := itField;
-  FContainerValue.PropertiesOnCreate[i].PropFieldValue := ivByDependencyInjection;
-  FContainerValue.PropertiesOnCreate[i].Name := AFieldName;
-  FContainerValue.PropertiesOnCreate[i].TypeName := ATypeName;
-  FContainerValue.PropertiesOnCreate[i].TypeAlias := ATypeAlias;
-  Result := Self;
-end;
-
-function TioDependencyInjectionRegister.InjectProperty(const APropertyName, ATypeName, ATypeAlias: String): TioDependencyInjectionRegister;
-var
-  i: Integer;
-begin
-  i := Length(FContainerValue.PropertiesOnCreate);
-  SetLength(FContainerValue.PropertiesOnCreate, i + 1);
-  FContainerValue.PropertiesOnCreate[i].PropFieldType := itProperty;
-  FContainerValue.PropertiesOnCreate[i].PropFieldValue := ivByDependencyInjection;
-  FContainerValue.PropertiesOnCreate[i].Name := APropertyName;
-  FContainerValue.PropertiesOnCreate[i].TypeName := ATypeName;
-  FContainerValue.PropertiesOnCreate[i].TypeAlias := ATypeAlias;
-  Result := Self;
-end;
-
-function TioDependencyInjectionRegister.SetBindSourceAsSelectorFor(const ASourcePresenterName: String; const ASelectionDest: IioBindSource)
-  : TioDependencyInjectionRegister;
-var
-  i: Integer;
-begin
-  i := Length(FContainerValue.PresenterSettings);
-  SetLength(FContainerValue.PresenterSettings, i + 1);
-  FContainerValue.PresenterSettings[i].SettingsType := TioDIPresenterSettingsType.pstSelectorFor;
-  FContainerValue.PresenterSettings[i].Name := ASourcePresenterName;
-  FContainerValue.PresenterSettings[i].Obj := (ASelectionDest as TObject);
-  Result := Self;
 end;
 
 function TioDependencyInjectionRegister._SetFarAncestorClassSameInterfaceAndTableAndConnection(const AValue: String): TioDependencyInjectionRegister;
@@ -1221,49 +1000,9 @@ begin
   Result := Self;
 end;
 
-procedure TioDependencyInjectionLocator.CheckConstructorInfo(const AContainerItem: TioDIContainerImplementersItem);
-var
-  i: Integer;
-begin
-  // If a constructor method name or constructor marker is specified in the locator call then use it (method, marker and params)
-  // else use the default values
-  if FConstructorMethod.IsEmpty and FConstructorMarker.IsEmpty and (Length(FConstructorParams) = 0) then
-  begin
-    FConstructorMethod := AContainerItem.DefaultConstructorMethod;
-    FConstructorMarker := AContainerItem.DefaultConstructorMarker;
-    // Solo così sembra andare bene
-    SetLength(FConstructorParams, Length(AContainerItem.DefaultConstructorParams));
-    for i := 0 to High(AContainerItem.DefaultConstructorParams) do
-      FConstructorParams[i] := AContainerItem.DefaultConstructorParams[i];
-  end;
-end;
-
 procedure TioDependencyInjectionLocator.ClearPresenterSettings;
 begin
   SetLength(FPresenterSettings, 0);
-end;
-
-function TioDependencyInjectionLocator.ConstructorMarker(const AConstructorMarker: String): IioDependencyInjectionLocator;
-begin
-  FConstructorMarker := AConstructorMarker;
-  Result := Self;
-end;
-
-function TioDependencyInjectionLocator.ConstructorMethod(const AConstructorMethod: String): IioDependencyInjectionLocator;
-begin
-  FConstructorMethod := AConstructorMethod;
-  Result := Self;
-end;
-
-function TioDependencyInjectionLocator.ConstructorParams(const AParams: TioConstructorParams): IioDependencyInjectionLocator;
-var
-  i: Integer;
-begin
-  // Solo così sembra andare bene
-  SetLength(FConstructorParams, Length(AParams));
-  for i := 0 to High(AParams) do
-    FConstructorParams[i] := AParams[i];
-  Result := Self;
 end;
 
 constructor TioDependencyInjectionLocator.Create(const AInterfaceName, AAlias: String; const AOwnerRequested, AVCProviderEnabled: Boolean);
@@ -1534,9 +1273,6 @@ end;
 procedure TioDependencyInjectionLocator._DuplicateLocatorForShowEachPurposeFrom(const ASourceLocator: TioDependencyInjectionLocator);
 begin
   FAlias := ASourceLocator._GetAlias;
-  FConstructorMethod := ASourceLocator._GetConstructorMethod;
-  FConstructorMarker := ASourceLocator._GetConstructorMarker;
-  FConstructorParams := ASourceLocator._GetConstructorParams^;
   FVCProvider := ASourceLocator._GetVCProvider;
   FViewContext := ASourceLocator._GetViewContext;
   FActionParentCloseQuery := ASourceLocator._GetParentCloseQueryAction;
@@ -1545,6 +1281,7 @@ end;
 function TioDependencyInjectionLocator._Get(const AContainerItem: TioDIContainerImplementersItem): TObject;
 var
   LValue: TValue;
+  LConstructorParams: array of TValue;
   procedure NestedSetParentCloseQueryActionToViewModel;
   begin
     // Non uso l'interfaccia IioViewModel perchè mi dava dei problemi con il RefCount
@@ -1575,7 +1312,7 @@ begin
   try
     // EmptyOwner is True then add a nil as parameter for the constructor
     // (used for Views and ViewModels and for object owned by someone)
-    if FOwnerRequested and (Length(FConstructorParams) = 0) then
+    if FOwnerRequested then
     begin
       // If the use of the ViewContextProvider is enabled (Locating a View)
       //  then try to retrieve and set the ViewContext for the View.
@@ -1602,7 +1339,7 @@ begin
         TValue.Make(@FViewContext, FViewContext.ClassInfo, LValue)
       else
         LValue := TValue.Empty;
-      FConstructorParams := [LValue];
+      LConstructorParams := [LValue];
     end;
     // If it is a singleton then get the Instance (if exists)...
     if AContainerItem.IsSingleton and TioSingletonsContainer.TryGet(FSingletonKey, FInterfaceName, FAlias, Result) then
@@ -1611,12 +1348,9 @@ begin
       // it is a new instance of a singleton)
     else
     begin
-      // If a constructor method name or constructor marker is specified in the locator call then use it (method, marker and params)
-      // else use the default values
-      Self.CheckConstructorInfo(AContainerItem);
       // Object creation
       // Result := TioObjectMaker.CreateObjectByClassRefEx(AContainerItem.ClassRef, FConstructorParams, FConstructorMarker, FConstructorMethod, AContainerItem);
-      Result := TioObjectMaker.CreateObjectByRttiTypeEx(AContainerItem.RttiType, FConstructorParams, FConstructorMarker, FConstructorMethod, AContainerItem);
+      Result := TioObjectMaker.CreateObjectByRttiTypeEx(AContainerItem.RttiType, LConstructorParams, AContainerItem);
       // Se stiamo creando un ViewModel oppure una SimpleView...
       if FInterfaceName.StartsWith(DI_VIEWMODEL_KEY_PREFIX) or FInterfaceName.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX) then
       begin
@@ -1718,21 +1452,6 @@ end;
 function TioDependencyInjectionLocator._GetAlias: String;
 begin
   Result := FAlias;
-end;
-
-function TioDependencyInjectionLocator._GetConstructorMarker: String;
-begin
-  Result := FConstructorMarker;
-end;
-
-function TioDependencyInjectionLocator._GetConstructorMethod: String;
-begin
-  Result := FConstructorMethod;
-end;
-
-function TioDependencyInjectionLocator._GetConstructorParams: PioConstructorParams;
-begin
-  Result := @FConstructorParams;
 end;
 
 function TioDependencyInjectionLocator._GetParentCloseQueryAction: IioBSCloseQueryAction;
@@ -1941,24 +1660,6 @@ function TioDependencyInjectionLocator<TI>.Alias(const AAlias: String): IioDepen
 begin
   Result := Self;
   TioDependencyInjectionLocator(Self).Alias(AAlias);
-end;
-
-function TioDependencyInjectionLocator<TI>.ConstructorMarker(const AConstructorMarker: String): IioDependencyInjectionLocator<TI>;
-begin
-  Result := Self;
-  TioDependencyInjectionLocator(Self).ConstructorMarker(AConstructorMarker);
-end;
-
-function TioDependencyInjectionLocator<TI>.ConstructorMethod(const AConstructorMethod: String): IioDependencyInjectionLocator<TI>;
-begin
-  Result := Self;
-  TioDependencyInjectionLocator(Self).ConstructorMethod(AConstructorMethod);
-end;
-
-function TioDependencyInjectionLocator<TI>.ConstructorParams(const AParams: TioConstructorParams): IioDependencyInjectionLocator<TI>;
-begin
-  Result := Self;
-  TioDependencyInjectionLocator(Self).ConstructorParams(AParams);
 end;
 
 function TioDependencyInjectionLocator<TI>.Get: TI;

@@ -614,7 +614,7 @@ end;
 
 function TdjJSONDestination.&To<T>: T;
 begin
-  Result := Self.ToValue(TypeInfo(T)).AsType<T>;
+  Result := Self.ToValue(TypeInfo(T)).Cast<T>.AsType<T>;
 end;
 
 function TdjJSONDestination.ToObject: TObject;

@@ -40,18 +40,6 @@ uses
 
 type
 
-  // Default initial property value for an implementers Item
-  TioDIPropFieldOnCreateType = (itProperty, itField);
-  TioDIPropFieldOnCreateValue = (ivByDependencyInjection, ivByValue);
-  TioDIPropFieldOnCreate = record
-    PropFieldType: TioDIPropFieldOnCreateType;
-    PropFieldValue: TioDIPropFieldOnCreateValue;
-    Name: String;
-    Value: TValue;
-    TypeName: String;
-    TypeAlias: String;
-  end;
-
   // Default settings creating ViewModels.Presenters
   TioDIPresenterSettingsType = (pstDataObject, pstInterfacedObj, pstMasterModelPresenter, pstWhere, pstSelectorFor, pstWhereBuilderFor, pstETMfor);
   TioDIPresenterSettings = record
@@ -66,8 +54,6 @@ type
 
   // Dependency Injection Container Implementers Item (SubContainer value)
   TioDIContainerImplementersItem = class
-  private
-    function GetPresenterSettingsPointer: PioDIPresenterSettingsContainer;
   public
     ClassRef: TioClassref;
     ClassName: String;
@@ -77,23 +63,12 @@ type
     // Questo serve a impostare correttamente la query select in modo che filtri correttamente in base anche
     //  ai vincoli di ereditarietà.
     FarAncestorClassSameInterfaceAndTableAndConnection: String;
-    PropertiesOnCreate: TArray<TioDIPropFieldOnCreate>;
-    DefaultConstructorMethod: String;
-    DefaultConstructorMarker: String;
-    DefaultConstructorParams: array of TValue;
     IsEntity: Boolean;
     IsSingleton: Boolean;
-    PresenterSettings: TioDIPresenterSettingsContainer;
-    property PresenterSettingsPointer:PioDIPresenterSettingsContainer read GetPresenterSettingsPointer;
+    // TValue che contiene l'eventuale factory method per la creazione dell'istanza
+    FactoryMethod: TValue;
   end;
 
 implementation
-
-{ TioDIContainerImplementersItem }
-
-function TioDIContainerImplementersItem.GetPresenterSettingsPointer: PioDIPresenterSettingsContainer;
-begin
-  Result := @PresenterSettings;
-end;
 
 end.
