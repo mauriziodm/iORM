@@ -45,7 +45,6 @@ type
   TioMap = class(TInterfacedObject, IioMap)
   strict private
     FClassRef: TioClassRef;
-    FDIContainerImplementersItem: TioDIContainerImplementersItem;
     FProperties: IioProperties;
     FRttiContext: TRttiContext;
     FRttiType: TRttiInstanceType;
@@ -63,9 +62,6 @@ type
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
     function TrueClass: IioTrueClass;
-    // DIContainerImplementersItem reference
-    function GetDIContainerImplementersItem: TioDIContainerImplementersItem;
-    procedure SetDIContainerImplementersItem(const AValue:TioDIContainerImplementersItem);
     /// This method build the part of the true class virtual map related to this class
     procedure BuildTrueClassVirtualMap;
     /// Duplicate itself as a new TrueClassVirtualMap
@@ -153,7 +149,6 @@ end;
 function TioMap.DuplicateToTrueClassMap: IioMap;
 begin
   Result := TioTrueClassVirtualMap.Create(FClassRef, FRttiContext, FRttiType, FTable.DuplicateForTrueClassMap, TioProperties.Create);
-  Result.SetDIContainerImplementersItem(FDIContainerImplementersItem);
 end;
 
 function TioMap.GetClassName: String;
@@ -164,11 +159,6 @@ end;
 function TioMap.GetClassRef: TioClassRef;
 begin
   Result := FClassRef;
-end;
-
-function TioMap.GetDIContainerImplementersItem: TioDIContainerImplementersItem;
-begin
-  Result := FDIContainerImplementersItem;
 end;
 
 function TioMap.GetProperties: IioProperties;
@@ -199,11 +189,6 @@ end;
 function TioMap.RttiType: TRttiInstanceType;
 begin
   Result := FRttiType;
-end;
-
-procedure TioMap.SetDIContainerImplementersItem(const AValue: TioDIContainerImplementersItem);
-begin
-  FDIContainerImplementersItem := AValue;
 end;
 
 { TioTrueClassVirtualMap }

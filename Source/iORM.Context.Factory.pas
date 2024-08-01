@@ -381,7 +381,7 @@ var
       LMember_RelationChildTypeAlias := '';
       LMember_RelationChildPropertyName := '';
       LMember_RelationChildLazyLoad := False;
-      LMember_RelationAutodetectEnabled := not ATable.IsNotPersistedEntity;
+      LMember_RelationAutodetectEnabled := True;
       // ObjStatus property detection by type "TioObjStatus"
       if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjStatus)) then
       begin

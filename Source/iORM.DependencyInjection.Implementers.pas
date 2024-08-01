@@ -54,21 +54,46 @@ type
 
   // Dependency Injection Container Implementers Item (SubContainer value)
   TioDIContainerImplementersItem = class
-  public
-    ClassRef: TioClassref;
-    ClassName: String;
-    RttiType: TRttiInstanceType;
-    InterfaceGUID: TGUID;
+  private
+    FClazzRef: TioClassRef;
+    FClazzName: String;
+    FRttiType: TRttiInstanceType;
+    FInterfaceGUID: TGUID;
     // Nome della classe antenata più lontana (più vicina a TObject possibile) che implementa la stessa interfaccia.
     // Questo serve a impostare correttamente la query select in modo che filtri correttamente in base anche
     //  ai vincoli di ereditarietà.
-    FarAncestorClassSameInterfaceAndTableAndConnection: String;
-    IsEntity: Boolean;
-    IsSingleton: Boolean;
+    FFarAncestorClazzSameInterfaceAndTableAndConnection: String;
+    FIsEntity: Boolean;
+    FIsSingleton: Boolean;
     // TValue che contiene l'eventuale factory method per la creazione dell'istanza
     FactoryMethod: TValue;
+  public
+    constructor Create(const AClassRttiType: TRttiInstanceType; const AImplementsIID: TGUID);
+    property ClazzRef: TioClassRef read FClazzRef;
+    property ClazzName: String read FClazzName;
+    property RttiType: TRttiInstanceType read FRttiType;
+    property InterfaceGUID: TGUID read FInterfaceGUID;
+    property FarAncestorClazzSameInterfaceAndTableAndConnection: String read FFarAncestorClazzSameInterfaceAndTableAndConnection write FFarAncestorClazzSameInterfaceAndTableAndConnection;
+    property IsEntity: Boolean read FIsEntity write FIsEntity;
+    property IsSingleton: Boolean read FIsSingleton write FIsSingleton;
   end;
 
 implementation
+
+uses
+  System.SysUtils;
+
+{ TioDIContainerImplementersItem }
+
+constructor TioDIContainerImplementersItem.Create(const AClassRttiType: TRttiInstanceType; const AImplementsIID: TGUID);
+begin
+  FClazzRef := AClassRttiType.MetaclassType;
+  FClazzName := AClassRttiType.MetaclassType.ClassName;
+  FRttiType := AClassRttiType;
+  FInterfaceGUID := AImplementsIID;
+  FIsSingleton := False;
+  FIsEntity := False;
+  FFarAncestorClazzSameInterfaceAndTableAndConnection := String.Empty;
+end;
 
 end.

@@ -49,29 +49,25 @@ type
   // ObjectMaker interface
   TioObjectMakerIntf = class abstract
   strict protected
-//    class function CheckOrCreateRelationChildObject(const AContext: IioContext; const AProperty: IioProperty): TObject;
-    class procedure InitializeObjectAfterCreate(const AObj: TObject; const AContainerItem: TioDIContainerImplementersItem);
-    class procedure LoadPropertyHasMany(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty);
-    class procedure LoadPropertyEmbeddedHasMany(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty);
-    class procedure LoadPropertyStreamable(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty);
-    class procedure LoadPropertyStream(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty);
-    class function LoadPropertyHasOne(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty): TObject;
-    class function LoadPropertyBelongsTo(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty): TObject;
-    class function LoadPropertyEmbeddedHasOne(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty): TObject;
-    class function InternalFindMethod(ARttiType: TRttiType; AMethodName, AMarkerText: String; IsConstructor: Boolean; const AParameters: Array of TValue)
-      : TRttiMethod;
-    class function FindConstructor(ARttiType: TRttiType; const AParameters: Array of TValue): TRttiMethod;
-    class function FindMethod(ARttiType: TRttiType; AMethodName: String; const AParameters: Array of TValue; AMarkerText: String = ''): TRttiMethod;
+    class procedure LoadPropertyHasMany(const AContext: IioContext; const AQuery: IioQuery; const AProperty: IioProperty); static;
+    class procedure LoadPropertyEmbeddedHasMany(const AContext: IioContext; const AQuery: IioQuery; const AProperty: IioProperty); static;
+    class procedure LoadPropertyStreamable(const AContext: IioContext; const AQuery: IioQuery; const AProperty: IioProperty); static;
+    class procedure LoadPropertyStream(const AContext: IioContext; const AQuery: IioQuery; const AProperty: IioProperty); static;
+    class function LoadPropertyHasOne(const AContext: IioContext; const AQuery: IioQuery; const AProperty: IioProperty): TObject; static;
+    class function LoadPropertyBelongsTo(const AContext: IioContext; const AQuery: IioQuery; const AProperty: IioProperty): TObject; static;
+    class function LoadPropertyEmbeddedHasOne(const AContext: IioContext; const AQuery: IioQuery; const AProperty: IioProperty): TObject; static;
+    class function InternalFindMethod(const ARttiType: TRttiType; const AMethodName: String; const IsConstructor: Boolean; const AParameters: Array of TValue): TRttiMethod; static;
+    class function FindConstructor(const ARttiType: TRttiType; const AParameters: Array of TValue): TRttiMethod; static;
+    class function FindMethod(const ARttiType: TRttiType; const AMethodName: String; const AParameters: Array of TValue): TRttiMethod; static;
   public
-    class procedure InitializeViewModelPresentersAfterCreate(const AViewModelOrSimpleView: TObject; const APresenterSettingsPointer: PioDIPresenterSettingsContainer);
-    class function CreateObjectFromBlobField(AQuery: IioQuery; AProperty: IioProperty): TObject;
-    class function CreateObjectByClassRef(AClassRef: TClass): TObject;
-    class function CreateObjectByClassRefEx(AClassRef: TClass; const AConstructorParams: array of TValue; AConstructorMarkerText: String = '';
-      AConstructorMethodName: String = ''; AContainerItem: TioDIContainerImplementersItem = nil): TObject;
-    class function CreateObjectByRttiType(ARttiType: TRttiType): TObject;
-    class function CreateObjectByRttiTypeEx(ARttiType: TRttiType; const AConstructorParams: array of TValue; AContainerItem: TioDIContainerImplementersItem = nil): TObject;
-    class function CreateListByClassRef(AClassRef: TClass; AOwnsObjects: Boolean = True): TObject;
-    class function CreateListByRttiType(const ARttiType: TRttiType; const AOwnsObject: Boolean = True): TObject;
+    class procedure InitializeViewModelPresentersAfterCreate(const AViewModelOrSimpleView: TObject; const APresenterSettingsPointer: PioDIPresenterSettingsContainer); static;
+    class function CreateObjectFromBlobField(const AQuery: IioQuery; const AProperty: IioProperty): TObject; static;
+    class function CreateObjectByClassRef(const AClassRef: TClass): TObject; inline;
+    class function CreateObjectByClassRefEx(const AClassRef: TClass; const AConstructorParams: array of TValue; const AContainerItem: TioDIContainerImplementersItem = nil): TObject; static;
+    class function CreateObjectByRttiType(const ARttiType: TRttiType): TObject; inline;
+    class function CreateObjectByRttiTypeEx(const ARttiType: TRttiType; const AConstructorParams: array of TValue; AContainerItem: TioDIContainerImplementersItem = nil): TObject; static;
+    class function CreateListByClassRef(const AClassRef: TClass; const AOwnsObjects: Boolean = True): TObject; inline;
+    class function CreateListByRttiType(const ARttiType: TRttiType; const AOwnsObject: Boolean = True): TObject; static;
     class function MakeObject(const AContext: IioContext; const AQuery: IioQuery): TObject; virtual; abstract;
   end;
 
@@ -89,37 +85,9 @@ uses
 
 { TioObjectMakerIntf }
 
-// NB: In caso di "ChildPropertyPath" non vuoto crea l'istanza dell'oggetto finale (ultimo livello) a cui
-// la MasterProperty si riferisce indirettamente, sarà compito della classe master e delle classi
-// "attraversate" il creare tutti gli eventuali oggetti facenti parte del percorso per raggiungere
-// la ChildProperty destinazione.
-//class function TioObjectMakerIntf.CheckOrCreateRelationChildObject(const AContext: IioContext; const AProperty: IioProperty): TObject;
-//begin
-//  // Get the child object if already assigned
-//  Result := AProperty.GetRelationChildObject(AContext.DataObject);
-//  // If the AProperty is of interface type...
-//  if AProperty.IsInterface then
-//  begin
-//    // Create the child object/list if it isn't not already created by the master class constructor
-//    if not Assigned(Result) then
-//      Result := io.di.Locate(AProperty.GetTypeName).Alias(AProperty.GetTypeAlias).Get;
-//    TioUtilities.ObjectAsIInterface(Result)._AddRef;
-//  end
-//  else
-//  // If the AProperty is of instance (class) type...
-//  begin
-//    // Create the child object/list if it isn't not already created by the master class constructor
-//    if not Assigned(Result) then
-//      if AProperty.GetRelationType = rtHasMany then
-//        Result := Self.CreateListByRttiType(AProperty.GetRttiType)
-//      else
-//        Result := Self.CreateObjectByRttiType(AProperty.GetRttiType);
-//  end;
-//end;
-
-class function TioObjectMakerIntf.CreateListByClassRef(AClassRef: TClass; AOwnsObjects: Boolean): TObject;
+class function TioObjectMakerIntf.CreateListByClassRef(const AClassRef: TClass; const AOwnsObjects: Boolean = True): TObject;
 begin
-  Result := Self.CreateListByRttiType(TioRttiFactory.GetRttiContext.GetType(AClassRef), AOwnsObjects);
+  Result := CreateListByRttiType(TioRttiFactory.GetRttiContext.GetType(AClassRef), AOwnsObjects);
 end;
 
 class function TioObjectMakerIntf.CreateListByRttiType(const ARttiType: TRttiType; const AOwnsObject: Boolean): TObject;
@@ -130,50 +98,41 @@ begin
   // Proprerty "OwnsObjects" by Rtti
   Prop := ARttiType.GetProperty('OwnsObjects');
   // Create object
-  Result := Self.CreateObjectByRttiType(ARttiType);
+  Result := CreateObjectByRttiType(ARttiType);
   // Set "OwnsObjects" if exists
   if Assigned(Prop) then
     Prop.SetValue(PTypeInfo(Result), AOwnsObject);
 end;
 
-class function TioObjectMakerIntf.CreateObjectByClassRef(AClassRef: TClass): TObject;
+class function TioObjectMakerIntf.CreateObjectByClassRef(const AClassRef: TClass): TObject;
 begin
-  Result := Self.CreateObjectByClassRefEx(AClassRef, []);
+  Result := CreateObjectByClassRefEx(AClassRef, []);
 end;
 
-class function TioObjectMakerIntf.CreateObjectByClassRefEx(AClassRef: TClass; const AConstructorParams: array of TValue;
-  AConstructorMarkerText, AConstructorMethodName: String; AContainerItem: TioDIContainerImplementersItem): TObject;
+class function TioObjectMakerIntf.CreateObjectByClassRefEx(const AClassRef: TClass; const AConstructorParams: array of TValue; const AContainerItem: TioDIContainerImplementersItem = nil): TObject;
 begin
   // Create object
-  Result := Self.CreateObjectByRttiTypeEx(TioRttiFactory.GetRttiContext.GetType(AClassRef), AConstructorParams, AContainerItem);
+  Result := CreateObjectByRttiTypeEx(TioRttiFactory.GetRttiContext.GetType(AClassRef), AConstructorParams, AContainerItem);
 end;
 
-class function TioObjectMakerIntf.CreateObjectByRttiType(ARttiType: TRttiType): TObject;
+class function TioObjectMakerIntf.CreateObjectByRttiType(const ARttiType: TRttiType): TObject;
 begin
-  Result := Self.CreateObjectByRttiTypeEx(ARttiType, []);
+  Result := CreateObjectByRttiTypeEx(ARttiType, []);
 end;
 
-class function TioObjectMakerIntf.CreateObjectByRttiTypeEx(ARttiType: TRttiType; const AConstructorParams: array of TValue;
-  AContainerItem: TioDIContainerImplementersItem = nil): TObject;
+class function TioObjectMakerIntf.CreateObjectByRttiTypeEx(const ARttiType: TRttiType; const AConstructorParams: array of TValue; AContainerItem: TioDIContainerImplementersItem = nil): TObject;
 var
   LMethod: TRttiMethod;
 begin
   // init
   // Result := nil;
   // Find the constructor
-  LMethod := Self.FindConstructor(ARttiType, AConstructorParams);
+  LMethod := FindConstructor(ARttiType, AConstructorParams);
   // If constructor not found...
   if not Assigned(LMethod) then
-    raise EioGenericException.Create(Self.ClassName, 'CreateObjectByRttiTypeEx', 'Constructor not found for class "' + ARttiType.Name + '"');
+    raise EioGenericException.Create(ClassName, 'CreateObjectByRttiTypeEx', 'Constructor not found for class "' + ARttiType.Name + '"');
   // Execute
    Result := LMethod.Invoke(ARttiType.AsInstance.MetaclassType, AConstructorParams).AsObject;
-  // Inject Properties/Fields: if the received ContainerItem is not assigned then
-  // try to retrieve it from MapContainer
-  // Inject ModelPresenters settings for ViewModels only.
-  if (not Assigned(AContainerItem)) and TioMapContainer.Exist(ARttiType.Name) then
-    AContainerItem := TioMapContainer.GetMap(ARttiType.Name).GetDIContainerImplementersItem;
-  if Assigned(AContainerItem) then
-    Self.InitializeObjectAfterCreate(Result, AContainerItem);
 end;
 
 class procedure TioObjectMakerIntf.InitializeViewModelPresentersAfterCreate(const AViewModelOrSimpleView: TObject; const APresenterSettingsPointer: PioDIPresenterSettingsContainer);
@@ -245,7 +204,7 @@ begin
         begin
           LIntf := LPresenterSettings[I].InterfacedObj;
           if not Supports(LIntf, IioWhere, LWhere) then
-            raise EioGenericException.Create(Self.ClassName, 'InitializeViewModelPresentersAfterCreate', 'Interface "IioWhere" not implemented by object.');
+            raise EioGenericException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', 'Interface "IioWhere" not implemented by object.');
           LTargetBS.SetWhere(LWhere);
         end;
       // SelectorFor
@@ -276,88 +235,32 @@ begin
   end;
 end;
 
-class procedure TioObjectMakerIntf.InitializeObjectAfterCreate(const AObj: TObject; const AContainerItem: TioDIContainerImplementersItem);
-var
-  LTyp: TRttiInstanceType;
-  LProp: TRttiProperty;
-  LField: TRttiField;
-  I: Integer;
-begin
-  if not Assigned(AContainerItem) then
-    Exit;
-  LTyp := AContainerItem.RttiType;
-  // ===========================================================================
-  // PROPERTIES/FIELDS INJECTION
-  // ---------------------------------------------------------------------------
-  // Loop for all properties to initialize (if exists)
-  for I := 0 to Length(AContainerItem.PropertiesOnCreate) - 1 do
-  begin
-    case AContainerItem.PropertiesOnCreate[I].PropFieldType of
-      // It is a property
-      itProperty:
-        begin
-          LProp := LTyp.GetProperty(AContainerItem.PropertiesOnCreate[I].Name);
-          case AContainerItem.PropertiesOnCreate[I].PropFieldValue of
-            ivByDependencyInjection:
-              LProp.SetValue(AObj, TValue.From(io.di.Locate(AContainerItem.PropertiesOnCreate[I].TypeName,
-                AContainerItem.PropertiesOnCreate[I].TypeAlias).Get));
-            ivByValue:
-              LProp.SetValue(AObj, AContainerItem.PropertiesOnCreate[I].Value);
-          end;
-        end;
-      // It is a field
-      itField:
-        begin
-          LField := LTyp.GetField(AContainerItem.PropertiesOnCreate[I].Name);
-          case AContainerItem.PropertiesOnCreate[I].PropFieldValue of
-            ivByDependencyInjection:
-              LField.SetValue(AObj, TValue.From(io.di.Locate(AContainerItem.PropertiesOnCreate[I].TypeName,
-                AContainerItem.PropertiesOnCreate[I].TypeAlias).Get));
-            ivByValue:
-              LField.SetValue(AObj, AContainerItem.PropertiesOnCreate[I].Value);
-          end;
-        end;
-    end;
-  end;
-  // ===========================================================================
-end;
-
-class function TioObjectMakerIntf.InternalFindMethod(ARttiType: TRttiType; AMethodName, AMarkerText: String; IsConstructor: Boolean;
-  const AParameters: Array of TValue): TRttiMethod;
+class function TioObjectMakerIntf.InternalFindMethod(const ARttiType: TRttiType; const AMethodName: String; const IsConstructor: Boolean; const AParameters: Array of TValue)
+      : TRttiMethod;
 var
   AMethod: TRttiMethod;
-  function CheckForMarker(ARttiMethod: TRttiMethod; AMarkerText: String): Boolean;
-  var
-    AAttribute: TCustomAttribute;
-  begin
-    Result := False;
-    for AAttribute in ARttiMethod.GetAttributes do
-      if (AAttribute is ioMarker) and (ioMarker(AAttribute).Value.Equals(AMarkerText)) then
-        Exit(True);
-  end;
-
 begin
   // Loop for all methods
   for AMethod in ARttiType.GetMethods do
   begin
-    if AMethod.HasExtendedInfo and ((AMethodName = '') or AMethod.Name.Equals(AMethodName)) // Check for method name
-      and (AMethod.IsConstructor = IsConstructor) // Check for IsConstructor
-      and (Length(AMethod.GetParameters) = Length(AParameters)) // Check for parameters count
-      and ((AMarkerText = '') or CheckForMarker(AMethod, AMarkerText)) // Check for marker
+    if AMethod.HasExtendedInfo
+    and ((AMethodName = '') or AMethod.Name.Equals(AMethodName)) // Check for method name
+    and (AMethod.IsConstructor = IsConstructor) // Check for IsConstructor
+    and (Length(AMethod.GetParameters) = Length(AParameters)) // Check for parameters count
     then
       Exit(AMethod);
   end;
   // If method/constructor not found...
-  raise EioGenericException.Create(Self.ClassName + ': Method "' + AMethodName + '" not found');
+  raise EioGenericException.Create(ClassName + ': Method "' + AMethodName + '" not found');
 end;
 
-class function TioObjectMakerIntf.CreateObjectFromBlobField(AQuery: IioQuery; AProperty: IioProperty): TObject;
+class function TioObjectMakerIntf.CreateObjectFromBlobField(const AQuery: IioQuery; const AProperty: IioProperty): TObject;
 var
   ADuckTypedStreamObject: IioDuckTypedStreamObject;
   AStream: TStream;
 begin
   // Create the object
-  Result := Self.CreateObjectByRttiType(AProperty.GetRttiType);
+  Result := CreateObjectByRttiType(AProperty.GetRttiType);
   // If the field is null then exit
   if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then
     Exit;
@@ -374,17 +277,17 @@ begin
   end;
 end;
 
-class function TioObjectMakerIntf.FindConstructor(ARttiType: TRttiType; const AParameters: Array of TValue; AMarkerText, AMethodName: String): TRttiMethod;
+class function TioObjectMakerIntf.FindConstructor(const ARttiType: TRttiType; const AParameters: Array of TValue): TRttiMethod;
 begin
-  Result := Self.InternalFindMethod(ARttiType, AMethodName, AMarkerText, True, AParameters);
+  Result := InternalFindMethod(ARttiType, String.Empty, True, AParameters);
 end;
 
-class function TioObjectMakerIntf.FindMethod(ARttiType: TRttiType; AMethodName: String; const AParameters: Array of TValue; AMarkerText: String): TRttiMethod;
+class function TioObjectMakerIntf.FindMethod(const ARttiType: TRttiType; const AMethodName: String; const AParameters: Array of TValue): TRttiMethod;
 begin
-  Result := Self.InternalFindMethod(ARttiType, AMethodName, AMarkerText, True, AParameters);
+  Result := InternalFindMethod(ARttiType, AMethodName, True, AParameters);
 end;
 
-class function TioObjectMakerIntf.LoadPropertyHasOne(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty): TObject;
+class function TioObjectMakerIntf.LoadPropertyHasOne(const AContext: IioContext; const AQuery: IioQuery; const AProperty: IioProperty): TObject;
 var
   LWhere: IioWhere;
 begin
@@ -410,7 +313,7 @@ begin
     Result := nil;
 end;
 
-class function TioObjectMakerIntf.LoadPropertyBelongsTo(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty): TObject;
+class function TioObjectMakerIntf.LoadPropertyBelongsTo(const AContext: IioContext; const AQuery: IioQuery; const AProperty: IioProperty): TObject;
 var
   LChildID: Integer;
 begin
@@ -451,7 +354,7 @@ begin
     Result := nil;
 end;
 
-class procedure TioObjectMakerIntf.LoadPropertyHasMany(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty);
+class procedure TioObjectMakerIntf.LoadPropertyHasMany(const AContext: IioContext; const AQuery: IioQuery; const AProperty: IioProperty);
 var
   LChildObject: TObject;
   LWhere, LDetailWhere: IioWhere;
@@ -478,7 +381,7 @@ begin
   LWhere.ToList(LChildObject);
 end;
 
-class procedure TioObjectMakerIntf.LoadPropertyEmbeddedHasMany(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty);
+class procedure TioObjectMakerIntf.LoadPropertyEmbeddedHasMany(const AContext: IioContext; const AQuery: IioQuery; const AProperty: IioProperty);
 var
   LChildObject: TObject;
   LJSONString: String;
@@ -502,7 +405,7 @@ begin
   dj.FromJson(LJSONString).byFields.TypeAnnotationsON.&To(LChildObject);
 end;
 
-class function TioObjectMakerIntf.LoadPropertyEmbeddedHasOne(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty): TObject;
+class function TioObjectMakerIntf.LoadPropertyEmbeddedHasOne(const AContext: IioContext; const AQuery: IioQuery; const AProperty: IioProperty): TObject;
 var
   LJSONString: String;
 begin
@@ -527,7 +430,7 @@ begin
   end;
 end;
 
-class procedure TioObjectMakerIntf.LoadPropertyStream(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty);
+class procedure TioObjectMakerIntf.LoadPropertyStream(const AContext: IioContext; const AQuery: IioQuery; const AProperty: IioProperty);
 var
   LChildObject: TObject;
   LChildStream, LBlobStream: TStream;
@@ -538,7 +441,7 @@ begin
   // Get the stream from the DataObject property
   LChildObject := AProperty.GetValue(AContext.DataObject).AsObject;
   if not Assigned(LChildObject) then
-    raise EioGenericException.Create(Self.ClassName, 'LoadPropertyStream', Format('Stream child object non assigned on property "%s", class "%s"',
+    raise EioGenericException.Create(ClassName, 'LoadPropertyStream', Format('Stream child object non assigned on property "%s", class "%s"',
       [AProperty.GetName, AContext.Map.GetClassName]));
   LChildStream := LChildObject as TStream;
   // Get the BlobStream
@@ -551,7 +454,7 @@ begin
   end;
 end;
 
-class procedure TioObjectMakerIntf.LoadPropertyStreamable(AContext: IioContext; AQuery: IioQuery; AProperty: IioProperty);
+class procedure TioObjectMakerIntf.LoadPropertyStreamable(const AContext: IioContext; const AQuery: IioQuery; const AProperty: IioProperty);
 var
   LChildObject: TObject;
   LDuckTypedStreamObject: IioDuckTypedStreamObject;
@@ -564,7 +467,7 @@ begin
   LChildObject := AProperty.GetRelationChildObject(AContext.DataObject);
   // If the related child object not exists then exit (return 'NULL')
   if not Assigned(LChildObject) then
-    raise EioGenericException.Create(Self.ClassName, 'LoadPropertyStreamable', Format('Streamable child object not assigned on property "%s", class "%s"',
+    raise EioGenericException.Create(ClassName, 'LoadPropertyStreamable', Format('Streamable child object not assigned on property "%s", class "%s"',
       [AProperty.GetName, AContext.Map.GetClassName]));
   // Wrap the object into a DuckTypedStreamObject
   LDuckTypedStreamObject := TioDuckTypedFactory.DuckTypedStreamObject(LChildObject);

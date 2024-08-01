@@ -87,7 +87,7 @@ end;
 
 function TioSession.HasRole(const ARole: String): Boolean;
 begin
-  FUserToken.Contains(ROLES_SEPARATOR + ARole.ToLower + ROLES_SEPARATOR);
+  Result := FUserToken.Contains(ROLES_SEPARATOR + ARole.ToLower + ROLES_SEPARATOR);
 end;
 
 procedure TioSession.SetConnectionName(const Value: String);

@@ -79,10 +79,10 @@ begin
   AAlias := AObj.ClassName;
   // If a custom implementation of the DuckTypedStreamObject (for the class of AObj; ClassName as Alias) is present in the
   // dependency injection cantainer then use it, else retrieve the standard implementation (no Alias)
-  if not io.di.Locate<IioDuckTypedStreamObject>.Alias(AAlias).Exist then
+  if not io.di.Locate<IioDuckTypedStreamObject>(AAlias).Exist then
     AAlias := '';
   // Return the result
-  Result := io.di.Locate<IioDuckTypedStreamObject>.Alias(AAlias).ConstructorParams([AObj]).Get;
+  Result := io.di.Locate<IioDuckTypedStreamObject>(AAlias).ConstructorParams([AObj]).Get;
 end;
 
 end.

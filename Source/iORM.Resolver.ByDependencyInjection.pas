@@ -64,7 +64,7 @@ class function TioResolverByDependencyInjection.Resolve(const ATypeName:String; 
   const AUseMapInfo: Boolean = True): IioResolvedTypeList;
 begin
   inherited;
-  Result := TioDependencyInjectionResolverBase.Resolve(ATypeName, AAlias, AResolverMode, AUseMapInfo);
+  Result := TioDIResolverBase.Resolve(ATypeName, AAlias, AResolverMode, AUseMapInfo);
 end;
 
 // NB: FOR ENTITY PERSISTENCE PURPOSES ONLY
@@ -72,7 +72,7 @@ class function TioResolverByDependencyInjection.ResolveInaccurateAsRttiType(
   const ATypeName, AAlias: String): TRttiType;
 begin
   inherited;
-  Result := TioDependencyInjectionResolverBase.ResolveInaccurateAsRttiType(ATypeName, AAlias);
+  Result := TioDIResolverBase.ResolveInaccurateAsRttiType(ATypeName, AAlias);
 end;
 
 end.

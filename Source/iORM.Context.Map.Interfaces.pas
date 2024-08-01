@@ -59,11 +59,6 @@ type
     function TrueClass: IioTrueClass;
     // Blob field present
     function BlobFieldExists: Boolean;
-    // DIContainerImplementersItem reference
-    //  NB: Non li metto perchè altrimenti ho una "Unit Circular Reference" quindi al momento
-    //       risolvo in altro modo
-    function GetDIContainerImplementersItem: TioDIContainerImplementersItem;
-    procedure SetDIContainerImplementersItem(const AValue:TioDIContainerImplementersItem);
     /// This method return true if it's a TrueClassVirtualMap, false otherwise.
     ///  Note: I could not simply check if the private field FTrueClassVirtualMap was assigned or not because
     ///         at the point where I need this functionality it could be a nil also in the parent base class.

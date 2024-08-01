@@ -83,6 +83,15 @@ const
 
 type
 
+  // Dependency injenction factory method types
+  TFactoryMethod = reference to function: TObject;
+  TFactoryMethod<T1> = reference to function(Arg1: T1): TObject;
+  TFactoryMethod<T1, T2> = reference to function(Arg1: T1; Arg2: T2): TObject;
+  TFactoryMethod<T1, T2, T3> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3): TObject;
+  TFactoryMethod<T1, T2, T3, T4> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3; Arg4: T4): TObject;
+  TFactoryMethod<T1, T2, T3, T4, T5> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3; Arg4: T4; Arg5: T5): TObject;
+  TFactoryMethod<T1, T2, T3, T4, T5, T6> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3; Arg4: T4; Arg5: T5; Arg6: T6): TObject;
+
   // SkipScope (vedi anche sopra (const) i valori)
   TioSkipScope = DJSON.Params.TdjSkipScope;
   TioSkipScopeSet = DJSON.Params.TdjSkipScopeSet;

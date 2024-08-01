@@ -1151,7 +1151,7 @@ end;
 
 function TioWhere.ToList(const AInterfacedListTypeName, AAlias: String; const AOwnsObjects: Boolean): TObject;
 begin
-  Result := Self.ToList(io.di.Locate(AInterfacedListTypeName).Alias(AAlias).GetItem.RttiType, AOwnsObjects);
+  Result := ToList(io.di.Locate(AInterfacedListTypeName, AAlias).GetItem.RttiType, AOwnsObjects);
 end;
 
 function TioWhere.ToList(const AListRttiType: TRttiType; const AOwnsObjects: Boolean): TObject;

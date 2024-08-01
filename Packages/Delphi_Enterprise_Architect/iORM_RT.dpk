@@ -101,7 +101,6 @@ contains
   iORM.MVVM.Interfaces in '..\..\Source\iORM.MVVM.Interfaces.pas',
   iORM.Global.Factory in '..\..\Source\iORM.Global.Factory.pas',
   iORM.DependencyInjection in '..\..\Source\iORM.DependencyInjection.pas',
-  iORM.DependencyInjection.Interfaces in '..\..\Source\iORM.DependencyInjection.Interfaces.pas',
   iORM.MVVM.Factory in '..\..\Source\iORM.MVVM.Factory.pas',
   iORM.DB.QueryContainer in '..\..\Source\iORM.DB.QueryContainer.pas',
   iORM.DB.QueryEngine in '..\..\Source\iORM.DB.QueryEngine.pas',
