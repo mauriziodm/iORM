@@ -66,7 +66,7 @@ type
     FIsEntity: Boolean;
     FIsSingleton: Boolean;
     // TValue che contiene l'eventuale factory method per la creazione dell'istanza
-    FactoryMethod: TValue;
+//    FactoryMethod: TValue;
   public
     constructor Create(const AClassRttiType: TRttiInstanceType; const AImplementsIID: TGUID);
     property ClazzRef: TioClassRef read FClazzRef;

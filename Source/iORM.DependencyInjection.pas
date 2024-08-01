@@ -60,8 +60,8 @@ type
   strict private
     FInternalContainer: TObjectDictionary<TioDIContainerImplementersKey, TioDIContainerImplementersItem>;
     FEntityAutoRegisteredCount: Integer;
-    procedure _IncCounter(const AAlias: String);
-    procedure _DecCounter(const AAlias: String);
+    procedure _IncCounter(const AAlias: String); inline;
+    procedure _DecCounter(const AAlias: String); inline;
     function GetCount: Integer;
     function GetRegularRegisteredCount: Integer;
   public
@@ -98,23 +98,23 @@ type
   TioDIContainer = class abstract
   strict private
     class var FContainer: TioDIContainerInstance;
-    class function _SubKeyResolver(const AKey, ASubKey: String): String;
+    class function _SubKeyResolver(const AKey, ASubKey: String): String; static;
   public
     class procedure Build;
-    class procedure CleanUp;
-    class procedure Add(AKey: TioDIContainerKey; ASubKey: TioDIContainerImplementersKey; const AValue: TioDIContainerImplementersItem);
-    class function Exists(AKey: TioDIContainerKey; ASubKey: TioDIContainerImplementersKey): Boolean; overload;
-    class function ImplementersExists(AKey: TioDIContainerKey): Boolean; overload;
-    class function Get(AKey: TioDIContainerKey; ASubKey: TioDIContainerImplementersKey): TioDIContainerImplementersItem;
-    class function GetInterfaceImplementers(AKey: TioDIContainerKey): TioDIContainerValue;
-    class procedure Remove(AKey: TioDIContainerKey; ASubKey: TioDIContainerImplementersKey);
+    class procedure CleanUp; inline;
+    class procedure Add(AKey: TioDIContainerKey; ASubKey: TioDIContainerImplementersKey; const AValue: TioDIContainerImplementersItem); static;
+    class function Exists(AKey: TioDIContainerKey; ASubKey: TioDIContainerImplementersKey): Boolean; static;
+    class function ImplementersExists(AKey: TioDIContainerKey): Boolean; static;
+    class function Get(AKey: TioDIContainerKey; ASubKey: TioDIContainerImplementersKey): TioDIContainerImplementersItem; static;
+    class function GetInterfaceImplementers(AKey: TioDIContainerKey): TioDIContainerValue; static;
+    class procedure Remove(AKey: TioDIContainerKey; ASubKey: TioDIContainerImplementersKey); static;
   end;
 
   // Base class for Dependency Injection Register and Locator classes
-  TioDIBase = class abstract
+  TioDIBase = class
   strict protected
-    class function Container: TioDIContainerRef;
-    class function BuildContainerKey(const AInterfaceName: String; const ADICObjType: TioDICObjType): String;
+    class function Container: TioDIContainerRef; inline;
+    class function BuildContainerKey(const AInterfaceName: String; const ADICObjType: TioDICObjType): String; inline;
   end;
 
   // ===========================================================================
@@ -123,47 +123,14 @@ type
   // Register Class
   TioDIRegister = class(TioDIBase)
   strict private
-    FContainerValue: TioDIContainerImplementersItem;
-    FInterfaceName: String;
-    FAlias: String;
-    FSetMapImplementersRef: Boolean;
-    FDICType: TioDICObjType;
+    FImpementersItem: TioDIContainerImplementersItem;
   public
-    constructor CreateNew(const AClassRttiType: TRttiInstanceType; const AImplementsIID: TGUID; const AAlias: String; const ADICType: TioDICObjType);
+    constructor CreateByClass(const AClassRttiType: TRttiInstanceType; const AAlias: String; const ADICType: TioDICObjType);
+    constructor CreateByIID(const AClassRttiType: TRttiInstanceType; const AImplementsIID: TGUID; const AAlias: String; const ADICType: TioDICObjType);
+    constructor CreateByTargetTypeName(const AClassRttiType: TRttiInstanceType; const ATargetTypeName, AAlias: String; const ADICType: TioDICObjType);
     function _SetFarAncestorClassSameInterfaceAndTableAndConnection(const AValue: String): TioDIRegister;
     function AsEntity: TioDIRegister;
     function AsSingleton(const AIsSingleton: Boolean = True): TioDIRegister;
-
-
-
-
-    constructor Create(const AContainerValue: TioDIContainerImplementersItem);
-    procedure Execute;
-    function Implements<T: IInterface>(const AAlias: String = ''): TioDIRegister; overload;
-    function Implements(const IID: TGUID; const AAlias: String = ''): TioDIRegister; overload;
-    function Alias(const AAlias: String): TioDIRegister;
-    function DisableMapImplemetersRef: TioDIRegister;
-
-    function AsDescendantClassOf(const AAncestorClassName: String; const AAlias: String = ''): TioDIRegister; overload;
-
-    function AsSimpleView: TioDIRegister; overload;
-    function AsSimpleViewFor(const ATargetTypeName: String; const AAlias: String = ''): TioDIRegister; overload;
-    function AsSimpleViewFor(const ATargetClassRef: TioClassRef; const AAlias: String = ''): TioDIRegister; overload;
-    function AsSimpleViewFor(const ATargetIID: TGUID; const AAlias: String = ''): TioDIRegister; overload;
-    function AsSimpleViewFor<T>(const AAlias: String = ''): TioDIRegister; overload;
-
-    function AsView: TioDIRegister; overload;
-    function AsViewFor(const ATargetTypeName: String; const AAlias: String = ''): TioDIRegister; overload;
-    function AsViewFor(const ATargetClassRef: TioClassRef; const AAlias: String = ''): TioDIRegister; overload;
-    function AsViewFor(const ATargetIID: TGUID; const AAlias: String = ''): TioDIRegister; overload;
-    function AsViewFor<T>(const AAlias: String = ''): TioDIRegister; overload;
-
-    function AsViewModel: TioDIRegister; overload;
-    function AsViewModelFor(const ATargetTypeName: String; const AAlias: String = ''): TioDIRegister; overload;
-    function AsViewModelFor(const ATargetClassRef: TioClassRef; const AAlias: String = ''): TioDIRegister; overload;
-    function AsViewModelFor(const ATargetIID: TGUID; const AAlias: String = ''): TioDIRegister; overload;
-    function AsViewModelFor<T>(const AAlias: String = ''): TioDIRegister; overload;
-
   end;
   // ===========================================================================
 
@@ -323,8 +290,60 @@ type
   public
     class function Singletons: TioSingletonsFacadeRef;
     // ========== REGISTER ==========
-    class function RegisterClass<T: class>: TioDIRegister; overload;
-    class function RegisterClass(const ARttiType: TRttiInstanceType): TioDIRegister; overload;
+    // Register class as inherited from (for internal use only)
+    class function _RegisterClassAsInheritedFrom(const AClassRttiType: TRttiInstanceType; const AAncestorClassName: String): TioDIRegister; static;
+    // Register class not implementing any interface
+    class function RegisterClass<T: class>(const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterClass(const AClassRttiType: TRttiInstanceType; const AAlias: String = ''): TioDIRegister; overload; static;
+    // Register class implementing an interface
+    class function RegisterClass<T: class; TImplements: IInterface>(const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterClass<T: class>(const AImplementsIID: TGUID; const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterClass(const AClassRttiType: TRttiInstanceType; const AImplementsIID: TGUID; const AAlias: String = ''): TioDIRegister; overload; static;
+    // Register SimpleView not implementing any interface
+    class function RegisterSimpleView<TSimpleViewClass: class>(const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterSimpleView(const ASimpleViewRttiType: TRttiInstanceType; const AAlias: String = ''): TioDIRegister; overload; static;
+    // Register SimpleView implementing an interface
+    class function RegisterSimpleView<TSimpleViewClass: class; TImplements: IInterface>(const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterSimpleView<TSimpleViewClass: class>(const AImplementsIID: TGUID; const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterSimpleView(const ASimpleViewRttiType: TRttiInstanceType; const AImplementsIID: TGUID; const AAlias: String = ''): TioDIRegister; overload; static;
+    // Register SimpleViewFor
+    class function RegisterSimpleViewFor<TSimpleViewClass: class; TTargetType>(const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterSimpleViewFor<TSimpleViewClass: class>(const ATargetTypeName: String; const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterSimpleViewFor<TSimpleViewClass: class>(const ATargetClassRef: TioClassRef; const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterSimpleViewFor<TSimpleViewClass: class>(const ATargetIID: TGUID; const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterSimpleViewFor(const ASimpleViewRttiType: TRttiInstanceType; const ATargetTypeName: String; const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterSimpleViewFor(const ASimpleViewRttiType: TRttiInstanceType; const ATargetClassRef: TioClassRef; const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterSimpleViewFor(const ASimpleViewRttiType: TRttiInstanceType; const ATargetIID: TGUID; const AAlias: String = ''): TioDIRegister; overload; static;
+    // Register View not implementing any interface
+    class function RegisterView<TViewClass: class>(const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterView(const AViewRttiType: TRttiInstanceType; const AAlias: String = ''): TioDIRegister; overload; static;
+    // Register View implementing an interface
+    class function RegisterView<TViewClass: class; TImplements: IInterface>(const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterView<TViewClass: class>(const AImplementsIID: TGUID; const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterView(const AViewRttiType: TRttiInstanceType; const AImplementsIID: TGUID; const AAlias: String = ''): TioDIRegister; overload; static;
+    // Register ViewFor
+    class function RegisterViewFor<TViewClass: class; TTargetType>(const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterViewFor<TViewClass: class>(const ATargetTypeName: String; const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterViewFor<TViewClass: class>(const ATargetClassRef: TioClassRef; const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterViewFor<TViewClass: class>(const ATargetIID: TGUID; const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterViewFor(const AViewRttiType: TRttiInstanceType; const ATargetTypeName: String; const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterViewFor(const AViewRttiType: TRttiInstanceType; const ATargetClassRef: TioClassRef; const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterViewFor(const AViewRttiType: TRttiInstanceType; const ATargetIID: TGUID; const AAlias: String = ''): TioDIRegister; overload; static;
+    // Register ViewModel not implementing any interface
+    class function RegisterViewModel<TViewModelClass: class>(const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterViewModel(const AViewModelRttiType: TRttiInstanceType; const AAlias: String = ''): TioDIRegister; overload; static;
+    // Register ViewModel implementing an interface
+    class function RegisterViewModel<TViewModelClass: class; TImplements: IInterface>(const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterViewModel<TViewModelClass: class>(const AImplementsIID: TGUID; const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterViewModel(const AViewModelRttiType: TRttiInstanceType; const AImplementsIID: TGUID; const AAlias: String = ''): TioDIRegister; overload; static;
+    // Register ViewModelFor
+    class function RegisterViewModelFor<TViewModelClass: class; TTargetType>(const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterViewModelFor<TViewModelClass: class>(const ATargetTypeName: String; const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterViewModelFor<TViewModelClass: class>(const ATargetClassRef: TioClassRef; const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterViewModelFor<TViewModelClass: class>(const ATargetIID: TGUID; const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterViewModelFor(const AViewModelRttiType: TRttiInstanceType; const ATargetTypeName: String; const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterViewModelFor(const AViewModelRttiType: TRttiInstanceType; const ATargetClassRef: TioClassRef; const AAlias: String = ''): TioDIRegister; overload; static;
+    class function RegisterViewModelFor(const AViewModelRttiType: TRttiInstanceType; const ATargetIID: TGUID; const AAlias: String = ''): TioDIRegister; overload; static;
     // ========== REGISTER ==========
     // ========== LOCATE ==========
     // Locate
@@ -373,7 +392,6 @@ type
   strict private
     // class procedure _CheckModelPresenter(const ATargetMP:TioModelPresenter); NB: Hint prevention "symbol declared but never used" (codice resente sotto)
   public
-    class function GetRegister(const AContainerValue: TioDIContainerImplementersItem): TioDIRegister; inline;
     class function GetLocator(const AInterfaceName: String; const AAlias: String; const AOwnerRequested, AVCProviderEnabled: Boolean; const ADICObjType: TioDICObjType): TioDILocator; static;
     class function GetLocatorFor<TI>(const AAlias: String; const AOwnerRequested, AVCProviderEnabled: Boolean; const ADICObjType: TioDICObjType): TioDILocator<TI>; static;
     class function GetSimpleViewLocatorFor(const ATargetBS: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TioDILocator; static;
@@ -579,23 +597,87 @@ begin
   Result := LocateVMfor(TioUtilities.GenericToString<T>, AParentCloseQueryAction, AVMAlias);
 end;
 
-class function TioDependencyInjection.RegisterClass(const ARttiType: TRttiInstanceType): TioDIRegister;
-//var
-//  ContainerValue: TioDIContainerImplementersItem;
+class function TioDependencyInjection.RegisterClass(const AClassRttiType: TRttiInstanceType; const AAlias: String = ''): TioDIRegister;
 begin
-// TODO: 30/07/2024 - Commentato temporaneamente
-//  ContainerValue := TioDIContainerImplementersItem.Create;
-//  ContainerValue.ClassRef := ARttiType.MetaclassType;
-//  ContainerValue.ClassName := ARttiType.MetaclassType.ClassName;
-//  ContainerValue.RttiType := ARttiType;
-//  ContainerValue.IsSingleton := False;
-//  ContainerValue.IsEntity := False;
-//  Result := TioDependencyInjectionFactory.GetRegister(ContainerValue);
+  Result := TioDIRegister.CreateByClass(AClassRttiType, AAlias, dotRegular);
 end;
 
-class function TioDependencyInjection.RegisterClass<T>: TioDIRegister;
+class function TioDependencyInjection.RegisterClass(const AClassRttiType: TRttiInstanceType; const AImplementsIID: TGUID; const AAlias: String): TioDIRegister;
 begin
-  Result := RegisterClass(TioUtilities.ClassRefToRttiType(T));
+  Result := TioDIRegister.CreateByIID(AClassRttiType, AImplementsIID, AAlias, dotRegular);
+end;
+
+class function TioDependencyInjection.RegisterClass<T, TImplements>(const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByIID(TioUtilities.ClassRefToRttiType(T), TioUtilities.TypeInfoToGUID(TypeInfo(TImplements)), AAlias, dotRegular);
+end;
+
+class function TioDependencyInjection.RegisterClass<T>(const AImplementsIID: TGUID; const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByIID(TioUtilities.ClassRefToRttiType(T), AImplementsIID, AAlias, dotRegular);
+end;
+
+class function TioDependencyInjection.RegisterClass<T>(const AAlias: String = ''): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByClass(TioUtilities.ClassRefToRttiType(T), AAlias, dotRegular);
+end;
+
+class function TioDependencyInjection.RegisterSimpleView(const ASimpleViewRttiType: TRttiInstanceType; const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByClass(ASimpleViewRttiType, AAlias, dotSimpleView);
+end;
+
+class function TioDependencyInjection.RegisterSimpleView(const ASimpleViewRttiType: TRttiInstanceType; const AImplementsIID: TGUID;
+  const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByIID(ASimpleViewRttiType, AImplementsIID, AAlias, dotSimpleView);
+end;
+
+class function TioDependencyInjection.RegisterSimpleView<TSimpleViewClass, TImplements>(const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByIID(TioUtilities.ClassRefToRttiType(TSimpleViewClass), TioUtilities.TypeInfoToGUID(TypeInfo(TImplements)), AAlias, dotSimpleView);
+end;
+
+class function TioDependencyInjection.RegisterSimpleView<TSimpleViewClass>(const AImplementsIID: TGUID; const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByIID(TioUtilities.ClassRefToRttiType(TSimpleViewClass), AImplementsIID, AAlias, dotSimpleView);
+end;
+
+class function TioDependencyInjection.RegisterSimpleView<TSimpleViewClass>(const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByClass(TioUtilities.ClassRefToRttiType(TSimpleViewClass), AAlias, dotSimpleView);
+end;
+
+class function TioDependencyInjection.RegisterSimpleViewFor(const ASimpleViewRttiType: TRttiInstanceType; const ATargetTypeName, AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByTargetTypeName(ASimpleViewRttiType, ATargetTypeName, AAlias, dotSimpleView);
+end;
+
+class function TioDependencyInjection.RegisterSimpleViewFor(const ASimpleViewRttiType: TRttiInstanceType; const ATargetIID: TGUID;
+  const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByTargetTypeName(ASimpleViewRttiType, TioUtilities.GUIDtoInterfaceName(ATargetIID), AAlias, dotSimpleView);
+end;
+
+class function TioDependencyInjection.RegisterSimpleViewFor(const ASimpleViewRttiType: TRttiInstanceType; const ATargetClassRef: TioClassRef;
+  const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByTargetTypeName(ASimpleViewRttiType, ATargetClassRef.ClassName, AAlias, dotSimpleView);
+end;
+
+class function TioDependencyInjection.RegisterSimpleViewFor<TSimpleViewClass, TTargetType>(const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByTargetTypeName(TioUtilities.ClassRefToRttiType(TSimpleViewClass), TioUtilities.GenericToString<TTargetType>, AAlias, dotSimpleView);
+end;
+
+class function TioDependencyInjection.RegisterSimpleViewFor<TSimpleViewClass>(const ATargetClassRef: TioClassRef; const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByTargetTypeName(TioUtilities.ClassRefToRttiType(TSimpleViewClass), ATargetClassRef.ClassName, AAlias, dotSimpleView);
+end;
+
+class function TioDependencyInjection.RegisterSimpleViewFor<TSimpleViewClass>(const ATargetTypeName, AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByTargetTypeName(TioUtilities.ClassRefToRttiType(TSimpleViewClass), ATargetTypeName, AAlias, dotSimpleView);
 end;
 
 class function TioDependencyInjection.Singletons: TioSingletonsFacadeRef;
@@ -632,6 +714,11 @@ begin
   Result.SetViewModel(LViewModel, AViewModelMarker);
 end;
 
+class function TioDependencyInjection._RegisterClassAsInheritedFrom(const AClassRttiType: TRttiInstanceType; const AAncestorClassName: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByTargetTypeName(AClassRttiType, AAncestorClassName, String.Empty, dotRegular);
+end;
+
 class function TioDependencyInjection.LocateViewVMfor(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias, AViewModelMarker: String): TioDILocator;
 var
   LViewModel: IioViewModel;
@@ -657,216 +744,69 @@ end;
 
 { TioDependencyInjectionRegister }
 
-function TioDIRegister.Alias(const AAlias: String): TioDIRegister;
-begin
-//  Self.FAlias := AAlias;
-//  Result := Self;
-end;
-
 function TioDIRegister.AsEntity: TioDIRegister;
 begin
-  FContainerValue.IsEntity := True;
+  FImpementersItem.IsEntity := True;
   Result := Self;
-end;
-
-function TioDIRegister.AsSimpleViewFor(const ATargetTypeName, AAlias: String): TioDIRegister;
-begin
-//  FDICType := dotSimpleView;
-//  // Set the InterfaceName
-//  FInterfaceName := ATargetTypeName;
-//  // Set the Alias
-//  if not AAlias.IsEmpty then
-//    Self.FAlias := AAlias;
-//  // Return itself
-//  Result := Self;
-end;
-
-function TioDIRegister.AsSimpleViewFor(const ATargetClassRef: TioClassRef; const AAlias: String): TioDIRegister;
-begin
-//  Result := Self.AsSimpleViewFor(ATargetClassRef.ClassName, AAlias);
-end;
-
-function TioDIRegister.AsSimpleView: TioDIRegister;
-begin
-//  FDICType := dotSimpleView;
-//  Result := Self;
-end;
-
-function TioDIRegister.AsSimpleViewFor(const ATargetIID: TGUID; const AAlias: String): TioDIRegister;
-begin
-//  Result := Self.AsSimpleViewFor(TioUtilities.GUIDtoInterfaceName(ATargetIID), AAlias);
-end;
-
-function TioDIRegister.AsSimpleViewFor<T>(const AAlias: String): TioDIRegister;
-begin
-//  Result := Self.AsSimpleViewFor(TioUtilities.GenericToString<T>, AAlias);
 end;
 
 function TioDIRegister.AsSingleton(const AIsSingleton: Boolean): TioDIRegister;
 begin
-  FContainerValue.IsSingleton := AIsSingleton;
+  FImpementersItem.IsSingleton := AIsSingleton;
   Result := Self;
 end;
 
-constructor TioDIRegister.Create(const AContainerValue: TioDIContainerImplementersItem);
-begin
-//  inherited Create;
-//  FSetMapImplementersRef := True;
-//  FContainerValue := AContainerValue;
-//  FInterfaceName := AContainerValue.ClassName; // Così si possono registrare anche direttamente le classi senza interfaccia
-//  FAlias := '';
-//  FDICType := dotRegular;
-end;
-
-constructor TioDIRegister.CreateNew(const AClassRttiType: TRttiInstanceType; const AImplementsIID: TGUID; const AAlias: String;
-  const ADICType: TioDICObjType);
+constructor TioDIRegister.CreateByClass(const AClassRttiType: TRttiInstanceType; const AAlias: String; const ADICType: TioDICObjType);
 var
   LDIContainerKey: String;
-  LInterfaceName: String;
 begin
-  // Se è stato specificato il parametro AImplementsIID allora estrae il nome della interfaccia
-  //  implementata ai fini della registrazione, se invece il parametro non è specificato
-  //  usa il nome della classe stessa che si sta registrando così si possono registrare
-  //  anche le classi nel DIC
-  if AImplementsIID.IsEmpty then
-    LInterfaceName := FContainerValue.ClazzName
-  else
-    LInterfaceName := TioUtilities.GetImplementedInterfaceName(AClassRttiType, AImplementsIID);
+  // Stiamo registrando una classe per se stessa, che non implementa nessuna interfaccia
+  //  e che non è registrata come vista o VM per una entità; in questo caso la chiave con
+  //  la quale viene registrata è il nome della classe stessa
+  // ----------
   // Crea la nuova istanza della implementer item sulla quale registrare le informazioni
   //  della classe che si sta registrando poi compone la relativa chiave e infine
   //  registra il tutto nel DIC
-  FContainerValue := TioDIContainerImplementersItem.Create(AClassRttiType, AImplementsIID);
-  LDIContainerKey := BuildContainerKey(LInterfaceName, ADICType);
-  Container.Add(LDIContainerKey, AAlias, FContainerValue);
+  FImpementersItem := TioDIContainerImplementersItem.Create(AClassRttiType, TGUID.Empty);
+  LDIContainerKey := BuildContainerKey(AClassRttiType.Name, ADICType);
+  Container.Add(BuildContainerKey(AClassRttiType.Name, ADICType), AAlias, FImpementersItem);
 end;
 
-function TioDIRegister.DisableMapImplemetersRef: TioDIRegister;
+constructor TioDIRegister.CreateByIID(const AClassRttiType: TRttiInstanceType; const AImplementsIID: TGUID; const AAlias: String;
+  const ADICType: TioDICObjType);
+var
+  LDIContainerKey: String;
 begin
-//  Self.FSetMapImplementersRef := False;
-//  Result := Self;
+  // Stiamo registrando una classe come classe che implementa l'interfaccia  ricevuta con il parametro
+  //  AImplementsIID; in questo caso la chiave con la quale viene registrata è il nome dell'interfaccia stessa
+  // ----------
+  // Crea la nuova istanza della implementer item sulla quale registrare le informazioni
+  //  della classe che si sta registrando poi compone la relativa chiave e infine
+  //  registra il tutto nel DIC
+  FImpementersItem := TioDIContainerImplementersItem.Create(AClassRttiType, AImplementsIID);
+  LDIContainerKey := BuildContainerKey(TioUtilities.GetImplementedInterfaceName(AClassRttiType, AImplementsIID), ADICType);
+  Container.Add(LDIContainerKey, AAlias, FImpementersItem);
 end;
 
-procedure TioDIRegister.Execute;
-//var
-//  LDIContainerKey: String;
+constructor TioDIRegister.CreateByTargetTypeName(const AClassRttiType: TRttiInstanceType; const ATargetTypeName, AAlias: String; const ADICType: TioDICObjType);
+var
+  LDIContainerKey: String;
 begin
-//  if FSetMapImplementersRef then
-//    SetMapImplementersRef;
-//  // Register into the DIC
-//  LDIContainerKey := BuildContainerKey(FInterfaceName, FDICType);
-//  Container.Add(LDIContainerKey, FAlias, FContainerValue);
-//
-//  Free;
-end;
-
-function TioDIRegister.Implements(const IID: TGUID; const AAlias: String): TioDIRegister;
-begin
-//  // Set the InterfaceName
-//  FInterfaceName := TioUtilities.GetImplementedInterfaceName(FContainerValue.RttiType, IID);
-//  // Set the interface GUID
-//  FContainerValue.InterfaceGUID := IID;
-//  // Set the Alias
-//  if not AAlias.IsEmpty then
-//    Self.FAlias := AAlias;
-//  // Return itself
-//  Result := Self;
-end;
-
-function TioDIRegister.AsDescendantClassOf(const AAncestorClassName, AAlias: String): TioDIRegister;
-begin
-//  // Set the InterfaceName
-//  FInterfaceName := AAncestorClassName;
-//  // Set the Alias
-//  if not AAlias.IsEmpty then
-//    FAlias := AAlias;
-//  // Return itself
-//  Result := Self;
-end;
-
-function TioDIRegister.Implements<T>(const AAlias: String): TioDIRegister;
-begin
-//  // Set the InterfaceName
-//  FInterfaceName := TioUtilities.GenericToString<T>;
-//  // Set the interface GUID
-//  FContainerValue.InterfaceGUID := TioUtilities.TypeInfoToGUID(TypeInfo(T));
-//  // Set the Alias
-//  if not AAlias.IsEmpty then
-//    FAlias := AAlias;
-//  // Return itself
-//  Result := Self;
+  // Stiamo registrando una classe come SimpleView/View/ViewModel per un'altra classe (ATArgetTypeName);
+  //  in questo caso la chiave con la quale viene registrata è il nome del ATArgetTypeName
+  // ----------
+  // Crea la nuova istanza della implementer item sulla quale registrare le informazioni
+  //  della classe che si sta registrando poi compone la relativa chiave e infine
+  //  registra il tutto nel DIC
+  FImpementersItem := TioDIContainerImplementersItem.Create(AClassRttiType, TGUID.Empty);
+  LDIContainerKey := BuildContainerKey(ATargetTypeName, ADICType);
+  Container.Add(LDIContainerKey, AAlias, FImpementersItem);
 end;
 
 function TioDIRegister._SetFarAncestorClassSameInterfaceAndTableAndConnection(const AValue: String): TioDIRegister;
 begin
-  FContainerValue.FarAncestorClazzSameInterfaceAndTableAndConnection := AValue;
+  FImpementersItem.FarAncestorClazzSameInterfaceAndTableAndConnection := AValue;
   Result := Self;
-end;
-
-function TioDIRegister.AsViewFor(const ATargetClassRef: TioClassRef; const AAlias: String): TioDIRegister;
-begin
-//  Result := Self.AsViewFor(ATargetClassRef.ClassName, AAlias);
-end;
-
-function TioDIRegister.AsViewFor(const ATargetTypeName, AAlias: String): TioDIRegister;
-begin
-//  FDICType := dotView;
-//  // Set the InterfaceName
-//  FInterfaceName := ATargetTypeName;
-//  // Set the Alias
-//  if not AAlias.IsEmpty then
-//    Self.FAlias := AAlias;
-//  // Return itself
-//  Result := Self;
-end;
-
-function TioDIRegister.AsView: TioDIRegister;
-begin
-//  FDICType := dotView;
-//  Result := Self;
-end;
-
-function TioDIRegister.AsViewFor(const ATargetIID: TGUID; const AAlias: String): TioDIRegister;
-begin
-//  Result := Self.AsViewFor(TioUtilities.GUIDtoInterfaceName(ATargetIID), AAlias);
-end;
-
-function TioDIRegister.AsViewFor<T>(const AAlias: String): TioDIRegister;
-begin
-//  // Result := Self.AsViewFor(T.ClassName, AAlias);
-//  Result := Self.AsViewFor(TioUtilities.GenericToString<T>, AAlias);
-end;
-
-function TioDIRegister.AsViewModelFor(const ATargetClassRef: TioClassRef; const AAlias: String): TioDIRegister;
-begin
-//  Result := Self.AsViewModelFor(ATargetClassRef.ClassName, AAlias);
-end;
-
-function TioDIRegister.AsViewModelFor(const ATargetTypeName, AAlias: String): TioDIRegister;
-begin
-//  FDICType := dotViewModel;
-//  // Set the InterfaceName
-//  FInterfaceName := ATargetTypeName;
-//  // Set the Alias
-//  if not AAlias.IsEmpty then
-//    Self.FAlias := AAlias;
-//  // Return itself
-//  Result := Self;
-end;
-
-function TioDIRegister.AsViewModel: TioDIRegister;
-begin
-//  FDICType := dotViewModel;
-//  Result := Self;
-end;
-
-function TioDIRegister.AsViewModelFor(const ATargetIID: TGUID; const AAlias: String): TioDIRegister;
-begin
-//  Result := Self.AsViewModelFor(TioUtilities.GUIDtoInterfaceName(ATargetIID), AAlias);
-end;
-
-function TioDIRegister.AsViewModelFor<T>(const AAlias: String): TioDIRegister;
-begin
-//  Result := Self.AsViewModelFor(TioUtilities.GenericToString<T>, AAlias);
 end;
 
 { TioDependencyInjectionContainer }
@@ -877,15 +817,15 @@ begin
   AKey := Uppercase(AKey);
   ASubKey := Uppercase(ASubKey);
   // If the Key not exist then create the SubContainer and add it to the MasterContainer
-  if not Self.FContainer.ContainsKey(AKey) then
-    Self.FContainer.Add(AKey, TioDIContainerValue.Create);
+  if not FContainer.ContainsKey(AKey) then
+    FContainer.Add(AKey, TioDIContainerValue.Create);
   // Add the Value to the SubKey
-  Self.FContainer.Items[AKey].Add(ASubKey, AValue);
+  FContainer.Items[AKey].Add(ASubKey, AValue);
 end;
 
 class procedure TioDIContainer.Build;
 begin
-  Self.FContainer := TioDIContainerInstance.Create([doOwnsValues]);
+  FContainer := TioDIContainerInstance.Create([doOwnsValues]);
 end;
 
 class procedure TioDIContainer.CleanUp;
@@ -897,7 +837,7 @@ class function TioDIContainer.Exists(AKey: TioDIContainerKey; ASubKey: TioDICont
 begin
   AKey := Uppercase(AKey);
   ASubKey := Uppercase(ASubKey);
-  Result := Self.FContainer.ContainsKey(AKey) and Self.FContainer.Items[AKey].Contains(ASubKey);
+  Result := FContainer.ContainsKey(AKey) and FContainer.Items[AKey].Contains(ASubKey);
 end;
 
 class function TioDIContainer.Get(AKey: TioDIContainerKey; ASubKey: TioDIContainerImplementersKey): TioDIContainerImplementersItem;
@@ -907,8 +847,8 @@ begin
   // Resolve the subkey if needed
   ASubKey := _SubKeyResolver(AKey, ASubKey);
   // If exists then return the implementer class else raise an exception
-  if Self.Exists(AKey, ASubKey) then
-    Result := Self.FContainer.Items[AKey].GetItem(ASubKey)
+  if Exists(AKey, ASubKey) then
+    Result := FContainer.Items[AKey].GetItem(ASubKey)
   else
   begin
     // ViewModel
@@ -916,13 +856,13 @@ begin
     begin
       AKey := Copy(AKey, 5, 99);
       if ASubKey.IsEmpty then
-        raise EioGenericException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+        raise EioGenericException.Create(ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
           #13#13'A ViewModel for "%s" is required but I cannot find any registered.' +
           #13#13'Perhaps you forgot to register it, to do so you can decorate the ViewModel class with the attribute "[diViewModelFor(%s)]" or you can write some code like: "io.di.RegisterClass<TMyViewModel>.AsViewModelFor<%s>.Execute".' +
           #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
           #13#13'This will work.', [AKey, AKey, AKey]))
       else
-        raise EioGenericException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+        raise EioGenericException.Create(ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
           #13#13'A ViewModel for "%s" (alias "%s") is required but I cannot find any registered.' +
           #13#13'Perhaps you forgot to register it, to do so you can decorate the ViewModel class with the attribute "[diViewModelFor(%s,"%s")]" or you can write some code like: "io.di.RegisterClass<TMyViewModel>.AsViewModelFor<%s>("%s").Execute".' +
           #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
@@ -934,13 +874,13 @@ begin
     begin
       AKey := Copy(AKey, 4, 99);
       if ASubKey.IsEmpty then
-        raise EioGenericException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+        raise EioGenericException.Create(ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
           #13#13'A View for "%s" is required but I cannot find any registered.' +
           #13#13'Perhaps you forgot to register it, to do so you can decorate the View class with the attribute "[diViewFor(%s)]" or you can write some code like: "io.di.RegisterClass<TMyViewModel>.AsViewFor<%s>.Execute".' +
           #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
           #13#13'This will work.', [AKey, AKey, AKey]))
       else
-        raise EioGenericException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+        raise EioGenericException.Create(ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
           #13#13'A View for "%s" (alias "%s") is required but I cannot find any registered.' +
           #13#13'Perhaps you forgot to register it, to do so you can decorate the View class with the attribute "[diViewFor(%s,"%s")]" or you can write some code like: "io.di.RegisterClass<TMyViewModel>.AsViewFor<%s>("%s").Execute".' +
           #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
@@ -952,13 +892,13 @@ begin
     begin
       AKey := Copy(AKey, 5, 99);
       if ASubKey.IsEmpty then
-        raise EioGenericException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+        raise EioGenericException.Create(ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
           #13#13'A SimpleView for "%s" is required but I cannot find any registered.' +
           #13#13'Perhaps you forgot to register it, to do so you can decorate the SimpleView class with the attribute "[diSimpleViewFor(%s)]" or you can write some code like: "io.di.RegisterClass<TMyViewModel>.AsSimpleViewFor<%s>.Execute".' +
           #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
           #13#13'This will work.', [AKey, AKey, AKey]))
       else
-        raise EioGenericException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+        raise EioGenericException.Create(ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
           #13#13'A SimpleView for "%s" (alias "%s") is required but I cannot find any registered.' +
           #13#13'Perhaps you forgot to register it, to do so you can decorate the SimpleView class with the attribute "[diSimpleViewFor(%s,"%s")]" or you can write some code like: "io.di.RegisterClass<TMyViewModel>.AsSimpleViewFor<%s>("%s").Execute".' +
           #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
@@ -968,13 +908,13 @@ begin
     else
     begin
       if ASubKey.IsEmpty then
-        raise EioGenericException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+        raise EioGenericException.Create(ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
           #13#13'Services of the "%s" interface are required but I cannot find any registered class that implements it.' +
           #13#13'Maybe you forgot to register the class, to do so you can decorate it with the "[diImplements(%s)]" attribute or you can write some code like: "io.di.RegisterClass<TMyClass>.Implements<%s>.Execute".' +
           #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
           #13#13'This will work.', [AKey, AKey, AKey]))
       else
-        raise EioGenericException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+        raise EioGenericException.Create(ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
           #13#13'Services of the "%s" interface (alias "%s") are required but I cannot find any registered class that implements it.' +
           #13#13'Maybe you forgot to register the class, to do so you can decorate it with the "[diImplements(%s, ''%s'')]" attribute or you can write some code like: "io.di.RegisterClass<TMyClass>.Implements<%s>(''%s'').Execute".' +
           #13#13'If you decide to use the attribute, make sure you have put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
@@ -986,13 +926,13 @@ end;
 class function TioDIContainer.GetInterfaceImplementers(AKey: TioDIContainerKey): TioDIContainerValue;
 begin
   AKey := Uppercase(AKey);
-  if not Self.ImplementersExists(AKey) then
-    raise EioGenericException.Create(Self.ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
+  if not ImplementersExists(AKey) then
+    raise EioGenericException.Create(ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
       #13#13'I was looking for a list of all registered classes implementing "%s" but couldn''t find any.' +
       #13#13'I remind you that you can register a class as an implementer of an interface by decorating it with the attribute "[diImplements (%s)]" or you can write some code like: "io.di.RegisterClass<TMyClass>.Implements<%s>.Execute".' +
       #13#13'If you decide to use the attribute, make sure you put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
       #13#13'I hope this information will be useful to you.', [AKey, AKey, AKey]));
-  Result := Self.FContainer.Items[AKey];
+  Result := FContainer.Items[AKey];
 end;
 
 class function TioDIContainer.ImplementersExists(AKey: TioDIContainerKey): Boolean;
@@ -1100,7 +1040,8 @@ end;
 
 function TioDILocator.ConstructorParams(const AParams: TioConstructorParams): TioDILocator;
 begin
-FConstructorParams := AParams;
+  FConstructorParams := AParams;
+  Result := Self;
 // ---------- OLD CODE ----------
 //  // Solo così sembra andare bene
 //  SetLength(FConstructorParams, Length(AParams));
@@ -1766,11 +1707,6 @@ begin
   Result := TioDILocator<TI>.Create(LDIContainerKey, AAlias, AOwnerRequested, AVCProviderEnabled);
 end;
 
-class function TioDIFactory.GetRegister(const AContainerValue: TioDIContainerImplementersItem): TioDIRegister;
-begin
-  Result := TioDIRegister.Create(AContainerValue);
-end;
-
 class function TioDIFactory.GetSimpleViewLocatorFor(const ATargetBS: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TioDILocator;
 begin
   // Check for ModelPresenter validity
@@ -1976,6 +1912,137 @@ begin
   LFirstResolvedClassMap := TioMapContainer.GetMap(LFirstResolvedClassName);
   // Ritorna la prima classe trovata che implementa l'interfaccia desiderata
   Result := LFirstResolvedClassMap.RttiType;
+end;
+
+class function TioDependencyInjection.RegisterSimpleViewFor<TSimpleViewClass>(const ATargetIID: TGUID; const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByTargetTypeName(TioUtilities.ClassRefToRttiType(TSimpleViewClass), TioUtilities.GUIDtoInterfaceName(ATargetIID), AAlias, dotSimpleView);
+end;
+
+class function TioDependencyInjection.RegisterView(const AViewRttiType: TRttiInstanceType; const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByClass(AViewRttiType, AAlias, dotView);
+end;
+
+class function TioDependencyInjection.RegisterView<TViewClass>(const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByClass(TioUtilities.ClassRefToRttiType(TViewClass), AAlias, dotView);
+end;
+
+class function TioDependencyInjection.RegisterViewFor(const AViewRttiType: TRttiInstanceType; const ATargetIID: TGUID;
+  const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByTargetTypeName(AViewRttiType, TioUtilities.GUIDtoInterfaceName(ATargetIID), AAlias, dotView);
+end;
+
+class function TioDependencyInjection.RegisterViewFor(const AViewRttiType: TRttiInstanceType; const ATargetClassRef: TioClassRef;
+  const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByTargetTypeName(AViewRttiType, ATargetClassRef.ClassName, AAlias, dotView);
+end;
+
+class function TioDependencyInjection.RegisterViewFor(const AViewRttiType: TRttiInstanceType; const ATargetTypeName, AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByTargetTypeName(AViewRttiType, ATargetTypeName, AAlias, dotView);
+end;
+
+class function TioDependencyInjection.RegisterViewFor<TViewClass, TTargetType>(const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByTargetTypeName(TioUtilities.ClassRefToRttiType(TViewClass), TioUtilities.GenericToString<TTargetType>, AAlias, dotView);
+end;
+
+class function TioDependencyInjection.RegisterViewFor<TViewClass>(const ATargetIID: TGUID; const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByTargetTypeName(TioUtilities.ClassRefToRttiType(TViewClass), TioUtilities.GUIDtoInterfaceName(ATargetIID), AAlias, dotView);
+end;
+
+class function TioDependencyInjection.RegisterViewModel(const AViewModelRttiType: TRttiInstanceType; const AImplementsIID: TGUID;
+  const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByIID(AViewModelRttiType, AImplementsIID, AAlias, dotViewModel);
+end;
+
+class function TioDependencyInjection.RegisterViewModel(const AViewModelRttiType: TRttiInstanceType; const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByClass(AViewModelRttiType, AAlias, dotViewModel);
+end;
+
+class function TioDependencyInjection.RegisterViewModel<TViewModelClass, TImplements>(const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByIID(TioUtilities.ClassRefToRttiType(TViewModelClass), TioUtilities.TypeInfoToGUID(TypeInfo(TImplements)), AAlias, dotViewModel);
+end;
+
+class function TioDependencyInjection.RegisterViewModel<TViewModelClass>(const AImplementsIID: TGUID; const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByIID(TioUtilities.ClassRefToRttiType(TViewModelClass), AImplementsIID, AAlias, dotViewModel);
+end;
+
+class function TioDependencyInjection.RegisterViewModel<TViewModelClass>(const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByClass(TioUtilities.ClassRefToRttiType(TViewModelClass), AAlias, dotViewModel);
+end;
+
+class function TioDependencyInjection.RegisterViewModelFor(const AViewModelRttiType: TRttiInstanceType; const ATargetTypeName, AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByTargetTypeName(AViewModelRttiType, ATargetTypeName, AAlias, dotViewModel);
+end;
+
+class function TioDependencyInjection.RegisterViewModelFor(const AViewModelRttiType: TRttiInstanceType; const ATargetIID: TGUID;
+  const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByTargetTypeName(AViewModelRttiType, TioUtilities.GUIDtoInterfaceName(ATargetIID), AAlias, dotViewModel);
+end;
+
+class function TioDependencyInjection.RegisterViewModelFor(const AViewModelRttiType: TRttiInstanceType; const ATargetClassRef: TioClassRef;
+  const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByTargetTypeName(AViewModelRttiType, ATargetClassRef.ClassName, AAlias, dotViewModel);
+end;
+
+class function TioDependencyInjection.RegisterViewModelFor<TViewModelClass, TTargetType>(const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByTargetTypeName(TioUtilities.ClassRefToRttiType(TViewModelClass), TioUtilities.GenericToString<TTargetType>, AAlias, dotViewModel);
+end;
+
+class function TioDependencyInjection.RegisterViewModelFor<TViewModelClass>(const ATargetIID: TGUID; const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByTargetTypeName(TioUtilities.ClassRefToRttiType(TViewModelClass), TioUtilities.GUIDtoInterfaceName(ATargetIID), AAlias, dotViewModel);
+end;
+
+class function TioDependencyInjection.RegisterViewModelFor<TViewModelClass>(const ATargetClassRef: TioClassRef; const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByTargetTypeName(TioUtilities.ClassRefToRttiType(TViewModelClass), ATargetClassRef.ClassName, AAlias, dotViewModel);
+end;
+
+class function TioDependencyInjection.RegisterViewModelFor<TViewModelClass>(const ATargetTypeName, AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByTargetTypeName(TioUtilities.ClassRefToRttiType(TViewModelClass), ATargetTypeName, AAlias, dotViewModel);
+end;
+
+class function TioDependencyInjection.RegisterViewFor<TViewClass>(const ATargetClassRef: TioClassRef; const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByTargetTypeName(TioUtilities.ClassRefToRttiType(TViewClass), ATargetClassRef.ClassName, AAlias, dotView);
+end;
+
+class function TioDependencyInjection.RegisterViewFor<TViewClass>(const ATargetTypeName, AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByTargetTypeName(TioUtilities.ClassRefToRttiType(TViewClass), ATargetTypeName, AAlias, dotView);
+end;
+
+class function TioDependencyInjection.RegisterView(const AViewRttiType: TRttiInstanceType; const AImplementsIID: TGUID;
+  const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByIID(AViewRttiType, AImplementsIID, AAlias, dotView);
+end;
+
+class function TioDependencyInjection.RegisterView<TViewClass, TImplements>(const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByIID(TioUtilities.ClassRefToRttiType(TViewClass), TioUtilities.TypeInfoToGUID(TypeInfo(TImplements)), AAlias, dotView);
+end;
+
+class function TioDependencyInjection.RegisterView<TViewClass>(const AImplementsIID: TGUID; const AAlias: String): TioDIRegister;
+begin
+  Result := TioDIRegister.CreateByIID(TioUtilities.ClassRefToRttiType(TViewClass), AImplementsIID, AAlias, dotView);
 end;
 
 { TioDIContainerImplementers }
