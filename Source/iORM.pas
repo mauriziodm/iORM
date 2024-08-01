@@ -2451,8 +2451,7 @@ TioDIContainer.Build;
 // NB: L'ho messo qui perchè altrimenti nella unit dove è dichiarata la classe non
 // venive eseguito
 // NB:  Evita un AV error probabilmente causato dal fatto che i vari containers della parte ORM non sono ancora a posto
-// TODO: 30/07/2024 COMMENTATO TEMPORANEAMENTE
-//io.di.RegisterClass<TioDuckTypedStreamObject>.Implements<IioDuckTypedStreamObject>.DisableMapImplemetersRef.Execute;
+io.di.RegisterClass<TioDuckTypedStreamObject, IioDuckTypedStreamObject>;
 
 // Create the ContextContainer Instance and Init it by loading
 // all entities declarated in the application

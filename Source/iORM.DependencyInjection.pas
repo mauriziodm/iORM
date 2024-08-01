@@ -170,7 +170,7 @@ type
     function Exist: Boolean; virtual;
     function Get: TObject; virtual;
     function GetAs<TResult>: TResult;
-    // TODO: 31/07/2024 - Verificare se serve ancora e se va pesso anche qui un try-finally
+    // TODO: 31/07/2024 - Verificare se serve ancora e se va messo anche qui un try-finally
     function GetItem: TioDIContainerImplementersItem;
     function Show: TComponent; virtual;
     function SingletonKey(const ASingletonKey: String): TioDILocator; virtual;
@@ -1359,7 +1359,6 @@ end;
 function TioDILocator._Get(const AContainerItem: TioDIContainerImplementersItem): TObject;
 var
   LValue: TValue;
-  LConstructorParams: array of TValue;
   procedure NestedSetParentCloseQueryActionToViewModel;
   begin
     // Non uso l'interfaccia IioViewModel perchè mi dava dei problemi con il RefCount
@@ -1390,7 +1389,7 @@ begin
   try
     // EmptyOwner is True then add a nil as parameter for the constructor
     // (used for Views and ViewModels and for object owned by someone)
-    if FOwnerRequested then
+    if FOwnerRequested and (Length(FConstructorParams) = 0) then
     begin
       // If the use of the ViewContextProvider is enabled (Locating a View)
       //  then try to retrieve and set the ViewContext for the View.
@@ -1417,7 +1416,7 @@ begin
         TValue.Make(@FViewContext, FViewContext.ClassInfo, LValue)
       else
         LValue := TValue.Empty;
-      LConstructorParams := [LValue];
+      FConstructorParams := [LValue];
     end;
     // If it is a singleton then get the Instance (if exists)...
     if AContainerItem.IsSingleton and TioSingletonsContainer.TryGet(FSingletonKey, FInterfaceName, FAlias, Result) then
@@ -1428,8 +1427,7 @@ begin
     begin
       // Object creation
       // Result := TioObjectMaker.CreateObjectByClassRefEx(AContainerItem.ClassRef, FConstructorParams, FConstructorMarker, FConstructorMethod, AContainerItem);
-      // TODO: 31/07/2024 - per i parametri del costruttore viene passato solo LCOnstructorParams che contiene l'eventuale Owner per le viste ma credo che vengano ignorati eventuali parametri presenti nel Locator
-      Result := TioObjectMaker.CreateObjectByRttiTypeEx(AContainerItem.RttiType, LConstructorParams, AContainerItem);
+      Result := TioObjectMaker.CreateObjectByRttiTypeEx(AContainerItem.RttiType, FConstructorParams, AContainerItem);
       // Se stiamo creando un ViewModel oppure una SimpleView...
       if FInterfaceName.StartsWith(DI_VIEWMODEL_KEY_PREFIX) or FInterfaceName.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX) then
       begin
