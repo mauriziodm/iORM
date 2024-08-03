@@ -306,7 +306,7 @@ begin
       AActiveBindSourceAdapter.LazyProps, AActiveBindSourceAdapter.ioWhere, AActiveBindSourceAdapter.DataObject, LTerminateMethod);
   end
   else
-    // If, on the other hand, the pagination is not progressive then it performs a normal Refresh(True)
+    // If, on the other hand, the pagination is not progressive then it performs a normal Reload
     // which in practice causes a normal loading in a new list which is then set as a new DataObject
     Reload(AActiveBindSourceAdapter);
 end;

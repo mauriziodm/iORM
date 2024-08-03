@@ -116,7 +116,7 @@ type
   strict private
     FCurrentPage: Integer;
     FCurrentPageOfFormat: String;
-    [djSkip] // Mauri 15/08/2023 (fix issue winth paging when using http connection): to avoid djson serialization error
+    [djSkip] // Mauri 15/08/2023 (fix issue with paging when using http connection): to avoid djson serialization error
     FLoadPageMethod: TioBSAPagingLoadMethod;
     FNextPageStartOffset: Integer;
     FPageCount: Integer;

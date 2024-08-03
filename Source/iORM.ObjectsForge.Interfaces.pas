@@ -203,9 +203,12 @@ begin
       TioDIPresenterSettingsType.pstWhere:
         begin
           LIntf := LPresenterSettings[I].InterfacedObj;
-          if not Supports(LIntf, IioWhere, LWhere) then
-            raise EioGenericException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', 'Interface "IioWhere" not implemented by object.');
-          LTargetBS.SetWhere(LWhere);
+          if Assigned(LIntf) then
+          begin
+            if not Supports(LIntf, IioWhere, LWhere) then
+              raise EioGenericException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', 'Interface "IioWhere" not implemented by object.');
+            LTargetBS.SetWhere(LWhere);
+          end;
         end;
       // SelectorFor
       TioDIPresenterSettingsType.pstSelectorFor:

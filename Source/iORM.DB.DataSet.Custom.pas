@@ -617,16 +617,16 @@ begin
   // If the adapter exists the return the property of the adapter
   // else return the Self.FWhere
   if CheckAdapter then
+    Result := GetActiveBindSourceAdapter.ioWhere
+  else
   begin
-    Result := GetActiveBindSourceAdapter.ioWhere;
-    Exit;
+    // if not already assigned then create it (così lo crea solo se serve
+    // davvero altrimenti no)
+    if not Assigned(FWhere) then
+      FWhere := TioWhereFactory.NewWhereWithPagingAndETMfor(FPaging, FETMfor);
+    // Return the Where instance
+    Result := FWhere;
   end;
-  // if not already assigned then create it (così lo crea solo se serve
-  // davvero altrimenti no)
-  if not Assigned(FWhere) then
-    FWhere := TioWhereFactory.NewWhereWithPagingAndETMfor(FPaging, FETMfor);
-  // Return the Where instance
-  Result := FWhere;
 end;
 
 procedure TioDataSetCustom.InitAsDefaultOnCreate;

@@ -211,7 +211,7 @@ var
       begin
         LFarAncestorClass := TioUtilities.GetFarAncestorEntityWithSameTableAndConnection(LMap.RttiType);
         io.di._RegisterClassAsInheritedFrom(LCurrentRttiType, DI_ENTITY_AUTOREGISTER_SUBKEY_PREFIX + LMap.RttiType.Name).AsEntity.
-        _SetFarAncestorClassSameInterfaceAndTableAndConnection(LFarAncestorClass.Name);
+        _SetFarAncestorClassSameInterfaceAndTableAndConnection(LFarAncestorClass.Name).Execute;
       end;
       LCurrentRttiType := LCurrentRttiType.BaseType;
     end;
@@ -444,7 +444,7 @@ var
     if LIsAnEntity then
     begin
       LFarAncestorClass := TioUtilities.GetFarAncestorEntityWithSameTableAndConnection(ACurrentRttiInstanceType);
-      io.di.RegisterClass(ACurrentRttiInstanceType)._SetFarAncestorClassSameInterfaceAndTableAndConnection(LFarAncestorClass.Name).AsEntity;
+      io.di.RegisterClass(ACurrentRttiInstanceType)._SetFarAncestorClassSameInterfaceAndTableAndConnection(LFarAncestorClass.Name).AsEntity.Execute;
     end;
     // Dependency Injection Container - Auto register the class for the resolver (persistence only) to use for load, persist, delete only
     if LIsAnEntity and LdiRegisterAsInterfacedEntity then
@@ -457,25 +457,25 @@ var
         begin
           LFarAncestorClass := TioUtilities.GetFarAncestorEntityImplementingInterfaceSameTableAndConnection(ACurrentRttiInstanceType, LdiImplementedInterfaces[Index].GUID);
           io.di.RegisterClass(ACurrentRttiInstanceType, LdiImplementedInterfaces[Index].GUID, DI_ENTITY_AUTOREGISTER_SUBKEY_PREFIX + ACurrentRttiInstanceType.Name).
-          _SetFarAncestorClassSameInterfaceAndTableAndConnection(LFarAncestorClass.Name).AsEntity;
+          _SetFarAncestorClassSameInterfaceAndTableAndConnection(LFarAncestorClass.Name).AsEntity.Execute;
         end;
     end;
     // Dependency Injection Container - Register the class as is without any interface
     if LdiRegister then
-      io.di.RegisterClass(ACurrentRttiInstanceType).AsSingleton(LdiAsSingleton);
+      io.di.RegisterClass(ACurrentRttiInstanceType).AsSingleton(LdiAsSingleton).Execute;
     // Dependency Injection Container - Register the class as implenter of the interfaces
     if Length(LdiImplements) > 0 then
       for Index := Low(LdiImplements) to High(LdiImplements) do
       begin
         case LdiImplements[Index].ItemType of
           vvmitSimpleView:
-            io.di.RegisterSimpleView(ACurrentRttiInstanceType, LdiImplements[Index].IID, LdiImplements[Index].Alias).AsSingleton(LdiAsSingleton);
+            io.di.RegisterSimpleView(ACurrentRttiInstanceType, LdiImplements[Index].IID, LdiImplements[Index].Alias).AsSingleton(LdiAsSingleton).Execute;
           vvmitView:
-            io.di.RegisterView(ACurrentRttiInstanceType, LdiImplements[Index].IID, LdiImplements[Index].Alias).AsSingleton(LdiAsSingleton);
+            io.di.RegisterView(ACurrentRttiInstanceType, LdiImplements[Index].IID, LdiImplements[Index].Alias).AsSingleton(LdiAsSingleton).Execute;
           vvmitViewModel:
-            io.di.RegisterViewModel(ACurrentRttiInstanceType, LdiImplements[Index].IID, LdiImplements[Index].Alias).AsSingleton(LdiAsSingleton);
+            io.di.RegisterViewModel(ACurrentRttiInstanceType, LdiImplements[Index].IID, LdiImplements[Index].Alias).AsSingleton(LdiAsSingleton).Execute;
         else
-          io.di.RegisterClass(ACurrentRttiInstanceType, LdiImplements[Index].IID, LdiImplements[Index].Alias).AsSingleton(LdiAsSingleton);
+          io.di.RegisterClass(ACurrentRttiInstanceType, LdiImplements[Index].IID, LdiImplements[Index].Alias).AsSingleton(LdiAsSingleton).Execute;
         end;
      end;
     // Dependency Injection Container - Register the class as View or ViewModel for some other classes
@@ -484,11 +484,11 @@ var
       begin
         case LdiVVMforItems[Index].ItemType of
           vvmitSimpleView:
-            io.di.RegisterSimpleViewFor(ACurrentRttiInstanceType, LdiVVMforItems[Index].Target, LdiVVMforItems[Index].Alias).AsSingleton(LdiAsSingleton);
+            io.di.RegisterSimpleViewFor(ACurrentRttiInstanceType, LdiVVMforItems[Index].Target, LdiVVMforItems[Index].Alias).AsSingleton(LdiAsSingleton).Execute;
           vvmitView:
-            io.di.RegisterViewFor(ACurrentRttiInstanceType, LdiVVMforItems[Index].Target, LdiVVMforItems[Index].Alias).AsSingleton(LdiAsSingleton);
+            io.di.RegisterViewFor(ACurrentRttiInstanceType, LdiVVMforItems[Index].Target, LdiVVMforItems[Index].Alias).AsSingleton(LdiAsSingleton).Execute;
           vvmitViewModel:
-            io.di.RegisterViewModelFor(ACurrentRttiInstanceType, LdiVVMforItems[Index].Target, LdiVVMforItems[Index].Alias).AsSingleton(LdiAsSingleton);
+            io.di.RegisterViewModelFor(ACurrentRttiInstanceType, LdiVVMforItems[Index].Target, LdiVVMforItems[Index].Alias).AsSingleton(LdiAsSingleton).Execute;
         end;
       end;
   end;
