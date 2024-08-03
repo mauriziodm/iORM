@@ -193,7 +193,7 @@ begin
   if AContext.IsTrueClass then
   begin
     LOriginalClassName := AContext.OriginalNonTrueClassMap.GetClassName;
-    LFarAncestorClassName := io.di.Locate(AContext.OriginalNonTrueClassMap.GetClassName).GetItem.FarAncestorClazzSameInterfaceAndTableAndConnection;
+    LFarAncestorClassName := io.di.Locate(AContext.OriginalNonTrueClassMap.GetClassName).GetImplementersItem.FarAncestorClazzSameInterfaceAndTableAndConnection;
     if TioUtilities.IsAnInterfaceTypeName(AContext.Where.TypeName) or (LOriginalClassName = LFarAncestorClassName) then
       ParamByName_SetValue(AContext.GetTrueClass.GetSqlParamName, '%' + LOriginalClassName + '%')
     else

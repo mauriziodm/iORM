@@ -36,7 +36,7 @@ unit iORM.CommonTypes;
 interface
 
 uses
-  System.SysUtils, DJSON.Params;
+  System.SysUtils, DJSON.Params, System.Rtti;
 
 const
   // M.M. 11/08/18 Default length to 50 if no attribute is specified because Firebird has a length limit on index generation for columns of length 255.
@@ -83,6 +83,9 @@ const
 
 type
 
+  // Pointer to TValue
+  PValue = ^TValue;
+
   // Dependency injenction factory method types
   TFactoryMethod = reference to function: TObject;
   TFactoryMethod<T1> = reference to function(Arg1: T1): TObject;
@@ -91,6 +94,9 @@ type
   TFactoryMethod<T1, T2, T3, T4> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3; Arg4: T4): TObject;
   TFactoryMethod<T1, T2, T3, T4, T5> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3; Arg4: T4; Arg5: T5): TObject;
   TFactoryMethod<T1, T2, T3, T4, T5, T6> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3; Arg4: T4; Arg5: T5; Arg6: T6): TObject;
+  TFactoryMethod<T1, T2, T3, T4, T5, T6, T7> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3; Arg4: T4; Arg5: T5; Arg6: T6; Arg7: T7): TObject;
+  TFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3; Arg4: T4; Arg5: T5; Arg6: T6; Arg7: T7; Arg8: T8): TObject;
+  TFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3; Arg4: T4; Arg5: T5; Arg6: T6; Arg7: T7; Arg8: T8; Arg9: T9): TObject;
 
   // SkipScope (vedi anche sopra (const) i valori)
   TioSkipScope = DJSON.Params.TdjSkipScope;

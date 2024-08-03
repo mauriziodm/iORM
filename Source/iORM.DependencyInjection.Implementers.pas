@@ -53,6 +53,7 @@ type
   PioDIPresenterSettingsContainer = ^TioDIPresenterSettingsContainer;
 
   // Dependency Injection Container Implementers Item (SubContainer value)
+  TioDIContainerImplementersItemCreationMode = (cmByObjectForge, cmByFactoryMethod);
   TioDIContainerImplementersItem = class
   private
     FClazzRef: TioClassRef;
@@ -66,13 +67,18 @@ type
     FIsEntity: Boolean;
     FIsSingleton: Boolean;
     // TValue che contiene l'eventuale factory method per la creazione dell'istanza
-//    FactoryMethod: TValue;
+    FFactoryMethod: TValue;
+    function GetCreationMode: TioDIContainerImplementersItemCreationMode;
+    function GetFactoryMethodPointer: PValue;
   public
     constructor Create(const AClassRttiType: TRttiInstanceType; const AImplementsIID: TGUID);
+    function CreateInstanceByFactoryMethodIfNotAlreadyDone(const AAlreadyCreatedInstance: TObject): TObject;
     property ClazzRef: TioClassRef read FClazzRef;
     property ClazzName: String read FClazzName;
+    property CreationMode: TioDIContainerImplementersItemCreationMode read GetCreationMode;
     property RttiType: TRttiInstanceType read FRttiType;
     property InterfaceGUID: TGUID read FInterfaceGUID;
+    property FactoryMethodPointer: PValue read GetFactoryMethodPointer;
     property FarAncestorClazzSameInterfaceAndTableAndConnection: String read FFarAncestorClazzSameInterfaceAndTableAndConnection write FFarAncestorClazzSameInterfaceAndTableAndConnection;
     property IsEntity: Boolean read FIsEntity write FIsEntity;
     property IsSingleton: Boolean read FIsSingleton write FIsSingleton;
@@ -94,6 +100,34 @@ begin
   FIsSingleton := False;
   FIsEntity := False;
   FFarAncestorClazzSameInterfaceAndTableAndConnection := String.Empty;
+end;
+
+function TioDIContainerImplementersItem.GetCreationMode: TioDIContainerImplementersItemCreationMode;
+begin
+  if FFactoryMethod.IsEmpty then
+    Result := cmByObjectForge
+  else
+    Result := cmByFactoryMethod;
+end;
+
+function TioDIContainerImplementersItem.GetFactoryMethodPointer: PValue;
+begin
+  Result := @FFactoryMethod;
+end;
+
+function TioDIContainerImplementersItem.CreateInstanceByFactoryMethodIfNotAlreadyDone(const AAlreadyCreatedInstance: TObject): TObject;
+begin
+  // Se è stato impostato un FactoryMethod allora l'istanza viene creata alla chiamata del metodo
+  //  "FactoryMethod<T1, T2, TX>" quindi prima della chiamata finale ai metodi Get/Show/ShowCurrent/ShowEach;
+  //  in questo caso l'istanza viene parcheggiata nel campo privato "FAlreadyCreatedInstance" del locator
+  //  e infine utilizzato dal metodo "_InternalGet", se però il FactoryMethod è senza parametri allora
+  //  la creazione avviene alla chiamata sempre del metodo "_InternalGet" perchè non dovendo passare
+  //  parametro non ci sarà nessuna chiamata al metodo "FactoryMethod" che senza parametri infatti
+  //  non esiste perchè sarebbe inutile.
+  if (CreationMode = cmByFactoryMethod) and not Assigned(AAlreadyCreatedInstance) then
+    Result := FFactoryMethod.Cast<TFactoryMethod>.AsType<TFactoryMethod>()()
+  else
+    Result := AAlreadyCreatedInstance;
 end;
 
 end.

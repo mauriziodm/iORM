@@ -131,7 +131,19 @@ type
     function _SetFarAncestorClassSameInterfaceAndTableAndConnection(const AValue: String): TioDIRegister;
     function AsEntity: TioDIRegister;
     function AsSingleton(const AIsSingleton: Boolean = True): TioDIRegister;
+    // Remember the 'Execute' at the end
     procedure Execute;
+    // Factory method
+    function FactoryMethod(const AFactoryMethod: TFActoryMethod): TioDIRegister; overload;
+    function FactoryMethod<T1>(const AFactoryMethod: TFActoryMethod<T1>): TioDIRegister; overload;
+    function FactoryMethod<T1, T2>(const AFactoryMethod: TFActoryMethod<T1, T2>): TioDIRegister; overload;
+    function FactoryMethod<T1, T2, T3>(const AFactoryMethod: TFActoryMethod<T1, T2, T3>): TioDIRegister; overload;
+    function FactoryMethod<T1, T2, T3, T4>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4>): TioDIRegister; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5>): TioDIRegister; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5, T6>): TioDIRegister; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5, T6, T7>): TioDIRegister; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>): TioDIRegister; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>): TioDIRegister; overload;
   end;
   // ===========================================================================
 
@@ -140,6 +152,7 @@ type
   // ---------------------------------------------------------------------------
   TioDILocator = class(TioDIBase)
   strict private
+    FImplementersItem: TioDIContainerImplementersItem;
     FInterfaceName: String;
     FAlias: String;
     FConstructorParams: TioConstructorParams;
@@ -157,22 +170,31 @@ type
     FForEachModelPresenter: IioBindSource;
     FForEachLocateViewModel: Boolean;
     // ---------- FOR SHOW EACH FUNCTIONALITY ----------
+    // ---------- FACTORY METHOD ----------
+    // Se è stato impostato un FactoryMethod allora l'istanza viene creata alla chiamata del metodo
+    //  "FactoryMethod<T1, T2, TX>" quindi prima della chiamata finale ai metodi Get/Show/ShowCurrent/ShowEach;
+    //  in questo caso l'istanza viene parcheggiata nel campo privato "FAlreadyCreatedInstance" del locator
+    //  e infine utilizzato dal metodo "_InternalGet", se però il FactoryMethod è senza parametri allora
+    //  la creazione avviene alla chiamata sempre del metodo "_InternalGet" perchè non dovendo passare
+    //  parametro non ci sarà nessuna chiamata al metodo "FactoryMethod" che senza parametri infatti
+    //  non esiste perchè sarebbe inutile.
+    FAlreadyCreatedInstance: TObject;
+    // ---------- FACTORY METHOD ----------
     procedure ClearPresenterSettings;
     function PresenterSettingsExists: Boolean;
     function ViewModelExist: Boolean;
     function ExtractVMFromView(const AView: TComponent): IioViewModelInternal;
   strict protected
     function _ShowCurrent: TComponent;
-    function _Get(const AContainerItem: TioDIContainerImplementersItem): TObject;
-    property _InterfaceName: String read FInterfaceName;
-    property _Alias: String read FAlias;
+    function _InternalGet: TObject;
+    property _ImplementersItem: TioDIContainerImplementersItem read FImplementersItem;
   public
     constructor Create(const AInterfaceName: String; const AAlias: String; const AOwnerRequested, AVCProviderEnabled: Boolean); virtual;
     function Exist: Boolean; virtual;
     function Get: TObject; virtual;
     function GetAs<TResult>: TResult;
     // TODO: 31/07/2024 - Verificare se serve ancora e se va messo anche qui un try-finally
-    function GetItem: TioDIContainerImplementersItem;
+    function GetImplementersItem: TioDIContainerImplementersItem;
     function Show: TComponent; virtual;
     function SingletonKey(const ASingletonKey: String): TioDILocator; virtual;
     // ---------- CONSTRUCTOR PARAMS ----------
@@ -183,7 +205,13 @@ type
     function ConstructorParams<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDILocator; overload;
     function ConstructorParams<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDILocator; overload;
     function ConstructorParams<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDILocator; overload;
+    function ConstructorParams<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDILocator; overload;
+    function ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8): TioDILocator; overload;
+    function ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8; AArg9: T9): TioDILocator; overload;
     // ---------- CONSTRUCTOR PARAMS ----------
+    // ---------- FACTORY METHOD ----------
+    function FactoryMethod<T1>(AArg1: T1): TioDILocator; //overload;
+    // ---------- FACTORY METHOD ----------
     // ---------- FOR SHOW EACH FUNCTIONALITY ----------
     function ShowCurrent: TComponent;
     procedure ShowEach;
@@ -809,6 +837,66 @@ begin
   Free;
 end;
 
+function TioDIRegister.FactoryMethod(const AFactoryMethod: TFActoryMethod): TioDIRegister;
+begin
+  TValue.Make(@AFactoryMethod, TypeInfo(TFactoryMethod), FImpementersItem.FactoryMethodPointer^);
+  Result := Self;
+end;
+
+function TioDIRegister.FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>): TioDIRegister;
+begin
+  TValue.Make(@AFactoryMethod, TypeInfo(TFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>), FImpementersItem.FactoryMethodPointer^);
+  Result := Self;
+end;
+
+function TioDIRegister.FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>): TioDIRegister;
+begin
+  TValue.Make(@AFactoryMethod, TypeInfo(TFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>), FImpementersItem.FactoryMethodPointer^);
+  Result := Self;
+end;
+
+function TioDIRegister.FactoryMethod<T1, T2, T3, T4, T5, T6, T7>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5, T6, T7>): TioDIRegister;
+begin
+  TValue.Make(@AFactoryMethod, TypeInfo(TFactoryMethod<T1, T2, T3, T4, T5, T6, T7>), FImpementersItem.FactoryMethodPointer^);
+  Result := Self;
+end;
+
+function TioDIRegister.FactoryMethod<T1, T2, T3, T4, T5, T6>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5, T6>): TioDIRegister;
+begin
+  TValue.Make(@AFactoryMethod, TypeInfo(TFactoryMethod<T1, T2, T3, T4, T5, T6>), FImpementersItem.FactoryMethodPointer^);
+  Result := Self;
+end;
+
+function TioDIRegister.FactoryMethod<T1, T2, T3, T4, T5>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5>): TioDIRegister;
+begin
+  TValue.Make(@AFactoryMethod, TypeInfo(TFactoryMethod<T1, T2, T3, T4, T5>), FImpementersItem.FactoryMethodPointer^);
+  Result := Self;
+end;
+
+function TioDIRegister.FactoryMethod<T1, T2, T3, T4>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4>): TioDIRegister;
+begin
+  TValue.Make(@AFactoryMethod, TypeInfo(TFactoryMethod<T1, T2, T3, T4>), FImpementersItem.FactoryMethodPointer^);
+  Result := Self;
+end;
+
+function TioDIRegister.FactoryMethod<T1, T2, T3>(const AFactoryMethod: TFActoryMethod<T1, T2, T3>): TioDIRegister;
+begin
+  TValue.Make(@AFactoryMethod, TypeInfo(TFactoryMethod<T1, T2, T3>), FImpementersItem.FactoryMethodPointer^);
+  Result := Self;
+end;
+
+function TioDIRegister.FactoryMethod<T1, T2>(const AFactoryMethod: TFActoryMethod<T1, T2>): TioDIRegister;
+begin
+  TValue.Make(@AFactoryMethod, TypeInfo(TFactoryMethod<T1, T2>), FImpementersItem.FactoryMethodPointer^);
+  Result := Self;
+end;
+
+function TioDIRegister.FactoryMethod<T1>(const AFactoryMethod: TFActoryMethod<T1>): TioDIRegister;
+begin
+  TValue.Make(@AFactoryMethod, TypeInfo(TFactoryMethod<T1>), FImpementersItem.FactoryMethodPointer^);
+  Result := Self;
+end;
+
 function TioDIRegister._SetFarAncestorClassSameInterfaceAndTableAndConnection(const AValue: String): TioDIRegister;
 begin
   FImpementersItem.FarAncestorClazzSameInterfaceAndTableAndConnection := AValue;
@@ -986,6 +1074,50 @@ begin
   SetLength(FPresenterSettings, 0);
 end;
 
+function TioDILocator.ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7;
+  AArg8: T8; AArg9: T9): TioDILocator;
+begin
+  SetLength(FConstructorParams, 9);
+  TValue.Make(@AArg1, TypeInfo(T1), FConstructorParams[0]);
+  TValue.Make(@AArg2, TypeInfo(T2), FConstructorParams[1]);
+  TValue.Make(@AArg3, TypeInfo(T3), FConstructorParams[2]);
+  TValue.Make(@AArg4, TypeInfo(T4), FConstructorParams[3]);
+  TValue.Make(@AArg5, TypeInfo(T5), FConstructorParams[4]);
+  TValue.Make(@AArg6, TypeInfo(T6), FConstructorParams[5]);
+  TValue.Make(@AArg6, TypeInfo(T6), FConstructorParams[6]);
+  TValue.Make(@AArg6, TypeInfo(T6), FConstructorParams[7]);
+  TValue.Make(@AArg6, TypeInfo(T6), FConstructorParams[8]);
+  Result := Self;
+end;
+
+function TioDILocator.ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7;
+  AArg8: T8): TioDILocator;
+begin
+  SetLength(FConstructorParams, 8);
+  TValue.Make(@AArg1, TypeInfo(T1), FConstructorParams[0]);
+  TValue.Make(@AArg2, TypeInfo(T2), FConstructorParams[1]);
+  TValue.Make(@AArg3, TypeInfo(T3), FConstructorParams[2]);
+  TValue.Make(@AArg4, TypeInfo(T4), FConstructorParams[3]);
+  TValue.Make(@AArg5, TypeInfo(T5), FConstructorParams[4]);
+  TValue.Make(@AArg6, TypeInfo(T6), FConstructorParams[5]);
+  TValue.Make(@AArg6, TypeInfo(T6), FConstructorParams[6]);
+  TValue.Make(@AArg6, TypeInfo(T6), FConstructorParams[7]);
+  Result := Self;
+end;
+
+function TioDILocator.ConstructorParams<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDILocator;
+begin
+  SetLength(FConstructorParams, 7);
+  TValue.Make(@AArg1, TypeInfo(T1), FConstructorParams[0]);
+  TValue.Make(@AArg2, TypeInfo(T2), FConstructorParams[1]);
+  TValue.Make(@AArg3, TypeInfo(T3), FConstructorParams[2]);
+  TValue.Make(@AArg4, TypeInfo(T4), FConstructorParams[3]);
+  TValue.Make(@AArg5, TypeInfo(T5), FConstructorParams[4]);
+  TValue.Make(@AArg6, TypeInfo(T6), FConstructorParams[5]);
+  TValue.Make(@AArg6, TypeInfo(T6), FConstructorParams[6]);
+  Result := Self;
+end;
+
 function TioDILocator.ConstructorParams<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDILocator;
 begin
   SetLength(FConstructorParams, 6);
@@ -1070,6 +1202,9 @@ begin
   FOwnerRequested := AOwnerRequested;
   FSingletonKey := '';
   FActionParentCloseQuery := nil;
+  FAlreadyCreatedInstance := nil;
+  // Load implementers item immediatly
+  FImplementersItem := Container.Get(AInterfaceName, AAlias);
 end;
 
 function TioDILocator.Exist: Boolean;
@@ -1091,13 +1226,17 @@ begin
     Result := LVMBridge.ViewModel as IioViewModelInternal;
 end;
 
+function TioDILocator.FactoryMethod<T1>(AArg1: T1): TioDILocator;
+begin
+  FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
+    .Cast<TFactoryMethod<T1>>
+    .AsType<TFactoryMethod<T1>>()(AArg1);
+end;
+
 function TioDILocator.Get: TObject;
-var
-  LContainerItem: TioDIContainerImplementersItem;
 begin
   try
-    LContainerItem := Container.Get(_InterfaceName, _Alias);
-    Result := _Get(LContainerItem);
+    Result := _InternalGet;
   finally
     Free;
   end;
@@ -1105,22 +1244,20 @@ end;
 
 function TioDILocator.GetAs<TResult>: TResult;
 var
-  LContainerItem: TioDIContainerImplementersItem;
   LObj: TObject;
 begin
   try
-    LContainerItem := Container.Get(_InterfaceName, _Alias);
-    LObj := _Get(LContainerItem);
+    LObj := _InternalGet;
     Result := TioUtilities.CastObjectToGeneric<TResult>(LObj);
   finally
     Free;
   end;
 end;
 
-function TioDILocator.GetItem: TioDIContainerImplementersItem;
+function TioDILocator.GetImplementersItem: TioDIContainerImplementersItem;
 begin
   try
-    Result := Container.Get(FInterfaceName, FAlias);
+    Result := FImplementersItem;
   finally
     Free;
   end;
@@ -1288,12 +1425,9 @@ begin
 end;
 
 function TioDILocator.Show: TComponent;
-var
-  LContainerItem: TioDIContainerImplementersItem;
 begin
   try
-    LContainerItem := Container.Get(_InterfaceName, _Alias);
-    Result := _Get(LContainerItem) as TComponent;
+    Result := _InternalGet as TComponent;
   finally
     Free;
   end;
@@ -1353,7 +1487,7 @@ begin
   FActionParentCloseQuery := ASourceLocator._GetParentCloseQueryAction;
 end;
 
-function TioDILocator._Get(const AContainerItem: TioDIContainerImplementersItem): TObject;
+function TioDILocator._InternalGet: TObject;
 var
   LValue: TValue;
   procedure NestedSetParentCloseQueryActionToViewModel;
@@ -1401,7 +1535,7 @@ begin
       //      Free (non distruggendo il ViewContext come nel caso di MVVM) e ci sarebbero problemi
       //      poi alla distruzione del ViewContext perchè poi cercherebbe di distruggere tutti
       //      i componenti owned e tra questi anche la vista che però è già distrutta.
-      if FVCProviderEnabled and (not Assigned(FViewContext)) and AContainerItem.RttiType.MetaclassType.InheritsFrom(TComponent) then
+      if FVCProviderEnabled and (not Assigned(FViewContext)) and FImplementersItem.RttiType.MetaclassType.InheritsFrom(TComponent) then
       begin
         if not Assigned(FVCProvider) then
           FVCProvider := TioGlobalVCProviderRegister.GetInstance.DefaultVCProvider;
@@ -1409,22 +1543,36 @@ begin
           FViewContext := FVCProvider.NewViewContext;
       end;
 //      if Assigned(FViewContext) and AContainerItem.RttiType.MetaclassType.InheritsFrom(TComponent) and not FInterfaceName.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX) then
-      if Assigned(FViewContext) and AContainerItem.RttiType.MetaclassType.InheritsFrom(TComponent) then
+      if Assigned(FViewContext) and FImplementersItem.RttiType.MetaclassType.InheritsFrom(TComponent) then
         TValue.Make(@FViewContext, FViewContext.ClassInfo, LValue)
       else
         LValue := TValue.Empty;
       FConstructorParams := [LValue];
     end;
     // If it is a singleton then get the Instance (if exists)...
-    if AContainerItem.IsSingleton and TioSingletonsContainer.TryGet(FSingletonKey, FInterfaceName, FAlias, Result) then
+    if FImplementersItem.IsSingleton and TioSingletonsContainer.TryGet(FSingletonKey, FInterfaceName, FAlias, Result) then
       // Nothing
       // ... else create the object (and add it to the ContainerItem.ObjInstance if
       // it is a new instance of a singleton)
     else
     begin
       // Object creation
-      // Result := TioObjectMaker.CreateObjectByClassRefEx(AContainerItem.ClassRef, FConstructorParams, FConstructorMarker, FConstructorMethod, AContainerItem);
-      Result := TioObjectMaker.CreateObjectByRttiTypeEx(AContainerItem.RttiType, FConstructorParams, AContainerItem);
+      // OLD CODE: Result := TioObjectMaker.CreateObjectByClassRefEx(AContainerItem.ClassRef, FConstructorParams, FConstructorMarker, FConstructorMethod, AContainerItem);
+      case FImplementersItem.CreationMode of
+        // Instanza creata dall'ObjectForge
+        cmByObjectForge:
+          Result := TioObjectMaker.CreateObjectByRttiTypeEx(FImplementersItem.RttiType, FConstructorParams, FImplementersItem);
+        // Istanza creata dal FactoryMethod
+        cmByFactoryMethod:
+          // Se è stato impostato un FactoryMethod allora l'istanza viene creata alla chiamata del metodo
+          //  "FactoryMethod<T1, T2, TX>" quindi prima della chiamata finale ai metodi Get/Show/ShowCurrent/ShowEach;
+          //  in questo caso l'istanza viene parcheggiata nel campo privato "FAlreadyCreatedInstance" del locator
+          //  e infine utilizzato dal metodo "_InternalGet", se però il FactoryMethod è senza parametri allora
+          //  la creazione avviene alla chiamata sempre del metodo "_InternalGet" perchè non dovendo passare
+          //  parametro non ci sarà nessuna chiamata al metodo "FactoryMethod" che senza parametri infatti
+          //  non esiste perchè sarebbe inutile.
+          Result := FImplementersItem.CreateInstanceByFactoryMethodIfNotAlreadyDone(FAlreadyCreatedInstance);
+      end;
       // Se stiamo creando un ViewModel oppure una SimpleView...
       if FInterfaceName.StartsWith(DI_VIEWMODEL_KEY_PREFIX) or FInterfaceName.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX) then
       begin
@@ -1448,7 +1596,7 @@ begin
         end;
       end;
       // If it is a new instance of a singleton then add it to the SingletonsContainer
-      if AContainerItem.IsSingleton then
+      if FImplementersItem.IsSingleton then
         TioSingletonsContainer.Add(FSingletonKey, FInterfaceName, FAlias, Result);
     end;
     // If the use of the ViewContextProvider is enabled (Locating a View)
@@ -1773,12 +1921,9 @@ begin
 end;
 
 function TioDILocator<TI>.Get: TI;
-var
-  LContainerItem: TioDIContainerImplementersItem;
 begin
   try
-    LContainerItem := Container.Get(_InterfaceName, _Alias);
-    Result := TioUtilities.CastObjectToGeneric<TI>(_Get(LContainerItem), LContainerItem.InterfaceGUID);
+    Result := TioUtilities.CastObjectToGeneric<TI>(_InternalGet, _ImplementersItem.InterfaceGUID);
   finally
     Free;
   end;
