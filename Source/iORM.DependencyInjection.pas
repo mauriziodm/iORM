@@ -210,7 +210,15 @@ type
     function ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8; AArg9: T9): TioDILocator; overload;
     // ---------- CONSTRUCTOR PARAMS ----------
     // ---------- FACTORY METHOD ----------
-    function FactoryMethod<T1>(AArg1: T1): TioDILocator; //overload;
+    function FactoryMethod<T1>(AArg1: T1): TioDILocator; overload;
+    function FactoryMethod<T1, T2>(AArg1: T1; AArg2: T2): TioDILocator; overload;
+    function FactoryMethod<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDILocator; overload;
+    function FactoryMethod<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDILocator; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDILocator; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDILocator; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDILocator; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8): TioDILocator; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8; AArg9: T9): TioDILocator; overload;
     // ---------- FACTORY METHOD ----------
     // ---------- FOR SHOW EACH FUNCTIONALITY ----------
     function ShowCurrent: TComponent;
@@ -1224,6 +1232,64 @@ begin
   LVMBridge := TioViewModelBridge.ExtractVMBridge(AView);
   if Assigned(LVMBridge) and LVMBridge.ViewModelIsAssigned then
     Result := LVMBridge.ViewModel as IioViewModelInternal;
+end;
+
+function TioDILocator.FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8;
+  AArg9: T9): TioDILocator;
+begin
+  FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
+    .Cast<TFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>>
+    .AsType<TFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>>()(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7, AArg8, AArg9);
+end;
+
+function TioDILocator.FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7;
+  AArg8: T8): TioDILocator;
+begin
+  FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
+    .Cast<TFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>>
+    .AsType<TFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>>()(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7, AArg8);
+end;
+
+function TioDILocator.FactoryMethod<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDILocator;
+begin
+  FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
+    .Cast<TFactoryMethod<T1, T2, T3, T4, T5, T6, T7>>
+    .AsType<TFactoryMethod<T1, T2, T3, T4, T5, T6, T7>>()(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7);
+end;
+
+function TioDILocator.FactoryMethod<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDILocator;
+begin
+  FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
+    .Cast<TFactoryMethod<T1, T2, T3, T4, T5, T6>>
+    .AsType<TFactoryMethod<T1, T2, T3, T4, T5, T6>>()(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6);
+end;
+
+function TioDILocator.FactoryMethod<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDILocator;
+begin
+  FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
+    .Cast<TFactoryMethod<T1, T2, T3, T4, T5>>
+    .AsType<TFactoryMethod<T1, T2, T3, T4, T5>>()(AArg1, AArg2, AArg3, AArg4, AArg5);
+end;
+
+function TioDILocator.FactoryMethod<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDILocator;
+begin
+  FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
+    .Cast<TFactoryMethod<T1, T2, T3, T4>>
+    .AsType<TFactoryMethod<T1, T2, T3, T4>>()(AArg1, AArg2, AArg3, AArg4);
+end;
+
+function TioDILocator.FactoryMethod<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDILocator;
+begin
+  FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
+    .Cast<TFactoryMethod<T1, T2, T3>>
+    .AsType<TFactoryMethod<T1, T2, T3>>()(AArg1, AArg2, AArg3);
+end;
+
+function TioDILocator.FactoryMethod<T1, T2>(AArg1: T1; AArg2: T2): TioDILocator;
+begin
+  FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
+    .Cast<TFactoryMethod<T1, T2>>
+    .AsType<TFactoryMethod<T1, T2>>()(AArg1, AArg2);
 end;
 
 function TioDILocator.FactoryMethod<T1>(AArg1: T1): TioDILocator;

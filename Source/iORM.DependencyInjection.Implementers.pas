@@ -124,7 +124,7 @@ begin
   //  la creazione avviene alla chiamata sempre del metodo "_InternalGet" perchè non dovendo passare
   //  parametro non ci sarà nessuna chiamata al metodo "FactoryMethod" che senza parametri infatti
   //  non esiste perchè sarebbe inutile.
-  if (CreationMode = cmByFactoryMethod) and not Assigned(AAlreadyCreatedInstance) then
+  if not Assigned(AAlreadyCreatedInstance) then
     Result := FFactoryMethod.Cast<TFactoryMethod>.AsType<TFactoryMethod>()()
   else
     Result := AAlreadyCreatedInstance;
