@@ -185,12 +185,13 @@ type
     function ViewModelExist: Boolean;
     function ExtractVMFromView(const AView: TComponent): IioViewModelInternal;
   strict protected
+    procedure _GetImplementersItemIfNotAlreadyExists; inline;
     function _ShowCurrent: TComponent;
     function _InternalGet: TObject;
     property _ImplementersItem: TioDIContainerImplementersItem read FImplementersItem;
   public
     constructor Create(const AInterfaceName: String; const AAlias: String; const AOwnerRequested, AVCProviderEnabled: Boolean); virtual;
-    function Exist: Boolean; virtual;
+    function Exist: Boolean;
     function Get: TObject; virtual;
     function GetAs<TResult>: TResult;
     // TODO: 31/07/2024 - Verificare se serve ancora e se va messo anche qui un try-finally
@@ -274,7 +275,23 @@ type
     function ConstructorParams<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDILocator<TI>; reintroduce; overload;
     function ConstructorParams<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDILocator<TI>; reintroduce; overload;
     function ConstructorParams<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDILocator<TI>; reintroduce; overload;
+
+    function ConstructorParams<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDILocator<TI>; reintroduce; overload;
+    function ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8): TioDILocator<TI>; reintroduce; overload;
+    function ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8; AArg9: T9): TioDILocator<TI>; reintroduce; overload;
+
     // ---------- CONSTRUCTOR PARAMS ----------
+    // ---------- FACTORY METHOD ----------
+    function FactoryMethod<T1>(AArg1: T1): TioDILocator<TI>; overload;
+    function FactoryMethod<T1, T2>(AArg1: T1; AArg2: T2): TioDILocator<TI>; overload;
+    function FactoryMethod<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDILocator<TI>; overload;
+    function FactoryMethod<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDILocator<TI>; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDILocator<TI>; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDILocator<TI>; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDILocator<TI>; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8): TioDILocator<TI>; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8; AArg9: T9): TioDILocator<TI>; overload;
+    // ---------- FACTORY METHOD ----------
     // ---------- VIEWMODEL METHODS ----------
     function SetViewModel(const AViewModel: IioViewModel; const AMarker: String = ''): TioDILocator<TI>;
     // ---------- VIEWMODEL METHODS ----------
@@ -385,7 +402,7 @@ type
     // ========== LOCATE ==========
     // Locate
     class function Locate(const AInterfaceName: String; const AAlias: String = ''): TioDILocator; overload;
-    class function Locate<T: IInterface>(const AAlias: String = ''): TioDILocator<T>; overload;
+    class function Locate<T>(const AAlias: String = ''): TioDILocator<T>; overload;
     // Locate SimpleView
     class function LocateSimpleView(const AInterfaceName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): TioDILocator; overload;
     class function LocateSimpleView<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): TioDILocator<T>; overload;
@@ -1211,14 +1228,12 @@ begin
   FSingletonKey := '';
   FActionParentCloseQuery := nil;
   FAlreadyCreatedInstance := nil;
-  // Load implementers item immediatly
-  FImplementersItem := Container.Get(AInterfaceName, AAlias);
 end;
 
 function TioDILocator.Exist: Boolean;
 begin
   try
-    Result := Container.Exists(FInterfaceName, Self.FAlias);
+    Result := Container.Exists(FInterfaceName, FAlias);
   finally
     Free;
   end;
@@ -1237,66 +1252,147 @@ end;
 function TioDILocator.FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8;
   AArg9: T9): TioDILocator;
 begin
+  // NB: Carica l'ImplementersItem se questa non è già stata caricata, questo perchè
+  //      da quando c'è il "FactoryMethod" l'ImplementersItem potrebbe essere necessaria
+  //      prima del Get/GetAs<T>/Show/GetItem finale (serve proprio nei metodi "FactoryMethod")
+  //      mentre prima invece serviva solo alla fine, quindi ho creato questo meccanismo.
+  //      Ho provato a crearla anche subito nel costruttore ma poi dava problemi in alcuni casi
+  //      (es: con l'Exists se poi non esistava alcuna ImplementersItem sollevava sempre una eccezione
+  //      perchè faceva subito il get della item sul container (che appunto non c'era)
+  _GetImplementersItemIfNotAlreadyExists;
   FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
     .Cast<TFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>>
     .AsType<TFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>>()(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7, AArg8, AArg9);
+  Result := Self;
 end;
 
 function TioDILocator.FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7;
   AArg8: T8): TioDILocator;
 begin
+  // NB: Carica l'ImplementersItem se questa non è già stata caricata, questo perchè
+  //      da quando c'è il "FactoryMethod" l'ImplementersItem potrebbe essere necessaria
+  //      prima del Get/GetAs<T>/Show/GetItem finale (serve proprio nei metodi "FactoryMethod")
+  //      mentre prima invece serviva solo alla fine, quindi ho creato questo meccanismo.
+  //      Ho provato a crearla anche subito nel costruttore ma poi dava problemi in alcuni casi
+  //      (es: con l'Exists se poi non esistava alcuna ImplementersItem sollevava sempre una eccezione
+  //      perchè faceva subito il get della item sul container (che appunto non c'era)
+  _GetImplementersItemIfNotAlreadyExists;
   FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
     .Cast<TFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>>
     .AsType<TFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>>()(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7, AArg8);
+  Result := Self;
 end;
 
 function TioDILocator.FactoryMethod<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDILocator;
 begin
+  // NB: Carica l'ImplementersItem se questa non è già stata caricata, questo perchè
+  //      da quando c'è il "FactoryMethod" l'ImplementersItem potrebbe essere necessaria
+  //      prima del Get/GetAs<T>/Show/GetItem finale (serve proprio nei metodi "FactoryMethod")
+  //      mentre prima invece serviva solo alla fine, quindi ho creato questo meccanismo.
+  //      Ho provato a crearla anche subito nel costruttore ma poi dava problemi in alcuni casi
+  //      (es: con l'Exists se poi non esistava alcuna ImplementersItem sollevava sempre una eccezione
+  //      perchè faceva subito il get della item sul container (che appunto non c'era)
+  _GetImplementersItemIfNotAlreadyExists;
   FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
     .Cast<TFactoryMethod<T1, T2, T3, T4, T5, T6, T7>>
     .AsType<TFactoryMethod<T1, T2, T3, T4, T5, T6, T7>>()(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7);
+  Result := Self;
 end;
 
 function TioDILocator.FactoryMethod<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDILocator;
 begin
+  // NB: Carica l'ImplementersItem se questa non è già stata caricata, questo perchè
+  //      da quando c'è il "FactoryMethod" l'ImplementersItem potrebbe essere necessaria
+  //      prima del Get/GetAs<T>/Show/GetItem finale (serve proprio nei metodi "FactoryMethod")
+  //      mentre prima invece serviva solo alla fine, quindi ho creato questo meccanismo.
+  //      Ho provato a crearla anche subito nel costruttore ma poi dava problemi in alcuni casi
+  //      (es: con l'Exists se poi non esistava alcuna ImplementersItem sollevava sempre una eccezione
+  //      perchè faceva subito il get della item sul container (che appunto non c'era)
+  _GetImplementersItemIfNotAlreadyExists;
   FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
     .Cast<TFactoryMethod<T1, T2, T3, T4, T5, T6>>
     .AsType<TFactoryMethod<T1, T2, T3, T4, T5, T6>>()(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6);
+  Result := Self;
 end;
 
 function TioDILocator.FactoryMethod<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDILocator;
 begin
+  // NB: Carica l'ImplementersItem se questa non è già stata caricata, questo perchè
+  //      da quando c'è il "FactoryMethod" l'ImplementersItem potrebbe essere necessaria
+  //      prima del Get/GetAs<T>/Show/GetItem finale (serve proprio nei metodi "FactoryMethod")
+  //      mentre prima invece serviva solo alla fine, quindi ho creato questo meccanismo.
+  //      Ho provato a crearla anche subito nel costruttore ma poi dava problemi in alcuni casi
+  //      (es: con l'Exists se poi non esistava alcuna ImplementersItem sollevava sempre una eccezione
+  //      perchè faceva subito il get della item sul container (che appunto non c'era)
+  _GetImplementersItemIfNotAlreadyExists;
   FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
     .Cast<TFactoryMethod<T1, T2, T3, T4, T5>>
     .AsType<TFactoryMethod<T1, T2, T3, T4, T5>>()(AArg1, AArg2, AArg3, AArg4, AArg5);
+  Result := Self;
 end;
 
 function TioDILocator.FactoryMethod<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDILocator;
 begin
+  // NB: Carica l'ImplementersItem se questa non è già stata caricata, questo perchè
+  //      da quando c'è il "FactoryMethod" l'ImplementersItem potrebbe essere necessaria
+  //      prima del Get/GetAs<T>/Show/GetItem finale (serve proprio nei metodi "FactoryMethod")
+  //      mentre prima invece serviva solo alla fine, quindi ho creato questo meccanismo.
+  //      Ho provato a crearla anche subito nel costruttore ma poi dava problemi in alcuni casi
+  //      (es: con l'Exists se poi non esistava alcuna ImplementersItem sollevava sempre una eccezione
+  //      perchè faceva subito il get della item sul container (che appunto non c'era)
+  _GetImplementersItemIfNotAlreadyExists;
   FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
     .Cast<TFactoryMethod<T1, T2, T3, T4>>
     .AsType<TFactoryMethod<T1, T2, T3, T4>>()(AArg1, AArg2, AArg3, AArg4);
+  Result := Self;
 end;
 
 function TioDILocator.FactoryMethod<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDILocator;
 begin
+  // NB: Carica l'ImplementersItem se questa non è già stata caricata, questo perchè
+  //      da quando c'è il "FactoryMethod" l'ImplementersItem potrebbe essere necessaria
+  //      prima del Get/GetAs<T>/Show/GetItem finale (serve proprio nei metodi "FactoryMethod")
+  //      mentre prima invece serviva solo alla fine, quindi ho creato questo meccanismo.
+  //      Ho provato a crearla anche subito nel costruttore ma poi dava problemi in alcuni casi
+  //      (es: con l'Exists se poi non esistava alcuna ImplementersItem sollevava sempre una eccezione
+  //      perchè faceva subito il get della item sul container (che appunto non c'era)
+  _GetImplementersItemIfNotAlreadyExists;
   FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
     .Cast<TFactoryMethod<T1, T2, T3>>
     .AsType<TFactoryMethod<T1, T2, T3>>()(AArg1, AArg2, AArg3);
+  Result := Self;
 end;
 
 function TioDILocator.FactoryMethod<T1, T2>(AArg1: T1; AArg2: T2): TioDILocator;
 begin
+  // NB: Carica l'ImplementersItem se questa non è già stata caricata, questo perchè
+  //      da quando c'è il "FactoryMethod" l'ImplementersItem potrebbe essere necessaria
+  //      prima del Get/GetAs<T>/Show/GetItem finale (serve proprio nei metodi "FactoryMethod")
+  //      mentre prima invece serviva solo alla fine, quindi ho creato questo meccanismo.
+  //      Ho provato a crearla anche subito nel costruttore ma poi dava problemi in alcuni casi
+  //      (es: con l'Exists se poi non esistava alcuna ImplementersItem sollevava sempre una eccezione
+  //      perchè faceva subito il get della item sul container (che appunto non c'era)
+  _GetImplementersItemIfNotAlreadyExists;
   FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
     .Cast<TFactoryMethod<T1, T2>>
     .AsType<TFactoryMethod<T1, T2>>()(AArg1, AArg2);
+  Result := Self;
 end;
 
 function TioDILocator.FactoryMethod<T1>(AArg1: T1): TioDILocator;
 begin
+  // NB: Carica l'ImplementersItem se questa non è già stata caricata, questo perchè
+  //      da quando c'è il "FactoryMethod" l'ImplementersItem potrebbe essere necessaria
+  //      prima del Get/GetAs<T>/Show/GetItem finale (serve proprio nei metodi "FactoryMethod")
+  //      mentre prima invece serviva solo alla fine, quindi ho creato questo meccanismo.
+  //      Ho provato a crearla anche subito nel costruttore ma poi dava problemi in alcuni casi
+  //      (es: con l'Exists se poi non esistava alcuna ImplementersItem sollevava sempre una eccezione
+  //      perchè faceva subito il get della item sul container (che appunto non c'era)
+  _GetImplementersItemIfNotAlreadyExists;
   FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
     .Cast<TFactoryMethod<T1>>
     .AsType<TFactoryMethod<T1>>()(AArg1);
+  Result := Self;
 end;
 
 function TioDILocator.Get: TObject;
@@ -1323,6 +1419,14 @@ end;
 function TioDILocator.GetImplementersItem: TioDIContainerImplementersItem;
 begin
   try
+    // NB: Carica l'ImplementersItem se questa non è già stata caricata, questo perchè
+    //      da quando c'è il "FactoryMethod" l'ImplementersItem potrebbe essere necessaria
+    //      prima del Get/GetAs<T>/Show/GetItem finale (serve proprio nei metodi "FactoryMethod")
+    //      mentre prima invece serviva solo alla fine, quindi ho creato questo meccanismo.
+    //      Ho provato a crearla anche subito nel costruttore ma poi dava problemi in alcuni casi
+    //      (es: con l'Exists se poi non esistava alcuna ImplementersItem sollevava sempre una eccezione
+    //      perchè faceva subito il get della item sul container (che appunto non c'era)
+    _GetImplementersItemIfNotAlreadyExists;
     Result := FImplementersItem;
   finally
     Free;
@@ -1572,6 +1676,14 @@ var
   end;
 begin
   Result := nil;
+  // NB: Carica l'ImplementersItem se questa non è già stata caricata, questo perchè
+  //      da quando c'è il "FactoryMethod" l'ImplementersItem potrebbe essere necessaria
+  //      prima del Get/GetAs<T>/Show/GetItem finale (serve proprio nei metodi "FactoryMethod")
+  //      mentre prima invece serviva solo alla fine, quindi ho creato questo meccanismo.
+  //      Ho provato a crearla anche subito nel costruttore ma poi dava problemi in alcuni casi
+  //      (es: con l'Exists se poi non esistava alcuna ImplementersItem sollevava sempre una eccezione
+  //      perchè faceva subito il get della item sul container (che appunto non c'era)
+  _GetImplementersItemIfNotAlreadyExists;
   // if the ViewModel is present then Lock it (MVVM)
   // and initializa it with PresenterSettings if exists
   if Self.ViewModelExist then
@@ -1745,6 +1857,12 @@ end;
 function TioDILocator._GetConstructorParams: PioConstructorParams;
 begin
   Result := @FConstructorParams;
+end;
+
+procedure TioDILocator._GetImplementersItemIfNotAlreadyExists;
+begin
+  if not Assigned(FImplementersItem) then
+    FImplementersItem := Container.Get(FInterfaceName, FAlias);
 end;
 
 function TioDILocator._GetParentCloseQueryAction: IioBSCloseQueryAction;
@@ -1950,6 +2068,27 @@ begin
   TioDILocator(Self).ConstructorParams(AParams);
 end;
 
+function TioDILocator<TI>.ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7;
+  AArg8: T8; AArg9: T9): TioDILocator<TI>;
+begin
+  Result := Self;
+  TioDILocator(Self).ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7, AArg8, AArg9);
+end;
+
+function TioDILocator<TI>.ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7;
+  AArg8: T8): TioDILocator<TI>;
+begin
+  Result := Self;
+  TioDILocator(Self).ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7, AArg8);
+end;
+
+function TioDILocator<TI>.ConstructorParams<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6;
+  AArg7: T7): TioDILocator<TI>;
+begin
+  Result := Self;
+  TioDILocator(Self).ConstructorParams<T1, T2, T3, T4, T5, T6, T7>(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7);
+end;
+
 function TioDILocator<TI>.ConstructorParams<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDILocator<TI>;
 begin
   Result := Self;
@@ -1984,6 +2123,60 @@ function TioDILocator<TI>.ConstructorParams<T1>(AArg1: T1): TioDILocator<TI>;
 begin
   Result := Self;
   TioDILocator(Self).ConstructorParams<T1>(AArg1);
+end;
+
+function TioDILocator<TI>.FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8; AArg9: T9): TioDILocator<TI>;
+begin
+  Result := Self;
+  TioDILocator(Self).FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7, AArg8, AArg9);
+end;
+
+function TioDILocator<TI>.FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8): TioDILocator<TI>;
+begin
+  Result := Self;
+  TioDILocator(Self).FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7, AArg8);
+end;
+
+function TioDILocator<TI>.FactoryMethod<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDILocator<TI>;
+begin
+  Result := Self;
+  TioDILocator(Self).FactoryMethod<T1, T2, T3, T4, T5, T6, T7>(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7);
+end;
+
+function TioDILocator<TI>.FactoryMethod<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDILocator<TI>;
+begin
+  Result := Self;
+  TioDILocator(Self).FactoryMethod<T1, T2, T3, T4, T5, T6>(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6);
+end;
+
+function TioDILocator<TI>.FactoryMethod<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDILocator<TI>;
+begin
+  Result := Self;
+  TioDILocator(Self).FactoryMethod<T1, T2, T3, T4, T5>(AArg1, AArg2, AArg3, AArg4, AArg5);
+end;
+
+function TioDILocator<TI>.FactoryMethod<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDILocator<TI>;
+begin
+  Result := Self;
+  TioDILocator(Self).FactoryMethod<T1, T2, T3, T4>(AArg1, AArg2, AArg3, AArg4);
+end;
+
+function TioDILocator<TI>.FactoryMethod<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDILocator<TI>;
+begin
+  Result := Self;
+  TioDILocator(Self).FactoryMethod<T1, T2, T3>(AArg1, AArg2, AArg3);
+end;
+
+function TioDILocator<TI>.FactoryMethod<T1, T2>(AArg1: T1; AArg2: T2): TioDILocator<TI>;
+begin
+  Result := Self;
+  TioDILocator(Self).FactoryMethod<T1, T2>(AArg1, AArg2);
+end;
+
+function TioDILocator<TI>.FactoryMethod<T1>(AArg1: T1): TioDILocator<TI>;
+begin
+  Result := Self;
+  TioDILocator(Self).FactoryMethod<T1>(AArg1);
 end;
 
 function TioDILocator<TI>.Get: TI;
