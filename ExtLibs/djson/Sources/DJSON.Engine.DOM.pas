@@ -1300,7 +1300,7 @@ begin
   if LQualifiedTypeName = 'System.SysUtils.TTimeStamp' then
   begin
     ts := AValue.AsType<System.SysUtils.TTimeStamp>;
-    Result := TJSONNumber.Create(TimeStampToMsecs(ts));
+    Result := TJSONNumber.Create(CompToDouble(TimeStampToMsecs(ts)));
   end
   // TValue
   else if LQualifiedTypeName = 'System.Rtti.TValue' then
