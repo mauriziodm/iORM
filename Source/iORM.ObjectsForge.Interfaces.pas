@@ -63,9 +63,9 @@ type
     class procedure InitializeViewModelPresentersAfterCreate(const AViewModelOrSimpleView: TObject; const APresenterSettingsPointer: PioDIPresenterSettingsContainer); static;
     class function CreateObjectFromBlobField(const AQuery: IioQuery; const AProperty: IioProperty): TObject; static;
     class function CreateObjectByClassRef(const AClassRef: TClass): TObject; inline;
-    class function CreateObjectByClassRefEx(const AClassRef: TClass; const AConstructorParams: array of TValue; const AContainerItem: TioDIContainerImplementersItem = nil): TObject; static;
+    class function CreateObjectByClassRefEx(const AClassRef: TClass; const AConstructorParams: array of TValue; const AImplementersItem: TioDIContainerImplementersItem = nil): TObject; static;
     class function CreateObjectByRttiType(const ARttiType: TRttiType): TObject; inline;
-    class function CreateObjectByRttiTypeEx(const ARttiType: TRttiType; const AConstructorParams: array of TValue; AContainerItem: TioDIContainerImplementersItem = nil): TObject; static;
+    class function CreateObjectByRttiTypeEx(const ARttiType: TRttiType; const AConstructorParams: array of TValue; AImplementersItem: TioDIContainerImplementersItem = nil): TObject; static;
     class function CreateListByClassRef(const AClassRef: TClass; const AOwnsObjects: Boolean = True): TObject; inline;
     class function CreateListByRttiType(const ARttiType: TRttiType; const AOwnsObject: Boolean = True): TObject; static;
     class function MakeObject(const AContext: IioContext; const AQuery: IioQuery): TObject; virtual; abstract;
@@ -109,10 +109,10 @@ begin
   Result := CreateObjectByClassRefEx(AClassRef, []);
 end;
 
-class function TioObjectMakerIntf.CreateObjectByClassRefEx(const AClassRef: TClass; const AConstructorParams: array of TValue; const AContainerItem: TioDIContainerImplementersItem = nil): TObject;
+class function TioObjectMakerIntf.CreateObjectByClassRefEx(const AClassRef: TClass; const AConstructorParams: array of TValue; const AImplementersItem: TioDIContainerImplementersItem = nil): TObject;
 begin
   // Create object
-  Result := CreateObjectByRttiTypeEx(TioRttiFactory.GetRttiContext.GetType(AClassRef), AConstructorParams, AContainerItem);
+  Result := CreateObjectByRttiTypeEx(TioRttiFactory.GetRttiContext.GetType(AClassRef), AConstructorParams, AImplementersItem);
 end;
 
 class function TioObjectMakerIntf.CreateObjectByRttiType(const ARttiType: TRttiType): TObject;
@@ -120,7 +120,7 @@ begin
   Result := CreateObjectByRttiTypeEx(ARttiType, []);
 end;
 
-class function TioObjectMakerIntf.CreateObjectByRttiTypeEx(const ARttiType: TRttiType; const AConstructorParams: array of TValue; AContainerItem: TioDIContainerImplementersItem = nil): TObject;
+class function TioObjectMakerIntf.CreateObjectByRttiTypeEx(const ARttiType: TRttiType; const AConstructorParams: array of TValue; AImplementersItem: TioDIContainerImplementersItem = nil): TObject;
 var
   LMethod: TRttiMethod;
 begin

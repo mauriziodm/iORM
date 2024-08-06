@@ -1318,7 +1318,7 @@ begin
   if LQualifiedTypeName = 'System.SysUtils.TTimeStamp' then
   begin
     LTimeStamp := AValue.AsType<System.SysUtils.TTimeStamp>;
-    AJSONWriter.WriteValue(TimeStampToMsecs(LTimeStamp));
+    AJSONWriter.WriteValue(CompToDouble(TimeStampToMsecs(LTimeStamp)));
   end
   // TValue
   else if LQualifiedTypeName = 'System.Rtti.TValue' then
