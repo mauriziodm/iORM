@@ -36,21 +36,9 @@ unit iORM.DependencyInjection.Implementers;
 interface
 
 uses
-  System.Rtti, iORM.CommonTypes;
+  System.Rtti, iORM.CommonTypes, iORM.DependencyInjection.Types;
 
 type
-
-  // Default settings creating ViewModels.Presenters
-  TioDIPresenterSettingsType = (pstDataObject, pstInterfacedObj, pstMasterModelPresenter, pstWhere, pstSelectorFor, pstWhereBuilderFor, pstETMfor);
-  TioDIPresenterSettings = record
-    SettingsType:TioDIPresenterSettingsType;
-    Name: String;
-    InterfacedObj: IInterface;
-    Obj: TObject;
-    StringParameter: String;
-  end;
-  TioDIPresenterSettingsContainer = TArray<TioDIPresenterSettings>;
-  PioDIPresenterSettingsContainer = ^TioDIPresenterSettingsContainer;
 
   // Dependency Injection Container Implementers Item (SubContainer value)
   TioDIContainerImplementersItemCreationMode = (cmByObjectForge, cmByFactoryMethod);
@@ -66,15 +54,20 @@ type
     FFarAncestorClazzSameInterfaceAndTableAndConnection: String;
     FIsEntity: Boolean;
     FIsSingleton: Boolean;
+    // Constructor params
+    FConstructorParams: TioConstructorParams;
     // TValue che contiene l'eventuale factory method per la creazione dell'istanza
     FFactoryMethod: TValue;
     function GetCreationMode: TioDIContainerImplementersItemCreationMode;
+    function GetConstructorParamsPointer: PioConstructorParams;
     function GetFactoryMethodPointer: PValue;
   public
     constructor Create(const AClassRttiType: TRttiInstanceType; const AImplementsIID: TGUID);
     function CreateInstanceByFactoryMethodIfNotAlreadyDone(const AAlreadyCreatedInstance: TObject): TObject;
     property ClazzRef: TioClassRef read FClazzRef;
     property ClazzName: String read FClazzName;
+    property ConstructorParams: TioConstructorParams read FConstructorParams write FConstructorParams;
+    property ConstructorParamsPointer: PioConstructorParams read GetConstructorParamsPointer;
     property CreationMode: TioDIContainerImplementersItemCreationMode read GetCreationMode;
     property RttiType: TRttiInstanceType read FRttiType;
     property InterfaceGUID: TGUID read FInterfaceGUID;
@@ -100,6 +93,11 @@ begin
   FIsSingleton := False;
   FIsEntity := False;
   FFarAncestorClazzSameInterfaceAndTableAndConnection := String.Empty;
+end;
+
+function TioDIContainerImplementersItem.GetConstructorParamsPointer: PioConstructorParams;
+begin
+  Result := @FConstructorParams;
 end;
 
 function TioDIContainerImplementersItem.GetCreationMode: TioDIContainerImplementersItemCreationMode;

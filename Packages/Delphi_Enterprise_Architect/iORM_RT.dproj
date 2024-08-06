@@ -396,6 +396,7 @@
         <DCCReference Include="..\..\Source\iORM.Session.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.Session.Model.pas"/>
         <DCCReference Include="..\..\Source\iORM.Session.Factory.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DependencyInjection.Types.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

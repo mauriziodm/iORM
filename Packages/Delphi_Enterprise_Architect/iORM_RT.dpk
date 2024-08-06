@@ -243,7 +243,8 @@ contains
   iORM.Session.Manager in '..\..\Source\iORM.Session.Manager.pas',
   iORM.Session.Interfaces in '..\..\Source\iORM.Session.Interfaces.pas',
   iORM.Session.Model in '..\..\Source\iORM.Session.Model.pas',
-  iORM.Session.Factory in '..\..\Source\iORM.Session.Factory.pas';
+  iORM.Session.Factory in '..\..\Source\iORM.Session.Factory.pas',
+  iORM.DependencyInjection.Types in '..\..\Source\iORM.DependencyInjection.Types.pas';
 
 end.
 

@@ -40,7 +40,8 @@ uses
   iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.Interfaces, iORM.Resolver.Interfaces, iORM.Context.Container,
   iORM.DependencyInjection.Singletons, iORM.DependencyInjection.Implementers, iORM.MVVM.ViewContextProvider,
   iORM.MVVM.ModelPresenter.Custom, iORM.Where.Interfaces, System.Classes, iORM.StdActions.Interfaces,
-  System.SysUtils, iORM.LiveBindings.BSPersistence;
+  System.SysUtils, iORM.LiveBindings.BSPersistence,
+  iORM.DependencyInjection.Types;
 
 const
   DI_ENTITY_AUTOREGISTER_SUBKEY_PREFIX = '<E>';
@@ -84,10 +85,6 @@ type
   TioDIContainerValue = TioDIContainerImplementers;
   TioDIContainerInstance = TObjectDictionary<TioDIContainerKey, TioDIContainerValue>;
   // ===============================================================================================================================
-
-  // Constructor params types
-  TioConstructorParams = array of TValue;
-  PioConstructorParams = ^TioConstructorParams;
 
   // ObjType (View, ViewModel, SimpleView, or normal subject)
   TioDICObjType = (dotRegular, dotAutoregisteredEntity, dotSimpleView, dotView, dotViewModel);
@@ -133,7 +130,19 @@ type
     function AsSingleton(const AIsSingleton: Boolean = True): TioDIRegister;
     // Remember the 'Execute' at the end
     procedure Execute;
-    // Factory method
+    // ---------- CONSTRUCTOR PARAMS ----------
+    function ConstructorParams(const AParams: TioConstructorParams): TioDIRegister; overload;
+    function ConstructorParams<T1>(AArg1: T1): TioDIRegister; overload;
+    function ConstructorParams<T1, T2>(AArg1: T1; AArg2: T2): TioDIRegister; overload;
+    function ConstructorParams<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDIRegister; overload;
+    function ConstructorParams<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDIRegister; overload;
+    function ConstructorParams<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDIRegister; overload;
+    function ConstructorParams<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDIRegister; overload;
+    function ConstructorParams<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDIRegister; overload;
+    function ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8): TioDIRegister; overload;
+    function ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8; AArg9: T9): TioDIRegister; overload;
+    // ---------- CONSTRUCTOR PARAMS ----------
+    // ---------- FACTORY METHOD ----------
     function FactoryMethod(const AFactoryMethod: TFActoryMethod): TioDIRegister; overload;
     function FactoryMethod<T1>(const AFactoryMethod: TFActoryMethod<T1>): TioDIRegister; overload;
     function FactoryMethod<T1, T2>(const AFactoryMethod: TFActoryMethod<T1, T2>): TioDIRegister; overload;
@@ -144,6 +153,7 @@ type
     function FactoryMethod<T1, T2, T3, T4, T5, T6, T7>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5, T6, T7>): TioDIRegister; overload;
     function FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>): TioDIRegister; overload;
     function FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>): TioDIRegister; overload;
+    // ---------- FACTORY METHOD ----------
   end;
   // ===========================================================================
 
@@ -227,7 +237,8 @@ type
     procedure _SetForEachModelPresenter(const AModelPresenter: IioBindSource; const ALocateViewModel: Boolean);
     procedure _DuplicateLocatorForShowEachPurposeFrom(const ASourceLocator: TioDILocator);
     function _GetAlias: String;
-    function _GetConstructorParams: PioConstructorParams;
+    function _GetLocatorConstructorParamsPointer: PioConstructorParams;
+    function _GetImplementersItemOrLocatorConstructorParamsPointer: PioConstructorParams;
     function _GetVCProvider: TioViewContextProvider;
     function _GetViewContext: TComponent;
     function _GetParentCloseQueryAction: IioBSCloseQueryAction;
@@ -810,6 +821,119 @@ begin
   Result := Self;
 end;
 
+function TioDIRegister.ConstructorParams(const AParams: TioConstructorParams): TioDIRegister;
+var
+  I: Integer;
+begin
+  // Solo così sembra andare bene
+  SetLength(FImpementersItem.ConstructorParamsPointer^, Length(AParams));
+  for I := Low(AParams) to High(AParams) do
+    FImpementersItem.ConstructorParamsPointer^[I] := AParams[I];
+  Result := Self;
+end;
+
+function TioDIRegister.ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7;
+  AArg8: T8; AArg9: T9): TioDIRegister;
+begin
+  SetLength(FImpementersItem.ConstructorParamsPointer^, 9);
+  TValue.Make(@AArg1, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[0]);
+  TValue.Make(@AArg2, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[1]);
+  TValue.Make(@AArg3, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[2]);
+  TValue.Make(@AArg4, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[3]);
+  TValue.Make(@AArg5, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[4]);
+  TValue.Make(@AArg6, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[5]);
+  TValue.Make(@AArg7, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[6]);
+  TValue.Make(@AArg8, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[7]);
+  TValue.Make(@AArg9, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[8]);
+  Result := Self;
+end;
+
+function TioDIRegister.ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7;
+  AArg8: T8): TioDIRegister;
+begin
+  SetLength(FImpementersItem.ConstructorParamsPointer^, 8);
+  TValue.Make(@AArg1, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[0]);
+  TValue.Make(@AArg2, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[1]);
+  TValue.Make(@AArg3, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[2]);
+  TValue.Make(@AArg4, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[3]);
+  TValue.Make(@AArg5, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[4]);
+  TValue.Make(@AArg6, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[5]);
+  TValue.Make(@AArg7, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[6]);
+  TValue.Make(@AArg8, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[7]);
+  Result := Self;
+end;
+
+function TioDIRegister.ConstructorParams<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6;
+  AArg7: T7): TioDIRegister;
+begin
+  SetLength(FImpementersItem.ConstructorParamsPointer^, 7);
+  TValue.Make(@AArg1, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[0]);
+  TValue.Make(@AArg2, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[1]);
+  TValue.Make(@AArg3, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[2]);
+  TValue.Make(@AArg4, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[3]);
+  TValue.Make(@AArg5, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[4]);
+  TValue.Make(@AArg6, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[5]);
+  TValue.Make(@AArg7, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[6]);
+  Result := Self;
+end;
+
+function TioDIRegister.ConstructorParams<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDIRegister;
+begin
+  SetLength(FImpementersItem.ConstructorParamsPointer^, 6);
+  TValue.Make(@AArg1, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[0]);
+  TValue.Make(@AArg2, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[1]);
+  TValue.Make(@AArg3, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[2]);
+  TValue.Make(@AArg4, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[3]);
+  TValue.Make(@AArg5, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[4]);
+  TValue.Make(@AArg6, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[5]);
+  Result := Self;
+end;
+
+function TioDIRegister.ConstructorParams<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDIRegister;
+begin
+  SetLength(FImpementersItem.ConstructorParamsPointer^, 5);
+  TValue.Make(@AArg1, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[0]);
+  TValue.Make(@AArg2, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[1]);
+  TValue.Make(@AArg3, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[2]);
+  TValue.Make(@AArg4, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[3]);
+  TValue.Make(@AArg5, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[4]);
+  Result := Self;
+end;
+
+function TioDIRegister.ConstructorParams<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDIRegister;
+begin
+  SetLength(FImpementersItem.ConstructorParamsPointer^, 4);
+  TValue.Make(@AArg1, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[0]);
+  TValue.Make(@AArg2, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[1]);
+  TValue.Make(@AArg3, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[2]);
+  TValue.Make(@AArg4, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[3]);
+  Result := Self;
+end;
+
+function TioDIRegister.ConstructorParams<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDIRegister;
+begin
+  SetLength(FImpementersItem.ConstructorParamsPointer^, 3);
+  TValue.Make(@AArg1, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[0]);
+  TValue.Make(@AArg2, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[1]);
+  TValue.Make(@AArg3, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[2]);
+  Result := Self;
+end;
+
+function TioDIRegister.ConstructorParams<T1, T2>(AArg1: T1; AArg2: T2): TioDIRegister;
+begin
+  SetLength(FImpementersItem.ConstructorParamsPointer^, 2);
+  TValue.Make(@AArg1, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[0]);
+  TValue.Make(@AArg2, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[1]);
+  Result := Self;
+end;
+
+function TioDIRegister.ConstructorParams<T1>(AArg1: T1): TioDIRegister;
+begin
+  SetLength(FImpementersItem.ConstructorParamsPointer^, 1);
+  TValue.Make(@AArg1, TypeInfo(T1), FImpementersItem.ConstructorParamsPointer^[0]);
+  Result := Self;
+end;
+
 constructor TioDIRegister.CreateByClass(const AClassRttiType: TRttiInstanceType; const AAlias: String; const ADICType: TioDICObjType);
 var
   LDIContainerKey: String;
@@ -1202,15 +1326,14 @@ begin
 end;
 
 function TioDILocator.ConstructorParams(const AParams: TioConstructorParams): TioDILocator;
+var
+  I: Integer;
 begin
-  FConstructorParams := AParams;
+  // Solo così sembra andare bene
+  SetLength(FConstructorParams, Length(AParams));
+  for i := 0 to High(AParams) do
+    FConstructorParams[i] := AParams[i];
   Result := Self;
-// ---------- OLD CODE ----------
-//  // Solo così sembra andare bene
-//  SetLength(FConstructorParams, Length(AParams));
-//  for i := 0 to High(AParams) do
-//    FConstructorParams[i] := AParams[i];
-//  Result := Self;
 end;
 
 constructor TioDILocator.Create(const AInterfaceName, AAlias: String; const AOwnerRequested, AVCProviderEnabled: Boolean);
@@ -1651,7 +1774,7 @@ end;
 procedure TioDILocator._DuplicateLocatorForShowEachPurposeFrom(const ASourceLocator: TioDILocator);
 begin
   FAlias := ASourceLocator._GetAlias;
-  FConstructorParams := ASourceLocator._GetConstructorParams^;
+  FConstructorParams := ASourceLocator._GetLocatorConstructorParamsPointer^;
   FVCProvider := ASourceLocator._GetVCProvider;
   FViewContext := ASourceLocator._GetViewContext;
   FActionParentCloseQuery := ASourceLocator._GetParentCloseQueryAction;
@@ -1739,7 +1862,7 @@ begin
       case FImplementersItem.CreationMode of
         // Instanza creata dall'ObjectForge
         cmByObjectForge:
-          Result := TioObjectMaker.CreateObjectByRttiTypeEx(FImplementersItem.RttiType, FConstructorParams, FImplementersItem);
+          Result := TioObjectMaker.CreateObjectByRttiTypeEx(FImplementersItem.RttiType, _GetImplementersItemOrLocatorConstructorParamsPointer^);
         // Istanza creata dal FactoryMethod
         cmByFactoryMethod:
           // Se è stato impostato un FactoryMethod allora l'istanza viene creata alla chiamata del metodo
@@ -1854,7 +1977,7 @@ begin
   Result := FAlias;
 end;
 
-function TioDILocator._GetConstructorParams: PioConstructorParams;
+function TioDILocator._GetLocatorConstructorParamsPointer: PioConstructorParams;
 begin
   Result := @FConstructorParams;
 end;
@@ -1863,6 +1986,16 @@ procedure TioDILocator._GetImplementersItemIfNotAlreadyExists;
 begin
   if not Assigned(FImplementersItem) then
     FImplementersItem := Container.Get(FInterfaceName, FAlias);
+end;
+
+function TioDILocator._GetImplementersItemOrLocatorConstructorParamsPointer: PioConstructorParams;
+begin
+  // Se sono specificati parametri per il costruttore nel locator restituisce questi perchè
+  //  hanno la precedenza, altrimenti restituisce quelli dell'ImplementersItem (RegisterClass)
+  if Length(FConstructorParams) > 0 then
+    Result := @FConstructorParams
+  else
+    Result := FImplementersItem.ConstructorParamsPointer;
 end;
 
 function TioDILocator._GetParentCloseQueryAction: IioBSCloseQueryAction;
