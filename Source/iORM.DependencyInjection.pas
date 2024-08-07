@@ -227,6 +227,7 @@ type
     function ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8; AArg9: T9): TioDILocator; overload;
     // ---------- CONSTRUCTOR PARAMS ----------
     // ---------- FACTORY METHOD ----------
+    function FactoryMethod: TioDILocator; overload;
     function FactoryMethod<T1>(AArg1: T1): TioDILocator; overload;
     function FactoryMethod<T1, T2>(AArg1: T1; AArg2: T2): TioDILocator; overload;
     function FactoryMethod<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDILocator; overload;
@@ -292,13 +293,13 @@ type
     function ConstructorParams<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDILocator<TI>; reintroduce; overload;
     function ConstructorParams<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDILocator<TI>; reintroduce; overload;
     function ConstructorParams<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDILocator<TI>; reintroduce; overload;
-
     function ConstructorParams<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDILocator<TI>; reintroduce; overload;
     function ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8): TioDILocator<TI>; reintroduce; overload;
     function ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8; AArg9: T9): TioDILocator<TI>; reintroduce; overload;
 
     // ---------- CONSTRUCTOR PARAMS ----------
     // ---------- FACTORY METHOD ----------
+    function FactoryMethod: TioDILocator<TI>; overload;
     function FactoryMethod<T1>(AArg1: T1): TioDILocator<TI>; overload;
     function FactoryMethod<T1, T2>(AArg1: T1; AArg2: T2): TioDILocator<TI>; overload;
     function FactoryMethod<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDILocator<TI>; overload;
@@ -1422,6 +1423,22 @@ begin
     Result := LVMBridge.ViewModel as IioViewModelInternal;
 end;
 
+function TioDILocator.FactoryMethod: TioDILocator;
+begin
+  // NB: Carica l'ImplementersItem se questa non è già stata caricata, questo perchè
+  //      da quando c'è il "FactoryMethod" l'ImplementersItem potrebbe essere necessaria
+  //      prima del Get/GetAs<T>/Show/GetItem finale (serve proprio nei metodi "FactoryMethod")
+  //      mentre prima invece serviva solo alla fine, quindi ho creato questo meccanismo.
+  //      Ho provato a crearla anche subito nel costruttore ma poi dava problemi in alcuni casi
+  //      (es: con l'Exists se poi non esistava alcuna ImplementersItem sollevava sempre una eccezione
+  //      perchè faceva subito il get della item sul container (che appunto non c'era)
+  _GetImplementersItemIfNotAlreadyExists;
+  FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
+    .Cast<TFactoryMethod>
+    .AsType<TFactoryMethod>()();
+  Result := Self;
+end;
+
 function TioDILocator.FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8;
   AArg9: T9): TioDILocator;
 begin
@@ -2308,6 +2325,12 @@ function TioDILocator<TI>.ConstructorParams<T1>(AArg1: T1): TioDILocator<TI>;
 begin
   Result := Self;
   TioDILocator(Self).ConstructorParams<T1>(AArg1);
+end;
+
+function TioDILocator<TI>.FactoryMethod: TioDILocator<TI>;
+begin
+  Result := Self;
+  TioDILocator(Self).FactoryMethod;
 end;
 
 function TioDILocator<TI>.FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8; AArg9: T9): TioDILocator<TI>;
