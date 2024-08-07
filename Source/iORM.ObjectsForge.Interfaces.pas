@@ -61,7 +61,7 @@ type
     class function FindConstructor(const ARttiType: TRttiType; var AConstructorParams: TioConstructorParams): TRttiMethod; static;
     class function FindMethod(const ARttiType: TRttiType; const AMethodName: String; var AConstructorParams: TioConstructorParams): TRttiMethod; static;
   public
-    class procedure InitializeViewModelPresentersAfterCreate(const AViewModelOrSimpleView: TObject; const APresenterSettingsPointer: PioDIPresenterSettingsContainer); static;
+    class procedure InitializeViewModelPresentersAfterCreate(const AViewModelOrSimpleView: TObject; const APresenterSettingsPointer: PioDIPresenterSettingsCollection); static;
     class function CreateObjectFromBlobField(const AQuery: IioQuery; const AProperty: IioProperty): TObject; static;
     class function CreateObjectByClassRef(const AClassRef: TClass): TObject; inline;
     class function CreateObjectByClassRefEx(const AClassRef: TClass; var AConstructorParams: TioConstructorParams): TObject; static;
@@ -127,7 +127,6 @@ end;
 
 class function TioObjectMakerIntf.CreateObjectByRttiTypeEx(const ARttiType: TRttiType; var AConstructorParams: TioConstructorParams): TObject;
 var
-  LConstructorParams: TioConstructorParams;
   LMethod: TRttiMethod;
 begin
   // Find the constructor
@@ -139,7 +138,7 @@ begin
     raise EioGenericException.Create(ClassName, 'CreateObjectByRttiTypeEx', 'Constructor not found for class "' + ARttiType.Name + '"');
 end;
 
-class procedure TioObjectMakerIntf.InitializeViewModelPresentersAfterCreate(const AViewModelOrSimpleView: TObject; const APresenterSettingsPointer: PioDIPresenterSettingsContainer);
+class procedure TioObjectMakerIntf.InitializeViewModelPresentersAfterCreate(const AViewModelOrSimpleView: TObject; const APresenterSettingsPointer: PioDIPresenterSettingsCollection);
 var
   LViewModelOrSimpleView: TComponent;
   LWhere: IioWhere;
@@ -148,7 +147,7 @@ var
   LTargetMasterBS, LParamMasterBS: IioMasterBindSource;
   LIntf: IInterface;
   I: Integer;
-  LPresenterSettings: TioDIPresenterSettingsContainer;
+  LPresenterSettings: TioDIPresenterSettingCollection;
 begin
   // **********************************************
   // **********************************************
@@ -185,13 +184,13 @@ begin
     // Initialize the BindSource based on SettingsType
     case LPresenterSettings[I].SettingsType of
       // DataObject
-      TioDIPresenterSettingsType.pstDataObject:
+      TioDIPresenterSettingType.pstDataObject:
         LTargetBS.SetDataObject(LPresenterSettings[I].Obj);
       // InterfacedObject
-      TioDIPresenterSettingsType.pstInterfacedObj:
+      TioDIPresenterSettingType.pstInterfacedObj:
         LTargetBS.SetDataObject(LPresenterSettings[I].InterfacedObj);
       // MasterModelPresenter
-      TioDIPresenterSettingsType.pstMasterModelPresenter:
+      TioDIPresenterSettingType.pstMasterModelPresenter:
         begin
           if Supports(LPresenterSettings[I].Obj, IioBindSource, LParamBS) then
           begin
@@ -204,7 +203,7 @@ begin
             raise EioGenericException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
         end;
       // Where
-      TioDIPresenterSettingsType.pstWhere:
+      TioDIPresenterSettingType.pstWhere:
         begin
           LIntf := LPresenterSettings[I].InterfacedObj;
           if Assigned(LIntf) then
@@ -215,7 +214,7 @@ begin
           end;
         end;
       // SelectorFor
-      TioDIPresenterSettingsType.pstSelectorFor:
+      TioDIPresenterSettingType.pstSelectorFor:
         begin
           if Supports(LPresenterSettings[I].Obj, IioBindSource, LParamBS) then
             LTargetBS.SetSelectorFor(LParamBS)
@@ -223,7 +222,7 @@ begin
             raise EioGenericException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
         end;
       // WhereBuilderFor
-      TioDIPresenterSettingsType.pstWhereBuilderFor:
+      TioDIPresenterSettingType.pstWhereBuilderFor:
         begin
           if Supports(LTargetBS, IioMasterBindSource, LTargetMasterBS) and Supports(LPresenterSettings[I].Obj, IioMasterBindSource, LParamMasterBS) then
             LTargetMasterBS.SetWhereBuilderFor(LParamMasterBS)
@@ -231,7 +230,7 @@ begin
             raise EioGenericException.Create(ClassName, 'InitializeViewModelPresentersAfterCreate', Format('The object of class "%s" is not a "IioBindSource" interface implementer.', [LPresenterSettings[I].Obj.ClassName]));
         end;
       // ETMfor
-      TioDIPresenterSettingsType.pstETMfor:
+      TioDIPresenterSettingType.pstETMfor:
         begin
           if Supports(LTargetBS, IioMasterBindSource, LTargetMasterBS) and Supports(LPresenterSettings[I].Obj, IioMasterBindSource, LParamMasterBS) then
             LTargetMasterBS.SetETMfor(LParamMasterBS)

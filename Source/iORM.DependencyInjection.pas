@@ -131,7 +131,7 @@ type
     // Remember the 'Execute' at the end
     procedure Execute;
     // ---------- CONSTRUCTOR PARAMS ----------
-    function ConstructorParams(const AParams: TioConstructorParams): TioDIRegister; overload;
+    function ConstructorParams(var AParams: TioConstructorParams): TioDIRegister; overload;
     function ConstructorParams<T1>(AArg1: T1): TioDIRegister; overload;
     function ConstructorParams<T1, T2>(AArg1: T1; AArg2: T2): TioDIRegister; overload;
     function ConstructorParams<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDIRegister; overload;
@@ -154,6 +154,12 @@ type
     function FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>): TioDIRegister; overload;
     function FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>): TioDIRegister; overload;
     // ---------- FACTORY METHOD ----------
+    // ---------- PROPERTY/FIELD INJECTION ----------
+    function InjectField(const AFieldName: String; var AValue: TValue): TioDIRegister; overload;
+    function InjectField<T>(const AFieldName: String; const AValue: T): TioDIRegister; overload;
+    function InjectProperty(const APropertyName: String; var AValue: TValue): TioDIRegister; overload;
+    function InjectProperty<T>(const APropertyName: String; const AValue: T): TioDIRegister; overload;
+    // ---------- PROPERTY/FIELD INJECTION ----------
   end;
   // ===========================================================================
 
@@ -166,7 +172,7 @@ type
     FInterfaceName: String;
     FAlias: String;
     FConstructorParams: TioConstructorParams;
-    FPresenterSettings: TArray<TioDIPresenterSettings>;
+    FPresenterSettings: TArray<TioDIPresenterSettingItem>;
     FViewModel: IioViewModelInternal;
     FViewModelMarker: String;
     FSingletonKey: String;
@@ -209,7 +215,7 @@ type
     function Show: TComponent; virtual;
     function SingletonKey(const ASingletonKey: String): TioDILocator; virtual;
     // ---------- CONSTRUCTOR PARAMS ----------
-    function ConstructorParams(const AParams: TioConstructorParams): TioDILocator; overload;
+    function ConstructorParams(var AParams: TioConstructorParams): TioDILocator; overload;
     function ConstructorParams<T1>(AArg1: T1): TioDILocator; overload;
     function ConstructorParams<T1, T2>(AArg1: T1; AArg2: T2): TioDILocator; overload;
     function ConstructorParams<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDILocator; overload;
@@ -821,7 +827,7 @@ begin
   Result := Self;
 end;
 
-function TioDIRegister.ConstructorParams(const AParams: TioConstructorParams): TioDIRegister;
+function TioDIRegister.ConstructorParams(var AParams: TioConstructorParams): TioDIRegister;
 var
   I: Integer;
 begin
@@ -1044,6 +1050,50 @@ function TioDIRegister.FactoryMethod<T1>(const AFactoryMethod: TFActoryMethod<T1
 begin
   TValue.Make(@AFactoryMethod, TypeInfo(TFactoryMethod<T1>), FImpementersItem.FactoryMethodPointer^);
   Result := Self;
+end;
+
+function TioDIRegister.InjectField(const AFieldName: String; var AValue: TValue): TioDIRegister;
+var
+  LIndex: Integer;
+begin
+  LIndex := Length(FImpementersItem.FieldInjectionsPointer^);
+  SetLength(FImpementersItem.FieldInjectionsPointer^, LIndex + 1);
+  with FImpementersItem.FieldInjectionsPointer^[LIndex] do
+  begin
+    Name := AFieldName;
+    Value := AValue;
+  end;
+  Result := Self;
+end;
+
+function TioDIRegister.InjectField<T>(const AFieldName: String; const AValue: T): TioDIRegister;
+var
+  LValue: TValue;
+begin
+  TValue.Make(@AValue, TypeInfo(T), LValue);
+  Result := InjectField(AFieldName, LValue);
+end;
+
+function TioDIRegister.InjectProperty(const APropertyName: String; var AValue: TValue): TioDIRegister;
+var
+  LIndex: Integer;
+begin
+  LIndex := Length(FImpementersItem.PropertyInjectionsPointer^);
+  SetLength(FImpementersItem.PropertyInjectionsPointer^, LIndex + 1);
+  with FImpementersItem.PropertyInjectionsPointer^[LIndex] do
+  begin
+    Name := APropertyName;
+    Value := AValue;
+  end;
+  Result := Self;
+end;
+
+function TioDIRegister.InjectProperty<T>(const APropertyName: String; const AValue: T): TioDIRegister;
+var
+  LValue: TValue;
+begin
+  TValue.Make(@AValue, TypeInfo(T), LValue);
+  Result := InjectProperty(APropertyName, LValue);
 end;
 
 function TioDIRegister._SetFarAncestorClassSameInterfaceAndTableAndConnection(const AValue: String): TioDIRegister;
@@ -1325,7 +1375,7 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.ConstructorParams(const AParams: TioConstructorParams): TioDILocator;
+function TioDILocator.ConstructorParams(var AParams: TioConstructorParams): TioDILocator;
 var
   I: Integer;
 begin
@@ -1573,7 +1623,7 @@ var
 begin
   i := Length(FPresenterSettings);
   SetLength(FPresenterSettings, i + 1);
-  FPresenterSettings[i].SettingsType := TioDIPresenterSettingsType.pstDataObject;
+  FPresenterSettings[i].SettingsType := TioDIPresenterSettingType.pstDataObject;
   FPresenterSettings[i].Name := ABSName;
   FPresenterSettings[i].Obj := ADataObject;
   Result := Self;
@@ -1586,7 +1636,7 @@ var
 begin
   i := Length(FPresenterSettings);
   SetLength(FPresenterSettings, i + 1);
-  FPresenterSettings[i].SettingsType := TioDIPresenterSettingsType.pstMasterModelPresenter;
+  FPresenterSettings[i].SettingsType := TioDIPresenterSettingType.pstMasterModelPresenter;
   FPresenterSettings[i].Name := ABSName;
   FPresenterSettings[i].Obj := (AMasterBindSource as TObject);
   FPresenterSettings[i].StringParameter := AMasterPropertyName;
@@ -1599,7 +1649,7 @@ var
 begin
   i := Length(FPresenterSettings);
   SetLength(FPresenterSettings, i + 1);
-  FPresenterSettings[i].SettingsType := TioDIPresenterSettingsType.pstWhere;
+  FPresenterSettings[i].SettingsType := TioDIPresenterSettingType.pstWhere;
   FPresenterSettings[i].Name := ABSName;
   FPresenterSettings[i].InterfacedObj := AWhere;
   Result := Self;
@@ -1633,7 +1683,7 @@ var
 begin
   i := Length(FPresenterSettings);
   SetLength(FPresenterSettings, i + 1);
-  FPresenterSettings[i].SettingsType := TioDIPresenterSettingsType.pstInterfacedObj;
+  FPresenterSettings[i].SettingsType := TioDIPresenterSettingType.pstInterfacedObj;
   FPresenterSettings[i].Name := ABSName;
   FPresenterSettings[i].InterfacedObj := AInterfacedObj;
   Result := Self;
@@ -1646,7 +1696,7 @@ var
 begin
   i := Length(FPresenterSettings);
   SetLength(FPresenterSettings, i + 1);
-  FPresenterSettings[i].SettingsType := TioDIPresenterSettingsType.pstSelectorFor;
+  FPresenterSettings[i].SettingsType := TioDIPresenterSettingType.pstSelectorFor;
   FPresenterSettings[i].Name := ASelectorBSName;
   FPresenterSettings[i].Obj := (ASelectionTargetBS as TObject);
   Result := Self;
@@ -1658,7 +1708,7 @@ var
 begin
   i := Length(FPresenterSettings);
   SetLength(FPresenterSettings, i + 1);
-  FPresenterSettings[i].SettingsType := TioDIPresenterSettingsType.pstETMfor;
+  FPresenterSettings[i].SettingsType := TioDIPresenterSettingType.pstETMfor;
   FPresenterSettings[i].Name := AEtmBSName;
   FPresenterSettings[i].Obj := (AEtmTargetBS as TObject);
   Result := Self;
@@ -1681,7 +1731,7 @@ var
 begin
   i := Length(FPresenterSettings);
   SetLength(FPresenterSettings, i + 1);
-  FPresenterSettings[i].SettingsType := TioDIPresenterSettingsType.pstWhereBuilderFor;
+  FPresenterSettings[i].SettingsType := TioDIPresenterSettingType.pstWhereBuilderFor;
   FPresenterSettings[i].Name := AWhereBuilderBSName;
   FPresenterSettings[i].Obj := (AWhereBuilderTargetBS as TObject);
   Result := Self;

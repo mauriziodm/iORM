@@ -44,17 +44,25 @@ type
   TioConstructorParams = array of TValue;
   PioConstructorParams = ^TioConstructorParams;
 
+  // Inject property/field types
+  TioInjectionCollectionItem = record
+    Name: String;
+    Value: TValue;
+  end;
+  TioInjectionCollection = array of TioInjectionCollectionItem;
+  PioInjectionCollection = ^TioInjectionCollection;
+
   // Default settings creating ViewModels.Presenters
-  TioDIPresenterSettingsType = (pstDataObject, pstInterfacedObj, pstMasterModelPresenter, pstWhere, pstSelectorFor, pstWhereBuilderFor, pstETMfor);
-  TioDIPresenterSettings = record
-    SettingsType:TioDIPresenterSettingsType;
+  TioDIPresenterSettingType = (pstDataObject, pstInterfacedObj, pstMasterModelPresenter, pstWhere, pstSelectorFor, pstWhereBuilderFor, pstETMfor);
+  TioDIPresenterSettingItem = record
+    SettingsType:TioDIPresenterSettingType;
     Name: String;
     InterfacedObj: IInterface;
     Obj: TObject;
     StringParameter: String;
   end;
-  TioDIPresenterSettingsContainer = TArray<TioDIPresenterSettings>;
-  PioDIPresenterSettingsContainer = ^TioDIPresenterSettingsContainer;
+  TioDIPresenterSettingCollection = TArray<TioDIPresenterSettingItem>;
+  PioDIPresenterSettingsCollection = ^TioDIPresenterSettingCollection;
 
 implementation
 

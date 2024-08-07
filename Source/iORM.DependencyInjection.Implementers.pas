@@ -56,31 +56,38 @@ type
     FIsSingleton: Boolean;
     // Constructor params
     FConstructorParams: TioConstructorParams;
+    // Injections
+    FFieldInjections: TioInjectionCollection;
+    FPropertyInjections: TioInjectionCollection;
     // TValue che contiene l'eventuale factory method per la creazione dell'istanza
     FFactoryMethod: TValue;
     function GetCreationMode: TioDIContainerImplementersItemCreationMode;
     function GetConstructorParamsPointer: PioConstructorParams;
     function GetFactoryMethodPointer: PValue;
+    function GetFieldInjectionsPointer: PioInjectionCollection;
+    function GetPropertyInjectionsPointer: PioInjectionCollection;
   public
     constructor Create(const AClassRttiType: TRttiInstanceType; const AImplementsIID: TGUID);
     function CreateInstanceByFactoryMethodIfNotAlreadyDone(const AAlreadyCreatedInstance: TObject): TObject;
+    procedure InjectPropField(const AObj: TObject);
     property ClazzRef: TioClassRef read FClazzRef;
     property ClazzName: String read FClazzName;
-    property ConstructorParams: TioConstructorParams read FConstructorParams write FConstructorParams;
     property ConstructorParamsPointer: PioConstructorParams read GetConstructorParamsPointer;
     property CreationMode: TioDIContainerImplementersItemCreationMode read GetCreationMode;
+    property FieldInjectionsPointer: PioInjectionCollection read GetFieldInjectionsPointer;
     property RttiType: TRttiInstanceType read FRttiType;
     property InterfaceGUID: TGUID read FInterfaceGUID;
     property FactoryMethodPointer: PValue read GetFactoryMethodPointer;
     property FarAncestorClazzSameInterfaceAndTableAndConnection: String read FFarAncestorClazzSameInterfaceAndTableAndConnection write FFarAncestorClazzSameInterfaceAndTableAndConnection;
     property IsEntity: Boolean read FIsEntity write FIsEntity;
     property IsSingleton: Boolean read FIsSingleton write FIsSingleton;
+    property PropertyInjectionsPointer: PioInjectionCollection read GetPropertyInjectionsPointer;
   end;
 
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils, iORM.Exceptions;
 
 { TioDIContainerImplementersItem }
 
@@ -111,6 +118,44 @@ end;
 function TioDIContainerImplementersItem.GetFactoryMethodPointer: PValue;
 begin
   Result := @FFactoryMethod;
+end;
+
+function TioDIContainerImplementersItem.GetFieldInjectionsPointer: PioInjectionCollection;
+begin
+  Result := @FFieldInjections;
+end;
+
+function TioDIContainerImplementersItem.GetPropertyInjectionsPointer: PioInjectionCollection;
+begin
+  Result := @FPropertyInjections;
+end;
+
+procedure TioDIContainerImplementersItem.InjectPropField(const AObj: TObject);
+var
+  I: Integer;
+  LRttiField: TRttiField;
+  LRttiProperty: TRttiProperty;
+begin
+  // Inject fields
+  for I := Low(FFieldInjections) to High(FFieldInjections) do
+  begin
+    LRttiField := FRttiType.GetField(FFieldInjections[I].Name);
+    if Assigned(LRttiField) then
+      LRttiField.SetValue(AObj, FFieldInjections[I].Value)
+    else
+      raise EioDependencyInjectionException.Create(ClassName, 'InjectPropField',
+        Format('Field named "%s" not found on instance of "%s" class.', [LRttiField.Name, AObj.ClassName]));
+  end;
+  // Inject properties
+  for I := Low(FPropertyInjections) to High(FPropertyInjections) do
+  begin
+    LRttiProperty := FRttiType.GetProperty(FPropertyInjections[I].Name);
+    if Assigned(LRttiProperty) then
+      LRttiProperty.SetValue(AObj, FPropertyInjections[I].Value)
+    else
+      raise EioDependencyInjectionException.Create(ClassName, 'InjectPropField',
+        Format('Property named "%s" not found on instance of "%s" class.', [LRttiProperty.Name, AObj.ClassName]));
+  end;
 end;
 
 function TioDIContainerImplementersItem.CreateInstanceByFactoryMethodIfNotAlreadyDone(const AAlreadyCreatedInstance: TObject): TObject;

@@ -54,6 +54,11 @@ type
   end;
   // -----------------------------------------------------------------------------------------------
 
+  // Dependency Injection exceptions --------------------------------------------------------------------
+  EioDependencyInjectionException = class(EioCustomException)
+  end;
+  // -----------------------------------------------------------------------------------------------
+
   // Persistence concurrency conflict exceptions ---------------------------------------------------
   EioConcurrencyConflictException = class(EioCustomException)
   public
