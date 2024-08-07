@@ -155,9 +155,9 @@ type
     function FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>): TioDIRegister; overload;
     // ---------- FACTORY METHOD ----------
     // ---------- PROPERTY/FIELD INJECTION ----------
-    function InjectField(const AFieldName: String; var AValue: TValue): TioDIRegister; overload;
+    function InjectField(const AFieldName: String; AValue: TValue): TioDIRegister; overload;
     function InjectField<T>(const AFieldName: String; const AValue: T): TioDIRegister; overload;
-    function InjectProperty(const APropertyName: String; var AValue: TValue): TioDIRegister; overload;
+    function InjectProperty(const APropertyName: String; AValue: TValue): TioDIRegister; overload;
     function InjectProperty<T>(const APropertyName: String; const AValue: T): TioDIRegister; overload;
     // ---------- PROPERTY/FIELD INJECTION ----------
   end;
@@ -285,7 +285,7 @@ type
     function Get: TI; reintroduce; overload;
     function SingletonKey(const ASingletonKey: String): TioDILocator<TI>; reintroduce; overload;
     // ---------- CONSTRUCTOR PARAMS ----------
-    function ConstructorParams(const AParams: TioConstructorParams): TioDILocator<TI>; reintroduce; overload;
+    function ConstructorParams(var AParams: TioConstructorParams): TioDILocator<TI>; reintroduce; overload;
     function ConstructorParams<T1>(AArg1: T1): TioDILocator<TI>; reintroduce; overload;
     function ConstructorParams<T1, T2>(AArg1: T1; AArg2: T2): TioDILocator<TI>; reintroduce; overload;
     function ConstructorParams<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDILocator<TI>; reintroduce; overload;
@@ -1052,7 +1052,7 @@ begin
   Result := Self;
 end;
 
-function TioDIRegister.InjectField(const AFieldName: String; var AValue: TValue): TioDIRegister;
+function TioDIRegister.InjectField(const AFieldName: String; AValue: TValue): TioDIRegister;
 var
   LIndex: Integer;
 begin
@@ -1074,7 +1074,7 @@ begin
   Result := InjectField(AFieldName, LValue);
 end;
 
-function TioDIRegister.InjectProperty(const APropertyName: String; var AValue: TValue): TioDIRegister;
+function TioDIRegister.InjectProperty(const APropertyName: String; AValue: TValue): TioDIRegister;
 var
   LIndex: Integer;
 begin
@@ -1924,6 +1924,8 @@ begin
           //  non esiste perchè sarebbe inutile.
           Result := FImplementersItem.CreateInstanceByFactoryMethodIfNotAlreadyDone(FAlreadyCreatedInstance);
       end;
+      // Properties/Fields injection
+      FImplementersItem.InjectPropField(Result);
       // Se stiamo creando un ViewModel oppure una SimpleView...
       if FInterfaceName.StartsWith(DI_VIEWMODEL_KEY_PREFIX) or FInterfaceName.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX) then
       begin
@@ -2245,7 +2247,7 @@ end;
 
 { TioDependencyInjectionLocator<T> }
 
-function TioDILocator<TI>.ConstructorParams(const AParams: TioConstructorParams): TioDILocator<TI>;
+function TioDILocator<TI>.ConstructorParams(var AParams: TioConstructorParams): TioDILocator<TI>;
 begin
   Result := Self;
   TioDILocator(Self).ConstructorParams(AParams);

@@ -93,16 +93,16 @@ end;
 
 class function TioObjectMakerIntf.CreateListByRttiType(const ARttiType: TRttiType; const AOwnsObject: Boolean): TObject;
 var
-  Prop: TRttiProperty;
+  LProp: TRttiProperty;
 begin
   inherited;
   // Proprerty "OwnsObjects" by Rtti
-  Prop := ARttiType.GetProperty('OwnsObjects');
+  LProp := ARttiType.GetProperty('OwnsObjects');
   // Create object
   Result := CreateObjectByRttiType(ARttiType);
   // Set "OwnsObjects" if exists
-  if Assigned(Prop) then
-    Prop.SetValue(PTypeInfo(Result), AOwnsObject);
+  if Assigned(LProp) then
+    LProp.SetValue(PTypeInfo(Result), AOwnsObject);
 end;
 
 class function TioObjectMakerIntf.CreateObjectByClassRef(const AClassRef: TClass): TObject;
