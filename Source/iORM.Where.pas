@@ -1137,7 +1137,7 @@ begin
     LList := Self.ToList(TList<IInterface>)
   else
     LList := Self.ToList(TList<TObject>);
-  io.di.LocateViewVMFor(TypeName, AParentCloseQueryAction, AVVMAlias).SetBindSource(LList).Show;
+  io.di.ResolveViewVMfor(TypeName, AParentCloseQueryAction, AVVMAlias).SetBindSource(LList).Show;
 end;
 
 procedure TioWhere.ToList(const AList: TObject);
@@ -1151,7 +1151,7 @@ end;
 
 function TioWhere.ToList(const AInterfacedListTypeName, AAlias: String; const AOwnsObjects: Boolean): TObject;
 begin
-  Result := ToList(io.di.Locate(AInterfacedListTypeName, AAlias).GetImplementersItem.RttiType, AOwnsObjects);
+  Result := ToList(io.di.Resolve(AInterfacedListTypeName, AAlias).GetImplementersItem.RttiType, AOwnsObjects);
 end;
 
 function TioWhere.ToList(const AListRttiType: TRttiType; const AOwnsObjects: Boolean): TObject;
@@ -1362,16 +1362,16 @@ begin
     raise EioGenericException.Create(Self.ClassName, '_Show', 'ADataObject non assigned.');
   // If specific View/ViewModel were found for the instance then use them...
   // NB: But only if AForceTypeNameUse = False
-  if io.di.LocateViewFor(ADataObject, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
-    and io.di.LocateVMFor(ADataObject, AParentCloseQueryAction, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
+  if io.di.ResolveViewFor(ADataObject, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
+    and io.di.ResolveVMfor(ADataObject, AParentCloseQueryAction, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
     and not AForceTypeNameUse then
-    io.di.LocateViewVMFor(ADataObject, AParentCloseQueryAction, AVVMAlias).SetBindSource(ADataObject).Show
+    io.di.ResolveViewVMfor(ADataObject, AParentCloseQueryAction, AVVMAlias).SetBindSource(ADataObject).Show
   else
     // Try also to look for a View/ViewModel for the TypeName (if the previous search was not successful)
-    if (not TypeName.IsEmpty) and io.di.LocateViewFor(TypeName, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
-      and io.di.LocateVMFor(TypeName, AParentCloseQueryAction, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
+    if (not TypeName.IsEmpty) and io.di.ResolveViewFor(TypeName, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
+      and io.di.ResolveVMfor(TypeName, AParentCloseQueryAction, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
     then
-      io.di.LocateViewVMFor(TypeName, AParentCloseQueryAction, AVVMAlias).SetBindSource(ADataObject).Show
+      io.di.ResolveViewVMfor(TypeName, AParentCloseQueryAction, AVVMAlias).SetBindSource(ADataObject).Show
     else
       raise EioGenericException.Create(Self.ClassName, '_Show',
         Format('No View/ViewModel were found for this instance (Object class = "%s"; TypeName = "%s"; AVVMAlias = "%s")',
@@ -1395,16 +1395,16 @@ begin
     raise EioGenericException.Create(Self.ClassName, '_Show', 'ADataObject non assigned.');
   // If specific View/ViewModel were found for the instance then use them...
   // NB: But only if AForceTypeNameUse = False
-  if io.di.LocateViewFor(ADataObject, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
-    and io.di.LocateVMFor(ADataObject, AParentCloseQueryAction, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
+  if io.di.ResolveViewFor(ADataObject, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
+    and io.di.ResolveVMfor(ADataObject, AParentCloseQueryAction, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
     and not AForceTypeNameUse then
-    io.di.LocateViewVMFor(ADataObject, AParentCloseQueryAction, AVVMAlias).SetBindSource(ADataObject).Show
+    io.di.ResolveViewVMfor(ADataObject, AParentCloseQueryAction, AVVMAlias).SetBindSource(ADataObject).Show
   else
     // Try also to look for a View/ViewModel for the TypeName (if the previous search was not successful)
-    if (not TypeName.IsEmpty) and io.di.LocateViewFor(TypeName, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
-      and io.di.LocateVMFor(TypeName, AParentCloseQueryAction, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
+    if (not TypeName.IsEmpty) and io.di.ResolveViewFor(TypeName, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
+      and io.di.ResolveVMfor(TypeName, AParentCloseQueryAction, AVVMAlias).Exist // NB: Lasciare le due condizioni separate
     then
-      io.di.LocateViewVMFor(TypeName, AParentCloseQueryAction, AVVMAlias).SetBindSource(ADataObject).Show
+      io.di.ResolveViewVMfor(TypeName, AParentCloseQueryAction, AVVMAlias).SetBindSource(ADataObject).Show
     else
       raise EioGenericException.Create(Self.ClassName, '_Show',
         Format('No View/ViewModel were found for this instance (Object class = "%s"; TypeName = "%s"; AVVMAlias = "%s")',

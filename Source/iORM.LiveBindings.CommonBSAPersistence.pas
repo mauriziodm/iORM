@@ -237,7 +237,7 @@ begin
   case AActiveBindSourceAdapter.TypeOfCollection of
     TioTypeOfCollection.tcSingleObject:
       begin
-        LObj := io.di.Locate(AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias).Get;
+        LObj := io.di.Resolve(AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias).Get;
         if AActiveBindSourceAdapter.IsInterfaceBSA and Supports(LObj, IInterface, LIntf) then
           AActiveBindSourceAdapter.InternalSetDataObject(LIntf, AActiveBindSourceAdapter.ioOwnsObjects)
         else

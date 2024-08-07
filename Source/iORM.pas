@@ -1118,110 +1118,110 @@ end;
 class procedure io.Show(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
   const AVVMAlias: String);
 begin
-  if di.LocateSimpleViewFor(ATargetObj, AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewFor(ATargetObj, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show
+  if di.ResolveSimpleViewFor(ATargetObj, AParentCloseQueryAction, AVVMAlias).Exist then
+    di.ResolveSimpleViewFor(ATargetObj, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show
   else
-    di.LocateViewVMfor(ATargetObj, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show;
+    di.ResolveViewVMfor(ATargetObj, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show;
 end;
 
 class procedure io.Show(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
   const AVVMAlias: String);
 begin
-  if di.LocateSimpleViewFor(ATargetObj, AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewFor(ATargetObj, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show
+  if di.ResolveSimpleViewFor(ATargetObj, AParentCloseQueryAction, AVVMAlias).Exist then
+    di.ResolveSimpleViewFor(ATargetObj, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show
   else
-    di.LocateViewVMfor(ATargetObj, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show;
+    di.ResolveViewVMfor(ATargetObj, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show;
 end;
 
 class procedure io.Show(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 begin
-  if di.LocateSimpleViewFor(ATargetObj, AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewFor(ATargetObj, AParentCloseQueryAction, AVVMAlias).Show
+  if di.ResolveSimpleViewFor(ATargetObj, AParentCloseQueryAction, AVVMAlias).Exist then
+    di.ResolveSimpleViewFor(ATargetObj, AParentCloseQueryAction, AVVMAlias).Show
   else
-    di.LocateViewVMfor(ATargetObj, AParentCloseQueryAction, AVVMAlias).Show;
+    di.ResolveViewVMfor(ATargetObj, AParentCloseQueryAction, AVVMAlias).Show;
 end;
 
 class procedure io.Show(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
   const AVVMAlias: String);
 begin
-  if di.LocateSimpleViewFor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewFor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show
+  if di.ResolveSimpleViewFor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).Exist then
+    di.ResolveSimpleViewFor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show
   else
-    di.LocateViewVMfor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show;
+    di.ResolveViewVMfor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show;
 end;
 
 class procedure io.Show<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 begin
-  if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Show
+  if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+    di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Show
   else
-    di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).Show;
+    di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).Show;
 end;
 
 class procedure io.Show<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
-  if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show
+  if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+    di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show
   else
-    di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show;
+    di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show;
 end;
 
 class procedure io.Show<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String);
 begin
-  if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show
+  if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+    di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show
   else
-    di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show;
+    di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show;
 end;
 
 class procedure io.Show(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
   const AVVMAlias: String);
 begin
-  if di.LocateSimpleViewFor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewFor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show
+  if di.ResolveSimpleViewFor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).Exist then
+    di.ResolveSimpleViewFor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show
   else
-    di.LocateViewVMfor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show;
+    di.ResolveViewVMfor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show;
 end;
 
 class procedure io.Show(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 begin
-  if di.LocateSimpleViewFor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewFor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).Show
+  if di.ResolveSimpleViewFor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).Exist then
+    di.ResolveSimpleViewFor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).Show
   else
-    di.LocateViewVMfor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).Show;
+    di.ResolveViewVMfor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).Show;
 end;
 
 class procedure io.ShowCurrent(const ABindSource: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
   const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ABindSource, True, False) then
-    TioDIFactory.GetViewVMLocatorFor(ABindSource, AParentCloseQueryAction, AVVMAlias, False).SetViewContext(AViewContext).ShowCurrent;
+    TioDIFactory.GetViewVMResolverFor(ABindSource, AParentCloseQueryAction, AVVMAlias, False).SetViewContext(AViewContext).ShowCurrent;
 end;
 
 class procedure io.ShowCurrent(const ABindSource: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ABindSource, True, False) then
-    TioDIFactory.GetViewVMLocatorFor(ABindSource, AParentCloseQueryAction, AVVMAlias, False).ShowCurrent;
+    TioDIFactory.GetViewVMResolverFor(ABindSource, AParentCloseQueryAction, AVVMAlias, False).ShowCurrent;
 end;
 
 class procedure io.ShowCurrent(const ABindSource: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
   const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ABindSource, True, False) then
-    TioDIFactory.GetViewVMLocatorFor(ABindSource, AParentCloseQueryAction, AVVMAlias, False).VCProvider(AVCProvider).ShowCurrent;
+    TioDIFactory.GetViewVMResolverFor(ABindSource, AParentCloseQueryAction, AVVMAlias, False).VCProvider(AVCProvider).ShowCurrent;
 end;
 
 class procedure io.ShowEach(const ABindSource: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
   const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ABindSource, True, False) then
-    TioDIFactory.GetViewVMLocatorFor(ABindSource, AParentCloseQueryAction, AVVMAlias, False).SetViewContext(AViewContext).ShowEach;
+    TioDIFactory.GetViewVMResolverFor(ABindSource, AParentCloseQueryAction, AVVMAlias, False).SetViewContext(AViewContext).ShowEach;
 end;
 
 class procedure io.ShowEach(const ABindSource: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ABindSource, True, False) then
-    TioDIFactory.GetViewVMLocatorFor(ABindSource, AParentCloseQueryAction, AVVMAlias, False).ShowEach;
+    TioDIFactory.GetViewVMResolverFor(ABindSource, AParentCloseQueryAction, AVVMAlias, False).ShowEach;
 end;
 
 class procedure io.ShowMessage(const AMessage: String);
@@ -1232,31 +1232,31 @@ end;
 class procedure io.ShowAsSelector<T>(const ASelectionTargetBS: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS, False, False) then
-    if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsSelectorFor(ASelectionTargetBS).Show
+    if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsSelectorFor(ASelectionTargetBS).Show
     else
-      di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsSelectorFor(ASelectionTargetBS).Show;
+      di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsSelectorFor(ASelectionTargetBS).Show;
 end;
 
 class procedure io.ShowAsSelector<T>(const ASelectionTargetBS: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
   const AViewContext: TComponent; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS, False, False) then
-    if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsSelectorFor(ASelectionTargetBS).Show
+    if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsSelectorFor(ASelectionTargetBS).Show
     else
-      di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsSelectorFor(ASelectionTargetBS).Show;
+      di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsSelectorFor(ASelectionTargetBS).Show;
 end;
 
 class procedure io.ShowAsWhereBuilder(const AEntityTypeName: String; const ASelectionTargetBS: IioMasterBindSource;
   const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext)
+    if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext)
         .SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).Show
     else
-      di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext)
+      di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext)
         .SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).Show;
 end;
 
@@ -1264,21 +1264,21 @@ class procedure io.ShowAsWhereBuilder<T>(const AWhere: IioWhere; const ASelectio
   const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).SetBindSource(AWhere).Show
+    if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).SetBindSource(AWhere).Show
     else
-      di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).SetBindSource(AWhere).Show;
+      di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).SetBindSource(AWhere).Show;
 end;
 
 class procedure io.ShowAsWhereBuilder<T>(const AWhere: IioWhere; const ASelectionTargetBS: IioMasterBindSource;
   const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS)
+    if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS)
         .SetBindSource(AWhere).Show
     else
-      di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS)
+      di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS)
         .SetBindSource(AWhere).Show;
 end;
 
@@ -1286,21 +1286,21 @@ class procedure io.ShowAsWhereBuilder(const AEntityTypeName: String; const AWher
   const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).SetBindSource(AWhere).Show
+    if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).SetBindSource(AWhere).Show
     else
-      di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).SetBindSource(AWhere).Show;
+      di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).SetBindSource(AWhere).Show;
 end;
 
 class procedure io.ShowAsWhereBuilder(const AEntityTypeName: String; const AWhere: IioWhere; const ASelectionTargetBS: IioMasterBindSource;
   const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS)
+    if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS)
         .SetBindSource(AWhere).Show
     else
-      di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS)
+      di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS)
         .SetBindSource(AWhere).Show;
 end;
 
@@ -1308,11 +1308,11 @@ class procedure io.ShowAsWhereBuilder(const AEntityTypeName: String; const AWher
   const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext)
+    if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext)
         .SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).SetBindSource(AWhere).Show
     else
-      di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS)
+      di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS)
         .SetBindSource(AWhere).Show;
 end;
 
@@ -1320,11 +1320,11 @@ class procedure io.ShowAsWhereBuilder<T>(const AWhere: IioWhere; const ASelectio
   const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS)
+    if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS)
         .SetBindSource(AWhere).Show
     else
-      di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS)
+      di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS)
         .SetBindSource(AWhere).Show;
 end;
 
@@ -1332,68 +1332,68 @@ class procedure io.ShowAsWhereBuilder(const AEntityTypeName: String; const ASele
   const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider)
+    if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider)
         .SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).Show
     else
-      di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).Show;
+      di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).Show;
 end;
 
 class procedure io.ShowAsWhereBuilder(const AEntityTypeName: String; const ASelectionTargetBS: IioMasterBindSource;
   const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).Show
+    if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).Show
     else
-      di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).Show;
+      di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).Show;
 end;
 
 class procedure io.ShowAsWhereBuilder<T>(const ASelectionTargetBS: IioMasterBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
   const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).Show
+    if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).Show
     else
-      di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).Show;
+      di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).Show;
 end;
 
 class procedure io.ShowAsWhereBuilder<T>(const ASelectionTargetBS: IioMasterBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
   const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).Show
+    if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).Show
     else
-      di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).Show;
+      di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).Show;
 end;
 
 class procedure io.ShowAsWhereBuilder<T>(const ASelectionTargetBS: IioMasterBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
   const AViewContext: TComponent; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).Show
+    if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).Show
     else
-      di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).Show;
+      di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsWhereBuilderFor(ASelectionTargetBS).Show;
 end;
 
 class procedure io.ShowAsSelector<T>(const ASelectionTargetBS: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
   const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS, False, False) then
-    if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ASelectionTargetBS).Show
+    if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ASelectionTargetBS).Show
     else
-      di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ASelectionTargetBS).Show;
+      di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ASelectionTargetBS).Show;
 end;
 
 class procedure io.ShowEach(const ABindSource: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
   const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ABindSource, True, False) then
-    TioDIFactory.GetViewVMLocatorFor(ABindSource, AParentCloseQueryAction, AVVMAlias, False).VCProvider(AVCProvider).ShowEach;
+    TioDIFactory.GetViewVMResolverFor(ABindSource, AParentCloseQueryAction, AVVMAlias, False).VCProvider(AVCProvider).ShowEach;
 end;
 
 class procedure io.ShowWait;
@@ -1482,255 +1482,255 @@ end;
 
 class function io.Create(const ATypeName, ATypeAlias: String): TObject;
 begin
-  Result := di.Locate(ATypeName, ATypeAlias).Get;
+  Result := di.Resolve(ATypeName, ATypeAlias).Get;
 end;
 
 class function io.Create<T>(const ATypeAlias: String): T;
 begin
-  Result := di.Locate<T>(ATypeAlias).Get;
+  Result := di.Resolve<T>(ATypeAlias).Get;
 end;
 
 class function io.CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
   const ASVAlias: String): TComponent;
 begin
-  Result := di.LocateSimpleView(ASVTypeName, AParentCloseQueryAction, ASVAlias).SetViewContext(AViewContext).GetAs<TComponent>;
+  Result := di.ResolveSimpleView(ASVTypeName, AParentCloseQueryAction, ASVAlias).SetViewContext(AViewContext).GetAs<TComponent>;
 end;
 
 class function io.CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewModel: IioViewModel;
   const ASVAlias: String): TComponent;
 begin
-  Result := di.LocateSimpleView(ASVTypeName, AParentCloseQueryAction, ASVAlias).SetViewModel(AViewModel).GetAs<TComponent>;
+  Result := di.ResolveSimpleView(ASVTypeName, AParentCloseQueryAction, ASVAlias).SetViewModel(AViewModel).GetAs<TComponent>;
 end;
 
 class function io.CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
   const AViewModel: IioViewModel; const ASVAlias: String): TComponent;
 begin
-  Result := di.LocateSimpleView(ASVTypeName, AParentCloseQueryAction, ASVAlias).VCProvider(AVCProvider).SetViewModel(AViewModel).GetAs<TComponent>;
+  Result := di.ResolveSimpleView(ASVTypeName, AParentCloseQueryAction, ASVAlias).VCProvider(AVCProvider).SetViewModel(AViewModel).GetAs<TComponent>;
 end;
 
 class function io.CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
   const AViewModel: IioViewModel; const ASVAlias: String): TComponent;
 begin
-  Result := di.LocateSimpleView(ASVTypeName, AParentCloseQueryAction, ASVAlias).SetViewContext(AViewContext).SetViewModel(AViewModel).GetAs<TComponent>;
+  Result := di.ResolveSimpleView(ASVTypeName, AParentCloseQueryAction, ASVAlias).SetViewContext(AViewContext).SetViewModel(AViewModel).GetAs<TComponent>;
 end;
 
 class function io.CreateSimpleView<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const ASVAlias: String): T;
 begin
-  Result := di.LocateSimpleView<T>(AParentCloseQueryAction, ASVAlias).SetViewContext(AViewContext).Get;
+  Result := di.ResolveSimpleView<T>(AParentCloseQueryAction, ASVAlias).SetViewContext(AViewContext).Get;
 end;
 
 class function io.CreateSimpleView<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
   const ASVAlias: String): T;
 begin
-  Result := di.LocateSimpleView<T>(AParentCloseQueryAction, ASVAlias).VCProvider(AVCProvider).Get;
+  Result := di.ResolveSimpleView<T>(AParentCloseQueryAction, ASVAlias).VCProvider(AVCProvider).Get;
 end;
 
 class function io.CreateSimpleView<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): T;
 begin
-  Result := di.LocateSimpleView<T>(AParentCloseQueryAction, ASVAlias).Get;
+  Result := di.ResolveSimpleView<T>(AParentCloseQueryAction, ASVAlias).Get;
 end;
 
 class function io.CreateSimpleView<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AViewModel: IioViewModel;
   const ASVAlias: String): T;
 begin
-  Result := di.LocateSimpleView<T>(AParentCloseQueryAction, ASVAlias).SetViewContext(AViewContext).SetViewModel(AViewModel).Get;
+  Result := di.ResolveSimpleView<T>(AParentCloseQueryAction, ASVAlias).SetViewContext(AViewContext).SetViewModel(AViewModel).Get;
 end;
 
 class function io.CreateSimpleViewFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const ASVAlias: String)
   : TComponent;
 begin
-  Result := io.di.LocateSimpleViewFor<T>(AParentCloseQueryAction, ASVAlias).SetViewContext(AViewContext).GetAs<TComponent>;
+  Result := io.di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, ASVAlias).SetViewContext(AViewContext).GetAs<TComponent>;
 end;
 
 class function io.CreateSimpleViewFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
   const ASVAlias: String): TComponent;
 begin
-  Result := io.di.LocateSimpleViewFor<T>(AParentCloseQueryAction, ASVAlias).VCProvider(AVCProvider).GetAs<TComponent>;
+  Result := io.di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, ASVAlias).VCProvider(AVCProvider).GetAs<TComponent>;
 end;
 
 class function io.CreateSimpleViewFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TComponent;
 begin
-  Result := io.di.LocateSimpleViewFor<T>(AParentCloseQueryAction, ASVAlias).GetAs<TComponent>;
+  Result := io.di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, ASVAlias).GetAs<TComponent>;
 end;
 
 class function io.CreateSimpleViewFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AViewModel: IioViewModel;
   const ASVAlias: String): TComponent;
 begin
-  Result := io.di.LocateSimpleViewFor<T>(AParentCloseQueryAction, ASVAlias).SetViewContext(AViewContext).SetViewModel(AViewModel).GetAs<TComponent>;
+  Result := io.di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, ASVAlias).SetViewContext(AViewContext).SetViewModel(AViewModel).GetAs<TComponent>;
 end;
 
 class function io.CreateSimpleViewFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
   const AViewModel: IioViewModel; const ASVAlias: String): TComponent;
 begin
-  Result := io.di.LocateSimpleViewFor<T>(AParentCloseQueryAction, ASVAlias).VCProvider(AVCProvider).SetViewModel(AViewModel).GetAs<TComponent>;
+  Result := io.di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, ASVAlias).VCProvider(AVCProvider).SetViewModel(AViewModel).GetAs<TComponent>;
 end;
 
 class function io.CreateSimpleViewFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewModel: IioViewModel; const ASVAlias: String)
   : TComponent;
 begin
-  Result := io.di.LocateSimpleViewFor<T>(AParentCloseQueryAction, ASVAlias).SetViewModel(AViewModel).GetAs<TComponent>;
+  Result := io.di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, ASVAlias).SetViewModel(AViewModel).GetAs<TComponent>;
 end;
 
 class function io.CreateSimpleView<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
   const AViewModel: IioViewModel; const ASVAlias: String): T;
 begin
-  Result := di.LocateSimpleView<T>(AParentCloseQueryAction, ASVAlias).VCProvider(AVCProvider).SetViewModel(AViewModel).Get;
+  Result := di.ResolveSimpleView<T>(AParentCloseQueryAction, ASVAlias).VCProvider(AVCProvider).SetViewModel(AViewModel).Get;
 end;
 
 class function io.CreateSimpleView<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewModel: IioViewModel; const ASVAlias: String): T;
 begin
-  Result := di.LocateSimpleView<T>(AParentCloseQueryAction, ASVAlias).SetViewModel(AViewModel).Get;
+  Result := di.ResolveSimpleView<T>(AParentCloseQueryAction, ASVAlias).SetViewModel(AViewModel).Get;
 end;
 
 class function io.CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
   const ASVAlias: String): TComponent;
 begin
-  Result := di.LocateSimpleView(ASVTypeName, AParentCloseQueryAction, ASVAlias).VCProvider(AVCProvider).GetAs<TComponent>;
+  Result := di.ResolveSimpleView(ASVTypeName, AParentCloseQueryAction, ASVAlias).VCProvider(AVCProvider).GetAs<TComponent>;
 end;
 
 class function io.CreateSimpleView(const ASVTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TComponent;
 begin
-  Result := di.LocateSimpleView(ASVTypeName, AParentCloseQueryAction, ASVAlias).GetAs<TComponent>;
+  Result := di.ResolveSimpleView(ASVTypeName, AParentCloseQueryAction, ASVAlias).GetAs<TComponent>;
 end;
 
 class function io.CreateView<T>(const AViewContext: TComponent; const AVAlias: String): T;
 begin
-  Result := di.LocateView<T>(AVAlias).SetViewContext(AViewContext).Get;
+  Result := di.ResolveView<T>(AVAlias).SetViewContext(AViewContext).Get;
 end;
 
 class function io.CreateView<T>(const AVCProvider: TioViewContextProvider; const AVAlias: String): T;
 begin
-  Result := di.LocateView<T>(AVAlias).VCProvider(AVCProvider).Get;
+  Result := di.ResolveView<T>(AVAlias).VCProvider(AVCProvider).Get;
 end;
 
 class function io.CreateView<T>(const AVAlias: String): T;
 begin
-  Result := di.LocateView<T>(AVAlias).Get;
+  Result := di.ResolveView<T>(AVAlias).Get;
 end;
 
 class function io.CreateView(const AViewTypeName, AVAlias: String): TComponent;
 begin
-  Result := di.LocateView(AViewTypeName, AVAlias).GetAs<TComponent>;
+  Result := di.ResolveView(AViewTypeName, AVAlias).GetAs<TComponent>;
 end;
 
 class function io.CreateView(const AViewTypeName: String; const AVCProvider: TioViewContextProvider; const AVAlias: String): TComponent;
 begin
-  Result := di.LocateView(AViewTypeName, AVAlias).VCProvider(AVCProvider).GetAs<TComponent>;
+  Result := di.ResolveView(AViewTypeName, AVAlias).VCProvider(AVCProvider).GetAs<TComponent>;
 end;
 
 class function io.CreateView(const AViewTypeName: String; const AViewContext: TComponent; const AVAlias: String): TComponent;
 begin
-  Result := di.LocateView(AViewTypeName, AVAlias).SetViewContext(AViewContext).GetAs<TComponent>;
+  Result := di.ResolveView(AViewTypeName, AVAlias).SetViewContext(AViewContext).GetAs<TComponent>;
 end;
 
 class function io.CreateView(const AViewTypeName: String; const AViewModel: IioViewModel; const AVAlias: String): TComponent;
 begin
-  Result := di.LocateView(AViewTypeName, AVAlias).SetViewModel(AViewModel).GetAs<TComponent>;
+  Result := di.ResolveView(AViewTypeName, AVAlias).SetViewModel(AViewModel).GetAs<TComponent>;
 end;
 
 class function io.CreateView(const AViewTypeName: String; const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const AVAlias: String)
   : TComponent;
 begin
-  Result := di.LocateView(AViewTypeName, AVAlias).VCProvider(AVCProvider).SetViewModel(AViewModel).GetAs<TComponent>;
+  Result := di.ResolveView(AViewTypeName, AVAlias).VCProvider(AVCProvider).SetViewModel(AViewModel).GetAs<TComponent>;
 end;
 
 class function io.CreateView(const AViewTypeName: String; const AViewContext: TComponent; const AViewModel: IioViewModel; const AVAlias: String): TComponent;
 begin
-  Result := di.LocateView(AViewTypeName, AVAlias).SetViewContext(AViewContext).SetViewModel(AViewModel).GetAs<TComponent>;
+  Result := di.ResolveView(AViewTypeName, AVAlias).SetViewContext(AViewContext).SetViewModel(AViewModel).GetAs<TComponent>;
 end;
 
 class function io.CreateView<T>(const AViewContext: TComponent; const AViewModel: IioViewModel; const AVAlias: String): T;
 begin
-  Result := di.LocateView<T>(AVAlias).SetViewContext(AViewContext).SetViewModel(AViewModel).Get;
+  Result := di.ResolveView<T>(AVAlias).SetViewContext(AViewContext).SetViewModel(AViewModel).Get;
 end;
 
 class function io.CreateViewFor<T>(const AVCProvider: TioViewContextProvider; const AVAlias: String): TComponent;
 begin
-  Result := io.di.LocateViewFor<T>(AVAlias).VCProvider(AVCProvider).GetAs<TComponent>;
+  Result := io.di.ResolveViewFor<T>(AVAlias).VCProvider(AVCProvider).GetAs<TComponent>;
 end;
 
 class function io.CreateViewFor<T>(const AViewContext: TComponent; const AVAlias: String): TComponent;
 begin
-  Result := io.di.LocateViewFor<T>(AVAlias).SetViewContext(AViewContext).GetAs<TComponent>;
+  Result := io.di.ResolveViewFor<T>(AVAlias).SetViewContext(AViewContext).GetAs<TComponent>;
 end;
 
 class function io.CreateViewFor<T>(const AVAlias: String): TComponent;
 begin
-  Result := io.di.LocateViewFor<T>(AVAlias).GetAs<TComponent>;
+  Result := io.di.ResolveViewFor<T>(AVAlias).GetAs<TComponent>;
 end;
 
 class function io.CreateViewFor<T>(const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const AVAlias: String): TComponent;
 begin
-  Result := io.di.LocateViewFor<T>(AVAlias).VCProvider(AVCProvider).SetViewModel(AViewModel).GetAs<TComponent>;
+  Result := io.di.ResolveViewFor<T>(AVAlias).VCProvider(AVCProvider).SetViewModel(AViewModel).GetAs<TComponent>;
 end;
 
 class function io.CreateViewFor<T>(const AViewContext: TComponent; const AViewModel: IioViewModel; const AVAlias: String): TComponent;
 begin
-  Result := io.di.LocateViewFor<T>(AVAlias).SetViewContext(AViewContext).SetViewModel(AViewModel).GetAs<TComponent>;
+  Result := io.di.ResolveViewFor<T>(AVAlias).SetViewContext(AViewContext).SetViewModel(AViewModel).GetAs<TComponent>;
 end;
 
 class function io.CreateViewFor<T>(const AViewModel: IioViewModel; const AVAlias: String): TComponent;
 begin
-  Result := io.di.LocateViewFor<T>(AVAlias).SetViewModel(AViewModel).GetAs<TComponent>;
+  Result := io.di.ResolveViewFor<T>(AVAlias).SetViewModel(AViewModel).GetAs<TComponent>;
 end;
 
 class function io.CreateView<T>(const AVCProvider: TioViewContextProvider; const AViewModel: IioViewModel; const AVAlias: String): T;
 begin
-  Result := di.LocateView<T>(AVAlias).VCProvider(AVCProvider).SetViewModel(AViewModel).Get;
+  Result := di.ResolveView<T>(AVAlias).VCProvider(AVCProvider).SetViewModel(AViewModel).Get;
 end;
 
 class function io.CreateView<T>(const AViewModel: IioViewModel; const AVAlias: String): T;
 begin
-  Result := di.LocateView<T>(AVAlias).SetViewModel(AViewModel).Get;
+  Result := di.ResolveView<T>(AVAlias).SetViewModel(AViewModel).Get;
 end;
 
 class procedure io.CreateViewVM<TView, TViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
   const AVVMAlias: String);
 begin
-  di.LocateViewVM<TView, TViewModel>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show;
+  di.ResolveViewVM<TView, TViewModel>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show;
 end;
 
 class procedure io.CreateViewVM(const AViewTypeName, AVMTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 begin
-  di.LocateViewVM(AViewTypeName, AVMTypeName, AParentCloseQueryAction, AVVMAlias).Show;
+  di.ResolveViewVM(AViewTypeName, AVMTypeName, AParentCloseQueryAction, AVVMAlias).Show;
 end;
 
 class procedure io.CreateViewVM(const AViewTypeName, AVMTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
   const AVVMAlias: String);
 begin
-  di.LocateViewVM(AViewTypeName, AVMTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show;
+  di.ResolveViewVM(AViewTypeName, AVMTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show;
 end;
 
 class procedure io.CreateViewVM(const AViewTypeName, AVMTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction;
   const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
-  di.LocateViewVM(AViewTypeName, AVMTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show;
+  di.ResolveViewVM(AViewTypeName, AVMTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show;
 end;
 
 class procedure io.CreateViewVM<TView, TViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
   const AVVMAlias: String);
 begin
-  di.LocateViewVM<TView, TViewModel>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show;
+  di.ResolveViewVM<TView, TViewModel>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show;
 end;
 
 class procedure io.CreateViewVM<TView, TViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 begin
-  di.LocateViewVM<TView, TViewModel>(AParentCloseQueryAction, AVVMAlias).Show;
+  di.ResolveViewVM<TView, TViewModel>(AParentCloseQueryAction, AVVMAlias).Show;
 end;
 
 class function io.CreateVMFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): IioViewModel;
 begin
-  Result := io.di.LocateVMfor<T>(AParentCloseQueryAction, AVMAlias).GetAs<IioViewModel>;
+  Result := io.di.ResolveVMfor<T>(AParentCloseQueryAction, AVMAlias).GetAs<IioViewModel>;
 end;
 
 class function io.CreateVM(const AVMTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): IioViewModel;
 begin
-  Result := di.LocateVM(AVMTypeName, AParentCloseQueryAction, AVMAlias).GetAs<IioViewModel>;
+  Result := di.ResolveVM(AVMTypeName, AParentCloseQueryAction, AVMAlias).GetAs<IioViewModel>;
 end;
 
 class function io.CreateVM<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): T;
 begin
-  Result := di.LocateVM<T>(AParentCloseQueryAction, AVMAlias).Get;
+  Result := di.ResolveVM<T>(AParentCloseQueryAction, AVMAlias).Get;
 end;
 
 class procedure io.DeleteObject(const [ref] AObj: TObject; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete);
@@ -2116,139 +2116,139 @@ end;
 
 class procedure io.Show(const AEntityTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 begin
-  if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Show
+  if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+    di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Show
   else
-    di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Show;
+    di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Show;
 end;
 
 class procedure io.Show(const AEntityTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
   const AVVMAlias: String);
 begin
-  if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show
+  if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+    di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show
   else
-    di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show;
+    di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).Show;
 end;
 
 class procedure io.Show(const AEntityTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
   const AVVMAlias: String);
 begin
-  if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show
+  if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+    di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show
   else
-    di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show;
+    di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).Show;
 end;
 
 class procedure io.ShowAsSelector(const AEntityTypeName: String; const ASelectionTargetBS: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
   const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS, False, False) then
-    if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsSelectorFor(ASelectionTargetBS).Show
+    if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsSelectorFor(ASelectionTargetBS).Show
     else
-      di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsSelectorFor(ASelectionTargetBS).Show;
+      di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsSelectorFor(ASelectionTargetBS).Show;
 end;
 
 class procedure io.ShowAsSelector(const AEntityTypeName: String; const ASelectionTargetBS: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
   const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS, False, False) then
-    if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ASelectionTargetBS).Show
+    if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ASelectionTargetBS).Show
     else
-      di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ASelectionTargetBS).Show;
+      di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ASelectionTargetBS).Show;
 end;
 
 class procedure io.ShowAsETM(const AEntityTypeName: String; const ASelectionTargetBS: IioMasterBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
   const AViewContext: TComponent; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsETMfor(ASelectionTargetBS).Show
+    if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsETMfor(ASelectionTargetBS).Show
     else
-      di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsETMfor(ASelectionTargetBS).Show;
+      di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsETMfor(ASelectionTargetBS).Show;
 end;
 
 class procedure io.ShowAsETM(const AEntityTypeName: String; const ASelectionTargetBS: IioMasterBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
   const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsETMfor(ASelectionTargetBS).Show
+    if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsETMfor(ASelectionTargetBS).Show
     else
-      di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsETMfor(ASelectionTargetBS).Show;
+      di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsETMfor(ASelectionTargetBS).Show;
 end;
 
 class procedure io.ShowAsETM(const AEntityTypeName: String; const ASelectionTargetBS: IioMasterBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
   const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsETMfor(ASelectionTargetBS).Show
+    if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsETMfor(ASelectionTargetBS).Show
     else
-      di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsETMfor(ASelectionTargetBS).Show;
+      di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsETMfor(ASelectionTargetBS).Show;
 end;
 
 class procedure io.ShowAsETM<T>(const ASelectionTargetBS: IioMasterBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsETMfor(ASelectionTargetBS).Show
+    if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsETMfor(ASelectionTargetBS).Show
     else
-      di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsETMfor(ASelectionTargetBS).Show;
+      di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsETMfor(ASelectionTargetBS).Show;
 end;
 
 class procedure io.ShowAsETM<T>(const ASelectionTargetBS: IioMasterBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
   const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsETMfor(ASelectionTargetBS).Show
+    if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsETMfor(ASelectionTargetBS).Show
     else
-      di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsETMfor(ASelectionTargetBS).Show;
+      di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsETMfor(ASelectionTargetBS).Show;
 end;
 
 class procedure io.ShowAsETM<T>(const ASelectionTargetBS: IioMasterBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
   const AViewContext: TComponent; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsETMfor(ASelectionTargetBS).Show
+    if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsETMfor(ASelectionTargetBS).Show
     else
-      di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsETMfor(ASelectionTargetBS).Show;
+      di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsETMfor(ASelectionTargetBS).Show;
 end;
 
 class procedure io.ShowAsSelector(const AEntityTypeName: String; const ASelectionTargetBS: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
   const AViewContext: TComponent; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS, False, False) then
-    if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext)
+    if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext)
         .SetBindSourceAsSelectorFor(ASelectionTargetBS).Show
     else
-      di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsSelectorFor(ASelectionTargetBS).Show;
+      di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsSelectorFor(ASelectionTargetBS).Show;
 end;
 
 class procedure io.ShowAsSelector(const AEntityTypeName: String; const AWhere: IioWhere; const ASelectionTargetBS: IioBindSource;
   const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS, False, False) then
-    if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsSelectorFor(ASelectionTargetBS).SetBindSource(AWhere).Show
+    if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsSelectorFor(ASelectionTargetBS).SetBindSource(AWhere).Show
     else
-      di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsSelectorFor(ASelectionTargetBS).SetBindSource(AWhere).Show;
+      di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsSelectorFor(ASelectionTargetBS).SetBindSource(AWhere).Show;
 end;
 
 class procedure io.ShowAsSelector(const AEntityTypeName: String; const AWhere: IioWhere; const ASelectionTargetBS: IioBindSource;
   const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS, False, False) then
-    if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ASelectionTargetBS)
+    if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ASelectionTargetBS)
         .SetBindSource(AWhere).Show
     else
-      di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ASelectionTargetBS)
+      di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ASelectionTargetBS)
         .SetBindSource(AWhere).Show;
 end;
 
@@ -2256,11 +2256,11 @@ class procedure io.ShowAsSelector(const AEntityTypeName: String; const AWhere: I
   const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS, False, False) then
-    if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsSelectorFor(ASelectionTargetBS)
+    if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsSelectorFor(ASelectionTargetBS)
         .SetBindSource(AWhere).Show
     else
-      di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsSelectorFor(ASelectionTargetBS)
+      di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsSelectorFor(ASelectionTargetBS)
         .SetBindSource(AWhere).Show;
 end;
 
@@ -2291,75 +2291,75 @@ end;
 
 class procedure io.Show(const AEntityTypeName: String; const AWhere: IioWhere; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 begin
-  if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).Show
+  if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+    di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).Show
   else
-    di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).Show;
+    di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).Show;
 end;
 
 class procedure io.Show(const AEntityTypeName: String; const AWhere: IioWhere; const AParentCloseQueryAction: IioBSCloseQueryAction;
   const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
-  if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).VCProvider(AVCProvider).Show
+  if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+    di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).VCProvider(AVCProvider).Show
   else
-    di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).VCProvider(AVCProvider).Show;
+    di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).VCProvider(AVCProvider).Show;
 end;
 
 class procedure io.Show(const AEntityTypeName: String; const AWhere: IioWhere; const AParentCloseQueryAction: IioBSCloseQueryAction;
   const AViewContext: TComponent; const AVVMAlias: String);
 begin
-  if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).SetViewContext(AViewContext).Show
+  if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+    di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).SetViewContext(AViewContext).Show
   else
-    di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).SetViewContext(AViewContext).Show;
+    di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).SetViewContext(AViewContext).Show;
 end;
 
 class procedure io.Show<T>(const AWhere: IioWhere; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 begin
-  if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).Show
+  if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+    di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).Show
   else
-    di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).Show;
+    di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).Show;
 end;
 
 class procedure io.Show<T>(const AWhere: IioWhere; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
   const AVVMAlias: String);
 begin
-  if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).VCProvider(AVCProvider).Show
+  if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+    di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).VCProvider(AVCProvider).Show
   else
-    di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).VCProvider(AVCProvider).Show;
+    di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).VCProvider(AVCProvider).Show;
 end;
 
 class procedure io.Show<T>(const AWhere: IioWhere; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
   const AVVMAlias: String);
 begin
-  if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-    di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).SetViewContext(AViewContext).Show
+  if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+    di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).SetViewContext(AViewContext).Show
   else
-    di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).SetViewContext(AViewContext).Show;
+    di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSource(AWhere).SetViewContext(AViewContext).Show;
 end;
 
 class procedure io.ShowAsSelector<T>(const AWhere: IioWhere; const ASelectionTargetBS: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
   const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS, False, False) then
-    if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsSelectorFor(ASelectionTargetBS).SetBindSource(AWhere).Show
+    if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsSelectorFor(ASelectionTargetBS).SetBindSource(AWhere).Show
     else
-      di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsSelectorFor(ASelectionTargetBS).SetBindSource(AWhere).Show;
+      di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsSelectorFor(ASelectionTargetBS).SetBindSource(AWhere).Show;
 end;
 
 class procedure io.ShowAsSelector<T>(const AWhere: IioWhere; const ASelectionTargetBS: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
   const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS, False, False) then
-    if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ASelectionTargetBS)
+    if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ASelectionTargetBS)
         .SetBindSource(AWhere).Show
     else
-      di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ASelectionTargetBS)
+      di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsSelectorFor(ASelectionTargetBS)
         .SetBindSource(AWhere).Show;
 end;
 
@@ -2367,11 +2367,11 @@ class procedure io.ShowAsSelector<T>(const AWhere: IioWhere; const ASelectionTar
   const AViewContext: TComponent; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS, False, False) then
-    if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsSelectorFor(ASelectionTargetBS)
+    if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsSelectorFor(ASelectionTargetBS)
         .SetBindSource(AWhere).Show
     else
-      di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsSelectorFor(ASelectionTargetBS)
+      di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsSelectorFor(ASelectionTargetBS)
         .SetBindSource(AWhere).Show;
 end;
 
@@ -2379,31 +2379,31 @@ class procedure io.ShowAsETM<T>(const AWhere: IioWhere; const ASelectionTargetBS
   const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsETMfor(ASelectionTargetBS).SetBindSource(AWhere).Show
+    if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsETMfor(ASelectionTargetBS).SetBindSource(AWhere).Show
     else
-      di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsETMfor(ASelectionTargetBS).SetBindSource(AWhere).Show;
+      di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetBindSourceAsETMfor(ASelectionTargetBS).SetBindSource(AWhere).Show;
 end;
 
 class procedure io.ShowAsETM<T>(const AWhere: IioWhere; const ASelectionTargetBS: IioMasterBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
   const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsETMfor(ASelectionTargetBS).SetBindSource(AWhere).Show
+    if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsETMfor(ASelectionTargetBS).SetBindSource(AWhere).Show
     else
-      di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsETMfor(ASelectionTargetBS).SetBindSource(AWhere).Show;
+      di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsETMfor(ASelectionTargetBS).SetBindSource(AWhere).Show;
 end;
 
 class procedure io.ShowAsETM<T>(const AWhere: IioWhere; const ASelectionTargetBS: IioMasterBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction;
   const AViewContext: TComponent; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsETMfor(ASelectionTargetBS)
+    if di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleViewFor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsETMfor(ASelectionTargetBS)
         .SetBindSource(AWhere).Show
     else
-      di.LocateViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsETMfor(ASelectionTargetBS)
+      di.ResolveViewVMfor<T>(AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsETMfor(ASelectionTargetBS)
         .SetBindSource(AWhere).Show;
 end;
 
@@ -2411,21 +2411,21 @@ class procedure io.ShowAsETM(const AEntityTypeName: String; const AWhere: IioWhe
   const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsETMfor(ASelectionTargetBS).SetBindSource(AWhere).Show
+    if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsETMfor(ASelectionTargetBS).SetBindSource(AWhere).Show
     else
-      di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsETMfor(ASelectionTargetBS).SetBindSource(AWhere).Show;
+      di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetBindSourceAsETMfor(ASelectionTargetBS).SetBindSource(AWhere).Show;
 end;
 
 class procedure io.ShowAsETM(const AEntityTypeName: String; const AWhere: IioWhere; const ASelectionTargetBS: IioMasterBindSource;
   const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsETMfor(ASelectionTargetBS)
+    if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsETMfor(ASelectionTargetBS)
         .SetBindSource(AWhere).Show
     else
-      di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsETMfor(ASelectionTargetBS)
+      di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).VCProvider(AVCProvider).SetBindSourceAsETMfor(ASelectionTargetBS)
         .SetBindSource(AWhere).Show;
 end;
 
@@ -2433,11 +2433,11 @@ class procedure io.ShowAsETM(const AEntityTypeName: String; const AWhere: IioWhe
   const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String);
 begin
   if TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ASelectionTargetBS as IioBindSource, False, False) then
-    if di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
-      di.LocateSimpleViewFor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsETMfor(ASelectionTargetBS)
+    if di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).Exist then
+      di.ResolveSimpleView(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsETMfor(ASelectionTargetBS)
         .SetBindSource(AWhere).Show
     else
-      di.LocateViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsETMfor(ASelectionTargetBS)
+      di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsETMfor(ASelectionTargetBS)
         .SetBindSource(AWhere).Show;
 end;
 

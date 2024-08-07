@@ -1201,7 +1201,7 @@ begin
         raise EioGenericException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
     end;
     // New instance by EntityType/Alias
-    if not FEntityTypeName.IsEmpty and io.di.Locate(FEntityTypeName, FEntityTypeAlias).Exist then
+    if not FEntityTypeName.IsEmpty and io.di.Resolve(FEntityTypeName, FEntityTypeAlias).Exist then
     begin
       LNewInstanceAsObject := io.Create(FEntityTypeName, FEntityTypeAlias);
       if Assigned(LNewInstanceAsObject) then
@@ -1286,7 +1286,7 @@ begin
         raise EioGenericException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
     end;
     // New instance ny EntityType/Alias
-    if not FEntityTypeName.IsEmpty and io.di.Locate(FEntityTypeName, FEntityTypeAlias).Exist then
+    if not FEntityTypeName.IsEmpty and io.di.Resolve(FEntityTypeName, FEntityTypeAlias).Exist then
     begin
       LNewInstanceAsObject := io.Create(FEntityTypeName, FEntityTypeAlias);
       if Assigned(LNewInstanceAsObject) then

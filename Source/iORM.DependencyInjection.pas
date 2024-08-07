@@ -166,7 +166,7 @@ type
   // ===========================================================================
   // CLASS LOCATOR
   // ---------------------------------------------------------------------------
-  TioDILocator = class(TioDIBase)
+  TioDIResolver = class(TioDIBase)
   strict private
     FImplementersItem: TioDIContainerImplementersItem;
     FInterfaceName: String;
@@ -213,36 +213,36 @@ type
     // TODO: 31/07/2024 - Verificare se serve ancora e se va messo anche qui un try-finally
     function GetImplementersItem: TioDIContainerImplementersItem;
     function Show: TComponent; virtual;
-    function SingletonKey(const ASingletonKey: String): TioDILocator; virtual;
+    function SingletonKey(const ASingletonKey: String): TioDIResolver; virtual;
     // ---------- CONSTRUCTOR PARAMS ----------
-    function ConstructorParams(var AParams: TioConstructorParams): TioDILocator; overload;
-    function ConstructorParams<T1>(AArg1: T1): TioDILocator; overload;
-    function ConstructorParams<T1, T2>(AArg1: T1; AArg2: T2): TioDILocator; overload;
-    function ConstructorParams<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDILocator; overload;
-    function ConstructorParams<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDILocator; overload;
-    function ConstructorParams<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDILocator; overload;
-    function ConstructorParams<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDILocator; overload;
-    function ConstructorParams<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDILocator; overload;
-    function ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8): TioDILocator; overload;
-    function ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8; AArg9: T9): TioDILocator; overload;
+    function ConstructorParams(var AParams: TioConstructorParams): TioDIResolver; overload;
+    function ConstructorParams<T1>(AArg1: T1): TioDIResolver; overload;
+    function ConstructorParams<T1, T2>(AArg1: T1; AArg2: T2): TioDIResolver; overload;
+    function ConstructorParams<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDIResolver; overload;
+    function ConstructorParams<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDIResolver; overload;
+    function ConstructorParams<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDIResolver; overload;
+    function ConstructorParams<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDIResolver; overload;
+    function ConstructorParams<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDIResolver; overload;
+    function ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8): TioDIResolver; overload;
+    function ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8; AArg9: T9): TioDIResolver; overload;
     // ---------- CONSTRUCTOR PARAMS ----------
     // ---------- FACTORY METHOD ----------
-    function FactoryMethod: TioDILocator; overload;
-    function FactoryMethod<T1>(AArg1: T1): TioDILocator; overload;
-    function FactoryMethod<T1, T2>(AArg1: T1; AArg2: T2): TioDILocator; overload;
-    function FactoryMethod<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDILocator; overload;
-    function FactoryMethod<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDILocator; overload;
-    function FactoryMethod<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDILocator; overload;
-    function FactoryMethod<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDILocator; overload;
-    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDILocator; overload;
-    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8): TioDILocator; overload;
-    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8; AArg9: T9): TioDILocator; overload;
+    function FactoryMethod: TioDIResolver; overload;
+    function FactoryMethod<T1>(AArg1: T1): TioDIResolver; overload;
+    function FactoryMethod<T1, T2>(AArg1: T1; AArg2: T2): TioDIResolver; overload;
+    function FactoryMethod<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDIResolver; overload;
+    function FactoryMethod<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDIResolver; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDIResolver; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDIResolver; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDIResolver; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8): TioDIResolver; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8; AArg9: T9): TioDIResolver; overload;
     // ---------- FACTORY METHOD ----------
     // ---------- FOR SHOW EACH FUNCTIONALITY ----------
     function ShowCurrent: TComponent;
     procedure ShowEach;
     procedure _SetForEachModelPresenter(const AModelPresenter: IioBindSource; const ALocateViewModel: Boolean);
-    procedure _DuplicateLocatorForShowEachPurposeFrom(const ASourceLocator: TioDILocator);
+    procedure _DuplicateLocatorForShowEachPurposeFrom(const ASourceLocator: TioDIResolver);
     function _GetAlias: String;
     function _GetLocatorConstructorParamsPointer: PioConstructorParams;
     function _GetImplementersItemOrLocatorConstructorParamsPointer: PioConstructorParams;
@@ -251,92 +251,92 @@ type
     function _GetParentCloseQueryAction: IioBSCloseQueryAction;
     // ---------- FOR SHOW EACH FUNCTIONALITY ----------
     // ---------- VIEWMODEL METHODS ----------
-    function SetViewModel(const AViewModel: IioViewModel; const AMarker: String = ''): TioDILocator;
+    function SetViewModel(const AViewModel: IioViewModel; const AMarker: String = ''): TioDIResolver;
     // ---------- VIEWMODEL METHODS ----------
     // ---------- SETBINDSOURCE METHODS ----------
     // SetBindSource (passing the name of the destination presenter)
-    function SetBindSource(const ABSName: String; const ADataObject: TObject): TioDILocator; overload;
-    function SetBindSource(const ABSName: String; const AInterfacedObj: IInterface): TioDILocator; overload;
-    function SetBindSource(const ABSName: String; const AMasterBindSource: IioBindSource; const AMasterPropertyName: String = ''): TioDILocator; overload;
-    function SetBindSource(const ABSName: String; const AWhere: IioWhere): TioDILocator; overload;
-    function SetBindSourceAsSelectorFor(const ASelectorBSName: String; const ASelectionTargetBS: IioBindSource): TioDILocator; overload;
-    function SetBindSourceAsWhereBuilderFor(const AWhereBuilderBSName: String; const AWhereBuilderTargetBS: IioMasterBindSource): TioDILocator; overload;
-    function SetBindSourceAsETMfor(const AEtmBSName: String; const AEtmTargetBS: IioMasterBindSource): TioDILocator; overload;
+    function SetBindSource(const ABSName: String; const ADataObject: TObject): TioDIResolver; overload;
+    function SetBindSource(const ABSName: String; const AInterfacedObj: IInterface): TioDIResolver; overload;
+    function SetBindSource(const ABSName: String; const AMasterBindSource: IioBindSource; const AMasterPropertyName: String = ''): TioDIResolver; overload;
+    function SetBindSource(const ABSName: String; const AWhere: IioWhere): TioDIResolver; overload;
+    function SetBindSourceAsSelectorFor(const ASelectorBSName: String; const ASelectionTargetBS: IioBindSource): TioDIResolver; overload;
+    function SetBindSourceAsWhereBuilderFor(const AWhereBuilderBSName: String; const AWhereBuilderTargetBS: IioMasterBindSource): TioDIResolver; overload;
+    function SetBindSourceAsETMfor(const AEtmBSName: String; const AEtmTargetBS: IioMasterBindSource): TioDIResolver; overload;
     // SetBindSource (WITHOUT passing the name of the destination presenter)
-    function SetBindSource(const ADataObject: TObject): TioDILocator; overload;
-    function SetBindSource(const AInterfacedObj: IInterface): TioDILocator; overload;
-    function SetBindSource(const AMasterBindSource: IioBindSource; const AMasterPropertyName: String = ''): TioDILocator; overload;
-    function SetBindSource(const AWhere: IioWhere): TioDILocator; overload;
-    function SetBindSourceAsSelectorFor(const ASelectionTargetBS: IioBindSource): TioDILocator; overload;
-    function SetBindSourceAsWhereBuilderFor(const AWhereBuilderTargetBS: IioMasterBindSource): TioDILocator; overload;
-    function SetBindSourceAsETMfor(const AEtmTargetBS: IioMasterBindSource): TioDILocator; overload;
+    function SetBindSource(const ADataObject: TObject): TioDIResolver; overload;
+    function SetBindSource(const AInterfacedObj: IInterface): TioDIResolver; overload;
+    function SetBindSource(const AMasterBindSource: IioBindSource; const AMasterPropertyName: String = ''): TioDIResolver; overload;
+    function SetBindSource(const AWhere: IioWhere): TioDIResolver; overload;
+    function SetBindSourceAsSelectorFor(const ASelectionTargetBS: IioBindSource): TioDIResolver; overload;
+    function SetBindSourceAsWhereBuilderFor(const AWhereBuilderTargetBS: IioMasterBindSource): TioDIResolver; overload;
+    function SetBindSourceAsETMfor(const AEtmTargetBS: IioMasterBindSource): TioDIResolver; overload;
     // ---------- SETBINDSOURCE METHODS ----------
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
-    function VCProvider(const AVCProvider: TioViewContextProvider): TioDILocator;
-    function SetViewContext(const AViewContext: TComponent; const AViewContextFreeMethod: TProc = nil): TioDILocator;
+    function VCProvider(const AVCProvider: TioViewContextProvider): TioDIResolver;
+    function SetViewContext(const AViewContext: TComponent; const AViewContextFreeMethod: TProc = nil): TioDIResolver;
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
     // ---------- CLOSE QUERY ACTION FUNCTIONALITY ----------
-    function SetParentCloseQueryAction(const AParentCLoseQueryAction: IioBSCloseQueryAction): TioDILocator;
+    function SetParentCloseQueryAction(const AParentCLoseQueryAction: IioBSCloseQueryAction): TioDIResolver;
     // ---------- CLOSE QUERY ACTION FUNCTIONALITY ----------
   end;
 
   // Generic version of the Service Locator Class
-  TioDILocator<TI> = class(TioDILocator)
+  TioDIResolver<TI> = class(TioDIResolver)
   public
     function Get: TI; reintroduce; overload;
-    function SingletonKey(const ASingletonKey: String): TioDILocator<TI>; reintroduce; overload;
+    function SingletonKey(const ASingletonKey: String): TioDIResolver<TI>; reintroduce; overload;
     // ---------- CONSTRUCTOR PARAMS ----------
-    function ConstructorParams(var AParams: TioConstructorParams): TioDILocator<TI>; reintroduce; overload;
-    function ConstructorParams<T1>(AArg1: T1): TioDILocator<TI>; reintroduce; overload;
-    function ConstructorParams<T1, T2>(AArg1: T1; AArg2: T2): TioDILocator<TI>; reintroduce; overload;
-    function ConstructorParams<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDILocator<TI>; reintroduce; overload;
-    function ConstructorParams<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDILocator<TI>; reintroduce; overload;
-    function ConstructorParams<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDILocator<TI>; reintroduce; overload;
-    function ConstructorParams<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDILocator<TI>; reintroduce; overload;
-    function ConstructorParams<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDILocator<TI>; reintroduce; overload;
-    function ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8): TioDILocator<TI>; reintroduce; overload;
-    function ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8; AArg9: T9): TioDILocator<TI>; reintroduce; overload;
+    function ConstructorParams(var AParams: TioConstructorParams): TioDIResolver<TI>; reintroduce; overload;
+    function ConstructorParams<T1>(AArg1: T1): TioDIResolver<TI>; reintroduce; overload;
+    function ConstructorParams<T1, T2>(AArg1: T1; AArg2: T2): TioDIResolver<TI>; reintroduce; overload;
+    function ConstructorParams<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDIResolver<TI>; reintroduce; overload;
+    function ConstructorParams<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDIResolver<TI>; reintroduce; overload;
+    function ConstructorParams<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDIResolver<TI>; reintroduce; overload;
+    function ConstructorParams<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDIResolver<TI>; reintroduce; overload;
+    function ConstructorParams<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDIResolver<TI>; reintroduce; overload;
+    function ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8): TioDIResolver<TI>; reintroduce; overload;
+    function ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8; AArg9: T9): TioDIResolver<TI>; reintroduce; overload;
 
     // ---------- CONSTRUCTOR PARAMS ----------
     // ---------- FACTORY METHOD ----------
-    function FactoryMethod: TioDILocator<TI>; overload;
-    function FactoryMethod<T1>(AArg1: T1): TioDILocator<TI>; overload;
-    function FactoryMethod<T1, T2>(AArg1: T1; AArg2: T2): TioDILocator<TI>; overload;
-    function FactoryMethod<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDILocator<TI>; overload;
-    function FactoryMethod<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDILocator<TI>; overload;
-    function FactoryMethod<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDILocator<TI>; overload;
-    function FactoryMethod<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDILocator<TI>; overload;
-    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDILocator<TI>; overload;
-    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8): TioDILocator<TI>; overload;
-    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8; AArg9: T9): TioDILocator<TI>; overload;
+    function FactoryMethod: TioDIResolver<TI>; overload;
+    function FactoryMethod<T1>(AArg1: T1): TioDIResolver<TI>; overload;
+    function FactoryMethod<T1, T2>(AArg1: T1; AArg2: T2): TioDIResolver<TI>; overload;
+    function FactoryMethod<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDIResolver<TI>; overload;
+    function FactoryMethod<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDIResolver<TI>; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDIResolver<TI>; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDIResolver<TI>; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDIResolver<TI>; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8): TioDIResolver<TI>; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8; AArg9: T9): TioDIResolver<TI>; overload;
     // ---------- FACTORY METHOD ----------
     // ---------- VIEWMODEL METHODS ----------
-    function SetViewModel(const AViewModel: IioViewModel; const AMarker: String = ''): TioDILocator<TI>;
+    function SetViewModel(const AViewModel: IioViewModel; const AMarker: String = ''): TioDIResolver<TI>;
     // ---------- VIEWMODEL METHODS ----------
     // ---------- SETBINDSOURCE METHODS ----------
     // SetPresenter (passing the name of the destination presenter)
-    function SetBindSource(const ABSName: String; const ADataObject: TObject): TioDILocator<TI>; overload;
-    function SetBindSource(const ABSName: String; const AInterfacedObj: IInterface): TioDILocator<TI>; overload;
-    function SetBindSource(const ABSName: String; const AMasterPresenter: IioBindSource; const AMasterPropertyName: String = ''): TioDILocator<TI>; overload;
-    function SetBindSource(const ABSName: String; const AWhere: IioWhere): TioDILocator<TI>; overload;
-    function SetBindSourceAsSelectorFor(const ASelectorBSName: String; const ASelectionTargetBS: IioBindSource): TioDILocator<TI>; overload;
-    function SetBindSourceAsWhereBuilderFor(const AWhereBuilderBSName: String; const AWhereBuilderTargetBS: IioMasterBindSource): TioDILocator<TI>; overload;
-    function SetBindSourceAsETMfor(const AEtmBSName: String; const AEtmTargetBS: IioMasterBindSource): TioDILocator<TI>; overload;
+    function SetBindSource(const ABSName: String; const ADataObject: TObject): TioDIResolver<TI>; overload;
+    function SetBindSource(const ABSName: String; const AInterfacedObj: IInterface): TioDIResolver<TI>; overload;
+    function SetBindSource(const ABSName: String; const AMasterPresenter: IioBindSource; const AMasterPropertyName: String = ''): TioDIResolver<TI>; overload;
+    function SetBindSource(const ABSName: String; const AWhere: IioWhere): TioDIResolver<TI>; overload;
+    function SetBindSourceAsSelectorFor(const ASelectorBSName: String; const ASelectionTargetBS: IioBindSource): TioDIResolver<TI>; overload;
+    function SetBindSourceAsWhereBuilderFor(const AWhereBuilderBSName: String; const AWhereBuilderTargetBS: IioMasterBindSource): TioDIResolver<TI>; overload;
+    function SetBindSourceAsETMfor(const AEtmBSName: String; const AEtmTargetBS: IioMasterBindSource): TioDIResolver<TI>; overload;
     // SetPresenter (WITHOUT passing the name of the destination presenter)
-    function SetBindSource(const ADataObject: TObject): TioDILocator<TI>; overload;
-    function SetBindSource(const AInterfacedObj: IInterface): TioDILocator<TI>; overload;
-    function SetBindSource(const AMasterPresenter: IioBindSource; const AMasterPropertyName: String = ''): TioDILocator<TI>; overload;
-    function SetBindSource(const AWhere: IioWhere): TioDILocator<TI>; overload;
-    function SetBindSourceAsSelectorFor(const ASelectionTargetBS: IioBindSource): TioDILocator<TI>; overload;
-    function SetBindSourceAsWhereBuilderFor(const AWhereBuilderTargetBS: IioMasterBindSource): TioDILocator<TI>; overload;
-    function SetBindSourceAsETMfor(const AEtmTargetBS: IioMasterBindSource): TioDILocator<TI>; overload;
+    function SetBindSource(const ADataObject: TObject): TioDIResolver<TI>; overload;
+    function SetBindSource(const AInterfacedObj: IInterface): TioDIResolver<TI>; overload;
+    function SetBindSource(const AMasterPresenter: IioBindSource; const AMasterPropertyName: String = ''): TioDIResolver<TI>; overload;
+    function SetBindSource(const AWhere: IioWhere): TioDIResolver<TI>; overload;
+    function SetBindSourceAsSelectorFor(const ASelectionTargetBS: IioBindSource): TioDIResolver<TI>; overload;
+    function SetBindSourceAsWhereBuilderFor(const AWhereBuilderTargetBS: IioMasterBindSource): TioDIResolver<TI>; overload;
+    function SetBindSourceAsETMfor(const AEtmTargetBS: IioMasterBindSource): TioDIResolver<TI>; overload;
     // ---------- VIEW MODEL METHODS ----------
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
-    function VCProvider(const AVCProvider: TioViewContextProvider): TioDILocator<TI>;
-    function SetViewContext(const AViewContext: TComponent; const AViewContextFreeMethod: TProc = nil): TioDILocator<TI>;
+    function VCProvider(const AVCProvider: TioViewContextProvider): TioDIResolver<TI>;
+    function SetViewContext(const AViewContext: TComponent; const AViewContextFreeMethod: TProc = nil): TioDIResolver<TI>;
     // ---------- LOCATE VIEW CONTEXT PROVIDER ----------
     // ---------- CLOSE QUERY ACTION FUNCTIONALITY ----------
-    function SetParentCloseQueryAction(const AParentCloseQueryAction: IioBSCloseQueryAction): TioDILocator<TI>;
+    function SetParentCloseQueryAction(const AParentCloseQueryAction: IioBSCloseQueryAction): TioDIResolver<TI>;
     // ---------- CLOSE QUERY ACTION FUNCTIONALITY ----------
   end;
   // ===========================================================================
@@ -357,8 +357,8 @@ type
 
   TioDependencyInjection = class(TioDIBase)
   private
-    class function _LocateForEachVVM_1stPhase_Browse(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String = ''): TioDILocator; overload;
-    class function _LocateForEachVVM_2ndPhase_Create(const ASourceMP: IioBindSource; const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String = ''; const AViewModelMarker: String = ''): TioDILocator; overload;
+    class function _LocateForEachVVM_1stPhase_Browse(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String = ''): TioDIResolver; overload;
+    class function _LocateForEachVVM_2ndPhase_Create(const ASourceMP: IioBindSource; const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String = ''; const AViewModelMarker: String = ''): TioDIResolver; overload;
   public
     class function Singletons: TioSingletonsFacadeRef;
     // ========== REGISTER ==========
@@ -419,43 +419,43 @@ type
     // ========== REGISTER ==========
     // ========== LOCATE ==========
     // Locate
-    class function Locate(const AInterfaceName: String; const AAlias: String = ''): TioDILocator; overload;
-    class function Locate<T>(const AAlias: String = ''): TioDILocator<T>; overload;
+    class function Resolve(const AInterfaceName: String; const AAlias: String = ''): TioDIResolver; overload;
+    class function Resolve<T>(const AAlias: String = ''): TioDIResolver<T>; overload;
     // Locate SimpleView
-    class function LocateSimpleView(const AInterfaceName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): TioDILocator; overload;
-    class function LocateSimpleView<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): TioDILocator<T>; overload;
-    class function LocateSimpleViewFor(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): TioDILocator; overload;
-    class function LocateSimpleViewFor(const AClassRef: TioClassRef; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): TioDILocator; overload;
-    class function LocateSimpleViewFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): TioDILocator; overload;
-    class function LocateSimpleViewFor(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): TioDILocator; overload;
-    class function LocateSimpleViewFor(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): TioDILocator; overload;
-    class function LocateSimpleViewFor(const ATargetMP: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): TioDILocator; overload;
+    class function ResolveSimpleView(const AInterfaceName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): TioDIResolver; overload;
+    class function ResolveSimpleView<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): TioDIResolver<T>; overload;
+    class function ResolveSimpleViewFor(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): TioDIResolver; overload;
+    class function ResolveSimpleViewFor(const AClassRef: TioClassRef; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): TioDIResolver; overload;
+    class function ResolveSimpleViewFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): TioDIResolver; overload;
+    class function ResolveSimpleViewFor(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): TioDIResolver; overload;
+    class function ResolveSimpleViewFor(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): TioDIResolver; overload;
+    class function ResolveSimpleViewFor(const ATargetMP: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String = ''): TioDIResolver; overload;
     // Locate View
-    class function LocateView(const AInterfaceName: String; const AVAlias: String = ''): TioDILocator; overload;
-    class function LocateView<T: IInterface>(const AVAlias: String = ''): TioDILocator<T>; overload;
-    class function LocateViewFor(const ATargetTypeName: String; const AVAlias: String = ''): TioDILocator; overload;
-    class function LocateViewFor(const AClassRef: TioClassRef; const AVAlias: String = ''): TioDILocator; overload;
-    class function LocateViewFor<T>(const AVAlias: String = ''): TioDILocator; overload;
-    class function LocateViewFor(const ATargetObj: TObject; const AVAlias: String = ''): TioDILocator; overload;
-    class function LocateViewFor(const ATargetIntf: IInterface; const AVAlias: String = ''): TioDILocator; overload;
-    class function LocateViewFor(const ATargetMP: IioBindSource; const AVAlias: String = ''): TioDILocator; overload;
+    class function ResolveView(const AInterfaceName: String; const AVAlias: String = ''): TioDIResolver; overload;
+    class function ResolveView<T: IInterface>(const AVAlias: String = ''): TioDIResolver<T>; overload;
+    class function ResolveViewFor(const ATargetTypeName: String; const AVAlias: String = ''): TioDIResolver; overload;
+    class function ResolveViewFor(const AClassRef: TioClassRef; const AVAlias: String = ''): TioDIResolver; overload;
+    class function ResolveViewFor<T>(const AVAlias: String = ''): TioDIResolver; overload;
+    class function ResolveViewFor(const ATargetObj: TObject; const AVAlias: String = ''): TioDIResolver; overload;
+    class function ResolveViewFor(const ATargetIntf: IInterface; const AVAlias: String = ''): TioDIResolver; overload;
+    class function ResolveViewFor(const ATargetMP: IioBindSource; const AVAlias: String = ''): TioDIResolver; overload;
     // Locate ViewModel
-    class function LocateVM(const AInterfaceName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): TioDILocator; overload;
-    class function LocateVM<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): TioDILocator<T>; overload;
-    class function LocateVMfor(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): TioDILocator; overload;
-    class function LocateVMfor(const AClassRef: TioClassRef; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): TioDILocator; overload;
-    class function LocateVMfor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): TioDILocator; overload;
-    class function LocateVMfor(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): TioDILocator; overload;
-    class function LocateVMfor(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): TioDILocator; overload;
+    class function ResolveVM(const AInterfaceName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): TioDIResolver; overload;
+    class function ResolveVM<T: IInterface>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): TioDIResolver<T>; overload;
+    class function ResolveVMfor(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): TioDIResolver; overload;
+    class function ResolveVMfor(const AClassRef: TioClassRef; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): TioDIResolver; overload;
+    class function ResolveVMfor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): TioDIResolver; overload;
+    class function ResolveVMfor(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): TioDIResolver; overload;
+    class function ResolveVMfor(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String = ''): TioDIResolver; overload;
     // Locate View & ViewModel
-    class function LocateViewVM(const AViewInterfaceName, AVMInterfaceName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''; const AViewModelMarker: String = ''): TioDILocator; overload;
-    class function LocateViewVM<TView: IInterface; TViewModel: IioViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''; const AViewModelMarker: String = ''): TioDILocator<TView>; overload;
-    class function LocateViewVMfor(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''; const AViewModelMarker: String = ''): TioDILocator; overload;
-    class function LocateViewVMfor(const AClassRef: TioClassRef; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''; const AViewModelMarker: String = ''): TioDILocator; overload;
-    class function LocateViewVMfor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''; const AViewModelMarker: String = ''): TioDILocator; overload;
-    class function LocateViewVMfor(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''): TioDILocator; overload;
-    class function LocateViewVMfor(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''): TioDILocator; overload;
-    class function LocateViewVMfor(const ASourceMP: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''): TioDILocator; overload;
+    class function ResolveViewVM(const AViewInterfaceName, AVMInterfaceName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''; const AViewModelMarker: String = ''): TioDIResolver; overload;
+    class function ResolveViewVM<TView: IInterface; TViewModel: IioViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''; const AViewModelMarker: String = ''): TioDIResolver<TView>; overload;
+    class function ResolveViewVMfor(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''; const AViewModelMarker: String = ''): TioDIResolver; overload;
+    class function ResolveViewVMfor(const AClassRef: TioClassRef; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''; const AViewModelMarker: String = ''): TioDIResolver; overload;
+    class function ResolveViewVMfor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''; const AViewModelMarker: String = ''): TioDIResolver; overload;
+    class function ResolveViewVMfor(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''): TioDIResolver; overload;
+    class function ResolveViewVMfor(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''): TioDIResolver; overload;
+    class function ResolveViewVMfor(const ASourceMP: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''): TioDIResolver; overload;
     // ========== LOCATE ==========
   end;
 
@@ -464,11 +464,11 @@ type
   strict private
     // class procedure _CheckModelPresenter(const ATargetMP:TioModelPresenter); NB: Hint prevention "symbol declared but never used" (codice resente sotto)
   public
-    class function GetLocator(const AInterfaceName: String; const AAlias: String; const AOwnerRequested, AVCProviderEnabled: Boolean; const ADICObjType: TioDICObjType): TioDILocator; static;
-    class function GetLocatorFor<TI>(const AAlias: String; const AOwnerRequested, AVCProviderEnabled: Boolean; const ADICObjType: TioDICObjType): TioDILocator<TI>; static;
-    class function GetSimpleViewLocatorFor(const ATargetBS: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TioDILocator; static;
-    class function GetViewLocatorFor(const ATargetBS: IioBindSource; const AVAlias: String): TioDILocator; static;
-    class function GetViewVMLocatorFor(const ATargetBS: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const ACreateViewModel: Boolean): TioDILocator; static;
+    class function GetResolver(const AInterfaceName: String; const AAlias: String; const AOwnerRequested, AVCProviderEnabled: Boolean; const ADICObjType: TioDICObjType): TioDIResolver; static;
+    class function GetResolverFor<TI>(const AAlias: String; const AOwnerRequested, AVCProviderEnabled: Boolean; const ADICObjType: TioDICObjType): TioDIResolver<TI>; static;
+    class function GetSimpleViewResolverFor(const ATargetBS: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TioDIResolver; static;
+    class function GetViewResolverFor(const ATargetBS: IioBindSource; const AVAlias: String): TioDIResolver; static;
+    class function GetViewVMResolverFor(const ATargetBS: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const ACreateViewModel: Boolean): TioDIResolver; static;
   end;
 
 implementation
@@ -500,173 +500,173 @@ end;
 
 { TioDependencyInjection }
 
-class function TioDependencyInjection.Locate(const AInterfaceName, AAlias: String): TioDILocator;
+class function TioDependencyInjection.Resolve(const AInterfaceName, AAlias: String): TioDIResolver;
 begin
-  Result := TioDIFactory.GetLocator(AInterfaceName, AAlias, False, False, dotRegular);
+  Result := TioDIFactory.GetResolver(AInterfaceName, AAlias, False, False, dotRegular);
 end;
 
-class function TioDependencyInjection.Locate<T>(const AAlias: String): TioDILocator<T>;
+class function TioDependencyInjection.Resolve<T>(const AAlias: String): TioDIResolver<T>;
 begin
-  Result := TioDIFactory.GetLocatorFor<T>(AAlias, False, False, dotRegular);
+  Result := TioDIFactory.GetResolverFor<T>(AAlias, False, False, dotRegular);
 end;
 
-class function TioDependencyInjection.LocateSimpleView(const AInterfaceName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TioDILocator;
+class function TioDependencyInjection.ResolveSimpleView(const AInterfaceName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TioDIResolver;
 begin
-  Result := TioDIFactory.GetLocator(AInterfaceName, ASVAlias, True, True, dotSimpleView).SetParentCloseQueryAction(AParentCloseQueryAction);
+  Result := TioDIFactory.GetResolver(AInterfaceName, ASVAlias, True, True, dotSimpleView).SetParentCloseQueryAction(AParentCloseQueryAction);
 end;
 
-class function TioDependencyInjection.LocateSimpleView<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TioDILocator<T>;
+class function TioDependencyInjection.ResolveSimpleView<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TioDIResolver<T>;
 begin
-  Result := TioDIFactory.GetLocatorFor<T>(ASVAlias, True, True, dotSimpleView).SetParentCloseQueryAction(AParentCloseQueryAction);
+  Result := TioDIFactory.GetResolverFor<T>(ASVAlias, True, True, dotSimpleView).SetParentCloseQueryAction(AParentCloseQueryAction);
 end;
 
-class function TioDependencyInjection.LocateSimpleViewFor(const AClassRef: TioClassRef; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TioDILocator;
+class function TioDependencyInjection.ResolveSimpleViewFor(const AClassRef: TioClassRef; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TioDIResolver;
 begin
-  Result := LocateSimpleViewFor(AClassRef.ClassName, AParentCloseQueryAction, ASVAlias);
+  Result := ResolveSimpleViewFor(AClassRef.ClassName, AParentCloseQueryAction, ASVAlias);
 end;
 
-class function TioDependencyInjection.LocateSimpleViewFor(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TioDILocator;
+class function TioDependencyInjection.ResolveSimpleViewFor(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TioDIResolver;
 begin
-  Result := LocateSimpleViewFor(ATargetObj.ClassName, AParentCloseQueryAction, ASVAlias).SetBindSource(ATargetObj);
+  Result := ResolveSimpleViewFor(ATargetObj.ClassName, AParentCloseQueryAction, ASVAlias).SetBindSource(ATargetObj);
 end;
 
-class function TioDependencyInjection.LocateSimpleViewFor(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TioDILocator;
+class function TioDependencyInjection.ResolveSimpleViewFor(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TioDIResolver;
 begin
-  Result := LocateSimpleViewFor((ATargetIntf as TObject).ClassName, AParentCloseQueryAction, ASVAlias).SetBindSource(ATargetIntf);
+  Result := ResolveSimpleViewFor((ATargetIntf as TObject).ClassName, AParentCloseQueryAction, ASVAlias).SetBindSource(ATargetIntf);
 end;
 
-class function TioDependencyInjection.LocateSimpleViewFor(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TioDILocator;
+class function TioDependencyInjection.ResolveSimpleViewFor(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TioDIResolver;
 begin
   // Get the ViewLocator
-  Result := TioDIFactory.GetLocator(ATargetTypeName, ASVAlias, True, True, dotSimpleView).SetParentCloseQueryAction(AParentCloseQueryAction);
+  Result := TioDIFactory.GetResolver(ATargetTypeName, ASVAlias, True, True, dotSimpleView).SetParentCloseQueryAction(AParentCloseQueryAction);
 end;
 
-class function TioDependencyInjection.LocateView(const AInterfaceName, AVAlias: String): TioDILocator;
+class function TioDependencyInjection.ResolveView(const AInterfaceName, AVAlias: String): TioDIResolver;
 begin
-  Result := TioDIFactory.GetLocator(AInterfaceName, AVAlias, True, True, dotView);
+  Result := TioDIFactory.GetResolver(AInterfaceName, AVAlias, True, True, dotView);
 end;
 
-class function TioDependencyInjection.LocateViewVM(const AViewInterfaceName, AVMInterfaceName: String; const AParentCloseQueryAction: IioBSCloseQueryAction;
-  const AVVMAlias, AViewModelMarker: String): TioDILocator;
+class function TioDependencyInjection.ResolveViewVM(const AViewInterfaceName, AVMInterfaceName: String; const AParentCloseQueryAction: IioBSCloseQueryAction;
+  const AVVMAlias, AViewModelMarker: String): TioDIResolver;
 var
   LViewModel: IioViewModel;
 begin
   // Get the ViewLocator
-  Result := TioDIFactory.GetLocator(AViewInterfaceName, AVVMAlias, True, True, dotView);
+  Result := TioDIFactory.GetResolver(AViewInterfaceName, AVVMAlias, True, True, dotView);
   // Get the ViewModel instance
-  LViewModel := io.di.LocateVM(AVMInterfaceName, AParentCloseQueryAction, AVVMAlias).GetAs<IioViewModel>;
+  LViewModel := io.di.ResolveVM(AVMInterfaceName, AParentCloseQueryAction, AVVMAlias).GetAs<IioViewModel>;
   Result.SetViewModel(LViewModel, AViewModelMarker);
 end;
 
-class function TioDependencyInjection.LocateViewVM<TView, TViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias, AViewModelMarker: String)
-  : TioDILocator<TView>;
+class function TioDependencyInjection.ResolveViewVM<TView, TViewModel>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias, AViewModelMarker: String)
+  : TioDIResolver<TView>;
 var
   LViewModel: IioViewModel;
 begin
   // Get the ViewLocator
-  Result := TioDIFactory.GetLocatorFor<TView>(AVVMAlias, True, True, dotView);
+  Result := TioDIFactory.GetResolverFor<TView>(AVVMAlias, True, True, dotView);
   // Get the ViewModel instance
-  LViewModel := io.di.LocateVM<TViewModel>(AParentCloseQueryAction, AVVMAlias).Get;
+  LViewModel := io.di.ResolveVM<TViewModel>(AParentCloseQueryAction, AVVMAlias).Get;
   Result.SetViewModel(LViewModel, AViewModelMarker);
 end;
 
-class function TioDependencyInjection.LocateViewVMfor(const AClassRef: TioClassRef; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias, AViewModelMarker: String): TioDILocator;
+class function TioDependencyInjection.ResolveViewVMfor(const AClassRef: TioClassRef; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias, AViewModelMarker: String): TioDIResolver;
 begin
-  Result := LocateViewVMfor(AClassRef.ClassName, AParentCloseQueryAction, AVVMAlias, AViewModelMarker);
+  Result := ResolveViewVMfor(AClassRef.ClassName, AParentCloseQueryAction, AVVMAlias, AViewModelMarker);
 end;
 
-class function TioDependencyInjection.LocateViewVMfor(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String): TioDILocator;
+class function TioDependencyInjection.ResolveViewVMfor(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String): TioDIResolver;
 var
   LViewModel: IioViewModel;
 begin
   // Get the ViewLocator
-  Result := LocateViewFor(ATargetObj.ClassName, AVVMAlias);
+  Result := ResolveViewFor(ATargetObj.ClassName, AVVMAlias);
   // Get & set the ViewModel instance into the ViewLocator
-  LViewModel := io.di.LocateVMfor(ATargetObj, AParentCloseQueryAction, AVVMAlias).GetAs<IioViewModel>;
+  LViewModel := io.di.ResolveVMfor(ATargetObj, AParentCloseQueryAction, AVVMAlias).GetAs<IioViewModel>;
   Result.SetViewModel(LViewModel);
 end;
 
-class function TioDependencyInjection.LocateViewVMfor(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String): TioDILocator;
+class function TioDependencyInjection.ResolveViewVMfor(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String): TioDIResolver;
 var
   LViewModel: IioViewModel;
 begin
   // Get the ViewLocator
-  Result := LocateViewFor(ATargetIntf, AVVMAlias);
+  Result := ResolveViewFor(ATargetIntf, AVVMAlias);
   // Get & set the ViewModel instance into the ViewLocator
-  LViewModel := io.di.LocateVMfor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).GetAs<IioViewModel>;
+  LViewModel := io.di.ResolveVMfor(ATargetIntf, AParentCloseQueryAction, AVVMAlias).GetAs<IioViewModel>;
   Result.SetViewModel(LViewModel);
 end;
 
-class function TioDependencyInjection.LocateViewVMfor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias, AViewModelMarker: String): TioDILocator;
+class function TioDependencyInjection.ResolveViewVMfor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias, AViewModelMarker: String): TioDIResolver;
 begin
-  Result := LocateViewVMfor(TioUtilities.GenericToString<T>, AParentCloseQueryAction, AVVMAlias, AViewModelMarker);
+  Result := ResolveViewVMfor(TioUtilities.GenericToString<T>, AParentCloseQueryAction, AVVMAlias, AViewModelMarker);
 end;
 
-class function TioDependencyInjection.LocateView<T>(const AVAlias: String): TioDILocator<T>;
+class function TioDependencyInjection.ResolveView<T>(const AVAlias: String): TioDIResolver<T>;
 begin
-  Result := TioDIFactory.GetLocatorFor<T>(AVAlias, True, True, dotView);
+  Result := TioDIFactory.GetResolverFor<T>(AVAlias, True, True, dotView);
 end;
 
-class function TioDependencyInjection.LocateViewFor(const AClassRef: TioClassRef; const AVAlias: String): TioDILocator;
+class function TioDependencyInjection.ResolveViewFor(const AClassRef: TioClassRef; const AVAlias: String): TioDIResolver;
 begin
-  Result := LocateViewFor(AClassRef.ClassName, AVAlias);
+  Result := ResolveViewFor(AClassRef.ClassName, AVAlias);
 end;
 
-class function TioDependencyInjection.LocateViewFor(const ATargetObj: TObject; const AVAlias: String): TioDILocator;
+class function TioDependencyInjection.ResolveViewFor(const ATargetObj: TObject; const AVAlias: String): TioDIResolver;
 begin
-  Result := LocateViewFor(ATargetObj.ClassName, AVAlias);
+  Result := ResolveViewFor(ATargetObj.ClassName, AVAlias);
 end;
 
-class function TioDependencyInjection.LocateViewFor<T>(const AVAlias: String): TioDILocator;
+class function TioDependencyInjection.ResolveViewFor<T>(const AVAlias: String): TioDIResolver;
 begin
-  Result := LocateViewFor(TioUtilities.GenericToString<T>, AVAlias);
+  Result := ResolveViewFor(TioUtilities.GenericToString<T>, AVAlias);
 end;
 
-class function TioDependencyInjection.LocateViewFor(const ATargetMP: IioBindSource; const AVAlias: String): TioDILocator;
+class function TioDependencyInjection.ResolveViewFor(const ATargetMP: IioBindSource; const AVAlias: String): TioDIResolver;
 begin
   // Get & set the locator
-  Result := TioDIFactory.GetViewLocatorFor(ATargetMP, AVAlias);
+  Result := TioDIFactory.GetViewResolverFor(ATargetMP, AVAlias);
 end;
 
-class function TioDependencyInjection.LocateViewFor(const ATargetTypeName, AVAlias: String): TioDILocator;
+class function TioDependencyInjection.ResolveViewFor(const ATargetTypeName, AVAlias: String): TioDIResolver;
 begin
   // Get the ViewLocator
-  Result := TioDIFactory.GetLocator(ATargetTypeName, AVAlias, True, True, dotView);
+  Result := TioDIFactory.GetResolver(ATargetTypeName, AVAlias, True, True, dotView);
 end;
 
-class function TioDependencyInjection.LocateVM(const AInterfaceName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): TioDILocator;
+class function TioDependencyInjection.ResolveVM(const AInterfaceName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): TioDIResolver;
 begin
-  Result := TioDIFactory.GetLocator(AInterfaceName, AVMAlias, True, False, dotViewModel).SetParentCloseQueryAction(AParentCloseQueryAction);
+  Result := TioDIFactory.GetResolver(AInterfaceName, AVMAlias, True, False, dotViewModel).SetParentCloseQueryAction(AParentCloseQueryAction);
 end;
 
-class function TioDependencyInjection.LocateVM<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): TioDILocator<T>;
+class function TioDependencyInjection.ResolveVM<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): TioDIResolver<T>;
 begin
-  Result := TioDIFactory.GetLocatorFor<T>(AVMAlias, True, False, dotViewModel).SetParentCloseQueryAction(AParentCloseQueryAction);
+  Result := TioDIFactory.GetResolverFor<T>(AVMAlias, True, False, dotViewModel).SetParentCloseQueryAction(AParentCloseQueryAction);
 end;
 
-class function TioDependencyInjection.LocateVMfor(const AClassRef: TioClassRef; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): TioDILocator;
+class function TioDependencyInjection.ResolveVMfor(const AClassRef: TioClassRef; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): TioDIResolver;
 begin
-  Result := LocateVMfor(AClassRef.ClassName, AParentCloseQueryAction, AVMAlias);
+  Result := ResolveVMfor(AClassRef.ClassName, AParentCloseQueryAction, AVMAlias);
 end;
 
-class function TioDependencyInjection.LocateVMfor(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): TioDILocator;
+class function TioDependencyInjection.ResolveVMfor(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): TioDIResolver;
 begin
-  Result := LocateVMfor(ATargetObj.ClassName, AParentCloseQueryAction, AVMAlias).SetBindSource(ATargetObj);
+  Result := ResolveVMfor(ATargetObj.ClassName, AParentCloseQueryAction, AVMAlias).SetBindSource(ATargetObj);
 end;
 
-class function TioDependencyInjection.LocateVMfor(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): TioDILocator;
+class function TioDependencyInjection.ResolveVMfor(const ATargetIntf: IInterface; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): TioDIResolver;
 begin
-  Result := LocateVMfor((ATargetIntf as TObject).ClassName, AParentCloseQueryAction, AVMAlias).SetBindSource(ATargetIntf);
+  Result := ResolveVMfor((ATargetIntf as TObject).ClassName, AParentCloseQueryAction, AVMAlias).SetBindSource(ATargetIntf);
 end;
 
-class function TioDependencyInjection.LocateVMfor(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): TioDILocator;
+class function TioDependencyInjection.ResolveVMfor(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): TioDIResolver;
 begin
-  Result := TioDIFactory.GetLocator(ATargetTypeName, AVMAlias, True, False, dotViewModel).SetParentCloseQueryAction(AParentCloseQueryAction);
+  Result := TioDIFactory.GetResolver(ATargetTypeName, AVMAlias, True, False, dotViewModel).SetParentCloseQueryAction(AParentCloseQueryAction);
 end;
 
-class function TioDependencyInjection.LocateVMfor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): TioDILocator;
+class function TioDependencyInjection.ResolveVMfor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVMAlias: String): TioDIResolver;
 begin
-  Result := LocateVMfor(TioUtilities.GenericToString<T>, AParentCloseQueryAction, AVMAlias);
+  Result := ResolveVMfor(TioUtilities.GenericToString<T>, AParentCloseQueryAction, AVMAlias);
 end;
 
 class function TioDependencyInjection.RegisterClass(const AClassRttiType: TRttiInstanceType; const AAlias: String = ''): TioDIRegister;
@@ -757,32 +757,32 @@ begin
   Result := TioSingletonsFacade;
 end;
 
-class function TioDependencyInjection.LocateViewFor(const ATargetIntf: IInterface; const AVAlias: String): TioDILocator;
+class function TioDependencyInjection.ResolveViewFor(const ATargetIntf: IInterface; const AVAlias: String): TioDIResolver;
 begin
-  Result := LocateViewFor((ATargetIntf as TObject).ClassName, AVAlias);
+  Result := ResolveViewFor((ATargetIntf as TObject).ClassName, AVAlias);
 end;
 
-class function TioDependencyInjection.LocateViewVMfor(const ASourceMP: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String): TioDILocator;
+class function TioDependencyInjection.ResolveViewVMfor(const ASourceMP: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String): TioDIResolver;
 begin
   // Get & set the locator
-  Result := TioDIFactory.GetViewVMLocatorFor(ASourceMP, AParentCloseQueryAction, AVVMAlias, False);
+  Result := TioDIFactory.GetViewVMResolverFor(ASourceMP, AParentCloseQueryAction, AVVMAlias, False);
 end;
 
-class function TioDependencyInjection._LocateForEachVVM_1stPhase_Browse(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String): TioDILocator;
+class function TioDependencyInjection._LocateForEachVVM_1stPhase_Browse(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias: String): TioDIResolver;
 begin
   // NB: This method create the locator instance only (never create a VM like LocateViewVM methods)
   // Get the ViewLocator
-  Result := TioDIFactory.GetLocator(ATargetTypeName, AAlias, True, True, dotView).SetParentCloseQueryAction(AParentCloseQueryAction);
+  Result := TioDIFactory.GetResolver(ATargetTypeName, AAlias, True, True, dotView).SetParentCloseQueryAction(AParentCloseQueryAction);
 end;
 
-class function TioDependencyInjection._LocateForEachVVM_2ndPhase_Create(const ASourceMP: IioBindSource; const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias, AViewModelMarker: String): TioDILocator;
+class function TioDependencyInjection._LocateForEachVVM_2ndPhase_Create(const ASourceMP: IioBindSource; const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AAlias, AViewModelMarker: String): TioDIResolver;
 var
   LViewModel: IioViewModel;
 begin
   // Get the ViewLocator
-  Result := LocateViewFor(ATargetTypeName, AAlias);
+  Result := ResolveViewFor(ATargetTypeName, AAlias);
   // Get & set the ViewModel instance into the ViewLocator
-  LViewModel := io.di.LocateVMfor(ATargetTypeName, AParentCloseQueryAction, AAlias).SetBindSource(ASourceMP).GetAs<IioViewModel>;
+  LViewModel := io.di.ResolveVMfor(ATargetTypeName, AParentCloseQueryAction, AAlias).SetBindSource(ASourceMP).GetAs<IioViewModel>;
   Result.SetViewModel(LViewModel, AViewModelMarker);
 end;
 
@@ -791,27 +791,27 @@ begin
   Result := TioDIRegister.CreateByTargetTypeName(AClassRttiType, AAncestorClassName, String.Empty, dotRegular);
 end;
 
-class function TioDependencyInjection.LocateViewVMfor(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias, AViewModelMarker: String): TioDILocator;
+class function TioDependencyInjection.ResolveViewVMfor(const ATargetTypeName: String; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias, AViewModelMarker: String): TioDIResolver;
 var
   LViewModel: IioViewModel;
 begin
   // Get the ViewLocator
-  Result := LocateViewFor(ATargetTypeName, AVVMAlias);
+  Result := ResolveViewFor(ATargetTypeName, AVVMAlias);
   // Get & set the ViewModel instance into the ViewLocator
-  LViewModel := io.di.LocateVMfor(ATargetTypeName, AParentCloseQueryAction, AVVMAlias).GetAs<IioViewModel>;
+  LViewModel := io.di.ResolveVMfor(ATargetTypeName, AParentCloseQueryAction, AVVMAlias).GetAs<IioViewModel>;
   Result.SetViewModel(LViewModel, AViewModelMarker);
 end;
 
-class function TioDependencyInjection.LocateSimpleViewFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TioDILocator;
+class function TioDependencyInjection.ResolveSimpleViewFor<T>(const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TioDIResolver;
 begin
   // Get & set the locator
-  Result := LocateSimpleViewFor(TioUtilities.GenericToString<T>, AParentCloseQueryAction, ASVAlias);
+  Result := ResolveSimpleViewFor(TioUtilities.GenericToString<T>, AParentCloseQueryAction, ASVAlias);
 end;
 
-class function TioDependencyInjection.LocateSimpleViewFor(const ATargetMP: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TioDILocator;
+class function TioDependencyInjection.ResolveSimpleViewFor(const ATargetMP: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TioDIResolver;
 begin
   // Get & set the locator
-  Result := TioDIFactory.GetSimpleViewLocatorFor(ATargetMP, AParentCloseQueryAction, ASVAlias);
+  Result := TioDIFactory.GetSimpleViewResolverFor(ATargetMP, AParentCloseQueryAction, ASVAlias);
 end;
 
 { TioDependencyInjectionRegister }
@@ -1269,13 +1269,13 @@ end;
 
 { TioDependencyInjectionLocator }
 
-procedure TioDILocator.ClearPresenterSettings;
+procedure TioDIResolver.ClearPresenterSettings;
 begin
   SetLength(FPresenterSettings, 0);
 end;
 
-function TioDILocator.ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7;
-  AArg8: T8; AArg9: T9): TioDILocator;
+function TioDIResolver.ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7;
+  AArg8: T8; AArg9: T9): TioDIResolver;
 begin
   SetLength(FConstructorParams, 9);
   TValue.Make(@AArg1, TypeInfo(T1), FConstructorParams[0]);
@@ -1290,8 +1290,8 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7;
-  AArg8: T8): TioDILocator;
+function TioDIResolver.ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7;
+  AArg8: T8): TioDIResolver;
 begin
   SetLength(FConstructorParams, 8);
   TValue.Make(@AArg1, TypeInfo(T1), FConstructorParams[0]);
@@ -1305,7 +1305,7 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.ConstructorParams<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDILocator;
+function TioDIResolver.ConstructorParams<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDIResolver;
 begin
   SetLength(FConstructorParams, 7);
   TValue.Make(@AArg1, TypeInfo(T1), FConstructorParams[0]);
@@ -1318,7 +1318,7 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.ConstructorParams<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDILocator;
+function TioDIResolver.ConstructorParams<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDIResolver;
 begin
   SetLength(FConstructorParams, 6);
   TValue.Make(@AArg1, TypeInfo(T1), FConstructorParams[0]);
@@ -1330,8 +1330,8 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.ConstructorParams<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4;
-  AArg5: T5): TioDILocator;
+function TioDIResolver.ConstructorParams<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4;
+  AArg5: T5): TioDIResolver;
 begin
   SetLength(FConstructorParams, 5);
   TValue.Make(@AArg1, TypeInfo(T1), FConstructorParams[0]);
@@ -1342,7 +1342,7 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.ConstructorParams<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDILocator;
+function TioDIResolver.ConstructorParams<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDIResolver;
 begin
   SetLength(FConstructorParams, 4);
   TValue.Make(@AArg1, TypeInfo(T1), FConstructorParams[0]);
@@ -1352,7 +1352,7 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.ConstructorParams<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDILocator;
+function TioDIResolver.ConstructorParams<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDIResolver;
 begin
   SetLength(FConstructorParams, 3);
   TValue.Make(@AArg1, TypeInfo(T1), FConstructorParams[0]);
@@ -1361,7 +1361,7 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.ConstructorParams<T1, T2>(AArg1: T1; AArg2: T2): TioDILocator;
+function TioDIResolver.ConstructorParams<T1, T2>(AArg1: T1; AArg2: T2): TioDIResolver;
 begin
   SetLength(FConstructorParams, 2);
   TValue.Make(@AArg1, TypeInfo(T1), FConstructorParams[0]);
@@ -1369,14 +1369,14 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.ConstructorParams<T1>(AArg1: T1): TioDILocator;
+function TioDIResolver.ConstructorParams<T1>(AArg1: T1): TioDIResolver;
 begin
   SetLength(FConstructorParams, 1);
   TValue.Make(@AArg1, TypeInfo(T1), FConstructorParams[0]);
   Result := Self;
 end;
 
-function TioDILocator.ConstructorParams(var AParams: TioConstructorParams): TioDILocator;
+function TioDIResolver.ConstructorParams(var AParams: TioConstructorParams): TioDIResolver;
 var
   I: Integer;
 begin
@@ -1387,7 +1387,7 @@ begin
   Result := Self;
 end;
 
-constructor TioDILocator.Create(const AInterfaceName, AAlias: String; const AOwnerRequested, AVCProviderEnabled: Boolean);
+constructor TioDIResolver.Create(const AInterfaceName, AAlias: String; const AOwnerRequested, AVCProviderEnabled: Boolean);
 begin
   inherited Create;
   FInterfaceName := AInterfaceName;
@@ -1404,7 +1404,7 @@ begin
   FAlreadyCreatedInstance := nil;
 end;
 
-function TioDILocator.Exist: Boolean;
+function TioDIResolver.Exist: Boolean;
 begin
   try
     Result := Container.Exists(FInterfaceName, FAlias);
@@ -1413,7 +1413,7 @@ begin
   end;
 end;
 
-function TioDILocator.ExtractVMFromView(const AView: TComponent): IioViewModelInternal;
+function TioDIResolver.ExtractVMFromView(const AView: TComponent): IioViewModelInternal;
 var
   LVMBridge: TioViewModelBridge;
 begin
@@ -1423,7 +1423,7 @@ begin
     Result := LVMBridge.ViewModel as IioViewModelInternal;
 end;
 
-function TioDILocator.FactoryMethod: TioDILocator;
+function TioDIResolver.FactoryMethod: TioDIResolver;
 begin
   // NB: Carica l'ImplementersItem se questa non è già stata caricata, questo perchè
   //      da quando c'è il "FactoryMethod" l'ImplementersItem potrebbe essere necessaria
@@ -1439,8 +1439,8 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8;
-  AArg9: T9): TioDILocator;
+function TioDIResolver.FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8;
+  AArg9: T9): TioDIResolver;
 begin
   // NB: Carica l'ImplementersItem se questa non è già stata caricata, questo perchè
   //      da quando c'è il "FactoryMethod" l'ImplementersItem potrebbe essere necessaria
@@ -1456,8 +1456,8 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7;
-  AArg8: T8): TioDILocator;
+function TioDIResolver.FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7;
+  AArg8: T8): TioDIResolver;
 begin
   // NB: Carica l'ImplementersItem se questa non è già stata caricata, questo perchè
   //      da quando c'è il "FactoryMethod" l'ImplementersItem potrebbe essere necessaria
@@ -1473,7 +1473,7 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.FactoryMethod<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDILocator;
+function TioDIResolver.FactoryMethod<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDIResolver;
 begin
   // NB: Carica l'ImplementersItem se questa non è già stata caricata, questo perchè
   //      da quando c'è il "FactoryMethod" l'ImplementersItem potrebbe essere necessaria
@@ -1489,7 +1489,7 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.FactoryMethod<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDILocator;
+function TioDIResolver.FactoryMethod<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDIResolver;
 begin
   // NB: Carica l'ImplementersItem se questa non è già stata caricata, questo perchè
   //      da quando c'è il "FactoryMethod" l'ImplementersItem potrebbe essere necessaria
@@ -1505,7 +1505,7 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.FactoryMethod<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDILocator;
+function TioDIResolver.FactoryMethod<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDIResolver;
 begin
   // NB: Carica l'ImplementersItem se questa non è già stata caricata, questo perchè
   //      da quando c'è il "FactoryMethod" l'ImplementersItem potrebbe essere necessaria
@@ -1521,7 +1521,7 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.FactoryMethod<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDILocator;
+function TioDIResolver.FactoryMethod<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDIResolver;
 begin
   // NB: Carica l'ImplementersItem se questa non è già stata caricata, questo perchè
   //      da quando c'è il "FactoryMethod" l'ImplementersItem potrebbe essere necessaria
@@ -1537,7 +1537,7 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.FactoryMethod<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDILocator;
+function TioDIResolver.FactoryMethod<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDIResolver;
 begin
   // NB: Carica l'ImplementersItem se questa non è già stata caricata, questo perchè
   //      da quando c'è il "FactoryMethod" l'ImplementersItem potrebbe essere necessaria
@@ -1553,7 +1553,7 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.FactoryMethod<T1, T2>(AArg1: T1; AArg2: T2): TioDILocator;
+function TioDIResolver.FactoryMethod<T1, T2>(AArg1: T1; AArg2: T2): TioDIResolver;
 begin
   // NB: Carica l'ImplementersItem se questa non è già stata caricata, questo perchè
   //      da quando c'è il "FactoryMethod" l'ImplementersItem potrebbe essere necessaria
@@ -1569,7 +1569,7 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.FactoryMethod<T1>(AArg1: T1): TioDILocator;
+function TioDIResolver.FactoryMethod<T1>(AArg1: T1): TioDIResolver;
 begin
   // NB: Carica l'ImplementersItem se questa non è già stata caricata, questo perchè
   //      da quando c'è il "FactoryMethod" l'ImplementersItem potrebbe essere necessaria
@@ -1585,7 +1585,7 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.Get: TObject;
+function TioDIResolver.Get: TObject;
 begin
   try
     Result := _InternalGet;
@@ -1594,7 +1594,7 @@ begin
   end;
 end;
 
-function TioDILocator.GetAs<TResult>: TResult;
+function TioDIResolver.GetAs<TResult>: TResult;
 var
   LObj: TObject;
 begin
@@ -1606,7 +1606,7 @@ begin
   end;
 end;
 
-function TioDILocator.GetImplementersItem: TioDIContainerImplementersItem;
+function TioDIResolver.GetImplementersItem: TioDIContainerImplementersItem;
 begin
   try
     // NB: Carica l'ImplementersItem se questa non è già stata caricata, questo perchè
@@ -1623,18 +1623,18 @@ begin
   end;
 end;
 
-function TioDILocator.PresenterSettingsExists: Boolean;
+function TioDIResolver.PresenterSettingsExists: Boolean;
 begin
   Result := (Length(FPresenterSettings) > 0);
 end;
 
-function TioDILocator.SingletonKey(const ASingletonKey: String): TioDILocator;
+function TioDIResolver.SingletonKey(const ASingletonKey: String): TioDIResolver;
 begin
   FSingletonKey := ASingletonKey;
   Result := Self;
 end;
 
-function TioDILocator.SetBindSource(const ABSName: String; const ADataObject: TObject): TioDILocator;
+function TioDIResolver.SetBindSource(const ABSName: String; const ADataObject: TObject): TioDIResolver;
 var
   i: Integer;
 begin
@@ -1646,8 +1646,8 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.SetBindSource(const ABSName: String; const AMasterBindSource: IioBindSource; const AMasterPropertyName: String)
-  : TioDILocator;
+function TioDIResolver.SetBindSource(const ABSName: String; const AMasterBindSource: IioBindSource; const AMasterPropertyName: String)
+  : TioDIResolver;
 var
   i: Integer;
 begin
@@ -1660,7 +1660,7 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.SetBindSource(const ABSName: String; const AWhere: IioWhere): TioDILocator;
+function TioDIResolver.SetBindSource(const ABSName: String; const AWhere: IioWhere): TioDIResolver;
 var
   i: Integer;
 begin
@@ -1678,23 +1678,23 @@ end;
 // Result := SetBindSource('', ABindSourceAdapter);
 // end;
 
-function TioDILocator.SetBindSource(const ADataObject: TObject): TioDILocator;
+function TioDIResolver.SetBindSource(const ADataObject: TObject): TioDIResolver;
 begin
   Result := SetBindSource('', ADataObject);
 end;
 
-function TioDILocator.SetBindSource(const AMasterBindSource: IioBindSource; const AMasterPropertyName: String)
-  : TioDILocator;
+function TioDIResolver.SetBindSource(const AMasterBindSource: IioBindSource; const AMasterPropertyName: String)
+  : TioDIResolver;
 begin
   Result := SetBindSource('', AMasterBindSource, AMasterPropertyName);
 end;
 
-function TioDILocator.SetBindSource(const AInterfacedObj: IInterface): TioDILocator;
+function TioDIResolver.SetBindSource(const AInterfacedObj: IInterface): TioDIResolver;
 begin
   Result := SetBindSource('', AInterfacedObj);
 end;
 
-function TioDILocator.SetBindSource(const ABSName: String; const AInterfacedObj: IInterface): TioDILocator;
+function TioDIResolver.SetBindSource(const ABSName: String; const AInterfacedObj: IInterface): TioDIResolver;
 var
   i: Integer;
 begin
@@ -1706,8 +1706,8 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.SetBindSourceAsSelectorFor(const ASelectorBSName: String; const ASelectionTargetBS: IioBindSource)
-  : TioDILocator;
+function TioDIResolver.SetBindSourceAsSelectorFor(const ASelectorBSName: String; const ASelectionTargetBS: IioBindSource)
+  : TioDIResolver;
 var
   i: Integer;
 begin
@@ -1719,7 +1719,7 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.SetBindSourceAsETMfor(const AEtmBSName: String; const AEtmTargetBS: IioMasterBindSource): TioDILocator;
+function TioDIResolver.SetBindSourceAsETMfor(const AEtmBSName: String; const AEtmTargetBS: IioMasterBindSource): TioDIResolver;
 var
   i: Integer;
 begin
@@ -1731,18 +1731,18 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.SetBindSourceAsETMfor(const AEtmTargetBS: IioMasterBindSource): TioDILocator;
+function TioDIResolver.SetBindSourceAsETMfor(const AEtmTargetBS: IioMasterBindSource): TioDIResolver;
 begin
   Result := SetBindSourceAsETMfor(String.Empty, AEtmTargetBS);
 end;
 
-function TioDILocator.SetBindSourceAsSelectorFor(const ASelectionTargetBS: IioBindSource): TioDILocator;
+function TioDIResolver.SetBindSourceAsSelectorFor(const ASelectionTargetBS: IioBindSource): TioDIResolver;
 begin
   Result := SetBindSourceAsSelectorFor(String.Empty, ASelectionTargetBS);
 end;
 
-function TioDILocator.SetBindSourceAsWhereBuilderFor(const AWhereBuilderBSName: String;
-  const AWhereBuilderTargetBS: IioMasterBindSource): TioDILocator;
+function TioDIResolver.SetBindSourceAsWhereBuilderFor(const AWhereBuilderBSName: String;
+  const AWhereBuilderTargetBS: IioMasterBindSource): TioDIResolver;
 var
   i: Integer;
 begin
@@ -1754,37 +1754,37 @@ begin
   Result := Self;
 end;
 
-function TioDILocator.SetBindSourceAsWhereBuilderFor(const AWhereBuilderTargetBS: IioMasterBindSource): TioDILocator;
+function TioDIResolver.SetBindSourceAsWhereBuilderFor(const AWhereBuilderTargetBS: IioMasterBindSource): TioDIResolver;
 begin
   Result := SetBindSourceAsWhereBuilderFor(String.Empty, AWhereBuilderTargetBS);
 end;
 
-function TioDILocator.SetParentCloseQueryAction(const AParentCLoseQueryAction: IioBSCloseQueryAction): TioDILocator;
+function TioDIResolver.SetParentCloseQueryAction(const AParentCLoseQueryAction: IioBSCloseQueryAction): TioDIResolver;
 begin
   FActionParentCloseQuery := AParentCLoseQueryAction;
   Result := Self;
 end;
 
-function TioDILocator.SetBindSource(const AWhere: IioWhere): TioDILocator;
+function TioDIResolver.SetBindSource(const AWhere: IioWhere): TioDIResolver;
 begin
   Result := SetBindSource('', AWhere);
 end;
 
-function TioDILocator.SetViewContext(const AViewContext: TComponent; const AViewContextFreeMethod: TProc): TioDILocator;
+function TioDIResolver.SetViewContext(const AViewContext: TComponent; const AViewContextFreeMethod: TProc): TioDIResolver;
 begin
   Result := Self;
   FViewContext := AViewContext;
   FViewContextFreeMethod := AViewContextFreeMethod;
 end;
 
-function TioDILocator.SetViewModel(const AViewModel: IioViewModel; const AMarker: String = ''): TioDILocator;
+function TioDIResolver.SetViewModel(const AViewModel: IioViewModel; const AMarker: String = ''): TioDIResolver;
 begin
   FViewModelMarker := AMarker;
   FViewModel := AViewModel as IioViewModelInternal;
   Result := Self;
 end;
 
-function TioDILocator.Show: TComponent;
+function TioDIResolver.Show: TComponent;
 begin
   try
     Result := _InternalGet as TComponent;
@@ -1793,7 +1793,7 @@ begin
   end;
 end;
 
-function TioDILocator.ShowCurrent: TComponent;
+function TioDIResolver.ShowCurrent: TComponent;
 begin
   Result := nil;
   try
@@ -1812,7 +1812,7 @@ begin
   end;
 end;
 
-procedure TioDILocator.ShowEach;
+procedure TioDIResolver.ShowEach;
 var
   i: Integer;
 begin
@@ -1838,7 +1838,7 @@ begin
   end;
 end;
 
-procedure TioDILocator._DuplicateLocatorForShowEachPurposeFrom(const ASourceLocator: TioDILocator);
+procedure TioDIResolver._DuplicateLocatorForShowEachPurposeFrom(const ASourceLocator: TioDIResolver);
 begin
   FAlias := ASourceLocator._GetAlias;
   FConstructorParams := ASourceLocator._GetLocatorConstructorParamsPointer^;
@@ -1847,7 +1847,7 @@ begin
   FActionParentCloseQuery := ASourceLocator._GetParentCloseQueryAction;
 end;
 
-function TioDILocator._InternalGet: TObject;
+function TioDIResolver._InternalGet: TObject;
 var
   LValue: TValue;
   procedure NestedSetParentCloseQueryActionToViewModel;
@@ -2041,23 +2041,23 @@ begin
   end;
 end;
 
-function TioDILocator._GetAlias: String;
+function TioDIResolver._GetAlias: String;
 begin
   Result := FAlias;
 end;
 
-function TioDILocator._GetLocatorConstructorParamsPointer: PioConstructorParams;
+function TioDIResolver._GetLocatorConstructorParamsPointer: PioConstructorParams;
 begin
   Result := @FConstructorParams;
 end;
 
-procedure TioDILocator._GetImplementersItemIfNotAlreadyExists;
+procedure TioDIResolver._GetImplementersItemIfNotAlreadyExists;
 begin
   if not Assigned(FImplementersItem) then
     FImplementersItem := Container.Get(FInterfaceName, FAlias);
 end;
 
-function TioDILocator._GetImplementersItemOrLocatorConstructorParamsPointer: PioConstructorParams;
+function TioDIResolver._GetImplementersItemOrLocatorConstructorParamsPointer: PioConstructorParams;
 begin
   // Se sono specificati parametri per il costruttore nel locator restituisce questi perchè
   //  hanno la precedenza, altrimenti restituisce quelli dell'ImplementersItem (RegisterClass)
@@ -2067,30 +2067,30 @@ begin
     Result := FImplementersItem.ConstructorParamsPointer;
 end;
 
-function TioDILocator._GetParentCloseQueryAction: IioBSCloseQueryAction;
+function TioDIResolver._GetParentCloseQueryAction: IioBSCloseQueryAction;
 begin
   Result := FActionParentCloseQuery;
 end;
 
-function TioDILocator._GetVCProvider: TioViewContextProvider;
+function TioDIResolver._GetVCProvider: TioViewContextProvider;
 begin
   Result := FVCProvider;
 end;
 
-function TioDILocator._GetViewContext: TComponent;
+function TioDIResolver._GetViewContext: TComponent;
 begin
   Result := FViewContext;
 end;
 
-procedure TioDILocator._SetForEachModelPresenter(const AModelPresenter: IioBindSource; const ALocateViewModel: Boolean);
+procedure TioDIResolver._SetForEachModelPresenter(const AModelPresenter: IioBindSource; const ALocateViewModel: Boolean);
 begin
   FForEachModelPresenter := AModelPresenter;
   FForEachLocateViewModel := ALocateViewModel;
 end;
 
-function TioDILocator._ShowCurrent: TComponent;
+function TioDIResolver._ShowCurrent: TComponent;
 var
-  LLocator: TioDILocator;
+  LLocator: TioDIResolver;
 begin
   // Check if FForEachModelPresenter is assigned
   if not Assigned(FForEachModelPresenter) then
@@ -2098,24 +2098,24 @@ begin
       '"FForEachModelPresenter" private field not assigned...'#13#13'ShowCurrent must be used with "io.ShowCurrent(AModelPrenter)" or "io.di.LocateViewVMFor(AModelPresenter)..." or other equivalent with ModelPresenter as parameter.');
   // Retrieve the correct locator
   if FInterfaceName.StartsWith(DI_SIMPLEVIEW_KEY_PREFIX) then
-    LLocator := TioDIFactory.GetSimpleViewLocatorFor(FForEachModelPresenter, FActionParentCloseQuery, FAlias) as TioDILocator
+    LLocator := TioDIFactory.GetSimpleViewResolverFor(FForEachModelPresenter, FActionParentCloseQuery, FAlias) as TioDIResolver
   else
   if FForEachLocateViewModel then
-    LLocator := TioDIFactory.GetViewVMLocatorFor(FForEachModelPresenter, FActionParentCloseQuery, FAlias, True) as TioDILocator
+    LLocator := TioDIFactory.GetViewVMResolverFor(FForEachModelPresenter, FActionParentCloseQuery, FAlias, True) as TioDIResolver
   else
-    LLocator := TioDIFactory.GetViewLocatorFor(FForEachModelPresenter, FAlias) as TioDILocator;
+    LLocator := TioDIFactory.GetViewResolverFor(FForEachModelPresenter, FAlias) as TioDIResolver;
   // Set the locator
   LLocator._DuplicateLocatorForShowEachPurposeFrom(Self);
   Result := LLocator.Show;
 end;
 
-function TioDILocator.VCProvider(const AVCProvider: TioViewContextProvider): TioDILocator;
+function TioDIResolver.VCProvider(const AVCProvider: TioViewContextProvider): TioDIResolver;
 begin
   Result := Self;
   FVCProvider := AVCProvider;
 end;
 
-function TioDILocator.ViewModelExist: Boolean;
+function TioDIResolver.ViewModelExist: Boolean;
 begin
   Result := Assigned(Self.FViewModel);
 end;
@@ -2135,20 +2135,20 @@ end;
 // raise EioException.Create(Self.ClassName, 'CheckModelPresenter', '"Current" object of the ModelPresenter not assigned.');
 // end;
 
-class function TioDIFactory.GetLocator(const AInterfaceName, AAlias: String; const AOwnerRequested, AVCProviderEnabled: Boolean; const ADICObjType: TioDICObjType): TioDILocator;
+class function TioDIFactory.GetResolver(const AInterfaceName, AAlias: String; const AOwnerRequested, AVCProviderEnabled: Boolean; const ADICObjType: TioDICObjType): TioDIResolver;
 var
   LDIContainerKey: String;
 begin
   LDIContainerKey := BuildContainerKey(AInterfaceName, ADICObjType);
-  Result := TioDILocator.Create(LDIContainerKey, AAlias, AOwnerRequested, AVCProviderEnabled);
+  Result := TioDIResolver.Create(LDIContainerKey, AAlias, AOwnerRequested, AVCProviderEnabled);
 end;
 
-class function TioDIFactory.GetViewLocatorFor(const ATargetBS: IioBindSource; const AVAlias: String): TioDILocator;
+class function TioDIFactory.GetViewResolverFor(const ATargetBS: IioBindSource; const AVAlias: String): TioDIResolver;
 begin
   // Check for ModelPresenter validity
   TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ATargetBS, True, True);
   // Try to retrieve a locator for MP.Current instance
-  Result := io.di.LocateViewFor(ATargetBS.Current.ClassName, AVAlias);
+  Result := io.di.ResolveViewFor(ATargetBS.Current.ClassName, AVAlias);
   // Set the locator
   Result._SetForEachModelPresenter(ATargetBS, True);
  // ---------- OLD CODE -----------
@@ -2171,16 +2171,16 @@ begin
 // ---------- OLD CODE -----------
 end;
 
-class function TioDIFactory.GetViewVMLocatorFor(const ATargetBS: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const ACreateViewModel: Boolean): TioDILocator;
+class function TioDIFactory.GetViewVMResolverFor(const ATargetBS: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String; const ACreateViewModel: Boolean): TioDIResolver;
 begin
   // Check for ModelPresenter validity
   TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ATargetBS, True, True);
   // Try to retrieve a SimpleView locator for MP.Current instance
-  if io.di.LocateSimpleViewFor(ATargetBS.Current, AParentCloseQueryAction, AVVMAlias).Exist then
-    Result := GetSimpleViewLocatorFor(ATargetBS, AParentCloseQueryAction, AVVMAlias)
+  if io.di.ResolveSimpleViewFor(ATargetBS.Current, AParentCloseQueryAction, AVVMAlias).Exist then
+    Result := GetSimpleViewResolverFor(ATargetBS, AParentCloseQueryAction, AVVMAlias)
   else
   // Try to retrieve a View + ViewModel locator for MP.Current instance
-  if io.di.LocateViewFor(ATargetBS.Current, AVVMAlias).Exist and io.di.LocateVMfor(ATargetBS.Current, AParentCloseQueryAction, AVVMAlias).Exist then
+  if io.di.ResolveViewFor(ATargetBS.Current, AVVMAlias).Exist and io.di.ResolveVMfor(ATargetBS.Current, AParentCloseQueryAction, AVVMAlias).Exist then
   begin
     if ACreateViewModel then
       Result := io.di._LocateForEachVVM_2ndPhase_Create(ATargetBS, ATargetBS.Current.ClassName, AParentCloseQueryAction, AVVMAlias)
@@ -2228,20 +2228,20 @@ begin
   // ---------- OLD CODE -----------
 end;
 
-class function TioDIFactory.GetLocatorFor<TI>(const AAlias: String; const AOwnerRequested, AVCProviderEnabled: Boolean; const ADICObjType: TioDICObjType): TioDILocator<TI>;
+class function TioDIFactory.GetResolverFor<TI>(const AAlias: String; const AOwnerRequested, AVCProviderEnabled: Boolean; const ADICObjType: TioDICObjType): TioDIResolver<TI>;
 var
   LDIContainerKey: String;
 begin
   LDIContainerKey := BuildContainerKey(TioUtilities.GenericToString<TI>, ADICObjType);
-  Result := TioDILocator<TI>.Create(LDIContainerKey, AAlias, AOwnerRequested, AVCProviderEnabled);
+  Result := TioDIResolver<TI>.Create(LDIContainerKey, AAlias, AOwnerRequested, AVCProviderEnabled);
 end;
 
-class function TioDIFactory.GetSimpleViewLocatorFor(const ATargetBS: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TioDILocator;
+class function TioDIFactory.GetSimpleViewResolverFor(const ATargetBS: IioBindSource; const AParentCloseQueryAction: IioBSCloseQueryAction; const ASVAlias: String): TioDIResolver;
 begin
   // Check for ModelPresenter validity
   TioCommonBSBehavior.IsValidForDependencyInjectionLocator(ATargetBS, True, True);
   // Try to retrieve a locator for MP.Current instance
-  Result := io.di.LocateSimpleViewFor(ATargetBS.Current.ClassName, AParentCloseQueryAction, ASVAlias).SetBindSource(ATargetBS);
+  Result := io.di.ResolveSimpleViewFor(ATargetBS.Current.ClassName, AParentCloseQueryAction, ASVAlias).SetBindSource(ATargetBS);
   // Set the locator
   Result._SetForEachModelPresenter(ATargetBS, False);
 // -------- OLD CODE --------
@@ -2264,130 +2264,130 @@ end;
 
 { TioDependencyInjectionLocator<T> }
 
-function TioDILocator<TI>.ConstructorParams(var AParams: TioConstructorParams): TioDILocator<TI>;
+function TioDIResolver<TI>.ConstructorParams(var AParams: TioConstructorParams): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).ConstructorParams(AParams);
+  TioDIResolver(Self).ConstructorParams(AParams);
 end;
 
-function TioDILocator<TI>.ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7;
-  AArg8: T8; AArg9: T9): TioDILocator<TI>;
+function TioDIResolver<TI>.ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7;
+  AArg8: T8; AArg9: T9): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7, AArg8, AArg9);
+  TioDIResolver(Self).ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7, AArg8, AArg9);
 end;
 
-function TioDILocator<TI>.ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7;
-  AArg8: T8): TioDILocator<TI>;
+function TioDIResolver<TI>.ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7;
+  AArg8: T8): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7, AArg8);
+  TioDIResolver(Self).ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7, AArg8);
 end;
 
-function TioDILocator<TI>.ConstructorParams<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6;
-  AArg7: T7): TioDILocator<TI>;
+function TioDIResolver<TI>.ConstructorParams<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6;
+  AArg7: T7): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).ConstructorParams<T1, T2, T3, T4, T5, T6, T7>(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7);
+  TioDIResolver(Self).ConstructorParams<T1, T2, T3, T4, T5, T6, T7>(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7);
 end;
 
-function TioDILocator<TI>.ConstructorParams<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDILocator<TI>;
+function TioDIResolver<TI>.ConstructorParams<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).ConstructorParams<T1, T2, T3, T4, T5, T6>(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6);
+  TioDIResolver(Self).ConstructorParams<T1, T2, T3, T4, T5, T6>(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6);
 end;
 
-function TioDILocator<TI>.ConstructorParams<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDILocator<TI>;
+function TioDIResolver<TI>.ConstructorParams<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).ConstructorParams<T1, T2, T3, T4, T5>(AArg1, AArg2, AArg3, AArg4, AArg5);
+  TioDIResolver(Self).ConstructorParams<T1, T2, T3, T4, T5>(AArg1, AArg2, AArg3, AArg4, AArg5);
 end;
 
-function TioDILocator<TI>.ConstructorParams<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDILocator<TI>;
+function TioDIResolver<TI>.ConstructorParams<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).ConstructorParams<T1, T2, T3, T4>(AArg1, AArg2, AArg3, AArg4);
+  TioDIResolver(Self).ConstructorParams<T1, T2, T3, T4>(AArg1, AArg2, AArg3, AArg4);
 end;
 
-function TioDILocator<TI>.ConstructorParams<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDILocator<TI>;
+function TioDIResolver<TI>.ConstructorParams<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).ConstructorParams<T1, T2, T3>(AArg1, AArg2, AArg3);
+  TioDIResolver(Self).ConstructorParams<T1, T2, T3>(AArg1, AArg2, AArg3);
 end;
 
-function TioDILocator<TI>.ConstructorParams<T1, T2>(AArg1: T1; AArg2: T2): TioDILocator<TI>;
+function TioDIResolver<TI>.ConstructorParams<T1, T2>(AArg1: T1; AArg2: T2): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).ConstructorParams<T1, T2>(AArg1, AArg2);
+  TioDIResolver(Self).ConstructorParams<T1, T2>(AArg1, AArg2);
 end;
 
-function TioDILocator<TI>.ConstructorParams<T1>(AArg1: T1): TioDILocator<TI>;
+function TioDIResolver<TI>.ConstructorParams<T1>(AArg1: T1): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).ConstructorParams<T1>(AArg1);
+  TioDIResolver(Self).ConstructorParams<T1>(AArg1);
 end;
 
-function TioDILocator<TI>.FactoryMethod: TioDILocator<TI>;
+function TioDIResolver<TI>.FactoryMethod: TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).FactoryMethod;
+  TioDIResolver(Self).FactoryMethod;
 end;
 
-function TioDILocator<TI>.FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8; AArg9: T9): TioDILocator<TI>;
+function TioDIResolver<TI>.FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8; AArg9: T9): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7, AArg8, AArg9);
+  TioDIResolver(Self).FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7, AArg8, AArg9);
 end;
 
-function TioDILocator<TI>.FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8): TioDILocator<TI>;
+function TioDIResolver<TI>.FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7, AArg8);
+  TioDIResolver(Self).FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7, AArg8);
 end;
 
-function TioDILocator<TI>.FactoryMethod<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDILocator<TI>;
+function TioDIResolver<TI>.FactoryMethod<T1, T2, T3, T4, T5, T6, T7>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).FactoryMethod<T1, T2, T3, T4, T5, T6, T7>(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7);
+  TioDIResolver(Self).FactoryMethod<T1, T2, T3, T4, T5, T6, T7>(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7);
 end;
 
-function TioDILocator<TI>.FactoryMethod<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDILocator<TI>;
+function TioDIResolver<TI>.FactoryMethod<T1, T2, T3, T4, T5, T6>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).FactoryMethod<T1, T2, T3, T4, T5, T6>(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6);
+  TioDIResolver(Self).FactoryMethod<T1, T2, T3, T4, T5, T6>(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6);
 end;
 
-function TioDILocator<TI>.FactoryMethod<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDILocator<TI>;
+function TioDIResolver<TI>.FactoryMethod<T1, T2, T3, T4, T5>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).FactoryMethod<T1, T2, T3, T4, T5>(AArg1, AArg2, AArg3, AArg4, AArg5);
+  TioDIResolver(Self).FactoryMethod<T1, T2, T3, T4, T5>(AArg1, AArg2, AArg3, AArg4, AArg5);
 end;
 
-function TioDILocator<TI>.FactoryMethod<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDILocator<TI>;
+function TioDIResolver<TI>.FactoryMethod<T1, T2, T3, T4>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).FactoryMethod<T1, T2, T3, T4>(AArg1, AArg2, AArg3, AArg4);
+  TioDIResolver(Self).FactoryMethod<T1, T2, T3, T4>(AArg1, AArg2, AArg3, AArg4);
 end;
 
-function TioDILocator<TI>.FactoryMethod<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDILocator<TI>;
+function TioDIResolver<TI>.FactoryMethod<T1, T2, T3>(AArg1: T1; AArg2: T2; AArg3: T3): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).FactoryMethod<T1, T2, T3>(AArg1, AArg2, AArg3);
+  TioDIResolver(Self).FactoryMethod<T1, T2, T3>(AArg1, AArg2, AArg3);
 end;
 
-function TioDILocator<TI>.FactoryMethod<T1, T2>(AArg1: T1; AArg2: T2): TioDILocator<TI>;
+function TioDIResolver<TI>.FactoryMethod<T1, T2>(AArg1: T1; AArg2: T2): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).FactoryMethod<T1, T2>(AArg1, AArg2);
+  TioDIResolver(Self).FactoryMethod<T1, T2>(AArg1, AArg2);
 end;
 
-function TioDILocator<TI>.FactoryMethod<T1>(AArg1: T1): TioDILocator<TI>;
+function TioDIResolver<TI>.FactoryMethod<T1>(AArg1: T1): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).FactoryMethod<T1>(AArg1);
+  TioDIResolver(Self).FactoryMethod<T1>(AArg1);
 end;
 
-function TioDILocator<TI>.Get: TI;
+function TioDIResolver<TI>.Get: TI;
 begin
   try
     Result := TioUtilities.CastObjectToGeneric<TI>(_InternalGet, _ImplementersItem.InterfaceGUID);
@@ -2396,48 +2396,48 @@ begin
   end;
 end;
 
-function TioDILocator<TI>.SingletonKey(const ASingletonKey: String): TioDILocator<TI>;
+function TioDIResolver<TI>.SingletonKey(const ASingletonKey: String): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).SingletonKey(ASingletonKey);
+  TioDIResolver(Self).SingletonKey(ASingletonKey);
 end;
 
-function TioDILocator<TI>.SetBindSource(const ABSName: String; const ADataObject: TObject): TioDILocator<TI>;
+function TioDIResolver<TI>.SetBindSource(const ABSName: String; const ADataObject: TObject): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).SetBindSource(ABSName, ADataObject);
+  TioDIResolver(Self).SetBindSource(ABSName, ADataObject);
 end;
 
-function TioDILocator<TI>.SetBindSource(const ABSName: String; const AMasterPresenter: IioBindSource;
-  const AMasterPropertyName: String): TioDILocator<TI>;
+function TioDIResolver<TI>.SetBindSource(const ABSName: String; const AMasterPresenter: IioBindSource;
+  const AMasterPropertyName: String): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).SetBindSource(ABSName, AMasterPresenter, AMasterPropertyName);
+  TioDIResolver(Self).SetBindSource(ABSName, AMasterPresenter, AMasterPropertyName);
 end;
 
-function TioDILocator<TI>.SetBindSource(const ABSName: String; const AWhere: IioWhere): TioDILocator<TI>;
+function TioDIResolver<TI>.SetBindSource(const ABSName: String; const AWhere: IioWhere): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).SetBindSource(ABSName, AWhere);
+  TioDIResolver(Self).SetBindSource(ABSName, AWhere);
 end;
 
-function TioDILocator<TI>.VCProvider(const AVCProvider: TioViewContextProvider): TioDILocator<TI>;
+function TioDIResolver<TI>.VCProvider(const AVCProvider: TioViewContextProvider): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).VCProvider(AVCProvider);
+  TioDIResolver(Self).VCProvider(AVCProvider);
 end;
 
-function TioDILocator<TI>.SetViewContext(const AViewContext: TComponent; const AViewContextFreeMethod: TProc)
-  : TioDILocator<TI>;
+function TioDIResolver<TI>.SetViewContext(const AViewContext: TComponent; const AViewContextFreeMethod: TProc)
+  : TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).SetViewContext(AViewContext, AViewContextFreeMethod);
+  TioDIResolver(Self).SetViewContext(AViewContext, AViewContextFreeMethod);
 end;
 
-function TioDILocator<TI>.SetViewModel(const AViewModel: IioViewModel; const AMarker: String = ''): TioDILocator<TI>;
+function TioDIResolver<TI>.SetViewModel(const AViewModel: IioViewModel; const AMarker: String = ''): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).SetViewModel(AViewModel, AMarker);
+  TioDIResolver(Self).SetViewModel(AViewModel, AMarker);
 end;
 
 { TioDependencyInjectionResolverBase }
@@ -2738,80 +2738,80 @@ begin
     Inc(FEntityAutoRegisteredCount);
 end;
 
-function TioDILocator<TI>.SetBindSource(const ADataObject: TObject): TioDILocator<TI>;
+function TioDIResolver<TI>.SetBindSource(const ADataObject: TObject): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).SetBindSource(ADataObject);
+  TioDIResolver(Self).SetBindSource(ADataObject);
 end;
 
-function TioDILocator<TI>.SetBindSource(const AMasterPresenter: IioBindSource; const AMasterPropertyName: String)
-  : TioDILocator<TI>;
+function TioDIResolver<TI>.SetBindSource(const AMasterPresenter: IioBindSource; const AMasterPropertyName: String)
+  : TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).SetBindSource(AMasterPresenter, AMasterPropertyName);
+  TioDIResolver(Self).SetBindSource(AMasterPresenter, AMasterPropertyName);
 end;
 
-function TioDILocator<TI>.SetBindSource(const AInterfacedObj: IInterface): TioDILocator<TI>;
+function TioDIResolver<TI>.SetBindSource(const AInterfacedObj: IInterface): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).SetBindSource(AInterfacedObj);
+  TioDIResolver(Self).SetBindSource(AInterfacedObj);
 end;
 
-function TioDILocator<TI>.SetBindSource(const ABSName: String; const AInterfacedObj: IInterface): TioDILocator<TI>;
+function TioDIResolver<TI>.SetBindSource(const ABSName: String; const AInterfacedObj: IInterface): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).SetBindSource(ABSName, AInterfacedObj);
+  TioDIResolver(Self).SetBindSource(ABSName, AInterfacedObj);
 end;
 
-function TioDILocator<TI>.SetBindSourceAsSelectorFor(const ASelectorBSName: String; const ASelectionTargetBS: IioBindSource)
-  : TioDILocator<TI>;
+function TioDIResolver<TI>.SetBindSourceAsSelectorFor(const ASelectorBSName: String; const ASelectionTargetBS: IioBindSource)
+  : TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).SetBindSourceAsSelectorFor(ASelectorBSName, ASelectionTargetBS);
+  TioDIResolver(Self).SetBindSourceAsSelectorFor(ASelectorBSName, ASelectionTargetBS);
 end;
 
-function TioDILocator<TI>.SetBindSourceAsETMfor(const AEtmBSName: String;
-  const AEtmTargetBS: IioMasterBindSource): TioDILocator<TI>;
+function TioDIResolver<TI>.SetBindSourceAsETMfor(const AEtmBSName: String;
+  const AEtmTargetBS: IioMasterBindSource): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).SetBindSourceAsETMfor(AEtmBSName, AEtmTargetBS);
+  TioDIResolver(Self).SetBindSourceAsETMfor(AEtmBSName, AEtmTargetBS);
 end;
 
-function TioDILocator<TI>.SetBindSourceAsETMfor(const AEtmTargetBS: IioMasterBindSource): TioDILocator<TI>;
+function TioDIResolver<TI>.SetBindSourceAsETMfor(const AEtmTargetBS: IioMasterBindSource): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).SetBindSourceAsETMfor(AEtmTargetBS);
+  TioDIResolver(Self).SetBindSourceAsETMfor(AEtmTargetBS);
 end;
 
-function TioDILocator<TI>.SetBindSourceAsSelectorFor(const ASelectionTargetBS: IioBindSource): TioDILocator<TI>;
+function TioDIResolver<TI>.SetBindSourceAsSelectorFor(const ASelectionTargetBS: IioBindSource): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).SetBindSourceAsSelectorFor(ASelectionTargetBS);
+  TioDIResolver(Self).SetBindSourceAsSelectorFor(ASelectionTargetBS);
 end;
 
-function TioDILocator<TI>.SetBindSourceAsWhereBuilderFor(const AWhereBuilderBSName: String;
-  const AWhereBuilderTargetBS: IioMasterBindSource): TioDILocator<TI>;
+function TioDIResolver<TI>.SetBindSourceAsWhereBuilderFor(const AWhereBuilderBSName: String;
+  const AWhereBuilderTargetBS: IioMasterBindSource): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).SetBindSourceAsWhereBuilderFor(AWhereBuilderBSName, AWhereBuilderTargetBS);
+  TioDIResolver(Self).SetBindSourceAsWhereBuilderFor(AWhereBuilderBSName, AWhereBuilderTargetBS);
 end;
 
-function TioDILocator<TI>.SetBindSourceAsWhereBuilderFor(const AWhereBuilderTargetBS: IioMasterBindSource): TioDILocator<TI>;
+function TioDIResolver<TI>.SetBindSourceAsWhereBuilderFor(const AWhereBuilderTargetBS: IioMasterBindSource): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).SetBindSourceAsWhereBuilderFor(AWhereBuilderTargetBS);
+  TioDIResolver(Self).SetBindSourceAsWhereBuilderFor(AWhereBuilderTargetBS);
 end;
 
-function TioDILocator<TI>.SetParentCloseQueryAction(const AParentCloseQueryAction: IioBSCloseQueryAction): TioDILocator<TI>;
+function TioDIResolver<TI>.SetParentCloseQueryAction(const AParentCloseQueryAction: IioBSCloseQueryAction): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).SetParentCloseQueryAction(AParentCloseQueryAction);
+  TioDIResolver(Self).SetParentCloseQueryAction(AParentCloseQueryAction);
 end;
 
-function TioDILocator<TI>.SetBindSource(const AWhere: IioWhere): TioDILocator<TI>;
+function TioDIResolver<TI>.SetBindSource(const AWhere: IioWhere): TioDIResolver<TI>;
 begin
   Result := Self;
-  TioDILocator(Self).SetBindSource(AWhere);
+  TioDIResolver(Self).SetBindSource(AWhere);
 end;
 
 initialization

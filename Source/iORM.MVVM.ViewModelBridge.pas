@@ -142,7 +142,7 @@ begin
         #13#13'Try emptying this property (and the other related properties whose name starts with "DI_VM ..."), it will be fine.',
         [Name, Owner.Name]))
     else
-      LObj := io.di.LocateVM(FDI_VMInterface, nil, FDI_VMAlias).Get;
+      LObj := io.di.ResolveVM(FDI_VMInterface, nil, FDI_VMAlias).Get;
       if not Supports(LObj, IioViewModel, FViewModel) then
         raise EioGenericException.Create(Self.ClassName, 'CheckForViewModel', Format('"IioViewModel" interface is not implemented by the object of class "%s".', [LObj.ClassName]));
   end;

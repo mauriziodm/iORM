@@ -81,10 +81,10 @@ begin
   TValue.Make(@AObj, TypeInfo(TObject), LValue);
   // If a custom implementation of the DuckTypedStreamObject (for the class of AObj; ClassName as Alias) is present in the
   // dependency injection cantainer then use it, else retrieve the standard implementation (no Alias)
-  if not io.di.Locate<IioDuckTypedStreamObject>(LAlias).Exist then
+  if not io.di.Resolve<IioDuckTypedStreamObject>(LAlias).Exist then
     LAlias := '';
   // Return the result
-  Result := io.di.Locate<IioDuckTypedStreamObject>(LAlias).ConstructorParams([LValue]).Get;
+  Result := io.di.Resolve<IioDuckTypedStreamObject>(LAlias).ConstructorParams([LValue]).Get;
 end;
 
 end.
