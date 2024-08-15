@@ -15,17 +15,14 @@ type
     FConnectionName: String;
     FUserName: String;
     FUserID: Integer;
-    FUserRoles: String;
     FUserToken: String;
     function GetConnectionName: String;
     function GetUserID: Integer;
     function GetUserName: String;
-    function GetUserRoles: String;
     function GetUserToken: String;
     procedure SetConnectionName(const Value: String);
     procedure SetUserID(const Value: Integer);
     procedure SetUserName(const Value: String);
-    procedure SetUserRoles(const Value: String);
     procedure SetUserToken(const Value: String);
   public
     constructor Create;
@@ -34,7 +31,6 @@ type
     property ConnectionName: String read GetConnectionName write SetConnectionName;
     property UserID: Integer read GetUserID write SetUserID;
     property UserName: String read GetUserName write SetUserName;
-    property UserRoles: String read GetUserRoles write SetUserRoles;
     property UserToken: String read GetUserToken write SetUserToken;
   end;
 
@@ -50,7 +46,6 @@ begin
   FUserName := String.Empty;
   FUserID := 0;
   FUserRoles := String.Empty;
-  FUserToken := String.Empty;
 end;
 
 constructor TioSession.CreateThreadSession(const AGlobalConnectionName: String);
@@ -72,11 +67,6 @@ end;
 function TioSession.GetUserName: String;
 begin
   Result := FUserName;
-end;
-
-function TioSession.GetUserRoles: String;
-begin
-  Result := FUserRoles;
 end;
 
 function TioSession.GetUserToken: String;
@@ -103,12 +93,6 @@ end;
 procedure TioSession.SetUserName(const Value: String);
 begin
   FUserName := Value;
-end;
-
-procedure TioSession.SetUserRoles(const Value: String);
-begin
-  // add the leading and trailing comma
-  FUserRoles := FUserToken.ToLower.QuotedString(ROLES_SEPARATOR);
 end;
 
 procedure TioSession.SetUserToken(const Value: String);

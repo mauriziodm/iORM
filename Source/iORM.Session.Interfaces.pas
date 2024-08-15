@@ -20,10 +20,6 @@ type
     procedure SetUserName(const Value: String);
     function GetUserName: String;
     property UserName: String read GetUserName write SetUserName;
-    // UserRoles
-    procedure SetUserRoles(const Value: String);
-    function GetUserRoles: String;
-    property UserRoles: String read GetUserRoles write SetUserRoles;
     // UserToken
     procedure SetUserToken(const Value: String);
     function GetUserToken: String;

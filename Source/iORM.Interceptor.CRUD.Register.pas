@@ -99,15 +99,16 @@ begin
   // If the internal container is not assigned then create it
   if not Assigned(FInternalContainer) then
     Build;
-  // If the current type name isn't registered into the internal container (there isn't previously registerd interceptors for that type) then add it
-  if not FInternalContainer.ContainsKey(ATypeName) then
+  // If the current type name is registered into the internal container (there is previously registerd interceptors for that type) then return it,
+  //  else  (there isn't previously registerd interceptors for that type) create and add it
+  if FInternalContainer.ContainsKey(ATypeName) then
+    LInterceptorList := FInternalContainer.Items[ATypeName]
+  else
   begin
     LInterceptorList := TioCRUDInterceptorList.Create;
-    LInterceptorList.Capacity := 0;
+    LInterceptorList.Capacity := 1;
     FInternalContainer.Add(ATypeName, LInterceptorList);
   end;
-  // Extract the intercaptor list for the requested TypeName
-  LInterceptorList := FInternalContainer.Items[ATypeName];
   // Check if an interceptor for the same class and connection name is already registered then exit to avoid duplicate
   for LInterceptorItem in LInterceptorList do
     if (LInterceptorItem.Interceptor = ACRUDInterceptor) and (LInterceptorItem.ConnectionName = AInterceptOnlyOnConnectionName) then
