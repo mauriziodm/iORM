@@ -11,12 +11,6 @@ uses
 
 type
   TViewBaseForForm = class(TUniFrame)
-    PanelTop: TUniPanel;
-    ButtonBack: TUniSpeedButton;
-    LabelTitle: TUniLabel;
-    PanelBottom: TUniPanel;
-    ButtonDelete: TUniSpeedButton;
-    ButtonAdd: TUniSpeedButton;
     BSSource: TDataSource;
     ActionList1: TActionList;
     VMBridge: TioViewModelBridge;

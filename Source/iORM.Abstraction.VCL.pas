@@ -40,23 +40,8 @@ uses
 
 type
 
-  TioVCL = class(TComponent)
-  strict private
-    // Events
-    FHideWait: TNotifyEvent;
-    FShowWait: TNotifyEvent;
-    // Methods
-    function Get_Version: String;
-    procedure SetHideWait(const Value: TNotifyEvent);
-    procedure SetShowWait(const Value: TNotifyEvent);
-  public
-    constructor Create(AOwner: TComponent); override;
-  published
-    // properties
-    property _Version: String read Get_Version;
-    // Events
-    property HideWait: TNotifyEvent read FHideWait write SetHideWait;
-    property ShowWait: TNotifyEvent read FShowWait write SetShowWait;
+  TioVCL = class(TioCustomPlatformAbstractionComponent)
+
   end;
 
   TioApplicationVCL = class(TioApplication)
@@ -65,6 +50,7 @@ type
     class procedure _ShowMessage(const AMessage: string); override;
     class function _ProjectPlatform: TioProjectPlatform; override;
     class function _Terminate: Boolean; override;
+    class function _GetSessionID: String; override;
   end;
 
   TioControlVCL = class(TioControl)
@@ -129,10 +115,15 @@ type
 implementation
 
 uses
-  VCL.Forms, VCL.Dialogs, VCL.Controls, iORM.Exceptions, iORM,
-  iORM.DB.ConnectionContainer;
+  iORM, iORM.Exceptions, Vcl.Forms, Vcl.Dialogs,
+  Vcl.Controls;
 
 { TioApplicationVCL }
+
+class function TioApplicationVCL._GetSessionID: String;
+begin
+  Result := IO_STRING_NULL_VALUE;
+end;
 
 class procedure TioApplicationVCL._HandleException(const Sender: TObject);
 begin
@@ -378,46 +369,6 @@ begin
   if not(AControl is TControl) then
     raise EioGenericException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TControl.');
   TControl(AControl).Visible := AVisible;
-end;
-
-{ TioVCL }
-
-constructor TioVCL.Create(AOwner: TComponent);
-begin
-  inherited;
-  FShowWait := nil;
-  FHideWait := nil;
-end;
-
-function TioVCL.Get_Version: String;
-begin
-  Result := io.Version;
-end;
-
-procedure TioVCL.SetHideWait(const Value: TNotifyEvent);
-begin
-  FHideWait := Value;
-  if Assigned(FHideWait) then
-    TioConnectionManager.SetHideWaitProc(
-      procedure
-      begin
-        FHideWait(Self);
-      end)
-  else
-    TioConnectionManager.SetHideWaitProc(nil);
-end;
-
-procedure TioVCL.SetShowWait(const Value: TNotifyEvent);
-begin
-  FShowWait := Value;
-  if Assigned(FShowWait) then
-    TioConnectionManager.SetShowWaitProc(
-      procedure
-      begin
-        FShowWait(Self);
-      end)
-  else
-    TioConnectionManager.SetShowWaitProc(nil);
 end;
 
 initialization

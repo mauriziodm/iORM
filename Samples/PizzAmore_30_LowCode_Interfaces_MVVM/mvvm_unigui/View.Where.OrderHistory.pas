@@ -12,7 +12,6 @@ type
 
   [diViewFor(IWhereOrder)]
   TViewWhereOrderHistory = class(TViewBaseForList)
-    GridCustomers: TUniDBGrid;
     BSMasterOrderID: TIntegerField;
     BSMasterOrderState: TStringField;
     BSMasterNote: TStringField;

@@ -16,21 +16,10 @@ type
     BSMasterName: TStringField;
     BSMasterPrice: TCurrencyField;
     BSMasterImage: TGraphicField;
-    GridCustomers: TUniDBGrid;
     BSWhereID: TIntegerField;
     BSWhereName: TStringField;
     BSWhereFromPrice: TCurrencyField;
     BSWhereToPrice: TCurrencyField;
-    PanelImage: TUniPanel;
-    UniDBImage1: TUniDBImage;
-    UniLabel1: TUniLabel;
-    DBEditWhereID: TUniDBEdit;
-    UniLabel2: TUniLabel;
-    DBEditWhereName: TUniDBEdit;
-    UniLabel3: TUniLabel;
-    DBEditWhereFromPrice: TUniDBEdit;
-    UniLabel4: TUniLabel;
-    DBEditWhereToPrice: TUniDBEdit;
   private
   public
   end;

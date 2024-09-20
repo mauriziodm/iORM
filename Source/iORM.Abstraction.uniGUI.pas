@@ -52,35 +52,21 @@ unit iORM.Abstraction.uniGUI;
 interface
 
 uses
-  System.Classes, iORM.Abstraction, Vcl.ActnList, System.Rtti;
+  System.Classes, Vcl.ActnList, System.Rtti, iORM.Abstraction;
 
 type
-  TioUniGUI = class(TComponent)
-  strict private
-    // Events
-    FHideWait: TNotifyEvent;
-    FShowWait: TNotifyEvent;
-    // Methods
-    function Get_Version: String;
-    procedure SetHideWait(const Value: TNotifyEvent);
-    procedure SetShowWait(const Value: TNotifyEvent);
-  public
-    constructor Create(AOwner: TComponent); override;
-  published
-    // properties
-    property _Version: String read Get_Version;
-    // Events
-    property HideWait: TNotifyEvent read FHideWait write SetHideWait;
-    property ShowWait: TNotifyEvent read FShowWait write SetShowWait;
+  TioUniGUI = class(TioCustomPlatformAbstractionComponent)
+
   end;
 
   // Note: TioApplication features not implemented for uniGUI platform
   TioApplicationUniGUI = class(TioApplication)
   protected
-    class procedure _HandleException(const Sender: TObject); override;
+    class procedure _HandleException(const Sender: TObject); override; // not yet implemented
     class procedure _ShowMessage(const AMessage: string); override;
     class function _ProjectPlatform: TioProjectPlatform; override;
     class function _Terminate: Boolean; override;
+    class function _GetSessionID: String; override;
   end;
 
   TioControlUniGUI = class(TioControl)
@@ -146,54 +132,19 @@ type
 implementation
 
 uses
-  iORM, Vcl.Forms, Vcl.Dialogs, iORM.Exceptions, Vcl.Controls,
-  iORM.DB.ConnectionContainer;
-
-{ TioUniGUI }
-
-constructor TioUniGUI.Create(AOwner: TComponent);
-begin
-  inherited;
-  FShowWait := nil;
-  FHideWait := nil;
-end;
-
-function TioUniGUI.Get_Version: String;
-begin
-  Result := io.Version;
-end;
-
-procedure TioUniGUI.SetHideWait(const Value: TNotifyEvent);
-begin
-  FHideWait := Value;
-  if Assigned(FHideWait) then
-    TioConnectionManager.SetHideWaitProc(
-      procedure
-      begin
-        FHideWait(Self);
-      end)
-  else
-    TioConnectionManager.SetHideWaitProc(nil);
-end;
-
-procedure TioUniGUI.SetShowWait(const Value: TNotifyEvent);
-begin
-  FShowWait := Value;
-  if Assigned(FShowWait) then
-    TioConnectionManager.SetShowWaitProc(
-      procedure
-      begin
-        FShowWait(Self);
-      end)
-  else
-    TioConnectionManager.SetShowWaitProc(nil);
-end;
+  iORM, iORM.Exceptions, Data.Bind.Components, Vcl.Controls, uniGUIApplication, uniGUIClasses, uniGUIDialogs,
+  System.SysUtils;
 
 { TioApplicationUniGUI }
 
+class function TioApplicationUniGUI._GetSessionID: String;
+begin
+  Result := uniGUIApplication.UniSession.SessionId;
+end;
+
 class procedure TioApplicationUniGUI._HandleException(const Sender: TObject);
 begin
-  raise EioGenericException.Create(ClassName, '_HandleException', 'Feature not implemented for then uniGUI platform.');
+  uniGUIApplication.UniSession.HandleException(Sender as Exception);
 end;
 
 class function TioApplicationUniGUI._ProjectPlatform: TioProjectPlatform;
@@ -203,12 +154,13 @@ end;
 
 class procedure TioApplicationUniGUI._ShowMessage(const AMessage: string);
 begin
-  raise EioGenericException.Create(ClassName, '_HandleException', 'Feature not implemented for then uniGUI platform.');
+  // TODO: Implementare anche ShowMessage con la callback?
+  uniGUIDialogs.ShowMessage(AMessage);
 end;
 
 class function TioApplicationUniGUI._Terminate: Boolean;
 begin
-  raise EioGenericException.Create(ClassName, '_Terminate', 'Feature not implemented for then uniGUI platform.');
+  uniGUIApplication.UniSession.Terminate;
 end;
 
 { TioControlUniGUI }
@@ -217,7 +169,7 @@ class procedure TioControlUniGUI._SetParent(const AControl, AParent: TObject);
 begin
   inherited;
   if not(AControl is TControl) then
-    raise EioGenericException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TControl.');
+    raise EioGenericException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TUniControl.');
   if not(AParent is TWinControl) then
     raise EioGenericException.Create(Self.ClassName, '_SetParent', 'AParent must descend from TWinControl.');
   TControl(AControl).Parent := TWinControl(AParent);
@@ -227,7 +179,7 @@ class procedure TioControlUniGUI._SetVisible(const AControl: TObject; const AVis
 begin
   inherited;
   if not(AControl is TControl) then
-    raise EioGenericException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TControl.');
+    raise EioGenericException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TUniControl.');
   TControl(AControl).Visible := AVisible;
 end;
 

@@ -294,7 +294,7 @@ begin
   begin
     // If the ViewModel is assigned then try
     // to Bind the View (Owner) components to ViewModel's actions
-    // and register the view into the VMVoews container of the VM
+    // and register the view into the VMViews container of the VM
     (FViewModel as IioViewModelInternal).BindView(Owner);
     // These lines set a timer to postpone the firing of the "OnViewPairing"
     //  event on the ViewModel until after all the ConnectionDefs possibly
@@ -321,6 +321,7 @@ begin
         end);
     end
     else
+      // TODO: problema di sequenza con uniGUI perchè non posso usare un timer per ritardare il richiamo dell'evento ViewPairing, provato con iORM.Abstraction.TioDeferred ma poi dava uno stack overflow per ora l'ho rimesso così
       (FViewModel as IioViewModelInternal).DoOnViewPairing;
   end;
   // ===========================================================================

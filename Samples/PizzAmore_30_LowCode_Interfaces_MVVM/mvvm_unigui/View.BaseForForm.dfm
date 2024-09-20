@@ -1,91 +1,15 @@
 object ViewBaseForForm: TViewBaseForForm
   Left = 0
   Top = 0
-  Width = 800
-  Height = 600
-  TabOrder = 0
-  object PanelTop: TUniPanel
-    Left = 0
-    Top = 0
-    Width = 800
-    Height = 40
-    Hint = ''
-    Align = alTop
-    TabOrder = 0
-    BorderStyle = ubsNone
-    Caption = ''
-    Color = clNavy
-    object ButtonBack: TUniSpeedButton
-      Left = 0
-      Top = 0
-      Width = 50
-      Height = 40
-      Action = acBack
-      Align = alLeft
-      ParentFont = False
-      Font.Color = clNavy
-      Font.Height = -13
-      ParentColor = False
-      TabOrder = 1
-    end
-    object LabelTitle: TUniLabel
-      Left = 50
-      Top = 0
-      Width = 750
-      Height = 40
-      Hint = ''
-      Alignment = taCenter
-      AutoSize = False
-      Caption = 'Title'
-      Align = alClient
-      ParentFont = False
-      Font.Color = clWhite
-      Font.Height = -16
-      Font.Style = [fsBold]
-      ParentColor = False
-      Color = clWhite
-      TabOrder = 2
-    end
-  end
-  object PanelBottom: TUniPanel
-    Left = 0
-    Top = 560
-    Width = 800
-    Height = 40
-    Hint = ''
-    Align = alBottom
-    TabOrder = 1
-    BorderStyle = ubsNone
-    Caption = ''
-    Color = clMenu
-    object ButtonDelete: TUniSpeedButton
-      Left = 0
-      Top = 0
-      Width = 50
-      Height = 40
-      Action = acRevert
-      Align = alLeft
-      ParentFont = False
-      Font.Color = clRed
-      Font.Height = -13
-      ParentColor = False
-      TabOrder = 1
-    end
-    object ButtonAdd: TUniSpeedButton
-      Left = 740
-      Top = 0
-      Width = 60
-      Height = 40
-      Action = acPersist
-      Align = alRight
-      ParentFont = False
-      Font.Color = clGreen
-      Font.Height = -13
-      Font.Style = [fsBold]
-      ParentColor = False
-      TabOrder = 2
-    end
-  end
+  ClientHeight = 562
+  ClientWidth = 788
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
+  Font.Style = []
+  TextHeight = 15
   object BSSource: TDataSource
     DataSet = BSMaster
     Left = 384

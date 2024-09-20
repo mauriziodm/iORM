@@ -10,13 +10,6 @@ uses
 
 type
   TViewBaseForList = class(TUniFrame)
-    PanelTop: TUniPanel;
-    PanelBottom: TUniPanel;
-    PanelWhere: TUniPanel;
-    ButtonBack: TUniSpeedButton;
-    ButtonSelect: TUniSpeedButton;
-    ButtonDelete: TUniSpeedButton;
-    ButtonAdd: TUniSpeedButton;
     ActionList1: TActionList;
     acBack: TioViewAction;
     acDelete: TioViewAction;
@@ -29,10 +22,6 @@ type
     SourceMaster: TDataSource;
     BSWhere: TioModelDataSet;
     SourceWhere: TDataSource;
-    LabelTitle: TUniLabel;
-    PanelWhereButtons: TUniPanel;
-    ButtonSearch: TUniSpeedButton;
-    ButtonClear: TUniSpeedButton;
   private
   public
   end;

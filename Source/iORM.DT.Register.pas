@@ -40,14 +40,14 @@ procedure Register;
 implementation
 
 uses
-  ToolsAPI, System.Classes, iORM.Abstraction.VCL, iORM.Abstraction.FMX, iORM.DB.ConnectionDef, iORM.DB.DataSet.Master,
+  ToolsAPI, System.Classes, iORM.DB.ConnectionDef, iORM.DB.DataSet.Master, iORM.Abstraction.VCL, iORM.Abstraction.FMX,
 {$IFNDEF ioDelphiProfessional}
   iORM.DB.ConnectionDef.MSSQLServer,
 {$ENDIF}
   iORM.DB.DataSet.Detail, iORM.DB.MemTable, iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.PrototypeBindSource.Master,
   iORM.LiveBindings.PrototypeBindSource.Detail, DesignIntf, iORM.MVVM.ModelPresenter.Master, iORM.MVVM.ModelPresenter.Detail, iORM.MVVM.ModelDataSet,
   iORM.MVVM.ModelBindSource, iORM.MVVM.ViewModelBridge, iORM.MVVM.ViewContextProvider, System.Actions, iORM.StdActions.VCL, iORM.StdActions.FMX,
-  iORM.DT.ViewModel.Wizard, iORM.MVVM.ViewModel, DesignEditors, iORM.StdActions.CloseQueryRepeater, iORM.Abstraction.uniGUI,
+  iORM.DT.ViewModel.Wizard, iORM.MVVM.ViewModel, DesignEditors, iORM.StdActions.CloseQueryRepeater,
   iORM.DT.CompAutoUses, iORM.MVVM.VMAction, iORM.DT.Editors.VMAction, iORM.SynchroStrategy.EtmBased, iORM.Http.WebBroker.Producer;
 
 
@@ -58,7 +58,7 @@ begin
   // Abstraction layer components
   RegisterComponents('iORM - Abstraction layer', [TioVCL]);
   RegisterComponents('iORM - Abstraction layer', [TioFMX]);
-  RegisterComponents('iORM - Abstraction layer', [TioUniGUI]);
+//  RegisterComponents('iORM - Abstraction layer', [TioUniGUI]); // Moved to iORM_uniGUI... specific packages
 
   // Connection components
   RegisterComponents('iORM - Connections', [TioHttpConnectionDef]);

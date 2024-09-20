@@ -673,7 +673,7 @@ type
     FExecuting, FExecutingEventHandler: Boolean;
     FInjectEventHandler: Boolean;
     FInternalExecutionMode: TioActionExecutionMode;
-    FOnCloseQuery: TCloseQueryEvent;
+    FOnCloseQuery: TioCloseQueryEvent;
     FOnEditingAction: TioBSCloseQueryOnEditingAction;
     FOnExecuteAction: TioBSCloseQueryOnExecuteAction;
     FOnUpdateScope: TioBSCloseQueryActionUpdateScope;
@@ -718,7 +718,7 @@ type
     property OnExecuteAction: TioBSCloseQueryOnExecuteAction read FOnExecuteAction write FOnExecuteAction default eaClose;
     property OnUpdateScope: TioBSCloseQueryActionUpdateScope read FOnUpdateScope write FOnUpdateScope default usLocal;
     // events
-    property OnCloseQuery: TCloseQueryEvent read FOnCloseQuery write FOnCloseQuery;
+    property OnCloseQuery: TioCloseQueryEvent read FOnCloseQuery write FOnCloseQuery;
   end;
 
   // =================================================================================================

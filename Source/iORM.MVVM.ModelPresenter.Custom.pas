@@ -1029,6 +1029,7 @@ begin
       // If we are in the opening of the bind source and we are NOT at design-time then
       // create the active bind source adapter
       CheckAdapter(True);
+// TODO: CArlo Marona 18/09/2024 - Carlo propone (e io sono d'accordo) di spostare il DoBeforeOpen più sopra e prima che venga creato il ABSA perchè se ad esempio volgio impostare il TypeName in questo evento non funzionerebbe
       DoBeforeOpen;
     end
     else

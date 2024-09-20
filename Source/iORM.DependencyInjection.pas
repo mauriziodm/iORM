@@ -143,16 +143,16 @@ type
     function ConstructorParams<T1, T2, T3, T4, T5, T6, T7, T8, T9>(AArg1: T1; AArg2: T2; AArg3: T3; AArg4: T4; AArg5: T5; AArg6: T6; AArg7: T7; AArg8: T8; AArg9: T9): TioDIRegister; overload;
     // ---------- CONSTRUCTOR PARAMS ----------
     // ---------- FACTORY METHOD ----------
-    function FactoryMethod(const AFactoryMethod: TFActoryMethod): TioDIRegister; overload;
-    function FactoryMethod<T1>(const AFactoryMethod: TFActoryMethod<T1>): TioDIRegister; overload;
-    function FactoryMethod<T1, T2>(const AFactoryMethod: TFActoryMethod<T1, T2>): TioDIRegister; overload;
-    function FactoryMethod<T1, T2, T3>(const AFactoryMethod: TFActoryMethod<T1, T2, T3>): TioDIRegister; overload;
-    function FactoryMethod<T1, T2, T3, T4>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4>): TioDIRegister; overload;
-    function FactoryMethod<T1, T2, T3, T4, T5>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5>): TioDIRegister; overload;
-    function FactoryMethod<T1, T2, T3, T4, T5, T6>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5, T6>): TioDIRegister; overload;
-    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5, T6, T7>): TioDIRegister; overload;
-    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>): TioDIRegister; overload;
-    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>): TioDIRegister; overload;
+    function FactoryMethod(const AFactoryMethod: TioFactoryMethod): TioDIRegister; overload;
+    function FactoryMethod<T1>(const AFactoryMethod: TioFactoryMethod<T1>): TioDIRegister; overload;
+    function FactoryMethod<T1, T2>(const AFactoryMethod: TioFactoryMethod<T1, T2>): TioDIRegister; overload;
+    function FactoryMethod<T1, T2, T3>(const AFactoryMethod: TioFactoryMethod<T1, T2, T3>): TioDIRegister; overload;
+    function FactoryMethod<T1, T2, T3, T4>(const AFactoryMethod: TioFactoryMethod<T1, T2, T3, T4>): TioDIRegister; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5>(const AFactoryMethod: TioFactoryMethod<T1, T2, T3, T4, T5>): TioDIRegister; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6>(const AFactoryMethod: TioFactoryMethod<T1, T2, T3, T4, T5, T6>): TioDIRegister; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7>(const AFactoryMethod: TioFactoryMethod<T1, T2, T3, T4, T5, T6, T7>): TioDIRegister; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(const AFactoryMethod: TioFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>): TioDIRegister; overload;
+    function FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(const AFactoryMethod: TioFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>): TioDIRegister; overload;
     // ---------- FACTORY METHOD ----------
     // ---------- PROPERTY/FIELD INJECTION ----------
     function InjectField(const AFieldName: String; AValue: TValue): TioDIRegister; overload;
@@ -993,63 +993,63 @@ begin
   Free;
 end;
 
-function TioDIRegister.FactoryMethod(const AFactoryMethod: TFActoryMethod): TioDIRegister;
+function TioDIRegister.FactoryMethod(const AFactoryMethod: TioFactoryMethod): TioDIRegister;
 begin
-  TValue.Make(@AFactoryMethod, TypeInfo(TFactoryMethod), FImpementersItem.FactoryMethodPointer^);
+  TValue.Make(@AFactoryMethod, TypeInfo(TioFactoryMethod), FImpementersItem.FactoryMethodPointer^);
   Result := Self;
 end;
 
-function TioDIRegister.FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>): TioDIRegister;
+function TioDIRegister.FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>(const AFactoryMethod: TioFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>): TioDIRegister;
 begin
-  TValue.Make(@AFactoryMethod, TypeInfo(TFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>), FImpementersItem.FactoryMethodPointer^);
+  TValue.Make(@AFactoryMethod, TypeInfo(TioFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>), FImpementersItem.FactoryMethodPointer^);
   Result := Self;
 end;
 
-function TioDIRegister.FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>): TioDIRegister;
+function TioDIRegister.FactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>(const AFactoryMethod: TioFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>): TioDIRegister;
 begin
-  TValue.Make(@AFactoryMethod, TypeInfo(TFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>), FImpementersItem.FactoryMethodPointer^);
+  TValue.Make(@AFactoryMethod, TypeInfo(TioFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>), FImpementersItem.FactoryMethodPointer^);
   Result := Self;
 end;
 
-function TioDIRegister.FactoryMethod<T1, T2, T3, T4, T5, T6, T7>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5, T6, T7>): TioDIRegister;
+function TioDIRegister.FactoryMethod<T1, T2, T3, T4, T5, T6, T7>(const AFactoryMethod: TioFactoryMethod<T1, T2, T3, T4, T5, T6, T7>): TioDIRegister;
 begin
-  TValue.Make(@AFactoryMethod, TypeInfo(TFactoryMethod<T1, T2, T3, T4, T5, T6, T7>), FImpementersItem.FactoryMethodPointer^);
+  TValue.Make(@AFactoryMethod, TypeInfo(TioFactoryMethod<T1, T2, T3, T4, T5, T6, T7>), FImpementersItem.FactoryMethodPointer^);
   Result := Self;
 end;
 
-function TioDIRegister.FactoryMethod<T1, T2, T3, T4, T5, T6>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5, T6>): TioDIRegister;
+function TioDIRegister.FactoryMethod<T1, T2, T3, T4, T5, T6>(const AFactoryMethod: TioFactoryMethod<T1, T2, T3, T4, T5, T6>): TioDIRegister;
 begin
-  TValue.Make(@AFactoryMethod, TypeInfo(TFactoryMethod<T1, T2, T3, T4, T5, T6>), FImpementersItem.FactoryMethodPointer^);
+  TValue.Make(@AFactoryMethod, TypeInfo(TioFactoryMethod<T1, T2, T3, T4, T5, T6>), FImpementersItem.FactoryMethodPointer^);
   Result := Self;
 end;
 
-function TioDIRegister.FactoryMethod<T1, T2, T3, T4, T5>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4, T5>): TioDIRegister;
+function TioDIRegister.FactoryMethod<T1, T2, T3, T4, T5>(const AFactoryMethod: TioFactoryMethod<T1, T2, T3, T4, T5>): TioDIRegister;
 begin
-  TValue.Make(@AFactoryMethod, TypeInfo(TFactoryMethod<T1, T2, T3, T4, T5>), FImpementersItem.FactoryMethodPointer^);
+  TValue.Make(@AFactoryMethod, TypeInfo(TioFactoryMethod<T1, T2, T3, T4, T5>), FImpementersItem.FactoryMethodPointer^);
   Result := Self;
 end;
 
-function TioDIRegister.FactoryMethod<T1, T2, T3, T4>(const AFactoryMethod: TFActoryMethod<T1, T2, T3, T4>): TioDIRegister;
+function TioDIRegister.FactoryMethod<T1, T2, T3, T4>(const AFactoryMethod: TioFactoryMethod<T1, T2, T3, T4>): TioDIRegister;
 begin
-  TValue.Make(@AFactoryMethod, TypeInfo(TFactoryMethod<T1, T2, T3, T4>), FImpementersItem.FactoryMethodPointer^);
+  TValue.Make(@AFactoryMethod, TypeInfo(TioFactoryMethod<T1, T2, T3, T4>), FImpementersItem.FactoryMethodPointer^);
   Result := Self;
 end;
 
-function TioDIRegister.FactoryMethod<T1, T2, T3>(const AFactoryMethod: TFActoryMethod<T1, T2, T3>): TioDIRegister;
+function TioDIRegister.FactoryMethod<T1, T2, T3>(const AFactoryMethod: TioFactoryMethod<T1, T2, T3>): TioDIRegister;
 begin
-  TValue.Make(@AFactoryMethod, TypeInfo(TFactoryMethod<T1, T2, T3>), FImpementersItem.FactoryMethodPointer^);
+  TValue.Make(@AFactoryMethod, TypeInfo(TioFactoryMethod<T1, T2, T3>), FImpementersItem.FactoryMethodPointer^);
   Result := Self;
 end;
 
-function TioDIRegister.FactoryMethod<T1, T2>(const AFactoryMethod: TFActoryMethod<T1, T2>): TioDIRegister;
+function TioDIRegister.FactoryMethod<T1, T2>(const AFactoryMethod: TioFactoryMethod<T1, T2>): TioDIRegister;
 begin
-  TValue.Make(@AFactoryMethod, TypeInfo(TFactoryMethod<T1, T2>), FImpementersItem.FactoryMethodPointer^);
+  TValue.Make(@AFactoryMethod, TypeInfo(TioFactoryMethod<T1, T2>), FImpementersItem.FactoryMethodPointer^);
   Result := Self;
 end;
 
-function TioDIRegister.FactoryMethod<T1>(const AFactoryMethod: TFActoryMethod<T1>): TioDIRegister;
+function TioDIRegister.FactoryMethod<T1>(const AFactoryMethod: TioFactoryMethod<T1>): TioDIRegister;
 begin
-  TValue.Make(@AFactoryMethod, TypeInfo(TFactoryMethod<T1>), FImpementersItem.FactoryMethodPointer^);
+  TValue.Make(@AFactoryMethod, TypeInfo(TioFactoryMethod<T1>), FImpementersItem.FactoryMethodPointer^);
   Result := Self;
 end;
 
@@ -1434,8 +1434,8 @@ begin
   //      perchè faceva subito il get della item sul container (che appunto non c'era)
   _GetImplementersItemIfNotAlreadyExists;
   FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
-    .Cast<TFactoryMethod>
-    .AsType<TFactoryMethod>()();
+    .Cast<TioFactoryMethod>
+    .AsType<TioFactoryMethod>()();
   Result := Self;
 end;
 
@@ -1451,8 +1451,8 @@ begin
   //      perchè faceva subito il get della item sul container (che appunto non c'era)
   _GetImplementersItemIfNotAlreadyExists;
   FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
-    .Cast<TFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>>
-    .AsType<TFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>>()(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7, AArg8, AArg9);
+    .Cast<TioFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>>
+    .AsType<TioFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9>>()(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7, AArg8, AArg9);
   Result := Self;
 end;
 
@@ -1468,8 +1468,8 @@ begin
   //      perchè faceva subito il get della item sul container (che appunto non c'era)
   _GetImplementersItemIfNotAlreadyExists;
   FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
-    .Cast<TFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>>
-    .AsType<TFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>>()(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7, AArg8);
+    .Cast<TioFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>>
+    .AsType<TioFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8>>()(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7, AArg8);
   Result := Self;
 end;
 
@@ -1484,8 +1484,8 @@ begin
   //      perchè faceva subito il get della item sul container (che appunto non c'era)
   _GetImplementersItemIfNotAlreadyExists;
   FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
-    .Cast<TFactoryMethod<T1, T2, T3, T4, T5, T6, T7>>
-    .AsType<TFactoryMethod<T1, T2, T3, T4, T5, T6, T7>>()(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7);
+    .Cast<TioFactoryMethod<T1, T2, T3, T4, T5, T6, T7>>
+    .AsType<TioFactoryMethod<T1, T2, T3, T4, T5, T6, T7>>()(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6, AArg7);
   Result := Self;
 end;
 
@@ -1500,8 +1500,8 @@ begin
   //      perchè faceva subito il get della item sul container (che appunto non c'era)
   _GetImplementersItemIfNotAlreadyExists;
   FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
-    .Cast<TFactoryMethod<T1, T2, T3, T4, T5, T6>>
-    .AsType<TFactoryMethod<T1, T2, T3, T4, T5, T6>>()(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6);
+    .Cast<TioFactoryMethod<T1, T2, T3, T4, T5, T6>>
+    .AsType<TioFactoryMethod<T1, T2, T3, T4, T5, T6>>()(AArg1, AArg2, AArg3, AArg4, AArg5, AArg6);
   Result := Self;
 end;
 
@@ -1516,8 +1516,8 @@ begin
   //      perchè faceva subito il get della item sul container (che appunto non c'era)
   _GetImplementersItemIfNotAlreadyExists;
   FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
-    .Cast<TFactoryMethod<T1, T2, T3, T4, T5>>
-    .AsType<TFactoryMethod<T1, T2, T3, T4, T5>>()(AArg1, AArg2, AArg3, AArg4, AArg5);
+    .Cast<TioFactoryMethod<T1, T2, T3, T4, T5>>
+    .AsType<TioFactoryMethod<T1, T2, T3, T4, T5>>()(AArg1, AArg2, AArg3, AArg4, AArg5);
   Result := Self;
 end;
 
@@ -1532,8 +1532,8 @@ begin
   //      perchè faceva subito il get della item sul container (che appunto non c'era)
   _GetImplementersItemIfNotAlreadyExists;
   FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
-    .Cast<TFactoryMethod<T1, T2, T3, T4>>
-    .AsType<TFactoryMethod<T1, T2, T3, T4>>()(AArg1, AArg2, AArg3, AArg4);
+    .Cast<TioFactoryMethod<T1, T2, T3, T4>>
+    .AsType<TioFactoryMethod<T1, T2, T3, T4>>()(AArg1, AArg2, AArg3, AArg4);
   Result := Self;
 end;
 
@@ -1548,8 +1548,8 @@ begin
   //      perchè faceva subito il get della item sul container (che appunto non c'era)
   _GetImplementersItemIfNotAlreadyExists;
   FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
-    .Cast<TFactoryMethod<T1, T2, T3>>
-    .AsType<TFactoryMethod<T1, T2, T3>>()(AArg1, AArg2, AArg3);
+    .Cast<TioFactoryMethod<T1, T2, T3>>
+    .AsType<TioFactoryMethod<T1, T2, T3>>()(AArg1, AArg2, AArg3);
   Result := Self;
 end;
 
@@ -1564,8 +1564,8 @@ begin
   //      perchè faceva subito il get della item sul container (che appunto non c'era)
   _GetImplementersItemIfNotAlreadyExists;
   FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
-    .Cast<TFactoryMethod<T1, T2>>
-    .AsType<TFactoryMethod<T1, T2>>()(AArg1, AArg2);
+    .Cast<TioFactoryMethod<T1, T2>>
+    .AsType<TioFactoryMethod<T1, T2>>()(AArg1, AArg2);
   Result := Self;
 end;
 
@@ -1580,8 +1580,8 @@ begin
   //      perchè faceva subito il get della item sul container (che appunto non c'era)
   _GetImplementersItemIfNotAlreadyExists;
   FAlreadyCreatedInstance := FImplementersItem.FactoryMethodPointer^
-    .Cast<TFactoryMethod<T1>>
-    .AsType<TFactoryMethod<T1>>()(AArg1);
+    .Cast<TioFactoryMethod<T1>>
+    .AsType<TioFactoryMethod<T1>>()(AArg1);
   Result := Self;
 end;
 

@@ -53,6 +53,8 @@ const
   IO_STRING_NULL_VALUE = '';
   IO_DATETIME_NULL_VALUE = 0;
 
+  IO_AUTH_NULL_JWT = '';
+
   IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME = 'Master___ID';
 
   IO_USERNAME_LENGTH = 30;
@@ -87,23 +89,23 @@ type
   PValue = ^TValue;
 
   // Dependency injenction factory method types
-  TFactoryMethod = reference to function: TObject;
-  TFactoryMethod<T1> = reference to function(Arg1: T1): TObject;
-  TFactoryMethod<T1, T2> = reference to function(Arg1: T1; Arg2: T2): TObject;
-  TFactoryMethod<T1, T2, T3> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3): TObject;
-  TFactoryMethod<T1, T2, T3, T4> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3; Arg4: T4): TObject;
-  TFactoryMethod<T1, T2, T3, T4, T5> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3; Arg4: T4; Arg5: T5): TObject;
-  TFactoryMethod<T1, T2, T3, T4, T5, T6> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3; Arg4: T4; Arg5: T5; Arg6: T6): TObject;
-  TFactoryMethod<T1, T2, T3, T4, T5, T6, T7> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3; Arg4: T4; Arg5: T5; Arg6: T6; Arg7: T7): TObject;
-  TFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3; Arg4: T4; Arg5: T5; Arg6: T6; Arg7: T7; Arg8: T8): TObject;
-  TFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3; Arg4: T4; Arg5: T5; Arg6: T6; Arg7: T7; Arg8: T8; Arg9: T9): TObject;
+  TioFactoryMethod = reference to function: TObject;
+  TioFactoryMethod<T1> = reference to function(Arg1: T1): TObject;
+  TioFactoryMethod<T1, T2> = reference to function(Arg1: T1; Arg2: T2): TObject;
+  TioFactoryMethod<T1, T2, T3> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3): TObject;
+  TioFactoryMethod<T1, T2, T3, T4> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3; Arg4: T4): TObject;
+  TioFactoryMethod<T1, T2, T3, T4, T5> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3; Arg4: T4; Arg5: T5): TObject;
+  TioFactoryMethod<T1, T2, T3, T4, T5, T6> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3; Arg4: T4; Arg5: T5; Arg6: T6): TObject;
+  TioFactoryMethod<T1, T2, T3, T4, T5, T6, T7> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3; Arg4: T4; Arg5: T5; Arg6: T6; Arg7: T7): TObject;
+  TioFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3; Arg4: T4; Arg5: T5; Arg6: T6; Arg7: T7; Arg8: T8): TObject;
+  TioFactoryMethod<T1, T2, T3, T4, T5, T6, T7, T8, T9> = reference to function(Arg1: T1; Arg2: T2; Arg3: T3; Arg4: T4; Arg5: T5; Arg6: T6; Arg7: T7; Arg8: T8; Arg9: T9): TObject;
 
   // SkipScope (vedi anche sopra (const) i valori)
   TioSkipScope = DJSON.Params.TdjSkipScope;
   TioSkipScopeSet = DJSON.Params.TdjSkipScopeSet;
 
   // Event handlers type
-  TCloseQueryEvent = procedure(Sender: TObject; var CanClose: Boolean) of object;
+  TioCloseQueryEvent = procedure(Sender: TObject; var CanClose: Boolean) of object;
   TioCanExecuteEvent = procedure(Sender: TObject; var CanExecute: Boolean) of object;
   TioStdActionNewInstanceAsObjectEvent = procedure(const ASender: TObject; out NewInstance: TObject) of object;
   TioStdActionNewInstanceAsInterfaceEvent = procedure(const ASender: TObject; out NewInstance: IInterface) of object;
@@ -163,7 +165,7 @@ type
 
   // Persistence related types
   // Note: Literal description for values added at the end of the "iORM.pas" unit (initialization)
-  TioPersistenceActionType = (atDoNotPersist, atInsert, atUpdate, atDelete);
+  TioPersistenceActionType = (atUndefined, atSelect, atInsert, atUpdate, atDelete);
   TioPersistenceIntentType = (itRegular, itRevert, itSynchro_PersistToServer, itSynchro_PersistToClient);
   TioPersistenceConflictState = (csUndefined, csResolved, csRejected, csRejectedRaise);
   TioFreeObjAfterPersistOrDelete = (foKeepAlive, foFree, foFreeAndNil);

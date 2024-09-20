@@ -1,13 +1,13 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{EDA76E4A-4BD0-4BDC-A9E0-03FA00D3B650}</ProjectGuid>
-        <MainSource>iORM_RT.dpk</MainSource>
+        <ProjectGuid>{D1D331FD-DDF6-4F09-962C-C9D6B7461D40}</ProjectGuid>
+        <MainSource>iORM_uniGUI_RT.dpk</MainSource>
         <ProjectVersion>19.5</ProjectVersion>
-        <FrameworkType>FMX</FrameworkType>
+        <FrameworkType>VCL</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
-        <TargetedPlatforms>32787</TargetedPlatforms>
+        <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Package</AppType>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -28,36 +28,13 @@
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
-        <Base_Win64>true</Base_Win64>
-        <CfgParent>Base</CfgParent>
-        <Base>true</Base>
-    </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
         <Cfg_1>true</Cfg_1>
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Android' and '$(Cfg_1)'=='true') or '$(Cfg_1_Android)'!=''">
-        <Cfg_1_Android>true</Cfg_1_Android>
-        <CfgParent>Cfg_1</CfgParent>
-        <Cfg_1>true</Cfg_1>
-        <Base>true</Base>
-    </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Android64' and '$(Cfg_1)'=='true') or '$(Cfg_1_Android64)'!=''">
-        <Cfg_1_Android64>true</Cfg_1_Android64>
-        <CfgParent>Cfg_1</CfgParent>
-        <Cfg_1>true</Cfg_1>
-        <Base>true</Base>
-    </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
         <Cfg_1_Win32>true</Cfg_1_Win32>
-        <CfgParent>Cfg_1</CfgParent>
-        <Cfg_1>true</Cfg_1>
-        <Base>true</Base>
-    </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win64)'!=''">
-        <Cfg_1_Win64>true</Cfg_1_Win64>
         <CfgParent>Cfg_1</CfgParent>
         <Cfg_1>true</Cfg_1>
         <Base>true</Base>
@@ -67,37 +44,7 @@
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Android' and '$(Cfg_2)'=='true') or '$(Cfg_2_Android)'!=''">
-        <Cfg_2_Android>true</Cfg_2_Android>
-        <CfgParent>Cfg_2</CfgParent>
-        <Cfg_2>true</Cfg_2>
-        <Base>true</Base>
-    </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Android64' and '$(Cfg_2)'=='true') or '$(Cfg_2_Android64)'!=''">
-        <Cfg_2_Android64>true</Cfg_2_Android64>
-        <CfgParent>Cfg_2</CfgParent>
-        <Cfg_2>true</Cfg_2>
-        <Base>true</Base>
-    </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
-        <Cfg_2_Win32>true</Cfg_2_Win32>
-        <CfgParent>Cfg_2</CfgParent>
-        <Cfg_2>true</Cfg_2>
-        <Base>true</Base>
-    </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win64)'!=''">
-        <Cfg_2_Win64>true</Cfg_2_Win64>
-        <CfgParent>Cfg_2</CfgParent>
-        <Cfg_2>true</Cfg_2>
-        <Base>true</Base>
-    </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <DCC_Description>iORM Runtime</DCC_Description>
-        <SanitizedProjectName>iORM_RT</SanitizedProjectName>
-        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
-        <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
-        <GenPackage>true</GenPackage>
-        <GenDll>true</GenDll>
         <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
         <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
         <DCC_E>false</DCC_E>
@@ -105,36 +52,28 @@
         <DCC_S>false</DCC_S>
         <DCC_F>false</DCC_F>
         <DCC_K>false</DCC_K>
-        <DCC_UsePackage>RESTComponents;$(DCC_UsePackage)</DCC_UsePackage>
+        <GenDll>true</GenDll>
+        <GenPackage>true</GenPackage>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
+        <SanitizedProjectName>iORM_uniGUI_RT</SanitizedProjectName>
         <RuntimeOnlyPackage>true</RuntimeOnlyPackage>
         <DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android)'!=''">
-        <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
-        <BT_BuildType>Debug</BT_BuildType>
-        <EnabledSysJars>annotation-1.2.0.dex.jar;asynclayoutinflater-1.0.0.dex.jar;billing-4.0.0.dex.jar;browser-1.0.0.dex.jar;cloud-messaging.dex.jar;collection-1.0.0.dex.jar;coordinatorlayout-1.0.0.dex.jar;core-1.5.0-rc02.dex.jar;core-common-2.0.1.dex.jar;core-runtime-2.0.1.dex.jar;cursoradapter-1.0.0.dex.jar;customview-1.0.0.dex.jar;documentfile-1.0.0.dex.jar;drawerlayout-1.0.0.dex.jar;firebase-annotations-16.0.0.dex.jar;firebase-common-20.0.0.dex.jar;firebase-components-17.0.0.dex.jar;firebase-datatransport-18.0.0.dex.jar;firebase-encoders-17.0.0.dex.jar;firebase-encoders-json-18.0.0.dex.jar;firebase-iid-interop-17.1.0.dex.jar;firebase-installations-17.0.0.dex.jar;firebase-installations-interop-17.0.0.dex.jar;firebase-measurement-connector-19.0.0.dex.jar;firebase-messaging-22.0.0.dex.jar;fmx.dex.jar;fragment-1.0.0.dex.jar;google-play-licensing.dex.jar;interpolator-1.0.0.dex.jar;javax.inject-1.dex.jar;legacy-support-core-ui-1.0.0.dex.jar;legacy-support-core-utils-1.0.0.dex.jar;lifecycle-common-2.0.0.dex.jar;lifecycle-livedata-2.0.0.dex.jar;lifecycle-livedata-core-2.0.0.dex.jar;lifecycle-runtime-2.0.0.dex.jar;lifecycle-service-2.0.0.dex.jar;lifecycle-viewmodel-2.0.0.dex.jar;listenablefuture-1.0.dex.jar;loader-1.0.0.dex.jar;localbroadcastmanager-1.0.0.dex.jar;play-services-ads-20.1.0.dex.jar;play-services-ads-base-20.1.0.dex.jar;play-services-ads-identifier-17.0.0.dex.jar;play-services-ads-lite-20.1.0.dex.jar;play-services-base-17.5.0.dex.jar;play-services-basement-17.6.0.dex.jar;play-services-cloud-messaging-16.0.0.dex.jar;play-services-drive-17.0.0.dex.jar;play-services-games-21.0.0.dex.jar;play-services-location-18.0.0.dex.jar;play-services-maps-17.0.1.dex.jar;play-services-measurement-base-18.0.0.dex.jar;play-services-measurement-sdk-api-18.0.0.dex.jar;play-services-places-placereport-17.0.0.dex.jar;play-services-stats-17.0.0.dex.jar;play-services-tasks-17.2.0.dex.jar;print-1.0.0.dex.jar;room-common-2.1.0.dex.jar;room-runtime-2.1.0.dex.jar;slidingpanelayout-1.0.0.dex.jar;sqlite-2.0.1.dex.jar;sqlite-framework-2.0.1.dex.jar;swiperefreshlayout-1.0.0.dex.jar;transport-api-3.0.0.dex.jar;transport-backend-cct-3.0.0.dex.jar;transport-runtime-3.0.0.dex.jar;user-messaging-platform-1.0.0.dex.jar;versionedparcelable-1.1.1.dex.jar;viewpager-1.0.0.dex.jar;work-runtime-2.1.0.dex.jar</EnabledSysJars>
-        <VerInfo_Build>1</VerInfo_Build>
+        <DCC_CBuilderOutput>None</DCC_CBuilderOutput>
+        <EnabledSysJars>activity-1.1.0.dex.jar;annotation-1.2.0.dex.jar;appcompat-1.2.0.dex.jar;appcompat-resources-1.2.0.dex.jar;asynclayoutinflater-1.0.0.dex.jar;billing-4.0.0.dex.jar;biometric-1.1.0.dex.jar;browser-1.0.0.dex.jar;cloud-messaging.dex.jar;collection-1.1.0.dex.jar;coordinatorlayout-1.0.0.dex.jar;core-1.5.0-rc02.dex.jar;core-common-2.1.0.dex.jar;core-runtime-2.1.0.dex.jar;cursoradapter-1.0.0.dex.jar;customview-1.0.0.dex.jar;documentfile-1.0.0.dex.jar;drawerlayout-1.0.0.dex.jar;firebase-annotations-16.0.0.dex.jar;firebase-common-20.0.0.dex.jar;firebase-components-17.0.0.dex.jar;firebase-datatransport-18.0.0.dex.jar;firebase-encoders-17.0.0.dex.jar;firebase-encoders-json-18.0.0.dex.jar;firebase-iid-interop-17.1.0.dex.jar;firebase-installations-17.0.0.dex.jar;firebase-installations-interop-17.0.0.dex.jar;firebase-measurement-connector-19.0.0.dex.jar;firebase-messaging-22.0.0.dex.jar;fmx.dex.jar;fragment-1.2.5.dex.jar;google-play-licensing.dex.jar;interpolator-1.0.0.dex.jar;javax.inject-1.dex.jar;legacy-support-core-ui-1.0.0.dex.jar;legacy-support-core-utils-1.0.0.dex.jar;lifecycle-common-2.2.0.dex.jar;lifecycle-livedata-2.0.0.dex.jar;lifecycle-livedata-core-2.2.0.dex.jar;lifecycle-runtime-2.2.0.dex.jar;lifecycle-service-2.0.0.dex.jar;lifecycle-viewmodel-2.2.0.dex.jar;lifecycle-viewmodel-savedstate-2.2.0.dex.jar;listenablefuture-1.0.dex.jar;loader-1.0.0.dex.jar;localbroadcastmanager-1.0.0.dex.jar;play-services-ads-20.1.0.dex.jar;play-services-ads-base-20.1.0.dex.jar;play-services-ads-identifier-17.0.0.dex.jar;play-services-ads-lite-20.1.0.dex.jar;play-services-base-17.5.0.dex.jar;play-services-basement-17.6.0.dex.jar;play-services-cloud-messaging-16.0.0.dex.jar;play-services-drive-17.0.0.dex.jar;play-services-games-21.0.0.dex.jar;play-services-location-18.0.0.dex.jar;play-services-maps-17.0.1.dex.jar;play-services-measurement-base-18.0.0.dex.jar;play-services-measurement-sdk-api-18.0.0.dex.jar;play-services-places-placereport-17.0.0.dex.jar;play-services-stats-17.0.0.dex.jar;play-services-tasks-17.2.0.dex.jar;print-1.0.0.dex.jar;room-common-2.1.0.dex.jar;room-runtime-2.1.0.dex.jar;savedstate-1.0.0.dex.jar;slidingpanelayout-1.0.0.dex.jar;sqlite-2.0.1.dex.jar;sqlite-framework-2.0.1.dex.jar;swiperefreshlayout-1.0.0.dex.jar;transport-api-3.0.0.dex.jar;transport-backend-cct-3.0.0.dex.jar;transport-runtime-3.0.0.dex.jar;user-messaging-platform-1.0.0.dex.jar;vectordrawable-1.1.0.dex.jar;vectordrawable-animated-1.1.0.dex.jar;versionedparcelable-1.1.1.dex.jar;viewpager-1.0.0.dex.jar;work-runtime-2.1.0.dex.jar</EnabledSysJars>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android64)'!=''">
-        <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
-        <BT_BuildType>Debug</BT_BuildType>
-        <EnabledSysJars>annotation-1.2.0.dex.jar;asynclayoutinflater-1.0.0.dex.jar;billing-4.0.0.dex.jar;browser-1.0.0.dex.jar;cloud-messaging.dex.jar;collection-1.0.0.dex.jar;coordinatorlayout-1.0.0.dex.jar;core-1.5.0-rc02.dex.jar;core-common-2.0.1.dex.jar;core-runtime-2.0.1.dex.jar;cursoradapter-1.0.0.dex.jar;customview-1.0.0.dex.jar;documentfile-1.0.0.dex.jar;drawerlayout-1.0.0.dex.jar;firebase-annotations-16.0.0.dex.jar;firebase-common-20.0.0.dex.jar;firebase-components-17.0.0.dex.jar;firebase-datatransport-18.0.0.dex.jar;firebase-encoders-17.0.0.dex.jar;firebase-encoders-json-18.0.0.dex.jar;firebase-iid-interop-17.1.0.dex.jar;firebase-installations-17.0.0.dex.jar;firebase-installations-interop-17.0.0.dex.jar;firebase-measurement-connector-19.0.0.dex.jar;firebase-messaging-22.0.0.dex.jar;fmx.dex.jar;fragment-1.0.0.dex.jar;google-play-licensing.dex.jar;interpolator-1.0.0.dex.jar;javax.inject-1.dex.jar;legacy-support-core-ui-1.0.0.dex.jar;legacy-support-core-utils-1.0.0.dex.jar;lifecycle-common-2.0.0.dex.jar;lifecycle-livedata-2.0.0.dex.jar;lifecycle-livedata-core-2.0.0.dex.jar;lifecycle-runtime-2.0.0.dex.jar;lifecycle-service-2.0.0.dex.jar;lifecycle-viewmodel-2.0.0.dex.jar;listenablefuture-1.0.dex.jar;loader-1.0.0.dex.jar;localbroadcastmanager-1.0.0.dex.jar;play-services-ads-20.1.0.dex.jar;play-services-ads-base-20.1.0.dex.jar;play-services-ads-identifier-17.0.0.dex.jar;play-services-ads-lite-20.1.0.dex.jar;play-services-base-17.5.0.dex.jar;play-services-basement-17.6.0.dex.jar;play-services-cloud-messaging-16.0.0.dex.jar;play-services-drive-17.0.0.dex.jar;play-services-games-21.0.0.dex.jar;play-services-location-18.0.0.dex.jar;play-services-maps-17.0.1.dex.jar;play-services-measurement-base-18.0.0.dex.jar;play-services-measurement-sdk-api-18.0.0.dex.jar;play-services-places-placereport-17.0.0.dex.jar;play-services-stats-17.0.0.dex.jar;play-services-tasks-17.2.0.dex.jar;print-1.0.0.dex.jar;room-common-2.1.0.dex.jar;room-runtime-2.1.0.dex.jar;slidingpanelayout-1.0.0.dex.jar;sqlite-2.0.1.dex.jar;sqlite-framework-2.0.1.dex.jar;swiperefreshlayout-1.0.0.dex.jar;transport-api-3.0.0.dex.jar;transport-backend-cct-3.0.0.dex.jar;transport-runtime-3.0.0.dex.jar;user-messaging-platform-1.0.0.dex.jar;versionedparcelable-1.1.1.dex.jar;viewpager-1.0.0.dex.jar;work-runtime-2.1.0.dex.jar</EnabledSysJars>
-        <VerInfo_Build>1</VerInfo_Build>
+        <DCC_CBuilderOutput>None</DCC_CBuilderOutput>
+        <EnabledSysJars>activity-1.1.0.dex.jar;annotation-1.2.0.dex.jar;appcompat-1.2.0.dex.jar;appcompat-resources-1.2.0.dex.jar;asynclayoutinflater-1.0.0.dex.jar;billing-4.0.0.dex.jar;biometric-1.1.0.dex.jar;browser-1.0.0.dex.jar;cloud-messaging.dex.jar;collection-1.1.0.dex.jar;coordinatorlayout-1.0.0.dex.jar;core-1.5.0-rc02.dex.jar;core-common-2.1.0.dex.jar;core-runtime-2.1.0.dex.jar;cursoradapter-1.0.0.dex.jar;customview-1.0.0.dex.jar;documentfile-1.0.0.dex.jar;drawerlayout-1.0.0.dex.jar;firebase-annotations-16.0.0.dex.jar;firebase-common-20.0.0.dex.jar;firebase-components-17.0.0.dex.jar;firebase-datatransport-18.0.0.dex.jar;firebase-encoders-17.0.0.dex.jar;firebase-encoders-json-18.0.0.dex.jar;firebase-iid-interop-17.1.0.dex.jar;firebase-installations-17.0.0.dex.jar;firebase-installations-interop-17.0.0.dex.jar;firebase-measurement-connector-19.0.0.dex.jar;firebase-messaging-22.0.0.dex.jar;fmx.dex.jar;fragment-1.2.5.dex.jar;google-play-licensing.dex.jar;interpolator-1.0.0.dex.jar;javax.inject-1.dex.jar;legacy-support-core-ui-1.0.0.dex.jar;legacy-support-core-utils-1.0.0.dex.jar;lifecycle-common-2.2.0.dex.jar;lifecycle-livedata-2.0.0.dex.jar;lifecycle-livedata-core-2.2.0.dex.jar;lifecycle-runtime-2.2.0.dex.jar;lifecycle-service-2.0.0.dex.jar;lifecycle-viewmodel-2.2.0.dex.jar;lifecycle-viewmodel-savedstate-2.2.0.dex.jar;listenablefuture-1.0.dex.jar;loader-1.0.0.dex.jar;localbroadcastmanager-1.0.0.dex.jar;play-services-ads-20.1.0.dex.jar;play-services-ads-base-20.1.0.dex.jar;play-services-ads-identifier-17.0.0.dex.jar;play-services-ads-lite-20.1.0.dex.jar;play-services-base-17.5.0.dex.jar;play-services-basement-17.6.0.dex.jar;play-services-cloud-messaging-16.0.0.dex.jar;play-services-drive-17.0.0.dex.jar;play-services-games-21.0.0.dex.jar;play-services-location-18.0.0.dex.jar;play-services-maps-17.0.1.dex.jar;play-services-measurement-base-18.0.0.dex.jar;play-services-measurement-sdk-api-18.0.0.dex.jar;play-services-places-placereport-17.0.0.dex.jar;play-services-stats-17.0.0.dex.jar;play-services-tasks-17.2.0.dex.jar;print-1.0.0.dex.jar;room-common-2.1.0.dex.jar;room-runtime-2.1.0.dex.jar;savedstate-1.0.0.dex.jar;slidingpanelayout-1.0.0.dex.jar;sqlite-2.0.1.dex.jar;sqlite-framework-2.0.1.dex.jar;swiperefreshlayout-1.0.0.dex.jar;transport-api-3.0.0.dex.jar;transport-backend-cct-3.0.0.dex.jar;transport-runtime-3.0.0.dex.jar;user-messaging-platform-1.0.0.dex.jar;vectordrawable-1.1.0.dex.jar;vectordrawable-animated-1.1.0.dex.jar;versionedparcelable-1.1.1.dex.jar;viewpager-1.0.0.dex.jar;work-runtime-2.1.0.dex.jar</EnabledSysJars>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
-        <DCC_UsePackage>rtl;DbxCommonDriver;dbrtl;fmx;bindengine;bindcomp;dbexpress;DBXSqliteDriver;soaprtl;vclFireDAC;FireDAC;FireDACCommonDriver;FireDACCommon;FireDACCommonODBC;FireDACIBDriver;fmxFireDAC;FireDACMSSQLDriver;vcl;CustomIPTransport;IndySystem;IndyProtocols;IndyCore;IndyIPClient;FireDACSqliteDriver;uIndy28;uniTools28;uniGUI28Core;uniGUI28;$(DCC_UsePackage)</DCC_UsePackage>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
-        <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
-        <VerInfo_Locale>1033</VerInfo_Locale>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Base_Win64)'!=''">
-        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <DCC_UsePackage>uIndy28;uniTools28;uniGUI28Core;uniGUI28;$(DCC_UsePackage)</DCC_UsePackage>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -143,20 +82,11 @@
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
         <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_1_Android)'!=''">
-        <VerInfo_Build>1</VerInfo_Build>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_1_Android64)'!=''">
-        <VerInfo_Build>1</VerInfo_Build>
+        <DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
+        <DCC_RangeChecking>true</DCC_RangeChecking>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <DCC_Description>iORM Runtime</DCC_Description>
-        <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
@@ -166,239 +96,26 @@
         <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
         <DCC_DebugInformation>0</DCC_DebugInformation>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_2_Android)'!=''">
-        <VerInfo_Build>1</VerInfo_Build>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_2_Android64)'!=''">
-        <VerInfo_Build>1</VerInfo_Build>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Locale>1033</VerInfo_Locale>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Locale>1033</VerInfo_Locale>
-    </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
+        <DCCReference Include="vcl.dcp"/>
         <DCCReference Include="rtl.dcp"/>
-        <DCCReference Include="dbrtl.dcp"/>
         <DCCReference Include="bindengine.dcp"/>
+        <DCCReference Include="dbrtl.dcp"/>
         <DCCReference Include="bindcomp.dcp"/>
-        <DCCReference Include="FireDACCommon.dcp"/>
+        <DCCReference Include="RESTComponents.dcp"/>
         <DCCReference Include="FireDAC.dcp"/>
         <DCCReference Include="FireDACCommonDriver.dcp"/>
-        <DCCReference Include="DbxCommonDriver.dcp"/>
+        <DCCReference Include="FireDACCommon.dcp"/>
         <DCCReference Include="FireDACIBDriver.dcp"/>
-        <DCCReference Include="soaprtl.dcp"/>
-        <DCCReference Include="CustomIPTransport.dcp"/>
-        <DCCReference Include="RESTComponents.dcp"/>
-        <DCCReference Include="IndySystem.dcp"/>
-        <DCCReference Include="IndyProtocols.dcp"/>
-        <DCCReference Include="IndyCore.dcp"/>
-        <DCCReference Include="IndyIPClient.dcp"/>
-        <DCCReference Include="fmx.dcp"/>
-        <DCCReference Include="fmxFireDAC.dcp"/>
-        <DCCReference Include="vcl.dcp"/>
-        <DCCReference Include="vclFireDAC.dcp"/>
-        <DCCReference Include="FireDACCommonODBC.dcp"/>
-        <DCCReference Include="FireDACMSSQLDriver.dcp"/>
         <DCCReference Include="FireDACSqliteDriver.dcp"/>
-        <DCCReference Include="..\..\Source\iORM.Attributes.pas"/>
-        <DCCReference Include="..\..\Source\iORM.CommonTypes.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Context.Container.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Context.Factory.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Context.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Context.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Context.Properties.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Context.Properties.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Context.Table.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Context.Table.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.Connection.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.Factory.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DuckTyped.Factory.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DuckTyped.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DuckTyped.List.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Exceptions.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.ObjectsForge.Factory.pas"/>
-        <DCCReference Include="..\..\Source\iORM.ObjectsForge.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.ObjectsForge.ObjectMaker.pas"/>
-        <DCCReference Include="..\..\Source\iORM.ObjectsForge.ObjectMaker.StrictlyTrueClass.pas"/>
-        <DCCReference Include="..\..\Source\iORM.pas"/>
-        <DCCReference Include="..\..\Source\iORM.RttiContext.Factory.pas"/>
-        <DCCReference Include="..\..\Source\iORM.SqlItems.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Where.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Where.SqlItems.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.SqLite.SqlDataConverter.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.SqLite.SqlGenerator.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DuckTyped.StreamObject.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.ActiveListBindSourceAdapter.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.ActiveObjectBindSourceAdapter.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.DetailAdaptersContainer.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.Factory.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.PrototypeBindSource.Custom.pas"/>
-        <DCCReference Include="..\..\Source\iORM.SqlTranslator.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Context.Map.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Context.Map.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.ConnectionContainer.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LazyLoad.Factory.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.Notification.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.NaturalActiveObjectBindSourceAdapter.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Global.Factory.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DependencyInjection.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.Factory.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.QueryContainer.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.QueryEngine.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Where.SqlItems.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Resolver.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Utilities.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Resolver.Factory.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Resolver.ByDependencyInjection.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.TransactionCollection.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.InterfaceListBindSourceAdapter.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.ActiveInterfaceListBindSourceAdapter.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.InterfaceObjectBindSourceAdapter.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.ActiveInterfaceObjectBindSourceAdapter.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DependencyInjection.ViewModelShuttleContainer.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DependencyInjection.Singletons.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.Firebird.SqlDataConverter.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.Firebird.SqlGenerator.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Where.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Where.DetailsContainer.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Where.Factory.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Where.Destinations.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.SQL.Destination.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.MemTable.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DependencyInjection.Implementers.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.VMActionContainer.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LazyLoad.LazyLoadObject.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Http.Connection.pas"/>
-        <DCCReference Include="..\..\Source\iORM.PersistenceStrategy.DB.pas"/>
-        <DCCReference Include="..\..\Source\iORM.PersistenceStrategy.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.PersistenceStrategy.Factory.pas"/>
-        <DCCReference Include="..\..\Source\iORM.PersistenceStrategy.Http.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Http.Body.Request.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Http.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Http.Body.Response.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Http.Factory.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.ViewContextProvider.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.ConnectionDef.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.CommonBSAPersistence.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.ViewModelBridge.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.ModelPresenter.Custom.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Components.Common.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.ModelBindSource.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.DataSet.Base.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.ModelDataSet.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Components.Common.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.BSAToDataSetLink.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.ViewRegister.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.ViewRegisterItem.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.ViewContextProviderContainer.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Abstraction.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Abstraction.VCL.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Abstraction.FMX.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.CommonBSABehavior.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Field.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Table.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.FK.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Builder.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.Factory.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlGenerator.SqLite.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlGenerator.Base.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlGenerator.Firebird.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.Strategy.WithoutAlterTable.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.Strategy.WithAlterTable.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.DBAnalyzer.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.Engine.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Field.ClassInfo.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.Strategy.Base.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.Script.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.CommonBSAPaging.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.DataSet.Custom.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.DataSet.Master.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.DataSet.Detail.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.BSPersistence.pas"/>
-        <DCCReference Include="..\..\Source\iORM.StdActions.Vcl.pas"/>
-        <DCCReference Include="..\..\Source\iORM.StdActions.Fmx.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.CommonBSBehavior.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.PrototypeBindSource.Master.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.PrototypeBindSource.Detail.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.ModelPresenter.Master.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.ModelPresenter.Detail.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.BSPersistence.SmartDeleteSystem.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.BSPersistence.SmartUpdateDetection.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.ViewModel.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Components.InterfacedDataModule.pas"/>
-        <DCCReference Include="..\..\Source\iORM.MVVM.VMAction.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.Query.FireDAC.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.ConnectionDef.MSSQLServer.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DB.MSSqlServer.SqlDataConverter.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlGenerator.MSSqlServer.pas"/>
-        <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.Utils.RTTI.pas"/>
-        <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.Utils.pas"/>
-        <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.TypeInfoCache.pas"/>
-        <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.Serializers.pas"/>
-        <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.pas"/>
-        <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.Params.pas"/>
-        <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.ISO8601Processor.pas"/>
-        <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.Factory.pas"/>
-        <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.Exceptions.pas"/>
-        <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.Engine.Stream.pas"/>
-        <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.Engine.Stream.BSON.pas"/>
-        <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.Engine.DOM.pas"/>
-        <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.Duck.PropField.pas"/>
-        <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.Duck.Obj.pas"/>
-        <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.Duck.List.pas"/>
-        <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.Duck.Interfaces.pas"/>
-        <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.Duck.Dictionary.pas"/>
-        <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.Constants.pas"/>
-        <DCCReference Include="..\..\ExtLibs\djson\Sources\DJSON.Attributes.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LazyLoad.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.LiveBindings.NaturalActiveInterfaceObjectBindSourceAdapter.pas"/>
-        <DCCReference Include="..\..\Source\iORM.StdActions.CloseQueryRepeater.pas"/>
-        <DCCReference Include="..\..\Source\iORM.StdActions.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.StdActions.CloseQueryActionRegister.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Where.SmartBuilder.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Where.NestedProp.Resolver.pas"/>
-        <DCCReference Include="..\..\Source\iORM.ETM.Engine.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Interceptor.Strategy.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Interceptor.CRUD.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Interceptor.Strategy.Register.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Interceptor.CRUD.Register.pas"/>
-        <DCCReference Include="..\..\Source\iORM.ETM.Interceptor.pas"/>
-        <DCCReference Include="..\..\Source\iORM.ETM.Diff.Oneway.pas"/>
-        <DCCReference Include="..\..\Source\iORM.ETM.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.ETM.Factory.pas"/>
-        <DCCReference Include="..\..\Source\iORM.ETM.Diff.Twoway.pas"/>
-        <DCCReference Include="..\..\Source\iORM.StdActions.CommonBehaviour.pas"/>
-        <DCCReference Include="..\..\Source\iORM.ConflictStrategy.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.ConflictStrategy.SameVersionWin.pas"/>
-        <DCCReference Include="..\..\Source\iORM.ConflictStrategy.LastUpdateWin.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Resolver.ResolvedTypeList.pas"/>
-        <DCCReference Include="..\..\Source\iORM.SynchroStrategy.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.SynchroStrategy.EtmBased.pas"/>
-        <DCCReference Include="..\..\Source\iORM.SynchroStrategy.Custom.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Http.Server.Executor.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Http.WebBroker.Producer.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Auth.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Auth.Factory.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DependencyInjection.Types.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Auth.Model.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Auth.JWT.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Auth.Components.AuthServer.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Auth.Components.AuthenticationClient.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Auth.Components.AuthorizationClient.pas"/>
+        <DCCReference Include="iORM_RT.dcp"/>
+        <DCCReference Include="uniGUI28Core.dcp"/>
+        <DCCReference Include="uniTools28.dcp"/>
+        <DCCReference Include="uIndy28.dcp"/>
+        <DCCReference Include="..\..\Source\iORM.Abstraction.uniGUI.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -417,53 +134,14 @@
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">iORM_RT.dpk</Source>
+                    <Source Name="MainSource">iORM_uniGUI_RT.dpk</Source>
                 </Source>
-                <VersionInfo>
-                    <VersionInfo Name="IncludeVerInfo">True</VersionInfo>
-                    <VersionInfo Name="AutoIncBuild">False</VersionInfo>
-                    <VersionInfo Name="MajorVer">1</VersionInfo>
-                    <VersionInfo Name="MinorVer">0</VersionInfo>
-                    <VersionInfo Name="Release">0</VersionInfo>
-                    <VersionInfo Name="Build">0</VersionInfo>
-                    <VersionInfo Name="Debug">False</VersionInfo>
-                    <VersionInfo Name="PreRelease">False</VersionInfo>
-                    <VersionInfo Name="Special">False</VersionInfo>
-                    <VersionInfo Name="Private">False</VersionInfo>
-                    <VersionInfo Name="DLL">False</VersionInfo>
-                    <VersionInfo Name="Locale">1040</VersionInfo>
-                    <VersionInfo Name="CodePage">1252</VersionInfo>
-                </VersionInfo>
-                <VersionInfoKeys>
-                    <VersionInfoKeys Name="CompanyName"/>
-                    <VersionInfoKeys Name="FileDescription"/>
-                    <VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys>
-                    <VersionInfoKeys Name="InternalName"/>
-                    <VersionInfoKeys Name="LegalCopyright"/>
-                    <VersionInfoKeys Name="LegalTrademarks"/>
-                    <VersionInfoKeys Name="OriginalFilename"/>
-                    <VersionInfoKeys Name="ProductName"/>
-                    <VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
-                    <VersionInfoKeys Name="Comments"/>
-                    <VersionInfoKeys Name="CFBundleName"/>
-                    <VersionInfoKeys Name="CFBundleDisplayName"/>
-                    <VersionInfoKeys Name="UIDeviceFamily"/>
-                    <VersionInfoKeys Name="CFBundleIdentifier"/>
-                    <VersionInfoKeys Name="CFBundleVersion"/>
-                    <VersionInfoKeys Name="CFBundlePackageType"/>
-                    <VersionInfoKeys Name="CFBundleSignature"/>
-                    <VersionInfoKeys Name="CFBundleAllowMixedLocalizations"/>
-                    <VersionInfoKeys Name="UISupportedInterfaceOrientations"/>
-                    <VersionInfoKeys Name="CFBundleExecutable"/>
-                    <VersionInfoKeys Name="CFBundleResourceSpecification"/>
-                    <VersionInfoKeys Name="LSRequiresIPhoneOS"/>
-                    <VersionInfoKeys Name="CFBundleInfoDictionaryVersion"/>
-                    <VersionInfoKeys Name="CFBundleDevelopmentRegion"/>
-                </VersionInfoKeys>
-                <Excluded_Packages/>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="4">
-                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule"/>
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule">
                     <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
@@ -474,17 +152,14 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgsqlite3.dylib" Class="DependencyModule"/>
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
                     <Platform Name="OSX32">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\osx64\libcgsqlite3.dylib" Class="DependencyModule"/>
-                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\iORM_Project.bpl" Configuration="Debug" Class="ProjectOutput"/>
-                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\iORM_RT.bpl" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\iORM_uniGUI_RT.bpl" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>iORM_RT.bpl</RemoteName>
+                        <RemoteName>iORM_uniGUI_RT.bpl</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -1205,7 +880,6 @@
                 <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="iOSSimARM64" Name="$(PROJECTNAME).app"/>
-                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Linux64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="OSX64" Name="$(PROJECTNAME)"/>
@@ -1214,13 +888,12 @@
                 <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
             </Deployment>
             <Platforms>
-                <Platform value="Android">True</Platform>
-                <Platform value="Android64">True</Platform>
+                <Platform value="Android">False</Platform>
+                <Platform value="Android64">False</Platform>
                 <Platform value="Linux64">False</Platform>
                 <Platform value="Win32">True</Platform>
-                <Platform value="Win64">True</Platform>
+                <Platform value="Win64">False</Platform>
             </Platforms>
-            <ModelSupport>False</ModelSupport>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>

@@ -37,13 +37,14 @@ interface
 
 uses
   iORM.Where.Interfaces, System.JSON, iORM.CommonTypes, iORM.Http.Interfaces,
-  iORM.DB.Interfaces, iORM;
+  iORM.DB.Interfaces, iORM, iORM.Auth.Interfaces;
 
 type
 
   // TODO: Servono proprio i nullable? Si potrebbe toglierli e tornare a tipi normali?
   TioHttpRequestBody = class(TInterfacedObject, IioHttpRequestBody)
   private
+    // fields
     FBlindLevel: TioNullableByte;
     FIntentType: TioPersistenceIntentType;
     FJSONDataValue: TJSONValue;
@@ -51,10 +52,12 @@ type
     FRelationOID: TioNullableInteger;
     FRelationPropertyName: TioNullableString;
     FSQLDestination: IioSQLDestination;
+    FWhere: IioWhere;
+    // TODO: AUTH - FUserID, FUserName, FUserToken da eliminare visto che adesso ci sono i nuovi Auth...?
     FUserID: TioNullableInteger;
     FUserName: TioNullableString;
     FUserToken: TioNullableString;
-    FWhere: IioWhere;
+    // methods
     procedure Clear;
     function GetBlindLevel: Byte;
     function GetIntentType: TioPersistenceIntentType;

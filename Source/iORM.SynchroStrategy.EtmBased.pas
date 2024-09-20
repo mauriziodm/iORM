@@ -826,7 +826,7 @@ end;
 
 initialization
 
-  io.KeepClass(TioEtmSynchroStrategy_LogItem);
-  io.KeepClass(TioEtmSynchroStrategy_Payload);
+  io.RegisterClass(TioEtmSynchroStrategy_LogItem);
+  io.RegisterClass(TioEtmSynchroStrategy_Payload);
 
 end.

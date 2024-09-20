@@ -101,6 +101,7 @@ type
     function GetTrueClass: IioTrueClass;
     function IsForThisConnection(AConnectionDefNameToCheck: String): Boolean;
     function IsNotPersistedEntity: Boolean;
+    function IsPersistedEntity: Boolean;
     function IsTrueClass: Boolean;
     function TableName: String;
     // IndexList

@@ -218,7 +218,6 @@ contains
   iORM.StdActions.Interfaces in '..\..\Source\iORM.StdActions.Interfaces.pas',
   iORM.StdActions.CloseQueryActionRegister in '..\..\Source\iORM.StdActions.CloseQueryActionRegister.pas',
   iORM.Where.SmartBuilder in '..\..\Source\iORM.Where.SmartBuilder.pas',
-  iORM.Abstraction.uniGUI in '..\..\Source\iORM.Abstraction.uniGUI.pas',
   iORM.Where.NestedProp.Resolver in '..\..\Source\iORM.Where.NestedProp.Resolver.pas',
   iORM.ETM.Engine in '..\..\Source\iORM.ETM.Engine.pas',
   iORM.Interceptor.Strategy in '..\..\Source\iORM.Interceptor.Strategy.pas',
@@ -240,11 +239,16 @@ contains
   iORM.SynchroStrategy.Custom in '..\..\Source\iORM.SynchroStrategy.Custom.pas',
   iORM.Http.Server.Executor in '..\..\Source\iORM.Http.Server.Executor.pas',
   iORM.Http.WebBroker.Producer in '..\..\Source\iORM.Http.WebBroker.Producer.pas',
-  iORM.Session.Manager in '..\..\Source\iORM.Session.Manager.pas',
-  iORM.Session.Interfaces in '..\..\Source\iORM.Session.Interfaces.pas',
-  iORM.Session.Model in '..\..\Source\iORM.Session.Model.pas',
-  iORM.Session.Factory in '..\..\Source\iORM.Session.Factory.pas',
-  iORM.DependencyInjection.Types in '..\..\Source\iORM.DependencyInjection.Types.pas';
+  iORM.Auth.Interfaces in '..\..\Source\iORM.Auth.Interfaces.pas',
+  iORM.Auth.Factory in '..\..\Source\iORM.Auth.Factory.pas',
+  iORM.DependencyInjection.Types in '..\..\Source\iORM.DependencyInjection.Types.pas',
+  iORM.Auth.Model in '..\..\Source\iORM.Auth.Model.pas',
+  iORM.Auth.JWT in '..\..\Source\iORM.Auth.JWT.pas',
+  iORM.Auth.Components.AuthServer in '..\..\Source\iORM.Auth.Components.AuthServer.pas',
+  iORM.Auth.Components.AuthenticationClient in '..\..\Source\iORM.Auth.Components.AuthenticationClient.pas',
+  iORM.Auth.Components.AuthorizationClient in '..\..\Source\iORM.Auth.Components.AuthorizationClient.pas';
 
 end.
+
+
 

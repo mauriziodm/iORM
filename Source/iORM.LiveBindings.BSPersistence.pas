@@ -39,7 +39,8 @@ uses
   iORM.LiveBindings.Interfaces,
   iORM.LiveBindings.BSPersistence.SmartDeleteSystem,
   iORM.LiveBindings.BSPersistence.SmartUpdateDetection,
-  DJSON.Attributes, iORM.CommonTypes, iORM.Where.Interfaces;
+  DJSON.Attributes, iORM.CommonTypes, iORM.Where.Interfaces,
+  iORM.StdActions.Interfaces, iORM.MVVM.ViewContextProvider, System.Classes;
 
 type
 
@@ -76,6 +77,15 @@ type
     function GetSourceBS: IioBindSource;
     procedure RegisterDetailBindSource(const ADetailBindSource: IioBindSource);
     procedure UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
+    // Show current record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
+    procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
+    procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
+      const AVVMAlias: String = ''); overload;
+    procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
+    // Show each record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
+    procedure ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
+    procedure ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
+    procedure ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AAlias: String = ''); overload;
     // TypeName
     function GetTypeName: String;
     // Where

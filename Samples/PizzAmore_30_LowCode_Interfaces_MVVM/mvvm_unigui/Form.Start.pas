@@ -12,16 +12,6 @@ uses
 
 type
   TStartForm = class(TUniForm)
-    PanelLogo: TUniPanel;
-    Panelmenu: TUniPanel;
-    UniPanel1: TUniPanel;
-    UniImage1: TUniImage;
-    UniLabel1: TUniLabel;
-    UniLabel2: TUniLabel;
-    ButtonOrders: TUniButton;
-    ButtonCustomers: TUniButton;
-    ButtonPizzas: TUniButton;
-    ButtonQuit: TUniButton;
     VMBridge: TioViewModelBridge;
     ActionList1: TActionList;
     acQuit: TioViewAction;

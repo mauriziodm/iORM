@@ -171,6 +171,7 @@ type
     function GetTrueClass: IioTrueClass;
     function IsForThisConnection(AConnectionDefNameToCheck: String): Boolean;
     function IsNotPersistedEntity: Boolean;
+    function IsPersistedEntity: Boolean;
     function IsTrueClass: Boolean;
     function TableName: String;
     // Conflict strategies (TClass instead of TioCustomConflictStrategyRef to avoid circular reference)
@@ -267,6 +268,11 @@ end;
 function TioTable.IsNotPersistedEntity: Boolean;
 begin
   Result := (FSqlText = NOT_PERSISTED_ENTITY_TABLE_NAME);
+end;
+
+function TioTable.IsPersistedEntity: Boolean;
+begin
+  Result := (FSqlText <> NOT_PERSISTED_ENTITY_TABLE_NAME);
 end;
 
 function TioTable.GetTrueClass: IioTrueClass;

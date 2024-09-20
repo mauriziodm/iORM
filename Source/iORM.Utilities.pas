@@ -95,8 +95,10 @@ type
     class function HasAttribute(const ARTTIType: TRttiType; const AAttrClass: TCustomAttributeRef): boolean; static;
     class function HasAttributes(const ARTTIType: TRttiType; const AAttrClass1, AAttrClass2: TCustomAttributeRef): boolean; static;
     // Funzioni che implementano verifiche riguardo l'essere Entità
-    class function isEntityType(const ARTTIType: TRttiType): Boolean;
-    class function isEntityAttribute(const AAttribute: TCustomAttribute): Boolean;
+    class function isEntityType(const ARTTIType: TRttiType): Boolean; inline;
+    class function isEntityAttribute(const AAttribute: TCustomAttribute): Boolean; inline;
+    class function IsNotPersistedEntity(const AClassName: String): Boolean; inline;
+    class function IsPersistedEntity(const AClassName: String): Boolean; inline;
     // ResolvePropertyPath
     class procedure ResolveChildPropertyPath_SplitPropNameAndPath(const AQualifiedPropertyPath: String; out OPath: TStrings; out OPropName: String); static;
     class function ResolveChildPropertyPath_GetFinalObj(const ARootObj: Tobject; const AChildObjPath: TStrings): Tobject; static;
@@ -478,6 +480,16 @@ end;
 class function TioUtilities.IsList(const AObj: TObject): Boolean;
 begin
   Result := TioDuckTypedFactory.IsList(AObj);
+end;
+
+class function TioUtilities.IsNotPersistedEntity(const AClassName: String): Boolean;
+begin
+  Result := TioMapContainer.GetMap(AClassName).GetTable.IsNotPersistedEntity;
+end;
+
+class function TioUtilities.IsPersistedEntity(const AClassName: String): Boolean;
+begin
+  Result := TioMapContainer.GetMap(AClassName).GetTable.IsPersistedEntity;
 end;
 
 class function TioUtilities.IsNullOID(const AObj: Tobject): Boolean;

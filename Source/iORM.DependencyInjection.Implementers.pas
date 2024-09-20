@@ -168,7 +168,7 @@ begin
   //  parametro non ci sarà nessuna chiamata al metodo "FactoryMethod" che senza parametri infatti
   //  non esiste perchè sarebbe inutile.
   if not Assigned(AAlreadyCreatedInstance) then
-    Result := FFactoryMethod.Cast<TFactoryMethod>.AsType<TFactoryMethod>()()
+    Result := FFactoryMethod.Cast<TioFactoryMethod>.AsType<TioFactoryMethod>()()
   else
     Result := AAlreadyCreatedInstance;
 end;

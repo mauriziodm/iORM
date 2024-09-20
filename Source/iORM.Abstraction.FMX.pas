@@ -37,28 +37,12 @@ interface
 
 uses
   FireDAC.FMXUI.Wait, // For FireDAC compatibility without using the original component
-  iORM.Abstraction, FMX.Types, System.Classes, FMX.ActnList,
-  System.Rtti;
+  iORM.Abstraction, FMX.Types, System.Classes, FMX.ActnList, System.Rtti;
 
 type
 
-  TioFMX = class(TComponent)
-  strict private
-    // Events
-    FHideWait: TNotifyEvent;
-    FShowWait: TNotifyEvent;
-    // Methods
-    function Get_Version: String;
-    procedure SetHideWait(const Value: TNotifyEvent);
-    procedure SetShowWait(const Value: TNotifyEvent);
-  public
-    constructor Create(AOwner: TComponent); override;
-  published
-    // properties
-    property _Version: String read Get_Version;
-    // Events
-    property HideWait: TNotifyEvent read FHideWait write SetHideWait;
-    property ShowWait: TNotifyEvent read FShowWait write SetShowWait;
+  TioFMX = class(TioCustomPlatformAbstractionComponent)
+
   end;
 
   TioApplicationFMX = class(TioApplication)
@@ -67,6 +51,7 @@ type
     class procedure _ShowMessage(const AMessage: string); override;
     class function _ProjectPlatform: TioProjectPlatform; override;
     class function _Terminate: Boolean; override;
+    class function _GetSessionID: String; override;
   end;
 
   TioControlFMX = class(TioControl)
@@ -131,8 +116,7 @@ type
 implementation
 
 uses
-  FMX.Forms, FMX.Dialogs, iORM.Exceptions, FMX.Controls, iORM,
-  iORM.DB.ConnectionContainer;
+  FMX.Forms, FMX.Dialogs, iORM.Exceptions, FMX.Controls, iORM;
 
 { TioTimerFMX }
 
@@ -190,6 +174,11 @@ begin
 end;
 
 { TioApplicationFMX }
+
+class function TioApplicationFMX._GetSessionID: String;
+begin
+  Result := IO_STRING_NULL_VALUE;
+end;
 
 class procedure TioApplicationFMX._HandleException(const Sender: TObject);
 begin
@@ -379,46 +368,6 @@ begin
   if not(AControl is TControl) then
     raise EioGenericException.Create(Self.ClassName, '_SetParent', 'AControl must descend from TControl.');
   TControl(AControl).Visible := AVisible;
-end;
-
-{ TioFMX }
-
-constructor TioFMX.Create(AOwner: TComponent);
-begin
-  inherited;
-  FShowWait := nil;
-  FHideWait := nil;
-end;
-
-function TioFMX.Get_Version: String;
-begin
-  Result := io.Version;
-end;
-
-procedure TioFMX.SetHideWait(const Value: TNotifyEvent);
-begin
-  FHideWait := Value;
-  if Assigned(FHideWait) then
-    TioConnectionManager.SetHideWaitProc(
-      procedure
-      begin
-        FHideWait(Self);
-      end)
-  else
-    TioConnectionManager.SetHideWaitProc(nil);
-end;
-
-procedure TioFMX.SetShowWait(const Value: TNotifyEvent);
-begin
-  FShowWait := Value;
-  if Assigned(FShowWait) then
-    TioConnectionManager.SetShowWaitProc(
-      procedure
-      begin
-        FShowWait(Self);
-      end)
-  else
-    TioConnectionManager.SetShowWaitProc(nil);
 end;
 
 initialization

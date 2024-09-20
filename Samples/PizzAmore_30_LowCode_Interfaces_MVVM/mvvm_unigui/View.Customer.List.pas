@@ -16,21 +16,11 @@ type
     BSMasterName: TStringField;
     BSMasterPhoneNumber: TStringField;
     BSMasterPagingCurrentPageOf: TStringField;
-    GridCustomers: TUniDBGrid;
     BSWhereID: TIntegerField;
     BSWhereName: TStringField;
     BSWhereCity: TStringField;
-    ButtonPageDown: TUniSpeedButton;
-    ButtonPageUp: TUniSpeedButton;
-    DBTextPageOf: TUniDBText;
     acNextPage: TioViewAction;
     acPrevPage: TioViewAction;
-    DBEditWhereID: TUniDBEdit;
-    UniLabel2: TUniLabel;
-    DBEditWhereName: TUniDBEdit;
-    UniLabel3: TUniLabel;
-    DBEditWhereCity: TUniDBEdit;
-    UniLabel1: TUniLabel;
   private
   public
   end;

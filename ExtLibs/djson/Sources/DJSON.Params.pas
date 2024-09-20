@@ -38,7 +38,7 @@ interface
 
 uses
   System.TypInfo, DJSON.Serializers, System.Generics.Collections, System.Rtti,
-  DJSON.TypeInfoCache, DJSON.ISO8601Processor;
+  DJSON.TypeInfoCache, DJSON.ISO8601Processor, System.Classes;
 
 type
 
@@ -57,8 +57,6 @@ type
   // Note: ssSUD = Smart Update Detection operation
   TdjSkipScope = (ssMap, ssETM, ssHTTP, ssEmbeddeRelation, ssSUD, ssSaveRevertPoint, ssDJSON);
   TdjSkipScopeSet = set of TdjSkipScope;
-
-  TdjIgnoredProperties = array of string;
 
   TdjSerializersContainer = class;
 
@@ -109,9 +107,9 @@ type
     function GetIgnoreObjStatus: Boolean;
     property IgnoreObjStatus: Boolean read GetIgnoreObjStatus write SetIgnoreObjStatus;
     // IgnoredProperties
-    procedure SetIgnoredProperties(const AValue: TdjIgnoredProperties);
-    function GetIgnoredProperties: TdjIgnoredProperties;
-    property IgnoredProperties: TdjIgnoredProperties read GetIgnoredProperties write SetIgnoredProperties;
+    procedure SetIgnoredProperties(const AValue: TStringList);
+    function GetIgnoredProperties: TStringList;
+    property IgnoredProperties: TStringList read GetIgnoredProperties write SetIgnoredProperties;
     // EnableCustomSerializers
     procedure SetEnableCustomSerializers(const AValue: Boolean);
     function GetEnableCustomSerializers: Boolean;
@@ -229,7 +227,7 @@ type
     FSerializationType: TdjSerializationType;
     FPrettyPrint: Boolean;
     FTypeAnnotations: Boolean;
-    FIgnoredProperties: TdjIgnoredProperties;
+    FIgnoredProperties: TStringList;
     FEnableCustomSerializers: Boolean;
     FSerializers: TdjSerializersContainer;
     FItemsKeyDefaultQualifiedName: String;
@@ -271,8 +269,8 @@ type
     procedure SetIgnoreObjStatus(const AValue: Boolean);
     function GetIgnoreObjStatus: Boolean;
     // IgnoredProperties
-    procedure SetIgnoredProperties(const AValue: TdjIgnoredProperties);
-    function GetIgnoredProperties: TdjIgnoredProperties;
+    procedure SetIgnoredProperties(const AValue: TStringList);
+    function GetIgnoredProperties: TStringList;
     // EnableCustomSerializers
     procedure SetEnableCustomSerializers(const AValue: Boolean);
     function GetEnableCustomSerializers: Boolean;
@@ -422,8 +420,8 @@ constructor TdjParams.Create;
 begin
   inherited;
   // Set the default engine & operation type
-  SetEngine(TdjEngine.eDelphiDOM);
-//  SetEngine(TdjEngine.eDelphiStream);
+//  SetEngine(TdjEngine.eDelphiDOM);
+  SetEngine(TdjEngine.eDelphiStream);
   FOperationType := ssDJSON;
 
   FTypeInfoCache := TdjTypeInfoCache.Create;
@@ -442,6 +440,9 @@ begin
   FClearCollection := False;
   FPropInfoCache := TdjPropInfoCache.Create;
   FIgnoreObjStatus := False;
+
+  FIgnoredProperties := TStringList.Create;
+  FIgnoredProperties.CaseSensitive := False;
 end;
 
 destructor TdjParams.Destroy;
@@ -449,6 +450,7 @@ begin
   FTypeInfoCache.Free;
   FSerializers.Free;
   FPropInfoCache.Free;
+  FIgnoredProperties.Free;
   inherited;
 end;
 
@@ -576,7 +578,7 @@ begin
   Result := FEngineType;
 end;
 
-function TdjParams.GetIgnoredProperties: TdjIgnoredProperties;
+function TdjParams.GetIgnoredProperties: TStringList;
 begin
   Result := FIgnoredProperties;
 end;
@@ -766,7 +768,7 @@ begin
   FEngineClass := TdjFactory.GetEngine(AValue);
 end;
 
-procedure TdjParams.SetIgnoredProperties(const AValue: TdjIgnoredProperties);
+procedure TdjParams.SetIgnoredProperties(const AValue: TStringList);
 begin
   FIgnoredProperties := AValue;
 end;

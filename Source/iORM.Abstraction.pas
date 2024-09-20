@@ -36,15 +36,38 @@ unit iORM.Abstraction;
 interface
 
 uses
-  System.Classes, System.SysUtils, System.Rtti;
+  System.Classes, System.SysUtils, System.Rtti, iORM.CommonTypes, System.Generics.Collections;
 
 type
   TioProjectPlatform = (ppVCL, ppFMX, ppUniGUI);
+
+  TioCustomPlatformAbstractionComponent = class(TComponent)
+  strict private
+    // Events
+    FHideWait: TNotifyEvent;
+    FShowWait: TNotifyEvent;
+    // Methods
+    function Get_Version: String;
+    procedure SetHideWait(const Value: TNotifyEvent);
+    procedure SetShowWait(const Value: TNotifyEvent);
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    // properties
+    property _Version: String read Get_Version;
+    // Events
+    property HideWait: TNotifyEvent read FHideWait write SetHideWait;
+    property ShowWait: TNotifyEvent read FShowWait write SetShowWait;
+  end;
 
   TioApplicationRef = class of TioApplication;
   TioApplication = class abstract
   private
     class var FConcreteClass_NoDirectCall: TioApplicationRef;
+    // TODO: Da eliminare?
+//    class var FSessionContainer: TDictionary<String, IioAuthCustomSession>;
+    class procedure Build;
+    class procedure Clean;
   protected
     class function GetConcreteClass: TioApplicationRef;
     class procedure SetConcreteClass(const AClass: TioApplicationRef);
@@ -52,12 +75,21 @@ type
     class procedure _ShowMessage(const AMessage: string); virtual; abstract;
     class function _ProjectPlatform: TioProjectPlatform; virtual; abstract;
     class function _Terminate: Boolean; virtual; abstract;
+    class function _GetSessionID: String; virtual; abstract;
   public
-    class procedure CheckIfAbstractionLayerComponentExists;
-    class procedure HandleException(const Sender: TObject);
-    class procedure ShowMessage(const AMessage: string);
-    class function ProjectPlatform: TioProjectPlatform;
-    class function Terminate: Boolean;
+    class procedure CheckIfAbstractionLayerComponentExists; inline;
+    class procedure HandleException(const Sender: TObject); inline;
+    class procedure ShowMessage(const AMessage: string); inline;
+    class function ProjectPlatform: TioProjectPlatform; inline;
+    class function Terminate: Boolean; inline;
+    // TODO: Da eliminare?
+    // Session
+//    class function GetSession: IioAuthSession; inline;
+//    class function GetSessionID: String; inline;
+//    class procedure SetSession(const AUserID: Integer; const AUserName: String; const AUserToken: String; const AConnectionName: String = IO_STRING_NULL_VALUE; const AExpires: TDateTime = IO_DATETIME_NULL_VALUE); overload;
+//    class procedure SetSession(const AUserName: String; const AUserToken: String; const AConnectionName: String = IO_STRING_NULL_VALUE; const AExpires: TDateTime = IO_DATETIME_NULL_VALUE); overload; inline;
+//    class procedure SetSession(const AUser: IioAuthUser; const AUserToken: String; const AConnectionName: String = IO_STRING_NULL_VALUE; const AExpires: TDateTime = IO_DATETIME_NULL_VALUE); overload; inline;
+//    class procedure RemoveSession;
   end;
 
   TioControlRef = class of TioControl;
@@ -106,6 +138,18 @@ type
   public
     constructor Create(const AIntervalMillisec: Integer; const AExecuteMethod: TFunc<boolean>);
     destructor Destroy; override;
+  end;
+
+  TioDeferred = class(TThread)
+  strict private
+    FDelayedMethod: TProc;
+    FIntervalMillisec: Integer;
+  strict protected
+    constructor Create(const AIntervalMillisec: Integer; ADelayedMethod: TProc); reintroduce;
+    procedure Execute; override;
+    procedure OnTerminateEventHandler(Sender: TObject);
+  public
+    class procedure Exec(const AIntervalMillisec: Integer; ADelayedMethod: TProc);
   end;
 
   TioActionRef = class of TioAction;
@@ -162,7 +206,7 @@ type
 implementation
 
 uses
-  iORM.Exceptions;
+  iORM.Exceptions, iORM, iORM.Auth.Factory;
 
 { TioTimer }
 
@@ -233,9 +277,21 @@ end;
 
 { TioApplication }
 
+class procedure TioApplication.Build;
+begin
+    // TODO: Da eliminare?
+//  FSessionContainer := TDictionary<String, IioAuthCustomSession>.Create(1);
+end;
+
 class procedure TioApplication.CheckIfAbstractionLayerComponentExists;
 begin
   GetConcreteClass;
+end;
+
+class procedure TioApplication.Clean;
+begin
+    // TODO: Da eliminare?
+//  FSessionContainer.Free;
 end;
 
 class function TioApplication.GetConcreteClass: TioApplicationRef;
@@ -244,6 +300,18 @@ begin
     raise EioGenericException.Create(Self.ClassName, 'GetConcreteClass', 'You must put one of the TioVCL or TioFMX components somewhere in the application.');
   Result := FConcreteClass_NoDirectCall;
 end;
+
+    // TODO: Da eliminare?
+//class function TioApplication.GetSession: IioAuthSession;
+//begin
+//  Result := FSessionContainer.Items[GetSessionID];
+//end;
+
+    // TODO: Da eliminare?
+//class function TioApplication.GetSessionID: String;
+//begin
+//  Result := GetConcreteClass._GetSessionID;
+//end;
 
 class procedure TioApplication.HandleException(const Sender: TObject);
 begin
@@ -254,6 +322,31 @@ class function TioApplication.ProjectPlatform: TioProjectPlatform;
 begin
   Result := GetConcreteClass._ProjectPlatform;
 end;
+
+    // TODO: Da eliminare?
+//class procedure TioApplication.SetSession(const AUserID: Integer; const AUserName, AUserToken, AConnectionName: String; const AExpires: TDateTime);
+//begin
+//  FSessionContainer.Remove(GetSessionID);
+//  FSessionContainer.Add(GetSessionID, TioAuthFactory.NewSession(AUserID, AUserName, AUserToken, AConnectionName, AExpires));
+//end;
+
+    // TODO: Da eliminare?
+//class procedure TioApplication.SetSession(const AUser: IioAuthUser; const AUserToken, AConnectionName: String; const AExpires: TDateTime);
+//begin
+//  SetSession(AUser.ID, AUser.LoginUserName, AUserToken, AConnectionName, AExpires);
+//end;
+
+    // TODO: Da eliminare?
+//class procedure TioApplication.SetSession(const AUserName, AUserToken, AConnectionName: String; const AExpires: TDateTime);
+//begin
+//  SetSession(IO_INTEGER_NULL_VALUE, AUserName, AUserToken, AConnectionName, AExpires);
+//end;
+
+    // TODO: Da eliminare?
+//class procedure TioApplication.RemoveSession;
+//begin
+//  FSessionContainer.Remove(GetSessionID);
+//end;
 
 class procedure TioApplication.SetConcreteClass(const AClass: TioApplicationRef);
 begin
@@ -353,5 +446,81 @@ begin
       Self.Free;
   end;
 end;
+
+{ TioCustomPlatformAbstractionComponent }
+
+constructor TioCustomPlatformAbstractionComponent.Create(AOwner: TComponent);
+begin
+  inherited;
+  FShowWait := nil;
+  FHideWait := nil;
+end;
+
+function TioCustomPlatformAbstractionComponent.Get_Version: String;
+begin
+  Result := io.Version;
+end;
+
+procedure TioCustomPlatformAbstractionComponent.SetHideWait(const Value: TNotifyEvent);
+begin
+  FHideWait := Value;
+  if Assigned(FHideWait) then
+    io.Connections.SetHideWaitProc(
+      procedure
+      begin
+        FHideWait(Self);
+      end)
+  else
+    io.Connections.SetHideWaitProc(nil);
+end;
+
+procedure TioCustomPlatformAbstractionComponent.SetShowWait(const Value: TNotifyEvent);
+begin
+  FShowWait := Value;
+  if Assigned(FShowWait) then
+    io.Connections.SetShowWaitProc(
+      procedure
+      begin
+        FShowWait(Self);
+      end)
+  else
+    io.Connections.SetShowWaitProc(nil);
+end;
+
+{ TioDelayedExec }
+
+constructor TioDeferred.Create(const AIntervalMillisec: Integer; ADelayedMethod: TProc);
+begin
+  inherited Create(False);
+  FIntervalMillisec := AIntervalMillisec;
+  FDelayedMethod := ADelayedMethod;
+  OnTerminate := OnTerminateEventHandler;
+  FreeOnTerminate := True;
+end;
+
+procedure TioDeferred.Execute;
+begin
+  inherited;
+  Sleep(FIntervalMillisec);
+end;
+
+class procedure TioDeferred.Exec(const AIntervalMillisec: Integer; ADelayedMethod: TProc);
+begin
+  TioDeferred.Create(AIntervalMillisec, ADelayedMethod);
+end;
+
+procedure TioDeferred.OnTerminateEventHandler(Sender: TObject);
+begin
+  if Assigned(FDelayedMethod) then
+    FDelayedMethod;
+end;
+
+initialization
+
+TioApplication.Build;
+
+finalization
+
+TioApplication.Clean;
 
 end.

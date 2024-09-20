@@ -39,7 +39,8 @@ uses
   System.Generics.Collections, Data.Bind.ObjectScope,
   iORM.Context.Properties.Interfaces, iORM.CommonTypes, System.Classes,
   iORM.Where.Interfaces, Data.DB, System.Rtti, iORM.LiveBindings.Notification,
-  iORM.LiveBindings.CommonBSAPaging, System.SysUtils;
+  iORM.LiveBindings.CommonBSAPaging, System.SysUtils,
+  iORM.StdActions.Interfaces, iORM.MVVM.ViewContextProvider;
 
 type
 
@@ -95,6 +96,15 @@ type
     procedure SetWhere(const AWhere: IioWhere);
     procedure RegisterDetailBindSource(const ADetailBindSource: IioBindSource);
     procedure UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
+    // Show current record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
+    procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
+    procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
+      const AVVMAlias: String = ''); overload;
+    procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String = ''); overload;
+    // Show each record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
+    procedure ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
+    procedure ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
+    procedure ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AAlias: String = ''); overload;
     // ETMfor
     procedure _InternalSetETMforPrivateField(const AETMFor: IioBindSource); // To avoid hint
     // Selectors related event for TObject selection

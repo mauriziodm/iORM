@@ -53,7 +53,7 @@ type
     FVMActionContainer: IioVMActionContainer;
     FViewRegister: IioViewRegisterMVVM;
     FLocalVCProviderRegister: IioLocalVCProviderRegister;
-    FOnCloseQuery: TCloseQueryEvent;
+    FOnCloseQuery: TioCloseQueryEvent;
     FOnViewPairing: TioVMOnViewPairingEvent;
     procedure DoOnViewPairing;
     procedure BindView(const AView: TComponent);
@@ -90,7 +90,7 @@ type
     property Presenter[const AName: String]: IioBindSource read GetPresenter;
   published
     // Events
-    property OnCloseQuery: TCloseQueryEvent read FOnCloseQuery write FOnCloseQuery;
+    property OnCloseQuery: TioCloseQueryEvent read FOnCloseQuery write FOnCloseQuery;
     property OnViewPairing: TioVMOnViewPairingEvent read FOnViewPairing write FOnViewPairing;
   end;
 

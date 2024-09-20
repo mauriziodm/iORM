@@ -252,17 +252,12 @@ end;
 
 class function TdjUtils.IsPropertyToBeIgnored(
   const APropField: TRttiNamedObject; const AParams: IdjParams): Boolean;
-var
-  LIgnoredProperty: String;
 begin
+  // If the current property is the iORM ObjStatus and it must be ignored
   if (TdjDuckPropField.RttiType(APropField).Name = 'TioObjStatus') and AParams.IgnoreObjStatus then
     Exit(True);
-  if Length(AParams.IgnoredProperties) = 0 then
-    Exit(False);
-  for LIgnoredProperty in AParams.IgnoredProperties do
-    if SameText(APropField.Name, LIgnoredProperty) then
-      Exit(True);
-  Exit(False);
+  // If the current property is listed in the IgnoredProperties list
+  Result := (AParams.IgnoredProperties.Count > 0) and (AParams.IgnoredProperties.IndexOf(APropField.Name) > -1);
 end;
 
 class function TdjUtils.Pretty(const AJSON: String): String;

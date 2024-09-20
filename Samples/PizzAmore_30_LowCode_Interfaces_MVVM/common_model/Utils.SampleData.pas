@@ -128,9 +128,9 @@ begin
   LOrder.OrderDate := Date;
   LOrder.Customer := io.LoadObject<ICustomer>(1);
   LOrder.Note := 'Well done';
-  LOrder.Rows.Add( io.Create<IOrderRow>('', [1, 'Margherita pizza', 4.5, 3]) );
-  LOrder.Rows.Add( io.Create<IOrderRow>('', [2, 'Capricciosa pizza', 7, 2]) );
-  LOrder.Rows.Add( io.Create<IOrderRow>('', [4, 'Love pizza', 5, 1]) );
+  LOrder.Rows.Add( io.di.Resolve<IOrderRow>.ConstructorParams([1, 'Margherita pizza', 4.5, 3]).Get );
+  LOrder.Rows.Add( io.di.Resolve<IOrderRow>.ConstructorParams([2, 'Capricciosa pizza', 7, 2]).Get );
+  LOrder.Rows.Add( io.di.Resolve<IOrderRow>.ConstructorParams([4, 'Love pizza', 5, 1]).Get );
   LOrder.OrderState := osReady;
   io.PersistObject(LOrder);
   // Second order
@@ -138,15 +138,15 @@ begin
   LOrder.OrderDate := Date;
   LOrder.Customer := io.LoadObject<ICustomer>(2);
   LOrder.Note := 'Double cheese please';
-  LOrder.Rows.Add( io.Create<IOrderRow>('', [1, 'Margherita pizza', 4.5, 1]) );
-  LOrder.Rows.Add( io.Create<IOrderRow>('', [3, 'Pepperoni pizza', 6.5, 1]) );
+  LOrder.Rows.Add( io.di.Resolve<IOrderRow>.ConstructorParams([1, 'Margherita pizza', 4.5, 1]).Get );
+  LOrder.Rows.Add( io.di.Resolve<IOrderRow>.ConstructorParams([3, 'Pepperoni pizza', 6.5, 1]).Get );
   LOrder.OrderState := osPreparing;
   io.PersistObject(LOrder);
   // Third order
   LOrder := io.Create<IOrder>;
   LOrder.OrderDate := Date;
   LOrder.Customer := io.LoadObject<ICustomer>(3);
-  LOrder.Rows.Add( io.Create<IOrderRow>('', [4, 'Love pizza', 5, 1]) );
+  LOrder.Rows.Add( io.di.Resolve<IOrderRow>.ConstructorParams([4, 'Love pizza', 5, 1]).Get );
   LOrder.OrderState := osWaiting;
   io.PersistObject(LOrder);
 end;

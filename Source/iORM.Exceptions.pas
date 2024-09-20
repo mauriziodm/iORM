@@ -100,6 +100,50 @@ type
   end;
   // -----------------------------------------------------------------------------------------------
 
+  // Auth exceptions -------------------------------------------------------------------------------
+  EioAuthException = class(Exception)
+  end;
+
+  EioAuthInvalidCredentialsException_401 = class(EioAuthException)
+  end;
+
+  EioAuthInactiveUserException_401 = class(EioAuthException)
+  end;
+
+  EioAuthUserExpiredException_401 = class(EioAuthException)
+  end;
+
+  EioAuthForbiddenException_403 = class(EioAuthException)
+  end;
+
+  EioTokenSignatureException_401 = class(EioAuthException)
+  end;
+
+  EioTokenAudienceException_401 = class(EioAuthException)
+  end;
+
+  EioTokenTypeException_401 = class(EioAuthException)
+  end;
+
+  EioTokenIssuerException_401 = class(EioAuthException)
+  end;
+
+  EioTokenExpirationException_401 = class(EioAuthException)
+  end;
+
+  EioTokenNotYetValidException_401 = class(EioAuthException)
+  end;
+
+  EioAuthUserOnlyAuthorizationTokenExpected_401 = class(EioAuthException)
+  end;
+
+  EioAuthInvalidAuthorizationToken_401 = class(EioAuthException)
+  end;
+
+  EioAuthInvalidRefreshToken_401 = class(EioAuthException)
+  end;
+  // -----------------------------------------------------------------------------------------------
+
 implementation
 
 { EioException }

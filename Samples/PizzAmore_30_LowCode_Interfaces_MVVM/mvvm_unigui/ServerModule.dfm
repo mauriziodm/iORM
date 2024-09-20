@@ -1,20 +1,15 @@
 object UniServerModule: TUniServerModule
-  TempFolder = 'temp\'
-  Title = 'New Application'
-  SuppressErrors = []
-  Bindings = <>
-  SSL.SSLOptions.RootCertFile = 'root.pem'
-  SSL.SSLOptions.CertFile = 'cert.pem'
-  SSL.SSLOptions.KeyFile = 'key.pem'
-  SSL.SSLOptions.Method = sslvSSLv23
-  SSL.SSLOptions.SSLVersions = [sslvTLSv1_1, sslvTLSv1_2]
-  SSL.SSLOptions.Mode = sslmUnassigned
-  SSL.SSLOptions.VerifyMode = []
-  SSL.SSLOptions.VerifyDepth = 0
-  ConnectionFailureRecovery.ErrorMessage = 'Connection Error'
-  ConnectionFailureRecovery.RetryMessage = 'Retrying...'
-  Height = 480
-  Width = 640
+  Left = 0
+  Top = 0
+  ClientHeight = 442
+  ClientWidth = 628
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
+  Font.Style = []
+  TextHeight = 15
   object SQLiteConn: TioSQLiteConnectionDef
     AsDefault = True
     AutoCreateDB.Enabled = True
@@ -22,7 +17,7 @@ object UniServerModule: TUniServerModule
     DatabaseStdFolder = sfDocuments
     Persistent = False
     Pooled = False
-    OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
+    AfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
     Left = 108
     Top = 24
   end

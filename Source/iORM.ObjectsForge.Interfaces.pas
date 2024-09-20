@@ -372,6 +372,7 @@ begin
         #13#13'I am loading an object of class "%s" with ID = %d.' +
         #13#13'The object of type "%s" in property "%s", on which there is an "HasMany" relationship, was not created.' +
         #13#13'This instance is usually created by the constructor method, in this case in the "%s" class.' +
+        #13#13'Also note that I (iORM) invoke parameterless constructor; you may have put the code that creates the specified object in parameterized constructor which I don''t invoke, please make sure that object creation happens in parameterless constructor.' +
         #13#13'If you are sure that the object is created but the problem remains then check that it is not destroyed somewhere before running this code.' +
         #13#13'It will work.', [AContext.GetTable.GetClassName, AContext.ObjID, AProperty.GetTypeName, AProperty.GetName, AContext.GetTable.GetClassName]));
   // Get the where conditions for the details if exists (nil if not exists)
@@ -402,6 +403,7 @@ begin
         #13#13'I am loading an object of class "%s" with ID = %d.' +
         #13#13'The object of type "%s" in property "%s", on which there is an "EmbeddedHasMany" relationship, was not created.' +
         #13#13'This instance is usually created by the constructor method, in this case in the "%s" class.' +
+        #13#13'Also note that I (iORM) invoke parameterless constructor; you may have put the code that creates the specified object in parameterized constructor which I don''t invoke, please make sure that object creation happens in parameterless constructor.' +
         #13#13'If you are sure that the object is created but the problem remains then check that it is not destroyed somewhere before running this code.' +
         #13#13'It will work.', [AContext.GetTable.GetClassName, AContext.ObjID, AProperty.GetTypeName, AProperty.GetName, AContext.GetTable.GetClassName]));
   // Get the JSONObject

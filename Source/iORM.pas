@@ -170,7 +170,7 @@ const
   rtEmbeddedHasOne = iORM.Attributes.rtEmbeddedHasOne;
 
   // TioPersistenceActionType = (atDoNotPersist, atInsert, atUpdate, atDelete);
-  atDoNotPersist = iORM.CommonTypes.atDoNotPersist;
+  atDoNotPersist = iORM.CommonTypes.atUndefined;
   atInsert = iORM.CommonTypes.atInsert;
   atUpdate = iORM.CommonTypes.atUpdate;
   atDelete = iORM.CommonTypes.atDelete;
@@ -419,7 +419,7 @@ type
     class procedure _FreeObjAfterPersistOrDelete(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete); static; inline;
   public
     // KeepClass
-    class procedure KeepClass(const AClass: TClass);
+    class procedure RegisterClass(const AClass: TClass);
 
     // AnonymousTimer
     class procedure AnonymousTimer(const AIntervalMillisec: Integer; const AExecuteMethod: TFunc<boolean>);
@@ -1887,7 +1887,7 @@ begin
   Result := TioPersistenceStrategyFactory.GetStrategy(AConnectionName).InTransaction(AConnectionName);
 end;
 
-class procedure io.KeepClass(const AClass: TClass);
+class procedure io.RegisterClass(const AClass: TClass);
 begin
   // This method does nothing, it only serves to ensure that the linker
   // does not remove the class whose pointer is received and therefore
@@ -2460,7 +2460,7 @@ TioEnumContainer._Build;
 TioMapContainer._Build;
 
 // Enums UI translations
-io.Enums.Add<TioPersistenceActionType>('do not persist, insert, update, delete');
+io.Enums.Add<TioPersistenceActionType>('do not persist, select, insert, update, delete');
 io.Enums.Add<TioPersistenceIntentType>('regular, revert, synchro (svr), synchro (cli)');
 io.Enums.Add<TioPersistenceConflictState>('undefined, resolved, rejected, rejected raise');
 io.Enums.Add<TioEtmTimeSlotSynchroState>('regular, to be synchronized, sent to server, received from server, received from client');
