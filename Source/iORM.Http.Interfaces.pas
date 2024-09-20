@@ -52,6 +52,12 @@ const
   HTTP_METHOD_NAME_SQLDESTEXECUTE = 'SQLDestExecute';
   HTTP_METHOD_NAME_SQLDESTLOADDATASET = 'SQLDestLoadDataSet';
   HTTP_METHOD_NAME_TEST = 'Test';
+  // auth
+  HTTP_METHOD_NAME_AUTH_AUTHORIZEUSER = '_AuthorizeUser';
+  HTTP_METHOD_NAME_AUTH_AUTHORIZEAPP = '_AuthorizeApp';
+  HTTP_METHOD_NAME_AUTH_AUTHORIZEACCESS = '_AuthorizeAccess';
+  HTTP_METHOD_NAME_AUTH_NEWACCESSTOKEN = '_NewAccessToken';
+  HTTP_METHOD_NAME_AUTH_REFRESHACCESSTOKEN = '_RefreshAccessToken';
 
   // All the interfaces declared here are moved on iORM.DB.Interfacex to avoi
   //  a circular reference error (IioHttpRequestBody, IioHttpResponseBody)

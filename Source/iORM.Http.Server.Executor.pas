@@ -115,6 +115,18 @@ begin
       _SQLLoadDataSet(LioRequestBody, LioResponseBody)
     else if LioRequestBody.MethodName = HTTP_METHOD_NAME_DOSYNCHRONIZATION then
       _DoSynchronization(LioRequestBody, LioResponseBody)
+    // auth methods
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_AUTHORIZEACCESS then
+      _AuthorizeAccess(LioRequestBody, LioResponseBody)
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_NEWACCESSTOKEN then
+      _NewAccessToken(LioRequestBody, LioResponseBody)
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_REFRESHACCESSTOKEN then
+      _RefreshAccessToken(LioRequestBody, LioResponseBody)
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_AUTHORIZEUSER then
+      _AuthorizeUser(LioRequestBody, LioResponseBody)
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_AUTHORIZEAPP then
+      _AuthorizeApp(LioRequestBody, LioResponseBody)
+    // else
     else
       raise EioHttpLocalException.Create(ClassName, 'Execute', Format('Method "%s" not found.', [LioRequestBody.MethodName]));
     // Return the response
