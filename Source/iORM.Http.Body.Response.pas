@@ -42,16 +42,25 @@ type
 
   TioHttpResponseBody = class(TInterfacedObject, IioHttpResponseBody)
   private
+    // auth fields
+    FAuthResult1: String;
+    FAuthResult2: String;
+    // fields
     FExceptionClassName: String;
     FExceptionMessage: String;
     FJSONDataValue: TJSONValue;
     FStream: TStream;
+    // methods
     function ExceptionOccurred: Boolean;
+    function GetAuthResult1: String;
+    function GetAuthResult2: String;
     function GetExceptionClassName: String;
     function GetExceptionMessage: String;
     function GetJSONDataValue: TJSONValue;
     function GetJSONDataValueAsObject: TObject;
     function GetStream: TStream;
+    procedure SetAuthResult1(const Value: String);
+    procedure SetAuthResult2(const Value: String);
     procedure SetExceptionClassName(const Value: String);
     procedure SetExceptionMessage(const Value: String);
     procedure SetJSONDataValue(const Value: TJSONValue);
@@ -136,6 +145,16 @@ begin
   Result := not (FExceptionClassName.IsEmpty and FExceptionMessage.IsEmpty);
 end;
 
+function TioHttpResponseBody.GetAuthResult1: String;
+begin
+  Result := FAuthResult1;
+end;
+
+function TioHttpResponseBody.GetAuthResult2: String;
+begin
+  Result := FAuthResult2;
+end;
+
 function TioHttpResponseBody.GetExceptionClassName: String;
 begin
    Result := FExceptionClassName;
@@ -164,6 +183,16 @@ begin
   if not Assigned(FStream) then
     FStream := TMemoryStream.Create;
   Result := FStream;
+end;
+
+procedure TioHttpResponseBody.SetAuthResult1(const Value: String);
+begin
+  FAuthResult1 := Value;
+end;
+
+procedure TioHttpResponseBody.SetAuthResult2(const Value: String);
+begin
+  FAuthResult2 := Value;
 end;
 
 procedure TioHttpResponseBody.SetExceptionClassName(const Value: String);

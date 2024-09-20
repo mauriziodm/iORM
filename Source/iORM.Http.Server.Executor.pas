@@ -56,6 +56,12 @@ type
     class procedure _PersistObject(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
     class procedure _SQLDestExecute(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
     class procedure _SQLLoadDataSet(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
+    // auth
+    class procedure _AuthorizeUser(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _AuthorizeApp(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _AuthorizeAccess(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _NewAccessToken(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _RefreshAccessToken(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
   public
     class function Execute(const ARequestBodyAsString: String): String; static;
     class function Test: String; static;
@@ -66,7 +72,8 @@ implementation
 uses
   iORM, DJSON, iORM.Http.Factory, iORM.Http.Interfaces, iORM.Exceptions,
   System.SysUtils, System.JSON, FireDAC.Comp.Client, FireDAC.Stan.Intf,
-  System.Generics.Collections, iORM.Utilities, iORM.SynchroStrategy.Custom;
+  System.Generics.Collections, iORM.Utilities, iORM.SynchroStrategy.Custom,
+  iORM.Auth.Components.AuthServer, iORM.Auth.Interfaces;
 
 { TioHttpServerExecutor }
 
@@ -126,6 +133,46 @@ end;
 class function TioHttpServerExecutor.Test: String;
 begin
   Result := Format('Hi, I''m iORM, I''m proud to tell you that my http server executor is successfully connected now %s.', [Now.ToString]);
+end;
+
+class procedure TioHttpServerExecutor._AuthorizeAccess(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
+begin
+  if TioAuthServer.GetInstance.AuthorizeAccess(AioRequestBody.AuthScope, AioRequestBody.AuthIntention, AioRequestBody.AuthToken) then
+    AioResponseBody.AuthResult1 := 't'
+  else
+    AioResponseBody.AuthResult1 := 'f';
+end;
+
+class procedure TioHttpServerExecutor._AuthorizeApp(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
+var
+  LObj: TObject;
+  LAppCredentials: IioAuthAppCredentials;
+  LResultAppAuthorizationToken: String;
+begin
+  LObj := AioRequestBody.JSONDataValueAsObject;
+  if Supports(LObj, IioAuthAppCredentials, LAppCredentials) then
+  begin
+    TioAuthServer.GetInstance.AuthorizeApp(LAppCredentials, AioRequestBody.AuthToken, LResultAppAuthorizationToken);
+    AioResponseBody.AuthResult1 := LResultAppAuthorizationToken;
+  end
+  else
+    raise EioHttpLocalException.Create(ClassName, '_AuthorizeApp', 'JSONDataValue object does not implement then "IioAuthAppCredentials" interface');
+end;
+
+class procedure TioHttpServerExecutor._AuthorizeUser(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
+var
+  LObj: TObject;
+  LUserCredentials: IioAuthUserCredentials;
+  LResultUserAuthorizationToken: String;
+begin
+  LObj := AioRequestBody.JSONDataValueAsObject;
+  if Supports(LObj, IioAuthUserCredentials, LUserCredentials) then
+  begin
+    TioAuthServer.GetInstance.AuthorizeUser(LUserCredentials, LResultUserAuthorizationToken);
+    AioResponseBody.AuthResult1 := LResultUserAuthorizationToken;
+  end
+  else
+    raise EioHttpLocalException.Create(ClassName, '_AuthorizeUser', 'JSONDataValue object does not implement then "IioAuthUserCredentials" interface');
 end;
 
 class procedure TioHttpServerExecutor._Count(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
@@ -221,6 +268,15 @@ begin
   AioResponseBody.JSONDataValue := TJSONNumber.Create(LMin);
 end;
 
+class procedure TioHttpServerExecutor._NewAccessToken(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
+var
+  LResultAccessToken, LResultRefreshToken: String;
+begin
+  TioAuthServer.GetInstance.NewAccessToken(AioRequestBody.AuthToken, LResultAccessToken, LResultRefreshToken);
+  AioResponseBody.AuthResult1 := LResultAccessToken;
+  AioResponseBody.AuthResult2 := LResultRefreshToken;
+end;
+
 class procedure TioHttpServerExecutor._PersistList(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
 var
   LList: TObject;
@@ -241,6 +297,15 @@ begin
     AioRequestBody.BlindLevel);
   if TioUtilities.BlindLevel_Do_AutoUpdateProps(AioRequestBody.BlindLevel) then
     AioResponseBody.JSONDataValueAsObject := LObj;
+end;
+
+class procedure TioHttpServerExecutor._RefreshAccessToken(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
+var
+  LResultAccessToken, LResultRefreshToken: String;
+begin
+  TioAuthServer.GetInstance.RefreshAccessToken(AioRequestBody.AuthToken, LResultAccessToken, LResultRefreshToken);
+  AioResponseBody.AuthResult1 := LResultAccessToken;
+  AioResponseBody.AuthResult2 := LResultRefreshToken;
 end;
 
 class procedure TioHttpServerExecutor._SQLDestExecute(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);

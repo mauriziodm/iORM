@@ -47,7 +47,8 @@ uses
   System.JSON, iORM.Where.Interfaces,
   FireDAC.Comp.DataSet, iORM.LiveBindings.BSPersistence,
   iORM.Where.SqlItems.Interfaces, iORM.Context.Map.Interfaces,
-  iORM.SynchroStrategy.Interfaces, iORM.SynchroStrategy.Custom;
+  iORM.SynchroStrategy.Interfaces, iORM.SynchroStrategy.Custom,
+  iORM.Auth.Interfaces;
 
 const
   OBJVERSION_NULL = 0;
@@ -348,6 +349,18 @@ type
     ['{83DE9ECE-47EA-4814-B40E-3E39FAA210A2}']
     procedure Clear;
     function ToJsonText: String;
+    // AuthIntention
+    procedure SetAuthIntention(const Value: TioAuthIntention);
+    function GetAuthIntention: TioAuthIntention;
+    property AuthIntention: TioAuthIntention read GetAuthIntention write SetAuthIntention;
+    // AuthScope
+    procedure SetAuthScope(const Value: String);
+    function GetAuthScope: String;
+    property AuthScope: String read GetAuthScope write SetAuthScope;
+    // AuthToken
+    procedure SetAuthToken(const Value: String);
+    function GetAuthToken: String;
+    property AuthToken: String read GetAuthToken write SetAuthToken;
     // BlindLevel
     procedure SetBlindLevel(const Value: Byte);
     function GetBlindLevel: Byte;
@@ -402,6 +415,14 @@ type
     ['{E5A14525-308F-4877-99B7-C270D691FC6D}']
     function ExceptionOccurred: Boolean;
     function ToJsonText: String;
+    // AuthResult 1
+    procedure SetAuthResult1(const Value: String);
+    function GetAuthResult1: String;
+    property AuthResult1: String read GetAuthResult1 write SetAuthResult1;
+    // AuthResult 2
+    procedure SetAuthResult2(const Value: String);
+    function GetAuthResult2: String;
+    property AuthResult2: String read GetAuthResult2 write SetAuthResult2;
     // ExceptionClassName
     procedure SetExceptionClassName(const Value: String);
     function GetExceptionClassName: String;

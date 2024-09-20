@@ -93,7 +93,7 @@ type
     procedure AuthorizeApp(const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String); // return an app authorization token
     function AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean; // return true or false depending the access to the requested result is permitted
     procedure NewAccessToken(const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String); // return a new acces token and also a new refresh token just after the authorization (login)
-    procedure RenewAccessToken(const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String); // return a new acces token and also a new refresh token
+    procedure RefreshAccessToken(const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String); // return a new acces token and also a new refresh token
   published
     // properties
     property TokenIssuer: String read FTokenIssuer write FTokenIssuer; // proprietà non thread safe ma per il momento provo a mantenerna non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
@@ -197,7 +197,7 @@ begin
   end;
 end;
 
-procedure TioAuthServer.RenewAccessToken(const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String);
+procedure TioAuthServer.RefreshAccessToken(const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String);
 var
   LDone: Boolean;
   LUserID, LAppID: String;

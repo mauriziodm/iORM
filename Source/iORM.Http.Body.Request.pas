@@ -44,6 +44,10 @@ type
   // TODO: Servono proprio i nullable? Si potrebbe toglierli e tornare a tipi normali?
   TioHttpRequestBody = class(TInterfacedObject, IioHttpRequestBody)
   private
+    // auth fields
+    FAuthIntention: TioAuthIntention;
+    FAuthScope: String;
+    FAuthToken: String;
     // fields
     FBlindLevel: TioNullableByte;
     FIntentType: TioPersistenceIntentType;
@@ -59,6 +63,9 @@ type
     FUserToken: TioNullableString;
     // methods
     procedure Clear;
+    function GetAuthIntention: TioAuthIntention;
+    function GetAuthScope: String;
+    function GetAuthToken: String;
     function GetBlindLevel: Byte;
     function GetIntentType: TioPersistenceIntentType;
     function GetJSONDataValue: TJSONValue;
@@ -71,6 +78,9 @@ type
     function GetUserName: String;
     function GetUserToken: String;
     function GetWhere: IioWhere;
+    procedure SetAuthIntention(const Value: TioAuthIntention);
+    procedure SetAuthScope(const Value: String);
+    procedure SetAuthToken(const Value: String);
     procedure SetBlindLevel(const Value: Byte);
     procedure SetIntentType(const Value: TioPersistenceIntentType);
     procedure SetJSONDataValue(const Value: TJSONValue);
@@ -180,6 +190,21 @@ begin
   FWhere := nil;
 end;
 
+function TioHttpRequestBody.GetAuthIntention: TioAuthIntention;
+begin
+  Result := FAuthIntention;
+end;
+
+function TioHttpRequestBody.GetAuthScope: String;
+begin
+  Result := FAuthScope;
+end;
+
+function TioHttpRequestBody.GetAuthToken: String;
+begin
+  Result := FAuthToken;
+end;
+
 function TioHttpRequestBody.GetBlindLevel: Byte;
 begin
   Result := FBlindLevel.Value;
@@ -241,6 +266,21 @@ end;
 function TioHttpRequestBody.GetWhere: IioWhere;
 begin
   Result := FWhere;
+end;
+
+procedure TioHttpRequestBody.SetAuthIntention(const Value: TioAuthIntention);
+begin
+  FAuthIntention := Value;
+end;
+
+procedure TioHttpRequestBody.SetAuthScope(const Value: String);
+begin
+  FAuthScope := Value;
+end;
+
+procedure TioHttpRequestBody.SetAuthToken(const Value: String);
+begin
+  FAuthToken := Value;
 end;
 
 procedure TioHttpRequestBody.SetBlindLevel(const Value: Byte);
