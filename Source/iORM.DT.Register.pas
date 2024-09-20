@@ -48,7 +48,8 @@ uses
   iORM.LiveBindings.PrototypeBindSource.Detail, DesignIntf, iORM.MVVM.ModelPresenter.Master, iORM.MVVM.ModelPresenter.Detail, iORM.MVVM.ModelDataSet,
   iORM.MVVM.ModelBindSource, iORM.MVVM.ViewModelBridge, iORM.MVVM.ViewContextProvider, System.Actions, iORM.StdActions.VCL, iORM.StdActions.FMX,
   iORM.DT.ViewModel.Wizard, iORM.MVVM.ViewModel, DesignEditors, iORM.StdActions.CloseQueryRepeater,
-  iORM.DT.CompAutoUses, iORM.MVVM.VMAction, iORM.DT.Editors.VMAction, iORM.SynchroStrategy.EtmBased, iORM.Http.WebBroker.Producer;
+  iORM.DT.CompAutoUses, iORM.MVVM.VMAction, iORM.DT.Editors.VMAction, iORM.SynchroStrategy.EtmBased, iORM.Http.WebBroker.Producer,
+  iORM.Auth.Components.AuthServer;
 
 
 
@@ -59,6 +60,9 @@ begin
   RegisterComponents('iORM - Abstraction layer', [TioVCL]);
   RegisterComponents('iORM - Abstraction layer', [TioFMX]);
 //  RegisterComponents('iORM - Abstraction layer', [TioUniGUI]); // Moved to iORM_uniGUI... specific packages
+
+  // Authentication / Authorization components
+  RegisterComponents('iORM - Auth', [TioAuthServer]);
 
   // Connection components
   RegisterComponents('iORM - Connections', [TioHttpConnectionDef]);

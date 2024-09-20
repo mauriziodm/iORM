@@ -61,7 +61,7 @@ type
   TioAuthServer = class(TComponent)
   strict private
     // singleton class fields
-    class var FSingletonAuthServer: TioAuthServer;
+    class var FInstance: TioAuthServer;
   strict private
     // fields
     FTokenIssuer: String; // proprietà non thread safe ma per il momento provo a mantenerna non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
@@ -75,6 +75,7 @@ type
     FOnNewAccessToken: TioOnNewAccessTokenEvent;
     FOnRefreshAccessToken: TioOnRefreshAccessTokenEvent;
     // methods
+    function Get_Version: String;
     procedure SetUserCacheExpirationMins(const Value: Integer);
     // jwt builders
     function _BuildAuthorizationToken(const AUserID: String; const AAppID: String = IO_STRING_NULL_VALUE): String; // this token is released after the initial user/app authorization request
@@ -99,6 +100,7 @@ type
     property TokenIssuer: String read FTokenIssuer write FTokenIssuer; // proprietà non thread safe ma per il momento provo a mantenerna non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
     property TokenSecret: String read FTokenSecret write FTokenSecret; // proprietà non thread safe ma per il momento provo a mantenerna non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
     property UserCacheExpirationMins: Integer read FUserCacheExpirationMins write FUserCacheExpirationMins default USER_CACHE_EXPIRATION_MINS;
+    property _Version: String read Get_Version;
     // events
     property OnAuthorizeApp: TioOnAuthorizeAppEvent read FOnAuthorizeApp write FOnAuthorizeApp;
     property OnAuthorizeAccess: TioOnAuthorizeAccessEvent read FOnAuthorizeAccess write FOnAuthorizeAccess;
@@ -154,12 +156,12 @@ begin
   if not (csDesigning in ComponentState) then
     FTokenIssuer := TPath.GetFileNameWithoutExtension(ParamStr(0));
   // Set the singleton internal reference to itself (one only auth server at a time)
-  TioAuthServer.FSingletonAuthServer := Self;
+  TioAuthServer.FInstance := Self;
 end;
 
 destructor TioAuthServer.Destroy;
 begin
-  FSingletonAuthServer := nil;
+  FInstance := nil;
   if Assigned(FUserCache) then
     FreeAndNil(FUserCache);
   inherited;
@@ -167,7 +169,12 @@ end;
 
 class function TioAuthServer.GetInstance: TioAuthServer;
 begin
-  Result := TioAuthServer.FSingletonAuthServer;
+  Result := TioAuthServer.FInstance;
+end;
+
+function TioAuthServer.Get_Version: String;
+begin
+  Result := io.Version;
 end;
 
 procedure TioAuthServer.NewAccessToken(const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String);
