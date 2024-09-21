@@ -54,6 +54,13 @@ const
   OBJVERSION_NULL = 0;
   TRANSACTION_TIMESTAMP_NULL = 0;
 
+  KEY_SESSION_USERID = 'UserID';
+  KEY_SESSION_USERNAME = 'UserName';
+  KEY_AUTH_INTENTION = 'AuthIntention';
+  KEY_AUTH_SCOPE = 'AuthScope';
+  KEY_AUTH_TOKEN = 'AuthToken';
+  KEY_AUTH_RESULT1 = 'AuthResult1';
+  KEY_AUTH_RESULT2 = 'AuthResult2';
   KEY_BLINDLEVEL = 'BlindLevel';
   KEY_EXCEPTIONCLASSNAME = 'ExceptionClassName';
   KEY_EXCEPTIONMESSAGE = 'ExceptionMessage';
@@ -64,9 +71,6 @@ const
   KEY_RELATIONPROPERTYNAME = 'RelationPropertyName';
   KEY_SQLDESTINATION = 'SQLDestination';
   KEY_STREAM = 'Stream';
-  KEY_USERID = 'UserID';
-  KEY_USERNAME = 'UserName';
-  KEY_USERTOKEN = 'UserToken';
   KEY_WHERE = 'Where';
 
 type
@@ -349,6 +353,16 @@ type
     ['{83DE9ECE-47EA-4814-B40E-3E39FAA210A2}']
     procedure Clear;
     function ToJsonText: String;
+    // ---------- session ----------
+    // UserID
+    procedure SetUserID(const Value: Integer);
+    function GetUserID: Integer;
+    property UserID: Integer read GetUserID write SetUserID;
+    // UserName
+    procedure SetUserName(const Value: String);
+    function GetUserName: String;
+    property UserName: String read GetUserName write SetUserName;
+    // ---------- auth ----------
     // AuthIntention
     procedure SetAuthIntention(const Value: TioAuthIntention);
     function GetAuthIntention: TioAuthIntention;
@@ -361,6 +375,7 @@ type
     procedure SetAuthToken(const Value: String);
     function GetAuthToken: String;
     property AuthToken: String read GetAuthToken write SetAuthToken;
+    // ---------- others ----------
     // BlindLevel
     procedure SetBlindLevel(const Value: Byte);
     function GetBlindLevel: Byte;
@@ -393,22 +408,11 @@ type
     procedure SetSQLDestination(const Value: IioSQLDestination);
     function GetSQLDestination: IioSQLDestination;
     property SQLDestination: IioSQLDestination read GetSQLDestination write SetSQLDestination;
-    // UserID
-    procedure SetUserID(const Value: Integer);
-    function GetUserID: Integer;
-    property UserID: Integer read GetUserID write SetUserID;
-    // UserName
-    procedure SetUserName(const Value: String);
-    function GetUserName: String;
-    property UserName: String read GetUserName write SetUserName;
-    // UserToken
-    procedure SetUserToken(const Value: String);
-    function GetUserToken: String;
-    property UserToken: String read GetUserToken write SetUserToken;
     // Where
     procedure SetWhere(const Value: IioWhere);
     function GetWhere: IioWhere;
     property Where: IioWhere read GetWhere write SetWhere;
+    // ---------- end ----------
   end;
 
   IioHttpResponseBody = interface

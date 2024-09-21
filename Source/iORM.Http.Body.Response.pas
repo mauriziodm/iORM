@@ -42,10 +42,10 @@ type
 
   TioHttpResponseBody = class(TInterfacedObject, IioHttpResponseBody)
   private
-    // auth fields
+    // auth
     FAuthResult1: String;
     FAuthResult2: String;
-    // fields
+    // others
     FExceptionClassName: String;
     FExceptionMessage: String;
     FJSONDataValue: TJSONValue;
@@ -82,8 +82,12 @@ uses
 constructor TioHttpResponseBody.Create;
 begin
   inherited Create;
-  FExceptionClassName := String.Empty;
-  FExceptionMessage := String.Empty;
+  // auth
+  FAuthResult1 := IO_STRING_NULL_VALUE;
+  FAuthResult2 := IO_STRING_NULL_VALUE;
+  // others
+  FExceptionClassName := IO_STRING_NULL_VALUE;
+  FExceptionMessage := IO_STRING_NULL_VALUE;
   FJSONDataValue := nil;
   FStream := nil;
 end;
@@ -110,6 +114,16 @@ begin
   Self.Create;
   LJSONObject := TJSONObject.ParseJSONValue(AJSONString) as TJSONObject;
   try
+    // ---------- session ----------
+    // AuthResult1
+    LJSONValue := LJSONObject.GetValue(KEY_AUTH_RESULT1);
+    if Assigned(LJSONValue) then
+      FAuthResult1 := LJSONValue.Value;
+    // AuthResult2
+    LJSONValue := LJSONObject.GetValue(KEY_AUTH_RESULT2);
+    if Assigned(LJSONValue) then
+      FAuthResult2 := LJSONValue.Value;
+    // ---------- others ----------
     // ExceptionClassName
     LJSONValue := LJSONObject.GetValue(KEY_EXCEPTIONCLASSNAME);
     if Assigned(LJSONValue) then
@@ -126,6 +140,7 @@ begin
     LJSONValue := LJSONObject.GetValue(KEY_STREAM);
     if Assigned(LJSONValue) then
       _LoadStream;
+    // ---------- end ----------
   finally
     LJSONObject.Free;
   end;
@@ -239,6 +254,12 @@ var
 begin
   LJSONObject := TJSONObject.Create;
   try
+    // ---------- session ----------
+    // AuthResult1
+    LJSONObject.AddPair(KEY_AUTH_RESULT1, FAuthResult1);
+    // AuthResult2
+    LJSONObject.AddPair(KEY_AUTH_RESULT2, FAuthResult2);
+    // ---------- others ----------
     // ExceptionClassName
     LJSONObject.AddPair(KEY_EXCEPTIONCLASSNAME, FExceptionClassName);
     // ExceptionClassMessage
@@ -249,6 +270,7 @@ begin
     // Stream
     if Assigned(FStream) then
       _SaveStream;
+    // ---------- end ----------
     // Result JSONObject as string
     Result := LJSONObject.ToString;
   finally
