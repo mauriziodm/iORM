@@ -152,8 +152,6 @@ begin
   // Verify the signature
   FIsVerified := (LSplittedToken <> nil) and (Length(LSplittedToken) = 3)
     and _DoVerifySignature(LSplittedToken[TOKEN_HEADER_IDX], LSplittedToken[TOKEN_PAYLOAD_IDX], LSplittedToken[TOKEN_SIGNATURE_IDX], ASecret);
-  if not FIsVerified then
-    Exit;
   // Decode
   _DoDecodeHeader(LSplittedToken[TOKEN_HEADER_IDX]);
   _DoDecodePayload(LSplittedToken[TOKEN_PAYLOAD_IDX]);

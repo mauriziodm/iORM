@@ -555,8 +555,7 @@ type
     class function NotExists<T>(const ATypeAlias: String; const AWhere: IioWhere): boolean; overload;
 
     // PersistObject (accepting instance to persist directly)
-    class procedure PersistObject(const [ref] AObj: TObject; const ABlindLevel: Byte = BL_DEFAULT;
-      const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
+    class procedure PersistObject(const [ref] AObj: TObject; const ABlindLevel: Byte = BL_DEFAULT; const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
     class procedure PersistObject(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete); overload;
     class procedure PersistObject(const AIntfObj: IInterface; const ABlindLevel: Byte = BL_DEFAULT); overload;
     class procedure _PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;

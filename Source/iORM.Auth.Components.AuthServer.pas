@@ -51,10 +51,10 @@ type
   TioAuthServer = class;
 
   TioOnAuthorizeAccessEvent = procedure(const Sender: TioAuthServer; const AScope: String; const AIntention: TioAuthIntention; const AAccessToken: String; var IsAuthorized, Done: Boolean) of object;
-  TioOnAuthorizeUserEvent = procedure(const Sender: TioAuthServer; const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String; var Done: Boolean) of object;
-  TioOnAuthorizeAppEvent = procedure(const Sender: TioAuthServer; const AAppCredentials: IioAuthAppCredentials; var AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String; var Done: Boolean) of object;
-  TioOnNewAccessTokenEvent = procedure(const Sender: TioAuthServer; const AAuthorizationToken: String; out ResultAccessToken, ResultRefreshToken: String) of object;
-  TioOnRefreshAccessTokenEvent = procedure(const Sender: TioAuthServer; const ARefreshToken: String; out ResultAccessToken, ResultRefreshToken: String) of object;
+  TioOnAuthorizeUserEvent = procedure(const Sender: TioAuthServer; const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String; var IsAuthorized, Done: Boolean) of object;
+  TioOnAuthorizeAppEvent = procedure(const Sender: TioAuthServer; const AAppCredentials: IioAuthAppCredentials; var AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String; var IsAuthorized, Done: Boolean) of object;
+  TioOnNewAccessTokenEvent = procedure(const Sender: TioAuthServer; const AAuthorizationToken: String; out ResultAccessToken, ResultRefreshToken: String; var IsAuthorized, Done: Boolean) of object;
+  TioOnRefreshAccessTokenEvent = procedure(const Sender: TioAuthServer; const ARefreshToken: String; out ResultAccessToken, ResultRefreshToken: String; var IsAuthorized, Done: Boolean) of object;
 
   TioAuthUserCache = class;
 
@@ -90,11 +90,11 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     class function GetInstance: TioAuthServer; static;
-    procedure AuthorizeUser(const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String); // return a user identity token
-    procedure AuthorizeApp(const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String); // return an app authorization token
+    function AuthorizeUser(const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String): Boolean; // return a user identity token
+    function AuthorizeApp(const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean; // return an app authorization token
     function AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean; // return true or false depending the access to the requested result is permitted
-    procedure NewAccessToken(const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String); // return a new acces token and also a new refresh token just after the authorization (login)
-    procedure RefreshAccessToken(const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String); // return a new acces token and also a new refresh token
+    function NewAccessToken(const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; // return a new acces token and also a new refresh token just after the authorization (login)
+    function RefreshAccessToken(const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; // return a new acces token and also a new refresh token
   published
     // properties
     property TokenIssuer: String read FTokenIssuer write FTokenIssuer; // proprietà non thread safe ma per il momento provo a mantenerna non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
@@ -177,17 +177,18 @@ begin
   Result := io.Version;
 end;
 
-procedure TioAuthServer.NewAccessToken(const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String);
+function TioAuthServer.NewAccessToken(const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean;
 var
   LDone: Boolean;
   LUserID, LAppID: String;
 begin
+  Result := False;
   AResultAccessToken := IO_AUTH_NULL_JWT;
   AResultRefreshToken := IO_AUTH_NULL_JWT;
   // invoke OnNewAccessToken event if assigned
   LDone := False;
   if Assigned(FOnNewAccessToken) then
-    FOnNewAccessToken(Self, AAuthorizationToken, AResultAccessToken, AResultRefreshToken);
+    FOnNewAccessToken(Self, AAuthorizationToken, AResultAccessToken, AResultRefreshToken, Result, LDone);
   // if the creation of the token was not handled then return the default one
   if not LDone then
   begin
@@ -201,20 +202,23 @@ begin
     // final check, if the result token is null the raise exception
     if (AResultAccessToken = IO_AUTH_NULL_JWT) or (AResultRefreshToken = IO_AUTH_NULL_JWT) then
       raise EioAuthInvalidAuthorizationToken_401.Create('Invalid authorization token/code');
+    // Return true if all is ok
+    Result := True;
   end;
 end;
 
-procedure TioAuthServer.RefreshAccessToken(const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String);
+function TioAuthServer.RefreshAccessToken(const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean;
 var
   LDone: Boolean;
   LUserID, LAppID: String;
 begin
+  Result := False;
   AResultAccessToken := IO_AUTH_NULL_JWT;
   AResultRefreshToken := IO_AUTH_NULL_JWT;
   // invoke OnNewAccessToken event if assigned
   LDone := False;
   if Assigned(FOnRefreshAccessToken) then
-    FOnRefreshAccessToken(Self, ARefreshToken, AResultAccessToken, AResultRefreshToken);
+    FOnRefreshAccessToken(Self, ARefreshToken, AResultAccessToken, AResultRefreshToken, Result, LDone);
   // if the creation of the token was not handled then return the default one
   if not LDone then
   begin
@@ -228,6 +232,8 @@ begin
     // final check, if the result token is null the raise exception
     if (AResultAccessToken = IO_AUTH_NULL_JWT) or (AResultRefreshToken = IO_AUTH_NULL_JWT) then
       raise EioAuthInvalidRefreshToken_401.Create('Invalid refresh token');
+    // Return true if all is ok
+    Result := True;
   end;
 end;
 
@@ -242,16 +248,17 @@ begin
     raise EioGenericException.Create(ClassName, 'SetUserCacheExpirationMins', 'The minimum value is 1');
 end;
 
-procedure TioAuthServer.AuthorizeUser(const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String);
+function TioAuthServer.AuthorizeUser(const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String): Boolean;
 var
   LDone: Boolean;
   LUser: IioAuthUser;
 begin
+  Result := False;
   ResultUserAuthorizationToken := IO_AUTH_NULL_JWT;
   // invoke OnLogin event if assigned
   LDone := False;
   if Assigned(FOnAuthorizeUser) then
-    FOnAuthorizeUser(Self, AUserCredentials, ResultUserAuthorizationToken, LDone);
+    FOnAuthorizeUser(Self, AUserCredentials, ResultUserAuthorizationToken, Result, LDone);
   // if the creation of the token was not handled then use the internal implementation
   if not LDone then
   begin
@@ -264,20 +271,23 @@ begin
     // final check, if the result token is null the raise exception
     if ResultUserAuthorizationToken = IO_AUTH_NULL_JWT then
       raise EioAuthInvalidCredentialsException_401.Create('Invalid user credentials');
+    // Return true if all is ok
+    Result := True;
   end;
 end;
 
-procedure TioAuthServer.AuthorizeApp(const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String);
+function TioAuthServer.AuthorizeApp(const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean;
 var
   LDone: Boolean;
   LUserID, LAppID: String;
   LApp: IioAuthApp;
 begin
+  Result := False;
   ResultAppAuthorizationToken := IO_AUTH_NULL_JWT;
   // invoke OnLogin event if assigned
   LDone := False;
   if Assigned(FOnAuthorizeApp) then
-    FOnAuthorizeApp(Self, AAppCredentials, AUserAuthorizationToken, ResultAppAuthorizationToken, LDone);
+    FOnAuthorizeApp(Self, AAppCredentials, AUserAuthorizationToken, ResultAppAuthorizationToken, Result, LDone);
   // if the creation of the token was not handled then use the internal implementation
   if not LDone then
   begin
@@ -294,6 +304,8 @@ begin
     // final check, if the result token is null the raise exception
     if ResultAppAuthorizationToken = IO_AUTH_NULL_JWT then
       raise EioAuthInvalidCredentialsException_401.Create('Invalid app credentials');
+    // Return true if all is ok
+    Result := True;
   end;
 end;
 
