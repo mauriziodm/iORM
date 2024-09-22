@@ -420,6 +420,10 @@ type
     ['{E5A14525-308F-4877-99B7-C270D691FC6D}']
     function ExceptionOccurred: Boolean;
     function ToJsonText: String;
+    // AuthResultIsAuthorized
+    procedure SetAuthResultIsAuthorized(const Value: Boolean);
+    function GetAuthResultIsAuthorized: Boolean;
+    property AuthResultIsAuthorized: Boolean read GetAuthResultIsAuthorized write SetAuthResultIsAuthorized;
     // AuthResult 1
     procedure SetAuthResult1(const Value: String);
     function GetAuthResult1: String;
@@ -483,6 +487,12 @@ type
     // SQLDestinations
     class procedure SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); virtual; abstract;
     class procedure SQLDest_Execute(const ASQLDestination: IioSQLDestination); virtual; abstract;
+    // Auth
+    class function AuthorizeUser(const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String): Boolean; virtual; abstract;
+    class function AuthorizeApp(const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean; virtual; abstract;
+    class function AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean; virtual; abstract;
+    class function Auth_NewAccessToken(const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; virtual; abstract;
+    class function Auth_RefreshAccessToken(const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; virtual; abstract;
     // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
 
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------

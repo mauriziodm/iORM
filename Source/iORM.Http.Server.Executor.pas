@@ -149,10 +149,7 @@ end;
 
 class procedure TioHttpServerExecutor._AuthorizeAccess(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
 begin
-  if TioAuthServer.GetInstance.AuthorizeAccess(AioRequestBody.AuthScope, AioRequestBody.AuthIntention, AioRequestBody.AuthToken) then
-    AioResponseBody.AuthResult1 := 't'
-  else
-    AioResponseBody.AuthResult1 := 'f';
+  AioResponseBody.AuthResultIsAuthorized := TioAuthServer.GetInstance.AuthorizeAccess(AioRequestBody.AuthScope, AioRequestBody.AuthIntention, AioRequestBody.AuthToken);
 end;
 
 class procedure TioHttpServerExecutor._AuthorizeApp(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
@@ -164,7 +161,7 @@ begin
   LObj := AioRequestBody.JSONDataValueAsObject;
   if Supports(LObj, IioAuthAppCredentials, LAppCredentials) then
   begin
-    TioAuthServer.GetInstance.AuthorizeApp(LAppCredentials, AioRequestBody.AuthToken, LResultAppAuthorizationToken);
+    AioResponseBody.AuthResultIsAuthorized := TioAuthServer.GetInstance.AuthorizeApp(LAppCredentials, AioRequestBody.AuthToken, LResultAppAuthorizationToken);
     AioResponseBody.AuthResult1 := LResultAppAuthorizationToken;
   end
   else
@@ -180,7 +177,7 @@ begin
   LObj := AioRequestBody.JSONDataValueAsObject;
   if Supports(LObj, IioAuthUserCredentials, LUserCredentials) then
   begin
-    TioAuthServer.GetInstance.AuthorizeUser(LUserCredentials, LResultUserAuthorizationToken);
+    AioResponseBody.AuthResultIsAuthorized := TioAuthServer.GetInstance.AuthorizeUser(LUserCredentials, LResultUserAuthorizationToken);
     AioResponseBody.AuthResult1 := LResultUserAuthorizationToken;
   end
   else
@@ -284,7 +281,7 @@ class procedure TioHttpServerExecutor._NewAccessToken(const AioRequestBody: IioH
 var
   LResultAccessToken, LResultRefreshToken: String;
 begin
-  TioAuthServer.GetInstance.NewAccessToken(AioRequestBody.AuthToken, LResultAccessToken, LResultRefreshToken);
+  AioResponseBody.AuthResultIsAuthorized := TioAuthServer.GetInstance.NewAccessToken(AioRequestBody.AuthToken, LResultAccessToken, LResultRefreshToken);
   AioResponseBody.AuthResult1 := LResultAccessToken;
   AioResponseBody.AuthResult2 := LResultRefreshToken;
 end;
@@ -315,7 +312,7 @@ class procedure TioHttpServerExecutor._RefreshAccessToken(const AioRequestBody: 
 var
   LResultAccessToken, LResultRefreshToken: String;
 begin
-  TioAuthServer.GetInstance.RefreshAccessToken(AioRequestBody.AuthToken, LResultAccessToken, LResultRefreshToken);
+  AioResponseBody.AuthResultIsAuthorized := TioAuthServer.GetInstance.RefreshAccessToken(AioRequestBody.AuthToken, LResultAccessToken, LResultRefreshToken);
   AioResponseBody.AuthResult1 := LResultAccessToken;
   AioResponseBody.AuthResult2 := LResultRefreshToken;
 end;
