@@ -40,7 +40,7 @@ uses
   iORM.Context.Properties.Interfaces, iORM.Where.Interfaces,
   iORM.DB.Interfaces, FireDAC.Comp.DataSet, Data.DB,
   iORM.LiveBindings.BSPersistence, iORM.CommonTypes,
-  iORM.SynchroStrategy.Custom;
+  iORM.SynchroStrategy.Custom, iORM.Auth.Interfaces;
 
 type
 
@@ -57,35 +57,44 @@ type
     class function LoadObjVersion_FromEntity_Internal(const AContext: IioContext): Integer;
     class function LoadObjVersion_FromETM_Internal(const AContext: IioContext): Integer;
   protected
+    // ========== BEGIN OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
+    // Persistence
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------
-    class procedure _DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
-      const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
-      const ABlindLevel: Byte); override;
+    class procedure _DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); override;
+    class procedure _DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); override;
+    class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType); override;
+    class function _DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
     class procedure _DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
       const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
       const ABlindLevel: Byte); override;
-    class procedure _DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); override;
-    class procedure _DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); override;
-    class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType); override;
-    class function _DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
+    class procedure _DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
+      const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
+      const ABlindLevel: Byte); override;
     // ---------- End intercepted methods (StrategyInterceptors) ----------
-  public
-    class procedure StartTransaction(const AConnectionName: String); override;
-    class procedure CommitTransaction(const AConnectionName: String); override;
-    class procedure RollbackTransaction(const AConnectionName: String); override;
-    class function InTransaction(const AConnectionName: String): Boolean; override;
-    class procedure Delete(const AWhere: IioWhere); override;
-    class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
-    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
-    class function LoadObjVersion(const AContext: IioContext): Integer; override;
-    class function Count(const AWhere: IioWhere): Integer; override;
-    class function Max(const AWhere: IioWhere; const APropertyName: String): Integer; override;
-    class function Min(const AWhere: IioWhere; const APropertyName: String): Integer; override;
+    class procedure _DoDelete(const AWhere: IioWhere); override;
+    class procedure _DoLoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
+    class function _DoLoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
+    class function _DoLoadObjVersion(const AContext: IioContext): Integer; override;
+    class function _DoCount(const AWhere: IioWhere): Integer; override;
+    class function _DoMax(const AWhere: IioWhere; const APropertyName: String): Integer; override;
+    class function _DoMin(const AWhere: IioWhere; const APropertyName: String): Integer; override;
+    // Transaction
+    class procedure _DoStartTransaction(const AConnectionName: String); override;
+    class procedure _DoCommitTransaction(const AConnectionName: String); override;
+    class procedure _DoRollbackTransaction(const AConnectionName: String); override;
+    class function _DoInTransaction(const AConnectionName: String): Boolean; override;
     // SynchroStrategy
-    class procedure DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload); override;
+    class procedure _DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload); override;
     // SQLDestinations
-    class procedure SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); override;
-    class procedure SQLDest_Execute(const ASQLDestination: IioSQLDestination); override;
+    class procedure _DoSQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); override;
+    class procedure _DoSQLDest_Execute(const ASQLDestination: IioSQLDestination); override;
+    // Auth
+    class function _DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String): Boolean; override;
+    class function _DoAuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean; override;
+    class function _DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean; override;
+    class function _DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; override;
+    class function _DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; override;
+    // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
   end;
 
 implementation
@@ -117,13 +126,43 @@ type
 
 { TioStrategyDB }
 
-class procedure TioPersistenceStrategyDB.CommitTransaction(const AConnectionName: String);
+class function TioPersistenceStrategyDB._DoAuthorizeAccess(const AConnectionDefName, AScope: String; const AAuthIntention: TioAuthIntention;
+  const AAccessToken: String): Boolean;
+begin
+
+end;
+
+class function TioPersistenceStrategyDB._DoAuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials;
+  AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean;
+begin
+
+end;
+
+class function TioPersistenceStrategyDB._DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials;
+  out ResultUserAuthorizationToken: String): Boolean;
+begin
+
+end;
+
+class function TioPersistenceStrategyDB._DoAuth_NewAccessToken(const AConnectionDefName, AAuthorizationToken: String; out AResultAccessToken,
+  AResultRefreshToken: String): Boolean;
+begin
+
+end;
+
+class function TioPersistenceStrategyDB._DoAuth_RefreshAccessToken(const AConnectionDefName, ARefreshToken: String; out AResultAccessToken,
+  AResultRefreshToken: String): Boolean;
+begin
+
+end;
+
+class procedure TioPersistenceStrategyDB._DoCommitTransaction(const AConnectionName: String);
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).Commit;
 end;
 
-class function TioPersistenceStrategyDB.Count(const AWhere: IioWhere): Integer;
+class function TioPersistenceStrategyDB._DoCount(const AWhere: IioWhere): Integer;
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
@@ -172,7 +211,7 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyDB.Delete(const AWhere: IioWhere);
+class procedure TioPersistenceStrategyDB._DoDelete(const AWhere: IioWhere);
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
@@ -240,7 +279,7 @@ begin
   // (a maggior ragione nel caso di una TList<IInterface> di interfacce, quindi avvio una transazione
   // sulla connessione di default che va bene nel 99% delle volte (raramente l'applicazione dichiererà classi
   // che operano su Database diversi contemporaneamente.
-  Self.StartTransaction('');
+  Self._DoStartTransaction('');
   try
     // Wrap the DestList into a DuckTypedList
     LDuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
@@ -250,9 +289,9 @@ begin
       // Persist object
       Self._DoDeleteObject(LObj, AIntent, ABlindLevel);
     end;
-    Self.CommitTransaction('');
+    Self._DoCommitTransaction('');
   except
-    Self.RollbackTransaction('');
+    Self._DoRollbackTransaction('');
     raise;
   end;
 end;
@@ -278,7 +317,7 @@ begin
   if LContext.Map.GetTable.IsNotPersistedEntity then
     Exit;
   // Start transaction
-  StartTransaction(LContext.GetTable.GetConnectionDefName);
+  _DoStartTransaction(LContext.GetTable.GetConnectionDefName);
   try
 
 {$REGION '-----INTERCEPTORS-----'}
@@ -301,13 +340,13 @@ begin
 {$ENDIF}
 {$ENDREGION}
     // Commit
-    CommitTransaction(LContext.GetTable.GetConnectionDefName);
+    _DoCommitTransaction(LContext.GetTable.GetConnectionDefName);
 
   except
     on E: Exception do
     begin
       // Rollback
-      RollbackTransaction(LContext.GetTable.GetConnectionDefName);
+      _DoRollbackTransaction(LContext.GetTable.GetConnectionDefName);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
       if TioCRUDInterceptorRegister.OnDeleteException(LContext, E) then
@@ -351,7 +390,7 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyDB.DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload);
+class procedure TioPersistenceStrategyDB._DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload);
 begin
   inherited;
   APayload.Initialize;
@@ -435,13 +474,13 @@ begin
   AContext.ObjStatus := osClean;
 end;
 
-class function TioPersistenceStrategyDB.InTransaction(const AConnectionName: String): Boolean;
+class function TioPersistenceStrategyDB._DoInTransaction(const AConnectionName: String): Boolean;
 begin
   inherited;
   Result := TioDBFactory.Connection(AConnectionName).InTransaction;
 end;
 
-class function TioPersistenceStrategyDB.LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
+class function TioPersistenceStrategyDB._DoLoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
 var
   LContext: IioContext;
   LQuery: IioQuery;
@@ -467,7 +506,7 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyDB.LoadObjVersion(const AContext: IioContext): Integer;
+class function TioPersistenceStrategyDB._DoLoadObjVersion(const AContext: IioContext): Integer;
 begin
   // NB: Ho riflettuto bene sul come ottenere l'ultima ObjVersion (la più alta) assegnata
   // per poi aggiungere 1 e ottenere la prossima e ho individuato 2 metodi:
@@ -525,7 +564,7 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyDB.Max(const AWhere: IioWhere; const APropertyName: String): Integer;
+class function TioPersistenceStrategyDB._DoMax(const AWhere: IioWhere; const APropertyName: String): Integer;
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
@@ -577,7 +616,7 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyDB.Min(const AWhere: IioWhere; const APropertyName: String): Integer;
+class function TioPersistenceStrategyDB._DoMin(const AWhere: IioWhere; const APropertyName: String): Integer;
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
@@ -669,7 +708,7 @@ begin
   // (a maggior ragione nel caso di una TList<IInterface> di interfacce, quindi avvio una transazione
   // sulla connessione di default che va bene nel 99% delle volte (raramente l'applicazione dichiererà classi
   // che operano su Database diversi contemporaneamente.
-  StartTransaction('');
+  _DoStartTransaction('');
   try
     // Wrap the DestList into a DuckTypedList
     LDuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
@@ -677,9 +716,9 @@ begin
     for LObj in LDuckTypedList do
       _DoPersistObject(LObj, AIntent, ARelationPropertyName, ARelationOID, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath, ABlindLevel);
     // Commit the transaction
-    CommitTransaction('');
+    _DoCommitTransaction('');
   except
-    RollbackTransaction('');
+    _DoRollbackTransaction('');
     raise;
   end;
 end;
@@ -772,7 +811,7 @@ begin
   if LContext.Map.GetTable.IsNotPersistedEntity then
     Exit;
   // Start transaction
-  StartTransaction(LContext.GetTable.GetConnectionDefName);
+  _DoStartTransaction(LContext.GetTable.GetConnectionDefName);
   try
     // Set/Update MasterID property if this is a relation child object (HasMany, HasOne, BelongsTo)
     // NB: (LContext.GetProperties.GetPropertyByName(ARelationPropertyName).GetRelationType = rtNone) perchè altrimenti in alcuni casi particolare dava errori
@@ -820,13 +859,13 @@ begin
 {$ENDIF}
 {$ENDREGION}
     // Commit
-    CommitTransaction(LContext.GetTable.GetConnectionDefName);
+    _DoCommitTransaction(LContext.GetTable.GetConnectionDefName);
 
   except
     on E: Exception do
     begin
       // Rollback
-      RollbackTransaction(LContext.GetTable.GetConnectionDefName);
+      _DoRollbackTransaction(LContext.GetTable.GetConnectionDefName);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
       if _Interceptors_InterceptException(E) then
@@ -916,13 +955,13 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyDB.RollbackTransaction(const AConnectionName: String);
+class procedure TioPersistenceStrategyDB._DoRollbackTransaction(const AConnectionName: String);
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).Rollback;
 end;
 
-class procedure TioPersistenceStrategyDB.SQLDest_Execute(const ASQLDestination: IioSQLDestination);
+class procedure TioPersistenceStrategyDB._DoSQLDest_Execute(const ASQLDestination: IioSQLDestination);
 var
   LQry: IioQuery;
 begin
@@ -944,7 +983,7 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyDB.SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet);
+class procedure TioPersistenceStrategyDB._DoSQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet);
 var
   LQry: IioQuery;
 begin
@@ -975,13 +1014,13 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyDB.StartTransaction(const AConnectionName: String);
+class procedure TioPersistenceStrategyDB._DoStartTransaction(const AConnectionName: String);
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).StartTransaction;
 end;
 
-class procedure TioPersistenceStrategyDB.LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
+class procedure TioPersistenceStrategyDB._DoLoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;

@@ -458,54 +458,79 @@ type
   TioPersistenceStrategyIntf = class abstract
   protected
     // ========== BEGIN OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
+    // Persistence
     // ---------- Begin intercepted methods (CRUDInterceptors) ----------
-    class procedure _DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
-      const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
-      const ABlindLevel: Byte); virtual; abstract;
+    class procedure _DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); virtual; abstract;
+    class procedure _DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); virtual; abstract;
+    class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType); virtual; abstract;
+    class function _DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; virtual; abstract;
     class procedure _DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
       const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
       const ABlindLevel: Byte); virtual; abstract;
-    class procedure _DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); virtual; abstract;
-    class procedure _DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); virtual; abstract;
-    class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType); virtual; abstract;
-    class function _DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; virtual; abstract;
+    class procedure _DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
+      const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
+      const ABlindLevel: Byte); virtual; abstract;
     // ---------- End intercepted methods (CRUDInterceptors) ----------
-  public
-    class procedure StartTransaction(const AConnectionName: String); virtual; abstract;
-    class procedure CommitTransaction(const AConnectionName: String); virtual; abstract;
-    class procedure RollbackTransaction(const AConnectionName: String); virtual; abstract;
-    class function InTransaction(const AConnectionName: String): Boolean; virtual; abstract;
-    class procedure Delete(const AWhere: IioWhere); virtual;
-    class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); virtual;
-    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; virtual;
-    class function LoadObjVersion(const AContext: IioContext): Integer; virtual; abstract;
-    class function Count(const AWhere: IioWhere): Integer; virtual;
-    class function Max(const AWhere: IioWhere; const APropertyName: String): Integer; virtual;
-    class function Min(const AWhere: IioWhere; const APropertyName: String): Integer; virtual;
+    class function _DoCount(const AWhere: IioWhere): Integer; virtual;
+    class procedure _DoDelete(const AWhere: IioWhere); virtual;
+    class procedure _DoLoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); virtual;
+    class function _DoLoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; virtual;
+    class function _DoLoadObjVersion(const AContext: IioContext): Integer; virtual; abstract;
+    class function _DoMax(const AWhere: IioWhere; const APropertyName: String): Integer; virtual;
+    class function _DoMin(const AWhere: IioWhere; const APropertyName: String): Integer; virtual;
+    // Transaction
+    class procedure _DoStartTransaction(const AConnectionName: String); virtual; abstract;
+    class procedure _DoCommitTransaction(const AConnectionName: String); virtual; abstract;
+    class procedure _DoRollbackTransaction(const AConnectionName: String); virtual; abstract;
+    class function _DoInTransaction(const AConnectionName: String): Boolean; virtual; abstract;
     // SynchroStrategy
-    class procedure DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload); virtual; abstract;
+    class procedure _DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload); virtual; abstract;
     // SQLDestinations
-    class procedure SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); virtual; abstract;
-    class procedure SQLDest_Execute(const ASQLDestination: IioSQLDestination); virtual; abstract;
+    class procedure _DoSQLDest_Execute(const ASQLDestination: IioSQLDestination); virtual; abstract;
+    class procedure _DoSQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); virtual; abstract;
     // Auth
-    class function AuthorizeUser(const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String): Boolean; virtual; abstract;
-    class function AuthorizeApp(const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean; virtual; abstract;
-    class function AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean; virtual; abstract;
-    class function Auth_NewAccessToken(const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; virtual; abstract;
-    class function Auth_RefreshAccessToken(const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; virtual; abstract;
+    class function _DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String): Boolean; virtual; abstract;
+    class function _DoAuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean; virtual; abstract;
+    class function _DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean; virtual; abstract;
+    class function _DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; virtual; abstract;
+    class function _DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; virtual; abstract;
     // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
-
+  public
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------
+    class procedure DeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
+    class procedure DeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
+    class procedure LoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType);
+    class function LoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
     class procedure PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
       const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
       const ABlindLevel: Byte);
     class procedure PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
-    class procedure DeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
-    class procedure DeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
-    class procedure LoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType);
-    class function LoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
     // ---------- End intercepted methods (StrategyInterceptors) ----------
+    // Transaction
+    class procedure StartTransaction(const AConnectionName: String);
+    class procedure CommitTransaction(const AConnectionName: String);
+    class procedure RollbackTransaction(const AConnectionName: String);
+    class function InTransaction(const AConnectionName: String): Boolean;
+    // Persistence
+    class procedure Delete(const AWhere: IioWhere);
+    class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
+    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
+    class function LoadObjVersion(const AContext: IioContext): Integer;
+    class function Count(const AWhere: IioWhere): Integer;
+    class function Max(const AWhere: IioWhere; const APropertyName: String): Integer;
+    class function Min(const AWhere: IioWhere; const APropertyName: String): Integer;
+    // SynchroStrategy
+    class procedure DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload);
+    // SQLDestinations
+    class procedure SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet);
+    class procedure SQLDest_Execute(const ASQLDestination: IioSQLDestination);
+    // Auth
+    class function AuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String): Boolean;
+    class function AuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean;
+    class function AuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean;
+    class function Auth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean;
+    class function Auth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean;
   end;
 
 implementation
@@ -897,38 +922,88 @@ end;
 
 { TioStrategyIntf }
 
-class function TioPersistenceStrategyIntf.Count(const AWhere: IioWhere): Integer;
+class function TioPersistenceStrategyIntf.AuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean;
+begin
+  Result := _DoAuthorizeAccess(AConnectionDefName, AScope, AAuthIntention, AAccessToken);
+end;
+
+class function TioPersistenceStrategyIntf.AuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean;
+begin
+  Result := _DoAuthorizeApp(AConnectionDefName, AAppCredentials, AUserAuthorizationToken, ResultAppAuthorizationToken);
+end;
+
+class function TioPersistenceStrategyIntf.AuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String): Boolean;
+begin
+  Result := _DoAuthorizeUser(AConnectionDefName, AUserCredentials, ResultUserAuthorizationToken);
+end;
+
+class function TioPersistenceStrategyIntf.Auth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean;
+begin
+  Result := _DoAuth_NewAccessToken(AConnectionDefName, AAuthorizationToken, AResultAccessToken, AResultRefreshToken);
+end;
+
+class function TioPersistenceStrategyIntf.Auth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean;
+begin
+  Result := _DoAuth_RefreshAccessToken(AConnectionDefName, ARefreshToken, AResultAccessToken, AResultRefreshToken);
+end;
+
+class procedure TioPersistenceStrategyIntf.CommitTransaction(const AConnectionName: String);
+begin
+  _DoCommitTransaction(AConnectionName);
+end;
+
+class function TioPersistenceStrategyIntf._DoCount(const AWhere: IioWhere): Integer;
 begin
   Result := 0;
   AWhere.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
 
-class procedure TioPersistenceStrategyIntf.Delete(const AWhere: IioWhere);
+class procedure TioPersistenceStrategyIntf._DoDelete(const AWhere: IioWhere);
 begin
   AWhere.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
 
-class procedure TioPersistenceStrategyIntf.LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
+class procedure TioPersistenceStrategyIntf._DoLoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
 begin
   AWhere.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
 
-class function TioPersistenceStrategyIntf.LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
+class function TioPersistenceStrategyIntf._DoLoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
 begin
   Result := nil;
   AWhere.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
 
-class function TioPersistenceStrategyIntf.Max(const AWhere: IioWhere; const APropertyName: String): Integer;
+class function TioPersistenceStrategyIntf._DoMax(const AWhere: IioWhere; const APropertyName: String): Integer;
 begin
   Result := 0;
   AWhere.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
 
+class function TioPersistenceStrategyIntf.Max(const AWhere: IioWhere; const APropertyName: String): Integer;
+begin
+  Result := _DoMax(AWhere, APropertyName);
+end;
+
 class function TioPersistenceStrategyIntf.Min(const AWhere: IioWhere; const APropertyName: String): Integer;
+begin
+  Result := _DoMin(AWhere, APropertyName);
+end;
+
+class function TioPersistenceStrategyIntf._DoMin(const AWhere: IioWhere; const APropertyName: String): Integer;
 begin
   Result := 0;
   AWhere.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
+end;
+
+class function TioPersistenceStrategyIntf.Count(const AWhere: IioWhere): Integer;
+begin
+  Result := _DoCount(AWhere);
+end;
+
+class procedure TioPersistenceStrategyIntf.Delete(const AWhere: IioWhere);
+begin
+  _DoDelete(AWhere);
 end;
 
 class procedure TioPersistenceStrategyIntf.DeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
@@ -977,6 +1052,21 @@ begin
   TioStrategyInterceptorRegister.AfterDeleteObject(AObj);
 {$ENDIF}
 {$ENDREGION}
+end;
+
+class procedure TioPersistenceStrategyIntf.DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload);
+begin
+  _DoSynchronization(APayload);
+end;
+
+class function TioPersistenceStrategyIntf.InTransaction(const AConnectionName: String): Boolean;
+begin
+  Result := _DoInTransaction(AConnectionName);
+end;
+
+class procedure TioPersistenceStrategyIntf.LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
+begin
+  _DoLoadDataSet(AWhere, ADestDataSet);
 end;
 
 class procedure TioPersistenceStrategyIntf.LoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType);
@@ -1030,6 +1120,16 @@ begin
 {$ENDREGION}
 end;
 
+class function TioPersistenceStrategyIntf.LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
+begin
+  Result := _DoLoadObjectByClassOnly(AWhere, AObj, AIntent);
+end;
+
+class function TioPersistenceStrategyIntf.LoadObjVersion(const AContext: IioContext): Integer;
+begin
+  Result := _DoLoadObjVersion(AContext);
+end;
+
 class procedure TioPersistenceStrategyIntf.PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
 {$REGION '-----INTERCEPTORS-----'}
@@ -1079,6 +1179,26 @@ begin
   TioStrategyInterceptorRegister.AfterPersistObject(AObj);
 {$ENDIF}
 {$ENDREGION}
+end;
+
+class procedure TioPersistenceStrategyIntf.RollbackTransaction(const AConnectionName: String);
+begin
+  _DoRollbackTransaction(AConnectionName);
+end;
+
+class procedure TioPersistenceStrategyIntf.SQLDest_Execute(const ASQLDestination: IioSQLDestination);
+begin
+ _DoSQLDest_Execute(ASQLDestination);
+end;
+
+class procedure TioPersistenceStrategyIntf.SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet);
+begin
+ _DoSQLDest_LoadDataSet(ASQLDestination, ADestDataSet);
+end;
+
+class procedure TioPersistenceStrategyIntf.StartTransaction(const AConnectionName: String);
+begin
+  _DoStartTransaction(AConnectionName);
 end;
 
 { TioConnectionInfo }

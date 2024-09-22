@@ -170,6 +170,8 @@ end;
 class function TioAuthServer.GetInstance: TioAuthServer;
 begin
   Result := TioAuthServer.FInstance;
+  if not Assigned(Result) then
+    raise EioAuthServerComponentNotFound_501.Create('"TioAuthServer" singleton component not found');
 end;
 
 function TioAuthServer.Get_Version: String;

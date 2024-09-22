@@ -38,7 +38,7 @@ interface
 uses
   iORM.PersistenceStrategy.Interfaces, iORM.Where.Interfaces, iORM.DB.Interfaces,
   FireDAC.Comp.DataSet, iORM.LiveBindings.BSPersistence, iORM.CommonTypes,
-  iORM.SynchroStrategy.Custom;
+  iORM.SynchroStrategy.Custom, iORM.Auth.Interfaces;
 
 type
 
@@ -47,32 +47,42 @@ type
   // Strategy class for database
   TioPersistenceStrategyHttp = class(TioPersistenceStrategyIntf)
   protected
+    // ========== BEGIN OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
+    // persistence
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------
-    class procedure _DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte); override;
+    class procedure _DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); override;
+    class procedure _DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); override;
+    class function _DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
+    class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType); override;
     class procedure _DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte); override;
-    class procedure _DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); override;
-    class procedure _DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); override;
-    class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType); override;
-    class function _DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
+    class procedure _DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte); override;
     // ---------- End intercepted methods (StrategyInterceptors) ----------
   public
-    class procedure StartTransaction(const AConnectionName: String); override;
-    class procedure CommitTransaction(const AConnectionName: String); override;
-    class procedure RollbackTransaction(const AConnectionName: String); override;
-    class function InTransaction(const AConnectionName: String): boolean; override;
-    class procedure Delete(const AWhere: IioWhere); override;
-    class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
-    class function LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
-    class function Count(const AWhere: IioWhere): Integer; override;
-    class function Max(const AWhere: IioWhere; const APropertyName: String): Integer; override;
-    class function Min(const AWhere: IioWhere; const APropertyName: String): Integer; override;
+    class procedure _DoDelete(const AWhere: IioWhere); override;
+    class procedure _DoLoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
+    class function _DoLoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
+    class function _DoCount(const AWhere: IioWhere): Integer; override;
+    class function _DoMax(const AWhere: IioWhere; const APropertyName: String): Integer; override;
+    class function _DoMin(const AWhere: IioWhere; const APropertyName: String): Integer; override;
+    // Transaction
+    class procedure _DoStartTransaction(const AConnectionName: String); override;
+    class procedure _DoCommitTransaction(const AConnectionName: String); override;
+    class procedure _DoRollbackTransaction(const AConnectionName: String); override;
+    class function _DoInTransaction(const AConnectionName: String): boolean; override;
     // SynchroStrategy
-    class procedure DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload); override;
+    class procedure _DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload); override;
     // SQLDestinations
-    class procedure SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); override;
-    class procedure SQLDest_Execute(const ASQLDestination: IioSQLDestination); override;
+    class procedure _DoSQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); override;
+    class procedure _DoSQLDest_Execute(const ASQLDestination: IioSQLDestination); override;
+    // Auth
+    class function _DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String): Boolean; override;
+    class function _DoAuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean; override;
+    class function _DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean; override;
+    class function _DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; override;
+    class function _DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; override;
+    // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
   end;
 
 implementation
@@ -86,7 +96,7 @@ uses
 
 { TioStrategyHttp }
 
-class function TioPersistenceStrategyHttp.Count(const AWhere: IioWhere): Integer;
+class function TioPersistenceStrategyHttp._DoCount(const AWhere: IioWhere): Integer;
 var
   LConnection: IioConnectionHttp;
 begin
@@ -113,7 +123,7 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyHttp.Delete(const AWhere: IioWhere);
+class procedure TioPersistenceStrategyHttp._DoDelete(const AWhere: IioWhere);
 var
   LConnection: IioConnectionHttp;
 begin
@@ -138,7 +148,7 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyHttp.DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload);
+class procedure TioPersistenceStrategyHttp._DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload);
 var
   LConnection: IioConnectionHttp;
 begin
@@ -222,7 +232,7 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyHttp.LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
+class procedure TioPersistenceStrategyHttp._DoLoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
 var
   LConnection: IioConnectionHttp;
 begin
@@ -314,14 +324,14 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyHttp.LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
+class function TioPersistenceStrategyHttp._DoLoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
 begin
   // This method is only used internally by the Object Maker,
   // and then you do not need to implement it in RESTStrategy.
   raise EioGenericException.Create(Self.ClassName + ': "LoadObjectByClassOnly", method not implemented in this strategy.');
 end;
 
-class function TioPersistenceStrategyHttp.Max(const AWhere: IioWhere; const APropertyName: String): Integer;
+class function TioPersistenceStrategyHttp._DoMax(const AWhere: IioWhere; const APropertyName: String): Integer;
 var
   LConnection: IioConnectionHttp;
 begin
@@ -349,7 +359,7 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyHttp.Min(const AWhere: IioWhere; const APropertyName: String): Integer;
+class function TioPersistenceStrategyHttp._DoMin(const AWhere: IioWhere; const APropertyName: String): Integer;
 var
   LConnection: IioConnectionHttp;
 begin
@@ -451,7 +461,7 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyHttp.SQLDest_Execute(const ASQLDestination: IioSQLDestination);
+class procedure TioPersistenceStrategyHttp._DoSQLDest_Execute(const ASQLDestination: IioSQLDestination);
 var
   LConnection: IioConnectionHttp;
 begin
@@ -476,7 +486,7 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyHttp.SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet);
+class procedure TioPersistenceStrategyHttp._DoSQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet);
 var
   LConnection: IioConnectionHttp;
 begin
@@ -503,25 +513,179 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyHttp.StartTransaction(const AConnectionName: String);
+class procedure TioPersistenceStrategyHttp._DoStartTransaction(const AConnectionName: String);
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).StartTransaction;
 end;
 
-class procedure TioPersistenceStrategyHttp.CommitTransaction(const AConnectionName: String);
+class function TioPersistenceStrategyHttp._DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean;
+var
+  LConnection: IioConnectionHttp;
+begin
+  inherited;
+  // Get the connection, set the request and execute it
+  LConnection := TioDBFactory.Connection(AConnectionDefName).AsHttpConnection;
+  // Start transaction
+  // NB: In this strategy (HTTP) call the Connection.StartTransaction (not the Self.StartTransaction
+  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  // perform any http call to the server at this point.
+  LConnection.StartTransaction;
+  try
+    // Set request parameters
+    LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.AuthScope := AScope;
+    LConnection.ioRequestBody.AuthIntention := AAuthIntention;
+    LConnection.ioRequestBody.AuthToken := AAccessToken;
+    // Execute
+    LConnection.Execute(HTTP_METHOD_NAME_AUTH_AUTHORIZEACCESS);
+    // Set result values
+    Result := LConnection.ioResponseBody.AuthResultIsAuthorized;
+    // Commit
+    LConnection.Commit;
+  except
+    // Rollback
+    LConnection.Rollback;
+    raise;
+  end;
+end;
+
+class function TioPersistenceStrategyHttp._DoAuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean;
+var
+  LConnection: IioConnectionHttp;
+begin
+  inherited;
+  // Get the connection, set the request and execute it
+  LConnection := TioDBFactory.Connection(AConnectionDefName).AsHttpConnection;
+  // Start transaction
+  // NB: In this strategy (HTTP) call the Connection.StartTransaction (not the Self.StartTransaction
+  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  // perform any http call to the server at this point.
+  LConnection.StartTransaction;
+  try
+    // Set request parameters
+    LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.AuthToken := AUserAuthorizationToken;
+    LConnection.ioRequestBody.JSONDataValueAsObject := AAppCredentials as TObject;
+    // Execute
+    LConnection.Execute(HTTP_METHOD_NAME_AUTH_AUTHORIZEUSER);
+    // Set result values
+    Result := LConnection.ioResponseBody.AuthResultIsAuthorized;
+    ResultAppAuthorizationToken := LConnection.ioResponseBody.AuthResult1;
+    // Commit
+    LConnection.Commit;
+  except
+    // Rollback
+    LConnection.Rollback;
+    raise;
+  end;
+end;
+
+class function TioPersistenceStrategyHttp._DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String): Boolean;
+var
+  LConnection: IioConnectionHttp;
+begin
+  inherited;
+  // Get the connection, set the request and execute it
+  LConnection := TioDBFactory.Connection(AConnectionDefName).AsHttpConnection;
+  // Start transaction
+  // NB: In this strategy (HTTP) call the Connection.StartTransaction (not the Self.StartTransaction
+  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  // perform any http call to the server at this point.
+  LConnection.StartTransaction;
+  try
+    // Set request parameters
+    LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.JSONDataValueAsObject := AUserCredentials as TObject;
+    // Execute
+    LConnection.Execute(HTTP_METHOD_NAME_AUTH_AUTHORIZEUSER);
+    // Set result values
+    Result := LConnection.ioResponseBody.AuthResultIsAuthorized;
+    ResultUserAuthorizationToken := LConnection.ioResponseBody.AuthResult1;
+    // Commit
+    LConnection.Commit;
+  except
+    // Rollback
+    LConnection.Rollback;
+    raise;
+  end;
+end;
+
+class function TioPersistenceStrategyHttp._DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean;
+var
+  LConnection: IioConnectionHttp;
+begin
+  inherited;
+  // Get the connection, set the request and execute it
+  LConnection := TioDBFactory.Connection(AConnectionDefName).AsHttpConnection;
+  // Start transaction
+  // NB: In this strategy (HTTP) call the Connection.StartTransaction (not the Self.StartTransaction
+  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  // perform any http call to the server at this point.
+  LConnection.StartTransaction;
+  try
+    // Set request parameters
+    LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.AuthToken := AAuthorizationToken;
+    // Execute
+    LConnection.Execute(HTTP_METHOD_NAME_AUTH_NEWACCESSTOKEN);
+    // Set result values
+    Result := LConnection.ioResponseBody.AuthResultIsAuthorized;
+    AResultAccessToken := LConnection.ioResponseBody.AuthResult1;
+    AResultRefreshToken := LConnection.ioResponseBody.AuthResult2;
+    // Commit
+    LConnection.Commit;
+  except
+    // Rollback
+    LConnection.Rollback;
+    raise;
+  end;
+end;
+
+class function TioPersistenceStrategyHttp._DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean;
+var
+  LConnection: IioConnectionHttp;
+begin
+  inherited;
+  // Get the connection, set the request and execute it
+  LConnection := TioDBFactory.Connection(AConnectionDefName).AsHttpConnection;
+  // Start transaction
+  // NB: In this strategy (HTTP) call the Connection.StartTransaction (not the Self.StartTransaction
+  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  // perform any http call to the server at this point.
+  LConnection.StartTransaction;
+  try
+    // Set request parameters
+    LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.AuthToken := ARefreshToken;
+    // Execute
+    LConnection.Execute(HTTP_METHOD_NAME_AUTH_REFRESHACCESSTOKEN);
+    // Set result values
+    Result := LConnection.ioResponseBody.AuthResultIsAuthorized;
+    AResultAccessToken := LConnection.ioResponseBody.AuthResult1;
+    AResultRefreshToken := LConnection.ioResponseBody.AuthResult2;
+    // Commit
+    LConnection.Commit;
+  except
+    // Rollback
+    LConnection.Rollback;
+    raise;
+  end;
+end;
+
+class procedure TioPersistenceStrategyHttp._DoCommitTransaction(const AConnectionName: String);
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).Commit;
 end;
 
-class procedure TioPersistenceStrategyHttp.RollbackTransaction(const AConnectionName: String);
+class procedure TioPersistenceStrategyHttp._DoRollbackTransaction(const AConnectionName: String);
 begin
   inherited;
   TioDBFactory.Connection(AConnectionName).Rollback;
 end;
 
-class function TioPersistenceStrategyHttp.InTransaction(const AConnectionName: String): boolean;
+class function TioPersistenceStrategyHttp._DoInTransaction(const AConnectionName: String): boolean;
 begin
   inherited;
   Result := TioDBFactory.Connection(AConnectionName).InTransaction;
