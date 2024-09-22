@@ -59,6 +59,7 @@ const
   KEY_AUTH_INTENTION = 'AuthIntention';
   KEY_AUTH_SCOPE = 'AuthScope';
   KEY_AUTH_TOKEN = 'AuthToken';
+  KEY_AUTH_RESULT_ISAUTHORIZED = 'AuthResultIsAuthorized';
   KEY_AUTH_RESULT1 = 'AuthResult1';
   KEY_AUTH_RESULT2 = 'AuthResult2';
   KEY_BLINDLEVEL = 'BlindLevel';

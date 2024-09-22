@@ -43,6 +43,7 @@ type
   TioHttpResponseBody = class(TInterfacedObject, IioHttpResponseBody)
   private
     // auth
+    FAuthResultIsAuthorized: Boolean;
     FAuthResult1: String;
     FAuthResult2: String;
     // others
@@ -52,6 +53,7 @@ type
     FStream: TStream;
     // methods
     function ExceptionOccurred: Boolean;
+    function GetAuthResultIsAuthorized: Boolean;
     function GetAuthResult1: String;
     function GetAuthResult2: String;
     function GetExceptionClassName: String;
@@ -59,6 +61,7 @@ type
     function GetJSONDataValue: TJSONValue;
     function GetJSONDataValueAsObject: TObject;
     function GetStream: TStream;
+    procedure SetAuthResultIsAuthorized(const Value: Boolean);
     procedure SetAuthResult1(const Value: String);
     procedure SetAuthResult2(const Value: String);
     procedure SetExceptionClassName(const Value: String);
@@ -83,6 +86,7 @@ constructor TioHttpResponseBody.Create;
 begin
   inherited Create;
   // auth
+  FAuthResultIsAuthorized := False;
   FAuthResult1 := IO_STRING_NULL_VALUE;
   FAuthResult2 := IO_STRING_NULL_VALUE;
   // others
@@ -115,6 +119,10 @@ begin
   LJSONObject := TJSONObject.ParseJSONValue(AJSONString) as TJSONObject;
   try
     // ---------- session ----------
+    // AuthResultIsAuthorized
+    LJSONValue := LJSONObject.GetValue(KEY_AUTH_RESULT_ISAUTHORIZED);
+    if Assigned(LJSONValue) then
+      FAuthResultIsAuthorized := (LJSONValue as TJSONBool).AsBoolean;
     // AuthResult1
     LJSONValue := LJSONObject.GetValue(KEY_AUTH_RESULT1);
     if Assigned(LJSONValue) then
@@ -170,14 +178,19 @@ begin
   Result := FAuthResult2;
 end;
 
+function TioHttpResponseBody.GetAuthResultIsAuthorized: Boolean;
+begin
+ Result := FAuthResultIsAuthorized;
+end;
+
 function TioHttpResponseBody.GetExceptionClassName: String;
 begin
-   Result := FExceptionClassName;
+ Result := FExceptionClassName;
 end;
 
 function TioHttpResponseBody.GetExceptionMessage: String;
 begin
-   Result := FExceptionMessage;
+ Result := FExceptionMessage;
 end;
 
 function TioHttpResponseBody.GetJSONDataValue: TJSONValue;
@@ -208,6 +221,11 @@ end;
 procedure TioHttpResponseBody.SetAuthResult2(const Value: String);
 begin
   FAuthResult2 := Value;
+end;
+
+procedure TioHttpResponseBody.SetAuthResultIsAuthorized(const Value: Boolean);
+begin
+  FAuthResultIsAuthorized := Value;
 end;
 
 procedure TioHttpResponseBody.SetExceptionClassName(const Value: String);
@@ -255,6 +273,8 @@ begin
   LJSONObject := TJSONObject.Create;
   try
     // ---------- session ----------
+    // AuthResultIsAuthorized
+    LJSONObject.AddPair(KEY_AUTH_RESULT_ISAUTHORIZED, FAuthResultIsAuthorized);
     // AuthResult1
     LJSONObject.AddPair(KEY_AUTH_RESULT1, FAuthResult1);
     // AuthResult2
