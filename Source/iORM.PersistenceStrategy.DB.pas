@@ -106,7 +106,7 @@ uses
   iORM.LazyLoad.Factory, iORM.Resolver.Factory, iORM.Where.Factory,
   iORM.Exceptions, iORM, System.SysUtils, System.Generics.Collections,
   iORM.Interceptor.CRUD, iORM.Interceptor.CRUD.Register, iORM.Utilities,
-  iORM.SynchroStrategy.Interfaces;
+  iORM.SynchroStrategy.Interfaces, iORM.Auth.Components.AuthServer;
 
 type
 
@@ -129,31 +129,31 @@ type
 class function TioPersistenceStrategyDB._DoAuthorizeAccess(const AConnectionDefName, AScope: String; const AAuthIntention: TioAuthIntention;
   const AAccessToken: String): Boolean;
 begin
-
+  Result := TioAuthServer.GetInstance.AuthorizeAccess(AScope, AAuthIntention, AAccessToken);
 end;
 
 class function TioPersistenceStrategyDB._DoAuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials;
   AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean;
 begin
-
+  Result := TioAuthServer.GetInstance.AuthorizeApp(AAppCredentials, AUserAuthorizationToken, ResultAppAuthorizationToken);
 end;
 
 class function TioPersistenceStrategyDB._DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials;
   out ResultUserAuthorizationToken: String): Boolean;
 begin
-
+  Result := TioAuthServer.GetInstance.AuthorizeUser(AUserCredentials, ResultUserAuthorizationToken);
 end;
 
 class function TioPersistenceStrategyDB._DoAuth_NewAccessToken(const AConnectionDefName, AAuthorizationToken: String; out AResultAccessToken,
   AResultRefreshToken: String): Boolean;
 begin
-
+  Result := TioAuthServer.GetInstance.NewAccessToken(AAuthorizationToken, AResultAccessToken, AResultRefreshToken);
 end;
 
 class function TioPersistenceStrategyDB._DoAuth_RefreshAccessToken(const AConnectionDefName, ARefreshToken: String; out AResultAccessToken,
   AResultRefreshToken: String): Boolean;
 begin
-
+  Result := TioAuthServer.GetInstance.RefreshAccessToken(ARefreshToken, AResultAccessToken, AResultRefreshToken);
 end;
 
 class procedure TioPersistenceStrategyDB._DoCommitTransaction(const AConnectionName: String);
