@@ -62,6 +62,7 @@ type
     Fiss: String; // issuer (rappresente colui che ha rilasciato il token, potrebbe essere l'authorization server stesso)
     Fjti: String; // jwt id (id univoco che identifica il token, es. si usa per annullare un token emesso attraverso una black list)
     Fnbf: TDateTime; // not before
+    Frfa: TDateTime; // the access token nedd to be refreshed after this DateTime
     Fsub: String; // subject (indica il soggetto destinatario del token, es. id dell'utente che richiesto autorizzazzione accesso a risorse)
     Ftyp: String; // indica il tipo di token
     // others
@@ -74,8 +75,9 @@ type
     function _DoEncodePayload: String; inline;
   protected
     // ---------- methods to be overrided ----------
-    function _DoIsExpired: Boolean; virtual;
-    function _DoIsNotYetValid: Boolean; virtual;
+    function _DoIsExpired(const ANow: TDateTime): Boolean; virtual;
+    function _DoIsNotYetValid(const ANow: TDateTime): Boolean; virtual;
+    function _DoIsToBeRefreshed(const ANow: TDateTime): Boolean; virtual;
     function _DoSign(const AEncodedHeader, AEncodedPayload, ASecret: String): String; virtual;
     function _DoVerifySignature(const AEncodedHeader, AEncodedPayload, ASignature, ASecret: String): Boolean; virtual;
     // ---------- methods to be overrided ----------
@@ -91,12 +93,14 @@ type
     function HasIssuer: Boolean;
     function HasJwtID: Boolean;
     function HasNotBefore: Boolean;
+    function HasRefreshAfter: Boolean;
     function HasSubject: Boolean;
     function HasTokenType: Boolean;
     function TokenAsString(const ASecret: String): String;
     // checks
-    function IsExpired: Boolean;
-    function IsNotYetValid: Boolean;
+    function IsExpired(const ANow: TDateTime): Boolean;
+    function IsNotYetValid(const ANow: TDateTime): Boolean;
+    function IsToBeRefreshed(const ANow: TDateTime): Boolean;
     // claims
     property AppID: String read Fapp write Fapp;
     property Audience: String read Faud write Faud;
@@ -105,6 +109,7 @@ type
     property Issuer: String read Fiss write Fiss;
     property JwtID: String read Fjti write Fjti;
     property NotBefore: TDateTime read Fnbf write Fnbf;
+    property RefreshAfter: TDateTime read Frfa write Frfa;
     property Subject: String read Fsub write Fsub;
     property TokenType: String read Ftyp write Ftyp;
     // token
@@ -130,6 +135,7 @@ begin
   Fiss := IO_STRING_NULL_VALUE;
   Fjti := IO_STRING_NULL_VALUE;
   Fnbf := IO_DATETIME_NULL_VALUE;
+  Frfa := IO_DATETIME_NULL_VALUE;
   Fsub := IO_STRING_NULL_VALUE;
   Ftyp := IO_STRING_NULL_VALUE;
   // others
@@ -204,6 +210,11 @@ begin
   Result := Fnbf <> IO_DATETIME_NULL_VALUE;
 end;
 
+function TioJWT.HasRefreshAfter: Boolean;
+begin
+  Result := Frfa <> IO_DATETIME_NULL_VALUE;
+end;
+
 function TioJWT.HasSubject: Boolean;
 begin
   Result := Fsub <> IO_STRING_NULL_VALUE;
@@ -214,14 +225,19 @@ begin
   Result := Ftyp <> IO_STRING_NULL_VALUE;
 end;
 
-function TioJWT.IsExpired: Boolean;
+function TioJWT.IsExpired(const ANow: TDateTime): Boolean;
 begin
-  Result := HasExpiration and (Now > Fexp);
+  Result := HasExpiration and _DoIsExpired(ANow);
 end;
 
-function TioJWT.IsNotYetValid: Boolean;
+function TioJWT.IsNotYetValid(const ANow: TDateTime): Boolean;
 begin
-  Result := HasNotBefore and _DoIsNotYetValid;
+  Result := HasNotBefore and _DoIsNotYetValid(ANow);
+end;
+
+function TioJWT.IsToBeRefreshed(const ANow: TDateTime): Boolean;
+begin
+  Result := HasRefreshAfter and _DoIsToBeRefreshed(ANow);
 end;
 
 procedure TioJWT._DoDecodeHeader(const AHeaderBase64: String);
@@ -267,6 +283,9 @@ begin
   // nbf = not before
   if Fnbf = IO_DATETIME_NULL_VALUE then
     LdjParams.IgnoredProperties.Add('nbf');
+  // rfa = refresh after
+  if Frfa = IO_DATETIME_NULL_VALUE then
+    LdjParams.IgnoredProperties.Add('rfa');
   // sub = subject
   if Fsub = IO_STRING_NULL_VALUE then
     LdjParams.IgnoredProperties.Add('sub');
@@ -279,14 +298,19 @@ begin
   Result := FBase64URLEncoding.Encode(Result);
 end;
 
-function TioJWT._DoIsExpired: Boolean;
+function TioJWT._DoIsExpired(const ANow: TDateTime): Boolean;
 begin
- Result := (Now > Fexp);
+ Result := (ANow > Fexp);
 end;
 
-function TioJWT._DoIsNotYetValid: Boolean;
+function TioJWT._DoIsNotYetValid(const ANow: TDateTime): Boolean;
 begin
- Result := (Now < Fnbf);
+ Result := (ANow < Fnbf);
+end;
+
+function TioJWT._DoIsToBeRefreshed(const ANow: TDateTime): Boolean;
+begin
+ Result := (ANow > Frfa);
 end;
 
 function TioJWT._DoSign(const AEncodedHeader, AEncodedPayload, ASecret: String): String;

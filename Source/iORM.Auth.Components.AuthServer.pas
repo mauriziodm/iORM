@@ -50,11 +50,12 @@ const
 type
   TioAuthServer = class;
 
-  TioOnAuthorizeAccessEvent = procedure(const Sender: TioAuthServer; const AScope: String; const AIntention: TioAuthIntention; const AAccessToken: String; var IsAuthorized, Done: Boolean) of object;
-  TioOnAuthorizeUserEvent = procedure(const Sender: TioAuthServer; const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String; var IsAuthorized, Done: Boolean) of object;
-  TioOnAuthorizeAppEvent = procedure(const Sender: TioAuthServer; const AAppCredentials: IioAuthAppCredentials; var AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String; var IsAuthorized, Done: Boolean) of object;
-  TioOnNewAccessTokenEvent = procedure(const Sender: TioAuthServer; const AAuthorizationToken: String; out ResultAccessToken, ResultRefreshToken: String; var IsAuthorized, Done: Boolean) of object;
-  TioOnRefreshAccessTokenEvent = procedure(const Sender: TioAuthServer; const ARefreshToken: String; out ResultAccessToken, ResultRefreshToken: String; var IsAuthorized, Done: Boolean) of object;
+  TioOnAuthorizeAccessEvent = procedure(const Sender: TioAuthServer; const AScope: String; const AIntention: TioAuthIntention; const AAccessToken: String; var ResultIsAuthorized, Done: Boolean) of object;
+  TioOnAuthorizeUserEvent = procedure(const Sender: TioAuthServer; const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String; var ResultIsAuthorized, Done: Boolean) of object;
+  TioOnAuthorizeAppEvent = procedure(const Sender: TioAuthServer; const AAppCredentials: IioAuthAppCredentials; var AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String; var ResultIsAuthorized, Done: Boolean) of object;
+  TioOnNewAccessTokenEvent = procedure(const Sender: TioAuthServer; const AAuthorizationToken: String; out ResultAccessToken, ResultRefreshToken: String; var ResultIsAuthorized, Done: Boolean) of object;
+  TioOnRefreshAccessTokenEvent = procedure(const Sender: TioAuthServer; const ARefreshToken: String; out ResultAccessToken, ResultRefreshToken: String; var ResultIsAuthorized, Done: Boolean) of object;
+  TioOnAccessTokenNeedRefreshEvent = procedure(const Sender: TioAuthServer; const AAccessToken: String; var ResultNeedRefresh, Done: Boolean) of object;
 
   TioAuthUserCache = class;
 
@@ -64,28 +65,33 @@ type
     class var FInstance: TioAuthServer;
   strict private
     // fields
-    FTokenIssuer: String; // proprietà non thread safe ma per il momento provo a mantenerna non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
-    FTokenSecret: String; // proprietà non thread safe ma per il momento provo a mantenerna non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
+    FEnabled: Boolean;
+    FTokenIssuer: String; // proprietà non thread safe ma per il momento provo a mantenerla non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
+    FTokenSecret: String; // proprietà non thread safe ma per il momento provo a mantenerla non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
+    FTokenTimeUTC: Boolean; // proprietà non thread safe ma per il momento provo a mantenerla non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
     FUserCache: TioAuthUserCache;
     FUserCacheExpirationMins: Integer;
     // events
+    FOnAccessTokenNeedRefresh: TioOnAccessTokenNeedRefreshEvent;
     FOnAuthorizeApp: TioOnAuthorizeAppEvent;
     FOnAuthorizeUser: TioOnAuthorizeUserEvent;
     FOnAuthorizeAccess: TioOnAuthorizeAccessEvent;
     FOnNewAccessToken: TioOnNewAccessTokenEvent;
     FOnRefreshAccessToken: TioOnRefreshAccessTokenEvent;
     // methods
+    procedure CheckIfEnabled;
     function Get_Version: String;
     procedure SetUserCacheExpirationMins(const Value: Integer);
     // jwt builders
-    function _BuildAuthorizationToken(const AUserID: String; const AAppID: String = IO_STRING_NULL_VALUE): String; // this token is released after the initial user/app authorization request
-    function _BuildAccessToken(const AUserID: String; const AAppID: String = IO_STRING_NULL_VALUE): String; // this token permit to acces to resources
-    function _BuildRefreshToken(const AUserID: String; const AAppID: String = IO_STRING_NULL_VALUE): String; // this token is released after the request of the first access+request token (just after the login/autorization request) or at every access token refresh request
+    function _BuildAuthorizationToken(const AUserID: String; const AAppID: String = IO_STRING_NULL_VALUE): String; inline; // this token is released after the initial user/app authorization request
+    function _BuildAccessToken(const AUserID: String; const AAppID: String = IO_STRING_NULL_VALUE): String; inline; // this token permit to acces to resources
+    function _BuildRefreshToken(const AUserID: String; const AAppID: String = IO_STRING_NULL_VALUE): String; inline; // this token is released after the request of the first access+request token (just after the login/autorization request) or at every access token refresh request
     // jwt checks
     procedure _CheckToken(const AJWT: TioJWT; const ATokenType: String); inline;
-    procedure _CheckAuthorizationToken(const AAuthorizationToken: String; out ResultUserID, ResultAppID: String);
-    procedure _CheckAccessToken(const AAccessToken: String; out ResultUserID, ResultAppID: String);
-    procedure _CheckRefreshToken(const ARefreshToken: String; out ResultUserID, ResultAppID: String);
+    procedure _CheckAuthorizationToken(const AAuthorizationToken: String; out ResultUserID, ResultAppID: String); inline;
+    procedure _CheckAccessToken(const AAccessToken: String; out ResultUserID, ResultAppID: String); inline;
+    procedure _CheckRefreshToken(const ARefreshToken: String; out ResultUserID, ResultAppID: String); inline;
+    function _CheckAccessTokenNeedRefresh(const AAccessToken: String): Boolean; inline;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -95,13 +101,17 @@ type
     function AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean; // return true or false depending the access to the requested result is permitted
     function NewAccessToken(const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; // return a new acces token and also a new refresh token just after the authorization (login)
     function RefreshAccessToken(const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; // return a new acces token and also a new refresh token
+    function AccessTokenNeedRefresh(const AAccessToken: String): Boolean;
   published
     // properties
+    property Enabled: Boolean read FEnabled write FEnabled;
     property TokenIssuer: String read FTokenIssuer write FTokenIssuer; // proprietà non thread safe ma per il momento provo a mantenerna non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
     property TokenSecret: String read FTokenSecret write FTokenSecret; // proprietà non thread safe ma per il momento provo a mantenerna non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
+    property TokenTimeUTC: Boolean read FTokenTimeUTC write FTokenTimeUTC; // proprietà non thread safe ma per il momento provo a mantenerna non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
     property UserCacheExpirationMins: Integer read FUserCacheExpirationMins write FUserCacheExpirationMins default USER_CACHE_EXPIRATION_MINS;
     property _Version: String read Get_Version;
     // events
+    property OnAccessTokenNeedRefresh: TioOnAccessTokenNeedRefreshEvent read FOnAccessTokenNeedRefresh write FOnAccessTokenNeedRefresh;
     property OnAuthorizeApp: TioOnAuthorizeAppEvent read FOnAuthorizeApp write FOnAuthorizeApp;
     property OnAuthorizeAccess: TioOnAuthorizeAccessEvent read FOnAuthorizeAccess write FOnAuthorizeAccess;
     property OnAuthorizeUser: TioOnAuthorizeUserEvent read FOnAuthorizeUser write FOnAuthorizeUser;
@@ -146,11 +156,19 @@ uses
 
 { TioAuthServer }
 
+procedure TioAuthServer.CheckIfEnabled;
+begin
+  if not FEnabled then
+    raise EioAuthServerComponentNotEnabled_404.Create('Component "TioAuthServer" not found');
+end;
+
 constructor TioAuthServer.Create(AOwner: TComponent);
 begin
   inherited;
+  FEnabled := True;
   FTokenSecret := 'change me as soon as possible';
   FTokenIssuer := IO_STRING_NULL_VALUE;
+  FTokenTimeUTC := True;
   FUserCache := TioAuthUserCache.Create(FUserCacheExpirationMins);
   FUserCacheExpirationMins := USER_CACHE_EXPIRATION_MINS; // default is 10 minutes
   if not (csDesigning in ComponentState) then
@@ -171,7 +189,7 @@ class function TioAuthServer.GetInstance: TioAuthServer;
 begin
   Result := TioAuthServer.FInstance;
   if not Assigned(Result) then
-    raise EioAuthServerComponentNotFound_501.Create('"TioAuthServer" singleton component not found');
+    raise EioAuthServerComponentNotFound_404.Create('"TioAuthServer" singleton component not found');
 end;
 
 function TioAuthServer.Get_Version: String;
@@ -187,6 +205,8 @@ begin
   Result := False;
   AResultAccessToken := IO_AUTH_NULL_JWT;
   AResultRefreshToken := IO_AUTH_NULL_JWT;
+  // First check if the component is enabled
+  CheckIfEnabled;
   // invoke OnNewAccessToken event if assigned
   LDone := False;
   if Assigned(FOnNewAccessToken) then
@@ -217,6 +237,8 @@ begin
   Result := False;
   AResultAccessToken := IO_AUTH_NULL_JWT;
   AResultRefreshToken := IO_AUTH_NULL_JWT;
+  // First check if the component is enabled
+  CheckIfEnabled;
   // invoke OnNewAccessToken event if assigned
   LDone := False;
   if Assigned(FOnRefreshAccessToken) then
@@ -257,6 +279,8 @@ var
 begin
   Result := False;
   ResultUserAuthorizationToken := IO_AUTH_NULL_JWT;
+  // First check if the component is enabled
+  CheckIfEnabled;
   // invoke OnLogin event if assigned
   LDone := False;
   if Assigned(FOnAuthorizeUser) then
@@ -286,6 +310,8 @@ var
 begin
   Result := False;
   ResultAppAuthorizationToken := IO_AUTH_NULL_JWT;
+  // First check if the component is enabled
+  CheckIfEnabled;
   // invoke OnLogin event if assigned
   LDone := False;
   if Assigned(FOnAuthorizeApp) then
@@ -311,6 +337,22 @@ begin
   end;
 end;
 
+function TioAuthServer.AccessTokenNeedRefresh(const AAccessToken: String): Boolean;
+var
+  LDone: Boolean;
+begin
+  Result := False;
+  // First check if the component is enabled
+  CheckIfEnabled;
+  // invoke OnLogin event if assigned
+  LDone := False;
+  if Assigned(FOnAccessTokenNeedRefresh) then
+    FOnAccessTokenNeedRefresh(Self, AAccessToken, Result, LDone);
+  // if the check of the token was not handled then use the internal implementation
+  if not LDone then
+    Result := _CheckAccessTokenNeedRefresh(AAccessToken);
+end;
+
 function TioAuthServer.AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean;
 var
   LDone: Boolean;
@@ -319,6 +361,8 @@ var
   LPermissionLevel: TioAuthPermissionLevel;
 begin
   Result := False;
+  // First check if the component is enabled
+  CheckIfEnabled;
   // invoke OnLogin event if assigned
   LDone := False;
   if Assigned(FOnAuthorizeAccess) then
@@ -342,7 +386,7 @@ var
   LToken: TioJWT;
   LNow: TDateTime;
 begin
-  LNow := Now;
+  LNow := TioUtilities.Now;
   LToken := TioJWT.Create;
   try
     LToken.AppID := AAppID;
@@ -364,7 +408,7 @@ var
   LToken: TioJWT;
   LNow: TDateTime;
 begin
-  LNow := Now;
+  LNow := TioUtilities.Now;
   LToken := TioJWT.Create;
   try
     LToken.AppID := AAppID;
@@ -386,7 +430,7 @@ var
   LToken: TioJWT;
   LNow: TDateTime;
 begin
-  LNow := Now;
+  LNow := TioUtilities.Now;
   LToken := TioJWT.Create;
   try
     LToken.AppID := AAppID;
@@ -404,7 +448,10 @@ begin
 end;
 
 procedure TioAuthServer._CheckToken(const AJWT: TioJWT; const ATokenType: String);
+var
+  LNow: TDateTime;
 begin
+  LNow := TioUtilities.Now(FTokenTimeUTC);
   // Check if it's verified
   if AJWT.IsVerified then
      raise EioTokenSignatureException_401.Create(Format('Token signature not verified (%s)', [ATokenType]));
@@ -415,10 +462,10 @@ begin
   if AJWT.Issuer <> FTokenIssuer then
      raise EioTokenIssuerException_401.Create(Format('Invalid token issuer (%s)', [ATokenType]));
   // Check expiration
-  if AJWT.IsExpired then
+  if AJWT.IsExpired(LNow) then
      raise EioTokenExpirationException_401.Create(Format('Token expired (%s)', [ATokenType]));
   // Check token not yet valid
-  if AJWT.IsNotYetValid then
+  if AJWT.IsNotYetValid(LNow) then
      raise EioTokenNotYetValidException_401.Create(Format('Token not yet valid (%s)', [ATokenType]));
 end;
 
@@ -455,6 +502,20 @@ begin
     // Extract user & app
     ResultUserID := LJWT.Subject;
     ResultAppID := LJWT.AppID;
+  finally
+    LJWT.Free;
+  end;
+end;
+
+function TioAuthServer._CheckAccessTokenNeedRefresh(const AAccessToken: String): Boolean;
+var
+  LJWT: TioJWT;
+  LNow: TDateTime;
+begin
+  LJWT := TioJWT.CreateByToken(AAccessToken, FTokenSecret);
+  try
+    LNow := TioUtilities.Now(FTokenTimeUTC);
+    Result := LJWT.IsToBeRefreshed(LNow) or LJWT.IsExpired(LNow);
   finally
     LJWT.Free;
   end;

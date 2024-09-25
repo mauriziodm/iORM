@@ -143,7 +143,10 @@ type
   EioAuthInvalidRefreshToken_401 = class(EioAuthException)
   end;
 
-  EioAuthServerComponentNotFound_501 = class(EioAuthException)
+  EioAuthServerComponentNotEnabled_404 = class(EioAuthException)
+  end;
+
+  EioAuthServerComponentNotFound_404 = class(EioAuthException)
   end;
   // -----------------------------------------------------------------------------------------------
 

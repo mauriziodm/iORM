@@ -494,6 +494,7 @@ type
     class function _DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean; virtual; abstract;
     class function _DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; virtual; abstract;
     class function _DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; virtual; abstract;
+    class function _DoAuth_AccessTokenNeedRefresh(const AConnectionDefName: String; const AAccessToken: String): Boolean; virtual; abstract;
     // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
   public
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------
@@ -531,6 +532,7 @@ type
     class function AuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean;
     class function Auth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean;
     class function Auth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean;
+    class function Auth_AccessTokenNeedRefresh(const AConnectionDefName: String; const AAccessToken: String): Boolean;
   end;
 
 implementation
@@ -935,6 +937,11 @@ end;
 class function TioPersistenceStrategyIntf.AuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String): Boolean;
 begin
   Result := _DoAuthorizeUser(AConnectionDefName, AUserCredentials, ResultUserAuthorizationToken);
+end;
+
+class function TioPersistenceStrategyIntf.Auth_AccessTokenNeedRefresh(const AConnectionDefName, AAccessToken: String): Boolean;
+begin
+  Result := _DoAuth_AccessTokenNeedRefresh(AConnectionDefName, AAccessToken);
 end;
 
 class function TioPersistenceStrategyIntf.Auth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean;

@@ -94,6 +94,7 @@ type
     class function _DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean; override;
     class function _DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; override;
     class function _DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; override;
+    class function _DoAuth_AccessTokenNeedRefresh(const AConnectionDefName: String; const AAccessToken: String): Boolean; override;
     // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
   end;
 
@@ -154,6 +155,11 @@ class function TioPersistenceStrategyDB._DoAuth_RefreshAccessToken(const AConnec
   AResultRefreshToken: String): Boolean;
 begin
   Result := TioAuthServer.GetInstance.RefreshAccessToken(ARefreshToken, AResultAccessToken, AResultRefreshToken);
+end;
+
+class function TioPersistenceStrategyDB._DoAuth_AccessTokenNeedRefresh(const AConnectionDefName, AAccessToken: String): Boolean;
+begin
+  Result := TioAuthServer.GetInstance.AccessTokenNeedRefresh(AAccessToken);
 end;
 
 class procedure TioPersistenceStrategyDB._DoCommitTransaction(const AConnectionName: String);

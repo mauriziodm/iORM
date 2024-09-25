@@ -62,6 +62,7 @@ type
     class procedure _AuthorizeAccess(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
     class procedure _NewAccessToken(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
     class procedure _RefreshAccessToken(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _AccessTokenNeedRefresh(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
   public
     class function Execute(const ARequestBodyAsString: String): String; static;
     class function Test: String; static;
@@ -118,10 +119,12 @@ begin
     // auth methods
     else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_AUTHORIZEACCESS then
       _AuthorizeAccess(LioRequestBody, LioResponseBody)
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_NEWACCESSTOKEN then
-      _NewAccessToken(LioRequestBody, LioResponseBody)
     else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_REFRESHACCESSTOKEN then
       _RefreshAccessToken(LioRequestBody, LioResponseBody)
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_ACCESSTOKENNEEDREFRESH then
+      _AccessTokenNeedRefresh(LioRequestBody, LioResponseBody)
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_NEWACCESSTOKEN then
+      _NewAccessToken(LioRequestBody, LioResponseBody)
     else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_AUTHORIZEUSER then
       _AuthorizeUser(LioRequestBody, LioResponseBody)
     else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_AUTHORIZEAPP then
@@ -145,6 +148,11 @@ end;
 class function TioHttpServerExecutor.Test: String;
 begin
   Result := Format('Hi, I''m iORM, I''m proud to tell you that my http server executor is successfully connected now %s.', [Now.ToString]);
+end;
+
+class procedure TioHttpServerExecutor._AccessTokenNeedRefresh(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
+begin
+  AioResponseBody.AuthResultIsAuthorized := TioAuthServer.GetInstance.AccessTokenNeedRefresh(AioRequestBody.AuthToken);
 end;
 
 class procedure TioHttpServerExecutor._AuthorizeAccess(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);

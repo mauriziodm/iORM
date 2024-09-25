@@ -82,6 +82,7 @@ type
     class procedure TrimStrings(const AStrings: TStrings);
     class function CloneObject(const ASourceObj: TObject): TObject;
     class procedure StopLinkerRemoval(const AClass: TClass);
+    class function Now(const UTC: Boolean = False; const ForceDayLight: Boolean = False): TDateTime; static; inline;
     /// Ricava la classe più in alto nella gerarchia (quello più vicina a TObject) che implementa la stessa interfaccia
     /// Questo serve a impostare correttamente la query select in modo che filtri correttamente in base anche
     ///  ai vincoli di ereditarietà.
@@ -117,7 +118,8 @@ implementation
 uses
   System.SysUtils, System.Types, iORM, iORM.Exceptions, iORM.Context.Container, iORM.DuckTyped.Factory, iORM.Context.Map.Interfaces,
   iORM.DependencyInjection.Implementers, DJSON, iORM.Resolver.Factory,
-  iORM.Resolver.Interfaces, iORM.DependencyInjection, iORM.MVVM.ViewModel;
+  iORM.Resolver.Interfaces, iORM.DependencyInjection, iORM.MVVM.ViewModel,
+  System.DateUtils;
 
 { TioRttiUtilities }
 
@@ -707,6 +709,14 @@ begin
 {$ELSE  NEXTGEN}
   Result := String(ATypeInfo.Name);
 {$ENDIF NEXTGEN}
+end;
+
+class function TioUtilities.Now(const UTC: Boolean = False; const ForceDayLight: Boolean = False): TDateTime;
+begin
+  if UTC then
+    Result := TTimeZone.Local.ToUniversalTime(Now, ForceDayLight)
+  else
+    Result := Now;
 end;
 
 class function TioUtilities._ExtractAttributeInfoSign(const ARttiInstanceType: TRttiInstanceType): String;

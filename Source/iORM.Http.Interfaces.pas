@@ -58,6 +58,7 @@ const
   HTTP_METHOD_NAME_AUTH_AUTHORIZEACCESS = '_AuthorizeAccess';
   HTTP_METHOD_NAME_AUTH_NEWACCESSTOKEN = '_NewAccessToken';
   HTTP_METHOD_NAME_AUTH_REFRESHACCESSTOKEN = '_RefreshAccessToken';
+  HTTP_METHOD_NAME_AUTH_ACCESSTOKENNEEDREFRESH = '_AccessTokenNeedRefresh';
 
   // All the interfaces declared here are moved on iORM.DB.Interfacex to avoi
   //  a circular reference error (IioHttpRequestBody, IioHttpResponseBody)

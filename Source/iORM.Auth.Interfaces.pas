@@ -45,9 +45,10 @@ type
   TioAuthRoleItem = class;
   TioAuthRoleList = class;
 
-  TioAuthUserStatusType = (usInactive, usBanned, usSuspended, usActive);
+  TioAuthUserStatus = (usInactive, usBanned, usSuspended, usActive);
   TioAuthIntention = (aiRead, aiWrite, aiDelete);
   TioAuthPermissionLevel = (ptUnauthorized, ptRead, ptReadWrite, ptReadWriteDelete);
+  TioAuthAccessTokenNeedRefreshCheckMode = (nrNever, nrByClient, nrByServer);
 
   IioAuthCustomCredentials = interface
     ['{BC126881-5EEA-43B2-B491-5BA51542FA17}']
@@ -124,14 +125,14 @@ type
     function GetID: Integer;
     function GetPermissiones: TioPermissionList;
     function GetRoles: TioAuthRoleList;
-    function GetStatus: TioAuthUserStatusType;
-    procedure SetStatus(const Value: TioAuthUserStatusType);
+    function GetStatus: TioAuthUserStatus;
+    procedure SetStatus(const Value: TioAuthUserStatus);
     // properties
     property Apps: TioAuthAppList read GetApps;
     property ID: Integer read GetID;
     property Permissions: TioPermissionList read GetPermissiones;
     property Roles: TioAuthRoleList read GetRoles;
-    property Status: TioAuthUserStatusType read GetStatus write SetStatus;
+    property Status: TioAuthUserStatus read GetStatus write SetStatus;
   end;
 
   TioAuthRoleItem = class

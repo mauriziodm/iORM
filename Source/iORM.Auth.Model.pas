@@ -136,7 +136,7 @@ type
     FID: Integer;
     FPermissions: TioPermissionList;
     FRoles: TioAuthRoleList;
-    FStatus: TioAuthUserStatusType;
+    FStatus: TioAuthUserStatus;
     function _IsExpired: Boolean; inline;
     function _IsValidPassword(const ALoginPassword: String): Boolean; inline;
     function _IsActiveStatus: Boolean; inline;
@@ -145,8 +145,8 @@ type
     function GetID: Integer;
     function GetPermissiones: TioPermissionList;
     function GetRoles: TioAuthRoleList;
-    function GetStatus: TioAuthUserStatusType;
-    procedure SetStatus(const Value: TioAuthUserStatusType);
+    function GetStatus: TioAuthUserStatus;
+    procedure SetStatus(const Value: TioAuthUserStatus);
   protected
     // ---------- to be ovverrided ----------
     function EncryptPassword(const APassword: String): String; virtual;
@@ -163,7 +163,7 @@ type
     property ID: Integer read FID;
     property Permissions: TioPermissionList read FPermissions;
     property Roles: TioAuthRoleList read GetRoles;
-    property Status: TioAuthUserStatusType read GetStatus write SetStatus;
+    property Status: TioAuthUserStatus read GetStatus write SetStatus;
   end;
 
 implementation
@@ -355,12 +355,12 @@ begin
   Result := FRoles;
 end;
 
-function TioAuthUser.GetStatus: TioAuthUserStatusType;
+function TioAuthUser.GetStatus: TioAuthUserStatus;
 begin
   Result := FStatus;
 end;
 
-procedure TioAuthUser.SetStatus(const Value: TioAuthUserStatusType);
+procedure TioAuthUser.SetStatus(const Value: TioAuthUserStatus);
 begin
   FStatus := Value;
 end;

@@ -82,6 +82,7 @@ type
     class function _DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean; override;
     class function _DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; override;
     class function _DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; override;
+    class function _DoAuth_AccessTokenNeedRefresh(const AConnectionDefName: String; const AAccessToken: String): Boolean; override;
     // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
   end;
 
@@ -664,6 +665,35 @@ begin
     Result := LConnection.ioResponseBody.AuthResultIsAuthorized;
     AResultAccessToken := LConnection.ioResponseBody.AuthResult1;
     AResultRefreshToken := LConnection.ioResponseBody.AuthResult2;
+    // Commit
+    LConnection.Commit;
+  except
+    // Rollback
+    LConnection.Rollback;
+    raise;
+  end;
+end;
+
+class function TioPersistenceStrategyHttp._DoAuth_AccessTokenNeedRefresh(const AConnectionDefName, AAccessToken: String): Boolean;
+var
+  LConnection: IioConnectionHttp;
+begin
+  inherited;
+  // Get the connection, set the request and execute it
+  LConnection := TioDBFactory.Connection(AConnectionDefName).AsHttpConnection;
+  // Start transaction
+  // NB: In this strategy (HTTP) call the Connection.StartTransaction (not the Self.StartTransaction
+  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
+  // perform any http call to the server at this point.
+  LConnection.StartTransaction;
+  try
+    // Set request parameters
+    LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.AuthToken := AAccessToken;
+    // Execute
+    LConnection.Execute(HTTP_METHOD_NAME_AUTH_ACCESSTOKENNEEDREFRESH);
+    // Set result values
+    Result := LConnection.ioResponseBody.AuthResultIsAuthorized;
     // Commit
     LConnection.Commit;
   except
