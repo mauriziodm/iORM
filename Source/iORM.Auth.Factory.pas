@@ -35,6 +35,26 @@ unit iORM.Auth.Factory;
 
 interface
 
+uses
+  iORM.Auth.Interfaces;
+
+type
+
+  TioAuthFactory = class
+  public
+    class function NewAuthSession: IioAuthSession;
+  end;
+
 implementation
+
+uses
+  iORM.Auth.Session;
+
+{ TioAuthFactory }
+
+class function TioAuthFactory.NewAuthSession: IioAuthSession;
+begin
+  Result := TioAuthSession.Create;
+end;
 
 end.

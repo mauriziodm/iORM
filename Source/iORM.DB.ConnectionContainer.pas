@@ -178,7 +178,7 @@ type
   // da creare ma è semplicemente un repository delle sole connessioni in uso in modo che chiamate ricorsive
   // all'ORM all'interno di una singola operazione (ad esempio quando carichiamo una classe che ha al suo interno
   // proprietà con relazioni il caricamento degli oggetti dettaglio avviene con una chiamata ricorsiva all'ORM
-  // e questa chicìamata deve svolgersi all'interno della stessa transazione del master e quindi con la stessa connection)
+  // e questa chiamata deve svolgersi all'interno della stessa transazione del master e quindi con la stessa connection)
   // possano accedere allo stesso oggetto connection (via factory).
   TioInternalContainerType = TDictionary<String, IioConnection>;
   TioConnectionContainerRef = class of TioConnectionContainer;

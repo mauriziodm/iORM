@@ -36,21 +36,28 @@ unit iORM.Abstraction.VCL;
 interface
 
 uses
-  iORM.Abstraction, VCL.ActnList, VCL.ExtCtrls, System.Rtti, System.Classes, FireDAC.VCLUI.Wait; // For FireDAC compatibility without original component
+  iORM.Abstraction, VCL.ActnList, VCL.ExtCtrls, System.Rtti, System.Classes, FireDAC.VCLUI.Wait,
+  iORM.Auth.Interfaces; // For FireDAC compatibility without original component
 
 type
 
   TioVCL = class(TioCustomPlatformAbstractionComponent)
-
   end;
 
   TioApplicationVCL = class(TioApplication)
+  private
+    class var FSession: IioAuthSession;
   protected
+    // --------- methods to be ovverrided by descendants ----------
+    class procedure _ClearSession; override;
+    class function _GetSession: IioAuthSession; override;
     class procedure _HandleException(const Sender: TObject); override;
-    class procedure _ShowMessage(const AMessage: string); override;
     class function _ProjectPlatform: TioProjectPlatform; override;
+    class procedure _ShowMessage(const AMessage: string); override;
     class function _Terminate: Boolean; override;
-    class function _GetSessionID: String; override;
+    // --------- methods to be ovverrided by descendants ----------
+  public
+    class constructor Create;
   end;
 
   TioControlVCL = class(TioControl)
@@ -116,13 +123,24 @@ implementation
 
 uses
   iORM, iORM.Exceptions, Vcl.Forms, Vcl.Dialogs,
-  Vcl.Controls;
+  Vcl.Controls, iORM.Auth.Factory;
 
 { TioApplicationVCL }
 
-class function TioApplicationVCL._GetSessionID: String;
+class constructor TioApplicationVCL.Create;
 begin
-  Result := IO_STRING_NULL_VALUE;
+  inherited;
+  FSession := TioAuthFactory.NewAuthSession;
+end;
+
+class procedure TioApplicationVCL._ClearSession;
+begin
+  FSession := TioAuthFactory.NewAuthSession;
+end;
+
+class function TioApplicationVCL._GetSession: IioAuthSession;
+begin
+  Result := FSession;
 end;
 
 class procedure TioApplicationVCL._HandleException(const Sender: TObject);

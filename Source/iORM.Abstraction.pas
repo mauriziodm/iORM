@@ -36,13 +36,14 @@ unit iORM.Abstraction;
 interface
 
 uses
-  System.Classes, System.SysUtils, System.Rtti, iORM.CommonTypes, System.Generics.Collections;
+  System.Classes, System.SysUtils, System.Rtti, iORM.CommonTypes,
+  iORM.Auth.Interfaces;
 
 type
   TioProjectPlatform = (ppVCL, ppFMX, ppUniGUI);
 
   TioCustomPlatformAbstractionComponent = class(TComponent)
-  strict private
+  private
     // Events
     FHideWait: TNotifyEvent;
     FShowWait: TNotifyEvent;
@@ -64,32 +65,25 @@ type
   TioApplication = class abstract
   private
     class var FConcreteClass_NoDirectCall: TioApplicationRef;
-    // TODO: Da eliminare?
-//    class var FSessionContainer: TDictionary<String, IioAuthCustomSession>;
-    class procedure Build;
-    class procedure Clean;
   protected
+    // --------- methods to be ovverrided by descendants ----------
+    class procedure _ClearSession; virtual; abstract;
+    class function _GetSession: IioAuthSession; virtual; abstract;
+    class procedure _HandleException(const Sender: TObject); virtual; abstract;
+    class function _ProjectPlatform: TioProjectPlatform; virtual; abstract;
+    class procedure _ShowMessage(const AMessage: string); virtual; abstract;
+    class function _Terminate: Boolean; virtual; abstract;
+    // --------- methods to be ovverrided by descendants ----------
     class function GetConcreteClass: TioApplicationRef;
     class procedure SetConcreteClass(const AClass: TioApplicationRef);
-    class procedure _HandleException(const Sender: TObject); virtual; abstract;
-    class procedure _ShowMessage(const AMessage: string); virtual; abstract;
-    class function _ProjectPlatform: TioProjectPlatform; virtual; abstract;
-    class function _Terminate: Boolean; virtual; abstract;
-    class function _GetSessionID: String; virtual; abstract;
   public
     class procedure CheckIfAbstractionLayerComponentExists; inline;
+    class procedure ClearSession; inline;
     class procedure HandleException(const Sender: TObject); inline;
-    class procedure ShowMessage(const AMessage: string); inline;
     class function ProjectPlatform: TioProjectPlatform; inline;
+    class function Session: IioAuthSession; inline;
+    class procedure ShowMessage(const AMessage: string); inline;
     class function Terminate: Boolean; inline;
-    // TODO: Da eliminare?
-    // Session
-//    class function GetSession: IioAuthSession; inline;
-//    class function GetSessionID: String; inline;
-//    class procedure SetSession(const AUserID: Integer; const AUserName: String; const AUserToken: String; const AConnectionName: String = IO_STRING_NULL_VALUE; const AExpires: TDateTime = IO_DATETIME_NULL_VALUE); overload;
-//    class procedure SetSession(const AUserName: String; const AUserToken: String; const AConnectionName: String = IO_STRING_NULL_VALUE; const AExpires: TDateTime = IO_DATETIME_NULL_VALUE); overload; inline;
-//    class procedure SetSession(const AUser: IioAuthUser; const AUserToken: String; const AConnectionName: String = IO_STRING_NULL_VALUE; const AExpires: TDateTime = IO_DATETIME_NULL_VALUE); overload; inline;
-//    class procedure RemoveSession;
   end;
 
   TioControlRef = class of TioControl;
@@ -277,21 +271,14 @@ end;
 
 { TioApplication }
 
-class procedure TioApplication.Build;
-begin
-    // TODO: Da eliminare?
-//  FSessionContainer := TDictionary<String, IioAuthCustomSession>.Create(1);
-end;
-
 class procedure TioApplication.CheckIfAbstractionLayerComponentExists;
 begin
   GetConcreteClass;
 end;
 
-class procedure TioApplication.Clean;
+class procedure TioApplication.ClearSession;
 begin
-    // TODO: Da eliminare?
-//  FSessionContainer.Free;
+  GetConcreteClass._ClearSession;
 end;
 
 class function TioApplication.GetConcreteClass: TioApplicationRef;
@@ -301,7 +288,12 @@ begin
   Result := FConcreteClass_NoDirectCall;
 end;
 
-    // TODO: Da eliminare?
+class function TioApplication.Session: IioAuthSession;
+begin
+  Result := GetConcreteClass._GetSession;
+end;
+
+// TODO: Da eliminare?
 //class function TioApplication.GetSession: IioAuthSession;
 //begin
 //  Result := FSessionContainer.Items[GetSessionID];
@@ -514,13 +506,5 @@ begin
   if Assigned(FDelayedMethod) then
     FDelayedMethod;
 end;
-
-initialization
-
-TioApplication.Build;
-
-finalization
-
-TioApplication.Clean;
 
 end.

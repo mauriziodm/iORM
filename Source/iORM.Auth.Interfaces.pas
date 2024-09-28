@@ -50,6 +50,32 @@ type
   TioAuthPermissionLevel = (ptUnauthorized, ptRead, ptReadWrite, ptReadWriteDelete);
   TioAuthAccessTokenNeedRefreshCheckMode = (nrNever, nrByClient, nrByServer);
 
+  IioAuthSession = interface
+    ['{AEC7DF37-A5C0-44E3-9D64-32216758506B}']
+    // methods
+    function GetAccessToken: String;
+    function GetAppAuthorizationToken: String;
+    function GetConnectionName: String;
+    function GetUserAuthorizationToken: String;
+    function GetUserID: Integer;
+    function GetUserName: String;
+    procedure SetAccessToken(const Value: String);
+    procedure SetAppAuthorizationToken(const Value: String);
+    procedure SetConnectionName(const Value: String);
+    procedure SetUserAuthorizationToken(const Value: String);
+    procedure SetUserID(const Value: Integer);
+    procedure SetUserName(const Value: String);
+    // user props
+    property UserID: Integer read GetUserID write SetUserID;
+    property UserName: String read GetUserName write SetUserName;
+    // tokens props
+    property UserAuthorizationToken: String read GetUserAuthorizationToken write SetUserAuthorizationToken;
+    property AppAuthorizationToken: String read GetAppAuthorizationToken write SetAppAuthorizationToken;
+    property AccessToken: String read GetAccessToken write SetAccessToken;
+    // connection props
+    property ConnectionName: String read GetConnectionName write SetConnectionName;
+  end;
+
   IioAuthCustomCredentials = interface
     ['{BC126881-5EEA-43B2-B491-5BA51542FA17}']
     function CanAuthorize(const ALoginPassword: String): Boolean;

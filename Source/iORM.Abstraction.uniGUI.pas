@@ -38,7 +38,7 @@
   *                         A T T E N T I O N !!!                            *
   *                                                                          *
   * 1) If you use iORM TDataSets with TUniDBGrids, remember to set the Grid's*
-  *    "BufferedStore.Enabled" property to True.                              *
+  *    "BufferedStore.Enabled" property to True.                             *
   *                                                                          *
   * 2) Do not use the TioTimer (alias TioTimerUniGUI), it doesn't work.      *
   *                                                                          *
@@ -52,21 +52,32 @@ unit iORM.Abstraction.uniGUI;
 interface
 
 uses
-  System.Classes, Vcl.ActnList, System.Rtti, iORM.Abstraction;
+  System.Classes, Vcl.ActnList, System.Rtti, iORM.Abstraction,
+  iORM.Auth.Interfaces, System.Generics.Collections;
 
 type
   TioUniGUI = class(TioCustomPlatformAbstractionComponent)
-
   end;
 
-  // Note: TioApplication features not implemented for uniGUI platform
+  TioSessionCollection = TDictionary<String, IioAuthSession>;
   TioApplicationUniGUI = class(TioApplication)
+  private
+    class var FSessionCollection: TioSessionCollection;
+    class function uniSessionID: String; inline;
+    class procedure _Lock; inline;
+    class procedure _Unlock; inline;
   protected
-    class procedure _HandleException(const Sender: TObject); override; // not yet implemented
-    class procedure _ShowMessage(const AMessage: string); override;
+    // --------- methods to be ovverrided by descendants ----------
+    class procedure _ClearSession; override;
+    class function _GetSession: IioAuthSession; override;
+    class procedure _HandleException(const Sender: TObject); override;
     class function _ProjectPlatform: TioProjectPlatform; override;
+    class procedure _ShowMessage(const AMessage: string); override;
     class function _Terminate: Boolean; override;
-    class function _GetSessionID: String; override;
+    // --------- methods to be ovverrided by descendants ----------
+  public
+    class constructor Create;
+    class destructor Destroy;
   end;
 
   TioControlUniGUI = class(TioControl)
@@ -133,18 +144,49 @@ implementation
 
 uses
   iORM, iORM.Exceptions, Data.Bind.Components, Vcl.Controls, uniGUIApplication, uniGUIClasses, uniGUIDialogs,
-  System.SysUtils;
+  System.SysUtils, iORM.Auth.Factory;
 
 { TioApplicationUniGUI }
 
-class function TioApplicationUniGUI._GetSessionID: String;
+class constructor TioApplicationUniGUI.Create;
+begin
+  FSessionCollection := TioSessionCollection.Create;
+end;
+
+class destructor TioApplicationUniGUI.Destroy;
+begin
+  FreeAndNil(FSessionCollection);
+end;
+
+class function TioApplicationUniGUI.uniSessionID: String;
 begin
   Result := uniGUIApplication.UniSession.SessionId;
+end;
+
+class procedure TioApplicationUniGUI._ClearSession;
+begin
+  FSessionCollection.Remove(uniSessionID);
+end;
+
+class function TioApplicationUniGUI._GetSession: IioAuthSession;
+var
+  LSessionID: String;
+begin
+  if not FSessionCollection.TryGetValue(uniSessionID, Result) then
+  begin
+    Result := TioAuthFactory.NewAuthSession;
+    FSessionCollection.Add(uniSessionID, Result);
+  end;
 end;
 
 class procedure TioApplicationUniGUI._HandleException(const Sender: TObject);
 begin
   uniGUIApplication.UniSession.HandleException(Sender as Exception);
+end;
+
+class procedure TioApplicationUniGUI._Lock;
+begin
+  TMonitor.Enter(FSessionCollection);
 end;
 
 class function TioApplicationUniGUI._ProjectPlatform: TioProjectPlatform;
@@ -161,6 +203,11 @@ end;
 class function TioApplicationUniGUI._Terminate: Boolean;
 begin
   uniGUIApplication.UniSession.Terminate;
+end;
+
+class procedure TioApplicationUniGUI._Unlock;
+begin
+  TMonitor.Exit(FSessionCollection);
 end;
 
 { TioControlUniGUI }

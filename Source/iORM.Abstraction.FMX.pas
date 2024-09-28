@@ -37,21 +37,28 @@ interface
 
 uses
   FireDAC.FMXUI.Wait, // For FireDAC compatibility without using the original component
-  iORM.Abstraction, FMX.Types, System.Classes, FMX.ActnList, System.Rtti;
+  iORM.Abstraction, FMX.Types, System.Classes, FMX.ActnList, System.Rtti,
+  iORM.Auth.Interfaces;
 
 type
 
   TioFMX = class(TioCustomPlatformAbstractionComponent)
-
   end;
 
   TioApplicationFMX = class(TioApplication)
+  private
+    class var FSession: IioAuthSession;
   protected
+    // --------- methods to be ovverrided by descendants ----------
+    class procedure _ClearSession; override;
+    class function _GetSession: IioAuthSession; override;
     class procedure _HandleException(const Sender: TObject); override;
-    class procedure _ShowMessage(const AMessage: string); override;
     class function _ProjectPlatform: TioProjectPlatform; override;
+    class procedure _ShowMessage(const AMessage: string); override;
     class function _Terminate: Boolean; override;
-    class function _GetSessionID: String; override;
+    // --------- methods to be ovverrided by descendants ----------
+  public
+    class constructor Create;
   end;
 
   TioControlFMX = class(TioControl)
@@ -116,7 +123,8 @@ type
 implementation
 
 uses
-  FMX.Forms, FMX.Dialogs, iORM.Exceptions, FMX.Controls, iORM;
+  FMX.Forms, FMX.Dialogs, iORM.Exceptions, FMX.Controls, iORM,
+  iORM.Auth.Factory;
 
 { TioTimerFMX }
 
@@ -175,9 +183,20 @@ end;
 
 { TioApplicationFMX }
 
-class function TioApplicationFMX._GetSessionID: String;
+class constructor TioApplicationFMX.Create;
 begin
-  Result := IO_STRING_NULL_VALUE;
+  inherited;
+  FSession := TioAuthFactory.NewAuthSession;
+end;
+
+class procedure TioApplicationFMX._ClearSession;
+begin
+  FSession := TioAuthFactory.NewAuthSession;
+end;
+
+class function TioApplicationFMX._GetSession: IioAuthSession;
+begin
+  Result := FSession;
 end;
 
 class procedure TioApplicationFMX._HandleException(const Sender: TObject);
