@@ -293,18 +293,6 @@ begin
   Result := GetConcreteClass._GetSession;
 end;
 
-// TODO: Da eliminare?
-//class function TioApplication.GetSession: IioAuthSession;
-//begin
-//  Result := FSessionContainer.Items[GetSessionID];
-//end;
-
-    // TODO: Da eliminare?
-//class function TioApplication.GetSessionID: String;
-//begin
-//  Result := GetConcreteClass._GetSessionID;
-//end;
-
 class procedure TioApplication.HandleException(const Sender: TObject);
 begin
   GetConcreteClass._HandleException(Sender);
@@ -314,31 +302,6 @@ class function TioApplication.ProjectPlatform: TioProjectPlatform;
 begin
   Result := GetConcreteClass._ProjectPlatform;
 end;
-
-    // TODO: Da eliminare?
-//class procedure TioApplication.SetSession(const AUserID: Integer; const AUserName, AUserToken, AConnectionName: String; const AExpires: TDateTime);
-//begin
-//  FSessionContainer.Remove(GetSessionID);
-//  FSessionContainer.Add(GetSessionID, TioAuthFactory.NewSession(AUserID, AUserName, AUserToken, AConnectionName, AExpires));
-//end;
-
-    // TODO: Da eliminare?
-//class procedure TioApplication.SetSession(const AUser: IioAuthUser; const AUserToken, AConnectionName: String; const AExpires: TDateTime);
-//begin
-//  SetSession(AUser.ID, AUser.LoginUserName, AUserToken, AConnectionName, AExpires);
-//end;
-
-    // TODO: Da eliminare?
-//class procedure TioApplication.SetSession(const AUserName, AUserToken, AConnectionName: String; const AExpires: TDateTime);
-//begin
-//  SetSession(IO_INTEGER_NULL_VALUE, AUserName, AUserToken, AConnectionName, AExpires);
-//end;
-
-    // TODO: Da eliminare?
-//class procedure TioApplication.RemoveSession;
-//begin
-//  FSessionContainer.Remove(GetSessionID);
-//end;
 
 class procedure TioApplication.SetConcreteClass(const AClass: TioApplicationRef);
 begin

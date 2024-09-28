@@ -1,4 +1,4 @@
-unit iORM.Auth.Components.AuthorizationClient;
+unit iORM.Auth.Components.AuthClient;
 
 interface
 
