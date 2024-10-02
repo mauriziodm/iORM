@@ -74,15 +74,24 @@ type
     property ConnectionName: String read GetConnectionName write SetConnectionName;
   end;
 
-  IioAuthCustomCredentials = interface
+  IioAuthBaseEntity = interface
     ['{BC126881-5EEA-43B2-B491-5BA51542FA17}']
-    function CanAuthorize: Boolean;
     function GetClassName: String;
-    function IsActive: Boolean;
+    function GetExpiration: TDateTime;
+    function GetStatus: TioAuthUserStatus;
+    function IsActive(const RaiseExceptions: Boolean): Boolean;
     function IsExpired: Boolean;
-    function PermissionLevelFor(AAppID, AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel;
+    procedure SetExpiration(const Value: TDateTime);
+    procedure SetStatus(const Value: TioAuthUserStatus);
     // properties
     property ClassName: String read GetClassName;
+    property Expiration: TDateTime read GetExpiration write SetExpiration;
+    property Status: TioAuthUserStatus read GetStatus write SetStatus;
+  end;
+
+  IioAuthCustomCredentials = interface(IioAuthBaseEntity)
+    ['{BC126881-5EEA-43B2-B491-5BA51542FA17}']
+    function CanAuthorize: Boolean;
   end;
 
   IioAuthUserCredentials = interface(IioAuthCustomCredentials)
@@ -122,12 +131,12 @@ type
     property Scope: String read GetScope write SetScope;
   end;
 
-  IioAuthRole = interface
+  IioAuthRole = interface(IioAuthBaseEntity)
     ['{3E8DE4D8-6089-41B5-85DD-1425947CE21A}']
     function GetID: Integer;
     function GetName: String;
     function GetPermissions: TList<IioAuthPermission>;
-    function PermissionLevelFor(AResourceName: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel;
+    function PermissionLevelFor(AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel;
     procedure SetName(const Value: String);
     // properties
     property ID: Integer read GetID;
@@ -139,40 +148,31 @@ type
 
   IioAuthApp = interface(IioAuthAppCredentials)
     ['{82D56816-0FC6-42B7-9EF8-AB339ECBEE00}']
-    function GetExpiration: TDateTime;
     function GetID: Integer;
-    function GetStatus: TioAuthUserStatus;
-    procedure SetExpiration(const Value: TDateTime);
-    procedure SetStatus(const Value: TioAuthUserStatus);
+    function PermissionLevelFor(AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel;
     // properties
-    property Expiration: TDateTime read GetExpiration write SetExpiration;
     property ID: Integer read GetID;
-    property Status: TioAuthUserStatus read GetStatus write SetStatus;
   end;
 
   IioAuthUser = interface(IioAuthUserCredentials)
     ['{2FBEE228-159C-4049-AD29-E5DFB4D67336}']
     function GetApps: TioAuthAppList;
-    function GetExpiration: TDateTime;
     function GetID: Integer;
     function GetPermissions: TioPermissionList;
     function GetRoles: TioAuthRoleList;
-    function GetStatus: TioAuthUserStatus;
-    procedure SetExpiration(const Value: TDateTime);
-    procedure SetStatus(const Value: TioAuthUserStatus);
+    function PermissionLevelFor(AAppID, AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel;
     // properties
     property Apps: TioAuthAppList read GetApps;
-    property Expiration: TDateTime read GetExpiration write SetExpiration;
     property ID: Integer read GetID;
     property Permissions: TioPermissionList read GetPermissions;
     property Roles: TioAuthRoleList read GetRoles;
-    property Status: TioAuthUserStatus read GetStatus write SetStatus;
   end;
 
-  IioAuthRoleItem = interface
+  IioAuthRoleItem = interface(IioAuthBaseEntity)
     ['{ECD3CA79-45EC-4EE9-9D89-1E7A8C24E328}']
     function GetID: Integer;
     function GetRole: IioAuthRole;
+    function PermissionLevelFor(AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel;
     // properties
     property ID: integer read GetID;
     property Role: IioAuthRole read GetRole;
@@ -183,19 +183,14 @@ type
     function Add(const ARole: IioAuthRole): Integer;
   end;
 
-  IioAuthAppItem = interface(IioAuthCustomCredentials)
+  IioAuthAppItem = interface(IioAuthBaseEntity)
     ['{E4492721-4954-4CD0-B38D-50828314A640}']
     function GetApp: IioAuthApp;
-    function GetExpiration: TDateTime;
     function GetID: Integer;
-    function GetStatus: TioAuthUserStatus;
-    procedure SetExpiration(const Value: TDateTime);
-    procedure SetStatus(const Value: TioAuthUserStatus);
+    function PermissionLevelFor(AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel;
     // properties
     property App: IioAuthApp read GetApp;
-    property Expiration: TDateTime read GetExpiration write SetExpiration;
     property ID: integer read GetID;
-    property Status: TioAuthUserStatus read GetStatus write SetStatus;
   end;
 
   TioAuthAppList = class(TList<IioAuthAppItem>)

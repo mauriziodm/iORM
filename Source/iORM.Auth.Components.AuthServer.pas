@@ -205,7 +205,7 @@ begin
     // check authorization token
     _CheckAuthorizationToken(AAuthorizationToken, LUserID, LAppID);
     // check if the user is still active
-    FUserCache.GetUser(LUserID).IsActive;
+    FUserCache.GetUser(LUserID).IsActive(True);
     // build the result access and refresh tokens
     AResultAccessToken := _BuildAccessToken(LUserID, LAppID);
     AResultRefreshToken := _BuildRefreshToken(LUserID, LAppID);
@@ -237,7 +237,7 @@ begin
     // check authorization token
     _CheckRefreshToken(ARefreshToken, LUserID, LAppID);
     // check if the user and app is still active
-    FUserCache.GetUser(LUserID).IsActive;
+    FUserCache.GetUser(LUserID).IsActive(True);
     // build the result access and refresh tokens
     AResultAccessToken := _BuildAccessToken(LUserID, LAppID);
     AResultRefreshToken := _BuildRefreshToken(LUserID, LAppID);
