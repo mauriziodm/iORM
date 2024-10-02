@@ -211,7 +211,7 @@ type
     property Role: IioAuthRole read GetRole;
   end;
 
-  TioAuthAppItem = class(TInterfacedObject, IioAuthAppItem)
+  TioAuthAppItem = class(TioAuthCustomCredentials, IioAuthAppItem)
   strict private
     FApp: IioAuthApp;
     FExpiration: TDateTime;
@@ -228,15 +228,34 @@ type
     procedure SetStatus(const Value: TioAuthUserStatus);
   public
     constructor Create(const AApp: IioAuthApp);
-    function CanAuthorize: Boolean;
-    function IsActive: Boolean;
-    function IsExpired: Boolean;
+    // ---------- to be ovverrided ----------
+    function CanAuthorize: Boolean; override;
+    function IsActive: Boolean; override;
+    function IsExpired: Boolean; override;
+    function PermissionLevelFor(AAppID, AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel; override;
+    // ---------- to be ovverrided ----------
     // properties
     property App: IioAuthApp read GetApp;
     property Expiration: TDateTime read GetExpiration write SetExpiration;
     property ID: integer read GetID;
     property Status: TioAuthUserStatus read GetStatus write SetStatus;
   end;
+//  TioAuthCustomCredentials = class(TInterfacedObject, IioAuthCustomCredentials)
+//  strict protected
+//    // ---------- to be ovverrided ----------
+//    function EncryptPassword(const APassword: String): String; virtual;
+//    // ---------- to be ovverrided ----------
+//  public
+//    function GetClassName: String;
+//    // ---------- to be ovverrided ----------
+//    function CanAuthorize: Boolean; virtual;
+//    function IsActive: Boolean; virtual;
+//    function IsExpired: Boolean; virtual;
+//    function PermissionLevelFor(AAppID, AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel; virtual;
+//    // ---------- to be ovverrided ----------
+//    // properties
+//    property ClassName: String read GetClassName;
+//  end;
 
 implementation
 
@@ -300,7 +319,7 @@ begin
   for LPermission in FPermissions do
     if LPermission.Scope = AScope then
       Exit(LPermission.PermissionLevel);
-  Result := ptUnauthorized
+  Result := plUnauthorized
 end;
 
 function TioAuthRole.GetPermissions: TioPermissionList;
@@ -389,8 +408,8 @@ var
   LAuthUserAppItem: IioAuthAppItem;
 begin
   AScope := AScope.ToLower;
-  LPermissionLevel := ptUnauthorized;
-  Result := ptUnauthorized;
+  LPermissionLevel := plUnauthorized;
+  Result := plUnauthorized;
   // Roles
   for LAuthUserRoleItem in FRoles do
   begin
@@ -408,7 +427,7 @@ begin
   // App permissions (if an app is specified)
   if (AAppID <> IO_STRING_NULL_VALUE) and (FApps.Count > 0) then
   begin
-    LPermissionLevel := ptUnauthorized;
+    LPermissionLevel := plUnauthorized;
     for LAuthUserAppItem in FApps do
       if LAuthUserAppItem.App.AppID = AAppID then
         LPermissionLevel := LAuthUserAppItem.App.PermissionLevelFor(AAppID, AScope, AIntention);
@@ -511,7 +530,7 @@ end;
 
 function TioAuthCustomCredentials.PermissionLevelFor(AAppID, AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel;
 begin
-  Result := ptUnauthorized;
+  Result := plUnauthorized;
 end;
 
 { TioAuthAppCredentials }
@@ -595,7 +614,10 @@ function TioAuthApp.PermissionLevelFor(AAppID, AScope: String; const AIntention:
 begin
   // Per ora ritorna sempre l'acesso completo che poi in pratica fa si che si basi unicamente sui permessi dell'utente
   //  perchè il permesso che ritorna è sempre il minore tra quello di utente e app (se c'è una app)
-  Result := TioAuthPermissionLevel.ptReadWriteDelete;
+  if _IsActive then
+    Result := TioAuthPermissionLevel.plReadWriteDelete
+  else
+    Result := plUnauthorized;
 end;
 
 procedure TioAuthApp.SetExpiration(const Value: TDateTime);
@@ -639,7 +661,7 @@ end;
 
 function TioAuthAppItem.CanAuthorize: Boolean;
 begin
-  Result := FApp.CanAuthorize;
+  Result := _IsActive and FApp.CanAuthorize;
 end;
 
 constructor TioAuthAppItem.Create(const AApp: IioAuthApp);
@@ -679,6 +701,14 @@ end;
 function TioAuthAppItem.IsExpired: Boolean;
 begin
   Result := _IsExpired or FApp.IsExpired;
+end;
+
+function TioAuthAppItem.PermissionLevelFor(AAppID, AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel;
+begin
+  if _IsActive then
+    Result := FApp.PermissionLevelFor(AAppID, AScope, AIntention)
+  else
+    Result := plUnauthorized;
 end;
 
 procedure TioAuthAppItem.SetExpiration(const Value: TDateTime);

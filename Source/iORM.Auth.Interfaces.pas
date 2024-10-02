@@ -45,7 +45,7 @@ type
 
   TioAuthUserStatus = (usInactive, usBanned, usSuspended, usActive);
   TioAuthIntention = (aiRead, aiWrite, aiDelete);
-  TioAuthPermissionLevel = (ptUnauthorized, ptRead, ptReadWrite, ptReadWriteDelete);
+  TioAuthPermissionLevel = (plUnauthorized, plRead, plReadWrite, plReadWriteDelete);
   TioAuthAccessTokenNeedRefreshCheckMode = (nrNever, nrByClient, nrByServer);
 
   IioAuthSession = interface
@@ -183,7 +183,7 @@ type
     function Add(const ARole: IioAuthRole): Integer;
   end;
 
-  IioAuthAppItem = interface
+  IioAuthAppItem = interface(IioAuthCustomCredentials)
     ['{E4492721-4954-4CD0-B38D-50828314A640}']
     function GetApp: IioAuthApp;
     function GetExpiration: TDateTime;
@@ -193,11 +193,8 @@ type
     procedure SetStatus(const Value: TioAuthUserStatus);
     // properties
     property App: IioAuthApp read GetApp;
-    function CanAuthorize: Boolean;
     property Expiration: TDateTime read GetExpiration write SetExpiration;
     property ID: integer read GetID;
-    function IsActive: Boolean;
-    function IsExpired: Boolean;
     property Status: TioAuthUserStatus read GetStatus write SetStatus;
   end;
 
