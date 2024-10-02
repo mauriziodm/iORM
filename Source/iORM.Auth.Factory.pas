@@ -42,19 +42,31 @@ type
 
   TioAuthFactory = class
   public
-    class function NewAuthSession: IioAuthSession;
+    class function NewAuthSession: IioAuthSession; static;
+    class function NewAuthRoleItem(const ARole: IioAuthRole): IioAuthRoleItem; static;
+    class function NewAuthUserAppItem(const AApp: IioAuthApp): IioAuthAppItem; static;
   end;
 
 implementation
 
 uses
-  iORM.Auth.Session;
+  iORM.Auth.Session, iORM.Auth.Model;
 
 { TioAuthFactory }
+
+class function TioAuthFactory.NewAuthRoleItem(const ARole: IioAuthRole): IioAuthRoleItem;
+begin
+  Result := TioAuthRoleItem.Create(ARole);
+end;
 
 class function TioAuthFactory.NewAuthSession: IioAuthSession;
 begin
   Result := TioAuthSession.Create;
+end;
+
+class function TioAuthFactory.NewAuthUserAppItem(const AApp: IioAuthApp): IioAuthAppItem;
+begin
+  Result := TioAuthAppItem.Create(AApp);
 end;
 
 end.

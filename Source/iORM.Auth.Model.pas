@@ -41,12 +41,17 @@ uses
 type
 
   TioAuthCustomCredentials = class(TInterfacedObject, IioAuthCustomCredentials)
+  strict protected
+    // ---------- to be ovverrided ----------
+    function EncryptPassword(const APassword: String): String; virtual;
+    // ---------- to be ovverrided ----------
   public
     function GetClassName: String;
     // ---------- to be ovverrided ----------
-    function CanAuthorize(const ALoginPassword: String): Boolean; virtual;
+    function CanAuthorize: Boolean; virtual;
     function IsActive: Boolean; virtual;
-    function PermissionLevelFor(AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel; virtual;
+    function IsExpired: Boolean; virtual;
+    function PermissionLevelFor(AAppID, AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel; virtual;
     // ---------- to be ovverrided ----------
     // properties
     property ClassName: String read GetClassName;
@@ -64,14 +69,56 @@ type
     procedure SetLoginPassword(const Value: String);
     procedure SetLoginUserName(const Value: String);
   public
+    // properties
     property LoginPassword: String read GetLoginPassword write SetLoginPassword;
     property LoginUserName: String read GetLoginUserName write SetLoginUserName;
   end;
 
+  TioAuthUser = class(TioAuthUserCredentials, IioAuthUser)
+  strict private
+    FApps: TioAuthAppList;
+    FEncryptedPassword: String;
+    FExpiration: TDateTime;
+    FID: Integer;
+    FPermissions: TioPermissionList;
+    FRoles: TioAuthRoleList;
+    FStatus: TioAuthUserStatus;
+    function _IsExpired: Boolean; inline;
+    function _IsValidPassword(const ALoginPassword: String): Boolean; inline;
+    function _IsActiveStatus: Boolean; inline;
+    function _IsActive: Boolean; inline;
+    function GetApps: TioAuthAppList;
+    function GetExpiration: TDateTime;
+    function GetID: Integer;
+    function GetPermissions: TioPermissionList;
+    function GetRoles: TioAuthRoleList;
+    function GetStatus: TioAuthUserStatus;
+    procedure SetExpiration(const Value: TDateTime);
+    procedure SetStatus(const Value: TioAuthUserStatus);
+  public
+    constructor Create;
+    destructor Destroy; override;
+    // ---------- to be ovverrided ----------
+    function CanAuthorize: Boolean; override;
+    function IsActive: Boolean; override;
+    function IsExpired: Boolean; override;
+    function PermissionLevelFor(AAppID, AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel; override;
+    // ---------- to be ovverrided ----------
+    // properties
+    property Apps: TioAuthAppList read FApps;
+    property Expiration: TDateTime read GetExpiration write SetExpiration;
+    property ID: Integer read FID;
+    property Permissions: TioPermissionList read GetPermissions;
+    property Roles: TioAuthRoleList read GetRoles;
+    property Status: TioAuthUserStatus read GetStatus write SetStatus;
+  end;
+
   TioAuthAppCredentials = class(TioAuthCustomCredentials, IioAuthAppCredentials)
   strict private
+    [ioIndex]
     FAppID: String;
     FAppScope: String;
+    [ioSkip]
     FAppSecret: String;
   private
     function GetAppID: String;
@@ -86,6 +133,35 @@ type
     property AppSecret: String read GetAppSecret write SetAppSecret;
   end;
 
+  TioAuthApp = class(TioAuthAppCredentials, IioAuthApp)
+  strict private
+    FEncryptedAppSecret: String;
+    FExpiration: TDateTime;
+    FID: Integer;
+    FStatus: TioAuthUserStatus;
+    function _IsExpired: Boolean; inline;
+    function _IsValidAppSecret(const AAppSecret: String): Boolean; inline;
+    function _IsActiveStatus: Boolean; inline;
+    function _IsActive: Boolean; inline;
+    function GetExpiration: TDateTime;
+    function GetID: Integer;
+    function GetStatus: TioAuthUserStatus;
+    procedure SetExpiration(const Value: TDateTime);
+    procedure SetStatus(const Value: TioAuthUserStatus);
+  public
+    constructor Create;
+    // ---------- to be ovverrided ----------
+    function CanAuthorize: Boolean; override;
+    function IsActive: Boolean; override;
+    function IsExpired: Boolean; override;
+    function PermissionLevelFor(AAppID, AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel; override;
+    // ---------- to be ovverrided ----------
+    // properties
+    property Expiration: TDateTime read GetExpiration write SetExpiration;
+    property ID: Integer read GetID;
+    property Status: TioAuthUserStatus read GetStatus write SetStatus;
+  end;
+
   TioAuthPermission = class(TInterfacedObject, IioAuthPermission)
   strict private
     FID: Integer;
@@ -97,6 +173,7 @@ type
     procedure SetPermissionLevel(const Value: TioAuthPermissionLevel);
     procedure SetScope(const Value: String);
   public
+    // properties
     property ID: Integer read GetID;
     property PermissionLevel: TioAuthPermissionLevel read GetPermissionLevel write SetPermissionLevel;
     property Scope: String read GetScope write SetScope;
@@ -115,60 +192,55 @@ type
     constructor Create;
     destructor Destroy; override;
     function PermissionLevelFor(AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel;
+    // properties
     property ID: Integer read GetID;
     property Name: String read GetName write SetName;
     property Permissions: TioPermissionList read GetPermissions;
   end;
 
-  TioAuthApp = class(TioAuthAppCredentials, IioAuthApp)
+  TioAuthRoleItem = class(TInterfacedObject, IioAuthRoleItem)
   strict private
     FID: Integer;
+    FRole: IioAuthRole;
     function GetID: Integer;
+    function GetRole: IioAuthRole;
   public
-    property ID: Integer read FID;
+    constructor Create(const ARole: IioAuthRole);
+    // properties
+    property ID: integer read GetID;
+    property Role: IioAuthRole read GetRole;
   end;
 
-  TioAuthUser = class(TioAuthUserCredentials, IioAuthUser)
+  TioAuthAppItem = class(TInterfacedObject, IioAuthAppItem)
   strict private
-    FApps: TioAuthAppList;
-    FEncryptedPassword: String;
+    FApp: IioAuthApp;
     FExpiration: TDateTime;
     FID: Integer;
-    FPermissions: TioPermissionList;
-    FRoles: TioAuthRoleList;
     FStatus: TioAuthUserStatus;
     function _IsExpired: Boolean; inline;
-    function _IsValidPassword(const ALoginPassword: String): Boolean; inline;
     function _IsActiveStatus: Boolean; inline;
     function _IsActive: Boolean; inline;
-    function GetApps: TioAuthAppList;
+    function GetApp: IioAuthApp;
+    function GetExpiration: TDateTime;
     function GetID: Integer;
-    function GetPermissiones: TioPermissionList;
-    function GetRoles: TioAuthRoleList;
     function GetStatus: TioAuthUserStatus;
+    procedure SetExpiration(const Value: TDateTime);
     procedure SetStatus(const Value: TioAuthUserStatus);
-  protected
-    // ---------- to be ovverrided ----------
-    function EncryptPassword(const APassword: String): String; virtual;
-    // ---------- to be ovverrided ----------
   public
-    constructor Create;
-    destructor Destroy; override;
-    // ---------- to be ovverrided ----------
-    function CanAuthorize(const ALoginPassword: String): Boolean; override;
-    function IsActive: Boolean; override;
-    function PermissionLevelFor(AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel; override;
-    // ---------- to be ovverrided ----------
-    property Apps: TioAuthAppList read FApps;
-    property ID: Integer read FID;
-    property Permissions: TioPermissionList read FPermissions;
-    property Roles: TioAuthRoleList read GetRoles;
+    constructor Create(const AApp: IioAuthApp);
+    function CanAuthorize: Boolean;
+    function IsActive: Boolean;
+    function IsExpired: Boolean;
+    // properties
+    property App: IioAuthApp read GetApp;
+    property Expiration: TDateTime read GetExpiration write SetExpiration;
+    property ID: integer read GetID;
     property Status: TioAuthUserStatus read GetStatus write SetStatus;
   end;
 
 implementation
 
-uses System.SysUtils, iORM.Exceptions, iORM.CommonTypes;
+uses System.SysUtils, iORM.Exceptions, iORM.CommonTypes, iORM.Utilities;
 
 { TioAuthPermission }
 
@@ -248,19 +320,24 @@ begin
   Result := _IsActive;
 end;
 
-function TioAuthUser.CanAuthorize(const ALoginPassword: String): Boolean;
+function TioAuthUser.IsExpired: Boolean;
+begin
+  Result := _IsExpired;
+end;
+
+function TioAuthUser.CanAuthorize: Boolean;
 begin
   Result := False;
   // Check password
-  if not _IsValidPassword(ALoginPassword) then
-    raise EioAuthInvalidCredentialsException_401.Create('Invalid credentials');
+  if not _IsValidPassword(LoginPassword) then
+    raise EioAuthInvalidCredentialsException_401.Create('Invalid user credentials');
   // check if active
   Result := _IsActive;
 end;
 
 function TioAuthUser._IsExpired: Boolean;
 begin
-  Result := (FExpiration <> IO_DATETIME_NULL_VALUE) and (Now > FExpiration);
+  Result := (FExpiration <> IO_DATETIME_NULL_VALUE) and (TioUtilities.NowUTC > FExpiration);
 end;
 
 function TioAuthUser._IsValidPassword(const ALoginPassword: String): Boolean;
@@ -276,7 +353,7 @@ begin
     raise EioAuthInactiveUserException_401.Create(Format('User "%s" has been deactivated', [LoginUserName]));
   // Check expiration
   if _IsExpired then
-    raise EioAuthUserExpiredException_401.Create(Format('User "%s" has expired', [LoginUserName]));
+    raise EioAuthUserExpiredException_401.Create(Format('User "%s" has been expired', [LoginUserName]));
   Result := True;
 end;
 
@@ -287,6 +364,7 @@ end;
 
 constructor TioAuthUser.Create;
 begin
+  inherited Create;
   FApps := TioAuthAppList.Create;
   FID := IO_INTEGER_NULL_VALUE;
   FExpiration := IO_DATETIME_NULL_VALUE;
@@ -303,18 +381,12 @@ begin
   inherited;
 end;
 
-function TioAuthUser.EncryptPassword(const APassword: String): String;
-begin
-  // TODO: AUTH - fare una implementazione di base ma che cifra veramente?
-  // System.Hash.THashMD5.GetHashString
-  Result := APassword;
-end;
-
-function TioAuthUser.PermissionLevelFor(AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel;
+function TioAuthUser.PermissionLevelFor(AAppID, AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel;
 var
   LPermissionLevel: TioAuthPermissionLevel;
   LPermission: IioAuthPermission;
-  LAuthUserRoleItem: TioAuthRoleItem;
+  LAuthUserRoleItem: IioAuthRoleItem;
+  LAuthUserAppItem: IioAuthAppItem;
 begin
   AScope := AScope.ToLower;
   LPermissionLevel := ptUnauthorized;
@@ -333,6 +405,16 @@ begin
       if LPermission.PermissionLevel > Result then
         Result := LPermissionLevel;
   end;
+  // App permissions (if an app is specified)
+  if (AAppID <> IO_STRING_NULL_VALUE) and (FApps.Count > 0) then
+  begin
+    LPermissionLevel := ptUnauthorized;
+    for LAuthUserAppItem in FApps do
+      if LAuthUserAppItem.App.AppID = AAppID then
+        LPermissionLevel := LAuthUserAppItem.App.PermissionLevelFor(AAppID, AScope, AIntention);
+    if LPermissionLevel < Result then
+      Result := LPermissionLevel;
+  end;
 end;
 
 function TioAuthUser.GetApps: TioAuthAppList;
@@ -340,12 +422,17 @@ begin
   Result := FApps;
 end;
 
+function TioAuthUser.GetExpiration: TDateTime;
+begin
+  Result := FExpiration;
+end;
+
 function TioAuthUser.GetID: Integer;
 begin
   Result := FID;
 end;
 
-function TioAuthUser.GetPermissiones: TioPermissionList;
+function TioAuthUser.GetPermissions: TioPermissionList;
 begin
   Result := FPermissions;
 end;
@@ -358,6 +445,11 @@ end;
 function TioAuthUser.GetStatus: TioAuthUserStatus;
 begin
   Result := FStatus;
+end;
+
+procedure TioAuthUser.SetExpiration(const Value: TDateTime);
+begin
+  FExpiration := Value;
 end;
 
 procedure TioAuthUser.SetStatus(const Value: TioAuthUserStatus);
@@ -390,9 +482,16 @@ end;
 
 { TioAuthBaseCredentials }
 
-function TioAuthCustomCredentials.CanAuthorize(const ALoginPassword: String): Boolean;
+function TioAuthCustomCredentials.CanAuthorize: Boolean;
 begin
   Result := False;
+end;
+
+function TioAuthCustomCredentials.EncryptPassword(const APassword: String): String;
+begin
+  // TODO: AUTH - fare una implementazione di base ma che cifra veramente?
+  // System.Hash.THashMD5.GetHashString
+  Result := APassword;
 end;
 
 function TioAuthCustomCredentials.GetClassName: String;
@@ -405,7 +504,12 @@ begin
   Result := False;
 end;
 
-function TioAuthCustomCredentials.PermissionLevelFor(AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel;
+function TioAuthCustomCredentials.IsExpired: Boolean;
+begin
+  Result := True;
+end;
+
+function TioAuthCustomCredentials.PermissionLevelFor(AAppID, AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel;
 begin
   Result := ptUnauthorized;
 end;
@@ -444,9 +548,187 @@ end;
 
 { TioAuthApp }
 
+function TioAuthApp.CanAuthorize: Boolean;
+begin
+  Result := False;
+  // Check password
+  if not _IsValidAppSecret(AppSecret) then
+    raise EioAuthInvalidCredentialsException_401.Create('Invalid app credentials');
+  // check if active
+  Result := _IsActive;
+end;
+
+constructor TioAuthApp.Create;
+begin
+  inherited Create;
+  FID := IO_INTEGER_NULL_VALUE;
+  FExpiration := IO_DATETIME_NULL_VALUE;
+  FStatus := usInactive;
+end;
+
+function TioAuthApp.GetExpiration: TDateTime;
+begin
+  Result := FExpiration;
+end;
+
 function TioAuthApp.GetID: Integer;
 begin
   Result := FID;
+end;
+
+function TioAuthApp.GetStatus: TioAuthUserStatus;
+begin
+  Result := FStatus;
+end;
+
+function TioAuthApp.IsActive: Boolean;
+begin
+  Result := _IsActive;
+end;
+
+function TioAuthApp.IsExpired: Boolean;
+begin
+  Result := _IsExpired;
+end;
+
+function TioAuthApp.PermissionLevelFor(AAppID, AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel;
+begin
+  // Per ora ritorna sempre l'acesso completo che poi in pratica fa si che si basi unicamente sui permessi dell'utente
+  //  perchè il permesso che ritorna è sempre il minore tra quello di utente e app (se c'è una app)
+  Result := TioAuthPermissionLevel.ptReadWriteDelete;
+end;
+
+procedure TioAuthApp.SetExpiration(const Value: TDateTime);
+begin
+  FExpiration := Value;
+end;
+
+procedure TioAuthApp.SetStatus(const Value: TioAuthUserStatus);
+begin
+  FStatus := Value;
+end;
+
+function TioAuthApp._IsActive: Boolean;
+begin
+  Result := False;
+  // Check status
+  if not _IsActiveStatus then
+    raise EioAuthInactiveAppException_401.Create(Format('App "%s" has been deactivated', [AppID]));
+  // Check expiration
+  if _IsExpired then
+    raise EioAuthAppExpiredException_401.Create(Format('App "%s" has been expired', [AppID]));
+  Result := True;
+end;
+
+function TioAuthApp._IsActiveStatus: Boolean;
+begin
+  Result := FStatus = usActive;
+end;
+
+function TioAuthApp._IsExpired: Boolean;
+begin
+  Result := (FExpiration <> IO_DATETIME_NULL_VALUE) and (TioUtilities.NowUTC > FExpiration);
+end;
+
+function TioAuthApp._IsValidAppSecret(const AAppSecret: String): Boolean;
+begin
+  Result := EncryptPassword(AAppSecret) = FEncryptedAppSecret;
+end;
+
+{ TioAuthAppItem }
+
+function TioAuthAppItem.CanAuthorize: Boolean;
+begin
+  Result := FApp.CanAuthorize;
+end;
+
+constructor TioAuthAppItem.Create(const AApp: IioAuthApp);
+begin
+  inherited Create;
+  FApp := AApp;
+  FID := IO_INTEGER_NULL_VALUE;
+  FExpiration := IO_DATETIME_NULL_VALUE;
+  FStatus := usInactive;
+end;
+
+function TioAuthAppItem.GetApp: IioAuthApp;
+begin
+  Result := FApp;
+end;
+
+function TioAuthAppItem.GetExpiration: TDateTime;
+begin
+  Result := FExpiration;
+end;
+
+function TioAuthAppItem.GetID: Integer;
+begin
+  Result := FID;
+end;
+
+function TioAuthAppItem.GetStatus: TioAuthUserStatus;
+begin
+  Result := FStatus;
+end;
+
+function TioAuthAppItem.IsActive: Boolean;
+begin
+  Result := _IsActive or FApp.IsActive;
+end;
+
+function TioAuthAppItem.IsExpired: Boolean;
+begin
+  Result := _IsExpired or FApp.IsExpired;
+end;
+
+procedure TioAuthAppItem.SetExpiration(const Value: TDateTime);
+begin
+  FExpiration := Value;
+end;
+
+procedure TioAuthAppItem.SetStatus(const Value: TioAuthUserStatus);
+begin
+  FStatus := Value;
+end;
+
+function TioAuthAppItem._IsActive: Boolean;
+begin
+  Result := False;
+  // Check status
+  if not _IsActiveStatus then
+    raise EioAuthInactiveAppException_401.Create(Format('App "%s" (as user item) has been deactivated', [FApp.AppID]));
+  // Check expiration
+  if _IsExpired then
+    raise EioAuthAppExpiredException_401.Create(Format('App "%s" (as user item) has been expired', [FApp.AppID]));
+  Result := True;
+end;
+
+function TioAuthAppItem._IsActiveStatus: Boolean;
+begin
+  Result := FStatus = usActive;
+end;
+
+function TioAuthAppItem._IsExpired: Boolean;
+begin
+  Result := (FExpiration <> IO_DATETIME_NULL_VALUE) and (TioUtilities.NowUTC > FExpiration);
+end;
+
+{ TioAuthRoleItem }
+
+constructor TioAuthRoleItem.Create(const ARole: IioAuthRole);
+begin
+  inherited Create;
+  FRole := ARole;
+end;
+
+function TioAuthRoleItem.GetID: Integer;
+begin
+  Result := FID;
+end;
+
+function TioAuthRoleItem.GetRole: IioAuthRole;
+begin
+  Result := FRole;
 end;
 
 end.

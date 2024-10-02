@@ -110,7 +110,13 @@ type
   EioAuthInactiveUserException_401 = class(EioAuthException)
   end;
 
+  EioAuthInactiveAppException_401 = class(EioAuthException)
+  end;
+
   EioAuthUserExpiredException_401 = class(EioAuthException)
+  end;
+
+  EioAuthAppExpiredException_401 = class(EioAuthException)
   end;
 
   EioAuthForbiddenException_403 = class(EioAuthException)

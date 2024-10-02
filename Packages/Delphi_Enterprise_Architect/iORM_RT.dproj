@@ -397,8 +397,7 @@
         <DCCReference Include="..\..\Source\iORM.Auth.Model.pas"/>
         <DCCReference Include="..\..\Source\iORM.Auth.JWT.pas"/>
         <DCCReference Include="..\..\Source\iORM.Auth.Components.AuthServer.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Auth.Components.AuthenticationClient.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Auth.Components.AuthorizationClient.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Auth.Components.AuthClient.pas"/>
         <DCCReference Include="..\..\Source\iORM.Auth.Session.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

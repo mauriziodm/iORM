@@ -82,7 +82,7 @@ type
     class procedure TrimStrings(const AStrings: TStrings);
     class function CloneObject(const ASourceObj: TObject): TObject;
     class procedure StopLinkerRemoval(const AClass: TClass);
-    class function Now(const UTC: Boolean = False; const ForceDayLight: Boolean = False): TDateTime; static; inline;
+    class function NowUTC(const ForceDayLight: Boolean = False): TDateTime; static;
     /// Ricava la classe più in alto nella gerarchia (quello più vicina a TObject) che implementa la stessa interfaccia
     /// Questo serve a impostare correttamente la query select in modo che filtri correttamente in base anche
     ///  ai vincoli di ereditarietà.
@@ -99,7 +99,7 @@ type
     class function isEntityType(const ARTTIType: TRttiType): Boolean; inline;
     class function isEntityAttribute(const AAttribute: TCustomAttribute): Boolean; inline;
     class function IsNotPersistedEntity(const AClassName: String): Boolean; inline;
-    class function IsPersistedEntity(const AClassName: String): Boolean; inline;
+    class function IsPersistedEntity(const AClassName: String): Boolean; static;
     // ResolvePropertyPath
     class procedure ResolveChildPropertyPath_SplitPropNameAndPath(const AQualifiedPropertyPath: String; out OPath: TStrings; out OPropName: String); static;
     class function ResolveChildPropertyPath_GetFinalObj(const ARootObj: Tobject; const AChildObjPath: TStrings): Tobject; static;
@@ -711,12 +711,9 @@ begin
 {$ENDIF NEXTGEN}
 end;
 
-class function TioUtilities.Now(const UTC: Boolean = False; const ForceDayLight: Boolean = False): TDateTime;
+class function TioUtilities.NowUTC(const ForceDayLight: Boolean = False): TDateTime;
 begin
-  if UTC then
-    Result := TTimeZone.Local.ToUniversalTime(Now, ForceDayLight)
-  else
-    Result := Now;
+  Result := TTimeZone.Local.ToUniversalTime(Now, ForceDayLight)
 end;
 
 class function TioUtilities._ExtractAttributeInfoSign(const ARttiInstanceType: TRttiInstanceType): String;

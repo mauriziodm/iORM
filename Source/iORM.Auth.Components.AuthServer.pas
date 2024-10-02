@@ -48,15 +48,6 @@ const
 
   USER_CACHE_EXPIRATION_MINS = 10; // default is 10 minutes
 type
-  TioAuthServer = class;
-
-  TioOnAuthorizeAccessEvent = procedure(const Sender: TioAuthServer; const AScope: String; const AIntention: TioAuthIntention; const AAccessToken: String; var ResultIsAuthorized, Done: Boolean) of object;
-  TioOnAuthorizeUserEvent = procedure(const Sender: TioAuthServer; const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String; var ResultIsAuthorized, Done: Boolean) of object;
-  TioOnAuthorizeAppEvent = procedure(const Sender: TioAuthServer; const AAppCredentials: IioAuthAppCredentials; var AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String; var ResultIsAuthorized, Done: Boolean) of object;
-  TioOnNewAccessTokenEvent = procedure(const Sender: TioAuthServer; const AAuthorizationToken: String; out ResultAccessToken, ResultRefreshToken: String; var ResultIsAuthorized, Done: Boolean) of object;
-  TioOnRefreshAccessTokenEvent = procedure(const Sender: TioAuthServer; const ARefreshToken: String; out ResultAccessToken, ResultRefreshToken: String; var ResultIsAuthorized, Done: Boolean) of object;
-  TioOnAccessTokenNeedRefreshEvent = procedure(const Sender: TioAuthServer; const AAccessToken: String; var ResultNeedRefresh, Done: Boolean) of object;
-
   TioAuthUserCache = class;
 
   TioAuthServer = class(TComponent)
@@ -65,10 +56,9 @@ type
     class var FInstance: TioAuthServer;
   strict private
     // fields
-    FEnabled: Boolean;
+    FActive: Boolean;
     FTokenIssuer: String; // proprietà non thread safe ma per il momento provo a mantenerla non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
     FTokenSecret: String; // proprietà non thread safe ma per il momento provo a mantenerla non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
-    FTokenTimeUTC: Boolean; // proprietà non thread safe ma per il momento provo a mantenerla non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
     FUserCache: TioAuthUserCache;
     FUserCacheExpirationMins: Integer;
     // events
@@ -97,17 +87,16 @@ type
     destructor Destroy; override;
     class function GetInstance: TioAuthServer; static;
     function AuthorizeUser(const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String): Boolean; // return a user identity token
-    function AuthorizeApp(const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean; // return an app authorization token
+    function AuthorizeApp(AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean; // return an app authorization token
     function AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean; // return true or false depending the access to the requested result is permitted
     function NewAccessToken(const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; // return a new acces token and also a new refresh token just after the authorization (login)
     function RefreshAccessToken(const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; // return a new acces token and also a new refresh token
     function AccessTokenNeedRefresh(const AAccessToken: String): Boolean;
   published
     // properties
-    property Enabled: Boolean read FEnabled write FEnabled;
+    property Active: Boolean read FActive write FActive;
     property TokenIssuer: String read FTokenIssuer write FTokenIssuer; // proprietà non thread safe ma per il momento provo a mantenerna non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
     property TokenSecret: String read FTokenSecret write FTokenSecret; // proprietà non thread safe ma per il momento provo a mantenerna non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
-    property TokenTimeUTC: Boolean read FTokenTimeUTC write FTokenTimeUTC; // proprietà non thread safe ma per il momento provo a mantenerna non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
     property UserCacheExpirationMins: Integer read FUserCacheExpirationMins write FUserCacheExpirationMins default USER_CACHE_EXPIRATION_MINS;
     property _Version: String read Get_Version;
     // events
@@ -158,17 +147,16 @@ uses
 
 procedure TioAuthServer.CheckIfEnabled;
 begin
-  if not FEnabled then
-    raise EioAuthServerComponentNotEnabled_404.Create('Component "TioAuthServer" not found');
+  if not FActive then
+    raise EioAuthServerComponentNotEnabled_404.Create(Format('Component "%s" not found', [Name]));
 end;
 
 constructor TioAuthServer.Create(AOwner: TComponent);
 begin
   inherited;
-  FEnabled := True;
+  FActive := True;
   FTokenSecret := 'change me as soon as possible';
   FTokenIssuer := IO_STRING_NULL_VALUE;
-  FTokenTimeUTC := True;
   FUserCache := TioAuthUserCache.Create(FUserCacheExpirationMins);
   FUserCacheExpirationMins := USER_CACHE_EXPIRATION_MINS; // default is 10 minutes
   if not (csDesigning in ComponentState) then
@@ -281,7 +269,7 @@ begin
   ResultUserAuthorizationToken := IO_AUTH_NULL_JWT;
   // First check if the component is enabled
   CheckIfEnabled;
-  // invoke OnLogin event if assigned
+  // invoke OnAuthorizeUser event if assigned
   LDone := False;
   if Assigned(FOnAuthorizeUser) then
     FOnAuthorizeUser(Self, AUserCredentials, ResultUserAuthorizationToken, Result, LDone);
@@ -290,7 +278,7 @@ begin
   begin
     // check LoginUserName and LoginUserPassword
     LUser := FUserCache.GetUser(AUserCredentials.LoginUserName, True);
-    if not LUser.CanAuthorize(AUserCredentials.LoginPassword) then
+    if not LUser.CanAuthorize then
       raise EioAuthInvalidCredentialsException_401.Create('Invalid user credentials');
     // if all is ok then build the result user authorization token
     ResultUserAuthorizationToken := _BuildAuthorizationToken(LUser.LoginUserName);
@@ -302,17 +290,16 @@ begin
   end;
 end;
 
-function TioAuthServer.AuthorizeApp(const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean;
+function TioAuthServer.AuthorizeApp(AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean;
 var
   LDone: Boolean;
   LUserID, LAppID: String;
-  LApp: IioAuthApp;
 begin
   Result := False;
   ResultAppAuthorizationToken := IO_AUTH_NULL_JWT;
   // First check if the component is enabled
   CheckIfEnabled;
-  // invoke OnLogin event if assigned
+  // invoke OnAuthorizeApp event if assigned
   LDone := False;
   if Assigned(FOnAuthorizeApp) then
     FOnAuthorizeApp(Self, AAppCredentials, AUserAuthorizationToken, ResultAppAuthorizationToken, Result, LDone);
@@ -323,13 +310,14 @@ begin
     _CheckAuthorizationToken(AUserAuthorizationToken, LUserID, LAppID);
     if LAppID <> IO_STRING_NULL_VALUE then
       raise EioAuthUserOnlyAuthorizationTokenExpected_401.Create('A user authorization token/code was expected, but an application authorization token/code was received instead.');
-    // check app credentials
-    LApp := io.Load<IioAuthApp>._Where('AppID', coEquals, AAppCredentials.AppID).ToObject;
-    if not LApp.CanAuthorize(AAppCredentials.AppSecret) then
+    // load app entity (if it is a persisted entity)
+    if TioUtilities.IsPersistedEntity((AAppCredentials as TObject).ClassName) then
+      io.Load<IioAuthApp>._Where('AppID', coEquals, AAppCredentials.AppID).ToObject(AAppCredentials);
+    // if not authorized then raise an exception
+    if not AAppCredentials.CanAuthorize then
       raise EioAuthInvalidCredentialsException_401.Create('Invalid app credentials');
     // Build token
-    ResultAppAuthorizationToken := _BuildAuthorizationToken(LApp.AppID, LUserID);
-    // final check, if the result token is null the raise exception
+    ResultAppAuthorizationToken := _BuildAuthorizationToken(AAppCredentials.AppID, LUserID);
     if ResultAppAuthorizationToken = IO_AUTH_NULL_JWT then
       raise EioAuthInvalidCredentialsException_401.Create('Invalid app credentials');
     // Return true if all is ok
@@ -374,7 +362,7 @@ begin
     _CheckAccessToken(AAccessToken, LUserID, LAppID);
     // check permissions
     LUser := FUserCache.GetUser(LUserID);
-    LPermissionLevel := LUser.PermissionLevelFor(AScope, AAuthIntention);
+    LPermissionLevel := LUser.PermissionLevelFor(LAppID, AScope, AAuthIntention);
     Result := (Ord(LPermissionLevel) > Ord(AAuthIntention));
     if not Result then
       raise EioAuthForbiddenException_403.Create(Format('Unhauthorized access to scope (%s)', [AScope]));
@@ -386,7 +374,7 @@ var
   LToken: TioJWT;
   LNow: TDateTime;
 begin
-  LNow := TioUtilities.Now;
+  LNow := TioUtilities.NowUTC;
   LToken := TioJWT.Create;
   try
     LToken.AppID := AAppID;
@@ -408,7 +396,7 @@ var
   LToken: TioJWT;
   LNow: TDateTime;
 begin
-  LNow := TioUtilities.Now;
+  LNow := TioUtilities.NowUTC;
   LToken := TioJWT.Create;
   try
     LToken.AppID := AAppID;
@@ -430,7 +418,7 @@ var
   LToken: TioJWT;
   LNow: TDateTime;
 begin
-  LNow := TioUtilities.Now;
+  LNow := TioUtilities.NowUTC;
   LToken := TioJWT.Create;
   try
     LToken.AppID := AAppID;
@@ -451,7 +439,7 @@ procedure TioAuthServer._CheckToken(const AJWT: TioJWT; const ATokenType: String
 var
   LNow: TDateTime;
 begin
-  LNow := TioUtilities.Now(FTokenTimeUTC);
+  LNow := TioUtilities.NowUTC;
   // Check if it's verified
   if AJWT.IsVerified then
      raise EioTokenSignatureException_401.Create(Format('Token signature not verified (%s)', [ATokenType]));
@@ -514,7 +502,7 @@ var
 begin
   LJWT := TioJWT.CreateByToken(AAccessToken, FTokenSecret);
   try
-    LNow := TioUtilities.Now(FTokenTimeUTC);
+    LNow := TioUtilities.NowUTC;
     Result := LJWT.IsToBeRefreshed(LNow) or LJWT.IsExpired(LNow);
   finally
     LJWT.Free;
@@ -626,12 +614,12 @@ end;
 constructor TioAuthUserCacheItem.Create(const AUser: IioAuthUser; const AExpirationMinutes: Integer);
 begin
   FUser := AUser;
-  FExpiration := IncMinute(Now, AExpirationMinutes);
+  FExpiration := IncMinute(TioUtilities.NowUTC, AExpirationMinutes);
 end;
 
 function TioAuthUserCacheItem.IsExpired: Boolean;
 begin
-  Result := Now > Expiration;
+  Result := TioUtilities.NowUTC > Expiration;
 end;
 
 end.
