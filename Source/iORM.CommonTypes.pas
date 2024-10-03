@@ -63,7 +63,7 @@ const
   ssMap = DJSON.Params.TdjSkipScope.ssMap;
   ssETM = DJSON.Params.TdjSkipScope.ssETM;
   ssHTTP = DJSON.Params.TdjSkipScope.ssHTTP;
-  ssEmbeddeRelation = DJSON.Params.TdjSkipScope.ssEmbeddeRelation;
+  ssEmbeddedRelation = DJSON.Params.TdjSkipScope.ssEmbeddedRelation;
   ssSUD = DJSON.Params.TdjSkipScope.ssSUD;
   ssSaveRevertPoint = DJSON.Params.TdjSkipScope.ssSaveRevertPoint;
   ssDJSON = DJSON.Params.TdjSkipScope.ssDJSON;

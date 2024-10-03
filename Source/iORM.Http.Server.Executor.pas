@@ -179,11 +179,11 @@ end;
 class procedure TioHttpServerExecutor._AuthorizeUser(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
 var
   LObj: TObject;
-  LUserCredentials: IioAuthUserCredentials;
+  LUserCredentials: IioAuthCustomCredentials;
   LResultUserAuthorizationToken: String;
 begin
   LObj := AioRequestBody.JSONDataValueAsObject;
-  if Supports(LObj, IioAuthUserCredentials, LUserCredentials) then
+  if Supports(LObj, IioAuthCustomCredentials, LUserCredentials) then
   begin
     AioResponseBody.AuthResultIsAuthorized := TioAuthServer.GetInstance.AuthorizeUser(LUserCredentials, LResultUserAuthorizationToken);
     AioResponseBody.AuthResult1 := LResultUserAuthorizationToken;

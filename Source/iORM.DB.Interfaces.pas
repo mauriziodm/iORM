@@ -489,7 +489,7 @@ type
     class procedure _DoSQLDest_Execute(const ASQLDestination: IioSQLDestination); virtual; abstract;
     class procedure _DoSQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); virtual; abstract;
     // Auth
-    class function _DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String): Boolean; virtual; abstract;
+    class function _DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthCustomCredentials; out ResultUserAuthorizationToken: String): Boolean; virtual; abstract;
     class function _DoAuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean; virtual; abstract;
     class function _DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean; virtual; abstract;
     class function _DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; virtual; abstract;
@@ -527,7 +527,7 @@ type
     class procedure SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet);
     class procedure SQLDest_Execute(const ASQLDestination: IioSQLDestination);
     // Auth
-    class function AuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String): Boolean;
+    class function AuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthCustomCredentials; out ResultUserAuthorizationToken: String): Boolean;
     class function AuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean;
     class function AuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean;
     class function Auth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean;
@@ -934,7 +934,7 @@ begin
   Result := _DoAuthorizeApp(AConnectionDefName, AAppCredentials, AUserAuthorizationToken, ResultAppAuthorizationToken);
 end;
 
-class function TioPersistenceStrategyIntf.AuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String): Boolean;
+class function TioPersistenceStrategyIntf.AuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthCustomCredentials; out ResultUserAuthorizationToken: String): Boolean;
 begin
   Result := _DoAuthorizeUser(AConnectionDefName, AUserCredentials, ResultUserAuthorizationToken);
 end;

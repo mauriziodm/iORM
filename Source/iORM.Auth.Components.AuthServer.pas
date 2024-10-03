@@ -86,7 +86,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     class function GetInstance: TioAuthServer; static;
-    function AuthorizeUser(const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String): Boolean; // return a user identity token
+    function AuthorizeUser(const AUserCredentials: IioAuthCustomCredentials; out ResultUserAuthorizationToken: String): Boolean; // return a user identity token
     function AuthorizeApp(AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean; // return an app authorization token
     function AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean; // return true or false depending the access to the requested result is permitted
     function NewAccessToken(const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; // return a new acces token and also a new refresh token just after the authorization (login)
@@ -260,7 +260,7 @@ begin
     raise EioGenericException.Create(ClassName, 'SetUserCacheExpirationMins', 'The minimum value is 1');
 end;
 
-function TioAuthServer.AuthorizeUser(const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String): Boolean;
+function TioAuthServer.AuthorizeUser(const AUserCredentials: IioAuthCustomCredentials; out ResultUserAuthorizationToken: String): Boolean;
 var
   LDone: Boolean;
   LUser: IioAuthUser;
@@ -277,11 +277,11 @@ begin
   if not LDone then
   begin
     // check LoginUserName and LoginUserPassword
-    LUser := FUserCache.GetUser(AUserCredentials.LoginUserName, True);
+    LUser := FUserCache.GetUser(AUserCredentials.LoginName, True);
     if not LUser.CanAuthorize then
       raise EioAuthInvalidCredentialsException_401.Create('Invalid user credentials');
     // if all is ok then build the result user authorization token
-    ResultUserAuthorizationToken := _BuildAuthorizationToken(LUser.LoginUserName);
+    ResultUserAuthorizationToken := _BuildAuthorizationToken(LUser.LoginPassword);
     // final check, if the result token is null the raise exception
     if ResultUserAuthorizationToken = IO_AUTH_NULL_JWT then
       raise EioAuthInvalidCredentialsException_401.Create('Invalid user credentials');

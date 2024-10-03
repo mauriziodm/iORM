@@ -55,7 +55,7 @@ type
   // Note: ssMap = Entity mapping (ORM only, not used by DJSON serilization)
   // Note: ssETM = Entity Time Machine operation
   // Note: ssSUD = Smart Update Detection operation
-  TdjSkipScope = (ssMap, ssETM, ssHTTP, ssEmbeddeRelation, ssSUD, ssSaveRevertPoint, ssDJSON);
+  TdjSkipScope = (ssMap, ssETM, ssHTTP, ssEmbeddedRelation, ssSUD, ssSaveRevertPoint, ssDJSON);
   TdjSkipScopeSet = set of TdjSkipScope;
 
   TdjSerializersContainer = class;

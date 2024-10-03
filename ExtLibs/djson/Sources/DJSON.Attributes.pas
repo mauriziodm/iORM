@@ -235,7 +235,7 @@ end;
 
 constructor djSkipAttribute.Create;
 begin
-  FScopes := [ssMap, ssETM, ssHTTP, ssEmbeddeRelation, ssSUD, ssSaveRevertPoint, ssDJSON];
+  FScopes := [ssMap, ssETM, ssHTTP, ssEmbeddedRelation, ssSUD, ssSaveRevertPoint, ssDJSON];
 end;
 
 constructor djSkipAttribute.Create(const AScopes: TdjSkipScopeSet);

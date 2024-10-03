@@ -67,39 +67,38 @@ type
 
   TioAuthCustomCredentials = class(TioAuthBaseEntity, IioAuthCustomCredentials)
   strict private
-    FSecretEncrypted: String;
-  strict protected
-    // ---------- to be ovverrided ----------
-    function SecretValidate(const ASecretToValidated: String): Boolean; virtual;
-    function SecretEncrypt(const ASecretToBeEncrypted: String): String; virtual;
-    // ---------- to be ovverrided ----------
+    [ioIndex]
+    FLoginName: String;
+    [ioSkip([ssMap, ssETM])]
+    FLoginOldPassword: String;
+    [ioSkip([ssMap, ssETM])]
+    FLoginPassword: String;
+    [ioSkip([ssMap, ssETM])]
+    FLoginPasswordConfirm: String;
+    FPswDigest: String;
+    function GetLoginName: String;
+    function GetLoginOldPassword: String;
+    function GetLoginPassword: String;
+    function GetLoginPasswordConfirm: String;
+    procedure SetLoginName(const Value: String);
+    procedure SetLoginOldPassword(const Value: String);
+    procedure SetLoginPassword(const Value: String);
+    procedure SetLoginPasswordConfirm(const Value: String);
   public
     constructor Create;
     // ---------- to be ovverrided ----------
     function CanAuthorize: Boolean; virtual;
+    function GeneratePasswordDigest(const APassword: String): String; virtual;
+    function ValidatePassword(const APassword: String): Boolean; virtual;
     // ---------- to be ovverrided ----------
-  end;
-
-  TioAuthUserCredentials = class(TioAuthCustomCredentials, IioAuthUserCredentials)
-  strict private
-    [ioSkip]
-    FLoginPassword: String;
-    [ioIndex]
-    FLoginUserName: String;
-    function GetLoginPassword: String;
-    function GetLoginUserName: String;
-    procedure SetLoginPassword(const Value: String);
-    procedure SetLoginUserName(const Value: String);
-  strict protected
-    function GetExceptionEntityName: String; override;
-    function GetExceptionSubjectName: String; override;
-  public
     // properties
+    property LoginName: String read GetLoginName write SetLoginName;
+    property LoginOldPassword: String read GetLoginOldPassword write SetLoginOldPassword;
     property LoginPassword: String read GetLoginPassword write SetLoginPassword;
-    property LoginUserName: String read GetLoginUserName write SetLoginUserName;
+    property LoginPasswordConfirm: String read GetLoginPasswordConfirm write SetLoginPasswordConfirm;
   end;
 
-  TioAuthUser = class(TioAuthUserCredentials, IioAuthUser)
+  TioAuthUser = class(TioAuthCustomCredentials, IioAuthUser)
   strict private
     FApps: TioAuthAppList;
     FID: Integer;
@@ -109,16 +108,18 @@ type
     function GetID: Integer;
     function GetPermissions: TioPermissionList;
     function GetRoles: TioAuthRoleList;
+  strict protected
+    function GetExceptionEntityName: String; override;
+    function GetExceptionSubjectName: String; override;
   public
     constructor Create;
     destructor Destroy; override;
     // ---------- to be ovverrided ----------
-    function CanAuthorize: Boolean; override;
     function PermissionLevelFor(AAppID, AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel; virtual;
     // ---------- to be ovverrided ----------
     // properties
-    property Apps: TioAuthAppList read FApps;
-    property ID: Integer read FID;
+    property Apps: TioAuthAppList read GetApps;
+    property ID: Integer read GetID;
     property Permissions: TioPermissionList read GetPermissions;
     property Roles: TioAuthRoleList read GetRoles;
   end;
@@ -238,7 +239,7 @@ type
 
 implementation
 
-uses System.SysUtils, iORM.Exceptions, iORM.Utilities;
+uses System.SysUtils, System.Hash, iORM.Exceptions, iORM.Utilities;
 
 { TioAuthPermission }
 
@@ -327,16 +328,6 @@ end;
 
 { TioAuthUser }
 
-function TioAuthUser.CanAuthorize: Boolean;
-begin
-  Result := False;
-  // Check password
-  if not SecretValidate(LoginPassword) then
-    raise EioAuthInvalidCredentialsException_401.Create('Invalid user credentials');
-  // check if active
-  Result := IsActive(True);
-end;
-
 constructor TioAuthUser.Create;
 begin
   inherited Create;
@@ -396,6 +387,16 @@ begin
   Result := FApps;
 end;
 
+function TioAuthUser.GetExceptionEntityName: String;
+begin
+  Result := 'User';
+end;
+
+function TioAuthUser.GetExceptionSubjectName: String;
+begin
+  Result := LoginName;
+end;
+
 function TioAuthUser.GetID: Integer;
 begin
   Result := FID;
@@ -411,62 +412,76 @@ begin
   Result := FRoles;
 end;
 
-
-{ TioAuthCredentials }
-
-function TioAuthUserCredentials.GetExceptionEntityName: String;
-begin
-  Result := 'User';
-end;
-
-function TioAuthUserCredentials.GetExceptionSubjectName: String;
-begin
-  Result := FLoginUserName;
-end;
-
-function TioAuthUserCredentials.GetLoginPassword: String;
-begin
-  Result := FLoginPassword;
-end;
-
-function TioAuthUserCredentials.GetLoginUserName: String;
-begin
-  Result := FLoginUserName;
-end;
-
-procedure TioAuthUserCredentials.SetLoginPassword(const Value: String);
-begin
-  FLoginPassword := Value;
-end;
-
-procedure TioAuthUserCredentials.SetLoginUserName(const Value: String);
-begin
-  FLoginUserName := Value;
-end;
-
 { TioAuthBaseCredentials }
 
 function TioAuthCustomCredentials.CanAuthorize: Boolean;
 begin
   Result := False;
+  // Check password
+  if not ValidatePassword(LoginPassword) then
+    raise EioAuthInvalidCredentialsException_401.Create(Format('Invalid %s credentials', [GetExceptionEntityName.ToLower]));
+  // check if active
+  Result := IsActive(True);
 end;
 
 constructor TioAuthCustomCredentials.Create;
 begin
   inherited Create;
-  FSecretEncrypted := IO_STRING_NULL_VALUE;
+  FLoginName := IO_STRING_NULL_VALUE;
+  FLoginOldPassword := IO_STRING_NULL_VALUE;
+  FLoginPassword := IO_STRING_NULL_VALUE;
+  FLoginPasswordConfirm := IO_STRING_NULL_VALUE;
+  FPswDigest := IO_STRING_NULL_VALUE;
 end;
 
-function TioAuthCustomCredentials.SecretValidate(const ASecretToValidated: String): Boolean;
+function TioAuthCustomCredentials.GetLoginName: String;
 begin
-  Result := SecretEncrypt(ASecretToValidated) = FSecretEncrypted;
+  Result := FLoginName;
 end;
 
-function TioAuthCustomCredentials.SecretEncrypt(const ASecretToBeEncrypted: String): String;
+function TioAuthCustomCredentials.GetLoginOldPassword: String;
 begin
-  // TODO: AUTH - fare una implementazione di base ma che cifra veramente?
-  // System.Hash.THashMD5.GetHashString
-  Result := ASecretToBeEncrypted;
+  Result := FLoginOldPassword;
+end;
+
+function TioAuthCustomCredentials.GetLoginPassword: String;
+begin
+  Result := FLoginPassword;
+end;
+
+function TioAuthCustomCredentials.GetLoginPasswordConfirm: String;
+begin
+  Result := FLoginPasswordConfirm;
+end;
+
+function TioAuthCustomCredentials.ValidatePassword(const APassword: String): Boolean;
+begin
+  Result := GeneratePasswordDigest(APassword) = FPswDigest;
+end;
+
+procedure TioAuthCustomCredentials.SetLoginName(const Value: String);
+begin
+  FLoginName := Value;
+end;
+
+procedure TioAuthCustomCredentials.SetLoginOldPassword(const Value: String);
+begin
+  FLoginOldPassword := Value;
+end;
+
+procedure TioAuthCustomCredentials.SetLoginPassword(const Value: String);
+begin
+  FLoginPassword := Value;
+end;
+
+procedure TioAuthCustomCredentials.SetLoginPasswordConfirm(const Value: String);
+begin
+  FLoginPasswordConfirm := Value;
+end;
+
+function TioAuthCustomCredentials.GeneratePasswordDigest(const APassword: String): String;
+begin
+  Result := THashSHA2.GetHashString(APassword);
 end;
 
 { TioAuthAppCredentials }
@@ -517,7 +532,7 @@ function TioAuthApp.CanAuthorize: Boolean;
 begin
   Result := False;
   // Check password
-  if not SecretValidate(AppSecret) then
+  if not ValidatePassword(AppSecret) then
     raise EioAuthInvalidCredentialsException_401.Create('Invalid app credentials');
   // check if active
   Result := IsActive(True);

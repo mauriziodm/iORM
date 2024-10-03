@@ -77,7 +77,7 @@ type
     class procedure _DoSQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); override;
     class procedure _DoSQLDest_Execute(const ASQLDestination: IioSQLDestination); override;
     // Auth
-    class function _DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String): Boolean; override;
+    class function _DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthCustomCredentials; out ResultUserAuthorizationToken: String): Boolean; override;
     class function _DoAuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean; override;
     class function _DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean; override;
     class function _DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; override;
@@ -582,7 +582,7 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyHttp._DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String): Boolean;
+class function TioPersistenceStrategyHttp._DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthCustomCredentials; out ResultUserAuthorizationToken: String): Boolean;
 var
   LConnection: IioConnectionHttp;
 begin

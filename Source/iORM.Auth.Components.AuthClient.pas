@@ -59,7 +59,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     class function GetInstance: TioAuthClient; static;
-    function AuthorizeUser(const AUserCredentials: IioAuthUserCredentials): Boolean; // user login (user authorization)
+    function AuthorizeUser(const AUserCredentials: IioAuthCustomCredentials): Boolean; // user login (user authorization)
 
 
     function AuthorizeApp(const AAppCredentials: IioAuthAppCredentials): Boolean; // app login (app authorization)
@@ -163,7 +163,7 @@ begin
 //  end;
 end;
 
-function TioAuthClient.AuthorizeUser(const AUserCredentials: IioAuthUserCredentials): Boolean;
+function TioAuthClient.AuthorizeUser(const AUserCredentials: IioAuthCustomCredentials): Boolean;
 var
   LDone: Boolean;
   LResultUserAuthorizationToken: String;
@@ -184,7 +184,7 @@ begin
   if Result and (LResultUserAuthorizationToken <> IO_AUTH_NULL_JWT) then
   begin
     LSession := TioApplication.Session;
-    LSession.UserName := AUserCredentials.LoginUserName;
+    LSession.UserName := AUserCredentials.LoginName;
     LSession.UserAuthorizationToken := LResultUserAuthorizationToken;
   end
   else
