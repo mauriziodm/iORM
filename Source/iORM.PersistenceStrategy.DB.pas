@@ -90,7 +90,7 @@ type
     class procedure _DoSQLDest_Execute(const ASQLDestination: IioSQLDestination); override;
     // Auth
     class function _DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthCustomCredentials; out ResultUserAuthorizationToken: String): Boolean; override;
-    class function _DoAuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean; override;
+    class function _DoAuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthCustomCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean; override;
     class function _DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean; override;
     class function _DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; override;
     class function _DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; override;
@@ -133,7 +133,7 @@ begin
   Result := TioAuthServer.GetInstance.AuthorizeAccess(AScope, AAuthIntention, AAccessToken);
 end;
 
-class function TioPersistenceStrategyDB._DoAuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials;
+class function TioPersistenceStrategyDB._DoAuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthCustomCredentials;
   AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean;
 begin
   Result := TioAuthServer.GetInstance.AuthorizeApp(AAppCredentials, AUserAuthorizationToken, ResultAppAuthorizationToken);

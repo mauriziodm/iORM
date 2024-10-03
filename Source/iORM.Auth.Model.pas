@@ -84,6 +84,8 @@ type
     procedure SetLoginOldPassword(const Value: String);
     procedure SetLoginPassword(const Value: String);
     procedure SetLoginPasswordConfirm(const Value: String);
+  strict protected
+    function GetExceptionSubjectName: String; override;
   public
     constructor Create;
     // ---------- to be ovverrided ----------
@@ -110,7 +112,6 @@ type
     function GetRoles: TioAuthRoleList;
   strict protected
     function GetExceptionEntityName: String; override;
-    function GetExceptionSubjectName: String; override;
   public
     constructor Create;
     destructor Destroy; override;
@@ -124,40 +125,23 @@ type
     property Roles: TioAuthRoleList read GetRoles;
   end;
 
-  TioAuthAppCredentials = class(TioAuthCustomCredentials, IioAuthAppCredentials)
-  strict private
-    [ioIndex]
-    FAppID: String;
-    FAppScope: String;
-    [ioSkip]
-    FAppSecret: String;
-    function GetAppID: String;
-    function GetAppScope: String;
-    function GetAppSecret: String;
-    procedure SetAppID(const Value: String);
-    procedure SetAppScope(const Value: String);
-    procedure SetAppSecret(const Value: String);
-  strict protected
-    function GetExceptionEntityName: String; override;
-    function GetExceptionSubjectName: String; override;
-  public
-    property AppID: String read GetAppID write SetAppID;
-    property AppScope: String read GetAppScope write SetAppScope;
-    property AppSecret: String read GetAppSecret write SetAppSecret;
-  end;
-
-  TioAuthApp = class(TioAuthAppCredentials, IioAuthApp)
+  TioAuthApp = class(TioAuthCustomCredentials, IioAuthApp)
   strict private
     FID: Integer;
+    FScopes: String;
     function GetID: Integer;
+    function GetScopes: String;
+    procedure SetScopes(const Value: String);
+  strict protected
+    function GetExceptionEntityName: String; override;
   public
     constructor Create;
     // ---------- to be ovverrided ----------
-    function CanAuthorize: Boolean; override;
     function PermissionLevelFor(AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel; virtual;
     // ---------- to be ovverrided ----------
     // properties
     property ID: Integer read GetID;
+    property Scopes: String read GetScopes write SetScopes;
   end;
 
   TioAuthPermission = class(TInterfacedObject, IioAuthPermission)
@@ -375,7 +359,7 @@ begin
   begin
     LPermissionLevel := plUnauthorized;
     for LAuthUserAppItem in FApps do
-      if LAuthUserAppItem.App.AppID = AAppID then
+      if LAuthUserAppItem.App.LoginName = AAppID then
         LPermissionLevel := LAuthUserAppItem.App.PermissionLevelFor(AScope, AIntention);
     if LPermissionLevel < Result then
       Result := LPermissionLevel;
@@ -390,11 +374,6 @@ end;
 function TioAuthUser.GetExceptionEntityName: String;
 begin
   Result := 'User';
-end;
-
-function TioAuthUser.GetExceptionSubjectName: String;
-begin
-  Result := LoginName;
 end;
 
 function TioAuthUser.GetID: Integer;
@@ -432,6 +411,11 @@ begin
   FLoginPassword := IO_STRING_NULL_VALUE;
   FLoginPasswordConfirm := IO_STRING_NULL_VALUE;
   FPswDigest := IO_STRING_NULL_VALUE;
+end;
+
+function TioAuthCustomCredentials.GetExceptionSubjectName: String;
+begin
+  Result := LoginName;
 end;
 
 function TioAuthCustomCredentials.GetLoginName: String;
@@ -484,69 +468,28 @@ begin
   Result := THashSHA2.GetHashString(APassword);
 end;
 
-{ TioAuthAppCredentials }
-
-function TioAuthAppCredentials.GetAppID: String;
-begin
-  Result := FAppID;
-end;
-
-function TioAuthAppCredentials.GetAppScope: String;
-begin
-  Result := FAppScope;
-end;
-
-function TioAuthAppCredentials.GetAppSecret: String;
-begin
-  Result := FAppSecret;
-end;
-
-function TioAuthAppCredentials.GetExceptionEntityName: String;
-begin
-  Result := 'App';
-end;
-
-function TioAuthAppCredentials.GetExceptionSubjectName: String;
-begin
-  Result := FAppID;
-end;
-
-procedure TioAuthAppCredentials.SetAppID(const Value: String);
-begin
-  FAppID := Value;
-end;
-
-procedure TioAuthAppCredentials.SetAppScope(const Value: String);
-begin
-  FAppScope := Value;
-end;
-
-procedure TioAuthAppCredentials.SetAppSecret(const Value: String);
-begin
-  FAppSecret := Value;
-end;
-
 { TioAuthApp }
-
-function TioAuthApp.CanAuthorize: Boolean;
-begin
-  Result := False;
-  // Check password
-  if not ValidatePassword(AppSecret) then
-    raise EioAuthInvalidCredentialsException_401.Create('Invalid app credentials');
-  // check if active
-  Result := IsActive(True);
-end;
 
 constructor TioAuthApp.Create;
 begin
   inherited Create;
   FID := IO_INTEGER_NULL_VALUE;
+  FScopes := IO_STRING_NULL_VALUE;
+end;
+
+function TioAuthApp.GetExceptionEntityName: String;
+begin
+  Result := 'App';
 end;
 
 function TioAuthApp.GetID: Integer;
 begin
   Result := FID;
+end;
+
+function TioAuthApp.GetScopes: String;
+begin
+  Result := FScopes;
 end;
 
 function TioAuthApp.PermissionLevelFor(AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel;
@@ -557,6 +500,11 @@ begin
     Result := TioAuthPermissionLevel.plReadWriteDelete
   else
     Result := plUnauthorized;
+end;
+
+procedure TioAuthApp.SetScopes(const Value: String);
+begin
+  FScopes := Value;
 end;
 
 { TioAuthAppItem }

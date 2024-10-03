@@ -87,7 +87,7 @@ type
     destructor Destroy; override;
     class function GetInstance: TioAuthServer; static;
     function AuthorizeUser(const AUserCredentials: IioAuthCustomCredentials; out ResultUserAuthorizationToken: String): Boolean; // return a user identity token
-    function AuthorizeApp(AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean; // return an app authorization token
+    function AuthorizeApp(AAppCredentials: IioAuthCustomCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean; // return an app authorization token
     function AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean; // return true or false depending the access to the requested result is permitted
     function NewAccessToken(const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; // return a new acces token and also a new refresh token just after the authorization (login)
     function RefreshAccessToken(const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; // return a new acces token and also a new refresh token
@@ -290,7 +290,7 @@ begin
   end;
 end;
 
-function TioAuthServer.AuthorizeApp(AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean;
+function TioAuthServer.AuthorizeApp(AAppCredentials: IioAuthCustomCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean;
 var
   LDone: Boolean;
   LUserID, LAppID: String;
@@ -312,12 +312,12 @@ begin
       raise EioAuthUserOnlyAuthorizationTokenExpected_401.Create('A user authorization token/code was expected, but an application authorization token/code was received instead.');
     // load app entity (if it is a persisted entity)
     if TioUtilities.IsPersistedEntity((AAppCredentials as TObject).ClassName) then
-      io.Load<IioAuthApp>._Where('AppID', coEquals, AAppCredentials.AppID).ToObject(AAppCredentials);
+      io.Load<IioAuthApp>._Where('AppID', coEquals, AAppCredentials.LoginName).ToObject(AAppCredentials);
     // if not authorized then raise an exception
     if not AAppCredentials.CanAuthorize then
       raise EioAuthInvalidCredentialsException_401.Create('Invalid app credentials');
     // Build token
-    ResultAppAuthorizationToken := _BuildAuthorizationToken(AAppCredentials.AppID, LUserID);
+    ResultAppAuthorizationToken := _BuildAuthorizationToken(AAppCredentials.LoginName, LUserID);
     if ResultAppAuthorizationToken = IO_AUTH_NULL_JWT then
       raise EioAuthInvalidCredentialsException_401.Create('Invalid app credentials');
     // Return true if all is ok
