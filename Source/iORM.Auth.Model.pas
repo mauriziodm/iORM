@@ -41,7 +41,7 @@ uses
 
 type
 
-  TioAuthBaseEntity = class(TInterfacedObject, IioAuthBaseEntity)
+  TioAuthBase = class(TInterfacedObject, IioAuthBase)
   strict private
     FExpiration: TDateTime;
     FStatus: TioAuthUserStatus;
@@ -54,18 +54,17 @@ type
     function GetExceptionSubjectName: String; virtual;
   public
     constructor Create;
-    function GetClassName: String;
+    function ClassName: String;
     // ---------- to be ovverrided ----------
     function IsActive(const RaiseExceptions: Boolean): Boolean; virtual;
     function IsExpired: Boolean; virtual;
     // ---------- to be ovverrided ----------
     // properties
-    property ClassName: String read GetClassName;
     property Expiration: TDateTime read GetExpiration write SetExpiration;
     property Status: TioAuthUserStatus read GetStatus write SetStatus;
   end;
 
-  TioAuthCustomCredentials = class(TioAuthBaseEntity, IioAuthCustomCredentials)
+  TioAuthCredentials = class(TioAuthBase, IioAuthCredentials)
   strict private
     [ioIndex]
     FLoginName: String;
@@ -100,13 +99,11 @@ type
     property LoginPasswordConfirm: String read GetLoginPasswordConfirm write SetLoginPasswordConfirm;
   end;
 
-  TioAuthUser = class(TioAuthCustomCredentials, IioAuthUser)
-  strict private
-    FApps: TioAuthAppList;
+// TODO: Dividere in due classi: TioAuthPermissionsHolder solo per i permessi e TioAuthRolseHolder per permessi e ruoli (deriva dalla prima)
+  TioAuthPermissionsHolder = class(TioAuthCredentials, IioAuthPermissionsHolder)
     FID: Integer;
     FPermissions: TioPermissionList;
     FRoles: TioAuthRoleList;
-    function GetApps: TioAuthAppList;
     function GetID: Integer;
     function GetPermissions: TioPermissionList;
     function GetRoles: TioAuthRoleList;
@@ -116,34 +113,42 @@ type
     constructor Create;
     destructor Destroy; override;
     // ---------- to be ovverrided ----------
-    function PermissionLevelFor(AAppID, AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel; virtual;
+    function PermissionLevelFor(AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel; virtual;
     // ---------- to be ovverrided ----------
     // properties
-    property Apps: TioAuthAppList read GetApps;
     property ID: Integer read GetID;
     property Permissions: TioPermissionList read GetPermissions;
     property Roles: TioAuthRoleList read GetRoles;
   end;
 
-  TioAuthApp = class(TioAuthCustomCredentials, IioAuthApp)
+  TioAuthUser = class(TioAuthPermissionsHolder, IioAuthUser)
   strict private
-    FID: Integer;
+    FApps: TioAuthAppList;
+    function GetApps: TioAuthAppList;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    // ---------- to be ovverrided ----------
+    function PermissionLevelFor(AAppID, AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel; reintroduce; virtual;
+    // ---------- to be ovverrided ----------
+    // properties
+    property Apps: TioAuthAppList read GetApps;
+  end;
+
+  TioAuthApp = class(TioAuthPermissionsHolder, IioAuthApp)
+  strict private
     FScopes: String;
-    function GetID: Integer;
     function GetScopes: String;
     procedure SetScopes(const Value: String);
   strict protected
     function GetExceptionEntityName: String; override;
   public
     constructor Create;
-    // ---------- to be ovverrided ----------
-    function PermissionLevelFor(AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel; virtual;
-    // ---------- to be ovverrided ----------
     // properties
-    property ID: Integer read GetID;
     property Scopes: String read GetScopes write SetScopes;
   end;
 
+// TODO: Fare un container di scopes che viene caricato durante il mapping delle classi in base agli attributi [ioAuthScope('...')] presenti nelle entità e quando si crea un oggetto TioAuthPermission (constructor) verificare che lo scope sia presente nel container, altrimento solleva una eccezione
   TioAuthPermission = class(TInterfacedObject, IioAuthPermission)
   strict private
     FID: Integer;
@@ -161,7 +166,7 @@ type
     property Scope: String read GetScope write SetScope;
   end;
 
-  TioAuthRole = class(TioAuthBaseEntity, IioAuthRole)
+  TioAuthRole = class(TioAuthBase, IioAuthRole)
   strict private
     FID: Integer;
     FName: String;
@@ -185,7 +190,7 @@ type
     property Permissions: TioPermissionList read GetPermissions;
   end;
 
-  TioAuthRoleItem = class(TioAuthBaseEntity, IioAuthRoleItem)
+  TioAuthRoleItem = class(TioAuthBase, IioAuthRoleItem)
   strict private
     FID: Integer;
     FRole: IioAuthRole;
@@ -203,7 +208,7 @@ type
     property Role: IioAuthRole read GetRole;
   end;
 
-  TioAuthAppItem = class(TioAuthBaseEntity, IioAuthAppItem)
+  TioAuthAppItem = class(TioAuthBase, IioAuthAppItem)
   strict private
     FApp: IioAuthApp;
     FID: Integer;
@@ -316,46 +321,23 @@ constructor TioAuthUser.Create;
 begin
   inherited Create;
   FApps := TioAuthAppList.Create;
-  FID := IO_INTEGER_NULL_VALUE;
-  FPermissions := TioPermissionList.Create;
-  FRoles := TioAuthRoleList.Create;
 end;
 
 destructor TioAuthUser.Destroy;
 begin
   FApps.Free;
-  FPermissions.Free;
-  FRoles.Free;
   inherited;
 end;
 
 function TioAuthUser.PermissionLevelFor(AAppID, AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel;
 var
-  LPermissionLevel: TioAuthPermissionLevel;
-  LPermission: IioAuthPermission;
-  LAuthUserRoleItem: IioAuthRoleItem;
   LAuthUserAppItem: IioAuthAppItem;
+  LPermissionLevel: TioAuthPermissionLevel;
 begin
-  AScope := AScope.ToLower;
-  LPermissionLevel := plUnauthorized;
-  Result := plUnauthorized;
-  // if not
-  // Roles
-  for LAuthUserRoleItem in FRoles do
-  begin
-    LPermissionLevel := LAuthUserRoleItem.Role.PermissionLevelFor(AScope, AIntention);
-    if LPermissionLevel > Result then
-      Result := LPermissionLevel;
-  end;
-  // User specific permissions
-  for LPermission in FPermissions do
-  begin
-    if LPermission.Scope = AScope then
-      if LPermission.PermissionLevel > Result then
-        Result := LPermissionLevel;
-  end;
-  // App permissions (if an app is specified)
-  if (AAppID <> IO_STRING_NULL_VALUE) and (FApps.Count > 0) then
+  Result := inherited PermissionLevelFor(AScope, AIntention);
+  // App permissions
+  // note: if there are no apps or if the apps have no permission or role assigned then use those of the user otherwise use those of the app
+  if AAppID <> IO_STRING_NULL_VALUE then
   begin
     LPermissionLevel := plUnauthorized;
     for LAuthUserAppItem in FApps do
@@ -371,31 +353,10 @@ begin
   Result := FApps;
 end;
 
-function TioAuthUser.GetExceptionEntityName: String;
-begin
-  Result := 'User';
-end;
-
-function TioAuthUser.GetID: Integer;
-begin
-  Result := FID;
-end;
-
-function TioAuthUser.GetPermissions: TioPermissionList;
-begin
-  Result := FPermissions;
-end;
-
-function TioAuthUser.GetRoles: TioAuthRoleList;
-begin
-  Result := FRoles;
-end;
-
 { TioAuthBaseCredentials }
 
-function TioAuthCustomCredentials.CanAuthorize: Boolean;
+function TioAuthCredentials.CanAuthorize: Boolean;
 begin
-  Result := False;
   // Check password
   if not ValidatePassword(LoginPassword) then
     raise EioAuthInvalidCredentialsException_401.Create(Format('Invalid %s credentials', [GetExceptionEntityName.ToLower]));
@@ -403,7 +364,7 @@ begin
   Result := IsActive(True);
 end;
 
-constructor TioAuthCustomCredentials.Create;
+constructor TioAuthCredentials.Create;
 begin
   inherited Create;
   FLoginName := IO_STRING_NULL_VALUE;
@@ -413,57 +374,57 @@ begin
   FPswDigest := IO_STRING_NULL_VALUE;
 end;
 
-function TioAuthCustomCredentials.GetExceptionSubjectName: String;
+function TioAuthCredentials.GetExceptionSubjectName: String;
 begin
   Result := LoginName;
 end;
 
-function TioAuthCustomCredentials.GetLoginName: String;
+function TioAuthCredentials.GetLoginName: String;
 begin
   Result := FLoginName;
 end;
 
-function TioAuthCustomCredentials.GetLoginOldPassword: String;
+function TioAuthCredentials.GetLoginOldPassword: String;
 begin
   Result := FLoginOldPassword;
 end;
 
-function TioAuthCustomCredentials.GetLoginPassword: String;
+function TioAuthCredentials.GetLoginPassword: String;
 begin
   Result := FLoginPassword;
 end;
 
-function TioAuthCustomCredentials.GetLoginPasswordConfirm: String;
+function TioAuthCredentials.GetLoginPasswordConfirm: String;
 begin
   Result := FLoginPasswordConfirm;
 end;
 
-function TioAuthCustomCredentials.ValidatePassword(const APassword: String): Boolean;
+function TioAuthCredentials.ValidatePassword(const APassword: String): Boolean;
 begin
   Result := GeneratePasswordDigest(APassword) = FPswDigest;
 end;
 
-procedure TioAuthCustomCredentials.SetLoginName(const Value: String);
+procedure TioAuthCredentials.SetLoginName(const Value: String);
 begin
   FLoginName := Value;
 end;
 
-procedure TioAuthCustomCredentials.SetLoginOldPassword(const Value: String);
+procedure TioAuthCredentials.SetLoginOldPassword(const Value: String);
 begin
   FLoginOldPassword := Value;
 end;
 
-procedure TioAuthCustomCredentials.SetLoginPassword(const Value: String);
+procedure TioAuthCredentials.SetLoginPassword(const Value: String);
 begin
   FLoginPassword := Value;
 end;
 
-procedure TioAuthCustomCredentials.SetLoginPasswordConfirm(const Value: String);
+procedure TioAuthCredentials.SetLoginPasswordConfirm(const Value: String);
 begin
   FLoginPasswordConfirm := Value;
 end;
 
-function TioAuthCustomCredentials.GeneratePasswordDigest(const APassword: String): String;
+function TioAuthCredentials.GeneratePasswordDigest(const APassword: String): String;
 begin
   Result := THashSHA2.GetHashString(APassword);
 end;
@@ -473,7 +434,6 @@ end;
 constructor TioAuthApp.Create;
 begin
   inherited Create;
-  FID := IO_INTEGER_NULL_VALUE;
   FScopes := IO_STRING_NULL_VALUE;
 end;
 
@@ -482,24 +442,9 @@ begin
   Result := 'App';
 end;
 
-function TioAuthApp.GetID: Integer;
-begin
-  Result := FID;
-end;
-
 function TioAuthApp.GetScopes: String;
 begin
   Result := FScopes;
-end;
-
-function TioAuthApp.PermissionLevelFor(AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel;
-begin
-  // Per ora ritorna sempre l'acesso completo che poi in pratica fa si che si basi unicamente sui permessi dell'utente
-  //  perchè il permesso che ritorna è sempre il minore tra quello di utente e app (se c'è una app)
-  if IsActive(False) then
-    Result := TioAuthPermissionLevel.plReadWriteDelete
-  else
-    Result := plUnauthorized;
 end;
 
 procedure TioAuthApp.SetScopes(const Value: String);
@@ -583,39 +528,39 @@ end;
 
 { TioAuthBaseEntity }
 
-constructor TioAuthBaseEntity.Create;
+constructor TioAuthBase.Create;
 begin
   inherited Create;
   FExpiration := IO_DATETIME_NULL_VALUE;
   FStatus := usInactive;
 end;
 
-function TioAuthBaseEntity.GetClassName: String;
+function TioAuthBase.ClassName: String;
 begin
   Result := inherited ClassName;
 end;
 
-function TioAuthBaseEntity.GetExceptionEntityName: String;
+function TioAuthBase.GetExceptionEntityName: String;
 begin
   Result := ClassName;
 end;
 
-function TioAuthBaseEntity.GetExceptionSubjectName: String;
+function TioAuthBase.GetExceptionSubjectName: String;
 begin
   Result := Format('%s.Subject', [ClassName]);
 end;
 
-function TioAuthBaseEntity.GetExpiration: TDateTime;
+function TioAuthBase.GetExpiration: TDateTime;
 begin
   Result := FExpiration;
 end;
 
-function TioAuthBaseEntity.GetStatus: TioAuthUserStatus;
+function TioAuthBase.GetStatus: TioAuthUserStatus;
 begin
   Result := FStatus;
 end;
 
-function TioAuthBaseEntity.IsActive(const RaiseExceptions: Boolean): Boolean;
+function TioAuthBase.IsActive(const RaiseExceptions: Boolean): Boolean;
 var
   LIsExpired: Boolean;
 begin
@@ -630,19 +575,77 @@ begin
   Result := Result and LIsExpired;
 end;
 
-function TioAuthBaseEntity.IsExpired: Boolean;
+function TioAuthBase.IsExpired: Boolean;
 begin
   Result := (FExpiration <> IO_DATETIME_NULL_VALUE) and (TioUtilities.NowUTC > FExpiration);
 end;
 
-procedure TioAuthBaseEntity.SetExpiration(const Value: TDateTime);
+procedure TioAuthBase.SetExpiration(const Value: TDateTime);
 begin
   FExpiration := Value;
 end;
 
-procedure TioAuthBaseEntity.SetStatus(const Value: TioAuthUserStatus);
+procedure TioAuthBase.SetStatus(const Value: TioAuthUserStatus);
 begin
   FStatus := Value;
+end;
+
+{ TioAuthCustomUser }
+
+constructor TioAuthPermissionsHolder.Create;
+begin
+  inherited Create;
+  FID := IO_INTEGER_NULL_VALUE;
+  FPermissions := TioPermissionList.Create;
+  FRoles := TioAuthRoleList.Create;
+end;
+
+destructor TioAuthPermissionsHolder.Destroy;
+begin
+  FPermissions.Free;
+  FRoles.Free;
+  inherited;
+end;
+
+function TioAuthPermissionsHolder.GetExceptionEntityName: String;
+begin
+  Result := 'User';
+end;
+
+function TioAuthPermissionsHolder.GetID: Integer;
+begin
+  Result := FID;
+end;
+
+function TioAuthPermissionsHolder.GetPermissions: TioPermissionList;
+begin
+  Result := FPermissions;
+end;
+
+function TioAuthPermissionsHolder.GetRoles: TioAuthRoleList;
+begin
+  Result := FRoles;
+end;
+
+function TioAuthPermissionsHolder.PermissionLevelFor(AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel;
+var
+  LAuthUserRoleItem: IioAuthRoleItem;
+  LPermission: IioAuthPermission;
+  LPermissionLevel: TioAuthPermissionLevel;
+begin
+  AScope := AScope.ToLower;
+  Result := plUnauthorized;
+  // User specific permissions
+  for LPermission in FPermissions do
+    if LPermission.Scope = AScope then
+      Exit(LPermission.PermissionLevel);
+  // Roles
+  for LAuthUserRoleItem in FRoles do
+  begin
+    LPermissionLevel := LAuthUserRoleItem.Role.PermissionLevelFor(AScope, AIntention);
+    if LPermissionLevel > Result then
+      Result := LPermissionLevel;
+  end;
 end;
 
 end.

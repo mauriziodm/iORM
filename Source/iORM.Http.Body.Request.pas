@@ -353,7 +353,6 @@ end;
 function TioHttpRequestBody.ToJSONText: String;
 var
   LJSONObject: TJSONObject;
-  LJSONValue: TJSONValue;
 begin
   LJSONObject := TJSONObject.Create;
   try

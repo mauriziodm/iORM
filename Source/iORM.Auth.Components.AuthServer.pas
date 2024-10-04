@@ -86,8 +86,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     class function GetInstance: TioAuthServer; static;
-    function AuthorizeUser(const AUserCredentials: IioAuthCustomCredentials; out ResultUserAuthorizationToken: String): Boolean; // return a user identity token
-    function AuthorizeApp(AAppCredentials: IioAuthCustomCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean; // return an app authorization token
+    function AuthorizeUser(const AUserCredentials: IioAuthCredentials; out ResultUserAuthorizationToken: String): Boolean; // return a user identity token
+    function AuthorizeApp(AAppCredentials: IioAuthCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean; // return an app authorization token
     function AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean; // return true or false depending the access to the requested result is permitted
     function NewAccessToken(const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; // return a new acces token and also a new refresh token just after the authorization (login)
     function RefreshAccessToken(const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; // return a new acces token and also a new refresh token
@@ -97,7 +97,7 @@ type
     property Active: Boolean read FActive write FActive;
     property TokenIssuer: String read FTokenIssuer write FTokenIssuer; // proprietà non thread safe ma per il momento provo a mantenerna non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
     property TokenSecret: String read FTokenSecret write FTokenSecret; // proprietà non thread safe ma per il momento provo a mantenerna non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
-    property UserCacheExpirationMins: Integer read FUserCacheExpirationMins write FUserCacheExpirationMins default USER_CACHE_EXPIRATION_MINS;
+    property UserCacheExpirationMins: Integer read FUserCacheExpirationMins write SetUserCacheExpirationMins default USER_CACHE_EXPIRATION_MINS;
     property _Version: String read Get_Version;
     // events
     property OnAccessTokenNeedRefresh: TioOnAccessTokenNeedRefreshEvent read FOnAccessTokenNeedRefresh write FOnAccessTokenNeedRefresh;
@@ -260,7 +260,7 @@ begin
     raise EioGenericException.Create(ClassName, 'SetUserCacheExpirationMins', 'The minimum value is 1');
 end;
 
-function TioAuthServer.AuthorizeUser(const AUserCredentials: IioAuthCustomCredentials; out ResultUserAuthorizationToken: String): Boolean;
+function TioAuthServer.AuthorizeUser(const AUserCredentials: IioAuthCredentials; out ResultUserAuthorizationToken: String): Boolean;
 var
   LDone: Boolean;
   LUser: IioAuthUser;
@@ -290,7 +290,7 @@ begin
   end;
 end;
 
-function TioAuthServer.AuthorizeApp(AAppCredentials: IioAuthCustomCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean;
+function TioAuthServer.AuthorizeApp(AAppCredentials: IioAuthCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String): Boolean;
 var
   LDone: Boolean;
   LUserID, LAppID: String;

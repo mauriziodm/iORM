@@ -74,9 +74,9 @@ type
     property ConnectionName: String read GetConnectionName write SetConnectionName;
   end;
 
-  IioAuthBaseEntity = interface
+  IioAuthBase = interface
     ['{BC126881-5EEA-43B2-B491-5BA51542FA17}']
-    function GetClassName: String;
+    function ClassName: String;
     function GetExpiration: TDateTime;
     function GetStatus: TioAuthUserStatus;
     function IsActive(const RaiseExceptions: Boolean): Boolean;
@@ -84,12 +84,11 @@ type
     procedure SetExpiration(const Value: TDateTime);
     procedure SetStatus(const Value: TioAuthUserStatus);
     // properties
-    property ClassName: String read GetClassName;
     property Expiration: TDateTime read GetExpiration write SetExpiration;
     property Status: TioAuthUserStatus read GetStatus write SetStatus;
   end;
 
-  IioAuthCustomCredentials = interface(IioAuthBaseEntity)
+  IioAuthCredentials = interface(IioAuthBase)
     ['{BC126881-5EEA-43B2-B491-5BA51542FA17}']
     // ---------- to be ovverrided (on classes) ----------
     function CanAuthorize: Boolean;
@@ -124,7 +123,7 @@ type
     property Scope: String read GetScope write SetScope;
   end;
 
-  IioAuthRole = interface(IioAuthBaseEntity)
+  IioAuthRole = interface(IioAuthBase)
     ['{3E8DE4D8-6089-41B5-85DD-1425947CE21A}']
     function GetID: Integer;
     function GetName: String;
@@ -139,32 +138,35 @@ type
 
   TioPermissionList = TList<IioAuthPermission>;
 
-  IioAuthUser = interface(IioAuthCustomCredentials)
+  IioAuthPermissionsHolder = interface(IioAuthCredentials)
     ['{2FBEE228-159C-4049-AD29-E5DFB4D67336}']
-    function GetApps: TioAuthAppList;
     function GetID: Integer;
     function GetPermissions: TioPermissionList;
     function GetRoles: TioAuthRoleList;
-    function PermissionLevelFor(AAppID, AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel;
+    function PermissionLevelFor(AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel;
     // properties
-    property Apps: TioAuthAppList read GetApps;
     property ID: Integer read GetID;
     property Permissions: TioPermissionList read GetPermissions;
     property Roles: TioAuthRoleList read GetRoles;
   end;
 
-  IioAuthApp = interface(IioAuthCustomCredentials)
+  IioAuthUser = interface(IioAuthPermissionsHolder)
+    ['{2FBEE228-159C-4049-AD29-E5DFB4D67336}']
+    function GetApps: TioAuthAppList;
+    function PermissionLevelFor(AAppID, AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel;
+    // properties
+    property Apps: TioAuthAppList read GetApps;
+  end;
+
+  IioAuthApp = interface(IioAuthPermissionsHolder)
     ['{82D56816-0FC6-42B7-9EF8-AB339ECBEE00}']
-    function GetID: Integer;
     function GetScopes: String;
-    function PermissionLevelFor(AScope: String; const AIntention: TioAuthIntention): TioAuthPermissionLevel;
     procedure SetScopes(const Value: String);
     // properties
-    property ID: Integer read GetID;
     property Scopes: String read GetScopes write SetScopes;
   end;
 
-  IioAuthRoleItem = interface(IioAuthBaseEntity)
+  IioAuthRoleItem = interface(IioAuthBase)
     ['{ECD3CA79-45EC-4EE9-9D89-1E7A8C24E328}']
     function GetID: Integer;
     function GetRole: IioAuthRole;
@@ -179,7 +181,7 @@ type
     function Add(const ARole: IioAuthRole): Integer;
   end;
 
-  IioAuthAppItem = interface(IioAuthBaseEntity)
+  IioAuthAppItem = interface(IioAuthBase)
     ['{E4492721-4954-4CD0-B38D-50828314A640}']
     function GetApp: IioAuthApp;
     function GetID: Integer;
@@ -195,9 +197,9 @@ type
   end;
 
   TioOnAuthorizeAccessEvent = procedure(const Sender: TObject; const AScope: String; const AIntention: TioAuthIntention; const AAccessToken: String; var ResultIsAuthorized, Done: Boolean) of object;
-  TioOnAuthorizeUserEvent = procedure(const Sender: TObject; const AUserCredentials: IioAuthCustomCredentials; out ResultUserAuthorizationToken: String; var ResultIsAuthorized, Done: Boolean) of object;
-  TioOnAuthorizeAppEvent = procedure(const Sender: TObject; const AAppCredentials: IioAuthCustomCredentials; var AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String; var ResultIsAuthorized, Done: Boolean) of object;
-  TioOnAuthorizeAppGetUserAuthCodeEvent = procedure(const Sender: TObject; const AAppCredentials: IioAuthCustomCredentials; var AResultUserAuthorizationToken: String; var ResultIsAuthorized: Boolean) of object;
+  TioOnAuthorizeUserEvent = procedure(const Sender: TObject; const AUserCredentials: IioAuthCredentials; out ResultUserAuthorizationToken: String; var ResultIsAuthorized, Done: Boolean) of object;
+  TioOnAuthorizeAppEvent = procedure(const Sender: TObject; const AAppCredentials: IioAuthCredentials; var AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String; var ResultIsAuthorized, Done: Boolean) of object;
+  TioOnAuthorizeAppGetUserAuthCodeEvent = procedure(const Sender: TObject; const AAppCredentials: IioAuthCredentials; var AResultUserAuthorizationToken: String; var ResultIsAuthorized: Boolean) of object;
   TioOnNewAccessTokenEvent = procedure(const Sender: TObject; const AAuthorizationToken: String; out ResultAccessToken, ResultRefreshToken: String; var ResultIsAuthorized, Done: Boolean) of object;
   TioOnRefreshAccessTokenEvent = procedure(const Sender: TObject; const ARefreshToken: String; out ResultAccessToken, ResultRefreshToken: String; var ResultIsAuthorized, Done: Boolean) of object;
   TioOnAccessTokenNeedRefreshEvent = procedure(const Sender: TObject; const AAccessToken: String; var ResultNeedRefresh, Done: Boolean) of object;

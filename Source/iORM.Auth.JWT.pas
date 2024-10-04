@@ -172,7 +172,7 @@ end;
 
 function TioJWT.TokenAsString(const ASecret: String): String;
 begin
-  Result := _DoSign(_DoEncodeHeader, _DoEncodeHeader, ASecret);
+  Result := _DoSign(_DoEncodeHeader, _DoEncodePayload, ASecret);
 end;
 
 function TioJWT.HasAppID: Boolean;

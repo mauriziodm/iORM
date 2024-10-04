@@ -59,10 +59,10 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     class function GetInstance: TioAuthClient; static;
-    function AuthorizeUser(const AUserCredentials: IioAuthCustomCredentials): Boolean; // user login (user authorization)
+    function AuthorizeUser(const AUserCredentials: IioAuthCredentials): Boolean; // user login (user authorization)
 
 
-    function AuthorizeApp(const AAppCredentials: IioAuthAppCredentials): Boolean; // app login (app authorization)
+    function AuthorizeApp(const AAppCredentials: IioAuthCredentials): Boolean; // app login (app authorization)
     function AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention): Boolean; // request authorization to access a resource (scope)
 
 
@@ -91,13 +91,12 @@ var
   LAccessToken: String;
   LSession: IioAuthSession;
 begin
-  Result := False;
   LSession := TioApplication.Session;
   LAccessToken := LSession.AccessToken;
   Result := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).AuthorizeAccess(FConnectionName, AScope, AAuthIntention, LAccessToken)
 end;
 
-function TioAuthClient.AuthorizeApp(const AAppCredentials: IioAuthAppCredentials): Boolean;
+function TioAuthClient.AuthorizeApp(const AAppCredentials: IioAuthCredentials): Boolean;
 var
   LDone: Boolean;
   LResultAppAuthorizationToken: String;
@@ -163,7 +162,7 @@ begin
 //  end;
 end;
 
-function TioAuthClient.AuthorizeUser(const AUserCredentials: IioAuthCustomCredentials): Boolean;
+function TioAuthClient.AuthorizeUser(const AUserCredentials: IioAuthCredentials): Boolean;
 var
   LDone: Boolean;
   LResultUserAuthorizationToken: String;
