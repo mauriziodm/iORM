@@ -242,11 +242,11 @@ contains
   iORM.Auth.Interfaces in '..\..\Source\iORM.Auth.Interfaces.pas',
   iORM.Auth.Factory in '..\..\Source\iORM.Auth.Factory.pas',
   iORM.DependencyInjection.Types in '..\..\Source\iORM.DependencyInjection.Types.pas',
-  iORM.Auth.Model in '..\..\Source\iORM.Auth.Model.pas',
   iORM.Auth.JWT in '..\..\Source\iORM.Auth.JWT.pas',
   iORM.Auth.Components.AuthServer in '..\..\Source\iORM.Auth.Components.AuthServer.pas',
   iORM.Auth.Components.AuthClient in '..\..\Source\iORM.Auth.Components.AuthClient.pas',
-  iORM.Auth.Session in '..\..\Source\iORM.Auth.Session.pas';
+  iORM.Auth.Session in '..\..\Source\iORM.Auth.Session.pas',
+  iORM.Auth.Model in '..\..\Source\iORM.Auth.Model.pas';
 
 end.
 

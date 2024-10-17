@@ -59,10 +59,10 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     class function GetInstance: TioAuthClient; static;
-    function AuthorizeUser(const AUserCredentials: IioAuthCredentials): Boolean; // user login (user authorization)
+    function AuthorizeUser(const AUserCredentials: IioAuthUserCredentials): Boolean; // user login (user authorization)
 
 
-    function AuthorizeApp(const AAppCredentials: IioAuthCredentials): Boolean; // app login (app authorization)
+    function AuthorizeApp(const AAppCredentials: IioAuthAppCredentials): Boolean; // app login (app authorization)
     function AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention): Boolean; // request authorization to access a resource (scope)
 
 
@@ -96,7 +96,7 @@ begin
   Result := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).AuthorizeAccess(FConnectionName, AScope, AAuthIntention, LAccessToken)
 end;
 
-function TioAuthClient.AuthorizeApp(const AAppCredentials: IioAuthCredentials): Boolean;
+function TioAuthClient.AuthorizeApp(const AAppCredentials: IioAuthAppCredentials): Boolean;
 var
   LDone: Boolean;
   LResultAppAuthorizationToken: String;
@@ -162,7 +162,7 @@ begin
 //  end;
 end;
 
-function TioAuthClient.AuthorizeUser(const AUserCredentials: IioAuthCredentials): Boolean;
+function TioAuthClient.AuthorizeUser(const AUserCredentials: IioAuthUserCredentials): Boolean;
 var
   LDone: Boolean;
   LResultUserAuthorizationToken: String;
@@ -183,7 +183,7 @@ begin
   if Result and (LResultUserAuthorizationToken <> IO_AUTH_NULL_JWT) then
   begin
     LSession := TioApplication.Session;
-    LSession.UserName := AUserCredentials.LoginName;
+    LSession.UserName := AUserCredentials.LoginUser;
     LSession.UserAuthorizationToken := LResultUserAuthorizationToken;
   end
   else

@@ -107,16 +107,10 @@ type
   EioAuthInvalidCredentialsException_401 = class(EioAuthException)
   end;
 
-  EioAuthInactiveUserException_401 = class(EioAuthException)
+  EioAuthInactiveCredentialsException_401 = class(EioAuthException)
   end;
 
-  EioAuthInactiveAppException_401 = class(EioAuthException)
-  end;
-
-  EioAuthUserExpiredException_401 = class(EioAuthException)
-  end;
-
-  EioAuthAppExpiredException_401 = class(EioAuthException)
+  EioAuthExpiredCredentialsException_401 = class(EioAuthException)
   end;
 
   EioAuthForbiddenException_403 = class(EioAuthException)
@@ -140,7 +134,7 @@ type
   EioTokenNotYetValidException_401 = class(EioAuthException)
   end;
 
-  EioAuthUserOnlyAuthorizationTokenExpected_401 = class(EioAuthException)
+  EioAuthUserAuthorizationTokenExpected_401 = class(EioAuthException)
   end;
 
   EioAuthInvalidAuthorizationToken_401 = class(EioAuthException)
@@ -153,6 +147,9 @@ type
   end;
 
   EioAuthServerComponentNotFound_404 = class(EioAuthException)
+  end;
+
+  EioAuthNewPasswordNotIdenticalException_401 = class(EioAuthException)
   end;
   // -----------------------------------------------------------------------------------------------
 

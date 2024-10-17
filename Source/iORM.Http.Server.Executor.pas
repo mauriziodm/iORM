@@ -163,11 +163,11 @@ end;
 class procedure TioHttpServerExecutor._AuthorizeApp(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
 var
   LObj: TObject;
-  LAppCredentials: IioAuthCredentials;
+  LAppCredentials: IioAuthAppCredentials;
   LResultAppAuthorizationToken: String;
 begin
   LObj := AioRequestBody.JSONDataValueAsObject;
-  if Supports(LObj, IioAuthCredentials, LAppCredentials) then
+  if Supports(LObj, IioAuthAppCredentials, LAppCredentials) then
   begin
     AioResponseBody.AuthResultIsAuthorized := TioAuthServer.GetInstance.AuthorizeApp(LAppCredentials, AioRequestBody.AuthToken, LResultAppAuthorizationToken);
     AioResponseBody.AuthResult1 := LResultAppAuthorizationToken;
@@ -179,11 +179,11 @@ end;
 class procedure TioHttpServerExecutor._AuthorizeUser(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
 var
   LObj: TObject;
-  LUserCredentials: IioAuthCredentials;
+  LUserCredentials: IioAuthUserCredentials;
   LResultUserAuthorizationToken: String;
 begin
   LObj := AioRequestBody.JSONDataValueAsObject;
-  if Supports(LObj, IioAuthCredentials, LUserCredentials) then
+  if Supports(LObj, IioAuthUserCredentials, LUserCredentials) then
   begin
     AioResponseBody.AuthResultIsAuthorized := TioAuthServer.GetInstance.AuthorizeUser(LUserCredentials, LResultUserAuthorizationToken);
     AioResponseBody.AuthResult1 := LResultUserAuthorizationToken;
