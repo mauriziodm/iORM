@@ -39,8 +39,8 @@ uses
   iORM.CommonTypes, System.Generics.Collections;
 
 const
-  AUTH_OTP_PASSWORD_DURATION_MIN = 20;
-  AUTH_PASSWORD_DURATION_DAYS = 180;
+  AUTH_OTP_DURATION_MIN = 20;
+  AUTH_PSW_DURATION_DAYS = 180;
 
 type
 
@@ -171,7 +171,7 @@ type
     // ---------- can be ovverrided ----------
     function CanAuthorizeCredentials: Boolean;
     procedure ConfirmCredentials;
-    function ResetCredentials(const AGenerateOTP: Boolean = True; const AOTPDurationMins: Integer = AUTH_OTP_PASSWORD_DURATION_MIN): String;
+    function ResetCredentials(const AGenerateOTP: Boolean = True; const AOTPDurationMins: Integer = AUTH_OTP_DURATION_MIN): String;
     // ---------- can be ovverrided ----------
     function GetCredentialMode: TioAuthCredentialsMode;
     function GetLoginPassword: String;
@@ -200,7 +200,7 @@ type
     // ---------- can be ovverrided ----------
     function CanAuthorizeCredentials: Boolean;
     procedure ConfirmCredentials;
-    function ResetCredentials(const AGenerateOTP: Boolean = True; const AOTPDurationMins: Integer = AUTH_OTP_PASSWORD_DURATION_MIN): String;
+    function ResetCredentials(const AGenerateOTP: Boolean = True; const AOTPDurationMins: Integer = AUTH_OTP_DURATION_MIN): String;
     // ---------- can be ovverrided ----------
     function GetAppID: String;
     function GetAppName: String;

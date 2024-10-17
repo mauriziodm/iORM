@@ -1,3 +1,36 @@
+{
+  ****************************************************************************
+  *                                                                          *
+  *           iORM - (interfaced ORM)                                        *
+  *                                                                          *
+  *           Copyright (C) 2015-2023 Maurizio Del Magno                     *
+  *                                                                          *
+  *           mauriziodm@levantesw.it                                        *
+  *           mauriziodelmagno@gmail.com                                     *
+  *           https://github.com/mauriziodm/iORM.git                         *
+  *                                                                          *
+  ****************************************************************************
+  *                                                                          *
+  * This file is part of iORM (Interfaced Object Relational Mapper).         *
+  *                                                                          *
+  * Licensed under the GNU Lesser General Public License, Version 3;         *
+  *  you may not use this file except in compliance with the License.        *
+  *                                                                          *
+  * iORM is free software: you can redistribute it and/or modify             *
+  * it under the terms of the GNU Lesser General Public License as published *
+  * by the Free Software Foundation, either version 3 of the License, or     *
+  * (at your option) any later version.                                      *
+  *                                                                          *
+  * iORM is distributed in the hope that it will be useful,                  *
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of           *
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the            *
+  * GNU Lesser General Public License for more details.                      *
+  *                                                                          *
+  * You should have received a copy of the GNU Lesser General Public License *
+  * along with iORM.  If not, see <http://www.gnu.org/licenses/>.            *
+  *                                                                          *
+  ****************************************************************************
+}
 unit iORM.Auth.Model;
 
 interface
@@ -192,7 +225,7 @@ type
     // TODO: implementare attributi [ioInvokeBeforePersist, ioInvokeAfterPersist, ioInvokeBeforeDelete, ioInvokeAfterDelete]
     [ioInvokeBeforePersist]
     procedure ConfirmCredentials; virtual;
-    function ResetCredentials(const AGenerateOTP: Boolean = True; const AOTPDurationMins: Integer = AUTH_OTP_PASSWORD_DURATION_MIN): String;
+    function ResetCredentials(const AGenerateOTP: Boolean = True; const AOTPDurationMins: Integer = AUTH_OTP_DURATION_MIN): String;
     // ---------- can be ovverrided ----------
     // login related properties
     property LoginUser: String read GetLoginUser write SetLoginUser;
@@ -229,11 +262,11 @@ type
   public
     constructor Create; override;
     // ---------- can be ovverrided ----------
-    function CanAuthorizeCredentials: Boolean; virtual; // IioAuthExtendedCredentials
+    function CanAuthorizeCredentials: Boolean; virtual;
     // TODO: implementare attributi [ioInvokeBeforePersist, ioInvokeAfterPersist, ioInvokeBeforeDelete, ioInvokeAfterDelete]
     [ioInvokeBeforePersist]
     procedure ConfirmCredentials; virtual;
-    function ResetCredentials(const AGenerateOTP: Boolean = True; const AOTPDurationMins: Integer = AUTH_OTP_PASSWORD_DURATION_MIN): String;
+    function ResetCredentials(const AGenerateOTP: Boolean = True; const AOTPDurationMins: Integer = AUTH_OTP_DURATION_MIN): String;
     // ---------- can be ovverrided ----------
     property AppName: String read GetAppName write SetAppName;
     property AppID: String read GetAppID write SetAppID;
@@ -276,7 +309,7 @@ implementation
 
 uses
   iORM.Exceptions, System.SysUtils, System.Hash, System.DateUtils,
-  iORM.Utilities;
+  iORM.Utilities, iORM.Auth.Components.AuthServer;
 
 { TioAuthCredentials }
 
@@ -583,7 +616,7 @@ begin
   FNewPassword2 := IO_STRING_NULL_VALUE;
   FPswDigest := IO_STRING_NULL_VALUE;
   // Set password expiration & credentials mode
-  FPswExp := IncMinute(TioUtilities.NowUTC, AUTH_OTP_PASSWORD_DURATION_MIN);
+  FPswExp := IncMinute(TioUtilities.NowUTC, TioAuthServer.GetInstance.UserOTPDurationMins);
   FCredentialMode := cmSetPassword;
 end;
 
@@ -606,9 +639,9 @@ begin
   // ...set the password expiration
   case FCredentialMode of
     cmLogin:
-      FPswExp := AUTH_PASSWORD_DURATION_DAYS; // 0 = perpetual password
+      FPswExp := TioAuthServer.GetInstance.UserPswDurationDays; // 0 = perpetual
     cmSetPassword, cmChangePassword:
-      FPswExp := AUTH_OTP_PASSWORD_DURATION_MIN;
+      FPswExp := TioAuthServer.GetInstance.UserOTPDurationMins; // 0 = perpetual
   end;
   // ...set the credentials mode
   FCredentialMode := cmLogin;

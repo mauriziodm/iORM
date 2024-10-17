@@ -61,6 +61,8 @@ type
     FTokenSecret: String; // proprietà non thread safe ma per il momento provo a mantenerla non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
     FUserCache: TioAuthUserCache;
     FUserCacheExpirationMins: Integer;
+    FUserOTPDurationMins: Integer;
+    FUserPswDurationDays: Integer;
     // events
     FOnAccessTokenNeedRefresh: TioOnAccessTokenNeedRefreshEvent;
     FOnAuthorizeApp: TioOnAuthorizeAppEvent;
@@ -98,6 +100,8 @@ type
     property TokenIssuer: String read FTokenIssuer write FTokenIssuer; // proprietà non thread safe ma per il momento provo a mantenerna non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
     property TokenSecret: String read FTokenSecret write FTokenSecret; // proprietà non thread safe ma per il momento provo a mantenerna non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
     property UserCacheExpirationMins: Integer read FUserCacheExpirationMins write SetUserCacheExpirationMins default USER_CACHE_EXPIRATION_MINS;
+    property UserOTPDurationMins: Integer read FUserOTPDurationMins write FUserOTPDurationMins;
+    property UserPswDurationDays: Integer read FUserPswDurationDays write FUserPswDurationDays;
     property _Version: String read Get_Version;
     // events
     property OnAccessTokenNeedRefresh: TioOnAccessTokenNeedRefreshEvent read FOnAccessTokenNeedRefresh write FOnAccessTokenNeedRefresh;
@@ -159,6 +163,8 @@ begin
   FTokenIssuer := IO_STRING_NULL_VALUE;
   FUserCache := TioAuthUserCache.Create(FUserCacheExpirationMins);
   FUserCacheExpirationMins := USER_CACHE_EXPIRATION_MINS; // default is 10 minutes
+  FUserOTPDurationMins := AUTH_OTP_DURATION_MIN;
+  FUserPswDurationDays := AUTH_PSW_DURATION_DAYS;
   if not (csDesigning in ComponentState) then
     FTokenIssuer := TPath.GetFileNameWithoutExtension(ParamStr(0));
   // Set the singleton internal reference to itself (one only auth server at a time)
