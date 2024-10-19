@@ -45,6 +45,8 @@ type
     // user
     FUserID: Integer;
     FUserName: String;
+    // app
+    FAppID: Integer;
     // tokens
     FUserAuthorizationToken: String;
     FAppAuthorizationToken: String;
@@ -54,20 +56,25 @@ type
     // methods
     function GetAccessToken: String;
     function GetAppAuthorizationToken: String;
+    function GetAppID: Integer;
     function GetConnectionName: String;
     function GetUserAuthorizationToken: String;
     function GetUserID: Integer;
     function GetUserName: String;
     procedure SetAccessToken(const Value: String);
     procedure SetAppAuthorizationToken(const Value: String);
+    procedure SetAppID(const Value: Integer);
     procedure SetConnectionName(const Value: String);
     procedure SetUserAuthorizationToken(const Value: String);
     procedure SetUserID(const Value: Integer);
     procedure SetUserName(const Value: String);
   public
+    constructor Create;
     // user
     property UserID: Integer read GetUserID write SetUserID;
     property UserName: String read GetUserName write SetUserName;
+    // app props
+    property AppID: Integer read GetAppID write SetAppID;
     // tokens
     property UserAuthorizationToken: String read GetUserAuthorizationToken write SetUserAuthorizationToken;
     property AppAuthorizationToken: String read GetAppAuthorizationToken write SetAppAuthorizationToken;
@@ -78,7 +85,25 @@ type
 
 implementation
 
+uses iORM.CommonTypes;
+
 { TioAuthSession }
+
+constructor TioAuthSession.Create;
+begin
+  inherited;
+  // user
+  FUserID := IO_INTEGER_NULL_VALUE;
+  FUserName := IO_STRING_NULL_VALUE;
+  // app
+  FAppID := IO_INTEGER_NULL_VALUE;
+  // tokens
+  FUserAuthorizationToken := IO_STRING_NULL_VALUE;
+  FAppAuthorizationToken := IO_STRING_NULL_VALUE;
+  FAccessToken := IO_STRING_NULL_VALUE;
+  // connection
+  FConnectionName := IO_STRING_NULL_VALUE;
+end;
 
 function TioAuthSession.GetAccessToken: String;
 begin
@@ -88,6 +113,11 @@ end;
 function TioAuthSession.GetAppAuthorizationToken: String;
 begin
   Result := FAppAuthorizationToken;
+end;
+
+function TioAuthSession.GetAppID: Integer;
+begin
+  Result := FAppID;
 end;
 
 function TioAuthSession.GetConnectionName: String;
@@ -118,6 +148,11 @@ end;
 procedure TioAuthSession.SetAppAuthorizationToken(const Value: String);
 begin
   FAppAuthorizationToken := Value;
+end;
+
+procedure TioAuthSession.SetAppID(const Value: Integer);
+begin
+  FAppID := Value;
 end;
 
 procedure TioAuthSession.SetConnectionName(const Value: String);

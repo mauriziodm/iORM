@@ -55,7 +55,8 @@ type
     // header
     [ioSkip] FHeader: TioJWT_Header;
     // payload claims
-    Fapp: String; // indica l'app id nel caso l'accesso sia richiesto da una app esterna
+    Faid: integer; // app id (managed by iorm)
+    Fapp: String; // app name (managed by iorm)
     Faud: String; // audience (potrebbe rappresentare i resource server ai quali la client app o l'utente sono autorizzati ad accedere)
     Fexp: TDateTime; // expiration
     Fiat: TDateTime; // issued at time
@@ -63,8 +64,10 @@ type
     Fjti: String; // jwt id (id univoco che identifica il token, es. si usa per annullare un token emesso attraverso una black list)
     Fnbf: TDateTime; // not before
     Frfa: TDateTime; // the access token nedd to be refreshed after this DateTime
-    Fsub: String; // subject (indica il soggetto destinatario del token, es. id dell'utente che richiesto autorizzazzione accesso a risorse)
-    Ftyp: String; // indica il tipo di token
+    Fsub: String; // subject
+    Ftyp: String; // token type
+    Fuid: integer; // user id (managed by iorm)
+    Fusr: String; // user name (managed by iorm)
     // others
     [ioSkip] FBase64URLEncoding: TBase64URLEncoding;
     [ioSkip] FIsVerified: Boolean;
@@ -87,6 +90,7 @@ type
     destructor Destroy; override;
     // methods
     function HasAppID: Boolean;
+    function HasApp: Boolean;
     function HasAudience: Boolean;
     function HasExpiration: Boolean;
     function HasIssuedAtTime: Boolean;
@@ -96,13 +100,16 @@ type
     function HasRefreshAfter: Boolean;
     function HasSubject: Boolean;
     function HasTokenType: Boolean;
+    function HasUserID: Boolean;
+    function HasUser: Boolean;
     function TokenAsString(const ASecret: String): String;
     // checks
     function IsExpired(const ANow: TDateTime): Boolean;
     function IsNotYetValid(const ANow: TDateTime): Boolean;
     function IsToBeRefreshed(const ANow: TDateTime): Boolean;
     // claims
-    property AppID: String read Fapp write Fapp;
+    property AppID: Integer read Faid write Faid;
+    property App: String read Fapp write Fapp;
     property Audience: String read Faud write Faud;
     property Expiration: TDateTime read Fexp write Fexp;
     property IssueAtTime: TDateTime read Fiat write Fiat;
@@ -112,6 +119,8 @@ type
     property RefreshAfter: TDateTime read Frfa write Frfa;
     property Subject: String read Fsub write Fsub;
     property TokenType: String read Ftyp write Ftyp;
+    property UserID: Integer read Fuid write Fuid;
+    property User: String read Fusr write Fusr;
     // token
     property IsVerified: Boolean read FIsVerified;
   end;
@@ -128,6 +137,7 @@ begin
   // header
   FHeader := TioJWT_Header.Create;
   // payload claims
+  Faid := IO_INTEGER_NULL_VALUE;
   Fapp := IO_STRING_NULL_VALUE;
   Faud := IO_STRING_NULL_VALUE;
   Fexp := IO_DATETIME_NULL_VALUE;
@@ -137,6 +147,8 @@ begin
   Fnbf := IO_DATETIME_NULL_VALUE;
   Frfa := IO_DATETIME_NULL_VALUE;
   Fsub := IO_STRING_NULL_VALUE;
+  Fuid := IO_INTEGER_NULL_VALUE;
+  Fusr := IO_STRING_NULL_VALUE;
   Ftyp := IO_STRING_NULL_VALUE;
   // others
   FBase64URLEncoding := TBase64URLEncoding.Create;
@@ -175,9 +187,14 @@ begin
   Result := _DoSign(_DoEncodeHeader, _DoEncodePayload, ASecret);
 end;
 
-function TioJWT.HasAppID: Boolean;
+function TioJWT.HasApp: Boolean;
 begin
   Result := Fapp <> IO_STRING_NULL_VALUE;
+end;
+
+function TioJWT.HasAppID: Boolean;
+begin
+  Result := Faid <> IO_INTEGER_NULL_VALUE;
 end;
 
 function TioJWT.HasAudience: Boolean;
@@ -218,6 +235,16 @@ end;
 function TioJWT.HasSubject: Boolean;
 begin
   Result := Fsub <> IO_STRING_NULL_VALUE;
+end;
+
+function TioJWT.HasUser: Boolean;
+begin
+  Result := Fusr <> IO_STRING_NULL_VALUE;
+end;
+
+function TioJWT.HasUserID: Boolean;
+begin
+  Result := Fuid <> IO_INTEGER_NULL_VALUE;
 end;
 
 function TioJWT.HasTokenType: Boolean;
@@ -262,36 +289,45 @@ var
 begin
   LdjParams := dj.DefaultByFields;
   LdjParams.DateTimeFormat := TdjDateTimeFormat.dfUnix;
-  // app = app id
-  if Fapp = IO_STRING_NULL_VALUE then
+  // aid = app id
+  if not HasAppID then
+    LdjParams.IgnoredProperties.Add('aid');
+  // app = app
+  if not HasApp then
     LdjParams.IgnoredProperties.Add('app');
   // aud = audience
-  if Faud = IO_STRING_NULL_VALUE then
+  if not HasAudience then
     LdjParams.IgnoredProperties.Add('aud');
   // exp = expiration
-  if Fexp = IO_DATETIME_NULL_VALUE then
+  if not HasExpiration then
     LdjParams.IgnoredProperties.Add('exp');
   // iat = issued at time
-  if Fiat = IO_DATETIME_NULL_VALUE then
+  if not HasIssuedAtTime then
     LdjParams.IgnoredProperties.Add('iat');
   // iss = issuer
-  if Fiss = IO_STRING_NULL_VALUE then
+  if not HasIssuer then
     LdjParams.IgnoredProperties.Add('iss');
   // jti = jwt id
-  if Fjti = IO_STRING_NULL_VALUE then
+  if not HasJwtID then
     LdjParams.IgnoredProperties.Add('jti');
   // nbf = not before
-  if Fnbf = IO_DATETIME_NULL_VALUE then
+  if not HasNotBefore then
     LdjParams.IgnoredProperties.Add('nbf');
   // rfa = refresh after
-  if Frfa = IO_DATETIME_NULL_VALUE then
+  if not HasRefreshAfter then
     LdjParams.IgnoredProperties.Add('rfa');
   // sub = subject
-  if Fsub = IO_STRING_NULL_VALUE then
+  if not HasSubject then
     LdjParams.IgnoredProperties.Add('sub');
   // typ = type
-  if Ftyp = IO_STRING_NULL_VALUE then
+  if not HasTokenType then
     LdjParams.IgnoredProperties.Add('typ');
+  // uid = user id
+  if not HasUserID then
+    LdjParams.IgnoredProperties.Add('uid');
+  // usr = user name
+  if not HasUser then
+    LdjParams.IgnoredProperties.Add('usr');
   // Serialize claims (self)
   Result := dj.From(Self, LdjParams).ToJson;
   // Encode

@@ -165,12 +165,14 @@ var
   LObj: TObject;
   LAppCredentials: IioAuthAppCredentials;
   LResultAppAuthorizationToken: String;
+  LAppID: Integer;
 begin
   LObj := AioRequestBody.JSONDataValueAsObject;
   if Supports(LObj, IioAuthAppCredentials, LAppCredentials) then
   begin
-    AioResponseBody.AuthResultIsAuthorized := TioAuthServer.GetInstance.AuthorizeApp(LAppCredentials, AioRequestBody.AuthToken, LResultAppAuthorizationToken);
+    AioResponseBody.AuthResultIsAuthorized := TioAuthServer.GetInstance.AuthorizeApp(LAppCredentials, AioRequestBody.AuthToken, LResultAppAuthorizationToken, LAppID);
     AioResponseBody.AuthResult1 := LResultAppAuthorizationToken;
+    AioResponseBody.AuthResult2 := LAppID.ToString;
   end
   else
     raise EioHttpLocalException.Create(ClassName, '_AuthorizeApp', 'JSONDataValue object does not implement then "IioAuthAppCredentials" interface');
@@ -181,12 +183,14 @@ var
   LObj: TObject;
   LUserCredentials: IioAuthUserCredentials;
   LResultUserAuthorizationToken: String;
+  LUserID: Integer;
 begin
   LObj := AioRequestBody.JSONDataValueAsObject;
   if Supports(LObj, IioAuthUserCredentials, LUserCredentials) then
   begin
-    AioResponseBody.AuthResultIsAuthorized := TioAuthServer.GetInstance.AuthorizeUser(LUserCredentials, LResultUserAuthorizationToken);
+    AioResponseBody.AuthResultIsAuthorized := TioAuthServer.GetInstance.AuthorizeUser(LUserCredentials, LResultUserAuthorizationToken, LUserID);
     AioResponseBody.AuthResult1 := LResultUserAuthorizationToken;
+    AioResponseBody.AuthResult2 := LUserID.ToString;
   end
   else
     raise EioHttpLocalException.Create(ClassName, '_AuthorizeUser', 'JSONDataValue object does not implement then "IioAuthUserCredentials" interface');
