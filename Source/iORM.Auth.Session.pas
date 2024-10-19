@@ -48,9 +48,10 @@ type
     // app
     FAppOID: Integer;
     // tokens
-    FUserAuthorizationToken: String;
-    FAppAuthorizationToken: String;
     FAccessToken: String;
+    FAppAuthorizationToken: String;
+    FRefreshToken: String;
+    FUserAuthorizationToken: String;
     // connection
     FConnectionName: String;
     // methods
@@ -58,6 +59,7 @@ type
     function GetAppAuthorizationToken: String;
     function GetAppOID: Integer;
     function GetConnectionName: String;
+    function GetRefreshToken: String;
     function GetUserAuthorizationToken: String;
     function GetUserOID: Integer;
     function GetUserName: String;
@@ -65,6 +67,7 @@ type
     procedure SetAppAuthorizationToken(const Value: String);
     procedure SetAppOID(const Value: Integer);
     procedure SetConnectionName(const Value: String);
+    procedure SetRefreshToken(const Value: String);
     procedure SetUserAuthorizationToken(const Value: String);
     procedure SetUserOID(const Value: Integer);
     procedure SetUserName(const Value: String);
@@ -76,9 +79,10 @@ type
     // app props
     property AppOID: Integer read GetAppOID write SetAppOID;
     // tokens
-    property UserAuthorizationToken: String read GetUserAuthorizationToken write SetUserAuthorizationToken;
-    property AppAuthorizationToken: String read GetAppAuthorizationToken write SetAppAuthorizationToken;
     property AccessToken: String read GetAccessToken write SetAccessToken;
+    property AppAuthorizationToken: String read GetAppAuthorizationToken write SetAppAuthorizationToken;
+    property RefreshTokenToken: String read GetRefreshToken write SetRefreshToken;
+    property UserAuthorizationToken: String read GetUserAuthorizationToken write SetUserAuthorizationToken;
     // connection
     property ConnectionName: String read GetConnectionName write SetConnectionName;
   end;
@@ -98,9 +102,10 @@ begin
   // app
   FAppOID := IO_INTEGER_NULL_VALUE;
   // tokens
-  FUserAuthorizationToken := IO_STRING_NULL_VALUE;
-  FAppAuthorizationToken := IO_STRING_NULL_VALUE;
   FAccessToken := IO_STRING_NULL_VALUE;
+  FAppAuthorizationToken := IO_STRING_NULL_VALUE;
+  FRefreshToken := IO_STRING_NULL_VALUE;
+  FUserAuthorizationToken := IO_STRING_NULL_VALUE;
   // connection
   FConnectionName := IO_STRING_NULL_VALUE;
 end;
@@ -123,6 +128,11 @@ end;
 function TioAuthSession.GetConnectionName: String;
 begin
   Result := FConnectionName;
+end;
+
+function TioAuthSession.GetRefreshToken: String;
+begin
+  Result := FRefreshToken;
 end;
 
 function TioAuthSession.GetUserAuthorizationToken: String;
@@ -158,6 +168,11 @@ end;
 procedure TioAuthSession.SetConnectionName(const Value: String);
 begin
   FConnectionName := Value;
+end;
+
+procedure TioAuthSession.SetRefreshToken(const Value: String);
+begin
+  FRefreshToken := Value;
 end;
 
 procedure TioAuthSession.SetUserAuthorizationToken(const Value: String);

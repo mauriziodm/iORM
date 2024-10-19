@@ -60,12 +60,8 @@ type
     destructor Destroy; override;
     class function GetInstance: TioAuthClient; static;
     function AuthorizeUser(const AUserCredentials: IioAuthUserCredentials): Boolean; // user login (user authorization)
-
-
     function AuthorizeApp(const AAppCredentials: IioAuthAppCredentials): Boolean; // app login (app authorization)
     function AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention): Boolean; // request authorization to access a resource (scope)
-
-
   published
     // properties
     property Active: Boolean read FActive write FActive;
