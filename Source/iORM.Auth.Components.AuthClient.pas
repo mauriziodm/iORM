@@ -100,9 +100,9 @@ function TioAuthClient.AuthorizeApp(const AAppCredentials: IioAuthAppCredentials
 var
   LDone: Boolean;
   LResultAppAuthorizationToken: String;
-  LResultAppID: Integer;
+  LResultAppOID: Integer;
   LSession: IioAuthSession;
-  LUserID: Integer;
+  LUserOID: Integer;
   LUserName: String;
   LUserAuthorizationToken: String;
 begin
@@ -114,25 +114,25 @@ begin
   // invoke OnAuthorizeAppGetUserAuthCode event to retrieve the user authorization code/token
   if Assigned(FOnAuthorizeAppGetUserAuthCode) then
   begin
-    FOnAuthorizeAppGetUserAuthCode(Self, AAppCredentials, LUserAuthorizationToken, LUserName, LUserID, Result);
+    FOnAuthorizeAppGetUserAuthCode(Self, AAppCredentials, LUserAuthorizationToken, LUserName, LUserOID, Result);
     if not Result then
       raise EioAuthInvalidCredentialsException_401.Create('Unable to retrieve a valid user authorization token');
   end;
   // invoke OnAuthorizeApp event if assigned
   LDone := False;
   if Assigned(FOnAuthorizeApp) then
-    FOnAuthorizeApp(Self, AAppCredentials, LUserAuthorizationToken, LResultAppAuthorizationToken, Result, LDone);
+    FOnAuthorizeApp(Self, AAppCredentials, LUserAuthorizationToken, LResultAppAuthorizationToken, LResultAppOID, Result, LDone);
   // if the creation of the token was not handled then use the internal implementation
   if not LDone then
-    Result := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).AuthorizeApp(FConnectionName, AAppCredentials, LUserAuthorizationToken, LResultAppAuthorizationToken, LResultAppID);
+    Result := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).AuthorizeApp(FConnectionName, AAppCredentials, LUserAuthorizationToken, LResultAppAuthorizationToken, LResultAppOID);
   // if authorized then update session props (else raise an exception)
   if Result and (LResultAppAuthorizationToken <> IO_AUTH_NULL_JWT) then
   begin
     LSession := TioApplication.Session;
-    LSession.UserID := LUserID;
+    LSession.UserOID := LUserOID;
     LSession.UserName := LUserName;
     LSession.UserAuthorizationToken := LUserAuthorizationToken;
-    LSession.AppID := LResultAppID;
+    LSession.AppOID := LResultAppOID;
     LSession.AppAuthorizationToken := LResultAppAuthorizationToken;
   end
   else
@@ -143,7 +143,7 @@ function TioAuthClient.AuthorizeUser(const AUserCredentials: IioAuthUserCredenti
 var
   LDone: Boolean;
   LResultUserAuthorizationToken: String;
-  LResultUserID: Integer;
+  LResultUserOID: Integer;
   LSession: IioAuthSession;
 begin
   Result := False;
@@ -153,15 +153,15 @@ begin
   // invoke OnAuthorizeUser event if assigned
   LDone := False;
   if Assigned(FOnAuthorizeUser) then
-    FOnAuthorizeUser(Self, AUserCredentials, LResultUserAuthorizationToken, LResultUserID, Result, LDone);
+    FOnAuthorizeUser(Self, AUserCredentials, LResultUserAuthorizationToken, LResultUserOID, Result, LDone);
   // if the creation of the token was not handled then use the internal implementation
   if not LDone then
-    Result := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).AuthorizeUser(FConnectionName, AUserCredentials, LResultUserAuthorizationToken, LResultUserID);
+    Result := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).AuthorizeUser(FConnectionName, AUserCredentials, LResultUserAuthorizationToken, LResultUserOID);
   // if authorized then update session props (else raise an exception)
   if Result and (LResultUserAuthorizationToken <> IO_AUTH_NULL_JWT) then
   begin
     LSession := TioApplication.Session;
-    LSession.UserID := LResultUserID;
+    LSession.UserOID := LResultUserOID;
     LSession.UserName := AUserCredentials.LoginUser;
     LSession.UserAuthorizationToken := LResultUserAuthorizationToken;
   end

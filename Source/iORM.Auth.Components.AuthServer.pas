@@ -88,8 +88,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     class function GetInstance: TioAuthServer; static;
-    function AuthorizeUser(const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String; out ResultUserID: Integer): Boolean; // return a user identity token
-    function AuthorizeApp(AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String; out ResultAppID: Integer): Boolean; // return an app authorization token
+    function AuthorizeUser(const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String; out ResultUserOID: Integer): Boolean; // return a user identity token
+    function AuthorizeApp(AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String; out ResultAppOID: Integer): Boolean; // return an app authorization token
     function AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean; // return true or false depending the access to the requested result is permitted
     function NewAccessToken(const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; // return a new acces token and also a new refresh token just after the authorization (login)
     function RefreshAccessToken(const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; // return a new acces token and also a new refresh token
@@ -267,20 +267,20 @@ begin
     raise EioGenericException.Create(ClassName, 'SetUserCacheExpirationMins', 'The minimum value is 1');
 end;
 
-function TioAuthServer.AuthorizeUser(const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String; out ResultUserID: Integer): Boolean;
+function TioAuthServer.AuthorizeUser(const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String; out ResultUserOID: Integer): Boolean;
 var
   LDone: Boolean;
   LUser: IioAuthUser;
 begin
   Result := False;
   ResultUserAuthorizationToken := IO_AUTH_NULL_JWT;
-  ResultUserID := IO_INTEGER_NULL_VALUE;
+  ResultUserOID := IO_INTEGER_NULL_VALUE;
   // First check if the component is enabled
   CheckIfEnabled;
   // invoke OnAuthorizeUser event if assigned
   LDone := False;
   if Assigned(FOnAuthorizeUser) then
-    FOnAuthorizeUser(Self, AUserCredentials, ResultUserAuthorizationToken, ResultUserID, Result, LDone);
+    FOnAuthorizeUser(Self, AUserCredentials, ResultUserAuthorizationToken, ResultUserOID, Result, LDone);
   // if the creation of the token was not handled then use the internal implementation
   if not LDone then
   begin
@@ -290,7 +290,7 @@ begin
       raise EioAuthInvalidCredentialsException_401.Create('Invalid user credentials');
     // if all is ok then build the result user authorization token
     ResultUserAuthorizationToken := _BuildAuthorizationToken(LUser.LoginPassword);
-    ResultUserID := LUser.ID;
+    ResultUserOID := LUser.ID;
     // final check, if the result token is null the raise exception
     if ResultUserAuthorizationToken = IO_AUTH_NULL_JWT then
       raise EioAuthInvalidCredentialsException_401.Create('Invalid user credentials');
@@ -299,12 +299,12 @@ begin
   end;
 end;
 
-function TioAuthServer.AuthorizeApp(AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String; out ResultAppID: Integer): Boolean;
+function TioAuthServer.AuthorizeApp(AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String; out ResultAppOID: Integer): Boolean;
 var
   LAppInstance: IioAuthApp;
   LDone: Boolean;
   LUser, LApp: String;
-  LUserID, LAppID: Integer;
+  LUserOID, LAppOID: Integer;
 begin
   Result := False;
   ResultAppAuthorizationToken := IO_AUTH_NULL_JWT;
@@ -313,12 +313,12 @@ begin
   // invoke OnAuthorizeApp event if assigned
   LDone := False;
   if Assigned(FOnAuthorizeApp) then
-    FOnAuthorizeApp(Self, AAppCredentials, AUserAuthorizationToken, ResultAppAuthorizationToken, Result, LDone);
+    FOnAuthorizeApp(Self, AAppCredentials, AUserAuthorizationToken, ResultAppAuthorizationToken, LAppOID, Result, LDone);
   // if the creation of the token was not handled then use the internal implementation
   if not LDone then
   begin
     // check user token
-    _CheckAuthorizationToken(AUserAuthorizationToken, LUser, LApp, LUserID, LAppID);
+    _CheckAuthorizationToken(AUserAuthorizationToken, LUser, LApp, LUserOID, LAppOID);
     if LApp <> IO_STRING_NULL_VALUE then
       raise EioAuthUserAuthorizationTokenExpected_401.Create('A user authorization token/code was expected, but an application authorization token/code was received instead.');
     // load app entity (if it is a persisted entity)
@@ -328,8 +328,8 @@ begin
     if not LAppInstance.CanAuthorizeCredentials then
       raise EioAuthInvalidCredentialsException_401.Create('Invalid app credentials');
     // Build token
-    ResultAppAuthorizationToken := _BuildAuthorizationToken(LUser, LUserID, LAppInstance.AppID, LAppInstance.ID);
-    ResultAppID := LAppInstance.ID;
+    ResultAppAuthorizationToken := _BuildAuthorizationToken(LUser, LUserOID, LAppInstance.AppID, LAppInstance.ID);
+    ResultAppOID := LAppInstance.ID;
     // final check, if the result token is null the raise exception
     if ResultAppAuthorizationToken = IO_AUTH_NULL_JWT then
       raise EioAuthInvalidCredentialsException_401.Create('Invalid app credentials');

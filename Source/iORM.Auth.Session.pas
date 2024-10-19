@@ -43,10 +43,10 @@ type
   TioAuthSession = class(TInterfacedObject, IioAuthSession)
   private
     // user
-    FUserID: Integer;
+    FUserOID: Integer;
     FUserName: String;
     // app
-    FAppID: Integer;
+    FAppOID: Integer;
     // tokens
     FUserAuthorizationToken: String;
     FAppAuthorizationToken: String;
@@ -56,25 +56,25 @@ type
     // methods
     function GetAccessToken: String;
     function GetAppAuthorizationToken: String;
-    function GetAppID: Integer;
+    function GetAppOID: Integer;
     function GetConnectionName: String;
     function GetUserAuthorizationToken: String;
-    function GetUserID: Integer;
+    function GetUserOID: Integer;
     function GetUserName: String;
     procedure SetAccessToken(const Value: String);
     procedure SetAppAuthorizationToken(const Value: String);
-    procedure SetAppID(const Value: Integer);
+    procedure SetAppOID(const Value: Integer);
     procedure SetConnectionName(const Value: String);
     procedure SetUserAuthorizationToken(const Value: String);
-    procedure SetUserID(const Value: Integer);
+    procedure SetUserOID(const Value: Integer);
     procedure SetUserName(const Value: String);
   public
     constructor Create;
     // user
-    property UserID: Integer read GetUserID write SetUserID;
+    property UserOID: Integer read GetUserOID write SetUserOID;
     property UserName: String read GetUserName write SetUserName;
     // app props
-    property AppID: Integer read GetAppID write SetAppID;
+    property AppOID: Integer read GetAppOID write SetAppOID;
     // tokens
     property UserAuthorizationToken: String read GetUserAuthorizationToken write SetUserAuthorizationToken;
     property AppAuthorizationToken: String read GetAppAuthorizationToken write SetAppAuthorizationToken;
@@ -93,10 +93,10 @@ constructor TioAuthSession.Create;
 begin
   inherited;
   // user
-  FUserID := IO_INTEGER_NULL_VALUE;
+  FUserOID := IO_INTEGER_NULL_VALUE;
   FUserName := IO_STRING_NULL_VALUE;
   // app
-  FAppID := IO_INTEGER_NULL_VALUE;
+  FAppOID := IO_INTEGER_NULL_VALUE;
   // tokens
   FUserAuthorizationToken := IO_STRING_NULL_VALUE;
   FAppAuthorizationToken := IO_STRING_NULL_VALUE;
@@ -115,9 +115,9 @@ begin
   Result := FAppAuthorizationToken;
 end;
 
-function TioAuthSession.GetAppID: Integer;
+function TioAuthSession.GetAppOID: Integer;
 begin
-  Result := FAppID;
+  Result := FAppOID;
 end;
 
 function TioAuthSession.GetConnectionName: String;
@@ -130,9 +130,9 @@ begin
   Result := FUserAuthorizationToken;
 end;
 
-function TioAuthSession.GetUserID: Integer;
+function TioAuthSession.GetUserOID: Integer;
 begin
-  Result := FUserID;
+  Result := FUserOID;
 end;
 
 function TioAuthSession.GetUserName: String;
@@ -150,9 +150,9 @@ begin
   FAppAuthorizationToken := Value;
 end;
 
-procedure TioAuthSession.SetAppID(const Value: Integer);
+procedure TioAuthSession.SetAppOID(const Value: Integer);
 begin
-  FAppID := Value;
+  FAppOID := Value;
 end;
 
 procedure TioAuthSession.SetConnectionName(const Value: String);
@@ -165,9 +165,9 @@ begin
   FUserAuthorizationToken := Value;
 end;
 
-procedure TioAuthSession.SetUserID(const Value: Integer);
+procedure TioAuthSession.SetUserOID(const Value: Integer);
 begin
-  FUserID := Value;
+  FUserOID := Value;
 end;
 
 procedure TioAuthSession.SetUserName(const Value: String);
