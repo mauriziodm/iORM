@@ -246,7 +246,8 @@ contains
   iORM.Auth.Components.AuthServer in '..\..\Source\iORM.Auth.Components.AuthServer.pas',
   iORM.Auth.Components.AuthClient in '..\..\Source\iORM.Auth.Components.AuthClient.pas',
   iORM.Auth.Session in '..\..\Source\iORM.Auth.Session.pas',
-  iORM.Auth.Model in '..\..\Source\iORM.Auth.Model.pas';
+  iORM.Auth.Model in '..\..\Source\iORM.Auth.Model.pas',
+  iORM.Auth.Response in '..\..\Source\iORM.Auth.Response.pas';
 
 end.
 

@@ -399,6 +399,7 @@
         <DCCReference Include="..\..\Source\iORM.Auth.Components.AuthClient.pas"/>
         <DCCReference Include="..\..\Source\iORM.Auth.Session.pas"/>
         <DCCReference Include="..\..\Source\iORM.Auth.Model.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Auth.Response.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

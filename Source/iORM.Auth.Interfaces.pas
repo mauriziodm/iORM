@@ -51,6 +51,38 @@ type
   TioAuthCredentialsMode = (cmLogin, cmSetPassword, cmChangePassword);
   TioAuthCredentialsClearMode = (cmAll, cmSecretsOnly);
 
+  IioAuthResponse = interface
+    ['{BB322BD7-DD1C-49B2-A55D-F323749B8D32}']
+    function GetAccessToken: String;
+    function GetAppAuthToken: String;
+    function GetAppOID: Integer;
+    function GetIsAuthorized: Boolean;
+    function GetRefreshAfter: TDateTime;
+    function GetRefreshToken: String;
+    function GetUserAuthToken: String;
+    function GetUserOID: Integer;
+    procedure SetAccessToken(const Value: String);
+    procedure SetAppAuthToken(const Value: String);
+    procedure SetAppOID(const Value: Integer);
+    procedure SetIsAuthorized(const Value: Boolean);
+    procedure SetRefreshAfter(const Value: TDateTime);
+    procedure SetRefreshToken(const Value: String);
+    procedure SetUserAuthToken(const Value: String);
+    procedure SetUserOID(const Value: Integer);
+    // properties
+    property FIsAuthorized: Boolean read GetIsAuthorized write SetIsAuthorized;
+    // user
+    property FUserAuthToken: String read GetUserAuthToken write SetUserAuthToken;
+    property FUserOID: Integer read GetUserOID write SetUserOID;
+    // app
+    property FAppAuthToken: String read GetAppAuthToken write SetAppAuthToken;
+    property FAppOID: Integer read GetAppOID write SetAppOID;
+    // access
+    property FAccessToken: String read GetAccessToken write SetAccessToken;
+    property FRefreshAfter: TDateTime read GetRefreshAfter write SetRefreshAfter;
+    property FRefreshToken: String read GetRefreshToken write SetRefreshToken;
+  end;
+
   IioAuthSession = interface
     ['{AEC7DF37-A5C0-44E3-9D64-32216758506B}']
     // methods
