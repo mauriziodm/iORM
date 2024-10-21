@@ -45,14 +45,26 @@ type
     class function NewAuthSession: IioAuthSession; static;
     class function NewAuthRoleItem(const ARole: IioAuthRole): IioAuthRoleItem; static;
     class function NewAuthUserAppItem(const AApp: IioAuthApp): IioAuthAppItem; static;
+    class function NewAuthResponse: IioAuthResponse; static;
+    class function NewAuthResponseFromString(const AValue: String): IioAuthResponse; static;
   end;
 
 implementation
 
 uses
-  iORM.Auth.Session, iORM.Auth.Model;
+  iORM.Auth.Session, iORM.Auth.Model, iORM.Auth.Response;
 
 { TioAuthFactory }
+
+class function TioAuthFactory.NewAuthResponse: IioAuthResponse;
+begin
+  Result := TioAuthResponse.Create;
+end;
+
+class function TioAuthFactory.NewAuthResponseFromString(const AValue: String): IioAuthResponse;
+begin
+  Result := TioAuthResponse.CreateByString(AValue);
+end;
 
 class function TioAuthFactory.NewAuthRoleItem(const ARole: IioAuthRole): IioAuthRoleItem;
 begin
