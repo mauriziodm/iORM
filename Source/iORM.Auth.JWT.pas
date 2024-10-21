@@ -55,7 +55,9 @@ type
     // header
     [ioSkip] FHeader: TioJWT_Header;
     // payload claims
+    // TODO: DA ELIMINARE?
     Faid: integer; // app id (managed by iorm)
+    // TODO: DA ELIMINARE?
     Fapp: String; // app name (managed by iorm)
     Faud: String; // audience (potrebbe rappresentare i resource server ai quali la client app o l'utente sono autorizzati ad accedere)
     Fexp: TDateTime; // expiration
@@ -63,10 +65,13 @@ type
     Fiss: String; // issuer (rappresente colui che ha rilasciato il token, potrebbe essere l'authorization server stesso)
     Fjti: String; // jwt id (id univoco che identifica il token, es. si usa per annullare un token emesso attraverso una black list)
     Fnbf: TDateTime; // not before
+    // TODO: DA ELIMINARE?
     Frfa: TDateTime; // the access token nedd to be refreshed after this DateTime
     Fsub: String; // subject
     Ftyp: String; // token type
+    // TODO: DA ELIMINARE?
     Fuid: integer; // user id (managed by iorm)
+    // TODO: DA ELIMINARE?
     Fusr: String; // user name (managed by iorm)
     // others
     [ioSkip] FBase64URLEncoding: TBase64URLEncoding;
@@ -290,43 +295,43 @@ begin
   LdjParams := dj.DefaultByFields;
   LdjParams.DateTimeFormat := TdjDateTimeFormat.dfUnix;
   // aid = app id
-  if not HasAppID then
+  if Faid = IO_INTEGER_NULL_VALUE then
     LdjParams.IgnoredProperties.Add('aid');
   // app = app
-  if not HasApp then
+  if Fapp = IO_STRING_NULL_VALUE then
     LdjParams.IgnoredProperties.Add('app');
   // aud = audience
-  if not HasAudience then
+  if Faud = IO_STRING_NULL_VALUE then
     LdjParams.IgnoredProperties.Add('aud');
   // exp = expiration
-  if not HasExpiration then
+  if Fexp = IO_DATETIME_NULL_VALUE then
     LdjParams.IgnoredProperties.Add('exp');
   // iat = issued at time
-  if not HasIssuedAtTime then
+  if Fiat = IO_DATETIME_NULL_VALUE then
     LdjParams.IgnoredProperties.Add('iat');
   // iss = issuer
-  if not HasIssuer then
+  if Fiss = IO_STRING_NULL_VALUE then
     LdjParams.IgnoredProperties.Add('iss');
   // jti = jwt id
-  if not HasJwtID then
+  if Fjti = IO_STRING_NULL_VALUE then
     LdjParams.IgnoredProperties.Add('jti');
   // nbf = not before
-  if not HasNotBefore then
+  if Fnbf = IO_DATETIME_NULL_VALUE then
     LdjParams.IgnoredProperties.Add('nbf');
   // rfa = refresh after
-  if not HasRefreshAfter then
+  if Frfa = IO_DATETIME_NULL_VALUE then
     LdjParams.IgnoredProperties.Add('rfa');
   // sub = subject
-  if not HasSubject then
+  if Fsub = IO_STRING_NULL_VALUE then
     LdjParams.IgnoredProperties.Add('sub');
   // typ = type
-  if not HasTokenType then
+  if Ftyp = IO_STRING_NULL_VALUE then
     LdjParams.IgnoredProperties.Add('typ');
   // uid = user id
-  if not HasUserID then
+  if Fuid = IO_INTEGER_NULL_VALUE then
     LdjParams.IgnoredProperties.Add('uid');
   // usr = user name
-  if not HasUser then
+  if Fusr = IO_STRING_NULL_VALUE then
     LdjParams.IgnoredProperties.Add('usr');
   // Serialize claims (self)
   Result := dj.From(Self, LdjParams).ToJson;
