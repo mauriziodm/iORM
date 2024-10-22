@@ -113,7 +113,7 @@ type
     function IsNotYetValid(const ANow: TDateTime): Boolean;
     function IsToBeRefreshed(const ANow: TDateTime): Boolean;
     // claims
-    property AppID: Integer read Faid write Faid;
+    property AppOID: Integer read Faid write Faid;
     property App: String read Fapp write Fapp;
     property Audience: String read Faud write Faud;
     property Expiration: TDateTime read Fexp write Fexp;
@@ -124,7 +124,7 @@ type
     property RefreshAfter: TDateTime read Frfa write Frfa;
     property Subject: String read Fsub write Fsub;
     property TokenType: String read Ftyp write Ftyp;
-    property UserID: Integer read Fuid write Fuid;
+    property UserOID: Integer read Fuid write Fuid;
     property User: String read Fusr write Fusr;
     // token
     property IsVerified: Boolean read FIsVerified;

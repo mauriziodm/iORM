@@ -11,9 +11,11 @@ type
   private
     FIsAuthorized: Boolean;
     // user
+    FUser: String;
     FUserAuthToken: String;
     FUserOID: Integer;
     // app
+    FApp: String;
     FAppAuthToken: String;
     FAppOID: Integer;
     // access
@@ -21,19 +23,23 @@ type
     FRefreshAfter: TDateTime;
     FRefreshToken: String;
     function GetAccessToken: String;
+    function GetApp: String;
     function GetAppAuthToken: String;
     function GetAppOID: Integer;
     function GetIsAuthorized: Boolean;
     function GetRefreshAfter: TDateTime;
     function GetRefreshToken: String;
+    function GetUser: String;
     function GetUserAuthToken: String;
     function GetUserOID: Integer;
     procedure SetAccessToken(const Value: String);
+    procedure SetApp(const Value: String);
     procedure SetAppAuthToken(const Value: String);
     procedure SetAppOID(const Value: Integer);
     procedure SetIsAuthorized(const Value: Boolean);
     procedure SetRefreshAfter(const Value: TDateTime);
     procedure SetRefreshToken(const Value: String);
+    procedure SetUser(const Value: String);
     procedure SetUserAuthToken(const Value: String);
     procedure SetUserOID(const Value: Integer);
   public
@@ -48,9 +54,11 @@ type
     // properties
     property IsAuthorized: Boolean read GetIsAuthorized write SetIsAuthorized;
     // user
+    property User: String read GetUser write SetUser;
     property UserAuthToken: String read GetUserAuthToken write SetUserAuthToken;
     property UserOID: Integer read GetUserOID write SetUserOID;
     // app
+    property App: String read GetApp write SetApp;
     property AppAuthToken: String read GetAppAuthToken write SetAppAuthToken;
     property AppOID: Integer read GetAppOID write SetAppOID;
     // access
@@ -70,9 +78,11 @@ constructor TioAuthResponse.Create;
 begin
     FIsAuthorized := False;
     // user
+    FUser := IO_STRING_NULL_VALUE;
     FUserAuthToken := IO_STRING_NULL_VALUE;
     FUserOID := IO_INTEGER_NULL_VALUE;
     // app
+    FApp := IO_STRING_NULL_VALUE;
     FAppAuthToken := IO_STRING_NULL_VALUE;
     FAppOID := IO_INTEGER_NULL_VALUE;
     // access
@@ -89,6 +99,11 @@ end;
 function TioAuthResponse.GetAccessToken: String;
 begin
   Result := FAccessToken;
+end;
+
+function TioAuthResponse.GetApp: String;
+begin
+  Result := FApp;
 end;
 
 function TioAuthResponse.GetAppAuthToken: String;
@@ -114,6 +129,11 @@ end;
 function TioAuthResponse.GetRefreshToken: String;
 begin
   Result := FRefreshToken;
+end;
+
+function TioAuthResponse.GetUser: String;
+begin
+  Result := FUser;
 end;
 
 function TioAuthResponse.GetUserAuthToken: String;
@@ -156,6 +176,11 @@ begin
   FAccessToken := Value;
 end;
 
+procedure TioAuthResponse.SetApp(const Value: String);
+begin
+  FApp := Value;
+end;
+
 procedure TioAuthResponse.SetAppAuthToken(const Value: String);
 begin
   FAppAuthToken := Value;
@@ -179,6 +204,11 @@ end;
 procedure TioAuthResponse.SetRefreshToken(const Value: String);
 begin
   FRefreshToken := Value;
+end;
+
+procedure TioAuthResponse.SetUser(const Value: String);
+begin
+  FUser := Value;
 end;
 
 procedure TioAuthResponse.SetUserAuthToken(const Value: String);
