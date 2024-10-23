@@ -67,6 +67,7 @@ type
     function GetUserAuthorizationToken: String;
     function GetUserOID: Integer;
     function GetUser: String;
+    function NeedRefresh: Boolean;
     procedure SetAccessToken(const Value: String);
     procedure SetAppAuthorizationToken(const Value: String);
     procedure SetAppOID(const Value: Integer);
@@ -97,7 +98,7 @@ type
 
 implementation
 
-uses iORM.CommonTypes;
+uses iORM.CommonTypes, iORM.Utilities;
 
 { TioAuthSession }
 
@@ -163,6 +164,11 @@ end;
 function TioAuthSession.GetUserOID: Integer;
 begin
   Result := FUserOID;
+end;
+
+function TioAuthSession.NeedRefresh: Boolean;
+begin
+  Result := (FRefreshAfter <> IO_DATETIME_NULL_VALUE) and (TioUtilities.NowUTC > FRefreshAfter);
 end;
 
 function TioAuthSession.GetUser: String;

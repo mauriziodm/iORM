@@ -109,6 +109,7 @@ type
     function GetUserAuthorizationToken: String;
     function GetUserOID: Integer;
     function GetUser: String;
+    function NeedRefresh: Boolean;
     procedure SetAccessToken(const Value: String);
     procedure SetAppAuthorizationToken(const Value: String);
     procedure SetAppOID(const Value: Integer);

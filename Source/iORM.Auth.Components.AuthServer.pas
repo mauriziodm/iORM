@@ -90,7 +90,7 @@ type
     FOnNewAccessToken: TioOnNewAccessTokenEvent;
     FOnRefreshAccessToken: TioOnRefreshAccessTokenEvent;
     // methods
-    procedure CheckIfEnabled;
+    procedure CheckIfEnabled; inline;
     function Get_Version: String;
     procedure SetUserCache_Expiration_Mins(const Value: Integer);
     // jwt builders
@@ -103,7 +103,6 @@ type
     procedure _CheckAuthorizationToken(const AAuthorizationToken: String; const AAuthResponse: IioAuthResponse; const ATokenType: String); inline;
     procedure _CheckAccessToken(const AAccessToken: String; const AAuthResponse: IioAuthResponse); inline;
     procedure _CheckRefreshToken(const ARefreshToken: String; const AAuthResponse: IioAuthResponse); inline;
-    function _CheckAccessTokenNeedRefresh(const AAccessToken: String): Boolean; inline;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -172,7 +171,8 @@ implementation
 
 uses
   iORM.CommonTypes, iORM.Utilities, iORM.Exceptions,
-  System.SysUtils, System.DateUtils, System.IOUtils, iORM.Auth.Factory;
+  System.SysUtils, System.DateUtils, System.IOUtils, iORM.Auth.Factory,
+  iORM.Abstraction;
 
 { TioAuthServer }
 
@@ -373,7 +373,7 @@ begin
     FOnAccessTokenNeedRefresh(Self, AAccessToken, Result, LDone);
   // if the check of the token was not handled then use the internal implementation
   if not LDone then
-    Result := _CheckAccessTokenNeedRefresh(AAccessToken);
+    Result := TioApplication.Session.NeedRefresh;
 end;
 
 function TioAuthServer.AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
@@ -492,10 +492,10 @@ begin
     LToken.IssueAtTime := LNow; // issued now by default
     LToken.Issuer := FToken_Issuer;
     LToken.NotBefore := IncMinute(LNow, -FToken_NotBefore_Mins);
-    LToken.RefreshAfter := IncMinute(LNow, FAccessToken_RefreshAfter_Mins);
     LToken.User := AAuthResponse.User;
     LToken.UserOID :=  AAuthResponse.UserOID;
     AAuthResponse.AccessToken := LToken.TokenAsString(FToken_Secret);
+    AAuthResponse.RefreshAfter := IncMinute(LNow, FAccessToken_RefreshAfter_Mins);
   finally
     LToken.Free;
   end;
@@ -560,20 +560,6 @@ begin
     AAuthResponse.UserOID := LJWT.UserOID;
     AAuthResponse.App := LJWT.App;
     AAuthResponse.AppOID := LJWT.AppOID;
-  finally
-    LJWT.Free;
-  end;
-end;
-
-function TioAuthServer._CheckAccessTokenNeedRefresh(const AAccessToken: String): Boolean;
-var
-  LJWT: TioJWT;
-  LNow: TDateTime;
-begin
-  LJWT := TioJWT.CreateByToken(AAccessToken, FToken_Secret);
-  try
-    LNow := TioUtilities.NowUTC;
-    Result := LJWT.IsToBeRefreshed(LNow) or LJWT.IsExpired(LNow);
   finally
     LJWT.Free;
   end;
