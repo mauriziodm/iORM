@@ -10,7 +10,6 @@ type
   TioAuthResponse = class(TInterfacedObject, IioAuthResponse)
   private
     FIsAuthorized: Boolean;
-    FIsExpired: Boolean;
     // user
     FUser: String;
     FUserAuthToken: String;
@@ -28,7 +27,6 @@ type
     function GetAppOID: Integer;
     function GetApp: String;
     function GetIsAuthorized: Boolean;
-    function GetIsExpired: Boolean;
     function GetRefreshAfter: TDateTime;
     function GetRefreshToken: String;
     function GetUserAuthToken: String;
@@ -39,7 +37,6 @@ type
     procedure SetAppOID(const Value: Integer);
     procedure SetApp(const Value: String);
     procedure SetIsAuthorized(const Value: Boolean);
-    procedure SetIsExpired(const Value: Boolean);
     procedure SetRefreshAfter(const Value: TDateTime);
     procedure SetRefreshToken(const Value: String);
     procedure SetUserAuthToken(const Value: String);
@@ -56,7 +53,6 @@ type
     function AsString: String;
     // properties
     property IsAuthorized: Boolean read GetIsAuthorized write SetIsAuthorized;
-    property IsExpired: Boolean read GetIsExpired write SetIsExpired;
     // user
     property UserAuthToken: String read GetUserAuthToken write SetUserAuthToken;
     property UserOID: Integer read GetUserOID write SetUserOID;
@@ -81,7 +77,6 @@ uses
 constructor TioAuthResponse.Create;
 begin
     FIsAuthorized := False;
-    FIsExpired := False;
     // user
     FUser := IO_STRING_NULL_VALUE;
     FUserAuthToken := IO_STRING_NULL_VALUE;

@@ -58,7 +58,6 @@ type
     function GetAppAuthToken: String;
     function GetAppOID: Integer;
     function GetIsAuthorized: Boolean;
-    function GetIsExpired: Boolean;
     function GetRefreshAfter: TDateTime;
     function GetRefreshToken: String;
     function GetUser: String;
@@ -69,7 +68,6 @@ type
     procedure SetAppAuthToken(const Value: String);
     procedure SetAppOID(const Value: Integer);
     procedure SetIsAuthorized(const Value: Boolean);
-    procedure SetIsExpired(const Value: Boolean);
     procedure SetRefreshAfter(const Value: TDateTime);
     procedure SetRefreshToken(const Value: String);
     procedure SetUser(const Value: String);
@@ -84,7 +82,6 @@ type
     function AsString: String;
     // properties
     property IsAuthorized: Boolean read GetIsAuthorized write SetIsAuthorized;
-    property IsExpired: Boolean read GetIsExpired write SetIsExpired;
     // user
     property User: String read GetUser write SetUser;
     property UserAuthToken: String read GetUserAuthToken write SetUserAuthToken;
