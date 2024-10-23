@@ -43,8 +43,10 @@ type
   TioHttpResponseBody = class(TInterfacedObject, IioHttpResponseBody)
   private
     // auth
+    // TODO: Auth - non serve più?
     FAuthResultIsAuthorized: Boolean;
     FAuthResult1: String;
+    // TODO: Auth - non serve più?
     FAuthResult2: String;
     // others
     FExceptionClassName: String;
@@ -53,7 +55,6 @@ type
     FStream: TStream;
     // methods
     function ExceptionOccurred: Boolean;
-    function GetAuthResultIsAuthorized: Boolean;
     function GetAuthResult1: String;
     function GetAuthResult2: String;
     function GetExceptionClassName: String;
@@ -61,7 +62,6 @@ type
     function GetJSONDataValue: TJSONValue;
     function GetJSONDataValueAsObject: TObject;
     function GetStream: TStream;
-    procedure SetAuthResultIsAuthorized(const Value: Boolean);
     procedure SetAuthResult1(const Value: String);
     procedure SetAuthResult2(const Value: String);
     procedure SetExceptionClassName(const Value: String);
@@ -178,11 +178,6 @@ begin
   Result := FAuthResult2;
 end;
 
-function TioHttpResponseBody.GetAuthResultIsAuthorized: Boolean;
-begin
- Result := FAuthResultIsAuthorized;
-end;
-
 function TioHttpResponseBody.GetExceptionClassName: String;
 begin
  Result := FExceptionClassName;
@@ -221,11 +216,6 @@ end;
 procedure TioHttpResponseBody.SetAuthResult2(const Value: String);
 begin
   FAuthResult2 := Value;
-end;
-
-procedure TioHttpResponseBody.SetAuthResultIsAuthorized(const Value: Boolean);
-begin
-  FAuthResultIsAuthorized := Value;
 end;
 
 procedure TioHttpResponseBody.SetExceptionClassName(const Value: String);

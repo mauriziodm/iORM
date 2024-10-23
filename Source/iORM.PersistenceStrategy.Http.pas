@@ -77,12 +77,11 @@ type
     class procedure _DoSQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); override;
     class procedure _DoSQLDest_Execute(const ASQLDestination: IioSQLDestination); override;
     // Auth
-    class function _DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String; out ResultUserOID: Integer): Boolean; override;
-    class function _DoAuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String; out ResultAppOID: Integer): Boolean; override;
-    class function _DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean; override;
-    class function _DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; override;
-    class function _DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; override;
-    class function _DoAuth_AccessTokenNeedRefresh(const AConnectionDefName: String; const AAccessToken: String): Boolean; override;
+    class function _DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse; override;
+    class function _DoAuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials; const AUserAuthorizationToken: String): IioAuthResponse; override;
+    class function _DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse; override;
+    class function _DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String): IioAuthResponse; override;
+    class function _DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String): IioAuthResponse; override;
     // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
   end;
 
@@ -93,7 +92,7 @@ uses
   iORM.DB.Factory, System.Generics.Collections, iORM.Utilities,
   iORM.DuckTyped.Interfaces, iORM.Http.Interfaces, iORM.Http.Factory,
   iORM.Exceptions, System.SysUtils, FireDAC.Stan.Intf, FireDAC.Stan.StorageJSON,
-  iORM.Context.Container, DJSON;
+  iORM.Context.Container, DJSON, iORM.Auth.Factory;
 
 { TioStrategyHttp }
 
@@ -520,7 +519,7 @@ begin
   TioDBFactory.Connection(AConnectionName).StartTransaction;
 end;
 
-class function TioPersistenceStrategyHttp._DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean;
+class function TioPersistenceStrategyHttp._DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
 var
   LConnection: IioConnectionHttp;
 begin
@@ -541,7 +540,7 @@ begin
     // Execute
     LConnection.Execute(HTTP_METHOD_NAME_AUTH_AUTHORIZEACCESS);
     // Set result values
-    Result := LConnection.ioResponseBody.AuthResultIsAuthorized;
+    Result := TioAuthFactory.NewAuthResponseFromString( LConnection.ioResponseBody.AuthResult1 );
     // Commit
     LConnection.Commit;
   except
@@ -551,7 +550,7 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyHttp._DoAuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String; out ResultAppOID: Integer): Boolean;
+class function TioPersistenceStrategyHttp._DoAuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials; const AUserAuthorizationToken: String): IioAuthResponse;
 var
   LConnection: IioConnectionHttp;
 begin
@@ -571,9 +570,7 @@ begin
     // Execute
     LConnection.Execute(HTTP_METHOD_NAME_AUTH_AUTHORIZEUSER);
     // Set result values
-    Result := LConnection.ioResponseBody.AuthResultIsAuthorized;
-    ResultAppAuthorizationToken := LConnection.ioResponseBody.AuthResult1;
-    ResultAppOID := LConnection.ioResponseBody.AuthResult2.ToInteger;
+    Result := TioAuthFactory.NewAuthResponseFromString( LConnection.ioResponseBody.AuthResult1 );
     // Commit
     LConnection.Commit;
   except
@@ -583,7 +580,7 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyHttp._DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String; out ResultUserOID: Integer): Boolean;
+class function TioPersistenceStrategyHttp._DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse;
 var
   LConnection: IioConnectionHttp;
 begin
@@ -602,9 +599,7 @@ begin
     // Execute
     LConnection.Execute(HTTP_METHOD_NAME_AUTH_AUTHORIZEUSER);
     // Set result values
-    Result := LConnection.ioResponseBody.AuthResultIsAuthorized;
-    ResultUserAuthorizationToken := LConnection.ioResponseBody.AuthResult1;
-    ResultUserOID := LConnection.ioResponseBody.AuthResult2.ToInteger;
+    Result := TioAuthFactory.NewAuthResponseFromString( LConnection.ioResponseBody.AuthResult1 );
     // Commit
     LConnection.Commit;
   except
@@ -614,7 +609,7 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyHttp._DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean;
+class function TioPersistenceStrategyHttp._DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String): IioAuthResponse;
 var
   LConnection: IioConnectionHttp;
 begin
@@ -633,9 +628,7 @@ begin
     // Execute
     LConnection.Execute(HTTP_METHOD_NAME_AUTH_NEWACCESSTOKEN);
     // Set result values
-    Result := LConnection.ioResponseBody.AuthResultIsAuthorized;
-    AResultAccessToken := LConnection.ioResponseBody.AuthResult1;
-    AResultRefreshToken := LConnection.ioResponseBody.AuthResult2;
+    Result := TioAuthFactory.NewAuthResponseFromString( LConnection.ioResponseBody.AuthResult1 );
     // Commit
     LConnection.Commit;
   except
@@ -645,7 +638,7 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyHttp._DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean;
+class function TioPersistenceStrategyHttp._DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String): IioAuthResponse;
 var
   LConnection: IioConnectionHttp;
 begin
@@ -664,38 +657,7 @@ begin
     // Execute
     LConnection.Execute(HTTP_METHOD_NAME_AUTH_REFRESHACCESSTOKEN);
     // Set result values
-    Result := LConnection.ioResponseBody.AuthResultIsAuthorized;
-    AResultAccessToken := LConnection.ioResponseBody.AuthResult1;
-    AResultRefreshToken := LConnection.ioResponseBody.AuthResult2;
-    // Commit
-    LConnection.Commit;
-  except
-    // Rollback
-    LConnection.Rollback;
-    raise;
-  end;
-end;
-
-class function TioPersistenceStrategyHttp._DoAuth_AccessTokenNeedRefresh(const AConnectionDefName, AAccessToken: String): Boolean;
-var
-  LConnection: IioConnectionHttp;
-begin
-  inherited;
-  // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(AConnectionDefName).AsHttpConnection;
-  // Start transaction
-  // NB: In this strategy (HTTP) call the Connection.StartTransaction (not the Self.StartTransaction
-  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any http call to the server at this point.
-  LConnection.StartTransaction;
-  try
-    // Set request parameters
-    LConnection.ioRequestBody.Clear;
-    LConnection.ioRequestBody.AuthToken := AAccessToken;
-    // Execute
-    LConnection.Execute(HTTP_METHOD_NAME_AUTH_ACCESSTOKENNEEDREFRESH);
-    // Set result values
-    Result := LConnection.ioResponseBody.AuthResultIsAuthorized;
+    Result := TioAuthFactory.NewAuthResponseFromString( LConnection.ioResponseBody.AuthResult1 );
     // Commit
     LConnection.Commit;
   except

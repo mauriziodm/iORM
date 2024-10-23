@@ -83,7 +83,6 @@ type
     FUserOTP_Expiration_Mins: Integer;
     FUserPsw_Expiration_Days: Integer;
     // events
-    FOnAccessTokenNeedRefresh: TioOnAccessTokenNeedRefreshEvent;
     FOnAuthorizeApp: TioOnAuthorizeAppEvent;
     FOnAuthorizeUser: TioOnAuthorizeUserEvent;
     FOnAuthorizeAccess: TioOnAuthorizeAccessEvent;
@@ -112,7 +111,6 @@ type
     function AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse; // return true or false depending the access to the requested result is permitted
     function NewAccessToken(const AAuthorizationToken: String): IioAuthResponse; // return a new acces token and also a new refresh token just after the authorization (login)
     function RefreshAccessToken(const ARefreshToken: String): IioAuthResponse; // return a new acces token and also a new refresh token
-    function AccessTokenNeedRefresh(const AAccessToken: String): Boolean;
   published
     // properties
     property AccessToken_Expiration_Mins: Integer read FAccessToken_Expiration_Mins write FAccessToken_Expiration_Mins;
@@ -130,7 +128,6 @@ type
     property UserPassword_Expiration_Days: Integer read FUserPsw_Expiration_Days write FUserPsw_Expiration_Days;
     property _Version: String read Get_Version;
     // events
-    property OnAccessTokenNeedRefresh: TioOnAccessTokenNeedRefreshEvent read FOnAccessTokenNeedRefresh write FOnAccessTokenNeedRefresh;
     property OnAuthorizeApp: TioOnAuthorizeAppEvent read FOnAuthorizeApp write FOnAuthorizeApp;
     property OnAuthorizeAccess: TioOnAuthorizeAccessEvent read FOnAuthorizeAccess write FOnAuthorizeAccess;
     property OnAuthorizeUser: TioOnAuthorizeUserEvent read FOnAuthorizeUser write FOnAuthorizeUser;
@@ -358,22 +355,6 @@ begin
     raise EioAuthInvalidCredentialsException_401.Create('Invalid app credentials');
   // Return true if all is ok
   Result.IsAuthorized := True;
-end;
-
-function TioAuthServer.AccessTokenNeedRefresh(const AAccessToken: String): Boolean;
-var
-  LDone: Boolean;
-begin
-  Result := False;
-  // First check if the component is enabled
-  CheckIfEnabled;
-  // invoke OnLogin event if assigned
-  LDone := False;
-  if Assigned(FOnAccessTokenNeedRefresh) then
-    FOnAccessTokenNeedRefresh(Self, AAccessToken, Result, LDone);
-  // if the check of the token was not handled then use the internal implementation
-  if not LDone then
-    Result := TioApplication.Session.NeedRefresh;
 end;
 
 function TioAuthServer.AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;

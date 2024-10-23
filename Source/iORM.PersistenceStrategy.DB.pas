@@ -89,12 +89,11 @@ type
     class procedure _DoSQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); override;
     class procedure _DoSQLDest_Execute(const ASQLDestination: IioSQLDestination); override;
     // Auth
-    class function _DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String; out ResultUserOID: Integer): Boolean; override;
-    class function _DoAuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String; out ResultAppOID: Integer): Boolean; override;
-    class function _DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean; override;
-    class function _DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; override;
-    class function _DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String; out AResultAccessToken, AResultRefreshToken: String): Boolean; override;
-    class function _DoAuth_AccessTokenNeedRefresh(const AConnectionDefName: String; const AAccessToken: String): Boolean; override;
+    class function _DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse; override;
+    class function _DoAuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials; const AUserAuthorizationToken: String): IioAuthResponse; override;
+    class function _DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse; override;
+    class function _DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String): IioAuthResponse; override;
+    class function _DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String): IioAuthResponse; override;
     // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
   end;
 
@@ -127,37 +126,29 @@ type
 
 { TioStrategyDB }
 
-class function TioPersistenceStrategyDB._DoAuthorizeAccess(const AConnectionDefName, AScope: String; const AAuthIntention: TioAuthIntention;
-  const AAccessToken: String): Boolean;
+class function TioPersistenceStrategyDB._DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
 begin
   Result := TioAuthServer.GetInstance.AuthorizeAccess(AScope, AAuthIntention, AAccessToken);
 end;
 
-class function TioPersistenceStrategyDB._DoAuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String; out ResultAppAuthorizationToken: String; out ResultAppOID: Integer): Boolean;
+class function TioPersistenceStrategyDB._DoAuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials; const AUserAuthorizationToken: String): IioAuthResponse;
 begin
-  Result := TioAuthServer.GetInstance.AuthorizeApp(AAppCredentials, AUserAuthorizationToken, ResultAppAuthorizationToken, ResultAppOID);
+  Result := TioAuthServer.GetInstance.AuthorizeApp(AAppCredentials, AUserAuthorizationToken);
 end;
 
-class function TioPersistenceStrategyDB._DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials; out ResultUserAuthorizationToken: String; out ResultUserOID: Integer): Boolean;
+class function TioPersistenceStrategyDB._DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse;
 begin
-  Result := TioAuthServer.GetInstance.AuthorizeUser(AUserCredentials, ResultUserAuthorizationToken, ResultUserOID);
+  Result := TioAuthServer.GetInstance.AuthorizeUser(AUserCredentials);
 end;
 
-class function TioPersistenceStrategyDB._DoAuth_NewAccessToken(const AConnectionDefName, AAuthorizationToken: String; out AResultAccessToken,
-  AResultRefreshToken: String): Boolean;
+class function TioPersistenceStrategyDB._DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String): IioAuthResponse;
 begin
-  Result := TioAuthServer.GetInstance.NewAccessToken(AAuthorizationToken, AResultAccessToken, AResultRefreshToken);
+  Result := TioAuthServer.GetInstance.NewAccessToken(AAuthorizationToken);
 end;
 
-class function TioPersistenceStrategyDB._DoAuth_RefreshAccessToken(const AConnectionDefName, ARefreshToken: String; out AResultAccessToken,
-  AResultRefreshToken: String): Boolean;
+class function TioPersistenceStrategyDB._DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String): IioAuthResponse;
 begin
-  Result := TioAuthServer.GetInstance.RefreshAccessToken(ARefreshToken, AResultAccessToken, AResultRefreshToken);
-end;
-
-class function TioPersistenceStrategyDB._DoAuth_AccessTokenNeedRefresh(const AConnectionDefName, AAccessToken: String): Boolean;
-begin
-  Result := TioAuthServer.GetInstance.AccessTokenNeedRefresh(AAccessToken);
+  Result := TioAuthServer.GetInstance.RefreshAccessToken(ARefreshToken);
 end;
 
 class procedure TioPersistenceStrategyDB._DoCommitTransaction(const AConnectionName: String);

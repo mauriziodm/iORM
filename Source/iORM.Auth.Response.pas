@@ -122,11 +122,6 @@ begin
   Result := FIsAuthorized;
 end;
 
-function TioAuthResponse.GetIsExpired: Boolean;
-begin
-  Result := FIsExpired;
-end;
-
 function TioAuthResponse.GetRefreshAfter: TDateTime;
 begin
   Result := FRefreshAfter;
@@ -200,11 +195,6 @@ end;
 procedure TioAuthResponse.SetIsAuthorized(const Value: Boolean);
 begin
   FIsAuthorized := Value;
-end;
-
-procedure TioAuthResponse.SetIsExpired(const Value: Boolean);
-begin
-  FIsExpired := Value;
 end;
 
 procedure TioAuthResponse.SetRefreshAfter(const Value: TDateTime);
