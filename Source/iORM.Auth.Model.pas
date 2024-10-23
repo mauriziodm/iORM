@@ -616,7 +616,7 @@ begin
   FNewPassword2 := IO_STRING_NULL_VALUE;
   FPswDigest := IO_STRING_NULL_VALUE;
   // Set password expiration & credentials mode
-  FPswExp := IncMinute(TioUtilities.NowUTC, TioAuthServer.GetInstance.UserOTPDurationMins);
+  FPswExp := IncMinute(TioUtilities.NowUTC, TioAuthServer.GetInstance.UserOTP_Expiration_Mins);
   FCredentialMode := cmSetPassword;
 end;
 
@@ -639,9 +639,9 @@ begin
   // ...set the password expiration
   case FCredentialMode of
     cmLogin:
-      FPswExp := TioAuthServer.GetInstance.UserPswDurationDays; // 0 = perpetual
+      FPswExp := TioAuthServer.GetInstance.UserPassword_Expiration_Days; // 0 = perpetual
     cmSetPassword, cmChangePassword:
-      FPswExp := TioAuthServer.GetInstance.UserOTPDurationMins; // 0 = perpetual
+      FPswExp := TioAuthServer.GetInstance.UserOTP_Expiration_Mins; // 0 = perpetual
   end;
   // ...set the credentials mode
   FCredentialMode := cmLogin;

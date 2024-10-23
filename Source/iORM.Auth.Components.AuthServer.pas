@@ -47,6 +47,13 @@ const
   TOKEN_TYPE_REFRESH = 'ref';
 
   TOKEN_AUDIENCE = 'iorm';
+  TOKEN_NOT_BEFORE_MINS = 5;
+
+  USERAUTHTOKEN_EXPIRATION_MINS = 10;
+  APPAUTHTOKEN_EXPIRATION_MINS = 10;
+  ACCESSTOKEN_EXPIRATION_MINS = 20;
+  ACCESSTOKEN_REFRESHAFTER_MINS = 10;
+  REFRESHTOKEN_EXPIRATION_DAYS = 30;
 
   USER_CACHE_EXPIRATION_MINS = 10; // default is 10 minutes
 type
@@ -60,13 +67,21 @@ type
     class var FInstance: TioAuthServer;
   strict private
     // fields
+    // nb: proprietà non thread safe ma per il momento provo a mantenerla non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
+    FAccessToken_Expiration_Mins: Integer;
+    FAccessToken_RefreshAfter_Mins: Integer;
+    FAppAuthToken_Expiration_Mins: Integer;
     FActive: Boolean;
-    FTokenIssuer: String; // proprietà non thread safe ma per il momento provo a mantenerla non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
-    FTokenSecret: String; // proprietà non thread safe ma per il momento provo a mantenerla non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
+    FRefreshToken_Expiration_Days: Integer;
+    FToken_Audience: String;
+    FToken_Issuer: String;
+    FToken_NotBefore_Mins: Integer;
+    FToken_Secret: String;
+    FUserAuthToken_Expiration_Mins: Integer;
     FUserCache: TioAuthUserCache;
-    FUserCacheExpirationMins: Integer;
-    FUserOTPDurationMins: Integer;
-    FUserPswDurationDays: Integer;
+    FUserCache_Expiration_Mins: Integer;
+    FUserOTP_Expiration_Mins: Integer;
+    FUserPsw_Expiration_Days: Integer;
     // events
     FOnAccessTokenNeedRefresh: TioOnAccessTokenNeedRefreshEvent;
     FOnAuthorizeApp: TioOnAuthorizeAppEvent;
@@ -77,7 +92,7 @@ type
     // methods
     procedure CheckIfEnabled;
     function Get_Version: String;
-    procedure SetUserCacheExpirationMins(const Value: Integer);
+    procedure SetUserCache_Expiration_Mins(const Value: Integer);
     // jwt builders
     procedure _BuildUserAuthorizationToken(const AAuthResponse: IioAuthResponse); inline;
     procedure _BuildAppAuthorizationToken(const AAuthResponse: IioAuthResponse); inline;
@@ -101,12 +116,19 @@ type
     function AccessTokenNeedRefresh(const AAccessToken: String): Boolean;
   published
     // properties
+    property AccessToken_Expiration_Mins: Integer read FAccessToken_Expiration_Mins write FAccessToken_Expiration_Mins;
+    property AccessToken_RefreshAfter_Mins: Integer read FAccessToken_RefreshAfter_Mins write FAccessToken_RefreshAfter_Mins;
     property Active: Boolean read FActive write FActive;
-    property TokenIssuer: String read FTokenIssuer write FTokenIssuer; // proprietà non thread safe ma per il momento provo a mantenerna non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
-    property TokenSecret: String read FTokenSecret write FTokenSecret; // proprietà non thread safe ma per il momento provo a mantenerna non protetta per migliorare le prestazioni, al max poi richiederà di nuovo un login
-    property UserCacheExpirationMins: Integer read FUserCacheExpirationMins write SetUserCacheExpirationMins default USER_CACHE_EXPIRATION_MINS;
-    property UserOTPDurationMins: Integer read FUserOTPDurationMins write FUserOTPDurationMins;
-    property UserPswDurationDays: Integer read FUserPswDurationDays write FUserPswDurationDays;
+    property AppAuthToken_Expiration_Mins: Integer read FAppAuthToken_Expiration_Mins write FAppAuthToken_Expiration_Mins;
+    property RefreshToken_Expiration_Days: Integer read FRefreshToken_Expiration_Days write FRefreshToken_Expiration_Days;
+    property Token_Audience: String read FToken_Audience write FToken_Audience;
+    property Token_Issuer: String read FToken_Issuer write FToken_Issuer;
+    property Token_NotBefore_Mins: Integer read FToken_NotBefore_Mins write FToken_NotBefore_Mins;
+    property Token_Secret: String read FToken_Secret write FToken_Secret;
+    property UserAuthToken_Expiration_Mins: Integer read FUserAuthToken_Expiration_Mins write FUserAuthToken_Expiration_Mins;
+    property UserCache_Expiration_Mins: Integer read FUserCache_Expiration_Mins write SetUserCache_Expiration_Mins default USER_CACHE_EXPIRATION_MINS;
+    property UserOTP_Expiration_Mins: Integer read FUserOTP_Expiration_Mins write FUserOTP_Expiration_Mins;
+    property UserPassword_Expiration_Days: Integer read FUserPsw_Expiration_Days write FUserPsw_Expiration_Days;
     property _Version: String read Get_Version;
     // events
     property OnAccessTokenNeedRefresh: TioOnAccessTokenNeedRefreshEvent read FOnAccessTokenNeedRefresh write FOnAccessTokenNeedRefresh;
@@ -163,15 +185,22 @@ end;
 constructor TioAuthServer.Create(AOwner: TComponent);
 begin
   inherited;
+  FAccessToken_Expiration_Mins := ACCESSTOKEN_EXPIRATION_MINS;
+  FAccessToken_RefreshAfter_Mins := ACCESSTOKEN_REFRESHAFTER_MINS;
+  FAppAuthToken_Expiration_Mins := APPAUTHTOKEN_EXPIRATION_MINS;
   FActive := True;
-  FTokenSecret := 'change me as soon as possible';
-  FTokenIssuer := IO_STRING_NULL_VALUE;
-  FUserCache := TioAuthUserCache.Create(FUserCacheExpirationMins);
-  FUserCacheExpirationMins := USER_CACHE_EXPIRATION_MINS; // default is 10 minutes
-  FUserOTPDurationMins := AUTH_OTP_DURATION_MIN;
-  FUserPswDurationDays := AUTH_PSW_DURATION_DAYS;
+  FRefreshToken_Expiration_Days := REFRESHTOKEN_EXPIRATION_DAYS;
+  FToken_Audience := TOKEN_AUDIENCE;
+  FToken_Issuer := IO_STRING_NULL_VALUE;
+  FToken_NotBefore_Mins := TOKEN_NOT_BEFORE_MINS;
+  FToken_Secret := 'change me as soon as possible';
+  FUserAuthToken_Expiration_Mins := USERAUTHTOKEN_EXPIRATION_MINS;
+  FUserCache := TioAuthUserCache.Create(FUserCache_Expiration_Mins);
+  FUserCache_Expiration_Mins := USER_CACHE_EXPIRATION_MINS;
+  FUserOTP_Expiration_Mins := AUTH_OTP_DURATION_MIN;
+  FUserPsw_Expiration_Days := AUTH_PSW_DURATION_DAYS;
   if not (csDesigning in ComponentState) then
-    FTokenIssuer := TPath.GetFileNameWithoutExtension(ParamStr(0));
+    FToken_Issuer := TPath.GetFileNameWithoutExtension(ParamStr(0));
   // Set the singleton internal reference to itself (one only auth server at a time)
   TioAuthServer.FInstance := Self;
 end;
@@ -254,11 +283,11 @@ begin
   Result.IsAuthorized := True;
 end;
 
-procedure TioAuthServer.SetUserCacheExpirationMins(const Value: Integer);
+procedure TioAuthServer.SetUserCache_Expiration_Mins(const Value: Integer);
 begin
   if Value >= 1 then
   begin
-    FUserCacheExpirationMins := Value;
+    FUserCache_Expiration_Mins := Value;
     FUserCache.ExpirationMinutes := Value;
   end
   else
@@ -384,18 +413,16 @@ begin
   LToken := TioJWT.Create;
   try
     LToken.TokenType := TOKEN_TYPE_REFRESH;
-    LToken.Audience := TOKEN_AUDIENCE;
+    LToken.Audience := FToken_Audience;
     LToken.App := AAuthResponse.App;
     LToken.AppOID := AAuthResponse.AppOID;
-    // TODO: AUTH - fare una proprietà del componente?
-    LToken.Expiration := IncDay(LNow, 30); // expires after 30 days by default (remind me)
+    LToken.Expiration := IncDay(LNow, FRefreshToken_Expiration_Days);
     LToken.IssueAtTime := LNow; // issued now by default
-    LToken.Issuer := FTokenIssuer;
-    // TODO: AUTH - fare una proprietà del componente?
-    LToken.NotBefore := IncMinute(LNow, -5); // not before 5 minutes before now to avoid problems with unsynchronized times between computers
+    LToken.Issuer := FToken_Issuer;
+    LToken.NotBefore := IncMinute(LNow, -FToken_NotBefore_Mins); // not before 5 minutes before now to avoid problems with unsynchronized times between computers
     LToken.User := AAuthResponse.User;
     LToken.UserOID :=  AAuthResponse.UserOID;
-    AAuthResponse.RefreshToken := LToken.TokenAsString(FTokenSecret);
+    AAuthResponse.RefreshToken := LToken.TokenAsString(FToken_Secret);
   finally
     LToken.Free;
   end;
@@ -410,17 +437,15 @@ begin
   LToken := TioJWT.Create;
   try
     LToken.TokenType := TOKEN_TYPE_USER_AUTHORIZATION;
-    LToken.Audience := TOKEN_AUDIENCE;
-    // TODO: AUTH - fare una proprietà del componente?
-    LToken.Expiration := IncMinute(LNow, 1); // expires after 1 minute by default (for first access/refresh token request only)
+    LToken.Audience := FToken_Audience;
+    LToken.Expiration := IncMinute(LNow, FUserAuthToken_Expiration_Mins);
     LToken.IssueAtTime := LNow; // issued now by default
-    LToken.Issuer := FTokenIssuer;
-    // TODO: AUTH - fare una proprietà del componente?
-    LToken.NotBefore := IncMinute(LNow, -5); // not before 5 minutes before now to avoid problems with unsynchronized times between computers
+    LToken.Issuer := FToken_Issuer;
+    LToken.NotBefore := IncMinute(LNow, -FToken_NotBefore_Mins);
     LToken.User := AAuthResponse.User;
     LToken.UserOID :=  AAuthResponse.UserOID;
     // set the user auth token in the response
-    AAuthResponse.UserAuthToken := LToken.TokenAsString(FTokenSecret);
+    AAuthResponse.UserAuthToken := LToken.TokenAsString(FToken_Secret);
   finally
     LToken.Free;
   end;
@@ -435,19 +460,17 @@ begin
   LToken := TioJWT.Create;
   try
     LToken.TokenType := TOKEN_TYPE_APP_AUTHORIZATION;
-    LToken.Audience := TOKEN_AUDIENCE;
+    LToken.Audience := FToken_Audience;
     LToken.App := AAuthResponse.App;
     LToken.AppOID := AAuthResponse.AppOID;
-    // TODO: AUTH - fare una proprietà del componente?
-    LToken.Expiration := IncMinute(LNow, 1); // expires after 1 minute by default (for first access/refresh token request only)
+    LToken.Expiration := IncMinute(LNow, FAppAuthToken_Expiration_Mins);
     LToken.IssueAtTime := LNow; // issued now by default
-    LToken.Issuer := FTokenIssuer;
-    // TODO: AUTH - fare una proprietà del componente?
-    LToken.NotBefore := IncMinute(LNow, -5); // not before 5 minutes before now to avoid problems with unsynchronized times between computers
+    LToken.Issuer := FToken_Issuer;
+    LToken.NotBefore := IncMinute(LNow, -FToken_NotBefore_Mins);
     LToken.User := AAuthResponse.User;
     LToken.UserOID :=  AAuthResponse.UserOID;
     // set the user auth token in the response
-    AAuthResponse.AppAuthToken := LToken.TokenAsString(FTokenSecret);
+    AAuthResponse.AppAuthToken := LToken.TokenAsString(FToken_Secret);
   finally
     LToken.Free;
   end;
@@ -462,18 +485,17 @@ begin
   LToken := TioJWT.Create;
   try
     LToken.TokenType := TOKEN_TYPE_ACCESS;
-    LToken.Audience := TOKEN_AUDIENCE;
+    LToken.Audience := FToken_Audience;
     LToken.App := AAuthResponse.App;
     LToken.AppOID := AAuthResponse.AppOID;
-    // TODO: AUTH - fare una proprietà del componente?
-    LToken.Expiration := IncDay(LNow, 1); // expires after 1 day by default
+    LToken.Expiration := IncMinute(LNow, FAccessToken_Expiration_Mins);
     LToken.IssueAtTime := LNow; // issued now by default
-    LToken.Issuer := FTokenIssuer;
-    // TODO: AUTH - fare una proprietà del componente?
-    LToken.NotBefore := IncMinute(LNow, -5); // not before 5 minutes before now to avoid problems with unsynchronized times between computers
+    LToken.Issuer := FToken_Issuer;
+    LToken.NotBefore := IncMinute(LNow, -FToken_NotBefore_Mins);
+    LToken.RefreshAfter := IncMinute(LNow, FAccessToken_RefreshAfter_Mins);
     LToken.User := AAuthResponse.User;
     LToken.UserOID :=  AAuthResponse.UserOID;
-    AAuthResponse.AccessToken := LToken.TokenAsString(FTokenSecret);
+    AAuthResponse.AccessToken := LToken.TokenAsString(FToken_Secret);
   finally
     LToken.Free;
   end;
@@ -488,11 +510,11 @@ begin
   if AJWT.IsVerified then
      raise EioTokenSignatureException_401.Create(Format('Token signature not verified (%s)', [AJWT.TokenType]));
   // Check the audience
-  if AJWT.Audience <> TOKEN_AUDIENCE then
-     raise EioTokenAudienceException_401.Create(Format('Invalid token audience "%s" ("%s" expected)', [AJWT.Audience, TOKEN_AUDIENCE]));
+  if AJWT.Audience <> FToken_Audience then
+     raise EioTokenAudienceException_401.Create(Format('Invalid token audience "%s" ("%s" expected)', [AJWT.Audience, FToken_Audience]));
   // Check issuer
-  if AJWT.Issuer <> FTokenIssuer then
-     raise EioTokenIssuerException_401.Create(Format('Invalid token issuer "%s" ("%s" expected)', [AJWT.Issuer, FTokenIssuer]));
+  if AJWT.Issuer <> FToken_Issuer then
+     raise EioTokenIssuerException_401.Create(Format('Invalid token issuer "%s" ("%s" expected)', [AJWT.Issuer, FToken_Issuer]));
   // Check expiration
   if AJWT.IsExpired(LNow) then
      raise EioTokenExpirationException_401.Create(Format('Token expired (%s)', [AJWT.TokenType]));
@@ -505,7 +527,7 @@ procedure TioAuthServer._CheckAuthorizationToken(const AAuthorizationToken: Stri
 var
   LJWT: TioJWT;
 begin
-  LJWT := TioJWT.CreateByToken(AAuthorizationToken, FTokenSecret);
+  LJWT := TioJWT.CreateByToken(AAuthorizationToken, FToken_Secret);
   try
     // Check token
     _CheckToken(LJWT);
@@ -526,7 +548,7 @@ procedure TioAuthServer._CheckAccessToken(const AAccessToken: String; const AAut
 var
   LJWT: TioJWT;
 begin
-  LJWT := TioJWT.CreateByToken(AAccessToken, FTokenSecret);
+  LJWT := TioJWT.CreateByToken(AAccessToken, FToken_Secret);
   try
     // Check token
     _CheckToken(LJWT);
@@ -548,7 +570,7 @@ var
   LJWT: TioJWT;
   LNow: TDateTime;
 begin
-  LJWT := TioJWT.CreateByToken(AAccessToken, FTokenSecret);
+  LJWT := TioJWT.CreateByToken(AAccessToken, FToken_Secret);
   try
     LNow := TioUtilities.NowUTC;
     Result := LJWT.IsToBeRefreshed(LNow) or LJWT.IsExpired(LNow);
@@ -561,7 +583,7 @@ procedure TioAuthServer._CheckRefreshToken(const ARefreshToken: String; const AA
 var
   LJWT: TioJWT;
 begin
-  LJWT := TioJWT.CreateByToken(ARefreshToken, FTokenSecret);
+  LJWT := TioJWT.CreateByToken(ARefreshToken, FToken_Secret);
   try
     // Check token
     _CheckToken(LJWT);
