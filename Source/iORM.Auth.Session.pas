@@ -44,12 +44,14 @@ type
   private
     // user
     FUserOID: Integer;
-    FUserName: String;
+    FUser: String;
     // app
     FAppOID: Integer;
+    FApp: String;
     // tokens
     FAccessToken: String;
     FAppAuthorizationToken: String;
+    FRefreshAfter: TDateTime;
     FRefreshToken: String;
     FUserAuthorizationToken: String;
     // connection
@@ -58,32 +60,38 @@ type
     function GetAccessToken: String;
     function GetAppAuthorizationToken: String;
     function GetAppOID: Integer;
+    function GetApp: String;
     function GetConnectionName: String;
+    function GetRefreshAfter: TDateTime;
     function GetRefreshToken: String;
     function GetUserAuthorizationToken: String;
     function GetUserOID: Integer;
-    function GetUserName: String;
+    function GetUser: String;
     procedure SetAccessToken(const Value: String);
     procedure SetAppAuthorizationToken(const Value: String);
     procedure SetAppOID(const Value: Integer);
+    procedure SetApp(const Value: String);
     procedure SetConnectionName(const Value: String);
+    procedure SetRefreshAfter(const Value: TDateTime);
     procedure SetRefreshToken(const Value: String);
     procedure SetUserAuthorizationToken(const Value: String);
     procedure SetUserOID(const Value: Integer);
-    procedure SetUserName(const Value: String);
+    procedure SetUser(const Value: String);
   public
     constructor Create;
-    // user
+    // user props
     property UserOID: Integer read GetUserOID write SetUserOID;
-    property UserName: String read GetUserName write SetUserName;
+    property User: String read GetUser write SetUser;
     // app props
     property AppOID: Integer read GetAppOID write SetAppOID;
-    // tokens
+    property App: String read GetApp write SetApp;
+    // token props
     property AccessToken: String read GetAccessToken write SetAccessToken;
     property AppAuthorizationToken: String read GetAppAuthorizationToken write SetAppAuthorizationToken;
-    property RefreshTokenToken: String read GetRefreshToken write SetRefreshToken;
+    property RefreshAfter: TDateTime read GetRefreshAfter write SetRefreshAfter;
+    property RefreshToken: String read GetRefreshToken write SetRefreshToken;
     property UserAuthorizationToken: String read GetUserAuthorizationToken write SetUserAuthorizationToken;
-    // connection
+    // connection props
     property ConnectionName: String read GetConnectionName write SetConnectionName;
   end;
 
@@ -98,12 +106,14 @@ begin
   inherited;
   // user
   FUserOID := IO_INTEGER_NULL_VALUE;
-  FUserName := IO_STRING_NULL_VALUE;
+  FUser := IO_STRING_NULL_VALUE;
   // app
   FAppOID := IO_INTEGER_NULL_VALUE;
+  FApp := IO_STRING_NULL_VALUE;
   // tokens
   FAccessToken := IO_STRING_NULL_VALUE;
   FAppAuthorizationToken := IO_STRING_NULL_VALUE;
+  FRefreshAfter := IO_DATETIME_NULL_VALUE;
   FRefreshToken := IO_STRING_NULL_VALUE;
   FUserAuthorizationToken := IO_STRING_NULL_VALUE;
   // connection
@@ -113,6 +123,11 @@ end;
 function TioAuthSession.GetAccessToken: String;
 begin
   Result := FAccessToken;
+end;
+
+function TioAuthSession.GetApp: String;
+begin
+  Result := FApp;
 end;
 
 function TioAuthSession.GetAppAuthorizationToken: String;
@@ -130,6 +145,11 @@ begin
   Result := FConnectionName;
 end;
 
+function TioAuthSession.GetRefreshAfter: TDateTime;
+begin
+  Result := FRefreshAfter;
+end;
+
 function TioAuthSession.GetRefreshToken: String;
 begin
   Result := FRefreshToken;
@@ -145,14 +165,19 @@ begin
   Result := FUserOID;
 end;
 
-function TioAuthSession.GetUserName: String;
+function TioAuthSession.GetUser: String;
 begin
-  Result := FUserName;
+  Result := FUser;
 end;
 
 procedure TioAuthSession.SetAccessToken(const Value: String);
 begin
   FAccessToken := Value;
+end;
+
+procedure TioAuthSession.SetApp(const Value: String);
+begin
+  FApp := Value;
 end;
 
 procedure TioAuthSession.SetAppAuthorizationToken(const Value: String);
@@ -170,6 +195,11 @@ begin
   FConnectionName := Value;
 end;
 
+procedure TioAuthSession.SetRefreshAfter(const Value: TDateTime);
+begin
+  FRefreshAfter := Value;
+end;
+
 procedure TioAuthSession.SetRefreshToken(const Value: String);
 begin
   FRefreshToken := Value;
@@ -185,9 +215,9 @@ begin
   FUserOID := Value;
 end;
 
-procedure TioAuthSession.SetUserName(const Value: String);
+procedure TioAuthSession.SetUser(const Value: String);
 begin
-  FUserName := Value;
+  FUser := Value;
 end;
 
 end.

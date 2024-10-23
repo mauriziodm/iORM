@@ -102,25 +102,34 @@ type
     function GetAccessToken: String;
     function GetAppAuthorizationToken: String;
     function GetAppOID: Integer;
+    function GetApp: String;
     function GetConnectionName: String;
+    function GetRefreshAfter: TDateTime;
+    function GetRefreshToken: String;
     function GetUserAuthorizationToken: String;
     function GetUserOID: Integer;
-    function GetUserName: String;
+    function GetUser: String;
     procedure SetAccessToken(const Value: String);
     procedure SetAppAuthorizationToken(const Value: String);
     procedure SetAppOID(const Value: Integer);
+    procedure SetApp(const Value: String);
     procedure SetConnectionName(const Value: String);
+    procedure SetRefreshAfter(const Value: TDateTime);
+    procedure SetRefreshToken(const Value: String);
     procedure SetUserAuthorizationToken(const Value: String);
     procedure SetUserOID(const Value: Integer);
-    procedure SetUserName(const Value: String);
+    procedure SetUser(const Value: String);
     // user props
     property UserOID: Integer read GetUserOID write SetUserOID;
-    property UserName: String read GetUserName write SetUserName;
+    property User: String read GetUser write SetUser;
     // app props
     property AppOID: Integer read GetAppOID write SetAppOID;
-    // tokens props
+    property App: String read GetApp write SetApp;
+    // token props
     property AccessToken: String read GetAccessToken write SetAccessToken;
     property AppAuthorizationToken: String read GetAppAuthorizationToken write SetAppAuthorizationToken;
+    property RefreshAfter: TDateTime read GetRefreshAfter write SetRefreshAfter;
+    property RefreshToken: String read GetRefreshToken write SetRefreshToken;
     property UserAuthorizationToken: String read GetUserAuthorizationToken write SetUserAuthorizationToken;
     // connection props
     property ConnectionName: String read GetConnectionName write SetConnectionName;

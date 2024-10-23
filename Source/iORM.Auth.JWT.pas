@@ -55,9 +55,7 @@ type
     // header
     [ioSkip] FHeader: TioJWT_Header;
     // payload claims
-    // TODO: DA ELIMINARE?
     Faid: integer; // app id (managed by iorm)
-    // TODO: DA ELIMINARE?
     Fapp: String; // app name (managed by iorm)
     Faud: String; // audience (potrebbe rappresentare i resource server ai quali la client app o l'utente sono autorizzati ad accedere)
     Fexp: TDateTime; // expiration
@@ -69,9 +67,7 @@ type
     Frfa: TDateTime; // the access token nedd to be refreshed after this DateTime
     Fsub: String; // subject
     Ftyp: String; // token type
-    // TODO: DA ELIMINARE?
     Fuid: integer; // user id (managed by iorm)
-    // TODO: DA ELIMINARE?
     Fusr: String; // user name (managed by iorm)
     // others
     [ioSkip] FBase64URLEncoding: TBase64URLEncoding;

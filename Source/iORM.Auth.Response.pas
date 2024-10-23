@@ -23,25 +23,25 @@ type
     FRefreshAfter: TDateTime;
     FRefreshToken: String;
     function GetAccessToken: String;
-    function GetApp: String;
     function GetAppAuthToken: String;
     function GetAppOID: Integer;
+    function GetApp: String;
     function GetIsAuthorized: Boolean;
     function GetRefreshAfter: TDateTime;
     function GetRefreshToken: String;
-    function GetUser: String;
     function GetUserAuthToken: String;
     function GetUserOID: Integer;
+    function GetUser: String;
     procedure SetAccessToken(const Value: String);
-    procedure SetApp(const Value: String);
     procedure SetAppAuthToken(const Value: String);
     procedure SetAppOID(const Value: Integer);
+    procedure SetApp(const Value: String);
     procedure SetIsAuthorized(const Value: Boolean);
     procedure SetRefreshAfter(const Value: TDateTime);
     procedure SetRefreshToken(const Value: String);
-    procedure SetUser(const Value: String);
     procedure SetUserAuthToken(const Value: String);
     procedure SetUserOID(const Value: Integer);
+    procedure SetUser(const Value: String);
   public
     constructor Create;
     constructor CreateByString(const AValue: String);
@@ -54,13 +54,13 @@ type
     // properties
     property IsAuthorized: Boolean read GetIsAuthorized write SetIsAuthorized;
     // user
-    property User: String read GetUser write SetUser;
     property UserAuthToken: String read GetUserAuthToken write SetUserAuthToken;
     property UserOID: Integer read GetUserOID write SetUserOID;
+    property User: String read GetUser write SetUser;
     // app
-    property App: String read GetApp write SetApp;
     property AppAuthToken: String read GetAppAuthToken write SetAppAuthToken;
     property AppOID: Integer read GetAppOID write SetAppOID;
+    property App: String read GetApp write SetApp;
     // access
     property AccessToken: String read GetAccessToken write SetAccessToken;
     property RefreshAfter: TDateTime read GetRefreshAfter write SetRefreshAfter;
