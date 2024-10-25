@@ -86,7 +86,6 @@ type
     property OnAuthorizeAppGetUserAuthCode: TioOnAuthorizeAppGetUserAuthCodeEvent read FOnAuthorizeAppGetUserAuthCode write FOnAuthorizeAppGetUserAuthCode;
   end;
 
-
 implementation
 
 uses
@@ -175,11 +174,13 @@ begin
   begin
     LSession := TioApplication.Session;
     Lsession.AppToken := LAuthResponse.AppTkn;
-    Lsession.AppOID := LAuthResponse.AppOID;
+    LSession.AppTokenExp := LAuthResponse.AppExp;
     Lsession.App := LAuthResponse.App;
+    Lsession.AppOID := LAuthResponse.AppOID;
     LSession.UserToken := LAuthResponse.UsrTkn;
-    LSession.UserOID := LAuthResponse.UsrOID;
+    LSession.UserTokenExp := LAuthResponse.UsrExp;
     LSession.User := LAuthResponse.Usr;
+    LSession.UserOID := LAuthResponse.UsrOID;
   end
   else
     raise EioAuthInvalidCredentialsException_401.Create('Invalid app credentials');
@@ -212,8 +213,9 @@ begin
   begin
     LSession := TioApplication.Session;
     LSession.UserToken := LAuthResponse.UsrTkn;
-    LSession.UserOID := LAuthResponse.UsrOID;
+    LSession.UserTokenExp := LAuthResponse.UsrExp;
     LSession.User := LAuthResponse.Usr;
+    LSession.UserOID := LAuthResponse.UsrOID;
   end
   else
     raise EioAuthInvalidCredentialsException_401.Create('Invalid user credentials');
