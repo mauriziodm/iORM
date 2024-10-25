@@ -174,10 +174,10 @@ begin
   if LAuthResponse.IsAuth and LAuthResponse.HasAppTkn then
   begin
     LSession := TioApplication.Session;
-    Lsession.AppAuthorizationToken := LAuthResponse.AppTkn;
+    Lsession.AppToken := LAuthResponse.AppTkn;
     Lsession.AppOID := LAuthResponse.AppOID;
     Lsession.App := LAuthResponse.App;
-    LSession.UserAuthorizationToken := LAuthResponse.UsrTkn;
+    LSession.UserToken := LAuthResponse.UsrTkn;
     LSession.UserOID := LAuthResponse.UsrOID;
     LSession.User := LAuthResponse.Usr;
   end
@@ -211,7 +211,7 @@ begin
   if LAuthResponse.IsAuth and LAuthResponse.HasUsrTkn then
   begin
     LSession := TioApplication.Session;
-    LSession.UserAuthorizationToken := LAuthResponse.UsrTkn;
+    LSession.UserToken := LAuthResponse.UsrTkn;
     LSession.UserOID := LAuthResponse.UsrOID;
     LSession.User := LAuthResponse.Usr;
   end

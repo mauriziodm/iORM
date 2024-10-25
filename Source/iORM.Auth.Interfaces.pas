@@ -112,39 +112,52 @@ type
     ['{AEC7DF37-A5C0-44E3-9D64-32216758506B}']
     // methods
     function GetAccessToken: String;
-    function GetAppAuthorizationToken: String;
+    function GetAccessTokenExp: TDateTime;
+    function GetAppToken: String;
+    function GetAppTokenExp: TDateTime;
     function GetAppOID: Integer;
     function GetApp: String;
     function GetConnectionName: String;
     function GetRefreshAfter: TDateTime;
     function GetRefreshToken: String;
-    function GetUserAuthorizationToken: String;
+    function GetRefreshTokenExp: TDateTime;
+    function GetUserToken: String;
+    function GetUserTokenExp: TDateTime;
     function GetUserOID: Integer;
     function GetUser: String;
     function NeedRefresh: Boolean;
     procedure SetAccessToken(const Value: String);
-    procedure SetAppAuthorizationToken(const Value: String);
+    procedure SetAccessTokenExp(const Value: TDateTime);
+    procedure SetAppToken(const Value: String);
+    procedure SetAppTokenExp(const Value: TDateTime);
     procedure SetAppOID(const Value: Integer);
     procedure SetApp(const Value: String);
     procedure SetConnectionName(const Value: String);
     procedure SetRefreshAfter(const Value: TDateTime);
     procedure SetRefreshToken(const Value: String);
-    procedure SetUserAuthorizationToken(const Value: String);
+    procedure SetRefreshTokenExp(const Value: TDateTime);
+    procedure SetUserToken(const Value: String);
+    procedure SetUserTokenExp(const Value: TDateTime);
     procedure SetUserOID(const Value: Integer);
     procedure SetUser(const Value: String);
-    // user props
-    property UserOID: Integer read GetUserOID write SetUserOID;
+    // user
+    property UserToken: String read GetUserToken write SetUserToken;
+    property UserTokenExp: TDateTime read GetUserTokenExp write SetUserTokenExp;
     property User: String read GetUser write SetUser;
-    // app props
-    property AppOID: Integer read GetAppOID write SetAppOID;
+    property UserOID: Integer read GetUserOID write SetUserOID;
+    // app
+    property AppToken: String read GetAppToken write SetAppToken;
+    property AppTokenExp: TDateTime read GetAppTokenExp write SetAppTokenExp;
     property App: String read GetApp write SetApp;
-    // token props
-    property AccessToken: String read GetAccessToken write SetAccessToken;
-    property AppAuthorizationToken: String read GetAppAuthorizationToken write SetAppAuthorizationToken;
-    property RefreshAfter: TDateTime read GetRefreshAfter write SetRefreshAfter;
+    property AppOID: Integer read GetAppOID write SetAppOID;
+    // refresh
     property RefreshToken: String read GetRefreshToken write SetRefreshToken;
-    property UserAuthorizationToken: String read GetUserAuthorizationToken write SetUserAuthorizationToken;
-    // connection props
+    property RefreshTokenExp: TDateTime read GetRefreshTokenExp write SetRefreshTokenExp;
+    // access
+    property AccessToken: String read GetAccessToken write SetAccessToken;
+    property AccessTokenExp: TDateTime read GetAccessTokenExp write SetAccessTokenExp;
+    property RefreshAfter: TDateTime read GetRefreshAfter write SetRefreshAfter;
+    // connection
     property ConnectionName: String read GetConnectionName write SetConnectionName;
   end;
 
