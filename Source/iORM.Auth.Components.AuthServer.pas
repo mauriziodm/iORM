@@ -404,6 +404,7 @@ begin
     LToken.User := AAuthResponse.Usr;
     LToken.UserOID :=  AAuthResponse.UsrOID;
     AAuthResponse.RefTkn := LToken.TokenAsString(FToken_Secret);
+    AAuthResponse.RefExp := LToken.Expiration;
   finally
     LToken.Free;
   end;
@@ -427,6 +428,7 @@ begin
     LToken.UserOID :=  AAuthResponse.UsrOID;
     // set the user auth token in the response
     AAuthResponse.UsrTkn := LToken.TokenAsString(FToken_Secret);
+    AAuthResponse.UsrExp := LToken.Expiration;
   finally
     LToken.Free;
   end;
@@ -452,6 +454,7 @@ begin
     LToken.UserOID :=  AAuthResponse.UsrOID;
     // set the user auth token in the response
     AAuthResponse.AppTkn := LToken.TokenAsString(FToken_Secret);
+    AAuthResponse.AppExp := LToken.Expiration;
   finally
     LToken.Free;
   end;
@@ -476,6 +479,7 @@ begin
     LToken.User := AAuthResponse.Usr;
     LToken.UserOID :=  AAuthResponse.UsrOID;
     AAuthResponse.AccTkn := LToken.TokenAsString(FToken_Secret);
+    AAuthResponse.AccExp := LToken.Expiration;
     AAuthResponse.RefAft := IncMinute(LNow, FAccessToken_RefreshAfter_Mins);
   finally
     LToken.Free;
