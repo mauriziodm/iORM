@@ -66,7 +66,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     class function GetInstance: TioAuthClient; static;
-    function AccessTokenNeedRefresh(const AAccessToken: String): Boolean;
+    function AccessTokenNeedRefresh: Boolean;
     function AuthorizeUser(const AUserCredentials: IioAuthUserCredentials): Boolean; // user login (user authorization)
     function AuthorizeApp(const AAppCredentials: IioAuthAppCredentials): Boolean; // app login (app authorization)
     function AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention): Boolean; // request authorization to access a resource (scope)
@@ -76,14 +76,13 @@ type
     property ConnectionName: String read FConnectionName write FConnectionName;
     property _Version: String read Get_Version;
     // events
-    property OnAccessTokenNeedRefresh: TioOnAccessTokenNeedRefreshEvent read FOnAccessTokenNeedRefresh write FOnAccessTokenNeedRefresh;
-
     property AfterAuthorizeAccess: TioAfterAuthorizeAccessEvent read FAfterAuthorizeAccess write FAfterAuthorizeAccess;
     property AfterAuthorizeApp: TioAfterAuthorizeAppEvent read FAfterAuthorizeApp write FAfterAuthorizeApp;
     property AfterAuthorizeUser: TioAfterAuthorizeUserEvent read FAfterAuthorizeUser write FAfterAuthorizeUser;
     property BeforeAuthorizeAccess: TioBeforeAuthorizeAccessEvent read FBeforeAuthorizeAccess write FBeforeAuthorizeAccess;
     property BeforeAuthorizeApp: TioBeforeAuthorizeAppEvent read FBeforeAuthorizeApp write FBeforeAuthorizeApp;
     property BeforeAuthorizeUser: TioBeforeAuthorizeUserEvent read FBeforeAuthorizeUser write FBeforeAuthorizeUser;
+    property OnAccessTokenNeedRefresh: TioOnAccessTokenNeedRefreshEvent read FOnAccessTokenNeedRefresh write FOnAccessTokenNeedRefresh;
     property OnAuthorizeAppGetUserAuthCode: TioOnAuthorizeAppGetUserAuthCodeEvent read FOnAuthorizeAppGetUserAuthCode write FOnAuthorizeAppGetUserAuthCode;
   end;
 
@@ -96,20 +95,20 @@ uses
 
 { TioAuthorizationClient }
 
-function TioAuthClient.AccessTokenNeedRefresh(const AAccessToken: String): Boolean;
+function TioAuthClient.AccessTokenNeedRefresh: Boolean;
 var
   LDone: Boolean;
 begin
-//  Result := False;
-//  // First check if the component is enabled
-//  CheckIfEnabled;
-//  // invoke OnLogin event if assigned
-//  LDone := False;
-//  if Assigned(FOnAccessTokenNeedRefresh) then
-//    FOnAccessTokenNeedRefresh(Self, AAccessToken, Result, LDone);
-//  // if the check of the token was not handled then use the internal implementation
-//  if not LDone then
-//    Result := TioApplication.Session.NeedRefresh;
+  Result := False;
+  // First check if the component is enabled
+  CheckIfEnabled;
+  // invoke OnLogin event if assigned
+  LDone := False;
+  if Assigned(FOnAccessTokenNeedRefresh) then
+    FOnAccessTokenNeedRefresh(Self, TioApplication.Session.AccessToken, Result, LDone);
+  // if the check of the token was not handled then use the internal implementation
+  if not LDone then
+    Result := TioApplication.Session.NeedRefresh;
 end;
 
 function TioAuthClient.AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention): Boolean;

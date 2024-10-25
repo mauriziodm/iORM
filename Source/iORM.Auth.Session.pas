@@ -67,7 +67,6 @@ type
     function GetUserAuthorizationToken: String;
     function GetUserOID: Integer;
     function GetUser: String;
-    function NeedRefresh: Boolean;
     procedure SetAccessToken(const Value: String);
     procedure SetAppAuthorizationToken(const Value: String);
     procedure SetAppOID(const Value: Integer);
@@ -80,6 +79,7 @@ type
     procedure SetUser(const Value: String);
   public
     constructor Create;
+    function NeedRefresh: Boolean;
     // user props
     property UserOID: Integer read GetUserOID write SetUserOID;
     property User: String read GetUser write SetUser;
