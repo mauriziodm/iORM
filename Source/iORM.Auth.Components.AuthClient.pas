@@ -55,12 +55,12 @@ type
     FBeforeAuthorizeAccess: TioBeforeAuthorizeAccessEvent;
     FBeforeAuthorizeApp: TioBeforeAuthorizeAppEvent;
     FBeforeAuthorizeUser: TioBeforeAuthorizeUserEvent;
-    FOnAuthorizeAppGetUserAuthCode: TioOnAuthorizeAppGetUserAuthCodeEvent;
-
-
     FOnAccessTokenNeedRefresh: TioOnAccessTokenNeedRefreshEvent;
+    FOnAuthorizeAppGetUserAuthCode: TioOnAuthorizeAppGetUserAuthCodeEvent;
     // methods
     procedure CheckIfEnabled;
+//    function GetIsLoggedOn: Boolean;
+//    function GetRefreshTokenIsExpired: Boolean;
     function Get_Version: String;
   public
     constructor Create(AOwner: TComponent); override;
@@ -135,7 +135,7 @@ begin
   if Assigned(FAfterAuthorizeAccess) then
     FAfterAuthorizeAccess(Self, AScope, AAuthIntention, LAccessToken, LAuthResponse);
   // if not authorized  raise an exception (non ci sarebbe bisogno perchè la solleva già il AuthServer ma per ulteriore sicurezza)
-  if not LAuthResponse.IsAuthorized then
+  if not LAuthResponse.IsAuth then
     raise EioAuthForbiddenException_403.Create(Format('Access forbidden to scope (%s)', [AScope]));
 end;
 
@@ -171,15 +171,15 @@ begin
   if Assigned(FAfterAuthorizeApp) then
     FAfterAuthorizeApp(Self, AAppCredentials, LUserAuthorizationToken, LAuthResponse);
   // if authorized then update session props (else raise an exception)
-  if LAuthResponse.IsAuthorized and LAuthResponse.HasAppAuthToken then
+  if LAuthResponse.IsAuth and LAuthResponse.HasAppToken then
   begin
     LSession := TioApplication.Session;
-    Lsession.AppAuthorizationToken := LAuthResponse.AppAuthToken;
+    Lsession.AppAuthorizationToken := LAuthResponse.AppTkn;
     Lsession.AppOID := LAuthResponse.AppOID;
     Lsession.App := LAuthResponse.App;
-    LSession.UserAuthorizationToken := LAuthResponse.UserAuthToken;
-    LSession.UserOID := LAuthResponse.UserOID;
-    LSession.User := LAuthResponse.User;
+    LSession.UserAuthorizationToken := LAuthResponse.UsrTkn;
+    LSession.UserOID := LAuthResponse.UsrOID;
+    LSession.User := LAuthResponse.Usr;
   end
   else
     raise EioAuthInvalidCredentialsException_401.Create('Invalid app credentials');
@@ -208,12 +208,12 @@ begin
   if Assigned(FAfterAuthorizeUser) then
     FAfterAuthorizeUser(Self, AUserCredentials, LAuthResponse);
   // if authorized then update session props (else raise an exception)
-  if LAuthResponse.IsAuthorized and LAuthResponse.HasUserAuthToken then
+  if LAuthResponse.IsAuth and LAuthResponse.HasUserToken then
   begin
     LSession := TioApplication.Session;
-    LSession.UserAuthorizationToken := LAuthResponse.UserAuthToken;
-    LSession.UserOID := LAuthResponse.UserOID;
-    LSession.User := LAuthResponse.User;
+    LSession.UserAuthorizationToken := LAuthResponse.UsrTkn;
+    LSession.UserOID := LAuthResponse.UsrOID;
+    LSession.User := LAuthResponse.Usr;
   end
   else
     raise EioAuthInvalidCredentialsException_401.Create('Invalid user credentials');

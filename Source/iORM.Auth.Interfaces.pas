@@ -53,47 +53,60 @@ type
 
   IioAuthResponse = interface
     ['{BB322BD7-DD1C-49B2-A55D-F323749B8D32}']
-    function GetAccessToken: String;
+    function GetAccTkn: String;
+    function GetAccExp: TDateTime;
     function GetApp: String;
-    function GetAppAuthToken: String;
+    function GetAppTkn: String;
+    function GetAppExp: TDateTime;
     function GetAppOID: Integer;
-    function GetIsAuthorized: Boolean;
-    function GetRefreshAfter: TDateTime;
-    function GetRefreshToken: String;
-    function GetUser: String;
-    function GetUserAuthToken: String;
-    function GetUserOID: Integer;
-    procedure SetAccessToken(const Value: String);
+    function GetIsAuth: Boolean;
+    function GetRefAft: TDateTime;
+    function GetRefTkn: String;
+    function GetRefExp: TDateTime;
+    function GetUsr: String;
+    function GetUsrTkn: String;
+    function GetUsrExp: TDateTime;
+    function GetUsrOID: Integer;
+    procedure SetAccTkn(const Value: String);
+    procedure SetAccExp(const Value: TDateTime);
     procedure SetApp(const Value: String);
-    procedure SetAppAuthToken(const Value: String);
+    procedure SetAppTkn(const Value: String);
+    procedure SetAppExp(const Value: TDateTime);
     procedure SetAppOID(const Value: Integer);
-    procedure SetIsAuthorized(const Value: Boolean);
-    procedure SetRefreshAfter(const Value: TDateTime);
-    procedure SetRefreshToken(const Value: String);
-    procedure SetUser(const Value: String);
-    procedure SetUserAuthToken(const Value: String);
-    procedure SetUserOID(const Value: Integer);
+    procedure SetIsAuth(const Value: Boolean);
+    procedure SetRefAft(const Value: TDateTime);
+    procedure SetRefTkn(const Value: String);
+    procedure SetRefExp(const Value: TDateTime);
+    procedure SetUsr(const Value: String);
+    procedure SetUsrTkn(const Value: String);
+    procedure SetUsrExp(const Value: TDateTime);
+    procedure SetUsrOID(const Value: Integer);
     // methods
     function HasAccessToken: Boolean;
-    function HasAppAuthToken: Boolean;
+    function HasAppToken: Boolean;
     function HasRefreshAfter: Boolean;
     function HasRefreshToken: Boolean;
-    function HasUserAuthToken: Boolean;
+    function HasUserToken: Boolean;
     function AsString: String;
     // properties
-    property IsAuthorized: Boolean read GetIsAuthorized write SetIsAuthorized;
+    property IsAuth: Boolean read GetIsAuth write SetIsAuth;
     // user
-    property User: String read GetUser write SetUser;
-    property UserAuthToken: String read GetUserAuthToken write SetUserAuthToken;
-    property UserOID: Integer read GetUserOID write SetUserOID;
+    property UsrTkn: String read GetUsrTkn write SetUsrTkn;
+    property UsrExp: TDateTime read GetUsrExp write SetUsrExp;
+    property Usr: String read GetUsr write SetUsr;
+    property UsrOID: Integer read GetUsrOID write SetUsrOID;
     // app
+    property AppTkn: String read GetAppTkn write SetAppTkn;
+    property AppExp: TDateTime read GetAppExp write SetAppExp;
     property App: String read GetApp write SetApp;
-    property AppAuthToken: String read GetAppAuthToken write SetAppAuthToken;
     property AppOID: Integer read GetAppOID write SetAppOID;
+    // refresh
+    property RefTkn: String read GetRefTkn write SetRefTkn;
+    property RefExp: TDateTime read GetRefExp write SetRefExp;
     // access
-    property AccessToken: String read GetAccessToken write SetAccessToken;
-    property RefreshAfter: TDateTime read GetRefreshAfter write SetRefreshAfter;
-    property RefreshToken: String read GetRefreshToken write SetRefreshToken;
+    property AccTkn: String read GetAccTkn write SetAccTkn;
+    property AccExp: TDateTime read GetAccExp write SetAccExp;
+    property RefAft: TDateTime read GetRefAft write SetRefAft;
   end;
 
   IioAuthSession = interface

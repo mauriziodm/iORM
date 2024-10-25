@@ -9,62 +9,80 @@ type
 
   TioAuthResponse = class(TInterfacedObject, IioAuthResponse)
   private
-    FIsAuthorized: Boolean;
+    FIsAuth: Boolean;
     // user
-    FUser: String;
-    FUserAuthToken: String;
-    FUserOID: Integer;
+    FUsrTkn: String;
+    FUsrExp: TDateTime;
+    FUsr: String;
+    FUsrOID: Integer;
     // app
+    FAppTkn: String;
+    FAppExp: TDateTime;
     FApp: String;
-    FAppAuthToken: String;
     FAppOID: Integer;
+    // refresh
+    FRefTkn: String;
+    FRefExp: TDateTime;
     // access
-    FAccessToken: String;
-    FRefreshAfter: TDateTime;
-    FRefreshToken: String;
-    function GetAccessToken: String;
-    function GetAppAuthToken: String;
+    FAccTkn: String;
+    FAccExp: TDateTime;
+    FRefAft: TDateTime;
+    function GetAccTkn: String;
+    function GetAccExp: TDateTime;
+    function GetAppTkn: String;
+    function GetAppExp: TDateTime;
     function GetAppOID: Integer;
     function GetApp: String;
-    function GetIsAuthorized: Boolean;
-    function GetRefreshAfter: TDateTime;
-    function GetRefreshToken: String;
-    function GetUserAuthToken: String;
-    function GetUserOID: Integer;
-    function GetUser: String;
-    procedure SetAccessToken(const Value: String);
-    procedure SetAppAuthToken(const Value: String);
+    function GetIsAuth: Boolean;
+    function GetRefAft: TDateTime;
+    function GetRefTkn: String;
+    function GetRefExp: TDateTime;
+    function GetUsrTkn: String;
+    function GetUsrOID: Integer;
+    function GetUsr: String;
+    function GetUsrExp: TDateTime;
+    procedure SetAccTkn(const Value: String);
+    procedure SetAccExp(const Value: TDateTime);
+    procedure SetAppTkn(const Value: String);
+    procedure SetAppExp(const Value: TDateTime);
     procedure SetAppOID(const Value: Integer);
     procedure SetApp(const Value: String);
-    procedure SetIsAuthorized(const Value: Boolean);
-    procedure SetRefreshAfter(const Value: TDateTime);
-    procedure SetRefreshToken(const Value: String);
-    procedure SetUserAuthToken(const Value: String);
-    procedure SetUserOID(const Value: Integer);
-    procedure SetUser(const Value: String);
+    procedure SetIsAuth(const Value: Boolean);
+    procedure SetRefAft(const Value: TDateTime);
+    procedure SetRefTkn(const Value: String);
+    procedure SetRefExp(const Value: TDateTime);
+    procedure SetUsrTkn(const Value: String);
+    procedure SetUsrExp(const Value: TDateTime);
+    procedure SetUsrOID(const Value: Integer);
+    procedure SetUsr(const Value: String);
   public
     constructor Create;
     constructor CreateByString(const AValue: String);
     function HasAccessToken: Boolean;
-    function HasAppAuthToken: Boolean;
+    function HasAppToken: Boolean;
     function HasRefreshAfter: Boolean;
     function HasRefreshToken: Boolean;
-    function HasUserAuthToken: Boolean;
+    function HasUserToken: Boolean;
     function AsString: String;
     // properties
-    property IsAuthorized: Boolean read GetIsAuthorized write SetIsAuthorized;
+    property IsAuth: Boolean read GetIsAuth write SetIsAuth;
     // user
-    property UserAuthToken: String read GetUserAuthToken write SetUserAuthToken;
-    property UserOID: Integer read GetUserOID write SetUserOID;
-    property User: String read GetUser write SetUser;
+    property UsrTkn: String read GetUsrTkn write SetUsrTkn;
+    property UsrExp: TDateTime read GetUsrExp write SetUsrExp;
+    property UsrOID: Integer read GetUsrOID write SetUsrOID;
+    property Usr: String read GetUsr write SetUsr;
     // app
-    property AppAuthToken: String read GetAppAuthToken write SetAppAuthToken;
+    property AppTkn: String read GetAppTkn write SetAppTkn;
+    property AppExp: TDateTime read GetAppExp write SetAppExp;
     property AppOID: Integer read GetAppOID write SetAppOID;
     property App: String read GetApp write SetApp;
+    // refresh
+    property RefTkn: String read GetRefTkn write SetRefTkn;
+    property RefExp: TDateTime read GetRefExp write SetRefExp;
     // access
-    property AccessToken: String read GetAccessToken write SetAccessToken;
-    property RefreshAfter: TDateTime read GetRefreshAfter write SetRefreshAfter;
-    property RefreshToken: String read GetRefreshToken write SetRefreshToken;
+    property AccTkn: String read GetAccTkn write SetAccTkn;
+    property AccExp: TDateTime read GetAccExp write SetAccExp;
+    property RefAft: TDateTime read GetRefAft write SetRefAft;
   end;
 
 implementation
@@ -76,19 +94,24 @@ uses
 
 constructor TioAuthResponse.Create;
 begin
-    FIsAuthorized := False;
+    FIsAuth := False;
     // user
-    FUser := IO_STRING_NULL_VALUE;
-    FUserAuthToken := IO_STRING_NULL_VALUE;
-    FUserOID := IO_INTEGER_NULL_VALUE;
+    FUsrTkn := IO_STRING_NULL_VALUE;
+    FUsrExp := IO_DATETIME_NULL_VALUE;
+    FUsr := IO_STRING_NULL_VALUE;
+    FUsrOID := IO_INTEGER_NULL_VALUE;
     // app
-    FApp := IO_STRING_NULL_VALUE;
-    FAppAuthToken := IO_STRING_NULL_VALUE;
+    FAppTkn := IO_STRING_NULL_VALUE;
+    FAppExp := IO_DATETIME_NULL_VALUE;
     FAppOID := IO_INTEGER_NULL_VALUE;
+    FApp := IO_STRING_NULL_VALUE;
+    // refresh
+    FRefTkn := IO_STRING_NULL_VALUE;
+    FRefExp := IO_DATETIME_NULL_VALUE;
     // access
-    FAccessToken := IO_STRING_NULL_VALUE;
-    FRefreshAfter := IO_DATETIME_NULL_VALUE;
-    FRefreshToken := IO_STRING_NULL_VALUE;
+    FAccTkn := IO_STRING_NULL_VALUE;
+    FAccExp := IO_DATETIME_NULL_VALUE;
+    FRefAft := IO_DATETIME_NULL_VALUE;
 end;
 
 constructor TioAuthResponse.CreateByString(const AValue: String);
@@ -97,9 +120,14 @@ begin
   dj.FromJson(AValue).byFields.DateTimeFormat(TdjDateTimeFormat.dfUnix).&To(Self);
 end;
 
-function TioAuthResponse.GetAccessToken: String;
+function TioAuthResponse.GetAccExp: TDateTime;
 begin
-  Result := FAccessToken;
+  Result := FAccExp;
+end;
+
+function TioAuthResponse.GetAccTkn: String;
+begin
+  Result := FAccTkn;
 end;
 
 function TioAuthResponse.GetApp: String;
@@ -107,9 +135,19 @@ begin
   Result := FApp;
 end;
 
-function TioAuthResponse.GetAppAuthToken: String;
+function TioAuthResponse.GetAppExp: TDateTime;
 begin
-  Result := FAppAuthToken;
+  Result := FAppExp;
+end;
+
+function TioAuthResponse.GetAppTkn: String;
+begin
+  Result := FAppTkn;
+end;
+
+function TioAuthResponse.GetUsrExp: TDateTime;
+begin
+  Result := FUsrExp;
 end;
 
 function TioAuthResponse.GetAppOID: Integer;
@@ -117,64 +155,74 @@ begin
   Result := FAppOID;
 end;
 
-function TioAuthResponse.GetIsAuthorized: Boolean;
+function TioAuthResponse.GetIsAuth: Boolean;
 begin
-  Result := FIsAuthorized;
+  Result := FIsAuth;
 end;
 
-function TioAuthResponse.GetRefreshAfter: TDateTime;
+function TioAuthResponse.GetRefAft: TDateTime;
 begin
-  Result := FRefreshAfter;
+  Result := FRefAft;
 end;
 
-function TioAuthResponse.GetRefreshToken: String;
+function TioAuthResponse.GetRefExp: TDateTime;
 begin
-  Result := FRefreshToken;
+  Result := FRefExp;
 end;
 
-function TioAuthResponse.GetUser: String;
+function TioAuthResponse.GetRefTkn: String;
 begin
-  Result := FUser;
+  Result := FRefTkn;
 end;
 
-function TioAuthResponse.GetUserAuthToken: String;
+function TioAuthResponse.GetUsr: String;
 begin
-  Result := FUserAuthToken;
+  Result := FUsr;
 end;
 
-function TioAuthResponse.GetUserOID: Integer;
+function TioAuthResponse.GetUsrTkn: String;
 begin
-  Result := FUserOID;
+  Result := FUsrTkn;
+end;
+
+function TioAuthResponse.GetUsrOID: Integer;
+begin
+  Result := FUsrOID;
 end;
 
 function TioAuthResponse.HasAccessToken: Boolean;
 begin
-  Result := FAccessToken = IO_STRING_NULL_VALUE;
+  Result := FAccTkn = IO_STRING_NULL_VALUE;
 end;
 
-function TioAuthResponse.HasAppAuthToken: Boolean;
+function TioAuthResponse.HasAppToken: Boolean;
 begin
-  Result := FAppAuthToken = IO_STRING_NULL_VALUE;
+  Result := FAppTkn = IO_STRING_NULL_VALUE;
 end;
 
 function TioAuthResponse.HasRefreshAfter: Boolean;
 begin
-  Result := FRefreshAfter = IO_DATETIME_NULL_VALUE;
+  Result := FRefAft = IO_DATETIME_NULL_VALUE;
 end;
 
 function TioAuthResponse.HasRefreshToken: Boolean;
 begin
-  Result := FRefreshToken = IO_STRING_NULL_VALUE;
+  Result := FRefTkn = IO_STRING_NULL_VALUE;
 end;
 
-function TioAuthResponse.HasUserAuthToken: Boolean;
+function TioAuthResponse.HasUserToken: Boolean;
 begin
-  Result := FUserAuthToken = IO_STRING_NULL_VALUE;
+  Result := FUsrTkn = IO_STRING_NULL_VALUE;
 end;
 
-procedure TioAuthResponse.SetAccessToken(const Value: String);
+procedure TioAuthResponse.SetAccExp(const Value: TDateTime);
 begin
-  FAccessToken := Value;
+  FAccExp := Value;
+end;
+
+procedure TioAuthResponse.SetAccTkn(const Value: String);
+begin
+  FAccTkn := Value;
 end;
 
 procedure TioAuthResponse.SetApp(const Value: String);
@@ -182,9 +230,14 @@ begin
   FApp := Value;
 end;
 
-procedure TioAuthResponse.SetAppAuthToken(const Value: String);
+procedure TioAuthResponse.SetAppExp(const Value: TDateTime);
 begin
-  FAppAuthToken := Value;
+  FAppExp := Value;
+end;
+
+procedure TioAuthResponse.SetAppTkn(const Value: String);
+begin
+  FAppTkn := Value;
 end;
 
 procedure TioAuthResponse.SetAppOID(const Value: Integer);
@@ -192,34 +245,44 @@ begin
   FAppOID := Value;
 end;
 
-procedure TioAuthResponse.SetIsAuthorized(const Value: Boolean);
+procedure TioAuthResponse.SetIsAuth(const Value: Boolean);
 begin
-  FIsAuthorized := Value;
+  FIsAuth := Value;
 end;
 
-procedure TioAuthResponse.SetRefreshAfter(const Value: TDateTime);
+procedure TioAuthResponse.SetRefAft(const Value: TDateTime);
 begin
-  FRefreshAfter := Value;
+  FRefAft := Value;
 end;
 
-procedure TioAuthResponse.SetRefreshToken(const Value: String);
+procedure TioAuthResponse.SetRefExp(const Value: TDateTime);
 begin
-  FRefreshToken := Value;
+  FRefExp := Value;
 end;
 
-procedure TioAuthResponse.SetUser(const Value: String);
+procedure TioAuthResponse.SetRefTkn(const Value: String);
 begin
-  FUser := Value;
+  FRefTkn := Value;
 end;
 
-procedure TioAuthResponse.SetUserAuthToken(const Value: String);
+procedure TioAuthResponse.SetUsr(const Value: String);
 begin
-  FUserAuthToken := Value;
+  FUsr := Value;
 end;
 
-procedure TioAuthResponse.SetUserOID(const Value: Integer);
+procedure TioAuthResponse.SetUsrTkn(const Value: String);
 begin
-  FUserOID := Value;
+  FUsrTkn := Value;
+end;
+
+procedure TioAuthResponse.SetUsrExp(const Value: TDateTime);
+begin
+  FUsrExp := Value;
+end;
+
+procedure TioAuthResponse.SetUsrOID(const Value: Integer);
+begin
+  FUsrOID := Value;
 end;
 
 function TioAuthResponse.AsString: String;
