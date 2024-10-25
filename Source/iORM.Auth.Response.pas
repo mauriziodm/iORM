@@ -58,11 +58,10 @@ type
   public
     constructor Create;
     constructor CreateByString(const AValue: String);
-    function HasAccTkn: Boolean;
-    function HasAppTkn: Boolean;
-    function HasRefAft: Boolean;
-    function HasRefTkn: Boolean;
     function HasUsrTkn: Boolean;
+    function HasAppTkn: Boolean;
+    function HasRefTkn: Boolean;
+    function HasAccTkn: Boolean;
     function AsString: String;
     // properties
     property IsAuth: Boolean read GetIsAuth write SetIsAuth;
@@ -198,11 +197,6 @@ end;
 function TioAuthResponse.HasAppTkn: Boolean;
 begin
   Result := FAppTkn = IO_STRING_NULL_VALUE;
-end;
-
-function TioAuthResponse.HasRefAft: Boolean;
-begin
-  Result := FRefAft = IO_DATETIME_NULL_VALUE;
 end;
 
 function TioAuthResponse.HasRefTkn: Boolean;

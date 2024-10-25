@@ -82,11 +82,10 @@ type
     procedure SetUsrExp(const Value: TDateTime);
     procedure SetUsrOID(const Value: Integer);
     // methods
-    function HasAccTkn: Boolean;
-    function HasAppTkn: Boolean;
-    function HasRefAft: Boolean;
-    function HasRefTkn: Boolean;
     function HasUsrTkn: Boolean;
+    function HasAppTkn: Boolean;
+    function HasRefTkn: Boolean;
+    function HasAccTkn: Boolean;
     function AsString: String;
     // properties
     property IsAuth: Boolean read GetIsAuth write SetIsAuth;
