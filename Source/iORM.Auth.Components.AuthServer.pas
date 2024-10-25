@@ -245,7 +245,7 @@ begin
     _BuildRefreshToken(Result);
   end;
   // final check, if the result token is null the raise exception
-  if not Result.HasAccessToken then
+  if not Result.HasAccTkn then
     raise EioAuthInvalidAuthorizationToken_401.Create('Invalid authorization token/code');
   // Return true if all is ok
   Result.IsAuth := True;
@@ -274,7 +274,7 @@ begin
     _BuildRefreshToken(Result);
   end;
   // final check, if the result token is null the raise exception
-  if not Result.HasAccessToken then
+  if not Result.HasAccTkn then
     raise EioAuthInvalidRefreshToken_401.Create('Invalid refresh token');
   // Return true if all is ok
   Result.IsAuth := True;
@@ -316,7 +316,7 @@ begin
     _BuildUserAuthorizationToken(Result);
   end;
   // final check, if the result token is null the raise exception
-  if not Result.HasUserToken then
+  if not Result.HasUsrTkn then
     raise EioAuthInvalidCredentialsException_401.Create('Invalid user credentials');
   // Return true if all is ok
   Result.IsAuth := True;
@@ -351,7 +351,7 @@ begin
     _BuildAppAuthorizationToken(Result);
   end;
   // final check, if the result token is null the raise exception
-  if not Result.HasAppToken then
+  if not Result.HasAppTkn then
     raise EioAuthInvalidCredentialsException_401.Create('Invalid app credentials');
   // Return true if all is ok
   Result.IsAuth := True;

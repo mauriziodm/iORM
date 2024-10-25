@@ -171,7 +171,7 @@ begin
   if Assigned(FAfterAuthorizeApp) then
     FAfterAuthorizeApp(Self, AAppCredentials, LUserAuthorizationToken, LAuthResponse);
   // if authorized then update session props (else raise an exception)
-  if LAuthResponse.IsAuth and LAuthResponse.HasAppToken then
+  if LAuthResponse.IsAuth and LAuthResponse.HasAppTkn then
   begin
     LSession := TioApplication.Session;
     Lsession.AppAuthorizationToken := LAuthResponse.AppTkn;
@@ -208,7 +208,7 @@ begin
   if Assigned(FAfterAuthorizeUser) then
     FAfterAuthorizeUser(Self, AUserCredentials, LAuthResponse);
   // if authorized then update session props (else raise an exception)
-  if LAuthResponse.IsAuth and LAuthResponse.HasUserToken then
+  if LAuthResponse.IsAuth and LAuthResponse.HasUsrTkn then
   begin
     LSession := TioApplication.Session;
     LSession.UserAuthorizationToken := LAuthResponse.UsrTkn;

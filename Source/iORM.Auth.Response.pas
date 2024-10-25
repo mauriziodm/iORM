@@ -58,11 +58,11 @@ type
   public
     constructor Create;
     constructor CreateByString(const AValue: String);
-    function HasAccessToken: Boolean;
-    function HasAppToken: Boolean;
-    function HasRefreshAfter: Boolean;
-    function HasRefreshToken: Boolean;
-    function HasUserToken: Boolean;
+    function HasAccTkn: Boolean;
+    function HasAppTkn: Boolean;
+    function HasRefAft: Boolean;
+    function HasRefTkn: Boolean;
+    function HasUsrTkn: Boolean;
     function AsString: String;
     // properties
     property IsAuth: Boolean read GetIsAuth write SetIsAuth;
@@ -190,27 +190,27 @@ begin
   Result := FUsrOID;
 end;
 
-function TioAuthResponse.HasAccessToken: Boolean;
+function TioAuthResponse.HasAccTkn: Boolean;
 begin
   Result := FAccTkn = IO_STRING_NULL_VALUE;
 end;
 
-function TioAuthResponse.HasAppToken: Boolean;
+function TioAuthResponse.HasAppTkn: Boolean;
 begin
   Result := FAppTkn = IO_STRING_NULL_VALUE;
 end;
 
-function TioAuthResponse.HasRefreshAfter: Boolean;
+function TioAuthResponse.HasRefAft: Boolean;
 begin
   Result := FRefAft = IO_DATETIME_NULL_VALUE;
 end;
 
-function TioAuthResponse.HasRefreshToken: Boolean;
+function TioAuthResponse.HasRefTkn: Boolean;
 begin
   Result := FRefTkn = IO_STRING_NULL_VALUE;
 end;
 
-function TioAuthResponse.HasUserToken: Boolean;
+function TioAuthResponse.HasUsrTkn: Boolean;
 begin
   Result := FUsrTkn = IO_STRING_NULL_VALUE;
 end;
