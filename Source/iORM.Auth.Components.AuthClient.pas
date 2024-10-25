@@ -49,10 +49,16 @@ type
     FActive: Boolean;
     FConnectionName: String;
     // events
-    FOnAccessTokenNeedRefresh: TioOnAccessTokenNeedRefreshEvent;
-    FOnAuthorizeApp: TioOnAuthorizeAppEvent;
+    FAfterAuthorizeAccess: TioAfterAuthorizeAccessEvent;
+    FAfterAuthorizeApp: TioAfterAuthorizeAppEvent;
+    FAfterAuthorizeUser: TioAfterAuthorizeUserEvent;
+    FBeforeAuthorizeAccess: TioBeforeAuthorizeAccessEvent;
+    FBeforeAuthorizeApp: TioBeforeAuthorizeAppEvent;
+    FBeforeAuthorizeUser: TioBeforeAuthorizeUserEvent;
     FOnAuthorizeAppGetUserAuthCode: TioOnAuthorizeAppGetUserAuthCodeEvent;
-    FOnAuthorizeUser: TioOnAuthorizeUserEvent;
+
+
+    FOnAccessTokenNeedRefresh: TioOnAccessTokenNeedRefreshEvent;
     // methods
     procedure CheckIfEnabled;
     function Get_Version: String;
@@ -71,9 +77,14 @@ type
     property _Version: String read Get_Version;
     // events
     property OnAccessTokenNeedRefresh: TioOnAccessTokenNeedRefreshEvent read FOnAccessTokenNeedRefresh write FOnAccessTokenNeedRefresh;
-    property OnAuthorizeApp: TioOnAuthorizeAppEvent read FOnAuthorizeApp write FOnAuthorizeApp;
+
+    property AfterAuthorizeAccess: TioAfterAuthorizeAccessEvent read FAfterAuthorizeAccess write FAfterAuthorizeAccess;
+    property AfterAuthorizeApp: TioAfterAuthorizeAppEvent read FAfterAuthorizeApp write FAfterAuthorizeApp;
+    property AfterAuthorizeUser: TioAfterAuthorizeUserEvent read FAfterAuthorizeUser write FAfterAuthorizeUser;
+    property BeforeAuthorizeAccess: TioBeforeAuthorizeAccessEvent read FBeforeAuthorizeAccess write FBeforeAuthorizeAccess;
+    property BeforeAuthorizeApp: TioBeforeAuthorizeAppEvent read FBeforeAuthorizeApp write FBeforeAuthorizeApp;
+    property BeforeAuthorizeUser: TioBeforeAuthorizeUserEvent read FBeforeAuthorizeUser write FBeforeAuthorizeUser;
     property OnAuthorizeAppGetUserAuthCode: TioOnAuthorizeAppGetUserAuthCodeEvent read FOnAuthorizeAppGetUserAuthCode write FOnAuthorizeAppGetUserAuthCode;
-    property OnAuthorizeUser: TioOnAuthorizeUserEvent read FOnAuthorizeUser write FOnAuthorizeUser;
   end;
 
 
@@ -81,7 +92,7 @@ implementation
 
 uses
   iORM, System.SysUtils, iORM.PersistenceStrategy.Factory, iORM.Abstraction,
-  iORM.Utilities, iORM.Exceptions, iORM.CommonTypes;
+  iORM.Utilities, iORM.Exceptions, iORM.CommonTypes, iORM.Auth.Factory;
 
 { TioAuthorizationClient }
 
@@ -103,87 +114,110 @@ end;
 
 function TioAuthClient.AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention): Boolean;
 var
+  LDone: Boolean;
   LAccessToken: String;
   LAuthResponse: IioAuthResponse;
-  LSession: IioAuthSession;
 begin
-//  LSession := TioApplication.Session;
-//  LAccessToken := LSession.AccessToken;
-//  LAuthResponse := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).AuthorizeAccess(FConnectionName, AScope, AAuthIntention, LAccessToken);
+  Result := False;
+  LAccessToken := TioApplication.Session.AccessToken;
+  // first check if the component is enabled
+  CheckIfEnabled;
+  // invoke BeforeAuthorizeAccess if assigned
+  LDone := False;
+  if Assigned(FBeforeAuthorizeAccess) then
+  begin
+    LAuthResponse := TioAuthFactory.NewAuthResponse;
+    FBeforeAuthorizeAccess(Self, AScope, AAuthIntention, LAccessToken, LAuthResponse, LDone);
+  end;
+  // if the access request was not handled then use the internal implementation
+  if not LDone then
+    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).AuthorizeAccess(FConnectionName, AScope, AAuthIntention, LAccessToken);
+  // invoke AfterAuthorizeAccess if assigned
+  if Assigned(FAfterAuthorizeAccess) then
+    FAfterAuthorizeAccess(Self, AScope, AAuthIntention, LAccessToken, LAuthResponse);
+  // if not authorized  raise an exception (non ci sarebbe bisogno perchè la solleva già il AuthServer ma per ulteriore sicurezza)
+  if not LAuthResponse.IsAuthorized then
+    raise EioAuthForbiddenException_403.Create(Format('Access forbidden to scope (%s)', [AScope]));
 end;
 
 function TioAuthClient.AuthorizeApp(const AAppCredentials: IioAuthAppCredentials): Boolean;
 var
   LAuthResponse: IioAuthResponse;
   LDone: Boolean;
-  LResultAppAuthorizationToken: String;
-  LResultAppOID: Integer;
   LSession: IioAuthSession;
-  LUserOID: Integer;
-  LUserName: String;
   LUserAuthorizationToken: String;
 begin
-//  Result := False;
-//  LResultAppAuthorizationToken := IO_AUTH_NULL_JWT;
-//  LUserAuthorizationToken := IO_AUTH_NULL_JWT;
-//  // first check if the component is enabled
-//  CheckIfEnabled;
-//  // invoke OnAuthorizeAppGetUserAuthCode event to retrieve the user authorization code/token
-//  if Assigned(FOnAuthorizeAppGetUserAuthCode) then
-//  begin
-//    FOnAuthorizeAppGetUserAuthCode(Self, AAppCredentials, LUserAuthorizationToken, LUserName, LUserOID, Result);
-//    if not Result then
-//      raise EioAuthInvalidCredentialsException_401.Create('Unable to retrieve a valid user authorization token');
-//  end;
-//  // invoke OnAuthorizeApp event if assigned
-//  LDone := False;
-//  if Assigned(FOnAuthorizeApp) then
-//    FOnAuthorizeApp(Self, AAppCredentials, LUserAuthorizationToken, LResultAppAuthorizationToken, LResultAppOID, Result, LDone);
-//  // if the creation of the token was not handled then use the internal implementation
-//  if not LDone then
-//    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).AuthorizeApp(FConnectionName, AAppCredentials, LUserAuthorizationToken);
-//  // if authorized then update session props (else raise an exception)
-//  if Result and (LResultAppAuthorizationToken <> IO_AUTH_NULL_JWT) then
-//  begin
-//    LSession := TioApplication.Session;
-//    LSession.UserOID := LUserOID;
-//    LSession.UserName := LUserName;
-//    LSession.UserAuthorizationToken := LUserAuthorizationToken;
-//    LSession.AppOID := LResultAppOID;
-//    LSession.AppAuthorizationToken := LResultAppAuthorizationToken;
-//  end
-//  else
-//    raise EioAuthInvalidCredentialsException_401.Create('Invalid app credentials');
+  Result := False;
+  LUserAuthorizationToken := IO_AUTH_NULL_JWT;
+  // first check if the component is enabled
+  CheckIfEnabled;
+  // invoke OnAuthorizeAppGetUserAuthCode event to retrieve the user authorization code/token
+  if Assigned(FOnAuthorizeAppGetUserAuthCode) then
+  begin
+    FOnAuthorizeAppGetUserAuthCode(Self, AAppCredentials, LUserAuthorizationToken, Result);
+    if not Result then
+      raise EioAuthInvalidCredentialsException_401.Create('Unable to retrieve a valid user authorization token');
+  end;
+  // invoke BeforeAuthorizeApp if assigned
+  LDone := False;
+  if Assigned(FBeforeAuthorizeApp) then
+  begin
+    LAuthResponse := TioAuthFactory.NewAuthResponse;
+    FBeforeAuthorizeApp(Self, AAppCredentials, LUserAuthorizationToken, LAuthResponse, LDone);
+  end;
+  // if the creation of the token was not handled then use the internal implementation
+  if not LDone then
+    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).AuthorizeApp(FConnectionName, AAppCredentials, LUserAuthorizationToken);
+  // invoke AfterAuthorizeApp if assigned
+  if Assigned(FAfterAuthorizeApp) then
+    FAfterAuthorizeApp(Self, AAppCredentials, LUserAuthorizationToken, LAuthResponse);
+  // if authorized then update session props (else raise an exception)
+  if LAuthResponse.IsAuthorized and LAuthResponse.HasAppAuthToken then
+  begin
+    LSession := TioApplication.Session;
+    Lsession.AppAuthorizationToken := LAuthResponse.AppAuthToken;
+    Lsession.AppOID := LAuthResponse.AppOID;
+    Lsession.App := LAuthResponse.App;
+    LSession.UserAuthorizationToken := LAuthResponse.UserAuthToken;
+    LSession.UserOID := LAuthResponse.UserOID;
+    LSession.User := LAuthResponse.User;
+  end
+  else
+    raise EioAuthInvalidCredentialsException_401.Create('Invalid app credentials');
 end;
 
 function TioAuthClient.AuthorizeUser(const AUserCredentials: IioAuthUserCredentials): Boolean;
 var
+  LAuthResponse: IioAuthResponse;
   LDone: Boolean;
-  LResultUserAuthorizationToken: String;
-  LResultUserOID: Integer;
   LSession: IioAuthSession;
 begin
-//  Result := False;
-//  LResultUserAuthorizationToken := IO_AUTH_NULL_JWT;
-//  // first check if the component is enabled
-//  CheckIfEnabled;
-//  // invoke OnAuthorizeUser event if assigned
-//  LDone := False;
-//  if Assigned(FOnAuthorizeUser) then
-//    FOnAuthorizeUser(Self, AUserCredentials, LResultUserAuthorizationToken, LResultUserOID, Result, LDone);
-//  // if the creation of the token was not handled then use the internal implementation
-//  if not LDone then
-//    Result := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).AuthorizeUser(FConnectionName, AUserCredentials, LResultUserAuthorizationToken, LResultUserOID);
-//  // if authorized then update session props (else raise an exception)
-//  if Result and (LResultUserAuthorizationToken <> IO_AUTH_NULL_JWT) then
-//  begin
-//    LSession := TioApplication.Session;
-//    LSession.UserOID := LResultUserOID;
-//    LSession.UserName := AUserCredentials.LoginUser;
-//    LSession.UserAuthorizationToken := LResultUserAuthorizationToken;
-//  end
-//  else
-//    raise EioAuthInvalidCredentialsException_401.Create('Invalid user credentials');
+  Result := False;
+  // first check if the component is enabled
+  CheckIfEnabled;
+  // invoke BeforeAuthorizeUser if assigned
+  LDone := False;
+  if Assigned(FBeforeAuthorizeUser) then
+  begin
+    LAuthResponse := TioAuthFactory.NewAuthResponse;
+    FBeforeAuthorizeUser(Self, AUserCredentials, LAuthResponse, LDone);
+  end;
+  // if the creation of the token was not handled then use the internal implementation
+  if not LDone then
+    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).AuthorizeUser(FConnectionName, AUserCredentials);
+  // invoke AfterAuthorizeUser if assigned
+  if Assigned(FAfterAuthorizeUser) then
+    FAfterAuthorizeUser(Self, AUserCredentials, LAuthResponse);
+  // if authorized then update session props (else raise an exception)
+  if LAuthResponse.IsAuthorized and LAuthResponse.HasUserAuthToken then
+  begin
+    LSession := TioApplication.Session;
+    LSession.UserAuthorizationToken := LAuthResponse.UserAuthToken;
+    LSession.UserOID := LAuthResponse.UserOID;
+    LSession.User := LAuthResponse.User;
+  end
+  else
+    raise EioAuthInvalidCredentialsException_401.Create('Invalid user credentials');
 end;
 
 procedure TioAuthClient.CheckIfEnabled;

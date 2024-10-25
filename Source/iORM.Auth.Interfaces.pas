@@ -293,12 +293,22 @@ type
   end;
 
   TioOnAuthorizeAccessEvent = procedure(const Sender: TObject; const AScope: String; const AIntention: TioAuthIntention; const AAccessToken: String; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
+
+  // TioAuthServer events
   TioOnAuthorizeUserEvent = procedure(const Sender: TObject; const AUserCredentials: IioAuthUserCredentials; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
   TioOnAuthorizeAppEvent = procedure(const Sender: TObject; const AAppCredentials: IioAuthAppCredentials; var AUserAuthorizationToken: String; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
-  TioOnAuthorizeAppGetUserAuthCodeEvent = procedure(const Sender: TObject; const AAppCredentials: IioAuthAppCredentials; var ResultUserAuthorizationToken, ResultUserName: String; var ResultUserOID: Integer; var ResultIsAuthorized: Boolean) of object;
   TioOnNewAccessTokenEvent = procedure(const Sender: TObject; const AAuthorizationToken: String; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
   TioOnRefreshAccessTokenEvent = procedure(const Sender: TObject; const ARefreshToken: String; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
   TioOnAccessTokenNeedRefreshEvent = procedure(const Sender: TObject; const AAccessToken: String; var ResultNeedRefresh, Done: Boolean) of object;
+
+  // TioAuthClient events
+  TioAfterAuthorizeAccessEvent =  procedure(const Sender: TObject; const AScope: String; const AIntention: TioAuthIntention; var AAccessToken: String; const AAuthResponse: IioAuthResponse) of object;
+  TioAfterAuthorizeAppEvent = procedure(const Sender: TObject; const AAppCredentials: IioAuthAppCredentials; var AUserAuthorizationToken: String; const AAuthResponse: IioAuthResponse) of object;
+  TioAfterAuthorizeUserEvent = procedure(const Sender: TObject; const AUserCredentials: IioAuthUserCredentials; const AAuthResponse: IioAuthResponse) of object;
+  TioBeforeAuthorizeAccessEvent = procedure(const Sender: TObject; const AScope: String; const AIntention: TioAuthIntention; var AAccessToken: String; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
+  TioBeforeAuthorizeAppEvent = procedure(const Sender: TObject; const AAppCredentials: IioAuthAppCredentials; var AUserAuthorizationToken: String; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
+  TioBeforeAuthorizeUserEvent = procedure(const Sender: TObject; const AUserCredentials: IioAuthUserCredentials; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
+  TioOnAuthorizeAppGetUserAuthCodeEvent = procedure(const Sender: TObject; const AAppCredentials: IioAuthAppCredentials; var ResultUserAuthorizationToken: String; var ResultIsAuthorized: Boolean) of object;
 
 implementation
 
