@@ -69,6 +69,7 @@ type
     function GetAppOID: Integer;
     function GetApp: String;
     function GetConnectionName: String;
+    function GetIsLoggedOn: Boolean;
     function GetRefreshAfter: TDateTime;
     function GetRefreshToken: String;
     function GetRefreshTokenExp: TDateTime;
@@ -92,7 +93,6 @@ type
     procedure SetUser(const Value: String);
   public
     constructor Create;
-    function NeedRefresh: Boolean;
     // user
     property UserToken: String read GetUserToken write SetUserToken;
     property UserTokenExp: TDateTime read GetUserTokenExp write SetUserTokenExp;
@@ -174,6 +174,11 @@ begin
   Result := FConnectionName;
 end;
 
+function TioAuthSession.GetIsLoggedOn: Boolean;
+begin
+//  Result :=
+end;
+
 function TioAuthSession.GetRefreshAfter: TDateTime;
 begin
   Result := FRefreshAfter;
@@ -202,11 +207,6 @@ end;
 function TioAuthSession.GetUserOID: Integer;
 begin
   Result := FUserOID;
-end;
-
-function TioAuthSession.NeedRefresh: Boolean;
-begin
-  Result := (FRefreshAfter <> IO_DATETIME_NULL_VALUE) and (TioUtilities.NowUTC > FRefreshAfter);
 end;
 
 function TioAuthSession.GetUser: String;

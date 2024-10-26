@@ -52,24 +52,26 @@ type
     FAfterAuthorizeAccess: TioAfterAuthorizeAccessEvent;
     FAfterAuthorizeApp: TioAfterAuthorizeAppEvent;
     FAfterAuthorizeUser: TioAfterAuthorizeUserEvent;
+    FAfterNeedRefresh: TioAfterNeedRefreshEvent;
     FBeforeAuthorizeAccess: TioBeforeAuthorizeAccessEvent;
     FBeforeAuthorizeApp: TioBeforeAuthorizeAppEvent;
     FBeforeAuthorizeUser: TioBeforeAuthorizeUserEvent;
-    FOnAccessTokenNeedRefresh: TioOnAccessTokenNeedRefreshEvent;
+    FBeforeNeedRefresh: TioBeforeNeedRefreshEvent;
     FOnAuthorizeAppGetUserAuthCode: TioOnAuthorizeAppGetUserAuthCodeEvent;
     // methods
-    procedure CheckIfEnabled;
+    procedure CheckActive;
 //    function GetIsLoggedOn: Boolean;
 //    function GetRefreshTokenIsExpired: Boolean;
+    function GetNeedRefresh: Boolean;
     function Get_Version: String;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     class function GetInstance: TioAuthClient; static;
-    function AccessTokenNeedRefresh: Boolean;
     function AuthorizeUser(const AUserCredentials: IioAuthUserCredentials): Boolean; // user login (user authorization)
     function AuthorizeApp(const AAppCredentials: IioAuthAppCredentials): Boolean; // app login (app authorization)
     function AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention): Boolean; // request authorization to access a resource (scope)
+    property NeedRefresh: Boolean read GetNeedRefresh;
   published
     // properties
     property Active: Boolean read FActive write FActive;
@@ -79,10 +81,11 @@ type
     property AfterAuthorizeAccess: TioAfterAuthorizeAccessEvent read FAfterAuthorizeAccess write FAfterAuthorizeAccess;
     property AfterAuthorizeApp: TioAfterAuthorizeAppEvent read FAfterAuthorizeApp write FAfterAuthorizeApp;
     property AfterAuthorizeUser: TioAfterAuthorizeUserEvent read FAfterAuthorizeUser write FAfterAuthorizeUser;
+    property AfterNeedRefresh: TioAfterNeedRefreshEvent read FAfterNeedRefresh write FAfterNeedRefresh;
     property BeforeAuthorizeAccess: TioBeforeAuthorizeAccessEvent read FBeforeAuthorizeAccess write FBeforeAuthorizeAccess;
     property BeforeAuthorizeApp: TioBeforeAuthorizeAppEvent read FBeforeAuthorizeApp write FBeforeAuthorizeApp;
     property BeforeAuthorizeUser: TioBeforeAuthorizeUserEvent read FBeforeAuthorizeUser write FBeforeAuthorizeUser;
-    property OnAccessTokenNeedRefresh: TioOnAccessTokenNeedRefreshEvent read FOnAccessTokenNeedRefresh write FOnAccessTokenNeedRefresh;
+    property BeforeNeedRefresh: TioBeforeNeedRefreshEvent read FBeforeNeedRefresh write FBeforeNeedRefresh;
     property OnAuthorizeAppGetUserAuthCode: TioOnAuthorizeAppGetUserAuthCodeEvent read FOnAuthorizeAppGetUserAuthCode write FOnAuthorizeAppGetUserAuthCode;
   end;
 
@@ -94,20 +97,24 @@ uses
 
 { TioAuthorizationClient }
 
-function TioAuthClient.AccessTokenNeedRefresh: Boolean;
+function TioAuthClient.GetNeedRefresh: Boolean;
 var
   LDone: Boolean;
 begin
   Result := False;
   // First check if the component is enabled
-  CheckIfEnabled;
-  // invoke OnLogin event if assigned
+  CheckActive;
+  // invoke BeforeNeedRefresh event if assigned
   LDone := False;
-  if Assigned(FOnAccessTokenNeedRefresh) then
-    FOnAccessTokenNeedRefresh(Self, TioApplication.Session.AccessToken, Result, LDone);
+  if Assigned(FBeforeNeedRefresh) then
+    FBeforeNeedRefresh(Self, TioApplication.Session.AccessToken, Result, LDone);
   // if the check of the token was not handled then use the internal implementation
   if not LDone then
-    Result := TioApplication.Session.NeedRefresh;
+    with TioApplication.Session do
+      Result := (RefreshAfter <> IO_DATETIME_NULL_VALUE) and (TioUtilities.NowUTC > RefreshAfter);
+  // invoke AfterNeedRefresh event if assigned
+  if Assigned(FAfterNeedRefresh) then
+    FAfterNeedRefresh(Self, TioApplication.Session.AccessToken, Result);
 end;
 
 function TioAuthClient.AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention): Boolean;
@@ -119,7 +126,7 @@ begin
   Result := False;
   LAccessToken := TioApplication.Session.AccessToken;
   // first check if the component is enabled
-  CheckIfEnabled;
+  CheckActive;
   // invoke BeforeAuthorizeAccess if assigned
   LDone := False;
   if Assigned(FBeforeAuthorizeAccess) then
@@ -148,7 +155,7 @@ begin
   Result := False;
   LUserAuthorizationToken := IO_AUTH_NULL_JWT;
   // first check if the component is enabled
-  CheckIfEnabled;
+  CheckActive;
   // invoke OnAuthorizeAppGetUserAuthCode event to retrieve the user authorization code/token
   if Assigned(FOnAuthorizeAppGetUserAuthCode) then
   begin
@@ -194,7 +201,7 @@ var
 begin
   Result := False;
   // first check if the component is enabled
-  CheckIfEnabled;
+  CheckActive;
   // invoke BeforeAuthorizeUser if assigned
   LDone := False;
   if Assigned(FBeforeAuthorizeUser) then
@@ -221,7 +228,7 @@ begin
     raise EioAuthInvalidCredentialsException_401.Create('Invalid user credentials');
 end;
 
-procedure TioAuthClient.CheckIfEnabled;
+procedure TioAuthClient.CheckActive;
 begin
   if not FActive then
     raise EioAuthServerComponentNotEnabled_404.Create(Format('Component "%s" is not active', [Name]));

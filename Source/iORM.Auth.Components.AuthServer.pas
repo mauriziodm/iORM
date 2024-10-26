@@ -89,7 +89,7 @@ type
     FOnNewAccessToken: TioOnNewAccessTokenEvent;
     FOnRefreshAccessToken: TioOnRefreshAccessTokenEvent;
     // methods
-    procedure CheckIfEnabled; inline;
+    procedure CheckActive; inline;
     function Get_Version: String;
     procedure SetUserCache_Expiration_Mins(const Value: Integer);
     // jwt builders
@@ -173,7 +173,7 @@ uses
 
 { TioAuthServer }
 
-procedure TioAuthServer.CheckIfEnabled;
+procedure TioAuthServer.CheckActive;
 begin
   if not FActive then
     raise EioAuthServerComponentNotEnabled_404.Create(Format('Component "%s" not found', [Name]));
@@ -228,7 +228,7 @@ var
 begin
   Result := TioAuthFactory.NewAuthResponse;
   // First check if the component is enabled
-  CheckIfEnabled;
+  CheckActive;
   // invoke OnNewAccessToken event if assigned
   LDone := False;
   if Assigned(FOnNewAccessToken) then
@@ -257,7 +257,7 @@ var
 begin
   Result := TioAuthFactory.NewAuthResponse;
   // First check if the component is enabled
-  CheckIfEnabled;
+  CheckActive;
   // invoke OnNewAccessToken event if assigned
   LDone := False;
   if Assigned(FOnRefreshAccessToken) then
@@ -298,7 +298,7 @@ var
 begin
   Result := TioAuthFactory.NewAuthResponse;
   // First check if the component is enabled
-  CheckIfEnabled;
+  CheckActive;
   // invoke OnAuthorizeUser event if assigned
   LDone := False;
   if Assigned(FOnAuthorizeUser) then
@@ -329,7 +329,7 @@ var
 begin
   Result := TioAuthFactory.NewAuthResponse;
   // First check if the component is enabled
-  CheckIfEnabled;
+  CheckActive;
   // invoke OnAuthorizeApp event if assigned
   LDone := False;
   if Assigned(FOnAuthorizeApp) then
@@ -366,7 +366,7 @@ var
 begin
   Result := TioAuthFactory.NewAuthResponse;
   // First check if the component is enabled
-  CheckIfEnabled;
+  CheckActive;
   // invoke OnLogin event if assigned
   LDone := False;
   if Assigned(FOnAuthorizeAccess) then
