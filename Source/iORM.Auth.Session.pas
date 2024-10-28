@@ -70,6 +70,10 @@ type
     function GetApp: String;
     function GetConnectionName: String;
     function GetIsLoggedOn: Boolean;
+    function GetHasAccessToken: Boolean;
+    function GetHasAppToken: Boolean;
+    function GetHasRefreshToken: Boolean;
+    function GetHasUserToken: Boolean;
     function GetRefreshAfter: TDateTime;
     function GetRefreshToken: String;
     function GetRefreshTokenExp: TDateTime;
@@ -98,17 +102,21 @@ type
     property UserTokenExp: TDateTime read GetUserTokenExp write SetUserTokenExp;
     property User: String read GetUser write SetUser;
     property UserOID: Integer read GetUserOID write SetUserOID;
+    property HasUserToken: Boolean read GetHasUserToken;
     // app
     property AppToken: String read GetAppToken write SetAppToken;
     property AppTokenExp: TDateTime read GetAppTokenExp write SetAppTokenExp;
     property App: String read GetApp write SetApp;
     property AppOID: Integer read GetAppOID write SetAppOID;
+    property HasAppToken: Boolean read GetHasAppToken;
     // refresh
     property RefreshToken: String read GetRefreshToken write SetRefreshToken;
     property RefreshTokenExp: TDateTime read GetRefreshTokenExp write SetRefreshTokenExp;
+    property HasRefreshToken: Boolean read GetHasRefreshToken;
     // access
     property AccessToken: String read GetAccessToken write SetAccessToken;
     property AccessTokenExp: TDateTime read GetAccessTokenExp write SetAccessTokenExp;
+    property HasAccessToken: Boolean read GetHasAccessToken;
     property RefreshAfter: TDateTime read GetRefreshAfter write SetRefreshAfter;
     // connection
     property ConnectionName: String read GetConnectionName write SetConnectionName;
@@ -172,6 +180,26 @@ end;
 function TioAuthSession.GetConnectionName: String;
 begin
   Result := FConnectionName;
+end;
+
+function TioAuthSession.GetHasAccessToken: Boolean;
+begin
+  Result := FAccessToken <> IO_STRING_NULL_VALUE;
+end;
+
+function TioAuthSession.GetHasAppToken: Boolean;
+begin
+  Result := FAppToken <> IO_STRING_NULL_VALUE;
+end;
+
+function TioAuthSession.GetHasRefreshToken: Boolean;
+begin
+  Result := FRefreshToken <> IO_STRING_NULL_VALUE;
+end;
+
+function TioAuthSession.GetHasUserToken: Boolean;
+begin
+  Result := FUserToken <> IO_STRING_NULL_VALUE;
 end;
 
 function TioAuthSession.GetIsLoggedOn: Boolean;

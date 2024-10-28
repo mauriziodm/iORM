@@ -119,6 +119,10 @@ type
     function GetApp: String;
     function GetConnectionName: String;
     function GetRefreshAfter: TDateTime;
+    function GetHasAccessToken: Boolean;
+    function GetHasAppToken: Boolean;
+    function GetHasRefreshToken: Boolean;
+    function GetHasUserToken: Boolean;
     function GetRefreshToken: String;
     function GetRefreshTokenExp: TDateTime;
     function GetUserToken: String;
@@ -144,17 +148,21 @@ type
     property UserTokenExp: TDateTime read GetUserTokenExp write SetUserTokenExp;
     property User: String read GetUser write SetUser;
     property UserOID: Integer read GetUserOID write SetUserOID;
+    property HasUserToken: Boolean read GetHasUserToken;
     // app
     property AppToken: String read GetAppToken write SetAppToken;
     property AppTokenExp: TDateTime read GetAppTokenExp write SetAppTokenExp;
     property App: String read GetApp write SetApp;
     property AppOID: Integer read GetAppOID write SetAppOID;
+    property HasAppToken: Boolean read GetHasAppToken;
     // refresh
     property RefreshToken: String read GetRefreshToken write SetRefreshToken;
     property RefreshTokenExp: TDateTime read GetRefreshTokenExp write SetRefreshTokenExp;
+    property HasRefreshToken: Boolean read GetHasRefreshToken;
     // access
     property AccessToken: String read GetAccessToken write SetAccessToken;
     property AccessTokenExp: TDateTime read GetAccessTokenExp write SetAccessTokenExp;
+    property HasAccessToken: Boolean read GetHasAccessToken;
     property RefreshAfter: TDateTime read GetRefreshAfter write SetRefreshAfter;
     // connection
     property ConnectionName: String read GetConnectionName write SetConnectionName;
@@ -334,6 +342,12 @@ type
   TioBeforeAuthorizeUserEvent = procedure(const Sender: TObject; const AUserCredentials: IioAuthUserCredentials; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
   TioBeforeNeedRefreshEvent = procedure(const Sender: TObject; const AAccessToken: String; var ResultNeedRefresh, Done: Boolean) of object;
   TioOnAuthorizeAppGetUserAuthCodeEvent = procedure(const Sender: TObject; const AAppCredentials: IioAuthAppCredentials; var ResultUserAuthorizationToken: String; var ResultIsAuthorized: Boolean) of object;
+
+  TioBeforeTokenIsExpired = procedure(const Sender: TObject; const AToken: String; var ResultIsExpired, Done: Boolean) of object;
+  TioAfterTokenIsExpired = procedure(const Sender: TObject; const AToken: String; var ResultIsExpired: Boolean) of object;
+
+  TioBeforeIsLoggedOn = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultIsExpired, Done: Boolean) of object;
+  TioAfterIsLoggedOn = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultIsExpired: Boolean) of object;
 
 implementation
 

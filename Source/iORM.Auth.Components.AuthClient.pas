@@ -48,20 +48,33 @@ type
     // fields
     FActive: Boolean;
     FConnectionName: String;
-    // events
+    // authorize events
     FAfterAuthorizeAccess: TioAfterAuthorizeAccessEvent;
     FAfterAuthorizeApp: TioAfterAuthorizeAppEvent;
     FAfterAuthorizeUser: TioAfterAuthorizeUserEvent;
-    FAfterNeedRefresh: TioAfterNeedRefreshEvent;
     FBeforeAuthorizeAccess: TioBeforeAuthorizeAccessEvent;
     FBeforeAuthorizeApp: TioBeforeAuthorizeAppEvent;
     FBeforeAuthorizeUser: TioBeforeAuthorizeUserEvent;
-    FBeforeNeedRefresh: TioBeforeNeedRefreshEvent;
     FOnAuthorizeAppGetUserAuthCode: TioOnAuthorizeAppGetUserAuthCodeEvent;
+    // need refresh events
+    FAfterNeedRefresh: TioAfterNeedRefreshEvent;
+    FBeforeNeedRefresh: TioBeforeNeedRefreshEvent;
+    // token is expired events
+    FAfterAccessTokenIsExpired: TioAfterTokenIsExpired;
+    FAfterAppTokenIsExpired: TioAfterTokenIsExpired;
+    FAfterRefreshTokenIsExpired: TioAfterTokenIsExpired;
+    FAfterUserTokenIsExpired: TioAfterTokenIsExpired;
+    FBeforeAccessTokenIsExpired: TioBeforeTokenIsExpired;
+    FBeforeAppTokenIsExpired: TioBeforeTokenIsExpired;
+    FBeforeRefreshTokenIsExpired: TioBeforeTokenIsExpired;
+    FBeforeUserTokenIsExpired: TioBeforeTokenIsExpired;
+    // is logged on events
+    FBeforeIsLoggedOn: TioBeforeIsLoggedOn;
+    FAfterIsLoggedOn: TioAfterIsLoggedOn;
     // methods
     procedure CheckActive;
 //    function GetIsLoggedOn: Boolean;
-//    function GetRefreshTokenIsExpired: Boolean;
+    function GetRefreshTokenIsExpired: Boolean;
     function GetNeedRefresh: Boolean;
     function Get_Version: String;
   public
@@ -77,16 +90,29 @@ type
     property Active: Boolean read FActive write FActive;
     property ConnectionName: String read FConnectionName write FConnectionName;
     property _Version: String read Get_Version;
-    // events
+    // authorize events
     property AfterAuthorizeAccess: TioAfterAuthorizeAccessEvent read FAfterAuthorizeAccess write FAfterAuthorizeAccess;
     property AfterAuthorizeApp: TioAfterAuthorizeAppEvent read FAfterAuthorizeApp write FAfterAuthorizeApp;
     property AfterAuthorizeUser: TioAfterAuthorizeUserEvent read FAfterAuthorizeUser write FAfterAuthorizeUser;
-    property AfterNeedRefresh: TioAfterNeedRefreshEvent read FAfterNeedRefresh write FAfterNeedRefresh;
     property BeforeAuthorizeAccess: TioBeforeAuthorizeAccessEvent read FBeforeAuthorizeAccess write FBeforeAuthorizeAccess;
     property BeforeAuthorizeApp: TioBeforeAuthorizeAppEvent read FBeforeAuthorizeApp write FBeforeAuthorizeApp;
     property BeforeAuthorizeUser: TioBeforeAuthorizeUserEvent read FBeforeAuthorizeUser write FBeforeAuthorizeUser;
-    property BeforeNeedRefresh: TioBeforeNeedRefreshEvent read FBeforeNeedRefresh write FBeforeNeedRefresh;
     property OnAuthorizeAppGetUserAuthCode: TioOnAuthorizeAppGetUserAuthCodeEvent read FOnAuthorizeAppGetUserAuthCode write FOnAuthorizeAppGetUserAuthCode;
+    // need refresh events
+    property AfterNeedRefresh: TioAfterNeedRefreshEvent read FAfterNeedRefresh write FAfterNeedRefresh;
+    property BeforeNeedRefresh: TioBeforeNeedRefreshEvent read FBeforeNeedRefresh write FBeforeNeedRefresh;
+    // token is expired events
+    property AfterAccessTokenIsExpired: TioAfterTokenIsExpired read FAfterAccessTokenIsExpired write FAfterAccessTokenIsExpired;
+    property AfterAppTokenIsExpired: TioAfterTokenIsExpired read FAfterAppTokenIsExpired write FAfterAppTokenIsExpired;
+    property AfterRefreshTokenIsExpired: TioAfterTokenIsExpired read FAfterRefreshTokenIsExpired write FAfterRefreshTokenIsExpired;
+    property AfterUserTokenIsExpired: TioAfterTokenIsExpired read FAfterUserTokenIsExpired write FAfterUserTokenIsExpired;
+    property BeforeAccessTokenIsExpired: TioBeforeTokenIsExpired read FBeforeAccessTokenIsExpired write FBeforeAccessTokenIsExpired;
+    property BeforeAppTokenIsExpired: TioBeforeTokenIsExpired read FBeforeAppTokenIsExpired write FBeforeAppTokenIsExpired;
+    property BeforeRefreshTokenIsExpired: TioBeforeTokenIsExpired read FBeforeRefreshTokenIsExpired write FBeforeRefreshTokenIsExpired;
+    property BeforeUserTokenIsExpired: TioBeforeTokenIsExpired read FBeforeUserTokenIsExpired write FBeforeUserTokenIsExpired;
+    // is logged on events
+    property BeforeIsLoggedOn: TioBeforeIsLoggedOn read FBeforeIsLoggedOn write FBeforeIsLoggedOn;
+    property AfterIsLoggedOn: TioAfterIsLoggedOn read FAfterIsLoggedOn write FAfterIsLoggedOn;
   end;
 
 implementation
@@ -111,10 +137,30 @@ begin
   // if the check of the token was not handled then use the internal implementation
   if not LDone then
     with TioApplication.Session do
-      Result := (RefreshAfter <> IO_DATETIME_NULL_VALUE) and (TioUtilities.NowUTC > RefreshAfter);
+      Result := ((RefreshAfter <> IO_DATETIME_NULL_VALUE) and (TioUtilities.NowUTC > RefreshAfter)) or not HasAccessToken;
   // invoke AfterNeedRefresh event if assigned
   if Assigned(FAfterNeedRefresh) then
     FAfterNeedRefresh(Self, TioApplication.Session.AccessToken, Result);
+end;
+
+function TioAuthClient.GetRefreshTokenIsExpired: Boolean;
+var
+  LDone: Boolean;
+begin
+//  Result := False;
+//  // First check if the component is enabled
+//  CheckActive;
+//  // invoke BeforeNeedRefresh event if assigned
+//  LDone := False;
+//  if Assigned(FBeforeRefreshTokenIsExpired) then
+//    FBeforeRefreshTokenIsExpired(Self, TioApplication.Session.RefreshToken, Result, LDone);
+//  // if the check of the token was not handled then use the internal implementation
+//  if not LDone then
+//    with TioApplication.Session do
+//      Result := (TioUtilities.NowUTC > RefreshTokenExp) or not HasRefreshToken;
+//  // invoke AfterNeedRefresh event if assigned
+//  if Assigned(FAfterRefreshTokenIsExpired) then
+//    FAfterRefreshTokenIsExpired(Self, TioApplication.Session.RefreshToken, Result);
 end;
 
 function TioAuthClient.AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention): Boolean;
