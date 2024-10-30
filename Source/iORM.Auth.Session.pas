@@ -65,7 +65,6 @@ type
     function GetAccessToken: String;
     function GetAccessTokenExp: TDateTime;
     function GetAccessTokenIsExpired: Boolean;
-    function GetNeedRefresh: Boolean;
     function GetAppToken: String;
     function GetAppTokenExp: TDateTime;
     function GetAppTokenIsExpired: Boolean;
@@ -77,6 +76,7 @@ type
     function GetHasRefreshToken: Boolean;
     function GetHasUserToken: Boolean;
     function GetIsLoggedOn: Boolean;
+    function GetNeedRefresh: Boolean;
     function GetRefreshAfter: TDateTime;
     function GetRefreshToken: String;
     function GetRefreshTokenExp: TDateTime;
@@ -128,6 +128,8 @@ type
     property HasAccessToken: Boolean read GetHasAccessToken;
     property RefreshAfter: TDateTime read GetRefreshAfter write SetRefreshAfter;
     property NeedRefresh: Boolean read GetNeedRefresh;
+    // is logged on
+    property IsLoggedOn: Boolean read GetisLoggedOn;
     // connection
     property ConnectionName: String read GetConnectionName write SetConnectionName;
   end;
