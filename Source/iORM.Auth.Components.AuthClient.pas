@@ -71,6 +71,8 @@ type
     // is logged on events
     FBeforeIsLoggedOn: TioBeforeIsLoggedOn;
     FAfterIsLoggedOn: TioAfterIsLoggedOn;
+    // on exception events
+    FonUserLoginException: TioOnUserLoginException;
     // methods
     procedure CheckActive;
     function GetAccessTokenIsExpired: Boolean;
@@ -85,6 +87,11 @@ type
     function AuthorizeUser(const AUserCredentials: IioAuthUserCredentials): Boolean; // user login (user authorization)
     function AuthorizeApp(const AAppCredentials: IioAuthAppCredentials): Boolean; // app login (app authorization)
     function AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention): Boolean; // request authorization to access a resource (scope)
+    procedure NewAccessToken(const AAuthorizationToken: String); // request a new access token
+    procedure RefreshAccessToken; // refresh the access token
+
+    function UserLogin(const AUserCredentials: IioAuthUserCredentials): Boolean;
+
     property AccessTokenIsExpired: Boolean read GetRefreshTokenIsExpired;
     property IsLoggedOn: Boolean read GetIsLoggedOn;
     property NeedRefresh: Boolean read GetNeedRefresh;
@@ -117,6 +124,8 @@ type
     // is logged on events
     property BeforeIsLoggedOn: TioBeforeIsLoggedOn read FBeforeIsLoggedOn write FBeforeIsLoggedOn;
     property AfterIsLoggedOn: TioAfterIsLoggedOn read FAfterIsLoggedOn write FAfterIsLoggedOn;
+    // on exception events
+    property onUserLoginException: TioOnUserLoginException read FonUserLoginException;
   end;
 
 implementation
@@ -195,6 +204,8 @@ begin
   // if not authorized  raise an exception (non ci sarebbe bisogno perchè la solleva già il AuthServer ma per ulteriore sicurezza)
   if not LAuthResponse.IsAuth then
     raise EioAuthForbiddenException_403.Create(Format('Access forbidden to scope (%s)', [AScope]));
+  //  return true
+  Result := True;
 end;
 
 function TioAuthClient.AuthorizeApp(const AAppCredentials: IioAuthAppCredentials): Boolean;
@@ -243,6 +254,8 @@ begin
   end
   else
     raise EioAuthInvalidCredentialsException_401.Create('Invalid app credentials');
+  //  return true
+  Result := True;
 end;
 
 function TioAuthClient.AuthorizeUser(const AUserCredentials: IioAuthUserCredentials): Boolean;
@@ -278,6 +291,8 @@ begin
   end
   else
     raise EioAuthInvalidCredentialsException_401.Create('Invalid user credentials');
+  //  return true
+  Result := True;
 end;
 
 procedure TioAuthClient.CheckActive;
@@ -351,6 +366,113 @@ end;
 function TioAuthClient.Get_Version: String;
 begin
   Result := io.Version;
+end;
+
+procedure TioAuthClient.NewAccessToken(const AAuthorizationToken: String);
+var
+  LAuthResponse: IioAuthResponse;
+  LDone: Boolean;
+  LSession: IioAuthSession;
+begin
+  // first check if the component is enabled
+  CheckActive;
+  LDone := False;
+  // invoke BeforeNewAccessToken if assigned
+//  if Assigned(FBeforeNewAccessToken) then
+//  begin
+//    LAuthResponse := TioAuthFactory.NewAuthResponse;
+//    FBeforeNewAccessToken(Self, AUserCredentials, LAuthResponse, LDone);
+//  end;
+  // if the creation of the token was not handled then use the internal implementation
+  if not LDone then
+    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).Auth_NewAccessToken(FConnectionName, AAuthorizationToken);
+  // invoke AfterNewAccessToken if assigned
+//  if Assigned(FAfterNewAccessToken) then
+//    FAfterNewAccessToken(Self, AUserCredentials, LAuthResponse);
+  // if authorized then update session props (else raise an exception)
+  if LAuthResponse.IsAuth and LAuthResponse.HasAccTkn then
+  begin
+    LSession := TioApplication.Session;
+    LSession.AccessToken := LAuthResponse.AccTkn;
+    LSession.AccessTokenExp := LAuthResponse.AccExp;
+    LSession.RefreshAfter := LAuthResponse.RefAft;
+    if LAuthResponse.HasRefTkn then
+    begin
+      LSession.RefreshToken := LAuthResponse.RefTkn;
+      LSession.RefreshTokenExp := LAuthResponse.RefExp;
+    end;
+  end
+  else
+    raise EioAuthInvalidCredentialsException_401.Create('Invalid user or app authorization token');
+end;
+
+procedure TioAuthClient.RefreshAccessToken;
+var
+  LAuthResponse: IioAuthResponse;
+  LDone: Boolean;
+  LSession: IioAuthSession;
+begin
+  LSession := TioApplication.Session;
+  // first check if the component is enabled
+  CheckActive;
+  LDone := False;
+  // invoke BeforeRefreshAccessToken if assigned
+//  if Assigned(FBeforeRefreshAccessToken) then
+//  begin
+//    LAuthResponse := TioAuthFactory.NewAuthResponse;
+//    FBeforeRefreshAccessToken(Self, AUserCredentials, LAuthResponse, LDone);
+//  end;
+  // if the creation of the token was not handled then use the internal implementation
+  if not LDone then
+    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).Auth_RefreshAccessToken(FConnectionName, LSession.RefreshToken);
+  // invoke AfterRefreshAccessToken if assigned
+//  if Assigned(FAfterRefreshAccessToken) then
+//    FAfterRefreshAccessToken(Self, AUserCredentials, LAuthResponse);
+  // if authorized then update session props (else raise an exception)
+  if LAuthResponse.IsAuth and LAuthResponse.HasAccTkn then
+  begin
+    LSession.AccessToken := LAuthResponse.AccTkn;
+    LSession.AccessTokenExp := LAuthResponse.AccExp;
+    LSession.RefreshAfter := LAuthResponse.RefAft;
+    if LAuthResponse.HasRefTkn then
+    begin
+      LSession.RefreshToken := LAuthResponse.RefTkn;
+      LSession.RefreshTokenExp := LAuthResponse.RefExp;
+    end;
+  end
+  else
+    raise EioAuthInvalidCredentialsException_401.Create('Invalid refresh token');
+end;
+
+function TioAuthClient.UserLogin(const AUserCredentials: IioAuthUserCredentials): Boolean;
+var
+  LException: Exception;
+begin
+  Result := False;
+  // first check if the component is enabled
+  CheckActive;
+  // executes the operation inside a try-finally block to be able to invoke the onException... event if there is one
+  try
+    // step 1 - authorize user
+    AuthorizeUser(AUserCredentials);
+    // step 2 - gwt new access token (and refresh token usually)
+    NewAccessToken(TioApplication.Session.UserToken);
+    // return true if success
+    Result := True;
+  except
+    // if an onException event handler is assigned then invoke it else re-raise the exception
+    if Assigned(FonUserLoginException) then
+    begin
+      LException := AcquireExceptionObject as Exception;
+      try
+        FonUserLoginException(Self, AUserCredentials, TioApplication.Session, LException);
+      finally
+        LException.Free;
+      end;
+    end
+    else
+      raise(LException);
+  end;
 end;
 
 end.

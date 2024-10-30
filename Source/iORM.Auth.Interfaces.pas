@@ -36,7 +36,7 @@ unit iORM.Auth.Interfaces;
 interface
 
 uses
-  iORM.CommonTypes, System.Generics.Collections;
+  iORM.CommonTypes, System.Generics.Collections, System.SysUtils;
 
 const
   AUTH_OTP_DURATION_MIN = 20;
@@ -357,6 +357,8 @@ type
 
   TioBeforeIsLoggedOn = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultIsExpired, Done: Boolean) of object;
   TioAfterIsLoggedOn = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultIsExpired: Boolean) of object;
+
+  TioOnUserLoginException = procedure(const Sender: TObject; const AUserCredentials: IioAuthUserCredentials; const ASession: IioAuthSession; const AException: Exception) of object;
 
 implementation
 
