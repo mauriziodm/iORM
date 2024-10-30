@@ -73,9 +73,10 @@ type
     FAfterIsLoggedOn: TioAfterIsLoggedOn;
     // methods
     procedure CheckActive;
-//    function GetIsLoggedOn: Boolean;
-    function GetRefreshTokenIsExpired: Boolean;
+    function GetAccessTokenIsExpired: Boolean;
+    function GetIsLoggedOn: Boolean;
     function GetNeedRefresh: Boolean;
+    function GetRefreshTokenIsExpired: Boolean;
     function Get_Version: String;
   public
     constructor Create(AOwner: TComponent); override;
@@ -84,7 +85,10 @@ type
     function AuthorizeUser(const AUserCredentials: IioAuthUserCredentials): Boolean; // user login (user authorization)
     function AuthorizeApp(const AAppCredentials: IioAuthAppCredentials): Boolean; // app login (app authorization)
     function AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention): Boolean; // request authorization to access a resource (scope)
+    property AccessTokenIsExpired: Boolean read GetRefreshTokenIsExpired;
+    property IsLoggedOn: Boolean read GetIsLoggedOn;
     property NeedRefresh: Boolean read GetNeedRefresh;
+    property RefreshTokenIsExpired: Boolean read GetRefreshTokenIsExpired;
   published
     // properties
     property Active: Boolean read FActive write FActive;
@@ -126,41 +130,43 @@ uses
 function TioAuthClient.GetNeedRefresh: Boolean;
 var
   LDone: Boolean;
+  LSession: IioAuthSession;
 begin
   Result := False;
+  LSession := TioApplication.Session;
   // First check if the component is enabled
   CheckActive;
   // invoke BeforeNeedRefresh event if assigned
   LDone := False;
   if Assigned(FBeforeNeedRefresh) then
-    FBeforeNeedRefresh(Self, TioApplication.Session.AccessToken, Result, LDone);
+    FBeforeNeedRefresh(Self, LSession.AccessToken, Result, LDone);
   // if the check of the token was not handled then use the internal implementation
   if not LDone then
-    with TioApplication.Session do
-      Result := ((RefreshAfter <> IO_DATETIME_NULL_VALUE) and (TioUtilities.NowUTC > RefreshAfter)) or not HasAccessToken;
+    Result := LSession.NeedRefresh;
   // invoke AfterNeedRefresh event if assigned
   if Assigned(FAfterNeedRefresh) then
-    FAfterNeedRefresh(Self, TioApplication.Session.AccessToken, Result);
+    FAfterNeedRefresh(Self, LSession.AccessToken, Result);
 end;
 
 function TioAuthClient.GetRefreshTokenIsExpired: Boolean;
 var
   LDone: Boolean;
+  LSession: IioAuthSession;
 begin
-//  Result := False;
-//  // First check if the component is enabled
-//  CheckActive;
-//  // invoke BeforeNeedRefresh event if assigned
-//  LDone := False;
-//  if Assigned(FBeforeRefreshTokenIsExpired) then
-//    FBeforeRefreshTokenIsExpired(Self, TioApplication.Session.RefreshToken, Result, LDone);
-//  // if the check of the token was not handled then use the internal implementation
-//  if not LDone then
-//    with TioApplication.Session do
-//      Result := (TioUtilities.NowUTC > RefreshTokenExp) or not HasRefreshToken;
-//  // invoke AfterNeedRefresh event if assigned
-//  if Assigned(FAfterRefreshTokenIsExpired) then
-//    FAfterRefreshTokenIsExpired(Self, TioApplication.Session.RefreshToken, Result);
+  Result := False;
+  LSession := TioApplication.Session;
+  // First check if the component is enabled
+  CheckActive;
+  // invoke BeforeNeedRefresh event if assigned
+  LDone := False;
+  if Assigned(FBeforeRefreshTokenIsExpired) then
+    FBeforeRefreshTokenIsExpired(Self, LSession.RefreshToken, Result, LDone);
+  // if the check of the token was not handled then use the internal implementation
+  if not LDone then
+    Result := LSession.RefreshTokenIsExpired;
+  // invoke AfterNeedRefresh event if assigned
+  if Assigned(FAfterRefreshTokenIsExpired) then
+    FAfterRefreshTokenIsExpired(Self, LSession.RefreshToken, Result);
 end;
 
 function TioAuthClient.AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention): Boolean;
@@ -295,9 +301,51 @@ begin
   inherited;
 end;
 
+function TioAuthClient.GetAccessTokenIsExpired: Boolean;
+var
+  LDone: Boolean;
+  LSession: IioAuthSession;
+begin
+  Result := False;
+  LSession := TioApplication.Session;
+  // First check if the component is enabled
+  CheckActive;
+  // invoke BeforeNeedRefresh event if assigned
+  LDone := False;
+  if Assigned(FBeforeAccessTokenIsExpired) then
+    FBeforeRefreshTokenIsExpired(Self, LSession.AccessToken, Result, LDone);
+  // if the check of the token was not handled then use the internal implementation
+  if not LDone then
+    Result := LSession.AccessTokenIsExpired;
+  // invoke AfterNeedRefresh event if assigned
+  if Assigned(FAfterAccessTokenIsExpired) then
+    FAfterAccessTokenIsExpired(Self, LSession.AccessToken, Result);
+end;
+
 class function TioAuthClient.GetInstance: TioAuthClient;
 begin
   Result := TioAuthClient.FInstance;
+end;
+
+function TioAuthClient.GetIsLoggedOn: Boolean;
+var
+  LDone: Boolean;
+  LSession: IioAuthSession;
+begin
+  Result := False;
+  LSession := TioApplication.Session;
+  // First check if the component is enabled
+  CheckActive;
+  // invoke BeforeNeedRefresh event if assigned
+  LDone := False;
+  if Assigned(FBeforeIsLoggedOn) then
+    FBeforeIsLoggedOn(Self, LSession, Result, LDone);
+  // if the check of the token was not handled then use the internal implementation
+  if not LDone then
+    Result := (LSession.HasAccessToken and not AccessTokenIsExpired) or (LSession.HasRefreshToken and not RefreshTokenIsExpired);
+  // invoke AfterNeedRefresh event if assigned
+  if Assigned(FAfterIsLoggedOn) then
+    FAfterIsLoggedOn(Self, LSession, Result);
 end;
 
 function TioAuthClient.Get_Version: String;

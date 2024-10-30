@@ -123,7 +123,6 @@ type
     function GetHasAppToken: Boolean;
     function GetHasRefreshToken: Boolean;
     function GetHasUserToken: Boolean;
-    function GetIsLoggedOn: Boolean;
     function GetNeedRefresh: Boolean;
     function GetRefreshAfter: TDateTime;
     function GetRefreshToken: String;
@@ -174,8 +173,6 @@ type
     property HasAccessToken: Boolean read GetHasAccessToken;
     property RefreshAfter: TDateTime read GetRefreshAfter write SetRefreshAfter;
     property NeedRefresh: Boolean read GetNeedRefresh;
-    // is logged on
-    property IsLoggedOn: Boolean read GetisLoggedOn;
     // connection
     property ConnectionName: String read GetConnectionName write SetConnectionName;
   end;
