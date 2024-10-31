@@ -70,8 +70,8 @@ type
   TioCommonBSAPageManager = class(TPersistent)
   strict private
     FConcretePageManager: TioCommonBSAPageManagerConcrete;
-    procedure _Lock;
-    procedure _Unlock;
+    procedure _Lock; inline;
+    procedure _Unlock; inline;
   strict protected
     function GetCurrentPage: Integer;
     function GetCurrentPageOf: String;

@@ -187,8 +187,8 @@ type
   strict private
     class var FContainer: TioInternalContainerType;
     class function ConnectionNameToContainerKey(AConnectionName: String): String;
-    class procedure _Lock;
-    class procedure _Unlock;
+    class procedure _Lock; inline;
+    class procedure _Unlock; inline;
   protected
     class procedure CreateInternalContainer;
     class procedure FreeInternalContainer;

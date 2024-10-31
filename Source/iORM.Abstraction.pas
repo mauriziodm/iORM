@@ -67,21 +67,23 @@ type
     class var FConcreteClass_NoDirectCall: TioApplicationRef;
   protected
     // --------- methods to be ovverrided by descendants ----------
+    class function _AcquireSession: IioAuthSession; virtual; abstract;
     class procedure _ClearSession; virtual; abstract;
-    class function _GetSession: IioAuthSession; virtual; abstract;
     class procedure _HandleException(const Sender: TObject); virtual; abstract;
     class function _ProjectPlatform: TioProjectPlatform; virtual; abstract;
+    class procedure _ReleaseSession; virtual; abstract;
     class procedure _ShowMessage(const AMessage: string); virtual; abstract;
     class function _Terminate: Boolean; virtual; abstract;
     // --------- methods to be ovverrided by descendants ----------
     class function GetConcreteClass: TioApplicationRef;
     class procedure SetConcreteClass(const AClass: TioApplicationRef);
   public
+    class function AcquireSession: IioAuthSession; inline;
     class procedure CheckIfAbstractionLayerComponentExists; inline;
     class procedure ClearSession; inline;
     class procedure HandleException(const Sender: TObject); inline;
     class function ProjectPlatform: TioProjectPlatform; inline;
-    class function Session: IioAuthSession; inline;
+    class procedure ReleaseSession; inline;
     class procedure ShowMessage(const AMessage: string); inline;
     class function Terminate: Boolean; inline;
   end;
@@ -271,6 +273,11 @@ end;
 
 { TioApplication }
 
+class function TioApplication.AcquireSession: IioAuthSession;
+begin
+  Result := GetConcreteClass._AcquireSession;
+end;
+
 class procedure TioApplication.CheckIfAbstractionLayerComponentExists;
 begin
   GetConcreteClass;
@@ -288,11 +295,6 @@ begin
   Result := FConcreteClass_NoDirectCall;
 end;
 
-class function TioApplication.Session: IioAuthSession;
-begin
-  Result := GetConcreteClass._GetSession;
-end;
-
 class procedure TioApplication.HandleException(const Sender: TObject);
 begin
   GetConcreteClass._HandleException(Sender);
@@ -301,6 +303,11 @@ end;
 class function TioApplication.ProjectPlatform: TioProjectPlatform;
 begin
   Result := GetConcreteClass._ProjectPlatform;
+end;
+
+class procedure TioApplication.ReleaseSession;
+begin
+  GetConcreteClass._ReleaseSession;
 end;
 
 class procedure TioApplication.SetConcreteClass(const AClass: TioApplicationRef);

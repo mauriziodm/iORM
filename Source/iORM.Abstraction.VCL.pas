@@ -46,13 +46,14 @@ type
 
   TioApplicationVCL = class(TioApplication)
   private
-    class var FSession: IioAuthSession;
+    class var FSessionThreadSafeWrapper: IioAuthSessionThreadSafeWrapper;
   protected
     // --------- methods to be ovverrided by descendants ----------
+    class function _AcquireSession: IioAuthSession; override;
     class procedure _ClearSession; override;
-    class function _GetSession: IioAuthSession; override;
     class procedure _HandleException(const Sender: TObject); override;
     class function _ProjectPlatform: TioProjectPlatform; override;
+    class procedure _ReleaseSession; override;
     class procedure _ShowMessage(const AMessage: string); override;
     class function _Terminate: Boolean; override;
     // --------- methods to be ovverrided by descendants ----------
@@ -130,17 +131,17 @@ uses
 class constructor TioApplicationVCL.Create;
 begin
   inherited;
-  FSession := TioAuthFactory.NewAuthSession;
+  FSessionThreadSafeWrapper := TioAuthFactory.NewAuthSessionThreadSafeWrapper;
+end;
+
+class function TioApplicationVCL._AcquireSession: IioAuthSession;
+begin
+  Result := FSessionThreadSafeWrapper.Acquire;
 end;
 
 class procedure TioApplicationVCL._ClearSession;
 begin
-  FSession := TioAuthFactory.NewAuthSession;
-end;
-
-class function TioApplicationVCL._GetSession: IioAuthSession;
-begin
-  Result := FSession;
+  FSessionThreadSafeWrapper.Clear;
 end;
 
 class procedure TioApplicationVCL._HandleException(const Sender: TObject);
@@ -151,6 +152,11 @@ end;
 class function TioApplicationVCL._ProjectPlatform: TioProjectPlatform;
 begin
   Result := ppVCL;
+end;
+
+class procedure TioApplicationVCL._ReleaseSession;
+begin
+  FSessionThreadSafeWrapper.Release;
 end;
 
 class procedure TioApplicationVCL._ShowMessage(const AMessage: string);

@@ -59,7 +59,7 @@ type
   TioUniGUI = class(TioCustomPlatformAbstractionComponent)
   end;
 
-  TioSessionCollection = TDictionary<String, IioAuthSession>;
+  TioSessionCollection = TDictionary<String, IioAuthSessionThreadSafeWrapper>;
   TioApplicationUniGUI = class(TioApplication)
   private
     class var FSessionCollection: TioSessionCollection;
@@ -68,10 +68,11 @@ type
     class procedure _Unlock; inline;
   protected
     // --------- methods to be ovverrided by descendants ----------
+    class function _AcquireSession: IioAuthSession; override;
     class procedure _ClearSession; override;
-    class function _GetSession: IioAuthSession; override;
     class procedure _HandleException(const Sender: TObject); override;
     class function _ProjectPlatform: TioProjectPlatform; override;
+    class procedure _ReleaseSession; override;
     class procedure _ShowMessage(const AMessage: string); override;
     class function _Terminate: Boolean; override;
     // --------- methods to be ovverrided by descendants ----------
@@ -163,20 +164,21 @@ begin
   Result := uniGUIApplication.UniSession.SessionId;
 end;
 
+class function TioApplicationUniGUI._AcquireSession: IioAuthSession;
+var
+  LSessionThreadSafeWrapper: IioAuthSessionThreadSafeWrapper;
+begin
+  if not FSessionCollection.TryGetValue(uniSessionID, LSessionThreadSafeWrapper) then
+  begin
+    LSessionThreadSafeWrapper := TioAuthFactory.NewAuthSessionThreadSafeWrapper;
+    FSessionCollection.Add(uniSessionID, LSessionThreadSafeWrapper);
+  end;
+  Result := LSessionThreadSafeWrapper.Acquire;
+end;
+
 class procedure TioApplicationUniGUI._ClearSession;
 begin
   FSessionCollection.Remove(uniSessionID);
-end;
-
-class function TioApplicationUniGUI._GetSession: IioAuthSession;
-var
-  LSessionID: String;
-begin
-  if not FSessionCollection.TryGetValue(uniSessionID, Result) then
-  begin
-    Result := TioAuthFactory.NewAuthSession;
-    FSessionCollection.Add(uniSessionID, Result);
-  end;
 end;
 
 class procedure TioApplicationUniGUI._HandleException(const Sender: TObject);
@@ -192,6 +194,14 @@ end;
 class function TioApplicationUniGUI._ProjectPlatform: TioProjectPlatform;
 begin
   Result := ppUniGUI;
+end;
+
+class procedure TioApplicationUniGUI._ReleaseSession;
+var
+  LSessionThreadSafeWrapper: IioAuthSessionThreadSafeWrapper;
+begin
+  if FSessionCollection.TryGetValue(uniSessionID, LSessionThreadSafeWrapper) then
+    LSessionThreadSafeWrapper.Release;
 end;
 
 class procedure TioApplicationUniGUI._ShowMessage(const AMessage: string);

@@ -40,6 +40,16 @@ uses
 
 type
 
+  TioAuthSessionThreadSafeWrapper = class(TInterfacedObject, IioAuthSessionThreadSafeWrapper)
+  private
+    FSession: IioAuthSession;
+  public
+    constructor Create;
+    procedure Clear;
+    function Acquire: IioAuthSession;
+    procedure Release;
+  end;
+
   TioAuthSession = class(TInterfacedObject, IioAuthSession)
   private
     // user
@@ -133,7 +143,7 @@ type
 
 implementation
 
-uses iORM.CommonTypes, iORM.Utilities;
+uses iORM.CommonTypes, iORM.Utilities, iORM.Auth.Factory;
 
 { TioAuthSession }
 
@@ -339,6 +349,35 @@ end;
 procedure TioAuthSession.SetUser(const Value: String);
 begin
   FUser := Value;
+end;
+
+{ TioAuthSessionThreadSafeWrapper }
+
+function TioAuthSessionThreadSafeWrapper.Acquire: IioAuthSession;
+begin
+  TMonitor.Enter(Self);
+  Result := FSession;
+end;
+
+procedure TioAuthSessionThreadSafeWrapper.Clear;
+begin
+  Acquire;
+  try
+    FSession := TioAuthFactory.NewAuthSession;
+  finally
+    Release;
+  end;
+end;
+
+constructor TioAuthSessionThreadSafeWrapper.Create;
+begin
+  inherited;
+  Clear;
+end;
+
+procedure TioAuthSessionThreadSafeWrapper.Release;
+begin
+  TMonitor.Exit(Self);
 end;
 
 end.

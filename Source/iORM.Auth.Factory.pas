@@ -42,11 +42,12 @@ type
 
   TioAuthFactory = class
   public
-    class function NewAuthSession: IioAuthSession; static;
-    class function NewAuthRoleItem(const ARole: IioAuthRole): IioAuthRoleItem; static;
-    class function NewAuthUserAppItem(const AApp: IioAuthApp): IioAuthAppItem; static;
     class function NewAuthResponse: IioAuthResponse; static;
     class function NewAuthResponseFromString(const AValue: String): IioAuthResponse; static;
+    class function NewAuthRoleItem(const ARole: IioAuthRole): IioAuthRoleItem; static;
+    class function NewAuthSession: IioAuthSession; static;
+    class function NewAuthSessionThreadSafeWrapper: IioAuthSessionThreadSafeWrapper; static;
+    class function NewAuthUserAppItem(const AApp: IioAuthApp): IioAuthAppItem; static;
   end;
 
 implementation
@@ -74,6 +75,11 @@ end;
 class function TioAuthFactory.NewAuthSession: IioAuthSession;
 begin
   Result := TioAuthSession.Create;
+end;
+
+class function TioAuthFactory.NewAuthSessionThreadSafeWrapper: IioAuthSessionThreadSafeWrapper;
+begin
+  Result := TioAuthSessionThreadSafeWrapper.Create;
 end;
 
 class function TioAuthFactory.NewAuthUserAppItem(const AApp: IioAuthApp): IioAuthAppItem;

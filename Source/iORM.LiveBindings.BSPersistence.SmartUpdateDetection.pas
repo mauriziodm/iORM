@@ -68,8 +68,8 @@ type
     FObjStateCollection: TDictionary<string, string>;
     FMonitor: TMonitor;
   protected
-    procedure Lock;
-    procedure Unlock;
+    procedure Lock; inline;
+    procedure Unlock; inline;
     procedure Add(const ACurrentObj: TObject; const AMasterPropertyPath: String);
     function EncodeKey(const ACurrentObj: TObject; const AMasterPropertyPath: String): string;
     function EncodeValue(const ACurrentObj: TObject): string; virtual;

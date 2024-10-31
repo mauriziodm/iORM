@@ -49,8 +49,8 @@ type
   private
     FContainer: TArray<TioSmartDeleteSystemItem>;
     FMonitor: TMonitor;
-    procedure Lock;
-    procedure Unlock;
+    procedure Lock; inline;
+    procedure Unlock; inline;
   public
     procedure Clear;
     procedure Add(const ATypeName: String; const AID: Integer);
