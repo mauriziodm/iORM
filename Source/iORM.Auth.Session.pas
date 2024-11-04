@@ -111,6 +111,7 @@ type
     procedure SetUser(const Value: String);
   public
     constructor Create;
+    procedure Clear;
     // user
     property UserToken: String read GetUserToken write SetUserToken;
     property UserTokenExp: TDateTime read GetUserTokenExp write SetUserTokenExp;
@@ -147,23 +148,31 @@ uses iORM.CommonTypes, iORM.Utilities, iORM.Auth.Factory;
 
 { TioAuthSession }
 
+procedure TioAuthSession.Clear;
+begin
+  // user
+  FUserToken := IO_STRING_NULL_VALUE;
+  FUserTokenExp := IO_DATETIME_NULL_VALUE;
+  FUser := IO_STRING_NULL_VALUE;
+  FUserOID := IO_INTEGER_NULL_VALUE;
+  // app
+  FAppToken := IO_STRING_NULL_VALUE;
+  FAppTokenExp := IO_DATETIME_NULL_VALUE;
+  FApp := IO_STRING_NULL_VALUE;
+  FAppOID := IO_INTEGER_NULL_VALUE;
+  // refresh
+  FRefreshToken := IO_STRING_NULL_VALUE;
+  FRefreshTokenExp := IO_DATETIME_NULL_VALUE;
+  // access
+  FAccessToken := IO_STRING_NULL_VALUE;
+  FAccessTokenExp := IO_DATETIME_NULL_VALUE;
+  FRefreshAfter := IO_DATETIME_NULL_VALUE;
+end;
+
 constructor TioAuthSession.Create;
 begin
   inherited;
-  // user
-  FUserOID := IO_INTEGER_NULL_VALUE;
-  FUser := IO_STRING_NULL_VALUE;
-  // app
-  FAppOID := IO_INTEGER_NULL_VALUE;
-  FApp := IO_STRING_NULL_VALUE;
-  // tokens
-  FAccessToken := IO_STRING_NULL_VALUE;
-  FAppToken := IO_STRING_NULL_VALUE;
-  FRefreshAfter := IO_DATETIME_NULL_VALUE;
-  FRefreshToken := IO_STRING_NULL_VALUE;
-  FUserToken := IO_STRING_NULL_VALUE;
-  // connection
-  FConnectionName := IO_STRING_NULL_VALUE;
+  Clear;
 end;
 
 function TioAuthSession.GetAccessToken: String;
