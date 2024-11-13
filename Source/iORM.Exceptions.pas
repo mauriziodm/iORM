@@ -143,13 +143,19 @@ type
   EioAuthInvalidRefreshToken_401 = class(EioAuthException)
   end;
 
-  EioAuthServerComponentNotEnabled_404 = class(EioAuthException)
+  EioAuthComponentNotEnabled_404 = class(EioAuthException)
   end;
 
   EioAuthServerComponentNotFound_404 = class(EioAuthException)
   end;
 
   EioAuthNewPasswordNotIdenticalException_401 = class(EioAuthException)
+  end;
+
+  EioAuthAlreadyLoggedOnException_401 = class(EioAuthException)
+  end;
+
+  EioAuthNotLoggedOnException_401 = class(EioAuthException)
   end;
   // -----------------------------------------------------------------------------------------------
 

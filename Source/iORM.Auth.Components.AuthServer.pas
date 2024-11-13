@@ -176,7 +176,7 @@ uses
 procedure TioAuthServer.CheckActive;
 begin
   if not FActive then
-    raise EioAuthServerComponentNotEnabled_404.Create(Format('Component "%s" not found', [Name]));
+    raise EioAuthComponentNotEnabled_404.Create(Format('Component "%s" not found', [Name]));
 end;
 
 constructor TioAuthServer.Create(AOwner: TComponent);
