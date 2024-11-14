@@ -74,8 +74,10 @@ type
     // methods
     function GetAccessToken: String;
     function GetAccessTokenExp: TDateTime;
+    function GetAccessTokenIsExpired: Boolean;
     function GetAppToken: String;
     function GetAppTokenExp: TDateTime;
+    function GetAppTokenIsExpired: Boolean;
     function GetAppOID: Integer;
     function GetApp: String;
     function GetConnectionName: String;
@@ -87,8 +89,10 @@ type
     function GetRefreshAfter: TDateTime;
     function GetRefreshToken: String;
     function GetRefreshTokenExp: TDateTime;
+    function GetRefreshTokenIsExpired: Boolean;
     function GetUserToken: String;
     function GetUserTokenExp: TDateTime;
+    function GetUserTokenIsExpired: Boolean;
     function GetUserOID: Integer;
     function GetUser: String;
     procedure SetAccessToken(const Value: String);
@@ -111,22 +115,26 @@ type
     // user
     property UserToken: String read GetUserToken write SetUserToken;
     property UserTokenExp: TDateTime read GetUserTokenExp write SetUserTokenExp;
+    property UserTokenIsExpired: Boolean read GetUserTokenIsExpired;
     property User: String read GetUser write SetUser;
     property UserOID: Integer read GetUserOID write SetUserOID;
     property HasUserToken: Boolean read GetHasUserToken;
     // app
     property AppToken: String read GetAppToken write SetAppToken;
     property AppTokenExp: TDateTime read GetAppTokenExp write SetAppTokenExp;
+    property AppTokenIsExpired: Boolean read GetAppTokenIsExpired;
     property App: String read GetApp write SetApp;
     property AppOID: Integer read GetAppOID write SetAppOID;
     property HasAppToken: Boolean read GetHasAppToken;
     // refresh
     property RefreshToken: String read GetRefreshToken write SetRefreshToken;
     property RefreshTokenExp: TDateTime read GetRefreshTokenExp write SetRefreshTokenExp;
+    property RefreshTokenIsExpired: Boolean read GetRefreshTokenIsExpired;
     property HasRefreshToken: Boolean read GetHasRefreshToken;
     // access
     property AccessToken: String read GetAccessToken write SetAccessToken;
     property AccessTokenExp: TDateTime read GetAccessTokenExp write SetAccessTokenExp;
+    property AccessTokenIsExpired: Boolean read GetAccessTokenIsExpired;
     property HasAccessToken: Boolean read GetHasAccessToken;
     property RefreshAfter: TDateTime read GetRefreshAfter write SetRefreshAfter;
     property NeedRefresh: Boolean read GetNeedRefresh;
@@ -177,6 +185,11 @@ begin
   Result := FAccessTokenExp;
 end;
 
+function TioAuthSession.GetAccessTokenIsExpired: Boolean;
+begin
+  Result := ((FAccessTokenExp <> IO_DATETIME_NULL_VALUE) and (TioUtilities.NowUTC > FAccessTokenExp)) or (FAccessToken = IO_STRING_NULL_VALUE);
+end;
+
 function TioAuthSession.GetNeedRefresh: Boolean;
 begin
   Result := ((FRefreshAfter <> IO_DATETIME_NULL_VALUE) and (TioUtilities.NowUTC > FRefreshAfter)) or (FAccessToken = IO_STRING_NULL_VALUE);
@@ -195,6 +208,11 @@ end;
 function TioAuthSession.GetAppTokenExp: TDateTime;
 begin
   Result := FAppTokenExp;
+end;
+
+function TioAuthSession.GetAppTokenIsExpired: Boolean;
+begin
+  Result := ((FAppTokenExp <> IO_DATETIME_NULL_VALUE) and (TioUtilities.NowUTC > FAppTokenExp)) or (FAppToken = IO_STRING_NULL_VALUE);
 end;
 
 function TioAuthSession.GetAppOID: Integer;
@@ -242,6 +260,11 @@ begin
   Result := FRefreshTokenExp;
 end;
 
+function TioAuthSession.GetRefreshTokenIsExpired: Boolean;
+begin
+  Result := ((FRefreshTokenExp <> IO_DATETIME_NULL_VALUE) and (TioUtilities.NowUTC > FRefreshTokenExp)) or (FRefreshToken = IO_STRING_NULL_VALUE);
+end;
+
 function TioAuthSession.GetUserToken: String;
 begin
   Result := FUserToken;
@@ -250,6 +273,11 @@ end;
 function TioAuthSession.GetUserTokenExp: TDateTime;
 begin
   Result := FUserTokenExp;
+end;
+
+function TioAuthSession.GetUserTokenIsExpired: Boolean;
+begin
+  Result := ((FUserTokenExp <> IO_DATETIME_NULL_VALUE) and (TioUtilities.NowUTC > FUserTokenExp)) or (FUserToken = IO_STRING_NULL_VALUE);
 end;
 
 function TioAuthSession.GetUserOID: Integer;

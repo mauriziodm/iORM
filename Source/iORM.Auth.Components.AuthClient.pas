@@ -170,7 +170,7 @@ begin
     FBeforeRefreshTokenIsExpired(Self, ASession, Result, LDone);
   // if the check of the token was not handled then use the internal implementation
   if not LDone then
-    Result := ((ASession.RefreshTokenExp <> IO_DATETIME_NULL_VALUE) and (TioUtilities.NowUTC > ASession.RefreshTokenExp)) or (ASession.RefreshToken = IO_STRING_NULL_VALUE);
+    Result := ASession.RefreshTokenIsExpired;
   // invoke AfterNeedRefresh event if assigned
   if Assigned(FAfterRefreshTokenIsExpired) then
     FAfterRefreshTokenIsExpired(Self, ASession, Result);
@@ -427,7 +427,7 @@ begin
     FBeforeRefreshTokenIsExpired(Self, ASession, Result, LDone);
   // if the check of the token was not handled then use the internal implementation
   if not LDone then
-    Result := ((ASession.AccessTokenExp <> IO_DATETIME_NULL_VALUE) and (TioUtilities.NowUTC > ASession.AccessTokenExp)) or (ASession.AccessToken = IO_STRING_NULL_VALUE);
+    Result := ASession.AccessTokenIsExpired;
   // invoke AfterNeedRefresh event if assigned
   if Assigned(FAfterAccessTokenIsExpired) then
     FAfterAccessTokenIsExpired(Self, ASession, Result);
