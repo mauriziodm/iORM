@@ -87,7 +87,7 @@ type
     procedure _AuthorizeUser(const AUserCredentials: IioAuthUserCredentials; const ASession: IioAuthSession);
     procedure _AuthorizeApp(const AAppCredentials: IioAuthAppCredentials; const AUserAuthorizationCode: String; const ASession: IioAuthSession);
     procedure _AuthorizeAppRequestUserAuthCode(const AAppCredentials: IioAuthAppCredentials);
-    function _AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean;
+    function _AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
     procedure _CheckActive; inline;
     function _IsLoggedOn(const ASession: IioAuthSession): Boolean;
     procedure _RaiseAlreadyLoggedOnException(const ASession: IioAuthSession);
@@ -186,30 +186,26 @@ begin
     FAfterRefreshTokenIsExpired(Self, ASession, Result);
 end;
 
-function TioAuthClient._AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): Boolean;
+function TioAuthClient._AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
 var
   LDone: Boolean;
-  LAuthResponse: IioAuthResponse;
 begin
-  Result := False;
   // invoke BeforeAuthorizeAccess if assigned
   LDone := False;
   if Assigned(FBeforeAuthorizeAccess) then
   begin
-    LAuthResponse := TioAuthFactory.NewAuthResponse;
-    FBeforeAuthorizeAccess(Self, AScope, AAuthIntention, AAccessToken, LAuthResponse, LDone);
+    Result := TioAuthFactory.NewAuthResponse;
+    FBeforeAuthorizeAccess(Self, AScope, AAuthIntention, AAccessToken, Result, LDone);
   end;
   // if the access request was not handled then use the internal implementation
   if not LDone then
-    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).AuthorizeAccess(FConnectionName, AScope, AAuthIntention, AAccessToken);
+    Result := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).AuthorizeAccess(FConnectionName, AScope, AAuthIntention, AAccessToken);
   // invoke AfterAuthorizeAccess if assigned
   if Assigned(FAfterAuthorizeAccess) then
-    FAfterAuthorizeAccess(Self, AScope, AAuthIntention, AAccessToken, LAuthResponse);
+    FAfterAuthorizeAccess(Self, AScope, AAuthIntention, AAccessToken, Result);
   // if not authorized  raise an exception (non ci sarebbe bisogno perchè la solleva già il AuthServer ma per ulteriore sicurezza)
-  if not LAuthResponse.IsAuth then
+  if not Result.IsAuth then
     raise EioAuthForbiddenException_403.Create(Format('Access forbidden to scope (%s)', [AScope]));
-  //  return true
-  Result := True;
 end;
 
 procedure TioAuthClient._AuthorizeApp(const AAppCredentials: IioAuthAppCredentials; const AUserAuthorizationCode: String; const ASession: IioAuthSession);
@@ -373,16 +369,19 @@ end;
 
 function TioAuthClient.AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention): Boolean;
 var
+  LAccessToken: String;
+  LAuthResponse: IioAuthResponse;
   LException: Exception;
   LSession: IioAuthSession;
 begin
   Result := False;
   // first check if the component is enabled
   _CheckActive;
-  // acquire the session
-  LSession := TioApplication.AcquireSession;
+  // executes the operation inside a try-except block to be able to invoke the onException... event if there is one
   try
-    // executes the operation inside a try-finally block to be able to invoke the onException... event if there is one
+    // --------------------
+    // acquire the session to check if it is logged on and if need refresh
+    LSession := TioApplication.AcquireSession;
     try
       // step 1 - check if logged on
       if not _IsLoggedOn(LSession) then
@@ -390,24 +389,48 @@ begin
       // step 2 - check if the access token need to be refreshed
       if _NeedRefresh(LSession) then
         _RefreshAccessToken(LSession);
-      // step 3 - authorize access
-      Result := _AuthorizeAccess(AScope, AAuthIntention, LSession.AccessToken);
-    except
-      // if an onException event handler is assigned then invoke it else re-raise the exception
-      if Assigned(FonUserLoginException) then
-      begin
-        LException := AcquireExceptionObject as Exception;
-        try
-          FonAuthorizeAccessException(Self, AScope, AAuthIntention, LSession, LException);
-        finally
-          LException.Free;
-        end;
-      end
-      else
-        raise(LException);
+      // set the access token to a local variable (thread-safe)
+      LAccessToken := LSession.AccessToken;
+    finally
+      TioApplication.ReleaseSession;
     end;
-  finally
-    TioApplication.ReleaseSession;
+    // --------------------
+    // step 3 - authorize access (outside session lock to minimize session lock time when not necessary)
+    LAuthResponse := _AuthorizeAccess(AScope, AAuthIntention, LAccessToken);
+    Result := LAuthResponse.IsAuth;
+    // --------------------
+    // if there is a new access token (refresh token maintained by auth server compatibility)
+    //  then update the session object
+    if Result and LAuthResponse.HasAccTkn then
+    begin
+      LSession := TioApplication.AcquireSession;
+      try
+        LSession.AccessToken := LAuthResponse.AccTkn;
+        LSession.AccessTokenExp := LAuthResponse.AccExp;
+        LSession.RefreshAfter := LAuthResponse.RefAft;
+        if LAuthResponse.HasRefTkn then
+        begin
+          LSession.RefreshToken := LAuthResponse.RefTkn;
+          LSession.RefreshTokenExp := LAuthResponse.RefExp;
+        end;
+      finally
+        TioApplication.ReleaseSession;
+      end;
+    end;
+    // --------------------
+  except
+    // if an onException event handler is assigned then invoke it else re-raise the exception
+    if Assigned(FonUserLoginException) then
+    begin
+      LException := AcquireExceptionObject as Exception;
+      try
+        FonAuthorizeAccessException(Self, AScope, AAuthIntention, LSession, LException);
+      finally
+        LException.Free;
+      end;
+    end
+    else
+      raise(LException);
   end;
 end;
 
