@@ -56,26 +56,31 @@ type
     FBeforeAuthorizeApp: TioBeforeAuthorizeAppEvent;
     FBeforeAuthorizeUser: TioBeforeAuthorizeUserEvent;
     FOnAuthorizeAppGetUserAuthCode: TioOnAuthorizeAppGetUserAuthCodeEvent;
-    // need refresh events
+    // access token generation or refresh events
+    FAfterNewAccessToken: TioAfterBuildAccessTokenEvent;
     FAfterNeedRefresh: TioAfterNeedRefreshEvent;
+    FAfterRefreshAccessToken: TioAfterBuildAccessTokenEvent;
+    FBeforeNewAccessToken: TioBeforeBuildAccessTokenEvent;
     FBeforeNeedRefresh: TioBeforeNeedRefreshEvent;
+    FBeforeRefreshAccessToken: TioBeforeBuildAccessTokenEvent;
     // token is expired events
-    FAfterAccessTokenIsExpired: TioAfterTokenIsExpired;
-    FAfterAppTokenIsExpired: TioAfterTokenIsExpired;
-    FAfterRefreshTokenIsExpired: TioAfterTokenIsExpired;
-    FAfterUserTokenIsExpired: TioAfterTokenIsExpired;
-    FBeforeAccessTokenIsExpired: TioBeforeTokenIsExpired;
-    FBeforeAppTokenIsExpired: TioBeforeTokenIsExpired;
-    FBeforeRefreshTokenIsExpired: TioBeforeTokenIsExpired;
-    FBeforeUserTokenIsExpired: TioBeforeTokenIsExpired;
+    FAfterAccessTokenIsExpired: TioAfterTokenIsExpiredEvent;
+    FAfterAppTokenIsExpired: TioAfterTokenIsExpiredEvent;
+    FAfterRefreshTokenIsExpired: TioAfterTokenIsExpiredEvent;
+    FAfterUserTokenIsExpired: TioAfterTokenIsExpiredEvent;
+    FBeforeAccessTokenIsExpired: TioBeforeTokenIsExpiredEvent;
+    FBeforeAppTokenIsExpired: TioBeforeTokenIsExpiredEvent;
+    FBeforeRefreshTokenIsExpired: TioBeforeTokenIsExpiredEvent;
+    FBeforeUserTokenIsExpired: TioBeforeTokenIsExpiredEvent;
     // is logged on events
-    FBeforeIsLoggedOn: TioBeforeIsLoggedOn;
-    FAfterIsLoggedOn: TioAfterIsLoggedOn;
+    FBeforeIsLoggedOn: TioBeforeIsLoggedOnEvent;
+    FAfterIsLoggedOn: TioAfterIsLoggedOnEvent;
     // on exception events
-    FonAppLoginException: TioOnAppLoginException;
-    FonAuthorizeAccessException: TioOnAuthorizeAccessException;
-    FonLogoutException: TioOnLogoutException;
-    FonUserLoginException: TioOnUserLoginException;
+    FonAppLoginException: TioOnAppLoginExceptionEvent;
+    FonAuthorizeAccessException: TioOnAuthorizeAccessExceptionEvent;
+    FonIsLoggedOnException: TioOnAuthExceptionEvent;
+    FonLogoutException: TioOnAuthExceptionEvent;
+    FonUserLoginException: TioOnUserLoginExceptionEvent;
     // methods
     function Get_Version: String;
     function _AccessTokenIsExpired(const ASession: IioAuthSession): Boolean;
@@ -87,8 +92,8 @@ type
     function _IsLoggedOn(const ASession: IioAuthSession): Boolean;
     procedure _RaiseAlreadyLoggedOnException(const ASession: IioAuthSession);
     function _NeedRefresh(const ASession: IioAuthSession): Boolean;
-    procedure _NewAccessToken(const AAuthorizationToken: String; const ASession: IioAuthSession);
-    procedure _RefreshAccessToken(const ASession: IioAuthSession);
+    procedure _NewAccessToken(const ASession: IioAuthSession);
+    procedure _RefreshAccessToken(const ASession: IioAuthSession); // Da completare
     function _RefreshTokenIsExpired(const ASession: IioAuthSession): Boolean;
   public
     constructor Create(AOwner: TComponent); override;
@@ -112,26 +117,31 @@ type
     property BeforeAuthorizeApp: TioBeforeAuthorizeAppEvent read FBeforeAuthorizeApp write FBeforeAuthorizeApp;
     property BeforeAuthorizeUser: TioBeforeAuthorizeUserEvent read FBeforeAuthorizeUser write FBeforeAuthorizeUser;
     property OnAuthorizeAppGetUserAuthCode: TioOnAuthorizeAppGetUserAuthCodeEvent read FOnAuthorizeAppGetUserAuthCode write FOnAuthorizeAppGetUserAuthCode;
-    // need refresh events
+    // access token generation or refresh events
+    property AfterNewAccessToken: TioAfterBuildAccessTokenEvent read FAfterNewAccessToken write FAfterNewAccessToken;
     property AfterNeedRefresh: TioAfterNeedRefreshEvent read FAfterNeedRefresh write FAfterNeedRefresh;
+    property AfterRefreshAccessToken: TioAfterBuildAccessTokenEvent read FAfterRefreshAccessToken write FAfterRefreshAccessToken;
+    property BeforeNewAccessToken: TioBeforeBuildAccessTokenEvent read FBeforeNewAccessToken write FBeforeNewAccessToken;
     property BeforeNeedRefresh: TioBeforeNeedRefreshEvent read FBeforeNeedRefresh write FBeforeNeedRefresh;
+    property BeforeRefreshAccessToken: TioBeforeBuildAccessTokenEvent read FBeforeRefreshAccessToken write FBeforeRefreshAccessToken;
     // token is expired events
-    property AfterAccessTokenIsExpired: TioAfterTokenIsExpired read FAfterAccessTokenIsExpired write FAfterAccessTokenIsExpired;
-    property AfterAppTokenIsExpired: TioAfterTokenIsExpired read FAfterAppTokenIsExpired write FAfterAppTokenIsExpired;
-    property AfterRefreshTokenIsExpired: TioAfterTokenIsExpired read FAfterRefreshTokenIsExpired write FAfterRefreshTokenIsExpired;
-    property AfterUserTokenIsExpired: TioAfterTokenIsExpired read FAfterUserTokenIsExpired write FAfterUserTokenIsExpired;
-    property BeforeAccessTokenIsExpired: TioBeforeTokenIsExpired read FBeforeAccessTokenIsExpired write FBeforeAccessTokenIsExpired;
-    property BeforeAppTokenIsExpired: TioBeforeTokenIsExpired read FBeforeAppTokenIsExpired write FBeforeAppTokenIsExpired;
-    property BeforeRefreshTokenIsExpired: TioBeforeTokenIsExpired read FBeforeRefreshTokenIsExpired write FBeforeRefreshTokenIsExpired;
-    property BeforeUserTokenIsExpired: TioBeforeTokenIsExpired read FBeforeUserTokenIsExpired write FBeforeUserTokenIsExpired;
+    property AfterAccessTokenIsExpired: TioAfterTokenIsExpiredEvent read FAfterAccessTokenIsExpired write FAfterAccessTokenIsExpired;
+    property AfterAppTokenIsExpired: TioAfterTokenIsExpiredEvent read FAfterAppTokenIsExpired write FAfterAppTokenIsExpired;
+    property AfterRefreshTokenIsExpired: TioAfterTokenIsExpiredEvent read FAfterRefreshTokenIsExpired write FAfterRefreshTokenIsExpired;
+    property AfterUserTokenIsExpired: TioAfterTokenIsExpiredEvent read FAfterUserTokenIsExpired write FAfterUserTokenIsExpired;
+    property BeforeAccessTokenIsExpired: TioBeforeTokenIsExpiredEvent read FBeforeAccessTokenIsExpired write FBeforeAccessTokenIsExpired;
+    property BeforeAppTokenIsExpired: TioBeforeTokenIsExpiredEvent read FBeforeAppTokenIsExpired write FBeforeAppTokenIsExpired;
+    property BeforeRefreshTokenIsExpired: TioBeforeTokenIsExpiredEvent read FBeforeRefreshTokenIsExpired write FBeforeRefreshTokenIsExpired;
+    property BeforeUserTokenIsExpired: TioBeforeTokenIsExpiredEvent read FBeforeUserTokenIsExpired write FBeforeUserTokenIsExpired;
     // is logged on events
-    property AfterIsLoggedOn: TioAfterIsLoggedOn read FAfterIsLoggedOn write FAfterIsLoggedOn;
-    property BeforeIsLoggedOn: TioBeforeIsLoggedOn read FBeforeIsLoggedOn write FBeforeIsLoggedOn;
+    property AfterIsLoggedOn: TioAfterIsLoggedOnEvent read FAfterIsLoggedOn write FAfterIsLoggedOn;
+    property BeforeIsLoggedOn: TioBeforeIsLoggedOnEvent read FBeforeIsLoggedOn write FBeforeIsLoggedOn;
     // on exception events
-    property onAppLoginException: TioOnAppLoginException read FonAppLoginException;
-    property onAuthorizeAccessException: TioOnAuthorizeAccessException read FonAuthorizeAccessException;
-    property onLogoutException: TioOnLogoutException read FonLogoutException;
-    property onUserLoginException: TioOnUserLoginException read FonUserLoginException;
+    property onAppLoginException: TioOnAppLoginExceptionEvent read FonAppLoginException write FonAppLoginException;
+    property onAuthorizeAccessException: TioOnAuthorizeAccessExceptionEvent read FonAuthorizeAccessException write FonAuthorizeAccessException;
+    property onIsLoggedOnException: TioOnAuthExceptionEvent read FonIsLoggedOnException write FonIsLoggedOnException;
+    property onLogoutException: TioOnAuthExceptionEvent read FonLogoutException write FonLogoutException;
+    property onUserLoginException: TioOnUserLoginExceptionEvent read FonUserLoginException write FonUserLoginException;
   end;
 
 implementation
@@ -256,7 +266,7 @@ begin
         // step 3 - authorize app
         _AuthorizeApp(AAppCredentials, AUserAuthorizationCode, LSession);
         // step 4 - get new access token (and refresh token usually)
-        _NewAccessToken(LSession.AppToken, LSession);
+        _NewAccessToken(LSession);
         // return true if success
       except
         // if an onException event handler is assigned then invoke it else re-raise the exception
@@ -461,8 +471,37 @@ begin
 end;
 
 function TioAuthClient.IsLoggedOn: Boolean;
+var
+  LException: Exception;
+  LSession: IioAuthSession;
 begin
-
+  Result := False;
+  // first check if the component is enabled
+  _CheckActive;
+  // acquire the session
+  LSession := TioApplication.AcquireSession;
+  try
+    // executes the operation inside a try-finally block to be able to invoke the onException... event if there is one
+    try
+      // step 1 - check if logged on
+      Result := _IsLoggedOn(LSession);
+    except
+      // if an onException event handler is assigned then invoke it else re-raise the exception
+      if Assigned(FonIsLoggedOnException) then
+      begin
+        LException := AcquireExceptionObject as Exception;
+        try
+          FonIsLoggedOnException(Self, LSession, LException);
+        finally
+          LException.Free;
+        end;
+      end
+      else
+        raise(LException);
+    end;
+  finally
+    TioApplication.ReleaseSession;
+  end;
 end;
 
 function TioAuthClient.Logout: Boolean;
@@ -501,24 +540,24 @@ begin
   end;
 end;
 
-procedure TioAuthClient._NewAccessToken(const AAuthorizationToken: String; const ASession: IioAuthSession);
+procedure TioAuthClient._NewAccessToken(const ASession: IioAuthSession);
 var
   LAuthResponse: IioAuthResponse;
   LDone: Boolean;
 begin
   LDone := False;
   // invoke BeforeNewAccessToken if assigned
-//  if Assigned(FBeforeNewAccessToken) then
-//  begin
-//    LAuthResponse := TioAuthFactory.NewAuthResponse;
-//    FBeforeNewAccessToken(Self, AUserCredentials, LAuthResponse, LDone);
-//  end;
+  if Assigned(FBeforeNewAccessToken) then
+  begin
+    LAuthResponse := TioAuthFactory.NewAuthResponse;
+    FBeforeNewAccessToken(Self, ASession, LAuthResponse, LDone);
+  end;
   // if the creation of the token was not handled then use the internal implementation
   if not LDone then
-    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).Auth_NewAccessToken(FConnectionName, AAuthorizationToken);
+    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).Auth_NewAccessToken(FConnectionName, ASession.UserToken);
   // invoke AfterNewAccessToken if assigned
-//  if Assigned(FAfterNewAccessToken) then
-//    FAfterNewAccessToken(Self, AUserCredentials, LAuthResponse);
+  if Assigned(FAfterNewAccessToken) then
+    FAfterNewAccessToken(Self, ASession, LAuthResponse);
   // if authorized then update session props (else raise an exception)
   if LAuthResponse.IsAuth and LAuthResponse.HasAccTkn then
   begin
@@ -532,7 +571,7 @@ begin
     end;
   end
   else
-    raise EioAuthInvalidCredentialsException_401.Create('Invalid user or app authorization token');
+    raise EioAuthInvalidCredentialsException_401.Create('User or App auth code not valid');
 end;
 
 procedure TioAuthClient._RaiseAlreadyLoggedOnException(const ASession: IioAuthSession);
@@ -550,17 +589,17 @@ var
 begin
   LDone := False;
   // invoke BeforeRefreshAccessToken if assigned
-//  if Assigned(FBeforeRefreshAccessToken) then
-//  begin
-//    LAuthResponse := TioAuthFactory.NewAuthResponse;
-//    FBeforeRefreshAccessToken(Self, AUserCredentials, LAuthResponse, LDone);
-//  end;
+  if Assigned(FBeforeRefreshAccessToken) then
+  begin
+    LAuthResponse := TioAuthFactory.NewAuthResponse;
+    FBeforeRefreshAccessToken(Self, ASession, LAuthResponse, LDone);
+  end;
   // if the creation of the token was not handled then use the internal implementation
   if not LDone then
     LAuthResponse := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).Auth_RefreshAccessToken(FConnectionName, ASession.RefreshToken);
   // invoke AfterRefreshAccessToken if assigned
-//  if Assigned(FAfterRefreshAccessToken) then
-//    FAfterRefreshAccessToken(Self, AUserCredentials, LAuthResponse);
+  if Assigned(FAfterRefreshAccessToken) then
+    FAfterRefreshAccessToken(Self, ASession, LAuthResponse);
   // if authorized then update session props (else raise an exception)
   if LAuthResponse.IsAuth and LAuthResponse.HasAccTkn then
   begin
@@ -596,7 +635,7 @@ begin
       // step 2 - authorize user
       _AuthorizeUser(AUserCredentials, LSession);
       // step 3 - get new access token (and refresh token usually)
-      _NewAccessToken(LSession.UserToken, LSession);
+      _NewAccessToken(LSession);
       // return true if success
       Result := True;
     except

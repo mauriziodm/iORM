@@ -363,16 +363,19 @@ type
   TioBeforeNeedRefreshEvent = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultNeedRefresh, Done: Boolean) of object;
   TioAfterNeedRefreshEvent = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultNeedRefresh: Boolean) of object;
 
-  TioBeforeTokenIsExpired = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultIsExpired, Done: Boolean) of object;
-  TioAfterTokenIsExpired = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultIsExpired: Boolean) of object;
+  TioBeforeTokenIsExpiredEvent = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultIsExpired, Done: Boolean) of object;
+  TioAfterTokenIsExpiredEvent = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultIsExpired: Boolean) of object;
 
-  TioBeforeIsLoggedOn = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultIsLoggedOn, Done: Boolean) of object;
-  TioAfterIsLoggedOn = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultLoggedOn: Boolean) of object;
+  TioBeforeIsLoggedOnEvent = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultIsLoggedOn, Done: Boolean) of object;
+  TioAfterIsLoggedOnEvent = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultLoggedOn: Boolean) of object;
 
-  TioOnAppLoginException = procedure(const Sender: TObject; const AAppCredentials: IioAuthAppCredentials; const ASession: IioAuthSession; const AException: Exception) of object;
-  TioOnUserLoginException = procedure(const Sender: TObject; const AUserCredentials: IioAuthUserCredentials; const ASession: IioAuthSession; const AException: Exception) of object;
-  TioOnAuthorizeAccessException = procedure(const Sender: TObject; const AScope: String; const AAuthIntention: TioAuthIntention; const ASession: IioAuthSession; const AException: Exception) of object;
-  TioOnLogoutException = procedure(const Sender: TObject; const ASession: IioAuthSession; const AException: Exception) of object;
+  TioBeforeBuildAccessTokenEvent = procedure(const Sender: TObject; const ASession: IioAuthSession; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
+  TioAfterBuildAccessTokenEvent = procedure(const Sender: TObject; const ASession: IioAuthSession; const AAuthResponse: IioAuthResponse) of object;
+
+  TioOnAppLoginExceptionEvent = procedure(const Sender: TObject; const AAppCredentials: IioAuthAppCredentials; const ASession: IioAuthSession; const AException: Exception) of object;
+  TioOnUserLoginExceptionEvent = procedure(const Sender: TObject; const AUserCredentials: IioAuthUserCredentials; const ASession: IioAuthSession; const AException: Exception) of object;
+  TioOnAuthorizeAccessExceptionEvent = procedure(const Sender: TObject; const AScope: String; const AAuthIntention: TioAuthIntention; const ASession: IioAuthSession; const AException: Exception) of object;
+  TioOnAuthExceptionEvent = procedure(const Sender: TObject; const ASession: IioAuthSession; const AException: Exception) of object;
 
 implementation
 
