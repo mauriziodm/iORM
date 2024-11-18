@@ -78,7 +78,7 @@ begin
     //  (otherwise I had problems) and then raise a new exception with the same message so that it comes out to the user too.
     // note: The new exception is raised decoupled with a Timer because I had problems otherwise.
     if Assigned(FException) then
-                                            begin
+    begin
       if FShowWait then
         io.HideWait;
       if Assigned(FOnExceptionMethod) then

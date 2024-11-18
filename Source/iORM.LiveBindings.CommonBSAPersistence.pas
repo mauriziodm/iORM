@@ -37,30 +37,22 @@ interface
 
 uses
   iORM.LiveBindings.Interfaces, iORM.Where.Interfaces, iORM.CommonTypes,
-  iORM.Context.Container, iORM.LiveBindings.BSPersistence;
+  iORM.Context.Container, iORM.LiveBindings.BSPersistence, iORM.Async.Func;
 
 type
 
-  TioCommonBSAPersistenceThreadExecute = reference to function: TObject;
-  TioCommonBSAPersistenceThreadOnTerminate = reference to procedure(AResultValue: TObject);
-
   TioCommonBSAPersistence = class
   private
-    // Exucute
-    class procedure _Execute(const AASync: Boolean; AExecuteMethod: TioCommonBSAPersistenceThreadExecute;
-      ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate); static;
-    class procedure _SyncExecute(AExecuteMethod: TioCommonBSAPersistenceThreadExecute; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate); static;
-    class procedure _AsyncExecute(AExecuteMethod: TioCommonBSAPersistenceThreadExecute; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate); static;
     // Load object
     class procedure _LoadObject(const AASync: Boolean; const ATypeName, ATypeAlias: String; const ALazy: Boolean; const ALazyProps: String; AWhere: IioWhere;
-      ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+      AOnSuccessMethod: TioAsyncFuncOnSuccess<TObject>);
     class procedure _LoadToObject(const AASync: Boolean; const ATypeName, ATypeAlias: String; const ALazy: Boolean; const ALazyProps: String; AWhere: IioWhere;
-      ATargetObject: TObject; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+      ATargetObject: TObject; AOnSuccessMethod: TioAsyncFuncOnSuccess<TObject>);
     // Load list
     class procedure _LoadList(const AASync: Boolean; const ATypeName, ATypeAlias: String; const ALazy: Boolean; const ALazyProps: String; AWhere: IioWhere;
-      ATargetClass: TioClassRef; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+      ATargetClass: TioClassRef; AOnSuccessMethod: TioAsyncFuncOnSuccess<TObject>);
     class procedure _LoadToList(const AASync: Boolean; const ATypeName, ATypeAlias: String; const ALazy: Boolean; const ALazyProps: String; AWhere: IioWhere;
-      ATargetList: TObject; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+      ATargetList: TObject; AOnSuccessMethod: TioAsyncFuncOnSuccess<TObject>);
     // Page manager
     class procedure _SetItemCountToPageManager(const ATypeName, ATypeAlias: String; AWhere: IioWhere);
   public
@@ -104,52 +96,21 @@ type
   TioCommonBSAAnonymousMethodsFactory = class
   public
     // persist
-    class function GetPersistCurrentExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadExecute;
-    class function GetPersistAllExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadExecute;
+    class function GetPersistCurrentExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioAsyncFuncExecute<TObject>;
+    class function GetPersistAllExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioAsyncFuncExecute<TObject>;
     // Delete
-    class function GetDeleteExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadExecute;
-    class function GetDeleteTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadOnTerminate;
+    class function GetDeleteExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioAsyncFuncExecute<TObject>;
+    class function GetDeleteOnSuccessMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioAsyncFuncOnSuccess<TObject>;
     // Refresh/Reload
-    class function GetReloadTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean)
-      : TioCommonBSAPersistenceThreadOnTerminate;
+    class function GetReloadOnSuccessMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean)
+      : TioAsyncFuncOnSuccess<TObject>;
     // LoadPage (progressive)
-    class function GetProgressiveLoadPageTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadOnTerminate;
+    class function GetProgressiveLoadPageOnSuccessMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioAsyncFuncOnSuccess<TObject>;
     // Other
-    class function GetNotifyTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadOnTerminate;
-  end;
-
-  TioCommonBSAPersistenceThread = class(TThread)
-  strict private
-    FExceptionMessage: String;
-    FExecuteFunc: TioCommonBSAPersistenceThreadExecute;
-    FOnTerminateProc: TioCommonBSAPersistenceThreadOnTerminate;
-    FResultValue: TObject;
-  strict protected
-    procedure Execute; override;
-    procedure OnTerminateEventHandler(Sender: TObject);
-  public
-    constructor Create(AExecuteFunc: TioCommonBSAPersistenceThreadExecute; AOnTerminateProc: TioCommonBSAPersistenceThreadOnTerminate); overload;
-    function ResultValue: TObject;
+    class function GetNotifyOnSuccessMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioAsyncFuncOnSuccess<TObject>;
   end;
 
   { TioCommonBSAPersistence }
-
-class procedure TioCommonBSAPersistence._AsyncExecute(AExecuteMethod: TioCommonBSAPersistenceThreadExecute;
-  ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
-begin
-  io.ShowWait;
-  // Create and execute the thread
-  TioCommonBSAPersistenceThread.Create(AExecuteMethod, ATerminateMethod).Start;
-end;
-
-class procedure TioCommonBSAPersistence._Execute(const AASync: Boolean; AExecuteMethod: TioCommonBSAPersistenceThreadExecute;
-  ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
-begin
-  if AASync then
-    _AsyncExecute(AExecuteMethod, ATerminateMethod)
-  else
-    _SyncExecute(AExecuteMethod, ATerminateMethod);
-end;
 
 class procedure TioCommonBSAPersistence.BeforeEdit(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 var
@@ -182,8 +143,8 @@ end;
 class procedure TioCommonBSAPersistence.BSPersistenceDelete(const ABindSource: IioMasterBindSource);
 var
   LActiveBindSourceAdapter: IioActiveBindSourceAdapter;
-  LExecuteMethod: TioCommonBSAPersistenceThreadExecute;
-  LTerminateMethod: TioCommonBSAPersistenceThreadOnTerminate;
+  LExecuteMethod: TioAsyncFuncExecute<TObject>;
+  LTerminateMethod: TioAsyncFuncOnSuccess<TObject>;
 begin
   LActiveBindSourceAdapter := ABindSource.GetActiveBindSourceAdapter;
   // If current is nil then exit
@@ -191,9 +152,9 @@ begin
     Exit;
   // Set anonimous methods
   LExecuteMethod := TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(LActiveBindSourceAdapter);
-  LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetDeleteTerminateMethod(LActiveBindSourceAdapter);
+  LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetDeleteOnSuccessMethod(LActiveBindSourceAdapter);
   // Execute synchronous or asynchronous
-  _Execute(LActiveBindSourceAdapter.AsyncPersist, LExecuteMethod, LTerminateMethod);
+  TioFunc<TObject>.Invoke(LActiveBindSourceAdapter.AsyncPersist, LExecuteMethod, LTerminateMethod, nil, True);
 end;
 
 class procedure TioCommonBSAPersistence.BeforeDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
@@ -253,7 +214,7 @@ end;
 class procedure TioCommonBSAPersistence.Load(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 var
   LTargetClass: TioClassRef;
-  LTerminateMethod: TioCommonBSAPersistenceThreadOnTerminate;
+  LTerminateMethod: TioAsyncFuncOnSuccess<TObject>;
 begin
   LTargetClass := nil;
   // If AutoLoadData is disabled then exit
@@ -289,7 +250,7 @@ end;
 class procedure TioCommonBSAPersistence.LoadPage(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 var
   LPagingObj: TioCommonBSAPageManager;
-  LTerminateMethod: TioCommonBSAPersistenceThreadOnTerminate;
+  LTerminateMethod: TioAsyncFuncOnSuccess<TObject>;
 begin
   // If the adapter is a detail adapter or AutoLoadData is not active then do not execute
   if AActiveBindSourceAdapter.HasMasterBSA or (AActiveBindSourceAdapter.TypeOfCollection <> tcList) or not AActiveBindSourceAdapter.AutoLoad then
@@ -301,7 +262,7 @@ begin
   begin
     // If the pagination is progressive then it loads the next page and adds it to the
     // internal list of the BSA and then does a Refresh(False)
-    LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetProgressiveLoadPageTerminateMethod(AActiveBindSourceAdapter);
+    LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetProgressiveLoadPageOnSuccessMethod(AActiveBindSourceAdapter);
     _LoadToList(AActiveBindSourceAdapter.AsyncLoad, AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias, AActiveBindSourceAdapter.Lazy,
       AActiveBindSourceAdapter.LazyProps, AActiveBindSourceAdapter.ioWhere, AActiveBindSourceAdapter.DataObject, LTerminateMethod);
   end
@@ -379,7 +340,7 @@ class procedure TioCommonBSAPersistence.Reload(const AActiveBindSourceAdapter: I
 var
   LPagingObj: TioCommonBSAPageManager;
   LTargetClass: TioClassRef;
-  LTerminateMethod: TioCommonBSAPersistenceThreadOnTerminate;
+  LTerminateMethod: TioAsyncFuncOnSuccess<TObject>;
 begin
   // Checks
   if AActiveBindSourceAdapter.GetBindSource = nil then
@@ -397,7 +358,7 @@ begin
   if Assigned(AActiveBindSourceAdapter.DataObject) then
     LTargetClass := AActiveBindSourceAdapter.DataObject.ClassType;
   // Set the OnTerminate method
-  LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetReloadTerminateMethod(AActiveBindSourceAdapter, False); // Notify = false (verificare)
+  LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetReloadOnSuccessMethod(AActiveBindSourceAdapter, False); // Notify = false (verificare)
   // Extract the paging obj from the where obj and prepare it for an HardRefresh
   LPagingObj := AActiveBindSourceAdapter.ioWhere.GetPagingObj as TioCommonBSAPageManager;
   LPagingObj.PrepareForRefresh;
@@ -418,7 +379,7 @@ end;
 class procedure TioCommonBSAPersistence.ReloadNaturalBindSourceAdapter(const ANaturalBindSourceAdapter: IioNaturalActiveBindSourceAdapter);
 var
   LActiveBindSourceAdapter: IioActiveBindSourceAdapter;
-  LTerminateMethod: TioCommonBSAPersistenceThreadOnTerminate;
+  LTerminateMethod: TioAsyncFuncOnSuccess<TObject>;
   LDataObject: TObject;
   LWhere: IioWhere;
 begin
@@ -443,7 +404,7 @@ begin
     // Reload to the same instance
     ltFromBSAsIs, ltFromBSReload:
       begin
-        LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetNotifyTerminateMethod(LActiveBindSourceAdapter);
+        LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetNotifyOnSuccessMethod(LActiveBindSourceAdapter);
         _LoadToObject(LActiveBindSourceAdapter.AsyncLoad, LDataObject.ClassName, '', LActiveBindSourceAdapter.Lazy, LActiveBindSourceAdapter.LazyProps, LWhere,
           LDataObject, LTerminateMethod);
       end;
@@ -451,7 +412,7 @@ begin
     ltFromBSReloadNewInstance:
       begin
         LActiveBindSourceAdapter.Reloading := True;
-        LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetReloadTerminateMethod(LActiveBindSourceAdapter, False); // Notify = false (verificare)
+        LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetReloadOnSuccessMethod(LActiveBindSourceAdapter, False); // Notify = false (verificare)
         _LoadObject(LActiveBindSourceAdapter.AsyncLoad, LDataObject.ClassName, '', LActiveBindSourceAdapter.Lazy, LActiveBindSourceAdapter.LazyProps, LWhere,
           LTerminateMethod);
       end
@@ -463,8 +424,8 @@ end;
 
 class procedure TioCommonBSAPersistence.PersistAll(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 var
-  LExecuteMethod: TioCommonBSAPersistenceThreadExecute;
-  LTerminateMethod: TioCommonBSAPersistenceThreadOnTerminate;
+  LExecuteMethod: TioAsyncFuncExecute<TObject>;
+  LTerminateMethod: TioAsyncFuncOnSuccess<TObject>;
 begin
   // If it's a single object then call the normal PersistCurrent method and exit
   if AActiveBindSourceAdapter.TypeOfCollection = TioTypeOfCollection.tcSingleObject then
@@ -477,22 +438,22 @@ begin
     AActiveBindSourceAdapter.Post;
   // Set anonimous methods then execute
   LExecuteMethod := TioCommonBSAAnonymousMethodsFactory.GetPersistAllExecuteMethod(AActiveBindSourceAdapter);
-  LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetNotifyTerminateMethod(AActiveBindSourceAdapter);
-  _Execute(AActiveBindSourceAdapter.AsyncPersist, LExecuteMethod, LTerminateMethod);
+  LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetNotifyOnSuccessMethod(AActiveBindSourceAdapter);
+  TioFunc<TObject>.Invoke(AActiveBindSourceAdapter.AsyncPersist, LExecuteMethod, LTerminateMethod, nil, True);
 end;
 
 class procedure TioCommonBSAPersistence.PersistCurrent(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 var
-  LExecuteMethod: TioCommonBSAPersistenceThreadExecute;
-  LTerminateMethod: TioCommonBSAPersistenceThreadOnTerminate;
+  LExecuteMethod: TioAsyncFuncExecute<TObject>;
+  LTerminateMethod: TioAsyncFuncOnSuccess<TObject>;
 begin
   // if editing the post
   if AActiveBindSourceAdapter.State in seEditModes then
     AActiveBindSourceAdapter.Post;
   // Set anonimous methods then execute
   LExecuteMethod := TioCommonBSAAnonymousMethodsFactory.GetPersistCurrentExecuteMethod(AActiveBindSourceAdapter);
-  LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetNotifyTerminateMethod(AActiveBindSourceAdapter);
-  _Execute(AActiveBindSourceAdapter.AsyncPersist, LExecuteMethod, LTerminateMethod);
+  LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetNotifyOnSuccessMethod(AActiveBindSourceAdapter);
+  TioFunc<TObject>.Invoke(AActiveBindSourceAdapter.AsyncPersist, LExecuteMethod, LTerminateMethod, nil, True);
 end;
 
 class procedure TioCommonBSAPersistence.Post(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
@@ -520,27 +481,10 @@ begin
   end;
 end;
 
-class procedure TioCommonBSAPersistence._SyncExecute(AExecuteMethod: TioCommonBSAPersistenceThreadExecute;
-  ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
-var
-  LResultValue: TObject;
-begin
-  io.ShowWait;
-  try
-    // Execute core code
-    LResultValue := AExecuteMethod;
-    // Execute OnTerminate code
-    if Assigned(ATerminateMethod) then
-      ATerminateMethod(LResultValue);
-  finally
-    io.HideWait;
-  end;
-end;
-
 class procedure TioCommonBSAPersistence._LoadList(const AASync: Boolean; const ATypeName, ATypeAlias: String; const ALazy: Boolean; const ALazyProps: String;
-  AWhere: IioWhere; ATargetClass: TioClassRef; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+  AWhere: IioWhere; ATargetClass: TioClassRef; AOnSuccessMethod: TioAsyncFuncOnSuccess<TObject>);
 begin
-  _Execute(AASync,
+  TioFunc<TObject>.Invoke(AASync,
     function: TObject
     begin
       io.StartTransaction;
@@ -554,15 +498,15 @@ begin
         io.RollbackTransaction;
         raise;
       end;
-    end, ATerminateMethod);
+    end, AOnSuccessMethod, nil, True);
 end;
 
 // Load objects into an existing List
 // Note: This isn't a reload for lazy loading purposes but for paging (used in LoadPage method)
 class procedure TioCommonBSAPersistence._LoadToList(const AASync: Boolean; const ATypeName, ATypeAlias: String; const ALazy: Boolean; const ALazyProps: String;
-AWhere: IioWhere; ATargetList: TObject; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+AWhere: IioWhere; ATargetList: TObject; AOnSuccessMethod: TioAsyncFuncOnSuccess<TObject>);
 begin
-  _Execute(AASync,
+  TioFunc<TObject>.Invoke(AASync,
     function: TObject
     begin
       io.StartTransaction;
@@ -577,95 +521,35 @@ begin
         io.RollbackTransaction;
         raise;
       end;
-    end, ATerminateMethod);
+    end, AOnSuccessMethod, nil, True);
 end;
 
 // Load object into an existing instance
 // Note: This isn't a reload for lazy loading purposes
 class procedure TioCommonBSAPersistence._LoadToObject(const AASync: Boolean; const ATypeName, ATypeAlias: String; const ALazy: Boolean;
-const ALazyProps: String; AWhere: IioWhere; ATargetObject: TObject; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+const ALazyProps: String; AWhere: IioWhere; ATargetObject: TObject; AOnSuccessMethod: TioAsyncFuncOnSuccess<TObject>);
 begin
-  _Execute(AASync,
+  TioFunc<TObject>.Invoke(AASync,
     function: TObject
     begin
       Result := nil;
       io.Load(ATypeName, ATypeAlias).Lazy(ALazy).LazyProps(ALazyProps)._Where(AWhere).ClearListBefore.ToObject(ATargetObject);
-    end, ATerminateMethod);
+    end, AOnSuccessMethod, nil, True);
 end;
 
 class procedure TioCommonBSAPersistence._LoadObject(const AASync: Boolean; const ATypeName, ATypeAlias: String; const ALazy: Boolean; const ALazyProps: String;
-AWhere: IioWhere; ATerminateMethod: TioCommonBSAPersistenceThreadOnTerminate);
+AWhere: IioWhere; AOnSuccessMethod: TioAsyncFuncOnSuccess<TObject>);
 begin
-  _Execute(AASync,
+  TioFunc<TObject>.Invoke(AASync,
     function: TObject
     begin
       Result := io.Load(ATypeName, ATypeAlias).Lazy(ALazy).LazyProps(ALazyProps)._Where(AWhere).ToObject;
-    end, ATerminateMethod);
-end;
-
-{ TioCommonBSAPersistenceThread }
-
-constructor TioCommonBSAPersistenceThread.Create(AExecuteFunc: TioCommonBSAPersistenceThreadExecute;
-AOnTerminateProc: TioCommonBSAPersistenceThreadOnTerminate);
-begin
-  inherited Create(True);
-  FExecuteFunc := AExecuteFunc;
-  FOnTerminateProc := AOnTerminateProc;
-  FExceptionMessage := String.Empty;
-  FResultValue := nil;
-  Self.OnTerminate := OnTerminateEventHandler;
-  Self.FreeOnTerminate := True;
-end;
-
-procedure TioCommonBSAPersistenceThread.Execute;
-begin
-  inherited;
-  try
-    FResultValue := FExecuteFunc;
-  except
-    on E: Exception do
-    begin
-      FExceptionMessage := E.Message;
-      raise;
-    end;
-  end;
-end;
-
-procedure TioCommonBSAPersistenceThread.OnTerminateEventHandler(Sender: TObject);
-var
-  LExceptionMessage: String;
-begin
-  try
-    // If an exception was raised during the execution of the thread then load the error message into a local variable
-    //  (otherwise I had problems) and then raise a new exception with the same message so that it comes out to the user too.
-    // note: The new exception is raised decoupled with a Timer because I had problems otherwise.
-    if not FExceptionMessage.IsEmpty then
-    begin
-      io.HideWait;
-      LExceptionMessage := FExceptionMessage;
-      // TODO: uniGUI - Probabilmente ci saranno dei problemi con uniGUI, controllare
-      TioAnonymousTimer.Create(100, function: Boolean
-        begin
-          raise EioGenericException.Create(LExceptionMessage);
-        end);
-    end
-    else
-    // If everything went well, it executes the terminate anonymous method
-    if Assigned(FOnTerminateProc) then
-      FOnTerminateProc(FResultValue);
-  finally
-    io.HideWait;
-  end;
-end;
-
-function TioCommonBSAPersistenceThread.ResultValue: TObject;
-begin
-  Result := FResultValue;
+    end, AOnSuccessMethod, nil, True);
 end;
 
 { TioCommonBSAAnonymousMethodsFactory }
 
-class function TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioCommonBSAPersistenceThreadExecute;
+class function TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioAsyncFuncExecute<TObject>;
 var
   LID: Integer;
   LDataObj: TObject;
@@ -724,8 +608,8 @@ end;
 //    end;
 //end;
 
-class function TioCommonBSAAnonymousMethodsFactory.GetDeleteTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter)
-  : TioCommonBSAPersistenceThreadOnTerminate;
+class function TioCommonBSAAnonymousMethodsFactory.GetDeleteOnSuccessMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter)
+  : TioAsyncFuncOnSuccess<TObject>;
 begin
   Result := procedure(AResultValue: TObject)
     begin
@@ -734,8 +618,8 @@ begin
     end;
 end;
 
-class function TioCommonBSAAnonymousMethodsFactory.GetNotifyTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter)
-  : TioCommonBSAPersistenceThreadOnTerminate;
+class function TioCommonBSAAnonymousMethodsFactory.GetNotifyOnSuccessMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter)
+  : TioAsyncFuncOnSuccess<TObject>;
 begin
   Result := procedure(AResultValue: TObject)
     begin
@@ -744,8 +628,7 @@ begin
     end;
 end;
 
-class function TioCommonBSAAnonymousMethodsFactory.GetPersistAllExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter)
-  : TioCommonBSAPersistenceThreadExecute;
+class function TioCommonBSAAnonymousMethodsFactory.GetPersistAllExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioAsyncFuncExecute<TObject>;
 begin
   Result := function: TObject
     begin
@@ -755,7 +638,7 @@ begin
 end;
 
 class function TioCommonBSAAnonymousMethodsFactory.GetPersistCurrentExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter)
-  : TioCommonBSAPersistenceThreadExecute;
+  : TioAsyncFuncExecute<TObject>;
 var
   LMasterBindSource: IioMasterBindSource;
   LDataObj: TObject;
@@ -848,8 +731,8 @@ begin
     end;
 end;
 
-class function TioCommonBSAAnonymousMethodsFactory.GetProgressiveLoadPageTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter)
-  : TioCommonBSAPersistenceThreadOnTerminate;
+class function TioCommonBSAAnonymousMethodsFactory.GetProgressiveLoadPageOnSuccessMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter)
+  : TioAsyncFuncOnSuccess<TObject>;
 begin
   Result := procedure(AResultValue: TObject)
     begin
@@ -858,8 +741,8 @@ begin
     end;
 end;
 
-class function TioCommonBSAAnonymousMethodsFactory.GetReloadTerminateMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean)
-  : TioCommonBSAPersistenceThreadOnTerminate;
+class function TioCommonBSAAnonymousMethodsFactory.GetReloadOnSuccessMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ANotify: Boolean)
+  : TioAsyncFuncOnSuccess<TObject>;
 begin
   Result := procedure(AResultValue: TObject)
     var
