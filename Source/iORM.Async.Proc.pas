@@ -18,7 +18,7 @@ type
 
   TioSyncProc = class
   public
-    class procedure Invoke(const AOnExecute: TioAsyncProcExecute; const AOnSuccess: TioAsyncProcOnSuccess; const AOnException: TioAsyncProcOnException; const AShowWait: Boolean = False); inline;
+    class procedure Invoke(const AOnExecute: TioAsyncProcExecute; const AOnSuccess: TioAsyncProcOnSuccess; const AOnException: TioAsyncProcOnException; const AShowWait: Boolean = False);
   end;
 
   TioAsyncProc = class(TThread)
