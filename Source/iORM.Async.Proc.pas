@@ -64,10 +64,7 @@ begin
     FOnExecuteMethod;
   except
     on E: Exception do
-    begin
       FException := AcquireExceptionObject as Exception;
-      raise;
-    end;
   end;
 end;
 

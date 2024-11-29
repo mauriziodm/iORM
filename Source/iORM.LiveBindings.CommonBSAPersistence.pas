@@ -562,6 +562,7 @@ begin
         // Delete the DataObj and if a conflict exception is raised then invoke the BindSOurce onDeleteConflictException
         //  event handler (if the event handler is assigned)
         try
+          LID := Trunc(5 / 0);
           io.DeleteObject(LDataObj);
         except
           // Try to resolve the unresolved conflict (raise) invoking the BindSource.OnDeleteConflictException event handler if assigned
@@ -634,6 +635,7 @@ var
   LMasterBindSource: IioMasterBindSource;
   LDataObj: TObject;
   LConflictResolved: Boolean;
+  LX: Integer;
 begin
   // Save into local variables to avoid multithread resource access inconsistency problems
   // TODO:  Multithread - Accesso all'oggetto da persistere non protetto in caso di Async = True
@@ -641,6 +643,7 @@ begin
   // Build the anonimous method
   Result := procedure
     begin
+      LX := Trunc(5 / 0);
       // Continues only if there is a BindSource connected and it is a MasterBindSource
       if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioMasterBindSource, LMasterBindSource) then
       begin

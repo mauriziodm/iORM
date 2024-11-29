@@ -47,6 +47,7 @@ type
   private
     // fields
     FActive: Boolean;
+    FAsync: Boolean;
     FConnectionName: String;
     // authorize events
     FAfterAuthorizeAccess: TioAfterAuthorizeAccessEvent;
@@ -89,6 +90,7 @@ type
     procedure _AuthorizeAppRequestUserAuthCode(const AAppCredentials: IioAuthAppCredentials);
     function _AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
     procedure _CheckActive; inline;
+    procedure _FillSessionData(const ASession: IioAuthSession; const AAuthResponse: IioAuthResponse);
     function _IsLoggedOn(const ASession: IioAuthSession): Boolean;
     procedure _RaiseAlreadyLoggedOnException(const ASession: IioAuthSession);
     function _NeedRefresh(const ASession: IioAuthSession): Boolean;
@@ -106,7 +108,8 @@ type
     function UserLogin(const AUserCredentials: IioAuthUserCredentials): Boolean;
   published
     // properties
-    property Active: Boolean read FActive write FActive;
+    property Active: Boolean read FActive write FActive default True;
+    property Async: Boolean read FAsync write FAsync default False;
     property ConnectionName: String read FConnectionName write FConnectionName;
     property _Version: String read Get_Version;
     // authorize events
@@ -308,13 +311,12 @@ begin
   if Assigned(FAfterAuthorizeUser) then
     FAfterAuthorizeUser(Self, AUserCredentials, LAuthResponse);
   // if authorized then update session props (else raise an exception)
-  if LAuthResponse.IsAuth and LAuthResponse.HasUsrTkn then
+  //  note: it might be that the auth server immediately provides the access token
+  //        (and also the refresh token) without providing any user token/authcode
+  if LAuthResponse.IsAuth then
   begin
     ASession.Clear;
-    ASession.UserToken := LAuthResponse.UsrTkn;
-    ASession.UserTokenExp := LAuthResponse.UsrExp;
-    ASession.User := LAuthResponse.Usr;
-    ASession.UserOID := LAuthResponse.UsrOID;
+    _FillSessionData(ASession, LAuthResponse);
   end
   else
     raise EioAuthInvalidCredentialsException_401.Create('Invalid user credentials');
@@ -324,6 +326,34 @@ procedure TioAuthClient._CheckActive;
 begin
   if not FActive then
     raise EioAuthComponentNotEnabled_404.Create(Format('Component "%s" is not active', [Name]));
+end;
+
+procedure TioAuthClient._FillSessionData(const ASession: IioAuthSession; const AAuthResponse: IioAuthResponse);
+begin
+  // fill user data
+  if AAuthResponse.HasUser then
+    ASession.User := AAuthResponse.Usr;
+  if AAuthResponse.HasUserOID then
+    ASession.UserOID := AAuthResponse.UsrOID;
+  // fill user token/authcode data
+  if AAuthResponse.HasUsrTkn then
+  begin
+    ASession.UserToken := AAuthResponse.UsrTkn;
+    ASession.UserTokenExp := AAuthResponse.UsrExp;
+  end;
+  // fill access token data
+  if AAuthResponse.HasAccTkn then
+  begin
+    ASession.AccessToken := AAuthResponse.AccTkn;
+    ASession.AccessTokenExp := AAuthResponse.AccExp;
+    ASession.RefreshAfter := AAuthResponse.RefAft;
+  end;
+  // fill refresh token data
+  if AAuthResponse.HasRefTkn then
+  begin
+    ASession.RefreshToken := AAuthResponse.RefTkn;
+    ASession.RefreshTokenExp := AAuthResponse.RefExp;
+  end;
 end;
 
 function TioAuthClient.AppLogin(const AAppCredentials: IioAuthAppCredentials): Boolean;
@@ -438,6 +468,7 @@ constructor TioAuthClient.Create(AOwner: TComponent);
 begin
   inherited;
   FActive := True;
+  FAsync := False;
   FConnectionName := String.Empty;
   // Set the singleton internal reference to itself (one only auth server at a time)
   TioAuthClient.FInstance := Self;
@@ -582,6 +613,10 @@ begin
   if Assigned(FAfterNewAccessToken) then
     FAfterNewAccessToken(Self, ASession, LAuthResponse);
   // if authorized then update session props (else raise an exception)
+
+
+
+
   if LAuthResponse.IsAuth and LAuthResponse.HasAccTkn then
   begin
     ASession.AccessToken := LAuthResponse.AccTkn;

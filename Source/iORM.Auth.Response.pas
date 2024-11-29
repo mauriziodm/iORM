@@ -58,7 +58,11 @@ type
   public
     constructor Create;
     constructor CreateByString(const AValue: String);
+    function HasUser: Boolean;
+    function HasUserOID: Boolean;
     function HasUsrTkn: Boolean;
+    function HasApp: Boolean;
+    function HasAppOID: Boolean;
     function HasAppTkn: Boolean;
     function HasRefTkn: Boolean;
     function HasAccTkn: Boolean;
@@ -191,22 +195,42 @@ end;
 
 function TioAuthResponse.HasAccTkn: Boolean;
 begin
-  Result := FAccTkn = IO_STRING_NULL_VALUE;
+  Result := FAccTkn <> IO_STRING_NULL_VALUE;
+end;
+
+function TioAuthResponse.HasApp: Boolean;
+begin
+  Result := FApp <> IO_STRING_NULL_VALUE;
+end;
+
+function TioAuthResponse.HasAppOID: Boolean;
+begin
+  Result := FAppOID <> IO_INTEGER_NULL_VALUE;
 end;
 
 function TioAuthResponse.HasAppTkn: Boolean;
 begin
-  Result := FAppTkn = IO_STRING_NULL_VALUE;
+  Result := FAppTkn <> IO_STRING_NULL_VALUE;
 end;
 
 function TioAuthResponse.HasRefTkn: Boolean;
 begin
-  Result := FRefTkn = IO_STRING_NULL_VALUE;
+  Result := FRefTkn <> IO_STRING_NULL_VALUE;
+end;
+
+function TioAuthResponse.HasUser: Boolean;
+begin
+  Result := FUsr <> IO_STRING_NULL_VALUE;
+end;
+
+function TioAuthResponse.HasUserOID: Boolean;
+begin
+  Result := FUsrOID <> IO_INTEGER_NULL_VALUE;
 end;
 
 function TioAuthResponse.HasUsrTkn: Boolean;
 begin
-  Result := FUsrTkn = IO_STRING_NULL_VALUE;
+  Result := FUsrTkn <> IO_STRING_NULL_VALUE;
 end;
 
 procedure TioAuthResponse.SetAccExp(const Value: TDateTime);
