@@ -130,14 +130,14 @@ begin
     else
       raise EioHttpLocalException.Create(ClassName, 'Execute', Format('Method "%s" not found.', [LioRequestBody.MethodName]));
     // Return the response
-    Result := LioResponseBody.ToJSONText;
+    Result := LioResponseBody.AsString;
   except
     on E: Exception do
     begin
       LioResponseBody.ExceptionClassName := E.ClassName;
       LioResponseBody.ExceptionMessage := E.Message;
       // Return the response
-      Result := LioResponseBody.ToJSONText;
+      Result := LioResponseBody.AsString;
     end;
   end;
 end;

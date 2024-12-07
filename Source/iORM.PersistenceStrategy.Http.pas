@@ -67,10 +67,10 @@ type
     class function _DoMax(const AWhere: IioWhere; const APropertyName: String): Integer; override;
     class function _DoMin(const AWhere: IioWhere; const APropertyName: String): Integer; override;
     // Transaction
-    class procedure _DoStartTransaction(const AConnectionName: String); override;
-    class procedure _DoCommitTransaction(const AConnectionName: String); override;
-    class procedure _DoRollbackTransaction(const AConnectionName: String); override;
-    class function _DoInTransaction(const AConnectionName: String): boolean; override;
+    class procedure _DoStartTransaction(const AConnectionDefName: String); override;
+    class procedure _DoCommitTransaction(const AConnectionDefName: String); override;
+    class procedure _DoRollbackTransaction(const AConnectionDefName: String); override;
+    class function _DoInTransaction(const AConnectionDefName: String): boolean; override;
     // SynchroStrategy
     class procedure _DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload); override;
     // SQLDestinations
@@ -513,10 +513,10 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyHttp._DoStartTransaction(const AConnectionName: String);
+class procedure TioPersistenceStrategyHttp._DoStartTransaction(const AConnectionDefName: String);
 begin
   inherited;
-  TioDBFactory.Connection(AConnectionName).StartTransaction;
+  TioDBFactory.Connection(AConnectionDefName).StartTransaction;
 end;
 
 class function TioPersistenceStrategyHttp._DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
@@ -667,22 +667,22 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyHttp._DoCommitTransaction(const AConnectionName: String);
+class procedure TioPersistenceStrategyHttp._DoCommitTransaction(const AConnectionDefName: String);
 begin
   inherited;
-  TioDBFactory.Connection(AConnectionName).Commit;
+  TioDBFactory.Connection(AConnectionDefName).Commit;
 end;
 
-class procedure TioPersistenceStrategyHttp._DoRollbackTransaction(const AConnectionName: String);
+class procedure TioPersistenceStrategyHttp._DoRollbackTransaction(const AConnectionDefName: String);
 begin
   inherited;
-  TioDBFactory.Connection(AConnectionName).Rollback;
+  TioDBFactory.Connection(AConnectionDefName).Rollback;
 end;
 
-class function TioPersistenceStrategyHttp._DoInTransaction(const AConnectionName: String): boolean;
+class function TioPersistenceStrategyHttp._DoInTransaction(const AConnectionDefName: String): boolean;
 begin
   inherited;
-  Result := TioDBFactory.Connection(AConnectionName).InTransaction;
+  Result := TioDBFactory.Connection(AConnectionDefName).InTransaction;
 end;
 
 end.

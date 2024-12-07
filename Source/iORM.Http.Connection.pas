@@ -116,9 +116,9 @@ begin
   FRESTRequest.ClearBody;
   FioHttpRequestBody.MethodName := AMethodName;
   if FAsJsonRpc then
-    FRESTRequest.AddBody(WrapBodyAsJsonRpcRequest(FioHttpRequestBody.ToJSONText), ctAPPLICATION_JSON)
+    FRESTRequest.AddBody(WrapBodyAsJsonRpcRequest(FioHttpRequestBody.AsString), ctAPPLICATION_JSON)
   else
-    FRESTRequest.AddBody(FioHttpRequestBody.ToJSONText, ctAPPLICATION_JSON);
+    FRESTRequest.AddBody(FioHttpRequestBody.AsString, ctAPPLICATION_JSON);
   // Send/Execute the request
   FRESTRequest.Execute;
   // Create and set the ioRESTResponseBody
@@ -187,7 +187,7 @@ end;
 
 function TioConnectionHttp.WrapBodyAsJsonRpcRequest(const AJSONText: String): String;
 begin
-  Result := Format('{"jsonrpc": "2.0", "method": "execute_action", "params": ["%s"], "id": %d}', [FioHttpRequestBody.ToJSONText, Random(1000)]);
+  Result := Format('{"jsonrpc": "2.0", "method": "execute_action", "params": ["%s"], "id": %d}', [FioHttpRequestBody.AsString, Random(1000)]);
 end;
 
 end.

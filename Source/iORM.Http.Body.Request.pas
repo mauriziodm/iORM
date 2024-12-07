@@ -44,24 +44,22 @@ type
   // TODO: Servono proprio i nullable? Si potrebbe toglierli e tornare a tipi normali?
   TioHttpRequestBody = class(TInterfacedObject, IioHttpRequestBody)
   private
-    // session
-    FUserID: Integer;
-    FUserName: String;
+    // session subjects
+    FSubjects: IioAuthSessionSubjects;
     // auth
     FAuthIntention: TioAuthIntention;
     FAuthScope: String;
-    FAuthToken: String;
+    FAuthToken: String; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
     // others
     FBlindLevel: Byte;
     FIntentType: TioPersistenceIntentType;
-    FJSONDataValue: TJSONValue;
+    FJSONDataValue: TJSONValue; // for auth purposes -> Credentials (without CodeVerifier/CodeChallenge)
     FMethodName: String;
     FRelationOID: Integer;
     FRelationPropertyName: String;
     FSQLDestination: IioSQLDestination;
     FWhere: IioWhere;
     // methods
-    procedure Clear;
     function GetAuthIntention: TioAuthIntention;
     function GetAuthScope: String;
     function GetAuthToken: String;
@@ -73,8 +71,7 @@ type
     function GetRelationOID: Integer;
     function GetRelationPropertyName: String;
     function GetSQLDestination: IioSQLDestination;
-    function GetUserID: Integer;
-    function GetUserName: String;
+    function GetSubjects: IioAuthSessionSubjects;
     function GetWhere: IioWhere;
     procedure SetAuthIntention(const Value: TioAuthIntention);
     procedure SetAuthScope(const Value: String);
@@ -87,25 +84,25 @@ type
     procedure SetRelationOID(const Value: Integer);
     procedure SetRelationPropertyName(const Value: String);
     procedure SetSQLDestination(const Value: IioSQLDestination);
-    procedure SetUserID(const Value: Integer);
-    procedure SetUserName(const Value: String);
     procedure SetWhere(const Value: IioWhere);
-    function ToJSONText: String;
   public
     constructor Create;
     constructor CreateByJSONString(const AJSONString:String);
+    function AsString: String;
+    procedure Clear;
   end;
 
 implementation
 
 uses
-  System.SysUtils, DJSON;
+  System.SysUtils, DJSON, iORM.Auth.Factory;
 
 { TioHttpRequestBody }
 
 constructor TioHttpRequestBody.Create;
 begin
   inherited Create;
+  FSubjects := TioAuthFactory.NewAuthSessionSubjects;
   Clear;
 end;
 
@@ -118,14 +115,10 @@ begin
   LJSONObject := TJSONObject.ParseJSONValue(AJSONString) as TJSONObject;
   try
     // ---------- session ----------
-    // UserID
-    LJSONValue := LJSONObject.GetValue(KEY_SESSION_USERID);
+    // Subjects
+    LJSONValue := LJSONObject.GetValue(KEY_SESSION_SUBJECTS);
     if Assigned(LJSONValue) then
-      FUserID := (LJSONValue as TJSONNumber).AsInt;
-    // UserName
-    LJSONValue := LJSONObject.GetValue(KEY_SESSION_USERNAME);
-    if Assigned(LJSONValue) then
-      FUserName := LJSONValue.Value;
+      FSubjects.FromString(LJSONValue.Value);
     // ---------- auth ----------
     // AuthIntention
     LJSONValue := LJSONObject.GetValue(KEY_AUTH_INTENTION);
@@ -186,9 +179,8 @@ end;
 
 procedure TioHttpRequestBody.Clear;
 begin
-  // session
-  FUserID := IO_INTEGER_NULL_VALUE;
-  FUserName := IO_STRING_NULL_VALUE;
+  // session subjects
+  FSubjects.Clear;
   // auth
   FAuthIntention := aiRead;
   FAuthScope := IO_STRING_NULL_VALUE;
@@ -262,14 +254,9 @@ begin
   Result := FSQLDestination;
 end;
 
-function TioHttpRequestBody.GetUserID: Integer;
+function TioHttpRequestBody.GetSubjects: IioAuthSessionSubjects;
 begin
-  Result := FUserID;
-end;
-
-function TioHttpRequestBody.GetUserName: String;
-begin
-  Result := FUserName;
+  Result := FSubjects;
 end;
 
 function TioHttpRequestBody.GetWhere: IioWhere;
@@ -335,39 +322,30 @@ begin
   FSQLDestination := Value;
 end;
 
-procedure TioHttpRequestBody.SetUserID(const Value: Integer);
-begin
-  FUserID := Value;
-end;
-
-procedure TioHttpRequestBody.SetUserName(const Value: String);
-begin
-  FUserName := Value;
-end;
-
 procedure TioHttpRequestBody.SetWhere(const Value: IioWhere);
 begin
   FWhere := Value;
 end;
 
-function TioHttpRequestBody.ToJSONText: String;
+function TioHttpRequestBody.AsString: String;
 var
   LJSONObject: TJSONObject;
 begin
   LJSONObject := TJSONObject.Create;
   try
     // ---------- session ----------
-    // UserID
-    LJSONObject.AddPair(KEY_SESSION_USERID, FUserID);
-    // UserName
-    LJSONObject.AddPair(KEY_SESSION_USERNAME, FUserName);
+    // Subjects
+    if not FSubjects.IsEmpty then
+      LJSONObject.AddPair(KEY_SESSION_SUBJECTS, FSubjects.AsString);
     // ---------- auth ----------
     // AuthIntention
     LJSONObject.AddPair(KEY_AUTH_INTENTION, Ord(FAuthIntention));
     // AuthScope
-    LJSONObject.AddPair(KEY_AUTH_SCOPE, FAuthScope);
+    if FAuthScope <> IO_STRING_NULL_VALUE then
+      LJSONObject.AddPair(KEY_AUTH_SCOPE, FAuthScope);
     // AuthToken
-    LJSONObject.AddPair(KEY_AUTH_TOKEN, FAuthToken);
+    if FAuthToken <> IO_STRING_NULL_VALUE then
+      LJSONObject.AddPair(KEY_AUTH_TOKEN, FAuthToken);
     // ---------- others ----------
     // BlindLevel
     LJSONObject.AddPair(KEY_BLINDLEVEL, FBlindLevel);
@@ -378,13 +356,17 @@ begin
     // MethodName
     LJSONObject.AddPair(KEY_METHODNAME, FMethodName);
     // RelationOID
-    LJSONObject.AddPair(KEY_RELATIONOID, FRelationOID);
+    if FRelationOID <> IO_INTEGER_NULL_VALUE then
+      LJSONObject.AddPair(KEY_RELATIONOID, FRelationOID);
     // RelationPropertyName
-    LJSONObject.AddPair(KEY_RELATIONPROPERTYNAME, FRelationPropertyName);
+    if FRelationPropertyName <> IO_STRING_NULL_VALUE then
+      LJSONObject.AddPair(KEY_RELATIONPROPERTYNAME, FRelationPropertyName);
     // SQLDestination
-    LJSONObject.AddPair(KEY_SQLDESTINATION, dj.From(FSQLDestination).byFields.TypeAnnotationsON.ToJsonValue);
+    if Assigned(FSQLDestination) then
+      LJSONObject.AddPair(KEY_SQLDESTINATION, dj.From(FSQLDestination).byFields.TypeAnnotationsON.ToJsonValue);
     // Where
-    LJSONObject.AddPair(KEY_WHERE, dj.From(FWhere).byFields.TypeAnnotationsON.ToJsonValue);
+    if Assigned(FWhere) then
+      LJSONObject.AddPair(KEY_WHERE, dj.From(FWhere).byFields.TypeAnnotationsON.ToJsonValue);
     // ---------- end ----------
     // Result JSONObject as string
     Result := LJSONObject.ToString;

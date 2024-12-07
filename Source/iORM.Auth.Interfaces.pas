@@ -49,37 +49,30 @@ type
   TioAuthPermissionLevel = (plUnauthorized, plRead, plReadWrite, plReadWriteDelete);
   TioAuthAccessTokenNeedRefreshCheckMode = (nrNever, nrByClient, nrByServer);
   TioAuthCredentialsMode = (cmLogin, cmSetPassword, cmChangePassword);
-  TioAuthCredentialsClearMode = (cmAll, cmSecretsOnly);
 
   IioAuthResponse = interface
     ['{BB322BD7-DD1C-49B2-A55D-F323749B8D32}']
     function GetAccTkn: String;
     function GetAccExp: TDateTime;
     function GetApp: String;
-    function GetAppTkn: String;
-    function GetAppExp: TDateTime;
     function GetAppOID: Integer;
+    function GetAutGnt: String;
     function GetIsAuth: Boolean;
     function GetRefAft: TDateTime;
     function GetRefTkn: String;
     function GetRefExp: TDateTime;
     function GetUsr: String;
-    function GetUsrTkn: String;
-    function GetUsrExp: TDateTime;
     function GetUsrOID: Integer;
     procedure SetAccTkn(const Value: String);
     procedure SetAccExp(const Value: TDateTime);
     procedure SetApp(const Value: String);
-    procedure SetAppTkn(const Value: String);
-    procedure SetAppExp(const Value: TDateTime);
     procedure SetAppOID(const Value: Integer);
+    procedure SetAutGnt(const Value: String);
     procedure SetIsAuth(const Value: Boolean);
     procedure SetRefAft(const Value: TDateTime);
     procedure SetRefTkn(const Value: String);
     procedure SetRefExp(const Value: TDateTime);
     procedure SetUsr(const Value: String);
-    procedure SetUsrTkn(const Value: String);
-    procedure SetUsrExp(const Value: TDateTime);
     procedure SetUsrOID(const Value: Integer);
     // methods
     function HasUser: Boolean;
@@ -88,19 +81,16 @@ type
     function HasApp: Boolean;
     function HasAppOID: Boolean;
     function HasAppTkn: Boolean;
+    function HasAutGnt: Boolean;
     function HasRefTkn: Boolean;
     function HasAccTkn: Boolean;
     function AsString: String;
     // properties
     property IsAuth: Boolean read GetIsAuth write SetIsAuth;
     // user
-    property UsrTkn: String read GetUsrTkn write SetUsrTkn;
-    property UsrExp: TDateTime read GetUsrExp write SetUsrExp;
     property Usr: String read GetUsr write SetUsr;
     property UsrOID: Integer read GetUsrOID write SetUsrOID;
     // app
-    property AppTkn: String read GetAppTkn write SetAppTkn;
-    property AppExp: TDateTime read GetAppExp write SetAppExp;
     property App: String read GetApp write SetApp;
     property AppOID: Integer read GetAppOID write SetAppOID;
     // refresh
@@ -112,60 +102,50 @@ type
     property RefAft: TDateTime read GetRefAft write SetRefAft;
   end;
 
+  IioAuthSessionSubjects = interface
+    ['{DE6E7EDA-BEE0-4F8A-A12F-2A99E63D8EC5}']
+    procedure Assign(const ASource: IioAuthSessionSubjects);
+    function AsString: String;
+    procedure Clear;
+    function IsEmpty: Boolean;
+    procedure FromString(const Value: String);
+    function GetAppOID: Integer;
+    function GetApp: String;
+    function GetUserOID: Integer;
+    function GetUser: String;
+    procedure SetAppOID(const Value: Integer);
+    procedure SetApp(const Value: String);
+    procedure SetUserOID(const Value: Integer);
+    procedure SetUser(const Value: String);
+    property App: String read GetApp write SetApp;
+    property AppOID: Integer read GetAppOID write SetAppOID;
+    property User: String read GetUser write SetUser;
+    property UserOID: Integer read GetUserOID write SetUserOID;
+  end;
+
   IioAuthSession = interface
     ['{AEC7DF37-A5C0-44E3-9D64-32216758506B}']
     procedure Clear;
     function GetAccessToken: String;
     function GetAccessTokenExp: TDateTime;
     function GetAccessTokenIsExpired: Boolean;
-    function GetAppToken: String;
-    function GetAppTokenExp: TDateTime;
-    function GetAppTokenIsExpired: Boolean;
-    function GetAppOID: Integer;
-    function GetApp: String;
     function GetConnectionName: String;
     function GetHasAccessToken: Boolean;
-    function GetHasAppToken: Boolean;
     function GetHasRefreshToken: Boolean;
-    function GetHasUserToken: Boolean;
     function GetNeedRefresh: Boolean;
     function GetRefreshAfter: TDateTime;
     function GetRefreshToken: String;
     function GetRefreshTokenExp: TDateTime;
     function GetRefreshTokenIsExpired: Boolean;
-    function GetUserToken: String;
-    function GetUserTokenExp: TDateTime;
-    function GetUserTokenIsExpired: Boolean;
-    function GetUserOID: Integer;
-    function GetUser: String;
+    function GetSubjects: IioAuthSessionSubjects;
     procedure SetAccessToken(const Value: String);
     procedure SetAccessTokenExp(const Value: TDateTime);
-    procedure SetAppToken(const Value: String);
-    procedure SetAppTokenExp(const Value: TDateTime);
-    procedure SetAppOID(const Value: Integer);
-    procedure SetApp(const Value: String);
     procedure SetConnectionName(const Value: String);
     procedure SetRefreshAfter(const Value: TDateTime);
     procedure SetRefreshToken(const Value: String);
     procedure SetRefreshTokenExp(const Value: TDateTime);
-    procedure SetUserToken(const Value: String);
-    procedure SetUserTokenExp(const Value: TDateTime);
-    procedure SetUserOID(const Value: Integer);
-    procedure SetUser(const Value: String);
-    // user
-    property UserToken: String read GetUserToken write SetUserToken;
-    property UserTokenExp: TDateTime read GetUserTokenExp write SetUserTokenExp;
-    property UserTokenIsExpired: Boolean read GetUserTokenIsExpired;
-    property User: String read GetUser write SetUser;
-    property UserOID: Integer read GetUserOID write SetUserOID;
-    property HasUserToken: Boolean read GetHasUserToken;
-    // app
-    property AppToken: String read GetAppToken write SetAppToken;
-    property AppTokenExp: TDateTime read GetAppTokenExp write SetAppTokenExp;
-    property AppTokenIsExpired: Boolean read GetAppTokenIsExpired;
-    property App: String read GetApp write SetApp;
-    property AppOID: Integer read GetAppOID write SetAppOID;
-    property HasAppToken: Boolean read GetHasAppToken;
+    // subjects (user, app)
+    property Subjects: IioAuthSessionSubjects read GetSubjects;
     // refresh
     property RefreshToken: String read GetRefreshToken write SetRefreshToken;
     property RefreshTokenExp: TDateTime read GetRefreshTokenExp write SetRefreshTokenExp;
@@ -203,13 +183,10 @@ type
   IioAuthAppCredentials = interface
     ['{1714A188-B473-4114-8648-8EF6D4CBE084}']
     function GetAppID: String;
-    function GetAppName: String;
     function GetAppSecret: String;
     procedure SetAppID(const Value: String);
-    procedure SetAppName(const Value: String);
     procedure SetAppSecret(const Value: String);
     // properties
-    property AppName: String read GetAppName write SetAppName;
     property AppID: String read GetAppID write SetAppID;
     property AppSecret: String read GetAppSecret write SetAppSecret;
   end;
@@ -315,13 +292,10 @@ type
     function ResetCredentials(const AGenerateOTP: Boolean = True; const AOTPDurationMins: Integer = AUTH_OTP_DURATION_MIN): String;
     // ---------- can be ovverrided ----------
     function GetAppID: String;
-    function GetAppName: String;
     function GetAppSecret: String;
     procedure SetAppID(const Value: String);
-    procedure SetAppName(const Value: String);
     procedure SetAppSecret(const Value: String);
     // properties
-    property AppName: String read GetAppName write SetAppName;
     property AppID: String read GetAppID write SetAppID;
     property AppSecret: String read GetAppSecret write SetAppSecret;
   end;

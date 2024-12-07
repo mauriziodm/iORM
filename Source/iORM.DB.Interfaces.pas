@@ -54,8 +54,7 @@ const
   OBJVERSION_NULL = 0;
   TRANSACTION_TIMESTAMP_NULL = 0;
 
-  KEY_SESSION_USERID = 'UserID';
-  KEY_SESSION_USERNAME = 'UserName';
+  KEY_SESSION_SUBJECTS = 'Subjects';
   KEY_AUTH_INTENTION = 'AuthIntention';
   KEY_AUTH_SCOPE = 'AuthScope';
   KEY_AUTH_TOKEN = 'AuthToken';
@@ -353,16 +352,11 @@ type
   IioHttpRequestBody = interface
     ['{83DE9ECE-47EA-4814-B40E-3E39FAA210A2}']
     procedure Clear;
-    function ToJsonText: String;
+    function AsString: String;
     // ---------- session ----------
-    // UserID
-    procedure SetUserID(const Value: Integer);
-    function GetUserID: Integer;
-    property UserID: Integer read GetUserID write SetUserID;
-    // UserName
-    procedure SetUserName(const Value: String);
-    function GetUserName: String;
-    property UserName: String read GetUserName write SetUserName;
+    // Subjects
+    function GetSubjects: IioAuthSessionSubjects;
+    property Subjects: IioAuthSessionSubjects read GetSubjects;
     // ---------- auth ----------
     // AuthIntention
     procedure SetAuthIntention(const Value: TioAuthIntention);
@@ -372,7 +366,7 @@ type
     procedure SetAuthScope(const Value: String);
     function GetAuthScope: String;
     property AuthScope: String read GetAuthScope write SetAuthScope;
-    // AuthToken
+    // AuthToken (for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge)
     procedure SetAuthToken(const Value: String);
     function GetAuthToken: String;
     property AuthToken: String read GetAuthToken write SetAuthToken;
@@ -385,11 +379,11 @@ type
     procedure SetIntentType(const Value: TioPersistenceIntentType);
     function GetIntentType: TioPersistenceIntentType;
     property IntentType: TioPersistenceIntentType read GetIntentType write SetIntentType;
-    // JSONDataValue
+    // JSONDataValue (for auth purposes -> Credentials (without CodeVerifier/CodeChallenge))
     procedure SetJSONDataValue(const Value: TJSONValue);
     function GetJSONDataValue: TJSONValue;
     property JSONDataValue: TJSONValue read GetJSONDataValue write SetJSONDataValue;
-    // JSONDataValueAsObject
+    // JSONDataValueAsObject (for auth purposes -> Credentials (without CodeVerifier/CodeChallenge))
     procedure SetJSONDataValueAsObject(const AObj: TObject);
     function GetJSONDataValueAsObject: TObject;
     property JSONDataValueAsObject: TObject read GetJSONDataValueAsObject write SetJSONDataValueAsObject;
@@ -419,7 +413,7 @@ type
   IioHttpResponseBody = interface
     ['{E5A14525-308F-4877-99B7-C270D691FC6D}']
     function ExceptionOccurred: Boolean;
-    function ToJsonText: String;
+    function AsString: String;
     // AuthResult 1
     procedure SetAuthResult1(const Value: String);
     function GetAuthResult1: String;
@@ -475,10 +469,10 @@ type
     class function _DoMax(const AWhere: IioWhere; const APropertyName: String): Integer; virtual;
     class function _DoMin(const AWhere: IioWhere; const APropertyName: String): Integer; virtual;
     // Transaction
-    class procedure _DoStartTransaction(const AConnectionName: String); virtual; abstract;
-    class procedure _DoCommitTransaction(const AConnectionName: String); virtual; abstract;
-    class procedure _DoRollbackTransaction(const AConnectionName: String); virtual; abstract;
-    class function _DoInTransaction(const AConnectionName: String): Boolean; virtual; abstract;
+    class procedure _DoStartTransaction(const AConnectionDefName: String); virtual; abstract;
+    class procedure _DoCommitTransaction(const AConnectionDefName: String); virtual; abstract;
+    class procedure _DoRollbackTransaction(const AConnectionDefName: String); virtual; abstract;
+    class function _DoInTransaction(const AConnectionDefName: String): Boolean; virtual; abstract;
     // SynchroStrategy
     class procedure _DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload); virtual; abstract;
     // SQLDestinations
@@ -504,10 +498,10 @@ type
       const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
     // ---------- End intercepted methods (StrategyInterceptors) ----------
     // Transaction
-    class procedure StartTransaction(const AConnectionName: String);
-    class procedure CommitTransaction(const AConnectionName: String);
-    class procedure RollbackTransaction(const AConnectionName: String);
-    class function InTransaction(const AConnectionName: String): Boolean;
+    class procedure StartTransaction(const AConnectionDefName: String);
+    class procedure CommitTransaction(const AConnectionDefName: String);
+    class procedure RollbackTransaction(const AConnectionDefName: String);
+    class function InTransaction(const AConnectionDefName: String): Boolean;
     // Persistence
     class procedure Delete(const AWhere: IioWhere);
     class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
@@ -943,9 +937,9 @@ begin
   Result := _DoAuth_RefreshAccessToken(AConnectionDefName, ARefreshToken);
 end;
 
-class procedure TioPersistenceStrategyIntf.CommitTransaction(const AConnectionName: String);
+class procedure TioPersistenceStrategyIntf.CommitTransaction(const AConnectionDefName: String);
 begin
-  _DoCommitTransaction(AConnectionName);
+  _DoCommitTransaction(AConnectionDefName);
 end;
 
 class function TioPersistenceStrategyIntf._DoCount(const AWhere: IioWhere): Integer;
@@ -1055,9 +1049,9 @@ begin
   _DoSynchronization(APayload);
 end;
 
-class function TioPersistenceStrategyIntf.InTransaction(const AConnectionName: String): Boolean;
+class function TioPersistenceStrategyIntf.InTransaction(const AConnectionDefName: String): Boolean;
 begin
-  Result := _DoInTransaction(AConnectionName);
+  Result := _DoInTransaction(AConnectionDefName);
 end;
 
 class procedure TioPersistenceStrategyIntf.LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
@@ -1177,9 +1171,9 @@ begin
 {$ENDREGION}
 end;
 
-class procedure TioPersistenceStrategyIntf.RollbackTransaction(const AConnectionName: String);
+class procedure TioPersistenceStrategyIntf.RollbackTransaction(const AConnectionDefName: String);
 begin
-  _DoRollbackTransaction(AConnectionName);
+  _DoRollbackTransaction(AConnectionDefName);
 end;
 
 class procedure TioPersistenceStrategyIntf.SQLDest_Execute(const ASQLDestination: IioSQLDestination);
@@ -1192,9 +1186,9 @@ begin
  _DoSQLDest_LoadDataSet(ASQLDestination, ADestDataSet);
 end;
 
-class procedure TioPersistenceStrategyIntf.StartTransaction(const AConnectionName: String);
+class procedure TioPersistenceStrategyIntf.StartTransaction(const AConnectionDefName: String);
 begin
-  _DoStartTransaction(AConnectionName);
+  _DoStartTransaction(AConnectionDefName);
 end;
 
 { TioConnectionInfo }

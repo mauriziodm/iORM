@@ -68,7 +68,7 @@ type
     procedure SetExceptionMessage(const Value: String);
     procedure SetJSONDataValue(const Value: TJSONValue);
     procedure SetJSONDataValueAsObject(const AObj: TObject);
-    function ToJSONText: String;
+    function AsString: String;
   public
     constructor Create;
     constructor CreateByJSONString(const AJSONString: String);
@@ -241,7 +241,7 @@ begin
     FJSONDataValue := dj.From(AObj).OpType(ssHTTP).byFields.TypeAnnotationsON.ToJsonValue;
 end;
 
-function TioHttpResponseBody.ToJSONText: String;
+function TioHttpResponseBody.AsString: String;
 var
   LJSONObject: TJSONObject;
   procedure _SaveStream;
@@ -258,22 +258,25 @@ var
       LStringStream.Free;
     end;
   end;
-
 begin
   LJSONObject := TJSONObject.Create;
   try
-    // ---------- session ----------
+    // ---------- auth ----------
     // AuthResultIsAuthorized
     LJSONObject.AddPair(KEY_AUTH_RESULT_ISAUTHORIZED, FAuthResultIsAuthorized);
     // AuthResult1
-    LJSONObject.AddPair(KEY_AUTH_RESULT1, FAuthResult1);
+    if FAuthResult1 <> IO_STRING_NULL_VALUE then
+      LJSONObject.AddPair(KEY_AUTH_RESULT1, FAuthResult1);
     // AuthResult2
-    LJSONObject.AddPair(KEY_AUTH_RESULT2, FAuthResult2);
+    if FAuthResult2 <> IO_STRING_NULL_VALUE then
+      LJSONObject.AddPair(KEY_AUTH_RESULT2, FAuthResult2);
     // ---------- others ----------
     // ExceptionClassName
-    LJSONObject.AddPair(KEY_EXCEPTIONCLASSNAME, FExceptionClassName);
+    if FExceptionClassName <> IO_STRING_NULL_VALUE then
+      LJSONObject.AddPair(KEY_EXCEPTIONCLASSNAME, FExceptionClassName);
     // ExceptionClassMessage
-    LJSONObject.AddPair(KEY_EXCEPTIONMESSAGE, FExceptionMessage);
+    if FExceptionMessage <> IO_STRING_NULL_VALUE then
+      LJSONObject.AddPair(KEY_EXCEPTIONMESSAGE, FExceptionMessage);
     // JSONDataValue
     if Assigned(FJSONDataValue) then
       LJSONObject.AddPair(KEY_JSONDATAVALUE, FJSONDataValue.Clone as TJSONValue);

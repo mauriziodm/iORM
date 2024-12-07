@@ -79,10 +79,10 @@ type
     class function _DoMax(const AWhere: IioWhere; const APropertyName: String): Integer; override;
     class function _DoMin(const AWhere: IioWhere; const APropertyName: String): Integer; override;
     // Transaction
-    class procedure _DoStartTransaction(const AConnectionName: String); override;
-    class procedure _DoCommitTransaction(const AConnectionName: String); override;
-    class procedure _DoRollbackTransaction(const AConnectionName: String); override;
-    class function _DoInTransaction(const AConnectionName: String): Boolean; override;
+    class procedure _DoStartTransaction(const AConnectionDefName: String); override;
+    class procedure _DoCommitTransaction(const AConnectionDefName: String); override;
+    class procedure _DoRollbackTransaction(const AConnectionDefName: String); override;
+    class function _DoInTransaction(const AConnectionDefName: String): Boolean; override;
     // SynchroStrategy
     class procedure _DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload); override;
     // SQLDestinations
@@ -151,10 +151,10 @@ begin
   Result := TioAuthServer.GetInstance.RefreshAccessToken(ARefreshToken);
 end;
 
-class procedure TioPersistenceStrategyDB._DoCommitTransaction(const AConnectionName: String);
+class procedure TioPersistenceStrategyDB._DoCommitTransaction(const AConnectionDefName: String);
 begin
   inherited;
-  TioDBFactory.Connection(AConnectionName).Commit;
+  TioDBFactory.Connection(AConnectionDefName).Commit;
 end;
 
 class function TioPersistenceStrategyDB._DoCount(const AWhere: IioWhere): Integer;
@@ -469,10 +469,10 @@ begin
   AContext.ObjStatus := osClean;
 end;
 
-class function TioPersistenceStrategyDB._DoInTransaction(const AConnectionName: String): Boolean;
+class function TioPersistenceStrategyDB._DoInTransaction(const AConnectionDefName: String): Boolean;
 begin
   inherited;
-  Result := TioDBFactory.Connection(AConnectionName).InTransaction;
+  Result := TioDBFactory.Connection(AConnectionDefName).InTransaction;
 end;
 
 class function TioPersistenceStrategyDB._DoLoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
@@ -950,10 +950,10 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyDB._DoRollbackTransaction(const AConnectionName: String);
+class procedure TioPersistenceStrategyDB._DoRollbackTransaction(const AConnectionDefName: String);
 begin
   inherited;
-  TioDBFactory.Connection(AConnectionName).Rollback;
+  TioDBFactory.Connection(AConnectionDefName).Rollback;
 end;
 
 class procedure TioPersistenceStrategyDB._DoSQLDest_Execute(const ASQLDestination: IioSQLDestination);
@@ -1009,10 +1009,10 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyDB._DoStartTransaction(const AConnectionName: String);
+class procedure TioPersistenceStrategyDB._DoStartTransaction(const AConnectionDefName: String);
 begin
   inherited;
-  TioDBFactory.Connection(AConnectionName).StartTransaction;
+  TioDBFactory.Connection(AConnectionDefName).StartTransaction;
 end;
 
 class procedure TioPersistenceStrategyDB._DoLoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);

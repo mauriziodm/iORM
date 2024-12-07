@@ -57,21 +57,23 @@ type
 
   TioAuthAppCredentials = class(TInterfacedObject, IioAuthAppCredentials)
   strict private
-    FAppName: String;
     FAppID: String;
     FAppSecret: String;
+    [ioSkip] FCodeChallenge: String;
+    [ioSkip] FCodeVerifier: String;
     function GetAppID: String;
-    function GetAppName: String;
     function GetAppSecret: String;
     procedure SetAppID(const Value: String);
-    procedure SetAppName(const Value: String);
     procedure SetAppSecret(const Value: String);
+  strict protected
+    procedure GenerateCodeVerifierAndChallenge; virtual;
   public
     constructor Create; virtual;
     // app authorization related properties
-    property AppName: String read GetAppName write SetAppName;
     property AppID: String read GetAppID write SetAppID;
     property AppSecret: String read GetAppSecret write SetAppSecret;
+    [ioSkip] property CodeChallenge: String read FCodeChallenge write FCodeChallenge;
+    [ioSkip] property CodeVerifier: String read FCodeVerifier write FCodeVerifier;
   end;
 
   TioAuthExpirable = class(TInterfacedObject, IioAuthExpirable)
@@ -210,7 +212,7 @@ type
     procedure SetPswExp(const Value: TDateTime);
   strict protected
     // ---------- can be ovverrided ----------
-    procedure Clear(const AClearMode: TioAuthCredentialsClearMode);
+    procedure Clear;
     function GeneratePasswordDigest(const APassword: String): String; virtual;
     function GenerateOTP: String; virtual;
     function GetExceptionEntityName: String; override;
@@ -240,19 +242,15 @@ type
   TioAuthApp = class(TioAuthRolesHolder, IioAuthApp, IioAuthAppCredentials)
   strict private
     [ioIndex(ioAscending, True), ioNotNull] // unique & required
-    FAppName: String;
-    [ioIndex(ioAscending, True), ioNotNull] // unique & required
     FAppID: String;
     FAppSecret: String;
     function GetAppID: String;
-    function GetAppName: String;
     function GetAppSecret: String;
     procedure SetAppID(const Value: String);
-    procedure SetAppName(const Value: String);
     procedure SetAppSecret(const Value: String);
   strict protected
     // ---------- can be ovverrided ----------
-    procedure Clear(const AClearMode: TioAuthCredentialsClearMode);
+    procedure Clear;
     function GenerateAppID: String; virtual;
     function GenerateAppSecret: String; virtual;
     function GetExceptionEntityName: String; override;
@@ -268,7 +266,6 @@ type
     procedure ConfirmCredentials; virtual;
     function ResetCredentials(const AGenerateOTP: Boolean = True; const AOTPDurationMins: Integer = AUTH_OTP_DURATION_MIN): String;
     // ---------- can be ovverrided ----------
-    property AppName: String read GetAppName write SetAppName;
     property AppID: String read GetAppID write SetAppID;
     property AppSecret: String read GetAppSecret write SetAppSecret;
   end;
@@ -599,16 +596,9 @@ begin
     raise EioAuthInvalidCredentialsException_401.Create(Format('Invalid %s credentials', [GetExceptionEntityName.ToLower]));
 end;
 
-procedure TioAuthUser.Clear(const AClearMode: TioAuthCredentialsClearMode);
+procedure TioAuthUser.Clear;
 begin
   inherited;
-  // Clear all
-//  if AClearMode = cmAll then
-//  begin
-//    FName := IO_STRING_NULL_VALUE;
-//    FSurname := IO_STRING_NULL_VALUE;
-//    FLoginUser := IO_STRING_NULL_VALUE;
-//  end;
   // clear password
   FLoginPassword := IO_STRING_NULL_VALUE;
   // clear set/reset/change password related properties
@@ -770,10 +760,8 @@ begin
     raise EioAuthInvalidCredentialsException_401.Create(Format('Invalid %s credentials', [GetExceptionEntityName.ToLower]));
 end;
 
-procedure TioAuthApp.Clear(const AClearMode: TioAuthCredentialsClearMode);
+procedure TioAuthApp.Clear;
 begin
-  if AClearMode = cmAll then
-    FAppName := IO_STRING_NULL_VALUE;
   FAppID := IO_STRING_NULL_VALUE;
   FAppSecret := IO_STRING_NULL_VALUE;
 end;
@@ -829,11 +817,6 @@ begin
   Clear(cmSecretsOnly);
 end;
 
-function TioAuthApp.GetAppName: String;
-begin
-  Result := FAppName;
-end;
-
 procedure TioAuthApp.SetAppID(const Value: String);
 begin
   FAppID := Value;
@@ -842,11 +825,6 @@ end;
 procedure TioAuthApp.SetAppSecret(const Value: String);
 begin
   FAppSecret := Value;
-end;
-
-procedure TioAuthApp.SetAppName(const Value: String);
-begin
-  FAppName := Value;
 end;
 
 function TioAuthApp.ValidateSecrets: Boolean;
@@ -944,9 +922,15 @@ end;
 constructor TioAuthAppCredentials.Create;
 begin
   inherited;
-  FAppName := IO_STRING_NULL_VALUE;
   FAppID := IO_STRING_NULL_VALUE;
   FAppSecret := IO_STRING_NULL_VALUE;
+  GenerateCodeVerifierAndChallenge;
+end;
+
+procedure TioAuthAppCredentials.GenerateCodeVerifierAndChallenge;
+begin
+  FCodeChallenge := IO_STRING_NULL_VALUE;
+  FCodeVerifier := IO_STRING_NULL_VALUE;
 end;
 
 function TioAuthAppCredentials.GetAppID: String;
@@ -959,19 +943,9 @@ begin
   Result := FAppSecret;
 end;
 
-function TioAuthAppCredentials.GetAppName: String;
-begin
-  Result := FAppName;
-end;
-
 procedure TioAuthAppCredentials.SetAppID(const Value: String);
 begin
   FAppID := Value;
-end;
-
-procedure TioAuthAppCredentials.SetAppName(const Value: String);
-begin
-  FAppName := Value;
 end;
 
 procedure TioAuthAppCredentials.SetAppSecret(const Value: String);

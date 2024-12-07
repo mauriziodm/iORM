@@ -46,6 +46,7 @@ type
     class function NewAuthResponseFromString(const AValue: String): IioAuthResponse; static;
     class function NewAuthRoleItem(const ARole: IioAuthRole): IioAuthRoleItem; static;
     class function NewAuthSession: IioAuthSession; static;
+    class function NewAuthSessionSubjects: IioAuthSessionSubjects; static;
     class function NewAuthSessionThreadSafeWrapper: IioAuthSessionThreadSafeWrapper; static;
     class function NewAuthUserAppItem(const AApp: IioAuthApp): IioAuthAppItem; static;
   end;
@@ -75,6 +76,11 @@ end;
 class function TioAuthFactory.NewAuthSession: IioAuthSession;
 begin
   Result := TioAuthSession.Create;
+end;
+
+class function TioAuthFactory.NewAuthSessionSubjects: IioAuthSessionSubjects;
+begin
+  Result := TioAuthSessionSubjects.Create;
 end;
 
 class function TioAuthFactory.NewAuthSessionThreadSafeWrapper: IioAuthSessionThreadSafeWrapper;

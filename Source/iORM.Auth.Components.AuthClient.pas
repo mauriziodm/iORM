@@ -86,6 +86,7 @@ type
     function Get_Version: String;
     function _AccessTokenIsExpired(const ASession: IioAuthSession): Boolean;
     procedure _AuthorizeUser(const AUserCredentials: IioAuthUserCredentials; const ASession: IioAuthSession);
+    // TODO: _AuthorizeApp da rimuovere?
     procedure _AuthorizeApp(const AAppCredentials: IioAuthAppCredentials; const AUserAuthorizationCode: String; const ASession: IioAuthSession);
     procedure _AuthorizeAppRequestUserAuthCode(const AAppCredentials: IioAuthAppCredentials);
     function _AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
