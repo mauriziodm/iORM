@@ -7,15 +7,16 @@ uses
 
 type
 
+
+    *** FINIRE DI SISTEMARE SUBJECTS, ASSTRING, CREATEBYSTRING ***
+
+
+
   TioAuthResponse = class(TInterfacedObject, IioAuthResponse)
   private
     FIsAuth: Boolean;
-    // user
-    FUsr: String;
-    FUsrOID: Integer;
-    // app
-    FApp: String;
-    FAppOID: Integer;
+    // session subjects
+    FSubjects: IioAuthSessionSubjects;
     // auth grant (auth code)
     FAutGnt: String;
     // refresh
@@ -27,49 +28,32 @@ type
     FRefAft: TDateTime;
     function GetAccTkn: String;
     function GetAccExp: TDateTime;
-    function GetAppOID: Integer;
-    function GetApp: String;
     function GetAutGnt: String;
     function GetIsAuth: Boolean;
     function GetRefAft: TDateTime;
     function GetRefTkn: String;
     function GetRefExp: TDateTime;
-    function GetUsrOID: Integer;
-    function GetUsr: String;
+    function GetSubjects: IioAuthSessionSubjects;
     procedure SetAccTkn(const Value: String);
     procedure SetAccExp(const Value: TDateTime);
-    procedure SetAppOID(const Value: Integer);
-    procedure SetApp(const Value: String);
     procedure SetAutGnt(const Value: String);
     procedure SetIsAuth(const Value: Boolean);
     procedure SetRefAft(const Value: TDateTime);
     procedure SetRefTkn(const Value: String);
     procedure SetRefExp(const Value: TDateTime);
-    procedure SetUsrOID(const Value: Integer);
-    procedure SetUsr(const Value: String);
   public
     constructor Create;
-    constructor CreateByString(const AValue: String);
-    function HasUser: Boolean;
-    function HasUserOID: Boolean;
-    function HasUsrTkn: Boolean;
-    function HasApp: Boolean;
-    function HasAppOID: Boolean;
-    function HasAppTkn: Boolean;
+    constructor CreateByJSONString(const AValue: String);
     function HasAutGnt: Boolean;
     function HasRefTkn: Boolean;
     function HasAccTkn: Boolean;
     function AsString: String;
     // properties
     property IsAuth: Boolean read GetIsAuth write SetIsAuth;
-    // user
-    property UsrOID: Integer read GetUsrOID write SetUsrOID;
-    property Usr: String read GetUsr write SetUsr;
-    // app
-    property AppOID: Integer read GetAppOID write SetAppOID;
-    property App: String read GetApp write SetApp;
+    // session subjects
+    property Subjects: IioAuthSessionSubjects read GetSubjects;
     // auth grant (auth code)
-    property AutGnt: read GetAutGnt write SetAutGnt;
+    property AutGnt: String read GetAutGnt write SetAutGnt;
     // refresh
     property RefTkn: String read GetRefTkn write SetRefTkn;
     property RefExp: TDateTime read GetRefExp write SetRefExp;
@@ -82,19 +66,18 @@ type
 implementation
 
 uses
-  iORM.CommonTypes, DJSON, DJSON.Params;
+  iORM.CommonTypes, iORM.Auth.Factory, DJSON, DJSON.Params;
 
 { TioAuthResponse }
 
 constructor TioAuthResponse.Create;
 begin
+    // session subjects data
+    FSubjects := TioAuthFactory.NewAuthSessionSubjects;
+    // is authorized (login, access)
     FIsAuth := False;
-    // user
-    FUsr := IO_STRING_NULL_VALUE;
-    FUsrOID := IO_INTEGER_NULL_VALUE;
-    // app
-    FAppOID := IO_INTEGER_NULL_VALUE;
-    FApp := IO_STRING_NULL_VALUE;
+    // sessionsubjects
+    FSubjects := nil;
     // auth grant (auth code)
     FAutGnt:= IO_STRING_NULL_VALUE;
     // refresh
@@ -107,9 +90,45 @@ begin
 end;
 
 constructor TioAuthResponse.CreateByString(const AValue: String);
+var
+  LJSONObject: TJSONObject;
+  LJSONValue: TJSONValue;
 begin
   Create;
-  dj.FromJson(AValue).byFields.DateTimeFormat(TdjDateTimeFormat.dfUnix).&To(Self);
+  LJSONObject := TJSONObject.ParseJSONValue(AJSONString) as TJSONObject;
+  try
+    // is authorized
+    LJSONValue := LJSONObject.GetValue('IsAuth');
+    if Assigned(LJSONValue) then
+      FIsAuth := (LJSONValue as TJSONBool).AsBoolean;
+    // session subjects
+    LJSONValue := LJSONObject.GetValue('Subjects');
+    if Assigned(LJSONValue) then
+      FSubjects.FromString(LJSONValue.Value);
+    // auth grant (auth code)
+    LJSONValue := LJSONObject.GetValue('AutGnt');
+    if Assigned(LJSONValue) then
+      FAutGnt := (LJSONValue as TJSONBool).AsBoolean;
+    // refresh
+    LJSONValue := LJSONObject.GetValue('RefTkn');
+    if Assigned(LJSONValue) then
+      FRefTkn := LJSONValue.Value;
+    LJSONValue := LJSONObject.GetValue('RefExp');
+    if Assigned(LJSONValue) then
+      FRefExp :=  UnixToDateTime((LJSONValue as TJSONNumber).AsInt64, True); // True = UTC
+    // access
+    LJSONValue := LJSONObject.GetValue('AccTkn');
+    if Assigned(LJSONValue) then
+      FAccTkn := LJSONValue.Value;
+    LJSONValue := LJSONObject.GetValue('AccExp');
+    if Assigned(LJSONValue) then
+      FAccExp :=  UnixToDateTime((LJSONValue as TJSONNumber).AsInt64, True); // True = UTC
+    LJSONValue := LJSONObject.GetValue('RefAft');
+    if Assigned(LJSONValue) then
+      FRefAft :=  UnixToDateTime((LJSONValue as TJSONNumber).AsInt64, True); // True = UTC
+  finally
+    LJSONObject.Free;
+  end;
 end;
 
 function TioAuthResponse.GetAccExp: TDateTime;
@@ -120,16 +139,6 @@ end;
 function TioAuthResponse.GetAccTkn: String;
 begin
   Result := FAccTkn;
-end;
-
-function TioAuthResponse.GetApp: String;
-begin
-  Result := FApp;
-end;
-
-function TioAuthResponse.GetAppOID: Integer;
-begin
-  Result := FAppOID;
 end;
 
 function TioAuthResponse.GetAutGnt: String;
@@ -157,14 +166,9 @@ begin
   Result := FRefTkn;
 end;
 
-function TioAuthResponse.GetUsr: String;
+function TioAuthResponse.GetSubjects: IioAuthSessionSubjects;
 begin
-  Result := FUsr;
-end;
-
-function TioAuthResponse.GetUsrOID: Integer;
-begin
-  Result := FUsrOID;
+  Result := FSubjects;
 end;
 
 function TioAuthResponse.HasAccTkn: Boolean;
@@ -172,44 +176,14 @@ begin
   Result := FAccTkn <> IO_STRING_NULL_VALUE;
 end;
 
-function TioAuthResponse.HasApp: Boolean;
-begin
-  Result := FApp <> IO_STRING_NULL_VALUE;
-end;
-
-function TioAuthResponse.HasAppOID: Boolean;
-begin
-  Result := FAppOID <> IO_INTEGER_NULL_VALUE;
-end;
-
-function TioAuthResponse.HasAppTkn: Boolean;
-begin
-
-end;
-
 function TioAuthResponse.HasAutGnt: Boolean;
 begin
-
+  Result := FAutGnt <> IO_STRING_NULL_VALUE;
 end;
 
 function TioAuthResponse.HasRefTkn: Boolean;
 begin
   Result := FRefTkn <> IO_STRING_NULL_VALUE;
-end;
-
-function TioAuthResponse.HasUser: Boolean;
-begin
-  Result := FUsr <> IO_STRING_NULL_VALUE;
-end;
-
-function TioAuthResponse.HasUserOID: Boolean;
-begin
-  Result := FUsrOID <> IO_INTEGER_NULL_VALUE;
-end;
-
-function TioAuthResponse.HasUsrTkn: Boolean;
-begin
-  Result := FAutGnt <> IO_STRING_NULL_VALUE;
 end;
 
 procedure TioAuthResponse.SetAccExp(const Value: TDateTime);
@@ -220,16 +194,6 @@ end;
 procedure TioAuthResponse.SetAccTkn(const Value: String);
 begin
   FAccTkn := Value;
-end;
-
-procedure TioAuthResponse.SetApp(const Value: String);
-begin
-  FApp := Value;
-end;
-
-procedure TioAuthResponse.SetAppOID(const Value: Integer);
-begin
-  FAppOID := Value;
 end;
 
 procedure TioAuthResponse.SetAutGnt(const Value: String);
@@ -257,19 +221,37 @@ begin
   FRefTkn := Value;
 end;
 
-procedure TioAuthResponse.SetUsr(const Value: String);
-begin
-  FUsr := Value;
-end;
-
-procedure TioAuthResponse.SetUsrOID(const Value: Integer);
-begin
-  FUsrOID := Value;
-end;
-
 function TioAuthResponse.AsString: String;
+var                                                                <
+  LJSONObject: TJSONObject;
 begin
-  Result := dj.From(Self).byFields.DateTimeFormat(TdjDateTimeFormat.dfUnix).ToJson;
+  LJSONObject := TJSONObject.Create;
+  try
+    // is authorized
+    LJSONObject.AddPair('IsAuth', FIsAuth);
+    // session subjects
+    LJSONObject.AddPair('Subjects', FSubjects.AsString);
+    // auth grant (auth code)
+    if HasAutGnt then
+      LJSONObject.AddPair('AutGnt', FAutGnt);
+    // refresh
+    if HasRefTkn then
+    begin
+      LJSONObject.AddPair('RefTkn', FRefTkn);
+      LJSONObject.AddPair('RefExp', DateTimeToUnix(FRefExp, True)); // True = UTC
+    end;
+    // refresh
+    if HasAccTkn then
+    begin
+      LJSONObject.AddPair('AccTkn', FAccTkn);
+      LJSONObject.AddPair('AccExp', DateTimeToUnix(FAccExp, True)); // True = UTC
+      LJSONObject.AddPair('RefAft', DateTimeToUnix(RefAft, True)); // True = UTC
+    end;
+    // Result JSONObject as string
+    Result := LJSONObject.ToString;
+  finally
+    LJSONObject.Free;
+  end;
 end;
 
 end.

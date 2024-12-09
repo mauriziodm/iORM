@@ -45,7 +45,7 @@ type
   TioUtilities = class
   private
     class function _ExtractAttributeInfoSign(const ARttiInstanceType: TRttiInstanceType): String;
- public
+  public
     class function ObjectAsIInterface(const AObj: Tobject): IInterface; static;
     class function ObjectAsIioViewModel(const AObj: Tobject): IioViewModel; static;
     class function IsAnInterface<T>: Boolean; static;
@@ -70,33 +70,33 @@ type
     class function IntfToID(const AIntf: IInterface): Integer; static;
     class function IsNullOID(const AObj: Tobject): Boolean; static;
     class function ExtractObjVersion(const AObj: Tobject): Integer; static;
-    class function EnumToString<T>(const AEnumValue:T): String;
+    class function EnumToString<T>(const AEnumValue: T): String;
     class function StringToEnum<T>(const AStringValue: String): T;
     class function GetThreadID: TThreadID; static;
     class function ExtractItemRttiTypeByGeneric<T>: TRttiType;
-    class function ExtractItemRttiTypeFromList(const AList: TObject): TRttiType;
-    class function TryGetMemberAttribute<T: class>(const ARTTIMember: TRttiMember; out OAttribute: TCustomAttribute): boolean; static;
+    class function ExtractItemRttiTypeFromList(const AList: Tobject): TRttiType;
+    class function TryGetMemberAttribute<T: class>(const ARTTIMember: TRttiMember; out OAttribute: TCustomAttribute): Boolean; static;
     class function ClassNameToClassRef(const AClassName: String): TioClassRef;
-    class function IsList(const AObj: TObject): Boolean;
-    class procedure ClearList(const AList: TObject);
+    class function IsList(const AObj: Tobject): Boolean;
+    class procedure ClearList(const AList: Tobject);
     class procedure TrimStrings(const AStrings: TStrings);
-    class function CloneObject(const ASourceObj: TObject): TObject;
+    class function CloneObject(const ASourceObj: Tobject): Tobject;
     class procedure StopLinkerRemoval(const AClass: TClass);
     class function NowUTC(const ForceDayLight: Boolean = False): TDateTime; static;
     /// Ricava la classe più in alto nella gerarchia (quello più vicina a TObject) che implementa la stessa interfaccia
     /// Questo serve a impostare correttamente la query select in modo che filtri correttamente in base anche
-    ///  ai vincoli di ereditarietà.
+    /// ai vincoli di ereditarietà.
     class function GetFarAncestorClassImplementingInterface(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): TRttiInstanceType;
     class function GetFarAncestorEntityImplementingInterfaceSameTableAndConnection(ARttiInstanceType: TRttiInstanceType; const IID: TGUID): TRttiInstanceType;
     class function GetFarAncestorEntityWithSameTableAndConnection(AStartRttiInstanceType: TRttiInstanceType): TRttiInstanceType;
     class function GetDefaultBindSource(const AViewOrViewModel: TComponent): IioBindSource;
     class function GetBindSource(const AViewOrViewModel: TComponent; const AName: String): IioBindSource;
     // Metodi per per i CustomAttributes
-    class function GetAttribute(const ARTTIType: TRttiType; const AAttrClass: TCustomAttributeRef): TCustomAttribute; static;
-    class function HasAttribute(const ARTTIType: TRttiType; const AAttrClass: TCustomAttributeRef): boolean; static;
-    class function HasAttributes(const ARTTIType: TRttiType; const AAttrClass1, AAttrClass2: TCustomAttributeRef): boolean; static;
+    class function GetAttribute(const ARttiType: TRttiType; const AAttrClass: TCustomAttributeRef): TCustomAttribute; static;
+    class function HasAttribute(const ARttiType: TRttiType; const AAttrClass: TCustomAttributeRef): Boolean; static;
+    class function HasAttributes(const ARttiType: TRttiType; const AAttrClass1, AAttrClass2: TCustomAttributeRef): Boolean; static;
     // Funzioni che implementano verifiche riguardo l'essere Entità
-    class function isEntityType(const ARTTIType: TRttiType): Boolean; inline;
+    class function isEntityType(const ARttiType: TRttiType): Boolean; inline;
     class function isEntityAttribute(const AAttribute: TCustomAttribute): Boolean; inline;
     class function IsNotPersistedEntity(const AClassName: String): Boolean; inline;
     class function IsPersistedEntity(const AClassName: String): Boolean; static;
@@ -104,13 +104,14 @@ type
     class procedure ResolveChildPropertyPath_SplitPropNameAndPath(const AQualifiedPropertyPath: String; out OPath: TStrings; out OPropName: String); static;
     class function ResolveChildPropertyPath_GetFinalObj(const ARootObj: Tobject; const AChildObjPath: TStrings): Tobject; static;
     class function ResolveChildPropertySplitPath_GetValue(const ARootObj: Tobject; const AChildObjPath: TStrings; const AFinalPropName: String): TValue; static;
-    class procedure ResolveChildPropertySplitPath_SetValue(const ARootObj: Tobject; const AChildObjPath: TStrings; const AFinalPropName: String; const AValue: TValue); static;
+    class procedure ResolveChildPropertySplitPath_SetValue(const ARootObj: Tobject; const AChildObjPath: TStrings; const AFinalPropName: String;
+      const AValue: TValue); static;
     class function ResolveChildPropertyPath_GetValue(const ARootObj: Tobject; AQualifiedPropertyPath: String): TValue; static;
     class procedure ResolveChildPropertyPath_SetValue(const ARootObj: Tobject; AQualifiedPropertyPath: String; const AValue: TValue); static;
     // BlindLevel helper methods
-    class function BlindLevel_Do_DetectObjExists(const ABlindLevel: Byte): boolean; static;
-    class function BlindLevel_Do_AutoUpdateProps(const ABlindLevel: Byte): boolean; static;
-    class function BlindLevel_Do_DetectConflicts(const ABlindLevel: Byte): boolean; static;
+    class function BlindLevel_Do_DetectObjExists(const ABlindLevel: Byte): Boolean; static;
+    class function BlindLevel_Do_AutoUpdateProps(const ABlindLevel: Byte): Boolean; static;
+    class function BlindLevel_Do_DetectConflicts(const ABlindLevel: Byte): Boolean; static;
   end;
 
 implementation
@@ -123,17 +124,17 @@ uses
 
 { TioRttiUtilities }
 
-class function TioUtilities.BlindLevel_Do_AutoUpdateProps(const ABlindLevel: Byte): boolean;
+class function TioUtilities.BlindLevel_Do_AutoUpdateProps(const ABlindLevel: Byte): Boolean;
 begin
   Result := (ABlindLevel AND BL_BIT_AUTO_UPDATE_PROPS) <> 0;
 end;
 
-class function TioUtilities.BlindLevel_Do_DetectConflicts(const ABlindLevel: Byte): boolean;
+class function TioUtilities.BlindLevel_Do_DetectConflicts(const ABlindLevel: Byte): Boolean;
 begin
   Result := (ABlindLevel AND BL_BIT_DETECT_CONFLICTS) <> 0;
 end;
 
-class function TioUtilities.BlindLevel_Do_DetectObjExists(const ABlindLevel: Byte): boolean;
+class function TioUtilities.BlindLevel_Do_DetectObjExists(const ABlindLevel: Byte): Boolean;
 begin
   Result := (ABlindLevel AND BL_BIT_DETECT_OBJ_EXISTS) <> 0;
 end;
@@ -177,22 +178,22 @@ begin
   Result := TioRttiFactory.GetRttiContext.GetType(AClassRef).AsInstance.GetProperty(APropName);
 end;
 
-class procedure TioUtilities.ClearList(const AList: TObject);
+class procedure TioUtilities.ClearList(const AList: Tobject);
 begin
   if not Assigned(AList) then
     raise EioGenericException.Create(ClassName, 'ClearList', '"AList" parameter not assigned');
   TioDuckTypedFactory.DuckTypedList(AList).Clear;
 end;
 
-class function TioUtilities.CloneObject(const ASourceObj: TObject): TObject;
+class function TioUtilities.CloneObject(const ASourceObj: Tobject): Tobject;
 var
   LSourceJSON: String;
 begin
   LSourceJSON := dj.From(ASourceObj).byFields.TypeAnnotationsON.ToJSON;
   Result := dj.FromJSON(LSourceJSON).byFields.TypeAnnotationsON.ToObject;
-// ----- OLD CODE -----
-//  Result := io.Load(ASourceObj.ClassName).ByID(TioUtilities.ExtractOID(ASourceObj)).ToObject;
-// ----- OLD CODE -----
+  // ----- OLD CODE -----
+  // Result := io.Load(ASourceObj.ClassName).ByID(TioUtilities.ExtractOID(ASourceObj)).ToObject;
+  // ----- OLD CODE -----
 end;
 
 class function TioUtilities.ObjToID(const AObj: Tobject): Integer;
@@ -230,9 +231,9 @@ end;
 class procedure TioUtilities.StopLinkerRemoval(const AClass: TClass);
 begin
   // This method does nothing, it only serves to ensure that the linker
-  //  does not remove the class whose pointer is received and therefore
-  //  that the RTTI information is generated even for classes for which
-  //  there is no reference in the code.
+  // does not remove the class whose pointer is received and therefore
+  // that the RTTI information is generated even for classes for which
+  // there is no reference in the code.
 end;
 
 class function TioUtilities.StringToEnum<T>(const AStringValue: String): T;
@@ -240,7 +241,7 @@ begin
   Result := TRttiEnumerationType.GetValue<T>(AStringValue);
 end;
 
-class function TioUtilities.ExtractItemRttiTypeFromList(const AList: TObject): TRttiType;
+class function TioUtilities.ExtractItemRttiTypeFromList(const AList: Tobject): TRttiType;
 var
   LType: TRttiType;
   LGetItemMethod: TRttiMethod;
@@ -263,7 +264,8 @@ begin
   if Assigned(LGetItemMethod) then
     Result := LGetItemMethod.ReturnType
   else
-    raise EioGenericException.Create(Self.ClassName, 'ExtractItemRttiTypeByGeneric<T>', Format('Method "GetItem" not found in "%s" type.', [GenericToString<T>]));
+    raise EioGenericException.Create(Self.ClassName, 'ExtractItemRttiTypeByGeneric<T>', Format('Method "GetItem" not found in "%s" type.',
+      [GenericToString<T>]));
 end;
 
 class function TioUtilities.ExtractPropertyName(const AFullPathPropertyName: String): String;
@@ -284,31 +286,31 @@ begin
   Result := TypeInfoToTypeName(TypeInfo(T), AQualified);
 end;
 
-class function TioUtilities.GetAttribute(const ARTTIType: TRttiType; const AAttrClass: TCustomAttributeRef): TCustomAttribute;
+class function TioUtilities.GetAttribute(const ARttiType: TRttiType; const AAttrClass: TCustomAttributeRef): TCustomAttribute;
 var
   LAttr: TCustomAttribute;
 begin
-  for LAttr in ARTTIType.GetAttributes do
+  for LAttr in ARttiType.GetAttributes do
     if LAttr is AAttrClass then
       Exit(LAttr);
   Result := nil;
 end;
 
-class function TioUtilities.HasAttribute(const ARTTIType: TRttiType; const AAttrClass: TCustomAttributeRef): boolean;
+class function TioUtilities.HasAttribute(const ARttiType: TRttiType; const AAttrClass: TCustomAttributeRef): Boolean;
 var
   LAttr: TCustomAttribute;
 begin
-  for LAttr in ARTTIType.GetAttributes do
+  for LAttr in ARttiType.GetAttributes do
     if LAttr is AAttrClass then
       Exit(True);
   Result := False;
 end;
 
-class function TioUtilities.HasAttributes(const ARTTIType: TRttiType; const AAttrClass1, AAttrClass2: TCustomAttributeRef): boolean;
+class function TioUtilities.HasAttributes(const ARttiType: TRttiType; const AAttrClass1, AAttrClass2: TCustomAttributeRef): Boolean;
 var
   LAttr: TCustomAttribute;
 begin
-  for LAttr in ARTTIType.GetAttributes do
+  for LAttr in ARttiType.GetAttributes do
     if (LAttr is AAttrClass1) or (LAttr is AAttrClass2) then
       Exit(True);
   Result := False;
@@ -328,6 +330,7 @@ class function TioUtilities.GetBindSource(const AViewOrViewModel: TComponent; co
     else
       raise EioGenericException.Create(ClassName, 'GetBindSource', Format('BindSource named "%s" not found.', [AName]));
   end;
+
 begin
   if AViewOrViewModel is TioViewModel then
   begin
@@ -351,6 +354,7 @@ class function TioUtilities.GetDefaultBindSource(const AViewOrViewModel: TCompon
         Exit;
     Result := nil;
   end;
+
 begin
   if AViewOrViewModel is TioViewModel then
     Result := TioViewModel(AViewOrViewModel).DefaultPresenter
@@ -383,8 +387,8 @@ begin
   end;
 end;
 
-class function TioUtilities.GetFarAncestorEntityImplementingInterfaceSameTableAndConnection(ARttiInstanceType: TRttiInstanceType;
-  const IID: TGUID): TRttiInstanceType;
+class function TioUtilities.GetFarAncestorEntityImplementingInterfaceSameTableAndConnection(ARttiInstanceType: TRttiInstanceType; const IID: TGUID)
+  : TRttiInstanceType;
 var
   LCurrentTableAndConnection, LOriginalTableAndConnection: String;
 begin
@@ -444,9 +448,9 @@ begin
   Result := (AAttribute is ioEntity) or (AAttribute is ioNotPersistedEntity);
 end;
 
-class function TioUtilities.isEntityType(const ARTTIType: TRttiType): Boolean;
+class function TioUtilities.isEntityType(const ARttiType: TRttiType): Boolean;
 begin
-  Result := HasAttributes(ARTTIType, ioEntity, ioNotPersistedEntity);
+  Result := HasAttributes(ARttiType, ioEntity, ioNotPersistedEntity);
 end;
 
 class procedure TioUtilities.TrimStrings(const AStrings: TStrings);
@@ -454,11 +458,11 @@ var
   I: Integer;
 begin
   // Trim all lines
-  for I := 0 to AStrings.Count-1 do
+  for I := 0 to AStrings.Count - 1 do
     AStrings[I] := AStrings[I].Trim;
 end;
 
-class function TioUtilities.TryGetMemberAttribute<T>(const ARTTIMember: TRttiMember; out OAttribute: TCustomAttribute): boolean;
+class function TioUtilities.TryGetMemberAttribute<T>(const ARTTIMember: TRttiMember; out OAttribute: TCustomAttribute): Boolean;
 var
   LAttributes: TArray<TCustomAttribute>;
   LAttribute: TCustomAttribute;
@@ -470,7 +474,7 @@ begin
     if LAttribute is T then
     begin
       OAttribute := LAttribute;
-      Exit(true);
+      Exit(True);
     end;
 end;
 
@@ -479,7 +483,7 @@ begin
   Result := ATypeName.StartsWith('I');
 end;
 
-class function TioUtilities.IsList(const AObj: TObject): Boolean;
+class function TioUtilities.IsList(const AObj: Tobject): Boolean;
 begin
   Result := TioDuckTypedFactory.IsList(AObj);
 end;
@@ -590,9 +594,10 @@ begin
     FreeAndNil(OPath);
 end;
 
-class function TioUtilities.ResolveChildPropertySplitPath_GetValue(const ARootObj: Tobject; const AChildObjPath: TStrings; const AFinalPropName: String): TValue;
+class function TioUtilities.ResolveChildPropertySplitPath_GetValue(const ARootObj: Tobject; const AChildObjPath: TStrings;
+  const AFinalPropName: String): TValue;
 var
-  LFinalChildObj: TObject;
+  LFinalChildObj: Tobject;
   LFinalProp: TRttiProperty;
 begin
   // Get the instance on which to extract the property value
@@ -610,9 +615,10 @@ begin
     Result := TValue.Empty;
 end;
 
-class procedure TioUtilities.ResolveChildPropertySplitPath_SetValue(const ARootObj: Tobject; const AChildObjPath: TStrings; const AFinalPropName: String; const AValue: TValue);
+class procedure TioUtilities.ResolveChildPropertySplitPath_SetValue(const ARootObj: Tobject; const AChildObjPath: TStrings; const AFinalPropName: String;
+  const AValue: TValue);
 var
-  LFinalChildObj: TObject;
+  LFinalChildObj: Tobject;
   LFinalProp: TRttiProperty;
 begin
   // Get the instance on which to extract the property value
@@ -631,15 +637,15 @@ begin
 end;
 
 class function TioUtilities.ResolveRttiTypeToRttiType(const ARttiType: TRttiType): TRttiType;
-//var
-//  LContainerImplementersItem: TioDIContainerImplementersItem;
+// var
+// LContainerImplementersItem: TioDIContainerImplementersItem;
 begin
   if ARttiType.IsInstance then
     Result := ARttiType
   else if ARttiType is TRttiInterfaceType then
   begin
-//    LContainerImplementersItem := io.di.Locate(ARttiType.Name).GetItem;
-//    Exit(LContainerImplementersItem.RttiType);
+    // LContainerImplementersItem := io.di.Locate(ARttiType.Name).GetItem;
+    // Exit(LContainerImplementersItem.RttiType);
     Result := TioResolverFactory.GetResolver(rsByDependencyInjection).ResolveInaccurateAsRttiType(ARttiType.Name, '');
   end
   else
@@ -664,7 +670,7 @@ begin
   Result := nil;
   // 2023-01-17 Carlo Marona
   if AValue.IsEmpty then
-    exit;
+    Exit;
   case AValue.TypeInfo.Kind of
     tkInterface:
       Result := AValue.AsInterface As Tobject;
@@ -730,15 +736,13 @@ begin
   begin
     if LAttribute is ioEntity then
       LTableName := ioEntity(LAttribute).TableName
-    else
-    if LAttribute is ioNotPersistedEntity then
+    else if LAttribute is ioNotPersistedEntity then
       LTableName := ioNotPersistedEntity(LAttribute).TableName
-    else
-    if LAttribute is ioConnection then
+    else if LAttribute is ioConnection then
       LConnectionName := ioConnection(LAttribute).ConnectionName;
   end;
   // Se Table è vuota singifica che la classe attuale non è una entità (non è marcata con
-  //  l'attributo ioEntity), in questo caso restituisce una stringa vuota.
+  // l'attributo ioEntity), in questo caso restituisce una stringa vuota.
   if not LTableName.IsEmpty then
     Result := LTableName + ',' + LConnectionName
   else

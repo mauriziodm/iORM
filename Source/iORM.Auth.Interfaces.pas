@@ -54,33 +54,19 @@ type
     ['{BB322BD7-DD1C-49B2-A55D-F323749B8D32}']
     function GetAccTkn: String;
     function GetAccExp: TDateTime;
-    function GetApp: String;
-    function GetAppOID: Integer;
     function GetAutGnt: String;
     function GetIsAuth: Boolean;
     function GetRefAft: TDateTime;
     function GetRefTkn: String;
     function GetRefExp: TDateTime;
-    function GetUsr: String;
-    function GetUsrOID: Integer;
     procedure SetAccTkn(const Value: String);
     procedure SetAccExp(const Value: TDateTime);
-    procedure SetApp(const Value: String);
-    procedure SetAppOID(const Value: Integer);
     procedure SetAutGnt(const Value: String);
     procedure SetIsAuth(const Value: Boolean);
     procedure SetRefAft(const Value: TDateTime);
     procedure SetRefTkn(const Value: String);
     procedure SetRefExp(const Value: TDateTime);
-    procedure SetUsr(const Value: String);
-    procedure SetUsrOID(const Value: Integer);
     // methods
-    function HasUser: Boolean;
-    function HasUserOID: Boolean;
-    function HasUsrTkn: Boolean;
-    function HasApp: Boolean;
-    function HasAppOID: Boolean;
-    function HasAppTkn: Boolean;
     function HasAutGnt: Boolean;
     function HasRefTkn: Boolean;
     function HasAccTkn: Boolean;
