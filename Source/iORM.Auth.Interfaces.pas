@@ -49,45 +49,6 @@ type
   TioAuthPermissionLevel = (plUnauthorized, plRead, plReadWrite, plReadWriteDelete);
   TioAuthAccessTokenNeedRefreshCheckMode = (nrNever, nrByClient, nrByServer);
   TioAuthCredentialsMode = (cmLogin, cmSetPassword, cmChangePassword);
-
-  IioAuthResponse = interface
-    ['{BB322BD7-DD1C-49B2-A55D-F323749B8D32}']
-    function GetAccTkn: String;
-    function GetAccExp: TDateTime;
-    function GetAutGnt: String;
-    function GetIsAuth: Boolean;
-    function GetRefAft: TDateTime;
-    function GetRefTkn: String;
-    function GetRefExp: TDateTime;
-    procedure SetAccTkn(const Value: String);
-    procedure SetAccExp(const Value: TDateTime);
-    procedure SetAutGnt(const Value: String);
-    procedure SetIsAuth(const Value: Boolean);
-    procedure SetRefAft(const Value: TDateTime);
-    procedure SetRefTkn(const Value: String);
-    procedure SetRefExp(const Value: TDateTime);
-    // methods
-    function HasAutGnt: Boolean;
-    function HasRefTkn: Boolean;
-    function HasAccTkn: Boolean;
-    function AsString: String;
-    // properties
-    property IsAuth: Boolean read GetIsAuth write SetIsAuth;
-    // user
-    property Usr: String read GetUsr write SetUsr;
-    property UsrOID: Integer read GetUsrOID write SetUsrOID;
-    // app
-    property App: String read GetApp write SetApp;
-    property AppOID: Integer read GetAppOID write SetAppOID;
-    // refresh
-    property RefTkn: String read GetRefTkn write SetRefTkn;
-    property RefExp: TDateTime read GetRefExp write SetRefExp;
-    // access
-    property AccTkn: String read GetAccTkn write SetAccTkn;
-    property AccExp: TDateTime read GetAccExp write SetAccExp;
-    property RefAft: TDateTime read GetRefAft write SetRefAft;
-  end;
-
   IioAuthSessionSubjects = interface
     ['{DE6E7EDA-BEE0-4F8A-A12F-2A99E63D8EC5}']
     procedure Assign(const ASource: IioAuthSessionSubjects);
@@ -147,6 +108,42 @@ type
     // connection
     property ConnectionName: String read GetConnectionName write SetConnectionName;
   end;
+
+  IioAuthResponse = interface
+    ['{BB322BD7-DD1C-49B2-A55D-F323749B8D32}']
+    function GetAccTkn: String;
+    function GetAccExp: TDateTime;
+    function GetAutGnt: String;
+    function GetIsAuth: Boolean;
+    function GetRefAft: TDateTime;
+    function GetRefTkn: String;
+    function GetRefExp: TDateTime;
+    function GetSubjects: IioAuthSessionSubjects;
+    procedure SetAccTkn(const Value: String);
+    procedure SetAccExp(const Value: TDateTime);
+    procedure SetAutGnt(const Value: String);
+    procedure SetIsAuth(const Value: Boolean);
+    procedure SetRefAft(const Value: TDateTime);
+    procedure SetRefTkn(const Value: String);
+    procedure SetRefExp(const Value: TDateTime);
+    // methods
+    function HasAutGnt: Boolean;
+    function HasRefTkn: Boolean;
+    function HasAccTkn: Boolean;
+    function AsString: String;
+    // properties
+    property IsAuth: Boolean read GetIsAuth write SetIsAuth;
+    // session subjects
+    property Subjects: IioAuthSessionSubjects read GetSubjects;
+    // refresh
+    property RefTkn: String read GetRefTkn write SetRefTkn;
+    property RefExp: TDateTime read GetRefExp write SetRefExp;
+    // access
+    property AccTkn: String read GetAccTkn write SetAccTkn;
+    property AccExp: TDateTime read GetAccExp write SetAccExp;
+    property RefAft: TDateTime read GetRefAft write SetRefAft;
+  end;
+
 
   IioAuthSessionThreadSafeWrapper = interface
     ['{3E052A85-C5D8-4CC9-BA3F-CBE173FE68CD}']
