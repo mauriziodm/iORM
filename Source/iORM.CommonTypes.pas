@@ -59,7 +59,7 @@ const
 
   IO_USERNAME_LENGTH = 30;
 
-  // TdjSkipScope = (ssMap, ssETM, ssHTTP, ssEmbeddeRelation, ssSUD, ssSaveRevertPoint, ssDJSON);
+  // TdjSkipScope = (ssMap, ssETM, ssHTTP, ssEmbeddeRelation, ssSUD, ssSaveRevertPoint, ssDJSON, ssAuth);
   ssMap = DJSON.Params.TdjSkipScope.ssMap;
   ssETM = DJSON.Params.TdjSkipScope.ssETM;
   ssHTTP = DJSON.Params.TdjSkipScope.ssHTTP;
@@ -67,6 +67,7 @@ const
   ssSUD = DJSON.Params.TdjSkipScope.ssSUD;
   ssSaveRevertPoint = DJSON.Params.TdjSkipScope.ssSaveRevertPoint;
   ssDJSON = DJSON.Params.TdjSkipScope.ssDJSON;
+  ssAuth = DJSON.Params.TdjSkipScope.ssAuth;
 
   // BlindLevel bit value
   BL_BIT_DETECT_OBJ_EXISTS = 1;

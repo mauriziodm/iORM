@@ -6,12 +6,6 @@ uses
   iORM.Auth.Interfaces;
 
 type
-
-
-    *** FINIRE DI SISTEMARE SUBJECTS, ASSTRING, CREATEBYSTRING ***
-
-
-
   TioAuthResponse = class(TInterfacedObject, IioAuthResponse)
   private
     FIsAuth: Boolean;
@@ -43,7 +37,7 @@ type
     procedure SetRefExp(const Value: TDateTime);
   public
     constructor Create;
-    constructor CreateByJSONString(const AValue: String);
+    constructor CreateByJSONString(const AJSONString: String);
     function HasAutGnt: Boolean;
     function HasRefTkn: Boolean;
     function HasAccTkn: Boolean;
@@ -66,7 +60,8 @@ type
 implementation
 
 uses
-  iORM.CommonTypes, iORM.Auth.Factory, DJSON, DJSON.Params;
+  iORM.CommonTypes, iORM.Auth.Factory, DJSON, DJSON.Params, System.JSON,
+  System.DateUtils;
 
 { TioAuthResponse }
 
@@ -89,7 +84,7 @@ begin
     FRefAft := IO_DATETIME_NULL_VALUE;
 end;
 
-constructor TioAuthResponse.CreateByString(const AValue: String);
+constructor TioAuthResponse.CreateByJSONString(const AJSONString: String);
 var
   LJSONObject: TJSONObject;
   LJSONValue: TJSONValue;
@@ -108,7 +103,7 @@ begin
     // auth grant (auth code)
     LJSONValue := LJSONObject.GetValue('AutGnt');
     if Assigned(LJSONValue) then
-      FAutGnt := (LJSONValue as TJSONBool).AsBoolean;
+      FAutGnt := LJSONValue.Value;
     // refresh
     LJSONValue := LJSONObject.GetValue('RefTkn');
     if Assigned(LJSONValue) then
@@ -222,7 +217,7 @@ begin
 end;
 
 function TioAuthResponse.AsString: String;
-var                                                                <
+var
   LJSONObject: TJSONObject;
 begin
   LJSONObject := TJSONObject.Create;

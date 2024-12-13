@@ -52,10 +52,15 @@ type
   TdjSerializationType = (stProperties, stFields);
 
   // SkipScope
-  // Note: ssMap = Entity mapping (ORM only, not used by DJSON serilization)
-  // Note: ssETM = Entity Time Machine operation
-  // Note: ssSUD = Smart Update Detection operation
-  TdjSkipScope = (ssMap, ssETM, ssHTTP, ssEmbeddedRelation, ssSUD, ssSaveRevertPoint, ssDJSON);
+  // note: ssMap = Entity mapping (ORM only, not used by DJSON serilization)
+  // note: ssETM = Entity Time Machine operations
+  // note: ssHTTP = Http layer related operations
+  // note: ssEmbeddedRelation = Embedded relations related operations
+  // note: ssSUD = Smart Update Detection operations
+  // note: ssSaveRevertPoint = Persistence.SaveRevertPoint related operations
+  // note: ssDJSON = DJSON (serialization/deserialization) related operations
+  // note: ssAuth = Authentication/Authorization related operations
+  TdjSkipScope = (ssMap, ssETM, ssHTTP, ssEmbeddedRelation, ssSUD, ssSaveRevertPoint, ssDJSON, ssAuth);
   TdjSkipScopeSet = set of TdjSkipScope;
 
   TdjSerializersContainer = class;

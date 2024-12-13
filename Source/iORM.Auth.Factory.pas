@@ -65,7 +65,7 @@ end;
 
 class function TioAuthFactory.NewAuthResponseFromString(const AValue: String): IioAuthResponse;
 begin
-  Result := TioAuthResponse.CreateByString(AValue);
+  Result := TioAuthResponse.CreateByJSONString(AValue);
 end;
 
 class function TioAuthFactory.NewAuthRoleItem(const ARole: IioAuthRole): IioAuthRoleItem;

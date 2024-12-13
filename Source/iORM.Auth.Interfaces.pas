@@ -49,6 +49,8 @@ type
   TioAuthPermissionLevel = (plUnauthorized, plRead, plReadWrite, plReadWriteDelete);
   TioAuthAccessTokenNeedRefreshCheckMode = (nrNever, nrByClient, nrByServer);
   TioAuthCredentialsMode = (cmLogin, cmSetPassword, cmChangePassword);
+  TioAuthCredentialsClearMode = (cmAll, cmSecretsOnly);
+
   IioAuthSessionSubjects = interface
     ['{DE6E7EDA-BEE0-4F8A-A12F-2A99E63D8EC5}']
     procedure Assign(const ASource: IioAuthSessionSubjects);
@@ -135,6 +137,8 @@ type
     property IsAuth: Boolean read GetIsAuth write SetIsAuth;
     // session subjects
     property Subjects: IioAuthSessionSubjects read GetSubjects;
+    // auth grant (auth code)
+    property AutGnt: String read GetAutGnt write SetAutGnt;
     // refresh
     property RefTkn: String read GetRefTkn write SetRefTkn;
     property RefExp: TDateTime read GetRefExp write SetRefExp;
@@ -143,7 +147,6 @@ type
     property AccExp: TDateTime read GetAccExp write SetAccExp;
     property RefAft: TDateTime read GetRefAft write SetRefAft;
   end;
-
 
   IioAuthSessionThreadSafeWrapper = interface
     ['{3E052A85-C5D8-4CC9-BA3F-CBE173FE68CD}']
@@ -275,11 +278,14 @@ type
     function ResetCredentials(const AGenerateOTP: Boolean = True; const AOTPDurationMins: Integer = AUTH_OTP_DURATION_MIN): String;
     // ---------- can be ovverrided ----------
     function GetAppID: String;
+    function GetAppName: String;
     function GetAppSecret: String;
     procedure SetAppID(const Value: String);
+    procedure SetAppName(const Value: String);
     procedure SetAppSecret(const Value: String);
     // properties
     property AppID: String read GetAppID write SetAppID;
+    property AppName: String read GetAppName write SetAppName;
     property AppSecret: String read GetAppSecret write SetAppSecret;
   end;
 
@@ -306,7 +312,6 @@ type
 
   // TioAuthServer events
   TioOnAuthorizeUserEvent = procedure(const Sender: TObject; const AUserCredentials: IioAuthUserCredentials; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
-  TioOnAuthorizeAppEvent = procedure(const Sender: TObject; const AAppCredentials: IioAuthAppCredentials; var AUserAuthorizationToken: String; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
   TioOnNewAccessTokenEvent = procedure(const Sender: TObject; const AAuthorizationToken: String; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
   TioOnRefreshAccessTokenEvent = procedure(const Sender: TObject; const ARefreshToken: String; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
 

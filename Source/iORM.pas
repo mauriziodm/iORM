@@ -201,6 +201,7 @@ const
   ssSUD = DJSON.Params.TdjSkipScope.ssSUD;
   ssSaveRevertPoint = DJSON.Params.TdjSkipScope.ssSaveRevertPoint;
   ssDJSON = DJSON.Params.TdjSkipScope.ssDJSON;
+  ssAuth = DJSON.Params.TdjSkipScope.ssAuth;
 
   // TioStdAction_ETM_AutoExec_AfterRevert = (doNothing, doRefresh, doReload);
   doNothing = iORM.CommonTypes.doNothing;

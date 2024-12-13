@@ -87,7 +87,6 @@ type
     function _AccessTokenIsExpired(const ASession: IioAuthSession): Boolean;
     procedure _AuthorizeUser(const AUserCredentials: IioAuthUserCredentials; const ASession: IioAuthSession);
     // TODO: _AuthorizeApp da rimuovere?
-    procedure _AuthorizeApp(const AAppCredentials: IioAuthAppCredentials; const AUserAuthorizationCode: String; const ASession: IioAuthSession);
     procedure _AuthorizeAppRequestUserAuthCode(const AAppCredentials: IioAuthAppCredentials);
     function _AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
     procedure _CheckActive; inline;
@@ -212,41 +211,6 @@ begin
     raise EioAuthForbiddenException_403.Create(Format('Access forbidden to scope (%s)', [AScope]));
 end;
 
-procedure TioAuthClient._AuthorizeApp(const AAppCredentials: IioAuthAppCredentials; const AUserAuthorizationCode: String; const ASession: IioAuthSession);
-var
-  LAuthResponse: IioAuthResponse;
-  LDone: Boolean;
-begin
-  // invoke BeforeAuthorizeApp if assigned
-  LDone := False;
-  if Assigned(FBeforeAuthorizeApp) then
-  begin
-    LAuthResponse := TioAuthFactory.NewAuthResponse;
-    FBeforeAuthorizeApp(Self, AAppCredentials, AUserAuthorizationCode, LAuthResponse, LDone);
-  end;
-  // if the creation of the token was not handled then use the internal implementation
-  if not LDone then
-    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).AuthorizeApp(FConnectionName, AAppCredentials, AUserAuthorizationCode);
-  // invoke AfterAuthorizeApp if assigned
-  if Assigned(FAfterAuthorizeApp) then
-    FAfterAuthorizeApp(Self, AAppCredentials, AUserAuthorizationCode, LAuthResponse);
-  // if authorized then update session props (else raise an exception)
-  if LAuthResponse.IsAuth and LAuthResponse.HasAppTkn then
-  begin
-    ASession.Clear;
-    ASession.AppToken := LAuthResponse.AppTkn;
-    ASession.AppTokenExp := LAuthResponse.AppExp;
-    ASession.App := LAuthResponse.App;
-    ASession.AppOID := LAuthResponse.AppOID;
-    ASession.UserToken := LAuthResponse.UsrTkn;
-    ASession.UserTokenExp := LAuthResponse.UsrExp;
-    ASession.User := LAuthResponse.Usr;
-    ASession.UserOID := LAuthResponse.UsrOID;
-  end
-  else
-    raise EioAuthInvalidCredentialsException_401.Create('Invalid app credentials');
-end;
-
 procedure TioAuthClient._AuthorizeAppRequestUserAuthCode(const AAppCredentials: IioAuthAppCredentials);
 var
   LGetUserAuthCodeEventResponseMethod: TioGetUserAuthCodeEventResponseMethod;
@@ -263,8 +227,6 @@ begin
     try
       // executes the operation inside a try-finally block to be able to invoke the onException... event if there is one
       try
-        // step 3 - authorize app
-        _AuthorizeApp(AAppCredentials, AUserAuthorizationCode, LSession);
         // step 4 - get new access token (and refresh token usually)
         _NewAccessToken(LSession);
         // return true if success
@@ -331,17 +293,8 @@ end;
 
 procedure TioAuthClient._FillSessionData(const ASession: IioAuthSession; const AAuthResponse: IioAuthResponse);
 begin
-  // fill user data
-  if AAuthResponse.HasUser then
-    ASession.User := AAuthResponse.Usr;
-  if AAuthResponse.HasUserOID then
-    ASession.UserOID := AAuthResponse.UsrOID;
-  // fill user token/authcode data
-  if AAuthResponse.HasUsrTkn then
-  begin
-    ASession.UserToken := AAuthResponse.UsrTkn;
-    ASession.UserTokenExp := AAuthResponse.UsrExp;
-  end;
+  // fill session subjects data
+  ASession.Subjects.Assign(AAuthResponse.Subjects);
   // fill access token data
   if AAuthResponse.HasAccTkn then
   begin

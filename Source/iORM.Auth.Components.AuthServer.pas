@@ -83,7 +83,6 @@ type
     FUserOTP_Expiration_Mins: Integer;
     FUserPsw_Expiration_Days: Integer;
     // events
-    FOnAuthorizeApp: TioOnAuthorizeAppEvent;
     FOnAuthorizeUser: TioOnAuthorizeUserEvent;
     FOnAuthorizeAccess: TioOnAuthorizeAccessEvent;
     FOnNewAccessToken: TioOnNewAccessTokenEvent;
@@ -94,7 +93,6 @@ type
     procedure SetUserCache_Expiration_Mins(const Value: Integer);
     // jwt builders
     procedure _BuildUserAuthorizationToken(const AAuthResponse: IioAuthResponse); inline;
-    procedure _BuildAppAuthorizationToken(const AAuthResponse: IioAuthResponse); inline;
     procedure _BuildAccessToken(const AAuthResponse: IioAuthResponse); inline;
     procedure _BuildRefreshToken(const AAuthResponse: IioAuthResponse); inline;
     // jwt checks
@@ -107,7 +105,6 @@ type
     destructor Destroy; override;
     class function GetInstance: TioAuthServer; static;
     function AuthorizeUser(const AUserCredentials: IioAuthUserCredentials): IioAuthResponse;
-    function AuthorizeApp(const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String): IioAuthResponse; // return an app authorization token
     function AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse; // return true or false depending the access to the requested result is permitted
     function NewAccessToken(const AAuthorizationToken: String): IioAuthResponse; // return a new acces token and also a new refresh token just after the authorization (login)
     function RefreshAccessToken(const ARefreshToken: String): IioAuthResponse; // return a new acces token and also a new refresh token
@@ -128,7 +125,6 @@ type
     property UserPassword_Expiration_Days: Integer read FUserPsw_Expiration_Days write FUserPsw_Expiration_Days;
     property _Version: String read Get_Version;
     // events
-    property OnAuthorizeApp: TioOnAuthorizeAppEvent read FOnAuthorizeApp write FOnAuthorizeApp;
     property OnAuthorizeAccess: TioOnAuthorizeAccessEvent read FOnAuthorizeAccess write FOnAuthorizeAccess;
     property OnAuthorizeUser: TioOnAuthorizeUserEvent read FOnAuthorizeUser write FOnAuthorizeUser;
     property OnNewAccessToken: TioOnNewAccessTokenEvent read FOnNewAccessToken write FOnNewAccessToken;
@@ -239,7 +235,7 @@ begin
     // check authorization token
     _CheckAuthorizationToken(AAuthorizationToken, Result, TOKEN_TYPE_AUTHORIZATION);
     // check if the user is still active
-    FUserCache.GetUser(Result.Usr).CheckIfActive(True);
+    FUserCache.GetUser(Result.Subjects.User).CheckIfActive(True);
     // build the result access and refresh tokens
     _BuildAccessToken(Result);
     _BuildRefreshToken(Result);
@@ -268,7 +264,7 @@ begin
     // check authorization token
     _CheckRefreshToken(ARefreshToken, Result);
     // check if the user and app is still active
-    FUserCache.GetUser(Result.Usr).CheckIfActive(True);
+    FUserCache.GetUser(Result.Subjects.User).CheckIfActive(True);
     // build the result access and refresh tokens
     _BuildAccessToken(Result);
     _BuildRefreshToken(Result);
@@ -311,50 +307,15 @@ begin
     if not LUser.CanAuthorizeCredentials then
       raise EioAuthInvalidCredentialsException_401.Create('Invalid user credentials');
     // if all is ok then build the result user authorization token
-    Result.Usr := LUser.LoginUser;
-    Result.UsrOID := LUser.ID;
+    Result.Subjects.User := LUser.LoginUser;
+    Result.Subjects.UserOID := LUser.ID;
     _BuildUserAuthorizationToken(Result);
   end;
-  // final check, if the result token is null the raise exception
-  if not Result.HasUsrTkn then
+  // final check, if the result token is null the raise exception (return true if all is ok)
+  if Result.IsAuth and Result.HasAutGnt then
+    Result.IsAuth := True
+  else
     raise EioAuthInvalidCredentialsException_401.Create('Invalid user credentials');
-  // Return true if all is ok
-  Result.IsAuth := True;
-end;
-
-function TioAuthServer.AuthorizeApp(const AAppCredentials: IioAuthAppCredentials; AUserAuthorizationToken: String): IioAuthResponse;
-var
-  LAppInstance: IioAuthApp;
-  LDone: Boolean;
-begin
-  Result := TioAuthFactory.NewAuthResponse;
-  // First check if the component is enabled
-  CheckActive;
-  // invoke OnAuthorizeApp event if assigned
-  LDone := False;
-  if Assigned(FOnAuthorizeApp) then
-    FOnAuthorizeApp(Self, AAppCredentials, AUserAuthorizationToken, Result, LDone);
-  // if the creation of the token was not handled then use the internal implementation
-  if not LDone then
-  begin
-    // check user token
-    _CheckAuthorizationToken(AUserAuthorizationToken, Result, TOKEN_TYPE_USER_AUTHORIZATION);
-    // load app entity (if it is a persisted entity)
-    if TioUtilities.IsPersistedEntity((AAppCredentials as TObject).ClassName) then
-      LAppInstance := io.Load<IioAuthApp>._Where('AppID', coEquals, AAppCredentials.AppID).ToObject;
-    // if not authorized then raise an exception
-    if not LAppInstance.CanAuthorizeCredentials then
-      raise EioAuthInvalidCredentialsException_401.Create('Invalid app credentials');
-    // Build token
-    Result.App := LAppInstance.AppName;
-    Result.AppOID := LAppInstance.ID;
-    _BuildAppAuthorizationToken(Result);
-  end;
-  // final check, if the result token is null the raise exception
-  if not Result.HasAppTkn then
-    raise EioAuthInvalidCredentialsException_401.Create('Invalid app credentials');
-  // Return true if all is ok
-  Result.IsAuth := True;
 end;
 
 function TioAuthServer.AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
@@ -377,7 +338,7 @@ begin
     // check user token
     _CheckAccessToken(AAccessToken, Result);
     // check permissions
-    LPermissionLevel := FUserCache.GetUser(Result.Usr).GetPermissionLevelFor(AScope, Result.App);
+    LPermissionLevel := FUserCache.GetUser(Result.Subjects.User).GetPermissionLevelFor(AScope, Result.Subjects.App);
     Result.IsAuth := (Ord(LPermissionLevel) > Ord(AAuthIntention));
   end;
   // if not authorized raise an exception
@@ -395,14 +356,14 @@ begin
   try
     LToken.TokenType := TOKEN_TYPE_REFRESH;
     LToken.Audience := FToken_Audience;
-    LToken.App := AAuthResponse.App;
-    LToken.AppOID := AAuthResponse.AppOID;
+    LToken.App := AAuthResponse.Subjects.App;
+    LToken.AppOID := AAuthResponse.Subjects.AppOID;
     LToken.Expiration := IncDay(LNow, FRefreshToken_Expiration_Days);
     LToken.IssueAtTime := LNow; // issued now by default
     LToken.Issuer := FToken_Issuer;
     LToken.NotBefore := IncMinute(LNow, -FToken_NotBefore_Mins); // not before 5 minutes before now to avoid problems with unsynchronized times between computers
-    LToken.User := AAuthResponse.Usr;
-    LToken.UserOID :=  AAuthResponse.UsrOID;
+    LToken.User := AAuthResponse.Subjects.User;
+    LToken.UserOID :=  AAuthResponse.Subjects.UserOID;
     AAuthResponse.RefTkn := LToken.TokenAsString(FToken_Secret);
     AAuthResponse.RefExp := LToken.Expiration;
   finally
@@ -424,37 +385,10 @@ begin
     LToken.IssueAtTime := LNow; // issued now by default
     LToken.Issuer := FToken_Issuer;
     LToken.NotBefore := IncMinute(LNow, -FToken_NotBefore_Mins);
-    LToken.User := AAuthResponse.Usr;
-    LToken.UserOID :=  AAuthResponse.UsrOID;
+    LToken.User := AAuthResponse.Subjects.User;
+    LToken.UserOID :=  AAuthResponse.Subjects.UserOID;
     // set the user auth token in the response
-    AAuthResponse.UsrTkn := LToken.TokenAsString(FToken_Secret);
-    AAuthResponse.UsrExp := LToken.Expiration;
-  finally
-    LToken.Free;
-  end;
-end;
-
-procedure TioAuthServer._BuildAppAuthorizationToken(const AAuthResponse: IioAuthResponse);
-var
-  LToken: TioJWT;
-  LNow: TDateTime;
-begin
-  LNow := TioUtilities.NowUTC;
-  LToken := TioJWT.Create;
-  try
-    LToken.TokenType := TOKEN_TYPE_APP_AUTHORIZATION;
-    LToken.Audience := FToken_Audience;
-    LToken.App := AAuthResponse.App;
-    LToken.AppOID := AAuthResponse.AppOID;
-    LToken.Expiration := IncMinute(LNow, FAppAuthToken_Expiration_Mins);
-    LToken.IssueAtTime := LNow; // issued now by default
-    LToken.Issuer := FToken_Issuer;
-    LToken.NotBefore := IncMinute(LNow, -FToken_NotBefore_Mins);
-    LToken.User := AAuthResponse.Usr;
-    LToken.UserOID :=  AAuthResponse.UsrOID;
-    // set the user auth token in the response
-    AAuthResponse.AppTkn := LToken.TokenAsString(FToken_Secret);
-    AAuthResponse.AppExp := LToken.Expiration;
+    AAuthResponse.AutGnt := LToken.TokenAsString(FToken_Secret);
   finally
     LToken.Free;
   end;
@@ -470,14 +404,14 @@ begin
   try
     LToken.TokenType := TOKEN_TYPE_ACCESS;
     LToken.Audience := FToken_Audience;
-    LToken.App := AAuthResponse.App;
-    LToken.AppOID := AAuthResponse.AppOID;
+    LToken.App := AAuthResponse.Subjects.App;
+    LToken.AppOID := AAuthResponse.Subjects.AppOID;
     LToken.Expiration := IncMinute(LNow, FAccessToken_Expiration_Mins);
     LToken.IssueAtTime := LNow; // issued now by default
     LToken.Issuer := FToken_Issuer;
     LToken.NotBefore := IncMinute(LNow, -FToken_NotBefore_Mins);
-    LToken.User := AAuthResponse.Usr;
-    LToken.UserOID :=  AAuthResponse.UsrOID;
+    LToken.User := AAuthResponse.Subjects.User;
+    LToken.UserOID :=  AAuthResponse.Subjects.UserOID;
     AAuthResponse.AccTkn := LToken.TokenAsString(FToken_Secret);
     AAuthResponse.AccExp := LToken.Expiration;
     AAuthResponse.RefAft := IncMinute(LNow, FAccessToken_RefreshAfter_Mins);
@@ -520,10 +454,10 @@ begin
     if LJWT.TokenType.StartsWith(ATokenType) then
       raise EioTokenTypeException_401.Create(Format('Invalid token type "%s" ("%s" expected)', [LJWT.TokenType, ATokenType]));
     // Extract user & app
-    AAuthResponse.Usr := LJWT.User;
-    AAuthResponse.UsrOID := LJWT.UserOID;
-    AAuthResponse.App := LJWT.App;
-    AAuthResponse.AppOID := LJWT.AppOID;
+    AAuthResponse.Subjects.User := LJWT.User;
+    AAuthResponse.Subjects.UserOID := LJWT.UserOID;
+    AAuthResponse.Subjects.App := LJWT.App;
+    AAuthResponse.Subjects.AppOID := LJWT.AppOID;
   finally
     LJWT.Free;
   end;
@@ -541,10 +475,10 @@ begin
     if LJWT.TokenType <> TOKEN_TYPE_ACCESS then
        raise EioTokenTypeException_401.Create(Format('Invalid token type "%s" ("%s" expected)', [LJWT.TokenType, TOKEN_TYPE_ACCESS]));
     // Extract user & app
-    AAuthResponse.Usr := LJWT.User;
-    AAuthResponse.UsrOID := LJWT.UserOID;
-    AAuthResponse.App := LJWT.App;
-    AAuthResponse.AppOID := LJWT.AppOID;
+    AAuthResponse.Subjects.User := LJWT.User;
+    AAuthResponse.Subjects.UserOID := LJWT.UserOID;
+    AAuthResponse.Subjects.App := LJWT.App;
+    AAuthResponse.Subjects.AppOID := LJWT.AppOID;
   finally
     LJWT.Free;
   end;
@@ -562,10 +496,10 @@ begin
     if LJWT.TokenType <> TOKEN_TYPE_REFRESH then
        raise EioTokenTypeException_401.Create(Format('Invalid token type "%s" ("%s" expected)', [LJWT.TokenType, TOKEN_TYPE_REFRESH]));
     // Extract user & app
-    AAuthResponse.Usr := LJWT.User;
-    AAuthResponse.UsrOID := LJWT.UserOID;
-    AAuthResponse.App := LJWT.App;
-    AAuthResponse.AppOID := LJWT.AppOID;
+    AAuthResponse.Subjects.User := LJWT.User;
+    AAuthResponse.Subjects.UserOID := LJWT.UserOID;
+    AAuthResponse.Subjects.App := LJWT.App;
+    AAuthResponse.Subjects.AppOID := LJWT.AppOID;
   finally
     LJWT.Free;
   end;

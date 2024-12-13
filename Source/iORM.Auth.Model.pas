@@ -212,7 +212,7 @@ type
     procedure SetPswExp(const Value: TDateTime);
   strict protected
     // ---------- can be ovverrided ----------
-    procedure Clear;
+    procedure Clear(const AClearMode: TioAuthCredentialsClearMode);
     function GeneratePasswordDigest(const APassword: String): String; virtual;
     function GenerateOTP: String; virtual;
     function GetExceptionEntityName: String; override;
@@ -243,14 +243,17 @@ type
   strict private
     [ioIndex(ioAscending, True), ioNotNull] // unique & required
     FAppID: String;
+    FAppName: String;
     FAppSecret: String;
     function GetAppID: String;
+    function GetAppName: String;
     function GetAppSecret: String;
     procedure SetAppID(const Value: String);
+    procedure SetAppName(const Value: String);
     procedure SetAppSecret(const Value: String);
   strict protected
     // ---------- can be ovverrided ----------
-    procedure Clear;
+    procedure Clear(const AClearMode: TioAuthCredentialsClearMode);
     function GenerateAppID: String; virtual;
     function GenerateAppSecret: String; virtual;
     function GetExceptionEntityName: String; override;
@@ -267,6 +270,7 @@ type
     function ResetCredentials(const AGenerateOTP: Boolean = True; const AOTPDurationMins: Integer = AUTH_OTP_DURATION_MIN): String;
     // ---------- can be ovverrided ----------
     property AppID: String read GetAppID write SetAppID;
+    property AppName: String read GetAppName write SetAppName;
     property AppSecret: String read GetAppSecret write SetAppSecret;
   end;
 
@@ -596,9 +600,12 @@ begin
     raise EioAuthInvalidCredentialsException_401.Create(Format('Invalid %s credentials', [GetExceptionEntityName.ToLower]));
 end;
 
-procedure TioAuthUser.Clear;
+procedure TioAuthUser.Clear(const AClearMode: TioAuthCredentialsClearMode);
 begin
   inherited;
+  // clear user
+  if AClearMode = cmAll then
+    FLoginUser := IO_STRING_NULL_VALUE;
   // clear password
   FLoginPassword := IO_STRING_NULL_VALUE;
   // clear set/reset/change password related properties
@@ -607,7 +614,7 @@ begin
   FPswDigest := IO_STRING_NULL_VALUE;
   // Set password expiration & credentials mode
   FPswExp := IncMinute(TioUtilities.NowUTC, TioAuthServer.GetInstance.UserOTP_Expiration_Mins);
-  FCredentialMode := cmSetPassword;
+  FCredentialMode := cmChangePassword;
 end;
 
 procedure TioAuthUser.ConfirmCredentials;
@@ -760,8 +767,10 @@ begin
     raise EioAuthInvalidCredentialsException_401.Create(Format('Invalid %s credentials', [GetExceptionEntityName.ToLower]));
 end;
 
-procedure TioAuthApp.Clear;
+procedure TioAuthApp.Clear(const AClearMode: TioAuthCredentialsClearMode);
 begin
+  if AClearMode = cmAll then
+    FAppName := IO_STRING_NULL_VALUE;
   FAppID := IO_STRING_NULL_VALUE;
   FAppSecret := IO_STRING_NULL_VALUE;
 end;
@@ -797,6 +806,11 @@ begin
   Result := FAppID;
 end;
 
+function TioAuthApp.GetAppName: String;
+begin
+  Result := FAppName;
+end;
+
 function TioAuthApp.GetAppSecret: String;
 begin
   Result := FAppSecret;
@@ -820,6 +834,11 @@ end;
 procedure TioAuthApp.SetAppID(const Value: String);
 begin
   FAppID := Value;
+end;
+
+procedure TioAuthApp.SetAppName(const Value: String);
+begin
+  FAppName := Value;
 end;
 
 procedure TioAuthApp.SetAppSecret(const Value: String);

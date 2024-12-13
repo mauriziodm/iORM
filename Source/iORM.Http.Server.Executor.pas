@@ -58,7 +58,6 @@ type
     class procedure _SQLLoadDataSet(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
     // auth
     class procedure _AuthorizeUser(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
-    class procedure _AuthorizeApp(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
     class procedure _AuthorizeAccess(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
     class procedure _NewAccessToken(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
     class procedure _RefreshAccessToken(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
@@ -124,8 +123,6 @@ begin
       _NewAccessToken(LioRequestBody, LioResponseBody)
     else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_AUTHORIZEUSER then
       _AuthorizeUser(LioRequestBody, LioResponseBody)
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_AUTHORIZEAPP then
-      _AuthorizeApp(LioRequestBody, LioResponseBody)
     // else
     else
       raise EioHttpLocalException.Create(ClassName, 'Execute', Format('Method "%s" not found.', [LioRequestBody.MethodName]));
@@ -150,16 +147,6 @@ end;
 class procedure TioHttpServerExecutor._AuthorizeAccess(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
 begin
   AioResponseBody.AuthResult1 := TioAuthServer.GetInstance.AuthorizeAccess(AioRequestBody.AuthScope, AioRequestBody.AuthIntention, AioRequestBody.AuthToken).AsString;
-end;
-
-class procedure TioHttpServerExecutor._AuthorizeApp(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
-var
-  LAppCredentials: IioAuthAppCredentials;
-begin
-  if Supports(AioRequestBody.JSONDataValueAsObject, IioAuthAppCredentials, LAppCredentials) then
-    AioResponseBody.AuthResult1 := TioAuthServer.GetInstance.AuthorizeApp(LAppCredentials, AioRequestBody.AuthToken).AsString
-  else
-    raise EioHttpLocalException.Create(ClassName, '_AuthorizeApp', 'JSONDataValue object does not implement then "IioAuthAppCredentials" interface');
 end;
 
 class procedure TioHttpServerExecutor._AuthorizeUser(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);

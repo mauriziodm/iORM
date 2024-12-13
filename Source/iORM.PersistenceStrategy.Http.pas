@@ -78,7 +78,6 @@ type
     class procedure _DoSQLDest_Execute(const ASQLDestination: IioSQLDestination); override;
     // Auth
     class function _DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse; override;
-    class function _DoAuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials; const AUserAuthorizationToken: String): IioAuthResponse; override;
     class function _DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse; override;
     class function _DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String): IioAuthResponse; override;
     class function _DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String): IioAuthResponse; override;
@@ -539,36 +538,6 @@ begin
     LConnection.ioRequestBody.AuthToken := AAccessToken;
     // Execute
     LConnection.Execute(HTTP_METHOD_NAME_AUTH_AUTHORIZEACCESS);
-    // Set result values
-    Result := TioAuthFactory.NewAuthResponseFromString( LConnection.ioResponseBody.AuthResult1 );
-    // Commit
-    LConnection.Commit;
-  except
-    // Rollback
-    LConnection.Rollback;
-    raise;
-  end;
-end;
-
-class function TioPersistenceStrategyHttp._DoAuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials; const AUserAuthorizationToken: String): IioAuthResponse;
-var
-  LConnection: IioConnectionHttp;
-begin
-  inherited;
-  // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(AConnectionDefName).AsHttpConnection;
-  // Start transaction
-  // NB: In this strategy (HTTP) call the Connection.StartTransaction (not the Self.StartTransaction
-  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any http call to the server at this point.
-  LConnection.StartTransaction;
-  try
-    // Set request parameters
-    LConnection.ioRequestBody.Clear;
-    LConnection.ioRequestBody.AuthToken := AUserAuthorizationToken;
-    LConnection.ioRequestBody.JSONDataValueAsObject := AAppCredentials as TObject;
-    // Execute
-    LConnection.Execute(HTTP_METHOD_NAME_AUTH_AUTHORIZEUSER);
     // Set result values
     Result := TioAuthFactory.NewAuthResponseFromString( LConnection.ioResponseBody.AuthResult1 );
     // Commit
