@@ -383,7 +383,7 @@ type
     procedure SetJSONDataValue(const Value: TJSONValue);
     function GetJSONDataValue: TJSONValue;
     property JSONDataValue: TJSONValue read GetJSONDataValue write SetJSONDataValue;
-    // JSONDataValueAsObject (for auth purposes -> Credentials (without CodeVerifier/CodeChallenge))
+    // JSONDataValueAsObject (for auth purposes -> Credentials (without CodeVerifier/CodChallenge))
     procedure SetJSONDataValueAsObject(const AObj: TObject);
     function GetJSONDataValueAsObject: TObject;
     property JSONDataValueAsObject: TObject read GetJSONDataValueAsObject write SetJSONDataValueAsObject;

@@ -155,7 +155,19 @@ type
     procedure Release;
   end;
 
-  IioAuthUserCredentials = interface
+  IioAuthCredentials = interface
+    ['{CE64A453-68BF-4E11-8842-7E2A1BCA28B7}']
+    procedure GenerateCodeVerifierAndChallenge;
+    function GetCodeChallenge: String;
+    function GetCodeVerifier: String;
+    procedure SetCodeChallenge(const Value: String);
+    procedure SetCodeVerifier(const Value: String);
+    // properties
+    property CodeChallenge: String read GetCodeChallenge write SetCodeChallenge;
+    property CodeVerifier: String read GetCodeVerifier write SetCodeVerifier;
+  end;
+
+  IioAuthUserCredentials = interface(IioAuthCredentials)
     ['{2B8348E3-188F-477D-ACFD-C32C22BB342C}']
     function GetLoginPassword: String;
     function GetLoginUser: String;
@@ -166,7 +178,7 @@ type
     property LoginPassword: String read GetLoginPassword write SetLoginPassword;
   end;
 
-  IioAuthAppCredentials = interface
+  IioAuthAppCredentials = interface(IioAuthCredentials)
     ['{1714A188-B473-4114-8648-8EF6D4CBE084}']
     function GetAppID: String;
     function GetAppSecret: String;
@@ -323,8 +335,8 @@ type
   TioBeforeAuthorizeAppEvent = procedure(const Sender: TObject; const AAppCredentials: IioAuthAppCredentials; const AUserAuthorizationCode: String; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
   TioBeforeAuthorizeUserEvent = procedure(const Sender: TObject; const AUserCredentials: IioAuthUserCredentials; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
 
-  TioGetUserAuthCodeEventResponseMethod = reference to procedure(const AIsAuthorized: Boolean; const AUserAuthorizationCode: String = IO_AUTH_NULL_JWT; const AUser: String = IO_STRING_NULL_VALUE; const AUserOID: Integer = IO_INTEGER_NULL_VALUE; const AExpiration: TDateTime = IO_DATETIME_NULL_VALUE);
-  TioOnAuthorizeAppGetUserAuthCodeEvent = procedure(const Sender: TObject; const AAppCredentials: IioAuthAppCredentials; const AUserAuthCodeResponseMethod: TioGetUserAuthCodeEventResponseMethod) of object;
+  TioGetUserAuthGrantEventResponseMethod = reference to procedure(const AIsAuthorized: Boolean; const AUserAuthGrant: String = IO_AUTH_NULL_JWT);
+  TioOnAuthorizeAppGetUserAuthGrantEvent = procedure(const Sender: TObject; const AAppCredentials: IioAuthAppCredentials; const AUserAuthGrantResponseMethod: TioGetUserAuthGrantEventResponseMethod) of object;
 
   TioBeforeNeedRefreshEvent = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultNeedRefresh, Done: Boolean) of object;
   TioAfterNeedRefreshEvent = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultNeedRefresh: Boolean) of object;

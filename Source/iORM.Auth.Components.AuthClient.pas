@@ -56,7 +56,7 @@ type
     FBeforeAuthorizeAccess: TioBeforeAuthorizeAccessEvent;
     FBeforeAuthorizeApp: TioBeforeAuthorizeAppEvent;
     FBeforeAuthorizeUser: TioBeforeAuthorizeUserEvent;
-    FOnAuthorizeAppGetUserAuthCode: TioOnAuthorizeAppGetUserAuthCodeEvent;
+    FOnAuthorizeAppGetUserAuthCode: TioOnAuthorizeAppGetUserAuthGrantEvent;
     // access token generation or refresh events
     FAfterNewAccessToken: TioAfterBuildAccessTokenEvent;
     FAfterNeedRefresh: TioAfterNeedRefreshEvent;
@@ -119,7 +119,7 @@ type
     property BeforeAuthorizeAccess: TioBeforeAuthorizeAccessEvent read FBeforeAuthorizeAccess write FBeforeAuthorizeAccess;
     property BeforeAuthorizeApp: TioBeforeAuthorizeAppEvent read FBeforeAuthorizeApp write FBeforeAuthorizeApp;
     property BeforeAuthorizeUser: TioBeforeAuthorizeUserEvent read FBeforeAuthorizeUser write FBeforeAuthorizeUser;
-    property OnAuthorizeAppGetUserAuthCode: TioOnAuthorizeAppGetUserAuthCodeEvent read FOnAuthorizeAppGetUserAuthCode write FOnAuthorizeAppGetUserAuthCode;
+    property OnAuthorizeAppGetUserAuthCode: TioOnAuthorizeAppGetUserAuthGrantEvent read FOnAuthorizeAppGetUserAuthCode write FOnAuthorizeAppGetUserAuthCode;
     // access token generation or refresh events
     property AfterNewAccessToken: TioAfterBuildAccessTokenEvent read FAfterNewAccessToken write FAfterNewAccessToken;
     property AfterNeedRefresh: TioAfterNeedRefreshEvent read FAfterNeedRefresh write FAfterNeedRefresh;
@@ -213,10 +213,10 @@ end;
 
 procedure TioAuthClient._AuthorizeAppRequestUserAuthCode(const AAppCredentials: IioAuthAppCredentials);
 var
-  LGetUserAuthCodeEventResponseMethod: TioGetUserAuthCodeEventResponseMethod;
+  LGetUserAuthCodeEventResponseMethod: TioGetUserAuthGrantEventResponseMethod;
 begin
   // set the user auth code event reponse
-  LGetUserAuthCodeEventResponseMethod := procedure(const AIsAuthorized: Boolean; const AUserAuthorizationCode: String = IO_AUTH_NULL_JWT; const AUser: String = IO_STRING_NULL_VALUE; const AUserOID: Integer = IO_INTEGER_NULL_VALUE; const AExpiration: TDateTime = IO_DATETIME_NULL_VALUE)
+  LGetUserAuthCodeEventResponseMethod := procedure(const AIsAuthorized: Boolean; const AUserAuthorizationCode: String = IO_AUTH_NULL_JWT)
   var
     LDone: Boolean;
     LException: Exception;

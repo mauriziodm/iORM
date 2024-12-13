@@ -40,7 +40,24 @@ uses
 
 type
 
-  TioAuthUserCredentials = class(TInterfacedObject, IioAuthUserCredentials)
+  TioAuthCredentials = class(TInterfacedObject, IioAuthCredentials)
+  strict private
+    [ioSkip] FCodeChallenge: String;
+    [ioSkip] FCodeVerifier: String;
+    function GetCodeChallenge: String;
+    function GetCodeVerifier: String;
+    procedure SetCodeChallenge(const Value: String);
+    procedure SetCodeVerifier(const Value: String);
+  strict protected
+    procedure GenerateCodeVerifierAndChallenge; virtual;
+  public
+    constructor Create; virtual;
+    // PKCE (code challenge & code verifier) related properties
+    [ioSkip] property CodeChallenge: String read GetCodeChallenge write SetCodeChallenge;
+    [ioSkip] property CodeVerifier: String read GetCodeVerifier write SetCodeVerifier;
+  end;
+
+  TioAuthUserCredentials = class(TioAuthCredentials, IioAuthUserCredentials)
   strict private
     FLoginUser: String;
     FLoginPassword: String;
@@ -49,31 +66,25 @@ type
     procedure SetLoginUser(const Value: String);
     procedure SetLoginPassword(const Value: String);
   public
-    constructor Create; virtual;
+    constructor Create; override;
     // login related properties
     property LoginUser: String read GetLoginUser write SetLoginUser;
     property LoginPassword: String read GetLoginPassword write SetLoginPassword;
   end;
 
-  TioAuthAppCredentials = class(TInterfacedObject, IioAuthAppCredentials)
+  TioAuthAppCredentials = class(TioAuthCredentials, IioAuthAppCredentials)
   strict private
     FAppID: String;
     FAppSecret: String;
-    [ioSkip] FCodeChallenge: String;
-    [ioSkip] FCodeVerifier: String;
     function GetAppID: String;
     function GetAppSecret: String;
     procedure SetAppID(const Value: String);
     procedure SetAppSecret(const Value: String);
-  strict protected
-    procedure GenerateCodeVerifierAndChallenge; virtual;
   public
-    constructor Create; virtual;
+    constructor Create; override;
     // app authorization related properties
     property AppID: String read GetAppID write SetAppID;
     property AppSecret: String read GetAppSecret write SetAppSecret;
-    [ioSkip] property CodeChallenge: String read FCodeChallenge write FCodeChallenge;
-    [ioSkip] property CodeVerifier: String read FCodeVerifier write FCodeVerifier;
   end;
 
   TioAuthExpirable = class(TInterfacedObject, IioAuthExpirable)
@@ -168,22 +179,32 @@ type
     property Role: IioAuthRole read GetRole;
   end;
 
-  TioAuthRolesHolder = class(TioAuthExpirable, IioAuthRolesHolder)
+  TioAuthRolesHolderAndCredentials = class(TioAuthExpirable, IioAuthRolesHolder, IioAuthCredentials)
   strict private
+    [ioSkip] FCodeChallenge: String;
+    [ioSkip] FCodeVerifier: String;
     FRoles: TioAuthRoleList;
+    function GetCodeChallenge: String;
+    function GetCodeVerifier: String;
     function GetRoles: TioAuthRoleList;
+    procedure SetCodeChallenge(const Value: String);
+    procedure SetCodeVerifier(const Value: String);
   strict protected
     // ---------- can be ovverrided ----------
+    procedure GenerateCodeVerifierAndChallenge; virtual;
     function GetPermissionLevelFor(AScope: String; const AAppID: String = IO_STRING_NULL_VALUE): TioAuthPermissionLevel; virtual;
     // ---------- can be ovverrided ----------
   public
     constructor Create; override;
     destructor Destroy; override;
-    // properties
+    // IioAuthCredentials: PKCE (code challenge & code verifier) related properties
+    [ioSkip] property CodeChallenge: String read GetCodeChallenge write SetCodeChallenge;
+    [ioSkip] property CodeVerifier: String read GetCodeVerifier write SetCodeVerifier;
+    // IioAuthRolesHolder
     property Roles: TioAuthRoleList read GetRoles;
   end;
 
-  TioAuthUser = class(TioAuthRolesHolder, IioAuthUser, IioAuthUserCredentials)
+  TioAuthUser = class(TioAuthRolesHolderAndCredentials, IioAuthUser, IioAuthUserCredentials)
   strict private
     // login related fields
     [ioIndex(ioAscending, True), ioNotNull] // unique & required
@@ -239,7 +260,7 @@ type
     property PswExp: TDateTime read GetPswExp write SetPswExp;
   end;
 
-  TioAuthApp = class(TioAuthRolesHolder, IioAuthApp, IioAuthAppCredentials)
+  TioAuthApp = class(TioAuthRolesHolderAndCredentials, IioAuthApp, IioAuthAppCredentials)
   strict private
     [ioIndex(ioAscending, True), ioNotNull] // unique & required
     FAppID: String;
@@ -316,7 +337,7 @@ uses
 
 constructor TioAuthUserCredentials.Create;
 begin
-  inherited;
+  inherited Create;
   FLoginUser := IO_STRING_NULL_VALUE;
   FLoginPassword := IO_STRING_NULL_VALUE;
 end;
@@ -339,6 +360,41 @@ end;
 procedure TioAuthUserCredentials.SetLoginUser(const Value: String);
 begin
   FLoginUser := Value;
+end;
+
+{ TioAuthCredentials }
+
+constructor TioAuthCredentials.Create;
+begin
+  inherited Create;
+  GenerateCodeVerifierAndChallenge;
+end;
+
+procedure TioAuthCredentials.GenerateCodeVerifierAndChallenge;
+begin
+  // TODO: da implementare? oppure lascio tutto alle classi che derivano? (per pra sarei per implementare un comportamento di base overridabile)
+  FCodeChallenge := IO_STRING_NULL_VALUE;
+  FCodeVerifier := IO_STRING_NULL_VALUE;
+end;
+
+function TioAuthCredentials.GetCodeChallenge: String;
+begin
+  Result := FCodeChallenge;
+end;
+
+function TioAuthCredentials.GetCodeVerifier: String;
+begin
+  Result := FCodeVerifier;
+end;
+
+procedure TioAuthCredentials.SetCodeChallenge(const Value: String);
+begin
+  FCodeChallenge := Value;
+end;
+
+procedure TioAuthCredentials.SetCodeVerifier(const Value: String);
+begin
+  FCodeVerifier := Value;
 end;
 
 { TioAuthExpirable }
@@ -554,24 +610,52 @@ end;
 
 { TioAuthRolesHolder }
 
-constructor TioAuthRolesHolder.Create;
+constructor TioAuthRolesHolderAndCredentials.Create;
 begin
   inherited Create;
+  GenerateCodeVerifierAndChallenge;
   FRoles := TioAuthRoleList.Create;
 end;
 
-destructor TioAuthRolesHolder.Destroy;
+destructor TioAuthRolesHolderAndCredentials.Destroy;
 begin
   FRoles.Free;
   inherited;
 end;
 
-function TioAuthRolesHolder.GetRoles: TioAuthRoleList;
+function TioAuthRolesHolderAndCredentials.GetRoles: TioAuthRoleList;
 begin
   Result := FRoles;
 end;
 
-function TioAuthRolesHolder.GetPermissionLevelFor(AScope: String; const AAppID: String = IO_STRING_NULL_VALUE): TioAuthPermissionLevel;
+procedure TioAuthRolesHolderAndCredentials.GenerateCodeVerifierAndChallenge;
+begin
+  // TODO: da implementare? oppure lascio tutto alle classi che derivano? (per pra sarei per implementare un comportamento di base overridabile)
+  FCodeChallenge := IO_STRING_NULL_VALUE;
+  FCodeVerifier := IO_STRING_NULL_VALUE;
+end;
+
+function TioAuthRolesHolderAndCredentials.GetCodeChallenge: String;
+begin
+  Result := FCodeChallenge;
+end;
+
+function TioAuthRolesHolderAndCredentials.GetCodeVerifier: String;
+begin
+  Result := FCodeChallenge;
+end;
+
+procedure TioAuthRolesHolderAndCredentials.SetCodeChallenge(const Value: String);
+begin
+  FCodeChallenge := Value;
+end;
+
+procedure TioAuthRolesHolderAndCredentials.SetCodeVerifier(const Value: String);
+begin
+  FCodeVerifier := Value;
+end;
+
+function TioAuthRolesHolderAndCredentials.GetPermissionLevelFor(AScope: String; const AAppID: String = IO_STRING_NULL_VALUE): TioAuthPermissionLevel;
 var
   LAuthUserRoleItem: IioAuthRoleItem;
   LPermissionLevel: TioAuthPermissionLevel;
@@ -940,16 +1024,9 @@ end;
 
 constructor TioAuthAppCredentials.Create;
 begin
-  inherited;
+  inherited Create;
   FAppID := IO_STRING_NULL_VALUE;
   FAppSecret := IO_STRING_NULL_VALUE;
-  GenerateCodeVerifierAndChallenge;
-end;
-
-procedure TioAuthAppCredentials.GenerateCodeVerifierAndChallenge;
-begin
-  FCodeChallenge := IO_STRING_NULL_VALUE;
-  FCodeVerifier := IO_STRING_NULL_VALUE;
 end;
 
 function TioAuthAppCredentials.GetAppID: String;
