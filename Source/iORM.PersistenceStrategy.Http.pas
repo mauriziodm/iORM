@@ -79,7 +79,7 @@ type
     // Auth
     class function _DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse; override;
     class function _DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse; override;
-    class function _DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String): IioAuthResponse; override;
+    class function _DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse; override;
     class function _DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String): IioAuthResponse; override;
     // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
   end;
@@ -578,7 +578,7 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyHttp._DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String): IioAuthResponse;
+class function TioPersistenceStrategyHttp._DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse;
 var
   LConnection: IioConnectionHttp;
 begin
@@ -593,7 +593,8 @@ begin
   try
     // Set request parameters
     LConnection.ioRequestBody.Clear;
-    LConnection.ioRequestBody.AuthToken := AAuthorizationToken;
+    LConnection.ioRequestBody.AuthGrant := AAuthGrant;
+    LConnection.ioRequestBody.AuthToken := APkceCodeVerifier;
     // Execute
     LConnection.Execute(HTTP_METHOD_NAME_AUTH_NEWACCESSTOKEN);
     // Set result values

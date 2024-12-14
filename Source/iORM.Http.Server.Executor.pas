@@ -254,7 +254,8 @@ end;
 
 class procedure TioHttpServerExecutor._NewAccessToken(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
 begin
-  AioResponseBody.AuthResult1 := TioAuthServer.GetInstance.NewAccessToken(AioRequestBody.AuthToken).AsString;
+  // note: AioRequestBody.AuthToken param is PKCE code challenge
+  AioResponseBody.AuthResult1 := TioAuthServer.GetInstance.NewAccessToken(AioRequestBody.AuthGrant, AioRequestBody.AuthToken).AsString;
 end;
 
 class procedure TioHttpServerExecutor._PersistList(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);

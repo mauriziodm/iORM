@@ -106,7 +106,7 @@ type
     class function GetInstance: TioAuthServer; static;
     function AuthorizeUser(const AUserCredentials: IioAuthUserCredentials): IioAuthResponse;
     function AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse; // return true or false depending the access to the requested result is permitted
-    function NewAccessToken(const AAuthorizationToken: String): IioAuthResponse; // return a new acces token and also a new refresh token just after the authorization (login)
+    function NewAccessToken(const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse; // return a new acces token and also a new refresh token just after the authorization (login)
     function RefreshAccessToken(const ARefreshToken: String): IioAuthResponse; // return a new acces token and also a new refresh token
   published
     // properties
@@ -218,7 +218,7 @@ begin
   Result := io.Version;
 end;
 
-function TioAuthServer.NewAccessToken(const AAuthorizationToken: String): IioAuthResponse;
+function TioAuthServer.NewAccessToken(const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse;
 var
   LDone: Boolean;
 begin
@@ -228,12 +228,14 @@ begin
   // invoke OnNewAccessToken event if assigned
   LDone := False;
   if Assigned(FOnNewAccessToken) then
-    FOnNewAccessToken(Self, AAuthorizationToken, Result, LDone);
+    FOnNewAccessToken(Self, AAuthGrant, APkceCodeVerifier, Result, LDone);
   // if the creation of the token was not handled then return the default one
   if not LDone then
   begin
+    // TODO: AUTH: qui deve essere verificato anche il PKCE code verifier
+    // TODO: AUTH: questo deve cambiare per verificare l'AuthGrant
     // check authorization token
-    _CheckAuthorizationToken(AAuthorizationToken, Result, TOKEN_TYPE_AUTHORIZATION);
+//    _CheckAuthorizationToken(AAuthGrant, Result, TOKEN_TYPE_AUTHORIZATION);
     // check if the user is still active
     FUserCache.GetUser(Result.Subjects.User).CheckIfActive(True);
     // build the result access and refresh tokens
@@ -242,7 +244,7 @@ begin
   end;
   // final check, if the result token is null the raise exception
   if not Result.HasAccTkn then
-    raise EioAuthInvalidAuthorizationToken_401.Create('Invalid authorization token/code');
+    raise EioAuthInvalidAuthorizationGrant_401.Create('Invalid authorization token/code');
   // Return true if all is ok
   Result.IsAuth := True;
 end;

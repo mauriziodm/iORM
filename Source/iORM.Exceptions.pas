@@ -134,10 +134,10 @@ type
   EioTokenNotYetValidException_401 = class(EioAuthException)
   end;
 
-  EioAuthUserAuthorizationTokenExpected_401 = class(EioAuthException)
+  EioAuthUserAuthorizationGrantExpected_401 = class(EioAuthException)
   end;
 
-  EioAuthInvalidAuthorizationToken_401 = class(EioAuthException)
+  EioAuthInvalidAuthorizationGrant_401 = class(EioAuthException)
   end;
 
   EioAuthInvalidRefreshToken_401 = class(EioAuthException)

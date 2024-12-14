@@ -36,7 +36,7 @@ unit iORM.Auth.Components.AuthClient;
 interface
 
 uses
-  System.Classes, iORM.Auth.Interfaces;
+  System.Classes, iORM.Auth.Interfaces, iORM.CommonTypes;
 
 type
 
@@ -58,12 +58,12 @@ type
     FBeforeAuthorizeUser: TioBeforeAuthorizeUserEvent;
     FOnAuthorizeAppGetUserAuthCode: TioOnAuthorizeAppGetUserAuthGrantEvent;
     // access token generation or refresh events
-    FAfterNewAccessToken: TioAfterBuildAccessTokenEvent;
+    FAfterNewAccessToken: TioAfterNewAccessTokenEvent;
     FAfterNeedRefresh: TioAfterNeedRefreshEvent;
-    FAfterRefreshAccessToken: TioAfterBuildAccessTokenEvent;
-    FBeforeNewAccessToken: TioBeforeBuildAccessTokenEvent;
+    FAfterRefreshAccessToken: TioAfterRefreshAccessTokenEvent;
+    FBeforeNewAccessToken: TioBeforeNewAccessTokenEvent;
     FBeforeNeedRefresh: TioBeforeNeedRefreshEvent;
-    FBeforeRefreshAccessToken: TioBeforeBuildAccessTokenEvent;
+    FBeforeRefreshAccessToken: TioBeforeRefreshAccessTokenEvent;
     // token is expired events
     FAfterAccessTokenIsExpired: TioAfterTokenIsExpiredEvent;
     FAfterAppTokenIsExpired: TioAfterTokenIsExpiredEvent;
@@ -86,15 +86,14 @@ type
     function Get_Version: String;
     function _AccessTokenIsExpired(const ASession: IioAuthSession): Boolean;
     procedure _AuthorizeUser(const AUserCredentials: IioAuthUserCredentials; const ASession: IioAuthSession);
-    // TODO: _AuthorizeApp da rimuovere?
-    procedure _AuthorizeAppRequestUserAuthCode(const AAppCredentials: IioAuthAppCredentials);
+    procedure _AuthorizeApp_RequestUserAuthGrant(const AAppCredentials: IioAuthAppCredentials);
     function _AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
     procedure _CheckActive; inline;
     procedure _FillSessionData(const ASession: IioAuthSession; const AAuthResponse: IioAuthResponse);
     function _IsLoggedOn(const ASession: IioAuthSession): Boolean;
     procedure _RaiseAlreadyLoggedOnException(const ASession: IioAuthSession);
     function _NeedRefresh(const ASession: IioAuthSession): Boolean;
-    procedure _NewAccessToken(const ASession: IioAuthSession);
+    procedure _NewAccessToken(const ACredentials: IioAuthCredentials; const AAuthGrant: String = IO_STRING_NULL_VALUE);
     procedure _RefreshAccessToken(const ASession: IioAuthSession); // Da completare
     function _RefreshTokenIsExpired(const ASession: IioAuthSession): Boolean;
   public
@@ -121,12 +120,12 @@ type
     property BeforeAuthorizeUser: TioBeforeAuthorizeUserEvent read FBeforeAuthorizeUser write FBeforeAuthorizeUser;
     property OnAuthorizeAppGetUserAuthCode: TioOnAuthorizeAppGetUserAuthGrantEvent read FOnAuthorizeAppGetUserAuthCode write FOnAuthorizeAppGetUserAuthCode;
     // access token generation or refresh events
-    property AfterNewAccessToken: TioAfterBuildAccessTokenEvent read FAfterNewAccessToken write FAfterNewAccessToken;
+    property AfterNewAccessToken: TioAfterNewAccessTokenEvent read FAfterNewAccessToken write FAfterNewAccessToken;
     property AfterNeedRefresh: TioAfterNeedRefreshEvent read FAfterNeedRefresh write FAfterNeedRefresh;
-    property AfterRefreshAccessToken: TioAfterBuildAccessTokenEvent read FAfterRefreshAccessToken write FAfterRefreshAccessToken;
-    property BeforeNewAccessToken: TioBeforeBuildAccessTokenEvent read FBeforeNewAccessToken write FBeforeNewAccessToken;
+    property AfterRefreshAccessToken: TioAfterRefreshAccessTokenEvent read FAfterRefreshAccessToken write FAfterRefreshAccessToken;
+    property BeforeNewAccessToken: TioBeforeNewAccessTokenEvent read FBeforeNewAccessToken write FBeforeNewAccessToken;
     property BeforeNeedRefresh: TioBeforeNeedRefreshEvent read FBeforeNeedRefresh write FBeforeNeedRefresh;
-    property BeforeRefreshAccessToken: TioBeforeBuildAccessTokenEvent read FBeforeRefreshAccessToken write FBeforeRefreshAccessToken;
+    property BeforeRefreshAccessToken: TioBeforeRefreshAccessTokenEvent read FBeforeRefreshAccessToken write FBeforeRefreshAccessToken;
     // token is expired events
     property AfterAccessTokenIsExpired: TioAfterTokenIsExpiredEvent read FAfterAccessTokenIsExpired write FAfterAccessTokenIsExpired;
     property AfterAppTokenIsExpired: TioAfterTokenIsExpiredEvent read FAfterAppTokenIsExpired write FAfterAppTokenIsExpired;
@@ -151,7 +150,7 @@ implementation
 
 uses
   iORM, System.SysUtils, iORM.PersistenceStrategy.Factory, iORM.Abstraction,
-  iORM.Utilities, iORM.Exceptions, iORM.CommonTypes, iORM.Auth.Factory;
+  iORM.Utilities, iORM.Exceptions, iORM.Auth.Factory;
 
 { TioAuthorizationClient }
 
@@ -211,46 +210,43 @@ begin
     raise EioAuthForbiddenException_403.Create(Format('Access forbidden to scope (%s)', [AScope]));
 end;
 
-procedure TioAuthClient._AuthorizeAppRequestUserAuthCode(const AAppCredentials: IioAuthAppCredentials);
+procedure TioAuthClient._AuthorizeApp_RequestUserAuthGrant(const AAppCredentials: IioAuthAppCredentials);
 var
-  LGetUserAuthCodeEventResponseMethod: TioGetUserAuthGrantEventResponseMethod;
+  LGetUserAuthGrantResponseMethod: TioGetUserAuthGrantEventResponseMethod;
 begin
   // set the user auth code event reponse
-  LGetUserAuthCodeEventResponseMethod := procedure(const AIsAuthorized: Boolean; const AUserAuthorizationCode: String = IO_AUTH_NULL_JWT)
+  // TODO: AUTH: forse è meglio che il metodo anonimo riceva direttamente lìAuthResponse? Verificare!!!
+  LGetUserAuthGrantResponseMethod := procedure(const AIsAuthorized: Boolean; const AUserAuthGrant: String = IO_AUTH_NULL_JWT)
   var
     LDone: Boolean;
     LException: Exception;
-    LSession: IioAuthSession;
   begin
-    // acquire the session
-    LSession := TioApplication.AcquireSession;
+    // executes the operation inside a try-finally block to be able to invoke the onException... event if there is one
     try
-      // executes the operation inside a try-finally block to be able to invoke the onException... event if there is one
-      try
-        // step 4 - get new access token (and refresh token usually)
-        _NewAccessToken(LSession);
-        // return true if success
-      except
-        // if an onException event handler is assigned then invoke it else re-raise the exception
-        if Assigned(FonUserLoginException) then
-        begin
-          LException := AcquireExceptionObject as Exception;
-          try
-            FonAppLoginException(Self, AAppCredentials, LSession, LException);
-          finally
-            LException.Free;
-          end;
-        end
-        else
-          raise(LException);
-      end;
-    finally
-      TioApplication.ReleaseSession;
+      // step 3 - check if authorized
+      if not AIsAuthorized then
+        raise EioAuthForbiddenException_403.Create('Access authorization denied by the user');
+      // step 4 - get new access token (and refresh token usually)
+      _NewAccessToken(AAppCredentials, AUserAuthGrant);
+      // return true if success
+    except
+      // if an onException event handler is assigned then invoke it else re-raise the exception
+      if Assigned(FonUserLoginException) then
+      begin
+        LException := AcquireExceptionObject as Exception;
+        try
+          FonAppLoginException(Self, AAppCredentials, LException);
+        finally
+          LException.Free;
+        end;
+      end
+      else
+        raise(LException);
     end;
   end;
   // invoke OnAuthorizeAppGetUserAuthCode event to retrieve the user authorization code/token
   if Assigned(FOnAuthorizeAppGetUserAuthCode) then
-    FOnAuthorizeAppGetUserAuthCode(Self, AAppCredentials, LGetUserAuthCodeEventResponseMethod)
+    FOnAuthorizeAppGetUserAuthCode(Self, AAppCredentials, LGetUserAuthGrantResponseMethod)
   else
     raise EioAuthException.Create(Format('"OnAuthorizeAppGetUserAuthCode" handler isn''t assigned on TioAuthClient component named "%s"', [Name]));
 end;
@@ -293,16 +289,17 @@ end;
 
 procedure TioAuthClient._FillSessionData(const ASession: IioAuthSession; const AAuthResponse: IioAuthResponse);
 begin
-  // fill session subjects data
-  ASession.Subjects.Assign(AAuthResponse.Subjects);
-  // fill access token data
+  // update the session subjects data
+  if not AAuthResponse.Subjects.IsEmpty then
+    ASession.Subjects.Assign(AAuthResponse.Subjects);
+  // update session data with the access token data if exists
   if AAuthResponse.HasAccTkn then
   begin
     ASession.AccessToken := AAuthResponse.AccTkn;
     ASession.AccessTokenExp := AAuthResponse.AccExp;
     ASession.RefreshAfter := AAuthResponse.RefAft;
   end;
-  // fill refresh token data
+  // update session data with the refresh token data if exists
   if AAuthResponse.HasRefTkn then
   begin
     ASession.RefreshToken := AAuthResponse.RefTkn;
@@ -333,7 +330,7 @@ begin
       begin
         LException := AcquireExceptionObject as Exception;
         try
-          FonAppLoginException(Self, AAppCredentials, LSession, LException);
+          FonAppLoginException(Self, AAppCredentials, LException);
         finally
           LException.Free;
         end;
@@ -346,7 +343,7 @@ begin
   end;
   // -------------------- check if already logged on --------------------
   // step 2 - requeste the user authorization code (steps 3 & 4 are in the "_AuthorizeAppRequestUserAuthCode" method
-  _AuthorizeAppRequestUserAuthCode(AAppCredentials);
+  _AuthorizeApp_RequestUserAuthGrant(AAppCredentials);
   // return true if success
   Result := True;
 end;
@@ -548,50 +545,51 @@ begin
   end;
 end;
 
-procedure TioAuthClient._NewAccessToken(const ASession: IioAuthSession);
+procedure TioAuthClient._NewAccessToken(const ACredentials: IioAuthCredentials; const AAuthGrant: String = IO_STRING_NULL_VALUE);
 var
   LAuthResponse: IioAuthResponse;
   LDone: Boolean;
+  LSession: IioAuthSession;
 begin
   LDone := False;
   // invoke BeforeNewAccessToken if assigned
   if Assigned(FBeforeNewAccessToken) then
   begin
     LAuthResponse := TioAuthFactory.NewAuthResponse;
-    FBeforeNewAccessToken(Self, ASession, LAuthResponse, LDone);
+    FBeforeNewAccessToken(Self, ACredentials, LAuthResponse, LDone);
   end;
   // if the creation of the token was not handled then use the internal implementation
   if not LDone then
-    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).Auth_NewAccessToken(FConnectionName, ASession.UserToken);
+    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).Auth_NewAccessToken(FConnectionName, AAuthGrant, ACredentials.CodeVerifier);
   // invoke AfterNewAccessToken if assigned
   if Assigned(FAfterNewAccessToken) then
-    FAfterNewAccessToken(Self, ASession, LAuthResponse);
+    FAfterNewAccessToken(Self, ACredentials, LAuthResponse);
   // if authorized then update session props (else raise an exception)
-
-
-
-
-  if LAuthResponse.IsAuth and LAuthResponse.HasAccTkn then
+  if LAuthResponse.IsAuth then
   begin
-    ASession.AccessToken := LAuthResponse.AccTkn;
-    ASession.AccessTokenExp := LAuthResponse.AccExp;
-    ASession.RefreshAfter := LAuthResponse.RefAft;
-    if LAuthResponse.HasRefTkn then
-    begin
-      ASession.RefreshToken := LAuthResponse.RefTkn;
-      ASession.RefreshTokenExp := LAuthResponse.RefExp;
+    // acquire session data
+    LSession := TioApplication.AcquireSession;
+    try
+      // fill session data
+      _FillSessionData(LSession, LAuthResponse);
+    finally
+      // release session data
+      TioApplication.ReleaseSession;
     end;
   end
   else
-    raise EioAuthInvalidCredentialsException_401.Create('User or App auth code not valid');
+    raise EioAuthInvalidCredentialsException_401.Create('User or App credentials or authorization grant code are not valid');
 end;
 
 procedure TioAuthClient._RaiseAlreadyLoggedOnException(const ASession: IioAuthSession);
 begin
-  if ASession.HasAppToken then
-    raise EioAuthAlreadyLoggedOnException_401.Create(Format('Already logged on as app "%s", user "%s"', [ASession.App, ASession.User]))
+  if ASession.Subjects.HasApp then
+    raise EioAuthAlreadyLoggedOnException_401.Create(Format('Already logged on as app "%s", user "%s"', [ASession.Subjects.App, ASession.Subjects.User]))
   else
-    raise EioAuthAlreadyLoggedOnException_401.Create(Format('Already logged on as user "%s"', [ASession.User]));
+  if ASession.Subjects.HasUser then
+    raise EioAuthAlreadyLoggedOnException_401.Create(Format('Already logged on as user "%s"', [ASession.Subjects.User]))
+  else
+    raise EioAuthAlreadyLoggedOnException_401.Create(Format('Already logged on', [ASession.Subjects.User]))
 end;
 
 procedure TioAuthClient._RefreshAccessToken(const ASession: IioAuthSession);

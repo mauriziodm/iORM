@@ -91,7 +91,7 @@ type
     // Auth
     class function _DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse; override;
     class function _DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse; override;
-    class function _DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String): IioAuthResponse; override;
+    class function _DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse; override;
     class function _DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String): IioAuthResponse; override;
     // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
   end;
@@ -135,9 +135,10 @@ begin
   Result := TioAuthServer.GetInstance.AuthorizeUser(AUserCredentials);
 end;
 
-class function TioPersistenceStrategyDB._DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String): IioAuthResponse;
+class function TioPersistenceStrategyDB._DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse;
 begin
-  Result := TioAuthServer.GetInstance.NewAccessToken(AAuthorizationToken);
+// TODO: AUTH: da reimplementare
+//  Result := TioAuthServer.GetInstance.NewAccessToken(AAuthorizationToken);
 end;
 
 class function TioPersistenceStrategyDB._DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String): IioAuthResponse;

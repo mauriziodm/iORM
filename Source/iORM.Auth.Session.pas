@@ -56,14 +56,18 @@ type
     FAppOID: Integer;
     FUser: String;
     FUserOID: Integer;
-    function GetAppOID: Integer;
     function GetApp: String;
-    function GetUserOID: Integer;
+    function GetAppOID: Integer;
+    function GetHasApp: Boolean;
+    function GetHasAppOID: Boolean;
+    function GetHasUser: Boolean;
+    function GetHasUserOID: Boolean;
     function GetUser: String;
-    procedure SetAppOID(const Value: Integer);
+    function GetUserOID: Integer;
     procedure SetApp(const Value: String);
-    procedure SetUserOID(const Value: Integer);
+    procedure SetAppOID(const Value: Integer);
     procedure SetUser(const Value: String);
+    procedure SetUserOID(const Value: Integer);
   public
     constructor Create;
     procedure Assign(const ASource: IioAuthSessionSubjects);
@@ -73,6 +77,10 @@ type
     function IsEmpty: Boolean;
     property App: String read GetApp write SetApp;
     property AppOID: Integer read GetAppOID write SetAppOID;
+    property HasApp: Boolean read GetHasApp;
+    property HasAppOID: Boolean read GetHasAppOID;
+    property HasUser: Boolean read GetHasUser;
+    property HasUserOID: Boolean read GetHasUserOID;
     property User: String read GetUser write SetUser;
     property UserOID: Integer read GetUserOID write SetUserOID;
   end;
@@ -345,6 +353,26 @@ end;
 function TioAuthSessionSubjects.GetUserOID: Integer;
 begin
   Result := FUserOID;
+end;
+
+function TioAuthSessionSubjects.GetHasApp: Boolean;
+begin
+  Result := FApp <> IO_STRING_NULL_VALUE;
+end;
+
+function TioAuthSessionSubjects.GetHasAppOID: Boolean;
+begin
+  Result := FAppOID <> IO_INTEGER_NULL_VALUE;
+end;
+
+function TioAuthSessionSubjects.GetHasUser: Boolean;
+begin
+  Result := FUser <> IO_STRING_NULL_VALUE;
+end;
+
+function TioAuthSessionSubjects.GetHasUserOID: Boolean;
+begin
+  Result := FUserOID <> IO_INTEGER_NULL_VALUE;
 end;
 
 function TioAuthSessionSubjects.IsEmpty: Boolean;

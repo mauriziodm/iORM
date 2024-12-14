@@ -58,16 +58,25 @@ type
     procedure Clear;
     function IsEmpty: Boolean;
     procedure FromString(const Value: String);
-    function GetAppOID: Integer;
     function GetApp: String;
-    function GetUserOID: Integer;
+    function GetAppOID: Integer;
+    function GetHasApp: Boolean;
+    function GetHasAppOID: Boolean;
+    function GetHasUser: Boolean;
+    function GetHasUserOID: Boolean;
     function GetUser: String;
-    procedure SetAppOID(const Value: Integer);
+    function GetUserOID: Integer;
     procedure SetApp(const Value: String);
-    procedure SetUserOID(const Value: Integer);
+    procedure SetAppOID(const Value: Integer);
     procedure SetUser(const Value: String);
+    procedure SetUserOID(const Value: Integer);
+    // properties
     property App: String read GetApp write SetApp;
     property AppOID: Integer read GetAppOID write SetAppOID;
+    property HasApp: Boolean read GetHasApp;
+    property HasAppOID: Boolean read GetHasAppOID;
+    property HasUser: Boolean read GetHasUser;
+    property HasUserOID: Boolean read GetHasUserOID;
     property User: String read GetUser write SetUser;
     property UserOID: Integer read GetUserOID write SetUserOID;
   end;
@@ -324,7 +333,7 @@ type
 
   // TioAuthServer events
   TioOnAuthorizeUserEvent = procedure(const Sender: TObject; const AUserCredentials: IioAuthUserCredentials; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
-  TioOnNewAccessTokenEvent = procedure(const Sender: TObject; const AAuthorizationToken: String; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
+  TioOnNewAccessTokenEvent = procedure(const Sender: TObject; const AAuthGrant, APkceCodeVerifier: String; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
   TioOnRefreshAccessTokenEvent = procedure(const Sender: TObject; const ARefreshToken: String; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
 
   // TioAuthClient events
@@ -347,10 +356,13 @@ type
   TioBeforeIsLoggedOnEvent = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultIsLoggedOn, Done: Boolean) of object;
   TioAfterIsLoggedOnEvent = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultLoggedOn: Boolean) of object;
 
-  TioBeforeBuildAccessTokenEvent = procedure(const Sender: TObject; const ASession: IioAuthSession; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
-  TioAfterBuildAccessTokenEvent = procedure(const Sender: TObject; const ASession: IioAuthSession; const AAuthResponse: IioAuthResponse) of object;
+  TioBeforeNewAccessTokenEvent = procedure(const Sender: TObject; const ACredentials: IioAuthCredentials; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
+  TioAfterNewAccessTokenEvent = procedure(const Sender: TObject; const ACredentials: IioAuthCredentials; const AAuthResponse: IioAuthResponse) of object;
 
-  TioOnAppLoginExceptionEvent = procedure(const Sender: TObject; const AAppCredentials: IioAuthAppCredentials; const ASession: IioAuthSession; const AException: Exception) of object;
+  TioBeforeRefreshAccessTokenEvent = procedure(const Sender: TObject; const ACredentials: IioAuthCredentials; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
+  TioAfterRefreshAccessTokenEvent = procedure(const Sender: TObject; const ACredentials: IioAuthCredentials; const AAuthResponse: IioAuthResponse) of object;
+
+  TioOnAppLoginExceptionEvent = procedure(const Sender: TObject; const AAppCredentials: IioAuthAppCredentials; const AException: Exception) of object;
   TioOnUserLoginExceptionEvent = procedure(const Sender: TObject; const AUserCredentials: IioAuthUserCredentials; const ASession: IioAuthSession; const AException: Exception) of object;
   TioOnAuthorizeAccessExceptionEvent = procedure(const Sender: TObject; const AScope: String; const AAuthIntention: TioAuthIntention; const ASession: IioAuthSession; const AException: Exception) of object;
   TioOnAuthExceptionEvent = procedure(const Sender: TObject; const ASession: IioAuthSession; const AException: Exception) of object;

@@ -57,6 +57,7 @@ const
   KEY_SESSION_SUBJECTS = 'Subjects';
   KEY_AUTH_INTENTION = 'AuthIntention';
   KEY_AUTH_SCOPE = 'AuthScope';
+  KEY_AUTH_GRANT = 'AuthGrant';
   KEY_AUTH_TOKEN = 'AuthToken';
   KEY_AUTH_RESULT_ISAUTHORIZED = 'AuthResultIsAuthorized';
   KEY_AUTH_RESULT1 = 'AuthResult1';
@@ -366,6 +367,10 @@ type
     procedure SetAuthScope(const Value: String);
     function GetAuthScope: String;
     property AuthScope: String read GetAuthScope write SetAuthScope;
+    // AuthGrant
+    procedure SetAuthGrant(const Value: String);
+    function GetAuthGrant: String;
+    property AuthGrant: String read GetAuthGrant write SetAuthGrant;
     // AuthToken (for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge)
     procedure SetAuthToken(const Value: String);
     function GetAuthToken: String;
@@ -481,7 +486,7 @@ type
     // Auth
     class function _DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse; virtual; abstract;
     class function _DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse; virtual; abstract;
-    class function _DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String): IioAuthResponse; virtual; abstract;
+    class function _DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse; virtual; abstract;
     class function _DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String): IioAuthResponse; virtual; abstract;
     // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
   public
@@ -517,7 +522,7 @@ type
     // Auth
     class function AuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse;
     class function AuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
-    class function Auth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String): IioAuthResponse;
+    class function Auth_NewAccessToken(const AConnectionDefName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse;
     class function Auth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String): IioAuthResponse;
   end;
 
@@ -920,9 +925,9 @@ begin
   Result := _DoAuthorizeUser(AConnectionDefName, AUserCredentials);
 end;
 
-class function TioPersistenceStrategyIntf.Auth_NewAccessToken(const AConnectionDefName: String; const AAuthorizationToken: String): IioAuthResponse;
+class function TioPersistenceStrategyIntf.Auth_NewAccessToken(const AConnectionDefName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse;
 begin
-  Result := _DoAuth_NewAccessToken(AConnectionDefName, AAuthorizationToken);
+  Result := _DoAuth_NewAccessToken(AConnectionDefName, AAuthGrant, APkceCodeVerifier);
 end;
 
 class function TioPersistenceStrategyIntf.Auth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String): IioAuthResponse;

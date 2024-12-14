@@ -47,6 +47,7 @@ type
     // session subjects
     FSubjects: IioAuthSessionSubjects;
     // auth
+    FAuthGrant: String;
     FAuthIntention: TioAuthIntention;
     FAuthScope: String;
     FAuthToken: String; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
@@ -60,6 +61,7 @@ type
     FSQLDestination: IioSQLDestination;
     FWhere: IioWhere;
     // methods
+    function GetAuthGrant: String;
     function GetAuthIntention: TioAuthIntention;
     function GetAuthScope: String;
     function GetAuthToken: String;
@@ -73,6 +75,7 @@ type
     function GetSQLDestination: IioSQLDestination;
     function GetSubjects: IioAuthSessionSubjects;
     function GetWhere: IioWhere;
+    procedure SetAuthGrant(const Value: String);
     procedure SetAuthIntention(const Value: TioAuthIntention);
     procedure SetAuthScope(const Value: String);
     procedure SetAuthToken(const Value: String);
@@ -128,6 +131,10 @@ begin
     LJSONValue := LJSONObject.GetValue(KEY_AUTH_SCOPE);
     if Assigned(LJSONValue) then
       FAuthScope := LJSONValue.Value;
+    // AuthGrant
+    LJSONValue := LJSONObject.GetValue(KEY_AUTH_GRANT);
+    if Assigned(LJSONValue) then
+      FAuthGrant := LJSONValue.Value;
     // AuthToken
     LJSONValue := LJSONObject.GetValue(KEY_AUTH_TOKEN);
     if Assigned(LJSONValue) then
@@ -184,6 +191,7 @@ begin
   // auth
   FAuthIntention := aiRead;
   FAuthScope := IO_STRING_NULL_VALUE;
+  FAuthGrant := IO_STRING_NULL_VALUE;
   FAuthToken := IO_STRING_NULL_VALUE;
   // fields
   FBlindLevel := IO_INTEGER_NULL_VALUE;
@@ -194,6 +202,11 @@ begin
   FRelationPropertyName := IO_STRING_NULL_VALUE;
   FSQLDestination := nil;
   FWhere := nil;
+end;
+
+function TioHttpRequestBody.GetAuthGrant: String;
+begin
+  Result := FAuthGrant;
 end;
 
 function TioHttpRequestBody.GetAuthIntention: TioAuthIntention;
@@ -262,6 +275,11 @@ end;
 function TioHttpRequestBody.GetWhere: IioWhere;
 begin
   Result := FWhere;
+end;
+
+procedure TioHttpRequestBody.SetAuthGrant(const Value: String);
+begin
+  FAuthGrant := Value;
 end;
 
 procedure TioHttpRequestBody.SetAuthIntention(const Value: TioAuthIntention);
@@ -343,6 +361,9 @@ begin
     // AuthScope
     if FAuthScope <> IO_STRING_NULL_VALUE then
       LJSONObject.AddPair(KEY_AUTH_SCOPE, FAuthScope);
+    // AuthGrant
+    if FAuthGrant <> IO_STRING_NULL_VALUE then
+      LJSONObject.AddPair(KEY_AUTH_GRANT, FAuthGrant);
     // AuthToken
     if FAuthToken <> IO_STRING_NULL_VALUE then
       LJSONObject.AddPair(KEY_AUTH_TOKEN, FAuthToken);
