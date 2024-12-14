@@ -94,7 +94,7 @@ type
     procedure _RaiseAlreadyLoggedOnException(const ASession: IioAuthSession);
     function _NeedRefresh(const ASession: IioAuthSession): Boolean;
     procedure _NewAccessToken(const ACredentials: IioAuthCredentials; const AAuthGrant: String = IO_STRING_NULL_VALUE);
-    procedure _RefreshAccessToken(const ASession: IioAuthSession); // Da completare
+    procedure _RefreshAccessToken(const ARefreshToken: String); // Da completare
     function _RefreshTokenIsExpired(const ASession: IioAuthSession): Boolean;
   public
     constructor Create(AOwner: TComponent); override;
@@ -592,38 +592,40 @@ begin
     raise EioAuthAlreadyLoggedOnException_401.Create(Format('Already logged on', [ASession.Subjects.User]))
 end;
 
-procedure TioAuthClient._RefreshAccessToken(const ASession: IioAuthSession);
+procedure TioAuthClient._RefreshAccessToken(const ARefreshToken: String);
 var
   LAuthResponse: IioAuthResponse;
   LDone: Boolean;
+  LSession: IioAuthSession;
 begin
   LDone := False;
   // invoke BeforeRefreshAccessToken if assigned
   if Assigned(FBeforeRefreshAccessToken) then
   begin
     LAuthResponse := TioAuthFactory.NewAuthResponse;
-    FBeforeRefreshAccessToken(Self, ASession, LAuthResponse, LDone);
+    FBeforeRefreshAccessToken(Self, ARefreshToken, LAuthResponse, LDone);
   end;
   // if the creation of the token was not handled then use the internal implementation
   if not LDone then
     LAuthResponse := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).Auth_RefreshAccessToken(FConnectionName, ASession.RefreshToken);
   // invoke AfterRefreshAccessToken if assigned
   if Assigned(FAfterRefreshAccessToken) then
-    FAfterRefreshAccessToken(Self, ASession, LAuthResponse);
+    FAfterRefreshAccessToken(Self, ARefreshToken, LAuthResponse);
   // if authorized then update session props (else raise an exception)
-  if LAuthResponse.IsAuth and LAuthResponse.HasAccTkn then
+  if LAuthResponse.IsAuth then
   begin
-    ASession.AccessToken := LAuthResponse.AccTkn;
-    ASession.AccessTokenExp := LAuthResponse.AccExp;
-    ASession.RefreshAfter := LAuthResponse.RefAft;
-    if LAuthResponse.HasRefTkn then
-    begin
-      ASession.RefreshToken := LAuthResponse.RefTkn;
-      ASession.RefreshTokenExp := LAuthResponse.RefExp;
+    // acquire session data
+    LSession := TioApplication.AcquireSession;
+    try
+      // fill session data
+      _FillSessionData(LSession, LAuthResponse);
+    finally
+      // release session data
+      TioApplication.ReleaseSession;
     end;
   end
   else
-    raise EioAuthInvalidCredentialsException_401.Create('Invalid refresh token');
+    raise EioAuthInvalidCredentialsException_401.Create('Invalid or expired refresh token');
 end;
 
 function TioAuthClient.UserLogin(const AUserCredentials: IioAuthUserCredentials): Boolean;

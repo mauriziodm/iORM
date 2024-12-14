@@ -359,8 +359,8 @@ type
   TioBeforeNewAccessTokenEvent = procedure(const Sender: TObject; const ACredentials: IioAuthCredentials; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
   TioAfterNewAccessTokenEvent = procedure(const Sender: TObject; const ACredentials: IioAuthCredentials; const AAuthResponse: IioAuthResponse) of object;
 
-  TioBeforeRefreshAccessTokenEvent = procedure(const Sender: TObject; const ACredentials: IioAuthCredentials; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
-  TioAfterRefreshAccessTokenEvent = procedure(const Sender: TObject; const ACredentials: IioAuthCredentials; const AAuthResponse: IioAuthResponse) of object;
+  TioBeforeRefreshAccessTokenEvent = procedure(const Sender: TObject; const ARefreshToken: String; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
+  TioAfterRefreshAccessTokenEvent = procedure(const Sender: TObject; const ARefreshToken: String; const AAuthResponse: IioAuthResponse) of object;
 
   TioOnAppLoginExceptionEvent = procedure(const Sender: TObject; const AAppCredentials: IioAuthAppCredentials; const AException: Exception) of object;
   TioOnUserLoginExceptionEvent = procedure(const Sender: TObject; const AUserCredentials: IioAuthUserCredentials; const ASession: IioAuthSession; const AException: Exception) of object;
