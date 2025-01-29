@@ -883,7 +883,9 @@ begin
       // (quindi non dal binding che ha un meccanismo dedicato) questo oggetto che ho eliminato dalla lista ma che magari
       // non ho candellato dal DB non verrebbe eliminato apppunto dal DM. Quindi mi rimane il dubbio (anche in altre parti)
       // che non sia meglio fare un DELETE di quelli non con gli oggetti in modo da eliminare tutti i child direttamente
-      // sul DB senza passare dagli oggetti (però questo salterebbe ETM ad esempio).
+      // sul DB senza passare dagli oggetti (però questo salterebbe ETM ad esempio); oppure ancora fare prima un reload
+      // di tutti gli oggetti child e poi eliminarli uno ad uno come oggetti, questo risolverebbe tutto però con
+      // una minore efficienza.
       // If relation HasMany
       rtHasMany:
         _DoDeleteList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.IntentType, AMasterContext.BlindLevel);
