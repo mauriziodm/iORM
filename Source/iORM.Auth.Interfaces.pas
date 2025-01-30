@@ -51,30 +51,40 @@ type
   TioAuthCredentialsMode = (cmLogin, cmSetPassword, cmChangePassword);
   TioAuthCredentialsClearMode = (cmAll, cmSecretsOnly);
 
-  IioAuthSessionSubjects = interface
+  IioAuthSessionData = interface
     ['{DE6E7EDA-BEE0-4F8A-A12F-2A99E63D8EC5}']
-    procedure Assign(const ASource: IioAuthSessionSubjects);
+    procedure Assign(const ASource: IioAuthSessionData);
     function AsString: String;
     procedure Clear;
     function IsEmpty: Boolean;
     procedure FromString(const Value: String);
     function GetApp: String;
     function GetAppOID: Integer;
+    function GetConnectionName: String;
+    function GetConnectionNameRemote: String;
     function GetHasApp: Boolean;
     function GetHasAppOID: Boolean;
+    function GetHasConnectionName: Boolean;
+    function GetHasConnectionNameRemote: Boolean;
     function GetHasUser: Boolean;
     function GetHasUserOID: Boolean;
     function GetUser: String;
     function GetUserOID: Integer;
     procedure SetApp(const Value: String);
     procedure SetAppOID(const Value: Integer);
+    procedure SetConnectionName(const Value: String);
+    procedure SetConnectionNameRemote(const Value: String);
     procedure SetUser(const Value: String);
     procedure SetUserOID(const Value: Integer);
     // properties
     property App: String read GetApp write SetApp;
     property AppOID: Integer read GetAppOID write SetAppOID;
+    property ConnectionName: String read GetConnectionName write SetConnectionName;
+    property ConnectionNameRemote: String read GetConnectionNameRemote write SetConnectionNameRemote;
     property HasApp: Boolean read GetHasApp;
     property HasAppOID: Boolean read GetHasAppOID;
+    property HasConnectionName: Boolean read GetHasConnectionName;
+    property HasConnectionNameRemote: Boolean read GetHasConnectionNameRemote;
     property HasUser: Boolean read GetHasUser;
     property HasUserOID: Boolean read GetHasUserOID;
     property User: String read GetUser write SetUser;
@@ -87,7 +97,6 @@ type
     function GetAccessToken: String;
     function GetAccessTokenExp: TDateTime;
     function GetAccessTokenIsExpired: Boolean;
-    function GetConnectionName: String;
     function GetHasAccessToken: Boolean;
     function GetHasRefreshToken: Boolean;
     function GetNeedRefresh: Boolean;
@@ -95,15 +104,14 @@ type
     function GetRefreshToken: String;
     function GetRefreshTokenExp: TDateTime;
     function GetRefreshTokenIsExpired: Boolean;
-    function GetSubjects: IioAuthSessionSubjects;
+    function GetSessionData: IioAuthSessionData;
     procedure SetAccessToken(const Value: String);
     procedure SetAccessTokenExp(const Value: TDateTime);
-    procedure SetConnectionName(const Value: String);
     procedure SetRefreshAfter(const Value: TDateTime);
     procedure SetRefreshToken(const Value: String);
     procedure SetRefreshTokenExp(const Value: TDateTime);
     // subjects (user, app)
-    property Subjects: IioAuthSessionSubjects read GetSubjects;
+    property SessionData: IioAuthSessionData read GetSessionData;
     // refresh
     property RefreshToken: String read GetRefreshToken write SetRefreshToken;
     property RefreshTokenExp: TDateTime read GetRefreshTokenExp write SetRefreshTokenExp;
@@ -116,8 +124,6 @@ type
     property HasAccessToken: Boolean read GetHasAccessToken;
     property RefreshAfter: TDateTime read GetRefreshAfter write SetRefreshAfter;
     property NeedRefresh: Boolean read GetNeedRefresh;
-    // connection
-    property ConnectionName: String read GetConnectionName write SetConnectionName;
   end;
 
   IioAuthResponse = interface
@@ -129,7 +135,7 @@ type
     function GetRefAft: TDateTime;
     function GetRefTkn: String;
     function GetRefExp: TDateTime;
-    function GetSubjects: IioAuthSessionSubjects;
+    function GetSubjects: IioAuthSessionData;
     procedure SetAccTkn(const Value: String);
     procedure SetAccExp(const Value: TDateTime);
     procedure SetAutGnt(const Value: String);
@@ -145,7 +151,7 @@ type
     // properties
     property IsAuth: Boolean read GetIsAuth write SetIsAuth;
     // session subjects
-    property Subjects: IioAuthSessionSubjects read GetSubjects;
+    property Subjects: IioAuthSessionData read GetSubjects;
     // auth grant (auth code)
     property AutGnt: String read GetAutGnt write SetAutGnt;
     // refresh

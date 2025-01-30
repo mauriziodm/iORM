@@ -356,8 +356,8 @@ type
     function AsString: String;
     // ---------- session ----------
     // Subjects
-    function GetSubjects: IioAuthSessionSubjects;
-    property Subjects: IioAuthSessionSubjects read GetSubjects;
+    function GetSubjects: IioAuthSessionData;
+    property Subjects: IioAuthSessionData read GetSubjects;
     // ---------- auth ----------
     // AuthIntention
     procedure SetAuthIntention(const Value: TioAuthIntention);

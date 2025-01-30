@@ -10,7 +10,7 @@ type
   private
     FIsAuth: Boolean;
     // session subjects
-    FSubjects: IioAuthSessionSubjects;
+    FSubjects: IioAuthSessionData;
     // auth grant (auth code)
     FAutGnt: String;
     // refresh
@@ -27,7 +27,7 @@ type
     function GetRefAft: TDateTime;
     function GetRefTkn: String;
     function GetRefExp: TDateTime;
-    function GetSubjects: IioAuthSessionSubjects;
+    function GetSubjects: IioAuthSessionData;
     procedure SetAccTkn(const Value: String);
     procedure SetAccExp(const Value: TDateTime);
     procedure SetAutGnt(const Value: String);
@@ -45,7 +45,7 @@ type
     // properties
     property IsAuth: Boolean read GetIsAuth write SetIsAuth;
     // session subjects
-    property Subjects: IioAuthSessionSubjects read GetSubjects;
+    property Subjects: IioAuthSessionData read GetSubjects;
     // auth grant (auth code)
     property AutGnt: String read GetAutGnt write SetAutGnt;
     // refresh
@@ -68,7 +68,7 @@ uses
 constructor TioAuthResponse.Create;
 begin
     // session subjects data
-    FSubjects := TioAuthFactory.NewAuthSessionSubjects;
+    FSubjects := TioAuthFactory.NewAuthSessionData;
     // is authorized (login, access)
     FIsAuth := False;
     // sessionsubjects
@@ -161,7 +161,7 @@ begin
   Result := FRefTkn;
 end;
 
-function TioAuthResponse.GetSubjects: IioAuthSessionSubjects;
+function TioAuthResponse.GetSubjects: IioAuthSessionData;
 begin
   Result := FSubjects;
 end;

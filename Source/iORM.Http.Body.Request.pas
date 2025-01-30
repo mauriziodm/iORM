@@ -45,7 +45,7 @@ type
   TioHttpRequestBody = class(TInterfacedObject, IioHttpRequestBody)
   private
     // session subjects
-    FSubjects: IioAuthSessionSubjects;
+    FSubjects: IioAuthSessionData;
     // auth
     FAuthGrant: String;
     FAuthIntention: TioAuthIntention;
@@ -73,7 +73,7 @@ type
     function GetRelationOID: Integer;
     function GetRelationPropertyName: String;
     function GetSQLDestination: IioSQLDestination;
-    function GetSubjects: IioAuthSessionSubjects;
+    function GetSubjects: IioAuthSessionData;
     function GetWhere: IioWhere;
     procedure SetAuthGrant(const Value: String);
     procedure SetAuthIntention(const Value: TioAuthIntention);
@@ -105,7 +105,7 @@ uses
 constructor TioHttpRequestBody.Create;
 begin
   inherited Create;
-  FSubjects := TioAuthFactory.NewAuthSessionSubjects;
+  FSubjects := TioAuthFactory.NewAuthSessionData;
   Clear;
 end;
 
@@ -267,7 +267,7 @@ begin
   Result := FSQLDestination;
 end;
 
-function TioHttpRequestBody.GetSubjects: IioAuthSessionSubjects;
+function TioHttpRequestBody.GetSubjects: IioAuthSessionData;
 begin
   Result := FSubjects;
 end;
