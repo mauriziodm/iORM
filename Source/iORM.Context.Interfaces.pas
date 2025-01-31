@@ -39,7 +39,7 @@ uses
   iORM.CommonTypes, iORM.Context.Table.Interfaces,
   iORM.Context.Properties.Interfaces, System.Rtti, iORM.Where.Interfaces,
   iORM.Context.Map.Interfaces, iORM.LiveBindings.BSPersistence,
-  iORM.Attributes;
+  iORM.Attributes, iORM.Auth.Interfaces;
 
 type
 
@@ -168,6 +168,10 @@ type
     function GetConflictState: TioPersistenceConflictState;
     procedure SetConflictState(const Value: TioPersistenceConflictState);
     property ConflictState: TioPersistenceConflictState read GetConflictState write SetConflictState;
+    // SessionData
+    function GetSessionData: IioAuthSessionData;
+    procedure SetSessionData(const Value: IioAuthSessionData);
+    property SessionData: IioAuthSessionData read GetSessionData write SetSessionData;
   end;
 
 implementation

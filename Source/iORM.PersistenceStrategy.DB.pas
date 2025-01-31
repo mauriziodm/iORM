@@ -60,20 +60,20 @@ type
     // ========== BEGIN OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
     // Persistence
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------
-    class procedure _DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); override;
-    class procedure _DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); override;
-    class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType); override;
-    class function _DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
+    class procedure _DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); override;
+    class procedure _DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); override;
+    class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType; const ASessionData: IioAuthSessionData); override;
+    class function _DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType; const ASessionData: IioAuthSessionData): TObject; override;
     class procedure _DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
       const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
-      const ABlindLevel: Byte); override;
+      const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); override;
     class procedure _DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
       const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
-      const ABlindLevel: Byte); override;
+      const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); override;
     // ---------- End intercepted methods (StrategyInterceptors) ----------
     class procedure _DoDelete(const AWhere: IioWhere); override;
     class procedure _DoLoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
-    class function _DoLoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
+    class function _DoLoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType; const ASessionData: IioAuthSessionData): TObject; override;
     class function _DoLoadObjVersion(const AContext: IioContext): Integer; override;
     class function _DoCount(const AWhere: IioWhere): Integer; override;
     class function _DoMax(const AWhere: IioWhere; const APropertyName: String): Integer; override;
@@ -111,7 +111,7 @@ type
 
   IioContextCache = interface
     ['{FAFBB27B-3E84-4D23-8801-3C863FA3556B}']
-    function GetContext(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ABlindLevel: Byte): IioContext;
+    function GetContext(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData): IioContext;
   end;
 
   TioContextCache = class(TInterfacedObject, IioContextCache)
@@ -120,7 +120,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    function GetContext(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ABlindLevel: Byte): IioContext;
+    function GetContext(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData): IioContext;
   end;
 
 { TioStrategyDB }
@@ -246,7 +246,7 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyDB._DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
+class procedure TioPersistenceStrategyDB._DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData);
 var
   LDuckTypedList: IioDuckTypedList;
   LObj: TObject;
@@ -277,7 +277,7 @@ begin
     for LObj in LDuckTypedList do
     begin
       // Persist object
-      Self._DoDeleteObject(LObj, AIntent, ABlindLevel);
+      Self._DoDeleteObject(LObj, AIntent, ABlindLevel, ASessionData);
     end;
     Self._DoCommitTransaction('');
   except
@@ -286,7 +286,7 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyDB._DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
+class procedure TioPersistenceStrategyDB._DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData);
 var
   LContext: IioContext;
 
@@ -301,7 +301,7 @@ begin
   if not Assigned(AObj) then
     Exit;
   // Create Context (Create a dummy ioWhere first to pass ConnectionName parameter only).
-  LContext := TioContextFactory.Context(AIntent, AObj.ClassName, nil, AObj, nil, '', '', ABlindLevel);
+  LContext := TioContextFactory.Context(AIntent, AObj.ClassName, nil, AObj, nil, '', '', ABlindLevel, ASessionData);
   LContext.ActionType := atDelete;
   // If the object is of a class mapped as NotPersisted then exit
   if LContext.Map.GetTable.IsNotPersistedEntity then
@@ -470,7 +470,7 @@ begin
   Result := TioDBFactory.Connection(AConnectionDefName).InTransaction;
 end;
 
-class function TioPersistenceStrategyDB._DoLoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
+class function TioPersistenceStrategyDB._DoLoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType; const ASessionData: IioAuthSessionData): TObject;
 var
   LContext: IioContext;
   LQuery: IioQuery;
@@ -479,7 +479,7 @@ begin
   // Init
   Result := AObj;
   // Get the Context
-  LContext := TioContextFactory.Context(AIntent, AWhere.TypeName, AWhere, Result, nil, '', '', BL_DEFAULT);
+  LContext := TioContextFactory.Context(AIntent, AWhere.TypeName, AWhere, Result, nil, '', '', BL_DEFAULT, ASessionData);
   // If the object is of a class mapped as NotPersisted then skip it
   if LContext.Map.GetTable.IsNotPersistedEntity then
     Exit;
@@ -675,7 +675,7 @@ end;
 
 class procedure TioPersistenceStrategyDB._DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
       const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
-      const ABlindLevel: Byte);
+      const ABlindLevel: Byte; const ASessionData: IioAuthSessionData);
 var
   LDuckTypedList: IioDuckTypedList;
   LObj: TObject;
@@ -704,7 +704,7 @@ begin
     LDuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
     // Loop the list
     for LObj in LDuckTypedList do
-      _DoPersistObject(LObj, AIntent, ARelationPropertyName, ARelationOID, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath, ABlindLevel);
+      _DoPersistObject(LObj, AIntent, ARelationPropertyName, ARelationOID, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath, ABlindLevel, ASessionData);
     // Commit the transaction
     _DoCommitTransaction('');
   except
@@ -715,7 +715,7 @@ end;
 
 class procedure TioPersistenceStrategyDB._DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
       const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
-      const ABlindLevel: Byte);
+      const ABlindLevel: Byte; const ASessionData: IioAuthSessionData);
 var
   LContext: IioContext;
 
@@ -796,7 +796,7 @@ begin
   if not Assigned(AObj) then
     Exit;
   // Create Context
-  LContext := TioContextFactory.Context(AIntent, AObj.ClassName, nil, AObj, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath, ABlindLevel);
+  LContext := TioContextFactory.Context(AIntent, AObj.ClassName, nil, AObj, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath, ABlindLevel, ASessionData);
   // If the object is of a class mapped as NotPersisted then exit
   if LContext.Map.GetTable.IsNotPersistedEntity then
     Exit;
@@ -1077,7 +1077,7 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyDB._DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType);
+class procedure TioPersistenceStrategyDB._DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType; const ASessionData: IioAuthSessionData);
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
@@ -1112,7 +1112,7 @@ var
           // If TrueClassMode is tvSmart then get the specific context for the current record/object else
           // use the original context
           if LOriginalContext.GetTrueClass.Mode = tcSmart then
-            LCurrentContext := LContextCache.GetContext(AIntent, LQuery.ExtractTrueClassName(LOriginalContext), AWhere, BL_DEFAULT)
+            LCurrentContext := LContextCache.GetContext(AIntent, LQuery.ExtractTrueClassName(LOriginalContext), AWhere, BL_DEFAULT, ASessionData)
           else
             LCurrentContext := LOriginalContext;
           // Clean the DataObject (it contains the previous)
@@ -1172,7 +1172,7 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LOriginalContext := TioContextFactory.TrueClassVirtualContextIfEnabled(AIntent, LResolvedTypeName, AWhere, BL_DEFAULT);
+      LOriginalContext := TioContextFactory.TrueClassVirtualContextIfEnabled(AIntent, LResolvedTypeName, AWhere, BL_DEFAULT, ASessionData);
       // If the object is of a class mapped as NotPersisted then skip it
       if LOriginalContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
@@ -1190,7 +1190,7 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyDB._DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
+class function TioPersistenceStrategyDB._DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType; const ASessionData: IioAuthSessionData): TObject;
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
@@ -1221,7 +1221,7 @@ var
           // If TrueClassMode is tvSmart then get the specific context for the current record/object else
           // use the original context
           if LOriginalContext.GetTrueClass.Mode = tcSmart then
-            LCurrentContext := TioContextFactory.Context(AIntent, LQuery.ExtractTrueClassName(LOriginalContext), AWhere, Result, nil, '', '', BL_DEFAULT)
+            LCurrentContext := TioContextFactory.Context(AIntent, LQuery.ExtractTrueClassName(LOriginalContext), AWhere, Result, nil, '', '', BL_DEFAULT, ASessionData)
           else
             LCurrentContext := LOriginalContext;
           // Create the object as TObject (Intercepted by CRUDInterceptors)
@@ -1273,7 +1273,7 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LOriginalContext := TioContextFactory.TrueClassVirtualContextIfEnabled(AIntent, LResolvedTypeName, AWhere, BL_DEFAULT);
+      LOriginalContext := TioContextFactory.TrueClassVirtualContextIfEnabled(AIntent, LResolvedTypeName, AWhere, BL_DEFAULT, ASessionData);
       // If the object is of a class mapped as NotPersisted then skip it
       if LOriginalContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
@@ -1346,12 +1346,11 @@ begin
   inherited;
 end;
 
-function TioContextCache.GetContext(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ABlindLevel: Byte)
-  : IioContext;
+function TioContextCache.GetContext(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData): IioContext;
 begin
   // If the map is not already present in the cache then create and add it
   if not FContainer.ContainsKey(AClassName) then
-    FContainer.Add(AClassName, TioContextFactory.Context(AIntent, AClassName, AWhere, nil, nil, '', '', ABlindLevel));
+    FContainer.Add(AClassName, TioContextFactory.Context(AIntent, AClassName, AWhere, nil, nil, '', '', ABlindLevel, ASessionData));
   // Return the requested context and set its DataObject to nil
   Result := FContainer.Items[AClassName];
   Result.DataObject := nil;

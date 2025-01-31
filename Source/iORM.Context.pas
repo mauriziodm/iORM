@@ -42,7 +42,7 @@ uses
   iORM.Where, iORM.Context.Table.Interfaces, System.Rtti,
   iORM.Context.Map.Interfaces, iORM.Where.Interfaces,
   iORM.LiveBindings.BSPersistence, iORM.ConflictStrategy.Interfaces,
-  iORM.SynchroStrategy.Interfaces, iORM.Attributes;
+  iORM.SynchroStrategy.Interfaces, iORM.Attributes, iORM.Auth.Interfaces;
 
 type
 
@@ -63,6 +63,7 @@ type
     FConflictDetected: Boolean;
     FConflictState: TioPersistenceConflictState;
     FSynchroStrategy_Client_NoDirectCall: IioSynchroStrategy_Client;
+    FSessionData: IioAuthSessionData;
     // DataObject
     function GetDataObject: TObject;
     procedure SetDataObject(const AValue: TObject);
@@ -126,9 +127,12 @@ type
     // ConflictState
     function GetConflictState: TioPersistenceConflictState;
     procedure SetConflictState(const Value: TioPersistenceConflictState);
+    // SessionData
+    function GetSessionData: IioAuthSessionData;
+    procedure SetSessionData(const Value: IioAuthSessionData);
   public
     constructor Create(const AIntent: TioPersistenceIntentType; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
-      const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte); overload;
+      const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); overload;
     function GetClassRef: TioClassRef;
     function GetProperties: IioProperties;
     function GetTable: IioTable;
@@ -190,6 +194,7 @@ type
     property BlindLevel: Byte read GetBlindLevel write SetBlindLevel;
     property ConflictDetected: Boolean read GetConflictDetected write SetConflictDetected;
     property ConflictState: TioPersistenceConflictState read GetConflictState write SetConflictState;
+    property SessionData: IioAuthSessionData read GetSessionData write SetSessionData;
     /// Contiene il nome della classe originaria cioè, nel caso il contesto sia stato creato con
     ///  la TrueClassVirtual (select query) a partire da una resolved class name, contiene il nome
     ///  della classe originaria, quella dalla quale poi si è estratta la TrueClassVirtualMap stessa.
@@ -293,7 +298,7 @@ begin
 end;
 
 constructor TioContext.Create(const AIntent: TioPersistenceIntentType; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
-      const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
+      const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData);
 begin
   inherited Create;
   FMap := AMap;
@@ -311,6 +316,7 @@ begin
   FConflictDetected := False;
   FConflictState := csUndefined;
   FSynchroStrategy_Client_NoDirectCall := nil;
+  FSessionData := ASessionData;
 end;
 
 function TioContext.GetClassRef: TioClassRef;
@@ -342,6 +348,11 @@ end;
 function TioContext.GetRelationOID: Integer;
 begin
   Result := FHasManyChildVirtualPropertyValue;
+end;
+
+function TioContext.GetSessionData: IioAuthSessionData;
+begin
+  Result := FSessiondata;
 end;
 
 function TioContext.GetCurrentStrategyName: String;
@@ -497,6 +508,11 @@ end;
 procedure TioContext.SetRelationOID(const Value: Integer);
 begin
   FHasManyChildVirtualPropertyValue := Value;
+end;
+
+procedure TioContext.SetSessionData(const Value: IioAuthSessionData);
+begin
+  FSessionData := Value;
 end;
 
 procedure TioContext.SetObjCreated(const AValue: TioObjCreated);

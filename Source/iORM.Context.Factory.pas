@@ -42,7 +42,7 @@ uses
   iORM.Context.Table.Interfaces, System.Rtti,
   iORM.Attributes, System.Generics.Collections,
   iORM.Context.Map.Interfaces, iORM.Where.Interfaces,
-  iORM.LiveBindings.BSPersistence;
+  iORM.LiveBindings.BSPersistence, iORM.Auth.Interfaces;
 
 type
 
@@ -68,9 +68,9 @@ type
   public
     class function Map(const AClassRef: TioClassRef): IioMap;
     class function Context(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte): IioContext;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData): IioContext;
     class function TrueClassVirtualContextIfEnabled(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere;
-      const ABlindLevel: Byte): IioContext;
+      const ABlindLevel: Byte; const ASessionData: IioAuthSessionData): IioContext;
     class procedure GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
   end;
 
@@ -120,15 +120,15 @@ begin
 end;
 
 class function TioContextFactory.Context(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte): IioContext;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData): IioContext;
 begin
   // Get the Context
   Result := TioContext.Create(AIntent, TioMapContainer.GetMap(AClassName), AWhere, ADataObject, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath,
-    ABlindLevel);
+    ABlindLevel, ASessionData);
 end;
 
 class function TioContextFactory.TrueClassVirtualContextIfEnabled(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere;
-  const ABlindLevel: Byte): IioContext;
+      const ABlindLevel: Byte; const ASessionData: IioAuthSessionData): IioContext;
 var
   LMap: IioMap;
 begin
@@ -137,11 +137,11 @@ begin
   LMap := TioMapContainer.GetMap(AClassName);
   if LMap.GetTable.IsTrueClass then
   begin
-    Result := TioContext.Create(AIntent, LMap.GetTrueClassVirtualMap, AWhere, nil, nil, '', '', ABlindLevel);
+    Result := TioContext.Create(AIntent, LMap.GetTrueClassVirtualMap, AWhere, nil, nil, '', '', ABlindLevel, ASessionData);
     Result.OriginalNonTrueClassMap := LMap;
   end
   else
-    Result := TioContext.Create(AIntent, LMap, AWhere, nil, nil, '', '', ABlindLevel);
+    Result := TioContext.Create(AIntent, LMap, AWhere, nil, nil, '', '', ABlindLevel, ASessionData);
 end;
 
 class procedure TioContextFactory.GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
