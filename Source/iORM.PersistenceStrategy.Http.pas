@@ -50,19 +50,19 @@ type
     // ========== BEGIN OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
     // persistence
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------
-    class procedure _DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); override;
-    class procedure _DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); override;
-    class function _DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
-    class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType); override;
+    class procedure _DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); override;
+    class procedure _DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); override;
+    class function _DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType; const ASessionData: IioAuthSessionData): TObject; override;
+    class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType; const ASessionData: IioAuthSessionData); override;
     class procedure _DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte); override;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); override;
     class procedure _DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte); override;
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); override;
     // ---------- End intercepted methods (StrategyInterceptors) ----------
   public
     class procedure _DoDelete(const AWhere: IioWhere); override;
     class procedure _DoLoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
-    class function _DoLoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject; override;
+    class function _DoLoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType; const ASessionData: IioAuthSessionData): TObject; override;
     class function _DoCount(const AWhere: IioWhere): Integer; override;
     class function _DoMax(const AWhere: IioWhere; const APropertyName: String): Integer; override;
     class function _DoMin(const AWhere: IioWhere; const APropertyName: String): Integer; override;
@@ -169,7 +169,7 @@ begin
   APayload.Finalize;
 end;
 
-class procedure TioPersistenceStrategyHttp._DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
+class procedure TioPersistenceStrategyHttp._DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData);
 var
   LConnection: IioConnectionHttp;
 begin
@@ -186,6 +186,7 @@ begin
   LConnection.StartTransaction;
   try
     LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.SessionData := ASessionData;
     LConnection.ioRequestBody.BlindLevel := ABlindLevel;
     LConnection.ioRequestBody.IntentType := AIntent;
     LConnection.ioRequestBody.JSONDataValueAsObject := AList;
@@ -199,7 +200,7 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyHttp._DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
+class procedure TioPersistenceStrategyHttp._DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData);
 var
   LConnectionDefName: String;
   LConnection: IioConnectionHttp;
@@ -218,6 +219,7 @@ begin
   LConnection.StartTransaction;
   try
     LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.SessionData := ASessionData;
     LConnection.ioRequestBody.BlindLevel := ABlindLevel;
     LConnection.ioRequestBody.IntentType := AIntent;
     LConnection.ioRequestBody.JSONDataValueAsObject := AObj;
@@ -258,7 +260,7 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyHttp._DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType);
+class procedure TioPersistenceStrategyHttp._DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType; const ASessionData: IioAuthSessionData);
 var
   LConnection: IioConnectionHttp;
 begin
@@ -272,6 +274,7 @@ begin
   LConnection.StartTransaction;
   try
     LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.SessionData := ASessionData;
     LConnection.ioRequestBody.IntentType := AIntent;
     LConnection.ioRequestBody.Where := AWhere;
     LConnection.Execute(HTTP_METHOD_NAME_LOADLIST);
@@ -291,7 +294,7 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyHttp._DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
+class function TioPersistenceStrategyHttp._DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType; const ASessionData: IioAuthSessionData): TObject;
 var
   LConnection: IioConnectionHttp;
 begin
@@ -306,6 +309,7 @@ begin
   LConnection.StartTransaction;
   try
     LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.SessionData := ASessionData;
     LConnection.ioRequestBody.IntentType := AIntent;
     LConnection.ioRequestBody.Where := AWhere;
     LConnection.Execute(HTTP_METHOD_NAME_LOADOBJECT);
@@ -323,7 +327,7 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyHttp._DoLoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): TObject;
+class function TioPersistenceStrategyHttp._DoLoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType; const ASessionData: IioAuthSessionData): TObject;
 begin
   // This method is only used internally by the Object Maker,
   // and then you do not need to implement it in RESTStrategy.
@@ -387,7 +391,7 @@ begin
 end;
 
 class procedure TioPersistenceStrategyHttp._DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData);
 var
   LConnection: IioConnectionHttp;
 begin
@@ -404,6 +408,7 @@ begin
   LConnection.StartTransaction;
   try
     LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.SessionData := ASessionData;
     LConnection.ioRequestBody.BlindLevel := ABlindLevel;
     LConnection.ioRequestBody.IntentType := AIntent;
     LConnection.ioRequestBody.RelationPropertyName := ARelationPropertyName;
@@ -423,7 +428,7 @@ begin
 end;
 
 class procedure TioPersistenceStrategyHttp._DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String; const ARelationOID: Integer;
-      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
+      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData);
 var
   LConnectionDefName: String;
   LConnection: IioConnectionHttp;
@@ -442,6 +447,7 @@ begin
   LConnection.StartTransaction;
   try
     LConnection.ioRequestBody.Clear;
+    LConnection.ioRequestBody.SessionData := ASessionData;
     LConnection.ioRequestBody.BlindLevel := ABlindLevel;
     LConnection.ioRequestBody.IntentType := AIntent;
     LConnection.ioRequestBody.RelationPropertyName := ARelationPropertyName;

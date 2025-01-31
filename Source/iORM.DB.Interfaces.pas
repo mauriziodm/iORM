@@ -54,7 +54,7 @@ const
   OBJVERSION_NULL = 0;
   TRANSACTION_TIMESTAMP_NULL = 0;
 
-  KEY_SESSION_SUBJECTS = 'Subjects';
+  KEY_SESSION_DATA = 'SessionData';
   KEY_AUTH_INTENTION = 'AuthIntention';
   KEY_AUTH_SCOPE = 'AuthScope';
   KEY_AUTH_GRANT = 'AuthGrant';
@@ -354,10 +354,10 @@ type
     ['{83DE9ECE-47EA-4814-B40E-3E39FAA210A2}']
     procedure Clear;
     function AsString: String;
-    // ---------- session ----------
-    // Subjects
-    function GetSubjects: IioAuthSessionData;
-    property Subjects: IioAuthSessionData read GetSubjects;
+    // ---------- session data ----------
+    // SessionData
+    function GetSessionData: IioAuthSessionData;
+    property Subjects: IioAuthSessionData read GetSessionData;
     // ---------- auth ----------
     // AuthIntention
     procedure SetAuthIntention(const Value: TioAuthIntention);

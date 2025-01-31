@@ -45,7 +45,7 @@ type
   TioHttpRequestBody = class(TInterfacedObject, IioHttpRequestBody)
   private
     // session subjects
-    FSubjects: IioAuthSessionData;
+    FSessionData: IioAuthSessionData;
     // auth
     FAuthGrant: String;
     FAuthIntention: TioAuthIntention;
@@ -72,8 +72,8 @@ type
     function GetMethodName: String;
     function GetRelationOID: Integer;
     function GetRelationPropertyName: String;
+    function GetSessionData: IioAuthSessionData;
     function GetSQLDestination: IioSQLDestination;
-    function GetSubjects: IioAuthSessionData;
     function GetWhere: IioWhere;
     procedure SetAuthGrant(const Value: String);
     procedure SetAuthIntention(const Value: TioAuthIntention);
@@ -105,7 +105,7 @@ uses
 constructor TioHttpRequestBody.Create;
 begin
   inherited Create;
-  FSubjects := TioAuthFactory.NewAuthSessionData;
+  FSessionData := TioAuthFactory.NewAuthSessionData;
   Clear;
 end;
 
@@ -117,11 +117,11 @@ begin
   Self.Create;
   LJSONObject := TJSONObject.ParseJSONValue(AJSONString) as TJSONObject;
   try
-    // ---------- session ----------
-    // Subjects
-    LJSONValue := LJSONObject.GetValue(KEY_SESSION_SUBJECTS);
+    // ---------- session data ----------
+    // SessionData
+    LJSONValue := LJSONObject.GetValue(KEY_SESSION_DATA);
     if Assigned(LJSONValue) then
-      FSubjects.FromString(LJSONValue.Value);
+      FSessionData.FromString(LJSONValue.Value);
     // ---------- auth ----------
     // AuthIntention
     LJSONValue := LJSONObject.GetValue(KEY_AUTH_INTENTION);
@@ -187,7 +187,7 @@ end;
 procedure TioHttpRequestBody.Clear;
 begin
   // session subjects
-  FSubjects.Clear;
+  FSessionData.Clear;
   // auth
   FAuthIntention := aiRead;
   FAuthScope := IO_STRING_NULL_VALUE;
@@ -267,9 +267,9 @@ begin
   Result := FSQLDestination;
 end;
 
-function TioHttpRequestBody.GetSubjects: IioAuthSessionData;
+function TioHttpRequestBody.GetSessionData: IioAuthSessionData;
 begin
-  Result := FSubjects;
+  Result := FSessionData;
 end;
 
 function TioHttpRequestBody.GetWhere: IioWhere;
@@ -353,8 +353,8 @@ begin
   try
     // ---------- session ----------
     // Subjects
-    if not FSubjects.IsEmpty then
-      LJSONObject.AddPair(KEY_SESSION_SUBJECTS, FSubjects.AsString);
+    if not FSessionData.IsEmpty then
+      LJSONObject.AddPair(KEY_SESSION_DATA, FSessionData.AsString);
     // ---------- auth ----------
     // AuthIntention
     LJSONObject.AddPair(KEY_AUTH_INTENTION, Ord(FAuthIntention));
