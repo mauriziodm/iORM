@@ -448,6 +448,44 @@ type
     property Stream: TStream read GetStream;
   end;
 
+  IioPersistenceStrategyRequest = interface
+    ['{3CFC6D3D-EB9D-46C9-AF99-6F5AD8ECD284}']
+    // methods
+    function GetApp: String;
+    function GetAppOID: Integer;
+    function GetAuthToken: String;
+    function GetBlindLevel: Byte;
+    function GetConnection: String;
+    function GetConnectionRemote: String;
+    function GetIntent: TioPersistenceIntentType;
+    function GetMasterPropName: String;
+    function GetMasterPropPath: String;
+    function GetRelationOID: Integer;
+    function GetRelationPropName: String;
+    function GetUsr: String;
+    function GetUsrOID: Integer;
+    procedure SetMasterPropName(const Value: String);
+    procedure SetMasterPropPath(const Value: String);
+    procedure SetRelationOID(const Value: Integer);
+    procedure SetRelationPropName(const Value: String);
+    // session data
+    property App: String read GetApp;
+    property AppOID: Integer read GetAppOID;
+    property Connection: String read GetConnection;
+    property ConnectionRemote: String read GetConnectionRemote;
+    property Usr: String read GetUsr;
+    property UsrOID: Integer read GetUsrOID;
+    // auth
+    property AuthToken: String read GetAuthToken; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
+    // others
+    property BlindLevel: Byte read GetBlindLevel;
+    property Intent: TioPersistenceIntentType read GetIntent;
+    property MasterPropName: String read GetMasterPropName write SetMasterPropName;
+    property MasterPropPath: String read GetMasterPropPath write SetMasterPropPath;
+    property RelationOID: Integer read GetRelationOID write SetRelationOID;
+    property RelationPropName: String read GetRelationPropName write SetRelationPropName;
+  end;
+
   // Base class for strategy (Static class as an interface)
   // Note: {$DEFINE ioStrategyInterceptorsOff} to disable strategy interceptors
   TioPersistenceStrategyIntf = class abstract

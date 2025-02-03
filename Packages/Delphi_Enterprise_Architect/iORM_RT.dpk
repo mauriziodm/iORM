@@ -249,7 +249,8 @@ contains
   iORM.Auth.Model in '..\..\Source\iORM.Auth.Model.pas',
   iORM.Auth.Response in '..\..\Source\iORM.Auth.Response.pas',
   iORM.Async.Func in '..\..\Source\iORM.Async.Func.pas',
-  iORM.Async.Proc in '..\..\Source\iORM.Async.Proc.pas';
+  iORM.Async.Proc in '..\..\Source\iORM.Async.Proc.pas',
+  iORM.PersistenceStrategy.Request in '..\..\Source\iORM.PersistenceStrategy.Request.pas';
 
 end.
 

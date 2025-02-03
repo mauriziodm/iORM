@@ -36,7 +36,7 @@ unit iORM.PersistenceStrategy.Factory;
 interface
 
 uses
-  iORM.DB.Interfaces, iORM.PersistenceStrategy.Interfaces;
+  iORM.DB.Interfaces, iORM.PersistenceStrategy.Interfaces, iORM.CommonTypes;
 
 type
 
@@ -44,12 +44,15 @@ type
   public
     class function GetStrategy(const AConnectionName: String): TioPersistenceStrategyRef;
     class function ConnectionTypeToStrategy(const AConnectionType: TioConnectionType): TioPersistenceStrategyRef;
+    class function NewPersistenceStrategyRequest(const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
+    class function NewPersistenceStrategyRequestByJsonString(const AJsonString: String): IioPersistenceStrategyRequest;
   end;
 
 implementation
 
 uses
-  iORM.PersistenceStrategy.DB, iORM.PersistenceStrategy.Http, iORM.DB.ConnectionContainer;
+  iORM.PersistenceStrategy.DB, iORM.PersistenceStrategy.Http, iORM.DB.ConnectionContainer,
+  iORM.PersistenceStrategy.Request;
 
 { TioStrategyFactory }
 
@@ -66,6 +69,17 @@ end;
 class function TioPersistenceStrategyFactory.GetStrategy(const AConnectionName: String): TioPersistenceStrategyRef;
 begin
   Result := TioConnectionManager.GetConnectionInfo(AConnectionName).PersistenceStrategy;
+end;
+
+class function TioPersistenceStrategyFactory.NewPersistenceStrategyRequest(const AIntent: TioPersistenceIntentType;
+  const ABlindLevel: Byte): IioPersistenceStrategyRequest;
+begin
+  Result := TioPersistenceStrategyRequest.Create(AIntent, ABlindLevel);
+end;
+
+class function TioPersistenceStrategyFactory.NewPersistenceStrategyRequestByJsonString(const AJsonString: String): IioPersistenceStrategyRequest;
+begin
+  Result := TioPersistenceStrategyRequest.CreateByJSONString(AJsonString);
 end;
 
 end.
