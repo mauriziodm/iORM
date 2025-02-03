@@ -77,7 +77,8 @@ begin
   begin
     LTimeSlot := AContext.Map.GetTable.GetEtmTimeSlotClass.Create(AContext);
     try
-      io._PersistObject(LTimeSlot, itRegular, BL_ETM_PERSIST_TIMESLOT); // Intent is itRegular for the TimeSlot class and not depending from AContext
+      // Intent is itRegular for the TimeSlot class and not depending from AContext
+      io._PersistObjectInternal(LTimeSlot, itRegular, '', 0, nil, '', '', BL_ETM_PERSIST_TIMESLOT, AContext.SessionData);
     finally
       LTimeSlot.Free;
     end;

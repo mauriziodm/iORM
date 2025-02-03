@@ -37,7 +37,8 @@ interface
 
 uses
   System.Classes, iORM.SynchroStrategy.Interfaces, iORM.Attributes, DJSON.Attributes,
-  System.SysUtils, iORM.CommonTypes, iORM.Context.Interfaces;
+  System.SysUtils, iORM.CommonTypes, iORM.Context.Interfaces,
+  iORM.Auth.Interfaces;
 
 type
 
@@ -57,7 +58,9 @@ type
     FSynchroLogName: String;
     FSynchroStatus: TioSynchroStatus;
     FUserID: Integer;
-    FUserName: String;
+    FUser: String;
+    FAppID: Integer;
+    FApp: String;
     // Count
     FCliToSrv_Count: Integer;
     FSrvToCli_Count: Integer;
@@ -85,7 +88,10 @@ type
     property SynchroStatus: TioSynchroStatus read FSynchroStatus write FSynchroStatus;
     property UserID: Integer read FUserID write FUserID;
     [ioVarChar(100)]
-    property UserName: String read FUserName write FUserName;
+    property User: String read FUser write FUser;
+    property AppID: Integer read FAppID write FAppID;
+    [ioVarChar(100)]
+    property App: String read FApp write FApp;
     // Count
     property CliToSrv_Count: Integer read FCliToSrv_Count write FCliToSrv_Count;
     property SrvToCli_Count: Integer read FSrvToCli_Count write FSrvToCli_Count;
@@ -135,8 +141,7 @@ type
     FSynchroLogItem_New: TioCustomSynchroStrategy_LogItem;
     FSynchroLogItem_Old: TioCustomSynchroStrategy_LogItem;
     FSynchroLogName: String;
-    FUserID: Integer;
-    FUserName: String;
+    FSessionData: IioAuthSessionData;
     [djSkip] // Non viene serializzato (in caso di connessione HTTP) in questo modo poi capisco se siamo remotizzati e quindi se devo fare lo "use" o no.
     FTargetConnectionDefName: String;
     // TimeSlot finalization mode
@@ -184,8 +189,7 @@ type
     property SynchroLogItem_New: TioCustomSynchroStrategy_LogItem read FSynchroLogItem_New write FSynchroLogItem_New;
     property SynchroLogName: String read FSynchroLogName write FSynchroLogName;
     property TargetConnectionDefName: String read FTargetConnectionDefName write FTargetConnectionDefName;
-    property UserID: Integer read FUserID write FUserID;
-    property UserName: String read FUserName write FUserName;
+    property SessionData: IioAuthSessionData read FSessionData;
     // TimeSlot finalization mode
     property EtmTimeSlot_Delete_SentToServer: Boolean read FEtmTimeSlot_Delete_SentToServer write FEtmTimeSlot_Delete_SentToServer;
     property EtmTimeSlot_Update_SentToServer: Boolean read FEtmTimeSlot_Update_SentToServer write FEtmTimeSlot_Update_SentToServer;
@@ -456,6 +460,8 @@ var
 begin
   APayload.SynchroLevel := ASynchroLevel;
   APayload.SynchroLogName := FSynchroLogName;
+  // SessionData
+  APayLoad.SessionData := TioApplication.CloneSessionData;
   // Black & White class list
   for LClassName in FEntities_BlackList do
     APayload.ClassBlackList.Add(LClassName);
@@ -470,9 +476,6 @@ begin
   // TimeSlot finalization mode
   APayload.EtmTimeSlot_Delete_SentToServer := FEtmTimeSlot_Delete_SentToServer;
   APayload.EtmTimeSlot_Update_SentToServer := FEtmTimeSlot_Update_SentToServer;
-  // User
-//  LPayLoad.UserID :=
-//  LPayLoad.UserName :=
 end;
 
 procedure TioCustomSynchroStrategy_Client._AsyncExecute(AExecuteMethod, ATerminateMethod: TProc);
@@ -599,6 +602,7 @@ end;
 
 constructor TioCustomSynchroStrategy_Payload.Create;
 begin
+  FSessionData := nil;
   FClassWhiteList := TioSynchroStrategy_ClassList.Create;
   FClassBlackList := TioSynchroStrategy_ClassList.Create;
   FSynchroLogItem_Old := nil;
@@ -756,6 +760,10 @@ begin
   FSynchroLogItem_New.SynchroStatus := TioSynchroStatus.ssInitialization;
   FSynchroLogItem_New.SynchroLevel := FSynchroLevel;
   FSynchroLogItem_New.SynchroLogName := FSynchroLogName;
+  FSynchroLogItem_New.User := FSessionData.User;
+  FSynchroLogItem_New.UserID := FSessionData.UserID;
+  FSynchroLogItem_New.App := FSessionData.App;
+  FSynchroLogItem_New.AppID := FSessionData.AppID;
 end;
 
 procedure TioCustomSynchroStrategy_Payload._DoOldSynchroLogItem_LoadFromClient;
@@ -863,7 +871,9 @@ begin
   FDateAndTime := Now;
   FSynchroLogName := IO_STRING_NULL_VALUE;
   FUserID := IO_INTEGER_NULL_VALUE;
-  FUserName := IO_STRING_NULL_VALUE;
+  FUser := IO_STRING_NULL_VALUE;
+  FAppID := IO_INTEGER_NULL_VALUE;
+  FApp := IO_STRING_NULL_VALUE;
   FSynchroLevel := TioSynchroLevel.slIncremental;
   FSynchroStatus := TioSynchroStatus.ssInitialization;
   // Count
@@ -894,7 +904,7 @@ begin
   Result := String.Empty;
   // Extract user info as native type
   LUserID := Integer(FUserID);
-  LUserName := String(FUserName);
+  LUserName := String(FUser);
   // UserID
   if LUserID <> 0 then
     Result := LUserID.ToString;

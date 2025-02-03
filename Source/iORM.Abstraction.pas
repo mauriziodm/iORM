@@ -81,6 +81,7 @@ type
     class function AcquireSession: IioAuthSession; inline;
     class procedure CheckIfAbstractionLayerComponentExists; inline;
     class procedure ClearSession; inline;
+    class function CloneSessionData: IioAuthSessionData; inline;
     class procedure HandleException(const Sender: TObject); inline;
     class function ProjectPlatform: TioProjectPlatform; inline;
     class procedure ReleaseSession; inline;
@@ -286,6 +287,15 @@ end;
 class procedure TioApplication.ClearSession;
 begin
   GetConcreteClass._ClearSession;
+end;
+
+class function TioApplication.CloneSessionData: IioAuthSessionData;
+begin
+  try
+    Result := _AcquireSession.SessionData.Clone;
+  finally
+    _ReleaseSession;
+  end;
 end;
 
 class function TioApplication.GetConcreteClass: TioApplicationRef;

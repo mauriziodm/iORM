@@ -275,7 +275,7 @@ var
 begin
   LObj := AioRequestBody.JSONDataValueAsObject;
   io._PersistObjectInternal(LObj, AioRequestBody.IntentType, AioRequestBody.RelationPropertyName, AioRequestBody.RelationOID, nil, '', '',
-    AioRequestBody.BlindLevel);
+    AioRequestBody.BlindLevel, AioRequestBody.SessionData);
   if TioUtilities.BlindLevel_Do_AutoUpdateProps(AioRequestBody.BlindLevel) then
     AioResponseBody.JSONDataValueAsObject := LObj;
 end;

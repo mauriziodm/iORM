@@ -46,7 +46,8 @@ uses
   iORM.Interceptor.Strategy.Register, iORM.Interceptor.CRUD.Register,
   iORM.ETM.Engine, iORM.ETM.Interfaces, DJSON.Params,
   iORM.ConflictStrategy.Interfaces, iORM.ConflictStrategy.SameVersionWin, iORM.ConflictStrategy.LastUpdateWin,
-  iORM.Context.Interfaces, iORM.SynchroStrategy.Interfaces, iORM.MVVM.ViewModel;
+  iORM.Context.Interfaces, iORM.SynchroStrategy.Interfaces, iORM.MVVM.ViewModel,
+  iORM.Auth.Interfaces;
 
 const
   IORM_VERSION = 'iORM 2 (beta 3.4)';
@@ -562,7 +563,7 @@ type
     class procedure _PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
     class procedure _PersistObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
       const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
-      const ABlindLevel: Byte); static;
+      const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); static;
     // PersistCollection (accepting instance to persist directly)
     class procedure PersistList(const [ref] AList: TObject; const ABlindLevel: Byte = BL_DEFAULT;
       const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
@@ -965,18 +966,19 @@ end;
 
 class procedure io._PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 begin
-  _PersistObjectInternal(AObj, AIntent, '', 0, nil, '', '', ABlindLevel);
+  _PersistObjectInternal(AObj, AIntent, '', 0, nil, '', '', ABlindLevel, TioApplication.CloneSessionData);
 end;
 
 class procedure io._PersistObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
-  const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
+      const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
+      const ABlindLevel: Byte; const ASessionData: IioAuthSessionData);
 var
   LConnectionDefName: String;
 begin
   LConnectionDefName := TioMapContainer.GetConnectionDefName(AObj.ClassName);
   // Get the strategy and call the proper funtionality
   TioPersistenceStrategyFactory.GetStrategy(LConnectionDefName).PersistObject(AObj, AIntent, ARelationPropertyName, ARelationOID, AMasterBSPersistence,
-    AMasterPropertyName, AMasterPropertyPath, ABlindLevel);
+    AMasterPropertyName, AMasterPropertyPath, ABlindLevel, ASessionData);
 end;
 
 class procedure io.PersistList(const [ref] AList: TObject; const AFree: TioFreeObjAfterPersistOrDelete);
@@ -986,7 +988,7 @@ end;
 
 class procedure io.PersistObject(const AIntfObj: IInterface; const ABlindLevel: Byte);
 begin
-  _PersistObjectInternal(AIntfObj as TObject, itRegular, '', 0, nil, '', '', ABlindLevel);
+  _PersistObjectInternal(AIntfObj as TObject, itRegular, '', 0, nil, '', '', ABlindLevel, TioApplication.CloneSessionData);
 end;
 
 class procedure io.PersistList(const [ref] AList: TObject; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete);
@@ -997,8 +999,8 @@ end;
 
 class procedure io.PersistObject(const [ref] AObj: TObject; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete);
 begin
-  _PersistObjectInternal(AObj, itRegular, '', 0, nil, '', '', ABlindLevel);
-  _FreeObjAfterPersistOrDelete(AObj, AFree);
+    _PersistObjectInternal(AObj, itRegular, '', 0, nil, '', '', ABlindLevel, TioApplication.CloneSessionData);
+    _FreeObjAfterPersistOrDelete(AObj, AFree);
 end;
 
 class procedure io.PersistList(const AListIntf: IInterface; const ABlindLevel: Byte);

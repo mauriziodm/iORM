@@ -81,6 +81,7 @@ type
     procedure SetUserOID(const Value: Integer);
   public
     constructor Create;
+    function Clone: IioAuthSessionData;
     procedure Assign(const ASource: IioAuthSessionData);
     function AsString: String;
     procedure FromString(const Value: String);
@@ -319,6 +320,17 @@ begin
   // user
   FUser := IO_STRING_NULL_VALUE;
   FUserOID := IO_INTEGER_NULL_VALUE;
+end;
+
+function TioAuthSessionData.Clone: IioAuthSessionData;
+begin
+  Result := Create;
+  Result.User := User;
+  Result.UserID := UserID;
+  Result.App := App;
+  Result.AppID := AppID;
+  Result.ConnectionName := ConnectionName;
+  Result.ConnectionNameRemote := ConnectionNameRemote;
 end;
 
 constructor TioAuthSessionData.Create;

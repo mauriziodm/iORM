@@ -56,6 +56,7 @@ type
     procedure Assign(const ASource: IioAuthSessionData);
     function AsString: String;
     procedure Clear;
+    function Clone: IioAuthSessionData;
     function IsEmpty: Boolean;
     procedure FromString(const Value: String);
     function GetApp: String;
