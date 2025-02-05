@@ -81,12 +81,9 @@ type
     procedure SetUserOID(const Value: Integer);
   public
     constructor Create;
-    function Clone: IioAuthSessionData;
-    procedure Assign(const ASource: IioAuthSessionData);
     function AsString: String;
     procedure FromString(const Value: String);
     procedure Clear;
-    function IsEmpty: Boolean;
     // app
     property App: String read GetApp write SetApp;
     property AppOID: Integer read GetAppOID write SetAppOID;
@@ -289,16 +286,6 @@ end;
 
 { TioAuthSessionSubjects }
 
-procedure TioAuthSessionData.Assign(const ASource: IioAuthSessionData);
-begin
-  FApp := ASource.App;
-  FAppOID := ASource.AppOID;
-  FConnectionName := ASource.ConnectionName;
-  FConnectionNameRemote := ASource.ConnectionNameRemote;
-  FUser := ASource.User;
-  FUserOID := ASource.UserOID;
-end;
-
 function TioAuthSessionData.AsString: String;
 begin
   if IsEmpty then
@@ -320,17 +307,6 @@ begin
   // user
   FUser := IO_STRING_NULL_VALUE;
   FUserOID := IO_INTEGER_NULL_VALUE;
-end;
-
-function TioAuthSessionData.Clone: IioAuthSessionData;
-begin
-  Result := Create;
-  Result.User := User;
-  Result.UserID := UserID;
-  Result.App := App;
-  Result.AppID := AppID;
-  Result.ConnectionName := ConnectionName;
-  Result.ConnectionNameRemote := ConnectionNameRemote;
 end;
 
 constructor TioAuthSessionData.Create;
@@ -416,12 +392,6 @@ end;
 function TioAuthSessionData.GetConnectionNameRemote: String;
 begin
   Result := FConnectionNameRemote;
-end;
-
-function TioAuthSessionData.IsEmpty: Boolean;
-begin
-  Result := (FApp = IO_STRING_NULL_VALUE) and (FAppOID = IO_INTEGER_NULL_VALUE) and (FUser = IO_STRING_NULL_VALUE) and (FUserOID = IO_INTEGER_NULL_VALUE)
-     and (FConnectionName = IO_STRING_NULL_VALUE) and (FConnectionNameRemote = IO_STRING_NULL_VALUE);
 end;
 
 procedure TioAuthSessionData.SetApp(const Value: String);

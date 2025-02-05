@@ -53,11 +53,8 @@ type
 
   IioAuthSessionData = interface
     ['{DE6E7EDA-BEE0-4F8A-A12F-2A99E63D8EC5}']
-    procedure Assign(const ASource: IioAuthSessionData);
     function AsString: String;
     procedure Clear;
-    function Clone: IioAuthSessionData;
-    function IsEmpty: Boolean;
     procedure FromString(const Value: String);
     function GetApp: String;
     function GetAppOID: Integer;

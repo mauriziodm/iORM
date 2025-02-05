@@ -50,7 +50,7 @@ type
     FAuthGrant: String;
     FAuthIntention: TioAuthIntention;
     FAuthScope: String;
-    FAuthToken: String; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
+    FAuthToken: String; // for auth purposes -> RefreshToken, CodeVerifier, CodeChallenge (no access token)
     // others
     FBlindLevel: Byte;
     FIntentType: TioPersistenceIntentType;

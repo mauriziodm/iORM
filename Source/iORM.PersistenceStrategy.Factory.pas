@@ -41,13 +41,18 @@ uses
 type
 
   TioPersistenceStrategyFactory = class
+  private
+    class function _NewPSRequest(const FillSessionRelatedProperties: Boolean): IioPersistenceStrategyRequest; inline;
   public
     class function GetStrategy(const AConnectionName: String): TioPersistenceStrategyRef;
     class function ConnectionTypeToStrategy(const AConnectionType: TioConnectionType): TioPersistenceStrategyRef;
-    class function NewPersistenceStrategyRequest(const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
-    class function NewPersistenceStrategyRequestByJsonString(const AJsonString: String): IioPersistenceStrategyRequest;
+    // operation type specific persistence strategy request factories
+    class function NewPSRequest_ByJsonString(const AJsonString: String): IioPersistenceStrategyRequest;
+    class function NewPSRequest_Delete(const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
+    class function NewPSRequest_Load(const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
+    class function NewPSRequest_Persist(const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ARelationPropertyName: String;
+      const ARelationOID: Integer; const AMasterPropertyName, AMasterPropertyPath: String): IioPersistenceStrategyRequest;
   end;
-
 implementation
 
 uses
@@ -71,15 +76,40 @@ begin
   Result := TioConnectionManager.GetConnectionInfo(AConnectionName).PersistenceStrategy;
 end;
 
-class function TioPersistenceStrategyFactory.NewPersistenceStrategyRequest(const AIntent: TioPersistenceIntentType;
-  const ABlindLevel: Byte): IioPersistenceStrategyRequest;
+class function TioPersistenceStrategyFactory._NewPSRequest(const FillSessionRelatedProperties: Boolean): IioPersistenceStrategyRequest;
 begin
-  Result := TioPersistenceStrategyRequest.Create(AIntent, ABlindLevel);
+  Result := TioPersistenceStrategyRequest.Create(FillSessionRelatedProperties);
 end;
 
-class function TioPersistenceStrategyFactory.NewPersistenceStrategyRequestByJsonString(const AJsonString: String): IioPersistenceStrategyRequest;
+class function TioPersistenceStrategyFactory.NewPSRequest_ByJsonString(const AJsonString: String): IioPersistenceStrategyRequest;
 begin
   Result := TioPersistenceStrategyRequest.CreateByJSONString(AJsonString);
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_Delete(const AIntent: TioPersistenceIntentType;
+  const ABlindLevel: Byte): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(True);
+  Result.Intent := AIntent;
+  Result.BlindLevel := ABlindLevel;
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_Load(const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(True);
+  Result.Intent := AIntent;
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_Persist(const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
+  const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterPropertyName, AMasterPropertyPath: String): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(True);
+  Result.Intent := AIntent;
+  Result.BlindLevel := ABlindLevel;
+  Result.RelationPropertyName := ARelationPropertyName;
+  Result.RelationOID := ARelationOID;
+  Result.MasterPropertyName := AMasterPropertyName;
+  Result.MasterPropertyPath := AMasterPropertyPath;
 end;
 
 end.

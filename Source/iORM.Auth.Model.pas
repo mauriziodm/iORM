@@ -42,8 +42,10 @@ type
 
   TioAuthCredentials = class(TInterfacedObject, IioAuthCredentials)
   strict private
-    [ioSkip] FCodeChallenge: String;
-    [ioSkip] FCodeVerifier: String;
+    [ioSkip([ssMap, ssETM, ssEmbeddedRelation, ssSUD, ssSaveRevertPoint])]
+    FCodeChallenge: String; // TdjSkipScope = (ssMap, ssETM, ssHTTP, ssEmbeddedRelation, ssSUD, ssSaveRevertPoint, ssDJSON, ssAuth) - maintain ssHTTP, ssDJSON, ssAuth
+    [ioSkip]
+    FCodeVerifier: String;
     function GetCodeChallenge: String;
     function GetCodeVerifier: String;
     procedure SetCodeChallenge(const Value: String);
