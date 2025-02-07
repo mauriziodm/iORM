@@ -120,7 +120,7 @@ begin
   LJSONObject := TJSONObject.Create;
   try
     // method
-    LJSONObject.AddPair(PSR_METHOD, Ord(FIntentType));
+    LJSONObject.AddPair(PSR_METHOD, Ord(FMethod));
     // ---------- session ----------
     // App
     if not FApp.IsEmpty then
@@ -185,6 +185,12 @@ begin
     // RelationPropName
     if FRelationPropName <> IO_STRING_NULL_VALUE then
       LJSONObject.AddPair(PSR_RELATIONPROPERTYNAME, FRelationPropName);
+    // ---------- end ----------
+    // Result JSONObject as string
+    Result := LJSONObject.ToString;
+  finally
+    LJSONObject.Free;
+  end;
 end;
 
 constructor TioPersistenceStrategyRequest.Create(const AMethod: TioPersistenceStrategyMethod; const FillSessionRelatedProperties: Boolean);
@@ -220,22 +226,101 @@ begin
   Create;
   LJSONObject := TJSONObject.ParseJSONValue(Value) as TJSONObject;
   try
-    // session data
-    FApp := LJSONObject.GetValue('App').Value;
-    FAppOID := (LJSONObject.GetValue('AppOID') as TJSONNumber).AsInt;
-    FConnectionName := LJSONObject.GetValue('ConnectionName').Value;
-    FConnectionNameRemote := LJSONObject.GetValue('ConnectionNameRemote').Value;
-    FUser := LJSONObject.GetValue('User').Value;
-    FUserOID := (LJSONObject.GetValue('UserOID') as TJSONNumber).AsInt;
-    // auth
-    FAuthToken := LJSONObject.GetValue('AuthToken').Value;
-    // others
-    FBlindLevel := (LJSONObject.GetValue('BlindLevel') as TJSONNumber).AsInt;
-    FIntent := TioPersistenceIntentType((LJSONObject.GetValue('FIntent') as TJSONNumber).AsInt);
-    FMasterPropName := LJSONObject.GetValue('MasterPropName').Value;
-    FMasterPropPath := LJSONObject.GetValue('MasterPropPath').Value;
-    FRelationOID := (LJSONObject.GetValue('RelationOID') as TJSONNumber).AsInt;
-    FRelationPropName := LJSONObject.GetValue('RelationPropName').Value;
+    // Method
+    LJSONValue := LJSONObject.GetValue(PSR_METHOD);
+    if Assigned(LJSONValue) then
+      FAuthIntention := TioPersistenceStrategyMethod((LJSONValue as TJSONNumber).AsInt)
+    else
+      raise EioGenericException.Create(ClassName, 'CreateByJSONString', '"Method" property not present (JSON).');
+    // ---------- session ----------
+    // App
+    LJSONValue := LJSONObject.GetValue(PSR_SESSION_APP);
+    if Assigned(LJSONValue) then
+      FApp := LJSONValue.Value;
+    // AppOID
+    LJSONValue := LJSONObject.GetValue(PSR_SESSION_APPOID);
+    if Assigned(LJSONValue) then
+      FAppOID := dj.FromJSON(LJSONValue).&To<Integer>;
+    // Connection
+    LJSONValue := LJSONObject.GetValue(PSR_SESSION_CONNECTION);
+    if Assigned(LJSONValue) then
+      FConnection := LJSONValue.Value;
+    // ConnectionRemote
+    LJSONValue := LJSONObject.GetValue(PSR_SESSION_CONNECTIONREMOTE);
+    if Assigned(LJSONValue) then
+      FConnectionRemote := LJSONValue.Value;
+    // User
+    LJSONValue := LJSONObject.GetValue(PSR_SESSION_USER);
+    if Assigned(LJSONValue) then
+      FUsr := LJSONValue.Value;
+    // UserOID
+    LJSONValue := LJSONObject.GetValue(PSR_SESSION_USEROID);
+    if Assigned(LJSONValue) then
+      FUsrOID := dj.FromJSON(LJSONValue).&To<Integer>;
+    // ---------- auth ----------
+    // AuthGrant
+    LJSONValue := LJSONObject.GetValue(PSR_AUTH_GRANT);
+    if Assigned(LJSONValue) then
+      FAuthGrant := LJSONValue.Value;
+    // AuthIntention
+    LJSONValue := LJSONObject.GetValue(PSR_AUTH_INTENTION);
+    if Assigned(LJSONValue) then
+      FAuthIntention := TioAuthIntention((LJSONValue as TJSONNumber).AsInt);
+    // AuthScope
+    LJSONValue := LJSONObject.GetValue(PSR_AUTH_SCOPE);
+    if Assigned(LJSONValue) then
+      FAuthScope := LJSONValue.Value;
+    // AuthToken
+    LJSONValue := LJSONObject.GetValue(PSR_AUTH_TOKEN);
+    if Assigned(LJSONValue) then
+      FAuthToken := LJSONValue.Value;
+    // ---------- instances ----------
+    // AIntf1
+    LJSONValue := LJSONObject.GetValue(PSR_INSTANCES_INTF1);
+    if Assigned(LJSONValue) then
+      FIntf1 := dj.FromJSON(FJSONDataValue).byFields.TypeAnnotationsON.ToObject;
+    // AIntf2
+    LJSONValue := LJSONObject.GetValue(PSR_INSTANCES_INTF2);
+    if Assigned(LJSONValue) then
+      FIntf2 := dj.FromJSON(FJSONDataValue).byFields.TypeAnnotationsON.ToObject;
+    // AObj1
+    LJSONValue := LJSONObject.GetValue(PSR_INSTANCES_OBJ1);
+    if Assigned(LJSONValue) then
+      FObj1 := dj.FromJSON(FJSONDataValue).byFields.TypeAnnotationsON.ToObject;
+    // AObj2
+    LJSONValue := LJSONObject.GetValue(PSR_INSTANCES_OBJ2);
+    if Assigned(LJSONValue) then
+      FObj2 := dj.FromJSON(FJSONDataValue).byFields.TypeAnnotationsON.ToObject;
+    // ---------- others ----------
+    // BlindLevel
+    LJSONValue := LJSONObject.GetValue(PSR_BLINDLEVEL);
+    if Assigned(LJSONValue) then
+      FBlindLevel := dj.FromJSON(LJSONValue).&To<Byte>;
+    // IntentType
+    LJSONValue := LJSONObject.GetValue(PSR_INTENTTYPE);
+    if Assigned(LJSONValue) then
+      FIntentType := TioPersistenceIntentType((LJSONValue as TJSONNumber).AsInt);
+    // MasterPropName
+    LJSONValue := LJSONObject.GetValue(PSR_MASTERPROPERTYNAME);
+    if Assigned(LJSONValue) then
+      FMasterPropName := LJSONValue.Value;
+    // MasterPropPath
+    LJSONValue := LJSONObject.GetValue(PSR_MASTERPROPERTYPATH);
+    if Assigned(LJSONValue) then
+      FMasterPropPath := LJSONValue.Value;
+    // PropName
+    LJSONValue := LJSONObject.GetValue(PSR_PROPERTYNAME);
+    if Assigned(LJSONValue) then
+      FPropName := LJSONValue.Value;
+    // RelationOID
+    LJSONValue := LJSONObject.GetValue(PSR_RELATIONID);
+    if Assigned(LJSONValue) then
+      FRelationOID := dj.FromJSON(LJSONValue).&To<Integer>;
+    // RelationPropName
+    LJSONValue := LJSONObject.GetValue(PSR_RELATIONPROPERTYNAME);
+    if Assigned(LJSONValue) then
+      FRelationPropName := dj.FromJSON(LJSONValue).&To<String>;
+    // ---------- end ----------
   finally
     LJSONObject.Free;
   end;
