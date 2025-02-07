@@ -3,7 +3,7 @@ unit iORM.PersistenceStrategy.Request;
 interface
 
 uses
-  iORM.CommonTypes;
+  iORM.CommonTypes, iORM.PersistenceStrategy.Interfaces;
 
 type
 
@@ -16,16 +16,23 @@ type
     FConnectionRemote: String;
     FUsr: String;
     FUsrOID: Integer;
-    // access token
-    FAuthGrant: String;
-    FAuthIntention: TioAuthIntention;
-    FAuthScope: String;
+    // auth
+    FAuthGrant: String; // NEW
+    FAuthIntention: TioAuthIntention; // NEW
+    FAuthScope: String; // NEW
     FAuthToken: String; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
+    // instances
+    FObj1: TObject; // NEW
+    FObj2: TObject; // NEW
+    FIntf1: IInterface; // NEW
+    FIntf2: IInterface; // NEW
     // others
     FBlindLevel: Byte;
-    FIntent: TioPersistenceIntentType;
+    FIntentType: TioPersistenceIntentType;
     FMasterPropName: String;
     FMasterPropPath: String;
+    FMethod: TioPersistenceStrategyMethod; // NEW
+    FPropName: String; // NEW
     FRelationOID: Integer;
     FRelationPropName: String;
     // methods
@@ -39,21 +46,39 @@ type
     function GetBlindLevel: Byte;
     function GetConnection: String;
     function GetConnectionRemote: String;
-    function GetIntent: TioPersistenceIntentType;
+    function GetIntentType: TioPersistenceIntentType;
+    function GetIntf1: IInterface;
+    function GetIntf2: IInterface;
     function GetMasterPropName: String;
     function GetMasterPropPath: String;
+    function GetMethod: TioPersistenceStrategyMethod;
+    function GetObj1: TObject;
+    function GetObj2: TObject;
+    function GetPropName: String;
     function GetRelationOID: Integer;
     function GetRelationPropName: String;
     function GetUsr: String;
     function GetUsrOID: Integer;
+    procedure SetAuthGrant(const Value: String);
+    procedure SetAuthIntention(const Value: TioAuthIntention);
+    procedure SetAuthScope(const Value: String);
+    procedure SetBlindLevel(const Value: Byte);
+    procedure SetIntentType(const Value: TioPersistenceIntentType);
+    procedure SetIntf1(const Value: IInterface);
+    procedure SetIntf2(const Value: IInterface);
     procedure SetMasterPropName(const Value: String);
     procedure SetMasterPropPath(const Value: String);
+    procedure SetObj1(const Value: TObject);
+    procedure SetObj2(const Value: TObject);
+    procedure SetPropName(const Value: String);
     procedure SetRelationOID(const Value: Integer);
     procedure SetRelationPropName(const Value: String);
   public
-    constructor Create(const FillSessionRelatedProperties: Boolean);
+    constructor Create(const AMethod: TioPersistenceStrategyMethod; const FillSessionRelatedProperties: Boolean);
     constructor CreateByJSONString(const AJSONString:String);
     function AsString: String;
+    // method
+    property Method: TioPersistenceStrategyMethod read GetMethod;
     // session data
     property App: String read GetApp;
     property AppOID: Integer read GetAppOID;
@@ -66,11 +91,17 @@ type
     property AuthIntention: TioAuthIntention read GetAuthIntention;
     property AuthScope: String read GetAuthScope;
     property AuthToken: String read GetAuthToken; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
+    // instances
+    property Intf1: IInterface read GetIntf1 write SetIntf1;
+    property Intf2: IInterface read GetIntf2 write SetIntf2;
+    property Obj1: TObject read GetObj1 write SetObj1;
+    property Obj2: TObject read GetObj2 write SetObj2;
     // others
-    property BlindLevel: Byte read GetBlindLevel;
-    property Intent: TioPersistenceIntentType read GetIntent;
+    property BlindLevel: Byte read GetBlindLevel write SetBlindLevel;
+    property IntentType: TioPersistenceIntentType read GetIntentType write SetIntentType;
     property MasterPropName: String read GetMasterPropName write SetMasterPropName;
     property MasterPropPath: String read GetMasterPropPath write SetMasterPropPath;
+    property PropName: String read GetPropName write SetPropName;
     property RelationOID: Integer read GetRelationOID write SetRelationOID;
     property RelationPropName: String read GetRelationPropName write SetRelationPropName;
   end;
@@ -83,28 +114,102 @@ uses
 { TioPersistenceStrategyRequest }
 
 function TioPersistenceStrategyRequest.AsString: String;
+var
+  LJSONObject: TJSONObject;
 begin
-  // NB: quando serializza sostituisce il ConnectionName con il ConnectionNameRemote in modo che l'app server usi la connessione
-  //      corretta (quella remote) che diventa di fatto la connessione in uso per il server
-  Result := Format('{"Intent": %d, "BlindLevel": %d, "RelationPropName": "%s", "RelationOID": %d, "MasterPropName": "%s", "MasterPropPath": "%s", "AuthToken": "%s", "App": "%s", "AppOID": %d, "ConnectionName": "%s", "ConnectionNameRemote": "%s", "User": "%s", "UserOID": %d}',
-    [Ord(FIntent), FBlindLevel, FRelationPropName, FRelationOID, FMasterPropName, FMasterPropPath, FAuthToken, FApp, FAppOID, FConnectionNameRemote, IO_STRING_NULL_VALUE, FUser, FUserOID]);
+  LJSONObject := TJSONObject.Create;
+  try
+    // method
+    LJSONObject.AddPair(PSR_METHOD, Ord(FIntentType));
+    // ---------- session ----------
+    // App
+    if not FApp.IsEmpty then
+      LJSONObject.AddPair(PSR_SESSION_APP, FApp.AsString);
+    // AppOID
+    if FAppOID <> IO_INTEGER_NULL_VALUE then
+      LJSONObject.AddPair(PSR_SESSION_APPOID, FAppOID);
+    // Connection
+    if not FConnection.IsEmpty then
+      LJSONObject.AddPair(PSR_SESSION_CONNECTION, FConnection.AsString);
+    // ConnectionRemote
+    if not FConnectionRemote.IsEmpty then
+      LJSONObject.AddPair(PSR_SESSION_CONNECTIONREMOTE, FConnectionRemote.AsString);
+    // User
+    if not FUsr.IsEmpty then
+      LJSONObject.AddPair(PSR_SESSION_USER, FUsr.AsString);
+    // UserOID
+    if not FUsrOID.IsEmpty then
+      LJSONObject.AddPair(PSR_SESSION_USEROID, FUsrOID.AsString);
+    // ---------- auth ----------
+    // AuthGrant
+    if not FAuthGrant.IsEmpty then
+      LJSONObject.AddPair(PSR_AUTH_GRANT, FAuthGrant.AsString);
+    // AuthIntention
+    LJSONObject.AddPair(PSR_AUTH_INTENTION, Ord(FAuthIntention));
+    // AuthScope
+    if not FAuthScope.IsEmpty then
+      LJSONObject.AddPair(PSR_AUTH_SCOPE, FAuthScope.AsString);
+    // AuthToken
+    if not FAuthToken.IsEmpty then
+      LJSONObject.AddPair(PSR_AUTH_TOKEN, FAuthToken.AsString);
+    // ---------- instances ----------
+    // AIntf1
+    if Assigned(FIntf1) then
+      LJSONObject.AddPair(PSR_INSTANCES_INTF1, dj.From(FIntf1).byFields.TypeAnnotationsON.ToJsonValue);
+    // AIntf2
+    if Assigned(FIntf2) then
+      LJSONObject.AddPair(PSR_INSTANCES_INTF2, dj.From(FIntf2).byFields.TypeAnnotationsON.ToJsonValue);
+    // AObj1
+    if Assigned(FObj1) then
+      LJSONObject.AddPair(PSR_INSTANCES_OBJ1, dj.From(FObj1).byFields.TypeAnnotationsON.ToJsonValue);
+    // AObj2
+    if Assigned(FObj2) then
+      LJSONObject.AddPair(PSR_INSTANCES_OBJ2, dj.From(FObj2).byFields.TypeAnnotationsON.ToJsonValue);
+    // ---------- others ----------
+    // BlindLevel
+    LJSONObject.AddPair(PSR_BLINDLEVEL, FBlindLevel);
+    // IntentType
+    LJSONObject.AddPair(PSR_INTENTTYPE, Ord(FIntentType));
+    // MasterPropName
+    if not FMasterPropName.IsEmpty then
+      LJSONObject.AddPair(PSR_MASTERPROPERTYNAME, FMasterPropName.AsString);
+    // MasterPropPath
+    if not FMasterPropPath.IsEmpty then
+      LJSONObject.AddPair(PSR_MASTERPROPERTYPATH, FMasterPropPath.AsString);
+    // PropName
+    if not FPropName.IsEmpty then
+      LJSONObject.AddPair(PSR_PROPERTYNAME, FPropName.AsString);
+    // RelationOID
+    if FRelationOID <> IO_INTEGER_NULL_VALUE then
+      LJSONObject.AddPair(PSR_RELATIONID, FRelationOID);
+    // RelationPropName
+    if FRelationPropName <> IO_STRING_NULL_VALUE then
+      LJSONObject.AddPair(PSR_RELATIONPROPERTYNAME, FRelationPropName);
 end;
 
-constructor TioPersistenceStrategyRequest.Create(const FillSessionRelatedProperties: Boolean);
+constructor TioPersistenceStrategyRequest.Create(const AMethod: TioPersistenceStrategyMethod; const FillSessionRelatedProperties: Boolean);
 begin
-  FIntent := TioPersistenceIntentType.itRegular;
-  FBlindLevel := BL_DEFAULT;
-  FMasterPropName := IO_STRING_NULL_VALUE;
-  FMasterPropPath := IO_STRING_NULL_VALUE;
-  FRelationOID := IO_INTEGER_NULL_VALUE;
-  FRelationPropName := IO_STRING_NULL_VALUE;
-  // auth
+  // method
+  FMethod := AMethod;
+  // auth and session
   FAuthGrant := IO_STRING_NULL_VALUE;
   FAuthIntention: TioAuthIntention.aiRead;
   FAuthScope := IO_STRING_NULL_VALUE;
-  // Fill session related properties
   if FillSessionRelatedProperties then
     _FillSessionRelatedProperties;
+  // instances
+  AIntf1 := nil;
+  AIntf2 := nil;
+  AObj1 := nil;
+  AObj2 := nil;
+  // others
+  FBlindLevel := BL_DEFAULT;
+  FIntent := TioPersistenceIntentType.itRegular;
+  FMasterPropName := IO_STRING_NULL_VALUE;
+  FMasterPropPath := IO_STRING_NULL_VALUE;
+  FPropName := IO_STRING_NULL_VALUE;
+  FRelationOID := IO_INTEGER_NULL_VALUE;
+  FRelationPropName := IO_STRING_NULL_VALUE;
 end;
 
 constructor TioPersistenceStrategyRequest.CreateByJSONString(const AJSONString: String);
@@ -186,6 +291,16 @@ begin
   Result := FIntent;
 end;
 
+function TioPersistenceStrategyRequest.GetIntf1: IInterface;
+begin
+  Result := FIntf1;
+end;
+
+function TioPersistenceStrategyRequest.GetIntf2: IInterface;
+begin
+  Result := FIntf2;
+end;
+
 function TioPersistenceStrategyRequest.GetMasterPropName: String;
 begin
   Result := FMasterPropName;
@@ -194,6 +309,26 @@ end;
 function TioPersistenceStrategyRequest.GetMasterPropPath: String;
 begin
   Result := FMasterPropPath;
+end;
+
+function TioPersistenceStrategyRequest.GetMethod: TioPersistenceStrategyMethod;
+begin
+  Result := FMethod;
+end;
+
+function TioPersistenceStrategyRequest.GetObj1: TObject;
+begin
+  Result := FObj1;
+end;
+
+function TioPersistenceStrategyRequest.GetObj2: TObject;
+begin
+  Result := FObj2;
+end;
+
+function TioPersistenceStrategyRequest.GetPropName: String;
+begin
+  Result := FPropName;
 end;
 
 function TioPersistenceStrategyRequest.GetRelationOID: Integer;
@@ -216,6 +351,41 @@ begin
   Result := FUsrOID;
 end;
 
+procedure TioPersistenceStrategyRequest.SetAuthGrant(const Value: String);
+begin
+  FAuthGrant := Value;
+end;
+
+procedure TioPersistenceStrategyRequest.SetAuthIntention(const Value: TioAuthIntention);
+begin
+  FAuthIntention := Value;
+end;
+
+procedure TioPersistenceStrategyRequest.SetAuthScope(const Value: String);
+begin
+  FAuthScope := Value;
+end;
+
+procedure TioPersistenceStrategyRequest.SetBlindLevel(const Value: Byte);
+begin
+  FBlindLevel := Value;
+end;
+
+procedure TioPersistenceStrategyRequest.SetIntent(const Value: TioPersistenceIntentType);
+begin
+  FIntent := Value;
+end;
+
+procedure TioPersistenceStrategyRequest.SetIntf1(const Value: IInterface);
+begin
+  FIntf1 := Value:
+end;
+
+procedure TioPersistenceStrategyRequest.SetIntf2(const Value: IInterface);
+begin
+  FIntf2 := Value:
+end;
+
 procedure TioPersistenceStrategyRequest.SetMasterPropName(const Value: String);
 begin
   FMasterPropName := Value;
@@ -224,6 +394,21 @@ end;
 procedure TioPersistenceStrategyRequest.SetMasterPropPath(const Value: String);
 begin
   FMasterPropPath := Value;
+end;
+
+procedure TioPersistenceStrategyRequest.SetObj1(const Value: TObject);
+begin
+  FObj1 := Value;
+end;
+
+procedure TioPersistenceStrategyRequest.SetObj2(const Value: TObject);
+begin
+  FObj2 := Value;
+end;
+
+procedure TioPersistenceStrategyRequest.SetPropName(const Value: String);
+begin
+  FPropName := Value;
 end;
 
 procedure TioPersistenceStrategyRequest.SetRelationOID(const Value: Integer);
