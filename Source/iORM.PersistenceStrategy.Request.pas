@@ -28,7 +28,7 @@ type
     FIntf2: IInterface; // NEW
     // others
     FBlindLevel: Byte;
-    FIntentType: TioPersistenceIntentType;
+    FIntent: TioPersistenceIntentType;
     FMasterPropName: String;
     FMasterPropPath: String;
     FMethod: TioPersistenceStrategyMethod; // NEW
@@ -46,7 +46,7 @@ type
     function GetBlindLevel: Byte;
     function GetConnection: String;
     function GetConnectionRemote: String;
-    function GetIntentType: TioPersistenceIntentType;
+    function GetIntent: TioPersistenceIntentType;
     function GetIntf1: IInterface;
     function GetIntf2: IInterface;
     function GetMasterPropName: String;
@@ -63,7 +63,7 @@ type
     procedure SetAuthIntention(const Value: TioAuthIntention);
     procedure SetAuthScope(const Value: String);
     procedure SetBlindLevel(const Value: Byte);
-    procedure SetIntentType(const Value: TioPersistenceIntentType);
+    procedure SetIntent(const Value: TioPersistenceIntentType);
     procedure SetIntf1(const Value: IInterface);
     procedure SetIntf2(const Value: IInterface);
     procedure SetMasterPropName(const Value: String);
@@ -98,7 +98,7 @@ type
     property Obj2: TObject read GetObj2 write SetObj2;
     // others
     property BlindLevel: Byte read GetBlindLevel write SetBlindLevel;
-    property IntentType: TioPersistenceIntentType read GetIntentType write SetIntentType;
+    property Intent: TioPersistenceIntentType read GetIntent write SetIntent;
     property MasterPropName: String read GetMasterPropName write SetMasterPropName;
     property MasterPropPath: String read GetMasterPropPath write SetMasterPropPath;
     property PropName: String read GetPropName write SetPropName;
@@ -169,7 +169,7 @@ begin
     // BlindLevel
     LJSONObject.AddPair(PSR_BLINDLEVEL, FBlindLevel);
     // IntentType
-    LJSONObject.AddPair(PSR_INTENTTYPE, Ord(FIntentType));
+    LJSONObject.AddPair(PSR_INTENTTYPE, Ord(FIntent));
     // MasterPropName
     if not FMasterPropName.IsEmpty then
       LJSONObject.AddPair(PSR_MASTERPROPERTYNAME, FMasterPropName.AsString);

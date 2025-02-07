@@ -36,7 +36,8 @@ unit iORM.PersistenceStrategy.Factory;
 interface
 
 uses
-  iORM.DB.Interfaces, iORM.PersistenceStrategy.Interfaces, iORM.CommonTypes;
+  iORM.DB.Interfaces, iORM.PersistenceStrategy.Interfaces, iORM.CommonTypes,
+  iORM;
 
 type
 
@@ -46,12 +47,39 @@ type
   public
     class function GetStrategy(const AConnectionName: String): TioPersistenceStrategyRef;
     class function ConnectionTypeToStrategy(const AConnectionType: TioConnectionType): TioPersistenceStrategyRef;
-    // operation type specific persistence strategy request factories
+    // ---------- operation type specific persistence strategy request factories ----------
     class function NewPSRequest_ByJsonString(const AJsonString: String): IioPersistenceStrategyRequest;
-    class function NewPSRequest_Delete(const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
-    class function NewPSRequest_Load(const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
-    class function NewPSRequest_Persist(const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ARelationPropertyName: String;
-      const ARelationOID: Integer; const AMasterPropertyName, AMasterPropertyPath: String): IioPersistenceStrategyRequest;
+    // delete
+    class function NewPSRequest_Delete(const AWhere: IioWhere): IioPersistenceStrategyRequest;
+    class function NewPSRequest_DeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
+    class function NewPSRequest_DeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
+    // load
+    class function NewPSRequest_Count(const AWhere: IioWhere): IioPersistenceStrategyRequest;
+    class function NewPSRequest_LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet): IioPersistenceStrategyRequest;
+    class function NewPSRequest_LoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
+    class function NewPSRequest_LoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
+    class function NewPSRequest_LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
+    class function NewPSRequest_LoadObjVersion(const AContext: IioContext): IioPersistenceStrategyRequest;
+    class function NewPSRequest_Max(const AWhere: IioWhere; const APropertyName: String): IioPersistenceStrategyRequest;
+    class function NewPSRequest_Min(const AWhere: IioWhere; const APropertyName: String): IioPersistenceStrategyRequest;
+    // persist
+    class function NewPSRequest_PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
+      const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName,
+      AMasterPropertyPath: String): IioPersistenceStrategyRequest;
+    class function NewPSRequest_PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
+      const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName,
+      AMasterPropertyPath: String): IioPersistenceStrategyRequest;
+    // sql destinations
+    class function NewPSRequest_SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet): IioPersistenceStrategyRequest;
+    class function NewPSRequest_SQLDest_Execute(const ASQLDestination: IioSQLDestination): IioPersistenceStrategyRequest;
+    // synchro strategy
+    class function NewPSRequest_DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload): IioPersistenceStrategyRequest;
+    // ---------- operation type specific persistence strategy request factories ----------
+
+
+
+
+
   end;
 implementation
 
@@ -86,30 +114,138 @@ begin
   Result := TioPersistenceStrategyRequest.CreateByJSONString(AJsonString);
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_Delete(const AIntent: TioPersistenceIntentType;
+class function TioPersistenceStrategyFactory.NewPSRequest_Count(const AWhere: IioWhere): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(True);
+  Result.Intf1 := AWhere;
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_Delete(const AWhere: IioWhere): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(True);
+  Result.Intf1 := AWhere;
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_DeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType;
   const ABlindLevel: Byte): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(True);
-  Result.Intent := AIntent;
   Result.BlindLevel := ABlindLevel;
+  Result.Intent := AIntent;
+  Result.Obj1 := AList;
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_Load(const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
+class function TioPersistenceStrategyFactory.NewPSRequest_DeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType;
+  const ABlindLevel: Byte): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(True);
+  Result.BlindLevel := ABlindLevel;
+  Result.Intent := AIntent;
+  Result.Obj1 := AList;
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(True);
+  Result.Obj1 := APayload;
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(True);
+  Result.Intf1 := AWhere;
+  Result.Obj1 := ADestDataSet;
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_LoadList(const AWhere: IioWhere; const AList: TObject;
+  const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(True);
   Result.Intent := AIntent;
+  Result.Intf1 := AWhere;
+  Result.Obj1 := AList;
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_Persist(const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
-  const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterPropertyName, AMasterPropertyPath: String): IioPersistenceStrategyRequest;
+class function TioPersistenceStrategyFactory.NewPSRequest_LoadObject(const AWhere: IioWhere; const AObj: TObject;
+  const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(True);
   Result.Intent := AIntent;
+  Result.Intf1 := AWhere;
+  Result.Obj1 := AObj;
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject;
+  const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(True);
+  Result.Intent := AIntent;
+  Result.Intf1 := AWhere;
+  Result.Obj1 := AObj;
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_LoadObjVersion(const AContext: IioContext): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(True);
+  Result.Intf1 := AContext;
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_Max(const AWhere: IioWhere; const APropertyName: String): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(True);
+  Result.Intf1 := AWhere;
+  Result.PropName := APropertyName;
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_Min(const AWhere: IioWhere; const APropertyName: String): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(True);
+  Result.Intf1 := AWhere;
+  Result.PropName := APropertyName;
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
+  const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName,
+  AMasterPropertyPath: String): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(True);
   Result.BlindLevel := ABlindLevel;
+  Result.Intent := AIntent;
+  Result.Obj1 := AList;
+  Result.Obj2 := AMasterBSPersistence;
   Result.RelationPropertyName := ARelationPropertyName;
   Result.RelationOID := ARelationOID;
-  Result.MasterPropertyName := AMasterPropertyName;
-  Result.MasterPropertyPath := AMasterPropertyPath;
+  Result.MasterPropName := AMasterPropertyName;
+  Result.MasterPropPath := AMasterPropertyPath;
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
+  const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName,
+  AMasterPropertyPath: String): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(True);
+  Result.BlindLevel := ABlindLevel;
+  Result.Intent := AIntent;
+  Result.Obj1 := AObj;
+  Result.Obj2 := AMasterBSPersistence;
+  Result.RelationPropertyName := ARelationPropertyName;
+  Result.RelationOID := ARelationOID;
+  Result.MasterPropName := AMasterPropertyName;
+  Result.MasterPropPath := AMasterPropertyPath;
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_SQLDest_Execute(const ASQLDestination: IioSQLDestination): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(True);
+  Result.Intf1 := ASQLDestination;
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination;
+  const ADestDataSet: TFDDataSet): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(True);
+  Result.Intf1 := ASQLDestination;
+  Result.Obj1 := ADestDataSet;
 end;
 
 end.

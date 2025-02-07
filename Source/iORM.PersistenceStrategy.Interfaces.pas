@@ -38,28 +38,28 @@ interface
 const
 
   // persistence strategy request json properties constants
+  PSR_AUTH_GRANT = 'AuthGrant';
+  PSR_AUTH_INTENTION = 'AuthIntent';
+  PSR_AUTH_SCOPE = 'AuthScope';
+  PSR_AUTH_TOKEN = 'AuthToken';
+  PSR_BLINDLEVEL = 'BlindLevel';
+  PSR_INSTANCES_INTF1 = 'Intf1';
+  PSR_INSTANCES_INTF2 = 'Intf2';
+  PSR_INSTANCES_OBJ1 = 'Obj1';
+  PSR_INSTANCES_OBJ2 = 'Obj2';
+  PSR_INTENTTYPE = 'Intent';
+  PSR_MASTERPROPERTYNAME = 'MasterProp';
+  PSR_MASTERPROPERTYPATH = 'MasterPropPath';
   PSR_METHOD = 'Method';
+  PSR_PROPERTYNAME = 'PropName';
+  PSR_RELATIONID = 'RelPropID';
+  PSR_RELATIONPROPERTYNAME = 'RelPropName';
   PSR_SESSION_APP = 'App';
   PSR_SESSION_APPOID = 'AppID';
   PSR_SESSION_CONNECTION = 'Conn';
   PSR_SESSION_CONNECTIONREMOTE = 'ConnRem';
   PSR_SESSION_USER = 'Usr';
   PSR_SESSION_USEROID = 'UsrID';
-  PSR_AUTH_GRANT = 'AuthGrant';
-  PSR_AUTH_INTENTION = 'AuthIntent';
-  PSR_AUTH_SCOPE = 'AuthScope';
-  PSR_AUTH_TOKEN = 'AuthToken';
-  PSR_INSTANCES_INTF1 = 'Intf1';
-  PSR_INSTANCES_INTF2 = 'Intf2';
-  PSR_INSTANCES_OBJ1 = 'Obj1';
-  PSR_INSTANCES_OBJ2 = 'Obj2';
-  PSR_BLINDLEVEL = 'BlindLevel';
-  PSR_INTENTTYPE = 'Intent';
-  PSR_MASTERPROPERTYNAME = 'MasterProp';
-  PSR_MASTERPROPERTYPATH = 'MasterPropPath';
-  PSR_PROPERTYNAME = 'PropName';
-  PSR_RELATIONID = 'RelPropID';
-  PSR_RELATIONPROPERTYNAME = 'RelPropName';
 
 type
 
