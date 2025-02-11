@@ -51,71 +51,67 @@ type
   TioAuthCredentialsMode = (cmLogin, cmSetPassword, cmChangePassword);
   TioAuthCredentialsClearMode = (cmAll, cmSecretsOnly);
 
-  IioAuthSessionData = interface
-    ['{DE6E7EDA-BEE0-4F8A-A12F-2A99E63D8EC5}']
-    function AsString: String;
-    procedure Clear;
-    procedure FromString(const Value: String);
-    function GetApp: String;
-    function GetAppOID: Integer;
-    function GetConnectionName: String;
-    function GetConnectionNameRemote: String;
-    function GetHasApp: Boolean;
-    function GetHasAppOID: Boolean;
-    function GetHasConnectionName: Boolean;
-    function GetHasConnectionNameRemote: Boolean;
-    function GetHasUser: Boolean;
-    function GetHasUserOID: Boolean;
-    function GetUser: String;
-    function GetUserOID: Integer;
-    procedure SetApp(const Value: String);
-    procedure SetAppOID(const Value: Integer);
-    procedure SetConnectionName(const Value: String);
-    procedure SetConnectionNameRemote(const Value: String);
-    procedure SetUser(const Value: String);
-    procedure SetUserOID(const Value: Integer);
-    // properties
-    property App: String read GetApp write SetApp;
-    property AppOID: Integer read GetAppOID write SetAppOID;
-    property ConnectionName: String read GetConnectionName write SetConnectionName;
-    property ConnectionNameRemote: String read GetConnectionNameRemote write SetConnectionNameRemote;
-    property HasApp: Boolean read GetHasApp;
-    property HasAppOID: Boolean read GetHasAppOID;
-    property HasConnectionName: Boolean read GetHasConnectionName;
-    property HasConnectionNameRemote: Boolean read GetHasConnectionNameRemote;
-    property HasUser: Boolean read GetHasUser;
-    property HasUserOID: Boolean read GetHasUserOID;
-    property User: String read GetUser write SetUser;
-    property UserOID: Integer read GetUserOID write SetUserOID;
-  end;
-
   IioAuthSession = interface
-    ['{AEC7DF37-A5C0-44E3-9D64-32216758506B}']
+    ['{DE6E7EDA-BEE0-4F8A-A12F-2A99E63D8EC5}']
     procedure Clear;
     function GetAccessToken: String;
     function GetAccessTokenExp: TDateTime;
     function GetAccessTokenIsExpired: Boolean;
+    function GetApp: String;
+    function GetAppOID: Integer;
+    function GetConnectionDefault: String;
+    function GetConnectionLocal: String;
+    function GetConnectionRemote: String;
     function GetHasAccessToken: Boolean;
+    function GetHasApp: Boolean;
+    function GetHasAppOID: Boolean;
+    function GetHasConnectionName: Boolean;
+    function GetHasConnectionNameRemote: Boolean;
     function GetHasRefreshToken: Boolean;
+    function GetHasUser: Boolean;
+    function GetHasUserOID: Boolean;
     function GetNeedRefresh: Boolean;
     function GetRefreshAfter: TDateTime;
     function GetRefreshToken: String;
     function GetRefreshTokenExp: TDateTime;
     function GetRefreshTokenIsExpired: Boolean;
-    function GetSessionData: IioAuthSessionData;
+    function GetUser: String;
+    function GetUserOID: Integer;
+    procedure SetApp(const Value: String);
+    procedure SetAppOID(const Value: Integer);
     procedure SetAccessToken(const Value: String);
     procedure SetAccessTokenExp(const Value: TDateTime);
+    procedure SetConnectionDefault(const Value: String);
+    procedure SetConnectionLocal(const Value: String);
+    procedure SetConnectionRemote(const Value: String);
     procedure SetRefreshAfter(const Value: TDateTime);
     procedure SetRefreshToken(const Value: String);
     procedure SetRefreshTokenExp(const Value: TDateTime);
-    // subjects (user, app)
-    property SessionData: IioAuthSessionData read GetSessionData;
-    // refresh
+    procedure SetUser(const Value: String);
+    procedure SetUserOID(const Value: Integer);
+    // ----- properties -----
+    // app
+    property App: String read GetApp write SetApp;
+    property AppOID: Integer read GetAppOID write SetAppOID;
+    property HasApp: Boolean read GetHasApp;
+    property HasAppOID: Boolean read GetHasAppOID;
+    // connection
+    property ConnectionDefault: String read GetConnectionDefault write SetConnectionDefault;
+    property ConnectionLocal: String read GetConnectionLocal write SetConnectionLocal;
+    property ConnectionRemote: String read GetConnectionRemote write SetConnectionRemote;
+    property HasConnectionName: Boolean read GetHasConnectionName;
+    property HasConnectionNameRemote: Boolean read GetHasConnectionNameRemote;
+    // user
+    property HasUser: Boolean read GetHasUser;
+    property HasUserOID: Boolean read GetHasUserOID;
+    property User: String read GetUser write SetUser;
+    property UserOID: Integer read GetUserOID write SetUserOID;
+    // refresh token
     property RefreshToken: String read GetRefreshToken write SetRefreshToken;
     property RefreshTokenExp: TDateTime read GetRefreshTokenExp write SetRefreshTokenExp;
     property RefreshTokenIsExpired: Boolean read GetRefreshTokenIsExpired;
     property HasRefreshToken: Boolean read GetHasRefreshToken;
-    // access
+    // access token
     property AccessToken: String read GetAccessToken write SetAccessToken;
     property AccessTokenExp: TDateTime read GetAccessTokenExp write SetAccessTokenExp;
     property AccessTokenIsExpired: Boolean read GetAccessTokenIsExpired;
