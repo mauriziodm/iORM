@@ -40,16 +40,6 @@ uses
 
 type
 
-  TioAuthSessionThreadSafeWrapper = class(TInterfacedObject, IioAuthSessionThreadSafeWrapper)
-  private
-    FSession: IioAuthSessionData;
-  public
-    constructor Create;
-    procedure Clear;
-    function Acquire: IioAuthSessionData;
-    procedure Release;
-  end;
-
   TioAuthSessionData = class(TInterfacedObject, IioAuthSessionData)
   private
   private
@@ -353,35 +343,6 @@ end;
 procedure TioAuthSessionData.SetUserOID(const Value: Integer);
 begin
   FUserOID := Value;
-end;
-
-{ TioAuthSessionThreadSafeWrapper }
-
-function TioAuthSessionThreadSafeWrapper.Acquire: IioAuthSessionData;
-begin
-  TMonitor.Enter(Self);
-  Result := FSession;
-end;
-
-procedure TioAuthSessionThreadSafeWrapper.Clear;
-begin
-  Acquire;
-  try
-    FSession := TioAuthFactory.NewAuthSession;
-  finally
-    Release;
-  end;
-end;
-
-constructor TioAuthSessionThreadSafeWrapper.Create;
-begin
-  inherited;
-  Clear;
-end;
-
-procedure TioAuthSessionThreadSafeWrapper.Release;
-begin
-  TMonitor.Exit(Self);
 end;
 
 end.

@@ -63,23 +63,25 @@ type
   end;
 
   TioThreadSessionDataContainer = TDictionary<TThreadID, IioAuthSessionData>;
+  TioCustomSessionDataStoreRef = class of TioCustomSessionDataStore;
   TioCustomSessionDataStore = class abstract
   private
     class var FDefaultConnection: String;
     class var FThreadSessionData: TioThreadSessionDataContainer;
     class function _GetThreadOrMainSessionData: IioAuthSessionData; inline;
-    class procedure _Lock; inline;
-    class procedure _Unlock; inline;
     class function GetDefaultConnection: String; static;
     class procedure SetDefaultConnection(const AConnectionDefName: String); static;
   protected
     class procedure _Initialize; virtual;
     class procedure _Finalize; virtual;
+    class procedure _Lock; inline;
+    class procedure _Unlock; inline;
     class function _GetMainSessionData: IioAuthSessionData; virtual; abstract;
+    class function _ClearMainSessionData: IioAuthSessionData; virtual; abstract;
   public
     class constructor Create;
     class destructor Destroy;
-    // session data
+    // main session data
     class function AcquireSessionData: IioAuthSessionData;
     class procedure ReleaseSessionData;
     class procedure ClearSessionData;
@@ -99,34 +101,29 @@ type
   protected
     class procedure _Initialize; override;
     class function _GetMainSessionData: IioAuthSessionData; override;
+    class function _ClearMainSessionData: IioAuthSessionData; override;
   end;
 
   TioApplicationRef = class of TioApplication;
   TioApplication = class abstract
   private
-    class var FConcreteClass_NoDirectCall: TioApplicationRef;
-    class var FConnectionDefault: String;
+    class var _FConcreteClass_NoDirectCall: TioApplicationRef;
   protected
     // --------- methods to be ovverrided by descendants ----------
-    class function _AcquireSession: IioAuthSessionData; virtual; abstract;
-    class procedure _ClearSession; virtual; abstract;
+    class function _GetSessionDataStore: TioCustomSessionDataStoreRef; virtual; abstract;
     class procedure _HandleException(const Sender: TObject); virtual; abstract;
     class function _ProjectPlatform: TioProjectPlatform; virtual; abstract;
-    class procedure _ReleaseSession; virtual; abstract;
     class procedure _ShowMessage(const AMessage: string); virtual; abstract;
     class function _Terminate: Boolean; virtual; abstract;
     // --------- methods to be ovverrided by descendants ----------
-    class function GetConcreteClass: TioApplicationRef;
-    class procedure SetConcreteClass(const AClass: TioApplicationRef);
+    class procedure _SetConcreteClass(const AClass: TioApplicationRef);
   public
-    class constructor Create;
-    class function AcquireSession: IioAuthSessionData; inline;
+    class var _FConcreteSessionDataStoreClass_NoDirectCall: TioCustomSessionDataStoreRef; // public for inline, do not use directly
+    class function _GetConcreteClass_NoDirectCall: TioApplicationRef; // public for inline, do not use directly
     class procedure CheckIfAbstractionLayerComponentExists; inline;
-    class procedure ClearSession; inline;
-    class function CloneSessionData: IioAuthSessionData; inline;
     class procedure HandleException(const Sender: TObject); inline;
     class function ProjectPlatform: TioProjectPlatform; inline;
-    class procedure ReleaseSession; inline;
+    class function SessionDataStore: TioCustomSessionDataStoreRef; inline;
     class procedure ShowMessage(const AMessage: string); inline;
     class function Terminate: Boolean; inline;
   end;
@@ -316,71 +313,46 @@ end;
 
 { TioApplication }
 
-class function TioApplication.AcquireSession: IioAuthSessionData;
-begin
-  Result := GetConcreteClass._AcquireSession;
-end;
-
 class procedure TioApplication.CheckIfAbstractionLayerComponentExists;
 begin
-  GetConcreteClass;
+  _GetConcreteClass_NoDirectCall;
 end;
 
-class procedure TioApplication.ClearSession;
+class function TioApplication._GetConcreteClass_NoDirectCall: TioApplicationRef;
 begin
-  GetConcreteClass._ClearSession;
-end;
-
-class function TioApplication.CloneSessionData: IioAuthSessionData;
-begin
-  try
-    Result := _AcquireSession.SessionData.Clone;
-  finally
-    _ReleaseSession;
-  end;
-end;
-
-class constructor TioApplication.Create;
-begin
-  inherited;
-  FConnectionDefault := String.Empty;
-end;
-
-class function TioApplication.GetConcreteClass: TioApplicationRef;
-begin
-  if not Assigned(FConcreteClass_NoDirectCall) then
+  if not Assigned(_FConcreteClass_NoDirectCall) then
     raise EioGenericException.Create(Self.ClassName, 'GetConcreteClass', 'You must put one of the TioVCL or TioFMX components somewhere in the application.');
-  Result := FConcreteClass_NoDirectCall;
+  Result := _FConcreteClass_NoDirectCall;
 end;
 
 class procedure TioApplication.HandleException(const Sender: TObject);
 begin
-  GetConcreteClass._HandleException(Sender);
+  _GetConcreteClass_NoDirectCall._HandleException(Sender);
 end;
 
 class function TioApplication.ProjectPlatform: TioProjectPlatform;
 begin
-  Result := GetConcreteClass._ProjectPlatform;
+  Result := _GetConcreteClass_NoDirectCall._ProjectPlatform;
 end;
 
-class procedure TioApplication.ReleaseSession;
+class procedure TioApplication._SetConcreteClass(const AClass: TioApplicationRef);
 begin
-  GetConcreteClass._ReleaseSession;
+  _FConcreteClass_NoDirectCall := AClass;
 end;
 
-class procedure TioApplication.SetConcreteClass(const AClass: TioApplicationRef);
+class function TioApplication.SessionDataStore: TioCustomSessionDataStoreRef;
 begin
-  FConcreteClass_NoDirectCall := AClass;
+  Result := _FConcreteSessionDataStoreClass_NoDirectCall;
 end;
 
 class procedure TioApplication.ShowMessage(const AMessage: string);
 begin
-  GetConcreteClass._ShowMessage(AMessage);
+  _GetConcreteClass_NoDirectCall._ShowMessage(AMessage);
 end;
 
 class function TioApplication.Terminate: Boolean;
 begin
-  Result := GetConcreteClass._Terminate;
+  Result := _GetConcreteClass_NoDirectCall._Terminate;
 end;
 
 { TioAction }
@@ -547,7 +519,7 @@ class procedure TioCustomSessionDataStore.ClearSessionData;
 begin
   _Lock;
   try
-    _GetMainSessionData.Clear;
+    _ClearMainSessionData;
   finally
     _Unlock;
   end;
@@ -670,6 +642,11 @@ begin
 end;
 
 { TioSimpleSessionDataStore }
+
+class function TioSimpleSessionDataStore._ClearMainSessionData: IioAuthSessionData;
+begin
+  FMainSessionData.Clear;
+end;
 
 class function TioSimpleSessionDataStore._GetMainSessionData: IioAuthSessionData;
 begin

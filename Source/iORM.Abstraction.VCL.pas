@@ -36,29 +36,24 @@ unit iORM.Abstraction.VCL;
 interface
 
 uses
-  iORM.Abstraction, VCL.ActnList, VCL.ExtCtrls, System.Rtti, System.Classes, FireDAC.VCLUI.Wait,
-  iORM.Auth.Interfaces; // For FireDAC compatibility without original component
+  FireDAC.FMXUI.Wait, // For FireDAC compatibility without using the original component
+  iORM.Abstraction, VCL.ActnList, VCL.ExtCtrls, System.Rtti, System.Classes; // For FireDAC compatibility without original component
 
 type
 
   TioVCL = class(TioCustomPlatformAbstractionComponent)
+  public
+    class constructor Create;
   end;
 
   TioApplicationVCL = class(TioApplication)
-  private
-    class var FSessionThreadSafeWrapper: IioAuthSessionThreadSafeWrapper;
   protected
     // --------- methods to be ovverrided by descendants ----------
-    class function _AcquireSession: IioAuthSessionData; override;
-    class procedure _ClearSession; override;
     class procedure _HandleException(const Sender: TObject); override;
     class function _ProjectPlatform: TioProjectPlatform; override;
-    class procedure _ReleaseSession; override;
     class procedure _ShowMessage(const AMessage: string); override;
     class function _Terminate: Boolean; override;
     // --------- methods to be ovverrided by descendants ----------
-  public
-    class constructor Create;
   end;
 
   TioControlVCL = class(TioControl)
@@ -123,27 +118,9 @@ type
 implementation
 
 uses
-  iORM, iORM.Exceptions, Vcl.Forms, Vcl.Dialogs,
-  Vcl.Controls, iORM.Auth.Factory;
+  iORM, iORM.Exceptions, Vcl.Forms, Vcl.Dialogs, Vcl.Controls;
 
 { TioApplicationVCL }
-
-class constructor TioApplicationVCL.Create;
-begin
-  inherited;
-  FSessionThreadSafeWrapper := TioAuthFactory.NewAuthSessionThreadSafeWrapper;
-end;
-
-class function TioApplicationVCL._AcquireSession: IioAuthSessionData;
-begin
-  Result := FSessionThreadSafeWrapper.Acquire;
-end;
-
-class procedure TioApplicationVCL._ClearSession;
-begin
-  FSessionThreadSafeWrapper.Clear;
-end;
-
 class procedure TioApplicationVCL._HandleException(const Sender: TObject);
 begin
   Application.HandleException(Sender);
@@ -152,11 +129,6 @@ end;
 class function TioApplicationVCL._ProjectPlatform: TioProjectPlatform;
 begin
   Result := ppVCL;
-end;
-
-class procedure TioApplicationVCL._ReleaseSession;
-begin
-  FSessionThreadSafeWrapper.Release;
 end;
 
 class procedure TioApplicationVCL._ShowMessage(const AMessage: string);
@@ -395,11 +367,16 @@ begin
   TControl(AControl).Visible := AVisible;
 end;
 
-initialization
+{ TioVCL }
 
-TioApplicationVCL.SetConcreteClass(TioApplicationVCL);
-TioControlVCL.SetConcreteClass(TioControlVCL);
-TioTimerVCL.SetConcreteClass(TioTimerVCL);
-TioActionVCL.SetConcreteClass(TioActionVCL);
+class constructor TioVCL.Create;
+begin
+  inherited;
+  TioApplicationVCL._SetConcreteClass(TioApplicationVCL);
+  TioApplicationVCL._FConcreteSessionDataStoreClass_NoDirectCall(TioSimpleSessionDataStore);
+  TioControlVCL.SetConcreteClass(TioControlVCL);
+  TioTimerVCL.SetConcreteClass(TioTimerVCL);
+  TioActionVCL.SetConcreteClass(TioActionVCL);
+end;
 
 end.

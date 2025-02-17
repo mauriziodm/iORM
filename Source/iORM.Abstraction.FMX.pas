@@ -37,29 +37,23 @@ interface
 
 uses
   FireDAC.FMXUI.Wait, // For FireDAC compatibility without using the original component
-  iORM.Abstraction, FMX.Types, System.Classes, FMX.ActnList, System.Rtti,
-  iORM.Auth.Interfaces;
+  iORM.Abstraction, FMX.Types, System.Classes, FMX.ActnList, System.Rtti;
 
 type
 
   TioFMX = class(TioCustomPlatformAbstractionComponent)
+  public
+    class constructor Create;
   end;
 
   TioApplicationFMX = class(TioApplication)
-  private
-    class var FSessionThreadSafeWrapper: IioAuthSessionThreadSafeWrapper;
   protected
     // --------- methods to be ovverrided by descendants ----------
-    class function _AcquireSession: IioAuthSessionData; override;
-    class procedure _ClearSession; override;
     class procedure _HandleException(const Sender: TObject); override;
     class function _ProjectPlatform: TioProjectPlatform; override;
-    class procedure _ReleaseSession; override;
     class procedure _ShowMessage(const AMessage: string); override;
     class function _Terminate: Boolean; override;
     // --------- methods to be ovverrided by descendants ----------
-  public
-    class constructor Create;
   end;
 
   TioControlFMX = class(TioControl)
@@ -184,22 +178,6 @@ end;
 
 { TioApplicationFMX }
 
-class constructor TioApplicationFMX.Create;
-begin
-  inherited;
-  FSessionThreadSafeWrapper := TioAuthFactory.NewAuthSessionThreadSafeWrapper;
-end;
-
-class function TioApplicationFMX._AcquireSession: IioAuthSessionData;
-begin
-  Result := FSessionThreadSafeWrapper.Acquire;
-end;
-
-class procedure TioApplicationFMX._ClearSession;
-begin
-  FSessionThreadSafeWrapper.Clear;
-end;
-
 class procedure TioApplicationFMX._HandleException(const Sender: TObject);
 begin
   Application.HandleException(Sender);
@@ -208,11 +186,6 @@ end;
 class function TioApplicationFMX._ProjectPlatform: TioProjectPlatform;
 begin
   Result := ppFMX;
-end;
-
-class procedure TioApplicationFMX._ReleaseSession;
-begin
-  FSessionThreadSafeWrapper.Release;
 end;
 
 class procedure TioApplicationFMX._ShowMessage(const AMessage: string);
@@ -395,11 +368,15 @@ begin
   TControl(AControl).Visible := AVisible;
 end;
 
-initialization
+{ TioFMX }
 
-TioApplicationFMX.SetConcreteClass(TioApplicationFMX);
-TioControlFMX.SetConcreteClass(TioControlFMX);
-TioTimerFMX.SetConcreteClass(TioTimerFMX);
-TioActionFMX.SetConcreteClass(TioActionFMX);
+class constructor TioFMX.Create;
+begin
+  TioApplicationFMX._SetConcreteClass(TioApplicationFMX);
+  TioApplicationFMX._FConcreteSessionDataStoreClass_NoDirectCall(TioSimpleSessionDataStore);
+  TioControlFMX.SetConcreteClass(TioControlFMX);
+  TioTimerFMX.SetConcreteClass(TioTimerFMX);
+  TioActionFMX.SetConcreteClass(TioActionFMX);
+end;
 
 end.

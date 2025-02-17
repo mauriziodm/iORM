@@ -155,13 +155,6 @@ type
     property RefAft: TDateTime read GetRefAft write SetRefAft;
   end;
 
-  IioAuthSessionThreadSafeWrapper = interface
-    ['{3E052A85-C5D8-4CC9-BA3F-CBE173FE68CD}']
-    procedure Clear;
-    function Acquire: IioAuthSessionData;
-    procedure Release;
-  end;
-
   IioAuthCredentials = interface
     ['{CE64A453-68BF-4E11-8842-7E2A1BCA28B7}']
     procedure GenerateCodeVerifierAndChallenge;

@@ -52,33 +52,36 @@ unit iORM.Abstraction.uniGUI;
 interface
 
 uses
-  System.Classes, Vcl.ActnList, System.Rtti, iORM.Abstraction,
-  iORM.Auth.Interfaces, System.Generics.Collections;
+  iORM.Abstraction, System.Classes, Vcl.ActnList, System.Rtti,
+  iORM.Auth.Interfaces, System.Generics.Collections, iORM.Auth.Factory;
 
 type
   TioUniGUI = class(TioCustomPlatformAbstractionComponent)
+  public
+    class constructor Create;
   end;
 
-  TioSessionCollection = TDictionary<String, IioAuthSessionThreadSafeWrapper>;
+  TioUniMainSessionDataContainer = TDictionary<String, IioAuthSessionData>;
+  TioUniSessionDataStore = class(TioCustomSessionDataStore)
+  private
+    FMainSessionDataContainer: TioUniMainSessionDataContainer;
+  protected
+    class procedure _Initialize; override;
+    class procedure _Finalize; override;
+    class function _GetMainSessionData: IioAuthSessionData; override;
+    class function _ClearMainSessionData: IioAuthSessionData; override;
+  end;
+
   TioApplicationUniGUI = class(TioApplication)
   private
-    class var FSessionCollection: TioSessionCollection;
     class function uniSessionID: String; inline;
-    class procedure _Lock; inline;
-    class procedure _Unlock; inline;
   protected
     // --------- methods to be ovverrided by descendants ----------
-    class function _AcquireSession: IioAuthSession; override;
-    class procedure _ClearSession; override;
     class procedure _HandleException(const Sender: TObject); override;
     class function _ProjectPlatform: TioProjectPlatform; override;
-    class procedure _ReleaseSession; override;
     class procedure _ShowMessage(const AMessage: string); override;
     class function _Terminate: Boolean; override;
     // --------- methods to be ovverrided by descendants ----------
-  public
-    class constructor Create;
-    class destructor Destroy;
   end;
 
   TioControlUniGUI = class(TioControl)
@@ -145,50 +148,13 @@ implementation
 
 uses
   iORM, iORM.Exceptions, Data.Bind.Components, Vcl.Controls, uniGUIApplication, uniGUIClasses, uniGUIDialogs,
-  System.SysUtils, iORM.Auth.Factory;
+  System.SysUtils;
 
 { TioApplicationUniGUI }
-
-class constructor TioApplicationUniGUI.Create;
-begin
-  FSessionCollection := TioSessionCollection.Create;
-end;
-
-class destructor TioApplicationUniGUI.Destroy;
-begin
-  FreeAndNil(FSessionCollection);
-end;
 
 class function TioApplicationUniGUI.uniSessionID: String;
 begin
   Result := uniGUIApplication.UniSession.SessionId;
-end;
-
-class function TioApplicationUniGUI._AcquireSession: IioAuthSession;
-var
-  LSessionThreadSafeWrapper: IioAuthSessionThreadSafeWrapper;
-begin
-  _Lock;
-  try
-    if not FSessionCollection.TryGetValue(uniSessionID, LSessionThreadSafeWrapper) then
-    begin
-      LSessionThreadSafeWrapper := TioAuthFactory.NewAuthSessionThreadSafeWrapper;
-      FSessionCollection.Add(uniSessionID, LSessionThreadSafeWrapper);
-    end;
-    Result := LSessionThreadSafeWrapper.Acquire;
-  finally
-    _Unlock;
-  end;
-end;
-
-class procedure TioApplicationUniGUI._ClearSession;
-begin
-  _Lock;
-  try
-    FSessionCollection.Remove(uniSessionID);
-  finally
-    _Unlock;
-  end;
 end;
 
 class procedure TioApplicationUniGUI._HandleException(const Sender: TObject);
@@ -196,27 +162,9 @@ begin
   uniGUIApplication.UniSession.HandleException(Sender as Exception);
 end;
 
-class procedure TioApplicationUniGUI._Lock;
-begin
-  TMonitor.Enter(FSessionCollection);
-end;
-
 class function TioApplicationUniGUI._ProjectPlatform: TioProjectPlatform;
 begin
   Result := ppUniGUI;
-end;
-
-class procedure TioApplicationUniGUI._ReleaseSession;
-var
-  LSessionThreadSafeWrapper: IioAuthSessionThreadSafeWrapper;
-begin
-  _Lock;
-  try
-    if FSessionCollection.TryGetValue(uniSessionID, LSessionThreadSafeWrapper) then
-      LSessionThreadSafeWrapper.Release;
-  finally
-    _Unlock;
-  end;
 end;
 
 class procedure TioApplicationUniGUI._ShowMessage(const AMessage: string);
@@ -228,11 +176,6 @@ end;
 class function TioApplicationUniGUI._Terminate: Boolean;
 begin
   uniGUIApplication.UniSession.Terminate;
-end;
-
-class procedure TioApplicationUniGUI._Unlock;
-begin
-  TMonitor.Exit(FSessionCollection);
 end;
 
 { TioControlUniGUI }
@@ -465,11 +408,46 @@ begin
   Result := AField.FieldType.IsInstance and AField.FieldType.AsInstance.MetaclassType.InheritsFrom(TAction);
 end;
 
-initialization
+{ TioUniGUI }
 
-TioApplicationUniGUI.SetConcreteClass(TioApplicationUniGUI);
-TioControlUniGUI.SetConcreteClass(TioControlUniGUI);
-TioTimerUniGUI.SetConcreteClass(TioTimerUniGUI);
-TioActionUniGUI.SetConcreteClass(TioActionUniGUI);
+class constructor TioUniGUI.Create;
+begin
+  TioApplicationUniGUI._SetConcreteClass(TioApplicationUniGUI);
+  TioApplicationUniGUI._FConcreteSessionDataStoreClass_NoDirectCall(TioSimpleSessionDataStore);
+  TioControlUniGUI.SetConcreteClass(TioControlUniGUI);
+  TioTimerUniGUI.SetConcreteClass(TioTimerUniGUI);
+  TioActionUniGUI.SetConcreteClass(TioActionUniGUI);
+end;
+
+{ TioUniSessionDataStore }
+
+class procedure TioUniSessionDataStore._Initialize;
+begin
+  inherited;
+  FMainSessionDataContainer := TioUniMainSessionDataContainer.Create;
+end;
+
+class function TioUniSessionDataStore._ClearMainSessionData: IioAuthSessionData;
+begin
+  FMainSessionDataContainer.Remove(TioApplicationUniGUI.uniSessionID);
+end;
+
+class procedure TioUniSessionDataStore._Finalize;
+begin
+  inherited;
+  FMainSessionDataContainer.Free;
+end;
+
+class function TioUniSessionDataStore._GetMainSessionData: IioAuthSessionData;
+var
+  LSessionID: String;
+begin
+  LSessionID := TioApplicationUniGUI.uniSessionID;
+  if not FMainSessionDataContainer.TryGetValue(LSessionID, Result) then
+  begin
+    Result := TioAuthFactory.NewAuthSessionData;
+    FMainSessionDataContainer.Add(LSessionID, Result);
+  end;
+end;
 
 end.
