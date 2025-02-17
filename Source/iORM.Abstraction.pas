@@ -37,7 +37,8 @@ interface
 
 uses
   System.Classes, System.SysUtils, System.Rtti, iORM.CommonTypes,
-  iORM.Auth.Interfaces;
+  iORM.Auth.Interfaces, System.Generics.Collections,
+  iORM.PersistenceStrategy.Interfaces;
 
 type
   TioProjectPlatform = (ppVCL, ppFMX, ppUniGUI);
@@ -61,13 +62,53 @@ type
     property ShowWait: TNotifyEvent read FShowWait write SetShowWait;
   end;
 
+  TioThreadSessionDataContainer = TDictionary<TThreadID, IioAuthSessionData>;
+  TioCustomSessionDataStore = class abstract
+  private
+    class var FDefaultConnection: String;
+    class var FThreadSessionData: TioThreadSessionDataContainer;
+    class function _GetThreadOrMainSessionData: IioAuthSessionData; inline;
+    class procedure _Lock; inline;
+    class procedure _Unlock; inline;
+    class function GetDefaultConnection: String; static;
+    class procedure SetDefaultConnection(const AConnectionDefName: String); static;
+  protected
+    class procedure _Initialize; virtual;
+    class procedure _Finalize; virtual;
+    class function _GetMainSessionData: IioAuthSessionData; virtual; abstract;
+  public
+    class constructor Create;
+    class destructor Destroy;
+    // session data
+    class function AcquireSessionData: IioAuthSessionData;
+    class procedure ReleaseSessionData;
+    class procedure ClearSessionData;
+    // thread session data
+    class function ThreadAcquireSessionData: IioAuthSessionData;
+    class procedure ThreadReleaseSessionData;
+    class procedure ThreadClearSessionData;
+    // fill persistence strategy request
+    class procedure FillPersistenceStrategyRequest(const APersistenceStrategyRequest: IioPersistenceStrategyRequest);
+    // default connection
+    class property DefaultConnection: String read GetDefaultConnection write SetDefaultConnection;
+  end;
+
+  TioSimpleSessionDataStore = class(TioCustomSessionDataStore)
+  private
+    class var FMainSessionData: IioAuthSessionData;
+  protected
+    class procedure _Initialize; override;
+    class function _GetMainSessionData: IioAuthSessionData; override;
+  end;
+
   TioApplicationRef = class of TioApplication;
   TioApplication = class abstract
   private
     class var FConcreteClass_NoDirectCall: TioApplicationRef;
+    class var FConnectionDefault: String;
   protected
     // --------- methods to be ovverrided by descendants ----------
-    class function _AcquireSession: IioAuthSession; virtual; abstract;
+    class function _AcquireSession: IioAuthSessionData; virtual; abstract;
     class procedure _ClearSession; virtual; abstract;
     class procedure _HandleException(const Sender: TObject); virtual; abstract;
     class function _ProjectPlatform: TioProjectPlatform; virtual; abstract;
@@ -78,7 +119,8 @@ type
     class function GetConcreteClass: TioApplicationRef;
     class procedure SetConcreteClass(const AClass: TioApplicationRef);
   public
-    class function AcquireSession: IioAuthSession; inline;
+    class constructor Create;
+    class function AcquireSession: IioAuthSessionData; inline;
     class procedure CheckIfAbstractionLayerComponentExists; inline;
     class procedure ClearSession; inline;
     class function CloneSessionData: IioAuthSessionData; inline;
@@ -274,7 +316,7 @@ end;
 
 { TioApplication }
 
-class function TioApplication.AcquireSession: IioAuthSession;
+class function TioApplication.AcquireSession: IioAuthSessionData;
 begin
   Result := GetConcreteClass._AcquireSession;
 end;
@@ -296,6 +338,12 @@ begin
   finally
     _ReleaseSession;
   end;
+end;
+
+class constructor TioApplication.Create;
+begin
+  inherited;
+  FConnectionDefault := String.Empty;
 end;
 
 class function TioApplication.GetConcreteClass: TioApplicationRef;
@@ -485,6 +533,153 @@ procedure TioDeferred.OnTerminateEventHandler(Sender: TObject);
 begin
   if Assigned(FDelayedMethod) then
     FDelayedMethod;
+end;
+
+{ TioCustomSessionDataStore }
+
+class function TioCustomSessionDataStore.AcquireSessionData: IioAuthSessionData;
+begin
+  _Lock;
+  Result := _GetMainSessionData;
+end;
+
+class procedure TioCustomSessionDataStore.ClearSessionData;
+begin
+  _Lock;
+  try
+    _GetMainSessionData.Clear;
+  finally
+    _Unlock;
+  end;
+end;
+
+class constructor TioCustomSessionDataStore.Create;
+begin
+  _Initialize;
+end;
+
+class destructor TioCustomSessionDataStore.Destroy;
+begin
+  _Finalize;
+end;
+
+class procedure TioCustomSessionDataStore.FillPersistenceStrategyRequest(const APersistenceStrategyRequest: IioPersistenceStrategyRequest);
+var
+  LSessionData: IioAuthSessionData;
+begin
+  _Lock;
+  try
+    LSessionData := _GetMainSessionData;
+    // app
+    APersistenceStrategyRequest.App := LSessionData.App;
+    APersistenceStrategyRequest.AppOID := LSessionData.AppOID;
+    // connection
+    if LSessionData.HasConnection
+      APersistenceStrategyRequest.Connection := LSessionData.Connection
+    else
+      APersistenceStrategyRequest.Connection := FDefaultConnection;
+    APersistenceStrategyRequest.ConnectionRemote := LSessionData.ConnectionRemote;
+    // user
+    APersistenceStrategyRequest.User := LSessionData.User;
+    APersistenceStrategyRequest.UserOID := LSessionData.UserOID;
+    // auth
+    APersistenceStrategyRequest.AuthToken := LSessionData.AccessToken;
+  finally
+    _Unlock;
+  end;
+end;
+
+class function TioCustomSessionDataStore.GetDefaultConnection: String;
+begin
+  _Lock;
+  try
+    Result := FDefaultConnection;
+  finally
+    _Unlock;
+  end;
+end;
+
+class procedure TioCustomSessionDataStore.ReleaseSessionData;
+begin
+  _Unlock;
+end;
+
+class procedure TioCustomSessionDataStore.SetDefaultConnection(const AConnectionDefName: String);
+begin
+  _Lock;
+  try
+    FDefaultConnection := AConnectionDefName;
+  finally
+    _Unlock;
+  end;
+end;
+
+class function TioCustomSessionDataStore.ThreadAcquireSessionData: IioAuthSessionData;
+var
+  LThreadID: TThreadID;
+begin
+  LThreadID := TioUtilities.GetThreadID;
+  _Lock;
+  if not FThreadSessionData.TryGetValue(LThreadID, Result) then
+  begin
+    Result := AcquireSessionData.Clone;
+    FThreadSessionData.Add(LThreadID, Result);
+  end;
+end;
+
+class procedure TioCustomSessionDataStore.ThreadClearSessionData;
+begin
+  _Lock;
+  try
+    FThreadSessionData.Remove(TioUtilities.GetThreadID);
+  finally
+    _Unlock;
+  end;
+end;
+
+class procedure TioCustomSessionDataStore.ThreadReleaseSessionData;
+begin
+  _Unlock;
+end;
+
+class procedure TioCustomSessionDataStore._Finalize;
+begin
+  FThreadSessionData.Free;
+end;
+
+class function TioCustomSessionDataStore._GetThreadOrMainSessionData: IioAuthSessionData;
+begin
+  if (FThreadSessionData.Count = 0) or not FThreadSessionData.TryGetValue(TioUtilities.GetThreadID, Result) then
+    Result := _GetMainSessionData;
+end;
+
+class procedure TioCustomSessionDataStore._Initialize;
+begin
+  FDefaultConnection := IO_STRING_NULL_VALUE;
+  FThreadSessionData := TioThreadSessionDataContainer.Create;
+end;
+
+class procedure TioCustomSessionDataStore._Lock;
+begin
+  TMonitor.Enter(FConnectionManagerContainer);
+end;
+
+class procedure TioCustomSessionDataStore._Unlock;
+begin
+  TMonitor.Exit(FConnectionManagerContainer);
+end;
+
+{ TioSimpleSessionDataStore }
+
+class function TioSimpleSessionDataStore._GetMainSessionData: IioAuthSessionData;
+begin
+  Result := FMainSessionData;
+end;
+
+class procedure TioSimpleSessionDataStore._Initialize;
+begin
+  inherited;
+  FMainSessionData := TioAuthFactory.NewAuthSessionData;
 end;
 
 end.

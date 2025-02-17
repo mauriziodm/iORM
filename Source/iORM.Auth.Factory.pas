@@ -45,7 +45,6 @@ type
     class function NewAuthResponse: IioAuthResponse; static;
     class function NewAuthResponseFromString(const AValue: String): IioAuthResponse; static;
     class function NewAuthRoleItem(const ARole: IioAuthRole): IioAuthRoleItem; static;
-    class function NewAuthSession: IioAuthSession; static;
     class function NewAuthSessionData: IioAuthSessionData; static;
     class function NewAuthSessionThreadSafeWrapper: IioAuthSessionThreadSafeWrapper; static;
     class function NewAuthUserAppItem(const AApp: IioAuthApp): IioAuthAppItem; static;
@@ -54,7 +53,7 @@ type
 implementation
 
 uses
-  iORM.Auth.Session, iORM.Auth.Model, iORM.Auth.Response;
+  iORM.Auth.SessionData, iORM.Auth.Model, iORM.Auth.Response;
 
 { TioAuthFactory }
 
@@ -71,11 +70,6 @@ end;
 class function TioAuthFactory.NewAuthRoleItem(const ARole: IioAuthRole): IioAuthRoleItem;
 begin
   Result := TioAuthRoleItem.Create(ARole);
-end;
-
-class function TioAuthFactory.NewAuthSession: IioAuthSession;
-begin
-  Result := TioAuthSession.Create;
 end;
 
 class function TioAuthFactory.NewAuthSessionData: IioAuthSessionData;

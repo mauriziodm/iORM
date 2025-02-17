@@ -31,7 +31,7 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.Auth.Session;
+unit iORM.Auth.SessionData;
 
 interface
 
@@ -42,15 +42,15 @@ type
 
   TioAuthSessionThreadSafeWrapper = class(TInterfacedObject, IioAuthSessionThreadSafeWrapper)
   private
-    FSession: IioAuthSession;
+    FSession: IioAuthSessionData;
   public
     constructor Create;
     procedure Clear;
-    function Acquire: IioAuthSession;
+    function Acquire: IioAuthSessionData;
     procedure Release;
   end;
 
-  TioAuthSession = class(TInterfacedObject, IioAuthSession)
+  TioAuthSessionData = class(TInterfacedObject, IioAuthSessionData)
   private
   private
     // app
@@ -60,8 +60,7 @@ type
     FUser: String;
     FUserOID: Integer;
     // connection
-    FConnectionDefault: String;
-    FConnectionLocal: String;
+    FConnection: String;
     FConnectionRemote: String;
     // refresh token
     FRefreshToken: String;
@@ -76,14 +75,13 @@ type
     function GetAccessTokenIsExpired: Boolean;
     function GetApp: String;
     function GetAppOID: Integer;
-    function GetConnectionDefault: String;
-    function GetConnectionLocal: String;
+    function GetConnection: String;
     function GetConnectionRemote: String;
     function GetHasAccessToken: Boolean;
     function GetHasApp: Boolean;
     function GetHasAppOID: Boolean;
-    function GetHasConnectionName: Boolean;
-    function GetHasConnectionNameRemote: Boolean;
+    function GetHasConnection: Boolean;
+    function GetHasConnectionRemote: Boolean;
     function GetHasRefreshToken: Boolean;
     function GetHasUser: Boolean;
     function GetHasUserOID: Boolean;
@@ -98,8 +96,7 @@ type
     procedure SetAppOID(const Value: Integer);
     procedure SetAccessToken(const Value: String);
     procedure SetAccessTokenExp(const Value: TDateTime);
-    procedure SetConnectionDefault(const Value: String);
-    procedure SetConnectionLocal(const Value: String);
+    procedure SetConnection(const Value: String);
     procedure SetConnectionRemote(const Value: String);
     procedure SetRefreshAfter(const Value: TDateTime);
     procedure SetRefreshToken(const Value: String);
@@ -109,17 +106,17 @@ type
   public
     constructor Create;
     procedure Clear;
+    function Clone: IioAuthSessionData;
     // app
     property App: String read GetApp write SetApp;
     property AppOID: Integer read GetAppOID write SetAppOID;
     property HasApp: Boolean read GetHasApp;
     property HasAppOID: Boolean read GetHasAppOID;
     // connection
-    property ConnectionDefault: String read GetConnectionDefault write SetConnectionDefault;
-    property ConnectionLocal: String read GetConnectionLocal write SetConnectionLocal;
+    property Connection: String read GetConnection write SetConnection;
     property ConnectionRemote: String read GetConnectionRemote write SetConnectionRemote;
-    property HasConnectionName: Boolean read GetHasConnectionName;
-    property HasConnectionNameRemote: Boolean read GetHasConnectionNameRemote;
+    property HasConnection: Boolean read GetHasConnection;
+    property HasConnectionRemote: Boolean read GetHasConnectionRemote;
     // user
     property HasUser: Boolean read GetHasUser;
     property HasUserOID: Boolean read GetHasUserOID;
@@ -146,13 +143,13 @@ uses iORM.CommonTypes, iORM.Utilities, iORM.Auth.Factory, DJSON,
 
 { TioAuthSession }
 
-procedure TioAuthSession.Clear;
+procedure TioAuthSessionData.Clear;
 begin
   // app
   FApp := IO_STRING_NULL_VALUE;
   FAppOID := IO_INTEGER_NULL_VALUE;
   // connection (note: do not clear the default connection)
-  FConnectionLocal := IO_STRING_NULL_VALUE;
+  FConnection := IO_STRING_NULL_VALUE;
   FConnectionRemote := IO_STRING_NULL_VALUE;
   // user
   FUser := IO_STRING_NULL_VALUE;
@@ -166,190 +163,201 @@ begin
   FRefreshAfter := IO_DATETIME_NULL_VALUE;
 end;
 
-constructor TioAuthSession.Create;
+function TioAuthSessionData.Clone: IioAuthSessionData;
+begin
+  Result := TioAuthFactory.NewAuthSessionData;
+  // app
+  Result.App := FApp;
+  Result.AppOID := FAppOID;
+  // user
+  Result.User := FUser;
+  Result.UserOID := FUserOID;
+  // connection
+  Result.ConnectionLocal := FConnection;
+  Result.ConnectionRemote := FConnectionRemote;
+  // refresh token
+  Result.RefreshToken := FRefreshToken;
+  Result.RefreshTokenExp := FRefreshTokenExp;
+  // access token
+  Result.AccessToken := FAccessToken;
+  Result.AccessTokenExp := FAccessTokenExp;
+  Result.RefreshAfter := FRefreshAfter;
+end;
+
+constructor TioAuthSessionData.Create;
 begin
   inherited;
   Clear;
 end;
 
-function TioAuthSession.GetAccessToken: String;
+function TioAuthSessionData.GetAccessToken: String;
 begin
   Result := FAccessToken;
 end;
 
-function TioAuthSession.GetAccessTokenExp: TDateTime;
+function TioAuthSessionData.GetAccessTokenExp: TDateTime;
 begin
   Result := FAccessTokenExp;
 end;
 
-function TioAuthSession.GetAccessTokenIsExpired: Boolean;
+function TioAuthSessionData.GetAccessTokenIsExpired: Boolean;
 begin
   Result := ((FAccessTokenExp <> IO_DATETIME_NULL_VALUE) and (TioUtilities.NowUTC > FAccessTokenExp)) or (FAccessToken = IO_STRING_NULL_VALUE);
 end;
 
-function TioAuthSession.GetApp: String;
+function TioAuthSessionData.GetApp: String;
 begin
   Result := FApp;
 end;
 
-function TioAuthSession.GetAppOID: Integer;
+function TioAuthSessionData.GetAppOID: Integer;
 begin
   Result := FAppOID;
 end;
 
-function TioAuthSession.GetConnectionDefault: String;
+function TioAuthSessionData.GetConnection: String;
 begin
-  Result := FConnectionDefault;
+  Result := FConnection;
 end;
 
-function TioAuthSession.GetConnectionLocal: String;
-begin
-  Result := FConnectionLocal;
-end;
-
-function TioAuthSession.GetConnectionRemote: String;
+function TioAuthSessionData.GetConnectionRemote: String;
 begin
   Result := FConnectionRemote;
 end;
 
-function TioAuthSession.GetNeedRefresh: Boolean;
+function TioAuthSessionData.GetNeedRefresh: Boolean;
 begin
   Result := ((FRefreshAfter <> IO_DATETIME_NULL_VALUE) and (TioUtilities.NowUTC > FRefreshAfter)) or (FAccessToken = IO_STRING_NULL_VALUE);
 end;
 
-function TioAuthSession.GetHasAccessToken: Boolean;
+function TioAuthSessionData.GetHasAccessToken: Boolean;
 begin
   Result := FAccessToken <> IO_STRING_NULL_VALUE;
 end;
 
-function TioAuthSession.GetHasApp: Boolean;
+function TioAuthSessionData.GetHasApp: Boolean;
 begin
   Result := FApp <> IO_STRING_NULL_VALUE;
 end;
 
-function TioAuthSession.GetHasAppOID: Boolean;
+function TioAuthSessionData.GetHasAppOID: Boolean;
 begin
   Result := FAppOID <> IO_INTEGER_NULL_VALUE;
 end;
 
-function TioAuthSession.GetHasConnectionName: Boolean;
+function TioAuthSessionData.GetHasConnection: Boolean;
 begin
-  Result := FConnectionLocal <> IO_STRING_NULL_VALUE;
+  Result := FConnection <> IO_STRING_NULL_VALUE;
 end;
 
-function TioAuthSession.GetHasConnectionNameRemote: Boolean;
+function TioAuthSessionData.GetHasConnectionRemote: Boolean;
 begin
   Result := FConnectionRemote <> IO_STRING_NULL_VALUE;
 end;
 
-function TioAuthSession.GetHasRefreshToken: Boolean;
+function TioAuthSessionData.GetHasRefreshToken: Boolean;
 begin
   Result := FRefreshToken <> IO_STRING_NULL_VALUE;
 end;
 
-function TioAuthSession.GetHasUser: Boolean;
+function TioAuthSessionData.GetHasUser: Boolean;
 begin
   Result := FUser <> IO_STRING_NULL_VALUE;
 end;
 
-function TioAuthSession.GetHasUserOID: Boolean;
+function TioAuthSessionData.GetHasUserOID: Boolean;
 begin
   Result := FUserOID <> IO_INTEGER_NULL_VALUE;
 end;
 
-function TioAuthSession.GetRefreshAfter: TDateTime;
+function TioAuthSessionData.GetRefreshAfter: TDateTime;
 begin
   Result := FRefreshAfter;
 end;
 
-function TioAuthSession.GetRefreshToken: String;
+function TioAuthSessionData.GetRefreshToken: String;
 begin
   Result := FRefreshToken;
 end;
 
-function TioAuthSession.GetRefreshTokenExp: TDateTime;
+function TioAuthSessionData.GetRefreshTokenExp: TDateTime;
 begin
   Result := FRefreshTokenExp;
 end;
 
-function TioAuthSession.GetRefreshTokenIsExpired: Boolean;
+function TioAuthSessionData.GetRefreshTokenIsExpired: Boolean;
 begin
   Result := ((FRefreshTokenExp <> IO_DATETIME_NULL_VALUE) and (TioUtilities.NowUTC > FRefreshTokenExp)) or (FRefreshToken = IO_STRING_NULL_VALUE);
 end;
 
-function TioAuthSession.GetUser: String;
+function TioAuthSessionData.GetUser: String;
 begin
   Result := FUser;
 end;
 
-function TioAuthSession.GetUserOID: Integer;
+function TioAuthSessionData.GetUserOID: Integer;
 begin
   Result := FUserOID;
 end;
 
-procedure TioAuthSession.SetAccessToken(const Value: String);
+procedure TioAuthSessionData.SetAccessToken(const Value: String);
 begin
   FAccessToken := Value;
 end;
 
-procedure TioAuthSession.SetAccessTokenExp(const Value: TDateTime);
+procedure TioAuthSessionData.SetAccessTokenExp(const Value: TDateTime);
 begin
   FAccessTokenExp := Value;
 end;
 
-procedure TioAuthSession.SetApp(const Value: String);
+procedure TioAuthSessionData.SetApp(const Value: String);
 begin
   FApp := Value;
 end;
 
-procedure TioAuthSession.SetAppOID(const Value: Integer);
+procedure TioAuthSessionData.SetAppOID(const Value: Integer);
 begin
   FAppOID := Value;
 end;
 
-procedure TioAuthSession.SetConnectionDefault(const Value: String);
+procedure TioAuthSessionData.SetConnection(const Value: String);
 begin
-  Result := FConnectionDefault;
+  FConnection := Value;
 end;
 
-procedure TioAuthSession.SetConnectionLocal(const Value: String);
-begin
-  FConnectionLocal := Value;
-end;
-
-procedure TioAuthSession.SetConnectionRemote(const Value: String);
+procedure TioAuthSessionData.SetConnectionRemote(const Value: String);
 begin
   FConnectionRemote := Value;
 end;
 
-procedure TioAuthSession.SetRefreshAfter(const Value: TDateTime);
+procedure TioAuthSessionData.SetRefreshAfter(const Value: TDateTime);
 begin
   FRefreshAfter := Value;
 end;
 
-procedure TioAuthSession.SetRefreshToken(const Value: String);
+procedure TioAuthSessionData.SetRefreshToken(const Value: String);
 begin
   FRefreshToken := Value;
 end;
 
-procedure TioAuthSession.SetRefreshTokenExp(const Value: TDateTime);
+procedure TioAuthSessionData.SetRefreshTokenExp(const Value: TDateTime);
 begin
   FRefreshTokenExp := Value;
 end;
 
-procedure TioAuthSession.SetUser(const Value: String);
+procedure TioAuthSessionData.SetUser(const Value: String);
 begin
   FUser := Value;
 end;
 
-procedure TioAuthSession.SetUserOID(const Value: Integer);
+procedure TioAuthSessionData.SetUserOID(const Value: Integer);
 begin
   FUserOID := Value;
 end;
 
 { TioAuthSessionThreadSafeWrapper }
 
-function TioAuthSessionThreadSafeWrapper.Acquire: IioAuthSession;
+function TioAuthSessionThreadSafeWrapper.Acquire: IioAuthSessionData;
 begin
   TMonitor.Enter(Self);
   Result := FSession;

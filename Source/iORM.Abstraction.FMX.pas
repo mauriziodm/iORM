@@ -50,7 +50,7 @@ type
     class var FSessionThreadSafeWrapper: IioAuthSessionThreadSafeWrapper;
   protected
     // --------- methods to be ovverrided by descendants ----------
-    class function _AcquireSession: IioAuthSession; override;
+    class function _AcquireSession: IioAuthSessionData; override;
     class procedure _ClearSession; override;
     class procedure _HandleException(const Sender: TObject); override;
     class function _ProjectPlatform: TioProjectPlatform; override;
@@ -190,7 +190,7 @@ begin
   FSessionThreadSafeWrapper := TioAuthFactory.NewAuthSessionThreadSafeWrapper;
 end;
 
-class function TioApplicationFMX._AcquireSession: IioAuthSession;
+class function TioApplicationFMX._AcquireSession: IioAuthSessionData;
 begin
   Result := FSessionThreadSafeWrapper.Acquire;
 end;

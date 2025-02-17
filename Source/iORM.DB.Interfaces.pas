@@ -48,7 +48,7 @@ uses
   FireDAC.Comp.DataSet, iORM.LiveBindings.BSPersistence,
   iORM.Where.SqlItems.Interfaces, iORM.Context.Map.Interfaces,
   iORM.SynchroStrategy.Interfaces, iORM.SynchroStrategy.Custom,
-  iORM.Auth.Interfaces, iORM.PersistenceStrategy.Interfaces;
+  iORM.PersistenceStrategy.Interfaces, iORM.Auth.Interfaces;
 
 const
   OBJVERSION_NULL = 0;
@@ -446,75 +446,6 @@ type
     // Stream
     function GetStream: TStream;
     property Stream: TStream read GetStream;
-  end;
-
-  IioPersistenceStrategyRequest = interface
-    ['{3CFC6D3D-EB9D-46C9-AF99-6F5AD8ECD284}']
-    // methods
-    function AsString: String;
-    function GetApp: String;
-    function GetAppOID: Integer;
-    function GetAuthGrant: String;
-    function GetAuthIntention: TioAuthIntention;
-    function GetAuthScope: String;
-    function GetAuthToken: String;
-    function GetBlindLevel: Byte;
-    function GetConnection: String;
-    function GetConnectionRemote: String;
-    function GetIntent: TioPersistenceIntentType;
-    function GetIntf1: IInterface;
-    function GetIntf2: IInterface;
-    function GetMasterPropName: String;
-    function GetMasterPropPath: String;
-    function GetMethod: TioPersistenceStrategyMethod;
-    function GetObj1: TObject;
-    function GetObj2: TObject;
-    function GetPropName: String;
-    function GetRelationOID: Integer;
-    function GetRelationPropName: String;
-    function GetUsr: String;
-    function GetUsrOID: Integer;
-    procedure SetAuthGrant(const Value: String);
-    procedure SetAuthIntention(const Value: TioAuthIntention);
-    procedure SetAuthScope(const Value: String);
-    procedure SetBlindLevel(const Value: Byte);
-    procedure SetIntent(const Value: TioPersistenceIntentType);
-    procedure SetIntf1(const Value: IInterface);
-    procedure SetIntf2(const Value: IInterface);
-    procedure SetMasterPropName(const Value: String);
-    procedure SetMasterPropPath(const Value: String);
-    procedure SetObj1(const Value: TObject);
-    procedure SetObj2(const Value: TObject);
-    procedure SetPropName(const Value: String);
-    procedure SetRelationOID(const Value: Integer);
-    procedure SetRelationPropName(const Value: String);
-    // method
-    property Method: TioPersistenceStrategyMethod read GetMethod;
-    // session data
-    property App: String read GetApp;
-    property AppOID: Integer read GetAppOID;
-    property Connection: String read GetConnection;
-    property ConnectionRemote: String read GetConnectionRemote;
-    property Usr: String read GetUsr;
-    property UsrOID: Integer read GetUsrOID;
-    // auth
-    property AuthGrant: String read GetAuthGrant;
-    property AuthIntention: TioAuthIntention read GetAuthIntention;
-    property AuthScope: String read GetAuthScope;
-    property AuthToken: String read GetAuthToken; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
-    // instances
-    property Intf1: IInterface read GetIntf1 write SetIntf1;
-    property Intf2: IInterface read GetIntf2 write SetIntf2;
-    property Obj1: TObject read GetObj1 write SetObj1;
-    property Obj2: TObject read GetObj2 write SetObj2;
-    // others
-    property BlindLevel: Byte read GetBlindLevel write SetBlindLevel;
-    property Intent: TioPersistenceIntentType read GetIntent write SetIntent;
-    property MasterPropName: String read GetMasterPropName write SetMasterPropName;
-    property MasterPropPath: String read GetMasterPropPath write SetMasterPropPath;
-    property PropName: String read GetPropName write SetPropName;
-    property RelationOID: Integer read GetRelationOID write SetRelationOID;
-    property RelationPropName: String read GetRelationPropName write SetRelationPropName;
   end;
 
   // Base class for strategy (Static class as an interface)

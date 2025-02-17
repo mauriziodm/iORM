@@ -84,18 +84,18 @@ type
     FonUserLoginException: TioOnUserLoginExceptionEvent;
     // methods
     function Get_Version: String;
-    function _AccessTokenIsExpired(const ASession: IioAuthSession): Boolean;
-    procedure _AuthorizeUser(const AUserCredentials: IioAuthUserCredentials; const ASession: IioAuthSession);
+    function _AccessTokenIsExpired(const ASession: IioAuthSessionData): Boolean;
+    procedure _AuthorizeUser(const AUserCredentials: IioAuthUserCredentials; const ASession: IioAuthSessionData);
     procedure _AuthorizeApp_RequestUserAuthGrant(const AAppCredentials: IioAuthAppCredentials);
     function _AuthorizeAccess(const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
     procedure _CheckActive; inline;
-    procedure _FillSessionData(const ASession: IioAuthSession; const AAuthResponse: IioAuthResponse);
-    function _IsLoggedOn(const ASession: IioAuthSession): Boolean;
-    procedure _RaiseAlreadyLoggedOnException(const ASession: IioAuthSession);
-    function _NeedRefresh(const ASession: IioAuthSession): Boolean;
+    procedure _FillSessionData(const ASession: IioAuthSessionData; const AAuthResponse: IioAuthResponse);
+    function _IsLoggedOn(const ASession: IioAuthSessionData): Boolean;
+    procedure _RaiseAlreadyLoggedOnException(const ASession: IioAuthSessionData);
+    function _NeedRefresh(const ASession: IioAuthSessionData): Boolean;
     procedure _NewAccessToken(const ACredentials: IioAuthCredentials; const AAuthGrant: String = IO_STRING_NULL_VALUE);
     procedure _RefreshAccessToken(const ARefreshToken: String); // Da completare
-    function _RefreshTokenIsExpired(const ASession: IioAuthSession): Boolean;
+    function _RefreshTokenIsExpired(const ASession: IioAuthSessionData): Boolean;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -154,7 +154,7 @@ uses
 
 { TioAuthorizationClient }
 
-function TioAuthClient._NeedRefresh(const ASession: IioAuthSession): Boolean;
+function TioAuthClient._NeedRefresh(const ASession: IioAuthSessionData): Boolean;
 var
   LDone: Boolean;
 begin
@@ -171,7 +171,7 @@ begin
     FAfterNeedRefresh(Self, ASession, Result);
 end;
 
-function TioAuthClient._RefreshTokenIsExpired(const ASession: IioAuthSession): Boolean;
+function TioAuthClient._RefreshTokenIsExpired(const ASession: IioAuthSessionData): Boolean;
 var
   LDone: Boolean;
 begin
@@ -251,7 +251,7 @@ begin
     raise EioAuthException.Create(Format('"OnAuthorizeAppGetUserAuthCode" handler isn''t assigned on TioAuthClient component named "%s"', [Name]));
 end;
 
-procedure TioAuthClient._AuthorizeUser(const AUserCredentials: IioAuthUserCredentials; const ASession: IioAuthSession);
+procedure TioAuthClient._AuthorizeUser(const AUserCredentials: IioAuthUserCredentials; const ASession: IioAuthSessionData);
 var
   LAuthResponse: IioAuthResponse;
   LDone: Boolean;
@@ -287,7 +287,7 @@ begin
     raise EioAuthComponentNotEnabled_404.Create(Format('Component "%s" is not active', [Name]));
 end;
 
-procedure TioAuthClient._FillSessionData(const ASession: IioAuthSession; const AAuthResponse: IioAuthResponse);
+procedure TioAuthClient._FillSessionData(const ASession: IioAuthSessionData; const AAuthResponse: IioAuthResponse);
 begin
   // update the session subjects data
   if not AAuthResponse.Subjects.IsEmpty then
@@ -310,7 +310,7 @@ end;
 function TioAuthClient.AppLogin(const AAppCredentials: IioAuthAppCredentials): Boolean;
 var
   LException: Exception;
-  LSession: IioAuthSession;
+  LSession: IioAuthSessionData;
 begin
   Result := False;
   // first check if the component is enabled
@@ -353,7 +353,7 @@ var
   LAccessToken: String;
   LAuthResponse: IioAuthResponse;
   LException: Exception;
-  LSession: IioAuthSession;
+  LSession: IioAuthSessionData;
 begin
   Result := False;
   // first check if the component is enabled
@@ -431,7 +431,7 @@ begin
   inherited;
 end;
 
-function TioAuthClient._AccessTokenIsExpired(const ASession: IioAuthSession): Boolean;
+function TioAuthClient._AccessTokenIsExpired(const ASession: IioAuthSessionData): Boolean;
 var
   LDone: Boolean;
 begin
@@ -453,7 +453,7 @@ begin
   Result := TioAuthClient.FInstance;
 end;
 
-function TioAuthClient._IsLoggedOn(const ASession: IioAuthSession): Boolean;
+function TioAuthClient._IsLoggedOn(const ASession: IioAuthSessionData): Boolean;
 var
   LDone: Boolean;
 begin
@@ -478,7 +478,7 @@ end;
 function TioAuthClient.IsLoggedOn: Boolean;
 var
   LException: Exception;
-  LSession: IioAuthSession;
+  LSession: IioAuthSessionData;
 begin
   Result := False;
   // first check if the component is enabled
@@ -512,7 +512,7 @@ end;
 function TioAuthClient.Logout: Boolean;
 var
   LException: Exception;
-  LSession: IioAuthSession;
+  LSession: IioAuthSessionData;
 begin
   Result := False;
   // first check if the component is enabled
@@ -549,7 +549,7 @@ procedure TioAuthClient._NewAccessToken(const ACredentials: IioAuthCredentials; 
 var
   LAuthResponse: IioAuthResponse;
   LDone: Boolean;
-  LSession: IioAuthSession;
+  LSession: IioAuthSessionData;
 begin
   LDone := False;
   // invoke BeforeNewAccessToken if assigned
@@ -581,7 +581,7 @@ begin
     raise EioAuthInvalidCredentialsException_401.Create('User or App credentials or authorization grant code are not valid');
 end;
 
-procedure TioAuthClient._RaiseAlreadyLoggedOnException(const ASession: IioAuthSession);
+procedure TioAuthClient._RaiseAlreadyLoggedOnException(const ASession: IioAuthSessionData);
 begin
   if ASession.Subjects.HasApp then
     raise EioAuthAlreadyLoggedOnException_401.Create(Format('Already logged on as app "%s", user "%s"', [ASession.Subjects.App, ASession.Subjects.User]))
@@ -596,7 +596,7 @@ procedure TioAuthClient._RefreshAccessToken(const ARefreshToken: String);
 var
   LAuthResponse: IioAuthResponse;
   LDone: Boolean;
-  LSession: IioAuthSession;
+  LSession: IioAuthSessionData;
 begin
   LDone := False;
   // invoke BeforeRefreshAccessToken if assigned
@@ -631,7 +631,7 @@ end;
 function TioAuthClient.UserLogin(const AUserCredentials: IioAuthUserCredentials): Boolean;
 var
   LException: Exception;
-  LSession: IioAuthSession;
+  LSession: IioAuthSessionData;
 begin
   Result := False;
   // first check if the component is enabled

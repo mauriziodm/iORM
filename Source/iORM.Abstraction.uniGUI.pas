@@ -168,17 +168,27 @@ class function TioApplicationUniGUI._AcquireSession: IioAuthSession;
 var
   LSessionThreadSafeWrapper: IioAuthSessionThreadSafeWrapper;
 begin
-  if not FSessionCollection.TryGetValue(uniSessionID, LSessionThreadSafeWrapper) then
-  begin
-    LSessionThreadSafeWrapper := TioAuthFactory.NewAuthSessionThreadSafeWrapper;
-    FSessionCollection.Add(uniSessionID, LSessionThreadSafeWrapper);
+  _Lock;
+  try
+    if not FSessionCollection.TryGetValue(uniSessionID, LSessionThreadSafeWrapper) then
+    begin
+      LSessionThreadSafeWrapper := TioAuthFactory.NewAuthSessionThreadSafeWrapper;
+      FSessionCollection.Add(uniSessionID, LSessionThreadSafeWrapper);
+    end;
+    Result := LSessionThreadSafeWrapper.Acquire;
+  finally
+    _Unlock;
   end;
-  Result := LSessionThreadSafeWrapper.Acquire;
 end;
 
 class procedure TioApplicationUniGUI._ClearSession;
 begin
-  FSessionCollection.Remove(uniSessionID);
+  _Lock;
+  try
+    FSessionCollection.Remove(uniSessionID);
+  finally
+    _Unlock;
+  end;
 end;
 
 class procedure TioApplicationUniGUI._HandleException(const Sender: TObject);
@@ -200,8 +210,13 @@ class procedure TioApplicationUniGUI._ReleaseSession;
 var
   LSessionThreadSafeWrapper: IioAuthSessionThreadSafeWrapper;
 begin
-  if FSessionCollection.TryGetValue(uniSessionID, LSessionThreadSafeWrapper) then
-    LSessionThreadSafeWrapper.Release;
+  _Lock;
+  try
+    if FSessionCollection.TryGetValue(uniSessionID, LSessionThreadSafeWrapper) then
+      LSessionThreadSafeWrapper.Release;
+  finally
+    _Unlock;
+  end;
 end;
 
 class procedure TioApplicationUniGUI._ShowMessage(const AMessage: string);

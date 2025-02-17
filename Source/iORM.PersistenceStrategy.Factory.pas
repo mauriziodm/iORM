@@ -36,8 +36,10 @@ unit iORM.PersistenceStrategy.Factory;
 interface
 
 uses
-  iORM.DB.Interfaces, iORM.PersistenceStrategy.Interfaces, iORM.CommonTypes,
-  iORM;
+  iORM.PersistenceStrategy.Interfaces, iORM.DB.Interfaces,
+  iORM.Where.Interfaces, iORM.CommonTypes, FireDAC.Comp.DataSet,
+  iORM.Context.Interfaces, iORM.LiveBindings.BSPersistence,
+  iORM.SynchroStrategy.Custom;
 
 type
 

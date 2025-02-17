@@ -7,7 +7,7 @@ uses
 
 type
 
-  TioPersistenceStrategyRequest = class
+  TioPersistenceStrategyRequest = class(TInterfacedObject, IioPersistenceStrategyRequest)
   private
     // session data
     FApp: String;

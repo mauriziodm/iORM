@@ -51,22 +51,22 @@ type
   TioAuthCredentialsMode = (cmLogin, cmSetPassword, cmChangePassword);
   TioAuthCredentialsClearMode = (cmAll, cmSecretsOnly);
 
-  IioAuthSession = interface
+  IioAuthSessionData = interface
     ['{DE6E7EDA-BEE0-4F8A-A12F-2A99E63D8EC5}']
     procedure Clear;
+    function Clone: IioAuthSessionData;
     function GetAccessToken: String;
     function GetAccessTokenExp: TDateTime;
     function GetAccessTokenIsExpired: Boolean;
     function GetApp: String;
     function GetAppOID: Integer;
-    function GetConnectionDefault: String;
-    function GetConnectionLocal: String;
+    function GetConnection: String;
     function GetConnectionRemote: String;
     function GetHasAccessToken: Boolean;
     function GetHasApp: Boolean;
     function GetHasAppOID: Boolean;
-    function GetHasConnectionName: Boolean;
-    function GetHasConnectionNameRemote: Boolean;
+    function GetHasConnection: Boolean;
+    function GetHasConnectionRemote: Boolean;
     function GetHasRefreshToken: Boolean;
     function GetHasUser: Boolean;
     function GetHasUserOID: Boolean;
@@ -81,8 +81,7 @@ type
     procedure SetAppOID(const Value: Integer);
     procedure SetAccessToken(const Value: String);
     procedure SetAccessTokenExp(const Value: TDateTime);
-    procedure SetConnectionDefault(const Value: String);
-    procedure SetConnectionLocal(const Value: String);
+    procedure SetConnection(const Value: String);
     procedure SetConnectionRemote(const Value: String);
     procedure SetRefreshAfter(const Value: TDateTime);
     procedure SetRefreshToken(const Value: String);
@@ -96,11 +95,10 @@ type
     property HasApp: Boolean read GetHasApp;
     property HasAppOID: Boolean read GetHasAppOID;
     // connection
-    property ConnectionDefault: String read GetConnectionDefault write SetConnectionDefault;
-    property ConnectionLocal: String read GetConnectionLocal write SetConnectionLocal;
+    property Connection: String read GetConnection write SetConnection;
     property ConnectionRemote: String read GetConnectionRemote write SetConnectionRemote;
-    property HasConnectionName: Boolean read GetHasConnectionName;
-    property HasConnectionNameRemote: Boolean read GetHasConnectionNameRemote;
+    property HasConnection: Boolean read GetHasConnection;
+    property HasConnectionRemote: Boolean read GetHasConnectionRemote;
     // user
     property HasUser: Boolean read GetHasUser;
     property HasUserOID: Boolean read GetHasUserOID;
@@ -160,7 +158,7 @@ type
   IioAuthSessionThreadSafeWrapper = interface
     ['{3E052A85-C5D8-4CC9-BA3F-CBE173FE68CD}']
     procedure Clear;
-    function Acquire: IioAuthSession;
+    function Acquire: IioAuthSessionData;
     procedure Release;
   end;
 
@@ -347,14 +345,14 @@ type
   TioGetUserAuthGrantEventResponseMethod = reference to procedure(const AIsAuthorized: Boolean; const AUserAuthGrant: String = IO_AUTH_NULL_JWT);
   TioOnAuthorizeAppGetUserAuthGrantEvent = procedure(const Sender: TObject; const AAppCredentials: IioAuthAppCredentials; const AUserAuthGrantResponseMethod: TioGetUserAuthGrantEventResponseMethod) of object;
 
-  TioBeforeNeedRefreshEvent = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultNeedRefresh, Done: Boolean) of object;
-  TioAfterNeedRefreshEvent = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultNeedRefresh: Boolean) of object;
+  TioBeforeNeedRefreshEvent = procedure(const Sender: TObject; const ASession: IioAuthSessionData; var ResultNeedRefresh, Done: Boolean) of object;
+  TioAfterNeedRefreshEvent = procedure(const Sender: TObject; const ASession: IioAuthSessionData; var ResultNeedRefresh: Boolean) of object;
 
-  TioBeforeTokenIsExpiredEvent = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultIsExpired, Done: Boolean) of object;
-  TioAfterTokenIsExpiredEvent = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultIsExpired: Boolean) of object;
+  TioBeforeTokenIsExpiredEvent = procedure(const Sender: TObject; const ASession: IioAuthSessionData; var ResultIsExpired, Done: Boolean) of object;
+  TioAfterTokenIsExpiredEvent = procedure(const Sender: TObject; const ASession: IioAuthSessionData; var ResultIsExpired: Boolean) of object;
 
-  TioBeforeIsLoggedOnEvent = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultIsLoggedOn, Done: Boolean) of object;
-  TioAfterIsLoggedOnEvent = procedure(const Sender: TObject; const ASession: IioAuthSession; var ResultLoggedOn: Boolean) of object;
+  TioBeforeIsLoggedOnEvent = procedure(const Sender: TObject; const ASession: IioAuthSessionData; var ResultIsLoggedOn, Done: Boolean) of object;
+  TioAfterIsLoggedOnEvent = procedure(const Sender: TObject; const ASession: IioAuthSessionData; var ResultLoggedOn: Boolean) of object;
 
   TioBeforeNewAccessTokenEvent = procedure(const Sender: TObject; const ACredentials: IioAuthCredentials; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
   TioAfterNewAccessTokenEvent = procedure(const Sender: TObject; const ACredentials: IioAuthCredentials; const AAuthResponse: IioAuthResponse) of object;
@@ -363,9 +361,9 @@ type
   TioAfterRefreshAccessTokenEvent = procedure(const Sender: TObject; const ARefreshToken: String; const AAuthResponse: IioAuthResponse) of object;
 
   TioOnAppLoginExceptionEvent = procedure(const Sender: TObject; const AAppCredentials: IioAuthAppCredentials; const AException: Exception) of object;
-  TioOnUserLoginExceptionEvent = procedure(const Sender: TObject; const AUserCredentials: IioAuthUserCredentials; const ASession: IioAuthSession; const AException: Exception) of object;
-  TioOnAuthorizeAccessExceptionEvent = procedure(const Sender: TObject; const AScope: String; const AAuthIntention: TioAuthIntention; const ASession: IioAuthSession; const AException: Exception) of object;
-  TioOnAuthExceptionEvent = procedure(const Sender: TObject; const ASession: IioAuthSession; const AException: Exception) of object;
+  TioOnUserLoginExceptionEvent = procedure(const Sender: TObject; const AUserCredentials: IioAuthUserCredentials; const ASession: IioAuthSessionData; const AException: Exception) of object;
+  TioOnAuthorizeAccessExceptionEvent = procedure(const Sender: TObject; const AScope: String; const AAuthIntention: TioAuthIntention; const ASession: IioAuthSessionData; const AException: Exception) of object;
+  TioOnAuthExceptionEvent = procedure(const Sender: TObject; const ASession: IioAuthSessionData; const AException: Exception) of object;
 
 implementation
 
