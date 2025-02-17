@@ -544,8 +544,8 @@ begin
   Result.Params.Pooled := APooled;
   // If the AsDefault param is True or this is the first ConnectionDef of the application
   // then set it as default
-  if AAsDefault or (FGlobalSession.ConnectionName = '') then
-    FGlobalSession.ConnectionName := AConnectionName;
+  if AAsDefault then
+    TioApplication.SessionDataStore.SetDefaultConnectionIfEmpty(AConnectionName);
 end;
 
 class function TioConnectionManager.NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault: Boolean = True; const ASynchroStrategy_Client: IioSynchroStrategy_Client = nil;

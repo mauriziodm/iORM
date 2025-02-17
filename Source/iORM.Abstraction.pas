@@ -92,6 +92,7 @@ type
     // fill persistence strategy request
     class procedure FillPersistenceStrategyRequest(const APersistenceStrategyRequest: IioPersistenceStrategyRequest);
     // default connection
+    class procedure SetDefaultConnectionIfEmpty(const AConnectionName: String); // Per fare lock/unlock una sola volta invece di due
     class property DefaultConnection: String read GetDefaultConnection write SetDefaultConnection;
   end;
 
@@ -612,6 +613,17 @@ end;
 class procedure TioCustomSessionDataStore.ThreadReleaseSessionData;
 begin
   _Unlock;
+end;
+
+class function TioCustomSessionDataStore.SetDefaultConnectionIfEmpty(const AConnectionName: String): Boolean;
+begin
+  _Lock;
+  try
+    if FDefaultConnection = IO_STRING_NULL_VALUE then
+      FDefaultConnection := AConnectionName;
+  finally
+    _UnLock;
+  end;
 end;
 
 class procedure TioCustomSessionDataStore._Finalize;
