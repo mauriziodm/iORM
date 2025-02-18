@@ -36,7 +36,8 @@ unit iORM.PersistenceStrategy.Interfaces;
 interface
 
 uses
-  iORM.Auth.Interfaces, iORM.CommonTypes;
+  iORM.Auth.Interfaces, iORM.CommonTypes, iORM.LiveBindings.BSPersistence,
+  iORM.Where.Interfaces;
 
 const
 
@@ -46,10 +47,11 @@ const
   PSR_AUTH_SCOPE = 'AuthScope';
   PSR_AUTH_TOKEN = 'AuthToken';
   PSR_BLINDLEVEL = 'BlindLevel';
+  PSR_INSTANCES_DATAOBJ = 'DataObj';
   PSR_INSTANCES_INTF1 = 'Intf1';
-  PSR_INSTANCES_INTF2 = 'Intf2';
+  PSR_INSTANCES_MASTERBSPERSISTENCE = 'MasterBSP';
   PSR_INSTANCES_OBJ1 = 'Obj1';
-  PSR_INSTANCES_OBJ2 = 'Obj2';
+  PSR_INSTANCES_WHERE = 'Where';
   PSR_INTENTTYPE = 'Intent';
   PSR_MASTERPROPERTYNAME = 'MasterProp';
   PSR_MASTERPROPERTYPATH = 'MasterPropPath';
@@ -106,33 +108,35 @@ type
     function GetBlindLevel: Byte;
     function GetConnection: String;
     function GetConnectionRemote: String;
+    function GetDataObj: TObject;
     function GetIntent: TioPersistenceIntentType;
     function GetIntf1: IInterface;
-    function GetIntf2: IInterface;
+    function GetMasterBSPersistence: TioBSPersistence;
     function GetMasterPropName: String;
     function GetMasterPropPath: String;
     function GetMethod: TioPersistenceStrategyMethod;
     function GetObj1: TObject;
-    function GetObj2: TObject;
     function GetPropName: String;
     function GetRelationOID: Integer;
     function GetRelationPropName: String;
     function GetUsr: String;
     function GetUsrOID: Integer;
+    function GetWhere: IioWhere;
     procedure SetAuthGrant(const Value: String);
     procedure SetAuthIntention(const Value: TioAuthIntention);
     procedure SetAuthScope(const Value: String);
     procedure SetBlindLevel(const Value: Byte);
+    procedure SetDataObj(const Value: TObject);
     procedure SetIntent(const Value: TioPersistenceIntentType);
     procedure SetIntf1(const Value: IInterface);
-    procedure SetIntf2(const Value: IInterface);
+    procedure SetMasterBSPersistence(const Value: TioBSPersistence);
     procedure SetMasterPropName(const Value: String);
     procedure SetMasterPropPath(const Value: String);
     procedure SetObj1(const Value: TObject);
-    procedure SetObj2(const Value: TObject);
     procedure SetPropName(const Value: String);
     procedure SetRelationOID(const Value: Integer);
     procedure SetRelationPropName(const Value: String);
+    procedure SetWhere(const Value: IioWhere);
     // method
     property Method: TioPersistenceStrategyMethod read GetMethod;
     // session data
@@ -148,10 +152,11 @@ type
     property AuthScope: String read GetAuthScope;
     property AuthToken: String read GetAuthToken; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
     // instances
+    property DataObj: TObject read GetDataObj write SetDataObj;
     property Intf1: IInterface read GetIntf1 write SetIntf1;
-    property Intf2: IInterface read GetIntf2 write SetIntf2;
+    property SetMasterBSPersistence: TioBSPersistence read GetMasterBSPersistence write SetMasterBSPersistence;
     property Obj1: TObject read GetObj1 write SetObj1;
-    property Obj2: TObject read GetObj2 write SetObj2;
+    property Where: IioWhere read GetWhere write SetWhere;
     // others
     property BlindLevel: Byte read GetBlindLevel write SetBlindLevel;
     property Intent: TioPersistenceIntentType read GetIntent write SetIntent;

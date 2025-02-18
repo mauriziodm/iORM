@@ -119,13 +119,13 @@ end;
 class function TioPersistenceStrategyFactory.NewPSRequest_Count(const AWhere: IioWhere): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(True);
-  Result.Intf1 := AWhere;
+  Result.Where := AWhere;
 end;
 
 class function TioPersistenceStrategyFactory.NewPSRequest_Delete(const AWhere: IioWhere): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(True);
-  Result.Intf1 := AWhere;
+  Result.Where := AWhere;
 end;
 
 class function TioPersistenceStrategyFactory.NewPSRequest_DeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType;
@@ -134,7 +134,7 @@ begin
   Result := _NewPSRequest(True);
   Result.BlindLevel := ABlindLevel;
   Result.Intent := AIntent;
-  Result.Obj1 := AList;
+  Result.DataObj := AList;
 end;
 
 class function TioPersistenceStrategyFactory.NewPSRequest_DeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType;
@@ -143,7 +143,7 @@ begin
   Result := _NewPSRequest(True);
   Result.BlindLevel := ABlindLevel;
   Result.Intent := AIntent;
-  Result.Obj1 := AList;
+  Result.DataObj := AObj;
 end;
 
 class function TioPersistenceStrategyFactory.NewPSRequest_DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload): IioPersistenceStrategyRequest;
@@ -155,7 +155,7 @@ end;
 class function TioPersistenceStrategyFactory.NewPSRequest_LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(True);
-  Result.Intf1 := AWhere;
+  Result.Where := AWhere;
   Result.Obj1 := ADestDataSet;
 end;
 
@@ -164,8 +164,8 @@ class function TioPersistenceStrategyFactory.NewPSRequest_LoadList(const AWhere:
 begin
   Result := _NewPSRequest(True);
   Result.Intent := AIntent;
-  Result.Intf1 := AWhere;
-  Result.Obj1 := AList;
+  Result.Where := AWhere;
+  Result.DataObj := AList;
 end;
 
 class function TioPersistenceStrategyFactory.NewPSRequest_LoadObject(const AWhere: IioWhere; const AObj: TObject;
@@ -173,8 +173,8 @@ class function TioPersistenceStrategyFactory.NewPSRequest_LoadObject(const AWher
 begin
   Result := _NewPSRequest(True);
   Result.Intent := AIntent;
-  Result.Intf1 := AWhere;
-  Result.Obj1 := AObj;
+  Result.Where := AWhere;
+  Result.DataObj := AObj;
 end;
 
 class function TioPersistenceStrategyFactory.NewPSRequest_LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject;
@@ -182,8 +182,8 @@ class function TioPersistenceStrategyFactory.NewPSRequest_LoadObjectByClassOnly(
 begin
   Result := _NewPSRequest(True);
   Result.Intent := AIntent;
-  Result.Intf1 := AWhere;
-  Result.Obj1 := AObj;
+  Result.Where := AWhere;
+  Result.DataObj := AObj;
 end;
 
 class function TioPersistenceStrategyFactory.NewPSRequest_LoadObjVersion(const AContext: IioContext): IioPersistenceStrategyRequest;
@@ -195,14 +195,14 @@ end;
 class function TioPersistenceStrategyFactory.NewPSRequest_Max(const AWhere: IioWhere; const APropertyName: String): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(True);
-  Result.Intf1 := AWhere;
+  Result.Where := AWhere;
   Result.PropName := APropertyName;
 end;
 
 class function TioPersistenceStrategyFactory.NewPSRequest_Min(const AWhere: IioWhere; const APropertyName: String): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(True);
-  Result.Intf1 := AWhere;
+  Result.Where := AWhere;
   Result.PropName := APropertyName;
 end;
 
@@ -213,8 +213,8 @@ begin
   Result := _NewPSRequest(True);
   Result.BlindLevel := ABlindLevel;
   Result.Intent := AIntent;
-  Result.Obj1 := AList;
-  Result.Obj2 := AMasterBSPersistence;
+  Result.DataObj := AList;
+  Result.MasterBSPersistence := AMasterBSPersistence;
   Result.RelationPropertyName := ARelationPropertyName;
   Result.RelationOID := ARelationOID;
   Result.MasterPropName := AMasterPropertyName;
@@ -228,8 +228,8 @@ begin
   Result := _NewPSRequest(True);
   Result.BlindLevel := ABlindLevel;
   Result.Intent := AIntent;
-  Result.Obj1 := AObj;
-  Result.Obj2 := AMasterBSPersistence;
+  Result.DataObj := AObj;
+  Result.MasterBSPersistence := AMasterBSPersistence;
   Result.RelationPropertyName := ARelationPropertyName;
   Result.RelationOID := ARelationOID;
   Result.MasterPropName := AMasterPropertyName;
