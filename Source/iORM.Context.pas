@@ -42,28 +42,23 @@ uses
   iORM.Where, iORM.Context.Table.Interfaces, System.Rtti,
   iORM.Context.Map.Interfaces, iORM.Where.Interfaces,
   iORM.LiveBindings.BSPersistence, iORM.ConflictStrategy.Interfaces,
-  iORM.SynchroStrategy.Interfaces, iORM.Attributes, iORM.Auth.Interfaces;
+  iORM.SynchroStrategy.Interfaces, iORM.Attributes, iORM.Auth.Interfaces,
+  iORM.PersistenceStrategy.Interfaces;
 
 type
 
   TioContext = class(TInterfacedObject, IioContext)
   private
-    FDataObject: TObject;
-    FHasManyChildVirtualPropertyValue: Integer;
-    FMap: IioMap;
-    FWhere: IioWhere;
-    FMasterPropertyPath: String;
-    FMasterBSPersistence: TioBSPersistence;
-    FObjNextVersion: TioObjVersion;
-    FOriginalNonTrueClassMap: IioMap;
-    FEntityFromVersion: Integer;
     FActionType: TioPersistenceActionType;
-    FIntentType: TioPersistenceIntentType;
-    FBlindLevel: Byte;
     FConflictDetected: Boolean;
     FConflictState: TioPersistenceConflictState;
+    FEntityFromVersion: Integer;
+    FHasManyChildVirtualPropertyValue: Integer;
+    FMap: IioMap;
+    FObjNextVersion: TioObjVersion;
+    FOriginalNonTrueClassMap: IioMap;
+    FPSRequest: IioPersistenceStrategyRequest;
     FSynchroStrategy_Client_NoDirectCall: IioSynchroStrategy_Client;
-    FSessionData: IioAuthSessionData;
     // DataObject
     function GetDataObject: TObject;
     procedure SetDataObject(const AValue: TObject);
@@ -127,12 +122,10 @@ type
     // ConflictState
     function GetConflictState: TioPersistenceConflictState;
     procedure SetConflictState(const Value: TioPersistenceConflictState);
-    // SessionData
-    function GetSessionData: IioAuthSessionData;
-    procedure SetSessionData(const Value: IioAuthSessionData);
   public
-    constructor Create(const AIntent: TioPersistenceIntentType; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
-      const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); overload;
+//    constructor Create(const AIntent: TioPersistenceIntentType; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
+//      const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); overload;
+    constructor Create(const APSRequest: IioPersistenceStrategyRequest; const AMap: IioMap); overload;
     function GetClassRef: TioClassRef;
     function GetProperties: IioProperties;
     function GetTable: IioTable;
@@ -194,7 +187,6 @@ type
     property BlindLevel: Byte read GetBlindLevel write SetBlindLevel;
     property ConflictDetected: Boolean read GetConflictDetected write SetConflictDetected;
     property ConflictState: TioPersistenceConflictState read GetConflictState write SetConflictState;
-    property SessionData: IioAuthSessionData read GetSessionData write SetSessionData;
     /// Contiene il nome della classe originaria cioè, nel caso il contesto sia stato creato con
     ///  la TrueClassVirtual (select query) a partire da una resolved class name, contiene il nome
     ///  della classe originaria, quella dalla quale poi si è estratta la TrueClassVirtualMap stessa.
@@ -218,53 +210,53 @@ end;
 
 function TioContext.BlindLevel_Do_AutoUpdateProps: boolean;
 begin
-  Result := TioUtilities.BlindLevel_Do_AutoUpdateProps(FBlindLevel);
+  Result := TioUtilities.BlindLevel_Do_AutoUpdateProps(FPSRequest.BlindLevel);
 end;
 
 function TioContext.BlindLevel_Do_DetectConflicts: boolean;
 begin
-  Result := TioUtilities.BlindLevel_Do_DetectConflicts(FBlindLevel);
+  Result := TioUtilities.BlindLevel_Do_DetectConflicts(FPSRequest.BlindLevel);
 end;
 
 function TioContext.BlindLevel_Do_DetectObjExists: boolean;
 begin
-  Result := TioUtilities.BlindLevel_Do_DetectObjExists(FBlindLevel);
+  Result := TioUtilities.BlindLevel_Do_DetectObjExists(FPSRequest.BlindLevel);
 end;
 
 procedure TioContext.BlindLevel_Reset_AutoUpdateProps;
 begin
   if BlindLevel_Do_AutoUpdateProps then
-    Dec(FBlindLevel, BL_BIT_AUTO_UPDATE_PROPS);
+    Dec(FPSRequest.BlindLevel, BL_BIT_AUTO_UPDATE_PROPS);
 end;
 
 procedure TioContext.BlindLevel_Reset_DetectConflicts;
 begin
   if BlindLevel_Do_DetectConflicts then
-    Dec(FBlindLevel, BL_BIT_DETECT_CONFLICTS);
+    Dec(FPSRequest.BlindLevel, BL_BIT_DETECT_CONFLICTS);
 end;
 
 procedure TioContext.BlindLevel_Reset_DetectObjExists;
 begin
   if BlindLevel_Do_DetectObjExists then
-    Dec(FBlindLevel, BL_BIT_DETECT_OBJ_EXISTS);
+    Dec(FPSRequest.BlindLevel, BL_BIT_DETECT_OBJ_EXISTS);
 end;
 
 procedure TioContext.BlindLevel_Set_AutoUpdateProps;
 begin
   if not BlindLevel_Do_AutoUpdateProps then
-    Inc(FBlindLevel, BL_BIT_AUTO_UPDATE_PROPS);
+    Inc(FPSRequest.BlindLevel, BL_BIT_AUTO_UPDATE_PROPS);
 end;
 
 procedure TioContext.BlindLevel_Set_DetectConflicts;
 begin
   if not BlindLevel_Do_DetectConflicts then
-    Inc(FBlindLevel, BL_BIT_DETECT_CONFLICTS);
+    Inc(FPSRequest.BlindLevel, BL_BIT_DETECT_CONFLICTS);
 end;
 
 procedure TioContext.BlindLevel_Set_DetectObjExists;
 begin
   if not BlindLevel_Do_DetectObjExists then
-    Inc(FBlindLevel, BL_BIT_DETECT_OBJ_EXISTS);
+    Inc(FPSRequest.BlindLevel, BL_BIT_DETECT_OBJ_EXISTS);
 end;
 
 procedure TioContext.CheckDeleteConflict;
@@ -297,26 +289,38 @@ begin
   TioCustomConflictStrategyRef(GetTable.GetUpdateConflictStrategy).ResolveUpdateConflict(Self);
 end;
 
-constructor TioContext.Create(const AIntent: TioPersistenceIntentType; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
-      const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData);
+//constructor TioContext.Create(const AIntent: TioPersistenceIntentType; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
+//      const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData);
+constructor TioContext.Create(const APSRequest: IioPersistenceStrategyRequest; const AMap: IioMap);
 begin
   inherited Create;
-  FMap := AMap;
-  FDataObject := ADataObject;
-  FWhere := AWhere;
-  FHasManyChildVirtualPropertyValue := 0;
-  FMasterPropertyPath := AMasterPropertyPath + IfThen(AMasterPropertyName.IsEmpty, '', '.') + AMasterPropertyName;
-  FMasterBSPersistence := AMasterBSPersistence;
-  FObjNextVersion := OBJVERSION_NULL;
-  FOriginalNonTrueClassMap := nil;
-  FEntityFromVersion := 0;
-  FIntentType := AIntent;
   FActionType := atDoNotPersist;
-  FBlindLevel := ABlindLevel;
   FConflictDetected := False;
   FConflictState := csUndefined;
+  FEntityFromVersion := 0;
+  FMap := AMap;
+  FObjNextVersion := OBJVERSION_NULL;
+  FOriginalNonTrueClassMap := nil;
+  FPSRequest := APSRequest;
   FSynchroStrategy_Client_NoDirectCall := nil;
-  FSessionData := ASessionData;
+//--- OLD CODE ---
+//  FMap := AMap;
+//  FDataObject := ADataObject;
+//  FWhere := AWhere;
+//  FHasManyChildVirtualPropertyValue := 0;
+//  FMasterPropertyPath := AMasterPropertyPath + IfThen(AMasterPropertyName.IsEmpty, '', '.') + AMasterPropertyName;
+//  FMasterBSPersistence := AMasterBSPersistence;
+//  FObjNextVersion := OBJVERSION_NULL;
+//  FOriginalNonTrueClassMap := nil;
+//  FEntityFromVersion := 0;
+//  FIntentType := AIntent;
+//  FActionType := atDoNotPersist;
+//  FBlindLevel := ABlindLevel;
+//  FConflictDetected := False;
+//  FConflictState := csUndefined;
+//  FSynchroStrategy_Client_NoDirectCall := nil;
+//  FSessionData := ASessionData;
+//--- OLD CODE ---
 end;
 
 function TioContext.GetClassRef: TioClassRef;
@@ -326,7 +330,7 @@ end;
 
 function TioContext.GetDataObject: TObject;
 begin
-  Result := FDataObject;
+  Result := FPSRequest.DataObj;
 end;
 
 function TioContext.GetEntityFromVersion: Integer;
@@ -350,11 +354,6 @@ begin
   Result := FHasManyChildVirtualPropertyValue;
 end;
 
-function TioContext.GetSessionData: IioAuthSessionData;
-begin
-  Result := FSessiondata;
-end;
-
 function TioContext.GetCurrentStrategyName: String;
 begin
   case FActionType of
@@ -371,25 +370,25 @@ end;
 
 function TioContext.GetObjID: Integer;
 begin
-  if not Assigned(FDataObject) then
+  if not Assigned(FPSRequest.DataObj) then
     raise EioGenericException.Create(Self.ClassName + '.GetID: DataObject not assigned');
-  Result := GetProperties.GetIdProperty.GetValue(FDataObject).AsInteger;
+  Result := GetProperties.GetIdProperty.GetValue(FPSRequest.DataObj).AsInteger;
 end;
 
 function TioContext.GetMasterBSPersistence: TioBSPersistence;
 begin
-  Result := FMasterBSPersistence;
+  Result := FPSRequest.MasterBSPersistence;
 end;
 
 function TioContext.GetMasterPropertyPath: String;
 begin
-  Result := FMasterPropertyPath;
+  Result := FPSRequest.MasterPropertyPath + IfThen(FPSRequest.MasterPropertyName.IsEmpty, '', '.') + FPSRequest.MasterPropertyName;
 end;
 
 function TioContext.GetObjCreated: TioObjCreated;
 begin
   if GetProperties.ObjCreatedPropertyExist then
-    Result := GetProperties.ObjCreatedProperty.GetValue(FDataObject).AsType<TioObjCreated>
+    Result := GetProperties.ObjCreatedProperty.GetValue(FPSRequest.DataObj).AsType<TioObjCreated>
   else
     Result := TRANSACTION_TIMESTAMP_NULL;
 end;
@@ -397,7 +396,7 @@ end;
 function TioContext.GetObjCreatedUserID: TioObjCreatedUserID;
 begin
   if GetProperties.ObjCreatedUserIDPropertyExist then
-    Result := GetProperties.ObjCreatedUserIDProperty.GetValue(FDataObject).AsType<TioObjCreatedUserID>
+    Result := GetProperties.ObjCreatedUserIDProperty.GetValue(FPSRequest.DataObj).AsType<TioObjCreatedUserID>
   else
     Result := IO_INTEGER_NULL_VALUE;
 end;
@@ -405,7 +404,7 @@ end;
 function TioContext.GetObjCreatedUserName: TioObjCreatedUserName;
 begin
   if GetProperties.ObjCreatedUserNamePropertyExist then
-    Result := GetProperties.ObjCreatedUserNameProperty.GetValue(FDataObject).AsType<TioObjCreatedUserName>
+    Result := GetProperties.ObjCreatedUserNameProperty.GetValue(FPSRequest.DataObj).AsType<TioObjCreatedUserName>
   else
     Result := IO_STRING_NULL_VALUE;
 end;
@@ -413,7 +412,7 @@ end;
 function TioContext.GetObjStatus: TioObjStatus;
 begin
   if GetProperties.ObjStatusPropertyExist then
-    Result := TioObjStatus(GetProperties.ObjStatusProperty.GetValue(FDataObject).AsOrdinal)
+    Result := TioObjStatus(GetProperties.ObjStatusProperty.GetValue(FPSRequest.DataObj).AsOrdinal)
   else
     Result := osDirty;
 end;
@@ -421,7 +420,7 @@ end;
 function TioContext.GetObjUpdated: TioObjUpdated;
 begin
   if GetProperties.ObjUpdatedPropertyExist then
-    Result := GetProperties.ObjUpdatedProperty.GetValue(FDataObject).AsType<TioObjUpdated>
+    Result := GetProperties.ObjUpdatedProperty.GetValue(FPSRequest.DataObj).AsType<TioObjUpdated>
   else
     Result := TRANSACTION_TIMESTAMP_NULL;
 end;
@@ -429,7 +428,7 @@ end;
 function TioContext.GetObjUpdatedUserID: TioObjUpdatedUserID;
 begin
   if GetProperties.ObjUpdatedUserIDPropertyExist then
-    Result := GetProperties.ObjUpdatedUserIDProperty.GetValue(FDataObject).AsType<TioObjUpdatedUserID>
+    Result := GetProperties.ObjUpdatedUserIDProperty.GetValue(FPSRequest.DataObj).AsType<TioObjUpdatedUserID>
   else
     Result := IO_INTEGER_NULL_VALUE;
 end;
@@ -437,14 +436,14 @@ end;
 function TioContext.GetObjUpdatedUserName: TioObjUpdatedUserName;
 begin
   if GetProperties.ObjUpdatedUserNamePropertyExist then
-    Result := GetProperties.ObjUpdatedUserNameProperty.GetValue(FDataObject).AsType<TioObjUpdatedUserName>
+    Result := GetProperties.ObjUpdatedUserNameProperty.GetValue(FPSRequest.DataObj).AsType<TioObjUpdatedUserName>
   else
     Result := IO_STRING_NULL_VALUE;
 end;
 
 function TioContext.GetOrderBySql: String;
 begin
-  Result := FWhere.GetOrderBySql(FMap);
+  Result := FPSRequest.Where.GetOrderBySql(FMap);
 end;
 
 function TioContext.GetOriginalNonTrueClassMap: IioMap;
@@ -462,7 +461,7 @@ end;
 
 function TioContext.GetBlindLevel: Byte;
 begin
-  Result := FBlindLevel;
+  Result := FPSRequest.BlindLevel;
 end;
 
 function TioContext.GetConflictDetected: Boolean;
@@ -477,7 +476,7 @@ end;
 
 function TioContext.GetIntentType: TioPersistenceIntentType;
 begin
-  Result := FIntentType;
+  Result := FPSRequest.IntentType;
 end;
 
 function TioContext.GetProperties: IioProperties;
@@ -497,7 +496,7 @@ end;
 
 procedure TioContext.SetDataObject(const AValue: TObject);
 begin
-  FDataObject := AValue;
+  FPSRequest.DataObj := AValue;
 end;
 
 procedure TioContext.SetEntityFromVersion(const Value: Integer);
@@ -510,11 +509,6 @@ begin
   FHasManyChildVirtualPropertyValue := Value;
 end;
 
-procedure TioContext.SetSessionData(const Value: IioAuthSessionData);
-begin
-  FSessionData := Value;
-end;
-
 procedure TioContext.SetObjCreated(const AValue: TioObjCreated);
 var
   LPropValue: TValue;
@@ -522,7 +516,7 @@ begin
   if not GetProperties.ObjCreatedPropertyExist then
     Exit;
   LPropValue := TValue.From<TioObjCreated>(AValue);
-  GetProperties.ObjCreatedProperty.SetValue(FDataObject, LPropValue);
+  GetProperties.ObjCreatedProperty.SetValue(FPSRequest.DataObj, LPropValue);
 end;
 
 procedure TioContext.SetObjCreatedUserID(const AValue: TioObjCreatedUserID);
@@ -532,7 +526,7 @@ begin
   if not GetProperties.ObjCreatedUserIDPropertyExist then
     Exit;
   LPropValue := TValue.From<TioObjCreatedUserID>(AValue);
-  GetProperties.ObjCreatedUserIDProperty.SetValue(FDataObject, LPropValue);
+  GetProperties.ObjCreatedUserIDProperty.SetValue(FPSRequest.DataObj, LPropValue);
 end;
 
 procedure TioContext.SetObjCreatedUserName(const AValue: TioObjCreatedUserName);
@@ -542,7 +536,7 @@ begin
   if not GetProperties.ObjCreatedUserNamePropertyExist then
     Exit;
   LPropValue := TValue.From<TioObjCreatedUserName>(AValue);
-  GetProperties.ObjCreatedUserNameProperty.SetValue(FDataObject, LPropValue);
+  GetProperties.ObjCreatedUserNameProperty.SetValue(FPSRequest.DataObj, LPropValue);
 end;
 
 procedure TioContext.SetObjID(const AValue: Integer);
@@ -550,7 +544,7 @@ var
   LPropValue: TValue;
 begin
   LPropValue := TValue.From<Integer>(AValue);
-  GetProperties.GetIdProperty.SetValue(FDataObject, LPropValue);
+  GetProperties.GetIdProperty.SetValue(FPSRequest.DataObj, LPropValue);
 end;
 
 procedure TioContext.SetObjStatus(const AValue: TioObjStatus);
@@ -560,7 +554,7 @@ begin
   if not GetProperties.ObjStatusPropertyExist then
     Exit;
   LPropValue := TValue.From<TioObjStatus>(AValue);
-  GetProperties.ObjStatusProperty.SetValue(FDataObject, LPropValue);
+  GetProperties.ObjStatusProperty.SetValue(FPSRequest.DataObj, LPropValue);
 end;
 
 procedure TioContext.SetObjUpdated(const AValue: TioObjUpdated);
@@ -570,7 +564,7 @@ begin
   if not GetProperties.ObjUpdatedPropertyExist then
     Exit;
   LPropValue := TValue.From<TioObjUpdated>(AValue);
-  GetProperties.ObjUpdatedProperty.SetValue(FDataObject, LPropValue);
+  GetProperties.ObjUpdatedProperty.SetValue(FPSRequest.DataObj, LPropValue);
 end;
 
 procedure TioContext.SetObjUpdatedUserID(const AValue: TioObjUpdatedUserID);
@@ -580,7 +574,7 @@ begin
   if not GetProperties.ObjUpdatedUserIDPropertyExist then
     Exit;
   LPropValue := TValue.From<TioObjUpdatedUserID>(AValue);
-  GetProperties.ObjUpdatedUserIDProperty.SetValue(FDataObject, LPropValue);
+  GetProperties.ObjUpdatedUserIDProperty.SetValue(FPSRequest.DataObj, LPropValue);
 end;
 
 procedure TioContext.SetObjUpdatedUserName(const AValue: TioObjUpdatedUserName);
@@ -590,20 +584,20 @@ begin
   if not GetProperties.ObjUpdatedUserNamePropertyExist then
     Exit;
   LPropValue := TValue.From<TioObjUpdatedUserName>(AValue);
-  GetProperties.ObjUpdatedUserNameProperty.SetValue(FDataObject, LPropValue);
+  GetProperties.ObjUpdatedUserNameProperty.SetValue(FPSRequest.DataObj, LPropValue);
 end;
 
 procedure TioContext.SetObjVersion(const AValue: TioObjVersion);
 begin
   // note: if the ObjVersion property does not exist it should not raise any exceptions.
   if GetProperties.ObjVersionPropertyExist then
-    GetProperties.ObjVersionProperty.SetValue(FDataObject, AValue);
+    GetProperties.ObjVersionProperty.SetValue(FPSRequest.DataObj, AValue);
 end;
 
 function TioContext.GetObjVersion: TioObjVersion;
 begin
   if GetProperties.ObjVersionPropertyExist then
-    Result := GetProperties.ObjVersionProperty.GetValue(FDataObject).AsType<TioObjVersion>
+    Result := GetProperties.ObjVersionProperty.GetValue(FPSRequest.DataObj).AsType<TioObjVersion>
   else
     Result := OBJVERSION_NULL;
 end;
@@ -620,7 +614,7 @@ end;
 
 procedure TioContext.SetBlindLevel(const Value: Byte);
 begin
-  FBlindLevel := Value;
+  FPSRequest.BlindLevel := Value;
 end;
 
 procedure TioContext.SetConflictDetected(const Value: Boolean);
@@ -635,17 +629,17 @@ end;
 
 procedure TioContext.SetIntentType(const Value: TioPersistenceIntentType);
 begin
-  FIntentType := Value;
+  FPSRequest.IntentType := Value;
 end;
 
 procedure TioContext.SetWhere(const AWhere: IioWhere);
 begin
-  FWhere := AWhere;
+  FPSRequest.Where := AWhere;
 end;
 
 function TioContext.WhereExist: Boolean;
 begin
-  Result := Assigned(FWhere);
+  Result := Assigned(FPSRequest.Where);
 end;
 
 function TioContext.GetTable: IioTable;
@@ -655,12 +649,12 @@ end;
 
 function TioContext.GetWhere: IioWhere;
 begin
-  Result := FWhere;
+  Result := FPSRequest.Where;
 end;
 
 function TioContext.IDIsNull: Boolean;
 begin
-  Result := (not Assigned(FDataObject)) or (GetObjID = IO_INTEGER_NULL_VALUE);
+  Result := (not Assigned(FPSRequest.DataObj)) or (GetObjID = IO_INTEGER_NULL_VALUE);
 end;
 
 function TioContext.GetObjNextVersion: Integer;
@@ -703,7 +697,7 @@ end;
 function TioContext.SynchroStrategy_GetTimeSlotSynchroState: TioEtmTimeSlotSynchroState;
 begin
   // Determines the TimeSlotSynchroState based on the intent and whether or not it is a class to synchronize
-  case FIntentType of
+  case FPSRequest.IntentType of
     itRegular, itRevert:
       if SynchroStrategy_IsToBeSynchronized then
         Result := stToBeSynchronized
@@ -733,7 +727,7 @@ begin
   Result := True;
   if Assigned(LSynchroStrategy_Client) then
   begin
-    case FIntentType of
+    case FPSRequest.IntentType of
       itRegular, itRevert, itSynchro_PersistToServer:
         if SynchroStrategy_IsToBeSynchronized then
           Result := LSynchroStrategy_Client.EtmTimeSlot_Persist_ToBeSynchronized
@@ -765,7 +759,7 @@ end;
 
 function TioContext.IsTrueClass: Boolean;
 begin
-  Result := Self.GetTable.IsTrueClass and ((not Assigned(FWhere)) or (not FWhere.GetDisableStrictlyTrueClass));
+  Result := Self.GetTable.IsTrueClass and ((not Assigned(FPSRequest.Where)) or (not FPSRequest.Where.GetDisableStrictlyTrueClass));
 end;
 
 function TioContext.Map: IioMap;

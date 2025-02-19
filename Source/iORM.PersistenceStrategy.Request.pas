@@ -80,7 +80,7 @@ type
     constructor Create(const AMethod: TioPersistenceStrategyMethod; const FillSessionRelatedProperties: Boolean);
     constructor CreateByJSONString(const AJSONString:String);
     function AsString: String;
-    // method
+    // method property
     property Method: TioPersistenceStrategyMethod read GetMethod;
     // session data
     property App: String read GetApp;
