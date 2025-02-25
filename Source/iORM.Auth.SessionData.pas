@@ -70,8 +70,6 @@ type
     function GetHasAccessToken: Boolean;
     function GetHasApp: Boolean;
     function GetHasAppOID: Boolean;
-    function GetHasConnection: Boolean;
-    function GetHasConnectionRemote: Boolean;
     function GetHasRefreshToken: Boolean;
     function GetHasUser: Boolean;
     function GetHasUserOID: Boolean;
@@ -105,8 +103,6 @@ type
     // connection
     property Connection: String read GetConnection write SetConnection;
     property ConnectionRemote: String read GetConnectionRemote write SetConnectionRemote;
-    property HasConnection: Boolean read GetHasConnection;
-    property HasConnectionRemote: Boolean read GetHasConnectionRemote;
     // user
     property HasUser: Boolean read GetHasUser;
     property HasUserOID: Boolean read GetHasUserOID;
@@ -233,16 +229,6 @@ end;
 function TioAuthSessionData.GetHasAppOID: Boolean;
 begin
   Result := FAppOID <> IO_INTEGER_NULL_VALUE;
-end;
-
-function TioAuthSessionData.GetHasConnection: Boolean;
-begin
-  Result := FConnection <> IO_STRING_NULL_VALUE;
-end;
-
-function TioAuthSessionData.GetHasConnectionRemote: Boolean;
-begin
-  Result := FConnectionRemote <> IO_STRING_NULL_VALUE;
 end;
 
 function TioAuthSessionData.GetHasRefreshToken: Boolean;

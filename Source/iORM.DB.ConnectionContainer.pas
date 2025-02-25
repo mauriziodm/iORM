@@ -141,9 +141,10 @@ type
     class function GetConnectionDefByName(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoStanConnectionDef;
     class function IsEmptyConnectionName(const AConnectionName: String): Boolean;
     class function GetCurrentSession: IioSession;
+    class function GetDatabaseFileName(const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): String;
+
     class function GetCurrentConnectionName: String;
     class function GetCurrentConnectionNameIfEmpty(const AConnectionDefName: String): String;
-    class function GetDatabaseFileName(const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): String;
 
     class function GetConnectionInfo(AConnectionName: String): TioConnectionInfo;
     class procedure ClearConnectionInfoSynchroStrategy(AConnectionName: String);
@@ -170,7 +171,7 @@ type
 
   // Il ConnectionContainer contiene le connessioni attive in un dato momento, cioè quelle
   // connections che sono effettivamente in uso al momento; il loro ciclo di vita (delle connessioni)
-  // coincide con il ciclo della transazion in essere sulla connessione stessa, quando la transazione
+  // coincide con il ciclo della transazione in essere sulla connessione stessa, quando la transazione
   // termina (con un commit/rollback) anche la connessione viene elimimata.
   // Le connessioni sono separate per thread in modo da predisporeìle fin da subito ad eventuali sviluppi in
   // senso multithreading.
@@ -439,7 +440,7 @@ end;
 
 class function TioConnectionManager.GetCurrentConnectionNameIfEmpty(const AConnectionDefName: String): String;
 begin
-  _Lock;
+  ;                               _Lock
   try
     // If AConnectionName param is not specified (is empty) then
     // use the default connection def
@@ -794,8 +795,8 @@ end;
 
 initialization
 
-// NB: Per evitare l'errore di FireDAC sul WaitCursor
-FDManager.SilentMode := True;
+FDManager.Active := True; // For thread safe enable FDManager before any db connection start
+FDManager.SilentMode := True; // NB: Per evitare l'errore di FireDAC sul WaitCursor
 
 TioConnectionContainer.CreateInternalContainer;
 TioConnectionManager.CreateInternalContainer;

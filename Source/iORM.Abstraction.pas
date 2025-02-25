@@ -66,11 +66,13 @@ type
   TioCustomSessionDataStoreRef = class of TioCustomSessionDataStore;
   TioCustomSessionDataStore = class abstract
   private
-    class var FDefaultConnection: String;
+    class var FDefaultGlobalConnection: String;
     class var FThreadSessionData: TioThreadSessionDataContainer;
+    class function _InternalGetCurrentConnectionName: String; inline;
     class function _GetThreadOrMainSessionData: IioAuthSessionData; inline;
-    class function GetDefaultConnection: String; static;
-    class procedure SetDefaultConnection(const AConnectionDefName: String); static;
+    class function _IsEmptyConnectionName(const AConnectionName: String): Boolean; inline;
+    class function GetDefaultGlobalConnection: String; static;
+    class procedure SetDefaultGlobalConnection(const AConnectionDefName: String); static;
   protected
     class procedure _Initialize; virtual;
     class procedure _Finalize; virtual;
@@ -81,6 +83,11 @@ type
   public
     class constructor Create;
     class destructor Destroy;
+    // fill persistence strategy request
+    class procedure _FillPersistenceStrategyRequest(const APersistenceStrategyRequest: IioPersistenceStrategyRequest); static;
+    // current connection
+    class function _GetCurrentConnectionName: String; static;
+    class function _GetCurrentConnectionNameIfEmpty(const AConnectionDefName: String): String;
     // main session data
     class function AcquireSessionData: IioAuthSessionData;
     class procedure ReleaseSessionData;
@@ -89,11 +96,9 @@ type
     class function ThreadAcquireSessionData: IioAuthSessionData;
     class procedure ThreadReleaseSessionData;
     class procedure ThreadClearSessionData;
-    // fill persistence strategy request
-    class procedure FillPersistenceStrategyRequest(const APersistenceStrategyRequest: IioPersistenceStrategyRequest);
     // default connection
-    class procedure SetDefaultConnectionIfEmpty(const AConnectionName: String); // Per fare lock/unlock una sola volta invece di due
-    class property DefaultConnection: String read GetDefaultConnection write SetDefaultConnection;
+    class procedure _SetDefaultGlobalConnectionIfEmpty(const AConnectionName: String); static;
+    class property DefaultGlobalConnection: String read GetDefaultGlobalConnection write SetDefaultGlobalConnection;
   end;
 
   TioSimpleSessionDataStore = class(TioCustomSessionDataStore)
@@ -536,21 +541,52 @@ begin
   _Finalize;
 end;
 
-class procedure TioCustomSessionDataStore.FillPersistenceStrategyRequest(const APersistenceStrategyRequest: IioPersistenceStrategyRequest);
+class function TioCustomSessionDataStore._GetCurrentConnectionName: String;
+begin
+  _Lock;
+  try                                      ù
+    _GetCurrentConnectionName;
+  finally
+    _Unlock;
+  end;
+end;
+
+class function TioCustomSessionDataStore._InternalGetCurrentConnectionName: String;
+begin
+  Result := _GetThreadOrMainSessionData.Connection;
+  if _IsEmptyConnectionName(Result) then
+    Result := FDefaultGlobalConnection;
+end;
+
+class function TioCustomSessionDataStore._GetCurrentConnectionNameIfEmpty(const AConnectionDefName: String): String;
+begin
+  _Lock;
+  try
+    if _IsEmptyConnectionName(AConnectionDefName) then
+      Result := _InternalGetCurrentConnectionName
+    else
+      Result := AConnectionDefName;
+  finally
+    _Unlock;
+  end;
+end;
+
+class procedure TioCustomSessionDataStore._FillPersistenceStrategyRequest(const APersistenceStrategyRequest: IioPersistenceStrategyRequest);
 var
   LSessionData: IioAuthSessionData;
 begin
   _Lock;
   try
-    LSessionData := _GetMainSessionData;
+    LSessionData := _GetThreadOrMainSessionData;
     // app
     APersistenceStrategyRequest.App := LSessionData.App;
     APersistenceStrategyRequest.AppOID := LSessionData.AppOID;
     // connection
-    if LSessionData.HasConnection
-      APersistenceStrategyRequest.Connection := LSessionData.Connection
+    if _IsEmptyConnectionName(LSessionData.Connection)
+      APersistenceStrategyRequest.Connection := FDefaultGlobalConnection
     else
-      APersistenceStrategyRequest.Connection := FDefaultConnection;
+      APersistenceStrategyRequest.Connection := LSessionData.Connection;
+    // remote connection
     APersistenceStrategyRequest.ConnectionRemote := LSessionData.ConnectionRemote;
     // user
     APersistenceStrategyRequest.User := LSessionData.User;
@@ -562,11 +598,11 @@ begin
   end;
 end;
 
-class function TioCustomSessionDataStore.GetDefaultConnection: String;
+class function TioCustomSessionDataStore.GetDefaultGlobalConnection: String;
 begin
   _Lock;
   try
-    Result := FDefaultConnection;
+    Result := FDefaultGlobalConnection;
   finally
     _Unlock;
   end;
@@ -577,11 +613,11 @@ begin
   _Unlock;
 end;
 
-class procedure TioCustomSessionDataStore.SetDefaultConnection(const AConnectionDefName: String);
+class procedure TioCustomSessionDataStore.SetDefaultGlobalConnection(const AConnectionDefName: String);
 begin
   _Lock;
   try
-    FDefaultConnection := AConnectionDefName;
+    FDefaultGlobalConnection := AConnectionDefName;
   finally
     _Unlock;
   end;
@@ -615,12 +651,12 @@ begin
   _Unlock;
 end;
 
-class function TioCustomSessionDataStore.SetDefaultConnectionIfEmpty(const AConnectionName: String): Boolean;
+class function TioCustomSessionDataStore._SetDefaultGlobalConnectionIfEmpty(const AConnectionName: String): Boolean;
 begin
   _Lock;
   try
-    if FDefaultConnection = IO_STRING_NULL_VALUE then
-      FDefaultConnection := AConnectionName;
+    if FDefaultGlobalConnection = IO_STRING_NULL_VALUE then
+      FDefaultGlobalConnection := AConnectionName;
   finally
     _UnLock;
   end;
@@ -633,14 +669,19 @@ end;
 
 class function TioCustomSessionDataStore._GetThreadOrMainSessionData: IioAuthSessionData;
 begin
-  if (FThreadSessionData.Count = 0) or not FThreadSessionData.TryGetValue(TioUtilities.GetThreadID, Result) then
+  if not FThreadSessionData.TryGetValue(TioUtilities.GetThreadID, Result) then
     Result := _GetMainSessionData;
 end;
 
 class procedure TioCustomSessionDataStore._Initialize;
 begin
-  FDefaultConnection := IO_STRING_NULL_VALUE;
+  FDefaultGlobalConnection := IO_STRING_NULL_VALUE;
   FThreadSessionData := TioThreadSessionDataContainer.Create;
+end;
+
+class function TioCustomSessionDataStore._IsEmptyConnectionName(const AConnectionName: String): Boolean;
+begin
+  Result := (AConnectionName.IsEmpty or (AConnectionName = IO_CONNECTIONDEF_DEFAULTNAME));
 end;
 
 class procedure TioCustomSessionDataStore._Lock;
