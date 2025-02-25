@@ -544,8 +544,8 @@ end;
 class function TioCustomSessionDataStore._GetCurrentConnectionName: String;
 begin
   _Lock;
-  try                                      ù
-    _GetCurrentConnectionName;
+  try
+    _InternalGetCurrentConnectionName;
   finally
     _Unlock;
   end;
@@ -655,7 +655,7 @@ class function TioCustomSessionDataStore._SetDefaultGlobalConnectionIfEmpty(cons
 begin
   _Lock;
   try
-    if FDefaultGlobalConnection = IO_STRING_NULL_VALUE then
+    if _IsEmptyConnectionName(FDefaultGlobalConnection) then
       FDefaultGlobalConnection := AConnectionName;
   finally
     _UnLock;

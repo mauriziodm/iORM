@@ -72,51 +72,25 @@ type
   // se richiesto.
   // In realtà questa classe utilizza il TFDManager fornito da FireDAC e non fa molto altro
   // se non aggiungere un campo per mantenere un riferimento al nome della ConnectionDef
-  // di default. Una gestione di una connessione di default mi serviva perchè volevo fare in modo che NON
+  // di default (ora in TioApplication.SessionDataStore).
+  // Una gestione di una connessione di default mi serviva perchè volevo fare in modo che NON
   // fosse necessario specificare esplicitamente una ConnectionDef (con un attribute) per ogni classe/entità
   // e quindi ho deciso di mantenere un riferimento al nome della connectionDef di dafault in modo che per tutte le classi
   // che non indicano una connection esplicitamente utilizzino quella di default e quindi anche che normalmente nelle applicazioni
   // che utilizzano una sola ConnectionDef non è necessario specificare nulla nella dichiarazione delle classi perchè
   // tanto utilizzano automaticamente la ConnectionDef di default (l'unica).
 
-  // NB: Mauri 08/07/2023: Modifico FCurrentConnectionName e FPerThreadCurrentConnectionName in modo che oltre al nome della connessione
-  // corrente memorizzi anche uno "User" sotto forma di stringa e uno "UserID" sotto forma di intero più che altro. In realtà forse
-  // sarebbe meglio creare una sorta di oggetto sessione o LogOn, magari in futuro lo sposterò ma per ora, per fare la parte ETM
-  // e per il salvataggio eventuale di quale utente ha operato sulle entities va bene così.
-
-  TioSession = class(TInterfacedObject, IioSession)
-  strict private
-    FConnectionName: String;
-    FUserName: String;
-    FUserID: Integer;
-    function GetConnectionName: String;
-    function GetUserID: Integer;
-    function GetUserName: String;
-    procedure SetConnectionName(const Value: String);
-    procedure SetUserID(const Value: Integer);
-    procedure SetUserName(const Value: String);
-  public
-    constructor Create;
-    constructor CreateThreadSession(const AGlobalConnectionName: String);
-    property ConnectionName: String read GetConnectionName write SetConnectionName;
-    property UserName: String read GetUserName write SetUserName;
-    property UserID: Integer read GetUserID write SetUserID;
-  end;
-
   TioConnectionManagerContainer = TObjectDictionary<String, TioConnectionInfo>;
-  TioPerThreadSessionCollection = TDictionary<TThreadID, IioSession>;
   TioConnectionManagerRef = class of TioConnectionManager;
 
   TioConnectionManager = class // NB: Is thread-safe
   strict private
-    class var FGlobalSession: IioSession;
-    class var FPerThreadSessionCollection: TioPerThreadSessionCollection;
+// TODO: Spostare FConnectionManagerContainer oppure proprio tutto TioConnectionManager all'interno del SessionDataStore???
     class var FConnectionManagerContainer: TioConnectionManagerContainer;
     // NB: Questo container in realtà contiene solo il tipo di DB (cdtFirebird, cdtSQLite ecc.ecc.) in modo da poter fare dei confronti veloci nelle factory e per non dipendere direttamente dal DriverID delle connectionDef di FireDAC
     class var FShowWaitProc: TProc;
     class var FHideWaitProc: TProc;
     class function NewCustomConnectionDef(const AConnectionName: String; const APooled: Boolean; const AAsDefault: Boolean): IIoStanConnectionDef; inline;
-    class function CheckConnectionName(AConnectionName: String): String;
     class procedure _Lock; inline;
     class procedure _Unlock; inline;
   protected
@@ -139,31 +113,19 @@ type
     // ---------- END of connectionDef creation methods ----------
     class function GetCurrentConnectionDef: IIoStanConnectionDef;
     class function GetConnectionDefByName(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoStanConnectionDef;
-    class function IsEmptyConnectionName(const AConnectionName: String): Boolean;
-    class function GetCurrentSession: IioSession;
     class function GetDatabaseFileName(const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): String;
-
-    class function GetCurrentConnectionName: String;
-    class function GetCurrentConnectionNameIfEmpty(const AConnectionDefName: String): String;
 
     class function GetConnectionInfo(AConnectionName: String): TioConnectionInfo;
     class procedure ClearConnectionInfoSynchroStrategy(AConnectionName: String);
 
     class function GetSynchroStrategy_Client(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IioSynchroStrategy_Client;
 
+// TODO: WaitProc related methods move to TioApplication???
     class procedure SetShowWaitProc(const AShowWaitProc: TProc); static;
     class procedure SetHideWaitProc(const AHideWaitProc: TProc); static;
     class procedure SetShowHideWaitProc(const AShowWaitProc: TProc; const AHideWaitProc: TProc); static;
     class procedure ShowWaitProc; static;
     class procedure HideWaitProc; static;
-    // Use
-    class procedure UseConnection(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME);
-    class procedure UseUser(AUserID: Integer; AUserName: String = ''); overload;
-    class procedure UseUser(AUserName: String); overload;
-    class procedure ThreadUseConnection(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME);
-    class procedure ThreadUseUser(AUserID: Integer; AUserName: String = ''); overload;
-    class procedure ThreadUseUser(AUserName: String); overload;
-    class procedure ThreadUseClear;
 {$IFDEF MSWINDOWS}
     class function Monitor: TioConnectionMonitorRef;
 {$ENDIF}
@@ -203,7 +165,7 @@ type
 implementation
 
 uses
-  System.Classes, iORM.Exceptions, iORM.Utilities, iORM.DB.Factory;
+  System.Classes, iORM.Exceptions, iORM.Utilities, iORM.DB.Factory, iORM.Abstraction;
 
 { TioConnectionContainer }
 
@@ -295,31 +257,12 @@ end;
 
 { TioConnectionManager }
 
-class function TioConnectionManager.CheckConnectionName(AConnectionName: String): String;
-var
-  LConnectionInfo: TioConnectionInfo;
-begin
-  // NB: Lasciare anche se il parametro è già defaultizzato perchè in alcune circostanze serve
-  if IsEmptyConnectionName(AConnectionName) then
-    Result := IO_CONNECTIONDEF_DEFAULTNAME
-  else
-    Result := AConnectionName;
-  // Check and get the ConnectionInfo instance relative to the ConnectionName
-  if FConnectionManagerContainer.ContainsKey(Result) then
-    LConnectionInfo := FConnectionManagerContainer.Items[Result]
-  else
-    raise EioGenericException.Create(Self.ClassName + ': ConnectionInfo (TioConnectionInfo) for "' + Result + '" not found!');
-  // if the connection is of type then also check if it is present in the FireDAC's ConnectionDefs
-  if (LConnectionInfo.ConnectionType <> TioConnectionType.ctHTTP) and not Assigned(FDManager.ConnectionDefs.FindConnectionDef(Result)) then
-    raise EioGenericException.Create(Self.ClassName + ': Connection params definition "' + Result + '" not found!');
-end;
-
 class procedure TioConnectionManager.ClearConnectionInfoSynchroStrategy(AConnectionName: String);
 begin
   _Lock;
   try
     // If desired ConnectionName is empty then get then Default one.
-    AConnectionName := GetCurrentConnectionNameIfEmpty(AConnectionName);
+    AConnectionName := TioApplication.SessionDataStore._GetCurrentConnectionNameIfEmpty(AConnectionName);
     // Reset the ConnectionInfo.SynchroStrategy property
     if FConnectionManagerContainer.ContainsKey(AConnectionName) then
       FConnectionManagerContainer[AConnectionName].SynchroStrategy := nil;
@@ -347,7 +290,7 @@ begin
   try
     Result := nil;
     // If desired ConnectionName is empty then get then Default one.
-    AConnectionName := GetCurrentConnectionNameIfEmpty(AConnectionName);
+    AConnectionName := TioApplication.SessionDataStore._GetCurrentConnectionNameIfEmpty(AConnectionName);
     // Get the ConnectionDef info's
     Result := FDManager.ConnectionDefs.FindConnectionDef(AConnectionName);
     // Connection not found
@@ -363,7 +306,7 @@ begin
   _Lock;
   try
     // If desired ConnectionName is empty then get then Default one.
-    AConnectionName := GetCurrentConnectionNameIfEmpty(AConnectionName);
+    AConnectionName := TioApplication.SessionDataStore._GetCurrentConnectionNameIfEmpty(AConnectionName);
     // Return the desired connection type
     if not FConnectionManagerContainer.TryGetValue(AConnectionName, Result) then
       raise EioGenericException.Create(Self.ClassName, 'GetConnectionInfo',
@@ -379,7 +322,7 @@ begin
   _Lock;
   try
     // If desired ConnectionName is empty then get then Default one.
-    AConnectionName := GetCurrentConnectionNameIfEmpty(AConnectionName);
+    AConnectionName := TioApplication.SessionDataStore._GetCurrentConnectionNameIfEmpty(AConnectionName);
     // Return the desired info or raise an exception if the connection name was not found
     if FConnectionManagerContainer.ContainsKey(AConnectionName) then
       Result := FConnectionManagerContainer.Items[AConnectionName].SynchroStrategy
@@ -396,7 +339,7 @@ class function TioConnectionManager.GetDatabaseFileName(const AConnectionName: S
 begin
   _Lock;
   try
-    Result := Self.GetConnectionDefByName(AConnectionName).Params.Database;
+    Result := GetConnectionDefByName(AConnectionName).Params.Database;
   finally
     _Unlock;
   end;
@@ -406,48 +349,7 @@ class function TioConnectionManager.GetCurrentConnectionDef: IIoStanConnectionDe
 begin
   _Lock;
   try
-    Result := GetConnectionDefByName(GetCurrentConnectionName);
-  finally
-    _Unlock;
-  end;
-end;
-
-class function TioConnectionManager.GetCurrentSession: IioSession;
-begin
-  _Lock;
-  try
-    if FPerThreadSessionCollection.ContainsKey(TioUtilities.GetThreadID) then
-      Result := FPerThreadSessionCollection[TioUtilities.GetThreadID]
-    else
-      Result := FGlobalSession;
-  finally
-    _Unlock
-  end;
-end;
-
-class function TioConnectionManager.GetCurrentConnectionName: String;
-begin
-  _Lock;
-  try
-    if FPerThreadSessionCollection.ContainsKey(TioUtilities.GetThreadID) then
-      Result := FPerThreadSessionCollection[TioUtilities.GetThreadID].ConnectionName
-    else
-      Result := FGlobalSession.ConnectionName;
-  finally
-    _Unlock
-  end;
-end;
-
-class function TioConnectionManager.GetCurrentConnectionNameIfEmpty(const AConnectionDefName: String): String;
-begin
-  ;                               _Lock
-  try
-    // If AConnectionName param is not specified (is empty) then
-    // use the default connection def
-    if IsEmptyConnectionName(AConnectionDefName) then
-      Result := GetCurrentConnectionName
-    else
-      Result := AConnectionDefName;
+    Result := GetConnectionDefByName(TioApplication.SessionDataStore._GetCurrentConnectionName);
   finally
     _Unlock;
   end;
@@ -465,65 +367,26 @@ begin
     FShowWaitProc;
 end;
 
-class procedure TioConnectionManager.ThreadUseConnection(AConnectionName: String);
-begin
-  _Lock;
-  try
-    // Verifica ed eventualmente defaultizza il parametro
-    AConnectionName := CheckConnectionName(AConnectionName);
-    // If a CurrentConnectionInfo does not exists for the current thread the create it
-    if not FPerThreadSessionCollection.ContainsKey(TioUtilities.GetThreadID) then
-      FPerThreadSessionCollection.Add(TioUtilities.GetThreadID, TioDBFactory.NewThreadSession(FGlobalSession.ConnectionName));
-    // Set the current connection fot the currend thread
-    FPerThreadSessionCollection[TioUtilities.GetThreadID].ConnectionName := AConnectionName;
-  finally
-    _Unlock;
-  end;
-end;
-
-class procedure TioConnectionManager.ThreadUseUser(AUserName: String);
-begin
-  Self.ThreadUseUser(IO_INTEGER_NULL_VALUE, AUserName);
-end;
-
-class procedure TioConnectionManager.ThreadUseUser(AUserID: Integer; AUserName: String);
-begin
-  _Lock;
-  try
-    // If a CurrentConnectionInfo does not exists for the current thread the create it
-    if not FPerThreadSessionCollection.ContainsKey(TioUtilities.GetThreadID) then
-      FPerThreadSessionCollection.Add(TioUtilities.GetThreadID, TioDBFactory.NewThreadSession(FGlobalSession.ConnectionName));
-    // Set the current connection fot the currend thread
-    FPerThreadSessionCollection[TioUtilities.GetThreadID].UserID := AUserID;
-    FPerThreadSessionCollection[TioUtilities.GetThreadID].UserName := AUserName;
-  finally
-    _Unlock;
-  end;
-end;
-
-class procedure TioConnectionManager.ThreadUseClear;
-begin
-  _Lock;
-  try
-    FPerThreadSessionCollection.Remove(TioUtilities.GetThreadID);
-  finally
-    _Unlock;
-  end;
-end;
-
 class procedure TioConnectionManager._Lock;
 begin
-  TMonitor.Enter(FConnectionManagerContainer);
+  // NB: Ho pensato di usare il lock del SessionDataStore in modo da avere un solo
+  //      _Lock per evitare possibili deadlock.
+  //      Si potrebbe pensare anche di spostare il "FConnectionManagerContainer" nel
+  //      SessionDataStore e quindi sotto a TioApplication e togliere del tutto i  metodi
+  //      _Lock e _Unlock da questa classe
+  TioApplication.SessionDataStore._Lock;
+//  TMonitor.Enter(FConnectionManagerContainer);
 end;
 
 class procedure TioConnectionManager._Unlock;
 begin
-  TMonitor.Exit(FConnectionManagerContainer);
-end;
-
-class function TioConnectionManager.IsEmptyConnectionName(const AConnectionName: String): Boolean;
-begin
-  Result := (AConnectionName.IsEmpty or (AConnectionName = IO_CONNECTIONDEF_DEFAULTNAME));
+  // NB: Ho pensato di usare il lock del SessionDataStore in modo da avere un solo
+  //      _Lock per evitare possibili deadlock.
+  //      Si potrebbe pensare anche di spostare il "FConnectionManagerContainer" nel
+  //      SessionDataStore e quindi sotto a TioApplication e togliere del tutto i  metodi
+  //      _Lock e _Unlock da questa classe
+  TioApplication.SessionDataStore._UnLock;
+//  TMonitor.Exit(FConnectionManagerContainer);
 end;
 
 {$IFDEF MSWINDOWS}
@@ -546,7 +409,7 @@ begin
   // If the AsDefault param is True or this is the first ConnectionDef of the application
   // then set it as default
   if AAsDefault then
-    TioApplication.SessionDataStore.SetDefaultConnectionIfEmpty(AConnectionName);
+    TioApplication.SessionDataStore._SetDefaultConnectionIfEmpty(AConnectionName);
 end;
 
 class function TioConnectionManager.NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault: Boolean = True; const ASynchroStrategy_Client: IioSynchroStrategy_Client = nil;
@@ -554,7 +417,7 @@ class function TioConnectionManager.NewFirebirdConnectionDef(const AServer, ADat
 begin
   _Lock;
   try
-    Result := Self.NewCustomConnectionDef(AConnectionName, APooled, AAsDefault);
+    Result := NewCustomConnectionDef(AConnectionName, APooled, AAsDefault);
     Result.Params.DriverID := 'FB';
     Result.Params.Values['Server'] := AServer;
     Result.Params.Database := ADatabase;
@@ -575,7 +438,7 @@ class function TioConnectionManager.NewMySQLConnectionDef(const AServer, ADataba
 begin
   _Lock;
   try
-    Result := Self.NewCustomConnectionDef(AConnectionName, APooled, AAsDefault);
+    Result := NewCustomConnectionDef(AConnectionName, APooled, AAsDefault);
     Result.Params.DriverID := 'MySQL';
     Result.Params.Values['Server'] := AServer;
     Result.Params.Database := ADatabase;
@@ -597,15 +460,15 @@ var
 begin
   _Lock;
   try
-    // If the AsDefault param is True or this is the first ConnectionDef of the application
-    // then set it as default
-    if AAsDefault or (FGlobalSession.ConnectionName = '') then
-      FGlobalSession.ConnectionName := AConnectionName;
     // Setup the connection info
     LConnectionInfo := TioConnectionInfo.Create(AConnectionName, ctHTTP, APersistent, kgtUndefined, ASynchroStrategy_Client);
     LConnectionInfo.BaseURL := ABaseURL;
     // Add the connection type to the internal container
     FConnectionManagerContainer.AddOrSetValue(AConnectionName, LConnectionInfo);
+    // If the AsDefault param is True or this is the first ConnectionDef of the application
+    // then set it as default
+    if AAsDefault then
+      TioApplication.SessionDataStore._SetDefaultConnectionIfEmpty(AConnectionName);
   finally
     _Unlock;
   end;
@@ -616,7 +479,7 @@ class function TioConnectionManager.NewSQLiteConnectionDef(const ADatabase: Stri
 begin
   _Lock;
   try
-    Result := Self.NewCustomConnectionDef(AConnectionName, APooled, AAsDefault);
+    Result := NewCustomConnectionDef(AConnectionName, APooled, AAsDefault);
     Result.Params.DriverID := 'SQLite';
     Result.Params.Database := ADatabase;
     Result.Params.Values['FailIfMissing'] := 'False';
@@ -634,7 +497,7 @@ class function TioConnectionManager.NewSQLServerConnectionDef(const AServer, ADa
 begin
   _Lock;
   try
-    Result := Self.NewCustomConnectionDef(AConnectionName, APooled, AAsDefault);
+    Result := NewCustomConnectionDef(AConnectionName, APooled, AAsDefault);
     Result.Params.DriverID := 'MSSQL';
     Result.Params.Values['Server'] := AServer;
     Result.Params.Database := ADatabase;
@@ -647,35 +510,6 @@ begin
   end;
 end;
 {$ENDIF}
-
-class procedure TioConnectionManager.UseConnection(AConnectionName: String);
-begin
-  _Lock;
-  try
-    // Verifica ed eventualmente defaultizza il parametro
-    AConnectionName := CheckConnectionName(AConnectionName);
-    // Set the connection as default
-    FGlobalSession.ConnectionName := AConnectionName;
-  finally
-    _Unlock;
-  end;
-end;
-
-class procedure TioConnectionManager.UseUser(AUserName: String);
-begin
-  Self.UseUser(IO_INTEGER_NULL_VALUE, AUserName);
-end;
-
-class procedure TioConnectionManager.UseUser(AUserID: Integer; AUserName: String);
-begin
-  _Lock;
-  try
-    FGlobalSession.UserID := AUserID;
-    FGlobalSession.UserName := AUserName;
-  finally
-    _Unlock;
-  end;
-end;
 
 class procedure TioConnectionManager.SetHideWaitProc(const AHideWaitProc: TProc);
 begin
@@ -746,52 +580,6 @@ begin
   end;
 end;
 {$ENDIF}
-{ TioInUseConnectionRegister }
-
-{ TioCurrentConnectionInfo }
-
-constructor TioSession.Create;
-begin
-  FConnectionName := String.Empty;
-  FUserName := String.Empty;
-  FUserID := 0;
-end;
-
-constructor TioSession.CreateThreadSession(const AGlobalConnectionName: String);
-begin
-  Create;
-  FConnectionName := AGlobalConnectionName;
-end;
-
-function TioSession.GetConnectionName: String;
-begin
-  Result := FConnectionName;
-end;
-
-function TioSession.GetUserID: Integer;
-begin
-  Result := FUserID;
-end;
-
-function TioSession.GetUserName: String;
-begin
-  Result := FUserName;
-end;
-
-procedure TioSession.SetConnectionName(const Value: String);
-begin
-  FConnectionName := Value;
-end;
-
-procedure TioSession.SetUserID(const Value: Integer);
-begin
-  FUserID := Value;
-end;
-
-procedure TioSession.SetUserName(const Value: String);
-begin
-  FUserName := Value;
-end;
 
 initialization
 
