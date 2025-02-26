@@ -777,7 +777,7 @@ begin
       // Get the Context for the current ResolverTypeName
       AContext := TioContextFactory.Context(itRegular, AResolvedTypeName, Self, nil, nil, '', '', BL_DEFAULT);
       // Start transaction
-      ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
+      ATransactionCollection.StartTransaction(AContext.GetTable.GetTableConnectionName);
       // Load the current class data into the list
       NestedCreateIndex;
     end;
@@ -835,7 +835,7 @@ begin
       // Get the Context for the current ResolverTypeName
       AContext := TioContextFactory.Context(itRegular, AResolvedTypeName, Self, nil, nil, '', '', BL_DEFAULT);
       // Start transaction
-      ATransactionCollection.StartTransaction(AContext.GetTable.GetConnectionDefName);
+      ATransactionCollection.StartTransaction(AContext.GetTable.GetTableConnectionName);
       // Load the current class data into the list
       NestedDropIndex;
     end;

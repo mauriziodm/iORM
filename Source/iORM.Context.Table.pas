@@ -128,7 +128,7 @@ type
   // Classe che incapsula le info sulla tabella
   TioTable = class(TioSqlItem, IioTable)
   strict private
-    FConnectionDefName_DoNotCallDirectly: String;
+    FTableConnectionName_DoNotCallDirectly: String;
     FContainsSomeIioListProperty: Boolean;
     FEtmTimeSlotClass: TioEtmTimeSlotRef;
     FEtmTraceOnlyOnConnectionName: String;
@@ -160,7 +160,8 @@ type
     // This method create the TrueClassVirtualMap.Table object duplicating something of itself
     function DuplicateForTrueClassMap: IioTable;
     function GetClassName: String;
-    function GetConnectionDefName: String;
+    function GetTableConnectionName: String;
+    function GetTableConnectionNameIfEmpty(const AConnectionName: String): String;
     function GetGroupBy: IioGroupBy;
     function GetJoin: IioJoins;
     function GetKeyGenerator: String;
@@ -210,7 +211,7 @@ constructor TioTable.Create(const ASqlText, AKeyGenerator: String; const ATrueCl
 begin
   inherited Create(ASqlText);
   FKeyGenerator := AKeyGenerator;
-  FConnectionDefName_DoNotCallDirectly := AConnectionDefName;
+  FTableConnectionName_DoNotCallDirectly := AConnectionDefName;
   FMapMode := AMapMode;
   FRttiType := ARttiType;
   FIndexList := nil;
@@ -250,7 +251,7 @@ end;
 
 function TioTable.DuplicateForTrueClassMap: IioTable;
 begin
-  Result := TioTable.Create(FSqlText, FKeyGenerator, FTrueClass, FJoins, FGroupBy, FConnectionDefName_DoNotCallDirectly, FMapMode, FRttiType);
+  Result := TioTable.Create(FSqlText, FKeyGenerator, FTrueClass, FJoins, FGroupBy, FTableConnectionName_DoNotCallDirectly, FMapMode, FRttiType);
 end;
 
 function TioTable.GetEtmPropToPropList(AAutoCreateIfUnassigned: Boolean): TEtmPropToPropList;
@@ -305,9 +306,17 @@ begin
   Result := FUpdateConflictStrategy_OnConflictSetStateAs;
 end;
 
-function TioTable.GetConnectionDefName: String;
+function TioTable.GetTableConnectionName: String;
 begin
-  Result := TioDBFActory.ConnectionManager.GetCurrentConnectionNameIfEmpty(FConnectionDefName_DoNotCallDirectly);
+  Result := TioApplication.SessionDataStore._GetCurrentConnectionNameIfEmpty(FTableConnectionName_DoNotCallDirectly);
+end;
+
+function TioTable.GetTableConnectionNameIfEmpty(const AConnectionName: String): String;
+begin
+  if TioApplication._IsEmptyConnectionName(FTableConnectionName_DoNotCallDirectly) then
+    Result := AConnectionName
+  else
+    Result := FTableConnectionName_DoNotCallDirectly;
 end;
 
 function TioTable.GetEtmTimeSlotClass: TioEtmTimeSlotRef;
@@ -370,7 +379,7 @@ end;
 function TioTable.GetSql: String;
 begin
   Result := inherited;
-  Result := TioDBFActory.SqlDataConverter(GetConnectionDefName).FieldNameToSqlFieldName(Result);
+  Result := TioDBFActory.SqlDataConverter(GetTableConnectionName).FieldNameToSqlFieldName(Result);
 end;
 
 function TioTable.IndexListExists: Boolean;
@@ -390,7 +399,7 @@ begin
   // Defaultize the connection def name to check (default connection name if empty)
   AConnectionDefNameToCheck := TioDBFActory.ConnectionManager.GetCurrentConnectionNameIfEmpty(AConnectionDefNameToCheck);
   // Extract the curret connection def of the context table (ask it to the table itself obviously)
-  LCurrentConnectionDefName := GetConnectionDefName;
+  LCurrentConnectionDefName := GetTableConnectionName;
   // The table is for this connection if the current connection name of the table: is empty (no connection name is
   // specified for this table so this mean it is for all connections), or it's a default connection, or it's
   // specifically setted for the connection name received to check (AConnectionDefNameToCheck).
@@ -488,7 +497,7 @@ end;
 
 function TioTrueClass.GetSqlFieldName: string;
 begin
-  Result := TioDBFActory.SqlDataConverter(Table.GetConnectionDefName).FieldNameToSqlFieldName(FSqlFieldName);
+  Result := TioDBFActory.SqlDataConverter(Table.GetTableConnectionName).FieldNameToSqlFieldName(FSqlFieldName);
 end;
 
 function TioTrueClass.GetSqlParamName: String;
@@ -498,7 +507,7 @@ end;
 
 function TioTrueClass.GetSqlValue: string;
 begin
-  Result := TioDBFActory.SqlDataConverter(Table.GetConnectionDefName).StringToSQL(Self.GetValue);
+  Result := TioDBFActory.SqlDataConverter(Table.GetTableConnectionName).StringToSQL(Self.GetValue);
 end;
 
 function TioTrueClass.GetMode: TioTrueClassMode;
@@ -591,7 +600,7 @@ var
 begin
   Result := '';
   for AJoinItem in FJoinList do
-    Result := Result + #13 + TioSqlTranslator.Translate(AJoinItem.GetSql(Self.Table.GetConnectionDefName), Table.GetClassName);
+    Result := Result + #13 + TioSqlTranslator.Translate(AJoinItem.GetSql(Self.Table.GetTableConnectionName), Table.GetClassName);
 end;
 
 { TioGroupBy }

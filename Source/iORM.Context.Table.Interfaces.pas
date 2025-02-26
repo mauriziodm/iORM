@@ -91,7 +91,8 @@ type
     /// This method create the TrueClassVirtualMap.Table object duplicating something of itself
     function DuplicateForTrueClassMap: IioTable;
     function GetClassName: String;
-    function GetConnectionDefName: String;
+    function GetTableConnectionName: String;
+    function GetTableConnectionNameIfEmpty(const AConnectionName: String): String;
     function GetGroupBy: IioGroupBy;
     function GetJoin: IioJoins;
     function GetKeyGenerator: String;

@@ -114,7 +114,7 @@ begin
     begin
       LCurrentMap := TioMapContainer.GetMap(LCurrentRttiInstanceType.Name, False);
       // Se la classe corrente è mappata sulla stessa tabella/connessione...
-      if (LCurrentMap.GetTable.TableName = FTable.TableName) and (LCurrentMap.GetTable.GetConnectionDefName = FTable.GetConnectionDefName) then
+      if (LCurrentMap.GetTable.TableName = FTable.TableName) and (LCurrentMap.GetTable.GetTableConnectionName = FTable.GetTableConnectionName) then
         Result := LCurrentMap;
     end;
     // Go to the next next ancestor class

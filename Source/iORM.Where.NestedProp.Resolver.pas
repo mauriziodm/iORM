@@ -135,7 +135,7 @@ begin
       Continue;
     LDetailProp := LDetailMap.GetProperties.GetPropertyByName(LDetailPropName);
     // If the current resolved type is not for the same connection the skip it
-    if not LDetailMap.GetTable.IsForThisConnection(AMasterMap.GetTable.GetConnectionDefName) then
+    if not LDetailMap.GetTable.IsForThisConnection(AMasterMap.GetTable.GetTableConnectionName) then
       Continue;
     // Depending on relation type...
     case AMasterProp.GetRelationType of

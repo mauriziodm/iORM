@@ -825,7 +825,7 @@ class function io.LoadObjVersion(const AContext: IioContext): Integer;
 var
   LConnectionDefName: String;
 begin
-  LConnectionDefName := AContext.GetTable.GetConnectionDefName;
+  LConnectionDefName := AContext.GetTable.GetTableConnectionName;
   Result := TioPersistenceStrategyFactory.GetStrategy(LConnectionDefName).LoadObjVersion(AContext);
 end;
 

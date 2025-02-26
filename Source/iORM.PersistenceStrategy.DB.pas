@@ -188,7 +188,7 @@ begin
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Exit;
       // Start transaction
-      LTransactionCollection.StartTransaction(LContext.GetTable.GetConnectionDefName);
+      LTransactionCollection.StartTransaction(LContext.GetTable.GetTableConnectionName);
       // Get the count value for the current resolved type
       NestedCount;
     end;
@@ -233,7 +233,7 @@ begin
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
       // Start transaction
-      LTransactionCollection.StartTransaction(LContext.GetTable.GetConnectionDefName);
+      LTransactionCollection.StartTransaction(LContext.GetTable.GetTableConnectionName);
       // Load the current class data into the list
       NestedDelete;
     end;
@@ -307,7 +307,7 @@ begin
   if LContext.Map.GetTable.IsNotPersistedEntity then
     Exit;
   // Start transaction
-  _DoStartTransaction(LContext.GetTable.GetConnectionDefName);
+  _DoStartTransaction(LContext.GetTable.GetTableConnectionName);
   try
 
 {$REGION '-----INTERCEPTORS-----'}
@@ -330,13 +330,13 @@ begin
 {$ENDIF}
 {$ENDREGION}
     // Commit
-    _DoCommitTransaction(LContext.GetTable.GetConnectionDefName);
+    _DoCommitTransaction(LContext.GetTable.GetTableConnectionName);
 
   except
     on E: Exception do
     begin
       // Rollback
-      _DoRollbackTransaction(LContext.GetTable.GetConnectionDefName);
+      _DoRollbackTransaction(LContext.GetTable.GetTableConnectionName);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
       if TioCRUDInterceptorRegister.OnDeleteException(LContext, E) then
@@ -419,7 +419,7 @@ begin
   // a new ID even if the BlindLevel is set to disable the assignment to the object,
   // this is because the ID MUST be assigned (always if it is null)
   // otherwise the object would persist on the DB with ID zero.
-  if (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtBeforeInsert) and AContext.IDIsNull then
+  if (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetTableConnectionName).KeyGenerationTime = kgtBeforeInsert) and AContext.IDIsNull then
   begin
     LQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
     try
@@ -449,7 +449,7 @@ begin
   // Note: If KeyGenerationTime = kgtAfterInsert and the ID is not assigned then it requests a new ID
   // only if the BlindLevel enables reloading of the assigned ID or if the object contains at least
   // one property with a HasMany or HasOne relation.
-  if (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetConnectionDefName).KeyGenerationTime = kgtAfterInsert) and
+  if (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetTableConnectionName).KeyGenerationTime = kgtAfterInsert) and
     (AContext.BlindLevel_Do_AutoUpdateProps or AContext.GetProperties.ContainsHasManyOrHasOneProperties) and AContext.IDIsNull then
   begin
     LQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
@@ -593,7 +593,7 @@ begin
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Exit;
       // Start transaction
-      LTransactionCollection.StartTransaction(LContext.GetTable.GetConnectionDefName);
+      LTransactionCollection.StartTransaction(LContext.GetTable.GetTableConnectionName);
       // Get the count value for the current resolved type
       NestedMax;
     end;
@@ -645,7 +645,7 @@ begin
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Exit;
       // Start transaction
-      LTransactionCollection.StartTransaction(LContext.GetTable.GetConnectionDefName);
+      LTransactionCollection.StartTransaction(LContext.GetTable.GetTableConnectionName);
       // Get the count value for the current resolved type
       NestedMin;
     end;
@@ -801,7 +801,7 @@ begin
   if LContext.Map.GetTable.IsNotPersistedEntity then
     Exit;
   // Start transaction
-  _DoStartTransaction(LContext.GetTable.GetConnectionDefName);
+  _DoStartTransaction(LContext.GetTable.GetTableConnectionName);
   try
     // Set/Update MasterID property if this is a relation child object (HasMany, HasOne, BelongsTo)
     // NB: (LContext.GetProperties.GetPropertyByName(ARelationPropertyName).GetRelationType = rtNone) perchè altrimenti in alcuni casi particolare dava errori
@@ -849,13 +849,13 @@ begin
 {$ENDIF}
 {$ENDREGION}
     // Commit
-    _DoCommitTransaction(LContext.GetTable.GetConnectionDefName);
+    _DoCommitTransaction(LContext.GetTable.GetTableConnectionName);
 
   except
     on E: Exception do
     begin
       // Rollback
-      _DoRollbackTransaction(LContext.GetTable.GetConnectionDefName);
+      _DoRollbackTransaction(LContext.GetTable.GetTableConnectionName);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
       if _Interceptors_InterceptException(E) then
@@ -1064,7 +1064,7 @@ begin
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
       // Start transaction
-      LTransactionCollection.StartTransaction(LContext.GetTable.GetConnectionDefName);
+      LTransactionCollection.StartTransaction(LContext.GetTable.GetTableConnectionName);
       // Load the current class data into the list
       NestedLoadToMemTable;
     end;
@@ -1177,7 +1177,7 @@ begin
       if LOriginalContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
       // Start transaction
-      LTransactionCollection.StartTransaction(LOriginalContext.GetTable.GetConnectionDefName);
+      LTransactionCollection.StartTransaction(LOriginalContext.GetTable.GetTableConnectionName);
       // Load the current class data into the list
       NestedLoadToList;
     end;
@@ -1278,7 +1278,7 @@ begin
       if LOriginalContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
       // Start transaction
-      LTransactionCollection.StartTransaction(LOriginalContext.GetTable.GetConnectionDefName);
+      LTransactionCollection.StartTransaction(LOriginalContext.GetTable.GetTableConnectionName);
       // Load the current class object is founded
       Result := NestedLoadToObject;
       // If there is a result (an object) then exit;

@@ -95,7 +95,7 @@ begin
       // If FK is between two classes mapped to two different ConnectionDefNames then skip it
       // If one of the twi classes involved in the FK is a NotPersisted entity then skip it
       if AMap.GetTable.IsNotPersistedEntity or LResolvedChildTypeMap.GetTable.IsNotPersistedEntity
-      or (AMap.GetTable.GetConnectionDefName <> LResolvedChildTypeMap.GetTable.GetConnectionDefName) then
+      or (AMap.GetTable.GetTableConnectionName <> LResolvedChildTypeMap.GetTable.GetTableConnectionName) then
         Continue;
       if LProperty.GetRelationType in [rtBelongsTo] then
       begin

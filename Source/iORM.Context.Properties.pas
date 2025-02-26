@@ -642,7 +642,7 @@ begin
   if AClearDelimiters then
     Result := FSqlFieldName
   else
-    Result := TioDbFactory.SqlDataConverter(FTable.GetConnectionDefName).FieldNameToSqlFieldName(FSqlFieldName);
+    Result := TioDbFactory.SqlDataConverter(FTable.GetTableConnectionName).FieldNameToSqlFieldName(FSqlFieldName);
 end;
 
 function TioProperty.GetSqlFieldTableName: String;
@@ -653,8 +653,8 @@ end;
 function TioProperty.GetSqlQualifiedFieldName: String;
 begin
   // Result := FQualifiedSqlFieldName;
-  Result := TioDbFactory.SqlDataConverter(FTable.GetConnectionDefName).FieldNameToSqlFieldName(FSqlFieldTableName) + '.' +
-    TioDbFactory.SqlDataConverter(FTable.GetConnectionDefName).FieldNameToSqlFieldName(FSqlFieldName);
+  Result := TioDbFactory.SqlDataConverter(FTable.GetTableConnectionName).FieldNameToSqlFieldName(FSqlFieldTableName) + '.' +
+    TioDbFactory.SqlDataConverter(FTable.GetTableConnectionName).FieldNameToSqlFieldName(FSqlFieldName);
 end;
 
 function TioProperty.GetSqlParamName: String;
@@ -664,7 +664,7 @@ end;
 
 function TioProperty.GetSqlValue(const ADataObject: TObject): String;
 begin
-  Result := TioDbFactory.SqlDataConverter(FTable.GetConnectionDefName).TValueToSql(Self.GetValue(ADataObject));
+  Result := TioDbFactory.SqlDataConverter(FTable.GetTableConnectionName).TValueToSql(Self.GetValue(ADataObject));
 end;
 
 function TioProperty.GetSqlWhereParamName: String;

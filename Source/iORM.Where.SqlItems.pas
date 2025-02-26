@@ -162,7 +162,7 @@ end;
 function TioSqlItemsWhereTValue.GetSql(const AMap: IioMap): String;
 begin
   // NB: No inherited
-  Result := TioDBFactory.SqlDataConverter(AMap.GetTable.GetConnectionDefName).TValueToSql(FValue);
+  Result := TioDBFactory.SqlDataConverter(AMap.GetTable.GetTableConnectionName).TValueToSql(FValue);
 end;
 
 function TioSqlItemsWhereTValue.HasParameter: Boolean;

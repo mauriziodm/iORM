@@ -222,7 +222,10 @@ end;
 
 destructor TioViewModel.Destroy;
 begin
-
+  // Vedi anche note dentro al metodo TioViewRegisterMVVM.ReleaseAllViewContexts (Carlo Marona)
+  FVMActionContainer := nil;        // Added by Carlo Marona 2025/02/25
+  FViewRegister := nil;             // Added by Carlo Marona 2025/02/25
+  FLocalVCProviderRegister := nil;  // Added by Carlo Marona 2025/02/25
   inherited;
 end;
 

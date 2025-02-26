@@ -2471,7 +2471,7 @@ class function TioDIResolverBase.Resolve(const ATypeName: String; const AAlias: 
         if AUseMapInfo then
         begin
           LMap := TioMapContainer.GetMap(LImplementer.ClazzName);
-          LCurrentConnectionAndTable := LMap.GetTable.GetConnectionDefName + '.' + LMap.GetTable.TableName + '.' + LImplementer.FarAncestorClazzSameInterfaceAndTableAndConnection;
+          LCurrentConnectionAndTable := LMap.GetTable.GetTableConnectionName + '.' + LMap.GetTable.TableName + '.' + LImplementer.FarAncestorClazzSameInterfaceAndTableAndConnection;
         end
         else
           LCurrentConnectionAndTable := '';

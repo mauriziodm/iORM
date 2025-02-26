@@ -70,7 +70,6 @@ type
     class var FThreadSessionData: TioThreadSessionDataContainer;
     class function _InternalGetCurrentConnectionName: String; inline;
     class function _GetThreadOrMainSessionData: IioAuthSessionData; inline;
-    class function _IsEmptyConnectionName(const AConnectionName: String): Boolean; inline;
     class function GetDefaultGlobalConnection: String; static;
     class procedure SetDefaultGlobalConnection(const AConnectionDefName: String); static;
   protected
@@ -88,6 +87,7 @@ type
     // current connection
     class function _GetCurrentConnectionName: String; static;
     class function _GetCurrentConnectionNameIfEmpty(const AConnectionDefName: String): String;
+    class function _IsEmptyConnectionName(const AConnectionName: String): Boolean; inline;
     // main session data
     class function AcquireSessionData: IioAuthSessionData;
     class procedure ReleaseSessionData;

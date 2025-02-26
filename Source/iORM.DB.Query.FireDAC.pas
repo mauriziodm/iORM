@@ -224,7 +224,7 @@ begin
     Exit(FSqlQuery.FieldByName(AProperty.GetSqlFieldAlias).AsInteger);
 
   // Else return the value for the field related to the AProperty as TValue
-  Result := TioDBFactory.SqlDataConverter(AContext.GetTable.GetConnectionDefName).QueryToTValue(Self, AProperty);
+  Result := TioDBFactory.SqlDataConverter(AContext.GetTable.GetTableConnectionName).QueryToTValue(Self, AProperty);
 end;
 
 function TioFDQuery.IsActive: Boolean;
@@ -444,7 +444,7 @@ begin
   // -------------------------------------------------------------------------------------------------------------------------------
   if not AProp.IsBlob then
   begin
-    TioDBFactory.SqlDataConverter(AContext.GetTable.GetConnectionDefName).SetQueryParamByContext(Self, AProp, AContext);
+    TioDBFactory.SqlDataConverter(AContext.GetTable.GetTableConnectionName).SetQueryParamByContext(Self, AProp, AContext);
     Exit;
   end;
   // At this point the property refer to a blob field (and to an Object) type then

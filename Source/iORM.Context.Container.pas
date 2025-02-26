@@ -264,7 +264,7 @@ end;
 class function TioMapContainer.GetConnectionDefName(const AClassName: String): String;
 begin
   if Self.Exist(AClassName) then
-    Result := FInternalContainer.Items[AClassName.ToUpper].GetMap.GetTable.GetConnectionDefName
+    Result := FInternalContainer.Items[AClassName.ToUpper].GetMap.GetTable.GetTableConnectionName
   else
     raise EioGenericException.Create(Self.ClassName + ': class "' + AClassName + '" not found.');
 end;

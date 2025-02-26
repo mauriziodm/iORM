@@ -278,9 +278,17 @@ begin
   // NB: Ho dovuto posticiparlo con un timer perchè altrimenti con i TcxButton
   // della DevExpress c'erano dei problemi in alcuni casi
   // NB: If we are on an uniGUI application then doesn't use the timers but runs the code right away
-  if TioApplication.ProjectPlatform <> ppUniGUI then
-    FFreeViewsTimer.Enabled := True
-  else
+  // NB: Carlo Marona 25/02/2025: Carlo ha commentato le righe sotto togliendo quindi l'uso del timer
+  //      e richiamando direttamente il metodo _PostponedReleaseAllViewContexts, in pratica tutto
+  //      diventa come se si stesse sviluppando sotto uniGUI, in questo modo sembra non dargli
+  //      più quel problema strano degli AV errors quando in una sua applicazione chiudeva una vista
+  //      (ViewModel e tutto). Inoltre nella Destroy del ViewModel ha aggiunto delle righe per
+  //      impostare a nil FVMActionContainer, FViewRegister, FLocalVCProviderRegister.
+  //      Queste modifiche Carlo le ha provate solo su FMX testarle anche con la VCL
+// TODO: Verificare anche vada bene anche con i TCXButton della DevExpress
+//  if TioApplication.ProjectPlatform <> ppUniGUI then
+//    FFreeViewsTimer.Enabled := True
+//  else
     _PostponedReleaseAllViewContexts;
 end;
 

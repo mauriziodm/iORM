@@ -59,6 +59,8 @@ type
     FOriginalNonTrueClassMap: IioMap;
     FPSRequest: IioPersistenceStrategyRequest;
     FSynchroStrategy_Client_NoDirectCall: IioSynchroStrategy_Client;
+    // ConnectionName
+    function GetConnectionName: String;
     // DataObject
     function GetDataObject: TObject;
     procedure SetDataObject(const AValue: TObject);
@@ -166,6 +168,7 @@ type
     // OrderBy
     function GetOrderBySql: String;
     // Properties
+    property ConnectionName: String read GetConnectionName;
     property DataObject: TObject read GetDataObject write SetDataObject;
     property ObjID: Integer read GetObjID write SetObjID;
     property ObjStatus: TioObjStatus read GetObjStatus write SetObjStatus;
@@ -474,6 +477,11 @@ begin
   Result := FConflictState;
 end;
 
+function TioContext.GetConnectionName: String;
+begin
+  Result := GetTable.GetTableConnectionNameIfEmpty(FPSRequest.Connection);
+end;
+
 function TioContext.GetIntentType: TioPersistenceIntentType;
 begin
   Result := FPSRequest.IntentType;
@@ -742,7 +750,7 @@ end;
 function TioContext.SynchroStrategy_Client: IioSynchroStrategy_Client;
 begin
   if not Assigned(FSynchroStrategy_Client_NoDirectCall) then
-    FSynchroStrategy_Client_NoDirectCall := TioConnectionManager.GetSynchroStrategy_Client(GetTable.GetConnectionDefName);
+    FSynchroStrategy_Client_NoDirectCall := TioConnectionManager.GetSynchroStrategy_Client(GetTable.GetTableConnectionName);
   Result := FSynchroStrategy_Client_NoDirectCall;
 end;
 

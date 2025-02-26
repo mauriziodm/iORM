@@ -86,6 +86,9 @@ type
     // OrderBy
     function GetOrderBySql: String;
     // ---------- properties ----------
+    // ConnectionName
+    function GetConnectionName: String;
+    property ConnectionName: String read GetConnectionName;
     // DataObject
     function GetDataObject: TObject;
     procedure SetDataObject(const AValue: TObject);
