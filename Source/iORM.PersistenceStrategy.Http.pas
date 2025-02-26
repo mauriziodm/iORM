@@ -59,11 +59,11 @@ type
     // ---------- End intercepted methods (StrategyInterceptors) ----------
   public
     class procedure _DoDelete(const AWhere: IioWhere); override;
+    class function _DoLoadCount(const AWhere: IioWhere): Integer; override;
     class procedure _DoLoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
+    class function _DoLoadMax(const AWhere: IioWhere; const APropertyName: String): Integer; override;
+    class function _DoLoadMin(const AWhere: IioWhere; const APropertyName: String): Integer; override;
     class function _DoLoadObjectByClassOnly(const APresistenceStrategyRequest: IioPersistenceStrategyRequest; const AWhere: IioWhere; const AObj: TObject): TObject; override;
-    class function _DoCount(const AWhere: IioWhere): Integer; override;
-    class function _DoMax(const AWhere: IioWhere; const APropertyName: String): Integer; override;
-    class function _DoMin(const AWhere: IioWhere; const APropertyName: String): Integer; override;
     // Transaction
     class procedure _DoStartTransaction(const AConnectionDefName: String); override;
     class procedure _DoCommitTransaction(const AConnectionDefName: String); override;
@@ -75,10 +75,10 @@ type
     class procedure _DoSQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); override;
     class procedure _DoSQLDest_Execute(const ASQLDestination: IioSQLDestination); override;
     // Auth
-    class function _DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse; override;
-    class function _DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse; override;
-    class function _DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse; override;
-    class function _DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String): IioAuthResponse; override;
+    class function _DoAuth_User(const AAuthConnectionName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse; override;
+    class function _DoAuth_Access(const AAuthConnectionName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse; override;
+    class function _DoAuth_NewAccessToken(const AAuthConnectionName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse; override;
+    class function _DoAuth_RefreshAccessToken(const AAuthConnectionName: String; const ARefreshToken: String): IioAuthResponse; override;
     // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
   end;
 
@@ -93,7 +93,7 @@ uses
 
 { TioStrategyHttp }
 
-class function TioPersistenceStrategyHttp._DoCount(const AWhere: IioWhere): Integer;
+class function TioPersistenceStrategyHttp._DoLoadCount(const AWhere: IioWhere): Integer;
 var
   LConnection: IioConnectionHttp;
 begin
@@ -108,7 +108,7 @@ begin
   try
     LConnection.ioRequestBody.Clear;
     LConnection.ioRequestBody.Where := AWhere;
-    LConnection.Execute(HTTP_METHOD_NAME_COUNT);
+    LConnection.Execute(HTTP_METHOD_NAME_LOADCOUNT);
     // Deserialize the JSONDataValue to the result object
     Result := LConnection.ioResponseBody.JSONDataValue.AsType<Integer>;
     // Commit
@@ -332,7 +332,7 @@ begin
   raise EioGenericException.Create(Self.ClassName + ': "LoadObjectByClassOnly", method not implemented in this strategy.');
 end;
 
-class function TioPersistenceStrategyHttp._DoMax(const AWhere: IioWhere; const APropertyName: String): Integer;
+class function TioPersistenceStrategyHttp._DoLoadMax(const AWhere: IioWhere; const APropertyName: String): Integer;
 var
   LConnection: IioConnectionHttp;
 begin
@@ -348,7 +348,7 @@ begin
     LConnection.ioRequestBody.Clear;
     LConnection.ioRequestBody.Where := AWhere;
     LConnection.ioRequestBody.RelationPropertyName := APropertyName;
-    LConnection.Execute(HTTP_METHOD_NAME_MAX);
+    LConnection.Execute(HTTP_METHOD_NAME_LOADMAX);
     // Deserialize the JSONDataValue to the result object
     Result := LConnection.ioResponseBody.JSONDataValue.AsType<Integer>;
     // Commit
@@ -360,7 +360,7 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyHttp._DoMin(const AWhere: IioWhere; const APropertyName: String): Integer;
+class function TioPersistenceStrategyHttp._DoLoadMin(const AWhere: IioWhere; const APropertyName: String): Integer;
 var
   LConnection: IioConnectionHttp;
 begin
@@ -376,7 +376,7 @@ begin
     LConnection.ioRequestBody.Clear;
     LConnection.ioRequestBody.Where := AWhere;
     LConnection.ioRequestBody.RelationPropertyName := APropertyName;
-    LConnection.Execute(HTTP_METHOD_NAME_MIN);
+    LConnection.Execute(HTTP_METHOD_NAME_LOADMIN);
     // Deserialize the JSONDataValue to the result object
     Result := LConnection.ioResponseBody.JSONDataValue.AsType<Integer>;
     // Commit
@@ -520,13 +520,13 @@ begin
   TioDBFactory.Connection(AConnectionDefName).StartTransaction;
 end;
 
-class function TioPersistenceStrategyHttp._DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
+class function TioPersistenceStrategyHttp._DoAuth_Access(const AAuthConnectionName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
 var
   LConnection: IioConnectionHttp;
 begin
   inherited;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(AConnectionDefName).AsHttpConnection;
+  LConnection := TioDBFactory.Connection(AAuthConnectionName).AsHttpConnection;
   // Start transaction
   // NB: In this strategy (HTTP) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
@@ -539,7 +539,7 @@ begin
     LConnection.ioRequestBody.AuthIntention := AAuthIntention;
     LConnection.ioRequestBody.AuthToken := AAccessToken;
     // Execute
-    LConnection.Execute(HTTP_METHOD_NAME_AUTH_AUTHORIZEACCESS);
+    LConnection.Execute(HTTP_METHOD_NAME_AUTH_ACCESS);
     // Set result values
     Result := TioAuthFactory.NewAuthResponseFromString( LConnection.ioResponseBody.AuthResult1 );
     // Commit
@@ -551,13 +551,13 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyHttp._DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse;
+class function TioPersistenceStrategyHttp._DoAuth_User(const AAuthConnectionName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse;
 var
   LConnection: IioConnectionHttp;
 begin
   inherited;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(AConnectionDefName).AsHttpConnection;
+  LConnection := TioDBFactory.Connection(AAuthConnectionName).AsHttpConnection;
   // Start transaction
   // NB: In this strategy (HTTP) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
@@ -568,7 +568,7 @@ begin
     LConnection.ioRequestBody.Clear;
     LConnection.ioRequestBody.JSONDataValueAsObject := AUserCredentials as TObject;
     // Execute
-    LConnection.Execute(HTTP_METHOD_NAME_AUTH_AUTHORIZEUSER);
+    LConnection.Execute(HTTP_METHOD_NAME_AUTH_USER);
     // Set result values
     Result := TioAuthFactory.NewAuthResponseFromString( LConnection.ioResponseBody.AuthResult1 );
     // Commit
@@ -580,13 +580,13 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyHttp._DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse;
+class function TioPersistenceStrategyHttp._DoAuth_NewAccessToken(const AAuthConnectionName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse;
 var
   LConnection: IioConnectionHttp;
 begin
   inherited;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(AConnectionDefName).AsHttpConnection;
+  LConnection := TioDBFactory.Connection(AAuthConnectionName).AsHttpConnection;
   // Start transaction
   // NB: In this strategy (HTTP) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
@@ -610,13 +610,13 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyHttp._DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String): IioAuthResponse;
+class function TioPersistenceStrategyHttp._DoAuth_RefreshAccessToken(const AAuthConnectionName: String; const ARefreshToken: String): IioAuthResponse;
 var
   LConnection: IioConnectionHttp;
 begin
   inherited;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(AConnectionDefName).AsHttpConnection;
+  LConnection := TioDBFactory.Connection(AAuthConnectionName).AsHttpConnection;
   // Start transaction
   // NB: In this strategy (HTTP) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not

@@ -60,6 +60,7 @@ type
     // ========== BEGIN OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
     // Persistence
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------
+
     class procedure _DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); override;
     class procedure _DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); override;
     class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType; const ASessionData: IioAuthSessionData); override;
@@ -72,12 +73,12 @@ type
       const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); override;
     // ---------- End intercepted methods (StrategyInterceptors) ----------
     class procedure _DoDelete(const AWhere: IioWhere); override;
+    class function _DoLoadCount(const AWhere: IioWhere): Integer; override;
     class procedure _DoLoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
+    class function _DoLoadMax(const AWhere: IioWhere; const APropertyName: String): Integer; override;
+    class function _DoLoadMin(const AWhere: IioWhere; const APropertyName: String): Integer; override;
     class function _DoLoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType; const ASessionData: IioAuthSessionData): TObject; override;
     class function _DoLoadObjVersion(const AContext: IioContext): Integer; override;
-    class function _DoCount(const AWhere: IioWhere): Integer; override;
-    class function _DoMax(const AWhere: IioWhere; const APropertyName: String): Integer; override;
-    class function _DoMin(const AWhere: IioWhere; const APropertyName: String): Integer; override;
     // Transaction
     class procedure _DoStartTransaction(const AConnectionDefName: String); override;
     class procedure _DoCommitTransaction(const AConnectionDefName: String); override;
@@ -89,10 +90,10 @@ type
     class procedure _DoSQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); override;
     class procedure _DoSQLDest_Execute(const ASQLDestination: IioSQLDestination); override;
     // Auth
-    class function _DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse; override;
-    class function _DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse; override;
-    class function _DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse; override;
-    class function _DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String): IioAuthResponse; override;
+    class function _DoAuth_User(const AAuthConnectionName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse; override;
+    class function _DoAuth_Access(const AAuthConnectionName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse; override;
+    class function _DoAuth_NewAccessToken(const AAuthConnectionName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse; override;
+    class function _DoAuth_RefreshAccessToken(const AAuthConnectionName: String; const ARefreshToken: String): IioAuthResponse; override;
     // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
   end;
 
@@ -125,23 +126,23 @@ type
 
 { TioStrategyDB }
 
-class function TioPersistenceStrategyDB._DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
+class function TioPersistenceStrategyDB._DoAuth_Access(const AAuthConnectionName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
 begin
   Result := TioAuthServer.GetInstance.AuthorizeAccess(AScope, AAuthIntention, AAccessToken);
 end;
 
-class function TioPersistenceStrategyDB._DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse;
+class function TioPersistenceStrategyDB._DoAuth_User(const AAuthConnectionName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse;
 begin
   Result := TioAuthServer.GetInstance.AuthorizeUser(AUserCredentials);
 end;
 
-class function TioPersistenceStrategyDB._DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse;
+class function TioPersistenceStrategyDB._DoAuth_NewAccessToken(const AAuthConnectionName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse;
 begin
 // TODO: AUTH: da reimplementare
 //  Result := TioAuthServer.GetInstance.NewAccessToken(AAuthorizationToken);
 end;
 
-class function TioPersistenceStrategyDB._DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String): IioAuthResponse;
+class function TioPersistenceStrategyDB._DoAuth_RefreshAccessToken(const AAuthConnectionName: String; const ARefreshToken: String): IioAuthResponse;
 begin
   Result := TioAuthServer.GetInstance.RefreshAccessToken(ARefreshToken);
 end;
@@ -152,7 +153,7 @@ begin
   TioDBFactory.Connection(AConnectionDefName).Commit;
 end;
 
-class function TioPersistenceStrategyDB._DoCount(const AWhere: IioWhere): Integer;
+class function TioPersistenceStrategyDB._DoLoadCount(const AWhere: IioWhere): Integer;
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
@@ -554,7 +555,7 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyDB._DoMax(const AWhere: IioWhere; const APropertyName: String): Integer;
+class function TioPersistenceStrategyDB._DoLoadMax(const AWhere: IioWhere; const APropertyName: String): Integer;
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
@@ -606,7 +607,7 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyDB._DoMin(const AWhere: IioWhere; const APropertyName: String): Integer;
+class function TioPersistenceStrategyDB._DoLoadMin(const AWhere: IioWhere; const APropertyName: String): Integer;
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;

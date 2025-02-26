@@ -98,11 +98,11 @@ begin
       _PersistList(LioRequestBody, LioResponseBody)
     else if LioRequestBody.MethodName = HTTP_METHOD_NAME_DELETELIST then
       _DeleteList(LioRequestBody, LioResponseBody)
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_MAX then
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_LOADMAX then
       _Max(LioRequestBody, LioResponseBody)
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_MIN then
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_LOADMIN then
       _Min(LioRequestBody, LioResponseBody)
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_COUNT then
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_LOADCOUNT then
       _Count(LioRequestBody, LioResponseBody)
     else if LioRequestBody.MethodName = HTTP_METHOD_NAME_DELETE then
       _Delete(LioRequestBody, LioResponseBody)
@@ -115,13 +115,13 @@ begin
     else if LioRequestBody.MethodName = HTTP_METHOD_NAME_DOSYNCHRONIZATION then
       _DoSynchronization(LioRequestBody, LioResponseBody)
     // auth methods
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_AUTHORIZEACCESS then
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_ACCESS then
       _AuthorizeAccess(LioRequestBody, LioResponseBody)
     else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_REFRESHACCESSTOKEN then
       _RefreshAccessToken(LioRequestBody, LioResponseBody)
     else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_NEWACCESSTOKEN then
       _NewAccessToken(LioRequestBody, LioResponseBody)
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_AUTHORIZEUSER then
+    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_USER then
       _AuthorizeUser(LioRequestBody, LioResponseBody)
     // else
     else

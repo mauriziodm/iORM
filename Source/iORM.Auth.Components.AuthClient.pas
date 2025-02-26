@@ -201,7 +201,7 @@ begin
   end;
   // if the access request was not handled then use the internal implementation
   if not LDone then
-    Result := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).AuthorizeAccess(FConnectionName, AScope, AAuthIntention, AAccessToken);
+    Result := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).Auth_Access(FConnectionName, AScope, AAuthIntention, AAccessToken);
   // invoke AfterAuthorizeAccess if assigned
   if Assigned(FAfterAuthorizeAccess) then
     FAfterAuthorizeAccess(Self, AScope, AAuthIntention, AAccessToken, Result);
@@ -265,7 +265,7 @@ begin
   end;
   // if the creation of the token was not handled then use the internal implementation
   if not LDone then
-    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).AuthorizeUser(FConnectionName, AUserCredentials);
+    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).Auth_User(FConnectionName, AUserCredentials);
   // invoke AfterAuthorizeUser if assigned
   if Assigned(FAfterAuthorizeUser) then
     FAfterAuthorizeUser(Self, AUserCredentials, LAuthResponse);

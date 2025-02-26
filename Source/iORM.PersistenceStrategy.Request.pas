@@ -3,7 +3,7 @@ unit iORM.PersistenceStrategy.Request;
 interface
 
 uses
-  iORM.CommonTypes, iORM.PersistenceStrategy.Interfaces;
+  iORM.CommonTypes, iORM.PersistenceStrategy.Interfaces, iORM.Auth.Interfaces;
 
 type
 
@@ -17,9 +17,9 @@ type
     FUsr: String;
     FUsrOID: Integer;
     // auth
-    FAuthGrant: String; // NEW
-    FAuthIntention: TioAuthIntention; // NEW
-    FAuthScope: String; // NEW
+    FAuthGrant: String;
+    FAuthIntention: TioAuthIntention;
+    FAuthScope: String;
     FAuthToken: String; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
     // instances
     FDataObj: TObject;
@@ -113,7 +113,7 @@ type
 implementation
 
 uses
-  iORM.Abstraction, iORM.Auth.Interfaces;
+  iORM.Abstraction;
 
 { TioPersistenceStrategyRequest }
 

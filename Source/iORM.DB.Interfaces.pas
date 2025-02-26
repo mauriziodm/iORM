@@ -442,36 +442,36 @@ type
     // ========== BEGIN OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
     // Persistence
     // ---------- Begin intercepted methods (CRUDInterceptors) ----------
-    class procedure _DoDeleteList(const APSRequest: IioPersistenceStrategyRequest; const AList: TObject); virtual; abstract;
-    class procedure _DoDeleteObject(const APSRequest: IioPersistenceStrategyRequest; const AObj: TObject); virtual; abstract;
-    class procedure _DoLoadList(const APSRequest: IioPersistenceStrategyRequest; const AWhere: IioWhere; const AList: TObject); virtual; abstract;
-    class function _DoLoadObject(const APSRequest: IioPersistenceStrategyRequest; const AWhere: IioWhere; const AObj: TObject): TObject; virtual; abstract;
-    class procedure _DoPersistList(const APSRequest: IioPersistenceStrategyRequest; const AList: TObject; const AMasterBSPersistence: TioBSPersistence); virtual; abstract;
-    class procedure _DoPersistObject(const APSRequest: IioPersistenceStrategyRequest; const AObj: TObject; const AMasterBSPersistence: TioBSPersistence); virtual; abstract;
+    class procedure _DoDeleteList(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
+    class procedure _DoDeleteObject(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
+    class procedure _DoLoadList(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
+    class function _DoLoadObject(const APSRequest: IioPersistenceStrategyRequest): TObject; virtual; abstract;
+    class procedure _DoPersistList(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
+    class procedure _DoPersistObject(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     // ---------- End intercepted methods (CRUDInterceptors) ----------
-    class function _DoCount(const AWhere: IioWhere): Integer; virtual;
-    class procedure _DoDelete(const AWhere: IioWhere); virtual;
-    class function _DoLoadObjectByClassOnly(const APresistenceStrategyRequest: IioPersistenceStrategyRequest; const AWhere: IioWhere; const AObj: TObject): TObject; virtual;
-    class procedure _DoLoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); virtual;
-    class function _DoLoadObjVersion(const AContext: IioContext): Integer; virtual; abstract;
-    class function _DoMax(const AWhere: IioWhere; const APropertyName: String): Integer; virtual;
-    class function _DoMin(const AWhere: IioWhere; const APropertyName: String): Integer; virtual;
+    class procedure _DoDelete(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
+    class function _DoLoadCount(const APSRequest: IioPersistenceStrategyRequest): Integer; virtual;
+    class procedure _DoLoadDataSet(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
+    class function _DoLoadMax(const APSRequest: IioPersistenceStrategyRequest): Integer; virtual;
+    class function _DoLoadMin(const APSRequest: IioPersistenceStrategyRequest): Integer; virtual;
+    class function _DoLoadObjectByClassOnly(const APresistenceStrategyRequest: IioPersistenceStrategyRequest): TObject; virtual;
+    class function _DoLoadObjVersion(const APSRequest: IioPersistenceStrategyRequest): Integer; virtual; abstract;
     // Transaction
-    class procedure _DoStartTransaction(const AConnectionDefName: String); virtual; abstract;
-    class procedure _DoCommitTransaction(const AConnectionDefName: String); virtual; abstract;
-    class procedure _DoRollbackTransaction(const AConnectionDefName: String); virtual; abstract;
-    class function _DoInTransaction(const AConnectionDefName: String): Boolean; virtual; abstract;
+    class procedure _DoStartTransaction(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
+    class procedure _DoCommitTransaction(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
+    class procedure _DoRollbackTransaction(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
+    class function _DoInTransaction(const APSRequest: IioPersistenceStrategyRequest): Boolean; virtual; abstract;
     // SynchroStrategy
-    class procedure _DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload); virtual; abstract;
+    class procedure _DoSynchronization(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     // SQLDestinations
-    class procedure _DoSQLDest_Execute(const ASQLDestination: IioSQLDestination); virtual; abstract;
-    class procedure _DoSQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); virtual; abstract;
+    class procedure _DoSQLDest_Execute(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
+    class procedure _DoSQLDest_LoadDataSet(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     // Auth
-    class function _DoAuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials): IioAuthResponse; virtual; abstract;
-    class function _DoAuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse; virtual; abstract;
-    class function _DoAuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse; virtual; abstract;
-    class function _DoAuth_NewAccessToken(const AConnectionDefName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse; virtual; abstract;
-    class function _DoAuth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String): IioAuthResponse; virtual; abstract;
+    class function _DoAuth_App(const APSRequest: IioPersistenceStrategyRequest): IioAuthResponse; virtual; abstract;
+    class function _DoAuth_User(const APSRequest: IioPersistenceStrategyRequest): IioAuthResponse; virtual; abstract;
+    class function _DoAuth_Access(const APSRequest: IioPersistenceStrategyRequest): IioAuthResponse; virtual; abstract;
+    class function _DoAuth_NewAccessToken(const APSRequest: IioPersistenceStrategyRequest): IioAuthResponse; virtual; abstract;
+    class function _DoAuth_RefreshAccessToken(const APSRequest: IioPersistenceStrategyRequest): IioAuthResponse; virtual; abstract;
     // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
   public
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------
@@ -489,23 +489,23 @@ type
     class function InTransaction(const AConnectionDefName: String): Boolean;
     // Persistence
     class procedure Delete(const AWhere: IioWhere);
+    class function LoadCount(const AWhere: IioWhere): Integer;
     class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
+    class function LoadMax(const AWhere: IioWhere; const APropertyName: String): Integer;
+    class function LoadMin(const AWhere: IioWhere; const APropertyName: String): Integer;
     class function LoadObjectByClassOnly(const APSRequest: IioPersistenceStrategyRequest; const AWhere: IioWhere; const AObj: TObject): TObject;
     class function LoadObjVersion(const AContext: IioContext): Integer;
-    class function Count(const AWhere: IioWhere): Integer;
-    class function Max(const AWhere: IioWhere; const APropertyName: String): Integer;
-    class function Min(const AWhere: IioWhere; const APropertyName: String): Integer;
     // SynchroStrategy
     class procedure DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload);
     // SQLDestinations
     class procedure SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet);
     class procedure SQLDest_Execute(const ASQLDestination: IioSQLDestination);
     // Auth
-    class function AuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials): IioAuthResponse;
-    class function AuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse;
-    class function AuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
-    class function Auth_NewAccessToken(const AConnectionDefName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse;
-    class function Auth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String): IioAuthResponse;
+    class function Auth_App(const AAuthConnectionName: String; const AAppCredentials: IioAuthAppCredentials): IioAuthResponse;
+    class function Auth_User(const AAuthConnectionName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse;
+    class function Auth_Access(const AAuthConnectionName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
+    class function Auth_NewAccessToken(const AAuthConnectionName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse;
+    class function Auth_RefreshAccessToken(const AAuthConnectionName: String; const ARefreshToken: String): IioAuthResponse;
   end;
 
 implementation
@@ -897,29 +897,29 @@ end;
 
 { TioStrategyIntf }
 
-class function TioPersistenceStrategyIntf.AuthorizeAccess(const AConnectionDefName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
+class function TioPersistenceStrategyIntf.Auth_Access(const AAuthConnectionName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
 begin
-  Result := _DoAuthorizeAccess(AConnectionDefName, AScope, AAuthIntention, AAccessToken);
+  Result := _DoAuth_Access(AAuthConnectionName, AScope, AAuthIntention, AAccessToken);
 end;
 
-class function TioPersistenceStrategyIntf.AuthorizeApp(const AConnectionDefName: String; const AAppCredentials: IioAuthAppCredentials): IioAuthResponse;
+class function TioPersistenceStrategyIntf.Auth_App(const AAuthConnectionName: String; const AAppCredentials: IioAuthAppCredentials): IioAuthResponse;
 begin
-  Result := _DoAuthorizeApp(AConnectionDefName, AAppCredentials);
+  Result := _DoAuth_App(AAuthConnectionName, AAppCredentials);
 end;
 
-class function TioPersistenceStrategyIntf.AuthorizeUser(const AConnectionDefName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse;
+class function TioPersistenceStrategyIntf.Auth_User(const AAuthConnectionName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse;
 begin
-  Result := _DoAuthorizeUser(AConnectionDefName, AUserCredentials);
+  Result := _DoAuth_User(AAuthConnectionName, AUserCredentials);
 end;
 
-class function TioPersistenceStrategyIntf.Auth_NewAccessToken(const AConnectionDefName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse;
+class function TioPersistenceStrategyIntf.Auth_NewAccessToken(const AAuthConnectionName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse;
 begin
-  Result := _DoAuth_NewAccessToken(AConnectionDefName, AAuthGrant, APkceCodeVerifier);
+  Result := _DoAuth_NewAccessToken(AAuthConnectionName, AAuthGrant, APkceCodeVerifier);
 end;
 
-class function TioPersistenceStrategyIntf.Auth_RefreshAccessToken(const AConnectionDefName: String; const ARefreshToken: String): IioAuthResponse;
+class function TioPersistenceStrategyIntf.Auth_RefreshAccessToken(const AAuthConnectionName: String; const ARefreshToken: String): IioAuthResponse;
 begin
-  Result := _DoAuth_RefreshAccessToken(AConnectionDefName, ARefreshToken);
+  Result := _DoAuth_RefreshAccessToken(AAuthConnectionName, ARefreshToken);
 end;
 
 class procedure TioPersistenceStrategyIntf.CommitTransaction(const AConnectionDefName: String);
@@ -927,53 +927,39 @@ begin
   _DoCommitTransaction(AConnectionDefName);
 end;
 
-class function TioPersistenceStrategyIntf._DoCount(const AWhere: IioWhere): Integer;
+class function TioPersistenceStrategyIntf._DoLoadCount(const APSRequest: IioPersistenceStrategyRequest): Integer;
 begin
   Result := 0;
-  AWhere.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
 
-class procedure TioPersistenceStrategyIntf._DoDelete(const AWhere: IioWhere);
-begin
-  AWhere.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
-end;
-
-class procedure TioPersistenceStrategyIntf._DoLoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
-begin
-  AWhere.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
-end;
-
-class function TioPersistenceStrategyIntf._DoLoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType; const ASessionData: IioAuthSessionData): TObject;
+class function TioPersistenceStrategyIntf._DoLoadObjectByClassOnly(const APresistenceStrategyRequest: IioPersistenceStrategyRequest): TObject;
 begin
   Result := nil;
-  AWhere.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
 
-class function TioPersistenceStrategyIntf._DoMax(const AWhere: IioWhere; const APropertyName: String): Integer;
+class function TioPersistenceStrategyIntf._DoLoadMax(const APSRequest: IioPersistenceStrategyRequest): Integer;
 begin
   Result := 0;
-  AWhere.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
 
-class function TioPersistenceStrategyIntf.Max(const AWhere: IioWhere; const APropertyName: String): Integer;
+class function TioPersistenceStrategyIntf.LoadMax(const AWhere: IioWhere; const APropertyName: String): Integer;
 begin
-  Result := _DoMax(AWhere, APropertyName);
+  Result := _DoLoadMax(AWhere, APropertyName);
 end;
 
-class function TioPersistenceStrategyIntf.Min(const AWhere: IioWhere; const APropertyName: String): Integer;
+class function TioPersistenceStrategyIntf.LoadMin(const AWhere: IioWhere; const APropertyName: String): Integer;
 begin
-  Result := _DoMin(AWhere, APropertyName);
+  Result := _DoLoadMin(AWhere, APropertyName);
 end;
 
-class function TioPersistenceStrategyIntf._DoMin(const AWhere: IioWhere; const APropertyName: String): Integer;
+class function TioPersistenceStrategyIntf._DoLoadMin(const APSRequest: IioPersistenceStrategyRequest): Integer;
 begin
   Result := 0;
-  AWhere.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
 
-class function TioPersistenceStrategyIntf.Count(const AWhere: IioWhere): Integer;
+class function TioPersistenceStrategyIntf.LoadCount(const AWhere: IioWhere): Integer;
 begin
-  Result := _DoCount(AWhere);
+  Result := _DoLoadCount(AWhere);
 end;
 
 class procedure TioPersistenceStrategyIntf.Delete(const AWhere: IioWhere);

@@ -855,7 +855,7 @@ end;
 
 function TioWhere.Count: Integer;
 begin
-  Result := TioPersistenceStrategyFactory.GetStrategy('').Count(Self);
+  Result := TioPersistenceStrategyFactory.GetStrategy('').LoadCount(Self);
 end;
 
 function TioWhere.GetClearListBefore: Boolean;
@@ -1041,12 +1041,12 @@ end;
 
 function TioWhere.Max(const APropertyName: String): Integer;
 begin
-  Result := TioPersistenceStrategyFactory.GetStrategy('').Max(Self, APropertyName);
+  Result := TioPersistenceStrategyFactory.GetStrategy('').LoadMax(Self, APropertyName);
 end;
 
 function TioWhere.Min(const APropertyName: String): Integer;
 begin
-  Result := TioPersistenceStrategyFactory.GetStrategy('').Min(Self, APropertyName);
+  Result := TioPersistenceStrategyFactory.GetStrategy('').LoadMin(Self, APropertyName);
 end;
 
 function TioWhere.NotExists: Boolean;

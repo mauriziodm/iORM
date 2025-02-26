@@ -74,10 +74,11 @@ type
   // *************************************************************************
 
   TioPersistenceStrategyMethod = (
+    psmAuthAccess,
     psmAuthApp,
-    psmAuthUser,
     psmAuthNewAccessToken,
     psmAuthRefreshAccessToken,
+    psmAuthUser,
     psmCount,
     psmDelete,
     psmDeleteList,
@@ -85,13 +86,19 @@ type
     psmDoSynchronization,
     psmLoadDataSet,
     psmLoadList,
+    psmLoadMax,
+    psmLoadMin,
     psmLoadObject,
-    psmMax,
-    psmMin,
+    psmLoadObjectByClassOnly,
+    psmLoadObjVersion,
     psmPersistList,
     psmPersistObject,
     psmSQLDestExecute,
     psmSQLDestLoadDataSet,
+    psmTransactionCommit,
+    psmTransactionIn,
+    psmTransactionRollback,
+    psmTransactionStart,
     psmTest
   );
 

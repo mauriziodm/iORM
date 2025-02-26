@@ -37,26 +37,27 @@ interface
 
 const
 
-  HTTP_METHOD_NAME_COUNT = 'Count';
   HTTP_METHOD_NAME_DELETE = 'Delete';
   HTTP_METHOD_NAME_DELETELIST = 'DeleteList';
   HTTP_METHOD_NAME_DELETEOBJECT = 'DeleteObject';
   HTTP_METHOD_NAME_DOSYNCHRONIZATION = 'DoSynchronization';
+  HTTP_METHOD_NAME_LOADCOUNT = 'Count';
   HTTP_METHOD_NAME_LOADDATASET = 'LoadDataSet';
   HTTP_METHOD_NAME_LOADLIST = 'LoadList';
+  HTTP_METHOD_NAME_LOADMAX = 'Max';
+  HTTP_METHOD_NAME_LOADMIN = 'Min';
   HTTP_METHOD_NAME_LOADOBJECT = 'LoadObject';
-  HTTP_METHOD_NAME_MAX = 'Max';
-  HTTP_METHOD_NAME_MIN = 'Min';
   HTTP_METHOD_NAME_PERSISTLIST = 'PersistList';
   HTTP_METHOD_NAME_PERSISTOBJECT = 'PersistObject';
   HTTP_METHOD_NAME_SQLDESTEXECUTE = 'SQLDestExecute';
   HTTP_METHOD_NAME_SQLDESTLOADDATASET = 'SQLDestLoadDataSet';
   HTTP_METHOD_NAME_TEST = 'Test';
   // auth
-  HTTP_METHOD_NAME_AUTH_AUTHORIZEUSER = '_AuthorizeUser';
-  HTTP_METHOD_NAME_AUTH_AUTHORIZEACCESS = '_AuthorizeAccess';
-  HTTP_METHOD_NAME_AUTH_NEWACCESSTOKEN = '_NewAccessToken';
-  HTTP_METHOD_NAME_AUTH_REFRESHACCESSTOKEN = '_RefreshAccessToken';
+  HTTP_METHOD_NAME_AUTH_APP = '_Auth_App';
+  HTTP_METHOD_NAME_AUTH_USER = '_Auth_User';
+  HTTP_METHOD_NAME_AUTH_ACCESS = '_Auth_Access';
+  HTTP_METHOD_NAME_AUTH_NEWACCESSTOKEN = '_Auth_NewAccessToken';
+  HTTP_METHOD_NAME_AUTH_REFRESHACCESSTOKEN = '_Auth_RefreshAccessToken';
 
   // All the interfaces declared here are moved on iORM.DB.Interfacex to avoi
   //  a circular reference error (IioHttpRequestBody, IioHttpResponseBody)
