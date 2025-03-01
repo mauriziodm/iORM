@@ -98,8 +98,7 @@ type
     psmTransactionCommit,
     psmTransactionIn,
     psmTransactionRollback,
-    psmTransactionStart,
-    psmTest
+    psmTransactionStart
   );
 
   IioPersistenceStrategyRequest = interface
@@ -144,7 +143,7 @@ type
     procedure SetRelationOID(const Value: Integer);
     procedure SetRelationPropName(const Value: String);
     procedure SetWhere(const Value: IioWhere);
-    // method
+    // method property
     property Method: TioPersistenceStrategyMethod read GetMethod;
     // session data
     property App: String read GetApp;
@@ -172,6 +171,15 @@ type
     property PropName: String read GetPropName write SetPropName;
     property RelationOID: Integer read GetRelationOID write SetRelationOID;
     property RelationPropName: String read GetRelationPropName write SetRelationPropName;
+  end;
+
+  IioPersistenceStrategyRequest<TResult> = interface(IioPersistenceStrategyRequest)
+    ['{FF839CAE-788B-48B3-B801-916DF87A80CA}']
+    // methods
+    function GetResult: TResult;
+    procedure SetResult(const Value: TResult);
+    // properties
+    property Result: TResult read GetResult write SetResult;
   end;
 
 implementation

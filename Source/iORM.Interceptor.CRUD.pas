@@ -51,8 +51,8 @@ type
   TioCustomCRUDInterceptor = class
   public
     // Obj load
-    class function BeforeLoad(const AContext: IioContext; const AObj: TObject; var ADone: Boolean): TObject; virtual;
-    class function AfterLoad(const AContext: IioContext; const AObj: TObject): TObject; virtual;
+    class procedure BeforeLoad(const AContext: IioContext; var ADone: Boolean); virtual;
+    class procedure AfterLoad(const AContext: IioContext); virtual;
     class function OnLoadException(const AContext: IioContext; const AException: Exception): Boolean; virtual;
     // Obj insert
     class procedure BeforeInsert(const AContext: IioContext; var ADone: Boolean); virtual;
@@ -72,9 +72,9 @@ implementation
 
 { TioCustomObjCrudIncerceptor }
 
-class function TioCustomCRUDInterceptor.AfterLoad(const AContext: IioContext; const AObj: TObject): TObject;
+class procedure TioCustomCRUDInterceptor.AfterLoad(const AContext: IioContext);
 begin
-  Result := AObj;
+  // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
 class procedure TioCustomCRUDInterceptor.AfterDelete(const AContext: IioContext);
@@ -92,9 +92,9 @@ begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class function TioCustomCRUDInterceptor.BeforeLoad(const AContext: IioContext; const AObj: TObject; var ADone: Boolean): TObject;
+class procedure TioCustomCRUDInterceptor.BeforeLoad(const AContext: IioContext; var ADone: Boolean);
 begin
-  Result := AObj;
+  // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
 class procedure TioCustomCRUDInterceptor.BeforeDelete(const AContext: IioContext; var ADone: Boolean);

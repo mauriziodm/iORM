@@ -50,7 +50,9 @@ type
     // ========== BEGIN OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
     // persistence
     // ---------- Begin intercepted methods (StrategyInterceptors) ----------
-    class procedure _DoDeleteList(const APSRequest: IioPersistenceStrategyRequest; const AList: TObject); override
+
+    class procedure _DoDeleteList(const APSRequest: IioPersistenceStrategyRequest); override
+
     class procedure _DoDeleteObject(const APSRequest: IioPersistenceStrategyRequest; const AObj: TObject); override;
     class procedure _DoLoadList(const APSRequest: IioPersistenceStrategyRequest; const AWhere: IioWhere; const AList: TObject); override;
     class function _DoLoadObject(const APSRequest: IioPersistenceStrategyRequest; const AWhere: IioWhere; const AObj: TObject): TObject; virtual; override;
@@ -167,16 +169,16 @@ begin
   APayload.Finalize;
 end;
 
-class procedure TioPersistenceStrategyHttp._DoDeleteList(const APSRequest: IioPersistenceStrategyRequest; const AList: TObject);
+class procedure TioPersistenceStrategyHttp._DoDeleteList(const APSRequest: IioPersistenceStrategyRequest);
 var
   LConnection: IioConnectionHttp;
 begin
   inherited;
   // Check
-  if not Assigned(AList) then
+  if not Assigned(APSRequest.DataObj) then
     Exit;
   // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection('').AsHttpConnection;
+  LConnection := TioDBFactory.Connection(APSRequest.Connection).AsHttpConnection;
   // Start transaction
   // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
   // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
@@ -184,10 +186,9 @@ begin
   LConnection.StartTransaction;
   try
     LConnection.ioRequestBody.Clear;
-    LConnection.ioRequestBody.SessionData := ASessionData;
-    LConnection.ioRequestBody.BlindLevel := ABlindLevel;
-    LConnection.ioRequestBody.IntentType := AIntent;
-    LConnection.ioRequestBody.JSONDataValueAsObject := AList;
+    LConnection.ioRequestBody.BlindLevel := APSRequest.BlindLevel;
+    LConnection.ioRequestBody.IntentType := APSRequest.Intent;
+    LConnection.ioRequestBody.JSONDataValueAsObject := APSRequest.DataObj;
     LConnection.Execute(HTTP_METHOD_NAME_PERSISTLIST);
     // Commit
     LConnection.Commit;

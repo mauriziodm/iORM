@@ -69,7 +69,7 @@ type
     class function CreateObjectByRttiTypeEx(const ARttiType: TRttiType; var AConstructorParams: TioConstructorParams): TObject; static;
     class function CreateListByClassRef(const AClassRef: TClass; const AOwnsObjects: Boolean = True): TObject; inline;
     class function CreateListByRttiType(const ARttiType: TRttiType; const AOwnsObject: Boolean = True): TObject; static;
-    class function MakeObject(const AContext: IioContext; const AQuery: IioQuery): TObject; virtual; abstract;
+    class procedure MakeObject(const AContext: IioContext; const AQuery: IioQuery); virtual; abstract;
   end;
 
 implementation

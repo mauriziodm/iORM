@@ -285,7 +285,6 @@
         <DCCReference Include="..\..\Source\iORM.PersistenceStrategy.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.PersistenceStrategy.Factory.pas"/>
         <DCCReference Include="..\..\Source\iORM.PersistenceStrategy.Http.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Http.Body.Request.pas"/>
         <DCCReference Include="..\..\Source\iORM.Http.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.Http.Body.Response.pas"/>
         <DCCReference Include="..\..\Source\iORM.Http.Factory.pas"/>
@@ -487,7 +486,7 @@
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\osx64\libcgsqlite3.dylib" Class="DependencyModule"/>
                 <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\iORM_Project.bpl" Configuration="Debug" Class="ProjectOutput"/>
-                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\iORM_RT.bpl" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\iORM_RT280.bpl" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>iORM_RT.bpl</RemoteName>
                         <Overwrite>true</Overwrite>

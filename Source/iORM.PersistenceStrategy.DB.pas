@@ -1090,7 +1090,7 @@ var
   procedure NestedLoadToList;
   var
     LQuery: IioQuery;
-    LObj: TObject;
+    LCurrentObj: TObject;
     LCurrentContext: IioContext;
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
@@ -1122,21 +1122,21 @@ var
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
           LDoneByInterceptor := False;
-          LObj := TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext, nil, LDoneByInterceptor);
-          LCurrentContext.DataObject := LObj;
+          LCurrentObj := TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext, nil, LDoneByInterceptor);
+          LCurrentContext.DataObject := LCurrentObj;
           if not LDoneByInterceptor then
           begin
 {$ENDIF}
 {$ENDREGION}
-            LObj := TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
+            LCurrentObj := TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-            LObj := TioCRUDInterceptorRegister.AfterLoad(LCurrentContext, LObj);
+            LCurrentObj := TioCRUDInterceptorRegister.AfterLoad(LCurrentContext, LCurrentObj);
           end;
 {$ENDIF}
 {$ENDREGION}
           // Add current object to the list
-          LDuckTypedList.Add(LObj);
+          LDuckTypedList.Add(LCurrentObj);
           // Next
           LQuery.Next;
         end;

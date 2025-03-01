@@ -38,10 +38,10 @@ type
   public
     constructor Create;
     constructor CreateByJSONString(const AJSONString: String);
+    function AsString: String;
     function HasAutGnt: Boolean;
     function HasRefTkn: Boolean;
     function HasAccTkn: Boolean;
-    function AsString: String;
     // properties
     property IsAuth: Boolean read GetIsAuth write SetIsAuth;
     // session subjects

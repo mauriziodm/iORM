@@ -45,7 +45,7 @@ type
   // Standard Object Maker
   TioObjectMakerStrictlyTrueClass = class(TioObjectMakerIntf)
   public
-    class function MakeObject(const AContext:IioContext; const AQuery:IioQuery): TObject; override;
+    class procedure MakeObject(const AContext:IioContext; const AQuery:IioQuery); override;
   end;
 
 implementation
@@ -56,7 +56,7 @@ uses
 
 { TioObjectMakerTrueClass }
 
-class function TioObjectMakerStrictlyTrueClass.MakeObject(const AContext: IioContext; const AQuery: IioQuery): TObject;
+class procedure TioObjectMakerStrictlyTrueClass.MakeObject(const AContext:IioContext; const AQuery:IioQuery);
 var
   LRttiInstanceType: TRttiInstanceType;
   LClassName: String;
@@ -69,7 +69,7 @@ begin
   if not Assigned(LRttiInstanceType) then
     raise EioGenericException.Create(Self.ClassName + ': RttiType not found (' + LClassName + ')');
   // Load object
-  Result := io.Load(LRttiInstanceType.MetaclassType).ByID(AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext).AsInteger)
+  AContext.DataObject := io.Load(LRttiInstanceType.MetaclassType).ByID(AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext).AsInteger)
                                            .SetDetailsContainer(AContext.Where.Details)  // Copy the details from the Where  of the Context
                                            .DisableStrictlyTrueClass
                                            .Cacheable

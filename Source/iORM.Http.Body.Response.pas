@@ -43,10 +43,11 @@ type
   TioHttpResponseBody = class(TInterfacedObject, IioHttpResponseBody)
   private
     // auth
-    // TODO: Auth - non serve più?
+    // TODO: Auth - non serve più perchè tanto questo tipo di risposte incapsulano una TioAuthResponse?
     FAuthResultIsAuthorized: Boolean;
+    // TODO: Auth - non serve più perchè tanto questo tipo di risposte incapsulano una TioAuthResponse?
     FAuthResult1: String;
-    // TODO: Auth - non serve più?
+    // TODO: Auth - non serve più perchè tanto questo tipo di risposte incapsulano una TioAuthResponse?
     FAuthResult2: String;
     // others
     FExceptionClassName: String;

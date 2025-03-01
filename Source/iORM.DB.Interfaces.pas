@@ -48,7 +48,7 @@ uses
   FireDAC.Comp.DataSet, iORM.LiveBindings.BSPersistence,
   iORM.Where.SqlItems.Interfaces, iORM.Context.Map.Interfaces,
   iORM.SynchroStrategy.Interfaces, iORM.SynchroStrategy.Custom,
-  iORM.PersistenceStrategy.Interfaces, iORM.Auth.Interfaces;
+  iORM.PersistenceStrategy.Interfaces, iORM.Auth.Interfaces, iORM.Exceptions;
 
 const
   OBJVERSION_NULL = 0;
@@ -171,15 +171,14 @@ type
     procedure LastTransactionTimestampReset;
   end;
 
-  IioHttpRequestBody = interface;
   IioHttpResponseBody = interface;
 
   IioConnectionHttp = interface(IioConnection)
     ['{E29F952A-E7E5-44C7-A3BE-09C4F2939060}']
     procedure Execute(const AResource: String);
-    // ioRequestBody property
-    function GetioRequestBody: IioHttpRequestBody;
-    property ioRequestBody: IioHttpRequestBody read GetioRequestBody;
+    // persistence strategy request
+    function GetioRequestBody: IioPersistenceStrategyRequest;
+    property ioRequestBody: IioPersistenceStrategyRequest read GetioRequestBody;
     // ioResponseBody property
     function GetioResponseBody: IioHttpResponseBody;
     property ioResponseBody: IioHttpResponseBody read GetioResponseBody;
@@ -337,71 +336,6 @@ type
     function GetSQL: String;
   end;
 
-  IioHttpRequestBody = interface
-    ['{83DE9ECE-47EA-4814-B40E-3E39FAA210A2}']
-    procedure Clear;
-    function AsString: String;
-    // ---------- session data ----------
-    // SessionData
-    function GetSessionData: IioAuthSessionData;
-    property Subjects: IioAuthSessionData read GetSessionData;
-    // ---------- auth ----------
-    // AuthIntention
-    procedure SetAuthIntention(const Value: TioAuthIntention);
-    function GetAuthIntention: TioAuthIntention;
-    property AuthIntention: TioAuthIntention read GetAuthIntention write SetAuthIntention;
-    // AuthScope
-    procedure SetAuthScope(const Value: String);
-    function GetAuthScope: String;
-    property AuthScope: String read GetAuthScope write SetAuthScope;
-    // AuthGrant
-    procedure SetAuthGrant(const Value: String);
-    function GetAuthGrant: String;
-    property AuthGrant: String read GetAuthGrant write SetAuthGrant;
-    // AuthToken (for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge)
-    procedure SetAuthToken(const Value: String);
-    function GetAuthToken: String;
-    property AuthToken: String read GetAuthToken write SetAuthToken;
-    // ---------- others ----------
-    // BlindLevel
-    procedure SetBlindLevel(const Value: Byte);
-    function GetBlindLevel: Byte;
-    property BlindLevel: Byte read GetBlindLevel write SetBlindLevel;
-    // IntentType
-    procedure SetIntentType(const Value: TioPersistenceIntentType);
-    function GetIntentType: TioPersistenceIntentType;
-    property IntentType: TioPersistenceIntentType read GetIntentType write SetIntentType;
-    // JSONDataValue (for auth purposes -> Credentials (without CodeVerifier/CodeChallenge))
-    procedure SetJSONDataValue(const Value: TJSONValue);
-    function GetJSONDataValue: TJSONValue;
-    property JSONDataValue: TJSONValue read GetJSONDataValue write SetJSONDataValue;
-    // JSONDataValueAsObject (for auth purposes -> Credentials (without CodeVerifier/CodChallenge))
-    procedure SetJSONDataValueAsObject(const AObj: TObject);
-    function GetJSONDataValueAsObject: TObject;
-    property JSONDataValueAsObject: TObject read GetJSONDataValueAsObject write SetJSONDataValueAsObject;
-    // MethodName
-    procedure SetMethodName(const Value: String);
-    function GetMethodName: String;
-    property MethodName: String read GetMethodName write SetMethodName;
-    // RelationOID
-    procedure SetRelationOID(const Value: Integer);
-    function GetRelationOID: Integer;
-    property RelationOID: Integer read GetRelationOID write SetRelationOID;
-    // RelationPropertyName
-    procedure SetRelationPropertyName(const Value: String);
-    function GetRelationPropertyName: String;
-    property RelationPropertyName: String read GetRelationPropertyName write SetRelationPropertyName;
-    // SQLDestination
-    procedure SetSQLDestination(const Value: IioSQLDestination);
-    function GetSQLDestination: IioSQLDestination;
-    property SQLDestination: IioSQLDestination read GetSQLDestination write SetSQLDestination;
-    // Where
-    procedure SetWhere(const Value: IioWhere);
-    function GetWhere: IioWhere;
-    property Where: IioWhere read GetWhere write SetWhere;
-    // ---------- end ----------
-  end;
-
   IioHttpResponseBody = interface
     ['{E5A14525-308F-4877-99B7-C270D691FC6D}']
     function ExceptionOccurred: Boolean;
@@ -438,6 +372,14 @@ type
   // Base class for strategy (Static class as an interface)
   // Note: {$DEFINE ioStrategyInterceptorsOff} to disable strategy interceptors
   TioPersistenceStrategyIntf = class abstract
+  private
+    // strategy interception layer methods
+    class procedure _InterceptDeleteList(const APSRequest: IioPersistenceStrategyRequest); static; inline;
+    class procedure _InterceptDeleteObject(const APSRequest: IioPersistenceStrategyRequest); static; inline;
+    class procedure _InterceptLoadList(const APSRequest: IioPersistenceStrategyRequest); static; inline;
+    class procedure _InterceptLoadObject(const APSRequest: IioPersistenceStrategyRequest); static; inline;
+    class procedure _InterceptPersistList(const APSRequest: IioPersistenceStrategyRequest); static; inline;
+    class procedure _InterceptPersistObject(const APSRequest: IioPersistenceStrategyRequest); static; inline;
   protected
     // ========== BEGIN OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
     // Persistence
@@ -445,74 +387,49 @@ type
     class procedure _DoDeleteList(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     class procedure _DoDeleteObject(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     class procedure _DoLoadList(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
-    class function _DoLoadObject(const APSRequest: IioPersistenceStrategyRequest): TObject; virtual; abstract;
+    class procedure _DoLoadObject(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     class procedure _DoPersistList(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     class procedure _DoPersistObject(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     // ---------- End intercepted methods (CRUDInterceptors) ----------
     class procedure _DoDelete(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
-    class function _DoLoadCount(const APSRequest: IioPersistenceStrategyRequest): Integer; virtual;
+    class procedure _DoLoadCount(const APSRequest: IioPersistenceStrategyRequest<Integer>); virtual; abstract;
     class procedure _DoLoadDataSet(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
-    class function _DoLoadMax(const APSRequest: IioPersistenceStrategyRequest): Integer; virtual;
-    class function _DoLoadMin(const APSRequest: IioPersistenceStrategyRequest): Integer; virtual;
-    class function _DoLoadObjectByClassOnly(const APresistenceStrategyRequest: IioPersistenceStrategyRequest): TObject; virtual;
-    class function _DoLoadObjVersion(const APSRequest: IioPersistenceStrategyRequest): Integer; virtual; abstract;
+    class procedure _DoLoadMax(const APSRequest: IioPersistenceStrategyRequest<Integer>); virtual; abstract;
+    class procedure _DoLoadMin(const APSRequest: IioPersistenceStrategyRequest<Integer>); virtual; abstract;
+    class procedure _DoLoadObjectByClassOnly(const APresistenceStrategyRequest: IioPersistenceStrategyRequest); virtual; abstract;
+    class procedure _DoLoadObjVersion(const APSRequest: IioPersistenceStrategyRequest<Integer>); virtual; abstract;
     // Transaction
     class procedure _DoStartTransaction(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     class procedure _DoCommitTransaction(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     class procedure _DoRollbackTransaction(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
-    class function _DoInTransaction(const APSRequest: IioPersistenceStrategyRequest): Boolean; virtual; abstract;
+    class procedure _DoInTransaction(const APSRequest: IioPersistenceStrategyRequest<Boolean>); virtual; abstract;
     // SynchroStrategy
     class procedure _DoSynchronization(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     // SQLDestinations
     class procedure _DoSQLDest_Execute(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     class procedure _DoSQLDest_LoadDataSet(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     // Auth
-    class function _DoAuth_App(const APSRequest: IioPersistenceStrategyRequest): IioAuthResponse; virtual; abstract;
-    class function _DoAuth_User(const APSRequest: IioPersistenceStrategyRequest): IioAuthResponse; virtual; abstract;
-    class function _DoAuth_Access(const APSRequest: IioPersistenceStrategyRequest): IioAuthResponse; virtual; abstract;
-    class function _DoAuth_NewAccessToken(const APSRequest: IioPersistenceStrategyRequest): IioAuthResponse; virtual; abstract;
-    class function _DoAuth_RefreshAccessToken(const APSRequest: IioPersistenceStrategyRequest): IioAuthResponse; virtual; abstract;
+    class procedure _DoAuth_Access(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
+    class procedure _DoAuth_App(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
+    class procedure _DoAuth_NewAccessToken(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
+    class procedure _DoAuth_RefreshAccessToken(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
+    class procedure _DoAuth_User(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
   public
-    // ---------- Begin intercepted methods (StrategyInterceptors) ----------
-    class procedure DeleteList(const APSRequest: IioPersistenceStrategyRequest; const AList: TObject);
-    class procedure DeleteObject(const APSRequest: IioPersistenceStrategyRequest; const AObj: TObject);
-    class procedure LoadList(const APSRequest: IioPersistenceStrategyRequest; const AWhere: IioWhere; const AList: TObject);
-    class function LoadObject(const APSRequest: IioPersistenceStrategyRequest; const AWhere: IioWhere; const AObj: TObject): TObject;
-    class procedure PersistObject(const APSRequest: IioPersistenceStrategyRequest; const AObj: TObject; const AMasterBSPersistence: TioBSPersistence);
-    class procedure PersistList(const APSRequest: IioPersistenceStrategyRequest; const AList: TObject; const AMasterBSPersistence: TioBSPersistence);
-    // ---------- End intercepted methods (StrategyInterceptors) ----------
-    // Transaction
-    class procedure StartTransaction(const AConnectionDefName: String);
-    class procedure CommitTransaction(const AConnectionDefName: String);
-    class procedure RollbackTransaction(const AConnectionDefName: String);
-    class function InTransaction(const AConnectionDefName: String): Boolean;
-    // Persistence
-    class procedure Delete(const AWhere: IioWhere);
-    class function LoadCount(const AWhere: IioWhere): Integer;
-    class procedure LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
-    class function LoadMax(const AWhere: IioWhere; const APropertyName: String): Integer;
-    class function LoadMin(const AWhere: IioWhere; const APropertyName: String): Integer;
-    class function LoadObjectByClassOnly(const APSRequest: IioPersistenceStrategyRequest; const AWhere: IioWhere; const AObj: TObject): TObject;
-    class function LoadObjVersion(const AContext: IioContext): Integer;
-    // SynchroStrategy
-    class procedure DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload);
-    // SQLDestinations
-    class procedure SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet);
-    class procedure SQLDest_Execute(const ASQLDestination: IioSQLDestination);
-    // Auth
-    class function Auth_App(const AAuthConnectionName: String; const AAppCredentials: IioAuthAppCredentials): IioAuthResponse;
-    class function Auth_User(const AAuthConnectionName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse;
-    class function Auth_Access(const AAuthConnectionName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
-    class function Auth_NewAccessToken(const AAuthConnectionName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse;
-    class function Auth_RefreshAccessToken(const AAuthConnectionName: String; const ARefreshToken: String): IioAuthResponse;
+
+    class procedure ExecutePSRequest(const APSRequest: IioPersistenceStrategyRequest);
+// TODO: Fare anche una versione asincrona?
+//    class procedure ExecutePSRequestAsync(const APSRequest: IioPersistenceStrategyRequest; const AOnTerminate: TioPSROnTerminateMethod; const AOnException: TioPSROnExceptionMethod);
+// TODO: Fare anche l'esecuzione di Unit Of Work? (collezione di PSRequest)
+//    class procedure ExecuteUnitOfWork(const AUnitOfWork: IioUnitOfWork);
+// TODO: Fare anche l'esecuzione asincrona di Unit Of Work? (collezione di PSRequest)
+//    class procedure ExecuteUnitOfWork(const AUnitOfWork: IioUnitOfWork; const ABeforeEachExecution, AAfterEachExecution: TioUOWBeforeAfterExecutionMethod; const AOnTerminate: TioUOWOnTerminateMethod; const AOnException: TioUOWOnExceptionMethod);
   end;
 
 implementation
 
 uses
-  iORM.SqlTranslator, iORM.PersistenceStrategy.Factory, System.SysUtils, iORM.Attributes,
-  iORM.Exceptions, iORM.Utilities, iORM.SqlItems,
+  iORM.SqlTranslator, iORM.PersistenceStrategy.Factory, System.SysUtils, iORM.Attributes, iORM.Utilities, iORM.SqlItems,
   System.StrUtils, iORM.Context.Container, iORM.Resolver.Interfaces,
   iORM.Resolver.Factory, iORM.Interceptor.Strategy.Register,
   iORM.Context.Factory;
@@ -897,266 +814,158 @@ end;
 
 { TioStrategyIntf }
 
-class function TioPersistenceStrategyIntf.Auth_Access(const AAuthConnectionName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
-begin
-  Result := _DoAuth_Access(AAuthConnectionName, AScope, AAuthIntention, AAccessToken);
-end;
-
-class function TioPersistenceStrategyIntf.Auth_App(const AAuthConnectionName: String; const AAppCredentials: IioAuthAppCredentials): IioAuthResponse;
-begin
-  Result := _DoAuth_App(AAuthConnectionName, AAppCredentials);
-end;
-
-class function TioPersistenceStrategyIntf.Auth_User(const AAuthConnectionName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse;
-begin
-  Result := _DoAuth_User(AAuthConnectionName, AUserCredentials);
-end;
-
-class function TioPersistenceStrategyIntf.Auth_NewAccessToken(const AAuthConnectionName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse;
-begin
-  Result := _DoAuth_NewAccessToken(AAuthConnectionName, AAuthGrant, APkceCodeVerifier);
-end;
-
-class function TioPersistenceStrategyIntf.Auth_RefreshAccessToken(const AAuthConnectionName: String; const ARefreshToken: String): IioAuthResponse;
-begin
-  Result := _DoAuth_RefreshAccessToken(AAuthConnectionName, ARefreshToken);
-end;
-
-class procedure TioPersistenceStrategyIntf.CommitTransaction(const AConnectionDefName: String);
-begin
-  _DoCommitTransaction(AConnectionDefName);
-end;
-
-class function TioPersistenceStrategyIntf._DoLoadCount(const APSRequest: IioPersistenceStrategyRequest): Integer;
-begin
-  Result := 0;
-end;
-
-class function TioPersistenceStrategyIntf._DoLoadObjectByClassOnly(const APresistenceStrategyRequest: IioPersistenceStrategyRequest): TObject;
-begin
-  Result := nil;
-end;
-
-class function TioPersistenceStrategyIntf._DoLoadMax(const APSRequest: IioPersistenceStrategyRequest): Integer;
-begin
-  Result := 0;
-end;
-
-class function TioPersistenceStrategyIntf.LoadMax(const AWhere: IioWhere; const APropertyName: String): Integer;
-begin
-  Result := _DoLoadMax(AWhere, APropertyName);
-end;
-
-class function TioPersistenceStrategyIntf.LoadMin(const AWhere: IioWhere; const APropertyName: String): Integer;
-begin
-  Result := _DoLoadMin(AWhere, APropertyName);
-end;
-
-class function TioPersistenceStrategyIntf._DoLoadMin(const APSRequest: IioPersistenceStrategyRequest): Integer;
-begin
-  Result := 0;
-end;
-
-class function TioPersistenceStrategyIntf.LoadCount(const AWhere: IioWhere): Integer;
-begin
-  Result := _DoLoadCount(AWhere);
-end;
-
-class procedure TioPersistenceStrategyIntf.Delete(const AWhere: IioWhere);
-begin
-  _DoDelete(AWhere);
-end;
-
-class procedure TioPersistenceStrategyIntf.DeleteList(const APSRequest: IioPersistenceStrategyRequest; const AList: TObject);
-{$REGION '-----INTERCEPTORS-----'}
-{$IFNDEF ioStrategyInterceptorsOff}
-var
-  LDone: Boolean;
-{$ENDIF}
-{$ENDREGION}
+class procedure TioPersistenceStrategyIntf._InterceptDeleteList(const APSRequest: IioPersistenceStrategyRequest);
 begin
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
-  LDone := False;
-  TioStrategyInterceptorRegister.BeforeDeleteList(AList, LDone);
-  if LDone then
+  if TioStrategyInterceptorRegister.BeforeDeleteList(APSRequest) then
     Exit;
 {$ENDIF}
 {$ENDREGION}
-  _DoDeleteList(APSRequest, AList);
+  _DoDeleteList(APSRequest);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
-  TioStrategyInterceptorRegister.AfterDeleteList(AList);
+  TioStrategyInterceptorRegister.AfterDeleteList(APSRequest);
 {$ENDIF}
 {$ENDREGION}
 end;
 
-class procedure TioPersistenceStrategyIntf.DeleteObject(const APSRequest: IioPersistenceStrategyRequest; const AObj: TObject);
-{$REGION '-----INTERCEPTORS-----'}
-{$IFNDEF ioStrategyInterceptorsOff}
-var
-  LDone: Boolean;
-{$ENDIF}
-{$ENDREGION}
+class procedure TioPersistenceStrategyIntf._InterceptDeleteObject(const APSRequest: IioPersistenceStrategyRequest);
 begin
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
-  LDone := False;
-  TioStrategyInterceptorRegister.BeforeDeleteObject(AObj, LDone);
-  if LDone then
+  if TioStrategyInterceptorRegister.BeforeDeleteObject(APSRequest) then
     Exit;
 {$ENDIF}
 {$ENDREGION}
-  _DoDeleteObject(APSRequest, AObj);
+  _DoDeleteObject(APSRequest);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
-  TioStrategyInterceptorRegister.AfterDeleteObject(AObj);
+  TioStrategyInterceptorRegister.AfterDeleteObject(APSRequest);
 {$ENDIF}
 {$ENDREGION}
 end;
 
-class procedure TioPersistenceStrategyIntf.DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload);
+class procedure TioPersistenceStrategyIntf._InterceptLoadList(const APSRequest: IioPersistenceStrategyRequest);
 begin
-  _DoSynchronization(APayload);
-end;
-
-class function TioPersistenceStrategyIntf.InTransaction(const AConnectionDefName: String): Boolean;
-begin
-  Result := _DoInTransaction(AConnectionDefName);
-end;
-
-class procedure TioPersistenceStrategyIntf.LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
-begin
-  _DoLoadDataSet(AWhere, ADestDataSet);
-end;
-
-class procedure TioPersistenceStrategyIntf.LoadList(const APSRequest: IioPersistenceStrategyRequest; const AWhere: IioWhere; const AList: TObject);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
-var
-  LDone: Boolean;
-{$ENDIF}
-{$ENDREGION}
-begin
-  AWhere.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
-{$REGION '-----INTERCEPTORS-----'}
-{$IFNDEF ioStrategyInterceptorsOff}
-  LDone := False;
-  TioStrategyInterceptorRegister.BeforeLoadList(AWhere, AList, LDone);
-  if LDone then
+  if TioStrategyInterceptorRegister.BeforeLoadList(APSRequest) then
     Exit;
 {$ENDIF}
 {$ENDREGION}
-  _DoLoadList(APSRequest, AWhere, AList);
+  _DoLoadList(APSRequest);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
-  TioStrategyInterceptorRegister.AfterLoadList(AWhere, AList);
+  TioStrategyInterceptorRegister.AfterLoadList(APSRequest);
 {$ENDIF}
 {$ENDREGION}
 end;
 
-class function TioPersistenceStrategyIntf.LoadObject(const APSRequest: IioPersistenceStrategyRequest; const AWhere: IioWhere; const AObj: TObject): TObject;
-{$REGION '-----INTERCEPTORS-----'}
-{$IFNDEF ioStrategyInterceptorsOff}
-var
-  LDone: Boolean;
-{$ENDIF}
-{$ENDREGION}
+class procedure TioPersistenceStrategyIntf._InterceptLoadObject(const APSRequest: IioPersistenceStrategyRequest);
 begin
-  AWhere.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
-  Result := AObj;
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
-  LDone := False;
-  Result := TioStrategyInterceptorRegister.BeforeLoadObject(AWhere, Result, LDone);
-  if LDone then
+  if TioStrategyInterceptorRegister.BeforeLoadObject(APSRequest) then
     Exit;
 {$ENDIF}
 {$ENDREGION}
-  Result := _DoLoadObject(APSRequest, AWhere, Result);
+  Result := _DoLoadObject(APSRequest);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
-  Result := TioStrategyInterceptorRegister.AfterLoadObject(AWhere, Result);
+  Result := TioStrategyInterceptorRegister.AfterLoadObject(APSRequest);
 {$ENDIF}
 {$ENDREGION}
 end;
 
-class function TioPersistenceStrategyIntf.LoadObjectByClassOnly(const APSRequest: IioPersistenceStrategyRequest; const AWhere: IioWhere; const AObj: TObject): TObject;
-begin
-  Result := _DoLoadObjectByClassOnly(APSRequest, AWhere, AObj);
-end;
-
-class function TioPersistenceStrategyIntf.LoadObjVersion(const AContext: IioContext): Integer;
-begin
-  Result := _DoLoadObjVersion(AContext);
-end;
-
-class procedure TioPersistenceStrategyIntf.PersistList(const APSRequest: IioPersistenceStrategyRequest; const AList: TObject; const AMasterBSPersistence: TioBSPersistence);
-{$REGION '-----INTERCEPTORS-----'}
-{$IFNDEF ioStrategyInterceptorsOff}
-var
-  LDone: Boolean;
-{$ENDIF}
-{$ENDREGION}
+class procedure TioPersistenceStrategyIntf._InterceptPersistList(const APSRequest: IioPersistenceStrategyRequest);
 begin
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
-  LDone := False;
-  TioStrategyInterceptorRegister.BeforePersistList(AList, LDone);
-  if LDone then
+  if TioStrategyInterceptorRegister.BeforePersistList(APSRequest) then
     Exit;
 {$ENDIF}
 {$ENDREGION}
-  _DoPersistList(APSRequest, AList, AMasterBSPersistence);
+  _DoPersistList(APSRequest);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
-  TioStrategyInterceptorRegister.AfterPersistList(AList);
+  TioStrategyInterceptorRegister.AfterPersistList(APSRequest);
 {$ENDIF}
 {$ENDREGION}
 end;
 
-class procedure TioPersistenceStrategyIntf.PersistObject(const APSRequest: IioPersistenceStrategyRequest; const AObj: TObject; const AMasterBSPersistence: TioBSPersistence);
-{$REGION '-----INTERCEPTORS-----'}
-{$IFNDEF ioStrategyInterceptorsOff}
-var
-  LDone: Boolean;
-{$ENDIF}
-{$ENDREGION}
+class procedure TioPersistenceStrategyIntf._InterceptPersistObject(const APSRequest: IioPersistenceStrategyRequest);
 begin
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
-  LDone := False;
-  TioStrategyInterceptorRegister.BeforePersistObject(AObj, LDone);
-  if LDone then
+  if TioStrategyInterceptorRegister.BeforePersistObject(APSRequest) then
     Exit;
 {$ENDIF}
 {$ENDREGION}
-  _DoPersistObject(APSRequest, AObj, AMasterBSPersistence);
+  _DoPersistObject(APSRequest);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
-  TioStrategyInterceptorRegister.AfterPersistObject(AObj);
+  TioStrategyInterceptorRegister.AfterPersistObject(APSRequest);
 {$ENDIF}
 {$ENDREGION}
 end;
 
-class procedure TioPersistenceStrategyIntf.RollbackTransaction(const AConnectionDefName: String);
+class procedure TioPersistenceStrategyIntf.ExecutePSRequest(const APSRequest: IioPersistenceStrategyRequest);
 begin
-  _DoRollbackTransaction(AConnectionDefName);
-end;
-
-class procedure TioPersistenceStrategyIntf.SQLDest_Execute(const ASQLDestination: IioSQLDestination);
-begin
- _DoSQLDest_Execute(ASQLDestination);
-end;
-
-class procedure TioPersistenceStrategyIntf.SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet);
-begin
- _DoSQLDest_LoadDataSet(ASQLDestination, ADestDataSet);
-end;
-
-class procedure TioPersistenceStrategyIntf.StartTransaction(const AConnectionDefName: String);
-begin
-  _DoStartTransaction(AConnectionDefName);
+  case APSRequest.Method of
+    psmAuthAccess:
+      _DoAuth_Access(APSRequest);
+    psmAuthApp:
+      _DoAuth_App(APSRequest);
+    psmAuthNewAccessToken:
+      _DoAuth_NewAccessToken(APSRequest);
+    psmAuthRefreshAccessToken:
+      _DoAuth_RefreshAccessToken(APSRequest);
+    psmAuthUser:
+      _DoAuth_User(APSRequest);
+    psmCount:
+      _DoLoadCount(APSRequest);
+    psmDelete:
+      _DoDelete(APSRequest);
+    psmDeleteList:
+      _InterceptDeleteList(APSRequest); // intercepted
+    psmDeleteObject:
+      _InterceptDeleteObject(APSRequest); // intercepted
+    psmDoSynchronization:
+      _DoSynchronization(APSRequest);
+    psmLoadDataSet:
+      _DoLoadDataSet(APSRequest);
+    psmLoadList:
+      _InterceptLoadList(APSRequest); // intercepted
+    psmLoadMax:
+      _DoLoadMax(APSRequest);
+    psmLoadMin:
+      _DoLoadMin(APSRequest);
+    psmLoadObject:
+      _InterceptLoadObject(APSRequest); // intercepted
+    psmLoadObjectByClassOnly:
+      _DoLoadObjectByClassOnly(APSRequest);
+    psmLoadObjVersion:
+      _DoLoadObjVersion(APSRequest);
+    psmPersistList:
+      _InterceptPersistList(APSRequest); // intercepted
+    psmPersistObject:
+      _InterceptPersistObject(APSRequest); // intercepted
+    psmSQLDestExecute:
+      _DoSQLDestExecute(APSRequest);
+    psmSQLDestLoadDataSet:
+      _DoSQLDestLoadDataSet(APSRequest);
+    psmTransactionCommit:
+      _DoTransactionCommit(APSRequest);
+    psmTransactionIn:
+      _DoTransactionIn(APSRequest);
+    psmTransactionRollback:
+      _DoTransactionRollback(APSRequest);
+    psmTransactionStart:
+      _DoTransactionStart(APSRequest);
+  else
+    EioSynchroStrategyException.Create(Self.Name, 'ExecutePSRequest', 'The requested persistence strategy method is not handled');
+  end;
 end;
 
 { TioConnectionInfo }

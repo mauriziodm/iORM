@@ -45,7 +45,7 @@ type
   // Standard Object Maker
   TioObjectMaker = class(TioObjectMakerIntf)
   public
-    class function MakeObject(const AContext: IioContext; const AQuery: IioQuery): TObject; override;
+    class procedure MakeObject(const AContext: IioContext; const AQuery: IioQuery); override;
   end;
 
 implementation
@@ -56,22 +56,21 @@ uses
 
 { TObjectMaker }
 
-class function TioObjectMaker.MakeObject(const AContext: IioContext; const AQuery: IioQuery): TObject;
+class procedure TioObjectMaker.MakeObject(const AContext: IioContext; const AQuery: IioQuery);
 var
   LProp: IioProperty;
-  LObj: TObject;
+  LDetailObj: TObject;
 begin
   inherited;
   // DataObject creation if not already exists
   if not Assigned(AContext.DataObject) then
     AContext.DataObject := Self.CreateObjectByClassRef(AContext.GetClassRef);
-  Result := AContext.DataObject;
   // ObjectStatus
   AContext.ObjStatus := osClean;
   // Load properties values
   for LProp in AContext.GetProperties do
   begin
-    LObj := nil;
+    LDetailObj := nil;
     if LProp.isHasManyChildVirtualProperty or AContext.Where.IsLazyProp(AContext.Map.GetClassName, LProp) or not LProp.IsDBReadEnabled then
       Continue;
     case LProp.GetRelationType of
@@ -81,7 +80,7 @@ begin
         begin
           // If it isn't related to a blob field then load as normal value
           if not LProp.IsBlob then
-            LProp.SetValue(Result, AQuery.GetValue(LProp, AContext))
+            LProp.SetValue(AContext.DataObject, AQuery.GetValue(LProp, AContext))
             // If it's related to a blob field and it is of TStream or descendant the load as stream
           else if LProp.IsStream then
             LoadPropertyStream(AContext, AQuery, LProp)
@@ -98,20 +97,20 @@ begin
       rtEmbeddedHasMany:
         LoadPropertyEmbeddedHasMany(AContext, AQuery, LProp);
       rtBelongsTo:
-        LObj := LoadPropertyBelongsTo(AContext, AQuery, LProp);
+        LDetailObj := LoadPropertyBelongsTo(AContext, AQuery, LProp);
       rtHasOne:
-        LObj := LoadPropertyHasOne(AContext, AQuery, LProp);
+        LDetailObj := LoadPropertyHasOne(AContext, AQuery, LProp);
       rtEmbeddedHasOne:
-        LObj := LoadPropertyEmbeddedHasOne(AContext, AQuery, LProp);
+        LDetailObj := LoadPropertyEmbeddedHasOne(AContext, AQuery, LProp);
     end;
-    if Assigned(LObj) then
+    if Assigned(LDetailObj) then
     begin
       // If is an Interface property then adjust the RefCount to prevent an access violation
       if LProp.IsInterface then
-        TioUtilities.ObjectAsIInterface(LObj)._Release;
+        TioUtilities.ObjectAsIInterface(LDetailObj)._Release;
       // Assign the related object/s to the property   (***ChildPropertyPath***)
       if LProp.IsWritable then
-        LProp.SetValue(Result, LObj);
+        LProp.SetValue(AContext.DataObject, LDetailObj);
     end;
     // ---------------------------------------------------------------------------------------------------------------------------------
   end;

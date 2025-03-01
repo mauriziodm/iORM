@@ -48,24 +48,20 @@ type
     FRESTClient: TRESTClient;
     FRESTRequest: TRESTRequest;
     FRESTResponse: TRESTResponse;
-    FioHttpRequestBody: IioHttpRequestBody;
+    FioHttpRequestBody: IioPersistenceStrategyRequest;
     FioHttpResponseBody: IioHttpResponseBody;
-    FAsJsonRpc: Boolean;
-    procedure Execute(const AMethodName:String);
-    function WrapBodyAsJsonRpcRequest(const AJSONText: String): String;
-    function UnwrapBodyAsJsonRpcResponse(const AJSONText: String): String;
+    procedure Execute(const APSRequest: IioPersistenceStrategyRequest);
   strict protected
     procedure DoStartTransaction; override;
     procedure DoCommitTransaction; override;
     procedure DoRollbackTransaction; override;
-    property AsJsonRpc: Boolean read FAsJsonRpc write FAsJsonRpc default False;
   public
     constructor Create(const AConnectionInfo:TioConnectionInfo);
     destructor Destroy; override;
     function AsHttpConnection: IioConnectionHttp; override;
     function InTransaction: Boolean; override;
     // ioRequestBody property
-    function GetioRequestBody:IioHttpRequestBody;
+    function GetioRequestBody:IioPersistenceStrategyRequest;
     // ioResponseBody property
     function GetioResponseBody:IioHttpResponseBody;
   end;
@@ -110,22 +106,15 @@ begin
   inherited;
 end;
 
-procedure TioConnectionHttp.Execute(const AMethodName:String);
+procedure TioConnectionHttp.Execute(const APSRequest: IioPersistenceStrategyRequest);
 begin
   // Set the request
   FRESTRequest.ClearBody;
-  FioHttpRequestBody.MethodName := AMethodName;
-  if FAsJsonRpc then
-    FRESTRequest.AddBody(WrapBodyAsJsonRpcRequest(FioHttpRequestBody.AsString), ctAPPLICATION_JSON)
-  else
-    FRESTRequest.AddBody(FioHttpRequestBody.AsString, ctAPPLICATION_JSON);
+  FRESTRequest.AddBody(FioHttpRequestBody.AsString, ctAPPLICATION_JSON);
   // Send/Execute the request
   FRESTRequest.Execute;
   // Create and set the ioRESTResponseBody
-  if FAsJsonRpc then
-    FioHttpResponseBody := TioHttpFactory.NewResponseBodyByJSONString(UnwrapBodyAsJsonRpcResponse(FRESTResponse.Content))
-  else
-    FioHttpResponseBody := TioHttpFactory.NewResponseBodyByJSONString(FRESTResponse.Content);
+  FioHttpResponseBody := TioHttpFactory.NewResponseBodyByJSONString(FRESTResponse.Content);
   // Check for response exceptions
   if FioHttpResponseBody.ExceptionOccurred then
     raise EioHttpRemoteException.Create(ClassName, 'Execute', FioHttpResponseBody.ExceptionClassName, FioHttpResponseBody.ExceptionMessage);
@@ -164,30 +153,6 @@ function TioConnectionHttp.InTransaction: Boolean;
 begin
   inherited;
   Result := False;
-end;
-
-function TioConnectionHttp.UnwrapBodyAsJsonRpcResponse(const AJSONText: String): String;
-var
-  LJSONObject: TJSONObject;
-  LJSONValue: TJSONValue;
-begin
-  LJSONObject := TJSONObject.ParseJSONValue(AJSONText) as TJSONObject;
-  try
-    LJSONValue := LJSONObject.FindValue('result');
-    if LJSONValue <> nil then
-      Exit(LJSONValue.ToJSON);
-    LJSONValue := LJSONObject.FindValue('error');
-    if LJSONValue <> nil then
-      raise EioHttpLocalException.Create(ClassName, 'UnwrapBodyAsJsonRpcResponse', LJSONValue.ToString);
-    raise EioHttpLocalException.Create(ClassName, 'UnwrapBodyAsJsonRpcResponse', Format('Invalid JSON-RPC response: "%s"', [AJSONText]));
-  finally
-    LJSONObject.Free;
-  end;
-end;
-
-function TioConnectionHttp.WrapBodyAsJsonRpcRequest(const AJSONText: String): String;
-begin
-  Result := Format('{"jsonrpc": "2.0", "method": "execute_action", "params": ["%s"], "id": %d}', [FioHttpRequestBody.AsString, Random(1000)]);
 end;
 
 end.

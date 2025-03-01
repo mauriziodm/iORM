@@ -133,7 +133,6 @@ contains
   iORM.PersistenceStrategy.Interfaces in '..\..\Source\iORM.PersistenceStrategy.Interfaces.pas',
   iORM.PersistenceStrategy.Factory in '..\..\Source\iORM.PersistenceStrategy.Factory.pas',
   iORM.PersistenceStrategy.Http in '..\..\Source\iORM.PersistenceStrategy.Http.pas',
-  iORM.Http.Body.Request in '..\..\Source\iORM.Http.Body.Request.pas',
   iORM.Http.Interfaces in '..\..\Source\iORM.Http.Interfaces.pas',
   iORM.Http.Body.Response in '..\..\Source\iORM.Http.Body.Response.pas',
   iORM.Http.Factory in '..\..\Source\iORM.Http.Factory.pas',

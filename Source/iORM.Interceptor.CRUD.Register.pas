@@ -69,19 +69,23 @@ type
     class procedure RegisterInterceptor(const ACRUDInterceptor: TioCRUDInterceptorRef; const ATypeName: String; const AInterceptOnlyOnConnectionName: String = '');
     class procedure UnregisterInterceptor(const ACRUDInterceptor: TioCRUDInterceptorRef; const ATypeName: String; const AInterceptOnlyOnConnectionName: String = '');
     // Obj load
-    class function BeforeLoad(const AContext: IioContext; const AObj: TObject; var ADone: Boolean): TObject;
-    class function AfterLoad(const AContext: IioContext; const AObj: TObject): TObject;
+    // note: Result = True is like ADone := True
+    class function BeforeLoad(const AContext: IioContext): Boolean;
+    class procedure AfterLoad(const AContext: IioContext);
     class function OnLoadException(const AContext: IioContext; const AException: Exception): Boolean;
     // Obj insert
-    class procedure BeforeInsert(const AContext: IioContext; var ADone: Boolean);
+    // note: Result = True is like ADone := True
+    class function BeforeInsert(const AContext: IioContext): Boolean;
     class procedure AfterInsert(const AContext: IioContext);
     class function OnInsertException(const AContext: IioContext; const AException: Exception): Boolean;
     // Obj update
-    class procedure BeforeUpdate(const AContext: IioContext; var ADone: Boolean);
+    // note: Result = True is like ADone := True
+    class function BeforeUpdate(const AContext: IioContext): Boolean;
     class procedure AfterUpdate(const AContext: IioContext);
     class function OnUpdateException(const AContext: IioContext; const AException: Exception): Boolean;
     // Obj delete
-    class procedure BeforeDelete(const AContext: IioContext; var ADone: Boolean);
+    // note: Result = True is like ADone := True
+    class function BeforeDelete(const AContext: IioContext): Boolean;
     class procedure AfterDelete(const AContext: IioContext);
     class function OnDeleteException(const AContext: IioContext; const AException: Exception): Boolean;
   end;
@@ -146,19 +150,18 @@ begin
   end;
 end;
 
-class function TioCRUDInterceptorRegister.AfterLoad(const AContext: IioContext; const AObj: TObject): TObject;
+class procedure TioCRUDInterceptorRegister.AfterLoad(const AContext: IioContext);
 var
   LItem: TioCRUDInterceptorItem;
   LCurrConnectionName: String;
 begin
-  Result := AObj;
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
   begin
     // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
     LCurrConnectionName := AContext.Map.GetTable.GetTableConnectionName;
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName] do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
-        Result := LItem.Interceptor.AfterLoad(AContext, AObj);
+        LItem.Interceptor.AfterLoad(AContext);
   end;
 end;
 
@@ -207,13 +210,12 @@ begin
   end;
 end;
 
-class function TioCRUDInterceptorRegister.BeforeLoad(const AContext: IioContext; const AObj: TObject; var ADone: Boolean): TObject;
+class function TioCRUDInterceptorRegister.BeforeLoad(const AContext: IioContext): Boolean;
 var
   LDone: Boolean;
   LItem: TioCRUDInterceptorItem;
   LCurrConnectionName: String;
 begin
-  Result := AObj;
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
   begin
     // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
@@ -222,14 +224,15 @@ begin
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
       begin
         LDone := False;
-        Result := LItem.Interceptor.BeforeLoad(AContext, AObj, LDone);
+        LItem.Interceptor.BeforeLoad(AContext, LDone);
         if LDone then
-          ADone := True;
+          Exit(True);
+//          Result := True; <--- OLD CODE (se ADone = true esegue comunque tutti i before di tutti gli eventuali interceptors
       end;
   end;
 end;
 
-class procedure TioCRUDInterceptorRegister.BeforeDelete(const AContext: IioContext; var ADone: Boolean);
+class function TioCRUDInterceptorRegister.BeforeDelete(const AContext: IioContext): Boolean;
 var
   LDone: Boolean;
   LItem: TioCRUDInterceptorItem;
@@ -245,12 +248,13 @@ begin
         LDone := False;
         LItem.Interceptor.BeforeDelete(AContext, LDone);
         if LDone then
-          ADone := True;
+          Exit(True);
+//          Result := True; <--- OLD CODE (se ADone = true esegue comunque tutti i before di tutti gli eventuali interceptors
       end;
   end;
 end;
 
-class procedure TioCRUDInterceptorRegister.BeforeInsert(const AContext: IioContext; var ADone: Boolean);
+class function TioCRUDInterceptorRegister.BeforeInsert(const AContext: IioContext): Boolean;
 var
   LDone: Boolean;
   LItem: TioCRUDInterceptorItem;
@@ -266,12 +270,13 @@ begin
         LDone := False;
         LItem.Interceptor.BeforeInsert(AContext, LDone);
         if LDone then
-          ADone := True;
+          Exit(True);
+//          Result := True; <--- OLD CODE (se ADone = true esegue comunque tutti i before di tutti gli eventuali interceptors
       end;
   end;
 end;
 
-class procedure TioCRUDInterceptorRegister.BeforeUpdate(const AContext: IioContext; var ADone: Boolean);
+class function TioCRUDInterceptorRegister.BeforeUpdate(const AContext: IioContext): Boolean;
 var
   LDone: Boolean;
   LItem: TioCRUDInterceptorItem;
@@ -287,7 +292,8 @@ begin
         LDone := False;
         LItem.Interceptor.BeforeUpdate(AContext, LDone);
         if LDone then
-          ADone := True;
+          Exit(True);
+//          Result := True; <--- OLD CODE (se ADone = true esegue comunque tutti i before di tutti gli eventuali interceptors
       end;
   end;
 end;

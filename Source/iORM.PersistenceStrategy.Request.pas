@@ -110,6 +110,24 @@ type
     property RelationPropName: String read GetRelationPropName write SetRelationPropName;
   end;
 
+  TioPersistenceStrategyRequest<TResult> = class(TioPersistenceStrategyRequest, IioPersistenceStrategyRequest<TResult>)
+  private
+    FResult: TResult;
+    function GetResult: TResult;
+    procedure SetResult(const Value: TResult);
+  public
+    property Result: TResult read GetResult write SetResult;
+  end;
+
+  IioPersistenceStrategyRequest<TResult> = interface(IioPersistenceStrategyRequest)
+    ['{FF839CAE-788B-48B3-B801-916DF87A80CA}']
+    // methods
+    function GetResult: TResult;
+    procedure SetResult(const Value: TResult);
+    // properties
+    property Result: TResult read GetResult write SetResult;
+  end;
+
 implementation
 
 uses
@@ -193,7 +211,7 @@ begin
     if FRelationPropName <> IO_STRING_NULL_VALUE then
       LJSONObject.AddPair(PSR_RELATIONPROPERTYNAME, FRelationPropName);
     // ---------- end ----------
-    // Result JSONObject as string
+    // render as string
     Result := LJSONObject.ToString;
   finally
     LJSONObject.Free;
@@ -523,6 +541,11 @@ begin
   FRelationPropName := Value;
 end;
 
+procedure TioPersistenceStrategyRequest.SetWhere(const Value: IioWhere);
+begin
+  FWhere := Value;
+end;
+
 procedure TioPersistenceStrategyRequest._FillSessionRelatedProperties;
 begin
   try
@@ -541,6 +564,18 @@ begin
   finally
     TioApplication.ReleaseSession;
   end;
+end;
+
+{ TioPersistenceStrategyRequest<TResult> }
+
+function TioPersistenceStrategyRequest<TResult>.GetResult: TResult;
+begin
+  Result := FResult;
+end;
+
+procedure TioPersistenceStrategyRequest<TResult>.SetResult(const Value: TResult);
+begin
+  FResult := Value;
 end;
 
 end.

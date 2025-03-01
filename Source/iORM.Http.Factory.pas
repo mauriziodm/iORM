@@ -42,8 +42,6 @@ type
 
   TioHttpFactory = class
   public
-    class function NewRequestBody: IioHttpRequestBody; static;
-    class function NewRequestBodyByJSONString(const AJSONString:String): IioHttpRequestBody; static;
     class function NewResponseBody: IioHttpResponseBody; static;
     class function NewResponseBodyByJSONString(const AJSONString:String): IioHttpResponseBody; static;
   end;
@@ -54,16 +52,6 @@ uses
   iORM.Http.Body.Request, iORM.Http.Body.Response;
 
 { TioHttpFactory }
-
-class function TioHttpFactory.NewRequestBody: IioHttpRequestBody;
-begin
-  Result := TioHttpRequestBody.Create;
-end;
-
-class function TioHttpFactory.NewRequestBodyByJSONString(const AJSONString: String): IioHttpRequestBody;
-begin
-  Result := TioHttpRequestBody.CreateByJSONString(AJSONString);
-end;
 
 class function TioHttpFactory.NewResponseBody: IioHttpResponseBody;
 begin

@@ -41,7 +41,7 @@ unit iORM.Interceptor.Strategy;
 interface
 
 uses
-  iORM.Where.Interfaces;
+  iORM.Where.Interfaces, iORM.PersistenceStrategy.Interfaces;
 
 type
 
@@ -50,86 +50,86 @@ type
   TioCustomStrategyInterceptor = class
   public
     // LoadObject
-    class function BeforeLoadObject(const AWhere: IioWhere; const AObj: TObject; var ADone: Boolean): TObject; virtual;
-    class function AfterLoadObject(const AWhere: IioWhere; const AObj: TObject): TObject; virtual;
+    class procedure BeforeLoadObject(const APSRequest: IioPersistenceStrategyRequest; var ADone: Boolean); virtual;
+    class procedure AfterLoadObject(const APSRequest: IioPersistenceStrategyRequest); virtual;
     // LoadList
-    class procedure BeforeLoadList(const AWhere: IioWhere; const AList: TObject; var ADone: Boolean); virtual;
-    class procedure AfterLoadList(const AWhere: IioWhere; const AList: TObject); virtual;
+    class procedure BeforeLoadList(const APSRequest: IioPersistenceStrategyRequest; var ADone: Boolean); virtual;
+    class procedure AfterLoadList(const APSRequest: IioPersistenceStrategyRequest); virtual;
     // PersistObject
-    class procedure BeforePersistObject(const AObj: TObject; var ADone: Boolean); virtual;
-    class procedure AfterPersistObject(const AObj: TObject); virtual;
+    class procedure BeforePersistObject(const APSRequest: IioPersistenceStrategyRequest; var ADone: Boolean); virtual;
+    class procedure AfterPersistObject(const APSRequest: IioPersistenceStrategyRequest); virtual;
     // PersistList
-    class procedure BeforePersistList(const AList: TObject; var ADone: Boolean); virtual;
-    class procedure AfterPersistList(const AList: TObject); virtual;
+    class procedure BeforePersistList(const APSRequest: IioPersistenceStrategyRequest; var ADone: Boolean); virtual;
+    class procedure AfterPersistList(const APSRequest: IioPersistenceStrategyRequest); virtual;
     // DeleteObject
-    class procedure BeforeDeleteObject(const AObj: TObject; var ADone: Boolean); virtual;
-    class procedure AfterDeleteObject(const AObj: TObject); virtual;
+    class procedure BeforeDeleteObject(const APSRequest: IioPersistenceStrategyRequest; var ADone: Boolean); virtual;
+    class procedure AfterDeleteObject(const APSRequest: IioPersistenceStrategyRequest); virtual;
     // DeleteList
-    class procedure BeforeDeleteList(const AList: TObject; var ADone: Boolean); virtual;
-    class procedure AfterDeleteList(const AList: TObject); virtual;
+    class procedure BeforeDeleteList(const APSRequest: IioPersistenceStrategyRequest; var ADone: Boolean); virtual;
+    class procedure AfterDeleteList(const APSRequest: IioPersistenceStrategyRequest); virtual;
   end;
 
 implementation
 
 { TioStrategyIncerceptor }
 
-class procedure TioCustomStrategyInterceptor.AfterDeleteList(const AList: TObject);
+class procedure TioCustomStrategyInterceptor.AfterDeleteList(const APSRequest: IioPersistenceStrategyRequest);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomStrategyInterceptor.AfterDeleteObject(const AObj: TObject);
+class procedure TioCustomStrategyInterceptor.AfterDeleteObject(const APSRequest: IioPersistenceStrategyRequest);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomStrategyInterceptor.AfterLoadList(const AWhere: IioWhere; const AList: TObject);
+class procedure TioCustomStrategyInterceptor.AfterLoadList(const APSRequest: IioPersistenceStrategyRequest);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class function TioCustomStrategyInterceptor.AfterLoadObject(const AWhere: IioWhere; const AObj: TObject): TObject;
-begin
-  Result := AObj;
-end;
-
-
-class procedure TioCustomStrategyInterceptor.AfterPersistList(const AList: TObject);
+class procedure TioCustomStrategyInterceptor.AfterLoadObject(const APSRequest: IioPersistenceStrategyRequest);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomStrategyInterceptor.AfterPersistObject(const AObj: TObject);
+
+class procedure TioCustomStrategyInterceptor.AfterPersistList(const APSRequest: IioPersistenceStrategyRequest);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomStrategyInterceptor.BeforeDeleteList(const AList: TObject; var ADone: Boolean);
+class procedure TioCustomStrategyInterceptor.AfterPersistObject(const APSRequest: IioPersistenceStrategyRequest);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomStrategyInterceptor.BeforeDeleteObject(const AObj: TObject; var ADone: Boolean);
+class procedure TioCustomStrategyInterceptor.BeforeDeleteList(const APSRequest: IioPersistenceStrategyRequest; var ADone: Boolean);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomStrategyInterceptor.BeforeLoadList(const AWhere: IioWhere; const AList: TObject; var ADone: Boolean);
+class procedure TioCustomStrategyInterceptor.BeforeDeleteObject(const APSRequest: IioPersistenceStrategyRequest; var ADone: Boolean);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class function TioCustomStrategyInterceptor.BeforeLoadObject(const AWhere: IioWhere; const AObj: TObject; var ADone: Boolean): TObject;
-begin
-  Result := AObj;
-end;
-
-class procedure TioCustomStrategyInterceptor.BeforePersistList(const AList: TObject; var ADone: Boolean);
+class procedure TioCustomStrategyInterceptor.BeforeLoadList(const APSRequest: IioPersistenceStrategyRequest; var ADone: Boolean);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
 
-class procedure TioCustomStrategyInterceptor.BeforePersistObject(const AObj: TObject; var ADone: Boolean);
+class procedure TioCustomStrategyInterceptor.BeforeLoadObject(const APSRequest: IioPersistenceStrategyRequest; var ADone: Boolean);
+begin
+  // Nothing to do here (It must be implemented by the descendant classes)
+end;
+
+class procedure TioCustomStrategyInterceptor.BeforePersistList(const APSRequest: IioPersistenceStrategyRequest; var ADone: Boolean);
+begin
+  // Nothing to do here (It must be implemented by the descendant classes)
+end;
+
+class procedure TioCustomStrategyInterceptor.BeforePersistObject(const APSRequest: IioPersistenceStrategyRequest; var ADone: Boolean);
 begin
   // Nothing to do here (It must be implemented by the descendant classes)
 end;
