@@ -50,7 +50,6 @@ type
     FRESTResponse: TRESTResponse;
     FioHttpRequestBody: IioPersistenceStrategyRequest;
     FioHttpResponseBody: IioHttpResponseBody;
-    procedure Execute(const APSRequest: IioPersistenceStrategyRequest);
   strict protected
     procedure DoStartTransaction; override;
     procedure DoCommitTransaction; override;
@@ -59,6 +58,7 @@ type
     constructor Create(const AConnectionInfo:TioConnectionInfo);
     destructor Destroy; override;
     function AsHttpConnection: IioConnectionHttp; override;
+    procedure Execute(const APSRequest: IioPersistenceStrategyRequest);
     function InTransaction: Boolean; override;
     // ioRequestBody property
     function GetioRequestBody:IioPersistenceStrategyRequest;

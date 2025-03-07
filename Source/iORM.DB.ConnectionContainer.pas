@@ -86,6 +86,7 @@ type
   TioConnectionManager = class // NB: Is thread-safe
   strict private
 // TODO: Spostare FConnectionManagerContainer oppure proprio tutto TioConnectionManager all'interno del SessionDataStore???
+// TODO: Considerare di sostituire TioConnectionInfo direttamente con i componenti ConnectionDef, in questo modo eliminiamo una istanza e altri vantaggi
     class var FConnectionManagerContainer: TioConnectionManagerContainer;
     // NB: Questo container in realtà contiene solo il tipo di DB (cdtFirebird, cdtSQLite ecc.ecc.) in modo da poter fare dei confronti veloci nelle factory e per non dipendere direttamente dal DriverID delle connectionDef di FireDAC
     class var FShowWaitProc: TProc;

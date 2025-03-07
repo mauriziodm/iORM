@@ -127,6 +127,7 @@ type
     property Server: String read FServer write FServer;
     property SQLDialect: TioSQLDialect read FSQLDialect write FSQLDialect;
     property UserName: String read FUserName write FUserName;
+// TODO: Non ricordo se la proprietà IioSynchroStrategy_Client è da eliminare, controllare
     property SynchroStrategy_Client: IioSynchroStrategy_Client read FSynchroStrategy_Client write SetSynchroStrategy_Client default nil;
     // Events
     property AfterCreateOrAlterDB: TioDBBuilderAfterCreateOrAlterDBEvent read FAfterCreateOrAlterDBEvent write FAfterCreateOrAlterDBEvent;

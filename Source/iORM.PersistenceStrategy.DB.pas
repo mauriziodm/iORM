@@ -59,8 +59,7 @@ type
   protected
     // ========== BEGIN OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
     // Persistence
-    // ---------- Begin intercepted methods (StrategyInterceptors) ----------
-
+    // ---------- Begin intercepted methods (CRUD Interceptors) ----------
     class procedure _DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); override;
     class procedure _DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); override;
     class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType; const ASessionData: IioAuthSessionData); override;
@@ -71,7 +70,7 @@ type
     class procedure _DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
       const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
       const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); override;
-    // ---------- End intercepted methods (StrategyInterceptors) ----------
+    // ---------- End intercepted methods (CRUD Interceptors) ----------
     class procedure _DoDelete(const AWhere: IioWhere); override;
     class function _DoLoadCount(const AWhere: IioWhere): Integer; override;
     class procedure _DoLoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;

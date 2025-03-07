@@ -683,7 +683,7 @@ begin
     if (LSynchroStrategy_Client <> nil) then
       FObjNextVersion := LSynchroStrategy_Client.GetNextObjVersion(Self)
     else
-      FObjNextVersion := io.LoadObjVersion(Self) + 1;
+      FObjNextVersion := io._LoadObjVersionInternal(Self) + 1;
   end;
   // Return the value
   Result := FObjNextVersion;

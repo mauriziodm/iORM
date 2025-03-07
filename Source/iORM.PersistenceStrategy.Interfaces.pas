@@ -37,7 +37,7 @@ interface
 
 uses
   iORM.Auth.Interfaces, iORM.CommonTypes, iORM.LiveBindings.BSPersistence,
-  iORM.Where.Interfaces;
+  iORM.Where.Interfaces, System.Rtti;
 
 const
 
@@ -47,7 +47,6 @@ const
   PSR_AUTH_SCOPE = 'AuthScope';
   PSR_AUTH_TOKEN = 'AuthToken';
   PSR_BLINDLEVEL = 'BlindLevel';
-  PSR_INSTANCES_DATAOBJ = 'DataObj';
   PSR_INSTANCES_INTF1 = 'Intf1';
   PSR_INSTANCES_MASTERBSPERSISTENCE = 'MasterBSP';
   PSR_INSTANCES_OBJ1 = 'Obj1';
@@ -79,11 +78,11 @@ type
     psmAuthNewAccessToken,
     psmAuthRefreshAccessToken,
     psmAuthUser,
-    psmCount,
     psmDelete,
     psmDeleteList,
     psmDeleteObject,
     psmDoSynchronization,
+    psmLoadCount,
     psmLoadDataSet,
     psmLoadList,
     psmLoadMax,
@@ -114,17 +113,21 @@ type
     function GetBlindLevel: Byte;
     function GetConnection: String;
     function GetConnectionRemote: String;
-    function GetDataObj: TObject;
     function GetIntent: TioPersistenceIntentType;
     function GetIntf1: IInterface;
+    function GetIntf1_Serialize: Boolean;
     function GetMasterBSPersistence: TioBSPersistence;
     function GetMasterPropName: String;
     function GetMasterPropPath: String;
     function GetMethod: TioPersistenceStrategyMethod;
     function GetObj1: TObject;
+    function GetObj1_Serialize: Boolean;
     function GetPropName: String;
     function GetRelationOID: Integer;
     function GetRelationPropName: String;
+    function GetResult: TValue;
+    function GetResultAsBoolean: Boolean;
+    function GetResultAsInteger: Integer;
     function GetUsr: String;
     function GetUsrOID: Integer;
     function GetWhere: IioWhere;
@@ -132,17 +135,22 @@ type
     procedure SetAuthIntention(const Value: TioAuthIntention);
     procedure SetAuthScope(const Value: String);
     procedure SetBlindLevel(const Value: Byte);
-    procedure SetDataObj(const Value: TObject);
     procedure SetIntent(const Value: TioPersistenceIntentType);
     procedure SetIntf1(const Value: IInterface);
+    procedure SetIntf1_Serialize(const Value: Boolean);
     procedure SetMasterBSPersistence(const Value: TioBSPersistence);
     procedure SetMasterPropName(const Value: String);
     procedure SetMasterPropPath(const Value: String);
     procedure SetObj1(const Value: TObject);
+    procedure SetObj1_Serialize(const Value: Boolean);
     procedure SetPropName(const Value: String);
     procedure SetRelationOID(const Value: Integer);
     procedure SetRelationPropName(const Value: String);
+    procedure SetResult(const Value: TValue);
+    procedure SetResultAsBoolean(const Value: Boolean);
+    procedure SetResultAsInteger(const Value: Integer);
     procedure SetWhere(const Value: IioWhere);
+    procedure SwitchToConnectionRemote;
     // method property
     property Method: TioPersistenceStrategyMethod read GetMethod;
     // session data
@@ -158,10 +166,11 @@ type
     property AuthScope: String read GetAuthScope;
     property AuthToken: String read GetAuthToken; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
     // instances
-    property DataObj: TObject read GetDataObj write SetDataObj;
     property Intf1: IInterface read GetIntf1 write SetIntf1;
+    property Intf1_Serialize: Boolean read GetIntf1_Serialize write SetIntf1_Serialize;
     property SetMasterBSPersistence: TioBSPersistence read GetMasterBSPersistence write SetMasterBSPersistence;
     property Obj1: TObject read GetObj1 write SetObj1;
+    property Obj1_Serialize: Boolean read GetObj1_Serialize write SetObj1_Serialize;
     property Where: IioWhere read GetWhere write SetWhere;
     // others
     property BlindLevel: Byte read GetBlindLevel write SetBlindLevel;
@@ -171,15 +180,10 @@ type
     property PropName: String read GetPropName write SetPropName;
     property RelationOID: Integer read GetRelationOID write SetRelationOID;
     property RelationPropName: String read GetRelationPropName write SetRelationPropName;
-  end;
-
-  IioPersistenceStrategyRequest<TResult> = interface(IioPersistenceStrategyRequest)
-    ['{FF839CAE-788B-48B3-B801-916DF87A80CA}']
-    // methods
-    function GetResult: TResult;
-    procedure SetResult(const Value: TResult);
-    // properties
-    property Result: TResult read GetResult write SetResult;
+    // result
+    property Result: TValue read GetResult write SetResult;
+    property ResultAsBoolean: Boolean read GetResultAsBoolean write SetResultAsBoolean;
+    property ResultAsInteger: Integer read GetResultAsInteger write SetResultAsInteger;
   end;
 
 implementation

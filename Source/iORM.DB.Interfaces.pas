@@ -360,6 +360,10 @@ type
     procedure SetJSONDataValue(const Value: TJSONValue);
     function GetJSONDataValue: TJSONValue;
     property JSONDataValue: TJSONValue read GetJSONDataValue write SetJSONDataValue;
+    // JSONDataValueAsInteger
+    procedure SetJSONDataValueAsInteger(const AObj: TObject);
+    function GetJSONDataValueAsInteger: TObject;
+    property JSONDataValueAsInteger: TObject read GetJSONDataValueAsInteger write SetJSONDataValueAsInteger;
     // JSONDataValueAsObject
     procedure SetJSONDataValueAsObject(const AObj: TObject);
     function GetJSONDataValueAsObject: TObject;
@@ -374,35 +378,37 @@ type
   TioPersistenceStrategyIntf = class abstract
   private
     // strategy interception layer methods
+    // ---------- Begin intercepted methods (Strategy Interceptors) ----------
     class procedure _InterceptDeleteList(const APSRequest: IioPersistenceStrategyRequest); static; inline;
     class procedure _InterceptDeleteObject(const APSRequest: IioPersistenceStrategyRequest); static; inline;
     class procedure _InterceptLoadList(const APSRequest: IioPersistenceStrategyRequest); static; inline;
     class procedure _InterceptLoadObject(const APSRequest: IioPersistenceStrategyRequest); static; inline;
     class procedure _InterceptPersistList(const APSRequest: IioPersistenceStrategyRequest); static; inline;
     class procedure _InterceptPersistObject(const APSRequest: IioPersistenceStrategyRequest); static; inline;
+    // ---------- End intercepted methods (Strategy Interceptors) ----------
   protected
     // ========== BEGIN OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
     // Persistence
-    // ---------- Begin intercepted methods (CRUDInterceptors) ----------
+    // ---------- Begin intercepted methods (CRUD Interceptors) ----------
     class procedure _DoDeleteList(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     class procedure _DoDeleteObject(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     class procedure _DoLoadList(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     class procedure _DoLoadObject(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     class procedure _DoPersistList(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     class procedure _DoPersistObject(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
-    // ---------- End intercepted methods (CRUDInterceptors) ----------
+    // ---------- End intercepted methods (CRUD Interceptors) ----------
     class procedure _DoDelete(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
-    class procedure _DoLoadCount(const APSRequest: IioPersistenceStrategyRequest<Integer>); virtual; abstract;
+    class procedure _DoLoadCount(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     class procedure _DoLoadDataSet(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
-    class procedure _DoLoadMax(const APSRequest: IioPersistenceStrategyRequest<Integer>); virtual; abstract;
-    class procedure _DoLoadMin(const APSRequest: IioPersistenceStrategyRequest<Integer>); virtual; abstract;
+    class procedure _DoLoadMax(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
+    class procedure _DoLoadMin(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     class procedure _DoLoadObjectByClassOnly(const APresistenceStrategyRequest: IioPersistenceStrategyRequest); virtual; abstract;
-    class procedure _DoLoadObjVersion(const APSRequest: IioPersistenceStrategyRequest<Integer>); virtual; abstract;
+    class procedure _DoLoadObjVersion(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     // Transaction
     class procedure _DoStartTransaction(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     class procedure _DoCommitTransaction(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     class procedure _DoRollbackTransaction(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
-    class procedure _DoInTransaction(const APSRequest: IioPersistenceStrategyRequest<Boolean>); virtual; abstract;
+    class procedure _DoInTransaction(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     // SynchroStrategy
     class procedure _DoSynchronization(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     // SQLDestinations
@@ -416,8 +422,7 @@ type
     class procedure _DoAuth_User(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
   public
-
-    class procedure ExecutePSRequest(const APSRequest: IioPersistenceStrategyRequest);
+    class procedure Execute(const APSRequest: IioPersistenceStrategyRequest);
 // TODO: Fare anche una versione asincrona?
 //    class procedure ExecutePSRequestAsync(const APSRequest: IioPersistenceStrategyRequest; const AOnTerminate: TioPSROnTerminateMethod; const AOnException: TioPSROnExceptionMethod);
 // TODO: Fare anche l'esecuzione di Unit Of Work? (collezione di PSRequest)
@@ -814,6 +819,64 @@ end;
 
 { TioStrategyIntf }
 
+class procedure TioPersistenceStrategyIntf.Execute(const APSRequest: IioPersistenceStrategyRequest);
+begin
+  case APSRequest.Method of
+    psmAuthAccess:
+      _DoAuth_Access(APSRequest);
+    psmAuthApp:
+      _DoAuth_App(APSRequest);
+    psmAuthNewAccessToken:
+      _DoAuth_NewAccessToken(APSRequest);
+    psmAuthRefreshAccessToken:
+      _DoAuth_RefreshAccessToken(APSRequest);
+    psmAuthUser:
+      _DoAuth_User(APSRequest);
+    psmLoadCount:
+      _DoLoadCount(APSRequest);
+    psmDelete:
+      _DoDelete(APSRequest);
+    psmDeleteList:
+      _InterceptDeleteList(APSRequest); // intercepted
+    psmDeleteObject:
+      _InterceptDeleteObject(APSRequest); // intercepted
+    psmDoSynchronization:
+      _DoSynchronization(APSRequest);
+    psmLoadDataSet:
+      _DoLoadDataSet(APSRequest);
+    psmLoadList:
+      _InterceptLoadList(APSRequest); // intercepted
+    psmLoadMax:
+      _DoLoadMax(APSRequest);
+    psmLoadMin:
+      _DoLoadMin(APSRequest);
+    psmLoadObject:
+      _InterceptLoadObject(APSRequest); // intercepted
+    psmLoadObjectByClassOnly:
+      _DoLoadObjectByClassOnly(APSRequest);
+    psmLoadObjVersion:
+      _DoLoadObjVersion(APSRequest);
+    psmPersistList:
+      _InterceptPersistList(APSRequest); // intercepted
+    psmPersistObject:
+      _InterceptPersistObject(APSRequest); // intercepted
+    psmSQLDestExecute:
+      _DoSQLDestExecute(APSRequest);
+    psmSQLDestLoadDataSet:
+      _DoSQLDestLoadDataSet(APSRequest);
+    psmTransactionCommit:
+      _DoTransactionCommit(APSRequest);
+    psmTransactionIn:
+      _DoTransactionIn(APSRequest);
+    psmTransactionRollback:
+      _DoTransactionRollback(APSRequest);
+    psmTransactionStart:
+      _DoTransactionStart(APSRequest);
+  else
+    EioSynchroStrategyException.Create(Self.Name, 'ExecutePSRequest', 'The requested persistence strategy method is not handled');
+  end;
+end;
+
 class procedure TioPersistenceStrategyIntf._InterceptDeleteList(const APSRequest: IioPersistenceStrategyRequest);
 begin
 {$REGION '-----INTERCEPTORS-----'}
@@ -908,64 +971,6 @@ begin
   TioStrategyInterceptorRegister.AfterPersistObject(APSRequest);
 {$ENDIF}
 {$ENDREGION}
-end;
-
-class procedure TioPersistenceStrategyIntf.ExecutePSRequest(const APSRequest: IioPersistenceStrategyRequest);
-begin
-  case APSRequest.Method of
-    psmAuthAccess:
-      _DoAuth_Access(APSRequest);
-    psmAuthApp:
-      _DoAuth_App(APSRequest);
-    psmAuthNewAccessToken:
-      _DoAuth_NewAccessToken(APSRequest);
-    psmAuthRefreshAccessToken:
-      _DoAuth_RefreshAccessToken(APSRequest);
-    psmAuthUser:
-      _DoAuth_User(APSRequest);
-    psmCount:
-      _DoLoadCount(APSRequest);
-    psmDelete:
-      _DoDelete(APSRequest);
-    psmDeleteList:
-      _InterceptDeleteList(APSRequest); // intercepted
-    psmDeleteObject:
-      _InterceptDeleteObject(APSRequest); // intercepted
-    psmDoSynchronization:
-      _DoSynchronization(APSRequest);
-    psmLoadDataSet:
-      _DoLoadDataSet(APSRequest);
-    psmLoadList:
-      _InterceptLoadList(APSRequest); // intercepted
-    psmLoadMax:
-      _DoLoadMax(APSRequest);
-    psmLoadMin:
-      _DoLoadMin(APSRequest);
-    psmLoadObject:
-      _InterceptLoadObject(APSRequest); // intercepted
-    psmLoadObjectByClassOnly:
-      _DoLoadObjectByClassOnly(APSRequest);
-    psmLoadObjVersion:
-      _DoLoadObjVersion(APSRequest);
-    psmPersistList:
-      _InterceptPersistList(APSRequest); // intercepted
-    psmPersistObject:
-      _InterceptPersistObject(APSRequest); // intercepted
-    psmSQLDestExecute:
-      _DoSQLDestExecute(APSRequest);
-    psmSQLDestLoadDataSet:
-      _DoSQLDestLoadDataSet(APSRequest);
-    psmTransactionCommit:
-      _DoTransactionCommit(APSRequest);
-    psmTransactionIn:
-      _DoTransactionIn(APSRequest);
-    psmTransactionRollback:
-      _DoTransactionRollback(APSRequest);
-    psmTransactionStart:
-      _DoTransactionStart(APSRequest);
-  else
-    EioSynchroStrategyException.Create(Self.Name, 'ExecutePSRequest', 'The requested persistence strategy method is not handled');
-  end;
 end;
 
 { TioConnectionInfo }

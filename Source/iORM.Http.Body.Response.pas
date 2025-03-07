@@ -36,7 +36,7 @@ unit iORM.Http.Body.Response;
 interface
 
 uses
-  System.JSON, System.Classes, iORM.DB.Interfaces;
+  System.Classes, iORM.DB.Interfaces;
 
 type
 
@@ -45,7 +45,6 @@ type
     // auth
     // TODO: Auth - non serve più perchè tanto questo tipo di risposte incapsulano una TioAuthResponse?
     FAuthResultIsAuthorized: Boolean;
-    // TODO: Auth - non serve più perchè tanto questo tipo di risposte incapsulano una TioAuthResponse?
     FAuthResult1: String;
     // TODO: Auth - non serve più perchè tanto questo tipo di risposte incapsulano una TioAuthResponse?
     FAuthResult2: String;
@@ -61,6 +60,7 @@ type
     function GetExceptionClassName: String;
     function GetExceptionMessage: String;
     function GetJSONDataValue: TJSONValue;
+    function GetJSONDataValueAsInteger: Integer;
     function GetJSONDataValueAsObject: TObject;
     function GetStream: TStream;
     procedure SetAuthResult1(const Value: String);
@@ -68,6 +68,7 @@ type
     procedure SetExceptionClassName(const Value: String);
     procedure SetExceptionMessage(const Value: String);
     procedure SetJSONDataValue(const Value: TJSONValue);
+    procedure SetJSONDataValueAsInteger(const Value: Integer);
     procedure SetJSONDataValueAsObject(const AObj: TObject);
     function AsString: String;
   public
@@ -79,7 +80,8 @@ type
 implementation
 
 uses
-  iORM, System.NetEncoding, iORM.Exceptions, DJSON, System.SysUtils;
+  iORM, System.NetEncoding, iORM.Exceptions, DJSON, System.SysUtils,
+  System.JSON;
 
 { TioHttpResponseBody }
 
@@ -194,6 +196,11 @@ begin
   Result := FJSONDataValue;
 end;
 
+function TioHttpResponseBody.GetJSONDataValueAsInteger: Integer;
+begin
+  Result := FJSONDataValue.AsType<Integer>;
+end;
+
 function TioHttpResponseBody.GetJSONDataValueAsObject: TObject;
 begin
   if Assigned(FJSONDataValue) then
@@ -232,6 +239,11 @@ end;
 procedure TioHttpResponseBody.SetJSONDataValue(const Value: TJSONValue);
 begin
   FJSONDataValue := Value;
+end;
+
+procedure TioHttpResponseBody.SetJSONDataValueAsInteger(const Value: Integer);
+begin
+  FJSONDataValue := TJSONNumber.Create(Value);
 end;
 
 procedure TioHttpResponseBody.SetJSONDataValueAsObject(const AObj: TObject);

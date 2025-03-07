@@ -36,31 +36,26 @@ unit iORM.Http.Server.Executor;
 interface
 
 uses
-  iORM.DB.Interfaces, System.DateUtils;
+  iORM.DB.Interfaces, System.DateUtils, iORM.PersistenceStrategy.Interfaces;
 
 type
 
   TioHttpServerExecutor = class
   private
-    class procedure _Count(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
-    class procedure _Delete(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
-    class procedure _DeleteList(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
-    class procedure _DeleteObject(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
-    class procedure _DoSynchronization(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
-    class procedure _LoadDataSet(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
-    class procedure _LoadList(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
-    class procedure _LoadObject(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
-    class procedure _Max(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
-    class procedure _Min(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
-    class procedure _PersistList(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
-    class procedure _PersistObject(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
-    class procedure _SQLDestExecute(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
-    class procedure _SQLLoadDataSet(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
-    // auth
-    class procedure _AuthorizeUser(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
-    class procedure _AuthorizeAccess(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
-    class procedure _NewAccessToken(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
-    class procedure _RefreshAccessToken(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody); inline; static;
+    // generic execution methods
+    class procedure _Execute(const APSRequest: IioPersistenceStrategyRequest); inline; static;
+    class procedure _Execute_IntegerResult(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _Execute_DataSetResult(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _Execute_Persist(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); inline; static;
+    // specific execution methods
+    class procedure _Auth_Access(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _Auth_App(const  APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _Auth_NewAccessToken(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _Auth_RefreshAccessToken(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _Auth_User(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _DoSynchronization(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _LoadList(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _LoadObject(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); inline; static;
   public
     class function Execute(const ARequestBodyAsString: String): String; static;
     class function Test: String; static;
@@ -72,60 +67,73 @@ uses
   iORM, DJSON, iORM.Http.Factory, iORM.Http.Interfaces, iORM.Exceptions,
   System.SysUtils, System.JSON, FireDAC.Comp.Client, FireDAC.Stan.Intf,
   System.Generics.Collections, iORM.Utilities, iORM.SynchroStrategy.Custom,
-  iORM.Auth.Components.AuthServer, iORM.Auth.Interfaces;
+  iORM.Auth.Components.AuthServer, iORM.Auth.Interfaces,
+  iORM.PersistenceStrategy.Factory;
 
 { TioHttpServerExecutor }
 
 class function TioHttpServerExecutor.Execute(const ARequestBodyAsString: String): String;
 var
-  LioRequestBody: IioHttpRequestBody;
+  LPSRequest: IioPersistenceStrategyRequest;
   LioResponseBody: IioHttpResponseBody;
 begin
   try
-    // Create ioRequestBody and ioResponseBody instances
-    LioRequestBody := TioHttpFactory.NewRequestBodyByJSONString(ARequestBodyAsString);
+    // Create the request body and switch the "Connection" property with the "ConnectionRemote" one
+    LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_ByJsonString(ARequestBodyAsString);
+    LPSRequest.SwitchToConnectionRemote;
+    // Create the response body
     LioResponseBody := TioHttpFactory.NewResponseBody;
-    // Execute the right method/action (in ordine di prevista frequenza)
-    if LioRequestBody.MethodName = HTTP_METHOD_NAME_LOADOBJECT then
-      _LoadObject(LioRequestBody, LioResponseBody)
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_PERSISTOBJECT then
-      _PersistObject(LioRequestBody, LioResponseBody)
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_DELETEOBJECT then
-      _DeleteObject(LioRequestBody, LioResponseBody)
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_LOADLIST then
-      _LoadList(LioRequestBody, LioResponseBody)
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_PERSISTLIST then
-      _PersistList(LioRequestBody, LioResponseBody)
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_DELETELIST then
-      _DeleteList(LioRequestBody, LioResponseBody)
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_LOADMAX then
-      _Max(LioRequestBody, LioResponseBody)
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_LOADMIN then
-      _Min(LioRequestBody, LioResponseBody)
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_LOADCOUNT then
-      _Count(LioRequestBody, LioResponseBody)
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_DELETE then
-      _Delete(LioRequestBody, LioResponseBody)
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_LOADDATASET then
-      _LoadDataSet(LioRequestBody, LioResponseBody)
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_SQLDESTEXECUTE then
-      _SQLDestExecute(LioRequestBody, LioResponseBody)
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_SQLDESTLOADDATASET then
-      _SQLLoadDataSet(LioRequestBody, LioResponseBody)
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_DOSYNCHRONIZATION then
-      _DoSynchronization(LioRequestBody, LioResponseBody)
-    // auth methods
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_ACCESS then
-      _AuthorizeAccess(LioRequestBody, LioResponseBody)
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_REFRESHACCESSTOKEN then
-      _RefreshAccessToken(LioRequestBody, LioResponseBody)
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_NEWACCESSTOKEN then
-      _NewAccessToken(LioRequestBody, LioResponseBody)
-    else if LioRequestBody.MethodName = HTTP_METHOD_NAME_AUTH_USER then
-      _AuthorizeUser(LioRequestBody, LioResponseBody)
-    // else
+    // Dispatch to the right method/action
+    case APSRequest.Method of
+      psmAuthAccess:
+        _DoAuth_Access(LPSRequest, LioResponseBody);
+      psmAuthApp:
+        _DoAuth_App(LPSRequest, LioResponseBody);
+      psmAuthNewAccessToken:
+        _DoAuth_NewAccessToken(LPSRequest, LioResponseBody);
+      psmAuthRefreshAccessToken:
+        _DoAuth_RefreshAccessToken(LPSRequest, LioResponseBody);
+      psmAuthUser:
+        _DoAuth_User(LPSRequest, LioResponseBody);
+      psmDelete:
+        _Execute(LPSRequest);
+      psmDeleteList:
+        _Execute(LPSRequest);
+      psmDeleteObject:
+        _Execute(LPSRequest);
+      psmDoSynchronization:
+        _DoSynchronization(LPSRequest, LioResponseBody);
+      psmLoadCount:
+        _Execute_IntegerResult(LPSRequest, LioResponseBody);
+      psmLoadDataSet:
+        _Execute_DataSetResult(LPSRequest, LioResponseBody);
+      psmLoadList:
+        _LoadList(LPSRequest, LioResponseBody);
+      psmLoadMax:
+        _Execute_IntegerResult(LPSRequest, LioResponseBody);
+      psmLoadMin:
+        _Execute_IntegerResult(LPSRequest, LioResponseBody);
+      psmLoadObject:
+        _LoadObject(LPSRequest, LioResponseBody);
+      psmPersistList:
+        _Execute_Persist(LPSRequest, LioResponseBody);
+      psmPersistObject:
+        _Execute_Persist(LPSRequest, LioResponseBody);
+      psmSQLDestExecute:
+        _Execute(LPSRequest);
+      psmSQLDestLoadDataSet:
+        _Execute_DataSetResult(LPSRequest, LioResponseBody);
+      psmTransactionCommit:
+        _DoTransactionCommit(LPSRequest, LioResponseBody);
+      psmTransactionIn:
+        _DoTransactionIn(LPSRequest, LioResponseBody);
+      psmTransactionRollback:
+        _DoTransactionRollback(LPSRequest, LioResponseBody);
+      psmTransactionStart:
+        _DoTransactionStart(LPSRequest, LioResponseBody);
     else
-      raise EioHttpLocalException.Create(ClassName, 'Execute', Format('Method "%s" not found.', [LioRequestBody.MethodName]));
+      EioSynchroStrategyException.Create(Self.Name, 'Execute', 'The requested persistence strategy method is not handled');
+    end;
     // Return the response
     Result := LioResponseBody.AsString;
   except
@@ -144,162 +152,103 @@ begin
   Result := Format('Hi, I''m iORM, I''m proud to tell you that my http server executor is successfully connected now %s.', [Now.ToString]);
 end;
 
-class procedure TioHttpServerExecutor._AuthorizeAccess(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
+class procedure TioHttpServerExecutor._Auth_Access(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
 begin
-  AioResponseBody.AuthResult1 := TioAuthServer.GetInstance.AuthorizeAccess(AioRequestBody.AuthScope, AioRequestBody.AuthIntention, AioRequestBody.AuthToken).AsString;
+//  AioResponseBody.AuthResult1 := TioAuthServer.GetInstance.AuthorizeAccess(AioRequestBody.AuthScope, AioRequestBody.AuthIntention, AioRequestBody.AuthToken).AsString;
 end;
 
-class procedure TioHttpServerExecutor._AuthorizeUser(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
+class procedure TioHttpServerExecutor._Auth_App(const  APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
+begin
+  // Da fare
+end;
+
+class procedure TioHttpServerExecutor._Auth_User(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
 var
   LUserCredentials: IioAuthUserCredentials;
 begin
-  if Supports(AioRequestBody.JSONDataValueAsObject, IioAuthUserCredentials, LUserCredentials) then
+  if Supports(APSRequest.Intf1, IioAuthUserCredentials, LUserCredentials) then
     AioResponseBody.AuthResult1 := TioAuthServer.GetInstance.AuthorizeUser(LUserCredentials).AsString
   else
     raise EioHttpLocalException.Create(ClassName, '_AuthorizeUser', 'JSONDataValue object does not implement then "IioAuthUserCredentials" interface');
 end;
 
-class procedure TioHttpServerExecutor._Count(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
-var
-  LCount: integer;
-begin
-  LCount := AioRequestBody.Where.Count;
-  AioResponseBody.JSONDataValue := TJSONNumber.Create(LCount);
-end;
-
-class procedure TioHttpServerExecutor._Delete(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
-begin
-  AioRequestBody.Where.Delete;
-end;
-
-class procedure TioHttpServerExecutor._DeleteList(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
-var
-  LList: TObject;
-begin
-  LList := AioRequestBody.JSONDataValueAsObject;
-  io._DeleteListInternal(LList, AioRequestBody.IntentType, AioRequestBody.BlindLevel);
-end;
-
-class procedure TioHttpServerExecutor._DeleteObject(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
-begin
-  io._DeleteObjectInternal(AioRequestBody.JSONDataValueAsObject, AioRequestBody.IntentType, AioRequestBody.BlindLevel);
-end;
-
-class procedure TioHttpServerExecutor._DoSynchronization(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
+class procedure TioHttpServerExecutor._DoSynchronization(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
 var
   LPayload: TioCustomSynchroStrategy_Payload;
 begin
   // Get the server-side local copy of the payload from the client request
-  LPayload := AioRequestBody.JSONDataValueAsObject as TioCustomSynchroStrategy_Payload;
+  LPayload := APSRequest.Obj1 as TioCustomSynchroStrategy_Payload;
   try
     // Server-side operations
     LPayload.PersistAndReloadFromServer;
     // Return the updated payload object back to the client
     AioResponseBody.JSONDataValueAsObject := LPayload;
   finally
-    // Free the server-side local copy of the payload object
     LPayload.Free;
   end;
 end;
 
-class procedure TioHttpServerExecutor._LoadDataSet(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
+class procedure TioHttpServerExecutor._Execute(const APSRequest: IioPersistenceStrategyRequest);
+begin
+  TioPersistenceStrategyFactory.GetStrategy(APSRequest.Connection).Execute(APSRequest);
+end;
+
+class procedure TioHttpServerExecutor._Execute_DataSetResult(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
 var
   LMemTable: TFDMemTable;
 begin
-  LMemTable := AioRequestBody.Where.ToMemTable;
+  LMemTable := TFDMemTable.Create(nil);
   try
+    APSRequest.Obj1 := LMemTable;
+    _Execute(APSRequest);
     LMemTable.SaveToStream(AioResponseBody.Stream, TFDStorageFormat.sfJSON);
   finally
-    LMemTable.Free;
+    FreeAndNil(APSRequest.Obj1);
   end;
 end;
 
-class procedure TioHttpServerExecutor._LoadList(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
-var
-  LList: TObjectList<TObject>;
+class procedure TioHttpServerExecutor._Execute_IntegerResult(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
 begin
-  LList := TObjectList<TObject>.Create; // Create a dummy list (note: TObjectLIst even for interface type items)
+  _Execute(APSRequest);
+  AioResponseBody.JSONDataValueAsInteger := APSRequest.ResultAsInteger;
+end;
+
+class procedure TioHttpServerExecutor._Execute_Persist(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
+begin
+  _Execute(APSRequest);
+  if TioUtilities.BlindLevel_Do_AutoUpdateProps(APSRequest.BlindLevel) then
+    AioResponseBody.JSONDataValueAsObject := APSRequest.Obj1;
+end;
+
+class procedure TioHttpServerExecutor._LoadList(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
+begin
+  // Create a dummy list (note: TObjectList even for interface type items)
+  //  NB: La lista non viene ricevuta nella PSRequest ma viene ricreata qui perchè la lista stessa non è una entità mappata, invece
+  //       nel caso del LoadObject riguarda sempre una entità mappata e quindi non è necessario
+  AioRequestBody.DataObj := TObjectList<TObject>.Create;
   try
-    AioRequestBody.Where.ToList(LList);
-    AioResponseBody.JSONDataValueAsObject := LList;
+    _Execute(APSRequest);
+    AioResponseBody.JSONDataValueAsObject := AioRequestBody.DataObj;
   finally
-    LList.Free;
+    AioRequestBody.DataObj.Free;
   end;
 end;
 
-class procedure TioHttpServerExecutor._LoadObject(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
-var
-  LObj: TObject;
+class procedure TioHttpServerExecutor._LoadObject(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
 begin
-  LObj := AioRequestBody.Where.ToObject;
-  if Assigned(LObj) then
-    AioResponseBody.JSONDataValueAsObject := LObj;
+  _Execute(APSRequest);
+  AioResponseBody.JSONDataValueAsObject := APSRequest.Obj1;
 end;
 
-class procedure TioHttpServerExecutor._Max(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
-var
-  LMax: integer;
-begin
-  LMax := AioRequestBody.Where.Max(AioRequestBody.RelationPropertyName);
-  AioResponseBody.JSONDataValue := TJSONNumber.Create(LMax);
-end;
-
-class procedure TioHttpServerExecutor._Min(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
-var
-  LMin: integer;
-begin
-  LMin := AioRequestBody.Where.Min(AioRequestBody.RelationPropertyName);
-  AioResponseBody.JSONDataValue := TJSONNumber.Create(LMin);
-end;
-
-class procedure TioHttpServerExecutor._NewAccessToken(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
+class procedure TioHttpServerExecutor._Auth_NewAccessToken(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
 begin
   // note: AioRequestBody.AuthToken param is PKCE code challenge
-  AioResponseBody.AuthResult1 := TioAuthServer.GetInstance.NewAccessToken(AioRequestBody.AuthGrant, AioRequestBody.AuthToken).AsString;
+//  AioResponseBody.AuthResult1 := TioAuthServer.GetInstance.NewAccessToken(AioRequestBody.AuthGrant, AioRequestBody.AuthToken).AsString;
 end;
 
-class procedure TioHttpServerExecutor._PersistList(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
-var
-  LList: TObject;
+class procedure TioHttpServerExecutor._Auth_RefreshAccessToken(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
 begin
-  LList := AioRequestBody.JSONDataValueAsObject;
-  io._PersistListInternal(LList, AioRequestBody.IntentType, AioRequestBody.RelationPropertyName, AioRequestBody.RelationOID, nil, '', '',
-    AioRequestBody.BlindLevel);
-  if TioUtilities.BlindLevel_Do_AutoUpdateProps(AioRequestBody.BlindLevel) then
-    AioResponseBody.JSONDataValueAsObject := LList;
-end;
-
-class procedure TioHttpServerExecutor._PersistObject(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
-var
-  LObj: TObject;
-begin
-  LObj := AioRequestBody.JSONDataValueAsObject;
-  io._PersistObjectInternal(LObj, AioRequestBody.IntentType, AioRequestBody.RelationPropertyName, AioRequestBody.RelationOID, nil, '', '',
-    AioRequestBody.BlindLevel, AioRequestBody.SessionData);
-  if TioUtilities.BlindLevel_Do_AutoUpdateProps(AioRequestBody.BlindLevel) then
-    AioResponseBody.JSONDataValueAsObject := LObj;
-end;
-
-class procedure TioHttpServerExecutor._RefreshAccessToken(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
-begin
-  AioResponseBody.AuthResult1 := TioAuthServer.GetInstance.RefreshAccessToken(AioRequestBody.AuthToken).AsString;
-end;
-
-class procedure TioHttpServerExecutor._SQLDestExecute(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
-begin
-  io.SQL(AioRequestBody.SQLDestination).Execute(AioRequestBody.SQLDestination.GetIgnoreObjNotExists);
-end;
-
-class procedure TioHttpServerExecutor._SQLLoadDataSet(const AioRequestBody: IioHttpRequestBody; const AioResponseBody: IioHttpResponseBody);
-var
-  LMemTable: TFDMemTable;
-begin
-  LMemTable := io.SQL(AioRequestBody.SQLDestination).ToMemTable;
-  try
-    LMemTable.SaveToStream(AioResponseBody.Stream, TFDStorageFormat.sfJSON);
-  finally
-    LMemTable.Free;
-  end;
+//  AioResponseBody.AuthResult1 := TioAuthServer.GetInstance.RefreshAccessToken(AioRequestBody.AuthToken).AsString;
 end;
 
 end.

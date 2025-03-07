@@ -604,7 +604,7 @@ var
   LQuery: IioQuery;
 begin
   inherited;
-  // Generate negative ID as local temporary ID (tonbe changed during synchronization process)
+  // Generate negative ID as local temporary ID (to be changed during synchronization process)
   LQuery := TioDBFactory.QueryEngine.GetQueryMin(AContext, AContext.GetProperties.GetIDProperty);
   try
     LQuery.Open;
@@ -619,9 +619,9 @@ end;
 function TioEtmSynchroStrategy_Client._DoGetNextObjVersion(const AContext: IioContext): Integer;
 begin
   // If a SynchroStrategy is assigned and active (local remote and not connected device) then
-  //  the ObjVersion must NEVER BE INCREMENTED because the ObjVersionaintained on the local (remote)
-  //  DB will have to be compared wjth that of the centra DB (main server) to detect any conflicts
-  // NOTE: If the intent is SYnchronization then returnas absolute value to avoid the normal
+  //  the ObjVersion must NEVER BE INCREMENTED because the ObjVersion maintained on the local (remote)
+  //  DB will have to be compared wjth that of the central DB (main server) to detect any conflicts
+  // NOTE: If the intent is Synchronization then returnas absolute value to avoid the normal
   //        negative value after the Revert operation from the synchronizing time-slot
   Result := AContext.ObjVersion;
   if AContext.IntentType = itSynchro_PersistToClient then

@@ -497,8 +497,8 @@ type
     class procedure ReloadList(const AListIntf: IInterface; const ALazy: boolean; const ALazyProps: String); overload;
     class procedure ReloadList(const AListIntf: IInterface; const ALazy: boolean = False); overload;
     class procedure ReloadList(const AListIntf: IInterface; const ALazyProps: String); overload;
-    // LoadObjVersion (internal use)
-    class function LoadObjVersion(const AContext: IioContext): Integer;
+    // _LoadObjVersion (internal use)
+    class function _LoadObjVersionInternal(const AContext: IioContext): Integer;
 
     // DeleteObject (accepting instance to delete directly)
     class procedure DeleteObject(const [ref] AObj: TObject; const ABlindLevel: Byte = BL_DEFAULT;
@@ -821,7 +821,7 @@ begin
   // ----- OLD CODE -----
 end;
 
-class function io.LoadObjVersion(const AContext: IioContext): Integer;
+class function io._LoadObjVersionInternal(const AContext: IioContext): Integer;
 var
   LConnectionDefName: String;
 begin

@@ -3,7 +3,8 @@ unit iORM.PersistenceStrategy.Request;
 interface
 
 uses
-  iORM.CommonTypes, iORM.PersistenceStrategy.Interfaces, iORM.Auth.Interfaces;
+  iORM.Attributes, iORM.CommonTypes, iORM.PersistenceStrategy.Interfaces, iORM.Auth.Interfaces,
+  System.Rtti;
 
 type
 
@@ -22,11 +23,12 @@ type
     FAuthScope: String;
     FAuthToken: String; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
     // instances
-    FDataObj: TObject;
     FMasterBSPersistence: TioBSPersistence;
     FWhere: IioWhere;
     FObj1: TObject;
+    FObj1_Serialize: Boolean;
     FIntf1: IInterface;
+    FIntf1_Serialize: Boolean;
     // others
     FBlindLevel: Byte;
     FIntent: TioPersistenceIntentType;
@@ -36,6 +38,8 @@ type
     FPropName: String; // NEW
     FRelationOID: Integer;
     FRelationPropName: String;
+    // result
+    FResult: TValue;
     // methods
     procedure _FillSessionRelatedProperties; inline;
     function GetApp: String;
@@ -47,17 +51,21 @@ type
     function GetBlindLevel: Byte;
     function GetConnection: String;
     function GetConnectionRemote: String;
-    function GetDataObj: TObject;
     function GetIntent: TioPersistenceIntentType;
     function GetIntf1: IInterface;
+    function GetIntf1_Serializa: Boolean;
     function GetMasterBSPersistence: TioBSPersistence;
     function GetMasterPropName: String;
     function GetMasterPropPath: String;
     function GetMethod: TioPersistenceStrategyMethod;
     function GetObj1: TObject;
+    function GetObj1_Serializa: Boolean;
     function GetPropName: String;
     function GetRelationOID: Integer;
     function GetRelationPropName: String;
+    function GetResult: TValue;
+    function GetResultAsBoolean: Boolean;
+    function GetResultAsInteger: Integer;
     function GetUsr: String;
     function GetUsrOID: Integer;
     function GetWhere: IioWhere;
@@ -65,21 +73,28 @@ type
     procedure SetAuthIntention(const Value: TioAuthIntention);
     procedure SetAuthScope(const Value: String);
     procedure SetBlindLevel(const Value: Byte);
-    procedure SetDataObj(const Value: TObject);
     procedure SetIntent(const Value: TioPersistenceIntentType);
     procedure SetIntf1(const Value: IInterface);
+    procedure SetIntf1_Serialize(const Value: Boolean);
     procedure SetMasterBSPersistence(const Value: TioBSPersistence);
     procedure SetMasterPropName(const Value: String);
     procedure SetMasterPropPath(const Value: String);
     procedure SetObj1(const Value: TObject);
+    procedure SetObj1_Serialize(const Value: Boolean);
     procedure SetPropName(const Value: String);
     procedure SetRelationOID(const Value: Integer);
     procedure SetRelationPropName(const Value: String);
+    procedure SetResult(const Value: TValue);
+    procedure SetResultAsBoolean(const Value: Boolean);
+    procedure SetResultAsInteger(const Value: Integer);
     procedure SetWhere(const Value: IioWhere);
+    function GetIntf1_Serialize: Boolean;
+    function GetObj1_Serialize: Boolean;
   public
     constructor Create(const AMethod: TioPersistenceStrategyMethod; const FillSessionRelatedProperties: Boolean);
     constructor CreateByJSONString(const AJSONString:String);
     function AsString: String;
+    procedure SwitchToConnectionRemote;
     // method property
     property Method: TioPersistenceStrategyMethod read GetMethod;
     // session data
@@ -95,10 +110,11 @@ type
     property AuthScope: String read GetAuthScope;
     property AuthToken: String read GetAuthToken; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
     // instances
-    property DataObj: TObject read GetDataObj write SetDataObj;
     property Intf1: IInterface read GetIntf1 write SetIntf1;
+    property Intf1_Serialize: Boolean read GetIntf1_Serialize write SetIntf1_Serialize;
     property SetMasterBSPersistence: TioBSPersistence read GetMasterBSPersistence write SetMasterBSPersistence;
     property Obj1: TObject read GetObj1 write SetObj1;
+    property Obj1_Serialize: Boolean read GetObj1_Serialize write SetObj1_Serialize;
     property Where: IioWhere read GetWhere write SetWhere;
     // others
     property BlindLevel: Byte read GetBlindLevel write SetBlindLevel;
@@ -108,24 +124,10 @@ type
     property PropName: String read GetPropName write SetPropName;
     property RelationOID: Integer read GetRelationOID write SetRelationOID;
     property RelationPropName: String read GetRelationPropName write SetRelationPropName;
-  end;
-
-  TioPersistenceStrategyRequest<TResult> = class(TioPersistenceStrategyRequest, IioPersistenceStrategyRequest<TResult>)
-  private
-    FResult: TResult;
-    function GetResult: TResult;
-    procedure SetResult(const Value: TResult);
-  public
-    property Result: TResult read GetResult write SetResult;
-  end;
-
-  IioPersistenceStrategyRequest<TResult> = interface(IioPersistenceStrategyRequest)
-    ['{FF839CAE-788B-48B3-B801-916DF87A80CA}']
-    // methods
-    function GetResult: TResult;
-    procedure SetResult(const Value: TResult);
-    // properties
-    property Result: TResult read GetResult write SetResult;
+    // result
+    property Result: TValue read GetResult write SetResult;
+    property ResultAsBoolean: Boolean read GetResultAsBoolean write SetResultAsBoolean;
+    property ResultAsInteger: Integer read GetResultAsInteger write SetResultAsInteger;
   end;
 
 implementation
@@ -175,17 +177,15 @@ begin
     if not FAuthToken.IsEmpty then
       LJSONObject.AddPair(PSR_AUTH_TOKEN, FAuthToken.AsString);
     // ---------- instances ----------
-    // DataObj
-    if Assigned(FDataObj) then
-      LJSONObject.AddPair(PSR_INSTANCES_DATAOBJ, dj.From(FDataObj).byFields.TypeAnnotationsON.ToJsonValue);
     // AIntf1
-    if Assigned(FIntf1) then
+    if FIntf1_Serialize and Assigned(FIntf1) then
       LJSONObject.AddPair(PSR_INSTANCES_INTF1, dj.From(FIntf1).byFields.TypeAnnotationsON.ToJsonValue);
     // MasterBSPersistence
-    if Assigned(FMasterBSPersistence) then
-      LJSONObject.AddPair(PSR_INSTANCES_MASTERBSPERSISTENCE, dj.From(FMasterBSPersistence).byFields.TypeAnnotationsON.ToJsonValue);
+// NB: Non lo serializzo perchè tanto ho visto che nella HttpPersistenceStrategy non veniva passato nemmeno prima e quindi non veniva usato
+//    if Assigned(FMasterBSPersistence) then
+//      LJSONObject.AddPair(PSR_INSTANCES_MASTERBSPERSISTENCE, dj.From(FMasterBSPersistence).byFields.TypeAnnotationsON.ToJsonValue);
     // AObj1
-    if Assigned(FObj1) then
+    if FObj1_Serialize and Assigned(FObj1) then
       LJSONObject.AddPair(PSR_INSTANCES_OBJ1, dj.From(FObj1).byFields.TypeAnnotationsON.ToJsonValue);
     // Where
     if Assigned(FWhere) then
@@ -229,10 +229,11 @@ begin
   if FillSessionRelatedProperties then
     _FillSessionRelatedProperties;
   // instances
-  FDataObj := nil;
-  AIntf1 := nil;
+  FIntf1 := nil;
+  FIntf1_Serialize := True;
   FMasterBSPersistence := nil;
-  AObj1 := nil;
+  FObj1 := nil;
+  FObj1_Serialize := True;
   FWhere := nil;
   // others
   FBlindLevel := BL_DEFAULT;
@@ -301,18 +302,15 @@ begin
     if Assigned(LJSONValue) then
       FAuthToken := LJSONValue.Value;
     // ---------- instances ----------
-    // ADataObj
-    LJSONValue := LJSONObject.GetValue(PSR_INSTANCES_DATAOBJ);
-    if Assigned(LJSONValue) then
-      FDataObj := dj.FromJSON(FJSONDataValue).byFields.TypeAnnotationsON.ToObject;
     // AIntf1
     LJSONValue := LJSONObject.GetValue(PSR_INSTANCES_INTF1);
     if Assigned(LJSONValue) then
       FIntf1 := dj.FromJSON(FJSONDataValue).byFields.TypeAnnotationsON.ToObject;
     // MasterBSPersistence
-    LJSONValue := LJSONObject.GetValue(PSR_INSTANCES_MASTERBSPERSISTENCE);
-    if Assigned(LJSONValue) then
-      FMasterBSPersistence := dj.FromJSON(FJSONDataValue).byFields.TypeAnnotationsON.ToObject;
+// NB: Non lo serializzo perchè tanto ho visto che nella HttpPersistenceStrategy non veniva passato nemmeno prima e quindi non veniva usato
+//    LJSONValue := LJSONObject.GetValue(PSR_INSTANCES_MASTERBSPERSISTENCE);
+//    if Assigned(LJSONValue) then
+//      FMasterBSPersistence := dj.FromJSON(FJSONDataValue).byFields.TypeAnnotationsON.ToObject;
     // AObj1
     LJSONValue := LJSONObject.GetValue(PSR_INSTANCES_OBJ1);
     if Assigned(LJSONValue) then
@@ -401,11 +399,6 @@ begin
   Result := FConnectionRemote;
 end;
 
-function TioPersistenceStrategyRequest.GetDataObj: TObject;
-begin
-  Result := FDataObj;
-end;
-
 function TioPersistenceStrategyRequest.GetIntent: TioPersistenceIntentType;
 begin
   Result := FIntent;
@@ -414,6 +407,16 @@ end;
 function TioPersistenceStrategyRequest.GetIntf1: IInterface;
 begin
   Result := FIntf1;
+end;
+
+function TioPersistenceStrategyRequest.GetIntf1_Serializa: Boolean;
+begin
+  Result := FIntf1_Serialize;
+end;
+
+function TioPersistenceStrategyRequest.GetIntf1_Serialize: Boolean;
+begin
+  Result := FIntf1_Serialize;
 end;
 
 function TioPersistenceStrategyRequest.GetMasterBSPersistence: TioBSPersistence;
@@ -441,6 +444,16 @@ begin
   Result := FObj1;
 end;
 
+function TioPersistenceStrategyRequest.GetObj1_Serializa: Boolean;
+begin
+  Result := FObj1_Serialize;
+end;
+
+function TioPersistenceStrategyRequest.GetObj1_Serialize: Boolean;
+begin
+
+end;
+
 function TioPersistenceStrategyRequest.GetPropName: String;
 begin
   Result := FPropName;
@@ -454,6 +467,21 @@ end;
 function TioPersistenceStrategyRequest.GetRelationPropName: String;
 begin
   Result := FRelationPropName;
+end;
+
+function TioPersistenceStrategyRequest.GetResult: TValue;
+begin
+  Result := FResult;
+end;
+
+function TioPersistenceStrategyRequest.GetResultAsBoolean: Boolean;
+begin
+  Result := FValue.AsBoolean;
+end;
+
+function TioPersistenceStrategyRequest.GetResultAsInteger: Integer;
+begin
+  Result := FValue.AsInteger;
 end;
 
 function TioPersistenceStrategyRequest.GetUsr: String;
@@ -491,11 +519,6 @@ begin
   FBlindLevel := Value;
 end;
 
-procedure TioPersistenceStrategyRequest.SetDataObj(const Value: TObject);
-begin
-  FDataObj := Value;
-end;
-
 procedure TioPersistenceStrategyRequest.SetIntent(const Value: TioPersistenceIntentType);
 begin
   FIntent := Value;
@@ -504,6 +527,11 @@ end;
 procedure TioPersistenceStrategyRequest.SetIntf1(const Value: IInterface);
 begin
   FIntf1 := Value:
+end;
+
+procedure TioPersistenceStrategyRequest.SetIntf1_Serialize(const Value: Boolean);
+begin
+  FIntf1_Serialize := Value;
 end;
 
 procedure TioPersistenceStrategyRequest.SetMasterBSPersistence(const Value: TioBSPersistence);
@@ -526,6 +554,11 @@ begin
   FObj1 := Value;
 end;
 
+procedure TioPersistenceStrategyRequest.SetObj1_Serialize(const Value: Boolean);
+begin
+  FObj1_Serialize := Value;
+end;
+
 procedure TioPersistenceStrategyRequest.SetPropName(const Value: String);
 begin
   FPropName := Value;
@@ -541,9 +574,29 @@ begin
   FRelationPropName := Value;
 end;
 
+procedure TioPersistenceStrategyRequest.SetResult(const Value: TValue);
+begin
+  FResult := Value;
+end;
+
+procedure TioPersistenceStrategyRequest.SetResultAsBoolean(const Value: Boolean);
+begin
+  FResult.From<Boolean> := Value;
+end;
+
+procedure TioPersistenceStrategyRequest.SetResultAsInteger(const Value: Integer);
+begin
+  FResult.From<Integer> := Value;
+end;
+
 procedure TioPersistenceStrategyRequest.SetWhere(const Value: IioWhere);
 begin
   FWhere := Value;
+end;
+
+procedure TioPersistenceStrategyRequest.SwitchToConnectionRemote;
+begin
+  FConnection := FConnectionRemote;
 end;
 
 procedure TioPersistenceStrategyRequest._FillSessionRelatedProperties;
@@ -564,18 +617,6 @@ begin
   finally
     TioApplication.ReleaseSession;
   end;
-end;
-
-{ TioPersistenceStrategyRequest<TResult> }
-
-function TioPersistenceStrategyRequest<TResult>.GetResult: TResult;
-begin
-  Result := FResult;
-end;
-
-procedure TioPersistenceStrategyRequest<TResult>.SetResult(const Value: TResult);
-begin
-  FResult := Value;
 end;
 
 end.

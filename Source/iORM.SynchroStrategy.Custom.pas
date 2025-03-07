@@ -38,7 +38,7 @@ interface
 uses
   System.Classes, iORM.SynchroStrategy.Interfaces, iORM.Attributes, DJSON.Attributes,
   System.SysUtils, iORM.CommonTypes, iORM.Context.Interfaces,
-  iORM.Auth.Interfaces;
+  iORM.Auth.Interfaces, iORM.PersistenceStrategy.Interfaces;
 
 type
 
@@ -223,6 +223,7 @@ type
     procedure SetEntities_BlackList(const Value: TStrings);
     procedure SetEntities_WhiteList(const Value: TStrings);
   strict protected
+    procedure _CheckBeforeSynchronization(const APSRequest: IioPersistenceStrategyRequest);
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     function IsToBeSynchronized(const AContext: IioContext): Boolean; virtual;
     // EtmTimeSlot_Delete_SentToServer
@@ -486,6 +487,25 @@ begin
   TioCustomSynchroStrategy_Thread.Create(AExecuteMethod, ATerminateMethod).Start;
 end;
 
+procedure TioCustomSynchroStrategy_Client._CheckBeforeSynchronization(const APSRequest: IioPersistenceStrategyRequest);
+begin
+  // Check if TargetConnectionDef is assigned else raise an exception
+  if not Assigned(FTargetConnectionDef) then
+    EioSynchroStrategyException.Create(ClassName, '_CheckBeforeSynchronization',
+      Format('Hello, I''m iORM and there''s a problem.' +
+        #13#13'The property "TargetConnectionDef" of the component named "%s" (%s) is not assigned.' +
+        #13#13'Set the property with the connection to which synchronization should be made and try again.',
+        [Name, ClassName]));
+  // Check if TargetConnectionDef is the same as the current connection of the ORM
+  if APSRequest.Connection = FTargetConnectionDef.GetName then
+    EioSynchroStrategyException.Create(ClassName, '_CheckBeforeSynchronization',
+      Format('Hello, I''m iORM and there''s a problem.' +
+        #13#13'The "TargetConnectionDef" property of the component named "%s" (%s) is the same connection in use for entity persistence, this thing is not very clever.' +
+        #13#13'Synchronization normally occurs over a connection to a central server different from the one in use for local persistence purposes.' +
+        #13#13'I hope I have explained well enough.',
+        [Name, ClassName]));
+end;
+
 function TioCustomSynchroStrategy_Client.IsToBeSynchronized(const AContext: IioContext): Boolean;
 begin
   Result := (not (AContext.DataObject is TioEtmCustomTimeSlot))
@@ -552,7 +572,7 @@ var
   LExecuteMethod: TProc;
   LTerminateMethod: TProc;
 begin
-  // CanExeute
+  // CanExecute event handler
   if not DoCanExecuteEvent then
     Exit;
   // Create the payload and initialize it
@@ -571,17 +591,21 @@ begin
   LPersistenceStrategy := TioPersistenceStrategyFactory.GetStrategy(FTargetConnectionDef.GetName);
   // Build the execute method that start the synchronization
   LExecuteMethod := procedure
-  begin
-    try
-      LPersistenceStrategy.DoSynchronization(LPayload);
-    except
-      on E: Exception do
-      begin
-        LPayload.ExceptionRaised(E);
-        raise;
+    var
+      LPSRequest: IioPersistenceStrategyRequest;
+    begin
+      try
+        LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_DoSynchronization(LPayload);
+        _CheckBeforeSynchronization(LPSRequest);
+        LPersistenceStrategy.DoSynchronization(LPayload);
+      except
+        on E: Exception do
+        begin
+          LPayload.ExceptionRaised(E);
+          raise;
+        end;
       end;
     end;
-  end;
   // Build the terminate method
   LTerminateMethod := procedure
   begin
@@ -841,11 +865,12 @@ begin
   //        this is because the FTargetConnectionDefName field is set not to be serialized by DJSON so when synchronization
   //        is being done towards an HTTP connection (target) and the payload is passed to the server FTargetConnectionDefName
   //        becomes empty (while on the client side it is always valued).
-  if not FTargetConnectionDefName.IsEmpty then
-    io.Connections.ThreadUseClear;
+  TioApplication.SessionDataStore.ThreadClearSessionData;
 end;
 
 procedure TioCustomSynchroStrategy_Payload.SwitchToTargetConnection;
+var
+  LSessionData: IioAuthSessionData;
 begin
   // If you are synchronizing with an http connection as the target and we are running on the client side
   //  (FTargetConnectionDefName is not empty) or the target connection is a normal non-http connection
@@ -860,7 +885,7 @@ begin
   //        is being done towards an HTTP connection (target) and the payload is passed to the server FTargetConnectionDefName
   //        becomes empty (while on the client side it is always valued).
   if not FTargetConnectionDefName.IsEmpty then
-    io.Connections.ThreadUseConnection(FTargetConnectionDefName);
+    TioApplication.SessionDataStore.ThreadUseConnection(FTargetConnectionDefName);
 end;
 
 { TioCustomSynchroStrategy_LogItem }
