@@ -403,7 +403,7 @@ type
     class procedure _DoLoadMax(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     class procedure _DoLoadMin(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     class procedure _DoLoadObjectByClassOnly(const APresistenceStrategyRequest: IioPersistenceStrategyRequest); virtual; abstract;
-    class procedure _DoLoadObjVersion(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
+    class function _DoLoadObjVersion(const AContext: IioContext): Integers; virtual; abstract;
     // Transaction
     class procedure _DoStartTransaction(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     class procedure _DoCommitTransaction(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;

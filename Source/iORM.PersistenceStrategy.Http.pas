@@ -64,7 +64,7 @@ type
     class procedure _DoLoadMax(const APSRequest: IioPersistenceStrategyRequest); override;
     class procedure _DoLoadMin(const APSRequest: IioPersistenceStrategyRequest); override;
     class procedure _DoLoadObjectByClassOnly(const APSRequest: IioPersistenceStrategyRequest); override;
-    class procedure _DoLoadObjVersion(const APSRequest: IioPersistenceStrategyRequest); override;
+    class function _DoLoadObjVersion(const AContext: IioContext): Integer; override;
     // Transaction
     class procedure _DoStartTransaction(const APSRequest: IioPersistenceStrategyRequest); override;
     class procedure _DoCommitTransaction(const APSRequest: IioPersistenceStrategyRequest); override;
@@ -163,7 +163,7 @@ var
   LConnection: IioConnectionHttp;
 begin
   // Check
-  if not Assigned(APSRequest.Obj1) then
+  if not Assigned(APSRequest.List) then
     Exit;
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection(APSRequest.Connection).AsHttpConnection;
@@ -245,7 +245,7 @@ begin
     //      il paging ti tipo progressive. In questo modo invece sembra funzionare bene. Spero che la cosa non causi problemi
     //      in altri contesti. Lascio anche a vecchia versione commentata, poi vedremo.
 //    dj.FromJSON(LConnection.ResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(AList); // OLD CODE
-    dj.FromJSON(LConnection.ioResponseBody.JSONDataValue).OpType(ssHTTP).byFields.TypeAnnotationsON.&To(APSRequest.Obj1);
+    dj.FromJSON(LConnection.ioResponseBody.JSONDataValue).OpType(ssHTTP).byFields.TypeAnnotationsON.&To(APSRequest.List);
     LConnection.Commit;
   except
     LConnection.Rollback;
@@ -281,13 +281,13 @@ end;
 class procedure TioPersistenceStrategyHttp._DoLoadObjectByClassOnly(const APSRequest: IioPersistenceStrategyRequest);
 begin
   // This method is only used internally by the Object Maker then you do not need to implement it into http persistence strategy.
-  raise EioGenericException.Create(Self.ClassName + ': "LoadObjectByClassOnly", method not implemented in this strategy.');
+  raise EioGenericException.Create(Self.ClassName + ': "LoadObjectByClassOnly", method not implemented by this strategy.');
 end;
 
-class procedure TioPersistenceStrategyHttp._DoLoadObjVersion(const APSRequest: IioPersistenceStrategyRequest);
+class function TioPersistenceStrategyHttp._DoLoadObjVersion(const AContext: IioContext): Integer;
 begin
   // This method is only used internally by DBPersistenceStrategy then you do not need to implement it into http persistence strategy.
-  raise EioGenericException.Create(Self.ClassName + ': "DoLoadObjVersion", method not implemented in this strategy.');
+  raise EioGenericException.Create(Self.ClassName + ': "DoLoadObjVersion", method not implemented by this strategy.');
 end;
 
 class procedure TioPersistenceStrategyHttp._DoLoadMax(const APSRequest: IioPersistenceStrategyRequest);
@@ -339,7 +339,7 @@ var
   LConnection: IioConnectionHttp;
 begin
   // Check
-  if not Assigned(APSRequest.Obj1) then
+  if not Assigned(APSRequest.List) then
     Exit;
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection(APSRequest.Connection).AsHttpConnection;
@@ -352,7 +352,7 @@ begin
     LConnection.Execute(APSRequest);
     // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
     if TioUtilities.BlindLevel_Do_AutoUpdateProps(APSRequest.BlindLevel) then
-      dj.FromJSON(LConnection.ioResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(APSRequest.Obj1);
+      dj.FromJSON(LConnection.ioResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(APSRequest.List);
     LConnection.Commit;
   except
     LConnection.Rollback;

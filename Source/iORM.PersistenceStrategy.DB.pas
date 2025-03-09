@@ -40,19 +40,28 @@ uses
   iORM.Context.Properties.Interfaces, iORM.Where.Interfaces,
   iORM.DB.Interfaces, FireDAC.Comp.DataSet, Data.DB,
   iORM.LiveBindings.BSPersistence, iORM.CommonTypes,
-  iORM.SynchroStrategy.Custom, iORM.Auth.Interfaces;
+  iORM.SynchroStrategy.Custom, iORM.Auth.Interfaces,
+  iORM.PersistenceStrategy.Interfaces;
 
 type
 
   // Strategy class for database
   TioPersistenceStrategyDB = class(TioPersistenceStrategyIntf)
   private
+    // persistence internal
     class procedure InsertObject_Internal(const AContext: IioContext);
     class procedure UpdateObject_Internal(const AContext: IioContext);
     class procedure DeleteObject_Internal(const AContext: IioContext);
+    // pre-process post-process internal
     class procedure PreProcessRelationChildOnDelete(const AMasterContext: IioContext);
     class procedure PreProcessRelationChildOnPersist(const AMasterContext: IioContext);
     class procedure PostProcessRelationChildOnPersist(const AMasterContext: IioContext);
+    // transactions internal
+    class procedure StartTransaction_Internal(const AConnectionName: String); static; inline;
+    class procedure CommitTransaction_Internal(const AConnectionName: String); static; inline;
+    class procedure RollbackTransaction_Internal(const AConnectionName: String); static; inline;
+    class function InTransaction_Internal(const AConnectionName: String): Boolean; static; inline;
+    // other internal
     class function ObjectExists(const AContext: IioContext): Boolean;
     class function LoadObjVersion_FromEntity_Internal(const AContext: IioContext): Integer;
     class function LoadObjVersion_FromETM_Internal(const AContext: IioContext): Integer;
@@ -60,39 +69,36 @@ type
     // ========== BEGIN OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
     // Persistence
     // ---------- Begin intercepted methods (CRUD Interceptors) ----------
-    class procedure _DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); override;
-    class procedure _DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); override;
-    class procedure _DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType; const ASessionData: IioAuthSessionData); override;
-    class function _DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType; const ASessionData: IioAuthSessionData): TObject; override;
-    class procedure _DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
-      const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
-      const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); override;
-    class procedure _DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
-      const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
-      const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); override;
+    class procedure _DoDeleteList(const APSRequest: IioPersistenceStrategyRequest); override;
+    class procedure _DoDeleteObject(const APSRequest: IioPersistenceStrategyRequest); override;
+    class procedure _DoLoadList(const APSRequest: IioPersistenceStrategyRequest); override;
+    class procedure _DoLoadObject(const APSRequest: IioPersistenceStrategyRequest); override;
+    class procedure _DoPersistList(const APSRequest: IioPersistenceStrategyRequest); override;
+    class procedure _DoPersistObject(const APSRequest: IioPersistenceStrategyRequest); override;
     // ---------- End intercepted methods (CRUD Interceptors) ----------
-    class procedure _DoDelete(const AWhere: IioWhere); override;
-    class function _DoLoadCount(const AWhere: IioWhere): Integer; override;
-    class procedure _DoLoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet); override;
-    class function _DoLoadMax(const AWhere: IioWhere; const APropertyName: String): Integer; override;
-    class function _DoLoadMin(const AWhere: IioWhere; const APropertyName: String): Integer; override;
-    class function _DoLoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType; const ASessionData: IioAuthSessionData): TObject; override;
+    class procedure _DoDelete(const APSRequest: IioPersistenceStrategyRequest); override;
+    class procedure _DoLoadCount(const APSRequest: IioPersistenceStrategyRequest); override;
+    class procedure _DoLoadDataSet(const APSRequest: IioPersistenceStrategyRequest); override;
+    class procedure _DoLoadMax(const APSRequest: IioPersistenceStrategyRequest); override;
+    class procedure _DoLoadMin(const APSRequest: IioPersistenceStrategyRequest); override;
+    class procedure _DoLoadObjectByClassOnly(const APSRequest: IioPersistenceStrategyRequest); override;
     class function _DoLoadObjVersion(const AContext: IioContext): Integer; override;
     // Transaction
-    class procedure _DoStartTransaction(const AConnectionDefName: String); override;
-    class procedure _DoCommitTransaction(const AConnectionDefName: String); override;
-    class procedure _DoRollbackTransaction(const AConnectionDefName: String); override;
-    class function _DoInTransaction(const AConnectionDefName: String): Boolean; override;
+    class procedure _DoStartTransaction(const APSRequest: IioPersistenceStrategyRequest); override;
+    class procedure _DoCommitTransaction(const APSRequest: IioPersistenceStrategyRequest); override;
+    class procedure _DoRollbackTransaction(const APSRequest: IioPersistenceStrategyRequest); override;
+    class function _DoInTransaction(const APSRequest: IioPersistenceStrategyRequest): Boolean; override;
     // SynchroStrategy
-    class procedure _DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload); override;
+    class procedure _DoSynchronization(const APSRequest: IioPersistenceStrategyRequest); override;
     // SQLDestinations
-    class procedure _DoSQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet); override;
-    class procedure _DoSQLDest_Execute(const ASQLDestination: IioSQLDestination); override;
+    class procedure _DoSQLDest_LoadDataSet(const APSRequest: IioPersistenceStrategyRequest); override;
+    class procedure _DoSQLDest_Execute(const APSRequest: IioPersistenceStrategyRequest); override;
     // Auth
-    class function _DoAuth_User(const AAuthConnectionName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse; override;
-    class function _DoAuth_Access(const AAuthConnectionName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse; override;
-    class function _DoAuth_NewAccessToken(const AAuthConnectionName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse; override;
-    class function _DoAuth_RefreshAccessToken(const AAuthConnectionName: String; const ARefreshToken: String): IioAuthResponse; override;
+    class procedure _DoAuth_User(const APSRequest: IioPersistenceStrategyRequest); override;
+    class procedure _DoAuth_App(const APSRequest: IioPersistenceStrategyRequest); override;
+    class procedure _DoAuth_Access(const APSRequest: IioPersistenceStrategyRequest); override;
+    class procedure _DoAuth_NewAccessToken(const APSRequest: IioPersistenceStrategyRequest); override;
+    class procedure _DoAuth_RefreshAccessToken(const APSRequest: IioPersistenceStrategyRequest); override;
     // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
   end;
 
@@ -120,39 +126,45 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    function GetContext(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData): IioContext;
+    function GetContext(const APSRequest: IioPersistenceStrategyRequest; const AClassName: String): IioContext;
   end;
 
 { TioStrategyDB }
 
-class function TioPersistenceStrategyDB._DoAuth_Access(const AAuthConnectionName: String; const AScope: String; const AAuthIntention: TioAuthIntention; const AAccessToken: String): IioAuthResponse;
+class procedure TioPersistenceStrategyDB._DoAuth_Access(const APSRequest: IioPersistenceStrategyRequest);
 begin
-  Result := TioAuthServer.GetInstance.AuthorizeAccess(AScope, AAuthIntention, AAccessToken);
+// TODO: AUTH: da reimplementare
+//  Result := TioAuthServer.GetInstance.AuthorizeAccess(AScope, AAuthIntention, AAccessToken);
 end;
 
-class function TioPersistenceStrategyDB._DoAuth_User(const AAuthConnectionName: String; const AUserCredentials: IioAuthUserCredentials): IioAuthResponse;
+class procedure TioPersistenceStrategyDB._DoAuth_App(const APSRequest: IioPersistenceStrategyRequest);
 begin
-  Result := TioAuthServer.GetInstance.AuthorizeUser(AUserCredentials);
+// TODO: AUTH: da reimplementare
 end;
 
-class function TioPersistenceStrategyDB._DoAuth_NewAccessToken(const AAuthConnectionName: String; const AAuthGrant, APkceCodeVerifier: String): IioAuthResponse;
+class procedure TioPersistenceStrategyDB._DoAuth_User(const APSRequest: IioPersistenceStrategyRequest);
+begin
+// TODO: AUTH: da reimplementare
+end;
+
+class procedure TioPersistenceStrategyDB._DoAuth_NewAccessToken(const APSRequest: IioPersistenceStrategyRequest);
 begin
 // TODO: AUTH: da reimplementare
 //  Result := TioAuthServer.GetInstance.NewAccessToken(AAuthorizationToken);
 end;
 
-class function TioPersistenceStrategyDB._DoAuth_RefreshAccessToken(const AAuthConnectionName: String; const ARefreshToken: String): IioAuthResponse;
+class procedure TioPersistenceStrategyDB._DoAuth_RefreshAccessToken(const APSRequest: IioPersistenceStrategyRequest);
 begin
-  Result := TioAuthServer.GetInstance.RefreshAccessToken(ARefreshToken);
+// TODO: AUTH: da reimplementare
+//  Result := TioAuthServer.GetInstance.RefreshAccessToken(ARefreshToken);
 end;
 
-class procedure TioPersistenceStrategyDB._DoCommitTransaction(const AConnectionDefName: String);
+class procedure TioPersistenceStrategyDB._DoCommitTransaction(const APSRequest: IioPersistenceStrategyRequest);
 begin
-  inherited;
-  TioDBFactory.Connection(AConnectionDefName).Commit;
+  CommitTransaction_Internal(APSRequest.Connection);
 end;
 
-class function TioPersistenceStrategyDB._DoLoadCount(const AWhere: IioWhere): Integer;
+class procedure TioPersistenceStrategyDB._DoLoadCount(const APSRequest: IioPersistenceStrategyRequest);
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
@@ -175,7 +187,7 @@ var
 begin
   inherited;
   // Resolve the type and alias
-  LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
+  LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(APSRequest.Where.TypeName, APSRequest.Where.TypeAlias, rmAllDistinctByConnectionAndTable);
   // Get the transaction collection
   LTransactionCollection := TioDBFactory.TransactionCollection;
   try
@@ -183,12 +195,12 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LContext := TioContextFactory.Context(itRegular, LResolvedTypeName, AWhere, nil, nil, '', '', BL_DEFAULT);
+      LContext := TioContextFactory.Context(APSRequest, LResolvedTypeName);
       // If the object is of a class mapped as NotPersisted then continue
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Exit;
       // Start transaction
-      LTransactionCollection.StartTransaction(LContext.GetTable.GetTableConnectionName);
+      LTransactionCollection.StartTransaction(LContext.ConnectionNameResolved);
       // Get the count value for the current resolved type
       NestedCount;
     end;
@@ -201,7 +213,7 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyDB._DoDelete(const AWhere: IioWhere);
+class procedure TioPersistenceStrategyDB._DoDelete(const APSRequest: IioPersistenceStrategyRequest);
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
@@ -218,9 +230,8 @@ var
   end;
 
 begin
-  inherited;
   // Resolve the type and alias
-  LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
+  LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(APSRequest.Where.TypeName, APSRequest.Where.TypeAlias, rmAllDistinctByConnectionAndTable);
   // Get the transaction collection
   LTransactionCollection := TioDBFactory.TransactionCollection;
   try
@@ -228,12 +239,12 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LContext := TioContextFactory.Context(itRegular, LResolvedTypeName, AWhere, nil, nil, '', '', BL_DEFAULT);
+      LContext := TioContextFactory.Context(APSRequest, LResolvedTypeName);
       // If the object is of a class mapped as NotPersisted then skip it
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
       // Start transaction
-      LTransactionCollection.StartTransaction(LContext.GetTable.GetTableConnectionName);
+      LTransactionCollection.StartTransaction(LContext.ConnectionNameResolved);
       // Load the current class data into the list
       NestedDelete;
     end;
@@ -246,12 +257,11 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyDB._DoDeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData);
+class procedure TioPersistenceStrategyDB._DoDeleteList(const APSRequest: IioPersistenceStrategyRequest);
 var
   LDuckTypedList: IioDuckTypedList;
-  LObj: TObject;
+  LCurrentObj: TObject;
 begin
-  inherited;
   // NB: Qui avvio la transazione per fare in modo che tutto il Persist di tutti gli oggetti contenuti
   // nella collection vengano persistiti o annullati ma poi ogni chiamata a PersistObject riavvia
   // una transazione per l'oggetto singolo (che non avrà praticamente effetto perchè inglobata
@@ -269,52 +279,45 @@ begin
   // (a maggior ragione nel caso di una TList<IInterface> di interfacce, quindi avvio una transazione
   // sulla connessione di default che va bene nel 99% delle volte (raramente l'applicazione dichiererà classi
   // che operano su Database diversi contemporaneamente.
-  Self._DoStartTransaction('');
+// TODO: Probabilmente anche qui dovrei usare una TransactionCollection (come per LoadList e PersistList ad esempio) perchè può riguardare più oggetti mappati anche su connessioni diverse
+  _DoStartTransaction(APSRequest);
   try
     // Wrap the DestList into a DuckTypedList
-    LDuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
+    LDuckTypedList := TioDuckTypedFactory.DuckTypedList(APSRequest.List);
     // Loop the list and delete objects
-    for LObj in LDuckTypedList do
+// TODO: Vedere se si possono eliminare le variabili LDuckTypedList e LCurrentObj
+    for LCurrentObj in LDuckTypedList do
     begin
-      // Persist object
-      Self._DoDeleteObject(LObj, AIntent, ABlindLevel, ASessionData);
+      // Delete current object
+      APSRequest.Obj1 := LCurrentObj;
+      _DoDeleteObject(APSRequest);
     end;
-    Self._DoCommitTransaction('');
+    _DoCommitTransaction(APSRequest);
   except
-    Self._DoRollbackTransaction('');
+    _DoRollbackTransaction(APSRequest);
     raise;
   end;
 end;
 
-class procedure TioPersistenceStrategyDB._DoDeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData);
+class procedure TioPersistenceStrategyDB._DoDeleteObject(const APSRequest: IioPersistenceStrategyRequest);
 var
   LContext: IioContext;
-
-{$REGION '-----INTERCEPTORS-----'}
-{$IFNDEF ioCRUDInterceptorsOff}
-  LDoneByInterceptor: Boolean;
-{$ENDIF}
-{$ENDREGION}
 begin
-  inherited;
   // Check
-  if not Assigned(AObj) then
+  if not Assigned(APSRequest.Obj1) then
     Exit;
   // Create Context (Create a dummy ioWhere first to pass ConnectionName parameter only).
-  LContext := TioContextFactory.Context(AIntent, AObj.ClassName, nil, AObj, nil, '', '', ABlindLevel, ASessionData);
+  LContext := TioContextFactory.Context(APSRequest, APSRequest.Obj1.ClassName);
   LContext.ActionType := atDelete;
   // If the object is of a class mapped as NotPersisted then exit
   if LContext.Map.GetTable.IsNotPersistedEntity then
     Exit;
   // Start transaction
-  _DoStartTransaction(LContext.GetTable.GetTableConnectionName);
+  StartTransaction_Internal(LContext.ConnectionNameResolved);
   try
-
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-    LDoneByInterceptor := False;
-    TioCRUDInterceptorRegister.BeforeDelete(LContext, LDoneByInterceptor);
-    if not LDoneByInterceptor then
+    if not TioCRUDInterceptorRegister.BeforeDelete(LContext) then
     begin
 {$ENDIF}
 {$ENDREGION}
@@ -322,7 +325,6 @@ begin
       PreProcessRelationChildOnDelete(LContext);
       // Delete the object
       DeleteObject_Internal(LContext);
-
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
       TioCRUDInterceptorRegister.AfterDelete(LContext);
@@ -330,13 +332,12 @@ begin
 {$ENDIF}
 {$ENDREGION}
     // Commit
-    _DoCommitTransaction(LContext.GetTable.GetTableConnectionName);
-
+    CommitTransaction_Internal(LContext.ConnectionNameResolved);
   except
     on E: Exception do
     begin
       // Rollback
-      _DoRollbackTransaction(LContext.GetTable.GetTableConnectionName);
+      RollbackTransaction_Internal(LContext.ConnectionNameResolved);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
       if TioCRUDInterceptorRegister.OnDeleteException(LContext, E) then
@@ -345,6 +346,11 @@ begin
         raise;
     end;
   end;
+end;
+
+class procedure TioPersistenceStrategyDB.CommitTransaction_Internal(const AConnectionName: String);
+begin
+  TioDBFactory.Connection(AConnectionName).Commit;
 end;
 
 class procedure TioPersistenceStrategyDB.DeleteObject_Internal(const AContext: IioContext);
@@ -380,9 +386,11 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyDB._DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload);
+class procedure TioPersistenceStrategyDB._DoSynchronization(const APSRequest: IioPersistenceStrategyRequest);
+var
+  LPayload: TioCustomSynchroStrategy_Payload;
 begin
-  inherited;
+  LPayload := APSRequest.Obj1 as TioCustomSynchroStrategy_Payload;
   APayload.Initialize;
   APayload.LoadFromClient;
   APayload.PersistAndReloadFromServer;
@@ -464,22 +472,23 @@ begin
   AContext.ObjStatus := osClean;
 end;
 
-class function TioPersistenceStrategyDB._DoInTransaction(const AConnectionDefName: String): Boolean;
+class function TioPersistenceStrategyDB.InTransaction_Internal(const AConnectionName: String): Boolean;
 begin
-  inherited;
-  Result := TioDBFactory.Connection(AConnectionDefName).InTransaction;
+  Result := InTransaction_Internal(APSRequest.Connection);
 end;
 
-class function TioPersistenceStrategyDB._DoLoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType; const ASessionData: IioAuthSessionData): TObject;
+class function TioPersistenceStrategyDB._DoInTransaction(const APSRequest: IioPersistenceStrategyRequest): Boolean;
+begin
+  Result := TioDBFactory.Connection(APSRequest.Connection).InTransaction;
+end;
+
+class procedure TioPersistenceStrategyDB._DoLoadObjectByClassOnly(const APSRequest: IioPersistenceStrategyRequest);
 var
   LContext: IioContext;
   LQuery: IioQuery;
 begin
-  inherited;
-  // Init
-  Result := AObj;
   // Get the Context
-  LContext := TioContextFactory.Context(AIntent, AWhere.TypeName, AWhere, Result, nil, '', '', BL_DEFAULT, ASessionData);
+  LContext := TioContextFactory.Context(APSRequest, APSRequest.Where.TypeName);
   // If the object is of a class mapped as NotPersisted then skip it
   if LContext.Map.GetTable.IsNotPersistedEntity then
     Exit;
@@ -489,7 +498,7 @@ begin
   try
     // Create the object as TObject
     if not LQuery.IsEmpty then
-      Result := TioObjectMakerFactory.GetObjectMaker(LContext).MakeObject(LContext, LQuery);
+      TioObjectMakerFactory.GetObjectMaker(LContext).MakeObject(LContext, LQuery);
   finally
     // Close query
     LQuery.Close;
@@ -511,7 +520,6 @@ begin
   // l'ultimo ObjVersion (il maggiore) registrato. In questo modo se l'oggetto era stato eliminato risolviamo il problema del punto 1 ma
   // questa penso sarà una cosa non frequente, negli altri casi invece (quindi normalmente) continuiamo a usare il punto 1 che dovrebbe essere
   // leggermente più efficiente.
-  inherited;
   // Step 1: Prova a caricare l'ObjVersion dalla tabella su cui è mappata l'entità
   Result := LoadObjVersion_FromEntity_Internal(AContext);
   // Step 2: Se lo step precedente non ha avuto successo prova a caricare l'ObjVersion dall'ETM (se c'è)
@@ -554,7 +562,7 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyDB._DoLoadMax(const AWhere: IioWhere; const APropertyName: String): Integer;
+class procedure TioPersistenceStrategyDB._DoLoadMax(const APSRequest: IioPersistenceStrategyRequest);
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
@@ -566,21 +574,20 @@ var
     LProperty: IioProperty;
     AQuery: IioQuery;
   begin
-    LProperty := LContext.GetProperties.GetPropertyByName(APropertyName, True);
+    LProperty := LContext.GetProperties.GetPropertyByName(APSRequest.PropName, True);
     AQuery := TioDBFactory.QueryEngine.GetQueryMax(LContext, LProperty);
     AQuery.Open;
     try
-      if AQuery.Fields[0].AsInteger > Result then
-        Result := AQuery.Fields[0].AsInteger;
+      if AQuery.Fields[0].AsInteger > APSRequest.ResultAsInteger then
+        APSRequest.ResultAsInteger := AQuery.Fields[0].AsInteger;
     finally
       AQuery.Close;
     end;
   end;
 
 begin
-  inherited;
   // Resolve the type and alias
-  LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
+  LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(APSRequest.Where.TypeName, APSRequest.Where.TypeAlias, rmAllDistinctByConnectionAndTable);
   // Get the transaction collection
   LTransactionCollection := TioDBFactory.TransactionCollection;
   try
@@ -588,12 +595,12 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LContext := TioContextFactory.Context(itRegular, LResolvedTypeName, AWhere, nil, nil, '', '', BL_DEFAULT);
+      LContext := TioContextFactory.Context(APSRequest, LResolvedTypeName);
       // If the object is of a class mapped as NotPersisted then continue
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Exit;
       // Start transaction
-      LTransactionCollection.StartTransaction(LContext.GetTable.GetTableConnectionName);
+      LTransactionCollection.StartTransaction(LContext.ConnectionNameResolved);
       // Get the count value for the current resolved type
       NestedMax;
     end;
@@ -606,7 +613,7 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyDB._DoLoadMin(const AWhere: IioWhere; const APropertyName: String): Integer;
+class procedure TioPersistenceStrategyDB._DoLoadMin(const APSRequest: IioPersistenceStrategyRequest);
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
@@ -618,21 +625,20 @@ var
     LProperty: IioProperty;
     AQuery: IioQuery;
   begin
-    LProperty := LContext.GetProperties.GetPropertyByName(APropertyName, True);
+    LProperty := LContext.GetProperties.GetPropertyByName(APSRequest.PropName, True);
     AQuery := TioDBFactory.QueryEngine.GetQueryMin(LContext, LProperty);
     AQuery.Open;
     try
-      if AQuery.Fields[0].AsInteger < Result then
-        Result := AQuery.Fields[0].AsInteger;
+      if AQuery.Fields[0].AsInteger < APSRequest.ResultAsInteger then
+        APSRequest.ResultAsInteger := AQuery.Fields[0].AsInteger;
     finally
       AQuery.Close;
     end;
   end;
 
 begin
-  inherited;
   // Resolve the type and alias
-  LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
+  LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(APSRequest.Where.TypeName, APSRequest.Where.TypeAlias, rmAllDistinctByConnectionAndTable);
   // Get the transaction collection
   LTransactionCollection := TioDBFactory.TransactionCollection;
   try
@@ -640,12 +646,12 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LContext := TioContextFactory.Context(itRegular, LResolvedTypeName, AWhere, nil, nil, '', '', BL_DEFAULT);
+      LContext := TioContextFactory.Context(APSRequest, LResolvedTypeName);
       // If the object is of a class mapped as NotPersisted then continue
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Exit;
       // Start transaction
-      LTransactionCollection.StartTransaction(LContext.GetTable.GetTableConnectionName);
+      LTransactionCollection.StartTransaction(LContext.ConnectionNameResolved);
       // Get the count value for the current resolved type
       NestedMin;
     end;
@@ -673,12 +679,10 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyDB._DoPersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
-      const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
-      const ABlindLevel: Byte; const ASessionData: IioAuthSessionData);
+class procedure TioPersistenceStrategyDB._DoPersistList(const APSRequest: IioPersistenceStrategyRequest);
 var
   LDuckTypedList: IioDuckTypedList;
-  LObj: TObject;
+  LCurrentObj: TObject;
 begin
   inherited;
   // NB: Qui avvio la transazione per fare in modo che tutto il Persist di tutti gli oggetti contenuti
@@ -698,41 +702,39 @@ begin
   // (a maggior ragione nel caso di una TList<IInterface> di interfacce, quindi avvio una transazione
   // sulla connessione di default che va bene nel 99% delle volte (raramente l'applicazione dichiererà classi
   // che operano su Database diversi contemporaneamente.
-  _DoStartTransaction('');
+// TODO: Probabilmente anche qui dovrei usare una TransactionCollection (come per LoadList e PersistList ad esempio) perchè può riguardare più oggetti mappati anche su connessioni diverse
+  _DoStartTransaction(APSRequest);
   try
     // Wrap the DestList into a DuckTypedList
-    LDuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
+    LDuckTypedList := TioDuckTypedFactory.DuckTypedList(APSRequest.List);
     // Loop the list
-    for LObj in LDuckTypedList do
-      _DoPersistObject(LObj, AIntent, ARelationPropertyName, ARelationOID, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath, ABlindLevel, ASessionData);
-    // Commit the transaction
-    _DoCommitTransaction('');
+// TODO: Vedere se si possono eliminare le variabili LDuckTypedList e LCurrentObj
+    for LCurrentObj in LDuckTypedList do
+    begin
+      APSRequest.Obj1 := LCurrentObj;
+      _DoPersistObject(APSRequest);
+    end;
+    _DoCommitTransaction(APSRequest);
   except
-    _DoRollbackTransaction('');
+    _DoRollbackTransaction(APSRequest);
     raise;
   end;
 end;
 
-class procedure TioPersistenceStrategyDB._DoPersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
-      const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
-      const ABlindLevel: Byte; const ASessionData: IioAuthSessionData);
+class procedure TioPersistenceStrategyDB._DoPersistObject(const APSRequest: IioPersistenceStrategyRequest);
 var
   LContext: IioContext;
-
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-  LDoneByInterceptor: Boolean;
-
-  procedure _Interceptors_InterceptBeforeAction;
+  function _Interceptors_InterceptBeforeAction: Boolean;
   begin
-    LDoneByInterceptor := False;
     case LContext.ActionType of
       atUpdate:
-        TioCRUDInterceptorRegister.BeforeUpdate(LContext, LDoneByInterceptor);
+        Result := TioCRUDInterceptorRegister.BeforeUpdate(LContext);
       atInsert:
-        TioCRUDInterceptorRegister.BeforeInsert(LContext, LDoneByInterceptor);
+        Result := TioCRUDInterceptorRegister.BeforeInsert(LContext);
       atDelete:
-        TioCRUDInterceptorRegister.BeforeDelete(LContext, LDoneByInterceptor);
+        Result := TioCRUDInterceptorRegister.BeforeDelete(LContext);
     end;
   end;
   procedure _Interceptors_InterceptAfterAction;
@@ -767,8 +769,8 @@ var
     if (LContext.ObjStatus = osDirty) or (LContext.IntentType > itRegular) then
     begin
       // note: if SmartUpdateDetection system is not enabled or (if enabled) the object is to be persisted (according to the SmartUpdateDetection system)...
-      if LContext.GetProperties.ObjStatusPropertyExist or (AMasterBSPersistence = nil) or (not AMasterBSPersistence.IsSmartUpdateDetectionEnabled) or
-        AMasterBSPersistence.SmartUpdateDetection.IsToBePersisted(AObj, LContext.MasterPropertyPath) then
+      if LContext.GetProperties.ObjStatusPropertyExist or (APSRequest.MasterBSPersistence = nil) or (not APSRequest.MasterBSPersistence.IsSmartUpdateDetectionEnabled) or
+        APSRequest.MasterBSPersistence.SmartUpdateDetection.IsToBePersisted(APSRequest.Obj1, LContext.MasterPropertyPath) then
       begin
         // old code: if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
         if LContext.IDIsNull or (LContext.BlindLevel_Do_DetectObjExists and not ObjectExists(LContext)) then
@@ -791,33 +793,28 @@ var
   end;
 
 begin
-  inherited;
   // Check
-  if not Assigned(AObj) then
+  if not Assigned(APSRequest.Obj1) then
     Exit;
   // Create Context
-  LContext := TioContextFactory.Context(AIntent, AObj.ClassName, nil, AObj, AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath, ABlindLevel, ASessionData);
+  LContext := TioContextFactory.Context(APSRequest, APSRequest.Obj1.ClassName);
   // If the object is of a class mapped as NotPersisted then exit
   if LContext.Map.GetTable.IsNotPersistedEntity then
     Exit;
   // Start transaction
-  _DoStartTransaction(LContext.GetTable.GetTableConnectionName);
+  StartTransaction_Internal(LContext.ConnectionNameResolved);
   try
     // Set/Update MasterID property if this is a relation child object (HasMany, HasOne, BelongsTo)
     // NB: (LContext.GetProperties.GetPropertyByName(ARelationPropertyName).GetRelationType = rtNone) perchè altrimenti in alcuni casi particolare dava errori
-    LContext.RelationOID := ARelationOID;
-    if (ARelationPropertyName <> '') and (ARelationPropertyName <> IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME) and (ARelationOID <> 0) and
-      (LContext.GetProperties.GetPropertyByName(ARelationPropertyName).GetRelationType = rtNone) then
-      LContext.GetProperties.GetPropertyByName(ARelationPropertyName).SetValue(LContext.DataObject, ARelationOID);
-
+    if (APSRequest.RelationPropName <> '') and (APSRequest.RelationPropName <> IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME) and (APSRequest.RelationOID <> 0) and
+      (LContext.GetProperties.GetPropertyByName(APSRequest.RelationPropName).GetRelationType = rtNone) then
+      LContext.GetProperties.GetPropertyByName(APSRequest.RelationPropName).SetValue(LContext.DataObject, APSRequest.RelationOID);
     // Detect the persist action type
     _DetectPersistActionType;
-
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
     // Interceptors: intercept the "before" action
-    _Interceptors_InterceptBeforeAction;
-    if not LDoneByInterceptor then
+    if not _Interceptors_InterceptBeforeAction then
     begin
 {$ENDIF}
 {$ENDREGION}
@@ -840,7 +837,6 @@ begin
       // --------------------------
       // PostProcess (persist) relation childs (HasMany, HasOne)
       PostProcessRelationChildOnPersist(LContext);
-
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
       // Intercept the "after" action
@@ -849,13 +845,12 @@ begin
 {$ENDIF}
 {$ENDREGION}
     // Commit
-    _DoCommitTransaction(LContext.GetTable.GetTableConnectionName);
-
+    CommitTransaction_Internal(LContext.ConnectionNameResolved);
   except
     on E: Exception do
     begin
       // Rollback
-      _DoRollbackTransaction(LContext.GetTable.GetTableConnectionName);
+      RollbackTransaction_Internal(LContext.ConnectionNameResolved);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
       if _Interceptors_InterceptException(E) then
@@ -947,73 +942,88 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyDB._DoRollbackTransaction(const AConnectionDefName: String);
+class procedure TioPersistenceStrategyDB.RollbackTransaction_Internal(const AConnectionName: String);
 begin
-  inherited;
-  TioDBFactory.Connection(AConnectionDefName).Rollback;
+  TioDBFactory.Connection(AConnectionName).Rollback;
 end;
 
-class procedure TioPersistenceStrategyDB._DoSQLDest_Execute(const ASQLDestination: IioSQLDestination);
+class procedure TioPersistenceStrategyDB.StartTransaction_Internal(const AConnectionName: String);
+begin
+  TioDBFactory.Connection(AConnectionNamen).StartTransaction;
+end;
+
+class procedure TioPersistenceStrategyDB._DoRollbackTransaction(const APSRequest: IioPersistenceStrategyRequest);
+begin
+  RollbackTransaction_Internal(APSRequest.Connection);
+end;
+
+class procedure TioPersistenceStrategyDB._DoSQLDest_Execute(const APSRequest: IioPersistenceStrategyRequest);
 var
   LQry: IioQuery;
+  LSQLDest: IioSQLDestination;
 begin
-  inherited;
+  // extract SQLDestination
+  LSQLDest := APSRequest.Intf1 as IioPersistenceStrategyRequest;
   // Start transaction
-  io.StartTransaction(ASQLDestination.GetConnectionDefName);
+  io.StartTransaction(LSQLDest.GetConnectionDefName);
   try
     // Get the query object
-    LQry := TioDBFactory.Query(ASQLDestination.GetConnectionDefName);
+    LQry := TioDBFactory.Query(LSQLDest.GetConnectionDefName);
     // Set the SQL command text
-    LQry.SQL.Text := ASQLDestination.GetSQL;
+    LQry.SQL.Text := LSQLDest.GetSQL;
     LQry.ExecSQL;
     // Commit
-    io.CommitTransaction(ASQLDestination.GetConnectionDefName);
+    io.CommitTransaction(LSQLDest.GetConnectionDefName);
   except
     // Rollback
-    io.RollbackTransaction(ASQLDestination.GetConnectionDefName);
+    io.RollbackTransaction(LSQLDest.GetConnectionDefName);
     raise;
   end;
 end;
 
-class procedure TioPersistenceStrategyDB._DoSQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet);
+class procedure TioPersistenceStrategyDB._DoSQLDest_LoadDataSet(const APSRequest: IioPersistenceStrategyRequest);
 var
+  LDestDataSet: TFDDataSet;
   LQry: IioQuery;
+  LSQLDest: IioSQLDestination;
 begin
-  inherited;
+  // extract SQLDestination & DestDataSet objects
+  LDestDataSet := APSRequest.Obj1 as TFDDataSet;
+  LSQLDest := APSRequest.Intf1 as IioPersistenceStrategyRequest;
   // Start transaction
-  io.StartTransaction(ASQLDestination.GetConnectionDefName);
+  io.StartTransaction(LSQLDest.GetConnectionDefName);
   try
     // Get the query object
-    LQry := TioDBFactory.Query(ASQLDestination.GetConnectionDefName);
+    LQry := TioDBFactory.Query(LSQLDest.GetConnectionDefName);
     // Set the SQL command text
-    LQry.SQL.Text := ASQLDestination.GetSQL;
+    LQry.SQL.Text := LSQLDest.GetSQL;
     LQry.GetQuery.FetchOptions.Unidirectional := False;
     LQry.Open;
     try
       LQry.GetQuery.FetchAll;
       // Copy data to the MemoryTable
-      ADestDataSet.Data := LQry.GetQuery.Data;
-      ADestDataSet.First;
+      LDestDataSet.Data := LQry.GetQuery.Data;
+      LDestDataSet.First;
     finally
       LQry.Close;
     end;
     // Commit
-    io.CommitTransaction(ASQLDestination.GetConnectionDefName);
+    io.CommitTransaction(LSQLDest.GetConnectionDefName);
   except
     // Rollback
-    io.RollbackTransaction(ASQLDestination.GetConnectionDefName);
+    io.RollbackTransaction(LSQLDest.GetConnectionDefName);
     raise;
   end;
 end;
 
-class procedure TioPersistenceStrategyDB._DoStartTransaction(const AConnectionDefName: String);
+class procedure TioPersistenceStrategyDB._DoStartTransaction(const APSRequest: IioPersistenceStrategyRequest);
 begin
-  inherited;
-  TioDBFactory.Connection(AConnectionDefName).StartTransaction;
+  StartTransaction_Internal(APSRequest.Connection);
 end;
 
-class procedure TioPersistenceStrategyDB._DoLoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet);
+class procedure TioPersistenceStrategyDB._DoLoadDataSet(const APSRequest: IioPersistenceStrategyRequest);
 var
+  LDestDataSet: TFDDataSet;
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
   LContext: IioContext;
@@ -1032,17 +1042,17 @@ var
       // successivi in base a quante classi implementano l'interfaccia che si sta
       // caricando (se si tratta di un'interfaccia ovviamente) ho dovuto implementare due chiamate
       // differenti a CopyDataSet perchè se mantenevo l'opzione 'coStructure' ogni volta azzerava
-      // i records e quindi la prima volta la eseguq con lìopzione sopra citata mentre le volte successive no.
+      // i records e quindi la prima volta la eseguq con l'opzione sopra citata mentre le volte successive no.
       // Per sapere se è il primo passaggio verifico se la MemTable.Active = True perchè ho notato che al primo
       // passaggio la attiva automaticamente.
-      if ADestDataSet.FieldCount > 0 then
+      if LDestDataSet.FieldCount > 0 then
       begin
-        if not ADestDataSet.Active then
-          ADestDataSet.Open;
-        ADestDataSet.CopyDataSet(LQry.GetQuery, [coAppend])
+        if not LDestDataSet.Active then
+          LDestDataSet.Open;
+        LDestDataSet.CopyDataSet(LQry.GetQuery, [coAppend])
       end
       else
-        ADestDataSet.CopyDataSet(LQry.GetQuery, [coStructure, coAppend]);
+        LDestDataSet.CopyDataSet(LQry.GetQuery, [coStructure, coAppend]);
     finally
       LQry.Close;
     end;
@@ -1050,8 +1060,10 @@ var
 
 begin
   inherited;
+  // Extract the destination DataSet
+  LDestDataSet := APSRequest.Obj1 as TFDDataSet;
   // Resolve the type and alias
-  LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
+  LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(APSRequest.Where.TypeName, APSRequest.Where.TypeAlias, rmAllDistinctByConnectionAndTable);
   // Get the transaction collection
   LTransactionCollection := TioDBFactory.TransactionCollection;
   try
@@ -1059,12 +1071,12 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LContext := TioContextFactory.Context(itRegular, LResolvedTypeName, AWhere, nil, nil, '', '', BL_DEFAULT);
+      LContext := TioContextFactory.Context(APSRequest, LResolvedTypeName);
       // If the object is of a class mapped as NotPersisted then skip it
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
       // Start transaction
-      LTransactionCollection.StartTransaction(LContext.GetTable.GetTableConnectionName);
+      LTransactionCollection.StartTransaction(LContext.ConnectionNameResolved);
       // Load the current class data into the list
       NestedLoadToMemTable;
     end;
@@ -1077,7 +1089,7 @@ begin
   end;
 end;
 
-class procedure TioPersistenceStrategyDB._DoLoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType; const ASessionData: IioAuthSessionData);
+class procedure TioPersistenceStrategyDB._DoLoadList(const APSRequest: IioPersistenceStrategyRequest);
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
@@ -1089,13 +1101,7 @@ var
   procedure NestedLoadToList;
   var
     LQuery: IioQuery;
-    LCurrentObj: TObject;
     LCurrentContext: IioContext;
-{$REGION '-----INTERCEPTORS-----'}
-{$IFNDEF ioCRUDInterceptorsOff}
-    LDoneByInterceptor: Boolean;
-{$ENDIF}
-{$ENDREGION}
   begin
     // NB: Se TrueClassMode = tcSmart in pratica LCurrentContext ora contiene la VirtualMap (o SuperMap) e la usa per
     // creare il codice SQL della query poi, una volta aperta la query, inizia a ciclare per tutti i record/oggetti
@@ -1112,7 +1118,7 @@ var
           // If TrueClassMode is tvSmart then get the specific context for the current record/object else
           // use the original context
           if LOriginalContext.GetTrueClass.Mode = tcSmart then
-            LCurrentContext := LContextCache.GetContext(AIntent, LQuery.ExtractTrueClassName(LOriginalContext), AWhere, BL_DEFAULT, ASessionData)
+            LCurrentContext := LContextCache.GetContext(APSRequest, LQuery.ExtractTrueClassName(LOriginalContext))
           else
             LCurrentContext := LOriginalContext;
           // Clean the DataObject (it contains the previous)
@@ -1120,22 +1126,19 @@ var
           // Create the object as TObject  (Intercepted by CRUDInterceptors)
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-          LDoneByInterceptor := False;
-          LCurrentObj := TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext, nil, LDoneByInterceptor);
-          LCurrentContext.DataObject := LCurrentObj;
-          if not LDoneByInterceptor then
+          if not TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext) then
           begin
 {$ENDIF}
 {$ENDREGION}
-            LCurrentObj := TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
+            TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-            LCurrentObj := TioCRUDInterceptorRegister.AfterLoad(LCurrentContext, LCurrentObj);
+            TioCRUDInterceptorRegister.AfterLoad(LCurrentContext);
           end;
 {$ENDIF}
 {$ENDREGION}
           // Add current object to the list
-          LDuckTypedList.Add(LCurrentObj);
+          LDuckTypedList.Add(LCurrentContext.DataObject);
           // Next
           LQuery.Next;
         end;
@@ -1158,11 +1161,10 @@ var
   end;
 
 begin
-  inherited;
   // Resolve the type and alias
-  LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
+  LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(APSRequest.Where.TypeName, APSRequest.Where.TypeAlias, rmAllDistinctByConnectionAndTable);
   // Wrap the list into a DuckTypedList
-  LDuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
+  LDuckTypedList := TioDuckTypedFactory.DuckTypedList(APSRequest.List);
   // Create the IioContext cache (optimization)
   LContextCache := TioContextCache.Create;
   // Get the transaction collection
@@ -1172,12 +1174,12 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LOriginalContext := TioContextFactory.TrueClassVirtualContextIfEnabled(AIntent, LResolvedTypeName, AWhere, BL_DEFAULT, ASessionData);
+      LOriginalContext := TioContextFactory.TrueClassVirtualContextIfEnabled(APSRequest, LResolvedTypeName);
       // If the object is of a class mapped as NotPersisted then skip it
       if LOriginalContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
       // Start transaction
-      LTransactionCollection.StartTransaction(LOriginalContext.GetTable.GetTableConnectionName);
+      LTransactionCollection.StartTransaction(LOriginalContext.ConnectionNameResolved);
       // Load the current class data into the list
       NestedLoadToList;
     end;
@@ -1190,26 +1192,18 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyDB._DoLoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType; const ASessionData: IioAuthSessionData): TObject;
+class procedure TioPersistenceStrategyDB._DoLoadObject(const APSRequest: IioPersistenceStrategyRequest);
 var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
   LOriginalContext: IioContext;
   LTransactionCollection: IioTransactionCollection;
   // Nested
-  function NestedLoadToObject: TObject;
+  procedure NestedLoadObject;
   var
     LQuery: IioQuery;
     LCurrentContext: IioContext;
-
-{$REGION '-----INTERCEPTORS-----'}
-{$IFNDEF ioCRUDInterceptorsOff}
-    LDoneByInterceptor: Boolean;
-{$ENDIF}
-{$ENDREGION}
   begin
-    // Init
-    Result := AObj;
     // Create & open query
     LQuery := TioDBFactory.QueryEngine.GetQuerySelectObject(LOriginalContext);
     LQuery.Open;
@@ -1221,25 +1215,20 @@ var
           // If TrueClassMode is tvSmart then get the specific context for the current record/object else
           // use the original context
           if LOriginalContext.GetTrueClass.Mode = tcSmart then
-            LCurrentContext := TioContextFactory.Context(AIntent, LQuery.ExtractTrueClassName(LOriginalContext), AWhere, Result, nil, '', '', BL_DEFAULT, ASessionData)
+            LCurrentContext := TioContextFactory.Context(APSRequest, LQuery.ExtractTrueClassName(LOriginalContext))
           else
             LCurrentContext := LOriginalContext;
           // Create the object as TObject (Intercepted by CRUDInterceptors)
-
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-          LDoneByInterceptor := False;
-          Result := TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext, Result, LDoneByInterceptor);
-          LCurrentContext.DataObject := Result;
-          if not LDoneByInterceptor then
+          if not TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext) then
           begin
 {$ENDIF}
 {$ENDREGION}
-            Result := TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
-
+            TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-            Result := TioCRUDInterceptorRegister.AfterLoad(LCurrentContext, Result);
+            TioCRUDInterceptorRegister.AfterLoad(LCurrentContext);
           end;
 {$ENDIF}
 {$ENDREGION}
@@ -1262,10 +1251,8 @@ var
   end;
 
 begin
-  inherited;
-  Result := nil;
   // Resolve the type and alias
-  LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AWhere.TypeName, AWhere.TypeAlias, rmAllDistinctByConnectionAndTable);
+  LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(APSRequest.Where.TypeName, APSRequest.Where.TypeAlias, rmAllDistinctByConnectionAndTable);
   // Get the transaction collection
   LTransactionCollection := TioDBFactory.TransactionCollection;
   try
@@ -1273,16 +1260,16 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LOriginalContext := TioContextFactory.TrueClassVirtualContextIfEnabled(AIntent, LResolvedTypeName, AWhere, BL_DEFAULT, ASessionData);
+      LOriginalContext := TioContextFactory.TrueClassVirtualContextIfEnabled(APSRequest, LResolvedTypeName);
       // If the object is of a class mapped as NotPersisted then skip it
       if LOriginalContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
       // Start transaction
-      LTransactionCollection.StartTransaction(LOriginalContext.GetTable.GetTableConnectionName);
+      LTransactionCollection.StartTransaction(LOriginalContext.ConnectionNameResolved);
       // Load the current class object is founded
-      Result := NestedLoadToObject;
+      NestedLoadObject;
       // If there is a result (an object) then exit;
-      if Assigned(Result) then
+      if Assigned(APSRequest.Obj1) then
         Break;
     end;
     // Commit ALL transactions
@@ -1346,11 +1333,11 @@ begin
   inherited;
 end;
 
-function TioContextCache.GetContext(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData): IioContext;
+function TioContextCache.GetContext(const APSRequest: IioPersistenceStrategyRequest; const AClassName: String): IioContext;
 begin
   // If the map is not already present in the cache then create and add it
   if not FContainer.ContainsKey(AClassName) then
-    FContainer.Add(AClassName, TioContextFactory.Context(AIntent, AClassName, AWhere, nil, nil, '', '', ABlindLevel, ASessionData));
+    FContainer.Add(AClassName, TioContextFactory.Context(APSRequest, AClassName));
   // Return the requested context and set its DataObject to nil
   Result := FContainer.Items[AClassName];
   Result.DataObject := nil;

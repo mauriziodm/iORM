@@ -48,6 +48,7 @@ const
   PSR_AUTH_TOKEN = 'AuthToken';
   PSR_BLINDLEVEL = 'BlindLevel';
   PSR_INSTANCES_INTF1 = 'Intf1';
+  PSR_INSTANCES_LIST = 'List';
   PSR_INSTANCES_MASTERBSPERSISTENCE = 'MasterBSP';
   PSR_INSTANCES_OBJ1 = 'Obj1';
   PSR_INSTANCES_WHERE = 'Where';
@@ -116,6 +117,8 @@ type
     function GetIntent: TioPersistenceIntentType;
     function GetIntf1: IInterface;
     function GetIntf1_Serialize: Boolean;
+    function GetList: TObject;
+    function GetList_Serialize: Boolean;
     function GetMasterBSPersistence: TioBSPersistence;
     function GetMasterPropName: String;
     function GetMasterPropPath: String;
@@ -138,6 +141,8 @@ type
     procedure SetIntent(const Value: TioPersistenceIntentType);
     procedure SetIntf1(const Value: IInterface);
     procedure SetIntf1_Serialize(const Value: Boolean);
+    procedure SetList(const Value: TObject);
+    procedure SetList_Serialize(const Value: Boolean);
     procedure SetMasterBSPersistence(const Value: TioBSPersistence);
     procedure SetMasterPropName(const Value: String);
     procedure SetMasterPropPath(const Value: String);
@@ -168,7 +173,9 @@ type
     // instances
     property Intf1: IInterface read GetIntf1 write SetIntf1;
     property Intf1_Serialize: Boolean read GetIntf1_Serialize write SetIntf1_Serialize;
-    property SetMasterBSPersistence: TioBSPersistence read GetMasterBSPersistence write SetMasterBSPersistence;
+    property List: TObject read GetList write SetList;
+    property List_Serialize: Boolean read GetList_Serialize write SetList_Serialize;
+    property MasterBSPersistence: TioBSPersistence read GetMasterBSPersistence write SetMasterBSPersistence;
     property Obj1: TObject read GetObj1 write SetObj1;
     property Obj1_Serialize: Boolean read GetObj1_Serialize write SetObj1_Serialize;
     property Where: IioWhere read GetWhere write SetWhere;

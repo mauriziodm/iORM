@@ -201,8 +201,8 @@ begin
   Result := _NewPSRequest(psmDeleteList, True);
   Result.BlindLevel := ABlindLevel;
   Result.Intent := AIntent;
-  Result.Obj1 := AList;
-  Result.Obj1_Serialize := True;
+  Result.List := AList;
+  Result.List_Serialize := True;
 end;
 
 class function TioPersistenceStrategyFactory.NewPSRequest_DeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType;
@@ -236,8 +236,8 @@ class function TioPersistenceStrategyFactory.NewPSRequest_LoadList(const AWhere:
 begin
   Result := _NewPSRequest(psmLoadList, True);
   Result.Intent := AIntent;
-  Result.Obj1 := AList;
-  Result.Obj1_Serialize := False;
+  Result.List := AList;
+  Result.List_Serialize := False;
   Result.Where := AWhere;
   Result.Where.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
@@ -294,8 +294,8 @@ begin
   Result := _NewPSRequest(psmPersistList, True);
   Result.BlindLevel := ABlindLevel;
   Result.Intent := AIntent;
-  Result.Obj1 := AList;
-  Result.Obj1_Serialize := True;
+  Result.List := AList;
+  Result.List_Serialize := True;
   Result.MasterBSPersistence := AMasterBSPersistence;
   Result.RelationPropertyName := ARelationPropertyName;
   Result.RelationOID := ARelationOID;

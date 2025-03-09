@@ -71,8 +71,7 @@ type
 //    class function Context(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ADataObject: TObject;
 //      const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData): IioContext;
     class function Context(const APSRequest: IioPersistenceStrategyRequest; const AClassName: String): IioContext;
-    class function TrueClassVirtualContextIfEnabled(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere;
-      const ABlindLevel: Byte; const ASessionData: IioAuthSessionData): IioContext;
+    class function TrueClassVirtualContextIfEnabled(const APSRequest: IioPersistenceStrategyRequest; const AClassName: String): IioContext;
     class procedure GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
   end;
 
@@ -127,8 +126,7 @@ begin
   Result := TioContext.Create(APSRequest, TioMapContainer.GetMap(AClassName));
 end;
 
-class function TioContextFactory.TrueClassVirtualContextIfEnabled(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere;
-      const ABlindLevel: Byte; const ASessionData: IioAuthSessionData): IioContext;
+class function TioContextFactory.TrueClassVirtualContextIfEnabled(const APSRequest: IioPersistenceStrategyRequest; const AClassName: String): IioContext;
 var
   LMap: IioMap;
 begin
@@ -137,11 +135,11 @@ begin
   LMap := TioMapContainer.GetMap(AClassName);
   if LMap.GetTable.IsTrueClass then
   begin
-    Result := TioContext.Create(AIntent, LMap.GetTrueClassVirtualMap, AWhere, nil, nil, '', '', ABlindLevel, ASessionData);
+    Result := TioContext.Create(APSRequest, LMap.GetTrueClassVirtualMap);
     Result.OriginalNonTrueClassMap := LMap;
   end
   else
-    Result := TioContext.Create(AIntent, LMap, AWhere, nil, nil, '', '', ABlindLevel, ASessionData);
+    Result := TioContext.Create(APSRequest, LMap);
 end;
 
 class procedure TioContextFactory.GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;

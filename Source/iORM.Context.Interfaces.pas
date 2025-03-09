@@ -60,10 +60,10 @@ type
     procedure CheckDeleteConflict;
     procedure CheckInsertConflict;
     procedure CheckUpdateConflict;
+    function GetCurrentStrategyName: String;
     procedure ResolveDeleteConflict;
     procedure ResolveInsertConflict;
     procedure ResolveUpdateConflict;
-    function GetCurrentStrategyName: String;
     // Synchronization Strategy methods
     function SynchroStrategy_CanPersistEtmTimeSlot: Boolean;
     procedure SynchroStrategy_GenerateLocalID;
@@ -86,15 +86,46 @@ type
     // OrderBy
     function GetOrderBySql: String;
     // ---------- properties ----------
-    // ConnectionName
-    function GetConnectionName: String;
-    property ConnectionName: String read GetConnectionName;
+    // ActionType
+    function GetActionType: TioPersistenceActionType;
+    procedure SetActionType(const Value: TioPersistenceActionType);
+    property ActionType: TioPersistenceActionType read GetActionType write SetActionType;
+    // BlindLevel
+    function GetBlindLevel: Byte;
+    procedure SetBlindLevel(const Value: Byte);
+    property BlindLevel: Byte read GetBlindLevel write SetBlindLevel;
+    // ConflictDetected
+    function GetConflictDetected: Boolean;
+    procedure SetConflictDetected(const Value: Boolean);
+    property ConflictDetected: Boolean read GetConflictDetected write SetConflictDetected;
+    // ConflictState
+    function GetConflictState: TioPersistenceConflictState;
+    procedure SetConflictState(const Value: TioPersistenceConflictState);
+    property ConflictState: TioPersistenceConflictState read GetConflictState write SetConflictState;
+    // ConnectionNameResolved
+    function GetConnectionNameResolved: String;
+    property ConnectionNameResolved: String read GetConnectionNameResolved;
     // DataObject
     function GetDataObject: TObject;
     procedure SetDataObject(const AValue: TObject);
     property DataObject:TObject read GetDataObject write SetDataObject;
+    // EtmEntityVersion
+    function GetEntityFromVersion: Integer;
+    procedure SetEntityFromVersion(const Value: Integer);
+    property EntityFromVersion: Integer read GetEntityFromVersion write SetEntityFromVersion;
+    // IntentType
+    function GetIntentType: TioPersistenceIntentType;
+    procedure SetIntentType(const Value: TioPersistenceIntentType);
+    property IntentType: TioPersistenceIntentType read GetIntentType write SetIntentType;
+    // MasterBSPersistence
+    function GetMasterBSPersistence: TioBSPersistence;
+    property MasterBSPersistence: TioBSPersistence read GetMasterBSPersistence;
     // MasterPropertyPath
     function GetMasterPropertyPath: String;
+    // OriginalResolvedTypeNameNonTrueClass
+    procedure SetOriginalNonTrueClassMap(const AMap: IioMap);
+    function GetOriginalNonTrueClassMap: IioMap;
+    property OriginalNonTrueClassMap: IioMap read GetOriginalNonTrueClassMap write SetOriginalNonTrueClassMap;
     // ObjID
     function GetObjID: Integer;
     procedure SetObjID(const AValue: Integer);
@@ -142,37 +173,6 @@ type
     function GetWhere: IioWhere;
     procedure SetWhere(const AWhere: IioWhere);
     property Where:IioWhere read GetWhere write SetWhere;
-    // MasterBSPersistence
-    function GetMasterBSPersistence: TioBSPersistence;
-    property MasterBSPersistence: TioBSPersistence read GetMasterBSPersistence;
-    // OriginalResolvedTypeNameNonTrueClass
-    procedure SetOriginalNonTrueClassMap(const AMap: IioMap);
-    function GetOriginalNonTrueClassMap: IioMap;
-    property OriginalNonTrueClassMap: IioMap read GetOriginalNonTrueClassMap write SetOriginalNonTrueClassMap;
-    // EtmEntityVersion
-    function GetEntityFromVersion: Integer;
-    procedure SetEntityFromVersion(const Value: Integer);
-    property EntityFromVersion: Integer read GetEntityFromVersion write SetEntityFromVersion;
-    // ActionType
-    function GetActionType: TioPersistenceActionType;
-    procedure SetActionType(const Value: TioPersistenceActionType);
-    property ActionType: TioPersistenceActionType read GetActionType write SetActionType;
-    // IntentType
-    function GetIntentType: TioPersistenceIntentType;
-    procedure SetIntentType(const Value: TioPersistenceIntentType);
-    property IntentType: TioPersistenceIntentType read GetIntentType write SetIntentType;
-    // BlindLevel
-    function GetBlindLevel: Byte;
-    procedure SetBlindLevel(const Value: Byte);
-    property BlindLevel: Byte read GetBlindLevel write SetBlindLevel;
-    // ConflictDetected
-    function GetConflictDetected: Boolean;
-    procedure SetConflictDetected(const Value: Boolean);
-    property ConflictDetected: Boolean read GetConflictDetected write SetConflictDetected;
-    // ConflictState
-    function GetConflictState: TioPersistenceConflictState;
-    procedure SetConflictState(const Value: TioPersistenceConflictState);
-    property ConflictState: TioPersistenceConflictState read GetConflictState write SetConflictState;
   end;
 
 implementation

@@ -53,14 +53,14 @@ type
     FConflictDetected: Boolean;
     FConflictState: TioPersistenceConflictState;
     FEntityFromVersion: Integer;
-    FHasManyChildVirtualPropertyValue: Integer;
+//    FHasManyChildVirtualPropertyValue: Integer;
     FMap: IioMap;
     FObjNextVersion: TioObjVersion;
     FOriginalNonTrueClassMap: IioMap;
     FPSRequest: IioPersistenceStrategyRequest;
     FSynchroStrategy_Client_NoDirectCall: IioSynchroStrategy_Client;
     // ConnectionName
-    function GetConnectionName: String;
+    function GetConnectionNameResolved: String;
     // DataObject
     function GetDataObject: TObject;
     procedure SetDataObject(const AValue: TObject);
@@ -168,28 +168,28 @@ type
     // OrderBy
     function GetOrderBySql: String;
     // Properties
-    property ConnectionName: String read GetConnectionName;
-    property DataObject: TObject read GetDataObject write SetDataObject;
-    property ObjID: Integer read GetObjID write SetObjID;
-    property ObjStatus: TioObjStatus read GetObjStatus write SetObjStatus;
-    property ObjVersion: TioObjVersion read GetObjVersion write SetObjVersion;
-    property ObjNextVersion: Integer read GetObjNextVersion; // Con tipo TioObjVersion ci sono problemi
-    property ObjCreated: TioObjCreated read GetObjCreated write SetObjCreated;
-    property ObjCreatedUserID: TioObjCreatedUserID read GetObjCreatedUserID write SetObjCreatedUserID;
-    property ObjCreatedUserName: TioObjCreatedUserName read GetObjCreatedUserName write SetObjCreatedUserName;
-    property ObjUpdated: TioObjUpdated read GetObjUpdated write SetObjUpdated;
-    property ObjUpdatedUserID: TioObjUpdatedUserID read GetObjUpdatedUserID write SetObjUpdatedUserID;
-    property ObjUpdatedUserName: TioObjUpdatedUserName read GetObjUpdatedUserName write SetObjUpdatedUserName;
-    property Where: IioWhere read GetWhere write SetWhere;
-    property RelationOID: Integer read GetRelationOID write SetRelationOID;
-    property MasterPropertyPath: String read GetMasterPropertyPath;
-    property MasterBSPersistence: TioBSPersistence read GetMasterBSPersistence;
-    property EntityFromVersion: Integer read GetEntityFromVersion write SetEntityFromVersion;
     property ActionType: TioPersistenceActionType read GetActionType write SetActionType;
-    property IntentType: TioPersistenceIntentType read GetIntentType write SetIntentType;
     property BlindLevel: Byte read GetBlindLevel write SetBlindLevel;
     property ConflictDetected: Boolean read GetConflictDetected write SetConflictDetected;
     property ConflictState: TioPersistenceConflictState read GetConflictState write SetConflictState;
+    property ConnectionNameResolved: String read GetConnectionNameResolved;
+    property DataObject: TObject read GetDataObject write SetDataObject;
+    property EntityFromVersion: Integer read GetEntityFromVersion write SetEntityFromVersion;
+    property IntentType: TioPersistenceIntentType read GetIntentType write SetIntentType;
+    property MasterPropertyPath: String read GetMasterPropertyPath;
+    property MasterBSPersistence: TioBSPersistence read GetMasterBSPersistence;
+    property ObjCreated: TioObjCreated read GetObjCreated write SetObjCreated;
+    property ObjCreatedUserID: TioObjCreatedUserID read GetObjCreatedUserID write SetObjCreatedUserID;
+    property ObjCreatedUserName: TioObjCreatedUserName read GetObjCreatedUserName write SetObjCreatedUserName;
+    property ObjID: Integer read GetObjID write SetObjID;
+    property ObjStatus: TioObjStatus read GetObjStatus write SetObjStatus;
+    property ObjUpdated: TioObjUpdated read GetObjUpdated write SetObjUpdated;
+    property ObjUpdatedUserID: TioObjUpdatedUserID read GetObjUpdatedUserID write SetObjUpdatedUserID;
+    property ObjUpdatedUserName: TioObjUpdatedUserName read GetObjUpdatedUserName write SetObjUpdatedUserName;
+    property ObjVersion: TioObjVersion read GetObjVersion write SetObjVersion;
+    property ObjNextVersion: Integer read GetObjNextVersion; // Con tipo TioObjVersion ci sono problemi
+    property RelationOID: Integer read GetRelationOID write SetRelationOID;
+    property Where: IioWhere read GetWhere write SetWhere;
     /// Contiene il nome della classe originaria cioè, nel caso il contesto sia stato creato con
     ///  la TrueClassVirtual (select query) a partire da una resolved class name, contiene il nome
     ///  della classe originaria, quella dalla quale poi si è estratta la TrueClassVirtualMap stessa.
@@ -354,7 +354,7 @@ end;
 
 function TioContext.GetRelationOID: Integer;
 begin
-  Result := FHasManyChildVirtualPropertyValue;
+  Result := FPSRequest.RelationOID;
 end;
 
 function TioContext.GetCurrentStrategyName: String;
@@ -477,7 +477,7 @@ begin
   Result := FConflictState;
 end;
 
-function TioContext.GetConnectionName: String;
+function TioContext.GetConnectionNameResolved: String;
 begin
   Result := GetTable.GetTableConnectionNameIfEmpty(FPSRequest.Connection);
 end;
@@ -514,7 +514,7 @@ end;
 
 procedure TioContext.SetRelationOID(const Value: Integer);
 begin
-  FHasManyChildVirtualPropertyValue := Value;
+  FPSRequest.RelationOID := Value;
 end;
 
 procedure TioContext.SetObjCreated(const AValue: TioObjCreated);

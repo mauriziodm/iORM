@@ -46,7 +46,6 @@ type
     class procedure _Execute(const APSRequest: IioPersistenceStrategyRequest); inline; static;
     class procedure _Execute_IntegerResult(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); inline; static;
     class procedure _Execute_DataSetResult(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); inline; static;
-    class procedure _Execute_Persist(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); inline; static;
     // specific execution methods
     class procedure _Auth_Access(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); inline; static;
     class procedure _Auth_App(const  APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); inline; static;
@@ -56,6 +55,8 @@ type
     class procedure _DoSynchronization(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); inline; static;
     class procedure _LoadList(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); inline; static;
     class procedure _LoadObject(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _PersistList(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); inline; static;
+    class procedure _PersistObject(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); inline; static;
   public
     class function Execute(const ARequestBodyAsString: String): String; static;
     class function Test: String; static;
@@ -114,25 +115,17 @@ begin
       psmLoadMin:
         _Execute_IntegerResult(LPSRequest, LioResponseBody);
       psmLoadObject:
-        _LoadObject(LPSRequest, LioResponseBody);
+        _PersistObject(LPSRequest, LioResponseBody);
       psmPersistList:
-        _Execute_Persist(LPSRequest, LioResponseBody);
+        _PersistList(LPSRequest, LioResponseBody);
       psmPersistObject:
         _Execute_Persist(LPSRequest, LioResponseBody);
       psmSQLDestExecute:
         _Execute(LPSRequest);
       psmSQLDestLoadDataSet:
         _Execute_DataSetResult(LPSRequest, LioResponseBody);
-      psmTransactionCommit:
-        _DoTransactionCommit(LPSRequest, LioResponseBody);
-      psmTransactionIn:
-        _DoTransactionIn(LPSRequest, LioResponseBody);
-      psmTransactionRollback:
-        _DoTransactionRollback(LPSRequest, LioResponseBody);
-      psmTransactionStart:
-        _DoTransactionStart(LPSRequest, LioResponseBody);
     else
-      EioSynchroStrategyException.Create(Self.Name, 'Execute', 'The requested persistence strategy method is not handled');
+      EioSynchroStrategyException.Create(ClassName, 'Execute', 'Requested persistence strategy method is not handled');
     end;
     // Return the response
     Result := LioResponseBody.AsString;
@@ -213,13 +206,6 @@ begin
   AioResponseBody.JSONDataValueAsInteger := APSRequest.ResultAsInteger;
 end;
 
-class procedure TioHttpServerExecutor._Execute_Persist(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
-begin
-  _Execute(APSRequest);
-  if TioUtilities.BlindLevel_Do_AutoUpdateProps(APSRequest.BlindLevel) then
-    AioResponseBody.JSONDataValueAsObject := APSRequest.Obj1;
-end;
-
 class procedure TioHttpServerExecutor._LoadList(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
 begin
   // Create a dummy list (note: TObjectList even for interface type items)
@@ -238,6 +224,20 @@ class procedure TioHttpServerExecutor._LoadObject(const APSRequest: IioPersisten
 begin
   _Execute(APSRequest);
   AioResponseBody.JSONDataValueAsObject := APSRequest.Obj1;
+end;
+
+class procedure TioHttpServerExecutor._PersistList(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
+begin
+  _Execute(APSRequest);
+  if TioUtilities.BlindLevel_Do_AutoUpdateProps(APSRequest.BlindLevel) then
+    AioResponseBody.JSONDataValueAsObject := APSRequest.List;
+end;
+
+class procedure TioHttpServerExecutor._PersistObject(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
+begin
+  _Execute(APSRequest);
+  if TioUtilities.BlindLevel_Do_AutoUpdateProps(APSRequest.BlindLevel) then
+    AioResponseBody.JSONDataValueAsObject := APSRequest.Obj1;
 end;
 
 class procedure TioHttpServerExecutor._Auth_NewAccessToken(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
