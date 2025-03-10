@@ -263,7 +263,7 @@ begin
   _Lock;
   try
     // If desired ConnectionName is empty then get then Default one.
-    AConnectionName := TioApplication.SessionDataStore._GetCurrentConnectionNameIfEmpty(AConnectionName);
+    AConnectionName := TioApplication.SessionDataStore.GetCurrentConnectionNameIfEmpty(AConnectionName);
     // Reset the ConnectionInfo.SynchroStrategy property
     if FConnectionManagerContainer.ContainsKey(AConnectionName) then
       FConnectionManagerContainer[AConnectionName].SynchroStrategy := nil;
@@ -291,7 +291,7 @@ begin
   try
     Result := nil;
     // If desired ConnectionName is empty then get then Default one.
-    AConnectionName := TioApplication.SessionDataStore._GetCurrentConnectionNameIfEmpty(AConnectionName);
+    AConnectionName := TioApplication.SessionDataStore.GetCurrentConnectionNameIfEmpty(AConnectionName);
     // Get the ConnectionDef info's
     Result := FDManager.ConnectionDefs.FindConnectionDef(AConnectionName);
     // Connection not found
@@ -307,7 +307,7 @@ begin
   _Lock;
   try
     // If desired ConnectionName is empty then get then Default one.
-    AConnectionName := TioApplication.SessionDataStore._GetCurrentConnectionNameIfEmpty(AConnectionName);
+    AConnectionName := TioApplication.SessionDataStore.GetCurrentConnectionNameIfEmpty(AConnectionName);
     // Return the desired connection type
     if not FConnectionManagerContainer.TryGetValue(AConnectionName, Result) then
       raise EioGenericException.Create(Self.ClassName, 'GetConnectionInfo',
@@ -323,7 +323,7 @@ begin
   _Lock;
   try
     // If desired ConnectionName is empty then get then Default one.
-    AConnectionName := TioApplication.SessionDataStore._GetCurrentConnectionNameIfEmpty(AConnectionName);
+    AConnectionName := TioApplication.SessionDataStore.GetCurrentConnectionNameIfEmpty(AConnectionName);
     // Return the desired info or raise an exception if the connection name was not found
     if FConnectionManagerContainer.ContainsKey(AConnectionName) then
       Result := FConnectionManagerContainer.Items[AConnectionName].SynchroStrategy
@@ -350,7 +350,7 @@ class function TioConnectionManager.GetCurrentConnectionDef: IIoStanConnectionDe
 begin
   _Lock;
   try
-    Result := GetConnectionDefByName(TioApplication.SessionDataStore._GetCurrentConnectionName);
+    Result := GetConnectionDefByName(TioApplication.SessionDataStore.GetCurrentConnectionName);
   finally
     _Unlock;
   end;

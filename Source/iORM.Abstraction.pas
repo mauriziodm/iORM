@@ -85,9 +85,9 @@ type
     // fill persistence strategy request
     class procedure _FillPersistenceStrategyRequest(const APersistenceStrategyRequest: IioPersistenceStrategyRequest); static;
     // current connection
-    class function _GetCurrentConnectionName: String; static;
-    class function _GetCurrentConnectionNameIfEmpty(const AConnectionName: String): String;
     class function _IsEmptyConnectionName(const AConnectionName: String): Boolean; inline;
+    class function GetCurrentConnectionName: String; static;
+    class function GetCurrentConnectionNameIfEmpty(const AConnectionName: String): String;
     // main session data
     class function AcquireSessionData: IioAuthSessionData;
     class procedure ClearSessionData;
@@ -542,7 +542,7 @@ begin
   _Finalize;
 end;
 
-class function TioCustomSessionDataStore._GetCurrentConnectionName: String;
+class function TioCustomSessionDataStore.GetCurrentConnectionName: String;
 begin
   _Lock;
   try
@@ -559,7 +559,7 @@ begin
     Result := FDefaultGlobalConnection;
 end;
 
-class function TioCustomSessionDataStore._GetCurrentConnectionNameIfEmpty(const AConnectionName: String): String;
+class function TioCustomSessionDataStore.GetCurrentConnectionNameIfEmpty(const AConnectionName: String): String;
 begin
   _Lock;
   try

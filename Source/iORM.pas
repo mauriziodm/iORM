@@ -561,18 +561,18 @@ type
     class procedure PersistObject(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete); overload;
     class procedure PersistObject(const AIntfObj: IInterface; const ABlindLevel: Byte = BL_DEFAULT); overload;
     class procedure _PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
-    class procedure _PersistObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
-      const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
-      const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); static;
+    class procedure _PersistObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
+      const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence;
+      const AMasterPropertyName, AMasterPropertyPath: String); static;
     // PersistCollection (accepting instance to persist directly)
     class procedure PersistList(const [ref] AList: TObject; const ABlindLevel: Byte = BL_DEFAULT;
       const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
     class procedure PersistList(const [ref] AList: TObject; const AFree: TioFreeObjAfterPersistOrDelete); overload;
     class procedure PersistList(const AListIntf: IInterface; const ABlindLevel: Byte = BL_DEFAULT); overload;
     class procedure _PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
-    class procedure _PersistListInternal(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
-      const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
-      const ABlindLevel: Byte); static;
+    class procedure _PersistListInternal(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
+      const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence;
+      const AMasterPropertyName, AMasterPropertyPath: String); static;
 
     class procedure StartTransaction(const AConnectionName: String = '');
     class procedure CommitTransaction(const AConnectionName: String = '');
@@ -772,7 +772,8 @@ implementation
 uses
   System.Rtti, iORM.Exceptions, iORM.Utilities, iORM.Where.Factory, iORM.PersistenceStrategy.Factory, iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory, iORM.DB.Factory, iORM.Abstraction, iORM.DuckTyped.StreamObject,
-  iORM.LiveBindings.CommonBSBehavior, iORM.MVVM.ViewContextProviderContainer;
+  iORM.LiveBindings.CommonBSBehavior, iORM.MVVM.ViewContextProviderContainer,
+  iORM.PersistenceStrategy.Interfaces;
 
 { io }
 
@@ -826,7 +827,7 @@ var
   LConnectionDefName: String;
 begin
   LConnectionDefName := AContext.GetTable.GetTableConnectionName;
-  Result := TioPersistenceStrategyFactory.GetStrategy(LConnectionDefName).LoadObjVersion(AContext);
+  Result := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName(LConnectionDefName).LoadObjVersion(AContext);
 end;
 
 class procedure io.LoadToList<TItemType>(const AListObj: TObject; const AItemAlias: String);
@@ -966,19 +967,20 @@ end;
 
 class procedure io._PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 begin
-  _PersistObjectInternal(AObj, AIntent, '', 0, nil, '', '', ABlindLevel, TioApplication.CloneSessionData);
+  _PersistObjectInternal(AObj, AIntent, ABlindLevel, '', 0, nil, '', '');
 end;
 
-class procedure io._PersistObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
-      const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String;
-      const ABlindLevel: Byte; const ASessionData: IioAuthSessionData);
+class procedure io._PersistObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
+  const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence;
+  const AMasterPropertyName, AMasterPropertyPath: String);
 var
-  LConnectionDefName: String;
+  LPSRequest: IioPersistenceStrategyRequest;
 begin
-  LConnectionDefName := TioMapContainer.GetConnectionDefName(AObj.ClassName);
-  // Get the strategy and call the proper funtionality
-  TioPersistenceStrategyFactory.GetStrategy(LConnectionDefName).PersistObject(AObj, AIntent, ARelationPropertyName, ARelationOID, AMasterBSPersistence,
-    AMasterPropertyName, AMasterPropertyPath, ABlindLevel, ASessionData);
+  // Build the persistence strategy request
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_PersistObject(AObj, AIntent, ABlindLevel, ARelationPropertyName, ARelationOID, AMasterBSPersistence,
+    AMasterPropertyName, AMasterPropertyPath);
+  // get the right persistence strategy and execute the request
+  TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
 end;
 
 class procedure io.PersistList(const [ref] AList: TObject; const AFree: TioFreeObjAfterPersistOrDelete);
@@ -988,24 +990,24 @@ end;
 
 class procedure io.PersistObject(const AIntfObj: IInterface; const ABlindLevel: Byte);
 begin
-  _PersistObjectInternal(AIntfObj as TObject, itRegular, '', 0, nil, '', '', ABlindLevel, TioApplication.CloneSessionData);
+  _PersistObjectInternal(AIntfObj as TObject, itRegular, ABlindLevel, '', 0, nil, '', '');
 end;
 
 class procedure io.PersistList(const [ref] AList: TObject; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete);
 begin
-  _PersistListInternal(AList, itRegular, '', 0, nil, '', '', ABlindLevel);
+  _PersistListInternal(AList, itRegular, ABlindLevel, '', 0, nil, '', '');
   _FreeObjAfterPersistOrDelete(AList, AFree);
 end;
 
 class procedure io.PersistObject(const [ref] AObj: TObject; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete);
 begin
-    _PersistObjectInternal(AObj, itRegular, '', 0, nil, '', '', ABlindLevel, TioApplication.CloneSessionData);
+    _PersistObjectInternal(AObj, itRegular, ABlindLevel, '', 0, nil, '', '');
     _FreeObjAfterPersistOrDelete(AObj, AFree);
 end;
 
 class procedure io.PersistList(const AListIntf: IInterface; const ABlindLevel: Byte);
 begin
-  _PersistListInternal(AListIntf as TObject, itRegular, '', 0, nil, '', '', ABlindLevel);
+  _PersistListInternal(AListIntf as TObject, itRegular, ABlindLevel, '', 0, nil, '', '');
 end;
 
 class procedure io.PersistObject(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete);
@@ -1103,8 +1105,13 @@ begin
 end;
 
 class procedure io.RollbackTransaction(const AConnectionName: String);
+var
+  LPSRequest: IioPersistenceStrategyRequest;
 begin
-  TioPersistenceStrategyFactory.GetStrategy(AConnectionName).RollbackTransaction(AConnectionName);
+  // Build the persistence strategy request
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_Transaction_Rollback(AConnectionName);
+  // get the right persistence strategy and execute the request
+  TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
 end;
 
 class function io.SQL(const ASQL: String): IioSQLDestination;
@@ -1419,8 +1426,13 @@ begin
 end;
 
 class procedure io.StartTransaction(const AConnectionName: String);
+var
+  LPSRequest: IioPersistenceStrategyRequest;
 begin
-  TioPersistenceStrategyFactory.GetStrategy(AConnectionName).StartTransaction(AConnectionName);
+  // Build the persistence strategy request
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_Transaction_Start(AConnectionName);
+  // get the right persistence strategy and execute the request
+  TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
 end;
 
 class function io.StrategyInterceptors: TioStrategyInterceptorRegisterRef;
@@ -1439,8 +1451,13 @@ begin
 end;
 
 class procedure io.CommitTransaction(const AConnectionName: String);
+var
+  LPSRequest: IioPersistenceStrategyRequest;
 begin
-  TioPersistenceStrategyFactory.GetStrategy(AConnectionName).CommitTransaction(AConnectionName);
+  // Build the persistence strategy request
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_Transaction_Commit(AConnectionName);
+  // get the right persistence strategy and execute the request
+  TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
 end;
 
 class function io.Connections: TioConnectionManagerRef;
@@ -1885,8 +1902,15 @@ begin
 end;
 
 class function io.InTransaction(const AConnectionName: String): boolean;
+var
+  LPSRequest: IioPersistenceStrategyRequest;
 begin
-  Result := TioPersistenceStrategyFactory.GetStrategy(AConnectionName).InTransaction(AConnectionName);
+  // Build the persistence strategy request
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_Transaction_Rollback(AConnectionName);
+  // get the right persistence strategy and execute the request
+  TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
+  // extract the result
+  Result := LPSRequest.ResultAsBoolean;
 end;
 
 class procedure io.RegisterClass(const AClass: TClass);
@@ -1912,18 +1936,22 @@ end;
 
 class procedure io._DeleteListInternal(const AListObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 var
-  LConnectionDefName: String;
+  LPSRequest: IioPersistenceStrategyRequest;
 begin
-  LConnectionDefName := TioConnectionManager.GetCurrentConnectionName;
-  TioPersistenceStrategyFactory.GetStrategy(LConnectionDefName).DeleteList(AListObj, AIntent, ABlindLevel);
+  // Build the persistence strategy request
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_DeleteList(AListObj, AIntent, ABlindLevel);
+  // get the right persistence strategy and execute the request
+  TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
 end;
 
 class procedure io._DeleteObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 var
-  LConnectionDefName: String;
+  LPSRequest: IioPersistenceStrategyRequest;
 begin
-  LConnectionDefName := TioMapContainer.GetConnectionDefName(AObj.ClassName);
-  TioPersistenceStrategyFactory.GetStrategy(LConnectionDefName).DeleteObject(AObj, AIntent, ABlindLevel);
+  // Build the persistence strategy request
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_DeleteObject(AObj, AIntent, ABlindLevel);
+  // get the right persistence strategy and execute the request
+  TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
 end;
 
 class procedure io._FreeObjAfterPersistOrDelete(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete);
@@ -1938,17 +1966,20 @@ end;
 
 class procedure io._PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 begin
-  _PersistListInternal(AList, AIntent, '', 0, nil, '', '', ABlindLevel);
+  _PersistListInternal(AList, AIntent, ABlindLevel, '', 0, nil, '', '');
 end;
 
-class procedure io._PersistListInternal(const AList: TObject; const AIntent: TioPersistenceIntentType; const ARelationPropertyName: String;
-  const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte);
+class procedure io._PersistListInternal(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
+  const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence;
+  const AMasterPropertyName, AMasterPropertyPath: String);
 var
-  LConnectionDefName: String;
+  LPSRequest: IioPersistenceStrategyRequest;
 begin
-  LConnectionDefName := TioConnectionManager.GetCurrentConnectionName;
-  TioPersistenceStrategyFactory.GetStrategy(LConnectionDefName).PersistList(AList, AIntent, ARelationPropertyName, ARelationOID, AMasterBSPersistence,
-    AMasterPropertyName, AMasterPropertyPath, ABlindLevel);
+  // Build the persistence strategy request
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_PersistList(AList, AIntent, ABlindLevel, ARelationPropertyName, ARelationOID, AMasterBSPersistence,
+    AMasterPropertyName, AMasterPropertyPath);
+  // get the right persistence strategy and execute the request
+  TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
 end;
 
 class function io.TerminateApplication: boolean;

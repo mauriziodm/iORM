@@ -403,7 +403,7 @@ type
     class procedure _DoLoadMax(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     class procedure _DoLoadMin(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     class procedure _DoLoadObjectByClassOnly(const APresistenceStrategyRequest: IioPersistenceStrategyRequest); virtual; abstract;
-    class function _DoLoadObjVersion(const AContext: IioContext): Integers; virtual; abstract;
+    class function _DoLoadObjVersion(const AContext: IioContext): Integer; virtual; abstract;
     // Transaction
     class procedure _DoStartTransaction(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     class procedure _DoCommitTransaction(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
@@ -422,7 +422,8 @@ type
     class procedure _DoAuth_User(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
   public
-    class procedure Execute(const APSRequest: IioPersistenceStrategyRequest);
+    class procedure Execute(const APSRequest: IioPersistenceStrategyRequest); static;
+    class function LoadObjVersion(const AContext: IioContext): Integer; static;
 // TODO: Fare anche una versione asincrona?
 //    class procedure ExecutePSRequestAsync(const APSRequest: IioPersistenceStrategyRequest; const AOnTerminate: TioPSROnTerminateMethod; const AOnException: TioPSROnExceptionMethod);
 // TODO: Fare anche l'esecuzione di Unit Of Work? (collezione di PSRequest)
@@ -875,6 +876,11 @@ begin
   else
     EioSynchroStrategyException.Create(Self.Name, 'ExecutePSRequest', 'The requested persistence strategy method is not handled');
   end;
+end;
+
+class function TioPersistenceStrategyIntf.LoadObjVersion(const AContext: IioContext): Integer;
+begin
+  Result := _DoLoadObjVersionACOntext();
 end;
 
 class procedure TioPersistenceStrategyIntf._InterceptDeleteList(const APSRequest: IioPersistenceStrategyRequest);

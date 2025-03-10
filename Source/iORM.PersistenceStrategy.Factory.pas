@@ -45,31 +45,33 @@ type
 
   TioPersistenceStrategyFactory = class
   private
-    class procedure _SetPSRequestConnectionsIfNotEmpty(const APSRequest: IioPersistenceStrategyRequest; const AConnectionName, AConnectionNameRemote: String); inline;
-    class function _NewPSRequest(const AMethod: TioPersistenceStrategyMethod; const FillSessionRelatedProperties: Boolean): IioPersistenceStrategyRequest; inline;
+    class procedure _SetPSRequestConnectionsIfNotEmpty(const APSRequest: IioPersistenceStrategyRequest; const AConnectionName, AConnectionNameRemote: String); static; inline;
+    class function _NewPSRequest(const AMethod: TioPersistenceStrategyMethod; const FillSessionRelatedProperties: Boolean): IioPersistenceStrategyRequest; static; inline;
   public
-    class function GetStrategy(const AConnectionName: String): TioPersistenceStrategyRef;
+    // TODO: Possibile eliminare il metodo GetStrategy_ByConnectionName?
+    class function GetStrategy_ByConnectionName(const AConnectionName: String): TioPersistenceStrategyRef;
+    class function GetStrategy_ByPSRequest(const APSRequest: IioPersistenceStrategyRequest): TioPersistenceStrategyRef;
     class function ConnectionTypeToStrategy(const AConnectionType: TioConnectionType): TioPersistenceStrategyRef;
     // ---------- operation type specific persistence strategy request factories ----------
     class function NewPSRequest_ByJsonString(const AJsonString: String): IioPersistenceStrategyRequest;
     // delete
     class function NewPSRequest_Delete(const AWhere: IioWhere): IioPersistenceStrategyRequest;
-    class function NewPSRequest_DeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
-    class function NewPSRequest_DeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
+    class function NewPSRequest_DeleteList(const AListDTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
+    class function NewPSRequest_DeleteObject(const ADTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
     // load
     class function NewPSRequest_LoadCount(const AWhere: IioWhere): IioPersistenceStrategyRequest;
     class function NewPSRequest_LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet): IioPersistenceStrategyRequest;
-    class function NewPSRequest_LoadList(const AWhere: IioWhere; const AList: TObject; const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
+    class function NewPSRequest_LoadList(const AWhere: IioWhere; const AListDTO: TObject; const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
     class function NewPSRequest_LoadMax(const AWhere: IioWhere; const APropertyName: String): IioPersistenceStrategyRequest;
     class function NewPSRequest_LoadMin(const AWhere: IioWhere; const APropertyName: String): IioPersistenceStrategyRequest;
-    class function NewPSRequest_LoadObject(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
-    class function NewPSRequest_LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject; const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
+    class function NewPSRequest_LoadObject(const AWhere: IioWhere; const ADTO: TObject; const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
+    class function NewPSRequest_LoadObjectByClassOnly(const AWhere: IioWhere; const ADTO: TObject; const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
     class function NewPSRequest_LoadObjVersion(const AContext: IioContext): IioPersistenceStrategyRequest;
     // persist
-    class function NewPSRequest_PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
+    class function NewPSRequest_PersistList(const AListDTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
       const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName,
       AMasterPropertyPath: String): IioPersistenceStrategyRequest;
-    class function NewPSRequest_PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
+    class function NewPSRequest_PersistObject(const ADTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
       const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName,
       AMasterPropertyPath: String): IioPersistenceStrategyRequest;
     // sql destinations
@@ -108,9 +110,14 @@ begin
   end;
 end;
 
-class function TioPersistenceStrategyFactory.GetStrategy(const AConnectionName: String): TioPersistenceStrategyRef;
+class function TioPersistenceStrategyFactory.GetStrategy_ByConnectionName(const AConnectionName: String): TioPersistenceStrategyRef;
 begin
   Result := TioConnectionManager.GetConnectionInfo(AConnectionName).PersistenceStrategy;
+end;
+
+class function TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(const APSRequest: IioPersistenceStrategyRequest): TioPersistenceStrategyRef;
+begin
+  Result := TioConnectionManager.GetConnectionInfo(APSRequest.Connection).PersistenceStrategy;
 end;
 
 class function TioPersistenceStrategyFactory._NewPSRequest(const AMethod: TioPersistenceStrategyMethod; const FillSessionRelatedProperties: Boolean): IioPersistenceStrategyRequest;
@@ -195,24 +202,24 @@ begin
   Result.Where.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_DeleteList(const AList: TObject; const AIntent: TioPersistenceIntentType;
+class function TioPersistenceStrategyFactory.NewPSRequest_DeleteList(const AListDTO: TObject; const AIntent: TioPersistenceIntentType;
   const ABlindLevel: Byte): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(psmDeleteList, True);
   Result.BlindLevel := ABlindLevel;
   Result.Intent := AIntent;
-  Result.List := AList;
-  Result.List_Serialize := True;
+  Result.ListDTO := AListDTO;
+  Result.ListDTO_Serialize := True;
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_DeleteObject(const AObj: TObject; const AIntent: TioPersistenceIntentType;
+class function TioPersistenceStrategyFactory.NewPSRequest_DeleteObject(const ADTO: TObject; const AIntent: TioPersistenceIntentType;
   const ABlindLevel: Byte): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(psmDeleteObject, True);
   Result.BlindLevel := ABlindLevel;
   Result.Intent := AIntent;
-  Result.Obj1 := AObj;
-  Result.Obj1_Serialize := True;
+  Result.DTO := ADTO;
+  Result.DTO_Serialize := True;
 end;
 
 class function TioPersistenceStrategyFactory.NewPSRequest_DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload): IioPersistenceStrategyRequest;
@@ -231,35 +238,35 @@ begin
   Result.Where.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_LoadList(const AWhere: IioWhere; const AList: TObject;
+class function TioPersistenceStrategyFactory.NewPSRequest_LoadList(const AWhere: IioWhere; const AListDTO: TObject;
   const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(psmLoadList, True);
   Result.Intent := AIntent;
-  Result.List := AList;
-  Result.List_Serialize := False;
+  Result.ListDTO := AListDTO;
+  Result.ListDTO_Serialize := False;
   Result.Where := AWhere;
   Result.Where.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_LoadObject(const AWhere: IioWhere; const AObj: TObject;
+class function TioPersistenceStrategyFactory.NewPSRequest_LoadObject(const AWhere: IioWhere; const ADTO: TObject;
   const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(psmLoadObject, True);
   Result.Intent := AIntent;
-  Result.Obj1 := AObj;
-  Result.Obj1_Serialize := True;
+  Result.DTO := ADTO;
+  Result.DTO_Serialize := True;
   Result.Where := AWhere;
   Result.Where.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_LoadObjectByClassOnly(const AWhere: IioWhere; const AObj: TObject;
+class function TioPersistenceStrategyFactory.NewPSRequest_LoadObjectByClassOnly(const AWhere: IioWhere; const ADTO: TObject;
   const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(psmLoadObjectByClassOnly, True);
   Result.Intent := AIntent;
-  Result.Obj1 := AObj;
-  Result.Obj1_Serialize := False;
+  Result.DTO := ADTO;
+  Result.DTO_Serialize := False;
   Result.Where := AWhere;
   Result.Where.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
@@ -287,15 +294,15 @@ begin
   Result.PropName := APropertyName;
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
+class function TioPersistenceStrategyFactory.NewPSRequest_PersistList(const AListDTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
   const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName,
   AMasterPropertyPath: String): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(psmPersistList, True);
   Result.BlindLevel := ABlindLevel;
   Result.Intent := AIntent;
-  Result.List := AList;
-  Result.List_Serialize := True;
+  Result.ListDTO := AListDTO;
+  Result.ListDTO_Serialize := True;
   Result.MasterBSPersistence := AMasterBSPersistence;
   Result.RelationPropertyName := ARelationPropertyName;
   Result.RelationOID := ARelationOID;
@@ -303,15 +310,15 @@ begin
   Result.MasterPropPath := AMasterPropertyPath;
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
+class function TioPersistenceStrategyFactory.NewPSRequest_PersistObject(const ADTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
   const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName,
   AMasterPropertyPath: String): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(psmPersistObject, True);
   Result.BlindLevel := ABlindLevel;
   Result.Intent := AIntent;
-  Result.Obj1 := AObj;
-  Result.Obj1_Serialize := True;
+  Result.DTO := ADTO;
+  Result.DTO_Serialize := True;
   // TODO: MasterBSPersistence è usato alla DBPersistenceStrategy ma non usato dalla HttpPersistenceStrategy, indagare a cosa serve e se si può eliminare
   Result.MasterBSPersistence := AMasterBSPersistence;
   Result.RelationPropertyName := ARelationPropertyName;
@@ -339,25 +346,28 @@ end;
 
 class function TioPersistenceStrategyFactory.NewPSRequest_Transaction_Commit(const AConnectionName: String = String.Empty; const AConnectionNameRemote: String = String.Empty): IioPersistenceStrategyRequest;
 begin
-  Result := _NewPSRequest_Transaction(psmTransactionCommit, AConnectionName, AConnectionNameRemote);
+  Result := _NewPSRequest(psmTransactionCommit, False);
+  _SetPSRequestConnectionsIfNotEmpty(Result, AConnectionName, AConnectionNameRemote);
 end;
 
 class function TioPersistenceStrategyFactory.NewPSRequest_Transaction_In(const AConnectionName: String = String.Empty; const AConnectionNameRemote: String = String.Empty): IioPersistenceStrategyRequest<Boolean>;
 begin
-  Result := _NewPSRequest_Result<Boolean>(psmTransactionIn, AConnectionName, AConnectionNameRemote);
+  Result := _NewPSRequest(psmTransactionIn, False);
   _SetPSRequestConnectionsIfNotEmpty(Result, AConnectionName, AConnectionNameRemote);
 end;
 
 class function TioPersistenceStrategyFactory.NewPSRequest_Transaction_Rollback(const AConnectionName,
   AConnectionNameRemote: String): IioPersistenceStrategyRequest;
 begin
-  Result := _NewPSRequest_Transaction(psmTransactionRollback, AConnectionName, AConnectionNameRemote);
+  Result := _NewPSRequest(psmTransactionRollback, False);
+  _SetPSRequestConnectionsIfNotEmpty(Result, AConnectionName, AConnectionNameRemote);
 end;
 
 class function TioPersistenceStrategyFactory.NewPSRequest_Transaction_Start(const AConnectionName,
   AConnectionNameRemote: String): IioPersistenceStrategyRequest;
 begin
-  Result := _NewPSRequest_Transaction(psmTransactionStart, AConnectionName, AConnectionNameRemote);
+  Result := _NewPSRequest(psmTransactionStart, False);
+  _SetPSRequestConnectionsIfNotEmpty(Result, AConnectionName, AConnectionNameRemote);
 end;
 
 end.

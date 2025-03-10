@@ -588,7 +588,7 @@ begin
     raise;
   end;
   // Get the right target persistence strategy
-  LPersistenceStrategy := TioPersistenceStrategyFactory.GetStrategy(FTargetConnectionDef.GetName);
+  LPersistenceStrategy := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName(FTargetConnectionDef.GetName);
   // Build the execute method that start the synchronization
   LExecuteMethod := procedure
     var

@@ -87,7 +87,7 @@ type
     class procedure _DoStartTransaction(const APSRequest: IioPersistenceStrategyRequest); override;
     class procedure _DoCommitTransaction(const APSRequest: IioPersistenceStrategyRequest); override;
     class procedure _DoRollbackTransaction(const APSRequest: IioPersistenceStrategyRequest); override;
-    class function _DoInTransaction(const APSRequest: IioPersistenceStrategyRequest): Boolean; override;
+    class procedure _DoInTransaction(const APSRequest: IioPersistenceStrategyRequest); override;
     // SynchroStrategy
     class procedure _DoSynchronization(const APSRequest: IioPersistenceStrategyRequest); override;
     // SQLDestinations
@@ -283,13 +283,13 @@ begin
   _DoStartTransaction(APSRequest);
   try
     // Wrap the DestList into a DuckTypedList
-    LDuckTypedList := TioDuckTypedFactory.DuckTypedList(APSRequest.List);
+    LDuckTypedList := TioDuckTypedFactory.DuckTypedList(APSRequest.ListDTO);
     // Loop the list and delete objects
 // TODO: Vedere se si possono eliminare le variabili LDuckTypedList e LCurrentObj
     for LCurrentObj in LDuckTypedList do
     begin
       // Delete current object
-      APSRequest.Obj1 := LCurrentObj;
+      APSRequest.DTO := LCurrentObj;
       _DoDeleteObject(APSRequest);
     end;
     _DoCommitTransaction(APSRequest);
@@ -304,10 +304,10 @@ var
   LContext: IioContext;
 begin
   // Check
-  if not Assigned(APSRequest.Obj1) then
+  if not Assigned(APSRequest.DTO) then
     Exit;
   // Create Context (Create a dummy ioWhere first to pass ConnectionName parameter only).
-  LContext := TioContextFactory.Context(APSRequest, APSRequest.Obj1.ClassName);
+  LContext := TioContextFactory.Context(APSRequest, APSRequest.DTO.ClassName);
   LContext.ActionType := atDelete;
   // If the object is of a class mapped as NotPersisted then exit
   if LContext.Map.GetTable.IsNotPersistedEntity then
@@ -474,12 +474,12 @@ end;
 
 class function TioPersistenceStrategyDB.InTransaction_Internal(const AConnectionName: String): Boolean;
 begin
-  Result := InTransaction_Internal(APSRequest.Connection);
+  Result := InTransaction_Internal(AConnectionName);
 end;
 
-class function TioPersistenceStrategyDB._DoInTransaction(const APSRequest: IioPersistenceStrategyRequest): Boolean;
+class procedure TioPersistenceStrategyDB._DoInTransaction(const APSRequest: IioPersistenceStrategyRequest);
 begin
-  Result := TioDBFactory.Connection(APSRequest.Connection).InTransaction;
+  APSRequest.ResultAsBoolean := InTransaction_Internal(APSRequest.Connection);
 end;
 
 class procedure TioPersistenceStrategyDB._DoLoadObjectByClassOnly(const APSRequest: IioPersistenceStrategyRequest);
@@ -706,7 +706,7 @@ begin
   _DoStartTransaction(APSRequest);
   try
     // Wrap the DestList into a DuckTypedList
-    LDuckTypedList := TioDuckTypedFactory.DuckTypedList(APSRequest.List);
+    LDuckTypedList := TioDuckTypedFactory.DuckTypedList(APSRequest.ListDTO);
     // Loop the list
 // TODO: Vedere se si possono eliminare le variabili LDuckTypedList e LCurrentObj
     for LCurrentObj in LDuckTypedList do
@@ -770,7 +770,7 @@ var
     begin
       // note: if SmartUpdateDetection system is not enabled or (if enabled) the object is to be persisted (according to the SmartUpdateDetection system)...
       if LContext.GetProperties.ObjStatusPropertyExist or (APSRequest.MasterBSPersistence = nil) or (not APSRequest.MasterBSPersistence.IsSmartUpdateDetectionEnabled) or
-        APSRequest.MasterBSPersistence.SmartUpdateDetection.IsToBePersisted(APSRequest.Obj1, LContext.MasterPropertyPath) then
+        APSRequest.MasterBSPersistence.SmartUpdateDetection.IsToBePersisted(APSRequest.DTO, LContext.MasterPropertyPath) then
       begin
         // old code: if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
         if LContext.IDIsNull or (LContext.BlindLevel_Do_DetectObjExists and not ObjectExists(LContext)) then
@@ -794,10 +794,10 @@ var
 
 begin
   // Check
-  if not Assigned(APSRequest.Obj1) then
+  if not Assigned(APSRequest.DTO) then
     Exit;
   // Create Context
-  LContext := TioContextFactory.Context(APSRequest, APSRequest.Obj1.ClassName);
+  LContext := TioContextFactory.Context(APSRequest, APSRequest.DTO.ClassName);
   // If the object is of a class mapped as NotPersisted then exit
   if LContext.Map.GetTable.IsNotPersistedEntity then
     Exit;
@@ -1164,7 +1164,7 @@ begin
   // Resolve the type and alias
   LResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(APSRequest.Where.TypeName, APSRequest.Where.TypeAlias, rmAllDistinctByConnectionAndTable);
   // Wrap the list into a DuckTypedList
-  LDuckTypedList := TioDuckTypedFactory.DuckTypedList(APSRequest.List);
+  LDuckTypedList := TioDuckTypedFactory.DuckTypedList(APSRequest.ListDTO);
   // Create the IioContext cache (optimization)
   LContextCache := TioContextCache.Create;
   // Get the transaction collection
@@ -1269,7 +1269,7 @@ begin
       // Load the current class object is founded
       NestedLoadObject;
       // If there is a result (an object) then exit;
-      if Assigned(APSRequest.Obj1) then
+      if Assigned(APSRequest.DTO) then
         Break;
     end;
     // Commit ALL transactions

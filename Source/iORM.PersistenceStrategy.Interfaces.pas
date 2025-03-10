@@ -47,8 +47,9 @@ const
   PSR_AUTH_SCOPE = 'AuthScope';
   PSR_AUTH_TOKEN = 'AuthToken';
   PSR_BLINDLEVEL = 'BlindLevel';
+  PSR_INSTANCES_DTO = 'DTO';
   PSR_INSTANCES_INTF1 = 'Intf1';
-  PSR_INSTANCES_LIST = 'List';
+  PSR_INSTANCES_LIST_DTO = 'ListDTO';
   PSR_INSTANCES_MASTERBSPERSISTENCE = 'MasterBSP';
   PSR_INSTANCES_OBJ1 = 'Obj1';
   PSR_INSTANCES_WHERE = 'Where';
@@ -114,11 +115,13 @@ type
     function GetBlindLevel: Byte;
     function GetConnection: String;
     function GetConnectionRemote: String;
+    function GetDTO: TObject;
+    function GetDTO_Serialize: Boolean;
     function GetIntent: TioPersistenceIntentType;
     function GetIntf1: IInterface;
     function GetIntf1_Serialize: Boolean;
-    function GetList: TObject;
-    function GetList_Serialize: Boolean;
+    function GetListDTO: TObject;
+    function GetListDTO_Serialize: Boolean;
     function GetMasterBSPersistence: TioBSPersistence;
     function GetMasterPropName: String;
     function GetMasterPropPath: String;
@@ -138,11 +141,13 @@ type
     procedure SetAuthIntention(const Value: TioAuthIntention);
     procedure SetAuthScope(const Value: String);
     procedure SetBlindLevel(const Value: Byte);
+    procedure SetDTO(const Value: TObject);
+    procedure SetDTO_Serialize(const Value: Boolean);
     procedure SetIntent(const Value: TioPersistenceIntentType);
     procedure SetIntf1(const Value: IInterface);
     procedure SetIntf1_Serialize(const Value: Boolean);
-    procedure SetList(const Value: TObject);
-    procedure SetList_Serialize(const Value: Boolean);
+    procedure SetListDTO(const Value: TObject);
+    procedure SetListDTO_Serialize(const Value: Boolean);
     procedure SetMasterBSPersistence(const Value: TioBSPersistence);
     procedure SetMasterPropName(const Value: String);
     procedure SetMasterPropPath(const Value: String);
@@ -171,10 +176,12 @@ type
     property AuthScope: String read GetAuthScope;
     property AuthToken: String read GetAuthToken; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
     // instances
+    property DTO: TObject read GetDTO write SetDTO;
+    property DTO_Serialize: Boolean read GetDTO_Serialize write SetDTO_Serialize;
     property Intf1: IInterface read GetIntf1 write SetIntf1;
     property Intf1_Serialize: Boolean read GetIntf1_Serialize write SetIntf1_Serialize;
-    property List: TObject read GetList write SetList;
-    property List_Serialize: Boolean read GetList_Serialize write SetList_Serialize;
+    property ListDTO: TObject read GetListDTO write SetListDTO;
+    property ListDTO_Serialize: Boolean read GetListDTO_Serialize write SetListDTO_Serialize;
     property MasterBSPersistence: TioBSPersistence read GetMasterBSPersistence write SetMasterBSPersistence;
     property Obj1: TObject read GetObj1 write SetObj1;
     property Obj1_Serialize: Boolean read GetObj1_Serialize write SetObj1_Serialize;

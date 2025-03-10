@@ -201,7 +201,7 @@ begin
   end;
   // if the access request was not handled then use the internal implementation
   if not LDone then
-    Result := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).Auth_Access(FConnectionName, AScope, AAuthIntention, AAccessToken);
+    Result := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName(FConnectionName).Auth_Access(FConnectionName, AScope, AAuthIntention, AAccessToken);
   // invoke AfterAuthorizeAccess if assigned
   if Assigned(FAfterAuthorizeAccess) then
     FAfterAuthorizeAccess(Self, AScope, AAuthIntention, AAccessToken, Result);
@@ -265,7 +265,7 @@ begin
   end;
   // if the creation of the token was not handled then use the internal implementation
   if not LDone then
-    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).Auth_User(FConnectionName, AUserCredentials);
+    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName(FConnectionName).Auth_User(FConnectionName, AUserCredentials);
   // invoke AfterAuthorizeUser if assigned
   if Assigned(FAfterAuthorizeUser) then
     FAfterAuthorizeUser(Self, AUserCredentials, LAuthResponse);
@@ -560,7 +560,7 @@ begin
   end;
   // if the creation of the token was not handled then use the internal implementation
   if not LDone then
-    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).Auth_NewAccessToken(FConnectionName, AAuthGrant, ACredentials.CodeVerifier);
+    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName(FConnectionName).Auth_NewAccessToken(FConnectionName, AAuthGrant, ACredentials.CodeVerifier);
   // invoke AfterNewAccessToken if assigned
   if Assigned(FAfterNewAccessToken) then
     FAfterNewAccessToken(Self, ACredentials, LAuthResponse);
@@ -607,7 +607,7 @@ begin
   end;
   // if the creation of the token was not handled then use the internal implementation
   if not LDone then
-    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy(FConnectionName).Auth_RefreshAccessToken(FConnectionName, ASession.RefreshToken);
+    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName(FConnectionName).Auth_RefreshAccessToken(FConnectionName, ASession.RefreshToken);
   // invoke AfterRefreshAccessToken if assigned
   if Assigned(FAfterRefreshAccessToken) then
     FAfterRefreshAccessToken(Self, ARefreshToken, LAuthResponse);

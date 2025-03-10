@@ -792,7 +792,7 @@ end;
 
 procedure TioWhere.Delete;
 begin
-  TioPersistenceStrategyFactory.GetStrategy('').Delete(Self);
+  TioPersistenceStrategyFactory.GetStrategy_ByConnectionName('').Delete(Self);
 end;
 
 destructor TioWhere.Destroy;
@@ -855,7 +855,7 @@ end;
 
 function TioWhere.Count: Integer;
 begin
-  Result := TioPersistenceStrategyFactory.GetStrategy('').LoadCount(Self);
+  Result := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName('').LoadCount(Self);
 end;
 
 function TioWhere.GetClearListBefore: Boolean;
@@ -1041,12 +1041,12 @@ end;
 
 function TioWhere.Max(const APropertyName: String): Integer;
 begin
-  Result := TioPersistenceStrategyFactory.GetStrategy('').LoadMax(Self, APropertyName);
+  Result := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName('').LoadMax(Self, APropertyName);
 end;
 
 function TioWhere.Min(const APropertyName: String): Integer;
 begin
-  Result := TioPersistenceStrategyFactory.GetStrategy('').LoadMin(Self, APropertyName);
+  Result := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName('').LoadMin(Self, APropertyName);
 end;
 
 function TioWhere.NotExists: Boolean;
@@ -1146,7 +1146,7 @@ begin
     raise EioGenericException.Create(ClassName, 'ToList', '"AList" parameter not assigned');
   if FClearListBefore then
     TioUtilities.ClearList(AList);
-  TioPersistenceStrategyFactory.GetStrategy('').LoadList(Self, AList, FIntent);
+  TioPersistenceStrategyFactory.GetStrategy_ByConnectionName('').LoadList(Self, AList, FIntent);
 end;
 
 function TioWhere.ToList(const AInterfacedListTypeName, AAlias: String; const AOwnsObjects: Boolean): TObject;
@@ -1175,12 +1175,12 @@ end;
 
 procedure TioWhere.ToMemTable(const AMemTable: TFDMemTable);
 begin
-  TioPersistenceStrategyFactory.GetStrategy('').LoadDataSet(Self, AMemTable);
+  TioPersistenceStrategyFactory.GetStrategy_ByConnectionName('').LoadDataSet(Self, AMemTable);
 end;
 
 function TioWhere.ToObject(const AObj: TObject): TObject;
 begin
-  Result := TioPersistenceStrategyFactory.GetStrategy('').LoadObject(Self, AObj, FIntent);
+  Result := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName('').LoadObject(Self, AObj, FIntent);
 end;
 
 function TioWhere.ToObject(const AIntf: IInterface): TObject;
@@ -1423,7 +1423,7 @@ end;
 
 function TioWhere._ToObjectInternalByClassOnly(const AIntent: TioPersistenceIntentType; const AObj: TObject = nil): TObject;
 begin
-  Result := TioPersistenceStrategyFactory.GetStrategy('').LoadObjectByClassOnly(Self, AObj, AIntent);
+  Result := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName('').LoadObjectByClassOnly(Self, AObj, AIntent);
 end;
 
 function TioWhere._Value(AValue: IInterface): IioWhere;

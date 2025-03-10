@@ -98,7 +98,7 @@ var
 begin
   if Assigned(FInternalContainer) then
   begin
-    LTypeName := TioUtilities.ExtractItemRttiTypeFromList(APSRequest.DataObj).Name;
+    LTypeName := TioUtilities.ExtractItemRttiTypeFromList(APSRequest.ListDTO).Name;
     if FInternalContainer.ContainsKey(LTypeName) then
       for LInterceptor in FInternalContainer.Items[LTypeName] do
         LInterceptor.AfterDeleteList(APSRequest);
@@ -112,7 +112,7 @@ var
 begin
   if Assigned(FInternalContainer) then
   begin
-    LTypeName := APSRequest.DataObj.ClassName;
+    LTypeName := APSRequest.DTO.ClassName;
     if FInternalContainer.ContainsKey(LTypeName) then
       for LInterceptor in FInternalContainer.Items[LTypeName] do
         LInterceptor.AfterDeleteObject(APSRequest);
@@ -154,7 +154,7 @@ var
 begin
   if Assigned(FInternalContainer) then
   begin
-    LTypeName := TioUtilities.ExtractItemRttiTypeFromList(APSRequest.DataObj).Name;
+    LTypeName := TioUtilities.ExtractItemRttiTypeFromList(APSRequest.ListDTO).Name;
     if FInternalContainer.ContainsKey(LTypeName) then
       for LInterceptor in FInternalContainer.Items[LTypeName] do
         LInterceptor.AfterPersistList(APSRequest);
@@ -168,7 +168,7 @@ var
 begin
   if Assigned(FInternalContainer) then
   begin
-    LTypeName := APSRequest.DataObj.ClassName;
+    LTypeName := APSRequest.DTO.ClassName;
     if FInternalContainer.ContainsKey(LTypeName) then
       for LInterceptor in FInternalContainer.Items[LTypeName] do
         LInterceptor.AfterPersistObject(APSRequest);
@@ -183,7 +183,7 @@ var
 begin
   if Assigned(FInternalContainer) then
   begin
-    LTypeName := TioUtilities.ExtractItemRttiTypeFromList(APSRequest.DataObj).Name;
+    LTypeName := TioUtilities.ExtractItemRttiTypeFromList(APSRequest.ListDTO).Name;
     if FInternalContainer.ContainsKey(LTypeName) then
     begin
       for LInterceptor in FInternalContainer.Items[LTypeName] do
@@ -206,7 +206,7 @@ var
 begin
   if Assigned(FInternalContainer) then
   begin
-    LTypeName := APSRequest.DataObj.ClassName;
+    LTypeName := APSRequest.DTO.ClassName;
     if FInternalContainer.ContainsKey(LTypeName) then
     begin
       for LInterceptor in FInternalContainer.Items[LTypeName] do
@@ -275,7 +275,7 @@ var
 begin
   if Assigned(FInternalContainer) then
   begin
-    LTypeName := TioUtilities.ExtractItemRttiTypeFromList(APSRequest.DataObj).Name;
+    LTypeName := TioUtilities.ExtractItemRttiTypeFromList(APSRequest.ListDTO).Name;
     if FInternalContainer.ContainsKey(LTypeName) then
     begin
       for LInterceptor in FInternalContainer.Items[LTypeName] do
@@ -298,7 +298,7 @@ var
 begin
   if Assigned(FInternalContainer) then
   begin
-    LTypeName := APSRequest.DataObj.ClassName;
+    LTypeName := APSRequest.DTO.ClassName;
     if FInternalContainer.ContainsKey(LTypeName) then
     begin
       for LInterceptor in FInternalContainer.Items[LTypeName] do
