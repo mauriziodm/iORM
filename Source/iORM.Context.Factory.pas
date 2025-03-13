@@ -122,7 +122,7 @@ end;
 
 class function TioContextFactory.Context_PSRequest(const APSRequest: IioPersistenceStrategyRequest; const AClassName: String): IioContext;
 begin
-  Result := TioContext_Custom.CreateByPSRequest(APSRequest, TioMapContainer.GetMap(AClassName));
+  Result := TioContext_PSRequest.Create_PSRequest(APSRequest, TioMapContainer.GetMap(AClassName));
 end;
 
 class function TioContextFactory.Context_Simple(const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; AClassName: String; const AWhere: IioWhere;
@@ -141,11 +141,11 @@ begin
   LMap := TioMapContainer.GetMap(AClassName);
   if LMap.GetTable.IsTrueClass then
   begin
-    Result := TioContext_Custom.Create(APSRequest, LMap.GetTrueClassVirtualMap);
+    Result := TioContext_PSRequest.Create_PSRequest(APSRequest, LMap.GetTrueClassVirtualMap);
     Result.OriginalNonTrueClassMap := LMap;
   end
   else
-    Result := TioContext_Custom.Create(APSRequest, LMap);
+    Result := TioContext_PSRequest.Create_PSRequest(APSRequest, LMap);
 end;
 
 class procedure TioContextFactory.GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;

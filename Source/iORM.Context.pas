@@ -252,7 +252,7 @@ type
     function GetConnectionNameResolved: String; override;
     // DataObject
     function GetDataObject: TObject; override;
-    procedure SetDataObject(const AValue: TObject); override;
+    procedure SetDataObject(const Value: TObject); override;
     // IntentType
     function GetIntentType: TioPersistenceIntentType; override;
     procedure SetIntentType(const Value: TioPersistenceIntentType); override;
@@ -281,7 +281,7 @@ uses
   iORM.Context.Factory, iORM.DB.Factory, System.TypInfo,
   iORM.Context.Container, System.SysUtils, iORM.Exceptions,
   System.StrUtils, iORM.DB.Interfaces, iORM, iORM.DB.ConnectionContainer,
-  iORM.Utilities, iORM.SynchroStrategy.Custom;
+  iORM.Utilities, iORM.SynchroStrategy.Custom, iORM.Abstraction;
 
 { TioContext }
 
@@ -308,37 +308,37 @@ end;
 procedure TioContext_Custom.BlindLevel_Reset_AutoUpdateProps;
 begin
   if BlindLevel_Do_AutoUpdateProps then
-    Dec(BlindLevel, BL_BIT_AUTO_UPDATE_PROPS);
+    BlindLevel := BlindLevel - BL_BIT_AUTO_UPDATE_PROPS;
 end;
 
 procedure TioContext_Custom.BlindLevel_Reset_DetectConflicts;
 begin
   if BlindLevel_Do_DetectConflicts then
-    Dec(BlindLevel, BL_BIT_DETECT_CONFLICTS);
+    BlindLevel := BlindLevel - BL_BIT_DETECT_CONFLICTS;
 end;
 
 procedure TioContext_Custom.BlindLevel_Reset_DetectObjExists;
 begin
   if BlindLevel_Do_DetectObjExists then
-    Dec(BlindLevel, BL_BIT_DETECT_OBJ_EXISTS);
+    BlindLevel := BlindLevel - BL_BIT_DETECT_OBJ_EXISTS;
 end;
 
 procedure TioContext_Custom.BlindLevel_Set_AutoUpdateProps;
 begin
   if not BlindLevel_Do_AutoUpdateProps then
-    Inc(BlindLevel, BL_BIT_AUTO_UPDATE_PROPS);
+    BlindLevel := BlindLevel + BL_BIT_AUTO_UPDATE_PROPS;
 end;
 
 procedure TioContext_Custom.BlindLevel_Set_DetectConflicts;
 begin
   if not BlindLevel_Do_DetectConflicts then
-    Inc(BlindLevel, BL_BIT_DETECT_CONFLICTS);
+    BlindLevel := BlindLevel + BL_BIT_DETECT_CONFLICTS;
 end;
 
 procedure TioContext_Custom.BlindLevel_Set_DetectObjExists;
 begin
   if not BlindLevel_Do_DetectObjExists then
-    Inc(BlindLevel, BL_BIT_DETECT_OBJ_EXISTS);
+    BlindLevel := BlindLevel + BL_BIT_DETECT_OBJ_EXISTS;
 end;
 
 procedure TioContext_Custom.CheckDeleteConflict;
@@ -772,7 +772,7 @@ end;
 
 constructor TioContext_PSRequest.Create_PSRequest(const APSRequest: IioPersistenceStrategyRequest; const AMap: IioMap);
 begin
-  inherited CreateByMap(AMap);
+  inherited Create_Map(AMap);
   FPSRequest := APSRequest;
 end;
 
@@ -788,12 +788,12 @@ end;
 
 function TioContext_PSRequest.GetDataObject: TObject;
 begin
-  Result := FPSRequest.DataObj;
+  Result := FPSRequest.DTO;
 end;
 
 function TioContext_PSRequest.GetIntentType: TioPersistenceIntentType;
 begin
-  Result := FPSRequest.IntentType;
+  Result := FPSRequest.Intent;
 end;
 
 function TioContext_PSRequest.GetMasterBSPersistence: TioBSPersistence;
@@ -808,7 +808,7 @@ end;
 
 function TioContext_PSRequest.GetMasterPropertyPath: String;
 begin
-  Result := FPSRequest.MasterPropertyPath + IfThen(FPSRequest.MasterPropertyName.IsEmpty, '', '.') + FPSRequest.MasterPropertyName;
+  Result := FPSRequest.MasterPropPath + IfThen(FPSRequest.MasterPropName.IsEmpty, '', '.') + FPSRequest.MasterPropName;
 end;
 
 function TioContext_PSRequest.GetPSRequest: IioPersistenceStrategyRequest;
@@ -833,12 +833,12 @@ end;
 
 procedure TioContext_PSRequest.SetDataObject(const AValue: TObject);
 begin
-  FPSRequest.DataObj := AValue;
+  FPSRequest.DTO := AValue;
 end;
 
 procedure TioContext_PSRequest.SetIntentType(const Value: TioPersistenceIntentType);
 begin
-  FPSRequest.IntentType := Value;
+  FPSRequest.Intent := Value;
 end;
 
 procedure TioContext_PSRequest.SetRelationOID(const Value: Integer);
@@ -856,7 +856,7 @@ end;
 constructor TioContext_Simple.Create_Simple(const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const AMap: IioMap; const AWhere: IioWhere;
   const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 begin
-  inherited CreateByMap(AMap);
+  inherited Create_Map(AMap);
   FIntentType := AIntent;
   FBlindLevel := ABlindLevel;
   FWhere := AWhere;
@@ -921,7 +921,7 @@ begin
   FBlindLevel := Value;
 end;
 
-procedure TioContext_Simple.SetDataObject(const AValue: TObject);
+procedure TioContext_Simple.SetDataObject(const Value: TObject);
 begin
   FDataObject := Value;
 end;
@@ -938,7 +938,7 @@ end;
 
 procedure TioContext_Simple.SetWhere(const AWhere: IioWhere);
 begin
-  FWhere := Value;
+  FWhere := AWhere;
 end;
 
 end.

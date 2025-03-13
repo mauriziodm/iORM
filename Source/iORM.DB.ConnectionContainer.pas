@@ -274,15 +274,12 @@ end;
 
 class procedure TioConnectionManager.CreateInternalContainer;
 begin
-  FGlobalSession := TioDBFactory.NewGlobalSession;
   FConnectionManagerContainer := TioConnectionManagerContainer.Create([doOwnsValues]);
-  FPerThreadSessionCollection := TioPerThreadSessionCollection.Create;
 end;
 
 class procedure TioConnectionManager.FreeInternalContainer;
 begin
   FConnectionManagerContainer.Free;
-  FPerThreadSessionCollection.Free;
 end;
 
 class function TioConnectionManager.GetConnectionDefByName(AConnectionName: String): IIoStanConnectionDef;
@@ -370,6 +367,7 @@ end;
 
 class procedure TioConnectionManager._Lock;
 begin
+// TODO: Leggi le note qui sotto
   // NB: Ho pensato di usare il lock del SessionDataStore in modo da avere un solo
   //      _Lock per evitare possibili deadlock.
   //      Si potrebbe pensare anche di spostare il "FConnectionManagerContainer" nel
@@ -381,6 +379,7 @@ end;
 
 class procedure TioConnectionManager._Unlock;
 begin
+// TODO: Leggi le note qui sotto
   // NB: Ho pensato di usare il lock del SessionDataStore in modo da avere un solo
   //      _Lock per evitare possibili deadlock.
   //      Si potrebbe pensare anche di spostare il "FConnectionManagerContainer" nel
@@ -410,7 +409,7 @@ begin
   // If the AsDefault param is True or this is the first ConnectionDef of the application
   // then set it as default
   if AAsDefault then
-    TioApplication.SessionDataStore._SetDefaultConnectionIfEmpty(AConnectionName);
+    TioApplication.SessionDataStore._SetDefaultGlobalConnectionIfEmpty(AConnectionName);
 end;
 
 class function TioConnectionManager.NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault: Boolean = True; const ASynchroStrategy_Client: IioSynchroStrategy_Client = nil;
@@ -469,7 +468,7 @@ begin
     // If the AsDefault param is True or this is the first ConnectionDef of the application
     // then set it as default
     if AAsDefault then
-      TioApplication.SessionDataStore._SetDefaultConnectionIfEmpty(AConnectionName);
+      TioApplication.SessionDataStore._SetDefaultGlobalConnectionIfEmpty(AConnectionName);
   finally
     _Unlock;
   end;

@@ -111,7 +111,8 @@ uses
   iORM.LazyLoad.Factory, iORM.Resolver.Factory, iORM.Where.Factory,
   iORM.Exceptions, iORM, System.SysUtils, System.Generics.Collections,
   iORM.Interceptor.CRUD, iORM.Interceptor.CRUD.Register, iORM.Utilities,
-  iORM.SynchroStrategy.Interfaces, iORM.Auth.Components.AuthServer;
+  iORM.SynchroStrategy.Interfaces, iORM.Auth.Components.AuthServer,
+  iORM.PersistenceStrategy.Factory;
 
 type
 
@@ -865,6 +866,7 @@ end;
 
 class procedure TioPersistenceStrategyDB.PreProcessRelationChildOnDelete(const AMasterContext: IioContext);
 var
+  LChildPSRequest: IioPersistenceStrategyRequest;
   LMasterProp: IioProperty;
 begin
   inherited;
@@ -885,16 +887,27 @@ begin
       // una minore efficienza.
       // If relation HasMany
       rtHasMany:
-        _DoDeleteList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.IntentType, AMasterContext.BlindLevel);
+      begin
+        // Create the child PSRequest and execute it
+        LChildPSRequest := TioPersistenceStrategyFactory.NewPSRequest_DeleteList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject),
+          AMasterContext.IntentType, AMasterContext.BlindLevel);
+        _DoDeleteList(LChildPSRequest);
+      end;
       // If relation HasOne
       rtHasOne:
-        _DoDeleteObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.IntentType, AMasterContext.BlindLevel);
+      begin
+        // Create the child PSRequest and execute it
+        LChildPSRequest := TioPersistenceStrategyFactory.NewPSRequest_DeleteObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject),
+          AMasterContext.IntentType, AMasterContext.BlindLevel);
+        _DoDeleteObject(LChildPSRequest);
+      end;
     end;
   end;
 end;
 
 class procedure TioPersistenceStrategyDB.PostProcessRelationChildOnPersist(const AMasterContext: IioContext);
 var
+  LChildPSRequest: IioPersistenceStrategyRequest;
   LMasterProp: IioProperty;
 begin
   inherited;
@@ -907,14 +920,24 @@ begin
     case LMasterProp.GetRelationType of
       // If relation HasMany
       rtHasMany:
-        _DoPersistList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.IntentType, LMasterProp.GetRelationChildPropertyName,
+      begin
+        // Create the child PSRequest and execute it
+        LChildPSRequest := TioPersistenceStrategyFactory.NewPSRequest_PersistList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject),
+          AMasterContext.IntentType, AMasterContext.BlindLevel, LMasterProp.GetRelationChildPropertyName,
           AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, AMasterContext.MasterBSPersistence, LMasterProp.GetName,
-          AMasterContext.MasterPropertyPath, AMasterContext.BlindLevel);
+          AMasterContext.MasterPropertyPath);
+        _DoPersistList(LChildPSRequest);
+      end;
       // If relation HasOne
       rtHasOne:
-        _DoPersistObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject), AMasterContext.IntentType, LMasterProp.GetRelationChildPropertyName,
+      begin
+        // Create the child PSRequest and execute it
+        LChildPSRequest := TioPersistenceStrategyFactory.NewPSRequest_PersistObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject),
+          AMasterContext.IntentType, AMasterContext.BlindLevel, LMasterProp.GetRelationChildPropertyName,
           AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, AMasterContext.MasterBSPersistence, LMasterProp.GetName,
-          AMasterContext.MasterPropertyPath, AMasterContext.BlindLevel);
+          AMasterContext.MasterPropertyPath);
+        _DoPersistObject(LChildPSRequest);
+      end;
     end;
   end;
 end;
@@ -951,7 +974,7 @@ end;
 
 class procedure TioPersistenceStrategyDB.StartTransaction_Internal(const AConnectionName: String);
 begin
-  TioDBFactory.Connection(AConnectionNamen).StartTransaction;
+  TioDBFactory.Connection(AConnectionName).StartTransaction;
 end;
 
 class procedure TioPersistenceStrategyDB._DoRollbackTransaction(const APSRequest: IioPersistenceStrategyRequest);
@@ -965,7 +988,7 @@ var
   LSQLDest: IioSQLDestination;
 begin
   // extract SQLDestination
-  LSQLDest := APSRequest.Intf1 as IioPersistenceStrategyRequest;
+  LSQLDest := APSRequest.Intf1 as IioSQLDestination;
   // Start transaction
   io.StartTransaction(LSQLDest.GetConnectionDefName);
   try
@@ -991,7 +1014,7 @@ var
 begin
   // extract SQLDestination & DestDataSet objects
   LDestDataSet := APSRequest.Obj1 as TFDDataSet;
-  LSQLDest := APSRequest.Intf1 as IioPersistenceStrategyRequest;
+  LSQLDest := APSRequest.Intf1 as IioSQLDestination;
   // Start transaction
   io.StartTransaction(LSQLDest.GetConnectionDefName);
   try
@@ -1073,7 +1096,7 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LContext := TioContextFactory.ContextByPSRequest(APSRequest, LResolvedTypeName);
+      LContext := TioContextFactory.Context_PSRequest(APSRequest, LResolvedTypeName);
       // If the object is of a class mapped as NotPersisted then skip it
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
@@ -1218,7 +1241,7 @@ var
           // If TrueClassMode is tvSmart then get the specific context for the current record/object else
           // use the original context
           if LOriginalContext.GetTrueClass.Mode = tcSmart then
-            LCurrentContext := TioContextFactory.ContextByPSRequest(APSRequest, LQuery.ExtractTrueClassName(LOriginalContext))
+            LCurrentContext := TioContextFactory.Context_PSRequest(APSRequest, LQuery.ExtractTrueClassName(LOriginalContext))
           else
             LCurrentContext := LOriginalContext;
           // Create the object as TObject (Intercepted by CRUDInterceptors)
@@ -1317,8 +1340,8 @@ begin
   begin
     AContext.ObjVersion := AContext.ObjNextVersion;
     AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;;
-    AContext.ObjUpdatedUserID := TioConnectionManager.GetCurrentSession.UserID;
-    AContext.ObjUpdatedUserName := TioConnectionManager.GetCurrentSession.UserName;
+    AContext.ObjUpdatedUserID := AContext.PSREquest.UsrOID;
+    AContext.ObjUpdatedUserName := AContext.PSREquest.Usr;
     AContext.ObjStatus := osClean;
   end;
 end;
@@ -1340,7 +1363,7 @@ function TioContextCache.GetContext(const APSRequest: IioPersistenceStrategyRequ
 begin
   // If the map is not already present in the cache then create and add it
   if not FContainer.ContainsKey(AClassName) then
-    FContainer.Add(AClassName, TioContextFactory.ContextByPSRequest(APSRequest, AClassName));
+    FContainer.Add(AClassName, TioContextFactory.Context_PSRequest(APSRequest, AClassName));
   // Return the requested context and set its DataObject to nil
   Result := FContainer.Items[AClassName];
   Result.DataObject := nil;

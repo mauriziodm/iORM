@@ -37,7 +37,8 @@ interface
 
 uses
   iORM.PersistenceStrategy.Interfaces, iORM.Where.Interfaces, iORM.DB.Interfaces,
-  FireDAC.Comp.DataSet, iORM.LiveBindings.BSPersistence, iORM.CommonTypes, iORM.Auth.Interfaces;
+  FireDAC.Comp.DataSet, iORM.LiveBindings.BSPersistence, iORM.CommonTypes, iORM.Auth.Interfaces,
+  iORM.Context.Interfaces;
 
 type
 
@@ -220,7 +221,7 @@ var
   LConnection: IioConnectionHttp;
 begin
   // Check
-  if not Assigned(DTO) then
+  if not Assigned(APSRequest.DTO) then
     Exit;
   // Get the connection, set the request and execute it
   LConnection := TioDBFactory.Connection(APSRequest.Connection).AsHttpConnection;
@@ -408,7 +409,7 @@ begin
   try
     LConnection.Execute(APSRequest);
     // Extract the AuthResponse
-    APSReq.Intf1 := TioAuthFactory.NewAuthResponseFromString( LConnection.ioResponseBody.AuthResult1 );
+    APSRequest.Intf1 := TioAuthFactory.NewAuthResponseFromString( LConnection.ioResponseBody.AuthResult1 );
     LConnection.Commit;
   except
     LConnection.Rollback;

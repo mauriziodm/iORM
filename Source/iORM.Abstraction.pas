@@ -75,13 +75,14 @@ type
   protected
     class procedure _Initialize; virtual;
     class procedure _Finalize; virtual;
-    class procedure _Lock; inline;
-    class procedure _Unlock; inline;
     class function _GetMainSessionData: IioAuthSessionData; virtual; abstract;
     class function _ClearMainSessionData: IioAuthSessionData; virtual; abstract;
   public
     class constructor Create;
     class destructor Destroy;
+    // thread safe
+    class procedure _Lock; inline;
+    class procedure _Unlock; inline;
     // fill persistence strategy request
     class procedure _FillPersistenceStrategyRequest(const APersistenceStrategyRequest: IioPersistenceStrategyRequest); static;
     // current connection

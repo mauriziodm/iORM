@@ -4,12 +4,14 @@ interface
 
 uses
   iORM.Attributes, iORM.CommonTypes, iORM.PersistenceStrategy.Interfaces, iORM.Auth.Interfaces,
-  System.Rtti;
+  System.Rtti, iORM.LiveBindings.BSPersistence, iORM.Where.Interfaces;
 
 type
 
   TioPersistenceStrategyRequest = class(TInterfacedObject, IioPersistenceStrategyRequest)
   private
+    // method
+    FMethod: TioPersistenceStrategyMethod;
     // session data
     FApp: String;
     FAppOID: Integer;
@@ -38,14 +40,13 @@ type
     FIntent: TioPersistenceIntentType;
     FMasterPropName: String;
     FMasterPropPath: String;
-    FMethod: TioPersistenceStrategyMethod; // NEW
-    FPropName: String; // NEW
+    FPropName: String;
     FRelationOID: Integer;
     FRelationPropName: String;
     // result
     FResult: TValue;
     // methods
-    procedure _FillSessionRelatedProperties; inline;
+    procedure _Clear(const FillSessionRelatedProperties: Boolean); inline;
     function GetApp: String;
     function GetAppOID: Integer;
     function GetAuthGrant: String;
@@ -68,8 +69,6 @@ type
     function GetMethod: TioPersistenceStrategyMethod;
     function GetObj1: TObject;
     function GetObj1_Serialize: Boolean;
-    function GetObj2: TObject;
-    function GetObj2_Serialize: Boolean;
     function GetPropName: String;
     function GetRelationOID: Integer;
     function GetRelationPropName: String;
@@ -100,8 +99,6 @@ type
     procedure SetMasterPropPath(const Value: String);
     procedure SetObj1(const Value: TObject);
     procedure SetObj1_Serialize(const Value: Boolean);
-    procedure SetObj2(const Value: TObject);
-    procedure SetObj2_Serialize(const Value: Boolean);
     procedure SetPropName(const Value: String);
     procedure SetRelationOID(const Value: Integer);
     procedure SetRelationPropName(const Value: String);
@@ -111,7 +108,6 @@ type
     procedure SetUsr(const Value: String);
     procedure SetUsrOID(const Value: Integer);
     procedure SetWhere(const Value: IioWhere);
-    procedure SsetConnectionRemote(const Value: String);
   public
     constructor Create(const AMethod: TioPersistenceStrategyMethod; const FillSessionRelatedProperties: Boolean);
     constructor CreateByJSONString(const AJSONString:String);
@@ -127,9 +123,9 @@ type
     property Usr: String read GetUsr write SetUsr;
     property UsrOID: Integer read GetUsrOID write SetUsrOID;
     // auth
-    property AuthGrant: String read GetAuthGrant;
-    property AuthIntention: TioAuthIntention read GetAuthIntention;
-    property AuthScope: String read GetAuthScope;
+    property AuthGrant: String read GetAuthGrant write SetAuthGrant;
+    property AuthIntention: TioAuthIntention read GetAuthIntention write SetAuthIntention;
+    property AuthScope: String read GetAuthScope write SetAuthScope;
     property AuthToken: String read GetAuthToken write SetAuthToken; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
     // instances
     property DTO: TObject read GetDTO write SetDTO;
@@ -159,7 +155,7 @@ type
 implementation
 
 uses
-  iORM.Abstraction;
+  iORM.Abstraction, System.JSON, DJSON, iORM.Exceptions, System.SysUtils;
 
 { TioPersistenceStrategyRequest }
 
@@ -173,35 +169,35 @@ begin
     LJSONObject.AddPair(PSR_METHOD, Ord(FMethod));
     // ---------- session ----------
     // App
-    if not FApp.IsEmpty then
-      LJSONObject.AddPair(PSR_SESSION_APP, FApp.AsString);
+    if not (FApp <> IO_STRING_NULL_VALUE) then
+      LJSONObject.AddPair(PSR_SESSION_APP, FApp);
     // AppOID
     if FAppOID <> IO_INTEGER_NULL_VALUE then
       LJSONObject.AddPair(PSR_SESSION_APPOID, FAppOID);
     // Connection
-    if not FConnection.IsEmpty then
-      LJSONObject.AddPair(PSR_SESSION_CONNECTION, FConnection.AsString);
+    if not (FConnection <> IO_STRING_NULL_VALUE) then
+      LJSONObject.AddPair(PSR_SESSION_CONNECTION, FConnection);
     // ConnectionRemote
-    if not FConnectionRemote.IsEmpty then
-      LJSONObject.AddPair(PSR_SESSION_CONNECTIONREMOTE, FConnectionRemote.AsString);
+    if not (FConnectionRemote <> IO_STRING_NULL_VALUE) then
+      LJSONObject.AddPair(PSR_SESSION_CONNECTIONREMOTE, FConnectionRemote);
     // User
-    if not FUsr.IsEmpty then
-      LJSONObject.AddPair(PSR_SESSION_USER, FUsr.AsString);
+    if not (FUsr <> IO_STRING_NULL_VALUE) then
+      LJSONObject.AddPair(PSR_SESSION_USER, FUsr);
     // UserOID
-    if not FUsrOID.IsEmpty then
-      LJSONObject.AddPair(PSR_SESSION_USEROID, FUsrOID.AsString);
+    if not (FUsrOID <> IO_INTEGER_NULL_VALUE) then
+      LJSONObject.AddPair(PSR_SESSION_USEROID, FUsrOID);
     // ---------- auth ----------
     // AuthGrant
-    if not FAuthGrant.IsEmpty then
-      LJSONObject.AddPair(PSR_AUTH_GRANT, FAuthGrant.AsString);
+    if not (FAuthGrant <> IO_STRING_NULL_VALUE) then
+      LJSONObject.AddPair(PSR_AUTH_GRANT, FAuthGrant);
     // AuthIntention
     LJSONObject.AddPair(PSR_AUTH_INTENTION, Ord(FAuthIntention));
     // AuthScope
-    if not FAuthScope.IsEmpty then
-      LJSONObject.AddPair(PSR_AUTH_SCOPE, FAuthScope.AsString);
+    if not (FAuthScope <> IO_STRING_NULL_VALUE) then
+      LJSONObject.AddPair(PSR_AUTH_SCOPE, FAuthScope);
     // AuthToken
-    if not FAuthToken.IsEmpty then
-      LJSONObject.AddPair(PSR_AUTH_TOKEN, FAuthToken.AsString);
+    if not (FAuthToken <> IO_STRING_NULL_VALUE) then
+      LJSONObject.AddPair(PSR_AUTH_TOKEN, FAuthToken);
     // ---------- instances ----------
     // DTO
     if FDTO_Serialize and Assigned(FDTO) then
@@ -228,14 +224,14 @@ begin
     // IntentType
     LJSONObject.AddPair(PSR_INTENTTYPE, Ord(FIntent));
     // MasterPropName
-    if not FMasterPropName.IsEmpty then
-      LJSONObject.AddPair(PSR_MASTERPROPERTYNAME, FMasterPropName.AsString);
+    if not (FMasterPropName <> IO_STRING_NULL_VALUE) then
+      LJSONObject.AddPair(PSR_MASTERPROPERTYNAME, FMasterPropName);
     // MasterPropPath
-    if not FMasterPropPath.IsEmpty then
-      LJSONObject.AddPair(PSR_MASTERPROPERTYPATH, FMasterPropPath.AsString);
+    if not (FMasterPropPath <> IO_STRING_NULL_VALUE) then
+      LJSONObject.AddPair(PSR_MASTERPROPERTYPATH, FMasterPropPath);
     // PropName
-    if not FPropName.IsEmpty then
-      LJSONObject.AddPair(PSR_PROPERTYNAME, FPropName.AsString);
+    if not (FPropName <> IO_STRING_NULL_VALUE) then
+      LJSONObject.AddPair(PSR_PROPERTYNAME, FPropName);
     // RelationOID
     if FRelationOID <> IO_INTEGER_NULL_VALUE then
       LJSONObject.AddPair(PSR_RELATIONID, FRelationOID);
@@ -254,31 +250,8 @@ constructor TioPersistenceStrategyRequest.Create(const AMethod: TioPersistenceSt
 begin
   // method
   FMethod := AMethod;
-  // auth and session
-  FAuthGrant := IO_STRING_NULL_VALUE;
-  FAuthIntention: TioAuthIntention.aiRead;
-  FAuthScope := IO_STRING_NULL_VALUE;
-  if FillSessionRelatedProperties then
-    _FillSessionRelatedProperties;
-  // instances
-  FDTO := nil;
-  FDTO_Serialize := True;
-  FIntf1 := nil;
-  FIntf1_Serialize := True;
-  FListDTO := nil;
-  FListDTO_Serialize := True;
-  FMasterBSPersistence := nil;
-  FObj1 := nil;
-  FObj1_Serialize := True;
-  FWhere := nil;
-  // others
-  FBlindLevel := BL_DEFAULT;
-  FIntent := TioPersistenceIntentType.itRegular;
-  FMasterPropName := IO_STRING_NULL_VALUE;
-  FMasterPropPath := IO_STRING_NULL_VALUE;
-  FPropName := IO_STRING_NULL_VALUE;
-  FRelationOID := IO_INTEGER_NULL_VALUE;
-  FRelationPropName := IO_STRING_NULL_VALUE;
+  // other initializations
+  _Clear(FillSessionRelatedProperties);
 end;
 
 constructor TioPersistenceStrategyRequest.CreateByJSONString(const AJSONString: String);
@@ -286,13 +259,15 @@ var
   LJSONObject: TJSONObject;
   LJSONValue: TJSONValue;
 begin
-  Create;
-  LJSONObject := TJSONObject.ParseJSONValue(Value) as TJSONObject;
+  // initialization
+  _Clear(True);
+  // Parse JSON string
+  LJSONObject := TJSONObject.ParseJSONValue(AJSONString) as TJSONObject;
   try
     // Method
     LJSONValue := LJSONObject.GetValue(PSR_METHOD);
     if Assigned(LJSONValue) then
-      FAuthIntention := TioPersistenceStrategyMethod((LJSONValue as TJSONNumber).AsInt)
+      FMethod := TioPersistenceStrategyMethod((LJSONValue as TJSONNumber).AsInt)
     else
       raise EioGenericException.Create(ClassName, 'CreateByJSONString', '"Method" property not present (JSON).');
     // ---------- session ----------
@@ -341,15 +316,16 @@ begin
     // DTO
     LJSONValue := LJSONObject.GetValue(PSR_INSTANCES_DTO);
     if Assigned(LJSONValue) then
-      FDTO := dj.FromJSON(FJSONDataValue).byFields.TypeAnnotationsON.ToObject;
+      FDTO := dj.FromJSON(LJSONValue).byFields.TypeAnnotationsON.ToObject;
     // AIntf1
     LJSONValue := LJSONObject.GetValue(PSR_INSTANCES_INTF1);
     if Assigned(LJSONValue) then
-      FIntf1 := dj.FromJSON(FJSONDataValue).byFields.TypeAnnotationsON.ToObject;
+      if not Supports(dj.FromJSON(LJSONValue).byFields.TypeAnnotationsON.ToObject, IInterface, FIntf1) then
+        EioGenericException.Create(ClassName, 'CreateByJSONString', 'IInterface not implemented by the object');
     // ListDTO
     LJSONValue := LJSONObject.GetValue(PSR_INSTANCES_LIST_DTO);
     if Assigned(LJSONValue) then
-      FListDTO := dj.FromJSON(FJSONDataValue).byFields.TypeAnnotationsON.ToObject;
+      FListDTO := dj.FromJSON(LJSONValue).byFields.TypeAnnotationsON.ToObject;
     // MasterBSPersistence
 // NB: Non lo serializzo perchè tanto ho visto che nella HttpPersistenceStrategy non veniva passato nemmeno prima e quindi non veniva usato
 //    LJSONValue := LJSONObject.GetValue(PSR_INSTANCES_MASTERBSPERSISTENCE);
@@ -358,11 +334,12 @@ begin
     // AObj1
     LJSONValue := LJSONObject.GetValue(PSR_INSTANCES_OBJ1);
     if Assigned(LJSONValue) then
-      FObj1 := dj.FromJSON(FJSONDataValue).byFields.TypeAnnotationsON.ToObject;
+      FObj1 := dj.FromJSON(LJSONValue).byFields.TypeAnnotationsON.ToObject;
     // Where
     LJSONValue := LJSONObject.GetValue(PSR_INSTANCES_WHERE);
     if Assigned(LJSONValue) then
-      FWhere := dj.FromJSON(FJSONDataValue).byFields.TypeAnnotationsON.ToObject;
+      if not Supports(dj.FromJSON(LJSONValue).byFields.TypeAnnotationsON.ToObject, IioWhere, FWhere) then
+        EioGenericException.Create(ClassName, 'CreateByJSONString', 'IioWhere interface not implemented by the object');
     // ---------- others ----------
     // BlindLevel
     LJSONValue := LJSONObject.GetValue(PSR_BLINDLEVEL);
@@ -371,7 +348,7 @@ begin
     // IntentType
     LJSONValue := LJSONObject.GetValue(PSR_INTENTTYPE);
     if Assigned(LJSONValue) then
-      FIntentType := TioPersistenceIntentType((LJSONValue as TJSONNumber).AsInt);
+      FIntent := TioPersistenceIntentType((LJSONValue as TJSONNumber).AsInt);
     // MasterPropName
     LJSONValue := LJSONObject.GetValue(PSR_MASTERPROPERTYNAME);
     if Assigned(LJSONValue) then
@@ -468,19 +445,14 @@ begin
   Result := FIntf1_Serialize;
 end;
 
-function TioPersistenceStrategyRequest.GetIntf1_Serialize: Boolean;
-begin
-  Result := FIntf1_Serialize;
-end;
-
 function TioPersistenceStrategyRequest.GetListDTO: TObject;
 begin
-
+  Result := FListDTO;
 end;
 
 function TioPersistenceStrategyRequest.GetListDTO_Serialize: Boolean;
 begin
-
+  Result := FListDTO_Serialize;
 end;
 
 function TioPersistenceStrategyRequest.GetMasterBSPersistence: TioBSPersistence;
@@ -513,16 +485,6 @@ begin
   Result := FObj1_Serialize;
 end;
 
-function TioPersistenceStrategyRequest.GetObj2: TObject;
-begin
-  Result := FObj2;
-end;
-
-function TioPersistenceStrategyRequest.GetObj2_Serialize: Boolean;
-begin
-  Result := FObj2_Serialize;
-end;
-
 function TioPersistenceStrategyRequest.GetPropName: String;
 begin
   Result := FPropName;
@@ -545,12 +507,12 @@ end;
 
 function TioPersistenceStrategyRequest.GetResultAsBoolean: Boolean;
 begin
-  Result := FValue.AsBoolean;
+  Result := FResult.AsBoolean;
 end;
 
 function TioPersistenceStrategyRequest.GetResultAsInteger: Integer;
 begin
-  Result := FValue.AsInteger;
+  Result := FResult.AsInteger;
 end;
 
 function TioPersistenceStrategyRequest.GetUsr: String;
@@ -630,7 +592,7 @@ end;
 
 procedure TioPersistenceStrategyRequest.SetIntf1(const Value: IInterface);
 begin
-  FIntf1 := Value:
+  FIntf1 := Value;
 end;
 
 procedure TioPersistenceStrategyRequest.SetIntf1_Serialize(const Value: Boolean);
@@ -673,16 +635,6 @@ begin
   FObj1_Serialize := Value;
 end;
 
-procedure TioPersistenceStrategyRequest.SetObj2(const Value: TObject);
-begin
-  FObj2 := Value;
-end;
-
-procedure TioPersistenceStrategyRequest.SetObj2_Serialize(const Value: Boolean);
-begin
-  FObj2_Serialize := Value;
-end;
-
 procedure TioPersistenceStrategyRequest.SetPropName(const Value: String);
 begin
   FPropName := Value;
@@ -705,12 +657,12 @@ end;
 
 procedure TioPersistenceStrategyRequest.SetResultAsBoolean(const Value: Boolean);
 begin
-  FResult.From<Boolean> := Value;
+  FResult := TValue.From<Boolean>(Value);
 end;
 
 procedure TioPersistenceStrategyRequest.SetResultAsInteger(const Value: Integer);
 begin
-  FResult.From<Integer> := Value;
+  FResult := TValue.From<Integer>(Value);
 end;
 
 procedure TioPersistenceStrategyRequest.SetUsr(const Value: String);
@@ -728,34 +680,51 @@ begin
   FWhere := Value;
 end;
 
-procedure TioPersistenceStrategyRequest.SsetConnectionRemote(const Value: String);
-begin
-
-end;
-
 procedure TioPersistenceStrategyRequest.SwitchToConnectionRemote;
 begin
   FConnection := FConnectionRemote;
 end;
 
-procedure TioPersistenceStrategyRequest._FillSessionRelatedProperties;
+procedure TioPersistenceStrategyRequest._Clear(const FillSessionRelatedProperties: Boolean);
 begin
-  try
-    with TioApplication.AcquireSession do
-    begin
-      // session data
-      FApp := SessionData.App;
-      FAppOID := SessionData.AppOID;
-      FConnection := SessionData.ConnectionName;
-      FConnectionRemote := SessionData.ConnectionNameRemote;
-      FUsr := SessionData.Usr;
-      FUsrOID := SessionData.UsrOID;
-      // auth
-      FAuthToken := AccessToken;
-    end;
-  finally
-    TioApplication.ReleaseSession;
+  // user & app
+  if FillSessionRelatedProperties then
+    TioApplication.SessionDataStore._FillPersistenceStrategyRequest(Self)
+  else
+  begin
+    FApp := IO_STRING_NULL_VALUE;
+    FAppOID := IO_INTEGER_NULL_VALUE;
+    FConnection := IO_STRING_NULL_VALUE;
+    FConnectionRemote := IO_STRING_NULL_VALUE;
+    FUsr := IO_STRING_NULL_VALUE;
+    FUsrOID := IO_INTEGER_NULL_VALUE;
   end;
+  // auth
+  FAuthGrant := IO_STRING_NULL_VALUE;
+  FAuthIntention := TioAuthIntention.aiRead;
+  FAuthScope := IO_STRING_NULL_VALUE;
+  FAuthToken := IO_STRING_NULL_VALUE; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
+  // instances
+  FDTO := nil;
+  FDTO_Serialize := True;
+  FIntf1 := nil;
+  FIntf1_Serialize := True;
+  FListDTO := nil;
+  FListDTO_Serialize := True;
+  FMasterBSPersistence := nil;
+  FObj1 := nil;
+  FObj1_Serialize := True;
+  FWhere := nil;
+  // others
+  FBlindLevel := BL_DEFAULT;
+  FIntent := TioPersistenceIntentType.itRegular;
+  FMasterPropName := IO_STRING_NULL_VALUE;
+  FMasterPropPath := IO_STRING_NULL_VALUE;
+  FPropName := IO_STRING_NULL_VALUE;
+  FRelationOID := IO_INTEGER_NULL_VALUE;
+  FRelationPropName := IO_STRING_NULL_VALUE;
+  // result
+  FResult := TValue.Empty;
 end;
 
 end.

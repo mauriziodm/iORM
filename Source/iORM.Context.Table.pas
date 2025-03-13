@@ -202,7 +202,7 @@ implementation
 
 uses
   iORM.DB.Factory, System.SysUtils, iORM.Exceptions, iORM.SqlTranslator, System.StrUtils,
-  iORM.ConflictStrategy.SameVersionWin;
+  iORM.ConflictStrategy.SameVersionWin, iORM.Abstraction;
 
 { TioContextTable }
 
@@ -308,12 +308,12 @@ end;
 
 function TioTable.GetTableConnectionName: String;
 begin
-  Result := TioApplication.SessionDataStore._GetCurrentConnectionNameIfEmpty(FTableConnectionName_DoNotCallDirectly);
+  Result := TioApplication.SessionDataStore.GetCurrentConnectionNameIfEmpty(FTableConnectionName_DoNotCallDirectly);
 end;
 
 function TioTable.GetTableConnectionNameIfEmpty(const AConnectionName: String): String;
 begin
-  if TioApplication._IsEmptyConnectionName(FTableConnectionName_DoNotCallDirectly) then
+  if TioApplication.SessionDataStore._IsEmptyConnectionName(FTableConnectionName_DoNotCallDirectly) then
     Result := AConnectionName
   else
     Result := FTableConnectionName_DoNotCallDirectly;
@@ -397,7 +397,7 @@ var
   LCurrentConnectionDefName: String;
 begin
   // Defaultize the connection def name to check (default connection name if empty)
-  AConnectionDefNameToCheck := TioDBFActory.ConnectionManager.GetCurrentConnectionNameIfEmpty(AConnectionDefNameToCheck);
+  AConnectionDefNameToCheck := TioApplication.SessionDataStore.GetCurrentConnectionNameIfEmpty(AConnectionDefNameToCheck);
   // Extract the curret connection def of the context table (ask it to the table itself obviously)
   LCurrentConnectionDefName := GetTableConnectionName;
   // The table is for this connection if the current connection name of the table: is empty (no connection name is

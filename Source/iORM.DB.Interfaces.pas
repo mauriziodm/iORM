@@ -852,32 +852,30 @@ begin
       _InterceptLoadObject(APSRequest); // intercepted
     psmLoadObjectByClassOnly:
       _DoLoadObjectByClassOnly(APSRequest);
-    psmLoadObjVersion:
-      _DoLoadObjVersion(APSRequest);
     psmPersistList:
       _InterceptPersistList(APSRequest); // intercepted
     psmPersistObject:
       _InterceptPersistObject(APSRequest); // intercepted
     psmSQLDestExecute:
-      _DoSQLDestExecute(APSRequest);
+      _DoSQLDest_Execute(APSRequest);
     psmSQLDestLoadDataSet:
-      _DoSQLDestLoadDataSet(APSRequest);
+      _DoSQLDest_LoadDataSet(APSRequest);
     psmTransactionCommit:
-      _DoTransactionCommit(APSRequest);
+      _DoCommitTransaction(APSRequest);
     psmTransactionIn:
-      _DoTransactionIn(APSRequest);
+      _DoInTransaction(APSRequest);
     psmTransactionRollback:
-      _DoTransactionRollback(APSRequest);
+      _DoRollbackTransaction(APSRequest);
     psmTransactionStart:
-      _DoTransactionStart(APSRequest);
+      _DoStartTransaction(APSRequest);
   else
-    EioSynchroStrategyException.Create(Self.Name, 'ExecutePSRequest', 'The requested persistence strategy method is not handled');
+    EioSynchroStrategyException.Create(ClassName, 'ExecutePSRequest', 'The requested persistence strategy method is not handled');
   end;
 end;
 
 class function TioPersistenceStrategyIntf.LoadObjVersion(const AContext: IioContext): Integer;
 begin
-  Result := _DoLoadObjVersionACOntext();
+  Result := _DoLoadObjVersion(AContext);
 end;
 
 class procedure TioPersistenceStrategyIntf._InterceptDeleteList(const APSRequest: IioPersistenceStrategyRequest);
@@ -936,10 +934,10 @@ begin
     Exit;
 {$ENDIF}
 {$ENDREGION}
-  Result := _DoLoadObject(APSRequest);
+  _DoLoadObject(APSRequest);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioStrategyInterceptorsOff}
-  Result := TioStrategyInterceptorRegister.AfterLoadObject(APSRequest);
+  TioStrategyInterceptorRegister.AfterLoadObject(APSRequest);
 {$ENDIF}
 {$ENDREGION}
 end;

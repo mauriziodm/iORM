@@ -178,9 +178,9 @@ type
     property Usr: String read GetUsr write SetUsr;
     property UsrOID: Integer read GetUsrOID write SetUsrOID;
     // auth
-    property AuthGrant: String read GetAuthGrant;
-    property AuthIntention: TioAuthIntention read GetAuthIntention;
-    property AuthScope: String read GetAuthScope;
+    property AuthGrant: String read GetAuthGrant write SetAuthGrant;
+    property AuthIntention: TioAuthIntention read GetAuthIntention write SetAuthIntention;
+    property AuthScope: String read GetAuthScope write SetAuthScope;
     property AuthToken: String read GetAuthToken write SetAuthToken; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
     // instances
     property DTO: TObject read GetDTO write SetDTO;

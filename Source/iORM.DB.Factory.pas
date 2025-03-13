@@ -48,27 +48,27 @@ type
 
   TioDbFactory = class
   public
-    class function WhereItemCriteria(const APropertyName: String; const ACompareOperator: TioCompareOp; const AValue: TValue): IioSqlItemWhere;
-    class function WhereItemProperty(APropertyName: String): IioSqlItemWhere;
-    class function WhereItemPropertyOID: IioSqlItemWhere;
-    class function WhereItemTValue(AValue: TValue): IioSqlItemWhere;
-    class function WhereItemPropertyEqualsTo(APropertyName: String; AValue: TValue): IioSqlItemWhere;
-    class function WhereItemPropertyOIDEqualsTo(AValue: TValue): IioSqlItemWhere;
-    class function CompareOperator: TioCompareOperatorRef;
-    class function LogicRelation: TioLogicRelationRef;
-    class function SqlGenerator(const AConnectionName: String): TioSqlGeneratorRef;
-    class function SqlDataConverter(const AConnectionName: String): TioSqlDataConverterRef;
     class function Connection(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IioConnection;
-    class function NewConnection(const AConnectionName: String): IioConnection;
-    class function TransactionCollection: IioTransactionCollection;
-    class function Query(const AConnectionDefName: String; const AQueryIdentity: String = ''): IioQuery;
-    class function Script(const AConnectionDefName: String; const AScript: TStrings): IioScript;
     class function ConnectionContainer: TioConnectionContainerRef;
     class function ConnectionManager: TioConnectionManagerRef;
+    class function CompareOperator: TioCompareOperatorRef;
+    class function LogicRelation: TioLogicRelationRef;
+    class function NewConnection(const AConnectionName: String): IioConnection;
+    class function Query(const AConnectionDefName: String; const AQueryIdentity: String = ''): IioQuery;
     class function QueryContainer: IioQueryContainer;
     class function QueryEngine: TioQueryEngineRef;
+    class function Script(const AConnectionDefName: String; const AScript: TStrings): IioScript;
+    class function SqlDataConverter(const AConnectionName: String): TioSqlDataConverterRef;
     class function SQLDestination(const ASQL: String): IioSQLDestination; overload;
     class function SQLDestination(const ASQL: TStrings; const AOwns: Boolean = False): IioSQLDestination; overload;
+    class function SqlGenerator(const AConnectionName: String): TioSqlGeneratorRef;
+    class function TransactionCollection: IioTransactionCollection;
+    class function WhereItemCriteria(const APropertyName: String; const ACompareOperator: TioCompareOp; const AValue: TValue): IioSqlItemWhere;
+    class function WhereItemProperty(APropertyName: String): IioSqlItemWhere;
+    class function WhereItemPropertyEqualsTo(APropertyName: String; AValue: TValue): IioSqlItemWhere;
+    class function WhereItemPropertyOID: IioSqlItemWhere;
+    class function WhereItemPropertyOIDEqualsTo(AValue: TValue): IioSqlItemWhere;
+    class function WhereItemTValue(AValue: TValue): IioSqlItemWhere;
   end;
 
 implementation

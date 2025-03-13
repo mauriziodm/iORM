@@ -97,7 +97,7 @@ implementation
 
 uses
   iORM.PersistenceStrategy.DB, iORM.PersistenceStrategy.Http, iORM.DB.ConnectionContainer,
-  iORM.PersistenceStrategy.Request;
+  iORM.PersistenceStrategy.Request, iORM.Abstraction;
 
 { TioStrategyFactory }
 
@@ -305,7 +305,7 @@ begin
   Result.ListDTO := AListDTO;
   Result.ListDTO_Serialize := True;
   Result.MasterBSPersistence := AMasterBSPersistence;
-  Result.RelationPropertyName := ARelationPropertyName;
+  Result.RelationPropName := ARelationPropertyName;
   Result.RelationOID := ARelationOID;
   Result.MasterPropName := AMasterPropertyName;
   Result.MasterPropPath := AMasterPropertyPath;
@@ -322,7 +322,7 @@ begin
   Result.DTO_Serialize := True;
   // TODO: MasterBSPersistence è usato alla DBPersistenceStrategy ma non usato dalla HttpPersistenceStrategy, indagare a cosa serve e se si può eliminare
   Result.MasterBSPersistence := AMasterBSPersistence;
-  Result.RelationPropertyName := ARelationPropertyName;
+  Result.RelationPropName := ARelationPropertyName;
   Result.RelationOID := ARelationOID;
   Result.MasterPropName := AMasterPropertyName;
   Result.MasterPropPath := AMasterPropertyPath;
@@ -351,7 +351,7 @@ begin
   _SetPSRequestConnectionsIfNotEmpty(Result, AConnectionName, AConnectionNameRemote);
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_Transaction_In(const AConnectionName: String = String.Empty; const AConnectionNameRemote: String = String.Empty): IioPersistenceStrategyRequest<Boolean>;
+class function TioPersistenceStrategyFactory.NewPSRequest_Transaction_In(const AConnectionName: String = String.Empty; const AConnectionNameRemote: String = String.Empty): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(psmTransactionIn, False);
   _SetPSRequestConnectionsIfNotEmpty(Result, AConnectionName, AConnectionNameRemote);
