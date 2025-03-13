@@ -36,7 +36,8 @@ unit iORM.Http.Connection;
 interface
 
 uses
-  iORM.DB.Connection, iORM.DB.Interfaces, iORM.Http.Interfaces, REST.Client;
+  iORM.DB.Connection, iORM.DB.Interfaces, iORM.Http.Interfaces, REST.Client,
+  iORM.PersistenceStrategy.Interfaces;
 
 type
 
@@ -48,7 +49,6 @@ type
     FRESTClient: TRESTClient;
     FRESTRequest: TRESTRequest;
     FRESTResponse: TRESTResponse;
-    FioHttpRequestBody: IioPersistenceStrategyRequest;
     FioHttpResponseBody: IioHttpResponseBody;
   strict protected
     procedure DoStartTransaction; override;
@@ -60,8 +60,6 @@ type
     function AsHttpConnection: IioConnectionHttp; override;
     procedure Execute(const APSRequest: IioPersistenceStrategyRequest);
     function InTransaction: Boolean; override;
-    // ioRequestBody property
-    function GetioRequestBody:IioPersistenceStrategyRequest;
     // ioResponseBody property
     function GetioResponseBody:IioHttpResponseBody;
   end;
@@ -92,10 +90,6 @@ begin
   FRESTRequest.Method := TRESTRequestMethod.rmPUT;
   FRESTRequest.Resource := '/execute_action';
   FRESTRequest.Response := FRESTResponse;
-  // create request body (not the response body)
-  FioHttpRequestBody := TioHttpFactory.NewRequestBody;
-  // Set the flag indicating if the request must be wrapped into a jsonrpc request type
-  FAsJsonRpc := False;
 end;
 
 destructor TioConnectionHttp.Destroy;
@@ -110,7 +104,7 @@ procedure TioConnectionHttp.Execute(const APSRequest: IioPersistenceStrategyRequ
 begin
   // Set the request
   FRESTRequest.ClearBody;
-  FRESTRequest.AddBody(FioHttpRequestBody.AsString, ctAPPLICATION_JSON);
+  FRESTRequest.AddBody(APSRequest.AsString, ctAPPLICATION_JSON);
   // Send/Execute the request
   FRESTRequest.Execute;
   // Create and set the ioRESTResponseBody
@@ -136,11 +130,6 @@ procedure TioConnectionHttp.DoStartTransaction;
 begin
   inherited;
   // Nothing
-end;
-
-function TioConnectionHttp.GetioRequestBody: IioHttpRequestBody;
-begin
-  Result := FioHttpRequestBody;
 end;
 
 function TioConnectionHttp.GetioResponseBody: IioHttpResponseBody;

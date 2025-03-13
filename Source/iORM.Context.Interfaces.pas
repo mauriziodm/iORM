@@ -39,7 +39,7 @@ uses
   iORM.CommonTypes, iORM.Context.Table.Interfaces,
   iORM.Context.Properties.Interfaces, System.Rtti, iORM.Where.Interfaces,
   iORM.Context.Map.Interfaces, iORM.LiveBindings.BSPersistence,
-  iORM.Attributes, iORM.Auth.Interfaces;
+  iORM.Attributes, iORM.Auth.Interfaces, iORM.PersistenceStrategy.Interfaces;
 
 type
 
@@ -120,8 +120,14 @@ type
     // MasterBSPersistence
     function GetMasterBSPersistence: TioBSPersistence;
     property MasterBSPersistence: TioBSPersistence read GetMasterBSPersistence;
+    // MasterPropertyName
+    // TODO: Eliminare?
+    function GetMasterPropertyName: String;
+    property MasterPropertyName: String read GetMasterPropertyName;
     // MasterPropertyPath
+    // TODO: Eliminare?
     function GetMasterPropertyPath: String;
+    property MasterPropertyPath: String read GetMasterPropertyPath;
     // OriginalResolvedTypeNameNonTrueClass
     procedure SetOriginalNonTrueClassMap(const AMap: IioMap);
     function GetOriginalNonTrueClassMap: IioMap;
@@ -165,6 +171,9 @@ type
     function GetObjUpdatedUserName: TioObjUpdatedUserName;
     procedure SetObjUpdatedUserName(const AValue: TioObjUpdatedUserName);
     property ObjUpdatedUserName: TioObjUpdatedUserName read GetObjUpdatedUserName write SetObjUpdatedUserName;
+    // PSRequest
+    function GetPSRequest: IioPersistenceStrategyRequest;
+    property PSRequest: IioPersistenceStrategyRequest read GetPSRequest;
     // RelationOID
     function GetRelationOID: Integer;
     procedure SetRelationOID(const Value: Integer);

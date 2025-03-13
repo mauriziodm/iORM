@@ -249,7 +249,7 @@ type
 implementation
 
 uses
-  iORM.Exceptions, iORM, iORM.Auth.Factory;
+  iORM.Exceptions, iORM, iORM.Auth.Factory, iORM.Utilities;
 
 { TioTimer }
 
@@ -583,15 +583,15 @@ begin
     APersistenceStrategyRequest.App := LSessionData.App;
     APersistenceStrategyRequest.AppOID := LSessionData.AppOID;
     // connection
-    if _IsEmptyConnectionName(LSessionData.Connection)
+    if _IsEmptyConnectionName(LSessionData.Connection) then
       APersistenceStrategyRequest.Connection := FDefaultGlobalConnection
     else
       APersistenceStrategyRequest.Connection := LSessionData.Connection;
     // remote connection
     APersistenceStrategyRequest.ConnectionRemote := LSessionData.ConnectionRemote;
     // user
-    APersistenceStrategyRequest.User := LSessionData.User;
-    APersistenceStrategyRequest.UserOID := LSessionData.UserOID;
+    APersistenceStrategyRequest.Usr := LSessionData.User;
+    APersistenceStrategyRequest.UsrOID := LSessionData.UserOID;
     // auth
     APersistenceStrategyRequest.AuthToken := LSessionData.AccessToken;
   finally
@@ -665,7 +665,7 @@ begin
   end;
 end;
 
-class function TioCustomSessionDataStore._SetDefaultGlobalConnectionIfEmpty(const AConnectionName: String): Boolean;
+class procedure TioCustomSessionDataStore._SetDefaultGlobalConnectionIfEmpty(const AConnectionName: String);
 begin
   _Lock;
   try
@@ -700,12 +700,12 @@ end;
 
 class procedure TioCustomSessionDataStore._Lock;
 begin
-  TMonitor.Enter(FConnectionManagerContainer);
+  TMonitor.Enter(FThreadSessionData);
 end;
 
 class procedure TioCustomSessionDataStore._Unlock;
 begin
-  TMonitor.Exit(FConnectionManagerContainer);
+  TMonitor.Exit(FThreadSessionData);
 end;
 
 { TioSimpleSessionDataStore }

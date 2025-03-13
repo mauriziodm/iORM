@@ -79,7 +79,8 @@ uses
 {$IFNDEF ioDelphiProfessional}
   iORM.DB.MSSqlServer.SqlGenerator, iORM.DB.MSSqlServer.SqlDataConverter,
 {$ENDIF}
-  iORM.DB.SQL.Destination, FireDAC.Stan.Intf, iORM.Http.Connection, iORM.DB.Script, iORM.DB.Query.FireDAC;
+  iORM.DB.SQL.Destination, FireDAC.Stan.Intf, iORM.Http.Connection, iORM.DB.Script, iORM.DB.Query.FireDAC,
+  iORM.Abstraction;
 
 { TioDbBuilder }
 
@@ -92,7 +93,7 @@ class function TioDbFactory.Connection(AConnectionName: String = IO_CONNECTIONDE
 begin
   // If AConnectionName param is not specified (is empty) then
   // use the default connection def
-  AConnectionName := Self.ConnectionManager.GetCurrentConnectionNameIfEmpty(AConnectionName);
+  AConnectionName := TioApplication.SessionDataStore.GetCurrentConnectionNameIfEmpty(AConnectionName);
   // If the connection already exists in the COnnectionContainer then return then else
   // create a new connection, add it to the COnnectionContainer thne return the connection
   // itself to the caller code

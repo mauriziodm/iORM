@@ -36,7 +36,7 @@ unit iORM.Http.Body.Response;
 interface
 
 uses
-  System.Classes, iORM.DB.Interfaces;
+  System.Classes, iORM.DB.Interfaces, System.JSON;
 
 type
 
@@ -80,8 +80,7 @@ type
 implementation
 
 uses
-  iORM, System.NetEncoding, iORM.Exceptions, DJSON, System.SysUtils,
-  System.JSON;
+  iORM, System.NetEncoding, iORM.Exceptions, DJSON, System.SysUtils;
 
 { TioHttpResponseBody }
 

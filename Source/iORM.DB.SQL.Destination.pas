@@ -73,7 +73,8 @@ type
 implementation
 
 uses
-  iORM.SqlTranslator, iORM.DB.Factory, iORM.Exceptions, iORM.PersistenceStrategy.Factory, iORM.Abstraction;
+  iORM.SqlTranslator, iORM.DB.Factory, iORM.Exceptions, iORM.PersistenceStrategy.Factory, iORM.Abstraction,
+  iORM.PersistenceStrategy.Interfaces;
 
 { TioSQLDestination }
 
@@ -129,9 +130,13 @@ begin
 end;
 
 procedure TioSQLDestination.Execute(const AIgnoreObjNotExists:Boolean);
+var
+  LPSRequest: IioPersistenceStrategyRequest;
 begin
-  FIgnoreObjNotExists := AIgnoreObjNotExists;
-  TioPersistenceStrategyFactory.GetStrategy_ByConnectionName(FConnectionDefName).SQLDest_Execute(Self);
+  // Build the persistence strategy request
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_SQLDest_Execute(Self);
+  // get the right persistence strategy and execute the request
+  TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
 end;
 
 function TioSQLDestination.GetConnectionDefName: String;
@@ -172,8 +177,13 @@ begin
 end;
 
 procedure TioSQLDestination.ToMemTable(const AMemTable: TFDMemTable);
+var
+  LPSRequest: IioPersistenceStrategyRequest;
 begin
-  TioPersistenceStrategyFactory.GetStrategy_ByConnectionName(FConnectionDefName).SQLDest_LoadDataSet(Self, AMemTable);
+  // Build the persistence strategy request
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_SQLDest_LoadDataSet(Self, AMemTable);
+  // get the right persistence strategy and execute the request
+  TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
 end;
 
 end.

@@ -175,10 +175,7 @@ type
 
   IioConnectionHttp = interface(IioConnection)
     ['{E29F952A-E7E5-44C7-A3BE-09C4F2939060}']
-    procedure Execute(const AResource: String);
-    // persistence strategy request
-    function GetioRequestBody: IioPersistenceStrategyRequest;
-    property ioRequestBody: IioPersistenceStrategyRequest read GetioRequestBody;
+    procedure Execute(const APSRequest: IioPersistenceStrategyRequest);
     // ioResponseBody property
     function GetioResponseBody: IioHttpResponseBody;
     property ioResponseBody: IioHttpResponseBody read GetioResponseBody;
@@ -361,9 +358,9 @@ type
     function GetJSONDataValue: TJSONValue;
     property JSONDataValue: TJSONValue read GetJSONDataValue write SetJSONDataValue;
     // JSONDataValueAsInteger
-    procedure SetJSONDataValueAsInteger(const AObj: TObject);
-    function GetJSONDataValueAsInteger: TObject;
-    property JSONDataValueAsInteger: TObject read GetJSONDataValueAsInteger write SetJSONDataValueAsInteger;
+    procedure SetJSONDataValueAsInteger(const Value: Integer);
+    function GetJSONDataValueAsInteger: Integer;
+    property JSONDataValueAsInteger: Integer read GetJSONDataValueAsInteger write SetJSONDataValueAsInteger;
     // JSONDataValueAsObject
     procedure SetJSONDataValueAsObject(const AObj: TObject);
     function GetJSONDataValueAsObject: TObject;

@@ -47,7 +47,8 @@ uses
   iORM.Context.Map.Interfaces, FireDAC.Comp.Client, System.TypInfo,
   iORM.Utilities, iORM.LiveBindings.CommonBSAPaging,
   iORM.Context.Interfaces, iORM.StdActions.Interfaces,
-  iORM.LiveBindings.Interfaces, DJSON.Attributes;
+  iORM.LiveBindings.Interfaces, DJSON.Attributes,
+  iORM.PersistenceStrategy.Factory;
 
 type
 
@@ -416,9 +417,10 @@ implementation
 uses
   iORM.DB.Factory, iORM.Context.Factory, System.SysUtils, iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, iORM.ObjectsForge.Factory,
   iORM.RttiContext.Factory, iORM, iORM.Where.SqlItems, iORM.DB.Interfaces, iORM.Resolver.Factory,
-  iORM.Where.Factory, iORM.Exceptions, FireDAC.Comp.DataSet, iORM.LazyLoad.Factory, iORM.PersistenceStrategy.Factory,
+  iORM.Where.Factory, iORM.Exceptions, FireDAC.Comp.DataSet, iORM.LazyLoad.Factory,
   iORM.MVVM.Interfaces, iORM.Abstraction, iORM.Context.Container, System.StrUtils,
-  iORM.ObjectsForge.Interfaces, iORM.ETM.Engine;
+  iORM.ObjectsForge.Interfaces, iORM.ETM.Engine,
+  iORM.PersistenceStrategy.Interfaces;
 
 { TioWhere }
 
@@ -775,7 +777,7 @@ begin
     for AResolvedTypeName in AResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(itRegular, AResolvedTypeName, Self, nil, nil, '', '', BL_DEFAULT);
+      AContext := TioContextFactory.Context_Simple(itRegular, BL_DEFAULT, AResolvedTypeName, Self, nil, nil, '', '');
       // Start transaction
       ATransactionCollection.StartTransaction(AContext.GetTable.GetTableConnectionName);
       // Load the current class data into the list
@@ -791,8 +793,14 @@ begin
 end;
 
 procedure TioWhere.Delete;
+var
+  LPSRequest: IioPersistenceStrategyRequest;
 begin
-  TioPersistenceStrategyFactory.GetStrategy_ByConnectionName('').Delete(Self);
+// TODO: Lascio così che però salta l'ETM oppure lo cambio per fare in modo che prima carichi gli oggetti e poi fa il delete di quelli (già presente nela facciata "io.DeleteAll<T>" ma con generics, si potrebbe fare anche non generica)
+  // Build the persistence strategy request
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_Delete(Self);
+  // get the right persistence strategy and execute the request
+  TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
 end;
 
 destructor TioWhere.Destroy;
@@ -833,7 +841,7 @@ begin
     for AResolvedTypeName in AResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      AContext := TioContextFactory.Context(itRegular, AResolvedTypeName, Self, nil, nil, '', '', BL_DEFAULT);
+      AContext := TioContextFactory.Context_Simple(itRegular, BL_DEFAULT, AResolvedTypeName, Self, nil, nil, '', '');
       // Start transaction
       ATransactionCollection.StartTransaction(AContext.GetTable.GetTableConnectionName);
       // Load the current class data into the list
@@ -854,8 +862,13 @@ begin
 end;
 
 function TioWhere.Count: Integer;
+var
+  LPSRequest: IioPersistenceStrategyRequest;
 begin
-  Result := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName('').LoadCount(Self);
+  // Build the persistence strategy request
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadCount(Self);
+  // get the right persistence strategy and execute the request
+  TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
 end;
 
 function TioWhere.GetClearListBefore: Boolean;
@@ -1040,13 +1053,23 @@ begin
 end;
 
 function TioWhere.Max(const APropertyName: String): Integer;
+var
+  LPSRequest: IioPersistenceStrategyRequest;
 begin
-  Result := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName('').LoadMax(Self, APropertyName);
+  // Build the persistence strategy request
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadMax(Self, APropertyName);
+  // get the right persistence strategy and execute the request
+  TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
 end;
 
 function TioWhere.Min(const APropertyName: String): Integer;
+var
+  LPSRequest: IioPersistenceStrategyRequest;
 begin
-  Result := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName('').LoadMin(Self, APropertyName);
+  // Build the persistence strategy request
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadMin(Self, APropertyName);
+  // get the right persistence strategy and execute the request
+  TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
 end;
 
 function TioWhere.NotExists: Boolean;
@@ -1141,12 +1164,17 @@ begin
 end;
 
 procedure TioWhere.ToList(const AList: TObject);
+var
+  LPSRequest: IioPersistenceStrategyRequest;
 begin
   if not Assigned(AList) then
     raise EioGenericException.Create(ClassName, 'ToList', '"AList" parameter not assigned');
   if FClearListBefore then
     TioUtilities.ClearList(AList);
-  TioPersistenceStrategyFactory.GetStrategy_ByConnectionName('').LoadList(Self, AList, FIntent);
+  // Build the persistence strategy request
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadList(Self, AList, FIntent);
+  // get the right persistence strategy and execute the request
+  TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
 end;
 
 function TioWhere.ToList(const AInterfacedListTypeName, AAlias: String; const AOwnsObjects: Boolean): TObject;
@@ -1174,13 +1202,23 @@ begin
 end;
 
 procedure TioWhere.ToMemTable(const AMemTable: TFDMemTable);
+var
+  LPSRequest: IioPersistenceStrategyRequest;
 begin
-  TioPersistenceStrategyFactory.GetStrategy_ByConnectionName('').LoadDataSet(Self, AMemTable);
+  // Build the persistence strategy request
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadDataSet(Self, AMemTable);
+  // get the right persistence strategy and execute the request
+  TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
 end;
 
 function TioWhere.ToObject(const AObj: TObject): TObject;
+var
+  LPSRequest: IioPersistenceStrategyRequest;
 begin
-  Result := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName('').LoadObject(Self, AObj, FIntent);
+  // Build the persistence strategy request
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadObject(Self, AObj, FIntent);
+  // get the right persistence strategy and execute the request
+  TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
 end;
 
 function TioWhere.ToObject(const AIntf: IInterface): TObject;
@@ -1422,8 +1460,13 @@ begin
 end;
 
 function TioWhere._ToObjectInternalByClassOnly(const AIntent: TioPersistenceIntentType; const AObj: TObject = nil): TObject;
+var
+  LPSRequest: IioPersistenceStrategyRequest;
 begin
-  Result := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName('').LoadObjectByClassOnly(Self, AObj, AIntent);
+  // Build the persistence strategy request
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadObjectByClassOnly(Self, AObj, AIntent);
+  // get the right persistence strategy and execute the request
+  TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
 end;
 
 function TioWhere._Value(AValue: IInterface): IioWhere;

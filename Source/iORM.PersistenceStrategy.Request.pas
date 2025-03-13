@@ -68,6 +68,8 @@ type
     function GetMethod: TioPersistenceStrategyMethod;
     function GetObj1: TObject;
     function GetObj1_Serialize: Boolean;
+    function GetObj2: TObject;
+    function GetObj2_Serialize: Boolean;
     function GetPropName: String;
     function GetRelationOID: Integer;
     function GetRelationPropName: String;
@@ -77,10 +79,15 @@ type
     function GetUsr: String;
     function GetUsrOID: Integer;
     function GetWhere: IioWhere;
+    procedure SetApp(const Value: String);
+    procedure SetAppOID(const Value: Integer);
     procedure SetAuthGrant(const Value: String);
     procedure SetAuthIntention(const Value: TioAuthIntention);
     procedure SetAuthScope(const Value: String);
+    procedure SetAuthToken(const Value: String);
     procedure SetBlindLevel(const Value: Byte);
+    procedure SetConnection(const Value: String);
+    procedure SetConnectionRemote(const Value: String);
     procedure SetDTO(const Value: TObject);
     procedure SetDTO_Serialize(const Value: Boolean);
     procedure SetIntent(const Value: TioPersistenceIntentType);
@@ -93,19 +100,18 @@ type
     procedure SetMasterPropPath(const Value: String);
     procedure SetObj1(const Value: TObject);
     procedure SetObj1_Serialize(const Value: Boolean);
+    procedure SetObj2(const Value: TObject);
+    procedure SetObj2_Serialize(const Value: Boolean);
     procedure SetPropName(const Value: String);
     procedure SetRelationOID(const Value: Integer);
     procedure SetRelationPropName(const Value: String);
     procedure SetResult(const Value: TValue);
     procedure SetResultAsBoolean(const Value: Boolean);
     procedure SetResultAsInteger(const Value: Integer);
+    procedure SetUsr(const Value: String);
+    procedure SetUsrOID(const Value: Integer);
     procedure SetWhere(const Value: IioWhere);
-    function GetObj2: TObject;
-    function GetObj2_Serialize: Boolean;
-    procedure SetObj2(const Value: TObject);
-    procedure SetObj2_Serialize(const Value: Boolean);
-    procedure SetList(const Value: TObject);
-    procedure SetList_Serialize(const Value: Boolean);
+    procedure SsetConnectionRemote(const Value: String);
   public
     constructor Create(const AMethod: TioPersistenceStrategyMethod; const FillSessionRelatedProperties: Boolean);
     constructor CreateByJSONString(const AJSONString:String);
@@ -114,17 +120,17 @@ type
     // method property
     property Method: TioPersistenceStrategyMethod read GetMethod;
     // session data
-    property App: String read GetApp;
-    property AppOID: Integer read GetAppOID;
-    property Connection: String read GetConnection;
-    property ConnectionRemote: String read GetConnectionRemote;
-    property Usr: String read GetUsr;
-    property UsrOID: Integer read GetUsrOID;
+    property App: String read GetApp write SetApp;
+    property AppOID: Integer read GetAppOID write SetAppOID;
+    property Connection: String read GetConnection write SetConnection;
+    property ConnectionRemote: String read GetConnectionRemote write SetConnectionRemote;
+    property Usr: String read GetUsr write SetUsr;
+    property UsrOID: Integer read GetUsrOID write SetUsrOID;
     // auth
     property AuthGrant: String read GetAuthGrant;
     property AuthIntention: TioAuthIntention read GetAuthIntention;
     property AuthScope: String read GetAuthScope;
-    property AuthToken: String read GetAuthToken; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
+    property AuthToken: String read GetAuthToken write SetAuthToken; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
     // instances
     property DTO: TObject read GetDTO write SetDTO;
     property DTO_Serialize: Boolean read GetDTO_Serialize write SetDTO_Serialize;
@@ -562,6 +568,16 @@ begin
   Result := FWhere;
 end;
 
+procedure TioPersistenceStrategyRequest.SetApp(const Value: String);
+begin
+  FApp := Value;
+end;
+
+procedure TioPersistenceStrategyRequest.SetAppOID(const Value: Integer);
+begin
+  FAppOID := Value;
+end;
+
 procedure TioPersistenceStrategyRequest.SetAuthGrant(const Value: String);
 begin
   FAuthGrant := Value;
@@ -577,9 +593,24 @@ begin
   FAuthScope := Value;
 end;
 
+procedure TioPersistenceStrategyRequest.SetAuthToken(const Value: String);
+begin
+  FAuthToken := Value;
+end;
+
 procedure TioPersistenceStrategyRequest.SetBlindLevel(const Value: Byte);
 begin
   FBlindLevel := Value;
+end;
+
+procedure TioPersistenceStrategyRequest.SetConnection(const Value: String);
+begin
+  FConnection := Value;
+end;
+
+procedure TioPersistenceStrategyRequest.SetConnectionRemote(const Value: String);
+begin
+  FConnectionRemote := Value;
 end;
 
 procedure TioPersistenceStrategyRequest.SetDTO(const Value: TObject);
@@ -607,24 +638,14 @@ begin
   FIntf1_Serialize := Value;
 end;
 
-procedure TioPersistenceStrategyRequest.SetList(const Value: TObject);
-begin
-
-end;
-
 procedure TioPersistenceStrategyRequest.SetListDTO(const Value: TObject);
 begin
-
+  FListDTO := Value;
 end;
 
 procedure TioPersistenceStrategyRequest.SetListDTO_Serialize(const Value: Boolean);
 begin
-
-end;
-
-procedure TioPersistenceStrategyRequest.SetList_Serialize(const Value: Boolean);
-begin
-
+  FListDTO_Serialize := Value;
 end;
 
 procedure TioPersistenceStrategyRequest.SetMasterBSPersistence(const Value: TioBSPersistence);
@@ -692,9 +713,24 @@ begin
   FResult.From<Integer> := Value;
 end;
 
+procedure TioPersistenceStrategyRequest.SetUsr(const Value: String);
+begin
+  FUsr := Value;
+end;
+
+procedure TioPersistenceStrategyRequest.SetUsrOID(const Value: Integer);
+begin
+  FUsrOID := Value;
+end;
+
 procedure TioPersistenceStrategyRequest.SetWhere(const Value: IioWhere);
 begin
   FWhere := Value;
+end;
+
+procedure TioPersistenceStrategyRequest.SsetConnectionRemote(const Value: String);
+begin
+
 end;
 
 procedure TioPersistenceStrategyRequest.SwitchToConnectionRemote;

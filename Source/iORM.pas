@@ -2312,7 +2312,7 @@ var
   LList: TObject;
 begin
   if TioUtilities.IsAnInterface<T> then
-    LList := Self.Load<T>(ATypeAlias).Add(AWhere).ToGenericList.OfType < TList < IInterface >>
+    LList := Self.Load<T>(ATypeAlias).Add(AWhere).ToGenericList.OfType<TList<IInterface>>
   else
     LList := Self.Load<T>(ATypeAlias).Add(AWhere).ToGenericList.OfType<TObjectList<TObject>>;
   try

@@ -66,6 +66,7 @@ type
     class function NewPSRequest_LoadMin(const AWhere: IioWhere; const APropertyName: String): IioPersistenceStrategyRequest;
     class function NewPSRequest_LoadObject(const AWhere: IioWhere; const ADTO: TObject; const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
     class function NewPSRequest_LoadObjectByClassOnly(const AWhere: IioWhere; const ADTO: TObject; const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
+    // TODO: Da eliminare?
     class function NewPSRequest_LoadObjVersion(const AContext: IioContext): IioPersistenceStrategyRequest;
     // persist
     class function NewPSRequest_PersistList(const AListDTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;

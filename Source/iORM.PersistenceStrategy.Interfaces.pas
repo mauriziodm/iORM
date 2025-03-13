@@ -137,10 +137,15 @@ type
     function GetUsr: String;
     function GetUsrOID: Integer;
     function GetWhere: IioWhere;
+    procedure SetApp(const Value: String);
+    procedure SetAppOID(const Value: Integer);
     procedure SetAuthGrant(const Value: String);
     procedure SetAuthIntention(const Value: TioAuthIntention);
     procedure SetAuthScope(const Value: String);
+    procedure SetAuthToken(const Value: String);
     procedure SetBlindLevel(const Value: Byte);
+    procedure SetConnection(const Value: String);
+    procedure SetConnectionRemote(const Value: String);
     procedure SetDTO(const Value: TObject);
     procedure SetDTO_Serialize(const Value: Boolean);
     procedure SetIntent(const Value: TioPersistenceIntentType);
@@ -159,22 +164,24 @@ type
     procedure SetResult(const Value: TValue);
     procedure SetResultAsBoolean(const Value: Boolean);
     procedure SetResultAsInteger(const Value: Integer);
+    procedure SetUsr(const Value: String);
+    procedure SetUsrOID(const Value: Integer);
     procedure SetWhere(const Value: IioWhere);
     procedure SwitchToConnectionRemote;
     // method property
     property Method: TioPersistenceStrategyMethod read GetMethod;
     // session data
-    property App: String read GetApp;
-    property AppOID: Integer read GetAppOID;
-    property Connection: String read GetConnection;
-    property ConnectionRemote: String read GetConnectionRemote;
-    property Usr: String read GetUsr;
-    property UsrOID: Integer read GetUsrOID;
+    property App: String read GetApp write SetApp;
+    property AppOID: Integer read GetAppOID write SetAppOID;
+    property Connection: String read GetConnection write SetConnection;
+    property ConnectionRemote: String read GetConnectionRemote write SetConnectionRemote;
+    property Usr: String read GetUsr write SetUsr;
+    property UsrOID: Integer read GetUsrOID write SetUsrOID;
     // auth
     property AuthGrant: String read GetAuthGrant;
     property AuthIntention: TioAuthIntention read GetAuthIntention;
     property AuthScope: String read GetAuthScope;
-    property AuthToken: String read GetAuthToken; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
+    property AuthToken: String read GetAuthToken write SetAuthToken; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
     // instances
     property DTO: TObject read GetDTO write SetDTO;
     property DTO_Serialize: Boolean read GetDTO_Serialize write SetDTO_Serialize;

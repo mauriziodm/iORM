@@ -49,7 +49,7 @@ type
 implementation
 
 uses
-  iORM.Http.Body.Request, iORM.Http.Body.Response;
+  iORM.Http.Body.Response;
 
 { TioHttpFactory }
 

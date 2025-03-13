@@ -47,8 +47,8 @@ uses
 
 type
 
-  TioContext = class(TInterfacedObject, IioContext)
-  private
+  TioContext_Custom = class abstract (TInterfacedObject, IioContext)
+  strict private
     FActionType: TioPersistenceActionType;
     FConflictDetected: Boolean;
     FConflictState: TioPersistenceConflictState;
@@ -59,24 +59,18 @@ type
     FOriginalNonTrueClassMap: IioMap;
     FPSRequest: IioPersistenceStrategyRequest;
     FSynchroStrategy_Client_NoDirectCall: IioSynchroStrategy_Client;
-    // ConnectionName
-    function GetConnectionNameResolved: String;
-    // DataObject
-    function GetDataObject: TObject;
-    procedure SetDataObject(const AValue: TObject);
-    // MasterPropertyPath
-    function GetMasterPropertyPath: String;
-    // ObjID
-    function GetObjID: Integer;
-    procedure SetObjID(const AValue: Integer);
-    // ObjStatus
-    function GetObjStatus: TioObjStatus;
-    procedure SetObjStatus(const AValue: TioObjStatus);
-    // ObjVersion
-    function GetObjVersion: TioObjVersion;
-    procedure SetObjVersion(const AValue: TioObjVersion);
-    // ObjNextVersion
-    function GetObjNextVersion: Integer; // Con tipo TioObjVersion ci sono problemi
+    // ActionType
+    function GetActionType: TioPersistenceActionType;
+    procedure SetActionType(const Value: TioPersistenceActionType);
+    // ConflictDetected
+    function GetConflictDetected: Boolean;
+    procedure SetConflictDetected(const Value: Boolean);
+    // ConflictState
+    function GetConflictState: TioPersistenceConflictState;
+    procedure SetConflictState(const Value: TioPersistenceConflictState);
+    // EtmEntityVersion
+    function GetEntityFromVersion: Integer;
+    procedure SetEntityFromVersion(const Value: Integer);
     // ObjCreated
     function GetObjCreated: TioObjCreated;
     procedure SetObjCreated(const AValue: TioObjCreated);
@@ -86,6 +80,14 @@ type
     // ObjCreatedUserName
     function GetObjCreatedUserName: TioObjCreatedUserName;
     procedure SetObjCreatedUserName(const AValue: TioObjCreatedUserName);
+    // ObjID
+    function GetObjID: Integer;
+    procedure SetObjID(const AValue: Integer);
+    // ObjNextVersion
+    function GetObjNextVersion: Integer; // Con tipo TioObjVersion ci sono problemi
+    // ObjStatus
+    function GetObjStatus: TioObjStatus;
+    procedure SetObjStatus(const AValue: TioObjStatus);
     // ObjUpdated
     function GetObjUpdated: TioObjUpdated;
     procedure SetObjUpdated(const AValue: TioObjUpdated);
@@ -95,39 +97,40 @@ type
     // ObjUpdatedUserName
     function GetObjUpdatedUserName: TioObjUpdatedUserName;
     procedure SetObjUpdatedUserName(const AValue: TioObjUpdatedUserName);
-    // RelationOID
-    function GetRelationOID: Integer;
-    procedure SetRelationOID(const Value: Integer);
-    // Where
-    function GetWhere: IioWhere;
-    procedure SetWhere(const AWhere: IioWhere);
-    // MasterBSPersistence
-    function GetMasterBSPersistence: TioBSPersistence;
+    // ObjVersion
+    function GetObjVersion: TioObjVersion;
+    procedure SetObjVersion(const AValue: TioObjVersion);
     // OriginalResolvedTypeNameNonTrueClass
     procedure SetOriginalNonTrueClassMap(const AMap: IioMap);
     function GetOriginalNonTrueClassMap: IioMap;
-    // EtmEntityVersion
-    function GetEntityFromVersion: Integer;
-    procedure SetEntityFromVersion(const Value: Integer);
-    // ActionType
-    function GetActionType: TioPersistenceActionType;
-    procedure SetActionType(const Value: TioPersistenceActionType);
-    // IntentType
-    function GetIntentType: TioPersistenceIntentType;
-    procedure SetIntentType(const Value: TioPersistenceIntentType);
+  protected
     // BlindLevel
-    function GetBlindLevel: Byte;
-    procedure SetBlindLevel(const Value: Byte);
-    // ConflictDetected
-    function GetConflictDetected: Boolean;
-    procedure SetConflictDetected(const Value: Boolean);
-    // ConflictState
-    function GetConflictState: TioPersistenceConflictState;
-    procedure SetConflictState(const Value: TioPersistenceConflictState);
+    function GetBlindLevel: Byte; virtual; abstract;
+    procedure SetBlindLevel(const Value: Byte); virtual; abstract;
+    // ConnectionName
+    function GetConnectionNameResolved: String; virtual; abstract;
+    // DataObject
+    function GetDataObject: TObject; virtual; abstract;
+    procedure SetDataObject(const AValue: TObject); virtual; abstract;
+    // IntentType
+    function GetIntentType: TioPersistenceIntentType; virtual; abstract;
+    procedure SetIntentType(const Value: TioPersistenceIntentType); virtual; abstract;
+    // MasterBSPersistence
+    function GetMasterBSPersistence: TioBSPersistence; virtual; abstract;
+    // MasterPropertyName
+    function GetMasterPropertyName: String; virtual; abstract;
+    // MasterPropertyPath
+    function GetMasterPropertyPath: String; virtual; abstract;
+    // PSRequest
+    function GetPSRequest: IioPersistenceStrategyRequest; virtual; abstract;
+    // RelationOID
+    function GetRelationOID: Integer; virtual; abstract;
+    procedure SetRelationOID(const Value: Integer); virtual; abstract;
+    // Where
+    function GetWhere: IioWhere; virtual; abstract;
+    procedure SetWhere(const AWhere: IioWhere); virtual; abstract;
   public
-//    constructor Create(const AIntent: TioPersistenceIntentType; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
-//      const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData); overload;
-    constructor Create(const APSRequest: IioPersistenceStrategyRequest; const AMap: IioMap); overload;
+    constructor Create_Map(const AMap: IioMap);
     function GetClassRef: TioClassRef;
     function GetProperties: IioProperties;
     function GetTable: IioTable;
@@ -176,6 +179,7 @@ type
     property DataObject: TObject read GetDataObject write SetDataObject;
     property EntityFromVersion: Integer read GetEntityFromVersion write SetEntityFromVersion;
     property IntentType: TioPersistenceIntentType read GetIntentType write SetIntentType;
+    property MasterPropertyName: String read GetMasterPropertyName;
     property MasterPropertyPath: String read GetMasterPropertyPath;
     property MasterBSPersistence: TioBSPersistence read GetMasterBSPersistence;
     property ObjCreated: TioObjCreated read GetObjCreated write SetObjCreated;
@@ -188,12 +192,87 @@ type
     property ObjUpdatedUserName: TioObjUpdatedUserName read GetObjUpdatedUserName write SetObjUpdatedUserName;
     property ObjVersion: TioObjVersion read GetObjVersion write SetObjVersion;
     property ObjNextVersion: Integer read GetObjNextVersion; // Con tipo TioObjVersion ci sono problemi
+    property PSRequest: IioPersistenceStrategyRequest read GetPSRequest;
     property RelationOID: Integer read GetRelationOID write SetRelationOID;
     property Where: IioWhere read GetWhere write SetWhere;
     /// Contiene il nome della classe originaria cioè, nel caso il contesto sia stato creato con
     ///  la TrueClassVirtual (select query) a partire da una resolved class name, contiene il nome
     ///  della classe originaria, quella dalla quale poi si è estratta la TrueClassVirtualMap stessa.
     property OriginalNonTrueClassMap: IioMap read GetOriginalNonTrueClassMap write SetOriginalNonTrueClassMap;
+  end;
+
+  TioContext_PSRequest = class(TioContext_Custom)
+  strict private
+    FPSRequest: IioPersistenceStrategyRequest;
+  protected
+    // BlindLevel
+    function GetBlindLevel: Byte; override;
+    procedure SetBlindLevel(const Value: Byte); override;
+    // ConnectionName
+    function GetConnectionNameResolved: String; override;
+    // DataObject
+    function GetDataObject: TObject; override;
+    procedure SetDataObject(const AValue: TObject); override;
+    // IntentType
+    function GetIntentType: TioPersistenceIntentType; override;
+    procedure SetIntentType(const Value: TioPersistenceIntentType); override;
+    // MasterBSPersistence
+    function GetMasterBSPersistence: TioBSPersistence; override;
+    // MasterPropertyName
+    function GetMasterPropertyName: String; override;
+    // MasterPropertyPath
+    function GetMasterPropertyPath: String; override;
+    // PSRequest
+    function GetPSRequest: IioPersistenceStrategyRequest; override;
+    // RelationOID
+    function GetRelationOID: Integer; override;
+    procedure SetRelationOID(const Value: Integer); override;
+    // Where
+    function GetWhere: IioWhere; override;
+    procedure SetWhere(const AWhere: IioWhere); override;
+  public
+    constructor Create_PSRequest(const APSRequest: IioPersistenceStrategyRequest; const AMap: IioMap);
+  end;
+
+  TioContext_Simple = class(TioContext_Custom)
+  strict private
+    FBlindLevel: Byte;
+    FDataObject: TObject;
+    FIntentType: TioPersistenceIntentType;
+    FMasterBSPersistence: TioBSPersistence;
+    FMasterPropertyName: String;
+    FMasterPropertyPath: String;
+    FRelationOID: Integer;
+    FWhere: IioWhere;
+  protected
+    // BlindLevel
+    function GetBlindLevel: Byte; override;
+    procedure SetBlindLevel(const Value: Byte); override;
+    // ConnectionName
+    function GetConnectionNameResolved: String; override;
+    // DataObject
+    function GetDataObject: TObject; override;
+    procedure SetDataObject(const AValue: TObject); override;
+    // IntentType
+    function GetIntentType: TioPersistenceIntentType; override;
+    procedure SetIntentType(const Value: TioPersistenceIntentType); override;
+    // MasterBSPersistence
+    function GetMasterBSPersistence: TioBSPersistence; override;
+    // MasterPropertyName
+    function GetMasterPropertyName: String; override;
+    // MasterPropertyPath
+    function GetMasterPropertyPath: String; override;
+    // PSRequest
+    function GetPSRequest: IioPersistenceStrategyRequest; override;
+    // RelationOID
+    function GetRelationOID: Integer; override;
+    procedure SetRelationOID(const Value: Integer); override;
+    // Where
+    function GetWhere: IioWhere; override;
+    procedure SetWhere(const AWhere: IioWhere); override;
+  public
+    constructor Create_Simple(const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const AMap: IioMap; const AWhere: IioWhere;
+      const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
   end;
 
 implementation
@@ -206,95 +285,93 @@ uses
 
 { TioContext }
 
-function TioContext.GetTrueClass: IioTrueClass;
+function TioContext_Custom.GetTrueClass: IioTrueClass;
 begin
   Result := Self.Map.GetTable.GetTrueClass;
 end;
 
-function TioContext.BlindLevel_Do_AutoUpdateProps: boolean;
+function TioContext_Custom.BlindLevel_Do_AutoUpdateProps: boolean;
 begin
-  Result := TioUtilities.BlindLevel_Do_AutoUpdateProps(FPSRequest.BlindLevel);
+  Result := TioUtilities.BlindLevel_Do_AutoUpdateProps(BlindLevel);
 end;
 
-function TioContext.BlindLevel_Do_DetectConflicts: boolean;
+function TioContext_Custom.BlindLevel_Do_DetectConflicts: boolean;
 begin
-  Result := TioUtilities.BlindLevel_Do_DetectConflicts(FPSRequest.BlindLevel);
+  Result := TioUtilities.BlindLevel_Do_DetectConflicts(BlindLevel);
 end;
 
-function TioContext.BlindLevel_Do_DetectObjExists: boolean;
+function TioContext_Custom.BlindLevel_Do_DetectObjExists: boolean;
 begin
-  Result := TioUtilities.BlindLevel_Do_DetectObjExists(FPSRequest.BlindLevel);
+  Result := TioUtilities.BlindLevel_Do_DetectObjExists(BlindLevel);
 end;
 
-procedure TioContext.BlindLevel_Reset_AutoUpdateProps;
+procedure TioContext_Custom.BlindLevel_Reset_AutoUpdateProps;
 begin
   if BlindLevel_Do_AutoUpdateProps then
-    Dec(FPSRequest.BlindLevel, BL_BIT_AUTO_UPDATE_PROPS);
+    Dec(BlindLevel, BL_BIT_AUTO_UPDATE_PROPS);
 end;
 
-procedure TioContext.BlindLevel_Reset_DetectConflicts;
+procedure TioContext_Custom.BlindLevel_Reset_DetectConflicts;
 begin
   if BlindLevel_Do_DetectConflicts then
-    Dec(FPSRequest.BlindLevel, BL_BIT_DETECT_CONFLICTS);
+    Dec(BlindLevel, BL_BIT_DETECT_CONFLICTS);
 end;
 
-procedure TioContext.BlindLevel_Reset_DetectObjExists;
+procedure TioContext_Custom.BlindLevel_Reset_DetectObjExists;
 begin
   if BlindLevel_Do_DetectObjExists then
-    Dec(FPSRequest.BlindLevel, BL_BIT_DETECT_OBJ_EXISTS);
+    Dec(BlindLevel, BL_BIT_DETECT_OBJ_EXISTS);
 end;
 
-procedure TioContext.BlindLevel_Set_AutoUpdateProps;
+procedure TioContext_Custom.BlindLevel_Set_AutoUpdateProps;
 begin
   if not BlindLevel_Do_AutoUpdateProps then
-    Inc(FPSRequest.BlindLevel, BL_BIT_AUTO_UPDATE_PROPS);
+    Inc(BlindLevel, BL_BIT_AUTO_UPDATE_PROPS);
 end;
 
-procedure TioContext.BlindLevel_Set_DetectConflicts;
+procedure TioContext_Custom.BlindLevel_Set_DetectConflicts;
 begin
   if not BlindLevel_Do_DetectConflicts then
-    Inc(FPSRequest.BlindLevel, BL_BIT_DETECT_CONFLICTS);
+    Inc(BlindLevel, BL_BIT_DETECT_CONFLICTS);
 end;
 
-procedure TioContext.BlindLevel_Set_DetectObjExists;
+procedure TioContext_Custom.BlindLevel_Set_DetectObjExists;
 begin
   if not BlindLevel_Do_DetectObjExists then
-    Inc(FPSRequest.BlindLevel, BL_BIT_DETECT_OBJ_EXISTS);
+    Inc(BlindLevel, BL_BIT_DETECT_OBJ_EXISTS);
 end;
 
-procedure TioContext.CheckDeleteConflict;
+procedure TioContext_Custom.CheckDeleteConflict;
 begin
   TioCustomConflictStrategyRef(GetTable.GetDeleteConflictStrategy).CheckDeleteConflict(Self);
 end;
 
-procedure TioContext.CheckInsertConflict;
+procedure TioContext_Custom.CheckInsertConflict;
 begin
   TioCustomConflictStrategyRef(GetTable.GetInsertConflictStrategy).CheckInsertConflict(Self);
 end;
 
-procedure TioContext.CheckUpdateConflict;
+procedure TioContext_Custom.CheckUpdateConflict;
 begin
   TioCustomConflictStrategyRef(GetTable.GetUpdateConflictStrategy).CheckUpdateConflict(Self);
 end;
 
-procedure TioContext.ResolveDeleteConflict;
+procedure TioContext_Custom.ResolveDeleteConflict;
 begin
   TioCustomConflictStrategyRef(GetTable.GetDeleteConflictStrategy).ResolveDeleteConflict(Self);
 end;
 
-procedure TioContext.ResolveInsertConflict;
+procedure TioContext_Custom.ResolveInsertConflict;
 begin
   TioCustomConflictStrategyRef(GetTable.GetInsertConflictStrategy).ResolveInsertConflict(Self);
 end;
 
-procedure TioContext.ResolveUpdateConflict;
+procedure TioContext_Custom.ResolveUpdateConflict;
 begin
   TioCustomConflictStrategyRef(GetTable.GetUpdateConflictStrategy).ResolveUpdateConflict(Self);
 end;
 
-//constructor TioContext.Create(const AIntent: TioPersistenceIntentType; const AMap: IioMap; const AWhere: IioWhere; const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence;
-//      const AMasterPropertyName, AMasterPropertyPath: String; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData);
-constructor TioContext.Create(const APSRequest: IioPersistenceStrategyRequest; const AMap: IioMap);
+constructor TioContext_Custom.Create_Map(const AMap: IioMap);
 begin
   inherited Create;
   FActionType := atDoNotPersist;
@@ -304,44 +381,20 @@ begin
   FMap := AMap;
   FObjNextVersion := OBJVERSION_NULL;
   FOriginalNonTrueClassMap := nil;
-  FPSRequest := APSRequest;
   FSynchroStrategy_Client_NoDirectCall := nil;
-//--- OLD CODE ---
-//  FMap := AMap;
-//  FDataObject := ADataObject;
-//  FWhere := AWhere;
-//  FHasManyChildVirtualPropertyValue := 0;
-//  FMasterPropertyPath := AMasterPropertyPath + IfThen(AMasterPropertyName.IsEmpty, '', '.') + AMasterPropertyName;
-//  FMasterBSPersistence := AMasterBSPersistence;
-//  FObjNextVersion := OBJVERSION_NULL;
-//  FOriginalNonTrueClassMap := nil;
-//  FEntityFromVersion := 0;
-//  FIntentType := AIntent;
-//  FActionType := atDoNotPersist;
-//  FBlindLevel := ABlindLevel;
-//  FConflictDetected := False;
-//  FConflictState := csUndefined;
-//  FSynchroStrategy_Client_NoDirectCall := nil;
-//  FSessionData := ASessionData;
-//--- OLD CODE ---
 end;
 
-function TioContext.GetClassRef: TioClassRef;
+function TioContext_Custom.GetClassRef: TioClassRef;
 begin
   Result := Map.GetClassRef;
 end;
 
-function TioContext.GetDataObject: TObject;
-begin
-  Result := FPSRequest.DataObj;
-end;
-
-function TioContext.GetEntityFromVersion: Integer;
+function TioContext_Custom.GetEntityFromVersion: Integer;
 begin
   Result := FEntityFromVersion;
 end;
 
-function TioContext.GetGroupBySql: String;
+function TioContext_Custom.GetGroupBySql: String;
 begin
   Result := '';
   // Ritorna il GroupBy fisso (attribute nella dichiarazione della classe)
@@ -352,12 +405,7 @@ begin
   // context e che sostituisce il GroupBy fisso
 end;
 
-function TioContext.GetRelationOID: Integer;
-begin
-  Result := FPSRequest.RelationOID;
-end;
-
-function TioContext.GetCurrentStrategyName: String;
+function TioContext_Custom.GetCurrentStrategyName: String;
 begin
   case FActionType of
     atInsert:
@@ -371,85 +419,75 @@ begin
   end;  
 end;
 
-function TioContext.GetObjID: Integer;
+function TioContext_Custom.GetObjID: Integer;
 begin
-  if not Assigned(FPSRequest.DataObj) then
+  if not Assigned(DataObject) then
     raise EioGenericException.Create(Self.ClassName + '.GetID: DataObject not assigned');
-  Result := GetProperties.GetIdProperty.GetValue(FPSRequest.DataObj).AsInteger;
+  Result := GetProperties.GetIdProperty.GetValue(DataObject).AsInteger;
 end;
 
-function TioContext.GetMasterBSPersistence: TioBSPersistence;
-begin
-  Result := FPSRequest.MasterBSPersistence;
-end;
-
-function TioContext.GetMasterPropertyPath: String;
-begin
-  Result := FPSRequest.MasterPropertyPath + IfThen(FPSRequest.MasterPropertyName.IsEmpty, '', '.') + FPSRequest.MasterPropertyName;
-end;
-
-function TioContext.GetObjCreated: TioObjCreated;
+function TioContext_Custom.GetObjCreated: TioObjCreated;
 begin
   if GetProperties.ObjCreatedPropertyExist then
-    Result := GetProperties.ObjCreatedProperty.GetValue(FPSRequest.DataObj).AsType<TioObjCreated>
+    Result := GetProperties.ObjCreatedProperty.GetValue(DataObject).AsType<TioObjCreated>
   else
     Result := TRANSACTION_TIMESTAMP_NULL;
 end;
 
-function TioContext.GetObjCreatedUserID: TioObjCreatedUserID;
+function TioContext_Custom.GetObjCreatedUserID: TioObjCreatedUserID;
 begin
   if GetProperties.ObjCreatedUserIDPropertyExist then
-    Result := GetProperties.ObjCreatedUserIDProperty.GetValue(FPSRequest.DataObj).AsType<TioObjCreatedUserID>
+    Result := GetProperties.ObjCreatedUserIDProperty.GetValue(DataObject).AsType<TioObjCreatedUserID>
   else
     Result := IO_INTEGER_NULL_VALUE;
 end;
 
-function TioContext.GetObjCreatedUserName: TioObjCreatedUserName;
+function TioContext_Custom.GetObjCreatedUserName: TioObjCreatedUserName;
 begin
   if GetProperties.ObjCreatedUserNamePropertyExist then
-    Result := GetProperties.ObjCreatedUserNameProperty.GetValue(FPSRequest.DataObj).AsType<TioObjCreatedUserName>
+    Result := GetProperties.ObjCreatedUserNameProperty.GetValue(DataObject).AsType<TioObjCreatedUserName>
   else
     Result := IO_STRING_NULL_VALUE;
 end;
 
-function TioContext.GetObjStatus: TioObjStatus;
+function TioContext_Custom.GetObjStatus: TioObjStatus;
 begin
   if GetProperties.ObjStatusPropertyExist then
-    Result := TioObjStatus(GetProperties.ObjStatusProperty.GetValue(FPSRequest.DataObj).AsOrdinal)
+    Result := TioObjStatus(GetProperties.ObjStatusProperty.GetValue(DataObject).AsOrdinal)
   else
     Result := osDirty;
 end;
 
-function TioContext.GetObjUpdated: TioObjUpdated;
+function TioContext_Custom.GetObjUpdated: TioObjUpdated;
 begin
   if GetProperties.ObjUpdatedPropertyExist then
-    Result := GetProperties.ObjUpdatedProperty.GetValue(FPSRequest.DataObj).AsType<TioObjUpdated>
+    Result := GetProperties.ObjUpdatedProperty.GetValue(DataObject).AsType<TioObjUpdated>
   else
     Result := TRANSACTION_TIMESTAMP_NULL;
 end;
 
-function TioContext.GetObjUpdatedUserID: TioObjUpdatedUserID;
+function TioContext_Custom.GetObjUpdatedUserID: TioObjUpdatedUserID;
 begin
   if GetProperties.ObjUpdatedUserIDPropertyExist then
-    Result := GetProperties.ObjUpdatedUserIDProperty.GetValue(FPSRequest.DataObj).AsType<TioObjUpdatedUserID>
+    Result := GetProperties.ObjUpdatedUserIDProperty.GetValue(DataObject).AsType<TioObjUpdatedUserID>
   else
     Result := IO_INTEGER_NULL_VALUE;
 end;
 
-function TioContext.GetObjUpdatedUserName: TioObjUpdatedUserName;
+function TioContext_Custom.GetObjUpdatedUserName: TioObjUpdatedUserName;
 begin
   if GetProperties.ObjUpdatedUserNamePropertyExist then
-    Result := GetProperties.ObjUpdatedUserNameProperty.GetValue(FPSRequest.DataObj).AsType<TioObjUpdatedUserName>
+    Result := GetProperties.ObjUpdatedUserNameProperty.GetValue(DataObject).AsType<TioObjUpdatedUserName>
   else
     Result := IO_STRING_NULL_VALUE;
 end;
 
-function TioContext.GetOrderBySql: String;
+function TioContext_Custom.GetOrderBySql: String;
 begin
-  Result := FPSRequest.Where.GetOrderBySql(FMap);
+  Result := Where.GetOrderBySql(FMap);
 end;
 
-function TioContext.GetOriginalNonTrueClassMap: IioMap;
+function TioContext_Custom.GetOriginalNonTrueClassMap: IioMap;
 begin
   if Assigned(FOriginalNonTrueClassMap) then
     Result := FOriginalNonTrueClassMap
@@ -457,215 +495,170 @@ begin
     Result := FMap;
 end;
 
-function TioContext.GetActionType: TioPersistenceActionType;
+function TioContext_Custom.GetActionType: TioPersistenceActionType;
 begin
   Result := FActionType;
 end;
 
-function TioContext.GetBlindLevel: Byte;
-begin
-  Result := FPSRequest.BlindLevel;
-end;
-
-function TioContext.GetConflictDetected: Boolean;
+function TioContext_Custom.GetConflictDetected: Boolean;
 begin
   Result := FConflictDetected;
 end;
 
-function TioContext.GetConflictState: TioPersistenceConflictState;
+function TioContext_Custom.GetConflictState: TioPersistenceConflictState;
 begin
   Result := FConflictState;
 end;
 
-function TioContext.GetConnectionNameResolved: String;
-begin
-  Result := GetTable.GetTableConnectionNameIfEmpty(FPSRequest.Connection);
-end;
-
-function TioContext.GetIntentType: TioPersistenceIntentType;
-begin
-  Result := FPSRequest.IntentType;
-end;
-
-function TioContext.GetProperties: IioProperties;
+function TioContext_Custom.GetProperties: IioProperties;
 begin
   Result := Self.Map.GetProperties;
 end;
 
-function TioContext.RttiContext: TRttiContext;
+function TioContext_Custom.RttiContext: TRttiContext;
 begin
   Result := Self.Map.RttiContext;
 end;
 
-function TioContext.RttiType: TRttiInstanceType;
+function TioContext_Custom.RttiType: TRttiInstanceType;
 begin
   Result := Self.Map.RttiType;
 end;
 
-procedure TioContext.SetDataObject(const AValue: TObject);
-begin
-  FPSRequest.DataObj := AValue;
-end;
-
-procedure TioContext.SetEntityFromVersion(const Value: Integer);
+procedure TioContext_Custom.SetEntityFromVersion(const Value: Integer);
 begin
   FEntityFromVersion := Value;
 end;
 
-procedure TioContext.SetRelationOID(const Value: Integer);
-begin
-  FPSRequest.RelationOID := Value;
-end;
-
-procedure TioContext.SetObjCreated(const AValue: TioObjCreated);
+procedure TioContext_Custom.SetObjCreated(const AValue: TioObjCreated);
 var
   LPropValue: TValue;
 begin
   if not GetProperties.ObjCreatedPropertyExist then
     Exit;
   LPropValue := TValue.From<TioObjCreated>(AValue);
-  GetProperties.ObjCreatedProperty.SetValue(FPSRequest.DataObj, LPropValue);
+  GetProperties.ObjCreatedProperty.SetValue(DataObject, LPropValue);
 end;
 
-procedure TioContext.SetObjCreatedUserID(const AValue: TioObjCreatedUserID);
+procedure TioContext_Custom.SetObjCreatedUserID(const AValue: TioObjCreatedUserID);
 var
   LPropValue: TValue;
 begin
   if not GetProperties.ObjCreatedUserIDPropertyExist then
     Exit;
   LPropValue := TValue.From<TioObjCreatedUserID>(AValue);
-  GetProperties.ObjCreatedUserIDProperty.SetValue(FPSRequest.DataObj, LPropValue);
+  GetProperties.ObjCreatedUserIDProperty.SetValue(DataObject, LPropValue);
 end;
 
-procedure TioContext.SetObjCreatedUserName(const AValue: TioObjCreatedUserName);
+procedure TioContext_Custom.SetObjCreatedUserName(const AValue: TioObjCreatedUserName);
 var
   LPropValue: TValue;
 begin
   if not GetProperties.ObjCreatedUserNamePropertyExist then
     Exit;
   LPropValue := TValue.From<TioObjCreatedUserName>(AValue);
-  GetProperties.ObjCreatedUserNameProperty.SetValue(FPSRequest.DataObj, LPropValue);
+  GetProperties.ObjCreatedUserNameProperty.SetValue(DataObject, LPropValue);
 end;
 
-procedure TioContext.SetObjID(const AValue: Integer);
+procedure TioContext_Custom.SetObjID(const AValue: Integer);
 var
   LPropValue: TValue;
 begin
   LPropValue := TValue.From<Integer>(AValue);
-  GetProperties.GetIdProperty.SetValue(FPSRequest.DataObj, LPropValue);
+  GetProperties.GetIdProperty.SetValue(DataObject, LPropValue);
 end;
 
-procedure TioContext.SetObjStatus(const AValue: TioObjStatus);
+procedure TioContext_Custom.SetObjStatus(const AValue: TioObjStatus);
 var
   LPropValue: TValue;
 begin
   if not GetProperties.ObjStatusPropertyExist then
     Exit;
   LPropValue := TValue.From<TioObjStatus>(AValue);
-  GetProperties.ObjStatusProperty.SetValue(FPSRequest.DataObj, LPropValue);
+  GetProperties.ObjStatusProperty.SetValue(DataObject, LPropValue);
 end;
 
-procedure TioContext.SetObjUpdated(const AValue: TioObjUpdated);
+procedure TioContext_Custom.SetObjUpdated(const AValue: TioObjUpdated);
 var
   LPropValue: TValue;
 begin
   if not GetProperties.ObjUpdatedPropertyExist then
     Exit;
   LPropValue := TValue.From<TioObjUpdated>(AValue);
-  GetProperties.ObjUpdatedProperty.SetValue(FPSRequest.DataObj, LPropValue);
+  GetProperties.ObjUpdatedProperty.SetValue(DataObject, LPropValue);
 end;
 
-procedure TioContext.SetObjUpdatedUserID(const AValue: TioObjUpdatedUserID);
+procedure TioContext_Custom.SetObjUpdatedUserID(const AValue: TioObjUpdatedUserID);
 var
   LPropValue: TValue;
 begin
   if not GetProperties.ObjUpdatedUserIDPropertyExist then
     Exit;
   LPropValue := TValue.From<TioObjUpdatedUserID>(AValue);
-  GetProperties.ObjUpdatedUserIDProperty.SetValue(FPSRequest.DataObj, LPropValue);
+  GetProperties.ObjUpdatedUserIDProperty.SetValue(DataObject, LPropValue);
 end;
 
-procedure TioContext.SetObjUpdatedUserName(const AValue: TioObjUpdatedUserName);
+procedure TioContext_Custom.SetObjUpdatedUserName(const AValue: TioObjUpdatedUserName);
 var
   LPropValue: TValue;
 begin
   if not GetProperties.ObjUpdatedUserNamePropertyExist then
     Exit;
   LPropValue := TValue.From<TioObjUpdatedUserName>(AValue);
-  GetProperties.ObjUpdatedUserNameProperty.SetValue(FPSRequest.DataObj, LPropValue);
+  GetProperties.ObjUpdatedUserNameProperty.SetValue(DataObject, LPropValue);
 end;
 
-procedure TioContext.SetObjVersion(const AValue: TioObjVersion);
+procedure TioContext_Custom.SetObjVersion(const AValue: TioObjVersion);
 begin
   // note: if the ObjVersion property does not exist it should not raise any exceptions.
   if GetProperties.ObjVersionPropertyExist then
-    GetProperties.ObjVersionProperty.SetValue(FPSRequest.DataObj, AValue);
+    GetProperties.ObjVersionProperty.SetValue(DataObject, AValue);
 end;
 
-function TioContext.GetObjVersion: TioObjVersion;
+function TioContext_Custom.GetObjVersion: TioObjVersion;
 begin
   if GetProperties.ObjVersionPropertyExist then
-    Result := GetProperties.ObjVersionProperty.GetValue(FPSRequest.DataObj).AsType<TioObjVersion>
+    Result := GetProperties.ObjVersionProperty.GetValue(DataObject).AsType<TioObjVersion>
   else
     Result := OBJVERSION_NULL;
 end;
 
-procedure TioContext.SetOriginalNonTrueClassMap(const AMap: IioMap);
+procedure TioContext_Custom.SetOriginalNonTrueClassMap(const AMap: IioMap);
 begin
   FOriginalNonTrueClassMap := AMap;
 end;
 
-procedure TioContext.SetActionType(const Value: TioPersistenceActionType);
+procedure TioContext_Custom.SetActionType(const Value: TioPersistenceActionType);
 begin
   FActionType := Value;
 end;
 
-procedure TioContext.SetBlindLevel(const Value: Byte);
-begin
-  FPSRequest.BlindLevel := Value;
-end;
-
-procedure TioContext.SetConflictDetected(const Value: Boolean);
+procedure TioContext_Custom.SetConflictDetected(const Value: Boolean);
 begin
   FConflictDetected := Value;
 end;
 
-procedure TioContext.SetConflictState(const Value: TioPersistenceConflictState);
+procedure TioContext_Custom.SetConflictState(const Value: TioPersistenceConflictState);
 begin
   FConflictState := Value;
 end;
 
-procedure TioContext.SetIntentType(const Value: TioPersistenceIntentType);
+function TioContext_Custom.WhereExist: Boolean;
 begin
-  FPSRequest.IntentType := Value;
+  Result := Assigned(Where);
 end;
 
-procedure TioContext.SetWhere(const AWhere: IioWhere);
-begin
-  FPSRequest.Where := AWhere;
-end;
-
-function TioContext.WhereExist: Boolean;
-begin
-  Result := Assigned(FPSRequest.Where);
-end;
-
-function TioContext.GetTable: IioTable;
+function TioContext_Custom.GetTable: IioTable;
 begin
   Result := Self.Map.GetTable;
 end;
 
-function TioContext.GetWhere: IioWhere;
+function TioContext_Custom.IDIsNull: Boolean;
 begin
-  Result := FPSRequest.Where;
+  Result := (not Assigned(DataObject)) or (GetObjID = IO_INTEGER_NULL_VALUE);
 end;
 
-function TioContext.IDIsNull: Boolean;
-begin
-  Result := (not Assigned(FPSRequest.DataObj)) or (GetObjID = IO_INTEGER_NULL_VALUE);
-end;
-
-function TioContext.GetObjNextVersion: Integer;
+function TioContext_Custom.GetObjNextVersion: Integer;
 var
   LSynchroStrategy_Client: IioSynchroStrategy_Client;
 begin
@@ -689,7 +682,7 @@ begin
   Result := FObjNextVersion;
 end;
 
-procedure TioContext.SynchroStrategy_GenerateLocalID;
+procedure TioContext_Custom.SynchroStrategy_GenerateLocalID;
 var
   LSynchroStrategy_Client: IioSynchroStrategy_Client;
 begin
@@ -702,10 +695,10 @@ begin
     GetProperties.GetIdProperty.SetValue(DataObject, LSynchroStrategy_Client.GenerateLocalID(Self));
 end;
 
-function TioContext.SynchroStrategy_GetTimeSlotSynchroState: TioEtmTimeSlotSynchroState;
+function TioContext_Custom.SynchroStrategy_GetTimeSlotSynchroState: TioEtmTimeSlotSynchroState;
 begin
   // Determines the TimeSlotSynchroState based on the intent and whether or not it is a class to synchronize
-  case FPSRequest.IntentType of
+  case IntentType of
     itRegular, itRevert:
       if SynchroStrategy_IsToBeSynchronized then
         Result := stToBeSynchronized
@@ -723,7 +716,7 @@ begin
   end;
 end;
 
-function TioContext.SynchroStrategy_CanPersistEtmTimeSlot: Boolean;
+function TioContext_Custom.SynchroStrategy_CanPersistEtmTimeSlot: Boolean;
 var
   LSynchroStrategy_Client: IioSynchroStrategy_Client;
 begin
@@ -735,7 +728,7 @@ begin
   Result := True;
   if Assigned(LSynchroStrategy_Client) then
   begin
-    case FPSRequest.IntentType of
+    case IntentType of
       itRegular, itRevert, itSynchro_PersistToServer:
         if SynchroStrategy_IsToBeSynchronized then
           Result := LSynchroStrategy_Client.EtmTimeSlot_Persist_ToBeSynchronized
@@ -747,14 +740,14 @@ begin
   end;
 end;
 
-function TioContext.SynchroStrategy_Client: IioSynchroStrategy_Client;
+function TioContext_Custom.SynchroStrategy_Client: IioSynchroStrategy_Client;
 begin
   if not Assigned(FSynchroStrategy_Client_NoDirectCall) then
     FSynchroStrategy_Client_NoDirectCall := TioConnectionManager.GetSynchroStrategy_Client(GetTable.GetTableConnectionName);
   Result := FSynchroStrategy_Client_NoDirectCall;
 end;
 
-function TioContext.SynchroStrategy_IsToBeSynchronized: Boolean;
+function TioContext_Custom.SynchroStrategy_IsToBeSynchronized: Boolean;
 var
   LSynchroStrategy_Client: IioSynchroStrategy_Client;
 begin
@@ -765,14 +758,187 @@ begin
   Result := (LSynchroStrategy_Client <> nil) and LSynchroStrategy_Client.IsToBeSynchronized(Self);
 end;
 
-function TioContext.IsTrueClass: Boolean;
+function TioContext_Custom.IsTrueClass: Boolean;
 begin
-  Result := Self.GetTable.IsTrueClass and ((not Assigned(FPSRequest.Where)) or (not FPSRequest.Where.GetDisableStrictlyTrueClass));
+  Result := Self.GetTable.IsTrueClass and ((not Assigned(Where)) or (not Where.GetDisableStrictlyTrueClass));
 end;
 
-function TioContext.Map: IioMap;
+function TioContext_Custom.Map: IioMap;
 begin
   Result := FMap;
+end;
+
+{ TioContext_PSRequest }
+
+constructor TioContext_PSRequest.Create_PSRequest(const APSRequest: IioPersistenceStrategyRequest; const AMap: IioMap);
+begin
+  inherited CreateByMap(AMap);
+  FPSRequest := APSRequest;
+end;
+
+function TioContext_PSRequest.GetBlindLevel: Byte;
+begin
+  Result := FPSRequest.BlindLevel;
+end;
+
+function TioContext_PSRequest.GetConnectionNameResolved: String;
+begin
+  Result := GetTable.GetTableConnectionNameIfEmpty(FPSRequest.Connection);
+end;
+
+function TioContext_PSRequest.GetDataObject: TObject;
+begin
+  Result := FPSRequest.DataObj;
+end;
+
+function TioContext_PSRequest.GetIntentType: TioPersistenceIntentType;
+begin
+  Result := FPSRequest.IntentType;
+end;
+
+function TioContext_PSRequest.GetMasterBSPersistence: TioBSPersistence;
+begin
+  Result := FPSRequest.MasterBSPersistence;
+end;
+
+function TioContext_PSRequest.GetMasterPropertyName: String;
+begin
+  result := FPSRequest.MasterPropName;
+end;
+
+function TioContext_PSRequest.GetMasterPropertyPath: String;
+begin
+  Result := FPSRequest.MasterPropertyPath + IfThen(FPSRequest.MasterPropertyName.IsEmpty, '', '.') + FPSRequest.MasterPropertyName;
+end;
+
+function TioContext_PSRequest.GetPSRequest: IioPersistenceStrategyRequest;
+begin
+  Result := FPSRequest;
+end;
+
+function TioContext_PSRequest.GetRelationOID: Integer;
+begin
+  Result := FPSRequest.RelationOID;
+end;
+
+function TioContext_PSRequest.GetWhere: IioWhere;
+begin
+  Result := FPSRequest.Where;
+end;
+
+procedure TioContext_PSRequest.SetBlindLevel(const Value: Byte);
+begin
+  FPSRequest.BlindLevel := Value;
+end;
+
+procedure TioContext_PSRequest.SetDataObject(const AValue: TObject);
+begin
+  FPSRequest.DataObj := AValue;
+end;
+
+procedure TioContext_PSRequest.SetIntentType(const Value: TioPersistenceIntentType);
+begin
+  FPSRequest.IntentType := Value;
+end;
+
+procedure TioContext_PSRequest.SetRelationOID(const Value: Integer);
+begin
+  FPSRequest.RelationOID := Value;
+end;
+
+procedure TioContext_PSRequest.SetWhere(const AWhere: IioWhere);
+begin
+  FPSRequest.Where := AWhere;
+end;
+
+{ TioContext_Simple }
+
+constructor TioContext_Simple.Create_Simple(const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const AMap: IioMap; const AWhere: IioWhere;
+  const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
+begin
+  inherited CreateByMap(AMap);
+  FIntentType := AIntent;
+  FBlindLevel := ABlindLevel;
+  FWhere := AWhere;
+  FDataObject := ADataObject;
+  FMasterBSPersistence := AMasterBSPersistence;
+  FMasterPropertyName := AMasterPropertyName;
+  FMasterPropertyPath := AMasterPropertyPath + IfThen(AMasterPropertyName.IsEmpty, '', '.') + AMasterPropertyName;
+end;
+
+function TioContext_Simple.GetBlindLevel: Byte;
+begin
+  Result := FBlindLevel;
+end;
+
+function TioContext_Simple.GetConnectionNameResolved: String;
+begin
+  Result := GetTable.GetTableConnectionNameIfEmpty(TioApplication.SessionDataStore.GetCurrentConnectionName);
+end;
+
+function TioContext_Simple.GetDataObject: TObject;
+begin
+  Result := FDataObject;
+end;
+
+function TioContext_Simple.GetIntentType: TioPersistenceIntentType;
+begin
+  Result := FIntentType;
+end;
+
+function TioContext_Simple.GetMasterBSPersistence: TioBSPersistence;
+begin
+  Result := FMasterBSPersistence;
+end;
+
+function TioContext_Simple.GetMasterPropertyName: String;
+begin
+  Result := FMasterPropertyName;
+end;
+
+function TioContext_Simple.GetMasterPropertyPath: String;
+begin
+  Result := FMasterPropertyPath;
+end;
+
+function TioContext_Simple.GetPSRequest: IioPersistenceStrategyRequest;
+begin
+  raise EioGenericException.Create(ClassName, 'GetPSRequest', 'Persistence Strategy Request property does not work for this class');
+end;
+
+function TioContext_Simple.GetRelationOID: Integer;
+begin
+  Result := FRelationOID;
+end;
+
+function TioContext_Simple.GetWhere: IioWhere;
+begin
+  Result := FWhere;
+end;
+
+procedure TioContext_Simple.SetBlindLevel(const Value: Byte);
+begin
+  FBlindLevel := Value;
+end;
+
+procedure TioContext_Simple.SetDataObject(const AValue: TObject);
+begin
+  FDataObject := Value;
+end;
+
+procedure TioContext_Simple.SetIntentType(const Value: TioPersistenceIntentType);
+begin
+  FIntentType := Value;
+end;
+
+procedure TioContext_Simple.SetRelationOID(const Value: Integer);
+begin
+  FRelationOID := Value;
+end;
+
+procedure TioContext_Simple.SetWhere(const AWhere: IioWhere);
+begin
+  FWhere := Value;
 end;
 
 end.

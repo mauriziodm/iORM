@@ -182,7 +182,7 @@ class procedure TioEtmEngine._ObjVersionToNegativeRevertIntent(const AObj: TObje
 var
   LContext: IioContext;
 begin
-  LContext := TioContextFactory.Context(itRevert, AObj.ClassName, nil, AObj, nil, '', '', BL_DEFAULT);
+  LContext := TioContextFactory.Context_Simple(itRevert, BL_DEFAULT, AObj.ClassName, nil, AObj, nil, '', '');
   if LContext.ObjVersion > 0 then
     LContext.ObjVersion := -LContext.ObjVersion;
 end;
@@ -212,7 +212,7 @@ begin
   Result := _InternalBuildTimeLineWhere(AClassName);
 end;
 
-class function TioEtmEngine.FluentTimelineFor<T>: IioWhere<TioEtmCustomTimeSlot>;                                     tu
+class function TioEtmEngine.FluentTimelineFor<T>: IioWhere<TioEtmCustomTimeSlot>;
 begin
   Result := _InternalBuildTimeLineWhere(T.ClassName);
 end;

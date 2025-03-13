@@ -42,7 +42,6 @@ type
 
   TioAuthSessionData = class(TInterfacedObject, IioAuthSessionData)
   private
-  private
     // app
     FApp: String;
     FAppOID: Integer;

@@ -117,7 +117,8 @@ type
 
   IioContextCache = interface
     ['{FAFBB27B-3E84-4D23-8801-3C863FA3556B}']
-    function GetContext(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData): IioContext;
+    function GetContext(const APSRequest: IioPersistenceStrategyRequest; const AClassName: String): IioContext;
+//    function GetContext(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData): IioContext;
   end;
 
   TioContextCache = class(TInterfacedObject, IioContextCache)
@@ -127,6 +128,7 @@ type
     constructor Create;
     destructor Destroy; override;
     function GetContext(const APSRequest: IioPersistenceStrategyRequest; const AClassName: String): IioContext;
+//    function GetContext(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData): IioContext;
   end;
 
 { TioStrategyDB }
@@ -178,7 +180,7 @@ var
     AQuery := TioDBFactory.QueryEngine.GetQueryCount(LContext);
     AQuery.Open;
     try
-      Result := Result + AQuery.Fields[0].AsInteger;
+      APSRequest.ResultAsInteger := APSRequest.ResultAsInteger + AQuery.Fields[0].AsInteger;
     finally
       AQuery.Close;
     end;
@@ -195,7 +197,7 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LContext := TioContextFactory.Context(APSRequest, LResolvedTypeName);
+      LContext := TioContextFactory.Context_PSRequest(APSRequest, LResolvedTypeName);
       // If the object is of a class mapped as NotPersisted then continue
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Exit;
@@ -239,7 +241,7 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LContext := TioContextFactory.Context(APSRequest, LResolvedTypeName);
+      LContext := TioContextFactory.Context_PSRequest(APSRequest, LResolvedTypeName);
       // If the object is of a class mapped as NotPersisted then skip it
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
@@ -307,7 +309,7 @@ begin
   if not Assigned(APSRequest.DTO) then
     Exit;
   // Create Context (Create a dummy ioWhere first to pass ConnectionName parameter only).
-  LContext := TioContextFactory.Context(APSRequest, APSRequest.DTO.ClassName);
+  LContext := TioContextFactory.Context_PSRequest(APSRequest, APSRequest.DTO.ClassName);
   LContext.ActionType := atDelete;
   // If the object is of a class mapped as NotPersisted then exit
   if LContext.Map.GetTable.IsNotPersistedEntity then
@@ -391,11 +393,11 @@ var
   LPayload: TioCustomSynchroStrategy_Payload;
 begin
   LPayload := APSRequest.Obj1 as TioCustomSynchroStrategy_Payload;
-  APayload.Initialize;
-  APayload.LoadFromClient;
-  APayload.PersistAndReloadFromServer;
-  APayload.PersistToClient;
-  APayload.Finalize;
+  LPayload.Initialize;
+  LPayload.LoadFromClient;
+  LPayload.PersistAndReloadFromServer;
+  LPayload.PersistToClient;
+  LPayload.Finalize;
 end;
 
 class procedure TioPersistenceStrategyDB.InsertObject_Internal(const AContext: IioContext);
@@ -445,11 +447,11 @@ begin
   begin
     AContext.ObjVersion := AContext.ObjNextVersion;
     AContext.ObjCreated := LQuery.Connection.LastTransactionTimestamp;
-    AContext.ObjCreatedUserID := TioConnectionManager.GetCurrentSession.UserID;
-    AContext.ObjCreatedUserName := TioConnectionManager.GetCurrentSession.UserName;
+    AContext.ObjCreatedUserID := AContext.PSREquest.UsrOID;
+    AContext.ObjCreatedUserName := AContext.PSREquest.Usr;
     AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;
-    AContext.ObjUpdatedUserID := TioConnectionManager.GetCurrentSession.UserID;
-    AContext.ObjUpdatedUserName := TioConnectionManager.GetCurrentSession.UserName;
+    AContext.ObjUpdatedUserID := AContext.PSREquest.UsrOID;
+    AContext.ObjUpdatedUserName := AContext.PSREquest.Usr;
   end;
   // -----------------------------------------------------------
   // Get and execute a query to retrieve the last ID generated
@@ -488,7 +490,7 @@ var
   LQuery: IioQuery;
 begin
   // Get the Context
-  LContext := TioContextFactory.Context(APSRequest, APSRequest.Where.TypeName);
+  LContext := TioContextFactory.Context_PSRequest(APSRequest, APSRequest.Where.TypeName);
   // If the object is of a class mapped as NotPersisted then skip it
   if LContext.Map.GetTable.IsNotPersistedEntity then
     Exit;
@@ -595,7 +597,7 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LContext := TioContextFactory.Context(APSRequest, LResolvedTypeName);
+      LContext := TioContextFactory.Context_PSRequest(APSRequest, LResolvedTypeName);
       // If the object is of a class mapped as NotPersisted then continue
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Exit;
@@ -646,7 +648,7 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LContext := TioContextFactory.Context(APSRequest, LResolvedTypeName);
+      LContext := TioContextFactory.Context_PSRequest(APSRequest, LResolvedTypeName);
       // If the object is of a class mapped as NotPersisted then continue
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Exit;
@@ -797,7 +799,7 @@ begin
   if not Assigned(APSRequest.DTO) then
     Exit;
   // Create Context
-  LContext := TioContextFactory.Context(APSRequest, APSRequest.DTO.ClassName);
+  LContext := TioContextFactory.Context_PSRequest(APSRequest, APSRequest.DTO.ClassName);
   // If the object is of a class mapped as NotPersisted then exit
   if LContext.Map.GetTable.IsNotPersistedEntity then
     Exit;
@@ -1071,7 +1073,7 @@ begin
     for LResolvedTypeName in LResolvedTypeList do
     begin
       // Get the Context for the current ResolverTypeName
-      LContext := TioContextFactory.Context(APSRequest, LResolvedTypeName);
+      LContext := TioContextFactory.ContextByPSRequest(APSRequest, LResolvedTypeName);
       // If the object is of a class mapped as NotPersisted then skip it
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
@@ -1094,6 +1096,7 @@ var
   LResolvedTypeList: IioResolvedTypeList;
   LResolvedTypeName: String;
   LOriginalContext: IioContext;
+  // TODO: Non potrei usarlo anche in PersistList, DeleteList ecc.?
   LContextCache: IioContextCache;
   LTransactionCollection: IioTransactionCollection;
   LDuckTypedList: IioDuckTypedList;
@@ -1215,7 +1218,7 @@ var
           // If TrueClassMode is tvSmart then get the specific context for the current record/object else
           // use the original context
           if LOriginalContext.GetTrueClass.Mode = tcSmart then
-            LCurrentContext := TioContextFactory.Context(APSRequest, LQuery.ExtractTrueClassName(LOriginalContext))
+            LCurrentContext := TioContextFactory.ContextByPSRequest(APSRequest, LQuery.ExtractTrueClassName(LOriginalContext))
           else
             LCurrentContext := LOriginalContext;
           // Create the object as TObject (Intercepted by CRUDInterceptors)
@@ -1337,7 +1340,7 @@ function TioContextCache.GetContext(const APSRequest: IioPersistenceStrategyRequ
 begin
   // If the map is not already present in the cache then create and add it
   if not FContainer.ContainsKey(AClassName) then
-    FContainer.Add(AClassName, TioContextFactory.Context(APSRequest, AClassName));
+    FContainer.Add(AClassName, TioContextFactory.ContextByPSRequest(APSRequest, AClassName));
   // Return the requested context and set its DataObject to nil
   Result := FContainer.Items[AClassName];
   Result.DataObject := nil;
