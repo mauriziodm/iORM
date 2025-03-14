@@ -38,7 +38,7 @@ interface
 uses
   System.Classes, iORM.SynchroStrategy.Interfaces, iORM.Attributes, DJSON.Attributes,
   System.SysUtils, iORM.CommonTypes, iORM.Context.Interfaces,
-  iORM.Auth.Interfaces, iORM.PersistenceStrategy.Interfaces;
+  iORM.Auth.Interfaces, iORM.PersistenceStrategy.Interfaces, iORM.Abstraction;
 
 type
 
@@ -189,7 +189,7 @@ type
     property SynchroLogItem_New: TioCustomSynchroStrategy_LogItem read FSynchroLogItem_New write FSynchroLogItem_New;
     property SynchroLogName: String read FSynchroLogName write FSynchroLogName;
     property TargetConnectionDefName: String read FTargetConnectionDefName write FTargetConnectionDefName;
-    property SessionData: IioAuthSessionData read FSessionData;
+    property SessionData: IioAuthSessionData read FSessionData write FSessionData;
     // TimeSlot finalization mode
     property EtmTimeSlot_Delete_SentToServer: Boolean read FEtmTimeSlot_Delete_SentToServer write FEtmTimeSlot_Delete_SentToServer;
     property EtmTimeSlot_Update_SentToServer: Boolean read FEtmTimeSlot_Update_SentToServer write FEtmTimeSlot_Update_SentToServer;
@@ -304,7 +304,7 @@ type
 implementation
 
 uses
-  iORM, iORM.PersistenceStrategy.Factory, iORM.DB.Interfaces, iORM.Abstraction,
+  iORM, iORM.PersistenceStrategy.Factory, iORM.DB.Interfaces,
   iORM.Exceptions, iORM.DB.Factory, iORM.LiveBindings.BSPersistence;
 
 { TioCustomSynchroStrategy_Client }
@@ -462,7 +462,7 @@ begin
   APayload.SynchroLevel := ASynchroLevel;
   APayload.SynchroLogName := FSynchroLogName;
   // SessionData
-  APayLoad.SessionData := TioApplication.CloneSessionData;
+  APayLoad.SessionData := TioApplication.SessionDataStore.CloneSessionData;
   // Black & White class list
   for LClassName in FEntities_BlackList do
     APayload.ClassBlackList.Add(LClassName);

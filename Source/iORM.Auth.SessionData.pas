@@ -158,7 +158,7 @@ begin
   Result.User := FUser;
   Result.UserOID := FUserOID;
   // connection
-  Result.ConnectionLocal := FConnection;
+  Result.Connection := FConnection;
   Result.ConnectionRemote := FConnectionRemote;
   // refresh token
   Result.RefreshToken := FRefreshToken;

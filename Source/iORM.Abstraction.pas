@@ -92,6 +92,7 @@ type
     // main session data
     class function AcquireSessionData: IioAuthSessionData;
     class procedure ClearSessionData;
+    class function CloneSessionData_ThreadSafe: IioAuthSessionData;
     class procedure ReleaseSessionData;
     // thread session data
     class function ThreadAcquireSessionData: IioAuthSessionData;
@@ -533,6 +534,16 @@ begin
   end;
 end;
 
+class function TioCustomSessionDataStore.CloneSessionData_ThreadSafe: IioAuthSessionData;
+begin
+  _Lock;
+  try
+    Result := _GetMainSessionData.Clone;
+  finally
+    _Unlock;
+  end;
+end;
+
 class constructor TioCustomSessionDataStore.Create;
 begin
   _Initialize;
@@ -662,7 +673,7 @@ begin
   try
     LSessionData.Connection := AConnectionName;
   finally
-    TioApplication.SessionDataStore.ThreadReleaseSessionData;
+    ThreadReleaseSessionData;
   end;
 end;
 
