@@ -46,6 +46,8 @@ type
 
   TioSynchroErrorState = (esOK, esNotCompleted, esConflict, esError);
 
+  TioSynchroClientOrServerSide = (ssClientSideExec, ssServerSideExec);
+
   TioSynchroStrategy_ClassList = TList<String>;
 
   IioSynchroStrategy_Client = interface

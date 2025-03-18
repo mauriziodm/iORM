@@ -313,7 +313,7 @@ end;
 
 function TioTable.GetTableConnectionNameIfEmpty(const AConnectionName: String): String;
 begin
-  if TioApplication.SessionDataStore._IsEmptyConnectionName(FTableConnectionName_DoNotCallDirectly) then
+  if TioApplication.SessionDataStore.IsEmptyConnectionName(FTableConnectionName_DoNotCallDirectly) then
     Result := AConnectionName
   else
     Result := FTableConnectionName_DoNotCallDirectly;

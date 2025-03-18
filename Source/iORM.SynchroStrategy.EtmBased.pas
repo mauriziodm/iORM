@@ -124,7 +124,7 @@ type
     FEtmTimeSlot_ClassName: String;
     FEtmTimeSlot_Where_Client: IioWhere;
     FEtmTimeSlot_Where_Server: IioWhere;
-    FPayloadData: TioEtmTimeline;
+    FTimelinePayloadData: TioEtmTimeline;
     FTempIdContainer: TioEtmSynchroStrategy_TempIdContainer;
     procedure _BuildBlackAndWhiteListWhere(const AWhere: IioWhere);
     procedure _ClearPayloadData;
@@ -215,7 +215,8 @@ uses
   iORM.DB.Interfaces, iORM.DB.Factory, iORM.Exceptions,
   iORM.Context.Map.Interfaces, iORM.Context.Container,
   iORM.DB.ConnectionContainer, iORM.Where.Factory, iORM.Utilities,
-  iORM.LiveBindings.BSPersistence, DJSON, DJSON.Params, iORM.Resolver.Factory;
+  iORM.LiveBindings.BSPersistence, DJSON, DJSON.Params, iORM.Resolver.Factory,
+  iORM.PersistenceStrategy.Interfaces, iORM.PersistenceStrategy.Factory;
 
 { TioEtmBasetSynchroStrategy_LogItem }
 
@@ -239,13 +240,13 @@ begin
   FEtmTimeSlot_ClassName := String.Empty;
   FEtmTimeSlot_Where_Client := nil;
   FEtmTimeSlot_Where_Server := nil;
-  FPayloadData := TioEtmTimeline.Create;
+  FTimelinePayloadData := TioEtmTimeline.Create;
   FTempIdContainer := TioEtmSynchroStrategy_TempIdContainer.Create;
 end;
 
 destructor TioEtmSynchroStrategy_Payload.Destroy;
 begin
-  FPayloadData.Free;
+  FTimelinePayloadData.Free;
   FTempIdContainer.Free;
   inherited;
 end;
@@ -276,6 +277,7 @@ procedure TioEtmSynchroStrategy_Payload._InternalPersistObjToServer(const AObj: 
 var
   LMap: IioMap;
   LNewID, LOldID: Integer;
+  LPSRequest: IioPersistenceStrategyRequest;
   procedure _CheckForTemporaryBelongsToID;
   var
     LChildMap: IioMap;
@@ -321,7 +323,8 @@ begin
   if LOldID < 0 then
     LMap.GetProperties.GetIdProperty.SetValue(AObj, IO_INTEGER_NULL_VALUE);
   // Persist the current object
-  io._PersistObjectInternal(AObj, itSynchro_PersistToServer, '', 0, nil, '', '', BL_SYNCHRO_PERSIST_PAYLOAD_TOSERVER, SessionData);
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_Synchro_PersistObject(Self, ssServerSideExec, AObj, itSynchro_PersistToServer, BL_SYNCHRO_PERSIST_PAYLOAD_TOSERVER);
+  io._ExecutePSRequest(LPSRequest);
   // At this point if the object's ID was temporary (negative) then during persistence
   // it must have been assigned a new one so it re-reads it and add it
   // in the appropriate temporary ID container.
@@ -338,7 +341,7 @@ end;
 
 procedure TioEtmSynchroStrategy_Payload._ClearPayloadData;
 begin
-  FPayloadData.Count := 0;
+  FTimelinePayloadData.Count := 0;
 end;
 
 procedure TioEtmSynchroStrategy_Payload._DoOldSynchroLogItem_LoadFromClient;
@@ -368,6 +371,7 @@ end;
 
 procedure TioEtmSynchroStrategy_Payload._DoLoadPayloadFromClient;
 var
+  LPSRequest: IioPersistenceStrategyRequest;
   LSynchroLogItem_New: TioEtmSynchroStrategy_LogItem;
   LWhere: IioWhere;
 begin
@@ -385,21 +389,24 @@ begin
     LWhere._And(FEtmTimeSlot_Where_Client);
   // OrderBy
   LWhere._OrderBy('[.ID] ASC');
-  // Load objects to be synchronized
+  // TypeName
   LWhere.TypeName := FEtmTimeSlot_ClassName;
-  LWhere.ToList(FPayloadData);
+  // Create the persistence strategy request and execute it
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_Synchro_LoadList(Self, ssClientSideExec, LWhere, FTimelinePayloadData);
+  io._ExecutePSRequest(LPSRequest);
   // Update SynchroLogItem (cast the SynchroLogItem to the specialized etm based class)
   LSynchroLogItem_New := Self.SynchroLogItem_New as TioEtmSynchroStrategy_LogItem;
-  LSynchroLogItem_New.CliToSrv_Count := FPayloadData.Count;
-  if FPayloadData.Count > 0 then
+  LSynchroLogItem_New.CliToSrv_Count := FTimelinePayloadData.Count;
+  if FTimelinePayloadData.Count > 0 then
   begin
-    LSynchroLogItem_New.CliToSrv_TimeSlotID_From := FPayloadData.First.ID;
-    LSynchroLogItem_New.CliToSrv_TimeSlotID_To := FPayloadData.Last.ID;
+    LSynchroLogItem_New.CliToSrv_TimeSlotID_From := FTimelinePayloadData.First.ID;
+    LSynchroLogItem_New.CliToSrv_TimeSlotID_To := FTimelinePayloadData.Last.ID;
   end;
 end;
 
 procedure TioEtmSynchroStrategy_Payload._DoReloadPayloadFromServer;
 var
+  LPSRequest: IioPersistenceStrategyRequest;
   LSynchroLogItem_New: TioEtmSynchroStrategy_LogItem;
   LTimeSlotMaxID: Integer;
   LWhere: IioWhere;
@@ -422,14 +429,16 @@ begin
     LWhere._And(FEtmTimeSlot_Where_Server);
   // OrderBy (DESC because it load timeslots with negative ID)
   LWhere._OrderBy('[.ID] ASC');
-  // Load objects to be synchronized
+  // TypeName
   LWhere.TypeName := FEtmTimeSlot_ClassName;
-  LWhere.ToList(FPayloadData);
+  // Create the persistence strategy request and execute it
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_Synchro_LoadList(Self, ssServerSideExec, LWhere, FTimelinePayloadData);
+  io._ExecutePSRequest(LPSRequest);
   // Update SynchroLogItem (cast the SynchroLogItem to the specialized etm based class)
   LSynchroLogItem_New.EtmWhereSrv := LWhere;
-  LSynchroLogItem_New.SrvToCli_Count := FPayloadData.Count;
-  if FPayloadData.Count > 0 then
-    LSynchroLogItem_New.SrvToCli_TimeSlotID_To := FPayloadData.Last.ID
+  LSynchroLogItem_New.SrvToCli_Count := FTimelinePayloadData.Count;
+  if FTimelinePayloadData.Count > 0 then
+    LSynchroLogItem_New.SrvToCli_TimeSlotID_To := FTimelinePayloadData.Last.ID
   else
     LSynchroLogItem_New.SrvToCli_TimeSlotID_To := LSynchroLogItem_New.SrvToCli_TimeSlotID_From;
 end;
@@ -459,8 +468,9 @@ end;
 
 procedure TioEtmSynchroStrategy_Payload._DoPersistPayloadToClient;
 var
-  LObj: TObject;
   LEtmTimeSlot: TioEtmCustomTimeSlot;
+  LObj: TObject;
+  LPSRequest: IioPersistenceStrategyRequest;
 begin
   inherited;
   io.StartTransaction;
@@ -469,7 +479,7 @@ begin
     FTempIdContainer.DeleteObjectsWithTemporaryID;
     FTempIdContainer.UpdateEtmTimeSlotsWithTemporaryID(FEtmTimeSlot_ClassName);
     // Loop for all TimeSlots to be synchronized and revert and finally persist each of them
-    for LEtmTimeSlot in FPayloadData do
+    for LEtmTimeSlot in FTimelinePayloadData do
     begin
       LObj := io.ETM.RevertObject(LEtmTimeSlot, False);
       try
@@ -477,9 +487,17 @@ begin
           Continue;
         case LEtmTimeSlot.ActionType of
           atInsert, atUpdate:
-            io._PersistObjectInternal(LObj, itSynchro_PersistToClient, '', 0, nil, '', '', BL_SYNCHRO_PERSIST_PAYLOAD_TOCLIENT, SessionData);
+            begin
+              // Persist the current object (create the persistence strategy request and execute it)
+              LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_Synchro_PersistObject(Self, ssClientSideExec, LObj, itSynchro_PersistToClient, BL_SYNCHRO_PERSIST_PAYLOAD_TOCLIENT);
+              io._ExecutePSRequest(LPSRequest);
+            end;
           atDelete:
-            io._DeleteObjectInternal(LObj, itSynchro_PersistToClient, BL_SYNCHRO_PERSIST_PAYLOAD_TOCLIENT, SessionData);
+            begin
+              // Delete the current object (create the persistence strategy request and execute it)
+              LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_Synchro_DeleteObject(Self, ssClientSideExec, LObj, itSynchro_PersistToClient, BL_SYNCHRO_PERSIST_PAYLOAD_TOCLIENT);
+              io._ExecutePSRequest(LPSRequest);
+          end;
         end;
       finally
         FreeAndNil(LObj);
@@ -494,15 +512,16 @@ end;
 
 procedure TioEtmSynchroStrategy_Payload._DoPersistPayloadToServer;
 var
-  LObj: TObject;
   LEtmTimeSlot: TioEtmCustomTimeSlot;
+  LObj: TObject;
+  LPSRequest: IioPersistenceStrategyRequest;
 begin
   inherited;
   // Loop for all TimeSlots to be synchronized and revert and finally persist each of them
   io.StartTransaction;
   try
     LObj := nil;
-    for LEtmTimeSlot in FPayloadData do
+    for LEtmTimeSlot in FTimelinePayloadData do
     begin
       LObj := io.ETM.RevertObject(LEtmTimeSlot, False);
       try
@@ -512,7 +531,11 @@ begin
           atInsert, atUpdate:
             _InternalPersistObjToServer(LObj);
           atDelete:
-            io._DeleteObjectInternal(LObj, itSynchro_PersistToServer, BL_SYNCHRO_PERSIST_PAYLOAD_TOSERVER);
+            begin
+              // Delete the current object (create the persistence strategy request and execute it)
+              LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_Synchro_DeleteObject(Self, ssServerSideExec, LObj, itSynchro_PersistToServer, BL_SYNCHRO_PERSIST_PAYLOAD_TOSERVER);
+              io._ExecutePSRequest(LPSRequest);
+            end;
         end;
       finally
         FreeAndNil(LObj);

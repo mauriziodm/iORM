@@ -47,9 +47,7 @@ type
   // Strategy class for database
   TioPersistenceStrategyHttp = class(TioPersistenceStrategyIntf)
   private
-    class procedure _Execute(const APSRequest: IioPersistenceStrategyRequest); static; inline;
-    class procedure _Execute_DataSetResult(const APSRequest: IioPersistenceStrategyRequest); static; inline;
-    class procedure _Execute_IntegerResult(const APSRequest: IioPersistenceStrategyRequest); static; inline;
+    class function _InternalExecute(const APSRequest: IioPersistenceStrategyRequest): IioHttpResponseBody; static; inline;
   protected
     // ========== BEGIN OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
     // persistence
@@ -100,13 +98,18 @@ uses
 { TioStrategyHttp }
 
 class procedure TioPersistenceStrategyHttp._DoLoadCount(const APSRequest: IioPersistenceStrategyRequest);
+var
+  LResponse: IioHttpResponseBody;
 begin
-  _Execute_IntegerResult(APSRequest);
+  // Execute
+  LResponse := _InternalExecute(APSRequest);
+  // load the result
+  APSRequest.ResultAsInteger := LResponse.JSONDataValue.AsType<Integer>;
 end;
 
 class procedure TioPersistenceStrategyHttp._DoDelete(const APSRequest: IioPersistenceStrategyRequest);
 begin
-  _Execute(APSRequest);
+  _InternalExecute(APSRequest);
 end;
 
 class procedure TioPersistenceStrategyHttp._DoSynchronization(const APSRequest: IioPersistenceStrategyRequest);
@@ -129,7 +132,7 @@ begin
   LPayload.Finalize;
 end;
 
-class procedure TioPersistenceStrategyHttp._Execute(const APSRequest: IioPersistenceStrategyRequest);
+class function TioPersistenceStrategyHttp._InternalExecute(const APSRequest: IioPersistenceStrategyRequest): IioHttpResponseBody;
 var
   LConnection: IioConnectionHttp;
 begin
@@ -142,50 +145,7 @@ begin
   LConnection.StartTransaction;
   try
     LConnection.Execute(APSRequest);
-    LConnection.Commit;
-  except
-    LConnection.Rollback;
-    raise;
-  end;
-end;
-
-class procedure TioPersistenceStrategyHttp._Execute_DataSetResult(const APSRequest: IioPersistenceStrategyRequest);
-var
-  LConnection: IioConnectionHttp;
-begin
-  // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(APSRequest.Connection).AsHttpConnection;
-  // Start transaction
-  // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
-  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any http call to the server at this point.
-  LConnection.StartTransaction;
-  try
-    LConnection.Execute(APSRequest);
-    // Load the detination dataset
-    (APSRequest.Obj1 as TFDDataSet).LoadFromStream(LConnection.ioResponseBody.Stream, TFDStorageFormat.sfJSON);
-    LConnection.Commit;
-  except
-    LConnection.Rollback;
-    raise;
-  end;
-end;
-
-class procedure TioPersistenceStrategyHttp._Execute_IntegerResult(const APSRequest: IioPersistenceStrategyRequest);
-var
-  LConnection: IioConnectionHttp;
-begin
-  // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(APSRequest.Connection).AsHttpConnection;
-  // Start transaction
-  // NB: In this strategy (HTTP) call the Connection.StartTransaction (not the Self.StartTransaction
-  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any http call to the server at this point.
-  LConnection.StartTransaction;
-  try
-    LConnection.Execute(APSRequest);
-    // Load the result
-    APSRequest.ResultAsInteger := LConnection.ioResponseBody.JSONDataValue.AsType<Integer>;
+    Result := LConnection.ioResponseBody;
     LConnection.Commit;
   except
     LConnection.Rollback;
@@ -194,106 +154,59 @@ begin
 end;
 
 class procedure TioPersistenceStrategyHttp._DoDeleteList(const APSRequest: IioPersistenceStrategyRequest);
-var
-  LConnection: IioConnectionHttp;
 begin
   // Check
   if not Assigned(APSRequest.ListDTO) then
     Exit;
-  // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(APSRequest.Connection).AsHttpConnection;
-  // Start transaction
-  // NB: In this strategy (HTTP) call the Connection.StartTransaction (not the Self.StartTransaction
-  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any http call to the server at this point.
-  LConnection.StartTransaction;
-  try
-    LConnection.Execute(APSRequest);
-    LConnection.Commit;
-  except
-    LConnection.Rollback;
-    raise;
-  end;
+  // Execute
+  _InternalExecute(APSRequest);
 end;
 
 class procedure TioPersistenceStrategyHttp._DoDeleteObject(const APSRequest: IioPersistenceStrategyRequest);
-var
-  LConnection: IioConnectionHttp;
 begin
   // Check
   if not Assigned(APSRequest.DTO) then
     Exit;
-  // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(APSRequest.Connection).AsHttpConnection;
-  // Start transaction
-  // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
-  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any http call to the server at this point.
-  LConnection.StartTransaction;
-  try
-    LConnection.Execute(APSRequest);
-    LConnection.Commit;
-  except
-    LConnection.Rollback;
-    raise;
-  end;
+  // Execute
+  _InternalExecute(APSRequest);
 end;
 
 class procedure TioPersistenceStrategyHttp._DoLoadDataSet(const APSRequest: IioPersistenceStrategyRequest);
+var
+  LResponse: IioHttpResponseBody;
 begin
-  _Execute_DataSetResult(APSRequest);
+  // Execute
+  LResponse := _InternalExecute(APSRequest);
+  // load the result dataset into the destination dataset
+  (APSRequest.Obj1 as TFDDataSet).LoadFromStream(LResponse.Stream, TFDStorageFormat.sfJSON);
 end;
 
 class procedure TioPersistenceStrategyHttp._DoLoadList(const APSRequest: IioPersistenceStrategyRequest);
 var
-  LConnection: IioConnectionHttp;
+  LResponse: IioHttpResponseBody;
 begin
-  // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(APSRequest.Connection).AsHttpConnection;
-  // Start transaction
-  // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
-  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any http call to the server at this point.
-  LConnection.StartTransaction;
-  try
-    LConnection.Execute(APSRequest);
-    // Deserialize  the JSONDataValue to the result object
-    // NB: Mauri 15/08/2023 (fix issue with paging when using http connection):
-    //      Ho eliminato il "ClearCollection" dalla chiamata a DJSON perchè altrimenti non funzionava bene
-    //      il paging ti tipo progressive. In questo modo invece sembra funzionare bene. Spero che la cosa non causi problemi
-    //      in altri contesti. Lascio anche a vecchia versione commentata, poi vedremo.
-//    dj.FromJSON(LConnection.ResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(List); // OLD CODE
-    dj.FromJSON(LConnection.ioResponseBody.JSONDataValue).OpType(ssHTTP).byFields.TypeAnnotationsON.&To(APSRequest.ListDTO);
-    LConnection.Commit;
-  except
-    LConnection.Rollback;
-    raise;
-  end;
+  // Execute
+  LResponse := _InternalExecute(APSRequest);
+  // Deserialize  the JSONDataValue to the result object
+  // NB: Mauri 15/08/2023 (fix issue with paging when using http connection):
+  //      Ho eliminato il "ClearCollection" dalla chiamata a DJSON perchè altrimenti non funzionava bene
+  //      il paging ti tipo progressive. In questo modo invece sembra funzionare bene. Spero che la cosa non causi problemi
+  //      in altri contesti. Lascio anche a vecchia versione commentata, poi vedremo.
+//  dj.FromJSON(LConnection.ResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(List); // OLD CODE
+  dj.FromJSON(LResponse.JSONDataValue).OpType(ssHTTP).byFields.TypeAnnotationsON.&To(APSRequest.ListDTO);
 end;
 
 class procedure TioPersistenceStrategyHttp._DoLoadObject(const APSRequest: IioPersistenceStrategyRequest);
 var
-  LConnection: IioConnectionHttp;
+  LResponse: IioHttpResponseBody;
 begin
-  // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(APSRequest.Connection).AsHttpConnection;
-  // Start transaction
-  // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
-  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any http call to the server at this point.
-  LConnection.StartTransaction;
-  try
-    LConnection.Execute(APSRequest);
-    // Deserialize  the JSONDataValue to the result object
-    if Assigned(APSRequest.DTO) then
-      dj.FromJSON(LConnection.ioResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(APSRequest.DTO)
-    else
-      APSRequest.DTO := dj.FromJSON(LConnection.ioResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.ToObject;
-    LConnection.Commit;
-  except
-    LConnection.Rollback;
-    raise;
-  end;
+  // Execute
+  LResponse := _InternalExecute(APSRequest);
+  // Deserialize  the JSONDataValue to the result object
+  if Assigned(APSRequest.DTO) then
+    dj.FromJSON(LResponse.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(APSRequest.DTO)
+  else
+    APSRequest.DTO := dj.FromJSON(LResponse.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.ToObject;
 end;
 
 class procedure TioPersistenceStrategyHttp._DoLoadObjectByClassOnly(const APSRequest: IioPersistenceStrategyRequest);
@@ -309,75 +222,66 @@ begin
 end;
 
 class procedure TioPersistenceStrategyHttp._DoLoadMax(const APSRequest: IioPersistenceStrategyRequest);
+var
+  LResponse: IioHttpResponseBody;
 begin
-  _Execute_IntegerResult(APSRequest);
+  // Execute
+  LResponse := _InternalExecute(APSRequest);
+  // load the result
+  APSRequest.ResultAsInteger := LResponse.JSONDataValue.AsType<Integer>;
 end;
 
 class procedure TioPersistenceStrategyHttp._DoLoadMin(const APSRequest: IioPersistenceStrategyRequest);
+var
+  LResponse: IioHttpResponseBody;
 begin
-  _Execute_IntegerResult(APSRequest);
+  // Execute
+  LResponse := _InternalExecute(APSRequest);
+  // load the result
+  APSRequest.ResultAsInteger := LResponse.JSONDataValue.AsType<Integer>;
 end;
 
 class procedure TioPersistenceStrategyHttp._DoPersistList(const APSRequest: IioPersistenceStrategyRequest);
 var
-  LConnection: IioConnectionHttp;
+  LResponse: IioHttpResponseBody;
 begin
   // Check
   if not Assigned(APSRequest.ListDTO) then
     Exit;
-  // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(APSRequest.Connection).AsHttpConnection;
-  // Start transaction
-  // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
-  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any http call to the server at this point.
-  LConnection.StartTransaction;
-  try
-    LConnection.Execute(APSRequest);
-    // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
-    if TioUtilities.BlindLevel_Do_AutoUpdateProps(APSRequest.BlindLevel) then
-      dj.FromJSON(LConnection.ioResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(APSRequest.ListDTO);
-    LConnection.Commit;
-  except
-    LConnection.Rollback;
-    raise;
-  end;
+  // Execute
+  LResponse := _InternalExecute(APSRequest);
+  // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
+  if TioUtilities.BlindLevel_Do_AutoUpdateProps(APSRequest.BlindLevel) then
+    dj.FromJSON(LResponse.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(APSRequest.ListDTO);
 end;
 
 class procedure TioPersistenceStrategyHttp._DoPersistObject(const APSRequest: IioPersistenceStrategyRequest);
 var
-  LConnection: IioConnectionHttp;
+  LResponse: IioHttpResponseBody;
 begin
   // Check
   if not Assigned(APSRequest.DTO) then
     Exit;
-  // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(APSRequest.Connection).AsHttpConnection;
-  // Start transaction
-  // NB: In this strategy (REST) call the Connection.StartTransaction (not the Self.StartTransaction
-  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any http call to the server at this point.
-  LConnection.StartTransaction;
-  try
-    LConnection.Execute(APSRequest);
-    // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
-    if TioUtilities.BlindLevel_Do_AutoUpdateProps(APSRequest.BlindLevel) then
-      dj.FromJSON(LConnection.ioResponseBody.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(APSRequest.DTO);
-    LConnection.Commit;
-  except
-    LConnection.Rollback;
-    raise;
-  end;
+  // Execute
+  LResponse := _InternalExecute(APSRequest);
+  // Deserialize the JSONDataValue to update the object with the IDs (after Insert)
+  if TioUtilities.BlindLevel_Do_AutoUpdateProps(APSRequest.BlindLevel) then
+    dj.FromJSON(LResponse.JSONDataValue).OpType(ssHTTP).byFields.ClearCollection.TypeAnnotationsON.&To(APSRequest.DTO);
 end;
 
 class procedure TioPersistenceStrategyHttp._DoSQLDest_Execute(const APSRequest: IioPersistenceStrategyRequest);
 begin
-  _Execute(APSRequest);
+  _InternalExecute(APSRequest);
 end;
 
 class procedure TioPersistenceStrategyHttp._DoSQLDest_LoadDataSet(const APSRequest: IioPersistenceStrategyRequest);
+var
+  LResponse: IioHttpResponseBody;
 begin
-  _Execute_DataSetResult(APSRequest);
+  // Execute
+  LResponse := _InternalExecute(APSRequest);
+  // load the result dataset into the destination dataset
+  (APSRequest.Obj1 as TFDDataSet).LoadFromStream(LResponse.Stream, TFDStorageFormat.sfJSON);
 end;
 
 class procedure TioPersistenceStrategyHttp._DoStartTransaction(const APSRequest: IioPersistenceStrategyRequest);
@@ -397,46 +301,22 @@ end;
 
 class procedure TioPersistenceStrategyHttp._DoAuth_Access(const APSRequest: IioPersistenceStrategyRequest);
 var
-  LConnection: IioConnectionHttp;
+  LResponse: IioHttpResponseBody;
 begin
-  // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(APSRequest.Connection).AsHttpConnection;
-  // Start transaction
-  // NB: In this strategy (HTTP) call the Connection.StartTransaction (not the Self.StartTransaction
-  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any http call to the server at this point.
-  LConnection.StartTransaction;
-  try
-    LConnection.Execute(APSRequest);
-    // Extract the AuthResponse
-    APSRequest.Intf1 := TioAuthFactory.NewAuthResponseFromString( LConnection.ioResponseBody.AuthResult1 );
-    LConnection.Commit;
-  except
-    LConnection.Rollback;
-    raise;
-  end;
+  // Execute
+  LResponse := _InternalExecute(APSRequest);
+  // Extract the AuthResponse
+  APSRequest.Intf1 := TioAuthFactory.NewAuthResponseFromString(LResponse.AuthResult1);
 end;
 
 class procedure TioPersistenceStrategyHttp._DoAuth_User(const APSRequest: IioPersistenceStrategyRequest);
 var
-  LConnection: IioConnectionHttp;
+  LResponse: IioHttpResponseBody;
 begin
-  // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(APSRequest.Connection).AsHttpConnection;
-  // Start transaction
-  // NB: In this strategy (HTTP) call the Connection.StartTransaction (not the Self.StartTransaction
-  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any http call to the server at this point.
-  LConnection.StartTransaction;
-  try
-    LConnection.Execute(APSRequest);
-    // Extract the AuthResponse
-    APSRequest.Intf1 := TioAuthFactory.NewAuthResponseFromString( LConnection.ioResponseBody.AuthResult1 );
-    LConnection.Commit;
-  except
-    LConnection.Rollback;
-    raise;
-  end;
+  // Execute
+  LResponse := _InternalExecute(APSRequest);
+  // Extract the AuthResponse
+  APSRequest.Intf1 := TioAuthFactory.NewAuthResponseFromString(LResponse.AuthResult1);
 end;
 
 class procedure TioPersistenceStrategyHttp._DoAuth_App(const APSRequest: IioPersistenceStrategyRequest);
@@ -446,46 +326,22 @@ end;
 
 class procedure TioPersistenceStrategyHttp._DoAuth_NewAccessToken(const APSRequest: IioPersistenceStrategyRequest);
 var
-  LConnection: IioConnectionHttp;
+  LResponse: IioHttpResponseBody;
 begin
-  // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(APSRequest.Connection).AsHttpConnection;
-  // Start transaction
-  // NB: In this strategy (HTTP) call the Connection.StartTransaction (not the Self.StartTransaction
-  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any http call to the server at this point.
-  LConnection.StartTransaction;
-  try
-    LConnection.Execute(APSRequest);
-    // Extract the AuthResponse
-    APSRequest.Intf1 := TioAuthFactory.NewAuthResponseFromString( LConnection.ioResponseBody.AuthResult1 );
-    LConnection.Commit;
-  except
-    LConnection.Rollback;
-    raise;
-  end;
+  // Execute
+  LResponse := _InternalExecute(APSRequest);
+  // Extract the AuthResponse
+  APSRequest.Intf1 := TioAuthFactory.NewAuthResponseFromString(LResponse.AuthResult1);
 end;
 
 class procedure TioPersistenceStrategyHttp._DoAuth_RefreshAccessToken(const APSRequest: IioPersistenceStrategyRequest);
 var
-  LConnection: IioConnectionHttp;
+  LResponse: IioHttpResponseBody;
 begin
-  // Get the connection, set the request and execute it
-  LConnection := TioDBFactory.Connection(APSRequest.Connection).AsHttpConnection;
-  // Start transaction
-  // NB: In this strategy (HTTP) call the Connection.StartTransaction (not the Self.StartTransaction
-  // nor io.StartTransaction) because is only for the lifecicle of the connection itself and do not
-  // perform any http call to the server at this point.
-  LConnection.StartTransaction;
-  try
-    LConnection.Execute(APSRequest);
-    // Extract the AuthResponse
-    APSRequest.Intf1 := TioAuthFactory.NewAuthResponseFromString( LConnection.ioResponseBody.AuthResult1 );
-    LConnection.Commit;
-  except
-    LConnection.Rollback;
-    raise;
-  end;
+  // Execute
+  LResponse := _InternalExecute(APSRequest);
+  // Extract the AuthResponse
+  APSRequest.Intf1 := TioAuthFactory.NewAuthResponseFromString(LResponse.AuthResult1);
 end;
 
 class procedure TioPersistenceStrategyHttp._DoInTransaction(const APSRequest: IioPersistenceStrategyRequest);

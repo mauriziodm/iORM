@@ -133,7 +133,7 @@ begin
   // app
   FApp := IO_STRING_NULL_VALUE;
   FAppOID := IO_INTEGER_NULL_VALUE;
-  // connection (note: do not clear the default connection)
+  // connection
   FConnection := IO_STRING_NULL_VALUE;
   FConnectionRemote := IO_STRING_NULL_VALUE;
   // user

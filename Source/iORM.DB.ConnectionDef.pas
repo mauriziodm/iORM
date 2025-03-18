@@ -441,7 +441,7 @@ begin
     // If not in design or load mode the
     // NB: Messo anche qui perchè venga impostata la connessione di default anche a runtime
     if not((csDesigning in ComponentState) or (csLoading in ComponentState)) then
-      TioApplication.SessionDataStore.DefaultGlobalConnection := Self.Name;
+      TioApplication.SessionDataStore.SetDefaultConnection(Name);
   end;
 end;
 

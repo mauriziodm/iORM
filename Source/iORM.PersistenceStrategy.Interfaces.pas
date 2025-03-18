@@ -137,6 +137,7 @@ type
     function GetUsr: String;
     function GetUsrOID: Integer;
     function GetWhere: IioWhere;
+    procedure ImportSessionData(const ASessionData: IioAuthSessionData);
     procedure SetApp(const Value: String);
     procedure SetAppOID(const Value: Integer);
     procedure SetAuthGrant(const Value: String);

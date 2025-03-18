@@ -68,8 +68,8 @@ type
   protected
     class procedure _Initialize; override;
     class procedure _Finalize; override;
-    class function _GetMainSessionData: IioAuthSessionData; override;
     class function _ClearMainSessionData: IioAuthSessionData; override;
+    class function _GetMainSessionData: IioAuthSessionData; override;
   end;
 
   TioApplicationUniGUI = class(TioApplication)

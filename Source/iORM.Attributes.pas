@@ -249,8 +249,7 @@ type
     FOnUpdateAction: TioFKAction;
   public
     constructor Create(const AOnDeleteAction: TioFKAction = fkUnspecified; const AOnUpdateAction: TioFKAction = fkUnspecified); overload;
-    constructor Create(const AAutoCreate: TioFKCreate; const AOnDeleteAction: TioFKAction = fkUnspecified;
-      const AOnUpdateAction: TioFKAction = fkUnspecified); overload;
+    constructor Create(const AAutoCreate: TioFKCreate; const AOnDeleteAction: TioFKAction = fkUnspecified; const AOnUpdateAction: TioFKAction = fkUnspecified); overload;
     property AutoCreate: TioFKCreate read FAutoCreate;
     property OnDeleteAction: TioFKAction read FOnDeleteAction;
     property OnUpdateAction: TioFKAction read FOnUpdateAction;

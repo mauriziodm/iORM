@@ -47,7 +47,7 @@ uses
   iORM.ETM.Engine, iORM.ETM.Interfaces, DJSON.Params,
   iORM.ConflictStrategy.Interfaces, iORM.ConflictStrategy.SameVersionWin, iORM.ConflictStrategy.LastUpdateWin,
   iORM.Context.Interfaces, iORM.SynchroStrategy.Interfaces, iORM.MVVM.ViewModel,
-  iORM.Auth.Interfaces;
+  iORM.Auth.Interfaces, iORM.PersistenceStrategy.Interfaces;
 
 const
   IORM_VERSION = 'iORM 2 (beta 3.4)';
@@ -574,6 +574,9 @@ type
       const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence;
       const AMasterPropertyName, AMasterPropertyPath: String); static;
 
+    // Execute the pre-existing persistence strategy request
+    class procedure _ExecutePSRequest(const APSRequest: IioPersistenceStrategyRequest);
+
     class procedure StartTransaction(const AConnectionName: String = '');
     class procedure CommitTransaction(const AConnectionName: String = '');
     class procedure RollbackTransaction(const AConnectionName: String = '');
@@ -772,8 +775,7 @@ implementation
 uses
   System.Rtti, iORM.Exceptions, iORM.Utilities, iORM.Where.Factory, iORM.PersistenceStrategy.Factory, iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory, iORM.DB.Factory, iORM.Abstraction, iORM.DuckTyped.StreamObject,
-  iORM.LiveBindings.CommonBSBehavior, iORM.MVVM.ViewContextProviderContainer,
-  iORM.PersistenceStrategy.Interfaces;
+  iORM.LiveBindings.CommonBSBehavior, iORM.MVVM.ViewContextProviderContainer;
 
 { io }
 
@@ -1952,6 +1954,12 @@ begin
   LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_DeleteObject(AObj, AIntent, ABlindLevel);
   // get the right persistence strategy and execute the request
   TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
+end;
+
+class procedure io._ExecutePSRequest(const APSRequest: IioPersistenceStrategyRequest);
+begin
+  // get the right persistence strategy and execute the request
+  TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(APSRequest).Execute(APSRequest);
 end;
 
 class procedure io._FreeObjAfterPersistOrDelete(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete);

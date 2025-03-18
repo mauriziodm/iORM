@@ -39,7 +39,8 @@ uses
   iORM.PersistenceStrategy.Interfaces, iORM.DB.Interfaces,
   iORM.Where.Interfaces, iORM.CommonTypes, FireDAC.Comp.DataSet,
   iORM.Context.Interfaces, iORM.LiveBindings.BSPersistence,
-  iORM.SynchroStrategy.Custom, iORM.Auth.Interfaces, System.SysUtils;
+  iORM.SynchroStrategy.Custom, iORM.Auth.Interfaces, System.SysUtils,
+  iORM.SynchroStrategy.Interfaces;
 
 type
 
@@ -47,6 +48,8 @@ type
   private
     class procedure _SetPSRequestConnectionsIfNotEmpty(const APSRequest: IioPersistenceStrategyRequest; const AConnectionName, AConnectionNameRemote: String); static; inline;
     class function _NewPSRequest(const AMethod: TioPersistenceStrategyMethod; const FillSessionRelatedProperties: Boolean): IioPersistenceStrategyRequest; static; inline;
+    class function NewPSRequest_LoadList_WithPrevSessionData(const AWhere: IioWhere; const AListDTO: TObject; const AIntent: TioPersistenceIntentType;
+      const APrevSessionData: IioAuthSessionData): IioPersistenceStrategyRequest; static;
   public
     // TODO: Possibile eliminare il metodo GetStrategy_ByConnectionName?
     class function GetStrategy_ByConnectionName(const AConnectionName: String): TioPersistenceStrategyRef;
@@ -57,7 +60,9 @@ type
     // delete
     class function NewPSRequest_Delete(const AWhere: IioWhere): IioPersistenceStrategyRequest;
     class function NewPSRequest_DeleteList(const AListDTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
-    class function NewPSRequest_DeleteObject(const ADTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
+    class function NewPSRequest_DeleteObject(const ADTO: TObject; const AIntent: TioPersistenceIntentType;
+  const ABlindLevel: Byte): IioPersistenceStrategyRequest;
+//    class function NewPSRequest_DeleteObject(const ADTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
     // load
     class function NewPSRequest_LoadCount(const AWhere: IioWhere): IioPersistenceStrategyRequest;
     class function NewPSRequest_LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet): IioPersistenceStrategyRequest;
@@ -78,8 +83,6 @@ type
     // sql destinations
     class function NewPSRequest_SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet): IioPersistenceStrategyRequest;
     class function NewPSRequest_SQLDest_Execute(const ASQLDestination: IioSQLDestination): IioPersistenceStrategyRequest;
-    // synchro strategy
-    class function NewPSRequest_DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload): IioPersistenceStrategyRequest;
     // auth
     class function NewPSRequest_Auth_App(const AAppCredentials: IioAuthAppCredentials; const AConnectionName, AConnectionNameRemote: String): IioPersistenceStrategyRequest;
     class function NewPSRequest_Auth_Access(const AAuthIntention: TioAuthIntention; const AScope, AccessToken, AConnectionName, AConnectionNameRemote: String): IioPersistenceStrategyRequest;
@@ -91,6 +94,11 @@ type
     class function NewPSRequest_Transaction_In(const AConnectionName: String = String.Empty; const AConnectionNameRemote: String = String.Empty): IioPersistenceStrategyRequest;
     class function NewPSRequest_Transaction_Rollback(const AConnectionName: String = String.Empty; const AConnectionNameRemote: String = String.Empty): IioPersistenceStrategyRequest;
     class function NewPSRequest_Transaction_Start(const AConnectionName: String = String.Empty; const AConnectionNameRemote: String = String.Empty): IioPersistenceStrategyRequest;
+    // synchro strategy
+    class function NewPSRequest_Synchro_DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload): IioPersistenceStrategyRequest;
+    class function NewPSRequest_Synchro_LoadList(const APayload: TioCustomSynchroStrategy_Payload; const AClientOrServerSide: TioSynchroClientOrServerSide; const AWhere: IioWhere; const AListDTO: TObject): IioPersistenceStrategyRequest;
+    class function NewPSRequest_Synchro_PersistObject(const APayload: TioCustomSynchroStrategy_Payload; const AClientOrServerSide: TioSynchroClientOrServerSide; const ADTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
+    class function NewPSRequest_Synchro_DeleteObject(const APayload: TioCustomSynchroStrategy_Payload; const AClientOrServerSide: TioSynchroClientOrServerSide; const ADTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
     // ---------- operation type specific persistence strategy request factories ----------
   end;
 implementation
@@ -128,9 +136,9 @@ end;
 
 class procedure TioPersistenceStrategyFactory._SetPSRequestConnectionsIfNotEmpty(const APSRequest: IioPersistenceStrategyRequest; const AConnectionName, AConnectionNameRemote: String);
 begin
-  if not TioApplication.SessionDataStore._IsEmptyConnectionName(AConnectionName) then
+  if not TioApplication.SessionDataStore.IsEmptyConnectionName(AConnectionName) then
     APSRequest.Connection := AConnectionName;
-  if not TioApplication.SessionDataStore._IsEmptyConnectionName(AConnectionNameRemote) then
+  if not TioApplication.SessionDataStore.IsEmptyConnectionName(AConnectionNameRemote) then
     APSRequest.ConnectionRemote := AConnectionNameRemote;
 end;
 
@@ -223,8 +231,13 @@ begin
   Result.DTO_Serialize := True;
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload): IioPersistenceStrategyRequest;
+class function TioPersistenceStrategyFactory.NewPSRequest_Synchro_DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload): IioPersistenceStrategyRequest;
 begin
+  Result := _NewPSRequest(psmDoSynchronization, False);
+  // import session data from a previous existing one (app, user, connection, token)
+  //  and force the execution to the specified connection APayload.TargetConnectionDefName
+  Result.ImportSessionData(APayload.SessionData);
+  Result.Connection := APayload.TargetConnectionDefName;
   Result := _NewPSRequest(psmDoSynchronization, True);
   Result.Obj1 := APayload;
   Result.Obj1_Serialize := True;
@@ -243,6 +256,18 @@ class function TioPersistenceStrategyFactory.NewPSRequest_LoadList(const AWhere:
   const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(psmLoadList, True);
+  Result.Intent := AIntent;
+  Result.ListDTO := AListDTO;
+  Result.ListDTO_Serialize := False;
+  Result.Where := AWhere;
+  Result.Where.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_LoadList_WithPrevSessionData(const AWhere: IioWhere; const AListDTO: TObject;
+  const AIntent: TioPersistenceIntentType; const APrevSessionData: IioAuthSessionData): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(psmLoadList, False);
+  Result.ImportSessionData(APrevSessionData);
   Result.Intent := AIntent;
   Result.ListDTO := AListDTO;
   Result.ListDTO_Serialize := False;
@@ -343,6 +368,51 @@ begin
   Result.Intf1_Serialize := True;
   Result.Obj1 := ADestDataSet;
   Result.Obj1_Serialize := False;
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_Synchro_DeleteObject(const APayload: TioCustomSynchroStrategy_Payload; const AClientOrServerSide: TioSynchroClientOrServerSide; const ADTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(psmDeleteObject, False);
+  // import session data from a previous existing one (app, user, connection, token)
+  Result.ImportSessionData(APayload.SessionData);
+  // if the request must be executed server side
+  if AClientOrServerSide = ssServerSideExec then
+    Result.Connection := APayload.TargetConnectionDefName;
+  // other
+  Result.BlindLevel := ABlindLevel;
+  Result.Intent := AIntent;
+  Result.DTO := ADTO;
+  Result.DTO_Serialize := True;
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_Synchro_LoadList(const APayload: TioCustomSynchroStrategy_Payload; const AClientOrServerSide: TioSynchroClientOrServerSide; const AWhere: IioWhere; const AListDTO: TObject): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(psmLoadList, False);
+  // import session data from a previous existing one (app, user, connection, token)
+  Result.ImportSessionData(APayload.SessionData);
+  // if the request must be executed server side
+  if AClientOrServerSide = ssServerSideExec then
+    Result.Connection := APayload.TargetConnectionDefName;
+  // other
+  Result.ListDTO := AListDTO;
+  Result.ListDTO_Serialize := False;
+  Result.Where := AWhere;
+  Result.Where.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_Synchro_PersistObject(const APayload: TioCustomSynchroStrategy_Payload; const AClientOrServerSide: TioSynchroClientOrServerSide; const ADTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(psmPersistObject, False);
+  // import session data from a previous existing one (app, user, connection, token)
+  Result.ImportSessionData(APayload.SessionData);
+  // if the request must be executed server side
+  if AClientOrServerSide = ssServerSideExec then
+    Result.Connection := APayload.TargetConnectionDefName;
+  // other
+  Result.BlindLevel := ABlindLevel;
+  Result.Intent := AIntent;
+  Result.DTO := ADTO;
+  Result.DTO_Serialize := True;
 end;
 
 class function TioPersistenceStrategyFactory.NewPSRequest_Transaction_Commit(const AConnectionName: String = String.Empty; const AConnectionNameRemote: String = String.Empty): IioPersistenceStrategyRequest;

@@ -112,6 +112,7 @@ type
     constructor Create(const AMethod: TioPersistenceStrategyMethod; const FillSessionRelatedProperties: Boolean);
     constructor CreateByJSONString(const AJSONString:String);
     function AsString: String;
+    procedure ImportSessionData(const ASessionData: IioAuthSessionData);
     procedure SwitchToConnectionRemote;
     // method property
     property Method: TioPersistenceStrategyMethod read GetMethod;
@@ -528,6 +529,22 @@ end;
 function TioPersistenceStrategyRequest.GetWhere: IioWhere;
 begin
   Result := FWhere;
+end;
+
+procedure TioPersistenceStrategyRequest.ImportSessionData(const ASessionData: IioAuthSessionData);
+begin
+    // app
+    FApp := ASessionData.App;
+    FAppOID := ASessionData.AppOID;
+    // connection
+    FConnection := ASessionData.Connection;
+    // remote connection
+    FConnectionRemote := ASessionData.ConnectionRemote;
+    // user
+    FUsr := ASessionData.User;
+    FUsrOID := ASessionData.UserOID;
+    // auth
+    FAuthToken := ASessionData.AccessToken;
 end;
 
 procedure TioPersistenceStrategyRequest.SetApp(const Value: String);

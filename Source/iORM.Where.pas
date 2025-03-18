@@ -48,7 +48,7 @@ uses
   iORM.Utilities, iORM.LiveBindings.CommonBSAPaging,
   iORM.Context.Interfaces, iORM.StdActions.Interfaces,
   iORM.LiveBindings.Interfaces, DJSON.Attributes,
-  iORM.PersistenceStrategy.Factory;
+  iORM.PersistenceStrategy.Factory, iORM.Auth.Interfaces;
 
 type
 
@@ -1179,7 +1179,7 @@ end;
 
 function TioWhere.ToList(const AInterfacedListTypeName, AAlias: String; const AOwnsObjects: Boolean): TObject;
 begin
-  Result := ToList(io.di.Resolve(AInterfacedListTypeName, AAlias).GetImplementersItem.RttiType, AOwnsObjects);
+  Result := Self.ToList(io.di.Resolve(AInterfacedListTypeName, AAlias).GetImplementersItem.RttiType, AOwnsObjects);
 end;
 
 function TioWhere.ToList(const AListRttiType: TRttiType; const AOwnsObjects: Boolean): TObject;

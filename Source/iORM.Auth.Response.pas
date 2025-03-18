@@ -67,21 +67,19 @@ uses
 
 constructor TioAuthResponse.Create;
 begin
-    // session subjects data
-    FSubjects := TioAuthFactory.NewAuthSessionData;
-    // is authorized (login, access)
-    FIsAuth := False;
-    // sessionsubjects
-    FSubjects := nil;
-    // auth grant (auth code)
-    FAutGnt:= IO_STRING_NULL_VALUE;
-    // refresh
-    FRefTkn := IO_STRING_NULL_VALUE;
-    FRefExp := IO_DATETIME_NULL_VALUE;
-    // access
-    FAccTkn := IO_STRING_NULL_VALUE;
-    FAccExp := IO_DATETIME_NULL_VALUE;
-    FRefAft := IO_DATETIME_NULL_VALUE;
+  // session subjects data
+  FSubjects := TioAuthFactory.NewAuthSessionData;
+  // is authorized (login, access)
+  FIsAuth := False;
+  // auth grant (auth code)
+  FAutGnt:= IO_STRING_NULL_VALUE;
+  // refresh
+  FRefTkn := IO_STRING_NULL_VALUE;
+  FRefExp := IO_DATETIME_NULL_VALUE;
+  // access
+  FAccTkn := IO_STRING_NULL_VALUE;
+  FAccExp := IO_DATETIME_NULL_VALUE;
+  FRefAft := IO_DATETIME_NULL_VALUE;
 end;
 
 constructor TioAuthResponse.CreateByJSONString(const AJSONString: String);
