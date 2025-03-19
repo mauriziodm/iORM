@@ -42,6 +42,21 @@ const
   AUTH_OTP_DURATION_MIN = 20;
   AUTH_PSW_DURATION_DAYS = 180;
 
+  // auth response const
+  AR_APP = 'App';
+  AR_APP_OID = 'AppID';
+  AR_USER = 'Usr';
+  AR_USER_OID = 'UsrID';
+  AR_CONNECTION = 'Conn';
+  AR_CONNECTION_REMOTE = 'ConnRem';
+  AR_IS_AUTHORIZED = 'IsAut';
+  AR_AUTH_GRANT = 'AutGnt';
+  AR_REFRESH_TOKEN = 'RefTkn';
+  AR_REFRESH_TOKEN_EXP = 'RefTknExp';
+  AR_ACCESS_TOKEN = 'AccTkn';
+  AR_ACCESS_TOKEN_EXP = 'AccTknExp';
+  AR_REFRESH_AFTER = 'RefAfter';
+
 type
 
   TioAuthUserStatus = (usInactive, usBanned, usSuspended, usActive);
@@ -116,39 +131,57 @@ type
 
   IioAuthResponse = interface
     ['{BB322BD7-DD1C-49B2-A55D-F323749B8D32}']
-    function GetAccTkn: String;
-    function GetAccExp: TDateTime;
-    function GetAutGnt: String;
-    function GetIsAuth: Boolean;
-    function GetRefAft: TDateTime;
-    function GetRefTkn: String;
-    function GetRefExp: TDateTime;
-    function GetSubjects: IioAuthSessionData;
-    procedure SetAccTkn(const Value: String);
-    procedure SetAccExp(const Value: TDateTime);
-    procedure SetAutGnt(const Value: String);
-    procedure SetIsAuth(const Value: Boolean);
-    procedure SetRefAft(const Value: TDateTime);
-    procedure SetRefTkn(const Value: String);
-    procedure SetRefExp(const Value: TDateTime);
+    function GetAccessToken: String;
+    function GetAccessTokenExp: TDateTime;
+    function GetApp: String;
+    function GetAppOID: Integer;
+    function GetAuthGrant: String;
+    function GetConnection: String;
+    function GetConnectionRemote: String;
+    function GetIsAuthorized: Boolean;
+    function GetRefreshAfter: TDateTime;
+    function GetRefreshToken: String;
+    function GetRefreshTokenExp: TDateTime;
+    function GetUser: String;
+    function GetUserOID: Integer;
+    procedure SetAccessToken(const Value: String);
+    procedure SetAccessTokenExp(const Value: TDateTime);
+    procedure SetApp(const Value: String);
+    procedure SetAppOID(const Value: Integer);
+    procedure SetAuthGrant(const Value: String);
+    procedure SetConnection(const Value: String);
+    procedure SetConnectionRemote(const Value: String);
+    procedure SetIsAuthorized(const Value: Boolean);
+    procedure SetRefreshAfter(const Value: TDateTime);
+    procedure SetRefreshToken(const Value: String);
+    procedure SetRefreshTokenExp(const Value: TDateTime);
+    procedure SetUser(const Value: String);
+    procedure SetUserOID(const Value: Integer);
     // methods
-    function HasAutGnt: Boolean;
-    function HasRefTkn: Boolean;
-    function HasAccTkn: Boolean;
     function AsString: String;
-    // properties
-    property IsAuth: Boolean read GetIsAuth write SetIsAuth;
-    // session subjects
-    property Subjects: IioAuthSessionData read GetSubjects;
-    // auth grant (auth code)
-    property AutGnt: String read GetAutGnt write SetAutGnt;
-    // refresh
-    property RefTkn: String read GetRefTkn write SetRefTkn;
-    property RefExp: TDateTime read GetRefExp write SetRefExp;
-    // access
-    property AccTkn: String read GetAccTkn write SetAccTkn;
-    property AccExp: TDateTime read GetAccExp write SetAccExp;
-    property RefAft: TDateTime read GetRefAft write SetRefAft;
+    function HasAccessToken: Boolean;
+    function HasAuthGrant: Boolean;
+    function HasRefreshToken: Boolean;
+    // app props
+    property App: String read GetApp write SetApp;
+    property AppOID: Integer read GetAppOID write SetAppOID;
+    // user props
+    property User: String read GetUser write SetUser;
+    property UserOID: Integer read GetUserOID write SetUserOID;
+    // connection props
+    property Connection: String read GetConnection write SetConnection;
+    property ConnectionRemote: String read GetConnectionRemote write SetConnectionRemote;
+    // is authorized prop
+    property IsAuthorized: Boolean read GetIsAuthorized write SetIsAuthorized;
+    // auth grant (auth code) prop
+    property AuthGrant: String read GetAuthGrant write SetAuthGrant;
+    // refresh token props
+    property RefreshToken: String read GetRefreshToken write SetRefreshToken;
+    property RefreshTokenExp: TDateTime read GetRefreshTokenExp write SetRefreshTokenExp;
+    // access token props
+    property AccessToken: String read GetAccessToken write SetAccessToken;
+    property AccessTokenExp: TDateTime read GetAccessTokenExp write SetAccessTokenExp;
+    property RefreshAfter: TDateTime read GetRefreshAfter write SetRefreshAfter;
   end;
 
   IioAuthCredentials = interface

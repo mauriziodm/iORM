@@ -52,7 +52,7 @@ type
     class procedure _Auth_NewAccessToken(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); static; inline;
     class procedure _Auth_RefreshAccessToken(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); static; inline;
     class procedure _Auth_User(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); static; inline;
-    class procedure _DoSynchronization(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); istatic; inline;
+    class procedure _DoSynchronization(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); static; inline;
     class procedure _LoadList(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); static; inline;
     class procedure _LoadObject(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); static; inline;
     class procedure _PersistList(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); static; inline;
@@ -85,17 +85,17 @@ begin
     // Create the response body
     LioResponseBody := TioHttpFactory.NewResponseBody;
     // Dispatch to the right method/action
-    case APSRequest.Method of
+    case LPSRequest.Method of
       psmAuthAccess:
-        _DoAuth_Access(LPSRequest, LioResponseBody);
+        _Auth_Access(LPSRequest, LioResponseBody);
       psmAuthApp:
-        _DoAuth_App(LPSRequest, LioResponseBody);
+        _Auth_App(LPSRequest, LioResponseBody);
       psmAuthNewAccessToken:
-        _DoAuth_NewAccessToken(LPSRequest, LioResponseBody);
+        _Auth_NewAccessToken(LPSRequest, LioResponseBody);
       psmAuthRefreshAccessToken:
-        _DoAuth_RefreshAccessToken(LPSRequest, LioResponseBody);
+        _Auth_RefreshAccessToken(LPSRequest, LioResponseBody);
       psmAuthUser:
-        _DoAuth_User(LPSRequest, LioResponseBody);
+        _Auth_User(LPSRequest, LioResponseBody);
       psmDelete:
         _Execute(LPSRequest);
       psmDeleteList:
@@ -119,7 +119,7 @@ begin
       psmPersistList:
         _PersistList(LPSRequest, LioResponseBody);
       psmPersistObject:
-        _Execute_Persist(LPSRequest, LioResponseBody);
+        _PersistObject(LPSRequest, LioResponseBody);
       psmSQLDestExecute:
         _Execute(LPSRequest);
       psmSQLDestLoadDataSet:
@@ -183,7 +183,7 @@ end;
 
 class procedure TioHttpServerExecutor._Execute(const APSRequest: IioPersistenceStrategyRequest);
 begin
-  TioPersistenceStrategyFactory.GetStrategy(APSRequest.Connection).Execute(APSRequest);
+  TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(APSRequest).Execute(APSRequest);
 end;
 
 class procedure TioHttpServerExecutor._Execute_DataSetResult(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
@@ -214,9 +214,9 @@ begin
   APSRequest.ListDTO := TObjectList<TObject>.Create;
   try
     _Execute(APSRequest);
-    AioResponseBody.JSONDataValueAsObject := AioRequestBody.ListDTO;
+    AioResponseBody.JSONDataValueAsObject := APSRequest.ListDTO;
   finally
-    AioRequestBody.ListDTO.Free;
+    APSRequest.ListDTO.Free;
   end;
 end;
 

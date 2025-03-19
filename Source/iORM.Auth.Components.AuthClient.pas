@@ -201,12 +201,12 @@ begin
   end;
   // if the access request was not handled then use the internal implementation
   if not LDone then
-    Result := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName(FConnectionName).Auth_Access(FConnectionName, AScope, AAuthIntention, AAccessToken);
+//exception    Result := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName(FConnectionName).Auth_Access(FConnectionName, AScope, AAuthIntention, AAccessToken);
   // invoke AfterAuthorizeAccess if assigned
   if Assigned(FAfterAuthorizeAccess) then
     FAfterAuthorizeAccess(Self, AScope, AAuthIntention, AAccessToken, Result);
   // if not authorized  raise an exception (non ci sarebbe bisogno perchè la solleva già il AuthServer ma per ulteriore sicurezza)
-  if not Result.IsAuth then
+  if not Result.IsAuthorized then
     raise EioAuthForbiddenException_403.Create(Format('Access forbidden to scope (%s)', [AScope]));
 end;
 
@@ -265,14 +265,14 @@ begin
   end;
   // if the creation of the token was not handled then use the internal implementation
   if not LDone then
-    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName(FConnectionName).Auth_User(FConnectionName, AUserCredentials);
+//exception    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName(FConnectionName).Auth_User(FConnectionName, AUserCredentials);
   // invoke AfterAuthorizeUser if assigned
   if Assigned(FAfterAuthorizeUser) then
     FAfterAuthorizeUser(Self, AUserCredentials, LAuthResponse);
   // if authorized then update session props (else raise an exception)
   //  note: it might be that the auth server immediately provides the access token
   //        (and also the refresh token) without providing any user token/authcode
-  if LAuthResponse.IsAuth then
+  if LAuthResponse.IsAuthorized then
   begin
     ASession.Clear;
     _FillSessionData(ASession, LAuthResponse);
@@ -290,20 +290,20 @@ end;
 procedure TioAuthClient._FillSessionData(const ASession: IioAuthSessionData; const AAuthResponse: IioAuthResponse);
 begin
   // update the session subjects data
-  if not AAuthResponse.Subjects.IsEmpty then
-    ASession.Subjects.Assign(AAuthResponse.Subjects);
+//exception  if not AAuthResponse.Subjects.IsEmpty then
+//exception    ASession.Subjects.Assign(AAuthResponse.Subjects);
   // update session data with the access token data if exists
-  if AAuthResponse.HasAccTkn then
+  if AAuthResponse.HasAccessToken then
   begin
-    ASession.AccessToken := AAuthResponse.AccTkn;
-    ASession.AccessTokenExp := AAuthResponse.AccExp;
-    ASession.RefreshAfter := AAuthResponse.RefAft;
+    ASession.AccessToken := AAuthResponse.AccessToken;
+    ASession.AccessTokenExp := AAuthResponse.AccessTokenExp;
+    ASession.RefreshAfter := AAuthResponse.RefreshAfter;
   end;
   // update session data with the refresh token data if exists
-  if AAuthResponse.HasRefTkn then
+  if AAuthResponse.HasRefreshToken then
   begin
-    ASession.RefreshToken := AAuthResponse.RefTkn;
-    ASession.RefreshTokenExp := AAuthResponse.RefExp;
+    ASession.RefreshToken := AAuthResponse.RefreshToken;
+    ASession.RefreshTokenExp := AAuthResponse.RefreshTokenExp;
   end;
 end;
 
@@ -317,7 +317,7 @@ begin
   _CheckActive;
   // -------------------- check if already logged on --------------------
   // acquire the session
-  LSession := TioApplication.AcquireSession;
+  LSession := TioApplication.SessionDataStore.AcquireMainSessionData;
   try
     // executes the operation inside a try-finally block to be able to invoke the onException... event if there is one
     try
@@ -339,7 +339,7 @@ begin
         raise(LException);
     end;
   finally
-    TioApplication.ReleaseSession;
+    TioApplication.SessionDataStore.Release;
   end;
   // -------------------- check if already logged on --------------------
   // step 2 - requeste the user authorization code (steps 3 & 4 are in the "_AuthorizeAppRequestUserAuthCode" method
@@ -362,40 +362,40 @@ begin
   try
     // --------------------
     // acquire the session to check if it is logged on and if need refresh
-    LSession := TioApplication.AcquireSession;
+    LSession := TioApplication.SessionDataStore.AcquireMainSessionData;
     try
       // step 1 - check if logged on
       if not _IsLoggedOn(LSession) then
         raise EioAuthNotLoggedOnException_401.Create('User or App is not logged on');
       // step 2 - check if the access token need to be refreshed
       if _NeedRefresh(LSession) then
-        _RefreshAccessToken(LSession);
+//exception        _RefreshAccessToken(LSession);
       // set the access token to a local variable (thread-safe)
       LAccessToken := LSession.AccessToken;
     finally
-      TioApplication.ReleaseSession;
+      TioApplication.SessionDataStore.Release;
     end;
     // --------------------
     // step 3 - authorize access (outside session lock to minimize session lock time when not necessary)
     LAuthResponse := _AuthorizeAccess(AScope, AAuthIntention, LAccessToken);
-    Result := LAuthResponse.IsAuth;
+    Result := LAuthResponse.IsAuthorized;
     // --------------------
     // if there is a new access token (refresh token maintained by auth server compatibility)
     //  then update the session object
-    if Result and LAuthResponse.HasAccTkn then
+    if Result and LAuthResponse.HasAccessToken then
     begin
-      LSession := TioApplication.AcquireSession;
+      LSession := TioApplication.SessionDataStore.AcquireMainSessionData;
       try
-        LSession.AccessToken := LAuthResponse.AccTkn;
-        LSession.AccessTokenExp := LAuthResponse.AccExp;
-        LSession.RefreshAfter := LAuthResponse.RefAft;
-        if LAuthResponse.HasRefTkn then
+        LSession.AccessToken := LAuthResponse.AccessToken;
+        LSession.AccessTokenExp := LAuthResponse.AccessTokenExp;
+        LSession.RefreshAfter := LAuthResponse.RefreshAfter;
+        if LAuthResponse.HasRefreshToken then
         begin
-          LSession.RefreshToken := LAuthResponse.RefTkn;
-          LSession.RefreshTokenExp := LAuthResponse.RefExp;
+          LSession.RefreshToken := LAuthResponse.RefreshToken;
+          LSession.RefreshTokenExp := LAuthResponse.RefreshTokenExp;
         end;
       finally
-        TioApplication.ReleaseSession;
+        TioApplication.SessionDataStore.Release;
       end;
     end;
     // --------------------
@@ -484,7 +484,7 @@ begin
   // first check if the component is enabled
   _CheckActive;
   // acquire the session
-  LSession := TioApplication.AcquireSession;
+  LSession := TioApplication.SessionDataStore.AcquireMainSessionData;
   try
     // executes the operation inside a try-finally block to be able to invoke the onException... event if there is one
     try
@@ -505,7 +505,7 @@ begin
         raise(LException);
     end;
   finally
-    TioApplication.ReleaseSession;
+    TioApplication.SessionDataStore.Release;
   end;
 end;
 
@@ -518,7 +518,7 @@ begin
   // first check if the component is enabled
   _CheckActive;
   // acquire the session
-  LSession := TioApplication.AcquireSession;
+  LSession := TioApplication.SessionDataStore.AcquireMainSessionData;
   try
     // executes the operation inside a try-finally block to be able to invoke the onException... event if there is one
     try
@@ -541,7 +541,7 @@ begin
         raise(LException);
     end;
   finally
-    TioApplication.ReleaseSession;
+    TioApplication.SessionDataStore.Release;
   end;
 end;
 
@@ -560,21 +560,21 @@ begin
   end;
   // if the creation of the token was not handled then use the internal implementation
   if not LDone then
-    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName(FConnectionName).Auth_NewAccessToken(FConnectionName, AAuthGrant, ACredentials.CodeVerifier);
+//exception    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName(FConnectionName).Auth_NewAccessToken(FConnectionName, AAuthGrant, ACredentials.CodeVerifier);
   // invoke AfterNewAccessToken if assigned
   if Assigned(FAfterNewAccessToken) then
     FAfterNewAccessToken(Self, ACredentials, LAuthResponse);
   // if authorized then update session props (else raise an exception)
-  if LAuthResponse.IsAuth then
+  if LAuthResponse.IsAuthorized then
   begin
     // acquire session data
-    LSession := TioApplication.AcquireSession;
+    LSession := TioApplication.SessionDataStore.AcquireMainSessionData;
     try
       // fill session data
       _FillSessionData(LSession, LAuthResponse);
     finally
       // release session data
-      TioApplication.ReleaseSession;
+      TioApplication.SessionDataStore.Release;
     end;
   end
   else
@@ -583,13 +583,13 @@ end;
 
 procedure TioAuthClient._RaiseAlreadyLoggedOnException(const ASession: IioAuthSessionData);
 begin
-  if ASession.Subjects.HasApp then
-    raise EioAuthAlreadyLoggedOnException_401.Create(Format('Already logged on as app "%s", user "%s"', [ASession.Subjects.App, ASession.Subjects.User]))
-  else
-  if ASession.Subjects.HasUser then
-    raise EioAuthAlreadyLoggedOnException_401.Create(Format('Already logged on as user "%s"', [ASession.Subjects.User]))
-  else
-    raise EioAuthAlreadyLoggedOnException_401.Create(Format('Already logged on', [ASession.Subjects.User]))
+//exception  if ASession.Subjects.HasApp then
+//exception    raise EioAuthAlreadyLoggedOnException_401.Create(Format('Already logged on as app "%s", user "%s"', [ASession.Subjects.App, ASession.Subjects.User]))
+//exception  else
+//exception  if ASession.Subjects.HasUser then
+//exception    raise EioAuthAlreadyLoggedOnException_401.Create(Format('Already logged on as user "%s"', [ASession.Subjects.User]))
+//exception  else
+//exception    raise EioAuthAlreadyLoggedOnException_401.Create(Format('Already logged on', [ASession.Subjects.User]))
 end;
 
 procedure TioAuthClient._RefreshAccessToken(const ARefreshToken: String);
@@ -607,21 +607,21 @@ begin
   end;
   // if the creation of the token was not handled then use the internal implementation
   if not LDone then
-    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName(FConnectionName).Auth_RefreshAccessToken(FConnectionName, ASession.RefreshToken);
+//exception    LAuthResponse := TioPersistenceStrategyFactory.GetStrategy_ByConnectionName(FConnectionName).Auth_RefreshAccessToken(FConnectionName, ASession.RefreshToken);
   // invoke AfterRefreshAccessToken if assigned
   if Assigned(FAfterRefreshAccessToken) then
     FAfterRefreshAccessToken(Self, ARefreshToken, LAuthResponse);
   // if authorized then update session props (else raise an exception)
-  if LAuthResponse.IsAuth then
+  if LAuthResponse.IsAuthorized then
   begin
     // acquire session data
-    LSession := TioApplication.AcquireSession;
+    LSession := TioApplication.SessionDataStore.AcquireMainSessionData;
     try
       // fill session data
       _FillSessionData(LSession, LAuthResponse);
     finally
       // release session data
-      TioApplication.ReleaseSession;
+      TioApplication.SessionDataStore.Release;
     end;
   end
   else
@@ -637,7 +637,7 @@ begin
   // first check if the component is enabled
   _CheckActive;
   // acquire the session
-  LSession := TioApplication.AcquireSession;
+  LSession := TioApplication.SessionDataStore.AcquireMainSessionData;
   try
     // executes the operation inside a try-finally block to be able to invoke the onException... event if there is one
     try
@@ -647,7 +647,7 @@ begin
       // step 2 - authorize user
       _AuthorizeUser(AUserCredentials, LSession);
       // step 3 - get new access token (and refresh token usually)
-      _NewAccessToken(LSession);
+//exception      _NewAccessToken(LSession);
       // return true if success
       Result := True;
     except
@@ -665,7 +665,7 @@ begin
         raise(LException);
     end;
   finally
-    TioApplication.ReleaseSession;
+    TioApplication.SessionDataStore.Release;
   end;
 end;
 

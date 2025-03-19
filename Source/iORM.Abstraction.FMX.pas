@@ -373,7 +373,7 @@ end;
 class constructor TioFMX.Create;
 begin
   TioApplicationFMX._SetConcreteClass(TioApplicationFMX);
-  TioApplicationFMX._FConcreteSessionDataStoreClass_NoDirectCall(TioSimpleSessionDataStore);
+  TioApplicationFMX._FConcreteSessionDataStoreClass_NoDirectCall := TioSimpleSessionDataStore;
   TioControlFMX.SetConcreteClass(TioControlFMX);
   TioTimerFMX.SetConcreteClass(TioTimerFMX);
   TioActionFMX.SetConcreteClass(TioActionFMX);

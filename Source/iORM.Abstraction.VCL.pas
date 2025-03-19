@@ -373,7 +373,7 @@ class constructor TioVCL.Create;
 begin
   inherited;
   TioApplicationVCL._SetConcreteClass(TioApplicationVCL);
-  TioApplicationVCL._FConcreteSessionDataStoreClass_NoDirectCall(TioSimpleSessionDataStore);
+  TioApplicationVCL._FConcreteSessionDataStoreClass_NoDirectCall := TioSimpleSessionDataStore;
   TioControlVCL.SetConcreteClass(TioControlVCL);
   TioTimerVCL.SetConcreteClass(TioTimerVCL);
   TioActionVCL.SetConcreteClass(TioActionVCL);

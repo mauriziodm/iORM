@@ -8,53 +8,79 @@ uses
 type
   TioAuthResponse = class(TInterfacedObject, IioAuthResponse)
   private
-    FIsAuth: Boolean;
-    // session subjects
-    FSubjects: IioAuthSessionData;
+    // app
+    FApp: String;
+    FAppOID: Integer;
+    // user
+    FUser: String;
+    FUserOID: Integer;
+    // connection
+    FConnection: String;
+    FConnectionRemote: String;
+    // true if the the request is authorized
+    FIsAuthorized: Boolean;
     // auth grant (auth code)
-    FAutGnt: String;
+    FAuthGrant: String;
     // refresh
-    FRefTkn: String;
-    FRefExp: TDateTime;
+    FRefreshToken: String;
+    FRefreshTokenExp: TDateTime;
     // access
-    FAccTkn: String;
-    FAccExp: TDateTime;
-    FRefAft: TDateTime;
-    function GetAccTkn: String;
-    function GetAccExp: TDateTime;
-    function GetAutGnt: String;
-    function GetIsAuth: Boolean;
-    function GetRefAft: TDateTime;
-    function GetRefTkn: String;
-    function GetRefExp: TDateTime;
-    function GetSubjects: IioAuthSessionData;
-    procedure SetAccTkn(const Value: String);
-    procedure SetAccExp(const Value: TDateTime);
-    procedure SetAutGnt(const Value: String);
-    procedure SetIsAuth(const Value: Boolean);
-    procedure SetRefAft(const Value: TDateTime);
-    procedure SetRefTkn(const Value: String);
-    procedure SetRefExp(const Value: TDateTime);
+    FAccessToken: String;
+    FAccessTokenExp: TDateTime;
+    FRefreshAfter: TDateTime;
+    function GetAccessToken: String;
+    function GetAccessTokenExp: TDateTime;
+    function GetApp: String;
+    function GetAppOID: Integer;
+    function GetAuthGrant: String;
+    function GetConnection: String;
+    function GetConnectionRemote: String;
+    function GetIsAuthorized: Boolean;
+    function GetRefreshAfter: TDateTime;
+    function GetRefreshToken: String;
+    function GetRefreshTokenExp: TDateTime;
+    function GetUser: String;
+    function GetUserOID: Integer;
+    procedure SetAccessToken(const Value: String);
+    procedure SetAccessTokenExp(const Value: TDateTime);
+    procedure SetApp(const Value: String);
+    procedure SetAppOID(const Value: Integer);
+    procedure SetAuthGrant(const Value: String);
+    procedure SetConnection(const Value: String);
+    procedure SetConnectionRemote(const Value: String);
+    procedure SetIsAuthorized(const Value: Boolean);
+    procedure SetRefreshAfter(const Value: TDateTime);
+    procedure SetRefreshToken(const Value: String);
+    procedure SetRefreshTokenExp(const Value: TDateTime);
+    procedure SetUser(const Value: String);
+    procedure SetUserOID(const Value: Integer);
   public
     constructor Create;
     constructor CreateByJSONString(const AJSONString: String);
     function AsString: String;
-    function HasAutGnt: Boolean;
-    function HasRefTkn: Boolean;
-    function HasAccTkn: Boolean;
-    // properties
-    property IsAuth: Boolean read GetIsAuth write SetIsAuth;
-    // session subjects
-    property Subjects: IioAuthSessionData read GetSubjects;
-    // auth grant (auth code)
-    property AutGnt: String read GetAutGnt write SetAutGnt;
-    // refresh
-    property RefTkn: String read GetRefTkn write SetRefTkn;
-    property RefExp: TDateTime read GetRefExp write SetRefExp;
-    // access
-    property AccTkn: String read GetAccTkn write SetAccTkn;
-    property AccExp: TDateTime read GetAccExp write SetAccExp;
-    property RefAft: TDateTime read GetRefAft write SetRefAft;
+    function HasAccessToken: Boolean;
+    function HasAuthGrant: Boolean;
+    function HasRefreshToken: Boolean;
+    // app props
+    property App: String read GetApp write SetApp;
+    property AppOID: Integer read GetAppOID write SetAppOID;
+    // user props
+    property User: String read GetUser write SetUser;
+    property UserOID: Integer read GetUserOID write SetUserOID;
+    // connection props
+    property Connection: String read GetConnection write SetConnection;
+    property ConnectionRemote: String read GetConnectionRemote write SetConnectionRemote;
+    // is authorized prop
+    property IsAuthorized: Boolean read GetIsAuthorized write SetIsAuthorized;
+    // auth grant (auth code) prop
+    property AuthGrant: String read GetAuthGrant write SetAuthGrant;
+    // refresh token props
+    property RefreshToken: String read GetRefreshToken write SetRefreshToken;
+    property RefreshTokenExp: TDateTime read GetRefreshTokenExp write SetRefreshTokenExp;
+    // access token props
+    property AccessToken: String read GetAccessToken write SetAccessToken;
+    property AccessTokenExp: TDateTime read GetAccessTokenExp write SetAccessTokenExp;
+    property RefreshAfter: TDateTime read GetRefreshAfter write SetRefreshAfter;
   end;
 
 implementation
@@ -67,19 +93,26 @@ uses
 
 constructor TioAuthResponse.Create;
 begin
-  // session subjects data
-  FSubjects := TioAuthFactory.NewAuthSessionData;
+  // app
+  FApp := IO_STRING_NULL_VALUE;
+  FAppOID := IO_INTEGER_NULL_VALUE;
+  // user
+  FUser := IO_STRING_NULL_VALUE;
+  FUserOID := IO_INTEGER_NULL_VALUE;
+  // connection
+  FConnection := IO_STRING_NULL_VALUE;
+  FConnectionRemote := IO_STRING_NULL_VALUE;
   // is authorized (login, access)
-  FIsAuth := False;
+  FIsAuthorized := False;
   // auth grant (auth code)
-  FAutGnt:= IO_STRING_NULL_VALUE;
+  FAuthGrant:= IO_STRING_NULL_VALUE;
   // refresh
-  FRefTkn := IO_STRING_NULL_VALUE;
-  FRefExp := IO_DATETIME_NULL_VALUE;
+  FRefreshToken := IO_STRING_NULL_VALUE;
+  FRefreshTokenExp := IO_DATETIME_NULL_VALUE;
   // access
-  FAccTkn := IO_STRING_NULL_VALUE;
-  FAccExp := IO_DATETIME_NULL_VALUE;
-  FRefAft := IO_DATETIME_NULL_VALUE;
+  FAccessToken := IO_STRING_NULL_VALUE;
+  FAccessTokenExp := IO_DATETIME_NULL_VALUE;
+  FRefreshAfter := IO_DATETIME_NULL_VALUE;
 end;
 
 constructor TioAuthResponse.CreateByJSONString(const AJSONString: String);
@@ -90,128 +123,206 @@ begin
   Create;
   LJSONObject := TJSONObject.ParseJSONValue(AJSONString) as TJSONObject;
   try
+    // App
+    LJSONValue := LJSONObject.GetValue(AR_APP);
+    if Assigned(LJSONValue) then
+      FApp := LJSONValue.Value;
+    // AppOID
+    LJSONValue := LJSONObject.GetValue(AR_APP_OID);
+    if Assigned(LJSONValue) then
+      FAppOID := dj.FromJSON(LJSONValue).&To<Integer>;
+    // Connection
+    LJSONValue := LJSONObject.GetValue(AR_CONNECTION);
+    if Assigned(LJSONValue) then
+      FConnection := LJSONValue.Value;
+    // ConnectionRemote
+    LJSONValue := LJSONObject.GetValue(AR_CONNECTION_REMOTE);
+    if Assigned(LJSONValue) then
+      FConnectionRemote := LJSONValue.Value;
+    // User
+    LJSONValue := LJSONObject.GetValue(AR_USER);
+    if Assigned(LJSONValue) then
+      FUser := LJSONValue.Value;
+    // UserOID
+    LJSONValue := LJSONObject.GetValue(AR_USER_OID);
+    if Assigned(LJSONValue) then
+      FUserOID := dj.FromJSON(LJSONValue).&To<Integer>;
     // is authorized
-    LJSONValue := LJSONObject.GetValue('IsAuth');
+    LJSONValue := LJSONObject.GetValue(AR_IS_AUTHORIZED);
     if Assigned(LJSONValue) then
-      FIsAuth := (LJSONValue as TJSONBool).AsBoolean;
-    // session subjects
-    LJSONValue := LJSONObject.GetValue('Subjects');
-    if Assigned(LJSONValue) then
-      FSubjects.FromString(LJSONValue.Value);
+      FIsAuthorized := (LJSONValue as TJSONBool).AsBoolean;
     // auth grant (auth code)
-    LJSONValue := LJSONObject.GetValue('AutGnt');
+    LJSONValue := LJSONObject.GetValue(AR_AUTH_GRANT);
     if Assigned(LJSONValue) then
-      FAutGnt := LJSONValue.Value;
-    // refresh
-    LJSONValue := LJSONObject.GetValue('RefTkn');
+      FAuthGrant := LJSONValue.Value;
+    // refresh token
+    LJSONValue := LJSONObject.GetValue(AR_REFRESH_TOKEN);
     if Assigned(LJSONValue) then
-      FRefTkn := LJSONValue.Value;
-    LJSONValue := LJSONObject.GetValue('RefExp');
+      FRefreshToken := LJSONValue.Value;
+    // refresh token expiration
+    LJSONValue := LJSONObject.GetValue(AR_REFRESH_TOKEN_EXP);
     if Assigned(LJSONValue) then
-      FRefExp :=  UnixToDateTime((LJSONValue as TJSONNumber).AsInt64, True); // True = UTC
-    // access
-    LJSONValue := LJSONObject.GetValue('AccTkn');
+      FRefreshTokenExp :=  UnixToDateTime((LJSONValue as TJSONNumber).AsInt64, True); // True = UTC
+    // access token
+    LJSONValue := LJSONObject.GetValue(AR_ACCESS_TOKEN);
     if Assigned(LJSONValue) then
-      FAccTkn := LJSONValue.Value;
-    LJSONValue := LJSONObject.GetValue('AccExp');
+      FAccessToken := LJSONValue.Value;
+    // access token expiration
+    LJSONValue := LJSONObject.GetValue(AR_ACCESS_TOKEN_EXP);
     if Assigned(LJSONValue) then
-      FAccExp :=  UnixToDateTime((LJSONValue as TJSONNumber).AsInt64, True); // True = UTC
-    LJSONValue := LJSONObject.GetValue('RefAft');
+      FAccessTokenExp :=  UnixToDateTime((LJSONValue as TJSONNumber).AsInt64, True); // True = UTC
+    // refresh after (access token)
+    LJSONValue := LJSONObject.GetValue(AR_REFRESH_AFTER);
     if Assigned(LJSONValue) then
-      FRefAft :=  UnixToDateTime((LJSONValue as TJSONNumber).AsInt64, True); // True = UTC
+      FRefreshAfter :=  UnixToDateTime((LJSONValue as TJSONNumber).AsInt64, True); // True = UTC
   finally
     LJSONObject.Free;
   end;
 end;
 
-function TioAuthResponse.GetAccExp: TDateTime;
+function TioAuthResponse.GetAccessTokenExp: TDateTime;
 begin
-  Result := FAccExp;
+  Result := FAccessTokenExp;
 end;
 
-function TioAuthResponse.GetAccTkn: String;
+function TioAuthResponse.GetApp: String;
 begin
-  Result := FAccTkn;
+  Result := FApp;
 end;
 
-function TioAuthResponse.GetAutGnt: String;
+function TioAuthResponse.GetAppOID: Integer;
 begin
-  Result := FAutGnt;
+  Result := FAppOID;
 end;
 
-function TioAuthResponse.GetIsAuth: Boolean;
+function TioAuthResponse.GetAccessToken: String;
 begin
-  Result := FIsAuth;
+  Result := FAccessToken;
 end;
 
-function TioAuthResponse.GetRefAft: TDateTime;
+function TioAuthResponse.GetAuthGrant: String;
 begin
-  Result := FRefAft;
+  Result := FAuthGrant;
 end;
 
-function TioAuthResponse.GetRefExp: TDateTime;
+function TioAuthResponse.GetConnection: String;
 begin
-  Result := FRefExp;
+  Result := FConnection;
 end;
 
-function TioAuthResponse.GetRefTkn: String;
+function TioAuthResponse.GetConnectionRemote: String;
 begin
-  Result := FRefTkn;
+  Result := FConnectionRemote;
 end;
 
-function TioAuthResponse.GetSubjects: IioAuthSessionData;
+function TioAuthResponse.GetIsAuthorized: Boolean;
 begin
-  Result := FSubjects;
+  Result := FIsAuthorized;
 end;
 
-function TioAuthResponse.HasAccTkn: Boolean;
+function TioAuthResponse.GetRefreshAfter: TDateTime;
 begin
-  Result := FAccTkn <> IO_STRING_NULL_VALUE;
+  Result := FRefreshAfter;
 end;
 
-function TioAuthResponse.HasAutGnt: Boolean;
+function TioAuthResponse.GetRefreshTokenExp: TDateTime;
 begin
-  Result := FAutGnt <> IO_STRING_NULL_VALUE;
+  Result := FRefreshTokenExp;
 end;
 
-function TioAuthResponse.HasRefTkn: Boolean;
+function TioAuthResponse.GetUser: String;
 begin
-  Result := FRefTkn <> IO_STRING_NULL_VALUE;
+  Result := FUser;
 end;
 
-procedure TioAuthResponse.SetAccExp(const Value: TDateTime);
+function TioAuthResponse.GetUserOID: Integer;
 begin
-  FAccExp := Value;
+  Result := FUserOID;
 end;
 
-procedure TioAuthResponse.SetAccTkn(const Value: String);
+function TioAuthResponse.GetRefreshToken: String;
 begin
-  FAccTkn := Value;
+  Result := FRefreshToken;
 end;
 
-procedure TioAuthResponse.SetAutGnt(const Value: String);
+function TioAuthResponse.HasAccessToken: Boolean;
 begin
-  FAutGnt := Value;
+  Result := FAccessToken <> IO_STRING_NULL_VALUE;
 end;
 
-procedure TioAuthResponse.SetIsAuth(const Value: Boolean);
+function TioAuthResponse.HasAuthGrant: Boolean;
 begin
-  FIsAuth := Value;
+  Result := FAuthGrant <> IO_STRING_NULL_VALUE;
 end;
 
-procedure TioAuthResponse.SetRefAft(const Value: TDateTime);
+function TioAuthResponse.HasRefreshToken: Boolean;
 begin
-  FRefAft := Value;
+  Result := FRefreshToken <> IO_STRING_NULL_VALUE;
 end;
 
-procedure TioAuthResponse.SetRefExp(const Value: TDateTime);
+procedure TioAuthResponse.SetAccessTokenExp(const Value: TDateTime);
 begin
-  FRefExp := Value;
+  FAccessTokenExp := Value;
 end;
 
-procedure TioAuthResponse.SetRefTkn(const Value: String);
+procedure TioAuthResponse.SetApp(const Value: String);
 begin
-  FRefTkn := Value;
+  FApp := Value;
+end;
+
+procedure TioAuthResponse.SetAppOID(const Value: Integer);
+begin
+  FAppOID := Value;
+end;
+
+procedure TioAuthResponse.SetAccessToken(const Value: String);
+begin
+  FAccessToken := Value;
+end;
+
+procedure TioAuthResponse.SetAuthGrant(const Value: String);
+begin
+  FAuthGrant := Value;
+end;
+
+procedure TioAuthResponse.SetConnection(const Value: String);
+begin
+  FConnection := Value;
+end;
+
+procedure TioAuthResponse.SetConnectionRemote(const Value: String);
+begin
+  FConnectionRemote := Value;
+end;
+
+procedure TioAuthResponse.SetIsAuthorized(const Value: Boolean);
+begin
+  FIsAuthorized := Value;
+end;
+
+procedure TioAuthResponse.SetRefreshAfter(const Value: TDateTime);
+begin
+  FRefreshAfter := Value;
+end;
+
+procedure TioAuthResponse.SetRefreshTokenExp(const Value: TDateTime);
+begin
+  FRefreshTokenExp := Value;
+end;
+
+procedure TioAuthResponse.SetUser(const Value: String);
+begin
+  FUser := Value;
+end;
+
+procedure TioAuthResponse.SetUserOID(const Value: Integer);
+begin
+  FUserOID := Value;
+end;
+
+procedure TioAuthResponse.SetRefreshToken(const Value: String);
+begin
+  FRefreshToken := Value;
 end;
 
 function TioAuthResponse.AsString: String;
@@ -221,24 +332,22 @@ begin
   LJSONObject := TJSONObject.Create;
   try
     // is authorized
-    LJSONObject.AddPair('IsAuth', FIsAuth);
-    // session subjects
-    LJSONObject.AddPair('Subjects', FSubjects.AsString);
+    LJSONObject.AddPair(AR_IS_AUTHORIZED, FIsAuthorized);
     // auth grant (auth code)
-    if HasAutGnt then
-      LJSONObject.AddPair('AutGnt', FAutGnt);
-    // refresh
-    if HasRefTkn then
+    if HasAuthGrant then
+      LJSONObject.AddPair(AR_AUTH_GRANT, FAuthGrant);
+    // refresh token
+    if HasRefreshToken then
     begin
-      LJSONObject.AddPair('RefTkn', FRefTkn);
-      LJSONObject.AddPair('RefExp', DateTimeToUnix(FRefExp, True)); // True = UTC
+      LJSONObject.AddPair(AR_REFRESH_TOKEN, FRefreshToken);
+      LJSONObject.AddPair(AR_REFRESH_TOKEN_EXP, DateTimeToUnix(FRefreshTokenExp, True)); // True = UTC
     end;
-    // refresh
-    if HasAccTkn then
+    // access token
+    if HasAccessToken then
     begin
-      LJSONObject.AddPair('AccTkn', FAccTkn);
-      LJSONObject.AddPair('AccExp', DateTimeToUnix(FAccExp, True)); // True = UTC
-      LJSONObject.AddPair('RefAft', DateTimeToUnix(RefAft, True)); // True = UTC
+      LJSONObject.AddPair(AR_ACCESS_TOKEN, FAccessToken);
+      LJSONObject.AddPair(AR_ACCESS_TOKEN_EXP, DateTimeToUnix(FAccessTokenExp, True)); // True = UTC
+      LJSONObject.AddPair(AR_REFRESH_AFTER, DateTimeToUnix(RefreshAfter, True)); // True = UTC
     end;
     // Result JSONObject as string
     Result := LJSONObject.ToString;
