@@ -83,7 +83,7 @@ type
 implementation
 
 uses
-  iORM.Context.Container, iORM.Context.Properties;
+  iORM.Context.Container, iORM.Context.Properties, iORM.Exceptions;
 
 { TioMap }
 
@@ -108,7 +108,7 @@ begin
   while (LCurrentRttiInstanceType <> nil) do
   begin
     // Se la classe attuale è mappata (quindi è una entity) allora la considera altrimenti la salta e passa alla prossima
-    // (in pratica considera solo le entity quindi se c'è ad esempmio una classe astratta come antenato comune ma questa
+    // (in pratica considera solo le entity quindi se c'è ad esempio una classe astratta come antenato comune ma questa
     // giustamente non è una entità (in quanto astratta non c'è l'attributo ioEntity) questa non viene considerata.
     if TioMapContainer.Exist(LCurrentRttiInstanceType.Name) then
     begin

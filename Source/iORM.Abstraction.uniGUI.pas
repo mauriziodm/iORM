@@ -64,7 +64,7 @@ type
   TioUniMainSessionDataContainer = TDictionary<String, IioAuthSessionData>;
   TioUniSessionDataStore = class(TioCustomSessionDataStore)
   private
-    FMainSessionDataContainer: TioUniMainSessionDataContainer;
+    class var FMainSessionDataContainer: TioUniMainSessionDataContainer;
   protected
     class procedure _Initialize; override;
     class procedure _Finalize; override;
@@ -413,7 +413,7 @@ end;
 class constructor TioUniGUI.Create;
 begin
   TioApplicationUniGUI._SetConcreteClass(TioApplicationUniGUI);
-  TioApplicationUniGUI._FConcreteSessionDataStoreClass_NoDirectCall(TioSimpleSessionDataStore);
+  TioApplicationUniGUI._FConcreteSessionDataStoreClass_NoDirectCall := TioUniSessionDataStore;
   TioControlUniGUI.SetConcreteClass(TioControlUniGUI);
   TioTimerUniGUI.SetConcreteClass(TioTimerUniGUI);
   TioActionUniGUI.SetConcreteClass(TioActionUniGUI);

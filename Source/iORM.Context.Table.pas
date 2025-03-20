@@ -308,7 +308,11 @@ end;
 
 function TioTable.GetTableConnectionName: String;
 begin
-  Result := TioApplication.SessionDataStore.GetCurrentConnectionNameIfEmpty(FTableConnectionName_DoNotCallDirectly);
+  // TODO: Possibile togliere questo if? ho dovuto metterlo perchè altrimenti dava un AV error già quando installavo nell'IDE dovuto al fatto che ancora il session DataStore non era assegnato
+  if TioApplication.SessionDataStore <> nil then
+    Result := TioApplication.SessionDataStore.GetCurrentConnectionNameIfEmpty(FTableConnectionName_DoNotCallDirectly)
+  else
+    Result := FTableConnectionName_DoNotCallDirectly;
 end;
 
 function TioTable.GetTableConnectionNameIfEmpty(const AConnectionName: String): String;

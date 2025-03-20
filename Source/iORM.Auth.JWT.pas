@@ -58,10 +58,14 @@ type
     Faid: integer; // app id (managed by iorm)
     Fapp: String; // app name (managed by iorm)
     Faud: String; // audience (potrebbe rappresentare i resource server ai quali la client app o l'utente sono autorizzati ad accedere)
+    Fcon: String; // connection name to be used locally
+    Fcrm: String; // connection name to be used remotely (on the app server)
     Fexp: TDateTime; // expiration
     Fiat: TDateTime; // issued at time
     Fiss: String; // issuer (rappresente colui che ha rilasciato il token, potrebbe essere l'authorization server stesso)
     Fjti: String; // jwt id (id univoco che identifica il token, es. si usa per annullare un token emesso attraverso una black list)
+    Flic: String; // license (name/alphanumeric id/customer name etc)
+    Flid: integer; // license id (as integer)
     Fnbf: TDateTime; // not before
     Fsub: String; // subject
     Ftyp: String; // token type
@@ -87,35 +91,43 @@ type
     constructor CreateByToken(const AToken, ASecret: String);
     destructor Destroy; override;
     // methods
-    function HasAppID: Boolean;
     function HasApp: Boolean;
+    function HasAppOID: Boolean;
     function HasAudience: Boolean;
+    function HasConnection: Boolean;
+    function HasConnectionRemote: Boolean;
     function HasExpiration: Boolean;
     function HasIssuedAtTime: Boolean;
     function HasIssuer: Boolean;
     function HasJwtID: Boolean;
+    function HasLicense: Boolean;
+    function HasLicenseOID: Boolean;
     function HasNotBefore: Boolean;
     function HasSubject: Boolean;
     function HasTokenType: Boolean;
-    function HasUserID: Boolean;
     function HasUser: Boolean;
+    function HasUserOID: Boolean;
     function TokenAsString(const ASecret: String): String;
     // checks
     function IsExpired(const ANow: TDateTime): Boolean;
     function IsNotYetValid(const ANow: TDateTime): Boolean;
     // claims
-    property AppOID: Integer read Faid write Faid;
     property App: String read Fapp write Fapp;
+    property AppOID: Integer read Faid write Faid;
     property Audience: String read Faud write Faud;
+    property Connection: String read Fcon write Fcon;
+    property ConnectionRemote: String read Fcrm write Fcrm;
     property Expiration: TDateTime read Fexp write Fexp;
     property IssueAtTime: TDateTime read Fiat write Fiat;
     property Issuer: String read Fiss write Fiss;
     property JwtID: String read Fjti write Fjti;
+    property License: String read Flic write Flic;
+    property LicenseOID: integer read Flid write Flid;
     property NotBefore: TDateTime read Fnbf write Fnbf;
     property Subject: String read Fsub write Fsub;
     property TokenType: String read Ftyp write Ftyp;
-    property UserOID: Integer read Fuid write Fuid;
     property User: String read Fusr write Fusr;
+    property UserOID: Integer read Fuid write Fuid;
     // token
     property IsVerified: Boolean read FIsVerified;
   end;
@@ -186,7 +198,7 @@ begin
   Result := Fapp <> IO_STRING_NULL_VALUE;
 end;
 
-function TioJWT.HasAppID: Boolean;
+function TioJWT.HasAppOID: Boolean;
 begin
   Result := Faid <> IO_INTEGER_NULL_VALUE;
 end;
@@ -194,6 +206,16 @@ end;
 function TioJWT.HasAudience: Boolean;
 begin
   Result := Faud <> IO_STRING_NULL_VALUE;
+end;
+
+function TioJWT.HasConnection: Boolean;
+begin
+  Result := Fcon <> IO_STRING_NULL_VALUE;
+end;
+
+function TioJWT.HasConnectionRemote: Boolean;
+begin
+  Result := Fcrm <> IO_STRING_NULL_VALUE;
 end;
 
 function TioJWT.HasExpiration: Boolean;
@@ -216,6 +238,16 @@ begin
   Result := Fjti <> IO_STRING_NULL_VALUE;
 end;
 
+function TioJWT.HasLicense: Boolean;
+begin
+  Result := Flic <> IO_STRING_NULL_VALUE;
+end;
+
+function TioJWT.HasLicenseOID: Boolean;
+begin
+  Result := Flid <> IO_INTEGER_NULL_VALUE;
+end;
+
 function TioJWT.HasNotBefore: Boolean;
 begin
   Result := Fnbf <> IO_DATETIME_NULL_VALUE;
@@ -231,7 +263,7 @@ begin
   Result := Fusr <> IO_STRING_NULL_VALUE;
 end;
 
-function TioJWT.HasUserID: Boolean;
+function TioJWT.HasUserOID: Boolean;
 begin
   Result := Fuid <> IO_INTEGER_NULL_VALUE;
 end;
