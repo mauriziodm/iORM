@@ -40,6 +40,7 @@ procedure Register;
 implementation
 
 uses
+//  iORM.Abstraction.uniGUI,
   ToolsAPI, System.Classes, iORM.DB.ConnectionDef, iORM.DB.DataSet.Master, iORM.Abstraction.VCL, iORM.Abstraction.FMX,
 {$IFNDEF ioDelphiProfessional}
   iORM.DB.ConnectionDef.MSSQLServer,

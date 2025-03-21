@@ -634,8 +634,6 @@ begin
 end;
 
 class function TioCustomSessionDataStore.AcquireNewThreadSessionData: IioAuthSessionData;
-var
-  LThreadID: TThreadID;
 begin
   _Lock;
   Result := _GetThreadSessionData(True);

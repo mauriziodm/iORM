@@ -216,6 +216,7 @@ var
   LItem: TioCRUDInterceptorItem;
   LCurrConnectionName: String;
 begin
+  Result := False;
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
   begin
     // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
@@ -238,6 +239,7 @@ var
   LItem: TioCRUDInterceptorItem;
   LCurrConnectionName: String;
 begin
+  Result := False;
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
   begin
     // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
@@ -260,6 +262,7 @@ var
   LItem: TioCRUDInterceptorItem;
   LCurrConnectionName: String;
 begin
+  Result := False;
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
   begin
     // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
@@ -282,6 +285,7 @@ var
   LItem: TioCRUDInterceptorItem;
   LCurrConnectionName: String;
 begin
+  Result := False;
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
   begin
     // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)

@@ -57,7 +57,6 @@ type
     FMap: IioMap;
     FObjNextVersion: TioObjVersion;
     FOriginalNonTrueClassMap: IioMap;
-    FPSRequest: IioPersistenceStrategyRequest;
     FSynchroStrategy_Client_NoDirectCall: IioSynchroStrategy_Client;
     // ActionType
     function GetActionType: TioPersistenceActionType;

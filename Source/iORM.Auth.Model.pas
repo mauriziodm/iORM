@@ -102,6 +102,7 @@ type
     procedure SetStatus(const Value: TioAuthUserStatus);
   strict protected
     // ---------- can be ovverrided ----------
+    function CheckIfActive(const RaiseExceptions: Boolean): Boolean; virtual;
     function GetExceptionEntityName: String; virtual;
     function GetExceptionSubjectName: String; virtual;
     function GetIsExpired: Boolean; virtual;
@@ -109,9 +110,6 @@ type
   public
     constructor Create; virtual;
     function ClassName: String;
-    // ---------- can be ovverrided ----------
-    function CheckIfActive(const RaiseExceptions: Boolean): Boolean; virtual;
-    // ---------- can be ovverrided ----------
     // properties
     property ID: Integer read GetID;
     property Expiration: TDateTime read GetExpiration write SetExpiration;
@@ -136,7 +134,7 @@ type
     function GetPermissionLevelFor: TioAuthPermissionLevel; virtual;
     // ---------- can be ovverrided ----------
   public
-    constructor Create; virtual;
+    constructor Create; reintroduce; virtual;
     // properties
     property PermissionLevel: TioAuthPermissionLevel read GetPermissionLevel write SetPermissionLevel;
     property Scope: String read GetScope write SetScope;
@@ -156,7 +154,7 @@ type
     function GetPermissionLevelFor(AScope: String): TioAuthPermissionLevel; virtual;
     // ---------- can be ovverrided ----------
   public
-    constructor Create; override;
+    constructor Create; reintroduce; overload;
     destructor Destroy; override;
     // properties
     property Name: String read GetName write SetName;
@@ -176,7 +174,7 @@ type
     function GetPermissionLevelFor(AScope: String): TioAuthPermissionLevel; virtual;
     // ---------- can be ovverrided ----------
   public
-    constructor Create(const ARole: IioAuthRole); overload;
+    constructor Create(const ARole: IioAuthRole); reintroduce; overload;
     // properties
     property Role: IioAuthRole read GetRole;
   end;
@@ -248,7 +246,7 @@ type
     // ---------- can be ovverrided ----------
     function CanAuthorizeCredentials: Boolean; virtual;
     // TODO: implementare attributi [ioInvokeBeforePersist, ioInvokeAfterPersist, ioInvokeBeforeDelete, ioInvokeAfterDelete]
-    [ioInvokeBeforePersist]
+//    [ioInvokeBeforePersist]
     procedure ConfirmCredentials; virtual;
     function ResetCredentials(const AGenerateOTP: Boolean = True; const AOTPDurationMins: Integer = AUTH_OTP_DURATION_MIN): String;
     // ---------- can be ovverrided ----------
@@ -288,7 +286,7 @@ type
     // ---------- can be ovverrided ----------
     function CanAuthorizeCredentials: Boolean; virtual;
     // TODO: implementare attributi [ioInvokeBeforePersist, ioInvokeAfterPersist, ioInvokeBeforeDelete, ioInvokeAfterDelete]
-    [ioInvokeBeforePersist]
+//    [ioInvokeBeforePersist]
     procedure ConfirmCredentials; virtual;
     function ResetCredentials(const AGenerateOTP: Boolean = True; const AOTPDurationMins: Integer = AUTH_OTP_DURATION_MIN): String;
     // ---------- can be ovverrided ----------
@@ -302,7 +300,7 @@ type
     FApp: IioAuthApp;
     function GetApp: IioAuthApp;
   public
-    constructor Create(const AApp: IioAuthApp); overload;
+    constructor Create(const AApp: IioAuthApp); reintroduce; overload;
     // ---------- to be ovverrided ----------
     function CheckIfActive(const RaiseExceptions: Boolean): Boolean; override;
     function GetExceptionEntityName: String; override;
@@ -662,6 +660,7 @@ var
   LAuthUserRoleItem: IioAuthRoleItem;
   LPermissionLevel: TioAuthPermissionLevel;
 begin
+  Result := plUnauthorized;
   if IsActive then
   begin
     for LAuthUserRoleItem in FRoles do
@@ -670,9 +669,7 @@ begin
       if LPermissionLevel > Result then
         Result := LPermissionLevel;
     end;
-  end
-  else
-    Result := plUnauthorized;
+  end;
 end;
 
 { TioAuthUser }

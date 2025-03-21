@@ -328,6 +328,7 @@ var
   LPermissionLevel: TioAuthPermissionLevel;
 begin
   Result := TioAuthFactory.NewAuthResponse;
+  LPermissionLevel := plUnauthorized;
   // First check if the component is enabled
   CheckActive;
   // invoke OnLogin event if assigned

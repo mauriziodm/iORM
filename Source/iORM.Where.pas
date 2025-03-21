@@ -869,6 +869,8 @@ begin
   LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadCount(Self);
   // get the right persistence strategy and execute the request
   TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
+  // extract the result
+  Result := LPSRequest.ResultAsInteger;
 end;
 
 function TioWhere.GetClearListBefore: Boolean;
@@ -1060,6 +1062,8 @@ begin
   LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadMax(Self, APropertyName);
   // get the right persistence strategy and execute the request
   TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
+  // extract the result
+  Result := LPSRequest.ResultAsInteger;
 end;
 
 function TioWhere.Min(const APropertyName: String): Integer;
@@ -1070,6 +1074,8 @@ begin
   LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadMin(Self, APropertyName);
   // get the right persistence strategy and execute the request
   TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
+  // extract the result
+  Result := LPSRequest.ResultAsInteger;
 end;
 
 function TioWhere.NotExists: Boolean;
@@ -1219,6 +1225,8 @@ begin
   LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadObject(Self, AObj, FIntent);
   // get the right persistence strategy and execute the request
   TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
+  // extract the obj result
+  Result := LPSRequest.DTO;
 end;
 
 function TioWhere.ToObject(const AIntf: IInterface): TObject;
@@ -1467,6 +1475,8 @@ begin
   LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadObjectByClassOnly(Self, AObj, AIntent);
   // get the right persistence strategy and execute the request
   TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
+  // extract the obj result
+  Result := LPSRequest.DTO;
 end;
 
 function TioWhere._Value(AValue: IInterface): IioWhere;

@@ -175,6 +175,7 @@ end;
 
 class function TioApplicationUniGUI._Terminate: Boolean;
 begin
+  Result := True;
   uniGUIApplication.UniSession.Terminate;
 end;
 

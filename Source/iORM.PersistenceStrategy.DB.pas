@@ -738,6 +738,8 @@ var
         Result := TioCRUDInterceptorRegister.BeforeInsert(LContext);
       atDelete:
         Result := TioCRUDInterceptorRegister.BeforeDelete(LContext);
+    else
+      Result := False;
     end;
   end;
   procedure _Interceptors_InterceptAfterAction;

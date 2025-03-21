@@ -181,6 +181,7 @@ var
   LTypeName: String;
   LInterceptor: TioStrategyInterceptorRef;
 begin
+  Result := False;
   if Assigned(FInternalContainer) then
   begin
     LTypeName := TioUtilities.ExtractItemRttiTypeFromList(APSRequest.ListDTO).Name;
@@ -204,6 +205,7 @@ var
   LTypeName: String;
   LInterceptor: TioStrategyInterceptorRef;
 begin
+  Result := False;
   if Assigned(FInternalContainer) then
   begin
     LTypeName := APSRequest.DTO.ClassName;
@@ -227,6 +229,7 @@ var
   LTypeName: String;
   LInterceptor: TioStrategyInterceptorRef;
 begin
+  Result := False;
   if Assigned(FInternalContainer) then
   begin
     LTypeName := APSRequest.Where.TypeName;
@@ -250,6 +253,7 @@ var
   LTypeName: String;
   LInterceptor: TioStrategyInterceptorRef;
 begin
+  Result := False;
   if Assigned(FInternalContainer) then
   begin
     LTypeName := APSRequest.Where.TypeName;
@@ -273,6 +277,7 @@ var
   LTypeName: String;
   LInterceptor: TioStrategyInterceptorRef;
 begin
+  Result := False;
   if Assigned(FInternalContainer) then
   begin
     LTypeName := TioUtilities.ExtractItemRttiTypeFromList(APSRequest.ListDTO).Name;
@@ -296,6 +301,7 @@ var
   LTypeName: String;
   LInterceptor: TioStrategyInterceptorRef;
 begin
+  Result := False;
   if Assigned(FInternalContainer) then
   begin
     LTypeName := APSRequest.DTO.ClassName;

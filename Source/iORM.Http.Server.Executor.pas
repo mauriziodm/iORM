@@ -115,7 +115,7 @@ begin
       psmLoadMin:
         _Execute_IntegerResult(LPSRequest, LioResponseBody);
       psmLoadObject:
-        _PersistObject(LPSRequest, LioResponseBody);
+        _LoadObject(LPSRequest, LioResponseBody);
       psmPersistList:
         _PersistList(LPSRequest, LioResponseBody);
       psmPersistObject:

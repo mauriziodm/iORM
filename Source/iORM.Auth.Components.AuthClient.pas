@@ -218,9 +218,9 @@ begin
   // TODO: AUTH: forse è meglio che il metodo anonimo riceva direttamente lìAuthResponse? Verificare!!!
   LGetUserAuthGrantResponseMethod := procedure(const AIsAuthorized: Boolean; const AUserAuthGrant: String = IO_AUTH_NULL_JWT)
   var
-    LDone: Boolean;
     LException: Exception;
   begin
+    LException := nil;
     // executes the operation inside a try-finally block to be able to invoke the onException... event if there is one
     try
       // step 3 - check if authorized
@@ -313,6 +313,7 @@ var
   LSession: IioAuthSessionData;
 begin
   Result := False;
+  LException := nil;
   // first check if the component is enabled
   _CheckActive;
   // -------------------- check if already logged on --------------------
@@ -356,6 +357,7 @@ var
   LSession: IioAuthSessionData;
 begin
   Result := False;
+  LException := nil;
   // first check if the component is enabled
   _CheckActive;
   // executes the operation inside a try-except block to be able to invoke the onException... event if there is one
@@ -481,6 +483,7 @@ var
   LSession: IioAuthSessionData;
 begin
   Result := False;
+  LException := nil;
   // first check if the component is enabled
   _CheckActive;
   // acquire the session
@@ -515,6 +518,7 @@ var
   LSession: IioAuthSessionData;
 begin
   Result := False;
+  LException := nil;
   // first check if the component is enabled
   _CheckActive;
   // acquire the session
@@ -634,6 +638,7 @@ var
   LSession: IioAuthSessionData;
 begin
   Result := False;
+  LException := nil;
   // first check if the component is enabled
   _CheckActive;
   // acquire the session

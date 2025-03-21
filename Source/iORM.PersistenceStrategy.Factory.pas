@@ -48,8 +48,6 @@ type
   private
     class procedure _SetPSRequestConnectionsIfNotEmpty(const APSRequest: IioPersistenceStrategyRequest; const AConnectionName, AConnectionNameRemote: String); static; inline;
     class function _NewPSRequest(const AMethod: TioPersistenceStrategyMethod; const FillSessionRelatedProperties: Boolean): IioPersistenceStrategyRequest; static; inline;
-    class function NewPSRequest_LoadList_WithPrevSessionData(const AWhere: IioWhere; const AListDTO: TObject; const AIntent: TioPersistenceIntentType;
-      const APrevSessionData: IioAuthSessionData): IioPersistenceStrategyRequest; static;
   public
     // TODO: Possibile eliminare il metodo GetStrategy_ByConnectionName?
     class function GetStrategy_ByConnectionName(const AConnectionName: String): TioPersistenceStrategyRef;
@@ -256,18 +254,6 @@ class function TioPersistenceStrategyFactory.NewPSRequest_LoadList(const AWhere:
   const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(psmLoadList, True);
-  Result.Intent := AIntent;
-  Result.ListDTO := AListDTO;
-  Result.ListDTO_Serialize := False;
-  Result.Where := AWhere;
-  Result.Where.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
-end;
-
-class function TioPersistenceStrategyFactory.NewPSRequest_LoadList_WithPrevSessionData(const AWhere: IioWhere; const AListDTO: TObject;
-  const AIntent: TioPersistenceIntentType; const APrevSessionData: IioAuthSessionData): IioPersistenceStrategyRequest;
-begin
-  Result := _NewPSRequest(psmLoadList, False);
-  Result.ImportSessionData(APrevSessionData);
   Result.Intent := AIntent;
   Result.ListDTO := AListDTO;
   Result.ListDTO_Serialize := False;
