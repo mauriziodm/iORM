@@ -44,6 +44,7 @@ type
   TioFMX = class(TioCustomPlatformAbstractionComponent)
   public
     class constructor Create;
+    class destructor Destroy;
   end;
 
   TioApplicationFMX = class(TioApplication)
@@ -372,11 +373,17 @@ end;
 
 class constructor TioFMX.Create;
 begin
+  TioSimpleSessionDataStore._Initialize;
   TioApplicationFMX._SetConcreteClass(TioApplicationFMX);
   TioApplicationFMX._FConcreteSessionDataStoreClass_NoDirectCall := TioSimpleSessionDataStore;
   TioControlFMX.SetConcreteClass(TioControlFMX);
   TioTimerFMX.SetConcreteClass(TioTimerFMX);
   TioActionFMX.SetConcreteClass(TioActionFMX);
+end;
+
+class destructor TioFMX.Destroy;
+begin
+  TioSimpleSessionDataStore._Finalize;
 end;
 
 end.

@@ -44,6 +44,7 @@ type
   TioVCL = class(TioCustomPlatformAbstractionComponent)
   public
     class constructor Create;
+    class destructor Destroy;
   end;
 
   TioApplicationVCL = class(TioApplication)
@@ -372,11 +373,17 @@ end;
 class constructor TioVCL.Create;
 begin
   inherited;
+  TioSimpleSessionDataStore._Initialize;
   TioApplicationVCL._SetConcreteClass(TioApplicationVCL);
   TioApplicationVCL._FConcreteSessionDataStoreClass_NoDirectCall := TioSimpleSessionDataStore;
   TioControlVCL.SetConcreteClass(TioControlVCL);
   TioTimerVCL.SetConcreteClass(TioTimerVCL);
   TioActionVCL.SetConcreteClass(TioActionVCL);
+end;
+
+class destructor TioVCL.Destroy;
+begin
+  TioSimpleSessionDataStore._Finalize;
 end;
 
 end.

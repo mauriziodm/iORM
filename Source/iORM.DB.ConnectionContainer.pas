@@ -36,13 +36,8 @@ unit iORM.DB.ConnectionContainer;
 interface
 
 uses
-{$IFDEF MSWINDOWS}
-  FireDAC.Moni.Base,
-  FireDAC.Moni.RemoteClient,
-  FireDAC.Moni.FlatFile,
-{$ENDIF}
+  {$I ioFireDAC_uses.inc}
   System.Generics.Collections,
-  FireDAC.Comp.Client,
   iORM.DB.Interfaces,
   iORM.CommonTypes, System.SysUtils, iORM.SynchroStrategy.Interfaces;
 

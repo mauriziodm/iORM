@@ -59,6 +59,7 @@ type
   TioUniGUI = class(TioCustomPlatformAbstractionComponent)
   public
     class constructor Create;
+    class destructor Destroy;
   end;
 
   TioUniMainSessionDataContainer = TDictionary<String, IioAuthSessionData>;
@@ -66,10 +67,11 @@ type
   private
     class var FMainSessionDataContainer: TioUniMainSessionDataContainer;
   protected
-    class procedure _Initialize; override;
-    class procedure _Finalize; override;
     class function _ClearMainSessionData: IioAuthSessionData; override;
     class function _GetMainSessionData: IioAuthSessionData; override;
+  public
+    class procedure _Initialize; override;
+    class procedure _Finalize; override;
   end;
 
   TioApplicationUniGUI = class(TioApplication)
@@ -409,17 +411,6 @@ begin
   Result := AField.FieldType.IsInstance and AField.FieldType.AsInstance.MetaclassType.InheritsFrom(TAction);
 end;
 
-{ TioUniGUI }
-
-class constructor TioUniGUI.Create;
-begin
-  TioApplicationUniGUI._SetConcreteClass(TioApplicationUniGUI);
-  TioApplicationUniGUI._FConcreteSessionDataStoreClass_NoDirectCall := TioUniSessionDataStore;
-  TioControlUniGUI.SetConcreteClass(TioControlUniGUI);
-  TioTimerUniGUI.SetConcreteClass(TioTimerUniGUI);
-  TioActionUniGUI.SetConcreteClass(TioActionUniGUI);
-end;
-
 { TioUniSessionDataStore }
 
 class procedure TioUniSessionDataStore._Initialize;
@@ -449,6 +440,23 @@ begin
     Result := TioAuthFactory.NewAuthSessionData;
     FMainSessionDataContainer.Add(LSessionID, Result);
   end;
+end;
+
+{ TioUniGUI }
+
+class constructor TioUniGUI.Create;
+begin
+  TioUniSessionDataStore._Initialize;
+  TioApplicationUniGUI._SetConcreteClass(TioApplicationUniGUI);
+  TioApplicationUniGUI._FConcreteSessionDataStoreClass_NoDirectCall := TioUniSessionDataStore;
+  TioControlUniGUI.SetConcreteClass(TioControlUniGUI);
+  TioTimerUniGUI.SetConcreteClass(TioTimerUniGUI);
+  TioActionUniGUI.SetConcreteClass(TioActionUniGUI);
+end;
+
+class destructor TioUniGUI.Destroy;
+begin
+  TioUniSessionDataStore._Finalize;
 end;
 
 end.

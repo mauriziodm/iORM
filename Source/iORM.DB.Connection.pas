@@ -37,22 +37,8 @@ interface
 {$I ioGlobalDef.inc}   // iORM global definitions
 
 uses
-  iORM.DB.Interfaces,
-  FireDAC.Stan.Def,
-  FireDAC.Phys.SQLite,
-  FireDAC.Phys.SQLiteWrapper.Stat,
-  FireDAC.Phys.FB,
-  FireDAC.Stan.ExprFuncs,
-  FireDAC.Stan.Intf,
-  FireDAC.Phys,
-  FireDAC.DApt,
-  FireDAC.UI.Intf,
-{$IFDEF CONSOLE}  // Non più necessaria???
-  FireDAC.ConsoleUI.Wait,
-{$ENDIF}
-  FireDAC.Stan.Async,
-  FireDAC.Comp.UI;
-
+  {$I ioFireDAC_uses.inc}
+  iORM.DB.Interfaces;
 
 type
 

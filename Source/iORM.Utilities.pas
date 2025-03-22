@@ -198,12 +198,17 @@ end;
 
 class function TioUtilities.ObjToID(const AObj: Tobject): Integer;
 var
+  LIDProp: IioProperty;
   LMap: IioMap;
 begin
   if not Assigned(AObj) then
     raise EioGenericException.Create(ClassName, 'ExtractOID', '"AObj" parameter not assigned');
   LMap := TioMapContainer.GetMap(AObj.ClassName);
-  Result := LMap.GetProperties.GetIdProperty.GetValue(AObj).AsInteger;
+  LIDProp := LMap.GetProperties.GetIdProperty;
+  if Assigned(LIDProp) then
+    Result := LIDProp.GetValue(AObj).AsInteger
+  else
+    raise EioGenericException.Create(ClassName, 'ObjToID', Format('the %s class object does not contain any ID properties', [AObj.ClassName]));
 end;
 
 class function TioUtilities.IntfToID(const AIntf: IInterface): Integer;

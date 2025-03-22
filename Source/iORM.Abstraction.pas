@@ -70,48 +70,47 @@ type
     class var FThreadSessionData: TioThreadSessionDataContainer;
     class function _InternalGetCurrentConnectionName: String; inline;
   protected
-    class procedure _Initialize; virtual;
-    class procedure _Finalize; virtual;
     class function _ClearMainSessionData: IioAuthSessionData; virtual; abstract;
     class function _GetMainSessionData: IioAuthSessionData; virtual; abstract;
     class function _GetThreadSessionData(const CreateIfNotExists: Boolean): IioAuthSessionData; inline;
     class function _GetThreadOrMainSessionData(const RaiseIfNoSessionExists: Boolean): IioAuthSessionData; inline;
   public
-    class constructor Create;
-    class destructor Destroy;
+    class procedure _Initialize; virtual;
+    class procedure _Finalize; virtual;
     // thread safe
     class procedure _Lock; inline;
     class procedure _Unlock; inline;
-    class procedure Release; static;
+    class procedure Release;
     // fill persistence strategy request
-    class procedure _FillPersistenceStrategyRequest(const APersistenceStrategyRequest: IioPersistenceStrategyRequest); static;
+    class procedure _FillPersistenceStrategyRequest(const APersistenceStrategyRequest: IioPersistenceStrategyRequest);
     // current connection
     class function IsEmptyConnectionName(const AConnectionName: String): Boolean; inline;
-    class function GetCurrentConnectionName: String; static;
+    class function GetCurrentConnectionName: String;
     class function GetCurrentConnectionNameIfEmpty(const AConnectionName: String): String;
     // main session data
-    class function AcquireMainSessionData: IioAuthSessionData; static;
-    class procedure ClearMainSessionData; static;
-    class procedure SetMainSessionConnection(const Value: String); static;
+    class function AcquireMainSessionData: IioAuthSessionData;
+    class procedure ClearMainSessionData;
+    class procedure SetMainSessionConnection(const Value: String);
     // thread session data
-    class function AcquireNewThreadSessionData: IioAuthSessionData; static;
-    class procedure ClearThreadSessionData; static;
-    class procedure SetThreadSessionConnection(const Value: String); static;
+    class function AcquireNewThreadSessionData: IioAuthSessionData;
+    class procedure ClearThreadSessionData;
+    class procedure SetThreadSessionConnection(const Value: String);
     // thread or main session data
-    class function _CloneThreadOrMainSessionData: IioAuthSessionData; static;
+    class function _CloneThreadOrMainSessionData: IioAuthSessionData;
     // default connection
     class function GetDefaultConnection: String;
-    class procedure SetDefaultConnection(const Value: String); static;
-    class procedure SetDefaultConnectionIfEmpty(const AConnectionName: String); static;
+    class procedure SetDefaultConnection(const Value: String);
+    class procedure SetDefaultConnectionIfEmpty(const AConnectionName: String);
   end;
 
   TioSimpleSessionDataStore = class(TioCustomSessionDataStore)
   private
     class var FMainSessionData: IioAuthSessionData;
   protected
-    class procedure _Initialize; override;
     class function _ClearMainSessionData: IioAuthSessionData; override;
     class function _GetMainSessionData: IioAuthSessionData; override;
+  public
+    class procedure _Initialize; override;
   end;
 
   TioApplicationRef = class of TioApplication;
@@ -331,7 +330,7 @@ end;
 class function TioApplication._GetConcreteClass_NoDirectCall: TioApplicationRef;
 begin
   if not Assigned(_FConcreteClass_NoDirectCall) then
-    raise EioGenericException.Create(Self.ClassName, 'GetConcreteClass', 'You must put one of the TioVCL or TioFMX components somewhere in the application.');
+    raise EioGenericException.Create(Self.ClassName, 'GetConcreteClass', 'You must put one of the TioVCL, TioFMX or TioUniGUI components somewhere in the application.');
   Result := _FConcreteClass_NoDirectCall;
 end;
 
@@ -533,16 +532,6 @@ begin
   finally
     _Unlock;
   end;
-end;
-
-class constructor TioCustomSessionDataStore.Create;
-begin
-  _Initialize;
-end;
-
-class destructor TioCustomSessionDataStore.Destroy;
-begin
-  _Finalize;
 end;
 
 class function TioCustomSessionDataStore.GetCurrentConnectionName: String;

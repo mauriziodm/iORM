@@ -714,7 +714,7 @@ begin
 // TODO: Vedere se si possono eliminare le variabili LDuckTypedList e LCurrentObj
     for LCurrentObj in LDuckTypedList do
     begin
-      APSRequest.Obj1 := LCurrentObj;
+      APSRequest.DTO := LCurrentObj;
       _DoPersistObject(APSRequest);
     end;
     _DoCommitTransaction(APSRequest);

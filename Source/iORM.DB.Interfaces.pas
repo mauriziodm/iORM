@@ -376,12 +376,12 @@ type
   private
     // strategy interception layer methods
     // ---------- Begin intercepted methods (Strategy Interceptors) ----------
-    class procedure _InterceptDeleteList(const APSRequest: IioPersistenceStrategyRequest); static; inline;
-    class procedure _InterceptDeleteObject(const APSRequest: IioPersistenceStrategyRequest); static; inline;
-    class procedure _InterceptLoadList(const APSRequest: IioPersistenceStrategyRequest); static; inline;
-    class procedure _InterceptLoadObject(const APSRequest: IioPersistenceStrategyRequest); static; inline;
-    class procedure _InterceptPersistList(const APSRequest: IioPersistenceStrategyRequest); static; inline;
-    class procedure _InterceptPersistObject(const APSRequest: IioPersistenceStrategyRequest); static; inline;
+    class procedure _InterceptDeleteList(const APSRequest: IioPersistenceStrategyRequest); inline;
+    class procedure _InterceptDeleteObject(const APSRequest: IioPersistenceStrategyRequest); inline;
+    class procedure _InterceptLoadList(const APSRequest: IioPersistenceStrategyRequest); inline;
+    class procedure _InterceptLoadObject(const APSRequest: IioPersistenceStrategyRequest); inline;
+    class procedure _InterceptPersistList(const APSRequest: IioPersistenceStrategyRequest); inline;
+    class procedure _InterceptPersistObject(const APSRequest: IioPersistenceStrategyRequest); inline;
     // ---------- End intercepted methods (Strategy Interceptors) ----------
   protected
     // ========== BEGIN OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
@@ -419,8 +419,8 @@ type
     class procedure _DoAuth_User(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
   public
-    class procedure Execute(const APSRequest: IioPersistenceStrategyRequest); static;
-    class function LoadObjVersion(const AContext: IioContext): Integer; static;
+    class procedure Execute(const APSRequest: IioPersistenceStrategyRequest);
+    class function LoadObjVersion(const AContext: IioContext): Integer;
 // TODO: Fare anche una versione asincrona?
 //    class procedure ExecutePSRequestAsync(const APSRequest: IioPersistenceStrategyRequest; const AOnTerminate: TioPSROnTerminateMethod; const AOnException: TioPSROnExceptionMethod);
 // TODO: Fare anche l'esecuzione di Unit Of Work? (collezione di PSRequest)

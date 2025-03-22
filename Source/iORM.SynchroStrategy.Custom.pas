@@ -58,9 +58,9 @@ type
     FSynchroLogName: String;
     FSynchroStatus: TioSynchroStatus;
     FUserID: Integer;
-    FUser: String;
+    FUserName: String;
     FAppID: Integer;
-    FApp: String;
+    FAppName: String;
     // Count
     FCliToSrv_Count: Integer;
     FSrvToCli_Count: Integer;
@@ -88,10 +88,10 @@ type
     property SynchroStatus: TioSynchroStatus read FSynchroStatus write FSynchroStatus;
     property UserID: Integer read FUserID write FUserID;
     [ioVarChar(100)]
-    property User: String read FUser write FUser;
+    property UserName: String read FUserName write FUserName;
     property AppID: Integer read FAppID write FAppID;
     [ioVarChar(100)]
-    property App: String read FApp write FApp;
+    property App: String read FAppName write FAppName;
     // Count
     property CliToSrv_Count: Integer read FCliToSrv_Count write FCliToSrv_Count;
     property SrvToCli_Count: Integer read FSrvToCli_Count write FSrvToCli_Count;
@@ -744,7 +744,7 @@ begin
   FSynchroLogItem_New.SynchroStatus := TioSynchroStatus.ssInitialization;
   FSynchroLogItem_New.SynchroLevel := FSynchroLevel;
   FSynchroLogItem_New.SynchroLogName := FSynchroLogName;
-  FSynchroLogItem_New.User := FSessionData.User;
+  FSynchroLogItem_New.UserName := FSessionData.User;
   FSynchroLogItem_New.UserID := FSessionData.UserOID;
   FSynchroLogItem_New.App := FSessionData.App;
   FSynchroLogItem_New.AppID := FSessionData.AppOID;
@@ -822,9 +822,9 @@ begin
   FDateAndTime := Now;
   FSynchroLogName := IO_STRING_NULL_VALUE;
   FUserID := IO_INTEGER_NULL_VALUE;
-  FUser := IO_STRING_NULL_VALUE;
+  FUserName := IO_STRING_NULL_VALUE;
   FAppID := IO_INTEGER_NULL_VALUE;
-  FApp := IO_STRING_NULL_VALUE;
+  FAppName := IO_STRING_NULL_VALUE;
   FSynchroLevel := TioSynchroLevel.slIncremental;
   FSynchroStatus := TioSynchroStatus.ssInitialization;
   // Count
@@ -855,7 +855,7 @@ begin
   Result := String.Empty;
   // Extract user info as native type
   LUserID := Integer(FUserID);
-  LUserName := String(FUser);
+  LUserName := String(FUserName);
   // UserID
   if LUserID <> 0 then
     Result := LUserID.ToString;
