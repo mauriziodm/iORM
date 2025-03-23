@@ -407,6 +407,6 @@ initialization
 
 finalization
 
-TioCRUDInterceptorRegister.Clean;
+  TioCRUDInterceptorRegister.Clean;
 
 end.

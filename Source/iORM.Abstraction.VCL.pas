@@ -42,9 +42,6 @@ uses
 type
 
   TioVCL = class(TioCustomPlatformAbstractionComponent)
-  public
-    class constructor Create;
-    class destructor Destroy;
   end;
 
   TioApplicationVCL = class(TioApplication)
@@ -368,22 +365,34 @@ begin
   TControl(AControl).Visible := AVisible;
 end;
 
-{ TioVCL }
+initialization
 
-class constructor TioVCL.Create;
-begin
-  inherited;
   TioSimpleSessionDataStore._Initialize;
   TioApplicationVCL._SetConcreteClass(TioApplicationVCL);
   TioApplicationVCL._FConcreteSessionDataStoreClass_NoDirectCall := TioSimpleSessionDataStore;
   TioControlVCL.SetConcreteClass(TioControlVCL);
   TioTimerVCL.SetConcreteClass(TioTimerVCL);
   TioActionVCL.SetConcreteClass(TioActionVCL);
-end;
 
-class destructor TioVCL.Destroy;
-begin
-  TioSimpleSessionDataStore._Finalize;
-end;
+finalization
+
+  // controlllo se la Application.MainForm = nil perchè in questo modo riesco a capire
+  //  se questo codice sta girando nel contesto dell'IDE in quanto componente installato
+  //  oppure in una applicazione che usa il componente stesso. Quindi mi serviva un modo
+  //  globale, cioè non legato a una certa istanza del componente (non potevo controllare
+  //  la proprietà ComponentState se conteneva il flag csDesigning) perchè quanto si
+  //  installa o disinstalla il componente nell'IDE non c'è una vera e propria istanza
+  //  quindi ComponentState (che è una proprietà dell'istanza) non aveva senso. Verificando
+  //  invece se Application.MainForm = nil capisco che non sta girando dentro una applicazione
+  //  che usa il componente ma direttamente nell'IDE perchè a design time la MainForm non
+  //  esiste, esisterà solo quanto l'allicazione verrà avviata.
+  // NB: Ho dovuto mettere questo if perchè altrimenti quando chiudevo Delphi oppure
+  //      disinstallavo il package dall'IDE (o facevo il clean) mi dava un errore di
+  //      puntatore non valido; se invece eliminavo completamente la riga "TioSimpleSessionDataStore._Finalize;"
+  //      poi avevo un memory leak quando girava in una applicazione che usa il componente,
+  //      in questo modo invece sembra andare bene anche se mi rimane il dubbio che poi il memory
+  //      leak lo abbia l'IDE ma invece sembra andare tutto bene.
+  if Application.MainForm = nil then
+    TioSimpleSessionDataStore._Finalize;
 
 end.

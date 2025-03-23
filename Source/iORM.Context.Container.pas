@@ -851,7 +851,7 @@ end;
 initialization
 
 // NB: Spostato sulla initialize della unit iORM
-// Create the ContextXontainer Instance and Init it by loading
+// Create the ContextContainer Instance and Init it by loading
 // all entities declarated in the application
 // TioEnumerationContainer.Build;
 // TioMapContainer.Build;
