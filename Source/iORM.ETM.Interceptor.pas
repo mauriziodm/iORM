@@ -65,20 +65,25 @@ type
 implementation
 
 uses
-  iORM, iORM.CommonTypes, iORM.SynchroStrategy.Interfaces, iORM.LiveBindings.BSPersistence;
+  iORM, iORM.CommonTypes, iORM.SynchroStrategy.Interfaces, iORM.LiveBindings.BSPersistence,
+  iORM.PersistenceStrategy.Interfaces, iORM.PersistenceStrategy.Factory;
 
 { TioEtmInterceptor }
 
 class procedure TioEtmInterceptor._CreateAndPersistNewTimeSlot_Internal(const AContext: IioContext);
 var
+  LPSRequest: IioPersistenceStrategyRequest;
   LTimeSlot: TioEtmCustomTimeSlot;
 begin
   if AContext.SynchroStrategy_CanPersistEtmTimeSlot then
   begin
     LTimeSlot := AContext.Map.GetTable.GetEtmTimeSlotClass.Create(AContext);
     try
-      // Intent is itRegular for the TimeSlot class and not depending from AContext
-      io._PersistObjectInternal(LTimeSlot, itRegular, BL_ETM_PERSIST_TIMESLOT, '', 0, nil, '', '');
+      // Create the PSRequest to persist the TimeSlot, import session data from the context then execute it
+      // note: Intent is itRegular for the TimeSlot class and not depending from AContext
+      LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_PersistObject(LTimeSlot, itRegular, BL_ETM_PERSIST_TIMESLOT, '', 0, nil, '', '');
+      LPSRequest.ImportSessionDataFromPSRequest(AContext.PSRequest);
+      io._ExecutePSRequest(LPSRequest);
     finally
       LTimeSlot.Free;
     end;

@@ -42,7 +42,7 @@ uses
 
 type
 
-//  [ioEntity('SYNCHRO_LOG', mmProperties)]
+  [ioEntity('SYNCHRO_LOG', mmProperties)]
   TioEtmSynchroStrategy_LogItem = class(TioCustomSynchroStrategy_LogItem)
   strict private
     FEtmTimeSlot_ClassName: String;
@@ -420,8 +420,11 @@ begin
   LWhere := io.Where('ID', coGreaterOrEqual, LSynchroLogItem_New.SrvToCli_TimeSlotID_From);
   // Where: black & white class list
   _BuildBlackAndWhiteListWhere(LWhere);
+  // Load the last (max) ID of the last EtmTimeSlot from the server/remote connection
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_Synchro_LoadMax(Self, ssServerSideExec, FEtmTimeSlot_ClassName, 'ID');
+  io._ExecutePSRequest(LPSRequest);
+  LTimeSlotMaxID := LPSRequest.ResultAsInteger;
   // Where: last timeslot for any object only
-  LTimeSlotMaxID := io.Max(FEtmTimeSlot_ClassName, 'ID');
   LWhere._And(Format('[.ID] = (SELECT MAX(SUB.ID) FROM [%s] SUB WHERE SUB.ID <= %d AND SUB.EntityClassName = [.EntityClassName] AND SUB.EntityID = [.EntityID])',
     [FEtmTimeSlot_ClassName, LTimeSlotMaxID]));
   // EtmTimeSlot_Where if exists

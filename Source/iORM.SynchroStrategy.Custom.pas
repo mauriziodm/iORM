@@ -49,7 +49,6 @@ type
   //      (e.g. which EtmTimeSlot was the last one synchronized)
   //   2) on the server side as a history of the synchronizations that occurred over time
   //      (also on the client side if desired).
-  [ioEntity('SYNCHRO_LOG', mmProperties)]
   TioCustomSynchroStrategy_LogItem = class
   strict private
     FID: Integer;
@@ -142,7 +141,6 @@ type
     FSynchroLogItem_New: TioCustomSynchroStrategy_LogItem;
     FSynchroLogItem_Old: TioCustomSynchroStrategy_LogItem;
     FSynchroLogName: String;
-    [weak]
     FSessionData: IioAuthSessionData;
     [djSkip] // Non viene serializzato (in caso di connessione HTTP) in questo modo poi capisco se siamo remotizzati e quindi se devo fare lo "use" o no.
     FTargetConnectionDefName: String;

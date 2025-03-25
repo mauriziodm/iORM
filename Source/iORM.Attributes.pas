@@ -1234,8 +1234,6 @@ begin
   end;
 end;
 
-{ ioConflictStrategy }
-
 { etmProperty }
 
 constructor etmPropertyAttribute.Create;

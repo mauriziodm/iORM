@@ -113,6 +113,7 @@ type
     constructor CreateByJSONString(const AJSONString:String);
     function AsString: String;
     procedure ImportSessionData(const ASessionData: IioAuthSessionData);
+    procedure ImportSessionDataFromPSRequest(const APSRequest: IioPersistenceStrategyRequest);
     procedure SwitchToConnectionRemote;
     // method property
     property Method: TioPersistenceStrategyMethod read GetMethod;
@@ -545,6 +546,22 @@ begin
     FUsrOID := ASessionData.UserOID;
     // auth
     FAuthToken := ASessionData.AccessToken;
+end;
+
+procedure TioPersistenceStrategyRequest.ImportSessionDataFromPSRequest(const APSRequest: IioPersistenceStrategyRequest);
+begin
+    // app
+    FApp := APSRequest.App;
+    FAppOID := APSRequest.AppOID;
+    // connection
+    FConnection := APSRequest.Connection;
+    // remote connection
+    FConnectionRemote := APSRequest.ConnectionRemote;
+    // user
+    FUsr := APSRequest.Usr;
+    FUsrOID := APSRequest.UsrOID;
+    // auth
+    FAuthToken := APSRequest.AuthToken;
 end;
 
 procedure TioPersistenceStrategyRequest.SetApp(const Value: String);

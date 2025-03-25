@@ -138,6 +138,7 @@ type
     function GetUsrOID: Integer;
     function GetWhere: IioWhere;
     procedure ImportSessionData(const ASessionData: IioAuthSessionData);
+    procedure ImportSessionDataFromPSRequest(const APSRequest: IioPersistenceStrategyRequest);
     procedure SetApp(const Value: String);
     procedure SetAppOID(const Value: Integer);
     procedure SetAuthGrant(const Value: String);

@@ -460,7 +460,7 @@ begin
   // Note: If KeyGenerationTime = kgtAfterInsert and the ID is not assigned then it requests a new ID
   // only if the BlindLevel enables reloading of the assigned ID or if the object contains at least
   // one property with a HasMany or HasOne relation.
-  if (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetTableConnectionName).KeyGenerationTime = kgtAfterInsert) and
+  if (TioConnectionManager.GetConnectionInfo(AContext.GetConnectionNameResolved).KeyGenerationTime = kgtAfterInsert) and
     (AContext.BlindLevel_Do_AutoUpdateProps or AContext.GetProperties.ContainsHasManyOrHasOneProperties) and AContext.IDIsNull then
   begin
     LQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);

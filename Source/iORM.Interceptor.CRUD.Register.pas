@@ -158,7 +158,7 @@ begin
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
   begin
     // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
-    LCurrConnectionName := AContext.Map.GetTable.GetTableConnectionName;
+    LCurrConnectionName := AContext.ConnectionNameResolved;
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName] do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
         LItem.Interceptor.AfterLoad(AContext);
@@ -173,7 +173,7 @@ begin
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
   begin
     // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
-    LCurrConnectionName := AContext.Map.GetTable.GetTableConnectionName;
+    LCurrConnectionName := AContext.ConnectionNameResolved;
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName] do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
         LItem.Interceptor.AfterDelete(AContext);
@@ -188,7 +188,7 @@ begin
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
   begin
     // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
-    LCurrConnectionName := AContext.Map.GetTable.GetTableConnectionName;
+    LCurrConnectionName := AContext.ConnectionNameResolved;
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName] do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
         LItem.Interceptor.AfterInsert(AContext);
@@ -203,7 +203,7 @@ begin
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
   begin
     // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
-    LCurrConnectionName := AContext.Map.GetTable.GetTableConnectionName;
+    LCurrConnectionName := AContext.ConnectionNameResolved;
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName] do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
         LItem.Interceptor.AfterUpdate(AContext);
@@ -220,7 +220,7 @@ begin
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
   begin
     // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
-    LCurrConnectionName := AContext.Map.GetTable.GetTableConnectionName;
+    LCurrConnectionName := AContext.ConnectionNameResolved;
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName] do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
       begin
@@ -243,7 +243,7 @@ begin
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
   begin
     // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
-    LCurrConnectionName := AContext.Map.GetTable.GetTableConnectionName;
+    LCurrConnectionName := AContext.ConnectionNameResolved;
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName] do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
       begin
@@ -266,7 +266,7 @@ begin
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
   begin
     // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
-    LCurrConnectionName := AContext.Map.GetTable.GetTableConnectionName;
+    LCurrConnectionName := AContext.ConnectionNameResolved;
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName] do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
       begin
@@ -289,7 +289,7 @@ begin
   if Assigned(FInternalContainer) and FInternalContainer.ContainsKey(AContext.Map.GetClassName) then
   begin
     // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
-    LCurrConnectionName := AContext.Map.GetTable.GetTableConnectionName;
+    LCurrConnectionName := AContext.ConnectionNameResolved;
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName] do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
       begin
@@ -323,7 +323,7 @@ begin
     // In caso di più interceptor registrati basta che uno solo ritorni True che il risultato sarà True
     Result := False;
     // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
-    LCurrConnectionName := AContext.Map.GetTable.GetTableConnectionName;
+    LCurrConnectionName := AContext.ConnectionNameResolved;
     // Cicla per tutti gli interceptor registrati per la classe e li invoca
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName] do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
@@ -344,7 +344,7 @@ begin
     // In caso di più interceptor registrati basta che uno solo ritorni True che il risultato sarà True
     Result := False;
     // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
-    LCurrConnectionName := AContext.Map.GetTable.GetTableConnectionName;
+    LCurrConnectionName := AContext.ConnectionNameResolved;
     // Cicla per tutti gli interceptor registrati per la classe e li invoca
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName] do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then
@@ -384,7 +384,7 @@ begin
     // In caso di più interceptor registrati basta che uno solo ritorni True che il risultato sarà True
     Result := False;
     // Ottimizzazione perchè internamente poi accede al ConnectionManager che è threadsafe (Locked)
-    LCurrConnectionName := AContext.Map.GetTable.GetTableConnectionName;
+    LCurrConnectionName := AContext.ConnectionNameResolved;
     // Cicla per tutti gli interceptor registrati per la classe e li invoca
     for LItem in FInternalContainer.Items[AContext.Map.GetClassName] do
       if LItem.ConnectionName.IsEmpty or (LItem.ConnectionName = LCurrConnectionName) then

@@ -722,7 +722,7 @@ begin
   // Get the SynchroStrategy if exists
   LSynchroStrategy_Client := SynchroStrategy_Client;
   // If there is a SinchroStrategy, it determines whether the TimeSlot should be created
-  //  and persisted based on the intent of the operation and the properties of th
+  //  and persisted based on the intent of the operation and the properties of the
   //  SynchroStrategy itself.
   Result := True;
   if Assigned(LSynchroStrategy_Client) then
@@ -742,7 +742,7 @@ end;
 function TioContext_Custom.SynchroStrategy_Client: IioSynchroStrategy_Client;
 begin
   if not Assigned(FSynchroStrategy_Client_NoDirectCall) then
-    FSynchroStrategy_Client_NoDirectCall := TioConnectionManager.GetSynchroStrategy_Client(GetTable.GetTableConnectionName);
+    FSynchroStrategy_Client_NoDirectCall := TioConnectionManager.GetSynchroStrategy_Client(GetConnectionNameResolved);
   Result := FSynchroStrategy_Client_NoDirectCall;
 end;
 

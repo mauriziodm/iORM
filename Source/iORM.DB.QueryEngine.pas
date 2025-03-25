@@ -105,10 +105,10 @@ begin
     LQueryIdentity := ComposeQueryIdentity(AContext, 'DEL', AForceCacheable);
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
-  LQuery := TioDbFactory.Query(AContext.GetTable.GetTableConnectionName, LQueryIdentity);
+  LQuery := TioDbFactory.Query(AContext.GetConnectionNameResolved, LQueryIdentity);
   Result := LQuery;
   if LQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetTableConnectionName).GenerateSqlDelete(LQuery, AContext);
+    TioDbFactory.SqlGenerator(AContext.GetConnectionNameResolved).GenerateSqlDelete(LQuery, AContext);
   // Where
   if AContext.WhereExist then
     // Where condition to delete by type, without obj instance (NO ETM)
@@ -128,10 +128,10 @@ var
   AQuery: IioQuery;
 begin
   // Get the query object, the query is always empty because without query identity
-  AQuery := TioDbFactory.Query(AContext.GetTable.GetTableConnectionName);
+  AQuery := TioDbFactory.Query(AContext.GetConnectionNameResolved);
   Result := AQuery;
   if AQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetTableConnectionName).GenerateSqlCreateIndex(AQuery, AContext, AIndexName, ACommaSepFieldList,
+    TioDbFactory.SqlGenerator(AContext.GetConnectionNameResolved).GenerateSqlCreateIndex(AQuery, AContext, AIndexName, ACommaSepFieldList,
       AIndexOrientation, AUnique);
 end;
 
@@ -140,10 +140,10 @@ var
   AQuery: IioQuery;
 begin
   // Get the query object, the query is always empty because without query identity
-  AQuery := TioDbFactory.Query(AContext.GetTable.GetTableConnectionName);
+  AQuery := TioDbFactory.Query(AContext.GetConnectionNameResolved);
   Result := AQuery;
   if AQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetTableConnectionName).GenerateSqlDropIndex(AQuery, AContext, AIndexName);
+    TioDbFactory.SqlGenerator(AContext.GetConnectionNameResolved).GenerateSqlDropIndex(AQuery, AContext, AIndexName);
 end;
 
 class function TioQueryEngine.GetQueryExists(const AContext: IioContext): IioQuery;
@@ -155,10 +155,10 @@ begin
   LQueryIdentity := ComposeQueryIdentity(AContext, 'EXIST', True);
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
-  LQuery := TioDbFactory.Query(AContext.GetTable.GetTableConnectionName, LQueryIdentity);
+  LQuery := TioDbFactory.Query(AContext.GetConnectionNameResolved, LQueryIdentity);
   Result := LQuery;
   if LQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetTableConnectionName).GenerateSqlExists(LQuery, AContext);
+    TioDbFactory.SqlGenerator(AContext.GetConnectionNameResolved).GenerateSqlExists(LQuery, AContext);
   // If a Where exist then the query is an external query else
   // is an internal query.
   LQuery.WhereParamObjID_SetValue(AContext);
@@ -179,10 +179,10 @@ begin
     LQueryIdentity := ComposeQueryIdentity(AContext, 'INS_ID', True);
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
-  LQuery := TioDbFactory.Query(AContext.GetTable.GetTableConnectionName, LQueryIdentity);
+  LQuery := TioDbFactory.Query(AContext.GetConnectionNameResolved, LQueryIdentity);
   Result := LQuery;
   if LQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetTableConnectionName).GenerateSqlInsert(LQuery, AContext);
+    TioDbFactory.SqlGenerator(AContext.GetConnectionNameResolved).GenerateSqlInsert(LQuery, AContext);
   // Iterate for all properties
   for LProp in AContext.GetProperties do
   begin
@@ -225,27 +225,27 @@ class function TioQueryEngine.GetQueryMax(const AContext: IioContext; const APro
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   //   then call the sql query generator
-  Result := TioDbFactory.Query(AContext.GetTable.GetTableConnectionName, ComposeQueryIdentity(AContext, 'MAX_'+AProperty.GetName, True));
+  Result := TioDbFactory.Query(AContext.GetConnectionNameResolved, ComposeQueryIdentity(AContext, 'MAX_'+AProperty.GetName, True));
   if Result.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetTableConnectionName).GenerateSqlMax(Result, AContext, AProperty);
+    TioDbFactory.SqlGenerator(AContext.GetConnectionNameResolved).GenerateSqlMax(Result, AContext, AProperty);
 end;
 
 class function TioQueryEngine.GetQueryMin(const AContext: IioContext; const AProperty: IioProperty): IioQuery;
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   //   then call the sql query generator
-  Result := TioDbFactory.Query(AContext.GetTable.GetTableConnectionName, ComposeQueryIdentity(AContext, 'MIN_'+AProperty.GetName, True));
+  Result := TioDbFactory.Query(AContext.GetConnectionNameResolved, ComposeQueryIdentity(AContext, 'MIN_'+AProperty.GetName, True));
   if Result.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetTableConnectionName).GenerateSqlMin(Result, AContext, AProperty);
+    TioDbFactory.SqlGenerator(AContext.GetConnectionNameResolved).GenerateSqlMin(Result, AContext, AProperty);
 end;
 
 class function TioQueryEngine.GetQueryNextID(const AContext: IioContext): IioQuery;
 begin
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   //   then call the sql query generator
-  Result := TioDbFactory.Query(AContext.GetTable.GetTableConnectionName, ComposeQueryIdentity(AContext, 'NEXT_ID', True));
+  Result := TioDbFactory.Query(AContext.GetConnectionNameResolved, ComposeQueryIdentity(AContext, 'NEXT_ID', True));
   if Result.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetTableConnectionName).GenerateSqlNextID(Result, AContext);
+    TioDbFactory.SqlGenerator(AContext.GetConnectionNameResolved).GenerateSqlNextID(Result, AContext);
 end;
 
 class function TioQueryEngine.GetQueryCurrentTimestamp(const AConnectionDefName: String): IioQuery;
@@ -269,10 +269,10 @@ begin
   LQueryIdentity := ComposeQueryIdentity(AContext, 'SELCNT', False);
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
-  LQuery := TioDbFactory.Query(AContext.GetTable.GetTableConnectionName, LQueryIdentity);
+  LQuery := TioDbFactory.Query(AContext.GetConnectionNameResolved, LQueryIdentity);
   Result := LQuery;
   if LQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetTableConnectionName).GenerateSqlCount(LQuery, AContext);
+    TioDbFactory.SqlGenerator(AContext.GetConnectionNameResolved).GenerateSqlCount(LQuery, AContext);
   // Where
   if AContext.WhereExist then
     LQuery.FillQueryWhereParams(AContext)
@@ -289,10 +289,10 @@ begin
   LQueryIdentity := ComposeQueryIdentity(AContext, 'SELLST', False);
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
-  LQuery := TioDbFactory.Query(AContext.GetTable.GetTableConnectionName, LQueryIdentity);
+  LQuery := TioDbFactory.Query(AContext.GetConnectionNameResolved, LQueryIdentity);
   Result := LQuery;
   if LQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetTableConnectionName).GenerateSqlSelect(LQuery, AContext);
+    TioDbFactory.SqlGenerator(AContext.GetConnectionNameResolved).GenerateSqlSelect(LQuery, AContext);
   // Where
   if AContext.WhereExist then
     LQuery.FillQueryWhereParams(AContext)
@@ -309,10 +309,10 @@ begin
   LQueryIdentity := ComposeQueryIdentity(AContext, 'SELOBJ', False);
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
-  LQuery := TioDbFactory.Query(AContext.GetTable.GetTableConnectionName, LQueryIdentity);
+  LQuery := TioDbFactory.Query(AContext.GetConnectionNameResolved, LQueryIdentity);
   Result := LQuery;
   if LQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetTableConnectionName).GenerateSqlSelect(LQuery, AContext);
+    TioDbFactory.SqlGenerator(AContext.GetConnectionNameResolved).GenerateSqlSelect(LQuery, AContext);
   // Where
   if AContext.WhereExist then
     LQuery.FillQueryWhereParams(AContext)
@@ -329,10 +329,10 @@ begin
   LQueryIdentity := ComposeQueryIdentity(AContext, 'SELVERETY', True);
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
-  LQuery := TioDbFactory.Query(AContext.GetTable.GetTableConnectionName, LQueryIdentity);
+  LQuery := TioDbFactory.Query(AContext.GetConnectionNameResolved, LQueryIdentity);
   Result := LQuery;
   if LQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetTableConnectionName).GenerateSqlSelectLastObjVersionFromEntity(LQuery, AContext);
+    TioDbFactory.SqlGenerator(AContext.GetConnectionNameResolved).GenerateSqlSelectLastObjVersionFromEntity(LQuery, AContext);
   // Where
   LQuery.WhereParamObjID_SetValue(AContext);
 end;
@@ -371,10 +371,10 @@ begin
     LQueryIdentity := ComposeQueryIdentity(AContext, 'UPD', True);
   // Get the query object and if does not contain an SQL text (come from QueryContainer)
   // then call the sql query generator
-  LQuery := TioDbFactory.Query(AContext.GetTable.GetTableConnectionName, LQueryIdentity);
+  LQuery := TioDbFactory.Query(AContext.GetConnectionNameResolved, LQueryIdentity);
   Result := LQuery;
   if LQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetTable.GetTableConnectionName).GenerateSqlUpdate(LQuery, AContext);
+    TioDbFactory.SqlGenerator(AContext.GetConnectionNameResolved).GenerateSqlUpdate(LQuery, AContext);
   // Iterate for all properties
   for LProp in AContext.GetProperties do
   begin

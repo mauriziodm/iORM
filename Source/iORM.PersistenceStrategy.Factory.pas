@@ -95,6 +95,11 @@ type
     // synchro strategy
     class function NewPSRequest_Synchro_DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload): IioPersistenceStrategyRequest;
     class function NewPSRequest_Synchro_LoadList(const APayload: TioCustomSynchroStrategy_Payload; const AClientOrServerSide: TioSynchroClientOrServerSide; const AWhere: IioWhere; const AListDTO: TObject): IioPersistenceStrategyRequest;
+
+
+    class function NewPSRequest_Synchro_LoadMax(const APayload: TioCustomSynchroStrategy_Payload; const AClientOrServerSide: TioSynchroClientOrServerSide; const ATypeName, APropertyName: String): IioPersistenceStrategyRequest;
+
+
     class function NewPSRequest_Synchro_PersistObject(const APayload: TioCustomSynchroStrategy_Payload; const AClientOrServerSide: TioSynchroClientOrServerSide; const ADTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
     class function NewPSRequest_Synchro_DeleteObject(const APayload: TioCustomSynchroStrategy_Payload; const AClientOrServerSide: TioSynchroClientOrServerSide; const ADTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
     // ---------- operation type specific persistence strategy request factories ----------
@@ -103,7 +108,7 @@ implementation
 
 uses
   iORM.PersistenceStrategy.DB, iORM.PersistenceStrategy.Http, iORM.DB.ConnectionContainer,
-  iORM.PersistenceStrategy.Request, iORM.Abstraction;
+  iORM.PersistenceStrategy.Request, iORM.Abstraction, iORM.Where.Factory;
 
 { TioStrategyFactory }
 
@@ -293,17 +298,17 @@ end;
 class function TioPersistenceStrategyFactory.NewPSRequest_LoadMax(const AWhere: IioWhere; const APropertyName: String): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(psmLoadMax, True);
+  Result.PropName := APropertyName;
   Result.Where := AWhere;
   Result.Where.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
-  Result.PropName := APropertyName;
 end;
 
 class function TioPersistenceStrategyFactory.NewPSRequest_LoadMin(const AWhere: IioWhere; const APropertyName: String): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(psmLoadMin, True);
+  Result.PropName := APropertyName;
   Result.Where := AWhere;
   Result.Where.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
-  Result.PropName := APropertyName;
 end;
 
 class function TioPersistenceStrategyFactory.NewPSRequest_PersistList(const AListDTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
@@ -383,6 +388,22 @@ begin
   Result.ListDTO := AListDTO;
   Result.ListDTO_Serialize := False;
   Result.Where := AWhere;
+  Result.Where.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_Synchro_LoadMax(const APayload: TioCustomSynchroStrategy_Payload; const AClientOrServerSide: TioSynchroClientOrServerSide; const ATypeName, APropertyName: String): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(psmLoadMax, False);
+  // import session data from a previous existing one (app, user, connection, token)
+  Result.ImportSessionData(APayload.SessionData);
+  // if the request must be executed server side
+  if AClientOrServerSide = ssServerSideExec then
+    Result.Connection := APayload.TargetConnectionDefName;
+  // Property name
+  Result.PropName := APropertyName;
+  // Build where
+  Result.Where := TioWhereFactory.NewWhere;
+  Result.Where.TypeName := ATypeName;
   Result.Where.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
 
