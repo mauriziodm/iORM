@@ -455,9 +455,9 @@ begin
     FETMfor.UnregisterDetailBindSource(Self);
   // If the DetailPresenterContainer was created then destroy it
   if Assigned(FDetailBindSourceContainer) then
-    FDetailBindSourceContainer.Free;
+    FreeAndNil(FDetailBindSourceContainer);
   // Destroy paging object
-  FPaging.Free;
+  FreeAndNil(FPaging);
   inherited;
 end;
 
@@ -915,7 +915,7 @@ procedure TioPrototypeBindSourceCustom.UnregisterDetailBindSource(const ADetailB
 begin
   if not Assigned(FDetailBindSourceContainer) then
     FDetailBindSourceContainer := TList<IioBindSource>.Create;
-  if not FDetailBindSourceContainer.Contains(ADetailBindSource) then
+  if FDetailBindSourceContainer.Contains(ADetailBindSource) then
     FDetailBindSourceContainer.Remove(ADetailBindSource);
 end;
 

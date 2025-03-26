@@ -495,16 +495,20 @@ begin
     FETMfor.UnregisterDetailBindSource(Self);
   // Destroy the BindSourceAdapter was created then destroy it
   if CheckAdapter and not(csDestroying in TComponent(FBindSourceAdapter).ComponentState) then
+  begin
     FBindSourceAdapter.Free;
+    FBindSourceAdapter := nil;
+  end;
   // Collezione alla quale i ModelBindSource/ModelDataSet si registrano per rendere nota
   // la loro presenza e rendere possibile l'attivazione/disattivazione di se stessi da
   // parte del ModelPresenter al quale sono collegati
-  FViewBindSourceContainer.Free;
+
+  FreeAndNil(FViewBindSourceContainer);
   // If the DetailPresenterContainer was created then destroy it
   if Assigned(FDetailBindSourceContainer) then
-    FDetailBindSourceContainer.Free;
+    FreeAndNil(FDetailBindSourceContainer);
   // Destroy paging object
-  FPaging.Free;
+  FreeAndNil(FPaging);
   inherited;
 end;
 
@@ -990,7 +994,7 @@ procedure TioModelPresenterCustom.UnregisterDetailBindSource(const ADetailBindSo
 begin
   if not Assigned(FDetailBindSourceContainer) then
     FDetailBindSourceContainer := TList<IioBindSource>.Create;
-  if not FDetailBindSourceContainer.Contains(ADetailBindSource) then
+  if FDetailBindSourceContainer.Contains(ADetailBindSource) then
     FDetailBindSourceContainer.Remove(ADetailBindSource);
 end;
 
