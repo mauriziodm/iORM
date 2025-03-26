@@ -104,8 +104,8 @@ end;
 
 destructor TioDetailAdaptersContainer.Destroy;
 begin
-  FDetailAdapters.Free;
-  FNaturalAdapters.Free;
+  FreeAndNil(FDetailAdapters);
+  FreeAndNil(FNaturalAdapters);
   inherited;
 end;
 

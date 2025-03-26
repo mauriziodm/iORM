@@ -418,9 +418,9 @@ begin
     FETMfor.UnregisterDetailBindSource(Self);
   // If the DetailDataSetContainer was created then destroy it
   if Assigned(FDetailBindSourceContainer) then
-    FDetailBindSourceContainer.Free;
+    FreeAndNil(FDetailBindSourceContainer);
   // Destroy paging object
-  FPaging.Free;
+  FreeAndNil(FPaging);
   // Destroy the internal adapter
   if GetActiveBindSourceAdapter <> nil then
     GetActiveBindSourceAdapter.Free;
@@ -736,7 +736,7 @@ procedure TioDataSetCustom.UnregisterDetailBindSource(const ADetailBindSource: I
 begin
   if not Assigned(FDetailBindSourceContainer) then
     FDetailBindSourceContainer := TList<IioBindSource>.Create;
-  if not FDetailBindSourceContainer.Contains(ADetailBindSource) then
+  if FDetailBindSourceContainer.Contains(ADetailBindSource) then
     FDetailBindSourceContainer.Remove(ADetailBindSource);
 end;
 
