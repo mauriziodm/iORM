@@ -335,6 +335,12 @@ procedure TioActiveInterfaceListBindSourceAdapter.DoBeforeDelete;
 begin
   inherited;
   TioCommonBSAPersistence.BeforeDelete(Self);
+
+  // Prima di aggiungere questa riga succedeva che, nell'esempio degli ordini delle pizze,
+  //  se eliminavo una riga dell'ordine con una TDataSetDelete action (quella standard di Delphi)
+  //  poi quando si faceva il Persist dell'oggetto master l'ETM non veniva aggiornato (non si creava il nuovo TimeSlot),
+  //  questo a sua volta impediva il corretto funzionamento della sincronizzazione
+  DoBeforeEdit;
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.DoAfterDelete;
@@ -718,6 +724,14 @@ begin
 
   // NB: OnReceiveSelectionFreeObject property of the BindSource is not
   // useful in an interface bindsource adapter
+
+  // Forza l'aggiornamento del SUD (Smart Update Detection) in modo che poi, se richiesto,
+  //  l'oggetto Master vegga persistito. Prima di aggiungere questa riga succedeva che,
+  //  nell'esempio degli ordini delle pizze, se aggiungevo una nuova pizza in una nuova
+  //  riga con una nuova pizza poi lìoggetto non si persisteva perchè nel SUD l'oggetto
+  //  master non figurava come modificato e quindi non veniva persistito. La stessa cosa
+  //  succedeva anche in caso di modifica manuale di una riga.
+  DoBeforeEdit;
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.SetLazy(const Value: Boolean);

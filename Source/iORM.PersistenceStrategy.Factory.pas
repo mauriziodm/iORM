@@ -40,7 +40,7 @@ uses
   iORM.Where.Interfaces, iORM.CommonTypes, FireDAC.Comp.DataSet,
   iORM.Context.Interfaces, iORM.LiveBindings.BSPersistence,
   iORM.SynchroStrategy.Custom, iORM.Auth.Interfaces, System.SysUtils,
-  iORM.SynchroStrategy.Interfaces;
+  iORM.SynchroStrategy.Interfaces, iORM.Context.Properties.Interfaces;
 
 type
 
@@ -78,6 +78,12 @@ type
     class function NewPSRequest_PersistObject(const ADTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
       const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName,
       AMasterPropertyPath: String): IioPersistenceStrategyRequest;
+    // pre/post process relation child operations
+    class function NewPSRequest_PrePostRelationChild_Delete(const AMasterContext: IioContext; const AMasterProperty: IioProperty): IioPersistenceStrategyRequest;
+    class function NewPSRequest_PrePostRelationChild_DeleteList(const AMasterContext: IioContext; const AMasterProperty: IioProperty): IioPersistenceStrategyRequest;
+    class function NewPSRequest_PrePostRelationChild_DeleteObject(const AMasterContext: IioContext; const AMasterProperty: IioProperty): IioPersistenceStrategyRequest;
+    class function NewPSRequest_PrePostRelationChild_PersistList(const AMasterContext: IioContext; const AMasterProperty: IioProperty): IioPersistenceStrategyRequest;
+    class function NewPSRequest_PrePostRelationChild_PersistObject(const AMasterContext: IioContext; const AMasterProperty: IioProperty): IioPersistenceStrategyRequest;
     // sql destinations
     class function NewPSRequest_SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet): IioPersistenceStrategyRequest;
     class function NewPSRequest_SQLDest_Execute(const ASQLDestination: IioSQLDestination): IioPersistenceStrategyRequest;
@@ -95,11 +101,7 @@ type
     // synchro strategy
     class function NewPSRequest_Synchro_DoSynchronization(const APayload: TioCustomSynchroStrategy_Payload): IioPersistenceStrategyRequest;
     class function NewPSRequest_Synchro_LoadList(const APayload: TioCustomSynchroStrategy_Payload; const AClientOrServerSide: TioSynchroClientOrServerSide; const AWhere: IioWhere; const AListDTO: TObject): IioPersistenceStrategyRequest;
-
-
     class function NewPSRequest_Synchro_LoadMax(const APayload: TioCustomSynchroStrategy_Payload; const AClientOrServerSide: TioSynchroClientOrServerSide; const ATypeName, APropertyName: String): IioPersistenceStrategyRequest;
-
-
     class function NewPSRequest_Synchro_PersistObject(const APayload: TioCustomSynchroStrategy_Payload; const AClientOrServerSide: TioSynchroClientOrServerSide; const ADTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
     class function NewPSRequest_Synchro_DeleteObject(const APayload: TioCustomSynchroStrategy_Payload; const AClientOrServerSide: TioSynchroClientOrServerSide; const ADTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
     // ---------- operation type specific persistence strategy request factories ----------
@@ -342,6 +344,79 @@ begin
   Result.RelationOID := ARelationOID;
   Result.MasterPropName := AMasterPropertyName;
   Result.MasterPropPath := AMasterPropertyPath;
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_PrePostRelationChild_Delete(const AMasterContext: IioContext;
+  const AMasterProperty: IioProperty): IioPersistenceStrategyRequest;
+var
+  LWhere: IioWhereInternal;
+begin
+  // Build the where criteria
+  LWhere := TioWhereFactory.NewWhere as IioWhereInternal;
+  LWhere.TypeName := AMasterProperty.GetRelationChildTypeName;
+  LWhere.TypeAlias := AMasterProperty.GetRelationChildTypeAlias;
+  LWhere._AddCriteria(AMasterProperty.GetRelationChildPropertyName, coEquals, AMasterContext.ObjID);
+  // Build the persistence strategy request
+  Result := _NewPSRequest(psmDelete, False);
+  Result.ImportSessionDataFromPSRequest(AMasterContext.PSRequest);
+  Result.Where := LWhere;
+  Result.Where.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_PrePostRelationChild_DeleteList(const AMasterContext: IioContext;
+  const AMasterProperty: IioProperty): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(psmDeleteList, False);
+  Result.ImportSessionDataFromPSRequest(AMasterContext.PSRequest);
+  Result.BlindLevel := AMasterContext.BlindLevel;
+  Result.Intent := AMasterContext.IntentType;
+  Result.ListDTO := AMasterProperty.GetRelationChildObject(AMasterContext.DataObject);
+  Result.ListDTO_Serialize := True;
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_PrePostRelationChild_DeleteObject(const AMasterContext: IioContext;
+  const AMasterProperty: IioProperty): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(psmDeleteObject, False);
+  Result.ImportSessionDataFromPSRequest(AMasterContext.PSRequest);
+  Result.BlindLevel := AMasterContext.BlindLevel;
+  Result.Intent := AMasterContext.IntentType;
+  Result.ListDTO := AMasterProperty.GetRelationChildObject(AMasterContext.DataObject);
+  Result.ListDTO_Serialize := True;
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_PrePostRelationChild_PersistList(const AMasterContext: IioContext;
+  const AMasterProperty: IioProperty): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(psmPersistList, False);
+  Result.ImportSessionDataFromPSRequest(AMasterContext.PSRequest);
+  Result.BlindLevel := AMasterContext.BlindLevel;
+  Result.Intent := AMasterContext.IntentType;
+  Result.ListDTO := AMasterProperty.GetRelationChildObject(AMasterContext.DataObject);
+  Result.ListDTO_Serialize := True;
+  // TODO: MasterBSPersistence è usato alla DBPersistenceStrategy ma non usato dalla HttpPersistenceStrategy, indagare a cosa serve e se si può eliminare
+  Result.MasterBSPersistence := AMasterContext.MasterBSPersistence;
+  Result.RelationPropName := AMasterProperty.GetRelationChildPropertyName;
+  Result.RelationOID := AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger;
+  Result.MasterPropName := AMasterProperty.GetName;
+  Result.MasterPropPath := AMasterContext.MasterPropertyPath;
+end;
+
+class function TioPersistenceStrategyFactory.NewPSRequest_PrePostRelationChild_PersistObject(const AMasterContext: IioContext;
+  const AMasterProperty: IioProperty): IioPersistenceStrategyRequest;
+begin
+  Result := _NewPSRequest(psmPersistObject, False);
+  Result.ImportSessionDataFromPSRequest(AMasterContext.PSRequest);
+  Result.BlindLevel := AMasterContext.BlindLevel;
+  Result.Intent := AMasterContext.IntentType;
+  Result.DTO := AMasterProperty.GetRelationChildObject(AMasterContext.DataObject);
+  Result.DTO_Serialize := True;
+  // TODO: MasterBSPersistence è usato alla DBPersistenceStrategy ma non usato dalla HttpPersistenceStrategy, indagare a cosa serve e se si può eliminare
+  Result.MasterBSPersistence := AMasterContext.MasterBSPersistence;
+  Result.RelationPropName := AMasterProperty.GetRelationChildPropertyName;
+  Result.RelationOID := AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger;
+  Result.MasterPropName := AMasterProperty.GetName;
+  Result.MasterPropPath := AMasterContext.MasterPropertyPath;
 end;
 
 class function TioPersistenceStrategyFactory.NewPSRequest_SQLDest_Execute(const ASQLDestination: IioSQLDestination): IioPersistenceStrategyRequest;

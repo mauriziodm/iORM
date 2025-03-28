@@ -891,17 +891,19 @@ begin
       rtHasMany:
       begin
         // Create the child PSRequest and execute it
-        LChildPSRequest := TioPersistenceStrategyFactory.NewPSRequest_DeleteList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject),
-          AMasterContext.IntentType, AMasterContext.BlindLevel);
-        _DoDeleteList(LChildPSRequest);
+        LChildPSRequest := TioPersistenceStrategyFactory.NewPSRequest_PrePostRelationChild_DeleteList(AMasterContext, LMasterProp);
+        // NB: richiamo "io._ExecutePSRequest" perchè in questo modo usa la persistence strategy corretta nel caso
+        //      la classe interessata fosse mappata su una connessione diversa (http p DB)
+        io._ExecutePSRequest(LChildPSRequest);
       end;
       // If relation HasOne
       rtHasOne:
       begin
         // Create the child PSRequest and execute it
-        LChildPSRequest := TioPersistenceStrategyFactory.NewPSRequest_DeleteObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject),
-          AMasterContext.IntentType, AMasterContext.BlindLevel);
-        _DoDeleteObject(LChildPSRequest);
+        LChildPSRequest := TioPersistenceStrategyFactory.NewPSRequest_PrePostRelationChild_DeleteObject(AMasterContext, LMasterProp);
+        // NB: richiamo "io._ExecutePSRequest" perchè in questo modo usa la persistence strategy corretta nel caso
+        //      la classe interessata fosse mappata su una connessione diversa (http p DB)
+        io._ExecutePSRequest(LChildPSRequest);
       end;
     end;
   end;
@@ -924,21 +926,19 @@ begin
       rtHasMany:
       begin
         // Create the child PSRequest and execute it
-        LChildPSRequest := TioPersistenceStrategyFactory.NewPSRequest_PersistList(LMasterProp.GetRelationChildObject(AMasterContext.DataObject),
-          AMasterContext.IntentType, AMasterContext.BlindLevel, LMasterProp.GetRelationChildPropertyName,
-          AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, AMasterContext.MasterBSPersistence, LMasterProp.GetName,
-          AMasterContext.MasterPropertyPath);
-        _DoPersistList(LChildPSRequest);
+        LChildPSRequest := TioPersistenceStrategyFactory.NewPSRequest_PrePostRelationChild_PersistList(AMasterContext, LMasterProp);
+        // NB: richiamo "io._ExecutePSRequest" perchè in questo modo usa la persistence strategy corretta nel caso
+        //      la classe interessata fosse mappata su una connessione diversa (http p DB)
+        io._ExecutePSRequest(LChildPSRequest);
       end;
       // If relation HasOne
       rtHasOne:
       begin
         // Create the child PSRequest and execute it
-        LChildPSRequest := TioPersistenceStrategyFactory.NewPSRequest_PersistObject(LMasterProp.GetRelationChildObject(AMasterContext.DataObject),
-          AMasterContext.IntentType, AMasterContext.BlindLevel, LMasterProp.GetRelationChildPropertyName,
-          AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger, AMasterContext.MasterBSPersistence, LMasterProp.GetName,
-          AMasterContext.MasterPropertyPath);
-        _DoPersistObject(LChildPSRequest);
+        LChildPSRequest := TioPersistenceStrategyFactory.NewPSRequest_PrePostRelationChild_PersistObject(AMasterContext, LMasterProp);
+        // NB: richiamo "io._ExecutePSRequest" perchè in questo modo usa la persistence strategy corretta nel caso
+        //      la classe interessata fosse mappata su una connessione diversa (http p DB)
+        io._ExecutePSRequest(LChildPSRequest);
       end;
     end;
   end;
@@ -946,6 +946,7 @@ end;
 
 class procedure TioPersistenceStrategyDB.PreProcessRelationChildOnPersist(const AMasterContext: IioContext);
 var
+  LChildPSRequest: IioPersistenceStrategyRequest;
   LMasterProp: IioProperty;
 begin
   inherited;
@@ -959,8 +960,13 @@ begin
       // HasMany or HasOne: if the intent is Revert or Synchro then delete all HasMany details before persist
       rtHasMany, rtHasOne:
         if AMasterContext.IntentType > itRegular then
-          io.RefTo(LMasterProp.GetRelationChildTypeName, LMasterProp.GetRelationChildTypeAlias)._Where(LMasterProp.GetRelationChildPropertyName, coEquals,
-            AMasterContext.ObjID).Delete;
+        begin
+          // Create the child PSRequest and execute it
+          LChildPSRequest := TioPersistenceStrategyFactory.NewPSRequest_PrePostRelationChild_Delete(AMasterContext, LMasterProp);
+          // NB: richiamo "io._ExecutePSRequest" perchè in questo modo usa la persistence strategy corretta nel caso
+          //      la classe interessata fosse mappata su una connessione diversa (http p DB)
+          io._ExecutePSRequest(LChildPSRequest);
+        end;
       // BelongsTo
       rtBelongsTo:
         ;
