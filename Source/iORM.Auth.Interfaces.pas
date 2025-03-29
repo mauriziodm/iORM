@@ -80,9 +80,15 @@ type
     function GetHasAccessToken: Boolean;
     function GetHasApp: Boolean;
     function GetHasAppOID: Boolean;
+    function GetHasConnection: Boolean;
+    function GetHasConnectionRemote: Boolean;
+    function GetHasLicense: Boolean;
+    function GetHasLicenseOID: Boolean;
     function GetHasRefreshToken: Boolean;
     function GetHasUser: Boolean;
     function GetHasUserOID: Boolean;
+    function GetLicense: String;
+    function GetLicenseOID: Integer;
     function GetNeedRefresh: Boolean;
     function GetRefreshAfter: TDateTime;
     function GetRefreshToken: String;
@@ -96,6 +102,8 @@ type
     procedure SetAccessTokenExp(const Value: TDateTime);
     procedure SetConnection(const Value: String);
     procedure SetConnectionRemote(const Value: String);
+    procedure SetLicense(const Value: String);
+    procedure SetLicenseOID(const Value: Integer);
     procedure SetRefreshAfter(const Value: TDateTime);
     procedure SetRefreshToken(const Value: String);
     procedure SetRefreshTokenExp(const Value: TDateTime);
@@ -107,14 +115,21 @@ type
     property AppOID: Integer read GetAppOID write SetAppOID;
     property HasApp: Boolean read GetHasApp;
     property HasAppOID: Boolean read GetHasAppOID;
+    // user
+    property User: String read GetUser write SetUser;
+    property UserOID: Integer read GetUserOID write SetUserOID;
+    property HasUser: Boolean read GetHasUser;
+    property HasUserOID: Boolean read GetHasUserOID;
+    // license
+    property License: String read GetLicense write SetLicense;
+    property LicenseOID: Integer read GetLicenseOID write SetLicenseOID;
+    property HasLicense: Boolean read GetHasLicense;
+    property HasLicenseOID: Boolean read GetHasLicenseOID;
     // connection
     property Connection: String read GetConnection write SetConnection;
     property ConnectionRemote: String read GetConnectionRemote write SetConnectionRemote;
-    // user
-    property HasUser: Boolean read GetHasUser;
-    property HasUserOID: Boolean read GetHasUserOID;
-    property User: String read GetUser write SetUser;
-    property UserOID: Integer read GetUserOID write SetUserOID;
+    property HasConnection: Boolean read GetHasConnection;
+    property HasConnectionRemote: Boolean read GetHasConnectionRemote;
     // refresh token
     property RefreshToken: String read GetRefreshToken write SetRefreshToken;
     property RefreshTokenExp: TDateTime read GetRefreshTokenExp write SetRefreshTokenExp;

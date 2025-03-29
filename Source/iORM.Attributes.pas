@@ -543,9 +543,13 @@ type
     FEntityUpdated: TDateTime;
     [ioBinary('1')]
     FEntityState: String;
-    // User related props
-    FUserID: TioObjCreatedUserID;
-    FUserName: TioObjCreatedUserName;
+    // session data
+    FApp: String;
+    FAppID: Integer;
+    FLicense: String;
+    FLicenseID: Integer;
+    FUser: String;
+    FUserID: Integer;
     // Persistence related props
     FActionType: TioPersistenceActionType;
     FIntentType: TioPersistenceIntentType;
@@ -569,14 +573,16 @@ type
     function GetBlindLevel_DetectObjExists: Boolean;
     function GetBlindLevel_DetectConflicts: Boolean;
     // Smart properties
-    function GetSmartEntityInfo: String;
-    function GetSmartEntityVersion: String;
-    function GetSmartUser: String;
     function GetSmartActionType: String;
+    function GetSmartApp: String;
     function GetSmartConflictInfo: String;
     function GetSmartConflictCheckedByHuman: String;
     function GetSmartDescription: String;
+    function GetSmartEntityInfo: String;
+    function GetSmartEntityVersion: String;
     function GetSmartFullDescription: String;
+    function GetSmartLicense: String;
+    function GetSmartUser: String;
     // Diff
     function GetDiffOneWay: String;
     function GetDiffOneWayMoreInfo: String;
@@ -593,9 +599,13 @@ type
     property EntityToVersion: Integer read FEntityToVersion;
     property EntityUpdated: TDateTime read FEntityUpdated;
     property EntityState: String read FEntityState;
-    // User related props
-    property UserID: TioObjCreatedUserID read FUserID;
-    property UserName: TioObjCreatedUserName read FUserName;
+    // session data
+    property App: String read FApp;
+    property AppID: Integer read FAppID;
+    property Licence: String read FLicense;
+    property LicenseID: Integer read FLicenseID;
+    property User: String read FUser;
+    property UserID: Integer read FUserID;
     // Persistence related props
     property ActionType: TioPersistenceActionType read FActionType;
     property IntentType: TioPersistenceIntentType read FIntentType;
@@ -615,14 +625,16 @@ type
     // Synchronization
     property TimeSlotSynchroState: TioEtmTimeSlotSynchroState read FTimeSlotSynchroState;
     // Smart properties
-    property SmartEntityInfo: String read GetSmartEntityInfo;
-    property SmartEntityVersion: String read GetSmartEntityVersion;
-    property SmartUser: String read GetSmartUser;
     property SmartActionType: String read GetSmartActionType;
+    property SmartApp: String read GetSmartApp;
     property SmartConflictInfo: String read GetSmartConflictInfo;
     property SmartConflictCheckedByHuman: String read GetSmartConflictCheckedByHuman;
     property SmartDescription: String read GetSmartDescription;
+    property SmartEntityInfo: String read GetSmartEntityInfo;
+    property SmartEntityVersion: String read GetSmartEntityVersion;
     property SmartFullDescription: String read GetSmartFullDescription;
+    property SmartLicense: String read GetSmartLicense;
+    property SmartUser: String read GetSmartUser;
     // Diff methods
     function Diff(const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean): String;
     procedure DiffToStream(const ATargetStream: TStream; const ADiffMode: TioEtmDiffMode; const AMoreInfo: Boolean);
@@ -1029,9 +1041,13 @@ begin
   FEntityFromVersion := LContext.EntityFromVersion;
   FEntityUpdated := LContext.ObjUpdated;
   FEntityState := dj.From(LContext.DataObject, TioEtmFactory.djParamsEngine).ToJson;
-  // User related props
+  // session data props
+  FApp := IO_STRING_NULL_VALUE;
+  FAppID := IO_INTEGER_NULL_VALUE;
+  FLicense := IO_STRING_NULL_VALUE;
+  FLicenseID := IO_INTEGER_NULL_VALUE;
+  FUser := IO_STRING_NULL_VALUE;
   FUserID := IO_INTEGER_NULL_VALUE;
-  FUserName := IO_STRING_NULL_VALUE;
   // Persistence related props
   FActionType := LContext.ActionType;
   FIntentType := LContext.IntentType;
@@ -1097,6 +1113,21 @@ begin
       Result := Result + ' (revert)';
     itSynchro_PersistToServer, itSynchro_PersistToClient:
       Result := Result + ' (synchronization)';
+  end;
+end;
+
+function TioEtmCustomTimeSlot.GetSmartApp: String;
+begin
+  Result := String.Empty;
+  // AppID
+  if FAppID <> IO_INTEGER_NULL_VALUE then
+    Result := FAppID.ToString;
+  // App
+  if FApp <> IO_STRING_NULL_VALUE then
+  begin
+    if not Result.IsEmpty then
+      Result := Result + '-';
+    Result := FApp + Result;
   end;
 end;
 
@@ -1213,24 +1244,33 @@ begin
   Result := Format('%s ver. %s', [GetSmartDescription, GetSmartEntityVersion]);
 end;
 
-function TioEtmCustomTimeSlot.GetSmartUser: String;
-var
-  LUserID: Integer;
-  LUserName: String;
+function TioEtmCustomTimeSlot.GetSmartLicense: String;
 begin
   Result := String.Empty;
-  // Extract user info as native type
-  LUserID := Integer(FUserID);
-  LUserName := String(FUserName);
-  // UserID
-  if LUserID <> 0 then
-    Result := LUserID.ToString;
-  // UserName
-  if not LUserName.IsEmpty then
+  // LicenseID
+  if FLicenseID <> IO_INTEGER_NULL_VALUE then
+    Result := FLicenseID.ToString;
+  // License
+  if FLicense <> IO_STRING_NULL_VALUE then
   begin
     if not Result.IsEmpty then
       Result := Result + '-';
-    Result := LUserName + Result;
+    Result := FLicense + Result;
+  end;
+end;
+
+function TioEtmCustomTimeSlot.GetSmartUser: String;
+begin
+  Result := String.Empty;
+  // UserID
+  if FUserID <> IO_INTEGER_NULL_VALUE then
+    Result := FUserID.ToString;
+  // User
+  if FUser <> IO_STRING_NULL_VALUE then
+  begin
+    if not Result.IsEmpty then
+      Result := Result + '-';
+    Result := FUser + Result;
   end;
 end;
 

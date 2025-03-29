@@ -17,6 +17,8 @@ type
     FAppOID: Integer;
     FConnection: String;
     FConnectionRemote: String;
+    FLic: String;
+    FLicOID: Integer;
     FUsr: String;
     FUsrOID: Integer;
     // auth
@@ -61,6 +63,8 @@ type
     function GetIntent: TioPersistenceIntentType;
     function GetIntf1: IInterface;
     function GetIntf1_Serialize: Boolean;
+    function GetLic: String;
+    function GetLicOID: Integer;
     function GetListDTO: TObject;
     function GetListDTO_Serialize: Boolean;
     function GetMasterBSPersistence: TioBSPersistence;
@@ -92,6 +96,8 @@ type
     procedure SetIntent(const Value: TioPersistenceIntentType);
     procedure SetIntf1(const Value: IInterface);
     procedure SetIntf1_Serialize(const Value: Boolean);
+    procedure SetLic(const Value: String);
+    procedure SetLicOID(const Value: Integer);
     procedure SetListDTO(const Value: TObject);
     procedure SetListDTO_Serialize(const Value: Boolean);
     procedure SetMasterBSPersistence(const Value: TioBSPersistence);
@@ -122,6 +128,8 @@ type
     property AppOID: Integer read GetAppOID write SetAppOID;
     property Connection: String read GetConnection write SetConnection;
     property ConnectionRemote: String read GetConnectionRemote write SetConnectionRemote;
+    property Lic: String read GetLic write SetLic;
+    property LicOID: Integer read GetLicOID write SetLicOID;
     property Usr: String read GetUsr write SetUsr;
     property UsrOID: Integer read GetUsrOID write SetUsrOID;
     // auth
@@ -171,34 +179,40 @@ begin
     LJSONObject.AddPair(PSR_METHOD, Ord(FMethod));
     // ---------- session ----------
     // App
-    if not (FApp <> IO_STRING_NULL_VALUE) then
+    if (FApp <> IO_STRING_NULL_VALUE) then
       LJSONObject.AddPair(PSR_SESSION_APP, FApp);
     // AppOID
     if FAppOID <> IO_INTEGER_NULL_VALUE then
       LJSONObject.AddPair(PSR_SESSION_APPOID, FAppOID);
     // Connection
-    if not (FConnection <> IO_STRING_NULL_VALUE) then
+    if (FConnection <> IO_STRING_NULL_VALUE) then
       LJSONObject.AddPair(PSR_SESSION_CONNECTION, FConnection);
     // ConnectionRemote
-    if not (FConnectionRemote <> IO_STRING_NULL_VALUE) then
+    if (FConnectionRemote <> IO_STRING_NULL_VALUE) then
       LJSONObject.AddPair(PSR_SESSION_CONNECTIONREMOTE, FConnectionRemote);
+    // Lic
+    if (FLic <> IO_STRING_NULL_VALUE) then
+      LJSONObject.AddPair(PSR_SESSION_LIC, FLic);
+    // LicOID
+    if FLicOID <> IO_INTEGER_NULL_VALUE then
+      LJSONObject.AddPair(PSR_SESSION_LICOID, FLicOID);
     // User
-    if not (FUsr <> IO_STRING_NULL_VALUE) then
+    if (FUsr <> IO_STRING_NULL_VALUE) then
       LJSONObject.AddPair(PSR_SESSION_USER, FUsr);
     // UserOID
-    if not (FUsrOID <> IO_INTEGER_NULL_VALUE) then
+    if (FUsrOID <> IO_INTEGER_NULL_VALUE) then
       LJSONObject.AddPair(PSR_SESSION_USEROID, FUsrOID);
     // ---------- auth ----------
     // AuthGrant
-    if not (FAuthGrant <> IO_STRING_NULL_VALUE) then
+    if (FAuthGrant <> IO_STRING_NULL_VALUE) then
       LJSONObject.AddPair(PSR_AUTH_GRANT, FAuthGrant);
     // AuthIntention
     LJSONObject.AddPair(PSR_AUTH_INTENTION, Ord(FAuthIntention));
     // AuthScope
-    if not (FAuthScope <> IO_STRING_NULL_VALUE) then
+    if (FAuthScope <> IO_STRING_NULL_VALUE) then
       LJSONObject.AddPair(PSR_AUTH_SCOPE, FAuthScope);
     // AuthToken
-    if not (FAuthToken <> IO_STRING_NULL_VALUE) then
+    if (FAuthToken <> IO_STRING_NULL_VALUE) then
       LJSONObject.AddPair(PSR_AUTH_TOKEN, FAuthToken);
     // ---------- instances ----------
     // DTO
@@ -226,13 +240,13 @@ begin
     // IntentType
     LJSONObject.AddPair(PSR_INTENTTYPE, Ord(FIntent));
     // MasterPropName
-    if not (FMasterPropName <> IO_STRING_NULL_VALUE) then
+    if (FMasterPropName <> IO_STRING_NULL_VALUE) then
       LJSONObject.AddPair(PSR_MASTERPROPERTYNAME, FMasterPropName);
     // MasterPropPath
-    if not (FMasterPropPath <> IO_STRING_NULL_VALUE) then
+    if (FMasterPropPath <> IO_STRING_NULL_VALUE) then
       LJSONObject.AddPair(PSR_MASTERPROPERTYPATH, FMasterPropPath);
     // PropName
-    if not (FPropName <> IO_STRING_NULL_VALUE) then
+    if (FPropName <> IO_STRING_NULL_VALUE) then
       LJSONObject.AddPair(PSR_PROPERTYNAME, FPropName);
     // RelationOID
     if FRelationOID <> IO_INTEGER_NULL_VALUE then
@@ -289,6 +303,14 @@ begin
     LJSONValue := LJSONObject.GetValue(PSR_SESSION_CONNECTIONREMOTE);
     if Assigned(LJSONValue) then
       FConnectionRemote := LJSONValue.Value;
+    // Lic
+    LJSONValue := LJSONObject.GetValue(PSR_SESSION_LIC);
+    if Assigned(LJSONValue) then
+      FLic := LJSONValue.Value;
+    // LicOID
+    LJSONValue := LJSONObject.GetValue(PSR_SESSION_LICOID);
+    if Assigned(LJSONValue) then
+      FLicOID := dj.FromJSON(LJSONValue).&To<Integer>;
     // User
     LJSONValue := LJSONObject.GetValue(PSR_SESSION_USER);
     if Assigned(LJSONValue) then
@@ -445,6 +467,16 @@ end;
 function TioPersistenceStrategyRequest.GetIntf1_Serialize: Boolean;
 begin
   Result := FIntf1_Serialize;
+end;
+
+function TioPersistenceStrategyRequest.GetLic: String;
+begin
+  Result := FLic;
+end;
+
+function TioPersistenceStrategyRequest.GetLicOID: Integer;
+begin
+  Result := FLicOID;
 end;
 
 function TioPersistenceStrategyRequest.GetListDTO: TObject;
@@ -634,6 +666,16 @@ begin
   FIntf1_Serialize := Value;
 end;
 
+procedure TioPersistenceStrategyRequest.SetLic(const Value: String);
+begin
+  FLic := Value;
+end;
+
+procedure TioPersistenceStrategyRequest.SetLicOID(const Value: Integer);
+begin
+  FLicOID := Value;
+end;
+
 procedure TioPersistenceStrategyRequest.SetListDTO(const Value: TObject);
 begin
   FListDTO := Value;
@@ -730,6 +772,8 @@ begin
     FAppOID := IO_INTEGER_NULL_VALUE;
     FConnection := IO_STRING_NULL_VALUE;
     FConnectionRemote := IO_STRING_NULL_VALUE;
+    FLic := IO_STRING_NULL_VALUE;
+    FLicOID := IO_INTEGER_NULL_VALUE;
     FUsr := IO_STRING_NULL_VALUE;
     FUsrOID := IO_INTEGER_NULL_VALUE;
   end;

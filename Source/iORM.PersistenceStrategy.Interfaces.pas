@@ -64,6 +64,8 @@ const
   PSR_SESSION_APPOID = 'AppID';
   PSR_SESSION_CONNECTION = 'Conn';
   PSR_SESSION_CONNECTIONREMOTE = 'ConnRem';
+  PSR_SESSION_LIC = 'Lic';
+  PSR_SESSION_LICOID = 'LicID';
   PSR_SESSION_USER = 'Usr';
   PSR_SESSION_USEROID = 'UsrID';
 
@@ -120,6 +122,8 @@ type
     function GetIntent: TioPersistenceIntentType;
     function GetIntf1: IInterface;
     function GetIntf1_Serialize: Boolean;
+    function GetLic: String;
+    function GetLicOID: Integer;
     function GetListDTO: TObject;
     function GetListDTO_Serialize: Boolean;
     function GetMasterBSPersistence: TioBSPersistence;
@@ -153,6 +157,8 @@ type
     procedure SetIntent(const Value: TioPersistenceIntentType);
     procedure SetIntf1(const Value: IInterface);
     procedure SetIntf1_Serialize(const Value: Boolean);
+    procedure SetLic(const Value: String);
+    procedure SetLicOID(const Value: Integer);
     procedure SetListDTO(const Value: TObject);
     procedure SetListDTO_Serialize(const Value: Boolean);
     procedure SetMasterBSPersistence(const Value: TioBSPersistence);
@@ -172,11 +178,15 @@ type
     procedure SwitchToConnectionRemote;
     // method property
     property Method: TioPersistenceStrategyMethod read GetMethod;
+    // method property
+    property Method: TioPersistenceStrategyMethod read GetMethod;
     // session data
     property App: String read GetApp write SetApp;
     property AppOID: Integer read GetAppOID write SetAppOID;
     property Connection: String read GetConnection write SetConnection;
     property ConnectionRemote: String read GetConnectionRemote write SetConnectionRemote;
+    property Lic: String read GetLic write SetLic;
+    property LicOID: Integer read GetLicOID write SetLicOID;
     property Usr: String read GetUsr write SetUsr;
     property UsrOID: Integer read GetUsrOID write SetUsrOID;
     // auth

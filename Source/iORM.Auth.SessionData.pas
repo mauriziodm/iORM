@@ -48,16 +48,19 @@ type
     // user
     FUser: String;
     FUserOID: Integer;
+    // license
+    FLicense: String;
+    FLicenseOID: Integer;
     // connection
     FConnection: String;
     FConnectionRemote: String;
-    // refresh token
-    FRefreshToken: String;
-    FRefreshTokenExp: TDateTime;
     // access token
     FAccessToken: String;
     FAccessTokenExp: TDateTime;
     FRefreshAfter: TDateTime;
+    // refresh token
+    FRefreshToken: String;
+    FRefreshTokenExp: TDateTime;
     // methods
     function GetAccessToken: String;
     function GetAccessTokenExp: TDateTime;
@@ -69,9 +72,15 @@ type
     function GetHasAccessToken: Boolean;
     function GetHasApp: Boolean;
     function GetHasAppOID: Boolean;
+    function GetHasConnection: Boolean;
+    function GetHasConnectionRemote: Boolean;
+    function GetHasLicense: Boolean;
+    function GetHasLicenseOID: Boolean;
     function GetHasRefreshToken: Boolean;
     function GetHasUser: Boolean;
     function GetHasUserOID: Boolean;
+    function GetLicense: String;
+    function GetLicenseOID: Integer;
     function GetNeedRefresh: Boolean;
     function GetRefreshAfter: TDateTime;
     function GetRefreshToken: String;
@@ -85,6 +94,8 @@ type
     procedure SetAccessTokenExp(const Value: TDateTime);
     procedure SetConnection(const Value: String);
     procedure SetConnectionRemote(const Value: String);
+    procedure SetLicense(const Value: String);
+    procedure SetLicenseOID(const Value: Integer);
     procedure SetRefreshAfter(const Value: TDateTime);
     procedure SetRefreshToken(const Value: String);
     procedure SetRefreshTokenExp(const Value: TDateTime);
@@ -99,14 +110,21 @@ type
     property AppOID: Integer read GetAppOID write SetAppOID;
     property HasApp: Boolean read GetHasApp;
     property HasAppOID: Boolean read GetHasAppOID;
+    // user
+    property User: String read GetUser write SetUser;
+    property UserOID: Integer read GetUserOID write SetUserOID;
+    property HasUser: Boolean read GetHasUser;
+    property HasUserOID: Boolean read GetHasUserOID;
+    // license
+    property License: String read GetLicense write SetLicense;
+    property LicenseOID: Integer read GetLicenseOID write SetLicenseOID;
+    property HasLicense: Boolean read GetHasLicense;
+    property HasLicenseOID: Boolean read GetHasLicenseOID;
     // connection
     property Connection: String read GetConnection write SetConnection;
     property ConnectionRemote: String read GetConnectionRemote write SetConnectionRemote;
-    // user
-    property HasUser: Boolean read GetHasUser;
-    property HasUserOID: Boolean read GetHasUserOID;
-    property User: String read GetUser write SetUser;
-    property UserOID: Integer read GetUserOID write SetUserOID;
+    property HasConnection: Boolean read GetHasConnection;
+    property HasConnectionRemote: Boolean read GetHasConnectionRemote;
     // refresh token
     property RefreshToken: String read GetRefreshToken write SetRefreshToken;
     property RefreshTokenExp: TDateTime read GetRefreshTokenExp write SetRefreshTokenExp;
@@ -133,12 +151,15 @@ begin
   // app
   FApp := IO_STRING_NULL_VALUE;
   FAppOID := IO_INTEGER_NULL_VALUE;
-  // connection
-  FConnection := IO_STRING_NULL_VALUE;
-  FConnectionRemote := IO_STRING_NULL_VALUE;
   // user
   FUser := IO_STRING_NULL_VALUE;
   FUserOID := IO_INTEGER_NULL_VALUE;
+  // license
+  FLicense := IO_STRING_NULL_VALUE;
+  FLicenseOID := IO_INTEGER_NULL_VALUE;
+  // connection
+  FConnection := IO_STRING_NULL_VALUE;
+  FConnectionRemote := IO_STRING_NULL_VALUE;
   // refresh
   FRefreshToken := IO_STRING_NULL_VALUE;
   FRefreshTokenExp := IO_DATETIME_NULL_VALUE;
@@ -157,6 +178,9 @@ begin
   // user
   Result.User := FUser;
   Result.UserOID := FUserOID;
+  // license
+  Result.License := FLicense;
+  Result.LicenseOID := FLicenseOID;
   // connection
   Result.Connection := FConnection;
   Result.ConnectionRemote := FConnectionRemote;
@@ -230,6 +254,26 @@ begin
   Result := FAppOID <> IO_INTEGER_NULL_VALUE;
 end;
 
+function TioAuthSessionData.GetHasConnection: Boolean;
+begin
+  Result := FConnection <> IO_STRING_NULL_VALUE;
+end;
+
+function TioAuthSessionData.GetHasConnectionRemote: Boolean;
+begin
+  Result := FConnectionRemote <> IO_STRING_NULL_VALUE;
+end;
+
+function TioAuthSessionData.GetHasLicense: Boolean;
+begin
+  Result := FLicense <> IO_STRING_NULL_VALUE;
+end;
+
+function TioAuthSessionData.GetHasLicenseOID: Boolean;
+begin
+  Result := FLicenseOID <> IO_INTEGER_NULL_VALUE;
+end;
+
 function TioAuthSessionData.GetHasRefreshToken: Boolean;
 begin
   Result := FRefreshToken <> IO_STRING_NULL_VALUE;
@@ -243,6 +287,16 @@ end;
 function TioAuthSessionData.GetHasUserOID: Boolean;
 begin
   Result := FUserOID <> IO_INTEGER_NULL_VALUE;
+end;
+
+function TioAuthSessionData.GetLicense: String;
+begin
+  Result := FLicense;
+end;
+
+function TioAuthSessionData.GetLicenseOID: Integer;
+begin
+  Result := FLicenseOID;
 end;
 
 function TioAuthSessionData.GetRefreshAfter: TDateTime;
@@ -303,6 +357,16 @@ end;
 procedure TioAuthSessionData.SetConnectionRemote(const Value: String);
 begin
   FConnectionRemote := Value;
+end;
+
+procedure TioAuthSessionData.SetLicense(const Value: String);
+begin
+  FLicense := Value;
+end;
+
+procedure TioAuthSessionData.SetLicenseOID(const Value: Integer);
+begin
+  FLicenseOID := Value;
 end;
 
 procedure TioAuthSessionData.SetRefreshAfter(const Value: TDateTime);
