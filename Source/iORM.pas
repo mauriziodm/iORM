@@ -254,7 +254,7 @@ const
 
 type
 
-  // Type aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
+// Type aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
 {$REGION 'Type aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
   TioSimpleViewRegister = iORM.MVVM.ViewRegister.TioSimpleViewRegister;
 
@@ -327,9 +327,14 @@ type
 
   // ViewModel class
   TioViewModel = iORM.MVVM.ViewModel.TioViewModel;
-
 {$ENDREGION}
-  // Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
+
+// Interface aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
+{$REGION 'Interface aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
+  IioAuthSessionData = iORM.Auth.Interfaces.IioAuthSessionData;
+{$ENDREGION}
+
+// Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
 {$REGION 'Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
   // Property attributes
   ioSkip = iORM.Attributes.ioSkip;
@@ -412,7 +417,6 @@ type
   // Other attributes
   ioMarker = iORM.Attributes.ioMarker;
   ioEnumerated = iORM.Attributes.ioEnumerated;
-
 {$ENDREGION}
 
   // iORM facade

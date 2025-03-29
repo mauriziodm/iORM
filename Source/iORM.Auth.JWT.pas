@@ -50,6 +50,10 @@ type
     property typ: String read Ftyp write Ftyp;
   end;
 
+  // TODO: Fabio suggerisce di eliminare i claims aid, app, con, crm, lic, lid, usr, uid oerchè gli ho detto che li voglio tenere nella AuthSessionData per motivi di efficienza e allora lui ha detto allora toglili dal jwt altrimenti li mandiamo avanti e indietro doppi
+
+  // TODO: Valutare se mantenere l'uso di DJSON per la serializzazione oppure fare metodi custom (come in AUthSessionData) per motivi di efficienza (a scapito della facilità nell'aggiungere eventuali altri claims in classi derivate dall'utente)
+
   TioJWT = class
   private
     // header
@@ -314,6 +318,12 @@ begin
   // aud = audience
   if Faud = IO_STRING_NULL_VALUE then
     LdjParams.IgnoredProperties.Add('aud');
+  // con = connection
+  if Fcon = IO_STRING_NULL_VALUE then
+    LdjParams.IgnoredProperties.Add('con');
+  // crm = connection remote
+  if Fcrm = IO_STRING_NULL_VALUE then
+    LdjParams.IgnoredProperties.Add('crm');
   // exp = expiration
   if Fexp = IO_DATETIME_NULL_VALUE then
     LdjParams.IgnoredProperties.Add('exp');
@@ -326,6 +336,12 @@ begin
   // jti = jwt id
   if Fjti = IO_STRING_NULL_VALUE then
     LdjParams.IgnoredProperties.Add('jti');
+  // lic = license
+  if Flic = IO_STRING_NULL_VALUE then
+    LdjParams.IgnoredProperties.Add('lic');
+  // lid = license ID
+  if Flid = IO_INTEGER_NULL_VALUE then
+    LdjParams.IgnoredProperties.Add('lid');
   // nbf = not before
   if Fnbf = IO_DATETIME_NULL_VALUE then
     LdjParams.IgnoredProperties.Add('nbf');
