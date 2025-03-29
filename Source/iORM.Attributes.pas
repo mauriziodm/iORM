@@ -1042,12 +1042,12 @@ begin
   FEntityUpdated := LContext.ObjUpdated;
   FEntityState := dj.From(LContext.DataObject, TioEtmFactory.djParamsEngine).ToJson;
   // session data props
-  FApp := IO_STRING_NULL_VALUE;
-  FAppID := IO_INTEGER_NULL_VALUE;
-  FLicense := IO_STRING_NULL_VALUE;
-  FLicenseID := IO_INTEGER_NULL_VALUE;
-  FUser := IO_STRING_NULL_VALUE;
-  FUserID := IO_INTEGER_NULL_VALUE;
+  FApp := LContext.PSRequest.App;
+  FAppID := LContext.PSRequest.AppOID;
+  FLicense := LContext.PSRequest.Lic;
+  FLicenseID := LContext.PSRequest.LicOID;
+  FUser := LContext.PSRequest.Usr;
+  FUserID := LContext.PSRequest.UsrOID;
   // Persistence related props
   FActionType := LContext.ActionType;
   FIntentType := LContext.IntentType;
@@ -1126,7 +1126,7 @@ begin
   if FApp <> IO_STRING_NULL_VALUE then
   begin
     if not Result.IsEmpty then
-      Result := Result + '-';
+      Result := '-' + Result;
     Result := FApp + Result;
   end;
 end;
@@ -1254,7 +1254,7 @@ begin
   if FLicense <> IO_STRING_NULL_VALUE then
   begin
     if not Result.IsEmpty then
-      Result := Result + '-';
+      Result := '-' + Result;
     Result := FLicense + Result;
   end;
 end;
@@ -1269,7 +1269,7 @@ begin
   if FUser <> IO_STRING_NULL_VALUE then
   begin
     if not Result.IsEmpty then
-      Result := Result + '-';
+      Result := '-' + Result;
     Result := FUser + Result;
   end;
 end;

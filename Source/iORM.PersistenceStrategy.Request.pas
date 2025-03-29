@@ -571,6 +571,9 @@ begin
     FAppOID := ASessionData.AppOID;
     // connection
     FConnection := ASessionData.Connection;
+    // license
+    FLic := ASessionData.License;
+    FLicOID := ASessionData.LicenseOID;
     // remote connection
     FConnectionRemote := ASessionData.ConnectionRemote;
     // user
@@ -587,6 +590,9 @@ begin
     FAppOID := APSRequest.AppOID;
     // connection
     FConnection := APSRequest.Connection;
+    // license
+    FLic := APSRequest.Lic;
+    FLicOID := APSRequest.LicOID;
     // remote connection
     FConnectionRemote := APSRequest.ConnectionRemote;
     // user

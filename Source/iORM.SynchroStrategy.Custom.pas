@@ -56,10 +56,13 @@ type
     FSynchroLevel: TioSynchroLevel;
     FSynchroLogName: String;
     FSynchroStatus: TioSynchroStatus;
-    FUserID: Integer;
-    FUserName: String;
+    // session data
+    FApp: String;
     FAppID: Integer;
-    FAppName: String;
+    FLicense: String;
+    FLicenseID: Integer;
+    FUser: String;
+    FUserID: Integer;
     // Count
     FCliToSrv_Count: Integer;
     FSrvToCli_Count: Integer;
@@ -85,12 +88,16 @@ type
     [ioVarChar(100)]
     property SynchroLogName: String read FSynchroLogName write FSynchroLogName;
     property SynchroStatus: TioSynchroStatus read FSynchroStatus write FSynchroStatus;
-    property UserID: Integer read FUserID write FUserID;
+    // session data
     [ioVarChar(100)]
-    property UserName: String read FUserName write FUserName;
+    property App: String read FApp write FApp;
     property AppID: Integer read FAppID write FAppID;
     [ioVarChar(100)]
-    property App: String read FAppName write FAppName;
+    property License: String read FLicense write FLicense;
+    property LicenseID: Integer read FLicenseID write FLicenseID;
+    [ioVarChar(100)]
+    property User: String read FUser write FUser;
+    property UserID: Integer read FUserID write FUserID;
     // Count
     property CliToSrv_Count: Integer read FCliToSrv_Count write FCliToSrv_Count;
     property SrvToCli_Count: Integer read FSrvToCli_Count write FSrvToCli_Count;
@@ -742,10 +749,13 @@ begin
   FSynchroLogItem_New.SynchroStatus := TioSynchroStatus.ssInitialization;
   FSynchroLogItem_New.SynchroLevel := FSynchroLevel;
   FSynchroLogItem_New.SynchroLogName := FSynchroLogName;
-  FSynchroLogItem_New.UserName := FSessionData.User;
-  FSynchroLogItem_New.UserID := FSessionData.UserOID;
+  // session data
   FSynchroLogItem_New.App := FSessionData.App;
   FSynchroLogItem_New.AppID := FSessionData.AppOID;
+  FSynchroLogItem_New.License := FSessionData.License;
+  FSynchroLogItem_New.LicenseID := FSessionData.LicenseOID;
+  FSynchroLogItem_New.User := FSessionData.User;
+  FSynchroLogItem_New.UserID := FSessionData.UserOID;
 end;
 
 procedure TioCustomSynchroStrategy_Payload._DoOldSynchroLogItem_LoadFromClient;
@@ -819,12 +829,15 @@ begin
   FID := IO_INTEGER_NULL_VALUE;
   FDateAndTime := Now;
   FSynchroLogName := IO_STRING_NULL_VALUE;
-  FUserID := IO_INTEGER_NULL_VALUE;
-  FUserName := IO_STRING_NULL_VALUE;
-  FAppID := IO_INTEGER_NULL_VALUE;
-  FAppName := IO_STRING_NULL_VALUE;
   FSynchroLevel := TioSynchroLevel.slIncremental;
   FSynchroStatus := TioSynchroStatus.ssInitialization;
+  // session data
+  FApp := IO_STRING_NULL_VALUE;
+  FAppID := IO_INTEGER_NULL_VALUE;
+  FLicense := IO_STRING_NULL_VALUE;
+  FLicenseID := IO_INTEGER_NULL_VALUE;
+  FUser := IO_STRING_NULL_VALUE;
+  FUserID := IO_INTEGER_NULL_VALUE;
   // Count
   FCliToSrv_Count := IO_INTEGER_NULL_VALUE;
   FSrvToCli_Count := IO_INTEGER_NULL_VALUE;
@@ -853,7 +866,7 @@ begin
   Result := String.Empty;
   // Extract user info as native type
   LUserID := Integer(FUserID);
-  LUserName := String(FUserName);
+  LUserName := String(FUser);
   // UserID
   if LUserID <> 0 then
     Result := LUserID.ToString;

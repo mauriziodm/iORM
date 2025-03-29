@@ -595,8 +595,11 @@ begin
       APersistenceStrategyRequest.Connection := FDefaultConnection
     else
       APersistenceStrategyRequest.Connection := LSessionData.Connection;
-    // remote connection
+    // connection remote
     APersistenceStrategyRequest.ConnectionRemote := LSessionData.ConnectionRemote;
+    // license
+    APersistenceStrategyRequest.Lic := LSessionData.License;
+    APersistenceStrategyRequest.LicOID := LSessionData.LicenseOID;
     // user
     APersistenceStrategyRequest.Usr := LSessionData.User;
     APersistenceStrategyRequest.UsrOID := LSessionData.UserOID;
