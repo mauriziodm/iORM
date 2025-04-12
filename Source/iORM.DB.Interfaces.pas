@@ -54,25 +54,12 @@ const
   OBJVERSION_NULL = 0;
   TRANSACTION_TIMESTAMP_NULL = 0;
 
-  KEY_SESSION_DATA = 'SessionData';
-  KEY_AUTH_INTENTION = 'AuthIntention';
-  KEY_AUTH_SCOPE = 'AuthScope';
-  KEY_AUTH_GRANT = 'AuthGrant';
-  KEY_AUTH_TOKEN = 'AuthToken';
-  KEY_AUTH_RESULT_ISAUTHORIZED = 'AuthResultIsAuthorized';
-  KEY_AUTH_RESULT1 = 'AuthResult1';
-  KEY_AUTH_RESULT2 = 'AuthResult2';
-  KEY_BLINDLEVEL = 'BlindLevel';
-  KEY_EXCEPTIONCLASSNAME = 'ExceptionClassName';
-  KEY_EXCEPTIONMESSAGE = 'ExceptionMessage';
-  KEY_INTENTTYPE = 'IntentType';
-  KEY_JSONDATAVALUE = 'JSONDataValue';
-  KEY_METHODNAME = 'MethodName';
-  KEY_RELATIONOID = 'RelationOID';
-  KEY_RELATIONPROPERTYNAME = 'RelationPropertyName';
-  KEY_SQLDESTINATION = 'SQLDestination';
-  KEY_STREAM = 'Stream';
-  KEY_WHERE = 'Where';
+  // Http Body response related constants
+  BR_AUTHRESPONSE = 'AutRes';
+  BR_EXCEPTIONCLASSNAME = 'ExcCls';
+  BR_EXCEPTIONMESSAGE = 'ExcMsg';
+  BR_JSONDATAVALUE = 'JsonDV';
+  BR_STREAM = 'Stream';
 
 type
 
@@ -337,14 +324,10 @@ type
     ['{E5A14525-308F-4877-99B7-C270D691FC6D}']
     function ExceptionOccurred: Boolean;
     function AsString: String;
-    // AuthResult 1
-    procedure SetAuthResult1(const Value: String);
-    function GetAuthResult1: String;
-    property AuthResult1: String read GetAuthResult1 write SetAuthResult1;
-    // AuthResult 2
-    procedure SetAuthResult2(const Value: String);
-    function GetAuthResult2: String;
-    property AuthResult2: String read GetAuthResult2 write SetAuthResult2;
+    // AuthResponse
+    procedure SetAuthResponse(const AAuthResponse: IioAuthResponse);
+    function GetAuthResponse: IioAuthResponse;
+    property AuthResponse: IioAuthResponse read GetAuthResponse write SetAuthResponse;
     // ExceptionClassName
     procedure SetExceptionClassName(const Value: String);
     function GetExceptionClassName: String;

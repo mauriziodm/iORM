@@ -36,64 +36,67 @@ unit iORM.Http.Body.Response;
 interface
 
 uses
-  System.Classes, iORM.DB.Interfaces, System.JSON;
+  System.Classes, iORM.DB.Interfaces, System.JSON, iORM.Auth.Interfaces;
 
 type
 
   TioHttpResponseBody = class(TInterfacedObject, IioHttpResponseBody)
   private
-    // auth
-    // TODO: Auth - non serve più perchè tanto questo tipo di risposte incapsulano una TioAuthResponse?
-    FAuthResultIsAuthorized: Boolean;
-    FAuthResult1: String;
-    // TODO: Auth - non serve più perchè tanto questo tipo di risposte incapsulano una TioAuthResponse?
-    FAuthResult2: String;
-    // others
+    // auth response
+    FAuthResponse: IioAuthResponse;
+    // exceptions
     FExceptionClassName: String;
     FExceptionMessage: String;
+    // results
     FJSONDataValue: TJSONValue;
     FStream: TStream;
     // methods
     function ExceptionOccurred: Boolean;
-    function GetAuthResult1: String;
-    function GetAuthResult2: String;
+    function GetAuthResponse: IioAuthResponse;
     function GetExceptionClassName: String;
     function GetExceptionMessage: String;
     function GetJSONDataValue: TJSONValue;
     function GetJSONDataValueAsInteger: Integer;
     function GetJSONDataValueAsObject: TObject;
     function GetStream: TStream;
-    procedure SetAuthResult1(const Value: String);
-    procedure SetAuthResult2(const Value: String);
+    procedure SetAuthResponse(const AAuthResponse: IioAuthResponse);
     procedure SetExceptionClassName(const Value: String);
     procedure SetExceptionMessage(const Value: String);
     procedure SetJSONDataValue(const Value: TJSONValue);
     procedure SetJSONDataValueAsInteger(const Value: Integer);
     procedure SetJSONDataValueAsObject(const AObj: TObject);
-    function AsString: String;
   public
     constructor Create;
     constructor CreateByJSONString(const AJSONString: String);
     destructor Destroy; override;
+    function AsString: String;
+    // properties
+    property AuthResponse: IioAuthResponse read GetAuthResponse write SetAuthResponse;
+    property ExceptionClassName: String read GetExceptionClassName write SetExceptionClassName;
+    property ExceptionMessage: String read GetExceptionMessage write SetExceptionMessage;
+    property JSONDataValue: TJSONValue read GetJSONDataValue write SetJSONDataValue;
+    property JSONDataValueAsInteger: Integer read GetJSONDataValueAsInteger write SetJSONDataValueAsInteger;
+    property JSONDataValueAsObject: TObject read GetJSONDataValueAsObject write SetJSONDataValueAsObject;
+    property Stream: TStream read GetStream;
   end;
 
 implementation
 
 uses
-  iORM, System.NetEncoding, iORM.Exceptions, DJSON, System.SysUtils;
+  iORM, System.NetEncoding, iORM.Exceptions, DJSON, System.SysUtils,
+  iORM.Auth.Factory;
 
 { TioHttpResponseBody }
 
 constructor TioHttpResponseBody.Create;
 begin
   inherited Create;
-  // auth
-  FAuthResultIsAuthorized := False;
-  FAuthResult1 := IO_STRING_NULL_VALUE;
-  FAuthResult2 := IO_STRING_NULL_VALUE;
-  // others
+  // auth response
+  FAuthResponse := nil;
+  // exceptions
   FExceptionClassName := IO_STRING_NULL_VALUE;
   FExceptionMessage := IO_STRING_NULL_VALUE;
+  // results
   FJSONDataValue := nil;
   FStream := nil;
 end;
@@ -120,37 +123,26 @@ begin
   Self.Create;
   LJSONObject := TJSONObject.ParseJSONValue(AJSONString) as TJSONObject;
   try
-    // ---------- session ----------
-    // AuthResultIsAuthorized
-    LJSONValue := LJSONObject.GetValue(KEY_AUTH_RESULT_ISAUTHORIZED);
+    // auth response
+    LJSONValue := LJSONObject.GetValue(BR_AUTHRESPONSE);
     if Assigned(LJSONValue) then
-      FAuthResultIsAuthorized := (LJSONValue as TJSONBool).AsBoolean;
-    // AuthResult1
-    LJSONValue := LJSONObject.GetValue(KEY_AUTH_RESULT1);
-    if Assigned(LJSONValue) then
-      FAuthResult1 := LJSONValue.Value;
-    // AuthResult2
-    LJSONValue := LJSONObject.GetValue(KEY_AUTH_RESULT2);
-    if Assigned(LJSONValue) then
-      FAuthResult2 := LJSONValue.Value;
-    // ---------- others ----------
+      FAuthResponse := TioAuthFactory.NewAuthResponseFromString(LJSONValue.Value);
     // ExceptionClassName
-    LJSONValue := LJSONObject.GetValue(KEY_EXCEPTIONCLASSNAME);
+    LJSONValue := LJSONObject.GetValue(BR_EXCEPTIONCLASSNAME);
     if Assigned(LJSONValue) then
       FExceptionClassName := LJSONValue.Value;
     // ExceptionClassMessage
-    LJSONValue := LJSONObject.GetValue(KEY_EXCEPTIONMESSAGE);
+    LJSONValue := LJSONObject.GetValue(BR_EXCEPTIONMESSAGE);
     if Assigned(LJSONValue) then
       FExceptionMessage := LJSONValue.Value;
     // JSONDataValue
-    LJSONValue := LJSONObject.GetValue(KEY_JSONDATAVALUE);
+    LJSONValue := LJSONObject.GetValue(BR_JSONDATAVALUE);
     if Assigned(LJSONValue) then
       FJSONDataValue := LJSONValue.Clone as TJSONValue;
     // Stream
-    LJSONValue := LJSONObject.GetValue(KEY_STREAM);
+    LJSONValue := LJSONObject.GetValue(BR_STREAM);
     if Assigned(LJSONValue) then
       _LoadStream;
-    // ---------- end ----------
   finally
     LJSONObject.Free;
   end;
@@ -170,14 +162,9 @@ begin
   Result := not (FExceptionClassName.IsEmpty and FExceptionMessage.IsEmpty);
 end;
 
-function TioHttpResponseBody.GetAuthResult1: String;
+function TioHttpResponseBody.GetAuthResponse: IioAuthResponse;
 begin
-  Result := FAuthResult1;
-end;
-
-function TioHttpResponseBody.GetAuthResult2: String;
-begin
-  Result := FAuthResult2;
+  Result := FAuthResponse;
 end;
 
 function TioHttpResponseBody.GetExceptionClassName: String;
@@ -215,14 +202,9 @@ begin
   Result := FStream;
 end;
 
-procedure TioHttpResponseBody.SetAuthResult1(const Value: String);
+procedure TioHttpResponseBody.SetAuthResponse(const AAuthResponse: IioAuthResponse);
 begin
-  FAuthResult1 := Value;
-end;
-
-procedure TioHttpResponseBody.SetAuthResult2(const Value: String);
-begin
-  FAuthResult2 := Value;
+  FAuthResponse := AAuthResponse;
 end;
 
 procedure TioHttpResponseBody.SetExceptionClassName(const Value: String);
@@ -265,7 +247,7 @@ var
       FStream.Position := 0;
       TNetEncoding.Base64.Encode(FStream, LStringStream);
       LStringStream.Position := 0;
-      LJSONObject.AddPair(KEY_STREAM, LStringStream.DataString);
+      LJSONObject.AddPair(BR_STREAM, LStringStream.DataString);
     finally
       LStringStream.Free;
     end;
@@ -273,25 +255,18 @@ var
 begin
   LJSONObject := TJSONObject.Create;
   try
-    // ---------- auth ----------
-    // AuthResultIsAuthorized
-    LJSONObject.AddPair(KEY_AUTH_RESULT_ISAUTHORIZED, FAuthResultIsAuthorized);
-    // AuthResult1
-    if FAuthResult1 <> IO_STRING_NULL_VALUE then
-      LJSONObject.AddPair(KEY_AUTH_RESULT1, FAuthResult1);
-    // AuthResult2
-    if FAuthResult2 <> IO_STRING_NULL_VALUE then
-      LJSONObject.AddPair(KEY_AUTH_RESULT2, FAuthResult2);
-    // ---------- others ----------
+    // auth response
+    if Assigned(FAuthResponse) then
+      LJSONObject.AddPair(BR_AUTHRESPONSE, FAuthResponse.AsString);
     // ExceptionClassName
     if FExceptionClassName <> IO_STRING_NULL_VALUE then
-      LJSONObject.AddPair(KEY_EXCEPTIONCLASSNAME, FExceptionClassName);
+      LJSONObject.AddPair(BR_EXCEPTIONCLASSNAME, FExceptionClassName);
     // ExceptionClassMessage
     if FExceptionMessage <> IO_STRING_NULL_VALUE then
-      LJSONObject.AddPair(KEY_EXCEPTIONMESSAGE, FExceptionMessage);
+      LJSONObject.AddPair(BR_EXCEPTIONMESSAGE, FExceptionMessage);
     // JSONDataValue
     if Assigned(FJSONDataValue) then
-      LJSONObject.AddPair(KEY_JSONDATAVALUE, FJSONDataValue.Clone as TJSONValue);
+      LJSONObject.AddPair(BR_JSONDATAVALUE, FJSONDataValue.Clone as TJSONValue);
     // Stream
     if Assigned(FStream) then
       _SaveStream;
