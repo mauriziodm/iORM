@@ -22,10 +22,14 @@ type
     FUsr: String;
     FUsrOID: Integer;
     // auth
-    FAuthGrant: String;
+    FAuthAccessToken: String;
+    FAuthCodeChallenge: String;
+    FAuthCodeVerifier: String;
     FAuthIntention: TioAuthIntention;
+    FAuthorizationCode: String;
+    FAuthRefreshToken: String;
     FAuthScope: String;
-    FAuthToken: String; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
+    FAuthState: String;
     // instances
     FDTO: TObject;
     FDTO_Serialize: Boolean;
@@ -51,10 +55,14 @@ type
     procedure _Clear(const FillSessionRelatedProperties: Boolean); inline;
     function GetApp: String;
     function GetAppOID: Integer;
-    function GetAuthGrant: String;
+    function GetAuthAccessToken: String;
+    function GetAuthCodeChallenge: String;
+    function GetAuthCodeVerifier: String;
     function GetAuthIntention: TioAuthIntention;
+    function GetAuthorizationCode: String;
+    function GetAuthRefreshToken: String;
     function GetAuthScope: String;
-    function GetAuthToken: String;
+    function GetAuthState: String;
     function GetBlindLevel: Byte;
     function GetConnection: String;
     function GetConnectionRemote: String;
@@ -84,10 +92,14 @@ type
     function GetWhere: IioWhere;
     procedure SetApp(const Value: String);
     procedure SetAppOID(const Value: Integer);
-    procedure SetAuthGrant(const Value: String);
+    procedure SetAuthAccessToken(const Value: String);
+    procedure SetAuthCodeChallenge(const Value: String);
+    procedure SetAuthCodeVerifier(const Value: String);
     procedure SetAuthIntention(const Value: TioAuthIntention);
+    procedure SetAuthorizationCode(const Value: String);
+    procedure SetAuthRefreshToken(const Value: String);
     procedure SetAuthScope(const Value: String);
-    procedure SetAuthToken(const Value: String);
+    procedure SetAuthState(const Value: String);
     procedure SetBlindLevel(const Value: Byte);
     procedure SetConnection(const Value: String);
     procedure SetConnectionRemote(const Value: String);
@@ -133,10 +145,14 @@ type
     property Usr: String read GetUsr write SetUsr;
     property UsrOID: Integer read GetUsrOID write SetUsrOID;
     // auth
-    property AuthGrant: String read GetAuthGrant write SetAuthGrant;
+    property AuthAccessToken: String read GetAuthAccessToken write SetAuthAccessToken;
+    property AuthCodeChallenge: String read GetAuthCodeChallenge write SetAuthCodeChallenge;
+    property AuthCodeVerifier: String read GetAuthCodeVerifier write SetAuthCodeVerifier;
     property AuthIntention: TioAuthIntention read GetAuthIntention write SetAuthIntention;
+    property AuthorizationCode: String read GetAuthorizationCode write SetAuthorizationCode;
+    property AuthRefreshToken: String read GetAuthRefreshToken write SetAuthRefreshToken;
     property AuthScope: String read GetAuthScope write SetAuthScope;
-    property AuthToken: String read GetAuthToken write SetAuthToken; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
+    property AuthState: String read GetAuthState write SetAuthState;
     // instances
     property DTO: TObject read GetDTO write SetDTO;
     property DTO_Serialize: Boolean read GetDTO_Serialize write SetDTO_Serialize;
@@ -203,17 +219,26 @@ begin
     if (FUsrOID <> IO_INTEGER_NULL_VALUE) then
       LJSONObject.AddPair(PSR_SESSION_USEROID, FUsrOID);
     // ---------- auth ----------
-    // AuthGrant
-    if (FAuthGrant <> IO_STRING_NULL_VALUE) then
-      LJSONObject.AddPair(PSR_AUTH_GRANT, FAuthGrant);
+    // AuthAccessToken
+    if (FAuthAccessToken <> IO_STRING_NULL_VALUE) then
+      LJSONObject.AddPair(PSR_AUTH_ACCESSTOKEN, FAuthAccessToken);
+    // AuthCodeChallenge
+    if (FAuthCodeChallenge <> IO_STRING_NULL_VALUE) then
+      LJSONObject.AddPair(PSR_AUTH_CODECHALLENGE, FAuthCodeChallenge);
+    // AuthCodeVerifier
+    if (FAuthCodeVerifier <> IO_STRING_NULL_VALUE) then
+      LJSONObject.AddPair(PSR_AUTH_CODEVERIFIER, FAuthCodeVerifier);
     // AuthIntention
     LJSONObject.AddPair(PSR_AUTH_INTENTION, Ord(FAuthIntention));
+    // AuthRefreshToken
+    if (FAuthRefreshToken <> IO_STRING_NULL_VALUE) then
+      LJSONObject.AddPair(PSR_AUTH_REFRESHTOKEN, FAuthRefreshToken);
     // AuthScope
     if (FAuthScope <> IO_STRING_NULL_VALUE) then
       LJSONObject.AddPair(PSR_AUTH_SCOPE, FAuthScope);
-    // AuthToken
-    if (FAuthToken <> IO_STRING_NULL_VALUE) then
-      LJSONObject.AddPair(PSR_AUTH_TOKEN, FAuthToken);
+    // AuthState
+    if (FAuthState <> IO_STRING_NULL_VALUE) then
+      LJSONObject.AddPair(PSR_AUTH_STATE, FAuthState);
     // ---------- instances ----------
     // DTO
     if FDTO_Serialize and Assigned(FDTO) then
@@ -320,22 +345,38 @@ begin
     if Assigned(LJSONValue) then
       FUsrOID := dj.FromJSON(LJSONValue).&To<Integer>;
     // ---------- auth ----------
-    // AuthGrant
-    LJSONValue := LJSONObject.GetValue(PSR_AUTH_GRANT);
+    // AuthAccessToken
+    LJSONValue := LJSONObject.GetValue(PSR_AUTH_ACCESSTOKEN);
     if Assigned(LJSONValue) then
-      FAuthGrant := LJSONValue.Value;
+      FAuthAccessToken := LJSONValue.Value;
+    // AuthCodeChallenge
+    LJSONValue := LJSONObject.GetValue(PSR_AUTH_CODECHALLENGE);
+    if Assigned(LJSONValue) then
+      FAuthCodeChallenge := LJSONValue.Value;
+    // AuthCodeVerifier
+    LJSONValue := LJSONObject.GetValue(PSR_AUTH_CODEVERIFIER);
+    if Assigned(LJSONValue) then
+      FAuthCodeVerifier := LJSONValue.Value;
     // AuthIntention
     LJSONValue := LJSONObject.GetValue(PSR_AUTH_INTENTION);
     if Assigned(LJSONValue) then
       FAuthIntention := TioAuthIntention((LJSONValue as TJSONNumber).AsInt);
+    // AuthorizationCode
+    LJSONValue := LJSONObject.GetValue(PSR_AUTH_AUTHORIZATIONCODE);
+    if Assigned(LJSONValue) then
+      FAuthorizationCode := LJSONValue.Value;
+    // AuthRefreshToken
+    LJSONValue := LJSONObject.GetValue(PSR_AUTH_REFRESHTOKEN);
+    if Assigned(LJSONValue) then
+      FAuthRefreshToken := LJSONValue.Value;
     // AuthScope
     LJSONValue := LJSONObject.GetValue(PSR_AUTH_SCOPE);
     if Assigned(LJSONValue) then
       FAuthScope := LJSONValue.Value;
-    // AuthToken
-    LJSONValue := LJSONObject.GetValue(PSR_AUTH_TOKEN);
+    // AuthState
+    LJSONValue := LJSONObject.GetValue(PSR_AUTH_STATE);
     if Assigned(LJSONValue) then
-      FAuthToken := LJSONValue.Value;
+      FAuthState := LJSONValue.Value;
     // ---------- instances ----------
     // DTO
     LJSONValue := LJSONObject.GetValue(PSR_INSTANCES_DTO);
@@ -409,9 +450,24 @@ begin
   Result := FAppOID;
 end;
 
-function TioPersistenceStrategyRequest.GetAuthGrant: String;
+function TioPersistenceStrategyRequest.GetAuthCodeVerifier: String;
 begin
-  Result := FAuthGrant;
+  Result := FAuthCodeVerifier;
+end;
+
+function TioPersistenceStrategyRequest.GetAuthCodeChallenge: String;
+begin
+  Result := FAuthCodeChallenge;
+end;
+
+function TioPersistenceStrategyRequest.GetAuthAccessToken: String;
+begin
+  Result := FAuthAccessToken;
+end;
+
+function TioPersistenceStrategyRequest.GetAuthRefreshToken: String;
+begin
+  Result := FAuthRefreshToken;
 end;
 
 function TioPersistenceStrategyRequest.GetAuthIntention: TioAuthIntention;
@@ -419,14 +475,19 @@ begin
   Result := FAuthIntention;
 end;
 
+function TioPersistenceStrategyRequest.GetAuthorizationCode: String;
+begin
+  Result := FAuthorizationCode;
+end;
+
 function TioPersistenceStrategyRequest.GetAuthScope: String;
 begin
   Result := FAuthScope;
 end;
 
-function TioPersistenceStrategyRequest.GetAuthToken: String;
+function TioPersistenceStrategyRequest.GetAuthState: String;
 begin
-  Result := FAuthToken;
+  Result := FAuthState;
 end;
 
 function TioPersistenceStrategyRequest.GetBlindLevel: Byte;
@@ -580,7 +641,7 @@ begin
     FUsr := ASessionData.User;
     FUsrOID := ASessionData.UserOID;
     // auth
-    FAuthToken := ASessionData.AccessToken;
+    FAuthAccessToken := ASessionData.AccessToken;
 end;
 
 procedure TioPersistenceStrategyRequest.ImportSessionDataFromPSRequest(const APSRequest: IioPersistenceStrategyRequest);
@@ -599,7 +660,7 @@ begin
     FUsr := APSRequest.Usr;
     FUsrOID := APSRequest.UsrOID;
     // auth
-    FAuthToken := APSRequest.AuthToken;
+    FAuthAccessToken := APSRequest.AuthAccessToken;
 end;
 
 procedure TioPersistenceStrategyRequest.SetApp(const Value: String);
@@ -612,9 +673,24 @@ begin
   FAppOID := Value;
 end;
 
-procedure TioPersistenceStrategyRequest.SetAuthGrant(const Value: String);
+procedure TioPersistenceStrategyRequest.SetAuthCodeChallenge(const Value: String);
 begin
-  FAuthGrant := Value;
+  FAuthCodeChallenge := Value;
+end;
+
+procedure TioPersistenceStrategyRequest.SetAuthCodeVerifier(const Value: String);
+begin
+  FAuthCodeVerifier := Value;
+end;
+
+procedure TioPersistenceStrategyRequest.SetAuthAccessToken(const Value: String);
+begin
+  FAuthAccessToken := Value;
+end;
+
+procedure TioPersistenceStrategyRequest.SetAuthRefreshToken(const Value: String);
+begin
+  FAuthRefreshToken := Value;
 end;
 
 procedure TioPersistenceStrategyRequest.SetAuthIntention(const Value: TioAuthIntention);
@@ -622,14 +698,19 @@ begin
   FAuthIntention := Value;
 end;
 
+procedure TioPersistenceStrategyRequest.SetAuthorizationCode(const Value: String);
+begin
+  FAuthorizationCode := Value;
+end;
+
 procedure TioPersistenceStrategyRequest.SetAuthScope(const Value: String);
 begin
   FAuthScope := Value;
 end;
 
-procedure TioPersistenceStrategyRequest.SetAuthToken(const Value: String);
+procedure TioPersistenceStrategyRequest.SetAuthState(const Value: String);
 begin
-  FAuthToken := Value;
+  FAuthState := Value;
 end;
 
 procedure TioPersistenceStrategyRequest.SetBlindLevel(const Value: Byte);
@@ -784,10 +865,14 @@ begin
     FUsrOID := IO_INTEGER_NULL_VALUE;
   end;
   // auth
-  FAuthGrant := IO_STRING_NULL_VALUE;
+  FAuthCodeChallenge := IO_STRING_NULL_VALUE;
+  FAuthCodeVerifier := IO_STRING_NULL_VALUE;
+  FAuthAccessToken := IO_STRING_NULL_VALUE;
+  FAuthRefreshToken := IO_STRING_NULL_VALUE;
   FAuthIntention := TioAuthIntention.aiRead;
+  FAuthorizationCode := IO_STRING_NULL_VALUE;
   FAuthScope := IO_STRING_NULL_VALUE;
-  FAuthToken := IO_STRING_NULL_VALUE; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
+  FAuthState := IO_STRING_NULL_VALUE;
   // instances
   FDTO := nil;
   FDTO_Serialize := True;

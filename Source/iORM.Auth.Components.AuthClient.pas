@@ -49,6 +49,26 @@ type
     FActive: Boolean;
     FAsync: Boolean;
     FConnectionName: String;
+
+
+//    OnNewAccessTokenRequest
+//    OnNewAccessTokenResponse
+//
+//    OnAppAuthRequest
+//    OnAppAuthResponse
+//
+//    OnUserAuthRequest
+//    OnUserAuthResponse
+//
+//    OnRefreshAccessTokenRequest
+//    OnRefreshAccessTokenResponse
+//
+//    OnAccessTokenNeedRefreshRequest
+//    OnAccessTokenNeedRefreshResponse
+
+
+
+
     // authorize events
     FAfterAuthorizeAccess: TioAfterAuthorizeAccessEvent;
     FAfterAuthorizeApp: TioAfterAuthorizeAppEvent;

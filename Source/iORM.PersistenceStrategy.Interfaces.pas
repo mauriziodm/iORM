@@ -42,28 +42,32 @@ uses
 const
 
   // persistence strategy request json properties constants
-  PSR_AUTH_GRANT = 'AuthGrant';
-  PSR_AUTH_INTENTION = 'AuthIntent';
-  PSR_AUTH_SCOPE = 'AuthScope';
-  PSR_AUTH_TOKEN = 'AuthToken';
-  PSR_BLINDLEVEL = 'BlindLevel';
+  PSR_AUTH_ACCESSTOKEN = 'AutAccTkn';
+  PSR_AUTH_AUTHORIZATIONCODE = 'AutCod';
+  PSR_AUTH_CODECHALLENGE = 'AutCodCha';
+  PSR_AUTH_CODEVERIFIER = 'AutCodVer';
+  PSR_AUTH_INTENTION = 'AutInt';
+  PSR_AUTH_REFRESHTOKEN = 'AutRefTkn';
+  PSR_AUTH_SCOPE = 'AutScp';
+  PSR_AUTH_STATE = 'AutSta';
+  PSR_BLINDLEVEL = 'BliLev';
   PSR_INSTANCES_DTO = 'DTO';
   PSR_INSTANCES_INTF1 = 'Intf1';
-  PSR_INSTANCES_LIST_DTO = 'ListDTO';
-  PSR_INSTANCES_MASTERBSPERSISTENCE = 'MasterBSP';
+  PSR_INSTANCES_LIST_DTO = 'LisDTO';
+  PSR_INSTANCES_MASTERBSPERSISTENCE = 'MstBSP';
   PSR_INSTANCES_OBJ1 = 'Obj1';
-  PSR_INSTANCES_WHERE = 'Where';
-  PSR_INTENTTYPE = 'Intent';
-  PSR_MASTERPROPERTYNAME = 'MasterProp';
-  PSR_MASTERPROPERTYPATH = 'MasterPropPath';
-  PSR_METHOD = 'Method';
-  PSR_PROPERTYNAME = 'PropName';
-  PSR_RELATIONID = 'RelPropID';
-  PSR_RELATIONPROPERTYNAME = 'RelPropName';
+  PSR_INSTANCES_WHERE = 'Whr';
+  PSR_INTENTTYPE = 'Int';
+  PSR_MASTERPROPERTYNAME = 'MstPrp';
+  PSR_MASTERPROPERTYPATH = 'MstPrpPat';
+  PSR_METHOD = 'Met';
+  PSR_PROPERTYNAME = 'PrpNam';
+  PSR_RELATIONID = 'RelPrpID';
+  PSR_RELATIONPROPERTYNAME = 'RelPrpNam';
   PSR_SESSION_APP = 'App';
   PSR_SESSION_APPOID = 'AppID';
-  PSR_SESSION_CONNECTION = 'Conn';
-  PSR_SESSION_CONNECTIONREMOTE = 'ConnRem';
+  PSR_SESSION_CONNECTION = 'Con';
+  PSR_SESSION_CONNECTIONREMOTE = 'ConRem';
   PSR_SESSION_LIC = 'Lic';
   PSR_SESSION_LICOID = 'LicID';
   PSR_SESSION_USER = 'Usr';
@@ -110,10 +114,14 @@ type
     function AsString: String;
     function GetApp: String;
     function GetAppOID: Integer;
-    function GetAuthGrant: String;
+    function GetAuthAccessToken: String;
+    function GetAuthCodeChallenge: String;
+    function GetAuthCodeVerifier: String;
     function GetAuthIntention: TioAuthIntention;
+    function GetAuthorizationCode: String;
+    function GetAuthRefreshToken: String;
     function GetAuthScope: String;
-    function GetAuthToken: String;
+    function GetAuthState: String;
     function GetBlindLevel: Byte;
     function GetConnection: String;
     function GetConnectionRemote: String;
@@ -145,10 +153,14 @@ type
     procedure ImportSessionDataFromPSRequest(const APSRequest: IioPersistenceStrategyRequest);
     procedure SetApp(const Value: String);
     procedure SetAppOID(const Value: Integer);
-    procedure SetAuthGrant(const Value: String);
+    procedure SetAuthAccessToken(const Value: String);
+    procedure SetAuthCodeChallenge(const Value: String);
+    procedure SetAuthCodeVerifier(const Value: String);
     procedure SetAuthIntention(const Value: TioAuthIntention);
+    procedure SetAuthorizationCode(const Value: String);
+    procedure SetAuthRefreshToken(const Value: String);
     procedure SetAuthScope(const Value: String);
-    procedure SetAuthToken(const Value: String);
+    procedure SetAuthState(const Value: String);
     procedure SetBlindLevel(const Value: Byte);
     procedure SetConnection(const Value: String);
     procedure SetConnectionRemote(const Value: String);
@@ -190,10 +202,14 @@ type
     property Usr: String read GetUsr write SetUsr;
     property UsrOID: Integer read GetUsrOID write SetUsrOID;
     // auth
-    property AuthGrant: String read GetAuthGrant write SetAuthGrant;
+    property AuthAccessToken: String read GetAuthAccessToken write SetAuthAccessToken;
+    property AuthCodeChallenge: String read GetAuthCodeChallenge write SetAuthCodeChallenge;
+    property AuthCodeVerifier: String read GetAuthCodeVerifier write SetAuthCodeVerifier;
     property AuthIntention: TioAuthIntention read GetAuthIntention write SetAuthIntention;
+    property AuthorizationCode: String read GetAuthorizationCode write SetAuthorizationCode;
+    property AuthRefreshToken: String read GetAuthRefreshToken write SetAuthRefreshToken;
     property AuthScope: String read GetAuthScope write SetAuthScope;
-    property AuthToken: String read GetAuthToken write SetAuthToken; // for auth purposes -> AccessToken, RefreshToken, CodeVerifier, CodeChallenge
+    property AuthState: String read GetAuthState write SetAuthState;
     // instances
     property DTO: TObject read GetDTO write SetDTO;
     property DTO_Serialize: Boolean read GetDTO_Serialize write SetDTO_Serialize;

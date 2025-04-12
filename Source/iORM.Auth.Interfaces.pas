@@ -43,19 +43,20 @@ const
   AUTH_PSW_DURATION_DAYS = 180;
 
   // auth response const
+  AR_ACCESSTOKEN = 'AccTkn';
+  AR_ACCESSTOKEN_EXP = 'AccTknExp';
+  AR_ACCESSTOKEN_REFRESHAFTER = 'RefAft';
   AR_APP = 'App';
-  AR_APP_OID = 'AppID';
+  AR_APPOID = 'AppID';
+  AR_AUTHORIZATIONCODE = 'AutCod';
+  AR_CONNECTION = 'Con';
+  AR_CONNECTIONREMOTE = 'ConRem';
+  AR_ISAUTHORIZED = 'IsAuth';
+  AR_REFRESHTOKEN = 'RefTkn';
+  AR_REFRESHTOKEN_EXP = 'RefTknExp';
+  AR_STATE = 'State';
   AR_USER = 'Usr';
-  AR_USER_OID = 'UsrID';
-  AR_CONNECTION = 'Conn';
-  AR_CONNECTION_REMOTE = 'ConnRem';
-  AR_IS_AUTHORIZED = 'IsAut';
-  AR_AUTH_GRANT = 'AutGnt';
-  AR_REFRESH_TOKEN = 'RefTkn';
-  AR_REFRESH_TOKEN_EXP = 'RefTknExp';
-  AR_ACCESS_TOKEN = 'AccTkn';
-  AR_ACCESS_TOKEN_EXP = 'AccTknExp';
-  AR_REFRESH_AFTER = 'RefAfter';
+  AR_USEROID = 'UsrID';
 
 type
 
@@ -148,55 +149,52 @@ type
     ['{BB322BD7-DD1C-49B2-A55D-F323749B8D32}']
     function GetAccessToken: String;
     function GetAccessTokenExp: TDateTime;
+    function GetAccessTokenRefreshAfter: TDateTime;
     function GetApp: String;
     function GetAppOID: Integer;
-    function GetAuthGrant: String;
+    function GetAuthorizationCode: String;
     function GetConnection: String;
     function GetConnectionRemote: String;
     function GetIsAuthorized: Boolean;
-    function GetRefreshAfter: TDateTime;
     function GetRefreshToken: String;
     function GetRefreshTokenExp: TDateTime;
+    function GetState: String;
     function GetUser: String;
     function GetUserOID: Integer;
     procedure SetAccessToken(const Value: String);
     procedure SetAccessTokenExp(const Value: TDateTime);
+    procedure SetAccessTokenRefreshAfter(const Value: TDateTime);
     procedure SetApp(const Value: String);
     procedure SetAppOID(const Value: Integer);
-    procedure SetAuthGrant(const Value: String);
+    procedure SetAuthorizationCode(const Value: String);
     procedure SetConnection(const Value: String);
     procedure SetConnectionRemote(const Value: String);
     procedure SetIsAuthorized(const Value: Boolean);
-    procedure SetRefreshAfter(const Value: TDateTime);
     procedure SetRefreshToken(const Value: String);
     procedure SetRefreshTokenExp(const Value: TDateTime);
+    procedure SetState(const Value: String);
     procedure SetUser(const Value: String);
     procedure SetUserOID(const Value: Integer);
     // methods
     function AsString: String;
     function HasAccessToken: Boolean;
-    function HasAuthGrant: Boolean;
+    function HasAuthorizationCode: Boolean;
     function HasRefreshToken: Boolean;
-    // app props
-    property App: String read GetApp write SetApp;
-    property AppOID: Integer read GetAppOID write SetAppOID;
-    // user props
-    property User: String read GetUser write SetUser;
-    property UserOID: Integer read GetUserOID write SetUserOID;
-    // connection props
-    property Connection: String read GetConnection write SetConnection;
-    property ConnectionRemote: String read GetConnectionRemote write SetConnectionRemote;
-    // is authorized prop
-    property IsAuthorized: Boolean read GetIsAuthorized write SetIsAuthorized;
-    // auth grant (auth code) prop
-    property AuthGrant: String read GetAuthGrant write SetAuthGrant;
-    // refresh token props
-    property RefreshToken: String read GetRefreshToken write SetRefreshToken;
-    property RefreshTokenExp: TDateTime read GetRefreshTokenExp write SetRefreshTokenExp;
-    // access token props
+    // properties
     property AccessToken: String read GetAccessToken write SetAccessToken;
     property AccessTokenExp: TDateTime read GetAccessTokenExp write SetAccessTokenExp;
-    property RefreshAfter: TDateTime read GetRefreshAfter write SetRefreshAfter;
+    property AccessTokenRefreshAfter: TDateTime read GetAccessTokenRefreshAfter write SetAccessTokenRefreshAfter;
+    property App: String read GetApp write SetApp;
+    property AppOID: Integer read GetAppOID write SetAppOID;
+    property AuthorizationCode: String read GetAuthorizationCode write SetAuthorizationCode;
+    property Connection: String read GetConnection write SetConnection;
+    property ConnectionRemote: String read GetConnectionRemote write SetConnectionRemote;
+    property IsAuthorized: Boolean read GetIsAuthorized write SetIsAuthorized;
+    property RefreshToken: String read GetRefreshToken write SetRefreshToken;
+    property RefreshTokenExp: TDateTime read GetRefreshTokenExp write SetRefreshTokenExp;
+    property State: String read GetState write SetState;
+    property User: String read GetUser write SetUser;
+    property UserOID: Integer read GetUserOID write SetUserOID;
   end;
 
   IioAuthCredentials = interface
@@ -366,12 +364,23 @@ type
 
   TioOnAuthorizeAccessEvent = procedure(const Sender: TObject; const AScope: String; const AIntention: TioAuthIntention; const AAccessToken: String; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
 
-  // TioAuthServer events
+  // TioAuthClient events
+  TioOnAppAuthRequest = procedure(const Sender: TObject; const AAppCredentials: IioAuthAppCredentials; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
+
+
+
+//  OnAppAuthRequest
+
+
+
+
+
+  // OLD TioAuthServer events
   TioOnAuthorizeUserEvent = procedure(const Sender: TObject; const AUserCredentials: IioAuthUserCredentials; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
   TioOnNewAccessTokenEvent = procedure(const Sender: TObject; const AAuthGrant, APkceCodeVerifier: String; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
   TioOnRefreshAccessTokenEvent = procedure(const Sender: TObject; const ARefreshToken: String; const AAuthResponse: IioAuthResponse; var Done: Boolean) of object;
 
-  // TioAuthClient events
+  // OLD TioAuthClient events
   TioAfterAuthorizeAccessEvent =  procedure(const Sender: TObject; const AScope: String; const AIntention: TioAuthIntention; const AAccessToken: String; const AAuthResponse: IioAuthResponse) of object;
   TioAfterAuthorizeAppEvent = procedure(const Sender: TObject; const AAppCredentials: IioAuthAppCredentials; const AUserAuthorizationCode: String; const AAuthResponse: IioAuthResponse) of object;
   TioAfterAuthorizeUserEvent = procedure(const Sender: TObject; const AUserCredentials: IioAuthUserCredentials; const AAuthResponse: IioAuthResponse) of object;

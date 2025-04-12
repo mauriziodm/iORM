@@ -604,7 +604,7 @@ begin
     APersistenceStrategyRequest.Usr := LSessionData.User;
     APersistenceStrategyRequest.UsrOID := LSessionData.UserOID;
     // auth
-    APersistenceStrategyRequest.AuthToken := LSessionData.AccessToken;
+    APersistenceStrategyRequest.AuthAccessToken := LSessionData.AccessToken;
   finally
     _Unlock;
   end;

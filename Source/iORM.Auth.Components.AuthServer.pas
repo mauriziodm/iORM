@@ -391,7 +391,7 @@ begin
 //exception    LToken.User := AAuthResponse.Subjects.User;
 //exception    LToken.UserOID :=  AAuthResponse.Subjects.UserOID;
     // set the user auth token in the response
-    AAuthResponse.AuthGrant := LToken.TokenAsString(FToken_Secret);
+    AAuthResponse.AuthorizationCode := LToken.TokenAsString(FToken_Secret);
   finally
     LToken.Free;
   end;
@@ -417,7 +417,7 @@ begin
 //exception    LToken.UserOID :=  AAuthResponse.Subjects.UserOID;
     AAuthResponse.AccessToken := LToken.TokenAsString(FToken_Secret);
     AAuthResponse.AccessTokenExp := LToken.Expiration;
-    AAuthResponse.RefreshAfter := IncMinute(LNow, FAccessToken_RefreshAfter_Mins);
+    AAuthResponse.AccessTokenRefreshAfter := IncMinute(LNow, FAccessToken_RefreshAfter_Mins);
   finally
     LToken.Free;
   end;
