@@ -48,7 +48,7 @@ type
   //      (e.g. which EtmTimeSlot was the last one synchronized)
   //   2) on the server side as a history of the synchronizations that occurred over time
   //      (also on the client side if desired).
-  [ioEntity('SYNCHRO_LOG', mmProperties)]
+//  [ioEntity('SYNCHRO_LOG', mmProperties)]
   TioCustomSynchroStrategy_LogItem = class
   strict private
     FID: Integer;

@@ -133,7 +133,12 @@ begin
 end;
 
 destructor TioVMActionContainer.Destroy;
+var
+  LName: String;
 begin
+  for LName in FContainer.Keys do       // Carlo Marona 2025-02-11
+    Remove(LName);
+
   FContainer.Free;
   inherited;
 end;

@@ -222,6 +222,9 @@ end;
 
 destructor TioViewModel.Destroy;
 begin
+  FVMActionContainer := nil;        // Added by Carlo Marona 2025/02/25
+  FViewRegister := nil;             // Added by Carlo Marona 2025/02/25
+  FLocalVCProviderRegister := nil;  // Added by Carlo Marona 2025/02/25
 
   inherited;
 end;
