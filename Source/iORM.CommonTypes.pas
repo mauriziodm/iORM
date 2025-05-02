@@ -55,7 +55,7 @@ const
 
   IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME = 'Master___ID';
 
-  IO_USERNAME_LENGTH = 30;
+  IO_USERNAME_LENGTH = 32;
 
   // TdjSkipScope = (ssMap, ssETM, ssHTTP, ssEmbeddeRelation, ssSUD, ssSaveRevertPoint, ssDJSON);
   ssMap = DJSON.Params.TdjSkipScope.ssMap;

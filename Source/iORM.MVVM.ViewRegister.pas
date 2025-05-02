@@ -278,9 +278,9 @@ begin
   // NB: Ho dovuto posticiparlo con un timer perchè altrimenti con i TcxButton
   // della DevExpress c'erano dei problemi in alcuni casi
   // NB: If we are on an uniGUI application then doesn't use the timers but runs the code right away
-  if TioApplication.ProjectPlatform <> ppUniGUI then
-    FFreeViewsTimer.Enabled := True
-  else
+//  if TioApplication.ProjectPlatform <> ppUniGUI then      // Carlo Marona 2025-02-25
+//    FFreeViewsTimer.Enabled := True
+//  else
     _PostponedReleaseAllViewContexts;
 end;
 

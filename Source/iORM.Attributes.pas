@@ -1023,6 +1023,8 @@ begin
       Format('Hi, I''m iORM, we have a problem.' + #13#13'You asked me to persist an entity of type "%s" but this doesn''t have a valid ID.' +
       #13#13'You probably set the "BlindLevel" so as not to set the object ID immediately after the insert operation but this is incompatible with using the ETM.'
       + #13#13'Please try to set the BlindLevel to a correct value and try again, it will work.', [LContext.DataObject.ClassName]));
+  // Timeslot info
+  FDateAndTime := Now;
   // Entity related props
   FEntityClassName := LContext.DataObject.ClassName;
   FEntityID := LContext.ObjID;

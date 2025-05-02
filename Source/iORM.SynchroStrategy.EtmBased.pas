@@ -42,7 +42,7 @@ uses
 
 type
 
-  [ioEntity('SYNCHRO_LOG', mmProperties)]
+//  [ioEntity('SYNCHRO_LOG', mmProperties)]
   TioEtmSynchroStrategy_LogItem = class(TioCustomSynchroStrategy_LogItem)
   strict private
     FEtmTimeSlot_ClassName: String;
