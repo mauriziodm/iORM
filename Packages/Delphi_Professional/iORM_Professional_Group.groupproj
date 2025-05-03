@@ -9,6 +9,9 @@
         <Projects Include="iORM_DT.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="..\..\Samples\VMActionList\VMActionList.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -35,14 +38,23 @@
     <Target Name="iORM_DT:Make">
         <MSBuild Projects="iORM_DT.dproj" Targets="Make"/>
     </Target>
+    <Target Name="VMActionList">
+        <MSBuild Projects="..\..\Samples\VMActionList\VMActionList.dproj"/>
+    </Target>
+    <Target Name="VMActionList:Clean">
+        <MSBuild Projects="..\..\Samples\VMActionList\VMActionList.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="VMActionList:Make">
+        <MSBuild Projects="..\..\Samples\VMActionList\VMActionList.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="iORM_RT;iORM_DT"/>
+        <CallTarget Targets="iORM_RT;iORM_DT;VMActionList"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="iORM_RT:Clean;iORM_DT:Clean"/>
+        <CallTarget Targets="iORM_RT:Clean;iORM_DT:Clean;VMActionList:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="iORM_RT:Make;iORM_DT:Make"/>
+        <CallTarget Targets="iORM_RT:Make;iORM_DT:Make;VMActionList:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
