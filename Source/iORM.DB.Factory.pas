@@ -42,7 +42,7 @@ uses
   System.Classes,
   System.Rtti, iORM.DB.ConnectionContainer, iORM.CommonTypes,
   iORM.Context.Interfaces, iORM.Context.Properties.Interfaces,
-  iORM.DB.QueryEngine;
+  iORM.DB.QueryEngine, iORM.Where.SqlItems;
 
 type
 
@@ -53,6 +53,8 @@ type
     class function WhereItemPropertyOID: IioSqlItemWhere;
     class function WhereItemTValue(AValue: TValue): IioSqlItemWhere;
     class function WhereItemPropertyEqualsTo(APropertyName: String; AValue: TValue): IioSqlItemWhere;
+    class function WhereItemPropertyIn(APropertyName: String; Values: TArray<TValue>): IioSqlItemWhere; overload;
+    class function WhereItemPropertyIn(APropertyName: String; Values: TArray<Integer>): IioSqlItemWhere; overload;
     class function WhereItemPropertyOIDEqualsTo(AValue: TValue): IioSqlItemWhere;
     class function CompareOperator: TioCompareOperatorRef;
     class function LogicRelation: TioLogicRelationRef;
@@ -75,7 +77,7 @@ type
 implementation
 
 uses
-  System.IOUtils, iORM.DB.Connection, iORM.DB.SqLite.SqlDataConverter, iORM.DB.SqLite.SqlGenerator, iORM.Where.SqlItems, System.SysUtils,
+  System.IOUtils, iORM.DB.Connection, iORM.DB.SqLite.SqlDataConverter, iORM.DB.SqLite.SqlGenerator, System.SysUtils,
   iORM.DB.QueryContainer, iORM.DB.TransactionCollection, iORM.DB.Firebird.SqlDataConverter, iORM.Exceptions, iORM.DB.Firebird.SqlGenerator,
 {$IFNDEF ioDelphiProfessional}
   iORM.DB.MSSqlServer.SqlGenerator, iORM.DB.MSSqlServer.SqlDataConverter,
@@ -273,6 +275,22 @@ end;
 class function TioDbFactory.WhereItemPropertyEqualsTo(APropertyName: String; AValue: TValue): IioSqlItemWhere;
 begin
   Result := TioSqlItemsWherePropertyEqualsTo.Create(APropertyName, AValue);
+end;
+
+class function TioDbFactory.WhereItemPropertyIn(APropertyName: String; Values: TArray<Integer>): IioSqlItemWhere;
+var
+  LValue: TValue;
+begin
+  LValue := TValue.From<TArray<integer>>(Values);
+  Result := TioSqlItemsWherePropertyIn.Create(APropertyName, LValue);
+end;
+
+class function TioDbFactory.WhereItemPropertyIn(APropertyName: String; Values: TArray<TValue>): IioSqlItemWhere;
+var
+  LValue: TValue;
+begin
+  LValue := TValue.From<TArray<TValue>>(Values);
+  Result := TioSqlItemsWherePropertyIn.Create(APropertyName, LValue);
 end;
 
 class function TioDbFactory.WhereItemPropertyOID: IioSqlItemWhere;
