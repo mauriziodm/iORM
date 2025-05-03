@@ -70,16 +70,16 @@ type
     procedure Clear(const AClearWhereDetails: Boolean = True);
     function GetClearListBefore: Boolean;
     function GetWhereItems: TWhereItems;
-    function GetSql(const AMap:IioMap; const AddWhere:Boolean=True): String;
-    function GetSqlWithTrueClass(const AMap:IioMap; const AIsTrueClass:Boolean; const ATrueClass: IioTrueClass): String;
-    function GetOrderBySql(const AMap:IioMap): String;
+    function GetSql(const AMap: IioMap; const AddWhere: Boolean = True): String;
+    function GetSqlWithTrueClass(const AMap: IioMap; const AIsTrueClass: Boolean; const ATrueClass: IioTrueClass): String;
+    function GetOrderBySql(const AMap: IioMap): String;
     function GetOrderByInstance: IioSqlItemWhere;
-    procedure SetOrderBySql(const AOrderByText:String);
+    procedure SetOrderBySql(const AOrderByText: String);
     function GetDisableStrictlyTrueClass: Boolean;
     function GetLimitRows: Integer;
     function GetLimitOffset: Integer;
-    function GetPagingObj: TObject;  // TObject to avoid circular reference
-    procedure SetPagingObj(const APagingObj: TObject);  // TObject to avoid circular reference
+    function GetPagingObj: TObject; // TObject to avoid circular reference
+    procedure SetPagingObj(const APagingObj: TObject); // TObject to avoid circular reference
     procedure FillETM_Sql;
     procedure SetETMfor(const AETMfor: IInterface); // IInterface to avoid circular reference
     function GetETMfor: IInterface; // IInterface to avoid circular reference
@@ -88,19 +88,20 @@ type
     function ToGenericList: TioWhereGenericListDestination;
     // ------ Destination methods
     function ToMemTable: TFDMemTable; overload;
-    procedure ToMemTable(const AMemTable:TFDMemTable); overload;
+    procedure ToMemTable(const AMemTable: TFDMemTable); overload;
 
     function ToLazyObject(const AObj: TObject = nil): TObject; overload;
     function ToLazyObject(const AIntf: IInterface): TObject; overload;
 
-    function _ToObjectInternalByClassOnly(const AIntent: TioPersistenceIntentType; const AObj:TObject=nil): TObject;
-    function ToObject(const AObj:TObject=nil): TObject; overload;
-    function ToObject(const AIntf:IInterface): TObject; overload;
+    function _ToObjectInternalByClassOnly(const AIntent: TioPersistenceIntentType; const AObj: TObject = nil): TObject;
+    function ToObject(const AObj: TObject = nil): TObject; overload;
+    function ToObject(const AIntf: IInterface): TObject; overload;
 
-    procedure ToList(const AList:TObject); overload;
-    function ToList(const AListRttiType:TRttiType; const AOwnsObjects:Boolean=True): TObject; overload;
-    function ToList(const AInterfacedListTypeName:String; const AAlias:String=''; const AOwnsObjects:Boolean=True): TObject; overload;
-    function ToList(const AListClassRef:TioClassRef; const AOwnsObjects:Boolean=True): TObject; overload;
+    procedure ToList(const AList: TObject); overload;
+    function ToList(const AListRttiType: TRttiType; const AOwnsObjects: Boolean = True): TObject; overload;
+    function ToList(const AInterfacedListTypeName: String; const AAlias: String = ''; const AOwnsObjects: Boolean = True)
+      : TObject; overload;
+    function ToList(const AListClassRef: TioClassRef; const AOwnsObjects: Boolean = True): TObject; overload;
     function ClearListBefore(const AClearListBefore: Boolean = True): IioWhere;
 
     function Count: Integer;
@@ -112,16 +113,18 @@ type
 
     procedure Delete;
 
-    procedure Show(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias:String=''; const AForceTypeNameUse:Boolean=False);
-    procedure ShowList(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias:String='');
-    procedure ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias:String=''; const AForceTypeNameUse:Boolean=False);
+    procedure Show(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = '';
+      const AForceTypeNameUse: Boolean = False);
+    procedure ShowList(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = '');
+    procedure ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = '';
+      const AForceTypeNameUse: Boolean = False);
 
     // ------ Conditions
-    function ByID(const AID:Integer): IioWhere;
-    function Add(const ATextCondition:String): IioWhere; overload;
-    function Add(const AWhereCond:IioWhere): IioWhere; overload;
-    function AddDetail(const AMasterPropertyName, ATextCondition:String): IioWhere; overload;
-    function AddDetail(const AMasterPropertyName: String; const AWhereCond:IioWhere): IioWhere; overload;
+    function ByID(const AID: Integer): IioWhere;
+    function Add(const ATextCondition: String): IioWhere; overload;
+    function Add(const AWhereCond: IioWhere): IioWhere; overload;
+    function AddDetail(const AMasterPropertyName, ATextCondition: String): IioWhere; overload;
+    function AddDetail(const AMasterPropertyName: String; const AWhereCond: IioWhere): IioWhere; overload;
     function DisableStrictlyTrueClass: IioWhere;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere;
     function Lazy(const ALazyEnabled: Boolean = True): IioWhere;
@@ -140,11 +143,11 @@ type
     function _OpenPar: IioWhere; overload;
     function _ClosePar: IioWhere; overload;
     // ------ Logic relations with TextCondition
-    function _And(ATextCondition:String): IioWhere; overload;
-    function _Or(ATextCondition:String): IioWhere; overload;
-    function _Not(ATextCondition:String): IioWhere; overload;
+    function _And(ATextCondition: String): IioWhere; overload;
+    function _Or(ATextCondition: String): IioWhere; overload;
+    function _Not(ATextCondition: String): IioWhere; overload;
     // ------ Logic relations with TioWere
-    function _And(AWhereCond:IioWhere): IioWhere overload;
+    function _And(AWhereCond: IioWhere): IioWhere overload;
     // ------ Compare operators
     function _Equal: IioWhere;
     function _NotEqual: IioWhere;
@@ -157,38 +160,55 @@ type
     function _IsNull: IioWhere;
     function _IsNotNull: IioWhere;
     // ------ Compare operators with TValue
-    function _EqualTo(AValue:TValue): IioWhere; overload;
-    function _EqualTo(AValue:TDateTime): IioWhere; overload;
-    function _EqualTo(AValue:Double): IioWhere; overload;
-    function _EqualTo(AValue:Integer): IioWhere; overload;
-    function _NotEqualTo(AValue:TValue): IioWhere; overload;
-    function _NotEqualTo(AValue:TDateTime): IioWhere; overload;
-    function _NotEqualTo(AValue:Double): IioWhere; overload;
-    function _NotEqualTo(AValue:Integer): IioWhere; overload;
-    function _GreaterThan(AValue:TValue): IioWhere; overload;
-    function _GreaterThan(AValue:TDateTime): IioWhere; overload;
-    function _GreaterThan(AValue:Double): IioWhere; overload;
-    function _GreaterThan(AValue:Integer): IioWhere; overload;
-    function _LowerThan(AValue:TValue): IioWhere; overload;
-    function _LowerThan(AValue:TDateTime): IioWhere; overload;
-    function _LowerThan(AValue:Double): IioWhere; overload;
-    function _LowerThan(AValue:Integer): IioWhere; overload;
-    function _GreaterOrEqualThan(AValue:TValue): IioWhere; overload;
-    function _GreaterOrEqualThan(AValue:TDateTime): IioWhere; overload;
-    function _GreaterOrEqualThan(AValue:Double): IioWhere; overload;
-    function _GreaterOrEqualThan(AValue:Integer): IioWhere; overload;
-    function _LowerOrEqualThan(AValue:TValue): IioWhere; overload;
-    function _LowerOrEqualThan(AValue:TDateTime): IioWhere; overload;
-    function _LowerOrEqualThan(AValue:Double): IioWhere; overload;
-    function _LowerOrEqualThan(AValue:Integer): IioWhere; overload;
-    function _LikeTo(AValue:TValue): IioWhere; overload;
-    function _LikeTo(AValue:TDateTime): IioWhere; overload;
-    function _LikeTo(AValue:Double): IioWhere; overload;
-    function _LikeTo(AValue:Integer): IioWhere; overload;
-    function _NotLikeTo(AValue:TValue): IioWhere; overload;
-    function _NotLikeTo(AValue:TDateTime): IioWhere; overload;
-    function _NotLikeTo(AValue:Double): IioWhere; overload;
-    function _NotLikeTo(AValue:Integer): IioWhere; overload;
+    function _EqualTo(AValue: TValue): IioWhere; overload;
+    function _EqualTo(AValue: TDate): IioWhere; overload;
+    function _EqualTo(AValue: TDateTime): IioWhere; overload;
+    function _EqualTo(AValue: Double): IioWhere; overload;
+    function _EqualTo(AValue: Integer): IioWhere; overload;
+    function _EqualTo(AValue: Currency): IioWhere; overload;
+    function _In(Values: TArray<string>): IioWhere; overload;
+    function _In(Values: TArray<Integer>): IioWhere; overload;
+    function _In(Values: TArray<Double>): IioWhere; overload;
+    function _In(Values: TArray<TDate>; const UseUTC: Boolean = True): IioWhere; overload;
+    function _In(Values: TArray<TDateTime>; const UseUTC: Boolean = True): IioWhere; overload;
+    function _NotEqualTo(AValue: TValue): IioWhere; overload;
+    function _NotEqualTo(AValue: TDate): IioWhere; overload;
+    function _NotEqualTo(AValue: TDateTime): IioWhere; overload;
+    function _NotEqualTo(AValue: Double): IioWhere; overload;
+    function _NotEqualTo(AValue: Integer): IioWhere; overload;
+    function _NotEqualTo(AValue: Currency): IioWhere; overload;
+    function _GreaterThan(AValue: TValue): IioWhere; overload;
+    function _GreaterThan(AValue: TDate): IioWhere; overload;
+    function _GreaterThan(AValue: TDateTime): IioWhere; overload;
+    function _GreaterThan(AValue: Double): IioWhere; overload;
+    function _GreaterThan(AValue: Integer): IioWhere; overload;
+    function _GreaterThan(AValue: Currency): IioWhere; overload;
+    function _LowerThan(AValue: TValue): IioWhere; overload;
+    function _LowerThan(AValue: TDate): IioWhere; overload;
+    function _LowerThan(AValue: TDateTime): IioWhere; overload;
+    function _LowerThan(AValue: Double): IioWhere; overload;
+    function _LowerThan(AValue: Integer): IioWhere; overload;
+    function _LowerThan(AValue: Currency): IioWhere; overload;
+    function _GreaterOrEqualThan(AValue: TValue): IioWhere; overload;
+    function _GreaterOrEqualThan(AValue: TDate): IioWhere; overload;
+    function _GreaterOrEqualThan(AValue: TDateTime): IioWhere; overload;
+    function _GreaterOrEqualThan(AValue: Double): IioWhere; overload;
+    function _GreaterOrEqualThan(AValue: Integer): IioWhere; overload;
+    function _GreaterOrEqualThan(AValue: Currency): IioWhere; overload;
+    function _LowerOrEqualThan(AValue: TValue): IioWhere; overload;
+    function _LowerOrEqualThan(AValue: TDate): IioWhere; overload;
+    function _LowerOrEqualThan(AValue: TDateTime): IioWhere; overload;
+    function _LowerOrEqualThan(AValue: Double): IioWhere; overload;
+    function _LowerOrEqualThan(AValue: Integer): IioWhere; overload;
+    function _LowerOrEqualThan(AValue: Currency): IioWhere; overload;
+    function _LikeTo(AValue: TValue): IioWhere; overload;
+    function _LikeTo(AValue: TDateTime): IioWhere; overload;
+    function _LikeTo(AValue: Double): IioWhere; overload;
+    function _LikeTo(AValue: Integer): IioWhere; overload;
+    function _NotLikeTo(AValue: TValue): IioWhere; overload;
+    function _NotLikeTo(AValue: TDateTime): IioWhere; overload;
+    function _NotLikeTo(AValue: Double): IioWhere; overload;
+    function _NotLikeTo(AValue: Integer): IioWhere; overload;
     // ------ New criteria
     function _And(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere; overload;
     function _And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere; overload;
@@ -204,35 +224,39 @@ type
     function _Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere; overload;
     // ------
     function _Where: IioWhere; overload;
-    function _Where(AWhereCond:IioWhere): IioWhere; overload;
-    function _Where(ATextCondition:String): IioWhere; overload;
+    function _Where(AWhereCond: IioWhere): IioWhere; overload;
+    function _Where(ATextCondition: String): IioWhere; overload;
     function _Where(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere; overload;
     function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere; overload;
     function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere; overload;
     function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere; overload;
-    function _Property(APropertyName:String): IioWhere;
+    function _Property(APropertyName: String): IioWhere;
     function _PropertyOID: IioWhere;
-    function _PropertyEqualsTo(APropertyName:String; AValue:TValue): IioWhere; overload;
-    function _PropertyEqualsTo(APropertyName:String; AValue:TDateTime): IioWhere; overload;
-    function _PropertyEqualsTo(APropertyName:String; AValue:Double): IioWhere; overload;
-    function _PropertyEqualsTo(APropertyName:String; AValue:Integer): IioWhere; overload;
-    function _PropertyOIDEqualsTo(AValue:Integer): IioWhere;
-    function _PropertyIsNull(APropertyName:String): IioWhere;
-    function _PropertyIsNotNull(APropertyName:String): IioWhere;
+    function _PropertyEqualsTo(APropertyName: String; AValue: TValue): IioWhere; overload;
+    function _PropertyEqualsTo(APropertyName: String; AValue: TDateTime): IioWhere; overload;
+    function _PropertyEqualsTo(APropertyName: String; AValue: Double): IioWhere; overload;
+    function _PropertyEqualsTo(APropertyName: String; AValue: Integer): IioWhere; overload;
+    function _PropertyIn(APropertyName: String; Values: TArray<TValue>): IioWhere; overload;
+    function _PropertyIn(APropertyName: String; Values: TArray<Integer>): IioWhere; overload;
+    function _PropertyOIDEqualsTo(AValue: Integer): IioWhere;
+    function _PropertyIsNull(APropertyName: String): IioWhere;
+    function _PropertyIsNotNull(APropertyName: String): IioWhere;
 
-    function _Value(AValue:TValue): IioWhere; overload;
-    function _Value(AValue:TDateTime): IioWhere; overload;
-    function _Value(AValue:Integer): IioWhere; overload;
-    function _Value(AValue:Double): IioWhere; overload;
+    function _Value(AValue: TValue): IioWhere; overload;
+    function _Value(AValue: TDateTime): IioWhere; overload;
+    function _Value(AValue: Integer): IioWhere; overload;
+    function _Value(AValue: Double): IioWhere; overload;
     function _Value(AValue: TObject): IioWhere; overload;
     function _Value(AValue: IInterface): IioWhere; overload;
 
-    function _OrderBy(const ATextOrderBy:String): IioWhere; overload;
-    function _OrderBy(const AOrderByInstance:IioSqlItemWhere): IioWhere; overload;
+    function _OrderBy(const ATextOrderBy: String): IioWhere; overload;
+    function _OrderBy(const AOrderByInstance: IioSqlItemWhere): IioWhere; overload;
 
-    procedure CreateIndex(ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation=ioAscending; const AUnique:Boolean=False); overload;
-    procedure CreateIndex(const AIndexName:String; ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation=ioAscending; const AUnique:Boolean=False); overload;
-    procedure DropIndex(const AIndexName:String);
+    procedure CreateIndex(ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation = ioAscending;
+      const AUnique: Boolean = False); overload;
+    procedure CreateIndex(const AIndexName: String; ACommaSepFieldList: String;
+      const AIndexOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
+    procedure DropIndex(const AIndexName: String);
     // TypeName
     procedure SetTypeName(const Value: String);
     function GetTypeName: String;
@@ -247,7 +271,7 @@ type
     property TypeInfo: PTypeInfo read GetTypeInfo write SetTypeInfo;
     // Details property
     function GetDetails: IioWhereDetailsContainer;
-    property Details:IioWhereDetailsContainer read GetDetails;
+    property Details: IioWhereDetailsContainer read GetDetails;
     // Items property
     function GetItems: TWhereItems;
     property Items: TWhereItems read GetItems;
@@ -257,16 +281,16 @@ type
   IioWhere<T> = interface(IioWhere)
     ['{EB4137B9-D4F7-41EE-AD24-F3B12BA35CAC}']
     // ------ Destination methods
-    function ToLazyObject(const AObj:TObject=nil): T; overload;
-    function ToObject(const AObj:TObject=nil): T; overload;
+    function ToLazyObject(const AObj: TObject = nil): T; overload;
+    function ToObject(const AObj: TObject = nil): T; overload;
     function ToList: TList<T>; overload;
     function ClearListBefore(const AClearListBefore: Boolean = True): IioWhere<T>;
     // ------ Conditions
-    function ByID(const AID:Integer): IioWhere<T>;
-    function Add(const ATextCondition:String): IioWhere<T>; overload;
-    function Add(const AWhereCond:IioWhere): IioWhere<T>; overload;
-    function AddDetail(const AMasterPropertyName, ATextCondition:String): IioWhere<T>; overload;
-    function AddDetail(const AMasterPropertyName: String; const AWhereCond:IioWhere): IioWhere<T>; overload;
+    function ByID(const AID: Integer): IioWhere<T>;
+    function Add(const ATextCondition: String): IioWhere<T>; overload;
+    function Add(const AWhereCond: IioWhere): IioWhere<T>; overload;
+    function AddDetail(const AMasterPropertyName, ATextCondition: String): IioWhere<T>; overload;
+    function AddDetail(const AMasterPropertyName: String; const AWhereCond: IioWhere): IioWhere<T>; overload;
     function DisableStrictlyTrueClass: IioWhere<T>;
     function SetDetailsContainer(ADetailsContainer: IioWhereDetailsContainer): IioWhere<T>;
     function Lazy(const ALazyEnabled: Boolean = True): IioWhere<T>;
@@ -281,11 +305,11 @@ type
     function _OpenPar: IioWhere<T>; overload;
     function _ClosePar: IioWhere<T>; overload;
     // ------ Logic relations with TextCondition
-    function _And(ATextCondition:String): IioWhere<T>; overload;
-    function _Or(ATextCondition:String): IioWhere<T>; overload;
-    function _Not(ATextCondition:String): IioWhere<T>; overload;
+    function _And(ATextCondition: String): IioWhere<T>; overload;
+    function _Or(ATextCondition: String): IioWhere<T>; overload;
+    function _Not(ATextCondition: String): IioWhere<T>; overload;
     // ------ Logic relations with TioWere
-    function _And(AWhereCond:IioWhere): IioWhere<T>; overload;
+    function _And(AWhereCond: IioWhere): IioWhere<T>; overload;
     // ------ Compare operators
     function _Equal: IioWhere<T>;
     function _NotEqual: IioWhere<T>;
@@ -298,38 +322,55 @@ type
     function _IsNull: IioWhere<T>;
     function _IsNotNull: IioWhere<T>;
     // ------ Compare operators with TValue
-    function _EqualTo(AValue:TValue): IioWhere<T>; overload;
-    function _EqualTo(AValue:TDateTime): IioWhere<T>; overload;
-    function _EqualTo(AValue:Double): IioWhere<T>; overload;
-    function _EqualTo(AValue:Integer): IioWhere<T>; overload;
-    function _NotEqualTo(AValue:TValue): IioWhere<T>; overload;
-    function _NotEqualTo(AValue:TDateTime): IioWhere<T>; overload;
-    function _NotEqualTo(AValue:Double): IioWhere<T>; overload;
-    function _NotEqualTo(AValue:Integer): IioWhere<T>; overload;
-    function _GreaterThan(AValue:TValue): IioWhere<T>; overload;
-    function _GreaterThan(AValue:TDateTime): IioWhere<T>; overload;
-    function _GreaterThan(AValue:Double): IioWhere<T>; overload;
-    function _GreaterThan(AValue:Integer): IioWhere<T>; overload;
-    function _LowerThan(AValue:TValue): IioWhere<T>; overload;
-    function _LowerThan(AValue:TDateTime): IioWhere<T>; overload;
-    function _LowerThan(AValue:Double): IioWhere<T>; overload;
-    function _LowerThan(AValue:Integer): IioWhere<T>; overload;
-    function _GreaterOrEqualThan(AValue:TValue): IioWhere<T>; overload;
-    function _GreaterOrEqualThan(AValue:TDateTime): IioWhere<T>; overload;
-    function _GreaterOrEqualThan(AValue:Double): IioWhere<T>; overload;
-    function _GreaterOrEqualThan(AValue:Integer): IioWhere<T>; overload;
-    function _LowerOrEqualThan(AValue:TValue): IioWhere<T>; overload;
-    function _LowerOrEqualThan(AValue:TDateTime): IioWhere<T>; overload;
-    function _LowerOrEqualThan(AValue:Double): IioWhere<T>; overload;
-    function _LowerOrEqualThan(AValue:Integer): IioWhere<T>; overload;
-    function _LikeTo(AValue:TValue): IioWhere<T>; overload;
-    function _LikeTo(AValue:TDateTime): IioWhere<T>; overload;
-    function _LikeTo(AValue:Double): IioWhere<T>; overload;
-    function _LikeTo(AValue:Integer): IioWhere<T>; overload;
-    function _NotLikeTo(AValue:TValue): IioWhere<T>; overload;
-    function _NotLikeTo(AValue:TDateTime): IioWhere<T>; overload;
-    function _NotLikeTo(AValue:Double): IioWhere<T>; overload;
-    function _NotLikeTo(AValue:Integer): IioWhere<T>; overload;
+    function _EqualTo(AValue: TValue): IioWhere<T>; overload;
+    function _EqualTo(AValue: TDate): IioWhere<T>; overload;
+    function _EqualTo(AValue: TDateTime): IioWhere<T>; overload;
+    function _EqualTo(AValue: Double): IioWhere<T>; overload;
+    function _EqualTo(AValue: Integer): IioWhere<T>; overload;
+    function _EqualTo(AValue: Currency): IioWhere<T>; overload;
+    function _In(Values: TArray<string>): IioWhere<T>; overload;
+    function _In(Values: TArray<Integer>): IioWhere<T>; overload;
+    function _In(Values: TArray<Double>): IioWhere; overload;
+    function _In(Values: TArray<TDate>; const UseUTC: Boolean = True): IioWhere<T>; overload;
+    function _In(Values: TArray<TDateTime>; const UseUTC: Boolean = True): IioWhere<T>; overload;
+    function _NotEqualTo(AValue: TValue): IioWhere<T>; overload;
+    function _NotEqualTo(AValue: TDate): IioWhere<T>; overload;
+    function _NotEqualTo(AValue: TDateTime): IioWhere<T>; overload;
+    function _NotEqualTo(AValue: Double): IioWhere<T>; overload;
+    function _NotEqualTo(AValue: Integer): IioWhere<T>; overload;
+    function _NotEqualTo(AValue: Currency): IioWhere<T>; overload;
+    function _GreaterThan(AValue: TValue): IioWhere<T>; overload;
+    function _GreaterThan(AValue: TDate): IioWhere<T>; overload;
+    function _GreaterThan(AValue: TDateTime): IioWhere<T>; overload;
+    function _GreaterThan(AValue: Double): IioWhere<T>; overload;
+    function _GreaterThan(AValue: Integer): IioWhere<T>; overload;
+    function _GreaterThan(AValue: Currency): IioWhere<T>; overload;
+    function _LowerThan(AValue: TValue): IioWhere<T>; overload;
+    function _LowerThan(AValue: TDate): IioWhere<T>; overload;
+    function _LowerThan(AValue: TDateTime): IioWhere<T>; overload;
+    function _LowerThan(AValue: Double): IioWhere<T>; overload;
+    function _LowerThan(AValue: Integer): IioWhere<T>; overload;
+    function _LowerThan(AValue: Currency): IioWhere<T>; overload;
+    function _GreaterOrEqualThan(AValue: TValue): IioWhere<T>; overload;
+    function _GreaterOrEqualThan(AValue: TDate): IioWhere<T>; overload;
+    function _GreaterOrEqualThan(AValue: TDateTime): IioWhere<T>; overload;
+    function _GreaterOrEqualThan(AValue: Double): IioWhere<T>; overload;
+    function _GreaterOrEqualThan(AValue: Integer): IioWhere<T>; overload;
+    function _GreaterOrEqualThan(AValue: Currency): IioWhere<T>; overload;
+    function _LowerOrEqualThan(AValue: TValue): IioWhere<T>; overload;
+    function _LowerOrEqualThan(AValue: TDate): IioWhere<T>; overload;
+    function _LowerOrEqualThan(AValue: TDateTime): IioWhere<T>; overload;
+    function _LowerOrEqualThan(AValue: Double): IioWhere<T>; overload;
+    function _LowerOrEqualThan(AValue: Integer): IioWhere<T>; overload;
+    function _LowerOrEqualThan(AValue: Currency): IioWhere<T>; overload;
+    function _LikeTo(AValue: TValue): IioWhere<T>; overload;
+    function _LikeTo(AValue: TDateTime): IioWhere<T>; overload;
+    function _LikeTo(AValue: Double): IioWhere<T>; overload;
+    function _LikeTo(AValue: Integer): IioWhere<T>; overload;
+    function _NotLikeTo(AValue: TValue): IioWhere<T>; overload;
+    function _NotLikeTo(AValue: TDateTime): IioWhere<T>; overload;
+    function _NotLikeTo(AValue: Double): IioWhere<T>; overload;
+    function _NotLikeTo(AValue: Integer): IioWhere<T>; overload;
     // ------ New criteria
     function _And(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>; overload;
     function _And(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>; overload;
@@ -345,29 +386,29 @@ type
     function _Not(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>; overload;
     // ------
     function _Where: IioWhere<T>; overload;
-    function _Where(AWhereCond:IioWhere): IioWhere<T>; overload;
-    function _Where(ATextCondition:String): IioWhere<T>; overload;
+    function _Where(AWhereCond: IioWhere): IioWhere<T>; overload;
+    function _Where(ATextCondition: String): IioWhere<T>; overload;
     function _Where(const APropertyName: String; const ACompareOp: TioCompareOp): IioWhere<T>; overload;
     function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: Variant): IioWhere<T>; overload;
     function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: TObject): IioWhere<T>; overload;
     function _Where(const APropertyName: String; const ACompareOp: TioCompareOp; const AValue: IInterface): IioWhere<T>; overload;
-    function _Property(APropertyName:String): IioWhere<T>;
+    function _Property(APropertyName: String): IioWhere<T>;
     function _PropertyOID: IioWhere<T>;
-    function _PropertyEqualsTo(APropertyName:String; AValue:TValue): IioWhere<T>; overload;
-    function _PropertyEqualsTo(APropertyName:String; AValue:TDateTime): IioWhere<T>; overload;
-    function _PropertyEqualsTo(APropertyName:String; AValue:Double): IioWhere<T>; overload;
-    function _PropertyEqualsTo(APropertyName:String; AValue:Integer): IioWhere<T>; overload;
-    function _PropertyOIDEqualsTo(AValue:Integer): IioWhere<T>;
-    function _PropertyIsNull(APropertyName:String): IioWhere<T>;
-    function _PropertyIsNotNull(APropertyName:String): IioWhere<T>;
-    function _Value(AValue:TValue): IioWhere<T>; overload;
-    function _Value(AValue:TDateTime): IioWhere<T>; overload;
-    function _Value(AValue:Double): IioWhere<T>; overload;
-    function _Value(AValue:Integer): IioWhere<T>; overload;
+    function _PropertyEqualsTo(APropertyName: String; AValue: TValue): IioWhere<T>; overload;
+    function _PropertyEqualsTo(APropertyName: String; AValue: TDateTime): IioWhere<T>; overload;
+    function _PropertyEqualsTo(APropertyName: String; AValue: Double): IioWhere<T>; overload;
+    function _PropertyEqualsTo(APropertyName: String; AValue: Integer): IioWhere<T>; overload;
+    function _PropertyOIDEqualsTo(AValue: Integer): IioWhere<T>;
+    function _PropertyIsNull(APropertyName: String): IioWhere<T>;
+    function _PropertyIsNotNull(APropertyName: String): IioWhere<T>;
+    function _Value(AValue: TValue): IioWhere<T>; overload;
+    function _Value(AValue: TDateTime): IioWhere<T>; overload;
+    function _Value(AValue: Double): IioWhere<T>; overload;
+    function _Value(AValue: Integer): IioWhere<T>; overload;
     function _Value(AValue: TObject): IioWhere<T>; overload;
     function _Value(AValue: IInterface): IioWhere<T>; overload;
-    function _OrderBy(const ATextOrderBy:String): IioWhere<T>; overload;
-    function _OrderBy(const AOrderByInstance:IioSqlItemWhere): IioWhere<T>; overload;
+    function _OrderBy(const ATextOrderBy: String): IioWhere<T>; overload;
+    function _OrderBy(const AOrderByInstance: IioSqlItemWhere): IioWhere<T>; overload;
   end;
 
   // Internal where interfaces (for internal use only)
