@@ -59,8 +59,6 @@ type
     // header
     [ioSkip] FHeader: TioJWT_Header;
     // payload claims
-    Faid: integer; // app id (managed by iorm)
-    Fapp: String; // app name (managed by iorm)
     Faud: String; // audience (potrebbe rappresentare i resource server ai quali la client app o l'utente sono autorizzati ad accedere)
     Fcon: String; // connection name to be used locally
     Fcrm: String; // connection name to be used remotely (on the app server)
@@ -95,8 +93,6 @@ type
     constructor CreateByToken(const AToken, ASecret: String);
     destructor Destroy; override;
     // methods
-    function HasApp: Boolean;
-    function HasAppOID: Boolean;
     function HasAudience: Boolean;
     function HasConnection: Boolean;
     function HasConnectionRemote: Boolean;
@@ -116,8 +112,6 @@ type
     function IsExpired(const ANow: TDateTime): Boolean;
     function IsNotYetValid(const ANow: TDateTime): Boolean;
     // claims
-    property App: String read Fapp write Fapp;
-    property AppOID: Integer read Faid write Faid;
     property Audience: String read Faud write Faud;
     property Connection: String read Fcon write Fcon;
     property ConnectionRemote: String read Fcrm write Fcrm;
@@ -148,8 +142,6 @@ begin
   // header
   FHeader := TioJWT_Header.Create;
   // payload claims
-  Faid := IO_INTEGER_NULL_VALUE;
-  Fapp := IO_STRING_NULL_VALUE;
   Faud := IO_STRING_NULL_VALUE;
   Fexp := IO_DATETIME_NULL_VALUE;
   Fiat := IO_DATETIME_NULL_VALUE;
@@ -195,16 +187,6 @@ end;
 function TioJWT.TokenAsString(const ASecret: String): String;
 begin
   Result := _DoSign(_DoEncodeHeader, _DoEncodePayload, ASecret);
-end;
-
-function TioJWT.HasApp: Boolean;
-begin
-  Result := Fapp <> IO_STRING_NULL_VALUE;
-end;
-
-function TioJWT.HasAppOID: Boolean;
-begin
-  Result := Faid <> IO_INTEGER_NULL_VALUE;
 end;
 
 function TioJWT.HasAudience: Boolean;
@@ -309,12 +291,6 @@ var
 begin
   LdjParams := dj.DefaultByFields;
   LdjParams.DateTimeFormat := TdjDateTimeFormat.dfUnix;
-  // aid = app id
-  if Faid = IO_INTEGER_NULL_VALUE then
-    LdjParams.IgnoredProperties.Add('aid');
-  // app = app
-  if Fapp = IO_STRING_NULL_VALUE then
-    LdjParams.IgnoredProperties.Add('app');
   // aud = audience
   if Faud = IO_STRING_NULL_VALUE then
     LdjParams.IgnoredProperties.Add('aud');
