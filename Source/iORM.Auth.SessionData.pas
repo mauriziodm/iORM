@@ -57,7 +57,7 @@ type
     // access token
     FAccessToken: String;
     FAccessTokenExp: TDateTime;
-    FRefreshAfter: TDateTime;
+    FAccessTokenRefreshAfter: TDateTime;
     // refresh token
     FRefreshToken: String;
     FRefreshTokenExp: TDateTime;
@@ -65,6 +65,7 @@ type
     function GetAccessToken: String;
     function GetAccessTokenExp: TDateTime;
     function GetAccessTokenIsExpired: Boolean;
+    function GetAccessTokenRefreshAfter: TDateTime;
     function GetApp: String;
     function GetAppOID: Integer;
     function GetConnection: String;
@@ -82,7 +83,6 @@ type
     function GetLicense: String;
     function GetLicenseOID: Integer;
     function GetNeedRefresh: Boolean;
-    function GetRefreshAfter: TDateTime;
     function GetRefreshToken: String;
     function GetRefreshTokenExp: TDateTime;
     function GetRefreshTokenIsExpired: Boolean;
@@ -92,11 +92,11 @@ type
     procedure SetAppOID(const Value: Integer);
     procedure SetAccessToken(const Value: String);
     procedure SetAccessTokenExp(const Value: TDateTime);
+    procedure SetAccessTokenRefreshAfter(const Value: TDateTime);
     procedure SetConnection(const Value: String);
     procedure SetConnectionRemote(const Value: String);
     procedure SetLicense(const Value: String);
     procedure SetLicenseOID(const Value: Integer);
-    procedure SetRefreshAfter(const Value: TDateTime);
     procedure SetRefreshToken(const Value: String);
     procedure SetRefreshTokenExp(const Value: TDateTime);
     procedure SetUser(const Value: String);
@@ -134,8 +134,8 @@ type
     property AccessToken: String read GetAccessToken write SetAccessToken;
     property AccessTokenExp: TDateTime read GetAccessTokenExp write SetAccessTokenExp;
     property AccessTokenIsExpired: Boolean read GetAccessTokenIsExpired;
+    property AccessTokenRefreshAfter: TDateTime read GetAccessTokenRefreshAfter write SetAccessTokenRefreshAfter;
     property HasAccessToken: Boolean read GetHasAccessToken;
-    property RefreshAfter: TDateTime read GetRefreshAfter write SetRefreshAfter;
     property NeedRefresh: Boolean read GetNeedRefresh;
   end;
 
@@ -166,7 +166,7 @@ begin
   // access
   FAccessToken := IO_STRING_NULL_VALUE;
   FAccessTokenExp := IO_DATETIME_NULL_VALUE;
-  FRefreshAfter := IO_DATETIME_NULL_VALUE;
+  FAccessTokenRefreshAfter := IO_DATETIME_NULL_VALUE;
 end;
 
 function TioAuthSessionData.Clone: IioAuthSessionData;
@@ -190,7 +190,7 @@ begin
   // access token
   Result.AccessToken := FAccessToken;
   Result.AccessTokenExp := FAccessTokenExp;
-  Result.RefreshAfter := FRefreshAfter;
+  Result.AccessTokenRefreshAfter := FAccessTokenRefreshAfter;
 end;
 
 constructor TioAuthSessionData.Create;
@@ -236,7 +236,7 @@ end;
 
 function TioAuthSessionData.GetNeedRefresh: Boolean;
 begin
-  Result := ((FRefreshAfter <> IO_DATETIME_NULL_VALUE) and (TioUtilities.NowUTC > FRefreshAfter)) or (FAccessToken = IO_STRING_NULL_VALUE);
+  Result := ((FAccessTokenRefreshAfter <> IO_DATETIME_NULL_VALUE) and (TioUtilities.NowUTC > FAccessTokenRefreshAfter)) or (FAccessToken = IO_STRING_NULL_VALUE);
 end;
 
 function TioAuthSessionData.GetHasAccessToken: Boolean;
@@ -299,9 +299,9 @@ begin
   Result := FLicenseOID;
 end;
 
-function TioAuthSessionData.GetRefreshAfter: TDateTime;
+function TioAuthSessionData.GetAccessTokenRefreshAfter: TDateTime;
 begin
-  Result := FRefreshAfter;
+  Result := FAccessTokenRefreshAfter;
 end;
 
 function TioAuthSessionData.GetRefreshToken: String;
@@ -369,9 +369,9 @@ begin
   FLicenseOID := Value;
 end;
 
-procedure TioAuthSessionData.SetRefreshAfter(const Value: TDateTime);
+procedure TioAuthSessionData.SetAccessTokenRefreshAfter(const Value: TDateTime);
 begin
-  FRefreshAfter := Value;
+  FAccessTokenRefreshAfter := Value;
 end;
 
 procedure TioAuthSessionData.SetRefreshToken(const Value: String);

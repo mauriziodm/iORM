@@ -317,7 +317,7 @@ begin
   begin
     ASession.AccessToken := AAuthResponse.AccessToken;
     ASession.AccessTokenExp := AAuthResponse.AccessTokenExp;
-    ASession.RefreshAfter := AAuthResponse.RefreshAfter;
+    ASession.AccessTokenRefreshAfter := AAuthResponse.AccessTokenRefreshAfter;
   end;
   // update session data with the refresh token data if exists
   if AAuthResponse.HasRefreshToken then
@@ -410,7 +410,7 @@ begin
       try
         LSession.AccessToken := LAuthResponse.AccessToken;
         LSession.AccessTokenExp := LAuthResponse.AccessTokenExp;
-        LSession.RefreshAfter := LAuthResponse.RefreshAfter;
+        LSession.AccessTokenRefreshAfter := LAuthResponse.AccessTokenRefreshAfter;
         if LAuthResponse.HasRefreshToken then
         begin
           LSession.RefreshToken := LAuthResponse.RefreshToken;

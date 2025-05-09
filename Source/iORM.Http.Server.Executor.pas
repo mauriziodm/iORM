@@ -160,7 +160,7 @@ var
   LUserCredentials: IioAuthUserCredentials;
 begin
   if Supports(APSRequest.Intf1, IioAuthUserCredentials, LUserCredentials) then
-    AioResponseBody.AuthResult1 := TioAuthServer.GetInstance.AuthorizeUser(LUserCredentials).AsString
+    AioResponseBody.AuthResponse := TioAuthServer.GetInstance.AuthorizeUser(LUserCredentials)
   else
     raise EioHttpLocalException.Create(ClassName, '_AuthorizeUser', 'JSONDataValue object does not implement then "IioAuthUserCredentials" interface');
 end;

@@ -306,7 +306,7 @@ begin
   // Execute
   LResponse := _InternalExecute(APSRequest);
   // Extract the AuthResponse
-  APSRequest.Intf1 := TioAuthFactory.NewAuthResponseFromString(LResponse.AuthResult1);
+  APSRequest.Intf1 := LResponse.AuthResponse;
 end;
 
 class procedure TioPersistenceStrategyHttp._DoAuth_User(const APSRequest: IioPersistenceStrategyRequest);
@@ -316,7 +316,7 @@ begin
   // Execute
   LResponse := _InternalExecute(APSRequest);
   // Extract the AuthResponse
-  APSRequest.Intf1 := TioAuthFactory.NewAuthResponseFromString(LResponse.AuthResult1);
+  APSRequest.Intf1 := LResponse.AuthResponse;
 end;
 
 class procedure TioPersistenceStrategyHttp._DoAuth_App(const APSRequest: IioPersistenceStrategyRequest);
@@ -331,7 +331,7 @@ begin
   // Execute
   LResponse := _InternalExecute(APSRequest);
   // Extract the AuthResponse
-  APSRequest.Intf1 := TioAuthFactory.NewAuthResponseFromString(LResponse.AuthResult1);
+  APSRequest.Intf1 := LResponse.AuthResponse;
 end;
 
 class procedure TioPersistenceStrategyHttp._DoAuth_RefreshAccessToken(const APSRequest: IioPersistenceStrategyRequest);
@@ -341,7 +341,7 @@ begin
   // Execute
   LResponse := _InternalExecute(APSRequest);
   // Extract the AuthResponse
-  APSRequest.Intf1 := TioAuthFactory.NewAuthResponseFromString(LResponse.AuthResult1);
+  APSRequest.Intf1 := LResponse.AuthResponse;
 end;
 
 class procedure TioPersistenceStrategyHttp._DoInTransaction(const APSRequest: IioPersistenceStrategyRequest);
