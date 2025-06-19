@@ -1007,8 +1007,11 @@ end;
 
 procedure TioModelPresenterCustom.UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
 begin
+//  if not Assigned(FDetailBindSourceContainer) then
+//    FDetailBindSourceContainer := TList<IioBindSource>.Create;
   if not Assigned(FDetailBindSourceContainer) then
-    FDetailBindSourceContainer := TList<IioBindSource>.Create;
+  	exit;
+
   if not FDetailBindSourceContainer.Contains(ADetailBindSource) then
     FDetailBindSourceContainer.Remove(ADetailBindSource);
 end;
