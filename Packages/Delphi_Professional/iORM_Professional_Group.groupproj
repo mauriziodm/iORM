@@ -3,16 +3,22 @@
         <ProjectGuid>{39ABCB18-C20E-428C-9A69-8BA1BED36324}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <Projects Include="iORM_RT.dproj">
+        <Projects Include="iORM_CORE_RT.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="iORM_DT.dproj">
+        <Projects Include="iORM_CORE_DT.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="iORM_FMX_FRX.dproj">
+        <Projects Include="iORM_VCL_RT.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="iORM_FMX_FRX_DT.dproj">
+        <Projects Include="iORM_VCL_DT.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="iORM_FMX_RT.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="iORM_FMX_DT.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -23,50 +29,68 @@
             <Default.Personality/>
         </BorlandProject>
     </ProjectExtensions>
-    <Target Name="iORM_RT">
-        <MSBuild Projects="iORM_RT.dproj"/>
+    <Target Name="iORM_CORE_RT">
+        <MSBuild Projects="iORM_CORE_RT.dproj"/>
     </Target>
-    <Target Name="iORM_RT:Clean">
-        <MSBuild Projects="iORM_RT.dproj" Targets="Clean"/>
+    <Target Name="iORM_CORE_RT:Clean">
+        <MSBuild Projects="iORM_CORE_RT.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="iORM_RT:Make">
-        <MSBuild Projects="iORM_RT.dproj" Targets="Make"/>
+    <Target Name="iORM_CORE_RT:Make">
+        <MSBuild Projects="iORM_CORE_RT.dproj" Targets="Make"/>
     </Target>
-    <Target Name="iORM_DT">
-        <MSBuild Projects="iORM_DT.dproj"/>
+    <Target Name="iORM_CORE_DT">
+        <MSBuild Projects="iORM_CORE_DT.dproj"/>
     </Target>
-    <Target Name="iORM_DT:Clean">
-        <MSBuild Projects="iORM_DT.dproj" Targets="Clean"/>
+    <Target Name="iORM_CORE_DT:Clean">
+        <MSBuild Projects="iORM_CORE_DT.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="iORM_DT:Make">
-        <MSBuild Projects="iORM_DT.dproj" Targets="Make"/>
+    <Target Name="iORM_CORE_DT:Make">
+        <MSBuild Projects="iORM_CORE_DT.dproj" Targets="Make"/>
     </Target>
-    <Target Name="iORM_FMX_FRX">
-        <MSBuild Projects="iORM_FMX_FRX.dproj"/>
+    <Target Name="iORM_VCL_RT">
+        <MSBuild Projects="iORM_VCL_RT.dproj"/>
     </Target>
-    <Target Name="iORM_FMX_FRX:Clean">
-        <MSBuild Projects="iORM_FMX_FRX.dproj" Targets="Clean"/>
+    <Target Name="iORM_VCL_RT:Clean">
+        <MSBuild Projects="iORM_VCL_RT.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="iORM_FMX_FRX:Make">
-        <MSBuild Projects="iORM_FMX_FRX.dproj" Targets="Make"/>
+    <Target Name="iORM_VCL_RT:Make">
+        <MSBuild Projects="iORM_VCL_RT.dproj" Targets="Make"/>
     </Target>
-    <Target Name="iORM_FMX_FRX_DT">
-        <MSBuild Projects="iORM_FMX_FRX_DT.dproj"/>
+    <Target Name="iORM_VCL_DT">
+        <MSBuild Projects="iORM_VCL_DT.dproj"/>
     </Target>
-    <Target Name="iORM_FMX_FRX_DT:Clean">
-        <MSBuild Projects="iORM_FMX_FRX_DT.dproj" Targets="Clean"/>
+    <Target Name="iORM_VCL_DT:Clean">
+        <MSBuild Projects="iORM_VCL_DT.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="iORM_FMX_FRX_DT:Make">
-        <MSBuild Projects="iORM_FMX_FRX_DT.dproj" Targets="Make"/>
+    <Target Name="iORM_VCL_DT:Make">
+        <MSBuild Projects="iORM_VCL_DT.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="iORM_FMX_RT">
+        <MSBuild Projects="iORM_FMX_RT.dproj"/>
+    </Target>
+    <Target Name="iORM_FMX_RT:Clean">
+        <MSBuild Projects="iORM_FMX_RT.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="iORM_FMX_RT:Make">
+        <MSBuild Projects="iORM_FMX_RT.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="iORM_FMX_DT">
+        <MSBuild Projects="iORM_FMX_DT.dproj"/>
+    </Target>
+    <Target Name="iORM_FMX_DT:Clean">
+        <MSBuild Projects="iORM_FMX_DT.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="iORM_FMX_DT:Make">
+        <MSBuild Projects="iORM_FMX_DT.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="iORM_RT;iORM_DT;iORM_FMX_FRX;iORM_FMX_FRX_DT"/>
+        <CallTarget Targets="iORM_CORE_RT;iORM_CORE_DT;iORM_VCL_RT;iORM_VCL_DT;iORM_FMX_RT;iORM_FMX_DT"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="iORM_RT:Clean;iORM_DT:Clean;iORM_FMX_FRX:Clean;iORM_FMX_FRX_DT:Clean"/>
+        <CallTarget Targets="iORM_CORE_RT:Clean;iORM_CORE_DT:Clean;iORM_VCL_RT:Clean;iORM_VCL_DT:Clean;iORM_FMX_RT:Clean;iORM_FMX_DT:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="iORM_RT:Make;iORM_DT:Make;iORM_FMX_FRX:Make;iORM_FMX_FRX_DT:Make"/>
+        <CallTarget Targets="iORM_CORE_RT:Make;iORM_CORE_DT:Make;iORM_VCL_RT:Make;iORM_VCL_DT:Make;iORM_FMX_RT:Make;iORM_FMX_DT:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
