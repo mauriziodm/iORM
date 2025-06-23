@@ -1,7 +1,6 @@
-package iORM_DT;
+package iORM_VCL_DT;
 
 {$R *.res}
-{$R '..\..\source\iORM.DT.dcr'}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -14,8 +13,8 @@ package iORM_DT;
 {$LONGSTRINGS ON}
 {$OPENSTRINGS ON}
 {$OPTIMIZATION OFF}
-{$OVERFLOWCHECKS OFF}
-{$RANGECHECKS OFF}
+{$OVERFLOWCHECKS ON}
+{$RANGECHECKS ON}
 {$REFERENCEINFO ON}
 {$SAFEDIVIDE OFF}
 {$STACKFRAMES ON}
@@ -27,7 +26,7 @@ package iORM_DT;
 {$DEFINE DEBUG}
 {$DEFINE ioDelphiProfessional}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'iORM Designtime'}
+{$DESCRIPTION 'iORM VCL designtime'}
 {$LIBSUFFIX AUTO}
 {$DESIGNONLY}
 {$IMPLICITBUILD OFF}
@@ -35,14 +34,9 @@ package iORM_DT;
 requires
   rtl,
   Designide,
-  iORM_RT;
+  iORM_VCL_RT;
 
 contains
-  iORM.DT.ViewModel.Wizard in '..\..\Source\iORM.DT.ViewModel.Wizard.pas',
-  iORM.DT.ViewModel.Wizard.Creator in '..\..\Source\iORM.DT.ViewModel.Wizard.Creator.pas',
-  iORM.DT.Register in '..\..\Source\iORM.DT.Register.pas',
-  iORM.DT.Wizard.Utils in '..\..\Source\iORM.DT.Wizard.Utils.pas',
-  iORM.DT.CompAutoUses in '..\..\Source\iORM.DT.CompAutoUses.pas',
-  iORM.DT.Editors.VMAction in '..\..\Source\iORM.DT.Editors.VMAction.pas';
+  iORM.VCL.DT.Register in '..\..\Source\iORM.VCL.DT.Register.pas';
 
 end.

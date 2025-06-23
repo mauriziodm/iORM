@@ -31,7 +31,7 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.DT.Register;
+unit iORM.Core.DT.Register;
 
 interface
 
@@ -40,26 +40,44 @@ procedure Register;
 implementation
 
 uses
-  ToolsAPI, System.Classes, iORM.Abstraction.VCL, iORM.Abstraction.FMX, iORM.DB.ConnectionDef, iORM.DB.DataSet.Master,
+  ToolsAPI,
+  DesignIntf,
+  System.Classes,
+  System.Actions,
+  DesignEditors,
+
+  iORM.DB.ConnectionDef,
+  iORM.DB.DataSet.Master,
 {$IFNDEF ioDelphiProfessional}
   iORM.DB.ConnectionDef.MSSQLServer,
 {$ENDIF}
-  iORM.DB.DataSet.Detail, iORM.DB.MemTable, iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.PrototypeBindSource.Master,
-  iORM.LiveBindings.PrototypeBindSource.Detail, DesignIntf, iORM.MVVM.ModelPresenter.Master, iORM.MVVM.ModelPresenter.Detail, iORM.MVVM.ModelDataSet,
-  iORM.MVVM.ModelBindSource, iORM.MVVM.ViewModelBridge, iORM.MVVM.ViewContextProvider, System.Actions, iORM.StdActions.VCL, iORM.StdActions.FMX,
-  iORM.DT.ViewModel.Wizard, iORM.MVVM.ViewModel, DesignEditors, iORM.StdActions.CloseQueryRepeater, iORM.Abstraction.uniGUI,
-  iORM.DT.CompAutoUses, iORM.MVVM.VMAction, iORM.DT.Editors.VMAction, iORM.SynchroStrategy.EtmBased, iORM.Http.WebBroker.Producer;
+  iORM.DB.DataSet.Detail,
+  iORM.DB.MemTable,
+  iORM.LiveBindings.PrototypeBindSource.Custom,
+  iORM.LiveBindings.PrototypeBindSource.Master,
+  iORM.LiveBindings.PrototypeBindSource.Detail,
+  iORM.MVVM.ModelPresenter.Master,
+  iORM.MVVM.ModelPresenter.Detail,
+  iORM.MVVM.ModelDataSet,
+  iORM.MVVM.ModelBindSource,
+  iORM.MVVM.ViewModelBridge,
+  iORM.MVVM.ViewContextProvider,
+  iORM.MVVM.ViewModel,
+  iORM.MVVM.VMAction,
+  iORM.SynchroStrategy.EtmBased,
+  iORM.Http.WebBroker.Producer,
+  iORM.StdActions.CloseQueryRepeater,
+  iORM.DT.ViewModel.Wizard,
+  iORM.DT.CompAutoUses,
+  iORM.DT.Editors.VMAction
+
+  ;
 
 
 
 
 procedure Register;
 begin
-  // Abstraction layer components
-  RegisterComponents('iORM - Abstraction layer', [TioVCL]);
-  RegisterComponents('iORM - Abstraction layer', [TioFMX]);
-  RegisterComponents('iORM - Abstraction layer', [TioUniGUI]);
-
   // Connection components
   RegisterComponents('iORM - Connections', [TioHttpConnectionDef]);
   RegisterSelectionEditor(TioHttpConnectionDef, TioConnectionDefSelectionEditor);
@@ -144,50 +162,6 @@ begin
   RegisterComponents('iORM - MVVM - VMActions - BS - Persistence', [TioVMActionBSPersistenceInsert]);
   RegisterSelectionEditor(TioVMActionBSPersistenceInsert, TioMVVMSelectionEditor);
   RegisterComponents('iORM - MVVM - VMActions - Synchronization', [TioVMDoSynchronization]);
-
-  // VCL standard actions
-  RegisterActions('iORM - BS', [iORM.StdActions.Vcl.TioBSSelectCurrent], nil);
-  RegisterActions('iORM - BS', [iORM.StdActions.Vcl.TioBSShowOrSelect], nil);
-  RegisterActions('iORM - BS', [iORM.StdActions.Vcl.TioBSCloseQuery], nil);
-  RegisterActions('iORM - BS - ETM', [iORM.StdActions.Vcl.TioBS_ETM_RevertToObject], nil);
-  RegisterActions('iORM - BS - ETM', [iORM.StdActions.Vcl.TioBS_ETM_RevertToBindSource], nil);
-  RegisterActions('iORM - BS - Paging', [iORM.StdActions.Vcl.TioBSNextPage], nil);
-  RegisterActions('iORM - BS - Paging', [iORM.StdActions.Vcl.TioBSPrevPage], nil);
-  RegisterActions('iORM - BS - WhereBuilder', [iORM.StdActions.Vcl.TioBSBuildWhere], nil);
-  RegisterActions('iORM - BS - WhereBuilder', [iORM.StdActions.Vcl.TioBSClearWhere], nil);
-  RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Vcl.TioBSPersistenceAppend], nil);
-  RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Vcl.TioBSPersistenceClear], nil);
-  RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Vcl.TioBSPersistenceDelete], nil);
-  RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Vcl.TioBSPersistenceInsert], nil);
-  RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Vcl.TioBSPersistencePersist], nil);
-  RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Vcl.TioBSPersistenceReload], nil);
-  RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Vcl.TioBSPersistenceRevert], nil);
-  RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Vcl.TioBSPersistenceRevertOrDelete], nil);
-  RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Vcl.TioBSPersistenceSaveRevertPoint], nil);
-  RegisterActions('iORM - MVVM', [iORM.StdActions.Vcl.TioViewAction], nil);
-  RegisterActions('iORM - Synchronization', [iORM.StdActions.Vcl.TioDoSynchronization], nil);
-
-  // FMX standard actions
-  RegisterActions('iORM - BS', [iORM.StdActions.Fmx.TioBSSelectCurrent], nil);
-  RegisterActions('iORM - BS', [iORM.StdActions.Fmx.TioBSShowOrSelect], nil);
-  RegisterActions('iORM - BS', [iORM.StdActions.Fmx.TioBSCloseQuery], nil);
-  RegisterActions('iORM - BS - ETM', [iORM.StdActions.Fmx.TioBS_ETM_RevertToObject], nil);
-  RegisterActions('iORM - BS - ETM', [iORM.StdActions.Fmx.TioBS_ETM_RevertToBindSource], nil);
-  RegisterActions('iORM - BS - Paging', [iORM.StdActions.Fmx.TioBSNextPage], nil);
-  RegisterActions('iORM - BS - Paging', [iORM.StdActions.Fmx.TioBSPrevPage], nil);
-  RegisterActions('iORM - BS - WhereBuilder', [iORM.StdActions.Fmx.TioBSBuildWhere], nil);
-  RegisterActions('iORM - BS - WhereBuilder', [iORM.StdActions.Fmx.TioBSClearWhere], nil);
-  RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Fmx.TioBSPersistenceAppend], nil);
-  RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Fmx.TioBSPersistenceClear], nil);
-  RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Fmx.TioBSPersistenceDelete], nil);
-  RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Fmx.TioBSPersistenceInsert], nil);
-  RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Fmx.TioBSPersistencePersist], nil);
-  RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Fmx.TioBSPersistenceReload], nil);
-  RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Fmx.TioBSPersistenceRevert], nil);
-  RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Fmx.TioBSPersistenceRevertOrDelete], nil);
-  RegisterActions('iORM - BS - Persistence', [iORM.StdActions.Fmx.TioBSPersistenceSaveRevertPoint], nil);
-  RegisterActions('iORM - MVVM', [iORM.StdActions.Fmx.TioViewAction], nil);
-  RegisterActions('iORM - Synchronization', [iORM.StdActions.Fmx.TioDoSynchronization], nil);
 
   // StdActions common
   RegisterComponents('iORM - Other', [TioCloseQueryRepeater]);
