@@ -359,6 +359,8 @@ type
     property Unique: Boolean read FUnique;
   end;
 
+  //
+
 {$ENDREGION} // END OF CLASS ATTRIBUTES
 
 {$REGION '===== RELATION ATTRIBUTES ====='}
@@ -548,7 +550,7 @@ type
     FAppID: Integer;
     FLicense: String;
     FLicenseID: Integer;
-    FUser: String;
+    FUserName: String;
     FUserID: Integer;
     // Persistence related props
     FActionType: TioPersistenceActionType;
@@ -604,7 +606,7 @@ type
     property AppID: Integer read FAppID;
     property Licence: String read FLicense;
     property LicenseID: Integer read FLicenseID;
-    property User: String read FUser;
+    property UserName: String read FUserName;
     property UserID: Integer read FUserID;
     // Persistence related props
     property ActionType: TioPersistenceActionType read FActionType;
@@ -1046,7 +1048,7 @@ begin
   FAppID := LContext.PSRequest.AppOID;
   FLicense := LContext.PSRequest.Lic;
   FLicenseID := LContext.PSRequest.LicOID;
-  FUser := LContext.PSRequest.Usr;
+  FUserName := LContext.PSRequest.Usr;
   FUserID := LContext.PSRequest.UsrOID;
   // Persistence related props
   FActionType := LContext.ActionType;
@@ -1266,11 +1268,11 @@ begin
   if FUserID <> IO_INTEGER_NULL_VALUE then
     Result := FUserID.ToString;
   // User
-  if FUser <> IO_STRING_NULL_VALUE then
+  if FUserName <> IO_STRING_NULL_VALUE then
   begin
     if not Result.IsEmpty then
       Result := '-' + Result;
-    Result := FUser + Result;
+    Result := FUserName + Result;
   end;
 end;
 

@@ -61,7 +61,7 @@ type
     FAppID: Integer;
     FLicense: String;
     FLicenseID: Integer;
-    FUser: String;
+    FUserName: String;
     FUserID: Integer;
     // Count
     FCliToSrv_Count: Integer;
@@ -96,7 +96,7 @@ type
     property License: String read FLicense write FLicense;
     property LicenseID: Integer read FLicenseID write FLicenseID;
     [ioVarChar(100)]
-    property User: String read FUser write FUser;
+    property UserName: String read FUserName write FUserName;
     property UserID: Integer read FUserID write FUserID;
     // Count
     property CliToSrv_Count: Integer read FCliToSrv_Count write FCliToSrv_Count;
@@ -754,7 +754,7 @@ begin
   FSynchroLogItem_New.AppID := FSessionData.AppOID;
   FSynchroLogItem_New.License := FSessionData.License;
   FSynchroLogItem_New.LicenseID := FSessionData.LicenseOID;
-  FSynchroLogItem_New.User := FSessionData.User;
+  FSynchroLogItem_New.UserName := FSessionData.User;
   FSynchroLogItem_New.UserID := FSessionData.UserOID;
 end;
 
@@ -836,7 +836,7 @@ begin
   FAppID := IO_INTEGER_NULL_VALUE;
   FLicense := IO_STRING_NULL_VALUE;
   FLicenseID := IO_INTEGER_NULL_VALUE;
-  FUser := IO_STRING_NULL_VALUE;
+  FUserName := IO_STRING_NULL_VALUE;
   FUserID := IO_INTEGER_NULL_VALUE;
   // Count
   FCliToSrv_Count := IO_INTEGER_NULL_VALUE;
@@ -866,7 +866,7 @@ begin
   Result := String.Empty;
   // Extract user info as native type
   LUserID := Integer(FUserID);
-  LUserName := String(FUser);
+  LUserName := String(FUserName);
   // UserID
   if LUserID <> 0 then
     Result := LUserID.ToString;
