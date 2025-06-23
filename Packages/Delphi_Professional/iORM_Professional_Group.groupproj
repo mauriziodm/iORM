@@ -9,6 +9,12 @@
         <Projects Include="iORM_DT.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="iORM_FMX_FRX.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="iORM_FMX_FRX_DT.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -35,14 +41,32 @@
     <Target Name="iORM_DT:Make">
         <MSBuild Projects="iORM_DT.dproj" Targets="Make"/>
     </Target>
+    <Target Name="iORM_FMX_FRX">
+        <MSBuild Projects="iORM_FMX_FRX.dproj"/>
+    </Target>
+    <Target Name="iORM_FMX_FRX:Clean">
+        <MSBuild Projects="iORM_FMX_FRX.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="iORM_FMX_FRX:Make">
+        <MSBuild Projects="iORM_FMX_FRX.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="iORM_FMX_FRX_DT">
+        <MSBuild Projects="iORM_FMX_FRX_DT.dproj"/>
+    </Target>
+    <Target Name="iORM_FMX_FRX_DT:Clean">
+        <MSBuild Projects="iORM_FMX_FRX_DT.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="iORM_FMX_FRX_DT:Make">
+        <MSBuild Projects="iORM_FMX_FRX_DT.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="iORM_RT;iORM_DT"/>
+        <CallTarget Targets="iORM_RT;iORM_DT;iORM_FMX_FRX;iORM_FMX_FRX_DT"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="iORM_RT:Clean;iORM_DT:Clean"/>
+        <CallTarget Targets="iORM_RT:Clean;iORM_DT:Clean;iORM_FMX_FRX:Clean;iORM_FMX_FRX_DT:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="iORM_RT:Make;iORM_DT:Make"/>
+        <CallTarget Targets="iORM_RT:Make;iORM_DT:Make;iORM_FMX_FRX:Make;iORM_FMX_FRX_DT:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
