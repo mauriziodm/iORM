@@ -54,6 +54,9 @@ type
     // connection
     FConnection: String;
     FConnectionRemote: String;
+    // id token
+    FIDToken: String;
+    FIDTokenExp: TDateTime;
     // access token
     FAccessToken: String;
     FAccessTokenExp: TDateTime;
@@ -75,11 +78,15 @@ type
     function GetHasAppOID: Boolean;
     function GetHasConnection: Boolean;
     function GetHasConnectionRemote: Boolean;
+    function GetHasIDToken: Boolean;
     function GetHasLicense: Boolean;
     function GetHasLicenseOID: Boolean;
     function GetHasRefreshToken: Boolean;
     function GetHasUser: Boolean;
     function GetHasUserOID: Boolean;
+    function GetIDToken: String;
+    function GetIDTokenExp: TDateTime;
+    function GetIDTokenIsExpired: Boolean;
     function GetLicense: String;
     function GetLicenseOID: Integer;
     function GetNeedRefresh: Boolean;
@@ -95,6 +102,8 @@ type
     procedure SetAccessTokenRefreshAfter(const Value: TDateTime);
     procedure SetConnection(const Value: String);
     procedure SetConnectionRemote(const Value: String);
+    procedure SetIDToken(const Value: String);
+    procedure SetIDTokenExp(const Value: TDateTime);
     procedure SetLicense(const Value: String);
     procedure SetLicenseOID(const Value: Integer);
     procedure SetRefreshToken(const Value: String);
@@ -125,6 +134,11 @@ type
     property ConnectionRemote: String read GetConnectionRemote write SetConnectionRemote;
     property HasConnection: Boolean read GetHasConnection;
     property HasConnectionRemote: Boolean read GetHasConnectionRemote;
+    // id token
+    property IDToken: String read GetIDToken write SetIDToken;
+    property IDTokenExp: TDateTime read GetIDTokenExp write SetIDTokenExp;
+    property IDTokenIsExpired: Boolean read GetIDTokenIsExpired;
+    property HasIDToken: Boolean read GetHasIDToken;
     // refresh token
     property RefreshToken: String read GetRefreshToken write SetRefreshToken;
     property RefreshTokenExp: TDateTime read GetRefreshTokenExp write SetRefreshTokenExp;
@@ -160,6 +174,9 @@ begin
   // connection
   FConnection := IO_STRING_NULL_VALUE;
   FConnectionRemote := IO_STRING_NULL_VALUE;
+  // id token
+  FIDToken := IO_STRING_NULL_VALUE;
+  FIDTokenExp := IO_DATETIME_NULL_VALUE;
   // refresh
   FRefreshToken := IO_STRING_NULL_VALUE;
   FRefreshTokenExp := IO_DATETIME_NULL_VALUE;
@@ -184,6 +201,9 @@ begin
   // connection
   Result.Connection := FConnection;
   Result.ConnectionRemote := FConnectionRemote;
+  // id token
+  Result.IDToken := FIDToken;
+  Result.IDTokenExp := FIDTokenExp;
   // refresh token
   Result.RefreshToken := FRefreshToken;
   Result.RefreshTokenExp := FRefreshTokenExp;
@@ -264,6 +284,11 @@ begin
   Result := FConnectionRemote <> IO_STRING_NULL_VALUE;
 end;
 
+function TioAuthSessionData.GetHasIDToken: Boolean;
+begin
+  Result := FIDToken <> IO_STRING_NULL_VALUE;
+end;
+
 function TioAuthSessionData.GetHasLicense: Boolean;
 begin
   Result := FLicense <> IO_STRING_NULL_VALUE;
@@ -287,6 +312,21 @@ end;
 function TioAuthSessionData.GetHasUserOID: Boolean;
 begin
   Result := FUserOID <> IO_INTEGER_NULL_VALUE;
+end;
+
+function TioAuthSessionData.GetIDToken: String;
+begin
+  Result := FIDToken;
+end;
+
+function TioAuthSessionData.GetIDTokenExp: TDateTime;
+begin
+  Result := FIDTokenExp;
+end;
+
+function TioAuthSessionData.GetIDTokenIsExpired: Boolean;
+begin
+  Result := ((FIDTokenExp <> IO_DATETIME_NULL_VALUE) and (TioUtilities.NowUTC > FIDTokenExp)) or (FIDToken = IO_STRING_NULL_VALUE);
 end;
 
 function TioAuthSessionData.GetLicense: String;
@@ -357,6 +397,16 @@ end;
 procedure TioAuthSessionData.SetConnectionRemote(const Value: String);
 begin
   FConnectionRemote := Value;
+end;
+
+procedure TioAuthSessionData.SetIDToken(const Value: String);
+begin
+  FIDToken := Value;
+end;
+
+procedure TioAuthSessionData.SetIDTokenExp(const Value: TDateTime);
+begin
+  FIDTokenExp := Value;
 end;
 
 procedure TioAuthSessionData.SetLicense(const Value: String);

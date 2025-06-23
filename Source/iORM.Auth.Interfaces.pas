@@ -84,11 +84,15 @@ type
     function GetHasAppOID: Boolean;
     function GetHasConnection: Boolean;
     function GetHasConnectionRemote: Boolean;
+    function GetHasIDToken: Boolean;
     function GetHasLicense: Boolean;
     function GetHasLicenseOID: Boolean;
     function GetHasRefreshToken: Boolean;
     function GetHasUser: Boolean;
     function GetHasUserOID: Boolean;
+    function GetIDToken: String;
+    function GetIDTokenExp: TDateTime;
+    function GetIDTokenIsExpired: Boolean;
     function GetLicense: String;
     function GetLicenseOID: Integer;
     function GetNeedRefresh: Boolean;
@@ -104,6 +108,8 @@ type
     procedure SetAccessTokenRefreshAfter(const Value: TDateTime);
     procedure SetConnection(const Value: String);
     procedure SetConnectionRemote(const Value: String);
+    procedure SetIDToken(const Value: String);
+    procedure SetIDTokenExp(const Value: TDateTime);
     procedure SetLicense(const Value: String);
     procedure SetLicenseOID(const Value: Integer);
     procedure SetRefreshToken(const Value: String);
@@ -131,6 +137,11 @@ type
     property ConnectionRemote: String read GetConnectionRemote write SetConnectionRemote;
     property HasConnection: Boolean read GetHasConnection;
     property HasConnectionRemote: Boolean read GetHasConnectionRemote;
+    // id token
+    property IDToken: String read GetIDToken write SetIDToken;
+    property IDTokenExp: TDateTime read GetIDTokenExp write SetIDTokenExp;
+    property IDTokenIsExpired: Boolean read GetIDTokenIsExpired;
+    property HasIDToken: Boolean read GetHasIDToken;
     // refresh token
     property RefreshToken: String read GetRefreshToken write SetRefreshToken;
     property RefreshTokenExp: TDateTime read GetRefreshTokenExp write SetRefreshTokenExp;
