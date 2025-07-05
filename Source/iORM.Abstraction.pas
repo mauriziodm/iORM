@@ -587,8 +587,6 @@ begin
   _Lock;
   try
     LSessionData := _GetThreadOrMainSessionData(True);
-    // access token
-    APersistenceStrategyRequest.AccessToken := LSessionData.AccessToken;
     // app
     APersistenceStrategyRequest.App := LSessionData.App;
     APersistenceStrategyRequest.AppOID := LSessionData.AppOID;
