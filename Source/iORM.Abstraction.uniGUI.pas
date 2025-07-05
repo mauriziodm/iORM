@@ -52,8 +52,8 @@ unit iORM.Abstraction.uniGUI;
 interface
 
 uses
-  iORM.Abstraction, System.Classes, Vcl.ActnList, System.Rtti,
-  iORM.Auth.Interfaces, System.Generics.Collections, iORM.Auth.Factory;
+  iORM.Abstraction.Interfaces, iORM.Abstraction.SessionData.Interfaces, System.Classes, Vcl.ActnList, System.Rtti,
+  System.Generics.Collections;
 
 type
   TioUniGUI = class(TioCustomPlatformAbstractionComponent)
@@ -62,13 +62,13 @@ type
     class destructor Destroy;
   end;
 
-  TioUniMainSessionDataContainer = TDictionary<String, IioAuthSessionData>;
+  TioUniMainSessionDataContainer = TDictionary<String, IioSessionData>;
   TioUniSessionDataStore = class(TioCustomSessionDataStore)
   private
     class var FMainSessionDataContainer: TioUniMainSessionDataContainer;
   protected
-    class function _ClearMainSessionData: IioAuthSessionData; override;
-    class function _GetMainSessionData: IioAuthSessionData; override;
+    class function _ClearMainSessionData: IioSessionData; override;
+    class function _GetMainSessionData: IioSessionData; override;
   public
     class procedure _Initialize; override;
     class procedure _Finalize; override;
@@ -150,7 +150,7 @@ implementation
 
 uses
   iORM, iORM.Exceptions, Data.Bind.Components, Vcl.Controls, uniGUIApplication, uniGUIClasses, uniGUIDialogs,
-  System.SysUtils;
+  System.SysUtils, iORM.Abstraction.Factory;
 
 { TioApplicationUniGUI }
 
@@ -419,7 +419,7 @@ begin
   FMainSessionDataContainer := TioUniMainSessionDataContainer.Create;
 end;
 
-class function TioUniSessionDataStore._ClearMainSessionData: IioAuthSessionData;
+class function TioUniSessionDataStore._ClearMainSessionData: IioSessionData;
 begin
   FMainSessionDataContainer.Remove(TioApplicationUniGUI.uniSessionID);
 end;
@@ -430,14 +430,14 @@ begin
   FMainSessionDataContainer.Free;
 end;
 
-class function TioUniSessionDataStore._GetMainSessionData: IioAuthSessionData;
+class function TioUniSessionDataStore._GetMainSessionData: IioSessionData;
 var
   LSessionID: String;
 begin
   LSessionID := TioApplicationUniGUI.uniSessionID;
   if not FMainSessionDataContainer.TryGetValue(LSessionID, Result) then
   begin
-    Result := TioAuthFactory.NewAuthSessionData;
+    Result := TioAbstractionFactory.NewSessionData;
     FMainSessionDataContainer.Add(LSessionID, Result);
   end;
 end;
