@@ -68,6 +68,8 @@ type
     Fjti: String; // jwt id (id univoco che identifica il token, es. si usa per annullare un token emesso attraverso una black list)
     Flic: String; // license (name/alphanumeric id/customer name etc)
     Flid: integer; // license id (as integer)
+    Fname: String; // name (of the user) - OIDC
+    Fnonce: String; // nonce - OIDC
     Fnbf: TDateTime; // not before
     Fsub: String; // subject
     Ftyp: String; // token type
