@@ -47,11 +47,6 @@ type
     class procedure _Execute_DataSetResult(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); static; inline;
     class procedure _Execute_IntegerResult(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); static; inline;
     // specific execution methods
-    class procedure _Auth_Access(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); static; inline;
-    class procedure _Auth_App(const  APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); static; inline;
-    class procedure _Auth_NewAccessToken(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); static; inline;
-    class procedure _Auth_RefreshAccessToken(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); static; inline;
-    class procedure _Auth_User(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); static; inline;
     class procedure _DoSynchronization(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); static; inline;
     class procedure _LoadList(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); static; inline;
     class procedure _LoadObject(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody); static; inline;
@@ -68,7 +63,6 @@ uses
   iORM, DJSON, iORM.Http.Factory, iORM.Http.Interfaces, iORM.Exceptions,
   System.SysUtils, System.JSON, FireDAC.Comp.Client, FireDAC.Stan.Intf,
   System.Generics.Collections, iORM.Utilities, iORM.SynchroStrategy.Custom,
-  iORM.Auth.Components.AuthServer, iORM.Auth.Interfaces,
   iORM.PersistenceStrategy.Factory;
 
 { TioHttpServerExecutor }
@@ -86,16 +80,6 @@ begin
     LioResponseBody := TioHttpFactory.NewResponseBody;
     // Dispatch to the right method/action
     case LPSRequest.Method of
-      psmAuthAccess:
-        _Auth_Access(LPSRequest, LioResponseBody);
-      psmAuthApp:
-        _Auth_App(LPSRequest, LioResponseBody);
-      psmAuthNewAccessToken:
-        _Auth_NewAccessToken(LPSRequest, LioResponseBody);
-      psmAuthRefreshAccessToken:
-        _Auth_RefreshAccessToken(LPSRequest, LioResponseBody);
-      psmAuthUser:
-        _Auth_User(LPSRequest, LioResponseBody);
       psmDelete:
         _Execute(LPSRequest);
       psmDeleteList:
@@ -145,26 +129,6 @@ begin
   Result := Format('Hi, I''m iORM, I''m proud to tell you that my http server executor is successfully connected now %s.', [Now.ToString]);
 end;
 
-class procedure TioHttpServerExecutor._Auth_Access(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
-begin
-//  AioResponseBody.AuthResult1 := TioAuthServer.GetInstance.AuthorizeAccess(AioRequestBody.AuthScope, AioRequestBody.AuthIntention, AioRequestBody.AuthToken).AsString;
-end;
-
-class procedure TioHttpServerExecutor._Auth_App(const  APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
-begin
-  // Da fare
-end;
-
-class procedure TioHttpServerExecutor._Auth_User(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
-var
-  LUserCredentials: IioAuthUserCredentials;
-begin
-  if Supports(APSRequest.Intf1, IioAuthUserCredentials, LUserCredentials) then
-    AioResponseBody.AuthResponse := TioAuthServer.GetInstance.AuthorizeUser(LUserCredentials)
-  else
-    raise EioHttpLocalException.Create(ClassName, '_AuthorizeUser', 'JSONDataValue object does not implement then "IioAuthUserCredentials" interface');
-end;
-
 class procedure TioHttpServerExecutor._DoSynchronization(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
 var
   LPayload: TioCustomSynchroStrategy_Payload;
@@ -209,8 +173,8 @@ end;
 class procedure TioHttpServerExecutor._LoadList(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
 begin
   // Create a dummy list (note: TObjectList even for interface type items)
-  //  NB: La lista non viene ricevuta nella PSRequest ma viene ricreata qui perchè la lista stessa non è una entità mappata, invece
-  //       nel caso del LoadObject riguarda sempre una entità mappata e quindi non è necessario
+  // NB: La lista non viene ricevuta nella PSRequest ma viene ricreata qui perchè la lista stessa non è una entità mappata, invece
+  // nel caso del LoadObject riguarda sempre una entità mappata e quindi non è necessario
   APSRequest.ListDTO := TObjectList<TObject>.Create;
   try
     _Execute(APSRequest);
@@ -238,17 +202,6 @@ begin
   _Execute(APSRequest);
   if TioUtilities.BlindLevel_Do_AutoUpdateProps(APSRequest.BlindLevel) then
     AioResponseBody.JSONDataValueAsObject := APSRequest.DTO;
-end;
-
-class procedure TioHttpServerExecutor._Auth_NewAccessToken(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
-begin
-  // note: AioRequestBody.AuthToken param is PKCE code challenge
-//  AioResponseBody.AuthResult1 := TioAuthServer.GetInstance.NewAccessToken(AioRequestBody.AuthGrant, AioRequestBody.AuthToken).AsString;
-end;
-
-class procedure TioHttpServerExecutor._Auth_RefreshAccessToken(const APSRequest: IioPersistenceStrategyRequest; const AioResponseBody: IioHttpResponseBody);
-begin
-//  AioResponseBody.AuthResult1 := TioAuthServer.GetInstance.RefreshAccessToken(AioRequestBody.AuthToken).AsString;
 end;
 
 end.

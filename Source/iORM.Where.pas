@@ -48,7 +48,7 @@ uses
   iORM.Utilities, iORM.LiveBindings.CommonBSAPaging,
   iORM.Context.Interfaces, iORM.StdActions.Interfaces,
   iORM.LiveBindings.Interfaces, DJSON.Attributes,
-  iORM.PersistenceStrategy.Factory, iORM.Auth.Interfaces;
+  iORM.PersistenceStrategy.Factory;
 
 type
 

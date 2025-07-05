@@ -47,7 +47,7 @@ uses
   iORM.ETM.Engine, iORM.ETM.Interfaces, DJSON.Params,
   iORM.ConflictStrategy.Interfaces, iORM.ConflictStrategy.SameVersionWin, iORM.ConflictStrategy.LastUpdateWin,
   iORM.Context.Interfaces, iORM.SynchroStrategy.Interfaces, iORM.MVVM.ViewModel,
-  iORM.Auth.Interfaces, iORM.PersistenceStrategy.Interfaces;
+  iORM.PersistenceStrategy.Interfaces;
 
 const
   IORM_VERSION = 'iORM 2 (beta 3.4)';
@@ -202,7 +202,6 @@ const
   ssSUD = DJSON.Params.TdjSkipScope.ssSUD;
   ssSaveRevertPoint = DJSON.Params.TdjSkipScope.ssSaveRevertPoint;
   ssDJSON = DJSON.Params.TdjSkipScope.ssDJSON;
-  ssAuth = DJSON.Params.TdjSkipScope.ssAuth;
 
   // TioStdAction_ETM_AutoExec_AfterRevert = (doNothing, doRefresh, doReload);
   doNothing = iORM.CommonTypes.doNothing;
@@ -327,11 +326,6 @@ type
 
   // ViewModel class
   TioViewModel = iORM.MVVM.ViewModel.TioViewModel;
-{$ENDREGION}
-
-// Interface aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
-{$REGION 'Interface aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
-  IioAuthSessionData = iORM.Auth.Interfaces.IioAuthSessionData;
 {$ENDREGION}
 
 // Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM

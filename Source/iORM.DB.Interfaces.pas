@@ -48,14 +48,13 @@ uses
   FireDAC.Comp.DataSet, iORM.LiveBindings.BSPersistence,
   iORM.Where.SqlItems.Interfaces, iORM.Context.Map.Interfaces,
   iORM.SynchroStrategy.Interfaces, iORM.SynchroStrategy.Custom,
-  iORM.PersistenceStrategy.Interfaces, iORM.Auth.Interfaces, iORM.Exceptions;
+  iORM.PersistenceStrategy.Interfaces, iORM.Exceptions;
 
 const
   OBJVERSION_NULL = 0;
   TRANSACTION_TIMESTAMP_NULL = 0;
 
   // Http Body response related constants
-  BR_AUTHRESPONSE = 'AutRes';
   BR_EXCEPTIONCLASSNAME = 'ExcCls';
   BR_EXCEPTIONMESSAGE = 'ExcMsg';
   BR_JSONDATAVALUE = 'JsonDV';
@@ -324,10 +323,6 @@ type
     ['{E5A14525-308F-4877-99B7-C270D691FC6D}']
     function ExceptionOccurred: Boolean;
     function AsString: String;
-    // AuthResponse
-    procedure SetAuthResponse(const AAuthResponse: IioAuthResponse);
-    function GetAuthResponse: IioAuthResponse;
-    property AuthResponse: IioAuthResponse read GetAuthResponse write SetAuthResponse;
     // ExceptionClassName
     procedure SetExceptionClassName(const Value: String);
     function GetExceptionClassName: String;
@@ -394,12 +389,6 @@ type
     // SQLDestinations
     class procedure _DoSQLDest_Execute(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     class procedure _DoSQLDest_LoadDataSet(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
-    // Auth
-    class procedure _DoAuth_Access(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
-    class procedure _DoAuth_App(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
-    class procedure _DoAuth_NewAccessToken(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
-    class procedure _DoAuth_RefreshAccessToken(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
-    class procedure _DoAuth_User(const APSRequest: IioPersistenceStrategyRequest); virtual; abstract;
     // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
   public
     class procedure Execute(const APSRequest: IioPersistenceStrategyRequest);
@@ -803,16 +792,6 @@ end;
 class procedure TioPersistenceStrategyIntf.Execute(const APSRequest: IioPersistenceStrategyRequest);
 begin
   case APSRequest.Method of
-    psmAuthAccess:
-      _DoAuth_Access(APSRequest);
-    psmAuthApp:
-      _DoAuth_App(APSRequest);
-    psmAuthNewAccessToken:
-      _DoAuth_NewAccessToken(APSRequest);
-    psmAuthRefreshAccessToken:
-      _DoAuth_RefreshAccessToken(APSRequest);
-    psmAuthUser:
-      _DoAuth_User(APSRequest);
     psmLoadCount:
       _DoLoadCount(APSRequest);
     psmDelete:

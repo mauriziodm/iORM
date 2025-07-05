@@ -100,65 +100,6 @@ type
   end;
   // -----------------------------------------------------------------------------------------------
 
-  // Auth exceptions -------------------------------------------------------------------------------
-  EioAuthException = class(Exception)
-  end;
-
-  EioAuthInvalidCredentialsException_401 = class(EioAuthException)
-  end;
-
-  EioAuthInactiveCredentialsException_401 = class(EioAuthException)
-  end;
-
-  EioAuthExpiredCredentialsException_401 = class(EioAuthException)
-  end;
-
-  EioAuthForbiddenException_403 = class(EioAuthException)
-  end;
-
-  EioTokenSignatureException_401 = class(EioAuthException)
-  end;
-
-  EioTokenAudienceException_401 = class(EioAuthException)
-  end;
-
-  EioTokenTypeException_401 = class(EioAuthException)
-  end;
-
-  EioTokenIssuerException_401 = class(EioAuthException)
-  end;
-
-  EioTokenExpirationException_401 = class(EioAuthException)
-  end;
-
-  EioTokenNotYetValidException_401 = class(EioAuthException)
-  end;
-
-  EioAuthUserAuthorizationGrantExpected_401 = class(EioAuthException)
-  end;
-
-  EioAuthInvalidAuthorizationGrant_401 = class(EioAuthException)
-  end;
-
-  EioAuthInvalidRefreshToken_401 = class(EioAuthException)
-  end;
-
-  EioAuthComponentNotEnabled_404 = class(EioAuthException)
-  end;
-
-  EioAuthServerComponentNotFound_404 = class(EioAuthException)
-  end;
-
-  EioAuthNewPasswordNotIdenticalException_401 = class(EioAuthException)
-  end;
-
-  EioAuthAlreadyLoggedOnException_401 = class(EioAuthException)
-  end;
-
-  EioAuthNotLoggedOnException_401 = class(EioAuthException)
-  end;
-  // -----------------------------------------------------------------------------------------------
-
 implementation
 
 { EioException }

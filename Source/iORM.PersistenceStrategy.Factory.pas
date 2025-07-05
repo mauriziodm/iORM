@@ -39,7 +39,7 @@ uses
   iORM.PersistenceStrategy.Interfaces, iORM.DB.Interfaces,
   iORM.Where.Interfaces, iORM.CommonTypes, FireDAC.Comp.DataSet,
   iORM.Context.Interfaces, iORM.LiveBindings.BSPersistence,
-  iORM.SynchroStrategy.Custom, iORM.Auth.Interfaces, System.SysUtils,
+  iORM.SynchroStrategy.Custom, System.SysUtils,
   iORM.SynchroStrategy.Interfaces, iORM.Context.Properties.Interfaces;
 
 type
@@ -87,12 +87,6 @@ type
     // sql destinations
     class function NewPSRequest_SQLDest_LoadDataSet(const ASQLDestination: IioSQLDestination; const ADestDataSet: TFDDataSet): IioPersistenceStrategyRequest;
     class function NewPSRequest_SQLDest_Execute(const ASQLDestination: IioSQLDestination): IioPersistenceStrategyRequest;
-    // auth
-    class function NewPSRequest_Auth_Access(const AAuthIntention: TioAuthIntention; const AScope, AAccessToken, AConnectionName, AConnectionNameRemote: String): IioPersistenceStrategyRequest;
-    class function NewPSRequest_Auth_App(const AAppCredentials: IioAuthAppCredentials; const ACodeChallenge, AConnectionName, AConnectionNameRemote: String): IioPersistenceStrategyRequest;
-    class function NewPSRequest_Auth_NewAccessToken(const AAuthorizationCode, ACodeVerifier, AConnectionName, AConnectionNameRemote: String): IioPersistenceStrategyRequest;
-    class function NewPSRequest_Auth_RefreshAccessToken(const ARefreshToken, AConnectionName, AConnectionNameRemote: String): IioPersistenceStrategyRequest;
-    class function NewPSRequest_Auth_User(const AUserCredentials: IioAuthUserCredentials; const ACodeChallenge, AConnectionName, AConnectionNameRemote: String): IioPersistenceStrategyRequest;
     // transaction
     class function NewPSRequest_Transaction_Commit(const AConnectionName: String = String.Empty; const AConnectionNameRemote: String = String.Empty): IioPersistenceStrategyRequest;
     class function NewPSRequest_Transaction_In(const AConnectionName: String = String.Empty; const AConnectionNameRemote: String = String.Empty): IioPersistenceStrategyRequest;
@@ -145,54 +139,6 @@ begin
     APSRequest.Connection := AConnectionName;
   if not TioApplication.SessionDataStore.IsEmptyConnectionName(AConnectionNameRemote) then
     APSRequest.ConnectionRemote := AConnectionNameRemote;
-end;
-
-class function TioPersistenceStrategyFactory.NewPSRequest_Auth_Access(const AAuthIntention: TioAuthIntention; const AScope, AAccessToken, AConnectionName,
-  AConnectionNameRemote: String): IioPersistenceStrategyRequest;
-begin
-  Result := _NewPSRequest(psmAuthAccess, False);
-  Result.AuthAccessToken := AAccessToken;
-  Result.Connection := AConnectionName;
-  Result.ConnectionRemote := AConnectionNameRemote;
-  Result.AuthIntention := AAuthIntention;
-  Result.AuthScope := AScope;
-end;
-
-class function TioPersistenceStrategyFactory.NewPSRequest_Auth_App(const AAppCredentials: IioAuthAppCredentials; const ACodeChallenge, AConnectionName, AConnectionNameRemote: String): IioPersistenceStrategyRequest;
-begin
-  Result := _NewPSRequest(psmAuthApp, False);
-  Result.AuthCodeChallenge := ACodeChallenge;
-  Result.Connection := AConnectionName;
-  Result.ConnectionRemote := AConnectionNameRemote;
-  Result.Intf1 := AAppCredentials;
-  Result.Intf1_Serialize := True;
-end;
-
-class function TioPersistenceStrategyFactory.NewPSRequest_Auth_NewAccessToken(const AAuthorizationCode, ACodeVerifier, AConnectionName, AConnectionNameRemote: String): IioPersistenceStrategyRequest;
-begin
-  Result := _NewPSRequest(psmAuthNewAccessToken, False);
-  Result.AuthorizationCode := AAuthorizationCode;
-  Result.AuthCodeVerifier := ACodeVerifier;
-  Result.Connection := AConnectionName;
-  Result.ConnectionRemote := AConnectionNameRemote;
-end;
-
-class function TioPersistenceStrategyFactory.NewPSRequest_Auth_RefreshAccessToken(const ARefreshToken, AConnectionName, AConnectionNameRemote: String): IioPersistenceStrategyRequest;
-begin
-  Result := _NewPSRequest(psmAuthRefreshAccessToken, False);
-  Result.AuthRefreshToken := ARefreshToken;
-  Result.Connection := AConnectionName;
-  Result.ConnectionRemote := AConnectionNameRemote;
-end;
-
-class function TioPersistenceStrategyFactory.NewPSRequest_Auth_User(const AUserCredentials: IioAuthUserCredentials; const ACodeChallenge, AConnectionName, AConnectionNameRemote: String): IioPersistenceStrategyRequest;
-begin
-  Result := _NewPSRequest(psmAuthUser, False);
-  Result.AuthCodeChallenge := ACodeChallenge;
-  Result.Connection := AConnectionName;
-  Result.ConnectionRemote := AConnectionNameRemote;
-  Result.Intf1 := AUserCredentials;
-  Result.Intf1_Serialize := True;
 end;
 
 class function TioPersistenceStrategyFactory.NewPSRequest_ByJsonString(const AJsonString: String): IioPersistenceStrategyRequest;

@@ -38,7 +38,8 @@ interface
 uses
   System.Classes, iORM.SynchroStrategy.Interfaces, iORM.Attributes, DJSON.Attributes,
   System.SysUtils, iORM.CommonTypes, iORM.Context.Interfaces,
-  iORM.Auth.Interfaces, iORM.PersistenceStrategy.Interfaces, iORM.Abstraction.Interfaces;
+  iORM.PersistenceStrategy.Interfaces, iORM.Abstraction.Interfaces,
+  iORM.Abstraction.SessionData.Interfaces;
 
 type
 
@@ -148,7 +149,7 @@ type
     FSynchroLogItem_New: TioCustomSynchroStrategy_LogItem;
     FSynchroLogItem_Old: TioCustomSynchroStrategy_LogItem;
     FSynchroLogName: String;
-    FSessionData: IioAuthSessionData;
+    FSessionData: IioSessionData;
     [djSkip] // Non viene serializzato (in caso di connessione HTTP) in questo modo poi capisco se siamo remotizzati e quindi se devo fare lo "use" o no.
     FTargetConnectionDefName: String;
     // TimeSlot finalization mode
@@ -194,7 +195,7 @@ type
     property SynchroLogItem_New: TioCustomSynchroStrategy_LogItem read FSynchroLogItem_New write FSynchroLogItem_New;
     property SynchroLogName: String read FSynchroLogName write FSynchroLogName;
     property TargetConnectionDefName: String read FTargetConnectionDefName write FTargetConnectionDefName;
-    property SessionData: IioAuthSessionData read FSessionData write FSessionData;
+    property SessionData: IioSessionData read FSessionData write FSessionData;
     // TimeSlot finalization mode
     property EtmTimeSlot_Delete_SentToServer: Boolean read FEtmTimeSlot_Delete_SentToServer write FEtmTimeSlot_Delete_SentToServer;
     property EtmTimeSlot_Update_SentToServer: Boolean read FEtmTimeSlot_Update_SentToServer write FEtmTimeSlot_Update_SentToServer;

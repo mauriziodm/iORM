@@ -39,7 +39,7 @@ uses
   iORM.CommonTypes, iORM.Context.Table.Interfaces,
   iORM.Context.Properties.Interfaces, System.Rtti, iORM.Where.Interfaces,
   iORM.Context.Map.Interfaces, iORM.LiveBindings.BSPersistence,
-  iORM.Attributes, iORM.Auth.Interfaces, iORM.PersistenceStrategy.Interfaces;
+  iORM.Attributes, iORM.PersistenceStrategy.Interfaces;
 
 type
 

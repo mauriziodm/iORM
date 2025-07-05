@@ -59,8 +59,7 @@ type
   // note: ssSUD = Smart Update Detection operations
   // note: ssSaveRevertPoint = Persistence.SaveRevertPoint related operations
   // note: ssDJSON = DJSON (serialization/deserialization) related operations
-  // note: ssAuth = Authentication/Authorization related operations
-  TdjSkipScope = (ssMap, ssETM, ssHTTP, ssEmbeddedRelation, ssSUD, ssSaveRevertPoint, ssDJSON, ssAuth);
+  TdjSkipScope = (ssMap, ssETM, ssHTTP, ssEmbeddedRelation, ssSUD, ssSaveRevertPoint, ssDJSON);
   TdjSkipScopeSet = set of TdjSkipScope;
 
   TdjSerializersContainer = class;

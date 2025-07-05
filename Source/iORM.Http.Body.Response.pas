@@ -36,14 +36,12 @@ unit iORM.Http.Body.Response;
 interface
 
 uses
-  System.Classes, iORM.DB.Interfaces, System.JSON, iORM.Auth.Interfaces;
+  System.Classes, iORM.DB.Interfaces, System.JSON;
 
 type
 
   TioHttpResponseBody = class(TInterfacedObject, IioHttpResponseBody)
   private
-    // auth response
-    FAuthResponse: IioAuthResponse;
     // exceptions
     FExceptionClassName: String;
     FExceptionMessage: String;
@@ -52,14 +50,12 @@ type
     FStream: TStream;
     // methods
     function ExceptionOccurred: Boolean;
-    function GetAuthResponse: IioAuthResponse;
     function GetExceptionClassName: String;
     function GetExceptionMessage: String;
     function GetJSONDataValue: TJSONValue;
     function GetJSONDataValueAsInteger: Integer;
     function GetJSONDataValueAsObject: TObject;
     function GetStream: TStream;
-    procedure SetAuthResponse(const AAuthResponse: IioAuthResponse);
     procedure SetExceptionClassName(const Value: String);
     procedure SetExceptionMessage(const Value: String);
     procedure SetJSONDataValue(const Value: TJSONValue);
@@ -71,7 +67,6 @@ type
     destructor Destroy; override;
     function AsString: String;
     // properties
-    property AuthResponse: IioAuthResponse read GetAuthResponse write SetAuthResponse;
     property ExceptionClassName: String read GetExceptionClassName write SetExceptionClassName;
     property ExceptionMessage: String read GetExceptionMessage write SetExceptionMessage;
     property JSONDataValue: TJSONValue read GetJSONDataValue write SetJSONDataValue;
@@ -83,16 +78,13 @@ type
 implementation
 
 uses
-  iORM, System.NetEncoding, iORM.Exceptions, DJSON, System.SysUtils,
-  iORM.Auth.Factory;
+  iORM, System.NetEncoding, iORM.Exceptions, DJSON, System.SysUtils;
 
 { TioHttpResponseBody }
 
 constructor TioHttpResponseBody.Create;
 begin
   inherited Create;
-  // auth response
-  FAuthResponse := nil;
   // exceptions
   FExceptionClassName := IO_STRING_NULL_VALUE;
   FExceptionMessage := IO_STRING_NULL_VALUE;
@@ -123,10 +115,6 @@ begin
   Self.Create;
   LJSONObject := TJSONObject.ParseJSONValue(AJSONString) as TJSONObject;
   try
-    // auth response
-    LJSONValue := LJSONObject.GetValue(BR_AUTHRESPONSE);
-    if Assigned(LJSONValue) then
-      FAuthResponse := TioAuthFactory.NewAuthResponseFromString(LJSONValue.Value);
     // ExceptionClassName
     LJSONValue := LJSONObject.GetValue(BR_EXCEPTIONCLASSNAME);
     if Assigned(LJSONValue) then
@@ -162,11 +150,6 @@ begin
   Result := not (FExceptionClassName.IsEmpty and FExceptionMessage.IsEmpty);
 end;
 
-function TioHttpResponseBody.GetAuthResponse: IioAuthResponse;
-begin
-  Result := FAuthResponse;
-end;
-
 function TioHttpResponseBody.GetExceptionClassName: String;
 begin
  Result := FExceptionClassName;
@@ -200,11 +183,6 @@ begin
   if not Assigned(FStream) then
     FStream := TMemoryStream.Create;
   Result := FStream;
-end;
-
-procedure TioHttpResponseBody.SetAuthResponse(const AAuthResponse: IioAuthResponse);
-begin
-  FAuthResponse := AAuthResponse;
 end;
 
 procedure TioHttpResponseBody.SetExceptionClassName(const Value: String);
@@ -255,9 +233,6 @@ var
 begin
   LJSONObject := TJSONObject.Create;
   try
-    // auth response
-    if Assigned(FAuthResponse) then
-      LJSONObject.AddPair(BR_AUTHRESPONSE, FAuthResponse.AsString);
     // ExceptionClassName
     if FExceptionClassName <> IO_STRING_NULL_VALUE then
       LJSONObject.AddPair(BR_EXCEPTIONCLASSNAME, FExceptionClassName);

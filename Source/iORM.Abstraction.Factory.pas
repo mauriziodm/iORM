@@ -3,7 +3,7 @@ unit iORM.Abstraction.Factory;
 interface
 
 uses
-  iORM.Abstraction.Interfaces;
+  iORM.Abstraction.SessionData.Interfaces;
 
 type
 
@@ -13,6 +13,9 @@ type
   end;
 
 implementation
+
+uses
+  iORM.Abstraction.SessionData;
 
 { TioAbstractionFactory }
 

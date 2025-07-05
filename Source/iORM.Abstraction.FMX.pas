@@ -119,8 +119,7 @@ type
 implementation
 
 uses
-  FMX.Forms, FMX.Dialogs, iORM.Exceptions, FMX.Controls, iORM,
-  iORM.Auth.Factory;
+  FMX.Forms, FMX.Dialogs, iORM.Exceptions, FMX.Controls, iORM;
 
 { TioTimerFMX }
 

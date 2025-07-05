@@ -42,7 +42,7 @@ uses
   iORM.CommonTypes, iORM.Resolver.Interfaces, System.Classes,
   Data.Bind.ObjectScope, iORM.Where.Destinations,
   iORM.Context.Map.Interfaces, FireDAC.Comp.Client, System.TypInfo,
-  iORM.StdActions.Interfaces, iORM.Auth.Interfaces;
+  iORM.StdActions.Interfaces;
 type
 
   IioWhere = interface;

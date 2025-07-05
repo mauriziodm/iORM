@@ -40,7 +40,7 @@ uses
   iORM.Context.Properties.Interfaces, iORM.Where.Interfaces,
   iORM.DB.Interfaces, FireDAC.Comp.DataSet, Data.DB,
   iORM.LiveBindings.BSPersistence, iORM.CommonTypes,
-  iORM.SynchroStrategy.Custom, iORM.Auth.Interfaces,
+  iORM.SynchroStrategy.Custom,
   iORM.PersistenceStrategy.Interfaces;
 
 type
@@ -93,12 +93,6 @@ type
     // SQLDestinations
     class procedure _DoSQLDest_LoadDataSet(const APSRequest: IioPersistenceStrategyRequest); override;
     class procedure _DoSQLDest_Execute(const APSRequest: IioPersistenceStrategyRequest); override;
-    // Auth
-    class procedure _DoAuth_User(const APSRequest: IioPersistenceStrategyRequest); override;
-    class procedure _DoAuth_App(const APSRequest: IioPersistenceStrategyRequest); override;
-    class procedure _DoAuth_Access(const APSRequest: IioPersistenceStrategyRequest); override;
-    class procedure _DoAuth_NewAccessToken(const APSRequest: IioPersistenceStrategyRequest); override;
-    class procedure _DoAuth_RefreshAccessToken(const APSRequest: IioPersistenceStrategyRequest); override;
     // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
   end;
 
@@ -111,15 +105,14 @@ uses
   iORM.LazyLoad.Factory, iORM.Resolver.Factory, iORM.Where.Factory,
   iORM.Exceptions, iORM, System.SysUtils, System.Generics.Collections,
   iORM.Interceptor.CRUD, iORM.Interceptor.CRUD.Register, iORM.Utilities,
-  iORM.SynchroStrategy.Interfaces, iORM.Auth.Components.AuthServer,
-  iORM.PersistenceStrategy.Factory;
+  iORM.SynchroStrategy.Interfaces, iORM.PersistenceStrategy.Factory;
 
 type
 
   IioContextCache = interface
     ['{FAFBB27B-3E84-4D23-8801-3C863FA3556B}']
     function GetContext(const APSRequest: IioPersistenceStrategyRequest; const AClassName: String): IioContext;
-//    function GetContext(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData): IioContext;
+//    function GetContext(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ABlindLevel: Byte; const ASessionData: IioSessionData): IioContext;
   end;
 
   TioContextCache = class(TInterfacedObject, IioContextCache)
@@ -129,38 +122,10 @@ type
     constructor Create;
     destructor Destroy; override;
     function GetContext(const APSRequest: IioPersistenceStrategyRequest; const AClassName: String): IioContext;
-//    function GetContext(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ABlindLevel: Byte; const ASessionData: IioAuthSessionData): IioContext;
+//    function GetContext(const AIntent: TioPersistenceIntentType; const AClassName: String; const AWhere: IioWhere; const ABlindLevel: Byte; const ASessionData: IioSessionData): IioContext;
   end;
 
 { TioStrategyDB }
-
-class procedure TioPersistenceStrategyDB._DoAuth_Access(const APSRequest: IioPersistenceStrategyRequest);
-begin
-// TODO: AUTH: da reimplementare
-//  Result := TioAuthServer.GetInstance.AuthorizeAccess(AScope, AAuthIntention, AAccessToken);
-end;
-
-class procedure TioPersistenceStrategyDB._DoAuth_App(const APSRequest: IioPersistenceStrategyRequest);
-begin
-// TODO: AUTH: da reimplementare
-end;
-
-class procedure TioPersistenceStrategyDB._DoAuth_User(const APSRequest: IioPersistenceStrategyRequest);
-begin
-// TODO: AUTH: da reimplementare
-end;
-
-class procedure TioPersistenceStrategyDB._DoAuth_NewAccessToken(const APSRequest: IioPersistenceStrategyRequest);
-begin
-// TODO: AUTH: da reimplementare
-//  Result := TioAuthServer.GetInstance.NewAccessToken(AAuthorizationToken);
-end;
-
-class procedure TioPersistenceStrategyDB._DoAuth_RefreshAccessToken(const APSRequest: IioPersistenceStrategyRequest);
-begin
-// TODO: AUTH: da reimplementare
-//  Result := TioAuthServer.GetInstance.RefreshAccessToken(ARefreshToken);
-end;
 
 class procedure TioPersistenceStrategyDB._DoCommitTransaction(const APSRequest: IioPersistenceStrategyRequest);
 begin

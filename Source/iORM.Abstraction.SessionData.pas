@@ -36,7 +36,7 @@ unit iORM.Abstraction.SessionData;
 interface
 
 uses
-  iORM.Abstraction.Interfaces;
+  iORM.Abstraction.SessionData.Interfaces;
 
 type
 
@@ -155,10 +155,9 @@ type
 
 implementation
 
-uses iORM.CommonTypes, iORM.Utilities, iORM.Auth.Factory, DJSON,
-  System.SysUtils, System.JSON, iORM.Abstraction.Factory;
+uses iORM.CommonTypes, iORM.Utilities, DJSON, System.SysUtils, System.JSON, iORM.Abstraction.Factory;
 
-{ TioAuthSession }
+{ TioSession }
 
 procedure TioSessionData.Clear;
 begin

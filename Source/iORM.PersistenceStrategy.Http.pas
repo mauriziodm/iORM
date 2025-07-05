@@ -37,7 +37,7 @@ interface
 
 uses
   iORM.PersistenceStrategy.Interfaces, iORM.Where.Interfaces, iORM.DB.Interfaces,
-  FireDAC.Comp.DataSet, iORM.LiveBindings.BSPersistence, iORM.CommonTypes, iORM.Auth.Interfaces,
+  FireDAC.Comp.DataSet, iORM.LiveBindings.BSPersistence, iORM.CommonTypes,
   iORM.Context.Interfaces;
 
 type
@@ -76,12 +76,6 @@ type
     // SQLDestinations
     class procedure _DoSQLDest_LoadDataSet(const APSRequest: IioPersistenceStrategyRequest); override;
     class procedure _DoSQLDest_Execute(const APSRequest: IioPersistenceStrategyRequest); override;
-    // Auth
-    class procedure _DoAuth_Access(const APSRequest: IioPersistenceStrategyRequest); override;
-    class procedure _DoAuth_App(const APSRequest: IioPersistenceStrategyRequest); override;
-    class procedure _DoAuth_NewAccessToken(const APSRequest: IioPersistenceStrategyRequest); override;
-    class procedure _DoAuth_RefreshAccessToken(const APSRequest: IioPersistenceStrategyRequest); override;
-    class procedure _DoAuth_User(const APSRequest: IioPersistenceStrategyRequest); override;
     // ========== END OF METHODS TO BE OVERRIDED FROM CONCRETE PERSISTENCE STRATEGIES ==========
   end;
 
@@ -92,8 +86,7 @@ uses
   iORM.DB.Factory, System.Generics.Collections, iORM.Utilities,
   iORM.DuckTyped.Interfaces, iORM.Http.Interfaces, iORM.Http.Factory,
   iORM.Exceptions, System.SysUtils, FireDAC.Stan.Intf, FireDAC.Stan.StorageJSON,
-  iORM.Context.Container, DJSON, iORM.Auth.Factory,
-  iORM.SynchroStrategy.Custom;
+  iORM.Context.Container, DJSON, iORM.SynchroStrategy.Custom;
 
 { TioStrategyHttp }
 
@@ -297,51 +290,6 @@ end;
 class procedure TioPersistenceStrategyHttp._DoRollbackTransaction(const APSRequest: IioPersistenceStrategyRequest);
 begin
   // Nothing
-end;
-
-class procedure TioPersistenceStrategyHttp._DoAuth_Access(const APSRequest: IioPersistenceStrategyRequest);
-var
-  LResponse: IioHttpResponseBody;
-begin
-  // Execute
-  LResponse := _InternalExecute(APSRequest);
-  // Extract the AuthResponse
-  APSRequest.Intf1 := LResponse.AuthResponse;
-end;
-
-class procedure TioPersistenceStrategyHttp._DoAuth_User(const APSRequest: IioPersistenceStrategyRequest);
-var
-  LResponse: IioHttpResponseBody;
-begin
-  // Execute
-  LResponse := _InternalExecute(APSRequest);
-  // Extract the AuthResponse
-  APSRequest.Intf1 := LResponse.AuthResponse;
-end;
-
-class procedure TioPersistenceStrategyHttp._DoAuth_App(const APSRequest: IioPersistenceStrategyRequest);
-begin
-  // To be implemented
-end;
-
-class procedure TioPersistenceStrategyHttp._DoAuth_NewAccessToken(const APSRequest: IioPersistenceStrategyRequest);
-var
-  LResponse: IioHttpResponseBody;
-begin
-  // Execute
-  LResponse := _InternalExecute(APSRequest);
-  // Extract the AuthResponse
-  APSRequest.Intf1 := LResponse.AuthResponse;
-end;
-
-class procedure TioPersistenceStrategyHttp._DoAuth_RefreshAccessToken(const APSRequest: IioPersistenceStrategyRequest);
-var
-  LResponse: IioHttpResponseBody;
-begin
-  // Execute
-  LResponse := _InternalExecute(APSRequest);
-  // Extract the AuthResponse
-  APSRequest.Intf1 := LResponse.AuthResponse;
 end;
 
 class procedure TioPersistenceStrategyHttp._DoInTransaction(const APSRequest: IioPersistenceStrategyRequest);

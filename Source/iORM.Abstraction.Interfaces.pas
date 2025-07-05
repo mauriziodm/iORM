@@ -37,100 +37,11 @@ interface
 
 uses
   System.Classes, System.SysUtils, System.Rtti, iORM.CommonTypes,
-  iORM.Auth.Interfaces, System.Generics.Collections,
+  System.Generics.Collections, iORM.Abstraction.SessionData.Interfaces,
   iORM.PersistenceStrategy.Interfaces;
 
 type
   TioProjectPlatform = (ppVCL, ppFMX, ppUniGUI);
-
-  IioSessionData = interface
-    ['{DE6E7EDA-BEE0-4F8A-A12F-2A99E63D8EC5}']
-    procedure Clear;
-    function Clone: IioSessionData;
-    function GetAccessToken: String;
-    function GetAccessTokenExp: TDateTime;
-    function GetAccessTokenIsExpired: Boolean;
-    function GetAccessTokenRefreshAfter: TDateTime;
-    function GetApp: String;
-    function GetAppOID: Integer;
-    function GetConnection: String;
-    function GetConnectionRemote: String;
-    function GetHasAccessToken: Boolean;
-    function GetHasApp: Boolean;
-    function GetHasAppOID: Boolean;
-    function GetHasConnection: Boolean;
-    function GetHasConnectionRemote: Boolean;
-    function GetHasIDToken: Boolean;
-    function GetHasLicense: Boolean;
-    function GetHasLicenseOID: Boolean;
-    function GetHasRefreshToken: Boolean;
-    function GetHasUser: Boolean;
-    function GetHasUserOID: Boolean;
-    function GetIDToken: String;
-    function GetIDTokenExp: TDateTime;
-    function GetIDTokenIsExpired: Boolean;
-    function GetLicense: String;
-    function GetLicenseOID: Integer;
-    function GetNeedRefresh: Boolean;
-    function GetRefreshToken: String;
-    function GetRefreshTokenExp: TDateTime;
-    function GetRefreshTokenIsExpired: Boolean;
-    function GetUser: String;
-    function GetUserOID: Integer;
-    procedure SetApp(const Value: String);
-    procedure SetAppOID(const Value: Integer);
-    procedure SetAccessToken(const Value: String);
-    procedure SetAccessTokenExp(const Value: TDateTime);
-    procedure SetAccessTokenRefreshAfter(const Value: TDateTime);
-    procedure SetConnection(const Value: String);
-    procedure SetConnectionRemote(const Value: String);
-    procedure SetIDToken(const Value: String);
-    procedure SetIDTokenExp(const Value: TDateTime);
-    procedure SetLicense(const Value: String);
-    procedure SetLicenseOID(const Value: Integer);
-    procedure SetRefreshToken(const Value: String);
-    procedure SetRefreshTokenExp(const Value: TDateTime);
-    procedure SetUser(const Value: String);
-    procedure SetUserOID(const Value: Integer);
-    // ----- properties -----
-    // app
-    property App: String read GetApp write SetApp;
-    property AppOID: Integer read GetAppOID write SetAppOID;
-    property HasApp: Boolean read GetHasApp;
-    property HasAppOID: Boolean read GetHasAppOID;
-    // user
-    property User: String read GetUser write SetUser;
-    property UserOID: Integer read GetUserOID write SetUserOID;
-    property HasUser: Boolean read GetHasUser;
-    property HasUserOID: Boolean read GetHasUserOID;
-    // license
-    property License: String read GetLicense write SetLicense;
-    property LicenseOID: Integer read GetLicenseOID write SetLicenseOID;
-    property HasLicense: Boolean read GetHasLicense;
-    property HasLicenseOID: Boolean read GetHasLicenseOID;
-    // connection
-    property Connection: String read GetConnection write SetConnection;
-    property ConnectionRemote: String read GetConnectionRemote write SetConnectionRemote;
-    property HasConnection: Boolean read GetHasConnection;
-    property HasConnectionRemote: Boolean read GetHasConnectionRemote;
-    // id token
-    property IDToken: String read GetIDToken write SetIDToken;
-    property IDTokenExp: TDateTime read GetIDTokenExp write SetIDTokenExp;
-    property IDTokenIsExpired: Boolean read GetIDTokenIsExpired;
-    property HasIDToken: Boolean read GetHasIDToken;
-    // refresh token
-    property RefreshToken: String read GetRefreshToken write SetRefreshToken;
-    property RefreshTokenExp: TDateTime read GetRefreshTokenExp write SetRefreshTokenExp;
-    property RefreshTokenIsExpired: Boolean read GetRefreshTokenIsExpired;
-    property HasRefreshToken: Boolean read GetHasRefreshToken;
-    // access token
-    property AccessToken: String read GetAccessToken write SetAccessToken;
-    property AccessTokenExp: TDateTime read GetAccessTokenExp write SetAccessTokenExp;
-    property AccessTokenIsExpired: Boolean read GetAccessTokenIsExpired;
-    property AccessTokenRefreshAfter: TDateTime read GetAccessTokenRefreshAfter write SetAccessTokenRefreshAfter;
-    property HasAccessToken: Boolean read GetHasAccessToken;
-    property NeedRefresh: Boolean read GetNeedRefresh;
-  end;
 
   TioCustomPlatformAbstractionComponent = class(TComponent)
   private
@@ -151,7 +62,7 @@ type
     property ShowWait: TNotifyEvent read FShowWait write SetShowWait;
   end;
 
-  TioThreadSessionDataContainer = TDictionary<TThreadID, IioAuthSessionData>;
+  TioThreadSessionDataContainer = TDictionary<TThreadID, IioSessionData>;
   TioCustomSessionDataStoreRef = class of TioCustomSessionDataStore;
   TioCustomSessionDataStore = class abstract
   private
@@ -159,10 +70,10 @@ type
     class var FThreadSessionData: TioThreadSessionDataContainer;
     class function _InternalGetCurrentConnectionName: String; inline;
   protected
-    class function _ClearMainSessionData: IioAuthSessionData; virtual; abstract;
-    class function _GetMainSessionData: IioAuthSessionData; virtual; abstract;
-    class function _GetThreadSessionData(const CreateIfNotExists: Boolean): IioAuthSessionData; inline;
-    class function _GetThreadOrMainSessionData(const RaiseIfNoSessionExists: Boolean): IioAuthSessionData; inline;
+    class function _ClearMainSessionData: IioSessionData; virtual; abstract;
+    class function _GetMainSessionData: IioSessionData; virtual; abstract;
+    class function _GetThreadSessionData(const CreateIfNotExists: Boolean): IioSessionData; inline;
+    class function _GetThreadOrMainSessionData(const RaiseIfNoSessionExists: Boolean): IioSessionData; inline;
   public
     class procedure _Initialize; virtual;
     class procedure _Finalize; virtual;
@@ -177,15 +88,15 @@ type
     class function GetCurrentConnectionName: String;
     class function GetCurrentConnectionNameIfEmpty(const AConnectionName: String): String;
     // main session data
-    class function AcquireMainSessionData: IioAuthSessionData;
+    class function AcquireMainSessionData: IioSessionData;
     class procedure ClearMainSessionData;
     class procedure SetMainSessionConnection(const Value: String);
     // thread session data
-    class function AcquireNewThreadSessionData: IioAuthSessionData;
+    class function AcquireNewThreadSessionData: IioSessionData;
     class procedure ClearThreadSessionData;
     class procedure SetThreadSessionConnection(const Value: String);
     // thread or main session data
-    class function _CloneThreadOrMainSessionData: IioAuthSessionData;
+    class function _CloneThreadOrMainSessionData: IioSessionData;
     // default connection
     class function GetDefaultConnection: String;
     class procedure SetDefaultConnection(const Value: String);
@@ -194,10 +105,10 @@ type
 
   TioSimpleSessionDataStore = class(TioCustomSessionDataStore)
   private
-    class var FMainSessionData: IioAuthSessionData;
+    class var FMainSessionData: IioSessionData;
   protected
-    class function _ClearMainSessionData: IioAuthSessionData; override;
-    class function _GetMainSessionData: IioAuthSessionData; override;
+    class function _ClearMainSessionData: IioSessionData; override;
+    class function _GetMainSessionData: IioSessionData; override;
   public
     class procedure _Initialize; override;
   end;
@@ -340,7 +251,7 @@ type
 implementation
 
 uses
-  iORM.Exceptions, iORM, iORM.Auth.Factory, iORM.Utilities;
+  iORM.Exceptions, iORM, iORM.Utilities, iORM.Abstraction.Factory;
 
 { TioTimer }
 
@@ -607,7 +518,7 @@ end;
 
 { TioCustomSessionDataStore }
 
-class function TioCustomSessionDataStore.AcquireMainSessionData: IioAuthSessionData;
+class function TioCustomSessionDataStore.AcquireMainSessionData: IioSessionData;
 begin
   _Lock;
   Result := _GetMainSessionData;
@@ -635,7 +546,7 @@ end;
 
 class function TioCustomSessionDataStore._InternalGetCurrentConnectionName: String;
 var
-  LSessionData: IioAuthSessionData;
+  LSessionData: IioSessionData;
 begin
   LSessionData := _GetThreadOrMainSessionData(False);
   if Assigned(LSessionData) and not IsEmptyConnectionName(LSessionData.Connection) then
@@ -671,11 +582,13 @@ end;
 
 class procedure TioCustomSessionDataStore._FillPersistenceStrategyRequest(const APersistenceStrategyRequest: IioPersistenceStrategyRequest);
 var
-  LSessionData: IioAuthSessionData;
+  LSessionData: IioSessionData;
 begin
   _Lock;
   try
     LSessionData := _GetThreadOrMainSessionData(True);
+    // access token
+    APersistenceStrategyRequest.AccessToken := LSessionData.AccessToken;
     // app
     APersistenceStrategyRequest.App := LSessionData.App;
     APersistenceStrategyRequest.AppOID := LSessionData.AppOID;
@@ -692,8 +605,6 @@ begin
     // user
     APersistenceStrategyRequest.Usr := LSessionData.User;
     APersistenceStrategyRequest.UsrOID := LSessionData.UserOID;
-    // auth
-    APersistenceStrategyRequest.AuthAccessToken := LSessionData.AccessToken;
   finally
     _Unlock;
   end;
@@ -714,7 +625,7 @@ begin
   end;
 end;
 
-class function TioCustomSessionDataStore.AcquireNewThreadSessionData: IioAuthSessionData;
+class function TioCustomSessionDataStore.AcquireNewThreadSessionData: IioSessionData;
 begin
   _Lock;
   Result := _GetThreadSessionData(True);
@@ -730,7 +641,7 @@ begin
   end;
 end;
 
-class function TioCustomSessionDataStore._CloneThreadOrMainSessionData: IioAuthSessionData;
+class function TioCustomSessionDataStore._CloneThreadOrMainSessionData: IioSessionData;
 begin
   _Lock;
   try
@@ -776,7 +687,7 @@ begin
   FThreadSessionData.Free;
 end;
 
-class function TioCustomSessionDataStore._GetThreadOrMainSessionData(const RaiseIfNoSessionExists: Boolean): IioAuthSessionData;
+class function TioCustomSessionDataStore._GetThreadOrMainSessionData(const RaiseIfNoSessionExists: Boolean): IioSessionData;
 begin
   if not FThreadSessionData.TryGetValue(TioUtilities.GetThreadID, Result) then
     Result := _GetMainSessionData;
@@ -784,7 +695,7 @@ begin
     raise EioGenericException.Create(ClassName, '_GetThreadOrMainSessionData', 'There is no session data');
 end;
 
-class function TioCustomSessionDataStore._GetThreadSessionData(const CreateIfNotExists: Boolean): IioAuthSessionData;
+class function TioCustomSessionDataStore._GetThreadSessionData(const CreateIfNotExists: Boolean): IioSessionData;
 begin
   if (not FThreadSessionData.TryGetValue(TioUtilities.GetThreadID, Result)) then
   begin
@@ -821,12 +732,12 @@ end;
 
 { TioSimpleSessionDataStore }
 
-class function TioSimpleSessionDataStore._ClearMainSessionData: IioAuthSessionData;
+class function TioSimpleSessionDataStore._ClearMainSessionData: IioSessionData;
 begin
   FMainSessionData.Clear;
 end;
 
-class function TioSimpleSessionDataStore._GetMainSessionData: IioAuthSessionData;
+class function TioSimpleSessionDataStore._GetMainSessionData: IioSessionData;
 begin
   Result := FMainSessionData;
 end;
@@ -834,7 +745,7 @@ end;
 class procedure TioSimpleSessionDataStore._Initialize;
 begin
   inherited;
-  FMainSessionData := TioAuthFactory.NewAuthSessionData;
+  FMainSessionData := TioAbstractionFactory.NewSessionData;
 end;
 
 end.

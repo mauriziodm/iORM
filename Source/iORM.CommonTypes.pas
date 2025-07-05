@@ -53,13 +53,11 @@ const
   IO_STRING_NULL_VALUE = '';
   IO_DATETIME_NULL_VALUE = 0;
 
-  IO_AUTH_NULL_JWT = '';
-
   IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME = 'Master___ID';
 
   IO_USERNAME_LENGTH = 30;
 
-  // TdjSkipScope = (ssMap, ssETM, ssHTTP, ssEmbeddeRelation, ssSUD, ssSaveRevertPoint, ssDJSON, ssAuth);
+  // TdjSkipScope = (ssMap, ssETM, ssHTTP, ssEmbeddeRelation, ssSUD, ssSaveRevertPoint, ssDJSON);
   ssMap = DJSON.Params.TdjSkipScope.ssMap;
   ssETM = DJSON.Params.TdjSkipScope.ssETM;
   ssHTTP = DJSON.Params.TdjSkipScope.ssHTTP;
@@ -67,7 +65,6 @@ const
   ssSUD = DJSON.Params.TdjSkipScope.ssSUD;
   ssSaveRevertPoint = DJSON.Params.TdjSkipScope.ssSaveRevertPoint;
   ssDJSON = DJSON.Params.TdjSkipScope.ssDJSON;
-  ssAuth = DJSON.Params.TdjSkipScope.ssAuth;
 
   // BlindLevel bit value
   BL_BIT_DETECT_OBJ_EXISTS = 1;

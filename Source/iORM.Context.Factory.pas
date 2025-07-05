@@ -42,7 +42,7 @@ uses
   iORM.Context.Table.Interfaces, System.Rtti,
   iORM.Attributes, System.Generics.Collections,
   iORM.Context.Map.Interfaces, iORM.Where.Interfaces,
-  iORM.LiveBindings.BSPersistence, iORM.Auth.Interfaces,
+  iORM.LiveBindings.BSPersistence,
   iORM.PersistenceStrategy.Interfaces;
 
 type
