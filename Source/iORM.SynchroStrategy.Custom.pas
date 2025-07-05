@@ -37,8 +37,7 @@ interface
 
 uses
   System.Classes, iORM.SynchroStrategy.Interfaces, iORM.Attributes, DJSON.Attributes,
-  System.SysUtils, iORM.CommonTypes, iORM.Context.Interfaces,
-  iORM.PersistenceStrategy.Interfaces, iORM.Abstraction.Interfaces,
+  System.SysUtils, iORM.CommonTypes, iORM.Context.Interfaces, iORM.PersistenceStrategy.Interfaces,
   iORM.Abstraction.SessionData.Interfaces;
 
 type
@@ -311,7 +310,8 @@ implementation
 
 uses
   iORM, iORM.PersistenceStrategy.Factory, iORM.DB.Interfaces,
-  iORM.Exceptions, iORM.DB.Factory, iORM.LiveBindings.BSPersistence;
+  iORM.Exceptions, iORM.DB.Factory, iORM.LiveBindings.BSPersistence,
+  iORM.Abstraction;
 
 { TioCustomSynchroStrategy_Client }
 

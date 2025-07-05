@@ -52,8 +52,8 @@ unit iORM.Abstraction.uniGUI;
 interface
 
 uses
-  iORM.Abstraction.Interfaces, iORM.Abstraction.SessionData.Interfaces, System.Classes, Vcl.ActnList, System.Rtti,
-  System.Generics.Collections;
+  iORM.Abstraction.SessionData.Interfaces, System.Classes, Vcl.ActnList, System.Rtti,
+  System.Generics.Collections, iORM.Abstraction;
 
 type
   TioUniGUI = class(TioCustomPlatformAbstractionComponent)

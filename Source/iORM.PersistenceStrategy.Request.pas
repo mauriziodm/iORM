@@ -152,7 +152,7 @@ type
 implementation
 
 uses
-  iORM.Abstraction.Interfaces, System.JSON, DJSON, iORM.Exceptions, System.SysUtils;
+  System.JSON, DJSON, iORM.Exceptions, System.SysUtils, iORM.Abstraction;
 
 { TioPersistenceStrategyRequest }
 

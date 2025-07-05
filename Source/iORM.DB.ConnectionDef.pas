@@ -270,8 +270,8 @@ type
 implementation
 
 uses
-  System.IOUtils, iORM.DB.ConnectionContainer,
-  iORM, iORM.DBBuilder.Factory, iORM.Abstraction.Interfaces;
+  System.IOUtils, iORM.DB.ConnectionContainer, iORM, iORM.DBBuilder.Factory,
+  iORM.Abstraction;
 
 { TioCustomConnectionDef }
 

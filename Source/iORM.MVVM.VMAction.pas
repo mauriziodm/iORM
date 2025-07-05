@@ -38,8 +38,8 @@ interface
 uses
   System.Classes, System.Generics.Collections, iORM.MVVM.Interfaces, iORM.LiveBindings.Interfaces,
   iORM.CommonTypes, iORM.LiveBindings.BSPersistence, iORM.StdActions.Interfaces,
-  iORM.MVVM.ViewContextProvider, iORM.SynchroStrategy.Interfaces,
-  iORM.Abstraction.Interfaces, iORM.Where.Interfaces;
+  iORM.MVVM.ViewContextProvider, iORM.SynchroStrategy.Interfaces, iORM.Where.Interfaces,
+  iORM.Abstraction;
 
 type
 

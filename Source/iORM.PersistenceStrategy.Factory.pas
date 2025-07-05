@@ -104,7 +104,7 @@ implementation
 
 uses
   iORM.PersistenceStrategy.DB, iORM.PersistenceStrategy.Http, iORM.DB.ConnectionContainer,
-  iORM.PersistenceStrategy.Request, iORM.Abstraction.Interfaces, iORM.Where.Factory;
+  iORM.PersistenceStrategy.Request, iORM.Where.Factory, iORM.Abstraction;
 
 { TioStrategyFactory }
 

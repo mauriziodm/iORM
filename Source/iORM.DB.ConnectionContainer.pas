@@ -161,7 +161,8 @@ type
 implementation
 
 uses
-  System.Classes, iORM.Exceptions, iORM.Utilities, iORM.DB.Factory, iORM.Abstraction.Interfaces;
+  System.Classes, iORM.Exceptions, iORM.Utilities, iORM.DB.Factory,
+  iORM.Abstraction;
 
 { TioConnectionContainer }
 

@@ -150,7 +150,7 @@ contains
   iORM.MVVM.ViewRegister in '..\..\Source\iORM.MVVM.ViewRegister.pas',
   iORM.MVVM.ViewRegisterItem in '..\..\Source\iORM.MVVM.ViewRegisterItem.pas',
   iORM.MVVM.ViewContextProviderContainer in '..\..\Source\iORM.MVVM.ViewContextProviderContainer.pas',
-  iORM.Abstraction.Interfaces in '..\..\Source\iORM.Abstraction.Interfaces.pas',
+  iORM.Abstraction in '..\..\Source\iORM.Abstraction.pas',
   iORM.Abstraction.VCL in '..\..\Source\iORM.Abstraction.VCL.pas',
   iORM.Abstraction.FMX in '..\..\Source\iORM.Abstraction.FMX.pas',
   iORM.Abstraction.SessionData.Interfaces in '..\..\Source\iORM.Abstraction.SessionData.Interfaces.pas',

@@ -76,7 +76,7 @@ implementation
 
 uses
   iORM.DBBuilder.Factory, iORM.Exceptions, System.SysUtils, iORM.DB.ConnectionContainer, iORM.DB.Factory,
-  iORM.Abstraction.Interfaces;
+  iORM.Abstraction;
 
 { TioDBBuilderSchema }
 

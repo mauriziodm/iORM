@@ -772,8 +772,9 @@ implementation
 
 uses
   System.Rtti, iORM.Exceptions, iORM.Utilities, iORM.Where.Factory, iORM.PersistenceStrategy.Factory, iORM.DuckTyped.Interfaces,
-  iORM.DuckTyped.Factory, iORM.DB.Factory, iORM.Abstraction.Interfaces, iORM.DuckTyped.StreamObject,
-  iORM.LiveBindings.CommonBSBehavior, iORM.MVVM.ViewContextProviderContainer;
+  iORM.DuckTyped.Factory, iORM.DB.Factory, iORM.DuckTyped.StreamObject,
+  iORM.LiveBindings.CommonBSBehavior, iORM.MVVM.ViewContextProviderContainer,
+  iORM.Abstraction;
 
 { io }
 

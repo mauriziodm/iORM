@@ -73,8 +73,8 @@ type
 implementation
 
 uses
-  iORM.SqlTranslator, iORM.DB.Factory, iORM.Exceptions, iORM.PersistenceStrategy.Factory, iORM.Abstraction.Interfaces,
-  iORM.PersistenceStrategy.Interfaces;
+  iORM.SqlTranslator, iORM.DB.Factory, iORM.Exceptions, iORM.PersistenceStrategy.Factory,
+  iORM.PersistenceStrategy.Interfaces, iORM.Abstraction;
 
 { TioSQLDestination }
 

@@ -80,7 +80,7 @@ uses
   iORM.DB.MSSqlServer.SqlGenerator, iORM.DB.MSSqlServer.SqlDataConverter,
 {$ENDIF}
   iORM.DB.SQL.Destination, FireDAC.Stan.Intf, iORM.Http.Connection, iORM.DB.Script, iORM.DB.Query.FireDAC,
-  iORM.Abstraction.Interfaces;
+  iORM.Abstraction;
 
 { TioDbBuilder }
 

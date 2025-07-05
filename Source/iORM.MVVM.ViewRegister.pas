@@ -37,7 +37,7 @@ interface
 
 uses
   System.Generics.Collections, iORM.MVVM.ViewRegisterItem, System.Classes, iORM.MVVM.ViewContextProvider, iORM.MVVM.Interfaces, System.SysUtils,
-  iORM.Abstraction.Interfaces;
+  iORM.Abstraction;
 
 type
 
