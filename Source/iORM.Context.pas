@@ -280,7 +280,7 @@ uses
   iORM.Context.Factory, iORM.DB.Factory, System.TypInfo,
   iORM.Context.Container, System.SysUtils, iORM.Exceptions,
   System.StrUtils, iORM.DB.Interfaces, iORM, iORM.DB.ConnectionContainer,
-  iORM.Utilities, iORM.SynchroStrategy.Custom, iORM.Abstraction;
+  iORM.Utilities, iORM.SynchroStrategy.Custom, iORM.Abstraction.Interfaces;
 
 { TioContext }
 

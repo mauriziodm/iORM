@@ -181,7 +181,7 @@ type
 implementation
 
 uses
-  iORM.Abstraction, System.JSON, DJSON, iORM.Exceptions, System.SysUtils;
+  iORM.Abstraction.Interfaces, System.JSON, DJSON, iORM.Exceptions, System.SysUtils;
 
 { TioPersistenceStrategyRequest }
 

@@ -271,7 +271,7 @@ implementation
 
 uses
   System.IOUtils, iORM.DB.ConnectionContainer,
-  iORM, iORM.DBBuilder.Factory, iORM.Abstraction;
+  iORM, iORM.DBBuilder.Factory, iORM.Abstraction.Interfaces;
 
 { TioCustomConnectionDef }
 

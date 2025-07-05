@@ -169,7 +169,7 @@ type
 implementation
 
 uses
-  iORM, System.SysUtils, iORM.PersistenceStrategy.Factory, iORM.Abstraction,
+  iORM, System.SysUtils, iORM.PersistenceStrategy.Factory, iORM.Abstraction.Interfaces,
   iORM.Utilities, iORM.Exceptions, iORM.Auth.Factory;
 
 { TioAuthorizationClient }

@@ -38,7 +38,7 @@ interface
 uses
   Fmx.ActnList, iORM.LiveBindings.BSPersistence, System.Classes, iORM.LiveBindings.Interfaces, iORM.CommonTypes, iORM.MVVM.Interfaces,
   iORM.StdActions.Interfaces, iORM.MVVM.ViewContextProvider,
-  iORM.SynchroStrategy.Interfaces, iORM.Abstraction, iORM.Where.Interfaces;
+  iORM.SynchroStrategy.Interfaces, iORM.Abstraction.Interfaces, iORM.Where.Interfaces;
 
 type
 

@@ -38,7 +38,7 @@ interface
 uses
   System.Classes, iORM.SynchroStrategy.Interfaces, iORM.Attributes, DJSON.Attributes,
   System.SysUtils, iORM.CommonTypes, iORM.Context.Interfaces,
-  iORM.Auth.Interfaces, iORM.PersistenceStrategy.Interfaces, iORM.Abstraction;
+  iORM.Auth.Interfaces, iORM.PersistenceStrategy.Interfaces, iORM.Abstraction.Interfaces;
 
 type
 

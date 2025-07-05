@@ -15,7 +15,7 @@ type
 implementation
 
 uses
-  iORM, iORM.Abstraction, iORM.Exceptions, iORM.StdActions.Fmx,
+  iORM, iORM.Abstraction.Interfaces, iORM.Exceptions, iORM.StdActions.Fmx,
   System.SysUtils;
 
 { TioStdActionCommonBehaviour }

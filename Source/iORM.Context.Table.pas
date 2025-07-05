@@ -202,7 +202,7 @@ implementation
 
 uses
   iORM.DB.Factory, System.SysUtils, iORM.Exceptions, iORM.SqlTranslator, System.StrUtils,
-  iORM.ConflictStrategy.SameVersionWin, iORM.Abstraction;
+  iORM.ConflictStrategy.SameVersionWin, iORM.Abstraction.Interfaces;
 
 { TioContextTable }
 

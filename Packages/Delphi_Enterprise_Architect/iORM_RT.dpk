@@ -150,9 +150,10 @@ contains
   iORM.MVVM.ViewRegister in '..\..\Source\iORM.MVVM.ViewRegister.pas',
   iORM.MVVM.ViewRegisterItem in '..\..\Source\iORM.MVVM.ViewRegisterItem.pas',
   iORM.MVVM.ViewContextProviderContainer in '..\..\Source\iORM.MVVM.ViewContextProviderContainer.pas',
-  iORM.Abstraction in '..\..\Source\iORM.Abstraction.pas',
+  iORM.Abstraction.Interfaces in '..\..\Source\iORM.Abstraction.Interfaces.pas',
   iORM.Abstraction.VCL in '..\..\Source\iORM.Abstraction.VCL.pas',
   iORM.Abstraction.FMX in '..\..\Source\iORM.Abstraction.FMX.pas',
+  iORM.Abstraction.SessionData in '..\..\Source\iORM.Abstraction.SessionData.pas',
   iORM.LiveBindings.CommonBSABehavior in '..\..\Source\iORM.LiveBindings.CommonBSABehavior.pas',
   iORM.DBBuilder.Interfaces in '..\..\Source\iORM.DBBuilder.Interfaces.pas',
   iORM.DBBuilder.Schema.Field in '..\..\Source\iORM.DBBuilder.Schema.Field.pas',
@@ -250,7 +251,8 @@ contains
   iORM.Auth.Response in '..\..\Source\iORM.Auth.Response.pas',
   iORM.Async.Func in '..\..\Source\iORM.Async.Func.pas',
   iORM.Async.Proc in '..\..\Source\iORM.Async.Proc.pas',
-  iORM.PersistenceStrategy.Request in '..\..\Source\iORM.PersistenceStrategy.Request.pas';
+  iORM.PersistenceStrategy.Request in '..\..\Source\iORM.PersistenceStrategy.Request.pas',
+  iORM.Abstraction.factory in '..\..\Source\iORM.Abstraction.factory.pas';
 
 end.
 

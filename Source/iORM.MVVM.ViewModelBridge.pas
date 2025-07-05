@@ -95,7 +95,7 @@ implementation
 uses
   iORM.DependencyInjection.ViewModelShuttleContainer, iORM.Utilities,
   System.SysUtils, iORM.Exceptions, iORM.Components.Common.Interfaces,
-  iORM, iORM.Abstraction, iORM.DB.ConnectionDef, System.Threading;
+  iORM, iORM.Abstraction.Interfaces, iORM.DB.ConnectionDef, System.Threading;
 
 { TioViewModelBridge }
 

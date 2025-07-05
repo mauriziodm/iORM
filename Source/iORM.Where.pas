@@ -418,7 +418,7 @@ uses
   iORM.DB.Factory, iORM.Context.Factory, System.SysUtils, iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, iORM.ObjectsForge.Factory,
   iORM.RttiContext.Factory, iORM, iORM.Where.SqlItems, iORM.DB.Interfaces, iORM.Resolver.Factory,
   iORM.Where.Factory, iORM.Exceptions, FireDAC.Comp.DataSet, iORM.LazyLoad.Factory,
-  iORM.MVVM.Interfaces, iORM.Abstraction, iORM.Context.Container, System.StrUtils,
+  iORM.MVVM.Interfaces, iORM.Abstraction.Interfaces, iORM.Context.Container, System.StrUtils,
   iORM.ObjectsForge.Interfaces, iORM.ETM.Engine,
   iORM.PersistenceStrategy.Interfaces;
 

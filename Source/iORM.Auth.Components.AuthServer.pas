@@ -165,7 +165,7 @@ implementation
 uses
   iORM.CommonTypes, iORM.Utilities, iORM.Exceptions,
   System.SysUtils, System.DateUtils, System.IOUtils, iORM.Auth.Factory,
-  iORM.Abstraction;
+  iORM.Abstraction.Interfaces;
 
 { TioAuthServer }
 

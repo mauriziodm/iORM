@@ -705,7 +705,7 @@ type
 implementation
 
 uses
-  iORM, iORM.Utilities, iORM.Exceptions, iORM.Abstraction, iORM.ETM.Engine,
+  iORM, iORM.Utilities, iORM.Exceptions, iORM.Abstraction.Interfaces, iORM.ETM.Engine,
   iORM.Context.Interfaces, DJSON, iORM.ETM.Factory;
 
 { TioStringAttribute }

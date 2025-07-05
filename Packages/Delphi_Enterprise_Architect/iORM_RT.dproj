@@ -300,9 +300,10 @@
         <DCCReference Include="..\..\Source\iORM.MVVM.ViewRegister.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.ViewRegisterItem.pas"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.ViewContextProviderContainer.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Abstraction.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Abstraction.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.Abstraction.VCL.pas"/>
         <DCCReference Include="..\..\Source\iORM.Abstraction.FMX.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Abstraction.SessionData.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.CommonBSABehavior.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Field.pas"/>
@@ -401,6 +402,7 @@
         <DCCReference Include="..\..\Source\iORM.Async.Func.pas"/>
         <DCCReference Include="..\..\Source\iORM.Async.Proc.pas"/>
         <DCCReference Include="..\..\Source\iORM.PersistenceStrategy.Request.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Abstraction.factory.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

@@ -37,7 +37,7 @@ interface
 
 uses
   FireDAC.FMXUI.Wait, // For FireDAC compatibility without using the original component
-  iORM.Abstraction, VCL.ActnList, VCL.ExtCtrls, System.Rtti, System.Classes; // For FireDAC compatibility without original component
+  iORM.Abstraction.Interfaces, VCL.ActnList, VCL.ExtCtrls, System.Rtti, System.Classes; // For FireDAC compatibility without original component
 
 type
 

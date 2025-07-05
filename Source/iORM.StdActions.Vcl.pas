@@ -38,7 +38,7 @@ interface
 uses
   System.Classes, Vcl.ActnList, iORM.CommonTypes, iORM.LiveBindings.Interfaces, iORM.MVVM.Interfaces, iORM.LiveBindings.BSPersistence,
   Vcl.Forms, iORM.StdActions.Interfaces, iORM.MVVM.ViewContextProvider,
-  iORM.SynchroStrategy.Interfaces, iORM.Abstraction, iORM.Where.Interfaces;
+  iORM.SynchroStrategy.Interfaces, iORM.Abstraction.Interfaces, iORM.Where.Interfaces;
 
 type
 
