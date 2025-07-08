@@ -98,7 +98,7 @@ implementation
 
 uses
   System.SysUtils, iORM.Components.Common,
-  iORM.LiveBindings.ActiveListBindSourceAdapter, iORM.LiveBindings.Factory,
+  iORM.LiveBindings.Factory,
   iORM.Exceptions, System.Rtti, iORM.RttiContext.Factory,
   iORM.LiveBindings.BSPersistence, iORM;
 

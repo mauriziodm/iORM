@@ -36,8 +36,8 @@ unit iORM.PersistenceStrategy.Http;
 interface
 
 uses
-  iORM.PersistenceStrategy.Interfaces, iORM.Where.Interfaces, iORM.DB.Interfaces,
-  FireDAC.Comp.DataSet, iORM.LiveBindings.BSPersistence, iORM.CommonTypes,
+  iORM.PersistenceStrategy.Interfaces, iORM.DB.Interfaces,
+  FireDAC.Comp.DataSet, iORM.CommonTypes,
   iORM.Context.Interfaces;
 
 type
@@ -82,9 +82,9 @@ type
 implementation
 
 uses
-  System.JSON, iORM, System.Classes, iORM.PersistenceStrategy.DB, iORM.DB.ConnectionContainer,
-  iORM.DB.Factory, System.Generics.Collections, iORM.Utilities,
-  iORM.DuckTyped.Interfaces, iORM.Http.Interfaces, iORM.Http.Factory,
+  System.JSON, iORM, System.Classes, iORM.DB.ConnectionContainer,
+  iORM.DB.Factory, iORM.Utilities,
+
   iORM.Exceptions, System.SysUtils, FireDAC.Stan.Intf, FireDAC.Stan.StorageJSON,
   iORM.Context.Container, DJSON, iORM.SynchroStrategy.Custom;
 

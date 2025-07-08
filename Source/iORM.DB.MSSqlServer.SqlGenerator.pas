@@ -38,7 +38,7 @@ interface
 uses
   System.Classes,
   System.SysUtils,
-  iORM.DB.SqLite.SqlGenerator, iORM.DB.Interfaces, iORM.Context.Interfaces,
+  iORM.DB.Interfaces, iORM.Context.Interfaces,
   iORM.CommonTypes;
 
 type

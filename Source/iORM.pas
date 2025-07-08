@@ -36,10 +36,10 @@ unit iORM;
 interface
 
 uses
-  System.Classes, System.SysUtils, System.TypInfo, System.Generics.Collections, DJSON,
+  System.Classes, System.SysUtils, System.TypInfo, System.Generics.Collections,
   iORM.CommonTypes, iORM.Where.Interfaces, iORM.Attributes, iORM.LiveBindings.BSPersistence,
   iORM.DB.ConnectionContainer, iORM.DB.Interfaces, iORM.DBBuilder.Interfaces, iORM.DependencyInjection, iORM.Global.Factory,
-  iORM.MVVM.ViewContextProvider, iORM.MVVM.Interfaces, iORM.MVVM.ModelPresenter.Custom,
+  iORM.MVVM.ViewContextProvider, iORM.MVVM.Interfaces,
   iORM.LiveBindings.Interfaces, iORM.MVVM.ViewRegister,
   iORM.StdActions.Interfaces, iORM.Context.Container,
   iORM.Context.Properties.Interfaces, iORM.Where.SmartBuilder,
@@ -47,7 +47,7 @@ uses
   iORM.ETM.Engine, iORM.ETM.Interfaces, DJSON.Params,
   iORM.ConflictStrategy.Interfaces, iORM.ConflictStrategy.SameVersionWin, iORM.ConflictStrategy.LastUpdateWin,
   iORM.Context.Interfaces, iORM.SynchroStrategy.Interfaces, iORM.MVVM.ViewModel,
-  iORM.PersistenceStrategy.Interfaces;
+  iORM.PersistenceStrategy.Interfaces, iORM.Abstraction;
 
 const
   IORM_VERSION = 'iORM 2 (beta 3.4)';
@@ -417,10 +417,6 @@ type
   io = class
   private
     class procedure _FreeObjAfterPersistOrDelete(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete); static; inline;
-
-    class procedure SetWaitProc(const AShowWaitProc: TProc = nil; const AHideWaitProc: TProc = nil);
-    class procedure ShowWait;
-    class procedure HideWait;
   public
     // KeepClass
     class procedure RegisterClass(const AClass: TClass);
@@ -441,6 +437,14 @@ type
     // Global VCProvider register
     class function DefaultVCProvider: TioViewContextProvider;
     class function VCProviderByName(const AVCProviderName: String): TioViewContextProvider;
+
+    // Show-Hide Wait related methods
+    class procedure SetWaitMethods(const AShowWaitMethod: TioShowWaitMethod; const AHideWaitMethod: TioHideWaitMethod);
+    class procedure ShowWait;
+    class procedure HideWait;
+
+    // Access-token related methods
+    class procedure SetAccessTokenMethods(const AAccessTokenProviderMethod: TioAccessTokenProviderMethod; const AAccessTokenValidateMethod: TioAccessTokenValidateMethod);
 
     // RefTo (returning IioWhere fluent interface)
     class function RefTo(const ATypeName: String; const ATypeAlias: String = ''): IioWhere; overload;
@@ -773,8 +777,7 @@ implementation
 uses
   System.Rtti, iORM.Exceptions, iORM.Utilities, iORM.Where.Factory, iORM.PersistenceStrategy.Factory, iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory, iORM.DB.Factory, iORM.DuckTyped.StreamObject,
-  iORM.LiveBindings.CommonBSBehavior, iORM.MVVM.ViewContextProviderContainer,
-  iORM.Abstraction;
+  iORM.LiveBindings.CommonBSBehavior, iORM.MVVM.ViewContextProviderContainer;
 
 { io }
 
@@ -1120,9 +1123,15 @@ begin
   Result := TioDBFactory.SQLDestination(ASQL);
 end;
 
-class procedure io.SetWaitProc(const AShowWaitProc: TProc; const AHideWaitProc: TProc);
+class procedure io.SetAccessTokenMethods(const AAccessTokenProviderMethod: TioAccessTokenProviderMethod;
+  const AAccessTokenValidateMethod: TioAccessTokenValidateMethod);
 begin
-  TioApplication.SetShowHideWaitProc(AShowWaitProc, AHideWaitProc);
+  TioApplication.SetAccessTokenMethods(AAccessTokenProviderMethod, AAccessTokenValidateMethod);
+end;
+
+class procedure io.SetWaitMethods(const AShowWaitMethod: TioShowWaitMethod; const AHideWaitMethod: TioHideWaitMethod);
+begin
+  TioApplication.SetWaitMethods(AShowWaitMethod, AHideWaitMethod);
 end;
 
 class procedure io.Show(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;

@@ -107,7 +107,7 @@ type
 
 implementation
 
-uses iORM.CommonTypes, iORM.Utilities, DJSON, System.SysUtils, System.JSON, iORM.Abstraction.Factory;
+uses iORM.CommonTypes, System.SysUtils, System.JSON, iORM.Abstraction.Factory;
 
 { TioSession }
 

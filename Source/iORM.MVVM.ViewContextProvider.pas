@@ -97,7 +97,7 @@ type
 implementation
 
 uses
-  iORM.Exceptions,
+
   iORM.MVVM.ViewContextProviderContainer, iORM.Utilities, iORM.MVVM.ViewRegister,
   iORM;
 

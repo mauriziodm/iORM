@@ -57,7 +57,7 @@ implementation
 
 uses
   iORM.Context.Map.Interfaces, iORM.Context.Container, iORM.Attributes, System.SysUtils,
-  iORM.DuckTyped.Interfaces, iORM.Exceptions, iORM.DuckTyped.Factory,
+  iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory,
   iORM.Utilities, iORM.CommonTypes, System.Rtti, DJSON, DJSON.Params,
   iORM.ETM.Factory;
 

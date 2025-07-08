@@ -85,8 +85,8 @@ type
 
 implementation
 
-uses System.Classes, System.SysUtils, iORM.Exceptions, iORM, iORM.LiveBindings.Factory,
-  iORM.Context.Properties.Interfaces, Data.Bind.ObjectScope, System.Generics.Collections,
+uses System.Classes, System.SysUtils, iORM.Exceptions, iORM,
+  Data.Bind.ObjectScope,
   iORM.LiveBindings.CommonBSAPaging, iORM.LiveBindings.Notification,
   iORM.Utilities, iORM.LiveBindings.BSPersistence.SmartDeleteSystem,
   iORM.Where.Factory;

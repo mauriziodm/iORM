@@ -38,7 +38,7 @@ interface
 {$I ioGlobalDef.inc}   // io global definitions
 
 uses
-  System.Classes, System.SysUtils, iORM.MVVM.Interfaces, iORM.MVVM.VMActionContainer, iORM.Components.InterfacedDataModule, iORM.MVVM.ViewContextProvider,
+  System.Classes, System.SysUtils, iORM.MVVM.Interfaces, iORM.Components.InterfacedDataModule, iORM.MVVM.ViewContextProvider,
   iORM.MVVM.ModelPresenter.Custom, iORM.LiveBindings.Interfaces, iORM.CommonTypes,
   iORM.StdActions.Interfaces;
 

@@ -36,8 +36,8 @@ unit iORM.DB.MSSqlServer.SqlDataConverter;
 interface
 
 uses
-  iORM.DB.Interfaces, iORM.Context.Properties.Interfaces, System.Rtti,
-  iORM.Context.Interfaces, iORM.DB.Firebird.SqlDataConverter;
+  iORM.DB.Interfaces, System.Rtti,
+  iORM.DB.Firebird.SqlDataConverter;
 
 type
 

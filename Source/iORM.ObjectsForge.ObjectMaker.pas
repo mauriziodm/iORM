@@ -52,7 +52,7 @@ implementation
 
 uses
   iORM.Context.Properties.Interfaces, System.Rtti, iORM.Attributes, iORM,
-  iORM.CommonTypes, iORM.Utilities, System.StrUtils;
+  iORM.CommonTypes, iORM.Utilities;
 
 { TObjectMaker }
 

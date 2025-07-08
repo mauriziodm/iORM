@@ -102,10 +102,10 @@ uses
   iORM.Context.Factory, iORM.Attributes,
   iORM.DB.ConnectionContainer, iORM.DB.Factory, iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory, iORM.Resolver.Interfaces, iORM.ObjectsForge.Factory,
-  iORM.LazyLoad.Factory, iORM.Resolver.Factory, iORM.Where.Factory,
-  iORM.Exceptions, iORM, System.SysUtils, System.Generics.Collections,
-  iORM.Interceptor.CRUD, iORM.Interceptor.CRUD.Register, iORM.Utilities,
-  iORM.SynchroStrategy.Interfaces, iORM.PersistenceStrategy.Factory;
+  iORM.Resolver.Factory,
+  iORM, System.SysUtils, System.Generics.Collections,
+  iORM.Interceptor.CRUD.Register,
+  iORM.PersistenceStrategy.Factory;
 
 type
 

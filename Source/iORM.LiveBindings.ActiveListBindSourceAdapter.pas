@@ -37,11 +37,11 @@ interface
 
 uses
   Data.Bind.ObjectScope, System.Classes,
-  System.Generics.Collections, iORM.Where.SqlItems.Interfaces,
+  System.Generics.Collections,
   iORM.CommonTypes, iORM.Context.Properties.Interfaces,
   iORM.LiveBindings.Interfaces, iORM.LiveBindings.Notification,
-  iORM.LiveBindings.InterfaceListBindSourceAdapter, iORM.Where.Interfaces,
-  iORM.MVVM.Interfaces, System.Rtti;
+  iORM.Where.Interfaces,
+  System.Rtti;
 
 const
   TYPE_OF_COLLECTION = TioTypeOfCollection.tcList;
@@ -208,9 +208,9 @@ type
 implementation
 
 uses
-  iORM, iORM.LiveBindings.Factory, iORM.Context.Interfaces, System.SysUtils, iORM.LazyLoad.Interfaces, iORM.Exceptions, iORM.Utilities,
-  iORM.Context.Map.Interfaces, iORM.Where.Factory, iORM.LiveBindings.CommonBSAPersistence,
-  iORM.LiveBindings.CommonBSABehavior, iORM.Context.Container, iORM.Context.Factory;
+  iORM, iORM.LiveBindings.Factory, System.SysUtils, iORM.LazyLoad.Interfaces, iORM.Exceptions, iORM.Utilities,
+  iORM.Context.Map.Interfaces, iORM.LiveBindings.CommonBSAPersistence,
+  iORM.LiveBindings.CommonBSABehavior, iORM.Context.Container;
 
 { TioActiveListBindSourceAdapter<T> }
 

@@ -45,9 +45,9 @@ uses
   FireDAC.Comp.Client, FireDAC.Stan.Param,
   Data.DB, FireDAC.Stan.Intf, iORM.CommonTypes,
   System.JSON, iORM.Where.Interfaces,
-  FireDAC.Comp.DataSet, iORM.LiveBindings.BSPersistence,
-  iORM.Where.SqlItems.Interfaces, iORM.Context.Map.Interfaces,
-  iORM.SynchroStrategy.Interfaces, iORM.SynchroStrategy.Custom,
+
+
+  iORM.SynchroStrategy.Interfaces,
   iORM.PersistenceStrategy.Interfaces, iORM.Exceptions;
 
 const
@@ -405,9 +405,8 @@ implementation
 
 uses
   iORM.SqlTranslator, iORM.PersistenceStrategy.Factory, System.SysUtils, iORM.Attributes, iORM.Utilities, iORM.SqlItems,
-  System.StrUtils, iORM.Context.Container, iORM.Resolver.Interfaces,
-  iORM.Resolver.Factory, iORM.Interceptor.Strategy.Register,
-  iORM.Context.Factory;
+  iORM.Context.Container,
+  iORM.Interceptor.Strategy.Register;
 
 { TioSqlGenerator }
 

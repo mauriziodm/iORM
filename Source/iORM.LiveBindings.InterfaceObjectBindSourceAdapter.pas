@@ -37,7 +37,7 @@ interface
 
 uses
   Data.Bind.ObjectScope, System.Rtti, System.Classes,
-  iORM.LiveBindings.Interfaces, iORM.CommonTypes;
+  iORM.CommonTypes;
 
 type
 
@@ -95,7 +95,7 @@ type
 implementation
 
 
-uses SysUtils, iORM.Utilities, iORM, iORM.Exceptions,
+uses SysUtils, iORM.Utilities, iORM,
   iORM.Resolver.Factory, iORM.Resolver.Interfaces, iORM.LiveBindings.CommonBSABehavior;
 
 { TInterfaceObjectBindSourceAdapter<T> }

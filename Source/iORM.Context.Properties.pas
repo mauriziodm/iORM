@@ -42,7 +42,7 @@ uses
   iORM.SqlItems,
   System.Rtti,
   System.Generics.Collections, iORM.Context.Table.Interfaces, System.Classes,
-  System.TypInfo, iORM.Context.Interfaces;
+  System.TypInfo;
 
 type
 

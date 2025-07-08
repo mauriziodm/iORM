@@ -53,7 +53,7 @@ implementation
 
 uses
   iORM.COntext.Container, iORM.COntext.Properties.Interfaces, iORM.Attributes, iORM.DBBuilder.Factory,
-  iORM.Resolver.Factory, iORM.Resolver.Interfaces, iORM.Exceptions, System.SysUtils;
+  iORM.Resolver.Factory, iORM.Resolver.Interfaces, System.SysUtils;
 
 { TioDBBuilderSchemaBuilder }
 

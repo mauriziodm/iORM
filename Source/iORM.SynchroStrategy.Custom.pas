@@ -309,8 +309,8 @@ type
 implementation
 
 uses
-  iORM.PersistenceStrategy.Factory, iORM.DB.Interfaces,
-  iORM.Exceptions, iORM.DB.Factory, iORM.LiveBindings.BSPersistence,
+  iORM.PersistenceStrategy.Factory,
+  iORM.Exceptions,
   iORM.Abstraction, iORM;
 
 { TioCustomSynchroStrategy_Client }

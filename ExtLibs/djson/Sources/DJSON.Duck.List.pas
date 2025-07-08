@@ -86,7 +86,7 @@ implementation
 
 uses
   DJSON.Utils.RTTI, DJSON.Exceptions,
-  System.Generics.Collections, System.SysUtils;
+  System.SysUtils;
 
 { TdjDuckList }
 

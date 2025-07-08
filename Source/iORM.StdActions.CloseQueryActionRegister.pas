@@ -56,7 +56,7 @@ type
 implementation
 
 uses
-  iORM.Exceptions, System.SysUtils, System.Classes;
+  System.SysUtils, System.Classes;
 
 { TioCloseQueryActionsRegister }
 

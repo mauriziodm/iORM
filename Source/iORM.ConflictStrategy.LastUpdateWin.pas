@@ -56,7 +56,7 @@ type
 implementation
 
 uses
-  iORM, iORM.Where.Interfaces, iORM.Where.Factory, iORM.CommonTypes;
+  iORM, iORM.CommonTypes;
 
 { TioLastUpdateWin }
 

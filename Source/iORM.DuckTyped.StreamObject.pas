@@ -36,7 +36,7 @@ unit iORM.DuckTyped.StreamObject;
 interface
 
 uses
-  iORM.DuckTyped.Interfaces, System.Classes, System.Rtti, iORM.Attributes;
+  iORM.DuckTyped.Interfaces, System.Classes, System.Rtti;
 
 type
 

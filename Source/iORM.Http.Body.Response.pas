@@ -78,7 +78,7 @@ type
 implementation
 
 uses
-  iORM, System.NetEncoding, iORM.Exceptions, DJSON, System.SysUtils;
+  iORM, System.NetEncoding, DJSON, System.SysUtils;
 
 { TioHttpResponseBody }
 

@@ -36,7 +36,7 @@ unit iORM.DB.Firebird.SqlGenerator;
 interface
 
 uses
-  iORM.DB.SqLite.SqlGenerator, iORM.DB.Interfaces,
+  iORM.DB.Interfaces,
   iORM.Context.Interfaces, iORM.CommonTypes;
 
 type

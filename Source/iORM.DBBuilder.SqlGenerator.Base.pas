@@ -114,7 +114,7 @@ type
 implementation
 
 uses
-  iORM.DB.Factory, iORM.DB.ConnectionContainer, System.SysUtils, System.StrUtils, iORM.CommonTypes, iORM.SqlTranslator, iORM.Exceptions;
+  iORM.DB.Factory, iORM.DB.ConnectionContainer, System.SysUtils, System.StrUtils, iORM.CommonTypes, iORM.SqlTranslator;
 
 { TioDBBuilderSqlGenBase }
 

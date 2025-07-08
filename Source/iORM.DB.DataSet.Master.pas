@@ -157,8 +157,7 @@ type
 implementation
 
 uses
-  System.SysUtils, iORM.LiveBindings.BSPersistence.SmartUpdateDetection,
-  iORM.LiveBindings.Notification;
+  System.SysUtils, iORM.LiveBindings.BSPersistence.SmartUpdateDetection;
 
 { TioDataSetMaster }
 

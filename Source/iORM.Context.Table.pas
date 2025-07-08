@@ -36,7 +36,7 @@ unit iORM.Context.Table;
 interface
 
 uses
-  iORM.Context.Interfaces,
+
   iORM.SqlItems, iORM.Context.Table.Interfaces, iORM.Attributes,
   iORM.CommonTypes, System.Generics.Collections, System.Rtti;
 
@@ -201,7 +201,7 @@ type
 implementation
 
 uses
-  iORM.DB.Factory, System.SysUtils, iORM.Exceptions, iORM.SqlTranslator, System.StrUtils,
+  iORM.DB.Factory, System.SysUtils, iORM.SqlTranslator, System.StrUtils,
   iORM.ConflictStrategy.SameVersionWin, iORM.Abstraction;
 
 { TioContextTable }

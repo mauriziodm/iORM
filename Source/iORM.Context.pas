@@ -39,7 +39,7 @@ uses
   iORM.Context.Properties.Interfaces,
   iORM.Context.Interfaces,
   iORM.CommonTypes,
-  iORM.Where, iORM.Context.Table.Interfaces, System.Rtti,
+  iORM.Context.Table.Interfaces, System.Rtti,
   iORM.Context.Map.Interfaces, iORM.Where.Interfaces,
   iORM.LiveBindings.BSPersistence, iORM.ConflictStrategy.Interfaces,
   iORM.SynchroStrategy.Interfaces, iORM.Attributes,
@@ -277,10 +277,10 @@ type
 implementation
 
 uses
-  iORM.Context.Factory, iORM.DB.Factory, System.TypInfo,
+  System.TypInfo,
   iORM.Context.Container, System.SysUtils, iORM.Exceptions,
   System.StrUtils, iORM.DB.Interfaces, iORM, iORM.DB.ConnectionContainer,
-  iORM.Utilities, iORM.SynchroStrategy.Custom, iORM.Abstraction;
+  iORM.Utilities, iORM.Abstraction;
 
 { TioContext }
 

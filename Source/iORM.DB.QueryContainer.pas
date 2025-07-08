@@ -36,8 +36,8 @@ unit iORM.DB.QueryContainer;
 interface
 
 uses
-  iORM.DB.Interfaces, iORM.Context.Interfaces,
-  iORM.Context.Properties.Interfaces, System.Generics.Collections;
+  iORM.DB.Interfaces,
+  System.Generics.Collections;
 
 type
 

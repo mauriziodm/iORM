@@ -15,7 +15,7 @@ type
 implementation
 
 uses
-  iORM, iORM.Exceptions, iORM.StdActions.Fmx,
+  iORM,
   System.SysUtils;
 
 { TioStdActionCommonBehaviour }

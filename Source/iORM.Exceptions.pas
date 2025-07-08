@@ -36,8 +36,7 @@ unit iORM.Exceptions;
 interface
 
 uses
-  System.SysUtils, iORM.Context.Interfaces,
-  iORM.LiveBindings.BSPersistence;
+  System.SysUtils, iORM.Context.Interfaces;
 
 type
 

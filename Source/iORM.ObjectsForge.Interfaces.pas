@@ -40,8 +40,8 @@ uses
   iORM.Context.Interfaces,
   iORM.DB.Interfaces,
   System.Rtti, iORM.CommonTypes,
-  iORM.MVVM.Interfaces,
-  iORM.DependencyInjection.Implementers, iORM.DependencyInjection.Types;
+
+  iORM.DependencyInjection.Types;
 
 type
   // ClassRef to ObjectMaker
@@ -77,11 +77,11 @@ implementation
 uses
   System.TypInfo, iORM.Exceptions, iORM, iORM.RttiContext.Factory,
   iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, System.Classes,
-  Data.DB, iORM.LazyLoad.Interfaces, System.SysUtils, iORM.Attributes,
-  iORM.Resolver.Interfaces, iORM.Resolver.Factory, System.JSON,
-  iORM.ObjectsForge.Factory, iORM.Context.Container, iORM.Utilities,
-  iORM.LiveBindings.Interfaces, iORM.MVVM.ModelPresenter.Custom,
-  iORM.Where.Interfaces, iORM.MVVM.ViewModelBridge, iORM.MVVM.ViewModel,
+  Data.DB, System.SysUtils,
+  System.JSON,
+  iORM.Context.Container, iORM.Utilities,
+  iORM.LiveBindings.Interfaces,
+  iORM.Where.Interfaces,
   DJSON, iORM.LiveBindings.BSPersistence;
 
 { TioObjectMakerIntf }

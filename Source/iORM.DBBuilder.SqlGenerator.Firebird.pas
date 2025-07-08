@@ -83,7 +83,7 @@ implementation
 
 uses
   iORM.Context.Properties.Interfaces, iORM.Exceptions, System.SysUtils, iORM.DB.Factory, iORM.DB.Interfaces, System.StrUtils,
-  iORM.CommonTypes, iORM.SqlTranslator;
+  iORM.CommonTypes;
 
 { TioDBBuilderSqlGenFirebird }
 

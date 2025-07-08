@@ -36,7 +36,7 @@ unit iORM.MVVM.ViewRegisterItem;
 interface
 
 uses
-  System.Classes, iORM.MVVM.ViewContextProvider, System.Generics.Collections, System.SysUtils;
+  System.Classes, iORM.MVVM.ViewContextProvider, System.SysUtils;
 
 type
 

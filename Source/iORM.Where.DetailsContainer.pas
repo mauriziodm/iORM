@@ -36,7 +36,7 @@ unit iORM.Where.DetailsContainer;
 interface
 
 uses
-  iORM.Where.Interfaces, iORM.Where;
+  iORM.Where.Interfaces;
 
 type
 

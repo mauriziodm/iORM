@@ -65,7 +65,7 @@ type
 implementation
 
 uses
-  iORM, iORM.Where.Factory, System.SysUtils, iORM.Exceptions,
+  iORM, iORM.Where.Factory, System.SysUtils,
   iORM.RttiContext.Factory;
 
 { TioLazyObject }

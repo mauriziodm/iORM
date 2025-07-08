@@ -81,7 +81,7 @@ uses
   iORM.Context, iORM.Context.Properties,
   System.SysUtils, iORM.Context.Table,
   iORM.RttiContext.Factory, iORM.Context.Container, iORM.Context.Map,
-  System.StrUtils, iORM.Exceptions, System.TypInfo, iORM.Utilities,
+  iORM.Exceptions, System.TypInfo, iORM.Utilities,
   iORM.DuckTyped.Factory, iORM.Resolver.Interfaces, iORM.Resolver.Factory,
   iORM.ETM.Engine, iORM.ConflictStrategy.Interfaces;
 

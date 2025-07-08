@@ -60,7 +60,7 @@ type
 implementation
 
 uses
-  System.SysUtils, system.TypInfo, iORM.DBBuilder.Factory, iORM.DBBuilder.Schema, iORM.Exceptions, iORM.DB.Factory;
+  System.SysUtils, system.TypInfo, iORM.DBBuilder.Factory, iORM.Exceptions, iORM.DB.Factory;
 
 { TioDBBuilderEngine }
 

@@ -205,8 +205,8 @@ type
 implementation
 
 uses
-  DJSON.Factory, DJSON.Utils.RTTI, DJSON.Engine.DOM, DJSON.Constants, DJSON.Exceptions,
-  DJSON.Engine.Stream, DJSON.Engine.Stream.BSON, DJSON.Utils;
+  DJSON.Factory, DJSON.Utils.RTTI, DJSON.Engine.DOM,
+  DJSON.Engine.Stream.BSON, DJSON.Utils;
 
 { dj }
 

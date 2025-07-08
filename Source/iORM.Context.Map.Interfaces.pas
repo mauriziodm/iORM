@@ -37,8 +37,7 @@ interface
 
 uses
   iORM.CommonTypes, iORM.Context.Table.Interfaces,
-  iORM.Context.Properties.Interfaces, System.Rtti,
-  iORM.DependencyInjection.Implementers;
+  iORM.Context.Properties.Interfaces, System.Rtti;
 
 const
   //  Note: TCVM stands for  "True Class Virtual Map"

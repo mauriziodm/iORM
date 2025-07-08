@@ -153,7 +153,7 @@ type
 implementation
 
 uses
-  System.Classes, iORM.Exceptions, iORM.Utilities, iORM.DB.Factory,
+  System.Classes, iORM.Exceptions, iORM.Utilities,
   iORM.Abstraction;
 
 { TioConnectionContainer }

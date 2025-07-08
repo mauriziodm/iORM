@@ -60,7 +60,7 @@ type
 implementation
 
 uses
-  iORM, DJSON, iORM.Http.Factory, iORM.Http.Interfaces, iORM.Exceptions,
+  iORM, iORM.Http.Factory, iORM.Exceptions,
   System.SysUtils, System.JSON, FireDAC.Comp.Client, FireDAC.Stan.Intf,
   System.Generics.Collections, iORM.Utilities, iORM.SynchroStrategy.Custom,
   iORM.PersistenceStrategy.Factory;

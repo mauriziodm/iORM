@@ -37,7 +37,7 @@ interface
 
 uses
   iORM.LiveBindings.Interfaces, iORM.CommonTypes, Data.Bind.ObjectScope,
-  System.Classes, iORM.Where, iORM.Where.Interfaces,
+  System.Classes, iORM.Where.Interfaces,
   iORM.LiveBindings.Notification;
 
 type
@@ -75,8 +75,8 @@ type
 implementation
 
 uses
-  iORM.Attributes, iORM.LiveBindings.ActiveObjectBindSourceAdapter,
-  iORM.LiveBindings.ActiveListBindSourceAdapter, System.Generics.Collections,
+  iORM.Attributes,
+  System.Generics.Collections,
   iORM.Exceptions, iORM.LiveBindings.Factory, iORM, System.SysUtils,
   iORM.Context.Map.Interfaces, iORM.Context.Container,
   iORM.Context.Properties.Interfaces;

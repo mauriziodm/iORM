@@ -107,7 +107,7 @@ uses
   iORM.Attributes, iORM.DB.Factory, iORM.Interfaces,
   iORM.Where.SqlItems.Interfaces, System.SysUtils, iORM.DuckTyped.Interfaces,
   iORM.Exceptions, iORM.DuckTyped.Factory, System.JSON, iORM.Utilities,
-  iORM.ObjectsForge.Factory, DJSON, iORM.DependencyInjection, iORM,
+  DJSON, iORM.DependencyInjection, iORM,
   iORM.DB.ConnectionContainer;
 
 { TioFDQuery }

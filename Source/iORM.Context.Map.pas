@@ -38,7 +38,7 @@ interface
 uses
   iORM.CommonTypes, iORM.Context.Table.Interfaces,
   iORM.Context.Properties.Interfaces, System.Rtti,
-  iORM.Context.Map.Interfaces, iORM.DependencyInjection.Implementers;
+  iORM.Context.Map.Interfaces;
 
 type
 
@@ -83,7 +83,7 @@ type
 implementation
 
 uses
-  iORM.Context.Container, iORM.Context.Properties, iORM.Exceptions;
+  iORM.Context.Container, iORM.Context.Properties;
 
 { TioMap }
 

@@ -87,8 +87,7 @@ type
 implementation
 
 uses
-  iORM, iORM.Context.Properties.Interfaces, System.SysUtils, System.StrUtils, iORM.DB.Interfaces, iORM.CommonTypes, iORM.SqlTranslator,
-  iORM.Exceptions;
+  iORM, iORM.Context.Properties.Interfaces, System.SysUtils, System.StrUtils, iORM.DB.Interfaces, iORM.CommonTypes;
 
 { TioDBBuilderSqlGenFirebird }
 

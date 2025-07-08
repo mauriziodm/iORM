@@ -36,7 +36,7 @@ unit iORM.StdActions.Interfaces;
 interface
 
 uses
-  System.Classes, iORM.CommonTypes, System.Generics.Collections;
+  System.Classes, iORM.CommonTypes;
 
 type
 
@@ -90,9 +90,8 @@ implementation
 
 uses
   System.SysUtils, System.Rtti, iORM.RttiContext.Factory,
-  iORM.Exceptions, iORM.MVVM.ViewModelBridge,
-  iORM.StdActions.CloseQueryActionRegister,
-  System.TypInfo;
+  iORM.Exceptions,
+  iORM.StdActions.CloseQueryActionRegister;
 
 { TioBSCloseQueryCommonBehaviour }
 

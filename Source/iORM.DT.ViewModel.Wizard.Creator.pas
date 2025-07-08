@@ -82,7 +82,7 @@ type
 implementation
 
 uses
-  System.SysUtils, System.IOUtils, iORM.DT.Wizard.Utils;
+  System.SysUtils, iORM.DT.Wizard.Utils;
 
 { TioViewModelWizardCreator }
 

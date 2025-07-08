@@ -40,7 +40,7 @@ uses
   iORM.DuckTyped.Factory, iORM.LazyLoad.Factory,
   iORM.LiveBindings.Factory, iORM.ObjectsForge.Factory,
   iORM.RttiContext.Factory, iORM.MVVM.Factory,
-  iORM.Where.Factory, iORM.PersistenceStrategy.Interfaces, iORM.PersistenceStrategy.Factory,
+  iORM.Where.Factory, iORM.PersistenceStrategy.Factory,
   iORM.DBBuilder.Factory;
 
 Type

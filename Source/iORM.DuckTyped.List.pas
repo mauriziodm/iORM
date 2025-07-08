@@ -87,7 +87,7 @@ type
 implementation
 
 uses
-  iORM.Exceptions, iORM.RttiContext.Factory, iORM.Utilities, iORM.Attributes;
+  iORM.Exceptions, iORM.RttiContext.Factory, iORM.Utilities;
 
 { TioDuckTypedList }
 

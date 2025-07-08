@@ -39,7 +39,7 @@ uses
   iORM.Context.Properties.Interfaces, iORM.Context.Table.Interfaces,
   iORM.Where.SqlItems.Interfaces, System.Generics.Collections,
   iORM.Interfaces, System.Rtti,
-  iORM.CommonTypes, iORM.Resolver.Interfaces, System.Classes,
+  iORM.CommonTypes, System.Classes,
   Data.Bind.ObjectScope, iORM.Where.Destinations,
   iORM.Context.Map.Interfaces, FireDAC.Comp.Client, System.TypInfo,
   iORM.StdActions.Interfaces;

@@ -75,7 +75,7 @@ type
 implementation
 
 uses
-  Data.Bind.ObjectScope, System.SysUtils, iORM.Exceptions, iORM.Utilities,
+  Data.Bind.ObjectScope, System.SysUtils, iORM.Exceptions,
   iORM, iORM.Where.Factory;
 
 { TioCommonBSBehavior }

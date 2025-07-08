@@ -58,7 +58,7 @@ type
 implementation
 
 uses
-  SysUtils, iORM.Context.Interfaces, iORM.Context.Factory,
+  SysUtils,
   iORM.Context.Container, iORM.Context.Map.Interfaces,
   iORM.Exceptions;
 

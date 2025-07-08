@@ -85,7 +85,7 @@ implementation
 
 uses
   System.SysUtils, iORM.DB.Interfaces, iORM.Context.Properties.Interfaces, iORM.Exceptions, System.StrUtils, iORM.CommonTypes,
-  System.Classes, iORM.SqlTranslator;
+  System.Classes;
 
 { TioDBBuilderSqlGenSQLite }
 

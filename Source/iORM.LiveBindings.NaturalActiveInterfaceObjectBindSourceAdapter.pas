@@ -67,7 +67,7 @@ implementation
 uses
   Data.Bind.ObjectScope, iORM.LiveBindings.CommonBSAPersistence,
   System.SysUtils, iORM.LiveBindings.CommonBSABehavior,
-  iORM.LiveBindings.BSPersistence, iORM.Utilities, iORM.DuckTyped.Interfaces,
+  iORM.LiveBindings.BSPersistence, iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory, iORM.Exceptions;
 
 { TioNaturalActiveInterfaceObjectBindSourceAdapter }

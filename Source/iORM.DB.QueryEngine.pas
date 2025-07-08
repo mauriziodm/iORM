@@ -36,7 +36,7 @@ unit iORM.DB.QueryEngine;
 interface
 
 uses
-  iORM.Context.Interfaces, iORM.DB.Interfaces, iORM.Where,
+  iORM.Context.Interfaces, iORM.DB.Interfaces,
   iORM.CommonTypes, iORM.Context.Properties.Interfaces;
 
 type
@@ -74,9 +74,9 @@ implementation
 
 uses
   iORM.DB.Factory, FireDac.Stan.Param, System.Rtti,
-  iORM.Attributes, Data.DB, iORM.Interfaces, SysUtils,
-  iORM.Where.SqlItems.Interfaces, iORM.DB.ConnectionContainer,
-  System.ioUtils, iORM.Exceptions, iORM.Context.Factory;
+  iORM.Attributes, Data.DB, SysUtils,
+  iORM.DB.ConnectionContainer,
+  iORM.Context.Factory;
 
 { TioQueryEngine }
 

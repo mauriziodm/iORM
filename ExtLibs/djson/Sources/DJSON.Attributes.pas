@@ -126,7 +126,7 @@ type
 implementation
 
 uses
-  System.SysUtils, DJSON.Utils.Rtti, System.Generics.Collections;
+  System.SysUtils, DJSON.Utils.Rtti;
 
 { djEncodingAttribute }
 

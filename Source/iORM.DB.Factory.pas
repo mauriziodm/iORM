@@ -37,11 +37,11 @@ interface
 
 uses
   iORM.Where.SqlItems.Interfaces,
-  iORM.ObjectsForge.Interfaces,
+
   iORM.DB.Interfaces,
   System.Classes,
   System.Rtti, iORM.DB.ConnectionContainer, iORM.CommonTypes,
-  iORM.Context.Interfaces, iORM.Context.Properties.Interfaces,
+
   iORM.DB.QueryEngine;
 
 type
@@ -74,7 +74,7 @@ type
 implementation
 
 uses
-  System.IOUtils, iORM.DB.Connection, iORM.DB.SqLite.SqlDataConverter, iORM.DB.SqLite.SqlGenerator, iORM.Where.SqlItems, System.SysUtils,
+  iORM.DB.Connection, iORM.DB.SqLite.SqlDataConverter, iORM.DB.SqLite.SqlGenerator, iORM.Where.SqlItems, System.SysUtils,
   iORM.DB.QueryContainer, iORM.DB.TransactionCollection, iORM.DB.Firebird.SqlDataConverter, iORM.Exceptions, iORM.DB.Firebird.SqlGenerator,
 {$IFNDEF ioDelphiProfessional}
   iORM.DB.MSSqlServer.SqlGenerator, iORM.DB.MSSqlServer.SqlDataConverter,

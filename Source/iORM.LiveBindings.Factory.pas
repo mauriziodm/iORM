@@ -37,8 +37,8 @@ interface
 
 uses
   iORM.LiveBindings.Interfaces, iORM.CommonTypes, System.Classes, System.Generics.Collections, iORM.Context.Properties.Interfaces,
-  Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource.Custom, iORM.Utilities, iORM.MVVM.Interfaces, iORM.Where,
-  iORM.Where.Interfaces, iORM.MVVM.ModelPresenter.Custom, iORM.LiveBindings.CommonBSAPaging;
+  Data.Bind.ObjectScope, iORM.Utilities,
+  iORM.Where.Interfaces, iORM.LiveBindings.CommonBSAPaging;
 
 type
 
@@ -72,8 +72,8 @@ uses
   iORM.LiveBindings.ActiveListBindSourceAdapter,
   iORM.LiveBindings.ActiveObjectBindSourceAdapter,
   iORM.LiveBindings.NaturalActiveObjectBindSourceAdapter,
-  iORM.Context.Container, iORM.Context.Interfaces,
-  iORM.Resolver.Interfaces, iORM.Resolver.Factory, iORM.Context.Factory,
+  iORM.Context.Container,
+
   iORM.LiveBindings.ActiveInterfaceListBindSourceAdapter,
   iORM.LiveBindings.ActiveInterfaceObjectBindSourceAdapter,
   System.SysUtils, iORM.Exceptions, iORM.LiveBindings.BSAToDataSetLink,

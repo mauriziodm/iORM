@@ -215,7 +215,7 @@ uses
   iORM.DB.Interfaces, iORM.DB.Factory, iORM.Exceptions,
   iORM.Context.Map.Interfaces, iORM.Context.Container,
   iORM.DB.ConnectionContainer, iORM.Where.Factory, iORM.Utilities,
-  iORM.LiveBindings.BSPersistence, DJSON, DJSON.Params, iORM.Resolver.Factory,
+  DJSON, DJSON.Params,
   iORM.PersistenceStrategy.Interfaces, iORM.PersistenceStrategy.Factory;
 
 { TioEtmBasetSynchroStrategy_LogItem }

@@ -3,7 +3,7 @@ unit iORM.PersistenceStrategy.Request;
 interface
 
 uses
-  iORM.Attributes, iORM.CommonTypes, iORM.PersistenceStrategy.Interfaces,
+  iORM.CommonTypes, iORM.PersistenceStrategy.Interfaces,
   System.Rtti, iORM.LiveBindings.BSPersistence, iORM.Where.Interfaces,
   iORM.Abstraction.SessionData.Interfaces;
 

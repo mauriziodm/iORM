@@ -56,8 +56,8 @@ type
 implementation
 
 uses
-  System.Classes, iORM.DB.Factory, iORM.Context.Properties.Interfaces,
-  iORM.Attributes, iORM.Exceptions, System.IOUtils, System.SysUtils,
+  System.Classes, iORM.Context.Properties.Interfaces,
+  System.SysUtils,
   iORM.SqlTranslator;
 
 { TioSqlGeneratorSqLite }

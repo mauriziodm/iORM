@@ -69,7 +69,7 @@ uses
   System.DateUtils,
   System.TypInfo,
   DJSON.Attributes,
-  DJSON.Utils.RTTI, System.JSON, REST.Json;
+  DJSON.Utils.RTTI, System.JSON;
 
 { TdjUtils }
 

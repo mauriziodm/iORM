@@ -37,9 +37,9 @@ interface
 
 uses
   iORM.CommonTypes, System.Generics.Collections, iORM.MVVM.Interfaces, System.SyncObjs, System.Rtti,
-  iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.Interfaces, iORM.Resolver.Interfaces, iORM.Context.Container,
+  iORM.LiveBindings.Interfaces, iORM.Resolver.Interfaces, iORM.Context.Container,
   iORM.DependencyInjection.Singletons, iORM.DependencyInjection.Implementers, iORM.MVVM.ViewContextProvider,
-  iORM.MVVM.ModelPresenter.Custom, iORM.Where.Interfaces, System.Classes, iORM.StdActions.Interfaces,
+  iORM.Where.Interfaces, System.Classes, iORM.StdActions.Interfaces,
   System.SysUtils, iORM.LiveBindings.BSPersistence,
   iORM.DependencyInjection.Types;
 
@@ -475,9 +475,9 @@ implementation
 
 uses
   iORM, iORM.Exceptions, System.TypInfo, iORM.ObjectsForge.ObjectMaker, iORM.Utilities, iORM.Resolver.Factory, iORM.RttiContext.Factory,
-  iORM.Context.Map.Interfaces, iORM.DependencyInjection.ViewModelShuttleContainer, iORM.Attributes, iORM.Where.Factory,
+  iORM.Context.Map.Interfaces, iORM.DependencyInjection.ViewModelShuttleContainer,
   iORM.MVVM.ViewContextProviderContainer, iORM.ObjectsForge.Interfaces, iORM.MVVM.ViewModelBridge,
-  iORM.LiveBindings.CommonBSBehavior, DJSON, iORM.MVVM.ViewModel,
+  iORM.LiveBindings.CommonBSBehavior, iORM.MVVM.ViewModel,
   iORM.Abstraction;
 
 { TioDependencyInjectionBase }

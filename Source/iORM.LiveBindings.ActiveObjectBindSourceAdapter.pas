@@ -38,7 +38,7 @@ interface
 uses
   Data.Bind.ObjectScope, iORM.CommonTypes, System.Classes, System.Generics.Collections,
   iORM.Context.Properties.Interfaces, iORM.LiveBindings.Interfaces,
-  iORM.LiveBindings.Notification, iORM.Where.Interfaces, iORM.MVVM.Interfaces,
+  iORM.LiveBindings.Notification, iORM.Where.Interfaces,
   System.Rtti;
 
 const
@@ -198,9 +198,9 @@ implementation
 uses
   iORM, System.SysUtils,
   iORM.LiveBindings.Factory, iORM.Context.Map.Interfaces,
-  iORM.Where.Factory, iORM.Exceptions, iORM.LiveBindings.CommonBSAPersistence,
+  iORM.Exceptions, iORM.LiveBindings.CommonBSAPersistence,
   iORM.LiveBindings.CommonBSABehavior, iORM.Context.Container,
-  iORM.Context.Factory, iORM.Utilities;
+  iORM.Utilities;
 
 { TioActiveListBindSourceAdapter<T> }
 

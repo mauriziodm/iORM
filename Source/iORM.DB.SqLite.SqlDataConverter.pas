@@ -59,7 +59,7 @@ type
 implementation
 
 uses
-  System.SysUtils, System.StrUtils, System.TypInfo, iORM.Attributes, Data.DB, FireDac.Stan.Param;
+  System.SysUtils, System.StrUtils, System.TypInfo, Data.DB, FireDac.Stan.Param;
 
 { TioSqlConverterSqLite }
 

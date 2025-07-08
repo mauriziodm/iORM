@@ -38,10 +38,18 @@ interface
 uses
   System.Classes, System.SysUtils, System.Rtti, iORM.CommonTypes,
   System.Generics.Collections, iORM.Abstraction.SessionData.Interfaces,
-  iORM.PersistenceStrategy.Interfaces;
+  iORM.PersistenceStrategy.Interfaces, iORM.Context.Interfaces;
 
 type
   TioProjectPlatform = (ppVCL, ppFMX, ppUniGUI);
+
+  // show-hide wait related methods
+  TioShowWaitMethod = reference to Procedure;
+  TioHideWaitMethod = reference to Procedure;
+
+  // access-token related methods
+  TioAccessTokenProviderMethod = reference to Function: String;
+  TioAccessTokenValidateMethod = reference to Function(const AAccessToken: String; const AContext: IioContext): Boolean;
 
   TioCustomPlatformAbstractionComponent = class(TComponent)
   private
@@ -107,8 +115,8 @@ type
   TioApplication = class abstract
   private
     class var _FConcreteClass_NoDirectCall: TioApplicationRef;
-    class var FShowWaitProc: TProc;
-    class var FHideWaitProc: TProc;
+    class var FHideWaitMethod: TioHideWaitMethod;
+    class var FShowWaitMethod: TioShowWaitMethod;
   protected
     // --------- methods to be ovverrided by descendants ----------
     class function _GetSessionDataStore: TioCustomSessionDataStoreRef; virtual; abstract;
@@ -120,16 +128,24 @@ type
     class procedure _SetConcreteClass(const AClass: TioApplicationRef);
   public
     class var _FConcreteSessionDataStoreClass_NoDirectCall: TioCustomSessionDataStoreRef; // public for inline, do not use directly
+    class var _FAccessTokenProviderMethod: TioAccessTokenProviderMethod; // public for inline, do not use directly
+    class var _FAccessTokenValidateMethod: TioAccessTokenValidateMethod; // public for inline, do not use directly
+    class constructor Create;
     class function _GetConcreteClass_NoDirectCall: TioApplicationRef; // public for inline, do not use directly
     class procedure CheckIfAbstractionLayerComponentExists; inline;
     class procedure HandleException(const Sender: TObject); inline;
-    class procedure HideWait; static;
     class function ProjectPlatform: TioProjectPlatform; inline;
     class function SessionDataStore: TioCustomSessionDataStoreRef; inline;
-    class procedure SetShowHideWaitProc(const AShowWaitProc: TProc; const AHideWaitProc: TProc); static;
     class procedure ShowMessage(const AMessage: string); inline;
-    class procedure ShowWait; static;
     class function Terminate: Boolean; inline;
+    // Show-Hide Wait related methods
+    class procedure SetWaitMethods(const AShowWaitMethod: TioShowWaitMethod; const AHideWaitMethod: TioHideWaitMethod); static;
+    class procedure ShowWait; static;
+    class procedure HideWait; static;
+    // Access-token related methods
+    class procedure SetAccessTokenMethods(const AAccessTokenProviderMethod: TioAccessTokenProviderMethod; const AAccessTokenValidateMethod: TioAccessTokenValidateMethod); static;
+    class function ProvideAccessToken: String; inline; static;
+    class function ValidateAccessToken(const AAccessToken: String; const AContext: IioContext): Boolean; inline; static;
   end;
 
   TioControlRef = class of TioControl;
@@ -329,6 +345,14 @@ begin
   Result := _FConcreteClass_NoDirectCall;
 end;
 
+class constructor TioApplication.Create;
+begin
+  _FConcreteClass_NoDirectCall := nil;
+  FHideWaitMethod := nil;
+  FShowWaitMethod := nil;
+  SetAccessTokenMethods(nil, nil);
+end;
+
 class procedure TioApplication.HandleException(const Sender: TObject);
 begin
   _GetConcreteClass_NoDirectCall._HandleException(Sender);
@@ -336,13 +360,18 @@ end;
 
 class procedure TioApplication.HideWait;
 begin
-  if Assigned(FHideWaitProc) then
-    FHideWaitProc;
+  if Assigned(FHideWaitMethod) then
+    FHideWaitMethod;
 end;
 
 class function TioApplication.ProjectPlatform: TioProjectPlatform;
 begin
   Result := _GetConcreteClass_NoDirectCall._ProjectPlatform;
+end;
+
+class function TioApplication.ProvideAccessToken: String;
+begin
+  Result := _FAccessTokenProviderMethod;
 end;
 
 class procedure TioApplication._SetConcreteClass(const AClass: TioApplicationRef);
@@ -355,10 +384,37 @@ begin
   Result := _FConcreteSessionDataStoreClass_NoDirectCall;
 end;
 
-class procedure TioApplication.SetShowHideWaitProc(const AShowWaitProc, AHideWaitProc: TProc);
+class procedure TioApplication.SetAccessTokenMethods(const AAccessTokenProviderMethod: TioAccessTokenProviderMethod; const AAccessTokenValidateMethod: TioAccessTokenValidateMethod);
 begin
-  FShowWaitProc := AShowWaitProc;
-  FHideWaitProc := AHideWaitProc;
+  _FAccessTokenProviderMethod := AAccessTokenProviderMethod;
+  _FAccessTokenValidateMethod := AAccessTokenValidateMethod;
+
+  // set the token provider method
+  if Assigned(AAccessTokenProviderMethod) then
+    _FAccessTokenProviderMethod := AAccessTokenProviderMethod
+  else
+  begin
+    _FAccessTokenProviderMethod := function: String
+      begin
+        Result := String.Empty;
+      end;
+  end;
+  // set the token validate method
+  if Assigned(AAccessTokenValidateMethod) then
+    _FAccessTokenValidateMethod := AAccessTokenValidateMethod
+  else
+  begin
+    _FAccessTokenValidateMethod := function(const AAccessToken: String; const AContext: IioContext): Boolean
+      begin
+        Result := True;
+      end;
+  end;
+end;
+
+class procedure TioApplication.SetWaitMethods(const AShowWaitMethod: TioShowWaitMethod; const AHideWaitMethod: TioHideWaitMethod);
+begin
+  FShowWaitMethod := AShowWaitMethod;
+  FHideWaitMethod := AHideWaitMethod;
 end;
 
 class procedure TioApplication.ShowMessage(const AMessage: string);
@@ -368,13 +424,18 @@ end;
 
 class procedure TioApplication.ShowWait;
 begin
-  if Assigned(FShowWaitProc) then
-    FShowWaitProc;
+  if Assigned(FShowWaitMethod) then
+    FShowWaitMethod;
 end;
 
 class function TioApplication.Terminate: Boolean;
 begin
   Result := _GetConcreteClass_NoDirectCall._Terminate;
+end;
+
+class function TioApplication.ValidateAccessToken(const AAccessToken: String; const AContext: IioContext): Boolean;
+begin
+  Result := _FAccessTokenValidateMethod(AAccessToken, AContext);
 end;
 
 { TioAction }

@@ -57,7 +57,7 @@ type
 implementation
 
 uses
-  iORM, iORM.DB.Factory, iORM.DB.Interfaces, iORM.DB.ConnectionContainer;
+  iORM, iORM.DB.Interfaces, iORM.DB.ConnectionContainer;
 
 { TioDBBuilderDBAnalyzer }
 

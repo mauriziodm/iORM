@@ -39,7 +39,7 @@ interface
 uses
   System.JSON,
   System.Rtti,
-  System.Generics.Collections,
+
   DJSON.Params,
   DJSON.Duck.Interfaces;
 
@@ -97,7 +97,7 @@ implementation
 uses
 {$REGION 'System'}
   System.SysUtils,
-  System.DateUtils,
+
   System.NetEncoding,
   System.Classes,
   System.TypInfo,
@@ -109,7 +109,7 @@ uses
   DJSON.Serializers,
   DJSON.Constants,
   DJSON.Attributes,
-  DJSON.Factory,
+
   DJSON.Utils,
   DJSON.TypeInfoCache
 {$ENDREGION}

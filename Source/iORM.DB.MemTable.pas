@@ -69,7 +69,7 @@ type
 implementation
 
 uses
-  iORM, iORM.Where.Factory;
+  iORM;
 
 { TioMemTable }
 

@@ -36,7 +36,7 @@ unit iORM.Http.Connection;
 interface
 
 uses
-  iORM.DB.Connection, iORM.DB.Interfaces, iORM.Http.Interfaces, REST.Client,
+  iORM.DB.Connection, iORM.DB.Interfaces, REST.Client,
   iORM.PersistenceStrategy.Interfaces;
 
 type

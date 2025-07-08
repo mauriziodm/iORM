@@ -120,7 +120,7 @@ uses
 {$REGION 'System'}
   System.SysUtils,
   System.JSON.Types,
-  System.JSON.BSON,
+
   System.NetEncoding,
   System.TypInfo,
 {$ENDREGION}
@@ -131,7 +131,7 @@ uses
   DJSON.Attributes,
   DJSON.Exceptions,
   DJSON.Utils,
-  DJSON.Factory,
+
   DJSON.TypeInfoCache,
   DJSON.Serializers;
 {$ENDREGION}

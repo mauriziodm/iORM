@@ -169,9 +169,7 @@ type
 implementation
 
 uses
-  System.SysUtils, iORM.LiveBindings.BSPersistence.SmartUpdateDetection,
-  iORM.LiveBindings.Notification,
-  iORM.Where.Factory;
+  System.SysUtils, iORM.LiveBindings.BSPersistence.SmartUpdateDetection;
 
 { TioPrototypeBindSourceMaster }
 

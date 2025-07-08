@@ -203,7 +203,7 @@ type
 implementation
 
 uses
-  iORM.Exceptions, System.TypInfo;
+  iORM.Exceptions;
 
 { ioNullable<T> }
 

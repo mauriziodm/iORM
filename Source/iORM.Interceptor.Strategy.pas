@@ -41,7 +41,7 @@ unit iORM.Interceptor.Strategy;
 interface
 
 uses
-  iORM.Where.Interfaces, iORM.PersistenceStrategy.Interfaces;
+  iORM.PersistenceStrategy.Interfaces;
 
 type
 

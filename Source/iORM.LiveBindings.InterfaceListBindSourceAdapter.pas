@@ -38,7 +38,7 @@ interface
 uses
   Data.Bind.ObjectScope, System.Classes, System.Rtti,
   System.Generics.Collections,
-  iORM.LiveBindings.Interfaces, iORM.CommonTypes;
+  iORM.CommonTypes;
 
 type
 
@@ -105,7 +105,7 @@ type
 implementation
 
 uses Data.Bind.Consts, System.SysUtils, iORM.Utilities, System.TypInfo, iORM,
-  iORM.Resolver.Factory, iORM.Resolver.Interfaces, iORM.Exceptions,
+  iORM.Resolver.Factory, iORM.Resolver.Interfaces,
   iORM.LiveBindings.CommonBSABehavior;
 
 { TListBindSourceAdapter<T> }
