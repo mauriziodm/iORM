@@ -39,7 +39,7 @@ type
 implementation
 
 uses
-  iORM;
+  iORM.Abstraction;
 
 { TioAsyncExecutor<T> }
 
@@ -54,7 +54,7 @@ begin
   OnTerminate := OnTerminateEventHandler;
   FreeOnTerminate := True;
   if AShowWait then
-    io.ShowWait;
+    TioApplication.ShowWait;
 end;
 
 procedure TioAsyncFunc<T>.Execute;
@@ -77,7 +77,7 @@ begin
     if Assigned(FException) then
     begin
       if FShowWait then
-        io.HideWait;
+        TioApplication.HideWait;
       if Assigned(FOnExceptionMethod) then
         FOnExceptionMethod(FException)
       else
@@ -89,7 +89,7 @@ begin
         FOnSuccessMethod(FResultValue);
   finally
     if FShowWait then
-      io.HideWait;
+      TioApplication.HideWait;
   end;
 end;
 
@@ -101,14 +101,14 @@ var
   LResultValue: T;
 begin
   if AShowWait then
-    io.ShowWait;
+    TioApplication.ShowWait;
   try try
     LResultValue := AOnExecute;
     if Assigned(AOnSuccess) then
       AOnSuccess(LResultValue);
   finally
     if AShowWait then
-      io.HideWait;
+      TioApplication.HideWait;
   end;
   except
     on E: Exception do

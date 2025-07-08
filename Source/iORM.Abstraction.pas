@@ -45,21 +45,11 @@ type
 
   TioCustomPlatformAbstractionComponent = class(TComponent)
   private
-    // Events
-    FHideWait: TNotifyEvent;
-    FShowWait: TNotifyEvent;
     // Methods
     function Get_Version: String;
-    procedure SetHideWait(const Value: TNotifyEvent);
-    procedure SetShowWait(const Value: TNotifyEvent);
-  public
-    constructor Create(AOwner: TComponent); override;
   published
     // properties
     property _Version: String read Get_Version;
-    // Events
-    property HideWait: TNotifyEvent read FHideWait write SetHideWait;
-    property ShowWait: TNotifyEvent read FShowWait write SetShowWait;
   end;
 
   TioThreadSessionDataContainer = TDictionary<TThreadID, IioSessionData>;
@@ -117,6 +107,8 @@ type
   TioApplication = class abstract
   private
     class var _FConcreteClass_NoDirectCall: TioApplicationRef;
+    class var FShowWaitProc: TProc;
+    class var FHideWaitProc: TProc;
   protected
     // --------- methods to be ovverrided by descendants ----------
     class function _GetSessionDataStore: TioCustomSessionDataStoreRef; virtual; abstract;
@@ -131,9 +123,12 @@ type
     class function _GetConcreteClass_NoDirectCall: TioApplicationRef; // public for inline, do not use directly
     class procedure CheckIfAbstractionLayerComponentExists; inline;
     class procedure HandleException(const Sender: TObject); inline;
+    class procedure HideWait; static;
     class function ProjectPlatform: TioProjectPlatform; inline;
     class function SessionDataStore: TioCustomSessionDataStoreRef; inline;
+    class procedure SetShowHideWaitProc(const AShowWaitProc: TProc; const AHideWaitProc: TProc); static;
     class procedure ShowMessage(const AMessage: string); inline;
+    class procedure ShowWait; static;
     class function Terminate: Boolean; inline;
   end;
 
@@ -339,6 +334,12 @@ begin
   _GetConcreteClass_NoDirectCall._HandleException(Sender);
 end;
 
+class procedure TioApplication.HideWait;
+begin
+  if Assigned(FHideWaitProc) then
+    FHideWaitProc;
+end;
+
 class function TioApplication.ProjectPlatform: TioProjectPlatform;
 begin
   Result := _GetConcreteClass_NoDirectCall._ProjectPlatform;
@@ -354,9 +355,21 @@ begin
   Result := _FConcreteSessionDataStoreClass_NoDirectCall;
 end;
 
+class procedure TioApplication.SetShowHideWaitProc(const AShowWaitProc, AHideWaitProc: TProc);
+begin
+  FShowWaitProc := AShowWaitProc;
+  FHideWaitProc := AHideWaitProc;
+end;
+
 class procedure TioApplication.ShowMessage(const AMessage: string);
 begin
   _GetConcreteClass_NoDirectCall._ShowMessage(AMessage);
+end;
+
+class procedure TioApplication.ShowWait;
+begin
+  if Assigned(FShowWaitProc) then
+    FShowWaitProc;
 end;
 
 class function TioApplication.Terminate: Boolean;
@@ -450,42 +463,9 @@ end;
 
 { TioCustomPlatformAbstractionComponent }
 
-constructor TioCustomPlatformAbstractionComponent.Create(AOwner: TComponent);
-begin
-  inherited;
-  FShowWait := nil;
-  FHideWait := nil;
-end;
-
 function TioCustomPlatformAbstractionComponent.Get_Version: String;
 begin
   Result := io.Version;
-end;
-
-procedure TioCustomPlatformAbstractionComponent.SetHideWait(const Value: TNotifyEvent);
-begin
-  FHideWait := Value;
-  if Assigned(FHideWait) then
-    io.Connections.SetHideWaitProc(
-      procedure
-      begin
-        FHideWait(Self);
-      end)
-  else
-    io.Connections.SetHideWaitProc(nil);
-end;
-
-procedure TioCustomPlatformAbstractionComponent.SetShowWait(const Value: TNotifyEvent);
-begin
-  FShowWait := Value;
-  if Assigned(FShowWait) then
-    io.Connections.SetShowWaitProc(
-      procedure
-      begin
-        FShowWait(Self);
-      end)
-  else
-    io.Connections.SetShowWaitProc(nil);
 end;
 
 { TioDelayedExec }

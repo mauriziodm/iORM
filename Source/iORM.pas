@@ -417,6 +417,10 @@ type
   io = class
   private
     class procedure _FreeObjAfterPersistOrDelete(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete); static; inline;
+
+    class procedure SetWaitProc(const AShowWaitProc: TProc = nil; const AHideWaitProc: TProc = nil);
+    class procedure ShowWait;
+    class procedure HideWait;
   public
     // KeepClass
     class procedure RegisterClass(const AClass: TClass);
@@ -600,10 +604,6 @@ type
     class function SQL(const ASQL: String): IioSQLDestination; overload;
     class function SQL(const ASQL: TStrings; const AOwns: boolean = False): IioSQLDestination; overload;
     class function SQL(const ASQLDestination: IioSQLDestination): IioSQLDestination; overload;
-
-    class procedure SetWaitProc(const AShowWaitProc: TProc = nil; const AHideWaitProc: TProc = nil);
-    class procedure ShowWait;
-    class procedure HideWait;
 
     class function DBBuilder(const AAddIndexes: boolean = True; const AAddForeignKeys: boolean = True): IioDBBuilderEngine; overload;
     class function DBBuilder(const AConnectionDefName: String; const AAddIndexes: boolean = True; const AAddForeignKeys: boolean = True)
@@ -1122,7 +1122,7 @@ end;
 
 class procedure io.SetWaitProc(const AShowWaitProc: TProc; const AHideWaitProc: TProc);
 begin
-  TioConnectionManager.SetShowHideWaitProc(AShowWaitProc, AHideWaitProc);
+  TioApplication.SetShowHideWaitProc(AShowWaitProc, AHideWaitProc);
 end;
 
 class procedure io.Show(const ATargetObj: TObject; const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent;
@@ -1408,7 +1408,7 @@ end;
 
 class procedure io.ShowWait;
 begin
-  TioConnectionManager.ShowWaitProc;
+  TioApplication.ShowWait;
 end;
 
 class function io.SmartWhereBuilder: TioWhereSmartBuilderRef;
@@ -1899,7 +1899,7 @@ end;
 
 class procedure io.HideWait;
 begin
-  TioConnectionManager.HideWaitProc;
+  TioApplication.HideWait;
 end;
 
 class function io.InTransaction(const AConnectionName: String): boolean;

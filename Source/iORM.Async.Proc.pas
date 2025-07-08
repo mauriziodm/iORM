@@ -38,7 +38,7 @@ type
 implementation
 
 uses
-  iORM;
+  iORM.Abstraction;
 
 { TioAsyncProc }
 
@@ -54,7 +54,7 @@ begin
   OnTerminate := OnTerminateEventHandler;
   FreeOnTerminate := True;
   if AShowWait then
-    io.ShowWait;
+    TioApplication.ShowWait;
 end;
 
 procedure TioAsyncProc.Execute;
@@ -77,7 +77,7 @@ begin
     if Assigned(FException) then
     begin
       if FShowWait then
-        io.HideWait;
+        TioApplication.HideWait;
       if Assigned(FOnExceptionMethod) then
         FOnExceptionMethod(FException)
       else
@@ -89,7 +89,7 @@ begin
         FOnSuccessMethod;
   finally
     if FShowWait then
-      io.HideWait;
+      TioApplication.HideWait;
   end;
 end;
 
@@ -98,14 +98,14 @@ end;
 class procedure TioSyncProc.Invoke(const AOnExecute: TioAsyncProcExecute; const AOnSuccess: TioAsyncProcOnSuccess; const AOnException: TioAsyncProcOnException; const AShowWait: Boolean = False);
 begin
   if AShowWait then
-    io.ShowWait;
+    TioApplication.ShowWait;
   try try
     AOnExecute;
     if Assigned(AOnSuccess) then
       AOnSuccess;
   finally
     if AShowWait then
-      io.HideWait;
+      TioApplication.HideWait;
   end;
   except
     on E: Exception do

@@ -309,9 +309,9 @@ type
 implementation
 
 uses
-  iORM, iORM.PersistenceStrategy.Factory, iORM.DB.Interfaces,
+  iORM.PersistenceStrategy.Factory, iORM.DB.Interfaces,
   iORM.Exceptions, iORM.DB.Factory, iORM.LiveBindings.BSPersistence,
-  iORM.Abstraction;
+  iORM.Abstraction, iORM;
 
 { TioCustomSynchroStrategy_Client }
 
@@ -551,7 +551,7 @@ begin
   if Assigned(FAfterSynchronization) then
     FAfterSynchronization(Self, LHideGlobalWait);
   if LHideGlobalWait then
-    io.HideWait;
+    TioApplication.HideWait;
 end;
 
 procedure TioCustomSynchroStrategy_Client.DoBeforeSynchronizationEvent;
@@ -562,7 +562,7 @@ begin
   if Assigned(FBeforeSynchronization) then
     FBeforeSynchronization(Self, LShowGlobalWait);
   if LShowGlobalWait then
-    io.ShowWait;
+    TioApplication.ShowWait;
 end;
 
 function TioCustomSynchroStrategy_Client.DoCanExecuteEvent: Boolean;

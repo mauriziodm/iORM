@@ -84,8 +84,6 @@ type
 // TODO: Considerare di sostituire TioConnectionInfo direttamente con i componenti ConnectionDef, in questo modo eliminiamo una istanza e altri vantaggi
     class var FConnectionManagerContainer: TioConnectionManagerContainer;
     // NB: Questo container in realtà contiene solo il tipo di DB (cdtFirebird, cdtSQLite ecc.ecc.) in modo da poter fare dei confronti veloci nelle factory e per non dipendere direttamente dal DriverID delle connectionDef di FireDAC
-    class var FShowWaitProc: TProc;
-    class var FHideWaitProc: TProc;
     class function NewCustomConnectionDef(const AConnectionName: String; const APooled: Boolean; const AAsDefault: Boolean): IIoStanConnectionDef; inline;
     class procedure _Lock; inline;
     class procedure _Unlock; inline;
@@ -116,12 +114,6 @@ type
 
     class function GetSynchroStrategy_Client(AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IioSynchroStrategy_Client;
 
-// TODO: WaitProc related methods move to TioApplication???
-    class procedure SetShowWaitProc(const AShowWaitProc: TProc); static;
-    class procedure SetHideWaitProc(const AHideWaitProc: TProc); static;
-    class procedure SetShowHideWaitProc(const AShowWaitProc: TProc; const AHideWaitProc: TProc); static;
-    class procedure ShowWaitProc; static;
-    class procedure HideWaitProc; static;
 {$IFDEF MSWINDOWS}
     class function Monitor: TioConnectionMonitorRef;
 {$ENDIF}
@@ -349,18 +341,6 @@ begin
   end;
 end;
 
-class procedure TioConnectionManager.HideWaitProc;
-begin
-  if Assigned(FHideWaitProc) then
-    FHideWaitProc;
-end;
-
-class procedure TioConnectionManager.ShowWaitProc;
-begin
-  if Assigned(FShowWaitProc) then
-    FShowWaitProc;
-end;
-
 class procedure TioConnectionManager._Lock;
 begin
 // TODO: Leggi le note qui sotto
@@ -506,22 +486,6 @@ begin
   end;
 end;
 {$ENDIF}
-
-class procedure TioConnectionManager.SetHideWaitProc(const AHideWaitProc: TProc);
-begin
-  FHideWaitProc := AHideWaitProc;
-end;
-
-class procedure TioConnectionManager.SetShowHideWaitProc(const AShowWaitProc: TProc; const AHideWaitProc: TProc);
-begin
-  FShowWaitProc := AShowWaitProc;
-  FHideWaitProc := AHideWaitProc;
-end;
-
-class procedure TioConnectionManager.SetShowWaitProc(const AShowWaitProc: TProc);
-begin
-  FShowWaitProc := AShowWaitProc;
-end;
 
 { TioConnectionMonitor }
 
