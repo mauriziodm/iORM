@@ -533,6 +533,8 @@ end;
 
 procedure TioPersistenceStrategyRequest.ImportSessionDataFromPSRequest(const APSRequest: IioPersistenceStrategyRequest);
 begin
+    // access token
+    FAccessToken := APSRequest.AccessToken;
     // app
     FApp := APSRequest.App;
     FAppOID := APSRequest.AppOID;

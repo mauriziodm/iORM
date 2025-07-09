@@ -628,6 +628,8 @@ begin
   _Lock;
   try
     LSessionData := _GetThreadOrMainSessionData(True);
+    // access-token
+    APersistenceStrategyRequest.AccessToken := TioApplication.ProvideAccessToken;
     // app
     APersistenceStrategyRequest.App := LSessionData.App;
     APersistenceStrategyRequest.AppOID := LSessionData.AppOID;
