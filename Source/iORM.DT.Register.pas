@@ -49,7 +49,8 @@ uses
   iORM.LiveBindings.PrototypeBindSource.Detail, DesignIntf, iORM.MVVM.ModelPresenter.Master, iORM.MVVM.ModelPresenter.Detail, iORM.MVVM.ModelDataSet,
   iORM.MVVM.ModelBindSource, iORM.MVVM.ViewModelBridge, iORM.MVVM.ViewContextProvider, System.Actions, iORM.StdActions.VCL, iORM.StdActions.FMX,
   iORM.DT.ViewModel.Wizard, iORM.MVVM.ViewModel, DesignEditors, iORM.StdActions.CloseQueryRepeater,
-  iORM.DT.CompAutoUses, iORM.MVVM.VMAction, iORM.DT.Editors.VMAction, iORM.SynchroStrategy.EtmBased, iORM.Http.WebBroker.Producer;
+  iORM.DT.CompAutoUses, iORM.MVVM.VMAction, iORM.DT.Editors.VMAction, iORM.SynchroStrategy.EtmBased, iORM.Http.WebBroker.Producer,
+  DMForm;
 
 
 
@@ -194,10 +195,18 @@ begin
   RegisterComponents('iORM - Other', [TioCloseQueryRepeater]);
   RegisterComponents('iORM - Other', [TioWebBrokerProducer]);
 
+  // ioViewModel module
+  //  NB: Ho commentato la riga qui sotto che registra la classe TioViewModel usando TDataModuleCustomModule invece di
+  //       TCustomModule perchè Carlo Marona riferiva di problemi a inserire componenti non visuali FMX, in questo modo
+  //       invece sembra funzionare correttamente. Però questa riga era già presente ma commentata quindi non vorrei che
+  //       fosse stata precedentemente sostituita perchè dava qualche problema. Tenere d'occhio e nel caso ripristinare
+  //       la riga commentata. (Carlo Marona 09/07/2025)
+//  RegisterCustomModule(TioViewModel, TCustomModule);
+  RegisterCustomModule(TioViewModel, TDataModuleCustomModule); // TDataModuleCustomModule is declared in "DMForm" unit
+  RegisterNoIcon([TioViewModel]); // Non fa apparire l'icona nella component palette (Carlo Marona 09/07/2025)
+
   // IDE Wizards
   RegisterPackageWizard(TioViewModelWizard.Create);
-  RegisterCustomModule(TioViewModel, TCustomModule);
-//  RegisterCustomModule(TioViewModel, TDataModuleCustomModule); // TDataModuleCustomModule is declared in "DMForm" unit
 end;
 
 end.

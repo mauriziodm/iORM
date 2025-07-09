@@ -283,6 +283,7 @@ begin
   // Start transaction
   StartTransaction_Internal(LContext.ConnectionNameResolved);
   try
+    // ### ACCESS-TOKEN VALIDATE
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
     if not TioCRUDInterceptorRegister.BeforeDelete(LContext) then
@@ -781,6 +782,7 @@ begin
       LContext.GetProperties.GetPropertyByName(APSRequest.RelationPropName).SetValue(LContext.DataObject, APSRequest.RelationOID);
     // Detect the persist action type
     _DetectPersistActionType;
+    // ### ACCESS-TOKEN VALIDATE
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
     // Interceptors: intercept the "before" action
@@ -1120,6 +1122,7 @@ var
             LCurrentContext := LContextCache.GetContext(APSRequest, LQuery.ExtractTrueClassName(LOriginalContext))
           else
             LCurrentContext := LOriginalContext;
+    // ### ACCESS-TOKEN VALIDATE
           // Clean the DataObject (it contains the previous)
           LCurrentContext.DataObject := nil;
           // Create the object as TObject  (Intercepted by CRUDInterceptors)
@@ -1217,6 +1220,7 @@ var
             LCurrentContext := TioContextFactory.Context_PSRequest(APSRequest, LQuery.ExtractTrueClassName(LOriginalContext))
           else
             LCurrentContext := LOriginalContext;
+    // ### ACCESS-TOKEN VALIDATE
           // Create the object as TObject (Intercepted by CRUDInterceptors)
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}

@@ -56,7 +56,7 @@ const
   PSR_PROPERTYNAME = 'PrpNam';
   PSR_RELATIONID = 'RelPrpID';
   PSR_RELATIONPROPERTYNAME = 'RelPrpNam';
-  PSR_SESSION_ACCESSTOKEN = 'Tkn';
+  PSR_SESSION_TOKEN = 'Tkn';
   PSR_SESSION_APP = 'App';
   PSR_SESSION_APPOID = 'AppID';
   PSR_SESSION_CONNECTION = 'Con';
@@ -100,7 +100,6 @@ type
     ['{3CFC6D3D-EB9D-46C9-AF99-6F5AD8ECD284}']
     // methods
     function AsString: String;
-    function GetAccessToken: String;
     function GetApp: String;
     function GetAppOID: Integer;
     function GetBlindLevel: Byte;
@@ -127,12 +126,12 @@ type
     function GetResult: TValue;
     function GetResultAsBoolean: Boolean;
     function GetResultAsInteger: Integer;
+    function GetToken: String;
     function GetUsr: String;
     function GetUsrOID: Integer;
     function GetWhere: IioWhere;
     procedure ImportSessionData(const ASessionData: IioSessionData);
     procedure ImportSessionDataFromPSRequest(const APSRequest: IioPersistenceStrategyRequest);
-    procedure SetAccessToken(const Value: String);
     procedure SetApp(const Value: String);
     procedure SetAppOID(const Value: Integer);
     procedure SetBlindLevel(const Value: Byte);
@@ -158,6 +157,7 @@ type
     procedure SetResult(const Value: TValue);
     procedure SetResultAsBoolean(const Value: Boolean);
     procedure SetResultAsInteger(const Value: Integer);
+    procedure SetToken(const Value: String);
     procedure SetUsr(const Value: String);
     procedure SetUsrOID(const Value: Integer);
     procedure SetWhere(const Value: IioWhere);
@@ -167,13 +167,13 @@ type
     // method property
     property Method: TioPersistenceStrategyMethod read GetMethod;
     // session data
-    property AccessToken: String read GetAccessToken write SetAccessToken;
     property App: String read GetApp write SetApp;
     property AppOID: Integer read GetAppOID write SetAppOID;
     property Connection: String read GetConnection write SetConnection;
     property ConnectionRemote: String read GetConnectionRemote write SetConnectionRemote;
     property Lic: String read GetLic write SetLic;
     property LicOID: Integer read GetLicOID write SetLicOID;
+    property Token: String read GetToken write SetToken;
     property Usr: String read GetUsr write SetUsr;
     property UsrOID: Integer read GetUsrOID write SetUsrOID;
     // instances

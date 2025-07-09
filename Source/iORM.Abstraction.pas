@@ -48,8 +48,8 @@ type
   TioHideWaitMethod = reference to Procedure;
 
   // access-token related methods
-  TioAccessTokenProviderMethod = reference to Function: String;
-  TioAccessTokenValidateMethod = reference to Function(const AAccessToken: String; const AContext: IioContext): Boolean;
+  TioTokenProviderMethod = reference to Function: String;
+  TioTokenValidateMethod = reference to Function(const AContext: IioContext): Boolean;
 
   TioCustomPlatformAbstractionComponent = class(TComponent)
   private
@@ -128,8 +128,8 @@ type
     class procedure _SetConcreteClass(const AClass: TioApplicationRef);
   public
     class var _FConcreteSessionDataStoreClass_NoDirectCall: TioCustomSessionDataStoreRef; // public for inline, do not use directly
-    class var _FAccessTokenProviderMethod: TioAccessTokenProviderMethod; // public for inline, do not use directly
-    class var _FAccessTokenValidateMethod: TioAccessTokenValidateMethod; // public for inline, do not use directly
+    class var _FTokenProviderMethod: TioTokenProviderMethod; // public for inline, do not use directly
+    class var _FTokenValidateMethod: TioTokenValidateMethod; // public for inline, do not use directly
     class constructor Create;
     class function _GetConcreteClass_NoDirectCall: TioApplicationRef; // public for inline, do not use directly
     class procedure CheckIfAbstractionLayerComponentExists; inline;
@@ -143,9 +143,9 @@ type
     class procedure ShowWait; static;
     class procedure HideWait; static;
     // Access-token related methods
-    class procedure SetAccessTokenMethods(const AAccessTokenProviderMethod: TioAccessTokenProviderMethod; const AAccessTokenValidateMethod: TioAccessTokenValidateMethod); static;
-    class function ProvideAccessToken: String; inline; static;
-    class function ValidateAccessToken(const AAccessToken: String; const AContext: IioContext): Boolean; inline; static;
+    class procedure SetTokenMethods(const ATokenProviderMethod: TioTokenProviderMethod; const ATokenValidateMethod: TioTokenValidateMethod); static;
+    class function ProvideToken: String; inline; static;
+    class function ValidateToken(const AContext: IioContext): Boolean; inline; static;
   end;
 
   TioControlRef = class of TioControl;
@@ -350,7 +350,7 @@ begin
   _FConcreteClass_NoDirectCall := nil;
   FHideWaitMethod := nil;
   FShowWaitMethod := nil;
-  SetAccessTokenMethods(nil, nil);
+  SetTokenMethods(nil, nil);
 end;
 
 class procedure TioApplication.HandleException(const Sender: TObject);
@@ -369,9 +369,9 @@ begin
   Result := _GetConcreteClass_NoDirectCall._ProjectPlatform;
 end;
 
-class function TioApplication.ProvideAccessToken: String;
+class function TioApplication.ProvideToken: String;
 begin
-  Result := _FAccessTokenProviderMethod;
+  Result := _FTokenProviderMethod;
 end;
 
 class procedure TioApplication._SetConcreteClass(const AClass: TioApplicationRef);
@@ -384,27 +384,27 @@ begin
   Result := _FConcreteSessionDataStoreClass_NoDirectCall;
 end;
 
-class procedure TioApplication.SetAccessTokenMethods(const AAccessTokenProviderMethod: TioAccessTokenProviderMethod; const AAccessTokenValidateMethod: TioAccessTokenValidateMethod);
+class procedure TioApplication.SetTokenMethods(const ATokenProviderMethod: TioTokenProviderMethod; const ATokenValidateMethod: TioTokenValidateMethod);
 begin
-  _FAccessTokenProviderMethod := AAccessTokenProviderMethod;
-  _FAccessTokenValidateMethod := AAccessTokenValidateMethod;
+  _FTokenProviderMethod := ATokenProviderMethod;
+  _FTokenValidateMethod := ATokenValidateMethod;
 
   // set the token provider method
-  if Assigned(AAccessTokenProviderMethod) then
-    _FAccessTokenProviderMethod := AAccessTokenProviderMethod
+  if Assigned(ATokenProviderMethod) then
+    _FTokenProviderMethod := ATokenProviderMethod
   else
   begin
-    _FAccessTokenProviderMethod := function: String
+    _FTokenProviderMethod := function: String
       begin
         Result := String.Empty;
       end;
   end;
   // set the token validate method
-  if Assigned(AAccessTokenValidateMethod) then
-    _FAccessTokenValidateMethod := AAccessTokenValidateMethod
+  if Assigned(ATokenValidateMethod) then
+    _FTokenValidateMethod := ATokenValidateMethod
   else
   begin
-    _FAccessTokenValidateMethod := function(const AAccessToken: String; const AContext: IioContext): Boolean
+    _FTokenValidateMethod := function(const AContext: IioContext): Boolean
       begin
         Result := True;
       end;
@@ -433,9 +433,9 @@ begin
   Result := _GetConcreteClass_NoDirectCall._Terminate;
 end;
 
-class function TioApplication.ValidateAccessToken(const AAccessToken: String; const AContext: IioContext): Boolean;
+class function TioApplication.ValidateToken(const AContext: IioContext): Boolean;
 begin
-  Result := _FAccessTokenValidateMethod(AAccessToken, AContext);
+  Result := _FTokenValidateMethod(AContext);
 end;
 
 { TioAction }
@@ -629,7 +629,7 @@ begin
   try
     LSessionData := _GetThreadOrMainSessionData(True);
     // access-token
-    APersistenceStrategyRequest.AccessToken := TioApplication.ProvideAccessToken;
+    APersistenceStrategyRequest.Token := TioApplication.ProvideToken;
     // app
     APersistenceStrategyRequest.App := LSessionData.App;
     APersistenceStrategyRequest.AppOID := LSessionData.AppOID;

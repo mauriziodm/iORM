@@ -14,7 +14,7 @@ type
     // method
     FMethod: TioPersistenceStrategyMethod;
     // session data
-    FAccessToken: String;
+    FToken: String;
     FApp: String;
     FAppOID: Integer;
     FConnection: String;
@@ -46,7 +46,6 @@ type
     FResult: TValue;
     // methods
     procedure _Clear(const FillSessionRelatedProperties: Boolean); inline;
-    function GetAccessToken: String;
     function GetApp: String;
     function GetAppOID: Integer;
     function GetBlindLevel: Byte;
@@ -73,10 +72,10 @@ type
     function GetResult: TValue;
     function GetResultAsBoolean: Boolean;
     function GetResultAsInteger: Integer;
+    function GetToken: String;
     function GetUsr: String;
     function GetUsrOID: Integer;
     function GetWhere: IioWhere;
-    procedure SetAccessToken(const Value: String);
     procedure SetApp(const Value: String);
     procedure SetAppOID(const Value: Integer);
     procedure SetBlindLevel(const Value: Byte);
@@ -102,6 +101,7 @@ type
     procedure SetResult(const Value: TValue);
     procedure SetResultAsBoolean(const Value: Boolean);
     procedure SetResultAsInteger(const Value: Integer);
+    procedure SetToken(const Value: String);
     procedure SetUsr(const Value: String);
     procedure SetUsrOID(const Value: Integer);
     procedure SetWhere(const Value: IioWhere);
@@ -115,13 +115,13 @@ type
     // method property
     property Method: TioPersistenceStrategyMethod read GetMethod;
     // session data
-    property AccessToken: String read GetAccessToken write SetAccessToken;
     property App: String read GetApp write SetApp;
     property AppOID: Integer read GetAppOID write SetAppOID;
     property Connection: String read GetConnection write SetConnection;
     property ConnectionRemote: String read GetConnectionRemote write SetConnectionRemote;
     property Lic: String read GetLic write SetLic;
     property LicOID: Integer read GetLicOID write SetLicOID;
+    property Token: String read GetToken write SetToken;
     property Usr: String read GetUsr write SetUsr;
     property UsrOID: Integer read GetUsrOID write SetUsrOID;
     // instances
@@ -166,8 +166,8 @@ begin
     LJSONObject.AddPair(PSR_METHOD, Ord(FMethod));
     // ---------- session ----------
     // AccessToken
-    if (FAccessToken <> IO_STRING_NULL_VALUE) then
-      LJSONObject.AddPair(PSR_SESSION_ACCESSTOKEN, FAccessToken);
+    if (FToken <> IO_STRING_NULL_VALUE) then
+      LJSONObject.AddPair(PSR_SESSION_TOKEN, FToken);
     // App
     if (FApp <> IO_STRING_NULL_VALUE) then
       LJSONObject.AddPair(PSR_SESSION_APP, FApp);
@@ -266,9 +266,9 @@ begin
       raise EioGenericException.Create(ClassName, 'CreateByJSONString', '"Method" property not present (JSON).');
     // ---------- session ----------
     // AccessToken
-    LJSONValue := LJSONObject.GetValue(PSR_SESSION_ACCESSTOKEN);
+    LJSONValue := LJSONObject.GetValue(PSR_SESSION_TOKEN);
     if Assigned(LJSONValue) then
-      FAccessToken := LJSONValue.Value;
+      FToken := LJSONValue.Value;
     // App
     LJSONValue := LJSONObject.GetValue(PSR_SESSION_APP);
     if Assigned(LJSONValue) then
@@ -374,9 +374,9 @@ begin
   Result := FAppOID;
 end;
 
-function TioPersistenceStrategyRequest.GetAccessToken: String;
+function TioPersistenceStrategyRequest.GetToken: String;
 begin
-  Result := FAccessToken;
+  Result := FToken;
 end;
 
 function TioPersistenceStrategyRequest.GetBlindLevel: Byte;
@@ -534,7 +534,7 @@ end;
 procedure TioPersistenceStrategyRequest.ImportSessionDataFromPSRequest(const APSRequest: IioPersistenceStrategyRequest);
 begin
     // access token
-    FAccessToken := APSRequest.AccessToken;
+    FToken := APSRequest.Token;
     // app
     FApp := APSRequest.App;
     FAppOID := APSRequest.AppOID;
@@ -560,9 +560,9 @@ begin
   FAppOID := Value;
 end;
 
-procedure TioPersistenceStrategyRequest.SetAccessToken(const Value: String);
+procedure TioPersistenceStrategyRequest.SetToken(const Value: String);
 begin
-  FAccessToken := Value;
+  FToken := Value;
 end;
 
 procedure TioPersistenceStrategyRequest.SetBlindLevel(const Value: Byte);
@@ -703,7 +703,7 @@ end;
 procedure TioPersistenceStrategyRequest._Clear(const FillSessionRelatedProperties: Boolean);
 begin
   // session
-  FAccessToken := IO_STRING_NULL_VALUE;
+  FToken := IO_STRING_NULL_VALUE;
   if FillSessionRelatedProperties then
     TioApplication.SessionDataStore._FillPersistenceStrategyRequest(Self)
   else
