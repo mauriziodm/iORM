@@ -1052,7 +1052,7 @@ begin
   FUserID := LContext.PSRequest.UsrOID;
   // Persistence related props
   FActionType := LContext.ActionType;
-  FIntentType := LContext.IntentType;
+  FIntentType := LContext.Intent;
   FBlindLevel := LContext.BlindLevel;
   FConflictDetected := LContext.ConflictDetected;
   FConflictState := LContext.ConflictState;

@@ -737,7 +737,7 @@ var
   procedure _DetectPersistActionType;
   begin
     // If the ObjStatus is osDirty (or not exists) or IntentType is for revert or synchro operation then persist the object
-    if (LContext.ObjStatus = osDirty) or (LContext.IntentType > itRegular) then
+    if (LContext.ObjStatus = osDirty) or (LContext.Intent > itRegular) then
     begin
       // note: if SmartUpdateDetection system is not enabled or (if enabled) the object is to be persisted (according to the SmartUpdateDetection system)...
       if LContext.GetProperties.ObjStatusPropertyExist or (APSRequest.MasterBSPersistence = nil) or (not APSRequest.MasterBSPersistence.IsSmartUpdateDetectionEnabled) or
@@ -926,7 +926,7 @@ begin
     case LMasterProp.GetRelationType of
       // HasMany or HasOne: if the intent is Revert or Synchro then delete all HasMany details before persist
       rtHasMany, rtHasOne:
-        if AMasterContext.IntentType > itRegular then
+        if AMasterContext.Intent > itRegular then
         begin
           // Create the child PSRequest and execute it
           LChildPSRequest := TioPersistenceStrategyFactory.NewPSRequest_PrePostRelationChild_Delete(AMasterContext, LMasterProp);

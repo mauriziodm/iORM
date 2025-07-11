@@ -5,7 +5,7 @@ interface
 uses
   iORM.CommonTypes, iORM.PersistenceStrategy.Interfaces,
   System.Rtti, iORM.LiveBindings.BSPersistence, iORM.Where.Interfaces,
-  iORM.Abstraction.SessionData.Interfaces;
+  iORM.Abstraction.SessionData.Interfaces, iORM.Context.Interfaces;
 
 type
 

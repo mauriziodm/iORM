@@ -43,7 +43,7 @@ uses
   iORM.Context.Map.Interfaces, iORM.Where.Interfaces,
   iORM.LiveBindings.BSPersistence, iORM.ConflictStrategy.Interfaces,
   iORM.SynchroStrategy.Interfaces, iORM.Attributes,
-  iORM.PersistenceStrategy.Interfaces;
+  iORM.PersistenceStrategy.Interfaces, iORM.Abstraction.Interfaces;
 
 type
 
@@ -111,9 +111,9 @@ type
     // DataObject
     function GetDataObject: TObject; virtual; abstract;
     procedure SetDataObject(const AValue: TObject); virtual; abstract;
-    // IntentType
-    function GetIntentType: TioPersistenceIntentType; virtual; abstract;
-    procedure SetIntentType(const Value: TioPersistenceIntentType); virtual; abstract;
+    // Intent
+    function GetIntent: TioPersistenceIntentType; virtual; abstract;
+    procedure SetIntent(const Value: TioPersistenceIntentType); virtual; abstract;
     // MasterBSPersistence
     function GetMasterBSPersistence: TioBSPersistence; virtual; abstract;
     // MasterPropertyName
@@ -177,7 +177,7 @@ type
     property ConnectionNameResolved: String read GetConnectionNameResolved;
     property DataObject: TObject read GetDataObject write SetDataObject;
     property EntityFromVersion: Integer read GetEntityFromVersion write SetEntityFromVersion;
-    property IntentType: TioPersistenceIntentType read GetIntentType write SetIntentType;
+    property Intent: TioPersistenceIntentType read GetIntent write SetIntent;
     property MasterPropertyName: String read GetMasterPropertyName;
     property MasterPropertyPath: String read GetMasterPropertyPath;
     property MasterBSPersistence: TioBSPersistence read GetMasterBSPersistence;
@@ -200,10 +200,14 @@ type
     property OriginalNonTrueClassMap: IioMap read GetOriginalNonTrueClassMap write SetOriginalNonTrueClassMap;
   end;
 
-  TioContext_PSRequest = class(TioContext_Custom)
+  TioContext_PSRequest = class(TioContext_Custom, IioTokenValidationRequest)
   strict private
     FPSRequest: IioPersistenceStrategyRequest;
   protected
+    // access-token
+    function GetToken: String;
+    // as context
+    function AsContext: IioContext;
     // BlindLevel
     function GetBlindLevel: Byte; override;
     procedure SetBlindLevel(const Value: Byte); override;
@@ -212,9 +216,11 @@ type
     // DataObject
     function GetDataObject: TObject; override;
     procedure SetDataObject(const AValue: TObject); override;
-    // IntentType
-    function GetIntentType: TioPersistenceIntentType; override;
-    procedure SetIntentType(const Value: TioPersistenceIntentType); override;
+    // Intent
+    function GetIntent: TioPersistenceIntentType; override;
+    procedure SetIntent(const Value: TioPersistenceIntentType); override;
+    // is context
+    function IsContext: Boolean;
     // MasterBSPersistence
     function GetMasterBSPersistence: TioBSPersistence; override;
     // MasterPropertyName
@@ -226,6 +232,8 @@ type
     // RelationOID
     function GetRelationOID: Integer; override;
     procedure SetRelationOID(const Value: Integer); override;
+    // TypeName
+    function GetTypeName: String;
     // Where
     function GetWhere: IioWhere; override;
     procedure SetWhere(const AWhere: IioWhere); override;
@@ -237,7 +245,7 @@ type
   strict private
     FBlindLevel: Byte;
     FDataObject: TObject;
-    FIntentType: TioPersistenceIntentType;
+    FIntent: TioPersistenceIntentType;
     FMasterBSPersistence: TioBSPersistence;
     FMasterPropertyName: String;
     FMasterPropertyPath: String;
@@ -253,8 +261,8 @@ type
     function GetDataObject: TObject; override;
     procedure SetDataObject(const Value: TObject); override;
     // IntentType
-    function GetIntentType: TioPersistenceIntentType; override;
-    procedure SetIntentType(const Value: TioPersistenceIntentType); override;
+    function GetIntent: TioPersistenceIntentType; override;
+    procedure SetIntent(const Value: TioPersistenceIntentType); override;
     // MasterBSPersistence
     function GetMasterBSPersistence: TioBSPersistence; override;
     // MasterPropertyName
@@ -697,7 +705,7 @@ end;
 function TioContext_Custom.SynchroStrategy_GetTimeSlotSynchroState: TioEtmTimeSlotSynchroState;
 begin
   // Determines the TimeSlotSynchroState based on the intent and whether or not it is a class to synchronize
-  case IntentType of
+  case Intent of
     itRegular, itRevert:
       if SynchroStrategy_IsToBeSynchronized then
         Result := stToBeSynchronized
@@ -727,7 +735,7 @@ begin
   Result := True;
   if Assigned(LSynchroStrategy_Client) then
   begin
-    case IntentType of
+    case Intent of
       itRegular, itRevert, itSynchro_PersistToServer:
         if SynchroStrategy_IsToBeSynchronized then
           Result := LSynchroStrategy_Client.EtmTimeSlot_Persist_ToBeSynchronized
@@ -769,6 +777,11 @@ end;
 
 { TioContext_PSRequest }
 
+function TioContext_PSRequest.AsContext: IioContext;
+begin
+  Result := Self;
+end;
+
 constructor TioContext_PSRequest.Create_PSRequest(const APSRequest: IioPersistenceStrategyRequest; const AMap: IioMap);
 begin
   inherited Create_Map(AMap);
@@ -790,7 +803,7 @@ begin
   Result := FPSRequest.DTO;
 end;
 
-function TioContext_PSRequest.GetIntentType: TioPersistenceIntentType;
+function TioContext_PSRequest.GetIntent: TioPersistenceIntentType;
 begin
   Result := FPSRequest.Intent;
 end;
@@ -820,9 +833,27 @@ begin
   Result := FPSRequest.RelationOID;
 end;
 
+function TioContext_PSRequest.GetToken: String;
+begin
+  Result := FPSRequest.Token;
+end;
+
+function TioContext_PSRequest.GetTypeName: String;
+begin
+  if Assigned(FPSRequest.Where) then
+    Result := FPSRequest.Where.TypeName
+  else
+    Result := DataObject.ClassName;
+end;
+
 function TioContext_PSRequest.GetWhere: IioWhere;
 begin
   Result := FPSRequest.Where;
+end;
+
+function TioContext_PSRequest.IsContext: Boolean;
+begin
+  Result := True;
 end;
 
 procedure TioContext_PSRequest.SetBlindLevel(const Value: Byte);
@@ -835,7 +866,7 @@ begin
   FPSRequest.DTO := AValue;
 end;
 
-procedure TioContext_PSRequest.SetIntentType(const Value: TioPersistenceIntentType);
+procedure TioContext_PSRequest.SetIntent(const Value: TioPersistenceIntentType);
 begin
   FPSRequest.Intent := Value;
 end;
@@ -856,7 +887,7 @@ constructor TioContext_Simple.Create_Simple(const AIntent: TioPersistenceIntentT
   const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String);
 begin
   inherited Create_Map(AMap);
-  FIntentType := AIntent;
+  FIntent := AIntent;
   FBlindLevel := ABlindLevel;
   FWhere := AWhere;
   FDataObject := ADataObject;
@@ -880,9 +911,9 @@ begin
   Result := FDataObject;
 end;
 
-function TioContext_Simple.GetIntentType: TioPersistenceIntentType;
+function TioContext_Simple.GetIntent: TioPersistenceIntentType;
 begin
-  Result := FIntentType;
+  Result := FIntent;
 end;
 
 function TioContext_Simple.GetMasterBSPersistence: TioBSPersistence;
@@ -925,9 +956,9 @@ begin
   FDataObject := Value;
 end;
 
-procedure TioContext_Simple.SetIntentType(const Value: TioPersistenceIntentType);
+procedure TioContext_Simple.SetIntent(const Value: TioPersistenceIntentType);
 begin
-  FIntentType := Value;
+  FIntent := Value;
 end;
 
 procedure TioContext_Simple.SetRelationOID(const Value: Integer);

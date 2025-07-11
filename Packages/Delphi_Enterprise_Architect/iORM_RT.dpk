@@ -245,7 +245,8 @@ contains
   iORM.DependencyInjection.Types in '..\..\Source\iORM.DependencyInjection.Types.pas',
   iORM.Async.Func in '..\..\Source\iORM.Async.Func.pas',
   iORM.Async.Proc in '..\..\Source\iORM.Async.Proc.pas',
-  iORM.PersistenceStrategy.Request in '..\..\Source\iORM.PersistenceStrategy.Request.pas';
+  iORM.PersistenceStrategy.Request in '..\..\Source\iORM.PersistenceStrategy.Request.pas',
+  iORM.Abstraction.Interfaces in '..\..\Source\iORM.Abstraction.Interfaces.pas';
 
 end.
 

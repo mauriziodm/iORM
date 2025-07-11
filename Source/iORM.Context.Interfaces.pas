@@ -113,10 +113,10 @@ type
     function GetEntityFromVersion: Integer;
     procedure SetEntityFromVersion(const Value: Integer);
     property EntityFromVersion: Integer read GetEntityFromVersion write SetEntityFromVersion;
-    // IntentType
-    function GetIntentType: TioPersistenceIntentType;
-    procedure SetIntentType(const Value: TioPersistenceIntentType);
-    property IntentType: TioPersistenceIntentType read GetIntentType write SetIntentType;
+    // Intent
+    function GetIntent: TioPersistenceIntentType;
+    procedure SetIntent(const Value: TioPersistenceIntentType);
+    property Intent: TioPersistenceIntentType read GetIntent write SetIntent;
     // MasterBSPersistence
     function GetMasterBSPersistence: TioBSPersistence;
     property MasterBSPersistence: TioBSPersistence read GetMasterBSPersistence;

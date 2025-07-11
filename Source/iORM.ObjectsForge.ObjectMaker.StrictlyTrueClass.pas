@@ -73,7 +73,7 @@ begin
                                            .SetDetailsContainer(AContext.Where.Details)  // Copy the details from the Where  of the Context
                                            .DisableStrictlyTrueClass
                                            .Cacheable
-                                           ._ToObjectInternalByClassOnly(AContext.IntentType, AContext.DataObject);
+                                           ._ToObjectInternalByClassOnly(AContext.Intent, AContext.DataObject);
 end;
 
 end.

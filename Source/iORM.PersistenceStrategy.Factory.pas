@@ -58,8 +58,7 @@ type
     // delete
     class function NewPSRequest_Delete(const AWhere: IioWhere): IioPersistenceStrategyRequest;
     class function NewPSRequest_DeleteList(const AListDTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
-    class function NewPSRequest_DeleteObject(const ADTO: TObject; const AIntent: TioPersistenceIntentType;
-  const ABlindLevel: Byte): IioPersistenceStrategyRequest;
+    class function NewPSRequest_DeleteObject(const ADTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
 //    class function NewPSRequest_DeleteObject(const ADTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
     // load
     class function NewPSRequest_LoadCount(const AWhere: IioWhere): IioPersistenceStrategyRequest;
@@ -313,7 +312,7 @@ begin
   Result := _NewPSRequest(psmDeleteList, False);
   Result.ImportSessionDataFromPSRequest(AMasterContext.PSRequest);
   Result.BlindLevel := AMasterContext.BlindLevel;
-  Result.Intent := AMasterContext.IntentType;
+  Result.Intent := AMasterContext.Intent;
   Result.ListDTO := AMasterProperty.GetRelationChildObject(AMasterContext.DataObject);
   Result.ListDTO_Serialize := True;
 end;
@@ -324,7 +323,7 @@ begin
   Result := _NewPSRequest(psmDeleteObject, False);
   Result.ImportSessionDataFromPSRequest(AMasterContext.PSRequest);
   Result.BlindLevel := AMasterContext.BlindLevel;
-  Result.Intent := AMasterContext.IntentType;
+  Result.Intent := AMasterContext.Intent;
   Result.ListDTO := AMasterProperty.GetRelationChildObject(AMasterContext.DataObject);
   Result.ListDTO_Serialize := True;
 end;
@@ -335,7 +334,7 @@ begin
   Result := _NewPSRequest(psmPersistList, False);
   Result.ImportSessionDataFromPSRequest(AMasterContext.PSRequest);
   Result.BlindLevel := AMasterContext.BlindLevel;
-  Result.Intent := AMasterContext.IntentType;
+  Result.Intent := AMasterContext.Intent;
   Result.ListDTO := AMasterProperty.GetRelationChildObject(AMasterContext.DataObject);
   Result.ListDTO_Serialize := True;
   // TODO: MasterBSPersistence è usato alla DBPersistenceStrategy ma non usato dalla HttpPersistenceStrategy, indagare a cosa serve e se si può eliminare
@@ -352,7 +351,7 @@ begin
   Result := _NewPSRequest(psmPersistObject, False);
   Result.ImportSessionDataFromPSRequest(AMasterContext.PSRequest);
   Result.BlindLevel := AMasterContext.BlindLevel;
-  Result.Intent := AMasterContext.IntentType;
+  Result.Intent := AMasterContext.Intent;
   Result.DTO := AMasterProperty.GetRelationChildObject(AMasterContext.DataObject);
   Result.DTO_Serialize := True;
   // TODO: MasterBSPersistence è usato alla DBPersistenceStrategy ma non usato dalla HttpPersistenceStrategy, indagare a cosa serve e se si può eliminare

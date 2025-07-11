@@ -650,7 +650,7 @@ begin
   // NOTE: If the intent is Synchronization then returnas absolute value to avoid the normal
   //        negative value after the Revert operation from the synchronizing time-slot
   Result := AContext.ObjVersion;
-  if AContext.IntentType = itSynchro_PersistToClient then
+  if AContext.Intent = itSynchro_PersistToClient then
     Result := Abs(Result);
 end;
 
