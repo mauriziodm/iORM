@@ -8,6 +8,25 @@ uses
 
 type
 
+  TioProjectPlatform = (ppVCL, ppFMX, ppUniGUI);
+
+  // show-hide wait related methods
+  TioShowWaitMethod = reference to Procedure;
+  TioHideWaitMethod = reference to Procedure;
+
+  // forward declaration
+  IioTokenValidationRequest = interface;
+
+  // access-token related methods
+  // note: The anonymous method of type "TioTokenValidateMethod" can return true or false
+  //        to authorize or not the operation to be performed. But be careful, if the operation
+  //        is not authorized simply returning false will not raise any exception so the operation
+  //        will not be performed but the user will probably not notice the lack of authorization;
+  //        If you want to inform the user of the failed authorization, you need to raise an exception
+  //        within the annoying method itself (TioTokenValidateMethod).
+  TioTokenProviderMethod = reference to Function: String;
+  TioTokenValidateMethod = reference to Function(const AValidationRequest: IioTokenValidationRequest): Boolean;
+
   // Questa è l'interfaccia che verrà usata nell'anonymous method per validare l'access-token
   //  prima di ogni richiesta di esecuzione di una azione su un oggetto/classe.
   //  NB: Se e quando vorrò usarla anche per le standard-action non avro nessuno IioCOntext

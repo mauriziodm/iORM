@@ -105,7 +105,8 @@ uses
   iORM.Resolver.Factory,
   iORM, System.SysUtils, System.Generics.Collections,
   iORM.Interceptor.CRUD.Register,
-  iORM.PersistenceStrategy.Factory;
+  iORM.PersistenceStrategy.Factory,
+  iORM.Abstraction, iORM.Abstraction.Interfaces;
 
 type
 
@@ -283,23 +284,32 @@ begin
   // Start transaction
   StartTransaction_Internal(LContext.ConnectionNameResolved);
   try
-    // ### ACCESS-TOKEN VALIDATE
-{$REGION '-----INTERCEPTORS-----'}
-{$IFNDEF ioCRUDInterceptorsOff}
-    if not TioCRUDInterceptorRegister.BeforeDelete(LContext) then
+    // access-token validation
+    // note: The anonymous method of type "TioTokenValidateMethod" can return true or false
+    //        to authorize or not the operation to be performed. But be careful, if the operation
+    //        is not authorized simply returning false will not raise any exception so the operation
+    //        will not be performed but the user will probably not notice the lack of authorization;
+    //        If you want to inform the user of the failed authorization, you need to raise an exception
+    //        within the annoying method itself (TioTokenValidateMethod).
+    if TioApplication.ValidateToken(LContext as IioTokenValidationRequest) then
     begin
-{$ENDIF}
-{$ENDREGION}
-      // PreProcess (delete) relation childs (HasMany, HasOne)
-      PreProcessRelationChildOnDelete(LContext);
-      // Delete the object
-      DeleteObject_Internal(LContext);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-      TioCRUDInterceptorRegister.AfterDelete(LContext);
-    end;
+      if not TioCRUDInterceptorRegister.BeforeDelete(LContext) then
+      begin
 {$ENDIF}
 {$ENDREGION}
+        // PreProcess (delete) relation childs (HasMany, HasOne)
+        PreProcessRelationChildOnDelete(LContext);
+        // Delete the object
+        DeleteObject_Internal(LContext);
+{$REGION '-----INTERCEPTORS-----'}
+{$IFNDEF ioCRUDInterceptorsOff}
+        TioCRUDInterceptorRegister.AfterDelete(LContext);
+      end;
+{$ENDIF}
+{$ENDREGION}
+    end;
     // Commit
     CommitTransaction_Internal(LContext.ConnectionNameResolved);
   except
@@ -782,40 +792,49 @@ begin
       LContext.GetProperties.GetPropertyByName(APSRequest.RelationPropName).SetValue(LContext.DataObject, APSRequest.RelationOID);
     // Detect the persist action type
     _DetectPersistActionType;
-    // ### ACCESS-TOKEN VALIDATE
-{$REGION '-----INTERCEPTORS-----'}
-{$IFNDEF ioCRUDInterceptorsOff}
-    // Interceptors: intercept the "before" action
-    if not _Interceptors_InterceptBeforeAction then
+    // access-token validation
+    // note: The anonymous method of type "TioTokenValidateMethod" can return true or false
+    //        to authorize or not the operation to be performed. But be careful, if the operation
+    //        is not authorized simply returning false will not raise any exception so the operation
+    //        will not be performed but the user will probably not notice the lack of authorization;
+    //        If you want to inform the user of the failed authorization, you need to raise an exception
+    //        within the annoying method itself (TioTokenValidateMethod).
+    if TioApplication.ValidateToken(LContext as IioTokenValidationRequest) then
     begin
-{$ENDIF}
-{$ENDREGION}
-      // PreProcess (persist) relation childs (BelongsTo)
-      PreProcessRelationChildOnPersist(LContext);
-      // Process the current object
-      // --------------------------
-      case LContext.ActionType of
-        atInsert:
-          InsertObject_Internal(LContext);
-        atUpdate:
-          UpdateObject_Internal(LContext);
-        atDelete:
-          begin
-            // PreProcess (delete) relation childs (HasMany, HasOne)
-            PreProcessRelationChildOnDelete(LContext);
-            DeleteObject_Internal(LContext);
-          end;
-      end;
-      // --------------------------
-      // PostProcess (persist) relation childs (HasMany, HasOne)
-      PostProcessRelationChildOnPersist(LContext);
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-      // Intercept the "after" action
-      _Interceptors_InterceptAfterAction;
-    end;
+      // Interceptors: intercept the "before" action
+      if not _Interceptors_InterceptBeforeAction then
+      begin
 {$ENDIF}
 {$ENDREGION}
+        // PreProcess (persist) relation childs (BelongsTo)
+        PreProcessRelationChildOnPersist(LContext);
+        // Process the current object
+        // --------------------------
+        case LContext.ActionType of
+          atInsert:
+            InsertObject_Internal(LContext);
+          atUpdate:
+            UpdateObject_Internal(LContext);
+          atDelete:
+            begin
+              // PreProcess (delete) relation childs (HasMany, HasOne)
+              PreProcessRelationChildOnDelete(LContext);
+              DeleteObject_Internal(LContext);
+            end;
+        end;
+        // --------------------------
+        // PostProcess (persist) relation childs (HasMany, HasOne)
+        PostProcessRelationChildOnPersist(LContext);
+{$REGION '-----INTERCEPTORS-----'}
+{$IFNDEF ioCRUDInterceptorsOff}
+        // Intercept the "after" action
+        _Interceptors_InterceptAfterAction;
+      end;
+{$ENDIF}
+{$ENDREGION}
+    end;
     // Commit
     CommitTransaction_Internal(LContext.ConnectionNameResolved);
   except
@@ -1122,25 +1141,34 @@ var
             LCurrentContext := LContextCache.GetContext(APSRequest, LQuery.ExtractTrueClassName(LOriginalContext))
           else
             LCurrentContext := LOriginalContext;
-    // ### ACCESS-TOKEN VALIDATE
-          // Clean the DataObject (it contains the previous)
-          LCurrentContext.DataObject := nil;
-          // Create the object as TObject  (Intercepted by CRUDInterceptors)
-{$REGION '-----INTERCEPTORS-----'}
-{$IFNDEF ioCRUDInterceptorsOff}
-          if not TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext) then
+          // access-token validation
+          // note: The anonymous method of type "TioTokenValidateMethod" can return true or false
+          //        to authorize or not the operation to be performed. But be careful, if the operation
+          //        is not authorized simply returning false will not raise any exception so the operation
+          //        will not be performed but the user will probably not notice the lack of authorization;
+          //        If you want to inform the user of the failed authorization, you need to raise an exception
+          //        within the annoying method itself (TioTokenValidateMethod).
+          if TioApplication.ValidateToken(LCurrentContext as IioTokenValidationRequest) then
           begin
-{$ENDIF}
-{$ENDREGION}
-            TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
+            // Clean the DataObject (it contains the previous)
+            LCurrentContext.DataObject := nil;
+            // Create the object as TObject  (Intercepted by CRUDInterceptors)
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-            TioCRUDInterceptorRegister.AfterLoad(LCurrentContext);
-          end;
+            if not TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext) then
+            begin
 {$ENDIF}
 {$ENDREGION}
-          // Add current object to the list
-          LDuckTypedList.Add(LCurrentContext.DataObject);
+              TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
+{$REGION '-----INTERCEPTORS-----'}
+{$IFNDEF ioCRUDInterceptorsOff}
+              TioCRUDInterceptorRegister.AfterLoad(LCurrentContext);
+            end;
+{$ENDIF}
+{$ENDREGION}
+            // Add current object to the list
+            LDuckTypedList.Add(LCurrentContext.DataObject);
+          end;
           // Next
           LQuery.Next;
         end;
@@ -1220,21 +1248,30 @@ var
             LCurrentContext := TioContextFactory.Context_PSRequest(APSRequest, LQuery.ExtractTrueClassName(LOriginalContext))
           else
             LCurrentContext := LOriginalContext;
-    // ### ACCESS-TOKEN VALIDATE
-          // Create the object as TObject (Intercepted by CRUDInterceptors)
-{$REGION '-----INTERCEPTORS-----'}
-{$IFNDEF ioCRUDInterceptorsOff}
-          if not TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext) then
+          // access-token validation
+          // note: The anonymous method of type "TioTokenValidateMethod" can return true or false
+          //        to authorize or not the operation to be performed. But be careful, if the operation
+          //        is not authorized simply returning false will not raise any exception so the operation
+          //        will not be performed but the user will probably not notice the lack of authorization;
+          //        If you want to inform the user of the failed authorization, you need to raise an exception
+          //        within the annoying method itself (TioTokenValidateMethod).
+          if TioApplication.ValidateToken(LCurrentContext as IioTokenValidationRequest) then
           begin
-{$ENDIF}
-{$ENDREGION}
-            TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
+            // Create the object as TObject (Intercepted by CRUDInterceptors)
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
-            TioCRUDInterceptorRegister.AfterLoad(LCurrentContext);
-          end;
+            if not TioCRUDInterceptorRegister.BeforeLoad(LCurrentContext) then
+            begin
 {$ENDIF}
 {$ENDREGION}
+              TioObjectMakerFactory.GetObjectMaker(LCurrentContext).MakeObject(LCurrentContext, LQuery);
+{$REGION '-----INTERCEPTORS-----'}
+{$IFNDEF ioCRUDInterceptorsOff}
+              TioCRUDInterceptorRegister.AfterLoad(LCurrentContext);
+            end;
+{$ENDIF}
+{$ENDREGION}
+          end;
         end;
       finally
         // Close query

@@ -47,7 +47,7 @@ uses
   iORM.ETM.Engine, iORM.ETM.Interfaces, DJSON.Params,
   iORM.ConflictStrategy.Interfaces, iORM.ConflictStrategy.SameVersionWin, iORM.ConflictStrategy.LastUpdateWin,
   iORM.Context.Interfaces, iORM.SynchroStrategy.Interfaces, iORM.MVVM.ViewModel,
-  iORM.PersistenceStrategy.Interfaces, iORM.Abstraction;
+  iORM.PersistenceStrategy.Interfaces, iORM.Abstraction.Interfaces;
 
 const
   IORM_VERSION = 'iORM 2 (beta 3.4)';
@@ -777,7 +777,8 @@ implementation
 uses
   System.Rtti, iORM.Exceptions, iORM.Utilities, iORM.Where.Factory, iORM.PersistenceStrategy.Factory, iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory, iORM.DB.Factory, iORM.DuckTyped.StreamObject,
-  iORM.LiveBindings.CommonBSBehavior, iORM.MVVM.ViewContextProviderContainer;
+  iORM.LiveBindings.CommonBSBehavior, iORM.MVVM.ViewContextProviderContainer,
+  iORM.Abstraction;
 
 { io }
 

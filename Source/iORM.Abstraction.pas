@@ -38,18 +38,10 @@ interface
 uses
   System.Classes, System.SysUtils, System.Rtti, iORM.CommonTypes,
   System.Generics.Collections, iORM.Abstraction.SessionData.Interfaces,
-  iORM.PersistenceStrategy.Interfaces, iORM.Context.Interfaces;
+  iORM.PersistenceStrategy.Interfaces, iORM.Context.Interfaces,
+  iORM.Abstraction.Interfaces;
 
 type
-  TioProjectPlatform = (ppVCL, ppFMX, ppUniGUI);
-
-  // show-hide wait related methods
-  TioShowWaitMethod = reference to Procedure;
-  TioHideWaitMethod = reference to Procedure;
-
-  // access-token related methods
-  TioTokenProviderMethod = reference to Function: String;
-  TioTokenValidateMethod = reference to Function(const AContext: IioContext): Boolean;
 
   TioCustomPlatformAbstractionComponent = class(TComponent)
   private
@@ -145,7 +137,7 @@ type
     // Access-token related methods
     class procedure SetTokenMethods(const ATokenProviderMethod: TioTokenProviderMethod; const ATokenValidateMethod: TioTokenValidateMethod); static;
     class function ProvideToken: String; inline; static;
-    class function ValidateToken(const AContext: IioContext): Boolean; inline; static;
+    class function ValidateToken(const AValidationRequest: IioTokenValidationRequest): Boolean; inline; static;
   end;
 
   TioControlRef = class of TioControl;
@@ -404,7 +396,7 @@ begin
     _FTokenValidateMethod := ATokenValidateMethod
   else
   begin
-    _FTokenValidateMethod := function(const AContext: IioContext): Boolean
+    _FTokenValidateMethod := function(const AValidationRequest: IioTokenValidationRequest): Boolean
       begin
         Result := True;
       end;
@@ -433,9 +425,9 @@ begin
   Result := _GetConcreteClass_NoDirectCall._Terminate;
 end;
 
-class function TioApplication.ValidateToken(const AContext: IioContext): Boolean;
+class function TioApplication.ValidateToken(const AValidationRequest: IioTokenValidationRequest): Boolean;
 begin
-  Result := _FTokenValidateMethod(AContext);
+  Result := _FTokenValidateMethod(AValidationRequest);
 end;
 
 { TioAction }
