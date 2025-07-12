@@ -43,7 +43,7 @@ uses
   iORM.Context.Map.Interfaces, iORM.Where.Interfaces,
   iORM.LiveBindings.BSPersistence, iORM.ConflictStrategy.Interfaces,
   iORM.SynchroStrategy.Interfaces, iORM.Attributes,
-  iORM.PersistenceStrategy.Interfaces, iORM.Abstraction.Interfaces;
+  iORM.PersistenceStrategy.Interfaces, iORM.Abstraction;
 
 type
 
@@ -206,8 +206,10 @@ type
   protected
     // access-token
     function GetToken: String;
-    // as context
+    // AsContext
     function AsContext: IioContext;
+    // auth-cache
+    function GetAuthCache: IioAuthCache;
     // BlindLevel
     function GetBlindLevel: Byte; override;
     procedure SetBlindLevel(const Value: Byte); override;
@@ -288,7 +290,7 @@ uses
   System.TypInfo,
   iORM.Context.Container, System.SysUtils, iORM.Exceptions,
   System.StrUtils, iORM.DB.Interfaces, iORM, iORM.DB.ConnectionContainer,
-  iORM.Utilities, iORM.Abstraction;
+  iORM.Utilities;
 
 { TioContext }
 
@@ -786,6 +788,11 @@ constructor TioContext_PSRequest.Create_PSRequest(const APSRequest: IioPersisten
 begin
   inherited Create_Map(AMap);
   FPSRequest := APSRequest;
+end;
+
+function TioContext_PSRequest.GetAuthCache: IioAuthCache;
+begin
+  Result := FPSRequest.AuthCache;
 end;
 
 function TioContext_PSRequest.GetBlindLevel: Byte;

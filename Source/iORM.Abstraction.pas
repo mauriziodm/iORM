@@ -38,10 +38,56 @@ interface
 uses
   System.Classes, System.SysUtils, System.Rtti, iORM.CommonTypes,
   System.Generics.Collections, iORM.Abstraction.SessionData.Interfaces,
-  iORM.PersistenceStrategy.Interfaces, iORM.Context.Interfaces,
-  iORM.Abstraction.Interfaces;
+  iORM.PersistenceStrategy.Interfaces, iORM.Context.Interfaces;
 
 type
+
+  TioProjectPlatform = (ppVCL, ppFMX, ppUniGUI);
+
+  // show-hide wait related methods
+  TioShowWaitMethod = reference to Procedure;
+  TioHideWaitMethod = reference to Procedure;
+
+  // forward declaration
+  IioAuthDecisionRequest = interface;
+
+  // access-token related methods
+  // note: The anonymous method of type "TioTokenValidateMethod" can return true or false
+  //        to authorize or not the operation to be performed. But be careful, if the operation
+  //        is not authorized simply returning false will not raise any exception so the operation
+  //        will not be performed but the user will probably not notice the lack of authorization;
+  //        If you want to inform the user of the failed authorization, you need to raise an exception
+  //        within the annoying method itself (TioTokenValidateMethod).
+  TioAuthTokenProviderMethod = reference to Function: String;
+  TioAuthDecisionMethod = reference to Function(const AAuthDecisionRequest: IioAuthDecisionRequest): Boolean;
+
+  // Questa è l'interfaccia che verrà usata nell'anonymous method per validare l'access-token
+  //  prima di ogni richiesta di esecuzione di una azione su un oggetto/classe.
+  //  NB: Se e quando vorrò usarla anche per le standard-action non avro nessuno IioCOntext
+  //       a disposizione quindi farò una classe apposita che implementa semplicemente questa classe
+  //       e che popolerò appositamente per la validazione dell'access-token e stabilire quindi se
+  //       quella action deve essere abilitata per quell'utente e per quell'oggetto oppure no.
+  IioAuthDecisionRequest = interface
+    ['{02E419C2-347C-412D-B7B3-F264EFB92B94}']
+    // methods
+    function AsContext: IioContext;
+    function IsContext: Boolean;
+    // access-token
+    function GetToken: String;
+    property Token: String read GetToken;
+    // auth-cache
+    function GetAuthCache: IioAuthCache;
+    property AuthCache: IioAuthCache read GetAuthCache;
+    // action type
+    function GetActionType: TioPersistenceActionType;
+    property ActionType: TioPersistenceActionType read GetActionType;
+    // intent
+    function GetIntent: TioPersistenceIntentType;
+    property Intent: TioPersistenceIntentType read GetIntent;
+    // type name
+    function GetTypeName: String;
+    property TypeName: String read GetTypeName;
+  end;
 
   TioCustomPlatformAbstractionComponent = class(TComponent)
   private
@@ -107,6 +153,8 @@ type
   TioApplication = class abstract
   private
     class var _FConcreteClass_NoDirectCall: TioApplicationRef;
+    class var FAuthTokenProviderMethod: TioAuthTokenProviderMethod;
+    class var FAuthDecisionMethod: TioAuthDecisionMethod;
     class var FHideWaitMethod: TioHideWaitMethod;
     class var FShowWaitMethod: TioShowWaitMethod;
   protected
@@ -120,8 +168,6 @@ type
     class procedure _SetConcreteClass(const AClass: TioApplicationRef);
   public
     class var _FConcreteSessionDataStoreClass_NoDirectCall: TioCustomSessionDataStoreRef; // public for inline, do not use directly
-    class var _FAuthTokenProviderMethod_NoDirectCall: TioAuthTokenProviderMethod; // public for inline, do not use directly
-    class var _FAuthDecisionMethod_NoDirectCall: TioAuthDecisionMethod; // public for inline, do not use directly
     class constructor Create;
     class function _GetConcreteClass_NoDirectCall: TioApplicationRef; // public for inline, do not use directly
     class procedure CheckIfAbstractionLayerComponentExists; inline;
@@ -136,8 +182,8 @@ type
     class procedure HideWait; static;
     // Access-token related methods
     class procedure SetAuthMethods(const AAuthTokenProviderMethod: TioAuthTokenProviderMethod; const AAuthDecisionMethod: TioAuthDecisionMethod); static;
-    class function ProvideAuthToken: String; inline; static;
-    class function ProvideAuthDecision(const AValidationRequest: IioAuthDecisionRequest): Boolean; inline; static;
+    class function ProvideAuthToken: String; static;
+    class function ProvideAuthDecision(const AAuthDecisionRequest: IioAuthDecisionRequest): Boolean; static;
   end;
 
   TioControlRef = class of TioControl;
@@ -363,7 +409,7 @@ end;
 
 class function TioApplication.ProvideAuthToken: String;
 begin
-  Result := _FAuthTokenProviderMethod_NoDirectCall;
+  Result := FAuthTokenProviderMethod;
 end;
 
 class procedure TioApplication._SetConcreteClass(const AClass: TioApplicationRef);
@@ -378,25 +424,25 @@ end;
 
 class procedure TioApplication.SetAuthMethods(const AAuthTokenProviderMethod: TioAuthTokenProviderMethod; const AAuthDecisionMethod: TioAuthDecisionMethod);
 begin
-  _FAuthTokenProviderMethod_NoDirectCall := AAuthTokenProviderMethod;
-  _FAuthDecisionMethod_NoDirectCall := AAuthDecisionMethod;
+  FAuthTokenProviderMethod := AAuthTokenProviderMethod;
+  FAuthDecisionMethod := AAuthDecisionMethod;
 
   // set the token provider method
   if Assigned(AAuthTokenProviderMethod) then
-    _FAuthTokenProviderMethod_NoDirectCall := AAuthTokenProviderMethod
+    FAuthTokenProviderMethod := AAuthTokenProviderMethod
   else
   begin
-    _FAuthTokenProviderMethod_NoDirectCall := function: String
+    FAuthTokenProviderMethod := function: String
       begin
         Result := String.Empty;
       end;
   end;
   // set the token validate method
   if Assigned(AAuthDecisionMethod) then
-    _FAuthDecisionMethod_NoDirectCall := AAuthDecisionMethod
+    FAuthDecisionMethod := AAuthDecisionMethod
   else
   begin
-    _FAuthDecisionMethod_NoDirectCall := function(const AValidationRequest: IioAuthDecisionRequest): Boolean
+    FAuthDecisionMethod := function(const AValidationRequest: IioAuthDecisionRequest): Boolean
       begin
         Result := True;
       end;
@@ -425,9 +471,19 @@ begin
   Result := _GetConcreteClass_NoDirectCall._Terminate;
 end;
 
-class function TioApplication.ProvideAuthDecision(const AValidationRequest: IioAuthDecisionRequest): Boolean;
+class function TioApplication.ProvideAuthDecision(const AAuthDecisionRequest: IioAuthDecisionRequest): Boolean;
+var
+  LKey: String;
 begin
-  Result := _FAuthDecisionMethod_NoDirectCall(AValidationRequest);
+  // Non-regular operations (e.g. itRevert, itSynchro_XXX) are never subject to authorization
+  if AAuthDecisionRequest.Intent <> itRegular then
+    Exit(True);
+  LKey := AAuthDecisionRequest.TypeName + ':' + IntToStr(Ord(AAuthDecisionRequest.ActionType));
+  if not AAuthDecisionRequest.AuthCache.TryIsAuthorized(LKey, Result) then
+  begin
+    Result := FAuthDecisionMethod(AAuthDecisionRequest);
+    AAuthDecisionRequest.AuthCache.Add(LKey, Result);
+  end;
 end;
 
 { TioAction }
@@ -780,5 +836,6 @@ begin
   inherited;
   FMainSessionData := TioAbstractionFactory.NewSessionData;
 end;
+
 
 end.

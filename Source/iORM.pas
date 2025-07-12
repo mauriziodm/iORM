@@ -47,7 +47,7 @@ uses
   iORM.ETM.Engine, iORM.ETM.Interfaces, DJSON.Params,
   iORM.ConflictStrategy.Interfaces, iORM.ConflictStrategy.SameVersionWin, iORM.ConflictStrategy.LastUpdateWin,
   iORM.Context.Interfaces, iORM.SynchroStrategy.Interfaces, iORM.MVVM.ViewModel,
-  iORM.PersistenceStrategy.Interfaces, iORM.Abstraction.Interfaces;
+  iORM.PersistenceStrategy.Interfaces, iORM.Abstraction;
 
 const
   IORM_VERSION = 'iORM 2 (beta 3.4)';
@@ -329,9 +329,9 @@ type
   TioViewModel = iORM.MVVM.ViewModel.TioViewModel;
 
   // Auth
-  TioAuthTokenProviderMethod = iORM.Abstraction.Interfaces.TioAuthTokenProviderMethod;
-  TioAuthDecisionMethod = iORM.Abstraction.Interfaces.TioAuthDecisionMethod;
-  IioAuthDecisionRequest = iORM.Abstraction.Interfaces.IioAuthDecisionRequest;
+  TioAuthTokenProviderMethod = iORM.Abstraction.TioAuthTokenProviderMethod;
+  TioAuthDecisionMethod = iORM.Abstraction.TioAuthDecisionMethod;
+  IioAuthDecisionRequest = iORM.Abstraction.IioAuthDecisionRequest;
 {$ENDREGION}
 
 // Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
@@ -783,8 +783,7 @@ implementation
 uses
   System.Rtti, iORM.Exceptions, iORM.Utilities, iORM.Where.Factory, iORM.PersistenceStrategy.Factory, iORM.DuckTyped.Interfaces,
   iORM.DuckTyped.Factory, iORM.DB.Factory, iORM.DuckTyped.StreamObject,
-  iORM.LiveBindings.CommonBSBehavior, iORM.MVVM.ViewContextProviderContainer,
-  iORM.Abstraction;
+  iORM.LiveBindings.CommonBSBehavior, iORM.MVVM.ViewContextProviderContainer;
 
 { io }
 

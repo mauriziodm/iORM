@@ -40,7 +40,8 @@ uses
   iORM.Where.Interfaces, iORM.CommonTypes, FireDAC.Comp.DataSet,
   iORM.Context.Interfaces, iORM.LiveBindings.BSPersistence,
   iORM.SynchroStrategy.Custom, System.SysUtils,
-  iORM.SynchroStrategy.Interfaces, iORM.Context.Properties.Interfaces;
+  iORM.SynchroStrategy.Interfaces, iORM.Context.Properties.Interfaces,
+  iORM.Abstraction;
 
 type
 
@@ -53,6 +54,7 @@ type
     class function GetStrategy_ByConnectionName(const AConnectionName: String): TioPersistenceStrategyRef;
     class function GetStrategy_ByPSRequest(const APSRequest: IioPersistenceStrategyRequest): TioPersistenceStrategyRef;
     class function ConnectionTypeToStrategy(const AConnectionType: TioConnectionType): TioPersistenceStrategyRef;
+    class function NewAuthCache: IioAuthCache; static;
     // ---------- operation type specific persistence strategy request factories ----------
     class function NewPSRequest_ByJsonString(const AJsonString: String): IioPersistenceStrategyRequest;
     // delete
@@ -103,7 +105,8 @@ implementation
 
 uses
   iORM.PersistenceStrategy.DB, iORM.PersistenceStrategy.Http, iORM.DB.ConnectionContainer,
-  iORM.PersistenceStrategy.Request, iORM.Where.Factory, iORM.Abstraction;
+  iORM.PersistenceStrategy.Request, iORM.Where.Factory,
+  iORM.PersistenceStrategy.AuthCache;
 
 { TioStrategyFactory }
 
@@ -138,6 +141,11 @@ begin
     APSRequest.Connection := AConnectionName;
   if not TioApplication.SessionDataStore.IsEmptyConnectionName(AConnectionNameRemote) then
     APSRequest.ConnectionRemote := AConnectionNameRemote;
+end;
+
+class function TioPersistenceStrategyFactory.NewAuthCache: IioAuthCache;
+begin
+  Result := TioAuthCache.Create;
 end;
 
 class function TioPersistenceStrategyFactory.NewPSRequest_ByJsonString(const AJsonString: String): IioPersistenceStrategyRequest;

@@ -396,7 +396,7 @@
         <DCCReference Include="..\..\Source\iORM.Async.Func.pas"/>
         <DCCReference Include="..\..\Source\iORM.Async.Proc.pas"/>
         <DCCReference Include="..\..\Source\iORM.PersistenceStrategy.Request.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Abstraction.Interfaces.pas"/>
+        <DCCReference Include="..\..\Source\iORM.PersistenceStrategy.AuthCache.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

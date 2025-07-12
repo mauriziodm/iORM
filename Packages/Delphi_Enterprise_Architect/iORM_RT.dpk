@@ -246,7 +246,7 @@ contains
   iORM.Async.Func in '..\..\Source\iORM.Async.Func.pas',
   iORM.Async.Proc in '..\..\Source\iORM.Async.Proc.pas',
   iORM.PersistenceStrategy.Request in '..\..\Source\iORM.PersistenceStrategy.Request.pas',
-  iORM.Abstraction.Interfaces in '..\..\Source\iORM.Abstraction.Interfaces.pas';
+  iORM.PersistenceStrategy.AuthCache in '..\..\Source\iORM.PersistenceStrategy.AuthCache.pas';
 
 end.
 

@@ -5,7 +5,8 @@ interface
 uses
   iORM.CommonTypes, iORM.PersistenceStrategy.Interfaces,
   System.Rtti, iORM.LiveBindings.BSPersistence, iORM.Where.Interfaces,
-  iORM.Abstraction.SessionData.Interfaces, iORM.Context.Interfaces;
+  iORM.Abstraction.SessionData.Interfaces,
+  iORM.Abstraction;
 
 type
 
@@ -13,6 +14,8 @@ type
   private
     // method
     FMethod: TioPersistenceStrategyMethod;
+    // auth-cache
+    FAuthCache: IioAuthCache;
     // session data
     FToken: String;
     FApp: String;
@@ -48,6 +51,7 @@ type
     procedure _Clear(const FillSessionRelatedProperties: Boolean); inline;
     function GetApp: String;
     function GetAppOID: Integer;
+    function GetAuthCache: IioAuthCache;
     function GetBlindLevel: Byte;
     function GetConnection: String;
     function GetConnectionRemote: String;
@@ -78,6 +82,7 @@ type
     function GetWhere: IioWhere;
     procedure SetApp(const Value: String);
     procedure SetAppOID(const Value: Integer);
+    procedure SetAuthCache(const Value: IioAuthCache);
     procedure SetBlindLevel(const Value: Byte);
     procedure SetConnection(const Value: String);
     procedure SetConnectionRemote(const Value: String);
@@ -114,6 +119,8 @@ type
     procedure SwitchToConnectionRemote;
     // method property
     property Method: TioPersistenceStrategyMethod read GetMethod;
+    // auth-cache
+    property AuthCache: IioAuthCache read GetAuthCache write SetAuthCache;
     // session data
     property App: String read GetApp write SetApp;
     property AppOID: Integer read GetAppOID write SetAppOID;
@@ -152,7 +159,8 @@ type
 implementation
 
 uses
-  System.JSON, DJSON, iORM.Exceptions, System.SysUtils, iORM.Abstraction;
+  System.JSON, DJSON, iORM.Exceptions, System.SysUtils,
+  iORM.PersistenceStrategy.Factory;
 
 { TioPersistenceStrategyRequest }
 
@@ -244,6 +252,8 @@ constructor TioPersistenceStrategyRequest.Create(const AMethod: TioPersistenceSt
 begin
   // method
   FMethod := AMethod;
+  // auth-cache
+  FAuthCache := TioPersistenceStrategyFactory.NewAuthCache;
   // other initializations
   _Clear(FillSessionRelatedProperties);
 end;
@@ -372,6 +382,11 @@ end;
 function TioPersistenceStrategyRequest.GetAppOID: Integer;
 begin
   Result := FAppOID;
+end;
+
+function TioPersistenceStrategyRequest.GetAuthCache: IioAuthCache;
+begin
+  Result := FAuthCache;
 end;
 
 function TioPersistenceStrategyRequest.GetToken: String;
@@ -516,38 +531,40 @@ end;
 
 procedure TioPersistenceStrategyRequest.ImportSessionData(const ASessionData: IioSessionData);
 begin
-    // app
-    FApp := ASessionData.App;
-    FAppOID := ASessionData.AppOID;
-    // connection
-    FConnection := ASessionData.Connection;
-    // license
-    FLic := ASessionData.License;
-    FLicOID := ASessionData.LicenseOID;
-    // remote connection
-    FConnectionRemote := ASessionData.ConnectionRemote;
-    // user
-    FUsr := ASessionData.User;
-    FUsrOID := ASessionData.UserOID;
+  // app
+  FApp := ASessionData.App;
+  FAppOID := ASessionData.AppOID;
+  // connection
+  FConnection := ASessionData.Connection;
+  // license
+  FLic := ASessionData.License;
+  FLicOID := ASessionData.LicenseOID;
+  // remote connection
+  FConnectionRemote := ASessionData.ConnectionRemote;
+  // user
+  FUsr := ASessionData.User;
+  FUsrOID := ASessionData.UserOID;
 end;
 
 procedure TioPersistenceStrategyRequest.ImportSessionDataFromPSRequest(const APSRequest: IioPersistenceStrategyRequest);
 begin
-    // access token
-    FToken := APSRequest.Token;
-    // app
-    FApp := APSRequest.App;
-    FAppOID := APSRequest.AppOID;
-    // connection
-    FConnection := APSRequest.Connection;
-    // license
-    FLic := APSRequest.Lic;
-    FLicOID := APSRequest.LicOID;
-    // remote connection
-    FConnectionRemote := APSRequest.ConnectionRemote;
-    // user
-    FUsr := APSRequest.Usr;
-    FUsrOID := APSRequest.UsrOID;
+  // auth-cache
+  FAuthCache := APSRequest.AuthCache;
+  // access token
+  FToken := APSRequest.Token;
+  // app
+  FApp := APSRequest.App;
+  FAppOID := APSRequest.AppOID;
+  // connection
+  FConnection := APSRequest.Connection;
+  // license
+  FLic := APSRequest.Lic;
+  FLicOID := APSRequest.LicOID;
+  // remote connection
+  FConnectionRemote := APSRequest.ConnectionRemote;
+  // user
+  FUsr := APSRequest.Usr;
+  FUsrOID := APSRequest.UsrOID;
 end;
 
 procedure TioPersistenceStrategyRequest.SetApp(const Value: String);
@@ -558,6 +575,11 @@ end;
 procedure TioPersistenceStrategyRequest.SetAppOID(const Value: Integer);
 begin
   FAppOID := Value;
+end;
+
+procedure TioPersistenceStrategyRequest.SetAuthCache(const Value: IioAuthCache);
+begin
+  FAuthCache := Value;
 end;
 
 procedure TioPersistenceStrategyRequest.SetToken(const Value: String);
@@ -705,9 +727,13 @@ begin
   // session
   FToken := IO_STRING_NULL_VALUE;
   if FillSessionRelatedProperties then
-    TioApplication.SessionDataStore._FillPersistenceStrategyRequest(Self)
+  begin
+    FAuthCache := TioPersistenceStrategyFactory.NewAuthCache;
+    TioApplication.SessionDataStore._FillPersistenceStrategyRequest(Self);
+  end
   else
   begin
+    FAuthCache := nil;
     FApp := IO_STRING_NULL_VALUE;
     FAppOID := IO_INTEGER_NULL_VALUE;
     FConnection := IO_STRING_NULL_VALUE;

@@ -106,7 +106,7 @@ uses
   iORM, System.SysUtils, System.Generics.Collections,
   iORM.Interceptor.CRUD.Register,
   iORM.PersistenceStrategy.Factory,
-  iORM.Abstraction, iORM.Abstraction.Interfaces;
+  iORM.Abstraction;
 
 type
 

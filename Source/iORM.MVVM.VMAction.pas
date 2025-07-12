@@ -760,8 +760,7 @@ implementation
 
 uses
   System.SysUtils, iORM.Utilities, iORM.Exceptions, iORM, System.Rtti,
-  iORM.RttiContext.Factory, iORM.StdActions.CloseQueryActionRegister, iORM.ETM.Engine, iORM.StdActions.CommonBehaviour,
-  iORM.Abstraction.Interfaces;
+  iORM.RttiContext.Factory, iORM.StdActions.CloseQueryActionRegister, iORM.ETM.Engine, iORM.StdActions.CommonBehaviour;
 
 { TioVMActionCustom }
 

@@ -96,12 +96,21 @@ type
     psmTransactionStart
   );
 
+  IioAuthCache = interface
+    ['{126C694D-6A57-44A0-A012-35051AA6F852}']
+    // Add
+    procedure Add(const AKey: String; const AAuthorized: Boolean);
+    // IsAuthorized
+    function TryIsAuthorized(const AKey: String; var OResult: Boolean): Boolean;
+  end;
+
   IioPersistenceStrategyRequest = interface
     ['{3CFC6D3D-EB9D-46C9-AF99-6F5AD8ECD284}']
     // methods
     function AsString: String;
     function GetApp: String;
     function GetAppOID: Integer;
+    function GetAuthCache: IioAuthCache;
     function GetBlindLevel: Byte;
     function GetConnection: String;
     function GetConnectionRemote: String;
@@ -134,6 +143,7 @@ type
     procedure ImportSessionDataFromPSRequest(const APSRequest: IioPersistenceStrategyRequest);
     procedure SetApp(const Value: String);
     procedure SetAppOID(const Value: Integer);
+    procedure SetAuthCache(const Value: IioAuthCache);
     procedure SetBlindLevel(const Value: Byte);
     procedure SetConnection(const Value: String);
     procedure SetConnectionRemote(const Value: String);
@@ -164,8 +174,8 @@ type
     procedure SwitchToConnectionRemote;
     // method property
     property Method: TioPersistenceStrategyMethod read GetMethod;
-    // method property
-    property Method: TioPersistenceStrategyMethod read GetMethod;
+    // auth-cache
+    property AuthCache: IioAuthCache read GetAuthCache write SetAuthCache;
     // session data
     property App: String read GetApp write SetApp;
     property AppOID: Integer read GetAppOID write SetAppOID;
