@@ -120,8 +120,8 @@ type
     class procedure _SetConcreteClass(const AClass: TioApplicationRef);
   public
     class var _FConcreteSessionDataStoreClass_NoDirectCall: TioCustomSessionDataStoreRef; // public for inline, do not use directly
-    class var _FTokenProviderMethod: TioTokenProviderMethod; // public for inline, do not use directly
-    class var _FTokenValidateMethod: TioTokenValidateMethod; // public for inline, do not use directly
+    class var _FTokenProviderMethod_NoDirectCall: TioTokenProviderMethod; // public for inline, do not use directly
+    class var _FTokenValidateMethod_NoDirectCall: TioTokenValidateMethod; // public for inline, do not use directly
     class constructor Create;
     class function _GetConcreteClass_NoDirectCall: TioApplicationRef; // public for inline, do not use directly
     class procedure CheckIfAbstractionLayerComponentExists; inline;
@@ -363,7 +363,7 @@ end;
 
 class function TioApplication.ProvideToken: String;
 begin
-  Result := _FTokenProviderMethod;
+  Result := _FTokenProviderMethod_NoDirectCall;
 end;
 
 class procedure TioApplication._SetConcreteClass(const AClass: TioApplicationRef);
@@ -378,25 +378,25 @@ end;
 
 class procedure TioApplication.SetTokenMethods(const ATokenProviderMethod: TioTokenProviderMethod; const ATokenValidateMethod: TioTokenValidateMethod);
 begin
-  _FTokenProviderMethod := ATokenProviderMethod;
-  _FTokenValidateMethod := ATokenValidateMethod;
+  _FTokenProviderMethod_NoDirectCall := ATokenProviderMethod;
+  _FTokenValidateMethod_NoDirectCall := ATokenValidateMethod;
 
   // set the token provider method
   if Assigned(ATokenProviderMethod) then
-    _FTokenProviderMethod := ATokenProviderMethod
+    _FTokenProviderMethod_NoDirectCall := ATokenProviderMethod
   else
   begin
-    _FTokenProviderMethod := function: String
+    _FTokenProviderMethod_NoDirectCall := function: String
       begin
         Result := String.Empty;
       end;
   end;
   // set the token validate method
   if Assigned(ATokenValidateMethod) then
-    _FTokenValidateMethod := ATokenValidateMethod
+    _FTokenValidateMethod_NoDirectCall := ATokenValidateMethod
   else
   begin
-    _FTokenValidateMethod := function(const AValidationRequest: IioTokenValidationRequest): Boolean
+    _FTokenValidateMethod_NoDirectCall := function(const AValidationRequest: IioTokenValidationRequest): Boolean
       begin
         Result := True;
       end;
@@ -427,7 +427,7 @@ end;
 
 class function TioApplication.ValidateToken(const AValidationRequest: IioTokenValidationRequest): Boolean;
 begin
-  Result := _FTokenValidateMethod(AValidationRequest);
+  Result := _FTokenValidateMethod_NoDirectCall(AValidationRequest);
 end;
 
 { TioAction }
