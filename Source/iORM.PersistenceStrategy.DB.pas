@@ -165,6 +165,7 @@ begin
     begin
       // Get the Context for the current ResolverTypeName
       LContext := TioContextFactory.Context_PSRequest(APSRequest, LResolvedTypeName);
+      LContext.ActionType := atSelect;
       // If the object is of a class mapped as NotPersisted then continue
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Exit;
@@ -209,6 +210,7 @@ begin
     begin
       // Get the Context for the current ResolverTypeName
       LContext := TioContextFactory.Context_PSRequest(APSRequest, LResolvedTypeName);
+      LContext.ActionType := atDelete;
       // If the object is of a class mapped as NotPersisted then skip it
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
@@ -468,6 +470,7 @@ var
 begin
   // Get the Context
   LContext := TioContextFactory.Context_PSRequest(APSRequest, APSRequest.Where.TypeName);
+  LContext.ActionType := atSelect;
   // If the object is of a class mapped as NotPersisted then skip it
   if LContext.Map.GetTable.IsNotPersistedEntity then
     Exit;
@@ -575,6 +578,7 @@ begin
     begin
       // Get the Context for the current ResolverTypeName
       LContext := TioContextFactory.Context_PSRequest(APSRequest, LResolvedTypeName);
+      LContext.ActionType := atSelect;
       // If the object is of a class mapped as NotPersisted then continue
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Exit;
@@ -626,6 +630,7 @@ begin
     begin
       // Get the Context for the current ResolverTypeName
       LContext := TioContextFactory.Context_PSRequest(APSRequest, LResolvedTypeName);
+      LContext.ActionType := atSelect;
       // If the object is of a class mapped as NotPersisted then continue
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Exit;
@@ -1091,6 +1096,7 @@ begin
     begin
       // Get the Context for the current ResolverTypeName
       LContext := TioContextFactory.Context_PSRequest(APSRequest, LResolvedTypeName);
+      LContext.ActionType := atSelect;
       // If the object is of a class mapped as NotPersisted then skip it
       if LContext.Map.GetTable.IsNotPersistedEntity then
         Continue;
@@ -1141,6 +1147,7 @@ var
             LCurrentContext := LContextCache.GetContext(APSRequest, LQuery.ExtractTrueClassName(LOriginalContext))
           else
             LCurrentContext := LOriginalContext;
+          LCurrentContext.ActionType := atSelect;
           // access-token validation
           // note: The anonymous method of type "TioTokenValidateMethod" can return true or false
           //        to authorize or not the operation to be performed. But be careful, if the operation
@@ -1248,6 +1255,7 @@ var
             LCurrentContext := TioContextFactory.Context_PSRequest(APSRequest, LQuery.ExtractTrueClassName(LOriginalContext))
           else
             LCurrentContext := LOriginalContext;
+          LCurrentContext.ActionType := atSelect;
           // access-token validation
           // note: The anonymous method of type "TioTokenValidateMethod" can return true or false
           //        to authorize or not the operation to be performed. But be careful, if the operation

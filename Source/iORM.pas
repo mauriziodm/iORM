@@ -172,6 +172,7 @@ const
 
   // TioPersistenceActionType = (atDoNotPersist, atInsert, atUpdate, atDelete);
   atDoNotPersist = iORM.CommonTypes.atUndefined;
+  atSelect = iORM.CommonTypes.atSelect;
   atInsert = iORM.CommonTypes.atInsert;
   atUpdate = iORM.CommonTypes.atUpdate;
   atDelete = iORM.CommonTypes.atDelete;
@@ -326,6 +327,11 @@ type
 
   // ViewModel class
   TioViewModel = iORM.MVVM.ViewModel.TioViewModel;
+
+  // Auth
+  TioAuthTokenProviderMethod = iORM.Abstraction.Interfaces.TioAuthTokenProviderMethod;
+  TioAuthDecisionMethod = iORM.Abstraction.Interfaces.TioAuthDecisionMethod;
+  IioAuthDecisionRequest = iORM.Abstraction.Interfaces.IioAuthDecisionRequest;
 {$ENDREGION}
 
 // Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
