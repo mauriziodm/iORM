@@ -200,7 +200,7 @@ type
     property OriginalNonTrueClassMap: IioMap read GetOriginalNonTrueClassMap write SetOriginalNonTrueClassMap;
   end;
 
-  TioContext_PSRequest = class(TioContext_Custom, IioTokenValidationRequest)
+  TioContext_PSRequest = class(TioContext_Custom, IioAuthDecisionRequest)
   strict private
     FPSRequest: IioPersistenceStrategyRequest;
   protected

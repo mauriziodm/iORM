@@ -291,7 +291,7 @@ begin
     //        will not be performed but the user will probably not notice the lack of authorization;
     //        If you want to inform the user of the failed authorization, you need to raise an exception
     //        within the annoying method itself (TioTokenValidateMethod).
-    if TioApplication.ValidateToken(LContext as IioTokenValidationRequest) then
+    if TioApplication.ProvideAuthDecision(LContext as IioAuthDecisionRequest) then
     begin
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
@@ -799,7 +799,7 @@ begin
     //        will not be performed but the user will probably not notice the lack of authorization;
     //        If you want to inform the user of the failed authorization, you need to raise an exception
     //        within the annoying method itself (TioTokenValidateMethod).
-    if TioApplication.ValidateToken(LContext as IioTokenValidationRequest) then
+    if TioApplication.ProvideAuthDecision(LContext as IioAuthDecisionRequest) then
     begin
 {$REGION '-----INTERCEPTORS-----'}
 {$IFNDEF ioCRUDInterceptorsOff}
@@ -1148,7 +1148,7 @@ var
           //        will not be performed but the user will probably not notice the lack of authorization;
           //        If you want to inform the user of the failed authorization, you need to raise an exception
           //        within the annoying method itself (TioTokenValidateMethod).
-          if TioApplication.ValidateToken(LCurrentContext as IioTokenValidationRequest) then
+          if TioApplication.ProvideAuthDecision(LCurrentContext as IioAuthDecisionRequest) then
           begin
             // Clean the DataObject (it contains the previous)
             LCurrentContext.DataObject := nil;
@@ -1255,7 +1255,7 @@ var
           //        will not be performed but the user will probably not notice the lack of authorization;
           //        If you want to inform the user of the failed authorization, you need to raise an exception
           //        within the annoying method itself (TioTokenValidateMethod).
-          if TioApplication.ValidateToken(LCurrentContext as IioTokenValidationRequest) then
+          if TioApplication.ProvideAuthDecision(LCurrentContext as IioAuthDecisionRequest) then
           begin
             // Create the object as TObject (Intercepted by CRUDInterceptors)
 {$REGION '-----INTERCEPTORS-----'}

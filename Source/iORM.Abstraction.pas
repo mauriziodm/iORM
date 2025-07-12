@@ -120,8 +120,8 @@ type
     class procedure _SetConcreteClass(const AClass: TioApplicationRef);
   public
     class var _FConcreteSessionDataStoreClass_NoDirectCall: TioCustomSessionDataStoreRef; // public for inline, do not use directly
-    class var _FTokenProviderMethod_NoDirectCall: TioTokenProviderMethod; // public for inline, do not use directly
-    class var _FTokenValidateMethod_NoDirectCall: TioTokenValidateMethod; // public for inline, do not use directly
+    class var _FAuthTokenProviderMethod_NoDirectCall: TioAuthTokenProviderMethod; // public for inline, do not use directly
+    class var _FAuthDecisionMethod_NoDirectCall: TioAuthDecisionMethod; // public for inline, do not use directly
     class constructor Create;
     class function _GetConcreteClass_NoDirectCall: TioApplicationRef; // public for inline, do not use directly
     class procedure CheckIfAbstractionLayerComponentExists; inline;
@@ -135,9 +135,9 @@ type
     class procedure ShowWait; static;
     class procedure HideWait; static;
     // Access-token related methods
-    class procedure SetTokenMethods(const ATokenProviderMethod: TioTokenProviderMethod; const ATokenValidateMethod: TioTokenValidateMethod); static;
-    class function ProvideToken: String; inline; static;
-    class function ValidateToken(const AValidationRequest: IioTokenValidationRequest): Boolean; inline; static;
+    class procedure SetAuthMethods(const AAuthTokenProviderMethod: TioAuthTokenProviderMethod; const AAuthDecisionMethod: TioAuthDecisionMethod); static;
+    class function ProvideAuthToken: String; inline; static;
+    class function ProvideAuthDecision(const AValidationRequest: IioAuthDecisionRequest): Boolean; inline; static;
   end;
 
   TioControlRef = class of TioControl;
@@ -342,7 +342,7 @@ begin
   _FConcreteClass_NoDirectCall := nil;
   FHideWaitMethod := nil;
   FShowWaitMethod := nil;
-  SetTokenMethods(nil, nil);
+  SetAuthMethods(nil, nil);
 end;
 
 class procedure TioApplication.HandleException(const Sender: TObject);
@@ -361,9 +361,9 @@ begin
   Result := _GetConcreteClass_NoDirectCall._ProjectPlatform;
 end;
 
-class function TioApplication.ProvideToken: String;
+class function TioApplication.ProvideAuthToken: String;
 begin
-  Result := _FTokenProviderMethod_NoDirectCall;
+  Result := _FAuthTokenProviderMethod_NoDirectCall;
 end;
 
 class procedure TioApplication._SetConcreteClass(const AClass: TioApplicationRef);
@@ -376,27 +376,27 @@ begin
   Result := _FConcreteSessionDataStoreClass_NoDirectCall;
 end;
 
-class procedure TioApplication.SetTokenMethods(const ATokenProviderMethod: TioTokenProviderMethod; const ATokenValidateMethod: TioTokenValidateMethod);
+class procedure TioApplication.SetAuthMethods(const AAuthTokenProviderMethod: TioAuthTokenProviderMethod; const AAuthDecisionMethod: TioAuthDecisionMethod);
 begin
-  _FTokenProviderMethod_NoDirectCall := ATokenProviderMethod;
-  _FTokenValidateMethod_NoDirectCall := ATokenValidateMethod;
+  _FAuthTokenProviderMethod_NoDirectCall := AAuthTokenProviderMethod;
+  _FAuthDecisionMethod_NoDirectCall := AAuthDecisionMethod;
 
   // set the token provider method
-  if Assigned(ATokenProviderMethod) then
-    _FTokenProviderMethod_NoDirectCall := ATokenProviderMethod
+  if Assigned(AAuthTokenProviderMethod) then
+    _FAuthTokenProviderMethod_NoDirectCall := AAuthTokenProviderMethod
   else
   begin
-    _FTokenProviderMethod_NoDirectCall := function: String
+    _FAuthTokenProviderMethod_NoDirectCall := function: String
       begin
         Result := String.Empty;
       end;
   end;
   // set the token validate method
-  if Assigned(ATokenValidateMethod) then
-    _FTokenValidateMethod_NoDirectCall := ATokenValidateMethod
+  if Assigned(AAuthDecisionMethod) then
+    _FAuthDecisionMethod_NoDirectCall := AAuthDecisionMethod
   else
   begin
-    _FTokenValidateMethod_NoDirectCall := function(const AValidationRequest: IioTokenValidationRequest): Boolean
+    _FAuthDecisionMethod_NoDirectCall := function(const AValidationRequest: IioAuthDecisionRequest): Boolean
       begin
         Result := True;
       end;
@@ -425,9 +425,9 @@ begin
   Result := _GetConcreteClass_NoDirectCall._Terminate;
 end;
 
-class function TioApplication.ValidateToken(const AValidationRequest: IioTokenValidationRequest): Boolean;
+class function TioApplication.ProvideAuthDecision(const AValidationRequest: IioAuthDecisionRequest): Boolean;
 begin
-  Result := _FTokenValidateMethod_NoDirectCall(AValidationRequest);
+  Result := _FAuthDecisionMethod_NoDirectCall(AValidationRequest);
 end;
 
 { TioAction }
@@ -621,7 +621,7 @@ begin
   try
     LSessionData := _GetThreadOrMainSessionData(True);
     // access-token
-    APersistenceStrategyRequest.Token := TioApplication.ProvideToken;
+    APersistenceStrategyRequest.Token := TioApplication.ProvideAuthToken;
     // app
     APersistenceStrategyRequest.App := LSessionData.App;
     APersistenceStrategyRequest.AppOID := LSessionData.AppOID;

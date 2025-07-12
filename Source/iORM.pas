@@ -444,7 +444,7 @@ type
     class procedure HideWait;
 
     // Access-token related methods
-    class procedure SetTokenMethods(const ATokenProviderMethod: TioTokenProviderMethod; const ATokenValidateMethod: TioTokenValidateMethod);
+    class procedure SetAuthMethods(const ATokenProviderMethod: TioAuthTokenProviderMethod; const AAuthDecisionMethod: TioAuthDecisionMethod);
 
     // RefTo (returning IioWhere fluent interface)
     class function RefTo(const ATypeName: String; const ATypeAlias: String = ''): IioWhere; overload;
@@ -1124,10 +1124,10 @@ begin
   Result := TioDBFactory.SQLDestination(ASQL);
 end;
 
-class procedure io.SetTokenMethods(const ATokenProviderMethod: TioTokenProviderMethod;
-  const ATokenValidateMethod: TioTokenValidateMethod);
+class procedure io.SetAuthMethods(const ATokenProviderMethod: TioAuthTokenProviderMethod;
+  const AAuthDecisionMethod: TioAuthDecisionMethod);
 begin
-  TioApplication.SetTokenMethods(ATokenProviderMethod, ATokenValidateMethod);
+  TioApplication.SetAuthMethods(ATokenProviderMethod, AAuthDecisionMethod);
 end;
 
 class procedure io.SetWaitMethods(const AShowWaitMethod: TioShowWaitMethod; const AHideWaitMethod: TioHideWaitMethod);

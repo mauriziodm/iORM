@@ -15,7 +15,7 @@ type
   TioHideWaitMethod = reference to Procedure;
 
   // forward declaration
-  IioTokenValidationRequest = interface;
+  IioAuthDecisionRequest = interface;
 
   // access-token related methods
   // note: The anonymous method of type "TioTokenValidateMethod" can return true or false
@@ -24,8 +24,8 @@ type
   //        will not be performed but the user will probably not notice the lack of authorization;
   //        If you want to inform the user of the failed authorization, you need to raise an exception
   //        within the annoying method itself (TioTokenValidateMethod).
-  TioTokenProviderMethod = reference to Function: String;
-  TioTokenValidateMethod = reference to Function(const AValidationRequest: IioTokenValidationRequest): Boolean;
+  TioAuthTokenProviderMethod = reference to Function: String;
+  TioAuthDecisionMethod = reference to Function(const AAuthDecisionRequest: IioAuthDecisionRequest): Boolean;
 
   // Questa è l'interfaccia che verrà usata nell'anonymous method per validare l'access-token
   //  prima di ogni richiesta di esecuzione di una azione su un oggetto/classe.
@@ -33,7 +33,7 @@ type
   //       a disposizione quindi farò una classe apposita che implementa semplicemente questa classe
   //       e che popolerò appositamente per la validazione dell'access-token e stabilire quindi se
   //       quella action deve essere abilitata per quell'utente e per quell'oggetto oppure no.
-  IioTokenValidationRequest = interface
+  IioAuthDecisionRequest = interface
     ['{02E419C2-347C-412D-B7B3-F264EFB92B94}']
     // methods
     function AsContext: IioContext;
