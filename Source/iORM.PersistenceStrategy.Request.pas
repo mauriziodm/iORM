@@ -6,7 +6,7 @@ uses
   iORM.CommonTypes, iORM.PersistenceStrategy.Interfaces,
   System.Rtti, iORM.LiveBindings.BSPersistence, iORM.Where.Interfaces,
   iORM.Abstraction.SessionData.Interfaces,
-  iORM.Abstraction;
+  iORM.Abstraction, iORM.Attributes;
 
 type
 
@@ -15,6 +15,7 @@ type
     // method
     FMethod: TioPersistenceStrategyMethod;
     // auth-cache
+    [ioSkip]
     FAuthCache: IioAuthCache;
     // session data
     FToken: String;

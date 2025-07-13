@@ -82,7 +82,7 @@ uses
   iORM.Context.Container, iORM.Utilities,
   iORM.LiveBindings.Interfaces,
   iORM.Where.Interfaces,
-  DJSON, iORM.LiveBindings.BSPersistence;
+  DJSON, iORM.LiveBindings.BSPersistence, iORM.Where.Factory;
 
 { TioObjectMakerIntf }
 
@@ -296,10 +296,11 @@ class function TioObjectMakerIntf.LoadPropertyHasOne(const AContext: IioContext;
 var
   LWhere: IioWhere;
 begin
-  // Build where conditions
-  LWhere := io.Where(AProperty.GetRelationChildPropertyName, coEquals, AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext).AsInteger).Cacheable;
+  // Build where conditions (with previous AuthCache propagation)
+  LWhere := TioWhereFactory.NewWhere(AContext.PSRequest);
   LWhere.TypeName := AProperty.GetRelationChildTypeName;
   LWhere.TypeAlias := AProperty.GetRelationChildTypeAlias;
+  LWhere._And(AProperty.GetRelationChildPropertyName, coEquals, AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext).AsInteger).Cacheable;
   // Check if there is a detail object on the DB, if it finds it it loads it otherwise it returns nil
   // NB: In caso di "ChildPropertyPath" non vuoto crea l'istanza dell'oggetto finale (ultimo livello) a cui
   //      la MasterProperty si riferisce indirettamente, sarà compito della classe master e delle classi
@@ -321,6 +322,7 @@ end;
 class function TioObjectMakerIntf.LoadPropertyBelongsTo(const AContext: IioContext; const AQuery: IioQuery; const AProperty: IioProperty): TObject;
 var
   LChildID: Integer;
+  LWhere: IioWhere;
 begin
   // If the ID of the detail object is equal to zero it means that when it was persisted this
   //  property was nil then it exits returning nil otherwise it loads the object from the DB
@@ -334,7 +336,12 @@ begin
     //        la ChildProperty destinazione.
     // Note: If the property is an interface then artificially increment the RefCount to avoid premature destruction of the instance
     Result := AProperty.GetRelationChildObject(AContext.DataObject);
-    Result := io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias).ByID(LChildID).Cacheable.ToObject(Result);
+    // Build where conditions (with previous AuthCache propagation) and execute
+    LWhere := TioWhereFactory.NewWhere(AContext.PSRequest);
+    LWhere.TypeName := AProperty.GetRelationChildTypeName;
+    LWhere.TypeAlias := AProperty.GetRelationChildTypeAlias;
+    LWhere.ByID(LChildID).Cacheable;
+    Result := LWhere.ToObject(Result);
 // NB: Ho eliminato questa verifica perchè nel caso il child object fosse stata una NotPersistedEntity
 //      in pratica sarebbe sempre stato in errore nel caso per qualche strano motivo avesse cmq
 //      persistito l'ID del child object sul campo del master object (BelongsTo).
@@ -378,8 +385,12 @@ begin
   // Get the where conditions for the details if exists (nil if not exists)
   LDetailWhere := AContext.Where.Details.Get(AProperty.GetName);
   // It set the first part of the load operation
-  LWhere := io.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias)._PropertyEqualsTo(AProperty.GetRelationChildPropertyName,
-    AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext)).ClearListBefore(AContext.Where.GetClearListBefore).Cacheable;
+  // Build where conditions (with previous AuthCache propagation)
+  LWhere := TioWhereFactory.NewWhere(AContext.PSRequest);
+  LWhere.TypeName := AProperty.GetRelationChildTypeName;
+  LWhere.TypeAlias := AProperty.GetRelationChildTypeAlias;
+  LWhere._PropertyEqualsTo(AProperty.GetRelationChildPropertyName, AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext)).
+    ClearListBefore(AContext.Where.GetClearListBefore).Cacheable;
   // If a Details Where conditions (for the details) is present then add it to the load operation
   if Assigned(LDetailWhere) then
     LWhere._And(LDetailWhere)._OrderBy(LDetailWhere.GetOrderByInstance); // Eventuale DetailWhere & OrderBy

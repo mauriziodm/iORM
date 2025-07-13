@@ -52,28 +52,43 @@ implementation
 
 uses
   System.Rtti, iORM.Exceptions, iORM, System.SysUtils,
-  iORM.RttiContext.Factory;
+  iORM.RttiContext.Factory, iORM.Where.Factory;
 
 { TioObjectMakerTrueClass }
 
+//class procedure TioObjectMakerStrictlyTrueClass.MakeObject(const AContext:IioContext; const AQuery:IioQuery);
+//var
+//  LClassName: String;
+//  LRttiInstanceType: TRttiInstanceType;
+//  LWhere: IioWhere;
+//begin
+//  // Get full qualified class name
+//  LClassName := AQuery.Fields.FieldByName(AContext.GetTrueClass.GetFieldName).Value;
+//  LClassName := AContext.GetTrueClass.QualifiedClassNameFromClassInfoFieldValue(LClassName);
+//  // Get rtti class type for classref
+//  LRttiInstanceType := TioRttiFactory.GetRttiContext.FindType(LClassName) as TRttiInstanceType;
+//  if not Assigned(LRttiInstanceType) then
+//    raise EioGenericException.Create(Self.ClassName + ': RttiType not found (' + LClassName + ')');
+//  // Load object
+//  AContext.DataObject := io.Load(LRttiInstanceType.MetaclassType).ByID(AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext).AsInteger)
+//                                           .SetDetailsContainer(AContext.Where.Details)  // Copy the details from the Where  of the Context
+//                                           .DisableStrictlyTrueClass
+//                                           .Cacheable
+//                                           ._ToObjectInternalByClassOnly(AContext.Intent, AContext.DataObject);
+//end;
 class procedure TioObjectMakerStrictlyTrueClass.MakeObject(const AContext:IioContext; const AQuery:IioQuery);
 var
-  LRttiInstanceType: TRttiInstanceType;
-  LClassName: String;
+  LWhere: IioWhere;
 begin
-  // Get full qualified class name
-  LClassName := AQuery.Fields.FieldByName(AContext.GetTrueClass.GetFieldName).Value;
-  LClassName := AContext.GetTrueClass.QualifiedClassNameFromClassInfoFieldValue(LClassName);
-  // Get rtti class type for classref
-  LRttiInstanceType := TioRttiFactory.GetRttiContext.FindType(LClassName) as TRttiInstanceType;
-  if not Assigned(LRttiInstanceType) then
-    raise EioGenericException.Create(Self.ClassName + ': RttiType not found (' + LClassName + ')');
-  // Load object
-  AContext.DataObject := io.Load(LRttiInstanceType.MetaclassType).ByID(AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext).AsInteger)
-                                           .SetDetailsContainer(AContext.Where.Details)  // Copy the details from the Where  of the Context
-                                           .DisableStrictlyTrueClass
-                                           .Cacheable
-                                           ._ToObjectInternalByClassOnly(AContext.Intent, AContext.DataObject);
+  // Build where conditions (with previous AuthCache propagation)
+  LWhere := TioWhereFactory.NewWhere(AContext.PSRequest);
+  LWhere.TypeName := AContext.GetTrueClass.GetClassName;
+  LWhere.ByID(AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext).AsInteger)
+        .SetDetailsContainer(AContext.Where.Details)  // Copy the details from the Where  of the Context
+        .DisableStrictlyTrueClass
+        .Cacheable;
+  // Execute
+  AContext.DataObject := LWhere._ToObjectInternalByClassOnly(AContext.Intent, AContext.DataObject);
 end;
 
 end.

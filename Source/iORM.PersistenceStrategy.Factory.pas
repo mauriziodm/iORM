@@ -211,7 +211,13 @@ end;
 class function TioPersistenceStrategyFactory.NewPSRequest_LoadList(const AWhere: IioWhere; const AListDTO: TObject;
   const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
 begin
-  Result := _NewPSRequest(psmLoadList, True);
+  if AWhere.HasMasterPSRequest then
+  begin
+    Result := _NewPSRequest(psmLoadList, False);
+    Result.ImportSessionDataFromPSRequest(AWhere.GetMasterPSRequest as IioPersistenceStrategyRequest);
+  end
+  else
+    Result := _NewPSRequest(psmLoadList, True);
   Result.Intent := AIntent;
   Result.ListDTO := AListDTO;
   Result.ListDTO_Serialize := False;
@@ -222,7 +228,13 @@ end;
 class function TioPersistenceStrategyFactory.NewPSRequest_LoadObject(const AWhere: IioWhere; const ADTO: TObject;
   const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
 begin
-  Result := _NewPSRequest(psmLoadObject, True);
+  if AWhere.HasMasterPSRequest then
+  begin
+    Result := _NewPSRequest(psmLoadObject, False);
+    Result.ImportSessionDataFromPSRequest(AWhere.GetMasterPSRequest as IioPersistenceStrategyRequest);
+  end
+  else
+    Result := _NewPSRequest(psmLoadObject, True);
   Result.Intent := AIntent;
   Result.DTO := ADTO;
   Result.DTO_Serialize := True;
@@ -233,7 +245,13 @@ end;
 class function TioPersistenceStrategyFactory.NewPSRequest_LoadObjectByClassOnly(const AWhere: IioWhere; const ADTO: TObject;
   const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
 begin
-  Result := _NewPSRequest(psmLoadObjectByClassOnly, True);
+  if AWhere.HasMasterPSRequest then
+  begin
+    Result := _NewPSRequest(psmLoadObjectByClassOnly, False);
+    Result.ImportSessionDataFromPSRequest(AWhere.GetMasterPSRequest as IioPersistenceStrategyRequest);
+  end
+  else
+    Result := _NewPSRequest(psmLoadObjectByClassOnly, True);
   Result.Intent := AIntent;
   Result.DTO := ADTO;
   Result.DTO_Serialize := False;

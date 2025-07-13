@@ -37,13 +37,14 @@ interface
 
 uses
   iORM.Where.Interfaces, iORM.Where, iORM.LiveBindings.CommonBSAPaging,
-  iORM.Where.SmartBuilder, iORM.Where.SqlItems.Interfaces, iORM.LiveBindings.BSPersistence;
+  iORM.Where.SmartBuilder, iORM.Where.SqlItems.Interfaces, iORM.LiveBindings.BSPersistence,
+  iORM.PersistenceStrategy.Interfaces;
 
 type
 
   TioWhereFactory = class
   public
-    class function NewWhere: IioWhere; overload;
+    class function NewWhere(const APreviousPSRequest: IioPersistenceStrategyRequest = nil): IioWhere; overload;
     class function NewWhere<T>: IioWhere<T>; overload;
     class function NewWhereWithPagingAndETMfor(const APaging: TioCommonBSAPageManager; const AETMfor: IioMasterBindSource): IioWhere; overload;
     class function NewWhereItems: TWhereItems;
@@ -65,14 +66,14 @@ begin
   Result := TioWhereDetailsContainer.Create;
 end;
 
-class function TioWhereFactory.NewWhere: IioWhere;
+class function TioWhereFactory.NewWhere(const APreviousPSRequest: IioPersistenceStrategyRequest): IioWhere;
 begin
-  Result := TioWhere.Create;
+  Result := TioWhere.Create(APreviousPSRequest);
 end;
 
 class function TioWhereFactory.NewWhere<T>: IioWhere<T>;
 begin
-  Result := TioWhere<T>.Create;
+  Result := TioWhere<T>.Create(nil);
 end;
 
 class function TioWhereFactory.NewWhereItems: TWhereItems;
@@ -92,7 +93,7 @@ end;
 
 class function TioWhereFactory.NewWhereWithPagingAndETMfor(const APaging: TioCommonBSAPageManager; const AETMfor: IioMasterBindSource): IioWhere;
 begin
-  Result := TioWhere.Create;
+  Result := TioWhere.Create(nil);
   Result.SetPagingObj(APaging); // Inject paging object specified in the BindSource
   Result.SetETMfor(AETMfor); // Inject ETMfor BS specified in the BindSource
 end;

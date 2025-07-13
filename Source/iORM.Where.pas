@@ -48,7 +48,7 @@ uses
   iORM.Utilities, iORM.LiveBindings.CommonBSAPaging,
   iORM.Context.Interfaces, iORM.StdActions.Interfaces,
   iORM.LiveBindings.Interfaces, DJSON.Attributes,
-  iORM.PersistenceStrategy.Factory;
+  iORM.PersistenceStrategy.Factory, iORM.PersistenceStrategy.Interfaces;
 
 type
 
@@ -91,6 +91,14 @@ type
     [djSkip]
     FETMfor: IioBindSource;
     FETMFor_Sql: String;
+    // MasterPSRequest
+    // NB: Eventuale PSRequest usata per il caricamento di un oggetto master e poi ricevuta
+    //      da un successivo oggetto where per il caricamento di un oggetto child in seguito
+    //      a una relazione. Serve principalmente per la propagazione dei dati di sessione
+    //      e della AuthCache
+    [djSkip]
+    FMasterPSRequest: IInterface;  // IInterface to avoid circular reference (in IioWhere interface)
+    // methods
     procedure ClearETM_Sql; inline;
     procedure FillETM_Sql;  inline;
 
@@ -119,23 +127,25 @@ type
     function GetTypeInfo: PTypeInfo;
     procedure SetTypeInfo(const Value: PTypeInfo);
   public
-    constructor Create; reintroduce; overload;
+    constructor Create(const APreviousPSRequest: IioPersistenceStrategyRequest); reintroduce; overload;
     destructor Destroy; override;
     procedure Clear(const AClearWhereDetails: Boolean = True);
     function GetClearListBefore: Boolean;
-    function GetWhereItems: TWhereItems;
-    function GetSql(const AMap: IioMap; const AddWhere: Boolean = True): String; reintroduce;
-    function GetSqlWithTrueClass(const AMap: IioMap; const AIsTrueClass: Boolean; const ATrueClass: IioTrueClass): String;
     function GetDisableStrictlyTrueClass: Boolean;
-    function GetOrderByInstance: IioSqlItemWhere;
-    function GetOrderBySql(const AMap: IioMap): String;
+    function GetETMfor: IInterface; // IInterface to avoid circular reference
     function GetLimitRows: Integer;
     function GetLimitOffset: Integer;
+    function GetMasterPSRequest: IInterface; // IInterface to avoid circular reference
+    function GetOrderByInstance: IioSqlItemWhere;
+    function GetOrderBySql(const AMap: IioMap): String;
     function GetPagingObj: TObject; // TObject to avoid circular reference
-    procedure SetPagingObj(const APagingObj: TObject); // TObject to avoid circular reference
+    function GetSql(const AMap: IioMap; const AddWhere: Boolean = True): String; reintroduce;
+    function GetSqlWithTrueClass(const AMap: IioMap; const AIsTrueClass: Boolean; const ATrueClass: IioTrueClass): String;
+    function GetWhereItems: TWhereItems;
+    function HasMasterPSRequest: Boolean;
     procedure SetETMfor(const AETMfor: IInterface); // IInterface to avoid circular reference
-    function GetETMfor: IInterface; // IInterface to avoid circular reference
     procedure SetOrderBySql(const AOrderByText: String);
+    procedure SetPagingObj(const APagingObj: TObject); // TObject to avoid circular reference
     function WhereConditionExists: Boolean;
     // ------ Generic destinationz
     function ToGenericList: TioWhereGenericListDestination;
@@ -419,8 +429,7 @@ uses
   iORM.RttiContext.Factory, iORM, iORM.Where.SqlItems, iORM.DB.Interfaces, iORM.Resolver.Factory,
   iORM.Where.Factory, iORM.Exceptions, FireDAC.Comp.DataSet, iORM.LazyLoad.Factory,
   iORM.Context.Container, System.StrUtils,
-  iORM.ObjectsForge.Interfaces, iORM.ETM.Engine,
-  iORM.PersistenceStrategy.Interfaces, iORM.Abstraction;
+  iORM.ObjectsForge.Interfaces, iORM.ETM.Engine, iORM.Abstraction;
 
 { TioWhere }
 
@@ -726,9 +735,10 @@ begin
   FClearListBefore := AClearListBefore;
 end;
 
-constructor TioWhere.Create;
+constructor TioWhere.Create(const APreviousPSRequest: IioPersistenceStrategyRequest);
 begin
   TioApplication.CheckIfAbstractionLayerComponentExists;
+  FMasterPSRequest := APreviousPSRequest;
   FIntent := itRegular;
   FDisableStrictlyTrueClass := False;
   FLazyLoad := False;
@@ -918,6 +928,11 @@ begin
     Result := FPagingObj.GetSqlLimit;
 end;
 
+function TioWhere.GetMasterPSRequest: IInterface;
+begin
+  Result := FMasterPSRequest;
+end;
+
 function TioWhere.GetOrderByInstance: IioSqlItemWhere;
 begin
   Result := FOrderBy;
@@ -994,6 +1009,11 @@ end;
 function TioWhere.GetWhereItems: TWhereItems;
 begin
   Result := FWhereItems;
+end;
+
+function TioWhere.HasMasterPSRequest: Boolean;
+begin
+  Result := Assigned(FMasterPSRequest);
 end;
 
 function TioWhere.WhereConditionExists: Boolean;

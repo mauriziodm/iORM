@@ -68,21 +68,23 @@ type
   IioWhere = interface
     ['{CB0292C6-A7A8-4951-A867-D5A5F6D8F053}']
     procedure Clear(const AClearWhereDetails: Boolean = True);
+    procedure FillETM_Sql;
     function GetClearListBefore: Boolean;
-    function GetWhereItems: TWhereItems;
+    function GetDisableStrictlyTrueClass: Boolean;
+    function GetETMfor: IInterface; // IInterface to avoid circular reference
+    function GetLimitOffset: Integer;
+    function GetLimitRows: Integer;
+    function GetMasterPSRequest: IInterface; // IInterface to avoid circular reference
+    function GetOrderByInstance: IioSqlItemWhere;
+    function GetOrderBySql(const AMap:IioMap): String;
+    function GetPagingObj: TObject;  // TObject to avoid circular reference
     function GetSql(const AMap:IioMap; const AddWhere:Boolean=True): String;
     function GetSqlWithTrueClass(const AMap:IioMap; const AIsTrueClass:Boolean; const ATrueClass: IioTrueClass): String;
-    function GetOrderBySql(const AMap:IioMap): String;
-    function GetOrderByInstance: IioSqlItemWhere;
-    procedure SetOrderBySql(const AOrderByText:String);
-    function GetDisableStrictlyTrueClass: Boolean;
-    function GetLimitRows: Integer;
-    function GetLimitOffset: Integer;
-    function GetPagingObj: TObject;  // TObject to avoid circular reference
-    procedure SetPagingObj(const APagingObj: TObject);  // TObject to avoid circular reference
-    procedure FillETM_Sql;
+    function GetWhereItems: TWhereItems;
+    function HasMasterPSRequest: Boolean;
     procedure SetETMfor(const AETMfor: IInterface); // IInterface to avoid circular reference
-    function GetETMfor: IInterface; // IInterface to avoid circular reference
+    procedure SetOrderBySql(const AOrderByText:String);
+    procedure SetPagingObj(const APagingObj: TObject);  // TObject to avoid circular reference
     function WhereConditionExists: Boolean;
     // ------ Generic destinationz
     function ToGenericList: TioWhereGenericListDestination;
