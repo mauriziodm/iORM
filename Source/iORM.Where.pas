@@ -1212,8 +1212,14 @@ function TioWhere.ToList(const AListRttiType: TRttiType; const AOwnsObjects: Boo
 begin
   // Create the list
   Result := TioObjectMakerIntf.CreateListByRttiType(AListRttiType, AOwnsObjects);
-  // Fill the list
-  Self.ToList(Result);
+  // try-except to avoid memory leaks if an exception occurs
+  try
+    // Fill the list
+    Self.ToList(Result);
+  except
+    FreeAndNil(result);
+    raise;
+  end;
 end;
 
 function TioWhere.ToList(const AListClassRef: TioClassRef; const AOwnsObjects: Boolean = True): TObject;
