@@ -23,7 +23,7 @@ type
 
   TioAsyncProc = class(TThread)
   strict private
-    FException: Exception;
+    FException: TObject;
     FOnExceptionMethod: TioAsyncProcOnException;
     FOnExecuteMethod: TioAsyncProcExecute;
     FOnSuccessMethod: TioAsyncProcOnSuccess;
@@ -31,6 +31,7 @@ type
   strict protected
     procedure Execute; override;
     procedure OnTerminateEventHandler(Sender: TObject);
+    procedure ReraiseOnMainThread;
   public
     constructor Create(const AOnExecute: TioAsyncProcExecute; const AOnSuccess: TioAsyncProcOnSuccess; const AOnException: TioAsyncProcOnException; const AShowWait: Boolean = False);
   end;
@@ -64,32 +65,41 @@ begin
     FOnExecuteMethod;
   except
     on E: Exception do
-      FException := AcquireExceptionObject as Exception;
+      begin
+        FException := AcquireExceptionObject;
+        Synchronize(ReraiseOnMainThread);
+      end;
   end;
 end;
 
 procedure TioAsyncProc.OnTerminateEventHandler(Sender: TObject);
 begin
   try
-    // If an exception was raised during the execution of the thread then re-raise the acquire exception into the main thread
-    //  (otherwise I had problems) and then raise a new exception with the same message so that it comes out to the user too.
-    // note: The new exception is raised decoupled with a Timer because I had problems otherwise.
-    if Assigned(FException) then
-    begin
-      if FShowWait then
-        TioApplication.HideWait;
-      if Assigned(FOnExceptionMethod) then
-        FOnExceptionMethod(FException)
-      else
-        raise FException;
-    end
-    else
-      // If everything went well, it executes the terminate anonymous method
-      if Assigned(FOnSuccessMethod) then
-        FOnSuccessMethod;
+    // If everything went well, it executes the terminate anonymous method
+    if Assigned(FOnSuccessMethod) and not Assigned(FException) then
+      FOnSuccessMethod;
   finally
     if FShowWait then
       TioApplication.HideWait;
+  end;
+end;
+
+procedure TioAsyncProc.ReraiseOnMainThread;
+begin
+  // Questa procedura viene eseguita sul thread principale
+  if FShowWait then
+    TioApplication.HideWait;
+  try
+    if Assigned(FException) then
+      raise Exception(FException) at ExceptAddr; // Rilancia l'eccezione acquisita
+  except
+    on EMain: Exception do
+    begin
+      if Assigned(FOnExceptionMethod) then
+        FOnExceptionMethod(EMain)
+      else
+        TioApplication.ShowMessage('TioAsyncProc<T>: Exception caught on main thread: ' + EMain.Message);
+    end;
   end;
 end;
 

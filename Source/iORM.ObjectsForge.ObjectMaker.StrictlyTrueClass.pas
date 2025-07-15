@@ -51,7 +51,7 @@ type
 implementation
 
 uses
-  System.Rtti, iORM.Exceptions, iORM, System.SysUtils,
+  System.Rtti, iORM, System.SysUtils,
   iORM.RttiContext.Factory, iORM.Where.Factory;
 
 { TioObjectMakerTrueClass }

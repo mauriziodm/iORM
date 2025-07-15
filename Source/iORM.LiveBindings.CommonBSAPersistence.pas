@@ -89,7 +89,7 @@ uses System.Classes, System.SysUtils, iORM.Exceptions, iORM,
   Data.Bind.ObjectScope,
   iORM.LiveBindings.CommonBSAPaging, iORM.LiveBindings.Notification,
   iORM.Utilities, iORM.LiveBindings.BSPersistence.SmartDeleteSystem,
-  iORM.Where.Factory;
+  iORM.Where.Factory, iORM.Abstraction;
 
 type
 
