@@ -219,7 +219,7 @@ begin
   LTargetClass := nil;
   // If AutoLoadData is disabled then exit
   // Prevent AutoLoadData when reloading
-  if AActiveBindSourceAdapter.Reloading  or not AActiveBindSourceAdapter.AutoLoad then
+  if AActiveBindSourceAdapter.Reloading or not AActiveBindSourceAdapter.AutoLoad then
     Exit;
   // If it's a ListBindSourceAdapter then retrieve the list target class
   if Assigned(AActiveBindSourceAdapter.DataObject) then

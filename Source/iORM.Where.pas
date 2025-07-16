@@ -48,7 +48,8 @@ uses
   iORM.Utilities, iORM.LiveBindings.CommonBSAPaging,
   iORM.Context.Interfaces, iORM.StdActions.Interfaces,
   iORM.LiveBindings.Interfaces, DJSON.Attributes,
-  iORM.PersistenceStrategy.Factory, iORM.PersistenceStrategy.Interfaces;
+  iORM.PersistenceStrategy.Factory, iORM.PersistenceStrategy.Interfaces,
+  iORM.Async.Func;
 
 type
 
@@ -112,7 +113,10 @@ type
     procedure _AddCriteria(const AText: String); overload;
     procedure _AddCriteria(const AWhere: IioWhere); overload;
     procedure _AddCriteria(const ALogicOp: TioLogicOp; const AWhere: IioWhere); overload;
-    // -------------------------------------------
+
+    // Async internal
+    procedure _ToListAsync(const AAsync: Boolean; const AList: TObject; const AOnSuccessMethod: TioAsyncFuncOnSuccessMethod<TObject>; const AOnExceptionMethod: TioAsyncFuncOnExceptionMethod; const AFinallyMethod: TioAsyncFuncFinallyMethod);
+
     // Details property
     function GetDetails: IioWhereDetailsContainer;
     // Items property
@@ -153,13 +157,22 @@ type
     function ToMemTable: TFDMemTable; overload;
     procedure ToMemTable(const AMemTable: TFDMemTable); overload;
 
+    // ToLazyObject
     function ToLazyObject(const AObj: TObject = nil): TObject; overload;
     function ToLazyObject(const AIntf: IInterface): TObject; overload;
 
+    // TObject
     function _ToObjectInternalByClassOnly(const AIntent: TioPersistenceIntentType; const AObj: TObject = nil): TObject;
     function ToObject(const AObj: TObject = nil): TObject; overload;
     function ToObject(const AIntf: IInterface): TObject; overload;
 
+    // ToListAsync
+    procedure ToListAsync(const AList: TObject; const AOnSuccessMethod: TioAsyncFuncOnSuccessMethod<TObject>; const AOnExceptionMethod: TioAsyncFuncOnExceptionMethod = nil; const AFinallyMethod: TioAsyncFuncFinallyMethod = nil); overload;
+    procedure ToListAsync(const AListRttiType: TRttiType; const AOnSuccessMethod: TioAsyncFuncOnSuccessMethod<TObject>; const AOnExceptionMethod: TioAsyncFuncOnExceptionMethod = nil; const AFinallyMethod: TioAsyncFuncFinallyMethod = nil; const AOwnsObjects: Boolean = True); overload;
+    procedure ToListASync(const AInterfacedListTypeName: String; const AAlias: String; const AOnSuccessMethod: TioAsyncFuncOnSuccessMethod<TObject>; const AOnExceptionMethod: TioAsyncFuncOnExceptionMethod = nil; const AFinallyMethod: TioAsyncFuncFinallyMethod = nil; const AOwnsObjects: Boolean = True); overload;
+    procedure ToListAsync(const AListClassRef: TioClassRef; const AOnSuccessMethod: TioAsyncFuncOnSuccessMethod<TObject>; const AOnExceptionMethod: TioAsyncFuncOnExceptionMethod = nil; const AFinallyMethod: TioAsyncFuncFinallyMethod = nil; const AOwnsObjects: Boolean = True); overload;
+
+    // ToList
     procedure ToList(const AList: TObject); overload;
     function ToList(const AListRttiType: TRttiType; const AOwnsObjects: Boolean = True): TObject; overload;
     function ToList(const AInterfacedListTypeName: String; const AAlias: String = ''; const AOwnsObjects: Boolean = True): TObject; overload;
@@ -195,7 +208,6 @@ type
     function Cacheable: IioWhere;
     function IsCacheable: Boolean;
     function Intent(const AIntent: TioPersistenceIntentType): IioWhere;
-    // --------------------------------------------------------------
     // ------ Logic relations
     function _And: IioWhere; overload;
     function _Or: IioWhere; overload;
@@ -1217,7 +1229,7 @@ begin
     // Fill the list
     Self.ToList(Result);
   except
-    FreeAndNil(result);
+    FreeAndNil(Result);
     raise;
   end;
 end;
@@ -1225,6 +1237,60 @@ end;
 function TioWhere.ToList(const AListClassRef: TioClassRef; const AOwnsObjects: Boolean = True): TObject;
 begin
   Result := Self.ToList(TioUtilities.ClassRefToRttiType(AListClassRef), AOwnsObjects);
+end;
+
+procedure TioWhere.ToListAsync(const AListClassRef: TioClassRef; const AOnSuccessMethod: TioAsyncFuncOnSuccessMethod<TObject>;
+  const AOnExceptionMethod: TioAsyncFuncOnExceptionMethod; const AFinallyMethod: TioAsyncFuncFinallyMethod; const AOwnsObjects: Boolean);
+begin
+  Self.ToListAsync(
+    TioUtilities.ClassRefToRttiType(AListClassRef),
+    AOnSuccessMethod,
+    AOnExceptionMethod,
+    AFinallyMethod,
+    AOwnsObjects);
+end;
+
+procedure TioWhere.ToListAsync(const AInterfacedListTypeName, AAlias: String; const AOnSuccessMethod: TioAsyncFuncOnSuccessMethod<TObject>;
+  const AOnExceptionMethod: TioAsyncFuncOnExceptionMethod; const AFinallyMethod: TioAsyncFuncFinallyMethod; const AOwnsObjects: Boolean);
+begin
+  Self.ToListAsync(
+    io.di.Resolve(AInterfacedListTypeName, AAlias).GetImplementersItem.RttiType,
+    AOnSuccessMethod,
+    AOnExceptionMethod,
+    AFinallyMethod,
+    AOwnsObjects);
+end;
+
+procedure TioWhere.ToListAsync(const AListRttiType: TRttiType; const AOnSuccessMethod: TioAsyncFuncOnSuccessMethod<TObject>;
+  const AOnExceptionMethod: TioAsyncFuncOnExceptionMethod; const AFinallyMethod: TioAsyncFuncFinallyMethod; const AOwnsObjects: Boolean);
+var
+  LResult: TObject;
+begin
+  // Create the list
+  LResult := TioObjectMakerIntf.CreateListByRttiType(AListRttiType, AOwnsObjects);
+  // Fill the list (async)
+  Self.ToListAsync(LResult,
+    AOnSuccessMethod,
+    // OnExceptionMethod
+    procedure(AException: Exception)
+    begin
+      FreeAndNil(LResult);
+      AOnExceptionMethod(AException);
+    end,
+    AFinallyMethod);
+end;
+
+procedure TioWhere.ToListAsync(const AList: TObject; const AOnSuccessMethod: TioAsyncFuncOnSuccessMethod<TObject>;
+  const AOnExceptionMethod: TioAsyncFuncOnExceptionMethod; const AFinallyMethod: TioAsyncFuncFinallyMethod);
+var
+  LPSRequest: IioPersistenceStrategyRequest;
+begin
+  _ToListAsync(
+    True,
+    AList,
+    AOnSuccessMethod,
+    AOnExceptionMethod,
+    AFinallyMethod);
 end;
 
 function TioWhere.ToMemTable: TFDMemTable;
@@ -1491,6 +1557,32 @@ end;
 function TioWhere.ToLazyObject(const AIntf: IInterface): TObject;
 begin
   Result := ToLazyObject(AIntf as TObject);
+end;
+
+procedure TioWhere._ToListAsync(const AAsync: Boolean; const AList: TObject; const AOnSuccessMethod: TioAsyncFuncOnSuccessMethod<TObject>; const AOnExceptionMethod: TioAsyncFuncOnExceptionMethod; const AFinallyMethod: TioAsyncFuncFinallyMethod);
+var
+  LPSRequest: IioPersistenceStrategyRequest;
+begin
+  // check AList param and clear it if requested
+  if not Assigned(AList) then
+    raise EioGenericException.Create(ClassName, 'ToList', '"AList" parameter not assigned');
+  if FClearListBefore then
+    TioUtilities.ClearList(AList);
+  // Async
+  TioFunc<TObject>.Invoke(
+    AAsync,
+    function: TObject
+    begin
+      // Build the persistence strategy request
+      LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadList(Self, AList, FIntent);
+      // get the right persistence strategy and execute the request
+      TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
+      Result := AList;
+    end,
+    AOnSuccessMethod,
+    AOnExceptionMethod,
+    AFinallyMethod,
+    False);
 end;
 
 function TioWhere._ToObjectInternalByClassOnly(const AIntent: TioPersistenceIntentType; const AObj: TObject = nil): TObject;
