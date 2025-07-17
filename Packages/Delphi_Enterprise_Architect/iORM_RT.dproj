@@ -393,8 +393,7 @@
         <DCCReference Include="..\..\Source\iORM.Http.Server.Executor.pas"/>
         <DCCReference Include="..\..\Source\iORM.Http.WebBroker.Producer.pas"/>
         <DCCReference Include="..\..\Source\iORM.DependencyInjection.Types.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Async.Func.pas"/>
-        <DCCReference Include="..\..\Source\iORM.Async.Proc.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Async.pas"/>
         <DCCReference Include="..\..\Source\iORM.PersistenceStrategy.Request.pas"/>
         <DCCReference Include="..\..\Source\iORM.PersistenceStrategy.AuthCache.pas"/>
         <BuildConfiguration Include="Base">

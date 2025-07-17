@@ -243,8 +243,7 @@ contains
   iORM.Http.Server.Executor in '..\..\Source\iORM.Http.Server.Executor.pas',
   iORM.Http.WebBroker.Producer in '..\..\Source\iORM.Http.WebBroker.Producer.pas',
   iORM.DependencyInjection.Types in '..\..\Source\iORM.DependencyInjection.Types.pas',
-  iORM.Async.Func in '..\..\Source\iORM.Async.Func.pas',
-  iORM.Async.Proc in '..\..\Source\iORM.Async.Proc.pas',
+  iORM.Async in '..\..\Source\iORM.Async.pas',
   iORM.PersistenceStrategy.Request in '..\..\Source\iORM.PersistenceStrategy.Request.pas',
   iORM.PersistenceStrategy.AuthCache in '..\..\Source\iORM.PersistenceStrategy.AuthCache.pas';
 

@@ -37,7 +37,7 @@ interface
 
 uses
   iORM.LiveBindings.Interfaces, iORM.Where.Interfaces, iORM.CommonTypes,
-  iORM.Context.Container, iORM.LiveBindings.BSPersistence, iORM.Async.Func, iORM.Async.Proc;
+  iORM.Context.Container, iORM.LiveBindings.BSPersistence, iORM.Async;
 
 type
 

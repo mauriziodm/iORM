@@ -47,7 +47,7 @@ uses
   iORM.ETM.Engine, iORM.ETM.Interfaces, DJSON.Params,
   iORM.ConflictStrategy.Interfaces, iORM.ConflictStrategy.SameVersionWin, iORM.ConflictStrategy.LastUpdateWin,
   iORM.Context.Interfaces, iORM.SynchroStrategy.Interfaces, iORM.MVVM.ViewModel,
-  iORM.PersistenceStrategy.Interfaces, iORM.Abstraction;
+  iORM.PersistenceStrategy.Interfaces, iORM.Abstraction, iORM.Async;
 
 const
   IORM_VERSION = 'iORM 2 (beta 3.4)';
