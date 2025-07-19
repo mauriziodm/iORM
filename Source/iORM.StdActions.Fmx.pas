@@ -487,28 +487,6 @@ type
       default False;
   end;
 
-  TioBSPersistenceDelete = class(TioBSPersistenceStdActionFmx)
-  strict protected
-    procedure _InternalExecuteStdAction; override;
-    function _InternalUpdateStdAction: Boolean; override;
-  public
-    constructor Create(AOwner: TComponent); override;
-  published
-    // inherited properties
-    property Action_CloseQueryAction;
-    property DisableIfChangesExists;
-    property DisableIfSaved;
-    property RaiseIfChangesExists default False;
-    property RaiseIfRevertPointSaved;
-    property TargetBindSource;
-    // inherited events
-    property AfterExecute;
-    property BeforeExecute;
-    property CanExecute;
-    property OnHint;
-    property OnUpdate;
-  end;
-
   TioBSPersistenceReload = class(TioBSPersistenceStdActionFmx)
   strict protected
     procedure _InternalExecuteStdAction; override;
@@ -530,7 +508,29 @@ type
     property OnUpdate;
   end;
 
-  TioBSPersistenceAppend = class(TioBSPersistenceStdActionFmx)
+  TioBSDelete = class(TioBSPersistenceStdActionFmx)
+  strict protected
+    procedure _InternalExecuteStdAction; override;
+    function _InternalUpdateStdAction: Boolean; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    // inherited properties
+    property Action_CloseQueryAction;
+    property DisableIfChangesExists;
+    property DisableIfSaved;
+    property RaiseIfChangesExists default False;
+    property RaiseIfRevertPointSaved;
+    property TargetBindSource;
+    // inherited events
+    property AfterExecute;
+    property BeforeExecute;
+    property CanExecute;
+    property OnHint;
+    property OnUpdate;
+  end;
+
+  TioBSAppend = class(TioBSPersistenceStdActionFmx)
   private
     FEntityTypeAlias: String;
     FEntityTypeName: String;
@@ -563,7 +563,7 @@ type
     property OnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent read FOnNewInstanceAsInterface write FOnNewInstanceAsInterface;
   end;
 
-  TioBSPersistenceInsert = class(TioBSPersistenceStdActionFmx)
+  TioBSInsert = class(TioBSPersistenceStdActionFmx)
   private
     FEntityTypeAlias: String;
     FEntityTypeName: String;
@@ -1159,13 +1159,13 @@ end;
 
 { TioBSPersistenceDelete }
 
-constructor TioBSPersistenceDelete.Create(AOwner: TComponent);
+constructor TioBSDelete.Create(AOwner: TComponent);
 begin
   inherited;
   RaiseIfChangesExists := False;
 end;
 
-procedure TioBSPersistenceDelete._InternalExecuteStdAction;
+procedure TioBSDelete._InternalExecuteStdAction;
 var
   LMasterBindSource: IioMasterBindSource;
 begin
@@ -1175,7 +1175,7 @@ begin
   TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
 
-function TioBSPersistenceDelete._InternalUpdateStdAction: Boolean;
+function TioBSDelete._InternalUpdateStdAction: Boolean;
 var
   LMasterBindSource: IioMasterBindSource;
 begin
@@ -1213,7 +1213,7 @@ end;
 
 { TioBSPersistenceAppend }
 
-constructor TioBSPersistenceAppend.Create(AOwner: TComponent);
+constructor TioBSAppend.Create(AOwner: TComponent);
 begin
   inherited;
   FEntityTypeAlias := '';
@@ -1221,7 +1221,7 @@ begin
   RaiseIfChangesExists := False;
 end;
 
-procedure TioBSPersistenceAppend._InternalExecuteStdAction;
+procedure TioBSAppend._InternalExecuteStdAction;
 var
   LNewInstanceAsObject: TObject;
   LNewInstanceAsInterface: IInterface;
@@ -1291,7 +1291,7 @@ begin
   end;
 end;
 
-function TioBSPersistenceAppend._InternalUpdateStdAction: Boolean;
+function TioBSAppend._InternalUpdateStdAction: Boolean;
 var
   LMasterBindSource: IioMasterBindSource;
 begin
@@ -1309,7 +1309,7 @@ end;
 
 { TioBSPersistenceInsert }
 
-constructor TioBSPersistenceInsert.Create(AOwner: TComponent);
+constructor TioBSInsert.Create(AOwner: TComponent);
 begin
   inherited;
   FEntityTypeAlias := '';
@@ -1317,7 +1317,7 @@ begin
   RaiseIfChangesExists := False;
 end;
 
-procedure TioBSPersistenceInsert._InternalExecuteStdAction;
+procedure TioBSInsert._InternalExecuteStdAction;
 var
   LNewInstanceAsObject: TObject;
   LNewInstanceAsInterface: IInterface;
@@ -1386,7 +1386,7 @@ begin
   end;
 end;
 
-function TioBSPersistenceInsert._InternalUpdateStdAction: Boolean;
+function TioBSInsert._InternalUpdateStdAction: Boolean;
 var
   LMasterBindSource: IioMasterBindSource;
 begin
