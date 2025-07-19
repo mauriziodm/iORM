@@ -85,17 +85,30 @@ type
     function GetMasterPropertyName: String;
     function IsMasterBS: Boolean;
     function IsDetailBS: Boolean;
+    function HasMasterBS: Boolean;
+    function FirstMasterPersistenceBindSource: IioBindSource;
     procedure Refresh(const ANotify: Boolean = True);
     function GetName: String;
     function IsActive: Boolean;
     function IsFromBSLoadType: Boolean;
     procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
     procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
-    procedure SetMasterBindSource(const Value: IioBindSource);
     procedure SetMasterPropertyName(const Value: String);
     procedure SetWhere(const AWhere: IioWhere);
     procedure RegisterDetailBindSource(const ADetailBindSource: IioBindSource);
     procedure UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
+    // universal methods (used by std actions)
+    procedure _Action_Append(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
+    procedure _Action_AppendObj(AObject: TObject; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
+    procedure _Action_AppendIntf(AObject: IInterface; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
+    procedure _Action_Delete(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
+    procedure _Action_Insert(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
+    procedure _Action_InsertObj(AObject: TObject; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
+    procedure _Action_InsertIntf(AObject: IInterface; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
+    // MasterBindSource
+    function GetMasterBindSource: IioBindSource;
+    procedure SetMasterBindSource(const Value: IioBindSource);
+    property MasterBindSource: IioBindSource read GetMasterBindSource write SetMasterBindSource;
     // Show current record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
     procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
     procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;

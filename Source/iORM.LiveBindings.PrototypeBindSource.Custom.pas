@@ -101,6 +101,15 @@ type
     FBeforeOpen: TNotifyEvent;
     function Get_Version: String;
     procedure OpenCloseDetails(const AActive: Boolean);
+    function FirstMasterPersistenceBindSource: IioBindSource;
+    // universal methods (used by std actions)
+    procedure _Action_Append(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
+    procedure _Action_AppendObj(AObject: TObject; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
+    procedure _Action_AppendIntf(AObject: IInterface; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
+    procedure _Action_Delete(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
+    procedure _Action_Insert(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
+    procedure _Action_InsertObj(AObject: TObject; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
+    procedure _Action_InsertIntf(AObject: IInterface; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
     // =========================================================================
     // Part for the support of the IioBindSource interfaces (Added by iORM)
     // because is not implementing IInterface (NB: RefCount DISABLED)
@@ -113,7 +122,7 @@ type
 {$ENDIF}
     // =========================================================================
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
-    function IsActive: Boolean; // IioStdActionTargetBindSource
+    function IsActive: Boolean;
     // AsDefault
     function GetAsDefault: Boolean;
     procedure SetAsDefault(const Value: Boolean);
@@ -140,6 +149,7 @@ type
     // ItemCount
     function GetCount: Integer;
     // MasterPresenter
+    function GetMasterBindSource: IioBindSource;
     procedure SetMasterBindSource(const Value: IioBindSource);
     // MasterPropertyName
     procedure SetMasterPropertyName(const Value: String);
@@ -256,6 +266,7 @@ type
     destructor Destroy; override;
     procedure Open;
     procedure Close;
+    function HasMasterBS: Boolean;
     function IsMasterBS: Boolean; virtual; abstract;
     function IsDetailBS: Boolean; virtual; abstract;
     function IsFromBSLoadType: boolean;
@@ -527,6 +538,11 @@ begin
     FonSelectionInterface(Self, ASelected, ASelectionType, ADone);
 end;
 
+function TioPrototypeBindSourceCustom.FirstMasterPersistenceBindSource: IioBindSource;
+begin
+  Result := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(Self);
+end;
+
 procedure TioPrototypeBindSourceCustom.ForEach(const AForEachMethod: TProc);
 var
   I, PreviousItemIndex: Integer;
@@ -675,6 +691,11 @@ begin
   Result := io.Version;
 end;
 
+function TioPrototypeBindSourceCustom.HasMasterBS: Boolean;
+begin
+  Result := Assigned(FMasterBindSOurce);
+end;
+
 procedure TioPrototypeBindSourceCustom.InitAsDefaultOnCreate;
 begin
   // At DesignTime initialize the "AsDefault" property at True if it is the
@@ -737,6 +758,11 @@ end;
 function TioPrototypeBindSourceCustom.GetLoadType: TioLoadType;
 begin
   Result := FLoadType;
+end;
+
+function TioPrototypeBindSourceCustom.GetMasterBindSource: IioBindSource;
+begin
+  Result := FMasterBindSource;
 end;
 
 function TioPrototypeBindSourceCustom.GetMasterPropertyName: String;
@@ -1261,6 +1287,62 @@ function TioPrototypeBindSourceCustom._Release: Integer;
 begin
   // Nothing, the interfaces support is intended only as LazyLoadable support flag
   Result := -1;
+end;
+
+procedure TioPrototypeBindSourceCustom._Action_Append(const ARaiseIfSaved, ARaiseIfChangesExists: Boolean);
+begin
+  if IsMasterBS then
+    (Self as IioMasterBindSource).Persistence.Append(ARaiseIfSaved, ARaiseIfChangesExists)
+  else
+    Append;
+end;
+
+procedure TioPrototypeBindSourceCustom._Action_AppendIntf(AObject: IInterface; const ARaiseIfSaved, ARaiseIfChangesExists: Boolean);
+begin
+  if IsMasterBS then
+    (Self as IioMasterBindSource).Persistence.Append(AObject, ARaiseIfSaved, ARaiseIfChangesExists)
+  else
+    Append(AObject);
+end;
+
+procedure TioPrototypeBindSourceCustom._Action_AppendObj(AObject: TObject; const ARaiseIfSaved, ARaiseIfChangesExists: Boolean);
+begin
+  if IsMasterBS then
+    (Self as IioMasterBindSource).Persistence.Append(AObject, ARaiseIfSaved, ARaiseIfChangesExists)
+  else
+    Append(AObject);
+end;
+
+procedure TioPrototypeBindSourceCustom._Action_Delete(const ARaiseIfSaved, ARaiseIfChangesExists: Boolean);
+begin
+  if IsMasterBS then
+    (Self as IioMasterBindSource).Persistence.Delete(ARaiseIfSaved, ARaiseIfChangesExists)
+  else
+    Delete;
+end;
+
+procedure TioPrototypeBindSourceCustom._Action_Insert(const ARaiseIfSaved, ARaiseIfChangesExists: Boolean);
+begin
+  if IsMasterBS then
+    (Self as IioMasterBindSource).Persistence.Insert(ARaiseIfSaved, ARaiseIfChangesExists)
+  else
+    Insert;
+end;
+
+procedure TioPrototypeBindSourceCustom._Action_InsertIntf(AObject: IInterface; const ARaiseIfSaved, ARaiseIfChangesExists: Boolean);
+begin
+  if IsMasterBS then
+    (Self as IioMasterBindSource).Persistence.Insert(AObject, ARaiseIfSaved, ARaiseIfChangesExists)
+  else
+    Insert(AObject);
+end;
+
+procedure TioPrototypeBindSourceCustom._Action_InsertObj(AObject: TObject; const ARaiseIfSaved, ARaiseIfChangesExists: Boolean);
+begin
+  if IsMasterBS then
+    (Self as IioMasterBindSource).Persistence.Insert(AObject, ARaiseIfSaved, ARaiseIfChangesExists)
+  else
+    Insert(AObject);
 end;
 
 end.

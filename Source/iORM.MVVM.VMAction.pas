@@ -286,9 +286,9 @@ type
     FRaiseIfChangesExists: Boolean;
     FRaiseIfRevertPointSaved: Boolean;
     FRaiseIfRevertPointNotSaved: Boolean;
-    FTargetBindSource: IioMasterBindSource;
+    FTargetBindSource: IioBindSource;
     procedure _SetTargetBindSource(const AObj: TObject);
-    procedure SetTargetBindSource(const Value: IioMasterBindSource);
+    procedure SetTargetBindSource(const Value: IioBindSource);
     procedure SetAction_CloseQueryAction(const Value: IioBSSlaveAction);
     procedure SetAction_ShowOrSelectAction(const Value: IioBSSlaveAction);
   protected
@@ -306,7 +306,7 @@ type
     property RaiseIfChangesExists: Boolean read FRaiseIfChangesExists write FRaiseIfChangesExists default True;
     property RaiseIfRevertPointSaved: Boolean read FRaiseIfRevertPointSaved write FRaiseIfRevertPointSaved default False;
     property RaiseIfRevertPointNotSaved: Boolean read FRaiseIfRevertPointNotSaved write FRaiseIfRevertPointNotSaved default False;
-    property TargetBindSource: IioMasterBindSource read FTargetBindSource write SetTargetBindSource;
+    property TargetBindSource: IioBindSource read FTargetBindSource write SetTargetBindSource;
   public
     constructor Create(AOwner: TComponent); override;
     function HandlesTarget(Target: TObject): Boolean; override;
@@ -760,7 +760,8 @@ implementation
 
 uses
   System.SysUtils, iORM.Utilities, iORM.Exceptions, iORM, System.Rtti,
-  iORM.RttiContext.Factory, iORM.StdActions.CloseQueryActionRegister, iORM.ETM.Engine, iORM.StdActions.CommonBehaviour;
+  iORM.RttiContext.Factory, iORM.StdActions.CloseQueryActionRegister, iORM.ETM.Engine, iORM.StdActions.CommonBehaviour,
+  iORM.LiveBindings.CommonBSBehavior;
 
 { TioVMActionCustom }
 
@@ -1189,7 +1190,7 @@ begin
   end;
 end;
 
-procedure TioVMActionBSPersistenceCustom.SetTargetBindSource(const Value: IioMasterBindSource);
+procedure TioVMActionBSPersistenceCustom.SetTargetBindSource(const Value: IioBindSource);
 begin
   if not(csLoading in ComponentState) and FIsSlave then
     raise EioGenericException.Create(ClassName, 'SetTargetBindSource', 'The "TargetBindSource" property of a "..SelectCurrent" action is read-only when the action itself is nested into a "ShowOrSelect" action');
@@ -1228,9 +1229,9 @@ end;
 
 procedure TioVMActionBSPersistenceCustom._SetTargetBindSource(const AObj: TObject);
 var
-  LTargetBindSource: IioMasterBindSource;
+  LTargetBindSource: IioBindSource;
 begin
-  if Assigned(AObj) and not Supports(AObj, IioMasterBindSource, LTargetBindSource) then
+  if Assigned(AObj) and not Supports(AObj, IioBindSource, LTargetBindSource) then
     raise EioGenericException.Create(ClassName, '_SetTargetBindSource', 'AObj does not implements IioStdActionTargetBindSource interface');
   FIsSlave := False;
   SetTargetBindSource(LTargetBindSource);
@@ -1240,59 +1241,83 @@ end;
 { TioVMActionBSPersistenceSaveRevertPoint }
 
 procedure TioVMActionBSPersistenceSaveRevertPoint._InternalExecuteStdAction;
+var
+  LMasterBindSource: IioMasterBindSource;
 begin
-  TargetBindSource.Persistence.SaveRevertPoint(True);
+  LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
+  LMasterBindSource.Persistence.SaveRevertPoint(True);
 end;
 
 function TioVMActionBSPersistenceSaveRevertPoint._InternalUpdateStdAction: Boolean;
+var
+  LMasterBindSource: IioMasterBindSource;
 begin
-  Result := inherited and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanSaveRevertPoint;
+  LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
+  Result := inherited and Assigned(TargetBindSource) and LMasterBindSource.Persistence.CanSaveRevertPoint;
 end;
 
 { TioVMActionBSPersistenceClear }
 
 procedure TioVMActionBSPersistenceClear._InternalExecuteStdAction;
+var
+  LMasterBindSource: IioMasterBindSource;
 begin
-  TargetBindSource.Persistence.Clear(RaiseIfChangesExists);
+  LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
+  LMasterBindSource.Persistence.Clear(RaiseIfChangesExists);
 end;
 
 function TioVMActionBSPersistenceClear._InternalUpdateStdAction: Boolean;
+var
+  LMasterBindSource: IioMasterBindSource;
 begin
-  Result := inherited and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanClear;
-  Result := Result and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
+  LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
+  Result := inherited and Assigned(TargetBindSource) and LMasterBindSource.Persistence.CanClear;
+  Result := Result and ((not DisableIfChangesExists) or not LMasterBindSource.Persistence.IsChanged);
 end;
 
 { TioBSPersistencePersist }
 
 procedure TioVMActionBSPersistencePersist._InternalExecuteStdAction;
+var
+  LMasterBindSource: IioMasterBindSource;
 begin
+  LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
   TargetBindSource.Refresh(True); // Otherwise, in some cases, an outdated value persisted
-  TargetBindSource.Persistence.Persist(RaiseIfChangesDoesNotExists);
+  LMasterBindSource.Persistence.Persist(RaiseIfChangesDoesNotExists);
   // Execute slave actions
   TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
 
 function TioVMActionBSPersistencePersist._InternalUpdateStdAction: Boolean;
+var
+  LMasterBindSource: IioMasterBindSource;
 begin
+  LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
   Result := True;
-  Result := Result and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanPersist;
-  Result := Result and ((not DisableIfChangesDoesNotExists) or TargetBindSource.Persistence.IsChanged);
+  Result := Result and Assigned(TargetBindSource) and LMasterBindSource.Persistence.CanPersist;
+  Result := Result and ((not DisableIfChangesDoesNotExists) or LMasterBindSource.Persistence.IsChanged);
 end;
 
 { TioVMActionBSPersistenceRevert }
 
 procedure TioVMActionBSPersistenceRevert._InternalExecuteStdAction;
+var
+  LMasterBindSource: IioMasterBindSource;
 begin
-  TargetBindSource.Persistence.Revert(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists);
+  LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
+  LMasterBindSource.Persistence.Revert(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists);
   // Execute slave actions
   TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
 
 function TioVMActionBSPersistenceRevert._InternalUpdateStdAction: Boolean;
+var
+  LMasterBindSource: IioMasterBindSource;
 begin
+  LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
   Result := True;
-  Result := Result and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanRevert;
-  Result := Result and ((not DisableIfChangesDoesNotExists) or TargetBindSource.Persistence.IsChanged);
+  Result := Result and Assigned(TargetBindSource) and LMasterBindSource.Persistence.CanRevert;
+  Result := Result and ((not DisableIfChangesDoesNotExists) or LMasterBindSource.Persistence.IsChanged);
 end;
 
 { TioVMActionBSPersistenceRevertOrDelete }
@@ -1307,19 +1332,24 @@ end;
 procedure TioVMActionBSPersistenceRevertOrDelete._InternalExecuteStdAction;
 var
   LIsDeleting: Boolean;
+  LMasterBindSource: IioMasterBindSource;
 begin
-  LIsDeleting := TargetBindSource.Persistence.IsInserting;
-  TargetBindSource.Persistence.RevertOrDelete(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists);
+  LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
+  LIsDeleting := LMasterBindSource.Persistence.IsInserting;
+  LMasterBindSource.Persistence.RevertOrDelete(RaiseIfRevertPointNotSaved, RaiseIfChangesDoesNotExists);
   // Execute slave actions
   if (LIsDeleting and FAutoExec_CloseQueryAction_AfterDelete) or (not LIsDeleting and FAutoExec_CloseQueryAction_AfterRevert) then
     TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
 
 function TioVMActionBSPersistenceRevertOrDelete._InternalUpdateStdAction: Boolean;
+var
+  LMasterBindSource: IioMasterBindSource;
 begin
+  LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
   Result := True;
-  Result := Result and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanRevertOrDelete;
-  Result := Result and ((not DisableIfChangesDoesNotExists) or TargetBindSource.Persistence.IsChanged or TargetBindSource.Persistence.IsInserting);
+  Result := Result and Assigned(TargetBindSource) and LMasterBindSource.Persistence.CanRevertOrDelete;
+  Result := Result and ((not DisableIfChangesDoesNotExists) or LMasterBindSource.Persistence.IsChanged or LMasterBindSource.Persistence.IsInserting);
 end;
 
 { TioVMActionBSPersistenceDelete }
@@ -1331,17 +1361,23 @@ begin
 end;
 
 procedure TioVMActionBSPersistenceDelete._InternalExecuteStdAction;
+var
+  LMasterBindSource: IioMasterBindSource;
 begin
-  TargetBindSource.Persistence.Delete(RaiseIfRevertPointSaved, RaiseIfChangesExists);
+  LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
+  LMasterBindSource.Persistence.Delete(RaiseIfRevertPointSaved, RaiseIfChangesExists);
   // Execute slave actions
   TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
 
 function TioVMActionBSPersistenceDelete._InternalUpdateStdAction: Boolean;
+var
+  LMasterBindSource: IioMasterBindSource;
 begin
-  Result := inherited and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanDelete;
-  Result := Result and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
-  Result := Result and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
+  LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
+  Result := inherited and Assigned(TargetBindSource) and LMasterBindSource.Persistence.CanDelete;
+  Result := Result and ((not DisableIfChangesExists) or not LMasterBindSource.Persistence.IsChanged);
+  Result := Result and ((not DisableIfSaved) or not LMasterBindSource.Persistence.IsSavedRevertPoint);
 end;
 
 { TioVMActionBSPersistenceReload }
@@ -1353,15 +1389,21 @@ begin
 end;
 
 procedure TioVMActionBSPersistenceReload._InternalExecuteStdAction;
+var
+  LMasterBindSource: IioMasterBindSource;
 begin
-  TargetBindSource.Persistence.Reload(RaiseIfRevertPointSaved, RaiseIfChangesExists);
+  LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
+  LMasterBindSource.Persistence.Reload(RaiseIfRevertPointSaved, RaiseIfChangesExists);
 end;
 
 function TioVMActionBSPersistenceReload._InternalUpdateStdAction: Boolean;
+var
+  LMasterBindSource: IioMasterBindSource;
 begin
-  Result := inherited and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanReload;
-  Result := Result and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
-  Result := Result and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
+  LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
+  Result := inherited and Assigned(TargetBindSource) and LMasterBindSource.Persistence.CanReload;
+  Result := Result and ((not DisableIfChangesExists) or not LMasterBindSource.Persistence.IsChanged);
+  Result := Result and ((not DisableIfSaved) or not LMasterBindSource.Persistence.IsSavedRevertPoint);
 end;
 
 { TioVMActionBSPersistenceAppend }
@@ -1387,7 +1429,7 @@ begin
       FOnNewInstanceAsObject(Self, LNewInstanceAsObject);
       if LNewInstanceAsObject <> nil then
       begin
-        TargetBindSource.Persistence.Append(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists);
+        TargetBindSource._Action_AppendObj(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists);
         Exit;
       end
       else
@@ -1399,7 +1441,7 @@ begin
       FOnNewInstanceAsInterface(Self, LNewInstanceAsInterface);
       if LNewInstanceAsInterface <> nil then
       begin
-        TargetBindSource.Persistence.Append(LNewInstanceAsInterface, RaiseIfRevertPointSaved, RaiseIfChangesExists);
+        TargetBindSource._Action_AppendIntf(LNewInstanceAsInterface, RaiseIfRevertPointSaved, RaiseIfChangesExists);
         Exit;
       end
       else
@@ -1416,14 +1458,14 @@ begin
         begin
           if Supports(LNewInstanceAsObject, IInterface, LNewInstanceAsInterface) then
           begin
-            TargetBindSource.Persistence.Append(LNewInstanceAsInterface, RaiseIfRevertPointSaved, RaiseIfChangesExists);
+            TargetBindSource._Action_AppendIntf(LNewInstanceAsInterface, RaiseIfRevertPointSaved, RaiseIfChangesExists);
             Exit;
           end;
         end
         else
         // as object
         begin
-          TargetBindSource.Persistence.Append(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists);
+          TargetBindSource._Action_AppendObj(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists);
           Exit;
         end;
       end
@@ -1431,22 +1473,32 @@ begin
         raise EioGenericException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
     end;
     // New instance not provided (created by the ABSAdapter itself)
-    TargetBindSource.Persistence.Append(RaiseIfRevertPointSaved, RaiseIfChangesExists);
+    TargetBindSource._Action_Append(RaiseIfRevertPointSaved, RaiseIfChangesExists);
   finally
     // Execute slave actions
     if Assigned(Action_ShowOrSelectAction) then
     begin
       TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_ShowOrSelectAction);
-      TargetBindSource.Persistence.Clear;
+      if TargetBindSource.IsMasterBS then
+        (TargetBindSource as IioMasterBindSource).Persistence.Clear;
     end;
   end;
 end;
 
 function TioVMActionBSPersistenceAppend._InternalUpdateStdAction: Boolean;
+var
+  LMasterBindSource: IioMasterBindSource;
 begin
-  Result := inherited and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
-  Result := Result and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
-  Result := Result and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
+  LMasterBindSource := nil;
+  if TargetBindSource.IsMasterBS then
+  begin
+    LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
+    Result := inherited and Assigned(TargetBindSource) and LMasterBindSource.Persistence.CanInsert;
+    Result := Result and ((not DisableIfChangesExists) or not LMasterBindSource.Persistence.IsChanged);
+    Result := Result and ((not DisableIfSaved) or not LMasterBindSource.Persistence.IsSavedRevertPoint);
+  end
+  else
+    Result := inherited and Assigned(TargetBindSource);
 end;
 
 { TioVMActionBSPersistenceInsert }
@@ -1472,7 +1524,7 @@ begin
       FOnNewInstanceAsObject(Self, LNewInstanceAsObject);
       if LNewInstanceAsObject <> nil then
       begin
-        TargetBindSource.Persistence.Insert(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists);
+        TargetBindSource._Action_InsertObj(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists);
         Exit;
       end
       else
@@ -1484,7 +1536,7 @@ begin
       FOnNewInstanceAsInterface(Self, LNewInstanceAsInterface);
       if LNewInstanceAsInterface <> nil then
       begin
-        TargetBindSource.Persistence.Insert(LNewInstanceAsInterface, RaiseIfRevertPointSaved, RaiseIfChangesExists);
+        TargetBindSource._Action_InsertIntf(LNewInstanceAsInterface, RaiseIfRevertPointSaved, RaiseIfChangesExists);
         Exit;
       end
       else
@@ -1501,14 +1553,14 @@ begin
         begin
           if Supports(LNewInstanceAsObject, IInterface, LNewInstanceAsInterface) then
           begin
-            TargetBindSource.Persistence.Insert(LNewInstanceAsInterface, RaiseIfRevertPointSaved, RaiseIfChangesExists);
+            TargetBindSource._Action_InsertIntf(LNewInstanceAsInterface, RaiseIfRevertPointSaved, RaiseIfChangesExists);
             Exit;
           end;
         end
         else
         // as object
         begin
-          TargetBindSource.Persistence.Insert(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists);
+          TargetBindSource._Action_InsertObj(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists);
           Exit;
         end;
       end
@@ -1516,22 +1568,32 @@ begin
         raise EioGenericException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
     end;
     // New instance not provided (created by the ABSAdapter itself)
-    TargetBindSource.Persistence.Insert(RaiseIfRevertPointSaved, RaiseIfChangesExists);
+    TargetBindSource._Action_Insert(RaiseIfRevertPointSaved, RaiseIfChangesExists);
   finally
     // Execute slave actions
     if Assigned(Action_ShowOrSelectAction) then
     begin
       TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_ShowOrSelectAction);
-      TargetBindSource.Persistence.Clear;
+      if TargetBindSource.IsMasterBS then
+        (TargetBindSource as IioMasterBindSource).Persistence.Clear;
     end;
   end;
 end;
 
 function TioVMActionBSPersistenceInsert._InternalUpdateStdAction: Boolean;
+var
+  LMasterBindSource: IioMasterBindSource;
 begin
-  Result := inherited and Assigned(TargetBindSource) and TargetBindSource.Persistence.CanInsert;
-  Result := Result and ((not DisableIfChangesExists) or not TargetBindSource.Persistence.IsChanged);
-  Result := Result and ((not DisableIfSaved) or not TargetBindSource.Persistence.IsSavedRevertPoint);
+  LMasterBindSource := nil;
+  if TargetBindSource.IsMasterBS then
+  begin
+    LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
+    Result := inherited and Assigned(TargetBindSource) and LMasterBindSource.Persistence.CanInsert;
+    Result := Result and ((not DisableIfChangesExists) or not LMasterBindSource.Persistence.IsChanged);
+    Result := Result and ((not DisableIfSaved) or not LMasterBindSource.Persistence.IsSavedRevertPoint);
+  end
+  else
+    Result := inherited and Assigned(TargetBindSource);
 end;
 
 { TioVMActionBSCloseQuery }
@@ -1620,8 +1682,11 @@ begin
 end;
 
 function TioVMActionBSCloseQuery._CanClose: Boolean;
+var
+  LMasterBindSource: IioMasterBindSource;
 begin
-  Result := (TargetBindSource = nil) or TargetBindSource.Persistence.IsEmpty or TargetBindSource.Persistence.CanSaveRevertPoint or (FOnEditingAction <> eaDisable);
+  LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
+  Result := (TargetBindSource = nil) or LMasterBindSource.Persistence.IsEmpty or LMasterBindSource.Persistence.CanSaveRevertPoint or (FOnEditingAction <> eaDisable);
   // Se è il caso interroga anche le ChildCQA
   if FOnUpdateScope in [usGlobal, usDisableIfChilds] then
     Result := Result and TioBSCloseQueryActionRegister.CanClose(Self, FOnUpdateScope = usDisableIfChilds);
@@ -1638,9 +1703,11 @@ end;
 procedure TioVMActionBSCloseQuery._InternalExecuteStdAction;
 var
   LViewModel: IioViewModelInternal;
+  LMasterBindSource: IioMasterBindSource;
 begin
   FExecuting := True;
   try
+    LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
     // NB: DoOnConfirmationRequest richiede eventuale conferma all'utente ma solo se è in modalità attiva
     //      cioè è la prima BSCloseQueryAction della catena di esecuzione delle CloseQueryActions. HO
     //      fatto in questo modo sia perchè altrimenti ci sarebbero potute essere varie richieste di conferma
@@ -1655,10 +1722,10 @@ begin
       if FOnUpdateScope in [usGlobal] then
         TioBSCloseQueryActionRegister.Execute(Self);
       // In base a come impostata esegue l'azione
-      if (FOnEditingAction = eaAutoPersist) and TargetBindSource.Persistence.CanPersist then
-        TargetBindSource.Persistence.Persist;
-      if (FOnEditingAction = eaAutoRevert) and TargetBindSource.Persistence.CanRevert then
-        TargetBindSource.Persistence.Revert;
+      if (FOnEditingAction = eaAutoPersist) and LMasterBindSource.Persistence.CanPersist then
+        LMasterBindSource.Persistence.Persist;
+      if (FOnEditingAction = eaAutoRevert) and LMasterBindSource.Persistence.CanRevert then
+        LMasterBindSource.Persistence.Revert;
       if Supports(Owner, IioViewModelInternal, LViewModel) then
       begin
         if not FExecutingEventHandler then
@@ -2027,14 +2094,17 @@ begin
 end;
 
 procedure TioVMActionBS_ETM_RevertToBindSource._InternalExecuteStdAction;
+var
+  LMasterBindSource: IioMasterBindSource;
 begin
   inherited;
+  LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
   // Some check
   if not(TargetBindSource.Current is TioEtmCustomTimeSlot) then
     raise EioEtmException.Create(ClassName, 'ExecuteTarget', 'Current object in the TargetBindSource is not derived from "TioEtmCustomTimeSlot" base class.');
   // Revert
-  TioEtmEngine.RevertToBindSource(TargetBindSource.Current as TioEtmCustomTimeSlot, TargetBindSource, FAutoExec_Persist_AfterRevert);
-  FRevertedObj := TargetBindSource.ETMfor.Current;
+  TioEtmEngine.RevertToBindSource(TargetBindSource.Current as TioEtmCustomTimeSlot, LMasterBindSource, FAutoExec_Persist_AfterRevert);
+  FRevertedObj := LMasterBindSource.ETMfor.Current;
   // AfterRevert event handler
   if Assigned(FAfterRevertEvent) then
     FAfterRevertEvent(Self, FRevertedObj);
@@ -2043,14 +2113,14 @@ begin
     doRefresh:
       TargetBindSource.Refresh;
     doReload:
-      TargetBindSource.Persistence.Reload;
+      LMasterBindSource.Persistence.Reload;
   end;
-  if Assigned(TargetBindSource.ETMfor) then
+  if Assigned(LMasterBindSource.ETMfor) then
     case FAutoExec_OnETMfor_AfterRevert of
       doRefresh:
-        TargetBindSource.ETMfor.Refresh;
+        LMasterBindSource.ETMfor.Refresh;
       doReload:
-        TargetBindSource.ETMfor.Persistence.Reload;
+        LMasterBindSource.ETMfor.Persistence.Reload;
     end;
   // Execute slave actions
   if TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction) then
@@ -2060,12 +2130,15 @@ begin
 end;
 
 function TioVMActionBS_ETM_RevertToBindSource._InternalUpdateStdAction: Boolean;
+var
+  LMasterBindSource: IioMasterBindSource;
 begin
+  LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
   Result := inherited and Assigned(TargetBindSource);
-  Result := Result and Assigned(TargetBindSource.ETMfor);
+  Result := Result and Assigned(LMasterBindSource.ETMfor);
   Result := Result and Assigned(TargetBindSource.Current);
-  Result := Result and TargetBindSource.ETMfor.IsActive;
-  Result := Result and Assigned(TargetBindSource.ETMfor.Current);
+  Result := Result and LMasterBindSource.ETMfor.IsActive;
+  Result := Result and Assigned(LMasterBindSource.ETMfor.Current);
 end;
 
 procedure TioVMActionBS_ETM_RevertToBindSource._ShowRevertedObj;
@@ -2111,8 +2184,11 @@ begin
 end;
 
 procedure TioVMActionBS_ETM_RevertToObject._InternalExecuteStdAction;
+var
+  LMasterBindSource: IioMasterBindSource;
 begin
   inherited;
+  LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
   // Reset
   FRevertedObj := nil;
   // Some check
@@ -2134,14 +2210,14 @@ begin
     doRefresh:
       TargetBindSource.Refresh;
     doReload:
-      TargetBindSource.Persistence.Reload;
+      LMasterBindSource.Persistence.Reload;
   end;
-  if Assigned(TargetBindSource.ETMfor) then
+  if Assigned(LMasterBindSource.ETMfor) then
     case FAutoExec_OnETMfor_AfterRevert of
       doRefresh:
-        TargetBindSource.ETMfor.Refresh;
+        LMasterBindSource.ETMfor.Refresh;
       doReload:
-        TargetBindSource.ETMfor.Persistence.Reload;
+        LMasterBindSource.ETMfor.Persistence.Reload;
     end;
   // Execute slave actions
   if TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction) then
@@ -2151,12 +2227,15 @@ begin
 end;
 
 function TioVMActionBS_ETM_RevertToObject._InternalUpdateStdAction: Boolean;
+var
+  LMasterBindSource: IioMasterBindSource;
 begin
+  LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
   Result := inherited and Assigned(TargetBindSource);
-  Result := Result and Assigned(TargetBindSource.ETMfor);
+  Result := Result and Assigned(LMasterBindSource.ETMfor);
   Result := Result and Assigned(TargetBindSource.Current);
-  Result := Result and TargetBindSource.ETMfor.IsActive;
-  Result := Result and Assigned(TargetBindSource.ETMfor.Current);
+  Result := Result and LMasterBindSource.ETMfor.IsActive;
+  Result := Result and Assigned(LMasterBindSource.ETMfor.Current);
 end;
 
 procedure TioVMActionBS_ETM_RevertToObject._ShowRevertedObj;

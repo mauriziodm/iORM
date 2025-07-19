@@ -103,6 +103,15 @@ type
     function Get_Version: String;
     procedure OpenCloseViewBindSources(const AActive: Boolean);
     procedure OpenCloseDetails(const AActive: Boolean);
+    function FirstMasterPersistenceBindSource: IioBindSource;
+    // universal methods (used by std actions)
+    procedure _Action_Append(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
+    procedure _Action_AppendObj(AObject: TObject; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
+    procedure _Action_AppendIntf(AObject: IInterface; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
+    procedure _Action_Delete(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
+    procedure _Action_Insert(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
+    procedure _Action_InsertObj(AObject: TObject; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
+    procedure _Action_InsertIntf(AObject: IInterface; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
     // AsDefault
     function GetAsDefault: Boolean;
     procedure SetAsDefault(const Value: Boolean);
@@ -186,6 +195,7 @@ type
     procedure DoBeforeClose;
     procedure DoBeforeOpen;
     // MasterPresenter
+    function GetMasterBindSource: IioBindSource;
     procedure SetMasterBindSource(const Value: IioBindSource); virtual;
     // Active
     function GetActive: Boolean;
@@ -248,6 +258,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    function HasMasterBS: Boolean;
     function IsMasterBS: Boolean; virtual; abstract;
     function IsDetailBS: Boolean; virtual; abstract;
     function IsFromBSLoadType: Boolean;
@@ -319,7 +330,7 @@ type
     // NB: Queste sotto sono proprietà lasciate in public perchè usate in qualche parte del codice
     property AsDefault: Boolean read GetAsDefault write SetAsDefault; // Published: Master // non mettere default
     property ItemCount: Integer read GetCount; // Public: Master+Detail
-    property MasterBindSource: IioBindSource read FMasterBindSource write SetMasterBindSource; // Published: Detail
+    property MasterBindSource: IioBindSource read GetMasterBindSource write SetMasterBindSource; // Published: Detail
     property MasterPropertyName: String read GetMasterPropertyName write SetMasterPropertyName; // Published: Detail
     property TypeName: String read GetTypeName write SetTypeName; // Published: Master
     property Where: IioWhere read GetWhere write SetWhere; // public: Master
@@ -584,6 +595,11 @@ begin
     GetActiveBindSourceAdapter.First;
 end;
 
+function TioModelPresenterCustom.FirstMasterPersistenceBindSource: IioBindSource;
+begin
+  Result := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(Self);
+end;
+
 procedure TioModelPresenterCustom.ForceDetailAdaptersCreation;
 var
   LDetailBindSource: IioBindSource;
@@ -727,6 +743,11 @@ begin
   Result := FLoadType;
 end;
 
+function TioModelPresenterCustom.GetMasterBindSource: IioBindSource;
+begin
+  Result := FMasterBindSource;
+end;
+
 function TioModelPresenterCustom.GetMasterPropertyName: String;
 begin
   Result := FMasterPropertyName;
@@ -815,6 +836,11 @@ end;
 function TioModelPresenterCustom.Get_Version: String;
 begin
   Result := io.Version;
+end;
+
+function TioModelPresenterCustom.HasMasterBS: Boolean;
+begin
+  Result := Assigned(FMasterBindSource);
 end;
 
 procedure TioModelPresenterCustom.Insert;
@@ -1359,6 +1385,62 @@ end;
 procedure TioModelPresenterCustom._InternalSetETMforPrivateField(const AETMFor: IioBindSource);
 begin
   FETMfor := AETMfor as IioMasterBindSource;
+end;
+
+procedure TioModelPresenterCustom._Action_Append(const ARaiseIfSaved, ARaiseIfChangesExists: Boolean);
+begin
+  if IsMasterBS then
+    (Self as IioMasterBindSource).Persistence.Append(ARaiseIfSaved, ARaiseIfChangesExists)
+  else
+    Append;
+end;
+
+procedure TioModelPresenterCustom._Action_AppendIntf(AObject: IInterface; const ARaiseIfSaved, ARaiseIfChangesExists: Boolean);
+begin
+  if IsMasterBS then
+    (Self as IioMasterBindSource).Persistence.Append(AObject, ARaiseIfSaved, ARaiseIfChangesExists)
+  else
+    Append(AObject);
+end;
+
+procedure TioModelPresenterCustom._Action_AppendObj(AObject: TObject; const ARaiseIfSaved, ARaiseIfChangesExists: Boolean);
+begin
+  if IsMasterBS then
+    (Self as IioMasterBindSource).Persistence.Append(AObject, ARaiseIfSaved, ARaiseIfChangesExists)
+  else
+    Append(AObject);
+end;
+
+procedure TioModelPresenterCustom._Action_Delete(const ARaiseIfSaved, ARaiseIfChangesExists: Boolean);
+begin
+  if IsMasterBS then
+    (Self as IioMasterBindSource).Persistence.Delete(ARaiseIfSaved, ARaiseIfChangesExists)
+  else
+    Delete;
+end;
+
+procedure TioModelPresenterCustom._Action_Insert(const ARaiseIfSaved, ARaiseIfChangesExists: Boolean);
+begin
+  if IsMasterBS then
+    (Self as IioMasterBindSource).Persistence.Insert(ARaiseIfSaved, ARaiseIfChangesExists)
+  else
+    Insert;
+end;
+
+procedure TioModelPresenterCustom._Action_InsertIntf(AObject: IInterface; const ARaiseIfSaved, ARaiseIfChangesExists: Boolean);
+begin
+  if IsMasterBS then
+    (Self as IioMasterBindSource).Persistence.Insert(AObject, ARaiseIfSaved, ARaiseIfChangesExists)
+  else
+    Insert(AObject);
+end;
+
+procedure TioModelPresenterCustom._Action_InsertObj(AObject: TObject; const ARaiseIfSaved, ARaiseIfChangesExists: Boolean);
+begin
+  if IsMasterBS then
+    (Self as IioMasterBindSource).Persistence.Insert(AObject, ARaiseIfSaved, ARaiseIfChangesExists)
+  else
+    Insert(AObject);
 end;
 
 procedure TioModelPresenterCustom.Insert(AObject: IInterface);

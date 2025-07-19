@@ -50,6 +50,8 @@ type
   // Methods and functionalities common to all BindSouces (ioDataSet also)
   TioCommonBSBehavior = class
   public
+    // Common code tor return the first MasterBindSource with Persistence prop (the real master for CRUD operations)
+    class function GetFirstMasterPersistenceBindSource(const AStartBindSource: IioBindSource): IioBindSource; static;
     // Common code for ABSA to manage notifications
     class procedure Notify(const ASender: TObject; const ATargetBS: IioBindSource; const [Ref] ANotification: TioBSNotification);
     // Common code for selection
@@ -385,6 +387,15 @@ begin
   // Reset the filter object (sourceBS)
   ASourceBS.Persistence.Reload;
   Result := BuildWhere(ASourceBS, ATargetBS, AExecuteOnTarget, ABeforeWhereClearEvent, AOnWhereClearEvent, AAfterWhereClearEvent);
+end;
+
+class function TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(const AStartBindSource: IioBindSource): IioBindSource;
+begin
+  if not Assigned(AStartBindSource) then
+    Exit(nil);
+  Result := AStartBindSource;
+  while (not Result.IsMasterBS) and Result.HasMasterBS do
+    Result := Result.MasterBindSource;
 end;
 
 end.
