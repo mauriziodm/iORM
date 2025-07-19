@@ -315,7 +315,7 @@ type
   // =================================================================================================
 
   // Base class for all BinsDourceObjState standard actions
-  TioBSPersistenceStdActionFmx = class(Fmx.ActnList.TCustomAction, IioBSSlaveAction)
+  TioBSPersistenceStdActionFmx<T: IioBindSource> = class(Fmx.ActnList.TCustomAction, IioBSSlaveAction)
   strict private
     FAction_ReloadAction: IioBSSlaveAction;
     FAction_ShowOrSelectAction: IioBSSlaveAction;
@@ -329,14 +329,14 @@ type
     FRaiseIfChangesExists: Boolean;
     FRaiseIfRevertPointSaved: Boolean;
     FRaiseIfRevertPointNotSaved: Boolean;
-    FTargetBindSource: IioBindSource;
+    FTargetBindSource: T;
     // events
     FAfterExecute: TNotifyEvent;
     FBeforeExecute: TNotifyEvent;
     FCanExecute: TioCanExecuteEvent;
     function Get_Version: String;
     procedure _SetTargetBindSource(const AObj: TObject);
-    procedure SetTargetBindSource(const Value: IioBindSource);
+    procedure SetTargetBindSource(const Value: T);
     procedure SetAction_CloseQueryAction(const Value: IioBSSlaveAction);
     procedure SetAction_ShowOrSelectAction(const Value: IioBSSlaveAction);
   strict protected
@@ -358,7 +358,7 @@ type
     property RaiseIfChangesExists: Boolean read FRaiseIfChangesExists write FRaiseIfChangesExists default True;
     property RaiseIfRevertPointNotSaved: Boolean read FRaiseIfRevertPointNotSaved write FRaiseIfRevertPointNotSaved default False;
     property RaiseIfRevertPointSaved: Boolean read FRaiseIfRevertPointSaved write FRaiseIfRevertPointSaved default False;
-    property TargetBindSource: IioBindSource read FTargetBindSource write SetTargetBindSource;
+    property TargetBindSource: T read FTargetBindSource write SetTargetBindSource;
     // events
     property AfterExecute: TNotifyEvent read FAfterExecute write FAfterExecute;
     property BeforeExecute: TNotifyEvent read FBeforeExecute write FBeforeExecute;
@@ -389,7 +389,7 @@ type
     property _Version: String read Get_Version;
   end;
 
-  TioBSPersistenceSaveRevertPoint = class(TioBSPersistenceStdActionFmx)
+  TioBSPersistenceSaveRevertPoint = class(TioBSPersistenceStdActionFmx<IioMasterBindSource>)
   strict protected
     procedure _InternalExecuteStdAction; override;
     function _InternalUpdateStdAction: Boolean; override;
@@ -404,7 +404,7 @@ type
     property OnUpdate;
   end;
 
-  TioBSPersistenceClear = class(TioBSPersistenceStdActionFmx)
+  TioBSPersistenceClear = class(TioBSPersistenceStdActionFmx<IioMasterBindSource>)
   strict protected
     procedure _InternalExecuteStdAction; override;
     function _InternalUpdateStdAction: Boolean; override;
@@ -421,7 +421,7 @@ type
     property OnUpdate;
   end;
 
-  TioBSPersistencePersist = class(TioBSPersistenceStdActionFmx)
+  TioBSPersistencePersist = class(TioBSPersistenceStdActionFmx<IioMasterBindSource>)
   strict protected
     procedure _InternalExecuteStdAction; override;
     function _InternalUpdateStdAction: Boolean; override;
@@ -439,7 +439,7 @@ type
     property OnUpdate;
   end;
 
-  TioBSPersistenceRevert = class(TioBSPersistenceStdActionFmx)
+  TioBSPersistenceRevert = class(TioBSPersistenceStdActionFmx<IioMasterBindSource>)
   strict protected
     procedure _InternalExecuteStdAction; override;
     function _InternalUpdateStdAction: Boolean; override;
@@ -458,7 +458,7 @@ type
     property OnUpdate;
   end;
 
-  TioBSPersistenceRevertOrDelete = class(TioBSPersistenceStdActionFmx)
+  TioBSPersistenceRevertOrDelete = class(TioBSPersistenceStdActionFmx<IioMasterBindSource>)
   private
     FAutoExec_CloseQueryAction_AfterDelete: Boolean;
     FAutoExec_CloseQueryAction_AfterRevert: Boolean;
@@ -487,7 +487,7 @@ type
       default False;
   end;
 
-  TioBSPersistenceReload = class(TioBSPersistenceStdActionFmx)
+  TioBSPersistenceReload = class(TioBSPersistenceStdActionFmx<IioMasterBindSource>)
   strict protected
     procedure _InternalExecuteStdAction; override;
     function _InternalUpdateStdAction: Boolean; override;
@@ -508,7 +508,7 @@ type
     property OnUpdate;
   end;
 
-  TioBSDelete = class(TioBSPersistenceStdActionFmx)
+  TioBSDelete = class(TioBSPersistenceStdActionFmx<IioBindSource>)
   strict protected
     procedure _InternalExecuteStdAction; override;
     function _InternalUpdateStdAction: Boolean; override;
@@ -530,7 +530,7 @@ type
     property OnUpdate;
   end;
 
-  TioBSAppend = class(TioBSPersistenceStdActionFmx)
+  TioBSAppend = class(TioBSPersistenceStdActionFmx<IioBindSource>)
   private
     FEntityTypeAlias: String;
     FEntityTypeName: String;
@@ -563,7 +563,7 @@ type
     property OnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent read FOnNewInstanceAsInterface write FOnNewInstanceAsInterface;
   end;
 
-  TioBSInsert = class(TioBSPersistenceStdActionFmx)
+  TioBSInsert = class(TioBSPersistenceStdActionFmx<IioBindSource>)
   private
     FEntityTypeAlias: String;
     FEntityTypeName: String;
@@ -596,7 +596,7 @@ type
     property OnNewInstanceAsInterface: TioStdActionNewInstanceAsInterfaceEvent read FOnNewInstanceAsInterface write FOnNewInstanceAsInterface;
   end;
 
-  TioBS_ETM_RevertToObject = class(TioBSPersistenceStdActionFmx)
+  TioBS_ETM_RevertToObject = class(TioBSPersistenceStdActionFmx<IioMasterBindSource>)
   strict private
     FAutoExec_OnETMfor_AfterRevert: TioStdAction_ETM_AutoExec_AfterRevert;
     FAutoExec_OnTargetBS_AfterRevert: TioStdAction_ETM_AutoExec_AfterRevert;
@@ -633,7 +633,7 @@ type
     property BeforeRevert: TioStdAction_ETM_BeforeRevertEvent read FBeforeRevertEvent write FBeforeRevertEvent;
   end;
 
-  TioBS_ETM_RevertToBindSource = class(TioBSPersistenceStdActionFmx)
+  TioBS_ETM_RevertToBindSource = class(TioBSPersistenceStdActionFmx<IioMasterBindSource>)
   strict private
     FAutoExec_OnETMfor_AfterRevert: TioStdAction_ETM_AutoExec_AfterRevert;
     FAutoExec_OnTargetBS_AfterRevert: TioStdAction_ETM_AutoExec_AfterRevert;
@@ -668,7 +668,7 @@ type
     property AfterRevert: TioStdAction_ETM_AfterRevertEvent read FAfterRevertEvent write FAfterRevertEvent;
   end;
 
-  TioBSCloseQuery = class(TioBSPersistenceStdActionFmx, IioBSCloseQueryAction)
+  TioBSCloseQuery = class(TioBSPersistenceStdActionFmx<IioBindSource>, IioBSCloseQueryAction)
   strict private
     FExecuting, FExecutingEventHandler: Boolean;
     FInjectEventHandler: Boolean;
@@ -891,7 +891,7 @@ uses
 
 { TioBSObjStateStdActionFmx }
 
-constructor TioBSPersistenceStdActionFmx.Create(AOwner: TComponent);
+constructor TioBSPersistenceStdActionFmx<T>.Create(AOwner: TComponent);
 begin
   inherited;
   // Copied from TAction.Create
@@ -911,7 +911,7 @@ begin
   FAction_ShowOrSelectAction := nil;
 end;
 
-procedure TioBSPersistenceStdActionFmx.ExecuteTarget(Target: TObject);
+procedure TioBSPersistenceStdActionFmx<T>.ExecuteTarget(Target: TObject);
 var
   LCanExecute: Boolean;
 begin
@@ -932,22 +932,22 @@ begin
     FAfterExecute(Self);
 end;
 
-function TioBSPersistenceStdActionFmx.GetExecutionMode: TioActionExecutionMode;
+function TioBSPersistenceStdActionFmx<T>.GetExecutionMode: TioActionExecutionMode;
 begin
   Result := FExecutionMode;
 end;
 
-function TioBSPersistenceStdActionFmx.Get_Version: String;
+function TioBSPersistenceStdActionFmx<T>.Get_Version: String;
 begin
   Result := io.Version;
 end;
 
-function TioBSPersistenceStdActionFmx.HandlesTarget(Target: TObject): Boolean;
+function TioBSPersistenceStdActionFmx<T>.HandlesTarget(Target: TObject): Boolean;
 begin
   Result := Assigned(Target) and Supports(FTargetBindSource, IioMasterBindSource) and FTargetBindSource.isActive;
 end;
 
-procedure TioBSPersistenceStdActionFmx.Notification(AComponent: TComponent; Operation: TOperation);
+procedure TioBSPersistenceStdActionFmx<T>.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited Notification(AComponent, Operation);
   if (Operation = opRemove) and (AComponent = (FTargetBindSource as TComponent)) then
@@ -958,7 +958,7 @@ begin
     FAction_ShowOrSelectAction := nil;
 end;
 
-procedure TioBSPersistenceStdActionFmx.SetAction_CloseQueryAction(const Value: IioBSSlaveAction);
+procedure TioBSPersistenceStdActionFmx<T>.SetAction_CloseQueryAction(const Value: IioBSSlaveAction);
 begin
   if Value <> FAction_CloseQueryAction then
   begin
@@ -970,7 +970,7 @@ begin
   end;
 end;
 
-procedure TioBSPersistenceStdActionFmx.SetAction_ShowOrSelectAction(const Value: IioBSSlaveAction);
+procedure TioBSPersistenceStdActionFmx<T>.SetAction_ShowOrSelectAction(const Value: IioBSSlaveAction);
 begin
   if Value <> FAction_ShowOrSelectAction then
   begin
@@ -982,12 +982,12 @@ begin
   end;
 end;
 
-procedure TioBSPersistenceStdActionFmx.SetExecutionMode(const Value: TioActionExecutionMode);
+procedure TioBSPersistenceStdActionFmx<T>.SetExecutionMode(const Value: TioActionExecutionMode);
 begin
   FExecutionMode := Value;
 end;
 
-procedure TioBSPersistenceStdActionFmx.SetTargetBindSource(const Value: IioBindSource);
+procedure TioBSPersistenceStdActionFmx<T>.SetTargetBindSource(const Value: T);
 begin
   if not(csLoading in ComponentState) and FIsSlave then
     raise EioGenericException.Create(ClassName, 'SetTargetBindSource',
@@ -1004,7 +1004,7 @@ begin
   end;
 end;
 
-procedure TioBSPersistenceStdActionFmx.UpdateTarget(Target: TObject);
+procedure TioBSPersistenceStdActionFmx<T>.UpdateTarget(Target: TObject);
 var
   LEnabled: Boolean;
 begin
@@ -1015,24 +1015,24 @@ begin
     Enabled := LEnabled;
 end;
 
-procedure TioBSPersistenceStdActionFmx._InternalExecuteStdAction;
+procedure TioBSPersistenceStdActionFmx<T>._InternalExecuteStdAction;
 begin
   // Nothing to do here
 end;
 
-function TioBSPersistenceStdActionFmx._InternalUpdateStdAction: Boolean;
+function TioBSPersistenceStdActionFmx<T>._InternalUpdateStdAction: Boolean;
 begin
   Result := True;
   Result := Result and ((not Assigned(FAction_CloseQueryAction)) or FAction_CloseQueryAction._IsEnabled);
   Result := Result and ((not Assigned(FAction_ShowOrSelectAction)) or FAction_ShowOrSelectAction._IsEnabled);
 end;
 
-function TioBSPersistenceStdActionFmx._IsEnabled: Boolean;
+function TioBSPersistenceStdActionFmx<T>._IsEnabled: Boolean;
 begin
   Result := Enabled;
 end;
 
-procedure TioBSPersistenceStdActionFmx._SetTargetBindSource(const AObj: TObject);
+procedure TioBSPersistenceStdActionFmx<T>._SetTargetBindSource(const AObj: TObject);
 var
   LTargetBindSource: IioBindSource;
 begin

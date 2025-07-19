@@ -54,12 +54,8 @@ type
 
   TioBSPersistence = class;
 
-  IioMasterBindSource = interface
+  IioMasterBindSource = interface(IioBindSource)
     ['{8B930CF9-0EDC-483E-86A2-39C6CFD82D9D}']
-    procedure Open;
-    procedure Close;
-    function CheckAdapter: Boolean;
-    function Current: TObject;
     procedure Delete;
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
     function IsActive: Boolean;
