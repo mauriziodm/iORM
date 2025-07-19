@@ -97,6 +97,8 @@ type
     procedure SetWhere(const AWhere: IioWhere);
     procedure RegisterDetailBindSource(const ADetailBindSource: IioBindSource);
     procedure UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
+    procedure PostIfEditing;
+    procedure CancelIfEditing;
     // universal methods (used by std actions)
     procedure _Action_Append(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
     procedure _Action_AppendObj(AObject: TObject; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);

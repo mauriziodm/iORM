@@ -1862,10 +1862,29 @@ begin
       if FOnUpdateScope in [usGlobal] then
         TioBSCloseQueryActionRegister.Execute(Self);
       // In base a come impostata esegue l'azione
-      if (FOnEditingAction = eaAutoPersist) and LMasterBindSource.Persistence.CanPersist then
-        LMasterBindSource.Persistence.Persist;
-      if (FOnEditingAction = eaAutoRevert) and LMasterBindSource.Persistence.CanRevert then
-        LMasterBindSource.Persistence.Revert;
+      case FOnEditingAction of
+        eaAutoPersist:
+        begin
+          if TargetBindSource.IsMasterBS then
+          begin
+            if LMasterBindSource.Persistence.CanPersist then
+              LMasterBindSource.Persistence.Persist;
+          end
+          else
+            TargetBindSource.PostIfEditing;
+        end;
+        eaAutoRevert:
+        begin
+          if TargetBindSource.IsMasterBS then
+          begin
+            if LMasterBindSource.Persistence.CanRevert then
+              LMasterBindSource.Persistence.Revert;
+          end
+          else
+            TargetBindSource.CancelIfEditing;
+        end;
+      end;
+
       if not FExecutingEventHandler then
       begin
         case FOnExecuteAction of
