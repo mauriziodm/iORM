@@ -47,7 +47,7 @@ uses
   iORM.ETM.Engine, iORM.ETM.Interfaces, DJSON.Params,
   iORM.ConflictStrategy.Interfaces, iORM.ConflictStrategy.SameVersionWin, iORM.ConflictStrategy.LastUpdateWin,
   iORM.Context.Interfaces, iORM.SynchroStrategy.Interfaces, iORM.MVVM.ViewModel,
-  iORM.PersistenceStrategy.Interfaces, iORM.Abstraction, iORM.Async;
+  iORM.PersistenceStrategy.Interfaces, iORM.Abstraction, iORM.Abstraction.SessionData.Interfaces;
 
 const
   IORM_VERSION = 'iORM 2 (beta 3.4)';
@@ -256,6 +256,9 @@ type
 
 // Type aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
 {$REGION 'Type aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
+  IioBindSource = iORM.LiveBindings.Interfaces.IioBindSource;
+  IioMasterBindSource = iORM.LiveBindings.BSPersistence.IioMasterBindSource;
+
   TioSimpleViewRegister = iORM.MVVM.ViewRegister.TioSimpleViewRegister;
 
   TioCompareOp = iORM.CommonTypes.TioCompareOp;
@@ -332,6 +335,9 @@ type
   TioAuthTokenProviderMethod = iORM.Abstraction.TioAuthTokenProviderMethod;
   TioAuthDecisionMethod = iORM.Abstraction.TioAuthDecisionMethod;
   IioAuthDecisionRequest = iORM.Abstraction.IioAuthDecisionRequest;
+
+  // SessionData
+  IioSessionData = iORM.Abstraction.SessionData.Interfaces.IioSessionData;
 {$ENDREGION}
 
 // Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM
