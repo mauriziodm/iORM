@@ -384,7 +384,7 @@ type
     property _Version: String read Get_Version;
   end;
 
-  TioBSPersistenceSaveRevertPoint = class(TioBSPersistenceStdActionVcl<IioMasterBindSource>)
+  TioBSPersistenceSaveRevertPoint = class(TioBSPersistenceStdActionVcl<IioBindSource>)
   strict protected
     procedure _InternalExecuteStdAction; override;
     function _InternalUpdateStdAction: Boolean; override;
@@ -399,7 +399,7 @@ type
     property OnUpdate;
   end;
 
-  TioBSPersistenceClear = class(TioBSPersistenceStdActionVcl<IioMasterBindSource>)
+  TioBSPersistenceClear = class(TioBSPersistenceStdActionVcl<IioBindSource>)
   strict protected
     procedure _InternalExecuteStdAction; override;
     function _InternalUpdateStdAction: Boolean; override;
@@ -416,7 +416,7 @@ type
     property OnUpdate;
   end;
 
-  TioBSPersistencePersist = class(TioBSPersistenceStdActionVcl<IioMasterBindSource>)
+  TioBSPersistencePersist = class(TioBSPersistenceStdActionVcl<IioBindSource>)
   strict protected
     procedure _InternalExecuteStdAction; override;
     function _InternalUpdateStdAction: Boolean; override;
@@ -434,7 +434,7 @@ type
     property OnUpdate;
   end;
 
-  TioBSPersistenceRevert = class(TioBSPersistenceStdActionVcl<IioMasterBindSource>)
+  TioBSPersistenceRevert = class(TioBSPersistenceStdActionVcl<IioBindSource>)
   strict protected
     procedure _InternalExecuteStdAction; override;
     function _InternalUpdateStdAction: Boolean; override;
@@ -453,7 +453,7 @@ type
     property OnUpdate;
   end;
 
-  TioBSPersistenceRevertOrDelete = class(TioBSPersistenceStdActionVcl<IioMasterBindSource>)
+  TioBSPersistenceRevertOrDelete = class(TioBSPersistenceStdActionVcl<IioBindSource>)
   private
     FAutoExec_CloseQueryAction_AfterDelete: Boolean;
     FAutoExec_CloseQueryAction_AfterRevert: Boolean;
@@ -480,7 +480,7 @@ type
     property AutoExec_CloseQueryAction_AfterRevert: Boolean read FAutoExec_CloseQueryAction_AfterRevert write FAutoExec_CloseQueryAction_AfterRevert default False;
   end;
 
-  TioBSPersistenceReload = class(TioBSPersistenceStdActionVcl<IioMasterBindSource>)
+  TioBSPersistenceReload = class(TioBSPersistenceStdActionVcl<IioBindSource>)
   strict protected
     procedure _InternalExecuteStdAction; override;
     function _InternalUpdateStdAction: Boolean; override;

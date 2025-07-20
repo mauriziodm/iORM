@@ -389,7 +389,7 @@ type
     property _Version: String read Get_Version;
   end;
 
-  TioBSPersistenceSaveRevertPoint = class(TioBSPersistenceStdActionFmx<IioMasterBindSource>)
+  TioBSPersistenceSaveRevertPoint = class(TioBSPersistenceStdActionFmx<IioBindSource>)
   strict protected
     procedure _InternalExecuteStdAction; override;
     function _InternalUpdateStdAction: Boolean; override;
@@ -404,7 +404,7 @@ type
     property OnUpdate;
   end;
 
-  TioBSPersistenceClear = class(TioBSPersistenceStdActionFmx<IioMasterBindSource>)
+  TioBSPersistenceClear = class(TioBSPersistenceStdActionFmx<IioBindSource>)
   strict protected
     procedure _InternalExecuteStdAction; override;
     function _InternalUpdateStdAction: Boolean; override;
@@ -421,7 +421,7 @@ type
     property OnUpdate;
   end;
 
-  TioBSPersistencePersist = class(TioBSPersistenceStdActionFmx<IioMasterBindSource>)
+  TioBSPersistencePersist = class(TioBSPersistenceStdActionFmx<IioBindSource>)
   strict protected
     procedure _InternalExecuteStdAction; override;
     function _InternalUpdateStdAction: Boolean; override;
@@ -439,7 +439,7 @@ type
     property OnUpdate;
   end;
 
-  TioBSPersistenceRevert = class(TioBSPersistenceStdActionFmx<IioMasterBindSource>)
+  TioBSPersistenceRevert = class(TioBSPersistenceStdActionFmx<IioBindSource>)
   strict protected
     procedure _InternalExecuteStdAction; override;
     function _InternalUpdateStdAction: Boolean; override;
@@ -458,7 +458,7 @@ type
     property OnUpdate;
   end;
 
-  TioBSPersistenceRevertOrDelete = class(TioBSPersistenceStdActionFmx<IioMasterBindSource>)
+  TioBSPersistenceRevertOrDelete = class(TioBSPersistenceStdActionFmx<IioBindSource>)
   private
     FAutoExec_CloseQueryAction_AfterDelete: Boolean;
     FAutoExec_CloseQueryAction_AfterRevert: Boolean;
@@ -487,7 +487,7 @@ type
       default False;
   end;
 
-  TioBSPersistenceReload = class(TioBSPersistenceStdActionFmx<IioMasterBindSource>)
+  TioBSPersistenceReload = class(TioBSPersistenceStdActionFmx<IioBindSource>)
   strict protected
     procedure _InternalExecuteStdAction; override;
     function _InternalUpdateStdAction: Boolean; override;
