@@ -507,7 +507,7 @@ end;
 
 procedure TioBSPersistence.RevertOrDelete(const ARaiseIfRevertPointNotSaved: Boolean = False; const ARaiseIfNoChanges: Boolean = False);
 begin
-  CheckUnassigned('Revert', True);
+  CheckUnassigned('RevertOrDelete', True);
   // Depending on LoadType property...
   if FBindSource.IsFromBSLoadType then
     _InternalRevertWhenFromBSLoadType(ARaiseIfRevertPointNotSaved, ARaiseIfNoChanges)
