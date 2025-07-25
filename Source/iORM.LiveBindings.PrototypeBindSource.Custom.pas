@@ -342,6 +342,12 @@ end;
 
 procedure TioPrototypeBindSourceCustom.Append;
 begin
+
+
+Abort;
+
+
+
   if CheckActiveAdapter then
     GetInternalAdapter.Append;
 end;

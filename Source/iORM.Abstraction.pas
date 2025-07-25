@@ -63,7 +63,7 @@ type
 
   // Questa è l'interfaccia che verrà usata nell'anonymous method per validare l'access-token
   //  prima di ogni richiesta di esecuzione di una azione su un oggetto/classe.
-  //  NB: Se e quando vorrò usarla anche per le standard-action non avro nessuno IioCOntext
+  //  NB: Se e quando vorrò usarla anche per le standard-action non avro nessuno IioContext
   //       a disposizione quindi farò una classe apposita che implementa semplicemente questa classe
   //       e che popolerò appositamente per la validazione dell'access-token e stabilire quindi se
   //       quella action deve essere abilitata per quell'utente e per quell'oggetto oppure no.
@@ -86,6 +86,30 @@ type
     property Intent: TioPersistenceIntentType read GetIntent;
     // type name
     function GetTypeName: String;
+    property TypeName: String read GetTypeName;
+  end;
+
+  // Questa è la classe che implementa IioAuthDecisionRequest che viene usata per le richieste
+  //  di autorizzazione da parte dei BindSources e delle standard actions (senza IioContext)
+  TioBindSourceAuthDecisionRequest = class(TInterfacedObject, IioAuthDecisionRequest)
+  private
+    FActionType:TioPersistenceActionType;
+    FIntent: TioPersistenceIntentType;
+    FTypeName: String;
+    FToken: String;
+    function GetToken: String;
+    function GetAuthCache: IioAuthCache;
+    function GetActionType: TioPersistenceActionType;
+    function GetIntent: TioPersistenceIntentType;
+    function GetTypeName: String;
+  public
+    constructor Create(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType); reintroduce;
+    function AsContext: IioContext;
+    function IsContext: Boolean;
+    property Token: String read GetToken;
+    property AuthCache: IioAuthCache read GetAuthCache;
+    property ActionType: TioPersistenceActionType read GetActionType;
+    property Intent: TioPersistenceIntentType read GetIntent;
     property TypeName: String read GetTypeName;
   end;
 
@@ -837,5 +861,51 @@ begin
   FMainSessionData := TioAbstractionFactory.NewSessionData;
 end;
 
+
+{ TioBindSourceAuthDecisionRequest }
+
+function TioBindSourceAuthDecisionRequest.AsContext: IioContext;
+begin
+  raise EioGenericException.Create(ClassName, 'AsContext', 'The method is not implemented by this class.');
+end;
+
+constructor TioBindSourceAuthDecisionRequest.Create(const ATypeName: String; const AActionType: TioPersistenceActionType;
+  const AIntent: TioPersistenceIntentType);
+begin
+  FActionType := AActionType;
+  FIntent := AIntent;
+  FTypeName := ATypeName;
+  FToken := TioApplication.ProvideAuthToken;
+end;
+
+function TioBindSourceAuthDecisionRequest.GetActionType: TioPersistenceActionType;
+begin
+  Result := FActionType;
+end;
+
+function TioBindSourceAuthDecisionRequest.GetAuthCache: IioAuthCache;
+begin
+
+end;
+
+function TioBindSourceAuthDecisionRequest.GetIntent: TioPersistenceIntentType;
+begin
+  Result := FIntent;
+end;
+
+function TioBindSourceAuthDecisionRequest.GetToken: String;
+begin
+  Result := FToken;
+end;
+
+function TioBindSourceAuthDecisionRequest.GetTypeName: String;
+begin
+  Result := FTypeName;
+end;
+
+function TioBindSourceAuthDecisionRequest.IsContext: Boolean;
+begin
+  Result := False;
+end;
 
 end.

@@ -73,6 +73,12 @@ type
     BofCrack, // before the first record (crack)
     EofCrack: Integer; // after the last record (crack)
 
+
+
+    procedure DoBeforeInsert; override;
+
+
+
     // create, close, and so on
     procedure InternalOpen; override;
     procedure InternalClose; override;
@@ -482,6 +488,13 @@ begin
 end;
 
 // III: Free the buffer
+procedure TioBaseDataSet.DoBeforeInsert;
+begin
+  Abort;
+  inherited;
+
+end;
+
 procedure TioBaseDataSet.FreeRecordBuffer(var Buffer: TRecordBuffer);
 begin
   FreeMem(Buffer);

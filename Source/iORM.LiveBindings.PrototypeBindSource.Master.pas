@@ -44,6 +44,7 @@ type
 
   TioPrototypeBindSourceMaster = class(TioPrototypeBindSourceCustom, IioMasterBindSource, IioStdActionTargetMasterBindSource)
   private
+    FAuthorizationCheck: Boolean;
     FPersistence: TioBSPersistence;
     FOnDeleteAction: TioBSOnDeleteAction;
     FOnEditAction: TioBSOnEditAction;
@@ -58,6 +59,9 @@ type
     FOnWhereClear: TioOnWhereBuilderEvent;
     FAfterWhereBuild: TioAfterWhereBuilderEvent;
     FAfterWhereClear: TioAfterWhereBuilderEvent;
+    // AuthorizationCheck
+    procedure SetAuthorizationCheck(const Value: Boolean);
+    function GetAuthorizationCheck: Boolean;
     // SourcePrototypeBindSource
     function GetSourceBS: IioBindSource;
     procedure SetSourceBS(const Value: IioBindSource);
@@ -114,6 +118,7 @@ type
 //    property OnCreateAdapter;
     // properties redeclared from TioCUstomPrototypeBindSource
     property AsDefault; // non mettere default
+    property AuthorizationCheck: Boolean read GetAuthorizationCheck write SetAuthorizationCheck default True;
     property TypeName;
     property TypeAlias;
     property AsyncLoad default False;
@@ -176,6 +181,7 @@ uses
 constructor TioPrototypeBindSourceMaster.Create(AOwner: TComponent);
 begin
   inherited;
+  FAuthorizationCheck := True;
   LoadType := ltAuto;
   FOnDeleteAction := daSetSmartDeleteSystem;
   FOnEditAction := eaSaveRevertPoint;
@@ -195,6 +201,11 @@ end;
 function TioPrototypeBindSourceMaster.GetPersistence: TioBSPersistence;
 begin
   Result := FPersistence;
+end;
+
+function TioPrototypeBindSourceMaster.GetAuthorizationCheck: Boolean;
+begin
+  Result := FAuthorizationCheck;
 end;
 
 function TioPrototypeBindSourceMaster.GetOnDeleteAction: TioBSOnDeleteAction;
@@ -256,6 +267,11 @@ begin
   // Clear the BSPersistence status
   if Value and not (csDesigning in ComponentState) then
     Persistence.Clear(False);
+end;
+
+procedure TioPrototypeBindSourceMaster.SetAuthorizationCheck(const Value: Boolean);
+begin
+  FAuthorizationCheck := Value;
 end;
 
 procedure TioPrototypeBindSourceMaster.SetLoadType(const Value: TioLoadType);

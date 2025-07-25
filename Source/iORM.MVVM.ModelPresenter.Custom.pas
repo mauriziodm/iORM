@@ -368,6 +368,11 @@ end;
 
 procedure TioModelPresenterCustom.Append(AObject: IInterface);
 begin
+
+
+Abort;
+
+
   if CheckAdapter then
   begin
     GetActiveBindSourceAdapter.Append(AObject);

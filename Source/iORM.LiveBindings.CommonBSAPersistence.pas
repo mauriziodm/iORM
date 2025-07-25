@@ -116,6 +116,12 @@ class procedure TioCommonBSAPersistence.BeforeEdit(const AActiveBindSourceAdapte
 var
   LActiveBSA: IioActiveBindSourceAdapter;
 begin
+
+
+
+Abort;
+
+
   // Notification to save revert point before edit
   AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint));
   // Notification to register the current object into the SmartUpdateDetection system
