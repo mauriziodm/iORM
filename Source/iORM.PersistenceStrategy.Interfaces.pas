@@ -37,7 +37,8 @@ interface
 
 uses
   iORM.CommonTypes, iORM.LiveBindings.BSPersistence,
-  iORM.Where.Interfaces, System.Rtti, iORM.Abstraction.SessionData.Interfaces;
+  iORM.Where.Interfaces, System.Rtti, iORM.Abstraction.SessionData.Interfaces,
+  iORM.Auth.Interfaces;
 
 const
 
@@ -96,11 +97,26 @@ type
     psmTransactionStart
   );
 
-  IioAuthCache = interface
+  // Ho deciso di avere due AuthCache diverse, una per le operazioni CRUD (IioAuthCacheUI in iORM.PersistenceStrategy.Interfaces)
+  //  che viene usata nelle PersistenceStrategies per autorizzare o meno le operazioni,
+  //  questa ha lo stesso ciclo di vita della transazione/PSRequest quindi
+  //  ogni volta si azzera quindi non c'è nemmeno bisogno di proteggeerla per il multithreading, così c'è anche il vantaggio
+  //  che se i permessi dell'utente dovessero cambiare mentre la transazione è in atto i permessi visti saranno consistenti
+  //  per tutta la durata dell'operazione.
+  //  L'altra IioAuthCacheUI invece viene usata nel frontend e nella UI (BindSources e StandardActions) quindi deve essere globale
+  //  e deve essere thread-safe. La classe che la implementa mantiene anche una copia dell'ultimo Token usato in modo che
+  //  quando nelle chiamate successive cambia la cache viene svuotata e fare in modo quindi che se, ad esempio,
+  //  si fa un logout e ci si riautentica come altro utente i permessi preesistenti vengano eliminati, inoltre anche
+  //  se i permessi dello stesso utente dovessero cambiare dopo l'autenticazione una volta scaduto e rinnovato il token
+  //  verranno usati i nuovi permessi solo con un leggero ritardo  pari al max. alla dirata del token. Ho deciso di mantenere
+  //  la AuthCacheUI nel SessionData in modo che anche con uniGUI funzioni correttamente visto che in questo caso già iORM
+  //  mantiene SessionData separati per le diverse sessioni.
+  IioAuthCacheCRUD = interface
     ['{126C694D-6A57-44A0-A012-35051AA6F852}']
     // Add
     procedure Add(const AKey: String; const AAuthorized: Boolean);
     // IsAuthorized
+    // NB: IL parametro "AToken" serve solo per fare in modo che
     function TryIsAuthorized(const AKey: String; var OResult: Boolean): Boolean;
   end;
 

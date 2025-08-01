@@ -73,12 +73,6 @@ type
     BofCrack, // before the first record (crack)
     EofCrack: Integer; // after the last record (crack)
 
-
-
-    procedure DoBeforeInsert; override;
-
-
-
     // create, close, and so on
     procedure InternalOpen; override;
     procedure InternalClose; override;
@@ -131,28 +125,28 @@ type
     property Active;
   published
     // redeclared data set properties
-//    property BeforeOpen;
-//    property AfterOpen;
-//    property BeforeClose;
-//    property AfterClose;
-//    property BeforeInsert;
-//    property AfterInsert;
-//    property BeforeEdit;
-//    property AfterEdit;
-//    property BeforePost;
-//    property AfterPost;
-//    property BeforeCancel;
-//    property AfterCancel;
-//    property BeforeDelete;
-//    property AfterDelete;
-//    property BeforeScroll;
-//    property AfterScroll;
+    // property BeforeOpen;
+    // property AfterOpen;
+    // property BeforeClose;
+    // property AfterClose;
+    // property BeforeInsert;
+    // property AfterInsert;
+    // property BeforeEdit;
+    // property AfterEdit;
+    // property BeforePost;
+    // property AfterPost;
+    // property BeforeCancel;
+    // property AfterCancel;
+    // property BeforeDelete;
+    // property AfterDelete;
+    // property BeforeScroll;
+    // property AfterScroll;
     property OnCalcFields;
-//    property OnDeleteError;
-//    property OnEditError;
-//    property OnFilterRecord;
-//    property OnNewRecord;
-//    property OnPostError;
+    // property OnDeleteError;
+    // property OnEditError;
+    // property OnFilterRecord;
+    // property OnNewRecord;
+    // property OnPostError;
   end;
 
   TioBSABaseDataSet = class(TioBaseDataSet)
@@ -167,6 +161,7 @@ type
     function _IsValidRecNo: Boolean;
   protected
     function CheckAdapter: Boolean;
+    procedure DoBeforeInsert; override;
     procedure SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter); virtual;
     // dataset virtual methods
     procedure InternalPreOpen; override;
@@ -246,7 +241,8 @@ uses
   iORM.Exceptions, System.SysUtils, System.TypInfo, iORM.Attributes,
   iORM.Context.Container, System.Types, Data.FmtBcd, Data.DBConsts, System.DateUtils,
   iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, iORM.Utilities, System.StrUtils,
-  iORM.RttiContext.Factory, iORM;
+  iORM.RttiContext.Factory, iORM, iORM.Abstraction,
+  iORM.LiveBindings.CommonBSBehavior;
 
 /// //////////////////////////////////////////////
 /// /// Part I:
@@ -488,13 +484,6 @@ begin
 end;
 
 // III: Free the buffer
-procedure TioBaseDataSet.DoBeforeInsert;
-begin
-  Abort;
-  inherited;
-
-end;
-
 procedure TioBaseDataSet.FreeRecordBuffer(var Buffer: TRecordBuffer);
 begin
   FreeMem(Buffer);
@@ -552,35 +541,13 @@ end;
 { TMdListDataSet }
 
 procedure TioBSABaseDataSet.Append(AObject: IInterface);
-var
-  AnActiveBSA: IioActiveBindSourceAdapter;
 begin
-  if CheckAdapter and Supports(FBindSourceAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
-  begin
-    AnActiveBSA.Append(AObject);
-    // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
-    // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
-    // invocato un Post in seguito al Refresh stesso.
-    // AnActiveBSA.Refresh(False);
-  end
-  else
-    raise EioGenericException.Create(ClassName, 'Append(IInterface)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
+  TioCommonBSBehavior.InsertOrAppendIntf(Self as IioBindSource, AObject, iaAppend, False);
 end;
 
 procedure TioBSABaseDataSet.Append(AObject: TObject);
-var
-  AnActiveBSA: IioActiveBindSourceAdapter;
 begin
-  if CheckAdapter and Supports(FBindSourceAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
-  begin
-    AnActiveBSA.Append(AObject);
-    // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
-    // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
-    // invocato un Post in seguito al Refresh stesso.
-    // AnActiveBSA.Refresh(False);
-  end
-  else
-    raise EioGenericException.Create(ClassName, 'Append(TObject)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
+  TioCommonBSBehavior.InsertOrAppendObj(Self as IioBindSource, AObject, iaAppend, True);
 end;
 
 function TioBSABaseDataSet.CheckAdapter: Boolean;
@@ -624,6 +591,15 @@ begin
   end;
 end;
 
+procedure TioBSABaseDataSet.DoBeforeInsert;
+begin
+  // Requires an authorization-decision for UI purposes
+  // NB: Codice inserito qui per intercettare l'insert richiesto da tastiera, quello che non riceve l'istanza da aggiungere già creata
+  TioApplication.ProvideAuthDecisionUI(GetActiveBindSourceAdapter.TypeName, atInsert, itRegular);
+  // Execute the normal inherited operations if authorized
+  inherited;
+end;
+
 function TioBSABaseDataSet.GetCanModify: Boolean;
 begin
   Result := True; // read-write
@@ -635,35 +611,13 @@ begin
 end;
 
 procedure TioBSABaseDataSet.Insert(AObject: IInterface);
-var
-  AnActiveBSA: IioActiveBindSourceAdapter;
 begin
-  if CheckAdapter and Supports(FBindSourceAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
-  begin
-    AnActiveBSA.Insert(AObject);
-    // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
-    // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
-    // invocato un Post in seguito al Refresh stesso.
-    // AnActiveBSA.Refresh(False);
-  end
-  else
-    raise EioGenericException.Create(ClassName, 'Insert(IInterface)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
+  TioCommonBSBehavior.InsertOrAppendIntf(Self as IioBindSource, AObject, iaInsert, False);
 end;
 
 procedure TioBSABaseDataSet.Insert(AObject: TObject);
-var
-  AnActiveBSA: IioActiveBindSourceAdapter;
 begin
-  if CheckAdapter and Supports(FBindSourceAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
-  begin
-    AnActiveBSA.Insert(AObject);
-    // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
-    // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
-    // invocato un Post in seguito al Refresh stesso.
-    // AnActiveBSA.Refresh(False);
-  end
-  else
-    raise EioGenericException.Create(ClassName, 'Insert(TObject)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
+  TioCommonBSBehavior.InsertOrAppendObj(Self as IioBindSource, AObject, iaInsert, True);
 end;
 
 procedure TioBSABaseDataSet.InternalCancel;
@@ -1117,10 +1071,10 @@ end;
 function TioBSABaseDataSet.MoveBy(Distance: Integer): Integer;
 begin
   // Blocca l'AutoInsert di un nuovo record/object quando si
-  //  si preme il bottone VK_DOWN mentre si è sull'ultimo record.
-  //  In questo modo si comporta come i BindSource ed evito
-  //  alcuni problemi
-  if (Distance < 0) or not FBindSourceAdapter.EOF then
+  // si preme il bottone VK_DOWN mentre si è sull'ultimo record.
+  // In questo modo si comporta come i BindSource ed evito
+  // alcuni problemi
+  if (Distance < 0) or not FBindSourceAdapter.Eof then
     Result := inherited
   else
     Result := 0;
@@ -1228,7 +1182,7 @@ begin
   FIsReadingBlobData := True;
   try
     // To avoid an out of range error...
-    if FDataSet._IsValidRecNo then
+    if FDataset._IsValidRecNo then
     begin
       // Get the current record index (corrected by the situations)
       LRecordIndex := FDataset.GetRecordIdx;
@@ -1297,7 +1251,7 @@ begin
   FIsReadingBlobData := True;
   try
     // To avoid an out of range error...
-    if FDataSet._IsValidRecNo then
+    if FDataset._IsValidRecNo then
     begin
       // Get the current record index (corrected by the situations)
       LRecordIndex := FDataset.GetRecordIdx;
@@ -1384,27 +1338,27 @@ begin
   end;
 end;
 
-//class function TioFullPathPropertyReadWrite._ResolvePath(var AOutObj: TObject; var AOutProperty: IioProperty; AFullPathPropName: String): Boolean;
-//var
-//  LPropName: String;
-//begin
-//  Result := False;
-//  LPropName := _ExtractPropName(AFullPathPropName);
-//  AOutProperty := TioMapContainer.GetMap(AOutObj.ClassName).GetProperties.GetPropertyByName(LPropName);
-//  if not AFullPathPropName.IsEmpty then
-//  begin
-//    // If it is not the last property of the path then it must have a BelongsTo, HasOne or EmbeddedHasOne relationship
-//    if not(AOutProperty.GetRelationType in [rtBelongsTo, rtHasOne, rtEmbeddedHasOne]) then
-//      raise EioException.Create(ClassName, '_ResolvePath', Format('Property "%s.%s" must have a BelongsTo, HasOne or EmbeddedHasOne relationship.',
-//        [AOutObj.ClassName, LPropName]));
-//    AOutObj := AOutProperty.GetRelationChildObject(AOutObj);
-//    // Recursion: If the child object is not assigned, the recursion stops and the function returns false
-//    if Assigned(AOutObj) then
-//      Result := _ResolvePath(AOutObj, AOutProperty, AFullPathPropName); // Recursion
-//  end
-//  else
-//    Result := True;
-//end;
+// class function TioFullPathPropertyReadWrite._ResolvePath(var AOutObj: TObject; var AOutProperty: IioProperty; AFullPathPropName: String): Boolean;
+// var
+// LPropName: String;
+// begin
+// Result := False;
+// LPropName := _ExtractPropName(AFullPathPropName);
+// AOutProperty := TioMapContainer.GetMap(AOutObj.ClassName).GetProperties.GetPropertyByName(LPropName);
+// if not AFullPathPropName.IsEmpty then
+// begin
+// // If it is not the last property of the path then it must have a BelongsTo, HasOne or EmbeddedHasOne relationship
+// if not(AOutProperty.GetRelationType in [rtBelongsTo, rtHasOne, rtEmbeddedHasOne]) then
+// raise EioException.Create(ClassName, '_ResolvePath', Format('Property "%s.%s" must have a BelongsTo, HasOne or EmbeddedHasOne relationship.',
+// [AOutObj.ClassName, LPropName]));
+// AOutObj := AOutProperty.GetRelationChildObject(AOutObj);
+// // Recursion: If the child object is not assigned, the recursion stops and the function returns false
+// if Assigned(AOutObj) then
+// Result := _ResolvePath(AOutObj, AOutProperty, AFullPathPropName); // Recursion
+// end
+// else
+// Result := True;
+// end;
 class function TioFullPathPropertyReadWrite._ResolvePath(var AOutObj: TObject; var AOutRttiProperty: TRttiProperty; AFullPathPropName: String): Boolean;
 var
   LPropName: String;
@@ -1413,7 +1367,7 @@ begin
   Result := False;
   LPropName := _ExtractPropName(AFullPathPropName);
   // If we are in the middle of the path (we are not at the final leaf property)
-  //  then it recursively calls itself by continuing in the path through the mapped prop/fields...
+  // then it recursively calls itself by continuing in the path through the mapped prop/fields...
   if not AFullPathPropName.IsEmpty then
   begin
     LMidPathProperty := TioMapContainer.GetMap(AOutObj.ClassName).GetProperties.GetPropertyByName(LPropName);
@@ -1427,8 +1381,8 @@ begin
       Result := _ResolvePath(AOutObj, AOutRttiProperty, AFullPathPropName); // Recursion
   end
   // ...instead if we are in a final leaf property then look for the RttiProperty to be returned
-  //  in the RttiType of the final leaf object (not the mapped properties) because otherwise
-  //  if it has been mapped for private fields it would not pass through the possible set method.
+  // in the RttiType of the final leaf object (not the mapped properties) because otherwise
+  // if it has been mapped for private fields it would not pass through the possible set method.
   else
   begin
     AOutRttiProperty := TioRttiFactory.GetRttiPropertyByClass(AOutObj.ClassType, LPropName, True);
@@ -1436,15 +1390,15 @@ begin
   end;
 end;
 
-//class function TioFullPathPropertyReadWrite.GetValue(AObj: TObject; const AFullPathPropName: String): TValue;
-//var
-//  LProperty: IioProperty;
-//begin
-//  if _ResolvePath(AObj, LProperty, AFullPathPropName) then
-//    Result := LProperty.GetValue(AObj)
-//  else
-//    Result := TValue.Empty;
-//end;
+// class function TioFullPathPropertyReadWrite.GetValue(AObj: TObject; const AFullPathPropName: String): TValue;
+// var
+// LProperty: IioProperty;
+// begin
+// if _ResolvePath(AObj, LProperty, AFullPathPropName) then
+// Result := LProperty.GetValue(AObj)
+// else
+// Result := TValue.Empty;
+// end;
 class function TioFullPathPropertyReadWrite.GetValue(const ADataSet: TioBSABaseDataSet; AObj: TObject; const AField: TField): TValue;
 var
   LRttiProperty: TRttiProperty;
@@ -1454,9 +1408,8 @@ begin
   // In case of special bind source related property
   if LFullPathPropName.StartsWith('%') then
     Result := _GetValueForBSProp(ADataSet, LFullPathPropName)
-  // In case of normal property of the current object (current record)
-  else
-  if _ResolvePath(AObj, LRttiProperty, LFullPathPropName) then
+    // In case of normal property of the current object (current record)
+  else if _ResolvePath(AObj, LRttiProperty, LFullPathPropName) then
   begin
     // Enumeration type
     if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
@@ -1465,25 +1418,27 @@ begin
       if TioEnumContainer._Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
       begin
         Result := TioEnumContainer._OrdinalToStringAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType), LRttiProperty.GetValue(AObj).AsOrdinal).AsString;
-        if not (AField is TStringField) then
-          raise EioGenericException.Create(ClassName, 'GetValue', Format('Hi, I''m iORM and there is a problem.' +
-            #13#13'The property "%s" of the class "%s" is of the enumerated type "%s" and you have chosen to bind it as a string decorating it '+
-            '(the enum type) with the attribute [ioEnumerated], however the field "%s" of the dataset called "%s" is of type "%s" while it should be "TStringField".'+
-            #13#13'NOTE: if you prefer to bind this enumerated type as integer instead then you can remove the [ioEnumerated] attribute from its declaration.' +
-            #13#13'Can you fix this for me?',
-            [LRttiProperty.Name, AObj.ClassName, LRttiProperty.PropertyType.Name, AField.FieldName, ADataSet.Name, AField.ClassName]));
+        if not(AField is TStringField) then
+          raise EioGenericException.Create(ClassName, 'GetValue',
+            Format('Hi, I''m iORM and there is a problem.' +
+            #13#13'The property "%s" of the class "%s" is of the enumerated type "%s" and you have chosen to bind it as a string decorating it ' +
+            '(the enum type) with the attribute [ioEnumerated], however the field "%s" of the dataset called "%s" is of type "%s" while it should be "TStringField".'
+            + #13#13'NOTE: if you prefer to bind this enumerated type as integer instead then you can remove the [ioEnumerated] attribute from its declaration.'
+            + #13#13'Can you fix this for me?', [LRttiProperty.Name, AObj.ClassName, LRttiProperty.PropertyType.Name, AField.FieldName, ADataSet.Name,
+            AField.ClassName]));
       end
       // Enumeration binded as integer
       else
       begin
         Result := Byte(LRttiProperty.GetValue(AObj).GetReferenceToRawData^);
-        if not (AField is TIntegerField) then
-          raise EioGenericException.Create(ClassName, 'GetValue', Format('Hi, I''m iORM and there is a problem.' +
+        if not(AField is TIntegerField) then
+          raise EioGenericException.Create(ClassName, 'GetValue',
+            Format('Hi, I''m iORM and there is a problem.' +
             #13#13'The property "%s" of the class "%s" is of the enumerated type "%s" and you have chosen to bind it as integer, ' +
-            'however the field "%s" of the dataset called "%s" is of type "%s" while it should be "TIntegerField".'+
+            'however the field "%s" of the dataset called "%s" is of type "%s" while it should be "TIntegerField".' +
             #13#13'NOTE: if you prefer to bind this enumerated type as a string instead, then you can decorate it with the [ioEnumerated] attribute.' +
-            #13#13'Can you fix this for me?',
-            [LRttiProperty.Name, AObj.ClassName, LRttiProperty.PropertyType.Name, AField.FieldName, ADataSet.Name, AField.ClassName]));
+            #13#13'Can you fix this for me?', [LRttiProperty.Name, AObj.ClassName, LRttiProperty.PropertyType.Name, AField.FieldName, ADataSet.Name,
+            AField.ClassName]));
       end;
     end
     // Other types
@@ -1521,15 +1476,15 @@ begin
     LInstance := LBindSource.Paging as TObject;
   end
   else
-  // In case of bind source related property
-  if APropName.StartsWith('%') then
-  begin
-    APropName := APropName.Replace('%', '');
-    LInstance := LBindSource as TObject;
-  end
-  // Else return an empty value
-  else
-    Result := TValue.Empty;
+    // In case of bind source related property
+    if APropName.StartsWith('%') then
+    begin
+      APropName := APropName.Replace('%', '');
+      LInstance := LBindSource as TObject;
+    end
+    // Else return an empty value
+    else
+      Result := TValue.Empty;
   // Extract the value for the specified property and instance
   LProperty := TioUtilities.GetRttiProperty(LInstance.ClassType, APropName);
   if Assigned(LProperty) then
@@ -1538,26 +1493,26 @@ begin
     Result := TValue.Empty;
 end;
 
-//class procedure TioFullPathPropertyReadWrite.SetValue(AObj: TObject; const AFullPathPropName: String; const AValue: TValue);
-//var
-//  LProperty: IioProperty;
-//begin
-//  if _ResolvePath(AObj, LProperty, AFullPathPropName) then
-//    LProperty.SetValue(AObj, AValue)
-//  else
-//    raise EioException.Create(Self.ClassName, 'SetValue',
-//      Format('I am unable to resolve the property path "%s".'#13#13'It could be that one of the objects along the way is nil.', [AFullPathPropName]));
-//end;
+// class procedure TioFullPathPropertyReadWrite.SetValue(AObj: TObject; const AFullPathPropName: String; const AValue: TValue);
+// var
+// LProperty: IioProperty;
+// begin
+// if _ResolvePath(AObj, LProperty, AFullPathPropName) then
+// LProperty.SetValue(AObj, AValue)
+// else
+// raise EioException.Create(Self.ClassName, 'SetValue',
+// Format('I am unable to resolve the property path "%s".'#13#13'It could be that one of the objects along the way is nil.', [AFullPathPropName]));
+// end;
 class procedure TioFullPathPropertyReadWrite.SetValue(AObj: TObject; const AFullPathPropName: String; const AValue: TValue);
 var
   LRttiProperty: TRttiProperty;
 begin
   // NB: If it's a property relative to the BindSource then raise an exception because
-  //      these type of properties are ReadOnly
+  // these type of properties are ReadOnly
   if AFullPathPropName.StartsWith('%') then
     raise EioGenericException.Create(Self.ClassName, 'SetValue',
-      Format('Ooops, I see you have set some virtual fields in some BindSource or DataSet (FieldDefs property), they are the ones whose name starts with the character "%%".' +
-      #13#13'Note that these type of virtual fields are read-only by design; iORM cannot assign the new value to the field named "%s".' +
+      Format('Ooops, I see you have set some virtual fields in some BindSource or DataSet (FieldDefs property), they are the ones whose name starts with the character "%%".'
+      + #13#13'Note that these type of virtual fields are read-only by design; iORM cannot assign the new value to the field named "%s".' +
       #13#13'Please, try to Assign the value to the DataSet property directly by code.', [AFullPathPropName]));
   // In case of normal property of the current object (current record)
   if _ResolvePath(AObj, LRttiProperty, AFullPathPropName) then
@@ -1568,7 +1523,7 @@ begin
       // Enumeration binded as string
       if TioEnumContainer._Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
         LRttiProperty.SetValue(AObj, TioEnumContainer._StringToOrdinalAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType), AValue.AsString))
-      // Enumeration binded as integer
+        // Enumeration binded as integer
       else
         LRttiProperty.SetValue(AObj, TValue.FromOrdinal(LRttiProperty.PropertyType.Handle, AValue.AsOrdinal))
     end

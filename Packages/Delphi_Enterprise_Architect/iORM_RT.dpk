@@ -245,7 +245,10 @@ contains
   iORM.DependencyInjection.Types in '..\..\Source\iORM.DependencyInjection.Types.pas',
   iORM.Async in '..\..\Source\iORM.Async.pas',
   iORM.PersistenceStrategy.Request in '..\..\Source\iORM.PersistenceStrategy.Request.pas',
-  iORM.PersistenceStrategy.AuthCache in '..\..\Source\iORM.PersistenceStrategy.AuthCache.pas';
+  iORM.Auth.Interfaces in '..\..\Source\iORM.Auth.Interfaces.pas',
+  iORM.Auth.Cache in '..\..\Source\iORM.Auth.Cache.pas',
+  iORM.Auth.DecisionRequestUI in '..\..\Source\iORM.Auth.DecisionRequestUI.pas',
+  iORM.Auth.Factory in '..\..\Source\iORM.Auth.Factory.pas';
 
 end.
 

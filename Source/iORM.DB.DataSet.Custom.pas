@@ -41,7 +41,7 @@ uses
   iORM.LiveBindings.CommonBSAPaging, iORM.Where.Interfaces,
   Data.Bind.ObjectScope, System.Generics.Collections,
   iORM.MVVM.ViewContextProvider, iORM.StdActions.Interfaces,
-  iORM.LiveBindings.BSPersistence;
+  iORM.LiveBindings.BSPersistence, iORM.Abstraction;
 
 type
 
@@ -176,6 +176,7 @@ type
   protected
     procedure Loaded; override;
     function GetName: String;
+    procedure DoAfterInsert; override;
     procedure DoAfterOpen; override;
     procedure DoBeforeClose; override;
     procedure SetActive(Value: Boolean); override;
@@ -442,6 +443,15 @@ procedure TioDataSetCustom.DoAfterSelection(var ASelected: TObject; var ASelecti
 begin
   if Assigned(FAfterSelectionObject) then
     FAfterSelectionObject(Self, ASelected, ASelectionType);
+end;
+
+procedure TioDataSetCustom.DoAfterInsert;
+begin
+  inherited;
+  // Mauri 30/07/2025: Aggiunto refresh perchè altrimenti se si faceva un insert da tastiera
+  //  il nuovo oggetto non appariva subito, appariva solo dopo essersi spostati su un altro
+  //  record/oggetto o avere fatto un refresh
+  Refresh(False);
 end;
 
 procedure TioDataSetCustom.DoAfterOpen;

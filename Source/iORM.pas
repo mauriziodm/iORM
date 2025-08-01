@@ -47,7 +47,8 @@ uses
   iORM.ETM.Engine, iORM.ETM.Interfaces, DJSON.Params,
   iORM.ConflictStrategy.Interfaces, iORM.ConflictStrategy.SameVersionWin, iORM.ConflictStrategy.LastUpdateWin,
   iORM.Context.Interfaces, iORM.SynchroStrategy.Interfaces, iORM.MVVM.ViewModel,
-  iORM.PersistenceStrategy.Interfaces, iORM.Abstraction, iORM.Abstraction.SessionData.Interfaces;
+  iORM.PersistenceStrategy.Interfaces, iORM.Abstraction.SessionData.Interfaces, iORM.Auth.Interfaces,
+  iORM.Abstraction;
 
 const
   IORM_VERSION = 'iORM 2 (beta 3.4)';
@@ -332,9 +333,9 @@ type
   TioViewModel = iORM.MVVM.ViewModel.TioViewModel;
 
   // Auth
-  TioAuthTokenProviderMethod = iORM.Abstraction.TioAuthTokenProviderMethod;
-  TioAuthDecisionMethod = iORM.Abstraction.TioAuthDecisionMethod;
-  IioAuthDecisionRequest = iORM.Abstraction.IioAuthDecisionRequest;
+  TioAuthTokenProviderMethod = iORM.Auth.Interfaces.TioAuthTokenProviderMethod;
+  TioAuthDecisionMethod = iORM.Auth.Interfaces.TioAuthDecisionMethod;
+  IioAuthDecisionRequest = iORM.Auth.Interfaces.IioAuthDecisionRequest;
 
   // SessionData
   IioSessionData = iORM.Abstraction.SessionData.Interfaces.IioSessionData;

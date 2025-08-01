@@ -43,7 +43,7 @@ uses
   iORM.Context.Map.Interfaces, iORM.Where.Interfaces,
   iORM.LiveBindings.BSPersistence, iORM.ConflictStrategy.Interfaces,
   iORM.SynchroStrategy.Interfaces, iORM.Attributes,
-  iORM.PersistenceStrategy.Interfaces, iORM.Abstraction;
+  iORM.PersistenceStrategy.Interfaces, iORM.Abstraction, iORM.Auth.Interfaces;
 
 type
 
@@ -206,10 +206,6 @@ type
   protected
     // access-token
     function GetToken: String;
-    // AsContext
-    function AsContext: IioContext;
-    // auth-cache
-    function GetAuthCache: IioAuthCache;
     // BlindLevel
     function GetBlindLevel: Byte; override;
     procedure SetBlindLevel(const Value: Byte); override;
@@ -221,8 +217,6 @@ type
     // Intent
     function GetIntent: TioPersistenceIntentType; override;
     procedure SetIntent(const Value: TioPersistenceIntentType); override;
-    // is context
-    function IsContext: Boolean;
     // MasterBSPersistence
     function GetMasterBSPersistence: TioBSPersistence; override;
     // MasterPropertyName
@@ -241,6 +235,7 @@ type
     procedure SetWhere(const AWhere: IioWhere); override;
   public
     constructor Create_PSRequest(const APSRequest: IioPersistenceStrategyRequest; const AMap: IioMap);
+    function IsAuthorized: Boolean;
   end;
 
   TioContext_Simple = class(TioContext_Custom)
@@ -779,20 +774,10 @@ end;
 
 { TioContext_PSRequest }
 
-function TioContext_PSRequest.AsContext: IioContext;
-begin
-  Result := Self;
-end;
-
 constructor TioContext_PSRequest.Create_PSRequest(const APSRequest: IioPersistenceStrategyRequest; const AMap: IioMap);
 begin
   inherited Create_Map(AMap);
   FPSRequest := APSRequest;
-end;
-
-function TioContext_PSRequest.GetAuthCache: IioAuthCache;
-begin
-  Result := FPSRequest.AuthCache;
 end;
 
 function TioContext_PSRequest.GetBlindLevel: Byte;
@@ -858,9 +843,9 @@ begin
   Result := FPSRequest.Where;
 end;
 
-function TioContext_PSRequest.IsContext: Boolean;
+function TioContext_PSRequest.IsAuthorized: Boolean;
 begin
-  Result := True;
+  Result := FPSRequest.AuthCache.IsAuthorized(Self);
 end;
 
 procedure TioContext_PSRequest.SetBlindLevel(const Value: Byte);

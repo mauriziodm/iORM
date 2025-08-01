@@ -395,7 +395,10 @@
         <DCCReference Include="..\..\Source\iORM.DependencyInjection.Types.pas"/>
         <DCCReference Include="..\..\Source\iORM.Async.pas"/>
         <DCCReference Include="..\..\Source\iORM.PersistenceStrategy.Request.pas"/>
-        <DCCReference Include="..\..\Source\iORM.PersistenceStrategy.AuthCache.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Auth.Interfaces.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Auth.Cache.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Auth.DecisionRequestUI.pas"/>
+        <DCCReference Include="..\..\Source\iORM.Auth.Factory.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

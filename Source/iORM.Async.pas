@@ -232,9 +232,10 @@ begin
               end);
           end
           else
-            TioApplication.ShowMessage('TioAsyncFunc<T>: Exception caught on main thread: ' + E.Message);
           // Non rialziamo l'eccezione per non bloccare il thread pool,
           // l'abbiamo gestita qui.
+          if not (E is EAbort) then
+            TioApplication.ShowMessage('TioAsyncFunc<T>: Exception caught on main thread: ' + E.ClassName);
         end;
       end;
       finally
@@ -373,9 +374,10 @@ begin
               end);
           end
           else
-            TioApplication.ShowMessage('TioAsyncFunc<T>: Exception caught on main thread: ' + E.Message);
           // Non rialziamo l'eccezione per non bloccare il thread pool,
           // l'abbiamo gestita qui.
+          if not (E is EAbort) then
+            TioApplication.ShowMessage('TioAsyncFunc<T>: Exception caught on main thread: ' + E.ClassName);
         end;
       end;
       finally

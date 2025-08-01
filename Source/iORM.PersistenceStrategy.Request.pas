@@ -5,8 +5,8 @@ interface
 uses
   iORM.CommonTypes, iORM.PersistenceStrategy.Interfaces,
   System.Rtti, iORM.LiveBindings.BSPersistence, iORM.Where.Interfaces,
-  iORM.Abstraction.SessionData.Interfaces,
-  iORM.Abstraction, iORM.Attributes;
+  iORM.Abstraction, iORM.Attributes, iORM.Auth.Interfaces,
+  iORM.Abstraction.SessionData.Interfaces;
 
 type
 
@@ -160,8 +160,7 @@ type
 implementation
 
 uses
-  System.JSON, DJSON, iORM.Exceptions, System.SysUtils,
-  iORM.PersistenceStrategy.Factory;
+  System.JSON, DJSON, iORM.Exceptions, System.SysUtils, iORM.Auth.Factory;
 
 { TioPersistenceStrategyRequest }
 
@@ -254,7 +253,7 @@ begin
   // method
   FMethod := AMethod;
   // auth-cache
-  FAuthCache := TioPersistenceStrategyFactory.NewAuthCache;
+  FAuthCache := TioAuthFactory.NewAuthCacheCRUD;
   // other initializations
   _Clear(FillSessionRelatedProperties);
 end;
@@ -729,7 +728,7 @@ begin
   FToken := IO_STRING_NULL_VALUE;
   if FillSessionRelatedProperties then
   begin
-    FAuthCache := TioPersistenceStrategyFactory.NewAuthCache;
+    FAuthCache := TioAuthFactory.NewAuthCacheCRUD;
     TioApplication.SessionDataStore._FillPersistenceStrategyRequest(Self);
   end
   else

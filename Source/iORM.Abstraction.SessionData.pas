@@ -36,7 +36,7 @@ unit iORM.Abstraction.SessionData;
 interface
 
 uses
-  iORM.Abstraction.SessionData.Interfaces;
+  iORM.Abstraction.SessionData.Interfaces, iORM.Auth.Interfaces;
 
 type
 
@@ -54,9 +54,26 @@ type
     // connection
     FConnection: String;
     FConnectionRemote: String;
+    // AuthCacheUI:
+    // Ho deciso di avere due AuthCache diverse, una per le operazioni CRUD (IioAuthCacheUI in iORM.PersistenceStrategy.Interfaces)
+    //  che viene usata nelle PersistenceStrategies per autorizzare o meno le operazioni,
+    //  questa ha lo stesso ciclo di vita della transazione/PSRequest quindi
+    //  ogni volta si azzera quindi non c'è nemmeno bisogno di proteggeerla per il multithreading, così c'è anche il vantaggio
+    //  che se i permessi dell'utente dovessero cambiare mentre la transazione è in atto i permessi visti saranno consistenti
+    //  per tutta la durata dell'operazione.
+    //  L'altra IioAuthCacheUI invece viene usata nel frontend e nella UI (BindSources e StandardActions) quindi deve essere globale
+    //  e deve essere thread-safe. La classe che la implementa mantiene anche una copia dell'ultimo Token usato in modo che
+    //  quando nelle chiamate successive cambia la cache viene svuotata e fare in modo quindi che se, ad esempio,
+    //  si fa un logout e ci si riautentica come altro utente i permessi preesistenti vengano eliminati, inoltre anche
+    //  se i permessi dello stesso utente dovessero cambiare dopo l'autenticazione una volta scaduto e rinnovato il token
+    //  verranno usati i nuovi permessi solo con un leggero ritardo  pari al max. alla dirata del token. Ho deciso di mantenere
+    //  la AuthCacheUI nel SessionData in modo che anche con uniGUI funzioni correttamente visto che in questo caso già iORM
+    //  mantiene SessionData separati per le diverse sessioni.
+    FAuthCacheUI: IioAuthCache;
     // methods
     function GetApp: String;
     function GetAppOID: Integer;
+    function GetAuthCacheUI: IioAuthCache;
     function GetConnection: String;
     function GetConnectionRemote: String;
     function GetHasApp: Boolean;
@@ -88,26 +105,29 @@ type
     property AppOID: Integer read GetAppOID write SetAppOID;
     property HasApp: Boolean read GetHasApp;
     property HasAppOID: Boolean read GetHasAppOID;
-    // user
-    property User: String read GetUser write SetUser;
-    property UserOID: Integer read GetUserOID write SetUserOID;
-    property HasUser: Boolean read GetHasUser;
-    property HasUserOID: Boolean read GetHasUserOID;
-    // license
-    property License: String read GetLicense write SetLicense;
-    property LicenseOID: Integer read GetLicenseOID write SetLicenseOID;
-    property HasLicense: Boolean read GetHasLicense;
-    property HasLicenseOID: Boolean read GetHasLicenseOID;
+    // auth-cache-UI
+    property AuthCacheUI: IioAuthCache read GetAuthCacheUI;
     // connection
     property Connection: String read GetConnection write SetConnection;
     property ConnectionRemote: String read GetConnectionRemote write SetConnectionRemote;
     property HasConnection: Boolean read GetHasConnection;
     property HasConnectionRemote: Boolean read GetHasConnectionRemote;
+    // license
+    property License: String read GetLicense write SetLicense;
+    property LicenseOID: Integer read GetLicenseOID write SetLicenseOID;
+    property HasLicense: Boolean read GetHasLicense;
+    property HasLicenseOID: Boolean read GetHasLicenseOID;
+    // user
+    property User: String read GetUser write SetUser;
+    property UserOID: Integer read GetUserOID write SetUserOID;
+    property HasUser: Boolean read GetHasUser;
+    property HasUserOID: Boolean read GetHasUserOID;
   end;
 
 implementation
 
-uses iORM.CommonTypes, System.SysUtils, System.JSON, iORM.Abstraction.Factory;
+uses iORM.CommonTypes, System.SysUtils, System.JSON, iORM.Abstraction.Factory,
+  iORM.Auth.Factory;
 
 { TioSession }
 
@@ -147,6 +167,7 @@ end;
 constructor TioSessionData.Create;
 begin
   inherited;
+  FAuthCacheUI := TioAuthFactory.NewAuthCacheUI;
   Clear;
 end;
 
@@ -158,6 +179,11 @@ end;
 function TioSessionData.GetAppOID: Integer;
 begin
   Result := FAppOID;
+end;
+
+function TioSessionData.GetAuthCacheUI: IioAuthCache;
+begin
+  Result := FAuthCacheUI;
 end;
 
 function TioSessionData.GetConnection: String;
