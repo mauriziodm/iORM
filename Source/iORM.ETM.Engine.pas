@@ -182,7 +182,7 @@ class procedure TioEtmEngine._ObjVersionToNegativeRevertIntent(const AObj: TObje
 var
   LContext: IioContext;
 begin
-  LContext := TioContextFactory.Context_Simple(itRevert, BL_DEFAULT, AObj.ClassName, nil, AObj, nil, '', '');
+  LContext := TioContextFactory.Context_Simple(itETM_Revert, BL_DEFAULT, AObj.ClassName, nil, AObj, nil, '', '');
   if LContext.ObjVersion > 0 then
     LContext.ObjVersion := -LContext.ObjVersion;
 end;
@@ -227,7 +227,7 @@ begin
   _ObjVersionToNegativeRevertIntent(Result);
   // Persist immediately
   if APersistImmediately then
-    io._PersistObject(Result, itRevert, BL_ETM_REVERT_TO_OBJ);
+    io._PersistObject(Result, itETM_Revert, BL_ETM_REVERT_TO_OBJ);
 end;
 
 class procedure TioEtmEngine.RevertToObject(const ATargetIntf: IInterface; const ATimeSlot: TioEtmCustomTimeSlot; const APersistImmediately: Boolean);
@@ -245,7 +245,7 @@ begin
   _ObjVersionToNegativeRevertIntent(Result);
   // Persist immediately
   if APersistImmediately then
-    io._PersistObject(Result, itRevert, BL_ETM_REVERT_TO_OBJ);
+    io._PersistObject(Result, itETM_Revert, BL_ETM_REVERT_TO_OBJ);
 end;
 
 class procedure TioEtmEngine.RevertToObject(const ATargetObj: TObject; const ATimeSlot: TioEtmCustomTimeSlot; const APersistImmediately: Boolean);
@@ -258,7 +258,7 @@ begin
   _ObjVersionToNegativeRevertIntent(ATargetObj);
   // Persist immediately
   if APersistImmediately then
-    io._PersistObject(ATargetObj, itRevert, BL_ETM_REVERT_TO_OBJ);
+    io._PersistObject(ATargetObj, itETM_Revert, BL_ETM_REVERT_TO_OBJ);
 end;
 
 class procedure TioEtmEngine.RevertToBindSource(const ATimeSlot: TioEtmCustomTimeSlot; const ATargetBindSource: IioMasterBindSource;
@@ -290,7 +290,7 @@ begin
     // The entity's ObjVersion property is reset with a negative value to indicate that it has been reset by the ETM
     _ObjVersionToNegativeRevertIntent(LObj);
     // Persist immediately
-    io._PersistObject(LObj, itRevert, BL_ETM_REVERT_TO_DB);
+    io._PersistObject(LObj, itETM_Revert, BL_ETM_REVERT_TO_DB);
   finally
     LObj.Free;
   end;

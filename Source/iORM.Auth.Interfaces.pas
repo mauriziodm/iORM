@@ -104,6 +104,9 @@ type
     // intent
     function GetIntent: TioPersistenceIntentType;
     property Intent: TioPersistenceIntentType read GetIntent;
+    // PersistingNewEtmTimeSlot
+    function GetPersistingNewEtmTimeSlot: Boolean;
+    property PersistingNewEtmTimeSlot: Boolean read GetPersistingNewEtmTimeSlot;
     // type name
     function GetTypeName: String;
     property TypeName: String read GetTypeName;

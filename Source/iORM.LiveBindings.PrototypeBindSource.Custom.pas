@@ -305,6 +305,7 @@ type
     procedure Append; overload;
     procedure Append(AObject: TObject); overload;
     procedure Append(AObject: IInterface); overload;
+    procedure Insert; overload;
     procedure Insert(AObject: TObject); reintroduce; overload;
     procedure Insert(AObject: IInterface); reintroduce; overload;
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
@@ -342,49 +343,17 @@ end;
 
 procedure TioPrototypeBindSourceCustom.Append;
 begin
-
-
-Abort;
-  // Requires an authorization-decision for UI purposes
-  // NB: Codice inserito qui per intercettare l'insert/append richiesto con i metodi Append/Insert che ricevono l'istanza da aggiungere già creata
-  TioApplication.ProvideAuthDecisionUI(GetActiveBindSourceAdapter.TypeName, atInsert, itRegular);
-
-
-
-  if CheckActiveAdapter then
-    GetInternalAdapter.Append;
+  TioCommonBSBehavior.InsertOrAppend(Self as IioBindSource, iaAppend, True);
 end;
 
 procedure TioPrototypeBindSourceCustom.Append(AObject: TObject);
-var
-  AnActiveBSA: IioActiveBindSourceAdapter;
 begin
-  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
-  begin
-    AnActiveBSA.Append(AObject);
-    // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
-    // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
-    // invocato un Post in seguito al Refresh stesso.
-    // AnActiveBSA.Refresh(False);
-  end
-  else
-    raise EioGenericException.Create(ClassName, 'Append(TObject)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
+  TioCommonBSBehavior.InsertOrAppendObj(Self as IioBindSource, AObject, iaAppend, True);
 end;
 
 procedure TioPrototypeBindSourceCustom.Append(AObject: IInterface);
-var
-  AnActiveBSA: IioActiveBindSourceAdapter;
 begin
-  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
-  begin
-    AnActiveBSA.Append(AObject);
-    // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
-    // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
-    // invocato un Post in seguito al Refresh stesso.
-    // AnActiveBSA.Refresh(False);
-  end
-  else
-    raise EioGenericException.Create(ClassName, 'Append(IInterface)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
+  TioCommonBSBehavior.InsertOrAppendIntf(Self as IioBindSource, AObject, iaAppend, False);
 end;
 
 procedure TioPrototypeBindSourceCustom.CancelIfEditing;
@@ -714,20 +683,19 @@ begin
   TioCommonBSBehavior.InitAsDefaultOnCreate(Self, FAsDefault);
 end;
 
-procedure TioPrototypeBindSourceCustom.Insert(AObject: IInterface);
-var
-  AnActiveBSA: IioActiveBindSourceAdapter;
+procedure TioPrototypeBindSourceCustom.Insert;
 begin
-  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
-  begin
-    AnActiveBSA.Insert(AObject);
-    // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
-    // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
-    // invocato un Post in seguito al Refresh stesso.
-    // AnActiveBSA.Refresh(False);
-  end
-  else
-    raise EioGenericException.Create(ClassName, 'Insert(IInterface)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
+  TioCommonBSBehavior.InsertOrAppend(Self as IioBindSource, iaInsert, True);
+end;
+
+procedure TioPrototypeBindSourceCustom.Insert(AObject: TObject);
+begin
+  TioCommonBSBehavior.InsertOrAppendObj(Self as IioBindSource, AObject, iaInsert, True);
+end;
+
+procedure TioPrototypeBindSourceCustom.Insert(AObject: IInterface);
+begin
+  TioCommonBSBehavior.InsertOrAppendIntf(Self as IioBindSource, AObject, iaInsert, False);
 end;
 
 function TioPrototypeBindSourceCustom.IsActive: Boolean;
@@ -738,22 +706,6 @@ end;
 function TioPrototypeBindSourceCustom.IsFromBSLoadType: boolean;
 begin
   Result := TioCommonBSBehavior.CheckIfLoadTypeIsFromBS(FLoadType);
-end;
-
-procedure TioPrototypeBindSourceCustom.Insert(AObject: TObject);
-var
-  AnActiveBSA: IioActiveBindSourceAdapter;
-begin
-  if CheckActiveAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
-  begin
-    AnActiveBSA.Insert(AObject);
-    // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
-    // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
-    // invocato un Post in seguito al Refresh stesso.
-    // AnActiveBSA.Refresh(False);
-  end
-  else
-    raise EioGenericException.Create(ClassName, 'Insert(TObject)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [Name]));
 end;
 
 function TioPrototypeBindSourceCustom.GetIsInterfacePresenting: Boolean;

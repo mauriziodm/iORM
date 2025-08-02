@@ -73,7 +73,8 @@ var
   LKey: String;
 begin
   // Non-regular operations (e.g. itRevert, itSynchro_XXX) are never subject to authorization
-  if AAuthDecisionRequest.Intent <> itRegular then
+  // Even the persistence of a new ETM_TimeSlot never nedd an authorization (alwais authorized)
+  if (AAuthDecisionRequest.Intent <> itRegular) or AAuthDecisionRequest.PersistingNewEtmTimeSlot then
     Exit(True);
   // Compose the key
   LKey := AAuthDecisionRequest.TypeName + ':' + IntToStr(Ord(AAuthDecisionRequest.ActionType));

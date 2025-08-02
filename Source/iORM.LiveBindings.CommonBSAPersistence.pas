@@ -120,6 +120,9 @@ var
   LActionType: TioPersistenceActionType;
 begin
   // Requires an authorization-decision for UI purposes
+  if AActiveBindSourceAdapter.BSPersistenceDeleting then
+    LActionType := atDelete
+  else
   if _CurrentToBeInserted(AActiveBindSourceAdapter) then
     LActionType := atInsert
   else

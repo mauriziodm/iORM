@@ -19,6 +19,7 @@ type
     function GetToken: String;
     function GetActionType: TioPersistenceActionType;
     function GetIntent: TioPersistenceIntentType;
+    function GetPersistingNewEtmTimeSlot: Boolean;
     function GetTypeName: String;
   public
     constructor Create(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType);
@@ -26,6 +27,7 @@ type
     property Token: String read GetToken;
     property ActionType: TioPersistenceActionType read GetActionType;
     property Intent: TioPersistenceIntentType read GetIntent;
+    property PersistingNewEtmTimeSlot: Boolean read GetPersistingNewEtmTimeSlot;
     property TypeName: String read GetTypeName;
   end;
 
@@ -52,6 +54,11 @@ end;
 function TioAuthDecisionRequestUI.GetIntent: TioPersistenceIntentType;
 begin
   Result := FIntent;
+end;
+
+function TioAuthDecisionRequestUI.GetPersistingNewEtmTimeSlot: Boolean;
+begin
+  Result := False;
 end;
 
 function TioAuthDecisionRequestUI.GetToken: String;

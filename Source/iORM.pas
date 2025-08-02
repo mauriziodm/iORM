@@ -179,7 +179,7 @@ const
   atDelete = iORM.CommonTypes.atDelete;
   // TioPersistenceIntentType = (itRegular, itRevert, itSynchronization);
   itRegular = iORM.CommonTypes.itRegular;
-  itRevert = iORM.CommonTypes.itRevert;
+  itRevert = iORM.CommonTypes.itETM_Revert;
   itSynchro_PersistToServer = iORM.CommonTypes.itSynchro_PersistToServer;
   itSynchro_PersistToClient = iORM.CommonTypes.itSynchro_PersistToClient;
   // TioPersistenceConflictState = (csUndefined, csResolved, csRejected, csRejectedRaise);

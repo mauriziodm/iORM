@@ -348,39 +348,26 @@ uses
 
 { TioModelProvider }
 
-procedure TioModelPresenterCustom.Append(AObject: TObject);
-begin
-  if CheckAdapter then
-  begin
-    GetActiveBindSourceAdapter.Append(AObject);
-    // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
-    // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
-    // invocato un Post in seguito al Refresh stesso.
-    // BindSourceAdapter.Refresh(False);
-  end;
-end;
-
 procedure TioModelPresenterCustom.Append;
 begin
-  if CheckAdapter then
-    (GetActiveBindSourceAdapter as TBindSourceAdapter).Append;
+  TioCommonBSBehavior.InsertOrAppend(Self as IioBindSource, iaAppend, True);
+// ----- OLD CODE -----
+// NB: lasciato perchè vedo che richiama il metodo Append facendo prima un cast a TBindSourceAdapter
+//      mentre invece il codice nuovo richiama l'append dell'ActiveBindSourceAdapter e non vorrei
+//      che ci siano problemi
+//  if CheckAdapter then
+//    (GetActiveBindSourceAdapter as TBindSourceAdapter).Append;
+// ----- OLD CODE -----
+end;
+
+procedure TioModelPresenterCustom.Append(AObject: TObject);
+begin
+  TioCommonBSBehavior.InsertOrAppendObj(Self as IioBindSource, AObject, iaAppend, True);
 end;
 
 procedure TioModelPresenterCustom.Append(AObject: IInterface);
 begin
-
-
-Abort;
-
-
-  if CheckAdapter then
-  begin
-    GetActiveBindSourceAdapter.Append(AObject);
-    // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
-    // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
-    // invocato un Post in seguito al Refresh stesso.
-    // BindSourceAdapter.Refresh(False);
-  end;
+  TioCommonBSBehavior.InsertOrAppendIntf(Self as IioBindSource, AObject, iaAppend, False);
 end;
 
 procedure TioModelPresenterCustom.Cancel;
@@ -850,8 +837,24 @@ end;
 
 procedure TioModelPresenterCustom.Insert;
 begin
-  if CheckAdapter then
-    (GetActiveBindSourceAdapter as TBindSourceAdapter).Insert;
+  TioCommonBSBehavior.InsertOrAppend(Self as IioBindSource, iaInsert, True);
+// ----- OLD CODE -----
+// NB: lasciato perchè vedo che richiama il metodo Append facendo prima un cast a TBindSourceAdapter
+//      mentre invece il codice nuovo richiama l'append dell'ActiveBindSourceAdapter e non vorrei
+//      che ci siano problemi
+//  if CheckAdapter then
+//    (GetActiveBindSourceAdapter as TBindSourceAdapter).Insert;
+// ----- OLD CODE -----
+end;
+
+procedure TioModelPresenterCustom.Insert(AObject: TObject);
+begin
+  TioCommonBSBehavior.InsertOrAppendObj(Self as IioBindSource, AObject, iaInsert, True);
+end;
+
+procedure TioModelPresenterCustom.Insert(AObject: IInterface);
+begin
+  TioCommonBSBehavior.InsertOrAppendIntf(Self as IioBindSource, AObject, iaInsert, False);
 end;
 
 procedure TioModelPresenterCustom.InitAsDefaultOnCreate;
@@ -861,18 +864,6 @@ begin
   // NB: At Runtime set False as initial value (load real value from dfm file)
   // NB: The second parameter is FAsDefault private field to avoid deadlock
   TioCommonBSBehavior.InitAsDefaultOnCreate(Self, FAsDefault);
-end;
-
-procedure TioModelPresenterCustom.Insert(AObject: TObject);
-begin
-  if CheckAdapter then
-  begin
-    GetActiveBindSourceAdapter.Insert(AObject);
-    // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
-    // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
-    // invocato un Post in seguito al Refresh stesso.
-    // BindSourceAdapter.Refresh(False);
-  end;
 end;
 
 procedure TioModelPresenterCustom.Last;
@@ -1446,18 +1437,6 @@ begin
     (Self as IioMasterBindSource).Persistence.Insert(AObject, ARaiseIfSaved, ARaiseIfChangesExists)
   else
     Insert(AObject);
-end;
-
-procedure TioModelPresenterCustom.Insert(AObject: IInterface);
-begin
-  if CheckAdapter then
-  begin
-    GetActiveBindSourceAdapter.Insert(AObject);
-    // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
-    // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
-    // invocato un Post in seguito al Refresh stesso.
-    // BindSourceAdapter.Refresh(False);
-  end;
 end;
 
 // function TioModelPresenterCustom.IsActive: Boolean;

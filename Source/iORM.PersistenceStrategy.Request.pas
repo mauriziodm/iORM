@@ -43,6 +43,7 @@ type
     FIntent: TioPersistenceIntentType;
     FMasterPropName: String;
     FMasterPropPath: String;
+    FPersistingNewEtmTimeSlot: Boolean;
     FPropName: String;
     FRelationOID: Integer;
     FRelationPropName: String;
@@ -71,6 +72,7 @@ type
     function GetMethod: TioPersistenceStrategyMethod;
     function GetObj1: TObject;
     function GetObj1_Serialize: Boolean;
+    function GetPersistingNewEtmTimeSlot: Boolean;
     function GetPropName: String;
     function GetRelationOID: Integer;
     function GetRelationPropName: String;
@@ -101,6 +103,7 @@ type
     procedure SetMasterPropPath(const Value: String);
     procedure SetObj1(const Value: TObject);
     procedure SetObj1_Serialize(const Value: Boolean);
+    procedure SetPersistingNewEtmTimeSlot(const Value: Boolean);
     procedure SetPropName(const Value: String);
     procedure SetRelationOID(const Value: Integer);
     procedure SetRelationPropName(const Value: String);
@@ -148,6 +151,7 @@ type
     property Intent: TioPersistenceIntentType read GetIntent write SetIntent;
     property MasterPropName: String read GetMasterPropName write SetMasterPropName;
     property MasterPropPath: String read GetMasterPropPath write SetMasterPropPath;
+    property PersistingNewEtmTimeSlot: Boolean read GetPersistingNewEtmTimeSlot write SetPersistingNewEtmTimeSlot;
     property PropName: String read GetPropName write SetPropName;
     property RelationOID: Integer read GetRelationOID write SetRelationOID;
     property RelationPropName: String read GetRelationPropName write SetRelationPropName;
@@ -231,6 +235,9 @@ begin
     // MasterPropPath
     if (FMasterPropPath <> IO_STRING_NULL_VALUE) then
       LJSONObject.AddPair(PSR_MASTERPROPERTYPATH, FMasterPropPath);
+
+    // PersistingNewEtmTimeSlot (Non credo sia necessaria serializzarla perchè agisce solo localmente)
+
     // PropName
     if (FPropName <> IO_STRING_NULL_VALUE) then
       LJSONObject.AddPair(PSR_PROPERTYNAME, FPropName);
@@ -356,6 +363,9 @@ begin
     LJSONValue := LJSONObject.GetValue(PSR_MASTERPROPERTYPATH);
     if Assigned(LJSONValue) then
       FMasterPropPath := LJSONValue.Value;
+
+    // PersistingNewEtmTimeSlot (Non credo sia necessaria serializzarla perchè agisce solo localmente)
+
     // PropName
     LJSONValue := LJSONObject.GetValue(PSR_PROPERTYNAME);
     if Assigned(LJSONValue) then
@@ -482,6 +492,11 @@ end;
 function TioPersistenceStrategyRequest.GetObj1_Serialize: Boolean;
 begin
   Result := FObj1_Serialize;
+end;
+
+function TioPersistenceStrategyRequest.GetPersistingNewEtmTimeSlot: Boolean;
+begin
+  Result := FPersistingNewEtmTimeSlot;
 end;
 
 function TioPersistenceStrategyRequest.GetPropName: String;
@@ -672,6 +687,11 @@ begin
   FObj1_Serialize := Value;
 end;
 
+procedure TioPersistenceStrategyRequest.SetPersistingNewEtmTimeSlot(const Value: Boolean);
+begin
+  FPersistingNewEtmTimeSlot := Value;
+end;
+
 procedure TioPersistenceStrategyRequest.SetPropName(const Value: String);
 begin
   FPropName := Value;
@@ -759,6 +779,7 @@ begin
   FIntent := TioPersistenceIntentType.itRegular;
   FMasterPropName := IO_STRING_NULL_VALUE;
   FMasterPropPath := IO_STRING_NULL_VALUE;
+  FPersistingNewEtmTimeSlot := False;
   FPropName := IO_STRING_NULL_VALUE;
   FRelationOID := IO_INTEGER_NULL_VALUE;
   FRelationPropName := IO_STRING_NULL_VALUE;

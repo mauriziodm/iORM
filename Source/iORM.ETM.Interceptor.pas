@@ -82,7 +82,14 @@ begin
       // Create the PSRequest to persist the TimeSlot, import session data from the context then execute it
       // note: Intent is itRegular for the TimeSlot class and not depending from AContext
       LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_PersistObject(LTimeSlot, itRegular, BL_ETM_PERSIST_TIMESLOT, '', 0, nil, '', '');
+      // Questo flag indica che stiamo persistendo un nuovo ETM_TimeSlot nel contesto del tracciamento
+      //  di una classe/entità, inpostandolo a True in pratica facciamo in modo che sia sempre
+      //  autorizzata la sua persistenza (authorization-decision) anche se in realtà l'utente non
+      //  è autorizzato a persisterla
+      LPSRequest.PersistingNewEtmTimeSlot := True;
+      // Import session data from original PSRequest
       LPSRequest.ImportSessionDataFromPSRequest(AContext.PSRequest);
+      // Execute the PSRequest (Persist the new TimeSlot)
       io._ExecutePSRequest(LPSRequest);
     finally
       LTimeSlot.Free;
