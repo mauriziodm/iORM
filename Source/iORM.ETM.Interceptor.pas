@@ -50,7 +50,7 @@ type
   TioEtmInterceptor = class(TioCustomCRUDInterceptor)
   private
     class procedure _SetEntityFromVersion(const AContext: IioContext); inline;
-    class procedure _CreateAndPersistNewTimeSlot_Internal(const AContext: IioContext); inline;
+    class procedure _CreateAndPersistNewTimeSlot_Internal(const AContext: IioContext); static;
   public
     // Insert
     class procedure BeforeInsert(const AContext: IioContext; var ADone: Boolean); override;

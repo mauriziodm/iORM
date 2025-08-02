@@ -78,6 +78,7 @@ type
     // Common code for BindSources to requires an authorization-decision for an insert/append operation receving already created instance
     class procedure ProvideAuthDecisionForInsertOrAppend(AObj: TObject; const AFreeObjIfNotAuthorized: Boolean);
     // Common code for BindSources to Insert/Append an object
+    class procedure InsertOrAppend(const ABindSource: IioBindSource; const InsertOrAppend: TioCommonBSBehaviorInsertOrAppend; const AFreeObjIfNotAuthorized: Boolean);
     class procedure InsertOrAppendObj(const ABindSource: IioBindSource; AObj: TObject; const InsertOrAppend: TioCommonBSBehaviorInsertOrAppend; const AFreeObjIfNotAuthorized: Boolean);
     class procedure InsertOrAppendIntf(const ABindSource: IioBindSource; AIntf: Iinterface; const InsertOrAppend: TioCommonBSBehaviorInsertOrAppend; const AFreeObjIfNotAuthorized: Boolean);
   end;
@@ -158,6 +159,28 @@ begin
     AAsDefaultValue := False;
 end;
 
+class procedure TioCommonBSBehavior.InsertOrAppend(const ABindSource: IioBindSource; const InsertOrAppend: TioCommonBSBehaviorInsertOrAppend;
+  const AFreeObjIfNotAuthorized: Boolean);
+var
+  LActiveBSA: IioActiveBindSourceAdapter;
+begin
+  // Requires an authorization-decision for UI purposes
+  // NB: Codice inserito qui per intercettare l'insert/append richiesto con i metodi Append/Insert che ricevono l'istanza da aggiungere già creata
+  TioApplication.ProvideAuthDecisionUI(ABindSource.GetTypeName, atInsert, itRegular);
+  // Check the BindSourceAdapter
+  if ABindSource.CheckAdapter and Supports(ABindSource.GetActiveBindSourceAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
+  begin
+    case InsertOrAppend of
+      iaInsert:
+        LActiveBSA.Insert;
+      iaAppend:
+        LActiveBSA.Append;
+    else
+      raise EioGenericException.Create(ClassName, 'InsertOrAppend', '"InsertOrAppend" param value not as expected');
+    end;
+  end;
+end;
+
 class procedure TioCommonBSBehavior.InsertOrAppendIntf(const ABindSource: IioBindSource; AIntf: Iinterface;
   const InsertOrAppend: TioCommonBSBehaviorInsertOrAppend; const AFreeObjIfNotAuthorized: Boolean);
 var
@@ -169,14 +192,21 @@ begin
   // Check the BindSourceAdapter
   if ABindSource.CheckAdapter and Supports(ABindSource.GetActiveBindSourceAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
   begin
-    LActiveBSA.Append(AIntf);
+    case InsertOrAppend of
+      iaInsert:
+        LActiveBSA.Insert(AIntf);
+      iaAppend:
+        LActiveBSA.Append(AIntf);
+    else
+      raise EioGenericException.Create(ClassName, 'InsertOrAppendIntf', '"InsertOrAppend" param value not as expected');
+    end;
     // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
     // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
     // invocato un Post in seguito al Refresh stesso.
     // AnActiveBSA.Refresh(False);
   end
   else
-    raise EioGenericException.Create(ClassName, 'InsertOrAppendIntf(IInterface)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [ABindSource.GetName]));
+    raise EioGenericException.Create(ClassName, 'InsertOrAppendIntf', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [ABindSource.GetName]));
 end;
 
 class procedure TioCommonBSBehavior.InsertOrAppendObj(const ABindSource: IioBindSource; AObj: TObject; const InsertOrAppend: TioCommonBSBehaviorInsertOrAppend;
@@ -190,14 +220,21 @@ begin
   // Check the BindSourceAdapter
   if ABindSource.CheckAdapter and Supports(ABindSource.GetActiveBindSourceAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
   begin
-    LActiveBSA.Append(AObj);
+    case InsertOrAppend of
+      iaInsert:
+        LActiveBSA.Insert(AObj);
+      iaAppend:
+        LActiveBSA.Append(AObj);
+    else
+      raise EioGenericException.Create(ClassName, 'InsertOrAppendObj', '"InsertOrAppend" param value not as expected');
+    end;
     // NB: HO commentato la riga sotto perchè Marco Mottadelli mi ha segnalato che causava
     // il fatto che lo stato del componente passava subito a "Browse" perchè veniva
     // invocato un Post in seguito al Refresh stesso.
     // LActiveBSA.Refresh(False);
   end
   else
-    raise EioGenericException.Create(ClassName, 'InsertOrAppendObj(TObject)', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [ABindSource.GetName]));
+    raise EioGenericException.Create(ClassName, 'InsertOrAppendObj', Format('Internal adapter is not an ActiveBindSourceAdapter (%s)', [ABindSource.GetName]));
 end;
 
 class function TioCommonBSBehavior.IsValidForDependencyInjectionLocator(const ABindSource: IioBindSource;

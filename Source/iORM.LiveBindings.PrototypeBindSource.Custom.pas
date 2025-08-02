@@ -323,7 +323,7 @@ implementation
 uses
   iORM, iORM.Exceptions, iORM.LiveBindings.Factory,
   iORM.Where.Factory, iORM.Utilities, iORM.Components.Common, System.Rtti,
-  iORM.LiveBindings.CommonBSBehavior;
+  iORM.LiveBindings.CommonBSBehavior, iORM.Abstraction;
 
 { TioPrototypeBindSource }
 
@@ -345,6 +345,9 @@ begin
 
 
 Abort;
+  // Requires an authorization-decision for UI purposes
+  // NB: Codice inserito qui per intercettare l'insert/append richiesto con i metodi Append/Insert che ricevono l'istanza da aggiungere già creata
+  TioApplication.ProvideAuthDecisionUI(GetActiveBindSourceAdapter.TypeName, atInsert, itRegular);
 
 
 
