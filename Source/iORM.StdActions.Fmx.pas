@@ -1166,11 +1166,8 @@ begin
 end;
 
 procedure TioBSDelete._InternalExecuteStdAction;
-var
-  LMasterBindSource: IioMasterBindSource;
 begin
-  LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
-  LMasterBindSource.Persistence.Delete(RaiseIfRevertPointSaved, RaiseIfChangesExists);
+  TargetBindSource._Action_Delete(RaiseIfRevertPointSaved, RaiseIfChangesExists);
   // Execute slave actions
   TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
@@ -1227,58 +1224,48 @@ var
   LNewInstanceAsInterface: IInterface;
 begin
   inherited;
+  // ---------------------
   // New instance as object (OnNewInstanceAsObject event handler)
   if Assigned(FOnNewInstanceAsObject) then
   begin
     FOnNewInstanceAsObject(Self, LNewInstanceAsObject);
     if LNewInstanceAsObject <> nil then
-    begin
-      TargetBindSource._Action_AppendObj(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists);
-      Exit;
-    end
+      TargetBindSource._Action_AppendObj(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists)
     else
-      raise EioGenericException.Create(Self.ClassName, 'OnNewInstanceAsObject event handler', 'Invalid new instance (nil)');
-  end;
+      raise EioGenericException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
+  end
+  else
   // New instance as Interface (OnNewInstanceAsInterface event handler)
   if Assigned(FOnNewInstanceAsInterface) then
   begin
     FOnNewInstanceAsInterface(Self, LNewInstanceAsInterface);
     if LNewInstanceAsInterface <> nil then
-    begin
-      TargetBindSource._Action_AppendIntf(LNewInstanceAsInterface, RaiseIfRevertPointSaved, RaiseIfChangesExists);
-      Exit;
-    end
+      TargetBindSource._Action_AppendIntf(LNewInstanceAsInterface, RaiseIfRevertPointSaved, RaiseIfChangesExists)
     else
-      raise EioGenericException.Create(Self.ClassName, 'OnNewInstanceAsInterface event handler', 'Invalid new instance (nil)');
-  end;
-  // New instance ny EntityType/Alias
+      raise EioGenericException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
+  end
+  else
+  // New instance by EntityType/Alias
   if not FEntityTypeName.IsEmpty and io.di.Resolve(FEntityTypeName, FEntityTypeAlias).Exist then
   begin
     LNewInstanceAsObject := io.Create(FEntityTypeName, FEntityTypeAlias);
-    if Assigned(LNewInstanceAsObject) then
-    begin
-      // ...as interface
-      if TioUtilities.IsAnInterfaceTypeName(FEntityTypeName) then
-      begin
-        if Supports(LNewInstanceAsObject, IInterface, LNewInstanceAsInterface) then
-        begin
-          TargetBindSource._Action_AppendIntf(LNewInstanceAsInterface, RaiseIfRevertPointSaved, RaiseIfChangesExists);
-          Exit;
-        end;
-      end
-      else
-      // as object
-      begin
-        TargetBindSource._Action_AppendObj(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists);
-        Exit;
-      end;
-    end
-    else
+    if not Assigned(LNewInstanceAsObject) then
       raise EioGenericException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new instance (nil)');
-  end;
-  // New instance not provided (created by the ABSAdapter itself)
-  TargetBindSource._Action_Append(RaiseIfRevertPointSaved, RaiseIfChangesExists);
-  // If assigned the "ShowOrExecuteAction" then execute it
+    // ...as interface
+    if TioUtilities.IsAnInterfaceTypeName(FEntityTypeName) then
+    begin
+      if not Supports(LNewInstanceAsObject, IInterface, LNewInstanceAsInterface) then
+        raise EioGenericException.Create(Self.ClassName, 'ExecuteTarget', 'Invalid new interface instance (does not support Interface)');
+      TargetBindSource._Action_AppendIntf(LNewInstanceAsInterface, RaiseIfRevertPointSaved, RaiseIfChangesExists)
+    end
+    // as object
+    else
+      TargetBindSource._Action_AppendObj(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists);
+  end
+  else
+    // New instance not provided (created by the ABSAdapter itself)
+    TargetBindSource._Action_Append(RaiseIfRevertPointSaved, RaiseIfChangesExists);
+  // ---------------------
   // Execute slave actions
   if Assigned(Action_ShowOrSelectAction) then
   begin
@@ -1286,6 +1273,7 @@ begin
     if TargetBindSource.IsMasterBS then
       (TargetBindSource as IioMasterBindSource).Persistence.Clear;
   end;
+  // ---------------------
 end;
 
 function TioBSAppend._InternalUpdateStdAction: Boolean;

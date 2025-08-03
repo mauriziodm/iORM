@@ -1361,11 +1361,8 @@ begin
 end;
 
 procedure TioVMActionBSDelete._InternalExecuteStdAction;
-var
-  LMasterBindSource: IioMasterBindSource;
 begin
-  LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
-  LMasterBindSource.Persistence.Delete(RaiseIfRevertPointSaved, RaiseIfChangesExists);
+  TargetBindSource._Action_Delete(RaiseIfRevertPointSaved, RaiseIfChangesExists);
   // Execute slave actions
   TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_CloseQueryAction);
 end;
