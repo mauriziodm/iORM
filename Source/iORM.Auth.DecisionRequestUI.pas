@@ -14,20 +14,21 @@ type
   private
     FActionType:TioPersistenceActionType;
     FIntent: TioPersistenceIntentType;
+    FForceAuthDecision: Boolean;
     FTypeName: String;
     FToken: String;
     function GetToken: String;
     function GetActionType: TioPersistenceActionType;
     function GetIntent: TioPersistenceIntentType;
-    function GetPersistingNewEtmTimeSlot: Boolean;
+    function GetForceAuthDecision: Boolean;
     function GetTypeName: String;
   public
-    constructor Create(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType);
+    constructor Create(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType; const AForceAuthDecision: Boolean);
     function IsAuthorized: Boolean;
     property Token: String read GetToken;
     property ActionType: TioPersistenceActionType read GetActionType;
     property Intent: TioPersistenceIntentType read GetIntent;
-    property PersistingNewEtmTimeSlot: Boolean read GetPersistingNewEtmTimeSlot;
+    property ForceAuthDecision: Boolean read GetForceAuthDecision;
     property TypeName: String read GetTypeName;
   end;
 
@@ -38,12 +39,13 @@ uses
 
 { TioAuthDecisionRequestUI }
 
-constructor TioAuthDecisionRequestUI.Create(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType);
+constructor TioAuthDecisionRequestUI.Create(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType; const AForceAuthDecision: Boolean);
 begin
-    FActionType := AActionType;
-    FIntent := AIntent;
-    FTypeName := ATypeName;
-    FToken := TioApplication.ProvideAuthToken;
+  FActionType := AActionType;
+  FIntent := AIntent;
+  FForceAuthDecision := AForceAuthDecision;
+  FTypeName := ATypeName;
+  FToken := TioApplication.ProvideAuthToken;
 end;
 
 function TioAuthDecisionRequestUI.GetActionType: TioPersistenceActionType;
@@ -56,9 +58,9 @@ begin
   Result := FIntent;
 end;
 
-function TioAuthDecisionRequestUI.GetPersistingNewEtmTimeSlot: Boolean;
+function TioAuthDecisionRequestUI.GetForceAuthDecision: Boolean;
 begin
-  Result := False;
+  Result := FForceAuthDecision;
 end;
 
 function TioAuthDecisionRequestUI.GetToken: String;

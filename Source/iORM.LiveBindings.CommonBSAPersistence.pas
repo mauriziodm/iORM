@@ -118,16 +118,21 @@ class procedure TioCommonBSAPersistence.BeforeEdit(const AActiveBindSourceAdapte
 var
   LActiveBSA: IioActiveBindSourceAdapter;
   LActionType: TioPersistenceActionType;
+  LForceAuthDecision: Boolean;
 begin
+  LForceAuthDecision := False;
   // Requires an authorization-decision for UI purposes
   if AActiveBindSourceAdapter.BSPersistenceDeleting then
-    LActionType := atDelete
+  begin
+    LActionType := atDelete;
+    LForceAuthDecision := TioUtilities.IsNullOID(AActiveBindSourceAdapter.Current);
+  end
   else
   if _CurrentToBeInserted(AActiveBindSourceAdapter) then
     LActionType := atInsert
   else
     LActionType := atUpdate;
-  TioApplication.ProvideAuthDecisionUI(AActiveBindSourceAdapter.Current.ClassName, LActionType, itRegular);
+  TioApplication.ProvideAuthDecisionUI(AActiveBindSourceAdapter.Current.ClassName, LActionType, itRegular, LForceAuthDecision);
   // Notification to save revert point before edit
   AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint));
   // Notification to register the current object into the SmartUpdateDetection system

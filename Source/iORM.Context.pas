@@ -223,8 +223,8 @@ type
     function GetMasterPropertyName: String; override;
     // MasterPropertyPath
     function GetMasterPropertyPath: String; override;
-    // PersistingNewEtmTimeSlot
-    function GetPersistingNewEtmTimeSlot: Boolean;
+    // ForceAuthDecision
+    function GetForceAuthDecision: Boolean;
     // PSRequest
     function GetPSRequest: IioPersistenceStrategyRequest; override;
     // RelationOID
@@ -817,9 +817,9 @@ begin
   Result := FPSRequest.MasterPropPath + IfThen(FPSRequest.MasterPropName.IsEmpty, '', '.') + FPSRequest.MasterPropName;
 end;
 
-function TioContext_PSRequest.GetPersistingNewEtmTimeSlot: Boolean;
+function TioContext_PSRequest.GetForceAuthDecision: Boolean;
 begin
-  Result := FPSRequest.PersistingNewEtmTimeSlot;
+  Result := FPSRequest.ForceAuthDecision;
 end;
 
 function TioContext_PSRequest.GetPSRequest: IioPersistenceStrategyRequest;

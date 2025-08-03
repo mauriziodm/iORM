@@ -166,7 +166,7 @@ var
 begin
   // Requires an authorization-decision for UI purposes
   // NB: Codice inserito qui per intercettare l'insert/append richiesto con i metodi Append/Insert che ricevono l'istanza da aggiungere già creata
-  TioApplication.ProvideAuthDecisionUI(ABindSource.GetTypeName, atInsert, itRegular);
+  TioApplication.ProvideAuthDecisionUI(ABindSource.GetTypeName, atInsert, itRegular, False);
   // Check the BindSourceAdapter
   if ABindSource.CheckAdapter and Supports(ABindSource.GetActiveBindSourceAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
   begin
@@ -341,7 +341,7 @@ begin
   if not Assigned(AObj) then
     raise EioGenericException.Create(ClassName, 'ProvideAuthDecisionForInsertOrAppendObj', 'The parameter does not contain a valid object instance');
   try
-    TioApplication.ProvideAuthDecisionUI(AObj.ClassName, atInsert, itRegular);
+    TioApplication.ProvideAuthDecisionUI(AObj.ClassName, atInsert, itRegular, False);
   except
     if AFreeObjIfNotAuthorized then
       FreeAndNil(AObj);

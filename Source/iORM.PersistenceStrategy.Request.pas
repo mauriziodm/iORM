@@ -40,10 +40,10 @@ type
     FWhere: IioWhere;
     // others
     FBlindLevel: Byte;
+    FForceAuthDecision: Boolean;
     FIntent: TioPersistenceIntentType;
     FMasterPropName: String;
     FMasterPropPath: String;
-    FPersistingNewEtmTimeSlot: Boolean;
     FPropName: String;
     FRelationOID: Integer;
     FRelationPropName: String;
@@ -59,6 +59,7 @@ type
     function GetConnectionRemote: String;
     function GetDTO: TObject;
     function GetDTO_Serialize: Boolean;
+    function GetForceAuthDecision: Boolean;
     function GetIntent: TioPersistenceIntentType;
     function GetIntf1: IInterface;
     function GetIntf1_Serialize: Boolean;
@@ -72,7 +73,6 @@ type
     function GetMethod: TioPersistenceStrategyMethod;
     function GetObj1: TObject;
     function GetObj1_Serialize: Boolean;
-    function GetPersistingNewEtmTimeSlot: Boolean;
     function GetPropName: String;
     function GetRelationOID: Integer;
     function GetRelationPropName: String;
@@ -91,6 +91,7 @@ type
     procedure SetConnectionRemote(const Value: String);
     procedure SetDTO(const Value: TObject);
     procedure SetDTO_Serialize(const Value: Boolean);
+    procedure SetForceAuthDecision(const Value: Boolean);
     procedure SetIntent(const Value: TioPersistenceIntentType);
     procedure SetIntf1(const Value: IInterface);
     procedure SetIntf1_Serialize(const Value: Boolean);
@@ -103,7 +104,6 @@ type
     procedure SetMasterPropPath(const Value: String);
     procedure SetObj1(const Value: TObject);
     procedure SetObj1_Serialize(const Value: Boolean);
-    procedure SetPersistingNewEtmTimeSlot(const Value: Boolean);
     procedure SetPropName(const Value: String);
     procedure SetRelationOID(const Value: Integer);
     procedure SetRelationPropName(const Value: String);
@@ -148,10 +148,10 @@ type
     property Where: IioWhere read GetWhere write SetWhere;
     // others
     property BlindLevel: Byte read GetBlindLevel write SetBlindLevel;
+    property ForceAuthDecision: Boolean read GetForceAuthDecision write SetForceAuthDecision;
     property Intent: TioPersistenceIntentType read GetIntent write SetIntent;
     property MasterPropName: String read GetMasterPropName write SetMasterPropName;
     property MasterPropPath: String read GetMasterPropPath write SetMasterPropPath;
-    property PersistingNewEtmTimeSlot: Boolean read GetPersistingNewEtmTimeSlot write SetPersistingNewEtmTimeSlot;
     property PropName: String read GetPropName write SetPropName;
     property RelationOID: Integer read GetRelationOID write SetRelationOID;
     property RelationPropName: String read GetRelationPropName write SetRelationPropName;
@@ -494,9 +494,9 @@ begin
   Result := FObj1_Serialize;
 end;
 
-function TioPersistenceStrategyRequest.GetPersistingNewEtmTimeSlot: Boolean;
+function TioPersistenceStrategyRequest.GetForceAuthDecision: Boolean;
 begin
-  Result := FPersistingNewEtmTimeSlot;
+  Result := FForceAuthDecision;
 end;
 
 function TioPersistenceStrategyRequest.GetPropName: String;
@@ -687,9 +687,9 @@ begin
   FObj1_Serialize := Value;
 end;
 
-procedure TioPersistenceStrategyRequest.SetPersistingNewEtmTimeSlot(const Value: Boolean);
+procedure TioPersistenceStrategyRequest.SetForceAuthDecision(const Value: Boolean);
 begin
-  FPersistingNewEtmTimeSlot := Value;
+  FForceAuthDecision := Value;
 end;
 
 procedure TioPersistenceStrategyRequest.SetPropName(const Value: String);
@@ -779,7 +779,7 @@ begin
   FIntent := TioPersistenceIntentType.itRegular;
   FMasterPropName := IO_STRING_NULL_VALUE;
   FMasterPropPath := IO_STRING_NULL_VALUE;
-  FPersistingNewEtmTimeSlot := False;
+  FForceAuthDecision := False;
   FPropName := IO_STRING_NULL_VALUE;
   FRelationOID := IO_INTEGER_NULL_VALUE;
   FRelationPropName := IO_STRING_NULL_VALUE;

@@ -44,7 +44,7 @@ type
   public
     class function NewAuthCacheCRUD: IioAuthCache;
     class function NewAuthCacheUI: IioAuthCache;
-    class function NewDecisionRequestUI(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType): IioAuthDecisionRequest;
+    class function NewDecisionRequestUI(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType; const AForceAuthDecision: Boolean): IioAuthDecisionRequest;
   end;
 
 implementation
@@ -64,10 +64,9 @@ begin
   Result := TioAuthCacheUI.Create;
 end;
 
-class function TioAuthFactory.NewDecisionRequestUI(const ATypeName: String; const AActionType: TioPersistenceActionType;
-  const AIntent: TioPersistenceIntentType): IioAuthDecisionRequest;
+class function TioAuthFactory.NewDecisionRequestUI(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType; const AForceAuthDecision: Boolean): IioAuthDecisionRequest;
 begin
-  Result := TioAuthDecisionRequestUI.Create(ATypeName, AActionType, AIntent);
+  Result := TioAuthDecisionRequestUI.Create(ATypeName, AActionType, AIntent, AForceAuthDecision);
 end;
 
 end.

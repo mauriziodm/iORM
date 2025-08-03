@@ -595,7 +595,7 @@ procedure TioBSABaseDataSet.DoBeforeInsert;
 begin
   // Requires an authorization-decision for UI purposes
   // NB: Codice inserito qui per intercettare l'insert richiesto da tastiera, quello che non riceve l'istanza da aggiungere già creata
-  TioApplication.ProvideAuthDecisionUI(GetActiveBindSourceAdapter.TypeName, atInsert, itRegular);
+  TioApplication.ProvideAuthDecisionUI(GetActiveBindSourceAdapter.TypeName, atInsert, itRegular, False);
   // Execute the normal inherited operations if authorized
   inherited;
 end;

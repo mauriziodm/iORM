@@ -293,6 +293,7 @@ begin
     //        will not be performed but the user will probably not notice the lack of authorization;
     //        If you want to inform the user of the failed authorization, you need to raise an exception
     //        within the annoying method itself (TioTokenValidateMethod).
+    LContext.PSRequest.ForceAuthDecision := LContext.IDIsNull;
     if TioApplication.ProvideAuthDecisionCRUD(LContext as IioAuthDecisionRequest) then
     begin
 {$REGION '-----INTERCEPTORS-----'}

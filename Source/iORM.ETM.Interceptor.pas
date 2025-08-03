@@ -86,7 +86,7 @@ begin
       //  di una classe/entità, inpostandolo a True in pratica facciamo in modo che sia sempre
       //  autorizzata la sua persistenza (authorization-decision) anche se in realtà l'utente non
       //  è autorizzato a persisterla
-      LPSRequest.PersistingNewEtmTimeSlot := True;
+      LPSRequest.ForceAuthDecision := True;
       // Import session data from original PSRequest
       LPSRequest.ImportSessionDataFromPSRequest(AContext.PSRequest);
       // Execute the PSRequest (Persist the new TimeSlot)
