@@ -360,29 +360,33 @@ begin
       except
         on E: Exception do
         begin
-          // Gestione dell'eccezione: chiama AOnError nel main thread
-          if Assigned(AOnExceptionMethod) then
-          begin
-            TThread.Synchronize(nil,
-              procedure
-              begin
-                // Se richiesto nasconde l'attesa (thread principale)
-                if AShowWait then
-                  TioApplication.HideWait;
-                // Esegue AOnError nel main thread
-                AOnExceptionMethod(E);
-              end);
-          end
-          else
-          // Non rialziamo l'eccezione per non bloccare il thread pool,
-          // l'abbiamo gestita qui.
+          // Se è una eccezione EAbort non fa nulla (silent exception)
           if not (E is EAbort) then
           begin
-            TThread.Synchronize(nil,
-              procedure
-              begin
-                TioApplication.ShowMessage('TioAsyncFunc<T>: Exception caught on main thread: ' + E.Message);
-              end);
+            // Se è stato specificato l'anonymous method in caso di eccezione lo invoca
+            if Assigned(AOnExceptionMethod) then
+            begin
+              TThread.Synchronize(nil,
+                procedure
+                begin
+                  // Se richiesto nasconde l'attesa (thread principale)
+                  if AShowWait then
+                    TioApplication.HideWait;
+                  // Esegue AOnError nel main thread
+                  AOnExceptionMethod(E);
+                end);
+            end
+            // se invece non è stato specificato l'anonymous method in caso di eccezione allora
+            //  semplicemente fa una ShowMessage con il messaggio di errore della exception originaria.
+            //  PS: Ho provato a fare anche il raise ma non è andata bene
+            else
+            begin
+              TThread.Synchronize(nil,
+                procedure
+                begin
+                  TioApplication.ShowMessage('TioAsyncFunc<T>: Exception caught on main thread: ' + E.Message);
+                end);
+            end;
           end;
         end;
       end;
