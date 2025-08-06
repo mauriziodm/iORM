@@ -206,6 +206,8 @@ type
   protected
     // access-token
     function GetToken: String;
+    // auth-context
+    function GetAuthContext: String;
     // BlindLevel
     function GetBlindLevel: Byte; override;
     procedure SetBlindLevel(const Value: Byte); override;
@@ -780,6 +782,11 @@ constructor TioContext_PSRequest.Create_PSRequest(const APSRequest: IioPersisten
 begin
   inherited Create_Map(AMap);
   FPSRequest := APSRequest;
+end;
+
+function TioContext_PSRequest.GetAuthContext: String;
+begin
+  Result := FPSRequest.AuthContext;
 end;
 
 function TioContext_PSRequest.GetBlindLevel: Byte;

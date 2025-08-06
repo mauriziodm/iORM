@@ -13,22 +13,26 @@ type
   TioAuthDecisionRequestUI = class(TInterfacedObject, IioAuthDecisionRequest)
   private
     FActionType:TioPersistenceActionType;
+    FAuthContext: String;
     FIntent: TioPersistenceIntentType;
     FForceAuthDecision: Boolean;
     FTypeName: String;
     FToken: String;
-    function GetToken: String;
     function GetActionType: TioPersistenceActionType;
-    function GetIntent: TioPersistenceIntentType;
+    function GetAuthContext: String;
     function GetForceAuthDecision: Boolean;
+    function GetIntent: TioPersistenceIntentType;
+    function GetToken: String;
     function GetTypeName: String;
   public
-    constructor Create(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType; const AForceAuthDecision: Boolean);
+    constructor Create(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType; const AAuthContext: String; const AForceAuthDecision: Boolean);
     function IsAuthorized: Boolean;
-    property Token: String read GetToken;
+    // properties
     property ActionType: TioPersistenceActionType read GetActionType;
-    property Intent: TioPersistenceIntentType read GetIntent;
+    property AuthContext: String read GetAuthContext;
     property ForceAuthDecision: Boolean read GetForceAuthDecision;
+    property Intent: TioPersistenceIntentType read GetIntent;
+    property Token: String read GetToken;
     property TypeName: String read GetTypeName;
   end;
 
@@ -39,9 +43,10 @@ uses
 
 { TioAuthDecisionRequestUI }
 
-constructor TioAuthDecisionRequestUI.Create(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType; const AForceAuthDecision: Boolean);
+constructor TioAuthDecisionRequestUI.Create(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType; const AAuthContext: String; const AForceAuthDecision: Boolean);
 begin
   FActionType := AActionType;
+  FAuthContext := AAuthContext;
   FIntent := AIntent;
   FForceAuthDecision := AForceAuthDecision;
   FTypeName := ATypeName;
@@ -51,6 +56,11 @@ end;
 function TioAuthDecisionRequestUI.GetActionType: TioPersistenceActionType;
 begin
   Result := FActionType;
+end;
+
+function TioAuthDecisionRequestUI.GetAuthContext: String;
+begin
+  Result := FAuthContext;
 end;
 
 function TioAuthDecisionRequestUI.GetIntent: TioPersistenceIntentType;
