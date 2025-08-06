@@ -355,12 +355,19 @@ var
   LDestBSA: IioActiveBindSourceAdapter;
   LValue: TValue;
 begin
-  // Some checks
+  // Check if TargetBS is assigned
   if not Assigned(ATargetBS) then
     raise EioGenericException.Create(ClassName, 'Select<T>',
       Format('You have tried to make a selection by invoking the "SelectCurrent" method of the "%s" component but its "SelectorFor" property was left blank.' +
       #13#13'iORM does not know which target component to forward the selection to.'#13#13'Please set the property and try again.',
       [(ASender as TComponent).Name]));
+  // C'era un problema se il target è un BS che espone un singolo oggetto e in
+  // precedenza era stato impostato il suo dataObject a nil perchè in questo caso negli
+  // ObjectBSA il ABSA si disattiva (Active = False) e quindi poi quando faceva
+  // il SetDataObject sul TargetBSA dava un errore perchè non era attivo.
+  if not ATargetBS.IsActive then
+    ATargetBS.Open;
+  // Check if TargetBS is still inactive
   if not ATargetBS.IsActive then
     raise EioGenericException.Create(ClassName, 'Select<T>',
       Format('You have tried to make a selection by invoking the "SelectCurrent" method of component "%s" but the target component of the selection ("%s") is not active.'
