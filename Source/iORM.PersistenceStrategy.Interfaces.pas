@@ -127,6 +127,7 @@ type
     function GetApp: String;
     function GetAppOID: Integer;
     function GetAuthCache: IioAuthCache;
+    function GetAuthContext: String;
     function GetBlindLevel: Byte;
     function GetConnection: String;
     function GetConnectionRemote: String;
@@ -161,6 +162,7 @@ type
     procedure SetApp(const Value: String);
     procedure SetAppOID(const Value: Integer);
     procedure SetAuthCache(const Value: IioAuthCache);
+    procedure SetAuthContext(const Value: String);
     procedure SetBlindLevel(const Value: Byte);
     procedure SetConnection(const Value: String);
     procedure SetConnectionRemote(const Value: String);
@@ -192,8 +194,10 @@ type
     procedure SwitchToConnectionRemote;
     // method property
     property Method: TioPersistenceStrategyMethod read GetMethod;
-    // auth-cache
+    // auth
     property AuthCache: IioAuthCache read GetAuthCache write SetAuthCache;
+    property AuthContext: String read GetAuthContext write SetAuthContext;
+    property ForceAuthDecision: Boolean read GetForceAuthDecision write SetForceAuthDecision;
     // session data
     property App: String read GetApp write SetApp;
     property AppOID: Integer read GetAppOID write SetAppOID;
@@ -217,7 +221,6 @@ type
     property Where: IioWhere read GetWhere write SetWhere;
     // others
     property BlindLevel: Byte read GetBlindLevel write SetBlindLevel;
-    property ForceAuthDecision: Boolean read GetForceAuthDecision write SetForceAuthDecision;
     property Intent: TioPersistenceIntentType read GetIntent write SetIntent;
     property MasterPropName: String read GetMasterPropName write SetMasterPropName;
     property MasterPropPath: String read GetMasterPropPath write SetMasterPropPath;
