@@ -168,6 +168,9 @@ type
     property OnDeleteConflictException;
     property OnInsertConflictException;
     property OnUpdateConflictException;
+    // Published AuthContext property & event
+    property AuthContext;
+    property OnAuthContext;
   end;
 
 implementation

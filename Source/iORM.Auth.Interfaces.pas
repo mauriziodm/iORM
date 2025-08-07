@@ -95,19 +95,22 @@ type
   IioAuthDecisionRequest = interface
     ['{02E419C2-347C-412D-B7B3-F264EFB92B94}']
     function IsAuthorized: Boolean;
-    // access-token
+    // AuthContext
+    function GetAuthContext: String;
+    property AuthContext: String read GetAuthContext;
+    // AccessToken
     function GetToken: String;
     property Token: String read GetToken;
-    // action type
+    // ActionType
     function GetActionType: TioPersistenceActionType;
     property ActionType: TioPersistenceActionType read GetActionType;
-    // intent
-    function GetIntent: TioPersistenceIntentType;
-    property Intent: TioPersistenceIntentType read GetIntent;
     // ForceAuthDecision
     function GetForceAuthDecision: Boolean;
     property ForceAuthDecision: Boolean read GetForceAuthDecision;
-    // type name
+    // Intent
+    function GetIntent: TioPersistenceIntentType;
+    property Intent: TioPersistenceIntentType read GetIntent;
+    // TypeName
     function GetTypeName: String;
     property TypeName: String read GetTypeName;
   end;

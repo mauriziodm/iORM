@@ -27,6 +27,7 @@ type
   TioAuthCacheCustom = class (TInterfacedObject, IioAuthCache)
   strict private
     FInternalContainer: TDictionary<String, Boolean>;
+    function ComposeKey(const AAuthDecisionRequest: IioAuthDecisionRequest): String; inline;
   protected
     procedure Clear;
   public
@@ -57,6 +58,11 @@ begin
   FInternalContainer.Clear;
 end;
 
+function TioAuthCacheCustom.ComposeKey(const AAuthDecisionRequest: IioAuthDecisionRequest): String;
+begin
+  Result := AAuthDecisionRequest.TypeName + ':' + IntToStr(Ord(AAuthDecisionRequest.ActionType)) + ':' + AAuthDecisionRequest.AuthContext;
+end;
+
 constructor TioAuthCacheCustom.Create;
 begin
   FInternalContainer := TDictionary<String, Boolean>.Create;
@@ -76,7 +82,7 @@ begin
   if (AAuthDecisionRequest.Intent <> itRegular) or AAuthDecisionRequest.ForceAuthDecision then
     Exit(True);
   // Compose the key
-  LKey := AAuthDecisionRequest.TypeName + ':' + IntToStr(Ord(AAuthDecisionRequest.ActionType));
+  LKey := ComposeKey(AAuthDecisionRequest);
   // Authorization decision
   if not FInternalContainer.TryGetValue(LKey, Result) then
   begin

@@ -99,6 +99,10 @@ type
     FAfterOpen: TNotifyEvent;
     FBeforeClose: TNotifyEvent;
     FBeforeOpen: TNotifyEvent;
+    // Auth
+    FAuthContext: String; // property
+    FOnAuthContext: TioBSOnAuthContextEvent; // event
+
     // Methods
     function Get_Version: String;
     procedure OpenCloseViewBindSources(const AActive: Boolean);
@@ -177,6 +181,8 @@ type
     // SelectorFor
     function GetSelectorFor: IioBindSource;
     procedure SetSelectorFor(const ATargetBindSource: IioBindSource);
+    // AuthContext
+    function _InternalGetAuthContext: String;
     // Persistence concurrency conflicts
     function GetOnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent;
     function GetOnInsertConflictException: TioBSOnPersistenceConflictExceptionEvent;
@@ -255,6 +261,9 @@ type
     property AfterOpen: TNotifyEvent read FAfterOpen write FAfterOpen;
     property BeforeClose: TNotifyEvent read FBeforeClose write FBeforeClose;
     property BeforeOpen: TNotifyEvent read FBeforeOpen write FBeforeOpen;
+    // Published AuthContext property & event
+    property AuthContext: String read FAuthContext write FAuthContext;
+    property OnAuthContext: TioBSOnAuthContextEvent read FonAuthContext write FonAuthContext;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -422,6 +431,7 @@ end;
 constructor TioModelPresenterCustom.Create(AOwner: TComponent);
 begin
   inherited;
+  FAuthContext := String.Empty;
   FAutoPost := True;
   FAutoRefreshOnNotification := True;
   FAsyncLoad := False;
@@ -1370,6 +1380,13 @@ begin
 
   // Init the BSA
   FBindSourceAdapter.ioAutoPost := FAutoPost;
+end;
+
+function TioModelPresenterCustom._InternalGetAuthContext: String;
+begin
+  Result := FAuthContext;
+  if Assigned(FOnAuthContext) then
+    FOnAuthContext(Self, Result);
 end;
 
 procedure TioModelPresenterCustom._InternalSetETMforPrivateField(const AETMFor: IioBindSource);

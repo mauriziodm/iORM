@@ -41,7 +41,7 @@ uses
   iORM.LiveBindings.CommonBSAPaging, iORM.Where.Interfaces,
   Data.Bind.ObjectScope, System.Generics.Collections,
   iORM.MVVM.ViewContextProvider, iORM.StdActions.Interfaces,
-  iORM.LiveBindings.BSPersistence, iORM.Abstraction;
+  iORM.LiveBindings.BSPersistence;
 
 type
 
@@ -89,6 +89,9 @@ type
     FOnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent;
     FOnInsertConflictException: TioBSOnPersistenceConflictExceptionEvent;
     FOnUpdateConflictException: TioBSOnPersistenceConflictExceptionEvent;
+    // Auth
+    FAuthContext: String; // property
+    FOnAuthContext: TioBSOnAuthContextEvent; // event
 
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
     function IsActive: Boolean;
@@ -166,6 +169,8 @@ type
     // SelectorFor
     function GetSelectorFor: IioBindSource;
     procedure SetSelectorFor(const ATargetBindSource: IioBindSource);
+    // AuthContext
+    function _InternalGetAuthContext: String;
     // Persistence concurrency conflicts
     function GetOnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent;
     function GetOnInsertConflictException: TioBSOnPersistenceConflictExceptionEvent;
@@ -239,6 +244,9 @@ type
     property OnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent read GetOnDeleteConflictException write SetOnDeleteConflictException;
     property OnInsertConflictException: TioBSOnPersistenceConflictExceptionEvent read GetOnInsertConflictException write SetOnInsertConflictException;
     property OnUpdateConflictException: TioBSOnPersistenceConflictExceptionEvent read GetOnUpdateConflictException write SetOnUpdateConflictException;
+    // Published AuthContext property & event
+    property AuthContext: String read FAuthContext write FAuthContext;
+    property OnAuthContext: TioBSOnAuthContextEvent read FonAuthContext write FonAuthContext;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -331,6 +339,7 @@ end;
 constructor TioDataSetCustom.Create(AOwner: TComponent);
 begin
   inherited;
+  FAuthContext := String.Empty;
   FAutoPost := True;
   FAutoRefreshOnNotification := True;
   FAsyncLoad := False;
@@ -513,6 +522,13 @@ end;
 function TioDataSetCustom.GetAsDefault: Boolean;
 begin
   Result := FAsDefault;
+end;
+
+function TioDataSetCustom._InternalGetAuthContext: String;
+begin
+  Result := FAuthContext;
+  if Assigned(FOnAuthContext) then
+    FOnAuthContext(Self, Result);
 end;
 
 function TioDataSetCustom.GetAutoPost: Boolean;

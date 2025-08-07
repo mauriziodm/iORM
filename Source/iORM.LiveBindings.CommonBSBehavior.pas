@@ -76,7 +76,7 @@ type
     // Common code for ETMfor
     class procedure SetETMfor(const ABindSource: IioBindSource; const AETMfor: IioMasterBindSource; const AComponentState: TComponentState);
     // Common code for BindSources to requires an authorization-decision for an insert/append operation receving already created instance
-    class procedure ProvideAuthDecisionForInsertOrAppend(AObj: TObject; const AFreeObjIfNotAuthorized: Boolean);
+    class procedure ProvideAuthDecisionForInsertOrAppend(const ABindSource: IioBindSource; AObj: TObject; const AFreeObjIfNotAuthorized: Boolean);
     // Common code for BindSources to Insert/Append an object
     class procedure InsertOrAppend(const ABindSource: IioBindSource; const InsertOrAppend: TioCommonBSBehaviorInsertOrAppend; const AFreeObjIfNotAuthorized: Boolean);
     class procedure InsertOrAppendObj(const ABindSource: IioBindSource; AObj: TObject; const InsertOrAppend: TioCommonBSBehaviorInsertOrAppend; const AFreeObjIfNotAuthorized: Boolean);
@@ -166,7 +166,7 @@ var
 begin
   // Requires an authorization-decision for UI purposes
   // NB: Codice inserito qui per intercettare l'insert/append richiesto con i metodi Append/Insert che ricevono l'istanza da aggiungere già creata
-  TioApplication.ProvideAuthDecisionUI(ABindSource.GetTypeName, atInsert, itRegular, False);
+  TioApplication.ProvideAuthDecisionUI(ABindSource.GetTypeName, atInsert, itRegular, ABindSource._InternalGetAuthContext, False);
   // Check the BindSourceAdapter
   if ABindSource.CheckAdapter and Supports(ABindSource.GetActiveBindSourceAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
   begin
@@ -188,7 +188,7 @@ var
 begin
   // Requires an authorization-decision for UI purposes
   // NB: Codice inserito qui per intercettare l'insert/append richiesto con i metodi Append/Insert che ricevono l'istanza da aggiungere già creata
-  ProvideAuthDecisionForInsertOrAppend(AIntf As TObject, False);
+  ProvideAuthDecisionForInsertOrAppend(ABindSource, AIntf As TObject, False);
   // Check the BindSourceAdapter
   if ABindSource.CheckAdapter and Supports(ABindSource.GetActiveBindSourceAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
   begin
@@ -216,7 +216,7 @@ var
 begin
   // Requires an authorization-decision for UI purposes
   // NB: Codice inserito qui per intercettare l'insert/append richiesto con i metodi Append/Insert che ricevono l'istanza da aggiungere già creata
-  ProvideAuthDecisionForInsertOrAppend(AObj, True);
+  ProvideAuthDecisionForInsertOrAppend(ABindSource, AObj, True);
   // Check the BindSourceAdapter
   if ABindSource.CheckAdapter and Supports(ABindSource.GetActiveBindSourceAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
   begin
@@ -336,12 +336,12 @@ begin
   end;
 end;
 
-class procedure TioCommonBSBehavior.ProvideAuthDecisionForInsertOrAppend(AObj: TObject; const AFreeObjIfNotAuthorized: Boolean);
+class procedure TioCommonBSBehavior.ProvideAuthDecisionForInsertOrAppend(const ABindSource: IioBindSource; AObj: TObject; const AFreeObjIfNotAuthorized: Boolean);
 begin
   if not Assigned(AObj) then
     raise EioGenericException.Create(ClassName, 'ProvideAuthDecisionForInsertOrAppendObj', 'The parameter does not contain a valid object instance');
   try
-    TioApplication.ProvideAuthDecisionUI(AObj.ClassName, atInsert, itRegular, False);
+    TioApplication.ProvideAuthDecisionUI(AObj.ClassName, atInsert, itRegular, ABindSource._InternalGetAuthContext, False);
   except
     if AFreeObjIfNotAuthorized then
       FreeAndNil(AObj);

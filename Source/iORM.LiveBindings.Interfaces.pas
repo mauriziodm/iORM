@@ -49,11 +49,11 @@ type
   TioBSASelectionObjectEvent = procedure(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean) of object;
 
   TioBSABeforeAfterSelectionInterfaceEvent = procedure(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType) of object;
-  TioBSASelectionInterfaceEvent = procedure(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean)
-    of object;
+  TioBSASelectionInterfaceEvent = procedure(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean) of object;
 
-  TioBSOnPersistenceConflictExceptionEvent = procedure(const ASender, ADataObject: TObject; var AConflictResolved: Boolean)
-    of object;
+  TioBSOnPersistenceConflictExceptionEvent = procedure(const ASender, ADataObject: TObject; var AConflictResolved: Boolean) of object;
+
+  TioBSOnAuthContextEvent = procedure(const ASender: TObject; var AuthContext: String) of object;
 
   // Forward declaration
   IioActiveBindSourceAdapter = interface;
@@ -99,6 +99,7 @@ type
     procedure UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
     procedure PostIfEditing;
     procedure CancelIfEditing;
+    function _InternalGetAuthContext: String;
     // universal methods (used by std actions)
     procedure _Action_Append(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
     procedure _Action_AppendObj(AObject: TObject; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);

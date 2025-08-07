@@ -65,7 +65,7 @@ type
 implementation
 
 uses
-  iORM, iORM.CommonTypes, iORM.LiveBindings.BSPersistence,
+  iORM, iORM.CommonTypes,
   iORM.PersistenceStrategy.Interfaces, iORM.PersistenceStrategy.Factory;
 
 { TioEtmInterceptor }

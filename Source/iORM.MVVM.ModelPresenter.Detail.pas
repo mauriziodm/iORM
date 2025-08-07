@@ -69,6 +69,9 @@ type
     property AfterOpen;
     property BeforeClose;
     property BeforeOpen;
+    // Published AuthContext property & event
+    property AuthContext;
+    property OnAuthContext;
   end;
 
 

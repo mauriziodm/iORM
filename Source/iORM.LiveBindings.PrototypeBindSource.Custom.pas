@@ -99,6 +99,10 @@ type
     FAfterOpen: TNotifyEvent;
     FBeforeClose: TNotifyEvent;
     FBeforeOpen: TNotifyEvent;
+    // Auth
+    FAuthContext: String; // property
+    FOnAuthContext: TioBSOnAuthContextEvent; // event
+
     function Get_Version: String;
     procedure OpenCloseDetails(const AActive: Boolean);
     function FirstMasterPersistenceBindSource: IioBindSource;
@@ -187,6 +191,8 @@ type
     // SelectorFor
     function GetSelectorFor: IioBindSource;
     procedure SetSelectorFor(const ATargetBindSource: IioBindSource);
+    // AuthContext
+    function _InternalGetAuthContext: String;
     // Persistence concurrency conflicts
     function GetOnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent;
     function GetOnInsertConflictException: TioBSOnPersistenceConflictExceptionEvent;
@@ -261,6 +267,9 @@ type
     property AfterOpen: TNotifyEvent read FAfterOpen write FAfterOpen;
     property BeforeClose: TNotifyEvent read FBeforeClose write FBeforeClose;
     property BeforeOpen: TNotifyEvent read FBeforeOpen write FBeforeOpen;
+    // Published AuthContext property & event
+    property AuthContext: String read FAuthContext write FAuthContext;
+    property OnAuthContext: TioBSOnAuthContextEvent read FonAuthContext write FonAuthContext;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -305,7 +314,7 @@ type
     procedure Append; overload;
     procedure Append(AObject: TObject); overload;
     procedure Append(AObject: IInterface); overload;
-    procedure Insert; overload;
+    procedure Insert; reintroduce; overload;
     procedure Insert(AObject: TObject); reintroduce; overload;
     procedure Insert(AObject: IInterface); reintroduce; overload;
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
@@ -324,7 +333,7 @@ implementation
 uses
   iORM, iORM.Exceptions, iORM.LiveBindings.Factory,
   iORM.Where.Factory, iORM.Utilities, iORM.Components.Common, System.Rtti,
-  iORM.LiveBindings.CommonBSBehavior, iORM.Abstraction;
+  iORM.LiveBindings.CommonBSBehavior;
 
 { TioPrototypeBindSource }
 
@@ -395,6 +404,7 @@ end;
 constructor TioPrototypeBindSourceCustom.Create(AOwner: TComponent);
 begin
   inherited;
+  FAuthContext := String.Empty;
   FBindSourceAdapter := nil;
   AutoActivate := False;
   FAutoPost := True;
@@ -1231,6 +1241,13 @@ begin
     SetRuntimeAdapter(LActiveBSA.AsTBindSourceAdapter);
     FBindSourceAdapter := LActiveBSA;
   end;
+end;
+
+function TioPrototypeBindSourceCustom._InternalGetAuthContext: String;
+begin
+  Result := FAuthContext;
+  if Assigned(FOnAuthContext) then
+    FOnAuthContext(Self, Result);
 end;
 
 procedure TioPrototypeBindSourceCustom._InternalSetETMforPrivateField(const AETMFor: IioBindSource);

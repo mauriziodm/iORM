@@ -132,7 +132,7 @@ begin
     LActionType := atInsert
   else
     LActionType := atUpdate;
-  TioApplication.ProvideAuthDecisionUI(AActiveBindSourceAdapter.Current.ClassName, LActionType, itRegular, LForceAuthDecision);
+  TioApplication.ProvideAuthDecisionUI(AActiveBindSourceAdapter.Current.ClassName, LActionType, itRegular, AActiveBindSourceAdapter.GetBindSource._InternalGetAuthContext, LForceAuthDecision);
   // Notification to save revert point before edit
   AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint));
   // Notification to register the current object into the SmartUpdateDetection system
