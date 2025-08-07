@@ -175,7 +175,12 @@ begin
 end;
 
 class procedure TioCommonBSAPersistence.BeforeDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
+var
+  LForceAuthDecision: Boolean;
 begin
+  // Requires an authorization-decision for UI purposes
+  LForceAuthDecision := TioUtilities.IsNullOID(AActiveBindSourceAdapter.Current);
+  TioApplication.ProvideAuthDecisionUI(AActiveBindSourceAdapter.Current.ClassName, atDelete, itRegular, AActiveBindSourceAdapter.GetBindSource._InternalGetAuthContext, LForceAuthDecision);
   // If the delete detail is allowed then send a ntSaveRevertPoint notification
   if AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject, TioBSNotification.Create(TioBSNotificationType.ntCanDeleteDetail)) then
     AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject, TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint))
