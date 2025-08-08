@@ -581,7 +581,7 @@ type
     class procedure PersistObject(const [ref] AObj: TObject; const AAuthContext: String; const AFree: TioFreeObjAfterPersistOrDelete); overload;
     class procedure PersistObject(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete); overload;
     class procedure PersistObject(const AIntfObj: IInterface; const AAuthContext: String = ''; const ABlindLevel: Byte = BL_DEFAULT); overload;
-    class procedure _PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
+    class procedure _PersistObject(const AObj: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
     class procedure _PersistObjectInternal(const AObj: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
       const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence;
       const AMasterPropertyName, AMasterPropertyPath: String); static;
@@ -590,7 +590,7 @@ type
     class procedure PersistList(const [ref] AList: TObject; const AAuthContext: String; const AFree: TioFreeObjAfterPersistOrDelete); overload;
     class procedure PersistList(const [ref] AList: TObject; const AFree: TioFreeObjAfterPersistOrDelete); overload;
     class procedure PersistList(const AListIntf: IInterface; const AAuthContext: String = ''; const ABlindLevel: Byte = BL_DEFAULT); overload;
-    class procedure _PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
+    class procedure _PersistList(const AList: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
     class procedure _PersistListInternal(const AList: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
       const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence;
       const AMasterPropertyName, AMasterPropertyPath: String); static;
@@ -984,9 +984,9 @@ begin
   Result := AWhere.NotExists;
 end;
 
-class procedure io._PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
+class procedure io._PersistObject(const AObj: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 begin
-  _PersistObjectInternal(AObj, String.Empty, AIntent, ABlindLevel, '', 0, nil, '', '');
+  _PersistObjectInternal(AObj, AAuthContext, AIntent, ABlindLevel, '', 0, nil, '', '');
 end;
 
 class procedure io._PersistObjectInternal(const AObj: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
@@ -2015,9 +2015,9 @@ begin
   end;
 end;
 
-class procedure io._PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
+class procedure io._PersistList(const AList: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 begin
-  _PersistListInternal(AList, String.Empty, AIntent, ABlindLevel, '', 0, nil, '', '');
+  _PersistListInternal(AList, AAuthContext, AIntent, ABlindLevel, '', 0, nil, '', '');
 end;
 
 class procedure io._PersistListInternal(const AList: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
