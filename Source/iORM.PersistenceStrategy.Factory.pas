@@ -58,9 +58,8 @@ type
     class function NewPSRequest_ByJsonString(const AJsonString: String): IioPersistenceStrategyRequest;
     // delete
     class function NewPSRequest_Delete(const AWhere: IioWhere): IioPersistenceStrategyRequest;
-    class function NewPSRequest_DeleteList(const AListDTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
-    class function NewPSRequest_DeleteObject(const ADTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
-//    class function NewPSRequest_DeleteObject(const ADTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
+    class function NewPSRequest_DeleteList(const AListDTO: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
+    class function NewPSRequest_DeleteObject(const ADTO: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
     // load
     class function NewPSRequest_LoadCount(const AWhere: IioWhere): IioPersistenceStrategyRequest;
     class function NewPSRequest_LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet): IioPersistenceStrategyRequest;
@@ -72,10 +71,10 @@ type
     // TODO: Da eliminare?
     class function NewPSRequest_LoadObjVersion(const AContext: IioContext): IioPersistenceStrategyRequest;
     // persist
-    class function NewPSRequest_PersistList(const AListDTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
-      const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName,
-      AMasterPropertyPath: String): IioPersistenceStrategyRequest;
-    class function NewPSRequest_PersistObject(const ADTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
+    class function NewPSRequest_PersistList(const AListDTO: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType;
+      const ABlindLevel: Byte; const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence;
+      const AMasterPropertyName, AMasterPropertyPath: String): IioPersistenceStrategyRequest;
+    class function NewPSRequest_PersistObject(const ADTO: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
       const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName,
       AMasterPropertyPath: String): IioPersistenceStrategyRequest;
     // pre/post process relation child operations
@@ -160,20 +159,22 @@ begin
   Result.Where.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_DeleteList(const AListDTO: TObject; const AIntent: TioPersistenceIntentType;
+class function TioPersistenceStrategyFactory.NewPSRequest_DeleteList(const AListDTO: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType;
   const ABlindLevel: Byte): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(psmDeleteList, True);
+  Result.AuthContext := AAuthContext;
   Result.BlindLevel := ABlindLevel;
   Result.Intent := AIntent;
   Result.ListDTO := AListDTO;
   Result.ListDTO_Serialize := True;
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_DeleteObject(const ADTO: TObject; const AIntent: TioPersistenceIntentType;
+class function TioPersistenceStrategyFactory.NewPSRequest_DeleteObject(const ADTO: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType;
   const ABlindLevel: Byte): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(psmDeleteObject, True);
+  Result.AuthContext := AAuthContext;
   Result.BlindLevel := ABlindLevel;
   Result.Intent := AIntent;
   Result.DTO := ADTO;
@@ -275,11 +276,12 @@ begin
   Result.Where.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_PersistList(const AListDTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
-  const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName,
-  AMasterPropertyPath: String): IioPersistenceStrategyRequest;
+class function TioPersistenceStrategyFactory.NewPSRequest_PersistList(const AListDTO: TObject; const AAuthContext: String;
+  const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ARelationPropertyName: String; const ARelationOID: Integer;
+  const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(psmPersistList, True);
+  Result.AuthContext := AAuthContext;
   Result.BlindLevel := ABlindLevel;
   Result.Intent := AIntent;
   Result.ListDTO := AListDTO;
@@ -291,11 +293,12 @@ begin
   Result.MasterPropPath := AMasterPropertyPath;
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_PersistObject(const ADTO: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
-  const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName,
-  AMasterPropertyPath: String): IioPersistenceStrategyRequest;
+class function TioPersistenceStrategyFactory.NewPSRequest_PersistObject(const ADTO: TObject; const AAuthContext: String;
+  const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; const ARelationPropertyName: String; const ARelationOID: Integer;
+  const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(psmPersistObject, True);
+  Result.AuthContext := AAuthContext;
   Result.BlindLevel := ABlindLevel;
   Result.Intent := AIntent;
   Result.DTO := ADTO;

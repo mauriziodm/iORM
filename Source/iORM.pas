@@ -520,22 +520,25 @@ type
     class function _LoadObjVersionInternal(const AContext: IioContext): Integer;
 
     // DeleteObject (accepting instance to delete directly)
-    class procedure DeleteObject(const [ref] AObj: TObject; const ABlindLevel: Byte = BL_DEFAULT; const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
+    class procedure DeleteObject(const [ref] AObj: TObject; const AAuthContext: String = ''; const ABlindLevel: Byte = BL_DEFAULT; const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
+    class procedure DeleteObject(const [ref] AObj: TObject; const AAuthContext: String; const AFree: TioFreeObjAfterPersistOrDelete); overload;
     class procedure DeleteObject(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete); overload;
-    class procedure DeleteObject(const AIntfObj: IInterface; const ABlindLevel: Byte = BL_DEFAULT); overload;
-    class procedure _DeleteObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
+    class procedure DeleteObject(const AIntfObj: IInterface; const AAuthContext: String = ''; const ABlindLevel: Byte = BL_DEFAULT); overload;
+    class procedure _DeleteObjectInternal(const AObj: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
     // DeleteList (accepting instance to delete directly)
-    class procedure DeleteList(const [ref] AListObj: TObject; const ABlindLevel: Byte = BL_DEFAULT; const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
+    class procedure DeleteList(const [ref] AListObj: TObject; const AAuthContext: String = ''; const ABlindLevel: Byte = BL_DEFAULT; const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
+    class procedure DeleteList(const [ref] AListObj: TObject; const AAuthContext: String; const AFree: TioFreeObjAfterPersistOrDelete); overload;
     class procedure DeleteList(const [ref] AListObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete); overload;
-    class procedure DeleteList(const AListIntf: IInterface; const ABlindLevel: Byte = BL_DEFAULT); overload;
-    class procedure _DeleteListInternal(const AListObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
+    class procedure DeleteList(const AListIntf: IInterface; const AAuthContext: String = ''; const ABlindLevel: Byte = BL_DEFAULT); overload;
+    class procedure _DeleteListInternal(const AListObj: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
     // Delete (accepting generic type to delete and ciriteria)
     // NB: I metodi Delete qui sotto prima caricano gli oggetti vivi e poi li eliminano in modo che funzioni anche ETM e ConflictStrategy
-    class procedure Delete<T>(const AID: Integer); overload;
-    class procedure Delete<T>(const ATypeAlias: String; const AID: Integer); overload;
-    class procedure DeleteAll<T>(const ATypeAlias: String = ''); overload;
-    class procedure DeleteAll<T>(const AWhere: IioWhere); overload;
-    class procedure DeleteAll<T>(const ATypeAlias: String; const AWhere: IioWhere); overload;
+    class procedure Delete<T>(const AID: Integer; const AAuthContext: String = ''); overload;
+    class procedure Delete<T>(const ATypeAlias: String; const AID: Integer; const AAuthContext: String = ''); overload;
+    class procedure DeleteAll<T>(const ATypeAlias: String = ''; const AAuthContext: String = ''); overload;
+    class procedure DeleteAll<T>(const AAuthContext: String); overload;
+    class procedure DeleteAll<T>(const AWhere: IioWhere; const AAuthContext: String = ''); overload;
+    class procedure DeleteAll<T>(const ATypeAlias: String; const AWhere: IioWhere; const AAuthContext: String = ''); overload;
 
     // Count (accepting generic type and ciriteria)
     class function Count(const ATypeName: String; const ATypeAlias: String = ''): Integer; overload;
@@ -574,20 +577,21 @@ type
     class function NotExists<T>(const ATypeAlias: String; const AWhere: IioWhere): boolean; overload;
 
     // PersistObject (accepting instance to persist directly)
-    class procedure PersistObject(const [ref] AObj: TObject; const ABlindLevel: Byte = BL_DEFAULT; const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
+    class procedure PersistObject(const [ref] AObj: TObject; const AAuthContext: String = ''; const ABlindLevel: Byte = BL_DEFAULT; const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
+    class procedure PersistObject(const [ref] AObj: TObject; const AAuthContext: String; const AFree: TioFreeObjAfterPersistOrDelete); overload;
     class procedure PersistObject(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete); overload;
-    class procedure PersistObject(const AIntfObj: IInterface; const ABlindLevel: Byte = BL_DEFAULT); overload;
+    class procedure PersistObject(const AIntfObj: IInterface; const AAuthContext: String = ''; const ABlindLevel: Byte = BL_DEFAULT); overload;
     class procedure _PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
-    class procedure _PersistObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
+    class procedure _PersistObjectInternal(const AObj: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
       const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence;
       const AMasterPropertyName, AMasterPropertyPath: String); static;
     // PersistCollection (accepting instance to persist directly)
-    class procedure PersistList(const [ref] AList: TObject; const ABlindLevel: Byte = BL_DEFAULT;
-      const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
+    class procedure PersistList(const [ref] AList: TObject; const AAuthContext: String = ''; const ABlindLevel: Byte = BL_DEFAULT; const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
+    class procedure PersistList(const [ref] AList: TObject; const AAuthContext: String; const AFree: TioFreeObjAfterPersistOrDelete); overload;
     class procedure PersistList(const [ref] AList: TObject; const AFree: TioFreeObjAfterPersistOrDelete); overload;
-    class procedure PersistList(const AListIntf: IInterface; const ABlindLevel: Byte = BL_DEFAULT); overload;
+    class procedure PersistList(const AListIntf: IInterface; const AAuthContext: String = ''; const ABlindLevel: Byte = BL_DEFAULT); overload;
     class procedure _PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
-    class procedure _PersistListInternal(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
+    class procedure _PersistListInternal(const AList: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
       const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence;
       const AMasterPropertyName, AMasterPropertyPath: String); static;
 
@@ -982,52 +986,62 @@ end;
 
 class procedure io._PersistObject(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 begin
-  _PersistObjectInternal(AObj, AIntent, ABlindLevel, '', 0, nil, '', '');
+  _PersistObjectInternal(AObj, String.Empty, AIntent, ABlindLevel, '', 0, nil, '', '');
 end;
 
-class procedure io._PersistObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
+class procedure io._PersistObjectInternal(const AObj: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
   const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence;
   const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LPSRequest: IioPersistenceStrategyRequest;
 begin
   // Build the persistence strategy request
-  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_PersistObject(AObj, AIntent, ABlindLevel, ARelationPropertyName, ARelationOID, AMasterBSPersistence,
-    AMasterPropertyName, AMasterPropertyPath);
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_PersistObject(AObj, AAuthContext, AIntent, ABlindLevel, ARelationPropertyName, ARelationOID,
+    AMasterBSPersistence, AMasterPropertyName, AMasterPropertyPath);
   // get the right persistence strategy and execute the request
   TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
 end;
 
+class procedure io.PersistList(const [ref] AList: TObject; const AAuthContext: String; const AFree: TioFreeObjAfterPersistOrDelete);
+begin
+  PersistList(AList, AAuthContext, BL_DEFAULT, AFree);
+end;
+
 class procedure io.PersistList(const [ref] AList: TObject; const AFree: TioFreeObjAfterPersistOrDelete);
 begin
-  PersistList(AList, BL_DEFAULT, AFree);
+  PersistList(AList, String.Empty, BL_DEFAULT, AFree);
 end;
 
-class procedure io.PersistObject(const AIntfObj: IInterface; const ABlindLevel: Byte);
+class procedure io.PersistObject(const AIntfObj: IInterface; const AAuthContext: String; const ABlindLevel: Byte);
 begin
-  _PersistObjectInternal(AIntfObj as TObject, itRegular, ABlindLevel, '', 0, nil, '', '');
+  _PersistObjectInternal(AIntfObj as TObject, AAuthContext, itRegular, ABlindLevel, '', 0, nil, '', '');
 end;
 
-class procedure io.PersistList(const [ref] AList: TObject; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete);
+class procedure io.PersistObject(const [ref] AObj: TObject; const AAuthContext: String; const AFree: TioFreeObjAfterPersistOrDelete);
 begin
-  _PersistListInternal(AList, itRegular, ABlindLevel, '', 0, nil, '', '');
+  PersistObject(AObj, AAuthContext, BL_DEFAULT, AFree);
+end;
+
+class procedure io.PersistList(const [ref] AList: TObject; const AAuthContext: String; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete);
+begin
+  _PersistListInternal(AList, AAuthContext, itRegular, ABlindLevel, '', 0, nil, '', '');
   _FreeObjAfterPersistOrDelete(AList, AFree);
 end;
 
-class procedure io.PersistObject(const [ref] AObj: TObject; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete);
+class procedure io.PersistObject(const [ref] AObj: TObject; const AAuthContext: String; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete);
 begin
-    _PersistObjectInternal(AObj, itRegular, ABlindLevel, '', 0, nil, '', '');
+    _PersistObjectInternal(AObj, AAuthContext, itRegular, ABlindLevel, '', 0, nil, '', '');
     _FreeObjAfterPersistOrDelete(AObj, AFree);
 end;
 
-class procedure io.PersistList(const AListIntf: IInterface; const ABlindLevel: Byte);
+class procedure io.PersistList(const AListIntf: IInterface; const AAuthContext: String; const ABlindLevel: Byte);
 begin
-  _PersistListInternal(AListIntf as TObject, itRegular, ABlindLevel, '', 0, nil, '', '');
+  _PersistListInternal(AListIntf as TObject, AAuthContext, itRegular, ABlindLevel, '', 0, nil, '', '');
 end;
 
 class procedure io.PersistObject(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete);
 begin
-  PersistObject(AObj, BL_DEFAULT, AFree);
+  PersistObject(AObj, String.Empty, BL_DEFAULT, AFree);
 end;
 
 class function io.RefTo(const AClassRef: TioClassRef; const ATypeAlias: String = ''): IioWhere;
@@ -1773,9 +1787,9 @@ begin
   Result := di.ResolveVM<T>(AParentCloseQueryAction, AVMAlias).Get;
 end;
 
-class procedure io.DeleteObject(const [ref] AObj: TObject; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete);
+class procedure io.DeleteObject(const [ref] AObj: TObject; const AAuthContext: String; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete);
 begin
-  _DeleteObjectInternal(AObj, itRegular, ABlindLevel);
+  _DeleteObjectInternal(AObj, AAuthContext, itRegular, ABlindLevel);
   _FreeObjAfterPersistOrDelete(AObj, AFree);
 end;
 
@@ -1794,17 +1808,22 @@ begin
   Result := TioGlobalVCProviderRegister.GetInstance.DefaultVCProvider;
 end;
 
-class procedure io.DeleteObject(const AIntfObj: IInterface; const ABlindLevel: Byte);
+class procedure io.DeleteObject(const AIntfObj: IInterface; const AAuthContext: String; const ABlindLevel: Byte);
 begin
-  _DeleteObjectInternal(AIntfObj as TObject, itRegular, ABlindLevel);
+  _DeleteObjectInternal(AIntfObj as TObject, AAuthContext, itRegular, ABlindLevel);
 end;
 
-class procedure io.Delete<T>(const AID: Integer);
+class procedure io.DeleteObject(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete);
 begin
-  Self.Delete<T>(String.Empty, AID);
+  DeleteObject(AObj, String.Empty, BL_DEFAULT, AFree);
 end;
 
-class procedure io.Delete<T>(const ATypeAlias: String; const AID: Integer);
+class procedure io.Delete<T>(const AID: Integer; const AAuthContext: String);
+begin
+  Self.Delete<T>(String.Empty, AID, AAuthContext);
+end;
+
+class procedure io.Delete<T>(const ATypeAlias: String; const AID: Integer; const AAuthContext: String);
 var
   LTypeName: String;
   LObj: TObject;
@@ -1814,37 +1833,42 @@ begin
   if TioUtilities.IsAnInterfaceTypeName(LTypeName) then
   begin
     Supports(Self.Load(LTypeName, ATypeAlias).ByID(AID).ToObject, IInterface, LIntf);
-    Self.DeleteObject(LIntf);
+    Self.DeleteObject(LIntf, AAuthContext);
   end
   else
   begin
     LObj := Self.Load(LTypeName, ATypeAlias).ByID(AID).ToObject;
     try
-      Self.DeleteObject(LObj);
+      Self.DeleteObject(LObj, AAuthContext);
     finally
       LObj.Free;
     end;
   end;
 end;
 
-class procedure io.DeleteList(const AListIntf: IInterface; const ABlindLevel: Byte);
+class procedure io.DeleteAll<T>(const AAuthContext: String);
 begin
-  _DeleteListInternal(AListIntf as TObject, itRegular, ABlindLevel)
+  Self.DeleteAll<T>(String.Empty, nil, AAuthContext);
 end;
 
-class procedure io.DeleteList(const [ref] AListObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete);
+class procedure io.DeleteList(const AListIntf: IInterface; const AAuthContext: String; const ABlindLevel: Byte);
 begin
-  DeleteList(AListObj, BL_DEFAULT, AFree);
+  _DeleteListInternal(AListIntf as TObject, AAuthContext, itRegular, ABlindLevel)
 end;
 
-class procedure io.DeleteObject(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete);
+class procedure io.DeleteList(const [ref] AListObj: TObject; const AAuthContext: String; const AFree: TioFreeObjAfterPersistOrDelete);
 begin
-  DeleteObject(AObj, BL_DEFAULT, AFree);
+  DeleteList(AListObj, AAuthContext, BL_DEFAULT, AFree);
 end;
 
-class procedure io.DeleteList(const [ref] AListObj: TObject; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete);
+class procedure io.DeleteObject(const [ref] AObj: TObject; const AAuthContext: String; const AFree: TioFreeObjAfterPersistOrDelete);
 begin
-  _DeleteListInternal(AListObj, itRegular, ABlindLevel);
+  DeleteObject(AObj, AAuthContext, BL_DEFAULT, AFree);
+end;
+
+class procedure io.DeleteList(const [ref] AListObj: TObject; const AAuthContext: String; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete);
+begin
+  _DeleteListInternal(AListObj, AAuthContext, itRegular, ABlindLevel);
   _FreeObjAfterPersistOrDelete(AListObj, AFree);
 end;
 
@@ -1955,22 +1979,22 @@ begin
   Result.TypeInfo := ATypeInfo;
 end;
 
-class procedure io._DeleteListInternal(const AListObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
+class procedure io._DeleteListInternal(const AListObj: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 var
   LPSRequest: IioPersistenceStrategyRequest;
 begin
   // Build the persistence strategy request
-  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_DeleteList(AListObj, AIntent, ABlindLevel);
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_DeleteList(AListObj, AAuthContext, AIntent, ABlindLevel);
   // get the right persistence strategy and execute the request
   TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
 end;
 
-class procedure io._DeleteObjectInternal(const AObj: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
+class procedure io._DeleteObjectInternal(const AObj: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 var
   LPSRequest: IioPersistenceStrategyRequest;
 begin
   // Build the persistence strategy request
-  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_DeleteObject(AObj, AIntent, ABlindLevel);
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_DeleteObject(AObj, AAuthContext, AIntent, ABlindLevel);
   // get the right persistence strategy and execute the request
   TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
 end;
@@ -1993,17 +2017,17 @@ end;
 
 class procedure io._PersistList(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte);
 begin
-  _PersistListInternal(AList, AIntent, ABlindLevel, '', 0, nil, '', '');
+  _PersistListInternal(AList, String.Empty, AIntent, ABlindLevel, '', 0, nil, '', '');
 end;
 
-class procedure io._PersistListInternal(const AList: TObject; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
+class procedure io._PersistListInternal(const AList: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
   const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence;
   const AMasterPropertyName, AMasterPropertyPath: String);
 var
   LPSRequest: IioPersistenceStrategyRequest;
 begin
   // Build the persistence strategy request
-  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_PersistList(AList, AIntent, ABlindLevel, ARelationPropertyName, ARelationOID, AMasterBSPersistence,
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_PersistList(AList, AAuthContext, AIntent, ABlindLevel, ARelationPropertyName, ARelationOID, AMasterBSPersistence,
     AMasterPropertyName, AMasterPropertyPath);
   // get the right persistence strategy and execute the request
   TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
@@ -2324,17 +2348,17 @@ begin
         .SetBindSource(AWhere).Show;
 end;
 
-class procedure io.DeleteAll<T>(const ATypeAlias: String);
+class procedure io.DeleteAll<T>(const ATypeAlias: String; const AAuthContext: String);
 begin
-  Self.DeleteAll<T>(ATypeAlias, nil);
+  Self.DeleteAll<T>(ATypeAlias, nil, AAuthContext);
 end;
 
-class procedure io.DeleteAll<T>(const AWhere: IioWhere);
+class procedure io.DeleteAll<T>(const AWhere: IioWhere; const AAuthContext: String = '');
 begin
-  Self.DeleteAll<T>(string.Empty, AWhere);
+  Self.DeleteAll<T>(string.Empty, AWhere, AAuthContext);
 end;
 
-class procedure io.DeleteAll<T>(const ATypeAlias: String; const AWhere: IioWhere);
+class procedure io.DeleteAll<T>(const ATypeAlias: String; const AWhere: IioWhere; const AAuthContext: String);
 var
   LList: TObject;
 begin
@@ -2343,10 +2367,15 @@ begin
   else
     LList := Self.Load<T>(ATypeAlias).Add(AWhere).ToGenericList.OfType<TObjectList<TObject>>;
   try
-    Self.DeleteList(LList);
+    Self.DeleteList(LList, AAuthContext);
   finally
     LList.Free;
   end;
+end;
+
+class procedure io.DeleteList(const [ref] AListObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete);
+begin
+  DeleteList(AListObj, String.Empty, BL_DEFAULT, AFree);
 end;
 
 class procedure io.Show(const AEntityTypeName: String; const AWhere: IioWhere; const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String);

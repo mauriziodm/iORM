@@ -574,7 +574,6 @@ class function TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(const 
 var
   LID: Integer;
   LDataObj: TObject;
-  LConflictResolved: Boolean;
 begin
   // Save into local variables to avoid multithread resource access inconsistency problems
   // TODO: Multithread - Accesso all'oggetto da eliminare non protetto in caso di Async = True
@@ -583,13 +582,17 @@ begin
   AActiveBindSourceAdapter.BSPersistenceDeleting := True; // Look at GetDeleteTerminateMethod below
   // Build the anonimous method
   Result := procedure
+    var
+      LAuthContext: String;
+      LConflictResolved: Boolean;
     begin
       if LID <> 0 then
       begin
         // Delete the DataObj and if a conflict exception is raised then invoke the BindSOurce onDeleteConflictException
         //  event handler (if the event handler is assigned)
         try
-          io.DeleteObject(LDataObj);
+          LAuthContext := AActiveBindSourceAdapter.GetBindSource._InternalGetAuthContext;
+          io._DeleteObjectInternal(LDataObj, LAuthContext, itRegular, BL_DEFAULT);
         except
           // Try to resolve the unresolved conflict (raise) invoking the BindSource.OnDeleteConflictException event handler if assigned
           on E: EioDeleteConflictException do
@@ -651,22 +654,27 @@ end;
 class function TioCommonBSAAnonymousMethodsFactory.GetPersistAllExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioAsyncProcExecuteMethod;
 begin
   Result := procedure
+    var
+      LAuthContext: String;
     begin
-      io.PersistList(AActiveBindSourceAdapter.DataObject, BL_DEFAULT);
+      LAuthContext := AActiveBindSourceAdapter.GetBindSource._InternalGetAuthContext;
+      io.PersistList(AActiveBindSourceAdapter.DataObject, LAuthContext, BL_DEFAULT);
     end;
 end;
 
 class function TioCommonBSAAnonymousMethodsFactory.GetPersistCurrentExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioAsyncProcExecuteMethod;
 var
-  LMasterBindSource: IioMasterBindSource;
   LDataObj: TObject;
-  LConflictResolved: Boolean;
 begin
   // Save into local variables to avoid multithread resource access inconsistency problems
   // TODO:  Multithread - Accesso all'oggetto da persistere non protetto in caso di Async = True
   LDataObj := AActiveBindSourceAdapter.Current;
   // Build the anonimous method
   Result := procedure
+    var
+      LAuthContext: String;
+      LConflictResolved: Boolean;
+      LMasterBindSource: IioMasterBindSource;
     begin
       // Continues only if there is a BindSource connected and it is a MasterBindSource
       if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioMasterBindSource, LMasterBindSource) then
@@ -677,7 +685,8 @@ begin
           //  event handler (if the event handler is assigned)
           // ----------------------------------------------------------------------------------------------------------------------------
           try
-            io._PersistObjectInternal(LDataObj, itRegular, BL_DEFAULT, '', 0, LMasterBindSource.Persistence, '', '');
+            LAuthContext := AActiveBindSourceAdapter.GetBindSource._InternalGetAuthContext;
+            io._PersistObjectInternal(LDataObj, LAuthContext, itRegular, BL_DEFAULT, '', 0, LMasterBindSource.Persistence, '', '');
           except
             // Try to resolve the unresolved conflict (raise) invoking the BindSource.OnDeleteConflictException/OnUpdateConflictException
             //  event handler if assigned

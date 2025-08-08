@@ -81,6 +81,9 @@ const
   BL_SYNCHRO_PERSIST_PAYLOAD_TOSERVER = 7; // BL_BIT_DETECT_OBJ_EXISTS + BL_BIT_AUTO_UPDATE_PROPS + BL_BIT_DETECT_CONFLICTS
   BL_NONE = 0;
 
+  // AuthContext constants
+  AUTHCONTEXT_ETM = 'ioETM';
+
 type
 
   // Pointer to TValue
