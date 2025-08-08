@@ -43,6 +43,7 @@ type
 
   TioLazyObject = class(TVirtualInterface, IioLazyLoadable)
   private
+    FAuthContext: String;
     FFirstTimeRefCountToZero: Boolean;
     FInternalObj: TObject;
     FRelationChildTypeName: String;
@@ -58,7 +59,7 @@ type
     constructor Create(PIID: PTypeInfo);
     destructor Destroy; override;
     procedure SetRelationInfo(const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationChildID: Integer;
-      const ARelationChildWhere: IioWhere);
+      const ARelationChildWhere: IioWhere; const AAuthContext: String);
     function GetInternalObject: TObject;
   end;
 
@@ -83,7 +84,7 @@ begin
   if not FRelationChildPropertyName.IsEmpty then
     FRelationChildWhere._PropertyEqualsTo(FRelationChildPropertyName, FRelationChildID);
   // Load the instance
-  FInternalObj := io.Load(FRelationChildTypeName, FRelationChildTypeAlias)._Where(FRelationChildWhere).ToObject;
+  FInternalObj := io.Load(FRelationChildTypeName, FRelationChildTypeAlias).AuthContext(FAuthContext)._Where(FRelationChildWhere).ToObject;
 end;
 
 destructor TioLazyObject.Destroy;
@@ -114,8 +115,9 @@ begin
 end;
 
 procedure TioLazyObject.SetRelationInfo(const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String;
-  const ARelationChildID: Integer; const ARelationChildWhere: IioWhere);
+  const ARelationChildID: Integer; const ARelationChildWhere: IioWhere; const AAuthContext: String);
 begin
+  FAuthContext := AAuthContext;
   FRelationChildTypeName := ARelationChildTypeName;
   FRelationChildTypeAlias := ARelationChildTypeAlias;
   FRelationChildPropertyName := ARelationChildPropertyName;

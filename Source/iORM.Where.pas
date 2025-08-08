@@ -55,6 +55,7 @@ type
   // Where conditions (standard version)
   TioWhere = class(TioSqlItem, IioWhere, IioWhereInternal)
   strict protected
+    FAuthContext: String;
     FTypeName, FTypeAlias: String;
     FIntent: TioPersistenceIntentType;
     FTypeInfo: PTypeInfo;
@@ -168,6 +169,9 @@ type
     function ToList(const AInterfacedListTypeName: String; const AAlias: String = ''; const AOwnsObjects: Boolean = True): TObject; overload;
     function ToList(const AListClassRef: TioClassRef; const AOwnsObjects: Boolean = True): TObject; overload;
     function ClearListBefore(const AClearListBefore: Boolean = True): IioWhere;
+
+    // Others
+    function AuthContext(const AAuthContext: String): IioWhere;
 
     function Count: Integer;
     function Exists: Boolean;
@@ -312,6 +316,8 @@ type
     function ToObject(const AObj: TObject = nil): T; reintroduce; overload;
     function ToList: TList<T>; overload;
     function ClearListBefore(const AClearListBefore: Boolean = True): IioWhere<T>;
+
+    function AuthContext(const AAuthContext: String): IioWhere<T>;
 
     // procedure Show(const AVVMAlias:String=''; const AForceTypeNameUse:Boolean=False); override;
 
@@ -700,6 +706,12 @@ begin
   FDetailsContainer.AddOrUpdate(AMasterPropertyName, AWhereCond);
 end;
 
+function TioWhere.AuthContext(const AAuthContext: String): IioWhere;
+begin
+  Result := Self;
+  FAuthContext := AAuthContext;
+end;
+
 function TioWhere.ByID(const AID: Integer): IioWhere;
 begin
   Result := Self;
@@ -740,6 +752,7 @@ end;
 constructor TioWhere.Create(const APreviousPSRequest: IioPersistenceStrategyRequest);
 begin
   TioApplication.CheckIfAbstractionLayerComponentExists;
+  FAuthContext := String.Empty;
   FMasterPSRequest := APreviousPSRequest;
   FIntent := itRegular;
   FDisableStrictlyTrueClass := False;
@@ -810,7 +823,7 @@ var
 begin
 // TODO: Lascio così che però salta l'ETM oppure lo cambio per fare in modo che prima carichi gli oggetti e poi fa il delete di quelli (già presente nela facciata "io.DeleteAll<T>" ma con generics, si potrebbe fare anche non generica)
   // Build the persistence strategy request
-  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_Delete(Self);
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_Delete(Self, FAuthContext);
   // get the right persistence strategy and execute the request
   TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
 end;
@@ -878,7 +891,7 @@ var
   LPSRequest: IioPersistenceStrategyRequest;
 begin
   // Build the persistence strategy request
-  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadCount(Self);
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadCount(Self, FAuthContext);
   // get the right persistence strategy and execute the request
   TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
   // extract the result
@@ -1081,7 +1094,7 @@ var
   LPSRequest: IioPersistenceStrategyRequest;
 begin
   // Build the persistence strategy request
-  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadMax(Self, APropertyName);
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadMax(Self, APropertyName, FAuthContext);
   // get the right persistence strategy and execute the request
   TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
   // extract the result
@@ -1093,7 +1106,7 @@ var
   LPSRequest: IioPersistenceStrategyRequest;
 begin
   // Build the persistence strategy request
-  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadMin(Self, APropertyName);
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadMin(Self, APropertyName, FAuthContext);
   // get the right persistence strategy and execute the request
   TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
   // extract the result
@@ -1200,7 +1213,7 @@ begin
   if FClearListBefore then
     TioUtilities.ClearList(AList);
   // Build the persistence strategy request
-  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadList(Self, AList, FIntent);
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadList(Self, AList, FAuthContext, FIntent);
   // get the right persistence strategy and execute the request
   TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
 end;
@@ -1240,7 +1253,7 @@ var
   LPSRequest: IioPersistenceStrategyRequest;
 begin
   // Build the persistence strategy request
-  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadDataSet(Self, AMemTable);
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadDataSet(Self, AMemTable, FAuthContext);
   // get the right persistence strategy and execute the request
   TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
 end;
@@ -1250,7 +1263,7 @@ var
   LPSRequest: IioPersistenceStrategyRequest;
 begin
   // Build the persistence strategy request
-  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadObject(Self, AObj, FIntent);
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadObject(Self, AObj, FAuthContext, FIntent);
   // get the right persistence strategy and execute the request
   TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
   // extract the obj result
@@ -1487,7 +1500,7 @@ end;
 
 function TioWhere.ToLazyObject(const AObj: TObject): TObject;
 begin
-  Result := TioLazyLoadFactory.LazyLoadObject(Self.TypeInfo, Self.TypeName, Self.TypeAlias, '', 0, Self) as TObject;
+  Result := TioLazyLoadFactory.LazyLoadObject(Self.TypeInfo, Self.TypeName, Self.TypeAlias, '', 0, Self, FAuthContext) as TObject;
 end;
 
 function TioWhere.ToLazyObject(const AIntf: IInterface): TObject;
@@ -1500,7 +1513,7 @@ var
   LPSRequest: IioPersistenceStrategyRequest;
 begin
   // Build the persistence strategy request
-  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadObjectByClassOnly(Self, AObj, AIntent);
+  LPSRequest := TioPersistenceStrategyFactory.NewPSRequest_LoadObjectByClassOnly(Self, AObj, FAuthContext, AIntent);
   // get the right persistence strategy and execute the request
   TioPersistenceStrategyFactory.GetStrategy_ByPSRequest(LPSRequest).Execute(LPSRequest);
   // extract the obj result
@@ -1636,6 +1649,12 @@ function TioWhere<T>.AddDetail(const AMasterPropertyName: String; const AWhereCo
 begin
   Result := Self;
   TioWhere(Self).AddDetail(AMasterPropertyName, AWhereCond);
+end;
+
+function TioWhere<T>.AuthContext(const AAuthContext: String): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self).AuthContext(AAuthContext);
 end;
 
 function TioWhere<T>.ByID(const AID: Integer): IioWhere<T>;

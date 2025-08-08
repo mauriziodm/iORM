@@ -84,6 +84,7 @@ begin
   LWhere := TioWhereFactory.NewWhere(AContext.PSRequest);
   LWhere.TypeName := AContext.GetTrueClass.GetClassName;
   LWhere.ByID(AQuery.GetValue(AContext.GetProperties.GetIdProperty, AContext).AsInteger)
+        .AuthContext(AContext.PSRequest.AuthContext)
         .SetDetailsContainer(AContext.Where.Details)  // Copy the details from the Where  of the Context
         .DisableStrictlyTrueClass
         .Cacheable;

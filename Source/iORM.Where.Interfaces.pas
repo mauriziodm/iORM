@@ -105,6 +105,8 @@ type
     function ToList(const AListClassRef:TioClassRef; const AOwnsObjects:Boolean=True): TObject; overload;
     function ClearListBefore(const AClearListBefore: Boolean = True): IioWhere;
 
+    function AuthContext(const AAuthContext: String): IioWhere;
+
     function Count: Integer;
     function Exists: Boolean;
     function IsEmpty: Boolean;
@@ -258,6 +260,7 @@ type
   // Where interface (generic version)
   IioWhere<T> = interface(IioWhere)
     ['{EB4137B9-D4F7-41EE-AD24-F3B12BA35CAC}']
+    function AuthContext(const AAuthContext: String): IioWhere<T>;
     // ------ Destination methods
     function ToLazyObject(const AObj:TObject=nil): T; overload;
     function ToObject(const AObj:TObject=nil): T; overload;

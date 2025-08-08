@@ -57,17 +57,17 @@ type
     // ---------- operation type specific persistence strategy request factories ----------
     class function NewPSRequest_ByJsonString(const AJsonString: String): IioPersistenceStrategyRequest;
     // delete
-    class function NewPSRequest_Delete(const AWhere: IioWhere): IioPersistenceStrategyRequest;
+    class function NewPSRequest_Delete(const AWhere: IioWhere; const AAuthContext: String): IioPersistenceStrategyRequest;
     class function NewPSRequest_DeleteList(const AListDTO: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
     class function NewPSRequest_DeleteObject(const ADTO: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte): IioPersistenceStrategyRequest;
     // load
-    class function NewPSRequest_LoadCount(const AWhere: IioWhere): IioPersistenceStrategyRequest;
-    class function NewPSRequest_LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet): IioPersistenceStrategyRequest;
-    class function NewPSRequest_LoadList(const AWhere: IioWhere; const AListDTO: TObject; const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
-    class function NewPSRequest_LoadMax(const AWhere: IioWhere; const APropertyName: String): IioPersistenceStrategyRequest;
-    class function NewPSRequest_LoadMin(const AWhere: IioWhere; const APropertyName: String): IioPersistenceStrategyRequest;
-    class function NewPSRequest_LoadObject(const AWhere: IioWhere; const ADTO: TObject; const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
-    class function NewPSRequest_LoadObjectByClassOnly(const AWhere: IioWhere; const ADTO: TObject; const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
+    class function NewPSRequest_LoadCount(const AWhere: IioWhere; const AAuthContext: String): IioPersistenceStrategyRequest;
+    class function NewPSRequest_LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet; const AAuthContext: String): IioPersistenceStrategyRequest;
+    class function NewPSRequest_LoadList(const AWhere: IioWhere; const AListDTO: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
+    class function NewPSRequest_LoadMax(const AWhere: IioWhere; const APropertyName, AAuthContext: String): IioPersistenceStrategyRequest;
+    class function NewPSRequest_LoadMin(const AWhere: IioWhere; const APropertyName, AAuthContext: String): IioPersistenceStrategyRequest;
+    class function NewPSRequest_LoadObject(const AWhere: IioWhere; const ADTO: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
+    class function NewPSRequest_LoadObjectByClassOnly(const AWhere: IioWhere; const ADTO: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
     // TODO: Da eliminare?
     class function NewPSRequest_LoadObjVersion(const AContext: IioContext): IioPersistenceStrategyRequest;
     // persist
@@ -145,16 +145,18 @@ begin
   Result := TioPersistenceStrategyRequest.CreateByJSONString(AJsonString);
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_LoadCount(const AWhere: IioWhere): IioPersistenceStrategyRequest;
+class function TioPersistenceStrategyFactory.NewPSRequest_LoadCount(const AWhere: IioWhere; const AAuthContext: String): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(psmLoadCount, True);
+  Result.AuthContext := AAuthContext;
   Result.Where := AWhere;
   Result.Where.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_Delete(const AWhere: IioWhere): IioPersistenceStrategyRequest;
+class function TioPersistenceStrategyFactory.NewPSRequest_Delete(const AWhere: IioWhere; const AAuthContext: String): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(psmDelete, True);
+  Result.AuthContext := AAuthContext;
   Result.Where := AWhere;
   Result.Where.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
@@ -193,16 +195,17 @@ begin
   Result.Obj1_Serialize := True;
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet): IioPersistenceStrategyRequest;
+class function TioPersistenceStrategyFactory.NewPSRequest_LoadDataSet(const AWhere: IioWhere; const ADestDataSet: TFDDataSet; const AAuthContext: String): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(psmLoadDataSet, True);
+  Result.AuthContext := AAuthContext;
   Result.Obj1 := ADestDataSet;
   Result.Obj1_Serialize := False;
   Result.Where := AWhere;
   Result.Where.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_LoadList(const AWhere: IioWhere; const AListDTO: TObject;
+class function TioPersistenceStrategyFactory.NewPSRequest_LoadList(const AWhere: IioWhere; const AListDTO: TObject; const AAuthContext: String;
   const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
 begin
   if AWhere.HasMasterPSRequest then
@@ -212,6 +215,7 @@ begin
   end
   else
     Result := _NewPSRequest(psmLoadList, True);
+  Result.AuthContext := AAuthContext;
   Result.Intent := AIntent;
   Result.ListDTO := AListDTO;
   Result.ListDTO_Serialize := False;
@@ -219,7 +223,7 @@ begin
   Result.Where.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_LoadObject(const AWhere: IioWhere; const ADTO: TObject;
+class function TioPersistenceStrategyFactory.NewPSRequest_LoadObject(const AWhere: IioWhere; const ADTO: TObject; const AAuthContext: String;
   const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
 begin
   if AWhere.HasMasterPSRequest then
@@ -229,14 +233,15 @@ begin
   end
   else
     Result := _NewPSRequest(psmLoadObject, True);
-  Result.Intent := AIntent;
+  Result.AuthContext := AAuthContext;
   Result.DTO := ADTO;
   Result.DTO_Serialize := True;
+  Result.Intent := AIntent;
   Result.Where := AWhere;
   Result.Where.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_LoadObjectByClassOnly(const AWhere: IioWhere; const ADTO: TObject;
+class function TioPersistenceStrategyFactory.NewPSRequest_LoadObjectByClassOnly(const AWhere: IioWhere; const ADTO: TObject; const AAuthContext: String;
   const AIntent: TioPersistenceIntentType): IioPersistenceStrategyRequest;
 begin
   if AWhere.HasMasterPSRequest then
@@ -246,6 +251,7 @@ begin
   end
   else
     Result := _NewPSRequest(psmLoadObjectByClassOnly, True);
+  Result.AuthContext := AAuthContext;
   Result.Intent := AIntent;
   Result.DTO := ADTO;
   Result.DTO_Serialize := False;
@@ -260,17 +266,19 @@ begin
   Result.Intf1_Serialize := True;
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_LoadMax(const AWhere: IioWhere; const APropertyName: String): IioPersistenceStrategyRequest;
+class function TioPersistenceStrategyFactory.NewPSRequest_LoadMax(const AWhere: IioWhere; const APropertyName, AAUthContext: String): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(psmLoadMax, True);
+  Result.AuthContext := AAuthContext;
   Result.PropName := APropertyName;
   Result.Where := AWhere;
   Result.Where.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)
 end;
 
-class function TioPersistenceStrategyFactory.NewPSRequest_LoadMin(const AWhere: IioWhere; const APropertyName: String): IioPersistenceStrategyRequest;
+class function TioPersistenceStrategyFactory.NewPSRequest_LoadMin(const AWhere: IioWhere; const APropertyName, AAuthContext: String): IioPersistenceStrategyRequest;
 begin
   Result := _NewPSRequest(psmLoadMin, True);
+  Result.AuthContext := AAuthContext;
   Result.PropName := APropertyName;
   Result.Where := AWhere;
   Result.Where.FillETM_Sql; // Per risolvere problema con HttpCOnnection (vedi dichiaraione classe TioWHERE, campi ETMFor...)

@@ -42,7 +42,8 @@ type
 
   TioLazyLoadFactory = class
   public
-    class function LazyLoadObject(const ATypeInfo:PTypeInfo; const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName:String; const ARelationChildID:Integer; const ARelationChildWhere:IioWhere): TObject;
+    class function LazyLoadObject(const ATypeInfo:PTypeInfo; const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName:String;
+      const ARelationChildID:Integer; const ARelationChildWhere:IioWhere; const AAuthContext: String): TObject;
   end;
 
 implementation
@@ -53,14 +54,13 @@ uses
 { TioLazyLoadFactory }
 
 class function TioLazyLoadFactory.LazyLoadObject(const ATypeInfo:PTypeInfo; const ARelationChildTypeName,
-  ARelationChildTypeAlias, ARelationChildPropertyName: String;
-  const ARelationChildID: Integer;
-  const ARelationChildWhere: IioWhere): TObject;
+  ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationChildID: Integer; const ARelationChildWhere: IioWhere;
+  const AAuthContext: String): TObject;
 var
   LLazyLadable: IioLazyLoadable;
 begin
   LLazyLadable := TioLazyObject.Create(ATypeInfo);
-  LLazyLadable.SetRelationInfo(ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationChildID, ARelationChildWhere);
+  LLazyLadable.SetRelationInfo(ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationChildID, ARelationChildWhere, AAuthContext);
   // Ritorno il risultato come TObject e questo farebbe si che verrebbe distrutto se non avessi
   //  alterato artificiosamente la gestione del RefCount. In pratica l'override del metodo _Release
   //  fa si che la prima volta che il RefCount diventa zero questo venga ignorato (il comportamento

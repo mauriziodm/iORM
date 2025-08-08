@@ -42,7 +42,8 @@ type
 
   IioLazyLoadable = interface
     ['{3DB9E89C-2010-400A-8EA8-89D12C98218B}']
-    procedure SetRelationInfo(const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName:String; const ARelationChildID:Integer; const ARelationChildWhere:IioWhere);
+    procedure SetRelationInfo(const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName:String; const ARelationChildID:Integer;
+      const ARelationChildWhere:IioWhere; const AAuthContext: String);
     function GetInternalObject: TObject;
   end;
 
