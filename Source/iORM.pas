@@ -522,14 +522,18 @@ type
     // DeleteObject (accepting instance to delete directly)
     class procedure DeleteObject(const [ref] AObj: TObject; const AAuthContext: String = ''; const ABlindLevel: Byte = BL_DEFAULT; const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
     class procedure DeleteObject(const [ref] AObj: TObject; const AAuthContext: String; const AFree: TioFreeObjAfterPersistOrDelete); overload;
+    class procedure DeleteObject(const [ref] AObj: TObject; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
     class procedure DeleteObject(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete); overload;
     class procedure DeleteObject(const AIntfObj: IInterface; const AAuthContext: String = ''; const ABlindLevel: Byte = BL_DEFAULT); overload;
+    class procedure DeleteObject(const AIntfObj: IInterface; const ABlindLevel: Byte); overload;
     class procedure _DeleteObjectInternal(const AObj: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
     // DeleteList (accepting instance to delete directly)
     class procedure DeleteList(const [ref] AListObj: TObject; const AAuthContext: String = ''; const ABlindLevel: Byte = BL_DEFAULT; const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
     class procedure DeleteList(const [ref] AListObj: TObject; const AAuthContext: String; const AFree: TioFreeObjAfterPersistOrDelete); overload;
+    class procedure DeleteList(const [ref] AListObj: TObject; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
     class procedure DeleteList(const [ref] AListObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete); overload;
     class procedure DeleteList(const AListIntf: IInterface; const AAuthContext: String = ''; const ABlindLevel: Byte = BL_DEFAULT); overload;
+    class procedure DeleteList(const AListIntf: IInterface; const ABlindLevel: Byte); overload;
     class procedure _DeleteListInternal(const AListObj: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
     // Delete (accepting generic type to delete and ciriteria)
     // NB: I metodi Delete qui sotto prima caricano gli oggetti vivi e poi li eliminano in modo che funzioni anche ETM e ConflictStrategy
@@ -579,8 +583,10 @@ type
     // PersistObject (accepting instance to persist directly)
     class procedure PersistObject(const [ref] AObj: TObject; const AAuthContext: String = ''; const ABlindLevel: Byte = BL_DEFAULT; const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
     class procedure PersistObject(const [ref] AObj: TObject; const AAuthContext: String; const AFree: TioFreeObjAfterPersistOrDelete); overload;
+    class procedure PersistObject(const [ref] AObj: TObject; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
     class procedure PersistObject(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete); overload;
     class procedure PersistObject(const AIntfObj: IInterface; const AAuthContext: String = ''; const ABlindLevel: Byte = BL_DEFAULT); overload;
+    class procedure PersistObject(const AIntfObj: IInterface; const ABlindLevel: Byte); overload;
     class procedure _PersistObject(const AObj: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
     class procedure _PersistObjectInternal(const AObj: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte;
       const ARelationPropertyName: String; const ARelationOID: Integer; const AMasterBSPersistence: TioBSPersistence;
@@ -588,6 +594,7 @@ type
     // PersistCollection (accepting instance to persist directly)
     class procedure PersistList(const [ref] AList: TObject; const AAuthContext: String = ''; const ABlindLevel: Byte = BL_DEFAULT; const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
     class procedure PersistList(const [ref] AList: TObject; const AAuthContext: String; const AFree: TioFreeObjAfterPersistOrDelete); overload;
+    class procedure PersistList(const [ref] AList: TObject; const ABlindLevel: Byte = BL_DEFAULT; const AFree: TioFreeObjAfterPersistOrDelete = foKeepAlive); overload;
     class procedure PersistList(const [ref] AList: TObject; const AFree: TioFreeObjAfterPersistOrDelete); overload;
     class procedure PersistList(const AListIntf: IInterface; const AAuthContext: String = ''; const ABlindLevel: Byte = BL_DEFAULT); overload;
     class procedure _PersistList(const AList: TObject; const AAuthContext: String; const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte); static;
@@ -1037,6 +1044,16 @@ end;
 class procedure io.PersistList(const AListIntf: IInterface; const AAuthContext: String; const ABlindLevel: Byte);
 begin
   _PersistListInternal(AListIntf as TObject, AAuthContext, itRegular, ABlindLevel, '', 0, nil, '', '');
+end;
+
+class procedure io.PersistList(const [ref] AList: TObject; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete);
+begin
+  PersistList(AList, String.Empty, ABlindLevel, AFree);
+end;
+
+class procedure io.PersistObject(const [ref] AObj: TObject; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete);
+begin
+  PersistObject(AObj, String.Empty, ABlindLevel, AFree);
 end;
 
 class procedure io.PersistObject(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete);
@@ -1813,6 +1830,11 @@ begin
   _DeleteObjectInternal(AIntfObj as TObject, AAuthContext, itRegular, ABlindLevel);
 end;
 
+class procedure io.DeleteObject(const [ref] AObj: TObject; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete);
+begin
+  DeleteObject(AObj, String.Empty, ABlindLevel, AFree);
+end;
+
 class procedure io.DeleteObject(const [ref] AObj: TObject; const AFree: TioFreeObjAfterPersistOrDelete);
 begin
   DeleteObject(AObj, String.Empty, BL_DEFAULT, AFree);
@@ -1854,6 +1876,11 @@ end;
 class procedure io.DeleteList(const AListIntf: IInterface; const AAuthContext: String; const ABlindLevel: Byte);
 begin
   _DeleteListInternal(AListIntf as TObject, AAuthContext, itRegular, ABlindLevel)
+end;
+
+class procedure io.DeleteList(const [ref] AListObj: TObject; const ABlindLevel: Byte; const AFree: TioFreeObjAfterPersistOrDelete);
+begin
+  DeleteList(AListObj, String.Empty, ABlindLevel, AFree);
 end;
 
 class procedure io.DeleteList(const [ref] AListObj: TObject; const AAuthContext: String; const AFree: TioFreeObjAfterPersistOrDelete);
@@ -2528,6 +2555,21 @@ begin
     else
       di.ResolveViewVMfor(AEntityTypeName, AParentCloseQueryAction, AVVMAlias).SetViewContext(AViewContext).SetBindSourceAsETMfor(ASelectionTargetBS)
         .SetBindSource(AWhere).Show;
+end;
+
+class procedure io.PersistObject(const AIntfObj: IInterface; const ABlindLevel: Byte);
+begin
+  _PersistObjectInternal(AIntfObj as TObject, String.Empty, itRegular, ABlindLevel, '', 0, nil, '', '');
+end;
+
+class procedure io.DeleteObject(const AIntfObj: IInterface; const ABlindLevel: Byte);
+begin
+  _DeleteObjectInternal(AIntfObj as TObject, String.Empty, itRegular, ABlindLevel);
+end;
+
+class procedure io.DeleteList(const AListIntf: IInterface; const ABlindLevel: Byte);
+begin
+  _DeleteListInternal(AListIntf as TObject, String.Empty, itRegular, ABlindLevel)
 end;
 
 initialization
