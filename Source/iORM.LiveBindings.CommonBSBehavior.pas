@@ -354,8 +354,6 @@ class procedure TioCommonBSBehavior.Select<T>(const ASender: TObject; const ATar
 var
   LDestBSA: IioActiveBindSourceAdapter;
   LValue: TValue;
-
-  LFirstMasterPersistenceBS: IioBindSource;
 begin
   // Check if TargetBS is assigned
   if not Assigned(ATargetBS) then
@@ -386,7 +384,7 @@ begin
   // Encapsulate the SelectedInstance into a TValue then assign it
   // as selection in a proper way
   // NB: Lasciare assolutamente così perchè ho già provato in vari modi ma mi dava sempre un errore
-  // facendo cos' invece (cioè passando per un TValue) funziona correttamente.
+  // facendo così invece (cioè passando per un TValue) funziona correttamente.
   LValue := TValue.From<T>(ASelected);
   if LValue.Kind = TTypeKind.tkInterface then
     LDestBSA.ReceiveSelection(LValue.AsInterface, ASelectionType)
