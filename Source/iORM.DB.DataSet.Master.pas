@@ -133,12 +133,12 @@ type
     property SourceBS: IioBindSource read GetSourceBS write SetSourceBS;
     property WhereBuilderFor: IioMasterBindSource read GetWhereBuilderFor write SetWhereBuilderFor;
     // Published Events: selectors
-    property BeforeSelectionObject;
-    property OnSelectionObject;
-    property AfterSelectionObject;
-    property BeforeSelectionInterface;
-    property OnSelectionInterface;
-    property AfterSelectionInterface;
+//    property BeforeReceiveSelectionObject; INUTILE
+    property OnReceiveSelectionObject;
+    property AfterReceiveSelectionObject;
+//    property BeforeReceiveSelectionInterface; INUTILE
+    property OnReceiveSelectionInterface;
+    property AfterReceiveSelectionInterface;
     property OnReceiveSelectionCloneObject;
     property OnReceiveSelectionFreeObject;
     // Published events

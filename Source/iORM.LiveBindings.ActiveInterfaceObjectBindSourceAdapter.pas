@@ -130,9 +130,9 @@ type
     procedure DoAfterPostFields(AFields: TArray<TBindSourceAdapterField>); override;
     procedure DoAfterDelete; override;
     procedure DoAfterScroll; override;
-    procedure DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
-    procedure DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
-    procedure DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
+    procedure DoBeforeReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
+    procedure DoReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
+    procedure DoAfterReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
     procedure SetObjStatus(AObjStatus: TioObjStatus);
     function UseObjStatus: Boolean;
     // Generic parameter must be <IInterface> (for interfaced list such as IioList<IInterface>) or
@@ -290,10 +290,10 @@ begin
   TioCommonBSAPersistence.AfterScroll(Self);
 end;
 
-procedure TioActiveInterfaceObjectBindSourceAdapter.DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
+procedure TioActiveInterfaceObjectBindSourceAdapter.DoAfterReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FBindSource) then
-    FBindSource.DoAfterSelection(ASelected, ASelectionType);
+    FBindSource.DoAfterReceiveSelection(ASelected, ASelectionType);
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.DoBeforeDelete;
@@ -345,16 +345,16 @@ begin
     TioCommonBSAPersistence.Reload(Self);
 end;
 
-procedure TioActiveInterfaceObjectBindSourceAdapter.DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
+procedure TioActiveInterfaceObjectBindSourceAdapter.DoBeforeReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FBindSource) then
-    FBindSource.DoBeforeSelection(ASelected, ASelectionType);
+    FBindSource.DoBeforeReceiveSelection(ASelected, ASelectionType);
 end;
 
-procedure TioActiveInterfaceObjectBindSourceAdapter.DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
+procedure TioActiveInterfaceObjectBindSourceAdapter.DoReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
 begin
   if Assigned(FBindSource) then
-    FBindSource.DoSelection(ASelected, ASelectionType, ADone);
+    FBindSource.DoReceiveSelection(ASelected, ASelectionType, ADone);
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.ExtractDetailObject(AMasterObj: TObject);
@@ -654,11 +654,11 @@ begin
   //  useful in an interface bindsource adapter
 
   // Do the selection
-  DoBeforeSelection(ASelected, ASelectionType);
-  DoSelection(ASelected, ASelectionType, LDone);
+  DoBeforeReceiveSelection(ASelected, ASelectionType);
+  DoReceiveSelection(ASelected, ASelectionType, LDone);
   if not LDone then
     SetDataObject(ASelected);
-  DoAfterSelection(ASelected, ASelectionType);
+  DoAfterReceiveSelection(ASelected, ASelectionType);
 
   // NB: OnReceiveSelectionFreeObject property of the BindSource is not
   //  useful in an interface bindsource adapter

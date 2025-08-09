@@ -45,11 +45,11 @@ uses
 type
 
   // Events handler types
-  TioBSABeforeAfterSelectionObjectEvent = procedure(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType) of object;
-  TioBSASelectionObjectEvent = procedure(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean) of object;
+  TioBSABeforeAfterReceiveSelectionObjectEvent = procedure(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType) of object;
+  TioBSAReceiveSelectionObjectEvent = procedure(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean) of object;
 
-  TioBSABeforeAfterSelectionInterfaceEvent = procedure(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType) of object;
-  TioBSASelectionInterfaceEvent = procedure(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean) of object;
+  TioBSABeforeAfterReceiveSelectionInterfaceEvent = procedure(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType) of object;
+  TioBSAReceiveSelectionInterfaceEvent = procedure(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean) of object;
 
   TioBSOnPersistenceConflictExceptionEvent = procedure(const ASender, ADataObject: TObject; var AConflictResolved: Boolean) of object;
 
@@ -124,13 +124,13 @@ type
     // ETMfor
     procedure _InternalSetETMforPrivateField(const AETMFor: IioBindSource); // To avoid hint
     // Selectors related event for TObject selection
-    procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
-    procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
-    procedure DoAfterSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
+    procedure DoBeforeReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
+    procedure DoReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
+    procedure DoAfterReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     // Selectors related event for IInterface selection
-    procedure DoBeforeSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
-    procedure DoSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
-    procedure DoAfterSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
+    procedure DoBeforeReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
+    procedure DoReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
+    procedure DoAfterReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
     // Selector related properties
     procedure SetOnReceiveSelectionCloneObject(const Value: Boolean);
     function GetOnReceiveSelectionCloneObject: Boolean;

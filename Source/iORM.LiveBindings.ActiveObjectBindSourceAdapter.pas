@@ -138,9 +138,9 @@ type
     procedure DoAfterPostFields(AFields: TArray<TBindSourceAdapterField>); override;
     procedure DoAfterDelete; override;
     procedure DoAfterScroll; override;
-    procedure DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
-    procedure DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
-    procedure DoAfterSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
+    procedure DoBeforeReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
+    procedure DoReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
+    procedure DoAfterReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
     procedure SetObjStatus(AObjStatus: TioObjStatus);
     function UseObjStatus: Boolean;
     function GetBaseObjectClassName: String;
@@ -321,10 +321,10 @@ begin
   TioCommonBSAPersistence.AfterScroll(Self);
 end;
 
-procedure TioActiveObjectBindSourceAdapter.DoAfterSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
+procedure TioActiveObjectBindSourceAdapter.DoAfterReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FBindSource) then
-    FBindSource.DoAfterSelection(ASelected, ASelectionType);
+    FBindSource.DoAfterReceiveSelection(ASelected, ASelectionType);
 end;
 
 procedure TioActiveObjectBindSourceAdapter.DoBeforeDelete;
@@ -363,16 +363,16 @@ begin
   end;
 end;
 
-procedure TioActiveObjectBindSourceAdapter.DoBeforeSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
+procedure TioActiveObjectBindSourceAdapter.DoBeforeReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
 begin
   if Assigned(FBindSource) then
-    FBindSource.DoBeforeSelection(ASelected, ASelectionType);
+    FBindSource.DoBeforeReceiveSelection(ASelected, ASelectionType);
 end;
 
-procedure TioActiveObjectBindSourceAdapter.DoSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
+procedure TioActiveObjectBindSourceAdapter.DoReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
 begin
   if Assigned(FBindSource) then
-    FBindSource.DoSelection(ASelected, ASelectionType, ADone);
+    FBindSource.DoReceiveSelection(ASelected, ASelectionType, ADone);
 end;
 
 procedure TioActiveObjectBindSourceAdapter.ExtractDetailObject(AMasterObj: TObject);
@@ -675,11 +675,11 @@ begin
     ASelected := TioUtilities.CloneObject(ASelected);
 
   // Do the selection
-  DoBeforeSelection(ASelected, ASelectionType);
-  DoSelection(ASelected, ASelectionType, LDone);
+  DoBeforeReceiveSelection(ASelected, ASelectionType);
+  DoReceiveSelection(ASelected, ASelectionType, LDone);
   if not LDone then
     SetDataObject(ASelected);
-  DoAfterSelection(ASelected, ASelectionType);
+  DoAfterReceiveSelection(ASelected, ASelectionType);
 
   // Free the previous current object if OnReceiveSelectionFreeObject property
   // of the BindSource is True

@@ -354,6 +354,8 @@ class procedure TioCommonBSBehavior.Select<T>(const ASender: TObject; const ATar
 var
   LDestBSA: IioActiveBindSourceAdapter;
   LValue: TValue;
+
+  LFirstMasterPersistenceBS: IioBindSource;
 begin
   // Check if TargetBS is assigned
   if not Assigned(ATargetBS) then
@@ -373,6 +375,31 @@ begin
       Format('You have tried to make a selection by invoking the "SelectCurrent" method of component "%s" but the target component of the selection ("%s") is not active.'
       + #13#13'iORM cannot forward the selection.'#13#13'Please make sure that the target component of the selection is active as well and try again.',
       [(ASender as TComponent).Name, ATargetBS.GetName]));
+
+
+
+
+
+
+Abort;
+// -----------------------------------------------------------------------------------------------
+  LFirstMasterPersistenceBS := ATargetBS.FirstMasterPersistenceBindSource;
+
+  // Relazione HasMany/One o BelongsTo?
+
+  // HasMany/One: TypeName of the adding DetailObj; ActionType of the MasterObj (ID = 0 from the MasterBS)
+
+  // BelongsTO: TypeName of the MasterObj (from the MasterBS); ActionType of the MasterObj (ID = 0 from the MasterBS)
+
+
+
+  TioApplication.ProvideAuthDecisionUI(GetActiveBindSourceAdapter.TypeName, atInsert, itRegular, (Self as IioBindSource)._InternalGetAuthContext, False);
+// -----------------------------------------------------------------------------------------------
+
+
+
+
+
   // Get the selection destination BindSourceAdapter
   LDestBSA := ATargetBS.GetActiveBindSourceAdapter;
   // If the selection is allowed then send a ntSaveRevertPoint notification

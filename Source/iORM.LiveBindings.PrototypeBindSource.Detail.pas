@@ -54,12 +54,12 @@ type
     // Published properties: selectors
     property SelectorFor;
     // Published Events: selectors
-    property BeforeSelectionObject;
-    property OnSelectionObject;
-    property AfterSelectionObject;
-    property BeforeSelectionInterface;
-    property OnSelectionInterface;
-    property AfterSelectionInterface;
+//    property BeforeReceiveSelectionObject; INUTILE
+    property OnReceiveSelectionObject;
+    property AfterReceiveSelectionObject;
+//    property BeforeReceiveSelectionInterface; INUTILE
+    property OnReceiveSelectionInterface;
+    property AfterReceiveSelectionInterface;
     // Published properties: selectors
     property OnReceiveSelectionCloneObject;
     property OnReceiveSelectionFreeObject;
