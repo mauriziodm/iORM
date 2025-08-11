@@ -96,14 +96,16 @@ type
     ['{02E419C2-347C-412D-B7B3-F264EFB92B94}']
     function IsAuthorized: Boolean;
     // AuthContext
+    procedure SetAuthContext(const Value: String);
     function GetAuthContext: String;
-    property AuthContext: String read GetAuthContext;
+    property AuthContext: String read GetAuthContext write SetAuthContext;
     // AccessToken
     function GetToken: String;
     property Token: String read GetToken;
     // ActionType
+    procedure SetActionType(const Value: TioPersistenceActionType);
     function GetActionType: TioPersistenceActionType;
-    property ActionType: TioPersistenceActionType read GetActionType;
+    property ActionType: TioPersistenceActionType read GetActionType write SetActionType;
     // ForceAuthDecision
     function GetForceAuthDecision: Boolean;
     property ForceAuthDecision: Boolean read GetForceAuthDecision;
@@ -111,8 +113,9 @@ type
     function GetIntent: TioPersistenceIntentType;
     property Intent: TioPersistenceIntentType read GetIntent;
     // TypeName
+    procedure SetTypeName(const Value: String);
     function GetTypeName: String;
-    property TypeName: String read GetTypeName;
+    property TypeName: String read GetTypeName write SetTypeName;
   end;
 
 implementation

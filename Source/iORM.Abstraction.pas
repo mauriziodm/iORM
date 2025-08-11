@@ -143,8 +143,8 @@ type
     // Access-token related methods
     class procedure SetAuthMethods(const AAuthTokenProviderMethod: TioAuthTokenProviderMethod; const AAuthDecisionMethod: TioAuthDecisionMethod); static;
     class function ProvideAuthToken: String; static;
-    class function ProvideAuthDecisionCRUD(const AAuthDecisionRequest: IioAuthDecisionRequest): Boolean; static; inline;
-    class function ProvideAuthDecisionUI(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType; const AAuthContext: String; const AForceAuthDecision: Boolean): Boolean; static;
+    class function AuthorizeByRequestObj(const AAuthDecisionRequest: IioAuthDecisionRequest): Boolean; static; inline;
+    class function AuthorizeByRequestParams(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType; const AAuthContext: String; const AForceAuthDecision: Boolean): Boolean; static;
   end;
 
   TioControlRef = class of TioControl;
@@ -432,14 +432,14 @@ begin
   Result := _GetConcreteClass_NoDirectCall._Terminate;
 end;
 
-class function TioApplication.ProvideAuthDecisionCRUD(const AAuthDecisionRequest: IioAuthDecisionRequest): Boolean;
+class function TioApplication.AuthorizeByRequestObj(const AAuthDecisionRequest: IioAuthDecisionRequest): Boolean;
 begin
   Result := AAuthDecisionRequest.IsAuthorized;
 end;
 
-class function TioApplication.ProvideAuthDecisionUI(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType; const AAuthContext: String; const AForceAuthDecision: Boolean): Boolean;
+class function TioApplication.AuthorizeByRequestParams(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType; const AAuthContext: String; const AForceAuthDecision: Boolean): Boolean;
 begin
-  Result :=  TioAuthFactory.NewDecisionRequestUI(ATypeName, AActionType, AIntent, AAuthContext, AForceAuthDecision).IsAuthorized;
+  Result :=  TioAuthFactory.NewAuthDecisionRequest(ATypeName, AActionType, AIntent, AAuthContext, AForceAuthDecision).IsAuthorized;
 end;
 
 { TioAction }

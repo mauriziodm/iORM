@@ -59,10 +59,10 @@ type
     property OnReceiveSelectionCloneObject;
     property OnReceiveSelectionFreeObject;
     // Published Events: selectors
-//    property BeforeReceiveSelectionObject; INUTILE
+    property BeforeReceiveSelectionObject;
     property OnReceiveSelectionObject;
     property AfterReceiveSelectionObject;
-//    property BeforeReceiveSelectionInterface; INUTILE
+    property BeforeReceiveSelectionInterface;
     property OnReceiveSelectionInterface;
     property AfterReceiveSelectionInterface;
     // Published events

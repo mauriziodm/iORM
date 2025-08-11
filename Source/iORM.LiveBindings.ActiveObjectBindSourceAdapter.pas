@@ -138,7 +138,6 @@ type
     procedure DoAfterPostFields(AFields: TArray<TBindSourceAdapterField>); override;
     procedure DoAfterDelete; override;
     procedure DoAfterScroll; override;
-    procedure DoBeforeReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
     procedure DoReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
     procedure DoAfterReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
     procedure SetObjStatus(AObjStatus: TioObjStatus);
@@ -361,12 +360,6 @@ begin
     ltAuto:
       TioCommonBSAPersistence.Load(Self);
   end;
-end;
-
-procedure TioActiveObjectBindSourceAdapter.DoBeforeReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
-begin
-  if Assigned(FBindSource) then
-    FBindSource.DoBeforeReceiveSelection(ASelected, ASelectionType);
 end;
 
 procedure TioActiveObjectBindSourceAdapter.DoReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
@@ -675,7 +668,7 @@ begin
     ASelected := TioUtilities.CloneObject(ASelected);
 
   // Do the selection
-  DoBeforeReceiveSelection(ASelected, ASelectionType);
+//  DoBeforeReceiveSelection(ASelected, ASelectionType); Spostato in TioCommonBSBehavior.Select<T>
   DoReceiveSelection(ASelected, ASelectionType, LDone);
   if not LDone then
     SetDataObject(ASelected);

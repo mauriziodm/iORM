@@ -166,7 +166,7 @@ type
 
   // Persistence related types
   // Note: Literal description for values added at the end of the "iORM.pas" unit (initialization)
-  TioPersistenceActionType = (atUndefined, atSelect, atInsert, atUpdate, atDelete);
+  TioPersistenceActionType = (atDoNotPersist, atSelect, atInsert, atUpdate, atDelete, atMakeSelection);
   TioPersistenceIntentType = (itRegular, itETM_Revert, itSynchro_PersistToServer, itSynchro_PersistToClient);
   TioPersistenceConflictState = (csUndefined, csResolved, csRejected, csRejectedRaise);
   TioFreeObjAfterPersistOrDelete = (foKeepAlive, foFree, foFreeAndNil);

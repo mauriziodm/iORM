@@ -171,12 +171,13 @@ const
   rtEmbeddedHasMany = iORM.Attributes.rtEmbeddedHasMany;
   rtEmbeddedHasOne = iORM.Attributes.rtEmbeddedHasOne;
 
-  // TioPersistenceActionType = (atDoNotPersist, atInsert, atUpdate, atDelete);
-  atDoNotPersist = iORM.CommonTypes.atUndefined;
+  // TioPersistenceActionType = (atDoNotPersist, atInsert, atUpdate, atDelete, atMakeSelection);
+  atDoNotPersist = iORM.CommonTypes.atDoNotPersist;
   atSelect = iORM.CommonTypes.atSelect;
   atInsert = iORM.CommonTypes.atInsert;
   atUpdate = iORM.CommonTypes.atUpdate;
   atDelete = iORM.CommonTypes.atDelete;
+  atMakeSelection = iORM.CommonTypes.atMakeSelection;
   // TioPersistenceIntentType = (itRegular, itRevert, itSynchronization);
   itRegular = iORM.CommonTypes.itRegular;
   itRevert = iORM.CommonTypes.itETM_Revert;
@@ -2591,7 +2592,7 @@ TioEnumContainer._Build;
 TioMapContainer._Build;
 
 // Enums UI translations
-io.Enums.Add<TioPersistenceActionType>('do not persist, select, insert, update, delete');
+io.Enums.Add<TioPersistenceActionType>('do not persist, select, insert, update, delete, make selection');
 io.Enums.Add<TioPersistenceIntentType>('regular, revert, synchro (svr), synchro (cli)');
 io.Enums.Add<TioPersistenceConflictState>('undefined, resolved, rejected, rejected raise');
 io.Enums.Add<TioEtmTimeSlotSynchroState>('regular, to be synchronized, sent to server, received from server, received from client');

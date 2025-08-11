@@ -130,7 +130,6 @@ type
     procedure DoAfterPostFields(AFields: TArray<TBindSourceAdapterField>); override;
     procedure DoAfterDelete; override;
     procedure DoAfterScroll; override;
-    procedure DoBeforeReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
     procedure DoReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
     procedure DoAfterReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
     procedure SetObjStatus(AObjStatus: TioObjStatus);
@@ -343,12 +342,6 @@ begin
     TioCommonBSAPersistence.Create(Self)
   else
     TioCommonBSAPersistence.Reload(Self);
-end;
-
-procedure TioActiveInterfaceObjectBindSourceAdapter.DoBeforeReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
-begin
-  if Assigned(FBindSource) then
-    FBindSource.DoBeforeReceiveSelection(ASelected, ASelectionType);
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.DoReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
@@ -654,7 +647,7 @@ begin
   //  useful in an interface bindsource adapter
 
   // Do the selection
-  DoBeforeReceiveSelection(ASelected, ASelectionType);
+//  DoBeforeReceiveSelection(ASelected, ASelectionType); Spostato in TioCommonBSBehavior.Select<T>
   DoReceiveSelection(ASelected, ASelectionType, LDone);
   if not LDone then
     SetDataObject(ASelected);

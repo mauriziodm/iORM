@@ -145,7 +145,6 @@ type
     procedure DoAfterDelete; override;
     procedure DoAfterScroll; override;
     procedure DoCreateInstance(out AHandled: Boolean; out AInstance: TObject); override;
-    procedure DoBeforeReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
     procedure DoReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
     procedure DoAfterReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
     procedure SetObjStatus(AObjStatus: TioObjStatus);
@@ -417,12 +416,6 @@ begin
     TioCommonBSAPersistence.Create(Self)
   else
     TioCommonBSAPersistence.Reload(Self);
-end;
-
-procedure TioActiveListBindSourceAdapter.DoBeforeReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
-begin
-  if Assigned(FBindSource) then
-    FBindSource.DoBeforeReceiveSelection(ASelected, ASelectionType);
 end;
 
 procedure TioActiveListBindSourceAdapter.DoCreateInstance(out AHandled: Boolean; out AInstance: TObject);
@@ -736,7 +729,7 @@ begin
     ASelected := TioUtilities.CloneObject(ASelected);
 
   // Do the selection
-  DoBeforeReceiveSelection(ASelected, ASelectionType);
+//  DoBeforeReceiveSelection(ASelected, ASelectionType); Spostato in TioCommonBSBehavior.Select<T>
   DoReceiveSelection(ASelected, ASelectionType, LDone);
   if not LDone then
     case ASelectionType of
@@ -752,10 +745,9 @@ begin
 
   // Prima di aggiungere questa riga succedeva che,
   //  nell'esempio degli ordini delle pizze, se aggiungevo una nuova pizza in una nuova
-  //  riga con una nuova pizza poi lìoggetto non si persisteva perchè nel SUD l'oggetto
+  //  riga con una nuova pizza poi l'oggetto non si persisteva perchè nel SUD l'oggetto
   //  master non figurava come modificato e quindi non veniva persistito. La stessa cosa
   //  succedeva anche in caso di modifica manuale di una riga.
-
 
   // Prima di aggiungere questa riga succedeva che, nell'esempio degli ordini delle pizze,
   //  se aggiungevo una riga all'ordine con un selector oppure modificavo manualmente una riga (es: qtà da 1 a 2)

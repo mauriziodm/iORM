@@ -132,7 +132,7 @@ begin
     LActionType := atInsert
   else
     LActionType := atUpdate;
-  TioApplication.ProvideAuthDecisionUI(AActiveBindSourceAdapter.Current.ClassName, LActionType, itRegular, AActiveBindSourceAdapter.GetBindSource._InternalGetAuthContext, LForceAuthDecision);
+  TioApplication.AuthorizeByRequestParams(AActiveBindSourceAdapter.Current.ClassName, LActionType, itRegular, AActiveBindSourceAdapter.GetBindSource._InternalGetAuthContext, LForceAuthDecision);
   // Notification to save revert point before edit
   AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint));
   // Notification to register the current object into the SmartUpdateDetection system
@@ -180,7 +180,7 @@ var
 begin
   // Requires an authorization-decision for UI purposes
   LForceAuthDecision := TioUtilities.IsNullOID(AActiveBindSourceAdapter.Current);
-  TioApplication.ProvideAuthDecisionUI(AActiveBindSourceAdapter.Current.ClassName, atDelete, itRegular, AActiveBindSourceAdapter.GetBindSource._InternalGetAuthContext, LForceAuthDecision);
+  TioApplication.AuthorizeByRequestParams(AActiveBindSourceAdapter.Current.ClassName, atDelete, itRegular, AActiveBindSourceAdapter.GetBindSource._InternalGetAuthContext, LForceAuthDecision);
   // If the delete detail is allowed then send a ntSaveRevertPoint notification
   if AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject, TioBSNotification.Create(TioBSNotificationType.ntCanDeleteDetail)) then
     AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject, TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint))

@@ -40,16 +40,19 @@ uses
   iORM.Context.Properties.Interfaces, iORM.CommonTypes, System.Classes,
   iORM.Where.Interfaces, Data.DB, System.Rtti, iORM.LiveBindings.Notification,
   iORM.LiveBindings.CommonBSAPaging, System.SysUtils,
-  iORM.StdActions.Interfaces, iORM.MVVM.ViewContextProvider;
+  iORM.StdActions.Interfaces, iORM.MVVM.ViewContextProvider,
+  iORM.Auth.Interfaces;
 
 type
 
   // Events handler types
-  TioBSABeforeAfterReceiveSelectionObjectEvent = procedure(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType) of object;
-  TioBSAReceiveSelectionObjectEvent = procedure(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean) of object;
+  TioBSABeforeReceiveSelectionObjectEvent = procedure(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; const AAuthDecisionRequest: IioAuthDecisionRequest) of object;
+  TioBSAonReceiveSelectionObjectEvent = procedure(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean) of object;
+  TioBSAAfterReceiveSelectionObjectEvent = procedure(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType) of object;
 
-  TioBSABeforeAfterReceiveSelectionInterfaceEvent = procedure(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType) of object;
+  TioBSABeforeReceiveSelectionInterfaceEvent = procedure(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; const AAuthDecisionRequest: IioAuthDecisionRequest) of object;
   TioBSAReceiveSelectionInterfaceEvent = procedure(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean) of object;
+  TioBSAAfterReceiveSelectionInterfaceEvent = procedure(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType) of object;
 
   TioBSOnPersistenceConflictExceptionEvent = procedure(const ASender, ADataObject: TObject; var AConflictResolved: Boolean) of object;
 
@@ -124,11 +127,11 @@ type
     // ETMfor
     procedure _InternalSetETMforPrivateField(const AETMFor: IioBindSource); // To avoid hint
     // Selectors related event for TObject selection
-    procedure DoBeforeReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
+    procedure DoBeforeReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; const AAuthDecisionRequest: IioAuthDecisionRequest); overload;
     procedure DoReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
     procedure DoAfterReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     // Selectors related event for IInterface selection
-    procedure DoBeforeReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
+    procedure DoBeforeReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; const AAuthDecisionRequest: IioAuthDecisionRequest); overload;
     procedure DoReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
     procedure DoAfterReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
     // Selector related properties

@@ -52,6 +52,7 @@ type
     class function IsAnInterfaceTypeName(const ATypeName: String): Boolean; static;
     class function CastObjectToGeneric<T>(const AObj: Tobject): T; overload; static;
     class function CastObjectToGeneric<T>(const AObj: Tobject; IID: TGUID): T; overload; static;
+    class function GenericToTObject<T>(const AInstance: T): TObject;
     class function GenericToString<T>(const AQualified: Boolean = False): String; static;
     class function ClassRefToRttiType(const AClassRef: TioClassRef): TRttiInstanceType; static;
     class function GetRttiProperty(const AClassRef: TioClassRef; APropName: String): TRttiProperty; static;
@@ -283,6 +284,23 @@ begin
   begin
     Result := Result.Remove(0, LDotPos);
     LDotPos := Pos('.', Result);
+  end;
+end;
+
+class function TioUtilities.GenericToTObject<T>(const AInstance: T): TObject;
+var
+  LKind: TTypeKind;
+begin
+  // Extract the TypeKind of the generic
+  LKind := PTypeInfo(TypeInfo(T))^.Kind;
+  // Extract a TObject reference
+  case LKind of
+    tkClass:
+      Result := TObject(Pointer(@AInstance)^);
+    tkInterface:
+      Result := TObject(Pointer(IInterface(Pointer(@AInstance)^)));
+  else
+    raise EioGenericException.Create(ClassName, 'GenericToClassName<T>', 'The generic parameter <T> is neither a class nor an interface');
   end;
 end;
 

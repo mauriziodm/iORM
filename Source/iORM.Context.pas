@@ -207,6 +207,7 @@ type
     // access-token
     function GetToken: String;
     // auth-context
+    procedure SetAuthContext(const Value: String);
     function GetAuthContext: String;
     // BlindLevel
     function GetBlindLevel: Byte; override;
@@ -233,6 +234,7 @@ type
     function GetRelationOID: Integer; override;
     procedure SetRelationOID(const Value: Integer); override;
     // TypeName
+    procedure SetTypeName(const Value: String);
     function GetTypeName: String;
     // Where
     function GetWhere: IioWhere; override;
@@ -423,7 +425,7 @@ begin
     atDelete:
       Result := TioCustomConflictStrategyRef(GetTable.DeleteConflictStrategy).Name;
   else
-    raise EioGenericException.Create(ClassName, 'GetCurrentStrategyName', 'Undefined action type.');
+    raise EioGenericException.Create(ClassName, 'GetCurrentStrategyName', 'Wrong action type.');
   end;  
 end;
 
@@ -862,6 +864,11 @@ begin
   Result := FPSRequest.AuthCache.IsAuthorized(Self);
 end;
 
+procedure TioContext_PSRequest.SetAuthContext(const Value: String);
+begin
+  FPSRequest.AuthContext := Value;
+end;
+
 procedure TioContext_PSRequest.SetBlindLevel(const Value: Byte);
 begin
   FPSRequest.BlindLevel := Value;
@@ -880,6 +887,11 @@ end;
 procedure TioContext_PSRequest.SetRelationOID(const Value: Integer);
 begin
   FPSRequest.RelationOID := Value;
+end;
+
+procedure TioContext_PSRequest.SetTypeName(const Value: String);
+begin
+  raise EioGenericException.Create(ClassName, 'SetTypeName', 'Method not implemented by this class');
 end;
 
 procedure TioContext_PSRequest.SetWhere(const AWhere: IioWhere);

@@ -24,16 +24,19 @@ type
     function GetIntent: TioPersistenceIntentType;
     function GetToken: String;
     function GetTypeName: String;
+    procedure SetActionType(const Value: TioPersistenceActionType);
+    procedure SetAuthContext(const Value: String);
+    procedure SetTypeName(const Value: String);
   public
     constructor Create(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType; const AAuthContext: String; const AForceAuthDecision: Boolean);
     function IsAuthorized: Boolean;
     // properties
-    property ActionType: TioPersistenceActionType read GetActionType;
-    property AuthContext: String read GetAuthContext;
+    property ActionType: TioPersistenceActionType read GetActionType write SetActionType;
+    property AuthContext: String read GetAuthContext write SetAuthContext;
     property ForceAuthDecision: Boolean read GetForceAuthDecision;
     property Intent: TioPersistenceIntentType read GetIntent;
     property Token: String read GetToken;
-    property TypeName: String read GetTypeName;
+    property TypeName: String read GetTypeName write SetTypeName;
   end;
 
 implementation
@@ -96,6 +99,21 @@ begin
     // Release the MainSessionData (thread-safe)
     TioApplication.SessionDataStore.Release;
   end;
+end;
+
+procedure TioAuthDecisionRequestUI.SetActionType(const Value: TioPersistenceActionType);
+begin
+  FActionType := Value;
+end;
+
+procedure TioAuthDecisionRequestUI.SetAuthContext(const Value: String);
+begin
+  FAuthContext := Value;
+end;
+
+procedure TioAuthDecisionRequestUI.SetTypeName(const Value: String);
+begin
+  FTypeName := Value;
 end;
 
 end.

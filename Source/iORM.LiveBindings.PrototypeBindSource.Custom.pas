@@ -40,7 +40,8 @@ uses
   System.Classes, iORM.LiveBindings.Notification, iORM.Where.Interfaces,
   System.SysUtils, iORM.LiveBindings.CommonBSAPaging,
   System.Generics.Collections, iORM.MVVM.ViewContextProvider,
-  iORM.StdActions.Interfaces, iORM.LiveBindings.BSPersistence;
+  iORM.StdActions.Interfaces, iORM.LiveBindings.BSPersistence,
+  iORM.Auth.Interfaces;
 
 type
 
@@ -84,12 +85,12 @@ type
     // the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
     FioLoaded: Boolean;
     // Selection related events
-    FBeforeReceiveSelectionObject: TioBSABeforeAfterReceiveSelectionObjectEvent;
-    FonReceiveSelectionObject: TioBSAReceiveSelectionObjectEvent;
-    FAfterReceiveSelectionObject: TioBSABeforeAfterReceiveSelectionObjectEvent;
-    FBeforeReceiveSelectionInterface: TioBSABeforeAfterReceiveSelectionInterfaceEvent;
+    FBeforeReceiveSelectionObject: TioBSABeforeReceiveSelectionObjectEvent;
+    FonReceiveSelectionObject: TioBSAonReceiveSelectionObjectEvent;
+    FAfterReceiveSelectionObject: TioBSAAfterReceiveSelectionObjectEvent;
+    FBeforeReceiveSelectionInterface: TioBSABeforeReceiveSelectionInterfaceEvent;
     FonReceiveSelectionInterface: TioBSAReceiveSelectionInterfaceEvent;
-    FAfterReceiveSelectionInterface: TioBSABeforeAfterReceiveSelectionInterfaceEvent;
+    FAfterReceiveSelectionInterface: TioBSAAfterReceiveSelectionInterfaceEvent;
     // Persistence conflict events
     FOnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent;
     FOnInsertConflictException: TioBSOnPersistenceConflictExceptionEvent;
@@ -210,11 +211,11 @@ type
     procedure DoBeforeClose;
     procedure DoBeforeOpen;
     // Selectors related event for TObject selection
-    procedure DoBeforeReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
+    procedure DoBeforeReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; const AAuthDecisionRequest: IioAuthDecisionRequest); overload;
     procedure DoReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
     procedure DoAfterReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType); overload;
     // Selectors related event for IInterface selection
-    procedure DoBeforeReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
+    procedure DoBeforeReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; const AAuthDecisionRequest: IioAuthDecisionRequest); overload;
     procedure DoReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
     procedure DoAfterReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType); overload;
     // LoadType
@@ -252,12 +253,12 @@ type
     property OnReceiveSelectionFreeObject: Boolean read GetOnReceiveSelectionFreeObject write SetOnReceiveSelectionFreeObject default True;
     // published: Master+Detail
     // Published Events: selectors
-    property BeforeReceiveSelectionObject: TioBSABeforeAfterReceiveSelectionObjectEvent read FBeforeReceiveSelectionObject write FBeforeReceiveSelectionObject;
-    property OnReceiveSelectionObject: TioBSAReceiveSelectionObjectEvent read FonReceiveSelectionObject write FonReceiveSelectionObject;
-    property AfterReceiveSelectionObject: TioBSABeforeAfterReceiveSelectionObjectEvent read FAfterReceiveSelectionObject write FAfterReceiveSelectionObject;
-    property BeforeReceiveSelectionInterface: TioBSABeforeAfterReceiveSelectionInterfaceEvent read FBeforeReceiveSelectionInterface write FBeforeReceiveSelectionInterface;
+    property BeforeReceiveSelectionObject: TioBSABeforeReceiveSelectionObjectEvent read FBeforeReceiveSelectionObject write FBeforeReceiveSelectionObject;
+    property OnReceiveSelectionObject: TioBSAonReceiveSelectionObjectEvent read FonReceiveSelectionObject write FonReceiveSelectionObject;
+    property AfterReceiveSelectionObject: TioBSAAfterReceiveSelectionObjectEvent read FAfterReceiveSelectionObject write FAfterReceiveSelectionObject;
+    property BeforeReceiveSelectionInterface: TioBSABeforeReceiveSelectionInterfaceEvent read FBeforeReceiveSelectionInterface write FBeforeReceiveSelectionInterface;
     property OnReceiveSelectionInterface: TioBSAReceiveSelectionInterfaceEvent read FonReceiveSelectionInterface write FonReceiveSelectionInterface;
-    property AfterReceiveSelectionInterface: TioBSABeforeAfterReceiveSelectionInterfaceEvent read FAfterReceiveSelectionInterface write FAfterReceiveSelectionInterface;
+    property AfterReceiveSelectionInterface: TioBSAAfterReceiveSelectionInterfaceEvent read FAfterReceiveSelectionInterface write FAfterReceiveSelectionInterface;
     // Published Events: persistence concurrency conflicts
     property OnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent read GetOnDeleteConflictException write SetOnDeleteConflictException;
     property OnInsertConflictException: TioBSOnPersistenceConflictExceptionEvent read GetOnInsertConflictException write SetOnInsertConflictException;
@@ -502,16 +503,16 @@ begin
     FBeforeOpen(Self);
 end;
 
-procedure TioPrototypeBindSourceCustom.DoBeforeReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
+procedure TioPrototypeBindSourceCustom.DoBeforeReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; const AAuthDecisionRequest: IioAuthDecisionRequest);
 begin
   if Assigned(FBeforeReceiveSelectionInterface) then
-    FBeforeReceiveSelectionInterface(Self, ASelected, ASelectionType);
+    FBeforeReceiveSelectionInterface(Self, ASelected, ASelectionType, AAuthDecisionRequest);
 end;
 
-procedure TioPrototypeBindSourceCustom.DoBeforeReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
+procedure TioPrototypeBindSourceCustom.DoBeforeReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; const AAuthDecisionRequest: IioAuthDecisionRequest);
 begin
   if Assigned(FBeforeReceiveSelectionObject) then
-    FBeforeReceiveSelectionObject(Self, ASelected, ASelectionType);
+    FBeforeReceiveSelectionObject(Self, ASelected, ASelectionType, AAuthDecisionRequest);
 end;
 
 procedure TioPrototypeBindSourceCustom.DoReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);

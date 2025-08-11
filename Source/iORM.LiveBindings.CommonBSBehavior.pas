@@ -87,7 +87,8 @@ implementation
 
 uses
   Data.Bind.ObjectScope, System.SysUtils, iORM.Exceptions,
-  iORM, iORM.Where.Factory, iORM.Abstraction;
+  iORM, iORM.Where.Factory, iORM.Abstraction, iORM.Auth.Factory,
+  iORM.Utilities;
 
 { TioCommonBSBehavior }
 
@@ -166,7 +167,7 @@ var
 begin
   // Requires an authorization-decision for UI purposes
   // NB: Codice inserito qui per intercettare l'insert/append richiesto con i metodi Append/Insert che ricevono l'istanza da aggiungere già creata
-  TioApplication.ProvideAuthDecisionUI(ABindSource.GetTypeName, atInsert, itRegular, ABindSource._InternalGetAuthContext, False);
+  TioApplication.AuthorizeByRequestParams(ABindSource.GetTypeName, atInsert, itRegular, ABindSource._InternalGetAuthContext, False);
   // Check the BindSourceAdapter
   if ABindSource.CheckAdapter and Supports(ABindSource.GetActiveBindSourceAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
   begin
@@ -341,7 +342,7 @@ begin
   if not Assigned(AObj) then
     raise EioGenericException.Create(ClassName, 'ProvideAuthDecisionForInsertOrAppendObj', 'The parameter does not contain a valid object instance');
   try
-    TioApplication.ProvideAuthDecisionUI(AObj.ClassName, atInsert, itRegular, ABindSource._InternalGetAuthContext, False);
+    TioApplication.AuthorizeByRequestParams(AObj.ClassName, atInsert, itRegular, ABindSource._InternalGetAuthContext, False);
   except
     if AFreeObjIfNotAuthorized then
       FreeAndNil(AObj);
@@ -349,10 +350,12 @@ begin
   end;
 end;
 
-class procedure TioCommonBSBehavior.Select<T>(const ASender: TObject; const ATargetBS: IioBindSource; ASelected: T;
-  ASelectionType: TioSelectionType = TioSelectionType.stAppend);
+class procedure TioCommonBSBehavior.Select<T>(const ASender: TObject; const ATargetBS: IioBindSource; ASelected: T; ASelectionType: TioSelectionType = TioSelectionType.stAppend);
 var
+  LAuthDecisionRequest: IioAuthDecisionRequest;
   LDestBSA: IioActiveBindSourceAdapter;
+  LSelectedAsIInterface: IInterface;
+  LSelectedAsTObject: TObject;
   LValue: TValue;
 begin
   // Check if TargetBS is assigned
@@ -374,6 +377,27 @@ begin
       + #13#13'iORM cannot forward the selection.'#13#13'Please make sure that the target component of the selection is active as well and try again.',
       [(ASender as TComponent).Name, ATargetBS.GetName]));
 
+  // Parte che si occupa della richiesta dell'autorizzazione ad eseguire la selezione oppure no.
+  //  Prima crea l'oggetto AuthorizationRequest, lo imposta con il TypeName dell'oggetto ricevuto come selezione
+  //  e lo passa all'evento "BeforeReceiveSelection" dove, tra le altre cose, è possibile cambiare i valori delle
+  //  proprietà della AuthorizationRequest se necesario, alla fine esegue la richiesta di autorizzazione.
+  //  NB: Ho fatto così perchèragionando molto sono giunto alla conclusione che non era possibile impostare
+  //       la AuthorizationRequest in modo che andasse bene in qualunque situazione, dipende sempre da cosa
+  //       vuole fare il programmatore e come quindi ho deciso di fare in modo che scrivendo un event handler
+  //       (BeforeReceiveSelection...) sia possibile intervenire e impostare la richiesta di autorizzazione
+  //       come si vuole
+  LSelectedAsTObject := TioUtilities.GenericToTObject<T>(ASelected);
+  LAuthDecisionRequest := TioAuthFactory.NewAuthDecisionRequest(LSelectedAsTObject.ClassName, atMakeSelection, itRegular, ATargetBS._InternalGetAuthContext, False);
+  if TioUtilities.IsAnInterface<T> then
+  begin
+    LSelectedAsIInterface := TioUtilities.CastObjectToGeneric<IInterface>(LSelectedAsTObject);
+    ATargetBS.DoBeforeReceiveSelection(LSelectedAsIInterface, ASelectionType, LAuthDecisionRequest);
+  end
+  else
+    ATargetBS.DoBeforeReceiveSelection(LSelectedAsTObject, ASelectionType, LAuthDecisionRequest);
+  // Esegue la richiesta di autorizzazione
+  TioApplication.AuthorizeByRequestObj(LAuthDecisionRequest);
+
   // Get the selection destination BindSourceAdapter
   LDestBSA := ATargetBS.GetActiveBindSourceAdapter;
   // If the selection is allowed then send a ntSaveRevertPoint notification
@@ -381,6 +405,7 @@ begin
     LDestBSA.Notify(ASender, TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint))
   else
     raise EioGenericException.Create(ClassName, 'Select<T>', 'Master BindSource hasn''t saved a revert point');
+
   // Encapsulate the SelectedInstance into a TValue then assign it
   // as selection in a proper way
   // NB: Lasciare assolutamente così perchè ho già provato in vari modi ma mi dava sempre un errore
