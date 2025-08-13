@@ -645,6 +645,7 @@ type
   strict private
     FAction_ParentCloseQueryAction: IioBSCloseQueryAction;
     FAction_SelectCurrentAction: IioBSSlaveAction;
+    FAuthorizationCheck: Boolean;
     FEntityTypeName: String;
     FIsSlave: Boolean;
     FShowMode: TioActionShowMode;
@@ -682,6 +683,7 @@ type
     // properties
     property Action_ParentCloseQueryAction: IioBSCloseQueryAction read FAction_ParentCloseQueryAction write SetAction_ParentCloseQueryAction;
     property Action_SelectCurrentAction: IioBSSlaveAction read FAction_SelectCurrentAction write SetAction_SelectCurrentAction;
+    property AuthorizationCheck: Boolean read FAuthorizationCheck write FAuthorizationCheck default True;
     property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
     property ShowMode: TioActionShowMode read FShowMode write FShowMode;
     property TargetBindSource: IioStdActionTargetBindSource read FTargetBindSource write SetTargetBindSource;
@@ -1835,6 +1837,7 @@ begin
   FIsSlave := False;
   FAction_ParentCloseQueryAction := nil;
   FAction_SelectCurrentAction := nil;
+  FAuthorizationCheck := True;
   FShowMode := TioActionShowMode.smBSCurrent;
   FTargetBindSource := nil;
   FVVMTypeAlias := '';
@@ -2048,7 +2051,7 @@ begin
       Result := assigned(FTargetBindSource) and FTargetBindSource.IsActive and not FEntityTypeName.Trim.IsEmpty;
   end;
   // Authorization
-  if Result then
+  if Result and FAuthorizationCheck then
   begin
     if FShowMode = smBSCurrent then
       Result := Result and TioApplication.AuthorizeByRequestParams(FTargetBindSource.Current.ClassName, atSelect, itRegular, '', False, True)
