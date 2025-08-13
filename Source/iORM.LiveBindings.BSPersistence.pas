@@ -83,10 +83,6 @@ type
     procedure ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
     procedure ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider; const AVVMAlias: String = ''); overload;
     procedure ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AAlias: String = ''); overload;
-    // AuthorizationCheck
-    procedure SetAuthorizationCheck(const Value: Boolean);
-    function GetAuthorizationCheck: Boolean;
-    property AuthorizationCheck: Boolean read GetAuthorizationCheck write SetAuthorizationCheck;
     // TypeName
     function GetTypeName: String;
     // Where

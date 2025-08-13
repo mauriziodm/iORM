@@ -44,7 +44,6 @@ type
 
   TioModelPresenterMaster = class(TioModelPresenterCustom, IioMasterBindSource, IioStdActionTargetMasterBindSource)
   private
-    FAuthorizationCheck: Boolean;
     FWannaBeActive: Boolean;
     FPersistence: TioBSPersistence;
     FOnDeleteAction: TioBSOnDeleteAction;
@@ -60,9 +59,6 @@ type
     FOnWhereClear: TioOnWhereBuilderEvent;
     FAfterWhereBuild: TioAfterWhereBuilderEvent;
     FAfterWhereClear: TioAfterWhereBuilderEvent;
-    // AuthorizationCheck
-    procedure SetAuthorizationCheck(const Value: Boolean);
-    function GetAuthorizationCheck: Boolean;
     // SourceModelPresenter
     function GetSourceBS: IioBindSource;
     procedure SetSourceBS(const Value: IioBindSource);
@@ -117,7 +113,6 @@ type
     property Persistence: TioBSPersistence read GetPersistence;
   published
     property AsDefault; // non mettere default
-    property AuthorizationCheck: Boolean read GetAuthorizationCheck write SetAuthorizationCheck default True;
     property TypeName;
     property TypeAlias;
     property AsyncLoad default False;
@@ -189,7 +184,6 @@ end;
 constructor TioModelPresenterMaster.Create(AOwner: TComponent);
 begin
   inherited;
-  FAuthorizationCheck := True;
   FWannaBeActive := False;
   LoadType := ltAuto;
   FOnDeleteAction := daSetSmartDeleteSystem;
@@ -205,11 +199,6 @@ destructor TioModelPresenterMaster.Destroy;
 begin
   FPersistence.Free;
   inherited;
-end;
-
-function TioModelPresenterMaster.GetAuthorizationCheck: Boolean;
-begin
-  Result := FAuthorizationCheck;
 end;
 
 function TioModelPresenterMaster.GetOnDeleteAction: TioBSOnDeleteAction;
@@ -294,11 +283,6 @@ procedure TioModelPresenterMaster.SetActive(const Value: Boolean);
 begin
   FWannaBeActive := Value;
   inherited;
-end;
-
-procedure TioModelPresenterMaster.SetAuthorizationCheck(const Value: Boolean);
-begin
-  FAuthorizationCheck := Value;
 end;
 
 procedure TioModelPresenterMaster.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);

@@ -44,7 +44,6 @@ type
 
   TioDataSetMaster = class(TioDataSetCustom, IioMasterBindSource, IioStdActionTargetMasterBindSource)
   private
-    FAuthorizationCheck: Boolean;
     FPersistence: TioBSPersistence;
     FOnDeleteAction: TioBSOnDeleteAction;
     FOnEditAction: TioBSOnEditAction;
@@ -59,9 +58,6 @@ type
     FOnWhereClear: TioOnWhereBuilderEvent;
     FAfterWhereBuild: TioAfterWhereBuilderEvent;
     FAfterWhereClear: TioAfterWhereBuilderEvent;
-    // AuthorizationCheck
-    procedure SetAuthorizationCheck(const Value: Boolean);
-    function GetAuthorizationCheck: Boolean;
     // SourceDataSet
     function GetSourceBS: IioBindSource;
     procedure SetSourceBS(const Value: IioBindSource);
@@ -107,7 +103,6 @@ type
     property Persistence: TioBSPersistence read GetPersistence;
   published
     property AsDefault; // non mettere default
-    property AuthorizationCheck: Boolean read GetAuthorizationCheck write SetAuthorizationCheck default True;
     property TypeName;
     property TypeAlias;
     property AsyncLoad default False;
@@ -172,7 +167,6 @@ uses
 constructor TioDataSetMaster.Create(AOwner: TComponent);
 begin
   inherited;
-  FAuthorizationCheck := True;
   LoadType := ltAuto;
   FOnDeleteAction := daSetSmartDeleteSystem;
   FOnEditAction := eaSaveRevertPoint;
@@ -205,11 +199,6 @@ end;
 function TioDataSetMaster.GetPersistence: TioBSPersistence;
 begin
   Result := FPersistence;
-end;
-
-function TioDataSetMaster.GetAuthorizationCheck: Boolean;
-begin
-  Result := FAuthorizationCheck;
 end;
 
 function TioDataSetMaster.GetOnDeleteAction: TioBSOnDeleteAction;
@@ -257,11 +246,6 @@ function TioDataSetMaster.IsMasterBS: boolean;
 begin
   // Do not inherit
   Result := True;
-end;
-
-procedure TioDataSetMaster.SetAuthorizationCheck(const Value: Boolean);
-begin
-  FAuthorizationCheck := Value;
 end;
 
 procedure TioDataSetMaster.SetLoadType(const Value: TioLoadType);
