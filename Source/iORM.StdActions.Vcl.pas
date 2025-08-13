@@ -316,6 +316,7 @@ type
     FAction_CloseQueryAction: IioBSSlaveAction;
     FAction_ReloadAction: IioBSSlaveAction;
     FAction_ShowOrSelectAction: IioBSSlaveAction;
+    FAuthorizationCheck: Boolean;
     FDisableIfChangesDoesNotExists: Boolean;
     FDisableIfChangesExists: Boolean;
     FDisableIfSaved: Boolean;
@@ -346,6 +347,7 @@ type
     property Action_CloseQueryAction: IioBSSlaveAction read FAction_CloseQueryAction write SetAction_CloseQueryAction;
     property Action_ReloadAction: IioBSSlaveAction read FAction_ReloadAction write FAction_ReloadAction;
     property Action_ShowOrSelectAction: IioBSSlaveAction read FAction_ShowOrSelectAction write SetAction_ShowOrSelectAction;
+    property AuthorizationCheck: Boolean read FAuthorizationCheck write FAuthorizationCheck default True;
     property DisableIfChangesDoesNotExists: Boolean read FDisableIfChangesDoesNotExists write FDisableIfChangesDoesNotExists default False;
     property DisableIfChangesExists: Boolean read FDisableIfChangesExists write FDisableIfChangesExists default False;
     property DisableIfSaved: Boolean read FDisableIfSaved write FDisableIfSaved default False;
@@ -510,6 +512,7 @@ type
   published
     // inherited properties
     property Action_CloseQueryAction;
+    property AuthorizationCheck;
     property DisableIfChangesExists;
     property DisableIfSaved;
     property RaiseIfChangesExists default False;
@@ -898,6 +901,7 @@ begin
   FRaiseIfRevertPointNotSaved := False;
   FAction_ReloadAction := nil;
   FAction_ShowOrSelectAction := nil;
+  FAuthorizationCheck := True;
 end;
 
 procedure TioBSPersistenceStdActionVcl<T>.ExecuteTarget(Target: TObject);
@@ -1168,10 +1172,19 @@ function TioBSDelete._InternalUpdateStdAction: Boolean;
 var
   LMasterBindSource: IioMasterBindSource;
 begin
-  LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
-  Result := inherited and Assigned(TargetBindSource) and LMasterBindSource.Persistence.CanDelete;
-  Result := Result and ((not DisableIfChangesExists) or not LMasterBindSource.Persistence.IsChanged);
-  Result := Result and ((not DisableIfSaved) or not LMasterBindSource.Persistence.IsSavedRevertPoint);
+  // Master & Detail BS
+  Result := inherited and Assigned(TargetBindSource) and Assigned(TargetBindSource.Current);
+  // Master BS only
+  if TargetBindSource.IsMasterBS then
+  begin
+    LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
+    Result := Result and  LMasterBindSource.Persistence.CanDelete;
+    Result := Result and ((not DisableIfChangesExists) or not LMasterBindSource.Persistence.IsChanged);
+    Result := Result and ((not DisableIfSaved) or not LMasterBindSource.Persistence.IsSavedRevertPoint);
+  end;
+  // Authorization
+  if Result and AuthorizationCheck then
+    Result := Result and TioApplication.AuthorizeByRequestParams(TargetBindSource.Current.ClassName, atDelete, itRegular, '', False, True);
 end;
 
 { TioBSPersistenceReload }

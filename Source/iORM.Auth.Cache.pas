@@ -79,8 +79,8 @@ var
   LAuthDecisionResult: TioAuthDecisionResult;
   LKey: String;
 begin
-  // Non-regular operations (e.g. itRevert, itSynchro_XXX) are never subject to authorization
-  if (AAuthDecisionRequest.Intent <> itRegular) or AAuthDecisionRequest.ForceAuthDecision then
+  // Synchro operactions are never subject to authorization
+  if (AAuthDecisionRequest.Intent > itETM_Revert) or AAuthDecisionRequest.ForceAuthDecision then
     Exit(True);
   // Compose the key
   LKey := ComposeKey(AAuthDecisionRequest);
