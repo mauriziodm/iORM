@@ -40,6 +40,13 @@ uses
 
 type
 
+  // AuthCache value part of the cache internal dictionary
+  TioAuthDecisionResult = record
+    Authorized: Boolean;
+    ExceptionMsg: String;
+    class operator Initialize(out Dest: TioAuthDecisionResult);
+  end;
+
   // forward declaration
   IioAuthDecisionRequest = interface;
 
@@ -51,7 +58,7 @@ type
   //        If you want to inform the user of the failed authorization, you need to raise an exception
   //        within the annoying method itself (TioTokenValidateMethod).
   TioAuthTokenProviderMethod = reference to Function: String;
-  TioAuthDecisionMethod = reference to Function(const AAuthDecisionRequest: IioAuthDecisionRequest): Boolean;
+  TioAuthDecisionMethod = reference to Function(AAuthDecisionRequest: IioAuthDecisionRequest): TioAuthDecisionResult;
 
   // Ho deciso di avere due AuthCache diverse, una per le operazioni CRUD (IioAuthCacheUI in iORM.PersistenceStrategy.Interfaces)
   //  che viene usata nelle PersistenceStrategies per autorizzare o meno le operazioni,
@@ -69,7 +76,7 @@ type
   //  mantiene SessionData separati per le diverse sessioni.
   IioAuthCache = interface
     ['{20FCA9CF-C450-4E29-8EDA-EC8DF8B0B542}']
-    function IsAuthorized(const AAuthDecisionRequest: IioAuthDecisionRequest): Boolean;
+    function IsAuthorized(const AAuthDecisionRequest: IioAuthDecisionRequest; const Silent: Boolean): Boolean;
   end;
 
   // Questa è l'interfaccia che verrà usata nell'anonymous method per validare l'access-token
@@ -94,7 +101,7 @@ type
   //       mantiene SessionData separati per le diverse sessioni.
   IioAuthDecisionRequest = interface
     ['{02E419C2-347C-412D-B7B3-F264EFB92B94}']
-    function IsAuthorized: Boolean;
+    function IsAuthorized(const Silent: Boolean): Boolean;
     // AuthContext
     procedure SetAuthContext(const Value: String);
     function GetAuthContext: String;
@@ -119,5 +126,12 @@ type
   end;
 
 implementation
+
+{ TioAuthDecisionResult }
+
+class operator TioAuthDecisionResult.Initialize(out Dest: TioAuthDecisionResult);
+begin
+  Dest.Authorized := False;
+end;
 
 end.

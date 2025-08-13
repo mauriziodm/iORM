@@ -26,14 +26,14 @@ type
   //        Acquire... e Release...
   TioAuthCacheCustom = class (TInterfacedObject, IioAuthCache)
   strict private
-    FInternalContainer: TDictionary<String, Boolean>;
+    FInternalContainer: TDictionary<String, TioAuthDecisionResult>;
     function ComposeKey(const AAuthDecisionRequest: IioAuthDecisionRequest): String; inline;
   protected
     procedure Clear;
   public
     constructor Create;
     destructor Destroy; override;
-    function IsAuthorized(const AAuthDecisionRequest: IioAuthDecisionRequest): Boolean; virtual;
+    function IsAuthorized(const AAuthDecisionRequest: IioAuthDecisionRequest; const Silent: Boolean): Boolean; virtual;
   end;
 
   TioAuthCacheCRUD = class (TioAuthCacheCustom)
@@ -43,13 +43,13 @@ type
   strict private
     FPreviousToken: String;
   public
-    function IsAuthorized(const AAuthDecisionRequest: IioAuthDecisionRequest): Boolean; override;
+    function IsAuthorized(const AAuthDecisionRequest: IioAuthDecisionRequest; const Silent: Boolean): Boolean; override;
   end;
 
 implementation
 
 uses
-  System.SysUtils, iORM.Abstraction, iORM.CommonTypes;
+  System.SysUtils, iORM.Abstraction, iORM.CommonTypes, iORM.Exceptions;
 
 { TioAuthCacheCustom }
 
@@ -65,7 +65,7 @@ end;
 
 constructor TioAuthCacheCustom.Create;
 begin
-  FInternalContainer := TDictionary<String, Boolean>.Create;
+  FInternalContainer := TDictionary<String, TioAuthDecisionResult>.Create;
 end;
 
 destructor TioAuthCacheCustom.Destroy;
@@ -74,8 +74,9 @@ begin
   inherited;
 end;
 
-function TioAuthCacheCustom.IsAuthorized(const AAuthDecisionRequest: IioAuthDecisionRequest): Boolean;
+function TioAuthCacheCustom.IsAuthorized(const AAuthDecisionRequest: IioAuthDecisionRequest; const Silent: Boolean): Boolean;
 var
+  LAuthDecisionResult: TioAuthDecisionResult;
   LKey: String;
 begin
   // Non-regular operations (e.g. itRevert, itSynchro_XXX) are never subject to authorization
@@ -83,20 +84,29 @@ begin
     Exit(True);
   // Compose the key
   LKey := ComposeKey(AAuthDecisionRequest);
-  // Authorization decision
-  if not FInternalContainer.TryGetValue(LKey, Result) then
+  // Authorization decision (cached)
+  if not FInternalContainer.TryGetValue(LKey, LAuthDecisionResult) then
   begin
-    Result := TioApplication._FAuthDecisionMethod_InternalUse(AAuthDecisionRequest);
-    FInternalContainer.Add(LKey, Result);
+    LAuthDecisionResult := TioApplication._FAuthDecisionMethod_InternalUse(AAuthDecisionRequest);
+    FInternalContainer.Add(LKey, LAuthDecisionResult);
   end;
-  // If the ActionType is not atSelect and the operation isn't authorized then Abort
-  if (AAuthDecisionRequest.ActionType > atSelect) and not Result then
-    Abort;
+  Result := LAuthDecisionResult.Authorized;
+  // if not authorized then raise an exception or abort or nothing
+  if not Result then
+  begin
+    if Silent or LAuthDecisionResult.ExceptionMsg.IsEmpty then
+    begin
+      if AAuthDecisionRequest.ActionType > atSelect then
+        Abort;
+    end
+    else
+      raise EioAuthDecisionException.Create(LAuthDecisionResult.ExceptionMsg);
+  end;
 end;
 
 { TioAuthCacheUI }
 
-function TioAuthCacheUI.IsAuthorized(const AAuthDecisionRequest: IioAuthDecisionRequest): Boolean;
+function TioAuthCacheUI.IsAuthorized(const AAuthDecisionRequest: IioAuthDecisionRequest; const Silent: Boolean): Boolean;
 begin
   // Clear cache if necessary
   if AAuthDecisionRequest.Token <> FPreviousToken then

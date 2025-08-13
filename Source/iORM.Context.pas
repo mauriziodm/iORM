@@ -241,7 +241,7 @@ type
     procedure SetWhere(const AWhere: IioWhere); override;
   public
     constructor Create_PSRequest(const APSRequest: IioPersistenceStrategyRequest; const AMap: IioMap);
-    function IsAuthorized: Boolean;
+    function IsAuthorized(const Silent: Boolean): Boolean;
   end;
 
   TioContext_Simple = class(TioContext_Custom)
@@ -859,9 +859,9 @@ begin
   Result := FPSRequest.Where;
 end;
 
-function TioContext_PSRequest.IsAuthorized: Boolean;
+function TioContext_PSRequest.IsAuthorized(const Silent: Boolean): Boolean;
 begin
-  Result := FPSRequest.AuthCache.IsAuthorized(Self);
+  Result := FPSRequest.AuthCache.IsAuthorized(Self, Silent);
 end;
 
 procedure TioContext_PSRequest.SetAuthContext(const Value: String);

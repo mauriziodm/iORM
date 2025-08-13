@@ -340,6 +340,9 @@ type
 
   // SessionData
   IioSessionData = iORM.Abstraction.SessionData.Interfaces.IioSessionData;
+
+  // Autrorization
+  TioAuthDecisionResult = iORM.Auth.Interfaces.TioAuthDecisionResult;
 {$ENDREGION}
 
 // Attributes aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM

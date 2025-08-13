@@ -144,7 +144,7 @@ type
     class procedure SetAuthMethods(const AAuthTokenProviderMethod: TioAuthTokenProviderMethod; const AAuthDecisionMethod: TioAuthDecisionMethod); static;
     class function ProvideAuthToken: String; static;
     class function AuthorizeByRequestObj(const AAuthDecisionRequest: IioAuthDecisionRequest): Boolean; static; inline;
-    class function AuthorizeByRequestParams(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType; const AAuthContext: String; const AForceAuthDecision: Boolean): Boolean; static;
+    class function AuthorizeByRequestParams(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType; const AAuthContext: String; const AForceAuthDecision, Silent: Boolean): Boolean; static;
   end;
 
   TioControlRef = class of TioControl;
@@ -385,9 +385,6 @@ end;
 
 class procedure TioApplication.SetAuthMethods(const AAuthTokenProviderMethod: TioAuthTokenProviderMethod; const AAuthDecisionMethod: TioAuthDecisionMethod);
 begin
-  _FAuthTokenProviderMethod_NoDirectCall := AAuthTokenProviderMethod;
-  _FAuthDecisionMethod_InternalUse := AAuthDecisionMethod;
-
   // set the token provider method
   if Assigned(AAuthTokenProviderMethod) then
     _FAuthTokenProviderMethod_NoDirectCall := AAuthTokenProviderMethod
@@ -403,9 +400,9 @@ begin
     _FAuthDecisionMethod_InternalUse := AAuthDecisionMethod
   else
   begin
-    _FAuthDecisionMethod_InternalUse := function(const AValidationRequest: IioAuthDecisionRequest): Boolean
+    _FAuthDecisionMethod_InternalUse := function(AValidationRequest: IioAuthDecisionRequest): TioAuthDecisionResult
       begin
-        Result := True;
+        Result.Authorized := True;
       end;
   end;
 end;
@@ -434,12 +431,12 @@ end;
 
 class function TioApplication.AuthorizeByRequestObj(const AAuthDecisionRequest: IioAuthDecisionRequest): Boolean;
 begin
-  Result := AAuthDecisionRequest.IsAuthorized;
+  Result := AAuthDecisionRequest.IsAuthorized(False);
 end;
 
-class function TioApplication.AuthorizeByRequestParams(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType; const AAuthContext: String; const AForceAuthDecision: Boolean): Boolean;
+class function TioApplication.AuthorizeByRequestParams(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType; const AAuthContext: String; const AForceAuthDecision, Silent: Boolean): Boolean;
 begin
-  Result :=  TioAuthFactory.NewAuthDecisionRequest(ATypeName, AActionType, AIntent, AAuthContext, AForceAuthDecision).IsAuthorized;
+  Result :=  TioAuthFactory.NewAuthDecisionRequest(ATypeName, AActionType, AIntent, AAuthContext, AForceAuthDecision).IsAuthorized(Silent);
 end;
 
 { TioAction }

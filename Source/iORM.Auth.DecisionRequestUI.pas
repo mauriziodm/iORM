@@ -29,7 +29,7 @@ type
     procedure SetTypeName(const Value: String);
   public
     constructor Create(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType; const AAuthContext: String; const AForceAuthDecision: Boolean);
-    function IsAuthorized: Boolean;
+    function IsAuthorized(const Silent: Boolean): Boolean;
     // properties
     property ActionType: TioPersistenceActionType read GetActionType write SetActionType;
     property AuthContext: String read GetAuthContext write SetAuthContext;
@@ -86,7 +86,7 @@ begin
   Result := FTypeName;
 end;
 
-function TioAuthDecisionRequestUI.IsAuthorized: Boolean;
+function TioAuthDecisionRequestUI.IsAuthorized(const Silent: Boolean): Boolean;
 var
   LSessionData: IioSessionData;
 begin
@@ -94,7 +94,7 @@ begin
   LSessionData := TioApplication.SessionDataStore.AcquireMainSessionData;
   try
     // Check authorization from SessionData.AuthCache
-    Result := LSessionData.AuthCacheUI.IsAuthorized(Self);
+    Result := LSessionData.AuthCacheUI.IsAuthorized(Self, Silent);
   finally
     // Release the MainSessionData (thread-safe)
     TioApplication.SessionDataStore.Release;
