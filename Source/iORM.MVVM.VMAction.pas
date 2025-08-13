@@ -2032,32 +2032,29 @@ end;
 function TioVMActionBSShowOrSelect._InternalUpdateStdAction: Boolean;
 begin
   Result := True;
-
   // If the TargetBindSource is a SelectorFor some other BindSource then make the selection instead
-  if Assigned(FAction_SelectCurrentAction) and Assigned((TargetBindSource as IioBindSource).SelectorFor) then
+  if Assigned(FAction_SelectCurrentAction) and Assigned(TargetBindSource.SelectorFor) then
   begin
     Result := FAction_SelectCurrentAction._IsEnabled;
     Exit;
   end;
-
   // ShowBy
   case FShowMode of
     smBSCurrent, smBSEach:
-      Result := assigned(FTargetBindSource) and FTargetBindSource.IsActive;
+      Result := assigned(FTargetBindSource) and FTargetBindSource.IsActive and Assigned(FTargetBindSource.Current);
     smEntityTypeName:
       Result := not FEntityTypeName.Trim.IsEmpty;
     smEntityTypeNameAsSelector, smEntityTypeNameAsWhereBuilder, smEntityTypeNameAsETM:
       Result := assigned(FTargetBindSource) and FTargetBindSource.IsActive and not FEntityTypeName.Trim.IsEmpty;
   end;
-//  // ViewContextBy
-//  case FViewContextBy of
-//    vcByViewContextProviderName:
-//      Result := Result and not FViewContextProviderName.Trim.IsEmpty;
-//    vcByViewContextProvider:
-//      Result := Result and Assigned(FViewContextProvider);
-//    vcByViewContext:
-//      Result := Result and Assigned(FViewContext);
-//  end;
+  // Authorization
+  if Result then
+  begin
+    if FShowMode = smBSCurrent then
+      Result := Result and TioApplication.AuthorizeByRequestParams(FTargetBindSource.Current.ClassName, atSelect, itRegular, '', False, True)
+    else
+      Result := Result and TioApplication.AuthorizeByRequestParams(FEntityTypeName, atSelect, itRegular, '', False, True);
+  end;
 end;
 
 function TioVMActionBSShowOrSelect._IsEnabled: Boolean;

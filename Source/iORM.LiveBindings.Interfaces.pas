@@ -191,9 +191,14 @@ type
   // Interface for standard action target bind source
   IioStdActionTargetBindSource = interface
     ['{6E442DF5-154E-4253-9AFB-E5CCFDF32209}']
-    function IsActive: Boolean;
     function CanDoSelection: Boolean;
+    function Current: TObject;
+    function IsActive: Boolean;
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
+    // SelectorFor
+    function GetSelectorFor: IioBindSource;
+    procedure SetSelectorFor(const ATargetBindSource: IioBindSource);
+    property SelectorFor: IioBindSource read GetSelectorFor write SetSelectorFor; // published: Master
   end;
 
   // Interface for standard action target master bind source
