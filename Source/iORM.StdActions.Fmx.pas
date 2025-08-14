@@ -547,6 +547,7 @@ type
   published
     // inherited properties
     property Action_ShowOrSelectAction;
+    property AuthorizationCheck;
     property DisableIfChangesExists;
     property DisableIfSaved;
     property RaiseIfChangesExists default False;
@@ -580,6 +581,7 @@ type
   published
     // inherited properties
     property Action_ShowOrSelectAction;
+    property AuthorizationCheck;
     property DisableIfChangesExists;
     property DisableIfSaved;
     property RaiseIfChangesExists default False;
@@ -1288,6 +1290,7 @@ begin
   // Execute slave actions
   if Assigned(Action_ShowOrSelectAction) then
   begin
+    Action_ShowOrSelectAction.Update; // Forza l'update della slave-action in modo che punti al nuovo oggetto appena inserito e chieda l'autorizzazione su quest'ultimo
     TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_ShowOrSelectAction);
     if TargetBindSource.IsMasterBS then
       (TargetBindSource as IioMasterBindSource).Persistence.Clear;
@@ -1297,18 +1300,32 @@ end;
 
 function TioBSAppend._InternalUpdateStdAction: Boolean;
 var
+  LAuthTypeName: String;
   LMasterBindSource: IioMasterBindSource;
 begin
   LMasterBindSource := nil;
   if TargetBindSource.IsMasterBS then
   begin
     LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
-    Result := inherited and Assigned(TargetBindSource) and LMasterBindSource.Persistence.CanInsert;
+    Result := Assigned(TargetBindSource) and LMasterBindSource.Persistence.CanInsert;
     Result := Result and ((not DisableIfChangesExists) or not LMasterBindSource.Persistence.IsChanged);
     Result := Result and ((not DisableIfSaved) or not LMasterBindSource.Persistence.IsSavedRevertPoint);
   end
   else
     Result := inherited and Assigned(TargetBindSource);
+  // Authorization
+  if Result and AuthorizationCheck then
+  begin
+    // Try to get the TypeName for authorization request
+    if not FEntityTypeName.IsEmpty then
+      LAuthTypeName := FEntityTypeName
+    else
+      LAuthTypeName := TargetBindSource.GetTypeName;
+    if LAuthTypeName.IsEmpty then
+      raise EioGenericException.Create(ClassName, '_InternalUpdateStdAction', Format(INSERT_APPEND_EXCEPTION_MSG, [Name]));
+    // Authorization request
+    Result := Result and TioApplication.AuthorizeByRequestParams(LAuthTypeName, atInsert, itRegular, TargetBindSource._InternalGetAuthContext, False, True);
+  end;
 end;
 
 { TioBSPersistenceInsert }
