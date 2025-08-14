@@ -38,6 +38,13 @@ interface
 uses
   System.Classes, iORM.CommonTypes;
 
+const
+  INSERT_APPEND_EXCEPTION_MSG = 'Hi, I''m iORM.' +
+    #13#13'To decide whether or not to enable the "%s" action, I need to request authorization for the insert/append operation by providing a "TypeName" (class name).' +
+    #13#13'I tried my best but I didn''t find anything in the "EntityTypeName" property of the action nor in the "TypeName" property of the TargetBindSource, if you forgot to set them please do so.' +
+    #13#13'If you''re providing the new instance yourself via the "OnNewInstanceAsObject" or "OnNewInstanceAsInterface" events and you cannot specify a TypeName in advance, ' +
+    'then I recommend setting the "AuthorizationCheck" property = False to disable the need to request authorization and enable the action.';
+
 type
 
   TioActionShowMode = (smBSCurrent, smBSEach, smEntityTypeName, smEntityTypeNameAsSelector, smEntityTypeNameAsWhereBuilder, smEntityTypeNameAsETM);
@@ -50,6 +57,7 @@ type
     function _IsEnabled: Boolean;
     procedure _SetTargetBindSource(const AObj: TObject);
     function Execute: Boolean;
+    function Update: Boolean;
     // ExecutionMode
     function GetExecutionMode: TioActionExecutionMode;
     procedure SetExecutionMode(const Value: TioActionExecutionMode);
