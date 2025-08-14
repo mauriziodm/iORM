@@ -1180,6 +1180,7 @@ end;
 
 function TioBSDelete._InternalUpdateStdAction: Boolean;
 var
+  LForceAuthDecision: Boolean;
   LMasterBindSource: IioMasterBindSource;
 begin
   // Master & Detail BS
@@ -1194,7 +1195,10 @@ begin
   end;
   // Authorization
   if Result and AuthorizationCheck then
-    Result := Result and TioApplication.AuthorizeByRequestParams(TargetBindSource.Current.ClassName, atDelete, itRegular, '', False, True);
+  begin
+    LForceAuthDecision := TioUtilities.IsNullOID(TargetBindSource.Current);
+    Result := Result and TioApplication.AuthorizeByRequestParams(TargetBindSource.Current.ClassName, atDelete, itRegular, TargetBindSource._InternalGetAuthContext, LForceAuthDecision, True);
+  end;
 end;
 
 { TioBSPersistenceReload }

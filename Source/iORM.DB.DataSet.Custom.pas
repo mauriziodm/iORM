@@ -170,6 +170,8 @@ type
     function GetSelectorFor: IioBindSource;
     procedure SetSelectorFor(const ATargetBindSource: IioBindSource);
     // AuthContext
+    // NB: Non usare la proprietà AuthContext per usi interni, usare sempre "_InternalGetAuthContext" perchè
+    //      tiene conto anche dell'eventuale event-handler
     function _InternalGetAuthContext: String;
     // Persistence concurrency conflicts
     function GetOnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent;
@@ -245,6 +247,8 @@ type
     property OnInsertConflictException: TioBSOnPersistenceConflictExceptionEvent read GetOnInsertConflictException write SetOnInsertConflictException;
     property OnUpdateConflictException: TioBSOnPersistenceConflictExceptionEvent read GetOnUpdateConflictException write SetOnUpdateConflictException;
     // Published AuthContext property & event
+    // NB: Non usare la proprietà AuthContext per usi interni, usare sempre "_InternalGetAuthContext" perchè
+    //      tiene conto anche dell'eventuale event-handler
     property AuthContext: String read FAuthContext write FAuthContext;
     property OnAuthContext: TioBSOnAuthContextEvent read FonAuthContext write FonAuthContext;
   public

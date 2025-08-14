@@ -524,7 +524,10 @@ end;
 
 class function TioUtilities.IsNullOID(const AObj: Tobject): Boolean;
 begin
-  Result := TioMapContainer.GetMap(AObj.ClassName).GetProperties.GetIdProperty.GetValue(AObj).AsInteger = IO_INTEGER_NULL_VALUE;
+  if Assigned(AObj) then
+    Result := TioMapContainer.GetMap(AObj.ClassName).GetProperties.GetIdProperty.GetValue(AObj).AsInteger = IO_INTEGER_NULL_VALUE
+  else
+    Result := True;
 end;
 
 class function TioUtilities.ActionTypeByABSA(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; var OutForceAuthDecision: Boolean): TioPersistenceActionType;
