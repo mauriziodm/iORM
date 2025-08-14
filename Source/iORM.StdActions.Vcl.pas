@@ -2199,9 +2199,9 @@ begin
   if Result and FAuthorizationCheck then
   begin
     if FShowMode = smBSCurrent then
-      Result := Result and TioApplication.AuthorizeByRequestParams(FTargetBindSource.Current.ClassName, atSelect, itRegular, '', False, True)
+      Result := Result and TioApplication.AuthorizeByRequestParams(FTargetBindSource.Current.ClassName, atSelect, itRegular, TargetBindSource._InternalGetAuthContext, False, True)
     else
-      Result := Result and TioApplication.AuthorizeByRequestParams(FEntityTypeName, atSelect, itRegular, '', False, True);
+      Result := Result and TioApplication.AuthorizeByRequestParams(FEntityTypeName, atSelect, itRegular, TargetBindSource._InternalGetAuthContext, False, True);
   end;
 end;
 
