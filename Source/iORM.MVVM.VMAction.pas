@@ -278,7 +278,7 @@ type
     FAction_CloseQueryAction: IioBSSlaveAction;
     FAction_ReloadAction: IioBSSlaveAction;
     FAction_ShowOrSelectAction: IioBSSlaveAction;
-    FAuthorizationCheck: Boolean;
+    FAuthorizationRequest: Boolean;
     FDisableIfChangesDoesNotExists: Boolean;
     FDisableIfChangesExists: Boolean;
     FDisableIfSaved: Boolean;
@@ -296,7 +296,7 @@ type
     property Action_CloseQueryAction: IioBSSlaveAction read FAction_CloseQueryAction write SetAction_CloseQueryAction;
     property Action_ReloadAction: IioBSSlaveAction read FAction_ReloadAction write FAction_ReloadAction;
     property Action_ShowOrSelectAction: IioBSSlaveAction read FAction_ShowOrSelectAction write SetAction_ShowOrSelectAction;
-    property AuthorizationCheck: Boolean read FAuthorizationCheck write FAuthorizationCheck default True;
+    property AuthorizationRequest: Boolean read FAuthorizationRequest write FAuthorizationRequest default True;
     function _IsEnabled: Boolean; virtual;
     function _InternalUpdateStdAction: Boolean; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
@@ -444,7 +444,7 @@ type
   published
     // inherited properties
     property Action_CloseQueryAction;
-    property AuthorizationCheck;
+    property AuthorizationRequest;
     property DisableIfChangesExists;
     property DisableIfSaved;
     property RaiseIfChangesExists default False;
@@ -471,7 +471,7 @@ type
   published
     // inherited properties
     property Action_ShowOrSelectAction;
-    property AuthorizationCheck;
+    property AuthorizationRequest;
     property DisableIfChangesExists;
     property DisableIfSaved;
     property RaiseIfChangesExists default False;
@@ -504,7 +504,7 @@ type
   published
     // inherited properties
     property Action_ShowOrSelectAction;
-    property AuthorizationCheck;
+    property AuthorizationRequest;
     property DisableIfChangesExists;
     property DisableIfSaved;
     property RaiseIfChangesExists default False;
@@ -650,7 +650,7 @@ type
   strict private
     FAction_ParentCloseQueryAction: IioBSCloseQueryAction;
     FAction_SelectCurrentAction: IioBSSlaveAction;
-    FAuthorizationCheck: Boolean;
+    FAuthorizationRequest: Boolean;
     FEntityTypeName: String;
     FIsSlave: Boolean;
     FShowMode: TioActionShowMode;
@@ -688,7 +688,7 @@ type
     // properties
     property Action_ParentCloseQueryAction: IioBSCloseQueryAction read FAction_ParentCloseQueryAction write SetAction_ParentCloseQueryAction;
     property Action_SelectCurrentAction: IioBSSlaveAction read FAction_SelectCurrentAction write SetAction_SelectCurrentAction;
-    property AuthorizationCheck: Boolean read FAuthorizationCheck write FAuthorizationCheck default True;
+    property AuthorizationRequest: Boolean read FAuthorizationRequest write FAuthorizationRequest default True;
     property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
     property ShowMode: TioActionShowMode read FShowMode write FShowMode;
     property TargetBindSource: IioStdActionTargetBindSource read FTargetBindSource write SetTargetBindSource;
@@ -1146,7 +1146,7 @@ begin
   FRaiseIfRevertPointNotSaved := False;
   FAction_ReloadAction := nil;
   FAction_ShowOrSelectAction := nil;
-  FAuthorizationCheck := True;
+  FAuthorizationRequest := True;
 end;
 
 function TioVMActionBSPersistenceCustom<T>.Execute: Boolean;
@@ -1391,7 +1391,7 @@ begin
     Result := Result and ((not DisableIfSaved) or not LMasterBindSource.Persistence.IsSavedRevertPoint);
   end;
   // Authorization
-  if Result and AuthorizationCheck then
+  if Result and AuthorizationRequest then
   begin
     LForceAuthDecision := TioUtilities.IsNullOID(TargetBindSource.Current);
     Result := Result and TioApplication.AuthorizeByRequestParams(TargetBindSource.Current.ClassName, atDelete, itRegular, TargetBindSource._InternalGetAuthContext, LForceAuthDecision, True);
@@ -1509,7 +1509,7 @@ begin
   else
     Result := inherited and Assigned(TargetBindSource);
   // Authorization
-  if Result and AuthorizationCheck then
+  if Result and AuthorizationRequest then
   begin
     // Try to get the TypeName for authorization request
     if not FEntityTypeName.IsEmpty then
@@ -1608,7 +1608,7 @@ begin
   else
     Result := inherited and Assigned(TargetBindSource);
   // Authorization
-  if Result and AuthorizationCheck then
+  if Result and AuthorizationRequest then
   begin
     // Try to get the TypeName for authorization request
     if not FEntityTypeName.IsEmpty then
@@ -1886,7 +1886,7 @@ begin
   FIsSlave := False;
   FAction_ParentCloseQueryAction := nil;
   FAction_SelectCurrentAction := nil;
-  FAuthorizationCheck := True;
+  FAuthorizationRequest := True;
   FShowMode := TioActionShowMode.smBSCurrent;
   FTargetBindSource := nil;
   FVVMTypeAlias := '';
@@ -2103,7 +2103,7 @@ begin
       Result := assigned(FTargetBindSource) and FTargetBindSource.IsActive and not FEntityTypeName.Trim.IsEmpty;
   end;
   // Authorization
-  if Result and FAuthorizationCheck then
+  if Result and FAuthorizationRequest then
   begin
     LForceAuthDecision := Assigned(TargetBindSource) and TioUtilities.IsNullOID(TargetBindSource.Current);
     if Assigned(TargetBindSource) then
