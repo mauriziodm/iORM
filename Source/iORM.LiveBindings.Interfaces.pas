@@ -191,6 +191,7 @@ type
   // Interface for standard action target bind source
   IioStdActionTargetBindSource = interface
     ['{6E442DF5-154E-4253-9AFB-E5CCFDF32209}']
+    function _InternalGetAuthContext: String;
     function CanDoSelection: Boolean;
     function Current: TObject;
     function IsActive: Boolean;
