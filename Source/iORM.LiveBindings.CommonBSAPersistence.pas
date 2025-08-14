@@ -55,8 +55,6 @@ type
       ATargetList: TObject; AOnSuccessMethod: TioAsyncFuncOnSuccessMethod<TObject>);
     // Page manager
     class procedure _SetItemCountToPageManager(const ATypeName, ATypeAlias: String; AWhere: IioWhere);
-    // Ritorna true se l'oggetto corrente è un nuovo oggetto da persistere (ID = 0)
-    class function _CurrentToBeInserted(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): Boolean; static; inline;
   public
     // Create (ObjectBindSourceAdapter only)
     class procedure Create(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
@@ -120,18 +118,8 @@ var
   LActionType: TioPersistenceActionType;
   LForceAuthDecision: Boolean;
 begin
-  LForceAuthDecision := False;
   // Requires an authorization-decision for UI purposes
-  if AActiveBindSourceAdapter.BSPersistenceDeleting then
-  begin
-    LActionType := atDelete;
-    LForceAuthDecision := TioUtilities.IsNullOID(AActiveBindSourceAdapter.Current);
-  end
-  else
-  if _CurrentToBeInserted(AActiveBindSourceAdapter) then
-    LActionType := atInsert
-  else
-    LActionType := atUpdate;
+  LActionType := TioUtilities.ActionTypeByABSA(AActiveBindSourceAdapter, LForceAuthDecision);
   TioApplication.AuthorizeByRequestParams(AActiveBindSourceAdapter.Current.ClassName, LActionType, itRegular, AActiveBindSourceAdapter.GetBindSource._InternalGetAuthContext, LForceAuthDecision, False);
   // Notification to save revert point before edit
   AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint));
@@ -496,11 +484,6 @@ begin
     LCount := io.RefTo(ATypeName, ATypeAlias)._Where(AWhere).Count;
     LPagingObj.SetItemCount(LCount);
   end;
-end;
-
-class function TioCommonBSAPersistence._CurrentToBeInserted(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): Boolean;
-begin
-  Result := Assigned(AActiveBindSourceAdapter.Current) and (AActiveBindSourceAdapter.GetCurrentOID = IO_INTEGER_NULL_VALUE);
 end;
 
 class procedure TioCommonBSAPersistence._LoadList(const AASync: Boolean; const ATypeName, ATypeAlias: String; const ALazy: Boolean; const ALazyProps: String;

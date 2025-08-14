@@ -70,6 +70,7 @@ type
     class function ObjToID(const AObj: Tobject): Integer; static;
     class function IntfToID(const AIntf: IInterface): Integer; static;
     class function IsNullOID(const AObj: Tobject): Boolean; static;
+    class function ActionTypeByABSA(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; var OutForceAuthDecision: Boolean): TioPersistenceActionType;
     class function ExtractObjVersion(const AObj: Tobject): Integer; static;
     class function EnumToString<T>(const AEnumValue: T): String;
     class function StringToEnum<T>(const AStringValue: String): T;
@@ -524,6 +525,25 @@ end;
 class function TioUtilities.IsNullOID(const AObj: Tobject): Boolean;
 begin
   Result := TioMapContainer.GetMap(AObj.ClassName).GetProperties.GetIdProperty.GetValue(AObj).AsInteger = IO_INTEGER_NULL_VALUE;
+end;
+
+class function TioUtilities.ActionTypeByABSA(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; var OutForceAuthDecision: Boolean): TioPersistenceActionType;
+begin
+  OutForceAuthDecision := False;
+  // if AActiveBindSourceAdapter not assigned then exit
+  if not Assigned(AActiveBindSourceAdapter.Current) then
+    Exit;
+  // Return the right ActionType
+  if AActiveBindSourceAdapter.BSPersistenceDeleting then
+  begin
+    Result := atDelete;
+    OutForceAuthDecision := TioUtilities.IsNullOID(AActiveBindSourceAdapter.Current);
+  end
+  else
+  if IsNullOID(AActiveBindSourceAdapter.Current) then
+    Result := atInsert
+  else
+    Result := atUpdate;
 end;
 
 class function TioUtilities.ObjectAsIInterface(const AObj: Tobject): IInterface;
