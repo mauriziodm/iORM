@@ -876,7 +876,7 @@ type
 implementation
 
 uses
-  System.SysUtils, iORM.Exceptions, iORM.Utilities, iORM, System.Rtti,
+  System.SysUtils, System.StrUtils, iORM.Exceptions, iORM.Utilities, iORM, System.Rtti,
   iORM.RttiContext.Factory, iORM.StdActions.CloseQueryActionRegister,
   iORM.ETM.Engine, iORM.StdActions.CommonBehaviour,
   iORM.LiveBindings.CommonBSBehavior;
@@ -2172,12 +2172,15 @@ begin
         vcByViewContext:
           io.ShowAsETM(FEntityTypeName, FWhere, FTargetBindSource as IioMasterBindSource, FAction_ParentCloseQueryAction, FViewContext, FVVMTypeAlias);
         // vcNone:
-        // io.ShowAsETM(FEntityTypeName, FWhere, FParentCloseQueryAction, nil, FVVMTypeAlias);
+        //   io.ShowAsETM(FEntityTypeName, FWhere, FParentCloseQueryAction, nil, FVVMTypeAlias);
       end;
   end;
 end;
 
 function TioBSShowOrSelect._InternalUpdateStdAction: Boolean;
+var
+  LAuthContext: String;
+  LForceAuthDecision: Boolean;
 begin
   Result := True;
   // If the TargetBindSource is a SelectorFor some other BindSource then make the selection instead
@@ -2198,10 +2201,13 @@ begin
   // Authorization
   if Result and FAuthorizationCheck then
   begin
+    LForceAuthDecision := Assigned(TargetBindSource) and TioUtilities.IsNullOID(TargetBindSource.Current);
+    if Assigned(TargetBindSource) then
+      LAuthContext := TargetBindSource._InternalGetAuthContext;
     if FShowMode = smBSCurrent then
-      Result := Result and TioApplication.AuthorizeByRequestParams(FTargetBindSource.Current.ClassName, atSelect, itRegular, TargetBindSource._InternalGetAuthContext, False, True)
+      Result := Result and TioApplication.AuthorizeByRequestParams(FTargetBindSource.Current.ClassName, atSelect, itRegular, LAuthContext, LForceAuthDecision, True)
     else
-      Result := Result and TioApplication.AuthorizeByRequestParams(FEntityTypeName, atSelect, itRegular, TargetBindSource._InternalGetAuthContext, False, True);
+      Result := Result and TioApplication.AuthorizeByRequestParams(FEntityTypeName, atSelect, itRegular, LAuthContext, LForceAuthDecision, True);
   end;
 end;
 

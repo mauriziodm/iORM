@@ -2050,6 +2050,9 @@ begin
 end;
 
 function TioVMActionBSShowOrSelect._InternalUpdateStdAction: Boolean;
+var
+  LAuthContext: String;
+  LForceAuthDecision: Boolean;
 begin
   Result := True;
   // If the TargetBindSource is a SelectorFor some other BindSource then make the selection instead
@@ -2070,10 +2073,13 @@ begin
   // Authorization
   if Result and FAuthorizationCheck then
   begin
+    LForceAuthDecision := Assigned(TargetBindSource) and TioUtilities.IsNullOID(TargetBindSource.Current);
+    if Assigned(TargetBindSource) then
+      LAuthContext := TargetBindSource._InternalGetAuthContext;
     if FShowMode = smBSCurrent then
-      Result := Result and TioApplication.AuthorizeByRequestParams(FTargetBindSource.Current.ClassName, atSelect, itRegular, '', False, True)
+      Result := Result and TioApplication.AuthorizeByRequestParams(FTargetBindSource.Current.ClassName, atSelect, itRegular, LAuthContext, LForceAuthDecision, True)
     else
-      Result := Result and TioApplication.AuthorizeByRequestParams(FEntityTypeName, atSelect, itRegular, '', False, True);
+      Result := Result and TioApplication.AuthorizeByRequestParams(FEntityTypeName, atSelect, itRegular, LAuthContext, LForceAuthDecision, True);
   end;
 end;
 
