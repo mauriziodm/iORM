@@ -91,12 +91,19 @@ begin
     FInternalContainer.Add(LKey, LAuthDecisionResult);
   end;
   Result := LAuthDecisionResult.Authorized;
-  // if not authorized then raise an exception or abort or nothing
+  //  NB: Se non autorizzati ma non c'è una eccezione da sollevare (ExceptionMsg è vuoto) oppure sono Silent allora
+  //       esegue un abort per interrompere il flusso; ma se però siamo Silent oppure ActionType=atSelect
+  //       l'interruzione del flusso creava problemi con le StdActions oppure, nel caso di una operazione
+  //       LoadList/LoadObject, non volevo interrompere il flusso per fare in modo che se ho una entità
+  //       con dei dettagli e non sono autorizzato  a vedere i dettagli (ma il master si) allora proseguiva
+  //       e ottenevo la mia entità master ma senza i dettagli per i quali non sono autorizzato, per questo
+  //       non  devo interrompere il flusso in questo caso
+  //  NB: Ovviamente invece se non sono autorizzato e ExceptionMsg non è vuoto allora sollevo l'eccezione (a meno che non sono Silent)
   if not Result then
   begin
     if Silent or LAuthDecisionResult.ExceptionMsg.IsEmpty then
     begin
-      if AAuthDecisionRequest.ActionType > atSelect then
+      if (AAuthDecisionRequest.ActionType > atSelect) and not Silent then
         Abort;
     end
     else

@@ -950,7 +950,7 @@ end;
 
 function TioBSPersistenceStdActionFmx<T>.HandlesTarget(Target: TObject): Boolean;
 begin
-  Result := Assigned(Target) and Supports(FTargetBindSource, IioMasterBindSource) and FTargetBindSource.isActive;
+  Result := Assigned(Target) and Supports(FTargetBindSource, IioBindSource) and FTargetBindSource.isActive;
 end;
 
 procedure TioBSPersistenceStdActionFmx<T>.Notification(AComponent: TComponent; Operation: TOperation);
