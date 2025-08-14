@@ -1,4 +1,4 @@
-Ôªø{
+{
   ****************************************************************************
   *                                                                          *
   *           iORM - (interfaced ORM)                                        *
@@ -115,7 +115,7 @@ type
     //property Visible; // ridichiarata sotto
     // inherited events
     property OnHint;
-    //property OnUpdate; // Lasciarla non visibile, pu√≤ fare casino in questa particolare action
+    //property OnUpdate; // Lasciarla non visibile, puÚ fare casino in questa particolare action
     // properties
     property Checked: Boolean read GetChecked write SetChecked default False;
     property CheckedLinkedToVMAction: Boolean read GetCheckedLinkedToVMAction write SetCheckedLinkedToVMAction default True;
@@ -705,7 +705,7 @@ type
     property BeforeExecute;
     property CanExecute;
     property OnHint;
-    //OnUpdate; // Lasciarla non visibile, pu√≤ fare casino in questa particolare action
+    //OnUpdate; // Lasciarla non visibile, puÚ fare casino in questa particolare action
     // properties
     property InjectEventHandler: Boolean read FInjectEventHandler write FInjectEventHandler default True;
     property OnEditingAction: TioBSCloseQueryOnEditingAction read FOnEditingAction write FOnEditingAction default eaDisable;
@@ -789,7 +789,7 @@ type
     // properties
     property Action_ParentCloseQueryAction: IioBSCloseQueryAction read FAction_ParentCloseQueryAction write SetAction_ParentCloseQueryAction;
     property Action_SelectCurrentAction: IioBSSlaveAction read FAction_SelectCurrentAction write SetAction_SelectCurrentAction;
-    property AuthorizationCheck: Boolean read FAuthorizationRequest write FAuthorizationRequest default True;
+    property AuthorizationRequest: Boolean read FAuthorizationRequest write FAuthorizationRequest default True;
     property EntityTypeName: String read FEntityTypeName write FEntityTypeName;
     property ShowMode: TioActionShowMode read FShowMode write FShowMode;
     property TargetBindSource: IioStdActionTargetBindSource read FTargetBindSource write SetTargetBindSource;
@@ -1304,7 +1304,7 @@ begin
   else
     Result := inherited and Assigned(TargetBindSource);
   // Authorization
-  if Result and AuthorizationCheck then
+  if Result and AuthorizationRequest then
   begin
     // Try to get the TypeName for authorization request
     if not FEntityTypeName.IsEmpty then
@@ -1403,7 +1403,7 @@ begin
   else
     Result := inherited and Assigned(TargetBindSource);
   // Authorization
-  if Result and AuthorizationCheck then
+  if Result and AuthorizationRequest then
   begin
     // Try to get the TypeName for authorization request
     if not FEntityTypeName.IsEmpty then
@@ -1877,16 +1877,16 @@ begin
   FExecuting := True;
   try
     LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
-    // NB: DoOnConfirmationRequest richiede eventuale conferma all'utente ma solo se √® in modalit√† attiva
-    // cio√® √® la prima BSCloseQueryAction della catena di esecuzione delle CloseQueryActions. HO
-    // fatto in questo modo sia perch√® altrimenti ci sarebbero potute essere varie richieste di conferma
-    // sia perch√® altrimenti avevo un AV error.
-    // NB: Mauri 23/09/2023: Non c'√® pi√π dil DoOnConfirmationRequest perch√® rimosso perch√® ho aggiunto l'evento
+    // NB: DoOnConfirmationRequest richiede eventuale conferma all'utente ma solo se Ë in modalit‡ attiva
+    // cioË Ë la prima BSCloseQueryAction della catena di esecuzione delle CloseQueryActions. HO
+    // fatto in questo modo sia perchË altrimenti ci sarebbero potute essere varie richieste di conferma
+    // sia perchË altrimenti avevo un AV error.
+    // NB: Mauri 23/09/2023: Non c'Ë pi˘ dil DoOnConfirmationRequest perchË rimosso perchË ho aggiunto l'evento
     //      "CanExecute" a tutte le StdActions.
     if _CanClose then
     begin
-      // Se √® il caso fa l'Execute anche sulle ChildCQA
-      // NB: Le esegue sempre a partire da quella creata pi√π recentemente (child) e andando all'indietro
+      // Se Ë il caso fa l'Execute anche sulle ChildCQA
+      // NB: Le esegue sempre a partire da quella creata pi˘ recentemente (child) e andando all'indietro
       // quindi esegue prima le ChildCQA e poi se stessa
       if FOnUpdateScope in [usGlobal] then
         TioBSCloseQueryActionRegister.Execute(Self);
@@ -1962,17 +1962,17 @@ begin
   LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
   Result := (TargetBindSource = nil) or LMasterBindSource.Persistence.IsEmpty or LMasterBindSource.Persistence.CanSaveRevertPoint or
     (FOnEditingAction <> eaDisable);
-  // Se √® il caso interroga anche le ChildCQA
+  // Se Ë il caso interroga anche le ChildCQA
   if FOnUpdateScope in [usGlobal, usDisableIfChilds] then
     Result := Result and TioBSCloseQueryActionRegister.CanClose(Self, FOnUpdateScope = usDisableIfChilds);
-  // se c'√® un event handler per l'evento OnCloseQuery lascia a lui l'ultima parola
+  // se c'Ë un event handler per l'evento OnCloseQuery lascia a lui l'ultima parola
   if Assigned(FOnCloseQuery) then
     FOnCloseQuery(Self, Result);
 end;
 
 procedure TioBSCloseQuery._DummyOnExecute(Sender: TObject);
 begin
-  // Nothing, this is a dummy execute event handler (altrimenti l'azione non si esegue, in realt√† sembra servire solo su fmx)
+  // Nothing, this is a dummy execute event handler (altrimenti l'azione non si esegue, in realt‡ sembra servire solo su fmx)
 end;
 
 procedure TioBSCloseQuery._OnCloseQueryEventHandler(Sender: TObject; var CanClose: Boolean);
@@ -2433,14 +2433,14 @@ var
 begin
   if Assigned(Action_ShowOrSelectAction) and Action_ShowOrSelectAction._IsEnabled then
   begin
-    // Controlla se la ShowOrSelect action √® realmente una action di questo tipo
+    // Controlla se la ShowOrSelect action Ë realmente una action di questo tipo
     if not (Action_ShowOrSelectAction is TioBSShowOrSelect) then
       raise EioGenericException.Create(ClassName, '_ShowRevertedObj',
         Format('"Action_ShowOrSelectAction" property is of the wrong type "%s" insitead of "TioBSShowOrSelect".',
         [(Action_ShowOrSelectAction as TObject).ClassName]));
     // Estrae il tipo reale della ShowOrSelect action per poter poi accedere a informazioni che riguardano
     //  soprattutto come ottenere un ViewCOntext.
-    //  NB: Questa azione in realt√† non eseguir√† la ShowOrSelect action impostata bens√¨ far√† una chiamata
+    //  NB: Questa azione in realt‡ non eseguir‡ la ShowOrSelect action impostata bensÏ far‡ una chiamata
     //       io.Show... usando le informazioni recuperate.
     LShowOrSelectAction := Action_ShowOrSelectAction as TioBSShowOrSelect;
     case LShowOrSelectAction.ViewContextBy of
@@ -2523,14 +2523,14 @@ var
 begin
   if Assigned(Action_ShowOrSelectAction) and Action_ShowOrSelectAction._IsEnabled then
   begin
-    // Controlla se la ShowOrSelect action √® realmente una action di questo tipo
+    // Controlla se la ShowOrSelect action Ë realmente una action di questo tipo
     if not (Action_ShowOrSelectAction is TioBSShowOrSelect) then
       raise EioGenericException.Create(ClassName, '_ShowRevertedObj',
         Format('"Action_ShowOrSelectAction" property is of the wrong type "%s" insitead of "TioBSShowOrSelect".',
         [(Action_ShowOrSelectAction as TObject).ClassName]));
     // Estrae il tipo reale della ShowOrSelect action per poter poi accedere a informazioni che riguardano
     //  soprattutto come ottenere un ViewCOntext.
-    //  NB: Questa azione in realt√† non eseguir√† la ShowOrSelect action impostata bens√¨ far√† una chiamata
+    //  NB: Questa azione in realt‡ non eseguir‡ la ShowOrSelect action impostata bensÏ far‡ una chiamata
     //       io.Show... usando le informazioni recuperate.
     LShowOrSelectAction := Action_ShowOrSelectAction as TioBSShowOrSelect;
     case LShowOrSelectAction.ViewContextBy of
