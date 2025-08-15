@@ -165,8 +165,8 @@ type
     property OnInsertConflictException;
     property OnUpdateConflictException;
     // Published AuthContext property & event
-    property AuthContext;
-    property OnAuthContext;
+    property AuthorizationContext;
+    property OnAuthorizationContext;
   end;
 
 implementation

@@ -101,8 +101,8 @@ type
     FBeforeClose: TNotifyEvent;
     FBeforeOpen: TNotifyEvent;
     // Auth
-    FAuthContext: String; // property
-    FOnAuthContext: TioBSOnAuthContextEvent; // event
+    FAuthorizationContext: String; // property
+    FOnAuthorizationContext: TioBSOnAuthContextEvent; // event
 
     // Methods
     function Get_Version: String;
@@ -182,10 +182,10 @@ type
     // SelectorFor
     function GetSelectorFor: IioBindSource;
     procedure SetSelectorFor(const ATargetBindSource: IioBindSource);
-    // AuthContext
-    // NB: Non usare la proprietà AuthContext per usi interni, usare sempre "_InternalGetAuthContext" perchè
+    // AuthorizationContext
+    // NB: Non usare la proprietà AuthorizationContext per usi interni, usare sempre "_InternalGetAuthorizationContext" perchè
     //      tiene conto anche dell'eventuale event-handler
-    function _InternalGetAuthContext: String;
+    function _InternalGetAuthorizationContext: String;
     // Persistence concurrency conflicts
     function GetOnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent;
     function GetOnInsertConflictException: TioBSOnPersistenceConflictExceptionEvent;
@@ -264,11 +264,11 @@ type
     property AfterOpen: TNotifyEvent read FAfterOpen write FAfterOpen;
     property BeforeClose: TNotifyEvent read FBeforeClose write FBeforeClose;
     property BeforeOpen: TNotifyEvent read FBeforeOpen write FBeforeOpen;
-    // Published AuthContext property & event
-    // NB: Non usare la proprietà AuthContext per usi interni, usare sempre "_InternalGetAuthContext" perchè
+    // Published AuthorizationContext property & event
+    // NB: Non usare la proprietà AuthorizationContext per usi interni, usare sempre "_InternalGetAuthorizationContext" perchè
     //      tiene conto anche dell'eventuale event-handler
-    property AuthContext: String read FAuthContext write FAuthContext;
-    property OnAuthContext: TioBSOnAuthContextEvent read FonAuthContext write FonAuthContext;
+    property AuthorizationContext: String read FAuthorizationContext write FAuthorizationContext;
+    property OnAuthorizationContext: TioBSOnAuthContextEvent read FOnAuthorizationContext write FOnAuthorizationContext;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -436,7 +436,7 @@ end;
 constructor TioModelPresenterCustom.Create(AOwner: TComponent);
 begin
   inherited;
-  FAuthContext := String.Empty;
+  FAuthorizationContext := String.Empty;
   FAutoPost := True;
   FAutoRefreshOnNotification := True;
   FAsyncLoad := False;
@@ -1387,11 +1387,11 @@ begin
   FBindSourceAdapter.ioAutoPost := FAutoPost;
 end;
 
-function TioModelPresenterCustom._InternalGetAuthContext: String;
+function TioModelPresenterCustom._InternalGetAuthorizationContext: String;
 begin
-  Result := FAuthContext;
-  if Assigned(FOnAuthContext) then
-    FOnAuthContext(Self, Result);
+  Result := FAuthorizationContext;
+  if Assigned(FOnAuthorizationContext) then
+    FOnAuthorizationContext(Self, Result);
 end;
 
 procedure TioModelPresenterCustom._InternalSetETMforPrivateField(const AETMFor: IioBindSource);

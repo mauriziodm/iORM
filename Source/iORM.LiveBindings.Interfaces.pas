@@ -56,7 +56,7 @@ type
 
   TioBSOnPersistenceConflictExceptionEvent = procedure(const ASender, ADataObject: TObject; var AConflictResolved: Boolean) of object;
 
-  TioBSOnAuthContextEvent = procedure(const ASender: TObject; var AuthContext: String) of object;
+  TioBSOnAuthContextEvent = procedure(const ASender: TObject; var AuthorizationContext: String) of object;
 
   // Forward declaration
   IioActiveBindSourceAdapter = interface;
@@ -102,7 +102,7 @@ type
     procedure UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
     procedure PostIfEditing;
     procedure CancelIfEditing;
-    function _InternalGetAuthContext: String;
+    function _InternalGetAuthorizationContext: String;
     // universal methods (used by std actions)
     procedure _Action_Append(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
     procedure _Action_AppendObj(AObject: TObject; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
@@ -191,7 +191,7 @@ type
   // Interface for standard action target bind source
   IioStdActionTargetBindSource = interface
     ['{6E442DF5-154E-4253-9AFB-E5CCFDF32209}']
-    function _InternalGetAuthContext: String;
+    function _InternalGetAuthorizationContext: String;
     function CanDoSelection: Boolean;
     function Current: TObject;
     function IsActive: Boolean;

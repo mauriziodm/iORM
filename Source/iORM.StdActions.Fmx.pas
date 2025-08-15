@@ -1074,7 +1074,7 @@ begin
   if Result and AuthorizationRequest then
   begin
     LActionType := TioUtilities.ActionTypeByABSA(TargetBindSource.GetActiveBindSourceAdapter);
-    Result := Result and TioApplication.AuthorizeByRequestParams(TargetBindSource.Current.ClassName, LActionType, itRegular, TargetBindSource._InternalGetAuthContext, False, True);
+    Result := Result and TioApplication.AuthorizeByRequestParams(TargetBindSource.Current.ClassName, LActionType, itRegular, TargetBindSource._InternalGetAuthorizationContext, False, True);
   end;
 end;
 
@@ -1123,7 +1123,7 @@ begin
   if Result and AuthorizationRequest then
   begin
     LActionType := TioUtilities.ActionTypeByABSA(TargetBindSource.GetActiveBindSourceAdapter);
-    Result := Result and TioApplication.AuthorizeByRequestParams(TargetBindSource.Current.ClassName, LActionType, itRegular, TargetBindSource._InternalGetAuthContext, False, True);
+    Result := Result and TioApplication.AuthorizeByRequestParams(TargetBindSource.Current.ClassName, LActionType, itRegular, TargetBindSource._InternalGetAuthorizationContext, False, True);
   end;
 end;
 
@@ -1215,7 +1215,7 @@ begin
   if Result and AuthorizationRequest then
   begin
     LForceAuthDecision := TioUtilities.IsNullOID(TargetBindSource.Current);
-    Result := Result and TioApplication.AuthorizeByRequestParams(TargetBindSource.Current.ClassName, atDelete, itRegular, TargetBindSource._InternalGetAuthContext, LForceAuthDecision, True);
+    Result := Result and TioApplication.AuthorizeByRequestParams(TargetBindSource.Current.ClassName, atDelete, itRegular, TargetBindSource._InternalGetAuthorizationContext, LForceAuthDecision, True);
   end;
 end;
 
@@ -1340,7 +1340,7 @@ begin
     if LAuthTypeName.IsEmpty then
       raise EioGenericException.Create(ClassName, '_InternalUpdateStdAction', Format(INSERT_APPEND_EXCEPTION_MSG, [Name]));
     // Authorization request
-    Result := Result and TioApplication.AuthorizeByRequestParams(LAuthTypeName, atInsert, itRegular, TargetBindSource._InternalGetAuthContext, False, True);
+    Result := Result and TioApplication.AuthorizeByRequestParams(LAuthTypeName, atInsert, itRegular, TargetBindSource._InternalGetAuthorizationContext, False, True);
   end;
 end;
 
@@ -1439,7 +1439,7 @@ begin
     if LAuthTypeName.IsEmpty then
       raise EioGenericException.Create(ClassName, '_InternalUpdateStdAction', Format(INSERT_APPEND_EXCEPTION_MSG, [Name]));
     // Authorization request
-    Result := Result and TioApplication.AuthorizeByRequestParams(LAuthTypeName, atInsert, itRegular, TargetBindSource._InternalGetAuthContext, False, True);
+    Result := Result and TioApplication.AuthorizeByRequestParams(LAuthTypeName, atInsert, itRegular, TargetBindSource._InternalGetAuthorizationContext, False, True);
   end;
 end;
 
@@ -2357,7 +2357,7 @@ begin
   begin
     LForceAuthDecision := Assigned(TargetBindSource) and TioUtilities.IsNullOID(TargetBindSource.Current);
     if Assigned(TargetBindSource) then
-      LAuthContext := TargetBindSource._InternalGetAuthContext;
+      LAuthContext := TargetBindSource._InternalGetAuthorizationContext;
     if FShowMode = smBSCurrent then
       Result := Result and TioApplication.AuthorizeByRequestParams(FTargetBindSource.Current.ClassName, atSelect, itRegular, LAuthContext, LForceAuthDecision, True)
     else

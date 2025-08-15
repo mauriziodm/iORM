@@ -167,7 +167,7 @@ var
 begin
   // Requires an authorization-decision for UI purposes
   // NB: Codice inserito qui per intercettare l'insert/append richiesto con i metodi Append/Insert che ricevono l'istanza da aggiungere già creata
-  TioApplication.AuthorizeByRequestParams(ABindSource.GetTypeName, atInsert, itRegular, ABindSource._InternalGetAuthContext, False, False);
+  TioApplication.AuthorizeByRequestParams(ABindSource.GetTypeName, atInsert, itRegular, ABindSource._InternalGetAuthorizationContext, False, False);
   // Check the BindSourceAdapter
   if ABindSource.CheckAdapter and Supports(ABindSource.GetActiveBindSourceAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
   begin
@@ -342,7 +342,7 @@ begin
   if not Assigned(AObj) then
     raise EioGenericException.Create(ClassName, 'ProvideAuthDecisionForInsertOrAppendObj', 'The parameter does not contain a valid object instance');
   try
-    TioApplication.AuthorizeByRequestParams(AObj.ClassName, atInsert, itRegular, ABindSource._InternalGetAuthContext, False, False);
+    TioApplication.AuthorizeByRequestParams(AObj.ClassName, atInsert, itRegular, ABindSource._InternalGetAuthorizationContext, False, False);
   except
     if AFreeObjIfNotAuthorized then
       FreeAndNil(AObj);
@@ -387,7 +387,7 @@ begin
   //       (BeforeReceiveSelection...) sia possibile intervenire e impostare la richiesta di autorizzazione
   //       come si vuole
   LSelectedAsTObject := TioUtilities.GenericToTObject<T>(ASelected);
-  LAuthDecisionRequest := TioAuthFactory.NewAuthDecisionRequest(LSelectedAsTObject.ClassName, atMakeSelection, itRegular, ATargetBS._InternalGetAuthContext, False);
+  LAuthDecisionRequest := TioAuthFactory.NewAuthDecisionRequest(LSelectedAsTObject.ClassName, atMakeSelection, itRegular, ATargetBS._InternalGetAuthorizationContext, False);
   if TioUtilities.IsAnInterface<T> then
   begin
     LSelectedAsIInterface := TioUtilities.CastObjectToGeneric<IInterface>(LSelectedAsTObject);

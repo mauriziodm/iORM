@@ -90,8 +90,8 @@ type
     FOnInsertConflictException: TioBSOnPersistenceConflictExceptionEvent;
     FOnUpdateConflictException: TioBSOnPersistenceConflictExceptionEvent;
     // Auth
-    FAuthContext: String; // property
-    FOnAuthContext: TioBSOnAuthContextEvent; // event
+    FAuthorizationContext: String; // property
+    FOnAuthorizationContext: TioBSOnAuthContextEvent; // event
 
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
     function IsActive: Boolean;
@@ -169,10 +169,10 @@ type
     // SelectorFor
     function GetSelectorFor: IioBindSource;
     procedure SetSelectorFor(const ATargetBindSource: IioBindSource);
-    // AuthContext
-    // NB: Non usare la proprietà AuthContext per usi interni, usare sempre "_InternalGetAuthContext" perchè
+    // AuthorizationContext
+    // NB: Non usare la proprietà AuthorizationContext per usi interni, usare sempre "_InternalGetAuthorizationContext" perchè
     //      tiene conto anche dell'eventuale event-handler
-    function _InternalGetAuthContext: String;
+    function _InternalGetAuthorizationContext: String;
     // Persistence concurrency conflicts
     function GetOnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent;
     function GetOnInsertConflictException: TioBSOnPersistenceConflictExceptionEvent;
@@ -249,8 +249,8 @@ type
     // Published AuthContext property & event
     // NB: Non usare la proprietà AuthContext per usi interni, usare sempre "_InternalGetAuthContext" perchè
     //      tiene conto anche dell'eventuale event-handler
-    property AuthContext: String read FAuthContext write FAuthContext;
-    property OnAuthContext: TioBSOnAuthContextEvent read FonAuthContext write FonAuthContext;
+    property AuthorizationContext: String read FAuthorizationContext write FAuthorizationContext;
+    property OnAuthorizationContext: TioBSOnAuthContextEvent read FOnAuthorizationContext write FOnAuthorizationContext;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -343,7 +343,7 @@ end;
 constructor TioDataSetCustom.Create(AOwner: TComponent);
 begin
   inherited;
-  FAuthContext := String.Empty;
+  FAuthorizationContext := String.Empty;
   FAutoPost := True;
   FAutoRefreshOnNotification := True;
   FAsyncLoad := False;
@@ -528,11 +528,11 @@ begin
   Result := FAsDefault;
 end;
 
-function TioDataSetCustom._InternalGetAuthContext: String;
+function TioDataSetCustom._InternalGetAuthorizationContext: String;
 begin
-  Result := FAuthContext;
-  if Assigned(FOnAuthContext) then
-    FOnAuthContext(Self, Result);
+  Result := FAuthorizationContext;
+  if Assigned(FOnAuthorizationContext) then
+    FOnAuthorizationContext(Self, Result);
 end;
 
 function TioDataSetCustom.GetAutoPost: Boolean;

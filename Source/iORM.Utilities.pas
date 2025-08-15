@@ -534,7 +534,7 @@ class function TioUtilities.ActionTypeByABSA(const AActiveBindSourceAdapter: Iio
 begin
   // if AActiveBindSourceAdapter not assigned then exit
   if not Assigned(AActiveBindSourceAdapter.Current) then
-    Exit;
+    Exit(atDoNotPersist);
   // Return the right ActionType
   if AActiveBindSourceAdapter.BSPersistenceDeleting then
     Result := atDelete

@@ -119,7 +119,7 @@ var
 begin
   // Requires an authorization-decision for UI purposes
   LActionType := TioUtilities.ActionTypeByABSA(AActiveBindSourceAdapter);
-  TioApplication.AuthorizeByRequestParams(AActiveBindSourceAdapter.Current.ClassName, LActionType, itRegular, AActiveBindSourceAdapter.GetBindSource._InternalGetAuthContext, False, False);
+  TioApplication.AuthorizeByRequestParams(AActiveBindSourceAdapter.Current.ClassName, LActionType, itRegular, AActiveBindSourceAdapter.GetBindSource._InternalGetAuthorizationContext, False, False);
   // Notification to save revert point before edit
   AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint));
   // Notification to register the current object into the SmartUpdateDetection system
@@ -167,7 +167,7 @@ var
 begin
   // Requires an authorization-decision for UI purposes
   LForceAuthDecision := TioUtilities.IsNullOID(AActiveBindSourceAdapter.Current);
-  TioApplication.AuthorizeByRequestParams(AActiveBindSourceAdapter.Current.ClassName, atDelete, itRegular, AActiveBindSourceAdapter.GetBindSource._InternalGetAuthContext, LForceAuthDecision, False);
+  TioApplication.AuthorizeByRequestParams(AActiveBindSourceAdapter.Current.ClassName, atDelete, itRegular, AActiveBindSourceAdapter.GetBindSource._InternalGetAuthorizationContext, LForceAuthDecision, False);
   // If the delete detail is allowed then send a ntSaveRevertPoint notification
   if AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject, TioBSNotification.Create(TioBSNotificationType.ntCanDeleteDetail)) then
     AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject, TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint))
@@ -573,7 +573,7 @@ begin
         // Delete the DataObj and if a conflict exception is raised then invoke the BindSOurce onDeleteConflictException
         //  event handler (if the event handler is assigned)
         try
-          LAuthContext := AActiveBindSourceAdapter.GetBindSource._InternalGetAuthContext;
+          LAuthContext := AActiveBindSourceAdapter.GetBindSource._InternalGetAuthorizationContext;
           io._DeleteObjectInternal(LDataObj, LAuthContext, itRegular, BL_DEFAULT);
         except
           // Try to resolve the unresolved conflict (raise) invoking the BindSource.OnDeleteConflictException event handler if assigned
@@ -639,7 +639,7 @@ begin
     var
       LAuthContext: String;
     begin
-      LAuthContext := AActiveBindSourceAdapter.GetBindSource._InternalGetAuthContext;
+      LAuthContext := AActiveBindSourceAdapter.GetBindSource._InternalGetAuthorizationContext;
       io.PersistList(AActiveBindSourceAdapter.DataObject, LAuthContext, BL_DEFAULT);
     end;
 end;
@@ -667,7 +667,7 @@ begin
           //  event handler (if the event handler is assigned)
           // ----------------------------------------------------------------------------------------------------------------------------
           try
-            LAuthContext := AActiveBindSourceAdapter.GetBindSource._InternalGetAuthContext;
+            LAuthContext := AActiveBindSourceAdapter.GetBindSource._InternalGetAuthorizationContext;
             io._PersistObjectInternal(LDataObj, LAuthContext, itRegular, BL_DEFAULT, '', 0, LMasterBindSource.Persistence, '', '');
           except
             // Try to resolve the unresolved conflict (raise) invoking the BindSource.OnDeleteConflictException/OnUpdateConflictException
