@@ -330,6 +330,7 @@ type
     function _InternalUpdateStdAction: Boolean; override;
   published
     // inherited properties
+    property AuthorizationRequest;
     property TargetBindSource;
     // inherited events
     property AfterExecute;
@@ -361,6 +362,7 @@ type
   published
     // inherited properties
     property Action_CloseQueryAction;
+    property AuthorizationRequest;
     property DisableIfChangesDoesNotExists;
     property RaiseIfChangesDoesNotExists;
     property TargetBindSource;
@@ -1258,10 +1260,17 @@ end;
 
 function TioVMActionBSPersistenceSaveRevertPoint._InternalUpdateStdAction: Boolean;
 var
+  LActionType: TioPersistenceActionType;
   LMasterBindSource: IioMasterBindSource;
 begin
   LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
   Result := inherited and Assigned(TargetBindSource) and LMasterBindSource.Persistence.CanSaveRevertPoint;
+  // Authorization
+  if Result and AuthorizationRequest then
+  begin
+    LActionType := TioUtilities.ActionTypeByABSA(TargetBindSource.GetActiveBindSourceAdapter);
+    Result := Result and TioApplication.AuthorizeByRequestParams(TargetBindSource.Current.ClassName, LActionType, itRegular, TargetBindSource._InternalGetAuthContext, False, True);
+  end;
 end;
 
 { TioVMActionBSPersistenceClear }
