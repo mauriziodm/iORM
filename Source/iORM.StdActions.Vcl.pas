@@ -1109,11 +1109,18 @@ end;
 function TioBSPersistencePersist._InternalUpdateStdAction: Boolean;
 var
   LMasterBindSource: IioMasterBindSource;
+  LActionType: TioPersistenceActionType;
 begin
   LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
   Result := True;
   Result := Result and Assigned(TargetBindSource) and LMasterBindSource.Persistence.CanPersist;
   Result := Result and ((not DisableIfChangesDoesNotExists) or LMasterBindSource.Persistence.IsChanged);
+  // Authorization
+  if Result and AuthorizationRequest then
+  begin
+    LActionType := TioUtilities.ActionTypeByABSA(TargetBindSource.GetActiveBindSourceAdapter);
+    Result := Result and TioApplication.AuthorizeByRequestParams(TargetBindSource.Current.ClassName, LActionType, itRegular, TargetBindSource._InternalGetAuthContext, False, True);
+  end;
 end;
 
 { TioBSObjStateSave }

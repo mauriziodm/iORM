@@ -119,7 +119,8 @@ var
   LForceAuthDecision: Boolean;
 begin
   // Requires an authorization-decision for UI purposes
-  LActionType := TioUtilities.ActionTypeByABSA(AActiveBindSourceAdapter, LForceAuthDecision);
+  LActionType := TioUtilities.ActionTypeByABSA(AActiveBindSourceAdapter);
+  LForceAuthDecision := TioUtilities.IsNullOID(AActiveBindSourceAdapter.Current);
   TioApplication.AuthorizeByRequestParams(AActiveBindSourceAdapter.Current.ClassName, LActionType, itRegular, AActiveBindSourceAdapter.GetBindSource._InternalGetAuthContext, LForceAuthDecision, False);
   // Notification to save revert point before edit
   AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint));
