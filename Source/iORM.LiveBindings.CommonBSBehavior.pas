@@ -381,7 +381,7 @@ begin
   //  Prima crea l'oggetto AuthorizationRequest, lo imposta con il TypeName dell'oggetto ricevuto come selezione
   //  e lo passa all'evento "BeforeReceiveSelection" dove, tra le altre cose, è possibile cambiare i valori delle
   //  proprietà della AuthorizationRequest se necesario, alla fine esegue la richiesta di autorizzazione.
-  //  NB: Ho fatto così perchèragionando molto sono giunto alla conclusione che non era possibile impostare
+  //  NB: Ho fatto così perchè ragionando molto sono giunto alla conclusione che non era possibile impostare
   //       la AuthorizationRequest in modo che andasse bene in qualunque situazione, dipende sempre da cosa
   //       vuole fare il programmatore e come quindi ho deciso di fare in modo che scrivendo un event handler
   //       (BeforeReceiveSelection...) sia possibile intervenire e impostare la richiesta di autorizzazione
