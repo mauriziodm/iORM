@@ -657,6 +657,19 @@ var
   LDone: Boolean;
   LPreviousCurrentObj: TObject;
 begin
+  // Forza l'aggiornamento del SUD (Smart Update Detection) in modo che poi, se richiesto,
+  //  l'oggetto Master vegga persistito. Prima di aggiungere questa riga succedeva che,
+  //  nell'esempio degli ordini delle pizze, se aggiungevo una nuova pizza in una nuova
+  //  riga con una nuova pizza poi l'oggetto non si persisteva perchè nel SUD l'oggetto
+  //  master non figurava come modificato e quindi non veniva persistito. La stessa cosa
+  //  succedeva anche in caso di modifica manuale di una riga.
+  //  NB: Prima eera alla fine di questo metodo ma poi l'ho spostato all'inizio perchè
+  //       altrimenti la selezione avveniva anche se l'utente non aveva l'autorizzazione
+  //       l'oggetto ricevente (Target), nel senso che otteneva l'autorizzazione alla selezione
+  //       ma non alla modifica dell'oggetto target che cmq viene modificato. Spostandolo
+  //       all'inizio l'operazione non si esegue se non ottiene entrambe le autorizzazioni
+  DoBeforeEdit;
+
   // Initialization and save previous current object to delete it if
   // OnReceiveSelectionFreeObject property of the BindSource is True
   LDone := False;
@@ -678,14 +691,6 @@ begin
   // of the BindSource is True
   if FBindSource.OnReceiveSelectionFreeObject and (LPreviousCurrentObj <> nil) then
     LPreviousCurrentObj.Free;
-
-  // Forza l'aggiornamento del SUD (Smart Update Detection) in modo che poi, se richiesto,
-  //  l'oggetto Master vegga persistito. Prima di aggiungere questa riga succedeva che,
-  //  nell'esempio degli ordini delle pizze, se aggiungevo una nuova pizza in una nuova
-  //  riga con una nuova pizza poi lìoggetto non si persisteva perchè nel SUD l'oggetto
-  //  master non figurava come modificato e quindi non veniva persistito. La stessa cosa
-  //  succedeva anche in caso di modifica manuale di una riga.
-  DoBeforeEdit;
 end;
 
 procedure TioActiveObjectBindSourceAdapter.ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType);

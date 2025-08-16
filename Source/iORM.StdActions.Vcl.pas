@@ -1129,11 +1129,24 @@ end;
 
 procedure TioBSPersistenceSaveRevertPoint._InternalExecuteStdAction;
 var
+  LActionType: TioPersistenceActionType;
   LMasterBindSource: IioMasterBindSource;
 begin
-  inherited;
-  LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
-  LMasterBindSource.Persistence.SaveRevertPoint(True);
+  // Authorization
+  //  NB: Ho dovuto mettere anche qui la richiesta di autorizzazione perchè altrimenti se la
+  //      proprietà "AuthorizationRequest" di questa azione era impostata a False e quindi
+  //      in pratica sempre abilitata e poi l'utente cliccava sul bottone collegato (ad esempio)
+  //      la action riusciva a metetre lìoggetto in editing (SaveRevertPoint) anche se l'azione
+  //      atUpdate non era autorizzata.
+  //  NB: Probabilmente l'if non serve nemmeno perchè durante la verifica dell'autorizzazione
+  //       vene eseguito un abort (se l'operazione non è autorizzata)
+  LActionType := TioUtilities.ActionTypeByABSA(TargetBindSource.GetActiveBindSourceAdapter);
+  if TioApplication.AuthorizeByRequestParams(TargetBindSource.Current.ClassName, LActionType, itRegular, TargetBindSource._InternalGetAuthorizationContext, False, True) then
+  begin
+    inherited;
+    LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
+    LMasterBindSource.Persistence.SaveRevertPoint(True);
+  end;
 end;
 
 function TioBSPersistenceSaveRevertPoint._InternalUpdateStdAction: Boolean;
