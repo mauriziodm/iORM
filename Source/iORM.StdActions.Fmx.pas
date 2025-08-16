@@ -2443,6 +2443,7 @@ end;
 function TioBS_ETM_RevertToBindSource._InternalUpdateStdAction: Boolean;
 var
   LMasterBindSource: IioMasterBindSource;
+  LTypeNameToBeReverted: String;
 begin
   LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
   Result := inherited and Assigned(TargetBindSource);
@@ -2450,6 +2451,12 @@ begin
   Result := Result and Assigned(TargetBindSource.Current);
   Result := Result and LMasterBindSource.ETMfor.isActive;
   Result := Result and Assigned(LMasterBindSource.ETMfor.Current);
+  // Authorization
+  if Result and AuthorizationRequest then
+  begin
+    LTypeNameToBeReverted := (TargetBindSource.Current as TioEtmCustomTimeSlot).ClassName;
+    Result := Result and TioApplication.AuthorizeByRequestParams(LTypeNameToBeReverted, atUpdate, itRevert, TargetBindSource._InternalGetAuthorizationContext, False, True);
+  end;
 end;
 
 procedure TioBS_ETM_RevertToBindSource._ShowRevertedObj;
@@ -2541,6 +2548,7 @@ end;
 function TioBS_ETM_RevertToObject._InternalUpdateStdAction: Boolean;
 var
   LMasterBindSource: IioMasterBindSource;
+  LTypeNameToBeReverted: String;
 begin
   LMasterBindSource := TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(TargetBindSource) as IioMasterBindSource;
   Result := inherited and Assigned(TargetBindSource);
@@ -2548,6 +2556,12 @@ begin
   Result := Result and Assigned(TargetBindSource.Current);
   Result := Result and LMasterBindSource.ETMfor.isActive;
   Result := Result and Assigned(LMasterBindSource.ETMfor.Current);
+  // Authorization
+  if Result and AuthorizationRequest then
+  begin
+    LTypeNameToBeReverted := (TargetBindSource.Current as TioEtmCustomTimeSlot).ClassName;
+    Result := Result and TioApplication.AuthorizeByRequestParams(LTypeNameToBeReverted, atUpdate, itRevert, TargetBindSource._InternalGetAuthorizationContext, False, True);
+  end;
 end;
 
 procedure TioBS_ETM_RevertToObject._ShowRevertedObj;
