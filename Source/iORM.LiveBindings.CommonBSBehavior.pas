@@ -524,11 +524,14 @@ end;
 
 class function TioCommonBSBehavior.GetFirstMasterPersistenceBindSource(const AStartBindSource: IioBindSource): IioBindSource;
 begin
-  if not Assigned(AStartBindSource) then
-    Exit(nil);
-  Result := AStartBindSource;
-  while (not Result.IsMasterBS) and Result.HasMasterBS do
-    Result := Result.MasterBindSource;
+  if Assigned(AStartBindSource) then
+  begin
+    Result := AStartBindSource;
+    while (not Result.IsMasterBS) and Result.HasMasterBS do
+      Result := Result.MasterBindSource;
+  end
+  else
+    Result := nil;
 end;
 
 end.

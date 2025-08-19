@@ -530,9 +530,16 @@ end;
 
 function TioDataSetCustom._InternalGetAuthorizationContext: String;
 begin
-  Result := FAuthorizationContext;
-  if Assigned(FOnAuthorizationContext) then
-    FOnAuthorizationContext(Self, Result);
+  // Se il BS attuale è master allora ritorna il relativo AuthContext considerando anche l'eventule event-handler,
+  //  se invece non è master allora risale fino al primo master che incontra e lo prende da questo
+  if IsMasterBS then
+  begin
+    Result := FAuthorizationContext;
+    if Assigned(FOnAuthorizationContext) then
+      FOnAuthorizationContext(Self, Result);
+  end
+  else
+    Result := FirstMasterPersistenceBindSource._InternalGetAuthorizationContext;
 end;
 
 function TioDataSetCustom.GetAutoPost: Boolean;

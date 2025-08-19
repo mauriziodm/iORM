@@ -70,9 +70,6 @@ type
     property AfterOpen;
     property BeforeClose;
     property BeforeOpen;
-    // Published AuthContext property & event
-    property AuthorizationContext;
-    property OnAuthorizationContext;
   end;
 
 implementation
