@@ -29,9 +29,9 @@ type
     FInternalContainer: TDictionary<String, TioAuthDecisionResult>;
     function ComposeKey(const AAuthDecisionRequest: IioAuthDecisionRequest): String; inline;
   protected
-    procedure Clear;
   public
     constructor Create;
+    procedure Clear;
     destructor Destroy; override;
     function IsAuthorized(const AAuthDecisionRequest: IioAuthDecisionRequest; const Silent: Boolean): Boolean; virtual;
   end;

@@ -76,6 +76,7 @@ type
   //  mantiene SessionData separati per le diverse sessioni.
   IioAuthCache = interface
     ['{20FCA9CF-C450-4E29-8EDA-EC8DF8B0B542}']
+    procedure Clear;
     function IsAuthorized(const AAuthDecisionRequest: IioAuthDecisionRequest; const Silent: Boolean): Boolean;
   end;
 

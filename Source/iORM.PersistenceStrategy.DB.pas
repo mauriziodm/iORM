@@ -796,47 +796,50 @@ begin
       LContext.GetProperties.GetPropertyByName(APSRequest.RelationPropName).SetValue(LContext.DataObject, APSRequest.RelationOID);
     // Detect the persist action type
     _DetectPersistActionType;
-    // access-token validation
-    // note: The anonymous method of type "TioTokenValidateMethod" can return true or false
-    //        to authorize or not the operation to be performed. But be careful, if the operation
-    //        is not authorized simply returning false will not raise any exception so the operation
-    //        will not be performed but the user will probably not notice the lack of authorization;
-    //        If you want to inform the user of the failed authorization, you need to raise an exception
-    //        within the annoying method itself (TioTokenValidateMethod).
-    TioApplication.AuthorizeByRequestObj(LContext as IioAuthDecisionRequest);
-{$REGION '-----INTERCEPTORS-----'}
-{$IFNDEF ioCRUDInterceptorsOff}
-    // Interceptors: intercept the "before" action
-    if not _Interceptors_InterceptBeforeAction then
+    if LContext.ActionType > atDoNotPersist then
     begin
-{$ENDIF}
-{$ENDREGION}
-      // PreProcess (persist) relation childs (BelongsTo)
-      PreProcessRelationChildOnPersist(LContext);
-      // Process the current object
-      // --------------------------
-      case LContext.ActionType of
-        atInsert:
-          InsertObject_Internal(LContext);
-        atUpdate:
-          UpdateObject_Internal(LContext);
-        atDelete:
-          begin
-            // PreProcess (delete) relation childs (HasMany, HasOne)
-            PreProcessRelationChildOnDelete(LContext);
-            DeleteObject_Internal(LContext);
-          end;
+      // access-token validation
+      // note: The anonymous method of type "TioTokenValidateMethod" can return true or false
+      //        to authorize or not the operation to be performed. But be careful, if the operation
+      //        is not authorized simply returning false will not raise any exception so the operation
+      //        will not be performed but the user will probably not notice the lack of authorization;
+      //        If you want to inform the user of the failed authorization, you need to raise an exception
+      //        within the annoying method itself (TioTokenValidateMethod).
+      TioApplication.AuthorizeByRequestObj(LContext as IioAuthDecisionRequest);
+  {$REGION '-----INTERCEPTORS-----'}
+  {$IFNDEF ioCRUDInterceptorsOff}
+      // Interceptors: intercept the "before" action
+      if not _Interceptors_InterceptBeforeAction then
+      begin
+  {$ENDIF}
+  {$ENDREGION}
+        // PreProcess (persist) relation childs (BelongsTo)
+        PreProcessRelationChildOnPersist(LContext);
+        // Process the current object
+        // --------------------------
+        case LContext.ActionType of
+          atInsert:
+            InsertObject_Internal(LContext);
+          atUpdate:
+            UpdateObject_Internal(LContext);
+          atDelete:
+            begin
+              // PreProcess (delete) relation childs (HasMany, HasOne)
+              PreProcessRelationChildOnDelete(LContext);
+              DeleteObject_Internal(LContext);
+            end;
+        end;
+        // --------------------------
+        // PostProcess (persist) relation childs (HasMany, HasOne)
+        PostProcessRelationChildOnPersist(LContext);
+  {$REGION '-----INTERCEPTORS-----'}
+  {$IFNDEF ioCRUDInterceptorsOff}
+        // Intercept the "after" action
+        _Interceptors_InterceptAfterAction;
       end;
-      // --------------------------
-      // PostProcess (persist) relation childs (HasMany, HasOne)
-      PostProcessRelationChildOnPersist(LContext);
-{$REGION '-----INTERCEPTORS-----'}
-{$IFNDEF ioCRUDInterceptorsOff}
-      // Intercept the "after" action
-      _Interceptors_InterceptAfterAction;
+  {$ENDIF}
+  {$ENDREGION}
     end;
-{$ENDIF}
-{$ENDREGION}
     // Commit
     CommitTransaction_Internal(LContext.ConnectionNameResolved);
   except

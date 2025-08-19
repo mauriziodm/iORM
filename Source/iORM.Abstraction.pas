@@ -97,6 +97,8 @@ type
     class function GetDefaultConnection: String;
     class procedure SetDefaultConnection(const Value: String);
     class procedure SetDefaultConnectionIfEmpty(const AConnectionName: String);
+    // clear authorization-cache
+    class procedure ClearAuthorizationCache;
   end;
 
   TioSimpleSessionDataStore = class(TioCustomSessionDataStore)
@@ -564,6 +566,16 @@ class function TioCustomSessionDataStore.AcquireMainSessionData: IioSessionData;
 begin
   _Lock;
   Result := _GetMainSessionData;
+end;
+
+class procedure TioCustomSessionDataStore.ClearAuthorizationCache;
+begin
+  _Lock;
+  try
+    _GetThreadOrMainSessionData(False).AuthCacheUI.Clear;
+  finally
+    _Unlock;
+  end;
 end;
 
 class procedure TioCustomSessionDataStore.ClearMainSessionData;
