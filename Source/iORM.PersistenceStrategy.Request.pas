@@ -574,6 +574,8 @@ procedure TioPersistenceStrategyRequest.ImportSessionDataFromPSRequest(const APS
 begin
   // auth-cache
   FAuthCache := APSRequest.AuthCache;
+  // auth-context
+  FAuthContext := APSRequest.AuthContext;
   // access token
   FToken := APSRequest.Token;
   // app
