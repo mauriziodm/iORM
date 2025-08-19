@@ -881,7 +881,7 @@ type
 implementation
 
 uses
-  System.SysUtils, System.StrUtils, iORM.Exceptions, iORM.Utilities, iORM, System.Rtti,
+  System.SysUtils, iORM.Exceptions, iORM.Utilities, iORM, System.Rtti,
   iORM.RttiContext.Factory, iORM.StdActions.CloseQueryActionRegister,
   iORM.ETM.Engine, iORM.StdActions.CommonBehaviour,
   iORM.LiveBindings.CommonBSBehavior;
