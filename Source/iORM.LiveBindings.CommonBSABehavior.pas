@@ -607,7 +607,7 @@ begin
         if TioEnumContainer._Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
           Result := TioEnumContainer._OrdinalToStringAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType),
             LRttiProperty.GetValue(LObject).AsOrdinal).AsType<T>
-          // Enumeration binded as integer
+        // Enumeration binded as integer
         else
           Result := T(LRttiProperty.GetValue(LObject).GetReferenceToRawData^);
       end
