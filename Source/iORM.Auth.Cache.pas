@@ -60,7 +60,7 @@ end;
 
 function TioAuthCacheCustom.ComposeKey(const AAuthDecisionRequest: IioAuthDecisionRequest): String;
 begin
-  Result := AAuthDecisionRequest.TypeName + ':' + IntToStr(Ord(AAuthDecisionRequest.ActionType)) + ':' + AAuthDecisionRequest.AuthContext;
+  Result := AAuthDecisionRequest.TypeName + ':' + IntToStr(Ord(AAuthDecisionRequest.ActionType)) + ':' + AAuthDecisionRequest.AuthorizationContext;
 end;
 
 constructor TioAuthCacheCustom.Create;

@@ -19,20 +19,20 @@ type
     FTypeName: String;
     FToken: String;
     function GetActionType: TioPersistenceActionType;
-    function GetAuthContext: String;
+    function GetAuthorizationContext: String;
     function GetForceAuthDecision: Boolean;
     function GetIntent: TioPersistenceIntentType;
     function GetToken: String;
     function GetTypeName: String;
     procedure SetActionType(const Value: TioPersistenceActionType);
-    procedure SetAuthContext(const Value: String);
+    procedure SetAuthorizationContext(const Value: String);
     procedure SetTypeName(const Value: String);
   public
     constructor Create(const ATypeName: String; const AActionType: TioPersistenceActionType; const AIntent: TioPersistenceIntentType; const AAuthContext: String; const AForceAuthDecision: Boolean);
     function IsAuthorized(const Silent: Boolean): Boolean;
     // properties
     property ActionType: TioPersistenceActionType read GetActionType write SetActionType;
-    property AuthContext: String read GetAuthContext write SetAuthContext;
+    property AuthorizationContext: String read GetAuthorizationContext write SetAuthorizationContext;
     property ForceAuthDecision: Boolean read GetForceAuthDecision;
     property Intent: TioPersistenceIntentType read GetIntent;
     property Token: String read GetToken;
@@ -61,7 +61,7 @@ begin
   Result := FActionType;
 end;
 
-function TioAuthDecisionRequestUI.GetAuthContext: String;
+function TioAuthDecisionRequestUI.GetAuthorizationContext: String;
 begin
   Result := FAuthContext;
 end;
@@ -106,7 +106,7 @@ begin
   FActionType := Value;
 end;
 
-procedure TioAuthDecisionRequestUI.SetAuthContext(const Value: String);
+procedure TioAuthDecisionRequestUI.SetAuthorizationContext(const Value: String);
 begin
   FAuthContext := Value;
 end;

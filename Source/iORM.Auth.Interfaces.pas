@@ -104,9 +104,9 @@ type
     ['{02E419C2-347C-412D-B7B3-F264EFB92B94}']
     function IsAuthorized(const Silent: Boolean): Boolean;
     // AuthContext
-    procedure SetAuthContext(const Value: String);
-    function GetAuthContext: String;
-    property AuthContext: String read GetAuthContext write SetAuthContext;
+    procedure SetAuthorizationContext(const Value: String);
+    function GetAuthorizationContext: String;
+    property AuthorizationContext: String read GetAuthorizationContext write SetAuthorizationContext;
     // AccessToken
     function GetToken: String;
     property Token: String read GetToken;

@@ -207,8 +207,8 @@ type
     // access-token
     function GetToken: String;
     // auth-context
-    procedure SetAuthContext(const Value: String);
-    function GetAuthContext: String;
+    procedure SetAuthorizationContext(const Value: String);
+    function GetAuthorizationContext: String;
     // BlindLevel
     function GetBlindLevel: Byte; override;
     procedure SetBlindLevel(const Value: Byte); override;
@@ -786,7 +786,7 @@ begin
   FPSRequest := APSRequest;
 end;
 
-function TioContext_PSRequest.GetAuthContext: String;
+function TioContext_PSRequest.GetAuthorizationContext: String;
 begin
   Result := FPSRequest.AuthContext;
 end;
@@ -864,7 +864,7 @@ begin
   Result := FPSRequest.AuthCache.IsAuthorized(Self, Silent);
 end;
 
-procedure TioContext_PSRequest.SetAuthContext(const Value: String);
+procedure TioContext_PSRequest.SetAuthorizationContext(const Value: String);
 begin
   FPSRequest.AuthContext := Value;
 end;
