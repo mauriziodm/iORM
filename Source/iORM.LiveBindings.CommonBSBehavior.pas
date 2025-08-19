@@ -138,6 +138,14 @@ var
   LCurrentComponent: TObject;
   LCurrentBindSource: IioBindSource;
 begin
+  // Mauri 19/08/2025: adesso solo i MasterBS hanno la proprietà AsDefault  perchè non aveva senso che
+  //  l'avessero anche i DetailBS visto che solo i Master hanno il SetDataObject quindi non possono
+  //  essere il BS di default di una vista, quindi se sono DetailBS li imposto direttamente a False.
+  if Supports(ABindSource, IioBindSource, LCurrentBindSource) and LCurrentBindSource.IsDetailBS then
+  begin
+    AAsDefaultValue := False;
+    Exit;
+  end;
   // At DesignTime initialize the "AsDefault" property at True if it is the
   // first ModelPresenter inserted (no other presenters presents).
   // NB: At Runtime set False as initial value (load real value from dfm file)
