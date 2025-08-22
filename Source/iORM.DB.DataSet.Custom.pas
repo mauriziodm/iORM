@@ -41,7 +41,7 @@ uses
   iORM.LiveBindings.CommonBSAPaging, iORM.Where.Interfaces,
   Data.Bind.ObjectScope, System.Generics.Collections,
   iORM.MVVM.ViewContextProvider, iORM.StdActions.Interfaces,
-  iORM.LiveBindings.BSPersistence, iORM.Auth.Interfaces;
+  iORM.LiveBindings.BSPersistence, iORM.Auth.Interfaces, System.Rtti;
 
 type
 
@@ -66,6 +66,7 @@ type
     FETMfor: IioMasterBindSource;
     // Selectors
     FSelectorFor: IioBindSource;
+    [weak] FSelectionFrom: IioBindSource;
     FOnReceiveSelectionCloneObject: Boolean;
     FOnReceiveSelectionFreeObject: Boolean;
     // Questà è una collezione dove eventuali DataSet di dettaglio
@@ -97,6 +98,7 @@ type
     function IsActive: Boolean;
     procedure OpenCLoseDetails(const AActive: Boolean);
     function FirstMasterPersistenceBindSource: IioBindSource;
+    function Locate(const KeyFields: string; const KeyValues: TValue): Boolean;  // NB: Per ora messo solo per compatibilità con IioBindSource
     // universal methods (used by std actions)
     procedure _Action_Append(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
     procedure _Action_AppendObj(AObject: TObject; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
@@ -167,8 +169,11 @@ type
     procedure SetWhere(const AWhere: IioWhere);
     function GetWhere: IioWhere;
     // SelectorFor
-    function GetSelectorFor: IioBindSource;
     procedure SetSelectorFor(const ATargetBindSource: IioBindSource);
+    function GetSelectorFor: IioBindSource;
+    // SelectionFrom
+    procedure SetSelectionFrom(const Value: IioBindSource);
+    function GetSelectionFrom: IioBindSource;
     // AuthorizationContext
     // NB: Non usare la proprietà AuthorizationContext per usi interni, usare sempre "_InternalGetAuthorizationContext" perchè
     //      tiene conto anche dell'eventuale event-handler
@@ -298,7 +303,7 @@ implementation
 
 uses
   System.SysUtils, iORM.Utilities, iORM.Where.Factory, iORM.Exceptions,
-  iORM.LiveBindings.Factory, iORM.Components.Common, System.Rtti, iORM,
+  iORM.LiveBindings.Factory, iORM.Components.Common, iORM,
   iORM.LiveBindings.CommonBSBehavior;
 
 { TioDataSet }
@@ -642,6 +647,11 @@ begin
   Result := FPaging;
 end;
 
+function TioDataSetCustom.GetSelectionFrom: IioBindSource;
+begin
+  Result := FSelectionFrom;
+end;
+
 function TioDataSetCustom.GetSelectorFor: IioBindSource;
 begin
   Result := FSelectorFor;
@@ -744,6 +754,11 @@ begin
   // ===========================================================================
 
   inherited;
+end;
+
+function TioDataSetCustom.Locate(const KeyFields: string; const KeyValues: TValue): Boolean;
+begin
+  { TODO : Messo solo per compatibilità con IioBindSource, lasciarlo privato in modo che non possa nemmeno essere usata poi vedere se in futuro implementare il Locate anche così }
 end;
 
 procedure TioDataSetCustom.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
@@ -997,9 +1012,16 @@ begin
   raise EioGenericException.Create(ClassName, 'SetPaging', 'This property "Paging" is not writable');
 end;
 
+procedure TioDataSetCustom.SetSelectionFrom(const Value: IioBindSource);
+begin
+  FSelectionFrom := Value;
+end;
+
 procedure TioDataSetCustom.SetSelectorFor(const ATargetBindSource: IioBindSource);
 begin
   FSelectorFor := ATargetBindSource;
+  // set a reverse reference used by CoBOL system (COmbo-Box Object Lookup)
+  ATargetBindSource.SelectionFrom := Self;
 end;
 
 procedure TioDataSetCustom.SetTypeAlias(const Value: String);

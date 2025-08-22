@@ -98,7 +98,10 @@ type
   // properties of also child objects of the current master object (the current object of the BindSourceAdapter);
   // eg: "Customer.Address" field name.
   TioPropertyValueWriter<T> = class(TPropertyValueWriter<T>)
+  private
+    [weak] FBindSource: IioBindSource;
   public
+    constructor Create(const ABindSource: IioBindSource);
     procedure SetValue(const AValue: T); override;
   end;
 
@@ -140,7 +143,7 @@ implementation
 
 uses iORM.Context.Map.Interfaces, iORM.Attributes, System.TypInfo, System.SysUtils, iORM.Utilities, iORM.Exceptions, iORM.Context.Container,
   iORM.Context.Factory, iORM.LiveBindings.BSPersistence,
-  iORM.LiveBindings.CommonBSAPaging, iORM;
+  iORM.LiveBindings.CommonBSAPaging, iORM, iORM.Abstraction;
 
 { TioCommonBSABehavior }
 
@@ -476,7 +479,7 @@ begin
     if AProperty.IsWritable then
       Result := TBindSourceAdapterReadWriteField<T>.Create(ABindSourceAdapter, AFullPathPropName,
         TBindSourceAdapterFieldType.Create(AProperty.PropertyType.Name, AProperty.PropertyType.TypeKind), AGetMemberObject, TioPropertyValueReader<T>.Create,
-        TioPropertyValueWriter<T>.Create, AMemberType)
+        TioPropertyValueWriter<T>.Create((ABindSourceAdapter as IioActiveBindSourceAdapter).GetBindSource), AMemberType)
     else
       Result := TBindSourceAdapterReadField<T>.Create(ABindSourceAdapter, AFullPathPropName, TBindSourceAdapterFieldType.Create(AProperty.PropertyType.Name,
         AProperty.PropertyType.TypeKind), AGetMemberObject, TioPropertyValueReader<T>.Create, AMemberType);
@@ -593,33 +596,34 @@ begin
   // if FField.MemberName.StartsWith('%') then
   // _CheckVirtualFields;
 
+  // Extract the entity instance (exit an empty TValue if not assigned)
   LObject := FField.GetMemberObjectIntf.GetMemberObject;
-  if LObject <> nil then
-  begin
-    LRttiType := LCtxt.GetType(LObject.ClassType);
-    LRttiProperty := LRttiType.GetProperty(TioUtilities.ExtractPropertyName(FField.MemberName));
-    if LRttiProperty <> nil then
-    begin
-      // Enumeration type
-      if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
-      begin
-        // Enumeration binded as string
-        if TioEnumContainer._Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
-          Result := TioEnumContainer._OrdinalToStringAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType),
-            LRttiProperty.GetValue(LObject).AsOrdinal).AsType<T>
-        // Enumeration binded as integer
-        else
-          Result := T(LRttiProperty.GetValue(LObject).GetReferenceToRawData^);
-      end
-      // Other types
-      else
-        Result := LRttiProperty.GetValue(LObject).AsType<T>
-    end
-    else
-      Result := TValue.Empty.AsType<T>;
-  end
+  if not Assigned(LObject) then
+    Exit(TValue.Empty.AsType<T>);
+
+  // Get the RttiType & RttiProperty
+  LRttiType := LCtxt.GetType(LObject.ClassType);
+  LRttiProperty := LRttiType.GetProperty(TioUtilities.ExtractPropertyName(FField.MemberName));
+  // If property not found then return an empty TVAlue
+  if LRttiProperty = nil then
+    Result := TValue.Empty.AsType<T>
   else
-    Result := TValue.Empty.AsType<T>;
+  begin
+    // Enumeration type
+    if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
+    begin
+      // Enumeration binded as string
+      if TioEnumContainer._Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
+        Result := TioEnumContainer._OrdinalToStringAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType),
+          LRttiProperty.GetValue(LObject).AsOrdinal).AsType<T>
+      // Enumeration binded as integer
+      else
+        Result := T(LRttiProperty.GetValue(LObject).GetReferenceToRawData^);
+    end
+    // Other types
+    else
+      Result := LRttiProperty.GetValue(LObject).AsType<T>
+  end;
 end;
 
 // procedure TioPropertyValueReader<T>._CheckVirtualFields;
@@ -632,6 +636,12 @@ end;
 // end;
 
 { TioPropertyValueWriter<T> }
+constructor TioPropertyValueWriter<T>.Create(const ABindSource: IioBindSource);
+begin
+  inherited Create;
+  FBindSource := ABindSource;
+end;
+
 procedure TioPropertyValueWriter<T>.SetValue(const AValue: T);
 var
   LObject: TObject;
@@ -639,43 +649,57 @@ var
   LRttiType: TRttiType;
   LRttiProperty: TRttiProperty;
   LValue: TValue;
+  LLookupID: Integer;
 begin
+  // Do not inherit
+
   // NB: If it's a property relative to a BindSource virtual field then raise an exception because
   // these type of properties are ReadOnly
   if FField.MemberName.StartsWith('%') then
     raise EioGenericException.Create(Self.ClassName, 'SetValue',
       Format('Ooops, I see you have set some virtual fields in some BindSource or DataSet (FieldDefs property), they are the ones whose name starts with the character "%%".'
-      + #13#13'Note that these type of virtual fields are read-only by design; iORM cannot assign the new value to the field named "%s".' +
-      #13#13'Please, try to Assign value to the bind source property directly by code.', [FField.MemberName]));
-  // Do not inherit
+      + #13#13'Note that these type of virtual fields are read-only by design; iORM cannot assign the new value to the field named "%s".', [FField.MemberName]));
+  // Extract the target object
   LObject := FField.GetMemberObjectIntf.GetMemberObject;
-  if LObject <> nil then
-  begin
-    LRttiType := LCtxt.GetType(LObject.ClassType);
-    LRttiProperty := LRttiType.GetProperty(TioUtilities.ExtractPropertyName(FField.MemberName));
-    if LRttiProperty <> nil then
-    begin
-      // Enumeration type
-      if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
-      begin
-        // Enumeration binded as string
-        if TioEnumContainer._Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
-          LValue := TioEnumContainer._StringToOrdinalAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType), TValue.From<T>(AValue).AsString)
-          // Enumeration binded as integer
-        else
-          TValue.Make(@AValue, LRttiProperty.PropertyType.Handle, LValue);
-        // Set the enumeration value
-        LRttiProperty.SetValue(LObject, LValue);
-      end
-      // Other types
-      else
-        LRttiProperty.SetValue(LObject, TValue.From<T>(AValue));
-      // RecordChanged;
-    end;
-  end
-  else
+  if not Assigned(LObject) then
     raise EioGenericException.Create(Self.ClassName, 'SetValue',
       Format('I am unable to resolve the property path "%s".'#13#13'It could be that one of the objects along the way is nil.', [FField.MemberName]));
+  // Get the RttiType of the entity and the related RttiProperty
+  LRttiType := LCtxt.GetType(LObject.ClassType);
+  LRttiProperty := LRttiType.GetProperty(TioUtilities.ExtractPropertyName(FField.MemberName));
+  if not Assigned(LRttiProperty) then
+    exit;
+  // If the property has a BelongsTo relation and has ioCoBOL (COmbo-Box Object Lookup) attribute
+  if TioUtilities.PropertyHasAttribute(LRttiProperty, ioCoBOL) then
+  begin
+    if Assigned(FBindSource.SelectionFrom) then
+    begin
+      LLookupID := TValue.From<T>(AValue).AsInteger;
+      TioAnonymousTimer.Create(1,
+        function: Boolean
+        begin
+          FBindSource.SelectionFrom.Locate('ID', LLookupID);
+          FBindSource.SelectionFrom.SelectCurrent;
+        end);
+       Exit;
+    end;
+  end
+  // Enumeration type
+  else
+  if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
+  begin
+    // Enumeration binded as string
+    if TioEnumContainer._Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
+      LValue := TioEnumContainer._StringToOrdinalAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType), TValue.From<T>(AValue).AsString)
+    // Enumeration binded as integer
+    else
+      TValue.Make(@AValue, LRttiProperty.PropertyType.Handle, LValue);
+    // Set the enumeration value
+    LRttiProperty.SetValue(LObject, LValue);
+  end
+  // Other types
+  else
+    LRttiProperty.SetValue(LObject, TValue.From<T>(AValue));
 end;
 
 { TioBindSourceAdapterSimpleGetMemberObject }

@@ -151,6 +151,10 @@ type
 
   ioOID = ioID; // Deprecated
 
+  // CoBOL - COmbo Box Object Lookup
+  ioCoBOL = class(TioCustomAttribute)
+  end;
+
   // FieldName attribute
   ioField = class(TioCustomStringAttribute)
   end;

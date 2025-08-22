@@ -97,6 +97,7 @@ type
     class function GetAttribute(const ARttiType: TRttiType; const AAttrClass: TCustomAttributeRef): TCustomAttribute; static;
     class function HasAttribute(const ARttiType: TRttiType; const AAttrClass: TCustomAttributeRef): Boolean; static;
     class function HasAttributes(const ARttiType: TRttiType; const AAttrClass1, AAttrClass2: TCustomAttributeRef): Boolean; static;
+    class function PropertyHasAttribute(const ARttiProperty: TRttiProperty; const AAttrClass: TCustomAttributeRef): Boolean; static;
     // Funzioni che implementano verifiche riguardo l'essere Entità
     class function isEntityType(const ARttiType: TRttiType): Boolean; inline;
     class function isEntityAttribute(const AAttribute: TCustomAttribute): Boolean; inline;
@@ -211,6 +212,16 @@ begin
     Result := LIDProp.GetValue(AObj).AsInteger
   else
     raise EioGenericException.Create(ClassName, 'ObjToID', Format('the %s class object does not contain any ID properties', [AObj.ClassName]));
+end;
+
+class function TioUtilities.PropertyHasAttribute(const ARttiProperty: TRttiProperty; const AAttrClass: TCustomAttributeRef): Boolean;
+var
+  LAttr: TCustomAttribute;
+begin
+  for LAttr in ARttiProperty.GetAttributes do
+    if LAttr is AAttrClass then
+      Exit(True);
+  Result := False;
 end;
 
 class function TioUtilities.IntfToID(const AIntf: IInterface): Integer;

@@ -39,7 +39,7 @@ uses
   System.Classes, System.SysUtils, Data.Bind.ObjectScope, System.Generics.Collections, iORM.CommonTypes, iORM.LiveBindings.Interfaces,
   iORM.LiveBindings.CommonBSAPaging, iORM.LiveBindings.Notification, iORM.Where.Interfaces, iORM.MVVM.ViewContextProvider,
   iORM.StdActions.Interfaces, iORM.LiveBindings.BSPersistence,
-  iORM.Auth.Interfaces;
+  iORM.Auth.Interfaces, System.Rtti;
 
 type
 
@@ -64,6 +64,7 @@ type
     FETMfor: IioMasterBindSource;
     // Selectors
     FSelectorFor: IioBindSource;
+    [weak] FSelectionFrom: IioBindSource;
     FOnReceiveSelectionCloneObject: Boolean;
     FOnReceiveSelectionFreeObject: Boolean;
     // Questà è una collezione dove eventuali ModelPresenter di dettaglio
@@ -180,8 +181,11 @@ type
     procedure SetWhere(const AWhere: IioWhere);
     function GetWhere: IioWhere;
     // SelectorFor
-    function GetSelectorFor: IioBindSource;
     procedure SetSelectorFor(const ATargetBindSource: IioBindSource);
+    function GetSelectorFor: IioBindSource;
+    // SelectionFrom
+    procedure SetSelectionFrom(const Value: IioBindSource);
+    function GetSelectionFrom: IioBindSource;
     // AuthorizationContext
     // NB: Non usare la proprietà AuthorizationContext per usi interni, usare sempre "_InternalGetAuthorizationContext" perchè
     //      tiene conto anche dell'eventuale event-handler
@@ -300,6 +304,7 @@ type
     procedure Prior;
     procedure First;
     procedure Last;
+    function Locate(const KeyFields: string; const KeyValues: TValue): Boolean;
     procedure Edit(AForce: Boolean = False);
     procedure Post;
     procedure PostIfEditing;
@@ -795,6 +800,11 @@ begin
   Result := FPaging;
 end;
 
+function TioModelPresenterCustom.GetSelectionFrom: IioBindSource;
+begin
+  Result := FSelectionFrom;
+end;
+
 function TioModelPresenterCustom.GetSelectorFor: IioBindSource;
 begin
   Result := FSelectorFor;
@@ -911,6 +921,11 @@ begin
   // ===========================================================================
 
   inherited;
+end;
+
+function TioModelPresenterCustom.Locate(const KeyFields: string; const KeyValues: TValue): Boolean;
+begin
+  { TODO : To be implemented }
 end;
 
 procedure TioModelPresenterCustom.SelectCurrent(ASelectionType: TioSelectionType);
@@ -1264,9 +1279,16 @@ begin
   raise EioGenericException.Create(ClassName, 'SetPaging', 'This property "Paging" is not writable');
 end;
 
+procedure TioModelPresenterCustom.SetSelectionFrom(const Value: IioBindSource);
+begin
+  FSelectionFrom := Value;
+end;
+
 procedure TioModelPresenterCustom.SetSelectorFor(const ATargetBindSource: IioBindSource);
 begin
   FSelectorFor := ATargetBindSource;
+  // set a reverse reference used by CoBOL system (COmbo-Box Object Lookup)
+  ATargetBindSource.SelectionFrom := Self;
 end;
 
 procedure TioModelPresenterCustom.SetTypeAlias(const Value: String);

@@ -80,6 +80,7 @@ type
     // function AdapterExists: Boolean;
     procedure First;
     procedure Next;
+    function Locate(const KeyFields: string; const KeyValues: TValue): Boolean;
     function CheckAdapter: Boolean; overload;
     function CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean; overload;
     function CheckActiveAdapter: Boolean;
@@ -173,9 +174,14 @@ type
     procedure SetTypeOfCollection(const Value: TioTypeOfCollection);
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection write SetTypeOfCollection;
     // SelectorFor
+    procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     function GetSelectorFor: IioBindSource;
     procedure SetSelectorFor(const ATargetBindSource: IioBindSource);
     property SelectorFor: IioBindSource read GetSelectorFor write SetSelectorFor; // published: Master
+    // SelectionFrom
+    procedure SetSelectionFrom(const ABindSource: IioBindSource);
+    function GetSelectionFrom: IioBindSource;
+    property SelectionFrom: IioBindSource read GetSelectionFrom write SetSelectionFrom;
     // Published Events: persistence concurrency conflicts
     function GetOnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent;
     function GetOnInsertConflictException: TioBSOnPersistenceConflictExceptionEvent;
