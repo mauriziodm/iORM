@@ -652,7 +652,6 @@ var
   LLookupID: Integer;
 begin
   // Do not inherit
-
   // NB: If it's a property relative to a BindSource virtual field then raise an exception because
   // these type of properties are ReadOnly
   if FField.MemberName.StartsWith('%') then

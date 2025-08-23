@@ -41,7 +41,7 @@ uses
   iORM.LiveBindings.CommonBSAPaging, iORM.Where.Interfaces,
   Data.Bind.ObjectScope, System.Generics.Collections,
   iORM.MVVM.ViewContextProvider, iORM.StdActions.Interfaces,
-  iORM.LiveBindings.BSPersistence, iORM.Auth.Interfaces, System.Rtti;
+  iORM.LiveBindings.BSPersistence, iORM.Auth.Interfaces, System.Rtti, Data.DB;
 
 type
 
@@ -98,7 +98,8 @@ type
     function IsActive: Boolean;
     procedure OpenCLoseDetails(const AActive: Boolean);
     function FirstMasterPersistenceBindSource: IioBindSource;
-    function Locate(const KeyFields: string; const KeyValues: TValue): Boolean;  // NB: Per ora messo solo per compatibilità con IioBindSource
+    function Locate(const KeyFields: string; const KeyValues: Variant; Options: TLocateOptions): Boolean; overload; override;
+    function Locate(const KeyFields: string; const KeyValues: TValue): Boolean; overload;
     // universal methods (used by std actions)
     procedure _Action_Append(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
     procedure _Action_AppendObj(AObject: TObject; const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
@@ -185,6 +186,8 @@ type
     procedure SetOnDeleteConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
     procedure SetOnInsertConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
     procedure SetOnUpdateConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
+    // Locate related methods
+    function CompareValues(const AValue1, AValue2: Variant; Options: TLocateOptions): Boolean;
   protected
     procedure Loaded; override;
     function GetName: String;
@@ -304,7 +307,7 @@ implementation
 uses
   System.SysUtils, iORM.Utilities, iORM.Where.Factory, iORM.Exceptions,
   iORM.LiveBindings.Factory, iORM.Components.Common, iORM,
-  iORM.LiveBindings.CommonBSBehavior;
+  iORM.LiveBindings.CommonBSBehavior, System.Variants, System.StrUtils;
 
 { TioDataSet }
 
@@ -343,6 +346,20 @@ procedure TioDataSetCustom.ClearDataObject;
 begin
   if CheckAdapter then
     GetActiveBindSourceAdapter.ClearDataObject;
+end;
+
+function TioDataSetCustom.CompareValues(const AValue1, AValue2: Variant; Options: TLocateOptions): Boolean;
+begin
+  if (loCaseInsensitive in Options) and VarIsStr(AValue1) and VarIsStr(AValue2) then
+    // Confronto insensibile alle maiuscole/minuscole
+    Result := SameText(AValue1, AValue2)
+  else
+  if (loPartialKey in Options) and VarIsStr(AValue1) and VarIsStr(AValue2) then
+    // Confronto parziale (es. "Ro" trova "Roma")
+    Result := StartsStr(AValue2, AValue1)
+  else
+    // Confronto standard
+    Result := (AValue1 = AValue2);
 end;
 
 constructor TioDataSetCustom.Create(AOwner: TComponent);
@@ -756,9 +773,81 @@ begin
   inherited;
 end;
 
+function TioDataSetCustom.Locate(const KeyFields: string; const KeyValues: Variant; Options: TLocateOptions): Boolean;
+var
+  FieldList: TStringList;
+  Bookmark: TBookmark;
+  CurrentIndex: Integer;
+  IsArray: Boolean;
+
+  // Funzione locale per fare il confronto tra i campi
+  function MatchRecord: Boolean;
+  var
+    FieldValue: Variant;
+    I: Integer;
+  begin
+    Result := False;
+    if IsArray then
+    begin
+      // Gestione di un array di valori
+      for I := 0 to FieldList.Count - 1 do
+      begin
+        FieldValue := FieldByName(FieldList[I]).Value;
+        if CompareValues(FieldValue, KeyValues[I], Options) then
+          Exit(True);
+      end;
+    end
+    else
+    begin
+      // Gestione di un singolo valore
+      FieldValue := FieldByName(FieldList[0]).Value;
+      if CompareValues(FieldValue, KeyValues, Options) then
+        Exit(True);
+    end;
+  end;
+
+begin
+  Result := False;
+  // Salva il bookmark per poter tornare indietro se non trovi il record
+  Bookmark := GetBookmark;
+  try
+    FieldList := TStringList.Create;
+    try
+      // Suddividi la stringa KeyFields in una lista di nomi di campo
+      FieldList.Delimiter := ';';
+      FieldList.StrictDelimiter := True;
+      FieldList.DelimitedText := KeyFields;
+      // Controlla se KeyValues è un array di varianti
+      IsArray := (VarType(KeyValues) and varArray) <> 0;
+      // Controllo di coerenza tra il numero di campi e valori
+      // Solleva un'eccezione se il numero di campi non corrisponde ai valori
+      if ( IsArray and (VarArrayHighBound(KeyValues, 1) - VarArrayLowBound(KeyValues, 1) + 1 <> FieldList.Count) )
+      or ( not IsArray and (FieldList.Count <> 1) ) then
+        raise EioGenericException.Create(ClassName, 'Locate', 'The number of KeyFields and KeyValues must be equal');
+      // Inizia la ricerca dal primo record
+      First;
+      // Itera finché non raggiungi la fine del dataset o non trovi il record
+      while not Eof do
+      begin
+        if MatchRecord then
+          Exit(True);
+        Next;
+      end;
+      // Se non trovi il record, torna alla posizione iniziale
+      if not Result then
+        GotoBookmark(Bookmark);
+    finally
+      FieldList.Free;
+    end;
+  finally
+    // Libera il bookmark creato
+    FreeBookmark(Bookmark);
+  end;
+end;
+
 function TioDataSetCustom.Locate(const KeyFields: string; const KeyValues: TValue): Boolean;
 begin
-  { TODO : Messo solo per compatibilità con IioBindSource, lasciarlo privato in modo che non possa nemmeno essere usata poi vedere se in futuro implementare il Locate anche così }
+  Result := Locate(KeyFields, KeyValues.AsVariant, []);
 end;
 
 procedure TioDataSetCustom.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
