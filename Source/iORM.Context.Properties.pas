@@ -318,6 +318,7 @@ type
     function PropertyExists(const APropertyName: String): Boolean;
     function GetIdProperty: IioProperty;
     function GetPropertyByName(const APropertyName: String; const ARaiseIfNotFound: Boolean = True): IioProperty;
+    function IsIdPropByName(const APropertyName: String): Boolean;
     procedure SetTable(const ATable: IioTable);
     // Blob field present
     function BlobFieldExists: Boolean;
@@ -1134,6 +1135,11 @@ end;
 function TioProperties.GetSql: String;
 begin
   raise EioGenericException.Create(ClassName, 'GetSql', 'Method not to be called on this class');
+end;
+
+function TioProperties.IsIdPropByName(const APropertyName: String): Boolean;
+begin
+  Result := APropertyName.Equals(FIdProperty.GetName);
 end;
 
 function TioProperties.ObjCreatedPropertyExist: Boolean;

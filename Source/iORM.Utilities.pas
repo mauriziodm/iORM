@@ -70,6 +70,7 @@ type
     class function ObjToID(const AObj: Tobject): Integer; static;
     class function IntfToID(const AIntf: IInterface): Integer; static;
     class function IsNullOID(const AObj: Tobject): Boolean; static;
+    class function IsIdPropByName(const AEntityClassName, APropertyName: String): Boolean; static;
     class function ActionTypeByABSA(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioPersistenceActionType;
     class function ExtractObjVersion(const AObj: Tobject): Integer; static;
     class function EnumToString<T>(const AEnumValue: T): String;
@@ -531,6 +532,11 @@ end;
 class function TioUtilities.IsPersistedEntity(const AClassName: String): Boolean;
 begin
   Result := TioMapContainer.GetMap(AClassName).GetTable.IsPersistedEntity;
+end;
+
+class function TioUtilities.IsIdPropByName(const AEntityClassName, APropertyName: String): Boolean;
+begin
+  Result := TioMapContainer.GetMap(AEntityClassName).GetProperties.IsIdPropByName(APropertyName);;
 end;
 
 class function TioUtilities.IsNullOID(const AObj: Tobject): Boolean;
