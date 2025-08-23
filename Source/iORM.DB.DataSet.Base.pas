@@ -112,6 +112,10 @@ type
     function GetBookmarkFlag(Buffer: TRecordBuffer): TBookmarkFlag; override; deprecated 'Use overloaded method instead';
     function GetBookmarkFlag(Buffer: TRecBuf): TBookmarkFlag; override;
 
+    // locate
+    function CompareValues(const AValue1, AValue2: Variant; Options: TLocateOptions): Boolean;
+    function Locate(const KeyFields: string; const KeyValues: TValue): Boolean; reintroduce; overload; // IioBindSource
+
     // editing (dummy vesions)
     procedure InternalDelete; override;
     procedure InternalAddRecord(Buffer: TRecBuf; Append: Boolean); override;
@@ -121,6 +125,8 @@ type
     procedure InternalHandleException; override;
     function GetRecordInfo: TioRecInfo;
   public
+    // locate
+    function Locate(const KeyFields: string; const KeyValues: Variant; Options: TLocateOptions): Boolean; overload; override;
     // redeclared data set properties
     property Active;
   published
@@ -243,7 +249,7 @@ uses
   iORM.Context.Container, System.Types, Data.FmtBcd, Data.DBConsts, System.DateUtils,
   iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, iORM.Utilities, System.StrUtils,
   iORM.RttiContext.Factory, iORM, iORM.Abstraction,
-  iORM.LiveBindings.CommonBSBehavior;
+  iORM.LiveBindings.CommonBSBehavior, System.Variants;
 
 /// //////////////////////////////////////////////
 /// /// Part I:
@@ -297,6 +303,82 @@ end;
 function TioBaseDataSet.IsCursorOpen: Boolean;
 begin
   Result := FIsTableOpen;
+end;
+
+function TioBaseDataSet.Locate(const KeyFields: string; const KeyValues: TValue): Boolean;
+begin
+  Result := Locate(KeyFields, KeyValues.AsVariant, []);
+end;
+
+function TioBaseDataSet.Locate(const KeyFields: string; const KeyValues: Variant; Options: TLocateOptions): Boolean;
+var
+  FieldList: TStringList;
+  Bookmark: TBookmark;
+  IsArray: Boolean;
+
+  // Funzione locale per fare il confronto tra i campi
+  function MatchRecord: Boolean;
+  var
+    FieldValue: Variant;
+    I: Integer;
+  begin
+    Result := False;
+    if IsArray then
+    begin
+      // Gestione di un array di valori
+      for I := 0 to FieldList.Count - 1 do
+      begin
+        FieldValue := FieldByName(FieldList[I]).Value;
+        if CompareValues(FieldValue, KeyValues[I], Options) then
+          Exit(True);
+      end;
+    end
+    else
+    begin
+      // Gestione di un singolo valore
+      FieldValue := FieldByName(FieldList[0]).Value;
+      if CompareValues(FieldValue, KeyValues, Options) then
+        Exit(True);
+    end;
+  end;
+
+begin
+  Result := False;
+  // Salva il bookmark per poter tornare indietro se non trovi il record
+  Bookmark := GetBookmark;
+  try
+    FieldList := TStringList.Create;
+    try
+      // Suddividi la stringa KeyFields in una lista di nomi di campo
+      FieldList.Delimiter := ';';
+      FieldList.StrictDelimiter := True;
+      FieldList.DelimitedText := KeyFields;
+      // Controlla se KeyValues è un array di varianti
+      IsArray := (VarType(KeyValues) and varArray) <> 0;
+      // Controllo di coerenza tra il numero di campi e valori
+      // Solleva un'eccezione se il numero di campi non corrisponde ai valori
+      if ( IsArray and (VarArrayHighBound(KeyValues, 1) - VarArrayLowBound(KeyValues, 1) + 1 <> FieldList.Count) )
+      or ( not IsArray and (FieldList.Count <> 1) ) then
+        raise EioGenericException.Create(ClassName, 'Locate', 'The number of KeyFields and KeyValues must be equal');
+      // Inizia la ricerca dal primo record
+      First;
+      // Itera finché non raggiungi la fine del dataset o non trovi il record
+      while not Eof do
+      begin
+        if MatchRecord then
+          Exit(True);
+        Next;
+      end;
+      // Se non trovi il record, torna alla posizione iniziale
+      if not Result then
+        GotoBookmark(Bookmark);
+    finally
+      FieldList.Free;
+    end;
+  finally
+    // Libera il bookmark creato
+    FreeBookmark(Bookmark);
+  end;
 end;
 
 /// /////////////////////////////////////
@@ -485,6 +567,20 @@ begin
 end;
 
 // III: Free the buffer
+function TioBaseDataSet.CompareValues(const AValue1, AValue2: Variant; Options: TLocateOptions): Boolean;
+begin
+  if (loCaseInsensitive in Options) and VarIsStr(AValue1) and VarIsStr(AValue2) then
+    // Confronto insensibile alle maiuscole/minuscole
+    Result := SameText(AValue1, AValue2)
+  else
+  if (loPartialKey in Options) and VarIsStr(AValue1) and VarIsStr(AValue2) then
+    // Confronto parziale (es. "Ro" trova "Roma")
+    Result := StartsStr(AValue2, AValue1)
+  else
+    // Confronto standard
+    Result := (AValue1 = AValue2);
+end;
+
 procedure TioBaseDataSet.FreeRecordBuffer(var Buffer: TRecordBuffer);
 begin
   FreeMem(Buffer);
@@ -1467,7 +1563,6 @@ end;
 class procedure TioFullPathPropertyReadWrite.SetValue(const ADataSet: TioBSABaseDataSet; AObj: TObject; const AFullPathPropName: String; const AValue: TValue);
 var
   LBindSource: IioBindSource;
-  LLookupID: Integer;
   LRttiProperty: TRttiProperty;
 begin
   // NB: If it's a property relative to the BindSource then raise an exception because

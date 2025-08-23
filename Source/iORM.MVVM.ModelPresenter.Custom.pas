@@ -926,6 +926,7 @@ end;
 function TioModelPresenterCustom.Locate(const KeyFields: string; const KeyValues: TValue): Boolean;
 begin
   { TODO : To be implemented }
+  Result := False;
 end;
 
 procedure TioModelPresenterCustom.SelectCurrent(ASelectionType: TioSelectionType);
