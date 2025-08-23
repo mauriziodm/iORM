@@ -227,12 +227,13 @@ type
 
   TioFullPathPropertyReadWrite = class
   strict private
+    class var FLookingUp: Boolean;
     class function _ExtractPropName(var AFullPathPropName: String): String;
     class function _ResolvePath(var AOutObj: TObject; var AOutRttiProperty: TRttiProperty; AFullPathPropName: String): Boolean;
     class function _GetValueForBSProp(const ADataSet: TioBSABaseDataSet; APropName: String): TValue;
   public
     class function GetValue(const ADataSet: TioBSABaseDataSet; AObj: TObject; const AField: TField): TValue;
-    class procedure SetValue(AObj: TObject; const AFullPathPropName: String; const AValue: TValue);
+    class procedure SetValue(const ADataSet: TioBSABaseDataSet; AObj: TObject; const AFullPathPropName: String; const AValue: TValue);
   end;
 
 implementation
@@ -813,7 +814,7 @@ begin
   end;
   // Set Property, Object, Value:
   // Even if the property is of a child object, even multilevel, it resolves the path and set the value
-  TioFullPathPropertyReadWrite.SetValue(FBindSourceAdapter.Current, Field.FieldName, LValue);
+  TioFullPathPropertyReadWrite.SetValue(Self, FBindSourceAdapter.Current, Field.FieldName, LValue);
   // Set modified
   SetModified(True);
   // NB: Mauri 03/03/2020 - Aggiungendo queste due righe, oltre ad aver eliminato la condizione
@@ -1338,27 +1339,6 @@ begin
   end;
 end;
 
-// class function TioFullPathPropertyReadWrite._ResolvePath(var AOutObj: TObject; var AOutProperty: IioProperty; AFullPathPropName: String): Boolean;
-// var
-// LPropName: String;
-// begin
-// Result := False;
-// LPropName := _ExtractPropName(AFullPathPropName);
-// AOutProperty := TioMapContainer.GetMap(AOutObj.ClassName).GetProperties.GetPropertyByName(LPropName);
-// if not AFullPathPropName.IsEmpty then
-// begin
-// // If it is not the last property of the path then it must have a BelongsTo, HasOne or EmbeddedHasOne relationship
-// if not(AOutProperty.GetRelationType in [rtBelongsTo, rtHasOne, rtEmbeddedHasOne]) then
-// raise EioException.Create(ClassName, '_ResolvePath', Format('Property "%s.%s" must have a BelongsTo, HasOne or EmbeddedHasOne relationship.',
-// [AOutObj.ClassName, LPropName]));
-// AOutObj := AOutProperty.GetRelationChildObject(AOutObj);
-// // Recursion: If the child object is not assigned, the recursion stops and the function returns false
-// if Assigned(AOutObj) then
-// Result := _ResolvePath(AOutObj, AOutProperty, AFullPathPropName); // Recursion
-// end
-// else
-// Result := True;
-// end;
 class function TioFullPathPropertyReadWrite._ResolvePath(var AOutObj: TObject; var AOutRttiProperty: TRttiProperty; AFullPathPropName: String): Boolean;
 var
   LPropName: String;
@@ -1390,15 +1370,6 @@ begin
   end;
 end;
 
-// class function TioFullPathPropertyReadWrite.GetValue(AObj: TObject; const AFullPathPropName: String): TValue;
-// var
-// LProperty: IioProperty;
-// begin
-// if _ResolvePath(AObj, LProperty, AFullPathPropName) then
-// Result := LProperty.GetValue(AObj)
-// else
-// Result := TValue.Empty;
-// end;
 class function TioFullPathPropertyReadWrite.GetValue(const ADataSet: TioBSABaseDataSet; AObj: TObject; const AField: TField): TValue;
 var
   LRttiProperty: TRttiProperty;
@@ -1493,18 +1464,10 @@ begin
     Result := TValue.Empty;
 end;
 
-// class procedure TioFullPathPropertyReadWrite.SetValue(AObj: TObject; const AFullPathPropName: String; const AValue: TValue);
-// var
-// LProperty: IioProperty;
-// begin
-// if _ResolvePath(AObj, LProperty, AFullPathPropName) then
-// LProperty.SetValue(AObj, AValue)
-// else
-// raise EioException.Create(Self.ClassName, 'SetValue',
-// Format('I am unable to resolve the property path "%s".'#13#13'It could be that one of the objects along the way is nil.', [AFullPathPropName]));
-// end;
-class procedure TioFullPathPropertyReadWrite.SetValue(AObj: TObject; const AFullPathPropName: String; const AValue: TValue);
+class procedure TioFullPathPropertyReadWrite.SetValue(const ADataSet: TioBSABaseDataSet; AObj: TObject; const AFullPathPropName: String; const AValue: TValue);
 var
+  LBindSource: IioBindSource;
+  LLookupID: Integer;
   LRttiProperty: TRttiProperty;
 begin
   // NB: If it's a property relative to the BindSource then raise an exception because
@@ -1515,25 +1478,44 @@ begin
       + #13#13'Note that these type of virtual fields are read-only by design; iORM cannot assign the new value to the field named "%s".' +
       #13#13'Please, try to Assign the value to the DataSet property directly by code.', [AFullPathPropName]));
   // In case of normal property of the current object (current record)
-  if _ResolvePath(AObj, LRttiProperty, AFullPathPropName) then
-  begin
-    // Enumeration type
-    if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
-    begin
-      // Enumeration binded as string
-      if TioEnumContainer._Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
-        LRttiProperty.SetValue(AObj, TioEnumContainer._StringToOrdinalAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType), AValue.AsString))
-        // Enumeration binded as integer
-      else
-        LRttiProperty.SetValue(AObj, TValue.FromOrdinal(LRttiProperty.PropertyType.Handle, AValue.AsOrdinal))
-    end
-    // Other types
-    else
-      LRttiProperty.SetValue(AObj, AValue)
-  end
-  else
+  if not _ResolvePath(AObj, LRttiProperty, AFullPathPropName) then
     raise EioGenericException.Create(Self.ClassName, 'SetValue',
       Format('I am unable to resolve the property path "%s".'#13#13'It could be that one of the objects along the way is nil.', [AFullPathPropName]));
+  // Se la proprietà corrente è l'ID dell'oggetto e la proprietà SelectionFrom del BindSource è assegnata allora significa che il BindSource
+  //  è il target di un Selector; in questo contesto faccio in modo di invocare il metodo SelectCurrent del BindSOurce puntato da SelectionFrom
+  //  realizzando in pratica un sistema di lookup automatico dell'intero oggetto.
+  //  NB: Contrariamente a come ho dovuto fare nel metodo TioPropertyValueWriter<T>.SetValue (LiveBindings) qui non ho dovuto usare un Timer
+  //        e qauesto è una buonissima cosa anche perchè così non ovrebbe avere problemi nemmeno con uniGUI
+  //  NB: Ho dovuto mettere il flag FLookingUp perchè altrimenti andava in deadlock
+  LBindSource := ADataSet as IioBindSource;
+  if Assigned(LBindSource.SelectionFrom) and TioUtilities.IsIdPropByName(AObj.ClassName, LRttiProperty.Name) then
+  begin
+    if not FLookingUp then
+    begin
+      FLookingUp := True;
+      try
+        { TODO : Il Locate non funziona con i miei DataSet quindi se cambio direttamente l'ID dell'oggetto detail da un TEdit non funziona bene (seleziona sempre il primo) }
+        LBindSource.SelectionFrom.Locate('ID', AValue.AsInteger);
+        LBindSource.SelectionFrom.SelectCurrent;
+      finally
+        FLookingUp := False;
+      end;
+    end;
+  end
+  // Enumeration type
+  else
+  if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
+  begin
+    // Enumeration binded as string
+    if TioEnumContainer._Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
+      LRttiProperty.SetValue(AObj, TioEnumContainer._StringToOrdinalAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType), AValue.AsString))
+      // Enumeration binded as integer
+    else
+      LRttiProperty.SetValue(AObj, TValue.FromOrdinal(LRttiProperty.PropertyType.Handle, AValue.AsOrdinal))
+  end
+  // Other types
+  else
+    LRttiProperty.SetValue(AObj, AValue)
 end;
 
 end.

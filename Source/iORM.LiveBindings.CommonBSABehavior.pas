@@ -105,11 +105,6 @@ type
     procedure SetValue(const AValue: T); override;
   end;
 
-  TioCommonPropertyValueWriter = class
-  public
-    class procedure SetValue(const ABindSource: IioBindSource; const AObj: TObject; const ARttiProperty: TRttiProperty; const AValue: TValue);
-  end;
-
   // Methods and functionalities common to all ActiveBindSouceAdapters
   TioCommonBSABehavior = class
   private
@@ -674,8 +669,11 @@ begin
   LRttiProperty := LRttiType.GetProperty(TioUtilities.ExtractPropertyName(FField.MemberName));
   if not Assigned(LRttiProperty) then
     exit;
-  // If the property has a BelongsTo relation and has ioCoBOL (COmbo-Box Object Lookup) attribute
-  if Assigned(FBindSource.SelectionFrom) and TioUtilities.IsIdPropByName(LObject.ClassName, LRttiProperty.Name) then
+  // Se la proprietà corrente è l'ID dell'oggetto e la proprietà SelectionFrom del BindSource è assegnata allora significa che il BindSource
+  //  è il target di un Selector; in questo contesto faccio in modo di invocare il metodo SelectCurrent del BindSOurce puntato da SelectionFrom
+  //  realizzando in pratica un sistema di lookup automatico dell'intero oggetto
+  //  NB: HO dovuto usare un Timer perchè altrimenti dava problemi
+  if Assigned(FBindSource) and Assigned(FBindSource.SelectionFrom) and TioUtilities.IsIdPropByName(LObject.ClassName, LRttiProperty.Name) then
   begin
     LLookupID := TValue.From<T>(AValue).AsInteger;
     TioAnonymousTimer.Create(1,
@@ -714,46 +712,6 @@ end;
 function TioBindSourceAdapterSimpleGetMemberObject.GetMemberObject: TObject;
 begin
   Result := FMemberObject;
-end;
-
-{ TioCommonPropertyValueWriter }
-
-class procedure TioCommonPropertyValueWriter.SetValue(const ABindSource: IioBindSource; const AObj: TObject; const ARttiProperty: TRttiProperty;
-  const AValue: TValue);
-var
-  LLookupID: Integer;
-  LValue: TValue;
-begin
-  if not Assigned(ARttiProperty) then
-    exit;
-  // If the property has a BelongsTo relation and has ioCoBOL (COmbo-Box Object Lookup) attribute
-  if Assigned(ABindSource.SelectionFrom) and TioUtilities.IsIdPropByName(AObj.ClassName, ARttiProperty.Name) then
-  begin
-    LLookupID := AValue.AsInteger;
-    TioAnonymousTimer.Create(1,
-      function: Boolean
-      begin
-        ABindSource.SelectionFrom.Locate('ID', LLookupID);
-        ABindSource.SelectionFrom.SelectCurrent;
-      end);
-     Exit;
-  end
-  // Enumeration type
-  else
-  if (ARttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(ARttiProperty.PropertyType.Handle) then
-  begin
-    // Enumeration binded as string
-    if TioEnumContainer._Contains(TRttiEnumerationType(ARttiProperty.PropertyType)) then
-      LValue := TioEnumContainer._StringToOrdinalAsTValue(TRttiEnumerationType(ARttiProperty.PropertyType), AValue.AsString)
-    // Enumeration binded as integer
-    else
-      LValue := TValue.FromOrdinal(ARttiProperty.PropertyType.Handle, AValue.AsOrdinal);
-    // Set the enumeration value
-    ARttiProperty.SetValue(AObj, LValue);
-  end
-  // Other types
-  else
-    ARttiProperty.SetValue(AObj, AValue);
 end;
 
 end.
