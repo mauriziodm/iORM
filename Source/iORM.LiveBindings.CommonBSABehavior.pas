@@ -672,6 +672,7 @@ begin
   //  è il target di un Selector; in questo contesto faccio in modo di invocare il metodo SelectCurrent del BindSOurce puntato da SelectionFrom
   //  realizzando in pratica un sistema di lookup automatico dell'intero oggetto
   //  NB: HO dovuto usare un Timer perchè altrimenti dava problemi
+  //  NB: Questa funzionalità prende il nome di "Selector Auto Lookup"
   if Assigned(FBindSource) and Assigned(FBindSource.SelectionFrom) and TioUtilities.IsIdPropByName(LObject.ClassName, LRttiProperty.Name) then
   begin
     LLookupID := TValue.From<T>(AValue).AsInteger;

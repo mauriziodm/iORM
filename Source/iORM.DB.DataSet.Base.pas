@@ -411,23 +411,22 @@ begin
     raise EioGenericException.Create(Self.ClassName, 'InternalGotoBookmark', 'Bookmark ' + ReqBookmark.ToString + ' not found');
 end;
 
-// NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// II: same as above (but passes a buffer)
-// NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 procedure TioBaseDataSet.InternalSetToRecord(Buffer: TRecordBuffer);
 var
   ReqBookmark: Integer;
 begin
+  // Ora chiamiamo la versione non deprecata del metodo
   ReqBookmark := PioRecInfo(Buffer + FRecordSize).Bookmark;
-  InternalGotoBookmark(@ReqBookmark); // NB: Deprecated
+  InternalGotoBookmark(TBookmark(@ReqBookmark));
 end;
 
 procedure TioBaseDataSet.InternalSetToRecord(Buffer: TRecBuf);
 var
   ReqBookmark: Integer;
 begin
+  // Ora chiamiamo la versione non deprecata del metodo
   ReqBookmark := PioRecInfo(Buffer + FRecordSize)^.Bookmark;
-  InternalGotoBookmark(@ReqBookmark); // NB: Deprecated
+  InternalGotoBookmark(TBookmark(@ReqBookmark));
 end;
 
 // NB: DEPRECATED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1582,6 +1581,7 @@ begin
   //  NB: Contrariamente a come ho dovuto fare nel metodo TioPropertyValueWriter<T>.SetValue (LiveBindings) qui non ho dovuto usare un Timer
   //        e qauesto è una buonissima cosa anche perchè così non ovrebbe avere problemi nemmeno con uniGUI
   //  NB: Ho dovuto mettere il flag FLookingUp perchè altrimenti andava in deadlock
+  //  NB: Questa funzionalità prende il nome di "Selector Auto Lookup"
   LBindSource := ADataSet as IioBindSource;
   if Assigned(LBindSource.SelectionFrom) and TioUtilities.IsIdPropByName(AObj.ClassName, LRttiProperty.Name) then
   begin
