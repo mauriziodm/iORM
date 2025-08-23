@@ -682,7 +682,7 @@ begin
         FBindSource.SelectionFrom.Locate('ID', LLookupID);
         FBindSource.SelectionFrom.SelectCurrent;
       end);
-     Exit;
+    Exit;
   end
   // Enumeration type
   else
