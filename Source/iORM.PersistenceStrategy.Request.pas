@@ -52,6 +52,7 @@ type
     FResult: TValue;
     // methods
     procedure _Clear(const FillSessionRelatedProperties: Boolean); inline;
+    procedure _ClearGenericsFromJsonText(var AJSONText: String);
     function GetApp: String;
     function GetAppOID: Integer;
     function GetAuthCache: IioAuthCache;
@@ -168,7 +169,7 @@ type
 implementation
 
 uses
-  System.JSON, DJSON, iORM.Exceptions, System.SysUtils, iORM.Auth.Factory;
+  System.JSON, DJSON, iORM.Exceptions, System.SysUtils, iORM.Auth.Factory, System.StrUtils;
 
 { TioPersistenceStrategyRequest }
 
@@ -254,6 +255,9 @@ begin
     // ---------- end ----------
     // render as string
     Result := LJSONObject.ToString;
+    // Sostituisce nel JSON eventuali TioWhere<T> (generics) con TioWhere(not generics) per evitare
+    //  problemi poi nella deserializzazione (RTTI informations mancanti)
+    _ClearGenericsFromJsonText(Result);
   finally
     LJSONObject.Free;
   end;
@@ -803,6 +807,27 @@ begin
   FRelationPropName := IO_STRING_NULL_VALUE;
   // result
   FResult := TValue.Empty;
+end;
+
+procedure TioPersistenceStrategyRequest._ClearGenericsFromJsonText(var AJSONText: String);
+var
+  LStart: Integer;
+  LEnd: Integer;
+  LGenericType: String;
+begin
+  // Sostituisce nel JSON eventuali TioWhere<T> (generics) con TioWhere(not generics) per evitare
+  //  problemi poi nella deserializzazione (RTTI informations mancanti)
+  LStart := Pos('TioWhere<', AJSONText);
+  while LStart > 0 do
+  begin
+    LEnd := Pos('>', AJSONText, LStart);
+    if LEnd > 0 then
+    begin
+      LGenericType := AJSONText.Substring(LStart-1, LEnd-LStart+1);
+      AJSONText := AJSONText.Replace(LGenericType, 'TioWhere');
+      LStart := Pos('TioWhere<', AJSONText);
+    end;
+  end;
 end;
 
 end.
