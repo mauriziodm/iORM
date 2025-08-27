@@ -40,7 +40,7 @@ uses
 
 type
 
-  [MVCPath('/iorm')]
+  [MVCPath('/iorm/samples/pizzamore')]
   TioDMVCController = class(TMVCController)
   public
     [MVCPath('/execute_action'), MVCHTTPMethod([httpPUT]), MVCProduce('application/json'), MVCConsumes('application/json')]

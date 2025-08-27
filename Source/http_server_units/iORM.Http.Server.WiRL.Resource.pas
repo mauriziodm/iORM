@@ -50,7 +50,7 @@ uses
   WiRL.Core.JSON;
 
 type
-  [Path('iorm')]
+  [Path('pizzamore')]
   TioWiRLResource = class
   public
     [PUT]
