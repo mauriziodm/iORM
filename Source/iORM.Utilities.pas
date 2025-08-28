@@ -311,7 +311,7 @@ begin
     tkClass:
       Result := TObject(Pointer(@AInstance)^);
     tkInterface:
-      Result := TObject(Pointer(IInterface(Pointer(@AInstance)^)));
+      Result := IInterface(Pointer(@AInstance)^) as TObject;
   else
     raise EioGenericException.Create(ClassName, 'GenericToClassName<T>', 'The generic parameter <T> is neither a class nor an interface');
   end;

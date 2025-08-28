@@ -93,7 +93,8 @@ begin
       try
         FInternalContainer[I].Execute;
       finally
-        FInternalContainer[I].ExecutionMode := emActive;
+        if I < FInternalContainer.Count then
+          FInternalContainer[I].ExecutionMode := emActive;
       end;
     end;
     Dec(I);
