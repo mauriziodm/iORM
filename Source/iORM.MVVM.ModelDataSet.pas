@@ -37,7 +37,8 @@ interface
 
 uses
   iORM.DB.DataSet.Base, iORM.MVVM.ViewModelBridge, System.Classes,
-  iORM.Components.Common.Interfaces, iORM.MVVM.ModelPresenter.Custom;
+  iORM.Components.Common.Interfaces, iORM.MVVM.ModelPresenter.Custom,
+  iORM.LiveBindings.Interfaces;
 
 type
 
@@ -48,6 +49,7 @@ type
     FCrossView_MasterBindSource: IioCrossViewMasterSource;
     FCrossView_MasterPropertyName: String;
   protected
+    function AsIoBindSource: IioBindSource; override;
     procedure Loaded; override;
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     function GetModelPresenterInstance: TioModelPresenterCustom;
@@ -77,10 +79,14 @@ implementation
 
 uses
   iORM.Exceptions, System.SysUtils, iORM.Components.Common,
-  Data.Bind.ObjectScope, iORM.LiveBindings.Factory,
-  iORM.LiveBindings.Interfaces, iORM.LiveBindings.BSPersistence;
+  Data.Bind.ObjectScope, iORM.LiveBindings.Factory, iORM.LiveBindings.BSPersistence;
 
 { TioModelDataSet }
+
+function TioModelDataSet.AsIoBindSource: IioBindSource;
+begin
+  Result := FViewModelBridge.Presenter[FModelPresenter];
+end;
 
 constructor TioModelDataSet.Create(AOwner: TComponent);
 begin

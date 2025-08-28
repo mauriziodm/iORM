@@ -790,7 +790,7 @@ end;
 destructor TioVMActionCustom.Destroy;
 begin
   UnbindAllViewActions;
-  FBindedViewActionsContainer.Free;
+  FreeAndNil(FBindedViewActionsContainer);
   inherited;
 end;
 
@@ -864,7 +864,13 @@ begin
     FAfterExecute(Self);
   // Execute the ViewAction.onAfterExecute event
   // NB: If we are on an uniGUI application then doesn't use the timers but runs the code right away
-  if TioApplication.ProjectPlatform <> ppUniGUI then
+  // NB: Se si tratta di una VMCloseQuery action allora FBindedViewActionsContainer sarà già a nil
+  //      perchè la distruzione del ViewModel avrà già distrutto il FBindedViewActionsContainer
+  //      oltre anche ad aver già deregistrato anche tutte le relative ViewActions. Quindi
+  //      in pratica nel caso di una VMCloseQueryAction l'evento AfterExecute delle ViewActions
+  //      non sarà eseguito ma non posso nemmeno eliminare l'evento perchè potrebbe essere usato
+  //      per le altre VMActions.
+  if Assigned(FBindedViewActionsContainer) and (TioApplication.ProjectPlatform <> ppUniGUI) then
     for LViewAction in FBindedViewActionsContainer do
       LViewAction.DoAfterExecute;
 end;

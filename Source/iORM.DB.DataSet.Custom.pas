@@ -185,6 +185,7 @@ type
     procedure SetOnInsertConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
     procedure SetOnUpdateConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
   protected
+    function AsIoBindSource: IioBindSource; override;
     procedure Loaded; override;
     function GetName: String;
     procedure DoAfterInsert; override;
@@ -306,6 +307,11 @@ uses
   iORM.LiveBindings.CommonBSBehavior;
 
 { TioDataSet }
+
+function TioDataSetCustom.AsIoBindSource: IioBindSource;
+begin
+  Result := Self;
+end;
 
 procedure TioDataSetCustom.CancelIfEditing;
 begin

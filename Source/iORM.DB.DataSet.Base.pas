@@ -166,6 +166,7 @@ type
     procedure ValueToBuffer<T>(var AValue: TValue; const AField: TField; var ABuffer: TArray<System.Byte>; const ANativeFormat: Boolean);
     function _IsValidRecNo: Boolean;
   protected
+    function AsIoBindSource: IioBindSource; virtual; abstract;
     function CheckAdapter: Boolean;
     procedure DoBeforeInsert; override;
     procedure SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter); virtual;
@@ -1582,7 +1583,7 @@ begin
   //        e qauesto è una buonissima cosa anche perchè così non ovrebbe avere problemi nemmeno con uniGUI
   //  NB: Ho dovuto mettere il flag FLookingUp perchè altrimenti andava in deadlock
   //  NB: Questa funzionalità prende il nome di "Selector Auto Lookup"
-  LBindSource := ADataSet as IioBindSource;
+  LBindSource := ADataSet.AsIoBindSource;
   if Assigned(LBindSource.SelectionFrom) and TioUtilities.IsIdPropByName(AObj.ClassName, LRttiProperty.Name) then
   begin
     if not FLookingUp then
