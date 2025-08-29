@@ -647,7 +647,7 @@ end;
 
 procedure TioCommonBSAPageManagerConcrete.SetItemCount(const AItemCount: Integer);
 begin
-  FPageCount := (AItemCount div FPageSize);
+  FPageCount := Ceil(AItemCount/FPageSize);
 end;
 
 procedure TioCommonBSAPageManagerConcrete.SetPageSize(const Value: Integer);
