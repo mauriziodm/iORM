@@ -663,7 +663,7 @@ begin
   //  riga con una nuova pizza poi l'oggetto non si persisteva perchè nel SUD l'oggetto
   //  master non figurava come modificato e quindi non veniva persistito. La stessa cosa
   //  succedeva anche in caso di modifica manuale di una riga.
-  //  NB: Prima eera alla fine di questo metodo ma poi l'ho spostato all'inizio perchè
+  //  NB: Prima era alla fine di questo metodo ma poi l'ho spostato all'inizio perchè
   //       altrimenti la selezione avveniva anche se l'utente non aveva l'autorizzazione
   //       l'oggetto ricevente (Target), nel senso che otteneva l'autorizzazione alla selezione
   //       ma non alla modifica dell'oggetto target che cmq viene modificato. Spostandolo

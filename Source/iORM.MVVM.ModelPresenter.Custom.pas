@@ -525,7 +525,6 @@ begin
   // Collezione alla quale i ModelBindSource/ModelDataSet si registrano per rendere nota
   // la loro presenza e rendere possibile l'attivazione/disattivazione di se stessi da
   // parte del ModelPresenter al quale sono collegati
-
   FreeAndNil(FViewBindSourceContainer);
   // If the DetailPresenterContainer was created then destroy it
   if Assigned(FDetailBindSourceContainer) then

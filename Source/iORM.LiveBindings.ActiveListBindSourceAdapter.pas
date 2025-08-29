@@ -720,6 +720,19 @@ procedure TioActiveListBindSourceAdapter.ReceiveSelection(ASelected: TObject; AS
 var
   LDone: Boolean;
 begin
+  // Forza l'aggiornamento del SUD (Smart Update Detection) in modo che poi, se richiesto,
+  //  l'oggetto Master vegga persistito. Prima di aggiungere questa riga succedeva che,
+  //  nell'esempio degli ordini delle pizze, se aggiungevo una nuova pizza in una nuova
+  //  riga con una nuova pizza poi l'oggetto non si persisteva perchè nel SUD l'oggetto
+  //  master non figurava come modificato e quindi non veniva persistito. La stessa cosa
+  //  succedeva anche in caso di modifica manuale di una riga.
+  //  NB: Prima era alla fine di questo metodo ma poi l'ho spostato all'inizio perchè
+  //       altrimenti la selezione avveniva anche se l'utente non aveva l'autorizzazione
+  //       l'oggetto ricevente (Target), nel senso che otteneva l'autorizzazione alla selezione
+  //       ma non alla modifica dell'oggetto target che cmq viene modificato. Spostandolo
+  //       all'inizio l'operazione non si esegue se non ottiene entrambe le autorizzazioni
+  DoBeforeEdit;
+
   // Initialization
   LDone := False;
 
@@ -748,12 +761,6 @@ begin
   //  riga con una nuova pizza poi l'oggetto non si persisteva perchè nel SUD l'oggetto
   //  master non figurava come modificato e quindi non veniva persistito. La stessa cosa
   //  succedeva anche in caso di modifica manuale di una riga.
-
-  // Prima di aggiungere questa riga succedeva che, nell'esempio degli ordini delle pizze,
-  //  se aggiungevo una riga all'ordine con un selector oppure modificavo manualmente una riga (es: qtà da 1 a 2)
-  //  poi quando si faceva il Persist dell'oggetto master l'ETM non veniva aggiornato (non si creava il nuovo TimeSlot),
-  //  questo a sua volta impediva il corretto funzionamento della sincronizzazione
-  DoBeforeEdit;
 end;
 
 procedure TioActiveListBindSourceAdapter.ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType);
