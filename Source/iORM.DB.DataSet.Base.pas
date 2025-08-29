@@ -1525,11 +1525,14 @@ var
 begin
   LInstance := nil;
   // Get the bind source as IioBindSource (return an empty value if ADataSet don't implement the interface)
-  if not Supports(ADataSet, IioBindSource, LBindSource) then
-  begin
-    Result := TValue.Empty;
-    Exit;
-  end;
+// ----- OLD CODE -----
+//  if not Supports(ADataSet, IioBindSource, LBindSource) then
+//  begin
+//    Result := TValue.Empty;
+//    Exit;
+//  end;
+// ----- OLD CODE -----
+  LBindSource := ADataSet.AsIoBindSource;
   // Check if the VirtualFields are enabled
   if not LBindSource.VirtualFields then
     raise EioGenericException.Create(Self.ClassName, '_GetValueForBSProp',
