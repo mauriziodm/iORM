@@ -19,9 +19,9 @@ uses
 class procedure TRegisterClasses.RegisterClasses;
 begin
   // ViewModel for TOrder
-  io.di.RegisterClass<TVMOrder>.AsViewModelFor<TOrder>.Execute;
+  io.di.RegisterViewModelFor<TVMOrder, TOrder>.Execute;
   // ViewModel for IPizza (embedded or not)
-  io.di.RegisterClass<TVMPizzaList>.AsViewModelFor<IPizza>.Execute;
+  io.di.RegisterViewModelFor<TVMPizzaList, IPizza>.Execute;
 end;
 
 end.

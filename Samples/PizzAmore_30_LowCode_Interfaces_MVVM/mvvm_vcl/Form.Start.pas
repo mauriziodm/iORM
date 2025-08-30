@@ -6,7 +6,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.StdCtrls, iORM.Abstraction.VCL, iORM, iORM.Attributes, iORM.CommonTypes,
   iORM.DBBuilder.Interfaces, iORM.DB.ConnectionDef, iORM.MVVM.Interfaces, iORM.MVVM.ViewContextProvider, iORM.MVVM.ViewModelBridge, System.Actions,
-  Vcl.ActnList, iORM.StdActions.Vcl, Vcl.ExtActns;
+  Vcl.ActnList, iORM.StdActions.Vcl, Vcl.ExtActns, iORM.Abstraction,
+  Form.Authorization;
 
 type
   TStartForm = class(TForm)
@@ -37,6 +38,11 @@ type
     RadioButtonVCForm: TRadioButton;
     RadioButtonVCTab: TRadioButton;
     Label1: TLabel;
+    ButtonIngredients: TButton;
+    acShowIngredients: TioViewAction;
+    ButtonSynchroLogs: TButton;
+    acShowSynchroLog: TioViewAction;
+    ButtonAuthorization: TButton;
     procedure VCProviderFormRequest(const Sender: TObject; out ResultViewContext: TComponent);
     procedure VCProviderFormRelease(const Sender: TObject; const AView, AViewContext: TComponent);
     procedure VCProviderTabRequest(const Sender: TObject; out ResultViewContext: TComponent);
@@ -46,6 +52,8 @@ type
       AWarnings: TStrings);
     procedure VCProviderTabAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
     procedure RadioButtonVCFormClick(Sender: TObject);
+    procedure ButtonAuthorizationClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
   public
   end;
@@ -56,9 +64,47 @@ var
 implementation
 
 uses
-  Form.ViewContext, Utils.SampleData, System.IOUtils, RegisterClasses;
+  Form.ViewContext, Utils.SampleData, System.IOUtils, RegisterClasses,
+  Model.Interfaces;
 
 {$R *.dfm}
+
+procedure TStartForm.ButtonAuthorizationClick(Sender: TObject);
+begin
+  AuthorizationForm.Show;
+end;
+
+procedure TStartForm.FormCreate(Sender: TObject);
+var
+  LSessionData: IioSessionData;
+begin
+  // Set session data
+  LSessionData := TioApplication.SessionDataStore.AcquireMainSessionData;
+  try
+    LSessionData.App := 'Pizz''Amore VCL';
+    LSessionData.AppOID := 1;
+    LSessionData.License := 'iORM demo';
+    LSessionData.LicenseOID := 1;
+    LSessionData.User := 'MaurizioDM';
+    LSessionData.UserOID := 1;
+  finally
+    TioApplication.SessionDataStore.Release;
+  end;
+
+  // Set auth methods
+  io.SetAuthMethods(
+    // anonymous method returning the access-token
+    function: String
+    begin
+      Result := 'This is the access-token or whatever you want!';
+    end,
+    // anonymous method returning the authorization-decision
+    function(AAuthDecisionRequest: IioAuthDecisionRequest): TioAuthDecisionResult
+    begin
+      Result := AuthorizationForm.Authorize(AAuthDecisionRequest);
+    end
+  );
+end;
 
 procedure TStartForm.RadioButtonVCFormClick(Sender: TObject);
 begin

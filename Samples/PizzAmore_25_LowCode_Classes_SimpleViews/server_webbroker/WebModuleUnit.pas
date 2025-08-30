@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, Web.HTTPApp, iORM.Http.WebBroker.Producer, iORM, iORM.Attributes, iORM.CommonTypes, iORM.DBBuilder.Interfaces,
-  iORM.DB.ConnectionDef, iORM.Abstraction.VCL, iORM.SynchroStrategy.Interfaces, iORM.SynchroStrategy.Custom, iORM.SynchroStrategy.EtmBased;
+  iORM.DB.ConnectionDef, iORM.Abstraction.VCL, iORM.SynchroStrategy.Interfaces, iORM.SynchroStrategy.Custom, iORM.SynchroStrategy.EtmBased, iORM.Abstraction;
 
 type
   TWebModule2 = class(TWebModule)

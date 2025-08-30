@@ -4,8 +4,8 @@ object OrderListForm: TOrderListForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 560
-  ClientWidth = 611
+  ClientHeight = 558
+  ClientWidth = 603
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,23 +15,38 @@ object OrderListForm: TOrderListForm
   Position = poMainFormCenter
   Visible = True
   OnClose = FormClose
-  OnCreate = FormCreate
+  OnShow = FormShow
   TextHeight = 15
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 611
+    Width = 603
     Height = 40
     Align = alTop
     BevelOuter = bvNone
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 607
+    ExplicitWidth = 599
+    object LabelTitle: TLabel
+      Left = 0
+      Top = 8
+      Width = 603
+      Height = 21
+      Alignment = taCenter
+      AutoSize = False
+      Caption = 'Orders'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWhite
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
     object ButtonSelect: TSpeedButton
-      Left = 561
+      Left = 533
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
       Action = acShowOrSelect
       Align = alRight
@@ -41,13 +56,12 @@ object OrderListForm: TOrderListForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 334
-      ExplicitTop = -6
+      ExplicitLeft = 553
     end
     object ButtonBack: TSpeedButton
       Left = 0
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
       Action = acBack
       Align = alLeft
@@ -58,38 +72,25 @@ object OrderListForm: TOrderListForm
       Font.Style = []
       ParentFont = False
     end
-    object LabelTitle: TLabel
-      Left = 279
-      Top = 8
-      Width = 50
-      Height = 21
-      Caption = 'Orders'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
-      Font.Height = -16
-      Font.Name = 'Segoe UI'
-      Font.Style = [fsBold]
-      ParentFont = False
-    end
   end
   object PanelBottom: TPanel
     Left = 0
-    Top = 520
-    Width = 611
+    Top = 518
+    Width = 603
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
-    ExplicitTop = 519
-    ExplicitWidth = 607
+    ExplicitTop = 517
+    ExplicitWidth = 599
     object ButtonAdd: TSpeedButton
-      Left = 561
+      Left = 533
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
-      Action = acAdd
+      Action = acAppend
       Align = alRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clGreen
@@ -97,13 +98,12 @@ object OrderListForm: TOrderListForm
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
-      ExplicitLeft = 473
-      ExplicitTop = 3
+      ExplicitLeft = 553
     end
-    object ButtonDelete: TSpeedButton
+    object btnDelete: TSpeedButton
       Left = 0
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
       Action = acDelete
       Align = alLeft
@@ -113,14 +113,13 @@ object OrderListForm: TOrderListForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 8
     end
   end
   object GridCustomers: TDBGrid
     Left = 0
     Top = 40
-    Width = 611
-    Height = 384
+    Width = 603
+    Height = 382
     Align = alClient
     DataSource = SourceOrders
     Font.Charset = DEFAULT_CHARSET
@@ -135,6 +134,7 @@ object OrderListForm: TOrderListForm
     TitleFont.Height = -12
     TitleFont.Name = 'Segoe UI'
     TitleFont.Style = []
+    OnDblClick = GridCustomersDblClick
     Columns = <
       item
         Expanded = False
@@ -201,18 +201,18 @@ object OrderListForm: TOrderListForm
   end
   object PanelWhere: TPanel
     Left = 0
-    Top = 424
-    Width = 611
+    Top = 422
+    Width = 603
     Height = 96
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 3
-    ExplicitTop = 423
-    ExplicitWidth = 607
+    ExplicitTop = 421
+    ExplicitWidth = 599
     DesignSize = (
-      611
+      603
       96)
     object Label1: TLabel
       Left = 9
@@ -260,10 +260,10 @@ object OrderListForm: TOrderListForm
       ParentFont = False
     end
     object ButtonSearch: TSpeedButton
-      Left = 561
-      Top = 0
-      Width = 50
-      Height = 45
+      Left = 525
+      Top = 4
+      Width = 70
+      Height = 30
       Action = acBuildWhere
       Anchors = [akTop, akRight]
       Font.Charset = DEFAULT_CHARSET
@@ -272,12 +272,13 @@ object OrderListForm: TOrderListForm
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
+      ExplicitLeft = 533
     end
     object ButtonClear: TSpeedButton
-      Left = 561
-      Top = 68
-      Width = 50
-      Height = 25
+      Left = 525
+      Top = 66
+      Width = 70
+      Height = 30
       Action = acClearWhere
       Anchors = [akTop, akRight]
       Font.Charset = DEFAULT_CHARSET
@@ -286,6 +287,7 @@ object OrderListForm: TOrderListForm
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
+      ExplicitLeft = 533
     end
     object Label4: TLabel
       Left = 351
@@ -325,10 +327,10 @@ object OrderListForm: TOrderListForm
       Pen.Color = clGray
     end
     object ButtonHistory: TSpeedButton
-      Left = 561
-      Top = 44
-      Width = 50
-      Height = 25
+      Left = 525
+      Top = 35
+      Width = 70
+      Height = 30
       Action = acWhereShowHistory
       Anchors = [akTop, akRight]
       Font.Charset = DEFAULT_CHARSET
@@ -337,6 +339,7 @@ object OrderListForm: TOrderListForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      ExplicitLeft = 533
     end
     object Label6: TLabel
       Left = 129
@@ -403,7 +406,7 @@ object OrderListForm: TOrderListForm
     object DBEditWhereFromDate: TDBEdit
       Left = 423
       Top = 6
-      Width = 114
+      Width = 106
       Height = 25
       BorderStyle = bsNone
       Color = clWhite
@@ -420,7 +423,7 @@ object OrderListForm: TOrderListForm
     object DBEditWhereToDate: TDBEdit
       Left = 423
       Top = 39
-      Width = 114
+      Width = 106
       Height = 25
       BorderStyle = bsNone
       Color = clWhite
@@ -509,7 +512,7 @@ object OrderListForm: TOrderListForm
     object DBEditWhereIngredient: TDBEdit
       Left = 423
       Top = 73
-      Width = 114
+      Width = 106
       Height = 25
       BorderStyle = bsNone
       Color = clWhite
@@ -527,6 +530,8 @@ object OrderListForm: TOrderListForm
   object DSOrders: TioDataSetMaster
     AsDefault = True
     TypeName = 'TOrder'
+    AsyncLoad = True
+    AsyncPersist = True
     VirtualFields = True
     Paging.CurrentPageOfFormat = 'Page %d of %d'
     Paging.PageSize = 10
@@ -561,9 +566,10 @@ object OrderListForm: TOrderListForm
   object ActionList1: TActionList
     Left = 184
     Top = 112
-    object acDelete: TioBSPersistenceDelete
-      Category = 'iORM-BSPersistence'
-      Caption = 'Delete'
+    object acAppend: TioBSAppend
+      Category = 'iORM - BS'
+      Caption = 'Add'
+      Action_ShowOrSelectAction = acShowOrSelect
       TargetBindSource = DSOrders
     end
     object acBack: TioBSCloseQuery
@@ -571,32 +577,6 @@ object OrderListForm: TOrderListForm
       Caption = 'Back'
       TargetBindSource = DSOrders
       OnUpdateScope = usGlobal
-    end
-    object acShowOrSelect: TioBSShowOrSelect
-      Category = 'iORM-BS'
-      Caption = 'Select'
-      Action_ParentCloseQueryAction = acBack
-      ShowMode = smBSCurrent
-      TargetBindSource = DSOrders
-      ViewContextBy = vcByDefaultViewContextProvider
-    end
-    object acAdd: TioBSPersistenceAppend
-      Category = 'iORM-BSPersistence'
-      Caption = 'Add'
-      Action_ShowOrSelectAction = acShowOrSelect
-      TargetBindSource = DSOrders
-    end
-    object acWherePersist: TioBSPersistencePersist
-      Category = 'iORM-BSPersistence'
-      Caption = 'Persist'
-      TargetBindSource = DSWhere
-    end
-    object acWhereShowHistory: TioBSShowOrSelect
-      Category = 'iORM-BS'
-      Caption = 'History'
-      ShowMode = smBSTypeNameAsSelector
-      TargetBindSource = DSWhere
-      ViewContextBy = vcByDefaultViewContextProvider
     end
     object acBuildWhere: TioBSBuildWhere
       Category = 'iORM - BS - WhereBuilder'
@@ -610,6 +590,32 @@ object OrderListForm: TOrderListForm
       TargetBindSource = DSWhere
       AutoExec_Where_OnTargetBS = True
     end
+    object acDelete: TioBSDelete
+      Category = 'iORM - BS'
+      Caption = 'Delete'
+      TargetBindSource = DSOrders
+    end
+    object acShowOrSelect: TioBSShowOrSelect
+      Category = 'iORM-BS'
+      Caption = 'Select'
+      Action_ParentCloseQueryAction = acBack
+      ShowMode = smBSCurrent
+      TargetBindSource = DSOrders
+      ViewContextBy = vcByDefaultViewContextProvider
+    end
+    object acWherePersist: TioBSPersistencePersist
+      Category = 'iORM-BSPersistence'
+      Caption = 'Persist'
+      TargetBindSource = DSWhere
+    end
+    object acWhereShowHistory: TioBSShowOrSelect
+      Category = 'iORM-BS'
+      Caption = 'History'
+      EntityTypeName = 'TWhereOrder'
+      ShowMode = smEntityTypeNameAsSelector
+      TargetBindSource = DSWhere
+      ViewContextBy = vcByDefaultViewContextProvider
+    end
   end
   object DSWhere: TioDataSetMaster
     AsDefault = False
@@ -618,7 +624,7 @@ object OrderListForm: TOrderListForm
     TypeOfCollection = tcSingleObject
     Paging.CurrentPageOfFormat = '%d/%d'
     WhereBuilderFor = DSOrders
-    AfterSelectionObject = DSWhereAfterSelectionObject
+    AfterReceiveSelectionObject = DSWhereAfterReceiveSelectionObject
     OnReceiveSelectionFreeObject = False
     Left = 175
     Top = 360

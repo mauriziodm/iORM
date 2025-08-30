@@ -19,10 +19,19 @@ uses
 class procedure TRegisterClasses.RegisterClasses;
 begin
   // ViewModel for TOrder
-  io.di.RegisterClass<TVMOrderPizzaSel>.AsViewModelFor<TOrder>.Execute;
-  // ViewModel for IPizza (embedded or not)
-  io.di.RegisterClass<TVMPizzaList>.AsViewModelFor<IPizza>.Execute;
-  io.di.RegisterClass<TVMPizzaList>.AsViewModelFor<IPizza>('EMBEDDED').InjectProperty('Embedded', True).Execute;
+  io.di.RegisterViewModelFor<TVMOrderPizzaSel, TOrder>.Execute;
+  // ViewModel for IPizza (normal)
+  io.di.RegisterViewModelFor<TVMPizzaList, IPizza>.Execute;
+  // ViewModel for IPizza (embedded)
+  io.di.RegisterViewModelFor<TVMPizzaList, IPizza>('EMBEDDED').FactoryMethod(
+    function: TObject
+    begin
+      Result := TVMPizzaList.Create(nil);
+      TVMPizzaList(Result).Embedded := True;
+    end).Execute;
+
+// ----- OLD CODE -----
+//  io.di.RegisterViewModelFor<TVMPizzaList, IPizza>('EMBEDDED').InjectProperty('Embedded', True).Execute;
 end;
 
 end.

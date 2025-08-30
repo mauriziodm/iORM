@@ -8,7 +8,7 @@ uses
   Data.Bind.Components, Data.Bind.ObjectScope, iORM.LiveBindings.PrototypeBindSource.Custom, iORM.LiveBindings.PrototypeBindSource.Master, iORM.StdActions.Fmx,
   System.Actions, FMX.ActnList, FMX.Controls.Presentation, FMX.Objects, System.Rtti, FMX.Grid.Style, FMX.ScrollBox, FMX.Grid, FMX.Edit, FMX.Layouts,
   Data.Bind.GenData, iORM.LiveBindings.PrototypeBindSource.Detail, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt, Fmx.Bind.DBEngExt,
-  Fmx.Bind.Grid, Data.Bind.Grid, Model.Order, Fmx.Bind.Navigator, FMX.ListBox;
+  Fmx.Bind.Grid, Data.Bind.Grid, Model.Order, Fmx.Bind.Navigator, FMX.ListBox, iORM.MVVM.Interfaces, iORM.MVVM.ModelBindSource, iORM.MVVM.ViewModelBridge;
 
 type
 
@@ -45,13 +45,18 @@ type
     LinkControlToField5: TLinkControlToField;
     LinkControlToField6: TLinkControlToField;
     LinkGridToDataSourceBSRows: TLinkGridToDataSource;
-    acDeleteRow: TFMXBindNavigateDelete;
     acShowCustomerSelector: TioBSShowOrSelect;
     acShowPizzaSelector: TioBSShowOrSelect;
     ComboBoxOrderState: TComboBox;
     LinkFillControlToField1: TLinkFillControlToField;
     Label7: TLabel;
-    procedure BSMasterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
+    BSCustomers: TioPrototypeBindSourceMaster;
+    CBCustomer: TComboBox;
+    EditCustomerID: TEdit;
+    LinkControlToField7: TLinkControlToField;
+    LinkFillControlToField: TLinkFillControlToField;
+    acDeleteRow: TioBSDelete;
+    procedure BSMasterReceiveSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
   private
   public
     constructor Create(AOwner: TComponent); override;
@@ -64,7 +69,9 @@ uses
 
 {$R *.fmx}
 
-procedure TViewOrder.BSMasterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
+procedure TViewOrder.BSMasterReceiveSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
+var
+  LOrder: TOrder;
 begin
   inherited;
   BSMaster.CurrentAs<TOrder>.AddPizza(ASelected as TPizza);
@@ -75,6 +82,7 @@ end;
 constructor TViewOrder.Create(AOwner: TComponent);
 begin
   inherited;
+  BSCustomers.Open;
   io.Enums.FillStrings<TOrderState>(ComboBoxOrderState.Items);
 end;
 

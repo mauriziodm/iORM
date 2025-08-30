@@ -7,7 +7,7 @@ uses
 
 type
 
-  [ioEntity('CUSTOMERS'), diImplements(ICustomer), etmTrace(TEtmRepository)]
+  [ioEntity('CUSTOMERS'), etmTrace(TEtmTimeSlot)]
   TCustomer = class(TInterfacedObject, ICustomer)
   private
     FID: Integer;
@@ -36,7 +36,7 @@ type
     procedure SetPhoneNumber(const AValue: String);
     function GetPhoneNumber: String;
   public
-    constructor Create;
+    constructor Create(const AName, ACity, AAddress, APhoneNumber: String); overload;
     property ID: Integer read GetID write SetID;  // ReadOnly
     property Name: String read GetName write SetName;
     property City: String read GetCity write SetCity;
@@ -53,9 +53,12 @@ uses
 
 { TCustomer }
 
-constructor TCustomer.Create;
+constructor TCustomer.Create(const AName, ACity, AAddress, APhoneNumber: String);
 begin
-//  Sleep(5);
+  FName := AName;
+  FCity := ACity;
+  FAddress := AAddress;
+  FPhoneNumber := APhoneNumber;
 end;
 
 function TCustomer.GetAddress: String;

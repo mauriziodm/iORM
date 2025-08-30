@@ -4,8 +4,8 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.Mask, Vcl.DBCtrls, iORM, iORM.Attributes, iORM.CommonTypes,
-  iORM.Where.Interfaces, iORM.StdActions.Vcl, Vcl.ActnList, System.Actions, Data.DB, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom, iORM.DB.DataSet.Master,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.DBCtrls, iORM, iORM.Attributes, iORM.CommonTypes,
+  iORM.StdActions.Vcl, Vcl.ActnList, System.Actions, Data.DB, iORM.DB.DataSet.Master,
   Model.Ingredient;
 
 type
@@ -33,7 +33,6 @@ type
     ActionList1: TActionList;
     acPersist: TioBSPersistencePersist;
     acRevertOrDelete: TioBSPersistenceRevertOrDelete;
-    acLoadImage: TAction;
     acBack: TioBSCloseQuery;
     acShowETM: TioBSShowOrSelect;
     DSIngredientUnitOfMeasure: TStringField;

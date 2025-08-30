@@ -1,5 +1,10 @@
 inherited ViewOrderList: TViewOrderList
+  Size.Width = 402.000000000000000000
   inherited RectangleBottom: TRectangle
+    Size.Width = 402.000000000000000000
+    inherited ButtonAdd: TSpeedButton
+      Position.X = 362.000000000000000000
+    end
     object ButtonWhereHistory: TSpeedButton
       Action = acWhereShowHistory
       Align = Center
@@ -14,19 +19,27 @@ inherited ViewOrderList: TViewOrderList
     end
   end
   inherited RectangleTitle: TRectangle
+    Size.Width = 402.000000000000000000
     inherited LabelTitle: TLabel
+      Size.Width = 402.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       Text = 'Orders'
+      inherited ButtonSelect: TSpeedButton
+        Position.X = 352.000000000000000000
+      end
     end
   end
   inherited ListView: TListView
     ItemIndex = 0
+    Size.Width = 402.000000000000000000
     Size.Height = 365.000000000000000000
   end
   inherited RectangleWhere: TRectangle
     Position.Y = 405.000000000000000000
+    Size.Width = 402.000000000000000000
     Size.Height = 155.000000000000000000
     inherited RectangleWhereButtons: TRectangle
+      Position.X = 362.000000000000000000
       Size.Height = 155.000000000000000000
       inherited ButtonClear: TSpeedButton
         Position.Y = 115.000000000000000000
@@ -91,7 +104,8 @@ inherited ViewOrderList: TViewOrderList
       TabOrder = 13
     end
     object DateEditWhereFromDate: TDateEdit
-      Date = 45067.000000000000000000
+      Date = 45596.000000000000000000
+      IsEmpty = True
       Position.X = 252.000000000000000000
       Position.Y = 8.000000000000000000
       Size.Width = 100.000000000000000000
@@ -116,7 +130,8 @@ inherited ViewOrderList: TViewOrderList
       TabOrder = 11
     end
     object DateEditToDate: TDateEdit
-      Date = 45067.000000000000000000
+      Date = 45596.000000000000000000
+      IsEmpty = True
       Position.X = 252.000000000000000000
       Position.Y = 46.000000000000000000
       Size.Width = 100.000000000000000000
@@ -216,7 +231,9 @@ inherited ViewOrderList: TViewOrderList
     object acWhereShowHistory: TioBSShowOrSelect
       Category = 'iORM-BS'
       Text = 'History'
-      ShowMode = smBSTypeNameAsSelector
+      Action_ParentCloseQueryAction = acBack
+      EntityTypeName = 'TWhereOrder'
+      ShowMode = smEntityTypeNameAsSelector
       TargetBindSource = BSWhere
       ViewContextBy = vcByDefaultViewContextProvider
     end
@@ -248,6 +265,8 @@ inherited ViewOrderList: TViewOrderList
       end>
     Preview = True
     TypeName = 'TOrder'
+    AsyncLoad = True
+    AsyncPersist = True
   end
   inherited BSWhere: TioPrototypeBindSourceMaster
     FieldDefs = <
@@ -289,7 +308,9 @@ inherited ViewOrderList: TViewOrderList
         ReadOnly = False
       end>
     TypeName = 'TWhereOrder'
-    AfterSelectionObject = BSWhereAfterSelectionObject
+    AsyncLoad = True
+    AsyncPersist = True
+    AfterReceiveSelectionObject = BSWhereAfterReceiveSelectionObject
     OnReceiveSelectionFreeObject = False
     Left = 123
     Top = 484

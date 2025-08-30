@@ -23,23 +23,27 @@ type
     FToDate: TDate;
     [ioWhere('Customer.Name', coLike)]
     FCustomerName: String;
-    [ioWhere('Rows.Description', coLike)]
-    FRowsDescription: String;
+    [ioWhere('Rows.Pizza.Name', coLike)]
+    FPizzaName: String;
+    [ioWhere('Rows.Pizza.Ingredients.Ingredient.Name', coLike)]
+    FIngredientName: String;
   protected
+    function GetCustomerName: String;
+    function GetFromDate: TDate;
+    function GetIngredientName: String;
+    function GetNote: String;
     function GetOrderID: Integer;
     function GetOrderState: TOrderState;
-    function GetNote: String;
-    function GetFromDate: TDate;
+    function GetPizzaName: String;
     function GetToDate: TDate;
-    function GetCustomerName: String;
-    function GetRowsDescription: String;
+    procedure SetCustomerName(const Value: String);
+    procedure SetFromDate(const Value: TDate);
+    procedure SetIngredientName(const Value: String);
+    procedure SetNote(const Value: String);
     procedure SetOrderID(const Value: Integer);
     procedure SetOrderState(const Value: TOrderState);
-    procedure SetNote(const Value: String);
-    procedure SetFromDate(const Value: TDate);
+    procedure SetPizzaName(const Value: String);
     procedure SetToDate(const Value: TDate);
-    procedure SetCustomerName(const Value: String);
-    procedure SetRowsDescription(const Value: String);
   public
     constructor Create;
     property OrderID: Integer read GetOrderID write SetOrderID;
@@ -48,7 +52,8 @@ type
     property FromDate: TDate read GetFromDate Write SetFromDate;
     property ToDate: TDate read GetToDate Write SetToDate;
     property CustomerName: String read GetCustomerName write SetCustomerName;
-    property RowsDescription: String read GetRowsDescription write SetRowsDescription;
+    property PizzaName: String read GetPizzaName write SetPizzaName;
+    property IngredientName: String read GetIngredientName write SetIngredientName;
   end;
 
 implementation
@@ -75,6 +80,11 @@ begin
   Result := FFromDate;
 end;
 
+function TWhereOrder.GetIngredientName: String;
+begin
+  Result := FIngredientName;
+end;
+
 function TWhereOrder.GetNote: String;
 begin
   Result := FNote;
@@ -90,9 +100,9 @@ begin
   Result := FOrderState;
 end;
 
-function TWhereOrder.GetRowsDescription: String;
+function TWhereOrder.GetPizzaName: String;
 begin
-  Result := FRowsDescription;
+  Result := FPizzaName;
 end;
 
 function TWhereOrder.GetToDate: TDate;
@@ -110,6 +120,11 @@ begin
   FFromDate := Value;
 end;
 
+procedure TWhereOrder.SetIngredientName(const Value: String);
+begin
+  FIngredientName := Value;
+end;
+
 procedure TWhereOrder.SetNote(const Value: String);
 begin
   FNote := Value;
@@ -125,9 +140,9 @@ begin
   FOrderState := Value;
 end;
 
-procedure TWhereOrder.SetRowsDescription(const Value: String);
+procedure TWhereOrder.SetPizzaName(const Value: String);
 begin
-  FRowsDescription := Value;
+  FPizzaName := Value;
 end;
 
 procedure TWhereOrder.SetToDate(const Value: TDate);

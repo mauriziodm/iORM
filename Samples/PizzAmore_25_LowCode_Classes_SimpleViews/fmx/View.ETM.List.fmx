@@ -1,4 +1,4 @@
-object EtmView: TEtmView
+object EtmViewList: TEtmViewList
   Size.Width = 400.000000000000000000
   Size.Height = 600.000000000000000000
   Size.PlatformDefault = False
@@ -24,7 +24,7 @@ object EtmView: TEtmView
       TabOrder = 0
     end
     object ButtonRevert: TSpeedButton
-      Action = acRevertToObject
+      Action = acEtmRevertToVersion
       Align = Right
       Enabled = True
       StyledSettings = [Family, Size, Style]
@@ -144,8 +144,8 @@ object EtmView: TEtmView
       Size.Height = 330.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 4
-      Viewport.Width = 396.000000000000000000
-      Viewport.Height = 326.000000000000000000
+      Viewport.Width = 400.000000000000000000
+      Viewport.Height = 330.000000000000000000
     end
   end
   object GridETM: TStringGrid
@@ -157,8 +157,8 @@ object EtmView: TEtmView
     Size.PlatformDefault = False
     TextSettings.HorzAlign = Center
     TabOrder = 3
-    Viewport.Width = 396.000000000000000000
-    Viewport.Height = 155.000000000000000000
+    Viewport.Width = 400.000000000000000000
+    Viewport.Height = 180.000000000000000000
   end
   object BS_ETM: TioPrototypeBindSourceMaster
     FieldDefs = <
@@ -258,12 +258,6 @@ object EtmView: TEtmView
       AutoExec_OnETMfor_AfterRevert = doRefresh
       AutoExec_OnTargetBS_AfterRevert = doReload
       AutoExec_Persist_AfterRevert = True
-    end
-    object acRevertToObject: TioBS_ETM_RevertToObject
-      Category = 'iORM - BS - ETM'
-      Text = 'Revert to obj'
-      TargetBindSource = BS_ETM
-      AfterRevert = acRevertToObjectAfterRevert
     end
   end
 end

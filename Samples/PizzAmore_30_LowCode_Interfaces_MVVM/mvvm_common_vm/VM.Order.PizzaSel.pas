@@ -16,6 +16,8 @@ type
 
 implementation
 
+{%CLASSGROUP 'System.Classes.TPersistent'}
+
 uses
   Model.Interfaces;
 

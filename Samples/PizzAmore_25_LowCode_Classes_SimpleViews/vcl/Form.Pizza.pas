@@ -4,9 +4,9 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.Mask, Vcl.DBCtrls, iORM, iORM.Attributes, iORM.CommonTypes,
-  iORM.Where.Interfaces, Data.DB, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom, iORM.DB.DataSet.Master, Vcl.ExtDlgs, System.Actions, Vcl.ActnList,
-  iORM.StdActions.Vcl, Model.Pizza, Vcl.Grids, Vcl.DBGrids, iORM.DB.DataSet.Detail, Vcl.DBActns;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.DBCtrls, iORM, iORM.Attributes, iORM.CommonTypes,
+  Data.DB, iORM.DB.DataSet.Custom, iORM.DB.DataSet.Master, Vcl.ExtDlgs, System.Actions, Vcl.ActnList,
+  iORM.StdActions.Vcl, Model.Pizza, Vcl.DBGrids, iORM.DB.DataSet.Detail, iORM.Where.Interfaces, iORM.DB.DataSet.Base, Vcl.Grids, Vcl.Mask;
 
 type
 
@@ -44,15 +44,15 @@ type
     acShowETM: TioBSShowOrSelect;
     GridCustomers: TDBGrid;
     Label5: TLabel;
-    DSIngredients: TioDataSetDetail;
+    DSIngredientRows: TioDataSetDetail;
     SourceIngredients: TDataSource;
-    DSIngredientsIngredientName: TStringField;
-    DSIngredientsIngredientUnitOfMeasure: TStringField;
-    DSIngredientsQty: TFloatField;
+    DSIngredientRowsIngredientName: TStringField;
+    DSIngredientRowsIngredientUnitOfMeasure: TStringField;
+    DSIngredientRowsQty: TFloatField;
     ButtonAddIngredient: TSpeedButton;
     ButtonDeleteIngredient: TSpeedButton;
     acShowIngredientSelector: TioBSShowOrSelect;
-    acDeleteIngredient: TDataSetDelete;
+    acDeleteIngredientRow: TioBSDelete;
     procedure acLoadImageExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure DSIngredientsSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);

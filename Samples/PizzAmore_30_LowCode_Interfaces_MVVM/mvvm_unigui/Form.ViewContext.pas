@@ -16,9 +16,6 @@ type
 
 implementation
 
-uses
-  uniGUIApplication;
-
 {$R *.dfm}
 
 end.

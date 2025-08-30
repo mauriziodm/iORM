@@ -4,8 +4,8 @@ object OrderForm: TOrderForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 560
-  ClientWidth = 776
+  ClientHeight = 558
+  ClientWidth = 768
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -136,7 +136,7 @@ object OrderForm: TOrderForm
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 776
+    Width = 768
     Height = 40
     Align = alTop
     BevelOuter = bvNone
@@ -149,10 +149,28 @@ object OrderForm: TOrderForm
     ParentBackground = False
     ParentFont = False
     TabOrder = 0
-    ExplicitWidth = 772
+    ExplicitWidth = 764
     DesignSize = (
-      776
+      768
       40)
+    object LabelTitle: TLabel
+      Left = 0
+      Top = 7
+      Width = 728
+      Height = 21
+      Alignment = taCenter
+      Anchors = [akLeft, akTop, akRight]
+      AutoSize = False
+      Caption = 'Order'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWhite
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+      Layout = tlCenter
+      ExplicitWidth = 768
+    end
     object ButtonBack: TSpeedButton
       Left = 0
       Top = 0
@@ -167,26 +185,8 @@ object OrderForm: TOrderForm
       Font.Style = []
       ParentFont = False
     end
-    object LabelTitle: TLabel
-      Left = 56
-      Top = 7
-      Width = 266
-      Height = 21
-      Alignment = taCenter
-      Anchors = [akLeft, akTop, akRight]
-      AutoSize = False
-      Caption = 'Order'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
-      Font.Height = -16
-      Font.Name = 'Segoe UI'
-      Font.Style = [fsBold]
-      ParentFont = False
-      Layout = tlCenter
-      ExplicitWidth = 306
-    end
     object ButtonAdd: TSpeedButton
-      Left = 726
+      Left = 718
       Top = 0
       Width = 50
       Height = 40
@@ -201,7 +201,7 @@ object OrderForm: TOrderForm
       ExplicitLeft = 712
     end
     object ButtonETM: TSpeedButton
-      Left = 328
+      Left = 116
       Top = 0
       Width = 85
       Height = 40
@@ -215,19 +215,32 @@ object OrderForm: TOrderForm
       ParentFont = False
       ExplicitLeft = 332
     end
+    object DBLookupComboBox1: TDBLookupComboBox
+      Left = 440
+      Top = 5
+      Width = 249
+      Height = 29
+      DataField = 'ID'
+      DataSource = SourceCustomer
+      KeyField = 'ID'
+      ListField = 'ID; Name'
+      ListFieldIndex = 1
+      ListSource = SourceCustomers
+      TabOrder = 0
+    end
   end
   object PanelBottom: TPanel
     Left = 0
-    Top = 520
-    Width = 776
+    Top = 518
+    Width = 768
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
-    ExplicitTop = 519
-    ExplicitWidth = 772
+    ExplicitTop = 517
+    ExplicitWidth = 764
     object ButtonRevert: TSpeedButton
       Left = 0
       Top = 0
@@ -245,7 +258,7 @@ object OrderForm: TOrderForm
       ExplicitTop = -6
     end
     object ButtonPersist: TSpeedButton
-      Left = 726
+      Left = 718
       Top = 0
       Width = 50
       Height = 40
@@ -274,7 +287,7 @@ object OrderForm: TOrderForm
       Font.Style = [fsBold]
       ParentFont = False
     end
-    object ButtonDeleteRow: TSpeedButton
+    object btnDeleteRow: TSpeedButton
       Left = 50
       Top = 0
       Width = 111
@@ -309,34 +322,34 @@ object OrderForm: TOrderForm
     end
   end
   object PanelPizzas: TPanel
-    Left = 426
+    Left = 418
     Top = 40
     Width = 350
-    Height = 480
+    Height = 478
     Align = alRight
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 2
-    ExplicitLeft = 422
-    ExplicitHeight = 479
+    ExplicitLeft = 414
+    ExplicitHeight = 477
     object DBCtrlGridPizzas: TDBCtrlGrid
       Left = 0
       Top = 0
       Width = 350
-      Height = 480
+      Height = 478
       Align = alClient
       AllowDelete = False
       AllowInsert = False
       DataSource = SourcePizzas
-      PanelHeight = 96
+      PanelHeight = 95
       PanelWidth = 333
       TabOrder = 0
       RowCount = 5
       SelectedColor = 13828095
       ShowFocus = False
       OnDblClick = DBCtrlGridPizzasDblClick
-      ExplicitHeight = 479
+      ExplicitHeight = 477
       object DBTextName: TDBText
         Left = 99
         Top = 20
@@ -503,8 +516,8 @@ object OrderForm: TOrderForm
     TabOrder = 9
   end
   object GridRows: TDBGrid
-    Left = 8
-    Top = 238
+    Left = -4
+    Top = 235
     Width = 416
     Height = 277
     BorderStyle = bsNone
@@ -627,12 +640,13 @@ object OrderForm: TOrderForm
   object DSOrder: TioDataSetMaster
     AsDefault = True
     TypeName = 'TOrder'
+    AsyncLoad = True
+    AsyncPersist = True
     LoadType = ltFromBSReload
     TypeOfCollection = tcSingleObject
     Paging.CurrentPageOfFormat = '%d/%d'
-    OnSelectionObject = DSOrderSelectionObject
-    OnReceiveSelectionCloneObject = False
-    OnReceiveSelectionFreeObject = False
+    OnReceiveSelectionObject = DSOrderReceiveSelectionObject
+    AuthorizationContext = 'order'
     Left = 56
     Top = 312
     object DSOrderID: TIntegerField
@@ -660,7 +674,6 @@ object OrderForm: TOrderForm
     Top = 312
   end
   object DSCustomer: TioDataSetDetail
-    AsDefault = False
     MasterBindSource = DSOrder
     MasterPropertyName = 'Customer'
     Left = 56
@@ -688,9 +701,8 @@ object OrderForm: TOrderForm
     Top = 376
   end
   object DSRows: TioDataSetDetail
-    AsDefault = False
     MasterBindSource = DSOrder
-    MasterPropertyName = 'Rows'
+    MasterPropertyName = 'OrderRows'
     Left = 56
     Top = 440
     object DSRowsPizzaName: TStringField
@@ -715,9 +727,21 @@ object OrderForm: TOrderForm
   object ActionList1: TActionList
     Left = 256
     Top = 312
+    object acBack: TioBSCloseQuery
+      Category = 'iORM-BS'
+      Caption = 'Back'
+      TargetBindSource = DSOrder
+      OnUpdateScope = usGlobal
+    end
+    object acDeleteRow: TioBSDelete
+      Category = 'iORM - BS'
+      Caption = 'Delete Row'
+      TargetBindSource = DSRows
+    end
     object acPersist: TioBSPersistencePersist
       Category = 'iORM-BSPersistence'
       Caption = 'Persist'
+      AuthorizationRequest = False
       TargetBindSource = DSOrder
     end
     object acRevertOrDelete: TioBSPersistenceRevertOrDelete
@@ -731,18 +755,13 @@ object OrderForm: TOrderForm
       Caption = 'Select'
       TargetBindSource = DSPizzas
     end
-    object acDeleteRow: TDataSetDelete
-      Category = 'Dataset'
-      Caption = 'Delete row'
-      Hint = 'Delete'
-      ImageIndex = 5
-      DataSource = SourceRows
-    end
-    object acBack: TioBSCloseQuery
+    object acShowCustomer: TioBSShowOrSelect
       Category = 'iORM-BS'
-      Caption = 'Back'
-      TargetBindSource = DSOrder
-      OnUpdateScope = usGlobal
+      Caption = 'Show'
+      Action_ParentCloseQueryAction = acBack
+      ShowMode = smBSCurrent
+      TargetBindSource = DSCustomer
+      ViewContextBy = vcByDefaultViewContextProvider
     end
     object acShowCustomerSelector: TioBSShowOrSelect
       Category = 'iORM-BS'
@@ -754,14 +773,6 @@ object OrderForm: TOrderForm
       ViewContextBy = vcByDefaultViewContextProvider
       VVMTypeAlias = 'LIST'
     end
-    object acShowCustomer: TioBSShowOrSelect
-      Category = 'iORM-BS'
-      Caption = 'Show'
-      Action_ParentCloseQueryAction = acBack
-      ShowMode = smBSCurrent
-      TargetBindSource = DSCustomer
-      ViewContextBy = vcByDefaultViewContextProvider
-    end
     object acShowETM: TioBSShowOrSelect
       Category = 'iORM - BS'
       Caption = 'Time line'
@@ -772,5 +783,31 @@ object OrderForm: TOrderForm
       ViewContextBy = vcByDefaultViewContextProvider
       VVMTypeAlias = 'LIST'
     end
+  end
+  object DSCustomers: TioDataSetMaster
+    AsDefault = False
+    TypeName = 'TCustomer'
+    SelectorFor = DSCustomer
+    Paging.CurrentPageOfFormat = '%d/%d'
+    Left = 522
+    Top = 368
+    object DSCustomersID: TIntegerField
+      FieldName = 'ID'
+    end
+    object DSCustomersName: TStringField
+      FieldName = 'Name'
+      Size = 100
+    end
+  end
+  object SourceCustomers: TDataSource
+    DataSet = DSCustomers
+    Left = 522
+    Top = 432
+  end
+  object ClientDataSet1: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    Left = 352
+    Top = 336
   end
 end

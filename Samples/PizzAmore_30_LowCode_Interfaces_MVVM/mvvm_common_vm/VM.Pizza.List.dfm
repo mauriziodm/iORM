@@ -5,10 +5,13 @@ inherited VMPizzaList: TVMPizzaList
   inherited acBack: TioVMActionBSCloseQuery
     TargetBindSource = nil
   end
-  inherited acAdd: TioVMActionBSPersistenceAppend
-    EntityTypeName = 'IPizza'
+  inherited acSelectCurrent: TioVMActionBSSelectCurrent
+    Action_CloseQueryAction = nil
   end
   inherited BSWhere: TioModelPresenterMaster
     TypeName = 'IWherePizza'
+  end
+  inherited acAppend: TioVMActionBSAppend
+    OnNewInstanceAsInterface = acAppendNewInstanceAsInterface
   end
 end

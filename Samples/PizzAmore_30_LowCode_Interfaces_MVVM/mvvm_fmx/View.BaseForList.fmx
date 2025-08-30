@@ -82,7 +82,7 @@ object ViewBaseForList: TViewBaseForList
       TextSettings.FontColor = claAliceblue
     end
     object ButtonAdd: TSpeedButton
-      Action = acAdd
+      Action = acAppend
       Align = Right
       Enabled = True
       StyledSettings = [Family, Size, Style]
@@ -144,33 +144,19 @@ object ViewBaseForList: TViewBaseForList
   object ActionList1: TActionList
     Left = 203
     Top = 163
+    object acAppend: TioViewAction
+      Category = 'iORM-MVVM'
+      Text = 'Add'
+      Enabled = True
+      Visible = True
+      VMActionName = 'acAppend'
+    end
     object acBack: TioViewAction
       Category = 'iORM-MVVM'
       Text = 'Back'
       Enabled = True
       Visible = True
       VMActionName = 'acBack'
-    end
-    object acDelete: TioViewAction
-      Category = 'iORM-MVVM'
-      Text = 'Delete'
-      Enabled = True
-      Visible = True
-      VMActionName = 'acDelete'
-    end
-    object acAdd: TioViewAction
-      Category = 'iORM-MVVM'
-      Text = 'Add'
-      Enabled = True
-      Visible = True
-      VMActionName = 'acAdd'
-    end
-    object acShowOrSelect: TioViewAction
-      Category = 'iORM-MVVM'
-      Text = 'Select'
-      Enabled = True
-      Visible = True
-      VMActionName = 'acShowOrSelect'
     end
     object acBuildWhere: TioViewAction
       Category = 'iORM-MVVM'
@@ -185,6 +171,20 @@ object ViewBaseForList: TViewBaseForList
       Enabled = True
       Visible = True
       VMActionName = 'acClearWhere'
+    end
+    object acDelete: TioViewAction
+      Category = 'iORM-MVVM'
+      Text = 'Delete'
+      Enabled = True
+      Visible = True
+      VMActionName = 'acDelete'
+    end
+    object acShowOrSelect: TioViewAction
+      Category = 'iORM-MVVM'
+      Text = 'Select'
+      Enabled = True
+      Visible = True
+      VMActionName = 'acShowOrSelect'
     end
   end
   object VMBridge: TioViewModelBridge

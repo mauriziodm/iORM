@@ -21,9 +21,8 @@ type
   ICustomer = interface
     ['{28219347-5122-48BC-B735-3063FCFAE2B8}']
     // ID property
-    procedure SetID(const AValue: Integer);
     function GetID: Integer;
-    property ID: Integer read GetID write SetID;
+    property ID: Integer read GetID;
     // Name property
     procedure SetName(const AValue: String);
     function GetName: String;
@@ -38,18 +37,48 @@ type
     property Address: String read GetAddress write SetAddress;
     // FullAddress property
     function GetFullAddress: String;
-    property FullAddress: String read GetFullAddress;  // ReadOnly
+    property FullAddress: String read GetFullAddress;
     // PhoneNumber property
     procedure SetPhoneNumber(const AValue: String);
     function GetPhoneNumber: String;
     property PhoneNumber: String read GetPhoneNumber write SetPhoneNumber;
   end;
 
+  IIngredient = interface
+    ['{2F307C55-6DF0-4B99-9FD1-8B67559221A9}']
+    // ID property
+    procedure SetID(const Value: Integer);
+    function GetID: Integer;
+    property ID: Integer read GetID write SetID;
+    // Name property
+    procedure SetName(const AValue: String);
+    function GetName: String;
+    property Name: String read GetName write SetName;
+    // UnitOfMeasure property
+    procedure SetUnitOfMeasure(const AValue: String);
+    function GetUnitOfMeasure: String;
+    property UnitOfMeasure: String read GetUnitOfMeasure write SetUnitOfMeasure;
+  end;
+
+  IPizzaIngredientRow = interface
+    ['{21B19932-C57E-49EB-9E78-C1EE77C1432B}']
+    // ID property
+    function GetID: Integer;
+    property ID: Integer read GetID;
+    // Ingredient property
+    function GetIngredient: IIngredient;
+    property Ingredient: IIngredient read GetIngredient;
+    // Qty property
+    procedure SetQty(const AValue: Double);
+    function GetQty: Double;
+    property Qty: Double read GetQty write SetQty;
+  end;
+
   IPizza = interface
     ['{3D0E488C-A965-4CFF-B50B-71F38240710C}']
     // ID property
     function GetID: Integer;
-    property ID: Integer read GetID;  // ReadOnly
+    property ID: Integer read GetID;
     // Name property
     procedure SetName(const AValue: String);
     function GetName: String;
@@ -60,32 +89,27 @@ type
     property Price: Currency read GetPrice write SetPrice;
     // Image property
     function GetImage: TBitmap;
-    property Image: TBitmap read GetImage; // ReadOnly
+    property Image: TBitmap read GetImage;
+    // Ingredients
+    function GetIngredients: TList<IPizzaIngredientRow>;
+    property Ingredients: TList<IPizzaIngredientRow> read GetIngredients;
   end;
 
   IOrderRow = interface
     ['{5DC17439-9594-4CE9-A64A-585C32BA5903}']
     // ID property
     function GetID: Integer;
-    property ID: Integer read GetID;  // ReadOnly
-    // PizzaID property
-    function GetPizzaID: Integer;
-    property PizzaID: Integer read GetPizzaID;  // ReadOnly
-    // Description property
-    procedure SetDescription(const AValue: String);
-    function GetDescription: String;
-    property Description: String read GetDescription write SetDescription;
-    // Price property
-    procedure SetPrice(const AValue: Currency);
-    function GetPrice: Currency;
-    property Price: Currency read GetPrice write SetPrice;
+    property ID: Integer read GetID;
+    // Pizza property
+    function GetPizza: IPizza;
+    property Pizza: IPizza read GetPizza;
     // Qty property
     procedure SetQty(const AValue: Integer);
     function GetQty: Integer;
     property Qty: Integer read GetQty write SetQty;
     // RowTotal property
     function GetRowTotal: Currency;
-    property RowTotal: Currency read GetRowTotal;  // ReadOnly
+    property RowTotal: Currency read GetRowTotal;
   end;
 
   IOrder = interface
@@ -93,7 +117,7 @@ type
     procedure AddPizza(const APizza: IPizza);
     // ID property
     function GetID: Integer;
-    property ID: Integer read GetID;  // ReadOnly
+    property ID: Integer read GetID;
     // OrderDate property
     procedure SetOrderDate(const AValue: TDate);
     function GetOrderDate: TDate;
@@ -108,14 +132,14 @@ type
     property Customer: ICustomer read GetCustomer write SetCustomer;
     // Rows property
     function GetRows: TList<IOrderRow>;
-    property Rows: TList<IOrderRow> read GetRows; // ReadOnly
+    property Rows: TList<IOrderRow> read GetRows;
     // Note property
     procedure SetNote(const AValue: String);
     function GetNote: String;
     property Note: String read GetNote write SetNote;
     // GrandTotal property
     function GetGrandTotal: Currency;
-    property GrandTotal: Currency read GetGrandTotal; // ReadOnly
+    property GrandTotal: Currency read GetGrandTotal;
   end;
 
 implementation

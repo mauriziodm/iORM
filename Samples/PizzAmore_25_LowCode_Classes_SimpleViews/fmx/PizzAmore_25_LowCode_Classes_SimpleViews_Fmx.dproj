@@ -252,8 +252,8 @@
         <DCCReference Include="..\common_model\Where.Order.pas"/>
         <DCCReference Include="..\common_model\Where.Pizza.pas"/>
         <DCCReference Include="..\common_model\ETM.Repository.pas"/>
-        <DCCReference Include="View.ETM.pas">
-            <Form>EtmView</Form>
+        <DCCReference Include="View.ETM.List.pas">
+            <Form>EtmViewList</Form>
             <FormType>fmx</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>

@@ -1,4 +1,4 @@
-unit View.ETM;
+unit View.ETM.List;
 
 interface
 
@@ -12,8 +12,8 @@ uses
 type
 
   // Register the form into the dependency injection container as SimpleView for TEtmRepository objects
-  [diSimpleViewFor(TEtmRepository)]
-  TEtmView = class(TFrame)
+  [diSimpleViewFor(TEtmRepository, 'LIST')]
+  TEtmViewList = class(TFrame)
     RectangleTitle: TRectangle;
     LabelTitle: TLabel;
     ButtonRevert: TSpeedButton;
@@ -36,8 +36,7 @@ type
     ActionList1: TActionList;
     acBack: TioBSCloseQuery;
     acEtmRevertToVersion: TioBS_ETM_RevertToBindSource;
-    acRevertToObject: TioBS_ETM_RevertToObject;
-    procedure acRevertToObjectAfterRevert(const ASender, ARevertedObj: TObject);
+    procedure acEtmRevertToObjectAfterRevert(const ASender, ARevertedObj: TObject);
   private
   public
   end;
@@ -46,7 +45,7 @@ implementation
 
 {$R *.fmx}
 
-procedure TEtmView.acRevertToObjectAfterRevert(const ASender, ARevertedObj: TObject);
+procedure TEtmViewList.acEtmRevertToObjectAfterRevert(const ASender, ARevertedObj: TObject);
 begin
   io.Show(ARevertedObj, acBack);
 end;

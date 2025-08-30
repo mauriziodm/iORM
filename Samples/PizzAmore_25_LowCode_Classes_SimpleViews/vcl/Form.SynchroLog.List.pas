@@ -4,8 +4,8 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Data.DB, Vcl.Grids, Vcl.DBGrids, Vcl.DBCtrls, iORM, iORM.Attributes,
-  iORM.CommonTypes, iORM.Where.Interfaces, iORM.StdActions.Vcl, System.Actions, Vcl.ActnList, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Data.DB, Vcl.DBGrids, Vcl.DBCtrls, iORM, iORM.Attributes,
+  iORM.CommonTypes, iORM.StdActions.Vcl, System.Actions, Vcl.ActnList,
   iORM.DB.DataSet.Master, iORM.SynchroStrategy.EtmBased, iORM.DB.DataSet.Detail;
 
 type
@@ -20,7 +20,7 @@ type
     Label3: TLabel;
     Splitter1: TSplitter;
     GridCustomers: TDBGrid;
-    DBGrid1: TDBGrid;
+    GridETM: TDBGrid;
     DSSynchroLog: TioDataSetMaster;
     SourceSynchroLog: TDataSource;
     ActionList1: TActionList;
@@ -32,7 +32,6 @@ type
     DSSynchroLogSynchroStatus: TStringField;
     DSSynchroLogEtmTimeSlot_ClassName: TStringField;
     DSSynchroLogSmartCount: TStringField;
-    DSSynchroLogSmartUser: TStringField;
     DSSynchroLogSmartCliToSrv_TimeSlotID: TStringField;
     DSSynchroLogSmartSrvToCli_TimeSlotID: TStringField;
     DS_ETM: TioDataSetDetail;
@@ -50,13 +49,15 @@ type
     DS_ETMEntityClassName: TStringField;
     DS_ETMEntityID: TIntegerField;
     DS_ETMSmartEntityVersion: TStringField;
-    DS_ETMSmartUser: TStringField;
     DS_ETMSmartActionType: TStringField;
     DS_ETMSmartConflictInfo: TStringField;
     DS_ETMSmartConflictCheckedByHuman: TStringField;
     DSSynchroLogErrorState: TStringField;
     DSSynchroLogErrorMsg: TStringField;
     ButtonShowTimeslot: TButton;
+    DSSynchroLogUser: TStringField;
+    DSSynchroLogApp: TStringField;
+    DSSynchroLogLicense: TStringField;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
@@ -76,5 +77,4 @@ procedure TSynchroLogListForm.FormShow(Sender: TObject);
 begin
   DSSynchroLog.Open;
 end;
-
 end.

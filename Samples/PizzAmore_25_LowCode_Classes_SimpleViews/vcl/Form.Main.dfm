@@ -4,8 +4,8 @@ object MainForm: TMainForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 541
-  ClientWidth = 288
+  ClientHeight = 535
+  ClientWidth = 264
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -13,13 +13,14 @@ object MainForm: TMainForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poDesktopCenter
+  OnCreate = FormCreate
   DesignSize = (
-    288
-    541)
+    264
+    535)
   TextHeight = 15
   object ImagePizza: TImage
-    Left = 8
-    Top = 65
+    Left = -2
+    Top = 64
     Width = 268
     Height = 249
     Picture.Data = {
@@ -8466,7 +8467,7 @@ object MainForm: TMainForm
     Stretch = True
   end
   object LabelTitlePizz: TLabel
-    Left = 48
+    Left = 40
     Top = 8
     Width = 81
     Height = 50
@@ -8480,17 +8481,16 @@ object MainForm: TMainForm
   end
   object Shape1: TShape
     Left = 0
-    Top = 318
-    Width = 288
+    Top = 312
+    Width = 264
     Height = 223
     Align = alBottom
     Brush.Color = clNavy
     Pen.Style = psClear
-    ExplicitLeft = 8
-    ExplicitTop = 320
+    ExplicitLeft = 16
   end
   object LabelTitleAmore: TLabel
-    Left = 130
+    Left = 122
     Top = 8
     Width = 106
     Height = 50
@@ -8503,9 +8503,9 @@ object MainForm: TMainForm
     ParentFont = False
   end
   object ButtonOrders: TButton
-    Left = 42
-    Top = 329
-    Width = 182
+    Left = 12
+    Top = 322
+    Width = 233
     Height = 40
     Action = acShowOrders
     Anchors = [akLeft, akRight, akBottom]
@@ -8516,13 +8516,13 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 0
-    ExplicitTop = 328
-    ExplicitWidth = 178
+    ExplicitTop = 321
+    ExplicitWidth = 229
   end
   object ButtonCustomers: TButton
-    Left = 42
-    Top = 374
-    Width = 182
+    Left = 12
+    Top = 368
+    Width = 233
     Height = 40
     Action = acShowCustomers
     Anchors = [akLeft, akRight, akBottom]
@@ -8533,13 +8533,13 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 1
-    ExplicitTop = 373
-    ExplicitWidth = 178
+    ExplicitTop = 367
+    ExplicitWidth = 229
   end
   object ButtonPizzas: TButton
-    Left = 42
-    Top = 419
-    Width = 182
+    Left = 12
+    Top = 413
+    Width = 233
     Height = 40
     Action = acShowPizzas
     Anchors = [akLeft, akRight, akBottom]
@@ -8550,13 +8550,13 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 2
-    ExplicitTop = 418
-    ExplicitWidth = 178
+    ExplicitTop = 412
+    ExplicitWidth = 229
   end
   object ButtonQuit: TButton
-    Left = 42
-    Top = 500
-    Width = 182
+    Left = 12
+    Top = 495
+    Width = 233
     Height = 30
     Action = acQuit
     Anchors = [akLeft, akRight, akBottom]
@@ -8567,13 +8567,13 @@ object MainForm: TMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 3
-    ExplicitTop = 499
-    ExplicitWidth = 178
+    ExplicitTop = 494
+    ExplicitWidth = 229
   end
   object ButtonIngredients: TButton
-    Left = 42
-    Top = 464
-    Width = 71
+    Left = 12
+    Top = 459
+    Width = 62
     Height = 31
     Action = acShowIngredients
     Anchors = [akLeft, akRight, akBottom]
@@ -8584,13 +8584,13 @@ object MainForm: TMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 4
-    ExplicitTop = 463
-    ExplicitWidth = 67
+    ExplicitTop = 458
+    ExplicitWidth = 58
   end
   object ButtonSynchroLogs: TButton
-    Left = 127
-    Top = 464
-    Width = 97
+    Left = 84
+    Top = 459
+    Width = 105
     Height = 31
     Action = acShowSynchroLogs
     Anchors = [akLeft, akRight, akBottom]
@@ -8601,26 +8601,38 @@ object MainForm: TMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 5
-    ExplicitTop = 463
-    ExplicitWidth = 93
+    ExplicitTop = 458
+    ExplicitWidth = 101
   end
-  object ioVCL1: TioVCL
-    Left = 18
-    Top = 265
+  object ButtonAuthorization: TButton
+    Left = 199
+    Top = 459
+    Width = 46
+    Height = 31
+    Action = acShowIngredients
+    Anchors = [akLeft, akRight, akBottom]
+    Caption = 'Auth'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 6
+    OnClick = ButtonAuthorizationClick
+    ExplicitTop = 458
+    ExplicitWidth = 42
   end
-  object SQLiteConn: TioSQLiteConnectionDef
-    AsDefault = True
-    AutoCreateDB.Enabled = True
-    Database = 'PizzAmore_25_LowCode_Classes_SimpleViews_Vcl.db'
-    DatabaseStdFolder = sfDocuments
-    Persistent = False
-    Pooled = False
-    OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
-    Left = 84
-    Top = 265
+  object Button1: TButton
+    Left = 104
+    Top = 184
+    Width = 75
+    Height = 25
+    Caption = 'Button1'
+    TabOrder = 7
   end
   object ActionList1: TActionList
-    Left = 228
+    Left = 220
     Top = 265
     object acQuit: TioBSCloseQuery
       Category = 'iORM-BS'
@@ -8674,11 +8686,42 @@ object MainForm: TMainForm
       VVMTypeAlias = 'LIST'
     end
   end
+  object FBConn: TioFirebirdConnectionDef
+    AsDefault = False
+    Database = 'PIZZAMORE_25_SIMPLEVIEW_VCL.FDB'
+    DatabaseStdFolder = sfDocuments
+    OSAuthent = oaNo
+    Password = 'masterkey'
+    Persistent = False
+    Pooled = False
+    Port = 3050
+    Protocol = pLocal
+    SQLDialect = sqlDialect3
+    UserName = 'SYSDBA'
+    AfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
+    Left = 120
+    Top = 80
+  end
+  object ioVCL1: TioVCL
+    Left = 16
+    Top = 264
+  end
+  object SQLiteConn: TioSQLiteConnectionDef
+    AsDefault = True
+    AutoCreateDB.Enabled = True
+    Database = 'PIZZAMORE_25_SIMPLEVIEW_VCL.DB'
+    DatabaseStdFolder = sfDocuments
+    Persistent = False
+    Pooled = False
+    AfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
+    Left = 24
+    Top = 80
+  end
   object HttpConn: TioHttpConnectionDef
     AsDefault = False
-    BaseURL = 'http://localhost:8080/iorm'
+    BaseURL = 'http://localhost:8080/iorm/samples/pizzamore'
     Persistent = True
-    Left = 157
-    Top = 265
+    Left = 216
+    Top = 80
   end
 end

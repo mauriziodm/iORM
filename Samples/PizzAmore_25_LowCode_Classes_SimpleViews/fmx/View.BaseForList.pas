@@ -23,11 +23,9 @@ type
     ListView: TListView;
     ActionList1: TActionList;
     BSMaster: TioPrototypeBindSourceMaster;
-    acDelete: TioBSPersistenceDelete;
     acBack: TioBSCloseQuery;
     acShowOrSelect: TioBSShowOrSelect;
     acSelectCurrent: TioBSSelectCurrent;
-    acAdd: TioBSPersistenceAppend;
     RectangleWhere: TRectangle;
     RectangleWhereButtons: TRectangle;
     ButtonSearch: TSpeedButton;
@@ -35,6 +33,7 @@ type
     BSWhere: TioPrototypeBindSourceMaster;
     acBuildWhere: TioBSBuildWhere;
     acClearWhere: TioBSClearWhere;
+    procedure ListViewDblClick(Sender: TObject);
   private
   public
     constructor Create(AOwner: TComponent); override;
@@ -49,6 +48,11 @@ begin
   inherited;
   BSMaster.Open;
   BSWhere.Open;
+end;
+
+procedure TViewBaseForList.ListViewDblClick(Sender: TObject);
+begin
+  acShowOrSelect.Execute;
 end;
 
 end.

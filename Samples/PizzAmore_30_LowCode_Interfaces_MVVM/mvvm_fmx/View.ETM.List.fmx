@@ -1,4 +1,4 @@
-object ViewETM: TViewETM
+object ViewEtmList: TViewEtmList
   Size.Width = 400.000000000000000000
   Size.Height = 600.000000000000000000
   Size.PlatformDefault = False
@@ -87,7 +87,7 @@ object ViewETM: TViewETM
       TabOrder = 0
     end
     object ButtonRevert: TSpeedButton
-      Action = acEtmRevertToVersion
+      Action = acEtmRevertToDB
       Align = Right
       Enabled = True
       StyledSettings = [Family, Size, Style]
@@ -187,7 +187,7 @@ object ViewETM: TViewETM
     Left = 48
     Top = 96
   end
-  object BS_ETM: TioModelBindSource
+  object BSMaster: TioModelBindSource
     AutoActivate = False
     FieldDefs = <
       item
@@ -217,7 +217,7 @@ object ViewETM: TViewETM
         ReadOnly = False
       end>
     ScopeMappings = <>
-    ModelPresenter = 'BS_ETM'
+    ModelPresenter = 'BSMaster'
     ViewModelBridge = ioViewModelBridge1
     Left = 48
     Top = 174
@@ -232,12 +232,12 @@ object ViewETM: TViewETM
       Visible = True
       VMActionName = 'acBack'
     end
-    object acEtmRevertToVersion: TioViewAction
+    object acEtmRevertToDB: TioViewAction
       Category = 'iORM - MVVM'
       Text = 'Revert'
       Enabled = True
       Visible = True
-      VMActionName = 'acEtmRevertToVersion'
+      VMActionName = 'acEtmRevertToDB'
     end
   end
   object BindingsList1: TBindingsList
@@ -247,7 +247,7 @@ object ViewETM: TViewETM
     Top = 5
     object LinkGridToDataSourceBS_ETM: TLinkGridToDataSource
       Category = 'Quick Bindings'
-      DataSource = BS_ETM
+      DataSource = BSMaster
       GridControl = GridETM
       Columns = <
         item
@@ -265,7 +265,7 @@ object ViewETM: TViewETM
     end
     object LinkControlToField1: TLinkControlToField
       Category = 'Quick Bindings'
-      DataSource = BS_ETM
+      DataSource = BSMaster
       FieldName = 'DiffOneWay'
       Control = DiffMemo
       Track = False

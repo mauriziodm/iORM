@@ -2,7 +2,14 @@ inherited ViewOrderList: TViewOrderList
   inherited PanelTop: TPanel
     inherited LabelTitle: TLabel
       Caption = 'Orders'
+      ExplicitLeft = 60
       ExplicitWidth = 50
+    end
+  end
+  inherited PanelBottom: TPanel
+    inherited ButtonAdd: TSpeedButton
+      ExplicitLeft = 730
+      ExplicitTop = 2
     end
   end
   object GridOrders: TDBGrid [2]
@@ -12,6 +19,12 @@ inherited ViewOrderList: TViewOrderList
     Height = 424
     Align = alClient
     DataSource = SourceMaster
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
     TabOrder = 3
     TitleFont.Charset = DEFAULT_CHARSET
     TitleFont.Color = clWindowText
@@ -111,15 +124,15 @@ inherited ViewOrderList: TViewOrderList
     ExplicitTop = 464
     ExplicitHeight = 96
     object ButtonHistory: TSpeedButton [0]
-      Left = 750
-      Top = 44
-      Width = 50
+      Left = 730
+      Top = 45
+      Width = 70
       Height = 25
       Action = acWhereShowHistory
       Anchors = [akTop, akRight]
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
@@ -155,8 +168,8 @@ inherited ViewOrderList: TViewOrderList
       ParentFont = False
     end
     object Label5: TLabel [3]
-      Left = -5
-      Top = 41
+      Left = 270
+      Top = 7
       Width = 51
       Height = 25
       Alignment = taRightJustify
@@ -210,7 +223,7 @@ inherited ViewOrderList: TViewOrderList
       ParentFont = False
     end
     object Label6: TLabel [7]
-      Left = 278
+      Left = 2
       Top = 41
       Width = 86
       Height = 25
@@ -224,14 +237,33 @@ inherited ViewOrderList: TViewOrderList
       Font.Style = [fsBold]
       ParentFont = False
     end
-    object Label7: TLabel [8]
-      Left = 9
-      Top = 73
+    inherited ButtonClear: TSpeedButton
+      Top = 70
+      ExplicitTop = 70
+    end
+    object Label7: TLabel
+      Left = 185
+      Top = 41
       Width = 86
       Height = 25
       Alignment = taRightJustify
       AutoSize = False
-      Caption = 'Rows descr.'
+      Caption = 'Pizza name'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clGray
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object Label8: TLabel
+      Left = 336
+      Top = 41
+      Width = 86
+      Height = 25
+      Alignment = taRightJustify
+      AutoSize = False
+      Caption = 'Ingred.'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clGray
       Font.Height = -16
@@ -278,10 +310,11 @@ inherited ViewOrderList: TViewOrderList
       TabOrder = 1
     end
     object DBEditWhereNote: TDBEdit
-      Left = 54
-      Top = 41
-      Width = 218
+      Left = 329
+      Top = 7
+      Width = 193
       Height = 25
+      Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
       Color = clWhite
       DataField = 'Note'
@@ -330,12 +363,11 @@ inherited ViewOrderList: TViewOrderList
       ParentFont = False
       TabOrder = 4
     end
-    object DBEditCustomerName: TDBEdit
-      Left = 372
+    object DBEditWhereCustomerName: TDBEdit
+      Left = 96
       Top = 41
-      Width = 150
+      Width = 80
       Height = 25
-      Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
       Color = clWhite
       DataField = 'CustomerName'
@@ -348,15 +380,14 @@ inherited ViewOrderList: TViewOrderList
       ParentFont = False
       TabOrder = 5
     end
-    object DBEditRowsDescription: TDBEdit
-      Left = 105
-      Top = 73
-      Width = 417
+    object DBEditWherePizzaName: TDBEdit
+      Left = 279
+      Top = 41
+      Width = 80
       Height = 25
-      Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
       Color = clWhite
-      DataField = 'RowsDescription'
+      DataField = 'PizzaName'
       DataSource = SourceWhere
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -365,6 +396,24 @@ inherited ViewOrderList: TViewOrderList
       Font.Style = []
       ParentFont = False
       TabOrder = 6
+    end
+    object DBEditWhereIngredientName: TDBEdit
+      Left = 432
+      Top = 41
+      Width = 90
+      Height = 25
+      Anchors = [akLeft, akTop, akRight]
+      BorderStyle = bsNone
+      Color = clWhite
+      DataField = 'IngredientName'
+      DataSource = SourceWhere
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 7
     end
   end
   inherited ActionList1: TActionList
@@ -422,8 +471,12 @@ inherited ViewOrderList: TViewOrderList
       FieldName = 'CustomerName'
       Size = 100
     end
-    object BSWhereRowsDescription: TStringField
-      FieldName = 'RowsDescription'
+    object BSWherePizzaName: TStringField
+      FieldName = 'PizzaName'
+      Size = 100
+    end
+    object BSWhereIngredientName: TStringField
+      FieldName = 'IngredientName'
       Size = 100
     end
   end

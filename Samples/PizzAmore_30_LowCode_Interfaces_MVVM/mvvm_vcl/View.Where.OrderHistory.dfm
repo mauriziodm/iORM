@@ -1,8 +1,17 @@
 inherited ViewWhereOrderHistory: TViewWhereOrderHistory
   inherited PanelTop: TPanel
+    inherited ButtonSelect: TSpeedButton
+      ExplicitLeft = 736
+    end
     inherited LabelTitle: TLabel
       Caption = 'Where history'
-      ExplicitWidth = 108
+      ExplicitWidth = 700
+    end
+  end
+  inherited PanelBottom: TPanel
+    inherited ButtonAdd: TSpeedButton
+      ExplicitLeft = 730
+      ExplicitTop = 3
     end
   end
   inherited PanelWhere: TPanel
@@ -15,12 +24,19 @@ inherited ViewWhereOrderHistory: TViewWhereOrderHistory
     Height = 441
     Align = alClient
     DataSource = SourceMaster
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
     TabOrder = 3
     TitleFont.Charset = DEFAULT_CHARSET
     TitleFont.Color = clWindowText
     TitleFont.Height = -12
     TitleFont.Name = 'Segoe UI'
     TitleFont.Style = []
+    OnDblClick = GridCustomersDblClick
     Columns = <
       item
         Alignment = taCenter
@@ -51,6 +67,7 @@ inherited ViewWhereOrderHistory: TViewWhereOrderHistory
         Visible = True
       end
       item
+        Alignment = taCenter
         Expanded = False
         FieldName = 'FromDate'
         Title.Alignment = taCenter
@@ -60,7 +77,7 @@ inherited ViewWhereOrderHistory: TViewWhereOrderHistory
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
-        Width = 80
+        Width = 100
         Visible = True
       end
       item
@@ -74,7 +91,7 @@ inherited ViewWhereOrderHistory: TViewWhereOrderHistory
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
-        Width = 80
+        Width = 100
         Visible = True
       end
       item
@@ -92,15 +109,27 @@ inherited ViewWhereOrderHistory: TViewWhereOrderHistory
       end
       item
         Expanded = False
-        FieldName = 'RowsDescription'
+        FieldName = 'PizzaName'
         Title.Alignment = taCenter
-        Title.Caption = 'Rows descr.'
+        Title.Caption = 'Pizza'
         Title.Font.Charset = DEFAULT_CHARSET
         Title.Font.Color = clNavy
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
         Width = 130
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'IngredientName'
+        Title.Caption = 'Ingred.'
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clWindowText
+        Title.Font.Height = -13
+        Title.Font.Name = 'Segoe UI'
+        Title.Font.Style = [fsBold]
+        Width = 115
         Visible = True
       end
       item
@@ -137,8 +166,12 @@ inherited ViewWhereOrderHistory: TViewWhereOrderHistory
       FieldName = 'CustomerName'
       Size = 100
     end
+    object BSMasterIngredientName: TStringField
+      FieldName = 'IngredientName'
+      Size = 100
+    end
     object BSMasterRowsDescription: TStringField
-      FieldName = 'RowsDescription'
+      FieldName = 'PizzaName'
       Size = 100
     end
   end

@@ -16,6 +16,14 @@ type
     BSMasterName: TStringField;
     BSMasterPrice: TCurrencyField;
     BSMasterImage: TGraphicField;
+    UniLabel1: TUniLabel;
+    DBEditID: TUniDBEdit;
+    UniLabel2: TUniLabel;
+    DBEditName: TUniDBEdit;
+    UniLabel3: TUniLabel;
+    DBEditPrice: TUniDBEdit;
+    UniLabel4: TUniLabel;
+    UniDBImage1: TUniDBImage;
   private
   public
   end;

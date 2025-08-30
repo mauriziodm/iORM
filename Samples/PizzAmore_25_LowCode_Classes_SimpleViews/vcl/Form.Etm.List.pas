@@ -4,8 +4,8 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, iORM, iORM.Attributes, iORM.CommonTypes, iORM.Where.Interfaces, Data.DB,
-  iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom, iORM.DB.DataSet.Master, Vcl.Mask, Vcl.DBCtrls, Vcl.Grids, Vcl.DBGrids, ETM.Repository, iORM.StdActions.Vcl,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, iORM, iORM.Attributes, iORM.CommonTypes, Data.DB,
+  iORM.DB.DataSet.Master, Vcl.DBCtrls, Vcl.DBGrids, ETM.Repository, iORM.StdActions.Vcl,
   Vcl.ActnList, System.Actions;
 
 type
@@ -21,7 +21,6 @@ type
     DS_ETMEntityClassName: TStringField;
     DS_ETMEntityID: TIntegerField;
     DS_ETMSmartEntityVersion: TStringField;
-    DS_ETMSmartUser: TStringField;
     DS_ETMSmartEventType: TStringField;
     PanelEntityInfo: TPanel;
     Label1: TLabel;
@@ -37,17 +36,19 @@ type
     PanelDiff: TPanel;
     DiffMemo: TDBMemo;
     Label3: TLabel;
-    acEtmRevertToVersion: TioBS_ETM_RevertToBindSource;
+    acRevertToDB: TioBS_ETM_RevertToBindSource;
     DS_ETMDiffOneWay: TStringField;
     DS_ETMSmartConflictInfo: TStringField;
     DS_ETMSmartConflictCheckedByHuman: TStringField;
     acShowTimeSlot: TioBSShowOrSelect;
-    ButtonRevertTo: TSpeedButton;
+    ButtonRevertToDB: TSpeedButton;
     DS_ETMID: TIntegerField;
-    SpeedButton1: TSpeedButton;
-    acEtmRevertToObject: TioBS_ETM_RevertToObject;
+    acRevertToObj: TioBS_ETM_RevertToObject;
+    acShowRevertedObj: TioBSShowOrSelect;
+    ButonRevertToObject: TSpeedButton;
+    DS_ETMUserName: TStringField;
+    DS_ETMApp: TStringField;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure acEtmRevertToObjectAfterRevert(const ASender, ARevertedObj: TObject);
   private
   public
   end;
@@ -55,11 +56,6 @@ type
 implementation
 
 {$R *.dfm}
-
-procedure TEtmListForm.acEtmRevertToObjectAfterRevert(const ASender, ARevertedObj: TObject);
-begin
-  io.Show(ARevertedObj, acBack);
-end;
 
 procedure TEtmListForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin

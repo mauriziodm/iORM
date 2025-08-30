@@ -19,7 +19,7 @@ uses
   WiRL.Core.Application,
   WiRL.http.Server,
   WiRL.http.Server.Indy, iORM, iORM.Attributes, iORM.CommonTypes, iORM.SynchroStrategy.Interfaces, iORM.SynchroStrategy.Custom, iORM.SynchroStrategy.EtmBased,
-  iORM.DBBuilder.Interfaces, iORM.DB.ConnectionDef, iORM.Abstraction.VCL;
+  iORM.DBBuilder.Interfaces, iORM.DB.ConnectionDef, iORM.Abstraction.VCL, iORM.Abstraction;
 
 type
   TMainForm = class(TForm)
@@ -85,11 +85,11 @@ begin
   FServer
     .SetPort(StrToIntDef(PortNumberEdit.Text, 8080))
     // Engine configuration
-    .AddEngine<TWiRLEngine>('/rest')
+    .AddEngine<TWiRLEngine>('/iorm')
       .SetEngineName('WiRL ContentType Demo')
 
       // Application configuration
-      .AddApplication('/app')
+      .AddApplication('/samples')
         .SetAppName('Content App')
         .SetWriters('*')
         .SetReaders('*')

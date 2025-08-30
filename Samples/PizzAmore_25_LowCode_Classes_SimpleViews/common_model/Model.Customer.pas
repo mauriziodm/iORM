@@ -8,7 +8,7 @@ uses
 type
 
   // Register the form into the dependency injection container as SimpleView for TCustomer objects
-  [ioEntity('CUSTOMERS'), etmTrace(TEtmRepository), ioConflictStrategy(TioSameVersionWin, csRejectedRaise)]
+  [ioEntity('CUSTOMERS'), etmTrace(TEtmRepository), ioConflictStrategy(TioSameVersionWin)]
   TCustomer = class
   private
     FID: Integer;
@@ -21,6 +21,7 @@ type
     FObjVersion: TioObjVersion; // The ObjVersion is mandatory if you want to use the ETM
     function GetFullAddress: String;
   public
+    constructor Create;
     constructor CreateWithData(const AName, ACity, AAddress, APhoneNumber: String);
     property ID: Integer read FID write FID;
     property Name: String read FName write FName;
@@ -37,6 +38,12 @@ uses
   System.SysUtils;
 
 { TCustomer }
+
+constructor TCustomer.Create;
+begin
+//  Sleep(5);
+  inherited Create;
+end;
 
 constructor TCustomer.CreateWithData(const AName, ACity, AAddress, APhoneNumber: String);
 begin

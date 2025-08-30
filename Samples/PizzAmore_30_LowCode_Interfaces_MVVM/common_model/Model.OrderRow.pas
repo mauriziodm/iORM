@@ -7,63 +7,40 @@ uses
 
 type
 
-  [ioEntity('ORDERROWS'), diImplements(IOrderRow)]
+  [ioEntity('ORDERROWS')]
   TOrderRow = class(TInterfacedObject, IOrderRow)
   private
     FID: Integer;
-    FPizzaID: Integer;
-    FDescription: String;
-    FPrice: Currency;
+    FPizza: IPizza;
     FQty: Integer;
-    // ID property
     function GetID: Integer;
-    // PizzaID property
-    function GetPizzaID: Integer;
-    // Description property
-    procedure SetDescription(const AValue: String);
-    function GetDescription: String;
-    // Price property
-    procedure SetPrice(const AValue: Currency);
-    function GetPrice: Currency;
-    // Qty property
-    procedure SetQty(const AValue: Integer);
+    function GetPizza: IPizza;
     function GetQty: Integer;
-    // RowTotal property
     function GetRowTotal: Currency;
+    procedure SetQty(const AValue: Integer);
   public
-    constructor Create(APizzaID: Integer; ADescription: String; AUnitPrice: Currency; AQty: Integer); overload;
-    constructor Create(APizza: IPizza); overload;
-    property ID: Integer read GetID;  // ReadOnly
-    property PizzaID: Integer read GetPizzaID;  // ReadOnly
-    property Description: String read GetDescription write SetDescription;
-    property Price: Currency read GetPrice write SetPrice;
+    constructor Create(const APizza: IPizza; const AQty: Integer); overload;
+    constructor Create(const APizza: IPizza); overload;
+    property ID: Integer read GetID;
+    property PizzaID: IPizza read GetPizza;
     property Qty: Integer read GetQty write SetQty;
-    property RowTotal: Currency read GetRowTotal;  // ReadOnly
+    property RowTotal: Currency read GetRowTotal;
   end;
 
 implementation
 
 { TOrderRow }
 
-constructor TOrderRow.Create(APizzaID: Integer; ADescription: String; AUnitPrice: Currency; AQty: Integer);
+constructor TOrderRow.Create(const APizza: IPizza; const AQty: Integer);
 begin
- FPizzaID := APizzaID;
- FDescription := ADescription;
- FPrice := AUnitPrice;
+ FPizza := APizza;
  FQty := AQty;
 end;
 
-constructor TOrderRow.Create(APizza: IPizza);
+constructor TOrderRow.Create(const APizza: IPizza);
 begin
- FPizzaID := APizza.ID;
- FDescription := APizza.Name;
- FPrice := APizza.Price;
+ FPizza := APizza;
  FQty := 1;
-end;
-
-function TOrderRow.GetDescription: String;
-begin
-  Result := FDescription;
 end;
 
 function TOrderRow.GetID: Integer;
@@ -71,14 +48,9 @@ begin
   Result := FID;
 end;
 
-function TOrderRow.GetPizzaID: Integer;
+function TOrderRow.GetPizza: IPizza;
 begin
-  Result := FPizzaID;
-end;
-
-function TOrderRow.GetPrice: Currency;
-begin
-  Result := FPrice;
+  Result := FPizza;
 end;
 
 function TOrderRow.GetQty: Integer;
@@ -88,17 +60,7 @@ end;
 
 function TOrderRow.GetRowTotal: Currency;
 begin
-  Result := FPrice * FQty;
-end;
-
-procedure TOrderRow.SetDescription(const AValue: String);
-begin
-  FDescription := AValue;
-end;
-
-procedure TOrderRow.SetPrice(const AValue: Currency);
-begin
-  FPrice := AValue;
+  Result := FPizza.Price * FQty;
 end;
 
 procedure TOrderRow.SetQty(const AValue: Integer);

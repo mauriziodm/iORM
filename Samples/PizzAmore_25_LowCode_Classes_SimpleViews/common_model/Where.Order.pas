@@ -23,9 +23,9 @@ type
     FToDate: TDate;
     [ioWhere('Customer.Name', coLike)]
     FCustomerName: String;
-    [ioWhere('Rows.Pizza.Name', coLike)]
+    [ioWhere('OrderRows.Pizza.Name', coLike)]
     FPizzaName: String;
-    [ioWhere('Rows.Pizza.Ingredients.Ingredient.Name', coLike)]
+    [ioWhere('OrderRows.Pizza.Ingredients.Ingredient.Name', coLike)]
     FIngredientName: String;
   public
     constructor Create;

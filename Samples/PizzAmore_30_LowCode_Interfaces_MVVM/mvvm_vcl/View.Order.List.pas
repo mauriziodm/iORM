@@ -38,11 +38,14 @@ type
     BSWhereToDate: TDateField;
     BSMasterOrderState: TStringField;
     Label6: TLabel;
-    DBEditCustomerName: TDBEdit;
-    Label7: TLabel;
-    DBEditRowsDescription: TDBEdit;
+    DBEditWhereCustomerName: TDBEdit;
     BSWhereCustomerName: TStringField;
-    BSWhereRowsDescription: TStringField;
+    Label7: TLabel;
+    DBEditWherePizzaName: TDBEdit;
+    Label8: TLabel;
+    DBEditWhereIngredientName: TDBEdit;
+    BSWherePizzaName: TStringField;
+    BSWhereIngredientName: TStringField;
     procedure GridOrdersDblClick(Sender: TObject);
   private
   public

@@ -3,8 +3,8 @@ object CustomerListForm: TCustomerListForm
   Top = 0
   BorderIcons = [biSystemMenu, biMinimize]
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 760
-  ClientWidth = 496
+  ClientHeight = 759
+  ClientWidth = 492
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,22 +18,22 @@ object CustomerListForm: TCustomerListForm
   TextHeight = 15
   object PanelBottom: TPanel
     Left = 0
-    Top = 720
-    Width = 496
+    Top = 719
+    Width = 492
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 0
-    ExplicitTop = 719
-    ExplicitWidth = 492
+    ExplicitTop = 718
+    ExplicitWidth = 488
     object ButtonAdd: TSpeedButton
-      Left = 446
+      Left = 422
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
-      Action = acAdd
+      Action = acAppend
       Align = alRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clGreen
@@ -41,10 +41,10 @@ object CustomerListForm: TCustomerListForm
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
-      ExplicitLeft = 264
+      ExplicitLeft = 432
     end
     object ButtonPageUp: TSpeedButton
-      Left = 120
+      Left = 140
       Top = 0
       Width = 70
       Height = 40
@@ -56,11 +56,12 @@ object CustomerListForm: TCustomerListForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      ExplicitLeft = 120
     end
-    object ButtonDelete: TSpeedButton
+    object btnDelete: TSpeedButton
       Left = 0
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
       Action = acDelete
       Align = alLeft
@@ -70,10 +71,9 @@ object CustomerListForm: TCustomerListForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 8
     end
     object ButtonPageDown: TSpeedButton
-      Left = 50
+      Left = 70
       Top = 0
       Width = 70
       Height = 40
@@ -85,11 +85,12 @@ object CustomerListForm: TCustomerListForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      ExplicitLeft = 50
     end
     object DBTextPageOf: TDBText
-      Left = 190
+      Left = 210
       Top = 0
-      Width = 256
+      Width = 212
       Height = 40
       Align = alClient
       Alignment = taCenter
@@ -109,18 +110,33 @@ object CustomerListForm: TCustomerListForm
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 496
+    Width = 492
     Height = 40
     Align = alTop
     BevelOuter = bvNone
     Color = clNavy
     ParentBackground = False
     TabOrder = 1
-    ExplicitWidth = 492
+    ExplicitWidth = 488
+    object LabelTitle: TLabel
+      Left = 0
+      Top = 7
+      Width = 492
+      Height = 21
+      Alignment = taCenter
+      AutoSize = False
+      Caption = 'Customers'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWhite
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
     object ButtonSelect: TSpeedButton
-      Left = 446
+      Left = 422
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
       Action = acShowOrSelect
       Align = alRight
@@ -130,13 +146,12 @@ object CustomerListForm: TCustomerListForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 334
-      ExplicitTop = -6
+      ExplicitLeft = 432
     end
     object ButtonBack: TSpeedButton
       Left = 0
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
       Action = acBack
       Align = alLeft
@@ -147,25 +162,12 @@ object CustomerListForm: TCustomerListForm
       Font.Style = []
       ParentFont = False
     end
-    object LabelTitle: TLabel
-      Left = 198
-      Top = 7
-      Width = 80
-      Height = 21
-      Caption = 'Customers'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
-      Font.Height = -16
-      Font.Name = 'Segoe UI'
-      Font.Style = [fsBold]
-      ParentFont = False
-    end
   end
   object GridCustomers: TDBGrid
     Left = 0
     Top = 40
-    Width = 496
-    Height = 601
+    Width = 492
+    Height = 600
     Align = alClient
     DataSource = SourceCustomers
     Font.Charset = DEFAULT_CHARSET
@@ -180,6 +182,7 @@ object CustomerListForm: TCustomerListForm
     TitleFont.Height = -12
     TitleFont.Name = 'Segoe UI'
     TitleFont.Style = []
+    OnDblClick = GridCustomersDblClick
     Columns = <
       item
         Expanded = False
@@ -221,18 +224,18 @@ object CustomerListForm: TCustomerListForm
   end
   object PanelWhere: TPanel
     Left = 0
-    Top = 641
-    Width = 496
+    Top = 640
+    Width = 492
     Height = 79
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 3
-    ExplicitTop = 640
-    ExplicitWidth = 492
+    ExplicitTop = 639
+    ExplicitWidth = 488
     DesignSize = (
-      496
+      492
       79)
     object Label1: TLabel
       Left = 8
@@ -250,7 +253,7 @@ object CustomerListForm: TCustomerListForm
       ParentFont = False
     end
     object Label2: TLabel
-      Left = 98
+      Left = 114
       Top = 7
       Width = 51
       Height = 25
@@ -280,9 +283,9 @@ object CustomerListForm: TCustomerListForm
       ParentFont = False
     end
     object ButtonSearch: TSpeedButton
-      Left = 442
+      Left = 398
       Top = 0
-      Width = 50
+      Width = 70
       Height = 45
       Action = acBuildWhere
       Anchors = [akTop, akRight]
@@ -292,12 +295,12 @@ object CustomerListForm: TCustomerListForm
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
-      ExplicitLeft = 446
+      ExplicitLeft = 422
     end
     object ButtonClear: TSpeedButton
-      Left = 442
+      Left = 398
       Top = 49
-      Width = 50
+      Width = 70
       Height = 25
       Action = acClearWhere
       Anchors = [akTop, akRight]
@@ -307,12 +310,12 @@ object CustomerListForm: TCustomerListForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 446
+      ExplicitLeft = 422
     end
     object DBEditWhereID: TDBEdit
       Left = 43
       Top = 7
-      Width = 40
+      Width = 54
       Height = 25
       BorderStyle = bsNone
       Color = clWhite
@@ -327,9 +330,9 @@ object CustomerListForm: TCustomerListForm
       TabOrder = 0
     end
     object DBEditWhereName: TDBEdit
-      Left = 155
+      Left = 171
       Top = 6
-      Width = 261
+      Width = 218
       Height = 25
       Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
@@ -343,12 +346,12 @@ object CustomerListForm: TCustomerListForm
       Font.Style = []
       ParentFont = False
       TabOrder = 1
-      ExplicitWidth = 257
+      ExplicitWidth = 214
     end
     object DBEditWhereCity: TDBEdit
       Left = 43
       Top = 37
-      Width = 166
+      Width = 346
       Height = 25
       Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
@@ -362,16 +365,17 @@ object CustomerListForm: TCustomerListForm
       Font.Style = []
       ParentFont = False
       TabOrder = 2
-      ExplicitWidth = 162
+      ExplicitWidth = 342
     end
   end
   object DSCustomers: TioDataSetMaster
     AsDefault = True
     TypeName = 'TCustomer'
     AsyncLoad = True
+    AsyncPersist = True
     VirtualFields = True
     Paging.CurrentPageOfFormat = 'Page %d of %d'
-    Paging.PageSize = 50
+    Paging.PageSize = 25
     Paging.PagingType = ptHardPaging
     Left = 56
     Top = 112
@@ -399,9 +403,32 @@ object CustomerListForm: TCustomerListForm
   object ActionList1: TActionList
     Left = 183
     Top = 112
-    object acDelete: TioBSPersistenceDelete
-      Category = 'iORM-BSPersistence'
-      Caption = 'Delete'
+    object acAppend: TioBSAppend
+      Category = 'iORM - BS'
+      Caption = 'Add'
+      Action_ShowOrSelectAction = acShowOrSelect
+      TargetBindSource = DSCustomers
+    end
+    object acBack: TioBSCloseQuery
+      Category = 'iORM-BS'
+      Caption = 'Back'
+      TargetBindSource = DSCustomers
+      OnUpdateScope = usGlobal
+    end
+    object acBuildWhere: TioBSBuildWhere
+      Category = 'iORM - BS - WhereBuilder'
+      Caption = 'Search'
+      TargetBindSource = DSWhere
+    end
+    object acClearWhere: TioBSClearWhere
+      Category = 'iORM - BS - WhereBuilder'
+      Caption = 'Clear'
+      TargetBindSource = DSWhere
+      AutoExec_Where_OnTargetBS = True
+    end
+    object acDelete: TioBSDelete
+      Category = 'iORM - BS'
+      Caption = 'Del'
       TargetBindSource = DSCustomers
     end
     object acNextPage: TioBSNextPage
@@ -414,11 +441,11 @@ object CustomerListForm: TCustomerListForm
       Caption = 'Pg.Dn'
       TargetBindSource = DSCustomers
     end
-    object acBack: TioBSCloseQuery
+    object acSelectCurrent: TioBSSelectCurrent
       Category = 'iORM-BS'
-      Caption = 'Back'
+      Caption = 'Select'
       TargetBindSource = DSCustomers
-      OnUpdateScope = usGlobal
+      Action_CloseQueryAction = acBack
     end
     object acShowOrSelect: TioBSShowOrSelect
       Category = 'iORM-BS'
@@ -428,29 +455,6 @@ object CustomerListForm: TCustomerListForm
       ShowMode = smBSCurrent
       TargetBindSource = DSCustomers
       ViewContextBy = vcByDefaultViewContextProvider
-    end
-    object acAdd: TioBSPersistenceAppend
-      Category = 'iORM-BSPersistence'
-      Caption = 'Add'
-      Action_ShowOrSelectAction = acShowOrSelect
-      TargetBindSource = DSCustomers
-    end
-    object acSelectCurrent: TioBSSelectCurrent
-      Category = 'iORM-BS'
-      Caption = 'Select'
-      TargetBindSource = DSCustomers
-      Action_CloseQueryAction = acBack
-    end
-    object acBuildWhere: TioBSBuildWhere
-      Category = 'iORM - BS - WhereBuilder'
-      Caption = 'Search'
-      TargetBindSource = DSWhere
-    end
-    object acClearWhere: TioBSClearWhere
-      Category = 'iORM - BS - WhereBuilder'
-      Caption = 'Clear'
-      TargetBindSource = DSWhere
-      AutoExec_Where_OnTargetBS = True
     end
   end
   object DSWhere: TioDataSetMaster

@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, View.BaseForForm, iORM, iORM.Attributes, iORM.CommonTypes, iORM.MVVM.Interfaces, Data.DB, iORM.MVVM.ViewModelBridge,
   iORM.DB.DataSet.Base, iORM.MVVM.ModelDataSet, System.Actions, Vcl.ActnList, iORM.StdActions.Vcl, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.DBCtrls,
-  Vcl.Mask, Model.Pizza;
+  Vcl.Mask, Model.Pizza, Vcl.Grids, Vcl.DBGrids;
 
 type
 
@@ -24,6 +24,17 @@ type
     DBEditName: TDBEdit;
     DBEditPrice: TDBEdit;
     DBImage: TDBImage;
+    Label5: TLabel;
+    ButtonAddIngredient: TSpeedButton;
+    ButtonDeleteIngredient: TSpeedButton;
+    GridCustomers: TDBGrid;
+    BSIngredients: TioModelDataSet;
+    BSIngredientsIngredientName: TStringField;
+    BSIngredientsIngredientUnitOfMeasure: TStringField;
+    BSIngredientsQty: TFloatField;
+    SourceIngredients: TDataSource;
+    acShowIngredientSelector: TioViewAction;
+    acDeleteIngredient: TioViewAction;
   private
   public
   end;

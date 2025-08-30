@@ -10,11 +10,12 @@ uses
 {$ELSE}
   Vcl.Graphics,
 {$IFEND}
-  iORM, Model.Interfaces, DJSON.Attributes, ETM.Repository;
+  iORM, Model.Interfaces, DJSON.Attributes, ETM.Repository,
+  System.Generics.Collections;
 
 type
 
-  [ioEntity('PIZZAS'), diImplements(IPizza), etmTrace(TEtmRepository)]
+  [ioEntity('PIZZAS'), etmTrace(TEtmTimeSlot), ioConflictStrategy(TioSameVersionWin, csResolved)]
   TPizza = class(TInterfacedObject, IPizza)
   private
     FID: Integer;
@@ -22,24 +23,23 @@ type
     FPrice: Currency;
     [ioSkip([ssETM])]
     FImage: TBitmap;
-    FObjVersion: TioObjVersion; // The ObjVersion is mandatory if you want to use the ETM
-    // ID property
+    FObjVersion: TioObjVersion;  // The ObjVersion is mandatory if you want to use the ETM, otherwise not
+    FIngredients: TList<IPizzaIngredientRow>;
     function GetID: Integer;
-    // Name property
-    procedure SetName(const AValue: String);
-    function GetName: String;
-    // Price property
-    procedure SetPrice(const AValue: Currency);
-    function GetPrice: Currency;
-    // Image property
     function GetImage: TBitmap;
+    function GetIngredients: TList<IPizzaIngredientRow>;
+    function GetName: String;
+    function GetPrice: Currency;
+    procedure SetName(const AValue: String);
+    procedure SetPrice(const AValue: Currency);
   public
     constructor Create;
     destructor Destroy; override;
-    property ID: Integer read GetID;  // ReadOnly
+    property ID: Integer read GetID;
     property Name: String read GetName write SetName;
     property Price: Currency read GetPrice write SetPrice;
-    property Image: TBitmap read GetImage; // ReadOnly
+    property Image: TBitmap read GetImage;
+    property Ingredients: TList<IPizzaIngredientRow> read GetIngredients;
   end;
 
 implementation
@@ -50,11 +50,13 @@ constructor TPizza.Create;
 begin
   inherited;
   FImage := TBitmap.Create;
+  FIngredients := TList<IPizzaIngredientRow>.Create;
 end;
 
 destructor TPizza.Destroy;
 begin
   FImage.Free;
+  FIngredients.Free;
   inherited;
 end;
 
@@ -66,6 +68,11 @@ end;
 function TPizza.GetImage: TBitmap;
 begin
   Result := FImage;
+end;
+
+function TPizza.GetIngredients: TList<IPizzaIngredientRow>;
+begin
+  Result := FIngredients;
 end;
 
 function TPizza.GetName: String;

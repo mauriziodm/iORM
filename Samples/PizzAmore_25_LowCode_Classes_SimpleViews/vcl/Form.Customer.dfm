@@ -4,8 +4,8 @@ object CustomerForm: TCustomerForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 561
-  ClientWidth = 640
+  ClientHeight = 560
+  ClientWidth = 636
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,8 +16,8 @@ object CustomerForm: TCustomerForm
   Visible = True
   OnClose = FormClose
   DesignSize = (
-    640
-    561)
+    636
+    560)
   TextHeight = 15
   object Label5: TLabel
     Left = 8
@@ -113,18 +113,20 @@ object CustomerForm: TCustomerForm
   end
   object PanelBottom: TPanel
     Left = 0
-    Top = 521
-    Width = 640
+    Top = 520
+    Width = 636
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
+    ExplicitTop = 519
+    ExplicitWidth = 632
     object ButtonRevert: TSpeedButton
       Left = 0
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
       Action = acRevertOrDelete
       Align = alLeft
@@ -134,13 +136,11 @@ object CustomerForm: TCustomerForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 334
-      ExplicitTop = -6
     end
     object ButtonPersist: TSpeedButton
-      Left = 590
+      Left = 566
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
       Action = acPersist
       Align = alRight
@@ -150,8 +150,7 @@ object CustomerForm: TCustomerForm
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
-      ExplicitLeft = 334
-      ExplicitTop = -6
+      ExplicitLeft = 576
     end
   end
   object DBEditCity: TDBEdit
@@ -225,34 +224,21 @@ object CustomerForm: TCustomerForm
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 640
+    Width = 636
     Height = 40
     Align = alTop
     BevelOuter = bvNone
     Color = clNavy
     ParentBackground = False
     TabOrder = 6
+    ExplicitWidth = 632
     DesignSize = (
-      640
+      636
       40)
-    object ButtonBack: TSpeedButton
-      Left = 0
-      Top = 0
-      Width = 50
-      Height = 40
-      Action = acBack
-      Align = alLeft
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clNavy
-      Font.Height = -16
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
-    end
     object LabelTitle: TLabel
-      Left = 104
+      Left = 0
       Top = 7
-      Width = 413
+      Width = 632
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -265,13 +251,27 @@ object CustomerForm: TCustomerForm
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlCenter
-      ExplicitWidth = 369
+      ExplicitWidth = 636
+    end
+    object ButtonBack: TSpeedButton
+      Left = 0
+      Top = 0
+      Width = 70
+      Height = 40
+      Action = acBack
+      Align = alLeft
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clNavy
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
     end
   end
   object PanelETM: TPanel
     Left = 0
-    Top = 239
-    Width = 640
+    Top = 238
+    Width = 636
     Height = 282
     Align = alBottom
     BevelOuter = bvNone
@@ -279,10 +279,12 @@ object CustomerForm: TCustomerForm
     Color = clMenu
     ParentBackground = False
     TabOrder = 7
+    ExplicitTop = 237
+    ExplicitWidth = 632
     object PageControl1: TPageControl
       Left = 0
       Top = 0
-      Width = 640
+      Width = 636
       Height = 282
       ActivePage = TabSheet1
       Align = alClient
@@ -293,12 +295,13 @@ object CustomerForm: TCustomerForm
       Font.Style = [fsBold]
       ParentFont = False
       TabOrder = 0
+      ExplicitWidth = 632
       object TabSheet1: TTabSheet
         Caption = 'Timeline'
         object GridCustomers: TDBGrid
           Left = 0
           Top = 0
-          Width = 632
+          Width = 628
           Height = 250
           Align = alClient
           BorderStyle = bsNone
@@ -363,7 +366,7 @@ object CustomerForm: TCustomerForm
         object DiffMemo: TDBMemo
           Left = 0
           Top = 0
-          Width = 636
+          Width = 628
           Height = 250
           Align = alClient
           BorderStyle = bsNone
@@ -377,13 +380,12 @@ object CustomerForm: TCustomerForm
           ParentFont = False
           ScrollBars = ssBoth
           TabOrder = 0
-          ExplicitWidth = 580
         end
       end
     end
   end
   object ButtonRevertToVersion: TButton
-    Left = 474
+    Left = 410
     Top = 241
     Width = 139
     Height = 23
@@ -396,10 +398,13 @@ object CustomerForm: TCustomerForm
     Font.Style = []
     ParentFont = False
     TabOrder = 8
+    ExplicitLeft = 406
   end
   object DSCustomer: TioDataSetMaster
     AsDefault = True
     TypeName = 'TCustomer'
+    AsyncLoad = True
+    AsyncPersist = True
     LoadType = ltFromBSReload
     TypeOfCollection = tcSingleObject
     VirtualFields = True
@@ -435,17 +440,6 @@ object CustomerForm: TCustomerForm
   object ActionList1: TActionList
     Left = 416
     Top = 48
-    object acPersist: TioBSPersistencePersist
-      Category = 'iORM-BSPersistence'
-      Caption = 'Persist'
-      TargetBindSource = DSCustomer
-    end
-    object acRevertOrDelete: TioBSPersistenceRevertOrDelete
-      Category = 'iORM-BSPersistence'
-      Caption = 'Revert'
-      Action_CloseQueryAction = acBack
-      TargetBindSource = DSCustomer
-    end
     object acBack: TioBSCloseQuery
       Category = 'iORM-BS'
       Caption = 'Back'
@@ -460,11 +454,22 @@ object CustomerForm: TCustomerForm
       AutoExec_OnTargetBS_AfterRevert = doReload
       AutoExec_Persist_AfterRevert = True
     end
+    object acPersist: TioBSPersistencePersist
+      Category = 'iORM-BSPersistence'
+      Caption = 'Persist'
+      TargetBindSource = DSCustomer
+    end
+    object acRevertOrDelete: TioBSPersistenceRevertOrDelete
+      Category = 'iORM-BSPersistence'
+      Caption = 'Revert'
+      Action_CloseQueryAction = acBack
+      TargetBindSource = DSCustomer
+    end
   end
   object SourceETM: TDataSource
     AutoEdit = False
     DataSet = DS_ETM
-    Left = 32
+    Left = 320
     Top = 400
   end
   object DS_ETM: TioDataSetMaster
@@ -472,7 +477,7 @@ object CustomerForm: TCustomerForm
     TypeName = 'TEtmRepository'
     ETMfor = DSCustomer
     Paging.CurrentPageOfFormat = '%d/%d'
-    Left = 32
+    Left = 320
     Top = 344
     object DS_ETMDateAndTime: TDateTimeField
       FieldName = 'DateAndTime'

@@ -191,6 +191,10 @@
             <Form>SynchroLogListForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="Form.Authorization.pas">
+            <Form>AuthorizationForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -211,10 +215,7 @@
                 <Source>
                     <Source Name="MainSource">PizzAmore_25_LowCode_Classes_SimpleViews_Vcl.dpr</Source>
                 </Source>
-                <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
-                </Excluded_Packages>
+                <Excluded_Packages/>
             </Delphi.Personality>
             <Deployment Version="4">
                 <DeployFile LocalName="Win32\Debug\PizzAmore_25_LessAttr_Class_simpleview_vcl_desktop.exe" Configuration="Debug" Class="ProjectOutput"/>

@@ -27,23 +27,6 @@ type
     MDSMasterPhoneNumber: TStringField;
     MDSMasterCity: TStringField;
     MDSMasterAddress: TStringField;
-    PanelETM: TPanel;
-    PageControl1: TPageControl;
-    TabSheet1: TTabSheet;
-    GridCustomers: TDBGrid;
-    TabSheet2: TTabSheet;
-    DiffMemo: TDBMemo;
-    BS_ETM: TioModelDataSet;
-    SourceETM: TDataSource;
-    ButtonRevertToVersion: TButton;
-    BS_ETMDateAndTime: TDateTimeField;
-    BS_ETMEntityClassName: TStringField;
-    BS_ETMEntityID: TIntegerField;
-    BS_ETMSmartEntityVersion: TStringField;
-    BS_ETMSmartUser: TStringField;
-    BS_ETMSmartActionType: TStringField;
-    BS_ETMDiffOneWay: TStringField;
-    acEtmRevertToVersion: TioViewAction;
   private
   public
   end;

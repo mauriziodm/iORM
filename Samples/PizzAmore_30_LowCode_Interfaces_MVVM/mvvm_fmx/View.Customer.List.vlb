@@ -1,9 +1,6 @@
 ﻿[LabelTitle]
 Coordinates=412,309,62,51
 
-[acAdd]
-Coordinates=22,77,45,33
-
 [ListView]
 Coordinates=625,10,89,159
 
@@ -108,4 +105,7 @@ Coordinates=56,129,60,105
 
 [acWhereClear]
 Coordinates=281,1,83,33
+
+[acAppend]
+Coordinates=22,77,45,33
 

@@ -5,8 +5,7 @@ object MyWebModule: TMyWebModule
   Height = 225
   Width = 415
   object FirebirdConn: TioFirebirdConnectionDef
-    AsDefault = True
-    AutoCreateDB.Enabled = True
+    AsDefault = False
     Database = 'PizzAmore_25_LowCode_Classes_SimpleViews_Vcl.FDB'
     DatabaseStdFolder = sfDocuments
     OSAuthent = oaNo
@@ -17,26 +16,26 @@ object MyWebModule: TMyWebModule
     Protocol = pLocal
     SQLDialect = sqlDialect3
     UserName = 'SYSDBA'
-    OnAfterCreateOrAlterDB = FirebirdConnAfterCreateOrAlterDB
     Left = 72
     Top = 24
   end
   object ioVCL1: TioVCL
-    Left = 232
-    Top = 48
+    Left = 224
+    Top = 24
   end
   object SQLiteConn: TioSQLiteConnectionDef
-    AsDefault = False
+    AsDefault = True
+    AutoCreateDB.Enabled = True
     Database = 'PizzAmore_25_LowCode_Classes_SimpleViews_Vcl.db'
     DatabaseStdFolder = sfDocuments
     Persistent = False
     Pooled = False
-    OnAfterCreateOrAlterDB = FirebirdConnAfterCreateOrAlterDB
+    AfterCreateOrAlterDB = FirebirdConnAfterCreateOrAlterDB
     Left = 72
     Top = 102
   end
   object ioEtmSynchroStrategy_Server1: TioEtmSynchroStrategy_Server
-    Left = 232
-    Top = 128
+    Left = 224
+    Top = 104
   end
 end

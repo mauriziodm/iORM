@@ -112,6 +112,7 @@ object ViewBaseForForm: TViewBaseForForm
       ShowMode = smEntityTypeNameAsETM
       TargetBindSource = BSMaster
       ViewContextBy = vcByDefaultViewContextProvider
+      VVMTypeAlias = 'LIST'
     end
   end
   object BSMaster: TioPrototypeBindSourceMaster

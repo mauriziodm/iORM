@@ -12,33 +12,30 @@ object VMBaseForForm: TVMBaseForForm
     Top = 48
   end
   object acPersist: TioVMActionBSPersistencePersist
-    Name = 'acPersist'
     TargetBindSource = BSMaster
-    Left = 192
+    Left = 120
     Top = 112
   end
   object acBack: TioVMActionBSCloseQuery
-    Name = 'acBack'
     TargetBindSource = BSMaster
     OnUpdateScope = usGlobal
-    Left = 192
+    Left = 120
     Top = 48
   end
   object acRevert: TioVMActionBSPersistenceRevertOrDelete
-    Name = 'acRevert'
     Action_CloseQueryAction = acBack
     TargetBindSource = BSMaster
-    Left = 192
-    Top = 184
+    Left = 120
+    Top = 176
   end
   object acShowETM: TioVMActionBSShowOrSelect
-    Name = 'acShowETM'
     Action_ParentCloseQueryAction = acBack
-    EntityTypeName = 'TEtmRepository'
+    EntityTypeName = 'TEtmTimeSlot'
     ShowMode = smEntityTypeNameAsETM
     TargetBindSource = BSMaster
+    VVMTypeAlias = 'LIST'
     ViewContextBy = vcByDefaultViewContextProvider
-    Left = 336
-    Top = 48
+    Left = 120
+    Top = 240
   end
 end

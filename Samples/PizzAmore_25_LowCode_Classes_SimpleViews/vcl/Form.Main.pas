@@ -4,11 +4,13 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, iORM, iORM.Attributes, iORM.CommonTypes, iORM.DBBuilder.Interfaces, iORM.DB.ConnectionDef,
-  iORM.Abstraction.VCL, iORM.MVVM.Interfaces, iORM.MVVM.ViewContextProvider, iORM.StdActions.CloseQueryRepeater, System.Actions, Vcl.ActnList,
-  iORM.StdActions.Vcl, iORM.SynchroStrategy.Interfaces, iORM.SynchroStrategy.Custom, iORM.SynchroStrategy.EtmBased;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, iORM.CommonTypes,
+  System.Actions, Vcl.ActnList,
+  iORM.StdActions.Vcl, iORM.SynchroStrategy.EtmBased, iORM,
+  iORM.DBBuilder.Interfaces, iORM.DB.ConnectionDef, iORM.Abstraction, iORM.Abstraction.VCL, iORM.Attributes;
 
 type
+
   TMainForm = class(TForm)
     ButtonOrders: TButton;
     ButtonCustomers: TButton;
@@ -17,21 +19,25 @@ type
     LabelTitlePizz: TLabel;
     LabelTitleAmore: TLabel;
     Shape1: TShape;
-    ioVCL1: TioVCL;
-    SQLiteConn: TioSQLiteConnectionDef;
     ActionList1: TActionList;
     acQuit: TioBSCloseQuery;
     ButtonQuit: TButton;
     acShowCustomers: TioBSShowOrSelect;
     acShowPizzas: TioBSShowOrSelect;
     acShowOrders: TioBSShowOrSelect;
-    HttpConn: TioHttpConnectionDef;
     ButtonIngredients: TButton;
     acShowIngredients: TioBSShowOrSelect;
     ButtonSynchroLogs: TButton;
     acShowSynchroLogs: TioBSShowOrSelect;
-    procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
-      AWarnings: TStrings);
+    FBConn: TioFirebirdConnectionDef;
+    ioVCL1: TioVCL;
+    SQLiteConn: TioSQLiteConnectionDef;
+    ButtonAuthorization: TButton;
+    HttpConn: TioHttpConnectionDef;
+    Button1: TButton;
+    procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript, AWarnings: TStrings);
+    procedure FormCreate(Sender: TObject);
+    procedure ButtonAuthorizationClick(Sender: TObject);
   private
   public
   end;
@@ -42,14 +48,52 @@ var
 implementation
 
 uses
-  Utils.SampleData;
+  Utils.SampleData, Model.Order, System.Rtti,
+  Form.Authorization, Model.Customer;
 
 {$R *.dfm}
+
+procedure TMainForm.FormCreate(Sender: TObject);
+var
+  LSessionData: IioSessionData;
+begin
+  // Set session data
+  LSessionData := TioApplication.SessionDataStore.AcquireMainSessionData;
+  try
+    LSessionData.App := 'Pizz''Amore VCL';
+    LSessionData.AppOID := 1;
+    LSessionData.License := 'iORM demo';
+    LSessionData.LicenseOID := 1;
+    LSessionData.User := 'MaurizioDM';
+    LSessionData.UserOID := 1;
+  finally
+    TioApplication.SessionDataStore.Release;
+  end;
+
+  // Set auth methods
+  io.SetAuthMethods(
+    // anonymous method returning the access-token
+    function: String
+    begin
+      Result := 'This is the access-token or whatever you want!';
+    end,
+    // anonymous method returning the authorization-decision
+    function(AAuthDecisionRequest: IioAuthDecisionRequest): TioAuthDecisionResult
+    begin
+      Result := AuthorizationForm.Authorize(AAuthDecisionRequest);
+    end
+  );
+end;
 
 procedure TMainForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
   AWarnings: TStrings);
 begin
   TSampleData.CheckForSampleDataCreation;
+end;
+
+procedure TMainForm.ButtonAuthorizationClick(Sender: TObject);
+begin
+  AuthorizationForm.Show;
 end;
 
 end.

@@ -229,16 +229,62 @@
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
         </DCCReference>
-        <DCCReference Include="..\common_model\ETM.Repository.pas"/>
-        <DCCReference Include="..\mvvm_common_vm\VM.ETM.pas">
-            <Form>VM_ETM</Form>
+        <DCCReference Include="..\common_model\Model.Pizza.IngredientRow.pas"/>
+        <DCCReference Include="..\common_model\Model.Ingredient.pas"/>
+        <DCCReference Include="..\mvvm_common_vm\VM.Ingredient.List.pas">
+            <Form>VMIngredientList</Form>
             <FormType>dfm</FormType>
             <DesignClass>TioViewModel</DesignClass>
         </DCCReference>
-        <DCCReference Include="View.ETM.pas">
-            <Form>ViewETM</Form>
+        <DCCReference Include="View.Ingredient.List.pas">
+            <Form>ViewIngredientList</Form>
             <FormType>dfm</FormType>
             <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\mvvm_common_vm\VM.Ingredient.pas">
+            <Form>VMIngredient</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TioViewModel</DesignClass>
+        </DCCReference>
+        <DCCReference Include="View.Ingredient.pas">
+            <Form>ViewIngredient</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\common_model\Etm.Repository.pas"/>
+        <DCCReference Include="..\mvvm_common_vm\VM.Etm.pas">
+            <Form>VMEtm</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TioViewModel</DesignClass>
+        </DCCReference>
+        <DCCReference Include="View.Etm.pas">
+            <Form>ViewEtm</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\mvvm_common_vm\VM.Etm.List.pas">
+            <Form>VMEtmList</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TioViewModel</DesignClass>
+        </DCCReference>
+        <DCCReference Include="View.Etm.List.pas">
+            <Form>ViewEtmList</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\mvvm_common_vm\VM.SynchroLog.List.pas">
+            <Form>VMSynchroLogList</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TioViewModel</DesignClass>
+        </DCCReference>
+        <DCCReference Include="View.SynchroLog.List.pas">
+            <Form>ViewSynchroLogList</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TFrame</DesignClass>
+        </DCCReference>
+        <DCCReference Include="Form.Authorization.pas">
+            <Form>AuthorizationForm</Form>
+            <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

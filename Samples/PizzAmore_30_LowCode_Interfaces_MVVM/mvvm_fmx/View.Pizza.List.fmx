@@ -7,10 +7,18 @@ inherited ViewPizzaList: TViewPizzaList
   end
   inherited ListView: TListView
     ItemAppearanceClassName = 'TImageListItemBottomDetailAppearance'
-    ItemEditAppearanceClassName = 'TImageListItemBottomDetailShowCheckAppearance'
     ItemIndex = 0
+    Size.Height = 405.000000000000000000
   end
   inherited RectangleWhere: TRectangle
+    Position.Y = 445.000000000000000000
+    Size.Height = 115.000000000000000000
+    inherited RectangleWhereButtons: TRectangle
+      Size.Height = 115.000000000000000000
+      inherited ButtonClear: TSpeedButton
+        Position.Y = 75.000000000000000000
+      end
+    end
     object Label1: TLabel
       StyledSettings = [Family]
       Position.X = 8.000000000000000000
@@ -22,11 +30,11 @@ inherited ViewPizzaList: TViewPizzaList
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       TextSettings.FontColor = claDarkslategray
       Text = 'ID'
-      TabOrder = 7
+      TabOrder = 9
     end
     object EditWhereID: TEdit
       Touch.InteractiveGestures = [LongTap, DoubleTap]
-      TabOrder = 3
+      TabOrder = 4
       Text = '-33'
       TextSettings.Font.Size = 14.000000000000000000
       Position.X = 56.000000000000000000
@@ -47,12 +55,87 @@ inherited ViewPizzaList: TViewPizzaList
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       TextSettings.FontColor = claDarkslategray
       Text = 'Name'
-      TabOrder = 6
+      TabOrder = 8
     end
     object EditWhereName: TEdit
       Touch.InteractiveGestures = [LongTap, DoubleTap]
       Anchors = [akLeft, akTop, akRight]
+      TabOrder = 3
+      Text = 'Mark Anderson'
+      TextSettings.Font.Size = 14.000000000000000000
+      Position.X = 176.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 176.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      StyledSettings = [Family, Style, FontColor]
+    end
+    object Label2: TLabel
+      StyledSettings = [Family]
+      Position.X = 8.000000000000000000
+      Position.Y = 45.000000000000000000
+      Size.Width = 80.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claDarkslategray
+      Text = 'From price'
+      TabOrder = 6
+    end
+    object EditWhereFromPrice: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
       TabOrder = 2
+      Text = '67,67'
+      TextSettings.Font.Size = 14.000000000000000000
+      Position.X = 92.000000000000000000
+      Position.Y = 46.000000000000000000
+      Size.Width = 90.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      StyledSettings = [Family, Style, FontColor]
+    end
+    object Label4: TLabel
+      StyledSettings = [Family]
+      Position.X = 200.000000000000000000
+      Position.Y = 46.000000000000000000
+      Size.Width = 61.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claDarkslategray
+      Text = 'to price'
+      TabOrder = 5
+    end
+    object EditWhereToPrice: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 0
+      Text = '67,67'
+      TextSettings.Font.Size = 14.000000000000000000
+      Position.X = 262.000000000000000000
+      Position.Y = 46.000000000000000000
+      Size.Width = 90.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      StyledSettings = [Family, Style, FontColor]
+    end
+    object Label5: TLabel
+      StyledSettings = [Family]
+      Position.X = 8.000000000000000000
+      Position.Y = 83.000000000000000000
+      Size.Width = 80.000000000000000000
+      Size.Height = 30.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claDarkslategray
+      Text = 'Ingredient'
+      TabOrder = 7
+    end
+    object EditWhereIngredient: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 1
       Text = 
         'ipsum mi vehicula purus, eu congue sapien orci eu est. Morbi bla' +
         'ndit volutpat ante, non ultrices eros semper at. Fusce leo leo, ' +
@@ -75,59 +158,9 @@ inherited ViewPizzaList: TViewPizzaList
         'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
         'por, velit sit'
       TextSettings.Font.Size = 14.000000000000000000
-      Position.X = 176.000000000000000000
-      Position.Y = 8.000000000000000000
-      Size.Width = 176.000000000000000000
-      Size.Height = 30.000000000000000000
-      Size.PlatformDefault = False
-      StyledSettings = [Family, Style, FontColor]
-    end
-    object Label2: TLabel
-      StyledSettings = [Family]
-      Position.X = 8.000000000000000000
-      Position.Y = 45.000000000000000000
-      Size.Width = 80.000000000000000000
-      Size.Height = 30.000000000000000000
-      Size.PlatformDefault = False
-      TextSettings.Font.Size = 14.000000000000000000
-      TextSettings.Font.StyleExt = {00070000000000000004000000}
-      TextSettings.FontColor = claDarkslategray
-      Text = 'From price'
-      TabOrder = 5
-    end
-    object EditWhereFromPrice: TEdit
-      Touch.InteractiveGestures = [LongTap, DoubleTap]
-      TabOrder = 1
-      Text = '67,67 '#8364
-      TextSettings.Font.Size = 14.000000000000000000
       Position.X = 92.000000000000000000
-      Position.Y = 46.000000000000000000
-      Size.Width = 90.000000000000000000
-      Size.Height = 30.000000000000000000
-      Size.PlatformDefault = False
-      StyledSettings = [Family, Style, FontColor]
-    end
-    object Label4: TLabel
-      StyledSettings = [Family]
-      Position.X = 200.000000000000000000
-      Position.Y = 46.000000000000000000
-      Size.Width = 61.000000000000000000
-      Size.Height = 30.000000000000000000
-      Size.PlatformDefault = False
-      TextSettings.Font.Size = 14.000000000000000000
-      TextSettings.Font.StyleExt = {00070000000000000004000000}
-      TextSettings.FontColor = claDarkslategray
-      Text = 'to price'
-      TabOrder = 4
-    end
-    object EditWhereToPrice: TEdit
-      Touch.InteractiveGestures = [LongTap, DoubleTap]
-      TabOrder = 0
-      Text = '67,67 '#8364
-      TextSettings.Font.Size = 14.000000000000000000
-      Position.X = 262.000000000000000000
-      Position.Y = 46.000000000000000000
-      Size.Width = 90.000000000000000000
+      Position.Y = 84.000000000000000000
+      Size.Width = 260.000000000000000000
       Size.Height = 30.000000000000000000
       Size.PlatformDefault = False
       StyledSettings = [Family, Style, FontColor]
@@ -138,7 +171,7 @@ inherited ViewPizzaList: TViewPizzaList
     FieldDefs = <
       item
         Name = 'Name'
-        Generator = 'ColorsNames'
+        Generator = 'LoremIpsum'
         ReadOnly = False
       end
       item
@@ -156,6 +189,7 @@ inherited ViewPizzaList: TViewPizzaList
     Preview = True
   end
   inherited BSWhere: TioModelBindSource
+    AutoActivate = True
     FieldDefs = <
       item
         Name = 'ID'
@@ -179,7 +213,13 @@ inherited ViewPizzaList: TViewPizzaList
         FieldType = ftCurrency
         Generator = 'Currency'
         ReadOnly = False
+      end
+      item
+        Name = 'ingredientName'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
       end>
+    Preview = True
   end
   object BindingsList1: TBindingsList
     Methods = <>
@@ -195,7 +235,6 @@ inherited ViewPizzaList: TViewPizzaList
         item
           SourceMemberName = 'Price'
           ControlMemberName = 'Detail'
-          CustomFormat = 'Format('#39'%%m'#39', Value) + '#39' each'#39
         end
         item
           SourceMemberName = 'Image'
@@ -207,31 +246,36 @@ inherited ViewPizzaList: TViewPizzaList
     object LinkControlToField1: TLinkControlToField
       Category = 'Quick Bindings'
       DataSource = BSWhere
-      FieldName = 'ToPrice'
-      Control = EditWhereToPrice
+      FieldName = 'ID'
+      Control = EditWhereID
       Track = False
-      CustomFormat = 'Format('#39'%%m'#39', Value)'
     end
     object LinkControlToField2: TLinkControlToField
-      Category = 'Quick Bindings'
-      DataSource = BSWhere
-      FieldName = 'FromPrice'
-      Control = EditWhereFromPrice
-      Track = False
-      CustomFormat = 'Format('#39'%%m'#39', Value)'
-    end
-    object LinkControlToField3: TLinkControlToField
       Category = 'Quick Bindings'
       DataSource = BSWhere
       FieldName = 'Name'
       Control = EditWhereName
       Track = False
     end
+    object LinkControlToField3: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWhere
+      FieldName = 'FromPrice'
+      Control = EditWhereFromPrice
+      Track = False
+    end
     object LinkControlToField4: TLinkControlToField
       Category = 'Quick Bindings'
       DataSource = BSWhere
-      FieldName = 'ID'
-      Control = EditWhereID
+      FieldName = 'ToPrice'
+      Control = EditWhereToPrice
+      Track = False
+    end
+    object LinkControlToField5: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSWhere
+      FieldName = 'ingredientName'
+      Control = EditWhereIngredient
       Track = False
     end
   end

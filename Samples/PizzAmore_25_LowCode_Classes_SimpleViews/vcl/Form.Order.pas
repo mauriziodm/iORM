@@ -3,9 +3,9 @@ unit Form.Order;
 interface
 
 uses
-  Vcl.Forms, Data.DB, iORM, iORM.Attributes, iORM.CommonTypes, iORM.Where.Interfaces, iORM.StdActions.Vcl, Vcl.DBActns, Vcl.ActnList, System.Classes,
-  System.Actions, iORM.DB.DataSet.Detail, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom, iORM.DB.DataSet.Master, Vcl.Controls, Vcl.StdCtrls, Vcl.DBCtrls,
-  Vcl.Grids, Vcl.DBGrids, Vcl.DBCGrids, Vcl.Mask, Vcl.ExtCtrls, Vcl.Buttons, Model.Order;
+  Vcl.Forms, Data.DB, iORM, iORM.Attributes, iORM.CommonTypes, iORM.StdActions.Vcl, Vcl.ActnList, System.Classes,
+  System.Actions, iORM.DB.DataSet.Detail, iORM.DB.DataSet.Custom, iORM.DB.DataSet.Master, Vcl.Controls, Vcl.StdCtrls, Vcl.DBCtrls,
+  Vcl.DBGrids, Vcl.DBCGrids, Vcl.ExtCtrls, Vcl.Buttons, Model.Order, iORM.Where.Interfaces, iORM.DB.DataSet.Base, Vcl.Grids, Vcl.Mask, Datasnap.DBClient;
 
 type
 
@@ -66,8 +66,7 @@ type
     acRevertOrDelete: TioBSPersistenceRevertOrDelete;
     ButtonAdd: TSpeedButton;
     acSelectPizza: TioBSSelectCurrent;
-    ButtonDeleteRow: TSpeedButton;
-    acDeleteRow: TDataSetDelete;
+    btnDeleteRow: TSpeedButton;
     acBack: TioBSCloseQuery;
     acShowCustomerSelector: TioBSShowOrSelect;
     Label7: TLabel;
@@ -78,10 +77,17 @@ type
     acShowETM: TioBSShowOrSelect;
     ButtonETM: TSpeedButton;
     DSRowsPizzaName: TStringField;
+    acDeleteRow: TioBSDelete;
+    DBLookupComboBox1: TDBLookupComboBox;
+    DSCustomers: TioDataSetMaster;
+    SourceCustomers: TDataSource;
+    DSCustomersID: TIntegerField;
+    DSCustomersName: TStringField;
+    ClientDataSet1: TClientDataSet;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure DSOrderSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
     procedure DBCtrlGridPizzasDblClick(Sender: TObject);
+    procedure DSOrderReceiveSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
   private
   public
   end;
@@ -98,7 +104,7 @@ begin
   acSelectPizza.Execute;
 end;
 
-procedure TOrderForm.DSOrderSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
+procedure TOrderForm.DSOrderReceiveSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
 begin
   DSOrder.CurrentAs<TOrder>.AddPizza(ASelected as TPizza);
   DSOrder.Refresh;
@@ -114,6 +120,7 @@ procedure TOrderForm.FormShow(Sender: TObject);
 begin
   io.Enums.FillStrings<TOrderState>(DBComboBoxOrderState.Items);
   DSPizzas.Open;
+  DSCustomers.Open;
 end;
 
 end.

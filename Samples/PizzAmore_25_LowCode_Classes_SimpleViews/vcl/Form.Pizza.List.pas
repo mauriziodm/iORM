@@ -5,8 +5,8 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.DBCtrls, Vcl.DBCGrids, iORM, iORM.Attributes, iORM.CommonTypes,
-  iORM.Where.Interfaces, Data.DB, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom, iORM.DB.DataSet.Master, System.Actions, Vcl.ActnList, iORM.StdActions.Vcl,
-  Model.Pizza, Vcl.Mask, iORM.MVVM.Interfaces, iORM.MVVM.ViewModelBridge;
+  Data.DB, iORM.DB.DataSet.Master, System.Actions, Vcl.ActnList, iORM.StdActions.Vcl,
+  Model.Pizza, iORM.MVVM.ViewModelBridge;
 
 type
 
@@ -28,10 +28,8 @@ type
     DSPizzas: TioDataSetMaster;
     SourcePizzas: TDataSource;
     ActionList1: TActionList;
-    acDelete: TioBSPersistenceDelete;
     acBack: TioBSCloseQuery;
     acShowOrSelect: TioBSShowOrSelect;
-    acAdd: TioBSPersistenceAppend;
     PanelWhere: TPanel;
     Label1: TLabel;
     Label2: TLabel;
@@ -58,8 +56,11 @@ type
     Label5: TLabel;
     DBEditWhereIngredient: TDBEdit;
     DSWhereIngredientName: TStringField;
+    acAppend: TioBSAppend;
+    acDelete: TioBSDelete;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure DBCtrlGridPizzasDblClick(Sender: TObject);
   private
   public
   end;
@@ -67,6 +68,11 @@ type
 implementation
 
 {$R *.dfm}
+
+procedure TPizzaListForm.DBCtrlGridPizzasDblClick(Sender: TObject);
+begin
+  acShowOrSelect.Execute;
+end;
 
 procedure TPizzaListForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin

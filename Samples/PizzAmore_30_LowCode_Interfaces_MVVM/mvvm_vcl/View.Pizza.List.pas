@@ -10,7 +10,8 @@ uses
 
 type
 
-  [diViewFor(IPizza), diViewFor(IPizza, 'embedded')]
+  [diViewFor(IPizza)]
+  [diViewFor(IPizza, 'EMBEDDED')]
   TViewPizzaList = class(TViewBaseForList)
     CtrlGridPizzas: TDBCtrlGrid;
     DBTextName: TDBText;
@@ -31,6 +32,9 @@ type
     BSWhereName: TStringField;
     BSWhereFromPrice: TCurrencyField;
     BSWhereToPrice: TCurrencyField;
+    Label5: TLabel;
+    DBEditIngredient: TDBEdit;
+    BSWhereIngredientName: TStringField;
     procedure CtrlGridPizzasDblClick(Sender: TObject);
   private
   public

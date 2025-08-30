@@ -13,9 +13,6 @@ Coordinates=10,195,62,51
 [VMBridge]
 Coordinates=312,245,62,33
 
-[acAdd]
-Coordinates=312,297,45,33
-
 [BSMaster]
 Coordinates=179,28,61,123
 Visible=True
@@ -70,4 +67,7 @@ Coordinates=445,105,82,33
 
 [BindingsList1]
 Coordinates=298,80,82,33
+
+[acAppend]
+Coordinates=312,297,45,33
 

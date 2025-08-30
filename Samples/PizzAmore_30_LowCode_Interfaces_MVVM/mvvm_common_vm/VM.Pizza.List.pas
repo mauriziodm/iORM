@@ -10,6 +10,7 @@ uses
 type
 
   TVMPizzaList = class(TVMBaseForList)
+    procedure acAppendNewInstanceAsInterface(const ASender: TObject; out NewInstance: IInterface);
   private
     FEmbedded: Boolean;
     procedure SetEmbedded(const Value: Boolean);
@@ -19,15 +20,22 @@ type
 
 implementation
 
+{%CLASSGROUP 'System.Classes.TPersistent'}
+
 {$R *.dfm}
 
 { TVMPizzas }
 
+procedure TVMPizzaList.acAppendNewInstanceAsInterface(const ASender: TObject; out NewInstance: IInterface);
+begin
+  NewInstance := io.Create<IPizza>;
+end;
+
 procedure TVMPizzaList.SetEmbedded(const Value: Boolean);
 begin
-  acAdd.Visible := not Value;
+//  acAdd.Visible := not Value;
   acBack.Visible := not Value;
-  acDelete.Visible := not Value;
+//  acDelete.Visible := not Value;
   acSelectCurrent.Action_CloseQueryAction := nil;
 end;
 

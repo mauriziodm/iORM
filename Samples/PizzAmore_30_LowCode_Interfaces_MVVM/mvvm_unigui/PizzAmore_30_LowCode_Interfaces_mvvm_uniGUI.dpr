@@ -5,12 +5,6 @@ uses
   ServerModule in 'ServerModule.pas' {UniServerModule: TUniGUIServerModule},
   MainModule in 'MainModule.pas' {UniMainModule: TUniGUIMainModule},
   Form.Start in 'Form.Start.pas' {StartForm: TUniForm},
-  Model.Customer in '..\common_model\Model.Customer.pas',
-  Model.Interfaces in '..\common_model\Model.Interfaces.pas',
-  Model.Order in '..\common_model\Model.Order.pas',
-  Model.OrderRow in '..\common_model\Model.OrderRow.pas',
-  Model.Pizza in '..\common_model\Model.Pizza.pas',
-  Utils.SampleData in '..\common_model\Utils.SampleData.pas',
   VM.BaseForForm in '..\mvvm_common_vm\VM.BaseForForm.pas' {VMBaseForForm: TioViewModel},
   VM.BaseForList in '..\mvvm_common_vm\VM.BaseForList.pas' {VMBaseForList: TioViewModel},
   VM.Customer in '..\mvvm_common_vm\VM.Customer.pas' {VMCustomer: TioViewModel},
@@ -34,10 +28,18 @@ uses
   VM.Customer.List in '..\mvvm_common_vm\VM.Customer.List.pas' {VMCustomerList: TioViewModel},
   VM.Order.List in '..\mvvm_common_vm\VM.Order.List.pas' {VMOrderList: TioViewModel},
   VM.Pizza.List in '..\mvvm_common_vm\VM.Pizza.List.pas' {VMPizzaList: TioViewModel},
-  Where.Interfaces in '..\common_model\Where.Interfaces.pas',
-  Where.Order in '..\common_model\Where.Order.pas',
   Where.Pizza in '..\common_model\Where.Pizza.pas',
-  ETM.Repository in '..\common_model\ETM.Repository.pas';
+  Where.Order in '..\common_model\Where.Order.pas',
+  Where.Interfaces in '..\common_model\Where.Interfaces.pas',
+  Utils.SampleData in '..\common_model\Utils.SampleData.pas',
+  Model.Pizza in '..\common_model\Model.Pizza.pas',
+  Model.Pizza.IngredientRow in '..\common_model\Model.Pizza.IngredientRow.pas',
+  Model.OrderRow in '..\common_model\Model.OrderRow.pas',
+  Model.Order in '..\common_model\Model.Order.pas',
+  Model.Interfaces in '..\common_model\Model.Interfaces.pas',
+  Model.Ingredient in '..\common_model\Model.Ingredient.pas',
+  Model.Customer in '..\common_model\Model.Customer.pas',
+  Etm.Repository in '..\common_model\Etm.Repository.pas';
 
 {$R *.res}
 {$STRONGLINKTYPES ON}

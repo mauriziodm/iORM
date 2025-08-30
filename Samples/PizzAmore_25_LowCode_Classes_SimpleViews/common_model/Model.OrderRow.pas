@@ -17,7 +17,7 @@ type
     function GetRowTotal: Currency;
     procedure SetQty(const Value: Integer);
   public
-    constructor Create(const APizza: TPizza; const AQty: Integer = 1); overload;
+    constructor Create(const APizza: TPizza; const AQty: Integer = 1);
     destructor Destroy; override;
     property ID: Integer read FID;  // ReadOnly if you want
     property Pizza: TPizza read FPizza;  // ReadOnly if you want
@@ -26,9 +26,6 @@ type
   end;
 
 implementation
-
-uses
-  Winapi.Windows;
 
 { TOrderRow }
 

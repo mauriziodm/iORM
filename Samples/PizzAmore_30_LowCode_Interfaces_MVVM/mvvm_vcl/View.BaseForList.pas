@@ -20,7 +20,7 @@ type
     ActionList1: TActionList;
     acBack: TioViewAction;
     acShowOrSelect: TioViewAction;
-    acAdd: TioViewAction;
+    acAppend: TioViewAction;
     acDelete: TioViewAction;
     VMBridge: TioViewModelBridge;
     BSMaster: TioModelDataSet;
@@ -32,7 +32,6 @@ type
     SourceWhere: TDataSource;
     acBuildWhere: TioViewAction;
     acClearWhere: TioViewAction;
-    Action1: TAction;
   private
   public
   end;

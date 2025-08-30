@@ -1,4 +1,4 @@
-unit View.ETM;
+unit View.ETM.List;
 
 interface
 
@@ -12,8 +12,8 @@ uses
 
 type
 
-  [diViewFor(TEtmRepository)]
-  TViewETM = class(TFrame)
+  [diViewFor(TEtmTimeSlot, 'LIST')]
+  TViewEtmList = class(TFrame)
     Rectangle1: TRectangle;
     Label1: TLabel;
     LabelTimeLineFor: TLabel;
@@ -28,10 +28,10 @@ type
     Label2: TLabel;
     DiffMemo: TMemo;
     ioViewModelBridge1: TioViewModelBridge;
-    BS_ETM: TioModelBindSource;
+    BSMaster: TioModelBindSource;
     ActionList1: TActionList;
     acBack: TioViewAction;
-    acEtmRevertToVersion: TioViewAction;
+    acEtmRevertToDB: TioViewAction;
     BindingsList1: TBindingsList;
     LinkGridToDataSourceBS_ETM: TLinkGridToDataSource;
     LinkControlToField1: TLinkControlToField;

@@ -7,7 +7,7 @@ uses
 
 type
 
-  [ioEntity('ORDERS'), diImplements(IOrder), etmTrace(TEtmRepository)]
+  [ioEntity('ORDERS'), etmTrace(TEtmTimeSlot), ioConflictStrategy(TioSameVersionWin, csResolved)]
   TOrder = class(TInterfacedObject, IOrder)
   private
     FID: Integer;
@@ -16,25 +16,18 @@ type
     FCustomer: ICustomer;
     FRows: TList<IOrderRow>;
     FNote: String;
-    FObjVersion: TioObjVersion; // The ObjVersion is mandatory if you want to use the ETM
-    // ID property
-    function GetID: Integer;
-    // OrderDate property
-    procedure SetOrderDate(const AValue: TDate);
-    function GetOrderDate: TDate;
-    // OrderState property
-    procedure SetOrderState(const AValue: TOrderState);
-    function GetOrderState: TOrderState;
-    // Customer property
-    procedure SetCustomer(const AValue: ICustomer);
+    FObjVersion: TioObjVersion; // The ObjVersion is mandatory if you want to use the ETM, otherwise not
     function GetCustomer: ICustomer;
-    // Rows property
-    function GetRows: TList<IOrderRow>;
-    // Note property
-    procedure SetNote(const AValue: String);
-    function GetNote: String;
-    // GrandTotal property
     function GetGrandTotal: Currency;
+    function GetID: Integer;
+    function GetNote: String;
+    function GetOrderDate: TDate;
+    function GetOrderState: TOrderState;
+    function GetRows: TList<IOrderRow>;
+    procedure SetCustomer(const AValue: ICustomer);
+    procedure SetNote(const AValue: String);
+    procedure SetOrderDate(const AValue: TDate);
+    procedure SetOrderState(const AValue: TOrderState);
   public
     constructor Create;
     destructor Destroy; override;
@@ -62,14 +55,14 @@ begin
   // If a row with the same pizza is present then increment its qty
   for LRow in Rows do
   begin
-    if LRow.PizzaID = APizza.ID then
+    if LRow.Pizza.ID = APizza.ID then
     begin
       LRow.Qty := LRow.Qty + 1;
       Exit;
     end;
   end;
-  // Else create a new OrderRow
-  Rows.Add( io.di.Resolve<IOrderRow>.ConstructorParams([TValue.From<IPizza>(APizza)]).Get );
+  // Else create a new OrderRow (I used dependency injection but it can also be created directly or with a factory or builder)
+  Rows.Add( io.di.Resolve<IOrderRow>.ConstructorParams( [TValue.From<IPizza>(APizza)] ).Get );
 end;
 
 constructor TOrder.Create;

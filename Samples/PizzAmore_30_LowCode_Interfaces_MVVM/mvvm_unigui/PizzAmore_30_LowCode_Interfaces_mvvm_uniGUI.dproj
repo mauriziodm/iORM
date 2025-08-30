@@ -141,12 +141,6 @@
             <FormType>dfm</FormType>
             <DesignClass>TUniForm</DesignClass>
         </DCCReference>
-        <DCCReference Include="..\common_model\Model.Customer.pas"/>
-        <DCCReference Include="..\common_model\Model.Interfaces.pas"/>
-        <DCCReference Include="..\common_model\Model.Order.pas"/>
-        <DCCReference Include="..\common_model\Model.OrderRow.pas"/>
-        <DCCReference Include="..\common_model\Model.Pizza.pas"/>
-        <DCCReference Include="..\common_model\Utils.SampleData.pas"/>
         <DCCReference Include="..\mvvm_common_vm\VM.BaseForForm.pas">
             <Form>VMBaseForForm</Form>
             <FormType>dfm</FormType>
@@ -254,10 +248,18 @@
             <FormType>dfm</FormType>
             <DesignClass>TioViewModel</DesignClass>
         </DCCReference>
-        <DCCReference Include="..\common_model\Where.Interfaces.pas"/>
-        <DCCReference Include="..\common_model\Where.Order.pas"/>
         <DCCReference Include="..\common_model\Where.Pizza.pas"/>
-        <DCCReference Include="..\common_model\ETM.Repository.pas"/>
+        <DCCReference Include="..\common_model\Where.Order.pas"/>
+        <DCCReference Include="..\common_model\Where.Interfaces.pas"/>
+        <DCCReference Include="..\common_model\Utils.SampleData.pas"/>
+        <DCCReference Include="..\common_model\Model.Pizza.pas"/>
+        <DCCReference Include="..\common_model\Model.Pizza.IngredientRow.pas"/>
+        <DCCReference Include="..\common_model\Model.OrderRow.pas"/>
+        <DCCReference Include="..\common_model\Model.Order.pas"/>
+        <DCCReference Include="..\common_model\Model.Interfaces.pas"/>
+        <DCCReference Include="..\common_model\Model.Ingredient.pas"/>
+        <DCCReference Include="..\common_model\Model.Customer.pas"/>
+        <DCCReference Include="..\common_model\Etm.Repository.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -278,10 +280,7 @@
                 <Source>
                     <Source Name="MainSource">PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI.dpr</Source>
                 </Source>
-                <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
-                </Excluded_Packages>
+                <Excluded_Packages/>
             </Delphi.Personality>
             <Deployment Version="4">
                 <DeployFile LocalName="Win32\Debug\PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI.exe" Configuration="Debug" Class="ProjectOutput">

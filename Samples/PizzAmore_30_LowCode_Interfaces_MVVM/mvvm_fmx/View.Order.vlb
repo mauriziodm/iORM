@@ -79,7 +79,7 @@ Visible=True
 Coordinates=649,420,46,51
 
 []
-Coordinates=516,497,90,51
+Coordinates=293,324,89,33
 
 [BindingsList1]
 Coordinates=287,80,82,33
@@ -89,6 +89,7 @@ Coordinates=10,420,46,51
 
 [StringGrid1]
 Coordinates=760,10,70,123
+Visible=True
 
 [LayoutRows]
 Coordinates=632,497,75,33
@@ -119,4 +120,10 @@ Visible=True
 [BSRows]
 Coordinates=562,10,57,123
 Visible=True
+
+[ButtonETM]
+Coordinates=421,198,69,51
+
+[acShowETM]
+Coordinates=421,275,75,33
 

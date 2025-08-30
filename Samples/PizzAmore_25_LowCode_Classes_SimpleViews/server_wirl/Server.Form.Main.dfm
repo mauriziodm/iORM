@@ -81,7 +81,7 @@ object MainForm: TMainForm
     DatabaseStdFolder = sfDocuments
     Persistent = False
     Pooled = False
-    OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
+    AfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
     Left = 72
     Top = 142
   end
@@ -101,6 +101,7 @@ object MainForm: TMainForm
     Protocol = pLocal
     SQLDialect = sqlDialect3
     UserName = 'SYSDBA'
+    AfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
     Left = 72
     Top = 80
   end

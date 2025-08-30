@@ -1,5 +1,11 @@
 inherited ViewCustomerList: TViewCustomerList
   inherited RectangleBottom: TRectangle
+    inherited ButtonDelete: TSpeedButton
+      Action = acDelete
+    end
+    inherited ButtonAdd: TSpeedButton
+      Action = acAdd
+    end
     object ButtonPgDown: TSpeedButton
       Action = acPrevPage
       Align = Left
@@ -122,6 +128,9 @@ inherited ViewCustomerList: TViewCustomerList
     end
   end
   inherited ActionList1: TActionList
+    inherited acSelectCurrent: TioBSSelectCurrent
+      Action_CloseQueryAction = acBack
+    end
     object acNextPage: TioBSNextPage
       Category = 'iORM-BSPaging'
       Text = 'PgUp'
@@ -130,6 +139,17 @@ inherited ViewCustomerList: TViewCustomerList
     object acPrevPage: TioBSPrevPage
       Category = 'iORM-BSPaging'
       Text = 'PgDn'
+      TargetBindSource = BSMaster
+    end
+    object acAdd: TioBSAppend
+      Category = 'iORM - BS'
+      Text = 'Add'
+      Action_ShowOrSelectAction = acShowOrSelect
+      TargetBindSource = BSMaster
+    end
+    object acDelete: TioBSDelete
+      Category = 'iORM - BS'
+      Text = 'Delete'
       TargetBindSource = BSMaster
     end
   end
@@ -159,9 +179,11 @@ inherited ViewCustomerList: TViewCustomerList
       end>
     Preview = True
     TypeName = 'TCustomer'
+    AsyncLoad = True
+    AsyncPersist = True
     VirtualFields = True
     Paging.CurrentPageOfFormat = 'Page %d of %d'
-    Paging.PageSize = 50
+    Paging.PageSize = 5
     Paging.PagingType = ptHardPaging
   end
   inherited BSWhere: TioPrototypeBindSourceMaster

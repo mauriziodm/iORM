@@ -4,8 +4,8 @@ object PizzaListForm: TPizzaListForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 658
-  ClientWidth = 372
+  ClientHeight = 656
+  ClientWidth = 379
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,18 +20,33 @@ object PizzaListForm: TPizzaListForm
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 372
+    Width = 379
     Height = 40
     Align = alTop
     BevelOuter = bvNone
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 368
+    ExplicitWidth = 360
+    object LabelTitle: TLabel
+      Left = 0
+      Top = 7
+      Width = 364
+      Height = 21
+      Alignment = taCenter
+      AutoSize = False
+      Caption = 'Pizzas'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWhite
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
     object ButtonSelect: TSpeedButton
-      Left = 322
+      Left = 309
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
       Action = acShowOrSelect
       Align = alRight
@@ -41,13 +56,12 @@ object PizzaListForm: TPizzaListForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 334
-      ExplicitTop = -6
+      ExplicitLeft = 314
     end
     object ButtonBack: TSpeedButton
       Left = 0
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
       Action = acBack
       Align = alLeft
@@ -58,38 +72,25 @@ object PizzaListForm: TPizzaListForm
       Font.Style = []
       ParentFont = False
     end
-    object LabelTitle: TLabel
-      Left = 166
-      Top = 7
-      Width = 47
-      Height = 21
-      Caption = 'Pizzas'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
-      Font.Height = -16
-      Font.Name = 'Segoe UI'
-      Font.Style = [fsBold]
-      ParentFont = False
-    end
   end
   object PanelBottom: TPanel
     Left = 0
-    Top = 618
-    Width = 372
+    Top = 616
+    Width = 379
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
-    ExplicitTop = 617
-    ExplicitWidth = 368
+    ExplicitTop = 615
+    ExplicitWidth = 360
     object ButtonAdd: TSpeedButton
-      Left = 322
+      Left = 309
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
-      Action = acAdd
+      Action = acAppend
       Align = alRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clGreen
@@ -97,12 +98,12 @@ object PizzaListForm: TPizzaListForm
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
-      ExplicitLeft = 264
+      ExplicitLeft = 314
     end
     object ButtonDelete: TSpeedButton
       Left = 0
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
       Action = acDelete
       Align = alLeft
@@ -112,24 +113,24 @@ object PizzaListForm: TPizzaListForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 8
     end
   end
   object DBCtrlGridPizzas: TDBCtrlGrid
     Left = 0
     Top = 40
-    Width = 372
-    Height = 481
+    Width = 379
+    Height = 479
     Align = alClient
     DataSource = SourcePizzas
-    PanelHeight = 96
-    PanelWidth = 355
+    PanelHeight = 95
+    PanelWidth = 362
     TabOrder = 2
     RowCount = 5
     SelectedColor = 13828095
     ShowFocus = False
-    ExplicitWidth = 368
-    ExplicitHeight = 480
+    OnDblClick = DBCtrlGridPizzasDblClick
+    ExplicitWidth = 360
+    ExplicitHeight = 478
     object DBTextName: TDBText
       Left = 99
       Top = 20
@@ -143,6 +144,7 @@ object PizzaListForm: TPizzaListForm
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
+      OnDblClick = DBCtrlGridPizzasDblClick
     end
     object DBTextPrice: TDBText
       Left = 99
@@ -157,6 +159,7 @@ object PizzaListForm: TPizzaListForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      OnDblClick = DBCtrlGridPizzasDblClick
     end
     object DBImage: TDBImage
       Left = 7
@@ -170,22 +173,23 @@ object PizzaListForm: TPizzaListForm
       Proportional = True
       Stretch = True
       TabOrder = 0
+      OnDblClick = DBCtrlGridPizzasDblClick
     end
   end
   object PanelWhere: TPanel
     Left = 0
-    Top = 521
-    Width = 372
+    Top = 519
+    Width = 379
     Height = 97
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 3
-    ExplicitTop = 520
-    ExplicitWidth = 368
+    ExplicitLeft = 294
+    ExplicitWidth = 364
     DesignSize = (
-      372
+      379
       97)
     object Label1: TLabel
       Left = 8
@@ -232,9 +236,9 @@ object PizzaListForm: TPizzaListForm
       ParentFont = False
     end
     object ButtonSearch: TSpeedButton
-      Left = 314
+      Left = 309
       Top = 0
-      Width = 50
+      Width = 70
       Height = 45
       Action = acBuildWhere
       Anchors = [akTop, akRight]
@@ -244,12 +248,12 @@ object PizzaListForm: TPizzaListForm
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
-      ExplicitLeft = 326
+      ExplicitLeft = 294
     end
     object ButtonClear: TSpeedButton
-      Left = 314
+      Left = 309
       Top = 49
-      Width = 50
+      Width = 70
       Height = 25
       Action = acClearWhere
       Anchors = [akTop, akRight]
@@ -259,10 +263,10 @@ object PizzaListForm: TPizzaListForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 326
+      ExplicitLeft = 294
     end
     object Label4: TLabel
-      Left = 179
+      Left = 171
       Top = 37
       Width = 58
       Height = 21
@@ -310,7 +314,7 @@ object PizzaListForm: TPizzaListForm
     object DBEditWhereName: TDBEdit
       Left = 155
       Top = 6
-      Width = 166
+      Width = 142
       Height = 25
       BorderStyle = bsNone
       Color = clWhite
@@ -327,7 +331,7 @@ object PizzaListForm: TPizzaListForm
     object DBEditWhereFromPrice: TDBEdit
       Left = 94
       Top = 37
-      Width = 80
+      Width = 67
       Height = 25
       BorderStyle = bsNone
       Color = clWhite
@@ -342,9 +346,9 @@ object PizzaListForm: TPizzaListForm
       TabOrder = 2
     end
     object DBEditWhereToPrice: TDBEdit
-      Left = 241
+      Left = 235
       Top = 37
-      Width = 80
+      Width = 62
       Height = 25
       BorderStyle = bsNone
       Color = clWhite
@@ -361,7 +365,7 @@ object PizzaListForm: TPizzaListForm
     object DBEditWhereIngredient: TDBEdit
       Left = 94
       Top = 68
-      Width = 226
+      Width = 203
       Height = 25
       BorderStyle = bsNone
       Color = clWhite
@@ -381,7 +385,6 @@ object PizzaListForm: TPizzaListForm
     TypeName = 'TPizza'
     AsyncLoad = True
     AsyncPersist = True
-    OrderBy = '[.Name] DESC'
     Paging.CurrentPageOfFormat = '%d/%d'
     Left = 80
     Top = 176
@@ -405,9 +408,10 @@ object PizzaListForm: TPizzaListForm
   object ActionList1: TActionList
     Left = 192
     Top = 176
-    object acDelete: TioBSPersistenceDelete
-      Category = 'iORM-BSPersistence'
-      Caption = 'Delete'
+    object acAppend: TioBSAppend
+      Category = 'iORM - BS'
+      Caption = 'Add'
+      Action_ShowOrSelectAction = acShowOrSelect
       TargetBindSource = DSPizzas
     end
     object acBack: TioBSCloseQuery
@@ -415,20 +419,6 @@ object PizzaListForm: TPizzaListForm
       Caption = 'Back'
       TargetBindSource = DSPizzas
       OnUpdateScope = usGlobal
-    end
-    object acShowOrSelect: TioBSShowOrSelect
-      Category = 'iORM-BS'
-      Caption = 'Select'
-      Action_ParentCloseQueryAction = acBack
-      ShowMode = smBSCurrent
-      TargetBindSource = DSPizzas
-      ViewContextBy = vcByDefaultViewContextProvider
-    end
-    object acAdd: TioBSPersistenceAppend
-      Category = 'iORM-BSPersistence'
-      Caption = 'Add'
-      Action_ShowOrSelectAction = acShowOrSelect
-      TargetBindSource = DSPizzas
     end
     object acBuildWhere: TioBSBuildWhere
       Category = 'iORM - BS - WhereBuilder'
@@ -440,6 +430,19 @@ object PizzaListForm: TPizzaListForm
       Caption = 'Clear'
       TargetBindSource = DSWhere
       AutoExec_Where_OnTargetBS = True
+    end
+    object acDelete: TioBSDelete
+      Category = 'iORM - BS'
+      Caption = 'Delete'
+      TargetBindSource = DSPizzas
+    end
+    object acShowOrSelect: TioBSShowOrSelect
+      Category = 'iORM-BS'
+      Caption = 'Select'
+      Action_ParentCloseQueryAction = acBack
+      ShowMode = smBSCurrent
+      TargetBindSource = DSPizzas
+      ViewContextBy = vcByDefaultViewContextProvider
     end
   end
   object DSWhere: TioDataSetMaster

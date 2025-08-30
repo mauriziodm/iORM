@@ -2,38 +2,35 @@
 Coordinates=224,141,70,33
 
 [ListView]
-Coordinates=10,10,89,159
+Coordinates=330,10,89,159
 Visible=True
 
 [ButtonBack]
-Coordinates=418,272,72,51
+Coordinates=10,492,72,51
 
 [RectangleTitle]
-Coordinates=186,349,84,33
-
-[acAdd]
-Coordinates=224,245,45,33
+Coordinates=436,569,84,33
 
 [ButtonAdd]
-Coordinates=516,272,67,51
+Coordinates=320,492,67,51
 
 [VMBridge]
 Coordinates=76,267,62,33
 
 [LabelTitle]
-Coordinates=436,195,62,51
+Coordinates=881,10,62,51
 
 [acDelete]
 Coordinates=17,267,56,33
 
 [ButtonSelect]
-Coordinates=596,195,77,51
+Coordinates=261,569,77,51
 
 [acShowOrSelect]
 Coordinates=346,1,95,33
 
 [ButtonDelete]
-Coordinates=10,349,78,51
+Coordinates=705,10,78,51
 
 [acBack]
 Coordinates=346,53,50,33
@@ -46,65 +43,93 @@ Visible=True
 Coordinates=118,134,82,33
 
 [BSMaster]
-Coordinates=179,28,81,123
+Coordinates=499,28,81,123
 Visible=True
 
 [RectangleBottom]
-Coordinates=363,349,99,33
+Coordinates=613,569,99,33
 
 [RectangleWhere]
-Coordinates=10,426,95,33
+Coordinates=738,569,95,33
 
 [ButtonClear]
-Coordinates=265,195,73,51
+Coordinates=606,10,73,51
 
 [acWhereBuild]
 Coordinates=494,299,83,33
 
 [RectangleWhereButtons]
-Coordinates=488,349,133,33
+Coordinates=859,569,133,33
 
 [ButtonSearch]
-Coordinates=10,272,81,51
+Coordinates=82,569,81,51
 
 [acWhereClear]
 Coordinates=494,351,83,33
 
 [BSWhere]
-Coordinates=286,10,60,123
+Coordinates=420,230,79,177
 Visible=True
 
 [EditWhereNote]
-Coordinates=10,195,88,51
+Coordinates=192,415,88,51
 
 [Label3]
-Coordinates=364,195,46,51
+Coordinates=189,569,46,51
 
 [ComboBoxWhereState]
-Coordinates=372,10,125,123
+Coordinates=174,232,125,123
 Visible=True
 
 [Line1]
-Coordinates=296,349,41,33
+Coordinates=546,569,41,33
 
 [Label4]
-Coordinates=114,349,46,51
+Coordinates=248,492,46,51
 
 [ButtonWhereHistory]
-Coordinates=117,272,114,51
+Coordinates=108,492,114,51
 
 [acWhereShowHistory]
 Coordinates=484,222,120,33
 
 [Label2]
-Coordinates=524,195,46,51
+Coordinates=809,10,46,51
 
 [DateEditWhereFromDate]
-Coordinates=257,272,135,51
+Coordinates=169,10,135,51
 
 [Label1]
-Coordinates=523,10,46,51
+Coordinates=364,569,46,51
 
 [DateEditToDate]
-Coordinates=124,195,115,51
+Coordinates=179,121,115,51
+
+[acBuildWhere]
+Coordinates=298,152,83,33
+
+[acClearWhere]
+Coordinates=535,80,83,33
+
+[Label6]
+Coordinates=413,492,46,51
+
+[EditWhereIngredientName]
+Coordinates=557,492,143,51
+
+[Label5]
+Coordinates=10,569,46,51
+
+[EditWhereCustomerName]
+Coordinates=726,492,141,51
+Visible=True
+
+[Label7]
+Coordinates=485,492,46,51
+
+[EditWherePizzaName]
+Coordinates=893,492,119,51
+
+[acAppend]
+Coordinates=224,245,45,33
 

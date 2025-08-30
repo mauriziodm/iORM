@@ -21,6 +21,10 @@ type
     acShowOrders: TioVMActionBSShowOrSelect;
     acShowCustomers: TioVMActionBSShowOrSelect;
     acShowPizzas: TioVMActionBSShowOrSelect;
+    acShowIngredients: TioVMActionBSShowOrSelect;
+    acShowSynchroLog: TioVMActionBSShowOrSelect;
+    acIOrmVersion: TioVMAction;
+    procedure acIOrmVersionExecute(Sender: TObject);
   private
   public
   end;
@@ -30,5 +34,10 @@ implementation
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
 {$R *.dfm}
+
+procedure TVMStart.acIOrmVersionExecute(Sender: TObject);
+begin
+  io.ShowMessage(io.Version);
+end;
 
 end.

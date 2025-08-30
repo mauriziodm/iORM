@@ -22,6 +22,8 @@ type
     BSMasterOrderState: TStringField;
     BSMasterCustomerName: TStringField;
     BSMasterRowsDescription: TStringField;
+    BSMasterIngredientName: TStringField;
+    procedure GridCustomersDblClick(Sender: TObject);
   private
   public
   end;
@@ -29,5 +31,10 @@ type
 implementation
 
 {$R *.dfm}
+
+procedure TViewWhereOrderHistory.GridCustomersDblClick(Sender: TObject);
+begin
+  acShowOrSelect.Execute;
+end;
 
 end.

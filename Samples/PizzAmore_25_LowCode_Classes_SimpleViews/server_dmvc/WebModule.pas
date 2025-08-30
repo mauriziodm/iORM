@@ -7,7 +7,7 @@ uses
   System.Classes,
   Web.HTTPApp,
   MVCFramework, iORM, iORM.DBBuilder.Interfaces, iORM.DB.ConnectionDef, iORM.Abstraction.VCL,
-  iORM.SynchroStrategy.Interfaces, iORM.SynchroStrategy.Custom, iORM.SynchroStrategy.EtmBased, iORM.Attributes, iORM.CommonTypes;
+  iORM.SynchroStrategy.Interfaces, iORM.SynchroStrategy.Custom, iORM.SynchroStrategy.EtmBased, iORM.Attributes, iORM.CommonTypes, iORM.Abstraction;
 
 type
   TMyWebModule = class(TWebModule)
@@ -73,7 +73,9 @@ begin
       // Max request size in bytes
       Config[TMVCConfigKey.MaxRequestSize] := IntToStr(TMVCConstants.DEFAULT_MAX_REQUEST_SIZE);
     end);
+
   FMVC.AddController(TioDMVCController);
+
 //  FMVC.AddController(TioDmvcJsonRpcController, '/iorm');
 
   // Enable the following middleware declaration if you want to

@@ -4,9 +4,9 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.DBCtrls, Vcl.Mask, Data.DB, Vcl.Grids, Vcl.DBGrids, iORM, iORM.Attributes,
-  iORM.CommonTypes, iORM.Where.Interfaces, iORM.StdActions.Vcl, Vcl.ActnList, System.Actions, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom,
-  iORM.DB.DataSet.Master, Where.Order;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.DBCtrls, Data.DB, Vcl.DBGrids, iORM, iORM.Attributes,
+  iORM.CommonTypes, iORM.StdActions.Vcl, Vcl.ActnList, System.Actions,
+  iORM.DB.DataSet.Master, Where.Order, iORM.Where.Interfaces, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom, Vcl.Grids;
 
 type
 
@@ -26,13 +26,13 @@ type
     DSWhereHistoryOrderState: TStringField;
     SourceWhereHistory: TDataSource;
     ActionList1: TActionList;
-    acDelete: TioBSPersistenceDelete;
     acBack: TioBSCloseQuery;
     DSWhereHistoryToDate: TDateField;
     acSelectCurrent: TioBSSelectCurrent;
     DSWhereHistoryCustomerName: TStringField;
     DSWhereHistoryPizzaName: TStringField;
     DSWhereHistoryIngredientName: TStringField;
+    acDelete: TioBSDelete;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure GridCustomersDblClick(Sender: TObject);

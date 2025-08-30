@@ -13,6 +13,7 @@ type
 
   [diViewFor(TOrder)]
   TViewOrder = class(TViewBaseForForm)
+    PanelPizzas: TUniPanel;
     VCProviderOrder: TioViewContextProvider;
     BSCustomer: TioModelDataSet;
     BSCustomerID: TIntegerField;
@@ -31,6 +32,24 @@ type
     BSMasterOrderState: TStringField;
     BSMasterNote: TStringField;
     BSMasterGrandTotal: TCurrencyField;
+    UniLabel1: TUniLabel;
+    DBEditID: TUniDBEdit;
+    DBEditDate: TUniDBEdit;
+    UniLabel2: TUniLabel;
+    LabelNote: TUniLabel;
+    DBEditNote: TUniDBEdit;
+    UniLabel3: TUniLabel;
+    DBEditCustID: TUniDBEdit;
+    DBEditCustName: TUniDBEdit;
+    ButtonSelectCustomer: TUniSpeedButton;
+    UniLabel4: TUniLabel;
+    DBEditCustAddress: TUniDBEdit;
+    UniLabel5: TUniLabel;
+    DBEditCustPhone: TUniDBEdit;
+    GridCustomers: TUniDBGrid;
+    DBComboBoxOrderState: TUniDBComboBox;
+    DBEditGrandTotal: TUniDBEdit;
+    UniLabel6: TUniLabel;
     acDeleteRow: TioViewAction;
     acShowCustomerSelector: TioViewAction;
     procedure VCProviderOrderRequest(const Sender: TObject; out ResultViewContext: TComponent);
@@ -50,7 +69,7 @@ uses
 procedure TViewOrder.UniFrameCreate(Sender: TObject);
 begin
   inherited;
-//  io.Enums.FillStrings<TOrderState>(DBComboBoxOrderState.Items);
+  io.Enums.FillStrings<TOrderState>(DBComboBoxOrderState.Items);
 end;
 
 procedure TViewOrder.VCProviderOrderAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
@@ -60,7 +79,7 @@ end;
 
 procedure TViewOrder.VCProviderOrderRequest(const Sender: TObject; out ResultViewContext: TComponent);
 begin
-//  ResultViewContext := PanelPizzas;
+  ResultViewContext := PanelPizzas;
 end;
 
 end.

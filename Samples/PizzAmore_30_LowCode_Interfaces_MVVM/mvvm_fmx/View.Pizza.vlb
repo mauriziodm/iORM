@@ -8,10 +8,10 @@ Coordinates=228,133,60,33
 Coordinates=209,173,70,33
 
 [ButtonSave]
-Coordinates=582,10,71,51
+Coordinates=694,10,71,51
 
 [ButtonRevert]
-Coordinates=225,197,79,51
+Coordinates=10,448,79,51
 
 [acBack]
 Coordinates=150,173,50,33
@@ -20,52 +20,52 @@ Coordinates=150,173,50,33
 Coordinates=81,173,57,33
 
 [RectangleTitle]
-Coordinates=370,197,84,33
+Coordinates=822,448,84,33
 
 [ButtonBack]
-Coordinates=390,10,72,51
+Coordinates=619,448,72,51
 
 [LabelTitle]
-Coordinates=99,197,62,51
+Coordinates=725,448,62,51
 
 [Rectangle1]
-Coordinates=464,197,69,33
+Coordinates=10,532,69,33
 
 [EditName]
-Coordinates=319,10,61,51
+Coordinates=170,364,61,51
 
 [ListBox]
-Coordinates=10,10,116,177
+Coordinates=276,10,116,177
 
 [Image]
-Coordinates=171,197,44,51
+Coordinates=180,10,44,51
 
 [Label2]
-Coordinates=263,10,46,51
+Coordinates=277,448,46,51
 
 [Label3]
-Coordinates=526,10,46,51
+Coordinates=615,10,46,51
 
 [Label4]
-Coordinates=314,197,46,51
+Coordinates=461,448,46,51
 
 [EditUnitPrice]
-Coordinates=10,197,79,51
+Coordinates=161,246,79,51
 
 [ListBoxItemPrice]
-Coordinates=123,258,98,33
+Coordinates=401,532,98,33
 
 [EditID]
-Coordinates=472,10,44,51
+Coordinates=180,128,44,51
 
 [ListBoxItemName]
-Coordinates=543,197,101,33
+Coordinates=116,532,101,33
 
 [Label1]
-Coordinates=207,10,46,51
+Coordinates=540,448,46,51
 
 [ListBoxItemImage]
-Coordinates=10,258,103,33
+Coordinates=258,532,103,33
 
 []
 Coordinates=421,10,70,123
@@ -75,6 +75,25 @@ Visible=True
 Coordinates=145,80,82,33
 
 [BSMaster]
-Coordinates=136,10,61,123
+Coordinates=10,143,61,123
 Visible=True
+
+[Grid1]
+Coordinates=630,100,53,105
+Visible=True
+
+[ListBoxItemIngredients]
+Coordinates=538,532,128,33
+
+[ButtonETM]
+Coordinates=356,448,69,51
+
+[acShowETM]
+Coordinates=353,274,75,33
+
+[Label5]
+Coordinates=126,448,46,51
+
+[BSIngredients]
+Coordinates=440,100,124,105
 

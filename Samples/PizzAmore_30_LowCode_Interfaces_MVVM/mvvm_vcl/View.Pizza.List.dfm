@@ -9,10 +9,10 @@ inherited ViewPizzaList: TViewPizzaList
     Left = 0
     Top = 40
     Width = 800
-    Height = 441
+    Height = 425
     Align = alClient
     DataSource = SourceMaster
-    PanelHeight = 110
+    PanelHeight = 106
     PanelWidth = 783
     TabOrder = 3
     RowCount = 4
@@ -65,6 +65,10 @@ inherited ViewPizzaList: TViewPizzaList
     end
   end
   inherited PanelWhere: TPanel
+    Top = 465
+    Height = 95
+    ExplicitTop = 465
+    ExplicitHeight = 95
     object Label1: TLabel
       Left = 8
       Top = 7
@@ -123,6 +127,20 @@ inherited ViewPizzaList: TViewPizzaList
       Font.Style = [fsBold]
       ParentFont = False
     end
+    object Label5: TLabel
+      Left = 8
+      Top = 68
+      Width = 80
+      Height = 21
+      Alignment = taRightJustify
+      Caption = 'Ingredient'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clGray
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
     object DBEditWhereID: TDBEdit
       Left = 43
       Top = 7
@@ -143,7 +161,7 @@ inherited ViewPizzaList: TViewPizzaList
     object DBEditWhereName: TDBEdit
       Left = 155
       Top = 6
-      Width = 582
+      Width = 569
       Height = 25
       Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
@@ -192,6 +210,23 @@ inherited ViewPizzaList: TViewPizzaList
       ParentFont = False
       TabOrder = 3
     end
+    object DBEditIngredient: TDBEdit
+      Left = 94
+      Top = 68
+      Width = 227
+      Height = 25
+      BorderStyle = bsNone
+      Color = clWhite
+      DataField = 'IngredientName'
+      DataSource = SourceWhere
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 4
+    end
   end
   inherited BSMaster: TioModelDataSet
     object BSMasterName: TStringField
@@ -219,6 +254,10 @@ inherited ViewPizzaList: TViewPizzaList
     end
     object BSWhereToPrice: TCurrencyField
       FieldName = 'ToPrice'
+    end
+    object BSWhereIngredientName: TStringField
+      FieldName = 'IngredientName'
+      Size = 100
     end
   end
 end

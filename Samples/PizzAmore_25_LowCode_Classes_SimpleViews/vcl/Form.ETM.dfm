@@ -2,8 +2,8 @@ object FormEtm: TFormEtm
   Left = 0
   Top = 0
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 599
-  ClientWidth = 956
+  ClientHeight = 598
+  ClientWidth = 952
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,8 +14,8 @@ object FormEtm: TFormEtm
   Visible = True
   OnClose = FormClose
   DesignSize = (
-    956
-    599)
+    952
+    598)
   TextHeight = 15
   object Label1: TLabel
     Left = 8
@@ -65,35 +65,21 @@ object FormEtm: TFormEtm
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 956
+    Width = 952
     Height = 40
     Align = alTop
     BevelOuter = bvNone
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 952
+    ExplicitWidth = 948
     DesignSize = (
-      956
+      952
       40)
-    object ButtonBack: TSpeedButton
-      Left = 0
-      Top = 0
-      Width = 50
-      Height = 40
-      Action = acBack
-      Align = alLeft
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clNavy
-      Font.Height = -16
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
-    end
     object LabelTitle: TLabel
-      Left = 96
+      Left = 0
       Top = 7
-      Width = 733
+      Width = 952
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -106,25 +92,38 @@ object FormEtm: TFormEtm
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlCenter
-      ExplicitWidth = 417
+    end
+    object ButtonBack: TSpeedButton
+      Left = 0
+      Top = 0
+      Width = 70
+      Height = 40
+      Action = acBack
+      Align = alLeft
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clNavy
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
     end
   end
   object PanelBottom: TPanel
     Left = 0
-    Top = 559
-    Width = 956
+    Top = 558
+    Width = 952
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
-    ExplicitTop = 558
-    ExplicitWidth = 952
+    ExplicitTop = 557
+    ExplicitWidth = 948
     object ButtonRevert: TSpeedButton
       Left = 0
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
       Action = acRevert
       Align = alLeft
@@ -134,13 +133,11 @@ object FormEtm: TFormEtm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 334
-      ExplicitTop = -6
     end
     object ButtonPersist: TSpeedButton
-      Left = 906
+      Left = 882
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
       Action = acPersist
       Align = alRight
@@ -150,8 +147,7 @@ object FormEtm: TFormEtm
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
-      ExplicitLeft = 334
-      ExplicitTop = -6
+      ExplicitLeft = 902
     end
   end
   object DBEditID: TDBEdit
@@ -225,8 +221,8 @@ object FormEtm: TFormEtm
   object PageControl1: TPageControl
     Left = 8
     Top = 96
-    Width = 928
-    Height = 452
+    Width = 900
+    Height = 451
     ActivePage = TabSheetTimeSlotData
     Anchors = [akLeft, akTop, akRight, akBottom]
     Font.Charset = DEFAULT_CHARSET
@@ -236,8 +232,8 @@ object FormEtm: TFormEtm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 6
-    ExplicitWidth = 924
-    ExplicitHeight = 451
+    ExplicitWidth = 896
+    ExplicitHeight = 450
     object TabSheetTimeSlotData: TTabSheet
       Caption = 'Time slot'
       object Label7: TLabel
@@ -271,9 +267,9 @@ object FormEtm: TFormEtm
         ParentFont = False
       end
       object Label9: TLabel
-        Left = 484
+        Left = 636
         Top = 25
-        Width = 79
+        Width = 81
         Height = 25
         Alignment = taRightJustify
         AutoSize = False
@@ -292,7 +288,7 @@ object FormEtm: TFormEtm
         Height = 25
         Alignment = taRightJustify
         AutoSize = False
-        Caption = 'user name && ID'
+        Caption = 'user'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clNavy
         Font.Height = -16
@@ -450,6 +446,36 @@ object FormEtm: TFormEtm
         Font.Style = [fsBold]
         ParentFont = False
       end
+      object Label3: TLabel
+        Left = 242
+        Top = 80
+        Width = 212
+        Height = 25
+        Alignment = taRightJustify
+        AutoSize = False
+        Caption = 'app'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clNavy
+        Font.Height = -16
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsBold]
+        ParentFont = False
+      end
+      object Label4: TLabel
+        Left = 501
+        Top = 80
+        Width = 210
+        Height = 25
+        Alignment = taRightJustify
+        AutoSize = False
+        Caption = 'license'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clNavy
+        Font.Height = -16
+        Font.Name = 'Segoe UI'
+        Font.Style = [fsBold]
+        ParentFont = False
+      end
       object DBEdit3: TDBEdit
         Left = 231
         Top = 25
@@ -485,9 +511,9 @@ object FormEtm: TFormEtm
         TabOrder = 1
       end
       object DBEdit5: TDBEdit
-        Left = 574
+        Left = 726
         Top = 25
-        Width = 158
+        Width = 160
         Height = 25
         BorderStyle = bsNone
         Color = clInactiveBorder
@@ -508,7 +534,7 @@ object FormEtm: TFormEtm
         Height = 25
         BorderStyle = bsNone
         Color = clInactiveBorder
-        DataField = 'UserName'
+        DataField = 'SmartUser'
         DataSource = SourceTimeSlot
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -517,23 +543,6 @@ object FormEtm: TFormEtm
         Font.Style = []
         ParentFont = False
         TabOrder = 3
-      end
-      object DBEdit7: TDBEdit
-        Left = 394
-        Top = 80
-        Width = 74
-        Height = 25
-        BorderStyle = bsNone
-        Color = clInactiveBorder
-        DataField = 'UserID'
-        DataSource = SourceTimeSlot
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -16
-        Font.Name = 'Segoe UI'
-        Font.Style = []
-        ParentFont = False
-        TabOrder = 4
       end
       object DBEdit8: TDBEdit
         Left = 231
@@ -550,7 +559,7 @@ object FormEtm: TFormEtm
         Font.Name = 'Segoe UI'
         Font.Style = []
         ParentFont = False
-        TabOrder = 5
+        TabOrder = 4
       end
       object DBEdit9: TDBEdit
         Left = 231
@@ -567,7 +576,7 @@ object FormEtm: TFormEtm
         Font.Name = 'Segoe UI'
         Font.Style = []
         ParentFont = False
-        TabOrder = 6
+        TabOrder = 5
       end
       object DBCheckBox1: TDBCheckBox
         Left = 231
@@ -576,7 +585,7 @@ object FormEtm: TFormEtm
         Height = 17
         DataField = 'ConflictDetected'
         DataSource = SourceTimeSlot
-        TabOrder = 7
+        TabOrder = 6
       end
       object DBEdit10: TDBEdit
         Left = 423
@@ -593,7 +602,7 @@ object FormEtm: TFormEtm
         Font.Name = 'Segoe UI'
         Font.Style = []
         ParentFont = False
-        TabOrder = 8
+        TabOrder = 7
       end
       object DBEdit11: TDBEdit
         Left = 721
@@ -610,7 +619,7 @@ object FormEtm: TFormEtm
         Font.Name = 'Segoe UI'
         Font.Style = []
         ParentFont = False
-        TabOrder = 9
+        TabOrder = 8
       end
       object DBEdit12: TDBEdit
         Left = 231
@@ -627,7 +636,7 @@ object FormEtm: TFormEtm
         Font.Name = 'Segoe UI'
         Font.Style = []
         ParentFont = False
-        TabOrder = 10
+        TabOrder = 9
       end
       object DBCheckBox2: TDBCheckBox
         Left = 309
@@ -638,7 +647,7 @@ object FormEtm: TFormEtm
         Caption = 'auto update props'
         DataField = 'BlindLevel_AutoUpdateProps'
         DataSource = SourceTimeSlot
-        TabOrder = 11
+        TabOrder = 10
       end
       object DBCheckBox3: TDBCheckBox
         Left = 525
@@ -649,7 +658,7 @@ object FormEtm: TFormEtm
         Caption = 'detect obj exists'
         DataField = 'BlindLevel_DetectObjExists'
         DataSource = SourceTimeSlot
-        TabOrder = 12
+        TabOrder = 11
       end
       object DBCheckBox4: TDBCheckBox
         Left = 725
@@ -660,7 +669,7 @@ object FormEtm: TFormEtm
         Caption = 'detect conflicts'
         DataField = 'BlindLevel_DetectConflicts'
         DataSource = SourceTimeSlot
-        TabOrder = 13
+        TabOrder = 12
       end
       object DBCheckBox5: TDBCheckBox
         Left = 231
@@ -669,7 +678,7 @@ object FormEtm: TFormEtm
         Height = 17
         DataField = 'ConflictCheckedByHuman'
         DataSource = SourceTimeSlot
-        TabOrder = 14
+        TabOrder = 13
       end
       object DBEdit13: TDBEdit
         Left = 427
@@ -686,7 +695,7 @@ object FormEtm: TFormEtm
         Font.Name = 'Segoe UI'
         Font.Style = []
         ParentFont = False
-        TabOrder = 15
+        TabOrder = 14
       end
       object DBEdit14: TDBEdit
         Left = 581
@@ -703,7 +712,7 @@ object FormEtm: TFormEtm
         Font.Name = 'Segoe UI'
         Font.Style = []
         ParentFont = False
-        TabOrder = 16
+        TabOrder = 15
       end
       object DBEdit15: TDBEdit
         Left = 725
@@ -720,7 +729,7 @@ object FormEtm: TFormEtm
         Font.Name = 'Segoe UI'
         Font.Style = []
         ParentFont = False
-        TabOrder = 17
+        TabOrder = 16
       end
       object DBEdit16: TDBEdit
         Left = 231
@@ -737,7 +746,41 @@ object FormEtm: TFormEtm
         Font.Name = 'Segoe UI'
         Font.Style = []
         ParentFont = False
+        TabOrder = 17
+      end
+      object DBEdit17: TDBEdit
+        Left = 463
+        Top = 80
+        Width = 157
+        Height = 25
+        BorderStyle = bsNone
+        Color = clInactiveBorder
+        DataField = 'SmartApp'
+        DataSource = SourceTimeSlot
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -16
+        Font.Name = 'Segoe UI'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 18
+      end
+      object DBEdit7: TDBEdit
+        Left = 719
+        Top = 80
+        Width = 157
+        Height = 25
+        BorderStyle = bsNone
+        Color = clInactiveBorder
+        DataField = 'SmartLicense'
+        DataSource = SourceTimeSlot
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -16
+        Font.Name = 'Segoe UI'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 19
       end
     end
     object TabSheetEneityState: TTabSheet
@@ -746,8 +789,8 @@ object FormEtm: TFormEtm
       object DBMemoEntityState: TDBMemo
         Left = 0
         Top = 0
-        Width = 920
-        Height = 416
+        Width = 892
+        Height = 415
         Align = alClient
         BorderStyle = bsNone
         Ctl3D = False
@@ -768,13 +811,13 @@ object FormEtm: TFormEtm
   object DSTimeSlot: TioDataSetMaster
     AsDefault = True
     TypeName = 'TEtmRepository'
-    LoadType = ltFromBSReload
+    LoadType = ltFromBSAsIs
     TypeOfCollection = tcSingleObject
     VirtualFields = True
     Paging.CurrentPageOfFormat = '%d/%d'
     Paging.PageSize = 10
-    Left = 576
-    Top = 208
+    Left = 248
+    Top = 352
     object DSTimeSlotID: TIntegerField
       FieldName = 'ID'
     end
@@ -800,13 +843,6 @@ object FormEtm: TFormEtm
     object DSTimeSlotEntityState: TStringField
       FieldName = 'EntityState'
       Size = 99999
-    end
-    object DSTimeSlotUserID: TIntegerField
-      FieldName = 'UserID'
-    end
-    object DSTimeSlotUserName: TStringField
-      FieldName = 'UserName'
-      Size = 100
     end
     object DSTimeSlotActionType: TStringField
       FieldName = 'ActionType'
@@ -856,15 +892,27 @@ object FormEtm: TFormEtm
       FieldName = 'TimeSlotSynchroState'
       Size = 50
     end
+    object DSTimeSlotSmartApp: TStringField
+      FieldName = 'SmartApp'
+      Size = 100
+    end
+    object DSTimeSlotSmartUser: TStringField
+      FieldName = 'SmartUser'
+      Size = 100
+    end
+    object DSTimeSlotSmartLicense: TStringField
+      FieldName = 'SmartLicense'
+      Size = 100
+    end
   end
   object SourceTimeSlot: TDataSource
     DataSet = DSTimeSlot
-    Left = 576
-    Top = 264
+    Left = 248
+    Top = 408
   end
   object ActionList1: TActionList
-    Left = 672
-    Top = 208
+    Left = 328
+    Top = 352
     object acBack: TioBSCloseQuery
       Category = 'iORM-BS'
       Caption = 'Back'

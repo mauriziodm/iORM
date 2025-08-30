@@ -4,8 +4,8 @@ object PizzaForm: TPizzaForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 562
-  ClientWidth = 490
+  ClientHeight = 561
+  ClientWidth = 486
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -91,7 +91,7 @@ object PizzaForm: TPizzaForm
   end
   object Label5: TLabel
     Left = 8
-    Top = 204
+    Top = 203
     Width = 57
     Height = 25
     Alignment = taRightJustify
@@ -105,27 +105,27 @@ object PizzaForm: TPizzaForm
     ParentFont = False
   end
   object ButtonAddIngredient: TSpeedButton
-    Left = 8
+    Left = 6
     Top = 234
     Width = 60
-    Height = 22
+    Height = 33
     Action = acShowIngredientSelector
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
-    Font.Height = -13
+    Font.Height = -16
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentFont = False
   end
   object ButtonDeleteIngredient: TSpeedButton
-    Left = 8
-    Top = 491
+    Left = 6
+    Top = 480
     Width = 60
-    Height = 22
-    Action = acDeleteIngredient
+    Height = 33
+    Action = acDeleteIngredientRow
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clRed
-    Font.Height = -13
+    Font.Height = -16
     Font.Name = 'Segoe UI'
     Font.Style = []
     ParentFont = False
@@ -133,36 +133,21 @@ object PizzaForm: TPizzaForm
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 490
+    Width = 486
     Height = 40
     Align = alTop
     BevelOuter = bvNone
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 486
+    ExplicitWidth = 482
     DesignSize = (
-      490
+      486
       40)
-    object ButtonBack: TSpeedButton
-      Left = 0
-      Top = 0
-      Width = 50
-      Height = 40
-      Action = acBack
-      Align = alLeft
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clNavy
-      Font.Height = -13
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
-      ExplicitTop = 15
-    end
     object LabelTitle: TLabel
-      Left = 96
+      Left = 0
       Top = 7
-      Width = 287
+      Width = 481
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -175,67 +160,78 @@ object PizzaForm: TPizzaForm
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlCenter
-      ExplicitWidth = 291
+      ExplicitWidth = 485
+    end
+    object ButtonBack: TSpeedButton
+      Left = 0
+      Top = 0
+      Width = 70
+      Height = 40
+      Action = acBack
+      Align = alLeft
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clNavy
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
     end
     object ButtonETM: TSpeedButton
-      Left = 430
+      Left = 416
       Top = 0
-      Width = 60
+      Width = 70
       Height = 40
       Action = acShowETM
       Align = alRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clNavy
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 358
+      ExplicitLeft = 426
     end
   end
   object PanelBottom: TPanel
     Left = 0
-    Top = 522
-    Width = 490
+    Top = 521
+    Width = 486
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
-    ExplicitTop = 521
-    ExplicitWidth = 486
+    ExplicitTop = 520
+    ExplicitWidth = 482
     object ButtonRevert: TSpeedButton
       Left = 0
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
       Action = acRevertOrDelete
       Align = alLeft
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clRed
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 334
-      ExplicitTop = -6
     end
     object ButtonPersist: TSpeedButton
-      Left = 440
+      Left = 416
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
       Action = acPersist
       Align = alRight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clGreen
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
-      ExplicitLeft = 334
-      ExplicitTop = -6
+      ExplicitLeft = 436
     end
   end
   object DBEditID: TDBEdit
@@ -366,7 +362,6 @@ object PizzaForm: TPizzaForm
     TypeName = 'TPizza'
     LoadType = ltFromBSReload
     TypeOfCollection = tcSingleObject
-    OrderBy = '[TPizza.Name]'
     Paging.CurrentPageOfFormat = '%d/%d'
     Left = 120
     Top = 312
@@ -393,6 +388,21 @@ object PizzaForm: TPizzaForm
   object ActionList1: TActionList
     Left = 371
     Top = 312
+    object acBack: TioBSCloseQuery
+      Category = 'iORM-BS'
+      Caption = 'Back'
+      TargetBindSource = DSPizza
+      OnUpdateScope = usGlobal
+    end
+    object acDeleteIngredientRow: TioBSDelete
+      Category = 'iORM - BS'
+      Caption = 'Delete'
+      TargetBindSource = DSIngredientRows
+    end
+    object acLoadImage: TAction
+      Caption = '...'
+      OnExecute = acLoadImageExecute
+    end
     object acPersist: TioBSPersistencePersist
       Category = 'iORM-BSPersistence'
       Caption = 'Persist'
@@ -403,16 +413,6 @@ object PizzaForm: TPizzaForm
       Caption = 'Revert'
       Action_CloseQueryAction = acBack
       TargetBindSource = DSPizza
-    end
-    object acLoadImage: TAction
-      Caption = '...'
-      OnExecute = acLoadImageExecute
-    end
-    object acBack: TioBSCloseQuery
-      Category = 'iORM-BS'
-      Caption = 'Back'
-      TargetBindSource = DSPizza
-      OnUpdateScope = usGlobal
     end
     object acShowETM: TioBSShowOrSelect
       Category = 'iORM - BS'
@@ -430,44 +430,36 @@ object PizzaForm: TPizzaForm
       Action_ParentCloseQueryAction = acBack
       EntityTypeName = 'TIngredient'
       ShowMode = smEntityTypeNameAsSelector
-      TargetBindSource = DSIngredients
+      TargetBindSource = DSIngredientRows
       ViewContextBy = vcByDefaultViewContextProvider
       VVMTypeAlias = 'LIST'
-    end
-    object acDeleteIngredient: TDataSetDelete
-      Category = 'Dataset'
-      Caption = 'Delete'
-      Hint = 'Delete'
-      ImageIndex = 5
-      DataSource = SourceIngredients
     end
   end
   object OpenPictureDialog: TOpenPictureDialog
     Left = 368
     Top = 376
   end
-  object DSIngredients: TioDataSetDetail
-    AsDefault = False
+  object DSIngredientRows: TioDataSetDetail
     MasterBindSource = DSPizza
     MasterPropertyName = 'Ingredients'
     OnReceiveSelectionFreeObject = False
-    OnSelectionObject = DSIngredientsSelectionObject
+    OnReceiveSelectionObject = DSIngredientsSelectionObject
     Left = 216
     Top = 312
-    object DSIngredientsIngredientName: TStringField
+    object DSIngredientRowsIngredientName: TStringField
       FieldName = 'Ingredient.Name'
       Size = 100
     end
-    object DSIngredientsIngredientUnitOfMeasure: TStringField
+    object DSIngredientRowsIngredientUnitOfMeasure: TStringField
       FieldName = 'Ingredient.UnitOfMeasure'
       Size = 10
     end
-    object DSIngredientsQty: TFloatField
+    object DSIngredientRowsQty: TFloatField
       FieldName = 'Qty'
     end
   end
   object SourceIngredients: TDataSource
-    DataSet = DSIngredients
+    DataSet = DSIngredientRows
     Left = 216
     Top = 368
   end

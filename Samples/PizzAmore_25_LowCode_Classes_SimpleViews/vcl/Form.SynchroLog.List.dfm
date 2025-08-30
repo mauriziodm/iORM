@@ -40,24 +40,10 @@ object SynchroLogListForm: TSynchroLogListForm
     DesignSize = (
       984
       40)
-    object ButtonBack: TSpeedButton
-      Left = 0
-      Top = 0
-      Width = 50
-      Height = 40
-      Action = acBack
-      Align = alLeft
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clNavy
-      Font.Height = -16
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
-    end
     object LabelTitle: TLabel
-      Left = 112
+      Left = 0
       Top = 7
-      Width = 705
+      Width = 980
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -69,7 +55,21 @@ object SynchroLogListForm: TSynchroLogListForm
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
-      ExplicitWidth = 717
+      ExplicitWidth = 984
+    end
+    object ButtonBack: TSpeedButton
+      Left = 0
+      Top = 0
+      Width = 70
+      Height = 40
+      Action = acBack
+      Align = alLeft
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clNavy
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
     end
   end
   object PanelTimeSlots: TPanel
@@ -103,7 +103,7 @@ object SynchroLogListForm: TSynchroLogListForm
       ParentFont = False
       ExplicitWidth = 988
     end
-    object DBGrid1: TDBGrid
+    object GridETM: TDBGrid
       Left = 0
       Top = 30
       Width = 984
@@ -132,7 +132,7 @@ object SynchroLogListForm: TSynchroLogListForm
           FieldName = 'ID'
           Title.Alignment = taCenter
           Title.Font.Charset = DEFAULT_CHARSET
-          Title.Font.Color = clWindowText
+          Title.Font.Color = clNavy
           Title.Font.Height = -13
           Title.Font.Name = 'Segoe UI'
           Title.Font.Style = [fsBold]
@@ -146,7 +146,7 @@ object SynchroLogListForm: TSynchroLogListForm
           Title.Alignment = taCenter
           Title.Caption = 'when'
           Title.Font.Charset = DEFAULT_CHARSET
-          Title.Font.Color = clWindowText
+          Title.Font.Color = clNavy
           Title.Font.Height = -13
           Title.Font.Name = 'Segoe UI'
           Title.Font.Style = [fsBold]
@@ -160,7 +160,7 @@ object SynchroLogListForm: TSynchroLogListForm
           Title.Alignment = taCenter
           Title.Caption = 'entity class'
           Title.Font.Charset = DEFAULT_CHARSET
-          Title.Font.Color = clWindowText
+          Title.Font.Color = clNavy
           Title.Font.Height = -13
           Title.Font.Name = 'Segoe UI'
           Title.Font.Style = [fsBold]
@@ -174,7 +174,7 @@ object SynchroLogListForm: TSynchroLogListForm
           Title.Alignment = taCenter
           Title.Caption = 'entity ID'
           Title.Font.Charset = DEFAULT_CHARSET
-          Title.Font.Color = clWindowText
+          Title.Font.Color = clNavy
           Title.Font.Height = -13
           Title.Font.Name = 'Segoe UI'
           Title.Font.Style = [fsBold]
@@ -188,7 +188,7 @@ object SynchroLogListForm: TSynchroLogListForm
           Title.Alignment = taCenter
           Title.Caption = 'action type'
           Title.Font.Charset = DEFAULT_CHARSET
-          Title.Font.Color = clWindowText
+          Title.Font.Color = clNavy
           Title.Font.Height = -13
           Title.Font.Name = 'Segoe UI'
           Title.Font.Style = [fsBold]
@@ -202,7 +202,7 @@ object SynchroLogListForm: TSynchroLogListForm
           Title.Alignment = taCenter
           Title.Caption = 'version'
           Title.Font.Charset = DEFAULT_CHARSET
-          Title.Font.Color = clWindowText
+          Title.Font.Color = clNavy
           Title.Font.Height = -13
           Title.Font.Name = 'Segoe UI'
           Title.Font.Style = [fsBold]
@@ -212,29 +212,15 @@ object SynchroLogListForm: TSynchroLogListForm
         item
           Alignment = taCenter
           Expanded = False
-          FieldName = 'SmartUser'
-          Title.Alignment = taCenter
-          Title.Caption = 'user'
-          Title.Font.Charset = DEFAULT_CHARSET
-          Title.Font.Color = clWindowText
-          Title.Font.Height = -13
-          Title.Font.Name = 'Segoe UI'
-          Title.Font.Style = [fsBold]
-          Width = 90
-          Visible = True
-        end
-        item
-          Alignment = taCenter
-          Expanded = False
           FieldName = 'SmartConflictInfo'
           Title.Alignment = taCenter
           Title.Caption = 'conflict'
           Title.Font.Charset = DEFAULT_CHARSET
-          Title.Font.Color = clWindowText
+          Title.Font.Color = clNavy
           Title.Font.Height = -13
           Title.Font.Name = 'Segoe UI'
           Title.Font.Style = [fsBold]
-          Width = 170
+          Width = 220
           Visible = True
         end
         item
@@ -244,16 +230,16 @@ object SynchroLogListForm: TSynchroLogListForm
           Title.Alignment = taCenter
           Title.Caption = 'conflict checked by human'
           Title.Font.Charset = DEFAULT_CHARSET
-          Title.Font.Color = clWindowText
+          Title.Font.Color = clNavy
           Title.Font.Height = -13
           Title.Font.Name = 'Segoe UI'
           Title.Font.Style = [fsBold]
-          Width = 170
+          Width = 250
           Visible = True
         end>
     end
     object ButtonShowTimeslot: TButton
-      Left = 852
+      Left = 812
       Top = 3
       Width = 110
       Height = 22
@@ -266,7 +252,7 @@ object SynchroLogListForm: TSynchroLogListForm
       Font.Style = []
       ParentFont = False
       TabOrder = 1
-      ExplicitLeft = 848
+      ExplicitLeft = 808
     end
   end
   object GridCustomers: TDBGrid
@@ -298,7 +284,7 @@ object SynchroLogListForm: TSynchroLogListForm
         FieldName = 'ID'
         Title.Alignment = taCenter
         Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clWindowText
+        Title.Font.Color = clNavy
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
@@ -312,7 +298,7 @@ object SynchroLogListForm: TSynchroLogListForm
         Title.Alignment = taCenter
         Title.Caption = 'when'
         Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clWindowText
+        Title.Font.Color = clNavy
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
@@ -326,7 +312,7 @@ object SynchroLogListForm: TSynchroLogListForm
         Title.Alignment = taCenter
         Title.Caption = 'synchro log name'
         Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clWindowText
+        Title.Font.Color = clNavy
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
@@ -340,7 +326,7 @@ object SynchroLogListForm: TSynchroLogListForm
         Title.Alignment = taCenter
         Title.Caption = 'synchro level'
         Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clWindowText
+        Title.Font.Color = clNavy
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
@@ -354,7 +340,7 @@ object SynchroLogListForm: TSynchroLogListForm
         Title.Alignment = taCenter
         Title.Caption = 'synchro status'
         Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clWindowText
+        Title.Font.Color = clNavy
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
@@ -368,7 +354,7 @@ object SynchroLogListForm: TSynchroLogListForm
         Title.Alignment = taCenter
         Title.Caption = 'error'
         Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clWindowText
+        Title.Font.Color = clNavy
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
@@ -382,7 +368,7 @@ object SynchroLogListForm: TSynchroLogListForm
         Title.Alignment = taCenter
         Title.Caption = 'obj count'
         Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clWindowText
+        Title.Font.Color = clNavy
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
@@ -392,11 +378,24 @@ object SynchroLogListForm: TSynchroLogListForm
       item
         Alignment = taCenter
         Expanded = False
-        FieldName = 'SmartUser'
+        FieldName = 'User'
         Title.Alignment = taCenter
         Title.Caption = 'user'
         Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clWindowText
+        Title.Font.Color = clNavy
+        Title.Font.Height = -13
+        Title.Font.Name = 'Segoe UI'
+        Title.Font.Style = [fsBold]
+        Width = 120
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'App'
+        Title.Alignment = taCenter
+        Title.Caption = 'app'
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clNavy
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
@@ -410,7 +409,7 @@ object SynchroLogListForm: TSynchroLogListForm
         Title.Alignment = taCenter
         Title.Caption = 'etm class'
         Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clWindowText
+        Title.Font.Color = clNavy
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
@@ -424,7 +423,7 @@ object SynchroLogListForm: TSynchroLogListForm
         Title.Alignment = taCenter
         Title.Caption = 'to srv etm ID'
         Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clWindowText
+        Title.Font.Color = clNavy
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
@@ -438,7 +437,7 @@ object SynchroLogListForm: TSynchroLogListForm
         Title.Alignment = taCenter
         Title.Caption = 'to cli etm ID'
         Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clWindowText
+        Title.Font.Color = clNavy
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
@@ -448,11 +447,11 @@ object SynchroLogListForm: TSynchroLogListForm
       item
         Alignment = taCenter
         Expanded = False
-        FieldName = 'Start'
+        FieldName = 'StartSynchro'
         Title.Alignment = taCenter
         Title.Caption = '0-start'
         Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clWindowText
+        Title.Font.Color = clNavy
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
@@ -466,7 +465,7 @@ object SynchroLogListForm: TSynchroLogListForm
         Title.Alignment = taCenter
         Title.Caption = '1-load from cli'
         Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clWindowText
+        Title.Font.Color = clNavy
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
@@ -480,7 +479,7 @@ object SynchroLogListForm: TSynchroLogListForm
         Title.Alignment = taCenter
         Title.Caption = '2-save to srv'
         Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clWindowText
+        Title.Font.Color = clNavy
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
@@ -494,7 +493,7 @@ object SynchroLogListForm: TSynchroLogListForm
         Title.Alignment = taCenter
         Title.Caption = '3-reload from srv'
         Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clWindowText
+        Title.Font.Color = clNavy
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
@@ -508,7 +507,7 @@ object SynchroLogListForm: TSynchroLogListForm
         Title.Alignment = taCenter
         Title.Caption = '4-save to cli'
         Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clWindowText
+        Title.Font.Color = clNavy
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
@@ -522,7 +521,7 @@ object SynchroLogListForm: TSynchroLogListForm
         Title.Alignment = taCenter
         Title.Caption = '5-finalize'
         Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clWindowText
+        Title.Font.Color = clNavy
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
@@ -536,7 +535,7 @@ object SynchroLogListForm: TSynchroLogListForm
         Title.Alignment = taCenter
         Title.Caption = '6-completed'
         Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clWindowText
+        Title.Font.Color = clNavy
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
@@ -548,11 +547,24 @@ object SynchroLogListForm: TSynchroLogListForm
         FieldName = 'ErrorMsg'
         Title.Caption = 'error message'
         Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clWindowText
+        Title.Font.Color = clNavy
         Title.Font.Height = -13
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
         Width = 1000
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'License'
+        Title.Alignment = taCenter
+        Title.Caption = 'license'
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clNavy
+        Title.Font.Height = -13
+        Title.Font.Name = 'Segoe UI'
+        Title.Font.Style = [fsBold]
+        Width = 120
         Visible = True
       end>
   end
@@ -585,7 +597,7 @@ object SynchroLogListForm: TSynchroLogListForm
       Size = 100
     end
     object DSSynchroLogStart: TTimeField
-      FieldName = 'Start'
+      FieldName = 'StartSynchro'
     end
     object DSSynchroLogLoadFromClient: TTimeField
       FieldName = 'LoadFromClient'
@@ -609,10 +621,6 @@ object SynchroLogListForm: TSynchroLogListForm
       FieldName = 'SmartCount'
       Size = 50
     end
-    object DSSynchroLogSmartUser: TStringField
-      FieldName = 'SmartUser'
-      Size = 100
-    end
     object DSSynchroLogSmartCliToSrv_TimeSlotID: TStringField
       FieldName = 'SmartCliToSrv_TimeSlotID'
       Size = 50
@@ -628,6 +636,18 @@ object SynchroLogListForm: TSynchroLogListForm
     object DSSynchroLogErrorMsg: TStringField
       FieldName = 'ErrorMsg'
       Size = 1000
+    end
+    object DSSynchroLogUser: TStringField
+      FieldName = 'User'
+      Size = 100
+    end
+    object DSSynchroLogApp: TStringField
+      FieldName = 'App'
+      Size = 100
+    end
+    object DSSynchroLogLicense: TStringField
+      FieldName = 'License'
+      Size = 100
     end
   end
   object SourceSynchroLog: TDataSource
@@ -654,7 +674,6 @@ object SynchroLogListForm: TSynchroLogListForm
     end
   end
   object DS_ETM: TioDataSetDetail
-    AsDefault = False
     MasterBindSource = DSSynchroLog
     MasterPropertyName = 'EtmTimeslotsSrv'
     Left = 96
@@ -674,10 +693,6 @@ object SynchroLogListForm: TSynchroLogListForm
     end
     object DS_ETMSmartEntityVersion: TStringField
       FieldName = 'SmartEntityVersion'
-      Size = 100
-    end
-    object DS_ETMSmartUser: TStringField
-      FieldName = 'SmartUser'
       Size = 100
     end
     object DS_ETMSmartActionType: TStringField

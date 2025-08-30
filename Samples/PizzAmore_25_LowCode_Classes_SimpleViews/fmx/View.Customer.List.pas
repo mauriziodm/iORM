@@ -33,6 +33,8 @@ type
     LinkControlToField1: TLinkControlToField;
     LinkControlToField2: TLinkControlToField;
     LinkControlToField3: TLinkControlToField;
+    acAdd: TioBSAppend;
+    acDelete: TioBSDelete;
   private
   public
   end;

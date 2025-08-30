@@ -6,7 +6,13 @@
         <Projects Include="iORM_RT.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="iORM_uniGUI_RT.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="iORM_DT.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="iORM_uniGUI_DT.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -26,6 +32,15 @@
     <Target Name="iORM_RT:Make">
         <MSBuild Projects="iORM_RT.dproj" Targets="Make"/>
     </Target>
+    <Target Name="iORM_uniGUI_RT">
+        <MSBuild Projects="iORM_uniGUI_RT.dproj"/>
+    </Target>
+    <Target Name="iORM_uniGUI_RT:Clean">
+        <MSBuild Projects="iORM_uniGUI_RT.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="iORM_uniGUI_RT:Make">
+        <MSBuild Projects="iORM_uniGUI_RT.dproj" Targets="Make"/>
+    </Target>
     <Target Name="iORM_DT">
         <MSBuild Projects="iORM_DT.dproj"/>
     </Target>
@@ -35,14 +50,23 @@
     <Target Name="iORM_DT:Make">
         <MSBuild Projects="iORM_DT.dproj" Targets="Make"/>
     </Target>
+    <Target Name="iORM_uniGUI_DT">
+        <MSBuild Projects="iORM_uniGUI_DT.dproj"/>
+    </Target>
+    <Target Name="iORM_uniGUI_DT:Clean">
+        <MSBuild Projects="iORM_uniGUI_DT.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="iORM_uniGUI_DT:Make">
+        <MSBuild Projects="iORM_uniGUI_DT.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="iORM_RT;iORM_DT"/>
+        <CallTarget Targets="iORM_RT;iORM_uniGUI_RT;iORM_DT;iORM_uniGUI_DT"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="iORM_RT:Clean;iORM_DT:Clean"/>
+        <CallTarget Targets="iORM_RT:Clean;iORM_uniGUI_RT:Clean;iORM_DT:Clean;iORM_uniGUI_DT:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="iORM_RT:Make;iORM_DT:Make"/>
+        <CallTarget Targets="iORM_RT:Make;iORM_uniGUI_RT:Make;iORM_DT:Make;iORM_uniGUI_DT:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

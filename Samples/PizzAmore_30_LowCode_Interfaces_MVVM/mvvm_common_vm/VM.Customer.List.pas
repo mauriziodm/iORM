@@ -13,6 +13,7 @@ type
   TVMCustomerList = class(TVMBaseForList)
     acNextPage: TioVMActionBSNextPage;
     acPrevPage: TioVMActionBSPrevPage;
+    procedure acAddNewInstanceAsInterface(const ASender: TObject; out NewInstance: IInterface);
   private
   public
   end;
@@ -22,5 +23,10 @@ implementation
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
 {$R *.dfm}
+
+procedure TVMCustomerList.acAddNewInstanceAsInterface(const ASender: TObject; out NewInstance: IInterface);
+begin
+  NewInstance := io.Create<ICustomer>;
+end;
 
 end.

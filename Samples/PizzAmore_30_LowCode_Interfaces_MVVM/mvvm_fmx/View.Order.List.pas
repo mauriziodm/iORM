@@ -31,6 +31,15 @@ type
     LinkControlToField2: TLinkControlToField;
     LinkControlToField3: TLinkControlToField;
     LinkFillControlToField1: TLinkFillControlToField;
+    Label5: TLabel;
+    EditWhereCustomerName: TEdit;
+    Label6: TLabel;
+    EditWherePizzaName: TEdit;
+    Label7: TLabel;
+    EditWhereIngredientName: TEdit;
+    LinkControlToField4: TLinkControlToField;
+    LinkControlToField5: TLinkControlToField;
+    LinkControlToField6: TLinkControlToField;
   private
   public
     constructor Create(AOwner: TComponent); override;

@@ -17,6 +17,16 @@ type
     BSMasterAddress: TStringField;
     BSMasterCity: TStringField;
     BSMasterPhoneNumber: TStringField;
+    UniLabel1: TUniLabel;
+    DBEditID: TUniDBEdit;
+    UniLabel2: TUniLabel;
+    DBEditName: TUniDBEdit;
+    UniLabel3: TUniLabel;
+    DBEditPhone: TUniDBEdit;
+    UniLabel4: TUniLabel;
+    DBEditCity: TUniDBEdit;
+    UniLabel5: TUniLabel;
+    DBEditAddress: TUniDBEdit;
   private
   public
   end;

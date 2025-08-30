@@ -1,6 +1,7 @@
 program PizzAmore_25_LowCode_Classes_Server_DMVC;
 
 {$APPTYPE CONSOLE}
+{$STRONGLINKTYPES ON}
 
 uses
   System.SysUtils,

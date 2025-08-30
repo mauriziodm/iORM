@@ -20,6 +20,8 @@ type
 
 implementation
 
+{%CLASSGROUP 'System.Classes.TPersistent'}
+
 {$R *.dfm}
 
 procedure TVMOrderList.BSWhereAfterSelectionInterface(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType);

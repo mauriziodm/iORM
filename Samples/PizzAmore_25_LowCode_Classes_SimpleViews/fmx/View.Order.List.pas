@@ -43,7 +43,7 @@ type
     LinkControlToField4: TLinkControlToField;
     LinkControlToField5: TLinkControlToField;
     LinkControlToField6: TLinkControlToField;
-    procedure BSWhereAfterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType);
+    procedure BSWhereAfterReceiveSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType);
   private
   public
     constructor Create(AOwner: TComponent); override;
@@ -51,11 +51,14 @@ type
 
 implementation
 
+uses
+  System.Generics.Collections;
+
 {$R *.fmx}
 
 { TViewOrders }
 
-procedure TViewOrderList.BSWhereAfterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType);
+procedure TViewOrderList.BSWhereAfterReceiveSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType);
 begin
   BSWhere.BuildWhere;
 end;

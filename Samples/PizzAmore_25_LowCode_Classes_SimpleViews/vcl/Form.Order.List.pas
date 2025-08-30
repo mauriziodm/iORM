@@ -4,9 +4,9 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.DBCtrls, Data.DB, Vcl.Grids, Vcl.DBGrids, iORM, iORM.Attributes,
-  iORM.CommonTypes, iORM.Where.Interfaces, iORM.StdActions.Vcl, System.Actions, Vcl.ActnList, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom,
-  iORM.DB.DataSet.Master, Model.Order, Vcl.Mask;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.DBCtrls, Data.DB, Vcl.DBGrids, iORM, iORM.Attributes,
+  iORM.CommonTypes, iORM.Where.Interfaces, iORM.StdActions.Vcl, System.Actions, Vcl.ActnList,
+  iORM.DB.DataSet.Master, Model.Order, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom, Vcl.Mask, Vcl.Grids;
 
 type
 
@@ -20,19 +20,17 @@ type
     LabelTitle: TLabel;
     PanelBottom: TPanel;
     ButtonAdd: TSpeedButton;
-    ButtonDelete: TSpeedButton;
+    btnDelete: TSpeedButton;
     GridCustomers: TDBGrid;
     DSOrders: TioDataSetMaster;
     DSOrdersID: TIntegerField;
     SourceOrders: TDataSource;
     ActionList1: TActionList;
-    acDelete: TioBSPersistenceDelete;
     DSOrdersOrderDate: TDateField;
     DSOrdersCustomerName: TStringField;
     DSOrdersGrandTotal: TCurrencyField;
     acBack: TioBSCloseQuery;
     acShowOrSelect: TioBSShowOrSelect;
-    acAdd: TioBSPersistenceAppend;
     DSOrdersOrderState: TStringField;
     PanelWhere: TPanel;
     Label1: TLabel;
@@ -69,9 +67,12 @@ type
     Label8: TLabel;
     DBEditWhereIngredient: TDBEdit;
     DSWhereIngredientName: TStringField;
-    procedure FormCreate(Sender: TObject);
+    acDelete: TioBSDelete;
+    acAppend: TioBSAppend;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure DSWhereAfterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType);
+    procedure DSWhereAfterReceiveSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType);
+    procedure FormShow(Sender: TObject);
+    procedure GridCustomersDblClick(Sender: TObject);
   private
   public
   end;
@@ -79,12 +80,11 @@ type
 implementation
 
 uses
-  Model.Customer,
-  System.Generics.Collections, System.SysUtils;
+  System.SysUtils, System.Rtti;
 
 {$R *.dfm}
 
-procedure TOrderListForm.DSWhereAfterSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType);
+procedure TOrderListForm.DSWhereAfterReceiveSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType);
 begin
   DSWhere.BuildWhere;
 end;
@@ -94,28 +94,16 @@ begin
   Action := caFree;
 end;
 
-procedure TOrderListForm.FormCreate(Sender: TObject);
-var
-  LOrders: TObjectList<TOrder>;
+procedure TOrderListForm.FormShow(Sender: TObject);
 begin
   io.Enums.FillStrings<TOrderState>(DBComboBoxWhereOrderState.Items);
   DSOrders.Open;
   DSWhere.Open;
+end;
 
-//  LOrders := TObjectList<TOrder>.Create;
-//  io.Load<TOrder>.ToList(LOrders);
-//  io.Load<TOrder>._Where('OrderState', coEquals, osReady).ToList(LOrders);
-//  io.Load<TOrder>._Where('Rows.Pizza.Ingredients.Ingredient.Name', coLike, 'Love').ToList(LOrders);
-
-//  var LCustomer: TCustomer := io.LoadObject<TCustomer>(1);
-//  try
-//    io.Load<TOrder>._Where('Customer', coEquals, LCustomer).ToList(LOrders);
-//  finally
-//    LCustomer.Free;
-//  end;
-
-//  DSOrders.LoadType := ltManual;
-//  DSOrders.SetDataObject(LOrders);
+procedure TOrderListForm.GridCustomersDblClick(Sender: TObject);
+begin
+  acShowOrSelect.Execute;
 end;
 
 end.

@@ -34,9 +34,6 @@ Coordinates=348,166,71,58
 [acPersist]
 Coordinates=488,540,68,36
 
-[ButtonDeleteRow]
-Coordinates=114,348,114,36
-
 [DBEditCustID]
 Coordinates=10,348,94,36
 
@@ -107,9 +104,6 @@ Coordinates=654,551,78,36
 [DSCustomerName]
 Coordinates=654,606,122,36
 
-[acDeleteRow]
-Coordinates=456,681,91,36
-
 [DBImage]
 Coordinates=10,302,68,36
 
@@ -156,7 +150,7 @@ Coordinates=838,276,106,36
 Coordinates=407,10,88,58
 
 []
-Coordinates=654,1,129,36
+Coordinates=456,681,91,36
 
 [acRevertOrDelete]
 Coordinates=488,320,66,36
@@ -169,4 +163,7 @@ Coordinates=560,302,84,36
 
 [DSRowsPizzaPrice]
 Coordinates=555,681,94,36
+
+[btnDeleteRow]
+Coordinates=114,348,114,36
 

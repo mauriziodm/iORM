@@ -35,9 +35,20 @@ uses
   Where.Pizza in '..\common_model\Where.Pizza.pas',
   VM.Where.OrderHistory in '..\mvvm_common_vm\VM.Where.OrderHistory.pas' {VMWhereOrderHistory: TioViewModel},
   View.Where.OrderHistory in 'View.Where.OrderHistory.pas' {ViewWhereOrderHistory: TFrame},
-  ETM.Repository in '..\common_model\ETM.Repository.pas',
-  VM.ETM in '..\mvvm_common_vm\VM.ETM.pas' {VM_ETM: TioViewModel},
-  View.ETM in 'View.ETM.pas' {ViewETM: TFrame};
+  Model.Pizza.IngredientRow in '..\common_model\Model.Pizza.IngredientRow.pas',
+  Model.Ingredient in '..\common_model\Model.Ingredient.pas',
+  VM.Ingredient.List in '..\mvvm_common_vm\VM.Ingredient.List.pas' {VMIngredientList: TioViewModel},
+  View.Ingredient.List in 'View.Ingredient.List.pas' {ViewIngredientList: TFrame},
+  VM.Ingredient in '..\mvvm_common_vm\VM.Ingredient.pas' {VMIngredient: TioViewModel},
+  View.Ingredient in 'View.Ingredient.pas' {ViewIngredient: TFrame},
+  Etm.Repository in '..\common_model\Etm.Repository.pas',
+  VM.Etm in '..\mvvm_common_vm\VM.Etm.pas' {VMEtm: TioViewModel},
+  View.Etm in 'View.Etm.pas' {ViewEtm: TFrame},
+  VM.Etm.List in '..\mvvm_common_vm\VM.Etm.List.pas' {VMEtmList: TioViewModel},
+  View.Etm.List in 'View.Etm.List.pas' {ViewEtmList: TFrame},
+  VM.SynchroLog.List in '..\mvvm_common_vm\VM.SynchroLog.List.pas' {VMSynchroLogList: TioViewModel},
+  View.SynchroLog.List in 'View.SynchroLog.List.pas' {ViewSynchroLogList: TFrame},
+  Form.Authorization in 'Form.Authorization.pas' {AuthorizationForm};
 
 {$R *.res}
 {$STRONGLINKTYPES ON}
@@ -48,5 +59,6 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TStartForm, StartForm);
+  Application.CreateForm(TAuthorizationForm, AuthorizationForm);
   Application.Run;
 end.

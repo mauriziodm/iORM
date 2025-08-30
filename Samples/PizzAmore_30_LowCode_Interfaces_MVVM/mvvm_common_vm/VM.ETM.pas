@@ -1,25 +1,16 @@
-unit VM.ETM;
+unit VM.Etm;
 
 interface
 
 uses
-  System.SysUtils,
-  System.Classes,
-  iORM,
-  iORM.Attributes,
-  iORM.CommonTypes,
-  iORM.Where.Interfaces,
-  iORM.MVVM.Interfaces,
-  iORM.MVVM.ViewModel, iORM.MVVM.ModelPresenter.Custom, iORM.MVVM.ModelPresenter.Master, iORM.MVVM.VMAction,
-  ETM.Repository;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, VM.BaseForForm, iORM, iORM.Attributes, iORM.CommonTypes, iORM.Where.Interfaces, iORM.MVVM.VMAction,
+  iORM.MVVM.ModelPresenter.Custom, iORM.MVVM.ModelPresenter.Master, Etm.Repository;
 
 type
 
-  [diViewModelFor(TEtmRepository)]
-  TVM_ETM = class(TioViewModel)
-    BS_ETM: TioModelPresenterMaster;
-    acBack: TioVMActionBSCloseQuery;
-    acEtmRevertToVersion: TioVMActionBS_ETM_RevertToBindSource;
+  [diViewModelFor(TEtmTimeSlot)]
+  TVMEtm = class(TVMBaseForForm)
   private
   public
   end;

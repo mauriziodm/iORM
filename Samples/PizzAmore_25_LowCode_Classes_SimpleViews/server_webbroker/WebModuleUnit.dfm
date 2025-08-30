@@ -3,7 +3,7 @@ object WebModule2: TWebModule2
     item
       Default = True
       Name = 'iORMHandler'
-      PathInfo = '/'
+      PathInfo = '/iorm/samples/pizzamore'
       Producer = ioWebBrokerProducer1
     end>
   Height = 230
@@ -23,7 +23,7 @@ object WebModule2: TWebModule2
     DatabaseStdFolder = sfDocuments
     Persistent = False
     Pooled = False
-    OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
+    AfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
     Left = 72
     Top = 102
   end
@@ -39,7 +39,6 @@ object WebModule2: TWebModule2
     Protocol = pLocal
     SQLDialect = sqlDialect3
     UserName = 'SYSDBA'
-    OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
     Left = 72
     Top = 24
   end

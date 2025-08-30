@@ -25,9 +25,6 @@ Coordinates=324,1,62,33
 [acBack]
 Coordinates=324,53,50,33
 
-[acAdd]
-Coordinates=324,105,45,33
-
 [acShowOrSelect]
 Coordinates=324,157,95,33
 
@@ -42,4 +39,7 @@ Coordinates=191,10,70,51
 
 [RectangleBottom]
 Coordinates=192,179,69,33
+
+[acAppend]
+Coordinates=324,105,45,33
 

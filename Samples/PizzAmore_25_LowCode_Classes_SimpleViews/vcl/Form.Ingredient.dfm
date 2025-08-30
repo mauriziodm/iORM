@@ -2,8 +2,8 @@ object IngredientForm: TIngredientForm
   Left = 0
   Top = 0
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 243
-  ClientWidth = 454
+  ClientHeight = 242
+  ClientWidth = 450
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -62,34 +62,21 @@ object IngredientForm: TIngredientForm
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 454
+    Width = 450
     Height = 40
     Align = alTop
     BevelOuter = bvNone
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
+    ExplicitWidth = 446
     DesignSize = (
-      454
+      450
       40)
-    object ButtonBack: TSpeedButton
-      Left = 0
-      Top = 0
-      Width = 50
-      Height = 40
-      Action = acBack
-      Align = alLeft
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clNavy
-      Font.Height = -16
-      Font.Name = 'Segoe UI'
-      Font.Style = []
-      ParentFont = False
-    end
     object LabelTitle: TLabel
-      Left = 80
+      Left = 0
       Top = 7
-      Width = 259
+      Width = 450
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -102,12 +89,25 @@ object IngredientForm: TIngredientForm
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlCenter
-      ExplicitWidth = 222
+    end
+    object ButtonBack: TSpeedButton
+      Left = 0
+      Top = 0
+      Width = 70
+      Height = 40
+      Action = acBack
+      Align = alLeft
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clNavy
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
     end
     object ButtonETM: TSpeedButton
-      Left = 394
+      Left = 380
       Top = 0
-      Width = 60
+      Width = 70
       Height = 40
       Action = acShowETM
       Align = alRight
@@ -117,23 +117,25 @@ object IngredientForm: TIngredientForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 358
+      ExplicitLeft = 390
     end
   end
   object PanelBottom: TPanel
     Left = 0
-    Top = 203
-    Width = 454
+    Top = 202
+    Width = 450
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
+    ExplicitTop = 201
+    ExplicitWidth = 446
     object ButtonRevert: TSpeedButton
       Left = 0
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
       Action = acRevertOrDelete
       Align = alLeft
@@ -143,13 +145,11 @@ object IngredientForm: TIngredientForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 334
-      ExplicitTop = -6
     end
     object ButtonPersist: TSpeedButton
-      Left = 404
+      Left = 380
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
       Action = acPersist
       Align = alRight
@@ -159,8 +159,7 @@ object IngredientForm: TIngredientForm
       Font.Name = 'Segoe UI'
       Font.Style = [fsBold]
       ParentFont = False
-      ExplicitLeft = 334
-      ExplicitTop = -6
+      ExplicitLeft = 400
     end
   end
   object DBEditID: TDBEdit
@@ -219,7 +218,6 @@ object IngredientForm: TIngredientForm
     TypeName = 'TPizza'
     LoadType = ltFromBSReload
     TypeOfCollection = tcSingleObject
-    OrderBy = '[TPizza.Name]'
     Paging.CurrentPageOfFormat = '%d/%d'
     Left = 272
     Top = 128
@@ -243,6 +241,12 @@ object IngredientForm: TIngredientForm
   object ActionList1: TActionList
     Left = 355
     Top = 128
+    object acBack: TioBSCloseQuery
+      Category = 'iORM-BS'
+      Caption = 'Back'
+      TargetBindSource = DSIngredient
+      OnUpdateScope = usGlobal
+    end
     object acPersist: TioBSPersistencePersist
       Category = 'iORM-BSPersistence'
       Caption = 'Persist'
@@ -253,15 +257,6 @@ object IngredientForm: TIngredientForm
       Caption = 'Revert'
       Action_CloseQueryAction = acBack
       TargetBindSource = DSIngredient
-    end
-    object acLoadImage: TAction
-      Caption = '...'
-    end
-    object acBack: TioBSCloseQuery
-      Category = 'iORM-BS'
-      Caption = 'Back'
-      TargetBindSource = DSIngredient
-      OnUpdateScope = usGlobal
     end
     object acShowETM: TioBSShowOrSelect
       Category = 'iORM - BS'

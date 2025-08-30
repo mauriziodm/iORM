@@ -24,7 +24,7 @@ type
     ActionList1: TActionList;
     acBack: TioViewAction;
     acDelete: TioViewAction;
-    acAdd: TioViewAction;
+    acAppend: TioViewAction;
     acShowOrSelect: TioViewAction;
     VMBridge: TioViewModelBridge;
     BSMaster: TioModelBindSource;

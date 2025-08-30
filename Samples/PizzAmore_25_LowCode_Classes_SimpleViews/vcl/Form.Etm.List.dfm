@@ -22,6 +22,7 @@ object EtmListForm: TEtmListForm
     Cursor = crVSplit
     Align = alTop
     AutoSnap = False
+    Beveled = True
     MinSize = 100
     ExplicitTop = 216
     ExplicitWidth = 588
@@ -43,7 +44,7 @@ object EtmListForm: TEtmListForm
     object ButtonBack: TSpeedButton
       Left = 0
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
       Action = acBack
       Align = alLeft
@@ -57,7 +58,7 @@ object EtmListForm: TEtmListForm
     object LabelTitle: TLabel
       Left = 120
       Top = 7
-      Width = 693
+      Width = 661
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -157,12 +158,12 @@ object EtmListForm: TEtmListForm
       Font.Style = []
       ParentFont = False
     end
-    object ButtonRevertTo: TSpeedButton
-      Left = 888
-      Top = 6
-      Width = 76
+    object ButtonRevertToDB: TSpeedButton
+      Left = 702
+      Top = 5
+      Width = 124
       Height = 28
-      Action = acEtmRevertToVersion
+      Action = acRevertToDB
       Anchors = [akTop, akRight]
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
@@ -170,14 +171,14 @@ object EtmListForm: TEtmListForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 904
+      ExplicitLeft = 734
     end
-    object SpeedButton1: TSpeedButton
-      Left = 720
-      Top = 6
-      Width = 123
+    object ButonRevertToObject: TSpeedButton
+      Left = 832
+      Top = 5
+      Width = 124
       Height = 28
-      Action = acEtmRevertToObject
+      Action = acRevertToObj
       Anchors = [akTop, akRight]
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
@@ -185,6 +186,7 @@ object EtmListForm: TEtmListForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
+      ExplicitLeft = 864
     end
   end
   object GridCustomers: TDBGrid
@@ -268,9 +270,22 @@ object EtmListForm: TEtmListForm
       item
         Alignment = taCenter
         Expanded = False
-        FieldName = 'SmartUser'
+        FieldName = 'UserName'
         Title.Alignment = taCenter
         Title.Caption = 'user'
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clNavy
+        Title.Font.Height = -13
+        Title.Font.Name = 'Segoe UI'
+        Title.Font.Style = [fsBold]
+        Width = 120
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'App'
+        Title.Alignment = taCenter
+        Title.Caption = 'app'
         Title.Font.Charset = DEFAULT_CHARSET
         Title.Font.Color = clNavy
         Title.Font.Height = -13
@@ -290,7 +305,7 @@ object EtmListForm: TEtmListForm
         Title.Font.Height = -12
         Title.Font.Name = 'Segoe UI'
         Title.Font.Style = [fsBold]
-        Width = 220
+        Width = 218
         Visible = True
       end
       item
@@ -380,10 +395,6 @@ object EtmListForm: TEtmListForm
       FieldName = 'SmartEntityVersion'
       Size = 100
     end
-    object DS_ETMSmartUser: TStringField
-      FieldName = 'SmartUser'
-      Size = 100
-    end
     object DS_ETMSmartEventType: TStringField
       DisplayLabel = 'SmartEventType'
       FieldName = 'SmartActionType'
@@ -401,6 +412,14 @@ object EtmListForm: TEtmListForm
       FieldName = 'DiffOneWay'
       Size = 99999
     end
+    object DS_ETMUserName: TStringField
+      FieldName = 'UserName'
+      Size = 100
+    end
+    object DS_ETMApp: TStringField
+      FieldName = 'App'
+      Size = 100
+    end
   end
   object SourceETM: TDataSource
     AutoEdit = False
@@ -416,13 +435,27 @@ object EtmListForm: TEtmListForm
       Caption = 'Back'
       OnUpdateScope = usGlobal
     end
-    object acEtmRevertToVersion: TioBS_ETM_RevertToBindSource
+    object acRevertToDB: TioBS_ETM_RevertToBindSource
       Category = 'iORM - BS - ETM'
-      Caption = 'Revert TO'
+      Caption = 'Revert to DB'
       TargetBindSource = DS_ETM
       AutoExec_OnETMfor_AfterRevert = doRefresh
       AutoExec_OnTargetBS_AfterRevert = doReload
       AutoExec_Persist_AfterRevert = True
+    end
+    object acRevertToObj: TioBS_ETM_RevertToObject
+      Category = 'iORM - BS - ETM'
+      Caption = 'Revert to OBJ'
+      Action_ShowOrSelectAction = acShowRevertedObj
+      TargetBindSource = DS_ETM
+    end
+    object acShowRevertedObj: TioBSShowOrSelect
+      Category = 'iORM - BS'
+      Caption = 'acShowRevertedOb'
+      Action_ParentCloseQueryAction = acBack
+      ShowMode = smBSCurrent
+      TargetBindSource = DS_ETM
+      ViewContextBy = vcByDefaultViewContextProvider
     end
     object acShowTimeSlot: TioBSShowOrSelect
       Category = 'iORM - BS'
@@ -431,12 +464,6 @@ object EtmListForm: TEtmListForm
       ShowMode = smBSCurrent
       TargetBindSource = DS_ETM
       ViewContextBy = vcByDefaultViewContextProvider
-    end
-    object acEtmRevertToObject: TioBS_ETM_RevertToObject
-      Category = 'iORM - BS - ETM'
-      Caption = 'Revert to Obj'
-      TargetBindSource = DS_ETM
-      AfterRevert = acEtmRevertToObjectAfterRevert
     end
   end
 end

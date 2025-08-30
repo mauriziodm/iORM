@@ -17,19 +17,20 @@ type
     FOrderDate: TDate;
     [etmProperty('Customer.ID', 'CustomerID')]
     FCustomer: TCustomer;
-    FRows: TObjectList<TOrderRow>;
+    FOrderRows: TObjectList<TOrderRow>;
     FNote: String;
     FOrderState: TOrderState;
     FObjVersion: TioObjVersion; // The ObjVersion is mandatory if you want to use the ETM
     function GetGrandTotal: Currency;
   public
     constructor Create;
+    constructor CreateWithCustomer(const ACustomer: TCustomer);
     destructor Destroy; override;
     procedure AddPizza(const APizza: TPizza);
     property ID: Integer read FID write FID; // ReadOnly if you want
     property OrderDate: TDate read FOrderDate Write FOrderDate;
     property Customer: TCustomer read FCustomer write FCustomer;
-    property Rows: TObjectList<TOrderRow> read FRows; // ReadOnly
+    property OrderRows: TObjectList<TOrderRow> read FOrderRows; // ReadOnly
     property Note: String read FNote write FNote;
     property GrandTotal: Currency read GetGrandTotal; // ReadOnly
     property OrderState: TOrderState read FOrderState write FOrderState;
@@ -38,7 +39,7 @@ type
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils, System.Rtti;
 
 { TOrder }
 
@@ -47,16 +48,17 @@ var
   LRow: TOrderRow;
 begin
   // If a row with the same pizza is present then increment its qty
-  for LRow in Rows do
+  for LRow in OrderRows do
   begin
     if LRow.Pizza.ID = APizza.ID then
     begin
+      FreeAndNil(APizza);
       LRow.Qty := LRow.Qty + 1;
       Exit;
     end;
   end;
   // Else create a new OrderRow
-  Rows.Add( TOrderRow.Create(APizza) );
+  OrderRows.Add( TOrderRow.Create(APizza) );
 end;
 
 constructor TOrder.Create;
@@ -64,12 +66,18 @@ begin
   inherited;
   FOrderDate := Date;
   FOrderState := osWaiting;
-  FRows := TObjectList<TOrderRow>.Create;
+  FOrderRows := TObjectList<TOrderRow>.Create;
+end;
+
+constructor TOrder.CreateWithCustomer(const ACustomer: TCustomer);
+begin
+  Create;
+  FCustomer := ACustomer;
 end;
 
 destructor TOrder.Destroy;
 begin
-  FRows.Free;
+  FOrderRows.Free;
   if FCustomer <> nil then
     FCustomer.Free;
   inherited;
@@ -80,8 +88,21 @@ var
   LRow: TOrderRow;
 begin
   Result := 0;
-  for LRow in FRows do
+  for LRow in FOrderRows do
     Result := Result + LRow.RowTotal;
 end;
+
+initialization
+
+  io.di.RegisterClass<TOrder>('CUSTOMER').FactoryMethod<TCustomer>(
+    function (ACustomer: TCustomer): TObject
+    begin
+      Result := TOrder.CreateWithCustomer(ACustomer);
+    end).Execute;
+
+//  io.di.RegisterClass<TOrder>('CUSTOMER_NEW').ConstructorParams<TCustomer>(TCustomer.CreateWithData('Nuovo cliente', '', '', '')).Execute;
+//  io.di.RegisterClass<TOrder>('CUSTOMER_NEW').ConstructorParams([TValue.From<TCustomer>(TCustomer.CreateWithData('Nuovo cliente', '', '', ''))]).Execute;
+//  io.di.RegisterClass<TOrder>('CUSTOMER_NEW').InjectProperty('Customer',  TValue.From<TCustomer>(TCustomer.CreateWithData('Nuovo cliente', '', '', '')) ).Execute;
+//  io.di.RegisterClass<TOrder>('CUSTOMER_NEW').InjectProperty<TCustomer>('Customer',  TCustomer.CreateWithData('Nuovo cliente', '', '', '') ).Execute;
 
 end.

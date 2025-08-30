@@ -17,12 +17,16 @@ type
     FFromPrice: Currency;
     [ioWhereGroup('Price'), ioWhere('Price', coLowerOrEqual)]
     FToPrice: Currency;
+    [ioWhere('Ingredients.Ingredient.Name', coLike)]
+    FIngredientName: String;
     function GetFromPrice: Currency;
     function GetID: Integer;
+    function GetIngredientName: String;
     function GetName: String;
     function GetToPrice: Currency;
     procedure SetFromPrice(const Value: Currency);
     procedure SetID(const Value: Integer);
+    procedure SetIngredientName(const Value: String);
     procedure SetName(const Value: String);
     procedure SetToPrice(const Value: Currency);
   public
@@ -31,6 +35,7 @@ type
     property Name: String read GetName write SetName;
     property FromPrice: Currency read GetFromPrice Write SetFromPrice;
     property ToPrice: Currency read GetToPrice Write SetToPrice;
+    property IngredientName: String read GetIngredientName write SetIngredientName;
   end;
 
 implementation
@@ -53,6 +58,11 @@ begin
   Result := FID;
 end;
 
+function TWherePizza.GetIngredientName: String;
+begin
+  Result := FIngredientName;
+end;
+
 function TWherePizza.GetName: String;
 begin
   Result := FName;
@@ -71,6 +81,11 @@ end;
 procedure TWherePizza.SetID(const Value: Integer);
 begin
   FID := Value;
+end;
+
+procedure TWherePizza.SetIngredientName(const Value: String);
+begin
+  FIngredientName := Value;
 end;
 
 procedure TWherePizza.SetName(const Value: String);

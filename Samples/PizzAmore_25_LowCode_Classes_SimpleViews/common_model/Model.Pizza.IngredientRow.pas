@@ -3,7 +3,7 @@ unit Model.Pizza.IngredientRow;
 interface
 
 uses
-  iORM, ETM.Repository, Model.Ingredient;
+  iORM, Model.Ingredient;
 
 type
 

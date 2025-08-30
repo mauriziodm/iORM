@@ -6,7 +6,7 @@ uses iORM, ETM.Repository;
 
 type
 
-  [ioEntity('INGREDIENTS'), etmTrace(TEtmRepository), ioConflictStrategy(TioSameVersionWin, csResolved)]
+  [ioEntity('INGREDIENTS'), etmTrace(TEtmRepository), ioConflictStrategy(TioSameVersionWin)]
   TIngredient = class
   private
     FID: Integer;

@@ -3,8 +3,8 @@ object OrderWhereHistoryForm: TOrderWhereHistoryForm
   Top = 0
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 461
-  ClientWidth = 878
+  ClientHeight = 459
+  ClientWidth = 870
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,18 +19,33 @@ object OrderWhereHistoryForm: TOrderWhereHistoryForm
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 878
+    Width = 870
     Height = 40
     Align = alTop
     BevelOuter = bvNone
     Color = clNavy
     ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 812
+    ExplicitWidth = 866
+    object LabelTitle: TLabel
+      Left = 0
+      Top = 8
+      Width = 870
+      Height = 21
+      Alignment = taCenter
+      AutoSize = False
+      Caption = 'Where history'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWhite
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
     object ButtonSelect: TSpeedButton
-      Left = 828
+      Left = 800
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
       Action = acSelectCurrent
       Align = alRight
@@ -40,13 +55,12 @@ object OrderWhereHistoryForm: TOrderWhereHistoryForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 334
-      ExplicitTop = -6
+      ExplicitLeft = 820
     end
     object ButtonBack: TSpeedButton
       Left = 0
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
       Action = acBack
       Align = alLeft
@@ -57,36 +71,23 @@ object OrderWhereHistoryForm: TOrderWhereHistoryForm
       Font.Style = []
       ParentFont = False
     end
-    object LabelTitle: TLabel
-      Left = 373
-      Top = 8
-      Width = 108
-      Height = 21
-      Caption = 'Where history'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
-      Font.Height = -16
-      Font.Name = 'Segoe UI'
-      Font.Style = [fsBold]
-      ParentFont = False
-    end
   end
   object PanelBottom: TPanel
     Left = 0
-    Top = 421
-    Width = 878
+    Top = 419
+    Width = 870
     Height = 40
     Align = alBottom
     BevelOuter = bvNone
     Color = clMenu
     ParentBackground = False
     TabOrder = 1
-    ExplicitTop = 420
-    ExplicitWidth = 812
+    ExplicitTop = 418
+    ExplicitWidth = 866
     object ButtonDelete: TSpeedButton
       Left = 0
       Top = 0
-      Width = 50
+      Width = 70
       Height = 40
       Action = acDelete
       Align = alLeft
@@ -96,14 +97,14 @@ object OrderWhereHistoryForm: TOrderWhereHistoryForm
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 8
+      ExplicitTop = 6
     end
   end
   object GridCustomers: TDBGrid
     Left = 0
     Top = 40
-    Width = 878
-    Height = 381
+    Width = 870
+    Height = 379
     Align = alClient
     DataSource = SourceWhereHistory
     Font.Charset = DEFAULT_CHARSET
@@ -274,14 +275,14 @@ object OrderWhereHistoryForm: TOrderWhereHistoryForm
   object ActionList1: TActionList
     Left = 184
     Top = 112
-    object acDelete: TioBSPersistenceDelete
-      Category = 'iORM-BSPersistence'
-      Caption = 'Delete'
-      TargetBindSource = DSWhereHistory
-    end
     object acBack: TioBSCloseQuery
       Category = 'iORM-BS'
       Caption = 'Back'
+      TargetBindSource = DSWhereHistory
+    end
+    object acDelete: TioBSDelete
+      Category = 'iORM - BS'
+      Caption = 'Delete'
       TargetBindSource = DSWhereHistory
     end
     object acSelectCurrent: TioBSSelectCurrent

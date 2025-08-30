@@ -4,9 +4,9 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, iORM, iORM.Attributes, iORM.CommonTypes, iORM.Where.Interfaces, Data.DB, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom,
-  iORM.DB.DataSet.Master, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Grids, Vcl.Buttons, Vcl.DBGrids, Vcl.DBCtrls, iORM.StdActions.Vcl, System.Actions, Vcl.ActnList,
-  Model.Customer, Vcl.Mask;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, iORM, iORM.Attributes, iORM.CommonTypes, Data.DB,
+  iORM.DB.DataSet.Master, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Buttons, Vcl.DBGrids, Vcl.DBCtrls, iORM.StdActions.Vcl, System.Actions, Vcl.ActnList,
+  Model.Customer, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom, Vcl.Mask, Vcl.Grids, iORM.Where.Interfaces;
 
 type
 
@@ -23,17 +23,15 @@ type
     ButtonSelect: TSpeedButton;
     ButtonBack: TSpeedButton;
     LabelTitle: TLabel;
-    ButtonDelete: TSpeedButton;
+    btnDelete: TSpeedButton;
     ButtonPageDown: TSpeedButton;
     GridCustomers: TDBGrid;
     DBTextPageOf: TDBText;
     ActionList1: TActionList;
-    acDelete: TioBSPersistenceDelete;
     acNextPage: TioBSNextPage;
     acPrevPage: TioBSPrevPage;
     acBack: TioBSCloseQuery;
     acShowOrSelect: TioBSShowOrSelect;
-    acAdd: TioBSPersistenceAppend;
     acSelectCurrent: TioBSSelectCurrent;
     PanelWhere: TPanel;
     DSWhere: TioDataSetMaster;
@@ -55,8 +53,11 @@ type
     DSWhereID: TIntegerField;
     DSWhereName: TStringField;
     DSWhereCity: TStringField;
+    acAppend: TioBSAppend;
+    acDelete: TioBSDelete;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure GridCustomersDblClick(Sender: TObject);
   private
   public
   end;
@@ -74,6 +75,11 @@ procedure TCustomerListForm.FormShow(Sender: TObject);
 begin
   DSCustomers.Open;
   DSWhere.Open;
+end;
+
+procedure TCustomerListForm.GridCustomersDblClick(Sender: TObject);
+begin
+  acShowOrSelect.Execute;
 end;
 
 end.

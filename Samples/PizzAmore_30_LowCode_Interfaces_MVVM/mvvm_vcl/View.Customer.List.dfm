@@ -2,44 +2,48 @@ inherited ViewCustomerList: TViewCustomerList
   inherited PanelTop: TPanel
     inherited LabelTitle: TLabel
       Caption = 'Customers'
-      ExplicitWidth = 80
+      ExplicitWidth = 680
     end
   end
   inherited PanelBottom: TPanel
+    inherited ButtonAdd: TSpeedButton
+      ExplicitLeft = 730
+      ExplicitTop = 3
+    end
     object ButtonPageDown: TSpeedButton
-      Left = 50
+      Left = 70
       Top = 0
-      Width = 50
+      Width = 60
       Height = 40
       Action = acPrevPage
       Align = alLeft
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 58
+      ExplicitLeft = 60
     end
     object ButtonPageUp: TSpeedButton
-      Left = 100
+      Left = 130
       Top = 0
-      Width = 50
+      Width = 60
       Height = 40
       Action = acNextPage
       Align = alLeft
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 94
+      ExplicitLeft = 120
     end
     object DBTextPageOf: TDBText
-      Left = 150
+      Left = 190
       Top = 0
-      Width = 600
+      Width = 540
       Height = 40
       Align = alClient
       Alignment = taCenter
@@ -47,7 +51,7 @@ inherited ViewCustomerList: TViewCustomerList
       DataSource = SourceMaster
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'Segoe UI'
       Font.Style = []
       ParentFont = False
@@ -64,6 +68,12 @@ inherited ViewCustomerList: TViewCustomerList
     Height = 441
     Align = alClient
     DataSource = SourceMaster
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentFont = False
     TabOrder = 3
     TitleFont.Charset = DEFAULT_CHARSET
     TitleFont.Color = clWindowText
@@ -189,7 +199,7 @@ inherited ViewCustomerList: TViewCustomerList
     object DBEditWhereName: TDBEdit
       Left = 155
       Top = 6
-      Width = 589
+      Width = 569
       Height = 25
       Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
@@ -207,7 +217,7 @@ inherited ViewCustomerList: TViewCustomerList
     object DBEditWhereCity: TDBEdit
       Left = 43
       Top = 37
-      Width = 701
+      Width = 681
       Height = 25
       Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone

@@ -14,27 +14,20 @@ type
     BSRows: TioModelPresenterDetail;
     acShowCustomerSelector: TioVMActionBSShowOrSelect;
     acShowPizzaSelector: TioVMActionBSShowOrSelect;
-    acDeleteRow: TioVMAction;
+    acDeleteRow: TioVMActionBSDelete;
     procedure MPMasterSelectionInterface(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
-    procedure acDeleteRowExecute(Sender: TObject);
   private
   public
   end;
 
 implementation
 
-{%CLASSGROUP 'System.Classes.TPersistent'}
+{%CLASSGROUP 'Vcl.Controls.TControl'}
 
 uses
   Model.Interfaces;
 
 {$R *.dfm}
-
-procedure TVMOrder.acDeleteRowExecute(Sender: TObject);
-begin
-  inherited;
-  BSRows.Delete;
-end;
 
 procedure TVMOrder.MPMasterSelectionInterface(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
 begin

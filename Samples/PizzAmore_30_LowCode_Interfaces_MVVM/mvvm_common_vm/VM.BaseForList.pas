@@ -16,15 +16,14 @@ type
 
   TVMBaseForList = class(TioViewModel)
     BSMaster: TioModelPresenterMaster;
-    acDelete: TioVMActionBSPersistenceDelete;
     acBack: TioVMActionBSCloseQuery;
     acShowOrSelect: TioVMActionBSShowOrSelect;
-    acAdd: TioVMActionBSPersistenceAppend;
     acSelectCurrent: TioVMActionBSSelectCurrent;
     BSWhere: TioModelPresenterMaster;
     acBuildWhere: TioVMActionBSBuildWhere;
     acClearWhere: TioVMActionBSClearWhere;
-    ioVMAction1: TioVMAction;
+    acAppend: TioVMActionBSAppend;
+    acDelete: TioVMActionBSDelete;
     procedure ioViewModelViewPairing(const Sender: TioViewModel);
   private
   public
@@ -32,7 +31,10 @@ type
 
 implementation
 
-{%CLASSGROUP 'Vcl.Controls.TControl'}
+uses
+  uniGUIApplication;
+
+{%CLASSGROUP 'System.Classes.TPersistent'}
 
 {$R *.dfm}
 

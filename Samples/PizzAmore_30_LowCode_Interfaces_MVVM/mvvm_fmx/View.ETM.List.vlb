@@ -4,9 +4,6 @@ Coordinates=132,10,46,51
 [LabelID]
 Coordinates=91,188,51,51
 
-[BS_ETM]
-Coordinates=10,10,94,141
-
 [LabelTitle]
 Coordinates=10,188,62,51
 
@@ -15,9 +12,6 @@ Coordinates=207,256,65,33
 
 [acBack]
 Coordinates=358,78,50,33
-
-[acEtmRevertToVersion]
-Coordinates=514,1,127,33
 
 [ioViewModelBridge1]
 Coordinates=358,133,115,33
@@ -59,4 +53,10 @@ Coordinates=91,283,91,36
 
 [BindingsList1]
 Coordinates=141,87,82,33
+
+[BSMaster]
+Coordinates=10,10,94,141
+
+[acEtmRevertToDB]
+Coordinates=514,1,127,33
 

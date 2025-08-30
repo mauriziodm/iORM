@@ -182,9 +182,9 @@ begin
   LOrder.OrderDate := Date;
   LOrder.Customer := io.LoadObject<TCustomer>(1);
   LOrder.Note := 'Well done';
-  LOrder.Rows.Add( TOrderRow.Create( io.LoadObject<TPizza>(1), 3) ); // Margherita pizza, Qty = 3
-  LOrder.Rows.Add( TOrderRow.Create( io.LoadObject<TPizza>(2), 2) ); // Capricciosa pizza, Qty = 2
-  LOrder.Rows.Add( TOrderRow.Create( io.LoadObject<TPizza>(4), 1) ); // Love pizza, Qty = 1
+  LOrder.OrderRows.Add( TOrderRow.Create( io.LoadObject<TPizza>(1), 3) ); // Margherita pizza, Qty = 3
+  LOrder.OrderRows.Add( TOrderRow.Create( io.LoadObject<TPizza>(2), 2) ); // Capricciosa pizza, Qty = 2
+  LOrder.OrderRows.Add( TOrderRow.Create( io.LoadObject<TPizza>(4), 1) ); // Love pizza, Qty = 1
   LOrder.OrderState := osReady;
   io.PersistObject(LOrder, foFreeAndNil);
   // Second order
@@ -192,15 +192,15 @@ begin
   LOrder.OrderDate := Date;
   LOrder.Customer := io.LoadObject<TCustomer>(2);
   LOrder.Note := 'Double cheese please';
-  LOrder.Rows.Add( TOrderRow.Create( io.LoadObject<TPizza>(1), 1) ); // Margherita pizza, Qty = 1
-  LOrder.Rows.Add( TOrderRow.Create( io.LoadObject<TPizza>(3), 1) ); // Pepperoni pizza, Qty = 1
+  LOrder.OrderRows.Add( TOrderRow.Create( io.LoadObject<TPizza>(1), 1) ); // Margherita pizza, Qty = 1
+  LOrder.OrderRows.Add( TOrderRow.Create( io.LoadObject<TPizza>(3), 1) ); // Pepperoni pizza, Qty = 1
   LOrder.OrderState := osPreparing;
   io.PersistObject(LOrder, foFreeAndNil);
   // Third order
   LOrder := TOrder.Create;
   LOrder.OrderDate := Date;
   LOrder.Customer := io.LoadObject<TCustomer>(3);
-  LOrder.Rows.Add( TOrderRow.Create( io.LoadObject<TPizza>(4), 1) ); // Love pizza, Qty = 1
+  LOrder.OrderRows.Add( TOrderRow.Create( io.LoadObject<TPizza>(4), 1) ); // Love pizza, Qty = 1
   LOrder.OrderState := osWaiting;
   io.PersistObject(LOrder, foFreeAndNil);
 end;

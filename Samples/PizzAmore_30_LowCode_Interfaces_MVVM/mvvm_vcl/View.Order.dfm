@@ -117,12 +117,16 @@ inherited ViewOrder: TViewOrder
         Caption = 'Order'
         ExplicitWidth = 340
       end
+      inherited ButtonETM: TSpeedButton
+        Left = 379
+        ExplicitLeft = 389
+      end
     end
     inherited PanelBottom: TPanel
       Width = 449
       ExplicitWidth = 449
       inherited ButtonPersist: TSpeedButton
-        Left = 399
+        Left = 379
         ExplicitLeft = 399
       end
       object Label6: TLabel
@@ -140,18 +144,19 @@ inherited ViewOrder: TViewOrder
         ParentFont = False
       end
       object ButtonDeleteRow: TSpeedButton
-        Left = 50
+        Left = 70
         Top = 0
-        Width = 79
+        Width = 90
         Height = 40
         Action = acDeleteRow
         Align = alLeft
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
-        Font.Height = -13
+        Font.Height = -16
         Font.Name = 'Segoe UI'
         Font.Style = []
         ParentFont = False
+        ExplicitLeft = 60
       end
       object DBEditGrandTotal: TDBEdit
         Left = 277
@@ -303,7 +308,13 @@ inherited ViewOrder: TViewOrder
       FixedColor = clInactiveBorder
       GradientEndColor = clInactiveBorder
       GradientStartColor = clInactiveBorder
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Segoe UI'
+      Font.Style = []
       ParentCtl3D = False
+      ParentFont = False
       TabOrder = 9
       TitleFont.Charset = DEFAULT_CHARSET
       TitleFont.Color = clWindowText
@@ -313,8 +324,9 @@ inherited ViewOrder: TViewOrder
       Columns = <
         item
           Expanded = False
-          FieldName = 'Description'
+          FieldName = 'Pizza.Name'
           Title.Alignment = taCenter
+          Title.Caption = 'Description'
           Title.Font.Charset = DEFAULT_CHARSET
           Title.Font.Color = clNavy
           Title.Font.Height = -13
@@ -325,8 +337,9 @@ inherited ViewOrder: TViewOrder
         end
         item
           Expanded = False
-          FieldName = 'UnitPrice'
+          FieldName = 'Pizza.Price'
           Title.Alignment = taCenter
+          Title.Caption = 'Price'
           Title.Font.Charset = DEFAULT_CHARSET
           Title.Font.Color = clNavy
           Title.Font.Height = -13
@@ -459,12 +472,12 @@ inherited ViewOrder: TViewOrder
     ModelPresenter = 'BSRows'
     Left = 204
     Top = 386
-    object BSRowsDescription: TStringField
-      FieldName = 'Description'
+    object BSRowsPizzaName: TStringField
+      FieldName = 'Pizza.Name'
       Size = 250
     end
-    object BSRowsPrice: TCurrencyField
-      FieldName = 'Price'
+    object BSRowsPizzaPrice: TCurrencyField
+      FieldName = 'Pizza.Price'
     end
     object BSRowsQty: TIntegerField
       FieldName = 'Qty'

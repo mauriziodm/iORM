@@ -8,7 +8,7 @@ uses
 type
 
   [etmRepository('ETM_REPOSITORY')]
-  TEtmRepository = class(TioEtmCustomTimeSlot)
+  TEtmTimeSlot = class(TioEtmCustomTimeSlot)
   end;
 
 implementation

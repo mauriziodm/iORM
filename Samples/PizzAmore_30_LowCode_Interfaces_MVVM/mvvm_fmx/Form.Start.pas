@@ -6,7 +6,8 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.StdCtrls, FMX.Controls.Presentation, FMX.Objects, FMX.TabControl, iORM, iORM.Attributes,
   iORM.CommonTypes, iORM.DBBuilder.Interfaces, iORM.MVVM.Interfaces, System.Actions, FMX.ActnList, iORM.StdActions.Fmx, iORM.MVVM.ViewModelBridge,
-  iORM.MVVM.ViewContextProvider, iORM.DB.ConnectionDef, iORM.Abstraction.FMX, FMX.Layouts;
+  iORM.MVVM.ViewContextProvider, iORM.DB.ConnectionDef, iORM.Abstraction.FMX, FMX.Layouts, iORM.SynchroStrategy.Interfaces, iORM.SynchroStrategy.Custom,
+  iORM.SynchroStrategy.EtmBased, iORM.Abstraction;
 
 type
 
@@ -33,6 +34,11 @@ type
     Label2: TLabel;
     Label1: TLabel;
     ImageLogo: TImage;
+    ServerConn: TioSQLiteConnectionDef;
+    SynchroStrategy: TioEtmSynchroStrategy_Client;
+    HttpConn: TioHttpConnectionDef;
+    ButtonDoSynchronization: TButton;
+    acDoSynchronization: TioDoSynchronization;
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
       AWarnings: TStrings);
     procedure VCProviderRequest(const Sender: TObject; out ResultViewContext: TComponent);

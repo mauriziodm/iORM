@@ -40,8 +40,8 @@ type
     BSCustomerName: TStringField;
     BSCustomerFullAddress: TStringField;
     BSCustomerPhoneNumber: TStringField;
-    BSRowsDescription: TStringField;
-    BSRowsPrice: TCurrencyField;
+    BSRowsPizzaName: TStringField;
+    BSRowsPizzaPrice: TCurrencyField;
     BSRowsQty: TIntegerField;
     BSRowsRowTotal: TCurrencyField;
     SourceCustomer: TDataSource;

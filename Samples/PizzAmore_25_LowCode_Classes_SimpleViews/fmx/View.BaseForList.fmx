@@ -11,11 +11,8 @@ object ViewBaseForList: TViewBaseForList
     Size.PlatformDefault = False
     Stroke.Kind = None
     object ButtonDelete: TSpeedButton
-      Action = acDelete
       Align = Left
-      Enabled = True
       StyledSettings = [Family, Size, Style]
-      ImageIndex = -1
       Size.Width = 40.000000000000000000
       Size.Height = 40.000000000000000000
       Size.PlatformDefault = False
@@ -23,11 +20,8 @@ object ViewBaseForList: TViewBaseForList
       TextSettings.FontColor = claAliceblue
     end
     object ButtonAdd: TSpeedButton
-      Action = acAdd
       Align = Right
-      Enabled = True
       StyledSettings = [Family, Size, Style]
-      ImageIndex = -1
       Position.X = 360.000000000000000000
       Size.Width = 40.000000000000000000
       Size.Height = 40.000000000000000000
@@ -93,6 +87,7 @@ object ViewBaseForList: TViewBaseForList
     Size.Height = 440.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 3
+    OnDblClick = ListViewDblClick
   end
   object RectangleWhere: TRectangle
     Align = Bottom
@@ -142,11 +137,6 @@ object ViewBaseForList: TViewBaseForList
   object ActionList1: TActionList
     Left = 203
     Top = 163
-    object acDelete: TioBSPersistenceDelete
-      Category = 'iORM-BSPersistence'
-      Text = 'Delete'
-      TargetBindSource = BSMaster
-    end
     object acBack: TioBSCloseQuery
       Category = 'iORM-BS'
       Text = 'Back'
@@ -165,13 +155,6 @@ object ViewBaseForList: TViewBaseForList
     object acSelectCurrent: TioBSSelectCurrent
       Category = 'iORM-BS'
       Text = 'Select'
-      TargetBindSource = BSMaster
-      Action_CloseQueryAction = acBack
-    end
-    object acAdd: TioBSPersistenceAppend
-      Category = 'iORM-BSPersistence'
-      Text = 'Add'
-      Action_ShowOrSelectAction = acShowOrSelect
       TargetBindSource = BSMaster
     end
     object acBuildWhere: TioBSBuildWhere

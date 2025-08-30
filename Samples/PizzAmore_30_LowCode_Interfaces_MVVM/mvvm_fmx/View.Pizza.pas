@@ -9,7 +9,7 @@ uses
   FMX.Controls.Presentation, FMX.Objects, Data.Bind.GenData, Fmx.Bind.GenData, FMX.Edit, FMX.ListBox, FMX.Layouts, System.Rtti, System.Bindings.Outputs,
   Fmx.Bind.Editors, Data.Bind.EngExt, Fmx.Bind.DBEngExt, Model.Pizza,
   iORM.Where.Interfaces, iORM.LiveBindings.PrototypeBindSource.Custom,
-  iORM.LiveBindings.PrototypeBindSource.Master;
+  iORM.LiveBindings.PrototypeBindSource.Master, FMX.Grid.Style, FMX.ScrollBox, FMX.Grid, Fmx.Bind.Grid, Data.Bind.Grid;
 
 type
 
@@ -32,6 +32,11 @@ type
     LinkControlToField2: TLinkControlToField;
     LinkControlToField3: TLinkControlToField;
     LinkControlToField4: TLinkControlToField;
+    ListBoxItemIngredients: TListBoxItem;
+    Label5: TLabel;
+    Grid1: TGrid;
+    BSIngredients: TioModelBindSource;
+    LinkGridToDataSourceBSIngredients: TLinkGridToDataSource;
   private
   public
   end;

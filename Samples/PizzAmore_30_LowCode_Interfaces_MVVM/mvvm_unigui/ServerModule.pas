@@ -28,7 +28,7 @@ implementation
 {$R *.dfm}
 
 uses
-  UniGUIVars, Utils.SampleData;
+  UniGUIVars, Utils.SampleData, RegisterClasses;
 
 procedure TUniServerModule.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
   const AScript, AWarnings: TStrings);
@@ -49,5 +49,6 @@ end;
 initialization
 
 RegisterServerModuleClass(TUniServerModule);
+TRegisterClasses.RegisterClasses; // Moved here from MainForm
 
 end.

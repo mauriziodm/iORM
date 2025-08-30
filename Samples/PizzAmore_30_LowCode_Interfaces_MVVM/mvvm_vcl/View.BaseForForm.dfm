@@ -31,13 +31,13 @@ object ViewBaseForForm: TViewBaseForForm
       object ButtonBack: TSpeedButton
         Left = 0
         Top = 0
-        Width = 50
+        Width = 70
         Height = 40
         Action = acBack
         Align = alLeft
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clNavy
-        Font.Height = -13
+        Font.Height = -16
         Font.Name = 'Segoe UI'
         Font.Style = []
         ParentFont = False
@@ -61,19 +61,19 @@ object ViewBaseForForm: TViewBaseForForm
         ExplicitWidth = 689
       end
       object ButtonETM: TSpeedButton
-        Left = 739
+        Left = 729
         Top = 0
-        Width = 60
+        Width = 70
         Height = 40
         Action = acShowETM
         Align = alRight
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clNavy
-        Font.Height = -13
+        Font.Height = -16
         Font.Name = 'Segoe UI'
         Font.Style = []
         ParentFont = False
-        ExplicitLeft = 749
+        ExplicitLeft = 739
       end
     end
     object PanelBottom: TPanel
@@ -89,34 +89,31 @@ object ViewBaseForForm: TViewBaseForForm
       object ButtonRevert: TSpeedButton
         Left = 0
         Top = 0
-        Width = 50
+        Width = 70
         Height = 40
         Action = acRevert
         Align = alLeft
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clRed
-        Font.Height = -13
+        Font.Height = -16
         Font.Name = 'Segoe UI'
         Font.Style = []
         ParentFont = False
-        ExplicitLeft = 334
-        ExplicitTop = -6
       end
       object ButtonPersist: TSpeedButton
-        Left = 749
+        Left = 729
         Top = 0
-        Width = 50
+        Width = 70
         Height = 40
         Action = acPersist
         Align = alRight
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clGreen
-        Font.Height = -13
+        Font.Height = -16
         Font.Name = 'Segoe UI'
         Font.Style = [fsBold]
         ParentFont = False
-        ExplicitLeft = 334
-        ExplicitTop = -6
+        ExplicitLeft = 739
       end
     end
   end

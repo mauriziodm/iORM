@@ -4,8 +4,8 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.Mask, Vcl.DBCtrls, Vcl.ComCtrls, iORM, iORM.Attributes, iORM.CommonTypes,
-  iORM.Where.Interfaces, iORM.StdActions.Vcl, System.Actions, Vcl.ActnList, Data.DB, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom, iORM.DB.DataSet.Master,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Vcl.DBCtrls, Vcl.ComCtrls, iORM, iORM.Attributes, iORM.CommonTypes,
+  iORM.StdActions.Vcl, System.Actions, Vcl.ActnList, Data.DB, iORM.DB.DataSet.Master,
   ETM.Repository;
 
 type
@@ -37,7 +37,6 @@ type
     DBEdit5: TDBEdit;
     Label10: TLabel;
     DBEdit6: TDBEdit;
-    DBEdit7: TDBEdit;
     Label11: TLabel;
     DBEdit8: TDBEdit;
     Label12: TLabel;
@@ -74,8 +73,6 @@ type
     DSTimeSlotEntityVersion: TIntegerField;
     DSTimeSlotEntityFromVersion: TIntegerField;
     DSTimeSlotEntityUpdated: TDateTimeField;
-    DSTimeSlotUserID: TIntegerField;
-    DSTimeSlotUserName: TStringField;
     DSTimeSlotActionType: TStringField;
     DSTimeSlotIntentType: TStringField;
     DSTimeSlotConflictDetected: TBooleanField;
@@ -92,6 +89,13 @@ type
     DSTimeSlotTimeSlotSynchroState: TStringField;
     acRevert: TioBSPersistenceRevert;
     DSTimeSlotEntityState: TStringField;
+    Label3: TLabel;
+    DBEdit17: TDBEdit;
+    Label4: TLabel;
+    DBEdit7: TDBEdit;
+    DSTimeSlotSmartApp: TStringField;
+    DSTimeSlotSmartUser: TStringField;
+    DSTimeSlotSmartLicense: TStringField;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
   public
