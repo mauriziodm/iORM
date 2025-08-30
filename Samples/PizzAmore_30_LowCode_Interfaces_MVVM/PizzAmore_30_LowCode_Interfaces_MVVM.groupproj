@@ -1,0 +1,60 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{DE12D756-476E-43F4-9807-49F49A19BF9D}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="mvvm_vcl\PizzAmore_30_LowCode_Interfaces_mvvm_Vcl.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="mvvm_fmx\PizzAmore_30_LowCode_Interfaces_mvvm_Fmx.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="mvvm_unigui\PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="PizzAmore_30_LowCode_Interfaces_mvvm_Vcl">
+        <MSBuild Projects="mvvm_vcl\PizzAmore_30_LowCode_Interfaces_mvvm_Vcl.dproj"/>
+    </Target>
+    <Target Name="PizzAmore_30_LowCode_Interfaces_mvvm_Vcl:Clean">
+        <MSBuild Projects="mvvm_vcl\PizzAmore_30_LowCode_Interfaces_mvvm_Vcl.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PizzAmore_30_LowCode_Interfaces_mvvm_Vcl:Make">
+        <MSBuild Projects="mvvm_vcl\PizzAmore_30_LowCode_Interfaces_mvvm_Vcl.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="PizzAmore_30_LowCode_Interfaces_mvvm_Fmx">
+        <MSBuild Projects="mvvm_fmx\PizzAmore_30_LowCode_Interfaces_mvvm_Fmx.dproj"/>
+    </Target>
+    <Target Name="PizzAmore_30_LowCode_Interfaces_mvvm_Fmx:Clean">
+        <MSBuild Projects="mvvm_fmx\PizzAmore_30_LowCode_Interfaces_mvvm_Fmx.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PizzAmore_30_LowCode_Interfaces_mvvm_Fmx:Make">
+        <MSBuild Projects="mvvm_fmx\PizzAmore_30_LowCode_Interfaces_mvvm_Fmx.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI">
+        <MSBuild Projects="mvvm_unigui\PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI.dproj"/>
+    </Target>
+    <Target Name="PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI:Clean">
+        <MSBuild Projects="mvvm_unigui\PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI:Make">
+        <MSBuild Projects="mvvm_unigui\PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="PizzAmore_30_LowCode_Interfaces_mvvm_Vcl;PizzAmore_30_LowCode_Interfaces_mvvm_Fmx;PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="PizzAmore_30_LowCode_Interfaces_mvvm_Vcl:Clean;PizzAmore_30_LowCode_Interfaces_mvvm_Fmx:Clean;PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="PizzAmore_30_LowCode_Interfaces_mvvm_Vcl:Make;PizzAmore_30_LowCode_Interfaces_mvvm_Fmx:Make;PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
