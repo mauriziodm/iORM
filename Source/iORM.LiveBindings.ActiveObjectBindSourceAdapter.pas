@@ -689,7 +689,14 @@ begin
 
   // Free the previous current object if OnReceiveSelectionFreeObject property
   // of the BindSource is True
-  if FBindSource.OnReceiveSelectionFreeObject and (LPreviousCurrentObj <> nil) then
+  // NB: Solo se in realtà il PreviousCurrentObj e il Current sono diversi, cioè non sono
+  //      stesso oggetto. Ho fatto questa modifica perchè in alcuni casi come quello dell'esempio
+  //      della pizza nel quale il Selector delle Pizze punta (properietà SelectorFor) non al BSRows
+  //      ma al BSOrder perchè essendoci l'apposito metodo per aggiungere una pizza nel TOrder ho deciso
+  //      di destinare la selezione li; in questo caso avrebbe fatto il Free dell'ordine. Si tratta di un caso
+  //      particolare però facendo in questo modo evito eventuali problemi di AV error semplificando
+  //      la vita anche se mi dimentico di mettere a False la proprietà OnReceiveSelectionFreeObject.
+  if FBindSource.OnReceiveSelectionFreeObject and (LPreviousCurrentObj <> nil) and (Current <> LPreviousCurrentObj) then
     LPreviousCurrentObj.Free;
 end;
 
