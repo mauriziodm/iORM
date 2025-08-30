@@ -4806,6 +4806,7 @@ object StartForm: TStartForm
     DatabaseStdFolder = sfDocuments
     Persistent = False
     Pooled = False
+    SynchroStrategy_Client = SynchroStrategy
     AfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
     Left = 32
     Top = 512
@@ -4820,12 +4821,10 @@ object StartForm: TStartForm
   end
   object ServerConn: TioSQLiteConnectionDef
     AsDefault = False
-    AutoCreateDB.Enabled = True
     Database = 'PIZZAMORE_25_SIMPLEVIEW_VCL.DB'
     DatabaseStdFolder = sfDocuments
     Persistent = False
     Pooled = False
-    AfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
     Left = 88
     Top = 304
   end

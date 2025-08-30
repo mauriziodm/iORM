@@ -34,7 +34,6 @@ type
     SQLiteConn: TioSQLiteConnectionDef;
     ButtonAuthorization: TButton;
     HttpConn: TioHttpConnectionDef;
-    Button1: TButton;
     procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript, AWarnings: TStrings);
     procedure FormCreate(Sender: TObject);
     procedure ButtonAuthorizationClick(Sender: TObject);
