@@ -268,7 +268,7 @@ begin
   // method
   FMethod := AMethod;
   // auth-cache
-  FAuthCache := TioAuthFactory.NewAuthCacheCRUD;
+//  FAuthCache := TioAuthFactory.NewAuthCacheCRUD; // Provo a eliminare la riga tanto viene cmq creato o nel metodo _Clear(...)
   // other initializations
   _Clear(FillSessionRelatedProperties);
 end;
@@ -559,6 +559,8 @@ end;
 
 procedure TioPersistenceStrategyRequest.ImportSessionData(const ASessionData: IioSessionData);
 begin
+  // auth-cache
+  FAuthCache := ASessionData.AuthCacheUI;
   // app
   FApp := ASessionData.App;
   FAppOID := ASessionData.AppOID;

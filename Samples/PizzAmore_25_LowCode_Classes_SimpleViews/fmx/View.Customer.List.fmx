@@ -183,7 +183,7 @@ inherited ViewCustomerList: TViewCustomerList
     AsyncPersist = True
     VirtualFields = True
     Paging.CurrentPageOfFormat = 'Page %d of %d'
-    Paging.PageSize = 5
+    Paging.PageSize = 25
     Paging.PagingType = ptHardPaging
   end
   inherited BSWhere: TioPrototypeBindSourceMaster
