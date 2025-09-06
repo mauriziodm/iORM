@@ -1593,7 +1593,6 @@ begin
     begin
       FLookingUp := True;
       try
-        { TODO : Il Locate non funziona con i miei DataSet quindi se cambio direttamente l'ID dell'oggetto detail da un TEdit non funziona bene (seleziona sempre il primo) }
         LBindSource.SelectionFrom.Locate('ID', AValue.AsInteger);
         LBindSource.SelectionFrom.SelectCurrent;
       finally

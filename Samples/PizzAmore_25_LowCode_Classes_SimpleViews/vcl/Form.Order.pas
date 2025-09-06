@@ -84,10 +84,12 @@ type
     DSCustomersID: TIntegerField;
     DSCustomersName: TStringField;
     ClientDataSet1: TClientDataSet;
+    Button1: TButton;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure DBCtrlGridPizzasDblClick(Sender: TObject);
     procedure DSOrderReceiveSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
+    procedure Button1Click(Sender: TObject);
   private
   public
   end;
@@ -98,6 +100,14 @@ uses
   Model.Pizza;
 
 {$R *.dfm}
+
+procedure TOrderForm.Button1Click(Sender: TObject);
+begin
+  if DSCustomer.Active then
+    io.ShowMessage('DSCUstomer is active')
+  else
+    io.ShowMessage('DSCUstomer is NOT active');
+end;
 
 procedure TOrderForm.DBCtrlGridPizzasDblClick(Sender: TObject);
 begin

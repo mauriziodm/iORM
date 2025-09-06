@@ -156,7 +156,7 @@ object OrderForm: TOrderForm
     object LabelTitle: TLabel
       Left = 0
       Top = 7
-      Width = 728
+      Width = 724
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -201,7 +201,7 @@ object OrderForm: TOrderForm
       ExplicitLeft = 712
     end
     object ButtonETM: TSpeedButton
-      Left = 116
+      Left = 112
       Top = 0
       Width = 85
       Height = 40
@@ -227,6 +227,15 @@ object OrderForm: TOrderForm
       ListFieldIndex = 1
       ListSource = SourceCustomers
       TabOrder = 0
+    end
+    object Button1: TButton
+      Left = 192
+      Top = 8
+      Width = 75
+      Height = 25
+      Caption = 'Button1'
+      TabOrder = 1
+      OnClick = Button1Click
     end
   end
   object PanelBottom: TPanel
