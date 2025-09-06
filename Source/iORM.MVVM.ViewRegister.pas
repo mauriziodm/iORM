@@ -64,12 +64,8 @@ type
 
   TioViewRegisterMVVM = class(TioViewRegisterBase, IioViewRegisterMVVM)
   private
-    FFreeViewsTimer: TioTimer;
-    procedure _FreeViewTimerEventHandler(Sender: TObject);
     procedure _PostponedReleaseAllViewContexts;
   public
-    constructor Create;
-    destructor Destroy; override;
     procedure ReleaseAllViewContexts;
     procedure HideAllViewContexts;
     procedure ShowAllViewContexts;
@@ -242,27 +238,6 @@ end;
 
 { TioViewRegisterMVVM }
 
-constructor TioViewRegisterMVVM.Create;
-begin
-  inherited;
-  // NB: If we are on an uniGUI application then doesn't use the timers but runs the code right away
-  if TioApplication.ProjectPlatform <> ppUniGUI then
-  begin
-    FFreeViewsTimer := TioTimer.CreateNewTimer;
-    FFreeViewsTimer.Enabled := False;
-    FFreeViewsTimer.OnTimer := _FreeViewTimerEventHandler;
-    FFreeViewsTimer.Interval := 100;
-  end;
-end;
-
-destructor TioViewRegisterMVVM.Destroy;
-begin
-  // NB: If we are on an uniGUI application then doesn't use the timers but runs the code right away
-  if TioApplication.ProjectPlatform <> ppUniGUI then
-    FFreeViewsTimer.Free;
-  inherited;
-end;
-
 procedure TioViewRegisterMVVM.HideAllViewContexts;
 var
   I: Integer;
@@ -277,6 +252,8 @@ begin
   // e, di conseguenza, di tutte le viste.
   // NB: Ho dovuto posticiparlo con un timer perchè altrimenti con i TcxButton
   // della DevExpress c'erano dei problemi in alcuni casi
+  // NB: Sembrano esserci problemi con gli esempi MVVM (es: dopo aver selezionato il clienti di un ordine con un selector)
+  //      anche senza uso di componenti DevExpress
   // NB: If we are on an uniGUI application then doesn't use the timers but runs the code right away
   // NB: Carlo Marona 25/02/2025: Carlo ha commentato le righe sotto togliendo quindi l'uso del timer
   //      e richiamando direttamente il metodo _PostponedReleaseAllViewContexts, in pratica tutto
@@ -285,10 +262,14 @@ begin
   //      (ViewModel e tutto). Inoltre nella Destroy del ViewModel ha aggiunto delle righe per
   //      impostare a nil FVMActionContainer, FViewRegister, FLocalVCProviderRegister.
   //      Queste modifiche Carlo le ha provate solo su FMX testarle anche con la VCL
-// TODO: Verificare anche vada bene anche con i TCXButton della DevExpress
-//  if TioApplication.ProjectPlatform <> ppUniGUI then
-//    FFreeViewsTimer.Enabled := True
-//  else
+// TODO: Verificare se il TThread.ForceQueue va bene anche con uniGUI (a differenza del Timer che usavo prima e che con uniGUI dava problemi)
+  if TioApplication.ProjectPlatform <> ppUniGUI then
+    TThread.ForceQueue(nil,
+      procedure
+      begin
+        _PostponedReleaseAllViewContexts;
+      end)
+  else
     _PostponedReleaseAllViewContexts;
 end;
 
@@ -298,12 +279,6 @@ var
 begin
   for I := FInternalContainer.Count - 1 downto 0 do
     FInternalContainer.Items[I].ShowViewContext;
-end;
-
-procedure TioViewRegisterMVVM._FreeViewTimerEventHandler(Sender: TObject);
-begin
-  FFreeViewsTimer.Enabled := False;
-  _PostponedReleaseAllViewContexts;
 end;
 
 procedure TioViewRegisterMVVM._PostponedReleaseAllViewContexts;

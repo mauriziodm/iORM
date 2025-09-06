@@ -100,9 +100,4 @@ initialization
       Result := TOrder.CreateWithCustomer(ACustomer);
     end).Execute;
 
-//  io.di.RegisterClass<TOrder>('CUSTOMER_NEW').ConstructorParams<TCustomer>(TCustomer.CreateWithData('Nuovo cliente', '', '', '')).Execute;
-//  io.di.RegisterClass<TOrder>('CUSTOMER_NEW').ConstructorParams([TValue.From<TCustomer>(TCustomer.CreateWithData('Nuovo cliente', '', '', ''))]).Execute;
-//  io.di.RegisterClass<TOrder>('CUSTOMER_NEW').InjectProperty('Customer',  TValue.From<TCustomer>(TCustomer.CreateWithData('Nuovo cliente', '', '', '')) ).Execute;
-//  io.di.RegisterClass<TOrder>('CUSTOMER_NEW').InjectProperty<TCustomer>('Customer',  TCustomer.CreateWithData('Nuovo cliente', '', '', '') ).Execute;
-
 end.

@@ -513,6 +513,9 @@ end;
 
 destructor TioModelPresenterCustom.Destroy;
 begin
+  // Se è un selector elimina il riferimento all'indietro a se stesso dal BS
+  //  target della selezione
+  SetSelectorFor(nil);
   // If the new AETMfor is assigned then unregister itself
   if Assigned(FETMFor) then
     FETMfor.UnregisterDetailBindSource(Self);
@@ -1286,9 +1289,20 @@ end;
 
 procedure TioModelPresenterCustom.SetSelectorFor(const ATargetBindSource: IioBindSource);
 begin
-  FSelectorFor := ATargetBindSource;
-  // set a reverse reference used by CoBOL system (COmbo-Box Object Lookup)
-  ATargetBindSource.SelectionFrom := Self;
+  if ATargetBindSource <> FSelectorFor then
+  begin
+    // Se era già assegnato  azzera la proprietà SelectionFrom dal BS target della selezione
+    if Assigned(FSelectorFor) then
+      FSelectorFor.SelectionFrom := nil;
+    // Assegna il nuovo valore
+    FSelectorFor := ATargetBindSource;
+    // Assegna se stesso alla proprietà SelectionFrom del BS target della selezione
+    //  perchè per la gestione delle standard action con la parte di autorizzazione
+    //  mi serviva anche un riferimento all'indietro per risalire dal Target al Source
+    //  della selezione
+    if Assigned(ATargetBindSource) then
+      ATargetBindSource.SelectionFrom := Self
+  end;
 end;
 
 procedure TioModelPresenterCustom.SetTypeAlias(const Value: String);
