@@ -118,8 +118,11 @@ var
   LActionType: TioPersistenceActionType;
 begin
   // Requires an authorization-decision for UI purposes
-  LActionType := TioUtilities.ActionTypeByABSA(AActiveBindSourceAdapter);
-  TioApplication.AuthorizeByRequestParams(AActiveBindSourceAdapter.Current.ClassName, LActionType, itRegular, AActiveBindSourceAdapter.GetBindSource._InternalGetAuthorizationContext, False, False);
+  if AActiveBindSourceAdapter.Active then  // To avoid AV error
+  begin
+    LActionType := TioUtilities.ActionTypeByABSA(AActiveBindSourceAdapter);
+    TioApplication.AuthorizeByRequestParams(AActiveBindSourceAdapter.Current.ClassName, LActionType, itRegular, AActiveBindSourceAdapter.GetBindSource._InternalGetAuthorizationContext, False, False);
+  end;
   // Notification to save revert point before edit
   AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint));
   // Notification to register the current object into the SmartUpdateDetection system
