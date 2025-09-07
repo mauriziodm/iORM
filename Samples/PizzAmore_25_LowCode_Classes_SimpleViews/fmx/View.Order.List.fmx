@@ -225,10 +225,13 @@ inherited ViewOrderList: TViewOrderList
     end
   end
   inherited ActionList1: TActionList
+    inherited acAppend: TioBSAppend
+      EntityTypeName = 'TOrder'
+    end
     inherited acBuildWhere: TioBSBuildWhere
       Action_PersistAction = acWherePersist
     end
-    object acWhereShowHistory: TioBSShowOrSelect
+    object acWhereShowHistory: TioBSShowOrSelect [5]
       Category = 'iORM-BS'
       Text = 'History'
       Action_ParentCloseQueryAction = acBack
@@ -237,7 +240,7 @@ inherited ViewOrderList: TViewOrderList
       TargetBindSource = BSWhere
       ViewContextBy = vcByDefaultViewContextProvider
     end
-    object acWherePersist: TioBSPersistencePersist
+    object acWherePersist: TioBSPersistencePersist [6]
       Category = 'iORM-BSPersistence'
       Text = 'acWherePersist'
       TargetBindSource = BSWhere

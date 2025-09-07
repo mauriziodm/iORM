@@ -20,8 +20,11 @@ object ViewBaseForList: TViewBaseForList
       TextSettings.FontColor = claAliceblue
     end
     object ButtonAdd: TSpeedButton
+      Action = acAppend
       Align = Right
+      Enabled = True
       StyledSettings = [Family, Size, Style]
+      ImageIndex = -1
       Position.X = 360.000000000000000000
       Size.Width = 40.000000000000000000
       Size.Height = 40.000000000000000000
@@ -137,6 +140,12 @@ object ViewBaseForList: TViewBaseForList
   object ActionList1: TActionList
     Left = 203
     Top = 163
+    object acAppend: TioBSAppend
+      Category = 'iORM - BS'
+      Text = 'Add'
+      Action_ShowOrSelectAction = acShowOrSelect
+      TargetBindSource = BSMaster
+    end
     object acBack: TioBSCloseQuery
       Category = 'iORM-BS'
       Text = 'Back'

@@ -33,6 +33,7 @@ type
     BSWhere: TioPrototypeBindSourceMaster;
     acBuildWhere: TioBSBuildWhere;
     acClearWhere: TioBSClearWhere;
+    acAppend: TioBSAppend;
     procedure ListViewDblClick(Sender: TObject);
   private
   public
