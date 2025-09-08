@@ -21,6 +21,12 @@
         <Projects Include="iORM_FMX_DT.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="iORM_FMX_FRX_RT.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="iORM_FMX_FRX_DT.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -83,14 +89,32 @@
     <Target Name="iORM_FMX_DT:Make">
         <MSBuild Projects="iORM_FMX_DT.dproj" Targets="Make"/>
     </Target>
+    <Target Name="iORM_FMX_FRX_RT">
+        <MSBuild Projects="iORM_FMX_FRX_RT.dproj"/>
+    </Target>
+    <Target Name="iORM_FMX_FRX_RT:Clean">
+        <MSBuild Projects="iORM_FMX_FRX_RT.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="iORM_FMX_FRX_RT:Make">
+        <MSBuild Projects="iORM_FMX_FRX_RT.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="iORM_FMX_FRX_DT">
+        <MSBuild Projects="iORM_FMX_FRX_DT.dproj"/>
+    </Target>
+    <Target Name="iORM_FMX_FRX_DT:Clean">
+        <MSBuild Projects="iORM_FMX_FRX_DT.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="iORM_FMX_FRX_DT:Make">
+        <MSBuild Projects="iORM_FMX_FRX_DT.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="iORM_CORE_RT;iORM_CORE_DT;iORM_VCL_RT;iORM_VCL_DT;iORM_FMX_RT;iORM_FMX_DT"/>
+        <CallTarget Targets="iORM_CORE_RT;iORM_CORE_DT;iORM_VCL_RT;iORM_VCL_DT;iORM_FMX_RT;iORM_FMX_DT;iORM_FMX_FRX_RT;iORM_FMX_FRX_DT"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="iORM_CORE_RT:Clean;iORM_CORE_DT:Clean;iORM_VCL_RT:Clean;iORM_VCL_DT:Clean;iORM_FMX_RT:Clean;iORM_FMX_DT:Clean"/>
+        <CallTarget Targets="iORM_CORE_RT:Clean;iORM_CORE_DT:Clean;iORM_VCL_RT:Clean;iORM_VCL_DT:Clean;iORM_FMX_RT:Clean;iORM_FMX_DT:Clean;iORM_FMX_FRX_RT:Clean;iORM_FMX_FRX_DT:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="iORM_CORE_RT:Make;iORM_CORE_DT:Make;iORM_VCL_RT:Make;iORM_VCL_DT:Make;iORM_FMX_RT:Make;iORM_FMX_DT:Make"/>
+        <CallTarget Targets="iORM_CORE_RT:Make;iORM_CORE_DT:Make;iORM_VCL_RT:Make;iORM_VCL_DT:Make;iORM_FMX_RT:Make;iORM_FMX_DT:Make;iORM_FMX_FRX_RT:Make;iORM_FMX_FRX_DT:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

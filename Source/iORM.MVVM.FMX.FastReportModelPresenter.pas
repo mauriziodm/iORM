@@ -3,10 +3,10 @@ unit iORM.MVVM.FMX.FastReportModelPresenter;
 interface
 
 uses
-  FMX.Controls,
   System.SysUtils,
   System.Classes,
   Data.DB,
+  FMX.Controls,
 
   FMX.frxClass,
 
@@ -18,7 +18,9 @@ uses
 type
   TioFastReportModelPresenterDataSet = class(TfrxUserDataSet)
   private
+    FRecordCount: integer;
     FModelPresenter: TioModelPresenterCustom;
+    function IsDesignMode: boolean;
     function CheckModelPresenter: Boolean;
     procedure SetModelPresenter(const Value: TioModelPresenterCustom);
   protected
@@ -51,10 +53,6 @@ type
     /// </summary>
     function Eof: Boolean; override;
     /// <summary>
-    ///   Returns True if dataset has field with specified name.
-    /// </summary>
-    function HasField(const AFieldName: String): Boolean;
-    /// <summary>
     ///   Returns records count if DataSet supports it.
     /// </summary>
     function RecordCount: Integer; override;
@@ -67,7 +65,8 @@ type
 implementation
 
 uses
-  iORM.Utilities
+  iORM.Utilities,
+  iORM.CommonTypes
 
   ;
 
@@ -91,33 +90,34 @@ end;
 
 procedure TioFastReportModelPresenterDataSet.Close;
 begin
-  if CheckModelPresenter then
+  if not IsDesignMode and CheckModelPresenter then
     TioModelPresenterAccess(FModelPresenter).Close;
-
-  inherited;
 end;
 
 function TioFastReportModelPresenterDataSet.Eof: Boolean;
 begin
-  if CheckModelPresenter then
-    Result := TioModelPresenterAccess(FModelPresenter).EOF;
-
-  inherited;
+  if not IsDesignMode and CheckModelPresenter then
+    Result := (FRecNo = Succ(RecordCount)) and TioModelPresenterAccess(FModelPresenter).EOF;
 end;
 
 procedure TioFastReportModelPresenterDataSet.First;
 begin
-  if CheckModelPresenter then
-    FModelPresenter.First;
+  FRecNo := 0;
 
-  inherited;
+  if not IsDesignMode and CheckModelPresenter then
+  begin
+    FModelPresenter.First;
+    FRecNo := 1;
+  end;
 end;
 
 function TioFastReportModelPresenterDataSet.GetValue(AFieldName: String): Variant;
 var
   LCurrentObject: TObject;
 begin
-  if CheckModelPresenter then
+  Result := varEmpty;
+
+  if not IsDesignMode and CheckModelPresenter then
   begin
     LCurrentObject := TioModelPresenterAccess(FModelPresenter).Current;
 
@@ -127,28 +127,18 @@ begin
   end;
 end;
 
-function TioFastReportModelPresenterDataSet.HasField(const AFieldName: String): Boolean;
-var
-  LCurrentObject: TObject;
+function TioFastReportModelPresenterDataSet.IsDesignMode: boolean;
 begin
-  if CheckModelPresenter then
-  begin
-    LCurrentObject := TioModelPresenterAccess(FModelPresenter).Current;
-
-    if Assigned(LCurrentObject) then
-      Result := Assigned(TioUtilities.GetRttiProperty(TioUtilities.ClassNameToClassRef(LCurrentObject.ClassName),
-        AFieldName));
-  end
-  else
-    Result := False;
+  Result := csDesigning in ComponentState;
 end;
 
 procedure TioFastReportModelPresenterDataSet.Next;
 begin
-  if CheckModelPresenter then
+  if not IsDesignMode and CheckModelPresenter then
+  begin
     FModelPresenter.Next;
-
-  inherited;
+    Inc(FRecNo);
+  end;
 end;
 
 procedure TioFastReportModelPresenterDataSet.Notification(AComponent: TComponent; Operation: TOperation);
@@ -161,24 +151,25 @@ end;
 
 procedure TioFastReportModelPresenterDataSet.Open;
 begin
-  if CheckModelPresenter then
-    TioModelPresenterAccess(FModelPresenter).Open;
+  FRecNo := 0;
 
-  inherited;
+  if not IsDesignMode and CheckModelPresenter then
+    TioModelPresenterAccess(FModelPresenter).Open;
 end;
 
 procedure TioFastReportModelPresenterDataSet.Prior;
 begin
-  if CheckModelPresenter then
+  if not IsDesignMode and CheckModelPresenter then
+  begin
     FModelPresenter.Prior;
-
-  inherited;
+    Dec(FRecNo);
+  end;
 end;
 
 function TioFastReportModelPresenterDataSet.RecordCount: Integer;
 begin
-  if CheckModelPresenter then
-    FModelPresenter.ItemCount
+  if not IsDesignMode and CheckModelPresenter then
+    Result := FModelPresenter.ItemCount
   else
     Result := 0;
 end;

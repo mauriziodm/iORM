@@ -1,4 +1,4 @@
-package iORM_FMX_FRX;
+package iORM_FMX_FRX_RT;
 
 {$R *.res}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
@@ -38,7 +38,7 @@ requires
   FMXfs28,
   FMXfsDB28,
   FMXfsTee28,
-  iORM_RT;
+  iORM_FMX_RT;
 
 contains
   iORM.MVVM.FMX.FastReportModelPresenter in '..\..\Source\iORM.MVVM.FMX.FastReportModelPresenter.pas';

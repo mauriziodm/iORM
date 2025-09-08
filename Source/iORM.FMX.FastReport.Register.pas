@@ -1,4 +1,4 @@
-unit iORM.FastReport.FMX.Register;
+unit iORM.FMX.FastReport.Register;
 
 interface
 
@@ -20,9 +20,8 @@ uses
 
 procedure Register;
 begin
-  RegisterComponents('iORM - FastReport', [TioFastReportModelPresenterDataset]);
-
   GroupDescendentsWith(TioFastReportModelPresenterDataset, FMX.Controls.TControl);
+  RegisterComponents('iORM - FastReport', [TioFastReportModelPresenterDataset]);
 end;
 
 

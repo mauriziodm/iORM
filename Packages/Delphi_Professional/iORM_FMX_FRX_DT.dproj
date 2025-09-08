@@ -115,7 +115,7 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <DCC_UsePackage>rtl;iORM_FMX_FRX;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_UsePackage>rtl;iORM_FMX_FRX;iORM_FMX_FRX_RT;$(DCC_UsePackage)</DCC_UsePackage>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
         <DCC_UsePackage>rtl;$(DCC_UsePackage)</DCC_UsePackage>
@@ -134,7 +134,7 @@
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <DCC_Description>iORM FastReport Firemonkey Design-Time Library</DCC_Description>
+        <DCC_Description>iORM FMX FastReport Design-Time</DCC_Description>
         <DllSuffix>$(Auto)</DllSuffix>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
@@ -148,8 +148,8 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="rtl.dcp"/>
-        <DCCReference Include="iORM_FMX_FRX.dcp"/>
-        <DCCReference Include="..\..\Source\iORM.FastReport.FMX.Register.pas"/>
+        <DCCReference Include="iORM_FMX_FRX_RT.dcp"/>
+        <DCCReference Include="..\..\Source\iORM.FMX.FastReport.Register.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

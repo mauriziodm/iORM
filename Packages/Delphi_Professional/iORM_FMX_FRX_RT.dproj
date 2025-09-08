@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{C354D2BE-BA0E-4C22-B0CB-551520E46ED8}</ProjectGuid>
-        <MainSource>iORM_FMX_FRX.dpk</MainSource>
+        <MainSource>iORM_FMX_FRX_RT.dpk</MainSource>
         <ProjectVersion>19.5</ProjectVersion>
         <FrameworkType>None</FrameworkType>
         <Base>True</Base>
@@ -66,7 +66,7 @@
         <GenPackage>true</GenPackage>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
         <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
-        <SanitizedProjectName>iORM_FMX_FRX</SanitizedProjectName>
+        <SanitizedProjectName>iORM_FMX_FRX_RT</SanitizedProjectName>
         <RuntimeOnlyPackage>true</RuntimeOnlyPackage>
         <DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
         <DCC_Define>ioDelphiProfessional;$(DCC_Define)</DCC_Define>
@@ -129,7 +129,7 @@
         <DCCReference Include="FMXfs28.dcp"/>
         <DCCReference Include="FMXfsDB28.dcp"/>
         <DCCReference Include="FMXfsTee28.dcp"/>
-        <DCCReference Include="iORM_RT.dcp"/>
+        <DCCReference Include="iORM_FMX_RT.dcp"/>
         <DCCReference Include="..\..\Source\iORM.MVVM.FMX.FastReportModelPresenter.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
@@ -155,7 +155,7 @@
                     <Excluded_Packages Name="C:\Program Files (x86)\FastReport VCL Professional\LibD28\dclfsIBX28.bpl">FastScript 1.9 IBX Components</Excluded_Packages>
                 </Excluded_Packages>
                 <Source>
-                    <Source Name="MainSource">iORM_FMX_FRX.dpk</Source>
+                    <Source Name="MainSource">iORM_FMX_FRX_RT.dpk</Source>
                 </Source>
             </Delphi.Personality>
             <Deployment Version="4">
@@ -174,9 +174,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="..\..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\iORM_FMX_FRX280.bpl" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="..\..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\iORM_FMX_FRX_RT280.bpl" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>iORM_FMX_FRX.bpl</RemoteName>
+                        <RemoteName>iORM_FMX_FRX_RT.bpl</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

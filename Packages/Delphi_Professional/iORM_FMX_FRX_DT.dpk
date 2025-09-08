@@ -25,16 +25,16 @@ package iORM_FMX_FRX_DT;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'iORM FastReport Firemonkey Design-Time Library'}
+{$DESCRIPTION 'iORM FMX FastReport Design-Time'}
 {$LIBSUFFIX AUTO}
 {$DESIGNONLY}
 {$IMPLICITBUILD OFF}
 
 requires
   rtl,
-  iORM_FMX_FRX;
+  iORM_FMX_FRX_RT;
 
 contains
-  iORM.FastReport.FMX.Register in '..\..\Source\iORM.FastReport.FMX.Register.pas';
+  iORM.FMX.FastReport.Register in '..\..\Source\iORM.FMX.FastReport.Register.pas';
 
 end.
