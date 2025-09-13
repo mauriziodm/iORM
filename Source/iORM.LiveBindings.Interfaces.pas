@@ -179,10 +179,6 @@ type
     function GetSelectorFor: IioBindSource;
     procedure SetSelectorFor(const ATargetBindSource: IioBindSource);
     property SelectorFor: IioBindSource read GetSelectorFor write SetSelectorFor; // published: Master
-    // SelectionFrom
-    procedure SetSelectionFrom(const ABindSource: IioBindSource);
-    function GetSelectionFrom: IioBindSource;
-    property SelectionFrom: IioBindSource read GetSelectionFrom write SetSelectionFrom;
     // IsInterfacePresenting
     function GetIsInterfacePresenting: Boolean;
     property IsInterfacePresenting: Boolean read GetIsInterfacePresenting; // public: Nascondere? Serve all'esterno?

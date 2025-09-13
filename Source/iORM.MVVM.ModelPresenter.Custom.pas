@@ -64,7 +64,6 @@ type
     FETMfor: IioMasterBindSource;
     // Selectors
     FSelectorFor: IioBindSource;
-    [weak] FSelectionFrom: IioBindSource;
     FOnReceiveSelectionCloneObject: Boolean;
     FOnReceiveSelectionFreeObject: Boolean;
     // Questà è una collezione dove eventuali ModelPresenter di dettaglio
@@ -183,9 +182,6 @@ type
     // SelectorFor
     procedure SetSelectorFor(const ATargetBindSource: IioBindSource);
     function GetSelectorFor: IioBindSource;
-    // SelectionFrom
-    procedure SetSelectionFrom(const Value: IioBindSource);
-    function GetSelectionFrom: IioBindSource;
     // AuthorizationContext
     // NB: Non usare la proprietà AuthorizationContext per usi interni, usare sempre "_InternalGetAuthorizationContext" perchè
     //      tiene conto anche dell'eventuale event-handler
@@ -802,11 +798,6 @@ begin
   Result := FPaging;
 end;
 
-function TioModelPresenterCustom.GetSelectionFrom: IioBindSource;
-begin
-  Result := FSelectionFrom;
-end;
-
 function TioModelPresenterCustom.GetSelectorFor: IioBindSource;
 begin
   Result := FSelectorFor;
@@ -1282,27 +1273,9 @@ begin
   raise EioGenericException.Create(ClassName, 'SetPaging', 'This property "Paging" is not writable');
 end;
 
-procedure TioModelPresenterCustom.SetSelectionFrom(const Value: IioBindSource);
-begin
-  FSelectionFrom := Value;
-end;
-
 procedure TioModelPresenterCustom.SetSelectorFor(const ATargetBindSource: IioBindSource);
 begin
-  if ATargetBindSource <> FSelectorFor then
-  begin
-    // Se era già assegnato  azzera la proprietà SelectionFrom dal BS target della selezione
-    if Assigned(FSelectorFor) then
-      FSelectorFor.SelectionFrom := nil;
-    // Assegna il nuovo valore
-    FSelectorFor := ATargetBindSource;
-    // Assegna se stesso alla proprietà SelectionFrom del BS target della selezione
-    //  perchè per la gestione delle standard action con la parte di autorizzazione
-    //  mi serviva anche un riferimento all'indietro per risalire dal Target al Source
-    //  della selezione
-    if Assigned(ATargetBindSource) then
-      ATargetBindSource.SelectionFrom := Self
-  end;
+  FSelectorFor := ATargetBindSource;
 end;
 
 procedure TioModelPresenterCustom.SetTypeAlias(const Value: String);

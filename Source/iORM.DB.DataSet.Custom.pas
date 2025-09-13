@@ -66,7 +66,6 @@ type
     FETMfor: IioMasterBindSource;
     // Selectors
     FSelectorFor: IioBindSource;
-    [weak] FSelectionFrom: IioBindSource;
     FOnReceiveSelectionCloneObject: Boolean;
     FOnReceiveSelectionFreeObject: Boolean;
     // Questà è una collezione dove eventuali DataSet di dettaglio
@@ -170,9 +169,6 @@ type
     // SelectorFor
     procedure SetSelectorFor(const ATargetBindSource: IioBindSource);
     function GetSelectorFor: IioBindSource;
-    // SelectionFrom
-    procedure SetSelectionFrom(const Value: IioBindSource);
-    function GetSelectionFrom: IioBindSource;
     // AuthorizationContext
     // NB: Non usare la proprietà AuthorizationContext per usi interni, usare sempre "_InternalGetAuthorizationContext" perchè
     //      tiene conto anche dell'eventuale event-handler
@@ -652,11 +648,6 @@ begin
   Result := FPaging;
 end;
 
-function TioDataSetCustom.GetSelectionFrom: IioBindSource;
-begin
-  Result := FSelectionFrom;
-end;
-
 function TioDataSetCustom.GetSelectorFor: IioBindSource;
 begin
   Result := FSelectorFor;
@@ -1012,16 +1003,9 @@ begin
   raise EioGenericException.Create(ClassName, 'SetPaging', 'This property "Paging" is not writable');
 end;
 
-procedure TioDataSetCustom.SetSelectionFrom(const Value: IioBindSource);
-begin
-  FSelectionFrom := Value;
-end;
-
 procedure TioDataSetCustom.SetSelectorFor(const ATargetBindSource: IioBindSource);
 begin
   FSelectorFor := ATargetBindSource;
-  // set a reverse reference used by CoBOL system (COmbo-Box Object Lookup)
-  ATargetBindSource.SelectionFrom := Self;
 end;
 
 procedure TioDataSetCustom.SetTypeAlias(const Value: String);
