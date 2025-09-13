@@ -149,14 +149,15 @@ object OrderForm: TOrderForm
     ParentBackground = False
     ParentFont = False
     TabOrder = 0
-    ExplicitWidth = 764
+    ExplicitLeft = 3
+    ExplicitTop = 1
     DesignSize = (
       768
       40)
     object LabelTitle: TLabel
       Left = 0
       Top = 7
-      Width = 724
+      Width = 684
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -201,7 +202,7 @@ object OrderForm: TOrderForm
       ExplicitLeft = 712
     end
     object ButtonETM: TSpeedButton
-      Left = 112
+      Left = 72
       Top = 0
       Width = 85
       Height = 40
@@ -220,22 +221,13 @@ object OrderForm: TOrderForm
       Top = 5
       Width = 249
       Height = 29
-      DataField = 'ID'
-      DataSource = SourceCustomer
+      DataField = 'Customer:TCustomer'
+      DataSource = SourceOrder
       KeyField = 'ID'
       ListField = 'ID; Name'
       ListFieldIndex = 1
       ListSource = SourceCustomers
       TabOrder = 0
-    end
-    object Button1: TButton
-      Left = 192
-      Top = 8
-      Width = 75
-      Height = 25
-      Caption = 'Button1'
-      TabOrder = 1
-      OnClick = Button1Click
     end
   end
   object PanelBottom: TPanel
@@ -676,6 +668,9 @@ object OrderForm: TOrderForm
       FieldName = 'OrderState'
       Size = 100
     end
+    object DSOrderCustomer: TIntegerField
+      FieldName = 'Customer:TCustomer'
+    end
   end
   object SourceOrder: TDataSource
     DataSet = DSOrder
@@ -796,7 +791,6 @@ object OrderForm: TOrderForm
   object DSCustomers: TioDataSetMaster
     AsDefault = False
     TypeName = 'TCustomer'
-    SelectorFor = DSCustomer
     Paging.CurrentPageOfFormat = '%d/%d'
     Left = 522
     Top = 368

@@ -50,8 +50,8 @@ type
     class function ObjectAsIioViewModel(const AObj: Tobject): IioViewModel; static;
     class function IsAnInterface<T>: Boolean; static;
     class function IsAnInterfaceTypeName(const ATypeName: String): Boolean; static;
-    class function CastObjectToGeneric<T>(const AObj: Tobject): T; overload; static;
-    class function CastObjectToGeneric<T>(const AObj: Tobject; IID: TGUID): T; overload; static;
+    class function CastObjectToGeneric<T>(const AObj: Tobject): T; static;
+    class function CastObjectToGeneric_ByIID<T>(const AObj: Tobject; IID: TGUID): T; static;
     class function GenericToTObject<T>(const AInstance: T): TObject;
     class function GenericToString<T>(const AQualified: Boolean = False): String; static;
     class function ClassRefToRttiType(const AClassRef: TioClassRef): TRttiInstanceType; static;
@@ -107,6 +107,7 @@ type
     // ResolvePropertyPath
     class procedure ResolveChildPropertyPath_SplitPropNameAndPath(const AQualifiedPropertyPath: String; out OPath: TStrings; out OPropName: String); static;
     class function ResolveChildPropertyPath_GetFinalObj(const ARootObj: Tobject; const AChildObjPath: TStrings): Tobject; static;
+    class function ResolveChildPropertyPath_GetFinalObj_ByStringPath(const ARootObj: Tobject; const AChildObjPath: String): Tobject; static;
     class function ResolveChildPropertySplitPath_GetValue(const ARootObj: Tobject; const AChildObjPath: TStrings; const AFinalPropName: String): TValue; static;
     class procedure ResolveChildPropertySplitPath_SetValue(const ARootObj: Tobject; const AChildObjPath: TStrings; const AFinalPropName: String;
       const AValue: TValue); static;
@@ -143,7 +144,7 @@ begin
   Result := (ABlindLevel AND BL_BIT_DETECT_OBJ_EXISTS) <> 0;
 end;
 
-class function TioUtilities.CastObjectToGeneric<T>(const AObj: Tobject; IID: TGUID): T;
+class function TioUtilities.CastObjectToGeneric_ByIID<T>(const AObj: Tobject; IID: TGUID): T;
 begin
   if not Assigned(AObj) then
     Exit(TValue.Empty.AsType<T>);
@@ -164,7 +165,7 @@ end;
 
 class function TioUtilities.CastObjectToGeneric<T>(const AObj: Tobject): T;
 begin
-  Result := CastObjectToGeneric<T>(AObj, GUID_NULL);
+  Result := CastObjectToGeneric_ByIID<T>(AObj, GUID_NULL);
 end;
 
 class function TioUtilities.ClassNameToClassRef(const AClassName: String): TioClassRef;
@@ -611,6 +612,19 @@ begin
     if not Assigned(Result) then
       Exit(nil);
     Result := _GetChildObject(Result, LCurrPropName);
+  end;
+end;
+
+class function TioUtilities.ResolveChildPropertyPath_GetFinalObj_ByStringPath(const ARootObj: Tobject; const AChildObjPath: String): Tobject;
+var
+  LChildObjPath: TStrings;
+begin
+  LChildObjPath := TStringList.Create(#0, '.', [soStrictDelimiter]);
+  try
+    LChildObjPath.DelimitedText := AChildObjPath;
+    Result := ResolveChildPropertyPath_GetFinalObj(ARootObj, LChildObjPath);
+  finally
+    LChildObjPath.Free;
   end;
 end;
 

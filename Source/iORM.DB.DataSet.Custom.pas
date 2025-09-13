@@ -209,7 +209,7 @@ type
     function GetLoadType: TioLoadType;
     // Public properties
     property Editing: Boolean read GetEditing; // public: Nascondere? Oppure rivedere per SaveState/Persist/RevertState?
-    property IsInterfacePresenting: Boolean read GetIsInterfacePresenting; // public: Nascondere? Serve all'esterno?
+    property IsInterfacePresenting: Boolean read GetIsInterfacePresenting; // public
     property State: TBindSourceAdapterState read GetState; // public: Nascondere? Oppure rivedere per SaveState/Persist/RevertState?
     property Where: IioWhere read GetWhere write SetWhere; // public: Master
     property ItemCount: Integer read GetCount; // Public: Master+Detail

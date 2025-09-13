@@ -162,9 +162,9 @@ type
     // the bind source adapter holding the data
     FBindSourceAdapter: IioActiveBindSourceAdapter;
     // Methods
+    function _IsValidRecNo: Boolean;
     function Get_Version: String;
     procedure ValueToBuffer<T>(var AValue: TValue; const AField: TField; var ABuffer: TArray<System.Byte>; const ANativeFormat: Boolean);
-    function _IsValidRecNo: Boolean;
   protected
     function AsIoBindSource: IioBindSource; virtual; abstract;
     function CheckAdapter: Boolean;
@@ -234,7 +234,6 @@ type
 
   TioFullPathPropertyReadWrite = class
   strict private
-    class var FLookingUp: Boolean;
     class function _ExtractPropName(var AFullPathPropName: String): String;
     class function _ResolvePath(var AOutObj: TObject; var AOutRttiProperty: TRttiProperty; AFullPathPropName: String): Boolean;
     class function _GetValueForBSProp(const ADataSet: TioBSABaseDataSet; APropName: String): TValue;
@@ -829,11 +828,11 @@ end;
 
 procedure TioBSABaseDataSet.SetFieldData(Field: TField; Buffer: TValueBuffer);
 var
-  LValue: TValue;
   LDateTime: TDateTime;
   LDateTimeRec: TDateTimeRec;
   LTimeStamp: TSqlTimeStamp;
   LTempValueBuffer: TValueBuffer;
+  LValue: TValue;
 begin
   // If empty then exit
   if FBindSourceAdapter.ItemCount = 0 then
@@ -908,9 +907,19 @@ begin
       LValue := TEncoding.Unicode.GetString(Buffer).TrimRight;
     // LValue := WideString(pWideChar(Buffer));
   end;
+  // S.O.LO (Smart-Object-LOokup system): If the field name contains object lookup info then get the new detail lookup object into the LValue
+  if LValue.Kind = tkInteger then
+    LValue := TioCommonBSBehavior.DetailObjLookup_ByTypeName(Self as IioBindSource, Field.FieldName, LValue);
+  if LValue.Kind = tkInteger then
+    LValue := TioCommonBSBehavior.DetailObjLookup_ByLookupBindSource(Self as IioBindSource, Field.FieldName, LValue);
   // Set Property, Object, Value:
   // Even if the property is of a child object, even multilevel, it resolves the path and set the value
   TioFullPathPropertyReadWrite.SetValue(Self, FBindSourceAdapter.Current, Field.FieldName, LValue);
+  // S.O.LO (Smart-Object-LOokup system):
+  //  If LValue is of type Class or Interface then it means that we are in the context of a S.O.LO operation
+  //   so it forces a refresh of the BindSource so that it takes into account the new detail object.
+  if LValue.Kind in [tkClass, tkInterface] then
+    FBindSourceAdapter.DetailAdaptersContainer.SetMasterObject(FBindSourceAdapter.Current);
   // Set modified
   SetModified(True);
   // NB: Mauri 03/03/2020 - Aggiungendo queste due righe, oltre ad aver eliminato la condizione
@@ -1032,6 +1041,12 @@ begin
   // Get Property, Object, Value:
   // Even if the property is of a child object, even multilevel, it resolves the path and returns the value
   LValue := TioFullPathPropertyReadWrite.GetValue(Self, FBindSourceAdapter.Items[LRecordIndex], Field);
+  // S.O.LO (Smart Object LOokup system)
+  //  Se il campo è relativo a una proprietà di un tipo oggetto o interfaccia con relazione BelongsTo ed è di tipo intero (il campo)
+  LValue := TioCommonBSBehavior.DetailObjLookup_DetailObjID(Field.FieldName, LValue);
+  // Se il TValue non ha un valore allora imposta la risposta come campo NULL
+  if LValue.IsEmpty then
+    Exit(False);
   // ---------- DATA FROM THE OBJECTS ----------
   // Move the value to the buffer
   case Field.DataType of
@@ -1441,6 +1456,9 @@ var
   LMidPathProperty: IioProperty;
 begin
   Result := False;
+  // Clear che FullPathPropName from lookup info
+  TioCommonBSBehavior.DetailObjLookup_ClearLookupInfoFromFieldName(AFullPathPropName);
+  // Extract the first PropName in the FullPathPropName
   LPropName := _ExtractPropName(AFullPathPropName);
   // If we are in the middle of the path (we are not at the final leaf property)
   // then it recursively calls itself by continuing in the path through the mapped prop/fields...
@@ -1565,7 +1583,6 @@ end;
 
 class procedure TioFullPathPropertyReadWrite.SetValue(const ADataSet: TioBSABaseDataSet; AObj: TObject; const AFullPathPropName: String; const AValue: TValue);
 var
-  LBindSource: IioBindSource;
   LRttiProperty: TRttiProperty;
 begin
   // NB: If it's a property relative to the BindSource then raise an exception because
@@ -1579,29 +1596,7 @@ begin
   if not _ResolvePath(AObj, LRttiProperty, AFullPathPropName) then
     raise EioGenericException.Create(Self.ClassName, 'SetValue',
       Format('I am unable to resolve the property path "%s".'#13#13'It could be that one of the objects along the way is nil.', [AFullPathPropName]));
-  // Se la proprietà corrente è l'ID dell'oggetto e la proprietà SelectionFrom del BindSource è assegnata allora significa che il BindSource
-  //  è il target di un Selector; in questo contesto faccio in modo di invocare il metodo SelectCurrent del BindSOurce puntato da SelectionFrom
-  //  realizzando in pratica un sistema di lookup automatico dell'intero oggetto.
-  //  NB: Contrariamente a come ho dovuto fare nel metodo TioPropertyValueWriter<T>.SetValue (LiveBindings) qui non ho dovuto usare un Timer
-  //        e qauesto è una buonissima cosa anche perchè così non ovrebbe avere problemi nemmeno con uniGUI
-  //  NB: Ho dovuto mettere il flag FLookingUp perchè altrimenti andava in deadlock
-  //  NB: Questa funzionalità prende il nome di "Selector Auto Lookup"
-  LBindSource := ADataSet.AsIoBindSource;
-  if Assigned(LBindSource.SelectionFrom) and TioUtilities.IsIdPropByName(AObj.ClassName, LRttiProperty.Name) then
-  begin
-    if not FLookingUp then
-    begin
-      FLookingUp := True;
-      try
-        LBindSource.SelectionFrom.Locate('ID', AValue.AsInteger);
-        LBindSource.SelectionFrom.SelectCurrent;
-      finally
-        FLookingUp := False;
-      end;
-    end;
-  end
   // Enumeration type
-  else
   if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
   begin
     // Enumeration binded as string
@@ -1613,7 +1608,7 @@ begin
   end
   // Other types
   else
-    LRttiProperty.SetValue(AObj, AValue)
+    LRttiProperty.SetValue(AObj, AValue);
 end;
 
 end.

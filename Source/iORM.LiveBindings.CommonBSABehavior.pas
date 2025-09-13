@@ -668,24 +668,7 @@ begin
   LRttiProperty := LRttiType.GetProperty(TioUtilities.ExtractPropertyName(FField.MemberName));
   if not Assigned(LRttiProperty) then
     exit;
-  // Se la proprietà corrente è l'ID dell'oggetto e la proprietà SelectionFrom del BindSource è assegnata allora significa che il BindSource
-  //  è il target di un Selector; in questo contesto faccio in modo di invocare il metodo SelectCurrent del BindSOurce puntato da SelectionFrom
-  //  realizzando in pratica un sistema di lookup automatico dell'intero oggetto
-  //  NB: HO dovuto usare un Timer perchè altrimenti dava problemi
-  //  NB: Questa funzionalità prende il nome di "Selector Auto Lookup"
-  if Assigned(FBindSource) and Assigned(FBindSource.SelectionFrom) and TioUtilities.IsIdPropByName(LObject.ClassName, LRttiProperty.Name) then
-  begin
-    LLookupID := TValue.From<T>(AValue).AsInteger;
-    TioAnonymousTimer.Create(1,
-      function: Boolean
-      begin
-        FBindSource.SelectionFrom.Locate('ID', LLookupID);
-        FBindSource.SelectionFrom.SelectCurrent;
-      end);
-    Exit;
-  end
   // Enumeration type
-  else
   if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
   begin
     // Enumeration binded as string

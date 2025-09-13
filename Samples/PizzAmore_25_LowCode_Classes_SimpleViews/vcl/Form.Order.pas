@@ -84,12 +84,11 @@ type
     DSCustomersID: TIntegerField;
     DSCustomersName: TStringField;
     ClientDataSet1: TClientDataSet;
-    Button1: TButton;
+    DSOrderCustomer: TIntegerField;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure DBCtrlGridPizzasDblClick(Sender: TObject);
     procedure DSOrderReceiveSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
-    procedure Button1Click(Sender: TObject);
   private
   public
   end;
@@ -101,14 +100,6 @@ uses
 
 {$R *.dfm}
 
-procedure TOrderForm.Button1Click(Sender: TObject);
-begin
-  if DSCustomer.Active then
-    io.ShowMessage('DSCUstomer is active')
-  else
-    io.ShowMessage('DSCUstomer is NOT active');
-end;
-
 procedure TOrderForm.DBCtrlGridPizzasDblClick(Sender: TObject);
 begin
   acSelectPizza.Execute;
@@ -116,9 +107,12 @@ end;
 
 procedure TOrderForm.DSOrderReceiveSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
 begin
-  DSOrder.CurrentAs<TOrder>.AddPizza(ASelected as TPizza);
-  DSOrder.Refresh;
-  ADone := True;
+  if ASelected is TPizza then
+  begin
+    DSOrder.CurrentAs<TOrder>.AddPizza(ASelected as TPizza);
+    DSOrder.Refresh;
+    ADone := True;
+  end;
 end;
 
 procedure TOrderForm.FormClose(Sender: TObject; var Action: TCloseAction);

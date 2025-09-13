@@ -95,6 +95,7 @@ type
     function GetName: String;
     function IsActive: Boolean;
     function IsFromBSLoadType: Boolean;
+    function DataObject: TObject;
     procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
     procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
     procedure SetMasterPropertyName(const Value: String);
@@ -182,6 +183,9 @@ type
     procedure SetSelectionFrom(const ABindSource: IioBindSource);
     function GetSelectionFrom: IioBindSource;
     property SelectionFrom: IioBindSource read GetSelectionFrom write SetSelectionFrom;
+    // IsInterfacePresenting
+    function GetIsInterfacePresenting: Boolean;
+    property IsInterfacePresenting: Boolean read GetIsInterfacePresenting; // public: Nascondere? Serve all'esterno?
     // Published Events: persistence concurrency conflicts
     function GetOnDeleteConflictException: TioBSOnPersistenceConflictExceptionEvent;
     function GetOnInsertConflictException: TioBSOnPersistenceConflictExceptionEvent;

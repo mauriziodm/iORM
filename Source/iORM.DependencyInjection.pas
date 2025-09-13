@@ -2391,7 +2391,7 @@ end;
 function TioDIResolver<TI>.Get: TI;
 begin
   try
-    Result := TioUtilities.CastObjectToGeneric<TI>(_InternalGet, _ImplementersItem.InterfaceGUID);
+    Result := TioUtilities.CastObjectToGeneric_ByIID<TI>(_InternalGet, _ImplementersItem.InterfaceGUID);
   finally
     Free;
   end;
