@@ -149,8 +149,7 @@ object OrderForm: TOrderForm
     ParentBackground = False
     ParentFont = False
     TabOrder = 0
-    ExplicitLeft = 3
-    ExplicitTop = 1
+    ExplicitWidth = 764
     DesignSize = (
       768
       40)

@@ -287,8 +287,8 @@ inherited ViewOrder: TViewOrder
       TabOrder = 1
       RowCount = 0
       Options = [AlternatingRowBackground, Editing, ColumnResize, ColumnMove, ColLines, RowLines, Tabs, Header, HeaderClick, AutoDisplacement]
-      Viewport.Width = 401.000000000000000000
-      Viewport.Height = 335.000000000000000000
+      Viewport.Width = 397.000000000000000000
+      Viewport.Height = 310.000000000000000000
     end
   end
   inherited ActionList1: TActionList
@@ -344,6 +344,12 @@ inherited ViewOrder: TViewOrder
         Name = 'GrandTotal'
         FieldType = ftCurrency
         Generator = 'Currency'
+        ReadOnly = False
+      end
+      item
+        Name = 'Customer'
+        FieldType = ftInteger
+        Generator = 'Integers'
         ReadOnly = False
       end>
     OnReceiveSelectionObject = BSMasterReceiveSelectionObject
@@ -491,13 +497,6 @@ inherited ViewOrder: TViewOrder
       FillHeaderExpressions = <>
       FillBreakGroups = <>
     end
-    object LinkControlToField7: TLinkControlToField
-      Category = 'Quick Bindings'
-      DataSource = BSCustomer
-      FieldName = 'ID'
-      Control = EditCustomerID
-      Track = False
-    end
     object LinkFillControlToField: TLinkFillControlToField
       Category = 'Quick Bindings'
       DataSource = BSCustomer
@@ -511,6 +510,13 @@ inherited ViewOrder: TViewOrder
       FillExpressions = <>
       FillHeaderExpressions = <>
       FillBreakGroups = <>
+    end
+    object LinkControlToField7: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSMaster
+      FieldName = 'Customer'
+      Control = EditCustomerID
+      Track = False
     end
   end
   object BSCustomers: TioPrototypeBindSourceMaster

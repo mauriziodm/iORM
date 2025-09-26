@@ -53,9 +53,9 @@ type
     BSCustomers: TioPrototypeBindSourceMaster;
     CBCustomer: TComboBox;
     EditCustomerID: TEdit;
-    LinkControlToField7: TLinkControlToField;
     LinkFillControlToField: TLinkFillControlToField;
     acDeleteRow: TioBSDelete;
+    LinkControlToField7: TLinkControlToField;
     procedure BSMasterReceiveSelectionObject(const ASender: TObject; var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
   private
   public
