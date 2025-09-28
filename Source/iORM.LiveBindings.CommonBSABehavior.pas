@@ -143,7 +143,8 @@ implementation
 
 uses iORM.Context.Map.Interfaces, iORM.Attributes, System.TypInfo, System.SysUtils, iORM.Utilities, iORM.Exceptions, iORM.Context.Container,
   iORM.Context.Factory, iORM.LiveBindings.BSPersistence,
-  iORM.LiveBindings.CommonBSAPaging, iORM, iORM.Abstraction;
+  iORM.LiveBindings.CommonBSAPaging, iORM, iORM.Abstraction,
+  iORM.LiveBindings.CommonBSBehavior, iORM.RttiContext.Factory;
 
 { TioCommonBSABehavior }
 
@@ -353,28 +354,39 @@ begin
                 LCollectionEditorField := CreateRttiPropertyField<Int64>(LProperty, ABindSourceAdapter, AGetMemberObject, mtInteger, APath + LProperty.Name);
             tkClass:
               begin
-                if LProperty.PropertyType.IsInstance then
-                begin
-                  LInstance := LProperty.PropertyType.AsInstance;
-                  while LInstance <> nil do
-                  begin
-                    LAncestor := LInstance.Name;
-                    if LAncestor = sTStrings then
-                      break;
-                    if LAncestor = sTPersistent then
-                      break;
-                    LInstance := LInstance.BaseType;
-                  end;
-                end;
-                if LAncestor = sTStrings then
-                  LCollectionEditorField := CreateRttiObjectPropertyField<TObject>(LProperty, ABindSourceAdapter, AGetMemberObject, mtMemo,
-                    APath + LProperty.Name)
-                else if LAncestor = sTPersistent then
-                  LCollectionEditorField := CreateRttiObjectPropertyField<TObject>(LProperty, ABindSourceAdapter, AGetMemberObject, mtBitmap,
-                    APath + LProperty.Name)
+                // S.O.LO (Smart-Object-LOokup system): Se la proprietà è di tipo classe e su di essa insiste
+                //  una relazione BelongsTo/AsOne allora la mappa come Integer in modo da bindare il suo ID come intero
+                if TioUtilities.HasBelongsToOrHasOneRelation(AType.Name, LProperty.Name) then
+                  LCollectionEditorField := CreateRttiPropertyField<Int32>(LProperty, ABindSourceAdapter, AGetMemberObject, mtInteger,
+                      APath + LProperty.Name)
+                // Altrimenti cerca di risalire alla classe capostipite fermandosi, a seconda dei casi, a TStrings, TPersistent o TObject per poi
+                //  "mappare" a un campo memo (mtMemo) nel caso di una TStrings, Bitmap (mtBitmap) nel caso di TPersistence o semplicemente
+                //  TObject (mtObject) nel caso di una normale entity
                 else
-                  LCollectionEditorField := CreateRttiObjectPropertyField<TObject>(LProperty, ABindSourceAdapter, AGetMemberObject, mtObject,
-                    APath + LProperty.Name)
+                begin
+                  if LProperty.PropertyType.IsInstance then
+                  begin
+                    LInstance := LProperty.PropertyType.AsInstance;
+                    while LInstance <> nil do
+                    begin
+                      LAncestor := LInstance.Name;
+                      if LAncestor = sTStrings then
+                        break;
+                      if LAncestor = sTPersistent then
+                        break;
+                      LInstance := LInstance.BaseType;
+                    end;
+                  end;
+                  if LAncestor = sTStrings then
+                    LCollectionEditorField := CreateRttiObjectPropertyField<TObject>(LProperty, ABindSourceAdapter, AGetMemberObject, mtMemo,
+                      APath + LProperty.Name)
+                  else if LAncestor = sTPersistent then
+                    LCollectionEditorField := CreateRttiObjectPropertyField<TObject>(LProperty, ABindSourceAdapter, AGetMemberObject, mtBitmap,
+                      APath + LProperty.Name)
+                  else
+                    LCollectionEditorField := CreateRttiObjectPropertyField<TObject>(LProperty, ABindSourceAdapter, AGetMemberObject, mtObject,
+                      APath + LProperty.Name)
+                end;
               end;
           end;
           if LCollectionEditorField <> nil then
@@ -580,8 +592,7 @@ end;
 
 function TioPropertyValueReader<T>.GetValue: T;
 var
-  LObject: TObject;
-  LCtxt: TRTTIContext;
+  LObj: TObject;
   LRttiType: TRttiType;
   LRttiProperty: TRttiProperty;
 begin
@@ -597,16 +608,24 @@ begin
   // _CheckVirtualFields;
 
   // Extract the entity instance (exit an empty TValue if not assigned)
-  LObject := FField.GetMemberObjectIntf.GetMemberObject;
-  if not Assigned(LObject) then
+  LObj := FField.GetMemberObjectIntf.GetMemberObject;
+  if not Assigned(LObj) then
     Exit(TValue.Empty.AsType<T>);
-
   // Get the RttiType & RttiProperty
-  LRttiType := LCtxt.GetType(LObject.ClassType);
-  LRttiProperty := LRttiType.GetProperty(TioUtilities.ExtractPropertyName(FField.MemberName));
+  LRttiProperty := TioRttiFactory.GetRttiContext.GetType(LObj.ClassType).AsInstance.GetProperty(TioUtilities.ExtractPropertyName(FField.MemberName));
   // If property not found then return an empty TVAlue
   if LRttiProperty = nil then
-    Result := TValue.Empty.AsType<T>
+  begin
+    Result := TValue.Empty.AsType<T>;
+  end
+  // S.O.LO (Smart-Object-LOokup system): Se la proprietà è di tipo classe e su di essa insiste
+  //  una relazione BelongsTo/AsOne allora la mappa come Integer in modo da bindare il suo ID come intero
+  else
+  if TioUtilities.HasBelongsToOrHasOneRelation(LObj.ClassName, LRttiProperty.Name) then
+  begin
+    Result := TioCommonBSBehavior.DetailObjLookup_DetailObjID_LB(LObj, LRttiProperty).AsType<T>;
+  end
+  // else if it is a regular property...
   else
   begin
     // Enumeration type
@@ -615,14 +634,14 @@ begin
       // Enumeration binded as string
       if TioEnumContainer._Contains(TRttiEnumerationType(LRttiProperty.PropertyType)) then
         Result := TioEnumContainer._OrdinalToStringAsTValue(TRttiEnumerationType(LRttiProperty.PropertyType),
-          LRttiProperty.GetValue(LObject).AsOrdinal).AsType<T>
+          LRttiProperty.GetValue(LObj).AsOrdinal).AsType<T>
       // Enumeration binded as integer
       else
-        Result := T(LRttiProperty.GetValue(LObject).GetReferenceToRawData^);
+        Result := T(LRttiProperty.GetValue(LObj).GetReferenceToRawData^);
     end
     // Other types
     else
-      Result := LRttiProperty.GetValue(LObject).AsType<T>
+      Result := LRttiProperty.GetValue(LObj).AsType<T>
   end;
 end;
 
@@ -645,7 +664,6 @@ end;
 procedure TioPropertyValueWriter<T>.SetValue(const AValue: T);
 var
   LObject: TObject;
-  LCtxt: TRTTIContext;
   LRttiType: TRttiType;
   LRttiProperty: TRttiProperty;
   LValue: TValue;
@@ -664,11 +682,24 @@ begin
     raise EioGenericException.Create(Self.ClassName, 'SetValue',
       Format('I am unable to resolve the property path "%s".'#13#13'It could be that one of the objects along the way is nil.', [FField.MemberName]));
   // Get the RttiType of the entity and the related RttiProperty
-  LRttiType := LCtxt.GetType(LObject.ClassType);
-  LRttiProperty := LRttiType.GetProperty(TioUtilities.ExtractPropertyName(FField.MemberName));
+  LRttiProperty := TioRttiFactory.GetRttiContext.GetType(LObject.ClassType).AsInstance.GetProperty(TioUtilities.ExtractPropertyName(FField.MemberName));
   if not Assigned(LRttiProperty) then
     exit;
+
+
+
+  // S.O.LO (Smart-Object-LOokup system): Se la proprietà è di tipo classe e su di essa insiste
+  //  una relazione BelongsTo/AsOne allora la mappa come Integer in modo da bindare il suo ID come intero
+  if TioUtilities.HasBelongsToOrHasOneRelation(LObject.ClassName, LRttiProperty.Name) then
+  begin
+    LValue := TioCommonBSBehavior.DetailObjLookup_ByTypeName_LB(FBindSource, LRttiProperty, TValue.From<T>(AValue));
+    LRttiProperty.SetValue(LObject, LValue);
+  end
+
+
+
   // Enumeration type
+  else
   if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
   begin
     // Enumeration binded as string
@@ -682,7 +713,10 @@ begin
   end
   // Other types
   else
-    LRttiProperty.SetValue(LObject, TValue.From<T>(AValue));
+  begin
+    LValue := TValue.From<T>(AValue);
+    LRttiProperty.SetValue(LObject, LValue);
+  end;
 end;
 
 { TioBindSourceAdapterSimpleGetMemberObject }

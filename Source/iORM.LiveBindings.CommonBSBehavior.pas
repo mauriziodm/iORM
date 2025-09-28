@@ -94,6 +94,14 @@ type
     class function DetailObjLookup_DetailObjID(const AFullPathFieldName: String; const [ref] AValue: TValue): TValue;
     class function DetailObjLookup_ByLookupBindSource(const ABindSource: IioBindSource; const AFullPathFieldName: String; const [ref] AValue: TValue): TValue;
     class function DetailObjLookup_ByTypeName(const ABindSource: IioBindSource; const AFullPathFieldName: String; const [ref] AValue: TValue): TValue;
+
+
+
+    class function DetailObjLookup_DetailObjID_LB(const AMasterObj: TObject; const ARttiProperty: TRttiProperty): TValue;
+    class function DetailObjLookup_ByTypeName_LB(const ABindSource: IioBindSource; const ARttiProperty: TRttiProperty; const [ref] AValue: TValue): TValue;
+
+
+
   end;
 
 implementation
@@ -634,6 +642,22 @@ begin
     Result := AValue;
 end;
 
+class function TioCommonBSBehavior.DetailObjLookup_ByTypeName_LB(const ABindSource: IioBindSource; const ARttiProperty: TRttiProperty;
+  const [ref] AValue: TValue): TValue;
+var
+  LDetailObj: TObject;
+  LLookupTypeName: String;
+  LMasterPropertyName: String;
+begin
+  // Extract the lookup type name & the master property name
+  LLookupTypeName := ARttiProperty.PropertyType.Name;
+  LMasterPropertyName := ARttiProperty.Name;
+  // Load the new detail object
+  LDetailObj := io.Load(LLookupTypeName).ByID(AValue.AsInteger).ToObject;
+  // Set the new detail object
+  Result := DetailObjLookup_SetDetailObject(ABindSource, LDetailObj, LMasterPropertyName, LLookupTypeName);
+end;
+
 class procedure TioCommonBSBehavior.DetailObjLookup_ClearLookupInfoFromFieldName(var [ref] AFullPathFieldName: String);
 var
   LDummyDetailTypeName: String;
@@ -657,6 +681,15 @@ begin
   end
   else
     Result := AValue;
+end;
+
+class function TioCommonBSBehavior.DetailObjLookup_DetailObjID_LB(const AMasterObj: TObject; const ARttiProperty: TRttiProperty): TValue;
+var
+  LChildObj: TObject;
+begin
+  LChildObj := ARttiProperty.GetValue(AMasterObj).AsObject;
+  if Assigned(LChildObj) then
+    Result := TioUtilities.ObjToID(LChildObj);
 end;
 
 class function TioCommonBSBehavior.DetailObjLookup_SetDetailObject(const ABindSource: IioBindSource; ADetailObj: TObject; const APropertyName, ADetailTypeName: String): TValue;

@@ -71,6 +71,7 @@ type
     class function IntfToID(const AIntf: IInterface): Integer; static;
     class function IsNullOID(const AObj: Tobject): Boolean; static;
     class function IsIdPropByName(const AEntityClassName, APropertyName: String): Boolean; static;
+    class function HasBelongsToOrHasOneRelation(const AEntityTypeName, AEntityPropName: String): Boolean; static;
     class function ActionTypeByABSA(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioPersistenceActionType;
     class function ExtractObjVersion(const AObj: Tobject): Integer; static;
     class function EnumToString<T>(const AEnumValue: T): String;
@@ -351,6 +352,11 @@ begin
     if (LAttr is AAttrClass1) or (LAttr is AAttrClass2) then
       Exit(True);
   Result := False;
+end;
+
+class function TioUtilities.HasBelongsToOrHasOneRelation(const AEntityTypeName, AEntityPropName: String): Boolean;
+begin
+  Result := TioMapContainer.GetMap(AEntityTypeName).GetProperties.GetPropertyByName(AEntityPropName).GetRelationType in [rtBelongsTo, rtHasOne, rtEmbeddedHasOne];
 end;
 
 class function TioUtilities.GetBindSource(const AViewOrViewModel: TComponent; const AName: String): IioBindSource;
