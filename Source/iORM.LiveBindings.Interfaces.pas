@@ -62,7 +62,6 @@ type
   IioActiveBindSourceAdapter = interface;
   IioContainedBindSourceAdapter = interface;
   IioDetailBindSourceAdaptersContainer = interface;
-  IioNaturalBindSourceAdapterSource = interface;
   IioNaturalActiveBindSourceAdapter = interface;
 
   // Interface (without RefCount) for ioBindSources detection
@@ -99,7 +98,6 @@ type
     procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
     procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
     procedure SetMasterPropertyName(const Value: String);
-    procedure SetWhere(const AWhere: IioWhere);
     procedure RegisterDetailBindSource(const ADetailBindSource: IioBindSource);
     procedure UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
     procedure PostIfEditing;
@@ -143,12 +141,42 @@ type
     procedure SetOnReceiveSelectionFreeObject(const Value: Boolean);
     function GetOnReceiveSelectionFreeObject: Boolean;
     property OnReceiveSelectionFreeObject: Boolean read GetOnReceiveSelectionFreeObject write SetOnReceiveSelectionFreeObject; // published: Master+Detail
+    // AsyncLoad property
+    procedure SetAsyncLoad(const Value: Boolean);
+    function GetAsyncLoad: Boolean;
+    property AsyncLoad: Boolean read GetAsyncLoad write SetAsyncLoad;
+    // AsyncPersist property
+    procedure SetAsyncPersist(const Value: Boolean);
+    function GetAsyncPersist: Boolean;
+    property AsyncPersist: Boolean read GetAsyncPersist write SetAsyncPersist;
+    // AutoPost property
+    procedure SetAutoPost(const Value: Boolean);
+    function GetAutoPost: Boolean;
+    property AutoPost: Boolean read GetAutoPost write SetAutoPost;
     // AsDefault
     function GetAsDefault: Boolean;
     procedure SetAsDefault(const Value: Boolean);
     property AsDefault: Boolean read GetAsDefault write SetAsDefault; // Published: Master
+    // TypeAlias
+    procedure SetTypeAlias(const Value: String);
+    function GetTypeAlias: String;
+    property TypeAlias: String read GetTypeAlias write SetTypeAlias;
     // TypeName
+    procedure SetTypeName(const Value: String);
     function GetTypeName: String;
+    property TypeName: String read GetTypeName write SetTypeName;
+    // LoadType
+    procedure SetLoadType(const Value: TioLoadType);
+    function GetLoadType: TioLoadType;
+    property LoadType: TioLoadType read GetLoadType write SetLoadType;
+    // Lazy
+    procedure SetLazy(const Value: Boolean);
+    function GetLazy: Boolean;
+    property Lazy: Boolean read GetLazy write SetLazy;
+    // LazyProps
+    procedure SetLazyProps(const Value: String);
+    function GetLazyProps: String;
+    property LazyProps: String read GetLazyProps write SetLazyProps;
     // Paging
     procedure SetPaging(const Value: TioCommonBSAPageManager);
     function GetPaging: TioCommonBSAPageManager;
@@ -174,6 +202,10 @@ type
     function GetTypeOfCollection: TioTypeOfCollection;
     procedure SetTypeOfCollection(const Value: TioTypeOfCollection);
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection write SetTypeOfCollection;
+    // Where
+    procedure SetWhere(const AWhere: IioWhere);
+    function GetWhere: IioWhere;
+    property Where: IioWhere read GetWhere write SetWhere;
     // SelectorFor
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
     function GetSelectorFor: IioBindSource;
@@ -313,9 +345,11 @@ type
     // AsyncLoad property
     procedure SetAsyncLoad(const Value: Boolean);
     function GetAsyncLoad: Boolean;
+    property AsyncLoad: Boolean read GetAsyncLoad write SetAsyncLoad;
     // AsyncPersist property
     procedure SetAsyncPersist(const Value: Boolean);
     function GetAsyncPersist: Boolean;
+    property AsyncPersist: Boolean read GetAsyncPersist write SetAsyncPersist;
     // AutoPost property
     procedure SetioAutoPost(const Value: Boolean);
     function GetioAutoPost: Boolean;
@@ -387,7 +421,7 @@ type
     procedure SetMasterObject(const AMasterObj: TObject);
     function NewDetailBindSourceAdapter(const AOwner: TComponent; const AMasterClassName, AMasterPropertyName: String; const AWhere: IioWhere)
       : IioActiveBindSourceAdapter;
-    function NewNaturalBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioNaturalBindSourceAdapterSource): IioActiveBindSourceAdapter;
+    function NewNaturalBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioActiveBindSourceAdapter): IioActiveBindSourceAdapter;
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure RemoveDetailBindSourceAdapter(const ABindSourceAdapter: IioContainedBindSourceAdapter);
     procedure RemoveNaturalBindSourceAdapter(const ANaturalBindSourceAdapter: IioNaturalActiveBindSourceAdapter);
@@ -409,18 +443,18 @@ type
     function GetWhere: IioWhere;
   end;
 
-  IioNaturalBindSourceAdapterSource = interface
-    ['{892D8DAE-96F3-48FC-925C-F3F5CD5C0F68}']
-    function Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
-    procedure Refresh(const ANotify: Boolean = True); overload;
-    function GetCurrent: TObject;
-    function UseObjStatus: Boolean;
-    function NewNaturalObjectBindSourceAdapter(const AOwner: TComponent): IioActiveBindSourceAdapter;
-    function DetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
-    function GetTypeName: String;
-    function GetTypeAlias: String;
-    function IsInterfaceBSA: Boolean;
-  end;
+//  IioNaturalBindSourceAdapterSource = interface
+//    ['{892D8DAE-96F3-48FC-925C-F3F5CD5C0F68}']
+//    function Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
+//    procedure Refresh(const ANotify: Boolean = True); overload;
+//    function GetCurrent: TObject;
+//    function UseObjStatus: Boolean;
+//    function NewNaturalObjectBindSourceAdapter(const AOwner: TComponent): IioActiveBindSourceAdapter;
+//    function DetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
+//    function GetTypeName: String;
+//    function GetTypeAlias: String;
+//    function IsInterfaceBSA: Boolean;
+//  end;
 
   IioNaturalActiveBindSourceAdapter = interface
     ['{9452A7CA-2C5F-43FB-BA63-DEE446B4FCC0}']

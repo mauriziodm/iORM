@@ -123,12 +123,16 @@ type
     procedure InitAsDefaultOnCreate;
     // AsyncLoad
     procedure SetAsyncLoad(const Value: Boolean);
+    function GetAsyncLoad: Boolean;
     // AsyncPersist
     procedure SetAsyncPersist(const Value: Boolean);
+    function GetAsyncPersist: Boolean;
     // Lazy
     procedure SetLazy(const Value: Boolean);
+    function GetLazy: Boolean;
     // LazyProps
     procedure SetLazyProps(const Value: String);
+    function GetLazyProps: String;
     // AutoPost
     procedure SetAutoPost(const Value: Boolean);
     function GetAutoPost: Boolean;
@@ -168,6 +172,7 @@ type
     function GetState: TBindSourceAdapterState;
     // TypeAlias
     procedure SetTypeAlias(const Value: String);
+    function GetTypeAlias: String;
     // TypeName
     procedure SetTypeName(const Value: String);
     function GetTypeName: String;
@@ -229,17 +234,17 @@ type
     property Bof: Boolean read GetBOF; // Public: Master+Detail
     property Eof: Boolean read GetEOF; // Public: Master+Detail
     // Published properties
-    property AsyncLoad: Boolean read FAsyncLoad write SetAsyncLoad default False; // Published: Master
-    property AsyncPersist: Boolean read FAsyncPersist write SetAsyncPersist default False; // Published: Master
+    property AsyncLoad: Boolean read GetAsyncLoad write SetAsyncLoad default False; // Published: Master
+    property AsyncPersist: Boolean read GetAsyncPersist write SetAsyncPersist default False; // Published: Master
     property LoadType: TioLoadType read GetLoadType write SetLoadType default ltManual; // Published: Master
-    property Lazy: Boolean read FLazy write SetLazy default False; // published: Master
-    property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
+    property Lazy: Boolean read GetLazy write SetLazy default False; // published: Master
+    property LazyProps: String read GetLazyProps write SetLazyProps; // published: Master
     property AutoPost: Boolean read GetAutoPost write SetAutoPost default True; // published: Nascondere e default = True
     property AutoRefreshOnNotification: Boolean read GetAutoRefreshOnNotification write SetAutoRefreshOnNotification default True;
     property VirtualFields: Boolean read GetVirtualFields write FVirtualFields default False;
     property ETMfor: IioMasterBindSource read GetETMfor write SetETMfor;
     // published: Nascondere e default = false
-    property TypeAlias: String read FTypeAlias write SetTypeAlias;
+    property TypeAlias: String read GetTypeAlias write SetTypeAlias;
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection write SetTypeOfCollection default tcList;
     // Published properties: paging
     property Paging: TioCommonBSAPageManager read GetPaging write SetPaging; // published: Master
@@ -666,6 +671,16 @@ begin
   Result := FAsDefault;
 end;
 
+function TioModelPresenterCustom.GetAsyncLoad: Boolean;
+begin
+  Result := FAsyncLoad;
+end;
+
+function TioModelPresenterCustom.GetAsyncPersist: Boolean;
+begin
+  Result := FAsyncPersist;
+end;
+
 function TioModelPresenterCustom.GetBOF: Boolean;
 begin
   if CheckAdapter then
@@ -748,6 +763,16 @@ begin
     Result := -1;
 end;
 
+function TioModelPresenterCustom.GetLazy: Boolean;
+begin
+  Result := FLazy;
+end;
+
+function TioModelPresenterCustom.GetLazyProps: String;
+begin
+  Result := FLazyProps;
+end;
+
 function TioModelPresenterCustom.GetLoadType: TioLoadType;
 begin
   Result := FLoadType;
@@ -809,6 +834,11 @@ begin
     Result := GetActiveBindSourceAdapter.State
   else
     Result := TBindSourceAdapterState.seInactive
+end;
+
+function TioModelPresenterCustom.GetTypeAlias: String;
+begin
+  Result := FTypeAlias;
 end;
 
 function TioModelPresenterCustom.GetTypeName: String;
@@ -1236,7 +1266,7 @@ end;
 
 procedure TioModelPresenterCustom.SetMasterPropertyName(const Value: String);
 begin
-  FMasterPropertyName := Trim(Value);
+  FMasterPropertyName := Value;
 end;
 
 procedure TioModelPresenterCustom.SetOnDeleteConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);

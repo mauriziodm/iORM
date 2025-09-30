@@ -44,7 +44,7 @@ type
 
   TioNaturalActiveObjectBindSourceAdapter = class(TioActiveObjectBindSourceAdapter, IioNaturalActiveBindSourceAdapter)
   private
-    FSourceAdapter: IioNaturalBindSourceAdapterSource;
+    FSourceActiveBSA: IioActiveBindSourceAdapterSource;
     procedure SynchronizeSourceAdapter;
   protected
     procedure DoBeforeOpen; override;
@@ -53,7 +53,7 @@ type
     // AutoLoad
     function GetAutoLoad: Boolean; override;
   public
-    constructor Create(const AOwner:TComponent; const ASourceAdapter:IioNaturalBindSourceAdapterSource); overload;
+    constructor Create(const AOwner:TComponent; const ABindSource:IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapterSource); virtual; reintroduce;
     destructor Destroy; override;
     procedure ForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure Reload; override;
@@ -70,16 +70,10 @@ uses
 
 { TioNaturalActiveObjectBindSourceAdapter }
 
-constructor TioNaturalActiveObjectBindSourceAdapter.Create(const AOwner:TComponent; const ASourceAdapter:IioNaturalBindSourceAdapterSource);
+constructor TioNaturalActiveObjectBindSourceAdapter.Create(const AOwner:TComponent; const ABindSource:IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapterSource);
 begin
-  inherited Create(
-                   ASourceAdapter.GetCurrent.ClassType,
-                   nil,  // Where
-                   AOwner,
-                   ASourceAdapter.GetCurrent,
-                   False
-                  );
-  FSourceAdapter := ASourceAdapter;
+  inherited Create(AOwner, ABindSource, ASourceActiveBSA.Current, False); // False because a NaturalBindSourceAdapter never owns objects
+  FSourceActiveBSA := ASourceActiveBSA;
 end;
 
 destructor TioNaturalActiveObjectBindSourceAdapter.Destroy;
@@ -87,8 +81,8 @@ var
   FLoadType: TioLoadType;
 begin
   // Unregister itself from the SourceBS.DetailAdaptersContainer
-  if Assigned(FSourceAdapter) and Assigned(FSourceAdapter.DetailAdaptersContainer) then
-    FSourceAdapter.DetailAdaptersContainer.RemoveNaturalBindSourceAdapter(Self);
+  if Assigned(FSourceActiveBSA) and Assigned(FSourceActiveBSA.DetailAdaptersContainer) then
+    FSourceActiveBSA.DetailAdaptersContainer.RemoveNaturalBindSourceAdapter(Self);
   // If the LoadType is ltFromBSReloadNewInstance and it is inherited from TioActiveObjectBindSourceAdapter
   //  (it is'n an interfaced bind source) then free che DataObject (owns it)
   FLoadType := (Self as IioActiveBindSourceAdapter).LoadType;
@@ -102,12 +96,12 @@ begin
   // Questo è un NaturalBindSourceAdapter quindi in realtà nella quasi totalità dei casi
   //  sta esponendo ad una form anagrafica l'oggetto selezionato in un altro BindSourceAdapter
   //  (probabilmente un TioActiveListBindSourceAdapter) e questo, in caso di eliminazione
-  //  dell'oggetto, causava il fatto che su quest'ultimo BSA sorgente (FSourceAdapter) in realtà
+  //  dell'oggetto, causava il fatto che su quest'ultimo BSA sorgente (FSourceActiveBSA) in realtà
   //  l'oggetto non viene eliminato.
   //  Per risolvere questo problema senza obbligare l'utente a generare un gestore per l'evento OnNotify
-  //  faccio eseguire il Delete alFSourceAdapter se presente (sempre).
-  //  Questo però causa una doppia notifica di eliminazione (su questo stesso BSA e sul FSourceAdapter) e
-  //  per questo e sempre se è presente l'FSourceAdapter inibisco anche il DoAfterDelete (oltre quindi al DoBeforeDelete).
+  //  faccio eseguire il Delete al FSourceActiveBSA se presente (sempre).
+  //  Questo però causa una doppia notifica di eliminazione (su questo stesso BSA e sul FSourceActiveBSA) e
+  //  per questo e sempre se è presente l'FSourceActiveBSA inibisco anche il DoAfterDelete (oltre quindi al DoBeforeDelete).
   // ---------------------------------------------------------------------------
   // NB: Nessun inherited perchè altrimenti cmq avrei una doppia notifica e
   //      addirittura anche una doppia query delete sul database
@@ -117,24 +111,23 @@ end;
 
 procedure TioNaturalActiveObjectBindSourceAdapter.DoBeforeDelete;
 var
-  LActiveBSA: IioActiveBindSourceAdapter;
   LMasterBS: IioMasterBindSource;
 begin
   // Questo è un NaturalBindSourceAdapter quindi in realtà nella quasi totalità dei casi
   //  sta esponendo ad una form anagrafica l'oggetto selezionato in un altro BindSourceAdapter
   //  (probabilmente un TioActiveListBindSourceAdapter) e questo, in caso di eliminazione
-  //  dell'oggetto, causava il fatto che su quest'ultimo BSA sorgente (FSourceAdapter) in realtà
+  //  dell'oggetto, causava il fatto che su quest'ultimo BSA sorgente (FSourceActiveBSA) in realtà
   //  l'oggetto non viene eliminato.
   //  Per risolvere questo problema senza obbligare l'utente a generare un gestore per l'evento OnNotify
-  //  faccio eseguire il Delete alFSourceAdapter se presente (sempre).
-  //  Questo però causa una doppia notifica di eliminazione (su questo stesso BSA e sul FSourceAdapter) e
-  //  per questo e sempre se è presente l'FSourceAdapter inibisco anche il DoAfterDelete (oltre quindi al DoBeforeDelete).
+  //  faccio eseguire il Delete al FSourceActiveBSA se presente (sempre).
+  //  Questo però causa una doppia notifica di eliminazione (su questo stesso BSA e sul FSourceActiveBSA) e
+  //  per questo e sempre se è presente l'FSourceActiveBSA inibisco anche il DoAfterDelete (oltre quindi al DoBeforeDelete).
   // ---------------------------------------------------------------------------
   // NB: Nessun inherited perchè altrimenti cmq avrei una doppia notifica e
   //      addirittura anche una doppia query delete sul database
   //      però in questo modo in pratica disabilito l'eventuale event handler
   //inherited;
-  if Assigned(FSourceAdapter) then
+  if Assigned(FSourceActiveBSA) then
   begin
     // Chiude il BindSource per evitare errori AV
     if HasBindSource then
@@ -143,16 +136,14 @@ begin
     //  sullo stesso oggetto a cui si riferisce il presente NaturalBSA in modo da
     //  poter poi delegare al SourceAdapter stesso l'operazione di Delete
     SynchronizeSourceAdapter;
-    // Riferimento al SourceAdapter come IioNaturalBindSourceAdapter
-    LActiveBSA := (FSourceAdapter as IioActiveBindSourceAdapter);
     // Se il SourceAdapter ha un BindSource e se questo è un MasterBS e implementa quindi l'interfaccia
     //   "IioBSPersistenceClient" estrae un riferimento di questo tipo (l'interfaccia) del suo
     //   BindSouce (relativo a SourceAdapter) fa fare a lui un vero e proprio Persistence.Delete.
     //   Se invece queste condizioni non sono soddisfatte procedete con il normale Delete del SourceAdapter (no persistence)
-    if LActiveBSA.HasBindSource and LActiveBSA.GetBindSource.IsMasterBS and Supports(LActiveBSA.GetBindSource, IioMasterBindSource, LMasterBS) then
+    if FSourceActiveBSA.HasBindSource and FSourceActiveBSA.GetBindSource.IsMasterBS and Supports(FSourceActiveBSA.GetBindSource, IioMasterBindSource, LMasterBS) then
       LMasterBS.Persistence.Delete
     else
-      LActiveBSA.Delete;
+      FSourceActiveBSA.Delete;
     // Abort to prevent an AVerror
     Abort;
   end;
@@ -161,13 +152,11 @@ end;
 procedure TioNaturalActiveObjectBindSourceAdapter.SynchronizeSourceAdapter;
 var
   LDataObject: TObject;
-  LActiveBSA: IioActiveBindSourceAdapter;
   LDuckList: IioDuckTypedList;
   LItemIndex: Integer;
 begin
   // Estrazione di un pò di riferimenti per comodità
-  LActiveBSA := (FSourceAdapter as IioActiveBindSourceAdapter);
-  LDataObject := LActiveBSA.DataObject;
+  LDataObject := FSourceActiveBSA.DataObject;
   // Se il SourceAdapter è un ListBindSourceAdapter allora lo sposta (ItemIndex)
   //  sullo stesso oggetto a cui si riferisce il presente NaturalBSA in modo da
   //  poter poi delegare al SourceAdapter stesso l'operazione di Delete
@@ -175,7 +164,7 @@ begin
   begin
     LDuckList := TioDuckTypedFactory.DuckTypedList(LDataObject);
     LItemIndex := LDuckList.IndexOf(Self.Current);
-    LActiveBSA.ItemIndex := LItemIndex;
+    FSourceActiveBSA.ItemIndex := LItemIndex;
   end;
 end;
 
@@ -191,8 +180,8 @@ end;
 
 procedure TioNaturalActiveObjectBindSourceAdapter.ForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
 begin
-  if Assigned(FSourceAdapter) then
-    FSourceAdapter.Notify(Self, ANotification);
+  if Assigned(FSourceActiveBSA) then
+    FSourceActiveBSA.Notify(Self, ANotification);
 end;
 
 function TioNaturalActiveObjectBindSourceAdapter.GetAutoLoad: Boolean;

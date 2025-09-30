@@ -148,10 +148,15 @@ type
     constructor InternalCreate(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent;
       const AOwnsObject: Boolean = True); overload;
   public
-    constructor Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject;
-      const AOwnsObject: Boolean = True); overload;
-//    constructor Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface;
-//      const AOwnsObject: Boolean = False); overload;
+//    constructor Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject;
+//      const AOwnsObject: Boolean = True); overload;
+
+
+
+    constructor Create(const AOwner: TComponent; const ABindSource: IioBindSource; const ADataObject: TObject; const AOwnsObject: Boolean = True); virtual; reintroduce;
+
+
+
     destructor Destroy; override;
     function MasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     procedure SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
@@ -241,20 +246,27 @@ begin
   FInsertObj_NewObj := nil;
 end;
 
-constructor TioActiveInterfaceListBindSourceAdapter.Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent;
-  const ADataObject: TObject; const AOwnsObject: Boolean);
-begin
-  inherited Create(AOwner, ADataObject, ATypeAlias, ATypeName, AOwnsObject);
-  InternalCreate(ATypeName, ATypeAlias, AWhere, AOwner, AOwnsObject);
-end;
-
 //constructor TioActiveInterfaceListBindSourceAdapter.Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent;
-//  const ADataObject: IInterface; const AOwnsObject: Boolean);
+//  const ADataObject: TObject; const AOwnsObject: Boolean);
 //begin
 //  inherited Create(AOwner, ADataObject, ATypeAlias, ATypeName, AOwnsObject);
 //  InternalCreate(ATypeName, ATypeAlias, AWhere, AOwner, AOwnsObject);
-//  FInterfacedList := ADataObject;
 //end;
+
+constructor TioActiveInterfaceListBindSourceAdapter.Create(const AOwner: TComponent; const ABindSource: IioBindSource; const ADataObject: TObject; const AOwnsObject: Boolean);
+begin
+  inherited Create(AOwner, ADataObject, ABindSource.GetTypeAlias, ABindSource.GetTypeName, AOwnsObject);
+  InternalCreate(ABindSource.GetTypeName, ABindSource.GetTypeAlias, ABindSource.Where, AOwner, AOwnsObject);
+  // TODO: Mauri 29-09-2025: da rimuovere quando si farà che i valori sotto saranno presi direttamente da IioBindSource
+  FAsyncLoad := ABindSource.AsyncLoad;
+  FAsyncPersist := ABindSource.AsyncPersist;
+  SetioAutoPost(ABindSource.AutoPost);
+  FLoadType := ABindSource.LoadType;
+  FLazy := ABindSource.Lazy;
+  FLazyProps := ABindSource.LazyProps;
+
+  FBindSource := ABindSource;
+end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.Append(AObject: IInterface);
 begin

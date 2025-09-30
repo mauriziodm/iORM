@@ -139,7 +139,14 @@ type
     procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
     procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
   public
-    constructor Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface); overload;
+//    constructor Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface); overload;
+
+
+
+    constructor Create(const AOwner: TComponent; const ABindSource: IioBindSource; const ADataObject: IInterface; const AOwnsObject: Boolean = True); virtual; reintroduce;
+
+
+
     destructor Destroy; override;
     function MasterAdaptersContainer:IioDetailBindSourceAdaptersContainer;
     procedure SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
@@ -232,22 +239,43 @@ begin
   Self.InternalSetDataObject(LIntf, False);
 end;
 
-constructor TioActiveInterfaceObjectBindSourceAdapter.Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface);
+//constructor TioActiveInterfaceObjectBindSourceAdapter.Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: IInterface);
+//begin
+//  FLoadType := ltAuto;
+//  FLazy := False;
+//  FLazyProps := '';
+//  FAsyncLoad := False;
+//  FAsyncPersist := False;
+//  FReloading := False;
+//  FBSPersistenceDeleting := False;
+//  inherited Create(AOwner, ADataObject, ATypeAlias, ATypeName);
+//  FLocalOwnsObject := False; // Always false because it's a BSA for an interface (AutoRefCount)
+//  FWhere := AWhere;
+//  FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
+//  // Set Master & Details adapters reference
+//  FMasterAdaptersContainer := nil;
+//  FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
+//end;
+
+constructor TioActiveInterfaceObjectBindSourceAdapter.Create(const AOwner: TComponent; const ABindSource: IioBindSource; const ADataObject: IInterface;
+  const AOwnsObject: Boolean);
 begin
-  FLoadType := ltAuto;
-  FLazy := False;
-  FLazyProps := '';
-  FAsyncLoad := False;
-  FAsyncPersist := False;
+  FLoadType := ABindSource.LoadType;
+  FLazy := ABindSource.Lazy;
+  FLazyProps := ABindSource.LazyProps;
+  FAsyncLoad := ABindSource.AsyncLoad;
+  FAsyncPersist := ABindSource.AsyncPersist;
   FReloading := False;
   FBSPersistenceDeleting := False;
-  inherited Create(AOwner, ADataObject, ATypeAlias, ATypeName);
+  inherited Create(AOwner, ADataObject, ABindSource.TypeAlias, ABindSource.TypeName);
   FLocalOwnsObject := False; // Always false because it's a BSA for an interface (AutoRefCount)
-  FWhere := AWhere;
+  FWhere := ABindSource.Where;
   FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
   // Set Master & Details adapters reference
   FMasterAdaptersContainer := nil;
   FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
+
+  FBindSource := ABindSource;
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.DeleteListViewItem(const AItemIndex, ADelayMilliseconds: Integer);

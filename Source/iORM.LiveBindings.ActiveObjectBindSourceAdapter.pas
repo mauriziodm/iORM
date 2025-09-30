@@ -46,8 +46,7 @@ const
 
 type
 
-  TioActiveObjectBindSourceAdapter = class(TObjectBindSourceAdapter, IioContainedBindSourceAdapter, IioActiveBindSourceAdapter,
-    IioNaturalBindSourceAdapterSource)
+  TioActiveObjectBindSourceAdapter = class(TObjectBindSourceAdapter, IioContainedBindSourceAdapter, IioActiveBindSourceAdapter)
   private
     FAsyncLoad: Boolean;
     FAsyncPersist: Boolean;
@@ -148,8 +147,15 @@ type
     procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
     procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
   public
-    constructor Create(AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject;
-      const AOwnsObject: Boolean = True); overload;
+//    constructor Create(AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject;
+//      const AOwnsObject: Boolean = True); overload;
+
+
+
+    constructor Create(const AOwner: TComponent; const ABindSource: IioBindSource; const ADataObject: TObject; const AOwnsObject: Boolean = True); virtual; reintroduce;
+
+
+
     destructor Destroy; override;
     function MasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     procedure SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
@@ -254,31 +260,65 @@ begin
   Self.InternalSetDataObject(nil, False);
 end;
 
-constructor TioActiveObjectBindSourceAdapter.Create(AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject;
-  const AOwnsObject: Boolean = True);
+//constructor TioActiveObjectBindSourceAdapter.Create(AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject;
+//  const AOwnsObject: Boolean = True);
+//begin
+//  FLoadType := ltAuto;
+//  FLazy := False;
+//  FLazyProps := '';
+//  FAsyncLoad := False;
+//  FAsyncPersist := False;
+//  FReloading := False;
+//  FBSPersistenceDeleting := False;
+//
+//  // If the AObject is assigned the set the BaseRttiType from this instance (most accurate) else resolve the TypeName
+//  // AObject is always a TObject by generic constraint
+//  if Assigned(ADataObject) then
+//    AClassRef := ADataObject.ClassType;
+//  inherited Create(AOwner, ADataObject, AClassRef, AOwnsObject);
+//
+//  FLocalOwnsObject := AOwnsObject;
+//  FWhere := AWhere;
+//  FTypeName := AClassRef.ClassName;
+//  FTypeAlias := ''; // NB: TypeAlias has no effect in this adapter (only used by interfaced BSA)
+//  FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
+//  // Set Master & Details adapters reference
+//  FMasterAdaptersContainer := nil;
+//  FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
+//end;
+
+constructor TioActiveObjectBindSourceAdapter.Create(const AOwner: TComponent; const ABindSource: IioBindSource; const ADataObject: TObject;
+  const AOwnsObject: Boolean);
+var
+  FClassRef: TioClassRef;
 begin
-  FLoadType := ltAuto;
-  FLazy := False;
-  FLazyProps := '';
-  FAsyncLoad := False;
-  FAsyncPersist := False;
+  FLoadType := ABindSource.LoadType;
+  FLazy := ABindSource.Lazy;
+  FLazyProps := ABindSource.LazyProps;
+  FAsyncLoad := ABindSource.AsyncLoad;
+  FAsyncPersist := ABindSource.AsyncPersist;
   FReloading := False;
   FBSPersistenceDeleting := False;
 
   // If the AObject is assigned the set the BaseRttiType from this instance (most accurate) else resolve the TypeName
   // AObject is always a TObject by generic constraint
   if Assigned(ADataObject) then
-    AClassRef := ADataObject.ClassType;
-  inherited Create(AOwner, ADataObject, AClassRef, AOwnsObject);
+    FClassRef := ADataObject.ClassType
+  else
+    FClassRef := TioUtilities.ClassNameToClassRef(ABindSource.TypeName);
+
+  inherited Create(AOwner, ADataObject, FClassRef, AOwnsObject);
 
   FLocalOwnsObject := AOwnsObject;
-  FWhere := AWhere;
-  FTypeName := AClassRef.ClassName;
-  FTypeAlias := ''; // NB: TypeAlias has no effect in this adapter (only used by interfaced BSA)
+  FWhere := ABindSource.Where;
+  FTypeName := ABindSource.TypeName;
+  FTypeAlias := ABindSource.TypeAlias; // NB: TypeAlias has no effect in this adapter (only used by interfaced BSA)
   FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
   // Set Master & Details adapters reference
   FMasterAdaptersContainer := nil;
   FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
+
+  FBindSource := ABindSource;
 end;
 
 procedure TioActiveObjectBindSourceAdapter.DeleteListViewItem(const AItemIndex, ADelayMilliseconds: Integer);

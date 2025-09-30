@@ -45,12 +45,9 @@ type
   TioLiveBindingsFactory = class
   public
     class function DetailAdaptersContainer(const AMasterAdapter: IioContainedBindSourceAdapter): IioDetailBindSourceAdaptersContainer;
-    class function ContainedListBindSourceAdapter(const AOwner: TComponent; const AMasterProperty: IioProperty; const AWhere: IioWhere)
-      : IioContainedBindSourceAdapter;
-    class function ContainedObjectBindSourceAdapter(const AOwner: TComponent; const AMasterProperty: IioProperty; const AWhere: IioWhere)
-      : IioContainedBindSourceAdapter;
-    class function NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioNaturalBindSourceAdapterSource)
-      : IioActiveBindSourceAdapter;
+    class function ContainedListBindSourceAdapter(const AOwner: TComponent; const AMasterProperty: IioProperty; const AWhere: IioWhere): IioContainedBindSourceAdapter;
+    class function ContainedObjectBindSourceAdapter(const AOwner: TComponent; const AMasterProperty: IioProperty; const AWhere: IioWhere): IioContainedBindSourceAdapter;
+    class function NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioActiveBindSourceAdapter): IioActiveBindSourceAdapter;
 // ----- OLD CODE -----
 //    class function GetBSAfromMasterBindSourceAdapter(const ASenderBSName: String; const AOwner: TComponent; const AMasterBindSource: IioBindSource;
 //      const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
@@ -198,8 +195,8 @@ begin
   end;
 end;
 
-class function TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioNaturalBindSourceAdapterSource)
-  : IioActiveBindSourceAdapter;
+class function TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioActiveBindSourceAdapter)
+      : IioActiveBindSourceAdapter;
 begin
   if ASourceAdapter.IsInterfaceBSA then
     Result := TioNaturalActiveInterfaceObjectBindSourceAdapter.Create(AOwner, ASourceAdapter)

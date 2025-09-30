@@ -111,12 +111,16 @@ type
     procedure InitAsDefaultOnCreate;
     // AsyncLoad
     procedure SetAsyncLoad(const Value: Boolean);
+    function GetAsyncLoad: Boolean;
     // AsyncPersist
     procedure SetAsyncPersist(const Value: Boolean);
+    function GetAsyncPersist: Boolean;
     // Lazy
     procedure SetLazy(const Value: Boolean);
+    function GetLazy: Boolean;
     // LazyProps
     procedure SetLazyProps(const Value: String);
+    function GetLazyProps: String;
     // AutoPost
     procedure SetAutoPost(const Value: Boolean);
     function GetAutoPost: Boolean;
@@ -155,6 +159,7 @@ type
     function GetState: TBindSourceAdapterState;
     // TypeAlias
     procedure SetTypeAlias(const Value: String);
+    function GetTypeAlias: String;
     // TypeName
     procedure SetTypeName(const Value: String);
     function GetTypeName: String;
@@ -213,12 +218,12 @@ type
     // Published properties
     property AsDefault: Boolean read GetAsDefault write SetAsDefault; // Published: Master  // non mettere default
     property TypeName: String read GetTypeName write SetTypeName; // published: Master
-    property TypeAlias: String read FTypeAlias write SetTypeAlias; // published: Master
-    property AsyncLoad: Boolean read FAsyncLoad write SetAsyncLoad default False; // published: Master
-    property AsyncPersist: Boolean read FAsyncPersist write SetAsyncPersist default False; // published: Master
+    property TypeAlias: String read GetTypeAlias write SetTypeAlias; // published: Master
+    property AsyncLoad: Boolean read GetAsyncLoad write SetAsyncLoad default False; // published: Master
+    property AsyncPersist: Boolean read GetAsyncPersist write SetAsyncPersist default False; // published: Master
     property LoadType: TioLoadType read GetLoadType write SetLoadType default ltManual; // published: Master
-    property Lazy: Boolean read FLazy write SetLazy default False; // published: Master
-    property LazyProps: String read FLazyProps write SetLazyProps; // published: Master
+    property Lazy: Boolean read GetLazy write SetLazy default False; // published: Master
+    property LazyProps: String read GetLazyProps write SetLazyProps; // published: Master
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection write SetTypeOfCollection default tcList;
     property VirtualFields: Boolean read GetVirtualFields write FVirtualFields default False;
     property ETMfor: IioMasterBindSource read GetETMfor write SetETMfor;
@@ -534,6 +539,16 @@ begin
   Result := FAsDefault;
 end;
 
+function TioDataSetCustom.GetAsyncLoad: Boolean;
+begin
+  Result := FAsyncLoad;
+end;
+
+function TioDataSetCustom.GetAsyncPersist: Boolean;
+begin
+  Result := FAsyncPersist;
+end;
+
 function TioDataSetCustom._InternalGetAuthorizationContext: String;
 begin
   // Se il BS attuale è master allora ritorna il relativo AuthContext considerando anche l'eventule event-handler,
@@ -598,6 +613,16 @@ begin
     Result := 0;
 end;
 
+function TioDataSetCustom.GetLazy: Boolean;
+begin
+  Result := FLazy;
+end;
+
+function TioDataSetCustom.GetLazyProps: String;
+begin
+  Result := FLazyProps;
+end;
+
 function TioDataSetCustom.GetLoadType: TioLoadType;
 begin
   Result := FLoadType;
@@ -659,6 +684,11 @@ begin
     Result := GetActiveBindSourceAdapter.State
   else
     Result := TBindSourceAdapterState.seInactive
+end;
+
+function TioDataSetCustom.GetTypeAlias: String;
+begin
+  Result := FTypeAlias;
 end;
 
 function TioDataSetCustom.GetTypeName: String;
@@ -934,7 +964,7 @@ end;
 
 procedure TioDataSetCustom.SetMasterPropertyName(const Value: String);
 begin
-  FMasterPropertyName := Trim(Value);
+  FMasterPropertyName := Value;
 end;
 
 procedure TioDataSetCustom.SetActive(Value: Boolean);
