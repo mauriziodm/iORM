@@ -45,18 +45,12 @@ type
   TioLiveBindingsFactory = class
   public
     class function DetailAdaptersContainer(const AMasterAdapter: IioContainedBindSourceAdapter): IioDetailBindSourceAdaptersContainer;
-    class function ContainedListBindSourceAdapter(const AOwner: TComponent; const AMasterProperty: IioProperty; const AWhere: IioWhere): IioContainedBindSourceAdapter;
-    class function ContainedObjectBindSourceAdapter(const AOwner: TComponent; const AMasterProperty: IioProperty; const AWhere: IioWhere): IioContainedBindSourceAdapter;
-    class function NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioActiveBindSourceAdapter): IioActiveBindSourceAdapter;
-// ----- OLD CODE -----
-//    class function GetBSAfromMasterBindSourceAdapter(const ASenderBSName: String; const AOwner: TComponent; const AMasterBindSource: IioBindSource;
-//      const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
-// ----- OLD CODE -----
-    class function GetNaturalBSAfromMasterBindSource(const AOwner: TComponent; const ASenderBSName: String; const AMasterBS: IioBindSource): IioActiveBindSourceAdapter;
-    class function GetDetailBSAfromMasterBindSource(const AOwner: TComponent; const ASenderBSName: String; const AMasterBS: IioBindSource;
-      const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
-    class function GetBSA(const AOwner: TComponent; const ASenderBSName, ATypeName, ATypeAlias: String; const AWhere: IioWhere; const ATypeOfCollection: TioTypeOfCollection;
-      const ADataObject: TObject; const AOwnsObject: Boolean): IioActiveBindSourceAdapter;
+    class function ContainedListBindSourceAdapter(const AOwner: TComponent; const ABindSource: IioBindSource; const AMasterProperty: IioProperty): IioContainedBindSourceAdapter;
+    class function ContainedObjectBindSourceAdapter(const AOwner: TComponent; const ABindSource: IioBindSource; const AMasterProperty: IioProperty): IioContainedBindSourceAdapter;
+    class function NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ABindSource: IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapter): IioActiveBindSourceAdapter;
+    class function GetNaturalBSAfromMasterBindSource(const AOwner: TComponent; const ABindSource: IioBindSource; const AMasterBS: IioBindSource): IioActiveBindSourceAdapter;
+    class function GetDetailBSAfromMasterBindSource(const AOwner: TComponent; const ABindSource, AMasterBindSource: IioBindSource; const AMasterPropertyName: String): IioActiveBindSourceAdapter;
+    class function GetBSA(const AOwner: TComponent; const ABindSource: IioBindSource; const ADataObject: TObject; const AOwnsObject: Boolean): IioActiveBindSourceAdapter;
     class function BSAToDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     class function GetBSAPageManagerStrategy(const APagingType: TioBSAPagingType): IioBSAPageManagerStrategy;
   end;
@@ -83,34 +77,30 @@ begin
   Result := TioBSAToDataSetLinkContainer.Create;
 end;
 
-class function TioLiveBindingsFactory.ContainedListBindSourceAdapter(const AOwner: TComponent; const AMasterProperty: IioProperty; const AWhere: IioWhere)
-  : IioContainedBindSourceAdapter;
+class function TioLiveBindingsFactory.ContainedListBindSourceAdapter(const AOwner: TComponent; const ABindSource: IioBindSource; const AMasterProperty: IioProperty): IioContainedBindSourceAdapter;
 begin
-  // If the master property type is an interface...
-  if TioUtilities.IsAnInterfaceTypeName(AMasterProperty.GetRelationChildTypeName) then
-    Result := TioActiveInterfaceListBindSourceAdapter.Create(AMasterProperty.GetRelationChildTypeName, AMasterProperty.GetRelationChildTypeAlias, AWhere,
-      AOwner, TList<IInterface>.Create)
-    // else if the master property type is a class...
+  // Setthe BindSOurce TypeName & TypeAlias
+  ABindSource.TypeName := AMasterProperty.GetRelationChildTypeName;
+  ABindSource.TypeAlias := AMasterProperty.GetRelationChildTypeAlias;
+  // If the master property type is an interface... else if the master property type is a class
+  if TioUtilities.IsAnInterfaceTypeName(ABindSource.TypeName) then
+    Result := TioActiveInterfaceListBindSourceAdapter.Create(AOwner, ABindSource, TList<IInterface>.Create, True)
   else
-  begin
-    Result := TioActiveListBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(AMasterProperty.GetRelationChildTypeName), AWhere, AOwner,
-      TList<TObject>.Create);
-  end;
+    Result := TioActiveListBindSourceAdapter.Create(AOwner, ABindSource, TList<TObject>.Create, True);
   // Set MasterProperty for the adapter
   Result.SetMasterProperty(AMasterProperty);
 end;
 
-class function TioLiveBindingsFactory.ContainedObjectBindSourceAdapter(const AOwner: TComponent; const AMasterProperty: IioProperty; const AWhere: IioWhere)
-  : IioContainedBindSourceAdapter;
+class function TioLiveBindingsFactory.ContainedObjectBindSourceAdapter(const AOwner: TComponent; const ABindSource: IioBindSource; const AMasterProperty: IioProperty): IioContainedBindSourceAdapter;
 begin
-  // If the master property type is an interface...
-  if TioUtilities.IsAnInterfaceTypeName(AMasterProperty.GetRelationChildTypeName) then
-    Result := TioActiveInterfaceObjectBindSourceAdapter.Create(AMasterProperty.GetRelationChildTypeName, AMasterProperty.GetRelationChildTypeAlias, AWhere,
-      AOwner, nil) // AObject:TObject;
-    // else if the master property type is a class...
+  // Setthe BindSOurce TypeName & TypeAlias
+  ABindSource.TypeName := AMasterProperty.GetRelationChildTypeName;
+  ABindSource.TypeAlias := AMasterProperty.GetRelationChildTypeAlias;
+  // If the master property type is an interface... else if the master property type is a class
+  if TioUtilities.IsAnInterfaceTypeName(ABindSource.TypeName) then
+    Result := TioActiveInterfaceObjectBindSourceAdapter.Create(AOwner, ABindSource, nil, False)
   else
-    Result := TioActiveObjectBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(AMasterProperty.GetRelationChildTypeName), AWhere, AOwner, nil);
-  // AObject:TObject;
+    Result := TioActiveObjectBindSourceAdapter.Create(AOwner, ABindSource, nil, True);
   // Set MasterProperty for the adapter
   Result.SetMasterProperty(AMasterProperty);
 end;
@@ -120,33 +110,32 @@ begin
   Result := TioDetailAdaptersContainer.Create(AMasterAdapter);
 end;
 
-class function TioLiveBindingsFactory.GetBSA(const AOwner: TComponent; const ASenderBSName, ATypeName, ATypeAlias: String; const AWhere: IioWhere; const ATypeOfCollection: TioTypeOfCollection;
-      const ADataObject: TObject; const AOwnsObject: Boolean): IioActiveBindSourceAdapter;
+class function TioLiveBindingsFactory.GetBSA(const AOwner: TComponent; const ABindSource: IioBindSource; const ADataObject: TObject; const AOwnsObject: Boolean): IioActiveBindSourceAdapter;
 var
   LIntfDataObject: IInterface;
   LDataObject: TObject;
 begin
   // Check for type name
-  if ATypeName.IsEmpty then
+  if ABindSource.TypeName.IsEmpty then
     raise EioGenericException.Create(ClassName, 'GetBSA',
       Format('In component "%s" the "LoadType" property has been set to "ltAuto" or "ltManual" but the "TypeName" property has been left blank.'
       + #13#13'iORM is therefore unable to load (from the RDBMS) the instance to expose for binding.'#13#13'Please set the property and then try again.',
-      [ASenderBSName]));
+      [ABindSource.GetName]));
 
   // Depending of the DataType (list or single object)...
-  case ATypeOfCollection of
+  case ABindSource.TypeOfCollection of
 
     // LIST
     TioTypeOfCollection.tcList:
       begin
         // Interfaced
-        if TioUtilities.IsAnInterfaceTypeName(ATypeName) then
+        if TioUtilities.IsAnInterfaceTypeName(ABindSource.TypeName) then
         begin
           if Assigned(ADataObject) then
             LDataObject := ADataObject
           else
             LDataObject := TList<IInterface>.Create;
-          Result := TioActiveInterfaceListBindSourceAdapter.Create(ATypeName, ATypeAlias, AWhere, AOwner, LDataObject, AOwnsObject);
+          Result := TioActiveInterfaceListBindSourceAdapter.Create(AOwner, ABindSource, ADataObject, AOwnsObject);
         end
         // Class
         else
@@ -155,8 +144,7 @@ begin
             LDataObject := ADataObject
           else
             LDataObject := TObjectList<TObject>.Create(True);
-          Result := TioActiveListBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(ATypeName), AWhere, AOwner, TObjectList<TObject>(LDataObject),
-            AOwnsObject);
+          Result := TioActiveListBindSourceAdapter.Create(AOwner, ABindSource, TObjectList<TObject>(LDataObject), AOwnsObject);
         end;
       end;
 
@@ -164,16 +152,16 @@ begin
     TioTypeOfCollection.tcSingleObject:
       begin
         // Interfaced
-        if TioUtilities.IsAnInterfaceTypeName(ATypeName) then
+        if TioUtilities.IsAnInterfaceTypeName(ABindSource.TypeName) then
         begin
           if Assigned(ADataObject) and not Supports(ADataObject, IInterface, LIntfDataObject) then
             raise EioGenericException.Create(Self.ClassName, 'GetBSA', 'TypeName is an interface but ADataObject does not implement any interface.');
-          Result := TioActiveInterfaceObjectBindSourceAdapter.Create(ATypeName, ATypeAlias, AWhere, AOwner, LIntfDataObject);
+          Result := TioActiveInterfaceObjectBindSourceAdapter.Create(AOwner, ABindSource, LIntfDataObject, False);
         end
         // Class
         else
         begin
-          Result := TioActiveObjectBindSourceAdapter.Create(TioUtilities.ClassNameToClassRef(ATypeName), AWhere, AOwner, ADataObject, AOwnsObject);
+          Result := TioActiveObjectBindSourceAdapter.Create(AOwner, ABindSource, ADataObject, AOwnsObject);
           // False);
         end;
 
@@ -195,61 +183,36 @@ begin
   end;
 end;
 
-class function TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioActiveBindSourceAdapter)
-      : IioActiveBindSourceAdapter;
+class function TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(const AOwner: TComponent; const ABindSource: IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapter): IioActiveBindSourceAdapter;
 begin
-  if ASourceAdapter.IsInterfaceBSA then
-    Result := TioNaturalActiveInterfaceObjectBindSourceAdapter.Create(AOwner, ASourceAdapter)
+  if ASourceActiveBSA.IsInterfaceBSA then
+    Result := TioNaturalActiveInterfaceObjectBindSourceAdapter.Create(AOwner, ABindSource, ASourceActiveBSA)
   else
-    Result := TioNaturalActiveObjectBindSourceAdapter.Create(AOwner, ASourceAdapter);
+    Result := TioNaturalActiveObjectBindSourceAdapter.Create(AOwner, ABindSource, ASourceActiveBSA);
 end;
 
-// ----- OLD CODE -----
-//class function TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(const ASenderBSName: String; const AOwner: TComponent;
-//  const AMasterBindSource: IioBindSource; const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
-//begin
-//  // If the MasterPropertyName property is empty then get a NaturalActiveBindSourceAdapter
-//  // from the MasterBindSource else get a detail ActiveBindSourceAdapter even from the
-//  // MasterBindSource.
-//  if AMasterPropertyName.IsEmpty then
-//  begin
-//    if not Assigned(AMasterBindSource) then
-//      raise EioException.Create(ClassName, 'GetBSAfromMasterBindSourceAdapter',
-//        Format('In bind source "%s" the "LoadType" property has been set to one of his values ("ltFromBSAsIs" or "ltFromBSReload" or "ltFromBSReloadNewInstance") but the "SourceXXX" property has been left blank.'
-//        + ' iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the "SourceXXX" property of bind source "%s" and then try again.',
-//        [ASenderBSName, ASenderBSName]));
-//    Result := AMasterBindSource.GetActiveBindSourceAdapter.NewNaturalObjectBindSourceAdapter(AOwner);
-//  end
-//  else
-//  begin
-//    Result := AMasterBindSource.GetActiveBindSourceAdapter.NewDetailBindSourceAdapter(AOwner, AMasterPropertyName, AWhere);
-//  end;
-//end;
-// ----- OLD CODE -----
-
-class function TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(const AOwner: TComponent; const ASenderBSName: String; const AMasterBS: IioBindSource): IioActiveBindSourceAdapter;
+class function TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(const AOwner: TComponent; const ABindSource: IioBindSource; const AMasterBS: IioBindSource): IioActiveBindSourceAdapter;
 begin
   // Check if the MasterBS property is set
   if not Assigned(AMasterBS) then
     raise EioGenericException.Create(ClassName, 'GetNaturalBSAfromMasterBindSource',
       Format('In component "%s" the "LoadType" property has been set to one of this values ("ltFromBSAsIs" or "ltFromBSReload" or "ltFromBSReloadNewInstance") but the "SourceXXX" property (maybe SourceDataSet, SourcePBS or SourcePresenter) has been left blank.'
       + #13#13'iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the "SourceXXX" property of bind source "%s" and then try again.',
-      [ASenderBSName, ASenderBSName]));
+      [ABindSource.GetName, ABindSource.GetName]));
   // Return the requested natural bind source adapter
-  Result := AMasterBS.GetActiveBindSourceAdapter.NewNaturalObjectBindSourceAdapter(AOwner);
+  Result := AMasterBS.GetActiveBindSourceAdapter.NewNaturalObjectBindSourceAdapter(AOwner, ABindSource);
 end;
 
-class function TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(const AOwner: TComponent; const ASenderBSName: String; const AMasterBS: IioBindSource;
-      const AMasterPropertyName: String = ''; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
+class function TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(const AOwner: TComponent; const ABindSource, AMasterBindSource: IioBindSource; const AMasterPropertyName: String): IioActiveBindSourceAdapter;
 begin
   // Check if the MasterPropertyName property is set
   if AMasterPropertyName.IsEmpty then
    raise EioGenericException.Create(ClassName, 'GetDetailBSAfromMasterBindSource',
      Format('The "MasterPropertyName" property has not been set in the component "%s".'
       + #13#13'iORM is therefore unable to find the instance to expose for binding.'#13#13'Please set the property and try again.',
-     [ASenderBSName]));
+     [ABindSource.GetName]));
   // Return the requested bind source adapter
-  Result := AMasterBS.GetActiveBindSourceAdapter.NewDetailBindSourceAdapter(AOwner, AMasterPropertyName, AWhere);
+  Result := AMasterBindSource.GetActiveBindSourceAdapter.NewDetailBindSourceAdapter(AOwner, ABindSource, AMasterPropertyName);
 end;
 
 end.

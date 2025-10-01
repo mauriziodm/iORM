@@ -295,9 +295,8 @@ type
     procedure Cancel;
     procedure SetObjStatus(AObjStatus: TioObjStatus);
     function UseObjStatus: Boolean;
-    function NewDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere): IioActiveBindSourceAdapter;
-    function NewNaturalObjectBindSourceAdapter(const AOwner: TComponent): IioActiveBindSourceAdapter;
-    function GetDetailBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
+    function NewDetailBindSourceAdapter(const AOwner: TComponent; const ABindSource: IioBindSource; const AMasterPropertyName: String): IioActiveBindSourceAdapter;
+    function NewNaturalObjectBindSourceAdapter(const AOwner: TComponent; const ABindSource: IioBindSource): IioActiveBindSourceAdapter;
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     function MasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     function DetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
@@ -419,9 +418,8 @@ type
     ['{B374E226-D7A9-4A44-9BB6-DF85AC283598}']
     procedure Free;
     procedure SetMasterObject(const AMasterObj: TObject);
-    function NewDetailBindSourceAdapter(const AOwner: TComponent; const AMasterClassName, AMasterPropertyName: String; const AWhere: IioWhere)
-      : IioActiveBindSourceAdapter;
-    function NewNaturalBindSourceAdapter(const AOwner: TComponent; const ASourceAdapter: IioActiveBindSourceAdapter): IioActiveBindSourceAdapter;
+    function NewDetailBindSourceAdapter(const AOwner: TComponent; const ABindSource: IioBindSource; const AMasterClassName, AMasterPropertyName: String): IioActiveBindSourceAdapter;
+    function NewNaturalBindSourceAdapter(const AOwner: TComponent; const ABindSource:IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapter): IioActiveBindSourceAdapter;
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure RemoveDetailBindSourceAdapter(const ABindSourceAdapter: IioContainedBindSourceAdapter);
     procedure RemoveNaturalBindSourceAdapter(const ANaturalBindSourceAdapter: IioNaturalActiveBindSourceAdapter);
@@ -435,7 +433,7 @@ type
     procedure SetMasterAdaptersContainer(AMasterAdapterContainer: IioDetailBindSourceAdaptersContainer);
     procedure SetMasterProperty(AMasterProperty: IioProperty);
     procedure ExtractDetailObject(AMasterObj: TObject); overload;
-    function NewDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere): IioActiveBindSourceAdapter;
+    function NewDetailBindSourceAdapter(const AOwner: TComponent; const ABindSource: IioBindSource; const AMasterPropertyName: String): IioActiveBindSourceAdapter;
     function Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
     function GetMasterPropertyName: String;
     function AsActiveBindSourceAdapter: IioActiveBindSourceAdapter;

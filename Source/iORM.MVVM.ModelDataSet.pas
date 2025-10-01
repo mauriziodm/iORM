@@ -166,6 +166,7 @@ end;
 procedure TioModelDataSet.InternalPreOpen;
 var
   LActiveBSA: IioActiveBindSourceAdapter;
+  LModelPresenter: TioModelPresenterCustom;
 begin
   // Checks
   if not Assigned(FViewModelBridge) then
@@ -174,21 +175,23 @@ begin
     raise EioGenericException.Create(Self.ClassName, 'InternalPreOpen', 'ViewModel not assigned.');
   if ModelPresenter.IsEmpty then // Note: Do not use FModelPresenter here
     raise EioGenericException.Create(Self.ClassName, 'InternalPreOpen', 'Model presenter not specified.');
+  // Extract the model presenter
+  LModelPresenter := GetModelPresenterInstance;
   // Get the BindSourceAdapter from ViewModel and open it
   // Note: If the 'CrossViewMasterSource' property is assigned then get the BindSourceAdapter
   // from it (for cross view with microviews)
   if Assigned(FCrossView_MasterBindSource) then
   begin
     // If here it means that it's a detail (crossview detail)
-    if GetModelPresenterInstance.IsDetailBS then
-      LActiveBSA := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(Self, Name, FCrossView_MasterBindSource.GetModelPresenterInstance, FCrossView_MasterPropertyName, nil)
+    if LModelPresenter.IsDetailBS then
+      LActiveBSA := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(Self, LModelPresenter, FCrossView_MasterBindSource.GetModelPresenterInstance, FCrossView_MasterPropertyName)
     else
-      LActiveBSA := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(Self, Name, FCrossView_MasterBindSource.GetModelPresenterInstance);
+      LActiveBSA := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(Self, LModelPresenter, FCrossView_MasterBindSource.GetModelPresenterInstance);
     // Set the retrieved BSA as adapter in the connected ModelPresenter
-    GetModelPresenterInstance.SetActiveBindSourceAdapter(LActiveBSA);
+    LModelPresenter.SetActiveBindSourceAdapter(LActiveBSA);
   end;
   // Get the BSA for this ModelDataSet from the connected ModelPresenter
-  SetActiveBindSourceAdapter(  GetModelPresenterInstance.GetActiveBindSourceAdapter  );
+  SetActiveBindSourceAdapter(  LModelPresenter.GetActiveBindSourceAdapter  );
 
   // Inherit
   inherited;

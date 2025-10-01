@@ -328,7 +328,6 @@ type
     procedure Insert(AObject: TObject); reintroduce; overload;
     procedure Insert(AObject: IInterface); reintroduce; overload;
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
-    function GetDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere = nil): IioActiveBindSourceAdapter;
     function CanDoSelection: Boolean;
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
   published
@@ -659,17 +658,6 @@ begin
     Result := Assigned(GetActiveBindSourceAdapter.DataObject)
   else
     Result := False;
-end;
-
-function TioPrototypeBindSourceCustom.GetDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere = nil)
-  : IioActiveBindSourceAdapter;
-var
-  AContainedBSA: IioContainedBindSourceAdapter;
-begin
-  if Supports(Self.InternalAdapter, IioContainedBindSourceAdapter, AContainedBSA) then
-    Result := AContainedBSA.NewDetailBindSourceAdapter(AOwner, AMasterPropertyName, AWhere)
-  else
-    Result := nil;
 end;
 
 function TioPrototypeBindSourceCustom.GetETMfor: IioMasterBindSource;
@@ -1255,12 +1243,12 @@ begin
   // else if it is a master bind source but load type property is set to ltFromBSAsIs, ltFromBSReload or ltFromBSReloadNewInstance
   // then get the natural BSA from the source bind source else it is a master bind source then get the normal BSA.
   if IsDetailBS and not MasterPropertyName.IsEmpty then
-    LActiveBSA := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(nil, Name, MasterBindSource, MasterPropertyName)
+    LActiveBSA := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(nil, Self, MasterBindSource, MasterPropertyName)
   else
   if IsFromBSLoadType or (IsDetailBS and MasterPropertyName.IsEmpty) then
-    LActiveBSA := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Name, MasterBindSource)
+    LActiveBSA := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Self, MasterBindSource)
   else
-    LActiveBSA := TioLiveBindingsFactory.GetBSA(nil, Name, TypeName, TypeAlias, GetWhere, TypeOfCollection, ADataObject, True);
+    LActiveBSA := TioLiveBindingsFactory.GetBSA(nil, Self, ADataObject, True);
   // If Self is a Notifiable bind source then register a reference to itself
   // in the ActiveBindSourceAdapter
   // PS: Set ioAsync also (and other properties)

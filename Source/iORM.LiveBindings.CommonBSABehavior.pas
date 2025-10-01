@@ -621,7 +621,7 @@ begin
   // S.O.LO (Smart-Object-LOokup system): Se la proprietà è di tipo classe e su di essa insiste
   //  una relazione BelongsTo/AsOne allora la mappa come Integer in modo da bindare il suo ID come intero
   else
-  if TioUtilities.HasBelongsToOrHasOneRelation(LObj.ClassName, LRttiProperty.Name) then
+  if (not FField.MemberName.StartsWith('%')) and TioUtilities.HasBelongsToOrHasOneRelation(LObj.ClassName, LRttiProperty.Name) then
   begin
     Result := TioCommonBSBehavior.DetailObjLookup_DetailObjID_LB(LObj, LRttiProperty).AsType<T>;
   end
@@ -685,9 +685,6 @@ begin
   LRttiProperty := TioRttiFactory.GetRttiContext.GetType(LObject.ClassType).AsInstance.GetProperty(TioUtilities.ExtractPropertyName(FField.MemberName));
   if not Assigned(LRttiProperty) then
     exit;
-
-
-
   // S.O.LO (Smart-Object-LOokup system): Se la proprietà è di tipo classe e su di essa insiste
   //  una relazione BelongsTo/AsOne allora la mappa come Integer in modo da bindare il suo ID come intero
   if TioUtilities.HasBelongsToOrHasOneRelation(LObject.ClassName, LRttiProperty.Name) then
@@ -695,9 +692,6 @@ begin
     LValue := TioCommonBSBehavior.DetailObjLookup_ByTypeName_LB(FBindSource, LRttiProperty, TValue.From<T>(AValue));
     LRttiProperty.SetValue(LObject, LValue);
   end
-
-
-
   // Enumeration type
   else
   if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then

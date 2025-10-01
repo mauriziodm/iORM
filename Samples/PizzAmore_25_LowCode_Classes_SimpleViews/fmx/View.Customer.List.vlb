@@ -1,70 +1,70 @@
 ﻿[BSMaster]
-Coordinates=414,28,143,146
+Coordinates=414,28,119,123
 Visible=True
 
 [RectangleTitle]
-Coordinates=471,386,97,36
+Coordinates=471,386,84,33
 
 [acBack]
-Coordinates=58,229,57,36
+Coordinates=58,229,50,33
 
 [acShowOrSelect]
-Coordinates=362,1,110,36
+Coordinates=362,1,95,33
 
 [acAdd]
-Coordinates=0,193,51,36
+Coordinates=0,193,45,33
 
 [ButtonBack]
-Coordinates=206,309,80,58
+Coordinates=206,309,72,51
 
 [Rectangle1]
 Coordinates=181,210,80,36
 
 [ListView]
-Coordinates=613,10,107,190
+Coordinates=613,10,89,159
 
 [LabelTitle]
-Coordinates=404,309,71,58
+Coordinates=404,309,62,51
 
 [ButtonAdd]
-Coordinates=10,309,74,58
+Coordinates=10,309,67,51
 
 [acDelete]
-Coordinates=362,111,65,36
+Coordinates=362,111,56,33
 
 [ButtonDelete]
-Coordinates=196,386,89,58
+Coordinates=196,386,78,51
 
 [ActionList1]
-Coordinates=362,166,78,36
+Coordinates=362,166,70,33
 
 []
 Coordinates=127,10,77,51
 
 [BindingsList1]
-Coordinates=136,87,91,36
+Coordinates=136,87,82,33
 
 [ButtonSelect]
-Coordinates=103,309,88,58
+Coordinates=103,309,77,51
 
 [acSelectCurrent]
-Coordinates=136,142,107,36
+Coordinates=136,142,93,33
 
 [acNextPage]
-Coordinates=170,306,84,36
+Coordinates=170,306,72,33
 
 [acPrevPage]
-Coordinates=81,306,84,36
+Coordinates=81,306,72,33
 
 [LabelPage]
-Coordinates=269,64,76,58
+Coordinates=269,64,65,51
 Visible=True
 
 [ButtonPgDown]
-Coordinates=10,386,100,58
+Coordinates=10,386,88,51
 
 [ButtonPgUp]
-Coordinates=304,309,84,58
+Coordinates=304,309,74,51
 
 [acWhereBuild]
 Coordinates=267,150,83,33
@@ -73,46 +73,49 @@ Coordinates=267,150,83,33
 Coordinates=267,262,83,33
 
 [BSWhere]
-Coordinates=10,94,69,124
+Coordinates=10,94,60,105
 
 [RectangleWhere]
-Coordinates=169,463,110,36
+Coordinates=169,463,95,33
 
 [RectangleWhereButtons]
-Coordinates=10,463,154,36
+Coordinates=10,463,133,33
 
 [ButtonClear]
-Coordinates=372,386,83,58
+Coordinates=372,386,73,51
 
 [RectangleBottom]
-Coordinates=581,386,113,36
+Coordinates=581,386,99,33
 
 [ButtonSearch]
-Coordinates=492,309,92,58
+Coordinates=492,309,81,51
 
 [EditWhereID]
-Coordinates=159,10,87,58
+Coordinates=159,10,75,51
 Visible=True
 
 [EditWhereCity]
-Coordinates=154,232,97,58
+Coordinates=154,232,84,51
 
 [EditWhereName]
-Coordinates=150,121,108,58
+Coordinates=150,121,93,51
 Visible=True
 
 [Label3]
-Coordinates=300,386,53,58
+Coordinates=300,386,46,51
 
 [Label1]
-Coordinates=599,309,53,58
+Coordinates=599,309,46,51
 
 [Label2]
-Coordinates=124,386,53,58
+Coordinates=124,386,46,51
 
 [acBuildWhere]
-Coordinates=0,0,95,36
+Coordinates=0,0,83,33
 
 [acClearWhere]
-Coordinates=34,55,97,36
+Coordinates=34,55,83,33
+
+[acAppend]
+Coordinates=284,1,64,33
 

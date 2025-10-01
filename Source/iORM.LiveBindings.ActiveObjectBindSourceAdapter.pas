@@ -152,7 +152,7 @@ type
 
 
 
-    constructor Create(const AOwner: TComponent; const ABindSource: IioBindSource; const ADataObject: TObject; const AOwnsObject: Boolean = True); virtual; reintroduce;
+    constructor Create(const AOwner: TComponent; const ABindSource: IioBindSource; const ADataObject: TObject; const AOwnsObject: Boolean); reintroduce; virtual;
 
 
 
@@ -166,9 +166,8 @@ type
     procedure ExtractDetailObject(AMasterObj: TObject);
     procedure PersistCurrent;
     procedure PersistAll;
-    function NewDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere): IioActiveBindSourceAdapter;
-    function NewNaturalObjectBindSourceAdapter(const AOwner: TComponent): IioActiveBindSourceAdapter;
-    function GetDetailBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
+    function NewDetailBindSourceAdapter(const AOwner: TComponent; const ABindSource: IioBindSource; const AMasterPropertyName: String): IioActiveBindSourceAdapter;
+    function NewNaturalObjectBindSourceAdapter(const AOwner: TComponent; const ABindSource: IioBindSource): IioActiveBindSourceAdapter;
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     function DetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     procedure Append(AObject: TObject); reintroduce; overload;
@@ -287,8 +286,7 @@ end;
 //  FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
 //end;
 
-constructor TioActiveObjectBindSourceAdapter.Create(const AOwner: TComponent; const ABindSource: IioBindSource; const ADataObject: TObject;
-  const AOwnsObject: Boolean);
+constructor TioActiveObjectBindSourceAdapter.Create(const AOwner: TComponent; const ABindSource: IioBindSource; const ADataObject: TObject; const AOwnsObject: Boolean);
 var
   FClassRef: TioClassRef;
 begin
@@ -519,11 +517,6 @@ begin
   Result := FDataSetLinkContainer;
 end;
 
-function TioActiveObjectBindSourceAdapter.GetDetailBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
-begin
-  Result := FDetailAdaptersContainer.GetBindSourceAdapterByMasterPropertyName(AMasterPropertyName);
-end;
-
 function TioActiveObjectBindSourceAdapter.GetFields: TList<TBindSourceAdapterField>;
 begin
   Result := Self.Fields;
@@ -539,12 +532,16 @@ begin
   Result := FAsyncPersist;
 end;
 
-function TioActiveObjectBindSourceAdapter.NewDetailBindSourceAdapter(const AOwner: TComponent; const AMasterPropertyName: String; const AWhere: IioWhere)
-  : IioActiveBindSourceAdapter;
+function TioActiveObjectBindSourceAdapter.NewDetailBindSourceAdapter(const AOwner: TComponent; const ABindSource: IioBindSource; const AMasterPropertyName: String): IioActiveBindSourceAdapter;
 begin
   // Return the requested DetailBindSourceAdapter and set the current master object
-  Result := FDetailAdaptersContainer.NewDetailBindSourceAdapter(AOwner, FTypeName, AMasterPropertyName, AWhere);
+  Result := FDetailAdaptersContainer.NewDetailBindSourceAdapter(AOwner, ABindSource, GetObjectType.Name, AMasterPropertyName);
   FDetailAdaptersContainer.SetMasterObject(Current);
+end;
+
+function TioActiveObjectBindSourceAdapter.NewNaturalObjectBindSourceAdapter(const AOwner: TComponent; const ABindSource: IioBindSource): IioActiveBindSourceAdapter;
+begin
+  Result := FDetailAdaptersContainer.NewNaturalBindSourceAdapter(AOwner, ABindSource, Self);
 end;
 
 function TioActiveObjectBindSourceAdapter.GetioAutoPost: Boolean;
@@ -615,11 +612,6 @@ end;
 function TioActiveObjectBindSourceAdapter.GetTypeName: String;
 begin
   Result := FTypeName;
-end;
-
-function TioActiveObjectBindSourceAdapter.NewNaturalObjectBindSourceAdapter(const AOwner: TComponent): IioActiveBindSourceAdapter;
-begin
-  Result := FDetailAdaptersContainer.NewNaturalBindSourceAdapter(AOwner, Self);
 end;
 
 procedure TioActiveObjectBindSourceAdapter.Insert(AObject: TObject);

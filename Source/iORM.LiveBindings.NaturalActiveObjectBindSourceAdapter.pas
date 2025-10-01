@@ -44,7 +44,7 @@ type
 
   TioNaturalActiveObjectBindSourceAdapter = class(TioActiveObjectBindSourceAdapter, IioNaturalActiveBindSourceAdapter)
   private
-    FSourceActiveBSA: IioActiveBindSourceAdapterSource;
+    FSourceActiveBSA: IioActiveBindSourceAdapter;
     procedure SynchronizeSourceAdapter;
   protected
     procedure DoBeforeOpen; override;
@@ -53,7 +53,7 @@ type
     // AutoLoad
     function GetAutoLoad: Boolean; override;
   public
-    constructor Create(const AOwner:TComponent; const ABindSource:IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapterSource); virtual; reintroduce;
+    constructor Create(const AOwner:TComponent; const ABindSource:IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapter); reintroduce; virtual;
     destructor Destroy; override;
     procedure ForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure Reload; override;
@@ -70,7 +70,7 @@ uses
 
 { TioNaturalActiveObjectBindSourceAdapter }
 
-constructor TioNaturalActiveObjectBindSourceAdapter.Create(const AOwner:TComponent; const ABindSource:IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapterSource);
+constructor TioNaturalActiveObjectBindSourceAdapter.Create(const AOwner:TComponent; const ABindSource:IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapter);
 begin
   inherited Create(AOwner, ABindSource, ASourceActiveBSA.Current, False); // False because a NaturalBindSourceAdapter never owns objects
   FSourceActiveBSA := ASourceActiveBSA;

@@ -335,6 +335,7 @@ end;
 procedure TioModelBindSource._CreateAdapter;
 var
   LActiveBSA: IioActiveBindSourceAdapter;
+  LModelPresenter: TioModelPresenterCustom;
 begin
   // If in DesignTime then Exit
   // FioLoaded flag for iORM DoCreateAdapter internal use only just before
@@ -349,19 +350,22 @@ begin
   // from it (for cross view with microviews)
   if (not ModelPresenter.IsEmpty) and Assigned(ViewModelBridge) and ViewModelBridge.ViewModelIsAssigned then
   begin
+    // Extract the model presenter
+    LModelPresenter := GetModelPresenterInstance;
+    // If there a FCrossView_MasterBindSource is assigned
     if Assigned(FCrossView_MasterBindSource) then
     begin
       // If here it means that it's a detail (crossview detail)
-      if GetModelPresenterInstance.IsDetailBS then
-        LActiveBSA := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(Self, Name, FCrossView_MasterBindSource.GetModelPresenterInstance, FCrossView_MasterPropertyName, nil)
+      if LModelPresenter.IsDetailBS then
+        LActiveBSA := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(Self, LModelPresenter, FCrossView_MasterBindSource.GetModelPresenterInstance, FCrossView_MasterPropertyName)
       else
-        LActiveBSA := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(Self, Name, FCrossView_MasterBindSource.GetModelPresenterInstance);
+        LActiveBSA := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, LModelPresenter, FCrossView_MasterBindSource.GetModelPresenterInstance);
       // Set the retrieved BSA as adapter for this Presenter
-      GetModelPresenterInstance.SetActiveBindSourceAdapter(LActiveBSA);
+      LModelPresenter.SetActiveBindSourceAdapter(LActiveBSA);
     end
     else
       // Get the BSA from the presenter
-      LActiveBSA := GetModelPresenterInstance.GetActiveBindSourceAdapter;
+      LActiveBSA := LModelPresenter.GetActiveBindSourceAdapter;
     // Assign the BindSourceAdapter
     if Assigned(LActiveBSA) then
     begin

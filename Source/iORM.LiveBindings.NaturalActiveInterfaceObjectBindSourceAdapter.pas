@@ -45,7 +45,7 @@ type
 
   TioNaturalActiveInterfaceObjectBindSourceAdapter = class(TioActiveInterfaceObjectBindSourceAdapter, IioNaturalActiveBindSourceAdapter)
   private
-    FSourceActiveBSA: IioActiveBindSourceAdapterSource;
+    FSourceActiveBSA: IioActiveBindSourceAdapter;
     procedure SynchronizeSourceAdapter;
   protected
     procedure DoBeforeOpen; override;
@@ -54,7 +54,7 @@ type
     // AutoLoad
     function GetAutoLoad: Boolean; override;
   public
-    constructor Create(const AOwner:TComponent; const ABindSource:IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapterSource); virtual; reintroduce;
+    constructor Create(const AOwner:TComponent; const ABindSource:IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapter); reintroduce; virtual;
     destructor Destroy; override;
     procedure ForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure Reload; override;
@@ -72,7 +72,7 @@ uses
 
 { TioNaturalActiveInterfaceObjectBindSourceAdapter }
 
-constructor TioNaturalActiveInterfaceObjectBindSourceAdapter.Create(const AOwner: TComponent;  const ABindSource:IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapterSource);
+constructor TioNaturalActiveInterfaceObjectBindSourceAdapter.Create(const AOwner:TComponent; const ABindSource:IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapter);
 var
   LCurrentAsInterface: IInterface;
 begin
@@ -165,7 +165,7 @@ end;
 procedure TioNaturalActiveInterfaceObjectBindSourceAdapter.ForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
 begin
   if Assigned(FSourceActiveBSA) then
-    FSourceActiveBSA.Notify(Self, FSourceActiveBSA);
+    FSourceActiveBSA.Notify(Self, ANotification);
 end;
 
 // Copiato tale e quale dal NaturalActiveObjectBindSourceAdapters

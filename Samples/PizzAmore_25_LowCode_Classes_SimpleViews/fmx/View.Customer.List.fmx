@@ -37,7 +37,7 @@ inherited ViewCustomerList: TViewCustomerList
       Size.Width = 240.000000000000000000
       Size.Height = 40.000000000000000000
       Size.PlatformDefault = False
-      Text = '-33'
+      Text = 'Darkgoldenrod'
       TabOrder = 2
     end
   end
@@ -174,7 +174,7 @@ inherited ViewCustomerList: TViewCustomerList
       end
       item
         Name = '%Paging.CurrentPageOf'
-        Generator = 'Integers'
+        Generator = 'ColorsNames'
         ReadOnly = False
       end>
     Preview = True
