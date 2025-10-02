@@ -135,7 +135,7 @@ begin
             LDataObject := ADataObject
           else
             LDataObject := TList<IInterface>.Create;
-          Result := TioActiveInterfaceListBindSourceAdapter.Create(ABindSource, ADataObject, AOwnsObject);
+          Result := TioActiveInterfaceListBindSourceAdapter.Create(ABindSource, LDataObject, AOwnsObject);
         end
         // Class
         else

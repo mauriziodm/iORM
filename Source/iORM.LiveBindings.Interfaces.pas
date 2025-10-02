@@ -267,6 +267,7 @@ type
 
   IioActiveBindSourceAdapter = interface
     ['{F407B515-AE0B-48FD-B8C3-0D0C81774A58}']
+    function GetObjectType: TRttiType;
     procedure Free;
     procedure Next;
     procedure Prior;
@@ -317,7 +318,6 @@ type
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     function GetMasterPropertyName: String;
     function GetMasterPropertyPath: String;
-    function GetBaseObjectClassName: String;
     function FindField(const AMemberName: string): TBindSourceAdapterField;
     // Selection related pethond
     procedure ReceiveSelection(ASelected: TObject; ASelectionType: TioSelectionType); overload;

@@ -76,8 +76,6 @@ type
     procedure InternalApplyUpdates; override;
     procedure DoOnBeforeSetList(AList: TList<T>); virtual;
     procedure DoOnAfterSetList; virtual;
-    function GetBaseObjectRttiType: TRttiType;
-    function GetBaseObjectClassName: String;
     // TypeName
     procedure SetTypeName(const AValue:String);
     function GetTypeName: String;
@@ -243,16 +241,6 @@ procedure TInterfaceListBindSourceAdapter<T>.DoOnBeforeSetList(AList: TList<T>);
 begin
   if Assigned(FOnBeforeSetList) then
     FOnBeforeSetList(Self, AList);
-end;
-
-function TInterfaceListBindSourceAdapter<T>.GetBaseObjectClassName: String;
-begin
-  Result := FBaseObjectRttiType.Name;
-end;
-
-function TInterfaceListBindSourceAdapter<T>.GetBaseObjectRttiType: TRttiType;
-begin
-  Result := FBaseObjectRttiType;
 end;
 
 function TInterfaceListBindSourceAdapter<T>.GetCanActivate: Boolean;

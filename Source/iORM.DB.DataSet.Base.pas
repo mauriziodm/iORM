@@ -943,7 +943,7 @@ begin
   if AActiveBindSourceAdpter = FBindSourceAdapter then
     Exit;
   // Set the Map of the BaseObject of the ActiveBindSourceAdapter
-  FMap := TioMapContainer.GetMap(AActiveBindSourceAdpter.GetBaseObjectClassName);
+  FMap := TioMapContainer.GetMap(AActiveBindSourceAdpter.GetObjectType.Name);
   // Set the BindSourceAdapter
   FBindSourceAdapter := AActiveBindSourceAdpter;
   // Register itself (the DataSet) into the DataSetLinkContainer of the BindSourceAdapter
