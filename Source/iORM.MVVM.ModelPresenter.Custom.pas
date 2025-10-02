@@ -289,7 +289,6 @@ type
     function CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean; overload;
     function CheckActiveAdapter: Boolean;
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
-    // procedure SetMasterBindSourceAdapter(const AMasterBindSourceAdapter:IioActiveBindSourceAdapter; const AMasterPropertyName:String='');
     procedure RegisterDetailBindSource(const ADetailBindSource: IioBindSource);
     procedure UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
 
@@ -1182,23 +1181,6 @@ begin
   // Register itself for notifications from BindSourceAdapter
   FBindSourceAdapter.SetBindSource(Self);
 end;
-
-// procedure TioModelPresenter.SetMasterBindSourceAdapter(
-// const AMasterBindSourceAdapter: IioActiveBindSourceAdapter;
-// const AMasterPropertyName: String);
-// var
-// LBindSourceAdapter: TBindSourceAdapter;
-// begin
-// // Get the BSAdapter from the MasterBindSourceAdapter and register Self for
-// //  notifications
-// LBindSourceAdapter := TioLiveBindingsFactory.GetBSAfromMasterBindSourceAdapter(
-// Self,
-// AMasterBindSourceAdapter,
-// AMasterPropertyName,
-// FWhere
-// );
-// Self.SetBindSourceAdapter(LBindSourceAdapter);
-// end;
 
 procedure TioModelPresenterCustom.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
