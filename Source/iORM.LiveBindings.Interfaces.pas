@@ -302,8 +302,6 @@ type
     function MasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     function DetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     function DataObject: TObject;
-    // procedure InternalSetDataObject(const ADataObject:TObject; const AOwnsObject:Boolean=True); overload;
-    // procedure InternalSetDataObject(const ADataObject:IInterface; const AOwnsObject:Boolean=False); overload;
     procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean); overload;
     procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean); overload;
     procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
@@ -316,49 +314,18 @@ type
     function IsInterfaceBSA: Boolean;
     function AsTBindSourceAdapter: TBindSourceAdapter;
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
-    function GetMasterPropertyName: String;
     function GetMasterPropertyPath: String;
     function FindField(const AMemberName: string): TBindSourceAdapterField;
     // Selection related pethond
     procedure ReceiveSelection(ASelected: TObject; ASelectionType: TioSelectionType); overload;
     procedure ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType); overload;
-    // TypeName
-    procedure SetTypeName(const AValue: String);
-    function GetTypeName: String;
-    // TypeAlias
-    procedure SetTypeAlias(const AValue: String);
-    function GetTypeAlias: String;
-    // Lazy
-    procedure SetLazy(const Value: Boolean);
-    function GetLazy: Boolean;
-    // LazyProps
-    procedure SetLazyProps(const Value: String);
-    function GetLazyProps: String;
-    // LoadType
-    procedure SetLoadType(const Value: TioLoadType);
-    function GetLoadType: TioLoadType;
     // AutoLoad
     function GetAutoLoad: Boolean;
     // Current property
     function GetCurrent: TObject;
-    // AsyncLoad property
-    procedure SetAsyncLoad(const Value: Boolean);
-    function GetAsyncLoad: Boolean;
-    property AsyncLoad: Boolean read GetAsyncLoad write SetAsyncLoad;
-    // AsyncPersist property
-    procedure SetAsyncPersist(const Value: Boolean);
-    function GetAsyncPersist: Boolean;
-    property AsyncPersist: Boolean read GetAsyncPersist write SetAsyncPersist;
     // AutoPost property
     procedure SetioAutoPost(const Value: Boolean);
     function GetioAutoPost: Boolean;
-    // Where property
-    procedure SetWhere(const Value: IioWhere);
-    function GetWhere: IioWhere;
-    // ioViewDataType
-    function GetTypeOfCollection: TioTypeOfCollection;
-    // ioOwnsObjects
-    function GetOwnsObjects: Boolean;
     // State
     function GetState: TBindSourceAdapterState;
     // EOF
@@ -393,18 +360,8 @@ type
     property Current: TObject read GetCurrent;
     property EOF: Boolean read GetEOF;
     property Fields: TList<TBindSourceAdapterField> read GetFields;
-    property AsyncLoad: Boolean read GetAsyncLoad write SetAsyncLoad;
-    property AsyncPersist: Boolean read GetAsyncPersist write SetAsyncPersist;
-    property Lazy: Boolean read GetLazy write SetLazy;
-    property LazyProps: String read GetLazyProps write SetLazyProps;
-    property LoadType: TioLoadType read GetLoadType write SetLoadType;
     property AutoLoad: Boolean read GetAutoLoad;
     property ioAutoPost: Boolean read GetioAutoPost write SetioAutoPost; // Lascio il nome a ioAutoPost perchè c'è già un AutoPost negli antenati
-    property ioOwnsObjects: Boolean read GetOwnsObjects; // Lascio il nome a ioAutoPost perchè c'è già un AutoPost negli antenati
-    property TypeAlias: String read GetTypeAlias write SetTypeAlias;
-    property TypeName: String read GetTypeName write SetTypeName;
-    property ioWhere: IioWhere read GetWhere write SetWhere;
-    property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection;
     property ItemCount: Integer read GetCount;
     property ItemIndex: Integer read GetItemIndex write SetItemIndex;
     property Items[const AIndex: Integer]: TObject read GetItems write SetItems;
@@ -431,14 +388,10 @@ type
     ['{66AF6AD7-9093-4526-A18C-54447FB220A3}']
     procedure Free;
     procedure SetMasterAdaptersContainer(AMasterAdapterContainer: IioDetailBindSourceAdaptersContainer);
-    procedure SetMasterProperty(AMasterProperty: IioProperty);
     procedure ExtractDetailObject(AMasterObj: TObject); overload;
     function NewDetailBindSourceAdapter(const ABindSource: IioBindSource; const AMasterPropertyName: String): IioActiveBindSourceAdapter;
     function Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
-    function GetMasterPropertyName: String;
     function AsActiveBindSourceAdapter: IioActiveBindSourceAdapter;
-    // Where property
-    function GetWhere: IioWhere;
   end;
 
 //  IioNaturalBindSourceAdapterSource = interface
