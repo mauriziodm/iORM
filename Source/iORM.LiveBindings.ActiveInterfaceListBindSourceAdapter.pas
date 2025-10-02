@@ -49,16 +49,7 @@ const
 type
   TioActiveInterfaceListBindSourceAdapter = class(TInterfaceListBindSourceAdapter, IioContainedBindSourceAdapter, IioActiveBindSourceAdapter)
   private
-    FAsyncLoad: Boolean;
-    FAsyncPersist: Boolean;
-    FWhere: IioWhere;
-    FTypeName, FTypeAlias: String;
-    FLocalOwnsObject: Boolean;
-    FLazy: Boolean;
-    FLazyProps: String;
-    FLoadType: TioLoadType;
     FReloading: Boolean;
-    FMasterPropertyName: String;
     FMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     FDetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     FBindSource: IioBindSource;
@@ -69,22 +60,11 @@ type
     // Reference to the same instance contained by FList field, this reference is only to keep live the list instance
     // TODO: Dopo aver eliminato le IioList<T> interne è da eliminare? Opppure la teniamo e ripristiniamo anche i costruttori per le liste di Spring4D
     FInterfacedList: IInterface;
-    // AsyncLoad property
-    function GetAsyncLoad: Boolean;
-    procedure SetAsyncLoad(const Value: Boolean);
-    // AsyncPersist property
-    function GetAsyncPersist: Boolean;
-    procedure SetAsyncPersist(const Value: Boolean);
     // AutoPost property
     procedure SetioAutoPost(const Value: Boolean);
     function GetioAutoPost: Boolean;
-    // Where property
-    procedure SetWhere(const Value: IioWhere);
-    function GetWhere: IioWhere;
-    // ioViewDataType
+    // TypeOfCollection
     function GetTypeOfCollection: TioTypeOfCollection;
-    // ioOwnsObjects
-    function GetOwnsObjects: Boolean;
     // State
     function GetState: TBindSourceAdapterState;
     // Fields
@@ -95,15 +75,6 @@ type
     // Items
     function GetItems(const AIndex: Integer): TObject;
     procedure SetItems(const AIndex: Integer; const Value: TObject);
-    // Lazy
-    procedure SetLazy(const Value: Boolean);
-    function GetLazy: Boolean;
-    // LazyProps
-    procedure SetLazyProps(const Value: String);
-    function GetLazyProps: String;
-    // LoadType
-    procedure SetLoadType(const Value: TioLoadType);
-    function GetLoadType: TioLoadType;
     // Reloading
     function GetReloading: Boolean;
     procedure SetReloading(const Value: Boolean);
@@ -143,7 +114,6 @@ type
     procedure _InternalSetDataObject<T>(const ADataObject: TObject; const AOwnsObject: Boolean);
     procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
     procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
-    constructor InternalCreate(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwnsObject: Boolean); overload;
   public
 //    constructor Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject;
 //      const AOwnsObject: Boolean = True); overload;
@@ -157,7 +127,6 @@ type
     destructor Destroy; override;
     function MasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     procedure SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
-    procedure SetMasterProperty(AMasterProperty: IioProperty);
     procedure SetBindSource(ANotifiableBindSource: IioBindSource);
     function GetBindSource: IioBindSource;
     function HasBindSource: Boolean;
@@ -185,7 +154,6 @@ type
     function IsMasterBSA: Boolean;
     function IsDetailBSA: Boolean;
     function IsInterfaceBSA: Boolean;
-    function GetMasterPropertyName: String;
     function GetMasterPropertyPath: String;
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     procedure DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer = 100);
@@ -217,30 +185,6 @@ begin
 end;
 {$ENDIF}
 
-constructor TioActiveInterfaceListBindSourceAdapter.InternalCreate(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwnsObject: Boolean);
-begin
-  FInterfacedList := nil;
-  FLoadType := ltAuto;
-  FLazy := False;
-  FLazyProps := '';
-  FAsyncLoad := False;
-  FAsyncPersist := False;
-  FReloading := False;
-  FBSPersistenceDeleting := False;
-  // inherited Create(AOwner, ADataObject, ATypeAlias, ATypeName, AOwnsObject);
-  FLocalOwnsObject := AOwnsObject;
-  FWhere := AWhere;
-  FTypeName := ATypeName;
-  FTypeAlias := ATypeAlias;
-  FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
-  // Set Master & Details adapters reference
-  FMasterAdaptersContainer := nil;
-  FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
-  // Init InsertObj subsystem values
-  FInsertObj_Enabled := False;
-  FInsertObj_NewObj := nil;
-end;
-
 //constructor TioActiveInterfaceListBindSourceAdapter.Create(const ATypeName, ATypeAlias: String; const AWhere: IioWhere; const AOwner: TComponent;
 //  const ADataObject: TObject; const AOwnsObject: Boolean);
 //begin
@@ -251,16 +195,19 @@ end;
 constructor TioActiveInterfaceListBindSourceAdapter.Create(const ABindSource: IioBindSource; const ADataObject: TObject; const AOwnsObject: Boolean);
 begin
   inherited Create(nil, ADataObject, ABindSource.GetTypeAlias, ABindSource.GetTypeName, AOwnsObject);
-  InternalCreate(ABindSource.GetTypeName, ABindSource.GetTypeAlias, ABindSource.Where, AOwnsObject);
-  // TODO: Mauri 29-09-2025: da rimuovere quando si farà che i valori sotto saranno presi direttamente da IioBindSource
-  FAsyncLoad := ABindSource.AsyncLoad;
-  FAsyncPersist := ABindSource.AsyncPersist;
-  SetioAutoPost(ABindSource.AutoPost);
-  FLoadType := ABindSource.LoadType;
-  FLazy := ABindSource.Lazy;
-  FLazyProps := ABindSource.LazyProps;
-
   FBindSource := ABindSource;
+  FInterfacedList := nil;
+  FReloading := False;
+  FBSPersistenceDeleting := False;
+  FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
+  // Set Master & Details adapters reference
+  FMasterAdaptersContainer := nil;
+  FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
+  // Init InsertObj subsystem values
+  FInsertObj_Enabled := False;
+  FInsertObj_NewObj := nil;
+  // AutoPost
+  SetioAutoPost(ABindSource.AutoPost);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.Append(AObject: IInterface);
@@ -425,9 +372,9 @@ procedure TioActiveInterfaceListBindSourceAdapter.ExtractDetailObject(AMasterObj
 var
   LDetailObj: TObject;
   LDetailIntf: IInterface;
-  LValue: TValue;
   LLazyLoadableObj: IioLazyLoadable;
   LMasterProperty: IioProperty;
+  LValue: TValue;
 begin
   LDetailObj := nil;
   LDetailIntf := nil;
@@ -473,21 +420,6 @@ begin
   // 2° parameter false ABSOLUTELY!!!!!!!
 end;
 
-function TioActiveInterfaceListBindSourceAdapter.GetLazy: Boolean;
-begin
-  Result := FLazy;
-end;
-
-function TioActiveInterfaceListBindSourceAdapter.GetLazyProps: String;
-begin
-  Result := FLazyProps;
-end;
-
-function TioActiveInterfaceListBindSourceAdapter.GetLoadType: TioLoadType;
-begin
-  Result := FLoadType;
-end;
-
 function TioActiveInterfaceListBindSourceAdapter.GetAutoLoad: Boolean;
 begin
   Result := FLoadType = ltAuto;
@@ -523,16 +455,6 @@ begin
   Result := Self.Fields;
 end;
 
-function TioActiveInterfaceListBindSourceAdapter.GetAsyncLoad: Boolean;
-begin
-  Result := FAsyncLoad;
-end;
-
-function TioActiveInterfaceListBindSourceAdapter.GetAsyncPersist: Boolean;
-begin
-  Result := FAsyncPersist;
-end;
-
 function TioActiveInterfaceListBindSourceAdapter.NewDetailBindSourceAdapter(const ABindSource: IioBindSource; const AMasterPropertyName: String): IioActiveBindSourceAdapter;
 begin
   // Return the requested DetailBindSourceAdapter and set the current master object
@@ -548,11 +470,6 @@ end;
 function TioActiveInterfaceListBindSourceAdapter.GetTypeOfCollection: TioTypeOfCollection;
 begin
   Result := TYPE_OF_COLLECTION;
-end;
-
-function TioActiveInterfaceListBindSourceAdapter.GetWhere: IioWhere;
-begin
-  Result := FWhere;
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.GetItemIndex: Integer;
@@ -574,22 +491,12 @@ begin
     Result := nil;
 end;
 
-function TioActiveInterfaceListBindSourceAdapter.GetMasterPropertyName: String;
-begin
-  Result := FMasterPropertyName;
-end;
-
 function TioActiveInterfaceListBindSourceAdapter.GetMasterPropertyPath: String;
 begin
   if HasMasterBSA then
     Result := GetMasterBindSourceAdapter.GetMasterPropertyPath + '.' + GetMasterPropertyName
   else
     Result := '';
-end;
-
-function TioActiveInterfaceListBindSourceAdapter.GetOwnsObjects: Boolean;
-begin
-  Result := FLocalOwnsObject;
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.GetReloading: Boolean;
@@ -733,21 +640,6 @@ begin
   // useful in an interface bindsource adapter
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter.SetLazy(const Value: Boolean);
-begin
-  FLazy := Value;
-end;
-
-procedure TioActiveInterfaceListBindSourceAdapter.SetLazyProps(const Value: String);
-begin
-  FLazyProps := Value;
-end;
-
-procedure TioActiveInterfaceListBindSourceAdapter.SetLoadType(const Value: TioLoadType);
-begin
-  FLoadType := Value;
-end;
-
 procedure TioActiveInterfaceListBindSourceAdapter.SetBindSource(ANotifiableBindSource: IioBindSource);
 begin
   FBindSource := ANotifiableBindSource;
@@ -841,24 +733,9 @@ begin
   Self._InternalSetDataObject<TObject>(ADataObject, AOwnsObject);
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter.SetAsyncLoad(const Value: Boolean);
-begin
-  FAsyncLoad := Value;
-end;
-
-procedure TioActiveInterfaceListBindSourceAdapter.SetAsyncPersist(const Value: Boolean);
-begin
-  FAsyncPersist := Value;
-end;
-
 procedure TioActiveInterfaceListBindSourceAdapter.SetioAutoPost(const Value: Boolean);
 begin
   Self.AutoPost := Value;
-end;
-
-procedure TioActiveInterfaceListBindSourceAdapter.SetWhere(const Value: IioWhere);
-begin
-  FWhere := Value;
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.SetItemIndex(const Value: Integer);
@@ -879,11 +756,6 @@ end;
 procedure TioActiveInterfaceListBindSourceAdapter.SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
 begin
   FMasterAdaptersContainer := AMasterAdaptersContainer;
-end;
-
-procedure TioActiveInterfaceListBindSourceAdapter.SetMasterProperty(AMasterProperty: IioProperty);
-begin
-  FMasterPropertyName := AMasterProperty.GetName;
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.SetObjStatus(AObjStatus: TioObjStatus);
