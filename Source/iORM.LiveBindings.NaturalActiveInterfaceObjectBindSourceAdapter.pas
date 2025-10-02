@@ -54,7 +54,7 @@ type
     // AutoLoad
     function GetAutoLoad: Boolean; override;
   public
-    constructor Create(const AOwner:TComponent; const ABindSource:IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapter); reintroduce; virtual;
+    constructor Create(const ABindSource:IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapter); reintroduce; virtual;
     destructor Destroy; override;
     procedure ForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure Reload; override;
@@ -72,13 +72,13 @@ uses
 
 { TioNaturalActiveInterfaceObjectBindSourceAdapter }
 
-constructor TioNaturalActiveInterfaceObjectBindSourceAdapter.Create(const AOwner:TComponent; const ABindSource:IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapter);
+constructor TioNaturalActiveInterfaceObjectBindSourceAdapter.Create(const ABindSource:IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapter);
 var
   LCurrentAsInterface: IInterface;
 begin
   if not Supports(ASourceActiveBSA.Current, IInterface, LCurrentAsInterface) then
     raise EioGenericException.Create(ClassName, 'Create', '"ASourceAdapter" object parameter does not implements "IInterface".');
-  inherited Create(AOwner, ABindSource, LCurrentAsInterface, False); // False because a NaturalBindSourceAdapter never owns objects
+  inherited Create(ABindSource, LCurrentAsInterface, False); // False because a NaturalBindSourceAdapter never owns objects
   FSourceActiveBSA := ASourceActiveBSA;
 end;
 

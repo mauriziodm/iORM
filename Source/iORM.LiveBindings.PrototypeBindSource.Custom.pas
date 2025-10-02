@@ -1243,12 +1243,12 @@ begin
   // else if it is a master bind source but load type property is set to ltFromBSAsIs, ltFromBSReload or ltFromBSReloadNewInstance
   // then get the natural BSA from the source bind source else it is a master bind source then get the normal BSA.
   if IsDetailBS and not MasterPropertyName.IsEmpty then
-    LActiveBSA := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(nil, Self, MasterBindSource, MasterPropertyName)
+    LActiveBSA := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(Self, MasterBindSource, MasterPropertyName)
   else
   if IsFromBSLoadType or (IsDetailBS and MasterPropertyName.IsEmpty) then
-    LActiveBSA := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, Self, MasterBindSource)
+    LActiveBSA := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(Self, MasterBindSource)
   else
-    LActiveBSA := TioLiveBindingsFactory.GetBSA(nil, Self, ADataObject, True);
+    LActiveBSA := TioLiveBindingsFactory.GetBSA(Self, ADataObject, True);
   // If Self is a Notifiable bind source then register a reference to itself
   // in the ActiveBindSourceAdapter
   // PS: Set ioAsync also (and other properties)

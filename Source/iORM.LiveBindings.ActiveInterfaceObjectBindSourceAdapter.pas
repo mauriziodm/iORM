@@ -142,7 +142,7 @@ type
 
 
 
-    constructor Create(const AOwner: TComponent; const ABindSource: IioBindSource; const ADataObject: IInterface; const AOwnsObject: Boolean); reintroduce; virtual;
+    constructor Create(const ABindSource: IioBindSource; const ADataObject: IInterface; const AOwnsObject: Boolean); reintroduce; virtual;
 
 
 
@@ -156,8 +156,8 @@ type
     procedure ExtractDetailObject(AMasterObj: TObject);
     procedure PersistCurrent;
     procedure PersistAll;
-    function NewDetailBindSourceAdapter(const AOwner: TComponent; const ABindSource: IioBindSource; const AMasterPropertyName: String): IioActiveBindSourceAdapter;
-    function NewNaturalObjectBindSourceAdapter(const AOwner: TComponent; const ABindSource: IioBindSource): IioActiveBindSourceAdapter;
+    function NewDetailBindSourceAdapter(const ABindSource: IioBindSource; const AMasterPropertyName: String): IioActiveBindSourceAdapter;
+    function NewNaturalObjectBindSourceAdapter(const ABindSource: IioBindSource): IioActiveBindSourceAdapter;
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     function DetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     procedure Append(AObject: TObject); reintroduce; overload;
@@ -255,7 +255,7 @@ end;
 //  FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
 //end;
 
-constructor TioActiveInterfaceObjectBindSourceAdapter.Create(const AOwner: TComponent; const ABindSource: IioBindSource; const ADataObject: IInterface; const AOwnsObject: Boolean);
+constructor TioActiveInterfaceObjectBindSourceAdapter.Create(const ABindSource: IioBindSource; const ADataObject: IInterface; const AOwnsObject: Boolean);
 begin
   FLoadType := ABindSource.LoadType;
   FLazy := ABindSource.Lazy;
@@ -264,7 +264,7 @@ begin
   FAsyncPersist := ABindSource.AsyncPersist;
   FReloading := False;
   FBSPersistenceDeleting := False;
-  inherited Create(AOwner, ADataObject, ABindSource.TypeAlias, ABindSource.TypeName);
+  inherited Create(nil, ADataObject, ABindSource.TypeAlias, ABindSource.TypeName);
   FLocalOwnsObject := False; // Always false because it's a BSA for an interface (AutoRefCount)
   FWhere := ABindSource.Where;
   FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
@@ -499,10 +499,10 @@ begin
   Result := FAsyncPersist;
 end;
 
-function TioActiveInterfaceObjectBindSourceAdapter.NewDetailBindSourceAdapter(const AOwner: TComponent; const ABindSource: IioBindSource; const AMasterPropertyName: String): IioActiveBindSourceAdapter;
+function TioActiveInterfaceObjectBindSourceAdapter.NewDetailBindSourceAdapter(const ABindSource: IioBindSource; const AMasterPropertyName: String): IioActiveBindSourceAdapter;
 begin
   // Return the requested DetailBindSourceAdapter and set the current master object
-  Result := FDetailAdaptersContainer.NewDetailBindSourceAdapter(AOwner, ABindSource, GetBaseObjectRttiType.Name, AMasterPropertyName);
+  Result := FDetailAdaptersContainer.NewDetailBindSourceAdapter(ABindSource, GetBaseObjectRttiType.Name, AMasterPropertyName);
   FDetailAdaptersContainer.SetMasterObject(Self.Current);
 end;
 
@@ -566,9 +566,9 @@ begin
   Result := Self.State;
 end;
 
-function TioActiveInterfaceObjectBindSourceAdapter.NewNaturalObjectBindSourceAdapter(const AOwner: TComponent; const ABindSource: IioBindSource): IioActiveBindSourceAdapter;
+function TioActiveInterfaceObjectBindSourceAdapter.NewNaturalObjectBindSourceAdapter(const ABindSource: IioBindSource): IioActiveBindSourceAdapter;
 begin
-  Result := FDetailAdaptersContainer.NewNaturalBindSourceAdapter(AOwner, ABindSource, Self);
+  Result := FDetailAdaptersContainer.NewNaturalBindSourceAdapter(ABindSource, Self);
 end;
 
 function TioActiveInterfaceObjectBindSourceAdapter.Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;

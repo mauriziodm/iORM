@@ -53,7 +53,7 @@ type
     // AutoLoad
     function GetAutoLoad: Boolean; override;
   public
-    constructor Create(const AOwner:TComponent; const ABindSource:IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapter); reintroduce; virtual;
+    constructor Create(const ABindSource:IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapter); reintroduce; virtual;
     destructor Destroy; override;
     procedure ForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure Reload; override;
@@ -70,9 +70,9 @@ uses
 
 { TioNaturalActiveObjectBindSourceAdapter }
 
-constructor TioNaturalActiveObjectBindSourceAdapter.Create(const AOwner:TComponent; const ABindSource:IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapter);
+constructor TioNaturalActiveObjectBindSourceAdapter.Create(const ABindSource:IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapter);
 begin
-  inherited Create(AOwner, ABindSource, ASourceActiveBSA.Current, False); // False because a NaturalBindSourceAdapter never owns objects
+  inherited Create(ABindSource, ASourceActiveBSA.Current, False); // False because a NaturalBindSourceAdapter never owns objects
   FSourceActiveBSA := ASourceActiveBSA;
 end;
 

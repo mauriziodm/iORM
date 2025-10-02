@@ -357,9 +357,9 @@ begin
     begin
       // If here it means that it's a detail (crossview detail)
       if LModelPresenter.IsDetailBS then
-        LActiveBSA := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(Self, LModelPresenter, FCrossView_MasterBindSource.GetModelPresenterInstance, FCrossView_MasterPropertyName)
+        LActiveBSA := TioLiveBindingsFactory.GetDetailBSAfromMasterBindSource(LModelPresenter, FCrossView_MasterBindSource.GetModelPresenterInstance, FCrossView_MasterPropertyName)
       else
-        LActiveBSA := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(nil, LModelPresenter, FCrossView_MasterBindSource.GetModelPresenterInstance);
+        LActiveBSA := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(LModelPresenter, FCrossView_MasterBindSource.GetModelPresenterInstance);
       // Set the retrieved BSA as adapter for this Presenter
       LModelPresenter.SetActiveBindSourceAdapter(LActiveBSA);
     end

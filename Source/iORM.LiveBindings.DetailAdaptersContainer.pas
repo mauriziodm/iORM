@@ -51,8 +51,8 @@ type
     constructor Create(const AMasterAdapter:IioContainedBindSourceAdapter); overload;
     destructor Destroy; override;
     procedure SetMasterObject(const AMasterObj: TObject);
-    function NewDetailBindSourceAdapter(const AOwner: TComponent; const ABindSource: IioBindSource; const AMasterClassName, AMasterPropertyName: String): IioActiveBindSourceAdapter;
-    function NewNaturalBindSourceAdapter(const AOwner: TComponent; const ABindSource: IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapter): IioActiveBindSourceAdapter;
+    function NewDetailBindSourceAdapter(const ABindSource: IioBindSource; const AMasterClassName, AMasterPropertyName: String): IioActiveBindSourceAdapter;
+    function NewNaturalBindSourceAdapter(const ABindSource: IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapter): IioActiveBindSourceAdapter;
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure RemoveDetailBindSourceAdapter(const ABindSourceAdapter: IioContainedBindSourceAdapter);
     procedure RemoveNaturalBindSourceAdapter(const ANaturalBindSourceAdapter: IioNaturalActiveBindSourceAdapter);
@@ -109,7 +109,7 @@ begin
   inherited;
 end;
 
-function TioDetailAdaptersContainer.NewDetailBindSourceAdapter(const AOwner: TComponent; const ABindSource: IioBindSource; const AMasterClassName, AMasterPropertyName: String): IioActiveBindSourceAdapter;
+function TioDetailAdaptersContainer.NewDetailBindSourceAdapter(const ABindSource: IioBindSource; const AMasterClassName, AMasterPropertyName: String): IioActiveBindSourceAdapter;
 var
   LMap: IioMap;
   LMasterProperty: IioProperty;
@@ -121,9 +121,9 @@ begin
   // Create the Adapter
   case LMasterProperty.GetRelationType of
     rtBelongsTo, rtHasOne, rtEmbeddedHasOne:
-      LNewAdapter := TioLiveBindingsFactory.ContainedObjectBindSourceAdapter(AOwner, ABindSource, LMasterProperty);
+      LNewAdapter := TioLiveBindingsFactory.ContainedObjectBindSourceAdapter(ABindSource, LMasterProperty);
     rtHasMany, rtEmbeddedHasMany:
-      LNewAdapter := TioLiveBindingsFactory.ContainedListBindSourceAdapter(AOwner, ABindSource, LMasterProperty);
+      LNewAdapter := TioLiveBindingsFactory.ContainedListBindSourceAdapter(ABindSource, LMasterProperty);
     else
       raise EioGenericException.Create(Self.ClassName + ': Relation not found');
   end;
@@ -136,9 +136,9 @@ begin
   Result := LNewAdapter.AsActiveBindSourceAdapter;
 end;
 
-function TioDetailAdaptersContainer.NewNaturalBindSourceAdapter(const AOwner: TComponent; const ABindSource: IioBindSource; const ASourceActiveBSA:IioActiveBindSourceAdapter): IioActiveBindSourceAdapter;
+function TioDetailAdaptersContainer.NewNaturalBindSourceAdapter(const ABindSource: IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapter): IioActiveBindSourceAdapter;
 begin
-  Result := TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(AOwner, ABindSource, ASourceActiveBSA);
+  Result := TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(ABindSource, ASourceActiveBSA);
   FNaturalAdapters.Add(Result as IioNaturalActiveBindSourceAdapter);
 end;
 
