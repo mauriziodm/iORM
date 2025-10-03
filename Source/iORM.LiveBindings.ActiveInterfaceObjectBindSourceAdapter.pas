@@ -68,9 +68,6 @@ type
     function GetBSPersistenceDeleting: Boolean;
     procedure SetBSPersistenceDeleting(const Value: Boolean);
     property BSPersistenceDeleting: Boolean read GetBSPersistenceDeleting write SetBSPersistenceDeleting;
-    // CanActivate
-    function GetCanActivate: Boolean; override;
-    property CanActivate: Boolean read GetCanActivate;
     // CurrentOID
     function GetCurrentOID: Integer;
     property CurrentOID: Integer read GetCurrentOID;
@@ -142,6 +139,9 @@ type
     function GetTypeOfCollection: TioTypeOfCollection;
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection;
   protected
+    // CanActivate
+    //  NB: Property on ancestor class
+    function GetCanActivate: Boolean; override;
     // IsAutoLoad
     function GetIsAutoLoad: Boolean; virtual;
     property IsAutoLoad: Boolean read GetIsAutoLoad;
@@ -177,7 +177,6 @@ type
     procedure ExtractDetailObject(AMasterObj: TObject);
     procedure Insert(AObject: TObject); reintroduce; overload;
     procedure Insert(AObject: IInterface); reintroduce; overload;
-    function IsMasterBSA: Boolean;
     procedure LoadPage;
     function NewDetailBindSourceAdapter(const ABindSource: IioBindSource; const AMasterPropertyName: String): IioActiveBindSourceAdapter;
     function NewNaturalObjectBindSourceAdapter(const ABindSource: IioBindSource): IioActiveBindSourceAdapter;

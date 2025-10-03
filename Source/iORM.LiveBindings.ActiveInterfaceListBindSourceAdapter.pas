@@ -71,9 +71,6 @@ type
     procedure SetBSPersistenceDeleting(const Value: Boolean);
     function GetBSPersistenceDeleting: Boolean;
     property BSPersistenceDeleting: Boolean read GetBSPersistenceDeleting write SetBSPersistenceDeleting;
-    // CanActivate
-    //  NB: getter method in ancestor class
-    property CanActivate: Boolean read GetCanActivate;
     // CurrentOID
     function GetCurrentOID: Integer;
     property CurrentOID: Integer read GetCurrentOID;

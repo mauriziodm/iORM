@@ -63,7 +63,6 @@ type
     //  NB: lascio il nome a ioAutoPost perchè c'è già un AutoPost negli antenati
     procedure SetioAutoPost(const Value: Boolean);
     function GetioAutoPost: Boolean;
-    function GetCanActivate: Boolean;
     property ioAutoPost: Boolean read GetioAutoPost write SetioAutoPost;
     // BindSource
     procedure SetBindSource(ABindSource: IioBindSource);
@@ -73,9 +72,6 @@ type
     function GetBSPersistenceDeleting: Boolean;
     procedure SetBSPersistenceDeleting(const Value: Boolean);
     property BSPersistenceDeleting: Boolean read GetBSPersistenceDeleting write SetBSPersistenceDeleting;
-    // CanActivate
-    //  NB: getter method in ancestor class
-    property CanActivate: Boolean read GetCanActivate;
     // CurrentOID
     function GetCurrentOID: Integer;
     property CurrentOID: Integer read GetCurrentOID;

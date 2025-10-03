@@ -67,9 +67,6 @@ type
     procedure SetBSPersistenceDeleting(const Value: Boolean);
     function GetBSPersistenceDeleting: Boolean;
     property BSPersistenceDeleting: Boolean read GetBSPersistenceDeleting write SetBSPersistenceDeleting;
-    // CanActivate
-    function GetCanActivate: Boolean; override;
-    property CanActivate: Boolean read GetCanActivate;
     // CurrentOID
     function GetCurrentOID: Integer;
     property CurrentOID: Integer read GetCurrentOID;
@@ -141,12 +138,12 @@ type
     function GetTypeOfCollection: TioTypeOfCollection;
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection;
   protected
+    // CanActivate
+    //  NB: Property on ancestor class
+    function GetCanActivate: Boolean; override;
     // IsAutoLoad
     function GetIsAutoLoad: Boolean; virtual;
     property IsAutoLoad: Boolean read GetIsAutoLoad;
-
-    function SupportsNestedFields: Boolean; override;
-    procedure AddFields; override;
     // =========================================================================
     // Part for the support of the IioBindSource interfaces (Added by iORM)
     // because is not implementing IInterface (NB: RefCount DISABLED)
@@ -158,6 +155,7 @@ type
     function __ObjRelease: Integer; override;
 {$ENDIF}
     // =========================================================================
+    procedure AddFields; override;
     procedure DoAfterDelete; override;
     procedure DoAfterPost; override;
     procedure DoAfterPostFields(AFields: TArray<TBindSourceAdapterField>); override;
@@ -167,6 +165,7 @@ type
     procedure DoBeforeDelete; override;
     procedure DoBeforeOpen; override;
     procedure DoReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
+    function SupportsNestedFields: Boolean; override;
   public
     constructor Create(const ABindSource: IioBindSource; const ADataObject: TObject; const AOwnsObject: Boolean); reintroduce; virtual;
     destructor Destroy; override;
@@ -177,7 +176,6 @@ type
     procedure ClearDataObject;
     procedure DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer = 100);
     procedure ExtractDetailObject(AMasterObj: TObject);
-    function GetMasterPropertyName: String;
     procedure Insert(AObject: TObject); reintroduce; overload;
     procedure Insert(AObject: IInterface); reintroduce; overload;
     procedure LoadPage;
@@ -474,7 +472,7 @@ end;
 function TioActiveObjectBindSourceAdapter.GetMasterPropertyPath: String;
 begin
   if HasMasterBSA then
-    Result := GetMasterBindSourceAdapter.GetMasterPropertyPath + '.' + GetMasterPropertyName
+    Result := GetMasterBindSourceAdapter.GetMasterPropertyPath + '.' +  FBindSource.MasterPropertyName
   else
     Result := '';
 end;
@@ -512,6 +510,11 @@ end;
 function TioActiveObjectBindSourceAdapter.GetHasMasterBSA: Boolean;
 begin
   Result := not FBindSource.MasterPropertyName.IsEmpty;
+end;
+
+function TioActiveObjectBindSourceAdapter.GetIsAutoLoad: Boolean;
+begin
+  Result := (FBindSource.LoadType = ltAuto);
 end;
 
 function TioActiveObjectBindSourceAdapter.GetIsDetailBSA: Boolean;
