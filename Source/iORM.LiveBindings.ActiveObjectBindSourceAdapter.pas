@@ -48,67 +48,105 @@ type
 
   TioActiveObjectBindSourceAdapter = class(TObjectBindSourceAdapter, IioContainedBindSourceAdapter, IioActiveBindSourceAdapter)
   private
-    FReloading: Boolean;
-    FMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
-    FDetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     FBindSource: IioBindSource;
-    // FNaturalBSA_MasterBindSourceAdapter: IioActiveBindSourceAdapter;  *** NB: Code presente (commented) in the unit body ***
-    FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     FBSPersistenceDeleting: Boolean;
-    // TypeName
-    procedure SetTypeName(const AValue: String);
-    function GetTypeName: String;
-    // TypeAlias
-    procedure SetTypeAlias(const AValue: String);
-    function GetTypeAlias: String;
-    // AsyncLoad property
-    function GetAsyncLoad: Boolean;
-    procedure SetAsyncLoad(const Value: Boolean);
-    // AsyncPersist property
-    function GetAsyncPersist: Boolean;
-    procedure SetAsyncPersist(const Value: Boolean);
+    FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
+    FDetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
+    FMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
+    FReloading: Boolean;
     // AutoPost property
+    //  NB: lascio il nome a ioAutoPost perchè c'è già un AutoPost negli antenati
     procedure SetioAutoPost(const Value: Boolean);
     function GetioAutoPost: Boolean;
-    // Where property
-    procedure SetWhere(const Value: IioWhere);
-    function GetWhere: IioWhere;
-    // ioViewDataType
-    function GetTypeOfCollection: TioTypeOfCollection;
-    // ioOwnsObjects
-    function GetOwnsObjects: Boolean;
-    // State
-    function GetState: TBindSourceAdapterState;
+    property ioAutoPost: Boolean read GetioAutoPost write SetioAutoPost;
+    // BindSource
+    procedure SetBindSource(ABindSource: IioBindSource);
+    function GetBindSource: IioBindSource;
+    property BindSource: IioBindSource read GetBindSource write SetBindSource;
+    // BSPersistenceDeleting
+    procedure SetBSPersistenceDeleting(const Value: Boolean);
+    function GetBSPersistenceDeleting: Boolean;
+    property BSPersistenceDeleting: Boolean read GetBSPersistenceDeleting write SetBSPersistenceDeleting;
+    // CanActivate
+    function GetCanActivate: Boolean; override;
+    property CanActivate: Boolean read GetCanActivate;
+    // CurrentOID
+    function GetCurrentOID: Integer;
+    property CurrentOID: Integer read GetCurrentOID;
+    // DataObject
+    //   NB: Generic parameter must be <IInterface> (for interfaced list such as IioList<IInterface>) or
+    //       <TObject> (for non interfaced list such as TList<IInterface>)
+    function DataObject: TObject;
+    procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
+    procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
+    procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
+    procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
+    // DataSetLlinkContainer
+    function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
+    property DataSetLinkContainer: IioBSAToDataSetLinkContainer read GetDataSetLinkContainer;
+    // DetailAdaptersContainer
+    function GetDetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
+    property DetailAdaptersContainer: IioDetailBindSourceAdaptersContainer read GetDetailAdaptersContainer;
     // Fields
     function GetFields: TList<TBindSourceAdapterField>;
+    property Fields: TList<TBindSourceAdapterField> read GetFields;
+    // HasBindSource
+    function GetHasBindSource: Boolean;
+    property HasBindSource: Boolean read GetHasBindSource;
+    // HasMasterBSA
+    function GetHasMasterBSA: Boolean;
+    property HasMasterBSA: Boolean read GetHasMasterBSA;
+    // IsDetailBSA
+    function GetIsDetailBSA: Boolean;
+    property IsDetailBSA: Boolean read GetIsDetailBSA;
+    // IsInterfaceBSA
+    function GetIsInterfaceBSA: Boolean;
+    property IsInterfaceBSA: Boolean read GetIsInterfaceBSA;
+    // IsMasterBSA
+    function GetIsMasterBSA: Boolean;
+    property IsMasterBSA: Boolean read GetIsMasterBSA;
     // ItemIndex
     function GetItemIndex: Integer;
     procedure SetItemIndex(const Value: Integer);
+    property ItemIndex: Integer read GetItemIndex write SetItemIndex;
     // Items
     function GetItems(const AIndex: Integer): TObject;
     procedure SetItems(const AIndex: Integer; const Value: TObject);
-    // Lazy
-    procedure SetLazy(const Value: Boolean);
-    function GetLazy: Boolean;
-    // LazyProps
-    procedure SetLazyProps(const Value: String);
-    function GetLazyProps: String;
-    // LoadType
-    procedure SetLoadType(const Value: TioLoadType);
-    function GetLoadType: TioLoadType;
+    property Items[const AIndex: Integer]: TObject read GetItems write SetItems;
+    // MasterAdaptersContainer
+    procedure SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
+    function GetMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
+    property MasterAdaptersContainer: IioDetailBindSourceAdaptersContainer read GetMasterAdaptersContainer write SetMasterAdaptersContainer;
+    // MasterBindSourceAdapter
+    function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
+    property MasterBindSourceAdapter: IioActiveBindSourceAdapter read GetMasterBindSourceAdapter;
+    // MasterPropertyPath
+    function GetMasterPropertyPath: String;
+    property MasterPropertyPath: String read GetMasterPropertyPath;
+    // ObjStatus
+    procedure SetObjStatus(AObjStatus: TioObjStatus);
+    function GetObjStatus: TioObjStatus;
+    property ObjStatus: TioObjStatus read GetObjStatus write SetObjStatus;
+    // ObjStatusInUse
+    function GetObjStatusInUse: Boolean;
+    property ObjStatusInUse: Boolean read GetObjStatusInUse;
     // Reloading
     function GetReloading: Boolean;
     procedure SetReloading(const Value: Boolean);
-    // BSPersistenceDeleting
-    function GetBSPersistenceDeleting: Boolean;
-    procedure SetBSPersistenceDeleting(const Value: Boolean);
+    property Reloading: Boolean read GetReloading write SetReloading;
+    // State
+    function GetState: TBindSourceAdapterState;
+    property State: TBindSourceAdapterState read GetState;
+    // TypeOfCollection
+    function GetTypeOfCollection: TioTypeOfCollection;
+    property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection;
   protected
-    // AutoLoad
-    function GetAutoLoad: Boolean; virtual;
+    // IsAutoLoad
+    function GetIsAutoLoad: Boolean; virtual;
+    property IsAutoLoad: Boolean read GetIsAutoLoad;
 
     function SupportsNestedFields: Boolean; override;
     procedure AddFields; override;
-    function GetCanActivate: Boolean; override;
     // =========================================================================
     // Part for the support of the IioBindSource interfaces (Added by iORM)
     // because is not implementing IInterface (NB: RefCount DISABLED)
@@ -120,71 +158,38 @@ type
     function __ObjRelease: Integer; override;
 {$ENDIF}
     // =========================================================================
-    procedure DoBeforeOpen; override;
-    procedure DoBeforeEdit; override;
-    procedure DoBeforeDelete; override;
+    procedure DoAfterDelete; override;
     procedure DoAfterPost; override;
     procedure DoAfterPostFields(AFields: TArray<TBindSourceAdapterField>); override;
-    procedure DoAfterDelete; override;
-    procedure DoAfterScroll; override;
-    procedure DoReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
     procedure DoAfterReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType);
-    procedure SetObjStatus(AObjStatus: TioObjStatus);
-    function UseObjStatus: Boolean;
-    function GetBaseObjectClassName: String;
-    // Generic parameter must be <IInterface> (for interfaced list such as IioList<IInterface>) or
-    // <TObject> (for non interfaced list such as TList<IInterface>)
-    procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
-    procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
+    procedure DoAfterScroll; override;
+    procedure DoBeforeEdit; override;
+    procedure DoBeforeDelete; override;
+    procedure DoBeforeOpen; override;
+    procedure DoReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
   public
-//    constructor Create(AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject;
-//      const AOwnsObject: Boolean = True); overload;
-
-
-
     constructor Create(const ABindSource: IioBindSource; const ADataObject: TObject; const AOwnsObject: Boolean); reintroduce; virtual;
-
-
-
     destructor Destroy; override;
-    function MasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
-    procedure SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
-    procedure SetMasterProperty(AMasterProperty: IioProperty);
-    procedure SetBindSource(ANotifiableBindSource: IioBindSource);
-    function GetBindSource: IioBindSource;
-    function HasBindSource: Boolean;
-    procedure ExtractDetailObject(AMasterObj: TObject);
-    procedure PersistCurrent;
-    procedure PersistAll;
-    function NewDetailBindSourceAdapter(const ABindSource: IioBindSource; const AMasterPropertyName: String): IioActiveBindSourceAdapter;
-    function NewNaturalObjectBindSourceAdapter(const ABindSource: IioBindSource): IioActiveBindSourceAdapter;
-    function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
-    function DetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     procedure Append(AObject: TObject); reintroduce; overload;
     procedure Append(AObject: IInterface); reintroduce; overload;
+    function AsActiveBindSourceAdapter: IioActiveBindSourceAdapter;
+    function AsTBindSourceAdapter: TBindSourceAdapter;
+    procedure ClearDataObject;
+    procedure DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer = 100);
+    procedure ExtractDetailObject(AMasterObj: TObject);
+    function GetMasterPropertyName: String;
     procedure Insert(AObject: TObject); reintroduce; overload;
     procedure Insert(AObject: IInterface); reintroduce; overload;
-    function Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
-    procedure Refresh(const ANotify: Boolean = True); reintroduce; overload;
-    procedure Reload; virtual;
     procedure LoadPage;
-    function DataObject: TObject;
-    procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
-    procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
-    procedure ClearDataObject;
-    function GetCurrentOID: Integer;
-    function HasMasterBSA: Boolean;
-    function IsMasterBSA: Boolean;
-    function IsDetailBSA: Boolean;
-    function IsInterfaceBSA: Boolean;
-    function GetMasterPropertyName: String;
-    function GetMasterPropertyPath: String;
-    function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
-    procedure DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer = 100);
-    function AsTBindSourceAdapter: TBindSourceAdapter;
+    function NewDetailBindSourceAdapter(const ABindSource: IioBindSource; const AMasterPropertyName: String): IioActiveBindSourceAdapter;
+    function NewNaturalObjectBindSourceAdapter(const ABindSource: IioBindSource): IioActiveBindSourceAdapter;
+    function Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
+    procedure PersistAll;
+    procedure PersistCurrent;
     procedure ReceiveSelection(ASelected: TObject; ASelectionType: TioSelectionType); overload;
     procedure ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType); overload;
-    function AsActiveBindSourceAdapter: IioActiveBindSourceAdapter;
+    procedure Refresh(const ANotify: Boolean = True); reintroduce; overload;
+    procedure Reload; virtual;
   end;
 
 implementation
@@ -249,33 +254,6 @@ begin
   Self.InternalSetDataObject(nil, False);
 end;
 
-//constructor TioActiveObjectBindSourceAdapter.Create(AClassRef: TioClassRef; const AWhere: IioWhere; const AOwner: TComponent; const ADataObject: TObject;
-//  const AOwnsObject: Boolean = True);
-//begin
-//  FLoadType := ltAuto;
-//  FLazy := False;
-//  FLazyProps := '';
-//  FAsyncLoad := False;
-//  FAsyncPersist := False;
-//  FReloading := False;
-//  FBSPersistenceDeleting := False;
-//
-//  // If the AObject is assigned the set the BaseRttiType from this instance (most accurate) else resolve the TypeName
-//  // AObject is always a TObject by generic constraint
-//  if Assigned(ADataObject) then
-//    AClassRef := ADataObject.ClassType;
-//  inherited Create(AOwner, ADataObject, AClassRef, AOwnsObject);
-//
-//  FLocalOwnsObject := AOwnsObject;
-//  FWhere := AWhere;
-//  FTypeName := AClassRef.ClassName;
-//  FTypeAlias := ''; // NB: TypeAlias has no effect in this adapter (only used by interfaced BSA)
-//  FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
-//  // Set Master & Details adapters reference
-//  FMasterAdaptersContainer := nil;
-//  FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
-//end;
-
 constructor TioActiveObjectBindSourceAdapter.Create(const ABindSource: IioBindSource; const ADataObject: TObject; const AOwnsObject: Boolean);
 var
   FClassRef: TioClassRef;
@@ -315,7 +293,7 @@ begin
   inherited;
 end;
 
-function TioActiveObjectBindSourceAdapter.DetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
+function TioActiveObjectBindSourceAdapter.GetDetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
 begin
   Result := FDetailAdaptersContainer;
 end;
@@ -412,31 +390,6 @@ begin
   // Set it to the Adapter itself
   Self.InternalSetDataObject(LDetailObj, False); // 2° parameter false ABSOLUTELY!!!!!!!
 end;
-// procedure TioActiveObjectBindSourceAdapter.ExtractDetailObject(
-// AMasterObj: TObject);
-// var
-// ADetailObj: TObject;
-// AValue: TValue;
-// begin
-// ADetailObj := nil;
-// // Check parameter, if the MasterObject is not assigned
-// //  then close the BSA
-// if not Assigned(AMasterObj) then
-// begin
-// Self.SetDataObject(nil, False);  // 2° parameter false ABSOLUTELY!!!!!!!
-// Exit;
-// end;
-// // Extract master property value
-// AValue := FMasterProperty.GetValue(AMasterObj);
-// // if not empty extract the detail object
-// if not AValue.IsEmpty then
-// if FMasterProperty.IsInterface then
-// ADetailObj := TObject(AValue.AsInterface)
-// else
-// ADetailObj := AValue.AsObject;
-// // Set it to the Adapter itself
-// Self.SetDataObject(ADetailObj, False);  // 2° parameter false ABSOLUTELY!!!!!!!
-// end;
 
 function TioActiveObjectBindSourceAdapter.GetBindSource: IioBindSource;
 begin
@@ -526,6 +479,11 @@ begin
     Result := '';
 end;
 
+function TioActiveObjectBindSourceAdapter.GetObjStatus: TioObjStatus;
+begin
+  Result := TioCommonBSABehavior.GetObjStatus(Self);
+end;
+
 function TioActiveObjectBindSourceAdapter.GetReloading: Boolean;
 begin
   Result := FReloading;
@@ -546,27 +504,27 @@ begin
   raise EioGenericException.Create(Self.ClassName, 'Append', 'This ActiveBindSourceAdapter is for class referenced instances only.');
 end;
 
-function TioActiveObjectBindSourceAdapter.HasBindSource: Boolean;
+function TioActiveObjectBindSourceAdapter.GetHasBindSource: Boolean;
 begin
   Result := Assigned(FBindSource);
 end;
 
-function TioActiveObjectBindSourceAdapter.HasMasterBSA: Boolean;
+function TioActiveObjectBindSourceAdapter.GetHasMasterBSA: Boolean;
 begin
   Result := not FMasterPropertyName.IsEmpty;
 end;
 
-function TioActiveObjectBindSourceAdapter.IsDetailBSA: Boolean;
+function TioActiveObjectBindSourceAdapter.GetIsDetailBSA: Boolean;
 begin
   Result := HasMasterBSA;
 end;
 
-function TioActiveObjectBindSourceAdapter.IsInterfaceBSA: Boolean;
+function TioActiveObjectBindSourceAdapter.GetIsInterfaceBSA: Boolean;
 begin
   Result := False;
 end;
 
-function TioActiveObjectBindSourceAdapter.IsMasterBSA: Boolean;
+function TioActiveObjectBindSourceAdapter.GetIsMasterBSA: Boolean;
 begin
   Result := not HasMasterBSA;
 end;
@@ -576,7 +534,7 @@ begin
   raise EioGenericException.Create(Self.ClassName, 'LoadPage', 'Method not available in ObjectBindSourceAdapters.');
 end;
 
-function TioActiveObjectBindSourceAdapter.MasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
+function TioActiveObjectBindSourceAdapter.GetMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
 begin
   Result := FMasterAdaptersContainer;
 end;
@@ -675,9 +633,9 @@ begin
     TioCommonBSAPersistence.Reload(Self);
 end;
 
-procedure TioActiveObjectBindSourceAdapter.SetBindSource(ANotifiableBindSource: IioBindSource);
+procedure TioActiveObjectBindSourceAdapter.SetBindSource(ABindSource: IioBindSource);
 begin
-  FBindSource := ANotifiableBindSource;
+  FBindSource := ABindSource;
 end;
 
 procedure TioActiveObjectBindSourceAdapter.SetBSPersistenceDeleting(const Value: Boolean);
@@ -783,9 +741,9 @@ begin
   Result := False;
 end;
 
-function TioActiveObjectBindSourceAdapter.UseObjStatus: Boolean;
+function TioActiveObjectBindSourceAdapter.GetObjStatusInUse: Boolean;
 begin
-  Result := TioCommonBSABehavior.UseObjStatus(Self);
+  Result := TioCommonBSABehavior.GetObjStatusInUse(Self);
 end;
 
 function TioActiveObjectBindSourceAdapter._AddRef: Integer;

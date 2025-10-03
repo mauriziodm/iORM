@@ -117,8 +117,9 @@ type
     // NB: Generic type for this methods must be only TObject or IInterface
     class procedure InternalSetDataObjectAsDetail<T>(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ADataObject: T);
     // ObjectStatus
+    class function GetObjStatus(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioObjStatus;
     class procedure SetObjStatus(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AObjStatus: TioObjStatus);
-    class function UseObjStatus(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): Boolean;
+    class function GetObjStatusInUse(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): Boolean;
     // Common code to delete ListViewItem
     class procedure DeleteListViewItem(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AItemIndex: Integer;
       const ADelayMilliseconds: Integer);
@@ -207,12 +208,17 @@ begin
     (AActiveBindSourceAdapter as IioNaturalActiveBindSourceAdapter).ForwardNotificationToSourceAdapter(AActiveBindSourceAdapter as TObject, ANotification);
 end;
 
+class function TioCommonBSABehavior.GetObjStatus(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): TioObjStatus;
+begin
+  Result := TioContextFactory.Context_Simple(itRegular, BL_DEFAULT, AActiveBindSourceAdapter.Current.ClassName, nil, AActiveBindSourceAdapter.Current, nil, '', '').ObjStatus;
+end;
+
 class procedure TioCommonBSABehavior.SetObjStatus(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const AObjStatus: TioObjStatus);
 begin
   TioContextFactory.Context_Simple(itRegular, BL_DEFAULT, AActiveBindSourceAdapter.Current.ClassName, nil, AActiveBindSourceAdapter.Current, nil, '', '').ObjStatus := AObjStatus;
 end;
 
-class function TioCommonBSABehavior.UseObjStatus(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): Boolean;
+class function TioCommonBSABehavior.GetObjStatusInUse(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter): Boolean;
 begin
   Result := TioContextFactory.Context_Simple(itRegular, BL_DEFAULT, AActiveBindSourceAdapter.Current.ClassName, nil, AActiveBindSourceAdapter.Current, nil, '', '')
     .GetProperties.ObjStatusPropertyExist;
