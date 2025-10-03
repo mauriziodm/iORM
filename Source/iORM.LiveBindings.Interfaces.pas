@@ -85,7 +85,6 @@ type
     function CheckActiveAdapter: Boolean;
     function Current: TObject;
     function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
-    function GetMasterPropertyName: String;
     function IsMasterBS: Boolean;
     function IsDetailBS: Boolean;
     function HasMasterBS: Boolean;
@@ -97,7 +96,6 @@ type
     function DataObject: TObject;
     procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
     procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
-    procedure SetMasterPropertyName(const Value: String);
     procedure RegisterDetailBindSource(const ADetailBindSource: IioBindSource);
     procedure UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
     procedure PostIfEditing;
@@ -177,6 +175,10 @@ type
     procedure SetLazyProps(const Value: String);
     function GetLazyProps: String;
     property LazyProps: String read GetLazyProps write SetLazyProps;
+    // MasterPropertyName
+    procedure SetMasterPropertyName(const Value: String);
+    function GetMasterPropertyName: String;
+    property MasterPropertyName: String read GetMasterPropertyName write SetMasterPropertyName; // published: Detail
     // Paging
     procedure SetPaging(const Value: TioCommonBSAPageManager);
     function GetPaging: TioCommonBSAPageManager;

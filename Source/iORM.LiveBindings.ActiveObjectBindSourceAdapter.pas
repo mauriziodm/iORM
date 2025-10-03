@@ -251,7 +251,7 @@ end;
 
 procedure TioActiveObjectBindSourceAdapter.ClearDataObject;
 begin
-  Self.InternalSetDataObject(nil, False);
+  InternalSetDataObject(nil, False);
 end;
 
 constructor TioActiveObjectBindSourceAdapter.Create(const ABindSource: IioBindSource; const ADataObject: TObject; const AOwnsObject: Boolean);
@@ -350,7 +350,7 @@ end;
 procedure TioActiveObjectBindSourceAdapter.DoBeforeOpen;
 begin
   inherited;
-  case FLoadType of
+  case FBindSource.LoadType of
     ltCreate:
       TioCommonBSAPersistence.Create(Self);
     ltAuto:
@@ -379,7 +379,7 @@ begin
     Exit;
   end;
   // Extract master property value
-  LMasterProperty := TioMapContainer.GetMap(AMasterObj.ClassName).GetProperties.GetPropertyByName(FMasterPropertyName);
+  LMasterProperty := TioMapContainer.GetMap(AMasterObj.ClassName).GetProperties.GetPropertyByName(FBindSource.MasterPropertyName);
   LValue := LMasterProperty.GetValue(AMasterObj);
   // if not empty extract the detail object
   if not LValue.IsEmpty then
@@ -511,7 +511,7 @@ end;
 
 function TioActiveObjectBindSourceAdapter.GetHasMasterBSA: Boolean;
 begin
-  Result := not FMasterPropertyName.IsEmpty;
+  Result := not FBindSource.MasterPropertyName.IsEmpty;
 end;
 
 function TioActiveObjectBindSourceAdapter.GetIsDetailBSA: Boolean;
@@ -627,7 +627,7 @@ end;
 
 procedure TioActiveObjectBindSourceAdapter.Reload;
 begin
-  if FLoadType = ltCreate then
+  if FBindSource.LoadType = ltCreate then
     TioCommonBSAPersistence.Create(Self)
   else
     TioCommonBSAPersistence.Reload(Self);
@@ -680,12 +680,12 @@ begin
     FDetailAdaptersContainer.SetMasterObject(Current);
     // Prior to reactivate the adapter force the "AutoLoadData" property to False to prevent double values
     // then restore the original value of the "AutoLoadData" property.
-    LPrecLoadType := FLoadType;
+    LPrecLoadType := FBindSource.LoadType;
     try
-      FLoadType := ltManual;
+      FBindSource.LoadType := ltManual;
       Active := True;
     finally
-      FLoadType := LPrecLoadType;
+      FBindSource.LoadType := LPrecLoadType;
     end;
   end
   else

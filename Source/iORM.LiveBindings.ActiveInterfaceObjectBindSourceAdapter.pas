@@ -78,8 +78,8 @@ type
     //   NB: Generic parameter must be <IInterface> (for interfaced list such as IioList<IInterface>) or
     //       <TObject> (for non interfaced list such as TList<IInterface>)
     function DataObject: TObject;
-    procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean); overload;
-    procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean); overload;
+    procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
+    procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
     procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
     procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
     // DataSetLlinkContainer
@@ -327,7 +327,7 @@ end;
 procedure TioActiveInterfaceObjectBindSourceAdapter.DoBeforeOpen;
 begin
   inherited;
-  case FLoadType of
+  case FBindSource.LoadType of
     ltCreate:
       TioCommonBSAPersistence.Create(Self);
     ltAuto:
@@ -342,7 +342,7 @@ end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.Reload;
 begin
-  if FLoadType = ltCreate then
+  if FBindSource.LoadType = ltCreate then
     TioCommonBSAPersistence.Create(Self)
   else
     TioCommonBSAPersistence.Reload(Self);
@@ -369,7 +369,7 @@ begin
     Exit;
   end;
   // Extract master property value
-  LMasterProperty := TioMapContainer.GetMap(AMasterObj.ClassName).GetProperties.GetPropertyByName(FMasterPropertyName);
+  LMasterProperty := TioMapContainer.GetMap(AMasterObj.ClassName).GetProperties.GetPropertyByName(FBindSource.MasterPropertyName);
   LValue := LMasterProperty.GetValue(AMasterObj);
   // Retrieve the object from the TValue
   if not LValue.IsEmpty then
@@ -383,7 +383,7 @@ end;
 
 function TioActiveInterfaceObjectBindSourceAdapter.GetIsAutoLoad: Boolean;
 begin
-  Result := FLoadType = ltAuto;
+  Result := FBindSource.LoadType = ltAuto;
 end;
 
 function TioActiveInterfaceObjectBindSourceAdapter.GetBindSource: IioBindSource;
@@ -464,7 +464,7 @@ end;
 function TioActiveInterfaceObjectBindSourceAdapter.GetMasterPropertyPath: String;
 begin
   if HasMasterBSA then
-    Result := GetMasterBindSourceAdapter.GetMasterPropertyPath + '.' + GetMasterPropertyName
+    Result := GetMasterBindSourceAdapter.GetMasterPropertyPath + '.' + FBindSource.MasterPropertyName
   else
     Result := '';
 end;
@@ -512,7 +512,7 @@ end;
 
 function TioActiveInterfaceObjectBindSourceAdapter.GetHasMasterBSA: Boolean;
 begin
-  Result := not FMasterPropertyName.IsEmpty;
+  Result := not FBindSource.MasterPropertyName.IsEmpty;
 end;
 
 function TioActiveInterfaceObjectBindSourceAdapter.GetIsDetailBSA: Boolean;
@@ -647,12 +647,12 @@ begin
     FDetailAdaptersContainer.SetMasterObject(Current);
     // Prior to reactivate the adapter force the "AutoLoadData" property to False to prevent double values
     // then restore the original value of the "AutoLoadData" property.
-    LPrecLoadType := FLoadType;
+    LPrecLoadType := FBindSource.LoadType;
     try
-      FLoadType := ltManual;
+      FBindSource.LoadType := ltManual;
       Active := True;
     finally
-      FLoadType := LPrecLoadType;
+      FBindSource.LoadType := LPrecLoadType;
     end;
   end
   else
