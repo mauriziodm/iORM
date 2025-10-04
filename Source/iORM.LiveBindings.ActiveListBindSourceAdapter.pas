@@ -552,7 +552,7 @@ end;
 
 function TioActiveListBindSourceAdapter.GetState: TBindSourceAdapterState;
 begin
-  Result := Self.State;
+  Result := inherited State;
 end;
 
 function TioActiveListBindSourceAdapter.NewNaturalObjectBindSourceAdapter(const ABindSource: IioBindSource): IioActiveBindSourceAdapter;

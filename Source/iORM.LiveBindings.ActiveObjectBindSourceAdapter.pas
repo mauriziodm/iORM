@@ -497,7 +497,7 @@ end;
 
 function TioActiveObjectBindSourceAdapter.GetState: TBindSourceAdapterState;
 begin
-  Result := Self.State;
+  Result := inherited State;
 end;
 
 procedure TioActiveObjectBindSourceAdapter.Insert(AObject: TObject);
