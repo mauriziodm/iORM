@@ -57,7 +57,7 @@ type
     class procedure _SetItemCountToPageManager(const ATypeName, ATypeAlias: String; AWhere: IioWhere);
   public
     // Create (ObjectBindSourceAdapter only)
-    class procedure Create(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
+    class procedure CreateDataObject(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
     // Load
     class procedure Load(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
     class procedure LoadPage(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter); static;
@@ -161,7 +161,7 @@ begin
   LExecuteMethod := TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(LActiveBindSourceAdapter);
   LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetDeleteOnSuccessMethod(LActiveBindSourceAdapter);
   // Execute synchronous or asynchronous
-  TioProc.Invoke(LActiveBindSourceAdapter.AsyncPersist, LExecuteMethod, LTerminateMethod, nil, nil, True);
+  TioProc.Invoke(ABindSource.AsyncPersist, LExecuteMethod, LTerminateMethod, nil, nil, True);
 end;
 
 class procedure TioCommonBSAPersistence.BeforeDelete(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
@@ -181,7 +181,7 @@ begin
     AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.CreateDeleteSmartNotification(AActiveBindSourceAdapter.Current)) then
     Exit;
   // If UseObjStatus is true then set ObjStatus propriety and abort (If "daSetObjStatusIfExists" delete mode is selected as OnDeleteAction on the MasterBS)
-  if AActiveBindSourceAdapter.UseObjStatus and AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter),
+  if AActiveBindSourceAdapter.ObjStatusInUse and AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter),
     TioBSNotification.Create(ntObjStatusSetDeleted)) then
   begin
     AActiveBindSourceAdapter.SetObjStatus(osDeleted);
@@ -202,17 +202,17 @@ begin
   AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(ntRefresh));
 end;
 
-class procedure TioCommonBSAPersistence.Create(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
+class procedure TioCommonBSAPersistence.CreateDataObject(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 var
   LObj: TObject;
   LIntf: IInterface;
 begin
-  case AActiveBindSourceAdapter.TypeOfCollection of
+  case AActiveBindSourceAdapter.BindSource.TypeOfCollection of
     TioTypeOfCollection.tcSingleObject:
       begin
-        LObj := io.di.Resolve(AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias).Get;
+        LObj := io.di.Resolve(AActiveBindSourceAdapter.BindSource.TypeName, AActiveBindSourceAdapter.BindSource.TypeAlias).Get;
         if AActiveBindSourceAdapter.IsInterfaceBSA and Supports(LObj, IInterface, LIntf) then
-          AActiveBindSourceAdapter.InternalSetDataObject(LIntf, AActiveBindSourceAdapter.ioOwnsObjects)
+          AActiveBindSourceAdapter.InternalSetDataObject(LIntf, False)
         else
           AActiveBindSourceAdapter.InternalSetDataObject(LObj, AActiveBindSourceAdapter.ioOwnsObjects);
       end;

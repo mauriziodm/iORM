@@ -849,13 +849,6 @@ end;
 
 function TioModelPresenterCustom.GetWhere: IioWhere;
 begin
-  // If the adapter exists the return the property of the adapter
-  // else return the Self.FWhere
-  if CheckAdapter then
-  begin
-    Result := FBindSourceAdapter.ioWhere;
-    Exit;
-  end;
   // if not already assigned then create it (così lo crea solo se serve
   // davvero altrimenti no)
   if not Assigned(FWhere) then
@@ -1126,60 +1119,35 @@ end;
 procedure TioModelPresenterCustom.SetAsyncLoad(const Value: Boolean);
 begin
   FAsyncLoad := Value;
-  // If the adapter is created and is an ActiveBindSourceAdapter then
-  // update the where of the adapter also
-  if CheckAdapter then
-    FBindSourceAdapter.AsyncLoad := Value;
 end;
 
 procedure TioModelPresenterCustom.SetAsyncPersist(const Value: Boolean);
 begin
   FAsyncPersist := Value;
-  // If the adapter is created and is an ActiveBindSourceAdapter then
-  // update the where of the adapter also
-  if CheckAdapter then
-    FBindSourceAdapter.AsyncPersist := Value;
 end;
 
 procedure TioModelPresenterCustom.SetLazy(const Value: Boolean);
 begin
   FLazy := Value;
-  // Update the adapter
-  if CheckAdapter then
-    GetActiveBindSourceAdapter.Lazy := Value;
 end;
 
 procedure TioModelPresenterCustom.SetLazyProps(const Value: String);
 begin
   FLazyProps := Value;
-  // Update the adapter
-  if CheckAdapter then
-    GetActiveBindSourceAdapter.LazyProps := Value;
 end;
 
 procedure TioModelPresenterCustom.SetLoadType(const Value: TioLoadType);
 begin
   FLoadType := Value;
-  // If the adapter is created and is an ActiveBindSourceAdapter then
-  // update the where of the adapter also
-  if CheckAdapter then
-    FBindSourceAdapter.LoadType := Value;
 end;
 
 procedure TioModelPresenterCustom.SetActiveBindSourceAdapter(const Value: IioActiveBindSourceAdapter);
 begin
-  if Value = FBindSourceAdapter then
-    Exit;
-  FBindSourceAdapter := Value;
-  // Set some properties
-  FBindSourceAdapter.AsyncLoad := FAsyncLoad;
-  FBindSourceAdapter.AsyncPersist := FAsyncPersist;
-  FBindSourceAdapter.ioWhere := GetWhere; // Do not directly access to the FWhere field here
-  FBindSourceAdapter.LoadType := FLoadType;
-  FBindSourceAdapter.Lazy := FLazy;
-  FBindSourceAdapter.LazyProps := FLazyProps;
-  // Register itself for notifications from BindSourceAdapter
-  FBindSourceAdapter.SetBindSource(Self);
+  if Value <> FBindSourceAdapter then
+  begin
+    FBindSourceAdapter := Value;
+    FBindSourceAdapter.BindSource := Self;
+  end;
 end;
 
 procedure TioModelPresenterCustom.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
@@ -1285,19 +1253,11 @@ end;
 procedure TioModelPresenterCustom.SetTypeAlias(const Value: String);
 begin
   FTypeAlias := Value;
-  // If the adapter is created and is an ActiveBindSourceAdapter then
-  // update the where of the adapter also
-  if CheckAdapter then
-    FBindSourceAdapter.TypeAlias := Value;
 end;
 
 procedure TioModelPresenterCustom.SetTypeName(const Value: String);
 begin
   FTypeName := Value;
-  // If the adapter is created and is an ActiveBindSourceAdapter then
-  // update the where of the adapter also
-  if CheckAdapter then
-    FBindSourceAdapter.TypeName := Value;
 end;
 
 procedure TioModelPresenterCustom.SetTypeOfCollection(const Value: TioTypeOfCollection);
@@ -1323,9 +1283,6 @@ begin
   AWhere.SetPagingObj(FPaging); // Inject paging object specified in the BindSource
   AWhere.SetETMfor(FETMfor); // Inject ETMfor BS specified in the BindSource
   FWhere := AWhere;
-  // Update the adapter where in the BSAdapter if exist
-  if CheckAdapter then
-    FBindSourceAdapter.ioWhere := AWhere;
 end;
 
 procedure TioModelPresenterCustom.ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String);

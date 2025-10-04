@@ -57,6 +57,7 @@ type
     FInsertObj_NewObj: IInterface;
     FInterfacedList: IInterface; // Reference to the same instance contained by FList field, this reference is only to keep live the list instance
     FMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
+    FOwnsDataObject: Boolean; // Replicate the FOwnsList or FOwnsObjects not accessible from ancoestor classes
     FReloading: Boolean;
     // AutoPost
     //  NB: lascio il nome a ioAutoPost perchè c'è già un AutoPost negli antenati
@@ -78,11 +79,11 @@ type
     //   NB: Generic parameter must be <IInterface> (for interfaced list such as IioList<IInterface>) or
     //       <TObject> (for non interfaced list such as TList<IInterface>)
     function DataObject: TObject;
-    procedure _InternalSetDataObject<T>(const ADataObject: TObject; const AOwnsObject: Boolean);
-    procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean); overload;
-    procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean); overload;
-    procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
-    procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
+    procedure _InternalSetDataObject<T>(const ADataObject: TObject; const AOwnsDataObject: Boolean);
+    procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsDataObject: Boolean); overload;
+    procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsDataObject: Boolean); overload;
+    procedure SetDataObject(const ADataObject: TObject; const AOwnsDataObject: Boolean = True); overload;
+    procedure SetDataObject(const ADataObject: IInterface; const AOwnsDataObject: Boolean = False); overload;
     // DataSetLlinkContainer
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     property DataSetLinkContainer: IioBSAToDataSetLinkContainer read GetDataSetLinkContainer;
@@ -135,6 +136,10 @@ type
     // ObjStatusInUse
     function GetObjStatusInUse: Boolean;
     property ObjStatusInUse: Boolean read GetObjStatusInUse;
+    // OwnsDataObject
+    //  NB: replicate the FOwnsList or FOwnsObjects not accessible from ancoestor classes
+    function GetOwnsDataObject: Boolean;
+    property OwnsDataObject: Boolean read GetOwnsDataObject;
     // Reloading
     procedure SetReloading(const Value: Boolean);
     function GetReloading: Boolean;
@@ -170,7 +175,7 @@ type
     procedure DoCreateInstance(out AHandled: Boolean; out AInstance: IInterface); override;
     procedure DoReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
   public
-    constructor Create(const ABindSource: IioBindSource; const ADataObject: TObject; const AOwnsObject: Boolean); reintroduce; virtual;
+    constructor Create(const ABindSource: IioBindSource; const ADataObject: TObject; const AOwnsDataObject: Boolean); reintroduce; virtual;
     destructor Destroy; override;
     procedure Append(AObject: TObject); reintroduce; overload;
     procedure Append(AObject: IInterface); reintroduce; overload;
@@ -215,14 +220,15 @@ begin
 end;
 {$ENDIF}
 
-constructor TioActiveInterfaceListBindSourceAdapter.Create(const ABindSource: IioBindSource; const ADataObject: TObject; const AOwnsObject: Boolean);
+constructor TioActiveInterfaceListBindSourceAdapter.Create(const ABindSource: IioBindSource; const ADataObject: TObject; const AOwnsDataObject: Boolean);
 begin
-  inherited Create(nil, ADataObject, ABindSource.GetTypeAlias, ABindSource.GetTypeName, AOwnsObject);
+  inherited Create(nil, ADataObject, ABindSource.GetTypeAlias, ABindSource.GetTypeName, AOwnsDataObject);
   FBindSource := ABindSource;
-  FInterfacedList := nil;
-  FReloading := False;
   FBSPersistenceDeleting := False;
   FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
+  FInterfacedList := nil;
+  FOwnsDataObject := AOwnsDataObject;
+  FReloading := False;
   // Set Master & Details adapters reference
   FMasterAdaptersContainer := nil;
   FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
@@ -350,7 +356,7 @@ begin
   inherited;
   case FBindSource.LoadType of
     ltCreate:
-      TioCommonBSAPersistence.Create(Self);
+      TioCommonBSAPersistence.CreateDataObject(Self);
     ltAuto:
       TioCommonBSAPersistence.Load(Self);
   end;
@@ -364,7 +370,7 @@ end;
 procedure TioActiveInterfaceListBindSourceAdapter.Reload;
 begin
   if FBindSource.LoadType = ltCreate then
-    TioCommonBSAPersistence.Create(Self)
+    TioCommonBSAPersistence.CreateDataObject(Self)
   else
     TioCommonBSAPersistence.Reload(Self);
 end;
@@ -678,28 +684,28 @@ begin
   FBSPersistenceDeleting := Value;
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
+procedure TioActiveInterfaceListBindSourceAdapter.SetDataObject(const ADataObject: TObject; const AOwnsDataObject: Boolean);
 begin
   if Self.HasMasterBSA then
     TioCommonBSABehavior.InternalSetDataObjectAsDetail<TObject>(Self, ADataObject)
   else
-    InternalSetDataObject(ADataObject, AOwnsObject);
+    InternalSetDataObject(ADataObject, AOwnsDataObject);
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
+procedure TioActiveInterfaceListBindSourceAdapter.SetDataObject(const ADataObject: IInterface; const AOwnsDataObject: Boolean);
 begin
   if Self.HasMasterBSA then
     TioCommonBSABehavior.InternalSetDataObjectAsDetail<IInterface>(Self, ADataObject)
   else
-    InternalSetDataObject(ADataObject, AOwnsObject);
+    InternalSetDataObject(ADataObject, AOwnsDataObject);
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter.InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
+procedure TioActiveInterfaceListBindSourceAdapter.InternalSetDataObject(const ADataObject: IInterface; const AOwnsDataObject: Boolean);
 begin
-  Self._InternalSetDataObject<IInterface>(ADataObject as TObject, AOwnsObject);
+  Self._InternalSetDataObject<IInterface>(ADataObject as TObject, AOwnsDataObject);
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter._InternalSetDataObject<T>(const ADataObject: TObject; const AOwnsObject: Boolean);
+procedure TioActiveInterfaceListBindSourceAdapter._InternalSetDataObject<T>(const ADataObject: TObject; const AOwnsDataObject: Boolean);
 var
   LPrecLoadType: TioLoadType;
 begin
@@ -714,7 +720,8 @@ begin
   if Assigned(ADataObject) then
   begin
     // Set the provided DataObject (always as TList<IInterface>)
-    SetList(TList<IInterface>(ADataObject), AOwnsObject);
+    SetList(TList<IInterface>(ADataObject), AOwnsDataObject);
+    FOwnsDataObject := AOwnsDataObject;
     // If the DataObject (List) is an interface referenced object then
     // set the FInterfacedList field to it to keep alive the list itself
     if TioUtilities.IsAnInterface<T> then
@@ -733,7 +740,8 @@ begin
   end
   else
   begin
-    SetList(nil, AOwnsObject);
+    SetList(nil, AOwnsDataObject);
+    FOwnsDataObject := AOwnsDataObject;
     // Fix the "Couldn't find Value" or "Couldn't find Owner" or similar using "CustomFormat" links property
     // NB: Questo "AddFields" che sembrerebbe non aver senso in questo punto in realtà risolve un errore che mi ha segnalato
     // Carlo Marona; questo errore (vedi sopra) si verificava se si impostava nil come DataObject (SetDataObject(nil))
@@ -756,9 +764,9 @@ begin
   /// / -------------------------------------------------------------------------------------------------------
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter.InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
+procedure TioActiveInterfaceListBindSourceAdapter.InternalSetDataObject(const ADataObject: TObject; const AOwnsDataObject: Boolean);
 begin
-  Self._InternalSetDataObject<TObject>(ADataObject, AOwnsObject);
+  Self._InternalSetDataObject<TObject>(ADataObject, AOwnsDataObject);
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.SetioAutoPost(const Value: Boolean);
@@ -799,6 +807,11 @@ end;
 function TioActiveInterfaceListBindSourceAdapter.GetObjStatusInUse: Boolean;
 begin
   Result := TioCommonBSABehavior.GetObjStatusInUse(Self);
+end;
+
+function TioActiveInterfaceListBindSourceAdapter.GetOwnsDataObject: Boolean;
+begin
+  Result := FOwnsDataObject;
 end;
 
 function TioActiveInterfaceListBindSourceAdapter._AddRef: Integer;

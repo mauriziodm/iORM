@@ -54,7 +54,7 @@ type
     function NewDetailBindSourceAdapter(const ABindSource: IioBindSource; const AMasterClassName, AMasterPropertyName: String): IioActiveBindSourceAdapter;
     function NewNaturalBindSourceAdapter(const ABindSource: IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapter): IioActiveBindSourceAdapter;
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
-    procedure RemoveDetailBindSourceAdapter(const ABindSourceAdapter: IioContainedBindSourceAdapter);
+    procedure RemoveDetailBindSourceAdapter(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
     procedure RemoveNaturalBindSourceAdapter(const ANaturalBindSourceAdapter: IioNaturalActiveBindSourceAdapter);
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetBindSourceAdapterByMasterPropertyName(const AMasterPropertyName:String): IioActiveBindSourceAdapter;
@@ -184,11 +184,9 @@ begin
     Result := E_NOINTERFACE;
 end;
 
-procedure TioDetailAdaptersContainer.RemoveDetailBindSourceAdapter(
-  const ABindSourceAdapter: IioContainedBindSourceAdapter);
+procedure TioDetailAdaptersContainer.RemoveDetailBindSourceAdapter(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 begin
-//  FDetailAdapters.Extract(ABindSourceAdapter);  // Questo era prima quando il container era una TList
-  FDetailAdapters.Remove(ABindSourceAdapter.GetMasterPropertyName);
+  FDetailAdapters.Remove(AActiveBindSourceAdapter.BindSource.MasterPropertyName);
 end;
 
 procedure TioDetailAdaptersContainer.RemoveNaturalBindSourceAdapter(const ANaturalBindSourceAdapter: IioNaturalActiveBindSourceAdapter);

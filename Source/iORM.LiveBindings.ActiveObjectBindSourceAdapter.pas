@@ -53,9 +53,10 @@ type
     FDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     FDetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     FMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
+    FOwnsDataObject: Boolean; // Replicate the FOwnsList or FOwnsObjects not accessible from ancoestor classes
     FReloading: Boolean;
     // AutoPost property
-    //  NB: lascio il nome a ioAutoPost perchè c'è già un AutoPost negli antenati
+    // NB: lascio il nome a ioAutoPost perchè c'è già un AutoPost negli antenati
     procedure SetioAutoPost(const Value: Boolean);
     function GetioAutoPost: Boolean;
     property ioAutoPost: Boolean read GetioAutoPost write SetioAutoPost;
@@ -71,13 +72,13 @@ type
     function GetCurrentOID: Integer;
     property CurrentOID: Integer read GetCurrentOID;
     // DataObject
-    //   NB: Generic parameter must be <IInterface> (for interfaced list such as IioList<IInterface>) or
-    //       <TObject> (for non interfaced list such as TList<IInterface>)
+    // NB: Generic parameter must be <IInterface> (for interfaced list such as IioList<IInterface>) or
+    // <TObject> (for non interfaced list such as TList<IInterface>)
     function DataObject: TObject;
-    procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
-    procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
-    procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
-    procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
+    procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsDataObject: Boolean = True); overload;
+    procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsDataObject: Boolean = False); overload;
+    procedure SetDataObject(const ADataObject: TObject; const AOwnsDataObject: Boolean = True); overload;
+    procedure SetDataObject(const ADataObject: IInterface; const AOwnsDataObject: Boolean = False); overload;
     // DataSetLlinkContainer
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     property DataSetLinkContainer: IioBSAToDataSetLinkContainer read GetDataSetLinkContainer;
@@ -127,6 +128,10 @@ type
     // ObjStatusInUse
     function GetObjStatusInUse: Boolean;
     property ObjStatusInUse: Boolean read GetObjStatusInUse;
+    // OwnsDataObject
+    //  NB: replicate the FOwnsList or FOwnsObjects not accessible from ancoestor classes
+    function GetOwnsDataObject: Boolean;
+    property OwnsDataObject: Boolean read GetOwnsDataObject;
     // Reloading
     function GetReloading: Boolean;
     procedure SetReloading(const Value: Boolean);
@@ -139,7 +144,7 @@ type
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection;
   protected
     // CanActivate
-    //  NB: Property on ancestor class
+    // NB: Property on ancestor class
     function GetCanActivate: Boolean; override;
     // IsAutoLoad
     function GetIsAutoLoad: Boolean; virtual;
@@ -167,7 +172,7 @@ type
     procedure DoReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean);
     function SupportsNestedFields: Boolean; override;
   public
-    constructor Create(const ABindSource: IioBindSource; const ADataObject: TObject; const AOwnsObject: Boolean); reintroduce; virtual;
+    constructor Create(const ABindSource: IioBindSource; const ADataObject: TObject; const AOwnsDataObject: Boolean); reintroduce; virtual;
     destructor Destroy; override;
     procedure Append(AObject: TObject); reintroduce; overload;
     procedure Append(AObject: IInterface); reintroduce; overload;
@@ -252,7 +257,7 @@ begin
   InternalSetDataObject(nil, False);
 end;
 
-constructor TioActiveObjectBindSourceAdapter.Create(const ABindSource: IioBindSource; const ADataObject: TObject; const AOwnsObject: Boolean);
+constructor TioActiveObjectBindSourceAdapter.Create(const ABindSource: IioBindSource; const ADataObject: TObject; const AOwnsDataObject: Boolean);
 var
   FClassRef: TioClassRef;
 begin
@@ -266,7 +271,8 @@ begin
   else
     FClassRef := TioUtilities.ClassNameToClassRef(ABindSource.TypeName);
 
-  inherited Create(nil, ADataObject, FClassRef, AOwnsObject);
+  inherited Create(nil, ADataObject, FClassRef, AOwnsDataObject);
+  FOwnsDataObject := AOwnsDataObject;
 
   FBindSource := ABindSource;
   FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
@@ -326,9 +332,9 @@ begin
   TioCommonBSAPersistence.BeforeDelete(Self);
 
   // Prima di aggiungere questa riga succedeva che, nell'esempio degli ordini delle pizze,
-  //  se eliminavo una riga dell'ordine con una TDataSetDelete action (quella standard di Delphi)
-  //  poi quando si faceva il Persist dell'oggetto master l'ETM non veniva aggiornato (non si creava il nuovo TimeSlot),
-  //  questo a sua volta impediva il corretto funzionamento della sincronizzazione
+  // se eliminavo una riga dell'ordine con una TDataSetDelete action (quella standard di Delphi)
+  // poi quando si faceva il Persist dell'oggetto master l'ETM non veniva aggiornato (non si creava il nuovo TimeSlot),
+  // questo a sua volta impediva il corretto funzionamento della sincronizzazione
   DoBeforeEdit;
 end;
 
@@ -350,7 +356,7 @@ begin
   inherited;
   case FBindSource.LoadType of
     ltCreate:
-      TioCommonBSAPersistence.Create(Self);
+      TioCommonBSAPersistence.CreateDataObject(Self);
     ltAuto:
       TioCommonBSAPersistence.Load(Self);
   end;
@@ -430,7 +436,8 @@ begin
   Result := Self.Fields;
 end;
 
-function TioActiveObjectBindSourceAdapter.NewDetailBindSourceAdapter(const ABindSource: IioBindSource; const AMasterPropertyName: String): IioActiveBindSourceAdapter;
+function TioActiveObjectBindSourceAdapter.NewDetailBindSourceAdapter(const ABindSource: IioBindSource; const AMasterPropertyName: String)
+  : IioActiveBindSourceAdapter;
 begin
   // Return the requested DetailBindSourceAdapter and set the current master object
   Result := FDetailAdaptersContainer.NewDetailBindSourceAdapter(ABindSource, GetObjectType.Name, AMasterPropertyName);
@@ -472,7 +479,7 @@ end;
 function TioActiveObjectBindSourceAdapter.GetMasterPropertyPath: String;
 begin
   if HasMasterBSA then
-    Result := GetMasterBindSourceAdapter.GetMasterPropertyPath + '.' +  FBindSource.MasterPropertyName
+    Result := GetMasterBindSourceAdapter.GetMasterPropertyPath + '.' + FBindSource.MasterPropertyName
   else
     Result := '';
 end;
@@ -573,16 +580,16 @@ var
   LPreviousCurrentObj: TObject;
 begin
   // Forza l'aggiornamento del SUD (Smart Update Detection) in modo che poi, se richiesto,
-  //  l'oggetto Master vegga persistito. Prima di aggiungere questa riga succedeva che,
-  //  nell'esempio degli ordini delle pizze, se aggiungevo una nuova pizza in una nuova
-  //  riga con una nuova pizza poi l'oggetto non si persisteva perchè nel SUD l'oggetto
-  //  master non figurava come modificato e quindi non veniva persistito. La stessa cosa
-  //  succedeva anche in caso di modifica manuale di una riga.
-  //  NB: Prima era alla fine di questo metodo ma poi l'ho spostato all'inizio perchè
-  //       altrimenti la selezione avveniva anche se l'utente non aveva l'autorizzazione
-  //       l'oggetto ricevente (Target), nel senso che otteneva l'autorizzazione alla selezione
-  //       ma non alla modifica dell'oggetto target che cmq viene modificato. Spostandolo
-  //       all'inizio l'operazione non si esegue se non ottiene entrambe le autorizzazioni
+  // l'oggetto Master vegga persistito. Prima di aggiungere questa riga succedeva che,
+  // nell'esempio degli ordini delle pizze, se aggiungevo una nuova pizza in una nuova
+  // riga con una nuova pizza poi l'oggetto non si persisteva perchè nel SUD l'oggetto
+  // master non figurava come modificato e quindi non veniva persistito. La stessa cosa
+  // succedeva anche in caso di modifica manuale di una riga.
+  // NB: Prima era alla fine di questo metodo ma poi l'ho spostato all'inizio perchè
+  // altrimenti la selezione avveniva anche se l'utente non aveva l'autorizzazione
+  // l'oggetto ricevente (Target), nel senso che otteneva l'autorizzazione alla selezione
+  // ma non alla modifica dell'oggetto target che cmq viene modificato. Spostandolo
+  // all'inizio l'operazione non si esegue se non ottiene entrambe le autorizzazioni
   DoBeforeEdit;
 
   // Initialization and save previous current object to delete it if
@@ -596,7 +603,7 @@ begin
     ASelected := TioUtilities.CloneObject(ASelected);
 
   // Do the selection
-//  DoBeforeReceiveSelection(ASelected, ASelectionType); Spostato in TioCommonBSBehavior.Select<T>
+  // DoBeforeReceiveSelection(ASelected, ASelectionType); Spostato in TioCommonBSBehavior.Select<T>
   DoReceiveSelection(ASelected, ASelectionType, LDone);
   if not LDone then
     SetDataObject(ASelected);
@@ -605,12 +612,12 @@ begin
   // Free the previous current object if OnReceiveSelectionFreeObject property
   // of the BindSource is True
   // NB: Solo se in realtà il PreviousCurrentObj e il Current sono diversi, cioè non sono
-  //      stesso oggetto. Ho fatto questa modifica perchè in alcuni casi come quello dell'esempio
-  //      della pizza nel quale il Selector delle Pizze punta (properietà SelectorFor) non al BSRows
-  //      ma al BSOrder perchè essendoci l'apposito metodo per aggiungere una pizza nel TOrder ho deciso
-  //      di destinare la selezione li; in questo caso avrebbe fatto il Free dell'ordine. Si tratta di un caso
-  //      particolare però facendo in questo modo evito eventuali problemi di AV error semplificando
-  //      la vita anche se mi dimentico di mettere a False la proprietà OnReceiveSelectionFreeObject.
+  // stesso oggetto. Ho fatto questa modifica perchè in alcuni casi come quello dell'esempio
+  // della pizza nel quale il Selector delle Pizze punta (properietà SelectorFor) non al BSRows
+  // ma al BSOrder perchè essendoci l'apposito metodo per aggiungere una pizza nel TOrder ho deciso
+  // di destinare la selezione li; in questo caso avrebbe fatto il Free dell'ordine. Si tratta di un caso
+  // particolare però facendo in questo modo evito eventuali problemi di AV error semplificando
+  // la vita anche se mi dimentico di mettere a False la proprietà OnReceiveSelectionFreeObject.
   if FBindSource.OnReceiveSelectionFreeObject and (LPreviousCurrentObj <> nil) and (Current <> LPreviousCurrentObj) then
     LPreviousCurrentObj.Free;
 end;
@@ -631,7 +638,7 @@ end;
 procedure TioActiveObjectBindSourceAdapter.Reload;
 begin
   if FBindSource.LoadType = ltCreate then
-    TioCommonBSAPersistence.Create(Self)
+    TioCommonBSAPersistence.CreateDataObject(Self)
   else
     TioCommonBSAPersistence.Reload(Self);
 end;
@@ -646,26 +653,26 @@ begin
   FBSPersistenceDeleting := Value;
 end;
 
-procedure TioActiveObjectBindSourceAdapter.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
+procedure TioActiveObjectBindSourceAdapter.SetDataObject(const ADataObject: TObject; const AOwnsDataObject: Boolean);
 begin
   if Self.HasMasterBSA then
     TioCommonBSABehavior.InternalSetDataObjectAsDetail<TObject>(Self, ADataObject)
   else
-    InternalSetDataObject(ADataObject, AOwnsObject);
+    InternalSetDataObject(ADataObject, AOwnsDataObject);
 end;
 
-procedure TioActiveObjectBindSourceAdapter.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
+procedure TioActiveObjectBindSourceAdapter.SetDataObject(const ADataObject: IInterface; const AOwnsDataObject: Boolean);
 begin
   raise EioGenericException.Create(Self.ClassName, 'SetDataObject', 'This ActiveBindSourceAdapter is for class referenced instances only (not interfaced).');
 end;
 
-procedure TioActiveObjectBindSourceAdapter.InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
+procedure TioActiveObjectBindSourceAdapter.InternalSetDataObject(const ADataObject: IInterface; const AOwnsDataObject: Boolean);
 begin
   raise EioGenericException.Create(Self.ClassName, 'InternalSetDataObject',
     'This ActiveBindSourceAdapter is for class referenced instances only (not interfaced).');
 end;
 
-procedure TioActiveObjectBindSourceAdapter.InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
+procedure TioActiveObjectBindSourceAdapter.InternalSetDataObject(const ADataObject: TObject; const AOwnsDataObject: Boolean);
 var
   LPrecLoadType: TioLoadType;
 begin
@@ -678,7 +685,8 @@ begin
   if Assigned(ADataObject) then
   begin
     // Set the provided DataObject
-    inherited SetDataObject(ADataObject, AOwnsObject);
+    inherited SetDataObject(ADataObject, AOwnsDataObject);
+    FOwnsDataObject := AOwnsDataObject;
     // Set details BSA
     FDetailAdaptersContainer.SetMasterObject(Current);
     // Prior to reactivate the adapter force the "AutoLoadData" property to False to prevent double values
@@ -693,7 +701,8 @@ begin
   end
   else
   begin
-    inherited SetDataObject(nil, AOwnsObject);
+    inherited SetDataObject(nil, AOwnsDataObject);
+    FOwnsDataObject := AOwnsDataObject;
     // Fix the "Couldn't find Value" or "Couldn't find Owner" or similar using "CustomFormat" links property
     // NB: Questo "AddFields" che sembrerebbe non aver senso in questo punto in realtà risolve un errore che mi ha segnalato
     // Carlo Marona; questo errore (vedi sopra) si verificava se si impostava nil come DataObject (SetDataObject(nil))
@@ -747,6 +756,11 @@ end;
 function TioActiveObjectBindSourceAdapter.GetObjStatusInUse: Boolean;
 begin
   Result := TioCommonBSABehavior.GetObjStatusInUse(Self);
+end;
+
+function TioActiveObjectBindSourceAdapter.GetOwnsDataObject: Boolean;
+begin
+  Result := FOwnsDataObject;
 end;
 
 function TioActiveObjectBindSourceAdapter._AddRef: Integer;

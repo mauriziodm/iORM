@@ -94,8 +94,8 @@ type
     function IsActive: Boolean;
     function IsFromBSLoadType: Boolean;
     function DataObject: TObject;
-    procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
-    procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
+    procedure SetDataObject(const ADataObject: TObject; const AOwnsDataObject: Boolean = True); overload;
+    procedure SetDataObject(const ADataObject: IInterface; const AOwnsDataObject: Boolean = False); overload;
     procedure RegisterDetailBindSource(const ADetailBindSource: IioBindSource);
     procedure UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
     procedure PostIfEditing;
@@ -332,10 +332,10 @@ type
     property CurrentOID: Integer read GetCurrentOID;
     // DataObject  (no property)
     function DataObject: TObject;
-    procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean); overload;
-    procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean); overload;
-    procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
-    procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
+    procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsDataObject: Boolean); overload;
+    procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsDataObject: Boolean); overload;
+    procedure SetDataObject(const ADataObject: TObject; const AOwnsDataObject: Boolean = True); overload;
+    procedure SetDataObject(const ADataObject: IInterface; const AOwnsDataObject: Boolean = False); overload;
     // DataSetLlinkContainer
     function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
     property DataSetLinkContainer: IioBSAToDataSetLinkContainer read GetDataSetLinkContainer;
@@ -411,7 +411,7 @@ type
     function NewDetailBindSourceAdapter(const ABindSource: IioBindSource; const AMasterClassName, AMasterPropertyName: String): IioActiveBindSourceAdapter;
     function NewNaturalBindSourceAdapter(const ABindSource:IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapter): IioActiveBindSourceAdapter;
     procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
-    procedure RemoveDetailBindSourceAdapter(const ABindSourceAdapter: IioContainedBindSourceAdapter);
+    procedure RemoveDetailBindSourceAdapter(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
     procedure RemoveNaturalBindSourceAdapter(const ANaturalBindSourceAdapter: IioNaturalActiveBindSourceAdapter);
     function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
     function GetBindSourceAdapterByMasterPropertyName(const AMasterPropertyName: String): IioActiveBindSourceAdapter;
