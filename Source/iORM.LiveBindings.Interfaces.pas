@@ -306,10 +306,9 @@ type
     function GetActive: Boolean;
     property Active: Boolean read GetActive write SetActive;
     // AutoPost property
-    //  NB: lascio il nome a ioAutoPost perchè c'è già un AutoPost negli antenati
-    procedure SetioAutoPost(const Value: Boolean);
-    function GetioAutoPost: Boolean;
-    property ioAutoPost: Boolean read GetioAutoPost write SetioAutoPost;
+    procedure SetAutoPost(const Value: Boolean);
+    function GetAutoPost: Boolean;
+    property AutoPost: Boolean read GetAutoPost write SetAutoPost;
     // BindSource
     procedure SetBindSource(ABindSource: IioBindSource);
     function GetBindSource: IioBindSource;

@@ -369,7 +369,6 @@ begin
     // Assign the BindSourceAdapter
     if Assigned(LActiveBSA) then
     begin
-      LActiveBSA.ioAutoPost := FAutoPost;
       SetRuntimeAdapter(LActiveBSA.AsTBindSourceAdapter);
       FBindSourceAdapter := LActiveBSA;
     end;

@@ -164,8 +164,9 @@ begin
           Result := TioActiveObjectBindSourceAdapter.Create(ABindSource, ADataObject, AOwnsObject);
           // False);
         end;
-
       end;
+  else
+    raise EioGenericException.Create(Self.ClassName, 'GetBSA', 'Wrong "TypeOfCollection" value.');
   end;
 end;
 

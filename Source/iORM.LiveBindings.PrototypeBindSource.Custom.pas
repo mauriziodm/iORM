@@ -1216,8 +1216,6 @@ begin
   // PS: Set ioAsync also (and other properties)
   if Assigned(LActiveBSA) then
   begin
-    LActiveBSA.ioAutoPost := FAutoPost;
-    LActiveBSA.SetBindSource(Self);
     SetRuntimeAdapter(LActiveBSA.AsTBindSourceAdapter);
     FBindSourceAdapter := LActiveBSA;
   end;

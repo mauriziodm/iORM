@@ -647,7 +647,7 @@ end;
 function TioModelPresenterCustom.GetAutoPost: Boolean;
 begin
   if CheckAdapter then
-    Result := Self.GetActiveBindSourceAdapter.ioAutoPost
+    Result := GetActiveBindSourceAdapter.AutoPost
   else
     Result := FAutoPost;
 end;
@@ -1144,10 +1144,7 @@ end;
 procedure TioModelPresenterCustom.SetActiveBindSourceAdapter(const Value: IioActiveBindSourceAdapter);
 begin
   if Value <> FBindSourceAdapter then
-  begin
     FBindSourceAdapter := Value;
-    FBindSourceAdapter.BindSource := Self;
-  end;
 end;
 
 procedure TioModelPresenterCustom.SetDataObject(const ADataObject: TObject; const AOwnsDataObject: Boolean);
@@ -1270,7 +1267,7 @@ begin
   FAutoPost := Value;
   // Update the adapter
   if CheckAdapter then
-    GetActiveBindSourceAdapter.ioAutoPost := Value;
+    GetActiveBindSourceAdapter.AutoPost := Value;
 end;
 
 procedure TioModelPresenterCustom.SetAutoRefreshOnNotification(const Value: Boolean);
@@ -1354,7 +1351,7 @@ begin
   end;
 
   // Init the BSA
-  FBindSourceAdapter.ioAutoPost := FAutoPost;
+  FBindSourceAdapter.AutoPost := FAutoPost;
 end;
 
 function TioModelPresenterCustom._InternalGetAuthorizationContext: String;

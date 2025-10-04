@@ -102,10 +102,9 @@ type
     procedure Reload; virtual;
     // ----- PROPERTIES ------
     // AutoPost property
-    //  NB: lascio il nome a ioAutoPost perchè c'è già un AutoPost negli antenati
-    procedure SetioAutoPost(const Value: Boolean);
-    function GetioAutoPost: Boolean;
-    property ioAutoPost: Boolean read GetioAutoPost write SetioAutoPost;
+    procedure SetAutoPost(const Value: Boolean);
+    function GetAutoPost: Boolean;
+    property AutoPost: Boolean read GetAutoPost write SetAutoPost;
     // BindSource
     procedure SetBindSource(ABindSource: IioBindSource);
     function GetBindSource: IioBindSource;
@@ -280,6 +279,8 @@ begin
   // Set Master & Details adapters reference
   FMasterAdaptersContainer := nil;
   FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
+  // AutoPost
+  AutoPost := ABindSource.AutoPost;
 end;
 
 procedure TioActiveObjectBindSourceAdapter.DeleteListViewItem(const AItemIndex, ADelayMilliseconds: Integer);
@@ -450,9 +451,9 @@ begin
   Result := FDetailAdaptersContainer.NewNaturalBindSourceAdapter(ABindSource, Self);
 end;
 
-function TioActiveObjectBindSourceAdapter.GetioAutoPost: Boolean;
+function TioActiveObjectBindSourceAdapter.GetAutoPost: Boolean;
 begin
-  Result := Self.AutoPost;
+  Result := inherited AutoPost;
 end;
 
 function TioActiveObjectBindSourceAdapter.GetTypeOfCollection: TioTypeOfCollection;
@@ -717,9 +718,9 @@ begin
   GetDataSetLinkContainer.Refresh;
 end;
 
-procedure TioActiveObjectBindSourceAdapter.SetioAutoPost(const Value: Boolean);
+procedure TioActiveObjectBindSourceAdapter.SetAutoPost(const Value: Boolean);
 begin
-  Self.AutoPost := Value;
+  inherited AutoPost := Value;
 end;
 
 procedure TioActiveObjectBindSourceAdapter.SetItemIndex(const Value: Integer);

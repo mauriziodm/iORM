@@ -932,7 +932,7 @@ begin
   // invece era già con stato seBrowse quindi, senza condizione, mi dava un errore di record not
   // in edit or insert mode. Non so perchè si verificava questo disallineamento, cmq così
   // sembra non dare problemi.
-  if GetActiveBindSourceAdapter.ioAutoPost and (FBindSourceAdapter.State in seEditModes) then
+  if GetActiveBindSourceAdapter.AutoPost and (FBindSourceAdapter.State in seEditModes) then
     GetActiveBindSourceAdapter.Post;
 end;
 

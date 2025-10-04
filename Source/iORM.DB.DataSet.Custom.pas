@@ -194,7 +194,7 @@ type
     procedure DoBeforeClose; override;
     procedure SetActive(Value: Boolean); override;
     // InternalAdapter (there is a setter but the property must be ReadOnly)
-    procedure SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter); override;
+    procedure SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);
     // Selectors related event for TObject selection
     procedure DoBeforeReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; const AAuthDecisionRequest: IioAuthDecisionRequest); overload;
     procedure DoReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;
@@ -566,7 +566,7 @@ end;
 function TioDataSetCustom.GetAutoPost: Boolean;
 begin
   if CheckAdapter then
-    Result := GetActiveBindSourceAdapter.ioAutoPost
+    Result := GetActiveBindSourceAdapter.AutoPost
   else
     Result := FAutoPost;
 end;
@@ -876,7 +876,7 @@ begin
   FAutoPost := Value;
   // Update the adapter
   if CheckAdapter then
-    GetActiveBindSourceAdapter.ioAutoPost := Value;
+    GetActiveBindSourceAdapter.AutoPost := Value;
 end;
 
 procedure TioDataSetCustom.SetAutoRefreshOnNotification(const Value: Boolean);
@@ -958,17 +958,22 @@ begin
   inherited;
 end;
 
+//procedure TioDataSetCustom.SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);
+//var
+//  LActiveBSA: IioActiveBindSourceAdapter;
+//begin
+//  inherited;
+//  LActiveBSA := GetActiveBindSourceAdapter;
+//  // Init the BSA
+//  LActiveBSA.AutoPost := FAutoPost;
+//  // Register itself for notifications from BindSourceAdapter
+//  LActiveBSA.SetBindSource(Self);
+//  FTypeOfCollection := LActiveBSA.TypeOfCollection;
+//end;
 procedure TioDataSetCustom.SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);
-var
-  LActiveBSA: IioActiveBindSourceAdapter;
 begin
   inherited;
-  LActiveBSA := GetActiveBindSourceAdapter;
-  // Init the BSA
-  LActiveBSA.ioAutoPost := FAutoPost;
-  // Register itself for notifications from BindSourceAdapter
-  LActiveBSA.SetBindSource(Self);
-  FTypeOfCollection := LActiveBSA.TypeOfCollection;
+  FTypeOfCollection := AActiveBindSourceAdpter.TypeOfCollection;
 end;
 
 procedure TioDataSetCustom.SetOnDeleteConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);

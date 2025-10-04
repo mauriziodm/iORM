@@ -107,10 +107,9 @@ type
     procedure ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType); overload;
     // ----- PROPERTIES ------
     // AutoPost
-    //  NB: lascio il nome a ioAutoPost perchè c'è già un AutoPost negli antenati
-    procedure SetioAutoPost(const Value: Boolean);
-    function GetioAutoPost: Boolean;
-    property ioAutoPost: Boolean read GetioAutoPost write SetioAutoPost;
+    procedure SetAutoPost(const Value: Boolean);
+    function GetAutoPost: Boolean;
+    property AutoPost: Boolean read GetAutoPost write SetAutoPost;
     // BindSource
     procedure SetBindSource(ABindSource: IioBindSource);
     function GetBindSource: IioBindSource;
@@ -237,7 +236,7 @@ begin
   FInsertObj_Enabled := False;
   FInsertObj_NewObj := nil;
   // AutoPost
-  SetioAutoPost(ABindSource.AutoPost);
+  AutoPost := ABindSource.AutoPost;
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.Append(AObject: IInterface);
@@ -492,9 +491,9 @@ begin
   FDetailAdaptersContainer.SetMasterObject(Self.Current);
 end;
 
-function TioActiveInterfaceListBindSourceAdapter.GetioAutoPost: Boolean;
+function TioActiveInterfaceListBindSourceAdapter.GetAutoPost: Boolean;
 begin
-  Result := Self.AutoPost;
+  Result := inherited AutoPost;
 end;
 
 function TioActiveInterfaceListBindSourceAdapter.GetTypeOfCollection: TioTypeOfCollection;
@@ -770,9 +769,9 @@ begin
   Self._InternalSetDataObject<TObject>(ADataObject, AOwnsDataObject);
 end;
 
-procedure TioActiveInterfaceListBindSourceAdapter.SetioAutoPost(const Value: Boolean);
+procedure TioActiveInterfaceListBindSourceAdapter.SetAutoPost(const Value: Boolean);
 begin
-  Self.AutoPost := Value;
+  inherited AutoPost := Value;
 end;
 
 procedure TioActiveInterfaceListBindSourceAdapter.SetItemIndex(const Value: Integer);
