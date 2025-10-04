@@ -55,100 +55,7 @@ type
     FMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     FOwnsDataObject: Boolean; // Replicate the FOwnsList or FOwnsObjects not accessible from ancoestor classes
     FReloading: Boolean;
-    // AutoPost property
-    // NB: lascio il nome a ioAutoPost perchè c'è già un AutoPost negli antenati
-    procedure SetioAutoPost(const Value: Boolean);
-    function GetioAutoPost: Boolean;
-    property ioAutoPost: Boolean read GetioAutoPost write SetioAutoPost;
-    // BSPersistenceDeleting
-    procedure SetBSPersistenceDeleting(const Value: Boolean);
-    function GetBSPersistenceDeleting: Boolean;
-    property BSPersistenceDeleting: Boolean read GetBSPersistenceDeleting write SetBSPersistenceDeleting;
-    // CurrentOID
-    function GetCurrentOID: Integer;
-    property CurrentOID: Integer read GetCurrentOID;
-    // DataObject
-    // NB: Generic parameter must be <IInterface> (for interfaced list such as IioList<IInterface>) or
-    // <TObject> (for non interfaced list such as TList<IInterface>)
-    function DataObject: TObject;
-    procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsDataObject: Boolean = True); overload;
-    procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsDataObject: Boolean = False); overload;
-    procedure SetDataObject(const ADataObject: TObject; const AOwnsDataObject: Boolean = True); overload;
-    procedure SetDataObject(const ADataObject: IInterface; const AOwnsDataObject: Boolean = False); overload;
-    // DataSetLlinkContainer
-    function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
-    property DataSetLinkContainer: IioBSAToDataSetLinkContainer read GetDataSetLinkContainer;
-    // DetailAdaptersContainer
-    function GetDetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
-    property DetailAdaptersContainer: IioDetailBindSourceAdaptersContainer read GetDetailAdaptersContainer;
-    // Fields
-    function GetFields: TList<TBindSourceAdapterField>;
-    property Fields: TList<TBindSourceAdapterField> read GetFields;
-    // HasMasterBSA
-    function GetHasMasterBSA: Boolean;
-    property HasMasterBSA: Boolean read GetHasMasterBSA;
-    // IsDetailBSA
-    function GetIsDetailBSA: Boolean;
-    property IsDetailBSA: Boolean read GetIsDetailBSA;
-    // IsMasterBSA
-    function GetIsMasterBSA: Boolean;
-    property IsMasterBSA: Boolean read GetIsMasterBSA;
-    // ItemIndex
-    function GetItemIndex: Integer;
-    procedure SetItemIndex(const Value: Integer);
-    property ItemIndex: Integer read GetItemIndex write SetItemIndex;
-    // Items
-    function GetItems(const AIndex: Integer): TObject;
-    procedure SetItems(const AIndex: Integer; const Value: TObject);
-    property Items[const AIndex: Integer]: TObject read GetItems write SetItems;
-    // MasterAdaptersContainer
-    procedure SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
-    function GetMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
-    property MasterAdaptersContainer: IioDetailBindSourceAdaptersContainer read GetMasterAdaptersContainer write SetMasterAdaptersContainer;
-    // MasterBindSourceAdapter
-    function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
-    property MasterBindSourceAdapter: IioActiveBindSourceAdapter read GetMasterBindSourceAdapter;
-    // MasterPropertyPath
-    function GetMasterPropertyPath: String;
-    property MasterPropertyPath: String read GetMasterPropertyPath;
-    // ObjStatus
-    procedure SetObjStatus(AObjStatus: TioObjStatus);
-    function GetObjStatus: TioObjStatus;
-    property ObjStatus: TioObjStatus read GetObjStatus write SetObjStatus;
-    // ObjStatusInUse
-    function GetObjStatusInUse: Boolean;
-    property ObjStatusInUse: Boolean read GetObjStatusInUse;
-    // OwnsDataObject
-    //  NB: replicate the FOwnsList or FOwnsObjects not accessible from ancoestor classes
-    function GetOwnsDataObject: Boolean;
-    property OwnsDataObject: Boolean read GetOwnsDataObject;
-    // Reloading
-    function GetReloading: Boolean;
-    procedure SetReloading(const Value: Boolean);
-    property Reloading: Boolean read GetReloading write SetReloading;
-    // State
-    function GetState: TBindSourceAdapterState;
-    property State: TBindSourceAdapterState read GetState;
-    // TypeOfCollection
-    function GetTypeOfCollection: TioTypeOfCollection;
-    property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection;
   protected
-    // BindSource
-    procedure SetBindSource(ABindSource: IioBindSource);
-    function GetBindSource: IioBindSource;
-    property BindSource: IioBindSource read GetBindSource write SetBindSource;
-    // CanActivate
-    // NB: Property on ancestor class
-    function GetCanActivate: Boolean; override;
-    // HasBindSource
-    function GetHasBindSource: Boolean;
-    property HasBindSource: Boolean read GetHasBindSource;
-    // IsAutoLoad
-    function GetIsAutoLoad: Boolean; virtual;
-    property IsAutoLoad: Boolean read GetIsAutoLoad;
-    // IsInterfaceBSA
-    function GetIsInterfaceBSA: Boolean;
-    property IsInterfaceBSA: Boolean read GetIsInterfaceBSA;
     // =========================================================================
     // Part for the support of the IioBindSource interfaces (Added by iORM)
     // because is not implementing IInterface (NB: RefCount DISABLED)
@@ -193,6 +100,100 @@ type
     procedure ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType); overload;
     procedure Refresh(const ANotify: Boolean = True); reintroduce; overload;
     procedure Reload; virtual;
+    // ----- PROPERTIES ------
+    // AutoPost property
+    //  NB: lascio il nome a ioAutoPost perchè c'è già un AutoPost negli antenati
+    procedure SetioAutoPost(const Value: Boolean);
+    function GetioAutoPost: Boolean;
+    property ioAutoPost: Boolean read GetioAutoPost write SetioAutoPost;
+    // BindSource
+    procedure SetBindSource(ABindSource: IioBindSource);
+    function GetBindSource: IioBindSource;
+    property BindSource: IioBindSource read GetBindSource write SetBindSource;
+    // BSPersistenceDeleting
+    function GetBSPersistenceDeleting: Boolean;
+    procedure SetBSPersistenceDeleting(const Value: Boolean);
+    property BSPersistenceDeleting: Boolean read GetBSPersistenceDeleting write SetBSPersistenceDeleting;
+    // CanActivate
+    //  NB: Property on ancestor class
+    function GetCanActivate: Boolean; override;
+    // CurrentOID
+    function GetCurrentOID: Integer;
+    property CurrentOID: Integer read GetCurrentOID;
+    // DataObject
+    //   NB: Generic parameter must be <IInterface> (for interfaced list such as IioList<IInterface>) or
+    //       <TObject> (for non interfaced list such as TList<IInterface>)
+    function DataObject: TObject;
+    procedure InternalSetDataObject(const ADataObject: TObject; const AOwnsDataObject: Boolean = True); overload;
+    procedure InternalSetDataObject(const ADataObject: IInterface; const AOwnsDataObject: Boolean = False); overload;
+    procedure SetDataObject(const ADataObject: TObject; const AOwnsDataObject: Boolean = True); overload;
+    procedure SetDataObject(const ADataObject: IInterface; const AOwnsDataObject: Boolean = False); overload;
+    // DataSetLlinkContainer
+    function GetDataSetLinkContainer: IioBSAToDataSetLinkContainer;
+    property DataSetLinkContainer: IioBSAToDataSetLinkContainer read GetDataSetLinkContainer;
+    // DetailAdaptersContainer
+    function GetDetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
+    property DetailAdaptersContainer: IioDetailBindSourceAdaptersContainer read GetDetailAdaptersContainer;
+    // Fields
+    function GetFields: TList<TBindSourceAdapterField>;
+    property Fields: TList<TBindSourceAdapterField> read GetFields;
+    // HasBindSource
+    function GetHasBindSource: boolean;
+    property HasBindSource: Boolean read GetHasBindSource;
+    // HasMasterBSA
+    function GetHasMasterBSA: Boolean;
+    property HasMasterBSA: Boolean read GetHasMasterBSA;
+    // IsAutoLoad
+    function GetIsAutoLoad: Boolean; virtual;
+    property IsAutoLoad: Boolean read GetIsAutoLoad;
+    // IsDetailBSA
+    function GetIsDetailBSA: Boolean;
+    property IsDetailBSA: Boolean read GetIsDetailBSA;
+    // IsInterfaceBSA
+    function GetIsInterfaceBSA: Boolean;
+    property IsInterfaceBSA: Boolean read GetIsInterfaceBSA;
+    // IsMasterBSA
+    function GetIsMasterBSA: Boolean;
+    property IsMasterBSA: Boolean read GetIsMasterBSA;
+    // ItemIndex
+    function GetItemIndex: Integer;
+    procedure SetItemIndex(const Value: Integer);
+    property ItemIndex: Integer read GetItemIndex write SetItemIndex;
+    // Items
+    function GetItems(const AIndex: Integer): TObject;
+    procedure SetItems(const AIndex: Integer; const Value: TObject);
+    property Items[const AIndex: Integer]: TObject read GetItems write SetItems;
+    // MasterAdaptersContainer
+    procedure SetMasterAdaptersContainer(AMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer);
+    function GetMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
+    property MasterAdaptersContainer: IioDetailBindSourceAdaptersContainer read GetMasterAdaptersContainer write SetMasterAdaptersContainer;
+    // MasterBindSourceAdapter
+    function GetMasterBindSourceAdapter: IioActiveBindSourceAdapter;
+    property MasterBindSourceAdapter: IioActiveBindSourceAdapter read GetMasterBindSourceAdapter;
+    // MasterPropertyPath
+    function GetMasterPropertyPath: String;
+    property MasterPropertyPath: String read GetMasterPropertyPath;
+    // ObjStatus
+    procedure SetObjStatus(AObjStatus: TioObjStatus);
+    function GetObjStatus: TioObjStatus;
+    property ObjStatus: TioObjStatus read GetObjStatus write SetObjStatus;
+    // ObjStatusInUse
+    function GetObjStatusInUse: Boolean;
+    property ObjStatusInUse: Boolean read GetObjStatusInUse;
+    // OwnsDataObject
+    //  NB: replicate the FOwnsList or FOwnsObjects not accessible from ancoestor classes
+    function GetOwnsDataObject: Boolean;
+    property OwnsDataObject: Boolean read GetOwnsDataObject;
+    // Reloading
+    function GetReloading: Boolean;
+    procedure SetReloading(const Value: Boolean);
+    property Reloading: Boolean read GetReloading write SetReloading;
+    // State
+    function GetState: TBindSourceAdapterState;
+    property State: TBindSourceAdapterState read GetState;
+    // TypeOfCollection
+    function GetTypeOfCollection: TioTypeOfCollection;
+    property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection;
   end;
 
 implementation

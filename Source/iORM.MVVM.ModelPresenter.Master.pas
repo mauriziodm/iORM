@@ -300,7 +300,7 @@ begin
   end;
 end;
 
-procedure TioModelPresenterMaster.SetDataObject(const ADataObject: TObject; const AOwnsDaaObject: Boolean);
+procedure TioModelPresenterMaster.SetDataObject(const ADataObject: TObject; const AOwnsDataObject: Boolean);
 begin
   inherited;
   // Mauri 23/06/2024: per risolvere in modo semplice il problema con i ModelPresenters (MVVM) che non si vedevano i dettagli delle

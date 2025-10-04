@@ -51,14 +51,15 @@ type
     procedure DoBeforeOpen; override;
     procedure DoBeforeDelete; override;
     procedure DoAfterDelete; override;
-    // AutoLoad
-    function GetIsAutoLoad: Boolean; override;
   public
     constructor Create(const ABindSource:IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapter); reintroduce; virtual;
     destructor Destroy; override;
     procedure ForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     procedure Reload; override;
     function NotifyButDontForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
+    // ----- PROPERTIES -----
+    // AutoLoad
+    function GetIsAutoLoad: Boolean; override;
   end;
 
 

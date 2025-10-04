@@ -87,8 +87,8 @@ begin
     Result := TioActiveInterfaceListBindSourceAdapter.Create(ABindSource, TList<IInterface>.Create, True)
   else
     Result := TioActiveListBindSourceAdapter.Create(ABindSource, TList<TObject>.Create, True);
-  // Set MasterProperty for the adapter
-  Result.SetMasterProperty(AMasterProperty);
+  // Set MasterProperty
+  ABindSource.MasterPropertyName := AMasterProperty.GetName;
 end;
 
 class function TioLiveBindingsFactory.ContainedObjectBindSourceAdapter(const ABindSource: IioBindSource; const AMasterProperty: IioProperty): IioContainedBindSourceAdapter;
@@ -101,8 +101,8 @@ begin
     Result := TioActiveInterfaceObjectBindSourceAdapter.Create(ABindSource, nil, False)
   else
     Result := TioActiveObjectBindSourceAdapter.Create(ABindSource, nil, True);
-  // Set MasterProperty for the adapter
-  Result.SetMasterProperty(AMasterProperty);
+  // Set MasterProperty
+  ABindSource.MasterPropertyName := AMasterProperty.GetName;
 end;
 
 class function TioLiveBindingsFactory.DetailAdaptersContainer(const AMasterAdapter: IioContainedBindSourceAdapter): IioDetailBindSourceAdaptersContainer;

@@ -59,6 +59,53 @@ type
     FMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     FOwnsDataObject: Boolean; // Replicate the FOwnsList or FOwnsObjects not accessible from ancoestor classes
     FReloading: Boolean;
+  protected
+    // =========================================================================
+    // Part for the support of the IioBindSource interfaces (Added by iORM)
+    // because is not implementing IInterface (NB: RefCount DISABLED)
+    function QueryInterface(const IID: TGUID; out Obj): HResult; reintroduce; stdcall;
+    function _AddRef: Integer; stdcall;
+    function _Release: Integer; stdcall;
+{$IFDEF AUTOREFCOUNT}
+    function __ObjAddRef: Integer; override;
+    function __ObjRelease: Integer; override;
+{$ENDIF}
+    // =========================================================================
+    procedure DoAfterDelete; override;
+    procedure DoAfterInsert; override;
+    procedure DoAfterPost; override;
+    procedure DoAfterPostFields(AFields: TArray<TBindSourceAdapterField>); override;
+    procedure DoAfterReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
+    procedure DoAfterScroll; override;
+    procedure DoBeforeDelete; override;
+    procedure DoBeforeEdit; override;
+    procedure DoBeforeInsert; override;
+    procedure DoBeforeOpen; override;
+    procedure DoCreateInstance(out AHandled: Boolean; out AInstance: IInterface); override;
+    procedure DoReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
+  public
+    constructor Create(const ABindSource: IioBindSource; const ADataObject: TObject; const AOwnsDataObject: Boolean); reintroduce; virtual;
+    destructor Destroy; override;
+    procedure Append(AObject: TObject); reintroduce; overload;
+    procedure Append(AObject: IInterface); reintroduce; overload;
+    function AsActiveBindSourceAdapter: IioActiveBindSourceAdapter;
+    function AsTBindSourceAdapter: TBindSourceAdapter;
+    procedure ClearDataObject;
+    procedure DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer = 100);
+    procedure ExtractDetailObject(AMasterObj: TObject);
+    procedure Insert(AObject: TObject); reintroduce; overload;
+    procedure Insert(AObject: IInterface); reintroduce; overload;
+    procedure LoadPage;
+    function NewDetailBindSourceAdapter(const ABindSource: IioBindSource; const AMasterPropertyName: String): IioActiveBindSourceAdapter;
+    function NewNaturalObjectBindSourceAdapter(const ABindSource: IioBindSource): IioActiveBindSourceAdapter;
+    function Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
+    procedure PersistAll;
+    procedure PersistCurrent;
+    procedure Refresh(const ANotify: Boolean = True); reintroduce; overload;
+    procedure Reload; virtual;
+    procedure ReceiveSelection(ASelected: TObject; ASelectionType: TioSelectionType); overload;
+    procedure ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType); overload;
+    // ----- PROPERTIES ------
     // AutoPost
     //  NB: lascio il nome a ioAutoPost perchè c'è già un AutoPost negli antenati
     procedure SetioAutoPost(const Value: Boolean);
@@ -150,52 +197,6 @@ type
     // TypeOfCollection
     function GetTypeOfCollection: TioTypeOfCollection;
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection;
-  protected
-    // =========================================================================
-    // Part for the support of the IioBindSource interfaces (Added by iORM)
-    // because is not implementing IInterface (NB: RefCount DISABLED)
-    function QueryInterface(const IID: TGUID; out Obj): HResult; reintroduce; stdcall;
-    function _AddRef: Integer; stdcall;
-    function _Release: Integer; stdcall;
-{$IFDEF AUTOREFCOUNT}
-    function __ObjAddRef: Integer; override;
-    function __ObjRelease: Integer; override;
-{$ENDIF}
-    // =========================================================================
-    procedure DoAfterDelete; override;
-    procedure DoAfterInsert; override;
-    procedure DoAfterPost; override;
-    procedure DoAfterPostFields(AFields: TArray<TBindSourceAdapterField>); override;
-    procedure DoAfterReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType);
-    procedure DoAfterScroll; override;
-    procedure DoBeforeDelete; override;
-    procedure DoBeforeEdit; override;
-    procedure DoBeforeInsert; override;
-    procedure DoBeforeOpen; override;
-    procedure DoCreateInstance(out AHandled: Boolean; out AInstance: IInterface); override;
-    procedure DoReceiveSelection(var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
-  public
-    constructor Create(const ABindSource: IioBindSource; const ADataObject: TObject; const AOwnsDataObject: Boolean); reintroduce; virtual;
-    destructor Destroy; override;
-    procedure Append(AObject: TObject); reintroduce; overload;
-    procedure Append(AObject: IInterface); reintroduce; overload;
-    function AsActiveBindSourceAdapter: IioActiveBindSourceAdapter;
-    function AsTBindSourceAdapter: TBindSourceAdapter;
-    procedure ClearDataObject;
-    procedure DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer = 100);
-    procedure ExtractDetailObject(AMasterObj: TObject);
-    procedure Insert(AObject: TObject); reintroduce; overload;
-    procedure Insert(AObject: IInterface); reintroduce; overload;
-    procedure LoadPage;
-    function NewDetailBindSourceAdapter(const ABindSource: IioBindSource; const AMasterPropertyName: String): IioActiveBindSourceAdapter;
-    function NewNaturalObjectBindSourceAdapter(const ABindSource: IioBindSource): IioActiveBindSourceAdapter;
-    function Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
-    procedure PersistAll;
-    procedure PersistCurrent;
-    procedure Refresh(const ANotify: Boolean = True); reintroduce; overload;
-    procedure Reload; virtual;
-    procedure ReceiveSelection(ASelected: TObject; ASelectionType: TioSelectionType); overload;
-    procedure ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType); overload;
   end;
 
 implementation

@@ -249,7 +249,7 @@ uses
   iORM.Context.Container, System.Types, Data.FmtBcd, Data.DBConsts, System.DateUtils,
   iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, iORM.Utilities, System.StrUtils,
   iORM.RttiContext.Factory, iORM, iORM.Abstraction,
-  iORM.LiveBindings.CommonBSBehavior, System.Variants;
+  iORM.LiveBindings.CommonBSBehavior, System.Variants, iORM.DB.DataSet.Custom;
 
 /// //////////////////////////////////////////////
 /// /// Part I:
@@ -691,7 +691,7 @@ procedure TioBSABaseDataSet.DoBeforeInsert;
 begin
   // Requires an authorization-decision for UI purposes
   // NB: Codice inserito qui per intercettare l'insert richiesto da tastiera, quello che non riceve l'istanza da aggiungere già creata
-  TioApplication.AuthorizeByRequestParams(GetActiveBindSourceAdapter.TypeName, atInsert, itRegular, (Self as IioBindSource)._InternalGetAuthorizationContext, False, False);
+  TioApplication.AuthorizeByRequestParams(GetActiveBindSourceAdapter.BindSource.TypeName, atInsert, itRegular, (Self as IioBindSource)._InternalGetAuthorizationContext, False, False);
   // Execute the normal inherited operations if authorized
   inherited;
 end;

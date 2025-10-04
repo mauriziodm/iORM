@@ -434,19 +434,6 @@ type
     procedure SetMasterAdaptersContainer(AMasterAdapterContainer: IioDetailBindSourceAdaptersContainer);
   end;
 
-//  IioNaturalBindSourceAdapterSource = interface
-//    ['{892D8DAE-96F3-48FC-925C-F3F5CD5C0F68}']
-//    function Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;
-//    procedure Refresh(const ANotify: Boolean = True); overload;
-//    function GetCurrent: TObject;
-//    function UseObjStatus: Boolean;
-//    function NewNaturalObjectBindSourceAdapter(const AOwner: TComponent): IioActiveBindSourceAdapter;
-//    function DetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
-//    function GetTypeName: String;
-//    function GetTypeAlias: String;
-//    function IsInterfaceBSA: Boolean;
-//  end;
-
   IioNaturalActiveBindSourceAdapter = interface(IioActiveBindSourceAdapter)
     ['{9452A7CA-2C5F-43FB-BA63-DEE446B4FCC0}']
     procedure ForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification);

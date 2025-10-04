@@ -708,19 +708,12 @@ end;
 
 function TioDataSetCustom.GetWhere: IioWhere;
 begin
-  // If the adapter exists the return the property of the adapter
-  // else return the Self.FWhere
-  if CheckAdapter then
-    Result := GetActiveBindSourceAdapter.ioWhere
-  else
-  begin
-    // if not already assigned then create it (così lo crea solo se serve
-    // davvero altrimenti no)
-    if not Assigned(FWhere) then
-      FWhere := TioWhereFactory.NewWhereWithPagingAndETMfor(FPaging, FETMfor);
-    // Return the Where instance
-    Result := FWhere;
-  end;
+  // if not already assigned then create it (così lo crea solo se serve
+  // davvero altrimenti no)
+  if not Assigned(FWhere) then
+    FWhere := TioWhereFactory.NewWhereWithPagingAndETMfor(FPaging, FETMfor);
+  // Return the Where instance
+  Result := FWhere;
 end;
 
 function TioDataSetCustom.HasMasterBS: Boolean;
@@ -856,41 +849,26 @@ end;
 procedure TioDataSetCustom.SetAsyncLoad(const Value: Boolean);
 begin
   FAsyncLoad := Value;
-  // Update the adapter
-  if CheckAdapter then
-    GetActiveBindSourceAdapter.AsyncLoad := Value;
 end;
 
 procedure TioDataSetCustom.SetAsyncPersist(const Value: Boolean);
 begin
   FAsyncPersist := Value;
-  // Update the adapter
-  if CheckAdapter then
-    GetActiveBindSourceAdapter.AsyncPersist := Value;
 end;
 
 procedure TioDataSetCustom.SetLazy(const Value: Boolean);
 begin
   FLazy := Value;
-  // Update the adapter
-  if CheckAdapter then
-    GetActiveBindSourceAdapter.Lazy := Value;
 end;
 
 procedure TioDataSetCustom.SetLazyProps(const Value: String);
 begin
   FLazyProps := Value;
-  // Update the adapter
-  if CheckAdapter then
-    GetActiveBindSourceAdapter.LazyProps := Value;
 end;
 
 procedure TioDataSetCustom.SetLoadType(const Value: TioLoadType);
 begin
   FLoadType := Value;
-  // Update the adapter
-  if CheckAdapter then
-    GetActiveBindSourceAdapter.LoadType := Value;
 end;
 
 procedure TioDataSetCustom.SetAutoPost(const Value: Boolean);
@@ -987,13 +965,7 @@ begin
   inherited;
   LActiveBSA := GetActiveBindSourceAdapter;
   // Init the BSA
-  LActiveBSA.AsyncLoad := FAsyncLoad;
-  LActiveBSA.AsyncPersist := FAsyncPersist;
   LActiveBSA.ioAutoPost := FAutoPost;
-  LActiveBSA.LoadType := FLoadType;
-  LActiveBSA.Lazy := FLazy;
-  LActiveBSA.LazyProps := FLazyProps;
-  LActiveBSA.ioWhere := GetWhere; // Do not directly access to the FWhere field here
   // Register itself for notifications from BindSourceAdapter
   LActiveBSA.SetBindSource(Self);
   FTypeOfCollection := LActiveBSA.TypeOfCollection;
@@ -1041,19 +1013,11 @@ end;
 procedure TioDataSetCustom.SetTypeAlias(const Value: String);
 begin
   FTypeAlias := Value;
-  // If the adapter is created and is an ActiveBindSourceAdapter then
-  // update the where of the adapter also
-  if CheckAdapter then
-    GetActiveBindSourceAdapter.TypeAlias := Value;
 end;
 
 procedure TioDataSetCustom.SetTypeName(const Value: String);
 begin
   FTypeName := Value;
-  // If the adapter is created and is an ActiveBindSourceAdapter then
-  // update the where of the adapter also
-  if CheckAdapter then
-    GetActiveBindSourceAdapter.TypeName := Value;
 end;
 
 procedure TioDataSetCustom.SetTypeOfCollection(const Value: TioTypeOfCollection);
@@ -1066,9 +1030,6 @@ begin
   AWhere.SetPagingObj(FPaging); // Inject paging object specified in the BindSource
   AWhere.SetETMfor(FETMfor); // Inject ETMfor BS specified in the BindSource
   FWhere := AWhere;
-  // Update the adapter where in the BSAdapter if exist
-  if CheckAdapter then
-    GetActiveBindSourceAdapter.ioWhere := AWhere;
 end;
 
 procedure TioDataSetCustom.ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AVVMAlias: String);
