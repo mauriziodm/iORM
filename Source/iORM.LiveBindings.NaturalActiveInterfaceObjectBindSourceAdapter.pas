@@ -52,7 +52,7 @@ type
     procedure DoBeforeDelete; override;
     procedure DoAfterDelete; override;
     // AutoLoad
-    function GetAutoLoad: Boolean; override;
+    function GetIsAutoLoad: Boolean; override;
   public
     constructor Create(const ABindSource:IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapter); reintroduce; virtual;
     destructor Destroy; override;
@@ -152,12 +152,9 @@ end;
 
 // Copiato tale e quale dal NaturalActiveObjectBindSourceAdapters
 procedure TioNaturalActiveInterfaceObjectBindSourceAdapter.DoBeforeOpen;
-var
-  FLoadType: TioLoadType;
 begin
   // If it's to be realoaded then reload che DataObject
-  FLoadType := (Self as IioActiveBindSourceAdapter).LoadType;
-  if (FLoadType = ltFromBSReload)  or (FLoadType = ltFromBSReloadNewInstance) then
+  if BindSource.LoadType in [ltFromBSReload, ltFromBSReloadNewInstance] then
     Reload;
 end;
 
@@ -169,7 +166,7 @@ begin
 end;
 
 // Copiato tale e quale dal NaturalActiveObjectBindSourceAdapters
-function TioNaturalActiveInterfaceObjectBindSourceAdapter.GetAutoLoad: Boolean;
+function TioNaturalActiveInterfaceObjectBindSourceAdapter.GetIsAutoLoad: Boolean;
 begin
   // NaturalBindSourceAdapter is always a not AutoLoad adapter by definition
   Result := False;

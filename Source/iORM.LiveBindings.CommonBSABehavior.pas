@@ -161,7 +161,7 @@ begin
   // Extract the master object from che master bind source adapter
   LMasterObj := LMasterBindSourceAdapter.Current;
   // Extract the master property (of the master object)
-  LMasterProperty := TioMapContainer.GetMap(LMasterObj.ClassName).GetProperties.GetPropertyByName(AActiveBindSourceAdapter.GetMasterPropertyName);
+  LMasterProperty := TioMapContainer.GetMap(LMasterObj.ClassName).GetProperties.GetPropertyByName(AActiveBindSourceAdapter.BindSource.GetMasterPropertyName);
   // Encapsulate (in a TValue) the new instance to be set as new DataObject
   TValue.Make(@ADataObject, LMasterProperty.GetTypeInfo, LValue);
   // It puts the master bind source adapter in the editing state because

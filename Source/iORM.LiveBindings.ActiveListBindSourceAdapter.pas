@@ -225,12 +225,12 @@ end;
 
 constructor TioActiveListBindSourceAdapter.Create(const ABindSource: IioBindSource; const ADataObject: TList<TObject>; const AOwnsDataObject: Boolean);
 begin
-  inherited Create(nil, ADataObject, TioUtilities.ClassNameToClassRef(ABindSource.TypeName), AOwnsObject);
+  inherited Create(nil, ADataObject, TioUtilities.ClassNameToClassRef(ABindSource.TypeName), AOwnsDataObject);
   FBindSource := ABindSource;
   FBSPersistenceDeleting := False;
   FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
   FInterfacedList := nil;
-  FOwnsDataObject := AOwnsObject;
+  FOwnsDataObject := AOwnsDataObject;
   FReloading := False;
   // Set Master & Details adapters reference
   FMasterAdaptersContainer := nil;
@@ -792,8 +792,8 @@ begin
   if Assigned(ADataObject) then
   begin
     // Set the provided DataObject (always as TList<IInterface>)
-    SetList(TList<TObject>(ADataObject), AOwnsObject);
-    FOwnsDataObject := AOwnsObject;
+    SetList(TList<TObject>(ADataObject), AOwnsDataObject);
+    FOwnsDataObject := AOwnsDataObject;
     // If the DataObject (List) is an interface referenced object then
     // set the FInterfacedList field to it to keep alive the list itself
     if TioUtilities.IsAnInterface<T> then
@@ -812,8 +812,8 @@ begin
   end
   else
   begin
-    SetList(nil, AOwnsObject);
-    FOwnsDataObject := AOwnsObject;
+    SetList(nil, AOwnsDataObject);
+    FOwnsDataObject := AOwnsDataObject;
     // Fix the "Couldn't find Value" or "Couldn't find Owner" or similar using "CustomFormat" links property
     // NB: Questo "AddFields" che sembrerebbe non aver senso in questo punto in realtà risolve un errore che mi ha segnalato
     //      Carlo Marona; questo errore (vedi sopra) si verificava se si impostava nil come DataObject (SetDataObject(nil))

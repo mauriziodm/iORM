@@ -60,10 +60,6 @@ type
     procedure SetioAutoPost(const Value: Boolean);
     function GetioAutoPost: Boolean;
     property ioAutoPost: Boolean read GetioAutoPost write SetioAutoPost;
-    // BindSource
-    procedure SetBindSource(ABindSource: IioBindSource);
-    function GetBindSource: IioBindSource;
-    property BindSource: IioBindSource read GetBindSource write SetBindSource;
     // BSPersistenceDeleting
     procedure SetBSPersistenceDeleting(const Value: Boolean);
     function GetBSPersistenceDeleting: Boolean;
@@ -88,18 +84,12 @@ type
     // Fields
     function GetFields: TList<TBindSourceAdapterField>;
     property Fields: TList<TBindSourceAdapterField> read GetFields;
-    // HasBindSource
-    function GetHasBindSource: Boolean;
-    property HasBindSource: Boolean read GetHasBindSource;
     // HasMasterBSA
     function GetHasMasterBSA: Boolean;
     property HasMasterBSA: Boolean read GetHasMasterBSA;
     // IsDetailBSA
     function GetIsDetailBSA: Boolean;
     property IsDetailBSA: Boolean read GetIsDetailBSA;
-    // IsInterfaceBSA
-    function GetIsInterfaceBSA: Boolean;
-    property IsInterfaceBSA: Boolean read GetIsInterfaceBSA;
     // IsMasterBSA
     function GetIsMasterBSA: Boolean;
     property IsMasterBSA: Boolean read GetIsMasterBSA;
@@ -143,12 +133,22 @@ type
     function GetTypeOfCollection: TioTypeOfCollection;
     property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection;
   protected
+    // BindSource
+    procedure SetBindSource(ABindSource: IioBindSource);
+    function GetBindSource: IioBindSource;
+    property BindSource: IioBindSource read GetBindSource write SetBindSource;
     // CanActivate
     // NB: Property on ancestor class
     function GetCanActivate: Boolean; override;
+    // HasBindSource
+    function GetHasBindSource: Boolean;
+    property HasBindSource: Boolean read GetHasBindSource;
     // IsAutoLoad
     function GetIsAutoLoad: Boolean; virtual;
     property IsAutoLoad: Boolean read GetIsAutoLoad;
+    // IsInterfaceBSA
+    function GetIsInterfaceBSA: Boolean;
+    property IsInterfaceBSA: Boolean read GetIsInterfaceBSA;
     // =========================================================================
     // Part for the support of the IioBindSource interfaces (Added by iORM)
     // because is not implementing IInterface (NB: RefCount DISABLED)

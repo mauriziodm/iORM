@@ -394,6 +394,10 @@ type
     // ObjStatusInUse
     function GetObjStatusInUse: Boolean;
     property ObjStatusInUse: Boolean read GetObjStatusInUse;
+    // OwnsDataObject
+    //  NB: replicate the FOwnsList or FOwnsObjects not accessible from ancoestor classes
+    function GetOwnsDataObject: Boolean;
+    property OwnsDataObject: Boolean read GetOwnsDataObject;
     // Reloading
     function GetReloading: Boolean;
     procedure SetReloading(const Value: Boolean);
@@ -401,6 +405,9 @@ type
     // State
     function GetState: TBindSourceAdapterState;
     property State: TBindSourceAdapterState read GetState;
+    // TypeOfCollection
+    function GetTypeOfCollection: TioTypeOfCollection;
+    property TypeOfCollection: TioTypeOfCollection read GetTypeOfCollection;
   end;
 
   // Bind source adapter container
@@ -440,7 +447,7 @@ type
 //    function IsInterfaceBSA: Boolean;
 //  end;
 
-  IioNaturalActiveBindSourceAdapter = interface
+  IioNaturalActiveBindSourceAdapter = interface(IioActiveBindSourceAdapter)
     ['{9452A7CA-2C5F-43FB-BA63-DEE446B4FCC0}']
     procedure ForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
     function NotifyButDontForwardNotificationToSourceAdapter(const Sender: TObject; const [Ref] ANotification: TioBSNotification): Boolean;

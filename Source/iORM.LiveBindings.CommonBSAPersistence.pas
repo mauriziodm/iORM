@@ -121,7 +121,7 @@ begin
   if AActiveBindSourceAdapter.Active then  // To avoid AV error
   begin
     LActionType := TioUtilities.ActionTypeByABSA(AActiveBindSourceAdapter);
-    TioApplication.AuthorizeByRequestParams(AActiveBindSourceAdapter.Current.ClassName, LActionType, itRegular, AActiveBindSourceAdapter.GetBindSource._InternalGetAuthorizationContext, False, False);
+    TioApplication.AuthorizeByRequestParams(AActiveBindSourceAdapter.Current.ClassName, LActionType, itRegular, AActiveBindSourceAdapter.BindSource._InternalGetAuthorizationContext, False, False);
   end;
   // Notification to save revert point before edit
   AActiveBindSourceAdapter.Notify(TObject(AActiveBindSourceAdapter), TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint));
@@ -133,8 +133,8 @@ begin
   LActiveBSA := AActiveBindSourceAdapter;
   while LActiveBSA.IsDetailBSA do
   begin
-    LActiveBSA := LActiveBSA.GetMasterBindSourceAdapter;
-    LActiveBSA.Notify(TObject(LActiveBSA), TioBSNotification.CreateSUDRegisterObjOnEdit(LActiveBSA.Current, LActiveBSA.GetMasterPropertyPath));
+    LActiveBSA := LActiveBSA.MasterBindSourceAdapter;
+    LActiveBSA.Notify(TObject(LActiveBSA), TioBSNotification.CreateSUDRegisterObjOnEdit(LActiveBSA.Current, LActiveBSA.MasterPropertyPath));
   end;
 end;
 
@@ -170,7 +170,7 @@ var
 begin
   // Requires an authorization-decision for UI purposes
   LForceAuthDecision := TioUtilities.IsNullOID(AActiveBindSourceAdapter.Current);
-  TioApplication.AuthorizeByRequestParams(AActiveBindSourceAdapter.Current.ClassName, atDelete, itRegular, AActiveBindSourceAdapter.GetBindSource._InternalGetAuthorizationContext, LForceAuthDecision, False);
+  TioApplication.AuthorizeByRequestParams(AActiveBindSourceAdapter.Current.ClassName, atDelete, itRegular, AActiveBindSourceAdapter.BindSource._InternalGetAuthorizationContext, LForceAuthDecision, False);
   // If the delete detail is allowed then send a ntSaveRevertPoint notification
   if AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject, TioBSNotification.Create(TioBSNotificationType.ntCanDeleteDetail)) then
     AActiveBindSourceAdapter.Notify(AActiveBindSourceAdapter as TObject, TioBSNotification.Create(TioBSNotificationType.ntSaveRevertPoint))
@@ -194,7 +194,7 @@ var
   LBSPersistenceClient: IioMasterBindSource;
 begin
   // If it is a MasterBindSource then clear the BSPersistence revert point
-  if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioMasterBindSource, LBSPersistenceClient) then
+  if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.BindSource, IioMasterBindSource, LBSPersistenceClient) then
     LBSPersistenceClient.Persistence.Clear(False);
   // DataSet synchro
   AActiveBindSourceAdapter.GetDataSetLinkContainer.Refresh;
@@ -204,17 +204,19 @@ end;
 
 class procedure TioCommonBSAPersistence.CreateDataObject(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 var
+  LBS: IioBindSource;
   LObj: TObject;
   LIntf: IInterface;
 begin
-  case AActiveBindSourceAdapter.BindSource.TypeOfCollection of
+  LBS := AActiveBindSourceAdapter.BindSource;
+  case LBS.TypeOfCollection of
     TioTypeOfCollection.tcSingleObject:
       begin
-        LObj := io.di.Resolve(AActiveBindSourceAdapter.BindSource.TypeName, AActiveBindSourceAdapter.BindSource.TypeAlias).Get;
+        LObj := io.di.Resolve(LBS.TypeName, LBS.TypeAlias).Get;
         if AActiveBindSourceAdapter.IsInterfaceBSA and Supports(LObj, IInterface, LIntf) then
           AActiveBindSourceAdapter.InternalSetDataObject(LIntf, False)
         else
-          AActiveBindSourceAdapter.InternalSetDataObject(LObj, AActiveBindSourceAdapter.ioOwnsObjects);
+          AActiveBindSourceAdapter.InternalSetDataObject(LObj, AActiveBindSourceAdapter.OwnsDataObject);
       end;
     TioTypeOfCollection.tcList:
       raise EioGenericException.Create(ClassName, 'Create', '"ltCreate" value for "LoadType" property is valid only if "TypeOfCollection" is set to "tcSingleObject"');
@@ -225,13 +227,16 @@ end;
 
 class procedure TioCommonBSAPersistence.Load(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 var
+  LBS: IIoBindSource;
   LTargetClass: TioClassRef;
   LTerminateMethod: TioAsyncFuncOnSuccessMethod<TObject>;
 begin
   LTargetClass := nil;
+  // Extract the BindSource
+  LBS := AActiveBindSourceAdapter.BindSource;
   // If AutoLoadData is disabled then exit
   // Prevent AutoLoadData when reloading
-  if AActiveBindSourceAdapter.Reloading or not AActiveBindSourceAdapter.AutoLoad then
+  if AActiveBindSourceAdapter.Reloading or not AActiveBindSourceAdapter.IsAutoLoad then
     Exit;
   // If it's a ListBindSourceAdapter then retrieve the list target class
   if Assigned(AActiveBindSourceAdapter.DataObject) then
@@ -242,18 +247,16 @@ begin
       LIntf: IInterface;
     begin
       if AActiveBindSourceAdapter.IsInterfaceBSA and Supports(AResultValue, IInterface, LIntf) then
-        AActiveBindSourceAdapter.InternalSetDataObject(LIntf, AActiveBindSourceAdapter.ioOwnsObjects)
+        AActiveBindSourceAdapter.InternalSetDataObject(LIntf, AActiveBindSourceAdapter.OwnsDataObject)
       else
-        AActiveBindSourceAdapter.InternalSetDataObject(AResultValue, AActiveBindSourceAdapter.ioOwnsObjects);
+        AActiveBindSourceAdapter.InternalSetDataObject(AResultValue, AActiveBindSourceAdapter.OwnsDataObject);
     end;
   // Load
   case AActiveBindSourceAdapter.TypeOfCollection of
     TioTypeOfCollection.tcSingleObject:
-      _LoadObject(AActiveBindSourceAdapter.AsyncLoad, AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias, AActiveBindSourceAdapter.Lazy,
-        AActiveBindSourceAdapter.LazyProps, AActiveBindSourceAdapter.ioWhere, LTerminateMethod);
+      _LoadObject(LBS.AsyncLoad, LBS.TypeName, LBS.TypeAlias, LBS.Lazy, LBS.LazyProps, LBS.Where, LTerminateMethod);
     TioTypeOfCollection.tcList:
-      _LoadList(AActiveBindSourceAdapter.AsyncLoad, AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias, AActiveBindSourceAdapter.Lazy,
-        AActiveBindSourceAdapter.LazyProps, AActiveBindSourceAdapter.ioWhere, LTargetClass, LTerminateMethod);
+      _LoadList(LBS.AsyncLoad, LBS.TypeName, LBS.TypeAlias, LBS.Lazy, LBS.LazyProps, LBS.Where, LTargetClass, LTerminateMethod);
   else
     raise EioGenericException.Create('TioCommonBSAPersistence.Load: wrong TypeOfCollection');
   end;
@@ -261,22 +264,24 @@ end;
 
 class procedure TioCommonBSAPersistence.LoadPage(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 var
+  LBS: IIoBindSource;
   LPagingObj: TioCommonBSAPageManager;
   LTerminateMethod: TioAsyncFuncOnSuccessMethod<TObject>;
 begin
   // If the adapter is a detail adapter or AutoLoadData is not active then do not execute
-  if AActiveBindSourceAdapter.HasMasterBSA or (AActiveBindSourceAdapter.TypeOfCollection <> tcList) or not AActiveBindSourceAdapter.AutoLoad then
+  if AActiveBindSourceAdapter.HasMasterBSA or (AActiveBindSourceAdapter.TypeOfCollection <> tcList) or not AActiveBindSourceAdapter.IsAutoLoad then
     Exit;
+  // Extract the BindSource
+  LBS := AActiveBindSourceAdapter.BindSource;
   // Extract the paging obj from the where obj
-  LPagingObj := AActiveBindSourceAdapter.ioWhere.GetPagingObj as TioCommonBSAPageManager;
+  LPagingObj := LBS.Where.GetPagingObj as TioCommonBSAPageManager;
   // Load next page
   if LPagingObj.IsProgressive then
   begin
     // If the pagination is progressive then it loads the next page and adds it to the
     // internal list of the BSA and then does a Refresh(False)
     LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetProgressiveLoadPageOnSuccessMethod(AActiveBindSourceAdapter);
-    _LoadToList(AActiveBindSourceAdapter.AsyncLoad, AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias, AActiveBindSourceAdapter.Lazy,
-      AActiveBindSourceAdapter.LazyProps, AActiveBindSourceAdapter.ioWhere, AActiveBindSourceAdapter.DataObject, LTerminateMethod);
+    _LoadToList(LBS.AsyncLoad, LBS.TypeName, LBS.TypeAlias, LBS.Lazy, LBS.LazyProps, LBS.Where, LBS.DataObject, LTerminateMethod);
   end
   else
     // If, on the other hand, the pagination is not progressive then it performs a normal Reload
@@ -299,7 +304,7 @@ var
   LBSPersistenceClient: IioMasterBindSource;
 begin
   // If it is a MasterBindSource then clear the BSPersistence revert point
-  if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioMasterBindSource, LBSPersistenceClient) then
+  if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.BindSource, IioMasterBindSource, LBSPersistenceClient) then
     LBSPersistenceClient.Persistence.Clear(False);
   // DataSet synchro
   AActiveBindSourceAdapter.GetDataSetLinkContainer.Refresh;
@@ -312,7 +317,7 @@ class procedure TioCommonBSAPersistence.AfterScroll(const AActiveBindSourceAdapt
   var
     LMasterBindSource: IioMasterBindSource;
   begin
-    if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioMasterBindSource, LMasterBindSource) then
+    if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.BindSource, IioMasterBindSource, LMasterBindSource) then
     begin
       TioEtmCustomTimeSlot(AActiveBindSourceAdapter.Current)._ExtractCurrentEntityFunc :=
         function: TObject
@@ -350,18 +355,20 @@ end;
 
 class procedure TioCommonBSAPersistence.Reload(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
 var
+  LBS: IIoBindSource;
   LPagingObj: TioCommonBSAPageManager;
   LTargetClass: TioClassRef;
   LTerminateMethod: TioAsyncFuncOnSuccessMethod<TObject>;
 begin
+  // Extract the BindSource
+  LBS := AActiveBindSourceAdapter.BindSource;
   // Checks
-  if AActiveBindSourceAdapter.GetBindSource = nil then
-    raise EioGenericException.Create(ClassName, 'Reload', Format('Unassigned bind source (TypeName = "%s", TypeAlias = "%s")',
-      [AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias]));
-  if not AActiveBindSourceAdapter.GetBindSource.IsMasterBS then
+  if not Assigned(LBS) then
+    raise EioGenericException.Create(ClassName, 'Reload', 'Unassigned bind source (TypeName = "%s", TypeAlias = "%s")');
+  if not LBS.IsMasterBS then
     raise EioGenericException.Create(ClassName, 'Reload',
       Format('This is isn''t a master bind source  (TypeName = "%s", TypeAlias = "%s").'#13'Reload is for master bind source only.',
-      [AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias]));
+      [LBS.TypeName, LBS.TypeAlias]));
 
   LTargetClass := nil;
   // Prevent AutoLoadData when activating the BSA
@@ -372,60 +379,60 @@ begin
   // Set the OnTerminate method
   LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetReloadOnSuccessMethod(AActiveBindSourceAdapter, False); // Notify = false (verificare)
   // Extract the paging obj from the where obj and prepare it for an HardRefresh
-  LPagingObj := AActiveBindSourceAdapter.ioWhere.GetPagingObj as TioCommonBSAPageManager;
+  LPagingObj := LBS.Where.GetPagingObj as TioCommonBSAPageManager;
   LPagingObj.PrepareForRefresh;
   // Load
   case AActiveBindSourceAdapter.TypeOfCollection of
     TioTypeOfCollection.tcSingleObject:
-      _LoadObject(AActiveBindSourceAdapter.AsyncLoad, AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias, AActiveBindSourceAdapter.Lazy,
-        AActiveBindSourceAdapter.LazyProps, AActiveBindSourceAdapter.ioWhere, LTerminateMethod);
+      _LoadObject(LBS.AsyncLoad, LBS.TypeName, LBS.TypeAlias, LBS.Lazy, LBS.LazyProps, LBS.Where, LTerminateMethod);
     TioTypeOfCollection.tcList:
-      _LoadList(AActiveBindSourceAdapter.AsyncLoad, AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias, AActiveBindSourceAdapter.Lazy,
-        AActiveBindSourceAdapter.LazyProps, AActiveBindSourceAdapter.ioWhere, LTargetClass, LTerminateMethod);
+      _LoadList(LBS.AsyncLoad, LBS.TypeName, LBS.TypeAlias, LBS.Lazy, LBS.LazyProps, LBS.Where, LTargetClass, LTerminateMethod);
   else
     raise EioGenericException.Create(ClassName, 'Reload', Format('Wrong "TypeOfCollection" property value (TypeName = "%s", TypeAlias = "%s")',
-      [AActiveBindSourceAdapter.TypeName, AActiveBindSourceAdapter.TypeAlias]));
+      [LBS.TypeName, LBS.TypeAlias]));
   end;
 end;
 
 class procedure TioCommonBSAPersistence.ReloadNaturalBindSourceAdapter(const ANaturalBindSourceAdapter: IioNaturalActiveBindSourceAdapter);
 var
+  LBS: IIoBindSource;
   LActiveBindSourceAdapter: IioActiveBindSourceAdapter;
   LDataObject: TObject;
   LWhere: IioWhere;
 begin
+  // Extract the BindSource
+  LBS := ANaturalBindSourceAdapter.BindSource;
   // Extract the IioActiveBindSourceAdapter interface
   if not Supports(ANaturalBindSourceAdapter, IioActiveBindSourceAdapter, LActiveBindSourceAdapter) then
     raise EioGenericException.Create(ClassName, 'ReloadNaturalBindSourceAdapter', 'ANaturalBindSourceAdapter does not implement IioActiveBindSOurceAdapter interface');
   // Checks
-  if LActiveBindSourceAdapter.GetBindSource = nil then
-    raise EioGenericException.Create(ClassName, 'ReloadNaturalBindSourceAdapter', Format('Unassigned bind source (TypeName = "%s", TypeAlias = "%s")',
-      [LActiveBindSourceAdapter.TypeName, LActiveBindSourceAdapter.TypeAlias]));
-  if not LActiveBindSourceAdapter.GetBindSource.IsMasterBS then
+  if not Assigned(LBS) then
+    raise EioGenericException.Create(ClassName, 'ReloadNaturalBindSourceAdapter', 'Unassigned bind source (TypeName = "%s", TypeAlias = "%s")');
+  if not LBS.IsMasterBS then
     raise EioGenericException.Create(ClassName, 'ReloadNaturalBindSourceAdapter',
       Format('This is isn''t a master bind source  (TypeName = "%s", TypeAlias = "%s").'#13'Reload is for master bind source only.',
-      [LActiveBindSourceAdapter.TypeName, LActiveBindSourceAdapter.TypeAlias]));
+      [LBS.TypeName, LBS.TypeAlias]));
   // Extract the current DataObject and the where condition to reload it
   LDataObject := LActiveBindSourceAdapter.Current;
   if TioUtilities.IsNullOID(LDataObject) then
     Exit;
   LWhere := TioWhereFactory.NewWhere.ByID( TioUtilities.ObjToID(LDataObject) );
   // Reload
-  case LActiveBindSourceAdapter.LoadType of
+  case LBS.LoadType of
     // Reload to the same instance
     ltFromBSAsIs, ltFromBSReload:
-      _LoadToObject(LActiveBindSourceAdapter.AsyncLoad, LDataObject.ClassName, '', LActiveBindSourceAdapter.Lazy, LActiveBindSourceAdapter.LazyProps, LWhere,
-        LDataObject, TioCommonBSAAnonymousMethodsFactory.GetNotifyOnSuccessMethod(LActiveBindSourceAdapter));
+      _LoadToObject(LBS.AsyncLoad, LDataObject.ClassName, '', LBS.Lazy, LBS.LazyProps, LWhere, LDataObject,
+        TioCommonBSAAnonymousMethodsFactory.GetNotifyOnSuccessMethod(LActiveBindSourceAdapter));
     // Reload on a new instance
     ltFromBSReloadNewInstance:
       begin
         LActiveBindSourceAdapter.Reloading := True;
-        _LoadObject(LActiveBindSourceAdapter.AsyncLoad, LDataObject.ClassName, '', LActiveBindSourceAdapter.Lazy, LActiveBindSourceAdapter.LazyProps, LWhere,
+        _LoadObject(LBS.AsyncLoad, LDataObject.ClassName, '', LBS.Lazy, LBS.LazyProps, LWhere,
           TioCommonBSAAnonymousMethodsFactory.GetReloadOnSuccessMethod(LActiveBindSourceAdapter, False)); // Notify = false (verificare)
       end
   else
     raise EioGenericException.Create(ClassName, 'ReloadNaturalBindSourceAdapter', Format('Wrong "LoadType" property value (TypeName = "%s", TypeAlias = "%s")',
-      [LActiveBindSourceAdapter.TypeName, LActiveBindSourceAdapter.TypeAlias]));
+      [LBS.TypeName, LBS.TypeAlias]));
   end;
 end;
 
@@ -446,7 +453,7 @@ begin
   // Set anonimous methods then execute
   LExecuteMethod := TioCommonBSAAnonymousMethodsFactory.GetPersistAllExecuteMethod(AActiveBindSourceAdapter);
   LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetNotifyOnSuccessMethod(AActiveBindSourceAdapter);
-  TioProc.Invoke(AActiveBindSourceAdapter.AsyncPersist, LExecuteMethod, LTerminateMethod, nil, nil, True);
+  TioProc.Invoke(AActiveBindSourceAdapter.BindSource.AsyncPersist, LExecuteMethod, LTerminateMethod, nil, nil, True);
 end;
 
 class procedure TioCommonBSAPersistence.PersistCurrent(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
@@ -460,7 +467,7 @@ begin
   // Set anonimous methods then execute
   LExecuteMethod := TioCommonBSAAnonymousMethodsFactory.GetPersistCurrentExecuteMethod(AActiveBindSourceAdapter);
   LTerminateMethod := TioCommonBSAAnonymousMethodsFactory.GetNotifyOnSuccessMethod(AActiveBindSourceAdapter);
-  TioProc.Invoke(AActiveBindSourceAdapter.AsyncPersist, LExecuteMethod, LTerminateMethod, nil, nil, True);
+  TioProc.Invoke(AActiveBindSourceAdapter.BindSource.AsyncPersist, LExecuteMethod, LTerminateMethod, nil, nil, True);
 end;
 
 class procedure TioCommonBSAPersistence.Post(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
@@ -569,23 +576,25 @@ begin
   Result := procedure
     var
       LAuthContext: String;
+      LBS: IioBindSource;
       LConflictResolved: Boolean;
     begin
       if LID <> 0 then
       begin
+        LBS := AActiveBindSourceAdapter.BindSource;
         // Delete the DataObj and if a conflict exception is raised then invoke the BindSOurce onDeleteConflictException
         //  event handler (if the event handler is assigned)
         try
-          LAuthContext := AActiveBindSourceAdapter.GetBindSource._InternalGetAuthorizationContext;
+          LAuthContext := LBS._InternalGetAuthorizationContext;
           io._DeleteObjectInternal(LDataObj, LAuthContext, itRegular, BL_DEFAULT);
         except
           // Try to resolve the unresolved conflict (raise) invoking the BindSource.OnDeleteConflictException event handler if assigned
           on E: EioDeleteConflictException do
           begin
-            if AActiveBindSourceAdapter.HasBindSource and Assigned(AActiveBindSourceAdapter.GetBindSource.OnDeleteConflictException) then
+            if AActiveBindSourceAdapter.HasBindSource and Assigned(LBS.OnDeleteConflictException) then
             begin
               LConflictResolved := False;
-              AActiveBindSourceAdapter.GetBindSource.OnDeleteConflictException(AActiveBindSourceAdapter.GetBindSource as TObject, LDataObj, LConflictResolved);
+              LBS.OnDeleteConflictException(LBS as TObject, LDataObj, LConflictResolved);
               if not LConflictResolved then
                 raise;
             end
@@ -598,23 +607,6 @@ begin
       end;
     end;
 end;
-//class function TioCommonBSAAnonymousMethodsFactory.GetDeleteExecuteMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter; const ADataObj: TObject)
-//  : TioCommonBSAPersistenceThreadExecute;
-//var
-//  LID: Integer;
-//  LClassName: String;
-//begin
-//  // Save into local variables to avoid multithread resource access inconsistency problems
-//  LClassName := ADataObj.ClassName;
-//  LID := TioUtilities.ExtractOID(ADataObj);
-//  AActiveBindSourceAdapter.BSPersistenceDeleting := True; // Look at GetDeleteTerminateMethod below
-//  Result := function: TObject
-//    begin
-//      Result := nil;
-//      if LID <> 0 then
-//        io.RefTo(LClassName).ByID(LID).Cacheable.Delete;
-//    end;
-//end;
 
 class function TioCommonBSAAnonymousMethodsFactory.GetDeleteOnSuccessMethod(const AActiveBindSourceAdapter: IioActiveBindSourceAdapter)
   : TioAsyncProcOnSuccessMethod;
@@ -642,7 +634,7 @@ begin
     var
       LAuthContext: String;
     begin
-      LAuthContext := AActiveBindSourceAdapter.GetBindSource._InternalGetAuthorizationContext;
+      LAuthContext := AActiveBindSourceAdapter.BindSource._InternalGetAuthorizationContext;
       io.PersistList(AActiveBindSourceAdapter.DataObject, LAuthContext, BL_DEFAULT);
     end;
 end;
@@ -658,20 +650,23 @@ begin
   Result := procedure
     var
       LAuthContext: String;
+      LBS: IioBindSource;
       LConflictResolved: Boolean;
-      LMasterBindSource: IioMasterBindSource;
+      LMasterBS: IioMasterBindSource;
     begin
       // Continues only if there is a BindSource connected and it is a MasterBindSource
-      if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioMasterBindSource, LMasterBindSource) then
+      if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.BindSource, IioMasterBindSource, LMasterBS) then
       begin
         io.StartTransaction;
         try
+          // Extract the BindSource
+          LBS := AActiveBindSourceAdapter.BindSource;
           // Persist the current obj and if a conflict exception is raised then invoke the BindSOurce onDeleteConflictException/onUpdateConflictException
           //  event handler (if the event handler is assigned)
           // ----------------------------------------------------------------------------------------------------------------------------
           try
-            LAuthContext := AActiveBindSourceAdapter.GetBindSource._InternalGetAuthorizationContext;
-            io._PersistObjectInternal(LDataObj, LAuthContext, itRegular, BL_DEFAULT, '', 0, LMasterBindSource.Persistence, '', '');
+            LAuthContext := LBS._InternalGetAuthorizationContext;
+            io._PersistObjectInternal(LDataObj, LAuthContext, itRegular, BL_DEFAULT, '', 0, LMasterBS.Persistence, '', '');
           except
             // Try to resolve the unresolved conflict (raise) invoking the BindSource.OnDeleteConflictException/OnUpdateConflictException
             //  event handler if assigned
@@ -679,10 +674,10 @@ begin
             // BS.OnDeleteConclictException
             on E: EioDeleteConflictException do
             begin
-              if AActiveBindSourceAdapter.HasBindSource and Assigned(AActiveBindSourceAdapter.GetBindSource.OnDeleteConflictException) then
+              if AActiveBindSourceAdapter.HasBindSource and Assigned(LBS.OnDeleteConflictException) then
               begin
                 LConflictResolved := False;
-                AActiveBindSourceAdapter.GetBindSource.OnDeleteConflictException(AActiveBindSourceAdapter.GetBindSource as TObject, LDataObj, LConflictResolved);
+                LBS.OnDeleteConflictException(LBS as TObject, LDataObj, LConflictResolved);
                 if not LConflictResolved then
                   raise;
               end
@@ -693,10 +688,10 @@ begin
             // BS.OnInsertConclictException
             on E: EioInsertConflictException do
             begin
-              if AActiveBindSourceAdapter.HasBindSource and Assigned(AActiveBindSourceAdapter.GetBindSource.OnInsertConflictException) then
+              if AActiveBindSourceAdapter.HasBindSource and Assigned(LBS.OnInsertConflictException) then
               begin
                 LConflictResolved := False;
-                AActiveBindSourceAdapter.GetBindSource.OnInsertConflictException(AActiveBindSourceAdapter.GetBindSource as TObject, LDataObj, LConflictResolved);
+                LBS.OnInsertConflictException(LBS as TObject, LDataObj, LConflictResolved);
                 if not LConflictResolved then
                   raise;
               end
@@ -707,10 +702,10 @@ begin
             // BS.OnUpdateConclictException
             on E: EioUpdateConflictException do
             begin
-              if AActiveBindSourceAdapter.HasBindSource and Assigned(AActiveBindSourceAdapter.GetBindSource.OnUpdateConflictException) then
+              if AActiveBindSourceAdapter.HasBindSource and Assigned(LBS.OnUpdateConflictException) then
               begin
                 LConflictResolved := False;
-                AActiveBindSourceAdapter.GetBindSource.OnUpdateConflictException(AActiveBindSourceAdapter.GetBindSource as TObject, LDataObj, LConflictResolved);
+                LBS.OnUpdateConflictException(LBS as TObject, LDataObj, LConflictResolved);
                 if not LConflictResolved then
                   raise;
               end
@@ -723,7 +718,7 @@ begin
           end;
           // ----------------------------------------------------------------------------------------------------------------------------
           // Delete objects referenced into the SmartDeleteSystem (details I think)
-          LMasterBindSource.Persistence.SmartDeleteSystem.ForEach(
+          LMasterBS.Persistence.SmartDeleteSystem.ForEach(
             procedure(ASmartDeleteSystemItem: TioSmartDeleteSystemItem)
             begin
               // TODO: ETM: Qui si è salvato il tipo e l'ID dell'oggetto da eliminare ma così salta ETM e conflict strategy
@@ -733,7 +728,7 @@ begin
           // commit
           io.CommitTransaction;
           // Clear saved state
-          LMasterBindSource.Persistence.Clear(False);
+          LMasterBS.Persistence.Clear(False);
         except
           io.RollbackTransaction;
           raise;
@@ -761,9 +756,9 @@ begin
     begin
       // Close the BSA, substitute the DataObject then reopen
       if AActiveBindSourceAdapter.IsInterfaceBSA and Supports(AResultValue, IInterface, LIntf) then
-        AActiveBindSourceAdapter.InternalSetDataObject(LIntf, AActiveBindSourceAdapter.ioOwnsObjects)
+        AActiveBindSourceAdapter.InternalSetDataObject(LIntf, AActiveBindSourceAdapter.OwnsDataObject)
       else
-        AActiveBindSourceAdapter.InternalSetDataObject(AResultValue, AActiveBindSourceAdapter.ioOwnsObjects);
+        AActiveBindSourceAdapter.InternalSetDataObject(AResultValue, AActiveBindSourceAdapter.OwnsDataObject);
       // Prevent AutoLoadData when activating the BSA
       AActiveBindSourceAdapter.Reloading := False;
       // Send a notification to other ActiveBindSourceAdapters & BindSource

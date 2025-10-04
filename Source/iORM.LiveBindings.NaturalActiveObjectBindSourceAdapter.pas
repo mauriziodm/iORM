@@ -51,7 +51,7 @@ type
     procedure DoBeforeDelete; override;
     procedure DoAfterDelete; override;
     // AutoLoad
-    function GetAutoLoad: Boolean; override;
+    function GetIsAutoLoad: Boolean; override;
   public
     constructor Create(const ABindSource:IioBindSource; const ASourceActiveBSA: IioActiveBindSourceAdapter); reintroduce; virtual;
     destructor Destroy; override;
@@ -77,16 +77,12 @@ begin
 end;
 
 destructor TioNaturalActiveObjectBindSourceAdapter.Destroy;
-var
-  FLoadType: TioLoadType;
 begin
   // Unregister itself from the SourceBS.DetailAdaptersContainer
   if Assigned(FSourceActiveBSA) and Assigned(FSourceActiveBSA.DetailAdaptersContainer) then
     FSourceActiveBSA.DetailAdaptersContainer.RemoveNaturalBindSourceAdapter(Self);
-  // If the LoadType is ltFromBSReloadNewInstance and it is inherited from TioActiveObjectBindSourceAdapter
-  //  (it is'n an interfaced bind source) then free che DataObject (owns it)
-  FLoadType := (Self as IioActiveBindSourceAdapter).LoadType;
-  if (FLoadType = ltFromBSReloadNewInstance) and (Self is TioActiveObjectBindSourceAdapter) then
+  // If the LoadType is ltFromBSReloadNewInstance and it is not an interfaced bind source
+  if (BindSource.LoadType = ltFromBSReloadNewInstance) and not IsInterfaceBSA then
     DataObject.Free;
   inherited;
 end;
@@ -169,12 +165,9 @@ begin
 end;
 
 procedure TioNaturalActiveObjectBindSourceAdapter.DoBeforeOpen;
-var
-  FLoadType: TioLoadType;
 begin
   // If it's to be realoaded then reload che DataObject
-  FLoadType := (Self as IioActiveBindSourceAdapter).LoadType;
-  if (FLoadType = ltFromBSReload)  or (FLoadType = ltFromBSReloadNewInstance) then
+  if BindSource.LoadType in [ltFromBSReload, ltFromBSReloadNewInstance] then
     Reload;
 end;
 
@@ -184,7 +177,7 @@ begin
     FSourceActiveBSA.Notify(Self, ANotification);
 end;
 
-function TioNaturalActiveObjectBindSourceAdapter.GetAutoLoad: Boolean;
+function TioNaturalActiveObjectBindSourceAdapter.GetIsAutoLoad: Boolean;
 begin
   // NaturalBindSourceAdapter is always a not AutoLoad adapter by definition
   Result := False;
