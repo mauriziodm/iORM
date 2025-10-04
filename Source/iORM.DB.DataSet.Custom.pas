@@ -194,7 +194,7 @@ type
     procedure DoBeforeClose; override;
     procedure SetActive(Value: Boolean); override;
     // InternalAdapter (there is a setter but the property must be ReadOnly)
-    procedure SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter);
+    procedure SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter); override;
     // Selectors related event for TObject selection
     procedure DoBeforeReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; const AAuthDecisionRequest: IioAuthDecisionRequest); overload;
     procedure DoReceiveSelection(var ASelected: TObject; var ASelectionType: TioSelectionType; var ADone: Boolean); overload;

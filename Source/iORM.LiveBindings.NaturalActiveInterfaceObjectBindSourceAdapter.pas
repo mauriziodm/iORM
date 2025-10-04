@@ -133,7 +133,7 @@ begin
   begin
     // Chiude il BindSource per evitare errori AV
     if HasBindSource then
-      GetBindSource.Close;
+      BindSource.Close;
     // Se il SourceAdapter è un ListBindSourceAdapter allora lo sposta (ItemIndex)
     //  sullo stesso oggetto a cui si riferisce il presente NaturalBSA in modo da
     //  poter poi delegare al SourceAdapter stesso l'operazione di Delete
@@ -142,7 +142,7 @@ begin
     //   "IioBSPersistenceClient" estrae un riferimento di questo tipo (l'interfaccia) del suo
     //   BindSouce (relativo a SourceAdapter) fa fare a lui un vero e proprio Persistence.Delete.
     //   Se invece queste condizioni non sono soddisfatte procedete con il normale Delete del SourceAdapter (no persistence)
-    if FSourceActiveBSA.HasBindSource and FSourceActiveBSA.GetBindSource.IsMasterBS and Supports(FSourceActiveBSA.GetBindSource, IioMasterBindSource, LMasterBS) then
+    if FSourceActiveBSA.HasBindSource and FSourceActiveBSA.BindSource.IsMasterBS and Supports(FSourceActiveBSA.BindSource, IioMasterBindSource, LMasterBS) then
       LMasterBS.Persistence.Delete
     else
       FSourceActiveBSA.Delete;

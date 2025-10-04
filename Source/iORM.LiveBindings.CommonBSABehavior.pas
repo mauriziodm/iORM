@@ -182,12 +182,12 @@ begin
   // Notify the BindSource
   // NB: First check if the BSA has a BindSource and if the message is not actually coming from it,
   // then it also verifies that the BindSource connected to the BSA is the correct directory for this notification
-  if AActiveBindSourceAdapter.HasBindSource and (Sender <> TObject(AActiveBindSourceAdapter.GetBindSource)) then
-    if (ANotification.DeliverToMasterBS and AActiveBindSourceAdapter.GetBindSource.IsMasterBS) or
-      (ANotification.DeliverToDetailBS and AActiveBindSourceAdapter.GetBindSource.IsDetailBS) then
+  if AActiveBindSourceAdapter.HasBindSource and (Sender <> TObject(AActiveBindSourceAdapter.BindSource)) then
+    if (ANotification.DeliverToMasterBS and AActiveBindSourceAdapter.BindSource.IsMasterBS) or
+      (ANotification.DeliverToDetailBS and AActiveBindSourceAdapter.BindSource.IsDetailBS) then
     begin
-      AActiveBindSourceAdapter.GetBindSource.Notify(AActiveBindSourceAdapter as TObject, ANotification);
-      if ANotification.StopAtTheFirstMasterBS and AActiveBindSourceAdapter.GetBindSource.IsMasterBS then
+      AActiveBindSourceAdapter.BindSource.Notify(AActiveBindSourceAdapter as TObject, ANotification);
+      if ANotification.StopAtTheFirstMasterBS and AActiveBindSourceAdapter.BindSource.IsMasterBS then
         Exit;
     end;
 
@@ -436,7 +436,7 @@ var
   LGetMemberObject: IGetMemberObject;
 begin
   // Get the bind source and exit if not assigned
-  LBindSource := (ABindSourceAdapter as IioActiveBindSourceAdapter).GetBindSource;
+  LBindSource := (ABindSourceAdapter as IioActiveBindSourceAdapter).BindSource;
   if Assigned(LBindSource) and LBindSource.VirtualFields then
   begin
     // Master & Detail bind source properties
@@ -497,7 +497,7 @@ begin
     if AProperty.IsWritable then
       Result := TBindSourceAdapterReadWriteField<T>.Create(ABindSourceAdapter, AFullPathPropName,
         TBindSourceAdapterFieldType.Create(AProperty.PropertyType.Name, AProperty.PropertyType.TypeKind), AGetMemberObject, TioPropertyValueReader<T>.Create,
-        TioPropertyValueWriter<T>.Create((ABindSourceAdapter as IioActiveBindSourceAdapter).GetBindSource), AMemberType)
+        TioPropertyValueWriter<T>.Create((ABindSourceAdapter as IioActiveBindSourceAdapter).BindSource), AMemberType)
     else
       Result := TBindSourceAdapterReadField<T>.Create(ABindSourceAdapter, AFullPathPropName, TBindSourceAdapterFieldType.Create(AProperty.PropertyType.Name,
         AProperty.PropertyType.TypeKind), AGetMemberObject, TioPropertyValueReader<T>.Create, AMemberType);
@@ -516,7 +516,7 @@ begin
       try
         if AActiveBindSourceAdapter.IsMasterBSA then
         begin
-          if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.GetBindSource, IioMasterBindSource, LBindSource) and
+          if AActiveBindSourceAdapter.HasBindSource and Supports(AActiveBindSourceAdapter.BindSource, IioMasterBindSource, LBindSource) and
             LBindSource.Persistence.CanDelete then
             LBindSource.Persistence.Delete;
         end
@@ -653,11 +653,11 @@ end;
 
 // procedure TioPropertyValueReader<T>._CheckVirtualFields;
 // begin
-// if FActiveBindSourceAdapter.HasBindSource and not FActiveBindSourceAdapter.GetBindSource.VirtualFields then
+// if FActiveBindSourceAdapter.HasBindSource and not FActiveBindSourceAdapter.BindSource.VirtualFields then
 // raise EioException.Create(Self.ClassName, 'GetValue',
 // Format('iORM trying to read the value of the "%s" virtual field declared in the component "%s".' +
 // #13#13'I''m sorry but the "VirtualFields" property of that component is set to "False" so they are disabled.' +
-// #13#13'Set the property to "True" and try again, it will work.', [FField.MemberName, FActiveBindSourceAdapter.GetBindSource.GetName]));
+// #13#13'Set the property to "True" and try again, it will work.', [FField.MemberName, FActiveBindSourceAdapter.BindSource.GetName]));
 // end;
 
 { TioPropertyValueWriter<T> }
