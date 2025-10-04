@@ -84,7 +84,7 @@ type
     procedure SetOnRecordChangeAction(const Value: TioBSOnRecordChangeAction);
   protected
     function PostPonedActivation_CanOpen(const ANewDataObject: TObject): Boolean;
-    procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean); override;
+    procedure _CreateAdapter(const ADataObject: TObject; const AOwnsDataObject: Boolean); override;
     procedure SetActive(const Value: Boolean); override;
     // procedure DoBeforeOpen; override; // NB: Gestire DoBeforeOpen sul ModelDataSet/ModelBindSource della view e poi passarlo al ModelPresenter
     // procedure DoBeforeScroll; override; // NB: Gestire DoBeforeOpen sul ModelDataSet/ModelBindSource della view e poi passarlo al ModelPresenter
@@ -99,8 +99,8 @@ type
     procedure Close; override;
     function IsMasterBS: Boolean; override;
     function IsDetailBS: Boolean; override;
-    procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
-    procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
+    procedure SetDataObject(const ADataObject: TObject; const AOwnsDataObject: Boolean = True); overload;
+    procedure SetDataObject(const ADataObject: IInterface; const AOwnsDataObject: Boolean = False); overload;
 
     // WhereBuilder
     function BuildWhere(const AExecuteOnTarget: Boolean = True): IioWhere;
@@ -285,7 +285,7 @@ begin
   inherited;
 end;
 
-procedure TioModelPresenterMaster.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
+procedure TioModelPresenterMaster.SetDataObject(const ADataObject: IInterface; const AOwnsDataObject: Boolean);
 begin
   inherited;
   // Mauri 23/06/2024: per risolvere in modo semplice il problema con i ModelPresenters (MVVM) che non si vedevano i dettagli delle
@@ -300,7 +300,7 @@ begin
   end;
 end;
 
-procedure TioModelPresenterMaster.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
+procedure TioModelPresenterMaster.SetDataObject(const ADataObject: TObject; const AOwnsDaaObject: Boolean);
 begin
   inherited;
   // Mauri 23/06/2024: per risolvere in modo semplice il problema con i ModelPresenters (MVVM) che non si vedevano i dettagli delle
@@ -380,7 +380,7 @@ begin
   FOnRecordChangeAction := Value;
 end;
 
-procedure TioModelPresenterMaster._CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
+procedure TioModelPresenterMaster._CreateAdapter(const ADataObject: TObject; const AOwnsDataObject: Boolean);
 begin
   if PostPonedActivation_CanOpen(ADataObject) then
     inherited;

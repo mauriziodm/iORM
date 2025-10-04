@@ -127,7 +127,7 @@ type
     function __ObjRelease: Integer; override;
 {$ENDIF}
     // =========================================================================
-    procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
+    procedure _CreateAdapter(const ADataObject: TObject; const AOwnsDataObject: Boolean);
     function IsActive: Boolean;
     // AsDefault
     function GetAsDefault: Boolean;
@@ -308,8 +308,8 @@ type
     procedure ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AAlias: String = ''); overload;
     // DataObject
     procedure ClearDataObject;
-    procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
-    procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
+    procedure SetDataObject(const ADataObject: TObject; const AOwnsDataObject: Boolean = True); overload;
+    procedure SetDataObject(const ADataObject: IInterface; const AOwnsDataObject: Boolean = False); overload;
     function DataObject: TObject;
     function DataObjectAs<T>: T;
     function DataObjectAssigned: Boolean;
@@ -1068,16 +1068,16 @@ begin
   FMasterPropertyName := Value;
 end;
 
-procedure TioPrototypeBindSourceCustom.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
+procedure TioPrototypeBindSourceCustom.SetDataObject(const ADataObject: TObject; const AOwnsDataObject: Boolean);
 begin
   // If the ADataObject is assigned then set it as the BSA DataObject...else ClearDataObject
   if Assigned(ADataObject) then
   begin
     FLoadType := ltManual;
     if CheckActiveAdapter then
-      GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
+      GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsDataObject)
     else
-      _CreateAdapter(ADataObject, AOwnsObject);
+      _CreateAdapter(ADataObject, AOwnsDataObject);
     // NB: Ho dovuto attivare automaticamnete il BindSource (nel caso non lo fosse già) perchè
     //  altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
     if not IsActive then
@@ -1087,16 +1087,16 @@ begin
     ClearDataObject;
 end;
 
-procedure TioPrototypeBindSourceCustom.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
+procedure TioPrototypeBindSourceCustom.SetDataObject(const ADataObject: IInterface; const AOwnsDataObject: Boolean);
 begin
   // If the ADataObject is assigned then set it as the BSA DataObject...else ClearDataObject
   if Assigned(ADataObject) then
   begin
     FLoadType := ltManual;
     if CheckActiveAdapter then
-      GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
+      GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsDataObject)
     else
-      _CreateAdapter(ADataObject as TObject, AOwnsObject);
+      _CreateAdapter(ADataObject as TObject, AOwnsDataObject);
     // NB: Ho dovuto attivare automaticamnete il BindSource (nel caso non lo fosse già) perchè
     //  altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
     if not IsActive then
@@ -1228,7 +1228,7 @@ begin
   Result := -1;
 end;
 
-procedure TioPrototypeBindSourceCustom._CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
+procedure TioPrototypeBindSourceCustom._CreateAdapter(const ADataObject: TObject; const AOwnsDataObject: Boolean);
 var
   LActiveBSA: IioActiveBindSourceAdapter;
 begin
@@ -1249,7 +1249,7 @@ begin
   if IsFromBSLoadType or (IsDetailBS and MasterPropertyName.IsEmpty) then
     LActiveBSA := TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(Self, MasterBindSource)
   else
-    LActiveBSA := TioLiveBindingsFactory.GetBSA(Self, ADataObject, True);
+    LActiveBSA := TioLiveBindingsFactory.GetBSA(Self, ADataObject, AOwnsDataObject);
   // If Self is a Notifiable bind source then register a reference to itself
   // in the ActiveBindSourceAdapter
   // PS: Set ioAsync also (and other properties)

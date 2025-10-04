@@ -199,7 +199,7 @@ type
     procedure SetOnInsertConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
     procedure SetOnUpdateConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
   protected
-    procedure _CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean); virtual;
+    procedure _CreateAdapter(const ADataObject: TObject; const AOwnsDataObject: Boolean); virtual;
     procedure Open; virtual;
     procedure Close; virtual;
     procedure Loaded; override;
@@ -339,8 +339,8 @@ type
     procedure ShowEach(const AParentCloseQueryAction: IioBSCloseQueryAction; const AViewContext: TComponent; const AAlias: String = ''); overload;
     // DataObject
     procedure ClearDataObject;
-    procedure SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean = True); overload;
-    procedure SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean = False); overload;
+    procedure SetDataObject(const ADataObject: TObject; const AOwnsDataObject: Boolean = True); overload;
+    procedure SetDataObject(const ADataObject: IInterface; const AOwnsDataObject: Boolean = False); overload;
     function DataObject: TObject;
     function DataObjectAs<T>: T;
     function DataObjectAssigned: Boolean;
@@ -1150,16 +1150,16 @@ begin
   end;
 end;
 
-procedure TioModelPresenterCustom.SetDataObject(const ADataObject: TObject; const AOwnsObject: Boolean);
+procedure TioModelPresenterCustom.SetDataObject(const ADataObject: TObject; const AOwnsDataObject: Boolean);
 begin
   // If the ADataObject is assigned then set it as the BSA DataObject...else ClearDataObject
   if Assigned(ADataObject) then
   begin
     LoadType := ltManual;
     if CheckActiveAdapter then
-      GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
+      GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsDataObject)
     else
-      _CreateAdapter(ADataObject, AOwnsObject);
+      _CreateAdapter(ADataObject, AOwnsDataObject);
     // NB: Ho dovuto attivare automaticamnete il BindSource (nel caso non lo fosse già) perchè
     //  altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
     if not IsActive then
@@ -1169,16 +1169,16 @@ begin
     ClearDataObject;
 end;
 
-procedure TioModelPresenterCustom.SetDataObject(const ADataObject: IInterface; const AOwnsObject: Boolean);
+procedure TioModelPresenterCustom.SetDataObject(const ADataObject: IInterface; const AOwnsDataObject: Boolean);
 begin
   // If the ADataObject is assigned then set it as the BSA DataObject...else ClearDataObject
   if Assigned(ADataObject) then
   begin
     LoadType := ltManual;
     if CheckActiveAdapter then
-      GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsObject)
+      GetActiveBindSourceAdapter.SetDataObject(ADataObject, AOwnsDataObject)
     else
-      _CreateAdapter(ADataObject as TObject, AOwnsObject);
+      _CreateAdapter(ADataObject as TObject, AOwnsDataObject);
     // NB: Ho dovuto attivare automaticamnete il BindSource (nel caso non lo fosse già) perchè
     //  altrimenti avevo degli AV dovuti al fatto che il BSA non esisteva
     if not IsActive then
@@ -1329,7 +1329,7 @@ begin
   io.ShowEach(Self, AParentCloseQueryAction, AVCProvider, AVVMAlias);
 end;
 
-procedure TioModelPresenterCustom._CreateAdapter(const ADataObject: TObject; const AOwnsObject: Boolean);
+procedure TioModelPresenterCustom._CreateAdapter(const ADataObject: TObject; const AOwnsDataObject: Boolean);
 begin
   // If an adapter already exists then raise an exception
   if Assigned(FBindSourceAdapter) then
@@ -1344,7 +1344,7 @@ begin
     SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetNaturalBSAfromMasterBindSource(Self, MasterBindSource))
   else
   begin
-    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(Self, ADataObject, AOwnsObject));
+    SetActiveBindSourceAdapter(TioLiveBindingsFactory.GetBSA(Self, ADataObject, AOwnsDataObject));
     // Force the creation of all the detail adapters (if exists)
     // NB: Per risolvere alcuni problemi di sequenza (tipo le condizioni in WhereStr di dettaglio che non
     // funzionavano perchè al momento di apertura del MasterAdapter i DetailAdapters non erano ancora nemmeno
