@@ -5,100 +5,100 @@ Coordinates=191,71,57,36
 Coordinates=191,123,57,33
 
 [BSMaster]
-Coordinates=10,259,71,190
+Coordinates=10,335,71,204
 Visible=True
 
 [ButtonBack]
-Coordinates=387,752,80,58
+Coordinates=194,934,80,58
 
 [ButtonSave]
-Coordinates=10,752,81,58
+Coordinates=300,934,81,58
 
 [ActionList1]
 Coordinates=172,159,78,36
 
 [RectangleTitle]
-Coordinates=10,829,97,36
+Coordinates=145,1018,97,36
 
 [Rectangle1]
-Coordinates=636,752,80,36
+Coordinates=268,1018,80,36
 
 [acPersist]
 Coordinates=24,159,68,36
 
 [LabelTitle]
-Coordinates=1012,603,71,58
+Coordinates=1214,934,71,58
 
 [EditCustName]
-Coordinates=461,232,97,58
+Coordinates=655,10,97,58
 
 [Label2]
-Coordinates=564,752,53,58
+Coordinates=407,934,53,58
 
 [EditCustAddress]
-Coordinates=455,10,110,58
+Coordinates=648,128,110,58
 
 [Label3]
-Coordinates=868,603,53,58
+Coordinates=115,934,53,58
 
 [EditID]
-Coordinates=190,415,50,58
+Coordinates=206,850,50,58
 
 [ButtonSelectCustomer]
-Coordinates=247,603,143,58
+Coordinates=900,934,143,58
 
 [ButtonRevert]
-Coordinates=691,603,90,58
+Coordinates=705,934,90,58
 
 [LayoutCustomer]
-Coordinates=860,752,109,36
+Coordinates=10,1018,109,36
 
 [BSCustomer]
-Coordinates=299,85,87,146
+Coordinates=481,25,87,146
 Visible=True
 
 [LayoutOrderData]
-Coordinates=982,752,113,36
+Coordinates=1454,934,113,36
 
 [LayoutGrandTotal]
-Coordinates=731,752,117,36
+Coordinates=1311,934,117,36
 
 [ButtonSelectPizza]
-Coordinates=186,752,119,58
+Coordinates=1069,934,119,58
 
 [LayoutRows]
-Coordinates=1106,752,85,36
+Coordinates=374,1018,85,36
 
 [Label1]
-Coordinates=796,603,53,58
+Coordinates=821,934,53,58
 
 [EditNote]
-Coordinates=184,193,64,58
+Coordinates=199,570,64,58
 
 [ButtonDeleteRow]
-Coordinates=470,603,114,58
+Coordinates=486,934,114,58
 
 [Label5]
-Coordinates=1100,603,53,58
+Coordinates=1122,10,53,58
 
 [BSRows]
-Coordinates=10,603,73,146
+Coordinates=784,10,73,146
 
 [EditGrandTotal]
-Coordinates=168,526,101,58
+Coordinates=181,246,101,58
 Visible=True
 
 [EditDate]
-Coordinates=184,304,64,58
+Coordinates=199,128,64,58
 
 [Label6]
-Coordinates=940,603,53,58
+Coordinates=1043,10,53,58
 
 [Label4]
-Coordinates=398,603,53,58
+Coordinates=1201,10,53,58
 
 [StringGrid1]
-Coordinates=151,603,80,146
+Coordinates=937,10,80,146
 Visible=True
 
 []
@@ -111,7 +111,7 @@ Coordinates=342,80,91,36
 Coordinates=277,1,87,36
 
 [ButtonETM]
-Coordinates=596,603,79,58
+Coordinates=10,934,79,58
 
 [acRevertOrDelete]
 Coordinates=462,191,117,36
@@ -123,21 +123,21 @@ Coordinates=462,243,139,36
 Coordinates=462,295,163,36
 
 [ComboBoxOrderState]
-Coordinates=151,10,141,146
+Coordinates=161,364,141,146
 Visible=True
 
 [Label7]
-Coordinates=315,752,53,58
+Coordinates=626,934,53,58
 
 [CBCustomer]
-Coordinates=461,85,101,146
+Coordinates=181,666,101,146
 Visible=True
 
 [BSCustomers]
-Coordinates=625,94,93,102
+Coordinates=400,710,93,102
 
 [EditCustomerID]
-Coordinates=460,330,105,58
+Coordinates=179,10,105,58
 Visible=True
 
 [acDeleteRow]

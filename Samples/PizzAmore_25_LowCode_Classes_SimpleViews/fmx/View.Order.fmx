@@ -499,8 +499,8 @@ inherited ViewOrder: TViewOrder
     end
     object LinkFillControlToField: TLinkFillControlToField
       Category = 'Quick Bindings'
-      DataSource = BSCustomer
-      FieldName = 'ID'
+      DataSource = BSMaster
+      FieldName = 'Customer'
       Control = CBCustomer
       Track = True
       FillDataSource = BSCustomers
@@ -535,7 +535,6 @@ inherited ViewOrder: TViewOrder
     ScopeMappings = <>
     AsDefault = False
     TypeName = 'TCustomer'
-    SelectorFor = BSCustomer
     Paging.CurrentPageOfFormat = '%d/%d'
     Left = 200
     Top = 227

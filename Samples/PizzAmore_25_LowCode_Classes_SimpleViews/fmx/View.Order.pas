@@ -74,9 +74,12 @@ var
   LOrder: TOrder;
 begin
   inherited;
-  BSMaster.CurrentAs<TOrder>.AddPizza(ASelected as TPizza);
-  BSMaster.Refresh;
-  ADone := True;
+  if ASelected is TPizza then
+  begin
+    BSMaster.CurrentAs<TOrder>.AddPizza(ASelected as TPizza);
+    BSMaster.Refresh;
+    ADone := True;
+  end;
 end;
 
 constructor TViewOrder.Create(AOwner: TComponent);

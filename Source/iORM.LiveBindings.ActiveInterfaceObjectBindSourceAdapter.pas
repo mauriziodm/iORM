@@ -246,13 +246,13 @@ end;
 
 constructor TioActiveInterfaceObjectBindSourceAdapter.Create(const ABindSource: IioBindSource; const ADataObject: IInterface; const AOwnsDataObject: Boolean);
 begin
+  FBindSource := ABindSource; // must be before inherited Create
   FReloading := False;
   FBSPersistenceDeleting := False;
 
   inherited Create(nil, ADataObject, ABindSource.TypeAlias, ABindSource.TypeName);
-  FOwnsDataObject := AOwnsDataObject;
 
-  FBindSource := ABindSource;
+  FOwnsDataObject := AOwnsDataObject;
   FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
   // Set Master & Details adapters reference
   FMasterAdaptersContainer := nil;
@@ -611,6 +611,9 @@ begin
 
   // NB: OnReceiveSelectionFreeObject property of the BindSource is not
   //  useful in an interface bindsource adapter
+
+  // Otherwise UI controls binded with S.O.LO (Smart-Object-LOokup system) would still show the old values
+  Refresh;
 end;
 
 procedure TioActiveInterfaceObjectBindSourceAdapter.SetBindSource(ABindSource: IioBindSource);

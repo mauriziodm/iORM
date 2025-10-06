@@ -225,8 +225,10 @@ end;
 
 constructor TioActiveListBindSourceAdapter.Create(const ABindSource: IioBindSource; const ADataObject: TList<TObject>; const AOwnsDataObject: Boolean);
 begin
+  FBindSource := ABindSource; // must be before inherited Create
+
   inherited Create(nil, ADataObject, TioUtilities.ClassNameToClassRef(ABindSource.TypeName), AOwnsDataObject);
-  FBindSource := ABindSource;
+
   FBSPersistenceDeleting := False;
   FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
   FInterfacedList := nil;
@@ -678,6 +680,9 @@ begin
   //  riga con una nuova pizza poi l'oggetto non si persisteva perchè nel SUD l'oggetto
   //  master non figurava come modificato e quindi non veniva persistito. La stessa cosa
   //  succedeva anche in caso di modifica manuale di una riga.
+
+  // Otherwise UI controls binded with S.O.LO (Smart-Object-LOokup system) would still show the old values
+  Refresh;
 end;
 
 procedure TioActiveListBindSourceAdapter.ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType);

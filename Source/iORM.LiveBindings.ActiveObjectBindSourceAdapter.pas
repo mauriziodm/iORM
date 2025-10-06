@@ -261,9 +261,9 @@ constructor TioActiveObjectBindSourceAdapter.Create(const ABindSource: IioBindSo
 var
   FClassRef: TioClassRef;
 begin
+  FBindSource := ABindSource; // must be before inherited Create
   FReloading := False;
   FBSPersistenceDeleting := False;
-
   // If the AObject is assigned the set the BaseRttiType from this instance (most accurate) else resolve the TypeName
   // AObject is always a TObject by generic constraint
   if Assigned(ADataObject) then
@@ -272,9 +272,8 @@ begin
     FClassRef := TioUtilities.ClassNameToClassRef(ABindSource.TypeName);
 
   inherited Create(nil, ADataObject, FClassRef, AOwnsDataObject);
-  FOwnsDataObject := AOwnsDataObject;
 
-  FBindSource := ABindSource;
+  FOwnsDataObject := AOwnsDataObject;
   FDataSetLinkContainer := TioLiveBindingsFactory.BSAToDataSetLinkContainer;
   // Set Master & Details adapters reference
   FMasterAdaptersContainer := nil;
@@ -622,6 +621,9 @@ begin
   // la vita anche se mi dimentico di mettere a False la proprietà OnReceiveSelectionFreeObject.
   if FBindSource.OnReceiveSelectionFreeObject and (LPreviousCurrentObj <> nil) and (Current <> LPreviousCurrentObj) then
     LPreviousCurrentObj.Free;
+
+  // Otherwise UI controls binded with S.O.LO (Smart-Object-LOokup system) would still show the old values
+  Refresh;
 end;
 
 procedure TioActiveObjectBindSourceAdapter.ReceiveSelection(ASelected: IInterface; ASelectionType: TioSelectionType);

@@ -697,6 +697,7 @@ begin
   begin
     LValue := TioCommonBSBehavior.DetailObjLookup_ByTypeName_LB(FBindSource, LRttiProperty, TValue.From<T>(AValue));
     LRttiProperty.SetValue(LObject, LValue);
+    FBindSource.GetActiveBindSourceAdapter.DetailAdaptersContainer.SetMasterObject(LObject);
   end
   // Enumeration type
   else
