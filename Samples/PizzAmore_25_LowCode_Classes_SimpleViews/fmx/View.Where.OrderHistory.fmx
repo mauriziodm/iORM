@@ -12,6 +12,11 @@ inherited ViewOrderHistory: TViewOrderHistory
   inherited RectangleWhere: TRectangle
     Visible = False
   end
+  inherited ActionList1: TActionList
+    inherited acSelectCurrent: TioBSSelectCurrent
+      Action_CloseQueryAction = acBack
+    end
+  end
   inherited BSMaster: TioPrototypeBindSourceMaster
     AutoActivate = True
     FieldDefs = <
