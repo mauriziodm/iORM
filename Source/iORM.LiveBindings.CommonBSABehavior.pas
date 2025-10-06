@@ -629,7 +629,7 @@ begin
   else
   if (not FField.MemberName.StartsWith('%')) and TioUtilities.HasBelongsToOrHasOneRelation(LObj.ClassName, LRttiProperty.Name) then
   begin
-    Result := TioCommonBSBehavior.DetailObjLookup_DetailObjID_LB(LObj, LRttiProperty).AsType<T>;
+    Result := TioCommonBSBehavior.DetailObjLookup_DetailObjID(LObj, LRttiProperty).AsType<T>;
   end
   // else if it is a regular property...
   else
@@ -670,10 +670,8 @@ end;
 procedure TioPropertyValueWriter<T>.SetValue(const AValue: T);
 var
   LObject: TObject;
-  LRttiType: TRttiType;
   LRttiProperty: TRttiProperty;
   LValue: TValue;
-  LLookupID: Integer;
 begin
   // Do not inherit
   // NB: If it's a property relative to a BindSource virtual field then raise an exception because
@@ -695,12 +693,13 @@ begin
   //  una relazione BelongsTo/AsOne allora la mappa come Integer in modo da bindare il suo ID come intero
   if TioUtilities.HasBelongsToOrHasOneRelation(LObject.ClassName, LRttiProperty.Name) then
   begin
-    LValue := TioCommonBSBehavior.DetailObjLookup_ByTypeName_LB(FBindSource, LRttiProperty, TValue.From<T>(AValue));
+    LValue := TioCommonBSBehavior.DetailObjLookup_ByTypeName(FBindSource, LRttiProperty, TValue.From<T>(AValue));
     LRttiProperty.SetValue(LObject, LValue);
     FBindSource.GetActiveBindSourceAdapter.DetailAdaptersContainer.SetMasterObject(LObject);
+    Exit;
   end
-  // Enumeration type
   else
+  // Enumeration type
   if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
   begin
     // Enumeration binded as string
@@ -709,15 +708,12 @@ begin
     // Enumeration binded as integer
     else
       TValue.Make(@AValue, LRttiProperty.PropertyType.Handle, LValue);
-    // Set the enumeration value
-    LRttiProperty.SetValue(LObject, LValue);
   end
   // Other types
   else
-  begin
     LValue := TValue.From<T>(AValue);
-    LRttiProperty.SetValue(LObject, LValue);
-  end;
+  // Set the value to the object property
+  LRttiProperty.SetValue(LObject, LValue);
 end;
 
 { TioBindSourceAdapterSimpleGetMemberObject }

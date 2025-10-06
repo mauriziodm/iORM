@@ -57,10 +57,6 @@ type
 
   // Methods and functionalities common to all BindSouces (ioDataSet also)
   TioCommonBSBehavior = class
-  private
-    // Common code  for S.O.Lo (Smart Object LOokup system)
-    class function DetailObjLookup_SplitFieldNameAndLookupInfo(const AFullPathFieldName: String; const ASeparator: Char; var OutFieldName, OutLookupInfo: String): Boolean;
-    class function DetailObjLookup_SetDetailObject(const ABindSource: IioBindSource; ADetailObj: TObject; const APropertyName, ADetailTypeName: String): TValue;
   public
     // Common code tor return the first MasterBindSource with Persistence prop (the real master for CRUD operations)
     class function GetFirstMasterPersistenceBindSource(const AStartBindSource: IioBindSource): IioBindSource; static;
@@ -90,18 +86,9 @@ type
     class procedure InsertOrAppendObj(const ABindSource: IioBindSource; AObj: TObject; const InsertOrAppend: TioCommonBSBehaviorInsertOrAppend; const AFreeObjIfNotAuthorized: Boolean);
     class procedure InsertOrAppendIntf(const ABindSource: IioBindSource; AIntf: Iinterface; const InsertOrAppend: TioCommonBSBehaviorInsertOrAppend; const AFreeObjIfNotAuthorized: Boolean);
     // Common code  for S.O.Lo (Smart Object LOokup system)
-    class procedure DetailObjLookup_ClearLookupInfoFromFieldName(var [ref] AFullPathFieldName: String);
-    class function DetailObjLookup_DetailObjID(const AFullPathFieldName: String; const [ref] AValue: TValue): TValue;
-    class function DetailObjLookup_ByLookupBindSource(const ABindSource: IioBindSource; const AFullPathFieldName: String; const [ref] AValue: TValue): TValue;
-    class function DetailObjLookup_ByTypeName(const ABindSource: IioBindSource; const AFullPathFieldName: String; const [ref] AValue: TValue): TValue;
-
-
-
-    class function DetailObjLookup_DetailObjID_LB(const AMasterObj: TObject; const ARttiProperty: TRttiProperty): TValue;
-    class function DetailObjLookup_ByTypeName_LB(const ABindSource: IioBindSource; const ARttiProperty: TRttiProperty; const [ref] AValue: TValue): TValue;
-
-
-
+    class function DetailObjLookup_DetailObjID(const AMasterObj: TObject; const ARttiProperty: TRttiProperty): TValue;
+    class function DetailObjLookup_ByTypeName(const ABindSource: IioBindSource; const ARttiProperty: TRttiProperty; const [ref] AValue: TValue): TValue;
+    class function DetailObjLookup_SetDetailObject(const ABindSource: IioBindSource; ADetailObj: TObject; const APropertyName, ADetailTypeName: String): TValue;
   end;
 
 implementation
@@ -551,98 +538,7 @@ begin
   Result := BuildWhere(ASourceBS, ATargetBS, AExecuteOnTarget, ABeforeWhereClearEvent, AOnWhereClearEvent, AAfterWhereClearEvent);
 end;
 
-class function TioCommonBSBehavior.DetailObjLookup_ByLookupBindSource(const ABindSource: IioBindSource; const AFullPathFieldName: String; const [ref] AValue: TValue): TValue;
-var
-  I: Integer;
-  LCleanFieldName: String;
-  LLookupBindSourceName: String;
-  LLookupBindSource: IioBindSource;
-  LCurrentObjItem: TObject;
-  LDetailObj: TObject;
-  LOwner: TComponent;
-  LDuckList: IioDuckTypedList;
-begin
-  // If AFullPathFieldName contains object lookup info...
-  if DetailObjLookup_SplitFieldNameAndLookupInfo(AFullPathFieldName, SOLO_BINDSOURCE_SEPARATOR, LCleanFieldName, LLookupBindSourceName) then
-  begin
-    // Search for the lookup-bind-source
-    LOwner := (ABindSource as TComponent).Owner;
-    for I := 0 to LOwner.ComponentCount-1 do
-    begin
-      if LOwner.Components[I].Name = LLookupBindSourceName then
-      begin
-        // Checks whether the found component implements the IioBindSource interface.
-        if not Supports(LOwner.Components[I], IioBindSource, LLookupBindSource) then
-          raise EioGenericException.Create(ClassName, 'DetailObjLookup_ByLookupBindSource', Format('Lookup component named "%s" found but does not implement the "IioBindSource" interface', [LLookupBindSourceName]));
-        // Check if LookupBindSource is active
-        if not LLookupBindSource.IsActive then
-          raise EioGenericException.Create(ClassName, 'DetailObjLookup_ByLookupBindSource', Format('Lookup BindSource named "%s" found but not active', [LLookupBindSourceName]));
-        // Extract the new detail object:
-        // If the DataObject of the LookupBindSource is a List then it loops until it finds the element with the searched ID
-        if TioDuckTypedFactory.IsList(LLookupBindSource.DataObject) then
-        begin
-          LDuckList := TioDuckTypedFactory.DuckTypedList(LLookupBindSource.DataObject);
-          for LCurrentObjItem in LDuckList do
-          begin
-            // If the current item isn't assigned then continue
-            if not Assigned(LCurrentObjItem) then
-              Continue;
-            // If the current object ID equals the searched one then set it as the new detail object
-            if TioUtilities.ObjToID(LCurrentObjItem) = AValue.AsInteger then
-            begin
-              // Clone the object or not depending on OnReceiveSelectionCloneObject property of the BindSource
-              if ABindSource.OnReceiveSelectionCloneObject and not LLookupBindSource.IsInterfacePresenting then
-                LDetailObj := TioUtilities.CloneObject(LCurrentObjItem)
-              else
-                LDetailObj := LCurrentObjItem;
-              // Set the new detail object
-              Result := DetailObjLookup_SetDetailObject(ABindSource, LDetailObj, LCleanFieldName, LDetailObj.ClassName);
-              Exit;
-            end;
-          end;
-          // If it gets here it means that it has not found the DetailObject with the searched ID and therefore raises an exception.
-          raise EioGenericException.Create(ClassName, 'DetailObjLookup_ByLookupBindSource', Format('Looking Up for a lookup instance with ID equals to %d but I couldn''t find it', [AValue.Asinteger]));
-        end
-        // Else check if the DataObject (SingleObject) ID equals  the searched one
-        else
-        begin
-          LDetailObj := LLookupBindSource.DataObject;
-          if TioUtilities.ObjToID(LDetailObj) = AValue.AsInteger then
-            Result := DetailObjLookup_SetDetailObject(ABindSource, LDetailObj, LCleanFieldName, LDetailObj.ClassName)
-          else
-            raise EioGenericException.Create(ClassName, 'DetailObjLookup_ByLookupBindSource', Format('Lookup BindSource named "%s" not found when searching on the owner component named "%s"', [AValue.Asinteger]));
-        end;
-      end;
-    end;
-    // Se arriva qui significa che non ha trovato il LookupBindSource
-    // If it gets here it means that it has not found the DetailObject with the searched ID and therefore raises an exception.
-    raise EioGenericException.Create(ClassName, 'DetailObjLookup_ByLookupBindSource', Format('Lookup BindSource named "%s" not found searching on the owner component named "%s"', [LLookupBindSourceName, LOwner.Name]));
-  end
-  else
-    // else return the AValue as is
-    Result := AValue;
-end;
-
-class function TioCommonBSBehavior.DetailObjLookup_ByTypeName(const ABindSource: IioBindSource; const AFullPathFieldName: String; const [ref] AValue: TValue): TValue;
-var
-  LCleanFieldName: String;
-  LDetailTypeName: String;
-  LDetailObj: TObject;
-begin
-  // If AFullPathFieldName contains object lookup info...
-  if DetailObjLookup_SplitFieldNameAndLookupInfo(AFullPathFieldName, SOLO_CLASS_SEPARATOR, LCleanFieldName, LDetailTypeName) then
-  begin
-    // Load the new detail object
-    LDetailObj := io.Load(LDetailTypeName).ByID(AValue.AsInteger).ToObject;
-    // Set the new detail object
-    Result := DetailObjLookup_SetDetailObject(ABindSource, LDetailObj, LCleanFieldName, LDetailTypeName);
-  end
-  else
-    // else return the AValue as is
-    Result := AValue;
-end;
-
-class function TioCommonBSBehavior.DetailObjLookup_ByTypeName_LB(const ABindSource: IioBindSource; const ARttiProperty: TRttiProperty;
+class function TioCommonBSBehavior.DetailObjLookup_ByTypeName(const ABindSource: IioBindSource; const ARttiProperty: TRttiProperty;
   const [ref] AValue: TValue): TValue;
 var
   LDetailObj: TObject;
@@ -658,32 +554,7 @@ begin
   Result := DetailObjLookup_SetDetailObject(ABindSource, LDetailObj, LMasterPropertyName, LLookupTypeName);
 end;
 
-class procedure TioCommonBSBehavior.DetailObjLookup_ClearLookupInfoFromFieldName(var [ref] AFullPathFieldName: String);
-var
-  LDummyDetailTypeName: String;
-begin
-  DetailObjLookup_SplitFieldNameAndLookupInfo(AFullPathFieldName, SOLO_CLASS_SEPARATOR, AFullPathFieldName, LDummyDetailTypeName);
-  DetailObjLookup_SplitFieldNameAndLookupInfo(AFullPathFieldName, SOLO_BINDSOURCE_SEPARATOR, AFullPathFieldName, LDummyDetailTypeName);
-end;
-
-class function TioCommonBSBehavior.DetailObjLookup_DetailObjID(const AFullPathFieldName: String; const [ref] AValue: TValue): TValue;
-var
-  LCleanFieldName: String;
-  LDetailTypeName: String;
-begin
-  if DetailObjLookup_SplitFieldNameAndLookupInfo(AFullPathFieldName, SOLO_CLASS_SEPARATOR, LCleanFieldName, LDetailTypeName)
-  or DetailObjLookup_SplitFieldNameAndLookupInfo(AFullPathFieldName, SOLO_BINDSOURCE_SEPARATOR, LCleanFieldName, LDetailTypeName) then
-  begin
-    if AValue.IsEmpty then
-      Result := TValue.Empty
-    else
-      Result := TioUtilities.ObjToID(AValue.AsObject);
-  end
-  else
-    Result := AValue;
-end;
-
-class function TioCommonBSBehavior.DetailObjLookup_DetailObjID_LB(const AMasterObj: TObject; const ARttiProperty: TRttiProperty): TValue;
+class function TioCommonBSBehavior.DetailObjLookup_DetailObjID(const AMasterObj: TObject; const ARttiProperty: TRttiProperty): TValue;
 var
   LChildObj: TObject;
 begin
@@ -748,25 +619,6 @@ begin
     LPreviousDetailObject := TioUtilities.ResolveChildPropertyPath_GetFinalObj_ByStringPath(ABindSource.Current, APropertyName);
     if Assigned(LPreviousDetailObject) then
       LPreviousDetailObject.Free;
-  end;
-end;
-
-class function TioCommonBSBehavior.DetailObjLookup_SplitFieldNameAndLookupInfo(const AFullPathFieldName: String; const ASeparator: Char; var OutFieldName,
-  OutLookupInfo: String): Boolean;
-var
-  LPos: Integer;
-begin
-  LPos := Pos(ASeparator, AFullPathFieldName);
-  Result := (LPos > 0);
-  if Result then
-  begin
-    OutLookupInfo := Copy(AFullPathFieldName, LPos+1);
-    OutFieldName := Copy(AFullPathFieldName, 1, LPos-1);
-  end
-  else
-  begin
-    OutLookupInfo := String.Empty;
-    OutFieldName := AFullPathFieldName;
   end;
 end;
 

@@ -239,7 +239,7 @@ type
     class function _GetValueForBSProp(const ADataSet: TioBSABaseDataSet; APropName: String): TValue;
   public
     class function GetValue(const ADataSet: TioBSABaseDataSet; AObj: TObject; const AField: TField): TValue;
-    class procedure SetValue(const ADataSet: TioBSABaseDataSet; AObj: TObject; const AFullPathPropName: String; const AValue: TValue);
+    class procedure SetValue(const ADataSet: TioBSABaseDataSet; AObj: TObject; const AFullPathPropName: String; AValue: TValue);
   end;
 
 implementation
@@ -907,19 +907,9 @@ begin
       LValue := TEncoding.Unicode.GetString(Buffer).TrimRight;
     // LValue := WideString(pWideChar(Buffer));
   end;
-  // S.O.LO (Smart-Object-LOokup system): If the field name contains object lookup info then get the new detail lookup object into the LValue
-  if LValue.Kind = tkInteger then
-    LValue := TioCommonBSBehavior.DetailObjLookup_ByTypeName(Self as IioBindSource, Field.FieldName, LValue);
-  if LValue.Kind = tkInteger then
-    LValue := TioCommonBSBehavior.DetailObjLookup_ByLookupBindSource(Self as IioBindSource, Field.FieldName, LValue);
   // Set Property, Object, Value:
   // Even if the property is of a child object, even multilevel, it resolves the path and set the value
   TioFullPathPropertyReadWrite.SetValue(Self, FBindSourceAdapter.Current, Field.FieldName, LValue);
-  // S.O.LO (Smart-Object-LOokup system):
-  //  If LValue is of type Class or Interface then it means that we are in the context of a S.O.LO operation
-  //   so it forces a refresh of the BindSource so that it takes into account the new detail object.
-  if LValue.Kind in [tkClass, tkInterface] then
-    FBindSourceAdapter.DetailAdaptersContainer.SetMasterObject(FBindSourceAdapter.Current);
   // Set modified
   SetModified(True);
   // NB: Mauri 03/03/2020 - Aggiungendo queste due righe, oltre ad aver eliminato la condizione
@@ -1041,9 +1031,6 @@ begin
   // Get Property, Object, Value:
   // Even if the property is of a child object, even multilevel, it resolves the path and returns the value
   LValue := TioFullPathPropertyReadWrite.GetValue(Self, FBindSourceAdapter.Items[LRecordIndex], Field);
-  // S.O.LO (Smart Object LOokup system)
-  //  Se il campo è relativo a una proprietà di un tipo oggetto o interfaccia con relazione BelongsTo ed è di tipo intero (il campo)
-  LValue := TioCommonBSBehavior.DetailObjLookup_DetailObjID(Field.FieldName, LValue);
   // Se il TValue non ha un valore allora imposta la risposta come campo NULL
   if LValue.IsEmpty then
     Exit(False);
@@ -1456,8 +1443,6 @@ var
   LMidPathProperty: IioProperty;
 begin
   Result := False;
-  // Clear che FullPathPropName from lookup info
-  TioCommonBSBehavior.DetailObjLookup_ClearLookupInfoFromFieldName(AFullPathPropName);
   // Extract the first PropName in the FullPathPropName
   LPropName := _ExtractPropName(AFullPathPropName);
   // If we are in the middle of the path (we are not at the final leaf property)
@@ -1496,6 +1481,17 @@ begin
     // In case of normal property of the current object (current record)
   else if _ResolvePath(AObj, LRttiProperty, LFullPathPropName) then
   begin
+
+
+    // S.O.LO (Smart-Object-LOokup system): Se la proprietà è di tipo classe e su di essa insiste
+    //  una relazione BelongsTo/AsOne allora la mappa come Integer in modo da bindare il suo ID come intero
+    if (not AField.FieldName.StartsWith('%')) and TioUtilities.HasBelongsToOrHasOneRelation(AObj.ClassName, LRttiProperty.Name) then
+    begin
+      Result := TioCommonBSBehavior.DetailObjLookup_DetailObjID(AObj, LRttiProperty);
+    end
+    else
+
+
     // Enumeration type
     if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
     begin
@@ -1581,8 +1577,9 @@ begin
     Result := TValue.Empty;
 end;
 
-class procedure TioFullPathPropertyReadWrite.SetValue(const ADataSet: TioBSABaseDataSet; AObj: TObject; const AFullPathPropName: String; const AValue: TValue);
+class procedure TioFullPathPropertyReadWrite.SetValue(const ADataSet: TioBSABaseDataSet; AObj: TObject; const AFullPathPropName: String; AValue: TValue);
 var
+  LBindSource: IioBindSource;
   LRttiProperty: TRttiProperty;
 begin
   // NB: If it's a property relative to the BindSource then raise an exception because
@@ -1596,6 +1593,16 @@ begin
   if not _ResolvePath(AObj, LRttiProperty, AFullPathPropName) then
     raise EioGenericException.Create(Self.ClassName, 'SetValue',
       Format('I am unable to resolve the property path "%s".'#13#13'It could be that one of the objects along the way is nil.', [AFullPathPropName]));
+  // S.O.LO (Smart-Object-LOokup system): Se la proprietà è di tipo classe e su di essa insiste
+  //  una relazione BelongsTo/AsOne allora la mappa come Integer in modo da bindare il suo ID come intero
+  if TioUtilities.HasBelongsToOrHasOneRelation(AObj.ClassName, LRttiProperty.Name) then
+  begin
+    Supports(ADataSet, IioBindSource, LBindSource);
+    AValue := TioCommonBSBehavior.DetailObjLookup_ByTypeName(LBindSource, LRttiProperty, AValue);
+    LRttiProperty.SetValue(AObj, AValue);
+    ADataSet.GetActiveBindSourceAdapter.DetailAdaptersContainer.SetMasterObject(AObj);
+  end
+  else
   // Enumeration type
   if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
   begin

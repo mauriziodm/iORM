@@ -220,7 +220,7 @@ object OrderForm: TOrderForm
       Top = 5
       Width = 249
       Height = 29
-      DataField = 'Customer:TCustomer'
+      DataField = 'Customer'
       DataSource = SourceOrder
       KeyField = 'ID'
       ListField = 'ID; Name'
@@ -454,8 +454,8 @@ object OrderForm: TOrderForm
     Height = 25
     BorderStyle = bsNone
     Color = clInactiveBorder
-    DataField = 'ID'
-    DataSource = SourceCustomer
+    DataField = 'Customer'
+    DataSource = SourceOrder
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -16
@@ -668,7 +668,7 @@ object OrderForm: TOrderForm
       Size = 100
     end
     object DSOrderCustomer: TIntegerField
-      FieldName = 'Customer:TCustomer'
+      FieldName = 'Customer'
     end
   end
   object SourceOrder: TDataSource
