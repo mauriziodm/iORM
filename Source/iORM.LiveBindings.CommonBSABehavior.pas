@@ -362,7 +362,7 @@ begin
               begin
                 // S.O.LO (Smart-Object-LOokup system): Se la proprietà è di tipo classe e su di essa insiste
                 //  una relazione BelongsTo/AsOne allora la mappa come Integer in modo da bindare il suo ID come intero
-                if TioUtilities.HasBelongsToOrHasOneRelation(AType.Name, LProperty.Name) then
+                if TioUtilities.HasBelongsToOrHasOneRelation(LType.Name, LProperty.Name) then
                   LCollectionEditorField := CreateRttiPropertyField<Int32>(LProperty, ABindSourceAdapter, AGetMemberObject, mtInteger,
                       APath + LProperty.Name)
                 // Altrimenti cerca di risalire alla classe capostipite fermandosi, a seconda dei casi, a TStrings, TPersistent o TObject per poi
