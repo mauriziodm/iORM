@@ -61,7 +61,7 @@ uses
 procedure TStartForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
   AWarnings: TStrings);
 begin
-  TSampleData.CheckForSampleDataCreation;
+//  TSampleData.CheckForSampleDataCreation;
 end;
 
 procedure TStartForm.VCProviderAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);

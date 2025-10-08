@@ -394,6 +394,14 @@ begin
                       APath + LProperty.Name)
                 end;
               end;
+            tkInterface:
+              begin
+                // S.O.LO (Smart-Object-LOokup system): Se la proprietà è di tipo classe e su di essa insiste
+                //  una relazione BelongsTo/AsOne allora la mappa come Integer in modo da bindare il suo ID come intero
+                if TioUtilities.HasBelongsToOrHasOneRelation(LType.Name, LProperty.Name) then
+                  LCollectionEditorField := CreateRttiPropertyField<Int32>(LProperty, ABindSourceAdapter, AGetMemberObject, mtInteger,
+                      APath + LProperty.Name);
+              end;
           end;
           if LCollectionEditorField <> nil then
           begin

@@ -5,6 +5,227 @@ inherited ViewOrder: TViewOrder
       Text = 'Order'
     end
   end
+  inherited Rectangle1: TRectangle
+    object EditCustomerID: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 1
+      Text = '-33'
+      Position.X = 48.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 66.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object CBCustomer: TComboBox
+      Items.Strings = (
+        'Mark Anderson'
+        'Mark Anderson'
+        'Paul Davis'
+        'Adam Brown'
+        'Michelle Smith'
+        'Mary Harris'
+        'Susan Sanchez'
+        'Susan Sanchez'
+        'Mary Harris'
+        'Steve Moore'
+        'Christine Jones'
+        'James Garcia'
+        'Adam Brown'
+        'Michelle Smith'
+        'Donna Martin'
+        'James Garcia'
+        'Steve Moore'
+        'Paul Davis'
+        'Donna Martin'
+        'Christine Jones'
+        'Mark Anderson'
+        'Mark Anderson'
+        'Paul Davis'
+        'Adam Brown'
+        'Michelle Smith'
+        'Mary Harris'
+        'Susan Sanchez'
+        'Susan Sanchez'
+        'Mary Harris'
+        'Steve Moore'
+        'Christine Jones'
+        'James Garcia'
+        'Adam Brown'
+        'Michelle Smith'
+        'Donna Martin'
+        'James Garcia'
+        'Steve Moore'
+        'Paul Davis'
+        'Donna Martin'
+        'Christine Jones'
+        'Mark Anderson'
+        'Mark Anderson'
+        'Paul Davis'
+        'Adam Brown'
+        'Michelle Smith'
+        'Mary Harris'
+        'Susan Sanchez'
+        'Susan Sanchez'
+        'Mary Harris'
+        'Steve Moore'
+        'Christine Jones'
+        'James Garcia'
+        'Adam Brown'
+        'Michelle Smith'
+        'Donna Martin'
+        'James Garcia'
+        'Steve Moore'
+        'Paul Davis'
+        'Donna Martin'
+        'Christine Jones'
+        'Mark Anderson'
+        'Mark Anderson'
+        'Paul Davis'
+        'Adam Brown'
+        'Michelle Smith'
+        'Mary Harris'
+        'Susan Sanchez'
+        'Susan Sanchez'
+        'Mary Harris'
+        'Steve Moore'
+        'Christine Jones'
+        'James Garcia'
+        'Adam Brown'
+        'Michelle Smith'
+        'Donna Martin'
+        'James Garcia'
+        'Steve Moore'
+        'Paul Davis'
+        'Donna Martin'
+        'Christine Jones'
+        'Mark Anderson'
+        'Mark Anderson'
+        'Paul Davis'
+        'Adam Brown'
+        'Michelle Smith'
+        'Mary Harris'
+        'Susan Sanchez'
+        'Susan Sanchez'
+        'Mary Harris'
+        'Steve Moore'
+        'Christine Jones'
+        'James Garcia'
+        'Adam Brown'
+        'Michelle Smith'
+        'Donna Martin'
+        'James Garcia'
+        'Steve Moore'
+        'Paul Davis'
+        'Donna Martin'
+        'Christine Jones'
+        'Mark Anderson'
+        'Mark Anderson'
+        'Paul Davis'
+        'Adam Brown'
+        'Michelle Smith'
+        'Mary Harris'
+        'Susan Sanchez'
+        'Susan Sanchez'
+        'Mary Harris'
+        'Steve Moore'
+        'Christine Jones'
+        'James Garcia'
+        'Adam Brown'
+        'Michelle Smith'
+        'Donna Martin'
+        'James Garcia'
+        'Steve Moore'
+        'Paul Davis'
+        'Donna Martin'
+        'Christine Jones'
+        'Mark Anderson'
+        'Mark Anderson'
+        'Paul Davis'
+        'Adam Brown'
+        'Michelle Smith'
+        'Mary Harris'
+        'Susan Sanchez'
+        'Susan Sanchez'
+        'Mary Harris'
+        'Steve Moore'
+        'Christine Jones'
+        'James Garcia'
+        'Adam Brown'
+        'Michelle Smith'
+        'Donna Martin'
+        'James Garcia'
+        'Steve Moore'
+        'Paul Davis'
+        'Donna Martin'
+        'Christine Jones'
+        'Mark Anderson'
+        'Mark Anderson'
+        'Paul Davis'
+        'Adam Brown'
+        'Michelle Smith'
+        'Mary Harris'
+        'Susan Sanchez'
+        'Susan Sanchez'
+        'Mary Harris'
+        'Steve Moore'
+        'Christine Jones'
+        'James Garcia'
+        'Adam Brown'
+        'Michelle Smith'
+        'Donna Martin'
+        'James Garcia'
+        'Steve Moore'
+        'Paul Davis'
+        'Donna Martin'
+        'Christine Jones'
+        'Mark Anderson'
+        'Mark Anderson'
+        'Paul Davis'
+        'Adam Brown'
+        'Michelle Smith'
+        'Mary Harris'
+        'Susan Sanchez'
+        'Susan Sanchez'
+        'Mary Harris'
+        'Steve Moore'
+        'Christine Jones'
+        'James Garcia'
+        'Adam Brown'
+        'Michelle Smith'
+        'Donna Martin'
+        'James Garcia'
+        'Steve Moore'
+        'Paul Davis'
+        'Donna Martin'
+        'Christine Jones'
+        'Mark Anderson'
+        'Mark Anderson'
+        'Paul Davis'
+        'Adam Brown'
+        'Michelle Smith'
+        'Mary Harris'
+        'Susan Sanchez'
+        'Susan Sanchez'
+        'Mary Harris'
+        'Steve Moore'
+        'Christine Jones'
+        'James Garcia'
+        'Adam Brown'
+        'Michelle Smith'
+        'Donna Martin'
+        'James Garcia'
+        'Steve Moore'
+        'Paul Davis'
+        'Donna Martin'
+        'Christine Jones')
+      Position.X = 122.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 219.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+    end
+  end
   object LayoutOrderData: TLayout [2]
     Align = Top
     Position.Y = 40.000000000000000000
@@ -324,6 +545,12 @@ inherited ViewOrder: TViewOrder
         FieldType = ftCurrency
         Generator = 'Currency'
         ReadOnly = False
+      end
+      item
+        Name = 'Customer'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
       end>
     Preview = True
     Left = 58
@@ -461,5 +688,47 @@ inherited ViewOrder: TViewOrder
           CustomFormat = 'Format('#39'%%m'#39', Value)'
         end>
     end
+    object LinkControlToField7: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSMaster
+      FieldName = 'Customer'
+      Control = EditCustomerID
+      Track = False
+    end
+    object LinkFillControlToField1: TLinkFillControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSMaster
+      FieldName = 'Customer'
+      Control = CBCustomer
+      Track = True
+      FillDataSource = BSCustomers
+      FillValueFieldName = 'ID'
+      FillDisplayFieldName = 'Name'
+      AutoFill = True
+      FillExpressions = <>
+      FillHeaderExpressions = <>
+      FillBreakGroups = <>
+    end
+  end
+  object BSCustomers: TioModelBindSource
+    AutoActivate = True
+    FieldDefs = <
+      item
+        Name = 'ID'
+        FieldType = ftInteger
+        Generator = 'Integers'
+        ReadOnly = False
+      end
+      item
+        Name = 'Name'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end>
+    ScopeMappings = <>
+    ModelPresenter = 'BSCustomers'
+    Preview = True
+    ViewModelBridge = VMBridge
+    Left = 54
+    Top = 476
   end
 end

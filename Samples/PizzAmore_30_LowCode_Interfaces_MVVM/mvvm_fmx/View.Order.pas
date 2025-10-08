@@ -7,7 +7,8 @@ uses
   FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.StdCtrls, View.BaseForForm, iORM, iORM.Attributes, iORM.CommonTypes, iORM.MVVM.Interfaces,
   Data.Bind.Components, Data.Bind.ObjectScope, iORM.MVVM.ModelBindSource, iORM.MVVM.ViewModelBridge, System.Actions, FMX.ActnList, iORM.StdActions.Fmx,
   FMX.Controls.Presentation, FMX.Objects, Data.Bind.GenData, System.Rtti, FMX.Grid.Style, Data.Bind.Controls, System.Bindings.Outputs, Fmx.Bind.Editors,
-  Data.Bind.EngExt, Fmx.Bind.DBEngExt, Fmx.Bind.Navigator, FMX.ScrollBox, FMX.Grid, FMX.Edit, FMX.Layouts, Fmx.Bind.Grid, Data.Bind.Grid, Model.Order;
+  Data.Bind.EngExt, Fmx.Bind.DBEngExt, Fmx.Bind.Navigator, FMX.ScrollBox, FMX.Grid, FMX.Edit, FMX.Layouts, Fmx.Bind.Grid, Data.Bind.Grid, Model.Order,
+  FMX.ListBox;
 
 type
 
@@ -46,6 +47,11 @@ type
     acShowCustomerSelector: TioViewAction;
     acShowPizzaSelector: TioViewAction;
     acDeleteRow: TioViewAction;
+    EditCustomerID: TEdit;
+    CBCustomer: TComboBox;
+    BSCustomers: TioModelBindSource;
+    LinkControlToField7: TLinkControlToField;
+    LinkFillControlToField1: TLinkFillControlToField;
   private
   public
   end;
