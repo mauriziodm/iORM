@@ -48,8 +48,6 @@ inherited VMOrder: TVMOrder
   object BSCustomers: TioModelPresenterMaster
     AsDefault = False
     TypeName = 'ICustomer'
-    AsyncLoad = True
-    AsyncPersist = True
     Paging.CurrentPageOfFormat = '%d/%d'
     OnReceiveSelectionInterface = MPMasterSelectionInterface
     OnReceiveSelectionCloneObject = False

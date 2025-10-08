@@ -639,12 +639,12 @@ end;
 
 procedure TioBSABaseDataSet.Append(AObject: IInterface);
 begin
-  TioCommonBSBehavior.InsertOrAppendIntf(Self as IioBindSource, AObject, iaAppend, False);
+  TioCommonBSBehavior.InsertOrAppendIntf(Self.AsBindSource, AObject, iaAppend, False);
 end;
 
 procedure TioBSABaseDataSet.Append(AObject: TObject);
 begin
-  TioCommonBSBehavior.InsertOrAppendObj(Self as IioBindSource, AObject, iaAppend, True);
+  TioCommonBSBehavior.InsertOrAppendObj(Self.AsBindSource, AObject, iaAppend, True);
 end;
 
 function TioBSABaseDataSet.CheckAdapter: Boolean;
@@ -692,7 +692,7 @@ procedure TioBSABaseDataSet.DoBeforeInsert;
 begin
   // Requires an authorization-decision for UI purposes
   // NB: Codice inserito qui per intercettare l'insert richiesto da tastiera, quello che non riceve l'istanza da aggiungere già creata
-  TioApplication.AuthorizeByRequestParams(GetActiveBindSourceAdapter.BindSource.TypeName, atInsert, itRegular, (Self as IioBindSource)._InternalGetAuthorizationContext, False, False);
+  TioApplication.AuthorizeByRequestParams(GetActiveBindSourceAdapter.BindSource.TypeName, atInsert, itRegular, Self.AsBindSource._InternalGetAuthorizationContext, False, False);
   // Execute the normal inherited operations if authorized
   inherited;
 end;
@@ -709,12 +709,12 @@ end;
 
 procedure TioBSABaseDataSet.Insert(AObject: IInterface);
 begin
-  TioCommonBSBehavior.InsertOrAppendIntf(Self as IioBindSource, AObject, iaInsert, False);
+  TioCommonBSBehavior.InsertOrAppendIntf(Self.AsBindSource, AObject, iaInsert, False);
 end;
 
 procedure TioBSABaseDataSet.Insert(AObject: TObject);
 begin
-  TioCommonBSBehavior.InsertOrAppendObj(Self as IioBindSource, AObject, iaInsert, True);
+  TioCommonBSBehavior.InsertOrAppendObj(Self.AsBindSource, AObject, iaInsert, True);
 end;
 
 procedure TioBSABaseDataSet.InternalCancel;

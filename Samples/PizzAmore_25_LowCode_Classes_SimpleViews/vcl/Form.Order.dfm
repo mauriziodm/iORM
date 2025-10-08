@@ -156,7 +156,7 @@ object OrderForm: TOrderForm
     object LabelTitle: TLabel
       Left = 0
       Top = 7
-      Width = 684
+      Width = 676
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -201,7 +201,7 @@ object OrderForm: TOrderForm
       ExplicitLeft = 712
     end
     object ButtonETM: TSpeedButton
-      Left = 72
+      Left = 64
       Top = 0
       Width = 85
       Height = 40
@@ -611,6 +611,15 @@ object OrderForm: TOrderForm
     ParentFont = False
     Sorted = True
     TabOrder = 11
+  end
+  object DBEdit1: TDBEdit
+    Left = 155
+    Top = 8
+    Width = 121
+    Height = 23
+    DataField = 'Name'
+    DataSource = SourceCustomers
+    TabOrder = 12
   end
   object DSPizzas: TioDataSetMaster
     AsDefault = False

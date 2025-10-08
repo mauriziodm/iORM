@@ -31,7 +31,7 @@
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\PizzAmore_30_LowCode_Interfaces_MVVM\mvvm_vcl\PizzAmore_30_LowCode_Interfaces_mvvm_Vcl.dproj">
-            <Dependencies/>
+            <Dependencies>..\Delphi_Enterprise_Architect\iORM_RT.dproj;..\Delphi_Enterprise_Architect\iORM_DT.dproj</Dependencies>
         </Projects>
         <Projects Include="..\..\Samples\PizzAmore_30_LowCode_Interfaces_MVVM\mvvm_fmx\PizzAmore_30_LowCode_Interfaces_mvvm_Fmx.dproj">
             <Dependencies/>
@@ -128,13 +128,13 @@
     <Target Name="PizzAmore_25_LowCode_Classes_WebBroker_Server:Make">
         <MSBuild Projects="..\..\Samples\PizzAmore_25_LowCode_Classes_SimpleViews\server_webbroker\PizzAmore_25_LowCode_Classes_WebBroker_Server.dproj" Targets="Make"/>
     </Target>
-    <Target Name="PizzAmore_30_LowCode_Interfaces_mvvm_Vcl">
+    <Target Name="PizzAmore_30_LowCode_Interfaces_mvvm_Vcl" DependsOnTargets="iORM_RT;iORM_DT">
         <MSBuild Projects="..\..\Samples\PizzAmore_30_LowCode_Interfaces_MVVM\mvvm_vcl\PizzAmore_30_LowCode_Interfaces_mvvm_Vcl.dproj"/>
     </Target>
-    <Target Name="PizzAmore_30_LowCode_Interfaces_mvvm_Vcl:Clean">
+    <Target Name="PizzAmore_30_LowCode_Interfaces_mvvm_Vcl:Clean" DependsOnTargets="iORM_RT:Clean;iORM_DT:Clean">
         <MSBuild Projects="..\..\Samples\PizzAmore_30_LowCode_Interfaces_MVVM\mvvm_vcl\PizzAmore_30_LowCode_Interfaces_mvvm_Vcl.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="PizzAmore_30_LowCode_Interfaces_mvvm_Vcl:Make">
+    <Target Name="PizzAmore_30_LowCode_Interfaces_mvvm_Vcl:Make" DependsOnTargets="iORM_RT:Make;iORM_DT:Make">
         <MSBuild Projects="..\..\Samples\PizzAmore_30_LowCode_Interfaces_MVVM\mvvm_vcl\PizzAmore_30_LowCode_Interfaces_mvvm_Vcl.dproj" Targets="Make"/>
     </Target>
     <Target Name="PizzAmore_30_LowCode_Interfaces_mvvm_Fmx">

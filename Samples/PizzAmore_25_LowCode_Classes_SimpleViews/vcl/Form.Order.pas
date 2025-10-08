@@ -85,6 +85,7 @@ type
     DSCustomersName: TStringField;
     ClientDataSet1: TClientDataSet;
     DSOrderCustomer: TIntegerField;
+    DBEdit1: TDBEdit;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure DBCtrlGridPizzasDblClick(Sender: TObject);

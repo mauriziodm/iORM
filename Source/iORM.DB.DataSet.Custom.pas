@@ -53,6 +53,10 @@ type
     FLoadType: TioLoadType;
     FLazy: Boolean;
     FLazyProps: String;
+    // TODO: NB-Mettendo ASyncLoad a True funziona ma se uso in DataSet come lookup per un TDBLookupComboBox questo non visualizzerà alcun valore, se invece AsyncLoad = False va tutto bene.
+    //   continuo il TODO sopra: probabilmente anche gli eventi AfterOpen vengono chiamati subito mentre ancora il caricamento iniziale degli oggetti
+    //   (AutoLoad) non è ancora terminato e per questo probabilmente avviente anche il problema del todo. Bisongerebbe trovare il modo
+    //   per far si che l'attivazione del DataSet (e quindi anche del DataSource) avvenga dopo che effettivamente si sono caricati gli oggetti e non prima.
     FAsyncLoad: Boolean;
     FAsyncPersist: Boolean;
     FTypeOfCollection: TioTypeOfCollection; // Renderlo automatico??? (rilevamento se è una lista con DuckTyping)
@@ -95,7 +99,7 @@ type
 
     procedure _CreateAdapter(const ADataObject: TObject; const AOwnsDataObject: Boolean);
     function IsActive: Boolean;
-    procedure OpenCLoseDetails(const AActive: Boolean);
+    procedure OpenCloseDetails(const AActive: Boolean);
     function FirstMasterPersistenceBindSource: IioBindSource;
     // universal methods (used by std actions)
     procedure _Action_Append(const ARaiseIfSaved: Boolean = False; const ARaiseIfChangesExists: Boolean = False);
@@ -780,7 +784,7 @@ begin
   TioCommonBSBehavior.Notify(Sender, Self, ANotification);
 end;
 
-procedure TioDataSetCustom.OpenCLoseDetails(const AActive: Boolean);
+procedure TioDataSetCustom.OpenCloseDetails(const AActive: Boolean);
 var
   LBindSource: IioBindSource;
 begin
