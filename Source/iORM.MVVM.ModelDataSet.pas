@@ -49,10 +49,9 @@ type
     FCrossView_MasterBindSource: IioCrossViewMasterSource;
     FCrossView_MasterPropertyName: String;
   protected
-    function AsIoBindSource: IioBindSource; override;
     procedure Loaded; override;
-    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     function GetModelPresenterInstance: TioModelPresenterCustom;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     // These methods handle the "Persistence" property which is actually located on the ModelPresenter
     procedure DoBeforeOpen; override;
     procedure DoBeforeScroll; override;
@@ -67,6 +66,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    function AsBindSource: IioBindSource; override;
     procedure DeleteListViewItem(const AItemIndex: Integer; const ADelayMilliseconds: Integer = 100);
   published
     property ViewModelBridge: TioViewModelBridge read GetViewModelBridge write SetViewModelBridge;
@@ -83,7 +83,7 @@ uses
 
 { TioModelDataSet }
 
-function TioModelDataSet.AsIoBindSource: IioBindSource;
+function TioModelDataSet.AsBindSource: IioBindSource;
 begin
   Result := FViewModelBridge.Presenter[FModelPresenter];
 end;

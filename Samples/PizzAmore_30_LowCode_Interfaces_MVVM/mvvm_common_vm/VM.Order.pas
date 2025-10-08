@@ -15,7 +15,9 @@ type
     acShowCustomerSelector: TioVMActionBSShowOrSelect;
     acShowPizzaSelector: TioVMActionBSShowOrSelect;
     acDeleteRow: TioVMActionBSDelete;
+    BSCustomers: TioModelPresenterMaster;
     procedure MPMasterSelectionInterface(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
+    procedure ioViewModelViewPairing(const Sender: TioViewModel);
   private
   public
   end;
@@ -29,11 +31,20 @@ uses
 
 {$R *.dfm}
 
+procedure TVMOrder.ioViewModelViewPairing(const Sender: TioViewModel);
+begin
+  inherited;
+  BSCustomers.Open;
+end;
+
 procedure TVMOrder.MPMasterSelectionInterface(const ASender: TObject; var ASelected: IInterface; var ASelectionType: TioSelectionType; var ADone: Boolean);
 begin
-  BSMaster.CurrentAs<IOrder>.AddPizza(ASelected as IPizza);
-  BSMaster.Refresh;
-  ADone := True;
+  if Supports(ASelected, IPizza) then
+  begin
+    BSMaster.CurrentAs<IOrder>.AddPizza(ASelected as IPizza);
+    BSMaster.Refresh;
+    ADone := True;
+  end;
 end;
 
 end.

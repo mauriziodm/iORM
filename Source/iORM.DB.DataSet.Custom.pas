@@ -186,7 +186,6 @@ type
     procedure SetOnInsertConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
     procedure SetOnUpdateConflictException(const APersistenceConflictEventHandler: TioBSOnPersistenceConflictExceptionEvent);
   protected
-    function AsIoBindSource: IioBindSource; override;
     procedure Loaded; override;
     function GetName: String;
     procedure DoAfterInsert; override;
@@ -260,28 +259,29 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    function HasMasterBS: Boolean;
-    function IsMasterBS: Boolean; virtual; abstract;
-    function IsDetailBS: Boolean; virtual; abstract;
-    function IsFromBSLoadType: Boolean;
+    function AsBindSource: IioBindSource; override;
+    function CanDoSelection: Boolean;
+    procedure CancelIfEditing;
+    function CheckActiveAdapter: Boolean;
     function CheckAdapter: Boolean; overload;
     function CheckAdapter(const ACreateIfNotAssigned: Boolean): Boolean; overload;
-    function CheckActiveAdapter: Boolean;
-    procedure RegisterDetailBindSource(const ADetailBindSource: IioBindSource);
-    procedure UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
-    procedure ForceDetailAdaptersCreation;
-    procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
-    procedure PostIfEditing;
-    procedure PersistCurrent;
-    procedure PersistAll;
-    procedure CancelIfEditing;
-    procedure Refresh(const ANotify: Boolean = True); overload;
     function Current: TObject;
     function CurrentAs<T>: T;
     function CurrentMasterObject: TObject;
     function CurrentMasterObjectAs<T>: T;
-    function CanDoSelection: Boolean;
+    procedure ForceDetailAdaptersCreation;
+    function HasMasterBS: Boolean;
+    function IsDetailBS: Boolean; virtual; abstract;
+    function IsFromBSLoadType: Boolean;
+    function IsMasterBS: Boolean; virtual; abstract;
+    procedure Notify(const Sender: TObject; const [Ref] ANotification: TioBSNotification);
+    procedure PostIfEditing;
+    procedure PersistCurrent;
+    procedure PersistAll;
+    procedure Refresh(const ANotify: Boolean = True); overload;
+    procedure RegisterDetailBindSource(const ADetailBindSource: IioBindSource);
     procedure SelectCurrent(ASelectionType: TioSelectionType = TioSelectionType.stAppend);
+    procedure UnregisterDetailBindSource(const ADetailBindSource: IioBindSource);
     // Show current record/instance of a ModelPresenter (even passing ViewContextProvider or an already created ViewContext)
     procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVVMAlias: String = ''); overload;
     procedure ShowCurrent(const AParentCloseQueryAction: IioBSCloseQueryAction; const AVCProvider: TioViewContextProvider;
@@ -309,7 +309,7 @@ uses
 
 { TioDataSet }
 
-function TioDataSetCustom.AsIoBindSource: IioBindSource;
+function TioDataSetCustom.AsBindSource: IioBindSource;
 begin
   Result := Self;
 end;

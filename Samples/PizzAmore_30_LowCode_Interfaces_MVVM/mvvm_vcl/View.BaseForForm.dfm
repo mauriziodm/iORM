@@ -15,8 +15,6 @@ object ViewBaseForForm: TViewBaseForForm
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitLeft = 3
-    ExplicitTop = 3
     object PanelTop: TPanel
       Left = 0
       Top = 0

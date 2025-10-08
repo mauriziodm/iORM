@@ -1,4 +1,5 @@
 inherited VMOrder: TVMOrder
+  OnViewPairing = ioViewModelViewPairing
   inherited BSMaster: TioModelPresenterMaster
     TypeName = 'IOrder'
     AsyncLoad = True
@@ -43,5 +44,17 @@ inherited VMOrder: TVMOrder
     TargetBindSource = BSRows
     Left = 328
     Top = 48
+  end
+  object BSCustomers: TioModelPresenterMaster
+    AsDefault = False
+    TypeName = 'ICustomer'
+    AsyncLoad = True
+    AsyncPersist = True
+    Paging.CurrentPageOfFormat = '%d/%d'
+    OnReceiveSelectionInterface = MPMasterSelectionInterface
+    OnReceiveSelectionCloneObject = False
+    OnReceiveSelectionFreeObject = False
+    Left = 56
+    Top = 328
   end
 end

@@ -236,8 +236,8 @@ inherited ViewOrder: TViewOrder
       Height = 25
       BorderStyle = bsNone
       Color = clInactiveBorder
-      DataField = 'ID'
-      DataSource = SourceCustomer
+      DataField = 'Customer'
+      DataSource = SourceMaster
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -16
@@ -396,6 +396,19 @@ inherited ViewOrder: TViewOrder
       Sorted = True
       TabOrder = 10
     end
+    object DBLookupComboBox1: TDBLookupComboBox
+      Left = 173
+      Top = 113
+      Width = 249
+      Height = 23
+      DataField = 'Customer'
+      DataSource = SourceMaster
+      KeyField = 'ID'
+      ListField = 'ID; Name'
+      ListFieldIndex = 1
+      ListSource = SourceCustomers
+      TabOrder = 11
+    end
   end
   object PanelPizzas: TPanel [1]
     Left = 449
@@ -441,6 +454,9 @@ inherited ViewOrder: TViewOrder
     object BSMasterOrderState: TStringField
       FieldName = 'OrderState'
       Size = 100
+    end
+    object BSMasterCustomer: TIntegerField
+      FieldName = 'Customer'
     end
   end
   inherited SourceMaster: TDataSource
@@ -502,5 +518,23 @@ inherited ViewOrder: TViewOrder
     OnRequest = VCProviderOrderRequest
     Left = 293
     Top = 162
+  end
+  object BSCustomers: TioModelDataSet
+    ViewModelBridge = VMBridge
+    ModelPresenter = 'BSCustomers'
+    Left = 203
+    Top = 498
+    object BSCustomersID: TIntegerField
+      FieldName = 'ID'
+    end
+    object BSCustomersName: TStringField
+      FieldName = 'Name'
+      Size = 100
+    end
+  end
+  object SourceCustomers: TDataSource
+    DataSet = BSCustomers
+    Left = 294
+    Top = 498
   end
 end

@@ -52,6 +52,12 @@ type
     BSMasterOrderState: TStringField;
     Label7: TLabel;
     DBComboBoxOrderState: TDBComboBox;
+    BSMasterCustomer: TIntegerField;
+    BSCustomers: TioModelDataSet;
+    SourceCustomers: TDataSource;
+    BSCustomersID: TIntegerField;
+    BSCustomersName: TStringField;
+    DBLookupComboBox1: TDBLookupComboBox;
     procedure VCProviderOrderRequest(const Sender: TObject; out ResultViewContext: TComponent);
     procedure VCProviderOrderAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
     procedure FrameResize(Sender: TObject);

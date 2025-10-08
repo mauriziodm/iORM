@@ -86,9 +86,9 @@ type
     class procedure InsertOrAppendObj(const ABindSource: IioBindSource; AObj: TObject; const InsertOrAppend: TioCommonBSBehaviorInsertOrAppend; const AFreeObjIfNotAuthorized: Boolean);
     class procedure InsertOrAppendIntf(const ABindSource: IioBindSource; AIntf: Iinterface; const InsertOrAppend: TioCommonBSBehaviorInsertOrAppend; const AFreeObjIfNotAuthorized: Boolean);
     // Common code  for S.O.Lo (Smart Object LOokup system)
-    class function DetailObjLookup_DetailObjID(const AMasterObj: TObject; const ARttiProperty: TRttiProperty): TValue;
-    class function DetailObjLookup_ByTypeName(const ABindSource: IioBindSource; const ARttiProperty: TRttiProperty; const [ref] AValue: TValue): TValue;
-    class function DetailObjLookup_SetDetailObject(const ABindSource: IioBindSource; ADetailObj: TObject; const APropertyName, ADetailTypeName: String): TValue;
+    class function DetailObjLookup_DetailObjID(const AMasterObj: TObject; const AMasterRttiProperty: TRttiProperty): TValue;
+    class function DetailObjLookup_ByTypeName(const ABindSource: IioBindSource; const AMasterRttiProperty: TRttiProperty; const [ref] AValue: TValue): TValue;
+    class function DetailObjLookup_SetDetailObject(const ABindSource: IioBindSource; const AMasterRttiProperty: TRttiProperty; ADetailObj: TObject): TValue;
   end;
 
 implementation
@@ -119,7 +119,7 @@ class procedure TioCommonBSBehavior.CheckForSetLoadType(const ABindSource, ASour
 begin
   // Mauri 23/06/2024: se sto impostando il LoadType a ltManual non controllo e non sollevo l'eccezione (anche se la proprietà "SourceBS" è assegnata)
   //  questo perchè non dovrebbe essere influente e inoltre mi risolve alcuni problemini
-  if Assigned(ASourceBS) and not CheckIfLoadTypeIsFromBS(ALoadType) and (ALoadType <> ltManual) then
+  if Assigned(ASourceBS) and (ALoadType <> ltManual) and not CheckIfLoadTypeIsFromBS(ALoadType) then
     raise EioGenericException.Create(ClassName, 'CheckForSetLoadType',
       Format('In order to set the "LoadType" property to a value other than "ltFromBSAsIs" or "ltFromBSReload" or "ltFromBSReloadNewInstance", you must first set the "SourceXXX" property to blank (nil).'
       + #13#13'Please set the "SourceXXX" property of the bind source "%s" (maybe a DataSet or BindSource) to blank and then try again.',
@@ -538,42 +538,50 @@ begin
   Result := BuildWhere(ASourceBS, ATargetBS, AExecuteOnTarget, ABeforeWhereClearEvent, AOnWhereClearEvent, AAfterWhereClearEvent);
 end;
 
-class function TioCommonBSBehavior.DetailObjLookup_ByTypeName(const ABindSource: IioBindSource; const ARttiProperty: TRttiProperty;
-  const [ref] AValue: TValue): TValue;
+class function TioCommonBSBehavior.DetailObjLookup_ByTypeName(const ABindSource: IioBindSource; const AMasterRttiProperty: TRttiProperty; const [ref] AValue: TValue): TValue;
 var
   LDetailObj: TObject;
   LLookupTypeName: String;
   LMasterPropertyName: String;
 begin
   // Extract the lookup type name & the master property name
-  LLookupTypeName := ARttiProperty.PropertyType.Name;
-  LMasterPropertyName := ARttiProperty.Name;
+  LLookupTypeName := AMasterRttiProperty.PropertyType.Name;
+  LMasterPropertyName := AMasterRttiProperty.Name;
   // Load the new detail object
   LDetailObj := io.Load(LLookupTypeName).ByID(AValue.AsInteger).ToObject;
   // Set the new detail object
-  Result := DetailObjLookup_SetDetailObject(ABindSource, LDetailObj, LMasterPropertyName, LLookupTypeName);
+  Result := DetailObjLookup_SetDetailObject(ABindSource, AMasterRttiProperty, LDetailObj);
 end;
 
-class function TioCommonBSBehavior.DetailObjLookup_DetailObjID(const AMasterObj: TObject; const ARttiProperty: TRttiProperty): TValue;
+class function TioCommonBSBehavior.DetailObjLookup_DetailObjID(const AMasterObj: TObject; const AMasterRttiProperty: TRttiProperty): TValue;
 var
   LChildObj: TObject;
 begin
-  LChildObj := ARttiProperty.GetValue(AMasterObj).AsObject;
+  // If the property is an interface type property (IsManaged)
+  //  NB: Qua si arriva solo se la proprietà è di tipo classe o interfaccia
+  if AMasterRttiProperty.PropertyType.IsManaged then
+    LChildObj := AMasterRttiProperty.GetValue(AMasterObj).AsInterface as TObject
+  else
+    LChildObj := AMasterRttiProperty.GetValue(AMasterObj).AsObject;
+  // If the child object is assigned then return the object ID value
   if Assigned(LChildObj) then
     Result := TioUtilities.ObjToID(LChildObj);
 end;
 
-class function TioCommonBSBehavior.DetailObjLookup_SetDetailObject(const ABindSource: IioBindSource; ADetailObj: TObject; const APropertyName, ADetailTypeName: String): TValue;
+class function TioCommonBSBehavior.DetailObjLookup_SetDetailObject(const ABindSource: IioBindSource; const AMasterRttiProperty: TRttiProperty; ADetailObj: TObject): TValue;
 var
   LAuthDecisionRequest: IioAuthDecisionRequest;
   LDetailIntf: IInterface;
   LDone: Boolean;
+  LIsMasterPropertyAnInterface: Boolean;
   LPreviousDetailObject: TObject;
   LSelectionType: TioSelectionType;
 begin
   // Check the detail object
   if not Assigned(ADetailObj) then
     raise EioGenericException.Create(ClassName, 'DetailObjLookup_SetDetailObject', '"ADetailObj" parameter not assigned (nil)');
+  // Extraxt if the master property is of an interface type or not
+  LIsMasterPropertyAnInterface := AMasterRttiProperty.PropertyType.IsManaged;
   // Parte che si occupa della richiesta dell'autorizzazione ad eseguire la selezione oppure no.
   //  Prima crea l'oggetto AuthorizationRequest, lo imposta con il TypeName dell'oggetto ricevuto come selezione
   //  e lo passa all'evento "BeforeReceiveSelection" dove, tra le altre cose, è possibile cambiare i valori delle
@@ -585,7 +593,8 @@ begin
   //       come si vuole
   LAuthDecisionRequest := TioAuthFactory.NewAuthDecisionRequest(ADetailObj.ClassName, atMakeSelection, itRegular, ABindSource._InternalGetAuthorizationContext, False);
   LSelectionType := TioSelectionType.stAppend;
-  if TioUtilities.IsAnInterfaceTypeName(ADetailTypeName) then
+  // If the master property o an interface type
+  if LIsMasterPropertyAnInterface then
   begin
     LDetailIntf := TioUtilities.CastObjectToGeneric<IInterface>(ADetailObj);
     ABindSource.DoBeforeReceiveSelection(LDetailIntf, LSelectionType, LAuthDecisionRequest);
@@ -596,7 +605,8 @@ begin
   TioApplication.AuthorizeByRequestObj(LAuthDecisionRequest);
   // ReceiveSelection event handler
   LDone := False;
-  if TioUtilities.IsAnInterfaceTypeName(ADetailTypeName) then
+  // ReceiveSelection event handler
+  if LIsMasterPropertyAnInterface then
     ABindSource.DoReceiveSelection(LDetailIntf, LSelectionType, LDone)
   else
     ABindSource.DoReceiveSelection(ADetailObj, LSelectionType, LDone);
@@ -604,19 +614,24 @@ begin
   if not LDone then
   begin
     if Assigned(ADetailObj) then
-      TValue.Make(@ADetailObj, ADetailObj.ClassInfo, Result)
+    begin
+      if LIsMasterPropertyAnInterface then
+        TValue.Make(@LDetailIntf, AMasterRttiProperty.PropertyType.Handle, Result)
+      else
+        TValue.Make(@ADetailObj, ADetailObj.ClassInfo, Result);
+    end
     else
       Result := TValue.Empty;
   end;
   // AfterReceiveSelection event handler
-  if TioUtilities.IsAnInterfaceTypeName(ADetailTypeName) then
+  if LIsMasterPropertyAnInterface then
     ABindSource.DoAfterReceiveSelection(LDetailIntf, LSelectionType)
   else
     ABindSource.DoAfterReceiveSelection(ADetailObj, LSelectionType);
-  // If the OnReceiveSelectionFreeObject of the BindSource is True then get the previous detail object and free it
-  if ABindSource.OnReceiveSelectionFreeObject and not TioUtilities.IsAnInterfaceTypeName(ADetailTypeName) then
+  // If the OnReceiveSelectionFreeObject of the BindSource is True then get the previous detail object and free it (if not an interface type property)
+  if ABindSource.OnReceiveSelectionFreeObject and not LIsMasterPropertyAnInterface then
   begin
-    LPreviousDetailObject := TioUtilities.ResolveChildPropertyPath_GetFinalObj_ByStringPath(ABindSource.Current, APropertyName);
+    LPreviousDetailObject := TioUtilities.ResolveChildPropertyPath_GetFinalObj_ByStringPath(ABindSource.Current, AMasterRttiProperty.Name);
     if Assigned(LPreviousDetailObject) then
       LPreviousDetailObject.Free;
   end;

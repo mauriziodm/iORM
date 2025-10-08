@@ -157,16 +157,15 @@ type
 
   TioBSABaseDataSet = class(TioBaseDataSet)
   private
-    // Map of the base class
-    FMap: IioMap;
     // the bind source adapter holding the data
     FBindSourceAdapter: IioActiveBindSourceAdapter;
+    // Map of the base class
+    FMap: IioMap;
     // Methods
     function _IsValidRecNo: Boolean;
     function Get_Version: String;
     procedure ValueToBuffer<T>(var AValue: TValue; const AField: TField; var ABuffer: TArray<System.Byte>; const ANativeFormat: Boolean);
   protected
-    function AsIoBindSource: IioBindSource; virtual; abstract;
     function CheckAdapter: Boolean;
     procedure DoBeforeInsert; override;
     procedure SetActiveBindSourceAdapter(const AActiveBindSourceAdpter: IioActiveBindSourceAdapter); virtual;
@@ -177,6 +176,9 @@ type
     function InternalRecordCount: Integer; override;
     procedure InternalLoadCurrentRecord(Buffer: TRecordBuffer); override;
     // Others
+    procedure DoAfterScroll; override;
+    function GetCanModify: Boolean; override;
+    function GetRecordIdx: Integer;
     procedure InternalInitFieldDefs; override;
     procedure InternalPost; override;
     procedure InternalInsert; override;
@@ -184,19 +186,17 @@ type
     procedure InternalEdit; override;
     procedure InternalDelete; override;
     procedure SetFieldData(Field: TField; Buffer: TValueBuffer); override;
-    function GetCanModify: Boolean; override;
-    procedure DoAfterScroll; override;
-    function GetRecordIdx: Integer;
   public
-    function MoveBy(Distance: Integer): Integer; override;
-    function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
-    function GetFieldData(Field: TField; var Buffer: TValueBuffer; NativeFormat: Boolean): Boolean; override;
-    function CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream; override;
     procedure Append(AObject: TObject); reintroduce; overload;
     procedure Append(AObject: IInterface); reintroduce; overload;
+    function AsBindSource: IioBindSource; virtual; abstract;
+    function CreateBlobStream(Field: TField; Mode: TBlobStreamMode): TStream; override;
+    function GetActiveBindSourceAdapter: IioActiveBindSourceAdapter;
+    function GetFieldData(Field: TField; var Buffer: TValueBuffer; NativeFormat: Boolean): Boolean; override;
     procedure Insert(AObject: TObject); reintroduce; overload;
     procedure Insert(AObject: IInterface); reintroduce; overload;
     property Map: IioMap read FMap;
+    function MoveBy(Distance: Integer): Integer; override;
   published
     property _Version: String read Get_Version;
   end;
@@ -249,7 +249,8 @@ uses
   iORM.Context.Container, System.Types, Data.FmtBcd, Data.DBConsts, System.DateUtils,
   iORM.DuckTyped.Interfaces, iORM.DuckTyped.Factory, iORM.Utilities, System.StrUtils,
   iORM.RttiContext.Factory, iORM, iORM.Abstraction,
-  iORM.LiveBindings.CommonBSBehavior, System.Variants, iORM.DB.DataSet.Custom;
+  iORM.LiveBindings.CommonBSBehavior, System.Variants, iORM.DB.DataSet.Custom,
+  iORM.Components.Common.Interfaces;
 
 /// //////////////////////////////////////////////
 /// /// Part I:
@@ -909,7 +910,13 @@ begin
   end;
   // Set Property, Object, Value:
   // Even if the property is of a child object, even multilevel, it resolves the path and set the value
-  TioFullPathPropertyReadWrite.SetValue(Self, FBindSourceAdapter.Current, Field.FieldName, LValue);
+  //  NB: Ho messo questo if perchè altrimenti settava due volte il valore e questo con il sistema S.O.LO (Smart Object LOokup)
+  //       non era il massimo perchè faceva due volte il load dell'oggetto dal DB. In questo modo ho evitato.
+  //  NB: Il problema del doppio passaggio (NB precedente) cmq ho visto che è causato dall'ultima riga (GetActiveBindSourceAdapter.Post)
+  //       che non ho eliminato per evitare altri problemi, bisognerebbe magari verificare se i problemi per i quali
+  //       è stata messo quel post ci sono ancora
+  if FBindSourceAdapter.State in seEditModes then
+    TioFullPathPropertyReadWrite.SetValue(Self, FBindSourceAdapter.Current, Field.FieldName, LValue);
   // Set modified
   SetModified(True);
   // NB: Mauri 03/03/2020 - Aggiungendo queste due righe, oltre ad aver eliminato la condizione
@@ -1481,8 +1488,6 @@ begin
     // In case of normal property of the current object (current record)
   else if _ResolvePath(AObj, LRttiProperty, LFullPathPropName) then
   begin
-
-
     // S.O.LO (Smart-Object-LOokup system): Se la proprietà è di tipo classe e su di essa insiste
     //  una relazione BelongsTo/AsOne allora la mappa come Integer in modo da bindare il suo ID come intero
     if (not AField.FieldName.StartsWith('%')) and TioUtilities.HasBelongsToOrHasOneRelation(AObj.ClassName, LRttiProperty.Name) then
@@ -1490,8 +1495,6 @@ begin
       Result := TioCommonBSBehavior.DetailObjLookup_DetailObjID(AObj, LRttiProperty);
     end
     else
-
-
     // Enumeration type
     if (LRttiProperty.PropertyType.TypeKind = tkEnumeration) and not IsBoolType(LRttiProperty.PropertyType.Handle) then
     begin
@@ -1546,7 +1549,7 @@ begin
 //    Exit;
 //  end;
 // ----- OLD CODE -----
-  LBindSource := ADataSet.AsIoBindSource;
+  LBindSource := ADataSet.AsBindSource;
   // Check if the VirtualFields are enabled
   if not LBindSource.VirtualFields then
     raise EioGenericException.Create(Self.ClassName, '_GetValueForBSProp',
@@ -1579,7 +1582,6 @@ end;
 
 class procedure TioFullPathPropertyReadWrite.SetValue(const ADataSet: TioBSABaseDataSet; AObj: TObject; const AFullPathPropName: String; AValue: TValue);
 var
-  LBindSource: IioBindSource;
   LRttiProperty: TRttiProperty;
 begin
   // NB: If it's a property relative to the BindSource then raise an exception because
@@ -1597,8 +1599,7 @@ begin
   //  una relazione BelongsTo/AsOne allora la mappa come Integer in modo da bindare il suo ID come intero
   if TioUtilities.HasBelongsToOrHasOneRelation(AObj.ClassName, LRttiProperty.Name) then
   begin
-    Supports(ADataSet, IioBindSource, LBindSource);
-    AValue := TioCommonBSBehavior.DetailObjLookup_ByTypeName(LBindSource, LRttiProperty, AValue);
+    AValue := TioCommonBSBehavior.DetailObjLookup_ByTypeName(ADataSet.AsBindSource, LRttiProperty, AValue);
     LRttiProperty.SetValue(AObj, AValue);
     ADataSet.GetActiveBindSourceAdapter.DetailAdaptersContainer.SetMasterObject(AObj);
   end
