@@ -36,8 +36,14 @@ unit iORM.DB.ConnectionDef;
 interface
 
 uses
-  System.Classes, iORM.DB.Interfaces, iORM.CommonTypes, iORM.DBBuilder.Interfaces,
-  iORM.SynchroStrategy.Interfaces;
+  System.Classes,
+
+  iORM.DB.Interfaces,
+  iORM.CommonTypes,
+  iORM.DBBuilder.Interfaces,
+  iORM.SynchroStrategy.Interfaces
+
+  ;
 
 type
 
@@ -257,7 +263,12 @@ implementation
 
 uses
   System.IOUtils, iORM.DB.ConnectionContainer, System.SysUtils,
-  iORM, iORM.DBBuilder.Factory;
+
+  iORM,
+  iORM.DBBuilder.Factory,
+  iORM.DBBuilder.SqlScript.Base
+
+  ;
 
 { TioCustomConnectionDef }
 
@@ -314,16 +325,27 @@ procedure TioCustomConnectionDef.CreateOrAlterDB(const AForce: Boolean = False);
 var
   LAbort: Boolean;
   LDBBuilderEngine: IioDBBuilderEngine;
+  LScript: IioDBBuilderSqlScript;
 begin
   LAbort := False;
+
   LDBBuilderEngine := TioDBBuilderFactory.NewEngine(Name, FAutoCreateDB.Indexes, FAutoCreateDB.ForeignKeys);
+  LDBBuilderEngine.Analyze;
+
+  LScript := TioDBBuilderFactory.NewSqlScript;
+  LDBBuilderEngine.BuildCreateOrAlterDBSqlScipt(LScript);
+
+  // Carlo Marona: sistemare
   if Assigned(FOnBeforeCreateOrAlterDBEvent) then
-    FOnBeforeCreateOrAlterDBEvent(Self, LDBBuilderEngine.Status, LDBBuilderEngine.Script, LDBBuilderEngine.Warnings, LAbort);
+    FOnBeforeCreateOrAlterDBEvent(Self, LDBBuilderEngine.Status, LScript.Sql, LDBBuilderEngine.Warnings, LAbort);
+
   if not LAbort then
   begin
-    LDBBuilderEngine.CreateOrAlterDB(AForce);
+    LDBBuilderEngine.CreateOrAlterDB(AForce, LScript);
+
+    // Carlo Marona: sistemare
     if Assigned(FOnAfterCreateOrAlterDBEvent) then
-      FOnAfterCreateOrAlterDBEvent(Self, LDBBuilderEngine.Status, LDBBuilderEngine.Script, LDBBuilderEngine.Warnings);
+      FOnAfterCreateOrAlterDBEvent(Self, LDBBuilderEngine.Status, LScript.Sql, LDBBuilderEngine.Warnings);
   end;
 end;
 

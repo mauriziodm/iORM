@@ -42,47 +42,134 @@ type
 
   TioDBBuilderStrategyWithAlter = class(TioDBBuilderStrategyBase)
   protected
-    procedure AlterTable(const ATable: IioDBBuilderSchemaTable); override;
-    procedure CreateTable(const ATable: IioDBBuilderSchemaTable); override;
+    procedure AlterTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); override;
+    procedure CreateTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); override;
+    procedure DropForeignKeys(const AScript: IioDBBuilderSqlScript); override;
+    procedure DropIndexes(const AScript: IioDBBuilderSqlScript); override;
+    procedure GenerateDatabaseObjects(const AScript: IioDBBuilderSqlScript; const Create: boolean); override;
   public
-    procedure GenerateScript; override;
   end;
 
 implementation
 
+uses
+  System.SysUtils,
+
+  iORM.DB.ConnectionContainer,
+  iORM.DB.Interfaces,
+  iORM.DBBuilder.QueryEngine
+
+  ;
+
+
 { TioDBBuilderStrategyWithAlter }
 
-procedure TioDBBuilderStrategyWithAlter.AlterTable(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyWithAlter.AlterTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
 begin
   inherited;
-  SqlGenerator.BeginAlterTable(ATable);
-  AddOrAlterFields(ATable);
-  SqlGenerator.EndAlterTable(ATable);
+
+  AScript.Add(SqlGenerator.BuildBeginAlterTableSql(ATable));
+  AScript.IncIndentationLevel;
+  AddOrAlterFields(AScript, ATable);
+  AScript.DecIndentationLevel;
+  AScript.Add(SqlGenerator.BuildEndAlterTableSql(ATable));
 end;
 
-procedure TioDBBuilderStrategyWithAlter.CreateTable(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyWithAlter.GenerateDatabaseObjects(const AScript: IioDBBuilderSqlScript; const Create: boolean);
+var
+  LDropForeignKeys,
+  LDropIndexes: boolean;
 begin
-  inherited;
-  SqlGenerator.BeginCreateTable(ATable);
-  CreateFields(ATable);
-  SqlGenerator.EndCreateTable(ATable);
-  SqlGenerator.ScriptAddEmpty;
-  SqlGenerator.AddPrimaryKey(ATable);
+  if Create then
+  begin
+    CreateTables(AScript);
+    CreateSequences(AScript);
+
+    if Schema.IndexesEnabled then
+      CreateIndexes(AScript);
+
+    if Schema.ForeignKeysEnabled then
+      CreateForeignKeys(Ascript);
+  end
+  else
+  begin
+    DropForeignKeys(AScript);
+    DropIndexes(AScript);
+    CreateOrAlterTables(AScript);
+    CreateSequences(AScript);
+
+    if Schema.IndexesEnabled then
+      CreateIndexes(AScript);
+
+    if Schema.ForeignKeysEnabled then
+      CreateForeignKeys(Ascript);
+  end;
+
+//  LDropForeignKeys := not Create;
+//  LDropIndexes := not Create;
+//
+//  // Carlo Marona: should be avoided if no changes has to be made
+//  if LDropForeignKeys then
+//    DropForeignKeys(AScript);
+//
+//  // Carlo Marona: should be avoided if no changes has to be made
+//  if LDropIndexes then
+//    DropIndexes(AScript);
+//
+//  CreateOrAlterTables(AScript);
+//  CreateSequences(AScript);
+//
+//  if ((Schema.Status > stClean) and Schema.IndexesEnabled) or LDropIndexes then
+//    CreateIndexes(AScript);
+//
+//  if ((Schema.Status > stClean) and Schema.ForeignKeysEnabled) or LDropForeignKeys then
+//    CreateForeignKeys(Ascript);
 end;
 
-procedure TioDBBuilderStrategyWithAlter.GenerateScript;
+procedure TioDBBuilderStrategyWithAlter.CreateTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
 begin
   inherited;
-  SqlGenerator.ScriptBegin;
-  DropForeignKeys;
-  DropIndexes;
-  CreateOrAlterTables;
-  CreateSequences;
-  if Schema.IndexesEnabled then
-    CreateIndexes;
-  if Schema.ForeignKeysEnabled then
-    CreateForeignKeys;
-  SqlGenerator.ScriptEnd;;
+
+  AScript.Add(SqlGenerator.BuildBeginCreateTableSql(ATable));
+  Ascript.IncIndentationLevel;
+  AScript.Add(SqlGenerator.BuildCreateFieldsSql(ATable, AScript.CurrentIndentation), False);
+  AScript.DecIndentationLevel;
+  AScript.Add(SqlGenerator.BuildEndCreateTableSql(ATable));
+  AScript.AddEmpty;
+  AScript.Add(SqlGenerator.BuildAddPrimaryKeySql(ATable));
+end;
+
+procedure TioDBBuilderStrategyWithAlter.DropForeignKeys(const AScript: IioDBBuilderSqlScript);
+var
+  LQuery: IioQuery;
+begin
+  inherited;
+
+  LQuery := TioDBBuilderQueryEngine.NewQuery(ConnectionDefName);
+  LQuery.SQL.Text := SqlGenerator.BuildListAllForeignKeysSql;
+  LQuery.Open;
+
+  while not LQuery.Eof do
+  begin
+    AScript.Add(SqlGenerator.BuildDropForeignKeySql(LQuery.Fields.FieldByName('table_name').AsString,
+      LQuery.Fields.FieldByName('constraint_name').AsString));
+    LQuery.Next;
+  end;
+end;
+
+procedure TioDBBuilderStrategyWithAlter.DropIndexes(const AScript: IioDBBuilderSqlScript);
+var
+  LQuery: IioQuery;
+begin
+  inherited;
+
+  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildListAllIndexesSql);
+
+  while not LQuery.Eof do
+  begin
+    AScript.Add(SqlGenerator.BuildDropIndexSql(LQuery.Fields[0].AsString));
+    LQuery.Next;
+  end;
 end;
 
 end.

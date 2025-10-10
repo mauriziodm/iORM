@@ -42,10 +42,8 @@ type
 
   TioDBBuilderSchema = class(TInterfacedObject, IioDBBuilderSchema)
   private
-    FConnectionDefName: String;
     FIndexesEnabled, FForeignKeysEnabled: Boolean;
     FSequences: TioDBBuilderSchemaSequences;
-    FScript: TStrings;
     FStatus: TioDBBuilderStatus;
     FTables: TioDBBuilderSchemaTables;
     FWarnings: TStrings;
@@ -53,18 +51,14 @@ type
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const AValue: TioDBBuilderStatus);
   public
-    constructor Create(const AConnectionDefName: String; const AIndexesEnabled, AForeignKeysEnabled: Boolean);
+    constructor Create({const AConnectionDefName: String; }const AIndexesEnabled, AForeignKeysEnabled: Boolean);
     destructor Destroy; override;
-    function ConnectionDefName: String;
-    function DatabaseFileName: String;
     function FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
     function FindTable(const ATableName: String): IioDBBuilderSchemaTable;
     function ForeignKeysEnabled: Boolean;
     function IndexesEnabled: Boolean;
     procedure SequenceAddIfNotExists(const ASequenceName: String);
     function Sequences: TioDBBuilderSchemaSequences;
-    function Script: TStrings;
-    function ScriptIsEmpty: Boolean;
     function Warnings: TStrings;
     function WarningExists: Boolean;
     function Tables: TioDBBuilderSchemaTables;
@@ -79,26 +73,14 @@ uses
 
 { TioDBBuilderSchema }
 
-function TioDBBuilderSchema.ConnectionDefName: String;
+constructor TioDBBuilderSchema.Create(const AIndexesEnabled, AForeignKeysEnabled: Boolean);
 begin
-  Result := FConnectionDefName;
-end;
-
-constructor TioDBBuilderSchema.Create(const AConnectionDefName: String; const AIndexesEnabled, AForeignKeysEnabled: Boolean);
-begin
-  FScript := TStringList.Create;
   FSequences := TioDBBuilderSchemaSequences.Create;
   FIndexesEnabled := AIndexesEnabled;
   FForeignKeysEnabled := AForeignKeysEnabled;
   FStatus := stClean;
-  FConnectionDefName := TioDBFActory.ConnectionManager.GetCurrentConnectionNameIfEmpty(AConnectionDefName);
   FWarnings := TStringList.Create;
   FTables := TioDBBuilderSchemaTables.Create;
-end;
-
-function TioDBBuilderSchema.DatabaseFileName: String;
-begin
-  Result := TioConnectionManager.GetDatabaseFileName(FConnectionDefName);
 end;
 
 destructor TioDBBuilderSchema.Destroy;
@@ -106,7 +88,6 @@ begin
   FWarnings.Free;
   FTables.Free;
   FSequences.Free;
-  FScript.Free;
   inherited;
 end;
 
@@ -163,16 +144,6 @@ procedure TioDBBuilderSchema.SetStatus(const AValue: TioDBBuilderStatus);
 begin
   if AValue > FStatus then
     FStatus := AValue;
-end;
-
-function TioDBBuilderSchema.Script: TStrings;
-begin
-  Result := FScript;
-end;
-
-function TioDBBuilderSchema.ScriptIsEmpty: Boolean;
-begin
-  Result := FScript.Count = 0;
 end;
 
 function TioDBBuilderSchema.Tables: TioDBBuilderSchemaTables;

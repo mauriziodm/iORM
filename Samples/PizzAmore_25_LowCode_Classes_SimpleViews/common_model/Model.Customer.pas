@@ -19,6 +19,7 @@ type
     FAddress: String;
     FPhoneNumber: String;
     FObjVersion: TioObjVersion; // The ObjVersion is mandatory if you want to use the ETM
+//    FTest: string;
     function GetFullAddress: String;
   public
     constructor CreateWithData(const AName, ACity, AAddress, APhoneNumber: String);
@@ -27,6 +28,7 @@ type
     property City: String read FCity write FCity;
     property Address: String read FAddress write FAddress;
     property PhoneNumber: String read FPhoneNumber write FPhoneNumber;
+//    property Test: string read FTest write FTest;
     [ioWhereSkip]
     property FullAddress: String read GetFullAddress;  // ReadOnly - Not mapped
   end;

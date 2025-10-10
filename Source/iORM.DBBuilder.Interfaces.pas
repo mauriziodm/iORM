@@ -37,13 +37,13 @@ interface
 
 uses
   System.Generics.Collections, iORM.Context.Table.Interfaces, iORM.Context.Properties.Interfaces, System.Classes,
-  iORM.Context.Map.Interfaces, iORM.Attributes, System.Rtti, iORM.CommonTypes;
+  iORM.Context.Map.Interfaces, iORM.Attributes, System.Rtti, iORM.CommonTypes, iORM.DB.Interfaces;
 
 type
 
   TioDBBuilderEngineResult = (dbUptodate, dbNotExists, dbUpdatesNeeded, dbWarningExists);
   TioDBBuilderStatus = (stClean, stAlter, stCreate);
-  TioDBBuilderFieldAlterStatus = (alFieldType, alFieldDefault, alFieldNotNull);
+  TioDBBuilderFieldAlterStatus = (alFieldType, alFieldDefault, alFieldNotNull, alFieldPrecision, alFieldLength);
   TioDBBuilderFieldAlter = set of TioDBBuilderFieldAlterStatus;
 
   IioDBBuilderSchemaFK = interface
@@ -112,16 +112,12 @@ type
 
   IioDBBuilderSchema = interface
     ['{1AEDB134-1ECB-490E-A53A-973BEDE509E5}']
-    function ConnectionDefName: String;
-    function DatabaseFileName: String;
     function FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
     function FindTable(const ATableName: String): IioDBBuilderSchemaTable;
     function ForeignKeysEnabled: boolean;
     function IndexesEnabled: boolean;
     procedure SequenceAddIfNotExists(const ASequenceName: String);
     function Sequences: TioDBBuilderSchemaSequences;
-    function Script: TStrings;
-    function ScriptIsEmpty: boolean;
     function Warnings: TStrings;
     function WarningExists: boolean;
     function Tables: TioDBBuilderSchemaTables;
@@ -131,45 +127,80 @@ type
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
+  IioDBBuilderSqlScript = interface
+    ['{714A36B3-A44C-4D1D-A046-BC6222DCE2B7}']
+
+    function GetCurrentIndentation: TioIndentation;
+    function GetSQL: TStringList;
+
+    procedure Add(const AText: String; const UseIndent: boolean = True);
+    procedure AddComment(const AText: String);
+    procedure AddEmpty;
+    procedure AddSeparator;
+    procedure AddTitle(const AText: String);
+    procedure AddWarning(const AText: String);
+    procedure AddWarnings(const WarningsList: TStrings);
+
+    procedure ScriptBegin(const AConnectionDefName, ADriverID: string);
+    procedure ScriptEnd;
+
+    procedure DecIndentationLevel;
+    procedure IncIndentationLevel;
+
+    property CurrentIndentation: TioIndentation read GetCurrentIndentation;
+    property SQL: TStringList read GetSQL;
+  end;
+
   // DBBuilder reference
   TioDBBuilderSchemaBuilderRef = class of TioDBBuilderSchemaBuilderIntf;
 
   TioDBBuilderSchemaBuilderIntf = class abstract
   public
-    class procedure BuildSchema(const ASchema: IioDBBuilderSchema); virtual; abstract;
+    class procedure BuildSchema(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema); virtual; abstract;
   end;
 
   IioDBBuilderSqlGenerator = interface
     ['{9B5DE886-BE08-4422-9D6C-A92ABF948CD9}']
-    // Script repated methods
-    procedure ScriptAddEmpty;
-    procedure ScriptAddTitle(const AText: String);
-    procedure ScriptBegin;
-    procedure ScriptEnd;
-    // Database related methods
-    function DatabaseExists: boolean;
-    procedure CreateDatabase;
+
     // Tables related methods
-    function TableExists(const ATable: IioDBBuilderSchemaTable): boolean;
-    procedure BeginCreateTable(const ATable: IioDBBuilderSchemaTable);
-    procedure EndCreateTable(const ATable: IioDBBuilderSchemaTable);
-    procedure BeginAlterTable(const ATable: IioDBBuilderSchemaTable);
-    procedure EndAlterTable(const ATable: IioDBBuilderSchemaTable);
+    function BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string;
+    function BuildEndCreateTableSql(const ATable: IioDBBuilderSchemaTable): string;
+    function BuildBeginAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
+    function BuildCreateTableSql(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string;
+    function BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
+    function BuildTableExistsSql(const ATableName: string): string;
     // Fields related methods
+    function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string;
+    function BuildCreateFieldsSql(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string;
+    function BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string;
+    function BuildAlterFieldSql(const AField: IioDBBuilderSchemaField): string;
+    function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
+    function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
+    function TranslateFieldType(const AField: IioDBBuilderSchemaField; const ReturnTypeNameOnly: boolean = true): String;
+    // PrimaryKey & other indexes
+    function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string;
+    function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): string;
+    function BuildDropIndexSql(const AIndexName: string): string;
+    function BuildListAllIndexesSql: string;
+    // Foreign keys
+    function BuildAddForeignKeySql(const AForeignKey: IioDBBuilderSchemaFK): string;
+    function BuildListAllForeignKeysSql: string;
+    function BuildDropForeignKeySql(const ATableName, AForeignKeyName: string): string;
+    // Sequences
+    function BuildAddSequenceSql(const ASequenceName: String; const ACreatingNewDatabase: boolean): string;
+    function BuildSequenceExistsSql(const ASequenceName: string): string;
+  end;
+
+  IioDBBuilderStrategy = interface
+    ['{4187C897-A5C6-4807-87D0-C466D3EE34CE}']
+    procedure CreateDatabase;
+    function DatabaseExists: Boolean;
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
-    procedure CreateField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
-    procedure AddField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
-    procedure AlterField(const AField: IioDBBuilderSchemaField; ACommaBefore: Char);
-    // PrimaryKey & other indexes
-    procedure AddPrimaryKey(ATable: IioDBBuilderSchemaTable);
-    procedure AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex);
-    procedure DropAllIndexes;
-    // Foreign keys
-    procedure AddForeignKey(const AForeignKey: IioDBBuilderSchemaFK);
-    procedure DropAllForeignKeys; // Not implented
-    // Sequences
-    procedure AddSequence(const ASequenceName: String; const ACreatingNewDatabase: boolean);
+    function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean;
+    //procedure GenerateCreateOrAlterScript(const AScript: IioDBBuilderSqlScript);
+    procedure GenerateCreateDatabaseScript(const AScript: IioDBBuilderSqlScript);
+    procedure GenerateUpdateDatabaseScript(const AScript: IioDBBuilderSqlScript);
   end;
 
   IioDBBuilderDBAnalyzer = interface
@@ -177,22 +208,26 @@ type
     procedure Analyze;
   end;
 
-  IioDBBuilderStrategy = interface
-    ['{4187C897-A5C6-4807-87D0-C466D3EE34CE}']
-    procedure GenerateScript;
-  end;
-
   IioDBBuilderEngine = interface
     ['{E7BC9176-4C71-48CA-A92F-37DE99E0AC3A}']
+    function GetSchema: IioDBBuilderSchema;
+    function GetWarnings: TStrings;
+
     procedure Analyze;
-    function Schema: IioDBBuilderSchema;
-    function Script: TStrings;
-    function Status: TioDBBuilderEngineResult;
-    function StatusAsString: String;
-    function StatusDescription: String;
-    function Warnings: TStrings;
-    procedure CreateOrAlterDB(const AForce: Boolean = False);
+    procedure CreateOrAlterDB(const AForce: Boolean = False; const AScript: IioDBBuilderSqlScript = nil);
+    procedure BuildCreateOrAlterDBSqlScipt(const AScript: IioDBBuilderSqlScript);
+
+    function GetStatus: TioDBBuilderEngineResult;
+    function GetStatusAsString: String;
+    function GetStatusDescription: String;
+
+    property Schema: IioDBBuilderSchema read GetSchema;
+    property Status: TioDBBuilderEngineResult read GetStatus;
+    property StatusAsString: string read GetStatusAsString;
+    property StatusDescription: string read GetStatusDescription;
+    property Warnings: TStrings read GetWarnings;
   end;
+
 
 implementation
 

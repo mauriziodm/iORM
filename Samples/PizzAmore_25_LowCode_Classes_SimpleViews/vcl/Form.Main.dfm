@@ -12,7 +12,7 @@ object MainForm: TMainForm
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
-  Position = poDesktopCenter
+  Position = poScreenCenter
   DesignSize = (
     288
     541)
@@ -8516,8 +8516,6 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 0
-    ExplicitTop = 328
-    ExplicitWidth = 186
   end
   object ButtonCustomers: TButton
     Left = 42
@@ -8533,8 +8531,6 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 1
-    ExplicitTop = 373
-    ExplicitWidth = 186
   end
   object ButtonPizzas: TButton
     Left = 42
@@ -8550,8 +8546,6 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 2
-    ExplicitTop = 418
-    ExplicitWidth = 186
   end
   object ButtonQuit: TButton
     Left = 42
@@ -8567,8 +8561,6 @@ object MainForm: TMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 3
-    ExplicitTop = 499
-    ExplicitWidth = 186
   end
   object ButtonIngredients: TButton
     Left = 42
@@ -8605,13 +8597,14 @@ object MainForm: TMainForm
     Top = 265
   end
   object SQLiteConn: TioSQLiteConnectionDef
-    AsDefault = True
+    AsDefault = False
     AutoCreateDB.Enabled = True
     Database = 'PizzAmore_25_LowCode_Classes_SimpleViews_Vcl.db'
     DatabaseStdFolder = sfDocuments
     Persistent = False
     Pooled = False
     OnAfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
+    OnBeforeCreateOrAlterDB = SQLiteConnBeforeCreateOrAlterDB
     Left = 84
     Top = 265
   end
@@ -8676,5 +8669,25 @@ object MainForm: TMainForm
     Persistent = True
     Left = 157
     Top = 265
+  end
+  object FirebirdConn: TioFirebirdConnectionDef
+    AsDefault = True
+    AutoCreateDB.Enabled = True
+    CharSet = 'utf8'
+    Database = 'PizzAmore_25_LowCode_Classes_SimpleViews_Vcl.fdb'
+    DatabaseStdFolder = sfDocuments
+    OSAuthent = oaNo
+    Password = 'masterkey'
+    Persistent = False
+    Pooled = False
+    Port = 3052
+    Protocol = pTCPIP
+    Server = 'localhost'
+    SQLDialect = sqlDialect3
+    UserName = 'SYSDBA'
+    OnAfterCreateOrAlterDB = FirebirdConnAfterCreateOrAlterDB
+    OnBeforeCreateOrAlterDB = FirebirdConnBeforeCreateOrAlterDB
+    Left = 88
+    Top = 208
   end
 end

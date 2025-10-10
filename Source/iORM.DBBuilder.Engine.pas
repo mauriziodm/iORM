@@ -36,7 +36,13 @@ unit iORM.DBBuilder.Engine;
 interface
 
 uses
-  System.Classes, iORM.CommonTypes, iORM.DBBuilder.Interfaces;
+  System.Classes,
+
+  iORM.CommonTypes,
+  iORM.DBBuilder.Interfaces,
+  iORM.DBBuilder.SqlScript.Base
+
+  ;
 
 type
 
@@ -45,22 +51,42 @@ type
     FDBAnalyzer: IioDBBuilderDBAnalyzer;
     FSchema: IioDBBuilderSchema;
     FSqlGenerator: IioDBBuilderSqlGenerator;
+    FConnectionDefName: string;
+    procedure CreateDatabase;
+    function GetSchema: IioDBBuilderSchema;
+    function GetStatus: TioDBBuilderEngineResult;
+    function GetStatusAsString: String;
+    function GetStatusDescription: String;
+    function GetWarnings: TStrings;
+
   public
     constructor Create(const AConnectionDefName: String; const AAddIndexes, AAddForeignKeys: Boolean);
+
     procedure Analyze;
-    function Schema: IioDBBuilderSchema;
-    function Script: TStrings;
-    function Status: TioDBBuilderEngineResult;
-    function StatusAsString: String;
-    function StatusDescription: String;
-    function Warnings: TStrings;
-    procedure CreateOrAlterDB(const AForce: Boolean = False);
+    procedure CreateOrAlterDB(const AForce: Boolean = False; const AScript: IioDBBuilderSqlScript = nil); overload;
+    procedure BuildCreateOrAlterDBSqlScipt(const AScript: IioDBBuilderSqlScript);
+    procedure BuildCreateDBSqlScript(const AScript: IioDBBuilderSqlScript);
+    procedure BuildUpdateDBSqlScript(const AScript: IioDBBuilderSqlScript);
+
+    property Schema: IioDBBuilderSchema read GetSchema;
+    property Status: TioDBBuilderEngineResult read GetStatus;
+    property StatusAsString: string read GetStatusAsString;
+    property StatusDescription: string read GetStatusDescription;
+    property Warnings: TStrings read GetWarnings;
   end;
 
 implementation
 
 uses
-  System.SysUtils, system.TypInfo, iORM.DBBuilder.Factory, iORM.DBBuilder.Schema, iORM.Exceptions, iORM.DB.Factory;
+  System.SysUtils,
+  System.TypInfo,
+
+  iORM.DBBuilder.Factory,
+  iORM.DBBuilder.Schema,
+  iORM.Exceptions,
+  iORM.DB.Factory
+
+  ;
 
 { TioDBBuilderEngine }
 
@@ -69,43 +95,90 @@ begin
   FDBAnalyzer.Analyze;
 end;
 
-constructor TioDBBuilderEngine.Create(const AConnectionDefName: String; const AAddIndexes, AAddForeignKeys: Boolean);
+procedure TioDBBuilderEngine.BuildCreateDBSqlScript(const AScript: IioDBBuilderSqlScript);
 begin
-  FSchema := TioDBBuilderFactory.NewSchema(AConnectionDefName, AAddIndexes, AAddForeignKeys);
-  FSqlGenerator := TioDBBuilderFactory.NewSqlGenerator(FSchema);
-  FDBAnalyzer := TioDBBuilderFactory.NewDBAnalyzer(FSchema, FSqlGenerator);
-  // Perform a first database analysis immediately
-  Analyze;
+  TioDBBuilderFactory.NewStrategy(FConnectionDefName, Schema, FSqlGenerator).GenerateCreateDatabaseScript(AScript);
 end;
 
-procedure TioDBBuilderEngine.CreateOrAlterDB(const AForce: Boolean);
+procedure TioDBBuilderEngine.BuildCreateOrAlterDBSqlScipt(const AScript: IioDBBuilderSqlScript);
 begin
-  if (Status > dbUptodate) or AForce then
-  begin
-    if Status = dbWarningExists then
-      raise EioGenericException.Create(ClassName, 'GenerateDB', 'Database to be updated but WARNINGS exists');
-    if Status = dbNotExists then
-      FSqlGenerator.CreateDatabase;
-    TioDBFactory.Script(FSchema.ConnectionDefName, Script).Execute;
+  case Status of
+    dbUptodate: ;
+    dbNotExists: TioDBBuilderFactory.NewStrategy(FConnectionDefName, Schema, FSqlGenerator).GenerateCreateDatabaseScript(AScript);
+    dbUpdatesNeeded: TioDBBuilderFactory.NewStrategy(FConnectionDefName, Schema, FSqlGenerator).GenerateUpdateDatabaseScript(AScript);
+    dbWarningExists: ;
   end;
 end;
 
-function TioDBBuilderEngine.Schema: IioDBBuilderSchema;
+procedure TioDBBuilderEngine.BuildUpdateDBSqlScript(const AScript: IioDBBuilderSqlScript);
+begin
+  TioDBBuilderFactory.NewStrategy(FConnectionDefName, Schema, FSqlGenerator).GenerateUpdateDatabaseScript(AScript);
+end;
+
+constructor TioDBBuilderEngine.Create(const AConnectionDefName: String; const AAddIndexes, AAddForeignKeys: Boolean);
+begin
+  FConnectionDefName := AConnectionDefName;
+  FSchema := TioDBBuilderFactory.NewSchema(AConnectionDefName, AAddIndexes, AAddForeignKeys);
+  FSqlGenerator := TioDBBuilderFactory.NewSqlGenerator(FConnectionDefName);
+  FDBAnalyzer := TioDBBuilderFactory.NewDBAnalyzer(AConnectionDefName, FSchema, FSqlGenerator);
+end;
+
+procedure TioDBBuilderEngine.CreateDatabase;
+var
+  LStrategy: IioDBBuilderStrategy;
+begin
+  LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, Schema, FSqlGenerator);
+  LStrategy.CreateDatabase;
+end;
+
+procedure TioDBBuilderEngine.CreateOrAlterDB(const AForce: Boolean; const AScript: IioDBBuilderSqlScript);
+var
+  LScript: IioDBBuilderSqlScript;
+  LBuildScript: boolean;
+begin
+  if (Status > dbUptodate) or AForce then
+  begin
+    LBuildScript := not Assigned(AScript);
+
+    if Status = dbWarningExists then
+      raise EioGenericException.Create(ClassName, 'GenerateDB',
+        'Database to be updated but WARNINGS exists.' + sLineBreak +
+        Schema.Warnings.Text
+      );
+
+    if not Assigned(AScript) then
+      LScript := TioDBBuilderFactory.NewSqlScript
+    else
+      LScript := AScript;
+
+    if Status = dbNotExists then
+    begin
+      // Carlo Marona: create the database fisically, on the server or as a file depending on database type used
+      CreateDatabase;
+
+      if LBuildScript then
+        BuildCreateDBSqlScript(AScript);
+    end
+    else if Status = dbUpdatesNeeded then
+    begin
+      if LBuildScript then
+        BuildUpdateDBSqlScript(AScript);
+    end;
+
+    TioDBFactory.Script(FConnectionDefName, LScript.SQL).Execute;
+  end;
+end;
+
+function TioDBBuilderEngine.GetSchema: IioDBBuilderSchema;
 begin
   Result := FSchema;
 end;
 
-function TioDBBuilderEngine.Script: TStrings;
-begin
-  if FSchema.ScriptIsEmpty then
-    TioDBBuilderFactory.NewStrategy(FSchema, FSqlGenerator).GenerateScript;
-  Result := FSchema.Script;
-end;
-
-function TioDBBuilderEngine.Status: TioDBBuilderEngineResult;
+function TioDBBuilderEngine.GetStatus: TioDBBuilderEngineResult;
 begin
   if FSchema.WarningExists then
     Exit(dbWarningExists);
+
   case FSchema.Status of
     stAlter:
       Exit(dbUpdatesNeeded);
@@ -116,12 +189,12 @@ begin
   end;
 end;
 
-function TioDBBuilderEngine.StatusAsString: String;
+function TioDBBuilderEngine.GetStatusAsString: String;
 begin
   Result := GetEnumName(TypeInfo(TioDBBuilderEngineResult), Ord(Status));
 end;
 
-function TioDBBuilderEngine.StatusDescription: String;
+function TioDBBuilderEngine.GetStatusDescription: String;
 begin
   case Status of
     dbUptodate:
@@ -135,7 +208,7 @@ begin
   end;
 end;
 
-function TioDBBuilderEngine.Warnings: TStrings;
+function TioDBBuilderEngine.GetWarnings: TStrings;
 begin
   Result := FSchema.Warnings;
 end;
