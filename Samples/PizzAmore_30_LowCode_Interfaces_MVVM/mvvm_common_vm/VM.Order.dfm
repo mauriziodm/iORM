@@ -5,6 +5,7 @@ inherited VMOrder: TVMOrder
     AsyncLoad = True
     AsyncPersist = True
     OnReceiveSelectionInterface = MPMasterSelectionInterface
+    AuthorizationContext = 'order'
   end
   inherited acShowETM: TioVMActionBSShowOrSelect
     Left = 328

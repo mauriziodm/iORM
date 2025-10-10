@@ -549,6 +549,13 @@ begin
   LMasterPropertyName := AMasterRttiProperty.Name;
   // Load the new detail object
   LDetailObj := io.Load(LLookupTypeName).ByID(AValue.AsInteger).ToObject;
+  // S.O.LO (Smart Object LOokup):
+  //  questo controllo serve per fare in modo che se non ha trovato il detail object con l'ID
+  //  specificato venga sollevata una eccezione a meno che non si sia inserito il valore 0 (zero)
+  //  che significa che si vuole assegnare nil alla proprietà sulla quale insiste una relazione
+  //  BelongsTo
+  if (LDetailObj = nil) and (AValue.AsInteger <> 0) then
+    raise EioGenericException.Create(ClassName, 'DetailObjLookup_ByTypeName', Format('Lookup detail object of type "%s", ID = %d not found.', [LLookupTypeName, AValue.AsInteger]));
   // Set the new detail object
   Result := DetailObjLookup_SetDetailObject(ABindSource, AMasterRttiProperty, LDetailObj);
 end;
@@ -577,9 +584,6 @@ var
   LPreviousDetailObject: TObject;
   LSelectionType: TioSelectionType;
 begin
-  // Check the detail object
-  if not Assigned(ADetailObj) then
-    raise EioGenericException.Create(ClassName, 'DetailObjLookup_SetDetailObject', '"ADetailObj" parameter not assigned (nil)');
   // Extraxt if the master property is of an interface type or not
   LIsMasterPropertyAnInterface := AMasterRttiProperty.PropertyType.IsManaged;
   // Parte che si occupa della richiesta dell'autorizzazione ad eseguire la selezione oppure no.
@@ -591,7 +595,8 @@ begin
   //       vuole fare il programmatore e come quindi ho deciso di fare in modo che scrivendo un event handler
   //       (BeforeReceiveSelection...) sia possibile intervenire e impostare la richiesta di autorizzazione
   //       come si vuole
-  LAuthDecisionRequest := TioAuthFactory.NewAuthDecisionRequest(ADetailObj.ClassName, atMakeSelection, itRegular, ABindSource._InternalGetAuthorizationContext, False);
+  if Assigned(ADetailObj) then // To avoid AV error
+    LAuthDecisionRequest := TioAuthFactory.NewAuthDecisionRequest(ADetailObj.ClassName, atMakeSelection, itRegular, ABindSource._InternalGetAuthorizationContext, False);
   LSelectionType := TioSelectionType.stAppend;
   // If the master property o an interface type
   if LIsMasterPropertyAnInterface then
@@ -602,7 +607,8 @@ begin
   else
     ABindSource.DoBeforeReceiveSelection(ADetailObj, LSelectionType, LAuthDecisionRequest);
   // Esegue la richiesta di autorizzazione
-  TioApplication.AuthorizeByRequestObj(LAuthDecisionRequest);
+  if Assigned(LAuthDecisionRequest) then // To avoid AV error
+    TioApplication.AuthorizeByRequestObj(LAuthDecisionRequest);
   // ReceiveSelection event handler
   LDone := False;
   // ReceiveSelection event handler

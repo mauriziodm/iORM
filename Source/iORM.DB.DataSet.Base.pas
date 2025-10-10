@@ -842,7 +842,17 @@ begin
   case Field.DataType of
     // Integer
     TFieldType.ftInteger:
-      LValue := TBitConverter.UnsafeInTo<Integer>(Buffer);
+      begin
+        // Questo if serve per fare in modo che, in caso di S.O.LO (Smart Object LOokup) e se si sta
+        //  editando la proprietà con relazione BelongsTo come intero, se anche se si cancella tutto
+        //  nel TDBEdit cmq inserisce il valore 0 (zero) e questo, tra l'altro, causa il fatto che
+        //  venga inserito nella proprietà con relazione BelongsTo il valore nil quindi serve
+        //  per tornare a un oggetto detail non assegnato (0 oppure vuoto)
+        if Length(Buffer) > 0 then
+          LValue := TBitConverter.UnsafeInTo<Integer>(Buffer)
+        else
+          LValue := 0;
+      end;
     TFieldType.ftAutoInc:
       LValue := TBitConverter.UnsafeInTo<Integer>(Buffer);
     TFieldType.ftShortint:
@@ -1582,6 +1592,7 @@ end;
 
 class procedure TioFullPathPropertyReadWrite.SetValue(const ADataSet: TioBSABaseDataSet; AObj: TObject; const AFullPathPropName: String; AValue: TValue);
 var
+  LDetailBindSourceAdapter: IioActiveBindSourceAdapter;
   LRttiProperty: TRttiProperty;
 begin
   // NB: If it's a property relative to the BindSource then raise an exception because
@@ -1601,6 +1612,21 @@ begin
   begin
     AValue := TioCommonBSBehavior.DetailObjLookup_ByTypeName(ADataSet.AsBindSource, LRttiProperty, AValue);
     LRttiProperty.SetValue(AObj, AValue);
+    // esempi Pizz'Amore) senza queste righe qui sotto, con Customer NON assegnsto (quindi ordine senza un customer come potrebbe
+    //  essere un nuovo ordine appena creato), se inserisco un ID valido per assegnare il relativo customer all'ordine corrente
+    //  allora eventuali controlli a video della UI (TDBEdit per esempio) rimanevano vuoti anche dopo aver assegnato il cliente
+    //  nel caso di controlli (TDBEdit) collegati a un DataSetDetail che espone il customer; questo accadeva perchè il DataSetDetail
+    //  che non era stato attivato all'apertura perchè Customer era a nil in pratica rimaneva disattivato. Nel caso invece di controlli
+    //  (TDBEdit) collegati a un campo tipo "Customer.Name" del DataSetMaster che espone l'ordine (DeepBinding) andava bene anche senza
+    //  queste righe.
+    //  NB: Spostando queste righe dopo il SetMasterObject (righe successive) non funziona più e il problema permane come se non ci fossero (provato)
+    LDetailBindSourceAdapter := ADataSet.GetActiveBindSourceAdapter.DetailAdaptersContainer.GetBindSourceAdapterByMasterPropertyName(LRttiProperty.Name);
+    if Assigned(LDetailBindSourceAdapter) then
+      LDetailBindSourceAdapter.BindSource.Open;
+    // (esempi Pizz'Amore) Senza questa riga qui sotto, con Customer assegnato, se inserisco 0 (zero) per
+    //  porre a nil la proprietà Customer dell'ordine e ho dei campi nella UI bindati su un
+    //  TioDataSetDetail che espone il customer stesso questi controlli della UI rimanevano
+    //  con i valori del vecchio customer, così invece i controlli si svuotano come deve essere.
     ADataSet.GetActiveBindSourceAdapter.DetailAdaptersContainer.SetMasterObject(AObj);
   end
   else

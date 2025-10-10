@@ -982,11 +982,15 @@ var
   LDetailBindSource: IioBindSource;
 begin
   if Assigned(FDetailBindSourceContainer) then
+  begin
     for LDetailBindSource in FDetailBindSourceContainer do
+    begin
       if AActive then
         LDetailBindSource.Open
       else
         LDetailBindSource.Close;
+    end;
+  end;
 end;
 
 procedure TioModelPresenterCustom.OpenCloseViewBindSources(const AActive: Boolean);
@@ -994,10 +998,12 @@ var
   LViewBindSource: IInterface;
 begin
   for LViewBindSource in FViewBindSourceContainer do
+  begin
     if AActive then
       (LViewBindSource as IioVMBridgeClientComponent).Open
     else
       (LViewBindSource as IioVMBridgeClientComponent).Close;
+  end;
 end;
 
 procedure TioModelPresenterCustom.PersistAll;
@@ -1087,7 +1093,7 @@ begin
       // If we are in the opening of the bind source and we are NOT at design-time then
       // create the active bind source adapter
       CheckAdapter(True);
-// TODO: CArlo Marona 18/09/2024 - Carlo propone (e io sono d'accordo) di spostare il DoBeforeOpen più sopra e prima che venga creato il ABSA perchè se ad esempio volgio impostare il TypeName in questo evento non funzionerebbe
+// TODO: Carlo Marona 18/09/2024 - Carlo propone (e io sono d'accordo) di spostare il DoBeforeOpen più sopra e prima che venga creato il ABSA perchè se ad esempio volgio impostare il TypeName in questo evento non funzionerebbe
       DoBeforeOpen;
     end
     else

@@ -118,7 +118,7 @@ var
   LActionType: TioPersistenceActionType;
 begin
   // Requires an authorization-decision for UI purposes
-  if AActiveBindSourceAdapter.Active then  // To avoid AV error
+  if AActiveBindSourceAdapter.Active and Assigned(AActiveBindSourceAdapter.Current) then  // To avoid AV error
   begin
     LActionType := TioUtilities.ActionTypeByABSA(AActiveBindSourceAdapter);
     TioApplication.AuthorizeByRequestParams(AActiveBindSourceAdapter.Current.ClassName, LActionType, itRegular, AActiveBindSourceAdapter.BindSource._InternalGetAuthorizationContext, False, False);

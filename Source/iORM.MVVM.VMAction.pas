@@ -2134,7 +2134,9 @@ begin
       Result := assigned(FTargetBindSource) and FTargetBindSource.IsActive and Assigned(FTargetBindSource.Current);
     smEntityTypeName:
       Result := not FEntityTypeName.Trim.IsEmpty;
-    smEntityTypeNameAsSelector, smEntityTypeNameAsWhereBuilder, smEntityTypeNameAsETM:
+    smEntityTypeNameAsSelector:
+      Result := assigned(FTargetBindSource) and not FEntityTypeName.Trim.IsEmpty;
+    smEntityTypeNameAsWhereBuilder, smEntityTypeNameAsETM:
       Result := assigned(FTargetBindSource) and FTargetBindSource.IsActive and not FEntityTypeName.Trim.IsEmpty;
   end;
   // Authorization
