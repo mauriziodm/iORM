@@ -1287,7 +1287,7 @@ begin
   end
   else
   // New instance by EntityType/Alias
-  if not FEntityTypeName.IsEmpty and io.di.Resolve(FEntityTypeName, FEntityTypeAlias).Exist then
+  if (not FEntityTypeName.IsEmpty) and io.di.Resolve(FEntityTypeName, FEntityTypeAlias).Exist then
   begin
     LNewInstanceAsObject := io.Create(FEntityTypeName, FEntityTypeAlias);
     if not Assigned(LNewInstanceAsObject) then
@@ -1304,8 +1304,18 @@ begin
       TargetBindSource._Action_AppendObj(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists);
   end
   else
-    // New instance not provided (created by the ABSAdapter itself)
-    TargetBindSource._Action_Append(RaiseIfRevertPointSaved, RaiseIfChangesExists);
+  // New instance not provided (created by the ABSAdapter itself)
+  //  note: for class TypeName only
+  begin
+    if not TargetBindSource.IsInterfacePresenting then
+      TargetBindSource._Action_Append(RaiseIfRevertPointSaved, RaiseIfChangesExists)
+    else
+      raise EioGenericException.Create(ClassName, Format('Hi, I''m iORM and we have a problem.' +
+        #13#13'You used a standard action named "%s" to insert/append a new object to a BindSource named "%s" (could be a TioDataSet, TioPrototypeBindSource, or TioModelPresenter) that is set to work with an interface type.' +
+        #13#13'In this situation, it is up to the programmer to provide the new instance implementing the interface through the "OnNewInstanceAsInterface" event of the standard action, or you can also set the ' +
+        '"EntityTypeName" property (if necessary also "EntityTypeAlias") to the name of the interface and let the Dependency Injection Container create the new object for you based on the classes registered in it.' +
+        #13#13'It looks like you haven''t done either of these things, please do so and everything will be fine.', [Name, TargetBindSource.GetName]));
+  end;
   // ---------------------
   // Execute slave actions
   if Assigned(Action_ShowOrSelectAction) then
@@ -1313,7 +1323,7 @@ begin
     Action_ShowOrSelectAction.Update; // Forza l'update della slave-action in modo che punti al nuovo oggetto appena inserito e chieda l'autorizzazione su quest'ultimo
     TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_ShowOrSelectAction);
     if TargetBindSource.IsMasterBS then
-      (TargetBindSource as IioMasterBindSource).Persistence.Clear;
+      (TargetBindSource as IioMasterBindSource).Persistence.Clear(False);
   end;
   // ---------------------
 end;
@@ -1386,7 +1396,7 @@ begin
   end
   else
   // New instance by EntityType/Alias
-  if not FEntityTypeName.IsEmpty and io.di.Resolve(FEntityTypeName, FEntityTypeAlias).Exist then
+  if (not FEntityTypeName.IsEmpty) and io.di.Resolve(FEntityTypeName, FEntityTypeAlias).Exist then
   begin
     LNewInstanceAsObject := io.Create(FEntityTypeName, FEntityTypeAlias);
     if not Assigned(LNewInstanceAsObject) then
@@ -1403,8 +1413,18 @@ begin
       TargetBindSource._Action_InsertObj(LNewInstanceAsObject, RaiseIfRevertPointSaved, RaiseIfChangesExists);
   end
   else
-    // New instance not provided (created by the ABSAdapter itself)
-    TargetBindSource._Action_Insert(RaiseIfRevertPointSaved, RaiseIfChangesExists);
+  // New instance not provided (created by the ABSAdapter itself)
+  //  note: for class TypeName only
+  begin
+    if not TargetBindSource.IsInterfacePresenting then
+      TargetBindSource._Action_Append(RaiseIfRevertPointSaved, RaiseIfChangesExists)
+    else
+      raise EioGenericException.Create(ClassName, Format('Hi, I''m iORM and we have a problem.' +
+        #13#13'You used a standard action named "%s" to insert/append a new object to a BindSource named "%s" (could be a TioDataSet, TioPrototypeBindSource, or TioModelPresenter) that is set to work with an interface type.' +
+        #13#13'In this situation, it is up to the programmer to provide the new instance implementing the interface through the "OnNewInstanceAsInterface" event of the standard action, or you can also set the ' +
+        '"EntityTypeName" property (if necessary also "EntityTypeAlias") to the name of the interface and let the Dependency Injection Container create the new object for you based on the classes registered in it.' +
+        #13#13'It looks like you haven''t done either of these things, please do so and everything will be fine.', [Name, TargetBindSource.GetName]));
+  end;
   // ---------------------
   // Execute slave actions
   if Assigned(Action_ShowOrSelectAction) then
@@ -1412,7 +1432,7 @@ begin
     Action_ShowOrSelectAction.Update; // Forza l'update della slave-action in modo che punti al nuovo oggetto appena inserito e chieda l'autorizzazione su quest'ultimo
     TioStdActionCommonBehaviour.ExecuteSlaveAction(Action_ShowOrSelectAction);
     if TargetBindSource.IsMasterBS then
-      (TargetBindSource as IioMasterBindSource).Persistence.Clear;
+      (TargetBindSource as IioMasterBindSource).Persistence.Clear(False);
   end;
   // ---------------------
 end;
@@ -2257,8 +2277,10 @@ begin
       Result := Assigned(FTargetBindSource) and FTargetBindSource.isActive and Assigned(FTargetBindSource.Current);
     smEntityTypeName:
       Result := not FEntityTypeName.Trim.IsEmpty;
-    smEntityTypeNameAsSelector, smEntityTypeNameAsWhereBuilder, smEntityTypeNameAsETM:
-      Result := Assigned(FTargetBindSource) and FTargetBindSource.isActive and not FEntityTypeName.Trim.IsEmpty;
+    smEntityTypeNameAsSelector:
+      Result := assigned(FTargetBindSource) and not FEntityTypeName.Trim.IsEmpty;
+    smEntityTypeNameAsWhereBuilder, smEntityTypeNameAsETM:
+      Result := assigned(FTargetBindSource) and FTargetBindSource.IsActive and not FEntityTypeName.Trim.IsEmpty;
   end;
   // Authorization
   if Result and FAuthorizationRequest then
