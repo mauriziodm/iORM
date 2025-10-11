@@ -54,6 +54,7 @@ object VMBaseForList: TVMBaseForList
   object acAppend: TioVMActionBSAppend
     Action_ShowOrSelectAction = acShowOrSelect
     TargetBindSource = BSMaster
+    EntityTypeName = 'IOrder'
     Left = 144
     Top = 48
   end

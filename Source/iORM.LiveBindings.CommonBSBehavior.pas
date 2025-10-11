@@ -183,7 +183,7 @@ var
 begin
   // Requires an authorization-decision for UI purposes
   // NB: Codice inserito qui per intercettare l'insert/append richiesto con i metodi Append/Insert che ricevono l'istanza da aggiungere già creata
-  TioApplication.AuthorizeByRequestParams(ABindSource.GetTypeName, atInsert, itRegular, ABindSource._InternalGetAuthorizationContext, False, False);
+  TioApplication.AuthorizeByRequestParams(ABindSource.TypeName, atInsert, itRegular, ABindSource._InternalGetAuthorizationContext, False, False);
   // Check the BindSourceAdapter
   if ABindSource.CheckAdapter and Supports(ABindSource.GetActiveBindSourceAdapter, IioActiveBindSourceAdapter, LActiveBSA) then
   begin

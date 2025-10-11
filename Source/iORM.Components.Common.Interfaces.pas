@@ -44,6 +44,7 @@ type
     ['{A9A526A3-D6D1-4E9D-B7D6-E2E7AB117325}']
     procedure Open;
     procedure Close;
+    function GetModelPresenterInstance: TioModelPresenterCustom;
     // ViewModelBridge
     procedure SetViewModelBridge(const AVMBridge:TioViewModelBridge);
     function GetViewModelBridge: TioViewModelBridge;

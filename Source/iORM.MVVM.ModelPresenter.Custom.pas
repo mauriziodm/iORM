@@ -1066,7 +1066,15 @@ begin
   if not FViewBindSourceContainer.Contains(AModelBindSourceOrModelDataSet) then
   begin
     FViewBindSourceContainer.Add(AModelBindSourceOrModelDataSet);
-    if IsActive then
+    // S.O.LO (Smart Object LOokup): A questo if ho aggiunto la condizione "or IsDetailBS" in pratica facendo in modo
+    //  che se si trata di un DetailBS venga fatto l'open in ogni caso (anche se Active = False) perchè facendo così
+    //  si risolve il problema che (esempio Pizz'Amore FMX MVVM) se nell'ordine non ho alcun cliente (come nel caso di
+    //  un ordine nuovo appena creato) non si vedano i dati fake generati perchè il ModelBindSource deriva da TPrototypeBindSource.
+    //  Infatti senza questa modifica, non facendo l'open, non veniva creato il ActiveBindSourceAdapter  dei dati concreti e quindi
+    //  rimaneva il BindSourceAdapter dei dati fake; con questa modifica invece viene fatto l'open e quindi viene anche creato
+    //  il relativo ActiveBindSourceAdapter reale anche se in realtà, non essendoci un Customer assegnato il suo DataObject
+    //  è nil.
+    if Active or IsDetailBS then
       (AModelBindSourceOrModelDataSet as IioVMBridgeClientComponent).Open
     else
       (AModelBindSourceOrModelDataSet as IioVMBridgeClientComponent).Close;

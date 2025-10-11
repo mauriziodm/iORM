@@ -8,6 +8,7 @@ uses
 type
 
   [ioEntity('ORDERS'), etmTrace(TEtmTimeSlot), ioConflictStrategy(TioSameVersionWin, csResolved)]
+  [diImplements(IOrder)]
   TOrder = class(TInterfacedObject, IOrder)
   private
     FID: Integer;
