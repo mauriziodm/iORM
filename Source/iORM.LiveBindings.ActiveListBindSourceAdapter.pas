@@ -454,6 +454,7 @@ begin
     Self.InternalSetDataObject(LDetailObj, False); // 2° parameter false ABSOLUTELY!!!!!!!
   end
   else
+  begin
     // else if it isn't a LazyLoadable list but the MasterProperty is an interface...
     if LMasterProperty.IsInterface then
     begin
@@ -463,6 +464,7 @@ begin
     // else it's a normal List object (not an interface)
     else
       Self.InternalSetDataObject(LDetailObj, False); // 2° parameter false ABSOLUTELY!!!!!!!
+  end;
 end;
 
 function TioActiveListBindSourceAdapter.GetIsAutoLoad: Boolean;

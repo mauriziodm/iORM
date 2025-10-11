@@ -388,10 +388,12 @@ begin
   LValue := LMasterProperty.GetValue(AMasterObj);
   // if not empty extract the detail object
   if not LValue.IsEmpty then
+  begin
     if LMasterProperty.IsInterface then
       raise EioGenericException.Create(Self.ClassName, 'ExtractDetailObject', 'Master property (in the master object) is an interface type.')
     else
       LDetailObj := LValue.AsObject;
+  end;
   // Set it to the Adapter itself
   Self.InternalSetDataObject(LDetailObj, False); // 2° parameter false ABSOLUTELY!!!!!!!
 end;
