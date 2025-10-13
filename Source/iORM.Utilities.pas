@@ -87,6 +87,7 @@ type
     class function CloneObject(const ASourceObj: Tobject): Tobject;
     class procedure StopLinkerRemoval(const AClass: TClass);
     class function NowUTC(const ForceDayLight: Boolean = False): TDateTime; static;
+    class function Remove_F_FromFieldName(const ARttiPropField: System.Rtti.TRttiNamedObject): String;
     /// Ricava la classe più in alto nella gerarchia (quello più vicina a TObject) che implementa la stessa interfaccia
     /// Questo serve a impostare correttamente la query select in modo che filtri correttamente in base anche
     /// ai vincoli di ereditarietà.
@@ -583,6 +584,14 @@ end;
 
 // Questa funzione, a partire dal RootObject, restituisce l'oggetto a relativo al ChildPropertyPath navigando le proprietà
 // dei vari livelli di oggetti.
+class function TioUtilities.Remove_F_FromFieldName(const ARttiPropField: System.Rtti.TRttiNamedObject): String;
+begin
+  if (ARttiPropField Is TRttiField) and Uppercase(ARttiPropField.Name).StartsWith('F') then
+    Result := ARttiPropField.Name.Substring(1) // Elimina il primo carattere (di solito la F)
+  else
+    Result := ARttiPropField.Name;
+end;
+
 class function TioUtilities.ResolveChildPropertyPath_GetFinalObj(const ARootObj: Tobject; const AChildObjPath: TStrings): Tobject;
 var
   LCtx: TRttiContext;

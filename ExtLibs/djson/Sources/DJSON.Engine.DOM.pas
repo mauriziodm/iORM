@@ -95,6 +95,7 @@ type
 implementation
 
 uses
+  iORM.Utilities,
 {$REGION 'System'}
   System.SysUtils,
 
@@ -227,10 +228,12 @@ begin
   // If the Property/Field is valid then try to get the value (Object) from the
   // master object else the MasterObject itself is the destination of the deserialization
   if Assigned(AMasterObj) then
+  begin
     if TdjDuckPropField.IsValidPropField(APropField) then
       LChildObj := TdjRTTI.TValueToObject(TdjDuckPropField.GetValue(AMasterObj, APropField))
     else
       LChildObj := AMasterObj;
+  end;
   // If the LChildObj is not assigned and the AValueType is assigned then
   // create the LChildObj of the type specified by the AValueType parameter,
   // PS: normally used by DeserializeList or other collection deserialization
@@ -880,8 +883,19 @@ begin
         LJSONValue := nil; // as LJSONKeyIsNotPresent := True
       // Deserialize the currente member and assign it to the object member
       LValue := DeserializePropField(LJSONValue, TdjDuckPropField.RttiType(LPropField), LPropField, AObject, AParams);
-      if not LValue.IsEmpty then
-        TdjDuckPropField.SetValue(AObject, LPropField, LValue, AParams);
+//      if not LValue.IsEmpty then
+//        TdjDuckPropField.SetValue(AObject, LPropField, LValue);
+
+
+
+
+      if (not LValue.IsEmpty) then
+        TdjDuckPropField.SetValue(AObject, LPropField, LValue)
+      else
+      if (LJSONValue.Null and Assigned(AObject) and TioUtilities.HasBelongsToOrHasOneRelation(AObject.ClassName, TioUtilities.Remove_F_FromFieldName(LPropField))) then
+      begin
+        TdjDuckPropField.SetValue(AObject, LPropField, LValue);
+      end;
     end;
     Result := AObject;
   except

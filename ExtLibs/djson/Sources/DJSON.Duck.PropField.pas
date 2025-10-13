@@ -48,7 +48,7 @@ type
     class function IsValidPropField(const ARttiType: TRttiNamedObject): Boolean; static;
     class function GetPropFieldType(const ARttiType: TRttiNamedObject): TdjDuckPropFieldType; static;
     class function GetValue(const Instance: TObject; const ARttiType: TRttiNamedObject): TValue; static;
-    class procedure SetValue(const Instance: TObject; const ARttiType: TRttiNamedObject; const AValue: TValue; const AParams:IdjParams); static;
+    class procedure SetValue(const Instance: TObject; const ARttiType: TRttiNamedObject; const AValue: TValue; const AOwnsPreviousValue: Boolean); static;
     class function RttiType(const ARttiType: TRttiNamedObject): TRttiType; static;
     class function IsWritable(const ARttiType: TRttiNamedObject): Boolean; static;
     class function QualifiedName(const ARttiType: TRttiNamedObject): String; static;
@@ -130,42 +130,33 @@ begin
   end;
 end;
 
-class procedure TdjDuckPropField.SetValue(const Instance: TObject; const ARttiType: TRttiNamedObject; const AValue: TValue; const AParams:IdjParams);
-// --------------- TEST FOR OPTIMIZATION (for properties only, no fields) --------------------
-//var
-//  LPropInfo: PPropInfo;
-// --------------- TEST FOR OPTIMIZATION (for properties only, no fields) --------------------
+class procedure TdjDuckPropField.SetValue(const Instance: TObject; const ARttiType: TRttiNamedObject; const AValue: TValue; const AOwnsPreviousValue: Boolean);
+var
+  LPreviousObj: TObject;
 begin
-
-  // NB: Il parametro AParams è stato aggiunto a questo metodo per fare delle prove di ottimizzazione in cui serviva
-  //      ma normalmente non servirebbe quindi alla fine delle prove se non dovesse essere più necessario meglio
-  //      eliminarlo
-
-
-
+  LPreviousObj := nil;
+  // In base al tipo (proprietà o campo) setta il nuovo valore nel modo corretto
+  // NB: Se il campo/proprietà è di tipo classe (instance) allora si pone il problema se distruggere o meno
+  //  l'oggetto/valore precedente ma solo nel caso che il nuovo valore sia nil perchè se il nuovo valore
+  //  non è nil allora djson deserializza lo stato del nuovo su quello vecchio quindi non si deve distruggere il vecchio.
   case GetPropFieldType(ARttiType) of
     ptField:
+    begin
+      if AOwnsPreviousValue and TRttiField(ARttiType).FieldType.IsInstance then
+        LPreviousObj := TRttiField(ARttiType).GetValue(Instance).AsObject;
       TRttiField(ARttiType).SetValue(Instance, AValue);
+    end;
     ptProperty:
+    begin
+      if AOwnsPreviousValue and TRttiProperty(ARttiType).PropertyType.IsInstance then
+        LPreviousObj := TRttiProperty(ARttiType).GetValue(Instance).AsObject;
       TRttiProperty(ARttiType).SetValue(Instance, AValue);
+    end
   else
       raise EdsonDuckException.CreateFmt('Invalid prop/field type $s', [ARttiType.Name]);
   end;
-
-
-
-
-// --------------- TEST FOR OPTIMIZATION (for properties only, no fields) --------------------
-//  LPropInfo := TRttiInstanceProperty(ARttiType).PropInfo;
-//  LPropInfo := AParams.PropInfoCache.GetPropInfo(ARttiType);
-//  case LPropInfo.PropType^.Kind of
-//    tkString, tkLString, tkWString, tkUString:
-//      SetStrProp(Instance, LPropInfo, AValue.AsString);
-//    tkInteger, tkInt64:
-//      SetOrdProp(Instance, LPropInfo, AValue.AsOrdinal);
-//      SetOrdProp(Instance, LPropInfo, 999);
-//  end;
-// --------------- TEST FOR OPTIMIZATION (for properties only, no fields) --------------------
+  if AOwnsPreviousValue and Assigned(LPreviousObj) then
+    LPreviousObj.Free;
 end;
 
 class function TdjDuckPropField.TypeKind(const ARttiType: TRttiNamedObject): TTypeKind;
