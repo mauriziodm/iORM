@@ -139,10 +139,10 @@ type
     procedure SetItemsValueDefaultTypeInfo(const AValue:PTypeInfo);
     function GetItemsValueDefaultTypeInfo: PTypeInfo;
     property ItemsValueDefaultTypeInfo: PTypeInfo read GetItemsValueDefaultTypeInfo write SetItemsValueDefaultTypeInfo;
-    // OwnJSONValue
-    procedure SetOwnJSONValue(const AValue:Boolean);
-    function GetOwnJSONValue: Boolean;
-    property OwnJSONValue: Boolean read GetOwnJSONValue write SetOwnJSONValue;
+    // OwnsBelongsToOrHasOneDetailObj
+    procedure SetOwnsBelongsToOrHasOneDetailObj(const AValue:Boolean);
+    function GetOwnsBelongsToOrHasOneDetailObj: Boolean;
+    property OwnsBelongsToOrHasOneDetailObj: Boolean read GetOwnsBelongsToOrHasOneDetailObj write SetOwnsBelongsToOrHasOneDetailObj;
     // NameCase
     procedure SetNameCase(const AValue:TdjNameCase);
     function GetNameCase: TdjNameCase;
@@ -236,7 +236,7 @@ type
     FSerializers: TdjSerializersContainer;
     FItemsKeyDefaultQualifiedName: String;
     FItemsValueDefaultQualifiedName: String;
-    FOwnJSONValue: Boolean;
+    FOwnsBelongsToOrHasOneDetailObj: Boolean;
     FNameCase: TdjNameCase;
     FTypeInfoCache: TdjTypeInfoCache;
     FBsonRoot: Boolean;
@@ -294,9 +294,9 @@ type
     // ItemsValueDefaultTypeInfo
     procedure SetItemsValueDefaultTypeInfo(const AValue:PTypeInfo);
     function GetItemsValueDefaultTypeInfo: PTypeInfo;
-    // OwnJSONValue
-    procedure SetOwnJSONValue(const AValue:Boolean);
-    function GetOwnJSONValue: Boolean;
+    // OwnsBelongsToOrHasOneDetailObj
+    procedure SetOwnsBelongsToOrHasOneDetailObj(const AValue:Boolean);
+    function GetOwnsBelongsToOrHasOneDetailObj: Boolean;
     // NameCase
     procedure SetNameCase(const AValue:TdjNameCase);
     function GetNameCase: TdjNameCase;
@@ -434,7 +434,7 @@ begin
   FEnableCustomSerializers := False;
   FItemsKeyDefaultQualifiedName := 'System.String';
   FItemsValueDefaultQualifiedName := '';
-  FOwnJSONValue := False; // JSONValue is not owned by default
+  FOwnsBelongsToOrHasOneDetailObj := False;
   FNameCase := ncUndefinedCase;
   FBsonRoot := True;
   FBsonRootLabel := 'root';
@@ -627,9 +627,9 @@ begin
   Result := FOperationType;
 end;
 
-function TdjParams.GetOwnJSONValue: Boolean;
+function TdjParams.GetOwnsBelongsToOrHasOneDetailObj: Boolean;
 begin
-  Result := FOwnJSONValue;
+  Result := FOwnsBelongsToOrHasOneDetailObj;
 end;
 
 function TdjParams.GetPrettyPrint: Boolean;
@@ -812,9 +812,9 @@ begin
   FOperationType := AValue;
 end;
 
-procedure TdjParams.SetOwnJSONValue(const AValue: Boolean);
+procedure TdjParams.SetOwnsBelongsToOrHasOneDetailObj(const AValue: Boolean);
 begin
-  FOwnJSONValue := AValue;
+  FOwnsBelongsToOrHasOneDetailObj := AValue;
 end;
 
 procedure TdjParams.SetPrettyPrint(const AValue: Boolean);

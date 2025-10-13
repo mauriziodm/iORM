@@ -882,20 +882,17 @@ begin
       else
         LJSONValue := nil; // as LJSONKeyIsNotPresent := True
       // Deserialize the currente member and assign it to the object member
+      //  NB: Mauri 13/10/2025 - Nell'uso insieme ad iORM c'era un grosso problema quando si faceva il Revert di un oggetto
+      //       nel caso in cui il nuovo valore/oggetto di una proprietà di tipo classe o interfaccia quando il nuovo valore
+      //       era nil; in pratica non si azzerava il precedente detail object bensì rimaneva il vecchio.
+      //       Ora, aggiungendo la seconda condizione all'if va bene
+      //  NB: Mauri 13/10/2025 - con rif, al NB precedente per risolvere ho anche dovuto aggiungere al metodo "TdjDuckPropField.SetValue"
+      //       il parametro "AOwnsBelongsToOrHasOneDetailObj" e ho aggiunto anche il relativo parametro ai djParams
       LValue := DeserializePropField(LJSONValue, TdjDuckPropField.RttiType(LPropField), LPropField, AObject, AParams);
-//      if not LValue.IsEmpty then
-//        TdjDuckPropField.SetValue(AObject, LPropField, LValue);
-
-
-
-
-      if (not LValue.IsEmpty) then
-        TdjDuckPropField.SetValue(AObject, LPropField, LValue)
-      else
-      if (LJSONValue.Null and Assigned(AObject) and TioUtilities.HasBelongsToOrHasOneRelation(AObject.ClassName, TioUtilities.Remove_F_FromFieldName(LPropField))) then
-      begin
-        TdjDuckPropField.SetValue(AObject, LPropField, LValue);
-      end;
+      if (not LValue.IsEmpty)
+        or (LJSONValue.Null and Assigned(AObject) and TioUtilities.HasBelongsToOrHasOneRelation(AObject.ClassName, TioUtilities.Remove_F_FromFieldName(LPropField)))
+      then
+        TdjDuckPropField.SetValue(AObject, LPropField, LValue, AParams.OwnsBelongsToOrHasOneDetailObj);
     end;
     Result := AObject;
   except

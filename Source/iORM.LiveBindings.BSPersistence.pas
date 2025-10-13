@@ -565,7 +565,7 @@ begin
   if ARaiseIfNoChanges and (State < osChanged) then
     raise EioBindSourceObjStateException.Create(ClassName, 'Revert', 'There where no changes');
   // Execute the revert
-  dj.FromJSON(FSavedRevertPointState).OpType(ssSaveRevertPoint).byFields.TypeAnnotationsON.ClearCollection.&To(FBindSource.Current);
+  dj.FromJSON(FSavedRevertPointState).OpType(ssSaveRevertPoint).byFields.TypeAnnotationsON.ClearCollection.OwnsBelongsToOrHasOneDetailObj.&To(FBindSource.Current);
   FBindSource.GetActiveBindSourceAdapter.DetailAdaptersContainer.SetMasterObject(FBindSource.Current);
 end;
 

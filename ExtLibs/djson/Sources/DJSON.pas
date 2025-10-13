@@ -170,6 +170,7 @@ type
     function Engine(const AEngine:TdjEngine): TdjJSONDestination;
     function EmptyStringAsNull: TdjJSONDestination;
     function EmptyCharAsNull: TdjJSONDestination;
+    function OwnsBelongsToOrHasOneDetailObj: TdjJSONDestination;
 
     function DateTimeFormat(const ADateTimeFormat:TdjDateTimeFormat): TdjJSONDestination;
     function DateSeparator(const AValue:String): TdjJSONDestination;
@@ -602,6 +603,12 @@ end;
 function TdjJSONDestination.OpType(const AOperationType: TdjSkipScope): TdjJSONDestination;
 begin
   FParams.OpType := AOperationType;
+  Result := Self;
+end;
+
+function TdjJSONDestination.OwnsBelongsToOrHasOneDetailObj: TdjJSONDestination;
+begin
+  FParams.OwnsBelongsToOrHasOneDetailObj := True;
   Result := Self;
 end;
 

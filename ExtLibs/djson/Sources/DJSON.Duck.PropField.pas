@@ -48,7 +48,7 @@ type
     class function IsValidPropField(const ARttiType: TRttiNamedObject): Boolean; static;
     class function GetPropFieldType(const ARttiType: TRttiNamedObject): TdjDuckPropFieldType; static;
     class function GetValue(const Instance: TObject; const ARttiType: TRttiNamedObject): TValue; static;
-    class procedure SetValue(const Instance: TObject; const ARttiType: TRttiNamedObject; const AValue: TValue; const AOwnsPreviousValue: Boolean); static;
+    class procedure SetValue(const Instance: TObject; const ARttiType: TRttiNamedObject; const AValue: TValue; const AOwnsBelongsToOrHasOneDetailObj: Boolean); static;
     class function RttiType(const ARttiType: TRttiNamedObject): TRttiType; static;
     class function IsWritable(const ARttiType: TRttiNamedObject): Boolean; static;
     class function QualifiedName(const ARttiType: TRttiNamedObject): String; static;
@@ -130,7 +130,7 @@ begin
   end;
 end;
 
-class procedure TdjDuckPropField.SetValue(const Instance: TObject; const ARttiType: TRttiNamedObject; const AValue: TValue; const AOwnsPreviousValue: Boolean);
+class procedure TdjDuckPropField.SetValue(const Instance: TObject; const ARttiType: TRttiNamedObject; const AValue: TValue; const AOwnsBelongsToOrHasOneDetailObj: Boolean);
 var
   LPreviousObj: TObject;
 begin
@@ -142,20 +142,20 @@ begin
   case GetPropFieldType(ARttiType) of
     ptField:
     begin
-      if AOwnsPreviousValue and TRttiField(ARttiType).FieldType.IsInstance then
+      if AOwnsBelongsToOrHasOneDetailObj and TRttiField(ARttiType).FieldType.IsInstance then
         LPreviousObj := TRttiField(ARttiType).GetValue(Instance).AsObject;
       TRttiField(ARttiType).SetValue(Instance, AValue);
     end;
     ptProperty:
     begin
-      if AOwnsPreviousValue and TRttiProperty(ARttiType).PropertyType.IsInstance then
+      if AOwnsBelongsToOrHasOneDetailObj and TRttiProperty(ARttiType).PropertyType.IsInstance then
         LPreviousObj := TRttiProperty(ARttiType).GetValue(Instance).AsObject;
       TRttiProperty(ARttiType).SetValue(Instance, AValue);
     end
   else
       raise EdsonDuckException.CreateFmt('Invalid prop/field type $s', [ARttiType.Name]);
   end;
-  if AOwnsPreviousValue and Assigned(LPreviousObj) then
+  if AOwnsBelongsToOrHasOneDetailObj and Assigned(LPreviousObj) then
     LPreviousObj.Free;
 end;
 
