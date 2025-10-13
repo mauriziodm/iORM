@@ -122,8 +122,6 @@ begin
   AScript.DecIndentationLevel;
 
   AScript.Add(Format('FROM %s', [Table2OldTableName(ATable)]));
-
-  AScript.DecIndentationLevel;
   AScript.Add(';');
   AScript.AddEmpty;
 end;
