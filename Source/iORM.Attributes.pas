@@ -354,7 +354,7 @@ type
       const AUnique: Boolean = False); overload;
     constructor Create(ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
     constructor Create(const AIndexOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
-    property IndexName: String read FIndexName;
+    property IndexName: String read FIndexName write FIndexName;  // Carlo Marona (2025-10-17): Added write
     property CommaSepFieldList: String read FCommaSepFieldList write FCommaSepFieldList;
     property IndexOrientation: TioIndexOrientation read FIndexOrientation;
     property Unique: Boolean read FUnique;

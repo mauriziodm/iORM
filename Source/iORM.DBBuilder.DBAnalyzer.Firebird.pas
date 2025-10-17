@@ -12,7 +12,7 @@ uses
 type
   TioDBBuilderDBAnalyzerFirebird = class(TioDBBuilderDBAnalyzer)
   public
-    procedure Analyze; override;
+    procedure Analyze(const ForceCreate: boolean = false); override;
   end;
 
 implementation
@@ -26,7 +26,7 @@ uses
 
 { TioDBBuilderDBAnalyzerFirebird }
 
-procedure TioDBBuilderDBAnalyzerFirebird.Analyze;
+procedure TioDBBuilderDBAnalyzerFirebird.Analyze(const ForceCreate: boolean = false);
 var
   LTable: IioDBBuilderSchemaTable;
 begin
@@ -49,7 +49,7 @@ begin
 
       // If the table status is not dbsClean then schema status became dbsAlter
       if LTable.Status > stClean then
-        Schema.Status := stAlter;
+        Schema.Status := stUpdate;
     end;
 
     // Commit or rollback the transaction (if in transaction)

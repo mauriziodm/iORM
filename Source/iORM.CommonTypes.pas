@@ -260,7 +260,10 @@ end;
 
 function TioIndentation.DecIndent(const ADecrement: integer = 1): integer;
 begin
-  Dec(FCurrentLevel, ADecrement);
+  if FCurrentLevel - ADecrement >= 0 then
+    Dec(FCurrentLevel, ADecrement)
+  else
+    FCurrentLevel := 0;
 end;
 
 function TioIndentation.GetCurrentLevel: integer;

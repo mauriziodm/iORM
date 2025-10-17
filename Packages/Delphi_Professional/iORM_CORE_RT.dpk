@@ -170,8 +170,6 @@ contains
   iORM.DBBuilder.SqlGenerator.SqLite in '..\..\Source\iORM.DBBuilder.SqlGenerator.SqLite.pas',
   iORM.DBBuilder.SqlGenerator.Base in '..\..\Source\iORM.DBBuilder.SqlGenerator.Base.pas',
   iORM.DBBuilder.SqlGenerator.Firebird in '..\..\Source\iORM.DBBuilder.SqlGenerator.Firebird.pas',
-  iORM.DBBuilder.Strategy.WithoutAlterTable in '..\..\Source\iORM.DBBuilder.Strategy.WithoutAlterTable.pas',
-  iORM.DBBuilder.Strategy.WithAlterTable in '..\..\Source\iORM.DBBuilder.Strategy.WithAlterTable.pas',
   iORM.DBBuilder.DBAnalyzer in '..\..\Source\iORM.DBBuilder.DBAnalyzer.pas',
   iORM.DBBuilder.Engine in '..\..\Source\iORM.DBBuilder.Engine.pas',
   iORM.DBBuilder.Schema.Field.ClassInfo in '..\..\Source\iORM.DBBuilder.Schema.Field.ClassInfo.pas',
@@ -254,6 +252,7 @@ contains
   iORM.DBBuilder.Strategy.SqLite in '..\..\Source\iORM.DBBuilder.Strategy.SqLite.pas',
   iORM.DBBuilder.Strategy.Firebird in '..\..\Source\iORM.DBBuilder.Strategy.Firebird.pas',
   iORM.DBBuilder.DBAnalyzer.Firebird in '..\..\Source\iORM.DBBuilder.DBAnalyzer.Firebird.pas',
-  iORM.DBBuilder.DBAnalyzer.SqLite in '..\..\Source\iORM.DBBuilder.DBAnalyzer.SqLite.pas';
+  iORM.DBBuilder.DBAnalyzer.SqLite in '..\..\Source\iORM.DBBuilder.DBAnalyzer.SqLite.pas',
+  iORM.DBBuilder.SqlGenerator.Firebird.Interfaces in '..\..\Source\iORM.DBBuilder.SqlGenerator.Firebird.Interfaces.pas';
 
 end.

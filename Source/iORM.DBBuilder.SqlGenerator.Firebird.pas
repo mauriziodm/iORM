@@ -40,6 +40,7 @@ uses
 
   iORM.CommonTypes,
   iORM.DBBuilder.SqlGenerator.Base,
+  iORM.DBBuilder.SqlGenerator.Firebird.Interfaces,
   iORM.DBBuilder.Interfaces,
   iORM.Attributes
 
@@ -47,39 +48,46 @@ uses
 
 
 type
-  TioDBBuilderSqlGenFirebird = class(TioDBBuilderSqlGenBase)
+  TioDBBuilderSqlGenFirebird = class(TioDBBuilderSqlGenBase, IioDBBuilderSqlGeneratorFirebird)
   private
     function AdaptIndexOrFKName(const APrefix, AName: String): String;
     function InternalCreateField(const AField: IioDBBuilderSchemaField): String;
   protected
-    function TValueToSql(const AValue: TValue): string; override;
     function TranslateFieldType(const AField: IioDBBuilderSchemaField; const ReturnTypeNameOnly: boolean = true): String; override;
+    function TValueToSql(const AValue: TValue): string; override;
   public
-    function BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
-    function BuildEndCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
-    function BuildBeginAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
-    function BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
+    // Tables related methods
     function BuildAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
+    function BuildBeginAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
+    function BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildCreateTableSql(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string; override;
+    function BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
+    function BuildEndCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildTableExistsSql(const ATableName: string): string; override;
     // Fields related methods
-    function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string; override;
     function BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string; override;
     function BuildAlterFieldSql(const AField: IioDBBuilderSchemaField): string; override;
+    function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
-    // PrimaryKey & other indexes
+    // PrimaryKey related methods
     function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string; override;
+    // Indexes related methods
     function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): string; override;
-    function BuildListAllIndexesSql: string; override;
     function BuildDropIndexSql(const AIndexName: string): string; override;
+    function BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): string; override;
+    function BuildIndexExistsSql(const AIndexName: string): string; override;
+    function BuildListAllIndexesSql: string; override;
+    function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string; override;
     // Foreign keys
     function BuildAddForeignKeySql(const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildDropForeignKeySql(const ATableName, AForeignKeyName: string): string; override;
     function BuildListAllForeignKeysSql: string; override;
+    function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string; override;
     // Sequences
-    function BuildAddSequenceSql(const ASequenceName: String; const ACreatingNewDatabase: boolean): string; override;
-    function BuildSequenceExistsSql(const ASequenceName: string): string; override;
+    function BuildAddSequenceSql(const ASequenceName: String; const ACreatingNewDatabase: boolean): string;
+    function BuildDropSequenceSql(const ASequenceName: string): string;
+    function BuildSequenceExistsSql(const ASequenceName: string): string;
   end;
 
 implementation
@@ -236,13 +244,23 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
 begin
-  Result := Format('select rdb$field_name from rdb$relation_fields where rdb$relation_name=''%s'' and rdb$field_name=''%s''',
+  Result := Format('select RDB$FIELD_NAME from RDB$RELATION_FIELDS where RDB$RELATION_NAME = ''%s'' and RDB$FIELD_NAME = ''%s'' and RDB$SYSTEM_FLAG = 0',
     [ATable.TableName.ToUpper, AField.FieldName.ToUpper]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
 begin
   Result := EmptyStr;
+end;
+
+function TioDBBuilderSqlGenFirebird.BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): string;
+begin
+  Result := BuildIndexExistsSql(BuildIndexNameSql(ATable, AIndex));
+end;
+
+function TioDBBuilderSqlGenFirebird.BuildIndexExistsSql(const AIndexName: string): string;
+begin
+  Result := Format('select RDB$INDEX_NAME from RDB$INDICES where RDB$INDEX_NAME like ''%s''', [AIndexName]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildListAllForeignKeysSql: string;
@@ -256,17 +274,67 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildListAllIndexesSql: string;
 begin
-  Result := 'select RDB$INDEX_NAME from rdb$indices where RDB$INDEX_NAME like ''IDX_%''';
+  // Carlo Marona (2025-10-15): Added condition to exclude system indices
+  Result := 'select RDB$INDEX_NAME from RDB$INDICES where (RDB$INDEX_NAME like ''IDX_%'') and (RDB$SYSTEM_FLAG = 0)';
+end;
+
+function TioDBBuilderSqlGenFirebird.BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string;
+begin
+  // Carlo Marona (2025-10-16): reference https://www.firebirdnews.org/listing-the-foreign-keys-in-a-firebird-database/
+  Result := Format(
+    'SELECT'  + SLineBreak +
+    '  rc.RDB$CONSTRAINT_NAME AS constraint_name,' + SLineBreak +
+    '  i.RDB$RELATION_NAME AS table_name,' + SLineBreak +
+    '  s.RDB$FIELD_NAME AS field_name,' + SLineBreak +
+    '  i.RDB$DESCRIPTION AS description,' + SLineBreak +
+    '  rc.RDB$DEFERRABLE AS is_deferrable,' + SLineBreak +
+    '  rc.RDB$INITIALLY_DEFERRED AS is_deferred,' + SLineBreak +
+    '  refc.RDB$UPDATE_RULE AS on_update,' + SLineBreak +
+    '  refc.RDB$DELETE_RULE AS on_delete,' + SLineBreak +
+    '  refc.RDB$MATCH_OPTION AS match_type,' + SLineBreak +
+    '  i2.RDB$RELATION_NAME AS references_table,' + SLineBreak +
+    '  s2.RDB$FIELD_NAME AS references_field,' + SLineBreak +
+    '  (s.RDB$FIELD_POSITION + 1) AS field_position' + SLineBreak +
+    'FROM RDB$INDEX_SEGMENTS s' + SLineBreak +
+    '  LEFT JOIN RDB$INDICES i ON i.RDB$INDEX_NAME = s.RDB$INDEX_NAME' + SLineBreak +
+    '  LEFT JOIN RDB$RELATION_CONSTRAINTS rc ON rc.RDB$INDEX_NAME = s.RDB$INDEX_NAME' + SLineBreak +
+    '  LEFT JOIN RDB$REF_CONSTRAINTS refc ON rc.RDB$CONSTRAINT_NAME = refc.RDB$CONSTRAINT_NAME' + SLineBreak +
+    '  LEFT JOIN RDB$RELATION_CONSTRAINTS rc2 ON rc2.RDB$CONSTRAINT_NAME = refc.RDB$CONST_NAME_UQ' + SLineBreak +
+    '  LEFT JOIN RDB$INDICES i2 ON i2.RDB$INDEX_NAME = rc2.RDB$INDEX_NAME' + SLineBreak +
+    '  LEFT JOIN RDB$INDEX_SEGMENTS s2 ON i2.RDB$INDEX_NAME = s2.RDB$INDEX_NAME' + SLineBreak +
+    'WHERE' + SLineBreak +
+    '  rc.RDB$CONSTRAINT_TYPE = ''FOREIGN KEY'' AND' + SLineBreak +
+    '  i.RDB$RELATION_NAME = ''%s''' + SLineBreak +
+    'ORDER BY' + SLineBreak +
+    '  s.RDB$FIELD_POSITION',
+    [ATable.TableName]
+  );
+end;
+
+function TioDBBuilderSqlGenFirebird.BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string;
+begin
+  Result := Format(
+    'select' + SLineBreak +
+    '  RDB$INDICES.RDB$INDEX_NAME, RDB$INDICES.RDB$RELATION_NAME, RDB$INDEX_SEGMENTS.RDB$FIELD_NAME' + sLineBreak +
+    'from' + SLineBreak +
+    '  rdb$index_segments right outer join rdb$indices on (rdb$index_segments.rdb$index_name = rdb$indices.rdb$index_name)' + SLineBreak +
+    'where' + SLineBreak +
+    '  (RDB$INDICES.RDB$SYSTEM_FLAG = 0) and' + SLineBreak +
+    '  (RDB$INDIXES.RDB$RELATION_NAME like ''%%s'')'
+    , [ATable.TableName]
+  );
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSequenceExistsSql(const ASequenceName: string): string;
 begin
-  Result := Format('select count(*) from rdb$generators where rdb$generator_name = ''%s''', [ASequenceName.ToUpper]);
+  // Carlo Marona (2025-10-15): Added condition to exclude system generators
+  Result := Format('select count(*) from rdb$generators where (rdb$generator_name = ''%s'') and (RDB$SYSTEM_FLAG = 0)', [ASequenceName.ToUpper]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildTableExistsSql(const ATableName: string): string;
 begin
-  Result := Format('select rdb$relation_name from rdb$relations where rdb$relation_name = ''%s''',
+  // Carlo Marona (2025-10-15): Added condition to exclude system relations
+  Result := Format('select RDB$RELATION_NAME from RDB$RELATIONS where (RDB$RELATION_NAME = ''%s'') and (RDB$SYSTEM_FLAG = 0)',
     [ATableName.ToUpper]);
 end;
 
@@ -317,6 +385,11 @@ end;
 function TioDBBuilderSqlGenFirebird.BuildDropIndexSql(const AIndexName: string): string;
 begin
   Result := Format('DROP INDEX %s;', [AIndexName]);
+end;
+
+function TioDBBuilderSqlGenFirebird.BuildDropSequenceSql(const ASequenceName: string): string;
+begin
+  Result := Format('DROP SEQUENCE %s;', [ASequenceName]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
@@ -400,70 +473,6 @@ begin
     raise EioGenericException.Create(ClassName, 'TranslateFieldType', 'Wrong Metadata_FieldType');
   end;
 end;
-
-//function TioDBBuilderSqlGenFirebird.TranslateFieldTypeForCreate(const AField: IioDBBuilderSchemaField): String;
-//begin
-//  case AField.FieldType of
-//    ioMdVarchar:
-//      Result := Format('VARCHAR(%d)', [AField.FieldLength]);
-//    ioMdChar:
-//      Result := Format('CHAR(%d)', [AField.FieldLength]);
-//    ioMdInteger:
-//      Result := 'INTEGER';
-//    ioMdFloat:
-//      Result := 'FLOAT';
-//    ioMdDate:
-//      Result := 'DATE';
-//    ioMdTime:
-//      Result := 'TIME';
-//    ioMdDateTime:
-//      Result := 'TIMESTAMP';
-//    ioMdDecimal:
-//      Result := Format('DECIMAL(%d,%d)', [AField.FieldPrecision, AField.FieldScale]);
-//    ioMdNumeric:
-//      Result := Format('NUMERIC(%d,%d)', [AField.FieldPrecision, AField.FieldScale]);
-//    ioMdBoolean:
-//      Result := 'INTEGER';
-//    ioMdBinary:
-//      Result := Format('BLOB SUB_TYPE %s', [IfThen(AField.FieldSubType.IsEmpty, '0', AField.FieldSubType)]);
-//    ioMdCustomFieldType:
-//      Result := AField.FieldCustomType;
-//  else
-//    raise EioGenericException.Create(ClassName, 'TranslateFieldTypeForCreate', 'Wrong Metadata_FieldType');
-//  end;
-//end;
-
-//function TioDBBuilderSqlGenFirebird.TranslateFieldTypeForModified(const AField: IioDBBuilderSchemaField): String;
-//begin
-//  case AField.FieldType of
-//    ioMdVarchar:
-//      Result := 'VARCHAR';
-//    ioMdChar:
-//      Result := 'CHAR';
-//    ioMdInteger:
-//      Result := 'INTEGER';
-//    ioMdFloat:
-//      Result := 'FLOAT';
-//    ioMdDate:
-//      Result := 'DATE';
-//    ioMdTime:
-//      Result := 'TIME';
-//    ioMdDateTime:
-//      Result := 'TIMESTAMP';
-//    ioMdDecimal:
-//      Result := 'INT64'; // Firebird use subtype for NUMERIC or DECIMALS
-//    ioMdNumeric:
-//      Result := 'INT64'; // Firebird use subtype NUMERIC or DECIMALS
-//    ioMdBoolean:
-//      Result := 'INTEGER';
-//    ioMdBinary:
-//      Result := 'BLOB';
-//    ioMdCustomFieldType:
-//      Result := AField.FieldCustomType;
-//  else
-//    raise EioGenericException.Create(ClassName, 'TranslateFieldType', 'Wrong Metadata_FieldType');
-//  end;
-//end;
 
 function TioDBBuilderSqlGenFirebird.TValueToSql(const AValue: TValue): string;
 begin

@@ -3,17 +3,40 @@ unit iORM.DBBuilder.Strategy.Firebird;
 interface
 
 uses
+  iORM.Attributes,
   iORM.DBBuilder.Interfaces,
-  iORM.DBBuilder.Strategy.WithAlterTable
+  iORM.DBBuilder.Strategy.Base,
+  iORM.DBBuilder.SqlGenerator.Firebird.Interfaces
 
   ;
 
 
 type
-  TioDBBuilderStrategyFirebird = class(TioDBBuilderStrategyWithAlter)
+  TioDBBuilderStrategyFirebird = class(TioDBBuilderStrategyBase)
+  private
+    function SequenceExists(const ASequenceName: string): boolean;
+    procedure CreateSequences(const AScript: IioDBBuilderSqlScript);
+    procedure CreateTableSequence(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
+    procedure DropSequence(const ASequenceName: string);
+    function GetFBSqlGenerator: IioDBBuilderSqlGeneratorFirebird;
+
+    property FBSqlGenerator: IioDBBuilderSqlGeneratorFirebird read GetFBSqlGenerator;
   protected
+    procedure AlterTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); override;
     procedure CreateDatabase; override;
+    procedure CreateTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); override;
+    procedure DropForeignKeys(const AScript: IioDBBuilderSqlScript); override;
+    procedure DropIndexes(const AScript: IioDBBuilderSqlScript); override;
+    procedure DropTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); override;
+
+    procedure GenerateDatabaseObjects(const AScript: IioDBBuilderSqlScript; const Create: boolean); override;
+
     function DatabaseExists: Boolean; override;
+    function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
+    function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
+    function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): boolean; override;
+    function IndexExists(const AIndexName: string): boolean; override;
+    function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean; override;
 
     function IsFieldTypeChanged(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField;
       const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
@@ -38,10 +61,6 @@ type
       const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
     procedure WarningValueChanged(const AValueName, AOldValue, ANewValue: String; const AField: IioDBBuilderSchemaField;
       const ATable: IioDBBuilderSchemaTable); virtual;
-
-    function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
-    function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
-    function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean; override;
   public
 
   end;
@@ -53,6 +72,7 @@ uses
   System.SysUtils,
   System.StrUtils,
 
+  iORM.Exceptions,
   iORM.DB.Factory,
   iORM.DB.Interfaces,
   iORM.DBBuilder.QueryEngine
@@ -70,6 +90,15 @@ const
 
 { TioDBBuilderFirebird }
 
+procedure TioDBBuilderStrategyFirebird.AlterTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
+begin
+  AScript.Add(SqlGenerator.BuildBeginAlterTableSql(ATable));
+  AScript.IncIndentationLevel;
+  AddOrAlterFields(AScript, ATable);
+  AScript.DecIndentationLevel;
+  AScript.Add(SqlGenerator.BuildEndAlterTableSql(ATable));
+end;
+
 procedure TioDBBuilderStrategyFirebird.CreateDatabase;
 begin
   // N.B. Sfrutta un parametro di Firedac per autocreare il db se non esiste
@@ -80,15 +109,82 @@ begin
   TioDbFactory.ConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.Values['OpenMode'] := 'Open';
 end;
 
+procedure TioDBBuilderStrategyFirebird.CreateSequences(const AScript: IioDBBuilderSqlScript);
+var
+  LSequence: String;
+begin
+  if not Assigned(AScript) then
+    raise EioArgumentNilException.Create(ClassName, 'CreateSequences', 'AScript is not assigned.');
+
+  if Schema.Sequences.Count = 0 then
+    Exit;
+
+  AScript.AddTitle('Creating sequences (if empty, no sequence needs to be created)');
+
+  if not Assigned(FBSqlGenerator) then
+    raise EioGenericException.Create(ClassName, 'CreateSequences', 'SqlGenerator doesn''t support IioDBBuilderSqlGeneratorFirebird interface.');
+
+  for LSequence in Schema.Sequences do
+  begin
+    // Check if sequence exists, then create it
+    if (Schema.Status = stCreate) or (not SequenceExists(LSequence)) then
+      AScript.Add(FBSqlGenerator.BuildAddSequenceSql(LSequence, Schema.Status = stCreate));
+  end;
+end;
+
+procedure TioDBBuilderStrategyFirebird.CreateTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
+var
+  LSqlGen: IioDBBuilderSqlGeneratorFirebird;
+begin
+  // Carlo Marona (2025-10-16): don't call inherited, it rewrites the method from scratch
+  if not Assigned(AScript) then
+    raise EioArgumentNilException.Create(ClassName, 'CreateTable', 'AScript is not assigned.');
+
+  if not Assigned(ATable) then
+    raise EioArgumentNilException.Create(ClassName, 'CreateTable', 'ATable is not assigned.');
+
+  AScript.AddTitle(Format('Creating table ''%s''', [ATable.TableName]));
+
+  CreateTableSequence(AScript, ATable);
+  AScript.AddEmpty;
+  AScript.Add(SqlGenerator.BuildBeginCreateTableSql(ATable));
+  Ascript.IncIndentationLevel;
+  AScript.Add(SqlGenerator.BuildCreateFieldsSql(ATable, AScript.CurrentIndentation), False);
+  AScript.DecIndentationLevel;
+  AScript.Add(SqlGenerator.BuildEndCreateTableSql(ATable));
+  AScript.AddEmpty;
+  AScript.Add(SqlGenerator.BuildAddPrimaryKeySql(ATable));
+  AScript.AddEmpty;
+  CreateTableIndexes(AScript, ATable);
+end;
+
+procedure TioDBBuilderStrategyFirebird.CreateTableSequence(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
+begin
+  if not Assigned(AScript) then
+    raise EioArgumentNilException.Create(ClassName, 'CreateTableSequence', 'AScript is not assigned.');
+
+  if not Assigned(ATable) then
+    raise EioArgumentNilException.Create(ClassName, 'CreateTableSequence', 'ATable is not assigned.');
+
+  if ATable.GetSequenceName.IsEmpty then
+    Exit;
+
+  if not Assigned(FBSqlGenerator) then
+    raise EioGenericException.Create(ClassName, 'CreateTableSequence', 'SqlGenerator doesn''t support IioDBBuilderSqlGeneratorFirebird interface.');
+
+  // Check if sequence exists, then create it
+  if (ATable.Status = stCreate) or (not SequenceExists(ATable.GetSequenceName)) then
+    AScript.Add(FBSqlGenerator.BuildAddSequenceSql(ATable.GetSequenceName, ATable.Status = stCreate));
+end;
+
 function TioDBBuilderStrategyFirebird.DatabaseExists: Boolean;
 var
   LOldOpenMode: string;
 begin
-  // Create the query to retrieve if DB exists
   // NB: This code also works with ALIAS, the old one doesnt
   // Carlo Marona (2025-10-10): Opening a query here implies opening the connection and if OpenMode param is set to OpenOrCreate or Create
-  //               (old code calls it CreateDatabase) in FireDac component the database will be created, so the method
-  //               returns always true
+  //               (old code calls it CreateDatabase) in FireDac component the database will be created, so the method returns
+  //               always true
   try
     // Carlo Marona (2025-10-10): Saves old OpenMode FireDac option to restore later
     LOldOpenMode := TioDbFactory.ConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.Values['OpenMode'];
@@ -105,6 +201,61 @@ begin
   finally
     // Carlo Marona (2025-10-10): Restores old OpenMode value
     TioDbFactory.ConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.Values['OpenMode'] := LOldOpenMode;
+  end;
+end;
+
+procedure TioDBBuilderStrategyFirebird.DropForeignKeys(const AScript: IioDBBuilderSqlScript);
+var
+  LQuery: IioQuery;
+begin
+  LQuery := TioDBBuilderQueryEngine.NewQuery(ConnectionDefName);
+  LQuery.SQL.Text := SqlGenerator.BuildListAllForeignKeysSql;
+  LQuery.Open;
+
+  while not LQuery.Eof do
+  begin
+    AScript.Add(SqlGenerator.BuildDropForeignKeySql(LQuery.Fields.FieldByName('table_name').AsString,
+      LQuery.Fields.FieldByName('constraint_name').AsString));
+    LQuery.Next;
+  end;
+end;
+
+procedure TioDBBuilderStrategyFirebird.DropIndexes(const AScript: IioDBBuilderSqlScript);
+var
+  LQuery: IioQuery;
+begin
+  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildListAllIndexesSql);
+
+  while not LQuery.Eof do
+  begin
+    AScript.Add(SqlGenerator.BuildDropIndexSql(LQuery.Fields[0].AsString));
+    LQuery.Next;
+  end;
+end;
+
+procedure TioDBBuilderStrategyFirebird.DropSequence(const ASequenceName: string);
+var
+  LQuery: IioQuery;
+begin
+  if ASequenceName.IsEmpty then
+    raise EioArgumentNilException.Create(ClassName, 'SequenceExists', 'ASequenceName is not specified.');
+
+  if not Assigned(FBSqlGenerator) then
+    raise EioGenericException.Create(ClassName, 'SequenceExists', 'SqlGenerator doesn''t support IioDBBuilderSqlGeneratorFirebird interface.');
+
+  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, FBSqlGenerator.BuildDropSequenceSql(ASequenceName));
+end;
+
+procedure TioDBBuilderStrategyFirebird.DropTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
+var
+  LQuery: IioQuery;
+begin
+  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildListTableIndexesSql(ATable));
+
+  while not LQuery.Eof do
+  begin
+    AScript.Add(SqlGenerator.BuildDropIndexSql(LQuery.Fields[0].AsString));
+    LQuery.Next;
   end;
 end;
 
@@ -226,6 +377,69 @@ begin
     Result := Result or IsBlobSubTypeChanged(LOldFieldSubType, LNewFieldSubType, AField, ATable, False);
 end;
 
+procedure TioDBBuilderStrategyFirebird.GenerateDatabaseObjects(const AScript: IioDBBuilderSqlScript; const Create: boolean);
+var
+  LDropForeignKeys,
+  LDropIndexes: boolean;
+begin
+  if Create then
+  begin
+    CreateTables(AScript);
+    // CreateSequences(AScript);  // Carlo Marona: Create sequence was moved in CreateTable method so the create table method creates all table components
+
+    //if Schema.IndexesEnabled then  // Carlo Marona: Create indexes was moved in CreateTable method so the create table method creates all table components
+    //  CreateIndexes(AScript);
+
+    // Foreignkeys are created at the end so all referenced tables are already created
+    if Schema.ForeignKeysEnabled then
+      CreateForeignKeys(Ascript);
+  end
+  else
+  begin
+    DropForeignKeys(AScript);
+    //DropIndexes(AScript);  // Carlo Marona: Create index method was updated to check if index exists before create so there's no need to remove all indexes blindly
+    CreateOrAlterTables(AScript);
+    // CreateSequences(AScript);  // Carlo Marona: Create sequence was moved in CreateTable method so the create table method creates all table components
+
+    //if Schema.IndexesEnabled then  // Carlo Marona: Create indexes was moved in CreateTable method so the create table method creates all table components
+    //  CreateIndexes(AScript);
+
+    // Foreignkeys are created at the end so all referenced tables are already created
+    if Schema.ForeignKeysEnabled then
+      CreateForeignKeys(Ascript);
+  end;
+end;
+
+function TioDBBuilderStrategyFirebird.GetFBSqlGenerator: IioDBBuilderSqlGeneratorFirebird;
+begin
+  Result := nil;
+
+  Supports(SqlGenerator, IioDBBuilderSqlGeneratorFirebird, Result);
+end;
+
+function TioDBBuilderStrategyFirebird.IndexExists(const AIndexName: string): boolean;
+var
+  LQuery: IioQuery;
+begin
+  Result := False;
+
+  if AIndexName.IsEmpty then
+    Exit;
+
+  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildIndexExistsSql(AIndexName));
+  Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
+end;
+
+function TioDBBuilderStrategyFirebird.IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): boolean;
+var
+  LQuery: IioQuery;
+begin
+  Result := False;
+
+  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildIndexExistsSql(ATable, AIndex));
+  Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
+end;
+
 function TioDBBuilderStrategyFirebird.IsBlobSubTypeChanged(const AOldBlobSubType, ANewBlobSubType: String;
   const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean;
 begin
@@ -287,7 +501,7 @@ begin
 end;
 
 function TioDBBuilderStrategyFirebird.IsFieldTypeChanged(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField;
-      const ATable: IioDBBuilderSchemaTable): Boolean;
+  const ATable: IioDBBuilderSchemaTable): Boolean;
 begin
   Result := not SameText(AOldFieldType, ANewFieldType);
   if Result then
@@ -295,6 +509,21 @@ begin
     AField.AddAltered(alFieldType);
     WarningTypeAffinity(AOldFieldType, ANewFieldType, AField, ATable, INVALID_FIELDTYPE_CONVERSIONS);
   end;
+end;
+
+function TioDBBuilderStrategyFirebird.SequenceExists(const ASequenceName: string): boolean;
+var
+  LQuery: IioQuery;
+  LSqlGen: IioDBBuilderSqlGeneratorFirebird;
+begin
+  if ASequenceName.IsEmpty then
+    raise EioArgumentNilException.Create(ClassName, 'SequenceExists', 'ASequenceName is not specified.');
+
+  if not Supports(SqlGenerator, IioDBBuilderSqlGeneratorFirebird, LSqlGen) then
+    raise EioGenericException.Create(ClassName, 'SequenceExists', 'SqlGenerator doesn''t support IioDBBuilderSqlGeneratorFirebird interface.');
+
+  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, LSqlGen.BuildSequenceExistsSql(ASequenceName));
+  Result := LQuery.Fields[0].AsInteger > 0;
 end;
 
 function TioDBBuilderStrategyFirebird.TableExists(const ATable: IioDBBuilderSchemaTable): Boolean;

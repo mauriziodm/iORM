@@ -53,46 +53,48 @@ type
   TioDBBuilderSqlGenBase = class(TInterfacedObject, IioDBBuilderSqlGenerator)
   private
   protected
-    function TValueToSql(const AValue: TValue): string; virtual; abstract;
+    function BuildCommentSql(const AText: string): string; virtual;
+    function BuildWarningSql(const AText: string): string; virtual;
     function ExtractFieldDefaultValue(const AField: IioDBBuilderSchemaField): string;
     function NewTextBuilder: IioTextBuilder; overload;
     function NewTextBuilder(const AIndentation: TioIndentation): IioTextBuilder; overload;
     function TranslateFieldType(const AField: IioDBBuilderSchemaField; const ReturnTypeNameOnly: boolean = true): String; virtual; abstract;
     function TranslateFKAction(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
-    function BuildCommentSql(const AText: string): string; virtual;
-    function BuildWarningSql(const AText: string): string; virtual;
+    function TValueToSql(const AValue: TValue): string; virtual; abstract;
     // Indexes related methods
-    function BuildIndexNameSql(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): String; virtual;
-    function BuildIndexUnique(const AIndex: ioIndex): String; virtual;
-    function BuildIndexOrientation(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex; const AIndexName: String): String; virtual;
     function BuildIndexFieldList(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex; const AIndexName: String;
       const AWithIndexOrientation: Boolean): String; virtual;
+    function BuildIndexNameSql(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): String; virtual;
+    function BuildIndexOrientation(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex; const AIndexName: String): String; virtual;
+    function BuildIndexUnique(const AIndex: ioIndex): String; virtual;
     // Tables related methods
-    function BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
-    function BuildEndCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     function BuildBeginAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
-    function BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
+    function BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     function BuildCreateTableSql(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string; virtual; abstract;
+    function BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
+    function BuildEndCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     function BuildTableExistsSql(const ATableName: string): string; virtual; abstract;
     // Fields related methods
-    function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string; virtual; abstract;
-    function BuildCreateFieldsSql(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string; virtual;
     function BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildAlterFieldSql(const AField: IioDBBuilderSchemaField): string; virtual; abstract;
+    function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string; virtual; abstract;
+    function BuildCreateFieldsSql(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string; virtual;
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
-    // PrimaryKey & other indexes
+    // PrimaryKeys related methods
     function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): string; virtual; abstract;
-    function BuildListAllIndexesSql: string; virtual; abstract;
+    // Index related methods
     function BuildDropIndexSql(const AIndexName: string): string; virtual; abstract;
+    function BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): string; overload; virtual; abstract;
+    function BuildIndexExistsSql(const AIndexName: string): string; overload; virtual; abstract;
+    function BuildListAllIndexesSql: string; virtual; abstract;
+    function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     // Foreign keys
     function BuildAddForeignKeySql(const AForeignKey: IioDBBuilderSchemaFK): string; virtual; abstract;
-    function BuildListAllForeignKeysSql: string; virtual; abstract;
     function BuildDropForeignKeySql(const ATableName, AForeignKeyName: string): string; virtual; abstract;
-    // Sequences
-    function BuildAddSequenceSql(const ASequenceName: String; const ACreatingNewDatabase: Boolean): string; virtual; abstract;
-    function BuildSequenceExistsSql(const ASequenceName: string): string; virtual; abstract;
+    function BuildListAllForeignKeysSql: string; virtual; abstract;
+    function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
   public
     constructor Create; virtual;
   end;

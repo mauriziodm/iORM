@@ -4,16 +4,33 @@ interface
 
 uses
   iORM.DBBuilder.Interfaces,
-  iORM.DBBuilder.Strategy.WithoutAlterTable
+  iORM.DBBuilder.Strategy.Base
 
   ;
 
 
 type
-  TioDBBuilderStrategySqLite = class(TioDBBuilderStrategyWithoutAlter)
+  TioDBBuilderStrategySqLite = class(TioDBBuilderStrategyBase)
   private
+    procedure CopyDataFromOldToNewTables(const AScript: IioDBBuilderSqlScript);
+    procedure CopyDataFromOldToNewTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
     procedure DropAllIndexes(const AScript: IioDBBuilderSqlScript);
+    procedure RenameAllTablesToOld(const AScript: IioDBBuilderSqlScript); // For SQLite, if the DB is to be modified (not created) it renames all tables with "_old"
+    function Table2OldTableName(const ATable: IioDBBuilderSchemaTable): String;
   protected
+    procedure AlterTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); override;
+    procedure CreateTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); override;
+
+    procedure CreateDatabase; override;
+
+    procedure GenerateDatabaseObjects(const AScript: IioDBBuilderSqlScript; const Create: boolean); override;
+
+    function DatabaseExists: Boolean; override;
+    function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
+    function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
+    function IndexExists(const AIndexName: string): boolean; override;
+    function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean; override;
+
     function IsFieldTypeChanged(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField;
       const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
     function IsFieldNotNullChanged(const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField;
@@ -26,15 +43,9 @@ type
     procedure WarningNullBecomesNotNull(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField;
       const ATable: IioDBBuilderSchemaTable); virtual;
 
-    procedure CreateDatabase; override;
-    function DatabaseExists: Boolean; override;
     procedure DropIndexes(const AScript: IioDBBuilderSqlScript); override;
-    function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
-    function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
-    procedure GenerateDatabaseObjects(const AScript: IioDBBuilderSqlScript; const Create: boolean); override;
-    function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean; override;
+    procedure DropTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); override;
   public
-//    procedure GenerateCreateOrAlterScript(const AScript: IioDBBuilderSqlScript); override;
   end;
 
 
@@ -60,9 +71,95 @@ const
 
 { TioDBBuilderSqLite }
 
+procedure TioDBBuilderStrategySqLite.AlterTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
+begin
+  AScript.Add(SqlGenerator.BuildBeginAlterTableSql(ATable));
+  AScript.IncIndentationLevel;
+  AScript.Add(SqlGenerator.BuildCreateFieldsSql(ATable, AScript.CurrentIndentation));
+
+  if Schema.ForeignKeysEnabled then
+    CreateTableForeignKeys(AScript, ATable);
+
+  AScript.DecIndentationLevel;
+  AScript.Add(SqlGenerator.BuildEndAlterTableSql(ATable));
+end;
+
+procedure TioDBBuilderStrategySqLite.CopyDataFromOldToNewTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
+var
+  LField: IioDBBuilderSchemaField;
+  LComma: string;
+begin
+  AScript.AddComment(Format('Copying data from "%s" to "%s"', [Table2OldTableName(ATable), ATable.TableName]));
+  // Insert into
+  AScript.Add(Format('INSERT INTO %s (', [ATable.TableName]));
+  AScript.IncIndentationLevel;
+
+  LComma := '  ';
+
+  for LField in ATable.Fields do
+  begin
+    if LField.Status = stCreate then
+      Continue;
+
+    AScript.Add(Format('%s%s', [LComma, LField.FieldName]));
+    LComma := ', ';
+  end;
+
+  AScript.DecIndentationLevel;
+
+  // Select from
+  AScript.Add(') SELECT');
+  AScript.IncIndentationLevel;
+
+  LComma := '  ';
+
+  for LField in ATable.Fields do
+  begin
+    if LField.Status = stCreate then
+      Continue;
+
+    AScript.Add(Format('%s%s', [LComma, LField.FieldName]));
+    LComma := ', ';
+  end;
+
+  AScript.DecIndentationLevel;
+
+  AScript.Add(Format('FROM %s', [Table2OldTableName(ATable)]));
+  AScript.Add(';');
+  AScript.AddEmpty;
+end;
+
+procedure TioDBBuilderStrategySqLite.CopyDataFromOldToNewTables(const AScript: IioDBBuilderSqlScript);
+var
+  LTable: IioDBBuilderSchemaTable;
+begin
+  AScript.AddTitle('Copying data from "_old" tables.');
+
+  for LTable in Schema.Tables.Values do
+  begin
+    if LTable.Status <> stUpdate then
+      Continue;
+
+    CopyDataFromOldToNewTable(AScript, LTable);
+  end;
+end;
+
 procedure TioDBBuilderStrategySqLite.CreateDatabase;
 begin
   TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, 'SELECT 1=1');
+end;
+
+procedure TioDBBuilderStrategySqLite.CreateTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
+begin
+  AScript.Add(SqlGenerator.BuildBeginCreateTableSql(ATable));
+  AScript.IncIndentationLevel;
+  AScript.Add(SqlGenerator.BuildCreateFieldsSql(ATable, AScript.CurrentIndentation), False);
+
+  if Schema.ForeignKeysEnabled then
+    CreateTableForeignKeys(AScript, ATable);
+
+  AScript.DecIndentationLevel;
+  AScript.Add(SqlGenerator.BuildEndCreateTableSql(ATable));
 end;
 
 function TioDBBuilderStrategySqLite.DatabaseExists: Boolean;
@@ -84,7 +181,7 @@ begin
   end;
 
   // For SQLite, if the DB is to be modified (not created) it renames all tables with "_old"
-  if Schema.Status = stAlter then
+  if Schema.Status = stUpdate then
     RenameAllTablesToOld(AScript);
 end;
 
@@ -93,6 +190,20 @@ begin
   inherited;
 
   DropAllIndexes(AScript);
+end;
+
+procedure TioDBBuilderStrategySqLite.DropTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
+var
+  LQuery: IioQuery;
+begin
+  // Carlo Marona (2025-10-16): ref to https://stackoverflow.com/questions/13426006/how-do-i-get-a-list-of-indexed-columns-for-a-given-table
+  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, Format('PRAGMA index_list(''%s''', [ATable.TableName]));
+
+  while not LQuery.Eof do
+  begin
+    AScript.Add(Format('DROP INDEX %s;', [LQuery.Fields.FieldByName('name').AsString]));
+    LQuery.Next;
+  end;
 end;
 
 function TioDBBuilderStrategySqLite.FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
@@ -121,7 +232,7 @@ var
   LOldFieldNotNull: Boolean;
 begin
   Result := False;
-  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, Format('pragma table_info(''%s'')', [ATable.TableName]));
+  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildFieldModifiedSql(ATable, nil));
 
   while not LQuery.Eof do
   begin
@@ -169,7 +280,7 @@ begin
     if Schema.IndexesEnabled then
       CreateIndexes(AScript);
 
-    if Schema.Status = tioDBBuilderStatus.stAlter then
+    if Schema.Status = tioDBBuilderStatus.stUpdate then
       CopyDataFromOldToNewTables(AScript);
   end;
 
@@ -179,33 +290,13 @@ begin
   AScript.AddEmpty;
 end;
 
-//procedure TioDBBuilderStrategySqLite.GenerateCreateOrAlterScript(const AScript: IioDBBuilderSqlScript);
-//begin
-//  AScript.ScriptBegin(ConnectionDefName, TioConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.DriverID);
-//
-//  AScript.AddEmpty;
-//  AScript.AddComment('Before we start...');
-//  AScript.Add('PRAGMA defer_foreign_keys=off;');
-//
-//  if Schema.WarningExists then
-//    AScript.AddWarnings(Schema.Warnings);
-//
-//  DropIndexes(AScript);
-//  CreateOrAlterTables(AScript);
-//
-//  if Schema.IndexesEnabled then
-//    CreateIndexes(AScript);
-//
-//  if Schema.Status = tioDBBuilderStatus.stAlter then
-//    CopyDataFromOldToNewTables(AScript);
-//
-//  AScript.AddEmpty;
-//  AScript.AddComment('At the end...');
-//  AScript.Add('PRAGMA defer_foreign_keys=on;');
-//  AScript.AddEmpty;
-//
-//  AScript.ScriptEnd;
-//end;
+function TioDBBuilderStrategySqLite.IndexExists(const AIndexName: string): boolean;
+var
+  LQuery: IioQuery;
+begin
+  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildIndexExistsSql(AIndexName));
+  Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
+end;
 
 function TioDBBuilderStrategySqLite.IsFieldNotNullChanged(const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField;
   const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean;
@@ -231,6 +322,29 @@ begin
     AField.AddAltered(alFieldType);
     WarningTypeAffinity(AOldFieldType, ANewFieldType, AField, ATable, INVALID_FIELDTYPE_CONVERSIONS);
   end;
+end;
+
+procedure TioDBBuilderStrategySqLite.RenameAllTablesToOld(const AScript: IioDBBuilderSqlScript);
+var
+  LTable: IioDBBuilderSchemaTable;
+begin
+  AScript.AddTitle('Renaming table names to "_old"');
+
+  for LTable in Schema.Tables.Values do
+  begin
+    if LTable.Status <> stUpdate then
+      Continue;
+
+    AScript.AddComment(Format('Renaming from "%s" to "%s"', [LTable.TableName, Table2OldTableName(LTable)]));
+    AScript.Add(Format('DROP TABLE IF EXISTS %s;', [Table2OldTableName(LTable)]));
+    AScript.Add(Format('ALTER TABLE %s RENAME TO %s;', [LTable.TableName, Table2OldTableName(LTable)]));
+    AScript.AddEmpty;
+  end;
+end;
+
+function TioDBBuilderStrategySqLite.Table2OldTableName(const ATable: IioDBBuilderSchemaTable): String;
+begin
+  Result := Format('_%s_old', [ATable.TableName.ToLower]);
 end;
 
 function TioDBBuilderStrategySqLite.TableExists(const ATable: IioDBBuilderSchemaTable): Boolean;

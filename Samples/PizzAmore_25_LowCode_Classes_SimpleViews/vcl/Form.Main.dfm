@@ -8464,6 +8464,7 @@ object MainForm: TMainForm
       FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
       FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
     Stretch = True
+    OnMouseDown = ImagePizzaMouseDown
   end
   object LabelTitlePizz: TLabel
     Left = 48

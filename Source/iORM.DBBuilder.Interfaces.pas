@@ -41,8 +41,8 @@ uses
 
 type
 
-  TioDBBuilderEngineResult = (dbUptodate, dbNotExists, dbUpdatesNeeded, dbWarningExists);
-  TioDBBuilderStatus = (stClean, stAlter, stCreate);
+  TioDBBuilderEngineStatus = (dbToBeAnalyzed, dbUptodate, dbNotExists, dbUpdatesNeeded, dbWarningExists);
+  TioDBBuilderStatus = (stClean, stUpdate, stCreate);
   TioDBBuilderFieldAlterStatus = (alFieldType, alFieldDefault, alFieldNotNull, alFieldPrecision, alFieldLength);
   TioDBBuilderFieldAlter = set of TioDBBuilderFieldAlterStatus;
 
@@ -163,68 +163,99 @@ type
     ['{9B5DE886-BE08-4422-9D6C-A92ABF948CD9}']
 
     // Tables related methods
-    function BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string;
-    function BuildEndCreateTableSql(const ATable: IioDBBuilderSchemaTable): string;
     function BuildBeginAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
+    function BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string;
     function BuildCreateTableSql(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string;
     function BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
+    function BuildEndCreateTableSql(const ATable: IioDBBuilderSchemaTable): string;
     function BuildTableExistsSql(const ATableName: string): string;
     // Fields related methods
-    function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string;
-    function BuildCreateFieldsSql(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string;
     function BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string;
     function BuildAlterFieldSql(const AField: IioDBBuilderSchemaField): string;
+    function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string;
+    function BuildCreateFieldsSql(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string;
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     function TranslateFieldType(const AField: IioDBBuilderSchemaField; const ReturnTypeNameOnly: boolean = true): String;
-    // PrimaryKey & other indexes
+    // PrimaryKeys related methods
     function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string;
+    // Indexes related methods
     function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): string;
     function BuildDropIndexSql(const AIndexName: string): string;
+    function BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): string; overload;
+    function BuildIndexExistsSql(const AIndexName: string): string; overload;
     function BuildListAllIndexesSql: string;
+    function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string;
     // Foreign keys
     function BuildAddForeignKeySql(const AForeignKey: IioDBBuilderSchemaFK): string;
-    function BuildListAllForeignKeysSql: string;
     function BuildDropForeignKeySql(const ATableName, AForeignKeyName: string): string;
-    // Sequences
-    function BuildAddSequenceSql(const ASequenceName: String; const ACreatingNewDatabase: boolean): string;
-    function BuildSequenceExistsSql(const ASequenceName: string): string;
+    function BuildListAllForeignKeysSql: string;
+    function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string;
   end;
 
   IioDBBuilderStrategy = interface
     ['{4187C897-A5C6-4807-87D0-C466D3EE34CE}']
+    procedure AlterTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
     procedure CreateDatabase;
+    procedure CreateForeignKeys(const AScript: IioDBBuilderSqlScript);
+    procedure CreateIndexes(const AScript: IioDBBuilderSqlScript);
+    procedure CreateTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
+    procedure CreateTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
+    procedure CreateTableForeignKeys(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
     function DatabaseExists: Boolean;
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
+    function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): boolean; overload;
+    function IndexExists(const AIndexName: string): boolean; overload;
     function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean;
-    //procedure GenerateCreateOrAlterScript(const AScript: IioDBBuilderSqlScript);
+
     procedure GenerateCreateDatabaseScript(const AScript: IioDBBuilderSqlScript);
     procedure GenerateUpdateDatabaseScript(const AScript: IioDBBuilderSqlScript);
   end;
 
   IioDBBuilderDBAnalyzer = interface
     ['{8F82C20B-5D51-42FE-80D2-96F818F3B555}']
-    procedure Analyze;
+    procedure Analyze(const ForceCreate: boolean = false);
   end;
 
   IioDBBuilderEngine = interface
     ['{E7BC9176-4C71-48CA-A92F-37DE99E0AC3A}']
-    function GetSchema: IioDBBuilderSchema;
+    function GetStatus: TioDBBuilderEngineStatus;
     function GetWarnings: TStrings;
 
-    procedure Analyze;
-    procedure CreateOrAlterDB(const AForce: Boolean = False; const AScript: IioDBBuilderSqlScript = nil);
-    procedure BuildCreateOrAlterDBSqlScipt(const AScript: IioDBBuilderSqlScript);
+    /// <summary>
+    ///  Analyzes the schema generated by entities mapping and current database schema updating the schema status.
+    ///  It must be called before CreateOrAlterDB, BuildCreateDBSqlScript, BuildUpdateDBSqlScript or BuildCreateOrAlterDBSqlScript methods.
+    /// <param name="ForceCreate">Forces the analyzer to act if the database should be created</param>
+    /// <remarks>
+    ///  If the ForceCreate parameter is true, the analyzer behaves like the database doesn't exists and should be created even if it already exists.
+    ///  If the ForceCreate parameter is false, the analyzer behaves like normal, acting as if the database doesn't exists if not exists or updated it if already exists.
+    /// </remarks>
+    /// </summary>
+    procedure Analyze(const ForceCreate: boolean = false);
+    /// <summary>
+    ///  Build Creates or Alter database SQL script based on schema status.
+    /// <param name="AScript">The script where sql instructions will be returned.</param>
+    /// </summary>
+    procedure BuildCreateOrUpdateDBSqlScript(const AScript: IioDBBuilderSqlScript);
+    /// <summary>
+    ///  Build Creates database SQL script regardless of schema status.
+    /// <param name="AScript">The script where sql instructions will be returned.</param>
+    /// </summary>
+    procedure BuildCreateDBSqlScript(const AScript: IioDBBuilderSqlScript);
+    /// <summary>
+    ///  Build update database SQL script regardless of schema status.
+    /// <param name="AScript">The script where sql instructions will be returned.</param>
+    /// </summary>
+    procedure BuildUpdateDBSqlScript(const AScript: IioDBBuilderSqlScript);
+    /// <summary>
+    ///  Creates or update the database depending on the actual schema/database status.
+    ///  No need to call Analyze because it is called internally.
+    /// <param name="Force">Forces the execution regardless of the schema status.</param>
+    /// </summary>
+    procedure CreateOrUpdateDB(const Force: Boolean = False; const AScript: IioDBBuilderSqlScript = nil);
 
-    function GetStatus: TioDBBuilderEngineResult;
-    function GetStatusAsString: String;
-    function GetStatusDescription: String;
-
-    property Schema: IioDBBuilderSchema read GetSchema;
-    property Status: TioDBBuilderEngineResult read GetStatus;
-    property StatusAsString: string read GetStatusAsString;
-    property StatusDescription: string read GetStatusDescription;
+    property Status: TioDBBuilderEngineStatus read GetStatus;
     property Warnings: TStrings read GetWarnings;
   end;
 

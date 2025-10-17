@@ -64,7 +64,7 @@ type
   public
     constructor Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator);
 
-    procedure Analyze; virtual;
+    procedure Analyze(const ForceCreate: boolean = false); virtual;
   end;
 
 implementation
@@ -129,10 +129,10 @@ begin
   Result := Strategy.TableExists(ATable);
 end;
 
-procedure TioDBBuilderDBAnalyzer.Analyze;
+procedure TioDBBuilderDBAnalyzer.Analyze(const ForceCreate: boolean);
 begin
   // Analyze if the database exists and set  it's status
-  if not DatabaseExists then
+  if ForceCreate or not DatabaseExists then
     Schema.Status := stCreate;
 end;
 
@@ -147,12 +147,12 @@ begin
     if not FieldExists(ATable, LField) then
       LField.Status := stCreate
     else if FieldModified(ATable, LField) then
-      LField.Status := stAlter;
+      LField.Status := stUpdate;
 
     // If the field status is not dbsClean (field modified) then
     //  table status became dbsAlter
     if LField.Status > stClean then
-      ATable.Status := stAlter;
+      ATable.Status := stUpdate;
   end;
 end;
 

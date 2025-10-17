@@ -74,7 +74,7 @@ uses
   iORM.DBBuilder.Schema, iORM.DBBuilder.Schema.Table, iORM.DBBuilder.Schema.Field, iORM.DBBuilder.Schema.FK,
   iORM.DBBuilder.Schema.Builder, iORM.DB.ConnectionContainer, iORM.DB.Interfaces, iORM.DBBuilder.SqlGenerator.Firebird,
   iORM.DBBuilder.SqlGenerator.SqLite, iORM.DBBuilder.Strategy.SqLite, iORM.DBBuilder.Strategy.Firebird,
-  iORM.DBBuilder.Strategy.WithAlterTable, iORM.Exceptions, iORM.DBBuilder.DBAnalyzer, iORM.DBBuilder.Engine, iORM.DBBuilder.SqlScript.Base,
+  iORM.Exceptions, iORM.DBBuilder.DBAnalyzer, iORM.DBBuilder.Engine, iORM.DBBuilder.SqlScript.Base,
   iORM.DBBuilder.DBAnalyzer.Firebird, iORM.DBBuilder.DBAnalyzer.SqLite,
 {$IFNDEF ioDelphiProfessional}
   iORM.DBBuilder.SqlGenerator.MSSqlServer,
