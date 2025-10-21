@@ -32,6 +32,7 @@ var
 begin
   inherited;
 
+  // Carlo Marona (2025-10-20): What's the need of a transaction????? I think it can be removed because no changes should be made by the analyzer on the db.
   // Start the transaction (if the DB already exists otherwise an error would occur)
   if Schema.Status <> stCreate then
     io.StartTransaction(ConnectionDefName);
@@ -45,7 +46,11 @@ begin
       if (Schema.Status = stCreate) or not TableExists(LTable) then
         LTable.Status := stCreate
       else
+      begin
         AnalyzeFields(LTable);
+        AnalyzeIndexes(LTable);
+        AnalyzeForeignKeys(LTable);
+      end;
 
       // If the table status is not dbsClean then schema status became dbsAlter
       if LTable.Status > stClean then

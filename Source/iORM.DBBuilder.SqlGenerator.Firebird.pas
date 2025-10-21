@@ -73,15 +73,18 @@ type
     // PrimaryKey related methods
     function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string; override;
     // Indexes related methods
-    function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): string; override;
+    function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildDropIndexSql(const AIndexName: string): string; override;
-    function BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): string; override;
+    function BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildIndexExistsSql(const AIndexName: string): string; override;
+    function BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildListAllIndexesSql: string; override;
     function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string; override;
     // Foreign keys
     function BuildAddForeignKeySql(const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildDropForeignKeySql(const ATableName, AForeignKeyName: string): string; override;
+    function BuildForeignKeyExistsSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
+    function BuildForeignKeyModifiedSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildListAllForeignKeysSql: string; override;
     function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string; override;
     // Sequences
@@ -123,7 +126,7 @@ var
 begin
   // N.B. Viene calcolato un nome random (quindi non uso l'apposito metodo dell'antenato se eccessivo)
   // perchè in FB c'e' un limite a 30 caratteri di lunghezza per i nomi dei constraint
-  LFKName := AdaptIndexOrFKName('FK_', AForeignKey.Name);
+  LFKName := AdaptIndexOrFKName('FK_', AForeignKey.Name.ToUpper);   // Carlo Marona (2025-10-21): Made foreign key name uppercase
 
   LTextBuilder := NewTextBuilder;
 
@@ -167,7 +170,7 @@ begin
   Result := LTextBuilder.Text;
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): string;
+function TioDBBuilderSqlGenFirebird.BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
 var
   LSqlText, LIndexName, LFieldList, LUnique, LIndexOrientation: String;
 begin
@@ -253,14 +256,70 @@ begin
   Result := EmptyStr;
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): string;
+function TioDBBuilderSqlGenFirebird.BuildForeignKeyExistsSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
+begin
+  Result := Format(
+    'select' + sLineBreak +
+    '  RDB$RELATION_CONSTRAINTS.rdb$constraint_name' + sLineBreak +
+    'from' + sLineBreak +
+    '  RDB$RELATIONS join RDB$RELATION_CONSTRAINTS ON RDB$RELATIONS.rdb$relation_name = RDB$RELATION_CONSTRAINTS.rdb$relation_name' + sLineBreak +
+    'where' + sLineBreak +
+    '  (RDB$RELATIONS.rdb$system_flag = 0) and' + sLineBreak +
+    '  (RDB$RELATION_CONSTRAINTS.rdb$constraint_type = ''FOREIGN KEY'') and' + sLineBreak +
+    '  (RDB$RELATIONS.Rdb$relation_name = ''%s'') and' + sLineBreak +
+    '  (RDB$RELATION_CONSTRAINTS.rdb$constraint_name = ''%s''))',
+    [ATable.TableName, AForeignKey.Name]
+  );
+end;
+
+function TioDBBuilderSqlGenFirebird.BuildForeignKeyModifiedSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
+begin
+  Result := Format(
+    'SELECT' + sLineBreak +
+    '  detail_index_segments.rdb$field_name AS Field_Name,' + sLineBreak +
+    '  master_relation_constraints.rdb$relation_name AS Reference_Table,' + sLineBreak +
+    '  master_index_segments.rdb$field_name AS FK_Field' + sLineBreak +
+    'FROM' + sLineBreak +
+    '  rdb$relation_constraints detail_relation_constraints JOIN'+ sLineBreak +
+    '  rdb$index_segments detail_index_segments ON detail_relation_constraints.rdb$index_name = detail_index_segments.rdb$index_name JOIN' + sLineBreak +
+    '  rdb$ref_constraints ON detail_relation_constraints.rdb$constraint_name = rdb$ref_constraints.rdb$constraint_name JOIN' + sLineBreak +
+    '  rdb$relation_constraints master_relation_constraints ON rdb$ref_constraints.rdb$const_name_uq = master_relation_constraints.rdb$constraint_name JOIN' + sLineBreak +
+    '  rdb$index_segments master_index_segments ON master_relation_constraints.rdb$index_name = master_index_segments.rdb$index_name' + sLineBreak +
+    'WHERE' + sLineBreak +
+    '  detail_relation_constraints.rdb$constraint_type = ''FOREIGN KEY'' AND' + sLineBreak +
+    '  detail_relation_constraints.rdb$relation_name = ''%s'' AND' + sLineBreak +
+    '  detail_relation_constraints.rdb$constraint_name = ''%s''',
+    [ATable.TableName, AForeignKey.Name]
+  );
+end;
+
+function TioDBBuilderSqlGenFirebird.BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
 begin
   Result := BuildIndexExistsSql(BuildIndexNameSql(ATable, AIndex));
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildIndexExistsSql(const AIndexName: string): string;
 begin
-  Result := Format('select RDB$INDEX_NAME from RDB$INDICES where RDB$INDEX_NAME like ''%s''', [AIndexName]);
+  Result := Format('select RDB$INDEX_NAME from RDB$INDICES where RDB$INDEX_NAME = ''%s''', [AIndexName]);
+end;
+
+function TioDBBuilderSqlGenFirebird.BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
+begin
+  Result := Format(
+    'select' + sLineBreak +
+    '  rdb$indices.rdb$index_name,' + sLineBreak +
+    '  rdb$indices.rdb$relation_name,' + sLineBreak +
+    '  rdb$indices.rdb$unique_flag,' + sLineBreak +
+    '  rdb$indices.rdb$index_type,' + sLineBreak +
+    '  rdb$indices.rdb$field_name' + sLineBreak +
+    'from' + sLineBreak +
+    '  rdb$index_segments right outer join rdb$indices on (rdb$index_segments.rdb$index_name = rdb$indices.rdb$index_name)' + sLineBreak +
+    'where' + sLineBreak +
+    '  (rdb$indices.rdb$system_flag = 0) and' + sLineBreak +
+    '  (rdb$indices.rdb$relation_name = ''%s'')' + sLineBReak +
+    '  (rdb$indices.rdb$index_name = ''%s'')',
+    [ATable.TableName, AIndex.IndexName]
+  );
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildListAllForeignKeysSql: string;

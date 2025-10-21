@@ -253,6 +253,7 @@ contains
   iORM.DBBuilder.Strategy.Firebird in '..\..\Source\iORM.DBBuilder.Strategy.Firebird.pas',
   iORM.DBBuilder.DBAnalyzer.Firebird in '..\..\Source\iORM.DBBuilder.DBAnalyzer.Firebird.pas',
   iORM.DBBuilder.DBAnalyzer.SqLite in '..\..\Source\iORM.DBBuilder.DBAnalyzer.SqLite.pas',
-  iORM.DBBuilder.SqlGenerator.Firebird.Interfaces in '..\..\Source\iORM.DBBuilder.SqlGenerator.Firebird.Interfaces.pas';
+  iORM.DBBuilder.SqlGenerator.Firebird.Interfaces in '..\..\Source\iORM.DBBuilder.SqlGenerator.Firebird.Interfaces.pas',
+  iORM.DBBuilder.Schema.Index in '..\..\Source\iORM.DBBuilder.Schema.Index.pas';
 
 end.

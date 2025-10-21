@@ -427,6 +427,7 @@
         <DCCReference Include="..\..\Source\iORM.DBBuilder.DBAnalyzer.Firebird.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.DBAnalyzer.SqLite.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlGenerator.Firebird.Interfaces.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Index.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

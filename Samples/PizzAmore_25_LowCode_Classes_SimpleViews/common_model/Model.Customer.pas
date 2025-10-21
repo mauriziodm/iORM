@@ -13,6 +13,7 @@ type
   private
     FID: Integer;
     [ioWhere(coLike)]
+    [ioIndex(TioIndexOrientation.ioAscending)]
     FName: String;
     [ioWhere(coLike), etmProperty]
     FCity: String;

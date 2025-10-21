@@ -142,8 +142,8 @@ end;
 
 procedure TioDBBuilderSchema.SetStatus(const AValue: TioDBBuilderStatus);
 begin
-  if AValue > FStatus then
-    FStatus := AValue;
+//  if AValue > FStatus then  // Carlo Marona (2025-10-20): Why?
+  FStatus := AValue;
 end;
 
 function TioDBBuilderSchema.Tables: TioDBBuilderSchemaTables;

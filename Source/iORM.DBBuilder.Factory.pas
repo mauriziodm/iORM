@@ -61,6 +61,7 @@ type
     class function NewSchemaFieldClassInfo: IioDBBuilderSchemaField;
     class function NewSchemaFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction): IioDBBuilderSchemaFK;
+    class function NewSchemaIndex(const AIndex: ioIndex): IioDBBuilderSchemaIndex;
     class function NewSchemaTable(const AContextTable: IioTable): IioDBBuilderSchemaTable;
     class function NewSqlGenerator(const AConnectionDefName: String): IioDBBuilderSqlGenerator;
     class function NewSqlScript: IioDBBuilderSqlScript;
@@ -75,7 +76,7 @@ uses
   iORM.DBBuilder.Schema.Builder, iORM.DB.ConnectionContainer, iORM.DB.Interfaces, iORM.DBBuilder.SqlGenerator.Firebird,
   iORM.DBBuilder.SqlGenerator.SqLite, iORM.DBBuilder.Strategy.SqLite, iORM.DBBuilder.Strategy.Firebird,
   iORM.Exceptions, iORM.DBBuilder.DBAnalyzer, iORM.DBBuilder.Engine, iORM.DBBuilder.SqlScript.Base,
-  iORM.DBBuilder.DBAnalyzer.Firebird, iORM.DBBuilder.DBAnalyzer.SqLite,
+  iORM.DBBuilder.DBAnalyzer.Firebird, iORM.DBBuilder.DBAnalyzer.SqLite, iORM.DBBuilder.Schema.Index,
 {$IFNDEF ioDelphiProfessional}
   iORM.DBBuilder.SqlGenerator.MSSqlServer,
 {$ENDIF}
@@ -140,6 +141,11 @@ class function TioDBBuilderFactory.NewSchemaFK(const AReferenceMap, ADependentMa
   const AOnDeleteAction, AOnUpdateAction: TioFKAction): IioDBBuilderSchemaFK;
 begin
   Result := TioDBBuilderSchemaFK.Create(AReferenceMap, ADependentMap, ADependentProperty, AOnDeleteAction, AOnUpdateAction);
+end;
+
+class function TioDBBuilderFactory.NewSchemaIndex(const AIndex: ioIndex): IioDBBuilderSchemaIndex;
+begin
+  Result := TioDBBuilderSchemaIndex.Create(AIndex);
 end;
 
 class function TioDBBuilderFactory.NewSchemaTable(const AContextTable: IioTable): IioDBBuilderSchemaTable;

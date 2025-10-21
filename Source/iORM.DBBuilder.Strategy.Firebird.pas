@@ -34,8 +34,11 @@ type
     function DatabaseExists: Boolean; override;
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
-    function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): boolean; override;
+    function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
+    function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
+    function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
     function IndexExists(const AIndexName: string): boolean; override;
+    function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
     function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean; override;
 
     function IsFieldTypeChanged(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField;
@@ -72,6 +75,7 @@ uses
   System.SysUtils,
   System.StrUtils,
 
+  iORM.CommonTypes,
   iORM.Exceptions,
   iORM.DB.Factory,
   iORM.DB.Interfaces,
@@ -92,11 +96,20 @@ const
 
 procedure TioDBBuilderStrategyFirebird.AlterTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
 begin
-  AScript.Add(SqlGenerator.BuildBeginAlterTableSql(ATable));
-  AScript.IncIndentationLevel;
-  AddOrAlterFields(AScript, ATable);
-  AScript.DecIndentationLevel;
-  AScript.Add(SqlGenerator.BuildEndAlterTableSql(ATable));
+  if taFields in ATable.Changes then
+  begin
+    AScript.Add(SqlGenerator.BuildBeginAlterTableSql(ATable));
+    AScript.IncIndentationLevel;
+    AddOrAlterFields(AScript, ATable);
+    AScript.DecIndentationLevel;
+    AScript.Add(SqlGenerator.BuildEndAlterTableSql(ATable));
+  end;
+
+  if Schema.IndexesEnabled and (taIndexes in ATable.Changes) then
+  begin
+    AScript.AddEmpty;
+    AddOrAlterIndexes(AScript, ATable);
+  end;
 end;
 
 procedure TioDBBuilderStrategyFirebird.CreateDatabase;
@@ -154,8 +167,12 @@ begin
   AScript.Add(SqlGenerator.BuildEndCreateTableSql(ATable));
   AScript.AddEmpty;
   AScript.Add(SqlGenerator.BuildAddPrimaryKeySql(ATable));
-  AScript.AddEmpty;
-  CreateTableIndexes(AScript, ATable);
+
+  if Schema.IndexesEnabled then
+  begin
+    AScript.AddEmpty;
+    CreateTableIndexes(AScript, ATable);
+  end;
 end;
 
 procedure TioDBBuilderStrategyFirebird.CreateTableSequence(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
@@ -377,6 +394,30 @@ begin
     Result := Result or IsBlobSubTypeChanged(LOldFieldSubType, LNewFieldSubType, AField, ATable, False);
 end;
 
+function TioDBBuilderStrategyFirebird.ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
+var
+  LQuery: IioQuery;
+begin
+  Result := False;
+
+  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildForeignKeyExistsSql(ATable, AForeignKey));
+  Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
+end;
+
+function TioDBBuilderStrategyFirebird.ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
+var
+  LQuery: IioQuery;
+begin
+  Result := False;
+
+  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildForeignKeyModifiedSql(ATable, AForeignKey));
+
+  while not (Result or LQuery.Eof) do
+  begin
+    Result := AForeignKey.Name.ToUpper <> AForeignKey.Name.ToUpper;
+  end;
+end;
+
 procedure TioDBBuilderStrategyFirebird.GenerateDatabaseObjects(const AScript: IioDBBuilderSqlScript; const Create: boolean);
 var
   LDropForeignKeys,
@@ -396,9 +437,11 @@ begin
   end
   else
   begin
-    DropForeignKeys(AScript);
+    // DropForeignKeys(AScript);  // Carlo Marona (2025-10-20): Removed because now the analisys was updated to take in account foreign keys changes
+    AScript.AddEmpty;
     //DropIndexes(AScript);  // Carlo Marona: Create index method was updated to check if index exists before create so there's no need to remove all indexes blindly
     CreateOrAlterTables(AScript);
+    AScript.AddEmpty;
     // CreateSequences(AScript);  // Carlo Marona: Create sequence was moved in CreateTable method so the create table method creates all table components
 
     //if Schema.IndexesEnabled then  // Carlo Marona: Create indexes was moved in CreateTable method so the create table method creates all table components
@@ -406,7 +449,7 @@ begin
 
     // Foreignkeys are created at the end so all referenced tables are already created
     if Schema.ForeignKeysEnabled then
-      CreateForeignKeys(Ascript);
+      AddOrAlterForeignKeys(AScript);
   end;
 end;
 
@@ -430,7 +473,33 @@ begin
   Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
 end;
 
-function TioDBBuilderStrategyFirebird.IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): boolean;
+function TioDBBuilderStrategyFirebird.IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
+var
+  LQuery: IioQuery;
+  LNewIndexOrientation: TioIndexOrientation;
+begin
+  Result := False;
+
+  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildIndexModifiedSql(ATable, AIndex));
+
+  while not (Result or LQuery.Eof) do
+  begin
+    if not AIndex.CommaSepFieldList.Contains(LQuery.Fields.FieldByName('rdb$index_segments.rdb$field_name').AsString) then
+      AIndex.AddChange(icFields);
+
+    if LQuery.Fields.FieldByName('rdb$index_segments.rdb$unique_flag').AsBoolean <> AIndex.Unique then
+      AIndex.AddChange(icUnique);
+
+    // Carlo Marona: Firebird index type can be 0 = Ascending, 1 = Descending. iORM orientation actually uses same values, but in the future, changes must be made carefully,
+    //               because this condition could be broken.
+    if LQuery.Fields.FieldByName('rdb$index_segments.rdb$index_type').AsInteger <> Ord(AIndex.IndexOrientation) then
+      AIndex.AddChange(icOrientation);
+
+    Result := AIndex.Changes <> [];
+  end;
+end;
+
+function TioDBBuilderStrategyFirebird.IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
 var
   LQuery: IioQuery;
 begin

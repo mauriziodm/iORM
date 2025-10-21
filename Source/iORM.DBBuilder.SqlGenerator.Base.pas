@@ -61,12 +61,6 @@ type
     function TranslateFieldType(const AField: IioDBBuilderSchemaField; const ReturnTypeNameOnly: boolean = true): String; virtual; abstract;
     function TranslateFKAction(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
     function TValueToSql(const AValue: TValue): string; virtual; abstract;
-    // Indexes related methods
-    function BuildIndexFieldList(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex; const AIndexName: String;
-      const AWithIndexOrientation: Boolean): String; virtual;
-    function BuildIndexNameSql(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): String; virtual;
-    function BuildIndexOrientation(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex; const AIndexName: String): String; virtual;
-    function BuildIndexUnique(const AIndex: ioIndex): String; virtual;
     // Tables related methods
     function BuildBeginAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     function BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
@@ -83,16 +77,24 @@ type
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     // PrimaryKeys related methods
     function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
-    function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): string; virtual; abstract;
     // Index related methods
+    function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual; abstract;
+    function BuildIndexFieldList(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex; const AIndexName: String;
+      const AWithIndexOrientation: Boolean): String; virtual;
     function BuildDropIndexSql(const AIndexName: string): string; virtual; abstract;
-    function BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): string; overload; virtual; abstract;
+    function BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; overload; virtual; abstract;
     function BuildIndexExistsSql(const AIndexName: string): string; overload; virtual; abstract;
+    function BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual; abstract;
+    function BuildIndexNameSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): String; virtual;
+    function BuildIndexOrientation(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex; const AIndexName: String): String; virtual;
+    function BuildIndexUnique(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
     function BuildListAllIndexesSql: string; virtual; abstract;
     function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     // Foreign keys
     function BuildAddForeignKeySql(const AForeignKey: IioDBBuilderSchemaFK): string; virtual; abstract;
     function BuildDropForeignKeySql(const ATableName, AForeignKeyName: string): string; virtual; abstract;
+    function BuildForeignKeyExistsSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual; abstract;
+    function BuildForeignKeyModifiedSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual; abstract;
     function BuildListAllForeignKeysSql: string; virtual; abstract;
     function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
   public
@@ -154,8 +156,8 @@ begin
   Result := LTextBuilder.Text;
 end;
 
-function TioDBBuilderSqlGenBase.BuildIndexFieldList(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex;
-  const AIndexName: String; const AWithIndexOrientation: Boolean): String;
+function TioDBBuilderSqlGenBase.BuildIndexFieldList(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex; const AIndexName: String;
+      const AWithIndexOrientation: Boolean): String;
 var
   LFieldList: TStrings;
   LField: String;
@@ -184,17 +186,17 @@ begin
   end;
 end;
 
-function TioDBBuilderSqlGenBase.BuildIndexNameSql(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): String;
+function TioDBBuilderSqlGenBase.BuildIndexNameSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): String;
 var
   LFieldList: TStrings;
   LField: String;
 begin
-  // If the index name is already specified then use it and exit
-  if not AIndex.IndexName.IsEmpty then
-    Exit(TioSqlTranslator.Translate(AIndex.IndexName, ATable.GetContextTable.GetClassName, False));
+  // Carlo Marona (2025-10-21): If the index name was specified by the user then use it and exit
+  if AIndex.ExplicitName then
+    Exit(TioSqlTranslator.Translate(AIndex.IndexName.ToUpper, ATable.GetContextTable.GetClassName, False));   // Carlo Marona (2025-10-21): Made foreign key name uppercase
 
   // Build the indexname
-  Result := 'IDX_' + ATable.TableName;
+  Result := 'IDX_' + ATable.TableName.ToUpper;  // Carlo Marona (2025-10-21): Made index name uppercase
   // Field list
   LFieldList := TStringList.Create;
 
@@ -203,7 +205,7 @@ begin
     LFieldList.DelimitedText := AIndex.CommaSepFieldList;
 
     for LField in LFieldList do
-      Result := Result + '_' + LField;
+      Result := Result + '_' + LField.ToUpper;
   finally
     LFieldList.Free;
   end;
@@ -224,8 +226,7 @@ begin
   Result := TioSqlTranslator.Translate(Result, ATable.GetContextTable.GetClassName, False);
 end;
 
-function TioDBBuilderSqlGenBase.BuildIndexOrientation(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex;
-  const AIndexName: String): String;
+function TioDBBuilderSqlGenBase.BuildIndexOrientation(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex; const AIndexName: String): String;
 begin
   Result := EmptyStr;
 
@@ -240,7 +241,7 @@ begin
   end;
 end;
 
-function TioDBBuilderSqlGenBase.BuildIndexUnique(const AIndex: ioIndex): String;
+function TioDBBuilderSqlGenBase.BuildIndexUnique(const AIndex: IioDBBuilderSchemaIndex): String;
 begin
   if AIndex.Unique then
     Exit('UNIQUE')

@@ -36,6 +36,7 @@ unit iORM.DBBuilder.DBAnalyzer;
 interface
 
 uses
+  iORM.Attributes,
   iORM.DBBuilder.Interfaces;
 
 type
@@ -52,9 +53,15 @@ type
     function GetStrategy: IioDBBuilderStrategy;
   protected
     procedure AnalyzeFields(const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure AnalyzeIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure AnalyzeForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
     function DatabaseExists: boolean; virtual;
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual;
+    function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual;
+    function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual;
+    function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; virtual;
+    function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; virtual;
     function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
 
     property ConnectionDefName: string read GetConnectionDefName;
@@ -104,6 +111,16 @@ begin
   Result := Strategy.FieldModified(ATable, AField);
 end;
 
+function TioDBBuilderDBAnalyzer.ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
+begin
+  Result := Strategy.ForeignKeyExists(ATable, AForeignKey);
+end;
+
+function TioDBBuilderDBAnalyzer.ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
+begin
+  Result := Strategy.ForeignKeyModified(ATable, AForeignKey);
+end;
+
 function TioDBBuilderDBAnalyzer.GetConnectionDefName: string;
 begin
   Result := FConnectionDefName;
@@ -122,6 +139,16 @@ end;
 function TioDBBuilderDBAnalyzer.GetStrategy: IioDBBuilderStrategy;
 begin
   Result := FStrategy;
+end;
+
+function TioDBBuilderDBAnalyzer.IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
+begin
+  Result := Strategy.IndexModified(ATable, AIndex);
+end;
+
+function TioDBBuilderDBAnalyzer.IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
+begin
+  Result := Strategy.IndexExists(ATable, AIndex);
 end;
 
 function TioDBBuilderDBAnalyzer.TableExists(const ATable: IioDBBuilderSchemaTable): Boolean;
@@ -149,10 +176,57 @@ begin
     else if FieldModified(ATable, LField) then
       LField.Status := stUpdate;
 
-    // If the field status is not dbsClean (field modified) then
-    //  table status became dbsAlter
+    // If the field status is not stClean (field modified) then
+    //  table status became stUpdate
     if LField.Status > stClean then
+    begin
+      ATable.AddChange(taFields);
       ATable.Status := stUpdate;
+    end;
+  end;
+end;
+
+procedure TioDBBuilderDBAnalyzer.AnalyzeForeignKeys(const ATable: IioDBBuilderSchemaTable);
+var
+  LFK: IioDBBuilderSchemaFK;
+begin
+  // Loops all foreign keys in the table
+  for LFK in ATable.ForeignKeys.Values do
+  begin
+    if not ForeignKeyExists(ATable, LFK) then
+      LFK.Status := stCreate
+    else if ForeignKeyModified(ATable, LFK) then
+      LFK.Status := stUpdate;
+
+    // If the foreign key status is not stClean (foreign key changed modified) then
+    //  table status became stUpdate
+    if LFK.Status > stClean then
+    begin
+      ATable.AddChange(taForeignKeys);
+      ATable.Status := stUpdate;
+    end;
+  end;
+end;
+
+procedure TioDBBuilderDBAnalyzer.AnalyzeIndexes(const ATable: IioDBBuilderSchemaTable);
+var
+  LIndex: IioDBBuilderSchemaIndex;
+begin
+  // Loops all indexes in the table
+  for LIndex in ATable.Indexes.Values do
+  begin
+    if not IndexExists(ATable, LIndex) then
+      LIndex.Status := stCreate
+    else if IndexModified(ATable, LIndex) then
+      LIndex.Status := stUpdate;
+
+    // If the index status is not stClean (index modified) then
+    //  table status became stUpdate
+    if LIndex.Status > stClean then
+    begin
+      ATable.AddChange(taIndexes);
+      ATable.Status := stUpdate;
+    end;
   end;
 end;
 

@@ -43,18 +43,33 @@ type
 
   TioDBBuilderEngineStatus = (dbToBeAnalyzed, dbUptodate, dbNotExists, dbUpdatesNeeded, dbWarningExists);
   TioDBBuilderStatus = (stClean, stUpdate, stCreate);
+  TioDBBuilderTableChange = (taFields, taIndexes, taForeignKeys);
+  TioDBBuilderTableChanges = set of TioDBBuilderTableChange;
   TioDBBuilderFieldAlterStatus = (alFieldType, alFieldDefault, alFieldNotNull, alFieldPrecision, alFieldLength);
   TioDBBuilderFieldAlter = set of TioDBBuilderFieldAlterStatus;
+  TioDBBuilderIndexChange = (icFields, icOrientation, icUnique);
+  TioDBBuilderIndexChanges = set of TioDBBuilderIndexChange;
 
   IioDBBuilderSchemaFK = interface
     ['{1F653F52-570B-4381-930D-FB3945025DA2}']
-    function Name: String;
-    function ReferenceTableName: String;
-    function ReferenceFieldName: String;
-    function DependentTableName: String;
-    function DependentFieldName: String;
-    function OnDeleteAction: TioFKAction;
-    function OnUpdateAction: TioFKAction;
+    function GetName: String;
+    function GetReferenceTableName: String;
+    function GetReferenceFieldName: String;
+    function GetDependentTableName: String;
+    function GetDependentFieldName: String;
+    function GetOnDeleteAction: TioFKAction;
+    function GetOnUpdateAction: TioFKAction;
+    function GetStatus: TioDBBuilderStatus;
+    procedure SetStatus(const Value: TioDBBuilderStatus);
+
+    property DependentTableName: String read GetDependentTableName;
+    property DependentFieldName: String read GetDependentFieldName;
+    property Name: String read GetName;
+    property OnDeleteAction: TioFKAction read GetOnDeleteAction;
+    property OnUpdateAction: TioFKAction read GetOnUpdateAction;
+    property ReferenceTableName: String read GetReferenceTableName;
+    property ReferenceFieldName: String read GetReferenceFieldName;
+    property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
   IioDBBuilderSchemaField = interface
@@ -79,12 +94,40 @@ type
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
+  IioDBBuilderSchemaIndex = interface
+    ['{35DBA528-3DE3-4515-B809-5FE42ABF1CBB}']
+
+    function GetStatus: TioDBBuilderStatus;
+    procedure SetStatus(const Value: TioDBBuilderStatus);
+    function GetChanges: TioDBBuilderIndexChanges;
+    function GetCommaSepFieldList: String;
+    function GetExplicitName: boolean;
+    function GetIndexName: String;
+    function GetIndexOrientation: TioIndexOrientation;
+    function GetUnique: Boolean;
+
+    procedure AddChange(const AChange: TioDBBuilderIndexChange);
+
+    property Changes: TioDBBuilderIndexChanges read GetChanges;
+    property CommaSepFieldList: String read GetCommaSepFieldList;
+    property ExplicitName: boolean read GetExplicitName;
+    property IndexName: String read GetIndexName;
+    property IndexOrientation: TioIndexOrientation read GetIndexOrientation;
+    property Status: TioDBBuilderStatus read GetStatus write SetStatus;
+    property Unique: Boolean read GetUnique;
+  end;
+
   TioDBBuilderSchemaFields = TList<IioDBBuilderSchemaField>;
-  TioDBBuilderSchemaIndexes = TioIndexList;
+  TioDBBuilderSchemaIndexes = TDictionary<String, IioDBBuilderSchemaIndex>;
+//  TioDBBuilderSchemaIndexes = TioIndexList;
   TioDBBuilderSchemaForeignKeys = TDictionary<String, IioDBBuilderSchemaFK>;
 
   IioDBBuilderSchemaTable = interface
     ['{2AFBE991-7E33-42DB-892E-01F8C98A5B8F}']
+
+    function GetChanges: TioDBBuilderTableChanges;
+
+    procedure AddChange(const AChange: TioDBBuilderTableChange);
     procedure AddField(ASchemaField: IioDBBuilderSchemaField);
     procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
@@ -104,6 +147,8 @@ type
     // Status
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const AValue: TioDBBuilderStatus);
+
+    property Changes: TioDBBuilderTableChanges read GetChanges;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
@@ -180,16 +225,20 @@ type
     // PrimaryKeys related methods
     function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string;
     // Indexes related methods
-    function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): string;
+    function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
     function BuildDropIndexSql(const AIndexName: string): string;
-    function BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): string; overload;
+    function BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; overload;
     function BuildIndexExistsSql(const AIndexName: string): string; overload;
+    function BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
+    function BuildIndexNameSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): String;
     function BuildListAllIndexesSql: string;
     function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string;
     // Foreign keys
     function BuildAddForeignKeySql(const AForeignKey: IioDBBuilderSchemaFK): string;
     function BuildDropForeignKeySql(const ATableName, AForeignKeyName: string): string;
     function BuildListAllForeignKeysSql: string;
+    function BuildForeignKeyExistsSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
+    function BuildForeignKeyModifiedSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
     function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string;
   end;
 
@@ -205,8 +254,11 @@ type
     function DatabaseExists: Boolean;
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
-    function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): boolean; overload;
+    function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
+    function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
+    function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; overload;
     function IndexExists(const AIndexName: string): boolean; overload;
+    function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
     function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean;
 
     procedure GenerateCreateDatabaseScript(const AScript: IioDBBuilderSqlScript);

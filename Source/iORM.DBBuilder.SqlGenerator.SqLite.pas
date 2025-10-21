@@ -65,7 +65,7 @@ type
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     // Indexes related methods
-    function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): string; override;
+    function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildIndexExistsSql(const AIndexName: string): string; override;
     function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string; override;
     // Foreign keys
@@ -98,7 +98,7 @@ begin
   Result := InternalCreateField(AField);
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: ioIndex): string;
+function TioDBBuilderSqlGenSQLite.BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
 var
   LSqlText, LIndexName, LFieldList, LUnique: String;
 begin
@@ -114,6 +114,7 @@ end;
 function TioDBBuilderSqlGenSQLite.BuildAlterFieldSql(const AField: IioDBBuilderSchemaField): string;
 begin
   // Do nothing. Can be removed?
+  Result := EmptyStr;
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
@@ -129,6 +130,7 @@ end;
 function TioDBBuilderSqlGenSQLite.BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
 begin
   // Do nothing. Can be removed?
+  Result := EmptyStr;
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
@@ -143,12 +145,12 @@ end;
 
 function TioDBBuilderSqlGenSQLite.BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string;
 begin
-
+  Result := EmptyStr;
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string;
 begin
-
+  Result := EmptyStr;
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildTableExistsSql(const ATableName: string): string;
@@ -214,6 +216,7 @@ end;
 function TioDBBuilderSqlGenSQLite.BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string;
 begin
   // Do nothing. Can be removed?
+  Result := EmptyStr;
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildAddForeignKeySql(const AForeignKey: IioDBBuilderSchemaFK): string;

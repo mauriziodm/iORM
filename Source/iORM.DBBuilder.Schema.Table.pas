@@ -50,6 +50,7 @@ type
     FIsTrueClass: Boolean;
     FPrimaryKeyField: IioDBBuilderSchemaField;
     FStatus: TioDBBuilderStatus;
+    FChanges: TioDBBuilderTableChanges;
     function FieldExists(const AFieldName: String): boolean;
     // IsTrueClass
     function GetIsTrueClass: Boolean;
@@ -57,9 +58,12 @@ type
     // Status
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const AValue: TioDBBuilderStatus);
+    function GetChanges: TioDBBuilderTableChanges;
   public
     constructor Create(const AContextTable: IioTable);
     destructor Destroy; override;
+
+    procedure AddChange(const AChange: TioDBBuilderTableChange);
     procedure AddField(ASchemaField: IioDBBuilderSchemaField);
     procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
@@ -71,6 +75,8 @@ type
     function Indexes: TioDBBuilderSchemaIndexes;
     function PrimaryKeyField: IioDBBuilderSchemaField;
     function TableName: String;
+
+    property Changes: TioDBBuilderTableChanges read GetChanges;
     property IsTrueClass: Boolean read GetIsTrueClass write SetIsTrueClass;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
@@ -81,6 +87,11 @@ uses
   iORM.CommonTypes, System.SysUtils, iORM.DBBuilder.Factory;
 
 { TioDBBuilderSchemaTable }
+
+procedure TioDBBuilderSchemaTable.AddChange(const AChange: TioDBBuilderTableChange);
+begin
+  Include(FChanges, AChange);
+end;
 
 procedure TioDBBuilderSchemaTable.AddField(ASchemaField: IioDBBuilderSchemaField);
 begin
@@ -94,6 +105,7 @@ end;
 
 constructor TioDBBuilderSchemaTable.Create(const AContextTable: IioTable);
 begin
+  FChanges := [];
   FStatus := stClean;
   FContextTable := AContextTable;
   FIsTrueClass := AContextTable.IsTrueClass;
@@ -128,8 +140,8 @@ end;
 procedure TioDBBuilderSchemaTable.AddIndex(const AIndexAttr: ioIndex);
 begin
   // Add index if not already exists
-  if FIndexes.IndexOf(AIndexAttr) = -1 then
-    FIndexes.Add(AIndexAttr);
+  if not FIndexes.ContainsKey(AIndexAttr.IndexName) then
+    FIndexes.Add(AIndexAttr.IndexName, TioDBBuilderFactory.NewSchemaIndex(AIndexAttr));
 end;
 
 procedure TioDBBuilderSchemaTable.AddForeignKey(const AReferenceMap, ADependentMap: IioMap;
@@ -161,6 +173,11 @@ end;
 function TioDBBuilderSchemaTable.TableName: String;
 begin
   Result := FContextTable.TableName;
+end;
+
+function TioDBBuilderSchemaTable.GetChanges: TioDBBuilderTableChanges;
+begin
+  Result := FChanges;
 end;
 
 function TioDBBuilderSchemaTable.GetContextTable: IioTable;
