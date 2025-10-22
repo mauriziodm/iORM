@@ -267,7 +267,7 @@ begin
     '  (RDB$RELATIONS.rdb$system_flag = 0) and' + sLineBreak +
     '  (RDB$RELATION_CONSTRAINTS.rdb$constraint_type = ''FOREIGN KEY'') and' + sLineBreak +
     '  (RDB$RELATIONS.Rdb$relation_name = ''%s'') and' + sLineBreak +
-    '  (RDB$RELATION_CONSTRAINTS.rdb$constraint_name = ''%s''))',
+    '  (RDB$RELATION_CONSTRAINTS.rdb$constraint_name = ''%s'')',
     [ATable.TableName, AForeignKey.Name]
   );
 end;
@@ -311,12 +311,12 @@ begin
     '  rdb$indices.rdb$relation_name,' + sLineBreak +
     '  rdb$indices.rdb$unique_flag,' + sLineBreak +
     '  rdb$indices.rdb$index_type,' + sLineBreak +
-    '  rdb$indices.rdb$field_name' + sLineBreak +
+    '  rdb$index_segments.rdb$field_name' + sLineBreak +
     'from' + sLineBreak +
     '  rdb$index_segments right outer join rdb$indices on (rdb$index_segments.rdb$index_name = rdb$indices.rdb$index_name)' + sLineBreak +
     'where' + sLineBreak +
     '  (rdb$indices.rdb$system_flag = 0) and' + sLineBreak +
-    '  (rdb$indices.rdb$relation_name = ''%s'')' + sLineBReak +
+    '  (rdb$indices.rdb$relation_name = ''%s'') and' + sLineBReak +
     '  (rdb$indices.rdb$index_name = ''%s'')',
     [ATable.TableName, AIndex.IndexName]
   );
