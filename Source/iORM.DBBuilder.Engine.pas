@@ -318,13 +318,6 @@ begin
   LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator);
 
   LStrategy.AlterTable(LScript, ATable);
-
-//  if AddIndexes then
-//    LStrategy.CreateIndexes(LScript, ATable);
-//
-//  if AddForeignKeys then
-//    LStrategy.CreateForeignKeys(LScript, ATable);
-
   TioDBFactory.Script(FConnectionDefName, LScript.SQL).Execute;
 end;
 
