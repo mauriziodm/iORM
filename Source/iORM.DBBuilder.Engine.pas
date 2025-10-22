@@ -278,9 +278,6 @@ begin
 
   LStrategy.CreateTable(LScript, ATable);
 
-  if AddIndexes then
-    LStrategy.CreateTableIndexes(LScript, ATable);
-
   if AddForeignKeys then
     LStrategy.CreateTableForeignKeys(LScript, ATable);
 

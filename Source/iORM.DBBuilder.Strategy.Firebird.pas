@@ -158,7 +158,9 @@ begin
 
   AScript.AddTitle(Format('Creating table ''%s''', [ATable.TableName]));
 
-  CreateTableSequence(AScript, ATable);
+  if not SequenceExists(ATable.GetSequenceName) then
+    CreateTableSequence(AScript, ATable);
+
   AScript.AddEmpty;
   AScript.Add(SqlGenerator.BuildBeginCreateTableSql(ATable));
   Ascript.IncIndentationLevel;
