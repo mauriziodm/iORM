@@ -316,21 +316,24 @@ type
     /// <param name="AddIndexes">Enable/Disable the creation table indexes.</param>
     /// <param name="AddForeignKeys">Enabled/Disable the creation of table foreign keys.</param>
     /// </summary>
-    procedure CreateOrUpdateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes, AddForeignKeys: Boolean);
+    procedure CreateOrUpdateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes: Boolean = True;
+      const AddForeignKeys: Boolean = True);
     /// <summary>
     ///  Creates the table using the schema passed.
     /// <param name="ATable">Schema of the table to be created/updated.</param>
     /// <param name="AddIndexes">Enable/Disable the creation table indexes.</param>
     /// <param name="AddForeignKeys">Enabled/Disable the creation of table foreign keys.</param>
     /// </summary>
-    procedure CreateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes, AddForeignKeys: Boolean);
+    procedure CreateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes: Boolean = True;
+      const AddForeignKeys: Boolean = True);
     /// <summary>
     ///  Updates the table using the schema passed.
     /// <param name="ATable">Schema of the table to be created/updated.</param>
     /// <param name="AddIndexes">Enable/Disable the creation table indexes.</param>
     /// <param name="AddForeignKeys">Enabled/Disable the creation of table foreign keys.</param>
     /// </summary>
-    procedure UpdateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes, AddForeignKeys: Boolean);
+    procedure UpdateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes: Boolean = True;
+      const AddForeignKeys: Boolean = True);
 
     property Analyzed: boolean read GetAnalyzed;
     property Schema: IioDBBuilderSchema read GetSchema;

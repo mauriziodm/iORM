@@ -98,21 +98,24 @@ type
     /// <param name="AddIndexes">Enable/Disable the creation table indexes.</param>
     /// <param name="AddForeignKeys">Enabled/Disable the creation of table foreign keys.</param>
     /// </summary>
-    procedure CreateOrUpdateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes, AddForeignKeys: Boolean);
+    procedure CreateOrUpdateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes: Boolean = True;
+      const AddForeignKeys: Boolean = True);
     /// <summary>
     ///  Creates the table using the schema passed.
     /// <param name="ATable">Schema of the table to be created/updated.</param>
     /// <param name="AddIndexes">Enable/Disable the creation table indexes.</param>
     /// <param name="AddForeignKeys">Enabled/Disable the creation of table foreign keys.</param>
     /// </summary>
-    procedure CreateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes, AddForeignKeys: Boolean);
+    procedure CreateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes: Boolean = True;
+      const AddForeignKeys: Boolean = True);
     /// <summary>
     ///  Updates the table using the schema passed.
     /// <param name="ATable">Schema of the table to be created/updated.</param>
     /// <param name="AddIndexes">Enable/Disable the creation table indexes.</param>
     /// <param name="AddForeignKeys">Enabled/Disable the creation of table foreign keys.</param>
     /// </summary>
-    procedure UpdateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes, AddForeignKeys: Boolean);
+    procedure UpdateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes: Boolean = True;
+      const AddForeignKeys: Boolean = True);
 
     property Analyzed: boolean read GetAnalyzed;
     property Schema: IioDBBuilderSchema read GetSchema;
@@ -246,7 +249,8 @@ begin
   end;
 end;
 
-procedure TioDBBuilderEngine.CreateOrUpdateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes, AddForeignKeys: Boolean);
+procedure TioDBBuilderEngine.CreateOrUpdateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes: Boolean;
+  const AddForeignKeys: Boolean);
 begin
   if not Assigned(ATable) then
     raise EioArgumentNilException.Create(ClassName, 'CreateOrUpdateTable', 'ATable is not assigned.');
@@ -257,7 +261,8 @@ begin
   end;
 end;
 
-procedure TioDBBuilderEngine.CreateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes, AddForeignKeys: Boolean);
+procedure TioDBBuilderEngine.CreateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes: Boolean;
+  const AddForeignKeys: Boolean);
 var
   LStrategy: IioDBBuilderStrategy;
   LScript: IioDBBuilderSqlScript;
@@ -297,7 +302,8 @@ begin
   Result := FSchema.Warnings;
 end;
 
-procedure TioDBBuilderEngine.UpdateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes, AddForeignKeys: Boolean);
+procedure TioDBBuilderEngine.UpdateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes: Boolean;
+  const AddForeignKeys: Boolean);
 var
   LStrategy: IioDBBuilderStrategy;
   LScript: IioDBBuilderSqlScript;
