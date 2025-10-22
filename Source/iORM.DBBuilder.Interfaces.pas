@@ -41,7 +41,7 @@ uses
 
 type
 
-  TioDBBuilderEngineStatus = (dbToBeAnalyzed, dbUptodate, dbNotExists, dbUpdatesNeeded, dbWarningExists);
+//  TioDBBuilderEngineStatus = (dbUptodate, dbNotExists, dbUpdatesNeeded);
   TioDBBuilderStatus = (stClean, stUpdate, stCreate);
   TioDBBuilderTableChange = (taFields, taIndexes, taForeignKeys);
   TioDBBuilderTableChanges = set of TioDBBuilderTableChange;
@@ -272,7 +272,7 @@ type
 
   IioDBBuilderEngine = interface
     ['{E7BC9176-4C71-48CA-A92F-37DE99E0AC3A}']
-    function GetStatus: TioDBBuilderEngineStatus;
+    function GetSchema: IioDBBuilderSchema;
     function GetWarnings: TStrings;
 
     /// <summary>
@@ -283,8 +283,11 @@ type
     ///  If the ForceCreate parameter is true, the analyzer behaves like the database doesn't exists and should be created even if it already exists.
     ///  If the ForceCreate parameter is false, the analyzer behaves like normal, acting as if the database doesn't exists if not exists or updated it if already exists.
     /// </remarks>
+    /// <returns>
+    ///  The status of the analyzed schema
+    /// </returns>
     /// </summary>
-    procedure Analyze(const ForceCreate: boolean = false);
+    function Analyze(const ForceCreate: boolean = false): TioDBBuilderStatus;
     /// <summary>
     ///  Build Creates or Alter database SQL script based on schema status.
     /// <param name="AScript">The script where sql instructions will be returned.</param>
@@ -307,7 +310,7 @@ type
     /// </summary>
     procedure CreateOrUpdateDB(const Force: Boolean = False; const AScript: IioDBBuilderSqlScript = nil);
 
-    property Status: TioDBBuilderEngineStatus read GetStatus;
+    property Schema: IioDBBuilderSchema read GetSchema;
     property Warnings: TStrings read GetWarnings;
   end;
 

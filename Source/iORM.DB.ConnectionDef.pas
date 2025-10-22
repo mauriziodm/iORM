@@ -54,9 +54,9 @@ type
 
   TioCustomConnectionDef = class;
 
-  TioDBBuilderBeforeCreateOrAlterDBEvent = procedure(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineStatus;
+  TioDBBuilderBeforeCreateOrAlterDBEvent = procedure(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus;
     const AScript, AWarnings: TStrings; var AAbort: Boolean) of object;
-  TioDBBuilderAfterCreateOrAlterDBEvent = procedure(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineStatus;
+  TioDBBuilderAfterCreateOrAlterDBEvent = procedure(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus;
     const AScript, AWarnings: TStrings) of object;
 
   TioDBBuilderProperty = class(TPersistent)
@@ -326,18 +326,19 @@ var
   LAbort: Boolean;
   LDBBuilderEngine: IioDBBuilderEngine;
   LScript: IioDBBuilderSqlScript;
+  LStatus: TioDBBuilderStatus;
 begin
   LAbort := False;
 
   LDBBuilderEngine := TioDBBuilderFactory.NewEngine(Name, FAutoCreateDB.Indexes, FAutoCreateDB.ForeignKeys);
-  LDBBuilderEngine.Analyze;
+  LStatus := LDBBuilderEngine.Analyze;
 
   LScript := TioDBBuilderFactory.NewSqlScript;
   LDBBuilderEngine.BuildCreateOrUpdateDBSqlScript(LScript);
 
   // Carlo Marona
   if Assigned(FOnBeforeCreateOrAlterDBEvent) then
-    FOnBeforeCreateOrAlterDBEvent(Self, LDBBuilderEngine.Status, LScript.Sql, LDBBuilderEngine.Warnings, LAbort);
+    FOnBeforeCreateOrAlterDBEvent(Self, LStatus, LScript.Sql, LDBBuilderEngine.Warnings, LAbort);
 
   if not LAbort then
   begin
@@ -345,7 +346,7 @@ begin
 
     // Carlo Marona
     if Assigned(FOnAfterCreateOrAlterDBEvent) then
-      FOnAfterCreateOrAlterDBEvent(Self, LDBBuilderEngine.Status, LScript.Sql, LDBBuilderEngine.Warnings);
+      FOnAfterCreateOrAlterDBEvent(Self, LStatus, LScript.Sql, LDBBuilderEngine.Warnings);
   end;
 end;
 

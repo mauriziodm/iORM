@@ -32,13 +32,13 @@ type
     ButtonSynchroLogs: TButton;
     acShowSynchroLogs: TioBSShowOrSelect;
     FirebirdConn: TioFirebirdConnectionDef;
-    procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineStatus; const AScript,
+    procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript,
       AWarnings: TStrings);
-    procedure SQLiteConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineStatus; const AScript, AWarnings: TStrings;
+    procedure SQLiteConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript, AWarnings: TStrings;
       var AAbort: Boolean);
-    procedure FirebirdConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineStatus; const AScript, AWarnings: TStrings;
+    procedure FirebirdConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript, AWarnings: TStrings;
       var AAbort: Boolean);
-    procedure FirebirdConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineStatus; const AScript, AWarnings: TStrings);
+    procedure FirebirdConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript, AWarnings: TStrings);
     procedure ImagePizzaMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   private
     procedure BuildCreateSQLScript(const AConnectionDefName: string; const AScript: IioDBBuilderSQLScript);
@@ -66,13 +66,13 @@ begin
   LDBBuilder.BuildCreateDBSqlScript(AScript);
 end;
 
-procedure TMainForm.FirebirdConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineStatus; const AScript, AWarnings: TStrings);
+procedure TMainForm.FirebirdConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript, AWarnings: TStrings);
 begin
   TSampleData.CheckForSampleDataCreation;
 end;
 
-procedure TMainForm.FirebirdConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineStatus; const AScript, AWarnings: TStrings;
-  var AAbort: Boolean);
+procedure TMainForm.FirebirdConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript, AWarnings: TStrings;
+      var AAbort: Boolean);
 var
   LFileName: string;
 begin
@@ -114,14 +114,14 @@ begin
   LScript.SQL.SaveToFile(ChangeFileExt(LFileName, '.sql'));
 end;
 
-procedure TMainForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineStatus; const AScript,
+procedure TMainForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript,
       AWarnings: TStrings);
 begin
   TSampleData.CheckForSampleDataCreation;
 end;
 
-procedure TMainForm.SQLiteConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineStatus; const AScript, AWarnings: TStrings;
-  var AAbort: Boolean);
+procedure TMainForm.SQLiteConnBeforeCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript, AWarnings: TStrings;
+      var AAbort: Boolean);
 var
   LFileName: string;
 begin
