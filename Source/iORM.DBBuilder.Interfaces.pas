@@ -272,6 +272,7 @@ type
 
   IioDBBuilderEngine = interface
     ['{E7BC9176-4C71-48CA-A92F-37DE99E0AC3A}']
+    function GetAnalyzed: boolean;
     function GetSchema: IioDBBuilderSchema;
     function GetWarnings: TStrings;
 
@@ -310,6 +311,7 @@ type
     /// </summary>
     procedure CreateOrUpdateDB(const Force: Boolean = False; const AScript: IioDBBuilderSqlScript = nil);
 
+    property Analyzed: boolean read GetAnalyzed;
     property Schema: IioDBBuilderSchema read GetSchema;
     property Warnings: TStrings read GetWarnings;
   end;
