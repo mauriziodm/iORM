@@ -414,9 +414,13 @@ begin
 
   LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildForeignKeyModifiedSql(ATable, AForeignKey));
 
-  while not (Result or LQuery.Eof) do
+  while not (LQuery.Eof or Result) do
   begin
-    Result := AForeignKey.Name.ToUpper <> AForeignKey.Name.ToUpper;
+    Result :=
+      (AForeignKey.DependentFieldName.ToUpper <> LQuery.Fields.FieldByName('Field_Name').AsString.ToUpper) or
+      (AForeignKey.ReferenceFieldName.ToUpper <> LQuery.Fields.FieldByName('FK_Field').AsString.ToUpper) or
+      (AForeignKey.ReferenceTableName.ToUpper <> LQuery.Fields.FieldByName('Reference_Table').AsString.ToUpper);
+    LQuery.Next;
   end;
 end;
 
