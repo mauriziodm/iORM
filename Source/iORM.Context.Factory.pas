@@ -554,8 +554,9 @@ var
           if ioIndex(LAttribute).CommaSepFieldList.IsEmpty then // If the "ACommaSepFieldList" is empty then set the current property field name
             ioIndex(LAttribute).CommaSepFieldList := LMember_FieldName;
 
-          if ioIndex(LAttribute).IndexName.IsEmpty then // Carlo Marona (2025-10-17): If the attribute is applied to a field and a IndexName is not specified, the field name is used as index name
-            ioIndex(LAttribute).IndexName := LMember_FieldName;
+          // Carlo Marona (2025-10-24): removed because if the name is not explicitly defined the TioDBBuilderSchemaIndex class calculate the name
+//          if ioIndex(LAttribute).IndexName.IsEmpty then // Carlo Marona (2025-10-17): If the attribute is applied to a field and a IndexName is not specified, the field name is used as index name
+//            ioIndex(LAttribute).IndexName := LMember_FieldName;
 
           ATable.GetIndexList(True).Add(ioIndex(LAttribute)); // Add the current index attribute
         end

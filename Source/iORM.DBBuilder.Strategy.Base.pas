@@ -68,7 +68,6 @@ type
     procedure DropForeignKeys(const AScript: IioDBBuilderSqlScript); virtual;
     procedure DropIndexes(const AScript: IioDBBuilderSqlScript); virtual;
     procedure DropTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); virtual;
-
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
     function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
@@ -119,12 +118,12 @@ begin
       case LFK.Status of
         stCreate:
           begin
-            AScript.Add(SqlGenerator.BuildAddForeignKeySql(LFK));
+            AScript.Add(SqlGenerator.BuildAddForeignKeySql(LTable, LFK));
           end;
         stUpdate:
           begin
             AScript.Add(SqlGenerator.BuildDropForeignKeySql(LTable.TableName, LFK.Name));
-            AScript.Add(SqlGenerator.BuildAddForeignKeySql(LFK));
+            AScript.Add(SqlGenerator.BuildAddForeignKeySql(LTable, LFK));
           end;
       end;
     end;
@@ -150,7 +149,7 @@ begin
         end;
       stUpdate:
         begin
-          AScript.Add(SqlGenerator.BuildDropIndexSql(LIndex.IndexName));
+          AScript.Add(SqlGenerator.BuildDropIndexSql(LIndex.Name));
           AScript.Add(SqlGenerator.BuildAddIndexSql(ATable, LIndex));
         end;
     end;
@@ -205,7 +204,7 @@ begin
     raise EioArgumentNilException.Create(ClassName, 'CreateForeignKeys', 'ATable is not assigned.');
 
   for LForeignKey in ATable.ForeignKeys.Values do
-    AScript.Add(SqlGenerator.BuildAddForeignKeySql(LForeignKey));
+    AScript.Add(SqlGenerator.BuildAddForeignKeySql(ATable, LForeignKey));
 end;
 
 procedure TioDBBuilderStrategyBase.CreateIndexes(const AScript: IioDBBuilderSqlScript);

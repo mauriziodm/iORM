@@ -27,7 +27,7 @@ type
     procedure SetStatus(const Value: TioDBBuilderStatus);
     function GetChanges: TioDBBuilderIndexChanges;
     function GetCommaSepFieldList: String;
-    function GetIndexName: String;
+    function GetName: String;
     function GetIndexOrientation: TioIndexOrientation;
     function GetUnique: Boolean;
     function GetExplicitName: boolean;
@@ -39,13 +39,21 @@ type
     property Changes: TioDBBuilderIndexChanges read GetChanges;
     property CommaSepFieldList: String read GetCommaSepFieldList;
     property ExplicitName: boolean read GetExplicitName;
-    property IndexName: String read GetIndexName;
     property IndexOrientation: TioIndexOrientation read GetIndexOrientation;
+    property Name: String read GetName;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
     property Unique: Boolean read GetUnique;
   end;
 
 implementation
+
+uses
+  System.SysUtils,
+  System.StrUtils,
+  System.Classes
+
+  ;
+
 
 { TioDBBuilderSchemaIndex }
 
@@ -81,9 +89,21 @@ begin
   Result := FExplicitName;
 end;
 
-function TioDBBuilderSchemaIndex.GetIndexName: String;
+function TioDBBuilderSchemaIndex.GetName: String;
+var
+  LFieldList: TArray<string>;
 begin
-  Result := FIndexName;
+  Result := EmptyStr;
+
+  if ExplicitName then
+    Result := FIndexName
+  else
+  begin
+    // Split fields list
+    LFieldList := CommaSepFieldList.Replace(' ', '').Split([',']);
+    // Join fields separated by '_'
+    Result := Result.Join('_', LFieldList);
+  end;
 end;
 
 function TioDBBuilderSchemaIndex.GetIndexOrientation: TioIndexOrientation;

@@ -25,17 +25,17 @@ type
     procedure AlterTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); override;
     procedure CreateDatabase; override;
     procedure CreateTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); override;
+    function DatabaseExists: Boolean; override;
     procedure DropForeignKeys(const AScript: IioDBBuilderSqlScript); override;
     procedure DropIndexes(const AScript: IioDBBuilderSqlScript); override;
     procedure DropTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); override;
-
-    procedure GenerateDatabaseObjects(const AScript: IioDBBuilderSqlScript; const Create: boolean); override;
-
-    function DatabaseExists: Boolean; override;
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
     function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
     function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
+
+    procedure GenerateDatabaseObjects(const AScript: IioDBBuilderSqlScript; const Create: boolean); override;
+
     function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
     function IndexExists(const AIndexName: string): boolean; override;
     function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
@@ -158,7 +158,7 @@ begin
 
   AScript.AddTitle(Format('Creating table ''%s''', [ATable.TableName]));
 
-  if not SequenceExists(ATable.GetSequenceName) then
+  if (Schema.Status = stCreate) or not SequenceExists(ATable.GetSequenceName) then
     CreateTableSequence(AScript, ATable);
 
   AScript.AddEmpty;
@@ -435,7 +435,7 @@ begin
 
     // Foreignkeys are created at the end so all referenced tables are already created
     if Schema.ForeignKeysEnabled then
-      CreateForeignKeys(Ascript);
+      CreateForeignKeys(AScript);
   end
   else
   begin

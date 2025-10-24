@@ -192,6 +192,7 @@
             <Form>SynchroLogListForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\common_model\DummyObject.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

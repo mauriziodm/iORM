@@ -50,9 +50,11 @@ uses
 type
   TioDBBuilderSqlGenFirebird = class(TioDBBuilderSqlGenBase, IioDBBuilderSqlGeneratorFirebird)
   private
-    function AdaptIndexOrFKName(const APrefix, AName: String): String;
+//    function AdaptIdentifierName(const APrefix, AName: String; const MaxLength: integer = 30): String;
     function InternalCreateField(const AField: IioDBBuilderSchemaField): String;
   protected
+    function GetMaxSqlIdentifierLength: integer; override;
+    function GetMinSqlIdentifierLength: integer; override;
     function TranslateFieldType(const AField: IioDBBuilderSchemaField; const ReturnTypeNameOnly: boolean = true): String; override;
     function TValueToSql(const AValue: TValue): string; override;
   public
@@ -81,7 +83,7 @@ type
     function BuildListAllIndexesSql: string; override;
     function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string; override;
     // Foreign keys
-    function BuildAddForeignKeySql(const AForeignKey: IioDBBuilderSchemaFK): string; override;
+    function BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildDropForeignKeySql(const ATableName, AForeignKeyName: string): string; override;
     function BuildForeignKeyExistsSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildForeignKeyModifiedSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
@@ -110,6 +112,12 @@ uses
 
   ;
 
+
+const
+  MAX_IDENTIFIER_NAME_LENGTH = 31;
+  MIN_IDENTIFIER_NAME_LENGTH = 27;
+
+
 { TioDBBuilderSqlGenFirebird }
 
 function TioDBBuilderSqlGenFirebird.BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string;
@@ -117,7 +125,7 @@ begin
   Result := Format('ADD %s', [InternalCreateField(AField)]);
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildAddForeignKeySql(const AForeignKey: IioDBBuilderSchemaFK): string;
+function TioDBBuilderSqlGenFirebird.BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
 var
   LFKName,
   LFKAction,
@@ -126,7 +134,8 @@ var
 begin
   // N.B. Viene calcolato un nome random (quindi non uso l'apposito metodo dell'antenato se eccessivo)
   // perchè in FB c'e' un limite a 30 caratteri di lunghezza per i nomi dei constraint
-  LFKName := AdaptIndexOrFKName('FK_', AForeignKey.Name.ToUpper);   // Carlo Marona (2025-10-21): Made foreign key name uppercase
+//  LFKName := AdaptIdentifierName('FK_', AForeignKey.Name.ToUpper);   // Carlo Marona (2025-10-21): Made foreign key name uppercase
+  LFKName := BuildForeignKeyNameSql(ATable, AForeignKey);
 
   LTextBuilder := NewTextBuilder;
 
@@ -176,7 +185,8 @@ var
 begin
   // N.B. Viene calcolato un nome random (quindi non uso l'apposito metodo dell'antenato se eccessivo)
   // perchè in FB c'e' un limite a 30 caratteri di lunghezza per i nomi dei constraint
-  LIndexName := AdaptIndexOrFKName('IDX_', BuildIndexNameSql(ATable, AIndex));
+//  LIndexName := AdaptIdentifierName('IDX_', BuildIndexNameSql(ATable, AIndex), MIN_IDENTIFIER_NAME_LENGTH); // Carlo Marona
+  LIndexName := BuildIndexNameSql(ATable, AIndex);
   LIndexOrientation := BuildIndexOrientation(ATable, AIndex, LIndexName);
   LUnique := BuildIndexUnique(AIndex);
   LFieldList := BuildIndexFieldList(ATable, AIndex, LIndexName, False);
@@ -257,7 +267,11 @@ begin
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildForeignKeyExistsSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
+var
+  LFKName: string;
 begin
+  LFKName := BuildForeignKeyNameSql(ATable, AForeignKey);
+
   Result := Format(
     'select' + sLineBreak +
     '  RDB$RELATION_CONSTRAINTS.rdb$constraint_name' + sLineBreak +
@@ -268,12 +282,16 @@ begin
     '  (RDB$RELATION_CONSTRAINTS.rdb$constraint_type = ''FOREIGN KEY'') and' + sLineBreak +
     '  (RDB$RELATIONS.Rdb$relation_name = ''%s'') and' + sLineBreak +
     '  (RDB$RELATION_CONSTRAINTS.rdb$constraint_name = ''%s'')',
-    [ATable.TableName, AForeignKey.Name]
+    [ATable.TableName, LFKName]
   );
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildForeignKeyModifiedSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
+var
+  LFKName: string;
 begin
+  LFKName := BuildForeignKeyNameSql(ATable, AForeignKey);
+
   Result := Format(
     'SELECT' + sLineBreak +
     '  detail_index_segments.rdb$field_name AS Field_Name,' + sLineBreak +
@@ -289,7 +307,7 @@ begin
     '  detail_relation_constraints.rdb$constraint_type = ''FOREIGN KEY'' AND' + sLineBreak +
     '  detail_relation_constraints.rdb$relation_name = ''%s'' AND' + sLineBreak +
     '  detail_relation_constraints.rdb$constraint_name = ''%s''',
-    [ATable.TableName, AForeignKey.Name]
+    [ATable.TableName, LFKName]
   );
 end;
 
@@ -318,7 +336,7 @@ begin
     '  (rdb$indices.rdb$system_flag = 0) and' + sLineBreak +
     '  (rdb$indices.rdb$relation_name = ''%s'') and' + sLineBReak +
     '  (rdb$indices.rdb$index_name = ''%s'')',
-    [ATable.TableName, AIndex.IndexName]
+    [ATable.TableName, AIndex.Name]
   );
 end;
 
@@ -397,21 +415,39 @@ begin
     [ATableName.ToUpper]);
 end;
 
-function TioDBBuilderSqlGenFirebird.AdaptIndexOrFKName(const APrefix, AName: String): String;
-var
-  LGuid: TGuid;
+function TioDBBuilderSqlGenFirebird.GetMaxSqlIdentifierLength: integer;
 begin
-  // N.B. Viene calcolato un nome random (quindi non uso l'apposito metodo dell'antenato se eccessivo)
-  // perchè in FB c'e' un limite a 30 caratteri di lunghezza per i nomi dei constraint
-  // Carlo Marona: In realtà il limite esiste per le versioni precedenti alla 4. Dalla 4 il limite è di 63 caratteri UTF8.
-  //               Bisognerebbe ristrutturare la parte di interfacciamento con il database per renderla più sofisticata
-  //               afficnhè tenga conto anche della specifica versione del database così da adattarsi alle specifiche caratteristiche
-  If Length(AName) <= 30 then
-    Exit(AName);
-
-  CreateGUID(LGuid);
-  Result := APrefix + LGuid.ToString.Replace('-', '', [rfReplaceAll]).Replace('}', '', [rfReplaceAll]).Substring(24);
+  Result := MAX_IDENTIFIER_NAME_LENGTH;
 end;
+
+function TioDBBuilderSqlGenFirebird.GetMinSqlIdentifierLength: integer;
+begin
+  Result := MIN_IDENTIFIER_NAME_LENGTH;
+end;
+
+//function TioDBBuilderSqlGenFirebird.AdaptIdentifierName(const APrefix, AName: String; const MaxLength: integer): String;
+//var
+//  LGuid: TGuid;
+//  LName: string;
+//begin
+//  if MaxLength < MIN_IDENTIFIER_NAME_LENGTH  then
+//   raise EioGenericException.Create(ClassName, 'AdaptIndexOrFKName', Format('Invalid max length: min allowed length is %d.', [MIN_IDENTIFIER_NAME_LENGTH]));
+//
+//  Result := APrefix.ToUpper + AName.ToUpper; // Carlo Marona (2025-10-22): Moved uppercase here
+//
+//  // N.B. Viene calcolato un nome random (quindi non uso l'apposito metodo dell'antenato se eccessivo)
+//  // perchè in FB c'e' un limite a 30 caratteri di lunghezza per i nomi dei constraint
+//  // Carlo Marona: In realtà il limite esiste per le versioni precedenti alla 4. Dalla 4 il limite è di 63 caratteri UTF8.
+//  //               Bisognerebbe ristrutturare la parte di interfacciamento con il database per renderla più sofisticata
+//  //               afficnhè tenga conto anche della specifica versione del database così da adattarsi alle specifiche caratteristiche
+//  // Carlo Marona (2025-10-24): It's not feasible to use a random name in case of max length was exeeded, because it' not possibile
+//  //                            to verify if the foreign key exists.
+//  If Length(Result) > MaxLength then
+//  begin
+//    CreateGUID(LGuid);
+//    Result := APrefix + LGuid.ToString.Replace('-', '', [rfReplaceAll]).Replace('}', '', [rfReplaceAll]).Substring(24);
+//  end;
+//end;
 
 function TioDBBuilderSqlGenFirebird.BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string;
 begin

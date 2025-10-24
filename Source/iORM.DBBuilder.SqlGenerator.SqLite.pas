@@ -69,7 +69,7 @@ type
     function BuildIndexExistsSql(const AIndexName: string): string; override;
     function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string; override;
     // Foreign keys
-    function BuildAddForeignKeySql(const AForeignKey: IioDBBuilderSchemaFK): string; override;
+    function BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string; override;
   end;
 
@@ -219,7 +219,7 @@ begin
   Result := EmptyStr;
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildAddForeignKeySql(const AForeignKey: IioDBBuilderSchemaFK): string;
+function TioDBBuilderSqlGenSQLite.BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
 var
   LTextBuilder: IioTextBuilder;
 begin

@@ -145,6 +145,7 @@ var
 begin
   LDBAnalyzer := TioDBBuilderFactory.NewDBAnalyzer(FConnectionDefName, FSchema, FSqlGenerator);
   LDBAnalyzer.Analyze(ForceCreate);
+  FSchemaAnalyzed := True;
 
   Result := FSchema.Status;
 end;
@@ -171,8 +172,6 @@ begin
   case Schema.Status of
     stCreate: TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateCreateDatabaseScript(AScript);
     stUpdate: TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateUpdateDatabaseScript(AScript);
-  else
-    raise EioGenericException.Create(ClassName, 'BuildCreateOrUpdateDBSqlScript', 'Unable to build SQL script: schema not analyzed');
   end;
 end;
 
@@ -216,7 +215,9 @@ begin
 
   // Carlo Marona (2025-10-15): Do not pass Force param of this method to Analyze method. They have different behavior
   if LBuildScript then
-    LStatus := Analyze;
+    LStatus := Analyze
+  else
+    LStatus := Schema.Status;
 
   if (LStatus > stClean) or Force then
   begin

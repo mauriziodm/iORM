@@ -8518,8 +8518,8 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 0
-    ExplicitTop = 329
-    ExplicitWidth = 190
+    ExplicitTop = 327
+    ExplicitWidth = 178
   end
   object ButtonCustomers: TButton
     Left = 42
@@ -8535,8 +8535,8 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 1
-    ExplicitTop = 374
-    ExplicitWidth = 190
+    ExplicitTop = 372
+    ExplicitWidth = 178
   end
   object ButtonPizzas: TButton
     Left = 42
@@ -8552,8 +8552,8 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 2
-    ExplicitTop = 419
-    ExplicitWidth = 190
+    ExplicitTop = 417
+    ExplicitWidth = 178
   end
   object ButtonQuit: TButton
     Left = 42
@@ -8569,8 +8569,8 @@ object MainForm: TMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 3
-    ExplicitTop = 500
-    ExplicitWidth = 190
+    ExplicitTop = 498
+    ExplicitWidth = 178
   end
   object ButtonIngredients: TButton
     Left = 42
@@ -8586,8 +8586,8 @@ object MainForm: TMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 4
-    ExplicitTop = 464
-    ExplicitWidth = 79
+    ExplicitTop = 462
+    ExplicitWidth = 67
   end
   object ButtonSynchroLogs: TButton
     Left = 127
@@ -8603,8 +8603,8 @@ object MainForm: TMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 5
-    ExplicitTop = 464
-    ExplicitWidth = 105
+    ExplicitTop = 462
+    ExplicitWidth = 93
   end
   object ioVCL1: TioVCL
     Left = 18
@@ -8694,7 +8694,7 @@ object MainForm: TMainForm
     Password = 'masterkey'
     Persistent = False
     Pooled = False
-    Port = 3052
+    Port = 3054
     Protocol = pTCPIP
     Server = 'localhost'
     SQLDialect = sqlDialect3

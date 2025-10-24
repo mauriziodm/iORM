@@ -52,8 +52,8 @@ begin
         AnalyzeForeignKeys(LTable);
       end;
 
-      // If the table status is not dbsClean then schema status became dbsAlter
-      if LTable.Status > stClean then
+      // If the table status is not stClean then schema status became stUpdate
+      if (LTable.Status > stClean) and (Schema.Status <> stCreate) then
         Schema.Status := stUpdate;
     end;
 
