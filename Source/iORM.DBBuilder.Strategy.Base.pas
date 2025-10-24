@@ -122,7 +122,7 @@ begin
           end;
         stUpdate:
           begin
-            AScript.Add(SqlGenerator.BuildDropForeignKeySql(LTable.TableName, LFK.Name));
+            AScript.Add(SqlGenerator.BuildDropForeignKeySql(LTable, LFK));
             AScript.Add(SqlGenerator.BuildAddForeignKeySql(LTable, LFK));
           end;
       end;
@@ -149,7 +149,7 @@ begin
         end;
       stUpdate:
         begin
-          AScript.Add(SqlGenerator.BuildDropIndexSql(LIndex.Name));
+          AScript.Add(SqlGenerator.BuildDropIndexSql(ATable, LIndex));
           AScript.Add(SqlGenerator.BuildAddIndexSql(ATable, LIndex));
         end;
     end;

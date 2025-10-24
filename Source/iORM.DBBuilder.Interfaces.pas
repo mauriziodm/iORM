@@ -227,7 +227,8 @@ type
     function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string;
     // Indexes related methods
     function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
-    function BuildDropIndexSql(const AIndexName: string): string;
+    function BuildDropIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; overload;
+    function BuildDropIndexSql(const AIndexName: string): string; overload;
     function BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; overload;
     function BuildIndexExistsSql(const AIndexName: string): string; overload;
     function BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
@@ -237,7 +238,8 @@ type
     function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string;
     // Foreign keys
     function BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
-    function BuildDropForeignKeySql(const ATableName, AForeignKeyName: string): string;
+    function BuildDropForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; overload;
+    function BuildDropForeignKeySql(const ATableName, AForeignKeyName: string): string; overload;
     function BuildListAllForeignKeysSql: string;
     function BuildForeignKeyExistsSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
     function BuildForeignKeyModifiedSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
