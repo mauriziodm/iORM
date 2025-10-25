@@ -74,23 +74,38 @@ type
 
   IioDBBuilderSchemaField = interface
     ['{D06F09FD-7252-46E3-A955-E6C2A3095E77}']
-    procedure AddAltered(const AAltered: TioDBBuilderFieldAlterStatus);
-    function Altered: TioDBBuilderFieldAlter;
-    function FieldCustomType: string;
-    function FieldDefault: TValue;
-    function FieldDefaultExists: Boolean;
-    function FieldLength: integer;
-    function FieldName(const AClearDelimiters: Boolean = False): String;
-    function FieldPrecision: integer;
-    function FieldScale: integer;
-    function FieldSubType: string;
-    function FieldType: TioMetadataFieldType;
-    function FieldUnicode: boolean;
-    function FieldNotNull: boolean;
-    function PrimaryKey: boolean;
     // Status
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const Value: TioDBBuilderStatus);
+
+    procedure AddAltered(const AAltered: TioDBBuilderFieldAlterStatus);
+    function Altered: TioDBBuilderFieldAlter;
+
+    function GetFieldCustomType: string;
+    function GetFieldDefault: TValue;
+    function GetFieldDefaultExists: Boolean;
+    function GetFieldLength: integer;
+    function GetFieldName{(const AClearDelimiters: Boolean = False)}: String;
+    function GetFieldPrecision: integer;
+    function GetFieldScale: integer;
+    function GetFieldSubType: string;
+    function GetFieldType: TioMetadataFieldType;
+    function GetFieldUnicode: boolean;
+    function GetFieldNotNull: boolean;
+    function GetPrimaryKey: boolean;
+
+    property FieldCustomType: string read GetFieldCustomType;
+    property FieldDefault: TValue read GetFieldDefault;
+    property FieldDefaultExists: Boolean read GetFieldDefaultExists;
+    property FieldLength: integer read GetFieldLength;
+    property FieldName: String read GetFieldName;
+    property FieldPrecision: integer read GetFieldPrecision;
+    property FieldScale: integer read GetFieldScale;
+    property FieldSubType: string read GetFieldSubType;
+    property FieldType: TioMetadataFieldType read GetFieldType;
+    property FieldUnicode: boolean read GetFieldUnicode;
+    property FieldNotNull: boolean read GetFieldNotNull;
+    property PrimaryKey: boolean read GetPrimaryKey;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
@@ -126,29 +141,36 @@ type
     ['{2AFBE991-7E33-42DB-892E-01F8C98A5B8F}']
 
     function GetChanges: TioDBBuilderTableChanges;
+    function GetFields: TioDBBuilderSchemaFields;
+    function GetForeignKeys: TioDBBuilderSchemaForeignKeys;
+    function GetContextTable: IioTable;
+    function GetSequenceName: String;
+    // function IDField: IioDBBuilderSchemaField;
+    function GetIndexes: TioDBBuilderSchemaIndexes;
+    function GetPrimaryKeyField: IioDBBuilderSchemaField;
+    function GetName: String;
+    // IsTrueClass
+    procedure SetIsTrueClass(const AValue: boolean);
+    function GetIsTrueClass: boolean;
+    // Status
+    function GetStatus: TioDBBuilderStatus;
+    procedure SetStatus(const AValue: TioDBBuilderStatus);
 
     procedure AddChange(const AChange: TioDBBuilderTableChange);
     procedure AddField(ASchemaField: IioDBBuilderSchemaField);
     procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
     procedure AddIndex(const AIndexAttr: ioIndex);
-    function Fields: TioDBBuilderSchemaFields;
-    function ForeignKeys: TioDBBuilderSchemaForeignKeys;
-    function GetContextTable: IioTable;
-    function GetSequenceName: String;
-    // function IDField: IioDBBuilderSchemaField;
-    function Indexes: TioDBBuilderSchemaIndexes;
-    function PrimaryKeyField: IioDBBuilderSchemaField;
-    function TableName: String;
-    // IsTrueClass
-    procedure SetIsTrueClass(const AValue: boolean);
-    function GetIsTrueClass: boolean;
-    property IsTrueClass: boolean read GetIsTrueClass write SetIsTrueClass;
-    // Status
-    function GetStatus: TioDBBuilderStatus;
-    procedure SetStatus(const AValue: TioDBBuilderStatus);
 
+    property ContextTable: IioTable read GetContextTable;
     property Changes: TioDBBuilderTableChanges read GetChanges;
+    property Fields: TioDBBuilderSchemaFields read GetFields;
+    property ForeignKeys: TioDBBuilderSchemaForeignKeys read GetForeignKeys;
+    property Indexes: TioDBBuilderSchemaIndexes read GetIndexes;
+    property IsTrueClass: boolean read GetIsTrueClass write SetIsTrueClass;
+    property Name: string read GetName;
+    property PrimaryKeyField: IioDBBuilderSchemaField read GetPrimaryKeyField;
+    property SequenceName: string read GetSequenceName;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
@@ -157,19 +179,27 @@ type
 
   IioDBBuilderSchema = interface
     ['{1AEDB134-1ECB-490E-A53A-973BEDE509E5}']
-    function FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
-    function FindTable(const ATableName: String): IioDBBuilderSchemaTable;
-    function ForeignKeysEnabled: boolean;
-    function IndexesEnabled: boolean;
-    procedure SequenceAddIfNotExists(const ASequenceName: String);
-    function Sequences: TioDBBuilderSchemaSequences;
-    function Warnings: TStrings;
-    function WarningExists: boolean;
-    function Tables: TioDBBuilderSchemaTables;
+    function GetForeignKeysEnabled: boolean;
+    function GetIndexesEnabled: boolean;
+    function GetSequences: TioDBBuilderSchemaSequences;
+    function GetWarnings: TStrings;
+    function GetWarningExists: boolean;
+    function GetTables: TioDBBuilderSchemaTables;
     // Status
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const Value: TioDBBuilderStatus);
+
+    function FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
+    function FindTable(const ATableName: String): IioDBBuilderSchemaTable;
+    procedure SequenceAddIfNotExists(const ASequenceName: String);
+
+    property ForeignKeysEnabled: boolean read GetForeignKeysEnabled;
+    property IndexesEnabled: boolean read GetIndexesEnabled;
+    property Sequences: TioDBBuilderSchemaSequences read GetSequences;
+    property Warnings: TStrings read GetWarnings;
+    property WarningExists: boolean read GetWarningExists;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
+    property Tables: TioDBBuilderSchemaTables read GetTables;
   end;
 
   IioDBBuilderSqlScript = interface

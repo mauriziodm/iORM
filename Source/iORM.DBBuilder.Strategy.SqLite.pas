@@ -89,9 +89,9 @@ var
   LField: IioDBBuilderSchemaField;
   LComma: string;
 begin
-  AScript.AddComment(Format('Copying data from "%s" to "%s"', [Table2OldTableName(ATable), ATable.TableName]));
+  AScript.AddComment(Format('Copying data from "%s" to "%s"', [Table2OldTableName(ATable), ATable.Name]));
   // Insert into
-  AScript.Add(Format('INSERT INTO %s (', [ATable.TableName]));
+  AScript.Add(Format('INSERT INTO %s (', [ATable.Name]));
   AScript.IncIndentationLevel;
 
   LComma := '  ';
@@ -197,7 +197,7 @@ var
   LQuery: IioQuery;
 begin
   // Carlo Marona (2025-10-16): ref to https://stackoverflow.com/questions/13426006/how-do-i-get-a-list-of-indexed-columns-for-a-given-table
-  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, Format('PRAGMA index_list(''%s''', [ATable.TableName]));
+  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, Format('PRAGMA index_list(''%s''', [ATable.Name]));
 
   while not LQuery.Eof do
   begin
@@ -211,7 +211,7 @@ var
   LQuery: IioQuery;
 begin
   Result := False;
-  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, Format('pragma table_info(''%s'')', [ATable.TableName]));
+  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, Format('pragma table_info(''%s'')', [ATable.Name]));
 
   while not LQuery.Eof do
   begin
@@ -335,23 +335,23 @@ begin
     if LTable.Status <> stUpdate then
       Continue;
 
-    AScript.AddComment(Format('Renaming from "%s" to "%s"', [LTable.TableName, Table2OldTableName(LTable)]));
+    AScript.AddComment(Format('Renaming from "%s" to "%s"', [LTable.Name, Table2OldTableName(LTable)]));
     AScript.Add(Format('DROP TABLE IF EXISTS %s;', [Table2OldTableName(LTable)]));
-    AScript.Add(Format('ALTER TABLE %s RENAME TO %s;', [LTable.TableName, Table2OldTableName(LTable)]));
+    AScript.Add(Format('ALTER TABLE %s RENAME TO %s;', [LTable.Name, Table2OldTableName(LTable)]));
     AScript.AddEmpty;
   end;
 end;
 
 function TioDBBuilderStrategySqLite.Table2OldTableName(const ATable: IioDBBuilderSchemaTable): String;
 begin
-  Result := Format('_%s_old', [ATable.TableName.ToLower]);
+  Result := Format('_%s_old', [ATable.Name.ToLower]);
 end;
 
 function TioDBBuilderStrategySqLite.TableExists(const ATable: IioDBBuilderSchemaTable): Boolean;
 var
   LQuery: IioQuery;
 begin
-  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildTableExistsSql(ATable.TableName));
+  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildTableExistsSql(ATable.Name));
   Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
 end;
 
@@ -359,7 +359,7 @@ procedure TioDBBuilderStrategySqLite.WarningNotNullCannotBeChanged(const AOldFie
 begin
   if AField.FieldNotNull <> AOldFieldNotNull then
     Schema.Warnings.Add(Format('Table ''%s'' field ''%s'' --> The not null setting cannot be changed automatically',
-      [ATable.TableName, AField.FieldName]));
+      [ATable.Name, AField.FieldName]));
 end;
 
 procedure TioDBBuilderStrategySqLite.WarningNullBecomesNotNull(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
@@ -367,7 +367,7 @@ begin
   if AField.FieldNotNull and (not AOldFieldNotNull) and (not AField.FieldDefaultExists) then
     Schema.Warnings.Add
       (Format('Table ''%s'' field ''%s'' --> The not null setting is changed from false to true and a default value has not been specified',
-      [ATable.TableName, AField.FieldName]));
+      [ATable.Name, AField.FieldName]));
 end;
 
 procedure TioDBBuilderStrategySqLite.WarningTypeAffinity(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable;
@@ -378,7 +378,7 @@ begin
   LRequiredConversion := Format('[%s->%s]', [AOldFieldType, ANewFieldType]);
 
   if ContainsText(AInvalidTypeConversions, LRequiredConversion) then
-    Schema.Warnings.Add(Format('Table ''%s'' field ''%s'' --> Invalid conversion from ''%s'' to ''%s''', [ATable.TableName, AField.FieldName,
+    Schema.Warnings.Add(Format('Table ''%s'' field ''%s'' --> Invalid conversion from ''%s'' to ''%s''', [ATable.Name, AField.FieldName,
       AOldFieldType, ANewFieldType]));
 end;
 

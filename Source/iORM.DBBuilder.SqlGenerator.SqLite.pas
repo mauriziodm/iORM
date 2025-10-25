@@ -106,7 +106,7 @@ begin
   LUnique := BuildIndexUnique(AIndex);
   LFieldList := BuildIndexFieldList(ATable, AIndex, LIndexName, True);
   // Compose the create index query text
-  LSqlText := Format('CREATE %s INDEX IF NOT EXISTS %s ON %s (%s);', [LUnique, LIndexName, ATable.TableName, LFieldList]);
+  LSqlText := Format('CREATE %s INDEX IF NOT EXISTS %s ON %s (%s);', [LUnique, LIndexName, ATable.Name, LFieldList]);
 
   Result := LSqlText;
 end;
@@ -135,7 +135,7 @@ end;
 
 function TioDBBuilderSqlGenSQLite.BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
 begin
-  Result := Format('pragma table_info(''%s'')', [ATable.TableName]);
+  Result := Format('pragma table_info(''%s'')', [ATable.Name]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildIndexExistsSql(const AIndexName: string): string;
@@ -253,7 +253,7 @@ end;
 
 function TioDBBuilderSqlGenSQLite.BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string;
 begin
-  Result := Format('CREATE TABLE %s (', [ATable.TableName]);
+  Result := Format('CREATE TABLE %s (', [ATable.Name]);
 end;
 
 end.

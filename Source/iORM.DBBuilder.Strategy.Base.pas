@@ -164,7 +164,7 @@ begin
   if not Assigned(ATable) then
     raise EioArgumentNilException.Create(ClassName, 'AlterTable', 'ATable is not assigned.');
 
-  AScript.AddTitle(Format('Altering table ''%s''', [ATable.TableName]));
+  AScript.AddTitle(Format('Altering table ''%s''', [ATable.Name]));
 end;
 
 constructor TioDBBuilderStrategyBase.Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator);
@@ -301,7 +301,7 @@ begin
   if not Assigned(ATable) then
     raise EioArgumentNilException.Create(ClassName, 'CreateTable', 'ATable is not assigned.');
 
-  AScript.AddTitle(Format('Creating table ''%s''', [ATable.TableName]));
+  AScript.AddTitle(Format('Creating table ''%s''', [ATable.Name]));
 end;
 
 procedure TioDBBuilderStrategyBase.CreateTables(const AScript: IioDBBuilderSqlScript);

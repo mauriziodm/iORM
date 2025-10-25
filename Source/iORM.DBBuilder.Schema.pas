@@ -47,23 +47,30 @@ type
     FStatus: TioDBBuilderStatus;
     FTables: TioDBBuilderSchemaTables;
     FWarnings: TStrings;
+    function GetForeignKeysEnabled: Boolean;
+    function GetIndexesEnabled: Boolean;
+    function GetSequences: TioDBBuilderSchemaSequences;
+    function GetWarnings: TStrings;
+    function GetWarningExists: Boolean;
+    function GetTables: TioDBBuilderSchemaTables;
     // DBExists
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const AValue: TioDBBuilderStatus);
   public
     constructor Create({const AConnectionDefName: String; }const AIndexesEnabled, AForeignKeysEnabled: Boolean);
     destructor Destroy; override;
+
     function FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
     function FindTable(const ATableName: String): IioDBBuilderSchemaTable;
-    function ForeignKeysEnabled: Boolean;
-    function IndexesEnabled: Boolean;
     procedure SequenceAddIfNotExists(const ASequenceName: String);
-    function Sequences: TioDBBuilderSchemaSequences;
-    function Warnings: TStrings;
-    function WarningExists: Boolean;
-    function Tables: TioDBBuilderSchemaTables;
 
+    property ForeignKeysEnabled: boolean read GetForeignKeysEnabled;
+    property IndexesEnabled: boolean read GetIndexesEnabled;
+    property Sequences: TioDBBuilderSchemaSequences read GetSequences;
+    property Warnings: TStrings read GetWarnings;
+    property WarningExists: boolean read GetWarningExists;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
+    property Tables: TioDBBuilderSchemaTables read GetTables;
   end;
 
 implementation
@@ -112,7 +119,7 @@ begin
     Result := nil;
 end;
 
-function TioDBBuilderSchema.ForeignKeysEnabled: Boolean;
+function TioDBBuilderSchema.GetForeignKeysEnabled: Boolean;
 begin
   Result := FForeignKeysEnabled;
 end;
@@ -122,7 +129,7 @@ begin
   Result := FStatus;
 end;
 
-function TioDBBuilderSchema.IndexesEnabled: Boolean;
+function TioDBBuilderSchema.GetIndexesEnabled: Boolean;
 begin
   Result := FIndexesEnabled;
 end;
@@ -135,7 +142,7 @@ begin
     FSequences.Add(ASequenceName);
 end;
 
-function TioDBBuilderSchema.Sequences: TioDBBuilderSchemaSequences;
+function TioDBBuilderSchema.GetSequences: TioDBBuilderSchemaSequences;
 begin
   Result := FSequences;
 end;
@@ -146,17 +153,17 @@ begin
   FStatus := AValue;
 end;
 
-function TioDBBuilderSchema.Tables: TioDBBuilderSchemaTables;
+function TioDBBuilderSchema.GetTables: TioDBBuilderSchemaTables;
 begin
   Result := FTables;
 end;
 
-function TioDBBuilderSchema.Warnings: TStrings;
+function TioDBBuilderSchema.GetWarnings: TStrings;
 begin
   Result := FWarnings;
 end;
 
-function TioDBBuilderSchema.WarningExists: Boolean;
+function TioDBBuilderSchema.GetWarningExists: Boolean;
 begin
   Result := FWarnings.Count > 0;
 end;

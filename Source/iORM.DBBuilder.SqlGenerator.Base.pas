@@ -278,10 +278,10 @@ begin
 
       // Build the indexname
       if not LShorten then
-        LIndexName := 'IDX_' + ATable.TableName + '_' + AIndex.Name
+        LIndexName := 'IDX_' + ATable.Name + '_' + AIndex.Name
       else  // Carlo Marona (2025-10-24): If the length exeed max length the name will be recalculated using a shortening algorithm.
       begin
-        LIndexName := 'IDX_' + ShortenIdentifierName(ATable.TableName, 4);
+        LIndexName := 'IDX_' + ShortenIdentifierName(ATable.Name, 4);
 
         // Carlo Marona (2025-10-24): Calculation of Index name was moved into TioDBBuilderSchemaIndex class like TioDBBuilderSchemaFK.
         // Field list
@@ -579,7 +579,7 @@ var
 begin
   LFKName := BuildForeignKeyNameSql(ATable, AForeignKey);
 
-  Result := BuildDropForeignKeySql(ATable.TableName, LFKName);
+  Result := BuildDropForeignKeySql(ATable.Name, LFKName);
 end;
 
 end.

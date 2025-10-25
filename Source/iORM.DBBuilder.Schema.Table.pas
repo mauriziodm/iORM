@@ -68,16 +68,23 @@ type
     procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
     procedure AddIndex(const AIndexAttr: ioIndex);
-    function Fields: TioDBBuilderSchemaFields;
-    function ForeignKeys: TioDBBuilderSchemaForeignKeys;
+    function GetFields: TioDBBuilderSchemaFields;
+    function GetForeignKeys: TioDBBuilderSchemaForeignKeys;
     function GetContextTable: IioTable;
     function GetSequenceName: String;
-    function Indexes: TioDBBuilderSchemaIndexes;
-    function PrimaryKeyField: IioDBBuilderSchemaField;
-    function TableName: String;
+    function GetIndexes: TioDBBuilderSchemaIndexes;
+    function GetPrimaryKeyField: IioDBBuilderSchemaField;
+    function GetName: String;
 
+    property ContextTable: IioTable read GetContextTable;
     property Changes: TioDBBuilderTableChanges read GetChanges;
-    property IsTrueClass: Boolean read GetIsTrueClass write SetIsTrueClass;
+    property Fields: TioDBBuilderSchemaFields read GetFields;
+    property ForeignKeys: TioDBBuilderSchemaForeignKeys read GetForeignKeys;
+    property Indexes: TioDBBuilderSchemaIndexes read GetIndexes;
+    property IsTrueClass: boolean read GetIsTrueClass write SetIsTrueClass;
+    property Name: string read GetName;
+    property PrimaryKeyField: IioDBBuilderSchemaField read GetPrimaryKeyField;
+    property SequenceName: string read GetSequenceName;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
@@ -132,7 +139,7 @@ begin
   Result := False;
 end;
 
-function TioDBBuilderSchemaTable.Fields: TioDBBuilderSchemaFields;
+function TioDBBuilderSchemaTable.GetFields: TioDBBuilderSchemaFields;
 begin
   Result := FFields;
 end;
@@ -155,22 +162,22 @@ begin
     FForeignKeys.Add(LForeignKey.Name, LForeignKey);
 end;
 
-function TioDBBuilderSchemaTable.ForeignKeys: TioDBBuilderSchemaForeignKeys;
+function TioDBBuilderSchemaTable.GetForeignKeys: TioDBBuilderSchemaForeignKeys;
 begin
   Result := FForeignKeys;
 end;
 
-function TioDBBuilderSchemaTable.Indexes: TioDBBuilderSchemaIndexes;
+function TioDBBuilderSchemaTable.GetIndexes: TioDBBuilderSchemaIndexes;
 begin
   Result := FIndexes;
 end;
 
-function TioDBBuilderSchemaTable.PrimaryKeyField: IioDBBuilderSchemaField;
+function TioDBBuilderSchemaTable.GetPrimaryKeyField: IioDBBuilderSchemaField;
 begin
   Result := FPrimaryKeyField;
 end;
 
-function TioDBBuilderSchemaTable.TableName: String;
+function TioDBBuilderSchemaTable.GetName: String;
 begin
   Result := FContextTable.TableName;
 end;

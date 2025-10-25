@@ -156,7 +156,7 @@ begin
   if not Assigned(ATable) then
     raise EioArgumentNilException.Create(ClassName, 'CreateTable', 'ATable is not assigned.');
 
-  AScript.AddTitle(Format('Creating table ''%s''', [ATable.TableName]));
+  AScript.AddTitle(Format('Creating table ''%s''', [ATable.Name]));
 
   if (Schema.Status = stCreate) or not SequenceExists(ATable.GetSequenceName) then
     CreateTableSequence(AScript, ATable);
@@ -315,7 +315,7 @@ var
 begin
   Result := False;
   // Load some new field informations
-  LTableName := ATable.TableName.ToUpper;
+  LTableName := ATable.Name.ToUpper;
   LFieldName := AField.FieldName.ToUpper;
   LNewFieldType := SqlGenerator.TranslateFieldType(AField); //TranslateFieldTypeForModified(AField);
   LNewFieldSubType := IfThen(AField.FieldSubType.IsEmpty, '0', AField.FieldSubType);
@@ -605,7 +605,7 @@ function TioDBBuilderStrategyFirebird.TableExists(const ATable: IioDBBuilderSche
 var
   LQuery: IioQuery;
 begin
-  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildTableExistsSql(ATable.TableName));
+  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildTableExistsSql(ATable.Name));
   Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
 end;
 
@@ -614,7 +614,7 @@ procedure TioDBBuilderStrategyFirebird.WarningNewValueLessThanTheOldOne(const AV
 begin
   if ANewValue < AOldValue then
     Schema.Warnings.Add(Format('Table ''%s'' field ''%s'' --> The new %s cannot be less than the old one (old = %d, new = %d)',
-      [ATable.TableName, AField.FieldName, AValueName, AOldValue, ANewValue]));
+      [ATable.Name, AField.FieldName, AValueName, AOldValue, ANewValue]));
 end;
 
 procedure TioDBBuilderStrategyFirebird.WarningNotNullCannotBeChanged(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField;
@@ -622,7 +622,7 @@ procedure TioDBBuilderStrategyFirebird.WarningNotNullCannotBeChanged(const AOldF
 begin
   if AField.FieldNotNull <> AOldFieldNotNull then
     Schema.Warnings.Add(Format('Table ''%s'' field ''%s'' --> The not null setting cannot be changed automatically',
-      [ATable.TableName, AField.FieldName]));
+      [ATable.Name, AField.FieldName]));
 end;
 
 procedure TioDBBuilderStrategyFirebird.WarningNullBecomesNotNull(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField;
@@ -631,7 +631,7 @@ begin
   if AField.FieldNotNull and (not AOldFieldNotNull) and (not AField.FieldDefaultExists) then
     Schema.Warnings.Add
       (Format('Table ''%s'' field ''%s'' --> The not null setting is changed from false to true and a default value has not been specified',
-      [ATable.TableName, AField.FieldName]));
+      [ATable.Name, AField.FieldName]));
 end;
 
 procedure TioDBBuilderStrategyFirebird.WarningTypeAffinity(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField;
@@ -641,7 +641,7 @@ var
 begin
   LRequiredConversion := Format('[%s->%s]', [AOldFieldType, ANewFieldType]);
   if ContainsText(AInvalidTypeConversions, LRequiredConversion) then
-    Schema.Warnings.Add(Format('Table ''%s'' field ''%s'' --> Invalid conversion from ''%s'' to ''%s''', [ATable.TableName, AField.FieldName,
+    Schema.Warnings.Add(Format('Table ''%s'' field ''%s'' --> Invalid conversion from ''%s'' to ''%s''', [ATable.Name, AField.FieldName,
       AOldFieldType, ANewFieldType]));
 end;
 
@@ -650,7 +650,7 @@ procedure TioDBBuilderStrategyFirebird.WarningValueChanged(const AValueName, AOl
 begin
   if ANewValue <> AOldValue then
     Schema.Warnings.Add(Format('Table ''%s'' field ''%s'' --> Changing the %s is not allowed (old = ''%s'', new = ''%s'')',
-      [ATable.TableName, AField.FieldName, AValueName, AOldValue, ANewValue]));
+      [ATable.Name, AField.FieldName, AValueName, AOldValue, ANewValue]));
 end;
 
 end.

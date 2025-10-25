@@ -191,13 +191,13 @@ begin
   LUnique := BuildIndexUnique(AIndex);
   LFieldList := BuildIndexFieldList(ATable, AIndex, LIndexName, False);
   // Compose the create index query text
-  LSqlText := Format('CREATE %s %s INDEX %s ON %s (%s);', [LUnique, LIndexOrientation, LIndexName, ATable.TableName, LFieldList]);
+  LSqlText := Format('CREATE %s %s INDEX %s ON %s (%s);', [LUnique, LIndexOrientation, LIndexName, ATable.Name, LFieldList]);
   Result := LSqlText;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string;
 begin
-  Result := Format('ALTER TABLE %s ADD CONSTRAINT PK_%s PRIMARY KEY (%s);', [ATable.TableName, ATable.TableName,
+  Result := Format('ALTER TABLE %s ADD CONSTRAINT PK_%s PRIMARY KEY (%s);', [ATable.Name, ATable.Name,
     ATable.PrimaryKeyField.FieldName]);
 end;
 
@@ -247,18 +247,18 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildBeginAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
 begin
-  Result := Format('ALTER TABLE %s', [ATable.TableName]);
+  Result := Format('ALTER TABLE %s', [ATable.Name]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string;
 begin
-  Result := Format('CREATE TABLE %s (', [ATable.TableName]);
+  Result := Format('CREATE TABLE %s (', [ATable.Name]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
 begin
   Result := Format('select RDB$FIELD_NAME from RDB$RELATION_FIELDS where RDB$RELATION_NAME = ''%s'' and RDB$FIELD_NAME = ''%s'' and RDB$SYSTEM_FLAG = 0',
-    [ATable.TableName.ToUpper, AField.FieldName.ToUpper]);
+    [ATable.Name.ToUpper, AField.FieldName.ToUpper]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
@@ -282,7 +282,7 @@ begin
     '  (RDB$RELATION_CONSTRAINTS.rdb$constraint_type = ''FOREIGN KEY'') and' + sLineBreak +
     '  (RDB$RELATIONS.Rdb$relation_name = ''%s'') and' + sLineBreak +
     '  (RDB$RELATION_CONSTRAINTS.rdb$constraint_name = ''%s'')',
-    [ATable.TableName, LFKName]
+    [ATable.Name, LFKName]
   );
 end;
 
@@ -307,7 +307,7 @@ begin
     '  detail_relation_constraints.rdb$constraint_type = ''FOREIGN KEY'' AND' + sLineBreak +
     '  detail_relation_constraints.rdb$relation_name = ''%s'' AND' + sLineBreak +
     '  detail_relation_constraints.rdb$constraint_name = ''%s''',
-    [ATable.TableName, LFKName]
+    [ATable.Name, LFKName]
   );
 end;
 
@@ -336,7 +336,7 @@ begin
     '  (rdb$indices.rdb$system_flag = 0) and' + sLineBreak +
     '  (rdb$indices.rdb$relation_name = ''%s'') and' + sLineBReak +
     '  (rdb$indices.rdb$index_name = ''%s'')',
-    [ATable.TableName, AIndex.Name]
+    [ATable.Name, AIndex.Name]
   );
 end;
 
@@ -384,7 +384,7 @@ begin
     '  i.RDB$RELATION_NAME = ''%s''' + SLineBreak +
     'ORDER BY' + SLineBreak +
     '  s.RDB$FIELD_POSITION',
-    [ATable.TableName]
+    [ATable.Name]
   );
 end;
 
@@ -398,7 +398,7 @@ begin
     'where' + SLineBreak +
     '  (RDB$INDICES.RDB$SYSTEM_FLAG = 0) and' + SLineBreak +
     '  (RDB$INDIXES.RDB$RELATION_NAME like ''%%s'')'
-    , [ATable.TableName]
+    , [ATable.Name]
   );
 end;
 
