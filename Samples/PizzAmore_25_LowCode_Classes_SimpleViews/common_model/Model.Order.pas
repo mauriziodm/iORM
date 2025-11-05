@@ -10,7 +10,7 @@ type
   [ioEnumerated('All, Waiting, Preparing, Ready, Delivered')]
   TOrderState = (osUnknown, osWaiting, osPreparing, osReady, osDelivered);
 
-  [ioEntity('ORDERS'), etmTrace(TEtmRepository)]
+  [ioEntity('ORDERS'), etmTrace(TEtmRepository),  ioConflictStrategy(TioSameVersionWin, csRejectedRaise)]
   TOrder = class
   private
     FID: Integer;

@@ -26,7 +26,7 @@ object MyWebModule: TMyWebModule
   object SQLiteConn: TioSQLiteConnectionDef
     AsDefault = True
     AutoCreateDB.Enabled = True
-    Database = 'PizzAmore_25_LowCode_Classes_SimpleViews_Vcl.db'
+    Database = 'PIZZAMORE_25_SIMPLEVIEW_VCL.DB'
     DatabaseStdFolder = sfDocuments
     Persistent = False
     Pooled = False

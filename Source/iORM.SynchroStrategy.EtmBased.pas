@@ -71,7 +71,8 @@ type
     property SrvToCli_TimeSlotID_From: Integer read FSrvToCli_TimeSlotID_From write FSrvToCli_TimeSlotID_From;
     property SrvToCli_TimeSlotID_To: Integer read FSrvToCli_TimeSlotID_To write FSrvToCli_TimeSlotID_To;
     // Server-side etm where criteria and time-slots
-    [ioSkip, ioHasMany(TioEtmCustomTimeSlot, 'SynchroLogItemID'), ioForeignKey(fkDoNotCreate), ioLoadOnly, ioPersistOnly]
+//    [ioSkip, ioHasMany(TioEtmCustomTimeSlot, 'SynchroLogItemID'), ioForeignKey(fkDoNotCreate), ioLoadOnly, ioPersistOnly]
+    [ioHasMany(TioEtmCustomTimeSlot, 'SynchroLogItemID'), ioForeignKey(fkDoNotCreate), ioLoadOnly, ioPersistOnly]
     property EtmTimeslotsSrv: TObjectList<TioEtmCustomTimeSlot> read GetEtmTimeslotsSrv;
     [ioBinary('1')]
     property EtmWhereSrvStr: String read FEtmWhereSrvStr_DoNotAccessDirectly write FEtmWhereSrvStr_DoNotAccessDirectly;

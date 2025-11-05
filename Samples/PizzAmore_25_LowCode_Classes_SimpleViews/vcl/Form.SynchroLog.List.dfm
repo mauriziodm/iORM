@@ -43,7 +43,7 @@ object SynchroLogListForm: TSynchroLogListForm
     object LabelTitle: TLabel
       Left = 0
       Top = 7
-      Width = 980
+      Width = 960
       Height = 21
       Alignment = taCenter
       Anchors = [akLeft, akTop, akRight]
@@ -239,7 +239,7 @@ object SynchroLogListForm: TSynchroLogListForm
         end>
     end
     object ButtonShowTimeslot: TButton
-      Left = 812
+      Left = 792
       Top = 3
       Width = 110
       Height = 22
@@ -252,7 +252,7 @@ object SynchroLogListForm: TSynchroLogListForm
       Font.Style = []
       ParentFont = False
       TabOrder = 1
-      ExplicitLeft = 808
+      ExplicitLeft = 788
     end
   end
   object GridCustomers: TDBGrid
@@ -378,7 +378,7 @@ object SynchroLogListForm: TSynchroLogListForm
       item
         Alignment = taCenter
         Expanded = False
-        FieldName = 'User'
+        FieldName = 'UserName'
         Title.Alignment = taCenter
         Title.Caption = 'user'
         Title.Font.Charset = DEFAULT_CHARSET
@@ -571,6 +571,8 @@ object SynchroLogListForm: TSynchroLogListForm
   object DSSynchroLog: TioDataSetMaster
     AsDefault = True
     TypeName = 'TioEtmSynchroStrategy_LogItem'
+    AsyncLoad = True
+    AsyncPersist = True
     Paging.CurrentPageOfFormat = '%d/%d'
     Left = 96
     Top = 128
@@ -637,8 +639,8 @@ object SynchroLogListForm: TSynchroLogListForm
       FieldName = 'ErrorMsg'
       Size = 1000
     end
-    object DSSynchroLogUser: TStringField
-      FieldName = 'User'
+    object DSSynchroLogUserName: TStringField
+      FieldName = 'UserName'
       Size = 100
     end
     object DSSynchroLogApp: TStringField

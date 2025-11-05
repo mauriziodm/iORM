@@ -58,6 +58,7 @@ type
     FAuthContext: String;
     FTypeName, FTypeAlias: String;
     FIntent: TioPersistenceIntentType;
+    [djSkip]
     FTypeInfo: PTypeInfo;
     FDisableStrictlyTrueClass: Boolean;
     FLazyLoad: Boolean;

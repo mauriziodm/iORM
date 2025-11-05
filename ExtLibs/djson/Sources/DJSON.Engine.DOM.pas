@@ -112,7 +112,7 @@ uses
   DJSON.Attributes,
 
   DJSON.Utils,
-  DJSON.TypeInfoCache
+  DJSON.TypeInfoCache, iORM.Context.Container
 {$ENDREGION}
     ;
 
@@ -890,7 +890,7 @@ begin
       //       il parametro "AOwnsBelongsToOrHasOneDetailObj" e ho aggiunto anche il relativo parametro ai djParams
       LValue := DeserializePropField(LJSONValue, TdjDuckPropField.RttiType(LPropField), LPropField, AObject, AParams);
       if (not LValue.IsEmpty)
-        or (LJSONValue.Null and Assigned(AObject) and TioUtilities.HasBelongsToOrHasOneRelation(AObject.ClassName, TioUtilities.Remove_F_FromFieldName(LPropField)))
+        or (LJSONValue.Null and Assigned(AObject) and TioMapContainer.Exist(AObject.ClassName) and TioUtilities.HasBelongsToOrHasOneRelation(AObject.ClassName, TioUtilities.Remove_F_FromFieldName(LPropField)))
       then
         TdjDuckPropField.SetValue(AObject, LPropField, LValue, AParams.OwnsBelongsToOrHasOneDetailObj);
     end;

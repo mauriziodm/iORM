@@ -4,8 +4,8 @@ object MainForm: TMainForm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
-  ClientHeight = 534
-  ClientWidth = 260
+  ClientHeight = 533
+  ClientWidth = 256
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,8 +15,8 @@ object MainForm: TMainForm
   Position = poDesktopCenter
   OnCreate = FormCreate
   DesignSize = (
-    260
-    534)
+    256
+    533)
   TextHeight = 15
   object ImagePizza: TImage
     Left = -2
@@ -8481,8 +8481,8 @@ object MainForm: TMainForm
   end
   object Shape1: TShape
     Left = 0
-    Top = 311
-    Width = 260
+    Top = 310
+    Width = 256
     Height = 223
     Align = alBottom
     Brush.Color = clNavy
@@ -8506,8 +8506,8 @@ object MainForm: TMainForm
   end
   object ButtonOrders: TButton
     Left = 12
-    Top = 321
-    Width = 217
+    Top = 320
+    Width = 205
     Height = 40
     Action = acShowOrders
     Anchors = [akLeft, akRight, akBottom]
@@ -8518,13 +8518,13 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 0
-    ExplicitTop = 320
-    ExplicitWidth = 213
+    ExplicitTop = 319
+    ExplicitWidth = 201
   end
   object ButtonCustomers: TButton
     Left = 12
-    Top = 367
-    Width = 217
+    Top = 366
+    Width = 205
     Height = 40
     Action = acShowCustomers
     Anchors = [akLeft, akRight, akBottom]
@@ -8535,13 +8535,13 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 1
-    ExplicitTop = 366
-    ExplicitWidth = 213
+    ExplicitTop = 365
+    ExplicitWidth = 201
   end
   object ButtonPizzas: TButton
     Left = 12
-    Top = 412
-    Width = 217
+    Top = 411
+    Width = 205
     Height = 40
     Action = acShowPizzas
     Anchors = [akLeft, akRight, akBottom]
@@ -8552,13 +8552,13 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 2
-    ExplicitTop = 411
-    ExplicitWidth = 213
+    ExplicitTop = 410
+    ExplicitWidth = 201
   end
   object ButtonQuit: TButton
     Left = 12
-    Top = 494
-    Width = 217
+    Top = 493
+    Width = 205
     Height = 30
     Action = acQuit
     Anchors = [akLeft, akRight, akBottom]
@@ -8569,13 +8569,13 @@ object MainForm: TMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 3
-    ExplicitTop = 493
-    ExplicitWidth = 213
+    ExplicitTop = 492
+    ExplicitWidth = 201
   end
   object ButtonIngredients: TButton
     Left = 12
-    Top = 458
-    Width = 46
+    Top = 457
+    Width = 34
     Height = 31
     Action = acShowIngredients
     Anchors = [akLeft, akRight, akBottom]
@@ -8586,13 +8586,13 @@ object MainForm: TMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 4
-    ExplicitTop = 457
-    ExplicitWidth = 42
+    ExplicitTop = 456
+    ExplicitWidth = 30
   end
   object ButtonSynchroLogs: TButton
     Left = 84
-    Top = 458
-    Width = 89
+    Top = 457
+    Width = 77
     Height = 31
     Action = acShowSynchroLogs
     Anchors = [akLeft, akRight, akBottom]
@@ -8603,13 +8603,13 @@ object MainForm: TMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 5
-    ExplicitTop = 457
-    ExplicitWidth = 85
+    ExplicitTop = 456
+    ExplicitWidth = 73
   end
   object ButtonAuthorization: TButton
     Left = 199
-    Top = 458
-    Width = 30
+    Top = 457
+    Width = 18
     Height = 31
     Action = acShowIngredients
     Anchors = [akLeft, akRight, akBottom]
@@ -8622,8 +8622,8 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 6
     OnClick = ButtonAuthorizationClick
-    ExplicitTop = 457
-    ExplicitWidth = 26
+    ExplicitTop = 456
+    ExplicitWidth = 14
   end
   object ActionList1: TActionList
     Left = 220

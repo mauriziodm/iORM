@@ -4831,13 +4831,13 @@ object StartForm: TStartForm
   object SynchroStrategy: TioEtmSynchroStrategy_Client
     EtmTimeSlot_ClassName = 'TEtmRepository'
     SynchroLogName = 'from mobile app'
-    TargetConnectionDef = ServerConn
+    TargetConnectionDef = HttpConn
     Left = 187
     Top = 304
   end
   object HttpConn: TioHttpConnectionDef
     AsDefault = False
-    BaseURL = 'http://localhost:8080/iorm'
+    BaseURL = 'http://localhost:8080/iorm/samples/pizzamore'
     Persistent = True
     Left = 280
     Top = 304

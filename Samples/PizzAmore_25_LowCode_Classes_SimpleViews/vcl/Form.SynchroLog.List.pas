@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Buttons, Vcl.ExtCtrls, Data.DB, Vcl.DBGrids, Vcl.DBCtrls, iORM, iORM.Attributes,
   iORM.CommonTypes, iORM.StdActions.Vcl, System.Actions, Vcl.ActnList,
-  iORM.DB.DataSet.Master, iORM.SynchroStrategy.EtmBased, iORM.DB.DataSet.Detail;
+  iORM.DB.DataSet.Master, iORM.SynchroStrategy.EtmBased, iORM.DB.DataSet.Detail, iORM.Where.Interfaces, iORM.DB.DataSet.Base, iORM.DB.DataSet.Custom, Vcl.Grids;
 
 type
 
@@ -55,7 +55,7 @@ type
     DSSynchroLogErrorState: TStringField;
     DSSynchroLogErrorMsg: TStringField;
     ButtonShowTimeslot: TButton;
-    DSSynchroLogUser: TStringField;
+    DSSynchroLogUserName: TStringField;
     DSSynchroLogApp: TStringField;
     DSSynchroLogLicense: TStringField;
     procedure FormShow(Sender: TObject);

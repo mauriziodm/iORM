@@ -119,7 +119,7 @@
             <FormType>dfm</FormType>
             <DesignClass>TWebModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="C:\delphi\tools\iORM\Source\http_server_units\iORM.Http.Server.DMVC.Controller.pas"/>
+        <DCCReference Include="..\..\..\Source\http_server_units\iORM.Http.Server.DMVC.Controller.pas"/>
         <DCCReference Include="..\common_model\Where.Pizza.pas"/>
         <DCCReference Include="..\common_model\Where.Order.pas"/>
         <DCCReference Include="..\common_model\Utils.SampleData.pas"/>

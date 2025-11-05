@@ -7,7 +7,7 @@ uses
 
 type
 
-  [ioEntity('CUSTOMERS'), etmTrace(TEtmRepository), ioConflictStrategy(TioSameVersionWin)]
+  [ioEntity('CUSTOMERS'), etmTrace(TEtmRepository), ioConflictStrategy(TioSameVersionWin, csResolved)]
   TCustomer = class
   private
     FID: Integer;
