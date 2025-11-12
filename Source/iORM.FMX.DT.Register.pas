@@ -43,8 +43,12 @@ uses
   System.Classes,
   System.Actions,
 
+  FMX.Controls,
+
   iORM.Abstraction.FMX,
-  iORM.StdActions.FMX
+  iORM.StdActions.FMX,
+
+  iORM.MVVM.ViewModel
 
 
   ;

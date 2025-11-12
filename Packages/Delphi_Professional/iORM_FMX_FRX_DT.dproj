@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{394B0BFA-89E4-4010-B25B-48906D609BCF}</ProjectGuid>
-        <MainSource>iORM_VCL_DT.dpk</MainSource>
+        <ProjectGuid>{A5C76CA6-4862-426D-9404-FA7CCC8F1BA3}</ProjectGuid>
+        <MainSource>iORM_FMX_FRX_DT.dpk</MainSource>
         <ProjectVersion>19.5</ProjectVersion>
         <FrameworkType>None</FrameworkType>
         <Base>True</Base>
@@ -81,14 +81,9 @@
         <GenPackage>true</GenPackage>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
         <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
-        <SanitizedProjectName>iORM_VCL_DT</SanitizedProjectName>
-        <DCC_Define>ioDelphiProfessional;$(DCC_Define)</DCC_Define>
-        <VerInfo_Locale>1040</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-        <DCC_Description>iORM VCL designtime</DCC_Description>
         <DesignOnlyPackage>true</DesignOnlyPackage>
         <DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
-        <DllSuffix>$(Auto)</DllSuffix>
+        <SanitizedProjectName>iORM_FMX_FRX_DT</SanitizedProjectName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android)'!=''">
         <DCC_CBuilderOutput>None</DCC_CBuilderOutput>
@@ -120,7 +115,7 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <DCC_UsePackage>rtl;iORM_VCL_RT;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_UsePackage>rtl;iORM_FMX_FRX;iORM_FMX_FRX_RT;$(DCC_UsePackage)</DCC_UsePackage>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
         <DCC_UsePackage>rtl;$(DCC_UsePackage)</DCC_UsePackage>
@@ -139,7 +134,8 @@
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <DCC_Description>iORM VCL Design-Time</DCC_Description>
+        <DCC_Description>iORM FMX FastReport Design-Time</DCC_Description>
+        <DllSuffix>$(Auto)</DllSuffix>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -152,9 +148,8 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="rtl.dcp"/>
-        <DCCReference Include="Designide.dcp"/>
-        <DCCReference Include="iORM_VCL_RT.dcp"/>
-        <DCCReference Include="..\..\Source\iORM.VCL.DT.Register.pas"/>
+        <DCCReference Include="iORM_FMX_FRX_RT.dcp"/>
+        <DCCReference Include="..\..\Source\iORM.FMX.FastReport.Register.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -179,7 +174,7 @@
                     <Excluded_Packages Name="C:\Program Files (x86)\FastReport VCL Professional\LibD28\dclfsIBX28.bpl">FastScript 1.9 IBX Components</Excluded_Packages>
                 </Excluded_Packages>
                 <Source>
-                    <Source Name="MainSource">iORM_VCL_DT.dpk</Source>
+                    <Source Name="MainSource">iORM_FMX_FRX_DT.dpk</Source>
                 </Source>
             </Delphi.Personality>
             <Deployment Version="4">
@@ -198,9 +193,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="..\..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\iORM_VCL_DT280.bpl" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="..\..\..\..\..\..\..\..\..\Public\Documents\Embarcadero\Studio\22.0\Bpl\iORM_FMX_FRX_DT280.bpl" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>iORM_VCL_DT.bpl</RemoteName>
+                        <RemoteName>iORM_FMX_FRX_DT.bpl</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

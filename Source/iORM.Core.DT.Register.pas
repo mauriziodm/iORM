@@ -45,6 +45,7 @@ uses
   System.Classes,
   System.Actions,
   DesignEditors,
+  DMForm,           // TDataModuleCustomModule
 
   iORM.DB.ConnectionDef,
   iORM.DB.DataSet.Master,
@@ -167,9 +168,13 @@ begin
   RegisterComponents('iORM - Other', [TioCloseQueryRepeater]);
   RegisterComponents('iORM - Other', [TioWebBrokerProducer]);
 
+  // ioViewModel module
+  RegisterCustomModule(TioViewModel, TDataModuleCustomModule);
+  RegisterNoIcon([TioViewModel]);
+
   // IDE Wizards
   RegisterPackageWizard(TioViewModelWizard.Create);
-  RegisterCustomModule(TioViewModel, TCustomModule);
+
 //  RegisterCustomModule(TioViewModel, TDataModuleCustomModule); // TDataModuleCustomModule is declared in "DMForm" unit
 end;
 
