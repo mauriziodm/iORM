@@ -553,107 +553,90 @@ var
         begin
           if ioIndex(LAttribute).CommaSepFieldList.IsEmpty then // If the "ACommaSepFieldList" is empty then set the current property field name
             ioIndex(LAttribute).CommaSepFieldList := LMember_FieldName;
+
+          // Carlo Marona (2025-10-24): removed because if the name is not explicitly defined the TioDBBuilderSchemaIndex class calculate the name
+//          if ioIndex(LAttribute).IndexName.IsEmpty then // Carlo Marona (2025-10-17): If the attribute is applied to a field and a IndexName is not specified, the field name is used as index name
+//            ioIndex(LAttribute).IndexName := LMember_FieldName;
+
           ATable.GetIndexList(True).Add(ioIndex(LAttribute)); // Add the current index attribute
         end
-        else
-
-          if LAttribute is etmPropertyAttribute then
+        else if LAttribute is etmPropertyAttribute then
         begin
           etmPropertyAttribute(LAttribute).SetMemberName(LMember_Name); // Add the current member name if necessary
           ATable.GetEtmPropToPropList(True).Add(etmPropertyAttribute(LAttribute)); // Add the current etmProperty attribute
         end
-        else
-
-          if LAttribute is ioWhereAttribute then
+        else if LAttribute is ioWhereAttribute then
         begin
           LWhereCompareOp := ioWhereAttribute(LAttribute).CompareOp;
           LWhereLogicOp := ioWhereAttribute(LAttribute).LogicOp;
           if not ioWhereAttribute(LAttribute).TargetPropName.IsEmpty then
             LWhereTargetPropName := ioWhereAttribute(LAttribute).TargetPropName;
         end
-
         else if LAttribute is ioWhereGroupAttribute then
         begin
           LWhereGroupName := ioWhereGroupAttribute(LAttribute).GroupName;
           LWhereGroupLogicOp := ioWhereGroupAttribute(LAttribute).GroupLogicOp;
           LWhereMasterGroupName := ioWhereGroupAttribute(LAttribute).MasterGroupName;
         end
-
         else if LAttribute is ioWhereNullValueAttribute then
           LWhereNullValue := ioWhereNullValueAttribute(LAttribute).Value
-
         else if LAttribute is ioWhereSkipAttribute then
           LWhereSkip := True
-
         else
           // Metadata Used by DBBuilder (M.M. 01/08/18)
           if LAttribute is ioNotNull then
             LDB_FieldNotNull := True
           else if LAttribute is ioVarchar then
-
           begin
             LDB_FieldType := ioMdVarchar;
             LDB_FieldLength := ioVarchar(LAttribute).Length;
             LDB_FieldUnicode := ioVarchar(LAttribute).IsUnicode;
           end
-
           else if LAttribute is ioChar then
           begin
             LDB_FieldType := ioMdChar;
             LDB_FieldLength := ioChar(LAttribute).Length;
             LDB_FieldUnicode := ioChar(LAttribute).IsUnicode;
           end
-
           else if LAttribute is ioInteger then
           begin
             LDB_FieldType := ioMdInteger;
             LDB_FieldPrecision := ioInteger(LAttribute).Precision;
           end
-
           else if LAttribute is ioFloat then
             LDB_FieldType := ioMdFloat
-
           else if LAttribute is ioDate then
             LDB_FieldType := ioMdDate
-
           else if LAttribute is ioTime then
             LDB_FieldType := ioMdTime
-
           else if LAttribute is ioDateTime then
             LDB_FieldType := ioMdDateTime
-
           else if LAttribute is ioDecimal then
           begin
             LDB_FieldType := ioMdDecimal;
             LDB_FieldPrecision := ioDecimal(LAttribute).Precision;
             LDB_FieldScale := ioDecimal(LAttribute).Scale;
           end
-
           else if LAttribute is ioNumeric then
           begin
             LDB_FieldType := ioMdNumeric;
             LDB_FieldPrecision := ioNumeric(LAttribute).Precision;
             LDB_FieldScale := ioNumeric(LAttribute).Scale;
           end
-
           else if LAttribute is ioBoolean then
             LDB_FieldType := ioMdBoolean
-
           else if LAttribute is ioBinary then
           begin
             LDB_FieldType := ioMdBinary;
             LDB_FieldSubType := ioBinary(LAttribute).BinarySubType
           end
-
           else if LAttribute is ioFTCustom then
           begin
             LDB_FieldType := ioMdCustomFieldType;
             LDB_CustomFieldType := ioFTCustom(LAttribute).Value;
           end
-
           else if LAttribute is ioDefault then
             LDB_Default := ioDefault(LAttribute).Value
-
           else if LAttribute is ioForeignKey then
           begin
             LForeignKeyAttributeExists := True;

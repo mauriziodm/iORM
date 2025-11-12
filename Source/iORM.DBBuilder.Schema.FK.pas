@@ -47,16 +47,28 @@ type
     FOnDeleteAction: TioFKAction;
     FOnUpdateAction: TioFKAction;
     FReferenceMap: IioMap;
+    FStatus: TioDBBuilderStatus;
+    function GetDependentTableName: String;
+    function GetDependentFieldName: String;
+    function GetName: String;
+    function GetOnDeleteAction: TioFKAction;
+    function GetOnUpdateAction: TioFKAction;
+    function GetReferenceTableName: String;
+    function GetReferenceFieldName: String;
+    function GetStatus: TioDBBuilderStatus;
+    procedure SetStatus(const Value: TioDBBuilderStatus);
   public
     constructor Create(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
-    function DependentTableName: String;
-    function DependentFieldName: String;
-    function Name: String;
-    function OnDeleteAction: TioFKAction;
-    function OnUpdateAction: TioFKAction;
-    function ReferenceTableName: String;
-    function ReferenceFieldName: String;
+
+    property DependentTableName: String read GetDependentTableName;
+    property DependentFieldName: String read GetDependentFieldName;
+    property Name: String read GetName;
+    property OnDeleteAction: TioFKAction read GetOnDeleteAction;
+    property OnUpdateAction: TioFKAction read GetOnUpdateAction;
+    property ReferenceTableName: String read GetReferenceTableName;
+    property ReferenceFieldName: String read GetReferenceFieldName;
+    property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
 implementation
@@ -66,34 +78,37 @@ uses
 
 { TioDBBuilderSchemaFK }
 
-function TioDBBuilderSchemaFK.DependentFieldName: String;
+function TioDBBuilderSchemaFK.GetDependentFieldName: String;
 begin
   Result := FDependentProperty.GetSqlFieldName;
 end;
 
-function TioDBBuilderSchemaFK.DependentTableName: String;
+function TioDBBuilderSchemaFK.GetDependentTableName: String;
 begin
   Result := FDependentMap.GetTable.TableName;
 end;
 
-function TioDBBuilderSchemaFK.Name: String;
+function TioDBBuilderSchemaFK.GetName: String;
 begin
-  Result := Format('FK_%s_%s_%s', [DependentTableName, DependentFieldName, ReferenceTableName]);
+//  Result := Format('%s_%s_%s', [DependentTableName, DependentFieldName, ReferenceTableName]);
+  // Carlo Marona (2025-10-24): Added ReferencedFieldName to the name of the foreign key
+  Result := Format('%s_%s_%s_%s', [DependentTableName, DependentFieldName, ReferenceTableName, ReferenceFieldName]);
 end;
 
-function TioDBBuilderSchemaFK.OnDeleteAction: TioFKAction;
+function TioDBBuilderSchemaFK.GetOnDeleteAction: TioFKAction;
 begin
   Result := FOnDeleteAction;
 end;
 
-function TioDBBuilderSchemaFK.OnUpdateAction: TioFKAction;
+function TioDBBuilderSchemaFK.GetOnUpdateAction: TioFKAction;
 begin
   Result := FOnUpdateAction;
 end;
 
 constructor TioDBBuilderSchemaFK.Create(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
-      const AOnDeleteAction, AOnUpdateAction: TioFKAction);
+  const AOnDeleteAction, AOnUpdateAction: TioFKAction);
 begin
+  FStatus := stClean;
   FReferenceMap := AReferenceMap;
   FDependentMap := ADependentMap;
   FDependentProperty := ADependentProperty;
@@ -101,14 +116,24 @@ begin
   FOnUpdateAction := AOnUpdateAction;
 end;
 
-function TioDBBuilderSchemaFK.ReferenceFieldName: String;
+function TioDBBuilderSchemaFK.GetReferenceFieldName: String;
 begin
   Result := FReferenceMap.GetProperties.GetIdProperty.GetSqlFieldName;
 end;
 
-function TioDBBuilderSchemaFK.ReferenceTableName: String;
+function TioDBBuilderSchemaFK.GetReferenceTableName: String;
 begin
   Result := FReferenceMap.GetTable.TableName;
+end;
+
+function TioDBBuilderSchemaFK.GetStatus: TioDBBuilderStatus;
+begin
+  Result := FStatus;
+end;
+
+procedure TioDBBuilderSchemaFK.SetStatus(const Value: TioDBBuilderStatus);
+begin
+  FStatus := Value;
 end;
 
 end.

@@ -13,12 +13,15 @@ type
   private
     FID: Integer;
     [ioWhere(coLike)]
+    [ioIndex(TioIndexOrientation.ioAscending)]
     FName: String;
     [ioWhere(coLike), etmProperty]
     FCity: String;
     FAddress: String;
     FPhoneNumber: String;
     FObjVersion: TioObjVersion; // The ObjVersion is mandatory if you want to use the ETM
+    FTest: string;
+    FTest2: integer;
     function GetFullAddress: String;
   public
     constructor CreateWithData(const AName, ACity, AAddress, APhoneNumber: String);
@@ -27,6 +30,8 @@ type
     property City: String read FCity write FCity;
     property Address: String read FAddress write FAddress;
     property PhoneNumber: String read FPhoneNumber write FPhoneNumber;
+    property Test: string read FTest write FTest;
+    property Test2: integer read FTest2 write FTest2;
     [ioWhereSkip]
     property FullAddress: String read GetFullAddress;  // ReadOnly - Not mapped
   end;

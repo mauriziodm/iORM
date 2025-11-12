@@ -301,7 +301,10 @@ end;
 
 function TioTable.GetConnectionDefName: String;
 begin
-  Result := TioDBFActory.ConnectionManager.GetCurrentConnectionNameIfEmpty(FConnectionDefName_DoNotCallDirectly);
+  // Carlo Marona (2025-10-15): Why returns the default connection name if the table is not specifically associated with a connection def???????
+  // It should return FConnectionDefName_DoNotCallDirectly that is the name of the connection the table was specifically associated if it is.
+  //Result := TioDBFActory.ConnectionManager.GetCurrentConnectionNameIfEmpty(FConnectionDefName_DoNotCallDirectly);
+  Result := FConnectionDefName_DoNotCallDirectly;
 end;
 
 function TioTable.GetEtmTimeSlotClass: TioEtmTimeSlotRef;

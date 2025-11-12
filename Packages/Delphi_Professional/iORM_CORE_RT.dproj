@@ -343,8 +343,6 @@
         <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlGenerator.SqLite.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlGenerator.Base.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlGenerator.Firebird.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.Strategy.WithoutAlterTable.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.Strategy.WithAlterTable.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.DBAnalyzer.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Engine.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Field.ClassInfo.pas"/>
@@ -419,6 +417,17 @@
         <DCCReference Include="..\..\Source\iORM.SynchroStrategy.Custom.pas"/>
         <DCCReference Include="..\..\Source\iORM.SynchroStrategy.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.SynchroStrategy.EtmBased.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlScript.Base.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DBBuilder.QueryEngine.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DB.Consts.pas"/>
+        <DCCReference Include="..\..\Source\iORM.TextBuilder.pas"/>
+        <DCCReference Include="..\..\Source\iORM.TextBuilder.Interfaces.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DBBuilder.Strategy.SqLite.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DBBuilder.Strategy.Firebird.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DBBuilder.DBAnalyzer.Firebird.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DBBuilder.DBAnalyzer.SqLite.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlGenerator.Firebird.Interfaces.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Index.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

@@ -188,6 +188,27 @@ type
   TioNullableBoolean = TioNullable<Boolean>;
   TioNullableDateTime = TioNullable<TDateTime>;
 
+  TioIndentation = record
+  private
+    FCurrentLevel: integer;
+    FWidth: integer;
+    FIndentChar: char;
+    function GetCurrentLevel: integer;
+    procedure SetCurrentLevel(const ALevel: integer);
+    function GetWidth: integer;
+    function GetIndentChars: string;
+  public
+    constructor Create(const AWidth: integer; const AStartLevel: integer = 0; const AIndentChar: char = ' ');
+
+    procedure Clear;
+    function IncIndent(const AIncrement: integer = 1): integer;
+    function DecIndent(const ADecrement: integer = 1): integer;
+
+    property CurrentLevel: integer read GetCurrentLevel write SetCurrentLevel;
+    property IndentChars: string read GetIndentChars;
+    property Width: integer read GetWidth;
+  end;
+
 implementation
 
 uses
@@ -221,6 +242,53 @@ procedure TioNullable<T>.SetValue(const Value: T);
 begin
   FValue := Value;
   FIsNull := ISNULL_VALUE;
+end;
+
+{ TIndentation }
+
+procedure TioIndentation.Clear;
+begin
+  FCurrentLevel := 0;
+end;
+
+constructor TioIndentation.Create(const AWidth: integer; const AStartLevel: integer; const AIndentChar: char);
+begin
+  FIndentChar := AIndentChar;
+  FCurrentLevel := AStartLevel;
+  FWidth := AWidth;
+end;
+
+function TioIndentation.DecIndent(const ADecrement: integer = 1): integer;
+begin
+  if FCurrentLevel - ADecrement >= 0 then
+    Dec(FCurrentLevel, ADecrement)
+  else
+    FCurrentLevel := 0;
+end;
+
+function TioIndentation.GetCurrentLevel: integer;
+begin
+  Result := FCurrentLevel;
+end;
+
+function TioIndentation.GetIndentChars: string;
+begin
+  Result := StringOfChar(FIndentChar, CurrentLevel * Width);
+end;
+
+function TioIndentation.GetWidth: integer;
+begin
+  Result := FCurrentLevel * FWidth;
+end;
+
+function TioIndentation.IncIndent(const AIncrement: integer = 1): integer;
+begin
+  Inc(FCurrentLevel, AIncrement);
+end;
+
+procedure TioIndentation.SetCurrentLevel(const ALevel: integer);
+begin
+  FCurrentLevel := ALevel;
 end;
 
 end.

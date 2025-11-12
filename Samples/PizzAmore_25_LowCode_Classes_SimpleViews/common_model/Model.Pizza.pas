@@ -18,6 +18,7 @@ type
   TPizza = class
   private
     FID: Integer;
+    [ioIndex(TioIndexOrientation.ioAscending)]
     FName: String;
     FObjVersion: TioObjVersion; // The ObjVersion is mandatory if you want to use the ETM
     FPrice: Currency;

@@ -44,24 +44,24 @@ type
   private
     FStatus: TioDBBuilderStatus;
     FAltered: TioDBBuilderFieldAlter;
+    function GetFieldCustomType: string;
+    function GetFieldDefault: TValue;
+    function GetFieldDefaultExists: Boolean;
+    function GetFieldLength: integer;
+    function GetFieldPrecision: integer;
+    function GetFieldScale: integer;
+    function GetFieldSubType: string;
+    function GetFieldType: TioMetadataFieldType;
+    function GetFieldUnicode: boolean;
+    function GetFieldNotNull: Boolean;
+    function GetFieldName{(const AClearDelimiters: Boolean = False)}: String;
+    function GetPrimaryKey: Boolean;
     // Status
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const Value: TioDBBuilderStatus);
   public
     procedure AddAltered(const AAltered: TioDBBuilderFieldAlterStatus);
     function Altered: TioDBBuilderFieldAlter;
-    function FieldCustomType: string;
-    function FieldDefault: TValue;
-    function FieldDefaultExists: Boolean;
-    function FieldLength: integer;
-    function FieldName(const AClearDelimiters: Boolean = False): String;
-    function FieldPrecision: integer;
-    function FieldScale: integer;
-    function FieldSubType: string;
-    function FieldType: TioMetadataFieldType;
-    function FieldUnicode: boolean;
-    function FieldNotNull: Boolean;
-    function PrimaryKey: Boolean;
 
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
@@ -83,57 +83,57 @@ begin
   Result := FAltered;
 end;
 
-function TioDBBuilderSchemaFieldClassInfo.FieldCustomType: string;
+function TioDBBuilderSchemaFieldClassInfo.GetFieldCustomType: string;
 begin
   Result := '';
 end;
 
-function TioDBBuilderSchemaFieldClassInfo.FieldDefault: TValue;
+function TioDBBuilderSchemaFieldClassInfo.GetFieldDefault: TValue;
 begin
   Result := nil;
 end;
 
-function TioDBBuilderSchemaFieldClassInfo.FieldDefaultExists: Boolean;
+function TioDBBuilderSchemaFieldClassInfo.GetFieldDefaultExists: Boolean;
 begin
-  Result := not FieldDefault.IsEmpty;
+  Result := not GetFieldDefault.IsEmpty;
 end;
 
-function TioDBBuilderSchemaFieldClassInfo.FieldLength: integer;
+function TioDBBuilderSchemaFieldClassInfo.GetFieldLength: integer;
 begin
   Result := IO_TRUECLASS_FIELDLENGTH;
 end;
 
-function TioDBBuilderSchemaFieldClassInfo.FieldName(const AClearDelimiters: Boolean = False): String;
+function TioDBBuilderSchemaFieldClassInfo.GetFieldName{(const AClearDelimiters: Boolean = False)}: String;
 begin
   Result := IO_TRUECLASS_FIELDNAME;
 end;
 
-function TioDBBuilderSchemaFieldClassInfo.FieldNotNull: Boolean;
+function TioDBBuilderSchemaFieldClassInfo.GetFieldNotNull: Boolean;
 begin
   Result := True;
 end;
 
-function TioDBBuilderSchemaFieldClassInfo.FieldPrecision: integer;
+function TioDBBuilderSchemaFieldClassInfo.GetFieldPrecision: integer;
 begin
   Result := 0;
 end;
 
-function TioDBBuilderSchemaFieldClassInfo.FieldScale: integer;
+function TioDBBuilderSchemaFieldClassInfo.GetFieldScale: integer;
 begin
   Result := 0;
 end;
 
-function TioDBBuilderSchemaFieldClassInfo.FieldSubType: string;
+function TioDBBuilderSchemaFieldClassInfo.GetFieldSubType: string;
 begin
   Result := '';
 end;
 
-function TioDBBuilderSchemaFieldClassInfo.FieldType: TioMetadataFieldType;
+function TioDBBuilderSchemaFieldClassInfo.GetFieldType: TioMetadataFieldType;
 begin
   Result := ioMdVarchar;
 end;
 
-function TioDBBuilderSchemaFieldClassInfo.FieldUnicode: boolean;
+function TioDBBuilderSchemaFieldClassInfo.GetFieldUnicode: boolean;
 begin
   Result := True;
 end;
@@ -143,7 +143,7 @@ begin
   Result := FStatus;
 end;
 
-function TioDBBuilderSchemaFieldClassInfo.PrimaryKey: Boolean;
+function TioDBBuilderSchemaFieldClassInfo.GetPrimaryKey: Boolean;
 begin
   Result := False;
 end;

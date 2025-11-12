@@ -36,8 +36,14 @@ unit iORM.DB.ConnectionDef;
 interface
 
 uses
-  System.Classes, iORM.DB.Interfaces, iORM.CommonTypes, iORM.DBBuilder.Interfaces,
-  iORM.SynchroStrategy.Interfaces;
+  System.Classes,
+
+  iORM.DB.Interfaces,
+  iORM.CommonTypes,
+  iORM.DBBuilder.Interfaces,
+  iORM.SynchroStrategy.Interfaces
+
+  ;
 
 type
 
@@ -48,9 +54,9 @@ type
 
   TioCustomConnectionDef = class;
 
-  TioDBBuilderBeforeCreateOrAlterDBEvent = procedure(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
+  TioDBBuilderBeforeCreateOrAlterDBEvent = procedure(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus;
     const AScript, AWarnings: TStrings; var AAbort: Boolean) of object;
-  TioDBBuilderAfterCreateOrAlterDBEvent = procedure(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
+  TioDBBuilderAfterCreateOrAlterDBEvent = procedure(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus;
     const AScript, AWarnings: TStrings) of object;
 
   TioDBBuilderProperty = class(TPersistent)
@@ -257,7 +263,12 @@ implementation
 
 uses
   System.IOUtils, iORM.DB.ConnectionContainer, System.SysUtils,
-  iORM, iORM.DBBuilder.Factory;
+
+  iORM,
+  iORM.DBBuilder.Factory,
+  iORM.DBBuilder.SqlScript.Base
+
+  ;
 
 { TioCustomConnectionDef }
 
@@ -314,16 +325,28 @@ procedure TioCustomConnectionDef.CreateOrAlterDB(const AForce: Boolean = False);
 var
   LAbort: Boolean;
   LDBBuilderEngine: IioDBBuilderEngine;
+  LScript: IioDBBuilderSqlScript;
+  LStatus: TioDBBuilderStatus;
 begin
   LAbort := False;
+
   LDBBuilderEngine := TioDBBuilderFactory.NewEngine(Name, FAutoCreateDB.Indexes, FAutoCreateDB.ForeignKeys);
+  LStatus := LDBBuilderEngine.Analyze;
+
+  LScript := TioDBBuilderFactory.NewSqlScript;
+  LDBBuilderEngine.BuildCreateOrUpdateDBSqlScript(LScript);
+
+  // Carlo Marona
   if Assigned(FOnBeforeCreateOrAlterDBEvent) then
-    FOnBeforeCreateOrAlterDBEvent(Self, LDBBuilderEngine.Status, LDBBuilderEngine.Script, LDBBuilderEngine.Warnings, LAbort);
+    FOnBeforeCreateOrAlterDBEvent(Self, LStatus, LScript.Sql, LDBBuilderEngine.Warnings, LAbort);
+
   if not LAbort then
   begin
-    LDBBuilderEngine.CreateOrAlterDB(AForce);
+    LDBBuilderEngine.CreateOrUpdateDB(AForce, LScript);
+
+    // Carlo Marona
     if Assigned(FOnAfterCreateOrAlterDBEvent) then
-      FOnAfterCreateOrAlterDBEvent(Self, LDBBuilderEngine.Status, LDBBuilderEngine.Script, LDBBuilderEngine.Warnings);
+      FOnAfterCreateOrAlterDBEvent(Self, LStatus, LScript.Sql, LDBBuilderEngine.Warnings);
   end;
 end;
 

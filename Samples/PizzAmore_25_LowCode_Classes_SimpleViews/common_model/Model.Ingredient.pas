@@ -10,6 +10,7 @@ type
   TIngredient = class
   private
     FID: Integer;
+    [ioIndex]
     FName: String;
     FObjVersion: TioObjVersion; // The ObjVersion is mandatory if you want to use the ETM
     FUnitOfMeasure: String;

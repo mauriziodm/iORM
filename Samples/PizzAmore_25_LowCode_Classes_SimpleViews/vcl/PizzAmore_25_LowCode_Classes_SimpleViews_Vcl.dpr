@@ -24,7 +24,8 @@ uses
   Form.Ingredient.List in 'Form.Ingredient.List.pas' {IngredientListForm},
   Form.Ingredient in 'Form.Ingredient.pas' {IngredientForm},
   Form.Etm in 'Form.Etm.pas' {FormEtm},
-  Form.SynchroLog.List in 'Form.SynchroLog.List.pas' {SynchroLogListForm};
+  Form.SynchroLog.List in 'Form.SynchroLog.List.pas' {SynchroLogListForm},
+  DummyObject in '..\common_model\DummyObject.pas';
 
 {$R *.res}
 {$STRONGLINKTYPES ON}

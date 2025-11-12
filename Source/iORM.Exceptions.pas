@@ -54,6 +54,11 @@ type
   end;
   // -----------------------------------------------------------------------------------------------
 
+  // Generic iORM exceptions -----------------------------------------------------------------------
+  EioArgumentNilException = class(EioCustomException)
+  end;
+  // -----------------------------------------------------------------------------------------------
+
   // Persistence concurrency conflict exceptions ---------------------------------------------------
   EioConcurrencyConflictException = class(EioCustomException)
   public

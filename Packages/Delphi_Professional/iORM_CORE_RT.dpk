@@ -16,6 +16,8 @@
   *                                                                                                        *
   **********************************************************************************************************
 }
+// JCL_DEBUG_EXPERT_GENERATEJDBG OFF
+// JCL_DEBUG_EXPERT_INSERTJDBG OFF
 package iORM_CORE_RT;
 {$R *.res}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
@@ -168,8 +170,6 @@ contains
   iORM.DBBuilder.SqlGenerator.SqLite in '..\..\Source\iORM.DBBuilder.SqlGenerator.SqLite.pas',
   iORM.DBBuilder.SqlGenerator.Base in '..\..\Source\iORM.DBBuilder.SqlGenerator.Base.pas',
   iORM.DBBuilder.SqlGenerator.Firebird in '..\..\Source\iORM.DBBuilder.SqlGenerator.Firebird.pas',
-  iORM.DBBuilder.Strategy.WithoutAlterTable in '..\..\Source\iORM.DBBuilder.Strategy.WithoutAlterTable.pas',
-  iORM.DBBuilder.Strategy.WithAlterTable in '..\..\Source\iORM.DBBuilder.Strategy.WithAlterTable.pas',
   iORM.DBBuilder.DBAnalyzer in '..\..\Source\iORM.DBBuilder.DBAnalyzer.pas',
   iORM.DBBuilder.Engine in '..\..\Source\iORM.DBBuilder.Engine.pas',
   iORM.DBBuilder.Schema.Field.ClassInfo in '..\..\Source\iORM.DBBuilder.Schema.Field.ClassInfo.pas',
@@ -243,6 +243,17 @@ contains
   iORM.Resolver.ResolvedTypeList in '..\..\Source\iORM.Resolver.ResolvedTypeList.pas',
   iORM.SynchroStrategy.Custom in '..\..\Source\iORM.SynchroStrategy.Custom.pas',
   iORM.SynchroStrategy.Interfaces in '..\..\Source\iORM.SynchroStrategy.Interfaces.pas',
-  iORM.SynchroStrategy.EtmBased in '..\..\Source\iORM.SynchroStrategy.EtmBased.pas';
+  iORM.SynchroStrategy.EtmBased in '..\..\Source\iORM.SynchroStrategy.EtmBased.pas',
+  iORM.DBBuilder.SqlScript.Base in '..\..\Source\iORM.DBBuilder.SqlScript.Base.pas',
+  iORM.DBBuilder.QueryEngine in '..\..\Source\iORM.DBBuilder.QueryEngine.pas',
+  iORM.DB.Consts in '..\..\Source\iORM.DB.Consts.pas',
+  iORM.TextBuilder in '..\..\Source\iORM.TextBuilder.pas',
+  iORM.TextBuilder.Interfaces in '..\..\Source\iORM.TextBuilder.Interfaces.pas',
+  iORM.DBBuilder.Strategy.SqLite in '..\..\Source\iORM.DBBuilder.Strategy.SqLite.pas',
+  iORM.DBBuilder.Strategy.Firebird in '..\..\Source\iORM.DBBuilder.Strategy.Firebird.pas',
+  iORM.DBBuilder.DBAnalyzer.Firebird in '..\..\Source\iORM.DBBuilder.DBAnalyzer.Firebird.pas',
+  iORM.DBBuilder.DBAnalyzer.SqLite in '..\..\Source\iORM.DBBuilder.DBAnalyzer.SqLite.pas',
+  iORM.DBBuilder.SqlGenerator.Firebird.Interfaces in '..\..\Source\iORM.DBBuilder.SqlGenerator.Firebird.Interfaces.pas',
+  iORM.DBBuilder.Schema.Index in '..\..\Source\iORM.DBBuilder.Schema.Index.pas';
 
 end.

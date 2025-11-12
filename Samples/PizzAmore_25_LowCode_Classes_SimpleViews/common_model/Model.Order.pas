@@ -11,9 +11,11 @@ type
   TOrderState = (osUnknown, osWaiting, osPreparing, osReady, osDelivered);
 
   [ioEntity('ORDERS'), etmTrace(TEtmRepository)]
+  [ioIndex('OrderState', 'OrderState', TioIndexOrientation.ioAscending)]
   TOrder = class
   private
     FID: Integer;
+    [ioIndex(TioIndexOrientation.ioAscending)]
     FOrderDate: TDate;
     [etmProperty('Customer.ID', 'CustomerID')]
     FCustomer: TCustomer;
