@@ -251,8 +251,8 @@ begin
 
     for LField in LFieldList do
     begin
-      Result := Format('%s%s %s %s', [Result, LComma, LField, LIndexOrientation]).Trim;
-      LComma := ', ';
+      Result := Format('%s%s %s %s', [Result, LComma, LField.Trim, LIndexOrientation]).Trim;
+      LComma := ',';
     end;
   finally
     LFieldList.Free;
@@ -288,7 +288,7 @@ begin
         LFieldList := AIndex.CommaSepFieldList.Split([',']);
 
         for LField in LFieldList do
-          LIndexName := LIndexName + '_' + ShortenIdentifierName(LField, 4);
+          LIndexName := LIndexName + '_' + ShortenIdentifierName(LField.Trim, 4);
       end;
 
       // Index orientation

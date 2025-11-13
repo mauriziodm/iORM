@@ -190,8 +190,14 @@ begin
   LIndexOrientation := BuildIndexOrientation(ATable, AIndex, LIndexName);
   LUnique := BuildIndexUnique(AIndex);
   LFieldList := BuildIndexFieldList(ATable, AIndex, LIndexName, False);
+
   // Compose the create index query text
-  LSqlText := Format('CREATE %s %s INDEX %s ON %s (%s);', [LUnique, LIndexOrientation, LIndexName, ATable.Name, LFieldList]);
+  if not LUnique.IsEmpty then
+    LSqlText := Format('CREATE %s %s INDEX %s ON %s (%s);', [LUnique, LIndexOrientation, LIndexName, ATable.Name, LFieldList])
+  else
+    LSqlText := Format('CREATE %s INDEX %s ON %s (%s);', [LIndexOrientation, LIndexName, ATable.Name, LFieldList]);
+
+
   Result := LSqlText;
 end;
 
