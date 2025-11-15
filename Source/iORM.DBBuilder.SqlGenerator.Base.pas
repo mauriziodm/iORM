@@ -127,6 +127,7 @@ uses
   System.SysUtils,
   System.StrUtils,
   System.Character,
+  System.Hash,
 
   iORM.DB.Factory,
   iORM.DB.ConnectionContainer,
@@ -210,12 +211,18 @@ begin
     if not LShorten then
       LFKName := 'FK_' + AForeignKey.Name
     else
-      LFKName := 'FK_' + Format('%s_%s_%s_%s', [
-        ShortenIdentifierName(AForeignKey.DependentTableName, 4),
-        ShortenIdentifierName(AForeignKey.DependentFieldName, 4),
-        ShortenIdentifierName(AForeignKey.ReferenceTableName, 4),
-        ShortenIdentifierName(AForeignKey.ReferenceFieldName, 4)
-      ]);
+//      LFKName := 'FK_' + Format('%s_%s_%s_%s', [
+//        ShortenIdentifierName(AForeignKey.DependentTableName, 4),
+//        ShortenIdentifierName(AForeignKey.DependentFieldName, 4),
+//        ShortenIdentifierName(AForeignKey.ReferenceTableName, 4),
+//        ShortenIdentifierName(AForeignKey.ReferenceFieldName, 4)
+//      ]);
+      // Max length is reduced by the length of 'FK_' prefix
+      LFKName := 'FK_' +
+        ShortenIdentifierName(Format('%s_%s_%s_%s', [AForeignKey.DependentTableName, AForeignKey.DependentFieldName,
+          AForeignKey.ReferenceTableName, AForeignKey.ReferenceFieldName]),
+          MaxSqlIdentifierLength - 3
+      );
 
     // Translate
     LFKName := TioSqlTranslator.Translate(LFKName, ATable.GetContextTable.GetClassName, False);
@@ -264,6 +271,7 @@ function TioDBBuilderSqlGenBase.BuildIndexNameSql(const ATable: IioDBBuilderSche
 var
   LFieldList: TArray<string>;
   LShorten: boolean;
+  LTmpIndexName,
   LField,
   LIndexName: string;
 begin
@@ -281,14 +289,26 @@ begin
         LIndexName := 'IDX_' + ATable.Name + '_' + AIndex.Name
       else  // Carlo Marona (2025-10-24): If the length exeed max length the name will be recalculated using a shortening algorithm.
       begin
-        LIndexName := 'IDX_' + ShortenIdentifierName(ATable.Name, 4);
-
-        // Carlo Marona (2025-10-24): Calculation of Index name was moved into TioDBBuilderSchemaIndex class like TioDBBuilderSchemaFK.
-        // Field list
+        LTmpIndexName := EmptyStr;
         LFieldList := AIndex.CommaSepFieldList.Split([',']);
+        LTmpIndexName := ATable.Name + '_';
 
         for LField in LFieldList do
-          LIndexName := LIndexName + '_' + ShortenIdentifierName(LField.Trim, 4);
+          LTmpIndexName := LTmpIndexName + '_' + LField.Trim;
+
+        // Max length is reduced by the length of unique and orientation suffixes (if presents) and the legth of 'IDX_' prefix
+        LIndexName := 'IDX_' + ShortenIdentifierName(LTmpIndexName,
+          MaxSqlIdentifierLength - GetIndexOrientationSuffix(AIndex.IndexOrientation).Length -
+          GetIndexUniqueSuffix(AIndex.Unique).Length - 4);
+
+//        LIndexName := 'IDX_' + ShortenIdentifierName(ATable.Name, 4);
+//
+//        // Carlo Marona (2025-10-24): Calculation of Index name was moved into TioDBBuilderSchemaIndex class like TioDBBuilderSchemaFK.
+//        // Field list
+//        LFieldList := AIndex.CommaSepFieldList.Split([',']);
+//
+//        for LField in LFieldList do
+//          LIndexName := LIndexName + '_' + ShortenIdentifierName(LField.Trim, 4);
       end;
 
       // Index orientation
@@ -436,17 +456,17 @@ begin
 end;
 
 function TioDBBuilderSqlGenBase.ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
-var
-  LVowels,
-  LConsonants: TCharArray;
-  LChar: Char;
-  I: integer;
+//var
+//  LVowels,
+//  LConsonants: TCharArray;
+//  LChar: Char;
+//  I: integer;
 
-  procedure AppendChar(const AChar: Char; var ACharArray: TCharArray);
-  begin
-    SetLength(ACharArray, Length(ACharArray) + 1);
-    ACharArray[High(ACharArray)] := AChar;
-  end;
+//  procedure AppendChar(const AChar: Char; var ACharArray: TCharArray);
+//  begin
+//    SetLength(ACharArray, Length(ACharArray) + 1);
+//    ACharArray[High(ACharArray)] := AChar;
+//  end;
 
 begin
   Result := EmptyStr;
@@ -454,35 +474,41 @@ begin
   if Length(AIdentifierName) <= AMaxLength then
     Exit(AIdentifierName);
 
-  // Separate Vowels from Constants
-  for LChar in AIdentifierName do
-  begin
-    if CharInSet(LChar.ToUpper, ['A', 'E', 'I', 'O', 'U']) then
-      AppendChar(LChar, LVowels)
-    else
-      AppendChar(LChar, LConsonants);
-  end;
+//  // Separate Vowels from Constants
+//  for LChar in AIdentifierName do
+//  begin
+//    if CharInSet(LChar.ToUpper, ['A', 'E', 'I', 'O', 'U']) then
+//      AppendChar(LChar, LVowels)
+//    else
+//      AppendChar(LChar, LConsonants);
+//  end;
+//
+//  // Add consonants
+//  if Length(LConsonants) >= AMaxLength then
+//    Result := LConsonants[0] + LConsonants[1] + LConsonants[2] + LConsonants[3]
+//  else
+//  begin
+//    for I := Low(LConsonants) to High(LConsonants) do
+//      Result := Result + LConsonants[I];
+//
+//    // Add vowels
+//    if (Length(Result) < AMaxLength) and (Length(LVowels) > 0) then
+//    begin
+//      I := 0;
+//
+//      while (I < Length(LVowels)) and (Length(Result) < AMaxLength) do
+//      begin
+//        Result := Result + LVowels[I];
+//        Inc(I);
+//      end;
+//    end;
+//  end;
 
-  // Add consonants
-  if Length(LConsonants) >= AMaxLength then
-    Result := LConsonants[0] + LConsonants[1] + LConsonants[2] + LConsonants[3]
-  else
-  begin
-    for I := Low(LConsonants) to High(LConsonants) do
-      Result := Result + LConsonants[I];
-
-    // Add vowels
-    if (Length(Result) < AMaxLength) and (Length(LVowels) > 0) then
-    begin
-      I := 0;
-
-      while (I < Length(LVowels)) and (Length(Result) < AMaxLength) do
-      begin
-        Result := Result + LVowels[I];
-        Inc(I);
-      end;
-    end;
-  end;
+  // Changed shortening algorithm because there are some cases where different input names comes to the same shortened
+  // name (collitions).
+  // Now I used SHA2 hash algorithm to produce a unique identifier calculated on the original identifier in all its
+  // length and keeping only the first AMaxLength chars. This should avoid identifier names collitions.
+  Result := THashSHA2.GetHashString(AIdentifierName).Substring(1, AMaxLength);
 end;
 
 function TioDBBuilderSqlGenBase.SqlIdentifierBehindMinLength(const AIdentifierName: string): boolean;

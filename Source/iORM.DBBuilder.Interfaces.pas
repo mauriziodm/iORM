@@ -291,6 +291,9 @@ type
     procedure CreateTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
     procedure CreateTableForeignKeys(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
     function DatabaseExists: Boolean;
+    procedure DropForeignKeys(const AScript: IioDBBuilderSqlScript);
+    procedure DropIndexes(const AScript: IioDBBuilderSqlScript);
+    procedure DropTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
     function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
@@ -338,6 +341,10 @@ type
     /// <param name="AScript">The script where sql instructions will be returned.</param>
     /// </summary>
     procedure BuildCreateDBSqlScript(const AScript: IioDBBuilderSqlScript);
+
+    procedure BuildDropIndexesSqlScript(const AScript: IioDBBuilderSqlScript);
+
+    procedure BuildDropForeignKeysSqlScript(const AScript: IioDBBuilderSqlScript);
     /// <summary>
     ///  Build update database SQL script regardless of schema status.
     /// <param name="AScript">The script where sql instructions will be returned.</param>
