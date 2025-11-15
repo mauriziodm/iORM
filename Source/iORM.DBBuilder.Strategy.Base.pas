@@ -113,18 +113,21 @@ begin
 
   for LTable in Schema.Tables.Values do
   begin
-    for LFK in LTable.ForeignKeys.Values do
+    if taForeignKeys in LTable.Changes then
     begin
-      case LFK.Status of
-        stCreate:
-          begin
-            AScript.Add(SqlGenerator.BuildAddForeignKeySql(LTable, LFK));
-          end;
-        stUpdate:
-          begin
-            AScript.Add(SqlGenerator.BuildDropForeignKeySql(LTable, LFK));
-            AScript.Add(SqlGenerator.BuildAddForeignKeySql(LTable, LFK));
-          end;
+      for LFK in LTable.ForeignKeys.Values do
+      begin
+        case LFK.Status of
+          stCreate:
+            begin
+              AScript.Add(SqlGenerator.BuildAddForeignKeySql(LTable, LFK));
+            end;
+          stUpdate:
+            begin
+              AScript.Add(SqlGenerator.BuildDropForeignKeySql(LTable, LFK));
+              AScript.Add(SqlGenerator.BuildAddForeignKeySql(LTable, LFK));
+            end;
+        end;
       end;
     end;
   end;

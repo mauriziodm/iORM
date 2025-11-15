@@ -263,7 +263,14 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
 begin
-  Result := Format('select RDB$FIELD_NAME from RDB$RELATION_FIELDS where RDB$RELATION_NAME = ''%s'' and RDB$FIELD_NAME = ''%s'' and RDB$SYSTEM_FLAG = 0',
+  Result := Format(
+    'select' +sLineBReak +
+    '  RDB$FIELD_NAME' + SLineBreak +
+    'from RDB$RELATION_FIELDS' + sLineBreak +
+    'where' + sLineBreak +
+    '  UPPER(RDB$RELATION_NAME) = UPPER(''%s'') and' + sLineBreak +
+    '  UPPER(RDB$FIELD_NAME) = UPPER(''%s'') and' + sLineBreak +
+    '  RDB$SYSTEM_FLAG = 0',
     [ATable.Name.ToUpper, AField.FieldName.ToUpper]);
 end;
 
@@ -286,8 +293,8 @@ begin
     'where' + sLineBreak +
     '  (RDB$RELATIONS.rdb$system_flag = 0) and' + sLineBreak +
     '  (RDB$RELATION_CONSTRAINTS.rdb$constraint_type = ''FOREIGN KEY'') and' + sLineBreak +
-    '  (RDB$RELATIONS.Rdb$relation_name = ''%s'') and' + sLineBreak +
-    '  (RDB$RELATION_CONSTRAINTS.rdb$constraint_name = ''%s'')',
+    '  (UPPER(RDB$RELATIONS.Rdb$relation_name) = UPPER(''%s'')) and' + sLineBreak +
+    '  (UPPER(RDB$RELATION_CONSTRAINTS.rdb$constraint_name) = (''%s''))',
     [ATable.Name, LFKName]
   );
 end;
@@ -311,8 +318,8 @@ begin
     '  rdb$index_segments master_index_segments ON master_relation_constraints.rdb$index_name = master_index_segments.rdb$index_name' + sLineBreak +
     'WHERE' + sLineBreak +
     '  detail_relation_constraints.rdb$constraint_type = ''FOREIGN KEY'' AND' + sLineBreak +
-    '  detail_relation_constraints.rdb$relation_name = ''%s'' AND' + sLineBreak +
-    '  detail_relation_constraints.rdb$constraint_name = ''%s''',
+    '  UPPER(detail_relation_constraints.rdb$relation_name) = UPPER(''%s'') AND' + sLineBreak +
+    '  UPPER(detail_relation_constraints.rdb$constraint_name) = UPPER(''%s'')',
     [ATable.Name, LFKName]
   );
 end;
@@ -324,7 +331,7 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildIndexExistsSql(const AIndexName: string): string;
 begin
-  Result := Format('select RDB$INDEX_NAME from RDB$INDICES where RDB$INDEX_NAME = ''%s''', [AIndexName]);
+  Result := Format('select RDB$INDEX_NAME from RDB$INDICES where UPPER(RDB$INDEX_NAME) = UPPER(''%s'')', [AIndexName]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
@@ -340,8 +347,8 @@ begin
     '  rdb$index_segments right outer join rdb$indices on (rdb$index_segments.rdb$index_name = rdb$indices.rdb$index_name)' + sLineBreak +
     'where' + sLineBreak +
     '  (rdb$indices.rdb$system_flag = 0) and' + sLineBreak +
-    '  (rdb$indices.rdb$relation_name = ''%s'') and' + sLineBReak +
-    '  (rdb$indices.rdb$index_name = ''%s'')',
+    '  (UPPER(rdb$indices.rdb$relation_name) = UPPER(''%s'')) and' + sLineBReak +
+    '  (UPPER(rdb$indices.rdb$index_name) = UPPER(''%s''))',
     [ATable.Name, AIndex.Name]
   );
 end;
