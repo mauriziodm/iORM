@@ -55,6 +55,9 @@ uses
   iORM.Abstraction.SessionData.Interfaces, System.Classes, Vcl.ActnList, System.Rtti,
   System.Generics.Collections, iORM.Abstraction;
 
+const
+  UNIGUI_NO_SESSION_ID = 'NO_SESSION';
+
 type
   TioUniGUI = class(TioCustomPlatformAbstractionComponent)
   public
@@ -156,7 +159,21 @@ uses
 
 class function TioApplicationUniGUI.uniSessionID: String;
 begin
-  Result := uniGUIApplication.UniSession.SessionId;
+  // Questo metodo ritorna la SessionID della sessione uniGUI attuale che poi serve
+  //  spesso per ottenere i SessionData (userName, UserPassword ecc.) da utilizzare poi
+  //  per ETM, sincronizzazione e anche operazioni normali.
+  //  Per uniGUI la cosa è un pò più complicata perchè si tratta di una app server multiutente
+  //  e che mantiene centralmente un repository di SessionData per e varie sessioni/utenti.
+  //  Però per le eventuali operazioni che avvenivano prima che ci fosse una qualunque sessione
+  //  (utente collegato) e cioè eventuali operazioni di creazione/udpate del DB ed eventuali successive
+  //  inizializzazioni (sample data) uniGUIApplication.UniSession ritornava nil e quindi un AV error.
+  //  Ho modificato il codice qui sotto per fare in modo che se non c'è ancora alcuna sessione attiva
+  //  ritorna una stringa vuota (o un valore che indica la situazione) da usarsi come sessionID e
+  //  questo sembra aver risolto il problema.
+  if uniGUIApplication.UniSession <> nil then
+    Result := uniGUIApplication.UniSession.SessionId
+  else
+    Result := UNIGUI_NO_SESSION_ID;
 end;
 
 class procedure TioApplicationUniGUI._HandleException(const Sender: TObject);

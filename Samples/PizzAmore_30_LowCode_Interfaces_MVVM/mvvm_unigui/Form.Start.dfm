@@ -14,6 +14,7 @@ object StartForm: TStartForm
     Height = 562
     Hint = ''
     ActivePage = UniTabSheet1
+    TabBarVisible = False
     Align = alClient
     TabOrder = 0
     ExplicitWidth = 784

@@ -156,6 +156,7 @@ inherited ViewCustomers: TViewCustomers
         Title.Font.Style = [fsBold]
         Width = 64
         Alignment = taCenter
+        ReadOnly = True
       end
       item
         FieldName = 'Name'
@@ -165,6 +166,7 @@ inherited ViewCustomers: TViewCustomers
         Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Width = 300
+        ReadOnly = True
       end
       item
         FieldName = 'PhoneNumber'
@@ -174,6 +176,7 @@ inherited ViewCustomers: TViewCustomers
         Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Width = 300
+        ReadOnly = True
       end>
   end
   inherited ActionList1: TActionList

@@ -15,6 +15,9 @@
         <Projects Include="..\..\Packages\Delphi_Professional\iORM_CORE_RT.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="..\..\Packages\Delphi_Professional\iORM_uniGUI_RT.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -59,14 +62,23 @@
     <Target Name="iORM_CORE_RT:Make">
         <MSBuild Projects="..\..\Packages\Delphi_Professional\iORM_CORE_RT.dproj" Targets="Make"/>
     </Target>
+    <Target Name="iORM_uniGUI_RT">
+        <MSBuild Projects="..\..\Packages\Delphi_Professional\iORM_uniGUI_RT.dproj"/>
+    </Target>
+    <Target Name="iORM_uniGUI_RT:Clean">
+        <MSBuild Projects="..\..\Packages\Delphi_Professional\iORM_uniGUI_RT.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="iORM_uniGUI_RT:Make">
+        <MSBuild Projects="..\..\Packages\Delphi_Professional\iORM_uniGUI_RT.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="PizzAmore_30_LowCode_Interfaces_mvvm_Vcl;PizzAmore_30_LowCode_Interfaces_mvvm_Fmx;PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI;iORM_CORE_RT"/>
+        <CallTarget Targets="PizzAmore_30_LowCode_Interfaces_mvvm_Vcl;PizzAmore_30_LowCode_Interfaces_mvvm_Fmx;PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI;iORM_CORE_RT;iORM_uniGUI_RT"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="PizzAmore_30_LowCode_Interfaces_mvvm_Vcl:Clean;PizzAmore_30_LowCode_Interfaces_mvvm_Fmx:Clean;PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI:Clean;iORM_CORE_RT:Clean"/>
+        <CallTarget Targets="PizzAmore_30_LowCode_Interfaces_mvvm_Vcl:Clean;PizzAmore_30_LowCode_Interfaces_mvvm_Fmx:Clean;PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI:Clean;iORM_CORE_RT:Clean;iORM_uniGUI_RT:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="PizzAmore_30_LowCode_Interfaces_mvvm_Vcl:Make;PizzAmore_30_LowCode_Interfaces_mvvm_Fmx:Make;PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI:Make;iORM_CORE_RT:Make"/>
+        <CallTarget Targets="PizzAmore_30_LowCode_Interfaces_mvvm_Vcl:Make;PizzAmore_30_LowCode_Interfaces_mvvm_Fmx:Make;PizzAmore_30_LowCode_Interfaces_mvvm_uniGUI:Make;iORM_CORE_RT:Make;iORM_uniGUI_RT:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

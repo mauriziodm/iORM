@@ -22,7 +22,7 @@ type
     constructor Create(const APizza: IPizza; const AQty: Integer); overload;
     constructor Create(const APizza: IPizza); overload;
     property ID: Integer read GetID;
-    property PizzaID: IPizza read GetPizza;
+    property Pizza: IPizza read GetPizza;
     property Qty: Integer read GetQty write SetQty;
     property RowTotal: Currency read GetRowTotal;
   end;

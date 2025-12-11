@@ -256,7 +256,7 @@ inherited ViewOrder: TViewOrder
     TabOrder = 17
     Columns = <
       item
-        FieldName = 'Description'
+        FieldName = 'Pizza.Name'
         Title.Alignment = taCenter
         Title.Caption = 'Description'
         Title.Font.Color = clNavy
@@ -266,7 +266,7 @@ inherited ViewOrder: TViewOrder
         Alignment = taCenter
       end
       item
-        FieldName = 'Price'
+        FieldName = 'Pizza.Price'
         Title.Alignment = taCenter
         Title.Caption = 'Price'
         Title.Font.Color = clNavy
@@ -393,11 +393,11 @@ inherited ViewOrder: TViewOrder
     Left = 140
     Top = 442
     object BSRowsDescription: TStringField
-      FieldName = 'Description'
+      FieldName = 'Pizza.Name'
       Size = 250
     end
     object BSRowsPrice: TCurrencyField
-      FieldName = 'Price'
+      FieldName = 'Pizza.Price'
     end
     object BSRowsQty: TIntegerField
       FieldName = 'Qty'
