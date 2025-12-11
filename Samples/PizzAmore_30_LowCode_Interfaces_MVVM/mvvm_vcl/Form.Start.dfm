@@ -8723,7 +8723,7 @@ object StartForm: TStartForm
     DatabaseStdFolder = sfDocuments
     Persistent = False
     Pooled = False
-    AfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
+    AfterDBBuild = SQLiteConnAfterDBBuild
     Left = 20
     Top = 463
   end

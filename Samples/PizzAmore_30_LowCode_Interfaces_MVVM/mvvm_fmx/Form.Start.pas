@@ -39,11 +39,10 @@ type
     HttpConn: TioHttpConnectionDef;
     ButtonDoSynchronization: TButton;
     acDoSynchronization: TioDoSynchronization;
-    procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
-      AWarnings: TStrings);
     procedure VCProviderRequest(const Sender: TObject; out ResultViewContext: TComponent);
     procedure VCProviderRelease(const Sender: TObject; const AView, AViewContext: TComponent);
     procedure VCProviderAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
+    procedure SQLiteConnAfterDBBuild(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript, AWarnings: TStrings);
   private
   public
   end;
@@ -58,8 +57,7 @@ uses
 
 {$R *.fmx}
 
-procedure TStartForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
-  AWarnings: TStrings);
+procedure TStartForm.SQLiteConnAfterDBBuild(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript, AWarnings: TStrings);
 begin
 //  TSampleData.CheckForSampleDataCreation;
 end;

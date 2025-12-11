@@ -4760,7 +4760,7 @@ object StartForm: TStartForm
     DatabaseStdFolder = sfDocuments
     Persistent = False
     Pooled = False
-    AfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
+    AfterDBBuild = SQLiteConnAfterDBBuild
     Left = 32
     Top = 504
   end

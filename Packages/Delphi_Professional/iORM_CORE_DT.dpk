@@ -1,0 +1,49 @@
+// JCL_DEBUG_EXPERT_GENERATEJDBG OFF
+// JCL_DEBUG_EXPERT_INSERTJDBG OFF
+package iORM_CORE_DT;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS ON}
+{$RANGECHECKS ON}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$DEFINE ioDelphiProfessional}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'iORM Core Design-Time'}
+{$LIBSUFFIX AUTO}
+{$DESIGNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  iORM_CORE_RT,
+  Designide;
+
+contains
+  iORM.Core.DT.Register in '..\..\Source\iORM.Core.DT.Register.pas',
+  iORM.DT.CompAutoUses in '..\..\Source\iORM.DT.CompAutoUses.pas',
+  iORM.DT.Editors.VMAction in '..\..\Source\iORM.DT.Editors.VMAction.pas',
+  iORM.DT.ViewModel.Wizard.Creator in '..\..\Source\iORM.DT.ViewModel.Wizard.Creator.pas',
+  iORM.DT.ViewModel.Wizard in '..\..\Source\iORM.DT.ViewModel.Wizard.pas',
+  iORM.DT.Wizard.Utils in '..\..\Source\iORM.DT.Wizard.Utils.pas';
+
+end.

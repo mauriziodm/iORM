@@ -23,7 +23,7 @@ object WebModule2: TWebModule2
     DatabaseStdFolder = sfDocuments
     Persistent = False
     Pooled = False
-    AfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
+    AfterDBBuild = SQLiteConnAfterDBBuild
     Left = 72
     Top = 102
   end

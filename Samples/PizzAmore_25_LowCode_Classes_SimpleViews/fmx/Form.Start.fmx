@@ -4807,7 +4807,7 @@ object StartForm: TStartForm
     Persistent = False
     Pooled = False
     SynchroStrategy_Client = SynchroStrategy
-    AfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
+    AfterDBBuild = SQLiteConnAfterDBBuild
     Left = 32
     Top = 512
   end

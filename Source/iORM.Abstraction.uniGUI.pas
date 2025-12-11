@@ -76,7 +76,7 @@ type
 
   TioApplicationUniGUI = class(TioApplication)
   private
-    class function uniSessionID: String; inline;
+    class function uniSessionID: String;// inline;
   protected
     // --------- methods to be ovverrided by descendants ----------
     class procedure _HandleException(const Sender: TObject); override;

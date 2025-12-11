@@ -228,29 +228,46 @@ type
     function _IsNotNull: IioWhere;
     // ------ Compare operators with TValue
     function _EqualTo(AValue: TValue): IioWhere; overload;
+    function _EqualTo(AValue: TDate): IioWhere; overload;
     function _EqualTo(AValue: TDateTime): IioWhere; overload;
     function _EqualTo(AValue: Double): IioWhere; overload;
     function _EqualTo(AValue: Integer): IioWhere; overload;
+    function _EqualTo(AValue: Currency): IioWhere; overload;
+    function _In(Values: TArray<string>): IioWhere;  overload;
+    function _In(Values: TArray<Integer>): IioWhere;  overload;
+    function _In(Values: TArray<Double>): IioWhere;  overload;
+    function _In(Values: TArray<TDate>; const UseUTC: Boolean = True): IioWhere;  overload;
+    function _In(Values: TArray<TDateTime>; const UseUTC: Boolean = True): IioWhere;  overload;
     function _NotEqualTo(AValue: TValue): IioWhere; overload;
+    function _NotEqualTo(AValue: TDate): IioWhere; overload;
     function _NotEqualTo(AValue: TDateTime): IioWhere; overload;
     function _NotEqualTo(AValue: Double): IioWhere; overload;
     function _NotEqualTo(AValue: Integer): IioWhere; overload;
+    function _NotEqualTo(AValue: Currency): IioWhere; overload;
     function _GreaterThan(AValue: TValue): IioWhere; overload;
+    function _GreaterThan(AValue: TDate): IioWhere; overload;
     function _GreaterThan(AValue: TDateTime): IioWhere; overload;
     function _GreaterThan(AValue: Double): IioWhere; overload;
     function _GreaterThan(AValue: Integer): IioWhere; overload;
+    function _GreaterThan(AValue: Currency): IioWhere; overload;
     function _LowerThan(AValue: TValue): IioWhere; overload;
+    function _LowerThan(AValue: TDate): IioWhere; overload;
     function _LowerThan(AValue: TDateTime): IioWhere; overload;
     function _LowerThan(AValue: Double): IioWhere; overload;
     function _LowerThan(AValue: Integer): IioWhere; overload;
+    function _LowerThan(AValue: Currency): IioWhere; overload;
     function _GreaterOrEqualThan(AValue: TValue): IioWhere; overload;
+    function _GreaterOrEqualThan(AValue: TDate): IioWhere; overload;
     function _GreaterOrEqualThan(AValue: TDateTime): IioWhere; overload;
     function _GreaterOrEqualThan(AValue: Double): IioWhere; overload;
     function _GreaterOrEqualThan(AValue: Integer): IioWhere; overload;
+    function _GreaterOrEqualThan(AValue: Currency): IioWhere; overload;
     function _LowerOrEqualThan(AValue: TValue): IioWhere; overload;
+    function _LowerOrEqualThan(AValue: TDate): IioWhere; overload;
     function _LowerOrEqualThan(AValue: TDateTime): IioWhere; overload;
     function _LowerOrEqualThan(AValue: Double): IioWhere; overload;
     function _LowerOrEqualThan(AValue: Integer): IioWhere; overload;
+    function _LowerOrEqualThan(AValue: Currency): IioWhere; overload;
     function _LikeTo(AValue: TValue): IioWhere; overload;
     function _LikeTo(AValue: TDateTime): IioWhere; overload;
     function _LikeTo(AValue: Double): IioWhere; overload;
@@ -286,6 +303,8 @@ type
     function _PropertyEqualsTo(APropertyName: String; AValue: TDateTime): IioWhere; overload;
     function _PropertyEqualsTo(APropertyName: String; AValue: Double): IioWhere; overload;
     function _PropertyEqualsTo(APropertyName: String; AValue: Integer): IioWhere; overload;
+    function _PropertyIn(APropertyName: String; Values: TArray<TValue>): IioWhere; overload;
+    function _PropertyIn(APropertyName: String; Values: TArray<integer>): IioWhere; overload;
     function _PropertyIsNull(APropertyName: String): IioWhere;
     function _PropertyIsNotNull(APropertyName: String): IioWhere;
     function _PropertyOIDEqualsTo(AValue: Integer): IioWhere;
@@ -360,29 +379,46 @@ type
     function _IsNotNull: IioWhere<T>;
     // ------ Compare operators with TValue
     function _EqualTo(AValue: TValue): IioWhere<T>; overload;
+    function _EqualTo(AValue: TDate): IioWhere<T>; overload;
     function _EqualTo(AValue: TDateTime): IioWhere<T>; overload;
     function _EqualTo(AValue: Double): IioWhere<T>; overload;
     function _EqualTo(AValue: Integer): IioWhere<T>; overload;
+    function _EqualTo(AValue: Currency): IioWhere<T>; overload;
+    function _In(Values: TArray<string>): IioWhere<T>;  overload;
+    function _In(Values: TArray<Integer>): IioWhere<T>;  overload;
+    function _In(Values: TArray<Double>): IioWhere;  overload;
+    function _In(Values: TArray<TDate>; const UseUTC: Boolean = True): IioWhere<T>;  overload;
+    function _In(Values: TArray<TDateTime>; const UseUTC: Boolean = True): IioWhere<T>;  overload;
     function _NotEqualTo(AValue: TValue): IioWhere<T>; overload;
+    function _NotEqualTo(AValue: TDate): IioWhere<T>; overload;
     function _NotEqualTo(AValue: TDateTime): IioWhere<T>; overload;
     function _NotEqualTo(AValue: Double): IioWhere<T>; overload;
     function _NotEqualTo(AValue: Integer): IioWhere<T>; overload;
+    function _NotEqualTo(AValue: Currency): IioWhere<T>; overload;
     function _GreaterThan(AValue: TValue): IioWhere<T>; overload;
+    function _GreaterThan(AValue: TDate): IioWhere<T>; overload;
     function _GreaterThan(AValue: TDateTime): IioWhere<T>; overload;
     function _GreaterThan(AValue: Double): IioWhere<T>; overload;
     function _GreaterThan(AValue: Integer): IioWhere<T>; overload;
+    function _GreaterThan(AValue: Currency): IioWhere<T>; overload;
     function _LowerThan(AValue: TValue): IioWhere<T>; overload;
+    function _LowerThan(AValue: TDate): IioWhere<T>; overload;
     function _LowerThan(AValue: TDateTime): IioWhere<T>; overload;
     function _LowerThan(AValue: Double): IioWhere<T>; overload;
     function _LowerThan(AValue: Integer): IioWhere<T>; overload;
+    function _LowerThan(AValue: Currency): IioWhere<T>; overload;
     function _GreaterOrEqualThan(AValue: TValue): IioWhere<T>; overload;
+    function _GreaterOrEqualThan(AValue: TDate): IioWhere<T>; overload;
     function _GreaterOrEqualThan(AValue: TDateTime): IioWhere<T>; overload;
     function _GreaterOrEqualThan(AValue: Double): IioWhere<T>; overload;
     function _GreaterOrEqualThan(AValue: Integer): IioWhere<T>; overload;
+    function _GreaterOrEqualThan(AValue: Currency): IioWhere<T>; overload;
     function _LowerOrEqualThan(AValue: TValue): IioWhere<T>; overload;
+    function _LowerOrEqualThan(AValue: TDate): IioWhere<T>; overload;
     function _LowerOrEqualThan(AValue: TDateTime): IioWhere<T>; overload;
     function _LowerOrEqualThan(AValue: Double): IioWhere<T>; overload;
     function _LowerOrEqualThan(AValue: Integer): IioWhere<T>; overload;
+    function _LowerOrEqualThan(AValue: Currency): IioWhere<T>; overload;
     function _LikeTo(AValue: TValue): IioWhere<T>; overload;
     function _LikeTo(AValue: TDateTime): IioWhere<T>; overload;
     function _LikeTo(AValue: Double): IioWhere<T>; overload;
@@ -434,7 +470,7 @@ type
 implementation
 
 uses
-  iORM.DB.Factory, iORM.Context.Factory, System.SysUtils,
+  iORM.DB.Factory, iORM.Context.Factory, System.SysUtils, System.DateUtils,
   iORM.RttiContext.Factory, iORM, iORM.Where.SqlItems, iORM.DB.Interfaces, iORM.Resolver.Factory,
   iORM.Where.Factory, iORM.Exceptions, FireDAC.Comp.DataSet, iORM.LazyLoad.Factory,
   iORM.Context.Container, System.StrUtils,
@@ -563,6 +599,11 @@ begin
   Result := Self._EqualTo(TValue.From<Integer>(AValue));
 end;
 
+function TioWhere._EqualTo(AValue: TDate): IioWhere;
+begin
+  Result := Self._EqualTo(TValue.From<TDate>(AValue));
+end;
+
 function TioWhere._EqualTo(AValue: TDateTime): IioWhere;
 begin
   Result := Self._EqualTo(TValue.From<TDateTime>(AValue));
@@ -592,6 +633,11 @@ begin
   Result := Self._GreaterOrEqualThan(TValue.From<Integer>(AValue));
 end;
 
+function TioWhere._GreaterOrEqualThan(AValue: TDate): IioWhere;
+begin
+  Result := Self._GreaterOrEqualThan(TValue.From<TDate>(AValue));
+end;
+
 function TioWhere._GreaterOrEqualThan(AValue: Double): IioWhere;
 begin
   Result := Self._GreaterOrEqualThan(TValue.From<Double>(AValue));
@@ -614,6 +660,96 @@ begin
   Result := Self;
   Self._Greater;
   Self._Value(AValue);
+end;
+
+function TioWhere._In(Values: TArray<Integer>): IioWhere;
+var
+  LValue: string;
+  LItemCount: Integer;
+  LElement: Integer;
+  LStrings: TStringList;
+  I: integer;
+begin
+  Result := Self;
+  Self.FWhereItems.Add(TioDbFactory.CompareOperator._In);
+
+  LStrings := TStringList.Create;
+
+  try
+    LItemCount := Length(Values);
+
+    for I := 0 to Pred(LItemCount) do
+    begin
+      LElement := Values[I];
+
+      LStrings.Add(LElement.ToString);
+    end;
+
+    LValue := LStrings.CommaText;
+  finally
+    LStrings.Free;
+  end;
+
+  Self._Value(LValue);
+end;
+
+function TioWhere._In(Values: TArray<string>): IioWhere;
+var
+  LValue: string;
+  LItemCount: Integer;
+  LStrings: TStringList;
+  I: integer;
+begin
+  Result := Self;
+  Self.FWhereItems.Add(TioDbFactory.CompareOperator._In);
+
+  LStrings := TStringList.Create;
+
+  try
+    LItemCount := Length(Values);
+
+    for I := 0 to Pred(LItemCount) do
+    begin
+      LStrings.Add(Values[I]);
+    end;
+
+    LValue := LStrings.CommaText;
+  finally
+    LStrings.Free;
+  end;
+
+  Self._Value(LValue);
+end;
+
+function TioWhere._In(Values: TArray<Double>): IioWhere;
+var
+  LValue: string;
+  LItemCount: Integer;
+  LElement: Double;
+  LStrings: TStringList;
+  I: integer;
+begin
+  Result := Self;
+  Self.FWhereItems.Add(TioDbFactory.CompareOperator._In);
+
+  LStrings := TStringList.Create;
+
+  try
+    LItemCount := Length(Values);
+
+    for I := 0 to Pred(LItemCount) do
+    begin
+      LElement := Values[I];
+
+      LStrings.Add(LElement.ToString);
+    end;
+
+    LValue := LStrings.CommaText;
+  finally
+    LStrings.Free;
+  end;
+
+  Self._Value(LValue);
 end;
 
 function TioWhere._IsNotNull: IioWhere;
@@ -658,6 +794,11 @@ begin
   Self.FWhereItems.Add(TioDbFactory.CompareOperator._LowerOrEqual);
 end;
 
+function TioWhere._LowerOrEqualThan(AValue: Currency): IioWhere;
+begin
+  Result := Self._LowerOrEqualThan(TValue.From<Currency>(AValue));
+end;
+
 function TioWhere._LowerOrEqualThan(AValue: Double): IioWhere;
 begin
   Result := Self._LowerOrEqualThan(TValue.From<Double>(AValue));
@@ -666,6 +807,11 @@ end;
 function TioWhere._LowerOrEqualThan(AValue: Integer): IioWhere;
 begin
   Result := Self._LowerOrEqualThan(TValue.From<Integer>(AValue));
+end;
+
+function TioWhere._LowerOrEqualThan(AValue: TDate): IioWhere;
+begin
+  Result := Self._LowerOrEqualThan(TValue.From<TDate>(AValue));
 end;
 
 function TioWhere._LowerOrEqualThan(AValue: TDateTime): IioWhere;
@@ -1315,6 +1461,11 @@ begin
   Self.FWhereItems.Add(TioDbFactory.CompareOperator._NotEqual);
 end;
 
+function TioWhere._NotEqualTo(AValue: TDate): IioWhere;
+begin
+  Result := Self._NotEqualTo(TValue.From<TDate>(AValue));
+end;
+
 function TioWhere._NotEqualTo(AValue: TDateTime): IioWhere;
 begin
   Result := Self._NotEqualTo(TValue.From<TDateTime>(AValue));
@@ -1405,6 +1556,18 @@ end;
 function TioWhere._PropertyEqualsTo(APropertyName: String; AValue: Integer): IioWhere;
 begin
   Result := Self._PropertyEqualsTo(APropertyName, TValue.From<Integer>(AValue));
+end;
+
+function TioWhere._PropertyIn(APropertyName: String; Values: TArray<integer>): IioWhere;
+begin
+  Result := Self;
+  Self.FWhereItems.Add(TioDbFactory.WhereItemPropertyIn(APropertyName, Values));
+end;
+
+function TioWhere._PropertyIn(APropertyName: String; Values: TArray<TValue>): IioWhere;
+begin
+  Result := Self;
+  Self.FWhereItems.Add(TioDbFactory.WhereItemPropertyIn(APropertyName, Values));
 end;
 
 function TioWhere._PropertyIsNotNull(APropertyName: String): IioWhere;
@@ -1774,6 +1937,11 @@ begin
   Result := Self._EqualTo(TValue.From<Integer>(AValue));
 end;
 
+function TioWhere<T>._EqualTo(AValue: TDate): IioWhere<T>;
+begin
+  Result := Self._EqualTo(TValue.From<TDate>(AValue));
+end;
+
 function TioWhere<T>._EqualTo(AValue: TDateTime): IioWhere<T>;
 begin
   Result := Self._EqualTo(TValue.From<TDateTime>(AValue));
@@ -1812,6 +1980,36 @@ function TioWhere<T>._GreaterThan(AValue: TValue): IioWhere<T>;
 begin
   Result := Self;
   TioWhere(Self)._GreaterThan(AValue);
+end;
+
+function TioWhere<T>._In(Values: TArray<Integer>): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._In(Values);
+end;
+
+function TioWhere<T>._In(Values: TArray<string>): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._In(Values);
+end;
+
+function TioWhere<T>._In(Values: TArray<Double>): IioWhere;
+begin
+  Result := Self;
+  TioWhere(Self)._In(Values);
+end;
+
+function TioWhere<T>._In(Values: TArray<TDate>; const UseUTC: Boolean): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._In(Values, UseUTC);
+end;
+
+function TioWhere<T>._In(Values: TArray<TDateTime>; const UseUTC: Boolean): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._In(Values, UseUTC);
 end;
 
 function TioWhere<T>._IsNotNull: IioWhere<T>;
@@ -1865,6 +2063,11 @@ begin
   TioWhere(Self)._LowerOrEqual;
 end;
 
+function TioWhere<T>._LowerOrEqualThan(AValue: Currency): IioWhere<T>;
+begin
+
+end;
+
 function TioWhere<T>._LowerOrEqualThan(AValue: TDateTime): IioWhere<T>;
 begin
   Result := Self._LowerOrEqualThan(TValue.From<TDateTime>(AValue));
@@ -1897,6 +2100,11 @@ end;
 function TioWhere<T>._NotEqualTo(AValue: Integer): IioWhere<T>;
 begin
   Result := Self._NotEqualTo(TValue.From<Integer>(AValue));
+end;
+
+function TioWhere<T>._NotEqualTo(AValue: TDate): IioWhere<T>;
+begin
+  Result := Self._NotEqualTo(TValue.From<TDate>(AValue));
 end;
 
 function TioWhere<T>._NotLike: IioWhere<T>;
@@ -2083,6 +2291,11 @@ begin
   Result := Self._GreaterThan(TValue.From<Integer>(AValue));
 end;
 
+function TioWhere._GreaterThan(AValue: TDate): IioWhere;
+begin
+  Result := Self._GreaterThan(TValue.From<TDate>(AValue));
+end;
+
 function TioWhere._GreaterThan(AValue: Double): IioWhere;
 begin
   Result := Self._GreaterThan(TValue.From<Double>(AValue));
@@ -2106,6 +2319,11 @@ end;
 function TioWhere._LowerThan(AValue: Integer): IioWhere;
 begin
   Result := Self._LowerThan(TValue.From<Integer>(AValue));
+end;
+
+function TioWhere._LowerThan(AValue: TDate): IioWhere;
+begin
+  Result := Self._LowerThan(TValue.From<TDate>(AValue));
 end;
 
 function TioWhere._NotEqualTo(AValue: Integer): IioWhere;
@@ -2151,6 +2369,16 @@ begin
   Result := Self._GreaterOrEqualThan(TValue.From<Integer>(AValue));
 end;
 
+function TioWhere<T>._GreaterThan(AValue: TDate): IioWhere<T>;
+begin
+  Result := Self._GreaterThan(TValue.From<TDate>(AValue));
+end;
+
+function TioWhere<T>._GreaterOrEqualThan(AValue: TDate): IioWhere<T>;
+begin
+  Result := Self._GreaterOrEqualThan(TValue.From<TDate>(AValue));
+end;
+
 function TioWhere<T>._GreaterOrEqualThan(AValue: Double): IioWhere<T>;
 begin
   Result := Self._GreaterOrEqualThan(TValue.From<Double>(AValue));
@@ -2176,6 +2404,11 @@ begin
   Result := Self._LowerOrEqualThan(TValue.From<Integer>(AValue));
 end;
 
+function TioWhere<T>._LowerOrEqualThan(AValue: TDate): IioWhere<T>;
+begin
+  Result := Self._LowerOrEqualThan(TValue.From<TDate>(AValue));
+end;
+
 function TioWhere<T>._LowerThan(AValue: Double): IioWhere<T>;
 begin
   Result := Self._LowerThan(TValue.From<Double>(AValue));
@@ -2184,6 +2417,11 @@ end;
 function TioWhere<T>._LowerThan(AValue: Integer): IioWhere<T>;
 begin
   Result := Self._LowerThan(TValue.From<Integer>(AValue));
+end;
+
+function TioWhere<T>._LowerThan(AValue: TDate): IioWhere<T>;
+begin
+  Result := Self._LowerThan(TValue.From<TDate>(AValue));
 end;
 
 function TioWhere<T>._PropertyEqualsTo(APropertyName: String; AValue: Double): IioWhere<T>;
@@ -2298,6 +2536,125 @@ function TioWhere<T>._Not(const APropertyName: String; const ACompareOp: TioComp
 begin
   Result := Self;
   TioWhere(Self)._Not(APropertyName, ACompareOp);
+end;
+
+function TioWhere._In(Values: TArray<TDateTime>; const UseUTC: Boolean): IioWhere;
+var
+  LValue: string;
+  LItemCount: Integer;
+  LElement: TDateTime;
+  LStrings: TStringList;
+  I: integer;
+begin
+  Result := Self;
+  Self.FWhereItems.Add(TioDbFactory.CompareOperator._In);
+
+  LStrings := TStringList.Create;
+
+  try
+    LItemCount := Length(Values);
+
+    for I := 0 to Pred(LItemCount) do
+    begin
+      LElement := Values[I];
+
+      // Format to iso8601
+      LStrings.Add(DateToISO8601(LElement, UseUTC).QuotedString(''''));
+    end;
+
+    LValue := LStrings.CommaText;
+  finally
+    LStrings.Free;
+  end;
+
+  Self._Value(LValue);
+end;
+
+function TioWhere._In(Values: TArray<TDate>; const UseUTC: Boolean): IioWhere;
+var
+  LValue: string;
+  LItemCount: Integer;
+  LElement: TDate;
+  LStrings: TStringList;
+  I: integer;
+begin
+  Result := Self;
+  Self.FWhereItems.Add(TioDbFactory.CompareOperator._In);
+
+  LStrings := TStringList.Create;
+
+  try
+    LItemCount := Length(Values);
+
+    for I := 0 to Pred(LItemCount) do
+    begin
+      LElement := Values[I];
+
+      // Format to iso8601
+      LStrings.Add(DateToISO8601(LElement, UseUTC).QuotedString(''''));
+    end;
+
+    LValue := LStrings.CommaText;
+  finally
+    LStrings.Free;
+  end;
+
+  Self._Value(LValue);
+end;
+
+function TioWhere<T>._EqualTo(AValue: Currency): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._EqualTo(AValue);
+end;
+
+function TioWhere<T>._GreaterOrEqualThan(AValue: Currency): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._GreaterOrEqualThan(AValue);
+end;
+
+function TioWhere<T>._GreaterThan(AValue: Currency): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._GreaterThan(AValue);
+end;
+
+function TioWhere<T>._LowerThan(AValue: Currency): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._LowerThan(AValue);
+end;
+
+function TioWhere<T>._NotEqualTo(AValue: Currency): IioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._NotEqualTo(AValue);
+end;
+
+function TioWhere._EqualTo(AValue: Currency): IioWhere;
+begin
+  Result := Self._EqualTo(TValue.From<Currency>(AValue));
+end;
+
+function TioWhere._GreaterOrEqualThan(AValue: Currency): IioWhere;
+begin
+  Result := Self._GreaterOrEqualThan(TValue.From<Currency>(AValue));
+end;
+
+function TioWhere._GreaterThan(AValue: Currency): IioWhere;
+begin
+  Result := Self._GreaterThan(TValue.From<Currency>(AValue));
+end;
+
+function TioWhere._LowerThan(AValue: Currency): IioWhere;
+begin
+  Result := Self._LowerThan(TValue.From<Currency>(AValue));
+end;
+
+function TioWhere._NotEqualTo(AValue: Currency): IioWhere;
+begin
+  Result := Self._NotEqualTo(TValue.From<Currency>(AValue));
 end;
 
 end.

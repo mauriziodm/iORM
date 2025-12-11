@@ -58,6 +58,11 @@ type
   end;
   // -----------------------------------------------------------------------------------------------
 
+	// Generic iORM exceptions -----------------------------------------------------------------------
+  EioArgumentNilException = class(EioCustomException)
+  end;
+  // -----------------------------------------------------------------------------------------------
+
   // Dependency Injection exceptions --------------------------------------------------------------------
   EioDependencyInjectionException = class(EioCustomException)
   end;

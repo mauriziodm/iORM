@@ -22,12 +22,12 @@ object UniServerModule: TUniServerModule
     DatabaseStdFolder = sfDocuments
     Persistent = False
     Pooled = False
-    AfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
+    AfterDBBuild = SQLiteConnAfterDBBuild
     Left = 108
     Top = 24
   end
-  object ioUniGUI1: TioUniGUI
-    Left = 32
+  object ioUniGUI: TioUniGUI
+    Left = 24
     Top = 24
   end
 end

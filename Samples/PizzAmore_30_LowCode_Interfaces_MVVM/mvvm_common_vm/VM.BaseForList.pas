@@ -31,9 +31,6 @@ type
 
 implementation
 
-uses
-  uniGUIApplication;
-
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
 {$R *.dfm}

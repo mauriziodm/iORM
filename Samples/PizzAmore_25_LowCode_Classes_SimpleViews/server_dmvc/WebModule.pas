@@ -17,8 +17,7 @@ type
     ioEtmSynchroStrategy_Server1: TioEtmSynchroStrategy_Server;
     procedure WebModuleCreate(Sender: TObject);
     procedure WebModuleDestroy(Sender: TObject);
-    procedure FirebirdConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
-      AWarnings: TStrings);
+    procedure SQLiteConnAfterDBBuild(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript, AWarnings: TStrings);
   private
     FMVC: TMVCEngine;
   public
@@ -39,8 +38,7 @@ uses
   MVCFramework.Middleware.Compression,
   Utils.SampleData, iORM.Http.Server.DMVC.Controller;
 
-procedure TMyWebModule.FirebirdConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
-  AWarnings: TStrings);
+procedure TMyWebModule.SQLiteConnAfterDBBuild(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript, AWarnings: TStrings);
 begin
   TSampleData.CheckForSampleDataCreation;
 end;

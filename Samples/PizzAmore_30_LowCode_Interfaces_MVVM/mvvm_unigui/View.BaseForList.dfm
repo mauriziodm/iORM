@@ -92,7 +92,7 @@ object ViewBaseForList: TViewBaseForList
       Top = 0
       Width = 60
       Height = 40
-      Action = acAdd
+      Action = acAppend
       Align = alRight
       ParentFont = False
       Font.Color = clGreen
@@ -169,12 +169,12 @@ object ViewBaseForList: TViewBaseForList
       Visible = True
       VMActionName = 'acDelete'
     end
-    object acAdd: TioViewAction
+    object acAppend: TioViewAction
       Category = 'iORM-MVVM'
       Caption = 'Add'
       Enabled = True
       Visible = True
-      VMActionName = 'acAdd'
+      VMActionName = 'acAppend'
     end
     object acShowOrSelect: TioViewAction
       Category = 'iORM-MVVM'

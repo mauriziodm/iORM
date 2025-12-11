@@ -43,9 +43,8 @@ type
     procedure VCProviderRequest(const Sender: TObject; out ResultViewContext: TComponent);
     procedure VCProviderRelease(const Sender: TObject; const AView, AViewContext: TComponent);
     procedure VCProviderAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
-    procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
-      AWarnings: TStrings);
     procedure FormCreate(Sender: TObject);
+    procedure SQLiteConnAfterDBBuild(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript, AWarnings: TStrings);
   private
   public
   end;
@@ -92,15 +91,14 @@ begin
   );
 end;
 
-procedure TStartForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
-  AWarnings: TStrings);
-begin
-//  TSampleData.CheckForSampleDataCreation;
-end;
-
 procedure TStartForm.VCProviderRequest(const Sender: TObject; out ResultViewContext: TComponent);
 begin
   ResultViewContext := TabControlStart.Add;
+end;
+
+procedure TStartForm.SQLiteConnAfterDBBuild(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript, AWarnings: TStrings);
+begin
+//  TSampleData.CheckForSampleDataCreation;
 end;
 
 procedure TStartForm.VCProviderAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);

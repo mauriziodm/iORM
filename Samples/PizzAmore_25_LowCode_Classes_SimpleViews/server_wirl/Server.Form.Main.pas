@@ -41,8 +41,7 @@ type
     procedure StopServerActionUpdate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
-      AWarnings: TStrings);
+    procedure SQLiteConnAfterDBBuild(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript, AWarnings: TStrings);
   private
     FServer: TWiRLServer;
   public
@@ -70,8 +69,7 @@ begin
   StartServerAction.Execute;
 end;
 
-procedure TMainForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
-  AWarnings: TStrings);
+procedure TMainForm.SQLiteConnAfterDBBuild(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript, AWarnings: TStrings);
 begin
   TSampleData.CheckForSampleDataCreation;
 end;
@@ -93,8 +91,7 @@ begin
         .SetAppName('Content App')
         .SetWriters('*')
         .SetReaders('*')
-        .SetResources('iORM.Http.Server.WiRL.Resource.TioWiRLResource')
-  ;
+        .SetResources('iORM.Http.Server.WiRL.Resource.TioWiRLResource');
 
   if not FServer.Active then
     FServer.Active := True;

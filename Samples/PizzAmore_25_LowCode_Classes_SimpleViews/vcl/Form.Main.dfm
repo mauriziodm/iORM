@@ -5,24 +5,25 @@ object MainForm: TMainForm
   BorderStyle = bsSingle
   Caption = 'Pizz'#39'Amore'
   ClientHeight = 533
-  ClientWidth = 256
+  ClientWidth = 288
   Color = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
-  Position = poDesktopCenter
+  Position = poScreenCenter
   OnCreate = FormCreate
   DesignSize = (
-    256
+    288
     533)
   TextHeight = 15
   object ImagePizza: TImage
-    Left = -2
-    Top = 64
+    Left = 8
+    Top = 56
     Width = 268
     Height = 249
+    Anchors = [akTop]
     Picture.Data = {
       07544269746D6170E61E0400424DE61E04000000000036000000280000002C01
       00002C0100000100180000000000B01E0400232E0000232E0000000000000000
@@ -8465,10 +8466,11 @@ object MainForm: TMainForm
       FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
       FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
     Stretch = True
+    ExplicitLeft = 10
   end
   object LabelTitlePizz: TLabel
     Left = 40
-    Top = 8
+    Top = 4
     Width = 81
     Height = 50
     Caption = 'Pizz'#39
@@ -8481,19 +8483,16 @@ object MainForm: TMainForm
   end
   object Shape1: TShape
     Left = 0
-    Top = 310
-    Width = 256
-    Height = 223
+    Top = 304
+    Width = 288
+    Height = 229
     Align = alBottom
     Brush.Color = clNavy
     Pen.Style = psClear
-    ExplicitLeft = 16
-    ExplicitTop = 312
-    ExplicitWidth = 264
   end
   object LabelTitleAmore: TLabel
     Left = 122
-    Top = 8
+    Top = 4
     Width = 106
     Height = 50
     Caption = 'Amore'
@@ -8505,9 +8504,9 @@ object MainForm: TMainForm
     ParentFont = False
   end
   object ButtonOrders: TButton
-    Left = 12
-    Top = 320
-    Width = 205
+    Left = 16
+    Top = 317
+    Width = 253
     Height = 40
     Action = acShowOrders
     Anchors = [akLeft, akRight, akBottom]
@@ -8518,13 +8517,13 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 0
-    ExplicitTop = 319
-    ExplicitWidth = 201
+    ExplicitTop = 316
+    ExplicitWidth = 249
   end
   object ButtonCustomers: TButton
-    Left = 12
-    Top = 366
-    Width = 205
+    Left = 16
+    Top = 363
+    Width = 253
     Height = 40
     Action = acShowCustomers
     Anchors = [akLeft, akRight, akBottom]
@@ -8535,13 +8534,13 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 1
-    ExplicitTop = 365
-    ExplicitWidth = 201
+    ExplicitTop = 362
+    ExplicitWidth = 249
   end
   object ButtonPizzas: TButton
-    Left = 12
-    Top = 411
-    Width = 205
+    Left = 16
+    Top = 409
+    Width = 253
     Height = 40
     Action = acShowPizzas
     Anchors = [akLeft, akRight, akBottom]
@@ -8552,13 +8551,13 @@ object MainForm: TMainForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 2
-    ExplicitTop = 410
-    ExplicitWidth = 201
+    ExplicitTop = 408
+    ExplicitWidth = 249
   end
   object ButtonQuit: TButton
-    Left = 12
-    Top = 493
-    Width = 205
+    Left = 16
+    Top = 490
+    Width = 253
     Height = 30
     Action = acQuit
     Anchors = [akLeft, akRight, akBottom]
@@ -8569,13 +8568,13 @@ object MainForm: TMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 3
-    ExplicitTop = 492
-    ExplicitWidth = 201
+    ExplicitTop = 489
+    ExplicitWidth = 249
   end
   object ButtonIngredients: TButton
-    Left = 12
-    Top = 457
-    Width = 34
+    Left = 16
+    Top = 454
+    Width = 69
     Height = 31
     Action = acShowIngredients
     Anchors = [akLeft, akRight, akBottom]
@@ -8586,13 +8585,13 @@ object MainForm: TMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 4
-    ExplicitTop = 456
-    ExplicitWidth = 30
+    ExplicitTop = 453
+    ExplicitWidth = 65
   end
   object ButtonSynchroLogs: TButton
-    Left = 84
-    Top = 457
-    Width = 77
+    Left = 95
+    Top = 454
+    Width = 95
     Height = 31
     Action = acShowSynchroLogs
     Anchors = [akLeft, akRight, akBottom]
@@ -8603,13 +8602,13 @@ object MainForm: TMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 5
-    ExplicitTop = 456
-    ExplicitWidth = 73
+    ExplicitTop = 453
+    ExplicitWidth = 91
   end
   object ButtonAuthorization: TButton
-    Left = 199
-    Top = 457
-    Width = 18
+    Left = 200
+    Top = 454
+    Width = 69
     Height = 31
     Action = acShowIngredients
     Anchors = [akLeft, akRight, akBottom]
@@ -8622,8 +8621,8 @@ object MainForm: TMainForm
     ParentFont = False
     TabOrder = 6
     OnClick = ButtonAuthorizationClick
-    ExplicitTop = 456
-    ExplicitWidth = 14
+    ExplicitTop = 453
+    ExplicitWidth = 65
   end
   object ActionList1: TActionList
     Left = 220
@@ -8692,7 +8691,8 @@ object MainForm: TMainForm
     Protocol = pLocal
     SQLDialect = sqlDialect3
     UserName = 'SYSDBA'
-    AfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
+    AfterDBBuild = AfterDBBuild
+    BeforeDBBuild = FBConnBeforeDBBuild
     Left = 120
     Top = 80
   end
@@ -8701,18 +8701,18 @@ object MainForm: TMainForm
     Top = 264
   end
   object SQLiteConn: TioSQLiteConnectionDef
-    AsDefault = True
-    AutoCreateDB.Enabled = True
+    AsDefault = False
     Database = 'PIZZAMORE_25_SIMPLEVIEW_VCL.DB'
     DatabaseStdFolder = sfDocuments
     Persistent = False
     Pooled = False
-    AfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
+    AfterDBBuild = AfterDBBuild
+    BeforeDBBuild = SQLiteConnBeforeDBBuild
     Left = 24
     Top = 80
   end
   object HttpConn: TioHttpConnectionDef
-    AsDefault = False
+    AsDefault = True
     BaseURL = 'http://localhost:8080/iorm/samples/pizzamore'
     Persistent = True
     Left = 216

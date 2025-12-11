@@ -289,6 +289,7 @@ type
     class function _NotLike: IioSqlItem; virtual;
     class function _IsNull: IioSqlItem; virtual;
     class function _IsNotNull: IioSqlItem; virtual;
+    class function _In: IioSqlItem; virtual;
   end;
 
   // Interface for TransactionColection
@@ -703,6 +704,11 @@ end;
 class function TioCompareOperator._GreaterOrEqual: IioSqlItem;
 begin
   Result := TioSqlItem.Create(' >= ');
+end;
+
+class function TioCompareOperator._In: IioSqlItem;
+begin
+  Result := TioSqlItem.Create(' IN ');
 end;
 
 class function TioCompareOperator._IsNotNull: IioSqlItem;

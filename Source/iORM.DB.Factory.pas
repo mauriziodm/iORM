@@ -66,6 +66,8 @@ type
     class function WhereItemCriteria(const APropertyName: String; const ACompareOperator: TioCompareOp; const AValue: TValue): IioSqlItemWhere;
     class function WhereItemProperty(APropertyName: String): IioSqlItemWhere;
     class function WhereItemPropertyEqualsTo(APropertyName: String; AValue: TValue): IioSqlItemWhere;
+    class function WhereItemPropertyIn(APropertyName: String; Values: TArray<TValue>): IioSqlItemWhere; overload;
+    class function WhereItemPropertyIn(APropertyName: String; Values: TArray<Integer>): IioSqlItemWhere; overload;
     class function WhereItemPropertyOID: IioSqlItemWhere;
     class function WhereItemPropertyOIDEqualsTo(AValue: TValue): IioSqlItemWhere;
     class function WhereItemTValue(AValue: TValue): IioSqlItemWhere;
@@ -268,6 +270,22 @@ end;
 class function TioDbFactory.WhereItemPropertyEqualsTo(APropertyName: String; AValue: TValue): IioSqlItemWhere;
 begin
   Result := TioSqlItemsWherePropertyEqualsTo.Create(APropertyName, AValue);
+end;
+
+class function TioDbFactory.WhereItemPropertyIn(APropertyName: String; Values: TArray<Integer>): IioSqlItemWhere;
+var
+  LValue: TValue;
+begin
+  LValue := TValue.From<TArray<integer>>(Values);
+  Result := TioSqlItemsWherePropertyIn.Create(APropertyName, LValue);
+end;
+
+class function TioDbFactory.WhereItemPropertyIn(APropertyName: String; Values: TArray<TValue>): IioSqlItemWhere;
+var
+  LValue: TValue;
+begin
+  LValue := TValue.From<TArray<TValue>>(Values);
+  Result := TioSqlItemsWherePropertyIn.Create(APropertyName, LValue);
 end;
 
 class function TioDbFactory.WhereItemPropertyOID: IioSqlItemWhere;

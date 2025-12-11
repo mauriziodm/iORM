@@ -283,7 +283,7 @@ object CustomerListForm: TCustomerListForm
       ParentFont = False
     end
     object ButtonSearch: TSpeedButton
-      Left = 398
+      Left = 394
       Top = 0
       Width = 70
       Height = 45
@@ -298,7 +298,7 @@ object CustomerListForm: TCustomerListForm
       ExplicitLeft = 422
     end
     object ButtonClear: TSpeedButton
-      Left = 398
+      Left = 394
       Top = 49
       Width = 70
       Height = 25
@@ -332,7 +332,7 @@ object CustomerListForm: TCustomerListForm
     object DBEditWhereName: TDBEdit
       Left = 171
       Top = 6
-      Width = 218
+      Width = 214
       Height = 25
       Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
@@ -346,12 +346,12 @@ object CustomerListForm: TCustomerListForm
       Font.Style = []
       ParentFont = False
       TabOrder = 1
-      ExplicitWidth = 214
+      ExplicitWidth = 210
     end
     object DBEditWhereCity: TDBEdit
       Left = 43
       Top = 37
-      Width = 346
+      Width = 342
       Height = 25
       Anchors = [akLeft, akTop, akRight]
       BorderStyle = bsNone
@@ -365,7 +365,7 @@ object CustomerListForm: TCustomerListForm
       Font.Style = []
       ParentFont = False
       TabOrder = 2
-      ExplicitWidth = 342
+      ExplicitWidth = 338
     end
   end
   object DSCustomers: TioDataSetMaster

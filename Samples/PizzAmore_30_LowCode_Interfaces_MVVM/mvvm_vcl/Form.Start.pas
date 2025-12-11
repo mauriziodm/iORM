@@ -48,12 +48,11 @@ type
     procedure VCProviderTabRequest(const Sender: TObject; out ResultViewContext: TComponent);
     procedure VCProviderTabRelease(const Sender: TObject; const AView, AViewContext: TComponent);
     procedure VCProviderFormAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
-    procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
-      AWarnings: TStrings);
     procedure VCProviderTabAfterRequest(const Sender: TObject; const AView, AViewContext: TComponent);
     procedure RadioButtonVCFormClick(Sender: TObject);
     procedure ButtonAuthorizationClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure SQLiteConnAfterDBBuild(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript, AWarnings: TStrings);
   private
   public
   end;
@@ -114,8 +113,7 @@ begin
     VCProviderForm.SetAsDefault;
 end;
 
-procedure TStartForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
-  AWarnings: TStrings);
+procedure TStartForm.SQLiteConnAfterDBBuild(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript, AWarnings: TStrings);
 begin
   TSampleData.CheckForSampleDataCreation;
 end;

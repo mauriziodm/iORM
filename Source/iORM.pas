@@ -51,7 +51,6 @@ uses
   iORM.Abstraction;
 
 const
-  IORM_VERSION = 'iORM 2 (beta 3.4) new base for Carlo Marona';
 
 {$REGION 'Value aliases to make sure you have to include fewer units (in practice only the iORM unit) in the "uses" part of the units that use iORM'}
   // NULL value constants
@@ -802,8 +801,8 @@ implementation
 
 uses
   System.Rtti, iORM.Exceptions, iORM.Utilities, iORM.Where.Factory, iORM.PersistenceStrategy.Factory, iORM.DuckTyped.Interfaces,
-  iORM.DuckTyped.Factory, iORM.DB.Factory, iORM.DuckTyped.StreamObject,
-  iORM.LiveBindings.CommonBSBehavior, iORM.MVVM.ViewContextProviderContainer;
+  iORM.DuckTyped.Factory, iORM.DB.Factory, iORM.DuckTyped.StreamObject, iORM.LiveBindings.CommonBSBehavior,
+  iORM.MVVM.ViewContextProviderContainer, iORM.Consts;
 
 { io }
 

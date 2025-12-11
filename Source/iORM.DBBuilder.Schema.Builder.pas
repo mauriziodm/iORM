@@ -44,27 +44,27 @@ type
   private
     class procedure BuildIndexList(const ASchemaTable: IioDBBuilderSchemaTable; const AMap: IioMap);
     class procedure BuildSchemaFK(const ASchema: IioDBBuilderSchema; const AMap: IioMap);
-    class procedure BuildSchemaTable(const ASchema: IioDBBuilderSchema; const AMap: IioMap);
+    class procedure BuildSchemaTable(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const AMap: IioMap);
   public
-    class procedure BuildSchema(const ASchema: IioDBBuilderSchema); override;
+    class procedure BuildSchema(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema); override;
   end;
 
 implementation
 
 uses
   iORM.COntext.Container, iORM.COntext.Properties.Interfaces, iORM.Attributes, iORM.DBBuilder.Factory,
-  iORM.Resolver.Factory, iORM.Resolver.Interfaces, System.SysUtils;
+  iORM.Resolver.Factory, iORM.Resolver.Interfaces, iORM.Exceptions, System.SysUtils;
 
 { TioDBBuilderSchemaBuilder }
 
-class procedure TioDBBuilderSchemaBuilder.BuildSchema(const ASchema: IioDBBuilderSchema);
+class procedure TioDBBuilderSchemaBuilder.BuildSchema(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema);
 var
   AContextSlot: TioMapSlot;
 begin
   inherited;
   // Loop for all entities and build table list
   for AContextSlot in TioMapContainer.GetContainer.Values do
-    BuildSchemaTable(ASchema, AContextSlot.GetMap);
+    BuildSchemaTable(AConnectionDefName, ASchema, AContextSlot.GetMap);
   // Loop for all entities and build FK list
   for AContextSlot in TioMapContainer.GetContainer.Values do
     BuildSchemaFK(ASchema, AContextSlot.GetMap);
@@ -127,13 +127,14 @@ begin
   end;
 end;
 
-class procedure TioDBBuilderSchemaBuilder.BuildSchemaTable(const ASchema: IioDBBuilderSchema; const AMap: IioMap);
+class procedure TioDBBuilderSchemaBuilder.BuildSchemaTable(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema;
+  const AMap: IioMap);
 var
   LSchemaTable: IioDBBuilderSchemaTable;
   LProperty: IioProperty;
 begin
   // Check if the class/table must be skipped or not
-  if AMap.GetTable.IsNotPersistedEntity or not AMap.GetTable.IsForThisConnection(ASchema.ConnectionDefName) then
+  if AMap.GetTable.IsNotPersistedEntity or not AMap.GetTable.IsForThisConnection(AConnectionDefName) then
     Exit;
   // Build or get the SchemaTable
   LSchemaTable := ASchema.FindOrCreateTable(AMap);

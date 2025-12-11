@@ -5,14 +5,13 @@ interface
 uses
   Classes, SysUtils, uniGUIServer, uniGUIMainModule, uniGUIApplication, uIdCustomHTTPServer,
   uniGUITypes, iORM, iORM.Attributes, iORM.CommonTypes,
-  iORM.DBBuilder.Interfaces, iORM.DB.ConnectionDef, iORM.Abstraction.uniGUI;
+  iORM.DBBuilder.Interfaces, iORM.DB.ConnectionDef, iORM.Abstraction.uniGUI, iORM.Abstraction;
 
 type
   TUniServerModule = class(TUniGUIServerModule)
     SQLiteConn: TioSQLiteConnectionDef;
-    ioUniGUI1: TioUniGUI;
-    procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
-      const AScript, AWarnings: TStrings);
+    ioUniGUI: TioUniGUI;
+    procedure SQLiteConnAfterDBBuild(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript, AWarnings: TStrings);
   private
     { Private declarations }
   protected
@@ -30,12 +29,6 @@ implementation
 uses
   UniGUIVars, Utils.SampleData, RegisterClasses;
 
-procedure TUniServerModule.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
-  const AScript, AWarnings: TStrings);
-begin
-  TSampleData.CheckForSampleDataCreation;
-end;
-
 function UniServerModule: TUniServerModule;
 begin
   Result := TUniServerModule(UniGUIServerInstance);
@@ -44,6 +37,12 @@ end;
 procedure TUniServerModule.FirstInit;
 begin
   InitServerModule(Self);
+end;
+
+procedure TUniServerModule.SQLiteConnAfterDBBuild(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript,
+  AWarnings: TStrings);
+begin
+  TSampleData.CheckForSampleDataCreation;
 end;
 
 initialization

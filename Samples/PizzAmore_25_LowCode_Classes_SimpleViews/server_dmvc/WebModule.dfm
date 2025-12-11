@@ -30,7 +30,7 @@ object MyWebModule: TMyWebModule
     DatabaseStdFolder = sfDocuments
     Persistent = False
     Pooled = False
-    AfterCreateOrAlterDB = FirebirdConnAfterCreateOrAlterDB
+    AfterDBBuild = SQLiteConnAfterDBBuild
     Left = 72
     Top = 102
   end

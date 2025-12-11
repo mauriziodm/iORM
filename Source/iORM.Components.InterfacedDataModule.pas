@@ -71,8 +71,7 @@ implementation
 uses
   iORM.Exceptions;
 
-// uses
-// Windows;
+
 
 { TInterfacedDataModule }
 

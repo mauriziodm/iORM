@@ -2,8 +2,8 @@ object MainForm: TMainForm
   Left = 0
   Top = 0
   Caption = 'WiRL ContentTypes Server'
-  ClientHeight = 202
-  ClientWidth = 468
+  ClientHeight = 201
+  ClientWidth = 464
   Color = clBtnFace
   Constraints.MinHeight = 240
   Constraints.MinWidth = 480
@@ -18,12 +18,11 @@ object MainForm: TMainForm
   object TopPanel: TPanel
     Left = 0
     Top = 0
-    Width = 468
+    Width = 464
     Height = 73
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitWidth = 464
     object Label1: TLabel
       Left = 28
       Top = 17
@@ -81,7 +80,7 @@ object MainForm: TMainForm
     DatabaseStdFolder = sfDocuments
     Persistent = False
     Pooled = False
-    AfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
+    AfterDBBuild = SQLiteConnAfterDBBuild
     Left = 72
     Top = 142
   end
@@ -101,7 +100,6 @@ object MainForm: TMainForm
     Protocol = pLocal
     SQLDialect = sqlDialect3
     UserName = 'SYSDBA'
-    AfterCreateOrAlterDB = SQLiteConnAfterCreateOrAlterDB
     Left = 72
     Top = 80
   end

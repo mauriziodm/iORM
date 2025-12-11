@@ -36,7 +36,9 @@ unit iORM.DBBuilder.Strategy.Base;
 interface
 
 uses
-  iORM.DBBuilder.Interfaces;
+  iORM.Attributes,
+  iORM.DBBuilder.Interfaces,
+  iORM.DB.Interfaces;
 
 type
 
@@ -44,167 +46,356 @@ type
   private
     FSchema: IioDBBuilderSchema;
     FSqlGenerator: IioDBBuilderSqlGenerator;
+    FConnectionDefName: string;
+
+    function GetSchema: IioDBBuilderSchema;
+    function GetSqlGenerator: IioDBBuilderSqlGenerator;
+    function GetConnectionDefName: string;
   protected
-    procedure AddOrAlterFields(const ATable: IioDBBuilderSchemaTable); virtual;
-    procedure AlterTable(const ATable: IioDBBuilderSchemaTable); virtual;
-    procedure CreateFields(const ATable: IioDBBuilderSchemaTable); virtual;
-    procedure CreateForeignKeys; overload; virtual;
-    procedure CreateForeignKeys(const ATable: IioDBBuilderSchemaTable); overload; virtual;
-    procedure CreateIndexes; overload; virtual;
-    procedure CreateIndexes(const ATable: IioDBBuilderSchemaTable); overload; virtual;
-    procedure CreateOrAlterTables; virtual;
-    procedure CreateSequences; virtual;
-    procedure CreateTable(const ATable: IioDBBuilderSchemaTable); virtual;
-    procedure DropForeignKeys; virtual;
-    procedure DropIndexes; virtual;
-    function Schema: IioDBBuilderSchema;
-    function SqlGenerator: IioDBBuilderSqlGenerator;
+    procedure AddOrAlterFields(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure AddOrAlterForeignKeys(const AScript: IioDBBuilderSqlScript); virtual;
+    procedure AddOrAlterIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure AlterTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure CreateDatabase; virtual; abstract;
+    procedure CreateForeignKeys(const AScript: IioDBBuilderSqlScript); overload; virtual;
+    procedure CreateIndexes(const AScript: IioDBBuilderSqlScript); overload; virtual;
+    procedure CreateOrAlterTables(const AScript: IioDBBuilderSqlScript); virtual;
+    procedure CreateTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure CreateTableForeignKeys(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); overload; virtual;
+    procedure CreateTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); overload; virtual;
+    procedure CreateTables(const AScript: IioDBBuilderSqlScript); virtual;
+    function DatabaseExists: Boolean; virtual; abstract;
+    procedure DropForeignKeys(const AScript: IioDBBuilderSqlScript); virtual;
+    procedure DropIndexes(const AScript: IioDBBuilderSqlScript); virtual;
+    procedure DropTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); virtual;
+    function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
+    function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
+    function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
+    function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
+    function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; overload; virtual; abstract;
+    function IndexExists(const AIndexName: string): boolean; overload; virtual; abstract;
+    function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; virtual; abstract;
+    function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean; virtual; abstract;
+
+    procedure GenerateDatabaseObjects(const AScript: IioDBBuilderSqlScript; const Create: boolean); virtual; abstract;
+
+    property ConnectionDefName: string read GetConnectionDefName;
+    property Schema: IioDBBuilderSchema read GetSchema;
+    property SqlGenerator: IioDBBuilderSqlGenerator read GetSqlGenerator;
   public
-    constructor Create(const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator);
-    procedure GenerateScript; virtual; abstract;
+    constructor Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator);
+
+    procedure GenerateCreateDatabaseScript(const AScript: IioDBBuilderSqlScript); virtual;
+    procedure GenerateUpdateDatabaseScript(const AScript: IioDBBuilderSqlScript); virtual;
   end;
 
 implementation
 
 uses
-  System.SysUtils, iORM.Attributes, System.Classes;
+  System.SysUtils,
+  System.Classes,
+
+  iORM.Exceptions,
+  iORM.DB.ConnectionContainer,
+  iORM.DBBuilder.QueryEngine
+
+  ;
 
 { TioDBBuilderStrategyBase }
 
-procedure TioDBBuilderStrategyBase.AlterTable(const ATable: IioDBBuilderSchemaTable);
-begin
-  SqlGenerator.ScriptAddTitle(Format('Altering table ''%s''', [ATable.TableName]));
-end;
-
-constructor TioDBBuilderStrategyBase.Create(const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator);
-begin
-  FSchema := ASchema;
-  FSqlGenerator := ASqlGenerator;
-end;
-
-procedure TioDBBuilderStrategyBase.CreateFields(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.AddOrAlterForeignKeys(const AScript: IioDBBuilderSqlScript);
 var
-  LComma: Char;
-  LField: IioDBBuilderSchemaField;
+  LTable: IioDBBuilderSchemaTable;
+  LFK: IioDBBuilderSchemaFK;
 begin
-  LComma := ' ';
-  for LField in ATable.Fields do
+  if not Assigned(AScript) then
+    raise EioArgumentNilException.Create(ClassName, 'AddOrAlterForeignKeys', 'AScript is not assigned.');
+
+  for LTable in Schema.Tables.Values do
   begin
-    FSqlGenerator.CreateField(LField, LComma);
-    LComma := ',';
+    if taForeignKeys in LTable.Changes then
+    begin
+      for LFK in LTable.ForeignKeys.Values do
+      begin
+        case LFK.Status of
+          stCreate:
+            begin
+              AScript.Schema.Add(SqlGenerator.BuildAddForeignKeySql(LTable, LFK));
+            end;
+          stUpdate:
+            begin
+              AScript.Schema.Add(SqlGenerator.BuildDropForeignKeySql(LTable, LFK));
+              AScript.Schema.Add(SqlGenerator.BuildAddForeignKeySql(LTable, LFK));
+            end;
+        end;
+      end;
+    end;
   end;
 end;
 
-procedure TioDBBuilderStrategyBase.CreateForeignKeys;
+procedure TioDBBuilderStrategyBase.AddOrAlterIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
+var
+  LIndex: IioDBBuilderSchemaIndex;
+begin
+  if not Assigned(AScript) then
+    raise EioArgumentNilException.Create(ClassName, 'AddOrAlterIndexes', 'AScript is not assigned.');
+
+  if not Assigned(ATable) then
+    raise EioArgumentNilException.Create(ClassName, 'AddOrAlterIndexes', 'ATable is not assigned.');
+
+  for LIndex in ATable.Indexes.Values do
+  begin
+    case LIndex.Status of
+      stCreate:
+        begin
+          AScript.Schema.Add(SqlGenerator.BuildAddIndexSql(ATable, LIndex));
+        end;
+      stUpdate:
+        begin
+          AScript.Schema.Add(SqlGenerator.BuildDropIndexSql(ATable, LIndex));
+          AScript.Schema.Add(SqlGenerator.BuildAddIndexSql(ATable, LIndex));
+        end;
+    end;
+  end;
+end;
+
+procedure TioDBBuilderStrategyBase.AlterTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
+begin
+  if not Assigned(AScript) then
+    raise EioArgumentNilException.Create(ClassName, 'AlterTable', 'AScript is not assigned.');
+
+  if not Assigned(ATable) then
+    raise EioArgumentNilException.Create(ClassName, 'AlterTable', 'ATable is not assigned.');
+
+  AScript.Schema.AddTitle(Format('Altering table ''%s''', [ATable.Name]));
+end;
+
+constructor TioDBBuilderStrategyBase.Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator);
+begin
+  if not Assigned(ASchema) then
+    raise EioArgumentNilException.Create(ClassName, 'Create', 'ASchema is not assigned.');
+
+  if not Assigned(ASqlGenerator) then
+    raise EioArgumentNilException.Create(ClassName, 'Create', 'ASqlGenerator is not assigned.');
+
+  FSchema := ASchema;
+  FSqlGenerator := ASqlGenerator;
+  FConnectionDefName := AConnectionDefName;
+end;
+
+procedure TioDBBuilderStrategyBase.CreateForeignKeys(const AScript: IioDBBuilderSqlScript);
 var
   LTable: IioDBBuilderSchemaTable;
 begin
-  SqlGenerator.ScriptAddTitle('Creating foreign keys');
-  for LTable in FSchema.Tables.Values do
-    CreateForeignKeys(LTable);
+  if not Assigned(AScript) then
+    raise EioArgumentNilException.Create(ClassName, 'CreateForeignKeys', 'AScript is not assigned.');
+
+  AScript.Schema.AddTitle('Creating foreign keys');
+
+  for LTable in Schema.Tables.Values do
+    CreateTableForeignKeys(AScript, LTable);
 end;
 
-procedure TioDBBuilderStrategyBase.CreateForeignKeys(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.CreateTableForeignKeys(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
 var
   LForeignKey: IioDBBuilderSchemaFK;
 begin
+  if not Assigned(AScript) then
+    raise EioArgumentNilException.Create(ClassName, 'CreateForeignKeys', 'AScript is not assigned.');
+
+  if not Assigned(ATable) then
+    raise EioArgumentNilException.Create(ClassName, 'CreateForeignKeys', 'ATable is not assigned.');
+
   for LForeignKey in ATable.ForeignKeys.Values do
-    FSqlGenerator.AddForeignKey(LForeignKey);
+    AScript.Schema.Add(SqlGenerator.BuildAddForeignKeySql(ATable, LForeignKey));
 end;
 
-procedure TioDBBuilderStrategyBase.CreateIndexes;
+procedure TioDBBuilderStrategyBase.CreateIndexes(const AScript: IioDBBuilderSqlScript);
 var
   LTable: IioDBBuilderSchemaTable;
 begin
-  SqlGenerator.ScriptAddTitle('Creating indexes');
-  for LTable in FSchema.Tables.Values do
-    CreateIndexes(LTable);
+  if not Assigned(AScript) then
+    raise EioArgumentNilException.Create(ClassName, 'CreateIndexes', 'AScript is not assigned.');
+
+  AScript.Schema.AddTitle('Creating indexes');
+
+  AScript.Schema.IncIndentationLevel;
+
+  for LTable in Schema.Tables.Values do
+    CreateTableIndexes(AScript, LTable);
+
+  AScript.Schema.DecIndentationLevel;
 end;
 
-procedure TioDBBuilderStrategyBase.CreateIndexes(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.CreateTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
 var
-  LIndex: ioIndex;
+  LIndex: IioDBBuilderSchemaIndex;
 begin
-  for LIndex in ATable.Indexes do
-    FSqlGenerator.AddIndex(ATable, LIndex);
+  if not Assigned(AScript) then
+    raise EioArgumentNilException.Create(ClassName, 'CreateTableIndexes', 'AScript is not assigned.');
+
+  for LIndex in ATable.Indexes.Values do
+  begin
+    // Carlo Marona (2025-10-16): Check if index already exists before create. If exists skip it.
+    if LIndex.Status = stUpdate then
+    begin
+      // If the index was changed, drops the old one then recreate it with updates
+      AScript.Schema.Add(SqlGenerator.BuildDropIndexSql(SqlGenerator.BuildIndexNameSql(ATable, LIndex)));
+    end;
+
+    if (ATable.Status = stCreate) or (LIndex.Status in [stCreate, stUpdate]) then
+      AScript.Schema.Add(SqlGenerator.BuildAddIndexSql(ATable, LIndex));
+  end;
 end;
 
-procedure TioDBBuilderStrategyBase.AddOrAlterFields(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.AddOrAlterFields(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
 var
-  LComma: Char;
+  LComma: string;
   LField: IioDBBuilderSchemaField;
 begin
-  LComma := ' ';
+  if not Assigned(AScript) then
+    raise EioArgumentNilException.Create(ClassName, 'AddOrAlterFields', 'AScript is not assigned.');
+
+  if not Assigned(ATable) then
+    raise EioArgumentNilException.Create(ClassName, 'AddOrAlterFields', 'ATable is not assigned.');
+
+  LComma := EmptyStr;
+
   for LField in ATable.Fields do
   begin
     case LField.Status of
       stCreate:
         begin
-          FSqlGenerator.AddField(LField, LComma);
-          LComma := ',';
+          AScript.Schema.Add(LComma + SqlGenerator.BuildAddFieldSql(LField));
+          LComma := ', ';
         end;
-      stAlter:
+      stUpdate:
         begin
-          FSqlGenerator.AlterField(LField, LComma);
-          LComma := ',';
+          AScript.Schema.Add(LComma + SqlGenerator.BuildAlterFieldSql(LField));
+          LComma := ', ';
         end;
     end;
   end;
 end;
 
-procedure TioDBBuilderStrategyBase.CreateOrAlterTables;
+procedure TioDBBuilderStrategyBase.CreateOrAlterTables(const AScript: IioDBBuilderSqlScript);
 var
   LTable: IioDBBuilderSchemaTable;
 begin
-  for LTable in FSchema.Tables.Values do
+  if not Assigned(AScript) then
+    raise EioArgumentNilException.Create(ClassName, 'CreateOrAlterTables', 'AScript is not assigned.');
+
+  for LTable in Schema.Tables.Values do
   begin
     case LTable.Status of
       stCreate:
-        CreateTable(LTable);
-      stAlter:
-        AlterTable(LTable);
+        CreateTable(AScript, LTable);
+      stUpdate:
+        AlterTable(AScript, LTable);
     end;
   end;
 end;
 
-procedure TioDBBuilderStrategyBase.CreateSequences;
+procedure TioDBBuilderStrategyBase.CreateTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
+begin
+  if not Assigned(AScript) then
+    raise EioArgumentNilException.Create(ClassName, 'CreateTable', 'AScript is not assigned.');
+
+  if not Assigned(ATable) then
+    raise EioArgumentNilException.Create(ClassName, 'CreateTable', 'ATable is not assigned.');
+
+  AScript.Schema.AddTitle(Format('Creating table ''%s''', [ATable.Name]));
+end;
+
+procedure TioDBBuilderStrategyBase.CreateTables(const AScript: IioDBBuilderSqlScript);
 var
-  LSequence: String;
+  LTable: IioDBBuilderSchemaTable;
 begin
-  if FSchema.Sequences.Count = 0 then
+  for LTable in Schema.Tables.Values do
+    CreateTable(AScript, LTable);
+end;
+
+procedure TioDBBuilderStrategyBase.DropForeignKeys(const AScript: IioDBBuilderSqlScript);
+begin
+  if not Assigned(AScript) then
+    raise EioArgumentNilException.Create(ClassName, 'DropForeignKeys', 'AScript is not assigned.');
+
+  if Schema.Status = stCreate then
     Exit;
-  SqlGenerator.ScriptAddTitle('Creating sequences (if empty, no sequence needs to be created)');
-  for LSequence in FSchema.Sequences do
-    SqlGenerator.AddSequence(LSequence, FSchema.Status = stCreate);
+
+  AScript.Schema.AddTitle('Dropping foreign keys');
 end;
 
-procedure TioDBBuilderStrategyBase.CreateTable(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.DropIndexes(const AScript: IioDBBuilderSqlScript);
 begin
-  SqlGenerator.ScriptAddTitle(Format('Creating table ''%s''', [ATable.TableName]));
-end;
+  if not Assigned(AScript) then
+    raise EioArgumentNilException.Create(ClassName, 'DropIndexes', 'AScript is not assigned.');
 
-procedure TioDBBuilderStrategyBase.DropForeignKeys;
-begin
-  if FSchema.Status = stCreate then
+  if Schema.Status = stCreate then
     Exit;
-  FSqlGenerator.ScriptAddTitle('Dropping foreign keys');
-  FSqlGenerator.DropAllForeignKeys;
+
+  AScript.Schema.AddTitle('Dropping indexes');
 end;
 
-procedure TioDBBuilderStrategyBase.DropIndexes;
+procedure TioDBBuilderStrategyBase.DropTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
 begin
-  if FSchema.Status = stCreate then
+  if not Assigned(AScript) then
+    raise EioArgumentNilException.Create(ClassName, 'DropTableIndexes', 'AScript is not assigned.');
+
+  if not Assigned(ATable) then
+    raise EioArgumentNilException.Create(ClassName, 'DropTableIndexes', 'ATable is not assigned.');
+
+  if Schema.Status = stCreate then
     Exit;
-  SqlGenerator.ScriptAddTitle('Dropping indexes');
-  SqlGenerator.DropAllIndexes;
+
+  AScript.Schema.AddTitle('Dropping indexes');
 end;
 
-function TioDBBuilderStrategyBase.Schema: IioDBBuilderSchema;
+procedure TioDBBuilderStrategyBase.GenerateCreateDatabaseScript(const AScript: IioDBBuilderSqlScript);
+begin
+  if not Assigned(AScript) then
+    raise EioArgumentNilException.Create(ClassName, 'GenerateCreateDatabaseScript', 'AScript is not assigned.');
+
+  Schema.Status := stCreate;
+
+  AScript.ScriptBegin(ConnectionDefName, TioConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.DriverID);
+
+  if Schema.WarningExists then
+    AScript.Schema.AddWarnings(Schema.Warnings);
+
+  GenerateDatabaseObjects(AScript, True);
+
+  AScript.ScriptEnd;
+end;
+
+procedure TioDBBuilderStrategyBase.GenerateUpdateDatabaseScript(const AScript: IioDBBuilderSqlScript);
+begin
+  if not Assigned(AScript) then
+    raise EioArgumentNilException.Create(ClassName, 'GenerateUpdateDatabaseScript', 'AScript is not assigned.');
+
+  Schema.Status := stUpdate;
+
+  AScript.ScriptBegin(ConnectionDefName, TioConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.DriverID);
+
+  if Schema.WarningExists then
+    AScript.Schema.AddWarnings(Schema.Warnings);
+
+  GenerateDatabaseObjects(AScript, False);
+
+  AScript.ScriptEnd;
+end;
+
+function TioDBBuilderStrategyBase.GetConnectionDefName: string;
+begin
+  Result := FConnectionDefName;
+end;
+
+function TioDBBuilderStrategyBase.GetSchema: IioDBBuilderSchema;
 begin
   Result := FSchema;
 end;
 
-function TioDBBuilderStrategyBase.SqlGenerator: IioDBBuilderSqlGenerator;
+function TioDBBuilderStrategyBase.GetSqlGenerator: IioDBBuilderSqlGenerator;
 begin
   Result := FSqlGenerator;
 end;

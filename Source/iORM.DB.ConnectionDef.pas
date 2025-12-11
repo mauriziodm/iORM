@@ -48,11 +48,11 @@ type
 
   TioCustomConnectionDef = class;
 
-  TioDBBuilderBeforeCreateOrAlterDBEvent = procedure(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
+  TioBeforeDBBuildEvent = procedure(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus;
     const AScript, AWarnings: TStrings; var AAbort: Boolean) of object;
-  TioDBBuilderAfterCreateOrAlterDBEvent = procedure(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
+  TioAfterDBBuildEvent = procedure(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus;
     const AScript, AWarnings: TStrings) of object;
-  TioDBBuilderExceptionOnCreateOrAlterDBEvent = procedure(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult;
+  TioDBBuildExceptionEvent = procedure(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus;
     const AScript, AWarnings: TStrings; const AException: Exception; var ReRaise: Boolean) of object;
 
   TioDBBuilderProperty = class(TPersistent)
@@ -73,11 +73,11 @@ type
   TioCustomConnectionDef = class(TComponent, IioSynchroStrategy_TargetConnectionDef)
   strict private
     // Events
-    FAfterCreateOrAlterDBEvent: TioDBBuilderAfterCreateOrAlterDBEvent;
+    FAfterDBBuild: TioAfterDBBuildEvent;
     FAfterRegister: TNotifyEvent;
-    FBeforeCreateOrAlterDBEvent: TioDBBuilderBeforeCreateOrAlterDBEvent;
+    FBeforeDBBuild: TioBeforeDBBuildEvent;
     FBeforeRegister: TNotifyEvent;
-    FExceptionOnCreateOrAlterDB: TioDBBuilderExceptionOnCreateOrAlterDBEvent;
+    FOnDBBuildException: TioDBBuildExceptionEvent;
     // Fields
     FAutoCreateDB: TioDBBuilderProperty;
     FBaseURL: String;
@@ -105,7 +105,6 @@ type
     // IioSynchroStrategy_TargetConnectionDef
     function GetName: String;
   protected
-    function DBBuilder: IioDBBuilderEngine; virtual;
     procedure DoAfterRegister;
     procedure DoBeforeRegister;
     function GetFullPathDatabase: String;
@@ -130,11 +129,11 @@ type
 // TODO: Non ricordo se la proprietà IioSynchroStrategy_Client è da eliminare, controllare
     property SynchroStrategy_Client: IioSynchroStrategy_Client read FSynchroStrategy_Client write SetSynchroStrategy_Client default nil;
     // Events
-    property AfterCreateOrAlterDB: TioDBBuilderAfterCreateOrAlterDBEvent read FAfterCreateOrAlterDBEvent write FAfterCreateOrAlterDBEvent;
+    property AfterDBBuild: TioAfterDBBuildEvent read FAfterDBBuild write FAfterDBBuild;
     property AfterRegister: TNotifyEvent read FAfterRegister write FAfterRegister;
-    property BeforeCreateOrAlterDB: TioDBBuilderBeforeCreateOrAlterDBEvent read FBeforeCreateOrAlterDBEvent write FBeforeCreateOrAlterDBEvent;
+    property BeforeDBBuild: TioBeforeDBBuildEvent read FBeforeDBBuild write FBeforeDBBuild;
     property BeforeRegister: TNotifyEvent read FBeforeRegister write FBeforeRegister;
-    property ExceptionOnCreateOrAlterDB: TioDBBuilderExceptionOnCreateOrAlterDBEvent read FExceptionOnCreateOrAlterDB write FExceptionOnCreateOrAlterDB;
+    property OnDBBuildException: TioDBBuildExceptionEvent read FOnDBBuildException write FOnDBBuildException;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -168,7 +167,6 @@ type
   TioSQLiteConnectionDef = class(TioCustomConnectionDef)
   public
     procedure RegisterConnectionDef; override;
-    function DBBuilder: IioDBBuilderEngine; override;
     // Properties
     property ConnectionDef;
   published
@@ -184,11 +182,11 @@ type
     property Pooled;
     property SynchroStrategy_Client;
     // Events
-    property AfterCreateOrAlterDB;
+    property AfterDBBuild;
     property AfterRegister;
-    property BeforeCreateOrAlterDB;
+    property BeforeDBBuild;
     property BeforeRegister;
-    property ExceptionOnCreateOrAlterDB;
+    property OnDBBuildException;
   end;
 
   // Class for Firebird connection
@@ -196,7 +194,6 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     procedure RegisterConnectionDef; override;
-    function DBBuilder: IioDBBuilderEngine; override;
     // Properties
     property ConnectionDef;
   published
@@ -217,11 +214,11 @@ type
     property UserName;
     property SynchroStrategy_Client;
     // Events
-    property AfterCreateOrAlterDB;
+    property AfterDBBuild;
     property AfterRegister;
-    property BeforeCreateOrAlterDB;
+    property BeforeDBBuild;
     property BeforeRegister;
-    property ExceptionOnCreateOrAlterDB;
+    property OnDBBuildException;
   end;
 
   // Class for MySQL connection
@@ -229,7 +226,6 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     procedure RegisterConnectionDef; override;
-    function DBBuilder: IioDBBuilderEngine; override;
     // Properties
     property ConnectionDef;
   published
@@ -247,11 +243,11 @@ type
     property UserName;
     property SynchroStrategy_Client;
     // Events
-    property AfterCreateOrAlterDB;
+    property AfterDBBuild;
     property AfterRegister;
-    property BeforeCreateOrAlterDB;
+    property BeforeDBBuild;
     property BeforeRegister;
-    property ExceptionOnCreateOrAlterDB;
+    property OnDBBuildException;
   end;
 
   // Class for SQL Monitor functionalities
@@ -299,11 +295,6 @@ begin
   FSynchroStrategy_Client := nil;
 end;
 
-function TioCustomConnectionDef.DBBuilder: IioDBBuilderEngine;
-begin
-  Result := TioDBBuilderFactory.NewEngine(Name, FAutoCreateDB.Indexes, FAutoCreateDB.ForeignKeys);
-end;
-
 destructor TioCustomConnectionDef.Destroy;
 begin
 //  if FSynchroStrategy_Client <> nil then
@@ -329,30 +320,39 @@ var
   LAbort: Boolean;
   LReRaise: Boolean;
   LDBBuilderEngine: IioDBBuilderEngine;
+  LScript: IioDBBuilderSqlScript;
+  LStatus: TioDBBuilderStatus;
 begin
   LAbort := False;
   LReRaise := True;
   LDBBuilderEngine := TioDBBuilderFactory.NewEngine(Name, FAutoCreateDB.Indexes, FAutoCreateDB.ForeignKeys);
-  // BeforeCreateOrAlterDBEvent
-  if Assigned(FBeforeCreateOrAlterDBEvent) then
-    FBeforeCreateOrAlterDBEvent(Self, LDBBuilderEngine.Status, LDBBuilderEngine.Script, LDBBuilderEngine.Warnings, LAbort);
+  LStatus := LDBBuilderEngine.Analyze;
+
+  LScript := TioDBBuilderFactory.NewSqlScript;
+  LDBBuilderEngine.BuildCreateOrUpdateDBSqlScript(LScript);
+
+  // Carlo Marona
+  if Assigned(FBeforeDBBuild) then
+    FBeforeDBBuild(Self, LStatus, LScript.Sql, LDBBuilderEngine.Warnings, LAbort);
+
   if not LAbort then
   begin
     try
-      // CreateOrAlterDB
-      LDBBuilderEngine.CreateOrAlterDB(AForce);
+      LDBBuilderEngine.CreateOrUpdateDB(AForce, LScript);
+      
+      // Carlo Marona
+    	if Assigned(FAfterDBBuild) then
+        FAfterDBBuild(Self, LStatus, LScript.Sql, LDBBuilderEngine.Warnings);
     except
       on E: Exception do
       begin
-        if Assigned(FExceptionOnCreateOrAlterDB) then
-          FExceptionOnCreateOrAlterDB(Self, LDBBuilderEngine.Status, LDBBuilderEngine.Script, LDBBuilderEngine.Warnings, E, LReRaise);
+        if Assigned(FOnDBBuildException) then
+          FOnDBBuildException(Self, LStatus, LScript.SQL, LDBBuilderEngine.Warnings, E, LReRaise);
+
         if LReRaise then
           raise;
       end;
     end;
-    // AfterCreateOrAlterDBEvent
-    if Assigned(FAfterCreateOrAlterDBEvent) then
-      FAfterCreateOrAlterDBEvent(Self, LDBBuilderEngine.Status, LDBBuilderEngine.Script, LDBBuilderEngine.Warnings);
   end;
 end;
 
@@ -396,8 +396,9 @@ begin
   // Register itself in the ConnectionManager if not already registered (byTioPrototypeBindSource)
   if (csDesigning in ComponentState) then
     Exit;
+
   if (not FIsRegistered) then
-         RegisterConnectionDef;
+    RegisterConnectionDef;
 end;
 
 procedure TioCustomConnectionDef.Notification(AComponent: TComponent; Operation: TOperation);
@@ -482,12 +483,6 @@ end;
 
 { TioSQLiteConnectionDef }
 
-function TioSQLiteConnectionDef.DBBuilder: IioDBBuilderEngine;
-begin
-  inherited
-  // Only to elevate the method visibility
-end;
-
 procedure TioSQLiteConnectionDef.RegisterConnectionDef;
 begin
   // Fire the OnBeforeRegister event if implemented
@@ -513,12 +508,6 @@ constructor TioFirebirdConnectionDef.Create(AOwner: TComponent);
 begin
   inherited;
   Port := 3050;
-end;
-
-function TioFirebirdConnectionDef.DBBuilder: IioDBBuilderEngine;
-begin
-  inherited
-  // Only to elevate the method visibility
 end;
 
 procedure TioFirebirdConnectionDef.RegisterConnectionDef;
@@ -572,12 +561,6 @@ constructor TioMySQLConnectionDef.Create(AOwner: TComponent);
 begin
   inherited;
   Port := 3306;
-end;
-
-function TioMySQLConnectionDef.DBBuilder: IioDBBuilderEngine;
-begin
-  inherited
-  // Only to elevate the method visibility
 end;
 
 procedure TioMySQLConnectionDef.RegisterConnectionDef;

@@ -34,9 +34,11 @@ type
     SQLiteConn: TioSQLiteConnectionDef;
     ButtonAuthorization: TButton;
     HttpConn: TioHttpConnectionDef;
-    procedure SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript, AWarnings: TStrings);
     procedure FormCreate(Sender: TObject);
     procedure ButtonAuthorizationClick(Sender: TObject);
+    procedure AfterDBBuild(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript, AWarnings: TStrings);
+    procedure SQLiteConnBeforeDBBuild(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript, AWarnings: TStrings; var AAbort: Boolean);
+    procedure FBConnBeforeDBBuild(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript, AWarnings: TStrings; var AAbort: Boolean);
   private
   public
   end;
@@ -47,10 +49,16 @@ var
 implementation
 
 uses
+  System.IOUtils,
   Utils.SampleData, Model.Order, System.Rtti,
   Form.Authorization, Model.Customer;
 
 {$R *.dfm}
+
+procedure TMainForm.FBConnBeforeDBBuild(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript, AWarnings: TStrings; var AAbort: Boolean);
+begin
+  AScript.SaveToFile(TPath.Combine(TPath.GetDocumentsPath, 'fb_script.sql'));
+end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 var
@@ -84,10 +92,14 @@ begin
   );
 end;
 
-procedure TMainForm.SQLiteConnAfterCreateOrAlterDB(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderEngineResult; const AScript,
-  AWarnings: TStrings);
+procedure TMainForm.AfterDBBuild(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript, AWarnings: TStrings);
 begin
   TSampleData.CheckForSampleDataCreation;
+end;
+
+procedure TMainForm.SQLiteConnBeforeDBBuild(const Sender: TioCustomConnectionDef; const ADBStatus: TioDBBuilderStatus; const AScript, AWarnings: TStrings; var AAbort: Boolean);
+begin
+  AScript.SaveToFile(TPath.Combine(TPath.GetDocumentsPath, 'sl_script.sql'));
 end;
 
 procedure TMainForm.ButtonAuthorizationClick(Sender: TObject);
