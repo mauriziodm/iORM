@@ -1,6 +1,8 @@
 inherited VMSynchroLogList: TVMSynchroLogList
   inherited BSMaster: TioModelPresenterMaster
     TypeName = 'TioEtmSynchroStrategy_LogItem'
+    AsyncLoad = True
+    AsyncPersist = True
   end
   inherited BSWhere: TioModelPresenterMaster
     LoadType = ltManual

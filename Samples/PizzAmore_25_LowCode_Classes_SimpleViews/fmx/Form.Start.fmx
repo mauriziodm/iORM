@@ -4831,7 +4831,7 @@ object StartForm: TStartForm
   object SynchroStrategy: TioEtmSynchroStrategy_Client
     EtmTimeSlot_ClassName = 'TEtmRepository'
     SynchroLogName = 'from mobile app'
-    TargetConnectionDef = HttpConn
+    TargetConnectionDef = ServerConn
     Left = 187
     Top = 304
   end

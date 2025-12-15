@@ -1074,7 +1074,12 @@ begin
     //  rimaneva il BindSourceAdapter dei dati fake; con questa modifica invece viene fatto l'open e quindi viene anche creato
     //  il relativo ActiveBindSourceAdapter reale anche se in realtà, non essendoci un Customer assegnato il suo DataObject
     //  è nil.
-    if Active or IsDetailBS then
+    //  NB: Ho dovuto aggiungere anche "and Assigned(FMasterBindSource) and FMasterBindSource.IsActive" perchè
+    //       altrimenti se in un progetto MVVM (PizzAmore_30_LowCode_Interfaces_mvvm_Vcl) avevo una vista con un
+    //       ModelPresenterMaster con LoadType = ltAuto e un ModelPresenterDetail impostato con MasterBindSource = al primo (ModelPresenterMaster)
+    //       (Es: View.SynchroLog.List) quando passa per questo codice faceva subito l'Open anche se in realtà
+    //       il MasterBindSource non era ancora attivo e questo causava un AVError.
+    if Active or (IsDetailBS and Assigned(FMasterBindSource) and FMasterBindSource.IsActive) then
       (AModelBindSourceOrModelDataSet as IioVMBridgeClientComponent).Open
     else
       (AModelBindSourceOrModelDataSet as IioVMBridgeClientComponent).Close;

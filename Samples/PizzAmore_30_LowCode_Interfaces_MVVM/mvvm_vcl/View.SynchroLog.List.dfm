@@ -27,7 +27,7 @@ inherited ViewSynchroLogList: TViewSynchroLogList
     inherited LabelTitle: TLabel
       Width = 860
       Caption = 'Synchro log'
-      ExplicitWidth = 91
+      ExplicitWidth = 900
     end
   end
   inherited PanelBottom: TPanel
@@ -38,8 +38,7 @@ inherited ViewSynchroLogList: TViewSynchroLogList
     ExplicitWidth = 1000
     inherited ButtonAdd: TSpeedButton
       Left = 930
-      ExplicitLeft = 930
-      ExplicitTop = 3
+      ExplicitLeft = 940
     end
   end
   inherited PanelWhere: TPanel
@@ -48,14 +47,6 @@ inherited ViewSynchroLogList: TViewSynchroLogList
     Visible = False
     ExplicitTop = 681
     ExplicitWidth = 1000
-    inherited ButtonSearch: TSpeedButton
-      Left = 930
-      ExplicitLeft = 930
-    end
-    inherited ButtonClear: TSpeedButton
-      Left = 930
-      ExplicitLeft = 930
-    end
   end
   object PanelTimeSlots: TPanel [4]
     Left = 0
@@ -627,8 +618,8 @@ inherited ViewSynchroLogList: TViewSynchroLogList
   object BS_ETM: TioModelDataSet
     ViewModelBridge = VMBridge
     ModelPresenter = 'BS_ETM'
-    Left = 232
-    Top = 253
+    Left = 200
+    Top = 341
     object BS_ETMID: TIntegerField
       FieldName = 'ID'
     end
@@ -666,7 +657,7 @@ inherited ViewSynchroLogList: TViewSynchroLogList
   end
   object SourceETM: TDataSource
     DataSet = BS_ETM
-    Left = 318
-    Top = 254
+    Left = 286
+    Top = 342
   end
 end
