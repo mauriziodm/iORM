@@ -77,13 +77,12 @@ uses
   iORM.DBBuilder.SqlGenerator.SqLite, iORM.DBBuilder.Strategy.SqLite, iORM.DBBuilder.Strategy.Firebird,
   iORM.Exceptions, iORM.DBBuilder.DBAnalyzer, iORM.DBBuilder.Engine, iORM.DBBuilder.SqlScript.Base,
   iORM.DBBuilder.DBAnalyzer.Firebird, iORM.DBBuilder.DBAnalyzer.SqLite, iORM.DBBuilder.Schema.Index,
-{$IFNDEF ioDelphiProfessional}
   iORM.DBBuilder.SqlGenerator.MSSqlServer,
-{$ENDIF}
-  iORM.DBBuilder.Schema.Field.ClassInfo;
+  iORM.DBBuilder.Schema.Field.ClassInfo,
+  iORM.DBBuilder.DBAnalyzer.MSSqlServer,
+  iORM.DBBuilder.Strategy.MSSqlServer
 
-
-
+  ;
 
 { TioDBBuilderFactory }
 
@@ -95,10 +94,8 @@ begin
       Result := TioDBBuilderDBAnalyzerFirebird.Create(AConnectionDefName, ASchema, ASqlGenerator);
     ctSQLite:
       Result := TioDBBuilderDBAnalyzerSQLite.Create(AConnectionDefName, ASchema, ASqlGenerator);
-{$IFNDEF ioDelphiProfessional}
     ctSQLServer:
-      Result := TioDBBuilderSqlGenMSSqlServer.Create(ASchema);
-{$ENDIF}
+      Result := TioDBBuilderDBAnalyzerMSSqlServer.Create(AConnectionDefName, ASchema, ASqlGenerator);
   else
     raise EioGenericException.Create(ClassName, 'NewSqlGenerator', 'Connection type not found');
   end;
@@ -160,10 +157,8 @@ begin
       Result := TioDBBuilderSqlGenFirebird.Create; //(ASchema);
     ctSQLite:
       Result := TioDBBuilderSqlGenSQLite.Create; //(ASchema);
-{$IFNDEF ioDelphiProfessional}
     ctSQLServer:
-      Result := TioDBBuilderSqlGenMSSqlServer.Create(ASchema);
-{$ENDIF}
+      Result := TioDBBuilderSqlGenMSSqlServer.Create; //(ASchema);
   else
     raise EioGenericException.Create(ClassName, 'NewSqlGenerator', 'Connection type not found');
   end;
@@ -178,10 +173,8 @@ class function TioDBBuilderFactory.NewStrategy(const AConnectionDefName: String;
   : IioDBBuilderStrategy;
 begin
   case TioConnectionManager.GetConnectionInfo(AConnectionDefName).ConnectionType of
-    {$IFNDEF ioDelphiProfessional}
     ctSQLServer:
-      Result := TioDBBuilderStrategyWithAlter.Create(AConnectionDefName, ASchema, ASqlGenerator);
-    {$ENDIF}
+      Result := TioDBBuilderStrategyMSSqlServer.Create(AConnectionDefName, ASchema, ASqlGenerator);
     ctFirebird:
       Result := TioDBBuilderStrategyFirebird.Create(AConnectionDefName, ASchema, ASqlGenerator);
     ctSQLite:

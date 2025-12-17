@@ -49,9 +49,6 @@ uses
 
   iORM.DB.ConnectionDef,
   iORM.DB.DataSet.Master,
-{$IFNDEF ioDelphiProfessional}
-  iORM.DB.ConnectionDef.MSSQLServer,
-{$ENDIF}
   iORM.DB.DataSet.Detail,
   iORM.DB.MemTable,
   iORM.LiveBindings.PrototypeBindSource.Custom,
@@ -86,10 +83,6 @@ begin
   RegisterSelectionEditor(TioSQLiteConnectionDef, TioConnectionDefSelectionEditor);
   RegisterComponents('iORM - Connections', [TioFirebirdConnectionDef]);
   RegisterSelectionEditor(TioFirebirdConnectionDef, TioConnectionDefSelectionEditor);
-{$IFNDEF ioDelphiProfessional}
-  RegisterComponents('iORM - Connections', [TioSQLServerConnectionDef]);
-  RegisterSelectionEditor(TioSQLServerConnectionDef, TioConnectionDefSelectionEditor);
-{$ENDIF}
   RegisterComponents('iORM - Connections', [TioSQLMonitor]);
 
   // Synchronization strategies

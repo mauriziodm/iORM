@@ -64,6 +64,7 @@ begin
     // Commit or rollback the transaction (if in transaction)
     if Schema.Status <> stCreate then
       io.RollbackTransaction(ConnectionDefName);
+    raise;
   end;
 end;
 

@@ -24,7 +24,6 @@ package iORM_FMX_FRX_RT;
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
-{$DEFINE ioDelphiProfessional}
 {$ENDIF IMPLICITBUILDING}
 {$DESCRIPTION 'iORM FastReport FMX runtime library'}
 {$LIBSUFFIX AUTO}

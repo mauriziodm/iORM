@@ -78,9 +78,7 @@ implementation
 uses
   iORM.DB.Connection, iORM.DB.SqLite.SqlDataConverter, iORM.DB.SqLite.SqlGenerator, iORM.Where.SqlItems, System.SysUtils,
   iORM.DB.QueryContainer, iORM.DB.TransactionCollection, iORM.DB.Firebird.SqlDataConverter, iORM.Exceptions, iORM.DB.Firebird.SqlGenerator,
-{$IFNDEF ioDelphiProfessional}
   iORM.DB.MSSqlServer.SqlGenerator, iORM.DB.MSSqlServer.SqlDataConverter,
-{$ENDIF}
   iORM.DB.SQL.Destination, FireDAC.Stan.Intf, iORM.Http.Connection, iORM.DB.Script, iORM.DB.Query.FireDAC,
   iORM.Abstraction;
 
@@ -217,10 +215,8 @@ begin
       Result := TioSqlDataConverterFirebird;
     ctSQLite:
       Result := TioSqlDataConverterSqLite;
-{$IFNDEF ioDelphiProfessional}
     ctSQLServer:
       Result := TioSqlDataConverterMSSqlServer;
-{$ENDIF}
   else
     raise EioGenericException.Create(ClassName + ': Connection type not found (SqlDataConverter).');
   end;
@@ -243,10 +239,8 @@ begin
       Result := TioSqlGeneratorFirebird;
     ctSQLite:
       Result := TioSqlGeneratorSqLite;
-{$IFNDEF ioDelphiProfessional}
     ctSQLServer:
       Result := TioSqlGeneratorMSSqlServer;
-{$ENDIF}
   else
     raise EioGenericException.Create(ClassName + ': Connection type not found (SqlGenerator).');
   end;

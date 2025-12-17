@@ -96,10 +96,8 @@ type
       const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoStanConnectionDef;
     class function NewFirebirdConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault: Boolean = True; const ASynchroStrategy_Client: IioSynchroStrategy_Client = nil;
       const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoStanConnectionDef;
-{$IFNDEF ioDelphiProfessional}
     class function NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword: String; const AAsDefault: Boolean = True; const ASynchroStrategy_Client: IioSynchroStrategy_Client = nil;
       const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoStanConnectionDef;
-{$ENDIF}
     class function NewMySQLConnectionDef(const AServer, ADatabase, AUserName, APassword, ACharSet: String; const AAsDefault: Boolean = True; const ASynchroStrategy_Client: IioSynchroStrategy_Client = nil;
       const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoStanConnectionDef;
     class procedure NewHttpConnection(const ABaseURL: String; const AAsDefault: Boolean = True; const ASynchroStrategy_Client: IioSynchroStrategy_Client = nil; const APersistent: Boolean = True;
@@ -466,7 +464,6 @@ begin
   end;
 end;
 
-{$IFNDEF ioDelphiProfessional}
 
 class function TioConnectionManager.NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword: String; const AAsDefault: Boolean = True; const ASynchroStrategy_Client: IioSynchroStrategy_Client = nil;
       const APersistent: Boolean = False; const APooled: Boolean = False; const AConnectionName: String = IO_CONNECTIONDEF_DEFAULTNAME): IIoStanConnectionDef;
@@ -485,7 +482,6 @@ begin
     _Unlock;
   end;
 end;
-{$ENDIF}
 
 { TioConnectionMonitor }
 

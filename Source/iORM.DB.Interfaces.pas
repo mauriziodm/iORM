@@ -71,11 +71,7 @@ type
   // Strategy class reference
   TioPersistenceStrategyRef = class of TioPersistenceStrategyIntf;
 
-  TioConnectionType = (ctFirebird, ctSQLite,
-{$IFNDEF ioDelphiProfessional}
-    ctSQLServer,
-{$ENDIF}
-    ctMySQL, ctHTTP);
+  TioConnectionType = (ctFirebird, ctSQLite, ctSQLServer, ctMySQL, ctHTTP);
 
   TioKeyGenerationTime = (kgtUndefined, kgtAfterInsert, kgtBeforeInsert);
 
