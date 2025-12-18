@@ -61,7 +61,7 @@ type
     // Fields related methods
     function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string; override;
     function BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string; override;
-    function BuildAlterFieldSql(const AField: IioDBBuilderSchemaField): string; override;
+    function BuildAlterFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     // Indexes related methods
@@ -111,7 +111,8 @@ begin
   Result := LSqlText;
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildAlterFieldSql(const AField: IioDBBuilderSchemaField): string;
+function TioDBBuilderSqlGenSQLite.BuildAlterFieldSql(const ATable: IioDBBuilderSchemaTable;
+  const AField: IioDBBuilderSchemaField): string;
 begin
   // Do nothing. Can be removed?
   Result := EmptyStr;

@@ -45,7 +45,8 @@ type
   TioDBBuilderStatus = (stClean, stUpdate, stCreate);
   TioDBBuilderTableChange = (taFields, taIndexes, taForeignKeys);
   TioDBBuilderTableChanges = set of TioDBBuilderTableChange;
-  TioDBBuilderFieldAlterStatus = (alFieldType, alFieldDefault, alFieldNotNull, alFieldPrecision, alFieldLength);
+  TioDBBuilderFieldAlterStatus = (alFieldType, alFieldDefault, alFieldNotNull, alFieldPrecisionIncreased,
+    alFieldPrecisionDecreased, alFieldLengthIncreased, alFieldLengthDecreased);
   TioDBBuilderFieldAlter = set of TioDBBuilderFieldAlterStatus;
   TioDBBuilderIndexChange = (icFields, icOrientation, icUnique);
   TioDBBuilderIndexChanges = set of TioDBBuilderIndexChange;
@@ -268,7 +269,7 @@ type
     function BuildTableNameSql(const ATable: IioDBBuilderSchemaTable): string;
     // Fields related methods
     function BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string;
-    function BuildAlterFieldSql(const AField: IioDBBuilderSchemaField): string;
+    function BuildAlterFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string;
     function BuildCreateFieldsSql(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string;
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
@@ -287,6 +288,7 @@ type
       const UpperCase: boolean = True): String;
     function BuildListAllIndexesSql: string;
     function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string;
+    function BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     // Foreign keys
     function BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
     function BuildDropForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; overload;
@@ -406,6 +408,7 @@ type
     property Schema: IioDBBuilderSchema read GetSchema;
     property Warnings: TStrings read GetWarnings;
   end;
+
 
 implementation
 

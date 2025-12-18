@@ -68,10 +68,11 @@ type
     function BuildTableExistsSql(const ATableName: string): string; override;
     // Fields related methods
     function BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string; override;
-    function BuildAlterFieldSql(const AField: IioDBBuilderSchemaField): string; override;
+    function BuildAlterFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
+    function BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     // PrimaryKey related methods
     function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string; override;
     // Indexes related methods
@@ -212,7 +213,8 @@ begin
   Result := Format('CREATE SEQUENCE %s;', [ASequenceName.ToUpper]);
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildAlterFieldSql(const AField: IioDBBuilderSchemaField): string;
+function TioDBBuilderSqlGenFirebird.BuildAlterFieldSql(const ATable: IioDBBuilderSchemaTable;
+  const AField: IioDBBuilderSchemaField): string;
 var
   LDefault: string;
   LTextBuilder: IioTextBuilder;
@@ -222,7 +224,7 @@ begin
   // Type
   if alFieldType in AField.Altered then
   begin
-    LTextBuilder.AddLine(Format('ALTER COLUMN %s TYPE %s', [AField.FieldName, TranslateFieldType(AField)]));
+    LTextBuilder.AddLine(Format('ALTER TABLE ALTER COLUMN %s TYPE %s;', [ATable.Name, AField.FieldName, TranslateFieldType(AField, False)]));
   end;
 
   // Default
@@ -231,15 +233,36 @@ begin
     LDefault := ExtractFieldDefaultValue(AField);
 
     if LDefault.IsEmpty then
-      LTextBuilder.Add(Format('ALTER COLUMN %s DROP DEFAULT', [AField.FieldName]))
+      LTextBuilder.Add(Format('ALTER TABLE %s ALTER COLUMN %s DROP DEFAULT;', [ATable.Name, AField.FieldName]))
     else
-      LTextBuilder.Add(Format('ALTER COLUMN %s SET DEFAULT %s', [AField.FieldName, LDefault]));
+      LTextBuilder.Add(Format('ALTER TABLE %s ALTER COLUMN %s SET DEFAULT %s;', [ATable.Name, AField.FieldName, LDefault]));
+
+    LTextBuilder.DecIndent;
+    LTextBuilder.AddLine(BuildEndAlterTableSql(ATable));
+  end;
+
+  // Length
+  if (alFieldLengthIncreased in AField.Altered) or (alFieldLengthDecreased in AField.Altered) or
+    (alFieldPrecisionIncreased in AField.Altered) or (alFieldPrecisionDecreased in AField.Altered) then
+  begin
+    // If length or precision was increased we can directly update the field with new settings
+    if (alFieldLengthIncreased in AField.Altered) or (alFieldPrecisionIncreased in AField.Altered) then
+    begin
+      LTextBuilder.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s TYPE %s;', [ATable.Name, AField.FieldName, TranslateFieldType(AField, False)]));
+    end
+    else if (alFieldLengthDecreased in AField.Altered) or (alFieldPrecisionDecreased in AField.Altered) then
+    begin
+      // If length or precision was decreased, we need to recreate the field.
+      LTextBuilder.Add(BuildRecreateFieldSql(ATable, AField));
+    end;
   end;
 
   // NotNull
   // Note: SET NOT NUL & DROP BOT NULL available only from firebird 3
   if alFieldNotNull in AField.Altered then
-    LTextBuilder.Add(Format('ALTER COLUMN %s %s NOT NULL', [AField.FieldName, IfThen(AField.FieldNotNull, 'SET', 'DROP')]));
+  begin
+    LTextBuilder.Add(Format('ALTER TABLE %s ALTER COLUMN %s %s NOT NULL;', [ATable.Name,  AField.FieldName, IfThen(AField.FieldNotNull, 'SET', 'DROP')]));
+  end;
 
   Result := LTextBuilder.Text;
 end;
@@ -413,6 +436,49 @@ begin
     '  (RDB$INDIXES.RDB$RELATION_NAME like ''%%s'')'
     , [ATable.Name]
   );
+end;
+
+function TioDBBuilderSqlGenFirebird.BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable;
+  const AField: IioDBBuilderSchemaField): string;
+var
+  LTempFieldName: string;
+  LDefault: string;
+  LNotNull: string;
+  LTextBuilder: IioTextBuilder;
+begin
+  Result := EmptyStr;
+
+  LTextBuilder := NewTextBuilder;
+
+  // 1 - We must create a temporary field with new settings (without not null flag if needed)
+  LTempFieldName := NewTempObjectName(GetMaxSqlIdentifierLength);
+
+  // Extract the default value if exists
+  LDefault := ExtractFieldDefaultValue(AField);
+
+  LTextBuilder.Add(Format(
+    'ALTER TABLE %s ADD %s %s %s;', [ATable.Name, LTempFieldName, TranslateFieldType(AField, False), LDefault]).Trim);
+
+  // 2 - Copy data from old field to temporary field
+  LTextBuilder.Add(Format(
+    'UPDATE %s SET %s = ''%s'';', [ATable.Name, LTempFieldName, AField.FieldName]).Trim);
+
+  // 3 - Remove old field (we consider the actual field name is also the old name)
+  LTextBuilder.Add(Format(
+    'ALTER TABLE %s DROP %s;', [ATable.Name, AField.FieldName]).Trim);
+
+  // 4 - Rename the temporary field to actual field name
+  LTextBuilder.Add(Format(
+    'ALTER TABLE %s ALTER COLUMN %s TO %s;', [ATable.Name, LTempFieldName, AField.FieldName]).Trim);
+
+  // 5 - Set the not null flag if needed
+  if AField.FieldNotNull then
+  begin
+    LTextBuilder.Add(Format(
+      'ALTER TABLE %s ALTER COLUMN %s SET NOT NULL;', [ATable.Name, AField.FieldName]).Trim);
+  end;
+
+  Result := LTextBuilder.Text;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSequenceExistsSql(const ASequenceName: string): string;
