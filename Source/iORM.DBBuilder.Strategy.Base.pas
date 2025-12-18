@@ -115,6 +115,8 @@ begin
   begin
     if taForeignKeys in LTable.Changes then
     begin
+      AScript.Schema.AddTitle(Format('Foreign keys for table ''%s''', [LTable.Name]));
+
       for LFK in LTable.ForeignKeys.Values do
       begin
         case LFK.Status of
@@ -166,6 +168,9 @@ begin
 
   if not Assigned(ATable) then
     raise EioArgumentNilException.Create(ClassName, 'AlterTable', 'ATable is not assigned.');
+
+  if (ATable.Status <> stUpdate) or (ATable.Changes = [taForeignKeys]) then
+    exit;
 
   AScript.Schema.AddTitle(Format('Altering table ''%s''', [ATable.Name]));
 end;
@@ -250,7 +255,6 @@ end;
 
 procedure TioDBBuilderStrategyBase.AddOrAlterFields(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
 var
-  LComma: string;
   LField: IioDBBuilderSchemaField;
 begin
   if not Assigned(AScript) then
@@ -259,20 +263,20 @@ begin
   if not Assigned(ATable) then
     raise EioArgumentNilException.Create(ClassName, 'AddOrAlterFields', 'ATable is not assigned.');
 
-  LComma := EmptyStr;
-
   for LField in ATable.Fields do
   begin
     case LField.Status of
       stCreate:
         begin
-          AScript.Schema.Add(LComma + SqlGenerator.BuildAddFieldSql(LField));
-          LComma := ', ';
+          AScript.Schema.Add(SqlGenerator.BuildBeginAlterTableSql(ATable));
+          AScript.Schema.IncIndentationLevel;
+          AScript.Schema.Add(SqlGenerator.BuildAddFieldSql(LField));
+          AScript.Schema.DecIndentationLevel;
+          AScript.Schema.Add(SqlGenerator.BuildEndAlterTableSql(ATable));
         end;
       stUpdate:
         begin
-          AScript.Schema.Add(LComma + SqlGenerator.BuildAlterFieldSql(LField));
-          LComma := ', ';
+          AScript.Schema.Add(SqlGenerator.BuildAlterFieldSql(ATable, LField));
         end;
     end;
   end;
@@ -399,5 +403,6 @@ function TioDBBuilderStrategyBase.GetSqlGenerator: IioDBBuilderSqlGenerator;
 begin
   Result := FSqlGenerator;
 end;
+
 
 end.

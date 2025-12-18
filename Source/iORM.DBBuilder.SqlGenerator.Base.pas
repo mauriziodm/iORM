@@ -58,6 +58,7 @@ type
     function ExtractFieldDefaultValue(const AField: IioDBBuilderSchemaField): string;
     function GetMaxSqlIdentifierLength: integer; virtual;
     function GetMinSqlIdentifierLength: integer; virtual;
+    function NewTempObjectName(const AMaxLength: integer): string;
     function NewTextBuilder: IioTextBuilder; overload;
     function NewTextBuilder(const AIndentation: TioIndentation): IioTextBuilder; overload;
     function ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
@@ -75,12 +76,13 @@ type
     function BuildTableNameSql(const ATable: IioDBBuilderSchemaTable): string; virtual;
     // Fields related methods
     function BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string; virtual; abstract;
-    function BuildAlterFieldSql(const AField: IioDBBuilderSchemaField): string; virtual; abstract;
+    function BuildAlterFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildCreateFieldsSql(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string; virtual;
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildFieldNameSql(const AField: IioDBBuilderSchemaField): string; virtual;
+    function BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     // PrimaryKeys related methods
     function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     // Index related methods
@@ -450,59 +452,22 @@ begin
   Result := 0;
 end;
 
+function TioDBBuilderSqlGenBase.NewTempObjectName(const AMaxLength: integer): string;
+begin
+  Result := TGUID.NewGuid.ToString.Replace('{', '').Replace('}', '').Replace('-', '').Substring(1, AMaxLength);
+end;
+
 function TioDBBuilderSqlGenBase.NewTextBuilder(const AIndentation: TioIndentation): IioTextBuilder;
 begin
   Result := TioTextBuilder.Create(AIndentation);
 end;
 
 function TioDBBuilderSqlGenBase.ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
-//var
-//  LVowels,
-//  LConsonants: TCharArray;
-//  LChar: Char;
-//  I: integer;
-
-//  procedure AppendChar(const AChar: Char; var ACharArray: TCharArray);
-//  begin
-//    SetLength(ACharArray, Length(ACharArray) + 1);
-//    ACharArray[High(ACharArray)] := AChar;
-//  end;
-
 begin
   Result := EmptyStr;
 
   if Length(AIdentifierName) <= AMaxLength then
     Exit(AIdentifierName);
-
-//  // Separate Vowels from Constants
-//  for LChar in AIdentifierName do
-//  begin
-//    if CharInSet(LChar.ToUpper, ['A', 'E', 'I', 'O', 'U']) then
-//      AppendChar(LChar, LVowels)
-//    else
-//      AppendChar(LChar, LConsonants);
-//  end;
-//
-//  // Add consonants
-//  if Length(LConsonants) >= AMaxLength then
-//    Result := LConsonants[0] + LConsonants[1] + LConsonants[2] + LConsonants[3]
-//  else
-//  begin
-//    for I := Low(LConsonants) to High(LConsonants) do
-//      Result := Result + LConsonants[I];
-//
-//    // Add vowels
-//    if (Length(Result) < AMaxLength) and (Length(LVowels) > 0) then
-//    begin
-//      I := 0;
-//
-//      while (I < Length(LVowels)) and (Length(Result) < AMaxLength) do
-//      begin
-//        Result := Result + LVowels[I];
-//        Inc(I);
-//      end;
-//    end;
-//  end;
 
   // Changed shortening algorithm because there are some cases where different input names comes to the same shortened
   // name (collitions).

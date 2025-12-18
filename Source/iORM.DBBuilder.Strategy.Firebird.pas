@@ -96,19 +96,18 @@ const
 
 procedure TioDBBuilderStrategyFirebird.AlterTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
 begin
+  inherited;
+
   if taFields in ATable.Changes then
   begin
-    AScript.Schema.Add(SqlGenerator.BuildBeginAlterTableSql(ATable));
-    AScript.Schema.IncIndentationLevel;
     AddOrAlterFields(AScript, ATable);
-    AScript.Schema.DecIndentationLevel;
-    AScript.Schema.Add(SqlGenerator.BuildEndAlterTableSql(ATable));
   end;
 
   if Schema.IndexesEnabled and (taIndexes in ATable.Changes) then
   begin
     AScript.Schema.AddEmpty;
     AddOrAlterIndexes(AScript, ATable);
+    AScript.Schema.AddEmpty;
   end;
 end;
 
@@ -149,6 +148,8 @@ procedure TioDBBuilderStrategyFirebird.CreateTable(const AScript: IioDBBuilderSq
 var
   LSqlGen: IioDBBuilderSqlGeneratorFirebird;
 begin
+  inherited;
+
   // Carlo Marona (2025-10-16): don't call inherited, it rewrites the method from scratch
   if not Assigned(AScript) then
     raise EioArgumentNilException.Create(ClassName, 'CreateTable', 'AScript is not assigned.');
@@ -488,7 +489,7 @@ begin
 
   LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildIndexModifiedSql(ATable, AIndex));
 
-  while not (Result or LQuery.Eof) do
+  while not LQuery.Eof do
   begin
     if not AIndex.CommaSepFieldList.ToUpper.Contains(LQuery.Fields.FieldByName('FieldName').AsString.ToUpper) then
       AIndex.AddChange(icFields);
@@ -501,10 +502,10 @@ begin
     if LQuery.Fields.FieldByName('IndexType').AsInteger <> Ord(AIndex.IndexOrientation) then
       AIndex.AddChange(icOrientation);
 
-    Result := AIndex.Changes <> [];
-
     LQuery.Next;
   end;
+
+  Result := AIndex.Changes <> [];
 end;
 
 function TioDBBuilderStrategyFirebird.IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
@@ -547,7 +548,11 @@ begin
   Result := ANewFieldLength <> AOldFieldLength;
   if Result then
   begin
-    AField.AddAltered(alFieldLength);
+    if ANewFieldLength > AOldFieldLength then
+      AField.AddAltered(alFieldLengthIncreased)
+    else
+      AField.AddAltered(alFieldLengthDecreased);
+
     WarningNewValueLessThanTheOldOne('field length', AOldFieldLength, ANewFieldLength, AField, ATable);
   end;
 end;
@@ -572,7 +577,11 @@ begin
   Result := AOldFieldPrecision <> ANewFieldPrecision;
   if Result then
   begin
-    AField.AddAltered(alFieldPrecision);
+    if ANewFieldPrecision > AOldFieldPrecision then
+      AField.AddAltered(alFieldPrecisionIncreased)
+    else
+      AField.AddAltered(alFieldPrecisionDecreased);
+
     WarningNewValueLessThanTheOldOne('field precision', AOldFieldPrecision, ANewFieldPrecision, AField, ATable);
   end;
 end;
