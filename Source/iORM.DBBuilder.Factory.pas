@@ -50,23 +50,18 @@ type
 
   TioDBBuilderFactory = class
   public
-    class function NewEngine(const AAddIndexes: Boolean = True; const AAddForeignKeys: Boolean = True): IioDBBuilderEngine; overload;
-    class function NewEngine(const AConnectionDefName: String; const AAddIndexes: Boolean = True;
-      const AAddForeignKeys: Boolean = True): IioDBBuilderEngine; overload;
-    class function NewDBAnalyzer(const AConnectionDefname: string; const ASchema: IioDBBuilderSchema;
-      const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderDBAnalyzer;
+    class function NewEngine(const AConnectionDefName: String; const AAddIndexes: Boolean = True; const AAddForeignKeys: Boolean = True): IioDBBuilderEngine;
+    class function NewDBAnalyzer(const AConnectionDefname: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderDBAnalyzer;
     class function NewSchema(const AConnectionDefName: String; const AIndexesEnabled, AForeignKeysEnabled: Boolean): IioDBBuilderSchema;
     class function NewSchemaBuilder: TioDBBuilderSchemaBuilderRef;
     class function NewSchemaField(const AContextProperty: IioProperty): IioDBBuilderSchemaField;
     class function NewSchemaFieldClassInfo: IioDBBuilderSchemaField;
-    class function NewSchemaFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
-      const AOnDeleteAction, AOnUpdateAction: TioFKAction): IioDBBuilderSchemaFK;
+    class function NewSchemaFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty; const AOnDeleteAction, AOnUpdateAction: TioFKAction): IioDBBuilderSchemaFK;
     class function NewSchemaIndex(const AIndex: ioIndex): IioDBBuilderSchemaIndex;
     class function NewSchemaTable(const AContextTable: IioTable): IioDBBuilderSchemaTable;
     class function NewSqlGenerator(const AConnectionDefName: String): IioDBBuilderSqlGenerator;
     class function NewSqlScript: IioDBBuilderSqlScript;
-    class function NewStrategy(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema;
-      const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderStrategy;
+    class function NewStrategy(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderStrategy;
   end;
 
 implementation
@@ -105,11 +100,6 @@ class function TioDBBuilderFactory.NewEngine(const AConnectionDefName: String; c
   const AAddForeignKeys: Boolean): IioDBBuilderEngine;
 begin
   Result := TioDBBuilderEngine.Create(AConnectionDefName, AAddIndexes, AAddForeignKeys);
-end;
-
-class function TioDBBuilderFactory.NewEngine(const AAddIndexes, AAddForeignKeys: Boolean): IioDBBuilderEngine;
-begin
-  Result := NewEngine('', AAddIndexes, AAddForeignKeys);
 end;
 
 class function TioDBBuilderFactory.NewSchema(const AConnectionDefName: String; const AIndexesEnabled,

@@ -635,8 +635,7 @@ type
     class function SQL(const ASQLDestination: IioSQLDestination): IioSQLDestination; overload;
 
     class function DBBuilder(const AAddIndexes: boolean = True; const AAddForeignKeys: boolean = True): IioDBBuilderEngine; overload;
-    class function DBBuilder(const AConnectionDefName: String; const AAddIndexes: boolean = True; const AAddForeignKeys: boolean = True)
-      : IioDBBuilderEngine; overload;
+    class function DBBuilder(const AConnectionDefName: String; const AAddIndexes: boolean = True; const AAddForeignKeys: boolean = True): IioDBBuilderEngine; overload;
 
     // Dependency Injection Container (DIC)
     class function di: TioDependencyInjectionRef;
@@ -1820,7 +1819,7 @@ end;
 
 class function io.DBBuilder(const AAddIndexes, AAddForeignKeys: boolean): IioDBBuilderEngine;
 begin
-  Result := GlobalFactory.DBBuilderFactory.NewEngine(AAddIndexes, AAddForeignKeys);
+  Result := GlobalFactory.DBBuilderFactory.NewEngine('', AAddIndexes, AAddForeignKeys);
 end;
 
 class function io.DefaultVCProvider: TioViewContextProvider;
