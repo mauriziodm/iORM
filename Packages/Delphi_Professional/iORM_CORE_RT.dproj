@@ -399,8 +399,11 @@
         <DCCReference Include="..\..\Source\iORM.Http.WebBroker.Producer.pas"/>
         <DCCReference Include="..\..\Source\iORM.PersistenceStrategy.Request.pas"/>
         <DCCReference Include="..\..\Source\iORM.Consts.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.DBAnalyzer.MSSqlServer.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Strategy.MSSqlServer.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DB.MSSqlServer.SqlDataConverter.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DBBuilder.DBAnalyzer.MSSqlServer.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlGenerator.MSSqlServer.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

@@ -43,6 +43,7 @@ package iORM_CORE_RT;
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
+{$DEFINE ioDelphiProfessional}
 {$ENDIF IMPLICITBUILDING}
 {$DESCRIPTION 'iORM Core Runtime'}
 {$LIBSUFFIX AUTO}
@@ -265,7 +266,10 @@ contains
   iORM.Http.WebBroker.Producer in '..\..\Source\iORM.Http.WebBroker.Producer.pas',
   iORM.PersistenceStrategy.Request in '..\..\Source\iORM.PersistenceStrategy.Request.pas',
   iORM.Consts in '..\..\Source\iORM.Consts.pas',
+  iORM.DBBuilder.Strategy.MSSqlServer in '..\..\Source\iORM.DBBuilder.Strategy.MSSqlServer.pas',
+  iORM.DB.MSSqlServer.SqlDataConverter in '..\..\Source\iORM.DB.MSSqlServer.SqlDataConverter.pas',
+  iORM.DB.MSSqlServer.SqlGenerator in '..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas',
   iORM.DBBuilder.DBAnalyzer.MSSqlServer in '..\..\Source\iORM.DBBuilder.DBAnalyzer.MSSqlServer.pas',
-  iORM.DBBuilder.Strategy.MSSqlServer in '..\..\Source\iORM.DBBuilder.Strategy.MSSqlServer.pas';
+  iORM.DBBuilder.SqlGenerator.MSSqlServer in '..\..\Source\iORM.DBBuilder.SqlGenerator.MSSqlServer.pas';
 
 end.
