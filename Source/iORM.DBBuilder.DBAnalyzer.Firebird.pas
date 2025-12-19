@@ -32,8 +32,10 @@ var
 begin
   inherited;
 
-  // Carlo Marona (2025-10-20): What's the need of a transaction????? I think it can be removed because no changes should be made by the analyzer on the db.
   // Start the transaction (if the DB already exists otherwise an error would occur)
+  // note: Maintain the transaction because the lifecycle of the physical connection
+  //        to the DB coincides with the lifecycle of the transaction, thus avoiding
+  //        the continuous creation and destruction of the connection
   if Schema.Status <> stCreate then
     io.StartTransaction(ConnectionDefName);
 

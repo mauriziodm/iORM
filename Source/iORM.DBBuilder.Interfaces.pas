@@ -41,12 +41,10 @@ uses
 
 type
 
-//  TioDBBuilderEngineStatus = (dbUptodate, dbNotExists, dbUpdatesNeeded);
   TioDBBuilderStatus = (stClean, stUpdate, stCreate);
   TioDBBuilderTableChange = (taFields, taIndexes, taForeignKeys);
   TioDBBuilderTableChanges = set of TioDBBuilderTableChange;
-  TioDBBuilderFieldAlterStatus = (alFieldType, alFieldDefault, alFieldNotNull, alFieldPrecisionIncreased,
-    alFieldPrecisionDecreased, alFieldLengthIncreased, alFieldLengthDecreased);
+  TioDBBuilderFieldAlterStatus = (alFieldType, alFieldDefault, alFieldNotNull, alFieldPrecisionIncreased, alFieldPrecisionDecreased, alFieldLengthIncreased, alFieldLengthDecreased);
   TioDBBuilderFieldAlter = set of TioDBBuilderFieldAlterStatus;
   TioDBBuilderIndexChange = (icFields, icOrientation, icUnique);
   TioDBBuilderIndexChanges = set of TioDBBuilderIndexChange;

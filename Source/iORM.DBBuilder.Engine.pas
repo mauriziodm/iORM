@@ -49,10 +49,10 @@ type
 
   TioDBBuilderEngine = class(TInterfacedObject, IioDBBuilderEngine)
   private
+    FAnalyzed: boolean;
+    FConnectionDefName: string;
     FSchema: IioDBBuilderSchema;
     FSqlGenerator: IioDBBuilderSqlGenerator;
-    FConnectionDefName: string;
-    FSchemaAnalyzed: boolean;
     procedure CreateDatabase;
     function GetWarnings: TStrings;
     function GetSchema: IioDBBuilderSchema;
@@ -102,24 +102,21 @@ type
     /// <param name="AddIndexes">Enable/Disable the creation table indexes.</param>
     /// <param name="AddForeignKeys">Enabled/Disable the creation of table foreign keys.</param>
     /// </summary>
-    procedure CreateOrUpdateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes: Boolean = True;
-      const AddForeignKeys: Boolean = True);
+    procedure CreateOrUpdateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes: Boolean = True; const AddForeignKeys: Boolean = True);
     /// <summary>
     ///  Creates the table using the schema passed.
     /// <param name="ATable">Schema of the table to be created/updated.</param>
     /// <param name="AddIndexes">Enable/Disable the creation table indexes.</param>
     /// <param name="AddForeignKeys">Enabled/Disable the creation of table foreign keys.</param>
     /// </summary>
-    procedure CreateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes: Boolean = True;
-      const AddForeignKeys: Boolean = True);
+    procedure CreateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes: Boolean = True; const AddForeignKeys: Boolean = True);
     /// <summary>
     ///  Updates the table using the schema passed.
     /// <param name="ATable">Schema of the table to be created/updated.</param>
     /// <param name="AddIndexes">Enable/Disable the creation table indexes.</param>
     /// <param name="AddForeignKeys">Enabled/Disable the creation of table foreign keys.</param>
     /// </summary>
-    procedure UpdateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes: Boolean = True;
-      const AddForeignKeys: Boolean = True);
+    procedure UpdateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes: Boolean = True; const AddForeignKeys: Boolean = True);
 
     property Analyzed: boolean read GetAnalyzed;
     property Schema: IioDBBuilderSchema read GetSchema;
@@ -149,7 +146,7 @@ var
 begin
   LDBAnalyzer := TioDBBuilderFactory.NewDBAnalyzer(FConnectionDefName, FSchema, FSqlGenerator);
   LDBAnalyzer.Analyze(ForceCreate);
-  FSchemaAnalyzed := True;
+  FAnalyzed := True;
 
   Result := FSchema.Status;
 end;
@@ -168,7 +165,7 @@ end;
 procedure TioDBBuilderEngine.BuildCreateOrUpdateDBSqlScript(const AScript: IioDBBuilderSqlScript);
 begin
   if not Analyzed then
-    raise EioGenericException.Create(ClassName, 'BuildCreateDBSqlScript', 'Unable to build SQL script: schema not analyzed');
+    raise EioGenericException.Create(ClassName, 'BuildCreateOrUpdateDBSqlScript', 'Unable to build SQL script: schema not analyzed');
 
   if not Assigned(AScript) then
     raise EioArgumentNilException.Create(ClassName, 'BuildCreateOrUpdateDBSqlScript', 'AScript is not assigned.');
@@ -208,7 +205,7 @@ end;
 
 constructor TioDBBuilderEngine.Create(const AConnectionDefName: String; const AddIndexes, AddForeignKeys: Boolean);
 begin
-  FSchemaAnalyzed := False;
+  FAnalyzed := False;
   FConnectionDefName := AConnectionDefName;
   FSchema := TioDBBuilderFactory.NewSchema(FConnectionDefName, AddIndexes, AddForeignKeys);
   FSqlGenerator := TioDBBuilderFactory.NewSqlGenerator(FConnectionDefName);
@@ -307,7 +304,7 @@ end;
 
 function TioDBBuilderEngine.GetAnalyzed: boolean;
 begin
-  Result := FSchemaAnalyzed;
+  Result := FAnalyzed;
 end;
 
 function TioDBBuilderEngine.GetSchema: IioDBBuilderSchema;
