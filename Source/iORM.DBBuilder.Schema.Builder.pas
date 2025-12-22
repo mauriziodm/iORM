@@ -110,7 +110,7 @@ begin
 //            [AMap.GetClassName, AMap.GetTable.TableName, AMap.GetTable.GetConnectionDefName, LProperty.GetName, LProperty.GetSqlFieldName(True), LProperty.GetRelationChildTypeName]));
 // ----------------------- ALLA FINE HO DECISO DI NON METTERLO ----------------------------------
         LDependentProperty := LProperty;
-        LSchemaTable := ASchema.FindTable(AMap.GetTable.TableName);
+        LSchemaTable := ASchema.FindTable(AMap.GetTable.TableName, False);
         if LSchemaTable <> nil then
           LSchemaTable.AddForeignKey(LResolvedChildTypeMap, AMap, LProperty, LDependentProperty.GetMetadata_FKOnDeleteAction,
             LDependentProperty.GetMetadata_FKOnUpdateAction);
@@ -118,7 +118,7 @@ begin
       else
       begin
         LDependentProperty := LResolvedChildTypeMap.GetProperties.GetPropertyByName(LProperty.GetRelationChildPropertyName);
-        LSchemaTable := ASchema.FindTable(LResolvedChildTypeMap.GetTable.TableName);
+        LSchemaTable := ASchema.FindTable(LResolvedChildTypeMap.GetTable.TableName, False);
         if LSchemaTable <> nil then
           LSchemaTable.AddForeignKey(AMap, LResolvedChildTypeMap, LDependentProperty, LProperty.GetMetadata_FKOnDeleteAction,
             LProperty.GetMetadata_FKOnUpdateAction);

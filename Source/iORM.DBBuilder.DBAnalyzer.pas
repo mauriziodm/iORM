@@ -43,11 +43,13 @@ type
 
   TioDBBuilderDBAnalyzer = class(TInterfacedObject, IioDBBuilderDBAnalyzer)
   private
+    FConnectionDefName: string;
+    FForceCreateNewDB: Boolean;
     FSchema: IioDBBuilderSchema;
     FSqlGenerator: IioDBBuilderSqlGenerator;
-    FConnectionDefName: string;
     FStrategy: IioDBBuilderStrategy;
     function GetConnectionDefName: string;
+    function GetForceToCreateNewDB: Boolean;
     function GetSchema: IioDBBuilderSchema;
     function GetSqlGenerator: IioDBBuilderSqlGenerator;
     function GetStrategy: IioDBBuilderStrategy;
@@ -55,6 +57,7 @@ type
     procedure AnalyzeFields(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure AnalyzeIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure AnalyzeForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
+
     function DatabaseExists: boolean; virtual;
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual;
@@ -69,9 +72,9 @@ type
     property SqlGenerator: IioDBBuilderSqlGenerator read GetSqlGenerator;
     property Strategy: IioDBBuilderStrategy read GetStrategy;
   public
-    constructor Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator);
+    constructor Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AForceCreateNewDB: Boolean);
 
-    procedure Analyze(const ForceCreate: boolean = false); virtual;
+    procedure Analyze; virtual;
   end;
 
 implementation
@@ -88,12 +91,13 @@ uses
 
 { TioDBBuilderDBAnalyzer }
 
-constructor TioDBBuilderDBAnalyzer.Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator);
+constructor TioDBBuilderDBAnalyzer.Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AForceCreateNewDB: Boolean);
 begin
+  FConnectionDefName := AConnectionDefName;
+  FForceCreateNewDB := AForceCreateNewDB;
   FSchema := ASchema;
   FSqlGenerator := ASqlGenerator;
-  FConnectionDefName := AConnectionDefName;
-  FStrategy := TioDBBuilderFactory.NewStrategy(AConnectionDefName, FSchema, FSqlGenerator);
+  FStrategy := TioDBBuilderFactory.NewStrategy(AConnectionDefName, ASchema, ASqlGenerator);
 end;
 
 function TioDBBuilderDBAnalyzer.DatabaseExists: boolean;
@@ -126,6 +130,11 @@ begin
   Result := FConnectionDefName;
 end;
 
+function TioDBBuilderDBAnalyzer.GetForceToCreateNewDB: Boolean;
+begin
+  Result := FForceCreateNewDB;
+end;
+
 function TioDBBuilderDBAnalyzer.GetSchema: IioDBBuilderSchema;
 begin
   Result := FSchema;
@@ -156,10 +165,10 @@ begin
   Result := Strategy.TableExists(ATable);
 end;
 
-procedure TioDBBuilderDBAnalyzer.Analyze(const ForceCreate: boolean);
+procedure TioDBBuilderDBAnalyzer.Analyze;
 begin
   // Analyze if the database exists and set  it's status
-  if ForceCreate or not DatabaseExists then
+  if FForceCreateNewDB or not DatabaseExists then
     Schema.Status := stCreate;
 end;
 
@@ -173,7 +182,8 @@ begin
     // Analyze the field and set it's status
     if not FieldExists(ATable, LField) then
       LField.Status := stCreate
-    else if FieldModified(ATable, LField) then
+    else
+    if FieldModified(ATable, LField) then
       LField.Status := stUpdate;
 
     // If the field status is not stClean (field modified) then
@@ -195,7 +205,8 @@ begin
   begin
     if not ForeignKeyExists(ATable, LFK) then
       LFK.Status := stCreate
-    else if ForeignKeyModified(ATable, LFK) then
+    else
+    if ForeignKeyModified(ATable, LFK) then
       LFK.Status := stUpdate;
 
     // If the foreign key status is not stClean (foreign key changed modified) then
@@ -217,7 +228,8 @@ begin
   begin
     if not IndexExists(ATable, LIndex) then
       LIndex.Status := stCreate
-    else if IndexModified(ATable, LIndex) then
+    else
+    if IndexModified(ATable, LIndex) then
       LIndex.Status := stUpdate;
 
     // If the index status is not stClean (index modified) then

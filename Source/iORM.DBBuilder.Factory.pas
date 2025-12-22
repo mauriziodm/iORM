@@ -51,7 +51,7 @@ type
   TioDBBuilderFactory = class
   public
     class function NewEngine(const AConnectionDefName: String; const AAddIndexes: Boolean = True; const AAddForeignKeys: Boolean = True): IioDBBuilderEngine;
-    class function NewDBAnalyzer(const AConnectionDefname: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderDBAnalyzer;
+    class function NewDBAnalyzer(const AConnectionDefname: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AForceCreateNewDB: Boolean): IioDBBuilderDBAnalyzer;
     class function NewSchema(const AConnectionDefName: String; const AIndexesEnabled, AForeignKeysEnabled: Boolean): IioDBBuilderSchema;
     class function NewSchemaBuilder: TioDBBuilderSchemaBuilderRef;
     class function NewSchemaField(const AContextProperty: IioProperty): IioDBBuilderSchemaField;
@@ -81,16 +81,15 @@ uses
 
 { TioDBBuilderFactory }
 
-class function TioDBBuilderFactory.NewDBAnalyzer(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema;
-  const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderDBAnalyzer;
+class function TioDBBuilderFactory.NewDBAnalyzer(const AConnectionDefname: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AForceCreateNewDB: Boolean): IioDBBuilderDBAnalyzer;
 begin
   case TioConnectionManager.GetConnectionInfo(AConnectionDefName).ConnectionType of
     ctFirebird:
-      Result := TioDBBuilderDBAnalyzerFirebird.Create(AConnectionDefName, ASchema, ASqlGenerator);
+      Result := TioDBBuilderDBAnalyzerFirebird.Create(AConnectionDefName, ASchema, ASqlGenerator, AForceCreateNewDB);
     ctSQLite:
-      Result := TioDBBuilderDBAnalyzerSQLite.Create(AConnectionDefName, ASchema, ASqlGenerator);
+      Result := TioDBBuilderDBAnalyzerSQLite.Create(AConnectionDefName, ASchema, ASqlGenerator, AForceCreateNewDB);
     ctSQLServer:
-      Result := TioDBBuilderDBAnalyzerMSSqlServer.Create(AConnectionDefName, ASchema, ASqlGenerator);
+      Result := TioDBBuilderDBAnalyzerMSSqlServer.Create(AConnectionDefName, ASchema, ASqlGenerator, AForceCreateNewDB);
   else
     raise EioGenericException.Create(ClassName, 'NewSqlGenerator', 'Connection type not found');
   end;

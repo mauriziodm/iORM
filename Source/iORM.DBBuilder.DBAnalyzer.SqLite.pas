@@ -17,7 +17,7 @@ type
     //  (to be created) obviously remain to be created.
     procedure SQLite_AllOrNothingPostProcess;
   public
-    procedure Analyze(const ForceCreate: boolean = false); override;
+    procedure Analyze; override;
   end;
 
 implementation
@@ -32,7 +32,7 @@ uses
 
 { TioDBBuilderDBAnalyzerSqLite }
 
-procedure TioDBBuilderDBAnalyzerSqLite.Analyze(const ForceCreate: boolean = false);
+procedure TioDBBuilderDBAnalyzerSqLite.Analyze;
 var
   LTable: IioDBBuilderSchemaTable;
 begin

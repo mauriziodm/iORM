@@ -61,7 +61,7 @@ type
     destructor Destroy; override;
 
     function FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
-    function FindTable(const ATableName: String): IioDBBuilderSchemaTable;
+    function FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
     procedure SequenceAddIfNotExists(const ASequenceName: String);
 
     property ForeignKeysEnabled: boolean read GetForeignKeysEnabled;
@@ -111,12 +111,17 @@ begin
   Result.IsTrueClass := AMap.GetTable.IsTrueClass;
 end;
 
-function TioDBBuilderSchema.FindTable(const ATableName: String): IioDBBuilderSchemaTable;
+function TioDBBuilderSchema.FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
 begin
   if FTables.ContainsKey(ATableName) then
     Result := FTables.Items[ATableName]
   else
-    Result := nil;
+  begin
+    if ARaiseIfNotFound then
+      raise EioGenericException.Create(ClassName, 'GetTableStatus', Format('SchemaTable not found "%s".', [ATableName]))
+    else
+      Result := nil;
+  end;
 end;
 
 function TioDBBuilderSchema.GetForeignKeysEnabled: Boolean;

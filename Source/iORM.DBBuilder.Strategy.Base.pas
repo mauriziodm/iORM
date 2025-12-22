@@ -115,19 +115,19 @@ begin
   begin
     if taForeignKeys in LTable.Changes then
     begin
-      AScript.Schema.AddTitle(Format('Foreign keys for table ''%s''', [LTable.Name]));
+      AScript.Body.AddTitle(Format('Foreign keys for table ''%s''', [LTable.Name]));
 
       for LFK in LTable.ForeignKeys.Values do
       begin
         case LFK.Status of
           stCreate:
             begin
-              AScript.Schema.Add(SqlGenerator.BuildAddForeignKeySql(LTable, LFK));
+              AScript.Body.Add(SqlGenerator.BuildAddForeignKeySql(LTable, LFK));
             end;
           stUpdate:
             begin
-              AScript.Schema.Add(SqlGenerator.BuildDropForeignKeySql(LTable, LFK));
-              AScript.Schema.Add(SqlGenerator.BuildAddForeignKeySql(LTable, LFK));
+              AScript.Body.Add(SqlGenerator.BuildDropForeignKeySql(LTable, LFK));
+              AScript.Body.Add(SqlGenerator.BuildAddForeignKeySql(LTable, LFK));
             end;
         end;
       end;
@@ -150,12 +150,12 @@ begin
     case LIndex.Status of
       stCreate:
         begin
-          AScript.Schema.Add(SqlGenerator.BuildAddIndexSql(ATable, LIndex));
+          AScript.Body.Add(SqlGenerator.BuildAddIndexSql(ATable, LIndex));
         end;
       stUpdate:
         begin
-          AScript.Schema.Add(SqlGenerator.BuildDropIndexSql(ATable, LIndex));
-          AScript.Schema.Add(SqlGenerator.BuildAddIndexSql(ATable, LIndex));
+          AScript.Body.Add(SqlGenerator.BuildDropIndexSql(ATable, LIndex));
+          AScript.Body.Add(SqlGenerator.BuildAddIndexSql(ATable, LIndex));
         end;
     end;
   end;
@@ -172,7 +172,7 @@ begin
   if (ATable.Status <> stUpdate) or (ATable.Changes = [taForeignKeys]) then
     exit;
 
-  AScript.Schema.AddTitle(Format('Altering table ''%s''', [ATable.Name]));
+  AScript.Body.AddTitle(Format('Altering table ''%s''', [ATable.Name]));
 end;
 
 constructor TioDBBuilderStrategyBase.Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator);
@@ -195,7 +195,7 @@ begin
   if not Assigned(AScript) then
     raise EioArgumentNilException.Create(ClassName, 'CreateForeignKeys', 'AScript is not assigned.');
 
-  AScript.Schema.AddTitle('Creating foreign keys');
+  AScript.Body.AddTitle('Creating foreign keys');
 
   for LTable in Schema.Tables.Values do
     CreateTableForeignKeys(AScript, LTable);
@@ -212,7 +212,7 @@ begin
     raise EioArgumentNilException.Create(ClassName, 'CreateForeignKeys', 'ATable is not assigned.');
 
   for LForeignKey in ATable.ForeignKeys.Values do
-    AScript.Schema.Add(SqlGenerator.BuildAddForeignKeySql(ATable, LForeignKey));
+    AScript.Body.Add(SqlGenerator.BuildAddForeignKeySql(ATable, LForeignKey));
 end;
 
 procedure TioDBBuilderStrategyBase.CreateIndexes(const AScript: IioDBBuilderSqlScript);
@@ -222,14 +222,14 @@ begin
   if not Assigned(AScript) then
     raise EioArgumentNilException.Create(ClassName, 'CreateIndexes', 'AScript is not assigned.');
 
-  AScript.Schema.AddTitle('Creating indexes');
+  AScript.Body.AddTitle('Creating indexes');
 
-  AScript.Schema.IncIndentationLevel;
+  AScript.Body.IncIndentationLevel;
 
   for LTable in Schema.Tables.Values do
     CreateTableIndexes(AScript, LTable);
 
-  AScript.Schema.DecIndentationLevel;
+  AScript.Body.DecIndentationLevel;
 end;
 
 procedure TioDBBuilderStrategyBase.CreateTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
@@ -245,11 +245,11 @@ begin
     if LIndex.Status = stUpdate then
     begin
       // If the index was changed, drops the old one then recreate it with updates
-      AScript.Schema.Add(SqlGenerator.BuildDropIndexSql(SqlGenerator.BuildIndexNameSql(ATable, LIndex)));
+      AScript.Body.Add(SqlGenerator.BuildDropIndexSql(SqlGenerator.BuildIndexNameSql(ATable, LIndex)));
     end;
 
     if (ATable.Status = stCreate) or (LIndex.Status in [stCreate, stUpdate]) then
-      AScript.Schema.Add(SqlGenerator.BuildAddIndexSql(ATable, LIndex));
+      AScript.Body.Add(SqlGenerator.BuildAddIndexSql(ATable, LIndex));
   end;
 end;
 
@@ -268,15 +268,15 @@ begin
     case LField.Status of
       stCreate:
         begin
-          AScript.Schema.Add(SqlGenerator.BuildBeginAlterTableSql(ATable));
-          AScript.Schema.IncIndentationLevel;
-          AScript.Schema.Add(SqlGenerator.BuildAddFieldSql(LField));
-          AScript.Schema.DecIndentationLevel;
-          AScript.Schema.Add(SqlGenerator.BuildEndAlterTableSql(ATable));
+          AScript.Body.Add(SqlGenerator.BuildBeginAlterTableSql(ATable));
+          AScript.Body.IncIndentationLevel;
+          AScript.Body.Add(SqlGenerator.BuildAddFieldSql(LField));
+          AScript.Body.DecIndentationLevel;
+          AScript.Body.Add(SqlGenerator.BuildEndAlterTableSql(ATable));
         end;
       stUpdate:
         begin
-          AScript.Schema.Add(SqlGenerator.BuildAlterFieldSql(ATable, LField));
+          AScript.Body.Add(SqlGenerator.BuildAlterFieldSql(ATable, LField));
         end;
     end;
   end;
@@ -308,7 +308,7 @@ begin
   if not Assigned(ATable) then
     raise EioArgumentNilException.Create(ClassName, 'CreateTable', 'ATable is not assigned.');
 
-  AScript.Schema.AddTitle(Format('Creating table ''%s''', [ATable.Name]));
+  AScript.Body.AddTitle(Format('Creating table ''%s''', [ATable.Name]));
 end;
 
 procedure TioDBBuilderStrategyBase.CreateTables(const AScript: IioDBBuilderSqlScript);
@@ -327,7 +327,7 @@ begin
   if Schema.Status = stCreate then
     Exit;
 
-  AScript.Schema.AddTitle('Dropping foreign keys');
+  AScript.Body.AddTitle('Dropping foreign keys');
 end;
 
 procedure TioDBBuilderStrategyBase.DropIndexes(const AScript: IioDBBuilderSqlScript);
@@ -338,7 +338,7 @@ begin
   if Schema.Status = stCreate then
     Exit;
 
-  AScript.Schema.AddTitle('Dropping indexes');
+  AScript.Body.AddTitle('Dropping indexes');
 end;
 
 procedure TioDBBuilderStrategyBase.DropTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
@@ -352,7 +352,7 @@ begin
   if Schema.Status = stCreate then
     Exit;
 
-  AScript.Schema.AddTitle('Dropping indexes');
+  AScript.Body.AddTitle('Dropping indexes');
 end;
 
 procedure TioDBBuilderStrategyBase.GenerateCreateDatabaseScript(const AScript: IioDBBuilderSqlScript);
@@ -365,7 +365,7 @@ begin
   AScript.ScriptBegin(ConnectionDefName, TioConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.DriverID);
 
   if Schema.WarningExists then
-    AScript.Schema.AddWarnings(Schema.Warnings);
+    AScript.Body.AddWarnings(Schema.Warnings);
 
   GenerateDatabaseObjects(AScript, True);
 
@@ -382,7 +382,7 @@ begin
   AScript.ScriptBegin(ConnectionDefName, TioConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.DriverID);
 
   if Schema.WarningExists then
-    AScript.Schema.AddWarnings(Schema.Warnings);
+    AScript.Body.AddWarnings(Schema.Warnings);
 
   GenerateDatabaseObjects(AScript, False);
 

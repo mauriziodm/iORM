@@ -12,7 +12,7 @@ uses
 type
   TioDBBuilderDBAnalyzerFirebird = class(TioDBBuilderDBAnalyzer)
   public
-    procedure Analyze(const ForceCreate: boolean = false); override;
+    procedure Analyze; override;
   end;
 
 implementation
@@ -26,7 +26,7 @@ uses
 
 { TioDBBuilderDBAnalyzerFirebird }
 
-procedure TioDBBuilderDBAnalyzerFirebird.Analyze(const ForceCreate: boolean = false);
+procedure TioDBBuilderDBAnalyzerFirebird.Analyze;
 var
   LTable: IioDBBuilderSchemaTable;
 begin
@@ -54,7 +54,7 @@ begin
         AnalyzeForeignKeys(LTable);
       end;
 
-      // If the table status is not stClean then schema status became stUpdate
+      // If the table status is not stClean (and DB status is not stCreate) then the schema status became stUpdate
       if (LTable.Status > stClean) and (Schema.Status <> stCreate) then
         Schema.Status := stUpdate;
     end;

@@ -47,6 +47,40 @@ uses
 
 type
 
+  TioDBBuilderEngine_New = class
+  private
+    FBuildForeignKeys: Boolean;
+    FBuildIndexes: Boolean;
+    FConnectionDefName: string;
+    FForceToCreateNewDB: Boolean;
+    FSchema: IioDBBuilderSchema;
+    FScript: IioDBBuilderSqlScript;
+    FSqlGenerator: IioDBBuilderSqlGenerator;
+
+    procedure CreateDatabasePhys;
+    function GetDBStatus: TioDBBuilderStatus;
+    function GetSchema: IioDBBuilderSchema;
+    function GetScript: IioDBBuilderSqlScript;
+    function GetTableStatus(const ATableName: String): TioDBBuilderStatus;
+    function GetWarnings: TStrings;
+  public
+    constructor Create(const AConnectionDefName: String; const ABuildIndexes, ABuildForeignKeys, AForceCreateNewDB: Boolean);
+
+    procedure CreateOrUpdateDB(const AForce: Boolean = False);
+    procedure CreateOrUpdateTable(const ATableName: String);
+    procedure RebuildSchema;
+    procedure RebuildScript;
+
+    property DBStatus: TioDBBuilderStatus read GetDBStatus;
+    property Schema: IioDBBuilderSchema read GetSchema;
+    property Script: IioDBBuilderSqlScript read GetScript;
+    property TableStatus[const TableName: String]: TioDBBuilderStatus read GetTableStatus;
+    property Warnings: TStrings read GetWarnings;
+  end;
+
+
+
+
   TioDBBuilderEngine = class(TInterfacedObject, IioDBBuilderEngine)
   private
     FAnalyzed: boolean;
@@ -144,8 +178,8 @@ function TioDBBuilderEngine.Analyze(const ForceCreate: boolean): TioDBBuilderSta
 var
   LDBAnalyzer: IioDBBuilderDBAnalyzer;
 begin
-  LDBAnalyzer := TioDBBuilderFactory.NewDBAnalyzer(FConnectionDefName, FSchema, FSqlGenerator);
-  LDBAnalyzer.Analyze(ForceCreate);
+  LDBAnalyzer := TioDBBuilderFactory.NewDBAnalyzer(FConnectionDefName, FSchema, FSqlGenerator, ForceCreate);
+  LDBAnalyzer.Analyze;
   FAnalyzed := True;
 
   Result := FSchema.Status;
@@ -302,21 +336,6 @@ begin
   TioDBFactory.Script(FConnectionDefName, LScript.SQL).Execute;
 end;
 
-function TioDBBuilderEngine.GetAnalyzed: boolean;
-begin
-  Result := FAnalyzed;
-end;
-
-function TioDBBuilderEngine.GetSchema: IioDBBuilderSchema;
-begin
-  Result := FSchema;
-end;
-
-function TioDBBuilderEngine.GetWarnings: TStrings;
-begin
-  Result := FSchema.Warnings;
-end;
-
 procedure TioDBBuilderEngine.UpdateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes: Boolean;
   const AddForeignKeys: Boolean);
 var
@@ -334,6 +353,120 @@ begin
 
   LStrategy.AlterTable(LScript, ATable);
   TioDBFactory.Script(FConnectionDefName, LScript.SQL).Execute;
+end;
+
+function TioDBBuilderEngine.GetAnalyzed: boolean;
+begin
+  Result := FAnalyzed;
+end;
+
+function TioDBBuilderEngine.GetSchema: IioDBBuilderSchema;
+begin
+  Result := FSchema;
+end;
+
+function TioDBBuilderEngine.GetWarnings: TStrings;
+begin
+  Result := FSchema.Warnings;
+end;
+
+{ TioDBBuilderEngine_New }
+constructor TioDBBuilderEngine_New.Create(const AConnectionDefName: String; const ABuildIndexes, ABuildForeignKeys, AForceCreateNewDB: Boolean);
+begin
+  FBuildForeignKeys := ABuildForeignKeys;
+  FBuildIndexes := ABuildIndexes;
+  FConnectionDefName := AConnectionDefName;
+  FForceToCreateNewDB := AForceCreateNewDB;
+
+  FSqlGenerator := TioDBBuilderFactory.NewSqlGenerator(AConnectionDefName);
+  RebuildSchema;
+  RebuildScript;
+end;
+
+procedure TioDBBuilderEngine_New.CreateDatabasePhys;
+begin
+  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).CreateDatabase;
+end;
+
+procedure TioDBBuilderEngine_New.CreateOrUpdateDB(const AForce: Boolean);
+begin
+  if (FSchema.Status > stClean) or AForce then
+  begin
+    if FSchema.WarningExists then
+      raise EioGenericException.Create(ClassName, 'CreateOrUpdateDB', 'Database must be updated but WARNINGS exists.' + sLineBreak + FSchema.Warnings.Text);
+
+    if FSchema.Status = stCreate then
+      CreateDatabasePhys;
+
+    TioDBFactory.Script(FConnectionDefName, FScript.SQL).Execute;
+
+    // Rebuilds schema and script to keep them consistent with the new situation
+    RebuildSchema;
+    RebuildScript;
+  end;
+end;
+
+procedure TioDBBuilderEngine_New.CreateOrUpdateTable(const ATableName: String);
+var
+  LScript: IioDBBuilderSqlScript;
+  LStrategy: IioDBBuilderStrategy;
+  LTable: IioDBBuilderSchemaTable;
+begin
+  LScript := TioDBBuilderFactory.NewSqlScript;
+  LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator);
+  LTable := FSchema.FindTable(ATableName);
+
+  case LTable.Status of
+    stUpdate:
+      LStrategy.CreateTable(LScript, LTable);
+    stCreate:
+      LStrategy.AlterTable(LScript, LTable);
+  end;
+
+  TioDBFactory.Script(FConnectionDefName, LScript.SQL).Execute;
+
+  // Rebuilds schema and script to keep them consistent with the new situation
+  RebuildSchema;
+  RebuildScript;
+end;
+
+function TioDBBuilderEngine_New.GetDBStatus: TioDBBuilderStatus;
+begin
+  Result := FSchema.Status;
+end;
+
+function TioDBBuilderEngine_New.GetSchema: IioDBBuilderSchema;
+begin
+  Result := FSchema;
+end;
+
+function TioDBBuilderEngine_New.GetScript: IioDBBuilderSqlScript;
+begin
+  Result := FScript;
+end;
+
+function TioDBBuilderEngine_New.GetTableStatus(const ATableName: String): TioDBBuilderStatus;
+begin
+  Result := FSchema.FindTable(ATableName).Status;
+end;
+
+function TioDBBuilderEngine_New.GetWarnings: TStrings;
+begin
+  Result := FSchema.Warnings;
+end;
+
+procedure TioDBBuilderEngine_New.RebuildSchema;
+begin
+  FSchema := TioDBBuilderFactory.NewSchema(FConnectionDefName, FBuildIndexes, FBuildForeignKeys);
+  TioDBBuilderFactory.NewDBAnalyzer(FConnectionDefName, FSchema, FSqlGenerator, FForceToCreateNewDB).Analyze;
+end;
+
+procedure TioDBBuilderEngine_New.RebuildScript;
+begin
+  case FSchema.Status of
+    stCreate: TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateCreateDatabaseScript(FScript);
+    stUpdate: TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateUpdateDatabaseScript(FScript);
+  end;
 end;
 
 end.

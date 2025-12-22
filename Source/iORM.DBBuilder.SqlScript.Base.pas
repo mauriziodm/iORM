@@ -16,7 +16,7 @@ type
   TioDBBuilderScriptSection = class(TInterfacedObject, IioDBBuilderSqlScriptSection)
   private
     FIndentation: TioIndentation;
-    FScript: TStringList;
+    FText: TStringList;
     FSeparatorLength: integer;
     function GetSQL: TStringList;
     function GetCurrentIndentation: TioIndentation;
@@ -46,13 +46,13 @@ type
   TioDBBuilderSqlScript = class(TInterfacedObject, IioDBBuilderSqlScript)
   private
     FFullScript: TStringList;
-    FSchemaScript: IioDBBuilderSqlScriptSection;
-    FScriptHeader: IioDBBuilderSqlScriptSection;
+    FScriptBody: IioDBBuilderSqlScriptSection;
     FScriptFooter: IioDBBuilderSqlScriptSection;
-    function GetSQL: TStringList;
+    FScriptHeader: IioDBBuilderSqlScriptSection;
+    function GetBody: IioDBBuilderSqlScriptSection;
     function GetFooter: IioDBBuilderSqlScriptSection;
     function GetHeader: IioDBBuilderSqlScriptSection;
-    function GetSchema: IioDBBuilderSqlScriptSection;
+    function GetSQL: TStringList;
   public
     constructor Create(const AIndentationWidth: integer = SCRIPT_INDENTATION_WIDTH; const ASeparatorLength: integer = SCRIPT_SEPARATOR_LENGTH);
     destructor Destroy; override;
@@ -65,9 +65,9 @@ type
     // This method works on footer section
     procedure ScriptEnd; virtual;
 
-    property Header: IioDBBuilderSqlScriptSection read GetHeader;
-    property Schema: IioDBBuilderSqlScriptSection read GetSchema;
+    property Body: IioDBBuilderSqlScriptSection read GetBody;
     property Footer: IioDBBuilderSqlScriptSection read GetFooter;
+    property Header: IioDBBuilderSqlScriptSection read GetHeader;
     property SQL: TStringList read GetSQL;
   end;
 
@@ -90,24 +90,24 @@ uses
 procedure TioDBBuilderScriptSection.Add(const AText: String; const UseIndent: boolean = True);
 begin
   if UseIndent then
-    FScript.Add(GetIndentation + AText)
+    FText.Add(GetIndentation + AText)
   else
-    FScript.Add(AText);
+    FText.Add(AText);
 end;
 
 procedure TioDBBuilderScriptSection.AddComment(const AText: String);
 begin
-  FScript.Add('-- ' + AText);
+  FText.Add('-- ' + AText);
 end;
 
 procedure TioDBBuilderScriptSection.AddEmpty;
 begin
-  FScript.Add('');
+  FText.Add('');
 end;
 
 procedure TioDBBuilderScriptSection.AddSeparator;
 begin
-  FScript.Add(StringOfChar('-', FSeparatorLength));
+  FText.Add(StringOfChar('-', FSeparatorLength));
 end;
 
 procedure TioDBBuilderScriptSection.AddTitle(const AText: String);
@@ -136,7 +136,7 @@ end;
 
 procedure TioDBBuilderScriptSection.Clear;
 begin
-  FScript.Clear;
+  FText.Clear;
 end;
 
 constructor TioDBBuilderScriptSection.Create(const AIndentationWidth: integer; const ASeparatorLength: integer);
@@ -145,7 +145,7 @@ begin
 
   FIndentation := TioIndentation.Create(AIndentationWidth);
   FSeparatorLength := ASeparatorLength;
-  FScript := TStringList.Create;
+  FText := TStringList.Create;
 end;
 
 procedure TioDBBuilderScriptSection.DecIndentationLevel;
@@ -155,7 +155,7 @@ end;
 
 destructor TioDBBuilderScriptSection.Destroy;
 begin
-  FScript.Free;
+  FText.Free;
 
   inherited;
 end;
@@ -172,7 +172,7 @@ end;
 
 function TioDBBuilderScriptSection.GetSQL: TStringList;
 begin
-  Result := FScript;
+  Result := FText;
 end;
 
 procedure TioDBBuilderScriptSection.IncIndentationLevel;
@@ -185,7 +185,7 @@ end;
 procedure TioDBBuilderSqlScript.Clear;
 begin
   Header.Clear;
-  Schema.Clear;
+  Body.Clear;
   Footer.Clear;
 end;
 
@@ -195,7 +195,7 @@ begin
 
   FFullScript := TStringList.Create;
   FScriptHeader := TioDBBuilderScriptSection.Create(AIndentationWidth, ASeparatorLength);
-  FSchemaScript := TioDBBuilderScriptSection.Create(AIndentationWidth, ASeparatorLength);
+  FScriptBody := TioDBBuilderScriptSection.Create(AIndentationWidth, ASeparatorLength);
   FScriptFooter := TioDBBuilderScriptSection.Create(AIndentationWidth, ASeparatorLength);
 end;
 
@@ -216,16 +216,16 @@ begin
   Result := FScriptHeader;
 end;
 
-function TioDBBuilderSqlScript.GetSchema: IioDBBuilderSqlScriptSection;
+function TioDBBuilderSqlScript.GetBody: IioDBBuilderSqlScriptSection;
 begin
-  Result := FSchemaScript;
+  Result := FScriptBody;
 end;
 
 function TioDBBuilderSqlScript.GetSQL: TStringList;
 begin
   FFullScript.Clear;
   FFullScript.AddStrings(FScriptHeader.SQL);
-  FFullScript.AddStrings(FSchemaScript.SQL);
+  FFullScript.AddStrings(FScriptBody.SQL);
   FFullScript.AddStrings(FScriptFooter.SQL);
 
   Result := FFullScript;

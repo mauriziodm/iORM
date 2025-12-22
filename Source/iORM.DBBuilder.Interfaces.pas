@@ -189,7 +189,7 @@ type
     procedure SetStatus(const Value: TioDBBuilderStatus);
 
     function FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
-    function FindTable(const ATableName: String): IioDBBuilderSchemaTable;
+    function FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
     procedure SequenceAddIfNotExists(const ASequenceName: String);
 
     property ForeignKeysEnabled: boolean read GetForeignKeysEnabled;
@@ -227,10 +227,10 @@ type
   IioDBBuilderSqlScript = interface
     ['{714A36B3-A44C-4D1D-A046-BC6222DCE2B7}']
 
-    function GetSQL: TStringList;
+    function GetBody: IioDBBuilderSqlScriptSection;
     function GetFooter: IioDBBuilderSqlScriptSection;
     function GetHeader: IioDBBuilderSqlScriptSection;
-    function GetSchema: IioDBBuilderSqlScriptSection;
+    function GetSQL: TStringList;
 
     // Full script clear
     procedure Clear;
@@ -240,9 +240,9 @@ type
     // This method works on footer section
     procedure ScriptEnd;
 
-    property Header: IioDBBuilderSqlScriptSection read GetHeader;
-    property Schema: IioDBBuilderSqlScriptSection read GetSchema;
+    property Body: IioDBBuilderSqlScriptSection read GetBody;
     property Footer: IioDBBuilderSqlScriptSection read GetFooter;
+    property Header: IioDBBuilderSqlScriptSection read GetHeader;
     property SQL: TStringList read GetSQL;
   end;
 
@@ -330,7 +330,7 @@ type
 
   IioDBBuilderDBAnalyzer = interface
     ['{8F82C20B-5D51-42FE-80D2-96F818F3B555}']
-    procedure Analyze(const ForceCreate: boolean = false);
+    procedure Analyze;
   end;
 
   IioDBBuilderEngine = interface
