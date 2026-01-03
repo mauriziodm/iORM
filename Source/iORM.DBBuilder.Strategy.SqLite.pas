@@ -31,17 +31,7 @@ type
     function IndexExists(const AIndexName: string): boolean; override;
     function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean; override;
 
-    function IsFieldTypeChanged(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField;
-      const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
-    function IsFieldNotNullChanged(const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField;
-      const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean; virtual;
-
-    procedure WarningTypeAffinity(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField;
-      const ATable: IioDBBuilderSchemaTable; const AInvalidTypeConversions: string); virtual;
-    procedure WarningNotNullCannotBeChanged(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField;
-      const ATable: IioDBBuilderSchemaTable); virtual;
-    procedure WarningNullBecomesNotNull(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField;
-      const ATable: IioDBBuilderSchemaTable); virtual;
+    function GetInvalidTypeConversions: string; override;
 
     procedure DropIndexes(const AScript: IioDBBuilderSqlScript); override;
     procedure DropTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); override;
@@ -70,6 +60,11 @@ const
 
 
 { TioDBBuilderSqLite }
+
+function TioDBBuilderStrategySqLite.GetInvalidTypeConversions: string;
+begin
+  Result := INVALID_FIELDTYPE_CONVERSIONS;
+end;
 
 procedure TioDBBuilderStrategySqLite.AlterTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
 begin
@@ -298,32 +293,6 @@ begin
   Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
 end;
 
-function TioDBBuilderStrategySqLite.IsFieldNotNullChanged(const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField;
-  const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean;
-begin
-  Result := AOldFieldNotNull <> ANewFieldNotNull;
-
-  if Result then
-  begin
-    AField.AddAltered(alFieldNotNull);
-    if AIsPermitted then
-      WarningNullBecomesNotNull(AOldFieldNotNull, AField, ATable)
-    else
-      WarningNotNullCannotBeChanged(AOldFieldNotNull, AField, ATable);
-  end;
-end;
-
-function TioDBBuilderStrategySqLite.IsFieldTypeChanged(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField;
-  const ATable: IioDBBuilderSchemaTable): Boolean;
-begin
-  Result := not SameText(AOldFieldType, ANewFieldType);
-  if Result then
-  begin
-    AField.AddAltered(alFieldType);
-    WarningTypeAffinity(AOldFieldType, ANewFieldType, AField, ATable, INVALID_FIELDTYPE_CONVERSIONS);
-  end;
-end;
-
 procedure TioDBBuilderStrategySqLite.RenameAllTablesToOld(const AScript: IioDBBuilderSqlScript);
 var
   LTable: IioDBBuilderSchemaTable;
@@ -353,33 +322,6 @@ var
 begin
   LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildTableExistsSql(ATable.Name));
   Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
-end;
-
-procedure TioDBBuilderStrategySqLite.WarningNotNullCannotBeChanged(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
-begin
-  if AField.FieldNotNull <> AOldFieldNotNull then
-    Schema.Warnings.Add(Format('Table ''%s'' field ''%s'' --> The not null setting cannot be changed automatically',
-      [ATable.Name, AField.FieldName]));
-end;
-
-procedure TioDBBuilderStrategySqLite.WarningNullBecomesNotNull(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
-begin
-  if AField.FieldNotNull and (not AOldFieldNotNull) and (not AField.FieldDefaultExists) then
-    Schema.Warnings.Add
-      (Format('Table ''%s'' field ''%s'' --> The not null setting is changed from false to true and a default value has not been specified',
-      [ATable.Name, AField.FieldName]));
-end;
-
-procedure TioDBBuilderStrategySqLite.WarningTypeAffinity(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable;
-  const AInvalidTypeConversions: string);
-var
-  LRequiredConversion: String;
-begin
-  LRequiredConversion := Format('[%s->%s]', [AOldFieldType, ANewFieldType]);
-
-  if ContainsText(AInvalidTypeConversions, LRequiredConversion) then
-    Schema.Warnings.Add(Format('Table ''%s'' field ''%s'' --> Invalid conversion from ''%s'' to ''%s''', [ATable.Name, AField.FieldName,
-      AOldFieldType, ANewFieldType]));
 end;
 
 end.

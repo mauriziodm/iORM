@@ -79,6 +79,16 @@ type
 
     procedure GenerateDatabaseObjects(const AScript: IioDBBuilderSqlScript; const Create: boolean); virtual; abstract;
 
+    // Warning methods (common to all databases)
+    procedure WarningTypeAffinity(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AInvalidTypeConversions: string); virtual;
+    procedure WarningNotNullCannotBeChanged(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure WarningNullBecomesNotNull(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
+
+    // Field change detection methods (common to all databases)
+    function GetInvalidTypeConversions: string; virtual; abstract;
+    function IsFieldTypeChanged(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
+    function IsFieldNotNullChanged(const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean; virtual;
+
     property ConnectionDefName: string read GetConnectionDefName;
     property Schema: IioDBBuilderSchema read GetSchema;
     property SqlGenerator: IioDBBuilderSqlGenerator read GetSqlGenerator;
@@ -93,6 +103,7 @@ implementation
 
 uses
   System.SysUtils,
+  System.StrUtils,
   System.Classes,
 
   iORM.Exceptions,
@@ -404,5 +415,57 @@ begin
   Result := FSqlGenerator;
 end;
 
+procedure TioDBBuilderStrategyBase.WarningTypeAffinity(const AOldFieldType, ANewFieldType: String;
+  const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AInvalidTypeConversions: string);
+var
+  LRequiredConversion: String;
+begin
+  LRequiredConversion := Format('[%s->%s]', [AOldFieldType, ANewFieldType]);
+  if ContainsText(AInvalidTypeConversions, LRequiredConversion) then
+    Schema.Warnings.Add(Format('Table ''%s'' field ''%s'' --> Invalid conversion from ''%s'' to ''%s''',
+      [ATable.Name, AField.FieldName, AOldFieldType, ANewFieldType]));
+end;
+
+procedure TioDBBuilderStrategyBase.WarningNotNullCannotBeChanged(const AOldFieldNotNull: Boolean;
+  const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
+begin
+  if AField.FieldNotNull <> AOldFieldNotNull then
+    Schema.Warnings.Add(Format('Table ''%s'' field ''%s'' --> The not null setting cannot be changed automatically',
+      [ATable.Name, AField.FieldName]));
+end;
+
+procedure TioDBBuilderStrategyBase.WarningNullBecomesNotNull(const AOldFieldNotNull: Boolean;
+  const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
+begin
+  if AField.FieldNotNull and (not AOldFieldNotNull) and (not AField.FieldDefaultExists) then
+    Schema.Warnings.Add
+      (Format('Table ''%s'' field ''%s'' --> The not null setting is changed from false to true and a default value has not been specified',
+      [ATable.Name, AField.FieldName]));
+end;
+
+function TioDBBuilderStrategyBase.IsFieldTypeChanged(const AOldFieldType, ANewFieldType: String;
+  const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean;
+begin
+  Result := not SameText(AOldFieldType, ANewFieldType);
+  if Result then
+  begin
+    AField.AddAltered(alFieldType);
+    WarningTypeAffinity(AOldFieldType, ANewFieldType, AField, ATable, GetInvalidTypeConversions);
+  end;
+end;
+
+function TioDBBuilderStrategyBase.IsFieldNotNullChanged(const AOldFieldNotNull, ANewFieldNotNull: Boolean;
+  const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean;
+begin
+  Result := AOldFieldNotNull <> ANewFieldNotNull;
+  if Result then
+  begin
+    AField.AddAltered(alFieldNotNull);
+    if AIsPermitted then
+      WarningNullBecomesNotNull(AOldFieldNotNull, AField, ATable)
+    else
+      WarningNotNullCannotBeChanged(AOldFieldNotNull, AField, ATable);
+  end;
+end;
 
 end.

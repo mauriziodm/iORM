@@ -41,16 +41,12 @@ type
     function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
     function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean; override;
 
-    function IsFieldTypeChanged(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
+    function GetInvalidTypeConversions: string; override;
     function IsFieldLengthChanged(const AOldFieldLength, ANewFieldLength: Smallint; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
     function IsFieldPrecisionChanged(const AOldFieldPrecision, ANewFieldPrecision: Smallint; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
     function IsFieldDecimalsChanged(const AOldFieldDecimals, ANewFieldDecimals: Smallint; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
-    function IsFieldNotNullChanged(const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean; virtual;
     function IsBlobSubTypeChanged(const AOldBlobSubType, ANewBlobSubType: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean; virtual;
 
-    procedure WarningTypeAffinity(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AInvalidTypeConversions: string); virtual;
-    procedure WarningNotNullCannotBeChanged(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
-    procedure WarningNullBecomesNotNull(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
     procedure WarningNewValueLessThanTheOldOne(const AValueName: String; const AOldValue, ANewValue: Integer; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
     procedure WarningValueChanged(const AValueName, AOldValue, ANewValue: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
   public
@@ -75,13 +71,18 @@ uses
 
 const
   INVALID_FIELDTYPE_CONVERSIONS =
-    '[timestamp->decimal][timestamp->numeric][timestamp->integer][date->decimal][date - > numeric]' +
+    '[timestamp->decimal][timestamp->numeric][timestamp->integer][date->decimal][date->numeric]' +
     '[date->integer][time->numeric][time->decimal][time->integer][varchar->decimal][varchar->integer][varchar->date][varchar->time]' +
     '[varchar->datetime][char->decimal][char->integer][char->date][char->time][char->datetime]';
 
 
 
 { TioDBBuilderFirebird }
+
+function TioDBBuilderStrategyFirebird.GetInvalidTypeConversions: string;
+begin
+  Result := INVALID_FIELDTYPE_CONVERSIONS;
+end;
 
 procedure TioDBBuilderStrategyFirebird.AlterTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
 begin
@@ -543,20 +544,6 @@ begin
   end;
 end;
 
-function TioDBBuilderStrategyFirebird.IsFieldNotNullChanged(const AOldFieldNotNull, ANewFieldNotNull: Boolean;
-  const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean;
-begin
-  Result := AOldFieldNotNull <> ANewFieldNotNull;
-  if Result then
-  begin
-    AField.AddAltered(alFieldNotNull);
-    if AIsPermitted then
-      WarningNullBecomesNotNull(AOldFieldNotNull, AField, ATable)
-    else
-      WarningNotNullCannotBeChanged(AOldFieldNotNull, AField, ATable);
-  end;
-end;
-
 function TioDBBuilderStrategyFirebird.IsFieldPrecisionChanged(const AOldFieldPrecision, ANewFieldPrecision: Smallint;
   const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean;
 begin
@@ -569,17 +556,6 @@ begin
       AField.AddAltered(alFieldPrecisionDecreased);
 
     WarningNewValueLessThanTheOldOne('field precision', AOldFieldPrecision, ANewFieldPrecision, AField, ATable);
-  end;
-end;
-
-function TioDBBuilderStrategyFirebird.IsFieldTypeChanged(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField;
-  const ATable: IioDBBuilderSchemaTable): Boolean;
-begin
-  Result := not SameText(AOldFieldType, ANewFieldType);
-  if Result then
-  begin
-    AField.AddAltered(alFieldType);
-    WarningTypeAffinity(AOldFieldType, ANewFieldType, AField, ATable, INVALID_FIELDTYPE_CONVERSIONS);
   end;
 end;
 
@@ -612,34 +588,6 @@ begin
   if ANewValue < AOldValue then
     Schema.Warnings.Add(Format('Table ''%s'' field ''%s'' --> The new %s cannot be less than the old one (old = %d, new = %d)',
       [ATable.Name, AField.FieldName, AValueName, AOldValue, ANewValue]));
-end;
-
-procedure TioDBBuilderStrategyFirebird.WarningNotNullCannotBeChanged(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField;
-  const ATable: IioDBBuilderSchemaTable);
-begin
-  if AField.FieldNotNull <> AOldFieldNotNull then
-    Schema.Warnings.Add(Format('Table ''%s'' field ''%s'' --> The not null setting cannot be changed automatically',
-      [ATable.Name, AField.FieldName]));
-end;
-
-procedure TioDBBuilderStrategyFirebird.WarningNullBecomesNotNull(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField;
-  const ATable: IioDBBuilderSchemaTable);
-begin
-  if AField.FieldNotNull and (not AOldFieldNotNull) and (not AField.FieldDefaultExists) then
-    Schema.Warnings.Add
-      (Format('Table ''%s'' field ''%s'' --> The not null setting is changed from false to true and a default value has not been specified',
-      [ATable.Name, AField.FieldName]));
-end;
-
-procedure TioDBBuilderStrategyFirebird.WarningTypeAffinity(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField;
-  const ATable: IioDBBuilderSchemaTable; const AInvalidTypeConversions: string);
-var
-  LRequiredConversion: String;
-begin
-  LRequiredConversion := Format('[%s->%s]', [AOldFieldType, ANewFieldType]);
-  if ContainsText(AInvalidTypeConversions, LRequiredConversion) then
-    Schema.Warnings.Add(Format('Table ''%s'' field ''%s'' --> Invalid conversion from ''%s'' to ''%s''', [ATable.Name, AField.FieldName,
-      AOldFieldType, ANewFieldType]));
 end;
 
 procedure TioDBBuilderStrategyFirebird.WarningValueChanged(const AValueName, AOldValue, ANewValue: String;

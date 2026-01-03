@@ -57,6 +57,7 @@ type
     procedure AnalyzeFields(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure AnalyzeIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure AnalyzeForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure AnalyzeTables; virtual;
 
     property ConnectionDefName: string read GetConnectionDefName;
     property Schema: IioDBBuilderSchema read GetSchema;
@@ -121,6 +122,33 @@ begin
   // Analyze if the database exists and set  it's status
   if FForceCreateNewDB or not FStrategy.DatabaseExists then
     Schema.Status := stCreate;
+
+  // Start the transaction (if the DB already exists otherwise an error would occur)
+  // note: Maintain the transaction because the lifecycle of the physical connection
+  //        to the DB coincides with the lifecycle of the transaction, thus avoiding
+  //        the continuous creation and destruction of the connection
+  if Schema.Status <> stCreate then
+    io.StartTransaction(ConnectionDefName);
+
+  try
+    // Analyze all tables (virtual method implemented by descendants)
+    AnalyzeTables;
+
+    // Commit the transaction (if in transaction)
+    if Schema.Status <> stCreate then
+      io.CommitTransaction(ConnectionDefName);
+  except
+    // Rollback the transaction (if in transaction)
+    if Schema.Status <> stCreate then
+      io.RollbackTransaction(ConnectionDefName);
+    raise;
+  end;
+end;
+
+procedure TioDBBuilderDBAnalyzer.AnalyzeTables;
+begin
+  // Default implementation does nothing
+  // Descendants override this method to implement table analysis logic
 end;
 
 procedure TioDBBuilderDBAnalyzer.AnalyzeFields(const ATable: IioDBBuilderSchemaTable);
