@@ -73,9 +73,9 @@ type
     function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
     function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
     function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; overload; virtual; abstract;
-    function IndexExists(const AIndexName: string): boolean; overload; virtual; abstract;
+    function IndexExists(const AIndexName: string): boolean; overload; virtual;
     function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; virtual; abstract;
-    function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean; virtual; abstract;
+    function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
 
     procedure GenerateDatabaseObjects(const AScript: IioDBBuilderSqlScript; const Create: boolean); virtual; abstract;
 
@@ -88,6 +88,9 @@ type
     function GetInvalidTypeConversions: string; virtual; abstract;
     function IsFieldTypeChanged(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
     function IsFieldNotNullChanged(const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean; virtual;
+
+    // Helper method for existence queries (common pattern)
+    function ExecuteExistsQuery(const ASql: string): Boolean; virtual;
 
     property ConnectionDefName: string read GetConnectionDefName;
     property Schema: IioDBBuilderSchema read GetSchema;
@@ -466,6 +469,29 @@ begin
     else
       WarningNotNullCannotBeChanged(AOldFieldNotNull, AField, ATable);
   end;
+end;
+
+function TioDBBuilderStrategyBase.ExecuteExistsQuery(const ASql: string): Boolean;
+var
+  LQuery: IioQuery;
+begin
+  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, ASql);
+  Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
+end;
+
+function TioDBBuilderStrategyBase.TableExists(const ATable: IioDBBuilderSchemaTable): Boolean;
+begin
+  Result := ExecuteExistsQuery(SqlGenerator.BuildTableExistsSql(ATable.Name));
+end;
+
+function TioDBBuilderStrategyBase.IndexExists(const AIndexName: string): boolean;
+begin
+  Result := False;
+
+  if AIndexName.IsEmpty then
+    Exit;
+
+  Result := ExecuteExistsQuery(SqlGenerator.BuildIndexExistsSql(AIndexName));
 end;
 
 end.

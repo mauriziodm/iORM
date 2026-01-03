@@ -28,8 +28,6 @@ type
     function DatabaseExists: Boolean; override;
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
-    function IndexExists(const AIndexName: string): boolean; override;
-    function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean; override;
 
     function GetInvalidTypeConversions: string; override;
 
@@ -285,14 +283,6 @@ begin
   AScript.Body.AddEmpty;
 end;
 
-function TioDBBuilderStrategySqLite.IndexExists(const AIndexName: string): boolean;
-var
-  LQuery: IioQuery;
-begin
-  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildIndexExistsSql(AIndexName));
-  Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
-end;
-
 procedure TioDBBuilderStrategySqLite.RenameAllTablesToOld(const AScript: IioDBBuilderSqlScript);
 var
   LTable: IioDBBuilderSchemaTable;
@@ -314,14 +304,6 @@ end;
 function TioDBBuilderStrategySqLite.Table2OldTableName(const ATable: IioDBBuilderSchemaTable): String;
 begin
   Result := Format('_%s_old', [ATable.Name.ToLower]);
-end;
-
-function TioDBBuilderStrategySqLite.TableExists(const ATable: IioDBBuilderSchemaTable): Boolean;
-var
-  LQuery: IioQuery;
-begin
-  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildTableExistsSql(ATable.Name));
-  Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
 end;
 
 end.

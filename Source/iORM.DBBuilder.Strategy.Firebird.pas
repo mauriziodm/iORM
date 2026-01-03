@@ -37,9 +37,7 @@ type
     procedure GenerateDatabaseObjects(const AScript: IioDBBuilderSqlScript; const Create: boolean); override;
 
     function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
-    function IndexExists(const AIndexName: string): boolean; override;
     function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
-    function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean; override;
 
     function GetInvalidTypeConversions: string; override;
     function IsFieldLengthChanged(const AOldFieldLength, ANewFieldLength: Smallint; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
@@ -454,19 +452,6 @@ begin
   Supports(SqlGenerator, IioDBBuilderSqlGeneratorFirebird, Result);
 end;
 
-function TioDBBuilderStrategyFirebird.IndexExists(const AIndexName: string): boolean;
-var
-  LQuery: IioQuery;
-begin
-  Result := False;
-
-  if AIndexName.IsEmpty then
-    Exit;
-
-  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildIndexExistsSql(AIndexName));
-  Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
-end;
-
 function TioDBBuilderStrategyFirebird.IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
 var
   LQuery: IioQuery;
@@ -572,14 +557,6 @@ begin
 
   LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, LSqlGen.BuildSequenceExistsSql(ASequenceName));
   Result := LQuery.Fields[0].AsInteger > 0;
-end;
-
-function TioDBBuilderStrategyFirebird.TableExists(const ATable: IioDBBuilderSchemaTable): Boolean;
-var
-  LQuery: IioQuery;
-begin
-  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildTableExistsSql(ATable.Name));
-  Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
 end;
 
 procedure TioDBBuilderStrategyFirebird.WarningNewValueLessThanTheOldOne(const AValueName: String; const AOldValue, ANewValue: Integer;

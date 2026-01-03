@@ -6,7 +6,9 @@
       "Bash(xargs ls:*)",
       "Bash(find:*)",
       "Bash(git diff:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nRefactoring DBBuilder Fase 2: estratto pattern query esistenza\n\n- Aggiunto ExecuteExistsQuery helper in Strategy base\n- Spostato TableExists in base class usando il helper\n- Spostato IndexExists\\(string\\) in base class usando il helper\n- Eliminato ~30 linee di codice duplicato\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ]
   }
 }
