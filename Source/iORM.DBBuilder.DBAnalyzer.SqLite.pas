@@ -48,7 +48,7 @@ begin
     begin
       // Analyze the table and set it's status
       // Note: If the schema status is dbsCreate then all the tables must be dbsCreate (obviously)
-      if (Schema.Status = stCreate) or not TableExists(LTable) then
+      if (Schema.Status = stCreate) or not Strategy.TableExists(LTable) then
         LTable.Status := stCreate
       else
         AnalyzeFields(LTable);

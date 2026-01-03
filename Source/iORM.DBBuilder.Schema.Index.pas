@@ -14,14 +14,14 @@ type
 
   TioDBBuilderSchemaIndex = class(TInterfacedObject, IioDBBuilderSchemaIndex)
   private
-    FContextProperty: IioProperty;
-    FStatus: TioDBBuilderStatus;
     FChanges: TioDBBuilderIndexChanges;
-    FIndexName: String;
     FCommaSepFieldList: String;
-    FIndexOrientation: TioIndexOrientation;
-    FUnique: Boolean;
+    FContextProperty: IioProperty;
     FExplicitName: boolean;
+    FIndexName: String;
+    FIndexOrientation: TioIndexOrientation;
+    FStatus: TioDBBuilderStatus;
+    FUnique: Boolean;
     // Status
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const Value: TioDBBuilderStatus);
