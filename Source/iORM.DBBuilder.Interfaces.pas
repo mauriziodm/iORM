@@ -264,7 +264,6 @@ type
     function BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
     function BuildEndCreateTableSql(const ATable: IioDBBuilderSchemaTable): string;
     function BuildTableExistsSql(const ATableName: string): string;
-    function BuildTableNameSql(const ATable: IioDBBuilderSchemaTable): string;
     // Fields related methods
     function BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string;
     function BuildAlterFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
