@@ -51,46 +51,48 @@ type
     function GetSchema: IioDBBuilderSchema;
     function GetSqlGenerator: IioDBBuilderSqlGenerator;
     function GetConnectionDefName: string;
+    // Helper method for existence queries (common pattern)
+    function _ExecuteExistsQuery(const ASql: string): Boolean;
   protected
-    procedure AddOrAlterFields(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); virtual;
-    procedure AddOrAlterForeignKeys(const AScript: IioDBBuilderSqlScript); virtual;
-    procedure AddOrAlterIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); virtual;
-    procedure AlterTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); virtual;
+    // Database
     procedure CreateDatabase; virtual; abstract;
-    procedure CreateForeignKeys(const AScript: IioDBBuilderSqlScript); overload; virtual;
-    procedure CreateIndexes(const AScript: IioDBBuilderSqlScript); overload; virtual;
+    function DatabaseExists: Boolean; virtual; abstract;
+    // Tables
+    procedure AlterTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); virtual;
     procedure CreateOrAlterTables(const AScript: IioDBBuilderSqlScript); virtual;
     procedure CreateTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); virtual;
-    procedure CreateTableForeignKeys(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); overload; virtual;
-    procedure CreateTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); overload; virtual;
     procedure CreateTables(const AScript: IioDBBuilderSqlScript); virtual;
-    function DatabaseExists: Boolean; virtual; abstract;
-    procedure DropForeignKeys(const AScript: IioDBBuilderSqlScript); virtual;
-    procedure DropIndexes(const AScript: IioDBBuilderSqlScript); virtual;
-    procedure DropTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); virtual;
+    function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
+    // Fields
+    procedure AddOrAlterFields(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure CreateTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); overload; virtual;
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
-    function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
-    function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
-    function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; overload; virtual; abstract;
-    function IndexExists(const AIndexName: string): boolean; overload; virtual;
-    function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; virtual; abstract;
-    function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
-
-    procedure GenerateDatabaseObjects(const AScript: IioDBBuilderSqlScript; const Create: boolean); virtual; abstract;
-
-    // Warning methods (common to all databases)
-    procedure WarningTypeAffinity(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AInvalidTypeConversions: string); virtual;
-    procedure WarningNotNullCannotBeChanged(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
-    procedure WarningNullBecomesNotNull(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
-
     // Field change detection methods (common to all databases)
     function GetInvalidTypeConversions: string; virtual; abstract;
     function IsFieldTypeChanged(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
     function IsFieldNotNullChanged(const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean; virtual;
+    // Indexes
+    procedure AddOrAlterIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure CreateIndexes(const AScript: IioDBBuilderSqlScript); overload; virtual;
+    procedure DropIndexes(const AScript: IioDBBuilderSqlScript); virtual;
+    procedure DropTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); virtual;
+    function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; overload; virtual; abstract;
+    function IndexExists(const AIndexName: string): boolean; overload; virtual;
+    function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; virtual; abstract;
+    // ForeignKeys
+    procedure AddOrAlterForeignKeys(const AScript: IioDBBuilderSqlScript); virtual;
+    procedure CreateForeignKeys(const AScript: IioDBBuilderSqlScript); overload; virtual;
+    procedure CreateTableForeignKeys(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); overload; virtual;
+    procedure DropForeignKeys(const AScript: IioDBBuilderSqlScript); virtual;
+    function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
+    function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
+    // Warnings
+    procedure WarningTypeAffinity(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AInvalidTypeConversions: string); virtual;
+    procedure WarningNotNullCannotBeChanged(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure WarningNullBecomesNotNull(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
 
-    // Helper method for existence queries (common pattern)
-    function ExecuteExistsQuery(const ASql: string): Boolean; virtual;
+    procedure GenerateDatabaseObjects(const AScript: IioDBBuilderSqlScript; const Create: boolean); virtual; abstract;
 
     property ConnectionDefName: string read GetConnectionDefName;
     property Schema: IioDBBuilderSchema read GetSchema;
@@ -471,7 +473,7 @@ begin
   end;
 end;
 
-function TioDBBuilderStrategyBase.ExecuteExistsQuery(const ASql: string): Boolean;
+function TioDBBuilderStrategyBase._ExecuteExistsQuery(const ASql: string): Boolean;
 var
   LQuery: IioQuery;
 begin
@@ -481,7 +483,7 @@ end;
 
 function TioDBBuilderStrategyBase.TableExists(const ATable: IioDBBuilderSchemaTable): Boolean;
 begin
-  Result := ExecuteExistsQuery(SqlGenerator.BuildTableExistsSql(ATable.Name));
+  Result := _ExecuteExistsQuery(SqlGenerator.BuildTableExistsSql(ATable.Name));
 end;
 
 function TioDBBuilderStrategyBase.IndexExists(const AIndexName: string): boolean;
@@ -491,7 +493,7 @@ begin
   if AIndexName.IsEmpty then
     Exit;
 
-  Result := ExecuteExistsQuery(SqlGenerator.BuildIndexExistsSql(AIndexName));
+  Result := _ExecuteExistsQuery(SqlGenerator.BuildIndexExistsSql(AIndexName));
 end;
 
 end.

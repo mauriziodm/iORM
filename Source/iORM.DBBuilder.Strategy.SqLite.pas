@@ -18,22 +18,24 @@ type
     procedure RenameAllTablesToOld(const AScript: IioDBBuilderSqlScript); // For SQLite, if the DB is to be modified (not created) it renames all tables with "_old"
     function Table2OldTableName(const ATable: IioDBBuilderSchemaTable): String;
   protected
+    // Database
+    procedure CreateDatabase; override;
+    function DatabaseExists: Boolean; override;
+    // Tables
     procedure AlterTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); override;
     procedure CreateTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); override;
-
-    procedure CreateDatabase; override;
-
-    procedure GenerateDatabaseObjects(const AScript: IioDBBuilderSqlScript; const Create: boolean); override;
-
-    function DatabaseExists: Boolean; override;
+    // Fields
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
-
+    // Field change detection methods
     function GetInvalidTypeConversions: string; override;
-
+    // Indexes
     procedure DropIndexes(const AScript: IioDBBuilderSqlScript); override;
     procedure DropTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); override;
+
+    procedure GenerateDatabaseObjects(const AScript: IioDBBuilderSqlScript; const Create: boolean); override;
   public
+
   end;
 
 
