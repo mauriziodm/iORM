@@ -1,4 +1,4 @@
-{
+﻿{
   ****************************************************************************
   *                                                                          *
   *           iORM - (interfaced ORM)                                        *
@@ -52,6 +52,10 @@ type
     /// (an empty string disable the cacheability of a query)
     class function ComposeQueryIdentity(const AContext: IioContext; const AIdentity: String; const AForceCacheable: Boolean): String;
   public
+    // Raw query methods (for DBBuilder and other low-level operations)
+    class function GetRawQuery(const AConnectionName: String): IioQuery;
+    class function GetRawQueryOpen(const AConnectionName: String; const ASQL: String): IioQuery;
+    // CRUD - ORM query methods (for normal ORM operations)
     class function GetQueryCount(const AContext: IioContext): IioQuery;
     class function GetQueryCreateIndex(const AContext: IioContext; const AIndexName: String; const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): IioQuery;
     class function GetQueryCurrentTimestamp(const AConnectionDefName: String): IioQuery;
@@ -67,9 +71,6 @@ type
     class function GetQuerySelectLastObjVersionFromEntity(const AContext: IioContext): IioQuery;
     class function GetQuerySelectLastObjVersionFromEtm(const AObjContext: IioContext): IioQuery;
     class function GetQueryUpdate(const AContext: IioContext): IioQuery;
-    // Raw query methods (for DBBuilder and other low-level operations)
-    class function GetRawQuery(const AConnectionName: String): IioQuery;
-    class function GetRawQueryOpen(const AConnectionName: String; const ASQL: String): IioQuery;
   end;
 
 implementation
