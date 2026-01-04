@@ -163,7 +163,6 @@ uses
   System.SysUtils,
   System.TypInfo,
 
-  iORM.DBBuilder.QueryEngine,
   iORM.DBBuilder.Factory,
   iORM.DBBuilder.Schema,
   iORM.DB.Consts,

@@ -243,7 +243,6 @@ contains
   iORM.SynchroStrategy.Interfaces in '..\..\Source\iORM.SynchroStrategy.Interfaces.pas',
   iORM.SynchroStrategy.EtmBased in '..\..\Source\iORM.SynchroStrategy.EtmBased.pas',
   iORM.DBBuilder.SqlScript.Base in '..\..\Source\iORM.DBBuilder.SqlScript.Base.pas',
-  iORM.DBBuilder.QueryEngine in '..\..\Source\iORM.DBBuilder.QueryEngine.pas',
   iORM.DB.Consts in '..\..\Source\iORM.DB.Consts.pas',
   iORM.TextBuilder in '..\..\Source\iORM.TextBuilder.pas',
   iORM.TextBuilder.Interfaces in '..\..\Source\iORM.TextBuilder.Interfaces.pas',

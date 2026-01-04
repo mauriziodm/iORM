@@ -47,7 +47,7 @@ uses
 
   iORM.DB.Interfaces,
   iORM.DB.ConnectionContainer,
-  iORM.DBBuilder.QueryEngine
+  iORM.DB.QueryEngine
 
   ;
 
@@ -141,7 +141,7 @@ end;
 
 procedure TioDBBuilderStrategySqLite.CreateDatabase;
 begin
-  TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, 'SELECT 1=1');
+  TioQueryEngine.GetRawQueryOpen(ConnectionDefName, 'SELECT 1=1');
 end;
 
 procedure TioDBBuilderStrategySqLite.CreateTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
@@ -167,7 +167,7 @@ var
   LQuery: IioQuery;
 begin
   // Drop all indexes part
-  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildListAllIndexesSql);
+  LQuery := TioQueryEngine.GetRawQueryOpen(ConnectionDefName, SqlGenerator.BuildListAllIndexesSql);
 
   while not LQuery.Eof do
   begin
@@ -192,7 +192,7 @@ var
   LQuery: IioQuery;
 begin
   // Carlo Marona (2025-10-16): ref to https://stackoverflow.com/questions/13426006/how-do-i-get-a-list-of-indexed-columns-for-a-given-table
-  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildListTableIndexesSql(ATable));
+  LQuery := TioQueryEngine.GetRawQueryOpen(ConnectionDefName, SqlGenerator.BuildListTableIndexesSql(ATable));
 
   while not LQuery.Eof do
   begin
@@ -206,7 +206,7 @@ var
   LQuery: IioQuery;
 begin
   Result := False;
-  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildFieldExistsSql(ATable, AField));
+  LQuery := TioQueryEngine.GetRawQueryOpen(ConnectionDefName, SqlGenerator.BuildFieldExistsSql(ATable, AField));
 
   while not LQuery.Eof do
   begin
@@ -227,7 +227,7 @@ var
   LOldFieldNotNull: Boolean;
 begin
   Result := False;
-  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildFieldModifiedSql(ATable, nil));
+  LQuery := TioQueryEngine.GetRawQueryOpen(ConnectionDefName, SqlGenerator.BuildFieldModifiedSql(ATable, nil));
 
   while not LQuery.Eof do
   begin

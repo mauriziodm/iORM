@@ -19,8 +19,7 @@ implementation
 
 uses
   iORM,
-  iORM.DB.Interfaces,
-  iORM.DBBuilder.QueryEngine
+  iORM.DB.Interfaces
 
   ;
 

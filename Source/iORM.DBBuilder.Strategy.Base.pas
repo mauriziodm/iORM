@@ -113,7 +113,7 @@ uses
 
   iORM.Exceptions,
   iORM.DB.ConnectionContainer,
-  iORM.DBBuilder.QueryEngine
+  iORM.DB.QueryEngine
 
   ;
 
@@ -477,7 +477,7 @@ function TioDBBuilderStrategyBase._ExecuteExistsQuery(const ASql: string): Boole
 var
   LQuery: IioQuery;
 begin
-  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, ASql);
+  LQuery := TioQueryEngine.GetRawQueryOpen(ConnectionDefName, ASql);
   Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
 end;
 

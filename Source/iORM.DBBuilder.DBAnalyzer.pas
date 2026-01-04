@@ -76,8 +76,7 @@ uses
   iORM.DB.Factory,
   iORM.DB.Interfaces,
   iORM.DB.ConnectionContainer,
-  iORM.DBBuilder.Factory,
-  iORM.DBBuilder.QueryEngine
+  iORM.DBBuilder.Factory
 
   ;
 

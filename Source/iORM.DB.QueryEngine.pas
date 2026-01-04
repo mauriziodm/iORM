@@ -53,8 +53,7 @@ type
     class function ComposeQueryIdentity(const AContext: IioContext; const AIdentity: String; const AForceCacheable: Boolean): String;
   public
     class function GetQueryCount(const AContext: IioContext): IioQuery;
-    class function GetQueryCreateIndex(const AContext: IioContext; const AIndexName: String; const ACommaSepFieldList: String;
-      const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): IioQuery;
+    class function GetQueryCreateIndex(const AContext: IioContext; const AIndexName: String; const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): IioQuery;
     class function GetQueryCurrentTimestamp(const AConnectionDefName: String): IioQuery;
     class function GetQueryDelete(const AContext: IioContext; const AForceCacheable: Boolean): IioQuery;
     class function GetQueryDropIndex(const AContext: IioContext; const AIndexName: String): IioQuery;
@@ -68,6 +67,9 @@ type
     class function GetQuerySelectLastObjVersionFromEntity(const AContext: IioContext): IioQuery;
     class function GetQuerySelectLastObjVersionFromEtm(const AObjContext: IioContext): IioQuery;
     class function GetQueryUpdate(const AContext: IioContext): IioQuery;
+    // Raw query methods (for DBBuilder and other low-level operations)
+    class function GetRawQuery(const AConnectionName: String): IioQuery;
+    class function GetRawQueryOpen(const AConnectionName: String; const ASQL: String): IioQuery;
   end;
 
 implementation
@@ -409,7 +411,19 @@ begin
   // Where conditions (with ObjVersion if exists for this entity type)
   LQuery.WhereParamObjID_SetValue(AContext);
   if AContext.BlindLevel_Do_DetectConflicts and AContext.GetProperties.ObjVersionPropertyExist then
-    LQuery.WhereParamObjVersion_SetValue(AContext); // Qua prende l'Objversion dall'oggetto così come è
+    LQuery.WhereParamObjVersion_SetValue(AContext); // Qua prende l'Objversion dall'oggetto cosï¿½ come ï¿½
+end;
+
+class function TioQueryEngine.GetRawQuery(const AConnectionName: String): IioQuery;
+begin
+  Result := TioDBFactory.Query(AConnectionName);
+end;
+
+class function TioQueryEngine.GetRawQueryOpen(const AConnectionName: String; const ASQL: String): IioQuery;
+begin
+  Result := GetRawQuery(AConnectionName);
+  Result.SQL.Text := ASQL;
+  Result.Open;
 end;
 
 end.
