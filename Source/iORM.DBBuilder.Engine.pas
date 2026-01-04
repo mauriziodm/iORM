@@ -201,7 +201,7 @@ begin
     raise EioGenericException.Create(ClassName, 'BuildCreateOrUpdateDBSqlScript', 'Unable to build SQL script: schema not analyzed');
 
   if not Assigned(AScript) then
-    raise EioArgumentNilException.Create(ClassName, 'BuildCreateOrUpdateDBSqlScript', 'AScript is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'BuildCreateOrUpdateDBSqlScript', 'AScript is not assigned.');
 
   case Schema.Status of
     stCreate: TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateCreateDatabaseScript(AScript);
@@ -228,7 +228,7 @@ end;
 procedure TioDBBuilderEngine.BuildUpdateDBSqlScript(const AScript: IioDBBuilderSqlScript);
 begin
   if not Assigned(AScript) then
-    raise EioArgumentNilException.Create(ClassName, 'BuildUpdateDBSqlScript', 'AScript is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'BuildUpdateDBSqlScript', 'AScript is not assigned.');
 
   if not Analyzed then
     raise EioGenericException.Create(ClassName, 'BuildUpdateDBSqlScript', 'Unable to build SQL script: schema not analyzed');
@@ -304,7 +304,7 @@ procedure TioDBBuilderEngine.CreateOrUpdateTable(const ATable: IioDBBuilderSchem
   const AddForeignKeys: Boolean);
 begin
   if not Assigned(ATable) then
-    raise EioArgumentNilException.Create(ClassName, 'CreateOrUpdateTable', 'ATable is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'CreateOrUpdateTable', 'ATable is not assigned.');
 
   case ATable.Status of
     stCreate: CreateTable(ATable, AddIndexes, AddForeignKeys);
@@ -319,7 +319,7 @@ var
   LScript: IioDBBuilderSqlScript;
 begin
   if not Assigned(ATable) then
-    raise EioArgumentNilException.Create(ClassName, 'CreateTable', 'ATable is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'CreateTable', 'ATable is not assigned.');
 
   if ATable.Status <> stCreate then
     exit;
@@ -342,7 +342,7 @@ var
   LScript: IioDBBuilderSqlScript;
 begin
   if not Assigned(ATable) then
-    raise EioArgumentNilException.Create(ClassName, 'UpdateTable', 'ATable is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'UpdateTable', 'ATable is not assigned.');
 
   if ATable.Status <> stCreate then
     exit;

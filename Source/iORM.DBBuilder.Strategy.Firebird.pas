@@ -120,7 +120,7 @@ var
   LSequence: String;
 begin
   if not Assigned(AScript) then
-    raise EioArgumentNilException.Create(ClassName, 'CreateSequences', 'AScript is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'CreateSequences', 'AScript is not assigned.');
 
   if Schema.Sequences.Count = 0 then
     Exit;
@@ -141,10 +141,10 @@ begin
 
   // Carlo Marona (2025-10-16): don't call inherited, it rewrites the method from scratch
   if not Assigned(AScript) then
-    raise EioArgumentNilException.Create(ClassName, 'CreateTable', 'AScript is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'CreateTable', 'AScript is not assigned.');
 
   if not Assigned(ATable) then
-    raise EioArgumentNilException.Create(ClassName, 'CreateTable', 'ATable is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'CreateTable', 'ATable is not assigned.');
 
   AScript.Body.AddTitle(Format('Creating table ''%s''', [ATable.Name]));
 
@@ -170,10 +170,10 @@ end;
 procedure TioDBBuilderStrategyFirebird.CreateTableSequence(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
 begin
   if not Assigned(AScript) then
-    raise EioArgumentNilException.Create(ClassName, 'CreateTableSequence', 'AScript is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'CreateTableSequence', 'AScript is not assigned.');
 
   if not Assigned(ATable) then
-    raise EioArgumentNilException.Create(ClassName, 'CreateTableSequence', 'ATable is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'CreateTableSequence', 'ATable is not assigned.');
 
   if ATable.GetSequenceName.IsEmpty then
     Exit;
@@ -242,7 +242,7 @@ var
   LQuery: IioQuery;
 begin
   if ASequenceName.IsEmpty then
-    raise EioArgumentNilException.Create(ClassName, 'DropSequence', 'ASequenceName is not specified.');
+    raise EioInvalidArgumentException.Create(ClassName, 'DropSequence', 'ASequenceName is not specified.');
 
   LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, FBSqlGenerator.BuildDropSequenceSql(ASequenceName), True);
 end;
@@ -541,7 +541,7 @@ var
   LQuery: IioQuery;
 begin
   if ASequenceName.IsEmpty then
-    raise EioArgumentNilException.Create(ClassName, 'SequenceExists', 'ASequenceName is not specified.');
+    raise EioInvalidArgumentException.Create(ClassName, 'SequenceExists', 'ASequenceName is not specified.');
 
   LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, FBSqlGenerator.BuildSequenceExistsSql(ASequenceName), True);
   Result := LQuery.Fields[0].AsInteger > 0;

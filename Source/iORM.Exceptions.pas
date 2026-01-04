@@ -48,7 +48,7 @@ type
   end;
   // -----------------------------------------------------------------------------------------------
 
-  // AuthDecisionException ------------------------------------------------------------
+  // AuthDecisionException -------------------------------------------------------------------------
   EioAuthDecisionException = class(Exception)
   end;
   // -----------------------------------------------------------------------------------------------
@@ -57,11 +57,11 @@ type
   EioGenericException = class(EioCustomException)
   end;
 
-  EioArgumentNilException = class(EioCustomException)
+  EioInvalidArgumentException = class(EioCustomException)
   end;
   // -----------------------------------------------------------------------------------------------
 
-  // Dependency Injection exceptions --------------------------------------------------------------------
+  // Dependency Injection exceptions ---------------------------------------------------------------
   EioDependencyInjectionException = class(EioCustomException)
   end;
   // -----------------------------------------------------------------------------------------------

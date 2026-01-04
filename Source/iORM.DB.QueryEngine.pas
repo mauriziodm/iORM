@@ -419,7 +419,7 @@ class function TioQueryEngine.GetRawQuery(const AConnectionName: String; const A
 begin
   // Validation: cannot open a query without SQL
   if AOpen and ASQL.IsEmpty then
-    raise EioArgumentNilException.Create('TioQueryEngine', 'GetRawQuery',
+    raise EioInvalidArgumentException.Create('TioQueryEngine', 'GetRawQuery',
       'Cannot open a query (AOpen = True) when ASQL parameter is empty.');
 
   Result := TioDBFactory.Query(AConnectionName);

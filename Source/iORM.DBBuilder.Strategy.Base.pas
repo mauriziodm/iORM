@@ -125,7 +125,7 @@ var
   LFK: IioDBBuilderSchemaFK;
 begin
   if not Assigned(AScript) then
-    raise EioArgumentNilException.Create(ClassName, 'AddOrAlterForeignKeys', 'AScript is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'AddOrAlterForeignKeys', 'AScript is not assigned.');
 
   for LTable in Schema.Tables.Values do
   begin
@@ -156,10 +156,10 @@ var
   LIndex: IioDBBuilderSchemaIndex;
 begin
   if not Assigned(AScript) then
-    raise EioArgumentNilException.Create(ClassName, 'AddOrAlterIndexes', 'AScript is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'AddOrAlterIndexes', 'AScript is not assigned.');
 
   if not Assigned(ATable) then
-    raise EioArgumentNilException.Create(ClassName, 'AddOrAlterIndexes', 'ATable is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'AddOrAlterIndexes', 'ATable is not assigned.');
 
   for LIndex in ATable.Indexes.Values do
   begin
@@ -180,10 +180,10 @@ end;
 procedure TioDBBuilderStrategyBase.AlterTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
 begin
   if not Assigned(AScript) then
-    raise EioArgumentNilException.Create(ClassName, 'AlterTable', 'AScript is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'AlterTable', 'AScript is not assigned.');
 
   if not Assigned(ATable) then
-    raise EioArgumentNilException.Create(ClassName, 'AlterTable', 'ATable is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'AlterTable', 'ATable is not assigned.');
 
   if (ATable.Status <> stUpdate) or (ATable.Changes = [taForeignKeys]) then
     exit;
@@ -194,10 +194,10 @@ end;
 constructor TioDBBuilderStrategyBase.Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator);
 begin
   if not Assigned(ASchema) then
-    raise EioArgumentNilException.Create(ClassName, 'Create', 'ASchema is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'Create', 'ASchema is not assigned.');
 
   if not Assigned(ASqlGenerator) then
-    raise EioArgumentNilException.Create(ClassName, 'Create', 'ASqlGenerator is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'Create', 'ASqlGenerator is not assigned.');
 
   FSchema := ASchema;
   FSqlGenerator := ASqlGenerator;
@@ -209,7 +209,7 @@ var
   LTable: IioDBBuilderSchemaTable;
 begin
   if not Assigned(AScript) then
-    raise EioArgumentNilException.Create(ClassName, 'CreateForeignKeys', 'AScript is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'CreateForeignKeys', 'AScript is not assigned.');
 
   AScript.Body.AddTitle('Creating foreign keys');
 
@@ -222,10 +222,10 @@ var
   LForeignKey: IioDBBuilderSchemaFK;
 begin
   if not Assigned(AScript) then
-    raise EioArgumentNilException.Create(ClassName, 'CreateForeignKeys', 'AScript is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'CreateForeignKeys', 'AScript is not assigned.');
 
   if not Assigned(ATable) then
-    raise EioArgumentNilException.Create(ClassName, 'CreateForeignKeys', 'ATable is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'CreateForeignKeys', 'ATable is not assigned.');
 
   for LForeignKey in ATable.ForeignKeys.Values do
     AScript.Body.Add(SqlGenerator.BuildAddForeignKeySql(ATable, LForeignKey));
@@ -236,7 +236,7 @@ var
   LTable: IioDBBuilderSchemaTable;
 begin
   if not Assigned(AScript) then
-    raise EioArgumentNilException.Create(ClassName, 'CreateIndexes', 'AScript is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'CreateIndexes', 'AScript is not assigned.');
 
   AScript.Body.AddTitle('Creating indexes');
 
@@ -253,7 +253,7 @@ var
   LIndex: IioDBBuilderSchemaIndex;
 begin
   if not Assigned(AScript) then
-    raise EioArgumentNilException.Create(ClassName, 'CreateTableIndexes', 'AScript is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'CreateTableIndexes', 'AScript is not assigned.');
 
   for LIndex in ATable.Indexes.Values do
   begin
@@ -274,10 +274,10 @@ var
   LField: IioDBBuilderSchemaField;
 begin
   if not Assigned(AScript) then
-    raise EioArgumentNilException.Create(ClassName, 'AddOrAlterFields', 'AScript is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'AddOrAlterFields', 'AScript is not assigned.');
 
   if not Assigned(ATable) then
-    raise EioArgumentNilException.Create(ClassName, 'AddOrAlterFields', 'ATable is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'AddOrAlterFields', 'ATable is not assigned.');
 
   for LField in ATable.Fields do
   begin
@@ -303,7 +303,7 @@ var
   LTable: IioDBBuilderSchemaTable;
 begin
   if not Assigned(AScript) then
-    raise EioArgumentNilException.Create(ClassName, 'CreateOrAlterTables', 'AScript is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'CreateOrAlterTables', 'AScript is not assigned.');
 
   for LTable in Schema.Tables.Values do
   begin
@@ -319,10 +319,10 @@ end;
 procedure TioDBBuilderStrategyBase.CreateTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
 begin
   if not Assigned(AScript) then
-    raise EioArgumentNilException.Create(ClassName, 'CreateTable', 'AScript is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'CreateTable', 'AScript is not assigned.');
 
   if not Assigned(ATable) then
-    raise EioArgumentNilException.Create(ClassName, 'CreateTable', 'ATable is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'CreateTable', 'ATable is not assigned.');
 
   AScript.Body.AddTitle(Format('Creating table ''%s''', [ATable.Name]));
 end;
@@ -338,7 +338,7 @@ end;
 procedure TioDBBuilderStrategyBase.DropForeignKeys(const AScript: IioDBBuilderSqlScript);
 begin
   if not Assigned(AScript) then
-    raise EioArgumentNilException.Create(ClassName, 'DropForeignKeys', 'AScript is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'DropForeignKeys', 'AScript is not assigned.');
 
   if Schema.Status = stCreate then
     Exit;
@@ -349,7 +349,7 @@ end;
 procedure TioDBBuilderStrategyBase.DropIndexes(const AScript: IioDBBuilderSqlScript);
 begin
   if not Assigned(AScript) then
-    raise EioArgumentNilException.Create(ClassName, 'DropIndexes', 'AScript is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'DropIndexes', 'AScript is not assigned.');
 
   if Schema.Status = stCreate then
     Exit;
@@ -360,10 +360,10 @@ end;
 procedure TioDBBuilderStrategyBase.DropTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
 begin
   if not Assigned(AScript) then
-    raise EioArgumentNilException.Create(ClassName, 'DropTableIndexes', 'AScript is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'DropTableIndexes', 'AScript is not assigned.');
 
   if not Assigned(ATable) then
-    raise EioArgumentNilException.Create(ClassName, 'DropTableIndexes', 'ATable is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'DropTableIndexes', 'ATable is not assigned.');
 
   if Schema.Status = stCreate then
     Exit;
@@ -374,7 +374,7 @@ end;
 procedure TioDBBuilderStrategyBase.GenerateCreateDatabaseScript(const AScript: IioDBBuilderSqlScript);
 begin
   if not Assigned(AScript) then
-    raise EioArgumentNilException.Create(ClassName, 'GenerateCreateDatabaseScript', 'AScript is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'GenerateCreateDatabaseScript', 'AScript is not assigned.');
 
   Schema.Status := stCreate;
 
@@ -391,7 +391,7 @@ end;
 procedure TioDBBuilderStrategyBase.GenerateUpdateDatabaseScript(const AScript: IioDBBuilderSqlScript);
 begin
   if not Assigned(AScript) then
-    raise EioArgumentNilException.Create(ClassName, 'GenerateUpdateDatabaseScript', 'AScript is not assigned.');
+    raise EioInvalidArgumentException.Create(ClassName, 'GenerateUpdateDatabaseScript', 'AScript is not assigned.');
 
   Schema.Status := stUpdate;
 
