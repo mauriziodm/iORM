@@ -127,9 +127,6 @@ begin
 
   AScript.Body.AddTitle('Creating sequences (if empty, no sequence needs to be created)');
 
-  if not Assigned(FBSqlGenerator) then
-    raise EioGenericException.Create(ClassName, 'CreateSequences', 'SqlGenerator doesn''t support IioDBBuilderSqlGeneratorFirebird interface.');
-
   for LSequence in Schema.Sequences do
   begin
     // Check if sequence exists, then create it
@@ -139,8 +136,6 @@ begin
 end;
 
 procedure TioDBBuilderStrategyFirebird.CreateTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
-var
-  LSqlGen: IioDBBuilderSqlGeneratorFirebird;
 begin
   inherited;
 
@@ -182,9 +177,6 @@ begin
 
   if ATable.GetSequenceName.IsEmpty then
     Exit;
-
-  if not Assigned(FBSqlGenerator) then
-    raise EioGenericException.Create(ClassName, 'CreateTableSequence', 'SqlGenerator doesn''t support IioDBBuilderSqlGeneratorFirebird interface.');
 
   // Check if sequence exists, then create it
   if (ATable.Status = stCreate) or (not SequenceExists(ATable.GetSequenceName)) then
@@ -252,10 +244,7 @@ var
   LQuery: IioQuery;
 begin
   if ASequenceName.IsEmpty then
-    raise EioArgumentNilException.Create(ClassName, 'SequenceExists', 'ASequenceName is not specified.');
-
-  if not Assigned(FBSqlGenerator) then
-    raise EioGenericException.Create(ClassName, 'SequenceExists', 'SqlGenerator doesn''t support IioDBBuilderSqlGeneratorFirebird interface.');
+    raise EioArgumentNilException.Create(ClassName, 'DropSequence', 'ASequenceName is not specified.');
 
   LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, FBSqlGenerator.BuildDropSequenceSql(ASequenceName));
 end;
@@ -453,9 +442,8 @@ end;
 
 function TioDBBuilderStrategyFirebird.GetFBSqlGenerator: IioDBBuilderSqlGeneratorFirebird;
 begin
-  Result := nil;
-
-  Supports(SqlGenerator, IioDBBuilderSqlGeneratorFirebird, Result);
+  if not Supports(SqlGenerator, IioDBBuilderSqlGeneratorFirebird, Result) then
+    raise EioGenericException.Create(ClassName, 'GetFBSqlGenerator', 'SqlGenerator doesn''t support IioDBBuilderSqlGeneratorFirebird interface.');
 end;
 
 function TioDBBuilderStrategyFirebird.IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
@@ -553,15 +541,11 @@ end;
 function TioDBBuilderStrategyFirebird.SequenceExists(const ASequenceName: string): boolean;
 var
   LQuery: IioQuery;
-  LSqlGen: IioDBBuilderSqlGeneratorFirebird;
 begin
   if ASequenceName.IsEmpty then
     raise EioArgumentNilException.Create(ClassName, 'SequenceExists', 'ASequenceName is not specified.');
 
-  if not Supports(SqlGenerator, IioDBBuilderSqlGeneratorFirebird, LSqlGen) then
-    raise EioGenericException.Create(ClassName, 'SequenceExists', 'SqlGenerator doesn''t support IioDBBuilderSqlGeneratorFirebird interface.');
-
-  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, LSqlGen.BuildSequenceExistsSql(ASequenceName));
+  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, FBSqlGenerator.BuildSequenceExistsSql(ASequenceName));
   Result := LQuery.Fields[0].AsInteger > 0;
 end;
 
