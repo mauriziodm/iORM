@@ -85,15 +85,15 @@ type
     function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     // Index related methods
     function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual; abstract;
-    function BuildIndexFieldList(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex; const AIndexName: String;
-      const AWithIndexOrientation: Boolean): String; virtual;
+    function BuildIndexFieldList(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex; const AIndexName: String; const AWithIndexOrientation: Boolean): String; virtual;
+
     function BuildDropIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; overload; virtual;
     function BuildDropIndexSql(const AIndexName: string): string; overload; virtual; abstract;
+
     function BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; overload; virtual; abstract;
     function BuildIndexExistsSql(const AIndexName: string): string; overload; virtual; abstract;
     function BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual; abstract;
-    function BuildIndexNameSql(const ATable: IioDBBuilderSchemaTable;
-      const AIndex: IioDBBuilderSchemaIndex; const UpperCase: boolean = True): String; virtual;
+    function BuildIndexNameSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex; const UpperCase: boolean = True): String; virtual;
     function BuildIndexOrientation(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex; const AIndexName: String): String; virtual;
     function BuildIndexUnique(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
     function BuildListAllIndexesSql: string; virtual; abstract;

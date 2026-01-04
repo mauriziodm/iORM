@@ -192,7 +192,7 @@ begin
   if not Analyzed then
     raise EioGenericException.Create(ClassName, 'BuildCreateDBSqlScript', 'Unable to build SQL script: schema not analyzed');
 
-  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateCreateDatabaseScript(AScript);
+  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, AScript).GenerateCreateDatabaseScript;
 end;
 
 procedure TioDBBuilderEngine.BuildCreateOrUpdateDBSqlScript(const AScript: IioDBBuilderSqlScript);
@@ -204,8 +204,8 @@ begin
     raise EioInvalidArgumentException.Create(ClassName, 'BuildCreateOrUpdateDBSqlScript', 'AScript is not assigned.');
 
   case Schema.Status of
-    stCreate: TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateCreateDatabaseScript(AScript);
-    stUpdate: TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateUpdateDatabaseScript(AScript);
+    stCreate: TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, AScript).GenerateCreateDatabaseScript;
+    stUpdate: TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, AScript).GenerateUpdateDatabaseScript;
   end;
 end;
 
@@ -214,7 +214,7 @@ begin
   if not Assigned(AScript) then
     raise EArgumentNilException.CreateFmt('%s.%s: %s', [ClassName, 'BuildDropForeignKeysSqlScript', 'AScript is not assigned.']);
 
-  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).DropForeignKeys(AScript);
+  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, AScript).DropForeignKeys;
 end;
 
 procedure TioDBBuilderEngine.BuildDropIndexesSqlScript(const AScript: IioDBBuilderSqlScript);
@@ -222,7 +222,7 @@ begin
   if not Assigned(AScript) then
     raise EArgumentNilException.CreateFmt('%s.%s: %s', [ClassName, 'BuildDropIndexesSqlScript', 'AScript is not assigned.']);
 
-  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).DropIndexes(AScript);
+  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, AScript).DropIndexes;
 end;
 
 procedure TioDBBuilderEngine.BuildUpdateDBSqlScript(const AScript: IioDBBuilderSqlScript);
@@ -233,7 +233,7 @@ begin
   if not Analyzed then
     raise EioGenericException.Create(ClassName, 'BuildUpdateDBSqlScript', 'Unable to build SQL script: schema not analyzed');
 
-  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateUpdateDatabaseScript(AScript);
+  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, AScript).GenerateUpdateDatabaseScript;
 end;
 
 constructor TioDBBuilderEngine.Create(const AConnectionDefName: String; const AddIndexes, AddForeignKeys: Boolean);
@@ -325,12 +325,12 @@ begin
     exit;
 
   LScript := TioDBBuilderFactory.NewSqlScript;
-  LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator);
+  LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, LScript);
 
-  LStrategy.CreateTable(LScript, ATable);
+  LStrategy.CreateTable(ATable);
 
   if AddForeignKeys then
-    LStrategy.CreateTableForeignKeys(LScript, ATable);
+    LStrategy.CreateTableForeignKeys(ATable);
 
   TioDBFactory.Script(FConnectionDefName, LScript.SQL).Execute;
 end;
@@ -348,9 +348,9 @@ begin
     exit;
 
   LScript := TioDBBuilderFactory.NewSqlScript;
-  LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator);
+  LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, LScript);
 
-  LStrategy.AlterTable(LScript, ATable);
+  LStrategy.AlterTable(ATable);
   TioDBFactory.Script(FConnectionDefName, LScript.SQL).Execute;
 end;
 
@@ -412,14 +412,14 @@ var
   LTable: IioDBBuilderSchemaTable;
 begin
   LScript := TioDBBuilderFactory.NewSqlScript;
-  LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator);
   LTable := FSchema.FindTable(ATableName);
+  LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, LScript);
 
   case LTable.Status of
     stUpdate:
-      LStrategy.CreateTable(LScript, LTable);
+      LStrategy.CreateTable(LTable);
     stCreate:
-      LStrategy.AlterTable(LScript, LTable);
+      LStrategy.AlterTable(LTable);
   end;
 
   TioDBFactory.Script(FConnectionDefName, LScript.SQL).Execute;
@@ -462,9 +462,10 @@ end;
 
 procedure TioDBBuilderEngine_New.RebuildScript;
 begin
+  FScript := TioDBBuilderFactory.NewSqlScript;
   case FSchema.Status of
-    stCreate: TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateCreateDatabaseScript(FScript);
-    stUpdate: TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateUpdateDatabaseScript(FScript);
+    stCreate: TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, FScript).GenerateCreateDatabaseScript;
+    stUpdate: TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, FScript).GenerateUpdateDatabaseScript;
   end;
 end;
 

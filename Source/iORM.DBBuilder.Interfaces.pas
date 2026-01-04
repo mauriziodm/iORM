@@ -303,17 +303,17 @@ type
 
   IioDBBuilderStrategy = interface
     ['{4187C897-A5C6-4807-87D0-C466D3EE34CE}']
-    procedure AlterTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
+    procedure AlterTable(const ATable: IioDBBuilderSchemaTable);
     procedure CreateDatabase;
-    procedure CreateForeignKeys(const AScript: IioDBBuilderSqlScript);
-    procedure CreateIndexes(const AScript: IioDBBuilderSqlScript);
-    procedure CreateTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
-    procedure CreateTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
-    procedure CreateTableForeignKeys(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
+    procedure CreateForeignKeys;
+    procedure CreateIndexes;
+    procedure CreateTable(const ATable: IioDBBuilderSchemaTable);
+    procedure CreateTableIndexes(const ATable: IioDBBuilderSchemaTable);
+    procedure CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable);
     function DatabaseExists: Boolean;
-    procedure DropForeignKeys(const AScript: IioDBBuilderSqlScript);
-    procedure DropIndexes(const AScript: IioDBBuilderSqlScript);
-    procedure DropTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
+    procedure DropForeignKeys;
+    procedure DropIndexes;
+    procedure DropTableIndexes(const ATable: IioDBBuilderSchemaTable);
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
     function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
@@ -323,8 +323,8 @@ type
     function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
     function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean;
 
-    procedure GenerateCreateDatabaseScript(const AScript: IioDBBuilderSqlScript);
-    procedure GenerateUpdateDatabaseScript(const AScript: IioDBBuilderSqlScript);
+    procedure GenerateCreateDatabaseScript;
+    procedure GenerateUpdateDatabaseScript;
   end;
 
   IioDBBuilderDBAnalyzer = interface

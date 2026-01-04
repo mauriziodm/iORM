@@ -15,8 +15,8 @@ type
   TioDBBuilderStrategyFirebird = class(TioDBBuilderStrategyBase)
   private
     // Sequences
-    procedure CreateSequences(const AScript: IioDBBuilderSqlScript);
-    procedure CreateTableSequence(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
+    procedure CreateSequences;
+    procedure CreateTableSequence(const ATable: IioDBBuilderSchemaTable);
     procedure DropSequence(const ASequenceName: string);
     function SequenceExists(const ASequenceName: string): boolean;
 
@@ -28,8 +28,8 @@ type
     procedure CreateDatabase; override;
     function DatabaseExists: Boolean; override;
     // Tables
-    procedure AlterTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); override;
-    procedure CreateTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); override;
+    procedure AlterTable(const ATable: IioDBBuilderSchemaTable); override;
+    procedure CreateTable(const ATable: IioDBBuilderSchemaTable); override;
     // Fields
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
@@ -40,19 +40,19 @@ type
     function IsFieldDecimalsChanged(const AOldFieldDecimals, ANewFieldDecimals: Smallint; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
     function IsBlobSubTypeChanged(const AOldBlobSubType, ANewBlobSubType: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean; virtual;
     // Indexes
-    procedure DropIndexes(const AScript: IioDBBuilderSqlScript); override;
-    procedure DropTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable); override;
+    procedure DropIndexes; override;
+    procedure DropTableIndexes(const ATable: IioDBBuilderSchemaTable); override;
     function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
     function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
     // ForeignKeys
-    procedure DropForeignKeys(const AScript: IioDBBuilderSqlScript); override;
+    procedure DropForeignKeys; override;
     function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
     function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
     // Warnings
     procedure WarningNewValueLessThanTheOldOne(const AValueName: String; const AOldValue, ANewValue: Integer; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
     procedure WarningValueChanged(const AValueName, AOldValue, ANewValue: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
 
-    procedure GenerateDatabaseObjects(const AScript: IioDBBuilderSqlScript; const Create: boolean); override;
+    procedure GenerateDatabaseObjects(const Create: boolean); override;
   public
 
   end;
@@ -88,20 +88,20 @@ begin
   Result := INVALID_FIELDTYPE_CONVERSIONS;
 end;
 
-procedure TioDBBuilderStrategyFirebird.AlterTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyFirebird.AlterTable(const ATable: IioDBBuilderSchemaTable);
 begin
   inherited;
 
   if taFields in ATable.Changes then
   begin
-    AddOrAlterFields(AScript, ATable);
+    AddOrAlterFields(ATable);
   end;
 
   if Schema.IndexesEnabled and (taIndexes in ATable.Changes) then
   begin
-    AScript.Body.AddEmpty;
-    AddOrAlterIndexes(AScript, ATable);
-    AScript.Body.AddEmpty;
+    Script.Body.AddEmpty;
+    AddOrAlterIndexes(ATable);
+    Script.Body.AddEmpty;
   end;
 end;
 
@@ -115,63 +115,53 @@ begin
   TioDbFactory.ConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.Values['OpenMode'] := 'Open';
 end;
 
-procedure TioDBBuilderStrategyFirebird.CreateSequences(const AScript: IioDBBuilderSqlScript);
+procedure TioDBBuilderStrategyFirebird.CreateSequences;
 var
   LSequence: String;
 begin
-  if not Assigned(AScript) then
-    raise EioInvalidArgumentException.Create(ClassName, 'CreateSequences', 'AScript is not assigned.');
-
   if Schema.Sequences.Count = 0 then
     Exit;
 
-  AScript.Body.AddTitle('Creating sequences (if empty, no sequence needs to be created)');
+  Script.Body.AddTitle('Creating sequences (if empty, no sequence needs to be created)');
 
   for LSequence in Schema.Sequences do
   begin
     // Check if sequence exists, then create it
     if (Schema.Status = stCreate) or (not SequenceExists(LSequence)) then
-      AScript.Body.Add(FBSqlGenerator.BuildAddSequenceSql(LSequence, Schema.Status = stCreate));
+      Script.Body.Add(FBSqlGenerator.BuildAddSequenceSql(LSequence, Schema.Status = stCreate));
   end;
 end;
 
-procedure TioDBBuilderStrategyFirebird.CreateTable(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyFirebird.CreateTable(const ATable: IioDBBuilderSchemaTable);
 begin
   inherited;
-
-  // Carlo Marona (2025-10-16): don't call inherited, it rewrites the method from scratch
-  if not Assigned(AScript) then
-    raise EioInvalidArgumentException.Create(ClassName, 'CreateTable', 'AScript is not assigned.');
 
   if not Assigned(ATable) then
     raise EioInvalidArgumentException.Create(ClassName, 'CreateTable', 'ATable is not assigned.');
 
-  AScript.Body.AddTitle(Format('Creating table ''%s''', [ATable.Name]));
+  Script.Body.AddTitle(Format('Creating table ''%s''', [ATable.Name]));
 
   if (Schema.Status = stCreate) or not SequenceExists(ATable.GetSequenceName) then
-    CreateTableSequence(AScript, ATable);
+    CreateTableSequence(ATable);
 
-  AScript.Body.AddEmpty;
-  AScript.Body.Add(SqlGenerator.BuildBeginCreateTableSql(ATable));
-  Ascript.Body.IncIndentationLevel;
-  AScript.Body.Add(SqlGenerator.BuildCreateFieldsSql(ATable, AScript.Body.CurrentIndentation), False);
-  AScript.Body.DecIndentationLevel;
-  AScript.Body.Add(SqlGenerator.BuildEndCreateTableSql(ATable));
-  AScript.Body.AddEmpty;
-  AScript.Body.Add(SqlGenerator.BuildAddPrimaryKeySql(ATable));
+  Script.Body.AddEmpty;
+  Script.Body.Add(SqlGenerator.BuildBeginCreateTableSql(ATable));
+  Script.Body.IncIndentationLevel;
+  Script.Body.Add(SqlGenerator.BuildCreateFieldsSql(ATable, Script.Body.CurrentIndentation), False);
+  Script.Body.DecIndentationLevel;
+  Script.Body.Add(SqlGenerator.BuildEndCreateTableSql(ATable));
+  Script.Body.AddEmpty;
+  Script.Body.Add(SqlGenerator.BuildAddPrimaryKeySql(ATable));
 
   if Schema.IndexesEnabled then
   begin
-    AScript.Body.AddEmpty;
-    CreateTableIndexes(AScript, ATable);
+    Script.Body.AddEmpty;
+    CreateTableIndexes(ATable);
   end;
 end;
 
-procedure TioDBBuilderStrategyFirebird.CreateTableSequence(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyFirebird.CreateTableSequence(const ATable: IioDBBuilderSchemaTable);
 begin
-  if not Assigned(AScript) then
-    raise EioInvalidArgumentException.Create(ClassName, 'CreateTableSequence', 'AScript is not assigned.');
-
   if not Assigned(ATable) then
     raise EioInvalidArgumentException.Create(ClassName, 'CreateTableSequence', 'ATable is not assigned.');
 
@@ -180,7 +170,7 @@ begin
 
   // Check if sequence exists, then create it
   if (ATable.Status = stCreate) or (not SequenceExists(ATable.GetSequenceName)) then
-    AScript.Body.Add(FBSqlGenerator.BuildAddSequenceSql(ATable.GetSequenceName, ATable.Status = stCreate));
+    Script.Body.Add(FBSqlGenerator.BuildAddSequenceSql(ATable.GetSequenceName, ATable.Status = stCreate));
 end;
 
 function TioDBBuilderStrategyFirebird.DatabaseExists: Boolean;
@@ -210,7 +200,7 @@ begin
   end;
 end;
 
-procedure TioDBBuilderStrategyFirebird.DropForeignKeys(const AScript: IioDBBuilderSqlScript);
+procedure TioDBBuilderStrategyFirebird.DropForeignKeys;
 var
   LQuery: IioQuery;
 begin
@@ -218,13 +208,13 @@ begin
 
   while not LQuery.Eof do
   begin
-    AScript.Body.Add(SqlGenerator.BuildDropForeignKeySql(LQuery.Fields.FieldByName('table_name').AsString,
+    Script.Body.Add(SqlGenerator.BuildDropForeignKeySql(LQuery.Fields.FieldByName('table_name').AsString,
       LQuery.Fields.FieldByName('constraint_name').AsString));
     LQuery.Next;
   end;
 end;
 
-procedure TioDBBuilderStrategyFirebird.DropIndexes(const AScript: IioDBBuilderSqlScript);
+procedure TioDBBuilderStrategyFirebird.DropIndexes;
 var
   LQuery: IioQuery;
 begin
@@ -232,7 +222,7 @@ begin
 
   while not LQuery.Eof do
   begin
-    AScript.Body.Add(SqlGenerator.BuildDropIndexSql(LQuery.Fields[0].AsString));
+    Script.Body.Add(SqlGenerator.BuildDropIndexSql(LQuery.Fields[0].AsString));
     LQuery.Next;
   end;
 end;
@@ -247,7 +237,7 @@ begin
   LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, FBSqlGenerator.BuildDropSequenceSql(ASequenceName), True);
 end;
 
-procedure TioDBBuilderStrategyFirebird.DropTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyFirebird.DropTableIndexes(const ATable: IioDBBuilderSchemaTable);
 var
   LQuery: IioQuery;
 begin
@@ -255,7 +245,7 @@ begin
 
   while not LQuery.Eof do
   begin
-    AScript.Body.Add(SqlGenerator.BuildDropIndexSql(LQuery.Fields[0].AsString));
+    Script.Body.Add(SqlGenerator.BuildDropIndexSql(LQuery.Fields[0].AsString));
     LQuery.Next;
   end;
 end;
@@ -406,35 +396,35 @@ begin
   end;
 end;
 
-procedure TioDBBuilderStrategyFirebird.GenerateDatabaseObjects(const AScript: IioDBBuilderSqlScript; const Create: boolean);
+procedure TioDBBuilderStrategyFirebird.GenerateDatabaseObjects(const Create: boolean);
 begin
   if Create then
   begin
-    CreateTables(AScript);
-    // CreateSequences(AScript);  // Carlo Marona: Create sequence was moved in CreateTable method so the create table method creates all table components
+    CreateTables;
+    // CreateSequences;  // Carlo Marona: Create sequence was moved in CreateTable method so the create table method creates all table components
 
     //if Schema.IndexesEnabled then  // Carlo Marona: Create indexes was moved in CreateTable method so the create table method creates all table components
-    //  CreateIndexes(AScript);
+    //  CreateIndexes;
 
     // Foreignkeys are created at the end so all referenced tables are already created
     if Schema.ForeignKeysEnabled then
-      CreateForeignKeys(AScript);
+      CreateForeignKeys;
   end
   else
   begin
-    // DropForeignKeys(AScript);  // Carlo Marona (2025-10-20): Removed because now the analisys was updated to take in account foreign keys changes
-    AScript.Body.AddEmpty;
-    //DropIndexes(AScript);  // Carlo Marona: Create index method was updated to check if index exists before create so there's no need to remove all indexes blindly
-    CreateOrAlterTables(AScript);
-    AScript.Body.AddEmpty;
-    // CreateSequences(AScript);  // Carlo Marona: Create sequence was moved in CreateTable method so the create table method creates all table components
+    // DropForeignKeys;  // Carlo Marona (2025-10-20): Removed because now the analisys was updated to take in account foreign keys changes
+    Script.Body.AddEmpty;
+    //DropIndexes;  // Carlo Marona: Create index method was updated to check if index exists before create so there's no need to remove all indexes blindly
+    CreateOrAlterTables;
+    Script.Body.AddEmpty;
+    // CreateSequences;  // Carlo Marona: Create sequence was moved in CreateTable method so the create table method creates all table components
 
     //if Schema.IndexesEnabled then  // Carlo Marona: Create indexes was moved in CreateTable method so the create table method creates all table components
-    //  CreateIndexes(AScript);
+    //  CreateIndexes;
 
     // Foreignkeys are created at the end so all referenced tables are already created
     if Schema.ForeignKeysEnabled then
-      AddOrAlterForeignKeys(AScript);
+      AddOrAlterForeignKeys;
   end;
 end;
 
