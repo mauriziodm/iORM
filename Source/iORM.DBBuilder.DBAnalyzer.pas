@@ -88,7 +88,7 @@ begin
   FForceCreateNewDB := AForceCreateNewDB;
   FSchema := ASchema;
   FSqlGenerator := ASqlGenerator;
-  FStrategy := TioDBBuilderFactory.NewStrategy(AConnectionDefName, ASchema, ASqlGenerator);
+  FStrategy := TioDBBuilderFactory.NewStrategy(AConnectionDefName, ASchema, ASqlGenerator, nil);
 end;
 
 function TioDBBuilderDBAnalyzer.GetConnectionDefName: string;

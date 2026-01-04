@@ -251,7 +251,7 @@ begin
   if not Analyzed then
     raise EioGenericException.Create(ClassName, 'CreateDatabase', 'Unable to create database: schema not analyzed');
 
-  LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator);
+  LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, nil);
   LStrategy.CreateDatabase;
 end;
 
@@ -384,7 +384,7 @@ end;
 
 procedure TioDBBuilderEngine_New.CreateDatabasePhys;
 begin
-  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).CreateDatabase;
+  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, nil).CreateDatabase;
 end;
 
 procedure TioDBBuilderEngine_New.CreateOrUpdateDB(const AForce: Boolean);
