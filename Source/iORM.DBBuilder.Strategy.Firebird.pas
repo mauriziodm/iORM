@@ -199,7 +199,7 @@ begin
       // Carlo Marona (2025-10-10): disables FireDac database creation option in the connection (OpenMode = Open)
       TioDbFactory.ConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.Values['OpenMode'] := 'Open';
 
-      TioQueryEngine.GetRawQueryOpen(ConnectionDefName, 'SELECT * FROM RDB$DATABASE');
+      TioQueryEngine.GetRawQuery(ConnectionDefName, 'SELECT * FROM RDB$DATABASE', True);
       Result := True;
     except
       Result := False;
@@ -214,9 +214,7 @@ procedure TioDBBuilderStrategyFirebird.DropForeignKeys(const AScript: IioDBBuild
 var
   LQuery: IioQuery;
 begin
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName);
-  LQuery.SQL.Text := SqlGenerator.BuildListAllForeignKeysSql;
-  LQuery.Open;
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildListAllForeignKeysSql, True);
 
   while not LQuery.Eof do
   begin
@@ -230,7 +228,7 @@ procedure TioDBBuilderStrategyFirebird.DropIndexes(const AScript: IioDBBuilderSq
 var
   LQuery: IioQuery;
 begin
-  LQuery := TioQueryEngine.GetRawQueryOpen(ConnectionDefName, SqlGenerator.BuildListAllIndexesSql);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildListAllIndexesSql, True);
 
   while not LQuery.Eof do
   begin
@@ -246,14 +244,14 @@ begin
   if ASequenceName.IsEmpty then
     raise EioArgumentNilException.Create(ClassName, 'DropSequence', 'ASequenceName is not specified.');
 
-  LQuery := TioQueryEngine.GetRawQueryOpen(ConnectionDefName, FBSqlGenerator.BuildDropSequenceSql(ASequenceName));
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, FBSqlGenerator.BuildDropSequenceSql(ASequenceName), True);
 end;
 
 procedure TioDBBuilderStrategyFirebird.DropTableIndexes(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
 var
   LQuery: IioQuery;
 begin
-  LQuery := TioQueryEngine.GetRawQueryOpen(ConnectionDefName, SqlGenerator.BuildListTableIndexesSql(ATable));
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildListTableIndexesSql(ATable), True);
 
   while not LQuery.Eof do
   begin
@@ -266,7 +264,7 @@ function TioDBBuilderStrategyFirebird.FieldExists(const ATable: IioDBBuilderSche
 var
   LQuery: IioQuery;
 begin
-  LQuery := TioQueryEngine.GetRawQueryOpen(ConnectionDefName, SqlGenerator.BuildFieldExistsSql(ATable, AField));
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildFieldExistsSql(ATable, AField), True);
   Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
 end;
 
@@ -308,7 +306,7 @@ begin
   LNewFieldDecimals := AField.FieldScale;
 
   // Create and open the query for old field informations
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, '', False);
   LQuery.SQL.Add('SELECT r.RDB$FIELD_NAME AS field_name,');
   LQuery.SQL.Add('  r.RDB$DEFAULT_VALUE AS field_default_value,');
   LQuery.SQL.Add('  r.RDB$NULL_FLAG AS field_not_null,');
@@ -386,7 +384,7 @@ var
 begin
   Result := False;
 
-  LQuery := TioQueryEngine.GetRawQueryOpen(ConnectionDefName, SqlGenerator.BuildForeignKeyExistsSql(ATable, AForeignKey));
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildForeignKeyExistsSql(ATable, AForeignKey), True);
   Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
 end;
 
@@ -396,7 +394,7 @@ var
 begin
   Result := False;
 
-  LQuery := TioQueryEngine.GetRawQueryOpen(ConnectionDefName, SqlGenerator.BuildForeignKeyModifiedSql(ATable, AForeignKey));
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildForeignKeyModifiedSql(ATable, AForeignKey), True);
 
   while not (LQuery.Eof or Result) do
   begin
@@ -453,7 +451,7 @@ var
 begin
   Result := False;
 
-  LQuery := TioQueryEngine.GetRawQueryOpen(ConnectionDefName, SqlGenerator.BuildIndexModifiedSql(ATable, AIndex));
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildIndexModifiedSql(ATable, AIndex), True);
 
   while not LQuery.Eof do
   begin
@@ -480,7 +478,7 @@ var
 begin
   Result := False;
 
-  LQuery := TioQueryEngine.GetRawQueryOpen(ConnectionDefName, SqlGenerator.BuildIndexExistsSql(ATable, AIndex));
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildIndexExistsSql(ATable, AIndex), True);
   Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
 end;
 
@@ -545,7 +543,7 @@ begin
   if ASequenceName.IsEmpty then
     raise EioArgumentNilException.Create(ClassName, 'SequenceExists', 'ASequenceName is not specified.');
 
-  LQuery := TioQueryEngine.GetRawQueryOpen(ConnectionDefName, FBSqlGenerator.BuildSequenceExistsSql(ASequenceName));
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, FBSqlGenerator.BuildSequenceExistsSql(ASequenceName), True);
   Result := LQuery.Fields[0].AsInteger > 0;
 end;
 

@@ -477,7 +477,7 @@ function TioDBBuilderStrategyBase._ExecuteExistsQuery(const ASql: string): Boole
 var
   LQuery: IioQuery;
 begin
-  LQuery := TioQueryEngine.GetRawQueryOpen(ConnectionDefName, ASql);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, ASql, True);
   Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
 end;
 

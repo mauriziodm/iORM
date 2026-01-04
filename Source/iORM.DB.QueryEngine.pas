@@ -53,8 +53,7 @@ type
     class function ComposeQueryIdentity(const AContext: IioContext; const AIdentity: String; const AForceCacheable: Boolean): String;
   public
     // Raw query methods (for DBBuilder and other low-level operations)
-    class function GetRawQuery(const AConnectionName: String): IioQuery;
-    class function GetRawQueryOpen(const AConnectionName: String; const ASQL: String): IioQuery;
+    class function GetRawQuery(const AConnectionName: String; const ASQL: String; AOpen: Boolean): IioQuery;
     // CRUD - ORM query methods (for normal ORM operations)
     class function GetQueryCount(const AContext: IioContext): IioQuery;
     class function GetQueryCreateIndex(const AContext: IioContext; const AIndexName: String; const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): IioQuery;
@@ -415,16 +414,15 @@ begin
     LQuery.WhereParamObjVersion_SetValue(AContext); // Qua prende l'Objversion dall'oggetto cos� come �
 end;
 
-class function TioQueryEngine.GetRawQuery(const AConnectionName: String): IioQuery;
+class function TioQueryEngine.GetRawQuery(const AConnectionName: String; const ASQL: String; AOpen: Boolean): IioQuery;
 begin
   Result := TioDBFactory.Query(AConnectionName);
-end;
 
-class function TioQueryEngine.GetRawQueryOpen(const AConnectionName: String; const ASQL: String): IioQuery;
-begin
-  Result := GetRawQuery(AConnectionName);
-  Result.SQL.Text := ASQL;
-  Result.Open;
+  if not ASQL.IsEmpty then
+    Result.SQL.Text := ASQL;
+
+  if AOpen then
+    Result.Open;
 end;
 
 end.
