@@ -67,6 +67,7 @@ type
     // Indexes related methods
     function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildIndexExistsSql(const AIndexName: string): string; override;
+    function BuildListAllIndexesSql: string; override;
     function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string; override;
     // Foreign keys
     function BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
@@ -130,8 +131,7 @@ end;
 
 function TioDBBuilderSqlGenSQLite.BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
 begin
-  // Do nothing. Can be removed?
-  Result := EmptyStr;
+  Result := Format('pragma table_info(''%s'')', [ATable.Name]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
@@ -144,6 +144,11 @@ begin
   Result := Format('SELECT * FROM sqlite_master WHERE type = ''index'' and name = ''%s''', [AIndexName]);
 end;
 
+function TioDBBuilderSqlGenSQLite.BuildListAllIndexesSql: string;
+begin
+  Result := 'SELECT name FROM sqlite_master WHERE type = ''index''';
+end;
+
 function TioDBBuilderSqlGenSQLite.BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string;
 begin
   Result := EmptyStr;
@@ -151,7 +156,7 @@ end;
 
 function TioDBBuilderSqlGenSQLite.BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string;
 begin
-  Result := EmptyStr;
+  Result := Format('PRAGMA index_list(''%s'')', [ATable.Name]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildTableExistsSql(const ATableName: string): string;

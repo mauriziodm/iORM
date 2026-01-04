@@ -167,11 +167,11 @@ var
   LQuery: IioQuery;
 begin
   // Drop all indexes part
-  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, 'SELECT * FROM sqlite_master WHERE type = ''index''');
+  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildListAllIndexesSql);
 
   while not LQuery.Eof do
   begin
-    AScript.Body.Add(Format('DROP INDEX %s;', [LQuery.Fields.FieldByName('name').AsString]));
+    AScript.Body.Add(Format('DROP INDEX %s;', [LQuery.Fields[0].AsString]));
     LQuery.Next;
   end;
 
@@ -192,7 +192,7 @@ var
   LQuery: IioQuery;
 begin
   // Carlo Marona (2025-10-16): ref to https://stackoverflow.com/questions/13426006/how-do-i-get-a-list-of-indexed-columns-for-a-given-table
-  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, Format('PRAGMA index_list(''%s''', [ATable.Name]));
+  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildListTableIndexesSql(ATable));
 
   while not LQuery.Eof do
   begin
@@ -206,7 +206,7 @@ var
   LQuery: IioQuery;
 begin
   Result := False;
-  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, Format('pragma table_info(''%s'')', [ATable.Name]));
+  LQuery := TioDBBuilderQueryEngine.OpenQuery(ConnectionDefName, SqlGenerator.BuildFieldExistsSql(ATable, AField));
 
   while not LQuery.Eof do
   begin
