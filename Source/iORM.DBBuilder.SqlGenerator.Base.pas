@@ -52,9 +52,14 @@ type
 
   TioDBBuilderSqlGenBase = class(TInterfacedObject, IioDBBuilderSqlGenerator)
   private
+    FConnectionDefName: string;
   protected
-    function BuildCommentSql(const AText: string): string; virtual;
-    function BuildWarningSql(const AText: string): string; virtual;
+    property ConnectionDefName: string read FConnectionDefName;
+
+    // Database operations (execute directly, don't return SQL)
+    procedure CreateDatabase; virtual; abstract;
+    function DatabaseExists: Boolean; virtual; abstract;
+
     function ExtractFieldDefaultValue(const AField: IioDBBuilderSchemaField): string;
     function GetMaxSqlIdentifierLength: integer; virtual;
     function GetMinSqlIdentifierLength: integer; virtual;
@@ -66,14 +71,14 @@ type
     function TranslateFKAction(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
     function TValueToSql(const AValue: TValue): string; virtual; abstract;
 
-    // Tables related methods
+    // Tables
     function BuildBeginAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     function BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     function BuildCreateTableSql(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string; virtual; abstract;
     function BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     function BuildEndCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     function BuildTableExistsSql(const ATableName: string): string; virtual; abstract;
-    // Fields related methods
+    // Fields
     function BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildAlterFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string; virtual; abstract;
@@ -81,15 +86,13 @@ type
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
-    // PrimaryKeys related methods
+    // PrimaryKeys
     function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     // Index related methods
     function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual; abstract;
     function BuildIndexFieldList(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex; const AIndexName: String; const AWithIndexOrientation: Boolean): String; virtual;
-
     function BuildDropIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; overload; virtual;
     function BuildDropIndexSql(const AIndexName: string): string; overload; virtual; abstract;
-
     function BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; overload; virtual; abstract;
     function BuildIndexExistsSql(const AIndexName: string): string; overload; virtual; abstract;
     function BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual; abstract;
@@ -98,19 +101,21 @@ type
     function BuildIndexUnique(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
     function BuildListAllIndexesSql: string; virtual; abstract;
     function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
+    function GetIndexOrientationSuffix(const AOrientation: TioIndexOrientation): string; virtual;
+    function GetIndexUniqueSuffix(const Unique: boolean): string; virtual;
     // Foreign keys
     function BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual; abstract;
     function BuildDropForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; overload; virtual;
     function BuildDropForeignKeySql(const ATableName, AForeignKeyName: string): string; overload; virtual; abstract;
     function BuildForeignKeyExistsSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual; abstract;
     function BuildForeignKeyModifiedSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual; abstract;
-    function BuildForeignKeyNameSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK;
-      const UpperCase: boolean = True): string; virtual;
+    function BuildForeignKeyNameSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK; const UpperCase: boolean = True): string; virtual;
     function BuildListAllForeignKeysSql: string; virtual; abstract;
     function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
-
-    function GetIndexOrientationSuffix(const AOrientation: TioIndexOrientation): string; virtual;
-    function GetIndexUniqueSuffix(const Unique: boolean): string; virtual;
+    // Comments
+    function BuildCommentSql(const AText: string): string; virtual;
+    // Warnings
+    function BuildWarningSql(const AText: string): string; virtual;
 
     function SqlIdentifierExeedMaxLength(const AIdentifierName: string): boolean; virtual;
     function SqlIdentifierBehindMinLength(const AIdentifierName: string): boolean; virtual;
@@ -118,7 +123,7 @@ type
     property MaxSqlIdentifierLength: integer read GetMaxSqlIdentifierLength;
     property MinSqlIdentifierLength: integer read GetMinSqlIdentifierLength;
   public
-    constructor Create; virtual;
+    constructor Create(const AConnectionDefName: string); virtual;
   end;
 
 implementation
@@ -335,10 +340,10 @@ begin
   Result := BuildCommentSql(Format('WARNING: %s', [AText]));
 end;
 
-constructor TioDBBuilderSqlGenBase.Create;
+constructor TioDBBuilderSqlGenBase.Create(const AConnectionDefName: string);
 begin
   inherited Create;
-
+  FConnectionDefName := AConnectionDefName;
 end;
 
 function TioDBBuilderSqlGenBase.ExtractFieldDefaultValue(const AField: IioDBBuilderSchemaField): string;

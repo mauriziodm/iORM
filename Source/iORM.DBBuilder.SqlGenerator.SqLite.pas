@@ -52,6 +52,9 @@ type
   protected
     function TValueToSql(const AValue: TValue): string; override;
   public
+    // Database
+    procedure CreateDatabase; override;
+    function DatabaseExists: Boolean; override;
     // Tables related methods
     function BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildEndCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
@@ -82,6 +85,8 @@ uses
   System.StrUtils,
 
   iORM.DB.Interfaces,
+  iORM.DB.Factory,
+  iORM.DB.ConnectionContainer,
   iORM.Context.Properties.Interfaces,
   iORM.Exceptions,
   iORM.CommonTypes,
@@ -92,6 +97,17 @@ uses
   ;
 
 { TioDBBuilderSqlGenSQLite }
+
+procedure TioDBBuilderSqlGenSQLite.CreateDatabase;
+begin
+  // SQLite creates the database file automatically when a connection is opened
+  TioDbFactory.Connection(ConnectionDefName);
+end;
+
+function TioDBBuilderSqlGenSQLite.DatabaseExists: Boolean;
+begin
+  Result := FileExists(TioConnectionManager.GetDatabaseFileName(ConnectionDefName));
+end;
 
 function TioDBBuilderSqlGenSQLite.BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string;
 begin

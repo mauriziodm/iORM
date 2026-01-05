@@ -257,6 +257,10 @@ type
   IioDBBuilderSqlGenerator = interface
     ['{9B5DE886-BE08-4422-9D6C-A92ABF948CD9}']
 
+    // Database operations (execute directly, don't return SQL)
+    procedure CreateDatabase;
+    function DatabaseExists: Boolean;
+
     // Tables related methods
     function BuildBeginAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
     function BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string;

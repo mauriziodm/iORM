@@ -57,8 +57,8 @@ type
     function _ExecuteExistsQuery(const ASql: string): Boolean;
   protected
     // Database
-    procedure CreateDatabase; virtual; abstract;
-    function DatabaseExists: Boolean; virtual; abstract;
+    procedure CreateDatabase; virtual;
+    function DatabaseExists: Boolean; virtual;
     // Tables
     procedure AlterTable(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure CreateOrAlterTables; virtual;
@@ -206,6 +206,16 @@ begin
     raise EioInvalidArgumentException.Create(ClassName, 'GetScript',
       'Script is not assigned. This operation requires a valid Script instance.');
   Result := FScript;
+end;
+
+procedure TioDBBuilderStrategyBase.CreateDatabase;
+begin
+  SqlGenerator.CreateDatabase;
+end;
+
+function TioDBBuilderStrategyBase.DatabaseExists: Boolean;
+begin
+  Result := SqlGenerator.DatabaseExists;
 end;
 
 procedure TioDBBuilderStrategyBase.CreateForeignKeys;

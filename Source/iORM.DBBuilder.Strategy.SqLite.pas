@@ -18,9 +18,6 @@ type
     procedure RenameAllTablesToOld; // For SQLite, if the DB is to be modified (not created) it renames all tables with "_old"
     function Table2OldTableName(const ATable: IioDBBuilderSchemaTable): String;
   protected
-    // Database
-    procedure CreateDatabase; override;
-    function DatabaseExists: Boolean; override;
     // Tables
     procedure AlterTable(const ATable: IioDBBuilderSchemaTable); override;
     procedure CreateTable(const ATable: IioDBBuilderSchemaTable); override;
@@ -139,11 +136,6 @@ begin
   end;
 end;
 
-procedure TioDBBuilderStrategySqLite.CreateDatabase;
-begin
-  TioQueryEngine.GetRawQuery(ConnectionDefName, 'SELECT 1=1', True);
-end;
-
 procedure TioDBBuilderStrategySqLite.CreateTable(const ATable: IioDBBuilderSchemaTable);
 begin
   Script.Body.Add(SqlGenerator.BuildBeginCreateTableSql(ATable));
@@ -155,11 +147,6 @@ begin
 
   Script.Body.DecIndentationLevel;
   Script.Body.Add(SqlGenerator.BuildEndCreateTableSql(ATable));
-end;
-
-function TioDBBuilderStrategySqLite.DatabaseExists: Boolean;
-begin
-  Result := FileExists(TioConnectionManager.GetDatabaseFileName(ConnectionDefName));
 end;
 
 procedure TioDBBuilderStrategySqLite.DropAllIndexes;

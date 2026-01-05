@@ -24,9 +24,6 @@ type
 
     property FBSqlGenerator: IioDBBuilderSqlGeneratorFirebird read GetFBSqlGenerator;
   protected
-    // Database
-    procedure CreateDatabase; override;
-    function DatabaseExists: Boolean; override;
     // Tables
     procedure AlterTable(const ATable: IioDBBuilderSchemaTable); override;
     procedure CreateTable(const ATable: IioDBBuilderSchemaTable); override;
@@ -105,16 +102,6 @@ begin
   end;
 end;
 
-procedure TioDBBuilderStrategyFirebird.CreateDatabase;
-begin
-  // N.B. Sfrutta un parametro di Firedac per autocreare il db se non esiste
-  TioDbFactory.ConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.Values['OpenMode'] := 'Create';
-  // N.B. Apriamo una connessione solo per fargli creare il db.
-  TioDbFactory.Connection(ConnectionDefName);
-  // N.B. Rimuoviamo il parametro di Firedac per autocreare il db se non esiste
-  TioDbFactory.ConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.Values['OpenMode'] := 'Open';
-end;
-
 procedure TioDBBuilderStrategyFirebird.CreateSequences;
 var
   LSequence: String;
@@ -171,33 +158,6 @@ begin
   // Check if sequence exists, then create it
   if (ATable.Status = stCreate) or (not SequenceExists(ATable.GetSequenceName)) then
     Script.Body.Add(FBSqlGenerator.BuildAddSequenceSql(ATable.GetSequenceName, ATable.Status = stCreate));
-end;
-
-function TioDBBuilderStrategyFirebird.DatabaseExists: Boolean;
-var
-  LOldOpenMode: string;
-begin
-  // NB: This code also works with ALIAS, the old one doesnt
-  // Carlo Marona (2025-10-10): Opening a query here implies opening the connection and if OpenMode param is set to OpenOrCreate or Create
-  //               (old code calls it CreateDatabase) in FireDac component the database will be created, so the method returns
-  //               always true
-  try
-    // Carlo Marona (2025-10-10): Saves old OpenMode FireDac option to restore later
-    LOldOpenMode := TioDbFactory.ConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.Values['OpenMode'];
-
-    try
-      // Carlo Marona (2025-10-10): disables FireDac database creation option in the connection (OpenMode = Open)
-      TioDbFactory.ConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.Values['OpenMode'] := 'Open';
-
-      TioQueryEngine.GetRawQuery(ConnectionDefName, 'SELECT * FROM RDB$DATABASE', True);
-      Result := True;
-    except
-      Result := False;
-    end;
-  finally
-    // Carlo Marona (2025-10-10): Restores old OpenMode value
-    TioDbFactory.ConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.Values['OpenMode'] := LOldOpenMode;
-  end;
 end;
 
 procedure TioDBBuilderStrategyFirebird.DropForeignKeys;

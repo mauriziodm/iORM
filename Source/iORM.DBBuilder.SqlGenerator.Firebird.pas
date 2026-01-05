@@ -1,4 +1,4 @@
-{
+ï»¿{
   ****************************************************************************
   *                                                                          *
   *           iORM - (interfaced ORM)                                        *
@@ -58,6 +58,9 @@ type
     function TranslateFieldType(const AField: IioDBBuilderSchemaField; const ReturnTypeNameOnly: boolean = true): String; override;
     function TValueToSql(const AValue: TValue): string; override;
   public
+    // Database operations
+    procedure CreateDatabase; override;
+    function DatabaseExists: Boolean; override;
     // Tables related methods
     function BuildAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
     function BuildBeginAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
@@ -106,6 +109,7 @@ uses
   iORM.Exceptions,
   iORM.DB.Factory,
   iORM.DB.Interfaces,
+  iORM.DB.QueryEngine,
   iORM.SqlTranslator,
   iORM.DB.Firebird.SqlDataConverter,
   iORM.DB.Consts,
@@ -121,6 +125,40 @@ const
 
 { TioDBBuilderSqlGenFirebird }
 
+procedure TioDBBuilderSqlGenFirebird.CreateDatabase;
+begin
+  // Use FireDAC OpenMode parameter to auto-create database if not exists
+  TioDbFactory.ConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.Values['OpenMode'] := 'Create';
+  // Open a connection just to create the database
+  TioDbFactory.Connection(ConnectionDefName);
+  // Remove the FireDAC parameter to auto-create database
+  TioDbFactory.ConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.Values['OpenMode'] := 'Open';
+end;
+
+function TioDBBuilderSqlGenFirebird.DatabaseExists: Boolean;
+var
+  LOldOpenMode: string;
+begin
+  // NB: This code also works with ALIAS, the old one doesn't
+  // Opening a query here implies opening the connection and if OpenMode param is set to OpenOrCreate or Create
+  // in FireDAC component the database will be created, so we need to temporarily set it to 'Open'
+  try
+    // Save old OpenMode FireDAC option to restore later
+    LOldOpenMode := TioDbFactory.ConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.Values['OpenMode'];
+    try
+      // Disable FireDAC database creation option in the connection (OpenMode = Open)
+      TioDbFactory.ConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.Values['OpenMode'] := 'Open';
+      TioQueryEngine.GetRawQuery(ConnectionDefName, 'SELECT * FROM RDB$DATABASE', True);
+      Result := True;
+    except
+      Result := False;
+    end;
+  finally
+    // Restore old OpenMode value
+    TioDbFactory.ConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.Values['OpenMode'] := LOldOpenMode;
+  end;
+end;
+
 function TioDBBuilderSqlGenFirebird.BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string;
 begin
   Result := Format('ADD %s', [InternalCreateField(AField)]);
@@ -134,7 +172,7 @@ var
   LTextBuilder: IioTextBuilder;
 begin
   // N.B. Viene calcolato un nome random (quindi non uso l'apposito metodo dell'antenato se eccessivo)
-  // perchè in FB c'e' un limite a 30 caratteri di lunghezza per i nomi dei constraint
+  // perchï¿½ in FB c'e' un limite a 30 caratteri di lunghezza per i nomi dei constraint
 //  LFKName := AdaptIdentifierName('FK_', AForeignKey.Name.ToUpper);   // Carlo Marona (2025-10-21): Made foreign key name uppercase
   LFKName := BuildForeignKeyNameSql(ATable, AForeignKey);
 
@@ -185,7 +223,7 @@ var
   LSqlText, LIndexName, LFieldList, LUnique, LIndexOrientation: String;
 begin
   // N.B. Viene calcolato un nome random (quindi non uso l'apposito metodo dell'antenato se eccessivo)
-  // perchè in FB c'e' un limite a 30 caratteri di lunghezza per i nomi dei constraint
+  // perchï¿½ in FB c'e' un limite a 30 caratteri di lunghezza per i nomi dei constraint
 //  LIndexName := AdaptIdentifierName('IDX_', BuildIndexNameSql(ATable, AIndex), MIN_IDENTIFIER_NAME_LENGTH); // Carlo Marona
   LIndexName := BuildIndexNameSql(ATable, AIndex);
   LIndexOrientation := BuildIndexOrientation(ATable, AIndex, LIndexName);
@@ -515,10 +553,10 @@ end;
 //  Result := APrefix.ToUpper + AName.ToUpper; // Carlo Marona (2025-10-22): Moved uppercase here
 //
 //  // N.B. Viene calcolato un nome random (quindi non uso l'apposito metodo dell'antenato se eccessivo)
-//  // perchè in FB c'e' un limite a 30 caratteri di lunghezza per i nomi dei constraint
-//  // Carlo Marona: In realtà il limite esiste per le versioni precedenti alla 4. Dalla 4 il limite è di 63 caratteri UTF8.
-//  //               Bisognerebbe ristrutturare la parte di interfacciamento con il database per renderla più sofisticata
-//  //               afficnhè tenga conto anche della specifica versione del database così da adattarsi alle specifiche caratteristiche
+//  // perchï¿½ in FB c'e' un limite a 30 caratteri di lunghezza per i nomi dei constraint
+//  // Carlo Marona: In realtï¿½ il limite esiste per le versioni precedenti alla 4. Dalla 4 il limite ï¿½ di 63 caratteri UTF8.
+//  //               Bisognerebbe ristrutturare la parte di interfacciamento con il database per renderla piï¿½ sofisticata
+//  //               afficnhï¿½ tenga conto anche della specifica versione del database cosï¿½ da adattarsi alle specifiche caratteristiche
 //  // Carlo Marona (2025-10-24): It's not feasible to use a random name in case of max length was exeeded, because it' not possibile
 //  //                            to verify if the foreign key exists.
 //  If Length(Result) > MaxLength then
