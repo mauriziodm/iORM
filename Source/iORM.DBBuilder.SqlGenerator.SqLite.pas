@@ -192,7 +192,7 @@ begin
     // Extract the default value if extsts
     LDefault := ExtractFieldDefaultValue(AField);
     LNotNull := IfThen(AField.FieldNotNull, 'NOT NULL', 'NULL');
-    Result := Format('"%s" %s %s %s', [AField.FieldName, TranslateFieldType(AField, true), LNotNull, LDefault]).Trim;
+    Result := Format('"%s" %s %s %s', [AField.FieldName, TranslateFieldType(AField, True), LNotNull, LDefault]).Trim;
   end;
 end;
 
