@@ -55,7 +55,7 @@ type
   protected
     function GetMaxSqlIdentifierLength: integer; override;
     function GetMinSqlIdentifierLength: integer; override;
-    function TranslateFieldType(const AField: IioDBBuilderSchemaField; const ReturnTypeNameOnly: boolean = true): String; override;
+    function TranslateFieldType(const AField: IioDBBuilderSchemaField; const AExcludeTypeAttributes: boolean): String; override;
     // Database operations
     procedure CreateDatabase; override;
     function DatabaseExists: Boolean; override;
@@ -629,19 +629,19 @@ begin
   Result := Format('%s %s %s %s', [AField.FieldName, TranslateFieldType(AField, False), LDefault, LNotNull]).Trim;
 end;
 
-function TioDBBuilderSqlGenFirebird.TranslateFieldType(const AField: IioDBBuilderSchemaField; const ReturnTypeNameOnly: boolean): String;
+function TioDBBuilderSqlGenFirebird.TranslateFieldType(const AField: IioDBBuilderSchemaField; const AExcludeTypeAttributes: boolean): String;
 begin
   case AField.FieldType of
     ioMdVarchar:
     begin
-      if ReturnTypeNameOnly then
+      if AExcludeTypeAttributes then
         Result := 'VARCHAR'
       else
         Result := Format('VARCHAR(%d)', [AField.FieldLength]);
     end;
     ioMdChar:
     begin
-      if ReturnTypeNameOnly then
+      if AExcludeTypeAttributes then
         Result := 'CHAR'
       else
         Result := Format('CHAR(%d)', [AField.FieldLength]);
@@ -658,14 +658,14 @@ begin
       Result := 'TIMESTAMP';
     ioMdDecimal:
     begin
-      if ReturnTypeNameOnly then
+      if AExcludeTypeAttributes then
         Result := 'DECIMAL'
       else
         Result := Format('DECIMAL(%d,%d)', [AField.FieldPrecision, AField.FieldScale]);
     end;
     ioMdNumeric:
     begin
-      if ReturnTypeNameOnly then
+      if AExcludeTypeAttributes then
         Result := 'NUMERIC'
       else
         Result := Format('NUMERIC(%d,%d)', [AField.FieldPrecision, AField.FieldScale]);
@@ -673,7 +673,7 @@ begin
     ioMdBoolean:
       Result := 'INTEGER';
     ioMdBinary:
-      if ReturnTypeNameOnly then
+      if AExcludeTypeAttributes then
         Result := 'BLOB'
       else
         Result := Format('BLOB SUB_TYPE %s', [IfThen(AField.FieldSubType.IsEmpty, '0', AField.FieldSubType)]);

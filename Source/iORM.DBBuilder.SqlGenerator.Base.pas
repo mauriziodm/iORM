@@ -55,9 +55,6 @@ type
     FConnectionDefName: string;
     FDataConverter: TioSqlDataConverterRef;
   protected
-    property ConnectionDefName: string read FConnectionDefName;
-    property DataConverter: TioSqlDataConverterRef read FDataConverter;
-
     function ExtractFieldDefaultValue(const AField: IioDBBuilderSchemaField): string;
     function GetMaxSqlIdentifierLength: integer; virtual;
     function GetMinSqlIdentifierLength: integer; virtual;
@@ -65,8 +62,8 @@ type
     function NewTextBuilder: IioTextBuilder; overload;
     function NewTextBuilder(const AIndentation: TioIndentation): IioTextBuilder; overload;
     function ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
-    function TranslateFieldType(const AField: IioDBBuilderSchemaField; const ReturnTypeNameOnly: boolean = true): String; virtual; abstract;
     function TranslateFKAction(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
+    function TranslateFieldType(const AField: IioDBBuilderSchemaField; const AExcludeTypeAttributes: boolean): String; virtual; abstract;
 
     // Database
     procedure CreateDatabase; virtual; abstract;
@@ -120,6 +117,8 @@ type
     function SqlIdentifierExeedMaxLength(const AIdentifierName: string): boolean; virtual;
     function SqlIdentifierBehindMinLength(const AIdentifierName: string): boolean; virtual;
 
+    property ConnectionDefName: string read FConnectionDefName;
+    property DataConverter: TioSqlDataConverterRef read FDataConverter;
     property MaxSqlIdentifierLength: integer read GetMaxSqlIdentifierLength;
     property MinSqlIdentifierLength: integer read GetMinSqlIdentifierLength;
   public

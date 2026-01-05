@@ -249,7 +249,7 @@ begin
   // Load some new field informations
   LTableName := ATable.Name.ToUpper;
   LFieldName := AField.FieldName.ToUpper;
-  LNewFieldType := SqlGenerator.TranslateFieldType(AField); //TranslateFieldTypeForModified(AField);
+  LNewFieldType := SqlGenerator.TranslateFieldType(AField, true);
   LNewFieldSubType := IfThen(AField.FieldSubType.IsEmpty, '0', AField.FieldSubType);
   LNewFieldLength := AField.FieldLength;
   LNewFieldPrecision := AField.FieldPrecision;

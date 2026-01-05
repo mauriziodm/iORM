@@ -226,7 +226,7 @@ begin
     begin
       LOldFieldType := LQuery.Fields.FieldByName('type').AsString;
       LOldFieldNotNull := (LQuery.Fields.FieldByName('notnull').AsInteger <> 0);
-      LNewFieldType := SqlGenerator.TranslateFieldType(AField);
+      LNewFieldType := SqlGenerator.TranslateFieldType(AField, true);
 
       // Verify if fieldType has been changed and check type affinity
       Result := Result or IsFieldTypeChanged(LOldFieldType, LNewFieldType, AField, ATable);

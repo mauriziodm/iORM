@@ -49,7 +49,7 @@ type
   private
     function InternalCreateField(const AField: IioDBBuilderSchemaField): String;
   protected
-    function TranslateFieldType(const AField: IioDBBuilderSchemaField; const ReturnTypeNameOnly: boolean = true): String; override;
+    function TranslateFieldType(const AField: IioDBBuilderSchemaField; const AExcludeTypeAttributes: boolean): String; override;
     // Database
     procedure CreateDatabase; override;
     function DatabaseExists: Boolean; override;
@@ -192,11 +192,11 @@ begin
     // Extract the default value if extsts
     LDefault := ExtractFieldDefaultValue(AField);
     LNotNull := IfThen(AField.FieldNotNull, 'NOT NULL', 'NULL');
-    Result := Format('"%s" %s %s %s', [AField.FieldName, TranslateFieldType(AField), LNotNull, LDefault]).Trim;
+    Result := Format('"%s" %s %s %s', [AField.FieldName, TranslateFieldType(AField, true), LNotNull, LDefault]).Trim;
   end;
 end;
 
-function TioDBBuilderSqlGenSQLite.TranslateFieldType(const AField: IioDBBuilderSchemaField; const ReturnTypeNameOnly: boolean): String;
+function TioDBBuilderSqlGenSQLite.TranslateFieldType(const AField: IioDBBuilderSchemaField; const AExcludeTypeAttributes: boolean): String;
 begin
   case AField.FieldType of
     ioMdVarchar:
