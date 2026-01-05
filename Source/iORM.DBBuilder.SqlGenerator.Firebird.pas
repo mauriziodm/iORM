@@ -56,10 +56,10 @@ type
     function GetMaxSqlIdentifierLength: integer; override;
     function GetMinSqlIdentifierLength: integer; override;
     function TranslateFieldType(const AField: IioDBBuilderSchemaField; const AExcludeTypeAttributes: boolean): String; override;
-    // Database operations
+    // Database
     procedure CreateDatabase; override;
     function DatabaseExists: Boolean; override;
-    // Tables related methods
+    // Tables
     function BuildAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
     function BuildBeginAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
@@ -67,16 +67,16 @@ type
     function BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildEndCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildTableExistsSql(const ATableName: string): string; override;
-    // Fields related methods
+    // Fields
     function BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string; override;
     function BuildAlterFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
-    // PrimaryKey related methods
+    // PrimaryKeys
     function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string; override;
-    // Indexes related methods
+    // Indexes
     function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildDropIndexSql(const AIndexName: string): string; override;
     function BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
@@ -84,7 +84,7 @@ type
     function BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildListAllIndexesSql: string; override;
     function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string; override;
-    // Foreign keys
+    // ForeignKeys
     function BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildDropForeignKeySql(const ATableName, AForeignKeyName: string): string; override;
     function BuildForeignKeyExistsSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;

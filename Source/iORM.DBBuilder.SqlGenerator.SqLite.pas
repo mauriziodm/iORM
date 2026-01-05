@@ -49,28 +49,28 @@ type
   private
     function InternalCreateField(const AField: IioDBBuilderSchemaField): String;
   protected
-    function TranslateFieldType(const AField: IioDBBuilderSchemaField; const AExcludeTypeAttributes: boolean): String; override;
     // Database
     procedure CreateDatabase; override;
     function DatabaseExists: Boolean; override;
-    // Tables related methods
+    // Tables
     function BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildEndCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildBeginAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildTableExistsSql(const ATableName: string): string; override;
-    // Fields related methods
+    // Fields
     function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string; override;
     function BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string; override;
     function BuildAlterFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
-    // Indexes related methods
+    function TranslateFieldType(const AField: IioDBBuilderSchemaField; const AExcludeTypeAttributes: boolean): String; override;
+    // Indexes
     function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildIndexExistsSql(const AIndexName: string): string; override;
     function BuildListAllIndexesSql: string; override;
     function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string; override;
-    // Foreign keys
+    // ForeignKeys
     function BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string; override;
   end;
@@ -189,7 +189,7 @@ begin
     Result := Format('"%s" INTEGER PRIMARY KEY NOT NULL', [AField.FieldName])
   else
   begin
-    // Extract the default value if extsts
+    // Extract the default value if exists
     LDefault := ExtractFieldDefaultValue(AField);
     LNotNull := IfThen(AField.FieldNotNull, 'NOT NULL', 'NULL');
     Result := Format('"%s" %s %s %s', [AField.FieldName, TranslateFieldType(AField, True), LNotNull, LDefault]).Trim;
