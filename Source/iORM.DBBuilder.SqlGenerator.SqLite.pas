@@ -48,10 +48,8 @@ type
   TioDBBuilderSqlGenSQLite = class(TioDBBuilderSqlGenBase)
   private
     function InternalCreateField(const AField: IioDBBuilderSchemaField): String;
-    function TranslateFieldType(const AField: IioDBBuilderSchemaField; const ReturnTypeNameOnly: boolean = true): String; override;
   protected
-    function TValueToSql(const AValue: TValue): string; override;
-  public
+    function TranslateFieldType(const AField: IioDBBuilderSchemaField; const ReturnTypeNameOnly: boolean = true): String; override;
     // Database
     procedure CreateDatabase; override;
     function DatabaseExists: Boolean; override;
@@ -228,11 +226,6 @@ begin
   else
     raise EioGenericException.Create(ClassName, 'TranslateFieldType', 'Wrong Metadata_FieldType');
   end;
-end;
-
-function TioDBBuilderSqlGenSQLite.TValueToSql(const AValue: TValue): string;
-begin
-  Result := TioSqlDataConverterSqLite.TValueToSql(AValue);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string;

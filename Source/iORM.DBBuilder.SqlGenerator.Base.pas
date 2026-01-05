@@ -53,12 +53,10 @@ type
   TioDBBuilderSqlGenBase = class(TInterfacedObject, IioDBBuilderSqlGenerator)
   private
     FConnectionDefName: string;
+    FDataConverter: TioSqlDataConverterRef;
   protected
     property ConnectionDefName: string read FConnectionDefName;
-
-    // Database operations (execute directly, don't return SQL)
-    procedure CreateDatabase; virtual; abstract;
-    function DatabaseExists: Boolean; virtual; abstract;
+    property DataConverter: TioSqlDataConverterRef read FDataConverter;
 
     function ExtractFieldDefaultValue(const AField: IioDBBuilderSchemaField): string;
     function GetMaxSqlIdentifierLength: integer; virtual;
@@ -69,8 +67,10 @@ type
     function ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
     function TranslateFieldType(const AField: IioDBBuilderSchemaField; const ReturnTypeNameOnly: boolean = true): String; virtual; abstract;
     function TranslateFKAction(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
-    function TValueToSql(const AValue: TValue): string; virtual; abstract;
 
+    // Database
+    procedure CreateDatabase; virtual; abstract;
+    function DatabaseExists: Boolean; virtual; abstract;
     // Tables
     function BuildBeginAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     function BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
@@ -344,6 +344,7 @@ constructor TioDBBuilderSqlGenBase.Create(const AConnectionDefName: string);
 begin
   inherited Create;
   FConnectionDefName := AConnectionDefName;
+  FDataConverter := TioDbFactory.SqlDataConverter(AConnectionDefName);
 end;
 
 function TioDBBuilderSqlGenBase.ExtractFieldDefaultValue(const AField: IioDBBuilderSchemaField): string;
@@ -355,7 +356,7 @@ begin
   if LFieldDefaultValue.IsEmpty then
     Result := ''
   else
-    Result := 'DEFAULT ' + TValueToSql(LFieldDefaultValue);
+    Result := 'DEFAULT ' + DataConverter.TValueToSql(LFieldDefaultValue);
 end;
 
 function TioDBBuilderSqlGenBase.GetIndexOrientationSuffix(const AOrientation: TioIndexOrientation): string;

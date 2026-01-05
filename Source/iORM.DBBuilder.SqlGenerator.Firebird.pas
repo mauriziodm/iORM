@@ -56,8 +56,6 @@ type
     function GetMaxSqlIdentifierLength: integer; override;
     function GetMinSqlIdentifierLength: integer; override;
     function TranslateFieldType(const AField: IioDBBuilderSchemaField; const ReturnTypeNameOnly: boolean = true): String; override;
-    function TValueToSql(const AValue: TValue): string; override;
-  public
     // Database operations
     procedure CreateDatabase; override;
     function DatabaseExists: Boolean; override;
@@ -684,11 +682,6 @@ begin
   else
     raise EioGenericException.Create(ClassName, 'TranslateFieldType', 'Wrong Metadata_FieldType');
   end;
-end;
-
-function TioDBBuilderSqlGenFirebird.TValueToSql(const AValue: TValue): string;
-begin
-  Result := TioSqlDataConverterFirebird.TValueToSql(AValue);
 end;
 
 end.
