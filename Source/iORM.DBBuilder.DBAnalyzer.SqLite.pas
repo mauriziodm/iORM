@@ -11,11 +11,12 @@ uses
 
 type
   TioDBBuilderDBAnalyzerSqLite = class(TioDBBuilderDBAnalyzer)
-  protected
+  private
     // If even one table is to be altered then all of them are to be altered
     //  (even those that have not actually changed). Instead those that are new
     //  (to be created) obviously remain to be created.
     procedure SQLite_AllOrNothingPostProcess;
+  protected
     procedure AnalyzeTables; override;
   end;
 
@@ -44,8 +45,8 @@ begin
     else
       AnalyzeFields(LTable);
 
-    // If the table status is not dbsClean then schema status became dbsAlter
-    if LTable.Status > stClean then
+    // If the table status is not stClean (and DB status is not stCreate) then the schema status became stUpdate
+    if (LTable.Status > stClean) and (Schema.Status <> stCreate) then
       Schema.Status := stUpdate;
   end;
 
