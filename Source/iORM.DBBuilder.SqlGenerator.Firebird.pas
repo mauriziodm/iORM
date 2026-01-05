@@ -469,7 +469,7 @@ begin
     '  rdb$index_segments right outer join rdb$indices on (rdb$index_segments.rdb$index_name = rdb$indices.rdb$index_name)' + SLineBreak +
     'where' + SLineBreak +
     '  (RDB$INDICES.RDB$SYSTEM_FLAG = 0) and' + SLineBreak +
-    '  (RDB$INDIXES.RDB$RELATION_NAME like ''%%s'')'
+    '  (RDB$INDICES.RDB$RELATION_NAME like ''%%s'')'
     , [ATable.Name]
   );
 end;
