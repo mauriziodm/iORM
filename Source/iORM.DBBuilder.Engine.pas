@@ -1,4 +1,4 @@
-{
+﻿{
   ****************************************************************************
   *                                                                          *
   *           iORM - (interfaced ORM)                                        *
@@ -464,8 +464,10 @@ procedure TioDBBuilderEngine_New.RebuildScript;
 begin
   FScript := TioDBBuilderFactory.NewSqlScript;
   case FSchema.Status of
-    stCreate: TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, FScript).GenerateCreateDatabaseScript;
-    stUpdate: TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, FScript).GenerateUpdateDatabaseScript;
+    stCreate:
+      TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, FScript).GenerateCreateDatabaseScript;
+    stUpdate:
+      TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, FScript).GenerateUpdateDatabaseScript;
   end;
 end;
 
