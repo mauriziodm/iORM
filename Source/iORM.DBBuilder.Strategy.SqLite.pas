@@ -29,6 +29,11 @@ type
     // Indexes
     procedure DropIndexes; override;
     procedure DropTableIndexes(const ATable: IioDBBuilderSchemaTable); override;
+    function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
+    function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
+    // ForeignKeys
+    function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
+    function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
 
     procedure GenerateDatabaseObjects(const Create: boolean); override;
   public
@@ -42,6 +47,7 @@ uses
   System.SysUtils,
   System.StrUtils,
 
+  iORM.Attributes,
   iORM.DB.Interfaces,
   iORM.DB.ConnectionContainer,
   iORM.DB.QueryEngine
@@ -151,18 +157,21 @@ end;
 
 procedure TioDBBuilderStrategySqLite.DropAllIndexes;
 var
-  LQuery: IioQuery;
+  LTable: IioDBBuilderSchemaTable;
 begin
-  // Drop all indexes part
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildListAllIndexesSql, True);
+  // Drop only indexes of tables that need to be rebuilt (stUpdate)
+  // Don't drop indexes of tables that remain unchanged (stClean) or are new (stCreate)
+  Script.Body.AddTitle('Dropping indexes for tables to be rebuilt');
 
-  while not LQuery.Eof do
+  for LTable in Schema.Tables.Values do
   begin
-    Script.Body.Add(Format('DROP INDEX %s;', [LQuery.Fields[0].AsString]));
-    LQuery.Next;
+    if LTable.Status <> stUpdate then
+      Continue;
+
+    DropTableIndexes(LTable);
   end;
 
-  // For SQLite, if the DB is to be modified (not created) it renames all tables with "_old"
+  // For SQLite, if DB needs to be modified, rename affected tables with "_old" suffix
   if Schema.Status = stUpdate then
     RenameAllTablesToOld;
 end;
@@ -241,11 +250,153 @@ begin
   end;
 end;
 
+function TioDBBuilderStrategySqLite.IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
+var
+  LQuery: IioQuery;
+  LIndexName: string;
+begin
+  Result := False;
+  LIndexName := SqlGenerator.BuildIndexNameSql(ATable, AIndex);
+
+  // PRAGMA index_list returns all indexes for a table
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildListTableIndexesSql(ATable), True);
+
+  while not LQuery.Eof do
+  begin
+    if SameText(LQuery.Fields.FieldByName('name').AsString, LIndexName) then
+      Exit(True);
+
+    LQuery.Next;
+  end;
+end;
+
+function TioDBBuilderStrategySqLite.IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
+var
+  LQuery: IioQuery;
+  LQueryInfo: IioQuery;
+  LIndexName: string;
+  LOldUnique: Boolean;
+  LOldFieldList: string;
+  LNewFieldList: string;
+begin
+  Result := False;
+  LIndexName := SqlGenerator.BuildIndexNameSql(ATable, AIndex);
+
+  // First, get index info from index_list to check uniqueness
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildListTableIndexesSql(ATable), True);
+
+  while not LQuery.Eof do
+  begin
+    if SameText(LQuery.Fields.FieldByName('name').AsString, LIndexName) then
+    begin
+      // Check uniqueness (unique field in PRAGMA index_list)
+      LOldUnique := LQuery.Fields.FieldByName('unique').AsInteger <> 0;
+      if LOldUnique <> AIndex.Unique then
+      begin
+        AIndex.AddChange(icUnique);
+        Result := True;
+      end;
+
+      // Now get the field list using PRAGMA index_info
+      LQueryInfo := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildIndexModifiedSql(ATable, AIndex), True);
+      LOldFieldList := '';
+
+      while not LQueryInfo.Eof do
+      begin
+        if not LOldFieldList.IsEmpty then
+          LOldFieldList := LOldFieldList + ',';
+        LOldFieldList := LOldFieldList + LQueryInfo.Fields.FieldByName('name').AsString.ToUpper;
+        LQueryInfo.Next;
+      end;
+
+      // Compare field lists (case-insensitive)
+      LNewFieldList := AIndex.CommaSepFieldList.ToUpper.Replace(' ', '');
+      LOldFieldList := LOldFieldList.Replace(' ', '');
+      if not SameText(LOldFieldList, LNewFieldList) then
+      begin
+        AIndex.AddChange(icFields);
+        Result := True;
+      end;
+
+      // Note: SQLite doesn't store index orientation (ASC/DESC) in a queryable way
+      // for all indexes. The ordering is stored in the index definition itself.
+      // We skip orientation check for SQLite.
+
+      Exit;
+    end;
+    LQuery.Next;
+  end;
+end;
+
+function TioDBBuilderStrategySqLite.ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
+var
+  LQuery: IioQuery;
+begin
+  Result := False;
+
+  // PRAGMA foreign_key_list returns: id, seq, table, from, to, on_update, on_delete, match
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildForeignKeyExistsSql(ATable, AForeignKey), True);
+
+  while not LQuery.Eof do
+  begin
+    // Match by dependent field (from) and reference table
+    if SameText(LQuery.Fields.FieldByName('from').AsString, AForeignKey.DependentFieldName) and
+       SameText(LQuery.Fields.FieldByName('table').AsString, AForeignKey.ReferenceTableName) then
+      Exit(True);
+
+    LQuery.Next;
+  end;
+end;
+
+function TioDBBuilderStrategySqLite.ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
+var
+  LQuery: IioQuery;
+  LOldOnUpdate, LOldOnDelete: string;
+  LNewOnUpdate, LNewOnDelete: string;
+begin
+  Result := False;
+
+  // PRAGMA foreign_key_list returns: id, seq, table, from, to, on_update, on_delete, match
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildForeignKeyModifiedSql(ATable, AForeignKey), True);
+
+  while not LQuery.Eof do
+  begin
+    // Find the matching FK by dependent field and reference table
+    if SameText(LQuery.Fields.FieldByName('from').AsString, AForeignKey.DependentFieldName) and
+       SameText(LQuery.Fields.FieldByName('table').AsString, AForeignKey.ReferenceTableName) then
+    begin
+      // Check reference field
+      if not SameText(LQuery.Fields.FieldByName('to').AsString, AForeignKey.ReferenceFieldName) then
+        Exit(True);
+
+      // Check ON UPDATE action
+      // Note: PRAGMA foreign_key_list returns actions as: NO ACTION, RESTRICT, CASCADE, SET NULL, SET DEFAULT
+      LOldOnUpdate := LQuery.Fields.FieldByName('on_update').AsString.ToUpper;
+      LNewOnUpdate := SqlGenerator.TranslateFKAction(AForeignKey, AForeignKey.OnUpdateAction).ToUpper;
+      if not SameText(LOldOnUpdate, LNewOnUpdate) then
+        Exit(True);
+
+      // Check ON DELETE action
+      // Note: PRAGMA foreign_key_list returns actions as: NO ACTION, RESTRICT, CASCADE, SET NULL, SET DEFAULT
+      LOldOnDelete := LQuery.Fields.FieldByName('on_delete').AsString.ToUpper;
+      LNewOnDelete := SqlGenerator.TranslateFKAction(AForeignKey, AForeignKey.OnDeleteAction).ToUpper;
+      if not SameText(LOldOnDelete, LNewOnDelete) then
+        Exit(True);
+
+      Exit(False); // FK exists and is not modified
+    end;
+    LQuery.Next;
+  end;
+
+  // FK not found - shouldn't happen if ForeignKeyExists was called first
+  Result := False;
+end;
+
 procedure TioDBBuilderStrategySqLite.GenerateDatabaseObjects(const Create: boolean);
 begin
   Script.Body.AddEmpty;
-  Script.Body.AddComment('Before we start...');
-  Script.Body.Add('PRAGMA defer_foreign_keys=off;');
+  Script.Body.AddComment('Before we start: defer foreign key checks to avoid errors during table rebuild');
+  Script.Body.Add('PRAGMA defer_foreign_keys=on;');
 
   if Create then
   begin
@@ -267,8 +418,8 @@ begin
   end;
 
   Script.Body.AddEmpty;
-  Script.Body.AddComment('At the end...');
-  Script.Body.Add('PRAGMA defer_foreign_keys=on;');
+  Script.Body.AddComment('At the end: restore normal foreign key checks');
+  Script.Body.Add('PRAGMA defer_foreign_keys=off;');
   Script.Body.AddEmpty;
 end;
 

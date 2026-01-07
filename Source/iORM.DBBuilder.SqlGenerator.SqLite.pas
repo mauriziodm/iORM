@@ -67,12 +67,21 @@ type
     function TranslateFieldType(const AField: IioDBBuilderSchemaField; const AExcludeTypeAttributes: boolean): String; override;
     // Indexes
     function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
-    function BuildIndexExistsSql(const AIndexName: string): string; override;
+    function BuildIndexExistsSql(const AIndexName: string): string; overload; override;
+    function BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; overload; override;
+    function BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildListAllIndexesSql: string; override;
     function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string; override;
     // ForeignKeys
     function BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
+    function BuildForeignKeyExistsSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
+    function BuildForeignKeyModifiedSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string; override;
+    function BuildListAllForeignKeysSql: string; override;
+    // PrimaryKey
+    function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string; override;
+    // RecreateField
+    function BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
   end;
 
 implementation
@@ -158,6 +167,20 @@ begin
   Result := Format('SELECT * FROM sqlite_master WHERE type = ''index'' and name = ''%s''', [AIndexName]);
 end;
 
+function TioDBBuilderSqlGenSQLite.BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
+begin
+  Result := BuildIndexExistsSql(BuildIndexNameSql(ATable, AIndex));
+end;
+
+function TioDBBuilderSqlGenSQLite.BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
+var
+  LIndexName: string;
+begin
+  // PRAGMA index_info returns columns info for the index
+  LIndexName := BuildIndexNameSql(ATable, AIndex);
+  Result := Format('PRAGMA index_info(''%s'')', [LIndexName]);
+end;
+
 function TioDBBuilderSqlGenSQLite.BuildListAllIndexesSql: string;
 begin
   Result := 'SELECT name FROM sqlite_master WHERE type = ''index''';
@@ -165,6 +188,41 @@ end;
 
 function TioDBBuilderSqlGenSQLite.BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string;
 begin
+  // PRAGMA foreign_key_list returns all foreign keys for a table
+  Result := Format('PRAGMA foreign_key_list(''%s'')', [ATable.Name]);
+end;
+
+function TioDBBuilderSqlGenSQLite.BuildListAllForeignKeysSql: string;
+begin
+  // SQLite doesn't have a single query to list all FKs across all tables
+  // This would require iterating through all tables and calling PRAGMA foreign_key_list for each
+  // Return empty string - Strategy will handle this differently
+  Result := EmptyStr;
+end;
+
+function TioDBBuilderSqlGenSQLite.BuildForeignKeyExistsSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
+begin
+  // PRAGMA foreign_key_list returns all FKs for a table, Strategy will filter by name
+  Result := Format('PRAGMA foreign_key_list(''%s'')', [ATable.Name]);
+end;
+
+function TioDBBuilderSqlGenSQLite.BuildForeignKeyModifiedSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
+begin
+  // Same query as existence check - Strategy will compare the values
+  Result := Format('PRAGMA foreign_key_list(''%s'')', [ATable.Name]);
+end;
+
+function TioDBBuilderSqlGenSQLite.BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string;
+begin
+  // SQLite defines PRIMARY KEY inline in CREATE TABLE statement
+  // Cannot add PK after table creation
+  Result := EmptyStr;
+end;
+
+function TioDBBuilderSqlGenSQLite.BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
+begin
+  // SQLite doesn't support ALTER COLUMN - requires full table rebuild
+  // This is handled by the Strategy layer (rename table, create new, copy data)
   Result := EmptyStr;
 end;
 

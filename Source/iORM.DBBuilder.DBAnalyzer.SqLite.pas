@@ -11,11 +11,6 @@ uses
 
 type
   TioDBBuilderDBAnalyzerSqLite = class(TioDBBuilderDBAnalyzer)
-  private
-    // If even one table is to be altered then all of them are to be altered
-    //  (even those that have not actually changed). Instead those that are new
-    //  (to be created) obviously remain to be created.
-    procedure SQLite_AllOrNothingPostProcess;
   protected
     procedure AnalyzeTables; override;
   end;
@@ -35,39 +30,30 @@ procedure TioDBBuilderDBAnalyzerSqLite.AnalyzeTables;
 var
   LTable: IioDBBuilderSchemaTable;
 begin
-  // Loop for all tables
+  // Loop through all tables in the schema
   for LTable in Schema.Tables.Values do
   begin
-    // Analyze the table and set it's status
-    // Note: If the schema status is dbsCreate then all the tables must be dbsCreate (obviously)
+    // Analyze the table and set its status
+    // Note: If schema status is stCreate then all tables must be stCreate
     if (Schema.Status = stCreate) or not Strategy.TableExists(LTable) then
       LTable.Status := stCreate
     else
+    begin
       AnalyzeFields(LTable);
+      AnalyzeIndexes(LTable);
+      AnalyzeForeignKeys(LTable);
+    end;
 
-    // If the table status is not stClean (and DB status is not stCreate) then the schema status became stUpdate
+    // If table status is not stClean (and DB status is not stCreate)
+    // then the schema status becomes stUpdate
     if (LTable.Status > stClean) and (Schema.Status <> stCreate) then
       Schema.Status := stUpdate;
   end;
 
-  // If even one table is to be altered then all of them are to be altered
-  //  (even those that have not actually changed). Instead those that are new
-  //  (to be created) obviously remain to be created.
-  SQLite_AllOrNothingPostProcess;
+  // Note: The old SQLite_AllOrNothingPostProcess is no longer needed
+  // because now the Strategy only drops indexes of tables being rebuilt,
+  // not all indexes in the database. This allows rebuilding only
+  // the tables that were actually modified, improving performance.
 end;
-
-procedure TioDBBuilderDBAnalyzerSqLite.SQLite_AllOrNothingPostProcess;
-var
-  LTable: IioDBBuilderSchemaTable;
-begin
-  // If even one table is to be altered then all of them are to be altered
-  //  (even those that have not actually changed). Instead those that are new
-  //  (to be created) obviously remain to be created.
-  if Schema.Status = stUpdate then
-    for LTable in Schema.Tables.Values do
-      if LTable.Status = stClean then
-        LTable.Status := stUpdate;
-end;
-
 
 end.

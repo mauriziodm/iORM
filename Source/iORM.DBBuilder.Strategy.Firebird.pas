@@ -352,6 +352,8 @@ begin
       (AForeignKey.DependentFieldName.ToUpper <> LQuery.Fields.FieldByName('Field_Name').AsString.ToUpper) or
       (AForeignKey.ReferenceFieldName.ToUpper <> LQuery.Fields.FieldByName('FK_Field').AsString.ToUpper) or
       (AForeignKey.ReferenceTableName.ToUpper <> LQuery.Fields.FieldByName('Reference_Table').AsString.ToUpper);
+    if Result then
+      Break;
     LQuery.Next;
   end;
 end;

@@ -300,6 +300,7 @@ type
     function BuildForeignKeyNameSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK;
       const UpperCase: boolean = True): string;
     function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string;
+    function TranslateFKAction(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
 
     function SqlIdentifierExeedMaxLength(const AIdentifierName: string): boolean;
     function SqlIdentifierBehindMinLength(const AIdentifierName: string): boolean;

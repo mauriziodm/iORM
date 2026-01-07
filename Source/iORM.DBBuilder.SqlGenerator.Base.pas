@@ -148,7 +148,7 @@ begin
   Result := EmptyStr;
 
   case AFKAction of
-    fkNoAction:
+    fkUnspecified, fkNoAction:
       Exit('NO ACTION');
     fkSetNull:
       Exit('SET NULL');
