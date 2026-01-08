@@ -93,8 +93,6 @@ type
     // Index related methods
     // ------------------------------------------
 
-    function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual; abstract;
-
     // --> Translate_SchemaIndex_To_CommaSepListOfFieldNames
     function BuildIndexFieldList(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex; const AIndexName: String; const AWithIndexOrientation: Boolean): String; virtual;
     // --> Translate_SchemaTableAndIndex_To_IndexName (eliminare parametro UpperCase perchè mi sembra non vemga mai impostato e usa sempre il default)
@@ -108,6 +106,9 @@ type
     // --> Translate_Unique_To_UniqueSuffixForIndexName
     function GetIndexUniqueSuffix(const Unique: boolean): string; virtual;
 
+
+    // --> BuildSQL_AddIndex
+    function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual; abstract;
 
 
     // --> BuildSQL_DropIndex (vedere se si può eliminare e tenere solo quella per nome perchè così si possono eliminare tutti gli indici anche quelli vecchi non più mappati)

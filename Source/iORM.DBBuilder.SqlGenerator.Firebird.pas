@@ -220,7 +220,7 @@ var
   LSqlText, LIndexName, LFieldList, LUnique, LIndexOrientation: String;
 begin
   // N.B. Viene calcolato un nome random (quindi non uso l'apposito metodo dell'antenato se eccessivo)
-  // perch� in FB c'e' un limite a 30 caratteri di lunghezza per i nomi dei constraint
+  // perchè in FB c'e' un limite a 30 caratteri di lunghezza per i nomi dei constraint
 //  LIndexName := AdaptIdentifierName('IDX_', BuildIndexNameSql(ATable, AIndex), MIN_IDENTIFIER_NAME_LENGTH); // Carlo Marona
   LIndexName := BuildIndexNameSql(ATable, AIndex);
   LIndexOrientation := BuildIndexOrientation(ATable, AIndex, LIndexName);
