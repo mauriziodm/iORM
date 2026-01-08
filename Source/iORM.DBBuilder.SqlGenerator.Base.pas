@@ -1,4 +1,4 @@
-{
+﻿{
   ****************************************************************************
   *                                                                          *
   *           iORM - (interfaced ORM)                                        *
@@ -95,8 +95,8 @@ type
 
     // --> Translate_SchemaIndex_To_CommaSepListOfFieldNames
     function BuildIndexFieldList(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
-    // --> Translate_SchemaTableAndIndex_To_IndexName (eliminare parametro UpperCase perch� mi sembra non vemga mai impostato e usa sempre il default)
-    function BuildIndexNameSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex; const UpperCase: boolean = True): String; virtual;
+    // --> Translate_SchemaTableAndIndex_To_IndexName
+    function BuildIndexNameSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): String; virtual;
     // --> Translate_SchemaIndex_To_Orientation
     function BuildIndexOrientation(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
     // --> Translate_SchemaIndex_To_Unique
@@ -302,8 +302,7 @@ begin
   end;
 end;
 
-function TioDBBuilderSqlGenBase.BuildIndexNameSql(const ATable: IioDBBuilderSchemaTable;
-  const AIndex: IioDBBuilderSchemaIndex; const UpperCase: boolean): String;
+function TioDBBuilderSqlGenBase.BuildIndexNameSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): String;
 var
   LFieldList: TArray<string>;
   LShorten: boolean;
@@ -351,10 +350,7 @@ begin
     until not LShorten;
   end;
 
-  if UpperCase then
-    Result := LIndexName.ToUpper
-  else
-    Result := LIndexName;
+  Result := LIndexName.ToUpper;
 end;
 
 function TioDBBuilderSqlGenBase.BuildIndexOrientation(const AIndex: IioDBBuilderSchemaIndex): String;
