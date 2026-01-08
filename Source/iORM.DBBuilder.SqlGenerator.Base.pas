@@ -98,13 +98,13 @@ type
     // --> Translate_SchemaTableAndIndex_To_IndexName
     function Translate_SchemaTableAndIndex_To_IndexName(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): String; virtual;
     // --> Translate_SchemaIndex_To_Orientation
-    function BuildIndexOrientation(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
+    function Translate_SchemaIndex_To_Orientation(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
     // --> Translate_SchemaIndex_To_Unique
-    function BuildIndexUnique(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
+    function Translate_SchemaIndex_To_Unique(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
     // --> Translate_Orientation_To_OrientationSuffixForIndexName
-    function GetIndexOrientationSuffix(const AOrientation: TioIndexOrientation): string; virtual;
+    function Translate_Orientation_To_OrientationSuffixForIndexName(const AOrientation: TioIndexOrientation): string; virtual;
     // --> Translate_Unique_To_UniqueSuffixForIndexName
-    function GetIndexUniqueSuffix(const Unique: boolean): string; virtual;
+    function Translate_Unique_To_UniqueSuffixForIndexName(const Unique: boolean): string; virtual;
 
 
     // --> BuildSQL_AddIndex
@@ -283,7 +283,7 @@ var
   LComma: String;
   LIndexOrientation: String;
 begin
-  LIndexOrientation := BuildIndexOrientation(AIndex);
+  LIndexOrientation := Translate_SchemaIndex_To_Orientation(AIndex);
 
   LFieldList := TStringList.Create;
 
@@ -333,15 +333,15 @@ begin
 
         // Max length is reduced by the length of unique and orientation suffixes (if presents) and the legth of 'IDX_' prefix
         LIndexName := 'IDX_' + ShortenIdentifierName(LTmpIndexName,
-          MaxSqlIdentifierLength - GetIndexOrientationSuffix(AIndex.IndexOrientation).Length -
-          GetIndexUniqueSuffix(AIndex.Unique).Length - 4);
+          MaxSqlIdentifierLength - Translate_Orientation_To_OrientationSuffixForIndexName(AIndex.IndexOrientation).Length -
+          Translate_Unique_To_UniqueSuffixForIndexName(AIndex.Unique).Length - 4);
       end;
 
       // Index orientation
-      LIndexName := LIndexName + GetIndexOrientationSuffix(AIndex.IndexOrientation);
+      LIndexName := LIndexName + Translate_Orientation_To_OrientationSuffixForIndexName(AIndex.IndexOrientation);
 
       // Unique
-      LIndexName := LIndexName + GetIndexUniqueSuffix(AIndex.Unique);
+      LIndexName := LIndexName + Translate_Unique_To_UniqueSuffixForIndexName(AIndex.Unique);
 
       // Translate
       LIndexName := TioSqlTranslator.Translate(LIndexName, ATable.GetContextTable.GetClassName, False);
@@ -353,7 +353,7 @@ begin
   Result := LIndexName.ToUpper;
 end;
 
-function TioDBBuilderSqlGenBase.BuildIndexOrientation(const AIndex: IioDBBuilderSchemaIndex): String;
+function TioDBBuilderSqlGenBase.Translate_SchemaIndex_To_Orientation(const AIndex: IioDBBuilderSchemaIndex): String;
 begin
   Result := EmptyStr;
 
@@ -365,7 +365,7 @@ begin
   end;
 end;
 
-function TioDBBuilderSqlGenBase.BuildIndexUnique(const AIndex: IioDBBuilderSchemaIndex): String;
+function TioDBBuilderSqlGenBase.Translate_SchemaIndex_To_Unique(const AIndex: IioDBBuilderSchemaIndex): String;
 begin
   if AIndex.Unique then
     Exit('UNIQUE')
@@ -397,7 +397,7 @@ begin
     Result := 'DEFAULT ' + DataConverter.TValueToSql(LFieldDefaultValue);
 end;
 
-function TioDBBuilderSqlGenBase.GetIndexOrientationSuffix(const AOrientation: TioIndexOrientation): string;
+function TioDBBuilderSqlGenBase.Translate_Orientation_To_OrientationSuffixForIndexName(const AOrientation: TioIndexOrientation): string;
 begin
   case AOrientation of
     ioAscending:
@@ -407,7 +407,7 @@ begin
   end;
 end;
 
-function TioDBBuilderSqlGenBase.GetIndexUniqueSuffix(const Unique: boolean): string;
+function TioDBBuilderSqlGenBase.Translate_Unique_To_UniqueSuffixForIndexName(const Unique: boolean): string;
 begin
   if Unique then
     Result := '_U'

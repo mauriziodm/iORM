@@ -224,8 +224,8 @@ begin
   // perchè in FB c'e' un limite a 30 caratteri di lunghezza per i nomi dei constraint
 //  LIndexName := AdaptIdentifierName('IDX_', Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex), MIN_IDENTIFIER_NAME_LENGTH); // Carlo Marona
   LIndexName := Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
-  LIndexOrientation := BuildIndexOrientation(AIndex);
-  LUnique := BuildIndexUnique(AIndex);
+  LIndexOrientation := Translate_SchemaIndex_To_Orientation(AIndex);
+  LUnique := Translate_SchemaIndex_To_Unique(AIndex);
   LFieldList := Translate_SchemaIndex_To_CommaSepListOfFieldNames(AIndex);
 
   // Compose the create index query text
