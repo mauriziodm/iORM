@@ -80,6 +80,7 @@ type
     function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildDropIndexSql(const AIndexName: string): string; override;
     function BuildIndexExistsSql(const AIndexName: string): string; override;
+    function BuildIndexFieldList(const AIndex: IioDBBuilderSchemaIndex): String; override;
     function BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildListAllIndexesSql: string; override;
     function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string; override;
@@ -110,7 +111,7 @@ uses
   iORM.SqlTranslator,
   iORM.DB.Firebird.SqlDataConverter,
   iORM.DB.Consts,
-  iORM.TextBuilder.Interfaces
+  iORM.TextBuilder.Interfaces, System.Classes
 
   ;
 
@@ -223,9 +224,9 @@ begin
   // perchè in FB c'e' un limite a 30 caratteri di lunghezza per i nomi dei constraint
 //  LIndexName := AdaptIdentifierName('IDX_', BuildIndexNameSql(ATable, AIndex), MIN_IDENTIFIER_NAME_LENGTH); // Carlo Marona
   LIndexName := BuildIndexNameSql(ATable, AIndex);
-  LIndexOrientation := BuildIndexOrientation(ATable, AIndex, LIndexName);
+  LIndexOrientation := BuildIndexOrientation(AIndex);
   LUnique := BuildIndexUnique(AIndex);
-  LFieldList := BuildIndexFieldList(ATable, AIndex, LIndexName, False);
+  LFieldList := BuildIndexFieldList(AIndex);
 
   // Compose the create index query text
   if not LUnique.IsEmpty then
@@ -385,6 +386,30 @@ end;
 function TioDBBuilderSqlGenFirebird.BuildIndexExistsSql(const AIndexName: string): string;
 begin
   Result := Format('select RDB$INDEX_NAME from RDB$INDICES where UPPER(RDB$INDEX_NAME) = UPPER(''%s'')', [AIndexName]);
+end;
+
+function TioDBBuilderSqlGenFirebird.BuildIndexFieldList(const AIndex: IioDBBuilderSchemaIndex): String;
+var
+  LFieldList: TStrings;
+  LField: String;
+  LComma: String;
+begin
+  // Firebird does not support ASC/DESC orientation in field list
+  LFieldList := TStringList.Create;
+
+  try
+    LComma := '';
+    LFieldList.Delimiter := ',';
+    LFieldList.DelimitedText := AIndex.CommaSepFieldList;
+
+    for LField in LFieldList do
+    begin
+      Result := Format('%s%s %s', [Result, LComma, LField.Trim]).Trim;
+      LComma := ',';
+    end;
+  finally
+    LFieldList.Free;
+  end;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
