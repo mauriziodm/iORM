@@ -127,7 +127,7 @@ var
 begin
   LIndexName := BuildIndexNameSql(ATable, AIndex);
   LUnique := BuildIndexUnique(AIndex);
-  LFieldList := BuildIndexFieldList(AIndex);
+  LFieldList := Translate_SchemaIndex_To_CommaSepListOfFieldNames(AIndex);
   // Compose the create index query text
   LSqlText := Format('CREATE %s INDEX IF NOT EXISTS %s ON %s (%s);', [LUnique, LIndexName, ATable.Name, LFieldList]);
 

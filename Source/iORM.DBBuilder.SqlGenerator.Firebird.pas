@@ -80,7 +80,7 @@ type
     function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildDropIndexSql(const AIndexName: string): string; override;
     function BuildIndexExistsSql(const AIndexName: string): string; override;
-    function BuildIndexFieldList(const AIndex: IioDBBuilderSchemaIndex): String; override;
+    function Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String; override;
     function BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildListAllIndexesSql: string; override;
     function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string; override;
@@ -226,7 +226,7 @@ begin
   LIndexName := BuildIndexNameSql(ATable, AIndex);
   LIndexOrientation := BuildIndexOrientation(AIndex);
   LUnique := BuildIndexUnique(AIndex);
-  LFieldList := BuildIndexFieldList(AIndex);
+  LFieldList := Translate_SchemaIndex_To_CommaSepListOfFieldNames(AIndex);
 
   // Compose the create index query text
   if not LUnique.IsEmpty then
@@ -388,7 +388,7 @@ begin
   Result := Format('select RDB$INDEX_NAME from RDB$INDICES where UPPER(RDB$INDEX_NAME) = UPPER(''%s'')', [AIndexName]);
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildIndexFieldList(const AIndex: IioDBBuilderSchemaIndex): String;
+function TioDBBuilderSqlGenFirebird.Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String;
 var
   LFieldList: TStrings;
   LField: String;

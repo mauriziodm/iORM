@@ -94,7 +94,7 @@ type
     // ------------------------------------------
 
     // --> Translate_SchemaIndex_To_CommaSepListOfFieldNames
-    function BuildIndexFieldList(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
+    function Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
     // --> Translate_SchemaTableAndIndex_To_IndexName
     function BuildIndexNameSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): String; virtual;
     // --> Translate_SchemaIndex_To_Orientation
@@ -276,7 +276,7 @@ begin
   Result := BuildIndexExistsSql(BuildIndexNameSql(ATable, AIndex));
 end;
 
-function TioDBBuilderSqlGenBase.BuildIndexFieldList(const AIndex: IioDBBuilderSchemaIndex): String;
+function TioDBBuilderSqlGenBase.Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String;
 var
   LFieldList: TStrings;
   LField: String;
