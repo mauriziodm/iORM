@@ -66,11 +66,11 @@ type
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function TranslateFieldType(const AField: IioDBBuilderSchemaField; const AExcludeTypeAttributes: boolean): String; override;
     // Indexes
-    function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
-    function BuildIndexExistsSql(const AIndexName: string): string; overload; override;
+    function BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
+    function BuildSQL_IndexExistsByName(const AIndexName: string): string; override;
     function BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
-    function BuildListAllIndexesSql: string; override;
-    function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string; override;
+    function BuildSQL_ListOfAllIndexNamesOfAllTables: string; override;
+    function BuildSQL_ListOfInfoAboutAllIndexesOfOneTable(const ATable: IioDBBuilderSchemaTable): string; override;
     // ForeignKeys
     function BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildForeignKeyExistsSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
@@ -121,7 +121,7 @@ begin
   Result := InternalCreateField(AField);
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
 var
   LSqlText, LIndexName, LFieldList, LUnique: String;
 begin
@@ -161,7 +161,7 @@ begin
   Result := Format('pragma table_info(''%s'')', [ATable.Name]);
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildIndexExistsSql(const AIndexName: string): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_IndexExistsByName(const AIndexName: string): string;
 begin
   Result := Format('SELECT * FROM sqlite_master WHERE type = ''index'' and name = ''%s''', [AIndexName]);
 end;
@@ -175,7 +175,7 @@ begin
   Result := Format('PRAGMA index_info(''%s'')', [LIndexName]);
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildListAllIndexesSql: string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_ListOfAllIndexNamesOfAllTables: string;
 begin
   Result := 'SELECT name FROM sqlite_master WHERE type = ''index''';
 end;
@@ -220,7 +220,7 @@ begin
   Result := EmptyStr;
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_ListOfInfoAboutAllIndexesOfOneTable(const ATable: IioDBBuilderSchemaTable): string;
 begin
   Result := Format('PRAGMA index_list(''%s'')', [ATable.Name]);
 end;

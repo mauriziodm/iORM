@@ -279,15 +279,15 @@ type
     // PrimaryKeys related methods
     function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string;
     // Indexes related methods
-    function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
-    function BuildDropIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; overload;
-    function BuildDropIndexSql(const AIndexName: string): string; overload;
-    function BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; overload;
-    function BuildIndexExistsSql(const AIndexName: string): string; overload;
+    function BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
+    function BuildSQL_DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
+    function BuildSQL_DropIndexByName(const AIndexName: string): string;
+    function BuildSQL_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
+    function BuildSQL_IndexExistsByName(const AIndexName: string): string;
     function BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
     function Translate_SchemaTableAndIndex_To_IndexName(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): String;
-    function BuildListAllIndexesSql: string;
-    function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string;
+    function BuildSQL_ListOfAllIndexNamesOfAllTables: string;
+    function BuildSQL_ListOfInfoAboutAllIndexesOfOneTable(const ATable: IioDBBuilderSchemaTable): string;
     function BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     // Foreign keys
     function BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;

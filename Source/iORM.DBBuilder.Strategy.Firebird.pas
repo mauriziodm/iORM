@@ -178,11 +178,11 @@ procedure TioDBBuilderStrategyFirebird.DropIndexes;
 var
   LQuery: IioQuery;
 begin
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildListAllIndexesSql, True);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_ListOfAllIndexNamesOfAllTables, True);
 
   while not LQuery.Eof do
   begin
-    Script.Body.Add(SqlGenerator.BuildDropIndexSql(LQuery.Fields[0].AsString));
+    Script.Body.Add(SqlGenerator.BuildSQL_DropIndexByName(LQuery.Fields[0].AsString));
     LQuery.Next;
   end;
 end;
@@ -201,11 +201,11 @@ procedure TioDBBuilderStrategyFirebird.DropTableIndexes(const ATable: IioDBBuild
 var
   LQuery: IioQuery;
 begin
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildListTableIndexesSql(ATable), True);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_ListOfInfoAboutAllIndexesOfOneTable(ATable), True);
 
   while not LQuery.Eof do
   begin
-    Script.Body.Add(SqlGenerator.BuildDropIndexSql(LQuery.Fields[0].AsString));
+    Script.Body.Add(SqlGenerator.BuildSQL_DropIndexByName(LQuery.Fields[0].AsString));
     LQuery.Next;
   end;
 end;
@@ -430,7 +430,7 @@ var
 begin
   Result := False;
 
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildIndexExistsSql(ATable, AIndex), True);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexExists(ATable, AIndex), True);
   Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
 end;
 

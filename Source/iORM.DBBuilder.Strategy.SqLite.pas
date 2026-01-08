@@ -188,7 +188,7 @@ var
   LQuery: IioQuery;
 begin
   // Carlo Marona (2025-10-16): ref to https://stackoverflow.com/questions/13426006/how-do-i-get-a-list-of-indexed-columns-for-a-given-table
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildListTableIndexesSql(ATable), True);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_ListOfInfoAboutAllIndexesOfOneTable(ATable), True);
 
   while not LQuery.Eof do
   begin
@@ -259,7 +259,7 @@ begin
   LIndexName := SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
 
   // PRAGMA index_list returns all indexes for a table
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildListTableIndexesSql(ATable), True);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_ListOfInfoAboutAllIndexesOfOneTable(ATable), True);
 
   while not LQuery.Eof do
   begin
@@ -283,7 +283,7 @@ begin
   LIndexName := SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
 
   // First, get index info from index_list to check uniqueness
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildListTableIndexesSql(ATable), True);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_ListOfInfoAboutAllIndexesOfOneTable(ATable), True);
 
   while not LQuery.Eof do
   begin

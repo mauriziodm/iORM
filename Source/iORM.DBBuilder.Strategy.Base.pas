@@ -163,12 +163,12 @@ begin
     case LIndex.Status of
       stCreate:
         begin
-          Script.Body.Add(SqlGenerator.BuildAddIndexSql(ATable, LIndex));
+          Script.Body.Add(SqlGenerator.BuildSQL_AddIndex(ATable, LIndex));
         end;
       stUpdate:
         begin
-          Script.Body.Add(SqlGenerator.BuildDropIndexSql(ATable, LIndex));
-          Script.Body.Add(SqlGenerator.BuildAddIndexSql(ATable, LIndex));
+          Script.Body.Add(SqlGenerator.BuildSQL_DropIndex(ATable, LIndex));
+          Script.Body.Add(SqlGenerator.BuildSQL_AddIndex(ATable, LIndex));
         end;
     end;
   end;
@@ -263,11 +263,11 @@ begin
     if LIndex.Status = stUpdate then
     begin
       // If the index was changed, drops the old one then recreate it with updates
-      Script.Body.Add(SqlGenerator.BuildDropIndexSql(SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, LIndex)));
+      Script.Body.Add(SqlGenerator.BuildSQL_DropIndexByName(SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, LIndex)));
     end;
 
     if (ATable.Status = stCreate) or (LIndex.Status in [stCreate, stUpdate]) then
-      Script.Body.Add(SqlGenerator.BuildAddIndexSql(ATable, LIndex));
+      Script.Body.Add(SqlGenerator.BuildSQL_AddIndex(ATable, LIndex));
   end;
 end;
 
@@ -471,7 +471,7 @@ begin
   if AIndexName.IsEmpty then
     Exit;
 
-  Result := _ExecuteExistsQuery(SqlGenerator.BuildIndexExistsSql(AIndexName));
+  Result := _ExecuteExistsQuery(SqlGenerator.BuildSQL_IndexExistsByName(AIndexName));
 end;
 
 end.

@@ -77,13 +77,13 @@ type
     // PrimaryKeys
     function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string; override;
     // Indexes
-    function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
-    function BuildDropIndexSql(const AIndexName: string): string; override;
-    function BuildIndexExistsSql(const AIndexName: string): string; override;
+    function BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
+    function BuildSQL_DropIndexByName(const AIndexName: string): string; override;
+    function BuildSQL_IndexExistsByName(const AIndexName: string): string; override;
     function Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String; override;
     function BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
-    function BuildListAllIndexesSql: string; override;
-    function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string; override;
+    function BuildSQL_ListOfAllIndexNamesOfAllTables: string; override;
+    function BuildSQL_ListOfInfoAboutAllIndexesOfOneTable(const ATable: IioDBBuilderSchemaTable): string; override;
     // ForeignKeys
     function BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildDropForeignKeySql(const ATableName, AForeignKeyName: string): string; override;
@@ -216,7 +216,7 @@ begin
   Result := LTextBuilder.Text;
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
 var
   LSqlText, LIndexName, LFieldList, LUnique, LIndexOrientation: String;
 begin
@@ -383,7 +383,7 @@ begin
   );
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildIndexExistsSql(const AIndexName: string): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_IndexExistsByName(const AIndexName: string): string;
 begin
   Result := Format('select RDB$INDEX_NAME from RDB$INDICES where UPPER(RDB$INDEX_NAME) = UPPER(''%s'')', [AIndexName]);
 end;
@@ -440,7 +440,7 @@ begin
     '  and rdb$constraint_name like ''FK_%''';
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildListAllIndexesSql: string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_ListOfAllIndexNamesOfAllTables: string;
 begin
   // Carlo Marona (2025-10-15): Added condition to exclude system indices
   Result := 'select RDB$INDEX_NAME from RDB$INDICES where (RDB$INDEX_NAME like ''IDX_%'') and (RDB$SYSTEM_FLAG = 0)';
@@ -479,7 +479,7 @@ begin
   );
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_ListOfInfoAboutAllIndexesOfOneTable(const ATable: IioDBBuilderSchemaTable): string;
 begin
   Result := Format(
     'select' + SLineBreak +
@@ -611,7 +611,7 @@ begin
   Result := Format('ALTER TABLE %s DROP CONSTRAINT %s;', [ATableName, AForeignKeyName]);
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildDropIndexSql(const AIndexName: string): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_DropIndexByName(const AIndexName: string): string;
 begin
   Result := Format('DROP INDEX %s;', [AIndexName]);
 end;

@@ -92,7 +92,6 @@ type
 
     // Index related methods
     // ------------------------------------------
-
     // --> Translate_SchemaIndex_To_CommaSepListOfFieldNames
     function Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
     // --> Translate_SchemaTableAndIndex_To_IndexName
@@ -108,19 +107,19 @@ type
 
 
     // --> BuildSQL_AddIndex
-    function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual; abstract;
+    function BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual; abstract;
 
 
     // --> BuildSQL_DropIndex (vedere se si pu� eliminare e tenere solo quella per nome perch� cos� si possono eliminare tutti gli indici anche quelli vecchi non pi� mappati)
-    function BuildDropIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; overload; virtual;
+    function BuildSQL_DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual;
     // --> BuildSQL_DropIndexByName
-    function BuildDropIndexSql(const AIndexName: string): string; overload; virtual; abstract;
+    function BuildSQL_DropIndexByName(const AIndexName: string): string; virtual; abstract;
 
 
     // --> BuildSQL_IndexExists
-    function BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; overload; virtual;
+    function BuildSQL_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual;
     // --> BuildSQL_IndexExistsByName (Vedere se si pu� eliminare perch� credo si possa fare anche solo con la versione a oggetti perch� non serve per l'eliminazione degli indici, non so se serve per altro)
-    function BuildIndexExistsSql(const AIndexName: string): string; overload; virtual; abstract;
+    function BuildSQL_IndexExistsByName(const AIndexName: string): string; virtual; abstract;
 
 
     // Questa la elimino e uso il metodo che mi ritorna le info degli di una tabella e quello che ritorna le indo di dettaglio dell'indice corrente (field list e relative info pi� che altro)
@@ -128,11 +127,11 @@ type
 
 
     // --> BuildSQL_ListOfAllIndexNamesOfAllTables (usato per ottenere l'elenco dei nomi di tutti gli indici presenti nel DB e dropparli tutti anche quelli non pi� mappati dalle classi entit�)
-    function BuildListAllIndexesSql: string; virtual; abstract;
+    function BuildSQL_ListOfAllIndexNamesOfAllTables: string; virtual; abstract;
 
 
     // --> BuildSQL_ListOfInfoAboutAllIndexesOfOneTable
-    function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
+    function BuildSQL_ListOfInfoAboutAllIndexesOfOneTable(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     // --> BuildSQL_ListOfInfoDetailsAboutOneIndex
 
     // ------------------------------------------
@@ -224,14 +223,14 @@ begin
   Result := LTextBuilder.Text;
 end;
 
-function TioDBBuilderSqlGenBase.BuildDropIndexSql(const ATable: IioDBBuilderSchemaTable;
+function TioDBBuilderSqlGenBase.BuildSQL_DropIndex(const ATable: IioDBBuilderSchemaTable;
   const AIndex: IioDBBuilderSchemaIndex): string;
 var
   LIndexName: string;
 begin
   LIndexName := Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
 
-  Result := BuildDropIndexSql(LIndexName);
+  Result := BuildSQL_DropIndexByName(LIndexName);
 end;
 
 function TioDBBuilderSqlGenBase.BuildForeignKeyNameSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK;
@@ -271,9 +270,9 @@ begin
     Result := LFKName;
 end;
 
-function TioDBBuilderSqlGenBase.BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
+function TioDBBuilderSqlGenBase.BuildSQL_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
 begin
-  Result := BuildIndexExistsSql(Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex));
+  Result := BuildSQL_IndexExistsByName(Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex));
 end;
 
 function TioDBBuilderSqlGenBase.Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String;
