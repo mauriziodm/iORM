@@ -85,21 +85,62 @@ type
     function TranslateFieldType(const AField: IioDBBuilderSchemaField; const AExcludeTypeAttributes: boolean): String; virtual; abstract;
     // PrimaryKeys
     function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
+
+
+
+
+
     // Index related methods
+    // ------------------------------------------
+
     function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual; abstract;
+
+    // --> Translate_SchemaIndex_To_CommaSepListOfFieldNames
     function BuildIndexFieldList(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex; const AIndexName: String; const AWithIndexOrientation: Boolean): String; virtual;
-    function BuildDropIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; overload; virtual;
-    function BuildDropIndexSql(const AIndexName: string): string; overload; virtual; abstract;
-    function BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; overload; virtual; abstract;
-    function BuildIndexExistsSql(const AIndexName: string): string; overload; virtual; abstract;
-    function BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual; abstract;
+    // --> Translate_SchemaTableAndIndex_To_IndexName (eliminare parametro UpperCase perchè mi sembra non vemga mai impostato e usa sempre il default)
     function BuildIndexNameSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex; const UpperCase: boolean = True): String; virtual;
+    // --> Translate_SchemaIndex_To_Orientation (Lasciare solo parametro AIndex e eliminare gli altri due perchè non usati)
     function BuildIndexOrientation(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex; const AIndexName: String): String; virtual;
+    // --> Translate_SchemaIndex_To_Unique
     function BuildIndexUnique(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
-    function BuildListAllIndexesSql: string; virtual; abstract;
-    function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
+    // --> Translate_Orientation_To_OrientationSuffixForIndexName
     function GetIndexOrientationSuffix(const AOrientation: TioIndexOrientation): string; virtual;
+    // --> Translate_Unique_To_UniqueSuffixForIndexName
     function GetIndexUniqueSuffix(const Unique: boolean): string; virtual;
+
+
+
+    // --> BuildSQL_DropIndex (vedere se si può eliminare e tenere solo quella per nome perchè così si possono eliminare tutti gli indici anche quelli vecchi non più mappati)
+    function BuildDropIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; overload; virtual;
+    // --> BuildSQL_DropIndexByName
+    function BuildDropIndexSql(const AIndexName: string): string; overload; virtual; abstract;
+
+
+    // --> BuildSQL_IndexExists
+    function BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; overload; virtual;
+    // --> BuildSQL_IndexExistsByName (Vedere se si può eliminare perchè credo si possa fare anche solo con la versione a oggetti perchè non serve per l'eliminazione degli indici, non so se serve per altro)
+    function BuildIndexExistsSql(const AIndexName: string): string; overload; virtual; abstract;
+
+
+    // Questa la elimino e uso il metodo che mi ritorna le info degli di una tabella e quello che ritorna le indo di dettaglio dell'indice corrente (field list e relative info più che altro)
+    function BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual; abstract;
+
+
+    // --> BuildSQL_ListOfAllIndexNamesOfAllTables (usato per ottenere l'elenco dei nomi di tutti gli indici presenti nel DB e dropparli tutti anche quelli non più mappati dalle classi entità)
+    function BuildListAllIndexesSql: string; virtual; abstract;
+
+
+    // --> BuildSQL_ListOfInfoAboutAllIndexesOfOneTable
+    function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
+    // --> BuildSQL_ListOfInfoDetailsAboutOneIndex
+
+    // ------------------------------------------
+
+
+
+
+
+
     // Foreign keys
     function BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual; abstract;
     function BuildDropForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; overload; virtual;
@@ -227,6 +268,11 @@ begin
     Result := LFKName.ToUpper
   else
     Result := LFKName;
+end;
+
+function TioDBBuilderSqlGenBase.BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
+begin
+  Result := BuildIndexExistsSql(BuildIndexNameSql(ATable, AIndex));
 end;
 
 function TioDBBuilderSqlGenBase.BuildIndexFieldList(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex; const AIndexName: String;

@@ -68,7 +68,6 @@ type
     // Indexes
     function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildIndexExistsSql(const AIndexName: string): string; overload; override;
-    function BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; overload; override;
     function BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildListAllIndexesSql: string; override;
     function BuildListTableIndexesSql(const ATable: IioDBBuilderSchemaTable): string; override;
@@ -165,11 +164,6 @@ end;
 function TioDBBuilderSqlGenSQLite.BuildIndexExistsSql(const AIndexName: string): string;
 begin
   Result := Format('SELECT * FROM sqlite_master WHERE type = ''index'' and name = ''%s''', [AIndexName]);
-end;
-
-function TioDBBuilderSqlGenSQLite.BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
-begin
-  Result := BuildIndexExistsSql(BuildIndexNameSql(ATable, AIndex));
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;

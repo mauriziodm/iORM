@@ -79,7 +79,6 @@ type
     // Indexes
     function BuildAddIndexSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildDropIndexSql(const AIndexName: string): string; override;
-    function BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildIndexExistsSql(const AIndexName: string): string; override;
     function BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildListAllIndexesSql: string; override;
@@ -381,11 +380,6 @@ begin
     '  UPPER(detail_relation_constraints.rdb$constraint_name) = UPPER(''%s'')',
     [ATable.Name, LFKName]
   );
-end;
-
-function TioDBBuilderSqlGenFirebird.BuildIndexExistsSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
-begin
-  Result := BuildIndexExistsSql(BuildIndexNameSql(ATable, AIndex));
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildIndexExistsSql(const AIndexName: string): string;
