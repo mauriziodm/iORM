@@ -256,7 +256,7 @@ var
   LIndexName: string;
 begin
   Result := False;
-  LIndexName := SqlGenerator.BuildIndexNameSql(ATable, AIndex);
+  LIndexName := SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
 
   // PRAGMA index_list returns all indexes for a table
   LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildListTableIndexesSql(ATable), True);
@@ -280,7 +280,7 @@ var
   LNewFieldList: string;
 begin
   Result := False;
-  LIndexName := SqlGenerator.BuildIndexNameSql(ATable, AIndex);
+  LIndexName := SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
 
   // First, get index info from index_list to check uniqueness
   LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildListTableIndexesSql(ATable), True);

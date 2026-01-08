@@ -125,7 +125,7 @@ function TioDBBuilderSqlGenSQLite.BuildAddIndexSql(const ATable: IioDBBuilderSch
 var
   LSqlText, LIndexName, LFieldList, LUnique: String;
 begin
-  LIndexName := BuildIndexNameSql(ATable, AIndex);
+  LIndexName := Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
   LUnique := BuildIndexUnique(AIndex);
   LFieldList := Translate_SchemaIndex_To_CommaSepListOfFieldNames(AIndex);
   // Compose the create index query text
@@ -171,7 +171,7 @@ var
   LIndexName: string;
 begin
   // PRAGMA index_info returns columns info for the index
-  LIndexName := BuildIndexNameSql(ATable, AIndex);
+  LIndexName := Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
   Result := Format('PRAGMA index_info(''%s'')', [LIndexName]);
 end;
 

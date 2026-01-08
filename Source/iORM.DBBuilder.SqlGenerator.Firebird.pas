@@ -222,8 +222,8 @@ var
 begin
   // N.B. Viene calcolato un nome random (quindi non uso l'apposito metodo dell'antenato se eccessivo)
   // perchè in FB c'e' un limite a 30 caratteri di lunghezza per i nomi dei constraint
-//  LIndexName := AdaptIdentifierName('IDX_', BuildIndexNameSql(ATable, AIndex), MIN_IDENTIFIER_NAME_LENGTH); // Carlo Marona
-  LIndexName := BuildIndexNameSql(ATable, AIndex);
+//  LIndexName := AdaptIdentifierName('IDX_', Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex), MIN_IDENTIFIER_NAME_LENGTH); // Carlo Marona
+  LIndexName := Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
   LIndexOrientation := BuildIndexOrientation(AIndex);
   LUnique := BuildIndexUnique(AIndex);
   LFieldList := Translate_SchemaIndex_To_CommaSepListOfFieldNames(AIndex);
