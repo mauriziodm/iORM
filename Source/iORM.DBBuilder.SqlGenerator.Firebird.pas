@@ -79,7 +79,7 @@ type
     function BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildSQL_DropIndexByName(const AIndexName: string): string; override;
     function BuildSQL_IndexExistsByName(const AIndexName: string): string; override;
-    function BuildSQL_IndexListForTable(const ATableName: string = ''): string; override;
+    function BuildSQL_IndexList(const ATableName: string = ''): string; override;
     function BuildSQL_IndexDetails(const AIndexName: string): string; override;
     function Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String; override;
     // ForeignKeys
@@ -229,7 +229,6 @@ begin
     LSqlText := Format('CREATE %s %s INDEX %s ON %s (%s);', [LUnique, LIndexOrientation, LIndexName, ATable.Name, LFieldList])
   else
     LSqlText := Format('CREATE %s INDEX %s ON %s (%s);', [LIndexOrientation, LIndexName, ATable.Name, LFieldList]);
-
 
   Result := LSqlText;
 end;
@@ -408,7 +407,7 @@ begin
   end;
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildSQL_IndexListForTable(const ATableName: string): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_IndexList(const ATableName: string): string;
 begin
   // Base query: all non-system indexes with basic info (name, unique, orientation)
   Result := 'SELECT RDB$INDEX_NAME, RDB$UNIQUE_FLAG, RDB$INDEX_TYPE ' +

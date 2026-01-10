@@ -261,10 +261,8 @@ begin
   begin
     // Carlo Marona (2025-10-16): Check if index already exists before create. If exists skip it.
     if LIndex.Status = stUpdate then
-    begin
       // If the index was changed, drops the old one then recreate it with updates
-      Script.Body.Add(SqlGenerator.BuildSQL_DropIndexByName(SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, LIndex)));
-    end;
+      Script.Body.Add(SqlGenerator.BuildSQL_DropIndex(ATable, LIndex));
 
     if (ATable.Status = stCreate) or (LIndex.Status in [stCreate, stUpdate]) then
       Script.Body.Add(SqlGenerator.BuildSQL_AddIndex(ATable, LIndex));

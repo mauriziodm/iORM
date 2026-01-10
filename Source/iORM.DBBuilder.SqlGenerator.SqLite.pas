@@ -68,7 +68,7 @@ type
     // Indexes
     function BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildSQL_IndexExistsByName(const AIndexName: string): string; override;
-    function BuildSQL_IndexListForTable(const ATableName: string = ''): string; override;
+    function BuildSQL_IndexList(const ATableName: string = ''): string; override;
     function BuildSQL_IndexDetails(const AIndexName: string): string; override;
     // ForeignKeys
     function BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
@@ -165,7 +165,7 @@ begin
   Result := Format('SELECT 1 FROM sqlite_master WHERE type = ''index'' AND name = ''%s''', [AIndexName]);
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildSQL_IndexListForTable(const ATableName: string): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_IndexList(const ATableName: string): string;
 begin
   // Query sqlite_master for all index info including SQL definition
   // We use sqlite_master instead of PRAGMA index_list because:

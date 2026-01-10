@@ -100,7 +100,7 @@ type
     // Returns list of indexes with basic info (name, unique, orientation)
     // If ATableName is empty, returns all indexes from DB
     // If ATableName is specified, returns indexes for that table only
-    function BuildSQL_IndexListForTable(const ATableName: string = ''): string; virtual; abstract;
+    function BuildSQL_IndexList(const ATableName: string = ''): string; virtual; abstract;
     // Returns detailed info about an index (list of fields with position/order)
     function BuildSQL_IndexDetails(const AIndexName: string): string; virtual; abstract;
 

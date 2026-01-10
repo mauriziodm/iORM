@@ -286,7 +286,7 @@ type
     function BuildSQL_DropIndexByName(const AIndexName: string): string;
     function BuildSQL_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
     function BuildSQL_IndexExistsByName(const AIndexName: string): string;
-    function BuildSQL_IndexListForTable(const ATableName: string = ''): string;
+    function BuildSQL_IndexList(const ATableName: string = ''): string;
     function BuildSQL_IndexDetails(const AIndexName: string): string;
     function Translate_SchemaTableAndIndex_To_IndexName(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): String;
     function BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;

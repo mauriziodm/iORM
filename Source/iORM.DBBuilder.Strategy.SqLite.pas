@@ -250,7 +250,7 @@ begin
   // We parse the SQL definition because PRAGMA index_list doesn't provide orientation info
   // Note: iORM applies the same orientation to all fields (no mixed ASC/DESC per field)
   // Example SQL: "CREATE UNIQUE INDEX idx_name ON table (field1 DESC, field2 DESC)"
-  LQueryIndexList := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexListForTable(ATable.Name), True);
+  LQueryIndexList := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexList(ATable.Name), True);
 
   while not LQueryIndexList.Eof do
   begin

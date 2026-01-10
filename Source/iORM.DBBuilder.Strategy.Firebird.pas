@@ -177,7 +177,7 @@ procedure TioDBBuilderStrategyFirebird.DropIndexes;
 var
   LQuery: IioQuery;
 begin
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexListForTable(''), True);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexList(''), True);
 
   while not LQuery.Eof do
   begin
@@ -394,7 +394,7 @@ begin
   LIndexName := SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
 
   // Get basic info (unique flag, orientation) for all indexes in the table
-  LQueryIndexList := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexListForTable(ATable.Name), True);
+  LQueryIndexList := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexList(ATable.Name), True);
 
   // Find the specific index in the result set
   while not LQueryIndexList.Eof do
