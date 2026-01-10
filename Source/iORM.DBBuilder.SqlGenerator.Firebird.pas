@@ -384,7 +384,7 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_IndexExistsByName(const AIndexName: string): string;
 begin
-  Result := Format('select RDB$INDEX_NAME from RDB$INDICES where UPPER(RDB$INDEX_NAME) = UPPER(''%s'')', [AIndexName]);
+  Result := Format('SELECT 1 FROM RDB$INDICES WHERE UPPER(RDB$INDEX_NAME) = UPPER(''%s'')', [AIndexName]);
 end;
 
 function TioDBBuilderSqlGenFirebird.Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String;

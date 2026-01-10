@@ -162,7 +162,7 @@ end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_IndexExistsByName(const AIndexName: string): string;
 begin
-  Result := Format('SELECT * FROM sqlite_master WHERE type = ''index'' and name = ''%s''', [AIndexName]);
+  Result := Format('SELECT 1 FROM sqlite_master WHERE type = ''index'' AND name = ''%s''', [AIndexName]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_IndexListForTable(const ATableName: string): string;
