@@ -172,6 +172,7 @@ begin
   // - PRAGMA provides only the unique flag, not orientation (ASC/DESC)
   // - sqlite_master.sql contains the full CREATE INDEX statement with both UNIQUE and orientation
   // - This allows extracting all needed info in one query without type casting
+  // Note: iORM applies the same orientation to all fields in an index (no mixed ASC/DESC per field)
   // Note: sql IS NOT NULL excludes auto-generated indexes for PK/UNIQUE constraints
   Result := 'SELECT name, tbl_name, sql FROM sqlite_master WHERE type = ''index'' AND sql IS NOT NULL';
   if not ATableName.IsEmpty then

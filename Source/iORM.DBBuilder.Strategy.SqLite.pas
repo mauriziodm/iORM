@@ -248,6 +248,7 @@ begin
   // Query sqlite_master for index info including SQL definition
   // Extract unique and orientation from the CREATE INDEX statement in sqlite_master.sql
   // We parse the SQL definition because PRAGMA index_list doesn't provide orientation info
+  // Note: iORM applies the same orientation to all fields (no mixed ASC/DESC per field)
   // Example SQL: "CREATE UNIQUE INDEX idx_name ON table (field1 DESC, field2 DESC)"
   LQueryIndexList := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexListForTable(ATable.Name), True);
 
