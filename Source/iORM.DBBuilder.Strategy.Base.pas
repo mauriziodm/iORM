@@ -345,14 +345,14 @@ begin
 end;
 
 procedure TioDBBuilderStrategyBase.DropTableIndexes(const ATable: IioDBBuilderSchemaTable);
+var
+  LIndex: IioDBBuilderSchemaIndex;
 begin
   if not Assigned(ATable) then
     raise EioInvalidArgumentException.Create(ClassName, 'DropTableIndexes', 'ATable is not assigned.');
 
-  if Schema.Status = stCreate then
-    Exit;
-
-  Script.Body.AddTitle('Dropping indexes');
+  for LIndex in ATable.Indexes.Values do
+    Script.Body.Add(SqlGenerator.BuildSQL_DropIndex(ATable, LIndex));
 end;
 
 procedure TioDBBuilderStrategyBase.GenerateCreateDatabaseScript;

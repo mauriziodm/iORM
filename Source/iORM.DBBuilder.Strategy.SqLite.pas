@@ -27,7 +27,6 @@ type
     function GetInvalidTypeConversions: string; override;
     // Indexes
     procedure DropIndexes; override;
-    procedure DropTableIndexes(const ATable: IioDBBuilderSchemaTable); override;
     function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
     function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
     // ForeignKeys
@@ -169,14 +168,6 @@ begin
 
     DropTableIndexes(LTable);
   end;
-end;
-
-procedure TioDBBuilderStrategySqLite.DropTableIndexes(const ATable: IioDBBuilderSchemaTable);
-var
-  LIndex: IioDBBuilderSchemaIndex;
-begin
-  for LIndex in ATable.Indexes.Values do
-    Script.Body.Add(SqlGenerator.BuildSQL_DropIndex(ATable, LIndex));
 end;
 
 function TioDBBuilderStrategySqLite.FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;

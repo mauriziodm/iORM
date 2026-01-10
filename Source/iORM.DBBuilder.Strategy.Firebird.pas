@@ -38,7 +38,6 @@ type
     function IsBlobSubTypeChanged(const AOldBlobSubType, ANewBlobSubType: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean; virtual;
     // Indexes
     procedure DropIndexes; override;
-    procedure DropTableIndexes(const ATable: IioDBBuilderSchemaTable); override;
     function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
     function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
     // ForeignKeys
@@ -195,14 +194,6 @@ begin
     raise EioInvalidArgumentException.Create(ClassName, 'DropSequence', 'ASequenceName is not specified.');
 
   LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, FBSqlGenerator.BuildDropSequenceSql(ASequenceName), True);
-end;
-
-procedure TioDBBuilderStrategyFirebird.DropTableIndexes(const ATable: IioDBBuilderSchemaTable);
-var
-  LIndex: IioDBBuilderSchemaIndex;
-begin
-  for LIndex in ATable.Indexes.Values do
-    Script.Body.Add(SqlGenerator.BuildSQL_DropIndex(ATable, LIndex));
 end;
 
 function TioDBBuilderStrategyFirebird.FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
