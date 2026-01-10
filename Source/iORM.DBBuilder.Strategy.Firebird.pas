@@ -178,7 +178,7 @@ procedure TioDBBuilderStrategyFirebird.DropIndexes;
 var
   LQuery: IioQuery;
 begin
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_ListOfAllIndexNamesOfAllTables, True);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexListForTable(''), True);
 
   while not LQuery.Eof do
   begin
@@ -199,15 +199,10 @@ end;
 
 procedure TioDBBuilderStrategyFirebird.DropTableIndexes(const ATable: IioDBBuilderSchemaTable);
 var
-  LQuery: IioQuery;
+  LIndex: IioDBBuilderSchemaIndex;
 begin
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_ListOfInfoAboutAllIndexesOfOneTable(ATable), True);
-
-  while not LQuery.Eof do
-  begin
-    Script.Body.Add(SqlGenerator.BuildSQL_DropIndexByName(LQuery.Fields[0].AsString));
-    LQuery.Next;
-  end;
+  for LIndex in ATable.Indexes.Values do
+    Script.Body.Add(SqlGenerator.BuildSQL_DropIndex(ATable, LIndex));
 end;
 
 function TioDBBuilderStrategyFirebird.FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
@@ -398,28 +393,60 @@ end;
 
 function TioDBBuilderStrategyFirebird.IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
 var
-  LQuery: IioQuery;
-  LNewIndexOrientation: TioIndexOrientation;
+  LQueryBasic: IioQuery;
+  LQueryFields: IioQuery;
+  LIndexName: string;
+  LOldFieldList: string;
+  LNewFieldList: string;
 begin
   Result := False;
+  LIndexName := SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
 
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildIndexModifiedSql(ATable, AIndex), True);
+  // Get basic info (unique flag, orientation) for all indexes in the table
+  LQueryBasic := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexListForTable(ATable.Name), True);
 
-  while not LQuery.Eof do
+  // Find the specific index in the result set
+  while not LQueryBasic.Eof do
   begin
-    if not AIndex.CommaSepFieldList.ToUpper.Contains(LQuery.Fields.FieldByName('FieldName').AsString.ToUpper) then
-      AIndex.AddChange(icFields);
+    if SameText(LQueryBasic.Fields.FieldByName('RDB$INDEX_NAME').AsString.Trim, LIndexName) then
+    begin
+      // Check unique flag
+      if LQueryBasic.Fields.FieldByName('RDB$UNIQUE_FLAG').AsInteger <> AIndex.Unique.ToInteger then
+        AIndex.AddChange(icUnique);
 
-    if LQuery.Fields.FieldByName('UniqueFlag').AsInteger <> AIndex.Unique.ToInteger then
-      AIndex.AddChange(icUnique);
+      // Check orientation
+      // Carlo Marona: Firebird index type can be 0 = Ascending, 1 = Descending. iORM orientation actually uses same values, but in the future, changes must be made carefully,
+      //               because this condition could be broken.
+      if LQueryBasic.Fields.FieldByName('RDB$INDEX_TYPE').AsInteger <> Ord(AIndex.IndexOrientation) then
+        AIndex.AddChange(icOrientation);
 
-    // Carlo Marona: Firebird index type can be 0 = Ascending, 1 = Descending. iORM orientation actually uses same values, but in the future, changes must be made carefully,
-    //               because this condition could be broken.
-    if LQuery.Fields.FieldByName('IndexType').AsInteger <> Ord(AIndex.IndexOrientation) then
-      AIndex.AddChange(icOrientation);
-
-    LQuery.Next;
+      Break; // Found the index, exit loop
+    end;
+    LQueryBasic.Next;
   end;
+
+  // If index not found, exit
+  if LQueryBasic.Eof then
+    Exit;
+
+  // Get fields info
+  LQueryFields := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexDetails(LIndexName), True);
+
+  // Build old field list from database
+  LOldFieldList := '';
+  while not LQueryFields.Eof do
+  begin
+    if not LOldFieldList.IsEmpty then
+      LOldFieldList := LOldFieldList + ',';
+    LOldFieldList := LOldFieldList + LQueryFields.Fields.FieldByName('RDB$FIELD_NAME').AsString.Trim.ToUpper;
+    LQueryFields.Next;
+  end;
+
+  // Compare field lists
+  LNewFieldList := AIndex.CommaSepFieldList.ToUpper.Replace(' ', '');
+  LOldFieldList := LOldFieldList.Replace(' ', '');
+  if not SameText(LOldFieldList, LNewFieldList) then
+    AIndex.AddChange(icFields);
 
   Result := AIndex.Changes <> [];
 end;

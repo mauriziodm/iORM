@@ -14,7 +14,6 @@ type
   private
     procedure CopyDataFromOldToNewTables;
     procedure CopyDataFromOldToNewTable(const ATable: IioDBBuilderSchemaTable);
-    procedure DropAllIndexes;
     procedure RenameAllTablesToOld; // For SQLite, if the DB is to be modified (not created) it renames all tables with "_old"
     function Table2OldTableName(const ATable: IioDBBuilderSchemaTable): String;
   protected
@@ -155,7 +154,7 @@ begin
   Script.Body.Add(SqlGenerator.BuildEndCreateTableSql(ATable));
 end;
 
-procedure TioDBBuilderStrategySqLite.DropAllIndexes;
+procedure TioDBBuilderStrategySqLite.DropIndexes;
 var
   LTable: IioDBBuilderSchemaTable;
 begin
@@ -170,31 +169,14 @@ begin
 
     DropTableIndexes(LTable);
   end;
-
-  // For SQLite, if DB needs to be modified, rename affected tables with "_old" suffix
-  if Schema.Status = stUpdate then
-    RenameAllTablesToOld;
-end;
-
-procedure TioDBBuilderStrategySqLite.DropIndexes;
-begin
-  inherited;
-
-  DropAllIndexes;
 end;
 
 procedure TioDBBuilderStrategySqLite.DropTableIndexes(const ATable: IioDBBuilderSchemaTable);
 var
-  LQuery: IioQuery;
+  LIndex: IioDBBuilderSchemaIndex;
 begin
-  // Carlo Marona (2025-10-16): ref to https://stackoverflow.com/questions/13426006/how-do-i-get-a-list-of-indexed-columns-for-a-given-table
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_ListOfInfoAboutAllIndexesOfOneTable(ATable), True);
-
-  while not LQuery.Eof do
-  begin
-    Script.Body.Add(Format('DROP INDEX %s;', [LQuery.Fields.FieldByName('name').AsString]));
-    LQuery.Next;
-  end;
+  for LIndex in ATable.Indexes.Values do
+    Script.Body.Add(SqlGenerator.BuildSQL_DropIndex(ATable, LIndex));
 end;
 
 function TioDBBuilderStrategySqLite.FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
@@ -253,27 +235,15 @@ end;
 function TioDBBuilderStrategySqLite.IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
 var
   LQuery: IioQuery;
-  LIndexName: string;
 begin
-  Result := False;
-  LIndexName := SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
-
-  // PRAGMA index_list returns all indexes for a table
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_ListOfInfoAboutAllIndexesOfOneTable(ATable), True);
-
-  while not LQuery.Eof do
-  begin
-    if SameText(LQuery.Fields.FieldByName('name').AsString, LIndexName) then
-      Exit(True);
-
-    LQuery.Next;
-  end;
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexExists(ATable, AIndex), True);
+  Result := not LQuery.Eof;
 end;
 
 function TioDBBuilderStrategySqLite.IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
 var
-  LQuery: IioQuery;
-  LQueryInfo: IioQuery;
+  LQueryIndexList: IioQuery;
+  LQueryFields: IioQuery;
   LIndexName: string;
   LOldUnique: Boolean;
   LOldFieldList: string;
@@ -282,49 +252,43 @@ begin
   Result := False;
   LIndexName := SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
 
-  // First, get index info from index_list to check uniqueness
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_ListOfInfoAboutAllIndexesOfOneTable(ATable), True);
+  // SQLite: Use PRAGMA index_list to get uniqueness (requires table name)
+  LQueryIndexList := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexListForTable(ATable.Name), True);
 
-  while not LQuery.Eof do
+  while not LQueryIndexList.Eof do
   begin
-    if SameText(LQuery.Fields.FieldByName('name').AsString, LIndexName) then
+    if SameText(LQueryIndexList.Fields.FieldByName('name').AsString, LIndexName) then
     begin
-      // Check uniqueness (unique field in PRAGMA index_list)
-      LOldUnique := LQuery.Fields.FieldByName('unique').AsInteger <> 0;
+      // Check uniqueness
+      LOldUnique := LQueryIndexList.Fields.FieldByName('unique').AsInteger <> 0;
       if LOldUnique <> AIndex.Unique then
-      begin
         AIndex.AddChange(icUnique);
-        Result := True;
-      end;
 
-      // Now get the field list using PRAGMA index_info
-      LQueryInfo := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildIndexModifiedSql(ATable, AIndex), True);
+      // Get field list using BuildSQL_IndexDetails
+      LQueryFields := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexDetails(LIndexName), True);
       LOldFieldList := '';
 
-      while not LQueryInfo.Eof do
+      while not LQueryFields.Eof do
       begin
         if not LOldFieldList.IsEmpty then
           LOldFieldList := LOldFieldList + ',';
-        LOldFieldList := LOldFieldList + LQueryInfo.Fields.FieldByName('name').AsString.ToUpper;
-        LQueryInfo.Next;
+        LOldFieldList := LOldFieldList + LQueryFields.Fields.FieldByName('name').AsString.ToUpper;
+        LQueryFields.Next;
       end;
 
-      // Compare field lists (case-insensitive)
+      // Compare field lists
       LNewFieldList := AIndex.CommaSepFieldList.ToUpper.Replace(' ', '');
       LOldFieldList := LOldFieldList.Replace(' ', '');
       if not SameText(LOldFieldList, LNewFieldList) then
-      begin
         AIndex.AddChange(icFields);
-        Result := True;
-      end;
 
       // Note: SQLite doesn't store index orientation (ASC/DESC) in a queryable way
-      // for all indexes. The ordering is stored in the index definition itself.
       // We skip orientation check for SQLite.
 
+      Result := AIndex.Changes <> [];
       Exit;
     end;
-    LQuery.Next;
+    LQueryIndexList.Next;
   end;
 end;
 
@@ -408,12 +372,16 @@ begin
   else
   begin
     DropIndexes;
+
+    if Schema.Status = stUpdate then
+      RenameAllTablesToOld;
+
     CreateOrAlterTables;
 
     if Schema.IndexesEnabled then
       CreateIndexes;
 
-    if Schema.Status = tioDBBuilderStatus.stUpdate then
+    if Schema.Status = stUpdate then
       CopyDataFromOldToNewTables;
   end;
 

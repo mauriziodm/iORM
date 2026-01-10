@@ -41,13 +41,15 @@ uses
 
 type
 
-  TioDBBuilderStatus = (stClean, stUpdate, stCreate);
-  TioDBBuilderTableChange = (taFields, taIndexes, taForeignKeys);
-  TioDBBuilderTableChanges = set of TioDBBuilderTableChange;
   TioDBBuilderFieldAlterStatus = (alFieldType, alFieldDefault, alFieldNotNull, alFieldPrecisionIncreased, alFieldPrecisionDecreased, alFieldLengthIncreased, alFieldLengthDecreased);
   TioDBBuilderFieldAlter = set of TioDBBuilderFieldAlterStatus;
   TioDBBuilderIndexChange = (icFields, icOrientation, icUnique);
   TioDBBuilderIndexChanges = set of TioDBBuilderIndexChange;
+  // irmDropAndRecreateAllTables (safe, default), irmDropAndRecreateModifiedTablesOnly (faster), irmIgnoreIndexes (disabled, fully manual)
+  TioDBBuilderIndexRebuildMode = (irmDropAndRecreateForAllTables, irmDropAndRecreateForModifiedTablesOnly, irmIgnoreIndexes);
+  TioDBBuilderStatus = (stClean, stUpdate, stCreate);
+  TioDBBuilderTableChange = (taFields, taIndexes, taForeignKeys);
+  TioDBBuilderTableChanges = set of TioDBBuilderTableChange;
 
   IioDBBuilderSchemaFK = interface
     ['{1F653F52-570B-4381-930D-FB3945025DA2}']
@@ -284,10 +286,9 @@ type
     function BuildSQL_DropIndexByName(const AIndexName: string): string;
     function BuildSQL_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
     function BuildSQL_IndexExistsByName(const AIndexName: string): string;
-    function BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
+    function BuildSQL_IndexListForTable(const ATableName: string = ''): string;
+    function BuildSQL_IndexDetails(const AIndexName: string): string;
     function Translate_SchemaTableAndIndex_To_IndexName(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): String;
-    function BuildSQL_ListOfAllIndexNamesOfAllTables: string;
-    function BuildSQL_ListOfInfoAboutAllIndexesOfOneTable(const ATable: IioDBBuilderSchemaTable): string;
     function BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     // Foreign keys
     function BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;

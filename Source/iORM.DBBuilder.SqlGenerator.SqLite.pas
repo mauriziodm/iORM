@@ -68,9 +68,8 @@ type
     // Indexes
     function BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildSQL_IndexExistsByName(const AIndexName: string): string; override;
-    function BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
-    function BuildSQL_ListOfAllIndexNamesOfAllTables: string; override;
-    function BuildSQL_ListOfInfoAboutAllIndexesOfOneTable(const ATable: IioDBBuilderSchemaTable): string; override;
+    function BuildSQL_IndexListForTable(const ATableName: string = ''): string; override;
+    function BuildSQL_IndexDetails(const AIndexName: string): string; override;
     // ForeignKeys
     function BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildForeignKeyExistsSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
@@ -166,18 +165,24 @@ begin
   Result := Format('SELECT * FROM sqlite_master WHERE type = ''index'' and name = ''%s''', [AIndexName]);
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
-var
-  LIndexName: string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_IndexListForTable(const ATableName: string): string;
 begin
-  // PRAGMA index_info returns columns info for the index
-  LIndexName := Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
-  Result := Format('PRAGMA index_info(''%s'')', [LIndexName]);
+  if ATableName.IsEmpty then
+    // All indexes: use sqlite_master (doesn't have full info, but has name)
+    // sql IS NOT NULL excludes auto-generated indexes for PK/UNIQUE
+    // Note: unique/origin/partial are not available in sqlite_master, return dummy values
+    Result := 'SELECT name, 0 as "unique", '''' as origin, 0 as partial ' +
+              'FROM sqlite_master WHERE type = ''index'' AND sql IS NOT NULL'
+  else
+    // Indexes for specific table: use PRAGMA index_list
+    // Returns: seq, name, unique, origin, partial
+    Result := Format('PRAGMA index_list(''%s'')', [ATableName]);
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildSQL_ListOfAllIndexNamesOfAllTables: string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_IndexDetails(const AIndexName: string): string;
 begin
-  Result := 'SELECT name FROM sqlite_master WHERE type = ''index''';
+  // PRAGMA index_info returns columns info for the index
+  Result := Format('PRAGMA index_info(''%s'')', [AIndexName]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string;
@@ -218,11 +223,6 @@ begin
   // SQLite doesn't support ALTER COLUMN - requires full table rebuild
   // This is handled by the Strategy layer (rename table, create new, copy data)
   Result := EmptyStr;
-end;
-
-function TioDBBuilderSqlGenSQLite.BuildSQL_ListOfInfoAboutAllIndexesOfOneTable(const ATable: IioDBBuilderSchemaTable): string;
-begin
-  Result := Format('PRAGMA index_list(''%s'')', [ATable.Name]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildTableExistsSql(const ATableName: string): string;

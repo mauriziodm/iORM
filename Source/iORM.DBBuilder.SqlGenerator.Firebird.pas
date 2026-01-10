@@ -80,10 +80,9 @@ type
     function BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildSQL_DropIndexByName(const AIndexName: string): string; override;
     function BuildSQL_IndexExistsByName(const AIndexName: string): string; override;
+    function BuildSQL_IndexListForTable(const ATableName: string = ''): string; override;
+    function BuildSQL_IndexDetails(const AIndexName: string): string; override;
     function Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String; override;
-    function BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
-    function BuildSQL_ListOfAllIndexNamesOfAllTables: string; override;
-    function BuildSQL_ListOfInfoAboutAllIndexesOfOneTable(const ATable: IioDBBuilderSchemaTable): string; override;
     // ForeignKeys
     function BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildDropForeignKeySql(const ATableName, AForeignKeyName: string): string; override;
@@ -412,22 +411,27 @@ begin
   end;
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildIndexModifiedSql(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_IndexListForTable(const ATableName: string): string;
+begin
+  // Base query: all non-system indexes with basic info (name, unique, orientation)
+  Result := 'SELECT RDB$INDEX_NAME, RDB$UNIQUE_FLAG, RDB$INDEX_TYPE ' +
+            'FROM RDB$INDICES ' +
+            'WHERE RDB$SYSTEM_FLAG = 0';
+  // Add table filter if specified
+  if not ATableName.IsEmpty then
+    Result := Result + Format(' AND UPPER(RDB$RELATION_NAME) = UPPER(''%s'')', [ATableName]);
+end;
+
+function TioDBBuilderSqlGenFirebird.BuildSQL_IndexDetails(const AIndexName: string): string;
 begin
   Result := Format(
-    'select' + sLineBreak +
-    '  rdb$indices.rdb$index_name as "IndexName",' + sLineBreak +
-    '  rdb$indices.rdb$relation_name as "TableName",' + sLineBreak +
-    '  rdb$indices.rdb$unique_flag as "UniqueFlag",' + sLineBreak +
-    '  rdb$indices.rdb$index_type as "IndexType",' + sLineBreak +
-    '  rdb$index_segments.rdb$field_name as "FieldName"' + sLineBreak +
-    'from' + sLineBreak +
-    '  rdb$index_segments right outer join rdb$indices on (rdb$index_segments.rdb$index_name = rdb$indices.rdb$index_name)' + sLineBreak +
-    'where' + sLineBreak +
-    '  (rdb$indices.rdb$system_flag = 0) and' + sLineBreak +
-    '  (UPPER(rdb$indices.rdb$relation_name) = UPPER(''%s'')) and' + sLineBReak +
-    '  (UPPER(rdb$indices.rdb$index_name) = UPPER(''%s''))',
-    [ATable.Name, AIndex.Name]
+    'SELECT' + sLineBreak +
+    '  RDB$FIELD_NAME,' + sLineBreak +
+    '  RDB$FIELD_POSITION' + sLineBreak +
+    'FROM RDB$INDEX_SEGMENTS' + sLineBreak +
+    'WHERE UPPER(RDB$INDEX_NAME) = UPPER(''%s'')' + sLineBreak +
+    'ORDER BY RDB$FIELD_POSITION',
+    [AIndexName]
   );
 end;
 
@@ -440,11 +444,6 @@ begin
     '  and rdb$constraint_name like ''FK_%''';
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildSQL_ListOfAllIndexNamesOfAllTables: string;
-begin
-  // Carlo Marona (2025-10-15): Added condition to exclude system indices
-  Result := 'select RDB$INDEX_NAME from RDB$INDICES where (RDB$INDEX_NAME like ''IDX_%'') and (RDB$SYSTEM_FLAG = 0)';
-end;
 
 function TioDBBuilderSqlGenFirebird.BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string;
 begin
@@ -479,19 +478,6 @@ begin
   );
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildSQL_ListOfInfoAboutAllIndexesOfOneTable(const ATable: IioDBBuilderSchemaTable): string;
-begin
-  Result := Format(
-    'select' + SLineBreak +
-    '  RDB$INDICES.RDB$INDEX_NAME, RDB$INDICES.RDB$RELATION_NAME, RDB$INDEX_SEGMENTS.RDB$FIELD_NAME' + sLineBreak +
-    'from' + SLineBreak +
-    '  rdb$index_segments right outer join rdb$indices on (rdb$index_segments.rdb$index_name = rdb$indices.rdb$index_name)' + SLineBreak +
-    'where' + SLineBreak +
-    '  (RDB$INDICES.RDB$SYSTEM_FLAG = 0) and' + SLineBreak +
-    '  (RDB$INDICES.RDB$RELATION_NAME like ''%%s'')'
-    , [ATable.Name]
-  );
-end;
 
 function TioDBBuilderSqlGenFirebird.BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable;
   const AField: IioDBBuilderSchemaField): string;
