@@ -284,7 +284,7 @@ var
   LField,
   LIndexName: string;
 begin
-  if AIndex.ExplicitName then
+  if AIndex.HasExplicitName then
     LIndexName := TioSqlTranslator.Translate(AIndex.Name, ATable.GetContextTable.GetClassName, False)
   else
   begin
@@ -307,12 +307,12 @@ begin
 
         // Max length is reduced by the length of unique and orientation suffixes (if presents) and the legth of 'IDX_' prefix
         LIndexName := 'IDX_' + ShortenIdentifierName(LTmpIndexName,
-          MaxSqlIdentifierLength - Translate_Orientation_To_OrientationSuffixForIndexName(AIndex.IndexOrientation).Length -
+          MaxSqlIdentifierLength - Translate_Orientation_To_OrientationSuffixForIndexName(AIndex.Orientation).Length -
           Translate_Unique_To_UniqueSuffixForIndexName(AIndex.Unique).Length - 4);
       end;
 
       // Index orientation
-      LIndexName := LIndexName + Translate_Orientation_To_OrientationSuffixForIndexName(AIndex.IndexOrientation);
+      LIndexName := LIndexName + Translate_Orientation_To_OrientationSuffixForIndexName(AIndex.Orientation);
 
       // Unique
       LIndexName := LIndexName + Translate_Unique_To_UniqueSuffixForIndexName(AIndex.Unique);
@@ -331,7 +331,7 @@ function TioDBBuilderSqlGenBase.Translate_SchemaIndex_To_Orientation(const AInde
 begin
   Result := EmptyStr;
 
-  case AIndex.IndexOrientation of
+  case AIndex.Orientation of
     ioAscending:
       Exit('ASC');
     ioDescending:

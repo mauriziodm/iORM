@@ -1,4 +1,4 @@
-{
+ï»¿{
   ****************************************************************************
   *                                                                          *
   *           iORM - (interfaced ORM)                                        *
@@ -345,21 +345,21 @@ type
   // Add an index definition to the class map
   ioIndex = class(TioCustomAttribute)
   strict private
-    FIndexName: String;
     FCommaSepFieldList: String;
-    FIndexOrientation: TioIndexOrientation;
+    FName: String;
+    FOrientation: TioIndexOrientation;
     FUnique: Boolean;
-    FExplicitName: boolean;
-  public
-    constructor Create(const AIndexName: String; ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation = ioAscending;
-      const AUnique: Boolean = False); overload;
-    constructor Create(ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
-    constructor Create(const AIndexOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
 
-    property ExplicitName: boolean read FExplicitName;  // Carlo Marona (2025-10-21): Property added to know when the index name was passed by the user or set by the iORM
-    property IndexName: String read FIndexName;
+    function GetHasExplicitName: boolean;
+  public
+    constructor Create(const AIndexName: String; ACommaSepFieldList: String; const AOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
+    constructor Create(ACommaSepFieldList: String; const AOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
+    constructor Create(const AOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
+
     property CommaSepFieldList: String read FCommaSepFieldList write FCommaSepFieldList;
-    property IndexOrientation: TioIndexOrientation read FIndexOrientation;
+    property HasExplicitName: boolean read GetHasExplicitName;  // Carlo Marona (2025-10-21): Property added to know when the index name was passed by the user or set by the iORM
+    property Name: String read FName;
+    property Orientation: TioIndexOrientation read FOrientation;
     property Unique: Boolean read FUnique;
   end;
 
@@ -530,8 +530,8 @@ type
   // Base class for ell ETM repositories
   TioEtmTimeSlotRef = class of TioEtmCustomTimeSlot;
 
-  // NB: Per la nuova gestione dei conflitti servirà la possibilità di memorizzare due data e ora, una che sarà il momento
-  // quando è stata fatto l'update sul DB remoto (es: mobile) e l'altra la data e ora di quanto è stato fatto l'update
+  // NB: Per la nuova gestione dei conflitti servirï¿½ la possibilitï¿½ di memorizzare due data e ora, una che sarï¿½ il momento
+  // quando ï¿½ stata fatto l'update sul DB remoto (es: mobile) e l'altra la data e ora di quanto ï¿½ stato fatto l'update
   // sul database centrale durante la fase di sincronizzazione.
   [ioNotPersistedEntity]
   TioEtmCustomTimeSlot = class
@@ -568,8 +568,8 @@ type
     FConflictCheckedByHuman_DateTime: TDateTime;
     // Synchronization
     FTimeSlotSynchroState: TioEtmTimeSlotSynchroState;
-    // NB: Questo è un anonymous method che viene passato dal BindSource che sta esponendo il TimeSlot stesso e che permette
-    // di risalire alla versione corrente della entità attraverso la catena "ETMBindSource.etmFor.Current"
+    // NB: Questo ï¿½ un anonymous method che viene passato dal BindSource che sta esponendo il TimeSlot stesso e che permette
+    // di risalire alla versione corrente della entitï¿½ attraverso la catena "ETMBindSource.etmFor.Current"
     [ioSkip]
     FExtractCurrentEntityFunc: TFunc<TObject>;
     // BlindLevel props
@@ -650,8 +650,8 @@ type
     property DiffTwoWay: String read GetDiffTwoWay;
     property DiffTwoWayMoreInfo: String read GetDiffTwoWayMoreInfo;
     // ExtractCurrentEntityFunc anonymous method
-    // NB: Questo è un anonymous method che viene passato dal BindSource che sta esponendo il TimeSlot stesso e che permette
-    // di risalire alla versione corrente della entità attraverso la catena "ETMBindSource.etmFor.Current"
+    // NB: Questo ï¿½ un anonymous method che viene passato dal BindSource che sta esponendo il TimeSlot stesso e che permette
+    // di risalire alla versione corrente della entitï¿½ attraverso la catena "ETMBindSource.etmFor.Current"
     property _ExtractCurrentEntityFunc: TFunc<TObject> read FExtractCurrentEntityFunc write FExtractCurrentEntityFunc;
   end;
 
@@ -670,7 +670,7 @@ type
     property TraceOnlyOnConnectionName: String read FTraceOnlyOnConnectionName;
   end;
 
-  etmPropertyAttribute = class(TCustomAttribute) // NB: Lasciarlo con "Attribute" alla fine del nome della classe così è più chiaro nelle eventuali exceptions
+  etmPropertyAttribute = class(TCustomAttribute) // NB: Lasciarlo con "Attribute" alla fine del nome della classe cosï¿½ ï¿½ piï¿½ chiaro nelle eventuali exceptions
   strict private
     FEntityFinalPropName: String;
     FEntityChildObjPath: TStrings;
@@ -785,48 +785,51 @@ end;
 
 { ioIndex }
 
-constructor ioIndex.Create(const AIndexName: String; ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
+constructor ioIndex.Create(const AIndexName: String; ACommaSepFieldList: String; const AOrientation: TioIndexOrientation; const AUnique: Boolean);
 begin
   // Carlo Marona (2025-10-21): added check for empty index name
   if AIndexName.IsEmpty then
     raise EioGenericException.Create(ClassName, 'Create', 'No index name specified.');
 
-  Create(ACommaSepFieldList, AIndexOrientation, AUnique);
-  FIndexName := AIndexName;
-  FExplicitName := True;
+  Create(ACommaSepFieldList, AOrientation, AUnique);
+  FName := AIndexName;
 //  FCommaSepFieldList := ACommaSepFieldList;
-//  FIndexOrientation := AIndexOrientation;
+//  FOrientation := AOrientation;
 //  FUnique := AUnique;
 end;
 
-constructor ioIndex.Create(ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
+constructor ioIndex.Create(ACommaSepFieldList: String; const AOrientation: TioIndexOrientation; const AUnique: Boolean);
 begin
   // Carlo Marona (2025-11-18): added check for empty fields list
   if ACommaSepFieldList.IsEmpty then
     raise EioGenericException.Create(ClassName, 'Create', 'No fields list specified.');
 
   // Carlo Marona (2025-10-21)
-  Create(AIndexOrientation, AUnique);
-//  FIndexName := EmptyStr;
+  Create(AOrientation, AUnique);
+//  FName := EmptyStr;
   //FExplicitName := False;
   FCommaSepFieldList := ACommaSepFieldList;
-//  FIndexOrientation := AIndexOrientation;
+//  FOrientation := AOrientation;
 //  FUnique := AUnique;
 
-//  Self.Create('', ACommaSepFieldList, AIndexOrientation, AUnique);
+//  Self.Create('', ACommaSepFieldList, AOrientation, AUnique);
 end;
 
-constructor ioIndex.Create(const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
+constructor ioIndex.Create(const AOrientation: TioIndexOrientation; const AUnique: Boolean);
 begin
   // Carlo Marona (2025-10-21)
   inherited Create;
-  FIndexName := EmptyStr;
-  FExplicitName := False;
+  FName := EmptyStr;
   FCommaSepFieldList := EmptyStr;
-  FIndexOrientation := AIndexOrientation;
+  FOrientation := AOrientation;
   FUnique := AUnique;
 
-//  Self.Create('', '', AIndexOrientation, AUnique);
+//  Self.Create('', '', AOrientation, AUnique);
+end;
+
+function ioIndex.GetHasExplicitName: boolean;
+begin
+  Result := not FName.IsEmpty;
 end;
 
 { ioInject }
@@ -1057,7 +1060,7 @@ var
 begin
   if not Supports(AContextAsIInterface, IioContext, LContext) then
     raise EioGenericException.Create(ClassName, 'Create', 'The object received by the "AContextAsIInterface" parameter does not implements "IioContext" interface.');
-  // Se l'entità non ha un ID valido non è possibile che l'ETM funzioni
+  // Se l'entitï¿½ non ha un ID valido non ï¿½ possibile che l'ETM funzioni
   if LContext.IDIsNull then
     raise EioETMException.Create(ClassName, 'Create',
       Format('Hi, I''m iORM, we have a problem.' + #13#13'You asked me to persist an entity of type "%s" but this doesn''t have a valid ID.' +
@@ -1091,8 +1094,8 @@ begin
   FConflictCheckedByHuman_DateTime := IO_DATETIME_NULL_VALUE;
   // Synchronization
   FTimeSlotSynchroState := LContext.SynchroStrategy_GetTimeSlotSynchroState;
-  // NB: Questo è un anonymous method che viene passato dal BindSource che sta esponendo il TimeSlot stesso e che permette
-  // di risalire alla versione corrente della entità attraverso la catena "ETMBindSource.etmFor.Current"
+  // NB: Questo ï¿½ un anonymous method che viene passato dal BindSource che sta esponendo il TimeSlot stesso e che permette
+  // di risalire alla versione corrente della entitï¿½ attraverso la catena "ETMBindSource.etmFor.Current"
   FExtractCurrentEntityFunc := nil;
   // Load custom property values (if exists)
   if LContext.GetTable.EtmPropToPropListExists then

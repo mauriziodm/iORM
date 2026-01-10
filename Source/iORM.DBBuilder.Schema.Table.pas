@@ -147,8 +147,8 @@ end;
 procedure TioDBBuilderSchemaTable.AddIndex(const AIndexAttr: ioIndex);
 begin
   // Add index if not already exists
-  if not FIndexes.ContainsKey(AIndexAttr.IndexName) then
-    FIndexes.Add(AIndexAttr.IndexName, TioDBBuilderFactory.NewSchemaIndex(AIndexAttr));
+  if not FIndexes.ContainsKey(AIndexAttr.Name) then
+    FIndexes.Add(AIndexAttr.Name, TioDBBuilderFactory.NewSchemaIndex(AIndexAttr));
 end;
 
 procedure TioDBBuilderSchemaTable.AddForeignKey(const AReferenceMap, ADependentMap: IioMap;

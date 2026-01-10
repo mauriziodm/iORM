@@ -268,7 +268,7 @@ begin
         LOldOrientation := ioDescending
       else
         LOldOrientation := ioAscending;
-      if LOldOrientation <> AIndex.IndexOrientation then
+      if LOldOrientation <> AIndex.Orientation then
         AIndex.AddChange(icOrientation);
 
       // Get field list using BuildSQL_IndexDetails (PRAGMA index_info)

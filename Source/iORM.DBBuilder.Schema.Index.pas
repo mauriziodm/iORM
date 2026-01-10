@@ -17,20 +17,21 @@ type
     FChanges: TioDBBuilderIndexChanges;
     FCommaSepFieldList: String;
     FContextProperty: IioProperty;
-    FExplicitName: boolean;
+    FHasExplicitName: boolean;
     FIndexName: String;
-    FIndexOrientation: TioIndexOrientation;
+    FOrientation: TioIndexOrientation;
     FStatus: TioDBBuilderStatus;
     FUnique: Boolean;
     // Status
-    function GetStatus: TioDBBuilderStatus;
-    procedure SetStatus(const Value: TioDBBuilderStatus);
     function GetChanges: TioDBBuilderIndexChanges;
     function GetCommaSepFieldList: String;
     function GetName: String;
-    function GetIndexOrientation: TioIndexOrientation;
+    function GetOrientation: TioIndexOrientation;
+    function GetStatus: TioDBBuilderStatus;
     function GetUnique: Boolean;
-    function GetExplicitName: boolean;
+    function GetHasExplicitName: boolean;
+
+    procedure SetStatus(const Value: TioDBBuilderStatus);
   public
     constructor Create(const AIndexAttr: ioIndex);
 
@@ -38,9 +39,9 @@ type
 
     property Changes: TioDBBuilderIndexChanges read GetChanges;
     property CommaSepFieldList: String read GetCommaSepFieldList;
-    property ExplicitName: boolean read GetExplicitName;
-    property IndexOrientation: TioIndexOrientation read GetIndexOrientation;
+    property HasExplicitName: boolean read GetHasExplicitName;
     property Name: String read GetName;
+    property Orientation: TioIndexOrientation read GetOrientation;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
     property Unique: Boolean read GetUnique;
   end;
@@ -67,11 +68,11 @@ begin
   inherited Create;
 
   FStatus := stClean;
-  FExplicitName := AIndexAttr.ExplicitName;
-  FIndexName := AIndexAttr.IndexName;
+  FHasExplicitName := AIndexAttr.HasExplicitName;
+  FIndexName := AIndexAttr.Name;
   FCommaSepFieldList := AIndexAttr.CommaSepFieldList;
   FUnique := AIndexAttr.Unique;
-  FIndexOrientation := AIndexAttr.IndexOrientation;
+  FOrientation := AIndexAttr.Orientation;
 end;
 
 function TioDBBuilderSchemaIndex.GetChanges: TioDBBuilderIndexChanges;
@@ -84,9 +85,9 @@ begin
   Result := FCommaSepFieldList;
 end;
 
-function TioDBBuilderSchemaIndex.GetExplicitName: boolean;
+function TioDBBuilderSchemaIndex.GetHasExplicitName: boolean;
 begin
-  Result := FExplicitName;
+  Result := FHasExplicitName;
 end;
 
 function TioDBBuilderSchemaIndex.GetName: String;
@@ -95,7 +96,7 @@ var
 begin
   Result := EmptyStr;
 
-  if ExplicitName then
+  if HasExplicitName then
     Result := FIndexName
   else
   begin
@@ -106,9 +107,9 @@ begin
   end;
 end;
 
-function TioDBBuilderSchemaIndex.GetIndexOrientation: TioIndexOrientation;
+function TioDBBuilderSchemaIndex.GetOrientation: TioIndexOrientation;
 begin
-  Result := FIndexOrientation
+  Result := FOrientation
 end;
 
 function TioDBBuilderSchemaIndex.GetStatus: TioDBBuilderStatus;

@@ -112,23 +112,23 @@ type
 
   IioDBBuilderSchemaIndex = interface
     ['{35DBA528-3DE3-4515-B809-5FE42ABF1CBB}']
+    procedure AddChange(const AChange: TioDBBuilderIndexChange);
 
-    function GetStatus: TioDBBuilderStatus;
-    procedure SetStatus(const Value: TioDBBuilderStatus);
     function GetChanges: TioDBBuilderIndexChanges;
     function GetCommaSepFieldList: String;
-    function GetExplicitName: boolean;
+    function GetHasExplicitName: boolean;
+    function GetOrientation: TioIndexOrientation;
     function GetName: String;
-    function GetIndexOrientation: TioIndexOrientation;
+    function GetStatus: TioDBBuilderStatus;
     function GetUnique: Boolean;
 
-    procedure AddChange(const AChange: TioDBBuilderIndexChange);
+    procedure SetStatus(const Value: TioDBBuilderStatus);
 
     property Changes: TioDBBuilderIndexChanges read GetChanges;
     property CommaSepFieldList: String read GetCommaSepFieldList;
-    property ExplicitName: boolean read GetExplicitName;
+    property HasExplicitName: boolean read GetHasExplicitName;
+    property Orientation: TioIndexOrientation read GetOrientation;
     property Name: String read GetName;
-    property IndexOrientation: TioIndexOrientation read GetIndexOrientation;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
     property Unique: Boolean read GetUnique;
   end;

@@ -408,7 +408,7 @@ begin
       // Check orientation
       // Carlo Marona: Firebird index type can be 0 = Ascending, 1 = Descending. iORM orientation actually uses same values, but in the future, changes must be made carefully,
       //               because this condition could be broken.
-      if LQueryIndexList.Fields.FieldByName('RDB$INDEX_TYPE').AsInteger <> Ord(AIndex.IndexOrientation) then
+      if LQueryIndexList.Fields.FieldByName('RDB$INDEX_TYPE').AsInteger <> Ord(AIndex.Orientation) then
         AIndex.AddChange(icOrientation);
 
       Break; // Found the index, exit loop
