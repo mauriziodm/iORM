@@ -167,16 +167,15 @@ end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_IndexListForTable(const ATableName: string): string;
 begin
-  if ATableName.IsEmpty then
-    // All indexes: use sqlite_master (doesn't have full info, but has name)
-    // sql IS NOT NULL excludes auto-generated indexes for PK/UNIQUE
-    // Note: unique/origin/partial are not available in sqlite_master, return dummy values
-    Result := 'SELECT name, 0 as "unique", '''' as origin, 0 as partial ' +
-              'FROM sqlite_master WHERE type = ''index'' AND sql IS NOT NULL'
-  else
-    // Indexes for specific table: use PRAGMA index_list
-    // Returns: seq, name, unique, origin, partial
-    Result := Format('PRAGMA index_list(''%s'')', [ATableName]);
+  // Query sqlite_master for all index info including SQL definition
+  // We use sqlite_master instead of PRAGMA index_list because:
+  // - PRAGMA provides only the unique flag, not orientation (ASC/DESC)
+  // - sqlite_master.sql contains the full CREATE INDEX statement with both UNIQUE and orientation
+  // - This allows extracting all needed info in one query without type casting
+  // Note: sql IS NOT NULL excludes auto-generated indexes for PK/UNIQUE constraints
+  Result := 'SELECT name, tbl_name, sql FROM sqlite_master WHERE type = ''index'' AND sql IS NOT NULL';
+  if not ATableName.IsEmpty then
+    Result := Result + Format(' AND tbl_name = ''%s''', [ATableName]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_IndexDetails(const AIndexName: string): string;

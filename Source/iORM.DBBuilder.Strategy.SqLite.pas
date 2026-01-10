@@ -48,7 +48,7 @@ uses
   iORM.Attributes,
   iORM.DB.Interfaces,
   iORM.DB.ConnectionContainer,
-  iORM.DB.QueryEngine
+  iORM.DB.QueryEngine, iORM.CommonTypes
 
   ;
 
@@ -239,23 +239,38 @@ var
   LOldUnique: Boolean;
   LOldFieldList: string;
   LNewFieldList: string;
+  LSqlDefinition: string;
+  LOldOrientation: TioIndexOrientation;
 begin
   Result := False;
   LIndexName := SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
 
-  // SQLite: Use PRAGMA index_list to get uniqueness (requires table name)
+  // Query sqlite_master for index info including SQL definition
+  // Extract unique and orientation from the CREATE INDEX statement in sqlite_master.sql
+  // We parse the SQL definition because PRAGMA index_list doesn't provide orientation info
+  // Example SQL: "CREATE UNIQUE INDEX idx_name ON table (field1 DESC, field2 DESC)"
   LQueryIndexList := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexListForTable(ATable.Name), True);
 
   while not LQueryIndexList.Eof do
   begin
     if SameText(LQueryIndexList.Fields.FieldByName('name').AsString, LIndexName) then
     begin
-      // Check uniqueness
-      LOldUnique := LQueryIndexList.Fields.FieldByName('unique').AsInteger <> 0;
+      LSqlDefinition := LQueryIndexList.Fields.FieldByName('sql').AsString.ToUpper;
+
+      // Check uniqueness from SQL definition
+      LOldUnique := LSqlDefinition.Contains('UNIQUE INDEX');
       if LOldUnique <> AIndex.Unique then
         AIndex.AddChange(icUnique);
 
-      // Get field list using BuildSQL_IndexDetails
+      // Check orientation from SQL definition
+      if LSqlDefinition.Contains(' DESC') then
+        LOldOrientation := ioDescending
+      else
+        LOldOrientation := ioAscending;
+      if LOldOrientation <> AIndex.IndexOrientation then
+        AIndex.AddChange(icOrientation);
+
+      // Get field list using BuildSQL_IndexDetails (PRAGMA index_info)
       LQueryFields := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexDetails(LIndexName), True);
       LOldFieldList := '';
 
@@ -272,9 +287,6 @@ begin
       LOldFieldList := LOldFieldList.Replace(' ', '');
       if not SameText(LOldFieldList, LNewFieldList) then
         AIndex.AddChange(icFields);
-
-      // Note: SQLite doesn't store index orientation (ASC/DESC) in a queryable way
-      // We skip orientation check for SQLite.
 
       Result := AIndex.Changes <> [];
       Exit;
