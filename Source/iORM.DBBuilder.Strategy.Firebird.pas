@@ -384,8 +384,8 @@ end;
 
 function TioDBBuilderStrategyFirebird.IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
 var
-  LQueryBasic: IioQuery;
-  LQueryFields: IioQuery;
+  LQueryIndexList: IioQuery;
+  LQueryIndexDetails: IioQuery;
   LIndexName: string;
   LOldFieldList: string;
   LNewFieldList: string;
@@ -394,43 +394,43 @@ begin
   LIndexName := SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
 
   // Get basic info (unique flag, orientation) for all indexes in the table
-  LQueryBasic := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexListForTable(ATable.Name), True);
+  LQueryIndexList := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexListForTable(ATable.Name), True);
 
   // Find the specific index in the result set
-  while not LQueryBasic.Eof do
+  while not LQueryIndexList.Eof do
   begin
-    if SameText(LQueryBasic.Fields.FieldByName('RDB$INDEX_NAME').AsString.Trim, LIndexName) then
+    if SameText(LQueryIndexList.Fields.FieldByName('RDB$INDEX_NAME').AsString.Trim, LIndexName) then
     begin
       // Check unique flag
-      if LQueryBasic.Fields.FieldByName('RDB$UNIQUE_FLAG').AsInteger <> AIndex.Unique.ToInteger then
+      if LQueryIndexList.Fields.FieldByName('RDB$UNIQUE_FLAG').AsInteger <> AIndex.Unique.ToInteger then
         AIndex.AddChange(icUnique);
 
       // Check orientation
       // Carlo Marona: Firebird index type can be 0 = Ascending, 1 = Descending. iORM orientation actually uses same values, but in the future, changes must be made carefully,
       //               because this condition could be broken.
-      if LQueryBasic.Fields.FieldByName('RDB$INDEX_TYPE').AsInteger <> Ord(AIndex.IndexOrientation) then
+      if LQueryIndexList.Fields.FieldByName('RDB$INDEX_TYPE').AsInteger <> Ord(AIndex.IndexOrientation) then
         AIndex.AddChange(icOrientation);
 
       Break; // Found the index, exit loop
     end;
-    LQueryBasic.Next;
+    LQueryIndexList.Next;
   end;
 
   // If index not found, exit
-  if LQueryBasic.Eof then
+  if LQueryIndexList.Eof then
     Exit;
 
   // Get fields info
-  LQueryFields := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexDetails(LIndexName), True);
+  LQueryIndexDetails := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexDetails(LIndexName), True);
 
   // Build old field list from database
   LOldFieldList := '';
-  while not LQueryFields.Eof do
+  while not LQueryIndexDetails.Eof do
   begin
     if not LOldFieldList.IsEmpty then
       LOldFieldList := LOldFieldList + ',';
-    LOldFieldList := LOldFieldList + LQueryFields.Fields.FieldByName('RDB$FIELD_NAME').AsString.Trim.ToUpper;
-    LQueryFields.Next;
+    LOldFieldList := LOldFieldList + LQueryIndexDetails.Fields.FieldByName('RDB$FIELD_NAME').AsString.Trim.ToUpper;
+    LQueryIndexDetails.Next;
   end;
 
   // Compare field lists

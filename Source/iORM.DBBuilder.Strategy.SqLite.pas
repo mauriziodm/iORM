@@ -234,7 +234,7 @@ end;
 function TioDBBuilderStrategySqLite.IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
 var
   LQueryIndexList: IioQuery;
-  LQueryFields: IioQuery;
+  LQueryIndexDetails: IioQuery;
   LIndexName: string;
   LOldUnique: Boolean;
   LOldFieldList: string;
@@ -271,15 +271,15 @@ begin
         AIndex.AddChange(icOrientation);
 
       // Get field list using BuildSQL_IndexDetails (PRAGMA index_info)
-      LQueryFields := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexDetails(LIndexName), True);
+      LQueryIndexDetails := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexDetails(LIndexName), True);
       LOldFieldList := '';
 
-      while not LQueryFields.Eof do
+      while not LQueryIndexDetails.Eof do
       begin
         if not LOldFieldList.IsEmpty then
           LOldFieldList := LOldFieldList + ',';
-        LOldFieldList := LOldFieldList + LQueryFields.Fields.FieldByName('name').AsString.ToUpper;
-        LQueryFields.Next;
+        LOldFieldList := LOldFieldList + LQueryIndexDetails.Fields.FieldByName('name').AsString.ToUpper;
+        LQueryIndexDetails.Next;
       end;
 
       // Compare field lists
