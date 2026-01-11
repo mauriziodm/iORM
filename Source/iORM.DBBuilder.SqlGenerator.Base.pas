@@ -260,6 +260,9 @@ var
   LCoreIndexName,
   LFullIndexName: string;
 begin
+  // If the index has an explicit name, use it directly (translated).
+  // Otherwise, build a name from table and field names with prefix/suffixes.
+  // If the generated name exceeds max length, use a shortened hash version.
   if AIndex.HasExplicitName then
     LFullIndexName := TioSqlTranslator.Translate(AIndex.Name, ATable.GetContextTable.GetClassName, False)
   else
