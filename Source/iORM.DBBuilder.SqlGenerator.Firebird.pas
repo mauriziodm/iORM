@@ -384,27 +384,10 @@ begin
 end;
 
 function TioDBBuilderSqlGenFirebird.Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String;
-var
-  LFieldList: TStrings;
-  LField: String;
-  LComma: String;
 begin
   // Firebird does not support ASC/DESC orientation in field list
-  LFieldList := TStringList.Create;
-
-  try
-    LComma := '';
-    LFieldList.Delimiter := ',';
-    LFieldList.DelimitedText := AIndex.CommaSepFieldList;
-
-    for LField in LFieldList do
-    begin
-      Result := Format('%s%s %s', [Result, LComma, LField.Trim]).Trim;
-      LComma := ',';
-    end;
-  finally
-    LFieldList.Free;
-  end;
+  Result := inherited;
+  Result := Result.Replace(' ASC', '').Replace(' DESC', '');
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_IndexList(const ATableName: string): string;
