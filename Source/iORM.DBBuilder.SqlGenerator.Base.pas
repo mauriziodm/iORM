@@ -105,11 +105,11 @@ type
     function BuildSQL_IndexDetails(const AIndexName: string): string; virtual; abstract;
 
     function Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
-    function Translate_SchemaTableAndIndex_To_IndexName(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): String; virtual;
     function Translate_SchemaIndex_To_Orientation(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
     function Translate_SchemaIndex_To_Unique(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
-    function Translate_Orientation_To_OrientationSuffixForIndexName(const AOrientation: TioIndexOrientation): string; virtual;
+    function Translate_SchemaTableAndIndex_To_IndexName(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): String; virtual;
     function Translate_Unique_To_UniqueSuffixForIndexName(const Unique: boolean): string; virtual;
+    function Translate_Orientation_To_OrientationSuffixForIndexName(const AOrientation: TioIndexOrientation): string; virtual;
     // ------------------------------------------
 
 
@@ -241,27 +241,15 @@ end;
 
 function TioDBBuilderSqlGenBase.Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String;
 var
-  LFieldList: TStrings;
-  LField: String;
-  LComma: String;
-  LIndexOrientation: String;
+  LField, LOrientation, LComma: String;
 begin
-  LIndexOrientation := Translate_SchemaIndex_To_Orientation(AIndex);
-
-  LFieldList := TStringList.Create;
-
-  try
-    LComma := '';
-    LFieldList.Delimiter := ',';
-    LFieldList.DelimitedText := AIndex.CommaSepFieldList;
-
-    for LField in LFieldList do
-    begin
-      Result := Format('%s%s %s %s', [Result, LComma, LField.Trim, LIndexOrientation]).Trim;
-      LComma := ',';
-    end;
-  finally
-    LFieldList.Free;
+  Result := '';
+  LComma := '';
+  LOrientation := Translate_SchemaIndex_To_Orientation(AIndex);
+  for LField in AIndex.CommaSepFieldList.Split([',']) do
+  begin
+    Result := Result + LComma + LField.Trim + ' ' + LOrientation;
+    LComma := ', ';
   end;
 end;
 
