@@ -266,14 +266,12 @@ type
     // Tables related methods
     function BuildBeginAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
     function BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string;
-    function BuildCreateTableSql(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string;
     function BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
     function BuildEndCreateTableSql(const ATable: IioDBBuilderSchemaTable): string;
     function BuildTableExistsSql(const ATableName: string): string;
     // Fields related methods
     function BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string;
     function BuildAlterFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
-    function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string;
     function BuildCreateFieldsSql(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string;
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
@@ -289,7 +287,6 @@ type
     function BuildSQL_IndexList(const ATableName: string = ''): string;
     function BuildSQL_IndexDetails(const AIndexName: string): string;
     function Translate_SchemaTableAndIndex_To_IndexName(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): String;
-    function BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     // Foreign keys
     function BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
     function BuildDropForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; overload;
@@ -297,13 +294,7 @@ type
     function BuildListAllForeignKeysSql: string;
     function BuildForeignKeyExistsSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
     function BuildForeignKeyModifiedSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
-    function BuildForeignKeyNameSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK;
-      const UpperCase: boolean = True): string;
-    function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string;
     function TranslateFKAction(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
-
-    function SqlIdentifierExeedMaxLength(const AIdentifierName: string): boolean;
-    function SqlIdentifierBehindMinLength(const AIdentifierName: string): boolean;
   end;
 
   IioDBBuilderStrategy = interface
