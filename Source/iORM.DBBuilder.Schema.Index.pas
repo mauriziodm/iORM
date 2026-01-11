@@ -18,7 +18,7 @@ type
     FCommaSepFieldList: String;
     FContextProperty: IioProperty;
     FHasExplicitName: boolean;
-    FIndexName: String;
+    FName: String;
     FOrientation: TioIndexOrientation;
     FStatus: TioDBBuilderStatus;
     FUnique: Boolean;
@@ -69,7 +69,7 @@ begin
 
   FStatus := stClean;
   FHasExplicitName := AIndexAttr.HasExplicitName;
-  FIndexName := AIndexAttr.Name;
+  FName := AIndexAttr.Name;
   FCommaSepFieldList := AIndexAttr.CommaSepFieldList;
   FUnique := AIndexAttr.Unique;
   FOrientation := AIndexAttr.Orientation;
@@ -91,20 +91,8 @@ begin
 end;
 
 function TioDBBuilderSchemaIndex.GetName: String;
-var
-  LFieldList: TArray<string>;
 begin
-  Result := EmptyStr;
-
-  if HasExplicitName then
-    Result := FIndexName
-  else
-  begin
-    // Split fields list
-    LFieldList := CommaSepFieldList.Replace(' ', '').Split([',']);
-    // Join fields separated by '_'
-    Result := Result.Join('_', LFieldList);
-  end;
+  Result := FName;
 end;
 
 function TioDBBuilderSchemaIndex.GetOrientation: TioIndexOrientation;

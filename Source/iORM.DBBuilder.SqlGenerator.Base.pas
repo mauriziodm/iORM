@@ -267,40 +267,34 @@ end;
 
 function TioDBBuilderSqlGenBase.Translate_SchemaTableAndIndex_To_IndexName(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): String;
 var
-  LFieldList: TArray<string>;
-  LTmpIndexName,
+  LFieldNameArray: TArray<string>;
   LField,
-  LIndexName: string;
+  LCoreIndexName,
+  LFullIndexName: string;
 begin
   if AIndex.HasExplicitName then
-    LIndexName := TioSqlTranslator.Translate(AIndex.Name, ATable.GetContextTable.GetClassName, False)
+    LFullIndexName := TioSqlTranslator.Translate(AIndex.Name, ATable.GetContextTable.GetClassName, False)
   else
   begin
-    // Build index name
-    LIndexName := 'IDX_' + ATable.Name + '_' + AIndex.Name;
-    LIndexName := LIndexName + Translate_Orientation_To_OrientationSuffixForIndexName(AIndex.Orientation);
-    LIndexName := LIndexName + Translate_Unique_To_UniqueSuffixForIndexName(AIndex.Unique);
-    LIndexName := TioSqlTranslator.Translate(LIndexName, ATable.GetContextTable.GetClassName, False);
+    // Build fields part (table + fields without spaces)
+    LCoreIndexName := ATable.Name;
+    LFieldNameArray := AIndex.CommaSepFieldList.Split([',']);
+    for LField in LFieldNameArray do
+      LCoreIndexName := LCoreIndexName + '_' + LField.Trim;
 
-    // If name exceeds max length, recalculate using shortening algorithm
-    if SqlIdentifierExeedMaxLength(LIndexName) then
-    begin
-      LTmpIndexName := ATable.Name + '_';
-      LFieldList := AIndex.CommaSepFieldList.Split([',']);
-      for LField in LFieldList do
-        LTmpIndexName := LTmpIndexName + '_' + LField.Trim;
+    // Build full index name with prefix and suffixes
+    LFullIndexName := 'IDX_'
+      + LCoreIndexName
+      + Translate_Orientation_To_OrientationSuffixForIndexName(AIndex.Orientation)
+      + Translate_Unique_To_UniqueSuffixForIndexName(AIndex.Unique);
 
-      // Max length is reduced by the length of unique and orientation suffixes (if presents) and the length of 'IDX_' prefix
-      LIndexName := 'IDX_' + ShortenIdentifierName(LTmpIndexName,
-        MaxSqlIdentifierLength - Translate_Orientation_To_OrientationSuffixForIndexName(AIndex.Orientation).Length -
-        Translate_Unique_To_UniqueSuffixForIndexName(AIndex.Unique).Length - 4);
-      LIndexName := LIndexName + Translate_Orientation_To_OrientationSuffixForIndexName(AIndex.Orientation);
-      LIndexName := LIndexName + Translate_Unique_To_UniqueSuffixForIndexName(AIndex.Unique);
-      LIndexName := TioSqlTranslator.Translate(LIndexName, ATable.GetContextTable.GetClassName, False);
-    end;
+    // If name exceeds max length, use hash of fields part only (without suffixes)
+    if SqlIdentifierExeedMaxLength(LFullIndexName) then
+      // Hash only the fields part, then add only the prefix (no suffixes needed with hash)
+      LFullIndexName := 'IDX_' + ShortenIdentifierName(LCoreIndexName, MaxSqlIdentifierLength - 4);
   end;
 
-  Result := LIndexName.ToUpper;
+  Result := LFullIndexName.ToUpper;
 end;
 
 function TioDBBuilderSqlGenBase.Translate_SchemaIndex_To_Orientation(const AIndex: IioDBBuilderSchemaIndex): String;
