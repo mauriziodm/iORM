@@ -131,8 +131,8 @@ type
     // Warnings
     function BuildWarningSql(const AText: string): string; virtual;
 
-    function SqlIdentifierExeedMaxLength(const AIdentifierName: string): boolean; virtual;
-    function SqlIdentifierBehindMinLength(const AIdentifierName: string): boolean; virtual;
+    function IsSqlIdentifierTooLong(const AIdentifierName: string): boolean; virtual;
+    function IsSqlIdentifierTooShort(const AIdentifierName: string): boolean; virtual;
 
     property ConnectionDefName: string read FConnectionDefName;
     property DataConverter: TioSqlDataConverterRef read FDataConverter;
@@ -218,7 +218,7 @@ begin
   LFKName := TioSqlTranslator.Translate(LFKName, ATable.GetContextTable.GetClassName, False);
 
   // If name exceeds max length, recalculate using shortening algorithm
-  if SqlIdentifierExeedMaxLength(LFKName) then
+  if IsSqlIdentifierTooLong(LFKName) then
   begin
     // Max length is reduced by the length of 'FK_' prefix
     LFKName := 'FK_' + ShortenIdentifierName(
@@ -280,7 +280,7 @@ begin
       + Translate_Unique_To_UniqueSuffixForIndexName(AIndex.Unique);
 
     // If name exceeds max length, use hash of fields part only (without suffixes)
-    if SqlIdentifierExeedMaxLength(LFullIndexName) then
+    if IsSqlIdentifierTooLong(LFullIndexName) then
       // Hash only the fields part, then add only the prefix (no suffixes needed with hash)
       LFullIndexName := 'IDX_' + ShortenIdentifierName(LCoreIndexName, MaxSqlIdentifierLength - 4);
   end;
@@ -384,12 +384,12 @@ begin
   Result := THashSHA2.GetHashString(AIdentifierName).Substring(1, AMaxLength);
 end;
 
-function TioDBBuilderSqlGenBase.SqlIdentifierBehindMinLength(const AIdentifierName: string): boolean;
+function TioDBBuilderSqlGenBase.IsSqlIdentifierTooShort(const AIdentifierName: string): boolean;
 begin
   Result := Length(AIdentifierName) < MinSqlIdentifierLength;
 end;
 
-function TioDBBuilderSqlGenBase.SqlIdentifierExeedMaxLength(const AIdentifierName: string): boolean;
+function TioDBBuilderSqlGenBase.IsSqlIdentifierTooLong(const AIdentifierName: string): boolean;
 begin
   // If MaxSqlIdentifierLength is 0 there's no limit to the identifier length
   Result := (MaxSqlIdentifierLength > 0) and (Length(AIdentifierName) > MaxSqlIdentifierLength);
