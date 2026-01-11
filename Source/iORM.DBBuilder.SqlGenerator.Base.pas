@@ -211,33 +211,22 @@ end;
 function TioDBBuilderSqlGenBase.BuildForeignKeyNameSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK;
   const UpperCase: boolean): string;
 var
-  LFieldList: TStrings;
-  LFKName,
-  LField: String;
-  LShorten: boolean;
+  LFKName: String;
 begin
-  LShorten := False;
+  // Build FK name
+  LFKName := 'FK_' + AForeignKey.Name;
+  LFKName := TioSqlTranslator.Translate(LFKName, ATable.GetContextTable.GetClassName, False);
 
-  repeat
-    LFKName := EmptyStr;
-
-    // Format('%s_%s_%s_%s', [DependentTableName, DependentFieldName, ReferenceTableName, ReferenceFieldName])
-
-    if not LShorten then
-      LFKName := 'FK_' + AForeignKey.Name
-    else
-      // Max length is reduced by the length of 'FK_' prefix
-      LFKName := 'FK_' +
-        ShortenIdentifierName(Format('%s_%s_%s_%s', [AForeignKey.DependentTableName, AForeignKey.DependentFieldName,
-          AForeignKey.ReferenceTableName, AForeignKey.ReferenceFieldName]),
-          MaxSqlIdentifierLength - 3
-      );
-
-    // Translate
+  // If name exceeds max length, recalculate using shortening algorithm
+  if SqlIdentifierExeedMaxLength(LFKName) then
+  begin
+    // Max length is reduced by the length of 'FK_' prefix
+    LFKName := 'FK_' + ShortenIdentifierName(
+      Format('%s_%s_%s_%s', [AForeignKey.DependentTableName, AForeignKey.DependentFieldName,
+        AForeignKey.ReferenceTableName, AForeignKey.ReferenceFieldName]),
+      MaxSqlIdentifierLength - 3);
     LFKName := TioSqlTranslator.Translate(LFKName, ATable.GetContextTable.GetClassName, False);
-
-    LShorten := SqlIdentifierExeedMaxLength(LFKName);
-  until not LShorten;
+  end;
 
   if UpperCase then
     Result := LFKName.ToUpper
@@ -279,7 +268,6 @@ end;
 function TioDBBuilderSqlGenBase.Translate_SchemaTableAndIndex_To_IndexName(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): String;
 var
   LFieldList: TArray<string>;
-  LShorten: boolean;
   LTmpIndexName,
   LField,
   LIndexName: string;
@@ -288,40 +276,28 @@ begin
     LIndexName := TioSqlTranslator.Translate(AIndex.Name, ATable.GetContextTable.GetClassName, False)
   else
   begin
-    LShorten := False;
+    // Build index name
+    LIndexName := 'IDX_' + ATable.Name + '_' + AIndex.Name;
+    LIndexName := LIndexName + Translate_Orientation_To_OrientationSuffixForIndexName(AIndex.Orientation);
+    LIndexName := LIndexName + Translate_Unique_To_UniqueSuffixForIndexName(AIndex.Unique);
+    LIndexName := TioSqlTranslator.Translate(LIndexName, ATable.GetContextTable.GetClassName, False);
 
-    repeat
-      LIndexName := EmptyStr;
+    // If name exceeds max length, recalculate using shortening algorithm
+    if SqlIdentifierExeedMaxLength(LIndexName) then
+    begin
+      LTmpIndexName := ATable.Name + '_';
+      LFieldList := AIndex.CommaSepFieldList.Split([',']);
+      for LField in LFieldList do
+        LTmpIndexName := LTmpIndexName + '_' + LField.Trim;
 
-      // Build the indexname
-      if not LShorten then
-        LIndexName := 'IDX_' + ATable.Name + '_' + AIndex.Name
-      else  // Carlo Marona (2025-10-24): If the length exeed max length the name will be recalculated using a shortening algorithm.
-      begin
-        LTmpIndexName := EmptyStr;
-        LFieldList := AIndex.CommaSepFieldList.Split([',']);
-        LTmpIndexName := ATable.Name + '_';
-
-        for LField in LFieldList do
-          LTmpIndexName := LTmpIndexName + '_' + LField.Trim;
-
-        // Max length is reduced by the length of unique and orientation suffixes (if presents) and the legth of 'IDX_' prefix
-        LIndexName := 'IDX_' + ShortenIdentifierName(LTmpIndexName,
-          MaxSqlIdentifierLength - Translate_Orientation_To_OrientationSuffixForIndexName(AIndex.Orientation).Length -
-          Translate_Unique_To_UniqueSuffixForIndexName(AIndex.Unique).Length - 4);
-      end;
-
-      // Index orientation
+      // Max length is reduced by the length of unique and orientation suffixes (if presents) and the length of 'IDX_' prefix
+      LIndexName := 'IDX_' + ShortenIdentifierName(LTmpIndexName,
+        MaxSqlIdentifierLength - Translate_Orientation_To_OrientationSuffixForIndexName(AIndex.Orientation).Length -
+        Translate_Unique_To_UniqueSuffixForIndexName(AIndex.Unique).Length - 4);
       LIndexName := LIndexName + Translate_Orientation_To_OrientationSuffixForIndexName(AIndex.Orientation);
-
-      // Unique
       LIndexName := LIndexName + Translate_Unique_To_UniqueSuffixForIndexName(AIndex.Unique);
-
-      // Translate
       LIndexName := TioSqlTranslator.Translate(LIndexName, ATable.GetContextTable.GetClassName, False);
-
-      LShorten := SqlIdentifierExeedMaxLength(LIndexName);
-    until not LShorten;
+    end;
   end;
 
   Result := LIndexName.ToUpper;
@@ -411,13 +387,13 @@ end;
 
 function TioDBBuilderSqlGenBase.ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
 begin
-  Result := EmptyStr;
+  Result := String.Empty;
 
   if Length(AIdentifierName) <= AMaxLength then
     Exit(AIdentifierName);
 
   // Changed shortening algorithm because there are some cases where different input names comes to the same shortened
-  // name (collitions).
+  // name (collision).
   // Now I used SHA2 hash algorithm to produce a unique identifier calculated on the original identifier in all its
   // length and keeping only the first AMaxLength chars. This should avoid identifier names collitions.
   Result := THashSHA2.GetHashString(AIdentifierName).Substring(1, AMaxLength);

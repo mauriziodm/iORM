@@ -52,7 +52,6 @@ type
   public
     constructor Create(const ASelfClassName: String; const AQualifiedFieldName: Boolean);
     class function Translate(const AValue, ASelfClassName:String; const AQualifiedFieldName:Boolean=True): String;
-//    class function Translate(const AValue, ASelfClassName:String; const AQualifiedFieldName:Boolean=True): String; overload;
   end;
 
 implementation
