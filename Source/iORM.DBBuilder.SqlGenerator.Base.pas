@@ -86,12 +86,9 @@ type
     // PrimaryKeys
     function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
 
-
-
-
-
-    // Index related methods
-    // ------------------------------------------
+    // ==========================================================
+    // INDEX RELATED METHODS
+    // ----------------------------------------------------------
     function BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual; abstract;
     function BuildSQL_DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual;
     function BuildSQL_DropIndexByName(const AIndexName: string): string; virtual; abstract;
@@ -110,22 +107,30 @@ type
     function Translate_SchemaTableAndIndex_To_IndexName(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): String; virtual;
     function Translate_Unique_To_UniqueSuffixForIndexName(const Unique: boolean): string; virtual;
     function Translate_Orientation_To_OrientationSuffixForIndexName(const AOrientation: TioIndexOrientation): string; virtual;
-    // ------------------------------------------
+    // ==========================================================
 
-
-
-
-
-
+    // ==========================================================
+    // FOREIGN KEY RELATED METHODS
+    // ----------------------------------------------------------
     // Foreign keys
-    function BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual; abstract;
-    function BuildDropForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; overload; virtual;
-    function BuildDropForeignKeySql(const ATableName, AForeignKeyName: string): string; overload; virtual; abstract;
-    function BuildForeignKeyExistsSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual; abstract;
+    function BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual; abstract;
+    function BuildSQL_DropFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; overload; virtual;
+    function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string; overload; virtual; abstract;
+    function BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual; abstract;
+
     function BuildForeignKeyModifiedSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual; abstract;
+
     function BuildForeignKeyNameSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK; const UpperCase: boolean = True): string; virtual;
     function BuildListAllForeignKeysSql: string; virtual; abstract;
     function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
+    // ==========================================================
+
+
+
+
+
+
+
     // Comments
     function BuildCommentSql(const AText: string): string; virtual;
     // Warnings
@@ -400,14 +405,13 @@ begin
   Result := TioTextBuilder.Create(SCRIPT_INDENTATION_WIDTH);
 end;
 
-function TioDBBuilderSqlGenBase.BuildDropForeignKeySql(const ATable: IioDBBuilderSchemaTable;
+function TioDBBuilderSqlGenBase.BuildSQL_DropFK(const ATable: IioDBBuilderSchemaTable;
   const AForeignKey: IioDBBuilderSchemaFK): string;
 var
   LFKName: string;
 begin
   LFKName := BuildForeignKeyNameSql(ATable, AForeignKey);
-
-  Result := BuildDropForeignKeySql(ATable.Name, LFKName);
+  Result := BuildSQL_DropFKbyName(ATable.Name, LFKName);
 end;
 
 end.

@@ -83,9 +83,9 @@ type
     function BuildSQL_IndexDetails(const AIndexName: string): string; override;
     function Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String; override;
     // ForeignKeys
-    function BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
-    function BuildDropForeignKeySql(const ATableName, AForeignKeyName: string): string; override;
-    function BuildForeignKeyExistsSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
+    function BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
+    function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string; override;
+    function BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildForeignKeyModifiedSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildListAllForeignKeysSql: string; override;
     function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string; override;
@@ -160,7 +160,7 @@ begin
   Result := Format('ADD %s', [InternalCreateField(AField)]);
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
 var
   LFKName,
   LFKAction,
@@ -333,7 +333,7 @@ begin
   Result := EmptyStr;
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildForeignKeyExistsSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
 var
   LFKName: string;
 begin
@@ -547,7 +547,7 @@ begin
   Result := LTextBuilder.Text;
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildDropForeignKeySql(const ATableName, AForeignKeyName: string): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string;
 begin
   Result := Format('ALTER TABLE %s DROP CONSTRAINT %s;', [ATableName, AForeignKeyName]);
 end;

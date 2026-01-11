@@ -71,8 +71,8 @@ type
     function BuildSQL_IndexList(const ATableName: string = ''): string; override;
     function BuildSQL_IndexDetails(const AIndexName: string): string; override;
     // ForeignKeys
-    function BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
-    function BuildForeignKeyExistsSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
+    function BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
+    function BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildForeignKeyModifiedSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildListAllForeignKeysSql: string; override;
@@ -199,7 +199,7 @@ begin
   Result := EmptyStr;
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildForeignKeyExistsSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
 begin
   // PRAGMA foreign_key_list returns all FKs for a table, Strategy will filter by name
   Result := Format('PRAGMA foreign_key_list(''%s'')', [ATable.Name]);
@@ -286,7 +286,7 @@ begin
   Result := EmptyStr;
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildAddForeignKeySql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
 var
   LTextBuilder: IioTextBuilder;
 begin
