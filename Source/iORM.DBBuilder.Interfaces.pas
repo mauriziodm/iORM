@@ -117,7 +117,7 @@ type
     function GetChanges: TioDBBuilderIndexChanges;
     function GetCommaSepFieldList: String;
     function GetHasExplicitName: boolean;
-    function GetOrientation: TioIndexOrientation;
+    function GetOrientation: TioOrientation;
     function GetName: String;
     function GetStatus: TioDBBuilderStatus;
     function GetUnique: Boolean;
@@ -127,7 +127,7 @@ type
     property Changes: TioDBBuilderIndexChanges read GetChanges;
     property CommaSepFieldList: String read GetCommaSepFieldList;
     property HasExplicitName: boolean read GetHasExplicitName;
-    property Orientation: TioIndexOrientation read GetOrientation;
+    property Orientation: TioOrientation read GetOrientation;
     property Name: String read GetName;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
     property Unique: Boolean read GetUnique;

@@ -241,12 +241,12 @@ type
     class procedure LoadSqlParamsFromContext(const AQuery: IioQuery; const AContext: IioContext);
     // N.B. M.M. 11/08/18 Spostata come protected per poterla eventualmente ridefinire per database dove esiste una lunghezza massima dei nomi degli indici
   protected
-    class function BuildIndexName(const AContext: IioContext; const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation;
+    class function BuildIndexName(const AContext: IioContext; const ACommaSepFieldList: String; const AIndexOrientation: TioOrientation;
       const AUnique: Boolean): String; virtual;
   public
     class procedure GenerateSqlCount(const AQuery: IioQuery; const AContext: IioContext); virtual;
     class procedure GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String; const ACommaSepFieldList: String;
-      const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean); virtual; abstract;
+      const AIndexOrientation: TioOrientation; const AUnique: Boolean); virtual; abstract;
     class procedure GenerateSqlCurrentTimestamp(const AQuery: IioQuery); virtual; abstract;
     class procedure GenerateSqlDelete(const AQuery: IioQuery; const AContext: IioContext); virtual;
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); virtual; abstract;
@@ -407,7 +407,7 @@ uses
 
 { TioSqlGenerator }
 
-class function TioSqlGenerator.BuildIndexName(const AContext: IioContext; const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation;
+class function TioSqlGenerator.BuildIndexName(const AContext: IioContext; const ACommaSepFieldList: String; const AIndexOrientation: TioOrientation;
   const AUnique: Boolean): String;
 var
   LFieldList: TStrings;

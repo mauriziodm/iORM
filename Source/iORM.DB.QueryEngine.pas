@@ -56,7 +56,7 @@ type
     class function GetRawQuery(const AConnectionName: String; const ASQL: String; AOpen: Boolean): IioQuery;
     // CRUD - ORM query methods (for normal ORM operations)
     class function GetQueryCount(const AContext: IioContext): IioQuery;
-    class function GetQueryCreateIndex(const AContext: IioContext; const AIndexName: String; const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): IioQuery;
+    class function GetQueryCreateIndex(const AContext: IioContext; const AIndexName: String; const ACommaSepFieldList: String; const AIndexOrientation: TioOrientation; const AUnique: Boolean): IioQuery;
     class function GetQueryCurrentTimestamp(const AConnectionDefName: String): IioQuery;
     class function GetQueryDelete(const AContext: IioContext; const AForceCacheable: Boolean): IioQuery;
     class function GetQueryDropIndex(const AContext: IioContext; const AIndexName: String): IioQuery;
@@ -126,7 +126,7 @@ begin
 end;
 
 class function TioQueryEngine.GetQueryCreateIndex(const AContext: IioContext; const AIndexName, ACommaSepFieldList: String;
-  const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): IioQuery;
+  const AIndexOrientation: TioOrientation; const AUnique: Boolean): IioQuery;
 var
   AQuery: IioQuery;
 begin

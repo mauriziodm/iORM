@@ -19,14 +19,14 @@ type
     FContextProperty: IioProperty;
     FHasExplicitName: boolean;
     FName: String;
-    FOrientation: TioIndexOrientation;
+    FOrientation: TioOrientation;
     FStatus: TioDBBuilderStatus;
     FUnique: Boolean;
     // Status
     function GetChanges: TioDBBuilderIndexChanges;
     function GetCommaSepFieldList: String;
     function GetName: String;
-    function GetOrientation: TioIndexOrientation;
+    function GetOrientation: TioOrientation;
     function GetStatus: TioDBBuilderStatus;
     function GetUnique: Boolean;
     function GetHasExplicitName: boolean;
@@ -41,7 +41,7 @@ type
     property CommaSepFieldList: String read GetCommaSepFieldList;
     property HasExplicitName: boolean read GetHasExplicitName;
     property Name: String read GetName;
-    property Orientation: TioIndexOrientation read GetOrientation;
+    property Orientation: TioOrientation read GetOrientation;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
     property Unique: Boolean read GetUnique;
   end;
@@ -95,7 +95,7 @@ begin
   Result := FName;
 end;
 
-function TioDBBuilderSchemaIndex.GetOrientation: TioIndexOrientation;
+function TioDBBuilderSchemaIndex.GetOrientation: TioOrientation;
 begin
   Result := FOrientation
 end;

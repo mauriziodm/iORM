@@ -316,8 +316,8 @@ type
     function _Value(AValue: IInterface): IioWhere; overload;
     function _OrderBy(const ATextOrderBy: String): IioWhere; overload;
     function _OrderBy(const AOrderByInstance: IioSqlItemWhere): IioWhere; overload;
-    procedure CreateIndex(ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
-    procedure CreateIndex(const AIndexName: String; ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation = ioAscending;
+    procedure CreateIndex(ACommaSepFieldList: String; const AIndexOrientation: TioOrientation = ioAscending; const AUnique: Boolean = False); overload;
+    procedure CreateIndex(const AIndexName: String; ACommaSepFieldList: String; const AIndexOrientation: TioOrientation = ioAscending;
       const AUnique: Boolean = False); overload;
     procedure DropIndex(const AIndexName: String);
     // ----- Properties -----
@@ -918,12 +918,12 @@ begin
   ClearETM_Sql;
 end;
 
-procedure TioWhere.CreateIndex(ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
+procedure TioWhere.CreateIndex(ACommaSepFieldList: String; const AIndexOrientation: TioOrientation; const AUnique: Boolean);
 begin
   Self.CreateIndex('', ACommaSepFieldList, AIndexOrientation, AUnique);
 end;
 
-procedure TioWhere.CreateIndex(const AIndexName: String; ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
+procedure TioWhere.CreateIndex(const AIndexName: String; ACommaSepFieldList: String; const AIndexOrientation: TioOrientation; const AUnique: Boolean);
 var
   AResolvedTypeList: IioResolvedTypeList;
   AResolvedTypeName: String;

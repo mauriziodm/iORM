@@ -240,7 +240,7 @@ var
   LOldFieldList: string;
   LNewFieldList: string;
   LSqlDefinition: string;
-  LOldOrientation: TioIndexOrientation;
+  LOldOrientation: TioOrientation;
 begin
   Result := False;
   LIndexName := SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);

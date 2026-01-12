@@ -109,8 +109,8 @@ const
   loClosePar = iORM.CommonTypes.TioLogicOp.loClosePar;
 
   // TioIndexOrientation = (ioAscending = 0, ioDescending)
-  ioAscending = iORM.CommonTypes.TioIndexOrientation.ioAscending;
-  ioDescending = iORM.CommonTypes.TioIndexOrientation.ioDescending;
+  ioAscending = iORM.CommonTypes.TioOrientation.ioAscending;
+  ioDescending = iORM.CommonTypes.TioOrientation.ioDescending;
 
   // TioMonitorMode = (mmDisabled = 0, mmRemote, mmFlatFile)
   mmDisabled = iORM.CommonTypes.TioMonitorMode.mmDisabled;
@@ -264,7 +264,7 @@ type
 
   TioCompareOp = iORM.CommonTypes.TioCompareOp;
   TioHideWaitProc = iORM.CommonTypes.TioHideWaitProc;
-  TioIndexOrientation = iORM.CommonTypes.TioIndexOrientation;
+  TioIndexOrientation = iORM.CommonTypes.TioOrientation;
   TioLoadType = iORM.CommonTypes.TioLoadType;
   TioLogicOp = iORM.CommonTypes.TioLogicOp;
   TioObjStatus = iORM.CommonTypes.TioObjStatus;

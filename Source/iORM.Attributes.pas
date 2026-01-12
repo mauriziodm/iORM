@@ -347,19 +347,19 @@ type
   strict private
     FCommaSepFieldList: String;
     FName: String;
-    FOrientation: TioIndexOrientation;
+    FOrientation: TioOrientation;
     FUnique: Boolean;
 
     function GetHasExplicitName: boolean;
   public
-    constructor Create(const AIndexName: String; ACommaSepFieldList: String; const AOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
-    constructor Create(ACommaSepFieldList: String; const AOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
-    constructor Create(const AOrientation: TioIndexOrientation = ioAscending; const AUnique: Boolean = False); overload;
+    constructor Create(const AIndexName: String; ACommaSepFieldList: String; const AOrientation: TioOrientation = ioAscending; const AUnique: Boolean = False); overload;
+    constructor Create(ACommaSepFieldList: String; const AOrientation: TioOrientation = ioAscending; const AUnique: Boolean = False); overload;
+    constructor Create(const AOrientation: TioOrientation = ioAscending; const AUnique: Boolean = False); overload;
 
     property CommaSepFieldList: String read FCommaSepFieldList write FCommaSepFieldList;
     property HasExplicitName: boolean read GetHasExplicitName;  // Carlo Marona (2025-10-21): Property added to know when the index name was passed by the user or set by the iORM
     property Name: String read FName;
-    property Orientation: TioIndexOrientation read FOrientation;
+    property Orientation: TioOrientation read FOrientation;
     property Unique: Boolean read FUnique;
   end;
 
@@ -785,7 +785,7 @@ end;
 
 { ioIndex }
 
-constructor ioIndex.Create(const AIndexName: String; ACommaSepFieldList: String; const AOrientation: TioIndexOrientation; const AUnique: Boolean);
+constructor ioIndex.Create(const AIndexName: String; ACommaSepFieldList: String; const AOrientation: TioOrientation; const AUnique: Boolean);
 begin
   // Carlo Marona (2025-10-21): added check for empty index name
   if AIndexName.IsEmpty then
@@ -798,7 +798,7 @@ begin
 //  FUnique := AUnique;
 end;
 
-constructor ioIndex.Create(ACommaSepFieldList: String; const AOrientation: TioIndexOrientation; const AUnique: Boolean);
+constructor ioIndex.Create(ACommaSepFieldList: String; const AOrientation: TioOrientation; const AUnique: Boolean);
 begin
   // Carlo Marona (2025-11-18): added check for empty fields list
   if ACommaSepFieldList.IsEmpty then
@@ -815,7 +815,7 @@ begin
 //  Self.Create('', ACommaSepFieldList, AOrientation, AUnique);
 end;
 
-constructor ioIndex.Create(const AOrientation: TioIndexOrientation; const AUnique: Boolean);
+constructor ioIndex.Create(const AOrientation: TioOrientation; const AUnique: Boolean);
 begin
   // Carlo Marona (2025-10-21)
   inherited Create;
