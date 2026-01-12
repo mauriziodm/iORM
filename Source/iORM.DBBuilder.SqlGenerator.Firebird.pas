@@ -172,16 +172,16 @@ begin
     AddLine(Format('ALTER TABLE %s', [AForeignKey.DependentTableName])).
     IncIndent.
     Add(Format('ADD CONSTRAINT %s', [BuildForeignKeyNameSql(ATable, AForeignKey)]), True).
-    Add(Format(' FOREIGN KEY (%s)', [AForeignKey.DependentFieldName])).
-    Add(Format(' REFERENCES %s (%s)', [AForeignKey.ReferenceTableName, AForeignKey.ReferenceFieldName]));
+    Add(Format('FOREIGN KEY (%s)', [AForeignKey.DependentFieldName])).
+    Add(Format('REFERENCES %s (%s)', [AForeignKey.ReferenceTableName, AForeignKey.ReferenceFieldName]));
 
   // Add optional ON UPDATE clause if specified
   if AForeignKey.OnUpdateAction > fkUnspecified then
-    LTextBuilder.Add(Format(' ON UPDATE %s', [TranslateFKAction(AForeignKey, AForeignKey.OnUpdateAction)]));
+    LTextBuilder.Add(Format('ON UPDATE %s', [TranslateFKAction(AForeignKey, AForeignKey.OnUpdateAction)]));
 
   // Add optional ON DELETE clause if specified
   if AForeignKey.OnDeleteAction > fkUnspecified then
-    LTextBuilder.Add(Format(' ON DELETE %s', [TranslateFKAction(AForeignKey, AForeignKey.OnDeleteAction)]));
+    LTextBuilder.Add(Format('ON DELETE %s', [TranslateFKAction(AForeignKey, AForeignKey.OnDeleteAction)]));
 
   LTextBuilder.
     DecIndent.
@@ -192,22 +192,15 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
 var
-  LSqlText, LIndexName, LFieldList, LUnique, LIndexOrientation: String;
+  LIndexName, LFieldList, LUnique, LIndexOrientation: String;
 begin
-  // N.B. Viene calcolato un nome random (quindi non uso l'apposito metodo dell'antenato se eccessivo)
-  // perchè in FB c'e' un limite a 30 caratteri di lunghezza per i nomi dei constraint
   LIndexName := Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
-  LIndexOrientation := Translate_SchemaIndex_To_Orientation(AIndex);
-  LUnique := Translate_SchemaIndex_To_Unique(AIndex);
+  LIndexOrientation := Translate_SchemaIndex_To_Orientation(AIndex);  // Returns ' ASC' or ' DESC' (with leading space)
+  LUnique := Translate_SchemaIndex_To_Unique(AIndex);  // Returns ' UNIQUE' or '' (with leading space if present)
   LFieldList := Translate_SchemaIndex_To_CommaSepListOfFieldNames(AIndex);
 
-  // Compose the create index query text
-  if not LUnique.IsEmpty then
-    LSqlText := Format('CREATE %s %s INDEX %s ON %s (%s);', [LUnique, LIndexOrientation, LIndexName, ATable.Name, LFieldList])
-  else
-    LSqlText := Format('CREATE %s INDEX %s ON %s (%s);', [LIndexOrientation, LIndexName, ATable.Name, LFieldList]);
-
-  Result := LSqlText;
+  // Note: LUnique and LIndexOrientation already include leading space when present
+  Result := Format('CREATE%s%s INDEX %s ON %s (%s);', [LUnique, LIndexOrientation, LIndexName, ATable.Name, LFieldList]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string;

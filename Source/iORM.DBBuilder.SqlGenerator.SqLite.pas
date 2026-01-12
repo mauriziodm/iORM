@@ -122,15 +122,14 @@ end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
 var
-  LSqlText, LIndexName, LFieldList, LUnique: String;
+  LIndexName, LFieldList, LUnique: String;
 begin
   LIndexName := Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
-  LUnique := Translate_SchemaIndex_To_Unique(AIndex);
+  LUnique := Translate_SchemaIndex_To_Unique(AIndex);  // Returns ' UNIQUE' or '' (with leading space if present)
   LFieldList := Translate_SchemaIndex_To_CommaSepListOfFieldNames(AIndex);
-  // Compose the create index query text
-  LSqlText := Format('CREATE %s INDEX IF NOT EXISTS %s ON %s (%s);', [LUnique, LIndexName, ATable.Name, LFieldList]);
 
-  Result := LSqlText;
+  // Note: LUnique already includes leading space when present
+  Result := Format('CREATE%s INDEX IF NOT EXISTS %s ON %s (%s);', [LUnique, LIndexName, ATable.Name, LFieldList]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildAlterFieldSql(const ATable: IioDBBuilderSchemaTable;

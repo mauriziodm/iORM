@@ -303,7 +303,7 @@ begin
   Result := False;
 
   // PRAGMA foreign_key_list returns: id, seq, table, from, to, on_update, on_delete, match
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildForeignKeyExistsSql(ATable, AForeignKey), True);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FKExists(ATable, AForeignKey), True);
 
   while not LQuery.Eof do
   begin

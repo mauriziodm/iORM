@@ -138,12 +138,12 @@ begin
         case LFK.Status of
           stCreate:
             begin
-              Script.Body.Add(SqlGenerator.BuildAddForeignKeySql(LTable, LFK));
+              Script.Body.Add(SqlGenerator.BuildSQL_AddFK(LTable, LFK));
             end;
           stUpdate:
             begin
-              Script.Body.Add(SqlGenerator.BuildDropForeignKeySql(LTable, LFK));
-              Script.Body.Add(SqlGenerator.BuildAddForeignKeySql(LTable, LFK));
+              Script.Body.Add(SqlGenerator.BuildSQL_DropFK(LTable, LFK));
+              Script.Body.Add(SqlGenerator.BuildSQL_AddFK(LTable, LFK));
             end;
         end;
       end;
@@ -236,7 +236,7 @@ begin
     raise EioInvalidArgumentException.Create(ClassName, 'CreateTableForeignKeys', 'ATable is not assigned.');
 
   for LForeignKey in ATable.ForeignKeys.Values do
-    Script.Body.Add(SqlGenerator.BuildAddForeignKeySql(ATable, LForeignKey));
+    Script.Body.Add(SqlGenerator.BuildSQL_AddFK(ATable, LForeignKey));
 end;
 
 procedure TioDBBuilderStrategyBase.CreateIndexes;

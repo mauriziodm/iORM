@@ -248,10 +248,11 @@ var
 begin
   Result := '';
   LComma := '';
-  LOrientation := Translate_SchemaIndex_To_Orientation(AIndex);
+  LOrientation := Translate_SchemaIndex_To_Orientation(AIndex);  // Returns ' ASC' or ' DESC' (with leading space)
   for LField in AIndex.CommaSepFieldList.Split([',']) do
   begin
-    Result := Result + LComma + LField.Trim + ' ' + LOrientation;
+    // Note: LOrientation already includes leading space
+    Result := Result + LComma + LField.Trim + LOrientation;
     LComma := ', ';
   end;
 end;
@@ -293,20 +294,20 @@ end;
 
 function TioDBBuilderSqlGenBase.Translate_SchemaIndex_To_Orientation(const AIndex: IioDBBuilderSchemaIndex): String;
 begin
-  Result := EmptyStr;
-
+  // Returns orientation with leading space for SQL composition (e.g. ' ASC' or ' DESC')
   case AIndex.Orientation of
     ioAscending:
-      Exit('ASC');
+      Exit(' ASC');
     ioDescending:
-      Exit('DESC');
+      Exit(' DESC');
   end;
 end;
 
 function TioDBBuilderSqlGenBase.Translate_SchemaIndex_To_Unique(const AIndex: IioDBBuilderSchemaIndex): String;
 begin
+  // Returns UNIQUE keyword with leading space for SQL composition (e.g. ' UNIQUE' or empty)
   if AIndex.Unique then
-    Exit('UNIQUE')
+    Exit(' UNIQUE')
   else
     Exit('');
 end;

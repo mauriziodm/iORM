@@ -167,7 +167,7 @@ begin
 
   while not LQuery.Eof do
   begin
-    Script.Body.Add(SqlGenerator.BuildDropForeignKeySql(LQuery.Fields.FieldByName('table_name').AsString,
+    Script.Body.Add(SqlGenerator.BuildSQL_DropFKbyName(LQuery.Fields.FieldByName('table_name').AsString,
       LQuery.Fields.FieldByName('constraint_name').AsString));
     LQuery.Next;
   end;
@@ -320,7 +320,7 @@ var
 begin
   Result := False;
 
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildForeignKeyExistsSql(ATable, AForeignKey), True);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FKExists(ATable, AForeignKey), True);
   Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
 end;
 
