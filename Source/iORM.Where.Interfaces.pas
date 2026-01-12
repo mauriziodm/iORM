@@ -253,8 +253,8 @@ type
     function _OrderBy(const ATextOrderBy:String): IioWhere; overload;
     function _OrderBy(const AOrderByInstance:IioSqlItemWhere): IioWhere; overload;
 
-    procedure CreateIndex(ACommaSepFieldList:String; const AIndexOrientation:TioOrientation=ioAscending; const AUnique:Boolean=False); overload;
-    procedure CreateIndex(const AIndexName:String; ACommaSepFieldList:String; const AIndexOrientation:TioOrientation=ioAscending; const AUnique:Boolean=False); overload;
+    procedure CreateIndex(ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation=ioAscending; const AUnique:Boolean=False); overload;
+    procedure CreateIndex(const AIndexName:String; ACommaSepFieldList:String; const AIndexOrientation:TioIndexOrientation=ioAscending; const AUnique:Boolean=False); overload;
     procedure DropIndex(const AIndexName:String);
     // TypeName
     procedure SetTypeName(const Value: String);

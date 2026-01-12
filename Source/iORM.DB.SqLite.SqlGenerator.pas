@@ -45,7 +45,7 @@ type
   TioSqlGeneratorSqLite = class(TioSqlGenerator)
   public
     class procedure GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String;
-      const ACommaSepFieldList: String; const AIndexOrientation: TioOrientation; const AUnique: Boolean); override;
+      const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean); override;
     class procedure GenerateSqlCurrentTimestamp(const AQuery: IioQuery); override;
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); override;
     class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); override;
@@ -63,7 +63,7 @@ uses
 { TioSqlGeneratorSqLite }
 
 class procedure TioSqlGeneratorSqLite.GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext;
-  AIndexName: String; const ACommaSepFieldList: String; const AIndexOrientation: TioOrientation; const AUnique: Boolean);
+  AIndexName: String; const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
 var
   LFieldList: TStrings;
   LQueryText, LIndexOrientationText, LField, LUniqueText: String;

@@ -106,7 +106,7 @@ type
     function Translate_SchemaIndex_To_Unique(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
     function Translate_SchemaTableAndIndex_To_IndexName(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): String; virtual;
     function Translate_Unique_To_UniqueSuffixForIndexName(const Unique: boolean): string; virtual;
-    function Translate_Orientation_To_OrientationSuffixForIndexName(const AOrientation: TioOrientation): string; virtual;
+    function Translate_Orientation_To_OrientationSuffixForIndexName(const AOrientation: TioIndexOrientation): string; virtual;
     // ==========================================================
 
     // ==========================================================
@@ -336,7 +336,7 @@ begin
     Result := 'DEFAULT ' + DataConverter.TValueToSql(LFieldDefaultValue);
 end;
 
-function TioDBBuilderSqlGenBase.Translate_Orientation_To_OrientationSuffixForIndexName(const AOrientation: TioOrientation): string;
+function TioDBBuilderSqlGenBase.Translate_Orientation_To_OrientationSuffixForIndexName(const AOrientation: TioIndexOrientation): string;
 begin
   case AOrientation of
     ioAscending:

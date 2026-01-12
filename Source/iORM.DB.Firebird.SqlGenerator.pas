@@ -45,10 +45,10 @@ type
   TioSqlGeneratorFirebird = class(TioSqlGenerator)
   protected
     class function BuildIndexName(const AContext: IioContext; const ACommaSepFieldList: String;
-      const AIndexOrientation: TioOrientation; const AUnique: Boolean): String; override;
+      const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): String; override;
   public
     class procedure GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String;
-      const ACommaSepFieldList: String; const AIndexOrientation: TioOrientation; const AUnique: Boolean); override;
+      const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean); override;
     class procedure GenerateSqlCurrentTimestamp(const AQuery: IioQuery); override;
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); override;
     class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); override;
@@ -64,7 +64,7 @@ uses
 { TioSqlGeneratorFirebird }
 
 class function TioSqlGeneratorFirebird.BuildIndexName(const AContext: IioContext; const ACommaSepFieldList: String;
-  const AIndexOrientation: TioOrientation; const AUnique: Boolean): String;
+  const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean): String;
 var
   // LFieldList: TStrings;
   // LField: String;
@@ -105,7 +105,7 @@ begin
 end;
 
 class procedure TioSqlGeneratorFirebird.GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext;
-  AIndexName: String; const ACommaSepFieldList: String; const AIndexOrientation: TioOrientation; const AUnique: Boolean);
+  AIndexName: String; const ACommaSepFieldList: String; const AIndexOrientation: TioIndexOrientation; const AUnique: Boolean);
 var
   LFieldList: TStrings;
   LQueryText, LIndexOrientationText, LField, LUniqueText: String;

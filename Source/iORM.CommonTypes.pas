@@ -142,7 +142,7 @@ type
   TCustomAttributeRef = class of TCustomAttribute;
 
   // DB index orientation
-  TioOrientation = (ioAscending = 0, ioDescending);
+  TioIndexOrientation = (ioAscending = 0, ioDescending);
 
   // FD monitor and trace mode
   TioMonitorMode = (mmDisabled = 0, mmRemote, mmFlatFile);
