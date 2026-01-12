@@ -162,49 +162,26 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
 var
-  LFKName,
-  LFKAction,
-  LSqlText: string;
   LTextBuilder: IioTextBuilder;
 begin
-  // N.B. Viene calcolato un nome random (quindi non uso l'apposito metodo dell'antenato se eccessivo)
-  // perch� in FB c'e' un limite a 30 caratteri di lunghezza per i nomi dei constraint
-  LFKName := BuildForeignKeyNameSql(ATable, AForeignKey);
-
+  // Generates: ALTER TABLE <table> ADD CONSTRAINT <name> FOREIGN KEY (...) REFERENCES (...) [ON UPDATE ...] [ON DELETE ...]
   LTextBuilder := NewTextBuilder;
 
+  // Build the main FK constraint structure
   LTextBuilder.
     AddLine(Format('ALTER TABLE %s', [AForeignKey.DependentTableName])).
     IncIndent.
-    Add(Format('ADD CONSTRAINT %s', [LFKName]), True).
+    Add(Format('ADD CONSTRAINT %s', [BuildForeignKeyNameSql(ATable, AForeignKey)]), True).
     Add(Format(' FOREIGN KEY (%s)', [AForeignKey.DependentFieldName])).
     Add(Format(' REFERENCES %s (%s)', [AForeignKey.ReferenceTableName, AForeignKey.ReferenceFieldName]));
 
+  // Add optional ON UPDATE clause if specified
   if AForeignKey.OnUpdateAction > fkUnspecified then
-  begin
-    LFKAction := TranslateFKAction(AForeignKey, AForeignKey.OnUpdateAction);
+    LTextBuilder.Add(Format(' ON UPDATE %s', [TranslateFKAction(AForeignKey, AForeignKey.OnUpdateAction)]));
 
-    if not LFKAction.IsEmpty then
-      LTextBuilder.Add(Format(' ON UPDATE %s', [LFKAction]))
-    else
-      LTextBuilder.AddLine(
-        BuildWarningSql(Format('Table ''%s'' constraint ''%s'' --> Invalid foreign key action (field %s reference to %s.%s)',
-          [AForeignKey.DependentTableName, AForeignKey.Name, AForeignKey.DependentFieldName, AForeignKey.ReferenceTableName,
-          AForeignKey.ReferenceFieldName])));
-  end;
-
+  // Add optional ON DELETE clause if specified
   if AForeignKey.OnDeleteAction > fkUnspecified then
-  begin
-    LFKAction := TranslateFKAction(AForeignKey, AForeignKey.OnDeleteAction);
-
-    if not LFKAction.IsEmpty then
-      LTextBuilder.Add(Format(' ON DELETE %s', [TranslateFKAction(AForeignKey, AForeignKey.OnDeleteAction)]))
-    else
-      LTextBuilder.AddLine(
-        BuildWarningSql(Format('Table ''%s'' constraint ''%s'' --> Invalid foreign key action (field %s reference to %s.%s)',
-          [AForeignKey.DependentTableName, AForeignKey.Name, AForeignKey.DependentFieldName, AForeignKey.ReferenceTableName,
-          AForeignKey.ReferenceFieldName])));
-  end;
+    LTextBuilder.Add(Format(' ON DELETE %s', [TranslateFKAction(AForeignKey, AForeignKey.OnDeleteAction)]));
 
   LTextBuilder.
     DecIndent.

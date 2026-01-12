@@ -167,8 +167,6 @@ uses
 
 function TioDBBuilderSqlGenBase.TranslateFKAction(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
 begin
-  Result := EmptyStr;
-
   case AFKAction of
     fkUnspecified, fkNoAction:
       Exit('NO ACTION');
