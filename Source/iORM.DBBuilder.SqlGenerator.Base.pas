@@ -227,7 +227,6 @@ begin
       Format('%s_%s_%s_%s', [AForeignKey.DependentTableName, AForeignKey.DependentFieldName,
         AForeignKey.ReferenceTableName, AForeignKey.ReferenceFieldName]),
       MaxSqlIdentifierLength - 3);
-    LFKName := TioSqlTranslator.Translate(LFKName, ATable.GetContextTable.GetClassName, False);
   end;
 
   Result := LFKName.ToUpper;
