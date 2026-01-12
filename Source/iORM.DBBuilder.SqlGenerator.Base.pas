@@ -120,7 +120,7 @@ type
 
     function BuildForeignKeyModifiedSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual; abstract;
 
-    function BuildForeignKeyNameSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK; const UpperCase: boolean = True): string; virtual;
+    function BuildForeignKeyNameSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual;
     function BuildListAllForeignKeysSql: string; virtual; abstract;
     function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     // ==========================================================
@@ -211,8 +211,7 @@ begin
   Result := BuildSQL_DropIndexByName(LIndexName);
 end;
 
-function TioDBBuilderSqlGenBase.BuildForeignKeyNameSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK;
-  const UpperCase: boolean): string;
+function TioDBBuilderSqlGenBase.BuildForeignKeyNameSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
 var
   LFKName: String;
 begin
@@ -231,10 +230,7 @@ begin
     LFKName := TioSqlTranslator.Translate(LFKName, ATable.GetContextTable.GetClassName, False);
   end;
 
-  if UpperCase then
-    Result := LFKName.ToUpper
-  else
-    Result := LFKName;
+  Result := LFKName.ToUpper;
 end;
 
 function TioDBBuilderSqlGenBase.BuildSQL_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
