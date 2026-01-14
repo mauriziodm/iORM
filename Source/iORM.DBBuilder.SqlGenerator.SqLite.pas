@@ -122,6 +122,7 @@ function TioDBBuilderSqlGenSQLite.BuildSQL_AddIndex(const ATable: IioDBBuilderSc
 var
   LIndexName, LFieldList, LUnique: String;
 begin
+  // Generates: CREATE [UNIQUE] INDEX IF NOT EXISTS <name> ON <table> (<fields>);
   LIndexName := Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
   LUnique := Translate_SchemaIndex_To_Unique(AIndex);  // Returns ' UNIQUE' or '' (with leading space if present)
   LFieldList := Translate_SchemaIndex_To_CommaSepListOfFieldNames(AIndex);
@@ -159,11 +160,13 @@ end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_IndexExistsByName(const AIndexName: string): string;
 begin
+  // Generates: SELECT query to check if an index exists by name
   Result := Format('SELECT 1 FROM sqlite_master WHERE type = ''index'' AND name = ''%s''', [AIndexName]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_IndexList(const ATableName: string): string;
 begin
+  // Generates: SELECT query to list indexes from sqlite_master with their SQL definitions
   // Query sqlite_master for all index info including SQL definition
   // We use sqlite_master instead of PRAGMA index_list because:
   // - PRAGMA provides only the unique flag, not orientation (ASC/DESC)
@@ -178,18 +181,21 @@ end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_IndexDetails(const AIndexName: string): string;
 begin
+  // Generates: PRAGMA index_info(<name>) to retrieve field details for a specific index
   // PRAGMA index_info returns columns info for the index
   Result := Format('PRAGMA index_info(''%s'')', [AIndexName]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
 begin
+  // Generates: PRAGMA foreign_key_list(<table>) to check if a foreign key exists (Strategy filters by name)
   // PRAGMA foreign_key_list returns all FKs for a table, Strategy will filter by name
   Result := Format('PRAGMA foreign_key_list(''%s'')', [ATable.Name]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string;
 begin
+  // Generates: PRAGMA foreign_key_list(<table>) to list foreign keys for a table
   // SQLite uses PRAGMA foreign_key_list which requires a table name
   // Note: AFKName parameter is ignored - PRAGMA returns all FKs for the table
   if ATableName.IsEmpty then

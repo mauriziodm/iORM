@@ -192,6 +192,7 @@ function TioDBBuilderSqlGenFirebird.BuildSQL_AddIndex(const ATable: IioDBBuilder
 var
   LIndexName, LFieldList, LUnique, LOrientation: String;
 begin
+  // Generates: CREATE [UNIQUE] [ASC|DESC] INDEX <name> ON <table> (<fields>);
   LIndexName := Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
   LOrientation := Translate_SchemaIndex_To_Orientation(AIndex);  // Returns ' ASC' or ' DESC' (with leading space)
   LUnique := Translate_SchemaIndex_To_Unique(AIndex);  // Returns ' UNIQUE' or '' (with leading space if present)
@@ -305,6 +306,7 @@ function TioDBBuilderSqlGenFirebird.BuildSQL_FKExists(const ATable: IioDBBuilder
 var
   LTextBuilder: IioTextBuilder;
 begin
+  // Generates: SELECT query to check if a specific foreign key exists in the database
   LTextBuilder := NewTextBuilder;
 
   LTextBuilder.
@@ -325,6 +327,7 @@ function TioDBBuilderSqlGenFirebird.BuildSQL_FKList(const ATableName: string = '
 var
   LTextBuilder: IioTextBuilder;
 begin
+  // Generates: SELECT query to list foreign keys with their properties (table_name, constraint_name, on_update, on_delete)
   // Generalized FK list query following the same pattern as BuildSQL_IndexList
   // Supports three scenarios:
   //   A. All FKs in database (ATableName = '', AFKName = '')
@@ -356,6 +359,7 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_IndexExistsByName(const AIndexName: string): string;
 begin
+  // Generates: SELECT query to check if an index exists by name
   Result := Format('SELECT 1 FROM RDB$INDICES WHERE UPPER(RDB$INDEX_NAME) = UPPER(''%s'')', [AIndexName]);
 end;
 
@@ -370,6 +374,7 @@ function TioDBBuilderSqlGenFirebird.BuildSQL_IndexList(const ATableName: string)
 var
   LTextBuilder: IioTextBuilder;
 begin
+  // Generates: SELECT query to list indexes with their properties (name, unique flag, orientation)
   // Base query: all non-system indexes with basic info (name, unique, orientation)
   LTextBuilder := NewTextBuilder;
 
@@ -389,6 +394,7 @@ function TioDBBuilderSqlGenFirebird.BuildSQL_IndexDetails(const AIndexName: stri
 var
   LTextBuilder: IioTextBuilder;
 begin
+  // Generates: SELECT query to retrieve field details for a specific index (field names and positions)
   LTextBuilder := NewTextBuilder;
 
   LTextBuilder.
@@ -493,11 +499,13 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string;
 begin
+  // Generates: ALTER TABLE <table> DROP CONSTRAINT <fk_name>;
   Result := Format('ALTER TABLE %s DROP CONSTRAINT %s;', [ATableName, AForeignKeyName]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_DropIndexByName(const AIndexName: string): string;
 begin
+  // Generates: DROP INDEX <name>;
   Result := Format('DROP INDEX %s;', [AIndexName]);
 end;
 

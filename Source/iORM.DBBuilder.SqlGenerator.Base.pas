@@ -203,6 +203,7 @@ function TioDBBuilderSqlGenBase.BuildSQL_DropIndex(const ATable: IioDBBuilderSch
 var
   LIndexName: string;
 begin
+  // Generates SQL to drop an index (delegates to BuildSQL_DropIndexByName after translating schema index to index name)
   LIndexName := Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
   Result := BuildSQL_DropIndexByName(LIndexName);
 end;
@@ -230,6 +231,7 @@ end;
 
 function TioDBBuilderSqlGenBase.BuildSQL_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
 begin
+  // Generates SQL to check if an index exists (delegates to BuildSQL_IndexExistsByName after translating schema index to index name)
   Result := BuildSQL_IndexExistsByName(Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex));
 end;
 
@@ -400,6 +402,7 @@ function TioDBBuilderSqlGenBase.BuildSQL_DropFK(const ATable: IioDBBuilderSchema
 var
   LFKName: string;
 begin
+  // Generates SQL to drop a foreign key (delegates to BuildSQL_DropFKbyName after translating schema FK to FK name)
   LFKName := Translate_SchemaTableAndFK_To_FKName(ATable, AForeignKey);
   Result := BuildSQL_DropFKbyName(ATable.Name, LFKName);
 end;
