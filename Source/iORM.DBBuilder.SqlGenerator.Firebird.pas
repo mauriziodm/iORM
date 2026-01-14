@@ -306,21 +306,23 @@ end;
 function TioDBBuilderSqlGenFirebird.BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
 var
   LFKName: string;
+  LTextBuilder: IioTextBuilder;
 begin
   LFKName := BuildForeignKeyNameSql(ATable, AForeignKey);
+  LTextBuilder := NewTextBuilder;
 
-  Result := Format(
-    'select' + sLineBreak +
-    '  RDB$RELATION_CONSTRAINTS.rdb$constraint_name' + sLineBreak +
-    'from' + sLineBreak +
-    '  RDB$RELATIONS join RDB$RELATION_CONSTRAINTS ON RDB$RELATIONS.rdb$relation_name = RDB$RELATION_CONSTRAINTS.rdb$relation_name' + sLineBreak +
-    'where' + sLineBreak +
-    '  (RDB$RELATIONS.rdb$system_flag = 0) and' + sLineBreak +
-    '  (RDB$RELATION_CONSTRAINTS.rdb$constraint_type = ''FOREIGN KEY'') and' + sLineBreak +
-    '  (UPPER(RDB$RELATIONS.Rdb$relation_name) = UPPER(''%s'')) and' + sLineBreak +
-    '  (UPPER(RDB$RELATION_CONSTRAINTS.rdb$constraint_name) = (''%s''))',
-    [ATable.Name, LFKName]
-  );
+  LTextBuilder.
+    AddLine('select').
+    AddLine('  RDB$RELATION_CONSTRAINTS.rdb$constraint_name').
+    AddLine('from').
+    AddLine('  RDB$RELATIONS join RDB$RELATION_CONSTRAINTS ON RDB$RELATIONS.rdb$relation_name = RDB$RELATION_CONSTRAINTS.rdb$relation_name').
+    AddLine('where').
+    AddLine('  (RDB$RELATIONS.rdb$system_flag = 0) and').
+    AddLine('  (RDB$RELATION_CONSTRAINTS.rdb$constraint_type = ''FOREIGN KEY'') and').
+    AddLine(Format('  (UPPER(RDB$RELATIONS.Rdb$relation_name) = UPPER(''%s'')) and', [ATable.Name])).
+    Add(Format('  (UPPER(RDB$RELATION_CONSTRAINTS.rdb$constraint_name) = (''%s''))', [LFKName]));
+
+  Result := LTextBuilder.Text;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildForeignKeyModifiedSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
