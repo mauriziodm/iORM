@@ -335,32 +335,25 @@ begin
   //   B. All FKs for a table (ATableName specified, AFKName = '')
   //   C. Specific FK (ATableName specified, AFKName specified)
   // Always returns: table_name, constraint_name, on_update, on_delete
-
   LTextBuilder := NewTextBuilder;
 
-  // Build SELECT clause - always returns the same fields
   LTextBuilder.
-    Add('SELECT ').
-    Add('  rc.RDB$RELATION_NAME AS table_name, ').
-    Add('  rc.RDB$CONSTRAINT_NAME AS constraint_name, ').
-    Add('  refc.RDB$UPDATE_RULE AS on_update, ').
-    Add('  refc.RDB$DELETE_RULE AS on_delete ');
-
-  // Build FROM clause with JOIN for ON UPDATE/DELETE info
-  LTextBuilder.
-    Add('FROM RDB$RELATION_CONSTRAINTS rc ').
-    Add('LEFT JOIN RDB$REF_CONSTRAINTS refc ON rc.RDB$CONSTRAINT_NAME = refc.RDB$CONSTRAINT_NAME ');
-
-  // Build WHERE clause
-  LTextBuilder.Add('WHERE rc.RDB$CONSTRAINT_TYPE = ''FOREIGN KEY'' ');
+    AddLine('SELECT ').
+    AddLine('  rc.RDB$RELATION_NAME AS table_name, ').
+    AddLine('  rc.RDB$CONSTRAINT_NAME AS constraint_name, ').
+    AddLine('  refc.RDB$UPDATE_RULE AS on_update, ').
+    AddLine('  refc.RDB$DELETE_RULE AS on_delete ').
+    AddLine('FROM RDB$RELATION_CONSTRAINTS rc ').
+    AddLine('LEFT JOIN RDB$REF_CONSTRAINTS refc ON rc.RDB$CONSTRAINT_NAME = refc.RDB$CONSTRAINT_NAME ').
+    AddLine('WHERE rc.RDB$CONSTRAINT_TYPE = ''FOREIGN KEY'' ');
 
   // Add table filter if specified (scenarios B/C)
   if not ATableName.IsEmpty then
-    LTextBuilder.Add(Format('  AND UPPER(rc.RDB$RELATION_NAME) = UPPER(''%s'') ', [ATableName]));
+    LTextBuilder.AddLine(Format('  AND UPPER(rc.RDB$RELATION_NAME) = UPPER(''%s'') ', [ATableName]));
 
   // Add FK name filter if specified (scenario C)
   if not AFKName.IsEmpty then
-    LTextBuilder.Add(Format('  AND UPPER(rc.RDB$CONSTRAINT_NAME) = UPPER(''%s'') ', [AFKName]));
+    LTextBuilder.AddLine(Format('  AND UPPER(rc.RDB$CONSTRAINT_NAME) = UPPER(''%s'') ', [AFKName]));
 
   Result := LTextBuilder.Text;
 end;
