@@ -305,10 +305,8 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
 var
-  LFKName: string;
   LTextBuilder: IioTextBuilder;
 begin
-  LFKName := BuildForeignKeyNameSql(ATable, AForeignKey);
   LTextBuilder := NewTextBuilder;
 
   LTextBuilder.
@@ -320,7 +318,7 @@ begin
     AddLine('  (RDB$RELATIONS.rdb$system_flag = 0) and').
     AddLine('  (RDB$RELATION_CONSTRAINTS.rdb$constraint_type = ''FOREIGN KEY'') and').
     AddLine(Format('  (UPPER(RDB$RELATIONS.Rdb$relation_name) = UPPER(''%s'')) and', [ATable.Name])).
-    Add(Format('  (UPPER(RDB$RELATION_CONSTRAINTS.rdb$constraint_name) = (''%s''))', [LFKName]));
+    Add(Format('  (UPPER(RDB$RELATION_CONSTRAINTS.rdb$constraint_name) = (''%s''))', [BuildForeignKeyNameSql(ATable, AForeignKey)]));
 
   Result := LTextBuilder.Text;
 end;
