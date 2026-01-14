@@ -339,7 +339,7 @@ begin
   Result := False;
 
   // Build FK name using SqlGenerator's method
-  LFKName := SqlGenerator.BuildForeignKeyNameSql(ATable, AForeignKey);
+  LFKName := SqlGenerator.Translate_SchemaTableAndFK_To_FKName(ATable, AForeignKey);
 
   // Query by FK name: if no record is found, the FK name changed (meaning the structural
   // properties changed), so we exit and let ForeignKeyExists handle it as a new FK.

@@ -169,7 +169,7 @@ begin
   LTextBuilder.
     AddLine(Format('ALTER TABLE %s', [AForeignKey.DependentTableName])).
     IncIndent.
-    Add(Format('ADD CONSTRAINT %s', [BuildForeignKeyNameSql(ATable, AForeignKey)]), True).
+    Add(Format('ADD CONSTRAINT %s', [Translate_SchemaTableAndFK_To_FKName(ATable, AForeignKey)]), True).
     Add(Format(' FOREIGN KEY (%s)', [AForeignKey.DependentFieldName])).
     Add(Format(' REFERENCES %s (%s)', [AForeignKey.ReferenceTableName, AForeignKey.ReferenceFieldName]));
 
@@ -316,7 +316,7 @@ begin
     AddLine('  (RDB$RELATIONS.rdb$system_flag = 0) and').
     AddLine('  (RDB$RELATION_CONSTRAINTS.rdb$constraint_type = ''FOREIGN KEY'') and').
     AddLine(Format('  (UPPER(RDB$RELATIONS.Rdb$relation_name) = UPPER(''%s'')) and', [ATable.Name])).
-    Add(Format('  (UPPER(RDB$RELATION_CONSTRAINTS.rdb$constraint_name) = UPPER(''%s''))', [BuildForeignKeyNameSql(ATable, AForeignKey)]));
+    Add(Format('  (UPPER(RDB$RELATION_CONSTRAINTS.rdb$constraint_name) = UPPER(''%s''))', [Translate_SchemaTableAndFK_To_FKName(ATable, AForeignKey)]));
 
   Result := LTextBuilder.Text;
 end;

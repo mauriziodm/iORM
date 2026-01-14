@@ -117,11 +117,8 @@ type
     function BuildSQL_DropFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; overload; virtual;
     function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string; overload; virtual; abstract;
     function BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual; abstract;
-
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; virtual; abstract;
-
-    // Translate_SchemaTableAndFK_To_FKName
-    function BuildForeignKeyNameSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual;
+    function Translate_SchemaTableAndFK_To_FKName(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual;
     // ==========================================================
 
 
@@ -210,7 +207,7 @@ begin
   Result := BuildSQL_DropIndexByName(LIndexName);
 end;
 
-function TioDBBuilderSqlGenBase.BuildForeignKeyNameSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
+function TioDBBuilderSqlGenBase.Translate_SchemaTableAndFK_To_FKName(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
 var
   LFKName: String;
 begin
@@ -403,7 +400,7 @@ function TioDBBuilderSqlGenBase.BuildSQL_DropFK(const ATable: IioDBBuilderSchema
 var
   LFKName: string;
 begin
-  LFKName := BuildForeignKeyNameSql(ATable, AForeignKey);
+  LFKName := Translate_SchemaTableAndFK_To_FKName(ATable, AForeignKey);
   Result := BuildSQL_DropFKbyName(ATable.Name, LFKName);
 end;
 
