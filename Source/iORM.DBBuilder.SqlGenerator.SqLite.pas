@@ -289,8 +289,8 @@ function TioDBBuilderSqlGenSQLite.BuildSQL_AddFK(const ATable: IioDBBuilderSchem
 var
   LTextBuilder: IioTextBuilder;
 begin
-  \ Generates: , CONSTRAINT <name> FOREIGN KEY (...) REFERENCES (...) [ON UPDATE ...] [ON DELETE ...] DEFERRABLE INITIALLY DEFERRED
-  \ Note: SQLite FK constraints are added within CREATE TABLE, not via ALTER TABLE
+  // Generates: , CONSTRAINT <name> FOREIGN KEY (...) REFERENCES (...) [ON UPDATE ...] [ON DELETE ...] DEFERRABLE INITIALLY DEFERRED
+  // Note: SQLite FK constraints are added within CREATE TABLE, not via ALTER TABLE
   LTextBuilder := NewTextBuilder;
 
   // Build the main FK constraint structure
