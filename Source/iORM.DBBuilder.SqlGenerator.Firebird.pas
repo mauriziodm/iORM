@@ -297,7 +297,7 @@ begin
     '  UPPER(RDB$RELATION_NAME) = UPPER(''%s'') and' + sLineBreak +
     '  UPPER(RDB$FIELD_NAME) = UPPER(''%s'') and' + sLineBreak +
     '  RDB$SYSTEM_FLAG = 0',
-    [ATable.Name.ToUpper, AField.FieldName.ToUpper]);
+    [ATable.Name, AField.FieldName]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
@@ -320,7 +320,7 @@ begin
     AddLine('  (RDB$RELATIONS.rdb$system_flag = 0) and').
     AddLine('  (RDB$RELATION_CONSTRAINTS.rdb$constraint_type = ''FOREIGN KEY'') and').
     AddLine(Format('  (UPPER(RDB$RELATIONS.Rdb$relation_name) = UPPER(''%s'')) and', [ATable.Name])).
-    Add(Format('  (UPPER(RDB$RELATION_CONSTRAINTS.rdb$constraint_name) = (''%s''))', [BuildForeignKeyNameSql(ATable, AForeignKey)]));
+    Add(Format('  (UPPER(RDB$RELATION_CONSTRAINTS.rdb$constraint_name) = UPPER(''%s''))', [BuildForeignKeyNameSql(ATable, AForeignKey)]));
 
   Result := LTextBuilder.Text;
 end;
@@ -447,7 +447,7 @@ begin
     '  LEFT JOIN RDB$INDEX_SEGMENTS s2 ON i2.RDB$INDEX_NAME = s2.RDB$INDEX_NAME' + SLineBreak +
     'WHERE' + SLineBreak +
     '  rc.RDB$CONSTRAINT_TYPE = ''FOREIGN KEY'' AND' + SLineBreak +
-    '  i.RDB$RELATION_NAME = ''%s''' + SLineBreak +
+    '  UPPER(i.RDB$RELATION_NAME) = UPPER(''%s'')' + SLineBreak +
     'ORDER BY' + SLineBreak +
     '  s.RDB$FIELD_POSITION',
     [ATable.Name]
@@ -501,14 +501,14 @@ end;
 function TioDBBuilderSqlGenFirebird.BuildSequenceExistsSql(const ASequenceName: string): string;
 begin
   // Carlo Marona (2025-10-15): Added condition to exclude system generators
-  Result := Format('select count(*) from rdb$generators where (rdb$generator_name = ''%s'') and (RDB$SYSTEM_FLAG = 0)', [ASequenceName.ToUpper]);
+  Result := Format('select count(*) from rdb$generators where (UPPER(rdb$generator_name) = UPPER(''%s'')) and (RDB$SYSTEM_FLAG = 0)', [ASequenceName]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildTableExistsSql(const ATableName: string): string;
 begin
   // Carlo Marona (2025-10-15): Added condition to exclude system relations
-  Result := Format('select RDB$RELATION_NAME from RDB$RELATIONS where (RDB$RELATION_NAME = ''%s'') and (RDB$SYSTEM_FLAG = 0)',
-    [ATableName.ToUpper]);
+  Result := Format('select RDB$RELATION_NAME from RDB$RELATIONS where (UPPER(RDB$RELATION_NAME) = UPPER(''%s'')) and (RDB$SYSTEM_FLAG = 0)',
+    [ATableName]);
 end;
 
 function TioDBBuilderSqlGenFirebird.GetMaxSqlIdentifierLength: integer;
