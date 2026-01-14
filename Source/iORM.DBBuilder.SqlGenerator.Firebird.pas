@@ -361,14 +361,22 @@ begin
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_IndexList(const ATableName: string): string;
+var
+  LTextBuilder: IioTextBuilder;
 begin
   // Base query: all non-system indexes with basic info (name, unique, orientation)
-  Result := 'SELECT RDB$INDEX_NAME, RDB$UNIQUE_FLAG, RDB$INDEX_TYPE ' +
-            'FROM RDB$INDICES ' +
-            'WHERE RDB$SYSTEM_FLAG = 0';
+  LTextBuilder := NewTextBuilder;
+
+  LTextBuilder.
+    Add('SELECT RDB$INDEX_NAME, RDB$UNIQUE_FLAG, RDB$INDEX_TYPE ').
+    Add('FROM RDB$INDICES ').
+    Add('WHERE RDB$SYSTEM_FLAG = 0');
+
   // Add table filter if specified
   if not ATableName.IsEmpty then
-    Result := Result + Format(' AND UPPER(RDB$RELATION_NAME) = UPPER(''%s'')', [ATableName]);
+    LTextBuilder.Add(Format(' AND UPPER(RDB$RELATION_NAME) = UPPER(''%s'')', [ATableName]));
+
+  Result := LTextBuilder.Text;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_IndexDetails(const AIndexName: string): string;
