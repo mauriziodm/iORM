@@ -339,7 +339,7 @@ begin
 
   // Query by FK name: if no record is found, the FK name changed (meaning the structural
   // properties changed), so we exit and let ForeignKeyExists handle it as a new FK.
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildForeignKeyModifiedSql(ATable, AForeignKey), True);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FKList(ATable, AForeignKey), True);
   if LQuery.Eof then
     Exit;
 

@@ -73,7 +73,7 @@ type
     // ForeignKeys
     function BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
-    function BuildForeignKeyModifiedSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
+    function BuildSQL_FKList(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildListAllForeignKeysSql: string; override;
     // PrimaryKey
@@ -204,7 +204,7 @@ begin
   Result := Format('PRAGMA foreign_key_list(''%s'')', [ATable.Name]);
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildForeignKeyModifiedSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_FKList(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
 begin
   // Same query as existence check - Strategy will compare the values
   Result := Format('PRAGMA foreign_key_list(''%s'')', [ATable.Name]);
