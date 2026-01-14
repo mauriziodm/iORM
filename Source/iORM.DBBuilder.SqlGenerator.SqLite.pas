@@ -74,7 +74,6 @@ type
     function BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; override;
-    function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string; override;
     // PrimaryKey
     function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string; override;
     // RecreateField
@@ -181,12 +180,6 @@ function TioDBBuilderSqlGenSQLite.BuildSQL_IndexDetails(const AIndexName: string
 begin
   // PRAGMA index_info returns columns info for the index
   Result := Format('PRAGMA index_info(''%s'')', [AIndexName]);
-end;
-
-function TioDBBuilderSqlGenSQLite.BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string;
-begin
-  // PRAGMA foreign_key_list returns all foreign keys for a table
-  Result := Format('PRAGMA foreign_key_list(''%s'')', [ATable.Name]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;

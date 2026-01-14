@@ -87,7 +87,6 @@ type
     function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string; override;
     function BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; override;
-    function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string; override;
     // Sequences
     function BuildAddSequenceSql(const ASequenceName: String; const ACreatingNewDatabase: boolean): string;
     function BuildDropSequenceSql(const ASequenceName: string): string;
@@ -402,40 +401,6 @@ begin
 
   Result := LTextBuilder.Text;
 end;
-
-function TioDBBuilderSqlGenFirebird.BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string;
-begin
-  // Carlo Marona (2025-10-16): reference https://www.firebirdnews.org/listing-the-foreign-keys-in-a-firebird-database/
-  Result := Format(
-    'SELECT'  + SLineBreak +
-    '  rc.RDB$CONSTRAINT_NAME AS constraint_name,' + SLineBreak +
-    '  i.RDB$RELATION_NAME AS table_name,' + SLineBreak +
-    '  s.RDB$FIELD_NAME AS field_name,' + SLineBreak +
-    '  i.RDB$DESCRIPTION AS description,' + SLineBreak +
-    '  rc.RDB$DEFERRABLE AS is_deferrable,' + SLineBreak +
-    '  rc.RDB$INITIALLY_DEFERRED AS is_deferred,' + SLineBreak +
-    '  refc.RDB$UPDATE_RULE AS on_update,' + SLineBreak +
-    '  refc.RDB$DELETE_RULE AS on_delete,' + SLineBreak +
-    '  refc.RDB$MATCH_OPTION AS match_type,' + SLineBreak +
-    '  i2.RDB$RELATION_NAME AS references_table,' + SLineBreak +
-    '  s2.RDB$FIELD_NAME AS references_field,' + SLineBreak +
-    '  (s.RDB$FIELD_POSITION + 1) AS field_position' + SLineBreak +
-    'FROM RDB$INDEX_SEGMENTS s' + SLineBreak +
-    '  LEFT JOIN RDB$INDICES i ON i.RDB$INDEX_NAME = s.RDB$INDEX_NAME' + SLineBreak +
-    '  LEFT JOIN RDB$RELATION_CONSTRAINTS rc ON rc.RDB$INDEX_NAME = s.RDB$INDEX_NAME' + SLineBreak +
-    '  LEFT JOIN RDB$REF_CONSTRAINTS refc ON rc.RDB$CONSTRAINT_NAME = refc.RDB$CONSTRAINT_NAME' + SLineBreak +
-    '  LEFT JOIN RDB$RELATION_CONSTRAINTS rc2 ON rc2.RDB$CONSTRAINT_NAME = refc.RDB$CONST_NAME_UQ' + SLineBreak +
-    '  LEFT JOIN RDB$INDICES i2 ON i2.RDB$INDEX_NAME = rc2.RDB$INDEX_NAME' + SLineBreak +
-    '  LEFT JOIN RDB$INDEX_SEGMENTS s2 ON i2.RDB$INDEX_NAME = s2.RDB$INDEX_NAME' + SLineBreak +
-    'WHERE' + SLineBreak +
-    '  rc.RDB$CONSTRAINT_TYPE = ''FOREIGN KEY'' AND' + SLineBreak +
-    '  UPPER(i.RDB$RELATION_NAME) = UPPER(''%s'')' + SLineBreak +
-    'ORDER BY' + SLineBreak +
-    '  s.RDB$FIELD_POSITION',
-    [ATable.Name]
-  );
-end;
-
 
 function TioDBBuilderSqlGenFirebird.BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable;
   const AField: IioDBBuilderSchemaField): string;
