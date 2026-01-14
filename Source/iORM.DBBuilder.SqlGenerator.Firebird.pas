@@ -86,10 +86,7 @@ type
     function BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string; override;
     function BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
-
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; override;
-
-    function BuildListAllForeignKeysSql: string; override;
     function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string; override;
     // Sequences
     function BuildAddSequenceSql(const ASequenceName: String; const ACreatingNewDatabase: boolean): string;
@@ -405,14 +402,6 @@ begin
 
   Result := LTextBuilder.Text;
 end;
-
-function TioDBBuilderSqlGenFirebird.BuildListAllForeignKeysSql: string;
-begin
-  // This method is superseded by the general BuildSQL_FKList.
-  // Kept for backward compatibility. Use BuildSQL_FKList('', '') instead.
-  Result := BuildSQL_FKList;
-end;
-
 
 function TioDBBuilderSqlGenFirebird.BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string;
 begin

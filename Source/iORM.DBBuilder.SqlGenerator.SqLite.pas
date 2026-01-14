@@ -75,7 +75,6 @@ type
     function BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; override;
     function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string; override;
-    function BuildListAllForeignKeysSql: string; override;
     // PrimaryKey
     function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string; override;
     // RecreateField
@@ -188,14 +187,6 @@ function TioDBBuilderSqlGenSQLite.BuildListTableForeignKeysSql(const ATable: Iio
 begin
   // PRAGMA foreign_key_list returns all foreign keys for a table
   Result := Format('PRAGMA foreign_key_list(''%s'')', [ATable.Name]);
-end;
-
-function TioDBBuilderSqlGenSQLite.BuildListAllForeignKeysSql: string;
-begin
-  // This method is superseded by the general BuildSQL_FKList.
-  // Kept for backward compatibility. Use BuildSQL_FKList('', '') instead.
-  // Note: SQLite doesn't support listing all FKs across all tables in a single query
-  Result := BuildSQL_FKList;
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
