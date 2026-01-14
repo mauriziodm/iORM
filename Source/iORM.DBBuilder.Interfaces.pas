@@ -293,7 +293,8 @@ type
     function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string; overload;
     function BuildListAllForeignKeysSql: string;
     function BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
-    function BuildSQL_FKList(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
+    function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string;
+    function BuildForeignKeyNameSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
     function TranslateFKAction(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
   end;
 

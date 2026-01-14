@@ -87,7 +87,7 @@ type
     function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string; override;
     function BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
 
-    function BuildSQL_FKList(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
+    function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; override;
 
     function BuildListAllForeignKeysSql: string; override;
     function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string; override;
@@ -325,21 +325,46 @@ begin
   Result := LTextBuilder.Text;
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildSQL_FKList(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string;
 var
   LTextBuilder: IioTextBuilder;
 begin
-  // Note: We only need to check ON UPDATE and ON DELETE actions.
-  // The structural properties (DependentFieldName, ReferenceTableName, ReferenceFieldName)
-  // are encoded in the FK name, so if the FK exists with this name, those properties match.
-  // This also works when the FK name is shortened using a hash, because the hash is deterministic:
-  // same input properties always produce the same hash, so a different hash means different properties.
+  // Generalized FK list query following the same pattern as BuildSQL_IndexList
+  // Supports three scenarios:
+  //   A. All FKs in database (ATableName = '', AFKName = '')
+  //   B. All FKs for a table (ATableName specified, AFKName = '')
+  //   C. Specific FK (ATableName specified, AFKName specified)
+  // Always returns: table_name, constraint_name, on_update, on_delete
+
   LTextBuilder := NewTextBuilder;
 
+  // Build SELECT clause - always returns the same fields
   LTextBuilder.
-    Add('SELECT RDB$UPDATE_RULE AS on_update, RDB$DELETE_RULE AS on_delete ').
-    Add('FROM RDB$REF_CONSTRAINTS ').
-    Add(Format('WHERE RDB$CONSTRAINT_NAME = ''%s''', [BuildForeignKeyNameSql(ATable, AForeignKey)]));
+    Add('SELECT ').
+    Add('  rc.RDB$RELATION_NAME AS table_name, ').
+    Add('  rc.RDB$CONSTRAINT_NAME AS constraint_name, ').
+    Add('  refc.RDB$UPDATE_RULE AS on_update, ').
+    Add('  refc.RDB$DELETE_RULE AS on_delete ');
+
+  // Build FROM clause with JOIN for ON UPDATE/DELETE info
+  LTextBuilder.
+    Add('FROM RDB$RELATION_CONSTRAINTS rc ').
+    Add('LEFT JOIN RDB$REF_CONSTRAINTS refc ON rc.RDB$CONSTRAINT_NAME = refc.RDB$CONSTRAINT_NAME ');
+
+  // Build WHERE clause
+  LTextBuilder.Add('WHERE rc.RDB$CONSTRAINT_TYPE = ''FOREIGN KEY'' ');
+
+  // Add table filter if specified (scenarios B/C)
+  if not ATableName.IsEmpty then
+    LTextBuilder.Add(Format('  AND UPPER(rc.RDB$RELATION_NAME) = UPPER(''%s'') ', [ATableName]));
+
+  // Add FK name filter if specified (scenario C)
+  if not AFKName.IsEmpty then
+    LTextBuilder.Add(Format('  AND UPPER(rc.RDB$CONSTRAINT_NAME) = UPPER(''%s'') ', [AFKName]));
+
+  // Add FK naming convention filter for scenario A only
+  if ATableName.IsEmpty and AFKName.IsEmpty then
+    LTextBuilder.Add('  AND rc.RDB$CONSTRAINT_NAME LIKE ''FK_%'' ');
 
   Result := LTextBuilder.Text;
 end;
@@ -393,18 +418,10 @@ begin
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildListAllForeignKeysSql: string;
-var
-  LTextBuilder: IioTextBuilder;
 begin
-  LTextBuilder := NewTextBuilder;
-
-  LTextBuilder.
-    AddLine('select rdb$relation_name as table_name, rdb$constraint_name as constraint_name').
-    AddLine('from rdb$relation_constraints').
-    AddLine('where rdb$constraint_type = ''FOREIGN KEY''').
-    Add('  and rdb$constraint_name like ''FK_%''');
-
-  Result := LTextBuilder.Text;
+  // This method is superseded by the general BuildSQL_FKList.
+  // Kept for backward compatibility. Use BuildSQL_FKList('', '') instead.
+  Result := BuildSQL_FKList;
 end;
 
 

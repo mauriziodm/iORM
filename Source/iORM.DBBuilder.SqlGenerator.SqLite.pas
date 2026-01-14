@@ -73,7 +73,7 @@ type
     // ForeignKeys
     function BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
-    function BuildSQL_FKList(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
+    function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; override;
     function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildListAllForeignKeysSql: string; override;
     // PrimaryKey
@@ -192,10 +192,10 @@ end;
 
 function TioDBBuilderSqlGenSQLite.BuildListAllForeignKeysSql: string;
 begin
-  // SQLite doesn't have a single query to list all FKs across all tables
-  // This would require iterating through all tables and calling PRAGMA foreign_key_list for each
-  // Return empty string - Strategy will handle this differently
-  Result := EmptyStr;
+  // This method is superseded by the general BuildSQL_FKList.
+  // Kept for backward compatibility. Use BuildSQL_FKList('', '') instead.
+  // Note: SQLite doesn't support listing all FKs across all tables in a single query
+  Result := BuildSQL_FKList;
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
@@ -204,10 +204,14 @@ begin
   Result := Format('PRAGMA foreign_key_list(''%s'')', [ATable.Name]);
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildSQL_FKList(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string;
 begin
-  // Same query as existence check - Strategy will compare the values
-  Result := Format('PRAGMA foreign_key_list(''%s'')', [ATable.Name]);
+  // SQLite uses PRAGMA foreign_key_list which requires a table name
+  // Note: AFKName parameter is ignored - PRAGMA returns all FKs for the table
+  if ATableName.IsEmpty then
+    Result := ''  // Caller must handle this case - SQLite doesn't support listing all FKs at once
+  else
+    Result := Format('PRAGMA foreign_key_list(''%s'')', [ATableName]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string;

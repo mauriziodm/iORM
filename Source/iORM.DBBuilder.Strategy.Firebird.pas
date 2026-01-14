@@ -163,7 +163,7 @@ procedure TioDBBuilderStrategyFirebird.DropForeignKeys;
 var
   LQuery: IioQuery;
 begin
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildListAllForeignKeysSql, True);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FKList, True);
 
   while not LQuery.Eof do
   begin
@@ -327,6 +327,7 @@ end;
 function TioDBBuilderStrategyFirebird.ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
 var
   LQuery: IioQuery;
+  LFKName: string;
   LOldOnUpdate, LNewOnUpdate: string;
   LOldOnDelete, LNewOnDelete: string;
 begin
@@ -337,9 +338,12 @@ begin
   // same input properties always produce the same hash, so a different hash means different properties.
   Result := False;
 
+  // Build FK name using SqlGenerator's method
+  LFKName := SqlGenerator.BuildForeignKeyNameSql(ATable, AForeignKey);
+
   // Query by FK name: if no record is found, the FK name changed (meaning the structural
   // properties changed), so we exit and let ForeignKeyExists handle it as a new FK.
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FKList(ATable, AForeignKey), True);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FKList(ATable.Name, LFKName), True);
   if LQuery.Eof then
     Exit;
 
