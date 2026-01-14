@@ -362,10 +362,6 @@ begin
   if not AFKName.IsEmpty then
     LTextBuilder.Add(Format('  AND UPPER(rc.RDB$CONSTRAINT_NAME) = UPPER(''%s'') ', [AFKName]));
 
-  // Add FK naming convention filter for scenario A only
-  if ATableName.IsEmpty and AFKName.IsEmpty then
-    LTextBuilder.Add('  AND rc.RDB$CONSTRAINT_NAME LIKE ''FK_%'' ');
-
   Result := LTextBuilder.Text;
 end;
 
