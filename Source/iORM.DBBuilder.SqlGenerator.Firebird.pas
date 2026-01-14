@@ -372,16 +372,20 @@ begin
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_IndexDetails(const AIndexName: string): string;
+var
+  LTextBuilder: IioTextBuilder;
 begin
-  Result := Format(
-    'SELECT' + sLineBreak +
-    '  RDB$FIELD_NAME,' + sLineBreak +
-    '  RDB$FIELD_POSITION' + sLineBreak +
-    'FROM RDB$INDEX_SEGMENTS' + sLineBreak +
-    'WHERE UPPER(RDB$INDEX_NAME) = UPPER(''%s'')' + sLineBreak +
-    'ORDER BY RDB$FIELD_POSITION',
-    [AIndexName]
-  );
+  LTextBuilder := NewTextBuilder;
+
+  LTextBuilder.
+    AddLine('SELECT').
+    AddLine('  RDB$FIELD_NAME,').
+    AddLine('  RDB$FIELD_POSITION').
+    AddLine('FROM RDB$INDEX_SEGMENTS').
+    AddLine(Format('WHERE UPPER(RDB$INDEX_NAME) = UPPER(''%s'')', [AIndexName])).
+    Add('ORDER BY RDB$FIELD_POSITION');
+
+  Result := LTextBuilder.Text;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildListAllForeignKeysSql: string;
