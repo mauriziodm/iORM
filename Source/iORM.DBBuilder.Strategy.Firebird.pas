@@ -327,21 +327,33 @@ end;
 function TioDBBuilderStrategyFirebird.ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
 var
   LQuery: IioQuery;
+  LOldOnUpdate, LNewOnUpdate: string;
+  LOldOnDelete, LNewOnDelete: string;
 begin
+  // Note: We only check ON UPDATE and ON DELETE actions here.
+  // The structural properties (DependentFieldName, ReferenceTableName, ReferenceFieldName)
+  // are encoded in the FK name, so if the FK exists with this name, those properties already match.
+  // This also works when the FK name is shortened using a hash, because the hash is deterministic:
+  // same input properties always produce the same hash, so a different hash means different properties.
   Result := False;
 
+  // Query by FK name: if no record is found, the FK name changed (meaning the structural
+  // properties changed), so we exit and let ForeignKeyExists handle it as a new FK.
   LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildForeignKeyModifiedSql(ATable, AForeignKey), True);
+  if LQuery.Eof then
+    Exit;
 
-  while not (LQuery.Eof or Result) do
-  begin
-    Result :=
-      (AForeignKey.DependentFieldName.ToUpper <> LQuery.Fields.FieldByName('Field_Name').AsString.ToUpper) or
-      (AForeignKey.ReferenceFieldName.ToUpper <> LQuery.Fields.FieldByName('FK_Field').AsString.ToUpper) or
-      (AForeignKey.ReferenceTableName.ToUpper <> LQuery.Fields.FieldByName('Reference_Table').AsString.ToUpper);
-    if Result then
-      Break;
-    LQuery.Next;
-  end;
+  // Check ON UPDATE action
+  LOldOnUpdate := LQuery.Fields.FieldByName('on_update').AsString.Trim.ToUpper;
+  LNewOnUpdate := SqlGenerator.TranslateFKAction(AForeignKey, AForeignKey.OnUpdateAction).ToUpper;
+  if not SameText(LOldOnUpdate, LNewOnUpdate) then
+    Exit(True);
+
+  // Check ON DELETE action
+  LOldOnDelete := LQuery.Fields.FieldByName('on_delete').AsString.Trim.ToUpper;
+  LNewOnDelete := SqlGenerator.TranslateFKAction(AForeignKey, AForeignKey.OnDeleteAction).ToUpper;
+  if not SameText(LOldOnDelete, LNewOnDelete) then
+    Exit(True);
 end;
 
 procedure TioDBBuilderStrategyFirebird.GenerateDatabaseObjects(const Create: boolean);

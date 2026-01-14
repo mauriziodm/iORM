@@ -86,7 +86,9 @@ type
     function BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string; override;
     function BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
+
     function BuildForeignKeyModifiedSql(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
+
     function BuildListAllForeignKeysSql: string; override;
     function BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string; override;
     // Sequences
@@ -327,23 +329,17 @@ function TioDBBuilderSqlGenFirebird.BuildForeignKeyModifiedSql(const ATable: Iio
 var
   LTextBuilder: IioTextBuilder;
 begin
+  // Note: We only need to check ON UPDATE and ON DELETE actions.
+  // The structural properties (DependentFieldName, ReferenceTableName, ReferenceFieldName)
+  // are encoded in the FK name, so if the FK exists with this name, those properties match.
+  // This also works when the FK name is shortened using a hash, because the hash is deterministic:
+  // same input properties always produce the same hash, so a different hash means different properties.
   LTextBuilder := NewTextBuilder;
 
   LTextBuilder.
-    AddLine('SELECT').
-    AddLine('  detail_index_segments.rdb$field_name AS Field_Name,').
-    AddLine('  master_relation_constraints.rdb$relation_name AS Reference_Table,').
-    AddLine('  master_index_segments.rdb$field_name AS FK_Field').
-    AddLine('FROM').
-    AddLine('  rdb$relation_constraints detail_relation_constraints JOIN').
-    AddLine('  rdb$index_segments detail_index_segments ON detail_relation_constraints.rdb$index_name = detail_index_segments.rdb$index_name JOIN').
-    AddLine('  rdb$ref_constraints ON detail_relation_constraints.rdb$constraint_name = rdb$ref_constraints.rdb$constraint_name JOIN').
-    AddLine('  rdb$relation_constraints master_relation_constraints ON rdb$ref_constraints.rdb$const_name_uq = master_relation_constraints.rdb$constraint_name JOIN').
-    AddLine('  rdb$index_segments master_index_segments ON master_relation_constraints.rdb$index_name = master_index_segments.rdb$index_name').
-    AddLine('WHERE').
-    AddLine('  detail_relation_constraints.rdb$constraint_type = ''FOREIGN KEY'' AND').
-    AddLine(Format('  UPPER(detail_relation_constraints.rdb$relation_name) = UPPER(''%s'') AND', [ATable.Name])).
-    Add(Format('  UPPER(detail_relation_constraints.rdb$constraint_name) = UPPER(''%s'')', [BuildForeignKeyNameSql(ATable, AForeignKey)]));
+    Add('SELECT RDB$UPDATE_RULE AS on_update, RDB$DELETE_RULE AS on_delete ').
+    Add('FROM RDB$REF_CONSTRAINTS ').
+    Add(Format('WHERE RDB$CONSTRAINT_NAME = ''%s''', [BuildForeignKeyNameSql(ATable, AForeignKey)]));
 
   Result := LTextBuilder.Text;
 end;
@@ -413,40 +409,36 @@ end;
 
 
 function TioDBBuilderSqlGenFirebird.BuildListTableForeignKeysSql(const ATable: IioDBBuilderSchemaTable): string;
-var
-  LTextBuilder: IioTextBuilder;
 begin
   // Carlo Marona (2025-10-16): reference https://www.firebirdnews.org/listing-the-foreign-keys-in-a-firebird-database/
-  LTextBuilder := NewTextBuilder;
-
-  LTextBuilder.
-    AddLine('SELECT').
-    AddLine('  rc.RDB$CONSTRAINT_NAME AS constraint_name,').
-    AddLine('  i.RDB$RELATION_NAME AS table_name,').
-    AddLine('  s.RDB$FIELD_NAME AS field_name,').
-    AddLine('  i.RDB$DESCRIPTION AS description,').
-    AddLine('  rc.RDB$DEFERRABLE AS is_deferrable,').
-    AddLine('  rc.RDB$INITIALLY_DEFERRED AS is_deferred,').
-    AddLine('  refc.RDB$UPDATE_RULE AS on_update,').
-    AddLine('  refc.RDB$DELETE_RULE AS on_delete,').
-    AddLine('  refc.RDB$MATCH_OPTION AS match_type,').
-    AddLine('  i2.RDB$RELATION_NAME AS references_table,').
-    AddLine('  s2.RDB$FIELD_NAME AS references_field,').
-    AddLine('  (s.RDB$FIELD_POSITION + 1) AS field_position').
-    AddLine('FROM RDB$INDEX_SEGMENTS s').
-    AddLine('  LEFT JOIN RDB$INDICES i ON i.RDB$INDEX_NAME = s.RDB$INDEX_NAME').
-    AddLine('  LEFT JOIN RDB$RELATION_CONSTRAINTS rc ON rc.RDB$INDEX_NAME = s.RDB$INDEX_NAME').
-    AddLine('  LEFT JOIN RDB$REF_CONSTRAINTS refc ON rc.RDB$CONSTRAINT_NAME = refc.RDB$CONSTRAINT_NAME').
-    AddLine('  LEFT JOIN RDB$RELATION_CONSTRAINTS rc2 ON rc2.RDB$CONSTRAINT_NAME = refc.RDB$CONST_NAME_UQ').
-    AddLine('  LEFT JOIN RDB$INDICES i2 ON i2.RDB$INDEX_NAME = rc2.RDB$INDEX_NAME').
-    AddLine('  LEFT JOIN RDB$INDEX_SEGMENTS s2 ON i2.RDB$INDEX_NAME = s2.RDB$INDEX_NAME').
-    AddLine('WHERE').
-    AddLine('  rc.RDB$CONSTRAINT_TYPE = ''FOREIGN KEY'' AND').
-    AddLine(Format('  i.RDB$RELATION_NAME = ''%s''', [ATable.Name])).
-    AddLine('ORDER BY').
-    Add('  s.RDB$FIELD_POSITION');
-
-  Result := LTextBuilder.Text;
+  Result := Format(
+    'SELECT'  + SLineBreak +
+    '  rc.RDB$CONSTRAINT_NAME AS constraint_name,' + SLineBreak +
+    '  i.RDB$RELATION_NAME AS table_name,' + SLineBreak +
+    '  s.RDB$FIELD_NAME AS field_name,' + SLineBreak +
+    '  i.RDB$DESCRIPTION AS description,' + SLineBreak +
+    '  rc.RDB$DEFERRABLE AS is_deferrable,' + SLineBreak +
+    '  rc.RDB$INITIALLY_DEFERRED AS is_deferred,' + SLineBreak +
+    '  refc.RDB$UPDATE_RULE AS on_update,' + SLineBreak +
+    '  refc.RDB$DELETE_RULE AS on_delete,' + SLineBreak +
+    '  refc.RDB$MATCH_OPTION AS match_type,' + SLineBreak +
+    '  i2.RDB$RELATION_NAME AS references_table,' + SLineBreak +
+    '  s2.RDB$FIELD_NAME AS references_field,' + SLineBreak +
+    '  (s.RDB$FIELD_POSITION + 1) AS field_position' + SLineBreak +
+    'FROM RDB$INDEX_SEGMENTS s' + SLineBreak +
+    '  LEFT JOIN RDB$INDICES i ON i.RDB$INDEX_NAME = s.RDB$INDEX_NAME' + SLineBreak +
+    '  LEFT JOIN RDB$RELATION_CONSTRAINTS rc ON rc.RDB$INDEX_NAME = s.RDB$INDEX_NAME' + SLineBreak +
+    '  LEFT JOIN RDB$REF_CONSTRAINTS refc ON rc.RDB$CONSTRAINT_NAME = refc.RDB$CONSTRAINT_NAME' + SLineBreak +
+    '  LEFT JOIN RDB$RELATION_CONSTRAINTS rc2 ON rc2.RDB$CONSTRAINT_NAME = refc.RDB$CONST_NAME_UQ' + SLineBreak +
+    '  LEFT JOIN RDB$INDICES i2 ON i2.RDB$INDEX_NAME = rc2.RDB$INDEX_NAME' + SLineBreak +
+    '  LEFT JOIN RDB$INDEX_SEGMENTS s2 ON i2.RDB$INDEX_NAME = s2.RDB$INDEX_NAME' + SLineBreak +
+    'WHERE' + SLineBreak +
+    '  rc.RDB$CONSTRAINT_TYPE = ''FOREIGN KEY'' AND' + SLineBreak +
+    '  i.RDB$RELATION_NAME = ''%s''' + SLineBreak +
+    'ORDER BY' + SLineBreak +
+    '  s.RDB$FIELD_POSITION',
+    [ATable.Name]
+  );
 end;
 
 
