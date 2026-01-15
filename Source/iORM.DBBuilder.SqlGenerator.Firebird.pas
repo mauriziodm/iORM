@@ -75,18 +75,27 @@ type
     function BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     // PrimaryKeys
     function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string; override;
-    // Indexes
+
+    // ==========================================================
+    // INDEX RELATED METHODS
+    // ----------------------------------------------------------
     function BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildSQL_DropIndexByName(const AIndexName: string): string; override;
     function BuildSQL_IndexExistsByName(const AIndexName: string): string; override;
     function BuildSQL_IndexList(const ATableName: string = ''): string; override;
     function BuildSQL_IndexDetails(const AIndexName: string): string; override;
+
     function Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String; override;
-    // ForeignKeys
+    // ==========================================================
+
+    // ==========================================================
+    // FOREIGN KEY RELATED METHODS
+    // ----------------------------------------------------------
     function BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string; override;
-    function BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; override;
+    // ==========================================================
+
     // Sequences
     function BuildAddSequenceSql(const ASequenceName: String; const ACreatingNewDatabase: boolean): string;
     function BuildDropSequenceSql(const ASequenceName: string): string;
@@ -302,27 +311,6 @@ begin
   Result := EmptyStr;
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
-var
-  LTextBuilder: IioTextBuilder;
-begin
-  // Generates: SELECT query to check if a specific foreign key exists in the database
-  LTextBuilder := NewTextBuilder;
-
-  LTextBuilder.
-    AddLine('select').
-    AddLine('  RDB$RELATION_CONSTRAINTS.rdb$constraint_name').
-    AddLine('from').
-    AddLine('  RDB$RELATIONS join RDB$RELATION_CONSTRAINTS ON RDB$RELATIONS.rdb$relation_name = RDB$RELATION_CONSTRAINTS.rdb$relation_name').
-    AddLine('where').
-    AddLine('  (RDB$RELATIONS.rdb$system_flag = 0) and').
-    AddLine('  (RDB$RELATION_CONSTRAINTS.rdb$constraint_type = ''FOREIGN KEY'') and').
-    AddLine(Format('  (UPPER(RDB$RELATIONS.Rdb$relation_name) = UPPER(''%s'')) and', [ATable.Name])).
-    Add(Format('  (UPPER(RDB$RELATION_CONSTRAINTS.rdb$constraint_name) = UPPER(''%s''))', [Translate_SchemaTableAndFK_To_FKName(ATable, AForeignKey)]));
-
-  Result := LTextBuilder.Text;
-end;
-
 function TioDBBuilderSqlGenFirebird.BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string;
 var
   LTextBuilder: IioTextBuilder;
@@ -379,13 +367,13 @@ begin
   LTextBuilder := NewTextBuilder;
 
   LTextBuilder.
-    Add('SELECT RDB$INDEX_NAME, RDB$UNIQUE_FLAG, RDB$INDEX_TYPE ').
-    Add('FROM RDB$INDICES ').
-    Add('WHERE RDB$SYSTEM_FLAG = 0');
+    AddLine('SELECT RDB$INDEX_NAME, RDB$UNIQUE_FLAG, RDB$INDEX_TYPE ').
+    AddLine('FROM RDB$INDICES ').
+    AddLine('WHERE RDB$SYSTEM_FLAG = 0');
 
   // Add table filter if specified
   if not ATableName.IsEmpty then
-    LTextBuilder.Add(Format(' AND UPPER(RDB$RELATION_NAME) = UPPER(''%s'')', [ATableName]));
+    LTextBuilder.AddLine(Format(' AND UPPER(RDB$RELATION_NAME) = UPPER(''%s'')', [ATableName]));
 
   Result := LTextBuilder.Text;
 end;

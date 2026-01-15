@@ -320,8 +320,12 @@ var
 begin
   Result := False;
 
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FKExists(ATable, AForeignKey), True);
-  Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
+  // BuildSQL_FKList returns only the specific FK (or empty result if not exists)
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName,
+    SqlGenerator.BuildSQL_FKList(ATable.Name,
+    SqlGenerator.Translate_SchemaTableAndFK_To_FKName(ATable, AForeignKey)),
+    True);
+  Result := not LQuery.Eof;
 end;
 
 function TioDBBuilderStrategyFirebird.ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;

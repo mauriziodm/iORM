@@ -302,9 +302,12 @@ var
 begin
   Result := False;
 
+  // SQLite limitation: PRAGMA foreign_key_list cannot filter by FK name
+  // We pass only the table name - BuildSQL_FKList returns ALL FKs for the table
   // PRAGMA foreign_key_list returns: id, seq, table, from, to, on_update, on_delete, match
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FKExists(ATable, AForeignKey), True);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FKList(ATable.Name), True);
 
+  // Manual filtering: loop through all FKs and match by dependent field + reference table
   while not LQuery.Eof do
   begin
     // Match by dependent field (from) and reference table
@@ -324,9 +327,12 @@ var
 begin
   Result := False;
 
+  // SQLite limitation: PRAGMA foreign_key_list cannot filter by FK name
+  // We pass only the table name - BuildSQL_FKList returns ALL FKs for the table
   // PRAGMA foreign_key_list returns: id, seq, table, from, to, on_update, on_delete, match
   LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FKList(ATable.Name), True);
 
+  // Manual filtering: loop through all FKs and find the matching one
   while not LQuery.Eof do
   begin
     // Find the matching FK by dependent field and reference table

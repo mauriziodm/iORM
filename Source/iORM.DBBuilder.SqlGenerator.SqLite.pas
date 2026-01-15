@@ -72,7 +72,6 @@ type
     function BuildSQL_IndexDetails(const AIndexName: string): string; override;
     // ForeignKeys
     function BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
-    function BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; override;
     // PrimaryKey
     function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string; override;
@@ -186,18 +185,12 @@ begin
   Result := Format('PRAGMA index_info(''%s'')', [AIndexName]);
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildSQL_FKExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
-begin
-  // Generates: PRAGMA foreign_key_list(<table>) to check if a foreign key exists (Strategy filters by name)
-  // PRAGMA foreign_key_list returns all FKs for a table, Strategy will filter by name
-  Result := Format('PRAGMA foreign_key_list(''%s'')', [ATable.Name]);
-end;
-
 function TioDBBuilderSqlGenSQLite.BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string;
 begin
   // Generates: PRAGMA foreign_key_list(<table>) to list foreign keys for a table
-  // SQLite uses PRAGMA foreign_key_list which requires a table name
-  // Note: AFKName parameter is ignored - PRAGMA returns all FKs for the table
+  // SQLite limitation: PRAGMA foreign_key_list accepts ONLY table name - cannot filter by FK name
+  // Note: AFKName parameter is IGNORED because SQLite doesn't support FK name filtering
+  //       PRAGMA always returns ALL FKs for the table, Strategy must filter manually
   if ATableName.IsEmpty then
     Result := ''  // Caller must handle this case - SQLite doesn't support listing all FKs at once
   else
