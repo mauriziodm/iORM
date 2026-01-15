@@ -187,10 +187,10 @@ end;
 procedure TioDBBuilderEngine.BuildCreateDBSqlScript(const AScript: IioDBBuilderSqlScript);
 begin
   if not Assigned(AScript) then
-    raise EArgumentNilException.CreateFmt('%s.%s: %s', [ClassName, 'BuildCreateDBSqlScript', 'AScript is not assigned.']);
+    raise EioInvalidArgumentException.Create(ClassName, 'BuildCreateDBSqlScript', 'AScript is not assigned.');
 
   if not Analyzed then
-    raise EioGenericException.Create(ClassName, 'BuildCreateDBSqlScript', 'Unable to build SQL script: schema not analyzed');
+    raise EioDBBuilderException.Create(ClassName, 'BuildCreateDBSqlScript', 'Unable to build SQL script: schema not analyzed');
 
   TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, AScript).GenerateCreateDatabaseScript;
 end;
@@ -198,7 +198,7 @@ end;
 procedure TioDBBuilderEngine.BuildCreateOrUpdateDBSqlScript(const AScript: IioDBBuilderSqlScript);
 begin
   if not Analyzed then
-    raise EioGenericException.Create(ClassName, 'BuildCreateOrUpdateDBSqlScript', 'Unable to build SQL script: schema not analyzed');
+    raise EioDBBuilderException.Create(ClassName, 'BuildCreateOrUpdateDBSqlScript', 'Unable to build SQL script: schema not analyzed');
 
   if not Assigned(AScript) then
     raise EioInvalidArgumentException.Create(ClassName, 'BuildCreateOrUpdateDBSqlScript', 'AScript is not assigned.');
@@ -212,7 +212,7 @@ end;
 procedure TioDBBuilderEngine.BuildDropForeignKeysSqlScript(const AScript: IioDBBuilderSqlScript);
 begin
   if not Assigned(AScript) then
-    raise EArgumentNilException.CreateFmt('%s.%s: %s', [ClassName, 'BuildDropForeignKeysSqlScript', 'AScript is not assigned.']);
+    raise EioInvalidArgumentException.Create(ClassName, 'BuildDropForeignKeysSqlScript', 'AScript is not assigned.');
 
   TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, AScript).DropForeignKeys;
 end;
@@ -220,7 +220,7 @@ end;
 procedure TioDBBuilderEngine.BuildDropIndexesSqlScript(const AScript: IioDBBuilderSqlScript);
 begin
   if not Assigned(AScript) then
-    raise EArgumentNilException.CreateFmt('%s.%s: %s', [ClassName, 'BuildDropIndexesSqlScript', 'AScript is not assigned.']);
+    raise EioInvalidArgumentException.Create(ClassName, 'BuildDropIndexesSqlScript', 'AScript is not assigned.');
 
   TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, AScript).DropIndexes;
 end;
@@ -231,7 +231,7 @@ begin
     raise EioInvalidArgumentException.Create(ClassName, 'BuildUpdateDBSqlScript', 'AScript is not assigned.');
 
   if not Analyzed then
-    raise EioGenericException.Create(ClassName, 'BuildUpdateDBSqlScript', 'Unable to build SQL script: schema not analyzed');
+    raise EioDBBuilderException.Create(ClassName, 'BuildUpdateDBSqlScript', 'Unable to build SQL script: schema not analyzed');
 
   TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, AScript).GenerateUpdateDatabaseScript;
 end;
@@ -249,7 +249,7 @@ var
   LStrategy: IioDBBuilderStrategy;
 begin
   if not Analyzed then
-    raise EioGenericException.Create(ClassName, 'CreateDatabase', 'Unable to create database: schema not analyzed');
+    raise EioDBBuilderException.Create(ClassName, 'CreateDatabase', 'Unable to create database: schema not analyzed');
 
   LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, nil);
   LStrategy.CreateDatabase;
@@ -272,7 +272,7 @@ begin
   if (LStatus > stClean) or Force then
   begin
     if Schema.WarningExists then
-      raise EioGenericException.Create(ClassName, 'CreateOrUpdateDB',
+      raise EioDBBuilderException.Create(ClassName, 'CreateOrUpdateDB',
         'Database must be updated but WARNINGS exists.' + sLineBreak +
         FSchema.Warnings.Text
       );
@@ -392,7 +392,7 @@ begin
   if (FSchema.Status > stClean) or AForce then
   begin
     if FSchema.WarningExists then
-      raise EioGenericException.Create(ClassName, 'CreateOrUpdateDB', 'Database must be updated but WARNINGS exists.' + sLineBreak + FSchema.Warnings.Text);
+      raise EioDBBuilderException.Create(ClassName, 'CreateOrUpdateDB', 'Database must be updated but WARNINGS exists.' + sLineBreak + FSchema.Warnings.Text);
 
     if FSchema.Status = stCreate then
       CreateDatabasePhys;

@@ -106,7 +106,7 @@ begin
   if not FTables.ContainsKey(LTableName) then
     FTables.Add(LTableName, TioDBBuilderFactory.NewSchemaTable(AMap.GetTable));
   Result := FTables.Items[LTableName];
-  // NB: Se anche una sola classe mappata su questa tabella è TrueClass allora IsTrueClass deve essere true
+  // NB: Se anche una sola classe mappata su questa tabella ï¿½ TrueClass allora IsTrueClass deve essere true
   // (vedi setter nella classe)
   Result.IsTrueClass := AMap.GetTable.IsTrueClass;
 end;
@@ -118,7 +118,7 @@ begin
   else
   begin
     if ARaiseIfNotFound then
-      raise EioGenericException.Create(ClassName, 'GetTableStatus', Format('SchemaTable not found "%s".', [ATableName]))
+      raise EioDBBuilderException.Create(ClassName, 'GetTableStatus', Format('SchemaTable not found "%s".', [ATableName]))
     else
       Result := nil;
   end;
@@ -142,7 +142,7 @@ end;
 procedure TioDBBuilderSchema.SequenceAddIfNotExists(const ASequenceName: String);
 begin
   if ASequenceName.Trim.IsEmpty then
-    raise EioGenericException.Create(ClassName, 'SequenceAddIfNotExists', Format('Invalid sequence name "%s"', [ASequenceName]));
+    raise EioDBBuilderException.Create(ClassName, 'SequenceAddIfNotExists', Format('Invalid sequence name "%s"', [ASequenceName]));
   if FSequences.IndexOf(ASequenceName) = -1 then
     FSequences.Add(ASequenceName);
 end;

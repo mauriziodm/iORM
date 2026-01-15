@@ -17,7 +17,8 @@
       "Bash(git grep:*)",
       "WebSearch",
       "WebFetch(domain:www.codegenes.net)",
-      "WebFetch(domain:sqlite.org)"
+      "WebFetch(domain:sqlite.org)",
+      "Bash(git -C \"C:\\\\delphi\\\\tools\\\\iORM\" log --oneline -10)"
     ]
   }
 }

@@ -91,7 +91,7 @@ begin
     ctSQLServer:
       Result := TioDBBuilderDBAnalyzerMSSqlServer.Create(AConnectionDefName, ASchema, ASqlGenerator, AForceCreateNewDB);
   else
-    raise EioGenericException.Create(ClassName, 'NewSqlGenerator', 'Connection type not found');
+    raise EioDBBuilderException.Create(ClassName, 'NewSqlGenerator', 'Connection type not found');
   end;
 end;
 
@@ -149,7 +149,7 @@ begin
     ctSQLServer:
       Result := TioDBBuilderSqlGenMSSqlServer.Create(AConnectionDefName);
   else
-    raise EioGenericException.Create(ClassName, 'NewSqlGenerator', 'Connection type not found');
+    raise EioDBBuilderException.Create(ClassName, 'NewSqlGenerator', 'Connection type not found');
   end;
 end;
 
@@ -169,7 +169,7 @@ begin
     ctSQLite:
       Result := TioDBBuilderStrategySqLite.Create(AConnectionDefName, ASchema, ASqlGenerator, AScript);
   else
-    raise EioGenericException.Create(ClassName, 'NewStrategy', 'Connection type not found');
+    raise EioDBBuilderException.Create(ClassName, 'NewStrategy', 'Connection type not found');
   end;
 end;
 

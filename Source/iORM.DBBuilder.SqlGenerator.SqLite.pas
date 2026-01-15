@@ -203,7 +203,7 @@ begin
 
   // Validate: ATableName is required for SQLite (unlike Firebird which can query all FKs)
   if ATableName.IsEmpty then
-    raise EioGenericException.Create(ClassName, 'BuildSQL_FKList',
+    raise EioDBBuilderException.Create(ClassName, 'BuildSQL_FKList',
       'SQLite requires a table name for PRAGMA foreign_key_list.'#13#13'Cannot list all foreign keys at once.');
 
   Result := Format('PRAGMA foreign_key_list(''%s'')', [ATableName]);
@@ -215,7 +215,7 @@ begin
   // SQLite defines PRIMARY KEY inline in CREATE TABLE statement.
   // This method exists only to satisfy the abstract interface contract.
   // If this exception is raised, it indicates a logic error in the Strategy layer.
-  raise EioGenericException.Create(ClassName, 'BuildAddPrimaryKeySql',
+  raise EioDBBuilderException.Create(ClassName, 'BuildAddPrimaryKeySql',
     'SQLite does not support adding PRIMARY KEY after table creation. ' +
     'Primary keys must be defined inline in the CREATE TABLE statement.');
 end;
@@ -278,7 +278,7 @@ begin
     ioMdCustomFieldType:
       Result := AField.FieldCustomType;
   else
-    raise EioGenericException.Create(ClassName, 'TranslateFieldType', 'Wrong Metadata_FieldType');
+    raise EioDBBuilderException.Create(ClassName, 'TranslateFieldType', 'Wrong Metadata_FieldType');
   end;
 end;
 

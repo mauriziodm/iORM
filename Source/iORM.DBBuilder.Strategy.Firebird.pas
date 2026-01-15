@@ -399,7 +399,7 @@ end;
 function TioDBBuilderStrategyFirebird.GetFBSqlGenerator: IioDBBuilderSqlGeneratorFirebird;
 begin
   if not Supports(SqlGenerator, IioDBBuilderSqlGeneratorFirebird, Result) then
-    raise EioGenericException.Create(ClassName, 'GetFBSqlGenerator', 'SqlGenerator doesn''t support IioDBBuilderSqlGeneratorFirebird interface.');
+    raise EioDBBuilderException.Create(ClassName, 'GetFBSqlGenerator', 'SqlGenerator doesn''t support IioDBBuilderSqlGeneratorFirebird interface.');
 end;
 
 function TioDBBuilderStrategyFirebird.IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
