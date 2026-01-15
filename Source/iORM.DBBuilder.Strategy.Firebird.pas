@@ -220,6 +220,8 @@ var
   LOldFieldPrecision: Smallint;
   LOldFieldDecimals: Smallint;
   LOldFieldNotNull: boolean;
+  LOldFieldDefault: string;
+  LNewFieldDefault: string;
 
   function IsDecimalOrNumeric: boolean;
   begin
@@ -234,6 +236,7 @@ begin
   LNewFieldLength := AField.FieldLength;
   LNewFieldPrecision := AField.FieldPrecision;
   LNewFieldDecimals := AField.FieldScale;
+  LNewFieldDefault := SqlGenerator.Translate_SchemaField_To_DefaultValue(AField);
 
   // Create and open the query for old field informations
   LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildFieldModifiedSql(ATable, AField), True);
@@ -249,6 +252,9 @@ begin
   LOldFieldNotNull := LQuery.Fields.FieldByName('field_not_null').AsInteger = 1;
   LOldFieldLength := LQuery.Fields.FieldByName('field_length').AsInteger;
   LOldFieldPrecision := LQuery.Fields.FieldByName('field_precision').AsInteger;
+  LOldFieldDefault := LQuery.Fields.FieldByName('field_default').AsString.Trim;
+  if LOldFieldDefault.ToUpper.StartsWith('DEFAULT ') then
+    LOldFieldDefault := LOldFieldDefault.Substring(8).Trim;
 
   // Verify if fieldType has been changed and check type affinity
   Result := Result or IsFieldTypeChanged(LOldFieldType, LNewFieldType, AField, ATable);
@@ -266,9 +272,11 @@ begin
   end;
 
   // Verify if DEFAULT setting of the field is changed
-  // NOTE: I have not found a way to retrieve the current DEFAULT
-  // setting from the DB (it is encoded in a binary representation called BLR)
-  // so it is not possible to verify if it has changed.
+  if not SameText(LOldFieldDefault, LNewFieldDefault) then
+  begin
+    AField.AddAltered(alFieldDefault);
+    Result := True;
+  end;
 
   // Verify if NotNull is changed (warning cannot change not null value with firebird)
   // Note: The last parameter set the NotNull change as permitted (firebird's alter table
