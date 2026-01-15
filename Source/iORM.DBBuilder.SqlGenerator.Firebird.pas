@@ -223,8 +223,8 @@ function TioDBBuilderSqlGenFirebird.BuildSQL_AlterField(const ATable: IioDBBuild
   const AField: IioDBBuilderSchemaField): string;
 var
   LDefaultValue: string;
-  LTextBuilder: IioTextBuilder;
   LTempSql: string;
+  LTextBuilder: IioTextBuilder;
 begin
   LTextBuilder := NewTextBuilder;
 
@@ -252,8 +252,8 @@ begin
     // The user can uncomment and execute manually at their own risk.
     if AField.IsFieldLengthDecreased or AField.IsFieldPrecisionDecreased then
     begin
-      LTextBuilder.AddLine('-- WARNING: Field recreation SQL commented out due to potential data loss.');
-      LTextBuilder.AddLine('-- Uncomment and execute manually at your own risk:');
+      LTextBuilder.AddLine('-- >> WARNING: Field recreation SQL commented out due to potential data loss.');
+      LTextBuilder.AddLine('-- >> Uncomment and execute manually at your own risk:');
       LTempSql := '-- ' + LTempSql;
     end;
     LTextBuilder.AddLine(LTempSql);
