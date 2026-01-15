@@ -64,12 +64,13 @@ type
     function BuildAlterFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
-    function TranslateFieldType(const AField: IioDBBuilderSchemaField; const AExcludeTypeAttributes: boolean): String; override;
+    function TranslateFieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; override;
 
     // ==========================================================
     // INDEX RELATED METHODS
     // ----------------------------------------------------------
     function BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
+    function BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_IndexExistsByName(const AIndexName: string): string; override;
     function BuildSQL_IndexList(const ATableName: string = ''): string; override;
     function BuildSQL_IndexDetails(const AIndexName: string): string; override;
@@ -82,8 +83,6 @@ type
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; override;
     // ==========================================================
 
-    // PrimaryKey
-    function BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string; override;
     // RecreateField
     function BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
   end;
@@ -246,11 +245,14 @@ begin
     // Extract the default value if exists
     LDefault := ExtractFieldDefaultValue(AField);
     LNotNull := IfThen(AField.FieldNotNull, 'NOT NULL', 'NULL');
-    Result := Format('"%s" %s %s %s', [AField.FieldName, TranslateFieldType(AField, True), LNotNull, LDefault]).Trim;
+    // OLD: Result := Format('"%s" %s %s %s', [AField.FieldName, TranslateFieldType(AField, True), LNotNull, LDefault]).Trim;
+    Result := Format('"%s" %s %s %s', [AField.FieldName, TranslateFieldType(AField, False), LNotNull, LDefault]).Trim;  // SQLite ignores the parameter
   end;
 end;
 
-function TioDBBuilderSqlGenSQLite.TranslateFieldType(const AField: IioDBBuilderSchemaField; const AExcludeTypeAttributes: boolean): String;
+function TioDBBuilderSqlGenSQLite.TranslateFieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String;
+// NOTE: SQLite ignores the AIncludeTypeAttributes parameter because SQLite uses type affinity system
+// and doesn't require/support length, precision, scale specifications in type names
 begin
   case AField.FieldType of
     ioMdVarchar:

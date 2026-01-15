@@ -74,7 +74,10 @@ type
     function BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     function BuildEndCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     function BuildTableExistsSql(const ATableName: string): string; virtual; abstract;
-    // Fields
+
+    // ==========================================================
+    // FIELD RELATED METHODS
+    // ----------------------------------------------------------
     function BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildAlterFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string; virtual; abstract;
@@ -82,14 +85,15 @@ type
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
-    function TranslateFieldType(const AField: IioDBBuilderSchemaField; const AExcludeTypeAttributes: boolean): String; virtual; abstract;
-    // PrimaryKeys
-    function BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
+
+    function TranslateFieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; virtual; abstract;
+    // ==========================================================
 
     // ==========================================================
     // INDEX RELATED METHODS
     // ----------------------------------------------------------
     function BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual; abstract;
+    function BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     function BuildSQL_DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual;
     function BuildSQL_DropIndexByName(const AIndexName: string): string; virtual; abstract;
     function BuildSQL_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual;

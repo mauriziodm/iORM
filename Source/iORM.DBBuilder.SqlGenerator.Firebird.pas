@@ -54,7 +54,7 @@ type
   protected
     function GetMaxSqlIdentifierLength: integer; override;
     function GetMinSqlIdentifierLength: integer; override;
-    function TranslateFieldType(const AField: IioDBBuilderSchemaField; const AExcludeTypeAttributes: boolean): String; override;
+    function TranslateFieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; override;
     // Database
     procedure CreateDatabase; override;
     function DatabaseExists: Boolean; override;
@@ -73,13 +73,12 @@ type
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
-    // PrimaryKeys
-    function BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string; override;
 
     // ==========================================================
     // INDEX RELATED METHODS
     // ----------------------------------------------------------
     function BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
+    function BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_DropIndexByName(const AIndexName: string): string; override;
     function BuildSQL_IndexExistsByName(const AIndexName: string): string; override;
     function BuildSQL_IndexList(const ATableName: string = ''): string; override;
@@ -233,7 +232,8 @@ begin
   // Type
   if alFieldType in AField.Altered then
   begin
-    LTextBuilder.AddLine(Format('ALTER TABLE ALTER COLUMN %s TYPE %s;', [ATable.Name, AField.FieldName, TranslateFieldType(AField, False)]));
+    // OLD: LTextBuilder.AddLine(Format('ALTER TABLE ALTER COLUMN %s TYPE %s;', [ATable.Name, AField.FieldName, TranslateFieldType(AField, False)]));  // False = include attributes
+    LTextBuilder.AddLine(Format('ALTER TABLE ALTER COLUMN %s TYPE %s;', [ATable.Name, AField.FieldName, TranslateFieldType(AField, True)]));  // True = include attributes
   end;
 
   // Default
@@ -257,7 +257,8 @@ begin
     // If length or precision was increased we can directly update the field with new settings
     if (alFieldLengthIncreased in AField.Altered) or (alFieldPrecisionIncreased in AField.Altered) then
     begin
-      LTextBuilder.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s TYPE %s;', [ATable.Name, AField.FieldName, TranslateFieldType(AField, False)]));
+      // OLD: LTextBuilder.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s TYPE %s;', [ATable.Name, AField.FieldName, TranslateFieldType(AField, False)]));  // False = include attributes
+      LTextBuilder.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s TYPE %s;', [ATable.Name, AField.FieldName, TranslateFieldType(AField, True)]));  // True = include attributes
     end
     else if (alFieldLengthDecreased in AField.Altered) or (alFieldPrecisionDecreased in AField.Altered) then
     begin
@@ -414,8 +415,9 @@ begin
   // Extract the default value if exists
   LDefault := ExtractFieldDefaultValue(AField);
 
+  // OLD: LTextBuilder.Add(Format('ALTER TABLE %s ADD %s %s %s;', [ATable.Name, LTempFieldName, TranslateFieldType(AField, False), LDefault]).Trim);  // False = include attributes
   LTextBuilder.Add(Format(
-    'ALTER TABLE %s ADD %s %s %s;', [ATable.Name, LTempFieldName, TranslateFieldType(AField, False), LDefault]).Trim);
+    'ALTER TABLE %s ADD %s %s %s;', [ATable.Name, LTempFieldName, TranslateFieldType(AField, True), LDefault]).Trim);  // True = include attributes
 
   // 2 - Copy data from old field to temporary field
   LTextBuilder.Add(Format(
@@ -526,25 +528,28 @@ begin
 
   // ...then continue
   LNotNull := IfThen(AField.FieldNotNull, 'NOT NULL', '');
-  Result := Format('%s %s %s %s', [AField.FieldName, TranslateFieldType(AField, False), LDefault, LNotNull]).Trim;
+  // OLD: Result := Format('%s %s %s %s', [AField.FieldName, TranslateFieldType(AField, False), LDefault, LNotNull]).Trim;  // False = include attributes
+  Result := Format('%s %s %s %s', [AField.FieldName, TranslateFieldType(AField, True), LDefault, LNotNull]).Trim;  // True = include attributes
 end;
 
-function TioDBBuilderSqlGenFirebird.TranslateFieldType(const AField: IioDBBuilderSchemaField; const AExcludeTypeAttributes: boolean): String;
+function TioDBBuilderSqlGenFirebird.TranslateFieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String;
 begin
   case AField.FieldType of
     ioMdVarchar:
     begin
-      if AExcludeTypeAttributes then
-        Result := 'VARCHAR'
+      // OLD: if AExcludeTypeAttributes then
+      if AIncludeTypeAttributes then
+        Result := Format('VARCHAR(%d)', [AField.FieldLength])
       else
-        Result := Format('VARCHAR(%d)', [AField.FieldLength]);
+        Result := 'VARCHAR';
     end;
     ioMdChar:
     begin
-      if AExcludeTypeAttributes then
-        Result := 'CHAR'
+      // OLD: if AExcludeTypeAttributes then
+      if AIncludeTypeAttributes then
+        Result := Format('CHAR(%d)', [AField.FieldLength])
       else
-        Result := Format('CHAR(%d)', [AField.FieldLength]);
+        Result := 'CHAR';
     end;
     ioMdInteger:
       Result := 'INTEGER';
@@ -558,25 +563,28 @@ begin
       Result := 'TIMESTAMP';
     ioMdDecimal:
     begin
-      if AExcludeTypeAttributes then
-        Result := 'DECIMAL'
+      // OLD: if AExcludeTypeAttributes then
+      if AIncludeTypeAttributes then
+        Result := Format('DECIMAL(%d,%d)', [AField.FieldPrecision, AField.FieldScale])
       else
-        Result := Format('DECIMAL(%d,%d)', [AField.FieldPrecision, AField.FieldScale]);
+        Result := 'DECIMAL';
     end;
     ioMdNumeric:
     begin
-      if AExcludeTypeAttributes then
-        Result := 'NUMERIC'
+      // OLD: if AExcludeTypeAttributes then
+      if AIncludeTypeAttributes then
+        Result := Format('NUMERIC(%d,%d)', [AField.FieldPrecision, AField.FieldScale])
       else
-        Result := Format('NUMERIC(%d,%d)', [AField.FieldPrecision, AField.FieldScale]);
+        Result := 'NUMERIC';
     end;
     ioMdBoolean:
       Result := 'INTEGER';
     ioMdBinary:
-      if AExcludeTypeAttributes then
-        Result := 'BLOB'
+      // OLD: if AExcludeTypeAttributes then
+      if AIncludeTypeAttributes then
+        Result := Format('BLOB SUB_TYPE %s', [IfThen(AField.FieldSubType.IsEmpty, '0', AField.FieldSubType)])
       else
-        Result := Format('BLOB SUB_TYPE %s', [IfThen(AField.FieldSubType.IsEmpty, '0', AField.FieldSubType)]);
+        Result := 'BLOB';
     ioMdCustomFieldType:
       Result := AField.FieldCustomType;
   else
