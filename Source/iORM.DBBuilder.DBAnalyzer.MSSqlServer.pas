@@ -11,10 +11,17 @@ uses
 
 type
   TioDBBuilderDBAnalyzerMSSqlServer = class(TioDBBuilderDBAnalyzer)
-  public
-//    procedure Analyze(const ForceCreate: boolean = false); override;
+  protected
+    procedure AnalyzeTables; override;
   end;
 
 implementation
+
+{ TioDBBuilderDBAnalyzerMSSqlServer }
+
+procedure TioDBBuilderDBAnalyzerMSSqlServer.AnalyzeTables;
+begin
+  // TODO: Implement table analysis for MS SQL Server
+end;
 
 end.

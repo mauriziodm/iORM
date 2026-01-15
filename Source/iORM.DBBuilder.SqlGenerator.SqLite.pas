@@ -65,14 +65,23 @@ type
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function TranslateFieldType(const AField: IioDBBuilderSchemaField; const AExcludeTypeAttributes: boolean): String; override;
-    // Indexes
+
+    // ==========================================================
+    // INDEX RELATED METHODS
+    // ----------------------------------------------------------
     function BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildSQL_IndexExistsByName(const AIndexName: string): string; override;
     function BuildSQL_IndexList(const ATableName: string = ''): string; override;
     function BuildSQL_IndexDetails(const AIndexName: string): string; override;
-    // ForeignKeys
+    // ==========================================================
+
+    // ==========================================================
+    // FOREIGN KEY RELATED METHODS
+    // ----------------------------------------------------------
     function BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; override;
+    // ==========================================================
+
     // PrimaryKey
     function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string; override;
     // RecreateField

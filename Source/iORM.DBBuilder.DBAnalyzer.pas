@@ -55,9 +55,9 @@ type
     function GetStrategy: IioDBBuilderStrategy;
   protected
     procedure AnalyzeFields(const ATable: IioDBBuilderSchemaTable); virtual;
-    procedure AnalyzeIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure AnalyzeForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
-    procedure AnalyzeTables; virtual;
+    procedure AnalyzeIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure AnalyzeTables; virtual; abstract;
 
     property ConnectionDefName: string read GetConnectionDefName;
     property Schema: IioDBBuilderSchema read GetSchema;
@@ -144,11 +144,6 @@ begin
   end;
 end;
 
-procedure TioDBBuilderDBAnalyzer.AnalyzeTables;
-begin
-  // Default implementation does nothing
-  // Descendants override this method to implement table analysis logic
-end;
 
 procedure TioDBBuilderDBAnalyzer.AnalyzeFields(const ATable: IioDBBuilderSchemaTable);
 var
