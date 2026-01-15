@@ -64,7 +64,7 @@ type
     // ----------------------------------------------------------
     function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string; override;
     function BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string; override;
-    function BuildAlterFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
+    function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; override;
@@ -82,9 +82,6 @@ type
     function BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; override;
     // ==========================================================
-
-    // RecreateField
-    function BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
   end;
 
 implementation
@@ -138,7 +135,7 @@ begin
   Result := Format('CREATE%s INDEX IF NOT EXISTS %s ON %s (%s);', [LUnique, LIndexName, ATable.Name, LFieldList]);
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildAlterFieldSql(const ATable: IioDBBuilderSchemaTable;
+function TioDBBuilderSqlGenSQLite.BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable;
   const AField: IioDBBuilderSchemaField): string;
 begin
   // Do nothing. Can be removed?
@@ -217,13 +214,6 @@ begin
   raise EioDBBuilderException.Create(ClassName, 'BuildSQL_AddPK',
     'SQLite does not support adding PRIMARY KEY after table creation. ' +
     'Primary keys must be defined inline in the CREATE TABLE statement.');
-end;
-
-function TioDBBuilderSqlGenSQLite.BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
-begin
-  // SQLite doesn't support ALTER COLUMN - requires full table rebuild
-  // This is handled by the Strategy layer (rename table, create new, copy data)
-  Result := EmptyStr;
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildTableExistsSql(const ATableName: string): string;
