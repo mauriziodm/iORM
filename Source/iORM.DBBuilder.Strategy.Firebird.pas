@@ -235,8 +235,8 @@ begin
   // Load some new field informations
   LTableName := ATable.Name.ToUpper;
   LFieldName := AField.FieldName.ToUpper;
-  // OLD: LNewFieldType := SqlGenerator.Translate_SchemaField_To_FieldTypeAsString(AField, True);  // True = exclude attributes (only base type)
-  LNewFieldType := SqlGenerator.Translate_SchemaField_To_FieldTypeAsString(AField, False);  // False = do NOT include attributes (only base type)
+  // OLD: LNewFieldType := SqlGenerator.Translate_SchemaField_To_FieldType(AField, True);  // True = exclude attributes (only base type)
+  LNewFieldType := SqlGenerator.Translate_SchemaField_To_FieldType(AField, False);  // False = do NOT include attributes (only base type)
   LNewFieldSubType := IfThen(AField.FieldSubType.IsEmpty, '0', AField.FieldSubType);
   LNewFieldLength := AField.FieldLength;
   LNewFieldPrecision := AField.FieldPrecision;

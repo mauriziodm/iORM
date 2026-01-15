@@ -96,7 +96,7 @@ type
     /// Use True for SQL generation (CREATE/ALTER statements), False for schema comparison.
     /// </param>
     /// <returns>The database-specific type name or full type specification.</returns>
-    function Translate_SchemaField_To_FieldTypeAsString(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; virtual; abstract;
+    function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; virtual; abstract;
     // ==========================================================
 
     // ==========================================================

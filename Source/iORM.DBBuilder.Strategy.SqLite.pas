@@ -208,8 +208,8 @@ begin
     begin
       LOldFieldType := LQuery.Fields.FieldByName('type').AsString;
       LOldFieldNotNull := (LQuery.Fields.FieldByName('notnull').AsInteger <> 0);
-      // OLD: LNewFieldType := SqlGenerator.Translate_SchemaField_To_FieldTypeAsString(AField, True);  // True = exclude attributes (only base type)
-      LNewFieldType := SqlGenerator.Translate_SchemaField_To_FieldTypeAsString(AField, False);  // False = do NOT include attributes (only base type)
+      // OLD: LNewFieldType := SqlGenerator.Translate_SchemaField_To_FieldType(AField, True);  // True = exclude attributes (only base type)
+      LNewFieldType := SqlGenerator.Translate_SchemaField_To_FieldType(AField, False);  // False = do NOT include attributes (only base type)
 
       // Verify if fieldType has been changed and check type affinity
       Result := Result or IsFieldTypeChanged(LOldFieldType, LNewFieldType, AField, ATable);
