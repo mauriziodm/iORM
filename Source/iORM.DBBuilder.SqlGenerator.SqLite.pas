@@ -58,14 +58,16 @@ type
     function BuildBeginAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildTableExistsSql(const ATableName: string): string; override;
-    // Fields
+
+    // ==========================================================
+    // FIELD RELATED METHODS
+    // ----------------------------------------------------------
     function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string; override;
     function BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string; override;
     function BuildAlterFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; override;
-
     // ==========================================================
     // INDEX RELATED METHODS
     // ----------------------------------------------------------
@@ -74,8 +76,6 @@ type
     function BuildSQL_IndexExistsByName(const AIndexName: string): string; override;
     function BuildSQL_IndexList(const ATableName: string = ''): string; override;
     function BuildSQL_IndexDetails(const AIndexName: string): string; override;
-    // ==========================================================
-
     // ==========================================================
     // FOREIGN KEY RELATED METHODS
     // ----------------------------------------------------------
@@ -249,9 +249,13 @@ begin
   end;
 end;
 
+/// <remarks>
+/// SQLite-specific implementation: This method ignores the AIncludeTypeAttributes parameter.
+/// SQLite uses a type affinity system and does not require or support length, precision, or scale
+/// specifications in type names. All field types return their simple base type name (e.g., "TEXT",
+/// "NUMERIC", "BLOB", "INTEGER", "REAL") regardless of the AIncludeTypeAttributes parameter value.
+/// </remarks>
 function TioDBBuilderSqlGenSQLite.Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String;
-// NOTE: SQLite ignores the AIncludeTypeAttributes parameter because SQLite uses type affinity system
-// and doesn't require/support length, precision, scale specifications in type names
 begin
   case AField.FieldType of
     ioMdVarchar:

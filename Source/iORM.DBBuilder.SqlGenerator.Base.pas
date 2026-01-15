@@ -85,19 +85,7 @@ type
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
-
-    /// <summary>
-    /// Translates an iORM field type to the database-specific SQL type name.
-    /// </summary>
-    /// <param name="AField">The field metadata to translate.</param>
-    /// <param name="AIncludeTypeAttributes">
-    /// When True: Returns full type specification with attributes (e.g., "VARCHAR(50)", "DECIMAL(10,2)", "BLOB SUB_TYPE 0")
-    /// When False: Returns only base type name (e.g., "VARCHAR", "DECIMAL", "BLOB")
-    /// Use True for SQL generation (CREATE/ALTER statements), False for schema comparison.
-    /// </param>
-    /// <returns>The database-specific type name or full type specification.</returns>
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; virtual; abstract;
-    // ==========================================================
 
     // ==========================================================
     // INDEX RELATED METHODS
@@ -114,14 +102,12 @@ type
     function BuildSQL_IndexList(const ATableName: string = ''): string; virtual; abstract;
     // Returns detailed info about an index (list of fields with position/order)
     function BuildSQL_IndexDetails(const AIndexName: string): string; virtual; abstract;
-
     function Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
     function Translate_SchemaIndex_To_Orientation(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
     function Translate_SchemaIndex_To_Unique(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
     function Translate_SchemaTableAndIndex_To_IndexName(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): String; virtual;
     function Translate_Unique_To_UniqueSuffixForIndexName(const Unique: boolean): string; virtual;
     function Translate_Orientation_To_OrientationSuffixForIndexName(const AOrientation: TioIndexOrientation): string; virtual;
-    // ==========================================================
 
     // ==========================================================
     // FOREIGN KEY RELATED METHODS
@@ -130,7 +116,6 @@ type
     function BuildSQL_DropFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; overload; virtual;
     function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string; overload; virtual; abstract;
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; virtual; abstract;
-
     function Translate_SchemaTableAndFK_To_FKName(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual;
     // ==========================================================
 

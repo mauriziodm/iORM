@@ -289,7 +289,6 @@ type
     /// </param>
     /// <returns>The database-specific type name or full type specification.</returns>
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String;
-    // ==========================================================
 
     // ==========================================================
     // INDEX RELATED METHODS
@@ -303,7 +302,6 @@ type
     function BuildSQL_IndexList(const ATableName: string = ''): string;
     function BuildSQL_IndexDetails(const AIndexName: string): string;
     function Translate_SchemaTableAndIndex_To_IndexName(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): String;
-    // ==========================================================
 
     // ==========================================================
     // FOREIGN KEY RELATED METHODS
