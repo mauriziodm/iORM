@@ -195,9 +195,7 @@ begin
   // Validate: ATableName is required for SQLite (unlike Firebird which can query all FKs)
   if ATableName.IsEmpty then
     raise EioGenericException.Create(ClassName, 'BuildSQL_FKList',
-      'SQLite requires a table name for PRAGMA foreign_key_list. ' +
-      'Cannot list all foreign keys at once like Firebird. ' +
-      'Use Firebird for database-wide FK queries.');
+      'SQLite requires a table name for PRAGMA foreign_key_list.'#13#13'Cannot list all foreign keys at once.');
 
   Result := Format('PRAGMA foreign_key_list(''%s'')', [ATableName]);
 end;

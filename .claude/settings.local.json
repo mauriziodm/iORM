@@ -13,7 +13,11 @@
       "Bash(findstr:*)",
       "Bash(dir:*)",
       "Bash(msbuild:*)",
-      "Bash(dcc32:*)"
+      "Bash(dcc32:*)",
+      "Bash(git grep:*)",
+      "WebSearch",
+      "WebFetch(domain:www.codegenes.net)",
+      "WebFetch(domain:sqlite.org)"
     ]
   }
 }
