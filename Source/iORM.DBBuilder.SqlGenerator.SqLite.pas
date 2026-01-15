@@ -267,17 +267,17 @@ begin
     ioMdFloat:
       Result := 'REAL';
     ioMdDate:
-      Result := 'REAL'; // But in SQLite documentation has NUMERIC affinity (Mauri: 02/08/2021)
+      Result := 'REAL'; // But in SQLite documentation has NUMERIC affinity
     ioMdTime:
-      Result := 'REAL'; // But in SQLite documentation has NUMERIC affinity (Mauri: 02/08/2021)
+      Result := 'REAL'; // But in SQLite documentation has NUMERIC affinity
     ioMdDateTime:
-      Result := 'REAL'; // But in SQLite documentation has NUMERIC affinity (Mauri: 02/08/2021)
+      Result := 'REAL'; // But in SQLite documentation has NUMERIC affinity
     ioMdDecimal:
       Result := 'NUMERIC';
     ioMdNumeric:
       Result := 'NUMERIC';
     ioMdBoolean:
-      Result := 'INTEGER'; // But in SQLite documentation has NUMERIC affinity (Mauri: 02/08/2021)
+      Result := 'INTEGER'; // But in SQLite documentation has NUMERIC affinity
     ioMdBinary:
       Result := 'BLOB';
     ioMdCustomFieldType:
