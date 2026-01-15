@@ -275,6 +275,16 @@ type
     function BuildCreateFieldsSql(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string;
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
+    /// <summary>
+    /// Translates an iORM field type to the database-specific SQL type name.
+    /// </summary>
+    /// <param name="AField">The field metadata to translate.</param>
+    /// <param name="AIncludeTypeAttributes">
+    /// When True: Returns full type specification with attributes (e.g., "VARCHAR(50)", "DECIMAL(10,2)", "BLOB SUB_TYPE 0")
+    /// When False: Returns only base type name (e.g., "VARCHAR", "DECIMAL", "BLOB")
+    /// Use True for SQL generation (CREATE/ALTER statements), False for schema comparison.
+    /// </param>
+    /// <returns>The database-specific type name or full type specification.</returns>
     function TranslateFieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String;
     // PrimaryKeys related methods
     function BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string;
