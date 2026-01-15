@@ -211,9 +211,13 @@ end;
 
 function TioDBBuilderSqlGenSQLite.BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string;
 begin
-  // SQLite defines PRIMARY KEY inline in CREATE TABLE statement
-  // Cannot add PK after table creation
-  Result := EmptyStr;
+  // Note: TioDBBuilderStrategySqLite should NEVER call this method.
+  // SQLite defines PRIMARY KEY inline in CREATE TABLE statement.
+  // This method exists only to satisfy the abstract interface contract.
+  // If this exception is raised, it indicates a logic error in the Strategy layer.
+  raise EioGenericException.Create(ClassName, 'BuildAddPrimaryKeySql',
+    'SQLite does not support adding PRIMARY KEY after table creation. ' +
+    'Primary keys must be defined inline in the CREATE TABLE statement.');
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
