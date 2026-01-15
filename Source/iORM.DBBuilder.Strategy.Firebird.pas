@@ -137,7 +137,7 @@ begin
   Script.Body.DecIndentationLevel;
   Script.Body.Add(SqlGenerator.BuildEndCreateTableSql(ATable));
   Script.Body.AddEmpty;
-  Script.Body.Add(SqlGenerator.BuildAddPrimaryKeySql(ATable));
+  Script.Body.Add(SqlGenerator.BuildSQL_AddPK(ATable));
 
   if Schema.IndexesEnabled then
   begin

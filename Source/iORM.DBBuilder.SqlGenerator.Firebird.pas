@@ -74,7 +74,7 @@ type
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     // PrimaryKeys
-    function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string; override;
+    function BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string; override;
 
     // ==========================================================
     // INDEX RELATED METHODS
@@ -211,7 +211,7 @@ begin
   Result := Format('CREATE%s%s INDEX %s ON %s (%s);', [LUnique, LOrientation, LIndexName, ATable.Name, LFieldList]);
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string;
 begin
   Result := Format('ALTER TABLE %s ADD CONSTRAINT PK_%s PRIMARY KEY (%s);', [ATable.Name, ATable.Name,
     ATable.PrimaryKeyField.FieldName]);
@@ -480,7 +480,7 @@ begin
     DecIndent.
     Add(BuildEndCreateTableSql(ATable)).
     AddEmptyLine.
-    Add(BuildAddPrimaryKeySql(ATable));
+    Add(BuildSQL_AddPK(ATable));
 
   Result := LTextBuilder.Text;
 end;

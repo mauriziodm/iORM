@@ -314,7 +314,7 @@ end;
 - [ ] `CreateDatabase` / `DatabaseExists` - PostgreSQL-specific
 - [ ] `BuildTableExistsSql` - Query `information_schema.tables`
 - [ ] `BuildFieldExistsSql` / `BuildFieldModifiedSql` - Query `information_schema.columns`
-- [ ] `BuildAddPrimaryKeySql` - PostgreSQL PRIMARY KEY syntax
+- [ ] `BuildSQL_AddPK` - PostgreSQL PRIMARY KEY syntax
 - [ ] `BuildListAllIndexesSql` / `BuildListTableIndexesSql` - Query `pg_indexes`
 - [ ] `BuildListAllForeignKeysSql` / `BuildListTableForeignKeysSql` - Query `information_schema.table_constraints`
 - [ ] `BuildForeignKeyExistsSql` / `BuildForeignKeyModifiedSql`

@@ -84,7 +84,7 @@ type
     function BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function TranslateFieldType(const AField: IioDBBuilderSchemaField; const AExcludeTypeAttributes: boolean): String; virtual; abstract;
     // PrimaryKeys
-    function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
+    function BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
 
     // ==========================================================
     // INDEX RELATED METHODS

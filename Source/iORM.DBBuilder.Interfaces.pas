@@ -277,7 +277,7 @@ type
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     function TranslateFieldType(const AField: IioDBBuilderSchemaField; const AExcludeTypeAttributes: boolean): String;
     // PrimaryKeys related methods
-    function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string;
+    function BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string;
     // Indexes related methods
     function BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
     function BuildSQL_DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;

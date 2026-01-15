@@ -83,7 +83,7 @@ type
     // ==========================================================
 
     // PrimaryKey
-    function BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string; override;
+    function BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string; override;
     // RecreateField
     function BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
   end;
@@ -209,13 +209,13 @@ begin
   Result := Format('PRAGMA foreign_key_list(''%s'')', [ATableName]);
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string;
 begin
   // Note: TioDBBuilderStrategySqLite should NEVER call this method.
   // SQLite defines PRIMARY KEY inline in CREATE TABLE statement.
   // This method exists only to satisfy the abstract interface contract.
   // If this exception is raised, it indicates a logic error in the Strategy layer.
-  raise EioDBBuilderException.Create(ClassName, 'BuildAddPrimaryKeySql',
+  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_AddPK',
     'SQLite does not support adding PRIMARY KEY after table creation. ' +
     'Primary keys must be defined inline in the CREATE TABLE statement.');
 end;
