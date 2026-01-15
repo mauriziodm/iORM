@@ -115,3 +115,8 @@ When code changes are complete:
 4. Never assume the user wants a commit just because the work is done
 
 This ensures the user maintains full control over the commit history.
+
+**Commit Format:**
+- Do NOT add "Co-Authored-By" trailers to commit messages
+- Use standard commit messages only
+- Keep messages concise but descriptive of the changes
