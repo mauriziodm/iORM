@@ -315,15 +315,11 @@ begin
 end;
 
 function TioDBBuilderSqlGenBase.ExtractFieldDefaultValue(const AField: IioDBBuilderSchemaField): string;
-var
-  LFieldDefaultValue: TValue;
 begin
-  LFieldDefaultValue := AField.FieldDefault;
-
-  if LFieldDefaultValue.IsEmpty then
+  if AField.FieldDefault.IsEmpty then
     Result := ''
   else
-    Result := 'DEFAULT ' + DataConverter.TValueToSql(LFieldDefaultValue);
+    Result := 'DEFAULT ' + DataConverter.TValueToSql(AField.FieldDefault);
 end;
 
 function TioDBBuilderSqlGenBase.Translate_Orientation_To_OrientationSuffixForIndexName(const AOrientation: TioIndexOrientation): string;
