@@ -233,7 +233,7 @@ begin
   else
   begin
     // Extract the default value if exists
-    LDefault := ExtractFieldDefaultValue(AField);
+    LDefault := Translate_SchemaField_To_DefaultValue(AField);
     LNotNull := IfThen(AField.FieldNotNull, 'NOT NULL', 'NULL');
     Result := Format('"%s" %s %s %s', [AField.FieldName, Translate_SchemaField_To_FieldType(AField, False), LNotNull, LDefault]).Trim;  // SQLite ignores the parameter
   end;

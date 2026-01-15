@@ -84,7 +84,7 @@ type
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; virtual; abstract;
-    function ExtractFieldDefaultValue(const AField: IioDBBuilderSchemaField): string;
+    function Translate_SchemaField_To_DefaultValue(const AField: IioDBBuilderSchemaField): string; virtual;
 
     // ==========================================================
     // INDEX RELATED METHODS
@@ -314,12 +314,12 @@ begin
   FDataConverter := TioDbFactory.SqlDataConverter(AConnectionDefName);
 end;
 
-function TioDBBuilderSqlGenBase.ExtractFieldDefaultValue(const AField: IioDBBuilderSchemaField): string;
+function TioDBBuilderSqlGenBase.Translate_SchemaField_To_DefaultValue(const AField: IioDBBuilderSchemaField): string;
 begin
   if AField.FieldDefault.IsEmpty then
     Result := ''
   else
-    Result := 'DEFAULT ' + DataConverter.TValueToSql(AField.FieldDefault);
+    Result := DataConverter.TValueToSql(AField.FieldDefault);
 end;
 
 function TioDBBuilderSqlGenBase.Translate_Orientation_To_OrientationSuffixForIndexName(const AOrientation: TioIndexOrientation): string;

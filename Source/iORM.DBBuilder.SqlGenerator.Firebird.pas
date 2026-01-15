@@ -235,7 +235,7 @@ begin
   // Default
   if AField.IsFieldDefaultAltered then
   begin
-    LDefaultValue := ExtractFieldDefaultValue(AField);
+    LDefaultValue := Translate_SchemaField_To_DefaultValue(AField);
 
     if LDefaultValue.IsEmpty then
       LTextBuilder.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s DROP DEFAULT;', [ATable.Name, AField.FieldName]))
@@ -252,8 +252,8 @@ begin
     // The user can uncomment and execute manually at their own risk.
     if AField.IsFieldLengthDecreased or AField.IsFieldPrecisionDecreased then
     begin
-      LTextBuilder.AddLine('-- >> WARNING: Field recreation SQL commented out due to potential data loss.');
-      LTextBuilder.AddLine('-- >> Uncomment and execute manually at your own risk:');
+      LTextBuilder.AddLine('-- >>> WARNING: Field recreation SQL commented out due to potential data loss.');
+      LTextBuilder.AddLine('-- >>> Uncomment and execute manually at your own risk:');
       LTempSql := '-- ' + LTempSql;
     end;
     LTextBuilder.AddLine(LTempSql);
@@ -466,7 +466,7 @@ var
   LNotNull: string;
 begin
   // Extract the default value if exists
-  LDefault := ExtractFieldDefaultValue(AField);
+  LDefault := Translate_SchemaField_To_DefaultValue(AField);
 
   // If primary key...
   if AField.PrimaryKey then
