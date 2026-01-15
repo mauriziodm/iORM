@@ -60,10 +60,20 @@ type
     // Status
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const Value: TioDBBuilderStatus);
+    // Alteration status getters
+    function GetIsAltered: Boolean;
+    function GetIsFieldTypeAltered: Boolean;
+    function GetIsFieldDefaultAltered: Boolean;
+    function GetIsFieldNotNullAltered: Boolean;
+    function GetIsFieldLengthAltered: Boolean;
+    function GetIsFieldLengthIncreased: Boolean;
+    function GetIsFieldLengthDecreased: Boolean;
+    function GetIsFieldPrecisionAltered: Boolean;
+    function GetIsFieldPrecisionIncreased: Boolean;
+    function GetIsFieldPrecisionDecreased: Boolean;
   public
     constructor Create(const AContextProperty: IioProperty);
     procedure AddAltered(const AAltered: TioDBBuilderFieldAlterStatus);
-    function Altered: TioDBBuilderFieldAlter;
 
     property FieldCustomType: string read GetFieldCustomType;
     property FieldDefault: TValue read GetFieldDefault;
@@ -78,6 +88,17 @@ type
     property FieldNotNull: boolean read GetFieldNotNull;
     property PrimaryKey: boolean read GetPrimaryKey;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
+    // Alteration status properties
+    property IsAltered: Boolean read GetIsAltered;
+    property IsFieldTypeAltered: Boolean read GetIsFieldTypeAltered;
+    property IsFieldDefaultAltered: Boolean read GetIsFieldDefaultAltered;
+    property IsFieldNotNullAltered: Boolean read GetIsFieldNotNullAltered;
+    property IsFieldLengthAltered: Boolean read GetIsFieldLengthAltered;
+    property IsFieldLengthIncreased: Boolean read GetIsFieldLengthIncreased;
+    property IsFieldLengthDecreased: Boolean read GetIsFieldLengthDecreased;
+    property IsFieldPrecisionAltered: Boolean read GetIsFieldPrecisionAltered;
+    property IsFieldPrecisionIncreased: Boolean read GetIsFieldPrecisionIncreased;
+    property IsFieldPrecisionDecreased: Boolean read GetIsFieldPrecisionDecreased;
   end;
 
 implementation
@@ -90,11 +111,6 @@ uses
 procedure TioDBBuilderSchemaField.AddAltered(const AAltered: TioDBBuilderFieldAlterStatus);
 begin
   Include(FAltered, AAltered);
-end;
-
-function TioDBBuilderSchemaField.Altered: TioDBBuilderFieldAlter;
-begin
-  Result := FAltered;
 end;
 
 constructor TioDBBuilderSchemaField.Create(const AContextProperty: IioProperty);
@@ -171,6 +187,56 @@ end;
 procedure TioDBBuilderSchemaField.SetStatus(const Value: TioDBBuilderStatus);
 begin
   FStatus := Value;
+end;
+
+function TioDBBuilderSchemaField.GetIsAltered: Boolean;
+begin
+  Result := FAltered <> [];
+end;
+
+function TioDBBuilderSchemaField.GetIsFieldTypeAltered: Boolean;
+begin
+  Result := alFieldType in FAltered;
+end;
+
+function TioDBBuilderSchemaField.GetIsFieldDefaultAltered: Boolean;
+begin
+  Result := alFieldDefault in FAltered;
+end;
+
+function TioDBBuilderSchemaField.GetIsFieldNotNullAltered: Boolean;
+begin
+  Result := alFieldNotNull in FAltered;
+end;
+
+function TioDBBuilderSchemaField.GetIsFieldLengthAltered: Boolean;
+begin
+  Result := (alFieldLengthIncreased in FAltered) or (alFieldLengthDecreased in FAltered);
+end;
+
+function TioDBBuilderSchemaField.GetIsFieldLengthIncreased: Boolean;
+begin
+  Result := alFieldLengthIncreased in FAltered;
+end;
+
+function TioDBBuilderSchemaField.GetIsFieldLengthDecreased: Boolean;
+begin
+  Result := alFieldLengthDecreased in FAltered;
+end;
+
+function TioDBBuilderSchemaField.GetIsFieldPrecisionAltered: Boolean;
+begin
+  Result := (alFieldPrecisionIncreased in FAltered) or (alFieldPrecisionDecreased in FAltered);
+end;
+
+function TioDBBuilderSchemaField.GetIsFieldPrecisionIncreased: Boolean;
+begin
+  Result := alFieldPrecisionIncreased in FAltered;
+end;
+
+function TioDBBuilderSchemaField.GetIsFieldPrecisionDecreased: Boolean;
+begin
+  Result := alFieldPrecisionDecreased in FAltered;
 end;
 
 end.

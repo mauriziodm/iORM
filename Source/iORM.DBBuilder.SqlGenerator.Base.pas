@@ -55,7 +55,6 @@ type
     FConnectionDefName: string;
     FDataConverter: TioSqlDataConverterRef;
   protected
-    function ExtractFieldDefaultValue(const AField: IioDBBuilderSchemaField): string;
     function GetMaxSqlIdentifierLength: integer; virtual;
     function GetMinSqlIdentifierLength: integer; virtual;
     function NewTempObjectName(const AMaxLength: integer): string;
@@ -85,6 +84,7 @@ type
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; virtual; abstract;
+    function ExtractFieldDefaultValue(const AField: IioDBBuilderSchemaField): string;
 
     // ==========================================================
     // INDEX RELATED METHODS

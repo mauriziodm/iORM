@@ -229,11 +229,11 @@ begin
   LTextBuilder := NewTextBuilder;
 
   // Type
-  if alFieldType in AField.Altered then
+  if AField.IsFieldTypeAltered then
     LTextBuilder.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s TYPE %s;', [ATable.Name, AField.FieldName, Translate_SchemaField_To_FieldType(AField, True)]));  // True = include attributes
 
   // Default
-  if alFieldDefault in AField.Altered then
+  if AField.IsFieldDefaultAltered then
   begin
     LDefaultValue := ExtractFieldDefaultValue(AField);
 
@@ -244,14 +244,13 @@ begin
   end;
 
   // Length
-  if (alFieldLengthIncreased in AField.Altered) or (alFieldLengthDecreased in AField.Altered) or
-    (alFieldPrecisionIncreased in AField.Altered) or (alFieldPrecisionDecreased in AField.Altered) then
+  if AField.IsFieldLengthAltered or AField.IsFieldPrecisionAltered then
   begin
     // If length or precision was increased we can directly update the field with new settings
     LTempSql := Format('ALTER TABLE %s ALTER COLUMN %s TYPE %s;', [ATable.Name, AField.FieldName, Translate_SchemaField_To_FieldType(AField, True)]);
     // If length or precision was decreased, generate SQL as comments only (data loss risk).
     // The user can uncomment and execute manually at their own risk.
-    if (alFieldLengthDecreased in AField.Altered) or (alFieldPrecisionDecreased in AField.Altered) then
+    if AField.IsFieldLengthDecreased or AField.IsFieldPrecisionDecreased then
     begin
       LTextBuilder.AddLine('-- WARNING: Field recreation SQL commented out due to potential data loss.');
       LTextBuilder.AddLine('-- Uncomment and execute manually at your own risk:');
@@ -261,8 +260,8 @@ begin
   end;
 
   // NotNull
-  // Note: SET NOT NUL & DROP NOT NULL available only from firebird 3
-  if alFieldNotNull in AField.Altered then
+  // Note: SET NOT NULL & DROP NOT NULL available only from firebird 3
+  if AField.IsFieldNotNullAltered then
     LTextBuilder.Add(Format('ALTER TABLE %s ALTER COLUMN %s %s NOT NULL;', [ATable.Name,  AField.FieldName, IfThen(AField.FieldNotNull, 'SET', 'DROP')]));
 
   Result := LTextBuilder.Text;
