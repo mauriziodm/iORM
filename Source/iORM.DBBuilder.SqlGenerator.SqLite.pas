@@ -191,10 +191,15 @@ begin
   // SQLite limitation: PRAGMA foreign_key_list accepts ONLY table name - cannot filter by FK name
   // Note: AFKName parameter is IGNORED because SQLite doesn't support FK name filtering
   //       PRAGMA always returns ALL FKs for the table, Strategy must filter manually
+
+  // Validate: ATableName is required for SQLite (unlike Firebird which can query all FKs)
   if ATableName.IsEmpty then
-    Result := ''  // Caller must handle this case - SQLite doesn't support listing all FKs at once
-  else
-    Result := Format('PRAGMA foreign_key_list(''%s'')', [ATableName]);
+    raise EioGenericException.Create(ClassName, 'BuildSQL_FKList',
+      'SQLite requires a table name for PRAGMA foreign_key_list. ' +
+      'Cannot list all foreign keys at once like Firebird. ' +
+      'Use Firebird for database-wide FK queries.');
+
+  Result := Format('PRAGMA foreign_key_list(''%s'')', [ATableName]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildAddPrimaryKeySql(const ATable: IioDBBuilderSchemaTable): string;
