@@ -243,7 +243,7 @@ begin
     Exit(False);
 
   // Load some old field informations
-  LOldFieldType := LQuery.Fields.FieldByName('field_type_name').AsString;
+  LOldFieldType := LQuery.Fields.FieldByName('field_type').AsString;
   LOldFieldSubType := LQuery.Fields.FieldByName('field_subtype').AsString;
   LOldFieldDecimals := Abs(LQuery.Fields.FieldByName('field_scale').AsInteger);
   LOldFieldNotNull := LQuery.Fields.FieldByName('field_not_null').AsInteger = 1;

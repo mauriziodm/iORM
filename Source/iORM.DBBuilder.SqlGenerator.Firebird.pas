@@ -303,13 +303,11 @@ var
 begin
   LTextBuilder := NewTextBuilder;
   LTextBuilder
-    .AddLine('SELECT r.RDB$FIELD_NAME AS field_name,')
-    .AddLine('  r.RDB$DEFAULT_VALUE AS field_default_value,')
-    .AddLine('  r.RDB$NULL_FLAG AS field_not_null,')
-    .AddLine('  f.RDB$CHARACTER_LENGTH AS field_length,')
-    .AddLine('  f.RDB$FIELD_PRECISION AS field_precision,')
-    .AddLine('  f.RDB$FIELD_SCALE AS field_scale,')
-    .AddLine('  CASE f.RDB$FIELD_TYPE ')
+    .AddLine('SELECT rf.RDB$NULL_FLAG AS field_not_null,')
+    .AddLine('  rf.RDB$CHARACTER_LENGTH AS field_length,')
+    .AddLine('  rf.RDB$FIELD_PRECISION AS field_precision,')
+    .AddLine('  rf.RDB$FIELD_SCALE AS field_scale,')
+    .AddLine('  CASE rf.RDB$FIELD_TYPE ')
     .AddLine('    WHEN 261 THEN ''BLOB''')
     .AddLine('    WHEN 37 THEN ''VARCHAR''')
     .AddLine('    WHEN 14 THEN ''CHAR''')
@@ -322,12 +320,12 @@ begin
     .AddLine('    WHEN 13 THEN ''TIME''')
     .AddLine('    WHEN 35 THEN ''TIMESTAMP''')
     .AddLine('    ELSE ''UNKNOWN''')
-    .AddLine('  END AS field_type_name,')
-    .AddLine('  f.RDB$FIELD_SUB_TYPE AS field_subtype')
-    .AddLine('FROM RDB$RELATION_FIELDS r')
-    .AddLine('LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME')
-    .AddLine(Format('WHERE r.RDB$RELATION_NAME = ''%s''', [ATable.Name.ToUpper]))
-    .AddLine(Format('  AND r.RDB$FIELD_NAME = ''%s''', [AField.FieldName.ToUpper]));
+    .AddLine('  END AS field_type,')
+    .AddLine('  fs.RDB$FIELD_SUB_TYPE AS field_subtype')
+    .AddLine('FROM RDB$RELATION_FIELDS rf')
+    .AddLine('LEFT JOIN RDB$FIELDS fs ON rf.RDB$FIELD_SOURCE = fs.RDB$FIELD_NAME')
+    .AddLine(Format('WHERE rf.RDB$RELATION_NAME = ''%s''', [ATable.Name.ToUpper]))
+    .AddLine(Format('  AND rf.RDB$FIELD_NAME = ''%s''', [AField.FieldName.ToUpper]));
   Result := LTextBuilder.Text;
 end;
 
