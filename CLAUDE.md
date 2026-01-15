@@ -103,3 +103,15 @@ Located in `Samples/`:
 - Attributes: `Source/iORM.Attributes.pas`
 - Common types/enums: `Source/iORM.CommonTypes.pas`
 - Exceptions: `Source/iORM.Exceptions.pas`
+
+## Git Workflow
+
+**IMPORTANT: Never create commits automatically.**
+
+When code changes are complete:
+1. Show the git diff to the user
+2. Ask explicit confirmation before creating any commit
+3. Only commit if the user explicitly requests it (e.g., "fai il commit", "commit now", etc.)
+4. Never assume the user wants a commit just because the work is done
+
+This ensures the user maintains full control over the commit history.
