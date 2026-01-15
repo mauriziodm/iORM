@@ -73,7 +73,7 @@ type
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildRecreateFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
 
-    function TranslateFieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; override;
+    function Translate_SchemaField_To_FieldTypeAsString(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; override;
 
     // ==========================================================
     // INDEX RELATED METHODS
@@ -232,7 +232,7 @@ begin
 
   // Type
   if alFieldType in AField.Altered then
-    LTextBuilder.AddLine(Format('ALTER TABLE ALTER COLUMN %s TYPE %s;', [ATable.Name, AField.FieldName, TranslateFieldType(AField, True)]));  // True = include attributes
+    LTextBuilder.AddLine(Format('ALTER TABLE ALTER COLUMN %s TYPE %s;', [ATable.Name, AField.FieldName, Translate_SchemaField_To_FieldTypeAsString(AField, True)]));  // True = include attributes
 
   // Default
   if alFieldDefault in AField.Altered then
@@ -254,7 +254,7 @@ begin
   begin
     // If length or precision was increased we can directly update the field with new settings
     if (alFieldLengthIncreased in AField.Altered) or (alFieldPrecisionIncreased in AField.Altered) then
-      LTextBuilder.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s TYPE %s;', [ATable.Name, AField.FieldName, TranslateFieldType(AField, True)]))  // True = include attributes
+      LTextBuilder.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s TYPE %s;', [ATable.Name, AField.FieldName, Translate_SchemaField_To_FieldTypeAsString(AField, True)]))  // True = include attributes
     else
     if (alFieldLengthDecreased in AField.Altered) or (alFieldPrecisionDecreased in AField.Altered) then
       // If length or precision was decreased, we need to recreate the field.
@@ -408,7 +408,7 @@ begin
   LDefault := ExtractFieldDefaultValue(AField);
 
   LTextBuilder.Add(Format(
-    'ALTER TABLE %s ADD %s %s %s;', [ATable.Name, LTempFieldName, TranslateFieldType(AField, True), LDefault]).Trim);  // True = include attributes
+    'ALTER TABLE %s ADD %s %s %s;', [ATable.Name, LTempFieldName, Translate_SchemaField_To_FieldTypeAsString(AField, True), LDefault]).Trim);  // True = include attributes
 
   // 2 - Copy data from old field to temporary field
   LTextBuilder.Add(Format(
@@ -519,10 +519,10 @@ begin
 
   // ...then continue
   LNotNull := IfThen(AField.FieldNotNull, 'NOT NULL', '');
-  Result := Format('%s %s %s %s', [AField.FieldName, TranslateFieldType(AField, True), LDefault, LNotNull]).Trim;  // True = include attributes
+  Result := Format('%s %s %s %s', [AField.FieldName, Translate_SchemaField_To_FieldTypeAsString(AField, True), LDefault, LNotNull]).Trim;  // True = include attributes
 end;
 
-function TioDBBuilderSqlGenFirebird.TranslateFieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String;
+function TioDBBuilderSqlGenFirebird.Translate_SchemaField_To_FieldTypeAsString(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String;
 begin
   case AField.FieldType of
     ioMdVarchar:
@@ -570,7 +570,7 @@ begin
     ioMdCustomFieldType:
       Result := AField.FieldCustomType;
   else
-    raise EioDBBuilderException.Create(ClassName, 'TranslateFieldType', 'Wrong Metadata_FieldType');
+    raise EioDBBuilderException.Create(ClassName, 'Translate_SchemaField_To_FieldTypeAsString', 'Wrong Metadata_FieldType');
   end;
 end;
 

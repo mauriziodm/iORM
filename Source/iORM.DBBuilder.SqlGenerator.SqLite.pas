@@ -64,7 +64,7 @@ type
     function BuildAlterFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
-    function TranslateFieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; override;
+    function Translate_SchemaField_To_FieldTypeAsString(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; override;
 
     // ==========================================================
     // INDEX RELATED METHODS
@@ -245,11 +245,11 @@ begin
     // Extract the default value if exists
     LDefault := ExtractFieldDefaultValue(AField);
     LNotNull := IfThen(AField.FieldNotNull, 'NOT NULL', 'NULL');
-    Result := Format('"%s" %s %s %s', [AField.FieldName, TranslateFieldType(AField, False), LNotNull, LDefault]).Trim;  // SQLite ignores the parameter
+    Result := Format('"%s" %s %s %s', [AField.FieldName, Translate_SchemaField_To_FieldTypeAsString(AField, False), LNotNull, LDefault]).Trim;  // SQLite ignores the parameter
   end;
 end;
 
-function TioDBBuilderSqlGenSQLite.TranslateFieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String;
+function TioDBBuilderSqlGenSQLite.Translate_SchemaField_To_FieldTypeAsString(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String;
 // NOTE: SQLite ignores the AIncludeTypeAttributes parameter because SQLite uses type affinity system
 // and doesn't require/support length, precision, scale specifications in type names
 begin
@@ -279,7 +279,7 @@ begin
     ioMdCustomFieldType:
       Result := AField.FieldCustomType;
   else
-    raise EioDBBuilderException.Create(ClassName, 'TranslateFieldType', 'Wrong Metadata_FieldType');
+    raise EioDBBuilderException.Create(ClassName, 'Translate_SchemaField_To_FieldTypeAsString', 'Wrong Metadata_FieldType');
   end;
 end;
 

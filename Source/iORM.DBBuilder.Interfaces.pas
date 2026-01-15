@@ -269,7 +269,10 @@ type
     function BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
     function BuildEndCreateTableSql(const ATable: IioDBBuilderSchemaTable): string;
     function BuildTableExistsSql(const ATableName: string): string;
-    // Fields related methods
+
+    // ==========================================================
+    // FIELD RELATED METHODS
+    // ----------------------------------------------------------
     function BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string;
     function BuildAlterFieldSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     function BuildCreateFieldsSql(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string;
@@ -285,11 +288,14 @@ type
     /// Use True for SQL generation (CREATE/ALTER statements), False for schema comparison.
     /// </param>
     /// <returns>The database-specific type name or full type specification.</returns>
-    function TranslateFieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String;
-    // PrimaryKeys related methods
-    function BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string;
-    // Indexes related methods
+    function Translate_SchemaField_To_FieldTypeAsString(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String;
+    // ==========================================================
+
+    // ==========================================================
+    // INDEX RELATED METHODS
+    // ----------------------------------------------------------
     function BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
+    function BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string;
     function BuildSQL_DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
     function BuildSQL_DropIndexByName(const AIndexName: string): string;
     function BuildSQL_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
@@ -297,13 +303,18 @@ type
     function BuildSQL_IndexList(const ATableName: string = ''): string;
     function BuildSQL_IndexDetails(const AIndexName: string): string;
     function Translate_SchemaTableAndIndex_To_IndexName(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): String;
-    // Foreign keys
+    // ==========================================================
+
+    // ==========================================================
+    // FOREIGN KEY RELATED METHODS
+    // ----------------------------------------------------------
     function BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
     function BuildSQL_DropFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; overload;
     function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string; overload;
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string;
     function Translate_SchemaTableAndFK_To_FKName(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
     function TranslateFKAction(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
+    // ==========================================================
   end;
 
   IioDBBuilderStrategy = interface

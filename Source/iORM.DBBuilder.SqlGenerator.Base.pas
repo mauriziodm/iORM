@@ -96,7 +96,7 @@ type
     /// Use True for SQL generation (CREATE/ALTER statements), False for schema comparison.
     /// </param>
     /// <returns>The database-specific type name or full type specification.</returns>
-    function TranslateFieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; virtual; abstract;
+    function Translate_SchemaField_To_FieldTypeAsString(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; virtual; abstract;
     // ==========================================================
 
     // ==========================================================
@@ -126,7 +126,6 @@ type
     // ==========================================================
     // FOREIGN KEY RELATED METHODS
     // ----------------------------------------------------------
-    // Foreign keys
     function BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual; abstract;
     function BuildSQL_DropFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; overload; virtual;
     function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string; overload; virtual; abstract;
