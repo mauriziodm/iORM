@@ -207,16 +207,12 @@ end;
 function TioDBBuilderStrategyFirebird.FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
 var
   LQuery: IioQuery;
-  LTableName: string;
-  LFieldName: string;
 
   LNewFieldType: string;
   LNewFieldSubType: string;
   LNewFieldLength: Smallint;
   LNewFieldPrecision: Smallint;
   LNewFieldDecimals: Smallint;
-  LFieldTypeChanged,
-  LFieldLengthChanged: boolean;
 
   LOldFieldType: string;
   LOldFieldSubType: string;
@@ -233,9 +229,6 @@ var
 begin
   Result := False;
   // Load some new field informations
-  LTableName := ATable.Name.ToUpper;
-  LFieldName := AField.FieldName.ToUpper;
-  // OLD: LNewFieldType := SqlGenerator.Translate_SchemaField_To_FieldType(AField, True);  // True = exclude attributes (only base type)
   LNewFieldType := SqlGenerator.Translate_SchemaField_To_FieldType(AField, False);  // False = do NOT include attributes (only base type)
   LNewFieldSubType := IfThen(AField.FieldSubType.IsEmpty, '0', AField.FieldSubType);
   LNewFieldLength := AField.FieldLength;
@@ -243,34 +236,7 @@ begin
   LNewFieldDecimals := AField.FieldScale;
 
   // Create and open the query for old field informations
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, '', False);
-  LQuery.SQL.Add('SELECT r.RDB$FIELD_NAME AS field_name,');
-  LQuery.SQL.Add('  r.RDB$DEFAULT_VALUE AS field_default_value,');
-  LQuery.SQL.Add('  r.RDB$NULL_FLAG AS field_not_null,');
-  LQuery.SQL.Add('  f.RDB$CHARACTER_LENGTH AS field_length,');
-  LQuery.SQL.Add('  f.RDB$FIELD_PRECISION AS field_precision,');
-  LQuery.SQL.Add('  f.RDB$FIELD_SCALE AS field_scale,');
-  LQuery.SQL.Add('  CASE f.RDB$FIELD_TYPE ');
-  LQuery.SQL.Add('    WHEN 261 THEN ''BLOB''');
-  LQuery.SQL.Add('    WHEN 37 THEN ''VARCHAR''');
-  LQuery.SQL.Add('    WHEN 14 THEN ''CHAR''');
-  LQuery.SQL.Add('    WHEN 8 THEN ''INTEGER''');
-  LQuery.SQL.Add('    WHEN 7 THEN ''SMALLINT''');
-  LQuery.SQL.Add('    WHEN 16 THEN ''INT64'''); // --> DECIMAL field_subtype 2, NUMERIC field_subtype 1, BIGINT field_subtype 0
-  LQuery.SQL.Add('    WHEN 27 THEN ''DOUBLE''');
-  LQuery.SQL.Add('    WHEN 10 THEN ''FLOAT''');
-  LQuery.SQL.Add('    WHEN 12 THEN ''DATE''');
-  LQuery.SQL.Add('    WHEN 13 THEN ''TIME''');
-  LQuery.SQL.Add('    WHEN 35 THEN ''TIMESTAMP''');
-  LQuery.SQL.Add('    ELSE ''UNKNOWN''');
-  LQuery.SQL.Add('  END AS field_type_name,');
-  LQuery.SQL.Add('  f.RDB$FIELD_SUB_TYPE AS field_subtype');
-  LQuery.SQL.Add('FROM RDB$RELATION_FIELDS r');
-  LQuery.SQL.Add('LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME');
-  LQuery.SQL.Add(Format('WHERE r.RDB$RELATION_NAME = ''%s''', [LTableName]));
-  LQuery.SQL.Add(Format('  AND r.RDB$FIELD_NAME = ''%s''', [LFieldName]));
-  // LQuery.SQL.Add('ORDER BY r.RDB$FIELD_POSITION');
-  LQuery.Open;
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildFieldModifiedSql(ATable, AField), True);
 
   // Field not found
   if LQuery.Eof then

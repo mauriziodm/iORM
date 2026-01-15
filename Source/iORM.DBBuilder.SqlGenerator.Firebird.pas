@@ -298,8 +298,37 @@ begin
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
+var
+  LTextBuilder: IioTextBuilder;
 begin
-  Result := EmptyStr;
+  LTextBuilder := NewTextBuilder;
+  LTextBuilder
+    .AddLine('SELECT r.RDB$FIELD_NAME AS field_name,')
+    .AddLine('  r.RDB$DEFAULT_VALUE AS field_default_value,')
+    .AddLine('  r.RDB$NULL_FLAG AS field_not_null,')
+    .AddLine('  f.RDB$CHARACTER_LENGTH AS field_length,')
+    .AddLine('  f.RDB$FIELD_PRECISION AS field_precision,')
+    .AddLine('  f.RDB$FIELD_SCALE AS field_scale,')
+    .AddLine('  CASE f.RDB$FIELD_TYPE ')
+    .AddLine('    WHEN 261 THEN ''BLOB''')
+    .AddLine('    WHEN 37 THEN ''VARCHAR''')
+    .AddLine('    WHEN 14 THEN ''CHAR''')
+    .AddLine('    WHEN 8 THEN ''INTEGER''')
+    .AddLine('    WHEN 7 THEN ''SMALLINT''')
+    .AddLine('    WHEN 16 THEN ''INT64''')
+    .AddLine('    WHEN 27 THEN ''DOUBLE''')
+    .AddLine('    WHEN 10 THEN ''FLOAT''')
+    .AddLine('    WHEN 12 THEN ''DATE''')
+    .AddLine('    WHEN 13 THEN ''TIME''')
+    .AddLine('    WHEN 35 THEN ''TIMESTAMP''')
+    .AddLine('    ELSE ''UNKNOWN''')
+    .AddLine('  END AS field_type_name,')
+    .AddLine('  f.RDB$FIELD_SUB_TYPE AS field_subtype')
+    .AddLine('FROM RDB$RELATION_FIELDS r')
+    .AddLine('LEFT JOIN RDB$FIELDS f ON r.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME')
+    .AddLine(Format('WHERE r.RDB$RELATION_NAME = ''%s''', [ATable.Name.ToUpper]))
+    .AddLine(Format('  AND r.RDB$FIELD_NAME = ''%s''', [AField.FieldName.ToUpper]));
+  Result := LTextBuilder.Text;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string;
