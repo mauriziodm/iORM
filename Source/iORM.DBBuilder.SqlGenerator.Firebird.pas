@@ -265,16 +265,19 @@ begin
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
+var
+  LTextBuilder: IioTextBuilder;
 begin
-  Result := Format(
-    'select' +sLineBReak +
-    '  RDB$FIELD_NAME' + SLineBreak +
-    'from RDB$RELATION_FIELDS' + sLineBreak +
-    'where' + sLineBreak +
-    '  UPPER(RDB$RELATION_NAME) = UPPER(''%s'') and' + sLineBreak +
-    '  UPPER(RDB$FIELD_NAME) = UPPER(''%s'') and' + sLineBreak +
-    '  RDB$SYSTEM_FLAG = 0',
-    [ATable.Name, AField.FieldName]);
+  LTextBuilder := NewTextBuilder;
+
+  LTextBuilder.
+    AddLine('SELECT 1').
+    AddLine('FROM RDB$RELATION_FIELDS').
+    AddLine(Format('WHERE UPPER(RDB$RELATION_NAME) = UPPER(''%s'')', [ATable.Name])).
+    AddLine(Format('  AND UPPER(RDB$FIELD_NAME) = UPPER(''%s'')', [AField.FieldName])).
+    Add('  AND RDB$SYSTEM_FLAG = 0');
+
+  Result := LTextBuilder.Text;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;

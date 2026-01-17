@@ -169,11 +169,17 @@ end;
 
 function TioDBBuilderSqlGenSQLite.BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
 begin
+  // SQLite limitation: PRAGMA table_info returns ALL columns for a table - cannot filter by column name
+  // The AField parameter is accepted for interface consistency but IGNORED in the query
+  // Strategy layer must manually filter results to find the specific field by name
   Result := Format('pragma table_info(''%s'')', [ATable.Name]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
 begin
+  // SQLite limitation: PRAGMA table_info returns ALL columns for a table - cannot filter by column name
+  // The AField parameter is accepted for interface consistency but IGNORED in the query
+  // Strategy layer must manually filter results to find the specific field and compare metadata
   Result := Format('pragma table_info(''%s'')', [ATable.Name]);
 end;
 

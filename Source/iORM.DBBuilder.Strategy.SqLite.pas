@@ -174,9 +174,12 @@ function TioDBBuilderStrategySqLite.FieldExists(const ATable: IioDBBuilderSchema
 var
   LQuery: IioQuery;
 begin
+  // SQLite limitation: PRAGMA table_info returns ALL columns - must filter manually
+  // Execute query (returns all fields from the table)
   Result := False;
   LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildFieldExistsSql(ATable, AField), True);
 
+  // Manual filtering: loop through all columns and find matching field name
   while not LQuery.Eof do
   begin
     if SameText(LQuery.Fields.FieldByName('name').AsString, AField.FieldName) then
@@ -195,9 +198,12 @@ var
   LOldFieldType: string;
   LOldFieldNotNull: Boolean;
 begin
+  // SQLite limitation: PRAGMA table_info returns ALL columns - must filter manually
+  // Execute query (returns all fields from the table)
   Result := False;
   LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildFieldModifiedSql(ATable, nil), True);
 
+  // Manual filtering: loop through all columns to find the target field
   while not LQuery.Eof do
   begin
     LOldFieldName := LQuery.Fields.FieldByName('name').AsString;
