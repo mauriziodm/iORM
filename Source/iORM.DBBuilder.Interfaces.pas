@@ -49,6 +49,7 @@ type
 
 
 
+//  TioDBBuilderIndexRebuildMode = (irmDropAndRecreateIndexes, irmAlterIndexes, irmIgnoreIndexes);
   TioDBBuilderIndexRebuildMode = (irmDropAndRecreateForAllTables, irmDropAndRecreateForModifiedTablesOnly, irmIgnoreIndexes);
 
 
