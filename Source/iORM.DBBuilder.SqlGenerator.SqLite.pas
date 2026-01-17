@@ -46,8 +46,6 @@ uses
 
 type
   TioDBBuilderSqlGenSQLite = class(TioDBBuilderSqlGenBase)
-  private
-    function InternalCreateField(const AField: IioDBBuilderSchemaField): String;
   protected
     // Database
     procedure CreateDatabase; override;
@@ -62,9 +60,9 @@ type
     // ==========================================================
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_CreateField(const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_AddField(const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
+    function BuildSQL_CreateField(const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; override;
@@ -117,9 +115,22 @@ begin
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_CreateField(const AField: IioDBBuilderSchemaField): string;
+var
+  LDefault: string;
+  LNotNull: string;
 begin
-//  Result := Format('%s%s', [ACommaBefore, InternalCreateField(AField)]);
-  Result := InternalCreateField(AField);
+  // Default
+  LDefault := IfThen(AField.FieldDefaultExists, ' DEFAULT ' + Translate_SchemaField_To_DefaultValue(AField), '');
+
+  // Not Null
+  LNotNull := IfThen(AField.FieldNotNull, ' NOT NULL', ' NULL');
+
+  // If primary key...
+  if AField.PrimaryKey then
+    Result := Format('"%s" INTEGER PRIMARY KEY NOT NULL', [AField.FieldName])
+  // ...else continue as regular field
+  else
+    Result := Format('"%s" %s%s%s', [AField.FieldName, Translate_SchemaField_To_FieldType(AField, False), LDefault, LNotNull]);  // False = does not include attributes
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
@@ -223,24 +234,6 @@ end;
 function TioDBBuilderSqlGenSQLite.BuildTableExistsSql(const ATableName: string): string;
 begin
   Result := Format('pragma table_info(''%s'')', [ATableName]);
-end;
-
-function TioDBBuilderSqlGenSQLite.InternalCreateField(const AField: IioDBBuilderSchemaField): String;
-var
-  LDefault: string;
-  LNotNull: string;
-begin
-  // If primary key...
-  // Carlo Marona (2025-10-16): No need to add AUTOINCREMENT keyword because when PRIMARY KEY is used SqLite internally uses an autoincrement column
-  if AField.PrimaryKey then
-    Result := Format('"%s" INTEGER PRIMARY KEY NOT NULL', [AField.FieldName])
-  else
-  begin
-    // Extract the default value if exists
-    LDefault := Translate_SchemaField_To_DefaultValue(AField);
-    LNotNull := IfThen(AField.FieldNotNull, 'NOT NULL', 'NULL');
-    Result := Format('"%s" %s %s %s', [AField.FieldName, Translate_SchemaField_To_FieldType(AField, False), LNotNull, LDefault]).Trim;  // SQLite ignores the parameter
-  end;
 end;
 
 /// <remarks>

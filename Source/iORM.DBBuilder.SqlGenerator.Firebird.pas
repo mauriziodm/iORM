@@ -481,7 +481,7 @@ begin
 
   // If primary key...
   if AField.PrimaryKey then
-    Result := Format('%s INTEGER %s NOT NULL', [AField.FieldName, LDefault])
+    Result := Format('%s INTEGER NOT NULL', [AField.FieldName])
   // ...else continue as regular field
   else
     Result := Format('%s %s%s%s', [AField.FieldName, Translate_SchemaField_To_FieldType(AField, True), LDefault, LNotNull]);  // True = include attributes
