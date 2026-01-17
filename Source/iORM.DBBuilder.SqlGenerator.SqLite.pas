@@ -138,8 +138,12 @@ end;
 function TioDBBuilderSqlGenSQLite.BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable;
   const AField: IioDBBuilderSchemaField): string;
 begin
-  // Do nothing. Can be removed?
-  Result := EmptyStr;
+  // Note: TioDBBuilderStrategySqLite should NEVER call this method.
+  // SQLite has very limited ALTER TABLE support and does not support altering column definitions.
+  // This method exists only to satisfy the abstract interface contract.
+  // If this exception is raised, it indicates a logic error in the Strategy layer.
+  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_AlterField',
+    'SQLite does not support altering column definitions. '#13#13'Column modifications are not supported by SQLite.');
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
