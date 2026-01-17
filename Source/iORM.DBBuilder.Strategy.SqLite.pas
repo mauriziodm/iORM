@@ -71,7 +71,7 @@ procedure TioDBBuilderStrategySqLite.AlterTable(const ATable: IioDBBuilderSchema
 begin
   Script.Body.Add(SqlGenerator.BuildBeginAlterTableSql(ATable));
   Script.Body.IncIndentationLevel;
-  Script.Body.Add(SqlGenerator.BuildCreateFieldsSql(ATable, Script.Body.CurrentIndentation));
+  Script.Body.Add(SqlGenerator.BuildSQL_CreateFields(ATable, Script.Body.CurrentIndentation));
 
   if Schema.ForeignKeysEnabled then
     CreateTableForeignKeys(ATable);
@@ -144,7 +144,7 @@ procedure TioDBBuilderStrategySqLite.CreateTable(const ATable: IioDBBuilderSchem
 begin
   Script.Body.Add(SqlGenerator.BuildBeginCreateTableSql(ATable));
   Script.Body.IncIndentationLevel;
-  Script.Body.Add(SqlGenerator.BuildCreateFieldsSql(ATable, Script.Body.CurrentIndentation), False);
+  Script.Body.Add(SqlGenerator.BuildSQL_CreateFields(ATable, Script.Body.CurrentIndentation), False);
 
   if Schema.ForeignKeysEnabled then
     CreateTableForeignKeys(ATable);

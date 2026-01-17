@@ -435,7 +435,7 @@ begin
   LTextBuilder.
     Add(BuildBeginCreateTableSql(ATable)).
     IncIndent.
-    Add(BuildCreateFieldsSql(ATable, AIndentation)).
+    Add(BuildSQL_CreateFields(ATable, AIndentation)).
     DecIndent.
     Add(BuildEndCreateTableSql(ATable)).
     AddEmptyLine.
