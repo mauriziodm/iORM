@@ -46,7 +46,13 @@ type
   TioDBBuilderIndexChange = (icFields, icOrientation, icUnique);
   TioDBBuilderIndexChanges = set of TioDBBuilderIndexChange;
   // irmDropAndRecreateAllTables (safe, default), irmDropAndRecreateModifiedTablesOnly (faster), irmIgnoreIndexes (disabled, fully manual)
+
+
+
   TioDBBuilderIndexRebuildMode = (irmDropAndRecreateForAllTables, irmDropAndRecreateForModifiedTablesOnly, irmIgnoreIndexes);
+
+
+
   TioDBBuilderStatus = (stClean, stUpdate, stCreate);
   TioDBBuilderTableChange = (taFields, taIndexes, taForeignKeys);
   TioDBBuilderTableChanges = set of TioDBBuilderTableChange;

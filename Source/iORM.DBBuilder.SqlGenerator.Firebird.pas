@@ -474,15 +474,17 @@ var
   LNotNull: string;
 begin
   // Extract the default value if exists
-  LDefault := Translate_SchemaField_To_DefaultValue(AField);
+  LDefault := '';
+  if AField.FieldDefaultExists then
+    LDefault := ' DEFAULT ' + Translate_SchemaField_To_DefaultValue(AField);
 
   // If primary key...
   if AField.PrimaryKey then
     Exit(Format('%s INTEGER %s NOT NULL', [AField.FieldName, LDefault]));
 
   // ...then continue
-  LNotNull := IfThen(AField.FieldNotNull, 'NOT NULL', '');
-  Result := Format('%s %s %s %s', [AField.FieldName, Translate_SchemaField_To_FieldType(AField, True), LDefault, LNotNull]).Trim;  // True = include attributes
+  LNotNull := IfThen(AField.FieldNotNull, ' NOT NULL', '');
+  Result := Format('%s %s%s%s', [AField.FieldName, Translate_SchemaField_To_FieldType(AField, True), LDefault, LNotNull]);  // True = include attributes
 end;
 
 function TioDBBuilderSqlGenFirebird.Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String;
