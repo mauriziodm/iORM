@@ -71,7 +71,7 @@ type
     // ----------------------------------------------------------
     function BuildSQL_AddField(const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
-    function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string; override;
+    function BuildSQL_CreateField(const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; override;
@@ -418,7 +418,7 @@ begin
   Result := MIN_IDENTIFIER_NAME_LENGTH;
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_CreateField(const AField: IioDBBuilderSchemaField): string;
 begin
   Result := _BuildSQL_CreateOrAddField(AField);
 end;

@@ -62,7 +62,7 @@ type
     // ==========================================================
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
-    function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string; override;
+    function BuildSQL_CreateField(const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_AddField(const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
@@ -116,7 +116,7 @@ begin
   Result := FileExists(TioConnectionManager.GetDatabaseFileName(ConnectionDefName));
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_CreateField(const AField: IioDBBuilderSchemaField): string;
 begin
 //  Result := Format('%s%s', [ACommaBefore, InternalCreateField(AField)]);
   Result := InternalCreateField(AField);

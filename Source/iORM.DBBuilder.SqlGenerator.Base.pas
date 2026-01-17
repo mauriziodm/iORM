@@ -79,7 +79,7 @@ type
     // ----------------------------------------------------------
     function BuildSQL_AddField(const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
-    function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string; virtual; abstract;
+    function BuildSQL_CreateField(const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildCreateFieldsSql(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string; virtual;
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
@@ -188,7 +188,7 @@ begin
 
   for LField in ATable.Fields do
   begin
-    LTextBuilder.AddLine(LComma + BuildCreateFieldSql(LField));
+    LTextBuilder.AddLine(LComma + BuildSQL_CreateField(LField));
     LComma := ', ';
   end;
 
