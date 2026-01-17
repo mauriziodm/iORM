@@ -159,7 +159,13 @@ end;
 
 function TioDBBuilderSqlGenSQLite.BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
 begin
-  Result := BuildEndCreateTableSql(ATable);
+  // Note: TioDBBuilderStrategySqLite should NEVER call this method.
+  // SQLite does not support ALTER TABLE in the traditional sense and uses table recreation instead.
+  // This method exists only to satisfy the abstract interface contract.
+  // If this exception is raised, it indicates a logic error in the Strategy layer.
+  raise EioDBBuilderException.Create(ClassName, 'BuildEndAlterTableSql',
+    'SQLite does not support ALTER TABLE. '#13#13 +
+    'Table modifications require the rename-create-copy pattern handled by the Strategy layer.');
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildEndCreateTableSql(const ATable: IioDBBuilderSchemaTable): string;
@@ -325,7 +331,13 @@ end;
 
 function TioDBBuilderSqlGenSQLite.BuildBeginAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
 begin
-  Result := BuildBeginCreateTableSql(ATable);
+  // Note: TioDBBuilderStrategySqLite should NEVER call this method.
+  // SQLite does not support ALTER TABLE in the traditional sense and uses table recreation instead.
+  // This method exists only to satisfy the abstract interface contract.
+  // If this exception is raised, it indicates a logic error in the Strategy layer.
+  raise EioDBBuilderException.Create(ClassName, 'BuildBeginAlterTableSql',
+    'SQLite does not support ALTER TABLE. '#13#13 +
+    'Table modifications require the rename-create-copy pattern handled by the Strategy layer.');
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string;

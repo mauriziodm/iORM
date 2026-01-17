@@ -19,6 +19,7 @@ type
   protected
     // Tables
     procedure AlterTable(const ATable: IioDBBuilderSchemaTable); override;
+    procedure CreateOrAlterTables; override;
     procedure CreateTable(const ATable: IioDBBuilderSchemaTable); override;
     // Fields
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
@@ -48,7 +49,7 @@ uses
   iORM.Attributes,
   iORM.DB.Interfaces,
   iORM.DB.ConnectionContainer,
-  iORM.DB.QueryEngine, iORM.CommonTypes
+  iORM.DB.QueryEngine, iORM.CommonTypes, iORM.Exceptions
 
   ;
 
@@ -69,15 +70,14 @@ end;
 
 procedure TioDBBuilderStrategySqLite.AlterTable(const ATable: IioDBBuilderSchemaTable);
 begin
-  Script.Body.Add(SqlGenerator.BuildBeginAlterTableSql(ATable));
-  Script.Body.IncIndentationLevel;
-  Script.Body.Add(SqlGenerator.BuildSQL_CreateFields(ATable, Script.Body.CurrentIndentation));
-
-  if Schema.ForeignKeysEnabled then
-    CreateTableForeignKeys(ATable);
-
-  Script.Body.DecIndentationLevel;
-  Script.Body.Add(SqlGenerator.BuildEndAlterTableSql(ATable));
+  // Note: This method should NEVER be called for SQLite.
+  // SQLite does not support ALTER TABLE in the traditional sense.
+  // Instead, CreateOrAlterTables override always calls CreateTable for both stCreate and stUpdate.
+  // This method exists only to satisfy the virtual method contract from the base class.
+  // If this exception is raised, it indicates a logic error in the Strategy layer.
+  raise EioDBBuilderException.Create(ClassName, 'AlterTable',
+    'SQLite does not support ALTER TABLE. '#13#13 +
+    'Table modifications require the rename-create-copy pattern, which is handled by CreateOrAlterTables override.');
 end;
 
 procedure TioDBBuilderStrategySqLite.CopyDataFromOldToNewTable(const ATable: IioDBBuilderSchemaTable);
@@ -137,6 +137,21 @@ begin
       Continue;
 
     CopyDataFromOldToNewTable(LTable);
+  end;
+end;
+
+procedure TioDBBuilderStrategySqLite.CreateOrAlterTables;
+var
+  LTable: IioDBBuilderSchemaTable;
+begin
+  // SQLite does not support ALTER TABLE like other databases.
+  // Instead, it always recreates tables using the rename-create-copy pattern
+  // (see GenerateDatabaseObjects method for the full workflow).
+  // Therefore, both stCreate and stUpdate use CreateTable.
+  for LTable in Schema.Tables.Values do
+  begin
+    if LTable.Status in [stCreate, stUpdate] then
+      CreateTable(LTable);
   end;
 end;
 
