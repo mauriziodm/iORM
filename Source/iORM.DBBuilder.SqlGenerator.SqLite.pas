@@ -283,8 +283,12 @@ end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_AddField(const AField: IioDBBuilderSchemaField): string;
 begin
-  // Do nothing. Can be removed?
-  Result := EmptyStr;
+  // Note: TioDBBuilderStrategySqLite should NEVER call this method.
+  // SQLite has very limited ALTER TABLE support and does not support adding new columns in certain contexts.
+  // This method exists only to satisfy the abstract interface contract.
+  // If this exception is raised, it indicates a logic error in the Strategy layer.
+  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_AddField',
+    'SQLite does not support adding columns via ALTER TABLE in this context. '#13#13'Column additions are not supported by SQLite.');
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
