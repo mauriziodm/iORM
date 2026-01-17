@@ -50,7 +50,7 @@ uses
 type
   TioDBBuilderSqlGenFirebird = class(TioDBBuilderSqlGenBase, IioDBBuilderSqlGeneratorFirebird)
   private
-    function InternalCreateField(const AField: IioDBBuilderSchemaField): String;
+    function _BuildSQL_CreateOrAddField(const AField: IioDBBuilderSchemaField): String;
   protected
     function GetMaxSqlIdentifierLength: integer; override;
     function GetMinSqlIdentifierLength: integer; override;
@@ -69,7 +69,7 @@ type
     // ==========================================================
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
-    function BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string; override;
+    function BuildSQL_AddField(const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
@@ -159,9 +159,9 @@ begin
   end;
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_AddField(const AField: IioDBBuilderSchemaField): string;
 begin
-  Result := Format('ADD %s', [InternalCreateField(AField)]);
+  Result := Format('ADD %s', [_BuildSQL_CreateOrAddField(AField)]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
@@ -420,7 +420,7 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string;
 begin
-  Result := InternalCreateField(AField);
+  Result := _BuildSQL_CreateOrAddField(AField);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildCreateTableSql(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string;
@@ -468,7 +468,7 @@ begin
   Result := ');';
 end;
 
-function TioDBBuilderSqlGenFirebird.InternalCreateField(const AField: IioDBBuilderSchemaField): String;
+function TioDBBuilderSqlGenFirebird._BuildSQL_CreateOrAddField(const AField: IioDBBuilderSchemaField): String;
 var
   LDefault: string;
   LNotNull: string;

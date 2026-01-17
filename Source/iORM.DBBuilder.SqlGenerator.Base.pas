@@ -77,7 +77,7 @@ type
     // ==========================================================
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
-    function BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string; virtual; abstract;
+    function BuildSQL_AddField(const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildCreateFieldsSql(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string; virtual;

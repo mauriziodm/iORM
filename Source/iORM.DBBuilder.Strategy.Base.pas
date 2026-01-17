@@ -283,7 +283,7 @@ begin
         begin
           Script.Body.Add(SqlGenerator.BuildBeginAlterTableSql(ATable));
           Script.Body.IncIndentationLevel;
-          Script.Body.Add(SqlGenerator.BuildAddFieldSql(LField));
+          Script.Body.Add(SqlGenerator.BuildSQL_AddField(LField));
           Script.Body.DecIndentationLevel;
           Script.Body.Add(SqlGenerator.BuildEndAlterTableSql(ATable));
         end;

@@ -63,7 +63,7 @@ type
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
     function BuildCreateFieldSql(const AField: IioDBBuilderSchemaField): string; override;
-    function BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string; override;
+    function BuildSQL_AddField(const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldExistsSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
@@ -281,7 +281,7 @@ begin
   end;
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildAddFieldSql(const AField: IioDBBuilderSchemaField): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_AddField(const AField: IioDBBuilderSchemaField): string;
 begin
   // Do nothing. Can be removed?
   Result := EmptyStr;
