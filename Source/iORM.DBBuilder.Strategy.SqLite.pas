@@ -177,7 +177,7 @@ begin
   // SQLite limitation: PRAGMA table_info returns ALL columns - must filter manually
   // Execute query (returns all fields from the table)
   Result := False;
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildFieldExistsSql(ATable, AField), True);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FieldExists(ATable, AField), True);
 
   // Manual filtering: loop through all columns and find matching field name
   while not LQuery.Eof do

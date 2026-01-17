@@ -114,11 +114,11 @@ La base già ha `_ExecuteExistsQuery`. Assicurarsi che tutte le sottoclassi lo u
 
 ```pascal
 // In Firebird/SQLite, cambiare da:
-LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildFieldExistsSql(...), True);
+LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FieldExists(...), True);
 Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
 
 // A:
-Result := _ExecuteExistsQuery(SqlGenerator.BuildFieldExistsSql(...));
+Result := _ExecuteExistsQuery(SqlGenerator.BuildSQL_FieldExists(...));
 ```
 
 **Metodi da aggiornare:**
@@ -313,7 +313,7 @@ end;
 - [ ] `TranslateFieldType` - Map iORM field types → PostgreSQL types
 - [ ] `CreateDatabase` / `DatabaseExists` - PostgreSQL-specific
 - [ ] `BuildTableExistsSql` - Query `information_schema.tables`
-- [ ] `BuildFieldExistsSql` / `BuildFieldModifiedSql` - Query `information_schema.columns`
+- [ ] `BuildSQL_FieldExists` / `BuildFieldModifiedSql` - Query `information_schema.columns`
 - [ ] `BuildSQL_AddPK` - PostgreSQL PRIMARY KEY syntax
 - [ ] `BuildListAllIndexesSql` / `BuildListTableIndexesSql` - Query `pg_indexes`
 - [ ] `BuildListAllForeignKeysSql` / `BuildListTableForeignKeysSql` - Query `information_schema.table_constraints`

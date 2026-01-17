@@ -201,7 +201,7 @@ function TioDBBuilderStrategyFirebird.FieldExists(const ATable: IioDBBuilderSche
 var
   LQuery: IioQuery;
 begin
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildFieldExistsSql(ATable, AField), True);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FieldExists(ATable, AField), True);
   Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
 end;
 
