@@ -222,41 +222,21 @@ end;
 function TioDBBuilderSqlGenFirebird.BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable;
   const AField: IioDBBuilderSchemaField): string;
 var
-  LDefaultValue: string;
-  LTempSql: string;
   LTextBuilder: IioTextBuilder;
 begin
   LTextBuilder := NewTextBuilder;
 
-  // Type
-  if AField.IsFieldTypeAltered then
+  // Type/Length/Precision
+  if AField.IsFieldTypeAltered or AField.IsFieldLengthAltered or AField.IsFieldPrecisionAltered then
     LTextBuilder.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s TYPE %s;', [ATable.Name, AField.FieldName, Translate_SchemaField_To_FieldType(AField, True)]));  // True = include attributes
 
   // Default
   if AField.IsFieldDefaultAltered then
   begin
-    LDefaultValue := Translate_SchemaField_To_DefaultValue(AField);
-
-    if LDefaultValue.IsEmpty then
+    if not AField.FieldDefaultExists then
       LTextBuilder.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s DROP DEFAULT;', [ATable.Name, AField.FieldName]))
     else
-      LTextBuilder.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s SET DEFAULT %s;', [ATable.Name, AField.FieldName, LDefaultValue]));
-  end;
-
-  // Length
-  if AField.IsFieldLengthAltered or AField.IsFieldPrecisionAltered then
-  begin
-    // If length or precision was increased we can directly update the field with new settings
-    LTempSql := Format('ALTER TABLE %s ALTER COLUMN %s TYPE %s;', [ATable.Name, AField.FieldName, Translate_SchemaField_To_FieldType(AField, True)]);
-    // If length or precision was decreased, generate SQL as comments only (data loss risk).
-    // The user can uncomment and execute manually at their own risk.
-    if AField.IsFieldLengthDecreased or AField.IsFieldPrecisionDecreased then
-    begin
-      LTextBuilder.AddLine('-- >>> WARNING: Field recreation SQL commented out due to potential data loss.');
-      LTextBuilder.AddLine('-- >>> Uncomment and execute manually at your own risk:');
-      LTempSql := '-- ' + LTempSql;
-    end;
-    LTextBuilder.AddLine(LTempSql);
+      LTextBuilder.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s SET DEFAULT %s;', [ATable.Name, AField.FieldName, Translate_SchemaField_To_DefaultValue(AField)]));
   end;
 
   // NotNull

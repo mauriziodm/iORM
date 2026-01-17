@@ -787,44 +787,22 @@ end;
 
 constructor ioIndex.Create(const AIndexName: String; ACommaSepFieldList: String; const AOrientation: TioIndexOrientation; const AUnique: Boolean);
 begin
-  // Carlo Marona (2025-10-21): added check for empty index name
-  if AIndexName.IsEmpty then
-    raise EioGenericException.Create(ClassName, 'Create', 'No index name specified.');
+  inherited Create;
 
-  Create(ACommaSepFieldList, AOrientation, AUnique);
   FName := AIndexName;
-//  FCommaSepFieldList := ACommaSepFieldList;
-//  FOrientation := AOrientation;
-//  FUnique := AUnique;
+  FCommaSepFieldList := ACommaSepFieldList;
+  FOrientation := AOrientation;
+  FUnique := AUnique;
 end;
 
 constructor ioIndex.Create(ACommaSepFieldList: String; const AOrientation: TioIndexOrientation; const AUnique: Boolean);
 begin
-  // Carlo Marona (2025-11-18): added check for empty fields list
-  if ACommaSepFieldList.IsEmpty then
-    raise EioGenericException.Create(ClassName, 'Create', 'No fields list specified.');
-
-  // Carlo Marona (2025-10-21)
-  Create(AOrientation, AUnique);
-//  FName := EmptyStr;
-  //FExplicitName := False;
-  FCommaSepFieldList := ACommaSepFieldList;
-//  FOrientation := AOrientation;
-//  FUnique := AUnique;
-
-//  Self.Create('', ACommaSepFieldList, AOrientation, AUnique);
+  Create(String.Empty, ACommaSepFieldList, AOrientation, AUnique);
 end;
 
 constructor ioIndex.Create(const AOrientation: TioIndexOrientation; const AUnique: Boolean);
 begin
-  // Carlo Marona (2025-10-21)
-  inherited Create;
-  FName := EmptyStr;
-  FCommaSepFieldList := EmptyStr;
-  FOrientation := AOrientation;
-  FUnique := AUnique;
-
-//  Self.Create('', '', AOrientation, AUnique);
+  Create(String.Empty, String.Empty, AOrientation, AUnique);
 end;
 
 function ioIndex.GetHasExplicitName: boolean;

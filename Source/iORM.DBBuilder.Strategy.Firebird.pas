@@ -36,6 +36,7 @@ type
     function IsFieldPrecisionChanged(const AOldFieldPrecision, ANewFieldPrecision: Smallint; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
     function IsFieldDecimalsChanged(const AOldFieldDecimals, ANewFieldDecimals: Smallint; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
     function IsBlobSubTypeChanged(const AOldBlobSubType, ANewBlobSubType: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean; virtual;
+    function IsFieldDefaultChanged(const AOldFieldDefault, ANewFieldDefault: String; const AField: IioDBBuilderSchemaField): Boolean; virtual;
     // Indexes
     procedure DropIndexes; override;
     function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
@@ -272,11 +273,7 @@ begin
   end;
 
   // Verify if DEFAULT setting of the field is changed
-  if not SameText(LOldFieldDefault, LNewFieldDefault) then
-  begin
-    AField.AddAltered(alFieldDefault);
-    Result := True;
-  end;
+  Result := Result or IsFieldDefaultChanged(LOldFieldDefault, LNewFieldDefault, AField);
 
   // Verify if NotNull is changed (warning cannot change not null value with firebird)
   // Note: The last parameter set the NotNull change as permitted (firebird's alter table
@@ -460,6 +457,14 @@ begin
   end;
 end;
 
+function TioDBBuilderStrategyFirebird.IsFieldDefaultChanged(const AOldFieldDefault, ANewFieldDefault: String;
+  const AField: IioDBBuilderSchemaField): Boolean;
+begin
+  Result := not SameText(AOldFieldDefault, ANewFieldDefault);
+  if Result then
+    AField.AddAltered(alFieldDefault);
+end;
+
 function TioDBBuilderStrategyFirebird.IsFieldDecimalsChanged(const AOldFieldDecimals, ANewFieldDecimals: Smallint;
   const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean;
 begin
@@ -480,9 +485,10 @@ begin
     if ANewFieldLength > AOldFieldLength then
       AField.AddAltered(alFieldLengthIncreased)
     else
+    begin
       AField.AddAltered(alFieldLengthDecreased);
-
-    WarningNewValueLessThanTheOldOne('field length', AOldFieldLength, ANewFieldLength, AField, ATable);
+      WarningNewValueLessThanTheOldOne('field length', AOldFieldLength, ANewFieldLength, AField, ATable);
+    end;
   end;
 end;
 

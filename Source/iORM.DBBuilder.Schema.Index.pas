@@ -51,9 +51,8 @@ implementation
 uses
   System.SysUtils,
   System.StrUtils,
-  System.Classes
-
-  ;
+  System.Classes,
+  iORM.Exceptions;
 
 
 { TioDBBuilderSchemaIndex }
@@ -66,6 +65,9 @@ end;
 constructor TioDBBuilderSchemaIndex.Create(const AIndexAttr: ioIndex);
 begin
   inherited Create;
+
+  if AIndexAttr.CommaSepFieldList.IsEmpty then
+    raise EioDBBuilderException.Create(Self.ClassName, 'Create', 'Cannot create index: no fields list specified.');
 
   FStatus := stClean;
   FHasExplicitName := AIndexAttr.HasExplicitName;

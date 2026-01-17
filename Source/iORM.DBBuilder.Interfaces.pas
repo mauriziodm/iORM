@@ -310,6 +310,7 @@ type
     /// </param>
     /// <returns>The database-specific type name or full type specification.</returns>
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String;
+    function Translate_SchemaField_To_DefaultValue(const AField: IioDBBuilderSchemaField): String;
 
     // ==========================================================
     // INDEX RELATED METHODS
