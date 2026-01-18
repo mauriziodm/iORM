@@ -61,7 +61,6 @@ type
     function BuildAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
     function BuildBeginAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
-    function BuildCreateTableSql(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string; override;
     function BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildEndCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildTableExistsSql(const ATableName: string): string; override;
@@ -424,24 +423,6 @@ end;
 function TioDBBuilderSqlGenFirebird.BuildSQL_CreateField(const AField: IioDBBuilderSchemaField): string;
 begin
   Result := _BuildSQL_CreateOrAddField(AField);
-end;
-
-function TioDBBuilderSqlGenFirebird.BuildCreateTableSql(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string;
-var
-  LTextBuilder: IioTextBuilder;
-begin
-  LTextBuilder := NewTextBuilder;
-
-  LTextBuilder.
-    Add(BuildBeginCreateTableSql(ATable)).
-    IncIndent.
-    Add(BuildSQL_CreateFields(ATable, AIndentation)).
-    DecIndent.
-    Add(BuildEndCreateTableSql(ATable)).
-    AddEmptyLine.
-    Add(BuildSQL_AddPK(ATable));
-
-  Result := LTextBuilder.Text;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string;

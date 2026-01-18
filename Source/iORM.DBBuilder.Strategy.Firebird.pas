@@ -126,8 +126,6 @@ begin
   if not Assigned(ATable) then
     raise EioInvalidArgumentException.Create(ClassName, 'CreateTable', 'ATable is not assigned.');
 
-  Script.Body.AddTitle(Format('Creating table ''%s''', [ATable.Name]));
-
   if (Schema.Status = stCreate) or not SequenceExists(ATable.GetSequenceName) then
     CreateTableSequence(ATable);
 
