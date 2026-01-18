@@ -283,32 +283,49 @@ function TioDBBuilderSqlGenFirebird.BuildFieldModifiedSql(const ATable: IioDBBui
 var
   LTextBuilder: IioTextBuilder;
 begin
+  // Note: Most field metadata (type, length, precision, scale) is stored in RDB$FIELDS (f),
+  // not in RDB$RELATION_FIELDS (rf). Only NULL_FLAG and DEFAULT_SOURCE are in rf.
+  // The scale in Firebird is stored as a negative number, so we use ABS() to normalize it.
+  // For DECIMAL/NUMERIC detection: types 7, 8, 16 with scale < 0 indicate decimal types,
+  // and the subtype distinguishes NUMERIC (1) from DECIMAL (2).
+  // For BOOLEAN (type 23, Firebird 3.0+): we map it to INTEGER for ORM compatibility.
   LTextBuilder := NewTextBuilder;
   LTextBuilder
     .AddLine('SELECT rf.RDB$NULL_FLAG AS field_not_null,')
-    .AddLine('  rf.RDB$CHARACTER_LENGTH AS field_length,')
-    .AddLine('  rf.RDB$FIELD_PRECISION AS field_precision,')
-    .AddLine('  rf.RDB$FIELD_SCALE AS field_scale,')
-    .AddLine('  CASE rf.RDB$FIELD_TYPE ')
-    .AddLine('    WHEN 261 THEN ''BLOB''')
-    .AddLine('    WHEN 37 THEN ''VARCHAR''')
-    .AddLine('    WHEN 14 THEN ''CHAR''')
-    .AddLine('    WHEN 8 THEN ''INTEGER''')
-    .AddLine('    WHEN 7 THEN ''SMALLINT''')
-    .AddLine('    WHEN 16 THEN ''INT64''')
-    .AddLine('    WHEN 27 THEN ''DOUBLE''')
-    .AddLine('    WHEN 10 THEN ''FLOAT''')
-    .AddLine('    WHEN 12 THEN ''DATE''')
-    .AddLine('    WHEN 13 THEN ''TIME''')
-    .AddLine('    WHEN 35 THEN ''TIMESTAMP''')
+    .AddLine('  f.RDB$CHARACTER_LENGTH AS field_length,')
+    .AddLine('  f.RDB$FIELD_PRECISION AS field_precision,')
+    .AddLine('  ABS(f.RDB$FIELD_SCALE) AS field_scale,')
+    .AddLine('  CASE')
+    .AddLine('    WHEN f.RDB$FIELD_TYPE = 261 THEN ''BLOB''')
+    .AddLine('    WHEN f.RDB$FIELD_TYPE = 37 THEN ''VARCHAR''')
+    .AddLine('    WHEN f.RDB$FIELD_TYPE = 14 THEN ''CHAR''')
+    // DECIMAL/NUMERIC: types 7, 8, 16 with scale < 0, subtype 1=NUMERIC, 2=DECIMAL
+    .AddLine('    WHEN f.RDB$FIELD_TYPE IN (7, 8, 16) AND COALESCE(f.RDB$FIELD_SCALE, 0) < 0 THEN')
+    .AddLine('      CASE COALESCE(f.RDB$FIELD_SUB_TYPE, 0)')
+    .AddLine('        WHEN 1 THEN ''NUMERIC''')
+    .AddLine('        WHEN 2 THEN ''DECIMAL''')
+    .AddLine('        ELSE ''DECIMAL''')
+    .AddLine('      END')
+    // Integer types (scale = 0)
+    // Note: All integer types (SMALLINT, INTEGER, BIGINT) are mapped to 'INTEGER'
+    // for ORM compatibility, since iORM uses ioMdInteger for all integer types
+    .AddLine('    WHEN f.RDB$FIELD_TYPE IN (7, 8, 16) THEN ''INTEGER''')
+    // Floating point types: both FLOAT (10) and DOUBLE PRECISION (27) are mapped
+    // to 'FLOAT' for ORM compatibility, since iORM uses ioMdFloat for both
+    .AddLine('    WHEN f.RDB$FIELD_TYPE IN (10, 27) THEN ''FLOAT''')
+    .AddLine('    WHEN f.RDB$FIELD_TYPE = 12 THEN ''DATE''')
+    .AddLine('    WHEN f.RDB$FIELD_TYPE = 13 THEN ''TIME''')
+    .AddLine('    WHEN f.RDB$FIELD_TYPE = 35 THEN ''TIMESTAMP''')
+    // BOOLEAN (Firebird 3.0+): map to INTEGER for ORM compatibility
+    .AddLine('    WHEN f.RDB$FIELD_TYPE = 23 THEN ''INTEGER''')
     .AddLine('    ELSE ''UNKNOWN''')
     .AddLine('  END AS field_type,')
-    .AddLine('  fs.RDB$FIELD_SUB_TYPE AS field_subtype,')
-    .AddLine('  COALESCE(rf.RDB$DEFAULT_SOURCE, fs.RDB$DEFAULT_SOURCE) AS field_default')
+    .AddLine('  f.RDB$FIELD_SUB_TYPE AS field_subtype,')
+    .AddLine('  CAST(COALESCE(rf.RDB$DEFAULT_SOURCE, f.RDB$DEFAULT_SOURCE) AS VARCHAR(255)) AS field_default')
     .AddLine('FROM RDB$RELATION_FIELDS rf')
-    .AddLine('LEFT JOIN RDB$FIELDS fs ON rf.RDB$FIELD_SOURCE = fs.RDB$FIELD_NAME')
-    .AddLine(Format('WHERE rf.RDB$RELATION_NAME = ''%s''', [ATable.Name.ToUpper]))
-    .AddLine(Format('  AND rf.RDB$FIELD_NAME = ''%s''', [AField.FieldName.ToUpper]));
+    .AddLine('LEFT JOIN RDB$FIELDS f ON rf.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME')
+    .AddLine(Format('WHERE UPPER(rf.RDB$RELATION_NAME) = UPPER(''%s'')', [ATable.Name]))
+    .AddLine(Format('  AND UPPER(rf.RDB$FIELD_NAME) = UPPER(''%s'')', [AField.FieldName]));
   Result := LTextBuilder.Text;
 end;
 

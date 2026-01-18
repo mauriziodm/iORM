@@ -224,7 +224,8 @@ var
 
   function IsDecimalOrNumeric: boolean;
   begin
-    Result := (LOldFieldType = 'INT64') and ((LOldFieldSubType = '1') or (LOldFieldSubType = '2'));
+    // The query now returns 'DECIMAL' or 'NUMERIC' directly for decimal types
+    Result := (LOldFieldType = 'DECIMAL') or (LOldFieldType = 'NUMERIC');
   end;
 
 begin
