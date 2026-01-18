@@ -64,7 +64,7 @@ type
     function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_CreateField(const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
-    function BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
+    function BuildSQL_FieldList(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; override;
     // ==========================================================
     // INDEX RELATED METHODS
@@ -181,7 +181,7 @@ begin
   Result := Format('pragma table_info(''%s'')', [ATable.Name]);
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildFieldModifiedSql(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_FieldList(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
 begin
   // SQLite limitation: PRAGMA table_info returns ALL columns for a table - cannot filter by column name
   // The AField parameter is accepted for interface consistency but IGNORED in the query

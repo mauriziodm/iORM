@@ -239,7 +239,7 @@ begin
   LNewFieldDefault := SqlGenerator.Translate_SchemaField_To_DefaultValue(AField);
 
   // Create and open the query for old field informations
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildFieldModifiedSql(ATable, AField), True);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FieldList(ATable, AField), True);
 
   // Field not found
   if LQuery.Eof then
