@@ -72,7 +72,7 @@ type
     function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_CreateField(const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
-    function BuildSQL_FieldList(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
+    function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; override;
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; override;
     // ==========================================================
     // INDEX RELATED METHODS
@@ -279,10 +279,14 @@ begin
   Result := LTextBuilder.Text;
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildSQL_FieldList(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string;
 var
   LTextBuilder: IioTextBuilder;
 begin
+  // Returns SQL to retrieve detailed field metadata from the database
+  // ATableName is required - returns all fields for that table
+  // If AFieldName is also specified, returns details for the specific field only
+  //
   // Note: Most field metadata (type, length, precision, scale) is stored in RDB$FIELDS (f),
   // not in RDB$RELATION_FIELDS (rf). Only NULL_FLAG and DEFAULT_SOURCE are in rf.
   // The scale in Firebird is stored as a negative number, so we use ABS() to normalize it.
@@ -324,8 +328,12 @@ begin
     .AddLine('  CAST(COALESCE(rf.RDB$DEFAULT_SOURCE, f.RDB$DEFAULT_SOURCE) AS VARCHAR(255)) AS field_default')
     .AddLine('FROM RDB$RELATION_FIELDS rf')
     .AddLine('LEFT JOIN RDB$FIELDS f ON rf.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME')
-    .AddLine(Format('WHERE UPPER(rf.RDB$RELATION_NAME) = UPPER(''%s'')', [ATable.Name]))
-    .AddLine(Format('  AND UPPER(rf.RDB$FIELD_NAME) = UPPER(''%s'')', [AField.FieldName]));
+    .AddLine(Format('WHERE UPPER(rf.RDB$RELATION_NAME) = UPPER(''%s'')', [ATableName]));
+
+  // Add field filter if specified
+  if not AFieldName.IsEmpty then
+    LTextBuilder.AddLine(Format('  AND UPPER(rf.RDB$FIELD_NAME) = UPPER(''%s'')', [AFieldName]));
+
   Result := LTextBuilder.Text;
 end;
 

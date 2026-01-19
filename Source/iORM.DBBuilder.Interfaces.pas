@@ -306,7 +306,9 @@ type
     function BuildSQL_CreateFields(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     // Returns SQL to retrieve detailed field metadata (type, length, precision, scale, default value, etc.) from the database
-    function BuildSQL_FieldList(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
+    // ATableName is required - returns all fields for that table
+    // If AFieldName is also specified, returns details for the specific field only
+    function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string;
     /// <summary>
     /// Translates an iORM field type to the database-specific SQL type name.
     /// </summary>

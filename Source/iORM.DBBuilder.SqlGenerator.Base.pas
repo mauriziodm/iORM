@@ -82,7 +82,9 @@ type
     function BuildSQL_CreateFields(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string; virtual;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     // Returns SQL to retrieve detailed field metadata (type, length, precision, scale, default value, etc.) from the database
-    function BuildSQL_FieldList(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
+    // ATableName is required - returns all fields for that table
+    // If AFieldName is also specified, returns details for the specific field only
+    function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; virtual; abstract;
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; virtual; abstract;
     function Translate_SchemaField_To_DefaultValue(const AField: IioDBBuilderSchemaField): string; virtual;
 
