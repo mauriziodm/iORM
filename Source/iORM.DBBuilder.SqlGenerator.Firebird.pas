@@ -263,23 +263,7 @@ begin
   // NotNull - Version-specific handling
   // Note: SET NOT NULL & DROP NOT NULL available only from Firebird 3.0+
   if AField.IsFieldNotNullAltered then
-  begin
-    if SupportsSetDropNotNull then
-    begin
-      // Firebird 3.0+: Use SET/DROP NOT NULL syntax
-      LTextBuilder.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s %s NOT NULL;', [ATable.Name, AField.FieldName, IfThen(AField.FieldNotNull, 'SET', 'DROP')]));
-    end
-    else
-    begin
-      // Firebird 2.0-2.5: NOT NULL modification not supported
-      // Generate warning comment instead of SQL that would fail
-      LTextBuilder.AddLine(Format('-- WARNING: Cannot alter NOT NULL constraint on Firebird %s',
-        [FFirebirdVersion]));
-      LTextBuilder.AddLine(Format('--          Table: %s, Column: %s, Desired NOT NULL: %s',
-        [ATable.Name, AField.FieldName, BoolToStr(AField.FieldNotNull, True)]));
-      LTextBuilder.AddLine('--          Manual intervention required: Recreate table or update RDB$RELATION_FIELDS');
-    end;
-  end;
+    LTextBuilder.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s %s NOT NULL;', [ATable.Name, AField.FieldName, IfThen(AField.FieldNotNull, 'SET', 'DROP')]));
 
   Result := LTextBuilder.Text;
 end;
