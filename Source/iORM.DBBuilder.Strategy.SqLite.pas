@@ -233,10 +233,10 @@ begin
       LNewFieldType := SqlGenerator.Translate_SchemaField_To_FieldType(AField, False);  // False = do NOT include attributes (only base type)
 
       // Verify if fieldType has been changed and check type affinity
-      Result := Result or IsFieldTypeChanged(LOldFieldType, LNewFieldType, AField, ATable);
+      Result := Result or IsFieldTypeChanged(ATable, AField, LOldFieldType, LNewFieldType);
 
       // Verify if NotNull is changed
-      Result := Result or IsFieldNotNullChanged(LOldFieldNotNull, AField.FieldNotNull, AField, ATable, True);
+      Result := Result or IsFieldNotNullChanged(ATable, AField, LOldFieldNotNull, AField.FieldNotNull, True);
 
       // Exit
       Exit;

@@ -72,8 +72,8 @@ type
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
     // Field change detection methods (common to all databases)
     function GetInvalidTypeConversions: string; virtual; abstract;
-    function IsFieldTypeChanged(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
-    function IsFieldNotNullChanged(const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean; virtual;
+    function IsFieldTypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String): Boolean; virtual;
+    function IsFieldNotNullChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AIsPermitted: Boolean): Boolean; virtual;
     // Indexes
     procedure AddOrAlterIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure CreateIndexes; overload; virtual;
@@ -90,9 +90,9 @@ type
     function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
     function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
     // Warnings
-    procedure WarningTypeAffinity(const AOldFieldType, ANewFieldType: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AInvalidTypeConversions: string); virtual;
-    procedure WarningNotNullCannotBeChanged(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
-    procedure WarningNullBecomesNotNull(const AOldFieldNotNull: Boolean; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure WarningTypeAffinity(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String; const AInvalidTypeConversions: string); virtual;
+    procedure WarningNotNullCannotBeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldNotNull: Boolean); virtual;
+    procedure WarningNullBecomesNotNull(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldNotNull: Boolean); virtual;
 
     procedure GenerateDatabaseObjects(const Create: boolean); virtual; abstract;
 
@@ -396,8 +396,8 @@ begin
   Result := FSqlGenerator;
 end;
 
-procedure TioDBBuilderStrategyBase.WarningTypeAffinity(const AOldFieldType, ANewFieldType: String;
-  const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AInvalidTypeConversions: string);
+procedure TioDBBuilderStrategyBase.WarningTypeAffinity(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
+  const AOldFieldType, ANewFieldType: String; const AInvalidTypeConversions: string);
 var
   LRequiredConversion: String;
 begin
@@ -407,16 +407,16 @@ begin
       [ATable.Name, AField.FieldName, AOldFieldType, ANewFieldType]));
 end;
 
-procedure TioDBBuilderStrategyBase.WarningNotNullCannotBeChanged(const AOldFieldNotNull: Boolean;
-  const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.WarningNotNullCannotBeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
+  const AOldFieldNotNull: Boolean);
 begin
   if AField.FieldNotNull <> AOldFieldNotNull then
     Schema.Warnings.Add(Format('Table ''%s'' field ''%s'' --> The not null setting cannot be changed automatically',
       [ATable.Name, AField.FieldName]));
 end;
 
-procedure TioDBBuilderStrategyBase.WarningNullBecomesNotNull(const AOldFieldNotNull: Boolean;
-  const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.WarningNullBecomesNotNull(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
+  const AOldFieldNotNull: Boolean);
 begin
   if AField.FieldNotNull and (not AOldFieldNotNull) and (not AField.FieldDefaultExists) then
     Schema.Warnings.Add
@@ -424,28 +424,28 @@ begin
       [ATable.Name, AField.FieldName]));
 end;
 
-function TioDBBuilderStrategyBase.IsFieldTypeChanged(const AOldFieldType, ANewFieldType: String;
-  const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean;
+function TioDBBuilderStrategyBase.IsFieldTypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
+  const AOldFieldType, ANewFieldType: String): Boolean;
 begin
   Result := not SameText(AOldFieldType, ANewFieldType);
   if Result then
   begin
     AField.AddAltered(alFieldType);
-    WarningTypeAffinity(AOldFieldType, ANewFieldType, AField, ATable, GetInvalidTypeConversions);
+    WarningTypeAffinity(ATable, AField, AOldFieldType, ANewFieldType, GetInvalidTypeConversions);
   end;
 end;
 
-function TioDBBuilderStrategyBase.IsFieldNotNullChanged(const AOldFieldNotNull, ANewFieldNotNull: Boolean;
-  const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean;
+function TioDBBuilderStrategyBase.IsFieldNotNullChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
+  const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AIsPermitted: Boolean): Boolean;
 begin
   Result := AOldFieldNotNull <> ANewFieldNotNull;
   if Result then
   begin
     AField.AddAltered(alFieldNotNull);
     if AIsPermitted then
-      WarningNullBecomesNotNull(AOldFieldNotNull, AField, ATable)
+      WarningNullBecomesNotNull(ATable, AField, AOldFieldNotNull)
     else
-      WarningNotNullCannotBeChanged(AOldFieldNotNull, AField, ATable);
+      WarningNotNullCannotBeChanged(ATable, AField, AOldFieldNotNull);
   end;
 end;
 

@@ -257,7 +257,7 @@ begin
     LOldFieldDefault := LOldFieldDefault.Substring(8).Trim;
 
   // Verify if fieldType has been changed and check type affinity
-  Result := Result or IsFieldTypeChanged(LOldFieldType, LNewFieldType, AField, ATable);
+  Result := Result or IsFieldTypeChanged(ATable, AField, LOldFieldType, LNewFieldType);
 
   // Verify if FieldLength is changed
   if 'VARCHAR,CHAR'.Contains(LNewFieldType) or 'VARCHAR,CHAR'.Contains(LOldFieldType) then
@@ -278,7 +278,7 @@ begin
   // Note: The last parameter indicates whether NOT NULL changes are supported.
   // We check this dynamically based on Firebird version (SET NOT NULL / DROP NOT NULL
   // is only supported from Firebird 3.0+). This controls whether blocking warnings are generated.
-  Result := Result or IsFieldNotNullChanged(LOldFieldNotNull, AField.FieldNotNull, AField, ATable, FBSqlGenerator.SupportsSetDropNotNull);
+  Result := Result or IsFieldNotNullChanged(ATable, AField, LOldFieldNotNull, AField.FieldNotNull, FBSqlGenerator.SupportsSetDropNotNull);
 
   // Verify if blob subtype is changed
   // Note: The last parameter set the blob sub-type change as NOT permitted in firebrd RDBMS

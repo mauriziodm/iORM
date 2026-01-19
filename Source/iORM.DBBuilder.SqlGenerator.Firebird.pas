@@ -267,8 +267,7 @@ begin
     if SupportsSetDropNotNull then
     begin
       // Firebird 3.0+: Use SET/DROP NOT NULL syntax
-      LTextBuilder.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s %s NOT NULL;',
-        [ATable.Name, AField.FieldName, IfThen(AField.FieldNotNull, 'SET', 'DROP')]));
+      LTextBuilder.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s %s NOT NULL;', [ATable.Name, AField.FieldName, IfThen(AField.FieldNotNull, 'SET', 'DROP')]));
     end
     else
     begin
