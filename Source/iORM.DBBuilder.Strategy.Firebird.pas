@@ -239,7 +239,7 @@ begin
   LNewFieldDefault := SqlGenerator.Translate_SchemaField_To_DefaultValue(AField);
 
   // Create and open the query for old field informations
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FieldList(ATable, AField), True);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FieldList(ATable.Name, AField.FieldName), True);
 
   // Field not found
   if LQuery.Eof then
@@ -324,13 +324,13 @@ begin
 
   // Check ON UPDATE action
   LOldOnUpdate := LQuery.Fields.FieldByName('on_update').AsString.Trim.ToUpper;
-  LNewOnUpdate := SqlGenerator.TranslateFKAction(AForeignKey, AForeignKey.OnUpdateAction).ToUpper;
+  LNewOnUpdate := SqlGenerator.Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnUpdateAction).ToUpper;
   if not SameText(LOldOnUpdate, LNewOnUpdate) then
     Exit(True);
 
   // Check ON DELETE action
   LOldOnDelete := LQuery.Fields.FieldByName('on_delete').AsString.Trim.ToUpper;
-  LNewOnDelete := SqlGenerator.TranslateFKAction(AForeignKey, AForeignKey.OnDeleteAction).ToUpper;
+  LNewOnDelete := SqlGenerator.Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnDeleteAction).ToUpper;
   if not SameText(LOldOnDelete, LNewOnDelete) then
     Exit(True);
 end;

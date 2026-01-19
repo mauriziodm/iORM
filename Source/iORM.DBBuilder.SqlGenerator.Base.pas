@@ -61,7 +61,7 @@ type
     function NewTextBuilder: IioTextBuilder; overload;
     function NewTextBuilder(const AIndentation: TioIndentation): IioTextBuilder; overload;
     function ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
-    function TranslateFKAction(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
+    function Translate_SchemaFK_To_FKvalue(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
 
     // Database
     procedure CreateDatabase; virtual; abstract;
@@ -160,7 +160,7 @@ uses
 
 { TioDBBuilderSqlGenBase }
 
-function TioDBBuilderSqlGenBase.TranslateFKAction(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
+function TioDBBuilderSqlGenBase.Translate_SchemaFK_To_FKvalue(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
 begin
   case AFKAction of
     fkUnspecified, fkNoAction:

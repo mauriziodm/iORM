@@ -216,7 +216,7 @@ begin
   // SQLite limitation: PRAGMA table_info returns ALL columns - must filter manually
   // Execute query (returns all fields from the table)
   Result := False;
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FieldList(ATable, nil), True);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FieldList(ATable.Name), True);
 
   // Manual filtering: loop through all columns to find the target field
   while not LQuery.Eof do
@@ -368,14 +368,14 @@ begin
       // Check ON UPDATE action
       // Note: PRAGMA foreign_key_list returns actions as: NO ACTION, RESTRICT, CASCADE, SET NULL, SET DEFAULT
       LOldOnUpdate := LQuery.Fields.FieldByName('on_update').AsString.ToUpper;
-      LNewOnUpdate := SqlGenerator.TranslateFKAction(AForeignKey, AForeignKey.OnUpdateAction).ToUpper;
+      LNewOnUpdate := SqlGenerator.Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnUpdateAction).ToUpper;
       if not SameText(LOldOnUpdate, LNewOnUpdate) then
         Exit(True);
 
       // Check ON DELETE action
       // Note: PRAGMA foreign_key_list returns actions as: NO ACTION, RESTRICT, CASCADE, SET NULL, SET DEFAULT
       LOldOnDelete := LQuery.Fields.FieldByName('on_delete').AsString.ToUpper;
-      LNewOnDelete := SqlGenerator.TranslateFKAction(AForeignKey, AForeignKey.OnDeleteAction).ToUpper;
+      LNewOnDelete := SqlGenerator.Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnDeleteAction).ToUpper;
       if not SameText(LOldOnDelete, LNewOnDelete) then
         Exit(True);
 

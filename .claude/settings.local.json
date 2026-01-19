@@ -18,7 +18,13 @@
       "WebSearch",
       "WebFetch(domain:www.codegenes.net)",
       "WebFetch(domain:sqlite.org)",
-      "Bash(git -C \"C:\\\\delphi\\\\tools\\\\iORM\" log --oneline -10)"
+      "Bash(git -C \"C:\\\\delphi\\\\tools\\\\iORM\" log --oneline -10)",
+      "Bash(cd:*)",
+      "Bash(git -C \"C:\\\\delphi\\\\tools\\\\iORM\" status)",
+      "Bash(git -C \"C:\\\\delphi\\\\tools\\\\iORM\" diff)",
+      "Bash(git -C \"C:\\\\delphi\\\\tools\\\\iORM\" log --oneline -5)",
+      "Bash(git -C \"C:\\\\delphi\\\\tools\\\\iORM\" add Source/iORM.DBBuilder.SqlGenerator.Firebird.pas Source/iORM.DBBuilder.Strategy.Firebird.pas)",
+      "Bash(git -C \"C:\\\\delphi\\\\tools\\\\iORM\" commit -m \"Rename fs alias to f in Firebird BuildFieldModifiedSql\")"
     ]
   }
 }
