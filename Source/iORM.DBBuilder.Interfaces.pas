@@ -292,11 +292,11 @@ type
     function DatabaseExists: Boolean;
 
     // Tables related methods
-    function BuildBeginAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
-    function BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string;
-    function BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
-    function BuildEndCreateTableSql(const ATable: IioDBBuilderSchemaTable): string;
-    function BuildTableExistsSql(const ATableName: string): string;
+    function BuildSQL_BeginAlterTable(const ATable: IioDBBuilderSchemaTable): string;
+    function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string;
+    function BuildSQL_EndAlterTable(const ATable: IioDBBuilderSchemaTable): string;
+    function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string;
+    function BuildSQL_TableExists(const ATableName: string): string;
 
     // ==========================================================
     // FIELD RELATED METHODS

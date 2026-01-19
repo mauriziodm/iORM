@@ -157,7 +157,7 @@ end;
 
 procedure TioDBBuilderStrategySqLite.CreateTable(const ATable: IioDBBuilderSchemaTable);
 begin
-  Script.Body.Add(SqlGenerator.BuildBeginCreateTableSql(ATable));
+  Script.Body.Add(SqlGenerator.BuildSQL_BeginCreateTable(ATable));
   Script.Body.IncIndentationLevel;
   Script.Body.Add(SqlGenerator.BuildSQL_CreateFields(ATable, Script.Body.CurrentIndentation), False);
 
@@ -165,7 +165,7 @@ begin
     CreateTableForeignKeys(ATable);
 
   Script.Body.DecIndentationLevel;
-  Script.Body.Add(SqlGenerator.BuildEndCreateTableSql(ATable));
+  Script.Body.Add(SqlGenerator.BuildSQL_EndCreateTable(ATable));
 end;
 
 procedure TioDBBuilderStrategySqLite.DropIndexes;

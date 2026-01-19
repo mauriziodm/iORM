@@ -54,16 +54,21 @@ type
   protected
     function GetMaxSqlIdentifierLength: integer; override;
     function GetMinSqlIdentifierLength: integer; override;
-    // Database
+
+    // ==========================================================
+    // FIELD RELATED METHODS
+    // ----------------------------------------------------------
     procedure CreateDatabase; override;
     function DatabaseExists: Boolean; override;
-    // Tables
-    function BuildAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
-    function BuildBeginAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
-    function BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
-    function BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
-    function BuildEndCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
-    function BuildTableExistsSql(const ATableName: string): string; override;
+
+    // ==========================================================
+    // FIELD RELATED METHODS
+    // ----------------------------------------------------------
+    function BuildSQL_BeginAlterTable(const ATable: IioDBBuilderSchemaTable): string; override;
+    function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
+    function BuildSQL_EndAlterTable(const ATable: IioDBBuilderSchemaTable): string; override;
+    function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
+    function BuildSQL_TableExists(const ATableName: string): string; override;
 
     // ==========================================================
     // FIELD RELATED METHODS
@@ -246,19 +251,12 @@ begin
   Result := LTextBuilder.Text;
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildAlterTAbleSql(const ATable: IioDBBuilderSchemaTable): string;
-begin
-  BuildBeginAlterTableSql(ATable);
-  // Build fields
-  BuildEndAlterTableSql(ATable);
-end;
-
-function TioDBBuilderSqlGenFirebird.BuildBeginAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_BeginAlterTable(const ATable: IioDBBuilderSchemaTable): string;
 begin
   Result := Format('ALTER TABLE %s', [ATable.Name]);
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string;
 begin
   Result := Format('CREATE TABLE %s (', [ATable.Name]);
 end;
@@ -428,7 +426,7 @@ begin
   Result := Format('select count(*) from rdb$generators where (UPPER(rdb$generator_name) = UPPER(''%s'')) and (RDB$SYSTEM_FLAG = 0)', [ASequenceName]);
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildTableExistsSql(const ATableName: string): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_TableExists(const ATableName: string): string;
 begin
   // Carlo Marona (2025-10-15): Added condition to exclude system relations
   Result := Format('select RDB$RELATION_NAME from RDB$RELATIONS where (UPPER(RDB$RELATION_NAME) = UPPER(''%s'')) and (RDB$SYSTEM_FLAG = 0)',
@@ -467,12 +465,12 @@ begin
   Result := Format('DROP SEQUENCE %s;', [ASequenceName]);
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_EndAlterTable(const ATable: IioDBBuilderSchemaTable): string;
 begin
   Result := ';';
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildEndCreateTableSql(const ATable: IioDBBuilderSchemaTable): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string;
 begin
   Result := ');';
 end;

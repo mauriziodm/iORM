@@ -63,15 +63,20 @@ type
     function ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
     function Translate_SchemaFK_To_FKvalue(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
 
-    // Database
+    // ==========================================================
+    // FIELD RELATED METHODS
+    // ----------------------------------------------------------
     procedure CreateDatabase; virtual; abstract;
     function DatabaseExists: Boolean; virtual; abstract;
-    // Tables
-    function BuildBeginAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
-    function BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
-    function BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
-    function BuildEndCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
-    function BuildTableExistsSql(const ATableName: string): string; virtual; abstract;
+
+    // ==========================================================
+    // FIELD RELATED METHODS
+    // ----------------------------------------------------------
+    function BuildSQL_BeginAlterTable(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
+    function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
+    function BuildSQL_EndAlterTable(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
+    function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
+    function BuildSQL_TableExists(const ATableName: string): string; virtual; abstract;
 
     // ==========================================================
     // FIELD RELATED METHODS

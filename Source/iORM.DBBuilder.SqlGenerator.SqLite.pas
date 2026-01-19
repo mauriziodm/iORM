@@ -47,15 +47,21 @@ uses
 type
   TioDBBuilderSqlGenSQLite = class(TioDBBuilderSqlGenBase)
   protected
-    // Database
+
+    // ==========================================================
+    // FIELD RELATED METHODS
+    // ----------------------------------------------------------
     procedure CreateDatabase; override;
     function DatabaseExists: Boolean; override;
-    // Tables
-    function BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
-    function BuildEndCreateTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
-    function BuildBeginAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
-    function BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string; override;
-    function BuildTableExistsSql(const ATableName: string): string; override;
+
+    // ==========================================================
+    // FIELD RELATED METHODS
+    // ----------------------------------------------------------
+    function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
+    function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
+    function BuildSQL_BeginAlterTable(const ATable: IioDBBuilderSchemaTable): string; override;
+    function BuildSQL_EndAlterTable(const ATable: IioDBBuilderSchemaTable): string; override;
+    function BuildSQL_TableExists(const ATableName: string): string; override;
 
     // ==========================================================
     // FIELD RELATED METHODS
@@ -157,18 +163,18 @@ begin
     'SQLite does not support altering column definitions. '#13#13'Column modifications are not supported by SQLite.');
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildEndAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_EndAlterTable(const ATable: IioDBBuilderSchemaTable): string;
 begin
   // Note: TioDBBuilderStrategySqLite should NEVER call this method.
   // SQLite does not support ALTER TABLE in the traditional sense and uses table recreation instead.
   // This method exists only to satisfy the abstract interface contract.
   // If this exception is raised, it indicates a logic error in the Strategy layer.
-  raise EioDBBuilderException.Create(ClassName, 'BuildEndAlterTableSql',
+  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_EndAlterTable',
     'SQLite does not support ALTER TABLE. '#13#13 +
     'Table modifications require the rename-create-copy pattern handled by the Strategy layer.');
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildEndCreateTableSql(const ATable: IioDBBuilderSchemaTable): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string;
 begin
   Result := ');';
 end;
@@ -247,7 +253,7 @@ begin
     'Primary keys must be defined inline in the CREATE TABLE statement.');
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildTableExistsSql(const ATableName: string): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_TableExists(const ATableName: string): string;
 begin
   Result := Format('pragma table_info(''%s'')', [ATableName]);
 end;
@@ -333,18 +339,18 @@ begin
   Result := LTextBuilder.Text;
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildBeginAlterTableSql(const ATable: IioDBBuilderSchemaTable): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_BeginAlterTable(const ATable: IioDBBuilderSchemaTable): string;
 begin
   // Note: TioDBBuilderStrategySqLite should NEVER call this method.
   // SQLite does not support ALTER TABLE in the traditional sense and uses table recreation instead.
   // This method exists only to satisfy the abstract interface contract.
   // If this exception is raised, it indicates a logic error in the Strategy layer.
-  raise EioDBBuilderException.Create(ClassName, 'BuildBeginAlterTableSql',
+  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_BeginAlterTable',
     'SQLite does not support ALTER TABLE. '#13#13 +
     'Table modifications require the rename-create-copy pattern handled by the Strategy layer.');
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildBeginCreateTableSql(const ATable: IioDBBuilderSchemaTable): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string;
 begin
   Result := Format('CREATE TABLE %s (', [ATable.Name]);
 end;

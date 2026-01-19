@@ -130,11 +130,11 @@ begin
     CreateTableSequence(ATable);
 
   Script.Body.AddEmpty;
-  Script.Body.Add(SqlGenerator.BuildBeginCreateTableSql(ATable));
+  Script.Body.Add(SqlGenerator.BuildSQL_BeginCreateTable(ATable));
   Script.Body.IncIndentationLevel;
   Script.Body.Add(SqlGenerator.BuildSQL_CreateFields(ATable, Script.Body.CurrentIndentation), False);
   Script.Body.DecIndentationLevel;
-  Script.Body.Add(SqlGenerator.BuildEndCreateTableSql(ATable));
+  Script.Body.Add(SqlGenerator.BuildSQL_EndCreateTable(ATable));
   Script.Body.AddEmpty;
   Script.Body.Add(SqlGenerator.BuildSQL_AddPK(ATable));
 

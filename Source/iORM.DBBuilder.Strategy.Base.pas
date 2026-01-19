@@ -281,11 +281,11 @@ begin
     case LField.Status of
       stCreate:
         begin
-          Script.Body.Add(SqlGenerator.BuildBeginAlterTableSql(ATable));
+          Script.Body.Add(SqlGenerator.BuildSQL_BeginAlterTable(ATable));
           Script.Body.IncIndentationLevel;
           Script.Body.Add(SqlGenerator.BuildSQL_AddField(LField));
           Script.Body.DecIndentationLevel;
-          Script.Body.Add(SqlGenerator.BuildEndAlterTableSql(ATable));
+          Script.Body.Add(SqlGenerator.BuildSQL_EndAlterTable(ATable));
         end;
       stUpdate:
         begin
@@ -459,7 +459,7 @@ end;
 
 function TioDBBuilderStrategyBase.TableExists(const ATable: IioDBBuilderSchemaTable): Boolean;
 begin
-  Result := _ExecuteExistsQuery(SqlGenerator.BuildTableExistsSql(ATable.Name));
+  Result := _ExecuteExistsQuery(SqlGenerator.BuildSQL_TableExists(ATable.Name));
 end;
 
 function TioDBBuilderStrategyBase.IndexExists(const AIndexName: string): boolean;
