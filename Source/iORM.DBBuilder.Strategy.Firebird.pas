@@ -274,10 +274,11 @@ begin
   // Verify if DEFAULT setting of the field is changed
   Result := Result or IsFieldDefaultChanged(LOldFieldDefault, LNewFieldDefault, AField);
 
-  // Verify if NotNull is changed (warning cannot change not null value with firebird)
-  // Note: The last parameter set the NotNull change as permitted (firebird's alter table
-  // with SET NOT NULL or DROP NOT NULL is supported from version 3)
-  Result := Result or IsFieldNotNullChanged(LOldFieldNotNull, AField.FieldNotNull, AField, ATable, True);
+  // Verify if NotNull is changed
+  // Note: The last parameter indicates whether NOT NULL changes are supported.
+  // We check this dynamically based on Firebird version (SET NOT NULL / DROP NOT NULL
+  // is only supported from Firebird 3.0+). This controls whether blocking warnings are generated.
+  Result := Result or IsFieldNotNullChanged(LOldFieldNotNull, AField.FieldNotNull, AField, ATable, FBSqlGenerator.SupportsSetDropNotNull);
 
   // Verify if blob subtype is changed
   // Note: The last parameter set the blob sub-type change as NOT permitted in firebrd RDBMS
@@ -337,6 +338,12 @@ end;
 
 procedure TioDBBuilderStrategyFirebird.GenerateDatabaseObjects(const Create: boolean);
 begin
+  // Add Firebird version detection info as script comment (not warning, to avoid blocking execution)
+  // Note: Accessing FirebirdVersion property triggers automatic version detection (lazy initialization)
+  Script.Body.AddEmpty;
+  Script.Header.AddComment(Format('Firebird version detected: %s (Major: %d, Minor: %d)',
+    [FBSqlGenerator.FirebirdVersion, FBSqlGenerator.FirebirdMajorVersion, FBSqlGenerator.FirebirdMinorVersion]));
+
   if Create then
   begin
     CreateTables;

@@ -50,7 +50,20 @@ uses
 type
   TioDBBuilderSqlGenFirebird = class(TioDBBuilderSqlGenBase, IioDBBuilderSqlGeneratorFirebird)
   private
+    // Firebird version detection fields (for multi-version compatibility 2.0-5.0)
+    FFirebirdVersion: string;           // Cache: '2.5.9', '3.0.10', '4.0.4', '5.0.1'
+    FFirebirdMajorVersion: Integer;     // Cache: 2, 3, 4, 5
+    FFirebirdMinorVersion: Integer;     // Cache: 0, 1, 2, etc.
+    FFirebirdVersionDetected: Boolean;          // Flag to avoid re-querying
+
     function _BuildSQL_CreateOrAddField(const AField: IioDBBuilderSchemaField): String;
+
+    // Version detection methods
+    function DetectFirebirdVersion: Boolean;
+    function GetFirebirdVersion: string;
+    function GetFirebirdMajorVersion: Integer;
+    function GetFirebirdMinorVersion: Integer;
+    function SupportsSetDropNotNull: Boolean;
   protected
     function GetMaxSqlIdentifierLength: integer; override;
     function GetMinSqlIdentifierLength: integer; override;
@@ -101,6 +114,10 @@ type
     function BuildAddSequenceSql(const ASequenceName: String; const ACreatingNewDatabase: boolean): string;
     function BuildDropSequenceSql(const ASequenceName: string): string;
     function BuildSequenceExistsSql(const ASequenceName: string): string;
+  public
+    property FirebirdVersion: string read GetFirebirdVersion;
+    property FirebirdMajorVersion: Integer read GetFirebirdMajorVersion;
+    property FirebirdMinorVersion: Integer read GetFirebirdMinorVersion;
   end;
 
 implementation
@@ -124,7 +141,7 @@ uses
 
 const
   MAX_IDENTIFIER_NAME_LENGTH = 31;
-  MIN_IDENTIFIER_NAME_LENGTH = 27;
+  MIN_IDENTIFIER_NAME_LENGTH = 4;
 
 
 { TioDBBuilderSqlGenFirebird }
@@ -243,10 +260,27 @@ begin
       LTextBuilder.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s SET DEFAULT %s;', [ATable.Name, AField.FieldName, Translate_SchemaField_To_DefaultValue(AField)]));
   end;
 
-  // NotNull
-  // Note: SET NOT NULL & DROP NOT NULL available only from firebird 3
+  // NotNull - Version-specific handling
+  // Note: SET NOT NULL & DROP NOT NULL available only from Firebird 3.0+
   if AField.IsFieldNotNullAltered then
-    LTextBuilder.Add(Format('ALTER TABLE %s ALTER COLUMN %s %s NOT NULL;', [ATable.Name,  AField.FieldName, IfThen(AField.FieldNotNull, 'SET', 'DROP')]));
+  begin
+    if SupportsSetDropNotNull then
+    begin
+      // Firebird 3.0+: Use SET/DROP NOT NULL syntax
+      LTextBuilder.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s %s NOT NULL;',
+        [ATable.Name, AField.FieldName, IfThen(AField.FieldNotNull, 'SET', 'DROP')]));
+    end
+    else
+    begin
+      // Firebird 2.0-2.5: NOT NULL modification not supported
+      // Generate warning comment instead of SQL that would fail
+      LTextBuilder.AddLine(Format('-- WARNING: Cannot alter NOT NULL constraint on Firebird %s',
+        [FFirebirdVersion]));
+      LTextBuilder.AddLine(Format('--          Table: %s, Column: %s, Desired NOT NULL: %s',
+        [ATable.Name, AField.FieldName, BoolToStr(AField.FieldNotNull, True)]));
+      LTextBuilder.AddLine('--          Manual intervention required: Recreate table or update RDB$RELATION_FIELDS');
+    end;
+  end;
 
   Result := LTextBuilder.Text;
 end;
@@ -319,6 +353,8 @@ begin
     .AddLine('    WHEN f.RDB$FIELD_TYPE = 13 THEN ''TIME''')
     .AddLine('    WHEN f.RDB$FIELD_TYPE = 35 THEN ''TIMESTAMP''')
     // BOOLEAN (Firebird 3.0+): map to INTEGER for ORM compatibility
+    // Note: Type 23 doesn't exist in Firebird 2.x, so this CASE clause is safely ignored
+    // on older versions (the CASE will never match type 23 in FB 2.x databases)
     .AddLine('    WHEN f.RDB$FIELD_TYPE = 23 THEN ''INTEGER''')
     .AddLine('    ELSE ''UNKNOWN''')
     .AddLine('  END AS field_type,')
@@ -544,6 +580,84 @@ begin
   else
     raise EioDBBuilderException.Create(ClassName, 'Translate_SchemaField_To_FieldType', 'Wrong Metadata_FieldType');
   end;
+end;
+
+{ TioDBBuilderSqlGenFirebird - Version Detection Methods }
+
+function TioDBBuilderSqlGenFirebird.DetectFirebirdVersion: Boolean;
+var
+  LQuery: IioQuery;
+  LVersionStr: string;
+  LParts: TArray<string>;
+begin
+  Result := False;
+
+  // Return immediately if already detected
+  if FFirebirdVersionDetected then
+    Exit(True);
+
+  try
+    // Try Firebird 2.1+ method using RDB$GET_CONTEXT
+    // This function was introduced in Firebird 2.1 and returns version like '3.0.10', '4.0.4', '5.0.1'
+    LQuery := TioQueryEngine.GetRawQuery(
+      ConnectionDefName,
+      'SELECT RDB$GET_CONTEXT(''SYSTEM'', ''ENGINE_VERSION'') AS VERSION FROM RDB$DATABASE',
+      True
+    );
+
+    if not LQuery.Eof then
+    begin
+      LVersionStr := LQuery.Fields.FieldByName('VERSION').AsString.Trim;
+      FFirebirdVersion := LVersionStr;
+
+      // Parse version: '3.0.10' -> Major=3, Minor=0
+      LParts := LVersionStr.Split(['.']);
+      if Length(LParts) >= 2 then
+      begin
+        FFirebirdMajorVersion := StrToIntDef(LParts[0], 2);
+        FFirebirdMinorVersion := StrToIntDef(LParts[1], 0);
+        FFirebirdVersionDetected := True;
+        Result := True;
+      end;
+    end;
+  except
+    // Firebird 2.0 doesn't support RDB$GET_CONTEXT
+    // Default to conservative version 2.0 assumptions
+    FFirebirdVersion := '2.0.0';
+    FFirebirdMajorVersion := 2;
+    FFirebirdMinorVersion := 0;
+    FFirebirdVersionDetected := True;
+    Result := True;
+  end;
+end;
+
+function TioDBBuilderSqlGenFirebird.GetFirebirdVersion: string;
+begin
+  // Lazy initialization - detect version on first access
+  DetectFirebirdVersion;
+  Result := FFirebirdVersion;
+end;
+
+function TioDBBuilderSqlGenFirebird.GetFirebirdMajorVersion: Integer;
+begin
+  // Lazy initialization - detect version on first access
+  DetectFirebirdVersion;
+  Result := FFirebirdMajorVersion;
+end;
+
+function TioDBBuilderSqlGenFirebird.GetFirebirdMinorVersion: Integer;
+begin
+  // Lazy initialization - detect version on first access
+  DetectFirebirdVersion;
+  Result := FFirebirdMinorVersion;
+end;
+
+function TioDBBuilderSqlGenFirebird.SupportsSetDropNotNull: Boolean;
+begin
+  // SET NOT NULL / DROP NOT NULL syntax is only available in Firebird 3.0+
+  // Firebird 2.x versions require table recreation for NOT NULL changes
+  DetectFirebirdVersion;
+  Result := (FFirebirdMajorVersion >= 3);
 end;
 
 end.
