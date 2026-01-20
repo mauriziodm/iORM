@@ -58,6 +58,9 @@ type
   TioDBBuilderTableChange = (taFields, taIndexes, taForeignKeys);
   TioDBBuilderTableChanges = set of TioDBBuilderTableChange;
 
+  // Forward declarations
+  IioDBBuilderSqlScript = interface;
+
   IioDBBuilderSchemaFK = interface
     ['{1F653F52-570B-4381-930D-FB3945025DA2}']
     function GetName: String;
@@ -210,9 +213,8 @@ type
     ['{1AEDB134-1ECB-490E-A53A-973BEDE509E5}']
     function GetForeignKeysEnabled: boolean;
     function GetIndexesEnabled: boolean;
+    function GetScript: IioDBBuilderSqlScript;
     function GetSequences: TioDBBuilderSchemaSequences;
-    function GetWarnings: TStrings;
-    function GetWarningExists: boolean;
     function GetTables: TioDBBuilderSchemaTables;
     // Status
     function GetStatus: TioDBBuilderStatus;
@@ -224,9 +226,8 @@ type
 
     property ForeignKeysEnabled: boolean read GetForeignKeysEnabled;
     property IndexesEnabled: boolean read GetIndexesEnabled;
+    property Script: IioDBBuilderSqlScript read GetScript;
     property Sequences: TioDBBuilderSchemaSequences read GetSequences;
-    property Warnings: TStrings read GetWarnings;
-    property WarningExists: boolean read GetWarningExists;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
     property Tables: TioDBBuilderSchemaTables read GetTables;
   end;
@@ -242,8 +243,6 @@ type
     procedure AddEmpty;
     procedure AddSeparator;
     procedure AddTitle(const AText: String);
-    procedure AddWarning(const AText: String);
-    procedure AddWarnings(const WarningsList: TStrings);
     procedure Clear;
 
     procedure DecIndentationLevel;
@@ -260,7 +259,9 @@ type
     function GetBody: IioDBBuilderSqlScriptSection;
     function GetFooter: IioDBBuilderSqlScriptSection;
     function GetHeader: IioDBBuilderSqlScriptSection;
+    function GetHints: IioDBBuilderSqlScriptSection;
     function GetSQL: TStringList;
+    function GetWarnings: IioDBBuilderSqlScriptSection;
 
     // Full script clear
     procedure Clear;
@@ -273,7 +274,9 @@ type
     property Body: IioDBBuilderSqlScriptSection read GetBody;
     property Footer: IioDBBuilderSqlScriptSection read GetFooter;
     property Header: IioDBBuilderSqlScriptSection read GetHeader;
+    property Hints: IioDBBuilderSqlScriptSection read GetHints;
     property SQL: TStringList read GetSQL;
+    property Warnings: IioDBBuilderSqlScriptSection read GetWarnings;
   end;
 
   // DBBuilder reference
