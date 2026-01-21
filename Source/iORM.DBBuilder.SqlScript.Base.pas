@@ -20,13 +20,12 @@ type
   private
     FIndentation: TioIndentation;
     FText: TStringList;
-    FSeparatorLength: integer;
     function GetSQL: TStringList;
     function GetCurrentIndentation: TioIndentation;
   protected
     function GetIndentation: String;
   public
-    constructor Create(const AIndentationWidth: integer = SCRIPT_INDENTATION_WIDTH; const ASeparatorLength: integer = SCRIPT_SEPARATOR_LENGTH);
+    constructor Create;
     destructor Destroy; override;
 
     procedure Add(const AText: String; const UseIndent: boolean = True); virtual;
@@ -63,7 +62,6 @@ type
     FScriptHeader: IioDBBuilderSqlScriptSection;
     FScriptHints: IioDBBuilderSqlScriptSection;
     FScriptWarnings: IioDBBuilderSqlScriptSection;
-    FSeparatorLength: integer;
     function GetBody: IioDBBuilderSqlScriptSection;
     function GetFooter: IioDBBuilderSqlScriptSection;
     function GetHeader: IioDBBuilderSqlScriptSection;
@@ -71,7 +69,7 @@ type
     function GetSQL: TStringList;
     function GetWarnings: IioDBBuilderSqlScriptSection;
   public
-    constructor Create(const AIndentationWidth: integer = SCRIPT_INDENTATION_WIDTH; const ASeparatorLength: integer = SCRIPT_SEPARATOR_LENGTH);
+    constructor Create;
     destructor Destroy; override;
 
     // Full script clear
@@ -126,7 +124,7 @@ end;
 
 procedure TioDBBuilderScriptSection.AddSeparator;
 begin
-  FText.Add(StringOfChar('-', FSeparatorLength));
+  FText.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
 end;
 
 procedure TioDBBuilderScriptSection.AddTitle(const AText: String);
@@ -143,12 +141,11 @@ begin
   FText.Clear;
 end;
 
-constructor TioDBBuilderScriptSection.Create(const AIndentationWidth: integer; const ASeparatorLength: integer);
+constructor TioDBBuilderScriptSection.Create;
 begin
   inherited Create;
 
-  FIndentation := TioIndentation.Create(AIndentationWidth);
-  FSeparatorLength := ASeparatorLength;
+  FIndentation := TioIndentation.Create(SCRIPT_INDENTATION_WIDTH);
   FText := TStringList.Create;
 end;
 
@@ -209,17 +206,16 @@ begin
   Footer.Clear;
 end;
 
-constructor TioDBBuilderSqlScript.Create(const AIndentationWidth, ASeparatorLength: integer);
+constructor TioDBBuilderSqlScript.Create;
 begin
   inherited Create;
 
   FFullScript := TStringList.Create;
-  FSeparatorLength := ASeparatorLength;
-  FScriptHeader := TioDBBuilderScriptSection.Create(AIndentationWidth, ASeparatorLength);
-  FScriptWarnings := TioDBBuilderScriptSectionWarnings.Create(AIndentationWidth, ASeparatorLength);
-  FScriptHints := TioDBBuilderScriptSectionHints.Create(AIndentationWidth, ASeparatorLength);
-  FScriptBody := TioDBBuilderScriptSection.Create(AIndentationWidth, ASeparatorLength);
-  FScriptFooter := TioDBBuilderScriptSection.Create(AIndentationWidth, ASeparatorLength);
+  FScriptHeader := TioDBBuilderScriptSection.Create;
+  FScriptWarnings := TioDBBuilderScriptSectionWarnings.Create;
+  FScriptHints := TioDBBuilderScriptSectionHints.Create;
+  FScriptBody := TioDBBuilderScriptSection.Create;
+  FScriptFooter := TioDBBuilderScriptSection.Create;
 end;
 
 destructor TioDBBuilderSqlScript.Destroy;
@@ -263,9 +259,9 @@ begin
   if FScriptWarnings.SQL.Count > 0 then
   begin
     FFullScript.Add('');
-    FFullScript.Add(StringOfChar('-', FSeparatorLength));
+    FFullScript.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
     FFullScript.Add('-- W A R N I N G S !!!        W A R N I N G S !!!        W A R N I N G S !!!');
-    FFullScript.Add(StringOfChar('-', FSeparatorLength));
+    FFullScript.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
     FFullScript.Add('');
     FFullScript.AddStrings(FScriptWarnings.SQL);
     FFullScript.Add('');
@@ -275,9 +271,9 @@ begin
   if FScriptHints.SQL.Count > 0 then
   begin
     FFullScript.Add('');
-    FFullScript.Add(StringOfChar('-', FSeparatorLength));
+    FFullScript.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
     FFullScript.Add('-- H I N T S');
-    FFullScript.Add(StringOfChar('-', FSeparatorLength));
+    FFullScript.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
     FFullScript.Add('');
     FFullScript.AddStrings(FScriptHints.SQL);
     FFullScript.Add('');
