@@ -11,6 +11,9 @@ uses
 
   ;
 
+const
+  SCRIPT_SEPARATOR_LENGTH = 79; // Per allineamento con i warnings
+  SCRIPT_INDENTATION_WIDTH = 4;
 
 type
   TioDBBuilderScriptSection = class(TInterfacedObject, IioDBBuilderSqlScriptSection)
@@ -60,6 +63,7 @@ type
     FScriptHeader: IioDBBuilderSqlScriptSection;
     FScriptHints: IioDBBuilderSqlScriptSection;
     FScriptWarnings: IioDBBuilderSqlScriptSection;
+    FSeparatorLength: integer;
     function GetBody: IioDBBuilderSqlScriptSection;
     function GetFooter: IioDBBuilderSqlScriptSection;
     function GetHeader: IioDBBuilderSqlScriptSection;
@@ -210,6 +214,7 @@ begin
   inherited Create;
 
   FFullScript := TStringList.Create;
+  FSeparatorLength := ASeparatorLength;
   FScriptHeader := TioDBBuilderScriptSection.Create(AIndentationWidth, ASeparatorLength);
   FScriptWarnings := TioDBBuilderScriptSectionWarnings.Create(AIndentationWidth, ASeparatorLength);
   FScriptHints := TioDBBuilderScriptSectionHints.Create(AIndentationWidth, ASeparatorLength);
@@ -253,10 +258,31 @@ function TioDBBuilderSqlScript.GetSQL: TStringList;
 begin
   FFullScript.Clear;
   FFullScript.AddStrings(FScriptHeader.SQL);
+
+  // Add warnings section with title
   if FScriptWarnings.SQL.Count > 0 then
+  begin
+    FFullScript.Add('');
+    FFullScript.Add(StringOfChar('-', FSeparatorLength));
+    FFullScript.Add('-- W A R N I N G S !!!        W A R N I N G S !!!        W A R N I N G S !!!');
+    FFullScript.Add(StringOfChar('-', FSeparatorLength));
+    FFullScript.Add('');
     FFullScript.AddStrings(FScriptWarnings.SQL);
+    FFullScript.Add('');
+  end;
+
+  // Add hints section with title
   if FScriptHints.SQL.Count > 0 then
+  begin
+    FFullScript.Add('');
+    FFullScript.Add(StringOfChar('-', FSeparatorLength));
+    FFullScript.Add('-- H I N T S');
+    FFullScript.Add(StringOfChar('-', FSeparatorLength));
+    FFullScript.Add('');
     FFullScript.AddStrings(FScriptHints.SQL);
+    FFullScript.Add('');
+  end;
+
   FFullScript.AddStrings(FScriptBody.SQL);
   FFullScript.AddStrings(FScriptFooter.SQL);
 
