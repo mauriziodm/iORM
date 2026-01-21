@@ -478,7 +478,7 @@ begin
   if Result then
   begin
     AField.AddAltered(alFieldType);
-    WarningNewValueLessThanTheOldOne('field decimals', AOldFieldDecimals, ANewFieldDecimals, AField, ATable);
+    WarningNewValueLessThanTheOldOne('field DECIMALS', AOldFieldDecimals, ANewFieldDecimals, AField, ATable);
   end;
 end;
 
@@ -493,7 +493,7 @@ begin
     else
     begin
       AField.AddAltered(alFieldLengthDecreased);
-      WarningNewValueLessThanTheOldOne('field length', AOldFieldLength, ANewFieldLength, AField, ATable);
+      WarningNewValueLessThanTheOldOne('field LENGTH', AOldFieldLength, ANewFieldLength, AField, ATable);
     end;
   end;
 end;
@@ -509,7 +509,7 @@ begin
     else
       AField.AddAltered(alFieldPrecisionDecreased);
 
-    WarningNewValueLessThanTheOldOne('field precision', AOldFieldPrecision, ANewFieldPrecision, AField, ATable);
+    WarningNewValueLessThanTheOldOne('field PRECISION', AOldFieldPrecision, ANewFieldPrecision, AField, ATable);
   end;
 end;
 
@@ -528,7 +528,7 @@ procedure TioDBBuilderStrategyFirebird.WarningNewValueLessThanTheOldOne(const AV
   const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
 begin
   if ANewValue < AOldValue then
-    Schema.Warnings.Add(Format('Table ''%s'' field ''%s'' --> The new %s cannot be less than the old one (old = %d, new = %d)',
+    Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> The new %s value becomes smaller than the old one (old = %d, new = %d)',
       [ATable.Name, AField.FieldName, AValueName, AOldValue, ANewValue]));
 end;
 
@@ -536,7 +536,7 @@ procedure TioDBBuilderStrategyFirebird.WarningValueChanged(const AValueName, AOl
   const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
 begin
   if ANewValue <> AOldValue then
-    Schema.Warnings.Add(Format('Table ''%s'' field ''%s'' --> Changing the %s is not allowed (old = ''%s'', new = ''%s'')',
+    Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> Changing the %s is not allowed (old = ''%s'', new = ''%s'')',
       [ATable.Name, AField.FieldName, AValueName, AOldValue, ANewValue]));
 end;
 

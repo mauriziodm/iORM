@@ -61,7 +61,7 @@ type
     class function NewSchemaTable(const AContextTable: IioTable): IioDBBuilderSchemaTable;
     class function NewSqlGenerator(const AConnectionDefName: String): IioDBBuilderSqlGenerator;
     class function NewSqlScript: IioDBBuilderSqlScript;
-    class function NewStrategy(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderSqlScript): IioDBBuilderStrategy;
+    class function NewStrategy(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderStrategy;
   end;
 
 implementation
@@ -159,15 +159,15 @@ begin
 end;
 
 class function TioDBBuilderFactory.NewStrategy(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema;
-  const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderSqlScript): IioDBBuilderStrategy;
+  const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderStrategy;
 begin
   case TioConnectionManager.GetConnectionInfo(AConnectionDefName).ConnectionType of
     ctSQLServer:
-      Result := TioDBBuilderStrategyMSSqlServer.Create(AConnectionDefName, ASchema, ASqlGenerator, AScript);
+      Result := TioDBBuilderStrategyMSSqlServer.Create(AConnectionDefName, ASchema, ASqlGenerator);
     ctFirebird:
-      Result := TioDBBuilderStrategyFirebird.Create(AConnectionDefName, ASchema, ASqlGenerator, AScript);
+      Result := TioDBBuilderStrategyFirebird.Create(AConnectionDefName, ASchema, ASqlGenerator);
     ctSQLite:
-      Result := TioDBBuilderStrategySqLite.Create(AConnectionDefName, ASchema, ASqlGenerator, AScript);
+      Result := TioDBBuilderStrategySqLite.Create(AConnectionDefName, ASchema, ASqlGenerator);
   else
     raise EioDBBuilderException.Create(ClassName, 'NewStrategy', 'Connection type not found');
   end;

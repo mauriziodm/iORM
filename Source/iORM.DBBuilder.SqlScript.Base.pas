@@ -31,8 +31,6 @@ type
     procedure AddEmpty; virtual;
     procedure AddSeparator; virtual;
     procedure AddTitle(const AText: String); virtual;
-    procedure AddWarning(const AText: String); virtual;
-    procedure AddWarnings(const WarningsList: TStrings); virtual;
     procedure Clear;
 
     procedure DecIndentationLevel;
@@ -42,6 +40,17 @@ type
     property SQL: TStringList read GetSQL;
   end;
 
+  // Specialized section that automatically prepends "WARNING: " to all added text
+  TioDBBuilderScriptSectionWarnings = class(TioDBBuilderScriptSection)
+  public
+    procedure Add(const AText: String; const UseIndent: boolean = True); override;
+  end;
+
+  // Specialized section that automatically prepends "Hint: " to all added text
+  TioDBBuilderScriptSectionHints = class(TioDBBuilderScriptSection)
+  public
+    procedure Add(const AText: String; const UseIndent: boolean = True); override;
+  end;
 
   TioDBBuilderSqlScript = class(TInterfacedObject, IioDBBuilderSqlScript)
   private
@@ -49,10 +58,14 @@ type
     FScriptBody: IioDBBuilderSqlScriptSection;
     FScriptFooter: IioDBBuilderSqlScriptSection;
     FScriptHeader: IioDBBuilderSqlScriptSection;
+    FScriptHints: IioDBBuilderSqlScriptSection;
+    FScriptWarnings: IioDBBuilderSqlScriptSection;
     function GetBody: IioDBBuilderSqlScriptSection;
     function GetFooter: IioDBBuilderSqlScriptSection;
     function GetHeader: IioDBBuilderSqlScriptSection;
+    function GetHints: IioDBBuilderSqlScriptSection;
     function GetSQL: TStringList;
+    function GetWarnings: IioDBBuilderSqlScriptSection;
   public
     constructor Create(const AIndentationWidth: integer = SCRIPT_INDENTATION_WIDTH; const ASeparatorLength: integer = SCRIPT_SEPARATOR_LENGTH);
     destructor Destroy; override;
@@ -68,7 +81,9 @@ type
     property Body: IioDBBuilderSqlScriptSection read GetBody;
     property Footer: IioDBBuilderSqlScriptSection read GetFooter;
     property Header: IioDBBuilderSqlScriptSection read GetHeader;
+    property Hints: IioDBBuilderSqlScriptSection read GetHints;
     property SQL: TStringList read GetSQL;
+    property Warnings: IioDBBuilderSqlScriptSection read GetWarnings;
   end;
 
 
@@ -119,21 +134,6 @@ begin
   AddEmpty;
 end;
 
-procedure TioDBBuilderScriptSection.AddWarning(const AText: String);
-begin
-  AddComment(Format('WARNING:  %s',  [AText]));
-end;
-
-procedure TioDBBuilderScriptSection.AddWarnings(const WarningsList: TStrings);
-var
-  LWarning: String;
-begin
-  AddTitle('W A R N I N G S !!!        W A R N I N G S !!!        W A R N I N G S !!! --');
-
-  for LWarning in WarningsList do
-    AddWarning(LWarning);
-end;
-
 procedure TioDBBuilderScriptSection.Clear;
 begin
   FText.Clear;
@@ -180,11 +180,27 @@ begin
   FIndentation.IncIndent;
 end;
 
+{ TioDBBuilderScriptSectionWarnings }
+
+procedure TioDBBuilderScriptSectionWarnings.Add(const AText: String; const UseIndent: boolean);
+begin
+  inherited Add('WARNING: ' + AText, UseIndent);
+end;
+
+{ TioDBBuilderScriptSectionHints }
+
+procedure TioDBBuilderScriptSectionHints.Add(const AText: String; const UseIndent: boolean);
+begin
+  inherited Add('Hint: ' + AText, UseIndent);
+end;
+
 { TioDBBuilderSqlScript }
 
 procedure TioDBBuilderSqlScript.Clear;
 begin
   Header.Clear;
+  Warnings.Clear;
+  Hints.Clear;
   Body.Clear;
   Footer.Clear;
 end;
@@ -195,6 +211,8 @@ begin
 
   FFullScript := TStringList.Create;
   FScriptHeader := TioDBBuilderScriptSection.Create(AIndentationWidth, ASeparatorLength);
+  FScriptWarnings := TioDBBuilderScriptSectionWarnings.Create(AIndentationWidth, ASeparatorLength);
+  FScriptHints := TioDBBuilderScriptSectionHints.Create(AIndentationWidth, ASeparatorLength);
   FScriptBody := TioDBBuilderScriptSection.Create(AIndentationWidth, ASeparatorLength);
   FScriptFooter := TioDBBuilderScriptSection.Create(AIndentationWidth, ASeparatorLength);
 end;
@@ -221,10 +239,24 @@ begin
   Result := FScriptBody;
 end;
 
+function TioDBBuilderSqlScript.GetHints: IioDBBuilderSqlScriptSection;
+begin
+  Result := FScriptHints;
+end;
+
+function TioDBBuilderSqlScript.GetWarnings: IioDBBuilderSqlScriptSection;
+begin
+  Result := FScriptWarnings;
+end;
+
 function TioDBBuilderSqlScript.GetSQL: TStringList;
 begin
   FFullScript.Clear;
   FFullScript.AddStrings(FScriptHeader.SQL);
+  if FScriptWarnings.SQL.Count > 0 then
+    FFullScript.AddStrings(FScriptWarnings.SQL);
+  if FScriptHints.SQL.Count > 0 then
+    FFullScript.AddStrings(FScriptHints.SQL);
   FFullScript.AddStrings(FScriptBody.SQL);
   FFullScript.AddStrings(FScriptFooter.SQL);
 

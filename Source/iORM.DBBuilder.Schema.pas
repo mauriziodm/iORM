@@ -43,15 +43,14 @@ type
   TioDBBuilderSchema = class(TInterfacedObject, IioDBBuilderSchema)
   private
     FIndexesEnabled, FForeignKeysEnabled: Boolean;
+    FScript: IioDBBuilderSqlScript;
     FSequences: TioDBBuilderSchemaSequences;
     FStatus: TioDBBuilderStatus;
     FTables: TioDBBuilderSchemaTables;
-    FWarnings: TStrings;
     function GetForeignKeysEnabled: Boolean;
     function GetIndexesEnabled: Boolean;
+    function GetScript: IioDBBuilderSqlScript;
     function GetSequences: TioDBBuilderSchemaSequences;
-    function GetWarnings: TStrings;
-    function GetWarningExists: Boolean;
     function GetTables: TioDBBuilderSchemaTables;
     // DBExists
     function GetStatus: TioDBBuilderStatus;
@@ -66,9 +65,8 @@ type
 
     property ForeignKeysEnabled: boolean read GetForeignKeysEnabled;
     property IndexesEnabled: boolean read GetIndexesEnabled;
+    property Script: IioDBBuilderSqlScript read GetScript;
     property Sequences: TioDBBuilderSchemaSequences read GetSequences;
-    property Warnings: TStrings read GetWarnings;
-    property WarningExists: boolean read GetWarningExists;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
     property Tables: TioDBBuilderSchemaTables read GetTables;
   end;
@@ -82,17 +80,16 @@ uses
 
 constructor TioDBBuilderSchema.Create(const AIndexesEnabled, AForeignKeysEnabled: Boolean);
 begin
+  FScript := TioDBBuilderFactory.NewSqlScript;
   FSequences := TioDBBuilderSchemaSequences.Create;
   FIndexesEnabled := AIndexesEnabled;
   FForeignKeysEnabled := AForeignKeysEnabled;
   FStatus := stClean;
-  FWarnings := TStringList.Create;
   FTables := TioDBBuilderSchemaTables.Create;
 end;
 
 destructor TioDBBuilderSchema.Destroy;
 begin
-  FWarnings.Free;
   FTables.Free;
   FSequences.Free;
   inherited;
@@ -158,19 +155,14 @@ begin
   FStatus := AValue;
 end;
 
+function TioDBBuilderSchema.GetScript: IioDBBuilderSqlScript;
+begin
+  Result := FScript;
+end;
+
 function TioDBBuilderSchema.GetTables: TioDBBuilderSchemaTables;
 begin
   Result := FTables;
-end;
-
-function TioDBBuilderSchema.GetWarnings: TStrings;
-begin
-  Result := FWarnings;
-end;
-
-function TioDBBuilderSchema.GetWarningExists: Boolean;
-begin
-  Result := FWarnings.Count > 0;
 end;
 
 end.

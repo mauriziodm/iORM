@@ -46,7 +46,6 @@ type
   private
     FConnectionDefName: string;
     FSchema: IioDBBuilderSchema;
-    FScript: IioDBBuilderSqlScript;
     FSqlGenerator: IioDBBuilderSqlGenerator;
 
     function GetConnectionDefName: string;
@@ -101,7 +100,7 @@ type
     property Script: IioDBBuilderSqlScript read GetScript;
     property SqlGenerator: IioDBBuilderSqlGenerator read GetSqlGenerator;
   public
-    constructor Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderSqlScript);
+    constructor Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator);
 
     procedure GenerateCreateDatabaseScript; virtual;
     procedure GenerateUpdateDatabaseScript; virtual;
@@ -186,7 +185,7 @@ begin
 end;
 
 constructor TioDBBuilderStrategyBase.Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema;
-  const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderSqlScript);
+  const ASqlGenerator: IioDBBuilderSqlGenerator);
 begin
   if not Assigned(ASchema) then
     raise EioInvalidArgumentException.Create(ClassName, 'Create', 'ASchema is not assigned.');
@@ -196,16 +195,12 @@ begin
 
   FConnectionDefName := AConnectionDefName;
   FSchema := ASchema;
-  FScript := AScript;
   FSqlGenerator := ASqlGenerator;
 end;
 
 function TioDBBuilderStrategyBase.GetScript: IioDBBuilderSqlScript;
 begin
-  if not Assigned(FScript) then
-    raise EioInvalidArgumentException.Create(ClassName, 'GetScript',
-      'Script is not assigned. This operation requires a valid Script instance.');
-  Result := FScript;
+  Result := Schema.Script;
 end;
 
 procedure TioDBBuilderStrategyBase.CreateDatabase;
@@ -359,9 +354,6 @@ begin
 
   Script.ScriptBegin(ConnectionDefName, TioConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.DriverID);
 
-  if Schema.WarningExists then
-    Script.Body.AddWarnings(Schema.Warnings);
-
   GenerateDatabaseObjects(True);
 
   Script.ScriptEnd;
@@ -372,9 +364,6 @@ begin
   Schema.Status := stUpdate;
 
   Script.ScriptBegin(ConnectionDefName, TioConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.DriverID);
-
-  if Schema.WarningExists then
-    Script.Body.AddWarnings(Schema.Warnings);
 
   GenerateDatabaseObjects(False);
 
@@ -403,7 +392,7 @@ var
 begin
   LRequiredConversion := Format('[%s->%s]', [AOldFieldType, ANewFieldType]);
   if ContainsText(AInvalidTypeConversions, LRequiredConversion) then
-    Schema.Warnings.Add(Format('Table ''%s'' field ''%s'' --> Invalid conversion from ''%s'' to ''%s''',
+    Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> Invalid conversion from ''%s'' to ''%s''',
       [ATable.Name, AField.FieldName, AOldFieldType, ANewFieldType]));
 end;
 
@@ -411,7 +400,7 @@ procedure TioDBBuilderStrategyBase.WarningNotNullCannotBeChanged(const ATable: I
   const AOldFieldNotNull: Boolean);
 begin
   if AField.FieldNotNull <> AOldFieldNotNull then
-    Schema.Warnings.Add(Format('Table ''%s'' field ''%s'' --> The not null setting cannot be changed automatically',
+    Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> The not null setting cannot be changed automatically',
       [ATable.Name, AField.FieldName]));
 end;
 
@@ -419,8 +408,8 @@ procedure TioDBBuilderStrategyBase.WarningNullBecomesNotNull(const ATable: IioDB
   const AOldFieldNotNull: Boolean);
 begin
   if AField.FieldNotNull and (not AOldFieldNotNull) and (not AField.FieldDefaultExists) then
-    Schema.Warnings.Add
-      (Format('Table ''%s'' field ''%s'' --> The not null setting is changed from false to true and a default value has not been specified',
+    Script.Hints.Add
+      (Format('Table ''%s'' field ''%s'' --> The not null setting is changed from FALSE to TRUE and a DEFAULT value has not been specified',
       [ATable.Name, AField.FieldName]));
 end;
 

@@ -24,7 +24,8 @@
       "Bash(git -C \"C:\\\\delphi\\\\tools\\\\iORM\" diff)",
       "Bash(git -C \"C:\\\\delphi\\\\tools\\\\iORM\" log --oneline -5)",
       "Bash(git -C \"C:\\\\delphi\\\\tools\\\\iORM\" add Source/iORM.DBBuilder.SqlGenerator.Firebird.pas Source/iORM.DBBuilder.Strategy.Firebird.pas)",
-      "Bash(git -C \"C:\\\\delphi\\\\tools\\\\iORM\" commit -m \"Rename fs alias to f in Firebird BuildFieldModifiedSql\")"
+      "Bash(git -C \"C:\\\\delphi\\\\tools\\\\iORM\" commit -m \"Rename fs alias to f in Firebird BuildFieldModifiedSql\")",
+      "Bash(git log:*)"
     ]
   }
 }
