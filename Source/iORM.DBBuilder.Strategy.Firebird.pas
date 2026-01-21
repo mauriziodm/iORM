@@ -132,7 +132,7 @@ begin
   Script.Body.AddEmpty;
   Script.Body.Add(SqlGenerator.BuildSQL_BeginCreateTable(ATable));
   Script.Body.IncIndentationLevel;
-  Script.Body.Add(SqlGenerator.BuildSQL_CreateFields(ATable, Script.Body.CurrentIndentation), False);
+  Script.Body.Add(SqlGenerator.BuildSQL_CreateFields(ATable, Script.Body.CurrentIndentation));
   Script.Body.DecIndentationLevel;
   Script.Body.Add(SqlGenerator.BuildSQL_EndCreateTable(ATable));
   Script.Body.AddEmpty;

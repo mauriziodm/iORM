@@ -238,7 +238,7 @@ type
     function GetCurrentIndentation: TioIndentation;
     function GetSQL: TStringList;
 
-    procedure Add(const AText: String; const UseIndent: boolean = True);
+    procedure Add(const AText: String);
     procedure AddComment(const AText: String);
     procedure AddEmpty;
     procedure AddSeparator;

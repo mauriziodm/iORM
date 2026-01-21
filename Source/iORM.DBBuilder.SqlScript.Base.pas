@@ -28,7 +28,7 @@ type
     constructor Create;
     destructor Destroy; override;
 
-    procedure Add(const AText: String; const UseIndent: boolean = True); virtual;
+    procedure Add(const AText: String); virtual;
     procedure AddComment(const AText: String); virtual;
     procedure AddEmpty; virtual;
     procedure AddSeparator; virtual;
@@ -45,13 +45,13 @@ type
   // Specialized section that automatically prepends "WARNING: " to all added text
   TioDBBuilderScriptSectionWarnings = class(TioDBBuilderScriptSection)
   public
-    procedure Add(const AText: String; const UseIndent: boolean = True); override;
+    procedure Add(const AText: String); override;
   end;
 
   // Specialized section that automatically prepends "Hint: " to all added text
   TioDBBuilderScriptSectionHints = class(TioDBBuilderScriptSection)
   public
-    procedure Add(const AText: String; const UseIndent: boolean = True); override;
+    procedure Add(const AText: String); override;
   end;
 
   TioDBBuilderSqlScript = class(TInterfacedObject, IioDBBuilderSqlScript)
@@ -104,12 +104,9 @@ uses
 
 { TioDBBuilderScriptSection }
 
-procedure TioDBBuilderScriptSection.Add(const AText: String; const UseIndent: boolean = True);
+procedure TioDBBuilderScriptSection.Add(const AText: String);
 begin
-  if UseIndent then
-    FText.Add(GetIndentation + AText)
-  else
-    FText.Add(AText);
+  FText.Add(GetIndentation + AText);
 end;
 
 procedure TioDBBuilderScriptSection.AddComment(const AText: String);
@@ -183,16 +180,16 @@ end;
 
 { TioDBBuilderScriptSectionWarnings }
 
-procedure TioDBBuilderScriptSectionWarnings.Add(const AText: String; const UseIndent: boolean);
+procedure TioDBBuilderScriptSectionWarnings.Add(const AText: String);
 begin
-  inherited Add('WARNING: ' + AText, UseIndent);
+  inherited Add('WARNING: ' + AText);
 end;
 
 { TioDBBuilderScriptSectionHints }
 
-procedure TioDBBuilderScriptSectionHints.Add(const AText: String; const UseIndent: boolean);
+procedure TioDBBuilderScriptSectionHints.Add(const AText: String);
 begin
-  inherited Add('Hint: ' + AText, UseIndent);
+  inherited Add('Hint: ' + AText);
 end;
 
 { TioDBBuilderSqlScript }
