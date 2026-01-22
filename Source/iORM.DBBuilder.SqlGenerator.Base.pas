@@ -57,7 +57,6 @@ type
   protected
     function GetMaxSqlIdentifierLength: integer; virtual;
     function GetMinSqlIdentifierLength: integer; virtual;
-    function NewTempObjectName(const AMaxLength: integer): string;
     function NewTextBuilder: IioTextBuilder; overload;
     function NewTextBuilder(const AIndentation: TioIndentation): IioTextBuilder; overload;
     function ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
@@ -227,7 +226,7 @@ begin
     LFKName := 'FK_' + ShortenIdentifierName(
       Format('%s_%s_%s_%s', [AForeignKey.DependentTableName, AForeignKey.DependentFieldName,
         AForeignKey.ReferenceTableName, AForeignKey.ReferenceFieldName]),
-      MaxSqlIdentifierLength - 3);
+        MaxSqlIdentifierLength - 3);
   end;
 
   Result := LFKName.ToUpper;
@@ -355,11 +354,6 @@ end;
 function TioDBBuilderSqlGenBase.GetMinSqlIdentifierLength: integer;
 begin
   Result := 0;
-end;
-
-function TioDBBuilderSqlGenBase.NewTempObjectName(const AMaxLength: integer): string;
-begin
-  Result := TGUID.NewGuid.ToString.Replace('{', '').Replace('}', '').Replace('-', '').Substring(1, AMaxLength);
 end;
 
 function TioDBBuilderSqlGenBase.NewTextBuilder(const AIndentation: TioIndentation): IioTextBuilder;
