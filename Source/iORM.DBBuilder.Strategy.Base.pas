@@ -90,7 +90,6 @@ type
     function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
     // Warnings
     procedure WarningTypeAffinity(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String; const AInvalidTypeConversions: string); virtual;
-    procedure WarningNullBecomesNotNull(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldNotNull: Boolean); virtual;
 
     procedure GenerateDatabaseObjects(const Create: boolean); virtual; abstract;
 
@@ -395,14 +394,6 @@ begin
       [ATable.Name, AField.FieldName, AOldFieldType, ANewFieldType]));
 end;
 
-procedure TioDBBuilderStrategyBase.WarningNullBecomesNotNull(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
-  const AOldFieldNotNull: Boolean);
-begin
-  if AField.FieldNotNull and (not AOldFieldNotNull) and (not AField.FieldDefaultExists) then
-    Script.Hints.Add
-      (Format('Table ''%s'' field ''%s'' --> The not null setting is changed from FALSE to TRUE and a DEFAULT value has not been specified',
-      [ATable.Name, AField.FieldName]));
-end;
 
 function TioDBBuilderStrategyBase.IsFieldTypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
   const AOldFieldType, ANewFieldType: String): Boolean;
@@ -418,13 +409,23 @@ end;
 function TioDBBuilderStrategyBase.IsFieldNotNullChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
   const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AIsPermitted: Boolean): Boolean;
 begin
+  // Check if the NOT NULL constraint has changed between the old and new field definitions
   Result := AOldFieldNotNull <> ANewFieldNotNull;
   if Result then
   begin
+    // Mark the field as having its NOT NULL constraint altered
     AField.AddAltered(alFieldNotNull);
     if AIsPermitted then
-      WarningNullBecomesNotNull(ATable, AField, AOldFieldNotNull)
+    begin
+      // If the field is now NOT NULL but wasn't before, and no default value is specified,
+      // add a hint to alert the user about the potential data impact
+      if AField.FieldNotNull and (not AOldFieldNotNull) and (not AField.FieldDefaultExists) then
+        Script.Hints.Add
+          (Format('Table ''%s'' field ''%s'' --> The not null setting is changed from FALSE to TRUE and a DEFAULT value has not been specified',
+          [ATable.Name, AField.FieldName]));
+    end
     else
+      // If the NOT NULL change is not permitted, add a warning to indicate it cannot be automatically changed
       Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> The NOT NULL setting cannot be changed automatically', [ATable.Name, AField.FieldName]));
   end;
 end;
