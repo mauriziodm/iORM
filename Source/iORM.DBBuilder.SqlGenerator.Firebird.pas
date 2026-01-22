@@ -196,21 +196,20 @@ begin
   LTextBuilder.
     AddLine(Format('ALTER TABLE %s', [AForeignKey.DependentTableName])).
     IncIndent.
-    Add(Format('ADD CONSTRAINT %s', [Translate_SchemaTableAndFK_To_FKName(ATable, AForeignKey)]), True).
-    Add(Format(' FOREIGN KEY (%s)', [AForeignKey.DependentFieldName])).
-    Add(Format(' REFERENCES %s (%s)', [AForeignKey.ReferenceTableName, AForeignKey.ReferenceFieldName]));
+    AddLine(Format('ADD CONSTRAINT %s', [Translate_SchemaTableAndFK_To_FKName(ATable, AForeignKey)])).
+    AddLine(Format('FOREIGN KEY (%s)', [AForeignKey.DependentFieldName])).
+    AddLine(Format('REFERENCES %s (%s)', [AForeignKey.ReferenceTableName, AForeignKey.ReferenceFieldName]));
 
   // Add optional ON UPDATE clause if specified
   if AForeignKey.OnUpdateAction > fkUnspecified then
-    LTextBuilder.Add(Format(' ON UPDATE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnUpdateAction)]));
+    LTextBuilder.AddLine(Format('ON UPDATE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnUpdateAction)]));
 
   // Add optional ON DELETE clause if specified
   if AForeignKey.OnDeleteAction > fkUnspecified then
-    LTextBuilder.Add(Format(' ON DELETE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnDeleteAction)]));
+    LTextBuilder.AddLine(Format('ON DELETE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnDeleteAction)]));
 
   LTextBuilder.
-    DecIndent.
-    AddLine(';');
+    Add(';');
 
   Result := LTextBuilder.Text;
 end;

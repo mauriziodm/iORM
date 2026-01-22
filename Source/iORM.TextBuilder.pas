@@ -24,7 +24,7 @@ type
     destructor Destroy; override;
 
     // Add the text witout indentation and carriage return
-    function Add(const AText: string; const Indent: boolean = false): IioTextBuilder;
+    function Add(const AText: string): IioTextBuilder;
     // Add the text with indentation and carriage return
     function AddLine(const AText: string): IioTextBuilder;
     function AddEmptyLine: IioTextBuilder;
@@ -44,13 +44,9 @@ implementation
 
 { TioTextBuilder }
 
-function TioTextBuilder.Add(const AText: string; const Indent: boolean): IioTextBuilder;
+function TioTextBuilder.Add(const AText: string): IioTextBuilder;
 begin
-  if Indent then
-    FStringBuilder.Append(Format('%s%s', [GetIndentationText, AText]))
-  else
-    FStringBuilder.Append(AText);
-
+  FStringBuilder.Append(AText);
   Result := Self;
 end;
 

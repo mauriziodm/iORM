@@ -10,7 +10,7 @@ type
     function GetText: string;
 
     // Add the text witout indentation and carriage return
-    function Add(const AText: string; const Indent: boolean = false): IioTextBuilder;
+    function Add(const AText: string): IioTextBuilder;
     // Add the text with indentation and carriage return
     function AddLine(const AText: string): IioTextBuilder;
     function AddEmptyLine: IioTextBuilder;
