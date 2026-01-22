@@ -6,7 +6,7 @@ uses
   iORM.Attributes,
   iORM.DBBuilder.Interfaces,
   iORM.DBBuilder.Strategy.Base,
-  iORM.DBBuilder.SqlGenerator.Firebird.Interfaces
+  iORM.DBBuilder.SqlGenerator.Firebird.Interfaces, iORM.Exceptions
 
   ;
 
@@ -62,7 +62,6 @@ uses
   System.StrUtils,
 
   iORM.CommonTypes,
-  iORM.Exceptions,
   iORM.DB.Factory,
   iORM.DB.Interfaces,
   iORM.DB.QueryEngine
@@ -122,9 +121,6 @@ end;
 procedure TioDBBuilderStrategyFirebird.CreateTable(const ATable: IioDBBuilderSchemaTable);
 begin
   inherited;
-
-  if not Assigned(ATable) then
-    raise EioInvalidArgumentException.Create(ClassName, 'CreateTable', 'ATable is not assigned.');
 
   if (Schema.Status = stCreate) or not SequenceExists(ATable.GetSequenceName) then
     CreateTableSequence(ATable);
