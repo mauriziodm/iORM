@@ -134,7 +134,7 @@ uses
   iORM.SqlTranslator,
   iORM.DB.Firebird.SqlDataConverter,
   iORM.DB.Consts,
-  iORM.TextBuilder.Interfaces, System.Classes
+  System.Classes
 
   ;
 
@@ -187,13 +187,13 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
 var
-  LTextBuilder: IioTextBuilder;
+  LSection: IioDBBuilderSqlScriptSection;
 begin
   // Generates: ALTER TABLE <table> ADD CONSTRAINT <name> FOREIGN KEY (...) REFERENCES (...) [ON UPDATE ...] [ON DELETE ...]
-  LTextBuilder := NewTextBuilder;
+  LSection := NewSqlScriptSection;
 
   // Build the main FK constraint structure
-  LTextBuilder.
+  LSection.
     AddLine(Format('ALTER TABLE %s', [AForeignKey.DependentTableName])).
     IncIndent.
     AddLine(Format('ADD CONSTRAINT %s', [Translate_SchemaTableAndFK_To_FKName(ATable, AForeignKey)])).
@@ -202,16 +202,16 @@ begin
 
   // Add optional ON UPDATE clause if specified
   if AForeignKey.OnUpdateAction > fkUnspecified then
-    LTextBuilder.AddLine(Format('ON UPDATE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnUpdateAction)]));
+    LSection.AddLine(Format('ON UPDATE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnUpdateAction)]));
 
   // Add optional ON DELETE clause if specified
   if AForeignKey.OnDeleteAction > fkUnspecified then
-    LTextBuilder.AddLine(Format('ON DELETE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnDeleteAction)]));
+    LSection.AddLine(Format('ON DELETE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnDeleteAction)]));
 
-  LTextBuilder.
+  LSection.
     Add(';');
 
-  Result := LTextBuilder.Text;
+  Result := LSection.Text;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
@@ -242,29 +242,29 @@ end;
 function TioDBBuilderSqlGenFirebird.BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable;
   const AField: IioDBBuilderSchemaField): string;
 var
-  LTextBuilder: IioTextBuilder;
+  LSection: IioDBBuilderSqlScriptSection;
 begin
-  LTextBuilder := NewTextBuilder;
+  LSection := NewSqlScriptSection;
 
   // Type/Length/Precision
   if AField.IsFieldTypeAltered or AField.IsFieldLengthAltered or AField.IsFieldPrecisionAltered then
-    LTextBuilder.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s TYPE %s;', [ATable.Name, AField.FieldName, Translate_SchemaField_To_FieldType(AField, True)]));  // True = include attributes
+    LSection.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s TYPE %s;', [ATable.Name, AField.FieldName, Translate_SchemaField_To_FieldType(AField, True)]));  // True = include attributes
 
   // Default
   if AField.IsFieldDefaultAltered then
   begin
     if not AField.FieldDefaultExists then
-      LTextBuilder.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s DROP DEFAULT;', [ATable.Name, AField.FieldName]))
+      LSection.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s DROP DEFAULT;', [ATable.Name, AField.FieldName]))
     else
-      LTextBuilder.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s SET DEFAULT %s;', [ATable.Name, AField.FieldName, Translate_SchemaField_To_DefaultValue(AField)]));
+      LSection.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s SET DEFAULT %s;', [ATable.Name, AField.FieldName, Translate_SchemaField_To_DefaultValue(AField)]));
   end;
 
   // NotNull - Version-specific handling
   // Note: SET NOT NULL & DROP NOT NULL available only from Firebird 3.0+
   if AField.IsFieldNotNullAltered then
-    LTextBuilder.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s %s NOT NULL;', [ATable.Name, AField.FieldName, IfThen(AField.FieldNotNull, 'SET', 'DROP')]));
+    LSection.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s %s NOT NULL;', [ATable.Name, AField.FieldName, IfThen(AField.FieldNotNull, 'SET', 'DROP')]));
 
-  Result := LTextBuilder.Text;
+  Result := LSection.Text;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_BeginAlterTable(const ATable: IioDBBuilderSchemaTable): string;
@@ -279,23 +279,23 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
 var
-  LTextBuilder: IioTextBuilder;
+  LSection: IioDBBuilderSqlScriptSection;
 begin
-  LTextBuilder := NewTextBuilder;
+  LSection := NewSqlScriptSection;
 
-  LTextBuilder.
+  LSection.
     AddLine('SELECT 1').
     AddLine('FROM RDB$RELATION_FIELDS').
     AddLine(Format('WHERE UPPER(RDB$RELATION_NAME) = UPPER(''%s'')', [ATable.Name])).
     AddLine(Format('  AND UPPER(RDB$FIELD_NAME) = UPPER(''%s'')', [AField.FieldName])).
     Add('  AND RDB$SYSTEM_FLAG = 0');
 
-  Result := LTextBuilder.Text;
+  Result := LSection.Text;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string;
 var
-  LTextBuilder: IioTextBuilder;
+  LSection: IioDBBuilderSqlScriptSection;
 begin
   // Returns SQL to retrieve detailed field metadata from the database
   // ATableName is required - returns all fields for that table
@@ -307,8 +307,8 @@ begin
   // For DECIMAL/NUMERIC detection: types 7, 8, 16 with scale < 0 indicate decimal types,
   // and the subtype distinguishes NUMERIC (1) from DECIMAL (2).
   // For BOOLEAN (type 23, Firebird 3.0+): we map it to INTEGER for ORM compatibility.
-  LTextBuilder := NewTextBuilder;
-  LTextBuilder
+  LSection := NewSqlScriptSection;
+  LSection
     .AddLine('SELECT rf.RDB$NULL_FLAG AS field_not_null,')
     .AddLine('  f.RDB$CHARACTER_LENGTH AS field_length,')
     .AddLine('  f.RDB$FIELD_PRECISION AS field_precision,')
@@ -348,14 +348,14 @@ begin
 
   // Add field filter if specified
   if not AFieldName.IsEmpty then
-    LTextBuilder.AddLine(Format('  AND UPPER(rf.RDB$FIELD_NAME) = UPPER(''%s'')', [AFieldName]));
+    LSection.AddLine(Format('  AND UPPER(rf.RDB$FIELD_NAME) = UPPER(''%s'')', [AFieldName]));
 
-  Result := LTextBuilder.Text;
+  Result := LSection.Text;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string;
 var
-  LTextBuilder: IioTextBuilder;
+  LSection: IioDBBuilderSqlScriptSection;
 begin
   // Generates: SELECT query to list foreign keys with their properties (table_name, constraint_name, on_update, on_delete)
   // Generalized FK list query following the same pattern as BuildSQL_IndexList
@@ -364,9 +364,9 @@ begin
   //   B. All FKs for a table (ATableName specified, AFKName = '')
   //   C. Specific FK (ATableName specified, AFKName specified)
   // Always returns: table_name, constraint_name, on_update, on_delete
-  LTextBuilder := NewTextBuilder;
+  LSection := NewSqlScriptSection;
 
-  LTextBuilder.
+  LSection.
     AddLine('SELECT ').
     AddLine('  rc.RDB$RELATION_NAME AS table_name, ').
     AddLine('  rc.RDB$CONSTRAINT_NAME AS constraint_name, ').
@@ -378,13 +378,13 @@ begin
 
   // Add table filter if specified (scenarios B/C)
   if not ATableName.IsEmpty then
-    LTextBuilder.AddLine(Format('  AND UPPER(rc.RDB$RELATION_NAME) = UPPER(''%s'') ', [ATableName]));
+    LSection.AddLine(Format('  AND UPPER(rc.RDB$RELATION_NAME) = UPPER(''%s'') ', [ATableName]));
 
   // Add FK name filter if specified (scenario C)
   if not AFKName.IsEmpty then
-    LTextBuilder.AddLine(Format('  AND UPPER(rc.RDB$CONSTRAINT_NAME) = UPPER(''%s'') ', [AFKName]));
+    LSection.AddLine(Format('  AND UPPER(rc.RDB$CONSTRAINT_NAME) = UPPER(''%s'') ', [AFKName]));
 
-  Result := LTextBuilder.Text;
+  Result := LSection.Text;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_IndexExistsByName(const AIndexName: string): string;
@@ -402,32 +402,32 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_IndexList(const ATableName: string): string;
 var
-  LTextBuilder: IioTextBuilder;
+  LSection: IioDBBuilderSqlScriptSection;
 begin
   // Generates: SELECT query to list indexes with their properties (name, unique flag, orientation)
   // Base query: all non-system indexes with basic info (name, unique, orientation)
-  LTextBuilder := NewTextBuilder;
+  LSection := NewSqlScriptSection;
 
-  LTextBuilder.
+  LSection.
     AddLine('SELECT RDB$INDEX_NAME, RDB$UNIQUE_FLAG, RDB$INDEX_TYPE ').
     AddLine('FROM RDB$INDICES ').
     AddLine('WHERE RDB$SYSTEM_FLAG = 0');
 
   // Add table filter if specified
   if not ATableName.IsEmpty then
-    LTextBuilder.AddLine(Format(' AND UPPER(RDB$RELATION_NAME) = UPPER(''%s'')', [ATableName]));
+    LSection.AddLine(Format(' AND UPPER(RDB$RELATION_NAME) = UPPER(''%s'')', [ATableName]));
 
-  Result := LTextBuilder.Text;
+  Result := LSection.Text;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_IndexDetails(const AIndexName: string): string;
 var
-  LTextBuilder: IioTextBuilder;
+  LSection: IioDBBuilderSqlScriptSection;
 begin
   // Generates: SELECT query to retrieve field details for a specific index (field names and positions)
-  LTextBuilder := NewTextBuilder;
+  LSection := NewSqlScriptSection;
 
-  LTextBuilder.
+  LSection.
     AddLine('SELECT').
     AddLine('  RDB$FIELD_NAME,').
     AddLine('  RDB$FIELD_POSITION').
@@ -435,7 +435,7 @@ begin
     AddLine(Format('WHERE UPPER(RDB$INDEX_NAME) = UPPER(''%s'')', [AIndexName])).
     Add('ORDER BY RDB$FIELD_POSITION');
 
-  Result := LTextBuilder.Text;
+  Result := LSection.Text;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSequenceExistsSql(const ASequenceName: string): string;

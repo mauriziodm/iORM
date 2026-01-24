@@ -43,8 +43,7 @@ uses
   iORM.DB.Interfaces,
   iORM.Attributes,
   iORM.DB.Consts,
-  iORM.CommonTypes,
-  iORM.TextBuilder.Interfaces
+  iORM.CommonTypes
 
   ;
 
@@ -57,8 +56,7 @@ type
   protected
     function GetMaxSqlIdentifierLength: integer; virtual;
     function GetMinSqlIdentifierLength: integer; virtual;
-    function NewTextBuilder: IioTextBuilder; overload;
-    function NewTextBuilder(const AIndentation: TioIndentation): IioTextBuilder; overload;
+    function NewSqlScriptSection: IioDBBuilderSqlScriptSection;
     function ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
     function Translate_SchemaFK_To_FKvalue(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
 
@@ -158,7 +156,7 @@ uses
   iORM.DB.ConnectionContainer,
   iORM.SqlTranslator,
   iORM.Exceptions,
-  iORM.TextBuilder
+  iORM.DBBuilder.Factory
 
   ;
 
@@ -187,18 +185,21 @@ function TioDBBuilderSqlGenBase.BuildSQL_CreateFields(const ATable: IioDBBuilder
 var
   LComma: string;
   LField: IioDBBuilderSchemaField;
-  LTextBuilder: IioTextBuilder;
+  LSection: IioDBBuilderSqlScriptSection;
 begin
-  LTextBuilder := NewTextBuilder(AIndentation);
+  LSection := NewSqlScriptSection;
+  // Set the initial indentation level based on the passed parameter
+  while LSection.Indent.CurrentLevel < AIndentation.CurrentLevel do
+    LSection.IncIndent;
   LComma := '  ';
 
   for LField in ATable.Fields do
   begin
-    LTextBuilder.AddLine(LComma + BuildSQL_CreateField(LField));
+    LSection.AddLine(LComma + BuildSQL_CreateField(LField));
     LComma := ', ';
   end;
 
-  Result := LTextBuilder.Text;
+  Result := LSection.Text;
 end;
 
 function TioDBBuilderSqlGenBase.BuildSQL_DropIndex(const ATable: IioDBBuilderSchemaTable;
@@ -356,9 +357,9 @@ begin
   Result := 0;
 end;
 
-function TioDBBuilderSqlGenBase.NewTextBuilder(const AIndentation: TioIndentation): IioTextBuilder;
+function TioDBBuilderSqlGenBase.NewSqlScriptSection: IioDBBuilderSqlScriptSection;
 begin
-  Result := TioTextBuilder.Create(AIndentation);
+  Result := TioDBBuilderFactory.NewSqlScriptSection;
 end;
 
 function TioDBBuilderSqlGenBase.ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
@@ -384,11 +385,6 @@ function TioDBBuilderSqlGenBase.IsSqlIdentifierTooLong(const AIdentifierName: st
 begin
   // If MaxSqlIdentifierLength is 0 there's no limit to the identifier length
   Result := (MaxSqlIdentifierLength > 0) and (Length(AIdentifierName) > MaxSqlIdentifierLength);
-end;
-
-function TioDBBuilderSqlGenBase.NewTextBuilder: IioTextBuilder;
-begin
-  Result := TioTextBuilder.Create(SCRIPT_INDENTATION_WIDTH);
 end;
 
 function TioDBBuilderSqlGenBase.BuildSQL_DropFK(const ATable: IioDBBuilderSchemaTable;

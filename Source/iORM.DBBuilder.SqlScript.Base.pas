@@ -20,38 +20,48 @@ type
   private
     FIndentation: TioIndentation;
     FText: TStringList;
+    function GetIndent: TioIndentation;
     function GetSQL: TStringList;
-    function GetCurrentIndentation: TioIndentation;
-  protected
-    function GetIndentation: String;
+    function GetText: string;
   public
     constructor Create;
     destructor Destroy; override;
 
-    procedure Add(const AText: String); virtual;
-    procedure AddComment(const AText: String); virtual;
-    procedure AddEmpty; virtual;
-    procedure AddSeparator; virtual;
-    procedure AddTitle(const AText: String); virtual;
+    // Fluent interface methods (return Self)
+    function Add(const AText: String): IioDBBuilderSqlScriptSection; virtual;      // Append inline to last line
+    function AddLine(const AText: string): IioDBBuilderSqlScriptSection; virtual;  // New line with indent
+    function AddEmptyLine: IioDBBuilderSqlScriptSection;
+    function IncIndent(const AIncrement: integer = 1): IioDBBuilderSqlScriptSection;
+    function DecIndent(const ADecrement: integer = 1): IioDBBuilderSqlScriptSection;
+
+    // Specialized methods (return Self for fluent)
+    function AddComment(const AText: String): IioDBBuilderSqlScriptSection; virtual;
+    function AddSeparator: IioDBBuilderSqlScriptSection; virtual;
+    function AddTitle(const AText: String): IioDBBuilderSqlScriptSection; virtual;
+
+    // Non-fluent methods
     procedure Clear;
 
-    procedure DecIndentationLevel;
+    // Backwards compatibility (deprecated, use IncIndent/DecIndent instead)
     procedure IncIndentationLevel;
+    procedure DecIndentationLevel;
 
-    property CurrentIndentation: TioIndentation read GetCurrentIndentation;
+    // Properties
+    property Indent: TioIndentation read GetIndent;
     property SQL: TStringList read GetSQL;
+    property Text: string read GetText;
   end;
 
   // Specialized section that automatically prepends "WARNING: " to all added text
   TioDBBuilderScriptSectionWarnings = class(TioDBBuilderScriptSection)
   public
-    procedure Add(const AText: String); override;
+    function AddLine(const AText: String): IioDBBuilderSqlScriptSection; override;
   end;
 
   // Specialized section that automatically prepends "Hint: " to all added text
   TioDBBuilderScriptSectionHints = class(TioDBBuilderScriptSection)
   public
-    procedure Add(const AText: String); override;
+    function AddLine(const AText: String): IioDBBuilderSqlScriptSection; override;
   end;
 
   TioDBBuilderSqlScript = class(TInterfacedObject, IioDBBuilderSqlScript)
@@ -104,68 +114,23 @@ uses
 
 { TioDBBuilderScriptSection }
 
-procedure TioDBBuilderScriptSection.Add(const AText: String);
-begin
-  FText.Add(GetIndentation + AText);
-end;
-
-procedure TioDBBuilderScriptSection.AddComment(const AText: String);
-begin
-  FText.Add('-- ' + AText);
-end;
-
-procedure TioDBBuilderScriptSection.AddEmpty;
-begin
-  FText.Add('');
-end;
-
-procedure TioDBBuilderScriptSection.AddSeparator;
-begin
-  FText.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
-end;
-
-procedure TioDBBuilderScriptSection.AddTitle(const AText: String);
-begin
-  AddEmpty;
-  AddSeparator;
-  AddComment(AText);
-  AddSeparator;
-  AddEmpty;
-end;
-
-procedure TioDBBuilderScriptSection.Clear;
-begin
-  FText.Clear;
-end;
-
 constructor TioDBBuilderScriptSection.Create;
 begin
   inherited Create;
-
   FIndentation := TioIndentation.Create(SCRIPT_INDENTATION_WIDTH);
   FText := TStringList.Create;
-end;
-
-procedure TioDBBuilderScriptSection.DecIndentationLevel;
-begin
-  FIndentation.DecIndent;
 end;
 
 destructor TioDBBuilderScriptSection.Destroy;
 begin
   FText.Free;
-
   inherited;
 end;
 
-function TioDBBuilderScriptSection.GetCurrentIndentation: TioIndentation;
+// Getters for properties
+function TioDBBuilderScriptSection.GetIndent: TioIndentation;
 begin
   Result := FIndentation;
-end;
-
-function TioDBBuilderScriptSection.GetIndentation: String;
-begin
-  Result := FIndentation.IndentChars;
 end;
 
 function TioDBBuilderScriptSection.GetSQL: TStringList;
@@ -173,23 +138,108 @@ begin
   Result := FText;
 end;
 
+function TioDBBuilderScriptSection.GetText: string;
+begin
+  Result := FText.Text;
+end;
+
+// Add() - Append inline to last line (no newline, no indent)
+function TioDBBuilderScriptSection.Add(const AText: String): IioDBBuilderSqlScriptSection;
+var
+  LLastIndex: Integer;
+begin
+  LLastIndex := FText.Count - 1;
+  if LLastIndex >= 0 then
+    FText[LLastIndex] := FText[LLastIndex] + AText
+  else
+    FText.Add(AText);
+  Result := Self;
+end;
+
+// AddLine() - Add new line with indentation
+function TioDBBuilderScriptSection.AddLine(const AText: string): IioDBBuilderSqlScriptSection;
+begin
+  FText.Add(FIndentation.IndentChars + AText);
+  Result := Self;
+end;
+
+// AddEmptyLine() - Add empty line
+function TioDBBuilderScriptSection.AddEmptyLine: IioDBBuilderSqlScriptSection;
+begin
+  FText.Add('');
+  Result := Self;
+end;
+
+// IncIndent() - Increment indentation level (fluent)
+function TioDBBuilderScriptSection.IncIndent(const AIncrement: integer): IioDBBuilderSqlScriptSection;
+begin
+  FIndentation.IncIndent(AIncrement);
+  Result := Self;
+end;
+
+// DecIndent() - Decrement indentation level (fluent)
+function TioDBBuilderScriptSection.DecIndent(const ADecrement: integer): IioDBBuilderSqlScriptSection;
+begin
+  FIndentation.DecIndent(ADecrement);
+  Result := Self;
+end;
+
+// AddComment() - Add SQL comment line
+function TioDBBuilderScriptSection.AddComment(const AText: String): IioDBBuilderSqlScriptSection;
+begin
+  FText.Add('-- ' + AText);
+  Result := Self;
+end;
+
+// AddSeparator() - Add separator line
+function TioDBBuilderScriptSection.AddSeparator: IioDBBuilderSqlScriptSection;
+begin
+  FText.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
+  Result := Self;
+end;
+
+// AddTitle() - Add title with separators
+function TioDBBuilderScriptSection.AddTitle(const AText: String): IioDBBuilderSqlScriptSection;
+begin
+  AddEmptyLine;
+  AddSeparator;
+  AddComment(AText);
+  AddSeparator;
+  AddEmptyLine;
+  Result := Self;
+end;
+
+// Clear - Non-fluent method
+procedure TioDBBuilderScriptSection.Clear;
+begin
+  FText.Clear;
+end;
+
+// Backwards compatibility (deprecated)
 procedure TioDBBuilderScriptSection.IncIndentationLevel;
 begin
-  FIndentation.IncIndent;
+  IncIndent(1);
+end;
+
+procedure TioDBBuilderScriptSection.DecIndentationLevel;
+begin
+  DecIndent(1);
 end;
 
 { TioDBBuilderScriptSectionWarnings }
 
-procedure TioDBBuilderScriptSectionWarnings.Add(const AText: String);
+function TioDBBuilderScriptSectionWarnings.AddLine(const AText: String): IioDBBuilderSqlScriptSection;
 begin
-  inherited Add('WARNING: ' + AText);
+  FText.Add('WARNING: ' + AText);
+  Result := Self;
 end;
 
 { TioDBBuilderScriptSectionHints }
 
-procedure TioDBBuilderScriptSectionHints.Add(const AText: String);
+function TioDBBuilderScriptSectionHints.AddLine(const AText: String): IioDBBuilderSqlScriptSection;
 begin
-  inherited Add('Hint: ' + AText);
+  FText.Add('Hint: ' + AText);
+  Result := Self;
 end;
 
 { TioDBBuilderSqlScript }

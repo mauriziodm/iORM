@@ -122,7 +122,7 @@ begin
 
   Script.Body.Add(Format('FROM %s', [Table2OldTableName(ATable)]));
   Script.Body.Add(';');
-  Script.Body.AddEmpty;
+  Script.Body.AddEmptyLine;
 end;
 
 procedure TioDBBuilderStrategySqLite.CopyDataFromOldToNewTables;
@@ -159,7 +159,7 @@ procedure TioDBBuilderStrategySqLite.CreateTable(const ATable: IioDBBuilderSchem
 begin
   Script.Body.Add(SqlGenerator.BuildSQL_BeginCreateTable(ATable));
   Script.Body.IncIndentationLevel;
-  Script.Body.Add(SqlGenerator.BuildSQL_CreateFields(ATable, Script.Body.CurrentIndentation));
+  Script.Body.Add(SqlGenerator.BuildSQL_CreateFields(ATable, Script.Body.Indent));
 
   if Schema.ForeignKeysEnabled then
     CreateTableForeignKeys(ATable);
@@ -390,7 +390,7 @@ end;
 
 procedure TioDBBuilderStrategySqLite.GenerateDatabaseObjects(const Create: boolean);
 begin
-  Script.Body.AddEmpty;
+  Script.Body.AddEmptyLine;
   Script.Body.AddComment('Before we start: defer foreign key checks to avoid errors during table rebuild');
   Script.Body.Add('PRAGMA defer_foreign_keys=on;');
 
@@ -417,10 +417,10 @@ begin
       CopyDataFromOldToNewTables;
   end;
 
-  Script.Body.AddEmpty;
+  Script.Body.AddEmptyLine;
   Script.Body.AddComment('At the end: restore normal foreign key checks');
   Script.Body.Add('PRAGMA defer_foreign_keys=off;');
-  Script.Body.AddEmpty;
+  Script.Body.AddEmptyLine;
 end;
 
 procedure TioDBBuilderStrategySqLite.RenameAllTablesToOld;
@@ -437,7 +437,7 @@ begin
     Script.Body.AddComment(Format('Renaming from "%s" to "%s"', [LTable.Name, Table2OldTableName(LTable)]));
     Script.Body.Add(Format('DROP TABLE IF EXISTS %s;', [Table2OldTableName(LTable)]));
     Script.Body.Add(Format('ALTER TABLE %s RENAME TO %s;', [LTable.Name, Table2OldTableName(LTable)]));
-    Script.Body.AddEmpty;
+    Script.Body.AddEmptyLine;
   end;
 end;
 

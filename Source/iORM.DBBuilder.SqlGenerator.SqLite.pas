@@ -102,7 +102,6 @@ uses
   iORM.Exceptions,
   iORM.CommonTypes,
   iORM.SqlTranslator,
-  iORM.TextBuilder.Interfaces,
   iORM.DB.SqLite.SqlDataConverter
 
   ;
@@ -308,14 +307,14 @@ end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
 var
-  LTextBuilder: IioTextBuilder;
+  LSection: IioDBBuilderSqlScriptSection;
 begin
   // Generates: , CONSTRAINT <name> FOREIGN KEY (...) REFERENCES (...) [ON UPDATE ...] [ON DELETE ...] DEFERRABLE INITIALLY DEFERRED
   // Note: SQLite FK constraints are added within CREATE TABLE, not via ALTER TABLE
-  LTextBuilder := NewTextBuilder;
+  LSection := NewSqlScriptSection;
 
   // Build the main FK constraint structure
-  LTextBuilder.Add(
+  LSection.Add(
     Format(', CONSTRAINT "%s" FOREIGN KEY ("%s") REFERENCES "%s" ("%s")', [
       AForeignKey.Name,
       AForeignKey.DependentFieldName,
@@ -326,17 +325,17 @@ begin
 
   // Add optional ON UPDATE clause if specified
   if AForeignKey.OnUpdateAction > fkUnspecified then
-    LTextBuilder.Add(Format(' ON UPDATE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnUpdateAction)]));
+    LSection.Add(Format(' ON UPDATE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnUpdateAction)]));
 
   // Add optional ON DELETE clause if specified
   if AForeignKey.OnDeleteAction > fkUnspecified then
-    LTextBuilder.Add(Format(' ON DELETE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnDeleteAction)]));
+    LSection.Add(Format(' ON DELETE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnDeleteAction)]));
 
   // SQLite-specific: make FK constraint deferrable to avoid constraint violations during complex updates
-  LTextBuilder.
+  LSection.
     Add(' DEFERRABLE INITIALLY DEFERRED');
 
-  Result := LTextBuilder.Text;
+  Result := LSection.Text;
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_BeginAlterTable(const ATable: IioDBBuilderSchemaTable): string;

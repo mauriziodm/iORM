@@ -95,9 +95,9 @@ begin
 
   if Schema.IndexesEnabled and (taIndexes in ATable.Changes) then
   begin
-    Script.Body.AddEmpty;
+    Script.Body.AddEmptyLine;
     AddOrAlterIndexes(ATable);
-    Script.Body.AddEmpty;
+    Script.Body.AddEmptyLine;
   end;
 end;
 
@@ -125,18 +125,18 @@ begin
   if (Schema.Status = stCreate) or not SequenceExists(ATable.GetSequenceName) then
     CreateTableSequence(ATable);
 
-  Script.Body.AddEmpty;
+  Script.Body.AddEmptyLine;
   Script.Body.Add(SqlGenerator.BuildSQL_BeginCreateTable(ATable));
   Script.Body.IncIndentationLevel;
-  Script.Body.Add(SqlGenerator.BuildSQL_CreateFields(ATable, Script.Body.CurrentIndentation));
+  Script.Body.Add(SqlGenerator.BuildSQL_CreateFields(ATable, Script.Body.Indent));
   Script.Body.DecIndentationLevel;
   Script.Body.Add(SqlGenerator.BuildSQL_EndCreateTable(ATable));
-  Script.Body.AddEmpty;
+  Script.Body.AddEmptyLine;
   Script.Body.Add(SqlGenerator.BuildSQL_AddPK(ATable));
 
   if Schema.IndexesEnabled then
   begin
-    Script.Body.AddEmpty;
+    Script.Body.AddEmptyLine;
     CreateTableIndexes(ATable);
   end;
 end;
@@ -336,7 +336,7 @@ procedure TioDBBuilderStrategyFirebird.GenerateDatabaseObjects(const Create: boo
 begin
   // Add Firebird version detection info as script comment (not warning, to avoid blocking execution)
   // Note: Accessing FirebirdVersion property triggers automatic version detection (lazy initialization)
-  Script.Body.AddEmpty;
+  Script.Body.AddEmptyLine;
   Script.Header.AddComment(Format('Firebird version detected: %s (Major: %d, Minor: %d)',
     [FBSqlGenerator.FirebirdVersion, FBSqlGenerator.FirebirdMajorVersion, FBSqlGenerator.FirebirdMinorVersion]));
 
@@ -355,10 +355,10 @@ begin
   else
   begin
     // DropForeignKeys;  // Carlo Marona (2025-10-20): Removed because now the analisys was updated to take in account foreign keys changes
-    Script.Body.AddEmpty;
+    Script.Body.AddEmptyLine;
     //DropIndexes;  // Carlo Marona: Create index method was updated to check if index exists before create so there's no need to remove all indexes blindly
     CreateOrAlterTables;
-    Script.Body.AddEmpty;
+    Script.Body.AddEmptyLine;
     // CreateSequences;  // Carlo Marona: Create sequence was moved in CreateTable method so the create table method creates all table components
 
     //if Schema.IndexesEnabled then  // Carlo Marona: Create indexes was moved in CreateTable method so the create table method creates all table components

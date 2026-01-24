@@ -235,21 +235,33 @@ type
   IioDBBuilderSqlScriptSection = interface
     ['{DF2D64EF-3576-49CF-B803-3D10D7A93816}']
 
-    function GetCurrentIndentation: TioIndentation;
+    function GetIndent: TioIndentation;
     function GetSQL: TStringList;
+    function GetText: string;
 
-    procedure Add(const AText: String);
-    procedure AddComment(const AText: String);
-    procedure AddEmpty;
-    procedure AddSeparator;
-    procedure AddTitle(const AText: String);
+    // Fluent interface methods (return Self)
+    function Add(const AText: String): IioDBBuilderSqlScriptSection;      // Append inline to last line
+    function AddLine(const AText: string): IioDBBuilderSqlScriptSection;  // New line with indent
+    function AddEmptyLine: IioDBBuilderSqlScriptSection;
+    function IncIndent(const AIncrement: integer = 1): IioDBBuilderSqlScriptSection;
+    function DecIndent(const ADecrement: integer = 1): IioDBBuilderSqlScriptSection;
+
+    // Specialized methods (return Self for fluent)
+    function AddComment(const AText: String): IioDBBuilderSqlScriptSection;
+    function AddSeparator: IioDBBuilderSqlScriptSection;
+    function AddTitle(const AText: String): IioDBBuilderSqlScriptSection;
+
+    // Non-fluent methods
     procedure Clear;
 
-    procedure DecIndentationLevel;
+    // Backwards compatibility (deprecated, use IncIndent/DecIndent instead)
     procedure IncIndentationLevel;
+    procedure DecIndentationLevel;
 
-    property CurrentIndentation: TioIndentation read GetCurrentIndentation;
-    property SQL: TStringList read GetSQL;
+    // Properties
+    property Indent: TioIndentation read GetIndent;  // Access to indentation object
+    property SQL: TStringList read GetSQL;           // For TStringList operations (Assign, Count, AddStrings)
+    property Text: string read GetText;              // Get content as string
   end;
 
 
