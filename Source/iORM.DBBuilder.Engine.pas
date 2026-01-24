@@ -193,7 +193,7 @@ begin
     raise EioDBBuilderException.Create(ClassName, 'BuildCreateDBSqlScript', 'Unable to build SQL script: schema not analyzed');
 
   TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateCreateDatabaseScript;
-  AScript.SQL.Assign(FSchema.Script.SQL);
+  AScript.Lines.Assign(FSchema.Script.Lines);
 end;
 
 procedure TioDBBuilderEngine.BuildCreateOrUpdateDBSqlScript(const AScript: IioDBBuilderSqlScript);
@@ -208,7 +208,7 @@ begin
     stCreate: TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateCreateDatabaseScript;
     stUpdate: TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateUpdateDatabaseScript;
   end;
-  AScript.SQL.Assign(FSchema.Script.SQL);
+  AScript.Lines.Assign(FSchema.Script.Lines);
 end;
 
 procedure TioDBBuilderEngine.BuildDropForeignKeysSqlScript(const AScript: IioDBBuilderSqlScript);
@@ -217,7 +217,7 @@ begin
     raise EioInvalidArgumentException.Create(ClassName, 'BuildDropForeignKeysSqlScript', 'AScript is not assigned.');
 
   TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).DropForeignKeys;
-  AScript.SQL.Assign(FSchema.Script.SQL);
+  AScript.Lines.Assign(FSchema.Script.Lines);
 end;
 
 procedure TioDBBuilderEngine.BuildDropIndexesSqlScript(const AScript: IioDBBuilderSqlScript);
@@ -226,7 +226,7 @@ begin
     raise EioInvalidArgumentException.Create(ClassName, 'BuildDropIndexesSqlScript', 'AScript is not assigned.');
 
   TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).DropIndexes;
-  AScript.SQL.Assign(FSchema.Script.SQL);
+  AScript.Lines.Assign(FSchema.Script.Lines);
 end;
 
 procedure TioDBBuilderEngine.BuildUpdateDBSqlScript(const AScript: IioDBBuilderSqlScript);
@@ -238,7 +238,7 @@ begin
     raise EioDBBuilderException.Create(ClassName, 'BuildUpdateDBSqlScript', 'Unable to build SQL script: schema not analyzed');
 
   TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateUpdateDatabaseScript;
-  AScript.SQL.Assign(FSchema.Script.SQL);
+  AScript.Lines.Assign(FSchema.Script.Lines);
 end;
 
 constructor TioDBBuilderEngine.Create(const AConnectionDefName: String; const AddIndexes, AddForeignKeys: Boolean);
@@ -276,10 +276,10 @@ begin
 
   if (LStatus > stClean) or Force then
   begin
-    if FSchema.Script.Warnings.SQL.Count > 0 then
+    if FSchema.Script.Warnings.Lines.Count > 0 then
       raise EioDBBuilderException.Create(ClassName, 'CreateOrUpdateDB',
         'Database must be updated but WARNINGS exists.' + sLineBreak +
-        FSchema.Script.Warnings.SQL.Text
+        FSchema.Script.Warnings.Lines.Text
       );
 
     if LBuildScript then
@@ -301,7 +301,7 @@ begin
         BuildUpdateDBSqlScript(LScript);
     end;
 
-    TioDBFactory.Script(FConnectionDefName, LScript.SQL).Execute;
+    TioDBFactory.Script(FConnectionDefName, LScript.Lines).Execute;
   end;
 end;
 
@@ -336,7 +336,7 @@ begin
   if AddForeignKeys then
     LStrategy.CreateTableForeignKeys(ATable);
 
-  TioDBFactory.Script(FConnectionDefName, FSchema.Script.SQL).Execute;
+  TioDBFactory.Script(FConnectionDefName, FSchema.Script.Lines).Execute;
 end;
 
 procedure TioDBBuilderEngine.UpdateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes: Boolean;
@@ -354,7 +354,7 @@ begin
   LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator);
 
   LStrategy.AlterTable(ATable);
-  TioDBFactory.Script(FConnectionDefName, FSchema.Script.SQL).Execute;
+  TioDBFactory.Script(FConnectionDefName, FSchema.Script.Lines).Execute;
 end;
 
 function TioDBBuilderEngine.GetAnalyzed: boolean;
@@ -369,7 +369,7 @@ end;
 
 function TioDBBuilderEngine.GetWarnings: TStrings;
 begin
-  Result := FSchema.Script.Warnings.SQL;
+  Result := FSchema.Script.Warnings.Lines;
 end;
 
 { TioDBBuilderEngine_New }
@@ -394,13 +394,13 @@ procedure TioDBBuilderEngine_New.CreateOrUpdateDB(const AForce: Boolean);
 begin
   if (FSchema.Status > stClean) or AForce then
   begin
-    if FSchema.Script.Warnings.SQL.Count > 0 then
-      raise EioDBBuilderException.Create(ClassName, 'CreateOrUpdateDB', 'Database must be updated but WARNINGS exists.' + sLineBreak + FSchema.Script.Warnings.SQL.Text);
+    if FSchema.Script.Warnings.Lines.Count > 0 then
+      raise EioDBBuilderException.Create(ClassName, 'CreateOrUpdateDB', 'Database must be updated but WARNINGS exists.' + sLineBreak + FSchema.Script.Warnings.Lines.Text);
 
     if FSchema.Status = stCreate then
       CreateDatabasePhys;
 
-    TioDBFactory.Script(FConnectionDefName, FScript.SQL).Execute;
+    TioDBFactory.Script(FConnectionDefName, FScript.Lines).Execute;
 
     // Rebuilds schema and script to keep them consistent with the new situation
     RebuildSchema;
@@ -424,7 +424,7 @@ begin
       LStrategy.AlterTable(LTable);
   end;
 
-  TioDBFactory.Script(FConnectionDefName, FSchema.Script.SQL).Execute;
+  TioDBFactory.Script(FConnectionDefName, FSchema.Script.Lines).Execute;
 
   // Rebuilds schema and script to keep them consistent with the new situation
   RebuildSchema;
@@ -453,7 +453,7 @@ end;
 
 function TioDBBuilderEngine_New.GetWarnings: TStrings;
 begin
-  Result := FSchema.Script.Warnings.SQL;
+  Result := FSchema.Script.Warnings.Lines;
 end;
 
 procedure TioDBBuilderEngine_New.RebuildSchema;

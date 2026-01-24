@@ -126,7 +126,7 @@ type
     property Server: String read FServer write FServer;
     property SQLDialect: TioSQLDialect read FSQLDialect write FSQLDialect;
     property UserName: String read FUserName write FUserName;
-// TODO: Non ricordo se la proprietà IioSynchroStrategy_Client è da eliminare, controllare
+// TODO: Non ricordo se la proprietï¿½ IioSynchroStrategy_Client ï¿½ da eliminare, controllare
     property SynchroStrategy_Client: IioSynchroStrategy_Client read FSynchroStrategy_Client write SetSynchroStrategy_Client default nil;
     // Events
     property AfterDBBuild: TioAfterDBBuildEvent read FAfterDBBuild write FAfterDBBuild;
@@ -333,21 +333,21 @@ begin
 
   // Carlo Marona
   if Assigned(FBeforeDBBuild) then
-    FBeforeDBBuild(Self, LStatus, LScript.Sql, LDBBuilderEngine.Warnings, LAbort);
+    FBeforeDBBuild(Self, LStatus, LScript.Lines, LDBBuilderEngine.Warnings, LAbort);
 
   if not LAbort then
   begin
     try
       LDBBuilderEngine.CreateOrUpdateDB(AForce, LScript);
-      
+
       // Carlo Marona
     	if Assigned(FAfterDBBuild) then
-        FAfterDBBuild(Self, LStatus, LScript.Sql, LDBBuilderEngine.Warnings);
+        FAfterDBBuild(Self, LStatus, LScript.Lines, LDBBuilderEngine.Warnings);
     except
       on E: Exception do
       begin
         if Assigned(FOnDBBuildException) then
-          FOnDBBuildException(Self, LStatus, LScript.SQL, LDBBuilderEngine.Warnings, E, LReRaise);
+          FOnDBBuildException(Self, LStatus, LScript.Lines, LDBBuilderEngine.Warnings, E, LReRaise);
 
         if LReRaise then
           raise;
@@ -440,7 +440,7 @@ begin
       end;
     end;
     // If not in design or load mode the
-    // NB: Messo anche qui perchè venga impostata la connessione di default anche a runtime
+    // NB: Messo anche qui perchï¿½ venga impostata la connessione di default anche a runtime
     if not((csDesigning in ComponentState) or (csLoading in ComponentState)) then
       TioApplication.SessionDataStore.SetDefaultConnection(Name);
   end;

@@ -19,29 +19,28 @@ type
   TioDBBuilderSqlText = class(TInterfacedObject, IioDBBuilderSqlText)
   private
     FIndentLevel: Integer;
-    FText: TStringList;
-    function GetSQL: TStringList;
+    FLines: TStringList;
+    function GetLines: TStringList;
     function GetText: string;
     function GetIndentationChars: string;
   public
     constructor Create;
     destructor Destroy; override;
 
+    procedure Clear;
+
     // Fluent interface methods (return Self)
     function Add(const AText: String): IioDBBuilderSqlText; virtual;      // Append inline to last line
     function AddComment(const AText: String): IioDBBuilderSqlText; virtual;
-    function AddLine(const AText: string): IioDBBuilderSqlText; virtual;  // New line with indent
+    function AddLine(const AText: string): IioDBBuilderSqlText; virtual;
     function AddEmpty: IioDBBuilderSqlText;
     function AddSeparator: IioDBBuilderSqlText; virtual;
     function AddTitle(const AText: String): IioDBBuilderSqlText; virtual;
     function DecIndent(const ADecrement: integer = 1): IioDBBuilderSqlText;
     function IncIndent(const AIncrement: integer = 1): IioDBBuilderSqlText;
 
-    // Non-fluent methods
-    procedure Clear;
-
     // Properties
-    property SQL: TStringList read GetSQL;
+    property Lines: TStringList read GetLines;
     property Text: string read GetText;
   end;
 
@@ -69,7 +68,7 @@ type
     function GetFooter: IioDBBuilderSqlText;
     function GetHeader: IioDBBuilderSqlText;
     function GetHints: IioDBBuilderSqlText;
-    function GetSQL: TStringList;
+    function GetLines: TStringList;
     function GetWarnings: IioDBBuilderSqlText;
   public
     constructor Create;
@@ -87,7 +86,7 @@ type
     property Footer: IioDBBuilderSqlText read GetFooter;
     property Header: IioDBBuilderSqlText read GetHeader;
     property Hints: IioDBBuilderSqlText read GetHints;
-    property SQL: TStringList read GetSQL;
+    property Lines: TStringList read GetLines;
     property Warnings: IioDBBuilderSqlText read GetWarnings;
   end;
 
@@ -111,24 +110,24 @@ constructor TioDBBuilderSqlText.Create;
 begin
   inherited Create;
   FIndentLevel := 0;
-  FText := TStringList.Create;
+  FLines := TStringList.Create;
 end;
 
 destructor TioDBBuilderSqlText.Destroy;
 begin
-  FText.Free;
+  FLines.Free;
   inherited;
 end;
 
 // Getters for properties
-function TioDBBuilderSqlText.GetSQL: TStringList;
+function TioDBBuilderSqlText.GetLines: TStringList;
 begin
-  Result := FText;
+  Result := FLines;
 end;
 
 function TioDBBuilderSqlText.GetText: string;
 begin
-  Result := FText.Text;
+  Result := FLines.Text;
 end;
 
 // Helper method for indentation
@@ -142,25 +141,25 @@ function TioDBBuilderSqlText.Add(const AText: String): IioDBBuilderSqlText;
 var
   LLastIndex: Integer;
 begin
-  LLastIndex := FText.Count - 1;
+  LLastIndex := FLines.Count - 1;
   if LLastIndex >= 0 then
-    FText[LLastIndex] := FText[LLastIndex] + AText
+    FLines[LLastIndex] := FLines[LLastIndex] + AText
   else
-    FText.Add(AText);
+    FLines.Add(AText);
   Result := Self;
 end;
 
 // AddLine() - Add new line with indentation
 function TioDBBuilderSqlText.AddLine(const AText: string): IioDBBuilderSqlText;
 begin
-  FText.Add(GetIndentationChars + AText);
+  FLines.Add(GetIndentationChars + AText);
   Result := Self;
 end;
 
 // AddEmpty() - Add empty line
 function TioDBBuilderSqlText.AddEmpty: IioDBBuilderSqlText;
 begin
-  FText.Add('');
+  FLines.Add('');
   Result := Self;
 end;
 
@@ -184,14 +183,14 @@ end;
 // AddComment() - Add SQL comment line
 function TioDBBuilderSqlText.AddComment(const AText: String): IioDBBuilderSqlText;
 begin
-  FText.Add('-- ' + AText);
+  FLines.Add('-- ' + AText);
   Result := Self;
 end;
 
 // AddSeparator() - Add separator line
 function TioDBBuilderSqlText.AddSeparator: IioDBBuilderSqlText;
 begin
-  FText.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
+  FLines.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
   Result := Self;
 end;
 
@@ -209,14 +208,14 @@ end;
 // Clear - Non-fluent method
 procedure TioDBBuilderSqlText.Clear;
 begin
-  FText.Clear;
+  FLines.Clear;
 end;
 
 { TioDBBuilderSqlTextWarnings }
 
 function TioDBBuilderSqlTextWarnings.AddLine(const AText: String): IioDBBuilderSqlText;
 begin
-  FText.Add('WARNING: ' + AText);
+  FLines.Add('WARNING: ' + AText);
   Result := Self;
 end;
 
@@ -224,7 +223,7 @@ end;
 
 function TioDBBuilderSqlTextHints.AddLine(const AText: String): IioDBBuilderSqlText;
 begin
-  FText.Add('Hint: ' + AText);
+  FLines.Add('Hint: ' + AText);
   Result := Self;
 end;
 
@@ -283,44 +282,44 @@ begin
   Result := FScriptWarnings;
 end;
 
-function TioDBBuilderSqlScript.GetSQL: TStringList;
+function TioDBBuilderSqlScript.GetLines: TStringList;
 begin
   FFullScript.Clear;
-  FFullScript.AddStrings(FScriptHeader.SQL);
+  FFullScript.AddStrings(FScriptHeader.Lines);
 
   // Add warnings section with title
-  if FScriptWarnings.SQL.Count > 0 then
+  if FScriptWarnings.Lines.Count > 0 then
   begin
     FFullScript.Add('');
     FFullScript.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
     FFullScript.Add('-- W A R N I N G S !!!        W A R N I N G S !!!        W A R N I N G S !!!');
     FFullScript.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
     FFullScript.Add('');
-    FFullScript.AddStrings(FScriptWarnings.SQL);
+    FFullScript.AddStrings(FScriptWarnings.Lines);
     FFullScript.Add('');
   end;
 
   // Add hints section with title
-  if FScriptHints.SQL.Count > 0 then
+  if FScriptHints.Lines.Count > 0 then
   begin
     FFullScript.Add('');
     FFullScript.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
     FFullScript.Add('-- H I N T S');
     FFullScript.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
     FFullScript.Add('');
-    FFullScript.AddStrings(FScriptHints.SQL);
+    FFullScript.AddStrings(FScriptHints.Lines);
     FFullScript.Add('');
   end;
 
-  FFullScript.AddStrings(FScriptBody.SQL);
-  FFullScript.AddStrings(FScriptFooter.SQL);
+  FFullScript.AddStrings(FScriptBody.Lines);
+  FFullScript.AddStrings(FScriptFooter.Lines);
 
   Result := FFullScript;
 end;
 
 procedure TioDBBuilderSqlScript.SaveToFile(const AFileName: string);
 begin
-  SQL.SaveToFile(AFileName);
+  Lines.SaveToFile(AFileName);
 end;
 
 procedure TioDBBuilderSqlScript.ScriptBegin(const AConnectionDefName, ADriverID: string);

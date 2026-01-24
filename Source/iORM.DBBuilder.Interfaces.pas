@@ -235,7 +235,7 @@ type
   IioDBBuilderSqlText = interface
     ['{DF2D64EF-3576-49CF-B803-3D10D7A93816}']
 
-    function GetSQL: TStringList;
+    function GetLines: TStringList;
     function GetText: string;
 
     // Fluent interface methods (return Self)
@@ -254,7 +254,7 @@ type
     procedure Clear;
 
     // Properties
-    property SQL: TStringList read GetSQL;           // For TStringList operations (Assign, Count, AddStrings)
+    property Lines: TStringList read GetLines;           // For TStringList operations (Assign, Count, AddStrings)
     property Text: string read GetText;              // Get content as string
   end;
 
@@ -266,7 +266,7 @@ type
     function GetFooter: IioDBBuilderSqlText;
     function GetHeader: IioDBBuilderSqlText;
     function GetHints: IioDBBuilderSqlText;
-    function GetSQL: TStringList;
+    function GetLines: TStringList;
     function GetWarnings: IioDBBuilderSqlText;
 
     // Full script clear
@@ -281,7 +281,7 @@ type
     property Footer: IioDBBuilderSqlText read GetFooter;
     property Header: IioDBBuilderSqlText read GetHeader;
     property Hints: IioDBBuilderSqlText read GetHints;
-    property SQL: TStringList read GetSQL;
+    property Lines: TStringList read GetLines;
     property Warnings: IioDBBuilderSqlText read GetWarnings;
   end;
 
