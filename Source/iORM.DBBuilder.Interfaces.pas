@@ -253,10 +253,6 @@ type
     // Non-fluent methods
     procedure Clear;
 
-    // Backwards compatibility (deprecated, use IncIndent/DecIndent instead)
-    procedure IncIndentationLevel;
-    procedure DecIndentationLevel;
-
     // Properties
     property SQL: TStringList read GetSQL;           // For TStringList operations (Assign, Count, AddStrings)
     property Text: string read GetText;              // Get content as string

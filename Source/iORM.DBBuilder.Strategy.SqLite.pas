@@ -88,7 +88,7 @@ begin
   Script.Body.AddComment(Format('Copying data from "%s" to "%s"', [Table2OldTableName(ATable), ATable.Name]));
   // Insert into
   Script.Body.Add(Format('INSERT INTO %s (', [ATable.Name]));
-  Script.Body.IncIndentationLevel;
+  Script.Body.IncIndent;
 
   LComma := '  ';
 
@@ -101,11 +101,11 @@ begin
     LComma := ', ';
   end;
 
-  Script.Body.DecIndentationLevel;
+  Script.Body.DecIndent;
 
   // Select from
   Script.Body.Add(') SELECT');
-  Script.Body.IncIndentationLevel;
+  Script.Body.IncIndent;
 
   LComma := '  ';
 
@@ -118,7 +118,7 @@ begin
     LComma := ', ';
   end;
 
-  Script.Body.DecIndentationLevel;
+  Script.Body.DecIndent;
 
   Script.Body.Add(Format('FROM %s', [Table2OldTableName(ATable)]));
   Script.Body.Add(';');
@@ -161,7 +161,7 @@ var
   LField: IioDBBuilderSchemaField;
 begin
   Script.Body.Add(SqlGenerator.BuildSQL_BeginCreateTable(ATable));
-  Script.Body.IncIndentationLevel;
+  Script.Body.IncIndent;
 
   // Inline field creation
   LComma := '  ';
@@ -174,7 +174,7 @@ begin
   if Schema.ForeignKeysEnabled then
     CreateTableForeignKeys(ATable);
 
-  Script.Body.DecIndentationLevel;
+  Script.Body.DecIndent;
   Script.Body.Add(SqlGenerator.BuildSQL_EndCreateTable(ATable));
 end;
 

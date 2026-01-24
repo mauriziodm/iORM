@@ -13,6 +13,7 @@ uses
 const
   SCRIPT_SEPARATOR_LENGTH = 79; // Per allineamento con i warnings
   SCRIPT_INDENTATION_WIDTH = 4;
+  SCRIPT_INDENTATION_CHAR = ' ';
 
 type
   TioDBBuilderSqlText = class(TInterfacedObject, IioDBBuilderSqlText)
@@ -28,22 +29,16 @@ type
 
     // Fluent interface methods (return Self)
     function Add(const AText: String): IioDBBuilderSqlText; virtual;      // Append inline to last line
+    function AddComment(const AText: String): IioDBBuilderSqlText; virtual;
     function AddLine(const AText: string): IioDBBuilderSqlText; virtual;  // New line with indent
     function AddEmpty: IioDBBuilderSqlText;
-    function IncIndent(const AIncrement: integer = 1): IioDBBuilderSqlText;
-    function DecIndent(const ADecrement: integer = 1): IioDBBuilderSqlText;
-
-    // Specialized methods (return Self for fluent)
-    function AddComment(const AText: String): IioDBBuilderSqlText; virtual;
     function AddSeparator: IioDBBuilderSqlText; virtual;
     function AddTitle(const AText: String): IioDBBuilderSqlText; virtual;
+    function DecIndent(const ADecrement: integer = 1): IioDBBuilderSqlText;
+    function IncIndent(const AIncrement: integer = 1): IioDBBuilderSqlText;
 
     // Non-fluent methods
     procedure Clear;
-
-    // Backwards compatibility (deprecated, use IncIndent/DecIndent instead)
-    procedure IncIndentationLevel;
-    procedure DecIndentationLevel;
 
     // Properties
     property SQL: TStringList read GetSQL;
@@ -139,7 +134,7 @@ end;
 // Helper method for indentation
 function TioDBBuilderSqlText.GetIndentationChars: string;
 begin
-  Result := StringOfChar(' ', FIndentLevel * SCRIPT_INDENTATION_WIDTH);
+  Result := StringOfChar(SCRIPT_INDENTATION_CHAR, FIndentLevel * SCRIPT_INDENTATION_WIDTH);
 end;
 
 // Add() - Append inline to last line (no newline, no indent)
@@ -215,17 +210,6 @@ end;
 procedure TioDBBuilderSqlText.Clear;
 begin
   FText.Clear;
-end;
-
-// Backwards compatibility (deprecated)
-procedure TioDBBuilderSqlText.IncIndentationLevel;
-begin
-  IncIndent(1);
-end;
-
-procedure TioDBBuilderSqlText.DecIndentationLevel;
-begin
-  DecIndent(1);
 end;
 
 { TioDBBuilderSqlTextWarnings }

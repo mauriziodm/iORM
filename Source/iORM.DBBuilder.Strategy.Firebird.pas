@@ -130,7 +130,7 @@ begin
 
   Script.Body.AddEmpty;
   Script.Body.Add(SqlGenerator.BuildSQL_BeginCreateTable(ATable));
-  Script.Body.IncIndentationLevel;
+  Script.Body.IncIndent;
 
   // Inline field creation
   LComma := '  ';
@@ -140,7 +140,7 @@ begin
     LComma := ', ';
   end;
 
-  Script.Body.DecIndentationLevel;
+  Script.Body.DecIndent;
   Script.Body.Add(SqlGenerator.BuildSQL_EndCreateTable(ATable));
   Script.Body.AddEmpty;
   Script.Body.Add(SqlGenerator.BuildSQL_AddPK(ATable));

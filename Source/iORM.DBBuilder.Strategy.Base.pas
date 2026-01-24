@@ -238,12 +238,12 @@ var
 begin
   Script.Body.AddTitle('Creating indexes');
 
-  Script.Body.IncIndentationLevel;
+  Script.Body.IncIndent;
 
   for LTable in Schema.Tables.Values do
     CreateTableIndexes(LTable);
 
-  Script.Body.DecIndentationLevel;
+  Script.Body.DecIndent;
 end;
 
 procedure TioDBBuilderStrategyBase.CreateTableIndexes(const ATable: IioDBBuilderSchemaTable);
@@ -275,9 +275,9 @@ begin
       stCreate:
         begin
           Script.Body.Add(SqlGenerator.BuildSQL_BeginAlterTable(ATable));
-          Script.Body.IncIndentationLevel;
+          Script.Body.IncIndent;
           Script.Body.Add(SqlGenerator.BuildSQL_AddField(LField));
-          Script.Body.DecIndentationLevel;
+          Script.Body.DecIndent;
           Script.Body.Add(SqlGenerator.BuildSQL_EndAlterTable(ATable));
         end;
       stUpdate:
