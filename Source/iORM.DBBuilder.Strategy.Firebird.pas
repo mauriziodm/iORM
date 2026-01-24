@@ -95,9 +95,9 @@ begin
 
   if Schema.IndexesEnabled and (taIndexes in ATable.Changes) then
   begin
-    Script.Body.AddEmptyLine;
+    Script.Body.AddEmpty;
     AddOrAlterIndexes(ATable);
-    Script.Body.AddEmptyLine;
+    Script.Body.AddEmpty;
   end;
 end;
 
@@ -119,24 +119,35 @@ begin
 end;
 
 procedure TioDBBuilderStrategyFirebird.CreateTable(const ATable: IioDBBuilderSchemaTable);
+var
+  LComma: string;
+  LField: IioDBBuilderSchemaField;
 begin
   inherited;
 
   if (Schema.Status = stCreate) or not SequenceExists(ATable.GetSequenceName) then
     CreateTableSequence(ATable);
 
-  Script.Body.AddEmptyLine;
+  Script.Body.AddEmpty;
   Script.Body.Add(SqlGenerator.BuildSQL_BeginCreateTable(ATable));
   Script.Body.IncIndentationLevel;
-  Script.Body.Add(SqlGenerator.BuildSQL_CreateFields(ATable, Script.Body.Indent));
+
+  // Inline field creation
+  LComma := '  ';
+  for LField in ATable.Fields do
+  begin
+    Script.Body.AddLine(LComma + SqlGenerator.BuildSQL_CreateField(LField));
+    LComma := ', ';
+  end;
+
   Script.Body.DecIndentationLevel;
   Script.Body.Add(SqlGenerator.BuildSQL_EndCreateTable(ATable));
-  Script.Body.AddEmptyLine;
+  Script.Body.AddEmpty;
   Script.Body.Add(SqlGenerator.BuildSQL_AddPK(ATable));
 
   if Schema.IndexesEnabled then
   begin
-    Script.Body.AddEmptyLine;
+    Script.Body.AddEmpty;
     CreateTableIndexes(ATable);
   end;
 end;
@@ -336,7 +347,7 @@ procedure TioDBBuilderStrategyFirebird.GenerateDatabaseObjects(const Create: boo
 begin
   // Add Firebird version detection info as script comment (not warning, to avoid blocking execution)
   // Note: Accessing FirebirdVersion property triggers automatic version detection (lazy initialization)
-  Script.Body.AddEmptyLine;
+  Script.Body.AddEmpty;
   Script.Header.AddComment(Format('Firebird version detected: %s (Major: %d, Minor: %d)',
     [FBSqlGenerator.FirebirdVersion, FBSqlGenerator.FirebirdMajorVersion, FBSqlGenerator.FirebirdMinorVersion]));
 
@@ -355,10 +366,10 @@ begin
   else
   begin
     // DropForeignKeys;  // Carlo Marona (2025-10-20): Removed because now the analisys was updated to take in account foreign keys changes
-    Script.Body.AddEmptyLine;
+    Script.Body.AddEmpty;
     //DropIndexes;  // Carlo Marona: Create index method was updated to check if index exists before create so there's no need to remove all indexes blindly
     CreateOrAlterTables;
-    Script.Body.AddEmptyLine;
+    Script.Body.AddEmpty;
     // CreateSequences;  // Carlo Marona: Create sequence was moved in CreateTable method so the create table method creates all table components
 
     //if Schema.IndexesEnabled then  // Carlo Marona: Create indexes was moved in CreateTable method so the create table method creates all table components

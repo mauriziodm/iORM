@@ -232,24 +232,23 @@ type
     property Tables: TioDBBuilderSchemaTables read GetTables;
   end;
 
-  IioDBBuilderSqlScriptSection = interface
+  IioDBBuilderSqlText = interface
     ['{DF2D64EF-3576-49CF-B803-3D10D7A93816}']
 
-    function GetIndent: TioIndentation;
     function GetSQL: TStringList;
     function GetText: string;
 
     // Fluent interface methods (return Self)
-    function Add(const AText: String): IioDBBuilderSqlScriptSection;      // Append inline to last line
-    function AddLine(const AText: string): IioDBBuilderSqlScriptSection;  // New line with indent
-    function AddEmptyLine: IioDBBuilderSqlScriptSection;
-    function IncIndent(const AIncrement: integer = 1): IioDBBuilderSqlScriptSection;
-    function DecIndent(const ADecrement: integer = 1): IioDBBuilderSqlScriptSection;
+    function Add(const AText: String): IioDBBuilderSqlText;      // Append inline to last line
+    function AddLine(const AText: string): IioDBBuilderSqlText;  // New line with indent
+    function AddEmpty: IioDBBuilderSqlText;
+    function IncIndent(const AIncrement: integer = 1): IioDBBuilderSqlText;
+    function DecIndent(const ADecrement: integer = 1): IioDBBuilderSqlText;
 
     // Specialized methods (return Self for fluent)
-    function AddComment(const AText: String): IioDBBuilderSqlScriptSection;
-    function AddSeparator: IioDBBuilderSqlScriptSection;
-    function AddTitle(const AText: String): IioDBBuilderSqlScriptSection;
+    function AddComment(const AText: String): IioDBBuilderSqlText;
+    function AddSeparator: IioDBBuilderSqlText;
+    function AddTitle(const AText: String): IioDBBuilderSqlText;
 
     // Non-fluent methods
     procedure Clear;
@@ -259,7 +258,6 @@ type
     procedure DecIndentationLevel;
 
     // Properties
-    property Indent: TioIndentation read GetIndent;  // Access to indentation object
     property SQL: TStringList read GetSQL;           // For TStringList operations (Assign, Count, AddStrings)
     property Text: string read GetText;              // Get content as string
   end;
@@ -268,12 +266,12 @@ type
   IioDBBuilderSqlScript = interface
     ['{714A36B3-A44C-4D1D-A046-BC6222DCE2B7}']
 
-    function GetBody: IioDBBuilderSqlScriptSection;
-    function GetFooter: IioDBBuilderSqlScriptSection;
-    function GetHeader: IioDBBuilderSqlScriptSection;
-    function GetHints: IioDBBuilderSqlScriptSection;
+    function GetBody: IioDBBuilderSqlText;
+    function GetFooter: IioDBBuilderSqlText;
+    function GetHeader: IioDBBuilderSqlText;
+    function GetHints: IioDBBuilderSqlText;
     function GetSQL: TStringList;
-    function GetWarnings: IioDBBuilderSqlScriptSection;
+    function GetWarnings: IioDBBuilderSqlText;
 
     // Full script clear
     procedure Clear;
@@ -283,12 +281,12 @@ type
     // This method works on footer section
     procedure ScriptEnd;
 
-    property Body: IioDBBuilderSqlScriptSection read GetBody;
-    property Footer: IioDBBuilderSqlScriptSection read GetFooter;
-    property Header: IioDBBuilderSqlScriptSection read GetHeader;
-    property Hints: IioDBBuilderSqlScriptSection read GetHints;
+    property Body: IioDBBuilderSqlText read GetBody;
+    property Footer: IioDBBuilderSqlText read GetFooter;
+    property Header: IioDBBuilderSqlText read GetHeader;
+    property Hints: IioDBBuilderSqlText read GetHints;
     property SQL: TStringList read GetSQL;
-    property Warnings: IioDBBuilderSqlScriptSection read GetWarnings;
+    property Warnings: IioDBBuilderSqlText read GetWarnings;
   end;
 
   // DBBuilder reference
@@ -318,7 +316,7 @@ type
     // ----------------------------------------------------------
     function BuildSQL_AddField(const AField: IioDBBuilderSchemaField): string;
     function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
-    function BuildSQL_CreateFields(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string;
+    function BuildSQL_CreateField(const AField: IioDBBuilderSchemaField): string;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     // Returns SQL to retrieve detailed field metadata (type, length, precision, scale, default value, etc.) from the database
     // ATableName is required - returns all fields for that table

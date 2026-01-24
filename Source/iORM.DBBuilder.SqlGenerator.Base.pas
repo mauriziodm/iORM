@@ -56,7 +56,7 @@ type
   protected
     function GetMaxSqlIdentifierLength: integer; virtual;
     function GetMinSqlIdentifierLength: integer; virtual;
-    function NewSqlScriptSection: IioDBBuilderSqlScriptSection;
+    function NewSqlScriptSection: IioDBBuilderSqlText;
     function ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
     function Translate_SchemaFK_To_FKvalue(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
 
@@ -81,7 +81,6 @@ type
     function BuildSQL_AddField(const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildSQL_CreateField(const AField: IioDBBuilderSchemaField): string; virtual; abstract;
-    function BuildSQL_CreateFields(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string; virtual;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     // Returns SQL to retrieve detailed field metadata (type, length, precision, scale, default value, etc.) from the database
     // ATableName is required - returns all fields for that table
@@ -181,26 +180,6 @@ begin
   Result := Format('-- %S', [AText]);
 end;
 
-function TioDBBuilderSqlGenBase.BuildSQL_CreateFields(const ATable: IioDBBuilderSchemaTable; const AIndentation: TioIndentation): string;
-var
-  LComma: string;
-  LField: IioDBBuilderSchemaField;
-  LSection: IioDBBuilderSqlScriptSection;
-begin
-  LSection := NewSqlScriptSection;
-  // Set the initial indentation level based on the passed parameter
-  while LSection.Indent.CurrentLevel < AIndentation.CurrentLevel do
-    LSection.IncIndent;
-  LComma := '  ';
-
-  for LField in ATable.Fields do
-  begin
-    LSection.AddLine(LComma + BuildSQL_CreateField(LField));
-    LComma := ', ';
-  end;
-
-  Result := LSection.Text;
-end;
 
 function TioDBBuilderSqlGenBase.BuildSQL_DropIndex(const ATable: IioDBBuilderSchemaTable;
   const AIndex: IioDBBuilderSchemaIndex): string;
@@ -357,7 +336,7 @@ begin
   Result := 0;
 end;
 
-function TioDBBuilderSqlGenBase.NewSqlScriptSection: IioDBBuilderSqlScriptSection;
+function TioDBBuilderSqlGenBase.NewSqlScriptSection: IioDBBuilderSqlText;
 begin
   Result := TioDBBuilderFactory.NewSqlScriptSection;
 end;

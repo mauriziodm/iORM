@@ -187,7 +187,7 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
 var
-  LSection: IioDBBuilderSqlScriptSection;
+  LSection: IioDBBuilderSqlText;
 begin
   // Generates: ALTER TABLE <table> ADD CONSTRAINT <name> FOREIGN KEY (...) REFERENCES (...) [ON UPDATE ...] [ON DELETE ...]
   LSection := NewSqlScriptSection;
@@ -242,7 +242,7 @@ end;
 function TioDBBuilderSqlGenFirebird.BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable;
   const AField: IioDBBuilderSchemaField): string;
 var
-  LSection: IioDBBuilderSqlScriptSection;
+  LSection: IioDBBuilderSqlText;
 begin
   LSection := NewSqlScriptSection;
 
@@ -279,7 +279,7 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
 var
-  LSection: IioDBBuilderSqlScriptSection;
+  LSection: IioDBBuilderSqlText;
 begin
   LSection := NewSqlScriptSection;
 
@@ -295,7 +295,7 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string;
 var
-  LSection: IioDBBuilderSqlScriptSection;
+  LSection: IioDBBuilderSqlText;
 begin
   // Returns SQL to retrieve detailed field metadata from the database
   // ATableName is required - returns all fields for that table
@@ -355,7 +355,7 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string;
 var
-  LSection: IioDBBuilderSqlScriptSection;
+  LSection: IioDBBuilderSqlText;
 begin
   // Generates: SELECT query to list foreign keys with their properties (table_name, constraint_name, on_update, on_delete)
   // Generalized FK list query following the same pattern as BuildSQL_IndexList
@@ -402,7 +402,7 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_IndexList(const ATableName: string): string;
 var
-  LSection: IioDBBuilderSqlScriptSection;
+  LSection: IioDBBuilderSqlText;
 begin
   // Generates: SELECT query to list indexes with their properties (name, unique flag, orientation)
   // Base query: all non-system indexes with basic info (name, unique, orientation)
@@ -422,7 +422,7 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_IndexDetails(const AIndexName: string): string;
 var
-  LSection: IioDBBuilderSqlScriptSection;
+  LSection: IioDBBuilderSqlText;
 begin
   // Generates: SELECT query to retrieve field details for a specific index (field names and positions)
   LSection := NewSqlScriptSection;

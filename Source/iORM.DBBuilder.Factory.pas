@@ -61,7 +61,7 @@ type
     class function NewSchemaTable(const AContextTable: IioTable): IioDBBuilderSchemaTable;
     class function NewSqlGenerator(const AConnectionDefName: String): IioDBBuilderSqlGenerator;
     class function NewSqlScript: IioDBBuilderSqlScript;
-    class function NewSqlScriptSection: IioDBBuilderSqlScriptSection;
+    class function NewSqlScriptSection: IioDBBuilderSqlText;
     class function NewStrategy(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderStrategy;
   end;
 
@@ -159,9 +159,9 @@ begin
   Result := TioDBBuilderSqlScript.Create;
 end;
 
-class function TioDBBuilderFactory.NewSqlScriptSection: IioDBBuilderSqlScriptSection;
+class function TioDBBuilderFactory.NewSqlScriptSection: IioDBBuilderSqlText;
 begin
-  Result := TioDBBuilderScriptSection.Create;
+  Result := TioDBBuilderSqlText.Create;
 end;
 
 class function TioDBBuilderFactory.NewStrategy(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema;
