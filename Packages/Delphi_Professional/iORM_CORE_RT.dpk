@@ -242,7 +242,7 @@ contains
   iORM.SynchroStrategy.Custom in '..\..\Source\iORM.SynchroStrategy.Custom.pas',
   iORM.SynchroStrategy.Interfaces in '..\..\Source\iORM.SynchroStrategy.Interfaces.pas',
   iORM.SynchroStrategy.EtmBased in '..\..\Source\iORM.SynchroStrategy.EtmBased.pas',
-  iORM.DBBuilder.SqlScript.Base in '..\..\Source\iORM.DBBuilder.SqlScript.Base.pas',
+  iORM.DBBuilder.Script in '..\..\Source\iORM.DBBuilder.Script.pas',
   iORM.DB.Consts in '..\..\Source\iORM.DB.Consts.pas',
   iORM.DBBuilder.Strategy.SqLite in '..\..\Source\iORM.DBBuilder.Strategy.SqLite.pas',
   iORM.DBBuilder.Strategy.Firebird in '..\..\Source\iORM.DBBuilder.Strategy.Firebird.pas',

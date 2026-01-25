@@ -234,28 +234,22 @@ type
 
   IioDBBuilderSqlText = interface
     ['{DF2D64EF-3576-49CF-B803-3D10D7A93816}']
-
+    procedure Clear;
     function GetLines: TStringList;
     function GetText: string;
 
     // Fluent interface methods (return Self)
-    function Add(const AText: String): IioDBBuilderSqlText;      // Append inline to last line
-    function AddLine(const AText: string): IioDBBuilderSqlText;  // New line with indent
-    function AddEmpty: IioDBBuilderSqlText;
-    function IncIndent(const AIncrement: integer = 1): IioDBBuilderSqlText;
-    function DecIndent(const ADecrement: integer = 1): IioDBBuilderSqlText;
-
-    // Specialized methods (return Self for fluent)
+    function Add(const AText: String): IioDBBuilderSqlText; // Append inline to last line
     function AddComment(const AText: String): IioDBBuilderSqlText;
+    function AddEmpty: IioDBBuilderSqlText;
+    function AddLine(const AText: string): IioDBBuilderSqlText;
     function AddSeparator: IioDBBuilderSqlText;
     function AddTitle(const AText: String): IioDBBuilderSqlText;
+    function DecIndent: IioDBBuilderSqlText;
+    function IncIndent: IioDBBuilderSqlText;
 
-    // Non-fluent methods
-    procedure Clear;
-
-    // Properties
-    property Lines: TStringList read GetLines;           // For TStringList operations (Assign, Count, AddStrings)
-    property Text: string read GetText;              // Get content as string
+    property Lines: TStringList read GetLines;
+    property Text: string read GetText;
   end;
 
 

@@ -56,9 +56,9 @@ type
   protected
     function GetMaxSqlIdentifierLength: integer; virtual;
     function GetMinSqlIdentifierLength: integer; virtual;
-    function NewSqlScriptSection: IioDBBuilderSqlText;
+    function IsSqlIdentifierTooLong(const AIdentifierName: string): boolean; virtual;
+    function IsSqlIdentifierTooShort(const AIdentifierName: string): boolean; virtual;
     function ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
-    function Translate_SchemaFK_To_FKvalue(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
 
     // ==========================================================
     // FIELD RELATED METHODS
@@ -118,22 +118,9 @@ type
     function BuildSQL_DropFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; overload; virtual;
     function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string; overload; virtual; abstract;
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; virtual; abstract;
+    function Translate_SchemaFK_To_FKvalue(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
     function Translate_SchemaTableAndFK_To_FKName(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual;
     // ==========================================================
-
-
-
-
-
-
-
-    // Comments
-    function BuildCommentSql(const AText: string): string; virtual;
-    // Warnings
-    function BuildWarningSql(const AText: string): string; virtual;
-
-    function IsSqlIdentifierTooLong(const AIdentifierName: string): boolean; virtual;
-    function IsSqlIdentifierTooShort(const AIdentifierName: string): boolean; virtual;
 
     property ConnectionDefName: string read FConnectionDefName;
     property DataConverter: TioSqlDataConverterRef read FDataConverter;
@@ -175,10 +162,6 @@ begin
   end;
 end;
 
-function TioDBBuilderSqlGenBase.BuildCommentSql(const AText: string): string;
-begin
-  Result := Format('-- %S', [AText]);
-end;
 
 
 function TioDBBuilderSqlGenBase.BuildSQL_DropIndex(const ATable: IioDBBuilderSchemaTable;
@@ -288,10 +271,6 @@ begin
     Exit('');
 end;
 
-function TioDBBuilderSqlGenBase.BuildWarningSql(const AText: string): string;
-begin
-  Result := BuildCommentSql(Format('WARNING: %s', [AText]));
-end;
 
 constructor TioDBBuilderSqlGenBase.Create(const AConnectionDefName: string);
 begin
@@ -336,10 +315,6 @@ begin
   Result := 0;
 end;
 
-function TioDBBuilderSqlGenBase.NewSqlScriptSection: IioDBBuilderSqlText;
-begin
-  Result := TioDBBuilderFactory.NewSqlScriptSection;
-end;
 
 function TioDBBuilderSqlGenBase.ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
 begin

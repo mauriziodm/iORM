@@ -61,7 +61,7 @@ type
     class function NewSchemaTable(const AContextTable: IioTable): IioDBBuilderSchemaTable;
     class function NewSqlGenerator(const AConnectionDefName: String): IioDBBuilderSqlGenerator;
     class function NewSqlScript: IioDBBuilderSqlScript;
-    class function NewSqlScriptSection: IioDBBuilderSqlText;
+    class function NewSqlText(const AAddLinePrefix: String = ''): IioDBBuilderSqlText;
     class function NewStrategy(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderStrategy;
   end;
 
@@ -71,7 +71,7 @@ uses
   iORM.DBBuilder.Schema, iORM.DBBuilder.Schema.Table, iORM.DBBuilder.Schema.Field, iORM.DBBuilder.Schema.FK,
   iORM.DBBuilder.Schema.Builder, iORM.DB.ConnectionContainer, iORM.DB.Interfaces, iORM.DBBuilder.SqlGenerator.Firebird,
   iORM.DBBuilder.SqlGenerator.SqLite, iORM.DBBuilder.Strategy.SqLite, iORM.DBBuilder.Strategy.Firebird,
-  iORM.Exceptions, iORM.DBBuilder.DBAnalyzer, iORM.DBBuilder.Engine, iORM.DBBuilder.SqlScript.Base,
+  iORM.Exceptions, iORM.DBBuilder.DBAnalyzer, iORM.DBBuilder.Engine, iORM.DBBuilder.Script,
   iORM.DBBuilder.DBAnalyzer.Firebird, iORM.DBBuilder.DBAnalyzer.SqLite, iORM.DBBuilder.Schema.Index,
   iORM.DBBuilder.SqlGenerator.MSSqlServer,
   iORM.DBBuilder.Schema.Field.ClassInfo,
@@ -159,9 +159,9 @@ begin
   Result := TioDBBuilderSqlScript.Create;
 end;
 
-class function TioDBBuilderFactory.NewSqlScriptSection: IioDBBuilderSqlText;
+class function TioDBBuilderFactory.NewSqlText(const AAddLinePrefix: String = ''): IioDBBuilderSqlText;
 begin
-  Result := TioDBBuilderSqlText.Create;
+  Result := TioDBBuilderSqlText.Create(AAddLinePrefix);
 end;
 
 class function TioDBBuilderFactory.NewStrategy(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema;

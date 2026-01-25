@@ -41,7 +41,7 @@ uses
   iORM.CommonTypes,
   iORM.Context.Table.Interfaces,
   iORM.DBBuilder.Interfaces,
-  iORM.DBBuilder.SqlScript.Base
+  iORM.DBBuilder.Script
 
   ;
 

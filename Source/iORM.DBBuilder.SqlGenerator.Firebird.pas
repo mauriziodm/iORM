@@ -134,6 +134,7 @@ uses
   iORM.SqlTranslator,
   iORM.DB.Firebird.SqlDataConverter,
   iORM.DB.Consts,
+  iORM.DBBuilder.Factory,
   System.Classes
 
   ;
@@ -190,7 +191,7 @@ var
   LSection: IioDBBuilderSqlText;
 begin
   // Generates: ALTER TABLE <table> ADD CONSTRAINT <name> FOREIGN KEY (...) REFERENCES (...) [ON UPDATE ...] [ON DELETE ...]
-  LSection := NewSqlScriptSection;
+  LSection := TioDBBuilderFactory.NewSqlText;
 
   // Build the main FK constraint structure
   LSection.
@@ -244,7 +245,7 @@ function TioDBBuilderSqlGenFirebird.BuildSQL_AlterField(const ATable: IioDBBuild
 var
   LSection: IioDBBuilderSqlText;
 begin
-  LSection := NewSqlScriptSection;
+  LSection := TioDBBuilderFactory.NewSqlText;
 
   // Type/Length/Precision
   if AField.IsFieldTypeAltered or AField.IsFieldLengthAltered or AField.IsFieldPrecisionAltered then
@@ -281,7 +282,7 @@ function TioDBBuilderSqlGenFirebird.BuildSQL_FieldExists(const ATable: IioDBBuil
 var
   LSection: IioDBBuilderSqlText;
 begin
-  LSection := NewSqlScriptSection;
+  LSection := TioDBBuilderFactory.NewSqlText;
 
   LSection.
     AddLine('SELECT 1').
@@ -307,7 +308,7 @@ begin
   // For DECIMAL/NUMERIC detection: types 7, 8, 16 with scale < 0 indicate decimal types,
   // and the subtype distinguishes NUMERIC (1) from DECIMAL (2).
   // For BOOLEAN (type 23, Firebird 3.0+): we map it to INTEGER for ORM compatibility.
-  LSection := NewSqlScriptSection;
+  LSection := TioDBBuilderFactory.NewSqlText;
   LSection
     .AddLine('SELECT rf.RDB$NULL_FLAG AS field_not_null,')
     .AddLine('  f.RDB$CHARACTER_LENGTH AS field_length,')
@@ -364,7 +365,7 @@ begin
   //   B. All FKs for a table (ATableName specified, AFKName = '')
   //   C. Specific FK (ATableName specified, AFKName specified)
   // Always returns: table_name, constraint_name, on_update, on_delete
-  LSection := NewSqlScriptSection;
+  LSection := TioDBBuilderFactory.NewSqlText;
 
   LSection.
     AddLine('SELECT ').
@@ -406,7 +407,7 @@ var
 begin
   // Generates: SELECT query to list indexes with their properties (name, unique flag, orientation)
   // Base query: all non-system indexes with basic info (name, unique, orientation)
-  LSection := NewSqlScriptSection;
+  LSection := TioDBBuilderFactory.NewSqlText;
 
   LSection.
     AddLine('SELECT RDB$INDEX_NAME, RDB$UNIQUE_FLAG, RDB$INDEX_TYPE ').
@@ -425,7 +426,7 @@ var
   LSection: IioDBBuilderSqlText;
 begin
   // Generates: SELECT query to retrieve field details for a specific index (field names and positions)
-  LSection := NewSqlScriptSection;
+  LSection := TioDBBuilderFactory.NewSqlText;
 
   LSection.
     AddLine('SELECT').

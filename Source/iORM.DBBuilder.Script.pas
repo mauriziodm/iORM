@@ -1,4 +1,4 @@
-unit iORM.DBBuilder.SqlScript.Base;
+unit iORM.DBBuilder.Script;
 
 interface
 
@@ -54,6 +54,7 @@ type
     FScriptHeader: IioDBBuilderSqlText;
     FScriptHints: IioDBBuilderSqlText;
     FScriptWarnings: IioDBBuilderSqlText;
+
     function GetBody: IioDBBuilderSqlText;
     function GetFooter: IioDBBuilderSqlText;
     function GetHeader: IioDBBuilderSqlText;
@@ -79,7 +80,6 @@ type
     property Lines: TStringList read GetLines;
     property Warnings: IioDBBuilderSqlText read GetWarnings;
   end;
-
 
 
 

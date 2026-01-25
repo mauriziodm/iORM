@@ -375,7 +375,7 @@
         <DCCReference Include="..\..\Source\iORM.SynchroStrategy.Custom.pas"/>
         <DCCReference Include="..\..\Source\iORM.SynchroStrategy.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\iORM.SynchroStrategy.EtmBased.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlScript.Base.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DBBuilder.Script.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.Consts.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Strategy.SqLite.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Strategy.Firebird.pas"/>

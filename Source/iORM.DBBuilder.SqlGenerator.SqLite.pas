@@ -102,7 +102,8 @@ uses
   iORM.Exceptions,
   iORM.CommonTypes,
   iORM.SqlTranslator,
-  iORM.DB.SqLite.SqlDataConverter
+  iORM.DB.SqLite.SqlDataConverter,
+  iORM.DBBuilder.Factory
 
   ;
 
@@ -311,7 +312,7 @@ var
 begin
   // Generates: , CONSTRAINT <name> FOREIGN KEY (...) REFERENCES (...) [ON UPDATE ...] [ON DELETE ...] DEFERRABLE INITIALLY DEFERRED
   // Note: SQLite FK constraints are added within CREATE TABLE, not via ALTER TABLE
-  LSection := NewSqlScriptSection;
+  LSection := TioDBBuilderFactory.NewSqlText;
 
   // Build the main FK constraint structure
   LSection.Add(
