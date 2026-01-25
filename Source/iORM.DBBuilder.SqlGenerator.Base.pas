@@ -318,16 +318,10 @@ end;
 
 function TioDBBuilderSqlGenBase.ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
 begin
-  Result := String.Empty;
-
-  if Length(AIdentifierName) <= AMaxLength then
-    Exit(AIdentifierName);
-
-  // Changed shortening algorithm because there are some cases where different input names comes to the same shortened
-  // name (collision).
-  // Now I used SHA2 hash algorithm to produce a unique identifier calculated on the original identifier in all its
-  // length and keeping only the first AMaxLength chars. This should avoid identifier names collitions.
-  Result := THashSHA2.GetHashString(AIdentifierName).Substring(1, AMaxLength);
+  if AIdentifierName.Length > AMaxLength then
+    Result := THashSHA2.GetHashString(AIdentifierName).Substring(1, AMaxLength)
+  else
+    Result := AIdentifierName;
 end;
 
 function TioDBBuilderSqlGenBase.IsSqlIdentifierTooShort(const AIdentifierName: string): boolean;
