@@ -6,6 +6,7 @@ uses
   System.Classes,
 
   iORM.DBBuilder.Interfaces,
+  iORM.DBBuilder.Factory,
   iORM.DB.Consts
 
   ;
@@ -20,11 +21,12 @@ type
   private
     FIndentLevel: Integer;
     FLines: TStringList;
+    FAddLinePrefix: String;
     function GetLines: TStringList;
     function GetText: string;
     function GetIndentationChars: string;
   public
-    constructor Create;
+    constructor Create(const AAddLinePrefix: String);
     destructor Destroy; override;
 
     procedure Clear;
@@ -36,24 +38,12 @@ type
     function AddEmpty: IioDBBuilderSqlText;
     function AddSeparator: IioDBBuilderSqlText; virtual;
     function AddTitle(const AText: String): IioDBBuilderSqlText; virtual;
-    function DecIndent(const ADecrement: integer = 1): IioDBBuilderSqlText;
-    function IncIndent(const AIncrement: integer = 1): IioDBBuilderSqlText;
+    function DecIndent: IioDBBuilderSqlText;
+    function IncIndent: IioDBBuilderSqlText;
 
     // Properties
     property Lines: TStringList read GetLines;
     property Text: string read GetText;
-  end;
-
-  // Specialized section that automatically prepends "WARNING: " to all added text
-  TioDBBuilderSqlTextWarnings = class(TioDBBuilderSqlText)
-  public
-    function AddLine(const AText: String): IioDBBuilderSqlText; override;
-  end;
-
-  // Specialized section that automatically prepends "Hint: " to all added text
-  TioDBBuilderSqlTextHints = class(TioDBBuilderSqlText)
-  public
-    function AddLine(const AText: String): IioDBBuilderSqlText; override;
   end;
 
   TioDBBuilderSqlScript = class(TInterfacedObject, IioDBBuilderSqlScript)
@@ -106,11 +96,12 @@ uses
 
 { TioDBBuilderSqlText }
 
-constructor TioDBBuilderSqlText.Create;
+constructor TioDBBuilderSqlText.Create(const AAddLinePrefix: String);
 begin
   inherited Create;
   FIndentLevel := 0;
   FLines := TStringList.Create;
+  FAddLinePrefix := AAddLinePrefix;
 end;
 
 destructor TioDBBuilderSqlText.Destroy;
@@ -149,10 +140,10 @@ begin
   Result := Self;
 end;
 
-// AddLine() - Add new line with indentation
+// AddLine() - Add new line with indentation and optional prefix
 function TioDBBuilderSqlText.AddLine(const AText: string): IioDBBuilderSqlText;
 begin
-  FLines.Add(GetIndentationChars + AText);
+  FLines.Add(FAddLinePrefix + GetIndentationChars + AText);
   Result := Self;
 end;
 
@@ -164,19 +155,20 @@ begin
 end;
 
 // IncIndent() - Increment indentation level (fluent)
-function TioDBBuilderSqlText.IncIndent(const AIncrement: integer): IioDBBuilderSqlText;
+function TioDBBuilderSqlText.IncIndent: IioDBBuilderSqlText;
 begin
-  Inc(FIndentLevel, AIncrement);
+  Inc(FIndentLevel);
   Result := Self;
 end;
 
 // DecIndent() - Decrement indentation level (fluent)
-function TioDBBuilderSqlText.DecIndent(const ADecrement: integer): IioDBBuilderSqlText;
+function TioDBBuilderSqlText.DecIndent: IioDBBuilderSqlText;
 begin
-  if FIndentLevel - ADecrement >= 0 then
-    Dec(FIndentLevel, ADecrement)
+  if FIndentLevel > 0 then
+    Dec(FIndentLevel)
   else
     FIndentLevel := 0;
+
   Result := Self;
 end;
 
@@ -211,22 +203,6 @@ begin
   FLines.Clear;
 end;
 
-{ TioDBBuilderSqlTextWarnings }
-
-function TioDBBuilderSqlTextWarnings.AddLine(const AText: String): IioDBBuilderSqlText;
-begin
-  FLines.Add('WARNING: ' + AText);
-  Result := Self;
-end;
-
-{ TioDBBuilderSqlTextHints }
-
-function TioDBBuilderSqlTextHints.AddLine(const AText: String): IioDBBuilderSqlText;
-begin
-  FLines.Add('Hint: ' + AText);
-  Result := Self;
-end;
-
 { TioDBBuilderSqlScript }
 
 procedure TioDBBuilderSqlScript.Clear;
@@ -243,11 +219,11 @@ begin
   inherited Create;
 
   FFullScript := TStringList.Create;
-  FScriptHeader := TioDBBuilderSqlText.Create;
-  FScriptWarnings := TioDBBuilderSqlTextWarnings.Create;
-  FScriptHints := TioDBBuilderSqlTextHints.Create;
-  FScriptBody := TioDBBuilderSqlText.Create;
-  FScriptFooter := TioDBBuilderSqlText.Create;
+  FScriptHeader := TioDBBuilderFactory.NewSqlText;
+  FScriptWarnings := TioDBBuilderFactory.NewSqlText('WARNING: ');
+  FScriptHints := TioDBBuilderFactory.NewSqlText('Hint: ');
+  FScriptBody := TioDBBuilderFactory.NewSqlText;
+  FScriptFooter := TioDBBuilderFactory.NewSqlText;
 end;
 
 destructor TioDBBuilderSqlScript.Destroy;
