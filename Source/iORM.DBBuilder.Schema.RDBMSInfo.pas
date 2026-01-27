@@ -31,91 +31,88 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.DBBuilder.SqlGenerator.MSSqlServer;
+unit iORM.DBBuilder.Schema.RDBMSInfo;
 
 interface
 
 uses
-  iORM.DBBuilder.SqlGenerator.Base, iORM.DBBuilder.Interfaces, iORM.Attributes;
-
-const
-  CONNECTION_NAME_MSSQL_MASTER = 'MSSQL_MASTER';
-
-  INVALID_FIELDTYPE_CONVERSIONS = '[datetime->decimal][datetime->numeric][datetime->int][date->decimal][date->numeric][date->int]' +
-    '[time->numeric][time->decimal][time->int][varchar->decimal][varchar->int][varchar->date][varchar->time][varchar->datetime]' +
-    '[nvarchar->decimal][nvarchar->int][nvarchar->date][nvarchar->time][nvarchar->datetime] [char->decimal][char->int][char->date]+' +
-    '[char->time][char->datetime][nchar->decimal][nchar->int][nchar->date][nchar->time][nchar->datetime]';
+  iORM.DBBuilder.Interfaces;
 
 type
 
-  TioDBBuilderSqlGenMSSqlServer = class(TioDBBuilderSqlGenBase, IioDBBuilderSqlGenerator)
-  protected
-    // ==========================================================
-    // RDBMS INFO METHODS
-    // ----------------------------------------------------------
-    function LoadRDBMSInfo: IioDBBuilderSchemaRDBMSInfo; override;
-    // ==========================================================
+  TioDBBuilderSchemaRDBMSInfo = class(TInterfacedObject, IioDBBuilderSchemaRDBMSInfo)
+  private
+    FName: String;
+    FRaw: String;
+    FVersion: String;
+    FMajorVersion: Integer;
+    FMinorVersion: Integer;
+    function GetName: String;
+    function GetRaw: String;
+    function GetVersion: String;
+    function GetMajorVersion: Integer;
+    function GetMinorVersion: Integer;
+  public
+    constructor Create(const AName, ARaw, AVersion: String; const AMajorVersion, AMinorVersion: Integer);
+    function IsAtLeast(const AMajor, AMinor: Integer): Boolean;
+    function ToString: String; override;
+
+    property MajorVersion: Integer read GetMajorVersion;
+    property MinorVersion: Integer read GetMinorVersion;
+    property Name: String read GetName;
+    property Raw: String read GetRaw;
+    property Version: String read GetVersion;
   end;
 
 implementation
 
 uses
-  System.SysUtils,
-  iORM.DB.Interfaces,
-  iORM.DB.QueryEngine,
-  iORM.DBBuilder.Factory;
+  System.SysUtils;
 
-{ TioDBBuilderSqlGenMSSqlServer }
+{ TioDBBuilderSchemaRDBMSInfo }
 
-function TioDBBuilderSqlGenMSSqlServer.LoadRDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
-var
-  LQuery: IioQuery;
-  LRaw, LVersion: String;
-  LMajorVersion, LMinorVersion: Integer;
-  LParts: TArray<string>;
+constructor TioDBBuilderSchemaRDBMSInfo.Create(const AName, ARaw, AVersion: String; const AMajorVersion, AMinorVersion: Integer);
 begin
-  // Query the database for raw version info
-  LQuery := TioQueryEngine.GetRawQuery(
-    ConnectionDefName,
-    'SELECT @@VERSION AS VERSION',
-    True
-  );
+  FName := AName;
+  FRaw := ARaw;
+  FVersion := AVersion;
+  FMajorVersion := AMajorVersion;
+  FMinorVersion := AMinorVersion;
+end;
 
-  if not LQuery.Eof then
-    LRaw := LQuery.Fields.FieldByName('VERSION').AsString.Trim
-  else
-    LRaw := '';
+function TioDBBuilderSchemaRDBMSInfo.GetMajorVersion: Integer;
+begin
+  Result := FMajorVersion;
+end;
 
-  // Query for clean product version (e.g., '15.0.4261.1')
-  LQuery := TioQueryEngine.GetRawQuery(
-    ConnectionDefName,
-    'SELECT CAST(SERVERPROPERTY(''ProductVersion'') AS VARCHAR(50)) AS VERSION',
-    True
-  );
+function TioDBBuilderSchemaRDBMSInfo.GetMinorVersion: Integer;
+begin
+  Result := FMinorVersion;
+end;
 
-  if not LQuery.Eof then
-    LVersion := LQuery.Fields.FieldByName('VERSION').AsString.Trim
-  else
-    LVersion := '';
+function TioDBBuilderSchemaRDBMSInfo.GetName: String;
+begin
+  Result := FName;
+end;
 
-  LMajorVersion := 0;
-  LMinorVersion := 0;
+function TioDBBuilderSchemaRDBMSInfo.GetRaw: String;
+begin
+  Result := FRaw;
+end;
 
-  // Parse version: '15.0.4261.1' -> Major=15, Minor=0
-  LParts := LVersion.Split(['.']);
-  if Length(LParts) >= 2 then
-  begin
-    LMajorVersion := StrToIntDef(LParts[0], 0);
-    LMinorVersion := StrToIntDef(LParts[1], 0);
-  end;
+function TioDBBuilderSchemaRDBMSInfo.GetVersion: String;
+begin
+  Result := FVersion;
+end;
 
-  Result := TioDBBuilderFactory.NewSchemaRDBMSInfo(
-    'SQL Server',
-    LRaw,
-    LVersion,
-    LMajorVersion,
-    LMinorVersion
-  );
+function TioDBBuilderSchemaRDBMSInfo.IsAtLeast(const AMajor, AMinor: Integer): Boolean;
+begin
+  Result := (FMajorVersion > AMajor) or ((FMajorVersion = AMajor) and (FMinorVersion >= AMinor));
+end;
+
+function TioDBBuilderSchemaRDBMSInfo.ToString: String;
+begin
+  Result := Format('%s %s (Major: %d, Minor: %d)', [FName, FVersion, FMajorVersion, FMinorVersion]);
 end;
 
 end.

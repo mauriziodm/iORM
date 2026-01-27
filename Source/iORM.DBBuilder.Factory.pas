@@ -58,6 +58,7 @@ type
     class function NewSchemaFieldClassInfo: IioDBBuilderSchemaField;
     class function NewSchemaFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty; const AOnDeleteAction, AOnUpdateAction: TioFKAction): IioDBBuilderSchemaFK;
     class function NewSchemaIndex(const AIndex: ioIndex): IioDBBuilderSchemaIndex;
+    class function NewSchemaRDBMSInfo(const AName, ARaw, AVersion: String; const AMajorVersion, AMinorVersion: Integer): IioDBBuilderSchemaRDBMSInfo;
     class function NewSchemaTable(const AContextTable: IioTable): IioDBBuilderSchemaTable;
     class function NewSqlGenerator(const AConnectionDefName: String): IioDBBuilderSqlGenerator;
     class function NewSqlScript: IioDBBuilderSqlScript;
@@ -76,7 +77,8 @@ uses
   iORM.DBBuilder.SqlGenerator.MSSqlServer,
   iORM.DBBuilder.Schema.Field.ClassInfo,
   iORM.DBBuilder.DBAnalyzer.MSSqlServer,
-  iORM.DBBuilder.Strategy.MSSqlServer
+  iORM.DBBuilder.Strategy.MSSqlServer,
+  iORM.DBBuilder.Schema.RDBMSInfo
 
   ;
 
@@ -133,6 +135,12 @@ end;
 class function TioDBBuilderFactory.NewSchemaIndex(const AIndex: ioIndex): IioDBBuilderSchemaIndex;
 begin
   Result := TioDBBuilderSchemaIndex.Create(AIndex);
+end;
+
+class function TioDBBuilderFactory.NewSchemaRDBMSInfo(const AName, ARaw, AVersion: String;
+  const AMajorVersion, AMinorVersion: Integer): IioDBBuilderSchemaRDBMSInfo;
+begin
+  Result := TioDBBuilderSchemaRDBMSInfo.Create(AName, ARaw, AVersion, AMajorVersion, AMinorVersion);
 end;
 
 class function TioDBBuilderFactory.NewSchemaTable(const AContextTable: IioTable): IioDBBuilderSchemaTable;

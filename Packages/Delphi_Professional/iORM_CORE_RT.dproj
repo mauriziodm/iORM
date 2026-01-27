@@ -298,6 +298,7 @@
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.FK.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Builder.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.RDBMSInfo.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Factory.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlGenerator.SqLite.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlGenerator.Base.pas"/>

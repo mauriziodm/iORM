@@ -60,6 +60,24 @@ type
 
   // Forward declarations
   IioDBBuilderSqlScript = interface;
+  IioDBBuilderSchemaRDBMSInfo = interface;
+
+  IioDBBuilderSchemaRDBMSInfo = interface
+    ['{A7D3E8F1-B2C4-4D5E-9F6A-1B2C3D4E5F6A}']
+    function GetName: String;
+    function GetRaw: String;
+    function GetVersion: String;
+    function GetMajorVersion: Integer;
+    function GetMinorVersion: Integer;
+    function IsAtLeast(const AMajor, AMinor: Integer): Boolean;
+    function ToString: String;
+
+    property Name: String read GetName;
+    property Raw: String read GetRaw;
+    property Version: String read GetVersion;
+    property MajorVersion: Integer read GetMajorVersion;
+    property MinorVersion: Integer read GetMinorVersion;
+  end;
 
   IioDBBuilderSchemaFK = interface
     ['{1F653F52-570B-4381-930D-FB3945025DA2}']
@@ -213,11 +231,13 @@ type
     ['{1AEDB134-1ECB-490E-A53A-973BEDE509E5}']
     function GetForeignKeysEnabled: boolean;
     function GetIndexesEnabled: boolean;
+    function GetRDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
     function GetScript: IioDBBuilderSqlScript;
     function GetSequences: TioDBBuilderSchemaSequences;
     function GetTables: TioDBBuilderSchemaTables;
     // Status
     function GetStatus: TioDBBuilderStatus;
+    procedure SetRDBMSInfo(const AValue: IioDBBuilderSchemaRDBMSInfo);
     procedure SetStatus(const Value: TioDBBuilderStatus);
 
     function FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
@@ -226,6 +246,7 @@ type
 
     property ForeignKeysEnabled: boolean read GetForeignKeysEnabled;
     property IndexesEnabled: boolean read GetIndexesEnabled;
+    property RDBMSInfo: IioDBBuilderSchemaRDBMSInfo read GetRDBMSInfo write SetRDBMSInfo;
     property Script: IioDBBuilderSqlScript read GetScript;
     property Sequences: TioDBBuilderSchemaSequences read GetSequences;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
@@ -347,6 +368,11 @@ type
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string;
     function Translate_SchemaTableAndFK_To_FKName(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
     function Translate_SchemaFK_To_FKvalue(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
+
+    // ==========================================================
+    // RDBMS INFO METHODS
+    // ----------------------------------------------------------
+    function LoadRDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
     // ==========================================================
   end;
 

@@ -285,7 +285,7 @@ begin
   // Note: The last parameter indicates whether NOT NULL changes are supported.
   // We check this dynamically based on Firebird version (SET NOT NULL / DROP NOT NULL
   // is only supported from Firebird 3.0+). This controls whether blocking warnings are generated.
-  Result := Result or IsFieldNotNullChanged(ATable, AField, LOldFieldNotNull, AField.FieldNotNull, FBSqlGenerator.SupportsSetDropNotNull);
+  Result := Result or IsFieldNotNullChanged(ATable, AField, LOldFieldNotNull, AField.FieldNotNull, Schema.RDBMSInfo.IsAtLeast(3, 0));
 
   // Verify if blob subtype is changed
   // Note: The last parameter set the blob sub-type change as NOT permitted in firebrd RDBMS
@@ -346,10 +346,8 @@ end;
 procedure TioDBBuilderStrategyFirebird.GenerateDatabaseObjects(const Create: boolean);
 begin
   // Add Firebird version detection info as script comment (not warning, to avoid blocking execution)
-  // Note: Accessing FirebirdVersion property triggers automatic version detection (lazy initialization)
   Script.Body.AddEmpty;
-  Script.Header.AddComment(Format('Firebird version detected: %s (Major: %d, Minor: %d)',
-    [FBSqlGenerator.FirebirdVersion, FBSqlGenerator.FirebirdMajorVersion, FBSqlGenerator.FirebirdMinorVersion]));
+  Script.Header.AddComment(Format('Firebird version detected: %s', [Schema.RDBMSInfo.ToString]));
 
   if Create then
   begin

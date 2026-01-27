@@ -194,6 +194,9 @@ begin
   FConnectionDefName := AConnectionDefName;
   FSchema := ASchema;
   FSqlGenerator := ASqlGenerator;
+
+  // Load RDBMS info
+  FSchema.RDBMSInfo := FSqlGenerator.LoadRDBMSInfo;
 end;
 
 function TioDBBuilderStrategyBase.GetScript: IioDBBuilderSqlScript;
