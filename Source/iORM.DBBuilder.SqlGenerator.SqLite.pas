@@ -46,6 +46,9 @@ uses
 
 type
   TioDBBuilderSqlGenSQLite = class(TioDBBuilderSqlGenBase)
+  private
+    // Helper method to escape single quotes in SQLite identifiers (for PRAGMA and queries)
+    function EscapeSQLiteIdentifier(const AIdentifier: string): string;
   protected
     // ==========================================================
     // RDBMS INFO METHODS
@@ -82,6 +85,7 @@ type
     // ----------------------------------------------------------
     function BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string; override;
+    function BuildSQL_DropIndexByName(const AIndexName: string): string; override;
     function BuildSQL_IndexExistsByName(const AIndexName: string): string; override;
     function BuildSQL_IndexList(const ATableName: string = ''): string; override;
     function BuildSQL_IndexDetails(const AIndexName: string): string; override;
@@ -90,6 +94,7 @@ type
     // FOREIGN KEY RELATED METHODS
     // ----------------------------------------------------------
     function BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
+    function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string; override;
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; override;
   end;
 
@@ -114,6 +119,13 @@ uses
   ;
 
 { TioDBBuilderSqlGenSQLite }
+
+function TioDBBuilderSqlGenSQLite.EscapeSQLiteIdentifier(const AIdentifier: string): string;
+begin
+  // SQLite escapes single quotes by doubling them
+  // This protects against malformed SQL when identifiers contain apostrophes
+  Result := StringReplace(AIdentifier, '''', '''''', [rfReplaceAll]);
+end;
 
 procedure TioDBBuilderSqlGenSQLite.CreateDatabase;
 begin
@@ -190,7 +202,7 @@ begin
   // SQLite limitation: PRAGMA table_info returns ALL columns for a table - cannot filter by column name
   // The AField parameter is accepted for interface consistency but IGNORED in the query
   // Strategy layer must manually filter results to find the specific field by name
-  Result := Format('pragma table_info(''%s'')', [ATable.Name]);
+  Result := Format('pragma table_info(''%s'')', [EscapeSQLiteIdentifier(ATable.Name)]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string;
@@ -202,13 +214,13 @@ begin
   // SQLite limitation: PRAGMA table_info returns ALL columns for a table - cannot filter by column name
   // Note: AFieldName parameter is IGNORED because SQLite doesn't support field name filtering
   //       PRAGMA always returns ALL fields for the table, Strategy must filter manually
-  Result := Format('PRAGMA table_info(''%s'')', [ATableName]);
+  Result := Format('PRAGMA table_info(''%s'')', [EscapeSQLiteIdentifier(ATableName)]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_IndexExistsByName(const AIndexName: string): string;
 begin
   // Generates: SELECT query to check if an index exists by name
-  Result := Format('SELECT 1 FROM sqlite_master WHERE type = ''index'' AND name = ''%s''', [AIndexName]);
+  Result := Format('SELECT 1 FROM sqlite_master WHERE type = ''index'' AND name = ''%s''', [EscapeSQLiteIdentifier(AIndexName)]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_IndexList(const ATableName: string): string;
@@ -223,14 +235,14 @@ begin
   // Note: sql IS NOT NULL excludes auto-generated indexes for PK/UNIQUE constraints
   Result := 'SELECT name, tbl_name, sql FROM sqlite_master WHERE type = ''index'' AND sql IS NOT NULL';
   if not ATableName.IsEmpty then
-    Result := Result + Format(' AND tbl_name = ''%s''', [ATableName]);
+    Result := Result + Format(' AND tbl_name = ''%s''', [EscapeSQLiteIdentifier(ATableName)]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_IndexDetails(const AIndexName: string): string;
 begin
   // Generates: PRAGMA index_info(<name>) to retrieve field details for a specific index
   // PRAGMA index_info returns columns info for the index
-  Result := Format('PRAGMA index_info(''%s'')', [AIndexName]);
+  Result := Format('PRAGMA index_info(''%s'')', [EscapeSQLiteIdentifier(AIndexName)]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string;
@@ -245,7 +257,7 @@ begin
     raise EioDBBuilderException.Create(ClassName, 'BuildSQL_FKList',
       'SQLite requires a table name for PRAGMA foreign_key_list.'#13#13'Cannot list all foreign keys at once.');
 
-  Result := Format('PRAGMA foreign_key_list(''%s'')', [ATableName]);
+  Result := Format('PRAGMA foreign_key_list(''%s'')', [EscapeSQLiteIdentifier(ATableName)]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string;
@@ -259,9 +271,15 @@ begin
     'Primary keys must be defined inline in the CREATE TABLE statement.');
 end;
 
+function TioDBBuilderSqlGenSQLite.BuildSQL_DropIndexByName(const AIndexName: string): string;
+begin
+  // Generates: DROP INDEX IF EXISTS <index_name>;
+  Result := Format('DROP INDEX IF EXISTS %s;', [AIndexName]);
+end;
+
 function TioDBBuilderSqlGenSQLite.BuildSQL_TableExists(const ATableName: string): string;
 begin
-  Result := Format('pragma table_info(''%s'')', [ATableName]);
+  Result := Format('pragma table_info(''%s'')', [EscapeSQLiteIdentifier(ATableName)]);
 end;
 
 /// <remarks>
@@ -282,17 +300,17 @@ begin
     ioMdFloat:
       Result := 'REAL';
     ioMdDate:
-      Result := 'REAL'; // But in SQLite documentation has NUMERIC affinity
+      Result := 'REAL'; // Delphi TDateTime uses Julian day numbers (floating-point)
     ioMdTime:
-      Result := 'REAL'; // But in SQLite documentation has NUMERIC affinity
+      Result := 'REAL'; // Delphi TDateTime uses Julian day numbers (floating-point)
     ioMdDateTime:
-      Result := 'REAL'; // But in SQLite documentation has NUMERIC affinity
+      Result := 'REAL'; // Delphi TDateTime uses Julian day numbers (floating-point)
     ioMdDecimal:
       Result := 'NUMERIC';
     ioMdNumeric:
       Result := 'NUMERIC';
     ioMdBoolean:
-      Result := 'INTEGER'; // But in SQLite documentation has NUMERIC affinity
+      Result := 'INTEGER'; // 0/1 values stored as integer
     ioMdBinary:
       Result := 'BLOB';
     ioMdCustomFieldType:
@@ -343,6 +361,18 @@ begin
     Add(' DEFERRABLE INITIALLY DEFERRED');
 
   Result := LSqlText.Text;
+end;
+
+function TioDBBuilderSqlGenSQLite.BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string;
+begin
+  // Note: TioDBBuilderStrategySqLite should NEVER call this method.
+  // SQLite does not support dropping foreign keys via ALTER TABLE.
+  // Foreign keys are embedded in the table definition and can only be modified by recreating the table.
+  // This method exists only to satisfy the abstract interface contract.
+  // If this exception is raised, it indicates a logic error in the Strategy layer.
+  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_DropFKbyName',
+    'SQLite does not support dropping foreign keys directly. '#13#13 +
+    'Foreign keys can only be modified by recreating the table using the rename-create-copy pattern.');
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_BeginAlterTable(const ATable: IioDBBuilderSchemaTable): string;

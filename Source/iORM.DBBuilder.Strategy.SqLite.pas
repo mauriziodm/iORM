@@ -239,8 +239,8 @@ begin
     begin
       LOldFieldType := LQuery.Fields.FieldByName('type').AsString;
       LOldFieldNotNull := (LQuery.Fields.FieldByName('notnull').AsInteger <> 0);
-      // OLD: LNewFieldType := SqlGenerator.Translate_SchemaField_To_FieldType(AField, True);  // True = exclude attributes (only base type)
-      LNewFieldType := SqlGenerator.Translate_SchemaField_To_FieldType(AField, False);  // False = do NOT include attributes (only base type)
+      // Note: For SQLite, the second parameter is irrelevant (SQLite doesn't support type attributes like length/precision/scale)
+      LNewFieldType := SqlGenerator.Translate_SchemaField_To_FieldType(AField, False);
 
       // Verify if fieldType has been changed and check type affinity
       Result := Result or IsFieldTypeChanged(ATable, AField, LOldFieldType, LNewFieldType);
@@ -307,6 +307,7 @@ begin
       LQueryIndexDetails := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexDetails(LIndexName), True);
       LOldFieldList := '';
 
+      // Note: PRAGMA index_info guarantees results ordered by seqno (field position in index)
       while not LQueryIndexDetails.Eof do
       begin
         if not LOldFieldList.IsEmpty then
