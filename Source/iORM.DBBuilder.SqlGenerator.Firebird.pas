@@ -50,26 +50,19 @@ uses
 type
   TioDBBuilderSqlGenFirebird = class(TioDBBuilderSqlGenBase, IioDBBuilderSqlGeneratorFirebird)
   private
-    // Firebird version detection fields (for multi-version compatibility 2.0-5.0)
-    FFirebirdVersion: string;           // Cache: '2.5.9', '3.0.10', '4.0.4', '5.0.1'
-    FFirebirdMajorVersion: Integer;     // Cache: 2, 3, 4, 5
-    FFirebirdMinorVersion: Integer;     // Cache: 0, 1, 2, etc.
-    FFirebirdVersionDetected: Boolean;          // Flag to avoid re-querying
-
     function _BuildSQL_CreateOrAddField(const AField: IioDBBuilderSchemaField): String;
-
-    // Version detection methods
-    function DetectFirebirdVersion: Boolean;
-    function GetFirebirdVersion: string;
-    function GetFirebirdMajorVersion: Integer;
-    function GetFirebirdMinorVersion: Integer;
-    function SupportsSetDropNotNull: Boolean;
   protected
     function GetMaxSqlIdentifierLength: integer; override;
     function GetMinSqlIdentifierLength: integer; override;
 
     // ==========================================================
-    // FIELD RELATED METHODS
+    // RDBMS INFO METHODS
+    // ----------------------------------------------------------
+    function LoadRDBMSInfo: IioDBBuilderSchemaRDBMSInfo; override;
+    // ==========================================================
+
+    // ==========================================================
+    // DATABASE RELATED METHODS
     // ----------------------------------------------------------
     procedure CreateDatabase; override;
     function DatabaseExists: Boolean; override;
@@ -114,10 +107,6 @@ type
     function BuildAddSequenceSql(const ASequenceName: String; const ACreatingNewDatabase: boolean): string;
     function BuildDropSequenceSql(const ASequenceName: string): string;
     function BuildSequenceExistsSql(const ASequenceName: string): string;
-  public
-    property FirebirdVersion: string read GetFirebirdVersion;
-    property FirebirdMajorVersion: Integer read GetFirebirdMajorVersion;
-    property FirebirdMinorVersion: Integer read GetFirebirdMinorVersion;
   end;
 
 implementation
@@ -188,13 +177,13 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
 var
-  LSection: IioDBBuilderSqlText;
+  LSqlText: IioDBBuilderSqlText;
 begin
   // Generates: ALTER TABLE <table> ADD CONSTRAINT <name> FOREIGN KEY (...) REFERENCES (...) [ON UPDATE ...] [ON DELETE ...]
-  LSection := TioDBBuilderFactory.NewSqlText;
+  LSqlText := TioDBBuilderFactory.NewSqlText;
 
   // Build the main FK constraint structure
-  LSection.
+  LSqlText.
     AddLine(Format('ALTER TABLE %s', [AForeignKey.DependentTableName])).
     IncIndent.
     AddLine(Format('ADD CONSTRAINT %s', [Translate_SchemaTableAndFK_To_FKName(ATable, AForeignKey)])).
@@ -203,16 +192,16 @@ begin
 
   // Add optional ON UPDATE clause if specified
   if AForeignKey.OnUpdateAction > fkUnspecified then
-    LSection.AddLine(Format('ON UPDATE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnUpdateAction)]));
+    LSqlText.AddLine(Format('ON UPDATE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnUpdateAction)]));
 
   // Add optional ON DELETE clause if specified
   if AForeignKey.OnDeleteAction > fkUnspecified then
-    LSection.AddLine(Format('ON DELETE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnDeleteAction)]));
+    LSqlText.AddLine(Format('ON DELETE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnDeleteAction)]));
 
-  LSection.
+  LSqlText.
     Add(';');
 
-  Result := LSection.Text;
+  Result := LSqlText.Text;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
@@ -243,29 +232,29 @@ end;
 function TioDBBuilderSqlGenFirebird.BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable;
   const AField: IioDBBuilderSchemaField): string;
 var
-  LSection: IioDBBuilderSqlText;
+  LSqlText: IioDBBuilderSqlText;
 begin
-  LSection := TioDBBuilderFactory.NewSqlText;
+  LSqlText := TioDBBuilderFactory.NewSqlText;
 
   // Type/Length/Precision
   if AField.IsFieldTypeAltered or AField.IsFieldLengthAltered or AField.IsFieldPrecisionAltered then
-    LSection.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s TYPE %s;', [ATable.Name, AField.FieldName, Translate_SchemaField_To_FieldType(AField, True)]));  // True = include attributes
+    LSqlText.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s TYPE %s;', [ATable.Name, AField.FieldName, Translate_SchemaField_To_FieldType(AField, True)]));  // True = include attributes
 
   // Default
   if AField.IsFieldDefaultAltered then
   begin
     if not AField.FieldDefaultExists then
-      LSection.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s DROP DEFAULT;', [ATable.Name, AField.FieldName]))
+      LSqlText.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s DROP DEFAULT;', [ATable.Name, AField.FieldName]))
     else
-      LSection.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s SET DEFAULT %s;', [ATable.Name, AField.FieldName, Translate_SchemaField_To_DefaultValue(AField)]));
+      LSqlText.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s SET DEFAULT %s;', [ATable.Name, AField.FieldName, Translate_SchemaField_To_DefaultValue(AField)]));
   end;
 
   // NotNull - Version-specific handling
   // Note: SET NOT NULL & DROP NOT NULL available only from Firebird 3.0+
   if AField.IsFieldNotNullAltered then
-    LSection.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s %s NOT NULL;', [ATable.Name, AField.FieldName, IfThen(AField.FieldNotNull, 'SET', 'DROP')]));
+    LSqlText.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s %s NOT NULL;', [ATable.Name, AField.FieldName, IfThen(AField.FieldNotNull, 'SET', 'DROP')]));
 
-  Result := LSection.Text;
+  Result := LSqlText.Text;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_BeginAlterTable(const ATable: IioDBBuilderSchemaTable): string;
@@ -280,23 +269,23 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
 var
-  LSection: IioDBBuilderSqlText;
+  LSqlText: IioDBBuilderSqlText;
 begin
-  LSection := TioDBBuilderFactory.NewSqlText;
+  LSqlText := TioDBBuilderFactory.NewSqlText;
 
-  LSection.
+  LSqlText.
     AddLine('SELECT 1').
     AddLine('FROM RDB$RELATION_FIELDS').
     AddLine(Format('WHERE UPPER(RDB$RELATION_NAME) = UPPER(''%s'')', [ATable.Name])).
     AddLine(Format('  AND UPPER(RDB$FIELD_NAME) = UPPER(''%s'')', [AField.FieldName])).
     Add('  AND RDB$SYSTEM_FLAG = 0');
 
-  Result := LSection.Text;
+  Result := LSqlText.Text;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string;
 var
-  LSection: IioDBBuilderSqlText;
+  LSqlText: IioDBBuilderSqlText;
 begin
   // Returns SQL to retrieve detailed field metadata from the database
   // ATableName is required - returns all fields for that table
@@ -308,8 +297,8 @@ begin
   // For DECIMAL/NUMERIC detection: types 7, 8, 16 with scale < 0 indicate decimal types,
   // and the subtype distinguishes NUMERIC (1) from DECIMAL (2).
   // For BOOLEAN (type 23, Firebird 3.0+): we map it to INTEGER for ORM compatibility.
-  LSection := TioDBBuilderFactory.NewSqlText;
-  LSection
+  LSqlText := TioDBBuilderFactory.NewSqlText;
+  LSqlText
     .AddLine('SELECT rf.RDB$NULL_FLAG AS field_not_null,')
     .AddLine('  f.RDB$CHARACTER_LENGTH AS field_length,')
     .AddLine('  f.RDB$FIELD_PRECISION AS field_precision,')
@@ -349,14 +338,14 @@ begin
 
   // Add field filter if specified
   if not AFieldName.IsEmpty then
-    LSection.AddLine(Format('  AND UPPER(rf.RDB$FIELD_NAME) = UPPER(''%s'')', [AFieldName]));
+    LSqlText.AddLine(Format('  AND UPPER(rf.RDB$FIELD_NAME) = UPPER(''%s'')', [AFieldName]));
 
-  Result := LSection.Text;
+  Result := LSqlText.Text;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string;
 var
-  LSection: IioDBBuilderSqlText;
+  LSqlText: IioDBBuilderSqlText;
 begin
   // Generates: SELECT query to list foreign keys with their properties (table_name, constraint_name, on_update, on_delete)
   // Generalized FK list query following the same pattern as BuildSQL_IndexList
@@ -365,9 +354,9 @@ begin
   //   B. All FKs for a table (ATableName specified, AFKName = '')
   //   C. Specific FK (ATableName specified, AFKName specified)
   // Always returns: table_name, constraint_name, on_update, on_delete
-  LSection := TioDBBuilderFactory.NewSqlText;
+  LSqlText := TioDBBuilderFactory.NewSqlText;
 
-  LSection.
+  LSqlText.
     AddLine('SELECT ').
     AddLine('  rc.RDB$RELATION_NAME AS table_name, ').
     AddLine('  rc.RDB$CONSTRAINT_NAME AS constraint_name, ').
@@ -379,13 +368,13 @@ begin
 
   // Add table filter if specified (scenarios B/C)
   if not ATableName.IsEmpty then
-    LSection.AddLine(Format('  AND UPPER(rc.RDB$RELATION_NAME) = UPPER(''%s'') ', [ATableName]));
+    LSqlText.AddLine(Format('  AND UPPER(rc.RDB$RELATION_NAME) = UPPER(''%s'') ', [ATableName]));
 
   // Add FK name filter if specified (scenario C)
   if not AFKName.IsEmpty then
-    LSection.AddLine(Format('  AND UPPER(rc.RDB$CONSTRAINT_NAME) = UPPER(''%s'') ', [AFKName]));
+    LSqlText.AddLine(Format('  AND UPPER(rc.RDB$CONSTRAINT_NAME) = UPPER(''%s'') ', [AFKName]));
 
-  Result := LSection.Text;
+  Result := LSqlText.Text;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_IndexExistsByName(const AIndexName: string): string;
@@ -403,32 +392,32 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_IndexList(const ATableName: string): string;
 var
-  LSection: IioDBBuilderSqlText;
+  LSqlText: IioDBBuilderSqlText;
 begin
   // Generates: SELECT query to list indexes with their properties (name, unique flag, orientation)
   // Base query: all non-system indexes with basic info (name, unique, orientation)
-  LSection := TioDBBuilderFactory.NewSqlText;
+  LSqlText := TioDBBuilderFactory.NewSqlText;
 
-  LSection.
+  LSqlText.
     AddLine('SELECT RDB$INDEX_NAME, RDB$UNIQUE_FLAG, RDB$INDEX_TYPE ').
     AddLine('FROM RDB$INDICES ').
     AddLine('WHERE RDB$SYSTEM_FLAG = 0');
 
   // Add table filter if specified
   if not ATableName.IsEmpty then
-    LSection.AddLine(Format(' AND UPPER(RDB$RELATION_NAME) = UPPER(''%s'')', [ATableName]));
+    LSqlText.AddLine(Format(' AND UPPER(RDB$RELATION_NAME) = UPPER(''%s'')', [ATableName]));
 
-  Result := LSection.Text;
+  Result := LSqlText.Text;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_IndexDetails(const AIndexName: string): string;
 var
-  LSection: IioDBBuilderSqlText;
+  LSqlText: IioDBBuilderSqlText;
 begin
   // Generates: SELECT query to retrieve field details for a specific index (field names and positions)
-  LSection := TioDBBuilderFactory.NewSqlText;
+  LSqlText := TioDBBuilderFactory.NewSqlText;
 
-  LSection.
+  LSqlText.
     AddLine('SELECT').
     AddLine('  RDB$FIELD_NAME,').
     AddLine('  RDB$FIELD_POSITION').
@@ -436,7 +425,7 @@ begin
     AddLine(Format('WHERE UPPER(RDB$INDEX_NAME) = UPPER(''%s'')', [AIndexName])).
     Add('ORDER BY RDB$FIELD_POSITION');
 
-  Result := LSection.Text;
+  Result := LSqlText.Text;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSequenceExistsSql(const ASequenceName: string): string;
@@ -565,23 +554,23 @@ begin
   end;
 end;
 
-{ TioDBBuilderSqlGenFirebird - Version Detection Methods }
-
-function TioDBBuilderSqlGenFirebird.DetectFirebirdVersion: Boolean;
+function TioDBBuilderSqlGenFirebird.LoadRDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
 var
   LQuery: IioQuery;
-  LVersionStr: string;
+  LRaw, LVersion: String;
   LParts: TArray<string>;
+  LMajorVersion, LMinorVersion: Integer;
 begin
-  Result := False;
+  // Default values (conservative: assume Firebird 2.0 if detection fails)
+  LVersion := '2.0.0';
+  LMajorVersion := 2;
+  LMinorVersion := 0;
 
-  // Return immediately if already detected
-  if FFirebirdVersionDetected then
-    Exit(True);
-
+  // The try-except block is necessary because RDB$GET_CONTEXT is not supported in Firebird 2.0
+  // and earlier versions. When running on older Firebird versions, the query will raise an exception
+  // which we catch and handle gracefully by falling back to the default values set above.
   try
-    // Try Firebird 2.1+ method using RDB$GET_CONTEXT
-    // This function was introduced in Firebird 2.1 and returns version like '3.0.10', '4.0.4', '5.0.1'
+    // Query the database for version info using RDB$GET_CONTEXT (Firebird 2.1+)
     LQuery := TioQueryEngine.GetRawQuery(
       ConnectionDefName,
       'SELECT RDB$GET_CONTEXT(''SYSTEM'', ''ENGINE_VERSION'') AS VERSION FROM RDB$DATABASE',
@@ -590,57 +579,31 @@ begin
 
     if not LQuery.Eof then
     begin
-      LVersionStr := LQuery.Fields.FieldByName('VERSION').AsString.Trim;
-      FFirebirdVersion := LVersionStr;
+      LRaw := LQuery.Fields.FieldByName('VERSION').AsString.Trim;
+      LVersion := LRaw;
 
       // Parse version: '3.0.10' -> Major=3, Minor=0
-      LParts := LVersionStr.Split(['.']);
+      LParts := LVersion.Split(['.']);
       if Length(LParts) >= 2 then
       begin
-        FFirebirdMajorVersion := StrToIntDef(LParts[0], 2);
-        FFirebirdMinorVersion := StrToIntDef(LParts[1], 0);
-        FFirebirdVersionDetected := True;
-        Result := True;
+        LMajorVersion := StrToIntDef(LParts[0], 2);
+        LMinorVersion := StrToIntDef(LParts[1], 0);
       end;
-    end;
+    end
+    else
+      LRaw := '';
   except
     // Firebird 2.0 doesn't support RDB$GET_CONTEXT
-    // Default to conservative version 2.0 assumptions
-    FFirebirdVersion := '2.0.0';
-    FFirebirdMajorVersion := 2;
-    FFirebirdMinorVersion := 0;
-    FFirebirdVersionDetected := True;
-    Result := True;
+    LRaw := '';
   end;
-end;
 
-function TioDBBuilderSqlGenFirebird.GetFirebirdVersion: string;
-begin
-  // Lazy initialization - detect version on first access
-  DetectFirebirdVersion;
-  Result := FFirebirdVersion;
-end;
-
-function TioDBBuilderSqlGenFirebird.GetFirebirdMajorVersion: Integer;
-begin
-  // Lazy initialization - detect version on first access
-  DetectFirebirdVersion;
-  Result := FFirebirdMajorVersion;
-end;
-
-function TioDBBuilderSqlGenFirebird.GetFirebirdMinorVersion: Integer;
-begin
-  // Lazy initialization - detect version on first access
-  DetectFirebirdVersion;
-  Result := FFirebirdMinorVersion;
-end;
-
-function TioDBBuilderSqlGenFirebird.SupportsSetDropNotNull: Boolean;
-begin
-  // SET NOT NULL / DROP NOT NULL syntax is only available in Firebird 3.0+
-  // Firebird 2.x versions require table recreation for NOT NULL changes
-  DetectFirebirdVersion;
-  Result := (FFirebirdMajorVersion >= 3);
+  Result := TioDBBuilderFactory.NewSchemaRDBMSInfo(
+    'Firebird',
+    LRaw,
+    LVersion,
+    LMajorVersion,
+    LMinorVersion
+  );
 end;
 
 end.

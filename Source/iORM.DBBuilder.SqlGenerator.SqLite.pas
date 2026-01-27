@@ -47,9 +47,13 @@ uses
 type
   TioDBBuilderSqlGenSQLite = class(TioDBBuilderSqlGenBase)
   protected
+    // ==========================================================
+    // RDBMS INFO METHODS
+    // ----------------------------------------------------------
+    function LoadRDBMSInfo: IioDBBuilderSchemaRDBMSInfo; override;
 
     // ==========================================================
-    // FIELD RELATED METHODS
+    // DATABASE RELATED METHODS
     // ----------------------------------------------------------
     procedure CreateDatabase; override;
     function DatabaseExists: Boolean; override;
@@ -72,6 +76,7 @@ type
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; override;
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; override;
+
     // ==========================================================
     // INDEX RELATED METHODS
     // ----------------------------------------------------------
@@ -80,12 +85,12 @@ type
     function BuildSQL_IndexExistsByName(const AIndexName: string): string; override;
     function BuildSQL_IndexList(const ATableName: string = ''): string; override;
     function BuildSQL_IndexDetails(const AIndexName: string): string; override;
+
     // ==========================================================
     // FOREIGN KEY RELATED METHODS
     // ----------------------------------------------------------
     function BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; override;
-    // ==========================================================
   end;
 
 implementation
@@ -98,6 +103,7 @@ uses
   iORM.DB.Interfaces,
   iORM.DB.Factory,
   iORM.DB.ConnectionContainer,
+  iORM.DB.QueryEngine,
   iORM.Context.Properties.Interfaces,
   iORM.Exceptions,
   iORM.CommonTypes,
@@ -308,14 +314,14 @@ end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
 var
-  LSection: IioDBBuilderSqlText;
+  LSqlText: IioDBBuilderSqlText;
 begin
   // Generates: , CONSTRAINT <name> FOREIGN KEY (...) REFERENCES (...) [ON UPDATE ...] [ON DELETE ...] DEFERRABLE INITIALLY DEFERRED
   // Note: SQLite FK constraints are added within CREATE TABLE, not via ALTER TABLE
-  LSection := TioDBBuilderFactory.NewSqlText;
+  LSqlText := TioDBBuilderFactory.NewSqlText;
 
   // Build the main FK constraint structure
-  LSection.Add(
+  LSqlText.Add(
     Format(', CONSTRAINT "%s" FOREIGN KEY ("%s") REFERENCES "%s" ("%s")', [
       AForeignKey.Name,
       AForeignKey.DependentFieldName,
@@ -326,17 +332,17 @@ begin
 
   // Add optional ON UPDATE clause if specified
   if AForeignKey.OnUpdateAction > fkUnspecified then
-    LSection.Add(Format(' ON UPDATE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnUpdateAction)]));
+    LSqlText.Add(Format(' ON UPDATE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnUpdateAction)]));
 
   // Add optional ON DELETE clause if specified
   if AForeignKey.OnDeleteAction > fkUnspecified then
-    LSection.Add(Format(' ON DELETE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnDeleteAction)]));
+    LSqlText.Add(Format(' ON DELETE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnDeleteAction)]));
 
   // SQLite-specific: make FK constraint deferrable to avoid constraint violations during complex updates
-  LSection.
+  LSqlText.
     Add(' DEFERRABLE INITIALLY DEFERRED');
 
-  Result := LSection.Text;
+  Result := LSqlText.Text;
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_BeginAlterTable(const ATable: IioDBBuilderSchemaTable): string;
@@ -353,6 +359,46 @@ end;
 function TioDBBuilderSqlGenSQLite.BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string;
 begin
   Result := Format('CREATE TABLE %s (', [ATable.Name]);
+end;
+
+function TioDBBuilderSqlGenSQLite.LoadRDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
+var
+  LQuery: IioQuery;
+  LRaw, LVersion: String;
+  LMajorVersion, LMinorVersion: Integer;
+  LParts: TArray<string>;
+begin
+  // Query the database for version info
+  LQuery := TioQueryEngine.GetRawQuery(
+    ConnectionDefName,
+    'SELECT sqlite_version() AS VERSION',
+    True
+  );
+
+  if not LQuery.Eof then
+    LRaw := LQuery.Fields.FieldByName('VERSION').AsString.Trim
+  else
+    LRaw := '';
+
+  LVersion := LRaw;
+  LMajorVersion := 0;
+  LMinorVersion := 0;
+
+  // Parse version: '3.39.4' -> Major=3, Minor=39
+  LParts := LVersion.Split(['.']);
+  if Length(LParts) >= 2 then
+  begin
+    LMajorVersion := StrToIntDef(LParts[0], 0);
+    LMinorVersion := StrToIntDef(LParts[1], 0);
+  end;
+
+  Result := TioDBBuilderFactory.NewSchemaRDBMSInfo(
+    'SQLite',
+    LRaw,
+    LVersion,
+    LMajorVersion,
+    LMinorVersion
+  );
 end;
 
 end.
