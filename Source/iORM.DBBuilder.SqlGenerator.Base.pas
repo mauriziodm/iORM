@@ -54,23 +54,62 @@ type
     FConnectionDefName: string;
     FDataConverter: TioSqlDataConverterRef;
   protected
+    /// <summary>
+    /// Returns the maximum allowed length for SQL identifiers (table names, column names, etc.) for this database.
+    /// Base implementation returns 0 (no limit). Derived classes should override to enforce database-specific limits.
+    /// </summary>
+    /// <returns>Maximum identifier length, or 0 if no limit applies</returns>
+    /// <remarks>
+    /// Examples: Firebird 2.5 = 31 chars, Firebird 3+ = 63 chars, SQLite = effectively unlimited
+    /// </remarks>
     function GetMaxSqlIdentifierLength: integer; virtual;
+    /// <summary>
+    /// Returns the minimum required length for SQL identifiers for this database.
+    /// Base implementation returns 0 (no minimum). Derived classes should override if database has minimum requirements.
+    /// </summary>
+    /// <returns>Minimum identifier length, or 0 if no minimum applies</returns>
     function GetMinSqlIdentifierLength: integer; virtual;
+    /// <summary>
+    /// Checks if an identifier name exceeds the maximum allowed length for this database.
+    /// </summary>
+    /// <param name="AIdentifierName">The identifier name to check</param>
+    /// <returns>True if the name is too long, False otherwise</returns>
     function IsSqlIdentifierTooLong(const AIdentifierName: string): boolean; virtual;
+    /// <summary>
+    /// Checks if an identifier name is shorter than the minimum required length for this database.
+    /// </summary>
+    /// <param name="AIdentifierName">The identifier name to check</param>
+    /// <returns>True if the name is too short, False otherwise</returns>
     function IsSqlIdentifierTooShort(const AIdentifierName: string): boolean; virtual;
+    /// <summary>
+    /// Shortens an identifier name to fit within the specified maximum length by generating a hash.
+    /// If the name is already within the limit, it is returned unchanged.
+    /// </summary>
+    /// <param name="AIdentifierName">The identifier name to shorten (must not be empty)</param>
+    /// <param name="AMaxLength">The maximum allowed length (must be positive)</param>
+    /// <returns>The shortened identifier name (or original if already within limit)</returns>
+    /// <exception cref="EioGenericException">Raised if AIdentifierName is empty or AMaxLength is not positive</exception>
     function ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
-    // Helper method to escape single quotes in SQL identifiers (standard SQL escaping)
-    // Used by all database implementations (SQLite, Firebird, MS SQL Server, etc.)
-    function EscapeSQLIdentifier(const AIdentifier: string): string; virtual;
+    /// <summary>
+    /// Escapes single quotes in SQL string literals by doubling them (standard SQL escaping).
+    /// Used when embedding string values in SQL queries (e.g., WHERE name = 'value').
+    /// NOT for SQL identifiers (table/column names) - those use database-specific delimiters.
+    /// </summary>
+    /// <param name="AStringLiteral">The string value to escape</param>
+    /// <returns>Escaped string safe for embedding in SQL queries</returns>
+    /// <example>
+    /// "Table'Name" becomes "Table''Name"
+    /// </example>
+    function EscapeSQLStringLiteral(const AStringLiteral: string): string; virtual;
 
     // ==========================================================
-    // FIELD RELATED METHODS
+    // DATABASE RELATED METHODS
     // ----------------------------------------------------------
     procedure CreateDatabase; virtual; abstract;
     function DatabaseExists: Boolean; virtual; abstract;
 
     // ==========================================================
-    // FIELD RELATED METHODS
+    // TABLE RELATED METHODS
     // ----------------------------------------------------------
     function BuildSQL_BeginAlterTable(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
@@ -85,9 +124,6 @@ type
     function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo): string; virtual; abstract;
     function BuildSQL_CreateField(const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
-    // Returns SQL to retrieve detailed field metadata (type, length, precision, scale, default value, etc.) from the database
-    // ATableName is required - returns all fields for that table
-    // If AFieldName is also specified, returns details for the specific field only
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; virtual; abstract;
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; virtual; abstract;
     function Translate_SchemaField_To_DefaultValue(const AField: IioDBBuilderSchemaField): string; virtual;
@@ -101,17 +137,38 @@ type
     function BuildSQL_DropIndexByName(const AIndexName: string): string; virtual; abstract;
     function BuildSQL_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual;
     function BuildSQL_IndexExistsByName(const AIndexName: string): string; virtual; abstract;
-    // Returns list of indexes with basic info (name, unique, orientation)
-    // If ATableName is empty, returns all indexes from DB
-    // If ATableName is specified, returns indexes for that table only
     function BuildSQL_IndexList(const ATableName: string = ''): string; virtual; abstract;
-    // Returns detailed info about an index (list of fields with position/order)
     function BuildSQL_IndexDetails(const AIndexName: string): string; virtual; abstract;
+    /// <summary>
+    /// Translates an index schema to a comma-separated list of field names with orientation.
+    /// </summary>
+    /// <param name="AIndex">The index schema</param>
+    /// <returns>Comma-separated field list (e.g., "Field1 ASC, Field2 DESC")</returns>
     function Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
+    /// <summary>
+    /// Translates an index orientation to SQL keyword with leading space.
+    /// </summary>
+    /// <param name="AIndex">The index schema</param>
+    /// <returns>Orientation string with leading space (e.g., " ASC" or " DESC")</returns>
     function Translate_SchemaIndex_To_Orientation(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
+    /// <summary>
+    /// Translates an index unique flag to SQL UNIQUE keyword with leading space.
+    /// </summary>
+    /// <param name="AIndex">The index schema</param>
+    /// <returns>"UNIQUE" string with leading space if unique, empty string otherwise</returns>
     function Translate_SchemaIndex_To_Unique(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
     function Translate_SchemaTableAndIndex_To_IndexName(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): String; virtual;
+    /// <summary>
+    /// Translates the unique flag to a suffix for auto-generated index names.
+    /// </summary>
+    /// <param name="Unique">True if index is unique</param>
+    /// <returns>"_U" if unique, empty string otherwise</returns>
     function Translate_Unique_To_UniqueSuffixForIndexName(const Unique: boolean): string; virtual;
+    /// <summary>
+    /// Translates the index orientation to a suffix for auto-generated index names.
+    /// </summary>
+    /// <param name="AOrientation">The index orientation</param>
+    /// <returns>"_A" for ascending, "_D" for descending</returns>
     function Translate_Orientation_To_OrientationSuffixForIndexName(const AOrientation: TioIndexOrientation): string; virtual;
 
     // ==========================================================
@@ -154,6 +211,11 @@ uses
 
   ;
 
+const
+  // Prefixes for identifier names
+  FK_PREFIX = 'FK_';
+  IDX_PREFIX = 'IDX_';
+
 { TioDBBuilderSqlGenBase }
 
 function TioDBBuilderSqlGenBase.Translate_SchemaFK_To_FKvalue(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
@@ -167,6 +229,9 @@ begin
       Exit('SET DEFAULT');
     fkCascade:
       Exit('CASCADE');
+  else
+    raise EioGenericException.Create(Self.ClassName, 'Translate_SchemaFK_To_FKvalue',
+      Format('Valore FK action inatteso: %d', [Ord(AFKAction)]));
   end;
 end;
 
@@ -186,18 +251,24 @@ function TioDBBuilderSqlGenBase.Translate_SchemaTableAndFK_To_FKName(const ATabl
 var
   LFKName: String;
 begin
+  // Input validation
+  if not Assigned(ATable) then
+    raise EioGenericException.Create(Self.ClassName, 'Translate_SchemaTableAndFK_To_FKName', 'ATable non può essere nil');
+  if not Assigned(AForeignKey) then
+    raise EioGenericException.Create(Self.ClassName, 'Translate_SchemaTableAndFK_To_FKName', 'AForeignKey non può essere nil');
+
   // Build FK name
-  LFKName := 'FK_' + AForeignKey.Name;
+  LFKName := FK_PREFIX + AForeignKey.Name;
   LFKName := TioSqlTranslator.Translate(LFKName, ATable.GetContextTable.GetClassName, False);
 
   // If name exceeds max length, recalculate using shortening algorithm
   if IsSqlIdentifierTooLong(LFKName) then
   begin
-    // Max length is reduced by the length of 'FK_' prefix
-    LFKName := 'FK_' + ShortenIdentifierName(
+    // Max length is reduced by the length of FK prefix
+    LFKName := FK_PREFIX + ShortenIdentifierName(
       Format('%s_%s_%s_%s', [AForeignKey.DependentTableName, AForeignKey.DependentFieldName,
         AForeignKey.ReferenceTableName, AForeignKey.ReferenceFieldName]),
-        MaxSqlIdentifierLength - 3);
+        MaxSqlIdentifierLength - Length(FK_PREFIX));
   end;
 
   Result := LFKName.ToUpper;
@@ -231,6 +302,12 @@ var
   LCoreIndexName,
   LFullIndexName: string;
 begin
+  // Input validation
+  if not Assigned(ATable) then
+    raise EioGenericException.Create(Self.ClassName, 'Translate_SchemaTableAndIndex_To_IndexName', 'ATable non può essere nil');
+  if not Assigned(AIndex) then
+    raise EioGenericException.Create(Self.ClassName, 'Translate_SchemaTableAndIndex_To_IndexName', 'AIndex non può essere nil');
+
   // If the index has an explicit name, use it directly (translated).
   // Otherwise, build a name from table and field names with prefix/suffixes.
   // If the generated name exceeds max length, use a shortened hash version.
@@ -245,7 +322,7 @@ begin
       LCoreIndexName := LCoreIndexName + '_' + LField.Trim;
 
     // Build full index name with prefix and suffixes
-    LFullIndexName := 'IDX_'
+    LFullIndexName := IDX_PREFIX
       + LCoreIndexName
       + Translate_Orientation_To_OrientationSuffixForIndexName(AIndex.Orientation)
       + Translate_Unique_To_UniqueSuffixForIndexName(AIndex.Unique);
@@ -253,7 +330,7 @@ begin
     // If name exceeds max length, use hash of fields part only (without suffixes)
     if IsSqlIdentifierTooLong(LFullIndexName) then
       // Hash only the fields part, then add only the prefix (no suffixes needed with hash)
-      LFullIndexName := 'IDX_' + ShortenIdentifierName(LCoreIndexName, MaxSqlIdentifierLength - 4);
+      LFullIndexName := IDX_PREFIX + ShortenIdentifierName(LCoreIndexName, MaxSqlIdentifierLength - Length(IDX_PREFIX));
   end;
 
   Result := LFullIndexName.ToUpper;
@@ -326,8 +403,15 @@ end;
 
 function TioDBBuilderSqlGenBase.ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
 begin
+  // Input validation
+  if AIdentifierName.IsEmpty then
+    raise EioGenericException.Create(Self.ClassName, 'ShortenIdentifierName', 'Il nome identificatore non può essere vuoto');
+  if AMaxLength <= 0 then
+    raise EioGenericException.Create(Self.ClassName, 'ShortenIdentifierName', 'La lunghezza massima deve essere positiva');
+
   if AIdentifierName.Length > AMaxLength then
-    Result := THashSHA2.GetHashString(AIdentifierName).Substring(1, AMaxLength)
+    // Fix: Use Substring(0, ...) to include first character of hash (0-indexed)
+    Result := THashSHA2.GetHashString(AIdentifierName).Substring(0, AMaxLength)
   else
     Result := AIdentifierName;
 end;
@@ -343,12 +427,13 @@ begin
   Result := (MaxSqlIdentifierLength > 0) and (Length(AIdentifierName) > MaxSqlIdentifierLength);
 end;
 
-function TioDBBuilderSqlGenBase.EscapeSQLIdentifier(const AIdentifier: string): string;
+function TioDBBuilderSqlGenBase.EscapeSQLStringLiteral(const AStringLiteral: string): string;
 begin
-  // Standard SQL escaping: single quotes are escaped by doubling them
+  // Standard SQL escaping: single quotes in string literals are escaped by doubling them
   // This is the standard approach used by SQLite, Firebird, MS SQL Server, PostgreSQL, etc.
+  // Used when embedding string values in SQL queries (e.g., WHERE name = 'value')
   // Example: "Table'Name" becomes "Table''Name"
-  Result := StringReplace(AIdentifier, '''', '''''', [rfReplaceAll]);
+  Result := StringReplace(AStringLiteral, '''', '''''', [rfReplaceAll]);
 end;
 
 function TioDBBuilderSqlGenBase.BuildSQL_DropFK(const ATable: IioDBBuilderSchemaTable;

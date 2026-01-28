@@ -104,6 +104,42 @@ Located in `Samples/`:
 - Common types/enums: `Source/iORM.CommonTypes.pas`
 - Exceptions: `Source/iORM.Exceptions.pas`
 
+## Code Documentation Standards
+
+**XML Documentation Format:**
+
+Use an **adaptive hybrid approach** for XML documentation:
+
+### Simple Methods (self-explanatory, few parameters):
+```pascal
+/// <summary>Brief description in one line</summary>
+function SimpleMethod: Boolean;
+```
+
+### Complex Methods (multi-parameter, articulated behavior):
+```pascal
+/// <summary>
+/// Brief description (1-2 lines max)
+/// </summary>
+/// <param name="AParam">Concise description</param>
+/// <returns>What it returns</returns>
+function ComplexMethod(...): String;
+```
+
+**Available XML tags:**
+- `<summary>` - General description
+- `<param name="...">` - Parameter description
+- `<returns>` - Return value
+- `<exception cref="...">` - Exceptions raised
+- `<remarks>` - Additional notes
+- `<example>` - Code examples
+
+**Rationale:**
+- Balances quality and practicality
+- Keeps source code clean and navigable
+- Provides excellent IDE intellisense hints
+- Focuses documentation effort where it matters most
+
 ## Git Workflow
 
 **IMPORTANT: Never create commits automatically.**

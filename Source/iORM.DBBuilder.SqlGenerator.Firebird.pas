@@ -68,7 +68,7 @@ type
     function DatabaseExists: Boolean; override;
 
     // ==========================================================
-    // FIELD RELATED METHODS
+    // TABLE RELATED METHODS
     // ----------------------------------------------------------
     function BuildSQL_BeginAlterTable(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
@@ -294,8 +294,8 @@ begin
   LSqlText.
     AddLine('SELECT 1').
     AddLine('FROM RDB$RELATION_FIELDS').
-    AddLine(Format('WHERE UPPER(RDB$RELATION_NAME) = UPPER(''%s'')', [EscapeSQLIdentifier(ATable.Name)])).
-    AddLine(Format('  AND UPPER(RDB$FIELD_NAME) = UPPER(''%s'')', [EscapeSQLIdentifier(AField.FieldName)])).
+    AddLine(Format('WHERE UPPER(RDB$RELATION_NAME) = UPPER(''%s'')', [EscapeSQLStringLiteral(ATable.Name)])).
+    AddLine(Format('  AND UPPER(RDB$FIELD_NAME) = UPPER(''%s'')', [EscapeSQLStringLiteral(AField.FieldName)])).
     Add('  AND RDB$SYSTEM_FLAG = 0');
 
   Result := LSqlText.Text;
@@ -352,11 +352,11 @@ begin
     .AddLine('  CAST(COALESCE(rf.RDB$DEFAULT_SOURCE, f.RDB$DEFAULT_SOURCE) AS VARCHAR(255)) AS field_default')
     .AddLine('FROM RDB$RELATION_FIELDS rf')
     .AddLine('LEFT JOIN RDB$FIELDS f ON rf.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME')
-    .AddLine(Format('WHERE UPPER(rf.RDB$RELATION_NAME) = UPPER(''%s'')', [EscapeSQLIdentifier(ATableName)]));
+    .AddLine(Format('WHERE UPPER(rf.RDB$RELATION_NAME) = UPPER(''%s'')', [EscapeSQLStringLiteral(ATableName)]));
 
   // Add field filter if specified
   if not AFieldName.IsEmpty then
-    LSqlText.AddLine(Format('  AND UPPER(rf.RDB$FIELD_NAME) = UPPER(''%s'')', [EscapeSQLIdentifier(AFieldName)]));
+    LSqlText.AddLine(Format('  AND UPPER(rf.RDB$FIELD_NAME) = UPPER(''%s'')', [EscapeSQLStringLiteral(AFieldName)]));
 
   Result := LSqlText.Text;
 end;
@@ -386,11 +386,11 @@ begin
 
   // Add table filter if specified (scenarios B/C)
   if not ATableName.IsEmpty then
-    LSqlText.AddLine(Format('  AND UPPER(rc.RDB$RELATION_NAME) = UPPER(''%s'') ', [EscapeSQLIdentifier(ATableName)]));
+    LSqlText.AddLine(Format('  AND UPPER(rc.RDB$RELATION_NAME) = UPPER(''%s'') ', [EscapeSQLStringLiteral(ATableName)]));
 
   // Add FK name filter if specified (scenario C)
   if not AFKName.IsEmpty then
-    LSqlText.AddLine(Format('  AND UPPER(rc.RDB$CONSTRAINT_NAME) = UPPER(''%s'') ', [EscapeSQLIdentifier(AFKName)]));
+    LSqlText.AddLine(Format('  AND UPPER(rc.RDB$CONSTRAINT_NAME) = UPPER(''%s'') ', [EscapeSQLStringLiteral(AFKName)]));
 
   Result := LSqlText.Text;
 end;
@@ -398,7 +398,7 @@ end;
 function TioDBBuilderSqlGenFirebird.BuildSQL_IndexExistsByName(const AIndexName: string): string;
 begin
   // Generates: SELECT query to check if an index exists by name
-  Result := Format('SELECT 1 FROM RDB$INDICES WHERE UPPER(RDB$INDEX_NAME) = UPPER(''%s'')', [EscapeSQLIdentifier(AIndexName)]);
+  Result := Format('SELECT 1 FROM RDB$INDICES WHERE UPPER(RDB$INDEX_NAME) = UPPER(''%s'')', [EscapeSQLStringLiteral(AIndexName)]);
 end;
 
 function TioDBBuilderSqlGenFirebird.Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String;
@@ -423,7 +423,7 @@ begin
 
   // Add table filter if specified
   if not ATableName.IsEmpty then
-    LSqlText.AddLine(Format(' AND UPPER(RDB$RELATION_NAME) = UPPER(''%s'')', [EscapeSQLIdentifier(ATableName)]));
+    LSqlText.AddLine(Format(' AND UPPER(RDB$RELATION_NAME) = UPPER(''%s'')', [EscapeSQLStringLiteral(ATableName)]));
 
   Result := LSqlText.Text;
 end;
@@ -440,7 +440,7 @@ begin
     AddLine('  RDB$FIELD_NAME,').
     AddLine('  RDB$FIELD_POSITION').
     AddLine('FROM RDB$INDEX_SEGMENTS').
-    AddLine(Format('WHERE UPPER(RDB$INDEX_NAME) = UPPER(''%s'')', [EscapeSQLIdentifier(AIndexName)])).
+    AddLine(Format('WHERE UPPER(RDB$INDEX_NAME) = UPPER(''%s'')', [EscapeSQLStringLiteral(AIndexName)])).
     Add('ORDER BY RDB$FIELD_POSITION');
 
   Result := LSqlText.Text;
@@ -449,14 +449,14 @@ end;
 function TioDBBuilderSqlGenFirebird.BuildSequenceExistsSql(const ASequenceName: string): string;
 begin
   // Carlo Marona (2024-10-15): Added condition to exclude system generators
-  Result := Format('select count(*) from rdb$generators where (UPPER(rdb$generator_name) = UPPER(''%s'')) and (RDB$SYSTEM_FLAG = 0)', [EscapeSQLIdentifier(ASequenceName)]);
+  Result := Format('select count(*) from rdb$generators where (UPPER(rdb$generator_name) = UPPER(''%s'')) and (RDB$SYSTEM_FLAG = 0)', [EscapeSQLStringLiteral(ASequenceName)]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_TableExists(const ATableName: string): string;
 begin
   // Carlo Marona (2024-10-15): Added condition to exclude system relations
   Result := Format('select RDB$RELATION_NAME from RDB$RELATIONS where (UPPER(RDB$RELATION_NAME) = UPPER(''%s'')) and (RDB$SYSTEM_FLAG = 0)',
-    [EscapeSQLIdentifier(ATableName)]);
+    [EscapeSQLStringLiteral(ATableName)]);
 end;
 
 function TioDBBuilderSqlGenFirebird.GetMaxSqlIdentifierLength: integer;

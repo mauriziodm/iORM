@@ -311,27 +311,67 @@ type
   IioDBBuilderSqlGenerator = interface
     ['{9B5DE886-BE08-4422-9D6C-A92ABF948CD9}']
 
-    // Database operations (execute directly, don't return SQL)
+    // ==========================================================
+    // DATABASE RELATED METHODS
+    // ----------------------------------------------------------
+    /// <summary>Creates the database</summary>
     procedure CreateDatabase;
+    /// <summary>Checks if database exists</summary>
     function DatabaseExists: Boolean;
 
-    // Tables related methods
+    // ==========================================================
+    // TABLE RELATED METHODS
+    // ----------------------------------------------------------
+    /// <summary>
+    /// Generates the opening SQL statement for ALTER TABLE command.
+    /// </summary>
+    /// <param name="ATable">The table schema to alter</param>
+    /// <returns>Opening SQL fragment (e.g., "ALTER TABLE tablename")</returns>
     function BuildSQL_BeginAlterTable(const ATable: IioDBBuilderSchemaTable): string;
+    /// <summary>
+    /// Generates the opening SQL statement for CREATE TABLE command.
+    /// </summary>
+    /// <param name="ATable">The table schema to create</param>
+    /// <returns>Opening SQL fragment (e.g., "CREATE TABLE tablename (")</returns>
     function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string;
+    /// <summary>
+    /// Generates the closing SQL statement for ALTER TABLE command.
+    /// </summary>
+    /// <param name="ATable">The table schema being altered</param>
+    /// <returns>Closing SQL fragment (may be empty for some databases)</returns>
     function BuildSQL_EndAlterTable(const ATable: IioDBBuilderSchemaTable): string;
+    /// <summary>
+    /// Generates the closing SQL statement for CREATE TABLE command.
+    /// </summary>
+    /// <param name="ATable">The table schema being created</param>
+    /// <returns>Closing SQL fragment (e.g., ")")</returns>
     function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string;
+    /// <summary>Generates SQL to check if a table exists</summary>
     function BuildSQL_TableExists(const ATableName: string): string;
 
     // ==========================================================
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
+    /// <summary>Generates SQL fragment to add a field in ALTER TABLE context</summary>
     function BuildSQL_AddField(const AField: IioDBBuilderSchemaField): string;
+    /// <summary>
+    /// Generates SQL to alter an existing field based on detected changes.
+    /// </summary>
+    /// <param name="ATable">Table containing the field</param>
+    /// <param name="AField">Field to alter with change flags set</param>
+    /// <param name="ARDBMSInfo">Database version info for compatibility</param>
+    /// <returns>ALTER TABLE SQL statement</returns>
     function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo): string;
+    /// <summary>Generates SQL fragment to define a field in CREATE TABLE context</summary>
     function BuildSQL_CreateField(const AField: IioDBBuilderSchemaField): string;
+    /// <summary>Generates SQL to check if a specific field exists in a table</summary>
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
-    // Returns SQL to retrieve detailed field metadata (type, length, precision, scale, default value, etc.) from the database
-    // ATableName is required - returns all fields for that table
-    // If AFieldName is also specified, returns details for the specific field only
+    /// <summary>
+    /// Generates SQL to retrieve detailed field metadata from the database.
+    /// </summary>
+    /// <param name="ATableName">Table name (required) - returns all fields for that table</param>
+    /// <param name="AFieldName">Optional field name to retrieve details for a specific field only</param>
+    /// <returns>SQL query to fetch field metadata (type, length, precision, scale, default value, etc.)</returns>
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string;
     /// <summary>
     /// Translates an iORM field type to the database-specific SQL type name.
@@ -344,34 +384,107 @@ type
     /// </param>
     /// <returns>The database-specific type name or full type specification.</returns>
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String;
+    /// <summary>
+    /// Translates a schema field's default value to its SQL representation.
+    /// </summary>
+    /// <param name="AField">The field schema containing the default value</param>
+    /// <returns>SQL representation of the default value, or empty string if no default exists</returns>
     function Translate_SchemaField_To_DefaultValue(const AField: IioDBBuilderSchemaField): String;
 
     // ==========================================================
     // INDEX RELATED METHODS
     // ----------------------------------------------------------
+    /// <summary>
+    /// Generates SQL to create an index on a table.
+    /// </summary>
+    /// <param name="ATable">The table schema</param>
+    /// <param name="AIndex">The index schema with field list and options</param>
+    /// <returns>CREATE INDEX SQL statement</returns>
     function BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
+    /// <summary>Generates SQL to add primary key constraint to a table</summary>
     function BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string;
+    /// <summary>
+    /// Generates SQL to drop an index from a table.
+    /// </summary>
+    /// <param name="ATable">The table schema</param>
+    /// <param name="AIndex">The index schema to drop</param>
+    /// <returns>DROP INDEX SQL statement</returns>
     function BuildSQL_DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
+    /// <summary>Generates SQL to drop an index by name</summary>
     function BuildSQL_DropIndexByName(const AIndexName: string): string;
+    /// <summary>Generates SQL to check if an index exists on a table</summary>
     function BuildSQL_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
+    /// <summary>Generates SQL to check if an index exists by name</summary>
     function BuildSQL_IndexExistsByName(const AIndexName: string): string;
+    /// <summary>
+    /// Returns SQL to retrieve list of indexes with basic info (name, unique, orientation).
+    /// </summary>
+    /// <param name="ATableName">
+    /// Optional table name filter. If empty, returns all indexes from DB.
+    /// If specified, returns indexes for that table only.
+    /// </param>
+    /// <returns>SQL query to retrieve index list</returns>
     function BuildSQL_IndexList(const ATableName: string = ''): string;
+    /// <summary>
+    /// Returns SQL to retrieve detailed info about an index (list of fields with position/order).
+    /// </summary>
+    /// <param name="AIndexName">The index name to get details for</param>
+    /// <returns>SQL query to retrieve index details</returns>
     function BuildSQL_IndexDetails(const AIndexName: string): string;
+    /// <summary>
+    /// Generates the index name from table and index schema information.
+    /// Handles both explicit names and auto-generated names with prefixes/suffixes.
+    /// </summary>
+    /// <param name="ATable">The table schema (must not be nil)</param>
+    /// <param name="AIndex">The index schema (must not be nil)</param>
+    /// <returns>The index name (uppercase)</returns>
+    /// <exception cref="EioGenericException">Raised if ATable or AIndex is nil</exception>
     function Translate_SchemaTableAndIndex_To_IndexName(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): String;
 
     // ==========================================================
     // FOREIGN KEY RELATED METHODS
     // ----------------------------------------------------------
     function BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
+    /// <summary>
+    /// Generates SQL to drop a foreign key constraint.
+    /// </summary>
+    /// <param name="ATable">The table schema (must not be nil)</param>
+    /// <param name="AForeignKey">The foreign key schema (must not be nil)</param>
+    /// <returns>SQL statement to drop the foreign key</returns>
     function BuildSQL_DropFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; overload;
+    /// <summary>Generates SQL to drop a foreign key constraint by name</summary>
     function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string; overload;
+    /// <summary>
+    /// Generates SQL to retrieve foreign key constraints from database.
+    /// </summary>
+    /// <param name="ATableName">Optional table name filter. If empty, returns all FKs</param>
+    /// <param name="AFKName">Optional FK name filter. If empty, returns all FKs for the table</param>
+    /// <returns>SQL query to retrieve FK list with full details</returns>
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string;
+    /// <summary>
+    /// Generates the foreign key constraint name from table and FK schema information.
+    /// </summary>
+    /// <param name="ATable">The table schema (must not be nil)</param>
+    /// <param name="AForeignKey">The foreign key schema (must not be nil)</param>
+    /// <returns>The FK constraint name (uppercase)</returns>
+    /// <exception cref="EioGenericException">Raised if ATable or AForeignKey is nil</exception>
     function Translate_SchemaTableAndFK_To_FKName(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
+    /// <summary>
+    /// Translates a foreign key action enum to its SQL representation.
+    /// </summary>
+    /// <param name="AForeignKey">The foreign key schema</param>
+    /// <param name="AFKAction">The FK action (ON DELETE/ON UPDATE)</param>
+    /// <returns>SQL action string (e.g., "CASCADE", "SET NULL", "NO ACTION")</returns>
+    /// <exception cref="EioGenericException">Raised if AFKAction has an unexpected value</exception>
     function Translate_SchemaFK_To_FKvalue(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
 
     // ==========================================================
     // RDBMS INFO METHODS
     // ----------------------------------------------------------
+    /// <summary>
+    /// Retrieves database system name and version information from the connected database.
+    /// </summary>
+    /// <returns>RDBMS info object with name, version, and comparison methods</returns>
     function LoadRDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
     // ==========================================================
   end;
