@@ -326,7 +326,7 @@ type
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
     function BuildSQL_AddField(const AField: IioDBBuilderSchemaField): string;
-    function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
+    function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo): string;
     function BuildSQL_CreateField(const AField: IioDBBuilderSchemaField): string;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     // Returns SQL to retrieve detailed field metadata (type, length, precision, scale, default value, etc.) from the database

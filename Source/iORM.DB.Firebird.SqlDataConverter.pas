@@ -99,18 +99,27 @@ begin
 end;
 
 class function TioSqlDataConverterFirebird.TValueToSql(const AValue: TValue): String;
+var
+  LFormatSettings: TFormatSettings;
 begin
   // Usa il risultato della classe antenata e ne modifica il risultato solo in
   // caso di DateTime
   Result := inherited TValueToSql(AValue);
+
   // If the value is of type TDateTime...
   if (AValue.TypeInfo.Kind = tkFloat) then
+  begin
+    // Force US locale to ensure consistent separators regardless of system locale
+    // Use ISO 8601 format (universally recognized by Firebird)
+    LFormatSettings := TFormatSettings.Create('en-US');
+
     if (AValue.TypeInfo = System.TypeInfo(TDate)) then
-      Result := QuotedStr(FormatDateTime('mm/dd/yyyy', AValue.AsExtended))
+      Result := QuotedStr(FormatDateTime('yyyy-mm-dd', AValue.AsExtended, LFormatSettings))
     else if (AValue.TypeInfo = System.TypeInfo(TTime)) then
-      Result := QuotedStr(FormatDateTime('hh:nn:ss', AValue.AsExtended))
+      Result := QuotedStr(FormatDateTime('hh:nn:ss', AValue.AsExtended, LFormatSettings))
     else if (AValue.TypeInfo = System.TypeInfo(TDateTime)) or (AValue.TypeInfo = System.TypeInfo(TioObjUpdated)) or (AValue.TypeInfo = System.TypeInfo(TioObjCreated)) then
-      Result := QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss', AValue.AsExtended));
+      Result := QuotedStr(FormatDateTime('yyyy-mm-dd hh:nn:ss', AValue.AsExtended, LFormatSettings));
+  end;
 end;
 
 end.

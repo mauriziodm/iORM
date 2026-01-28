@@ -352,10 +352,6 @@ begin
   if Create then
   begin
     CreateTables;
-    // CreateSequences;  // Carlo Marona: Create sequence was moved in CreateTable method so the create table method creates all table components
-
-    //if Schema.IndexesEnabled then  // Carlo Marona: Create indexes was moved in CreateTable method so the create table method creates all table components
-    //  CreateIndexes;
 
     // Foreignkeys are created at the end so all referenced tables are already created
     if Schema.ForeignKeysEnabled then
@@ -409,8 +405,8 @@ begin
         AIndex.AddChange(icUnique);
 
       // Check orientation
-      // Carlo Marona: Firebird index type can be 0 = Ascending, 1 = Descending. iORM orientation actually uses same values, but in the future, changes must be made carefully,
-      //               because this condition could be broken.
+      // Carlo Marona: Firebird index type can be 0 = Ascending, 1 = Descending.
+      // iORM orientation actually uses same values, but in the future, changes must be made carefully.
       if LQueryIndexList.Fields.FieldByName('RDB$INDEX_TYPE').AsInteger <> Ord(AIndex.Orientation) then
         AIndex.AddChange(icOrientation);
 

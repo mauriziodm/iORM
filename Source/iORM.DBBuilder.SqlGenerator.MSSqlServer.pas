@@ -55,6 +55,12 @@ type
     // ----------------------------------------------------------
     function LoadRDBMSInfo: IioDBBuilderSchemaRDBMSInfo; override;
     // ==========================================================
+
+    // ==========================================================
+    // FIELD RELATED METHODS
+    // ----------------------------------------------------------
+    function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo): string; override;
+    // ==========================================================
   end;
 
 implementation
@@ -63,7 +69,8 @@ uses
   System.SysUtils,
   iORM.DB.Interfaces,
   iORM.DB.QueryEngine,
-  iORM.DBBuilder.Factory;
+  iORM.DBBuilder.Factory,
+  iORM.Exceptions;
 
 { TioDBBuilderSqlGenMSSqlServer }
 
@@ -116,6 +123,14 @@ begin
     LMajorVersion,
     LMinorVersion
   );
+end;
+
+function TioDBBuilderSqlGenMSSqlServer.BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable;
+  const AField: IioDBBuilderSchemaField; const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo): string;
+begin
+  // TODO: MS SQL Server BuildSQL_AlterField implementation not yet complete
+  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_AlterField',
+    'MS SQL Server ALTER FIELD is not yet implemented in DBBuilder');
 end;
 
 end.

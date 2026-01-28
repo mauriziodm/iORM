@@ -285,7 +285,7 @@ begin
         end;
       stUpdate:
         begin
-          Script.Body.Add(SqlGenerator.BuildSQL_AlterField(ATable, LField));
+          Script.Body.Add(SqlGenerator.BuildSQL_AlterField(ATable, LField, Schema.RDBMSInfo));
         end;
     end;
   end;

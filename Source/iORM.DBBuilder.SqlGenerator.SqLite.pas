@@ -46,9 +46,6 @@ uses
 
 type
   TioDBBuilderSqlGenSQLite = class(TioDBBuilderSqlGenBase)
-  private
-    // Helper method to escape single quotes in SQLite identifiers (for PRAGMA and queries)
-    function EscapeSQLiteIdentifier(const AIdentifier: string): string;
   protected
     // ==========================================================
     // RDBMS INFO METHODS
@@ -74,7 +71,7 @@ type
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
     function BuildSQL_AddField(const AField: IioDBBuilderSchemaField): string; override;
-    function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
+    function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo): string; override;
     function BuildSQL_CreateField(const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; override;
@@ -120,13 +117,6 @@ uses
 
 { TioDBBuilderSqlGenSQLite }
 
-function TioDBBuilderSqlGenSQLite.EscapeSQLiteIdentifier(const AIdentifier: string): string;
-begin
-  // SQLite escapes single quotes by doubling them
-  // This protects against malformed SQL when identifiers contain apostrophes
-  Result := StringReplace(AIdentifier, '''', '''''', [rfReplaceAll]);
-end;
-
 procedure TioDBBuilderSqlGenSQLite.CreateDatabase;
 begin
   // SQLite creates the database file automatically when a connection is opened
@@ -171,7 +161,7 @@ begin
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable;
-  const AField: IioDBBuilderSchemaField): string;
+  const AField: IioDBBuilderSchemaField; const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo): string;
 begin
   // Note: TioDBBuilderStrategySqLite should NEVER call this method.
   // SQLite has very limited ALTER TABLE support and does not support altering column definitions.
@@ -202,7 +192,7 @@ begin
   // SQLite limitation: PRAGMA table_info returns ALL columns for a table - cannot filter by column name
   // The AField parameter is accepted for interface consistency but IGNORED in the query
   // Strategy layer must manually filter results to find the specific field by name
-  Result := Format('pragma table_info(''%s'')', [EscapeSQLiteIdentifier(ATable.Name)]);
+  Result := Format('pragma table_info(''%s'')', [EscapeSQLIdentifier(ATable.Name)]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string;
@@ -214,13 +204,13 @@ begin
   // SQLite limitation: PRAGMA table_info returns ALL columns for a table - cannot filter by column name
   // Note: AFieldName parameter is IGNORED because SQLite doesn't support field name filtering
   //       PRAGMA always returns ALL fields for the table, Strategy must filter manually
-  Result := Format('PRAGMA table_info(''%s'')', [EscapeSQLiteIdentifier(ATableName)]);
+  Result := Format('PRAGMA table_info(''%s'')', [EscapeSQLIdentifier(ATableName)]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_IndexExistsByName(const AIndexName: string): string;
 begin
   // Generates: SELECT query to check if an index exists by name
-  Result := Format('SELECT 1 FROM sqlite_master WHERE type = ''index'' AND name = ''%s''', [EscapeSQLiteIdentifier(AIndexName)]);
+  Result := Format('SELECT 1 FROM sqlite_master WHERE type = ''index'' AND name = ''%s''', [EscapeSQLIdentifier(AIndexName)]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_IndexList(const ATableName: string): string;
@@ -235,14 +225,14 @@ begin
   // Note: sql IS NOT NULL excludes auto-generated indexes for PK/UNIQUE constraints
   Result := 'SELECT name, tbl_name, sql FROM sqlite_master WHERE type = ''index'' AND sql IS NOT NULL';
   if not ATableName.IsEmpty then
-    Result := Result + Format(' AND tbl_name = ''%s''', [EscapeSQLiteIdentifier(ATableName)]);
+    Result := Result + Format(' AND tbl_name = ''%s''', [EscapeSQLIdentifier(ATableName)]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_IndexDetails(const AIndexName: string): string;
 begin
   // Generates: PRAGMA index_info(<name>) to retrieve field details for a specific index
   // PRAGMA index_info returns columns info for the index
-  Result := Format('PRAGMA index_info(''%s'')', [EscapeSQLiteIdentifier(AIndexName)]);
+  Result := Format('PRAGMA index_info(''%s'')', [EscapeSQLIdentifier(AIndexName)]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string;
@@ -257,7 +247,7 @@ begin
     raise EioDBBuilderException.Create(ClassName, 'BuildSQL_FKList',
       'SQLite requires a table name for PRAGMA foreign_key_list.'#13#13'Cannot list all foreign keys at once.');
 
-  Result := Format('PRAGMA foreign_key_list(''%s'')', [EscapeSQLiteIdentifier(ATableName)]);
+  Result := Format('PRAGMA foreign_key_list(''%s'')', [EscapeSQLIdentifier(ATableName)]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string;
@@ -279,7 +269,7 @@ end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_TableExists(const ATableName: string): string;
 begin
-  Result := Format('pragma table_info(''%s'')', [EscapeSQLiteIdentifier(ATableName)]);
+  Result := Format('pragma table_info(''%s'')', [EscapeSQLIdentifier(ATableName)]);
 end;
 
 /// <remarks>

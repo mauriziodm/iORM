@@ -59,6 +59,9 @@ type
     function IsSqlIdentifierTooLong(const AIdentifierName: string): boolean; virtual;
     function IsSqlIdentifierTooShort(const AIdentifierName: string): boolean; virtual;
     function ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
+    // Helper method to escape single quotes in SQL identifiers (standard SQL escaping)
+    // Used by all database implementations (SQLite, Firebird, MS SQL Server, etc.)
+    function EscapeSQLIdentifier(const AIdentifier: string): string; virtual;
 
     // ==========================================================
     // FIELD RELATED METHODS
@@ -79,7 +82,7 @@ type
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
     function BuildSQL_AddField(const AField: IioDBBuilderSchemaField): string; virtual; abstract;
-    function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
+    function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo): string; virtual; abstract;
     function BuildSQL_CreateField(const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     // Returns SQL to retrieve detailed field metadata (type, length, precision, scale, default value, etc.) from the database
@@ -338,6 +341,14 @@ function TioDBBuilderSqlGenBase.IsSqlIdentifierTooLong(const AIdentifierName: st
 begin
   // If MaxSqlIdentifierLength is 0 there's no limit to the identifier length
   Result := (MaxSqlIdentifierLength > 0) and (Length(AIdentifierName) > MaxSqlIdentifierLength);
+end;
+
+function TioDBBuilderSqlGenBase.EscapeSQLIdentifier(const AIdentifier: string): string;
+begin
+  // Standard SQL escaping: single quotes are escaped by doubling them
+  // This is the standard approach used by SQLite, Firebird, MS SQL Server, PostgreSQL, etc.
+  // Example: "Table'Name" becomes "Table''Name"
+  Result := StringReplace(AIdentifier, '''', '''''', [rfReplaceAll]);
 end;
 
 function TioDBBuilderSqlGenBase.BuildSQL_DropFK(const ATable: IioDBBuilderSchemaTable;

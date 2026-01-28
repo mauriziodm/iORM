@@ -80,7 +80,7 @@ type
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
     function BuildSQL_AddField(const AField: IioDBBuilderSchemaField): string; override;
-    function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
+    function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo): string; override;
     function BuildSQL_CreateField(const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; override;
@@ -225,12 +225,20 @@ begin
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildAddSequenceSql(const ASequenceName: String; const ACreatingNewDatabase: boolean): string;
+var
+  LSequenceName: string;
 begin
-  Result := Format('CREATE SEQUENCE %s;', [ASequenceName.ToUpper]);
+  LSequenceName := ASequenceName.ToUpper;
+
+  // Validate and shorten if necessary (Firebird max identifier length = 31 characters)
+  if IsSqlIdentifierTooLong(LSequenceName) then
+    LSequenceName := ShortenIdentifierName(LSequenceName, MaxSqlIdentifierLength);
+
+  Result := Format('CREATE SEQUENCE %s;', [LSequenceName]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable;
-  const AField: IioDBBuilderSchemaField): string;
+  const AField: IioDBBuilderSchemaField; const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo): string;
 var
   LSqlText: IioDBBuilderSqlText;
 begin
@@ -252,7 +260,17 @@ begin
   // NotNull - Version-specific handling
   // Note: SET NOT NULL & DROP NOT NULL available only from Firebird 3.0+
   if AField.IsFieldNotNullAltered then
+  begin
+    // Check Firebird version before generating SET/DROP NOT NULL syntax
+    if not ARDBMSInfo.IsAtLeast(3, 0) then
+      raise EioDBBuilderException.Create(ClassName, 'BuildSQL_AlterField',
+        Format('Firebird %s does not support SET/DROP NOT NULL for column "%s.%s". '#13#13 +
+          'This feature requires Firebird 3.0 or later. To modify NOT NULL constraints on existing columns, ' +
+          'you must either recreate the table manually or upgrade to Firebird 3.0+.',
+          [ARDBMSInfo.Version, ATable.Name, AField.FieldName]));
+
     LSqlText.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s %s NOT NULL;', [ATable.Name, AField.FieldName, IfThen(AField.FieldNotNull, 'SET', 'DROP')]));
+  end;
 
   Result := LSqlText.Text;
 end;
@@ -276,8 +294,8 @@ begin
   LSqlText.
     AddLine('SELECT 1').
     AddLine('FROM RDB$RELATION_FIELDS').
-    AddLine(Format('WHERE UPPER(RDB$RELATION_NAME) = UPPER(''%s'')', [ATable.Name])).
-    AddLine(Format('  AND UPPER(RDB$FIELD_NAME) = UPPER(''%s'')', [AField.FieldName])).
+    AddLine(Format('WHERE UPPER(RDB$RELATION_NAME) = UPPER(''%s'')', [EscapeSQLIdentifier(ATable.Name)])).
+    AddLine(Format('  AND UPPER(RDB$FIELD_NAME) = UPPER(''%s'')', [EscapeSQLIdentifier(AField.FieldName)])).
     Add('  AND RDB$SYSTEM_FLAG = 0');
 
   Result := LSqlText.Text;
@@ -334,11 +352,11 @@ begin
     .AddLine('  CAST(COALESCE(rf.RDB$DEFAULT_SOURCE, f.RDB$DEFAULT_SOURCE) AS VARCHAR(255)) AS field_default')
     .AddLine('FROM RDB$RELATION_FIELDS rf')
     .AddLine('LEFT JOIN RDB$FIELDS f ON rf.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME')
-    .AddLine(Format('WHERE UPPER(rf.RDB$RELATION_NAME) = UPPER(''%s'')', [ATableName]));
+    .AddLine(Format('WHERE UPPER(rf.RDB$RELATION_NAME) = UPPER(''%s'')', [EscapeSQLIdentifier(ATableName)]));
 
   // Add field filter if specified
   if not AFieldName.IsEmpty then
-    LSqlText.AddLine(Format('  AND UPPER(rf.RDB$FIELD_NAME) = UPPER(''%s'')', [AFieldName]));
+    LSqlText.AddLine(Format('  AND UPPER(rf.RDB$FIELD_NAME) = UPPER(''%s'')', [EscapeSQLIdentifier(AFieldName)]));
 
   Result := LSqlText.Text;
 end;
@@ -368,11 +386,11 @@ begin
 
   // Add table filter if specified (scenarios B/C)
   if not ATableName.IsEmpty then
-    LSqlText.AddLine(Format('  AND UPPER(rc.RDB$RELATION_NAME) = UPPER(''%s'') ', [ATableName]));
+    LSqlText.AddLine(Format('  AND UPPER(rc.RDB$RELATION_NAME) = UPPER(''%s'') ', [EscapeSQLIdentifier(ATableName)]));
 
   // Add FK name filter if specified (scenario C)
   if not AFKName.IsEmpty then
-    LSqlText.AddLine(Format('  AND UPPER(rc.RDB$CONSTRAINT_NAME) = UPPER(''%s'') ', [AFKName]));
+    LSqlText.AddLine(Format('  AND UPPER(rc.RDB$CONSTRAINT_NAME) = UPPER(''%s'') ', [EscapeSQLIdentifier(AFKName)]));
 
   Result := LSqlText.Text;
 end;
@@ -380,7 +398,7 @@ end;
 function TioDBBuilderSqlGenFirebird.BuildSQL_IndexExistsByName(const AIndexName: string): string;
 begin
   // Generates: SELECT query to check if an index exists by name
-  Result := Format('SELECT 1 FROM RDB$INDICES WHERE UPPER(RDB$INDEX_NAME) = UPPER(''%s'')', [AIndexName]);
+  Result := Format('SELECT 1 FROM RDB$INDICES WHERE UPPER(RDB$INDEX_NAME) = UPPER(''%s'')', [EscapeSQLIdentifier(AIndexName)]);
 end;
 
 function TioDBBuilderSqlGenFirebird.Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String;
@@ -405,7 +423,7 @@ begin
 
   // Add table filter if specified
   if not ATableName.IsEmpty then
-    LSqlText.AddLine(Format(' AND UPPER(RDB$RELATION_NAME) = UPPER(''%s'')', [ATableName]));
+    LSqlText.AddLine(Format(' AND UPPER(RDB$RELATION_NAME) = UPPER(''%s'')', [EscapeSQLIdentifier(ATableName)]));
 
   Result := LSqlText.Text;
 end;
@@ -422,7 +440,7 @@ begin
     AddLine('  RDB$FIELD_NAME,').
     AddLine('  RDB$FIELD_POSITION').
     AddLine('FROM RDB$INDEX_SEGMENTS').
-    AddLine(Format('WHERE UPPER(RDB$INDEX_NAME) = UPPER(''%s'')', [AIndexName])).
+    AddLine(Format('WHERE UPPER(RDB$INDEX_NAME) = UPPER(''%s'')', [EscapeSQLIdentifier(AIndexName)])).
     Add('ORDER BY RDB$FIELD_POSITION');
 
   Result := LSqlText.Text;
@@ -430,15 +448,15 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildSequenceExistsSql(const ASequenceName: string): string;
 begin
-  // Carlo Marona (2025-10-15): Added condition to exclude system generators
-  Result := Format('select count(*) from rdb$generators where (UPPER(rdb$generator_name) = UPPER(''%s'')) and (RDB$SYSTEM_FLAG = 0)', [ASequenceName]);
+  // Carlo Marona (2024-10-15): Added condition to exclude system generators
+  Result := Format('select count(*) from rdb$generators where (UPPER(rdb$generator_name) = UPPER(''%s'')) and (RDB$SYSTEM_FLAG = 0)', [EscapeSQLIdentifier(ASequenceName)]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_TableExists(const ATableName: string): string;
 begin
-  // Carlo Marona (2025-10-15): Added condition to exclude system relations
+  // Carlo Marona (2024-10-15): Added condition to exclude system relations
   Result := Format('select RDB$RELATION_NAME from RDB$RELATIONS where (UPPER(RDB$RELATION_NAME) = UPPER(''%s'')) and (RDB$SYSTEM_FLAG = 0)',
-    [ATableName]);
+    [EscapeSQLIdentifier(ATableName)]);
 end;
 
 function TioDBBuilderSqlGenFirebird.GetMaxSqlIdentifierLength: integer;
@@ -503,6 +521,8 @@ begin
 end;
 
 function TioDBBuilderSqlGenFirebird.Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String;
+var
+  LSubType: Integer;
 begin
   case AField.FieldType of
     ioMdVarchar:
@@ -545,7 +565,18 @@ begin
     begin
       Result := 'BLOB';
       if AIncludeTypeAttributes then
+      begin
+        // Validate SubType if specified
+        if not AField.FieldSubType.IsEmpty then
+        begin
+          LSubType := StrToIntDef(AField.FieldSubType, -1);
+          if (LSubType < 0) or (LSubType > 32767) then
+            raise EioDBBuilderException.Create(ClassName, 'Translate_SchemaField_To_FieldType',
+              Format('Invalid BLOB SUB_TYPE "%s" for field "%s". Valid range: 0-32767 (0=binary, 1=text, 2+=user-defined)',
+                [AField.FieldSubType, AField.FieldName]));
+        end;
         Result := Result + Format(' SUB_TYPE %s', [IfThen(AField.FieldSubType.IsEmpty, '0', AField.FieldSubType)]);
+      end;
     end;
     ioMdCustomFieldType:
       Result := AField.FieldCustomType;
