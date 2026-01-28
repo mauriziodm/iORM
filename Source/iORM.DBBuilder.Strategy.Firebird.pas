@@ -114,7 +114,7 @@ begin
   begin
     // Check if sequence exists, then create it
     if (Schema.Status = stCreate) or (not SequenceExists(LSequence)) then
-      Script.Body.Add(FBSqlGenerator.BuildAddSequenceSql(LSequence, Schema.Status = stCreate));
+      Script.Body.Add(FBSqlGenerator.BuildAddSequenceSql(LSequence));
   end;
 end;
 
@@ -159,7 +159,7 @@ begin
 
   // Check if sequence exists, then create it
   if (ATable.Status = stCreate) or (not SequenceExists(ATable.GetSequenceName)) then
-    Script.Body.Add(FBSqlGenerator.BuildAddSequenceSql(ATable.GetSequenceName, ATable.Status = stCreate));
+    Script.Body.Add(FBSqlGenerator.BuildAddSequenceSql(ATable.GetSequenceName));
 end;
 
 procedure TioDBBuilderStrategyFirebird.DropForeignKeys;

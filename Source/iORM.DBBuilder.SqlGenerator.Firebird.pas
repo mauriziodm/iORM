@@ -85,6 +85,7 @@ type
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; override;
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; override;
+
     // ==========================================================
     // INDEX RELATED METHODS
     // ----------------------------------------------------------
@@ -95,6 +96,7 @@ type
     function BuildSQL_IndexList(const ATableName: string = ''): string; override;
     function BuildSQL_IndexDetails(const AIndexName: string): string; override;
     function Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String; override;
+
     // ==========================================================
     // FOREIGN KEY RELATED METHODS
     // ----------------------------------------------------------
@@ -103,8 +105,10 @@ type
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; override;
     // ==========================================================
 
-    // Sequences
-    function BuildAddSequenceSql(const ASequenceName: String; const ACreatingNewDatabase: boolean): string;
+    // ==========================================================
+    // SEQUENCE RELATED METHODS
+    // ----------------------------------------------------------
+    function BuildAddSequenceSql(const ASequenceName: String): string;
     function BuildDropSequenceSql(const ASequenceName: string): string;
     function BuildSequenceExistsSql(const ASequenceName: string): string;
   end;
@@ -224,7 +228,7 @@ begin
     ATable.PrimaryKeyField.FieldName]);
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildAddSequenceSql(const ASequenceName: String; const ACreatingNewDatabase: boolean): string;
+function TioDBBuilderSqlGenFirebird.BuildAddSequenceSql(const ASequenceName: String): string;
 var
   LSequenceName: string;
 begin
@@ -447,9 +451,17 @@ begin
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSequenceExistsSql(const ASequenceName: string): string;
+var
+  LSequenceName: string;
 begin
+  LSequenceName := ASequenceName.ToUpper;
+
+  // Validate and shorten if necessary (Firebird max identifier length = 31 characters)
+  if IsSqlIdentifierTooLong(LSequenceName) then
+    LSequenceName := ShortenIdentifierName(LSequenceName, MaxSqlIdentifierLength);
+
   // Carlo Marona (2024-10-15): Added condition to exclude system generators
-  Result := Format('select count(*) from rdb$generators where (UPPER(rdb$generator_name) = UPPER(''%s'')) and (RDB$SYSTEM_FLAG = 0)', [EscapeSQLStringLiteral(ASequenceName)]);
+  Result := Format('select count(*) from rdb$generators where (UPPER(rdb$generator_name) = UPPER(''%s'')) and (RDB$SYSTEM_FLAG = 0)', [EscapeSQLStringLiteral(LSequenceName)]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_TableExists(const ATableName: string): string;
@@ -487,8 +499,16 @@ begin
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildDropSequenceSql(const ASequenceName: string): string;
+var
+  LSequenceName: string;
 begin
-  Result := Format('DROP SEQUENCE %s;', [ASequenceName]);
+  LSequenceName := ASequenceName.ToUpper;
+
+  // Validate and shorten if necessary (Firebird max identifier length = 31 characters)
+  if IsSqlIdentifierTooLong(LSequenceName) then
+    LSequenceName := ShortenIdentifierName(LSequenceName, MaxSqlIdentifierLength);
+
+  Result := Format('DROP SEQUENCE %s;', [LSequenceName]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_EndAlterTable(const ATable: IioDBBuilderSchemaTable): string;
