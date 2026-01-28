@@ -154,9 +154,6 @@ end;
 
 procedure TioDBBuilderStrategyFirebird.CreateTableSequence(const ATable: IioDBBuilderSchemaTable);
 begin
-  if not Assigned(ATable) then
-    raise EioInvalidArgumentException.Create(ClassName, 'CreateTableSequence', 'ATable is not assigned.');
-
   if ATable.GetSequenceName.IsEmpty then
     Exit;
 

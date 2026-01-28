@@ -152,9 +152,6 @@ procedure TioDBBuilderStrategyBase.AddOrAlterIndexes(const ATable: IioDBBuilderS
 var
   LIndex: IioDBBuilderSchemaIndex;
 begin
-  if not Assigned(ATable) then
-    raise EioInvalidArgumentException.Create(ClassName, 'AddOrAlterIndexes', 'ATable is not assigned.');
-
   for LIndex in ATable.Indexes.Values do
   begin
     case LIndex.Status of
@@ -269,9 +266,6 @@ procedure TioDBBuilderStrategyBase.AddOrAlterFields(const ATable: IioDBBuilderSc
 var
   LField: IioDBBuilderSchemaField;
 begin
-  if not Assigned(ATable) then
-    raise EioInvalidArgumentException.Create(ClassName, 'AddOrAlterFields', 'ATable is not assigned.');
-
   for LField in ATable.Fields do
   begin
     case LField.Status of
