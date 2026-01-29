@@ -55,9 +55,9 @@ type
     class function NewSchema(const AConnectionDefName: String; const AIndexesEnabled, AForeignKeysEnabled: Boolean): IioDBBuilderSchema;
     class function NewSchemaBuilder: TioDBBuilderSchemaBuilderRef;
     class function NewSchemaField(const AContextProperty: IioProperty): IioDBBuilderSchemaField;
-    class function NewSchemaFieldClassInfo: IioDBBuilderSchemaField;
+    class function NewSchemaFieldClassInfo(const AConnectionDefName: String): IioDBBuilderSchemaField;
     class function NewSchemaFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty; const AOnDeleteAction, AOnUpdateAction: TioFKAction): IioDBBuilderSchemaFK;
-    class function NewSchemaIndex(const AIndex: ioIndex): IioDBBuilderSchemaIndex;
+    class function NewSchemaIndex(const AIndex: ioIndex; const AConnectionDefName: String): IioDBBuilderSchemaIndex;
     class function NewSchemaRDBMSInfo(const AName, ARaw, AVersion: String; const AMajorVersion, AMinorVersion: Integer): IioDBBuilderSchemaRDBMSInfo;
     class function NewSchemaTable(const AContextTable: IioTable): IioDBBuilderSchemaTable;
     class function NewSqlGenerator(const AConnectionDefName: String): IioDBBuilderSqlGenerator;
@@ -121,9 +121,10 @@ begin
   Result := TioDBBuilderSchemaField.Create(AContextProperty);
 end;
 
-class function TioDBBuilderFactory.NewSchemaFieldClassInfo: IioDBBuilderSchemaField;
+// ConnectionDefName is required to apply database-specific identifier normalization
+class function TioDBBuilderFactory.NewSchemaFieldClassInfo(const AConnectionDefName: String): IioDBBuilderSchemaField;
 begin
-  Result := TioDBBuilderSchemaFieldClassInfo.Create;
+  Result := TioDBBuilderSchemaFieldClassInfo.Create(AConnectionDefName);
 end;
 
 class function TioDBBuilderFactory.NewSchemaFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
@@ -132,9 +133,9 @@ begin
   Result := TioDBBuilderSchemaFK.Create(AReferenceMap, ADependentMap, ADependentProperty, AOnDeleteAction, AOnUpdateAction);
 end;
 
-class function TioDBBuilderFactory.NewSchemaIndex(const AIndex: ioIndex): IioDBBuilderSchemaIndex;
+class function TioDBBuilderFactory.NewSchemaIndex(const AIndex: ioIndex; const AConnectionDefName: String): IioDBBuilderSchemaIndex;
 begin
-  Result := TioDBBuilderSchemaIndex.Create(AIndex);
+  Result := TioDBBuilderSchemaIndex.Create(AIndex, AConnectionDefName);
 end;
 
 class function TioDBBuilderFactory.NewSchemaRDBMSInfo(const AName, ARaw, AVersion: String;

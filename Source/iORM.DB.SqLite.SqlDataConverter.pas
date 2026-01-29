@@ -53,7 +53,8 @@ type
     class function TValueToSql(const AValue: TValue): String; override;
     class function QueryToTValue(const AQuery: IioQuery; const AProperty: IioProperty): TValue; override;
     class procedure SetQueryParamByContext(const AQuery: IioQuery; const AProp: IioProperty; const AContext: IioContext); override;
-    class function FieldNameToSqlFieldName(const AFieldName: string): string; override;
+    class function NormalizeSqlIdentifier(const AIdentifier: string;
+      const AIncludeDelimiters: Boolean = True): string; override;
   end;
 
 implementation
@@ -97,16 +98,20 @@ end;
 // end;
 // end;
 
-class function TioSqlDataConverterSqLite.FieldNameToSqlFieldName(const AFieldName: string): string;
+class function TioSqlDataConverterSqLite.NormalizeSqlIdentifier(const AIdentifier: string;
+  const AIncludeDelimiters: Boolean): string;
 begin
-  inherited;
-  Result := AFieldName;
+  // SQLite: no case normalization
+  if AIncludeDelimiters then
+    Result := '"' + AIdentifier + '"'
+  else
+    Result := AIdentifier;
 end;
 
 class function TioSqlDataConverterSqLite.QueryToTValue(const AQuery: IioQuery; const AProperty: IioProperty): TValue;
 begin
   // If the field is null
-  // HO levato questo controllo perchè nel caso in cui il campo fosse NULL mi dava un errore
+  // HO levato questo controllo perchï¿½ nel caso in cui il campo fosse NULL mi dava un errore
   // 'Invalid Type cast' dovuto al fatto che il TValue da ritornare non veniva
   // valorizzato per niente (nemmeno a NULL)
   // if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull
@@ -149,11 +154,11 @@ begin
   else
     AQuery.ParamByProp_SetValue(AProp, AProp.GetValue(AContext.DataObject).AsVariant);
 
-  // ATTENZIONE!!! - Ho modificato il codice come sopra, in pratica facendo in modo che le proprietà di
+  // ATTENZIONE!!! - Ho modificato il codice come sopra, in pratica facendo in modo che le proprietï¿½ di
   // tipo TDateTime, TDate e TTime vengano sempre impostate nel parametro della query sempre come TDate
-  // perchè nel progetto Marpimar di Omar e Thomas soccedeva che una propriet di tipo DateTime non veniva
-  // persistita bene, in pratica persisteva sempre uno zero. Facendo così invece va bene.
-  // Non abbiamo capito il perchè.
+  // perchï¿½ nel progetto Marpimar di Omar e Thomas soccedeva che una propriet di tipo DateTime non veniva
+  // persistita bene, in pratica persisteva sempre uno zero. Facendo cosï¿½ invece va bene.
+  // Non abbiamo capito il perchï¿½.
   // ==================== OLD CODE =================================
   // // If the property is of type TDateTime or TDate or TTime and the value is equal to
   // //  zero then set che ParamValue to NULL
@@ -192,8 +197,8 @@ begin
     // Enumerated (boolean also)
     tkEnumeration:
       Result := AValue.AsOrdinal.ToString;
-    // Se Float cerca di capire se è una data o similare, devo fare
-    // così perchè i TValue le date le esprimono come Float.
+    // Se Float cerca di capire se ï¿½ una data o similare, devo fare
+    // cosï¿½ perchï¿½ i TValue le date le esprimono come Float.
     tkFloat:
       begin
         if (AValue.TypeInfo = System.TypeInfo(TDateTime)) or (AValue.TypeInfo = System.TypeInfo(TioObjUpdated)) or (AValue.TypeInfo = System.TypeInfo(TioObjCreated)) then

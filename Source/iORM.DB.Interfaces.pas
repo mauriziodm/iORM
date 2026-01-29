@@ -163,8 +163,8 @@ type
     property ioResponseBody: IioHttpResponseBody read GetioResponseBody;
   end;
 
-  // Interfaccia per il componente Query, cioè del componente che si
-  // occuperà di eseguire il codice SQL o altro per caricare/modificare/eliminare
+  // Interfaccia per il componente Query, cioï¿½ del componente che si
+  // occuperï¿½ di eseguire il codice SQL o altro per caricare/modificare/eliminare
   // il dato
   IioQuery = interface
     ['{E8CFB984-2572-4D6F-BC4B-A4454F1EEDAA}']
@@ -231,7 +231,14 @@ type
     class function TValueToSql(const AValue: TValue): String; virtual; abstract;
     class function QueryToTValue(const AQuery: IioQuery; const AProperty: IioProperty): TValue; virtual; abstract;
     class procedure SetQueryParamByContext(const AQuery: IioQuery; const AProp: IioProperty; const AContext: IioContext); virtual; abstract;
-    class function FieldNameToSqlFieldName(const AFieldName: string): string; virtual; abstract;
+    /// <summary>
+    /// Normalizes a SQL identifier applying database-specific rules.
+    /// </summary>
+    /// <param name="AIdentifier">Original identifier name</param>
+    /// <param name="AIncludeDelimiters">True = add delimiters (default), False = case normalization only</param>
+    /// <returns>Normalized identifier, optionally with delimiters</returns>
+    class function NormalizeSqlIdentifier(const AIdentifier: string;
+      const AIncludeDelimiters: Boolean = True): string; virtual; abstract;
   end;
 
   // INterfaccia per le classi che devono generare i vari tipi di query

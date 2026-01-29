@@ -284,13 +284,15 @@ function TioDBBuilderSqlGenBase.Translate_SchemaIndex_To_CommaSepListOfFieldName
 var
   LField, LOrientation, LComma: String;
 begin
+  // Build field list with SQL-quoted names and orientation suffix
   Result := '';
   LComma := '';
   LOrientation := Translate_SchemaIndex_To_Orientation(AIndex);  // Returns ' ASC' or ' DESC' (with leading space)
-  for LField in AIndex.CommaSepFieldList.Split([',']) do
+  // Note: SqlCommaSepFieldList returns already quoted fields, we need to add orientation to each
+  for LField in AIndex.SqlCommaSepFieldList.Split([', ']) do
   begin
     // Note: LOrientation already includes leading space
-    Result := Result + LComma + LField.Trim + LOrientation;
+    Result := Result + LComma + LField + LOrientation;
     LComma := ', ';
   end;
 end;

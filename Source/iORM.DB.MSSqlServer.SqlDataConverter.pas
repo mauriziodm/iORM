@@ -47,7 +47,8 @@ type
   strict protected
   public
     class function TValueToSql(const AValue: TValue): String; override;
-    class function FieldNameToSqlFieldName(const AFieldName: string): string; override;
+    class function NormalizeSqlIdentifier(const AIdentifier: string;
+      const AIncludeDelimiters: Boolean = True): string; override;
   end;
 
 implementation
@@ -57,9 +58,14 @@ uses
 
 { TioSqlDataConverterMSSqlServer }
 
-class function TioSqlDataConverterMSSqlServer.FieldNameToSqlFieldName(const AFieldName: string): string;
+class function TioSqlDataConverterMSSqlServer.NormalizeSqlIdentifier(const AIdentifier: string;
+  const AIncludeDelimiters: Boolean): string;
 begin
-  Result := '[' + AFieldName + ']';
+  // MS SQL Server: no case normalization, use brackets
+  if AIncludeDelimiters then
+    Result := '[' + AIdentifier + ']'
+  else
+    Result := AIdentifier;
 end;
 
 class function TioSqlDataConverterMSSqlServer.TValueToSql(const AValue: TValue): String;

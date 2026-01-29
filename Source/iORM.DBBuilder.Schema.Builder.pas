@@ -144,7 +144,7 @@ begin
       LSchemaTable.AddField(TioDBBuilderFactory.NewSchemaField(LProperty));
   // Add the ClassInfo field if necessary
   if LSchemaTable.IsTrueClass then
-    LSchemaTable.AddField(TioDBBuilderFactory.NewSchemaFieldClassInfo);
+    LSchemaTable.AddField(TioDBBuilderFactory.NewSchemaFieldClassInfo(AConnectionDefName));
   // Add indexes
   BuildIndexList(LSchemaTable, AMap);
   // Add sequence

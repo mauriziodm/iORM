@@ -186,13 +186,13 @@ begin
   // Generates: ALTER TABLE <table> ADD CONSTRAINT <name> FOREIGN KEY (...) REFERENCES (...) [ON UPDATE ...] [ON DELETE ...]
   LSqlText := TioDBBuilderFactory.NewSqlText;
 
-  // Build the main FK constraint structure
+  // Build the main FK constraint structure using Sql* properties for SQL generation
   LSqlText.
-    AddLine(Format('ALTER TABLE %s', [AForeignKey.DependentTableName])).
+    AddLine(Format('ALTER TABLE %s', [AForeignKey.SqlDependentTableName])).
     IncIndent.
-    AddLine(Format('ADD CONSTRAINT %s', [Translate_SchemaTableAndFK_To_FKName(ATable, AForeignKey)])).
-    AddLine(Format('FOREIGN KEY (%s)', [AForeignKey.DependentFieldName])).
-    AddLine(Format('REFERENCES %s (%s)', [AForeignKey.ReferenceTableName, AForeignKey.ReferenceFieldName]));
+    AddLine(Format('ADD CONSTRAINT %s', [AForeignKey.SqlName])).
+    AddLine(Format('FOREIGN KEY (%s)', [AForeignKey.SqlDependentFieldName])).
+    AddLine(Format('REFERENCES %s (%s)', [AForeignKey.SqlReferenceTableName, AForeignKey.SqlReferenceFieldName]));
 
   // Add optional ON UPDATE clause if specified
   if AForeignKey.OnUpdateAction > fkUnspecified then
@@ -213,19 +213,20 @@ var
   LIndexName, LFieldList, LUnique, LOrientation: String;
 begin
   // Generates: CREATE [UNIQUE] [ASC|DESC] INDEX <name> ON <table> (<fields>);
-  LIndexName := Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
+  LIndexName := AIndex.SqlName;  // Already includes delimiters
   LOrientation := Translate_SchemaIndex_To_Orientation(AIndex);  // Returns ' ASC' or ' DESC' (with leading space)
   LUnique := Translate_SchemaIndex_To_Unique(AIndex);  // Returns ' UNIQUE' or '' (with leading space if present)
   LFieldList := Translate_SchemaIndex_To_CommaSepListOfFieldNames(AIndex);
 
   // Note: LUnique and LIndexOrientation already include leading space when present
-  Result := Format('CREATE%s%s INDEX %s ON %s (%s);', [LUnique, LOrientation, LIndexName, ATable.Name, LFieldList]);
+  Result := Format('CREATE%s%s INDEX %s ON %s (%s);', [LUnique, LOrientation, LIndexName, ATable.SqlName, LFieldList]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string;
 begin
-  Result := Format('ALTER TABLE %s ADD CONSTRAINT PK_%s PRIMARY KEY (%s);', [ATable.Name, ATable.Name,
-    ATable.PrimaryKeyField.FieldName]);
+  // Note: PK_%s uses raw name for constraint naming, SqlName for table reference
+  Result := Format('ALTER TABLE %s ADD CONSTRAINT PK_%s PRIMARY KEY (%s);', [ATable.SqlName, ATable.Name,
+    ATable.PrimaryKeyField.SqlFieldName]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildAddSequenceSql(const ASequenceName: String): string;
@@ -250,15 +251,15 @@ begin
 
   // Type/Length/Precision
   if AField.IsFieldTypeAltered or AField.IsFieldLengthAltered or AField.IsFieldPrecisionAltered then
-    LSqlText.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s TYPE %s;', [ATable.Name, AField.FieldName, Translate_SchemaField_To_FieldType(AField, True)]));  // True = include attributes
+    LSqlText.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s TYPE %s;', [ATable.SqlName, AField.SqlFieldName, Translate_SchemaField_To_FieldType(AField, True)]));  // True = include attributes
 
   // Default
   if AField.IsFieldDefaultAltered then
   begin
     if not AField.FieldDefaultExists then
-      LSqlText.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s DROP DEFAULT;', [ATable.Name, AField.FieldName]))
+      LSqlText.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s DROP DEFAULT;', [ATable.SqlName, AField.SqlFieldName]))
     else
-      LSqlText.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s SET DEFAULT %s;', [ATable.Name, AField.FieldName, Translate_SchemaField_To_DefaultValue(AField)]));
+      LSqlText.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s SET DEFAULT %s;', [ATable.SqlName, AField.SqlFieldName, Translate_SchemaField_To_DefaultValue(AField)]));
   end;
 
   // NotNull - Version-specific handling
@@ -273,7 +274,7 @@ begin
           'you must either recreate the table manually or upgrade to Firebird 3.0+.',
           [ARDBMSInfo.Version, ATable.Name, AField.FieldName]));
 
-    LSqlText.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s %s NOT NULL;', [ATable.Name, AField.FieldName, IfThen(AField.FieldNotNull, 'SET', 'DROP')]));
+    LSqlText.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s %s NOT NULL;', [ATable.SqlName, AField.SqlFieldName, IfThen(AField.FieldNotNull, 'SET', 'DROP')]));
   end;
 
   Result := LSqlText.Text;
@@ -281,12 +282,12 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_BeginAlterTable(const ATable: IioDBBuilderSchemaTable): string;
 begin
-  Result := Format('ALTER TABLE %s', [ATable.Name]);
+  Result := Format('ALTER TABLE %s', [ATable.SqlName]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string;
 begin
-  Result := Format('CREATE TABLE %s (', [ATable.Name]);
+  Result := Format('CREATE TABLE %s (', [ATable.SqlName]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
@@ -534,10 +535,10 @@ begin
 
   // If primary key...
   if AField.PrimaryKey then
-    Result := Format('%s INTEGER NOT NULL', [AField.FieldName])
+    Result := Format('%s INTEGER NOT NULL', [AField.SqlFieldName])
   // ...else continue as regular field
   else
-    Result := Format('%s %s%s%s', [AField.FieldName, Translate_SchemaField_To_FieldType(AField, True), LDefault, LNotNull]);  // True = include attributes
+    Result := Format('%s %s%s%s', [AField.SqlFieldName, Translate_SchemaField_To_FieldType(AField, True), LDefault, LNotNull]);  // True = include attributes
 end;
 
 function TioDBBuilderSqlGenFirebird.Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String;

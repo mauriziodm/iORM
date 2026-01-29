@@ -40,8 +40,13 @@ uses
 
 type
 
+  /// <summary>
+  /// Schema field implementation for the TrueClass field (stores the actual class name for polymorphism).
+  /// Uses NormalizeSqlIdentifier for proper case normalization and quoting.
+  /// </summary>
   TioDBBuilderSchemaFieldClassInfo = class(TInterfacedObject, IioDBBuilderSchemaField)
   private
+    FConnectionDefName: String;  // Required for SqlDataConverter to apply database-specific normalization
     FStatus: TioDBBuilderStatus;
     FAltered: TioDBBuilderFieldAlter;
     function GetFieldCustomType: string;
@@ -54,7 +59,8 @@ type
     function GetFieldType: TioMetadataFieldType;
     function GetFieldUnicode: boolean;
     function GetFieldNotNull: Boolean;
-    function GetFieldName{(const AClearDelimiters: Boolean = False)}: String;
+    function GetFieldName: String;
+    function GetSqlFieldName: String;
     function GetPrimaryKey: Boolean;
     // Status
     function GetStatus: TioDBBuilderStatus;
@@ -71,6 +77,7 @@ type
     function GetIsFieldPrecisionIncreased: Boolean;
     function GetIsFieldPrecisionDecreased: Boolean;
   public
+    constructor Create(const AConnectionDefName: String);
     procedure AddAltered(const AAltered: TioDBBuilderFieldAlterStatus);
 
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
@@ -90,9 +97,15 @@ type
 implementation
 
 uses
-  iORM.CommonTypes;
+  iORM.CommonTypes, iORM.DB.Factory;
 
 { TioDBBuilderSchemaFieldClassInfo }
+
+constructor TioDBBuilderSchemaFieldClassInfo.Create(const AConnectionDefName: String);
+begin
+  inherited Create;
+  FConnectionDefName := AConnectionDefName;
+end;
 
 procedure TioDBBuilderSchemaFieldClassInfo.AddAltered(const AAltered: TioDBBuilderFieldAlterStatus);
 begin
@@ -119,9 +132,20 @@ begin
   Result := IO_TRUECLASS_FIELDLENGTH;
 end;
 
-function TioDBBuilderSchemaFieldClassInfo.GetFieldName{(const AClearDelimiters: Boolean = False)}: String;
+// Returns field name with case normalization only (no delimiters).
+// Example: ioClassInfo for SQLite, IOCLASSINFO for Firebird
+function TioDBBuilderSchemaFieldClassInfo.GetFieldName: String;
 begin
-  Result := IO_TRUECLASS_FIELDNAME;
+  Result := TioDbFactory.SqlDataConverter(FConnectionDefName)
+    .NormalizeSqlIdentifier(IO_TRUECLASS_FIELDNAME, False);
+end;
+
+// Returns field name with case normalization AND database-specific delimiters.
+// Example: "ioClassInfo" for SQLite, "IOCLASSINFO" for Firebird, [ioClassInfo] for MS SQL Server
+function TioDBBuilderSchemaFieldClassInfo.GetSqlFieldName: String;
+begin
+  Result := TioDbFactory.SqlDataConverter(FConnectionDefName)
+    .NormalizeSqlIdentifier(IO_TRUECLASS_FIELDNAME, True);
 end;
 
 function TioDBBuilderSchemaFieldClassInfo.GetFieldNotNull: Boolean;

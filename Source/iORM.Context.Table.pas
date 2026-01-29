@@ -308,7 +308,7 @@ end;
 
 function TioTable.GetTableConnectionName: String;
 begin
-  // TODO: Possibile togliere questo if? ho dovuto metterlo perchè altrimenti dava un AV error già quando installavo nell'IDE dovuto al fatto che ancora il session DataStore non era assegnato
+  // TODO: Possibile togliere questo if? ho dovuto metterlo perchï¿½ altrimenti dava un AV error giï¿½ quando installavo nell'IDE dovuto al fatto che ancora il session DataStore non era assegnato
   if TioApplication.SessionDataStore <> nil then
     Result := TioApplication.SessionDataStore.GetCurrentConnectionNameIfEmpty(FTableConnectionName_DoNotCallDirectly)
   else
@@ -382,8 +382,8 @@ end;
 
 function TioTable.GetSql: String;
 begin
-  Result := inherited;
-  Result := TioDBFActory.SqlDataConverter(GetTableConnectionName).FieldNameToSqlFieldName(Result);
+  Result := TioDBFActory.SqlDataConverter(GetTableConnectionName)
+    .NormalizeSqlIdentifier(FSqlText, True);  // Case normalized + delimiters
 end;
 
 function TioTable.IndexListExists: Boolean;
@@ -463,7 +463,8 @@ end;
 
 function TioTable.TableName: String;
 begin
-  Result := FSqlText;
+  Result := TioDBFActory.SqlDataConverter(GetTableConnectionName)
+    .NormalizeSqlIdentifier(FSqlText, False);  // Case normalized, no delimiters
 end;
 
 { TioTrueClass }
@@ -501,7 +502,7 @@ end;
 
 function TioTrueClass.GetSqlFieldName: string;
 begin
-  Result := TioDBFActory.SqlDataConverter(Table.GetTableConnectionName).FieldNameToSqlFieldName(FSqlFieldName);
+  Result := TioDBFActory.SqlDataConverter(Table.GetTableConnectionName).NormalizeSqlIdentifier(FSqlFieldName, True);
 end;
 
 function TioTrueClass.GetSqlParamName: String;

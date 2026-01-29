@@ -141,10 +141,10 @@ begin
 
   // If primary key...
   if AField.PrimaryKey then
-    Result := Format('"%s" INTEGER PRIMARY KEY NOT NULL', [AField.FieldName])
+    Result := Format('%s INTEGER PRIMARY KEY NOT NULL', [AField.SqlFieldName])
   // ...else continue as regular field
   else
-    Result := Format('"%s" %s%s%s', [AField.FieldName, Translate_SchemaField_To_FieldType(AField, False), LDefault, LNotNull]);  // False = does not include attributes
+    Result := Format('%s %s%s%s', [AField.SqlFieldName, Translate_SchemaField_To_FieldType(AField, False), LDefault, LNotNull]);  // False = does not include attributes
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
@@ -152,12 +152,12 @@ var
   LIndexName, LFieldList, LUnique: String;
 begin
   // Generates: CREATE [UNIQUE] INDEX IF NOT EXISTS <name> ON <table> (<fields>);
-  LIndexName := Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
+  LIndexName := AIndex.SqlName;  // Already includes delimiters
   LUnique := Translate_SchemaIndex_To_Unique(AIndex);  // Returns ' UNIQUE' or '' (with leading space if present)
   LFieldList := Translate_SchemaIndex_To_CommaSepListOfFieldNames(AIndex);
 
   // Note: LUnique already includes leading space when present
-  Result := Format('CREATE%s INDEX IF NOT EXISTS %s ON %s (%s);', [LUnique, LIndexName, ATable.Name, LFieldList]);
+  Result := Format('CREATE%s INDEX IF NOT EXISTS %s ON %s (%s);', [LUnique, LIndexName, ATable.SqlName, LFieldList]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable;
@@ -328,13 +328,13 @@ begin
   // Note: SQLite FK constraints are added within CREATE TABLE, not via ALTER TABLE
   LSqlText := TioDBBuilderFactory.NewSqlText;
 
-  // Build the main FK constraint structure
+  // Build the main FK constraint structure using Sql* properties for SQL generation
   LSqlText.Add(
-    Format(', CONSTRAINT "%s" FOREIGN KEY ("%s") REFERENCES "%s" ("%s")', [
-      AForeignKey.Name,
-      AForeignKey.DependentFieldName,
-      AForeignKey.ReferenceTableName,
-      AForeignKey.ReferenceFieldName
+    Format(', CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)', [
+      AForeignKey.SqlName,
+      AForeignKey.SqlDependentFieldName,
+      AForeignKey.SqlReferenceTableName,
+      AForeignKey.SqlReferenceFieldName
     ])
   );
 
@@ -378,7 +378,7 @@ end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string;
 begin
-  Result := Format('CREATE TABLE %s (', [ATable.Name]);
+  Result := Format('CREATE TABLE %s (', [ATable.SqlName]);
 end;
 
 function TioDBBuilderSqlGenSQLite.LoadRDBMSInfo: IioDBBuilderSchemaRDBMSInfo;

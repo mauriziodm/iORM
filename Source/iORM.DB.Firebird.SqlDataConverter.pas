@@ -48,6 +48,8 @@ type
   public
     class function TValueToSql(const AValue:TValue): String; override;
     class procedure SetQueryParamByContext(const AQuery:IioQuery; const AProp:IioProperty;const AContext:IioContext); override;
+    class function NormalizeSqlIdentifier(const AIdentifier: string;
+      const AIncludeDelimiters: Boolean = True): string; override;
   end;
 
 implementation
@@ -96,6 +98,15 @@ begin
   // Other value types inherits from ancestor
   else
     inherited;
+end;
+
+class function TioSqlDataConverterFirebird.NormalizeSqlIdentifier(const AIdentifier: string;
+  const AIncludeDelimiters: Boolean): string;
+begin
+  // Firebird: always normalize to UPPERCASE
+  Result := AIdentifier.ToUpper;
+  if AIncludeDelimiters then
+    Result := '"' + Result + '"';
 end;
 
 class function TioSqlDataConverterFirebird.TValueToSql(const AValue: TValue): String;

@@ -46,7 +46,7 @@ uses
 
 type
 
-  // Classe che rappresenta una proprietà
+  // Classe che rappresenta una proprietï¿½
   TioProperty = class(TInterfacedObject, IioProperty)
   strict private
     FTransient: Boolean;
@@ -130,7 +130,7 @@ type
     function GetSqlQualifiedFieldName: String; virtual;
     function GetSqlFullQualifiedFieldName: String; virtual;
     function GetSqlFieldTableName: String;
-    function GetSqlFieldName(const AClearDelimiters: Boolean = False): String; virtual;
+    function GetSqlFieldName(const AIncludeDelimiters: Boolean = True): String; virtual;
     function GetSqlFieldAlias: String; virtual;
     function GetSqlParamName: String; virtual;
     function GetSqlWhereParamName: String; virtual;
@@ -215,7 +215,7 @@ type
   public
     constructor Create(const ATable: IioTable);
     function GetName: String; override;
-    function GetSqlFieldName(const AClearDelimiters: Boolean = False): String; override;
+    function GetSqlFieldName(const AIncludeDelimiters: Boolean = True): String; override;
     function GetSqlFieldAlias: String; override;
     function GetSqlParamName: String; override;
     function GetSqlWhereParamName: String; override;
@@ -254,7 +254,7 @@ type
     function IsEnumeration: Boolean; override;
   end;
 
-  // Classe con l'elenco delle proprietà della classe
+  // Classe con l'elenco delle proprietï¿½ della classe
   TioPropertiesGetSqlFunction = reference to function(AProperty: IioProperty): String;
 
   TioProperties = class(TioSqlItem, IioProperties)
@@ -413,12 +413,12 @@ begin
   // Set the RelationChildPropertyName & RelationChildPropertyPath
   SetRelationChildNameAndPath(ARelationChildPropertyName);
   // --------------------------------
-  // Quando si fa un Join in una classe (attributo ioJoin) poi nelle proprietà che ricevono il valore dai campi della
+  // Quando si fa un Join in una classe (attributo ioJoin) poi nelle proprietï¿½ che ricevono il valore dai campi della
   // joined class/table si deve usare anche l'attributo "ioField" per indicare ad iORM in che modo reperirne poi il
-  // valore anche in caso di ambiguità dovuta campi con lo stesso nome nelle tabelle coinvolte.
+  // valore anche in caso di ambiguitï¿½ dovuta campi con lo stesso nome nelle tabelle coinvolte.
   // Esempio:
   // Classe: [ioJoin(jtInner, TCostGeneric, '[TCostGeneric.CostType] = [TCostType.ID]')]
-  // Proprietà: >>>>>>>> [ioField('[TCostGeneric].TravelID')]  <<<<<<<<<
+  // Proprietï¿½: >>>>>>>> [ioField('[TCostGeneric].TravelID')]  <<<<<<<<<
   // --------------------------------
   SetFieldData;
   // Translate the LoadSQLData statement if needed
@@ -428,12 +428,12 @@ end;
 function TioProperty.GetFieldType: String;
 begin
   // ================================================================================
-  // NB: Questa funzione è usata solo da questa classe stessa (Self.IsBlob) e dalla
+  // NB: Questa funzione ï¿½ usata solo da questa classe stessa (Self.IsBlob) e dalla
   // creazione automatica del DB per determinare il tipo di campo. Siccome
-  // l'unicoDB per il quale è disponibile la creazione automatica del DB è SQLite
-  // non è necessario che questa funzione si adatti ai diversi RDBMS e quindi la lascio
-  // fissa così. Questo va bene anche all'interno della funzione Self.IsBlob
-  // perchè questa verifica solo se il tipo comincia per BLOB e uesto va bene per
+  // l'unicoDB per il quale ï¿½ disponibile la creazione automatica del DB ï¿½ SQLite
+  // non ï¿½ necessario che questa funzione si adatti ai diversi RDBMS e quindi la lascio
+  // fissa cosï¿½. Questo va bene anche all'interno della funzione Self.IsBlob
+  // perchï¿½ questa verifica solo se il tipo comincia per BLOB e uesto va bene per
   // qualunque DB.
   // ================================================================================
   // If the FField is not empty then return it
@@ -637,13 +637,10 @@ begin
   Result := FSqlFieldAlias;
 end;
 
-function TioProperty.GetSqlFieldName(const AClearDelimiters: Boolean): String;
+function TioProperty.GetSqlFieldName(const AIncludeDelimiters: Boolean): String;
 begin
-  // Result := FSqlFieldName;
-  if AClearDelimiters then
-    Result := FSqlFieldName
-  else
-    Result := TioDbFactory.SqlDataConverter(FTable.GetTableConnectionName).FieldNameToSqlFieldName(FSqlFieldName);
+  Result := TioDbFactory.SqlDataConverter(FTable.GetTableConnectionName)
+    .NormalizeSqlIdentifier(FSqlFieldName, AIncludeDelimiters);
 end;
 
 function TioProperty.GetSqlFieldTableName: String;
@@ -653,9 +650,8 @@ end;
 
 function TioProperty.GetSqlQualifiedFieldName: String;
 begin
-  // Result := FQualifiedSqlFieldName;
-  Result := TioDbFactory.SqlDataConverter(FTable.GetTableConnectionName).FieldNameToSqlFieldName(FSqlFieldTableName) + '.' +
-    TioDbFactory.SqlDataConverter(FTable.GetTableConnectionName).FieldNameToSqlFieldName(FSqlFieldName);
+  Result := TioDbFactory.SqlDataConverter(FTable.GetTableConnectionName).NormalizeSqlIdentifier(FSqlFieldTableName, True) + '.' +
+    TioDbFactory.SqlDataConverter(FTable.GetTableConnectionName).NormalizeSqlIdentifier(FSqlFieldName, True);
 end;
 
 function TioProperty.GetSqlParamName: String;
@@ -855,12 +851,12 @@ var
   LValue: String;
 begin
   // --------------------------------
-  // Quando si fa un Join in una classe (attributo ioJoin) poi nelle proprietà che ricevono il valore dai campi della
+  // Quando si fa un Join in una classe (attributo ioJoin) poi nelle proprietï¿½ che ricevono il valore dai campi della
   // joined class/table si deve usare anche l'attributo "ioField" per indicare ad iORM in che modo reperirne poi il
-  // valore anche in caso di ambiguità dovuta campi con lo stesso nome nelle tabelle coinvolte.
+  // valore anche in caso di ambiguitï¿½ dovuta campi con lo stesso nome nelle tabelle coinvolte.
   // Esempio:
   // Classe: [ioJoin(jtInner, TCostGeneric, '[TCostGeneric.CostType] = [TCostType.ID]')]
-  // Proprietà: >>>>>>>> [ioField('[TCostGeneric].TravelID')]  <<<<<<<<<
+  // Proprietï¿½: >>>>>>>> [ioField('[TCostGeneric].TravelID')]  <<<<<<<<<
   // --------------------------------
   LValue := FFieldDefinitionString;
   // Translate (if contains tags)
@@ -1341,9 +1337,9 @@ begin
   Result := GetSqlFieldTableName + '_' + IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME;
 end;
 
-function TioHasManyChildVirtualProperty.GetSqlFieldName(const AClearDelimiters: Boolean): String;
+function TioHasManyChildVirtualProperty.GetSqlFieldName(const AIncludeDelimiters: Boolean): String;
 begin
-  // No inherited
+  // No inherited (this virtual property always uses the constant name without normalization)
   Result := IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME;
 end;
 

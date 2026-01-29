@@ -55,7 +55,8 @@ type
     function GetFieldType: TioMetadataFieldType;
     function GetFieldUnicode: boolean;
     function GetFieldNotNull: Boolean;
-    function GetFieldName{(const AClearDelimiters: Boolean = False)}: String;
+    function GetFieldName: String;
+    function GetSqlFieldName: String;
     function GetPrimaryKey: Boolean;
     // Status
     function GetStatus: TioDBBuilderStatus;
@@ -80,6 +81,7 @@ type
     property FieldDefaultExists: Boolean read GetFieldDefaultExists;
     property FieldLength: integer read GetFieldLength;
     property FieldName: String read GetFieldName;
+    property SqlFieldName: String read GetSqlFieldName;
     property FieldPrecision: integer read GetFieldPrecision;
     property FieldScale: integer read GetFieldScale;
     property FieldSubType: string read GetFieldSubType;
@@ -139,9 +141,14 @@ begin
   Result := FContextProperty.GetMetadata_FieldLength;
 end;
 
-function TioDBBuilderSchemaField.GetFieldName{(const AClearDelimiters: Boolean = False)}: String;
+function TioDBBuilderSchemaField.GetFieldName: String;
 begin
-  Result := FContextProperty.GetSqlFieldName{(AClearDelimiters)};
+  Result := FContextProperty.GetSqlFieldName(False);  // Case normalized, no delimiters
+end;
+
+function TioDBBuilderSchemaField.GetSqlFieldName: String;
+begin
+  Result := FContextProperty.GetSqlFieldName(True);   // Case normalized + delimiters
 end;
 
 function TioDBBuilderSchemaField.GetFieldPrecision: integer;

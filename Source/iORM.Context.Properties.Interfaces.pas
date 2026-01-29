@@ -63,7 +63,7 @@ type
     function GetName: string;
     function GetSqlQualifiedFieldName: String;
     function GetSqlFullQualifiedFieldName: String;
-    function GetSqlFieldName(const AClearDelimiters: Boolean=False): String;
+    function GetSqlFieldName(const AIncludeDelimiters: Boolean = True): String;
     function GetSqlFieldAlias: String;
     function GetSqlParamName: String;
     function GetSqlWhereParamName: String;

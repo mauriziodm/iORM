@@ -16,6 +16,7 @@ type
   private
     FChanges: TioDBBuilderIndexChanges;
     FCommaSepFieldList: String;
+    FConnectionDefName: String;
     FContextProperty: IioProperty;
     FHasExplicitName: boolean;
     FName: String;
@@ -24,8 +25,13 @@ type
     FUnique: Boolean;
     // Status
     function GetChanges: TioDBBuilderIndexChanges;
+    // Raw names (case normalized, no delimiters)
     function GetCommaSepFieldList: String;
     function GetName: String;
+    // SQL names (case normalized + delimiters)
+    function GetSqlCommaSepFieldList: String;
+    function GetSqlName: String;
+    // Other
     function GetOrientation: TioIndexOrientation;
     function GetStatus: TioDBBuilderStatus;
     function GetUnique: Boolean;
@@ -33,14 +39,16 @@ type
 
     procedure SetStatus(const Value: TioDBBuilderStatus);
   public
-    constructor Create(const AIndexAttr: ioIndex);
+    constructor Create(const AIndexAttr: ioIndex; const AConnectionDefName: String);
 
     procedure AddChange(const AChange: TioDBBuilderIndexChange);
 
     property Changes: TioDBBuilderIndexChanges read GetChanges;
     property CommaSepFieldList: String read GetCommaSepFieldList;
+    property SqlCommaSepFieldList: String read GetSqlCommaSepFieldList;
     property HasExplicitName: boolean read GetHasExplicitName;
     property Name: String read GetName;
+    property SqlName: String read GetSqlName;
     property Orientation: TioIndexOrientation read GetOrientation;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
     property Unique: Boolean read GetUnique;
@@ -52,7 +60,8 @@ uses
   System.SysUtils,
   System.StrUtils,
   System.Classes,
-  iORM.Exceptions;
+  iORM.Exceptions,
+  iORM.DB.Factory;
 
 
 { TioDBBuilderSchemaIndex }
@@ -62,7 +71,7 @@ begin
   Include(FChanges, AChange);
 end;
 
-constructor TioDBBuilderSchemaIndex.Create(const AIndexAttr: ioIndex);
+constructor TioDBBuilderSchemaIndex.Create(const AIndexAttr: ioIndex; const AConnectionDefName: String);
 begin
   inherited Create;
 
@@ -70,6 +79,7 @@ begin
     raise EioDBBuilderException.Create(Self.ClassName, 'Create', 'Cannot create index: no fields list specified.');
 
   FStatus := stClean;
+  FConnectionDefName := AConnectionDefName;
   FHasExplicitName := AIndexAttr.HasExplicitName;
   FName := AIndexAttr.Name;
   FCommaSepFieldList := AIndexAttr.CommaSepFieldList;
@@ -82,19 +92,67 @@ begin
   Result := FChanges;
 end;
 
-function TioDBBuilderSchemaIndex.GetCommaSepFieldList: String;
-begin
-  Result := FCommaSepFieldList;
-end;
+// ============================================================
+// Raw names (case normalized, no delimiters)
+// ============================================================
 
-function TioDBBuilderSchemaIndex.GetHasExplicitName: boolean;
+function TioDBBuilderSchemaIndex.GetCommaSepFieldList: String;
+var
+  LField, LComma: String;
 begin
-  Result := FHasExplicitName;
+  // Normalize case of each field, no delimiters
+  Result := '';
+  LComma := '';
+  for LField in FCommaSepFieldList.Split([',']) do
+  begin
+    Result := Result + LComma +
+      TioDbFactory.SqlDataConverter(FConnectionDefName)
+        .NormalizeSqlIdentifier(LField.Trim, False);  // Case only
+    LComma := ', ';
+  end;
 end;
 
 function TioDBBuilderSchemaIndex.GetName: String;
 begin
-  Result := FName;
+  // Normalize case of the name, no delimiters
+  Result := TioDbFactory.SqlDataConverter(FConnectionDefName)
+    .NormalizeSqlIdentifier(FName, False);
+end;
+
+// ============================================================
+// SQL names (case normalized + delimiters)
+// ============================================================
+
+function TioDBBuilderSchemaIndex.GetSqlCommaSepFieldList: String;
+var
+  LField, LComma: String;
+begin
+  // Normalize case + add delimiters to each field
+  Result := '';
+  LComma := '';
+  for LField in FCommaSepFieldList.Split([',']) do
+  begin
+    Result := Result + LComma +
+      TioDbFactory.SqlDataConverter(FConnectionDefName)
+        .NormalizeSqlIdentifier(LField.Trim, True);  // Case + delimiters
+    LComma := ', ';
+  end;
+end;
+
+function TioDBBuilderSchemaIndex.GetSqlName: String;
+begin
+  // Normalize case + add delimiters to the name
+  Result := TioDbFactory.SqlDataConverter(FConnectionDefName)
+    .NormalizeSqlIdentifier(FName, True);
+end;
+
+// ============================================================
+// Other methods
+// ============================================================
+
+function TioDBBuilderSchemaIndex.GetHasExplicitName: boolean;
+begin
+  Result := FHasExplicitName;
 end;
 
 function TioDBBuilderSchemaIndex.GetOrientation: TioIndexOrientation;

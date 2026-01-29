@@ -81,23 +81,39 @@ type
 
   IioDBBuilderSchemaFK = interface
     ['{1F653F52-570B-4381-930D-FB3945025DA2}']
+    // Raw names (case normalized, no delimiters) - for FK name construction
     function GetName: String;
     function GetReferenceTableName: String;
     function GetReferenceFieldName: String;
     function GetDependentTableName: String;
     function GetDependentFieldName: String;
+    // SQL names (case normalized + delimiters) - for SQL generation
+    function GetSqlName: String;
+    function GetSqlReferenceTableName: String;
+    function GetSqlReferenceFieldName: String;
+    function GetSqlDependentTableName: String;
+    function GetSqlDependentFieldName: String;
+    // Other
     function GetOnDeleteAction: TioFKAction;
     function GetOnUpdateAction: TioFKAction;
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const Value: TioDBBuilderStatus);
 
+    // Raw properties
     property DependentTableName: String read GetDependentTableName;
     property DependentFieldName: String read GetDependentFieldName;
     property Name: String read GetName;
-    property OnDeleteAction: TioFKAction read GetOnDeleteAction;
-    property OnUpdateAction: TioFKAction read GetOnUpdateAction;
     property ReferenceTableName: String read GetReferenceTableName;
     property ReferenceFieldName: String read GetReferenceFieldName;
+    // SQL properties
+    property SqlName: String read GetSqlName;
+    property SqlDependentTableName: String read GetSqlDependentTableName;
+    property SqlDependentFieldName: String read GetSqlDependentFieldName;
+    property SqlReferenceTableName: String read GetSqlReferenceTableName;
+    property SqlReferenceFieldName: String read GetSqlReferenceFieldName;
+    // Other properties
+    property OnDeleteAction: TioFKAction read GetOnDeleteAction;
+    property OnUpdateAction: TioFKAction read GetOnUpdateAction;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
@@ -124,7 +140,8 @@ type
     function GetFieldDefault: TValue;
     function GetFieldDefaultExists: Boolean;
     function GetFieldLength: integer;
-    function GetFieldName{(const AClearDelimiters: Boolean = False)}: String;
+    function GetFieldName: String;
+    function GetSqlFieldName: String;
     function GetFieldPrecision: integer;
     function GetFieldScale: integer;
     function GetFieldSubType: string;
@@ -138,6 +155,7 @@ type
     property FieldDefaultExists: Boolean read GetFieldDefaultExists;
     property FieldLength: integer read GetFieldLength;
     property FieldName: String read GetFieldName;
+    property SqlFieldName: String read GetSqlFieldName;
     property FieldPrecision: integer read GetFieldPrecision;
     property FieldScale: integer read GetFieldScale;
     property FieldSubType: string read GetFieldSubType;
@@ -164,10 +182,15 @@ type
     procedure AddChange(const AChange: TioDBBuilderIndexChange);
 
     function GetChanges: TioDBBuilderIndexChanges;
+    // Raw names (case normalized, no delimiters)
     function GetCommaSepFieldList: String;
+    function GetName: String;
+    // SQL names (case normalized + delimiters)
+    function GetSqlCommaSepFieldList: String;
+    function GetSqlName: String;
+    // Other
     function GetHasExplicitName: boolean;
     function GetOrientation: TioIndexOrientation;
-    function GetName: String;
     function GetStatus: TioDBBuilderStatus;
     function GetUnique: Boolean;
 
@@ -175,9 +198,11 @@ type
 
     property Changes: TioDBBuilderIndexChanges read GetChanges;
     property CommaSepFieldList: String read GetCommaSepFieldList;
+    property SqlCommaSepFieldList: String read GetSqlCommaSepFieldList;
     property HasExplicitName: boolean read GetHasExplicitName;
     property Orientation: TioIndexOrientation read GetOrientation;
     property Name: String read GetName;
+    property SqlName: String read GetSqlName;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
     property Unique: Boolean read GetUnique;
   end;
@@ -199,6 +224,7 @@ type
     function GetIndexes: TioDBBuilderSchemaIndexes;
     function GetPrimaryKeyField: IioDBBuilderSchemaField;
     function GetName: String;
+    function GetSqlName: String;
     // IsTrueClass
     procedure SetIsTrueClass(const AValue: boolean);
     function GetIsTrueClass: boolean;
@@ -219,6 +245,7 @@ type
     property Indexes: TioDBBuilderSchemaIndexes read GetIndexes;
     property IsTrueClass: boolean read GetIsTrueClass write SetIsTrueClass;
     property Name: string read GetName;
+    property SqlName: string read GetSqlName;
     property PrimaryKeyField: IioDBBuilderSchemaField read GetPrimaryKeyField;
     property SequenceName: string read GetSequenceName;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;

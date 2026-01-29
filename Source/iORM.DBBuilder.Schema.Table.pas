@@ -75,6 +75,7 @@ type
     function GetIndexes: TioDBBuilderSchemaIndexes;
     function GetPrimaryKeyField: IioDBBuilderSchemaField;
     function GetName: String;
+    function GetSqlName: String;
 
     property ContextTable: IioTable read GetContextTable;
     property Changes: TioDBBuilderTableChanges read GetChanges;
@@ -83,6 +84,7 @@ type
     property Indexes: TioDBBuilderSchemaIndexes read GetIndexes;
     property IsTrueClass: Boolean read GetIsTrueClass write SetIsTrueClass;
     property Name: string read GetName;
+    property SqlName: string read GetSqlName;
     property PrimaryKeyField: IioDBBuilderSchemaField read GetPrimaryKeyField;
     property SequenceName: string read GetSequenceName;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
@@ -148,7 +150,7 @@ procedure TioDBBuilderSchemaTable.AddIndex(const AIndexAttr: ioIndex);
 begin
   // Add index if not already exists
   if not FIndexes.ContainsKey(AIndexAttr.Name) then
-    FIndexes.Add(AIndexAttr.Name, TioDBBuilderFactory.NewSchemaIndex(AIndexAttr));
+    FIndexes.Add(AIndexAttr.Name, TioDBBuilderFactory.NewSchemaIndex(AIndexAttr, FContextTable.GetTableConnectionName));
 end;
 
 procedure TioDBBuilderSchemaTable.AddForeignKey(const AReferenceMap, ADependentMap: IioMap;
@@ -179,7 +181,12 @@ end;
 
 function TioDBBuilderSchemaTable.GetName: String;
 begin
-  Result := FContextTable.TableName;
+  Result := FContextTable.TableName;  // Case normalized, no delimiters
+end;
+
+function TioDBBuilderSchemaTable.GetSqlName: String;
+begin
+  Result := FContextTable.GetSql;  // Case normalized + delimiters
 end;
 
 function TioDBBuilderSchemaTable.GetChanges: TioDBBuilderTableChanges;

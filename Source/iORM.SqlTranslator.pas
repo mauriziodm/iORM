@@ -119,9 +119,9 @@ begin
   if LPropName <> '' then
   begin
     if FQualifiedFieldName then
-      Result := Result + '.' + LMap.GetProperties.GetPropertyByName(LPropName).GetSqlFieldName(True)
+      Result := Result + '.' + LMap.GetProperties.GetPropertyByName(LPropName).GetSqlFieldName(False)
     else
-      Result := LMap.GetProperties.GetPropertyByName(LPropName).GetSqlFieldName(True);
+      Result := LMap.GetProperties.GetPropertyByName(LPropName).GetSqlFieldName(False);
   end;
 end;
 

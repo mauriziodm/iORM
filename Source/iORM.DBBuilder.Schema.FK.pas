@@ -48,52 +48,116 @@ type
     FOnUpdateAction: TioFKAction;
     FReferenceMap: IioMap;
     FStatus: TioDBBuilderStatus;
+    // Raw names (case normalized, no delimiters)
     function GetDependentTableName: String;
     function GetDependentFieldName: String;
     function GetName: String;
-    function GetOnDeleteAction: TioFKAction;
-    function GetOnUpdateAction: TioFKAction;
     function GetReferenceTableName: String;
     function GetReferenceFieldName: String;
+    // SQL names (case normalized + delimiters)
+    function GetSqlDependentTableName: String;
+    function GetSqlDependentFieldName: String;
+    function GetSqlName: String;
+    function GetSqlReferenceTableName: String;
+    function GetSqlReferenceFieldName: String;
+    // Other
+    function GetOnDeleteAction: TioFKAction;
+    function GetOnUpdateAction: TioFKAction;
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const Value: TioDBBuilderStatus);
   public
     constructor Create(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
 
+    // Raw properties
     property DependentTableName: String read GetDependentTableName;
     property DependentFieldName: String read GetDependentFieldName;
     property Name: String read GetName;
-    property OnDeleteAction: TioFKAction read GetOnDeleteAction;
-    property OnUpdateAction: TioFKAction read GetOnUpdateAction;
     property ReferenceTableName: String read GetReferenceTableName;
     property ReferenceFieldName: String read GetReferenceFieldName;
+    // SQL properties
+    property SqlName: String read GetSqlName;
+    property SqlDependentTableName: String read GetSqlDependentTableName;
+    property SqlDependentFieldName: String read GetSqlDependentFieldName;
+    property SqlReferenceTableName: String read GetSqlReferenceTableName;
+    property SqlReferenceFieldName: String read GetSqlReferenceFieldName;
+    // Other
+    property OnDeleteAction: TioFKAction read GetOnDeleteAction;
+    property OnUpdateAction: TioFKAction read GetOnUpdateAction;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils, iORM.DB.Factory;
 
 { TioDBBuilderSchemaFK }
 
+// ============================================================
+// Raw names (case normalized, no delimiters) - for FK name construction
+// ============================================================
+
 function TioDBBuilderSchemaFK.GetDependentFieldName: String;
 begin
-  Result := FDependentProperty.GetSqlFieldName;
+  Result := FDependentProperty.GetSqlFieldName(False);  // Case normalized, no delimiters
 end;
 
 function TioDBBuilderSchemaFK.GetDependentTableName: String;
 begin
-  Result := FDependentMap.GetTable.TableName;
+  Result := FDependentMap.GetTable.TableName;  // Already case normalized (FASE 3)
 end;
 
 function TioDBBuilderSchemaFK.GetName: String;
 begin
-//  Result := Format('%s_%s_%s', [DependentTableName, DependentFieldName, ReferenceTableName]);
-  // Carlo Marona (2025-10-24): Added ReferencedFieldName to the name of the foreign key
+  // Built from raw names (case normalized, no delimiters)
   Result := Format('%s_%s_%s_%s', [DependentTableName, DependentFieldName, ReferenceTableName, ReferenceFieldName]);
 end;
+
+function TioDBBuilderSchemaFK.GetReferenceFieldName: String;
+begin
+  Result := FReferenceMap.GetProperties.GetIdProperty.GetSqlFieldName(False);  // Case normalized, no delimiters
+end;
+
+function TioDBBuilderSchemaFK.GetReferenceTableName: String;
+begin
+  Result := FReferenceMap.GetTable.TableName;  // Already case normalized (FASE 3)
+end;
+
+// ============================================================
+// SQL names (case normalized + delimiters) - for SQL generation
+// ============================================================
+
+function TioDBBuilderSchemaFK.GetSqlDependentFieldName: String;
+begin
+  Result := FDependentProperty.GetSqlFieldName(True);  // Case normalized + delimiters
+end;
+
+function TioDBBuilderSchemaFK.GetSqlDependentTableName: String;
+begin
+  Result := FDependentMap.GetTable.GetSql;  // Already case normalized + delimiters (FASE 3)
+end;
+
+function TioDBBuilderSchemaFK.GetSqlName: String;
+begin
+  // The raw name is already case normalized, just add delimiters
+  Result := TioDbFactory.SqlDataConverter(FDependentMap.GetTable.GetTableConnectionName)
+    .NormalizeSqlIdentifier(GetName, True);
+end;
+
+function TioDBBuilderSchemaFK.GetSqlReferenceFieldName: String;
+begin
+  Result := FReferenceMap.GetProperties.GetIdProperty.GetSqlFieldName(True);  // Case normalized + delimiters
+end;
+
+function TioDBBuilderSchemaFK.GetSqlReferenceTableName: String;
+begin
+  Result := FReferenceMap.GetTable.GetSql;  // Already case normalized + delimiters (FASE 3)
+end;
+
+// ============================================================
+// Other methods
+// ============================================================
 
 function TioDBBuilderSchemaFK.GetOnDeleteAction: TioFKAction;
 begin
@@ -114,16 +178,6 @@ begin
   FDependentProperty := ADependentProperty;
   FOnDeleteAction := AOnDeleteAction;
   FOnUpdateAction := AOnUpdateAction;
-end;
-
-function TioDBBuilderSchemaFK.GetReferenceFieldName: String;
-begin
-  Result := FReferenceMap.GetProperties.GetIdProperty.GetSqlFieldName;
-end;
-
-function TioDBBuilderSchemaFK.GetReferenceTableName: String;
-begin
-  Result := FReferenceMap.GetTable.TableName;
 end;
 
 function TioDBBuilderSchemaFK.GetStatus: TioDBBuilderStatus;
