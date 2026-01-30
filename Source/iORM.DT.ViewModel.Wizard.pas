@@ -36,7 +36,7 @@ unit iORM.DT.ViewModel.Wizard;
 interface
 
 uses
-  Classes, ToolsAPI;
+  System.Classes, ToolsAPI;
 
 resourcestring
   SioGalleryCategoryName = 'iORM';  // the visible name of the category/page in the gallery in the File->New->Other form

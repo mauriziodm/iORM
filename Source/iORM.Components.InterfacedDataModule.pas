@@ -45,7 +45,7 @@ unit iORM.Components.InterfacedDataModule;
 interface
 
 uses
-  SysUtils, Classes;
+  System.SysUtils, System.Classes;
 
 type
 

@@ -36,7 +36,7 @@ unit iORM.LiveBindings.CommonBSABehavior;
 interface
 
 uses
-  iORM.LiveBindings.Interfaces, Rtti, Data.Bind.ObjectScope, System.Generics.Collections, Data.Bind.Components,
+  iORM.LiveBindings.Interfaces, System.Rtti, Data.Bind.ObjectScope, System.Generics.Collections, Data.Bind.Components,
   iORM.Context.Properties.Interfaces, iORM.LiveBindings.Notification,
   iORM.CommonTypes;
 

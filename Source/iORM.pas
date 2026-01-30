@@ -2589,16 +2589,16 @@ io.di.RegisterClass<TioDuckTypedStreamObject, IioDuckTypedStreamObject>.Execute;
 // Create the ContextContainer Instance and Init it by loading
 // all entities declarated in the application
 // NB: Attualmente effettua sia il mapping delle classi per la parte ORM che la registrazione delle classi al DIC (magari meglio separare le cose?)
-TioEnumContainer._Build;
-TioMapContainer._Build;
+//TioEnumContainer._Build;
+//TioMapContainer._Build;
 
 // Enums UI translations
-io.Enums.Add<TioPersistenceActionType>('do not persist, select, insert, update, delete, make selection');
-io.Enums.Add<TioPersistenceIntentType>('regular, revert, synchro (svr), synchro (cli)');
-io.Enums.Add<TioPersistenceConflictState>('undefined, resolved, rejected, rejected raise');
-io.Enums.Add<TioEtmTimeSlotSynchroState>('regular, to be synchronized, sent to server, received from server, received from client');
-io.Enums.Add<TioSynchroLevel>('incremental, full');
-io.Enums.Add<TioSynchroStatus>('0-initialization, 1-load from client, 2-save to server, 3-reload from client, 4-save to client, 5-finalization, 6-completed');
-io.Enums.Add<TioSynchroErrorState>(', NOT COMPLETED, CONFLICT, ERROR');
+//io.Enums.Add<TioPersistenceActionType>('do not persist, select, insert, update, delete, make selection');
+//io.Enums.Add<TioPersistenceIntentType>('regular, revert, synchro (svr), synchro (cli)');
+//io.Enums.Add<TioPersistenceConflictState>('undefined, resolved, rejected, rejected raise');
+//io.Enums.Add<TioEtmTimeSlotSynchroState>('regular, to be synchronized, sent to server, received from server, received from client');
+//io.Enums.Add<TioSynchroLevel>('incremental, full');
+//io.Enums.Add<TioSynchroStatus>('0-initialization, 1-load from client, 2-save to server, 3-reload from client, 4-save to client, 5-finalization, 6-completed');
+//io.Enums.Add<TioSynchroErrorState>(', NOT COMPLETED, CONFLICT, ERROR');
 
 end.
