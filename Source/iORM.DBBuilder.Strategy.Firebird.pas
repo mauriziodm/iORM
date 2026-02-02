@@ -114,7 +114,7 @@ begin
   begin
     // Check if sequence exists, then create it
     if (Schema.Status = stCreate) or (not SequenceExists(LSequence)) then
-      Script.Body.Add(FBSqlGenerator.BuildAddSequenceSql(LSequence));
+      Script.Body.Add(FBSqlGenerator.BuildSQL_AddSequence(LSequence));
   end;
 end;
 
@@ -159,7 +159,7 @@ begin
 
   // Check if sequence exists, then create it
   if (ATable.Status = stCreate) or (not SequenceExists(ATable.GetSequenceName)) then
-    Script.Body.Add(FBSqlGenerator.BuildAddSequenceSql(ATable.GetSequenceName));
+    Script.Body.Add(FBSqlGenerator.BuildSQL_AddSequence(ATable.GetSequenceName));
 end;
 
 procedure TioDBBuilderStrategyFirebird.DropForeignKeys;
@@ -196,7 +196,7 @@ begin
   if ASequenceName.IsEmpty then
     raise EioInvalidArgumentException.Create(ClassName, 'DropSequence', 'ASequenceName is not specified.');
 
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, FBSqlGenerator.BuildDropSequenceSql(ASequenceName), True);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, FBSqlGenerator.BuildSQL_DropSequence(ASequenceName), True);
 end;
 
 function TioDBBuilderStrategyFirebird.FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
@@ -518,7 +518,7 @@ begin
   if ASequenceName.IsEmpty then
     raise EioInvalidArgumentException.Create(ClassName, 'SequenceExists', 'ASequenceName is not specified.');
 
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, FBSqlGenerator.BuildSequenceExistsSql(ASequenceName), True);
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, FBSqlGenerator.BuildSQL_SequenceExists(ASequenceName), True);
   Result := LQuery.Fields[0].AsInteger > 0;
 end;
 

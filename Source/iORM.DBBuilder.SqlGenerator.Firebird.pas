@@ -108,9 +108,9 @@ type
     // ==========================================================
     // SEQUENCE RELATED METHODS
     // ----------------------------------------------------------
-    function BuildAddSequenceSql(const ASequenceName: String): string;
-    function BuildDropSequenceSql(const ASequenceName: string): string;
-    function BuildSequenceExistsSql(const ASequenceName: string): string;
+    function BuildSQL_AddSequence(const ASequenceName: String): string;
+    function BuildSQL_DropSequence(const ASequenceName: string): string;
+    function BuildSQL_SequenceExists(const ASequenceName: string): string;
   end;
 
 implementation
@@ -229,7 +229,7 @@ begin
     ATable.PrimaryKeyField.SqlFieldName]);
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildAddSequenceSql(const ASequenceName: String): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_AddSequence(const ASequenceName: String): string;
 var
   LSequenceName: string;
 begin
@@ -451,7 +451,7 @@ begin
   Result := LSqlText.Text;
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildSequenceExistsSql(const ASequenceName: string): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_SequenceExists(const ASequenceName: string): string;
 var
   LSequenceName: string;
 begin
@@ -499,7 +499,7 @@ begin
   Result := Format('DROP INDEX %s;', [AIndexName]);
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildDropSequenceSql(const ASequenceName: string): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_DropSequence(const ASequenceName: string): string;
 var
   LSequenceName: string;
 begin
