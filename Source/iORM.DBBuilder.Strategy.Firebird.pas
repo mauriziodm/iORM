@@ -55,7 +55,6 @@ type
     // Hook overrides for Firebird-specific behavior
     procedure DoGetNotNullChangeSupported(var AIsNotNullChangeSupported: Boolean); override;
     procedure DoGetBlobSubTypeChangePermitted(var AIsBlobSubTypeChangePermitted: Boolean); override;
-    procedure DoBeforeGenerateDatabaseObjects; override;
   end;
 
 
@@ -93,28 +92,6 @@ procedure TioDBBuilderStrategyFirebird.DoGetBlobSubTypeChangePermitted(var AIsBl
 begin
   // Firebird: BLOB subtype changes are NOT permitted
   AIsBlobSubTypeChangePermitted := False;
-end;
-
-procedure TioDBBuilderStrategyFirebird.DoBeforeGenerateDatabaseObjects;
-var
-  LTable: IioDBBuilderSchemaTable;
-  LTablesWithAutoStrategy: String;
-begin
-  inherited;
-  // Check for tables using kgsAuto strategy and add a hint about future default change
-  LTablesWithAutoStrategy := '';
-  for LTable in Schema.Tables.Values do
-    if LTable.KeyGenerationStrategy = kgsAuto then
-    begin
-      if not LTablesWithAutoStrategy.IsEmpty then
-        LTablesWithAutoStrategy := LTablesWithAutoStrategy + ', ';
-      LTablesWithAutoStrategy := LTablesWithAutoStrategy + LTable.Name;
-    end;
-  if not LTablesWithAutoStrategy.IsEmpty then
-    Script.Hints.Add(Format('The following tables use the default key generation strategy (Sequence): [%s]. ' +
-      'In a future major version, the Firebird default will change to Identity. ' +
-      'To keep the current behavior, add [ioKeySequence] attribute to these entities.',
-      [LTablesWithAutoStrategy]));
 end;
 
 end.

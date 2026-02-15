@@ -406,9 +406,6 @@ end;
 
 procedure TioDBBuilderStrategyWithAlterTable.GenerateDatabaseObjects(const Create: boolean);
 begin
-  // Hook for RDBMS-specific initialization (version info, hints, etc.)
-  DoBeforeGenerateDatabaseObjects;
-
   if Create then
   begin
     CreateTables;

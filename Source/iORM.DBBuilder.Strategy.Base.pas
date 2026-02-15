@@ -92,12 +92,6 @@ type
     // Warnings
     procedure WarningTypeAffinity(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String; const AInvalidTypeConversions: string); virtual;
     procedure WarningValueChanged(const AValueName, AOldValue, ANewValue: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
-    // Hook methods
-    /// <summary>
-    /// Hook method called at the beginning of GenerateDatabaseObjects.
-    /// Override to add RDBMS-specific headers, comments, or hints.
-    /// </summary>
-    procedure DoBeforeGenerateDatabaseObjects; virtual;
 
     procedure GenerateDatabaseObjects(const Create: boolean); virtual; abstract;
 
@@ -405,12 +399,6 @@ begin
   if ANewValue <> AOldValue then
     Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> Changing the %s is not allowed (old = ''%s'', new = ''%s'')',
       [ATable.Name, AField.FieldName, AValueName, AOldValue, ANewValue]));
-end;
-
-procedure TioDBBuilderStrategyBase.DoBeforeGenerateDatabaseObjects;
-begin
-  // Default implementation: do nothing
-  // Override in derived classes to add RDBMS-specific headers, comments, or hints
 end;
 
 function TioDBBuilderStrategyBase.IsFieldTypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
