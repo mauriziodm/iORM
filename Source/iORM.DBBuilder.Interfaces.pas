@@ -319,7 +319,7 @@ type
     procedure Clear;
     procedure SaveToFile(const AFileName: string);
     // This method works on header section
-    procedure ScriptBegin(const AConnectionDefName, ADriverID: string);
+    procedure ScriptBegin(const AConnectionDefName: string; const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo);
     // This method works on footer section
     procedure ScriptEnd;
 

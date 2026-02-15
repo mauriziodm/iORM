@@ -355,7 +355,7 @@ procedure TioDBBuilderStrategyBase.GenerateCreateDatabaseScript;
 begin
   Schema.Status := stCreate;
 
-  Script.ScriptBegin(ConnectionDefName, TioConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.DriverID);
+  Script.ScriptBegin(ConnectionDefName, Schema.RDBMSInfo);
 
   GenerateDatabaseObjects(True);
 
@@ -366,7 +366,7 @@ procedure TioDBBuilderStrategyBase.GenerateUpdateDatabaseScript;
 begin
   Schema.Status := stUpdate;
 
-  Script.ScriptBegin(ConnectionDefName, TioConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.DriverID);
+  Script.ScriptBegin(ConnectionDefName, Schema.RDBMSInfo);
 
   GenerateDatabaseObjects(False);
 
@@ -409,8 +409,8 @@ end;
 
 procedure TioDBBuilderStrategyBase.DoBeforeGenerateDatabaseObjects;
 begin
-  // Add RDBMS name and version info as script header comment
-  Script.Header.AddComment(Format('Database: %s', [Schema.RDBMSInfo.ToString]));
+  // Default implementation: do nothing
+  // Override in derived classes to add RDBMS-specific headers, comments, or hints
 end;
 
 function TioDBBuilderStrategyBase.IsFieldTypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
