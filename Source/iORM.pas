@@ -377,7 +377,7 @@ type
   // Class attributes
   ioEntity = iORM.Attributes.ioEntity;
   ioNotPersistedEntity = iORM.Attributes.ioNotPersistedEntity;
-  ioKeyGenerator = iORM.Attributes.ioKeyGenerator;
+  ioKeyIdentity = iORM.Attributes.ioKeyIdentity;
   ioKeySequence = iORM.Attributes.ioKeySequence;
   ioConnection = iORM.Attributes.ioConnection;
   ioTrueClass = iORM.Attributes.ioTrueClass;
@@ -2577,11 +2577,11 @@ end;
 initialization
 
 // Initialize the dependency injection container
-// NB: Crea semplicemente il dictionary, la registrazione delle classi avviene più sotto chiamando TioMapContainer.Build
+// NB: Crea semplicemente il dictionary, la registrazione delle classi avviene piï¿½ sotto chiamando TioMapContainer.Build
 TioDIContainer.Build;
 
 // Register as default DuckTypedStreamObject invoker
-// NB: L'ho messo qui perchè altrimenti nella unit dove è dichiarata la classe non
+// NB: L'ho messo qui perchï¿½ altrimenti nella unit dove ï¿½ dichiarata la classe non
 // venive eseguito
 // NB:  Evita un AV error probabilmente causato dal fatto che i vari containers della parte ORM non sono ancora a posto
 io.di.RegisterClass<TioDuckTypedStreamObject, IioDuckTypedStreamObject>.Execute;

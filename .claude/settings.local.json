@@ -46,7 +46,13 @@
       "Bash(Datasnap.Win)",
       "Bash(Web.Win)",
       "Bash(Soap.Win)",
-      "Bash(Xml.Win -U\"..\\\\..\\\\Source;..\\\\..\\\\ExtLibs\\\\djson\\\\Sources\" iORM.Test.DBBuilder.SqlGenerator.dpr)"
+      "Bash(Xml.Win -U\"..\\\\..\\\\Source;..\\\\..\\\\ExtLibs\\\\djson\\\\Sources\" iORM.Test.DBBuilder.SqlGenerator.dpr)",
+      "Bash(git -C \"C:\\\\delphi\\\\tools\\\\iORM\" diff --stat)",
+      "Bash(git -C \"C:\\\\delphi\\\\tools\\\\iORM\" log -3 --oneline)",
+      "Bash(git -C \"C:\\\\delphi\\\\tools\\\\iORM\" diff Source/iORM.DBBuilder.Strategy.Base.pas)",
+      "Bash(git -C \"C:\\\\delphi\\\\tools\\\\iORM\" diff --stat Source/iORM.DBBuilder.Strategy.Firebird.pas)",
+      "Bash(git -C \"C:\\\\delphi\\\\tools\\\\iORM\" add -A)",
+      "Bash(git -C \"C:\\\\delphi\\\\tools\\\\iORM\" commit -m \"$\\(cat <<''EOF''\nRefactor DBBuilder Strategy: extract common ALTER TABLE logic\n\n- Create TioDBBuilderStrategyWithAlterTable intermediate class\n  containing ~95% of code previously in Firebird strategy\n- Move sequence methods to common IioDBBuilderSqlGenerator interface\n- Delete IioDBBuilderSqlGeneratorFirebird interface \\(no longer needed\\)\n- Add IsBlobSubTypeChanged, WarningValueChanged to Strategy.Base\n- Add DoBeforeGenerateDatabaseObjects hook to Strategy.Base\n  with RDBMS version info in script header\n- Slim TioDBBuilderStrategyFirebird to only RDBMS-specific code:\n  GetInvalidTypeConversions and hook overrides\n- SQLite sequence methods raise \"not supported\" exception\n- Update package files with new unit references\n\nThis architecture prepares for easy addition of MS SQL Server\nand PostgreSQL strategies in the future.\nEOF\n\\)\")"
     ]
   }
 }

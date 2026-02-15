@@ -249,7 +249,7 @@ contains
   iORM.DBBuilder.Strategy.Firebird in '..\..\Source\iORM.DBBuilder.Strategy.Firebird.pas',
   iORM.DBBuilder.DBAnalyzer.Firebird in '..\..\Source\iORM.DBBuilder.DBAnalyzer.Firebird.pas',
   iORM.DBBuilder.DBAnalyzer.SqLite in '..\..\Source\iORM.DBBuilder.DBAnalyzer.SqLite.pas',
-  iORM.DBBuilder.SqlGenerator.Firebird.Interfaces in '..\..\Source\iORM.DBBuilder.SqlGenerator.Firebird.Interfaces.pas',
+  iORM.DBBuilder.Strategy.WithAlterTable in '..\..\Source\iORM.DBBuilder.Strategy.WithAlterTable.pas',
   iORM.DBBuilder.Schema.Index in '..\..\Source\iORM.DBBuilder.Schema.Index.pas',
   iORM.Abstraction.Factory in '..\..\Source\iORM.Abstraction.Factory.pas',
   iORM.Abstraction.SessionData.Interfaces in '..\..\Source\iORM.Abstraction.SessionData.Interfaces.pas',

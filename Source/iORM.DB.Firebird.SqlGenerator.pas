@@ -53,6 +53,7 @@ type
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); override;
     class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); override;
     class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); override;
+    class function GenerateSqlReturningClause(const AContext: IioContext): String; override;
     class procedure GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext); override;
   end;
 
@@ -70,7 +71,7 @@ var
   // LField: String;
   LGuid: TGUID;
 begin
-  // M.M. 11/08/18 Non chiama la funzione ereditata perchè per FIREBIRD i nome degli indici hanno lunghezza massima 31 char
+  // M.M. 11/08/18 Non chiama la funzione ereditata perchï¿½ per FIREBIRD i nome degli indici hanno lunghezza massima 31 char
 
   // Build the indexname
   // Result := 'IDX_' + AContext.GetTable.TableName;
@@ -80,7 +81,7 @@ begin
   // LFieldList.Delimiter := ',';
   // LFieldList.DelimitedText := ACommaSepFieldList;
   // for LField in LFieldList do
-  // Result := Result + '_' + LField.Substring(0,5).Trim;   // TODO: si può pensare anche ad un progressivo
+  // Result := Result + '_' + LField.Substring(0,5).Trim;   // TODO: si puï¿½ pensare anche ad un progressivo
   // finally
   // LFieldList.Free;
   // end;
@@ -192,6 +193,12 @@ begin
   // -----------------------------------------------------------------
   AQuery.SQL.Add('SELECT GEN_ID(' + AContext.GetTable.GetKeyGenerator + ',1) FROM RDB$DATABASE');
   // -----------------------------------------------------------------
+end;
+
+class function TioSqlGeneratorFirebird.GenerateSqlReturningClause(const AContext: IioContext): String;
+begin
+  // Firebird supports RETURNING clause from version 2.0+
+  Result := ' RETURNING ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName;
 end;
 
 class procedure TioSqlGeneratorFirebird.GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext);

@@ -40,7 +40,6 @@ uses
 
   iORM.CommonTypes,
   iORM.DBBuilder.SqlGenerator.Base,
-  iORM.DBBuilder.SqlGenerator.Firebird.Interfaces,
   iORM.DBBuilder.Interfaces,
   iORM.Attributes
 
@@ -48,7 +47,7 @@ uses
 
 
 type
-  TioDBBuilderSqlGenFirebird = class(TioDBBuilderSqlGenBase, IioDBBuilderSqlGeneratorFirebird)
+  TioDBBuilderSqlGenFirebird = class(TioDBBuilderSqlGenBase)
   private
     function _BuildSQL_CreateOrAddField(const AField: IioDBBuilderSchemaField): String;
   protected
@@ -108,9 +107,16 @@ type
     // ==========================================================
     // SEQUENCE RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_AddSequence(const ASequenceName: String): string;
-    function BuildSQL_DropSequence(const ASequenceName: string): string;
-    function BuildSQL_SequenceExists(const ASequenceName: string): string;
+    function BuildSQL_AddSequence(const ASequenceName: String): string; override;
+    function BuildSQL_DropSequence(const ASequenceName: string): string; override;
+    function BuildSQL_SequenceExists(const ASequenceName: string): string; override;
+
+    // ==========================================================
+    // KEY GENERATION CAPABILITY METHODS
+    // ----------------------------------------------------------
+    function SupportsIdentityForKeyGeneration: Boolean; override;
+    function SupportsSequenceForKeyGeneration: Boolean; override;
+    function GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategy; override;
   end;
 
 implementation
@@ -656,6 +662,26 @@ begin
     LMajorVersion,
     LMinorVersion
   );
+end;
+
+function TioDBBuilderSqlGenFirebird.SupportsIdentityForKeyGeneration: Boolean;
+begin
+  // Firebird supports IDENTITY columns from version 3.0+
+  // Note: Runtime version check would require database connection, so we return True
+  // and let runtime errors occur if used on older versions
+  Result := True;
+end;
+
+function TioDBBuilderSqlGenFirebird.SupportsSequenceForKeyGeneration: Boolean;
+begin
+  // Firebird has always supported sequences (called generators)
+  Result := True;
+end;
+
+function TioDBBuilderSqlGenFirebird.GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategy;
+begin
+  // Firebird default: use Sequence for backward compatibility
+  Result := kgsSequence;
 end;
 
 end.

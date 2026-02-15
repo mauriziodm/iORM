@@ -73,6 +73,7 @@ type
     function GetInvalidTypeConversions: string; virtual; abstract;
     function IsFieldTypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String): Boolean; virtual;
     function IsFieldNotNullChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AIsPermitted: Boolean): Boolean; virtual;
+    function IsBlobSubTypeChanged(const AOldBlobSubType, ANewBlobSubType: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean; virtual;
     // Indexes
     procedure AddOrAlterIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure CreateIndexes; overload; virtual;
@@ -90,6 +91,13 @@ type
     function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
     // Warnings
     procedure WarningTypeAffinity(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String; const AInvalidTypeConversions: string); virtual;
+    procedure WarningValueChanged(const AValueName, AOldValue, ANewValue: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
+    // Hook methods
+    /// <summary>
+    /// Hook method called at the beginning of GenerateDatabaseObjects.
+    /// Override to add RDBMS-specific headers, comments, or hints.
+    /// </summary>
+    procedure DoBeforeGenerateDatabaseObjects; virtual;
 
     procedure GenerateDatabaseObjects(const Create: boolean); virtual; abstract;
 
@@ -391,6 +399,19 @@ begin
       [ATable.Name, AField.FieldName, AOldFieldType, ANewFieldType]));
 end;
 
+procedure TioDBBuilderStrategyBase.WarningValueChanged(const AValueName, AOldValue, ANewValue: String;
+  const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
+begin
+  if ANewValue <> AOldValue then
+    Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> Changing the %s is not allowed (old = ''%s'', new = ''%s'')',
+      [ATable.Name, AField.FieldName, AValueName, AOldValue, ANewValue]));
+end;
+
+procedure TioDBBuilderStrategyBase.DoBeforeGenerateDatabaseObjects;
+begin
+  // Add RDBMS name and version info as script header comment
+  Script.Header.AddComment(Format('Database: %s', [Schema.RDBMSInfo.ToString]));
+end;
 
 function TioDBBuilderStrategyBase.IsFieldTypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
   const AOldFieldType, ANewFieldType: String): Boolean;
@@ -424,6 +445,18 @@ begin
     else
       // If the NOT NULL change is not permitted, add a warning to indicate it cannot be automatically changed
       Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> The NOT NULL setting cannot be changed automatically', [ATable.Name, AField.FieldName]));
+  end;
+end;
+
+function TioDBBuilderStrategyBase.IsBlobSubTypeChanged(const AOldBlobSubType, ANewBlobSubType: String;
+  const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean;
+begin
+  Result := AOldBlobSubType <> ANewBlobSubType;
+  if Result then
+  begin
+    AField.AddAltered(alFieldType);
+    if not AIsPermitted then
+      WarningValueChanged('blob sub-type', AOldBlobSubType, ANewBlobSubType, AField, ATable);
   end;
 end;
 

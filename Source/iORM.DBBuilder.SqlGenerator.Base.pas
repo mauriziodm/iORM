@@ -185,6 +185,26 @@ type
     // RDBMS INFO METHODS
     // ----------------------------------------------------------
     function LoadRDBMSInfo: IioDBBuilderSchemaRDBMSInfo; virtual; abstract;
+
+    // ==========================================================
+    // KEY GENERATION CAPABILITY METHODS
+    // ----------------------------------------------------------
+    /// <summary>Returns True if the database supports IDENTITY columns</summary>
+    function SupportsIdentityForKeyGeneration: Boolean; virtual; abstract;
+    /// <summary>Returns True if the database supports SEQUENCE objects</summary>
+    function SupportsSequenceForKeyGeneration: Boolean; virtual; abstract;
+    /// <summary>Returns the default key generation strategy for this database</summary>
+    function GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategy; virtual; abstract;
+
+    // ==========================================================
+    // SEQUENCE RELATED METHODS
+    // ----------------------------------------------------------
+    /// <summary>Generates SQL to create a sequence</summary>
+    function BuildSQL_AddSequence(const ASequenceName: String): string; virtual; abstract;
+    /// <summary>Generates SQL to drop a sequence</summary>
+    function BuildSQL_DropSequence(const ASequenceName: string): string; virtual; abstract;
+    /// <summary>Generates SQL to check if a sequence exists</summary>
+    function BuildSQL_SequenceExists(const ASequenceName: string): string; virtual; abstract;
     // ==========================================================
 
     property ConnectionDefName: string read FConnectionDefName;

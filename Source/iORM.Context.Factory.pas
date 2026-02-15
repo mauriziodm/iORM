@@ -743,6 +743,7 @@ class function TioContextFactory.Table(const Typ: TRttiInstanceType): IioTable;
 var
   LAttr: TCustomAttribute;
   LTableName, LConnectionName, LKeyGenerator: String;
+  LKeyGenerationStrategy: TioKeyGenerationStrategy;
   LTrueClass: IioTrueClass;
   LJoins: IioJoins;
   LGroupBy: IioGroupBy;
@@ -760,6 +761,7 @@ begin
     LTableName := Typ.MetaclassType.ClassName.Substring(1);
     LConnectionName := ''; // Elimina il primo carattere (di solito la T)
     LKeyGenerator := '';
+    LKeyGenerationStrategy := kgsAuto;
     LJoins := Self.Joins;
     LTrueClass := Self.TrueClass(DEFAULT_TRUE_CLASS_MODE, IO_TRUECLASS_FIELDNAME);
     LGroupBy := nil;
@@ -789,8 +791,14 @@ begin
         LMapMode := ioNotPersistedEntity(LAttr).MapMode;
       end
 
-      else if LAttr is ioKeyGenerator then
-        LKeyGenerator := ioKeyGenerator(LAttr).Value
+      else if LAttr is ioKeyIdentity then
+        LKeyGenerationStrategy := kgsIdentity
+
+      else if LAttr is ioKeySequence then
+      begin
+        LKeyGenerationStrategy := kgsSequence;
+        LKeyGenerator := ioKeySequence(LAttr).Value;
+      end
 
       else if LAttr is ioConnection then
         LConnectionName := ioConnection(LAttr).ConnectionName
@@ -804,7 +812,7 @@ begin
       else if LAttr is ioTrueClass then
         LTrueClass.Mode := ioTrueClass(LAttr).TrueClassMode
 
-      else if LAttr is ioIndex then // ioIndex (NB: costruisce la lista di indici solo se serve e così anche nella mappa)
+      else if LAttr is ioIndex then // ioIndex (NB: costruisce la lista di indici solo se serve e cosï¿½ anche nella mappa)
       begin
         if not Assigned(LIndexList) then
           LIndexList := TioIndexList.Create;
@@ -845,7 +853,7 @@ begin
         LEtmTraceOnlyOnConnectionName := etmTrace(LAttr).TraceOnlyOnConnectionName;
       end
 
-      else if LAttr is etmPropertyAttribute then // etmProperty (NB: costruisce la lista solo se serve e così anche nella mappa)
+      else if LAttr is etmPropertyAttribute then // etmProperty (NB: costruisce la lista solo se serve e cosï¿½ anche nella mappa)
       begin
         if not Assigned(LEtmPropToPropList) then
           LEtmPropToPropList := TEtmPropToPropList.Create;
@@ -854,7 +862,7 @@ begin
     end;
 
     // Create result Properties object
-    Result := TioTable.Create(LTableName, LKeyGenerator, LTrueClass, LJoins, LGroupBy, LConnectionName, LMapMode, Typ);
+    Result := TioTable.Create(LTableName, LKeyGenerator, LKeyGenerationStrategy, LTrueClass, LJoins, LGroupBy, LConnectionName, LMapMode, Typ);
 
     // Set conflict strategies
     if Assigned(LDeleteConflictStrategy) then

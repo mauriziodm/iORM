@@ -37,7 +37,7 @@ interface
 
 uses
   iORM.DBBuilder.Interfaces, iORM.Context.Table.Interfaces, iORM.Context.Map.Interfaces, iORM.Context.Properties.Interfaces,
-  iORM.Attributes;
+  iORM.Attributes, iORM.CommonTypes;
 
 type
 
@@ -71,7 +71,10 @@ type
     function GetFields: TioDBBuilderSchemaFields;
     function GetForeignKeys: TioDBBuilderSchemaForeignKeys;
     function GetContextTable: IioTable;
+    function GetKeyGenerationStrategy: TioKeyGenerationStrategy;
     function GetSequenceName: String;
+    function UsesSequenceForKeyGeneration: Boolean;
+    function UsesIdentityForKeyGeneration: Boolean;
     function GetIndexes: TioDBBuilderSchemaIndexes;
     function GetPrimaryKeyField: IioDBBuilderSchemaField;
     function GetName: String;
@@ -83,6 +86,7 @@ type
     property ForeignKeys: TioDBBuilderSchemaForeignKeys read GetForeignKeys;
     property Indexes: TioDBBuilderSchemaIndexes read GetIndexes;
     property IsTrueClass: Boolean read GetIsTrueClass write SetIsTrueClass;
+    property KeyGenerationStrategy: TioKeyGenerationStrategy read GetKeyGenerationStrategy;
     property Name: string read GetName;
     property SqlName: string read GetSqlName;
     property PrimaryKeyField: IioDBBuilderSchemaField read GetPrimaryKeyField;
@@ -93,7 +97,7 @@ type
 implementation
 
 uses
-  iORM.CommonTypes, System.SysUtils, iORM.DBBuilder.Factory;
+  System.SysUtils, iORM.DBBuilder.Factory, iORM.Exceptions;
 
 { TioDBBuilderSchemaTable }
 
@@ -199,6 +203,11 @@ begin
   Result := FContextTable;
 end;
 
+function TioDBBuilderSchemaTable.GetKeyGenerationStrategy: TioKeyGenerationStrategy;
+begin
+  Result := FContextTable.GetKeyGenerationStrategy;
+end;
+
 function TioDBBuilderSchemaTable.GetIsTrueClass: Boolean;
 begin
   Result := FIsTrueClass;
@@ -206,12 +215,25 @@ end;
 
 function TioDBBuilderSchemaTable.GetSequenceName: String;
 begin
+  if not UsesSequenceForKeyGeneration then
+    raise EioDBBuilderException.Create(ClassName, 'GetSequenceName',
+      Format('Table "%s" uses Identity for key generation, not Sequence.', [Name]));
   Result := FContextTable.GetKeyGenerator;
 end;
 
 function TioDBBuilderSchemaTable.GetStatus: TioDBBuilderStatus;
 begin
   Result := FStatus;
+end;
+
+function TioDBBuilderSchemaTable.UsesSequenceForKeyGeneration: Boolean;
+begin
+  Result := GetKeyGenerationStrategy = kgsSequence;
+end;
+
+function TioDBBuilderSchemaTable.UsesIdentityForKeyGeneration: Boolean;
+begin
+  Result := GetKeyGenerationStrategy in [kgsIdentity, kgsAuto];
 end;
 
 procedure TioDBBuilderSchemaTable.SetIsTrueClass(const AValue: Boolean);

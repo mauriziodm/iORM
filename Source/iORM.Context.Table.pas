@@ -137,6 +137,7 @@ type
     FIndexList: TioIndexList;
     FJoins: IioJoins;
     FKeyGenerator: String;
+    FKeyGenerationStrategy: TioKeyGenerationStrategy;
     FMapMode: TioMapModeType;
     FRttiType: TRttiInstanceType;
     FTrueClass: IioTrueClass;
@@ -154,7 +155,8 @@ type
     procedure SetEtmTraceOnlyOnConnectionName(const AConnectionName: String);
     function GetEtmTraceOnlyOnConnectionName: String;
   public
-    constructor Create(const ASqlText, AKeyGenerator: String; const ATrueClass: IioTrueClass; const AJoins: IioJoins; const AGroupBy: IioGroupBy;
+    constructor Create(const ASqlText, AKeyGenerator: String; const AKeyGenerationStrategy: TioKeyGenerationStrategy;
+      const ATrueClass: IioTrueClass; const AJoins: IioJoins; const AGroupBy: IioGroupBy;
       const AConnectionDefName: String; const AMapMode: TioMapModeType; const ARttiType: TRttiInstanceType); reintroduce; overload;
     destructor Destroy; override;
     // This method create the TrueClassVirtualMap.Table object duplicating something of itself
@@ -165,6 +167,7 @@ type
     function GetGroupBy: IioGroupBy;
     function GetJoin: IioJoins;
     function GetKeyGenerator: String;
+    function GetKeyGenerationStrategy: TioKeyGenerationStrategy;
     function GetMapMode: TioMapModeType;
     function GetQualifiedClassName: String;
     function GetRttiType: TRttiInstanceType;
@@ -206,11 +209,13 @@ uses
 
 { TioContextTable }
 
-constructor TioTable.Create(const ASqlText, AKeyGenerator: String; const ATrueClass: IioTrueClass; const AJoins: IioJoins; const AGroupBy: IioGroupBy;
+constructor TioTable.Create(const ASqlText, AKeyGenerator: String; const AKeyGenerationStrategy: TioKeyGenerationStrategy;
+      const ATrueClass: IioTrueClass; const AJoins: IioJoins; const AGroupBy: IioGroupBy;
       const AConnectionDefName: String; const AMapMode: TioMapModeType; const ARttiType: TRttiInstanceType);
 begin
   inherited Create(ASqlText);
   FKeyGenerator := AKeyGenerator;
+  FKeyGenerationStrategy := AKeyGenerationStrategy;
   FTableConnectionName_DoNotCallDirectly := AConnectionDefName;
   FMapMode := AMapMode;
   FRttiType := ARttiType;
@@ -251,7 +256,7 @@ end;
 
 function TioTable.DuplicateForTrueClassMap: IioTable;
 begin
-  Result := TioTable.Create(FSqlText, FKeyGenerator, FTrueClass, FJoins, FGroupBy, FTableConnectionName_DoNotCallDirectly, FMapMode, FRttiType);
+  Result := TioTable.Create(FSqlText, FKeyGenerator, FKeyGenerationStrategy, FTrueClass, FJoins, FGroupBy, FTableConnectionName_DoNotCallDirectly, FMapMode, FRttiType);
 end;
 
 function TioTable.GetEtmPropToPropList(AAutoCreateIfUnassigned: Boolean): TEtmPropToPropList;
@@ -363,6 +368,11 @@ end;
 function TioTable.GetKeyGenerator: String;
 begin
   Result := IfThen(FKeyGenerator.IsEmpty, TableName, FKeyGenerator);
+end;
+
+function TioTable.GetKeyGenerationStrategy: TioKeyGenerationStrategy;
+begin
+  Result := FKeyGenerationStrategy;
 end;
 
 function TioTable.GetMapMode: TioMapModeType;

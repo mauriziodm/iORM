@@ -40,7 +40,8 @@ uses
 
   iORM.DBBuilder.SqlGenerator.Base,
   iORM.DBBuilder.Interfaces,
-  iORM.Attributes
+  iORM.Attributes,
+  iORM.CommonTypes
 
   ;
 
@@ -93,6 +94,20 @@ type
     function BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string; override;
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; override;
+
+    // ==========================================================
+    // KEY GENERATION CAPABILITY METHODS
+    // ----------------------------------------------------------
+    function SupportsIdentityForKeyGeneration: Boolean; override;
+    function SupportsSequenceForKeyGeneration: Boolean; override;
+    function GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategy; override;
+
+    // ==========================================================
+    // SEQUENCE RELATED METHODS
+    // ----------------------------------------------------------
+    function BuildSQL_AddSequence(const ASequenceName: String): string; override;
+    function BuildSQL_DropSequence(const ASequenceName: string): string; override;
+    function BuildSQL_SequenceExists(const ASequenceName: string): string; override;
   end;
 
 implementation
@@ -108,7 +123,6 @@ uses
   iORM.DB.QueryEngine,
   iORM.Context.Properties.Interfaces,
   iORM.Exceptions,
-  iORM.CommonTypes,
   iORM.SqlTranslator,
   iORM.DB.SqLite.SqlDataConverter,
   iORM.DBBuilder.Factory
@@ -419,6 +433,45 @@ begin
     LMajorVersion,
     LMinorVersion
   );
+end;
+
+function TioDBBuilderSqlGenSQLite.SupportsIdentityForKeyGeneration: Boolean;
+begin
+  // SQLite uses INTEGER PRIMARY KEY which is an alias for rowid (auto-increment)
+  Result := True;
+end;
+
+function TioDBBuilderSqlGenSQLite.SupportsSequenceForKeyGeneration: Boolean;
+begin
+  // SQLite does not support sequences
+  Result := False;
+end;
+
+function TioDBBuilderSqlGenSQLite.GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategy;
+begin
+  // SQLite only supports Identity (INTEGER PRIMARY KEY = rowid)
+  Result := kgsIdentity;
+end;
+
+function TioDBBuilderSqlGenSQLite.BuildSQL_AddSequence(const ASequenceName: String): string;
+begin
+  // SQLite does not support sequences
+  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_AddSequence',
+    'SQLite does not support sequences.');
+end;
+
+function TioDBBuilderSqlGenSQLite.BuildSQL_DropSequence(const ASequenceName: string): string;
+begin
+  // SQLite does not support sequences
+  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_DropSequence',
+    'SQLite does not support sequences.');
+end;
+
+function TioDBBuilderSqlGenSQLite.BuildSQL_SequenceExists(const ASequenceName: string): string;
+begin
+  // SQLite does not support sequences
+  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_SequenceExists',
+    'SQLite does not support sequences.');
 end;
 
 end.

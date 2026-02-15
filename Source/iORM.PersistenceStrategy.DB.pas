@@ -235,22 +235,22 @@ var
 begin
   // NB: Qui avvio la transazione per fare in modo che tutto il Persist di tutti gli oggetti contenuti
   // nella collection vengano persistiti o annullati ma poi ogni chiamata a PersistObject riavvia
-  // una transazione per l'oggetto singolo (che non avrà praticamente effetto perchè inglobata
+  // una transazione per l'oggetto singolo (che non avrï¿½ praticamente effetto perchï¿½ inglobata
   // da quella avviata qua sotto.
-  // Nel caso particolare in cui uno o più singoli oggetti contenuti dela collection siano di una
-  // qualche classe che opera su una ConnectionDef diversa da quella di default verrà avviata (all'interno
+  // Nel caso particolare in cui uno o piï¿½ singoli oggetti contenuti dela collection siano di una
+  // qualche classe che opera su una ConnectionDef diversa da quella di default verrï¿½ avviata (all'interno
   // della chiamata a "PersistObject" una transazione sulla Connection diversa da quella di default e quindi
   // al di fuori della transazione principale sulla connessione di default avviata qui sotto e in pratica
-  // per questi oggetti ogni chiamata a "PersistObject" verrà eseguita nel contesto di una singola transazione
-  // slegata dalle altre e quindi è possibile che (solo in questo specifico e particolare caso) alcune operazioni
+  // per questi oggetti ogni chiamata a "PersistObject" verrï¿½ eseguita nel contesto di una singola transazione
+  // slegata dalle altre e quindi ï¿½ possibile che (solo in questo specifico e particolare caso) alcune operazioni
   // vadano a buon fine mentre altre no.
   // AL momento non ho una soluzione al problema.
   // NB: Qui non posso conoscere con certezza il tipo di oggetti realmente contenuto nella collection
   // in quanto il tipo reale dell'oggetto potrebbe essere diverso dal genericType della lista stessa
   // (a maggior ragione nel caso di una TList<IInterface> di interfacce, quindi avvio una transazione
-  // sulla connessione di default che va bene nel 99% delle volte (raramente l'applicazione dichiererà classi
+  // sulla connessione di default che va bene nel 99% delle volte (raramente l'applicazione dichiererï¿½ classi
   // che operano su Database diversi contemporaneamente.
-// TODO: Probabilmente anche qui dovrei usare una TransactionCollection (come per LoadList e PersistList ad esempio) perchè può riguardare più oggetti mappati anche su connessioni diverse
+// TODO: Probabilmente anche qui dovrei usare una TransactionCollection (come per LoadList e PersistList ad esempio) perchï¿½ puï¿½ riguardare piï¿½ oggetti mappati anche su connessioni diverse
   _DoStartTransaction(APSRequest);
   try
     // Wrap the DestList into a DuckTypedList
@@ -381,6 +381,8 @@ end;
 class procedure TioPersistenceStrategyDB.InsertObject_Internal(const AContext: IioContext);
 var
   LQuery: IioQuery;
+  LNeedsGeneratedID: Boolean;
+  LReturningClause: String;
 begin
   inherited;
   // -----------------------------------------------------------
@@ -401,13 +403,10 @@ begin
   // Note: Obviously if a new ID is assigned by SynchroStrategy this will disable the normal ID generation (if generated ID is not NULL)
   AContext.SynchroStrategy_GenerateLocalID;
   // -----------------------------------------------------------
-  // Get and execute a query to retrieve the next ID for the inserting object
-  // before the insert query (for Firebird/Interbase)
-  // Note: If KeyGenerationTime = kgtBeforeInsert and the ID is not assigned then I always request
-  // a new ID even if the BlindLevel is set to disable the assignment to the object,
-  // this is because the ID MUST be assigned (always if it is null)
-  // otherwise the object would persist on the DB with ID zero.
-  if (TioConnectionManager.GetConnectionInfo(AContext.GetTable.GetTableConnectionName).KeyGenerationTime = kgtBeforeInsert) and AContext.IDIsNull then
+  // For tables using Sequence for ID generation (Firebird default), we need to get the ID
+  // BEFORE the INSERT because there is no automatic ID generation in the INSERT itself.
+  // The ID MUST always be assigned (if null), otherwise the object would persist with ID zero.
+  if (AContext.GetTable.GetKeyGenerationStrategy = kgsSequence) and AContext.IDIsNull then
   begin
     LQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
     try
@@ -418,9 +417,35 @@ begin
     end;
   end;
   // -----------------------------------------------------------
-  // Create and execute insert query and set the version/created/updated of the entity (Intercepted by crudInterceptors)
+  // Determine if we need to retrieve a generated ID from the database (for Identity columns)
+  // This only applies when using Identity strategy (not Sequence, which was handled above)
+  LNeedsGeneratedID := (AContext.GetTable.GetKeyGenerationStrategy <> kgsSequence) and
+    AContext.IDIsNull and
+    (AContext.BlindLevel_Do_AutoUpdateProps or AContext.GetProperties.ContainsHasManyOrHasOneProperties);
+  // -----------------------------------------------------------
+  // Create insert query
   LQuery := TioDBFactory.QueryEngine.GetQueryInsert(AContext);
-  LQuery.ExecSQL;
+  // If we need a generated ID (Identity strategy), append RETURNING clause and execute as query that returns data
+  if LNeedsGeneratedID then
+  begin
+    // Get the RETURNING clause from the SqlGenerator
+    LReturningClause := TioDBFactory.SqlGenerator(AContext.GetConnectionNameResolved).GenerateSqlReturningClause(AContext);
+    LQuery.SQL.Add(LReturningClause);
+    try
+      LQuery.Open;
+      // Retrieve the generated ID from the result set
+      AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, LQuery.Fields[0].AsInteger);
+    finally
+      LQuery.Close;
+    end;
+  end
+  else
+  begin
+    // No generated ID needed (ID already set or Sequence strategy used), execute as normal INSERT
+    LQuery.ExecSQL;
+  end;
+  // -----------------------------------------------------------
+  // Set the version/created/updated of the entity (Intercepted by crudInterceptors)
   if AContext.BlindLevel_Do_AutoUpdateProps then
   begin
     AContext.ObjVersion := AContext.ObjNextVersion;
@@ -430,23 +455,6 @@ begin
     AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;
     AContext.ObjUpdatedUserID := AContext.PSREquest.UsrOID;
     AContext.ObjUpdatedUserName := AContext.PSREquest.Usr;
-  end;
-  // -----------------------------------------------------------
-  // Get and execute a query to retrieve the last ID generated
-  // in the last insert query.
-  // Note: If KeyGenerationTime = kgtAfterInsert and the ID is not assigned then it requests a new ID
-  // only if the BlindLevel enables reloading of the assigned ID or if the object contains at least
-  // one property with a HasMany or HasOne relation.
-  if (TioConnectionManager.GetConnectionInfo(AContext.GetConnectionNameResolved).KeyGenerationTime = kgtAfterInsert) and
-    (AContext.BlindLevel_Do_AutoUpdateProps or AContext.GetProperties.ContainsHasManyOrHasOneProperties) and AContext.IDIsNull then
-  begin
-    LQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
-    try
-      LQuery.Open;
-      AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, LQuery.Fields[0].AsInteger);
-    finally
-      LQuery.Close;
-    end;
   end;
   // -----------------------------------------------------------
   AContext.ObjStatus := osClean;
@@ -488,22 +496,22 @@ end;
 
 class function TioPersistenceStrategyDB._DoLoadObjVersion(const AContext: IioContext): Integer;
 begin
-  // NB: Ho riflettuto bene sul come ottenere l'ultima ObjVersion (la più alta) assegnata
+  // NB: Ho riflettuto bene sul come ottenere l'ultima ObjVersion (la piï¿½ alta) assegnata
   // per poi aggiungere 1 e ottenere la prossima e ho individuato 2 metodi:
   // 1) SENZA ETM: fa una query che prende l'ObjVersion dell'oggetto dal DB (normale tabella della classe della entity);
   // siccome possono verificarsi "salti" tra la versione in memoria e quella sul DB
-  // (es: due utenti con stesso oggetto in memoria ver. 5, il primo salva e non ci sono conflitti, ora sul DB c'è la ver. 6, il secondo salva
-  // successivamente e la nuova versione deve essere la 7) in questo caso l'unico modo è di interrogare il DB e farsi dare la versione più alta presente.
+  // (es: due utenti con stesso oggetto in memoria ver. 5, il primo salva e non ci sono conflitti, ora sul DB c'ï¿½ la ver. 6, il secondo salva
+  // successivamente e la nuova versione deve essere la 7) in questo caso l'unico modo ï¿½ di interrogare il DB e farsi dare la versione piï¿½ alta presente.
   // Se un oggetto viene eliminato sul DB e poi qualcuno lo ripersiste (magari lo aveva in memoria da prima del delete) l'ObjVersion ricomincia da 1
   // e non vedo soluzione a questa cosa.
-  // 2) CON ETM: se c'è l'ETM per la classe dell'oggetto che si vuole persistere si farà la stessa cosa del punto uno ma in più, se non riuscisse
-  // ad avere l'ObjVersion perchè l'entità è stata eliminata nel frattempo, allora si eseguirà una seconda query per chiedere all'ETM
+  // 2) CON ETM: se c'ï¿½ l'ETM per la classe dell'oggetto che si vuole persistere si farï¿½ la stessa cosa del punto uno ma in piï¿½, se non riuscisse
+  // ad avere l'ObjVersion perchï¿½ l'entitï¿½ ï¿½ stata eliminata nel frattempo, allora si eseguirï¿½ una seconda query per chiedere all'ETM
   // l'ultimo ObjVersion (il maggiore) registrato. In questo modo se l'oggetto era stato eliminato risolviamo il problema del punto 1 ma
-  // questa penso sarà una cosa non frequente, negli altri casi invece (quindi normalmente) continuiamo a usare il punto 1 che dovrebbe essere
-  // leggermente più efficiente.
-  // Step 1: Prova a caricare l'ObjVersion dalla tabella su cui è mappata l'entità
+  // questa penso sarï¿½ una cosa non frequente, negli altri casi invece (quindi normalmente) continuiamo a usare il punto 1 che dovrebbe essere
+  // leggermente piï¿½ efficiente.
+  // Step 1: Prova a caricare l'ObjVersion dalla tabella su cui ï¿½ mappata l'entitï¿½
   Result := LoadObjVersion_FromEntity_Internal(AContext);
-  // Step 2: Se lo step precedente non ha avuto successo prova a caricare l'ObjVersion dall'ETM (se c'è)
+  // Step 2: Se lo step precedente non ha avuto successo prova a caricare l'ObjVersion dall'ETM (se c'ï¿½)
   if (Result = OBJVERSION_NULL) and Assigned(AContext.GetTable.EtmTimeSlotClass) then
     Result := LoadObjVersion_FromETM_Internal(AContext);
 end;
@@ -670,22 +678,22 @@ begin
   inherited;
   // NB: Qui avvio la transazione per fare in modo che tutto il Persist di tutti gli oggetti contenuti
   // nella collection vengano persistiti o annullati ma poi ogni chiamata a PersistObject riavvia
-  // una transazione per l'oggetto singolo (che non avrà praticamente effetto perchè inglobata
+  // una transazione per l'oggetto singolo (che non avrï¿½ praticamente effetto perchï¿½ inglobata
   // da quella avviata qua sotto.
-  // Nel caso particolare in cui uno o più singoli oggetti contenuti dela collection siano di una
-  // qualche classe che opera su una ConnectionDef diversa da quella di default verrà avviata (all'interno
+  // Nel caso particolare in cui uno o piï¿½ singoli oggetti contenuti dela collection siano di una
+  // qualche classe che opera su una ConnectionDef diversa da quella di default verrï¿½ avviata (all'interno
   // della chiamata a "PersistObject" una transazione sulla Connection diversa da quella di default e quindi
   // al di fuori della transazione principale sulla connessione di default avviata qui sotto e in pratica
-  // per questi oggetti ogni chiamata a "PersistObject" verrà eseguita nel contesto di una singola transazione
-  // slegata dalle altre e quindi è possibile che (solo in questo specifico e particolare caso) alcune operazioni
+  // per questi oggetti ogni chiamata a "PersistObject" verrï¿½ eseguita nel contesto di una singola transazione
+  // slegata dalle altre e quindi ï¿½ possibile che (solo in questo specifico e particolare caso) alcune operazioni
   // vadano a buon fine mentre altre no.
   // AL momento non ho una soluzione al problema.
   // NB: Qui non posso conoscere con certezza il tipo di oggetti realmente contenuto nella collection
   // in quanto il tipo reale dell'oggetto potrebbe essere diverso dal genericType della lista stessa
   // (a maggior ragione nel caso di una TList<IInterface> di interfacce, quindi avvio una transazione
-  // sulla connessione di default che va bene nel 99% delle volte (raramente l'applicazione dichiererà classi
+  // sulla connessione di default che va bene nel 99% delle volte (raramente l'applicazione dichiererï¿½ classi
   // che operano su Database diversi contemporaneamente.
-// TODO: Probabilmente anche qui dovrei usare una TransactionCollection (come per LoadList e PersistList ad esempio) perchè può riguardare più oggetti mappati anche su connessioni diverse
+// TODO: Probabilmente anche qui dovrei usare una TransactionCollection (come per LoadList e PersistList ad esempio) perchï¿½ puï¿½ riguardare piï¿½ oggetti mappati anche su connessioni diverse
   _DoStartTransaction(APSRequest);
   try
     // Wrap the DestList into a DuckTypedList
@@ -768,11 +776,11 @@ var
     // Mauri 18/07/2024: Verificando su una app. che stava facendo Omar Bossoni dove aveva il problema che mettendo l'ObjStatus
     //                    degli oggetti di dettaglio di una relazione HasMany a osDelete poi quando si chiamava il Persist non venivano
     //                    eliminati, ho visto che (forse per mio errore) nelle righe sotto se l'ObjStatus rilevato era appunto
-    //                    osDeleted non impostava LContext.ActionType a atDelete bensì a atDoNotPersist. Solo che non sono sicuro che sia
-    //                    un errore quanto invece mi sembra di ricordare di avere fatto una modifica del genere che o è andata perduta
-    //                    oppure in qualche caso particolare (delete da BindSource?) andata settato così altrimenti dava problemi.
-    //                    Quindi ora lo metto a atDelete perchè è più sensato e risolve il problema di Omar ma scrivo questo commento
-    //                    così ricordo il caso.
+    //                    osDeleted non impostava LContext.ActionType a atDelete bensï¿½ a atDoNotPersist. Solo che non sono sicuro che sia
+    //                    un errore quanto invece mi sembra di ricordare di avere fatto una modifica del genere che o ï¿½ andata perduta
+    //                    oppure in qualche caso particolare (delete da BindSource?) andata settato cosï¿½ altrimenti dava problemi.
+    //                    Quindi ora lo metto a atDelete perchï¿½ ï¿½ piï¿½ sensato e risolve il problema di Omar ma scrivo questo commento
+    //                    cosï¿½ ricordo il caso.
     else if LContext.ObjStatus = osDeleted then
       LContext.ActionType := atDelete;
   end;
@@ -790,7 +798,7 @@ begin
   StartTransaction_Internal(LContext.ConnectionNameResolved);
   try
     // Set/Update MasterID property if this is a relation child object (HasMany, HasOne, BelongsTo)
-    // NB: (LContext.GetProperties.GetPropertyByName(ARelationPropertyName).GetRelationType = rtNone) perchè altrimenti in alcuni casi particolare dava errori
+    // NB: (LContext.GetProperties.GetPropertyByName(ARelationPropertyName).GetRelationType = rtNone) perchï¿½ altrimenti in alcuni casi particolare dava errori
     if (APSRequest.RelationPropName <> '') and (APSRequest.RelationPropName <> IO_HASMANY_CHILD_VIRTUAL_PROPERTY_NAME) and (APSRequest.RelationOID <> 0) and
       (LContext.GetProperties.GetPropertyByName(APSRequest.RelationPropName).GetRelationType = rtNone) then
       LContext.GetProperties.GetPropertyByName(APSRequest.RelationPropName).SetValue(LContext.DataObject, APSRequest.RelationOID);
@@ -870,20 +878,20 @@ begin
     if not LMasterProp.IsDBWriteEnabled then
       Continue;
     case LMasterProp.GetRelationType of
-      // TODO: Non sono sicuro che così vada bene perchè in questo modo elimina gli oggetti child presenti attualmente nella lista
+      // TODO: Non sono sicuro che cosï¿½ vada bene perchï¿½ in questo modo elimina gli oggetti child presenti attualmente nella lista
       // quindi se prima di aver chiamato il DELETE avessi eliminato qualche oggetto child della lista stessa da codice
       // (quindi non dal binding che ha un meccanismo dedicato) questo oggetto che ho eliminato dalla lista ma che magari
       // non ho candellato dal DB non verrebbe eliminato apppunto dal DM. Quindi mi rimane il dubbio (anche in altre parti)
       // che non sia meglio fare un DELETE di quelli non con gli oggetti in modo da eliminare tutti i child direttamente
-      // sul DB senza passare dagli oggetti (però questo salterebbe ETM ad esempio); oppure ancora fare prima un reload
-      // di tutti gli oggetti child e poi eliminarli uno ad uno come oggetti, questo risolverebbe tutto però con
+      // sul DB senza passare dagli oggetti (perï¿½ questo salterebbe ETM ad esempio); oppure ancora fare prima un reload
+      // di tutti gli oggetti child e poi eliminarli uno ad uno come oggetti, questo risolverebbe tutto perï¿½ con
       // una minore efficienza.
       // If relation HasMany
       rtHasMany:
       begin
         // Create the child PSRequest and execute it
         LChildPSRequest := TioPersistenceStrategyFactory.NewPSRequest_PrePostRelationChild_DeleteList(AMasterContext, LMasterProp);
-        // NB: richiamo "io._ExecutePSRequest" perchè in questo modo usa la persistence strategy corretta nel caso
+        // NB: richiamo "io._ExecutePSRequest" perchï¿½ in questo modo usa la persistence strategy corretta nel caso
         //      la classe interessata fosse mappata su una connessione diversa (http p DB)
         io._ExecutePSRequest(LChildPSRequest);
       end;
@@ -892,7 +900,7 @@ begin
       begin
         // Create the child PSRequest and execute it
         LChildPSRequest := TioPersistenceStrategyFactory.NewPSRequest_PrePostRelationChild_DeleteObject(AMasterContext, LMasterProp);
-        // NB: richiamo "io._ExecutePSRequest" perchè in questo modo usa la persistence strategy corretta nel caso
+        // NB: richiamo "io._ExecutePSRequest" perchï¿½ in questo modo usa la persistence strategy corretta nel caso
         //      la classe interessata fosse mappata su una connessione diversa (http p DB)
         io._ExecutePSRequest(LChildPSRequest);
       end;
@@ -918,7 +926,7 @@ begin
       begin
         // Create the child PSRequest and execute it
         LChildPSRequest := TioPersistenceStrategyFactory.NewPSRequest_PrePostRelationChild_PersistList(AMasterContext, LMasterProp);
-        // NB: richiamo "io._ExecutePSRequest" perchè in questo modo usa la persistence strategy corretta nel caso
+        // NB: richiamo "io._ExecutePSRequest" perchï¿½ in questo modo usa la persistence strategy corretta nel caso
         //      la classe interessata fosse mappata su una connessione diversa (http p DB)
         io._ExecutePSRequest(LChildPSRequest);
       end;
@@ -927,7 +935,7 @@ begin
       begin
         // Create the child PSRequest and execute it
         LChildPSRequest := TioPersistenceStrategyFactory.NewPSRequest_PrePostRelationChild_PersistObject(AMasterContext, LMasterProp);
-        // NB: richiamo "io._ExecutePSRequest" perchè in questo modo usa la persistence strategy corretta nel caso
+        // NB: richiamo "io._ExecutePSRequest" perchï¿½ in questo modo usa la persistence strategy corretta nel caso
         //      la classe interessata fosse mappata su una connessione diversa (http p DB)
         io._ExecutePSRequest(LChildPSRequest);
       end;
@@ -954,7 +962,7 @@ begin
         begin
           // Create the child PSRequest and execute it
           LChildPSRequest := TioPersistenceStrategyFactory.NewPSRequest_PrePostRelationChild_Delete(AMasterContext, LMasterProp);
-          // NB: richiamo "io._ExecutePSRequest" perchè in questo modo usa la persistence strategy corretta nel caso
+          // NB: richiamo "io._ExecutePSRequest" perchï¿½ in questo modo usa la persistence strategy corretta nel caso
           //      la classe interessata fosse mappata su una connessione diversa (http p DB)
           io._ExecutePSRequest(LChildPSRequest);
         end;
@@ -1062,12 +1070,12 @@ var
     LQry.Open;
     try
       // Copy data to the MemoryTable
-      // NB: Per poter fare in modo che i dati rimangano anche con più passaggi
+      // NB: Per poter fare in modo che i dati rimangano anche con piï¿½ passaggi
       // successivi in base a quante classi implementano l'interfaccia che si sta
       // caricando (se si tratta di un'interfaccia ovviamente) ho dovuto implementare due chiamate
-      // differenti a CopyDataSet perchè se mantenevo l'opzione 'coStructure' ogni volta azzerava
+      // differenti a CopyDataSet perchï¿½ se mantenevo l'opzione 'coStructure' ogni volta azzerava
       // i records e quindi la prima volta la eseguq con l'opzione sopra citata mentre le volte successive no.
-      // Per sapere se è il primo passaggio verifico se la MemTable.Active = True perchè ho notato che al primo
+      // Per sapere se ï¿½ il primo passaggio verifico se la MemTable.Active = True perchï¿½ ho notato che al primo
       // passaggio la attiva automaticamente.
       if LDestDataSet.FieldCount > 0 then
       begin
@@ -1357,7 +1365,7 @@ begin
       TioDBFactory.QueryEngine.GetQueryUpdate(AContext).ExecSQL;
     end;
   end;
-  // If there is no conflict or there is a conflict but it has been resolved…
+  // If there is no conflict or there is a conflict but it has been resolvedï¿½
   if AContext.BlindLevel_Do_AutoUpdateProps and ((not AContext.ConflictDetected) or (AContext.ConflictState <= csResolved)) then
   begin
     AContext.ObjVersion := AContext.ObjNextVersion;

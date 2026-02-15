@@ -43,7 +43,7 @@ uses
 
 type
 {$IFDEF MSWINDOWS}
-  // Il TioConnectionMonitor incapsula la funzionalità di tracing e monitoring di quanto avviene sulle connessioni
+  // Il TioConnectionMonitor incapsula la funzionalitï¿½ di tracing e monitoring di quanto avviene sulle connessioni
   TioConnectionMonitorRef = class of TioConnectionMonitor;
 
   TioConnectionMonitor = class
@@ -65,14 +65,14 @@ type
   // IL connection manager ha il compito di mantenere i parametri delle connessioni impostate all'avvio
   // dell'applicazione per una loro successiva istanziazione e di gestione del connection pooling
   // se richiesto.
-  // In realtà questa classe utilizza il TFDManager fornito da FireDAC e non fa molto altro
+  // In realtï¿½ questa classe utilizza il TFDManager fornito da FireDAC e non fa molto altro
   // se non aggiungere un campo per mantenere un riferimento al nome della ConnectionDef
   // di default (ora in TioApplication.SessionDataStore).
-  // Una gestione di una connessione di default mi serviva perchè volevo fare in modo che NON
-  // fosse necessario specificare esplicitamente una ConnectionDef (con un attribute) per ogni classe/entità
+  // Una gestione di una connessione di default mi serviva perchï¿½ volevo fare in modo che NON
+  // fosse necessario specificare esplicitamente una ConnectionDef (con un attribute) per ogni classe/entitï¿½
   // e quindi ho deciso di mantenere un riferimento al nome della connectionDef di dafault in modo che per tutte le classi
   // che non indicano una connection esplicitamente utilizzino quella di default e quindi anche che normalmente nelle applicazioni
-  // che utilizzano una sola ConnectionDef non è necessario specificare nulla nella dichiarazione delle classi perchè
+  // che utilizzano una sola ConnectionDef non ï¿½ necessario specificare nulla nella dichiarazione delle classi perchï¿½
   // tanto utilizzano automaticamente la ConnectionDef di default (l'unica).
 
   TioConnectionManagerContainer = TObjectDictionary<String, TioConnectionInfo>;
@@ -83,7 +83,7 @@ type
 // TODO: Spostare FConnectionManagerContainer oppure proprio tutto TioConnectionManager all'interno del SessionDataStore???
 // TODO: Considerare di sostituire TioConnectionInfo direttamente con i componenti ConnectionDef, in questo modo eliminiamo una istanza e altri vantaggi
     class var FConnectionManagerContainer: TioConnectionManagerContainer;
-    // NB: Questo container in realtà contiene solo il tipo di DB (cdtFirebird, cdtSQLite ecc.ecc.) in modo da poter fare dei confronti veloci nelle factory e per non dipendere direttamente dal DriverID delle connectionDef di FireDAC
+    // NB: Questo container in realtï¿½ contiene solo il tipo di DB (cdtFirebird, cdtSQLite ecc.ecc.) in modo da poter fare dei confronti veloci nelle factory e per non dipendere direttamente dal DriverID delle connectionDef di FireDAC
     class function NewCustomConnectionDef(const AConnectionName: String; const APooled: Boolean; const AAsDefault: Boolean): IIoStanConnectionDef; inline;
     class procedure _Lock; inline;
     class procedure _Unlock; inline;
@@ -117,16 +117,16 @@ type
 {$ENDIF}
   end;
 
-  // Il ConnectionContainer contiene le connessioni attive in un dato momento, cioè quelle
+  // Il ConnectionContainer contiene le connessioni attive in un dato momento, cioï¿½ quelle
   // connections che sono effettivamente in uso al momento; il loro ciclo di vita (delle connessioni)
   // coincide con il ciclo della transazione in essere sulla connessione stessa, quando la transazione
   // termina (con un commit/rollback) anche la connessione viene elimimata.
-  // Le connessioni sono separate per thread in modo da predisporeìle fin da subito ad eventuali sviluppi in
+  // Le connessioni sono separate per thread in modo da predisporeï¿½le fin da subito ad eventuali sviluppi in
   // senso multithreading.
   // NB: Questa classe non gestisce l'eventuale connection pooling e non contiene i parametri della/e connesioni
-  // da creare ma è semplicemente un repository delle sole connessioni in uso in modo che chiamate ricorsive
+  // da creare ma ï¿½ semplicemente un repository delle sole connessioni in uso in modo che chiamate ricorsive
   // all'ORM all'interno di una singola operazione (ad esempio quando carichiamo una classe che ha al suo interno
-  // proprietà con relazioni il caricamento degli oggetti dettaglio avviene con una chiamata ricorsiva all'ORM
+  // proprietï¿½ con relazioni il caricamento degli oggetti dettaglio avviene con una chiamata ricorsiva all'ORM
   // e questa chiamata deve svolgersi all'interno della stessa transazione del master e quindi con la stessa connection)
   // possano accedere allo stesso oggetto connection (via factory).
   TioInternalContainerType = TDictionary<String, IioConnection>;
@@ -191,15 +191,15 @@ begin
   _Lock;
   try
     // Remove the reference to the connection
-    // NB: Viene richiamato alla distruzione di una connessione perchè altrimenti avrei un riferimento incrociato
+    // NB: Viene richiamato alla distruzione di una connessione perchï¿½ altrimenti avrei un riferimento incrociato
     // tra la connessione che, attraverso il proprio QueryContainer, manteine un riferimento a tutte le query
     // che sono state preparate ela query che mantiene un riferimento alla connessione al suo interno; in pratica
-    // questo causava molti memory leaks perchè questi oggetti rimanevano in vita perenne in quanto si sostenevano
+    // questo causava molti memory leaks perchï¿½ questi oggetti rimanevano in vita perenne in quanto si sostenevano
     // a vicenda e rendevano inefficace il Reference Count
     if AConnection.IsDBConnection then
       AConnection.AsDBConnection.QueryContainer.CleanQueryConnectionsRef;
-    // RImuove la connessione causandone anche la distruzione perchè a questo punto non c'è
-    // più alcun riferimento ad essa.
+    // RImuove la connessione causandone anche la distruzione perchï¿½ a questo punto non c'ï¿½
+    // piï¿½ alcun riferimento ad essa.
     FContainer.Remove(Self.ConnectionNameToContainerKey(AConnection.GetConnectionInfo.ConnectionName));
   finally
     _Unlock;
@@ -211,10 +211,10 @@ var
   AConnection: IioConnection;
 begin
   // Remove the reference to the connection
-  // NB: Viene richiamato alla distruzione di una connessione perchè altrimenti avrei un riferimento incrociato
+  // NB: Viene richiamato alla distruzione di una connessione perchï¿½ altrimenti avrei un riferimento incrociato
   // tra la connessione che, attraverso il proprio QueryContainer, manteine un riferimento a tutte le query
   // che sono state preparate ela query che mantiene un riferimento alla connessione al suo interno; in pratica
-  // questo causava molti memory leaks perchè questi oggetti rimanevano in vita perenne in quanto si sostenevano
+  // questo causava molti memory leaks perchï¿½ questi oggetti rimanevano in vita perenne in quanto si sostenevano
   // a vicenda e rendevano inefficace il Reference Count
   for AConnection in Self.FContainer.Values do
     Self.FreeConnection(AConnection);
@@ -401,7 +401,7 @@ begin
     if ACharSet <> '' then
       Result.Params.Values['CharacterSet'] := ACharSet;
     // Add the connection type to the internal container
-    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, ctFirebird, APersistent, kgtBeforeInsert, ASynchroStrategy_Client));
+    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, ctFirebird, APersistent, ASynchroStrategy_Client));
   finally
     _Unlock
   end;
@@ -421,7 +421,7 @@ begin
     if ACharSet <> '' then
       Result.Params.Values['CharacterSet'] := ACharSet;
     // Add the connection type to the internal container
-    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, ctMySQL, APersistent, kgtUndefined, ASynchroStrategy_Client));
+    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, ctMySQL, APersistent, ASynchroStrategy_Client));
   finally
     _Unlock;
   end;
@@ -435,7 +435,7 @@ begin
   _Lock;
   try
     // Setup the connection info
-    LConnectionInfo := TioConnectionInfo.Create(AConnectionName, ctHTTP, APersistent, kgtUndefined, ASynchroStrategy_Client);
+    LConnectionInfo := TioConnectionInfo.Create(AConnectionName, ctHTTP, APersistent, ASynchroStrategy_Client);
     LConnectionInfo.BaseURL := ABaseURL;
     // Add the connection type to the internal container
     FConnectionManagerContainer.AddOrSetValue(AConnectionName, LConnectionInfo);
@@ -458,7 +458,7 @@ begin
     Result.Params.Database := ADatabase;
     Result.Params.Values['FailIfMissing'] := 'False';
     // Add the connection type to the internal container
-    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, ctSQLite, APersistent, kgtAfterInsert, ASynchroStrategy_Client));
+    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, ctSQLite, APersistent, ASynchroStrategy_Client));
   finally
     _Unlock;
   end;
@@ -477,7 +477,7 @@ begin
     Result.Params.UserName := AUserName;
     Result.Params.Password := APassword;
     // Add the connection type to the internal container
-    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, ctSQLServer, APersistent, kgtAfterInsert, ASynchroStrategy_Client));
+    FConnectionManagerContainer.AddOrSetValue(AConnectionName, TioConnectionInfo.Create(AConnectionName, ctSQLServer, APersistent, ASynchroStrategy_Client));
   finally
     _Unlock;
   end;

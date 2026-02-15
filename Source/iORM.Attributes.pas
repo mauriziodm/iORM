@@ -301,11 +301,14 @@ type
     property MapMode: TioMapModeType read FMapMode;
   end;
 
-  // Set the name of the generator/sequence for the table (on the DB) related to this class
-  ioKeyGenerator = class(TioCustomStringAttribute)
+  // Force IDENTITY column for primary key generation
+  ioKeyIdentity = class(TioCustomAttribute)
   end;
 
-  ioKeySequence = ioKeyGenerator;
+  // Set the name of the sequence for the table (on the DB) related to this class
+  // Use this when you need shared ID generation across multiple classes implementing the same interface
+  ioKeySequence = class(TioCustomStringAttribute)
+  end;
 
   // Link the class/entity to a specific connection
   ioConnection = class(TCustomAttribute)

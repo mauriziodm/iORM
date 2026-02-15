@@ -73,14 +73,11 @@ type
 
   TioConnectionType = (ctFirebird, ctSQLite, ctSQLServer, ctMySQL, ctHTTP);
 
-  TioKeyGenerationTime = (kgtUndefined, kgtAfterInsert, kgtBeforeInsert);
-
   TioConnectionInfo = class
   strict private
     FBaseURL: String;
     FConnectionName: String;
     FConnectionType: TioConnectionType;
-    FKeyGenerationTime: TioKeyGenerationTime;
     FPassword: String;
     FPersistent: Boolean;
     FPersistenceStrategy: TioPersistenceStrategyRef;
@@ -88,11 +85,10 @@ type
     FSynchroStrategy: IioSynchroStrategy_Client;
   public
     constructor Create(const AConnectionName: String; const AConnectionType: TioConnectionType; const APersistent: Boolean;
-      const AKeyGenerationTime: TioKeyGenerationTime; const ASynchroStrategy: IioSynchroStrategy_Client);
+      const ASynchroStrategy: IioSynchroStrategy_Client);
     property BaseURL: String read FBaseURL write FBaseURL;
     property ConnectionName: String read FConnectionName write FConnectionName;
     property ConnectionType: TioConnectionType read FConnectionType write FConnectionType;
-    property KeyGenerationTime: TioKeyGenerationTime read FKeyGenerationTime write FKeyGenerationTime;
     property Password: String read FPassword write FPassword;
     property Persistent: Boolean read FPersistent write FPersistent;
     property PersistenceStrategy: TioPersistenceStrategyRef read FPersistenceStrategy write FPersistenceStrategy;
@@ -259,6 +255,8 @@ type
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); virtual; abstract;
     class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
     class procedure GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext); virtual;
+    /// <summary>Generates the RETURNING clause for INSERT statements to retrieve generated ID</summary>
+    class function GenerateSqlReturningClause(const AContext: IioContext): String; virtual; abstract;
     class procedure GenerateSqlMax(const AQuery: IioQuery; const AContext: IioContext; const AProperty: IioProperty); virtual;
     class procedure GenerateSqlMin(const AQuery: IioQuery; const AContext: IioContext; const AProperty: IioProperty); virtual;
     class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
@@ -947,11 +945,10 @@ end;
 { TioConnectionInfo }
 
 constructor TioConnectionInfo.Create(const AConnectionName: String; const AConnectionType: TioConnectionType; const APersistent: Boolean;
-  const AKeyGenerationTime: TioKeyGenerationTime; const ASynchroStrategy: IioSynchroStrategy_Client);
+  const ASynchroStrategy: IioSynchroStrategy_Client);
 begin
   FConnectionName := AConnectionName;
   FConnectionType := AConnectionType;
-  FKeyGenerationTime := AKeyGenerationTime;
   FPersistent := APersistent;
   FSynchroStrategy := ASynchroStrategy;
   FPersistenceStrategy := TioPersistenceStrategyFactory.ConnectionTypeToStrategy(AConnectionType);

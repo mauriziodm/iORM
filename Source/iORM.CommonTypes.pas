@@ -164,6 +164,13 @@ type
   // ltFromBSReloadNewInstance: the bind source receives the object to bind from a source bind source and reloads it AS A NEW INSTANCE for any changes or lazy load
   TioLoadType = (ltManual, ltCreate, ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance, ltAuto);
 
+  // Key generation strategy for primary key fields
+  TioKeyGenerationStrategy = (
+    kgsAuto,      // Use database default behavior
+    kgsIdentity,  // Use IDENTITY/AUTOINCREMENT column
+    kgsSequence   // Use explicit SEQUENCE/GENERATOR
+  );
+
   // Persistence related types
   // Note: Literal description for values added at the end of the "iORM.pas" unit (initialization)
   TioPersistenceActionType = (atDoNotPersist, atSelect, atInsert, atUpdate, atDelete, atMakeSelection);

@@ -219,7 +219,10 @@ type
     function GetFields: TioDBBuilderSchemaFields;
     function GetForeignKeys: TioDBBuilderSchemaForeignKeys;
     function GetContextTable: IioTable;
+    function GetKeyGenerationStrategy: TioKeyGenerationStrategy;
     function GetSequenceName: String;
+    function UsesSequenceForKeyGeneration: Boolean;
+    function UsesIdentityForKeyGeneration: Boolean;
     // function IDField: IioDBBuilderSchemaField;
     function GetIndexes: TioDBBuilderSchemaIndexes;
     function GetPrimaryKeyField: IioDBBuilderSchemaField;
@@ -246,6 +249,7 @@ type
     property IsTrueClass: boolean read GetIsTrueClass write SetIsTrueClass;
     property Name: string read GetName;
     property SqlName: string read GetSqlName;
+    property KeyGenerationStrategy: TioKeyGenerationStrategy read GetKeyGenerationStrategy;
     property PrimaryKeyField: IioDBBuilderSchemaField read GetPrimaryKeyField;
     property SequenceName: string read GetSequenceName;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
@@ -513,6 +517,26 @@ type
     /// </summary>
     /// <returns>RDBMS info object with name, version, and comparison methods</returns>
     function LoadRDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
+
+    // ==========================================================
+    // KEY GENERATION CAPABILITY METHODS
+    // ----------------------------------------------------------
+    /// <summary>Returns True if the database supports IDENTITY columns</summary>
+    function SupportsIdentityForKeyGeneration: Boolean;
+    /// <summary>Returns True if the database supports SEQUENCE objects</summary>
+    function SupportsSequenceForKeyGeneration: Boolean;
+    /// <summary>Returns the default key generation strategy for this database</summary>
+    function GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategy;
+
+    // ==========================================================
+    // SEQUENCE RELATED METHODS
+    // ----------------------------------------------------------
+    /// <summary>Generates SQL to create a sequence</summary>
+    function BuildSQL_AddSequence(const ASequenceName: String): string;
+    /// <summary>Generates SQL to drop a sequence</summary>
+    function BuildSQL_DropSequence(const ASequenceName: string): string;
+    /// <summary>Generates SQL to check if a sequence exists</summary>
+    function BuildSQL_SequenceExists(const ASequenceName: string): string;
     // ==========================================================
   end;
 
