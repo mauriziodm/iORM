@@ -92,6 +92,12 @@ type
     // Warnings
     procedure WarningTypeAffinity(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String; const AInvalidTypeConversions: string); virtual;
     procedure WarningValueChanged(const AValueName, AOldValue, ANewValue: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
+    // Hook methods
+    /// <summary>
+    /// Hook method to check key generation strategy compatibility with RDBMS version.
+    /// Override in derived classes to add warnings for incompatible configurations.
+    /// </summary>
+    procedure DoCheckKeyGenerationCompatibility; virtual;
 
     procedure GenerateDatabaseObjects(const Create: boolean); virtual; abstract;
 
@@ -275,7 +281,7 @@ begin
         begin
           Script.Body.Add(SqlGenerator.BuildSQL_BeginAlterTable(ATable));
           Script.Body.IncIndent;
-          Script.Body.Add(SqlGenerator.BuildSQL_AddField(LField));
+          Script.Body.Add(SqlGenerator.BuildSQL_AddField(ATable, LField));
           Script.Body.DecIndent;
           Script.Body.Add(SqlGenerator.BuildSQL_EndAlterTable(ATable));
         end;
@@ -399,6 +405,12 @@ begin
   if ANewValue <> AOldValue then
     Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> Changing the %s is not allowed (old = ''%s'', new = ''%s'')',
       [ATable.Name, AField.FieldName, AValueName, AOldValue, ANewValue]));
+end;
+
+procedure TioDBBuilderStrategyBase.DoCheckKeyGenerationCompatibility;
+begin
+  // Default implementation: do nothing
+  // Override in derived classes to add warnings for incompatible key generation strategies
 end;
 
 function TioDBBuilderStrategyBase.IsFieldTypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;

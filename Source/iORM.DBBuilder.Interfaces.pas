@@ -384,7 +384,7 @@ type
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
     /// <summary>Generates SQL fragment to add a field in ALTER TABLE context</summary>
-    function BuildSQL_AddField(const AField: IioDBBuilderSchemaField): string;
+    function BuildSQL_AddField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     /// <summary>
     /// Generates SQL to alter an existing field based on detected changes.
     /// </summary>
@@ -394,7 +394,7 @@ type
     /// <returns>ALTER TABLE SQL statement</returns>
     function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo): string;
     /// <summary>Generates SQL fragment to define a field in CREATE TABLE context</summary>
-    function BuildSQL_CreateField(const AField: IioDBBuilderSchemaField): string;
+    function BuildSQL_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     /// <summary>Generates SQL to check if a specific field exists in a table</summary>
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     /// <summary>

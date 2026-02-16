@@ -71,9 +71,9 @@ type
     // ==========================================================
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_AddField(const AField: IioDBBuilderSchemaField): string; override;
+    function BuildSQL_AddField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo): string; override;
-    function BuildSQL_CreateField(const AField: IioDBBuilderSchemaField): string; override;
+    function BuildSQL_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; override;
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; override;
@@ -142,7 +142,7 @@ begin
   Result := FileExists(TioConnectionManager.GetDatabaseFileName(ConnectionDefName));
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildSQL_CreateField(const AField: IioDBBuilderSchemaField): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
 var
   LDefault: string;
   LNotNull: string;
@@ -154,6 +154,7 @@ begin
   LNotNull := IfThen(AField.FieldNotNull, ' NOT NULL', ' NULL');
 
   // If primary key...
+  // Note: SQLite uses INTEGER PRIMARY KEY which is automatically auto-increment
   if AField.PrimaryKey then
     Result := Format('%s INTEGER PRIMARY KEY NOT NULL', [AField.SqlFieldName])
   // ...else continue as regular field
@@ -324,7 +325,7 @@ begin
   end;
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildSQL_AddField(const AField: IioDBBuilderSchemaField): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_AddField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
 begin
   // Note: TioDBBuilderStrategySqLite should NEVER call this method.
   // SQLite has very limited ALTER TABLE support and does not support adding new columns in certain contexts.

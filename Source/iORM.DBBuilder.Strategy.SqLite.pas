@@ -167,7 +167,7 @@ begin
   LComma := '  ';
   for LField in ATable.Fields do
   begin
-    Script.Body.AddLine(LComma + SqlGenerator.BuildSQL_CreateField(LField));
+    Script.Body.AddLine(LComma + SqlGenerator.BuildSQL_CreateField(ATable, LField));
     LComma := ', ';
   end;
 
