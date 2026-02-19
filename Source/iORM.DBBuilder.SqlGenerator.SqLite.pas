@@ -72,7 +72,7 @@ type
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
     function BuildSQL_AddField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
-    function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo): string; override;
+    function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; override;
@@ -176,7 +176,7 @@ begin
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable;
-  const AField: IioDBBuilderSchemaField; const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo): string;
+  const AField: IioDBBuilderSchemaField): string;
 begin
   // Note: TioDBBuilderStrategySqLite should NEVER call this method.
   // SQLite has very limited ALTER TABLE support and does not support altering column definitions.

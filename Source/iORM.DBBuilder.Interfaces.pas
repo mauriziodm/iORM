@@ -262,13 +262,11 @@ type
     ['{1AEDB134-1ECB-490E-A53A-973BEDE509E5}']
     function GetForeignKeysEnabled: boolean;
     function GetIndexesEnabled: boolean;
-    function GetRDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
     function GetScript: IioDBBuilderSqlScript;
     function GetSequences: TioDBBuilderSchemaSequences;
     function GetTables: TioDBBuilderSchemaTables;
     // Status
     function GetStatus: TioDBBuilderStatus;
-    procedure SetRDBMSInfo(const AValue: IioDBBuilderSchemaRDBMSInfo);
     procedure SetStatus(const Value: TioDBBuilderStatus);
 
     function FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
@@ -277,7 +275,6 @@ type
 
     property ForeignKeysEnabled: boolean read GetForeignKeysEnabled;
     property IndexesEnabled: boolean read GetIndexesEnabled;
-    property RDBMSInfo: IioDBBuilderSchemaRDBMSInfo read GetRDBMSInfo write SetRDBMSInfo;
     property Script: IioDBBuilderSqlScript read GetScript;
     property Sequences: TioDBBuilderSchemaSequences read GetSequences;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
@@ -387,12 +384,12 @@ type
     function BuildSQL_AddField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     /// <summary>
     /// Generates SQL to alter an existing field based on detected changes.
+    /// Uses DBMSInfo property internally for version-specific behavior.
     /// </summary>
     /// <param name="ATable">Table containing the field</param>
     /// <param name="AField">Field to alter with change flags set</param>
-    /// <param name="ARDBMSInfo">Database version info for compatibility</param>
     /// <returns>ALTER TABLE SQL statement</returns>
-    function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo): string;
+    function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     /// <summary>Generates SQL fragment to define a field in CREATE TABLE context</summary>
     function BuildSQL_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     /// <summary>Generates SQL to check if a specific field exists in a table</summary>
@@ -510,13 +507,24 @@ type
     function Translate_SchemaFK_To_FKvalue(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
 
     // ==========================================================
-    // RDBMS INFO METHODS
+    // DBMS INFO METHODS
     // ----------------------------------------------------------
     /// <summary>
+    /// Returns DBMS version information with lazy loading (loaded on first access).
+    /// </summary>
+    /// <returns>DBMS info object with name, version, and comparison methods</returns>
+    function GetDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
+    /// <summary>
     /// Retrieves database system name and version information from the connected database.
+    /// Called internally by GetDBMSInfo for lazy loading.
     /// </summary>
     /// <returns>RDBMS info object with name, version, and comparison methods</returns>
     function LoadRDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
+    /// <summary>
+    /// DBMS version information with lazy loading (loaded on first access).
+    /// Use this property instead of LoadRDBMSInfo for cached access.
+    /// </summary>
+    property DBMSInfo: IioDBBuilderSchemaRDBMSInfo read GetDBMSInfo;
 
     // ==========================================================
     // KEY GENERATION CAPABILITY METHODS

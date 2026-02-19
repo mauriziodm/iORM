@@ -199,9 +199,6 @@ begin
   FConnectionDefName := AConnectionDefName;
   FSchema := ASchema;
   FSqlGenerator := ASqlGenerator;
-
-  // Load RDBMS info
-  FSchema.RDBMSInfo := FSqlGenerator.LoadRDBMSInfo;
 end;
 
 function TioDBBuilderStrategyBase.GetScript: IioDBBuilderSqlScript;
@@ -287,7 +284,7 @@ begin
         end;
       stUpdate:
         begin
-          Script.Body.Add(SqlGenerator.BuildSQL_AlterField(ATable, LField, Schema.RDBMSInfo));
+          Script.Body.Add(SqlGenerator.BuildSQL_AlterField(ATable, LField));
         end;
     end;
   end;
@@ -355,7 +352,7 @@ procedure TioDBBuilderStrategyBase.GenerateCreateDatabaseScript;
 begin
   Schema.Status := stCreate;
 
-  Script.ScriptBegin(ConnectionDefName, Schema.RDBMSInfo);
+  Script.ScriptBegin(ConnectionDefName, SqlGenerator.DBMSInfo);
 
   GenerateDatabaseObjects(True);
 
@@ -366,7 +363,7 @@ procedure TioDBBuilderStrategyBase.GenerateUpdateDatabaseScript;
 begin
   Schema.Status := stUpdate;
 
-  Script.ScriptBegin(ConnectionDefName, Schema.RDBMSInfo);
+  Script.ScriptBegin(ConnectionDefName, SqlGenerator.DBMSInfo);
 
   GenerateDatabaseObjects(False);
 

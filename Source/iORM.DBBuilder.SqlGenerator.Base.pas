@@ -53,6 +53,7 @@ type
   private
     FConnectionDefName: string;
     FDataConverter: TioSqlDataConverterRef;
+    FDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
   protected
     /// <summary>
     /// Returns the maximum allowed length for SQL identifiers (table names, column names, etc.) for this database.
@@ -121,7 +122,7 @@ type
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
     function BuildSQL_AddField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
-    function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo): string; virtual; abstract;
+    function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildSQL_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; virtual; abstract;
@@ -182,8 +183,15 @@ type
     function Translate_SchemaTableAndFK_To_FKName(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual;
 
     // ==========================================================
-    // RDBMS INFO METHODS
+    // DBMS INFO METHODS
     // ----------------------------------------------------------
+    /// <summary>
+    /// Returns DBMS version info with lazy loading (loads on first access).
+    /// </summary>
+    function GetDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
+    /// <summary>
+    /// Loads DBMS info from database. Called internally by GetDBMSInfo.
+    /// </summary>
     function LoadRDBMSInfo: IioDBBuilderSchemaRDBMSInfo; virtual; abstract;
 
     // ==========================================================
@@ -209,6 +217,7 @@ type
 
     property ConnectionDefName: string read FConnectionDefName;
     property DataConverter: TioSqlDataConverterRef read FDataConverter;
+    property DBMSInfo: IioDBBuilderSchemaRDBMSInfo read GetDBMSInfo;
     property MaxSqlIdentifierLength: integer read GetMaxSqlIdentifierLength;
     property MinSqlIdentifierLength: integer read GetMinSqlIdentifierLength;
   public
@@ -384,6 +393,14 @@ begin
   inherited Create;
   FConnectionDefName := AConnectionDefName;
   FDataConverter := TioDbFactory.SqlDataConverter(AConnectionDefName);
+  FDBMSInfo := nil;
+end;
+
+function TioDBBuilderSqlGenBase.GetDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
+begin
+  if not Assigned(FDBMSInfo) then
+    FDBMSInfo := LoadRDBMSInfo;
+  Result := FDBMSInfo;
 end;
 
 function TioDBBuilderSqlGenBase.Translate_SchemaField_To_DefaultValue(const AField: IioDBBuilderSchemaField): string;

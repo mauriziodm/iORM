@@ -59,7 +59,7 @@ type
     // ==========================================================
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo): string; override;
+    function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     // ==========================================================
   end;
 
@@ -126,7 +126,7 @@ begin
 end;
 
 function TioDBBuilderSqlGenMSSqlServer.BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable;
-  const AField: IioDBBuilderSchemaField; const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo): string;
+  const AField: IioDBBuilderSchemaField): string;
 begin
   // TODO: MS SQL Server BuildSQL_AlterField implementation not yet complete
   raise EioDBBuilderException.Create(ClassName, 'BuildSQL_AlterField',

@@ -79,7 +79,7 @@ type
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
     function BuildSQL_AddField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
-    function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo): string; override;
+    function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; override;
@@ -249,7 +249,7 @@ begin
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable;
-  const AField: IioDBBuilderSchemaField; const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo): string;
+  const AField: IioDBBuilderSchemaField): string;
 var
   LSqlText: IioDBBuilderSqlText;
 begin
@@ -273,12 +273,12 @@ begin
   if AField.IsFieldNotNullAltered then
   begin
     // Check Firebird version before generating SET/DROP NOT NULL syntax
-    if not ARDBMSInfo.IsAtLeast(3, 0) then
+    if not DBMSInfo.IsAtLeast(3, 0) then
       raise EioDBBuilderException.Create(ClassName, 'BuildSQL_AlterField',
         Format('Firebird %s does not support SET/DROP NOT NULL for column "%s.%s". '#13#13 +
           'This feature requires Firebird 3.0 or later. To modify NOT NULL constraints on existing columns, ' +
           'you must either recreate the table manually or upgrade to Firebird 3.0+.',
-          [ARDBMSInfo.Version, ATable.Name, AField.FieldName]));
+          [DBMSInfo.Version, ATable.Name, AField.FieldName]));
 
     LSqlText.AddLine(Format('ALTER TABLE %s ALTER COLUMN %s %s NOT NULL;', [ATable.SqlName, AField.SqlFieldName, IfThen(AField.FieldNotNull, 'SET', 'DROP')]));
   end;

@@ -43,19 +43,15 @@ type
   TioDBBuilderSchema = class(TInterfacedObject, IioDBBuilderSchema)
   private
     FIndexesEnabled, FForeignKeysEnabled: Boolean;
-    FRDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
     FScript: IioDBBuilderSqlScript;
     FSequences: TioDBBuilderSchemaSequences;
     FStatus: TioDBBuilderStatus;
     FTables: TioDBBuilderSchemaTables;
     function GetForeignKeysEnabled: Boolean;
     function GetIndexesEnabled: Boolean;
-    function GetRDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
     function GetScript: IioDBBuilderSqlScript;
     function GetSequences: TioDBBuilderSchemaSequences;
     function GetTables: TioDBBuilderSchemaTables;
-    // RDBMSInfo
-    procedure SetRDBMSInfo(const AValue: IioDBBuilderSchemaRDBMSInfo);
     // Status
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const AValue: TioDBBuilderStatus);
@@ -69,7 +65,6 @@ type
 
     property ForeignKeysEnabled: boolean read GetForeignKeysEnabled;
     property IndexesEnabled: boolean read GetIndexesEnabled;
-    property RDBMSInfo: IioDBBuilderSchemaRDBMSInfo read GetRDBMSInfo write SetRDBMSInfo;
     property Script: IioDBBuilderSqlScript read GetScript;
     property Sequences: TioDBBuilderSchemaSequences read GetSequences;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
@@ -139,16 +134,6 @@ end;
 function TioDBBuilderSchema.GetIndexesEnabled: Boolean;
 begin
   Result := FIndexesEnabled;
-end;
-
-function TioDBBuilderSchema.GetRDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
-begin
-  Result := FRDBMSInfo;
-end;
-
-procedure TioDBBuilderSchema.SetRDBMSInfo(const AValue: IioDBBuilderSchemaRDBMSInfo);
-begin
-  FRDBMSInfo := AValue;
 end;
 
 procedure TioDBBuilderSchema.SequenceAddIfNotExists(const ASequenceName: String);
