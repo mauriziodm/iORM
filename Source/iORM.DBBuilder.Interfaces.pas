@@ -61,6 +61,7 @@ type
   // Forward declarations
   IioDBBuilderSqlScript = interface;
   IioDBBuilderSchemaRDBMSInfo = interface;
+  IioDBBuilderSqlGenerator = interface;
 
   IioDBBuilderSchemaRDBMSInfo = interface
     ['{A7D3E8F1-B2C4-4D5E-9F6A-1B2C3D4E5F6A}']
@@ -264,6 +265,7 @@ type
     function GetIndexesEnabled: boolean;
     function GetScript: IioDBBuilderSqlScript;
     function GetSequences: TioDBBuilderSchemaSequences;
+    function GetSqlGenerator: IioDBBuilderSqlGenerator;
     function GetTables: TioDBBuilderSchemaTables;
     // Status
     function GetStatus: TioDBBuilderStatus;
@@ -277,6 +279,7 @@ type
     property IndexesEnabled: boolean read GetIndexesEnabled;
     property Script: IioDBBuilderSqlScript read GetScript;
     property Sequences: TioDBBuilderSchemaSequences read GetSequences;
+    property SqlGenerator: IioDBBuilderSqlGenerator read GetSqlGenerator;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
     property Tables: TioDBBuilderSchemaTables read GetTables;
   end;

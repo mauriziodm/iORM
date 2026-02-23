@@ -48,6 +48,7 @@ type
     FForeignKeys: TioDBBuilderSchemaForeignKeys;
     FIndexes: TioDBBuilderSchemaIndexes;
     FIsTrueClass: Boolean;
+    FKeyGenerationStrategy: TioKeyGenerationStrategy;
     FPrimaryKeyField: IioDBBuilderSchemaField;
     FStatus: TioDBBuilderStatus;
     FChanges: TioDBBuilderTableChanges;
@@ -60,7 +61,7 @@ type
     procedure SetStatus(const AValue: TioDBBuilderStatus);
     function GetChanges: TioDBBuilderTableChanges;
   public
-    constructor Create(const AContextTable: IioTable);
+    constructor Create(const AContextTable: IioTable; const AKeyGenerationStrategy: TioKeyGenerationStrategy);
     destructor Destroy; override;
 
     procedure AddChange(const AChange: TioDBBuilderTableChange);
@@ -116,12 +117,14 @@ begin
     FPrimaryKeyField := ASchemaField;
 end;
 
-constructor TioDBBuilderSchemaTable.Create(const AContextTable: IioTable);
+constructor TioDBBuilderSchemaTable.Create(const AContextTable: IioTable;
+  const AKeyGenerationStrategy: TioKeyGenerationStrategy);
 begin
   FChanges := [];
   FStatus := stClean;
   FContextTable := AContextTable;
   FIsTrueClass := AContextTable.IsTrueClass;
+  FKeyGenerationStrategy := AKeyGenerationStrategy;
   FFields := TioDBBuilderSchemaFields.Create;
   FForeignKeys := TioDBBuilderSchemaForeignKeys.Create;
   FIndexes := TioDBBuilderSchemaIndexes.Create;
@@ -205,7 +208,7 @@ end;
 
 function TioDBBuilderSchemaTable.GetKeyGenerationStrategy: TioKeyGenerationStrategy;
 begin
-  Result := FContextTable.GetKeyGenerationStrategy;
+  Result := FKeyGenerationStrategy;
 end;
 
 function TioDBBuilderSchemaTable.GetIsTrueClass: Boolean;
@@ -233,7 +236,7 @@ end;
 
 function TioDBBuilderSchemaTable.UsesIdentityForKeyGeneration: Boolean;
 begin
-  Result := GetKeyGenerationStrategy in [kgsIdentity, kgsAuto];
+  Result := GetKeyGenerationStrategy = kgsIdentity;
 end;
 
 procedure TioDBBuilderSchemaTable.SetIsTrueClass(const AValue: Boolean);

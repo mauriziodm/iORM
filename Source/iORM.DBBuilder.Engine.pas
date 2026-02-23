@@ -245,8 +245,9 @@ constructor TioDBBuilderEngine.Create(const AConnectionDefName: String; const Ad
 begin
   FAnalyzed := False;
   FConnectionDefName := AConnectionDefName;
-  FSchema := TioDBBuilderFactory.NewSchema(FConnectionDefName, AddIndexes, AddForeignKeys);
+  // SqlGenerator must be created BEFORE Schema so that kgsAuto can be resolved
   FSqlGenerator := TioDBBuilderFactory.NewSqlGenerator(FConnectionDefName);
+  FSchema := TioDBBuilderFactory.NewSchema(FConnectionDefName, AddIndexes, AddForeignKeys, FSqlGenerator);
 end;
 
 procedure TioDBBuilderEngine.CreateDatabase;
@@ -458,7 +459,7 @@ end;
 
 procedure TioDBBuilderEngine_New.RebuildSchema;
 begin
-  FSchema := TioDBBuilderFactory.NewSchema(FConnectionDefName, FBuildIndexes, FBuildForeignKeys);
+  FSchema := TioDBBuilderFactory.NewSchema(FConnectionDefName, FBuildIndexes, FBuildForeignKeys, FSqlGenerator);
   TioDBBuilderFactory.NewDBAnalyzer(FConnectionDefName, FSchema, FSqlGenerator, FForceToCreateNewDB).Analyze;
 end;
 

@@ -42,7 +42,8 @@ uses
   iORM.Context.Table.Interfaces,
   iORM.Context.Properties.Interfaces,
   iORM.Context.Map.Interfaces,
-  iORM.Attributes
+  iORM.Attributes,
+  iORM.CommonTypes
 
   ;
 
@@ -52,14 +53,16 @@ type
   public
     class function NewEngine(const AConnectionDefName: String; const AAddIndexes: Boolean = True; const AAddForeignKeys: Boolean = True): IioDBBuilderEngine;
     class function NewDBAnalyzer(const AConnectionDefname: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AForceCreateNewDB: Boolean): IioDBBuilderDBAnalyzer;
-    class function NewSchema(const AConnectionDefName: String; const AIndexesEnabled, AForeignKeysEnabled: Boolean): IioDBBuilderSchema;
+    class function NewSchema(const AConnectionDefName: String; const AIndexesEnabled, AForeignKeysEnabled: Boolean;
+      const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchema;
     class function NewSchemaBuilder: TioDBBuilderSchemaBuilderRef;
     class function NewSchemaField(const AContextProperty: IioProperty): IioDBBuilderSchemaField;
     class function NewSchemaFieldClassInfo(const AConnectionDefName: String): IioDBBuilderSchemaField;
     class function NewSchemaFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty; const AOnDeleteAction, AOnUpdateAction: TioFKAction): IioDBBuilderSchemaFK;
     class function NewSchemaIndex(const AIndex: ioIndex; const AConnectionDefName: String): IioDBBuilderSchemaIndex;
     class function NewSchemaRDBMSInfo(const AName, ARaw, AVersion: String; const AMajorVersion, AMinorVersion: Integer): IioDBBuilderSchemaRDBMSInfo;
-    class function NewSchemaTable(const AContextTable: IioTable): IioDBBuilderSchemaTable;
+    class function NewSchemaTable(const AContextTable: IioTable;
+      const AKeyGenerationStrategy: TioKeyGenerationStrategy): IioDBBuilderSchemaTable;
     class function NewSqlGenerator(const AConnectionDefName: String): IioDBBuilderSqlGenerator;
     class function NewSqlScript: IioDBBuilderSqlScript;
     class function NewSqlText(const AAddLinePrefix: String = ''): IioDBBuilderSqlText;
@@ -105,9 +108,9 @@ begin
 end;
 
 class function TioDBBuilderFactory.NewSchema(const AConnectionDefName: String; const AIndexesEnabled,
-  AForeignKeysEnabled: Boolean): IioDBBuilderSchema;
+  AForeignKeysEnabled: Boolean; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchema;
 begin
-  Result := TioDBBuilderSchema.Create(AIndexesEnabled, AForeignKeysEnabled);
+  Result := TioDBBuilderSchema.Create(AIndexesEnabled, AForeignKeysEnabled, ASqlGenerator);
   NewSchemaBuilder.BuildSchema(AConnectionDefName, Result);
 end;
 
@@ -144,9 +147,10 @@ begin
   Result := TioDBBuilderSchemaRDBMSInfo.Create(AName, ARaw, AVersion, AMajorVersion, AMinorVersion);
 end;
 
-class function TioDBBuilderFactory.NewSchemaTable(const AContextTable: IioTable): IioDBBuilderSchemaTable;
+class function TioDBBuilderFactory.NewSchemaTable(const AContextTable: IioTable;
+  const AKeyGenerationStrategy: TioKeyGenerationStrategy): IioDBBuilderSchemaTable;
 begin
-  Result := TioDBBuilderSchemaTable.Create(AContextTable);
+  Result := TioDBBuilderSchemaTable.Create(AContextTable, AKeyGenerationStrategy);
 end;
 
 class function TioDBBuilderFactory.NewSqlGenerator(const AConnectionDefName: String): IioDBBuilderSqlGenerator;

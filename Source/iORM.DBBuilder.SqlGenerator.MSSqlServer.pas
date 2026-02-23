@@ -36,7 +36,8 @@ unit iORM.DBBuilder.SqlGenerator.MSSqlServer;
 interface
 
 uses
-  iORM.DBBuilder.SqlGenerator.Base, iORM.DBBuilder.Interfaces, iORM.Attributes;
+  iORM.DBBuilder.SqlGenerator.Base, iORM.DBBuilder.Interfaces, iORM.Attributes,
+  iORM.CommonTypes;
 
 const
   CONNECTION_NAME_MSSQL_MASTER = 'MSSQL_MASTER';
@@ -54,6 +55,13 @@ type
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
     function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
+
+    // ==========================================================
+    // KEY GENERATION CAPABILITY METHODS
+    // ----------------------------------------------------------
+    function GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategy; override;
+    function Supports_Identity: Boolean; override;
+    function Supports_Sequence: Boolean; override;
 
     // ==========================================================
     // SQL GENERATOR UTILITIES
@@ -129,6 +137,23 @@ begin
   // TODO: MS SQL Server BuildSQL_AlterField implementation not yet complete
   raise EioDBBuilderException.Create(ClassName, 'BuildSQL_AlterField',
     'MS SQL Server ALTER FIELD is not yet implemented in DBBuilder');
+end;
+
+function TioDBBuilderSqlGenMSSqlServer.GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategy;
+begin
+  // SQL Server default: use Identity
+  Result := kgsIdentity;
+end;
+
+function TioDBBuilderSqlGenMSSqlServer.Supports_Identity: Boolean;
+begin
+  Result := True;
+end;
+
+function TioDBBuilderSqlGenMSSqlServer.Supports_Sequence: Boolean;
+begin
+  // SQL Server 2012+ supports sequences
+  Result := True;
 end;
 
 end.

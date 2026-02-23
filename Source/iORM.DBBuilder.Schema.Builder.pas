@@ -61,7 +61,6 @@ class procedure TioDBBuilderSchemaBuilder.BuildSchema(const AConnectionDefName: 
 var
   AContextSlot: TioMapSlot;
 begin
-  inherited;
   // Loop for all entities and build table list
   for AContextSlot in TioMapContainer.GetContainer.Values do
     BuildSchemaTable(AConnectionDefName, ASchema, AContextSlot.GetMap);

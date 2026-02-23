@@ -45,18 +45,21 @@ type
     FIndexesEnabled, FForeignKeysEnabled: Boolean;
     FScript: IioDBBuilderSqlScript;
     FSequences: TioDBBuilderSchemaSequences;
+    FSqlGenerator: IioDBBuilderSqlGenerator;
     FStatus: TioDBBuilderStatus;
     FTables: TioDBBuilderSchemaTables;
     function GetForeignKeysEnabled: Boolean;
     function GetIndexesEnabled: Boolean;
     function GetScript: IioDBBuilderSqlScript;
     function GetSequences: TioDBBuilderSchemaSequences;
+    function GetSqlGenerator: IioDBBuilderSqlGenerator;
     function GetTables: TioDBBuilderSchemaTables;
     // Status
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const AValue: TioDBBuilderStatus);
   public
-    constructor Create({const AConnectionDefName: String; }const AIndexesEnabled, AForeignKeysEnabled: Boolean);
+    constructor Create(const AIndexesEnabled, AForeignKeysEnabled: Boolean;
+      const ASqlGenerator: IioDBBuilderSqlGenerator);
     destructor Destroy; override;
 
     function FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
@@ -67,6 +70,7 @@ type
     property IndexesEnabled: boolean read GetIndexesEnabled;
     property Script: IioDBBuilderSqlScript read GetScript;
     property Sequences: TioDBBuilderSchemaSequences read GetSequences;
+    property SqlGenerator: IioDBBuilderSqlGenerator read GetSqlGenerator;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
     property Tables: TioDBBuilderSchemaTables read GetTables;
   end;
@@ -74,16 +78,19 @@ type
 implementation
 
 uses
-  iORM.DBBuilder.Factory, iORM.Exceptions, System.SysUtils, iORM.DB.ConnectionContainer, iORM.DB.Factory;
+  iORM.DBBuilder.Factory, iORM.Exceptions, System.SysUtils, iORM.DB.ConnectionContainer, iORM.DB.Factory,
+  iORM.CommonTypes;
 
 { TioDBBuilderSchema }
 
-constructor TioDBBuilderSchema.Create(const AIndexesEnabled, AForeignKeysEnabled: Boolean);
+constructor TioDBBuilderSchema.Create(const AIndexesEnabled, AForeignKeysEnabled: Boolean;
+  const ASqlGenerator: IioDBBuilderSqlGenerator);
 begin
   FScript := TioDBBuilderFactory.NewSqlScript;
   FSequences := TioDBBuilderSchemaSequences.Create;
   FIndexesEnabled := AIndexesEnabled;
   FForeignKeysEnabled := AForeignKeysEnabled;
+  FSqlGenerator := ASqlGenerator;
   FStatus := stClean;
   FTables := TioDBBuilderSchemaTables.Create;
 end;
@@ -98,12 +105,19 @@ end;
 function TioDBBuilderSchema.FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
 var
   LTableName: String;
+  LKeyGenStrategy: TioKeyGenerationStrategy;
 begin
   LTableName := AMap.GetTable.TableName;
   if not FTables.ContainsKey(LTableName) then
-    FTables.Add(LTableName, TioDBBuilderFactory.NewSchemaTable(AMap.GetTable));
+  begin
+    // Resolve kgsAuto to actual DBMS-specific strategy
+    LKeyGenStrategy := AMap.GetTable.GetKeyGenerationStrategy;
+    if LKeyGenStrategy = kgsAuto then
+      LKeyGenStrategy := FSqlGenerator.GetDefaultKeyGenerationStrategy;
+    FTables.Add(LTableName, TioDBBuilderFactory.NewSchemaTable(AMap.GetTable, LKeyGenStrategy));
+  end;
   Result := FTables.Items[LTableName];
-  // NB: Se anche una sola classe mappata su questa tabella � TrueClass allora IsTrueClass deve essere true
+  // NB: Se anche una sola classe mappata su questa tabella e' TrueClass allora IsTrueClass deve essere true
   // (vedi setter nella classe)
   Result.IsTrueClass := AMap.GetTable.IsTrueClass;
 end;
@@ -147,6 +161,11 @@ end;
 function TioDBBuilderSchema.GetSequences: TioDBBuilderSchemaSequences;
 begin
   Result := FSequences;
+end;
+
+function TioDBBuilderSchema.GetSqlGenerator: IioDBBuilderSqlGenerator;
+begin
+  Result := FSqlGenerator;
 end;
 
 procedure TioDBBuilderSchema.SetStatus(const AValue: TioDBBuilderStatus);
