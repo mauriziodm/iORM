@@ -64,7 +64,7 @@ type
       const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLazyLoad: Boolean; const ANotHasMany: Boolean;
       const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
       const AMetadata_FieldScale: Integer; const AMetadata_FieldNotNull: Boolean; const AMetadata_Default: TValue; const AMetadata_FieldUnicode: Boolean;
-      const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string; const AMetadata_FKCreate: TioFKCreate;
+      const AMetadata_CustomFieldType: string; const AMetadata_FieldSubtype: string; const AMetadata_FKCreate: TioFKCreate;
       const AMetadata_FKOnDeleteAction: TioFKAction; const AMetadata_FKOnUpdateAction: TioFKAction): IioProperty;
   public
     class function Context_PSRequest(const APSRequest: IioPersistenceStrategyRequest; const AClassName: String): IioContext;
@@ -222,7 +222,7 @@ class function TioContextFactory.GetProperty(const ATable: IioTable; const AMemb
   const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLazyLoad: Boolean; const ANotHasMany: Boolean;
   const AMetadata_FieldType: TioMetadataFieldType; const AMetadata_FieldLength: Integer; const AMetadata_FieldPrecision: Integer;
   const AMetadata_FieldScale: Integer; const AMetadata_FieldNotNull: Boolean; const AMetadata_Default: TValue; const AMetadata_FieldUnicode: Boolean;
-  const AMetadata_CustomFieldType: string; const AMetadata_FieldSubType: string; const AMetadata_FKCreate: TioFKCreate;
+  const AMetadata_CustomFieldType: string; const AMetadata_FieldSubtype: string; const AMetadata_FKCreate: TioFKCreate;
   const AMetadata_FKOnDeleteAction: TioFKAction; const AMetadata_FKOnUpdateAction: TioFKAction): IioProperty;
 begin
   if AMember is TRttiField then
@@ -230,14 +230,14 @@ begin
     Result := TioField.Create(AMember as TRttiField, ATable, ATypeAlias, ASqlFieldName, ALoadSql, AFieldType, ATransient, AIsID, AReadWrite, ARelationType,
       ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLazyLoad, ANotHasMany, AMetadata_FieldType, AMetadata_FieldLength,
       AMetadata_FieldPrecision, AMetadata_FieldScale, AMetadata_FieldNotNull, AMetadata_Default, AMetadata_FieldUnicode, AMetadata_CustomFieldType,
-      AMetadata_FieldSubType, AMetadata_FKCreate, AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction);
+      AMetadata_FieldSubtype, AMetadata_FKCreate, AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction);
   end
   else if AMember is TRttiProperty then
   begin
     Result := TioProperty.Create(AMember as TRttiProperty, ATable, ATypeAlias, ASqlFieldName, ALoadSql, AFieldType, ATransient, AIsID, AReadWrite,
       ARelationType, ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationLazyLoad, ANotHasMany, AMetadata_FieldType,
       AMetadata_FieldLength, AMetadata_FieldPrecision, AMetadata_FieldScale, AMetadata_FieldNotNull, AMetadata_Default, AMetadata_FieldUnicode,
-      AMetadata_CustomFieldType, AMetadata_FieldSubType, AMetadata_FKCreate, AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction);
+      AMetadata_CustomFieldType, AMetadata_FieldSubtype, AMetadata_FKCreate, AMetadata_FKOnDeleteAction, AMetadata_FKOnUpdateAction);
   end
   else
     raise EioGenericException.Create(Self.ClassName, 'GetProperty', 'Invalid member type');
@@ -289,7 +289,7 @@ var
     LForeignKeyAttributeExists: Boolean;
     // DB field metadata (DBBuilder)
     LDB_FieldType: TioMetadataFieldType;
-    LDB_FieldSubType: string;
+    LDB_FieldSubtype: string;
     LDB_FieldLength: Integer;
     LDB_FieldPrecision: Integer;
     LDB_FieldScale: Integer;
@@ -360,7 +360,7 @@ var
       LDB_Default := nil;
       LDB_FieldUnicode := True;
       LDB_CustomFieldType := '';
-      LDB_FieldSubType := '';
+      LDB_FieldSubtype := '';
       LDB_FKAutoCreate := fkCreate;
       LDB_FKOnDeleteAction := fkUnspecified;
       LDB_FKOnUpdateAction := fkUnspecified;
@@ -390,7 +390,7 @@ var
       if LMember_FieldValueType.Name = GetTypeName(TypeInfo(TioObjStatus)) then
       begin
         Result.ObjStatusProperty := Self.GetProperty(ATable, LMember, '', '', '', '', True, False, lpLoadOnly, rtNone, '', '', '', False, True, LDB_FieldType,
-          LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate,
+          LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType, LDB_FieldSubtype, LDB_FKAutoCreate,
           LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
         Continue;
       end
@@ -402,7 +402,7 @@ var
             LMember_FieldName := ioField(LAttribute).Value;
           Result.ObjVersionProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone, '', '', '',
             False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType,
-            LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
+            LDB_FieldSubtype, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
           Result.Add(Result.ObjVersionProperty);
           Continue;
         end
@@ -414,7 +414,7 @@ var
               LMember_FieldName := ioField(LAttribute).Value;
             Result.ObjCreatedProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone, '', '', '',
               False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode, LDB_CustomFieldType,
-              LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
+              LDB_FieldSubtype, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
             Result.Add(Result.ObjCreatedProperty);
             Continue;
           end
@@ -426,7 +426,7 @@ var
                 LMember_FieldName := ioField(LAttribute).Value;
               Result.ObjCreatedUserIDProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone, '',
                 '', '', False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode,
-                LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
+                LDB_CustomFieldType, LDB_FieldSubtype, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
               Result.Add(Result.ObjCreatedUserIDProperty);
               Continue;
             end
@@ -438,7 +438,7 @@ var
                   LMember_FieldName := ioField(LAttribute).Value;
                 Result.ObjCreatedUserNameProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone,
                   '', '', '', False, True, LDB_FieldType, IO_USERNAME_LENGTH, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode,
-                  LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
+                  LDB_CustomFieldType, LDB_FieldSubtype, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
                 Result.Add(Result.ObjCreatedUserNameProperty);
                 Continue;
               end
@@ -450,7 +450,7 @@ var
                     LMember_FieldName := ioField(LAttribute).Value;
                   Result.ObjUpdatedProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone, '', '',
                     '', False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode,
-                    LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
+                    LDB_CustomFieldType, LDB_FieldSubtype, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
                   Result.Add(Result.ObjUpdatedProperty);
                   Continue;
                 end
@@ -462,7 +462,7 @@ var
                       LMember_FieldName := ioField(LAttribute).Value;
                     Result.ObjUpdatedUserIDProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist, rtNone,
                       '', '', '', False, True, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil, LDB_FieldUnicode,
-                      LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
+                      LDB_CustomFieldType, LDB_FieldSubtype, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
                     Result.Add(Result.ObjUpdatedUserIDProperty);
                     Continue;
                   end
@@ -474,7 +474,7 @@ var
                         LMember_FieldName := ioField(LAttribute).Value;
                       Result.ObjUpdatedUserNameProperty := Self.GetProperty(ATable, LMember, '', LMember_FieldName, '', '', False, False, lpLoadAndPersist,
                         rtNone, '', '', '', False, True, LDB_FieldType, IO_USERNAME_LENGTH, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull, nil,
-                        LDB_FieldUnicode, LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
+                        LDB_FieldUnicode, LDB_CustomFieldType, LDB_FieldSubtype, LDB_FKAutoCreate, LDB_FKOnUpdateAction, LDB_FKOnDeleteAction);
                       Result.Add(Result.ObjUpdatedUserNameProperty);
                       Continue;
                     end;
@@ -646,7 +646,7 @@ var
           else if LAttribute is ioBinary then
           begin
             LDB_FieldType := ioMdBinary;
-            LDB_FieldSubType := ioBinary(LAttribute).BinarySubType
+            LDB_FieldSubtype := ioBinary(LAttribute).BinarySubtype
           end
 
           else if LAttribute is ioFTCustom then
@@ -703,7 +703,7 @@ var
       LNewProperty := GetProperty(ATable, LMember, LMember_TypeAlias, LMember_FieldName, LMember_LoadSql, LMember_FieldType, LMember_Transient, LMember_IsID,
         LMember_LoadPersist, LMember_RelationType, LMember_RelationChildTypeName, LMember_RelationChildTypeAlias, LMember_RelationChildPropertyName,
         LMember_RelationChildLazyLoad, LMember_RelationAutodetectEnabled, LDB_FieldType, LDB_FieldLength, LDB_FieldPrecision, LDB_FieldScale, LDB_FieldNotNull,
-        LDB_Default, LDB_FieldUnicode, LDB_CustomFieldType, LDB_FieldSubType, LDB_FKAutoCreate, LDB_FKOnDeleteAction, LDB_FKOnUpdateAction);
+        LDB_Default, LDB_FieldUnicode, LDB_CustomFieldType, LDB_FieldSubtype, LDB_FKAutoCreate, LDB_FKOnDeleteAction, LDB_FKOnUpdateAction);
       LNewProperty.WhereCompareOp := LWhereCompareOp;
       LNewProperty.WhereGroupLogicOp := LWhereGroupLogicOp;
       LNewProperty.WhereGroupName := LWhereGroupName;

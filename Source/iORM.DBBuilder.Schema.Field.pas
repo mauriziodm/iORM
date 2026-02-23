@@ -51,7 +51,7 @@ type
     function GetFieldLength: integer;
     function GetFieldPrecision: integer;
     function GetFieldScale: integer;
-    function GetFieldSubType: string;
+    function GetFieldSubtype: string;
     function GetFieldType: TioMetadataFieldType;
     function GetFieldUnicode: boolean;
     function GetFieldNotNull: Boolean;
@@ -84,7 +84,7 @@ type
     property SqlFieldName: String read GetSqlFieldName;
     property FieldPrecision: integer read GetFieldPrecision;
     property FieldScale: integer read GetFieldScale;
-    property FieldSubType: string read GetFieldSubType;
+    property FieldSubtype: string read GetFieldSubtype;
     property FieldType: TioMetadataFieldType read GetFieldType;
     property FieldUnicode: boolean read GetFieldUnicode;
     property FieldNotNull: boolean read GetFieldNotNull;
@@ -161,9 +161,9 @@ begin
   Result := FContextProperty.GetMetadata_FieldScale;
 end;
 
-function TioDBBuilderSchemaField.GetFieldSubType: string;
+function TioDBBuilderSchemaField.GetFieldSubtype: string;
 begin
-  Result := FContextProperty.GetMetadata_FieldSubType;
+  Result := FContextProperty.GetMetadata_FieldSubtype;
 end;
 
 function TioDBBuilderSchemaField.GetFieldType: TioMetadataFieldType;

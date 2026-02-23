@@ -227,10 +227,10 @@ type
   // Define Binary Type (Binary Data)
   ioBinary = class(TioCustomAttribute)
   strict private
-    FBinarySubType: string;
+    FBinarySubtype: string;
   public
-    constructor Create(const ABinarySubType: string = '');
-    property BinarySubType: string read FBinarySubType;
+    constructor Create(const ABinarySubtype: string = '');
+    property BinarySubtype: string read FBinarySubtype;
   end;
 
   // Default value for the DB field (SQL DEFAULT)
@@ -892,9 +892,9 @@ end;
 
 { ioBinary }
 
-constructor ioBinary.Create(const ABinarySubType: string);
+constructor ioBinary.Create(const ABinarySubtype: string);
 begin
-  FBinarySubType := ABinarySubType;
+  FBinarySubtype := ABinarySubtype;
 end;
 
 constructor TioCustomForTargetModel.Create(ATargetIID: TGUID; const AAlias: String);

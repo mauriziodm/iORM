@@ -73,7 +73,7 @@ type
     function GetInvalidTypeConversions: string; virtual; abstract;
     function IsFieldTypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String): Boolean; virtual;
     function IsFieldNotNullChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AIsPermitted: Boolean): Boolean; virtual;
-    function IsBlobSubTypeChanged(const AOldBlobSubType, ANewBlobSubType: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean; virtual;
+    function IsBlobSubtypeChanged(const AOldBlobSubtype, ANewBlobSubtype: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean; virtual;
     // Indexes
     procedure AddOrAlterIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure CreateIndexes; overload; virtual;
@@ -445,15 +445,15 @@ begin
   end;
 end;
 
-function TioDBBuilderStrategyBase.IsBlobSubTypeChanged(const AOldBlobSubType, ANewBlobSubType: String;
+function TioDBBuilderStrategyBase.IsBlobSubtypeChanged(const AOldBlobSubtype, ANewBlobSubtype: String;
   const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean;
 begin
-  Result := AOldBlobSubType <> ANewBlobSubType;
+  Result := AOldBlobSubtype <> ANewBlobSubtype;
   if Result then
   begin
     AField.AddAltered(alFieldType);
     if not AIsPermitted then
-      WarningValueChanged('blob sub-type', AOldBlobSubType, ANewBlobSubType, AField, ATable);
+      WarningValueChanged('blob sub-type', AOldBlobSubtype, ANewBlobSubtype, AField, ATable);
   end;
 end;
 

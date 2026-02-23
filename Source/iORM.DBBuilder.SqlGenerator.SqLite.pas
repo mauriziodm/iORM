@@ -49,11 +49,6 @@ type
   TioDBBuilderSqlGenSQLite = class(TioDBBuilderSqlGenBase)
   protected
     // ==========================================================
-    // RDBMS INFO METHODS
-    // ----------------------------------------------------------
-    function LoadRDBMSInfo: IioDBBuilderSchemaRDBMSInfo; override;
-
-    // ==========================================================
     // DATABASE RELATED METHODS
     // ----------------------------------------------------------
     procedure CreateDatabase; override;
@@ -62,10 +57,10 @@ type
     // ==========================================================
     // TABLE RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
-    function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_BeginAlterTable(const ATable: IioDBBuilderSchemaTable): string; override;
+    function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_EndAlterTable(const ATable: IioDBBuilderSchemaTable): string; override;
+    function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_TableExists(const ATableName: string): string; override;
 
     // ==========================================================
@@ -96,18 +91,19 @@ type
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; override;
 
     // ==========================================================
-    // KEY GENERATION CAPABILITY METHODS
-    // ----------------------------------------------------------
-    function SupportsIdentityForKeyGeneration: Boolean; override;
-    function SupportsSequenceForKeyGeneration: Boolean; override;
-    function GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategy; override;
-
-    // ==========================================================
-    // SEQUENCE RELATED METHODS
+    // KEY GENERATION RELATED METHODS
     // ----------------------------------------------------------
     function BuildSQL_AddSequence(const ASequenceName: String): string; override;
     function BuildSQL_DropSequence(const ASequenceName: string): string; override;
     function BuildSQL_SequenceExists(const ASequenceName: string): string; override;
+    function GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategy; override;
+    function Supports_Identity: Boolean; override;
+    function Supports_Sequence: Boolean; override;
+
+    // ==========================================================
+    // SQL GENERATOR UTILITIES
+    // ----------------------------------------------------------
+    function LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo; override;
   end;
 
 implementation
@@ -396,7 +392,7 @@ begin
   Result := Format('CREATE TABLE %s (', [ATable.SqlName]);
 end;
 
-function TioDBBuilderSqlGenSQLite.LoadRDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
+function TioDBBuilderSqlGenSQLite.LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
 var
   LQuery: IioQuery;
   LRaw, LVersion: String;
@@ -436,13 +432,13 @@ begin
   );
 end;
 
-function TioDBBuilderSqlGenSQLite.SupportsIdentityForKeyGeneration: Boolean;
+function TioDBBuilderSqlGenSQLite.Supports_Identity: Boolean;
 begin
   // SQLite uses INTEGER PRIMARY KEY which is an alias for rowid (auto-increment)
   Result := True;
 end;
 
-function TioDBBuilderSqlGenSQLite.SupportsSequenceForKeyGeneration: Boolean;
+function TioDBBuilderSqlGenSQLite.Supports_Sequence: Boolean;
 begin
   // SQLite does not support sequences
   Result := False;

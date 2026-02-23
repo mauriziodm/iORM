@@ -144,7 +144,7 @@ type
     function GetSqlFieldName: String;
     function GetFieldPrecision: integer;
     function GetFieldScale: integer;
-    function GetFieldSubType: string;
+    function GetFieldSubtype: string;
     function GetFieldType: TioMetadataFieldType;
     function GetFieldUnicode: boolean;
     function GetFieldNotNull: boolean;
@@ -158,7 +158,7 @@ type
     property SqlFieldName: String read GetSqlFieldName;
     property FieldPrecision: integer read GetFieldPrecision;
     property FieldScale: integer read GetFieldScale;
-    property FieldSubType: string read GetFieldSubType;
+    property FieldSubtype: string read GetFieldSubtype;
     property FieldType: TioMetadataFieldType read GetFieldType;
     property FieldUnicode: boolean read GetFieldUnicode;
     property FieldNotNull: boolean read GetFieldNotNull;
@@ -519,10 +519,10 @@ type
     /// Called internally by GetDBMSInfo for lazy loading.
     /// </summary>
     /// <returns>RDBMS info object with name, version, and comparison methods</returns>
-    function LoadRDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
+    function LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
     /// <summary>
     /// DBMS version information with lazy loading (loaded on first access).
-    /// Use this property instead of LoadRDBMSInfo for cached access.
+    /// Use this property instead of LoadDBMSInfo for cached access.
     /// </summary>
     property DBMSInfo: IioDBBuilderSchemaRDBMSInfo read GetDBMSInfo;
 
@@ -530,11 +530,19 @@ type
     // KEY GENERATION CAPABILITY METHODS
     // ----------------------------------------------------------
     /// <summary>Returns True if the database supports IDENTITY columns</summary>
-    function SupportsIdentityForKeyGeneration: Boolean;
+    function Supports_Identity: Boolean;
     /// <summary>Returns True if the database supports SEQUENCE objects</summary>
-    function SupportsSequenceForKeyGeneration: Boolean;
+    function Supports_Sequence: Boolean;
     /// <summary>Returns the default key generation strategy for this database</summary>
     function GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategy;
+
+    // ==========================================================
+    // ALTER TABLE CAPABILITY METHODS
+    // ----------------------------------------------------------
+    /// <summary>Returns True if the database supports ALTER COLUMN SET/DROP NOT NULL</summary>
+    function Supports_AlterNotNull: Boolean;
+    /// <summary>Returns True if the database permits BLOB subtype changes via ALTER COLUMN</summary>
+    function Supports_AlterBlobSubtype: Boolean;
 
     // ==========================================================
     // SEQUENCE RELATED METHODS

@@ -111,7 +111,7 @@ type
     procedure SetMetadata_FieldNotNull(const AMetadata_FieldNotNull: Boolean);
     procedure SetMetadata_FieldUnicode(const AMetadata_FieldUnicode: Boolean);
     procedure SetMetadata_CustomFieldType(const AMetadata_CustomFieldType: string);
-    procedure SetMetadata_FieldSubType(const AMetadata_FieldSubType: string);
+    procedure SetMetadata_FieldSubtype(const AMetadata_FieldSubtype: string);
     procedure SetMetadata_Default(const AMetadata_Default: TValue);
     procedure SetMetadata_FKCreate(const AMetadata_FKCreate: TioFKCreate);
     procedure SetMetadata_FKOnDeleteAction(const AOnDeleteAction: TioFKAction);
@@ -123,7 +123,7 @@ type
     function GetMetadata_FieldNotNull: Boolean;
     function GetMetadata_FieldUnicode: Boolean;
     function GetMetadata_CustomFieldType: string;
-    function GetMetadata_FieldSubType: string;
+    function GetMetadata_FieldSubtype: string;
     function GetMetadata_Default: TValue;
     function GetMetadata_FKCreate: TioFKCreate;
     function GetMetadata_FKOnDeleteAction: TioFKAction;

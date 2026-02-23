@@ -83,27 +83,6 @@ type
     // Main generation
     procedure GenerateDatabaseObjects(const Create: boolean); override;
 
-    // ==========================================================
-    // HOOK METHODS - Override in derived classes for RDBMS-specific behavior
-    // ==========================================================
-    /// <summary>
-    /// Hook method called during FieldModified to check NOT NULL changes.
-    /// Override to add RDBMS-specific version checks (e.g., Firebird 3.0+ for SET/DROP NOT NULL).
-    /// </summary>
-    /// <param name="AIsNotNullChangeSupported">
-    /// Set to True if NOT NULL changes are supported by this RDBMS version.
-    /// Default implementation returns True (assumes supported).
-    /// </param>
-    procedure DoGetNotNullChangeSupported(var AIsNotNullChangeSupported: Boolean); virtual;
-    /// <summary>
-    /// Hook method called during FieldModified to check if BLOB subtype changes are permitted.
-    /// Override to specify RDBMS-specific behavior.
-    /// </summary>
-    /// <param name="AIsBlobSubTypeChangePermitted">
-    /// Set to True if BLOB subtype changes are permitted by this RDBMS.
-    /// Default implementation returns True (assumes permitted).
-    /// </param>
-    procedure DoGetBlobSubTypeChangePermitted(var AIsBlobSubTypeChangePermitted: Boolean); virtual;
   public
 
   end;
@@ -209,20 +188,6 @@ begin
     Script.Body.Add(SqlGenerator.BuildSQL_AddSequence(ATable.GetSequenceName));
 end;
 
-procedure TioDBBuilderStrategyWithAlterTable.DoGetBlobSubTypeChangePermitted(var AIsBlobSubTypeChangePermitted: Boolean);
-begin
-  // Default implementation: BLOB subtype changes are permitted
-  // Override in derived classes if RDBMS doesn't support this
-  AIsBlobSubTypeChangePermitted := True;
-end;
-
-procedure TioDBBuilderStrategyWithAlterTable.DoGetNotNullChangeSupported(var AIsNotNullChangeSupported: Boolean);
-begin
-  // Default implementation: NOT NULL changes are supported
-  // Override in derived classes for version-specific checks (e.g., Firebird 3.0+)
-  AIsNotNullChangeSupported := True;
-end;
-
 procedure TioDBBuilderStrategyWithAlterTable.DropForeignKeys;
 var
   LQuery: IioQuery;
@@ -273,22 +238,19 @@ var
   LQuery: IioQuery;
 
   LNewFieldType: string;
-  LNewFieldSubType: string;
+  LNewFieldSubtype: string;
   LNewFieldLength: Smallint;
   LNewFieldPrecision: Smallint;
   LNewFieldDecimals: Smallint;
 
   LOldFieldType: string;
-  LOldFieldSubType: string;
+  LOldFieldSubtype: string;
   LOldFieldLength: Smallint;
   LOldFieldPrecision: Smallint;
   LOldFieldDecimals: Smallint;
   LOldFieldNotNull: boolean;
   LOldFieldDefault: string;
   LNewFieldDefault: string;
-
-  LIsNotNullChangeSupported: Boolean;
-  LIsBlobSubTypeChangePermitted: Boolean;
 
   function IsDecimalOrNumeric: boolean;
   begin
@@ -300,7 +262,7 @@ begin
   Result := False;
   // Load some new field informations
   LNewFieldType := SqlGenerator.Translate_SchemaField_To_FieldType(AField, False);  // False = do NOT include attributes (only base type)
-  LNewFieldSubType := IfThen(AField.FieldSubType.IsEmpty, '0', AField.FieldSubType);
+  LNewFieldSubtype := IfThen(AField.FieldSubtype.IsEmpty, '0', AField.FieldSubtype);
   LNewFieldLength := AField.FieldLength;
   LNewFieldPrecision := AField.FieldPrecision;
   LNewFieldDecimals := AField.FieldScale;
@@ -315,7 +277,7 @@ begin
 
   // Load some old field informations
   LOldFieldType := LQuery.Fields.FieldByName('field_type').AsString;
-  LOldFieldSubType := LQuery.Fields.FieldByName('field_subtype').AsString;
+  LOldFieldSubtype := LQuery.Fields.FieldByName('field_subtype').AsString;
   LOldFieldDecimals := Abs(LQuery.Fields.FieldByName('field_scale').AsInteger);
   LOldFieldNotNull := LQuery.Fields.FieldByName('field_not_null').AsInteger = 1;
   LOldFieldLength := LQuery.Fields.FieldByName('field_length').AsInteger;
@@ -343,15 +305,13 @@ begin
   Result := Result or IsFieldDefaultChanged(LOldFieldDefault, LNewFieldDefault, AField);
 
   // Verify if NotNull is changed
-  // Hook method to check if NOT NULL changes are supported by this RDBMS version
-  DoGetNotNullChangeSupported(LIsNotNullChangeSupported);
-  Result := Result or IsFieldNotNullChanged(ATable, AField, LOldFieldNotNull, AField.FieldNotNull, LIsNotNullChangeSupported);
+  // Check if NOT NULL changes are supported by this RDBMS version
+  Result := Result or IsFieldNotNullChanged(ATable, AField, LOldFieldNotNull, AField.FieldNotNull, SqlGenerator.Supports_AlterNotNull);
 
   // Verify if blob subtype is changed
-  // Hook method to check if BLOB subtype changes are permitted by this RDBMS
-  DoGetBlobSubTypeChangePermitted(LIsBlobSubTypeChangePermitted);
+  // Check if BLOB subtype changes are permitted by this RDBMS
   if LNewFieldType.StartsWith('BLOB') then
-    Result := Result or IsBlobSubTypeChanged(LOldFieldSubType, LNewFieldSubType, AField, ATable, LIsBlobSubTypeChangePermitted);
+    Result := Result or IsBlobSubtypeChanged(LOldFieldSubtype, LNewFieldSubtype, AField, ATable, SqlGenerator.Supports_AlterBlobSubtype);
 end;
 
 function TioDBBuilderStrategyWithAlterTable.ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;

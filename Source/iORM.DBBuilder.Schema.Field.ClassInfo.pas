@@ -55,7 +55,7 @@ type
     function GetFieldLength: integer;
     function GetFieldPrecision: integer;
     function GetFieldScale: integer;
-    function GetFieldSubType: string;
+    function GetFieldSubtype: string;
     function GetFieldType: TioMetadataFieldType;
     function GetFieldUnicode: boolean;
     function GetFieldNotNull: Boolean;
@@ -163,7 +163,7 @@ begin
   Result := 0;
 end;
 
-function TioDBBuilderSchemaFieldClassInfo.GetFieldSubType: string;
+function TioDBBuilderSchemaFieldClassInfo.GetFieldSubtype: string;
 begin
   Result := '';
 end;

@@ -55,54 +55,6 @@ type
     FDataConverter: TioSqlDataConverterRef;
     FDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
   protected
-    /// <summary>
-    /// Returns the maximum allowed length for SQL identifiers (table names, column names, etc.) for this database.
-    /// Base implementation returns 0 (no limit). Derived classes should override to enforce database-specific limits.
-    /// </summary>
-    /// <returns>Maximum identifier length, or 0 if no limit applies</returns>
-    /// <remarks>
-    /// Examples: Firebird 2.5 = 31 chars, Firebird 3+ = 63 chars, SQLite = effectively unlimited
-    /// </remarks>
-    function GetMaxSqlIdentifierLength: integer; virtual;
-    /// <summary>
-    /// Returns the minimum required length for SQL identifiers for this database.
-    /// Base implementation returns 0 (no minimum). Derived classes should override if database has minimum requirements.
-    /// </summary>
-    /// <returns>Minimum identifier length, or 0 if no minimum applies</returns>
-    function GetMinSqlIdentifierLength: integer; virtual;
-    /// <summary>
-    /// Checks if an identifier name exceeds the maximum allowed length for this database.
-    /// </summary>
-    /// <param name="AIdentifierName">The identifier name to check</param>
-    /// <returns>True if the name is too long, False otherwise</returns>
-    function IsSqlIdentifierTooLong(const AIdentifierName: string): boolean; virtual;
-    /// <summary>
-    /// Checks if an identifier name is shorter than the minimum required length for this database.
-    /// </summary>
-    /// <param name="AIdentifierName">The identifier name to check</param>
-    /// <returns>True if the name is too short, False otherwise</returns>
-    function IsSqlIdentifierTooShort(const AIdentifierName: string): boolean; virtual;
-    /// <summary>
-    /// Shortens an identifier name to fit within the specified maximum length by generating a hash.
-    /// If the name is already within the limit, it is returned unchanged.
-    /// </summary>
-    /// <param name="AIdentifierName">The identifier name to shorten (must not be empty)</param>
-    /// <param name="AMaxLength">The maximum allowed length (must be positive)</param>
-    /// <returns>The shortened identifier name (or original if already within limit)</returns>
-    /// <exception cref="EioGenericException">Raised if AIdentifierName is empty or AMaxLength is not positive</exception>
-    function ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
-    /// <summary>
-    /// Escapes single quotes in SQL string literals by doubling them (standard SQL escaping).
-    /// Used when embedding string values in SQL queries (e.g., WHERE name = 'value').
-    /// NOT for SQL identifiers (table/column names) - those use database-specific delimiters.
-    /// </summary>
-    /// <param name="AStringLiteral">The string value to escape</param>
-    /// <returns>Escaped string safe for embedding in SQL queries</returns>
-    /// <example>
-    /// "Table'Name" becomes "Table''Name"
-    /// </example>
-    function EscapeSQLStringLiteral(const AStringLiteral: string): string; virtual;
-
     // ==========================================================
     // DATABASE RELATED METHODS
     // ----------------------------------------------------------
@@ -117,6 +69,10 @@ type
     function BuildSQL_EndAlterTable(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     function BuildSQL_TableExists(const ATableName: string): string; virtual; abstract;
+    /// <summary>Returns True if the database supports ALTER COLUMN SET/DROP NOT NULL</summary>
+    function Supports_AlterNotNull: Boolean; virtual;
+    /// <summary>Returns True if the database permits BLOB subtype changes via ALTER COLUMN</summary>
+    function Supports_AlterBlobSubtype: Boolean; virtual;
 
     // ==========================================================
     // FIELD RELATED METHODS
@@ -183,29 +139,7 @@ type
     function Translate_SchemaTableAndFK_To_FKName(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual;
 
     // ==========================================================
-    // DBMS INFO METHODS
-    // ----------------------------------------------------------
-    /// <summary>
-    /// Returns DBMS version info with lazy loading (loads on first access).
-    /// </summary>
-    function GetDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
-    /// <summary>
-    /// Loads DBMS info from database. Called internally by GetDBMSInfo.
-    /// </summary>
-    function LoadRDBMSInfo: IioDBBuilderSchemaRDBMSInfo; virtual; abstract;
-
-    // ==========================================================
-    // KEY GENERATION CAPABILITY METHODS
-    // ----------------------------------------------------------
-    /// <summary>Returns True if the database supports IDENTITY columns</summary>
-    function SupportsIdentityForKeyGeneration: Boolean; virtual; abstract;
-    /// <summary>Returns True if the database supports SEQUENCE objects</summary>
-    function SupportsSequenceForKeyGeneration: Boolean; virtual; abstract;
-    /// <summary>Returns the default key generation strategy for this database</summary>
-    function GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategy; virtual; abstract;
-
-    // ==========================================================
-    // SEQUENCE RELATED METHODS
+    // KEY GENERATION RELATED METHODS
     // ----------------------------------------------------------
     /// <summary>Generates SQL to create a sequence</summary>
     function BuildSQL_AddSequence(const ASequenceName: String): string; virtual; abstract;
@@ -213,13 +147,66 @@ type
     function BuildSQL_DropSequence(const ASequenceName: string): string; virtual; abstract;
     /// <summary>Generates SQL to check if a sequence exists</summary>
     function BuildSQL_SequenceExists(const ASequenceName: string): string; virtual; abstract;
+    /// <summary>Returns the default key generation strategy for this database</summary>
+    function GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategy; virtual; abstract;
+    /// <summary>Returns True if the database supports IDENTITY columns</summary>
+    function Supports_Identity: Boolean; virtual; abstract;
+    /// <summary>Returns True if the database supports SEQUENCE objects</summary>
+    function Supports_Sequence: Boolean; virtual; abstract;
     // ==========================================================
 
+    // ==========================================================
+    // SQL GENERATOR UTILITIES
+    // ----------------------------------------------------------
+    /// <summary>
+    /// Returns DBMS version info with lazy loading (loads on first access).
+    /// </summary>
+    function GetDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
+    /// <summary>
+    /// Returns the maximum allowed length for SQL identifiers (table names, column names, etc.) for this database.
+    /// Base implementation returns 0 (no limit). Derived classes should override to enforce database-specific limits.
+    /// </summary>
+    /// <returns>Maximum identifier length, or 0 if no limit applies</returns>
+    /// <remarks>
+    /// Examples: Firebird 2.5 = 31 chars, Firebird 3+ = 63 chars, SQLite = effectively unlimited
+    /// </remarks>
+    function GetMaxSqlIdentifierLength: integer; virtual;
+    /// <summary>
+    /// Checks if an identifier name exceeds the maximum allowed length for this database.
+    /// </summary>
+    /// <param name="AIdentifierName">The identifier name to check</param>
+    /// <returns>True if the name is too long, False otherwise</returns>
+    function IsSqlIdentifierTooLong(const AIdentifierName: string): boolean; virtual;
+    /// <summary>
+    /// Loads DBMS info from database. Called internally by GetDBMSInfo.
+    /// </summary>
+    function LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo; virtual; abstract;
+    /// <summary>
+    /// Shortens an identifier name to fit within the specified maximum length by generating a hash.
+    /// If the name is already within the limit, it is returned unchanged.
+    /// </summary>
+    /// <param name="AIdentifierName">The identifier name to shorten (must not be empty)</param>
+    /// <param name="AMaxLength">The maximum allowed length (must be positive)</param>
+    /// <returns>The shortened identifier name (or original if already within limit)</returns>
+    /// <exception cref="EioGenericException">Raised if AIdentifierName is empty or AMaxLength is not positive</exception>
+    function ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
+    /// <summary>
+    /// Escapes single quotes in SQL string literals by doubling them (standard SQL escaping).
+    /// Used when embedding string values in SQL queries (e.g., WHERE name = 'value').
+    /// NOT for SQL identifiers (table/column names) - those use database-specific delimiters.
+    /// </summary>
+    /// <param name="AStringLiteral">The string value to escape</param>
+    /// <returns>Escaped string safe for embedding in SQL queries</returns>
+    /// <example>
+    /// "Table'Name" becomes "Table''Name"
+    /// </example>
+    function EscapeSQLStringLiteral(const AStringLiteral: string): string; virtual;
+
+    // Properties
     property ConnectionDefName: string read FConnectionDefName;
     property DataConverter: TioSqlDataConverterRef read FDataConverter;
     property DBMSInfo: IioDBBuilderSchemaRDBMSInfo read GetDBMSInfo;
     property MaxSqlIdentifierLength: integer read GetMaxSqlIdentifierLength;
-    property MinSqlIdentifierLength: integer read GetMinSqlIdentifierLength;
   public
     constructor Create(const AConnectionDefName: string); virtual;
   end;
@@ -399,7 +386,7 @@ end;
 function TioDBBuilderSqlGenBase.GetDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
 begin
   if not Assigned(FDBMSInfo) then
-    FDBMSInfo := LoadRDBMSInfo;
+    FDBMSInfo := LoadDBMSInfo;
   Result := FDBMSInfo;
 end;
 
@@ -434,12 +421,6 @@ begin
   Result := 0;
 end;
 
-function TioDBBuilderSqlGenBase.GetMinSqlIdentifierLength: integer;
-begin
-  Result := 0;
-end;
-
-
 function TioDBBuilderSqlGenBase.ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
 begin
   // Input validation
@@ -453,11 +434,6 @@ begin
     Result := THashSHA2.GetHashString(AIdentifierName).Substring(0, AMaxLength)
   else
     Result := AIdentifierName;
-end;
-
-function TioDBBuilderSqlGenBase.IsSqlIdentifierTooShort(const AIdentifierName: string): boolean;
-begin
-  Result := Length(AIdentifierName) < MinSqlIdentifierLength;
 end;
 
 function TioDBBuilderSqlGenBase.IsSqlIdentifierTooLong(const AIdentifierName: string): boolean;
@@ -483,6 +459,20 @@ begin
   // Generates SQL to drop a foreign key (delegates to BuildSQL_DropFKbyName after translating schema FK to FK name)
   LFKName := Translate_SchemaTableAndFK_To_FKName(ATable, AForeignKey);
   Result := BuildSQL_DropFKbyName(ATable.Name, LFKName);
+end;
+
+function TioDBBuilderSqlGenBase.Supports_AlterNotNull: Boolean;
+begin
+  // Default: ALTER COLUMN SET/DROP NOT NULL is supported
+  // Override in derived classes for version-specific checks (e.g., Firebird 3.0+)
+  Result := True;
+end;
+
+function TioDBBuilderSqlGenBase.Supports_AlterBlobSubtype: Boolean;
+begin
+  // Default: BLOB subtype changes via ALTER COLUMN are permitted
+  // Override in derived classes if RDBMS doesn't support this
+  Result := True;
 end;
 
 end.

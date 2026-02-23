@@ -51,15 +51,6 @@ type
   private
     function _BuildSQL_CreateOrAddField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): String;
   protected
-    function GetMaxSqlIdentifierLength: integer; override;
-    function GetMinSqlIdentifierLength: integer; override;
-
-    // ==========================================================
-    // RDBMS INFO METHODS
-    // ----------------------------------------------------------
-    function LoadRDBMSInfo: IioDBBuilderSchemaRDBMSInfo; override;
-    // ==========================================================
-
     // ==========================================================
     // DATABASE RELATED METHODS
     // ----------------------------------------------------------
@@ -74,6 +65,8 @@ type
     function BuildSQL_EndAlterTable(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_TableExists(const ATableName: string): string; override;
+    function Supports_AlterNotNull: Boolean; override;
+    function Supports_AlterBlobSubtype: Boolean; override;
 
     // ==========================================================
     // FIELD RELATED METHODS
@@ -102,21 +95,22 @@ type
     function BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string; override;
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; override;
-    // ==========================================================
 
     // ==========================================================
-    // SEQUENCE RELATED METHODS
+    // KEY GENERATION RELATED METHODS
     // ----------------------------------------------------------
     function BuildSQL_AddSequence(const ASequenceName: String): string; override;
     function BuildSQL_DropSequence(const ASequenceName: string): string; override;
     function BuildSQL_SequenceExists(const ASequenceName: string): string; override;
+    function GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategy; override;
+    function Supports_Identity: Boolean; override;
+    function Supports_Sequence: Boolean; override;
 
     // ==========================================================
-    // KEY GENERATION CAPABILITY METHODS
+    // SQL GENERATOR UTILITIES
     // ----------------------------------------------------------
-    function SupportsIdentityForKeyGeneration: Boolean; override;
-    function SupportsSequenceForKeyGeneration: Boolean; override;
-    function GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategy; override;
+    function GetMaxSqlIdentifierLength: integer; override;
+    function LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo; override;
   end;
 
 implementation
@@ -141,7 +135,6 @@ uses
 
 const
   MAX_IDENTIFIER_NAME_LENGTH = 31;
-  MIN_IDENTIFIER_NAME_LENGTH = 4;
 
 
 { TioDBBuilderSqlGenFirebird }
@@ -483,11 +476,6 @@ begin
   Result := MAX_IDENTIFIER_NAME_LENGTH;
 end;
 
-function TioDBBuilderSqlGenFirebird.GetMinSqlIdentifierLength: integer;
-begin
-  Result := MIN_IDENTIFIER_NAME_LENGTH;
-end;
-
 function TioDBBuilderSqlGenFirebird.BuildSQL_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
 begin
   Result := _BuildSQL_CreateOrAddField(ATable, AField);
@@ -555,7 +543,7 @@ end;
 
 function TioDBBuilderSqlGenFirebird.Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String;
 var
-  LSubType: Integer;
+  LSubtype: Integer;
 begin
   case AField.FieldType of
     ioMdVarchar:
@@ -599,16 +587,16 @@ begin
       Result := 'BLOB';
       if AIncludeTypeAttributes then
       begin
-        // Validate SubType if specified
-        if not AField.FieldSubType.IsEmpty then
+        // Validate Subtype if specified
+        if not AField.FieldSubtype.IsEmpty then
         begin
-          LSubType := StrToIntDef(AField.FieldSubType, -1);
-          if (LSubType < 0) or (LSubType > 32767) then
+          LSubtype := StrToIntDef(AField.FieldSubtype, -1);
+          if (LSubtype < 0) or (LSubtype > 32767) then
             raise EioDBBuilderException.Create(ClassName, 'Translate_SchemaField_To_FieldType',
               Format('Invalid BLOB SUB_TYPE "%s" for field "%s". Valid range: 0-32767 (0=binary, 1=text, 2+=user-defined)',
-                [AField.FieldSubType, AField.FieldName]));
+                [AField.FieldSubtype, AField.FieldName]));
         end;
-        Result := Result + Format(' SUB_TYPE %s', [IfThen(AField.FieldSubType.IsEmpty, '0', AField.FieldSubType)]);
+        Result := Result + Format(' SUB_TYPE %s', [IfThen(AField.FieldSubtype.IsEmpty, '0', AField.FieldSubtype)]);
       end;
     end;
     ioMdCustomFieldType:
@@ -618,7 +606,7 @@ begin
   end;
 end;
 
-function TioDBBuilderSqlGenFirebird.LoadRDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
+function TioDBBuilderSqlGenFirebird.LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
 var
   LQuery: IioQuery;
   LRaw, LVersion: String;
@@ -670,15 +658,13 @@ begin
   );
 end;
 
-function TioDBBuilderSqlGenFirebird.SupportsIdentityForKeyGeneration: Boolean;
+function TioDBBuilderSqlGenFirebird.Supports_Identity: Boolean;
 begin
   // Firebird supports IDENTITY columns from version 3.0+
-  // Note: Runtime version check would require database connection, so we return True
-  // and let runtime errors occur if used on older versions
-  Result := True;
+  Result := DBMSInfo.IsAtLeast(3, 0);
 end;
 
-function TioDBBuilderSqlGenFirebird.SupportsSequenceForKeyGeneration: Boolean;
+function TioDBBuilderSqlGenFirebird.Supports_Sequence: Boolean;
 begin
   // Firebird has always supported sequences (called generators)
   Result := True;
@@ -688,6 +674,18 @@ function TioDBBuilderSqlGenFirebird.GetDefaultKeyGenerationStrategy: TioKeyGener
 begin
   // Firebird default: use Sequence for backward compatibility
   Result := kgsSequence;
+end;
+
+function TioDBBuilderSqlGenFirebird.Supports_AlterNotNull: Boolean;
+begin
+  // Firebird: SET NOT NULL / DROP NOT NULL is only supported from Firebird 3.0+
+  Result := DBMSInfo.IsAtLeast(3, 0);
+end;
+
+function TioDBBuilderSqlGenFirebird.Supports_AlterBlobSubtype: Boolean;
+begin
+  // Firebird: BLOB subtype changes are NOT permitted
+  Result := False;
 end;
 
 end.

@@ -51,16 +51,14 @@ type
   TioDBBuilderSqlGenMSSqlServer = class(TioDBBuilderSqlGenBase, IioDBBuilderSqlGenerator)
   protected
     // ==========================================================
-    // RDBMS INFO METHODS
-    // ----------------------------------------------------------
-    function LoadRDBMSInfo: IioDBBuilderSchemaRDBMSInfo; override;
-    // ==========================================================
-
-    // ==========================================================
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
     function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
+
     // ==========================================================
+    // SQL GENERATOR UTILITIES
+    // ----------------------------------------------------------
+    function LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo; override;
   end;
 
 implementation
@@ -74,7 +72,7 @@ uses
 
 { TioDBBuilderSqlGenMSSqlServer }
 
-function TioDBBuilderSqlGenMSSqlServer.LoadRDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
+function TioDBBuilderSqlGenMSSqlServer.LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
 var
   LQuery: IioQuery;
   LRaw, LVersion: String;
