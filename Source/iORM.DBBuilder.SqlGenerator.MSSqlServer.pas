@@ -59,7 +59,7 @@ type
     // ==========================================================
     // KEY GENERATION CAPABILITY METHODS
     // ----------------------------------------------------------
-    function GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategy; override;
+    function ResolveKeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategy): TioKeyGenerationStrategy; override;
     function Supports_Identity: Boolean; override;
     function Supports_Sequence: Boolean; override;
 
@@ -139,10 +139,15 @@ begin
     'MS SQL Server ALTER FIELD is not yet implemented in DBBuilder');
 end;
 
-function TioDBBuilderSqlGenMSSqlServer.GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategy;
+function TioDBBuilderSqlGenMSSqlServer.ResolveKeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategy): TioKeyGenerationStrategy;
 begin
-  // SQL Server default: use Identity
-  Result := kgsIdentity;
+  // Resolves kgsAuto to the DBMS-specific default strategy.
+  // SQL Server default is kgsIdentity (IDENTITY columns).
+  // If a specific strategy is requested, it is returned unchanged.
+  if ARequestedStrategy = kgsAuto then
+    Result := kgsIdentity
+  else
+    Result := ARequestedStrategy;
 end;
 
 function TioDBBuilderSqlGenMSSqlServer.Supports_Identity: Boolean;

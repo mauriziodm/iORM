@@ -110,10 +110,9 @@ begin
   LTableName := AMap.GetTable.TableName;
   if not FTables.ContainsKey(LTableName) then
   begin
-    // Resolve kgsAuto to actual DBMS-specific strategy
-    LKeyGenStrategy := AMap.GetTable.GetKeyGenerationStrategy;
-    if LKeyGenStrategy = kgsAuto then
-      LKeyGenStrategy := FSqlGenerator.GetDefaultKeyGenerationStrategy;
+    // Resolve the key generation strategy: if kgsAuto is specified in the map,
+    // it will be resolved to the DBMS-specific default strategy by the SqlGenerator.
+    LKeyGenStrategy := FSqlGenerator.ResolveKeyGenerationStrategy(AMap.GetTable.GetKeyGenerationStrategy);
     FTables.Add(LTableName, TioDBBuilderFactory.NewSchemaTable(AMap.GetTable, LKeyGenStrategy));
   end;
   Result := FTables.Items[LTableName];

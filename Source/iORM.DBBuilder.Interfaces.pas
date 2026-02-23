@@ -536,8 +536,12 @@ type
     function Supports_Identity: Boolean;
     /// <summary>Returns True if the database supports SEQUENCE objects</summary>
     function Supports_Sequence: Boolean;
-    /// <summary>Returns the default key generation strategy for this database</summary>
-    function GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategy;
+    /// <summary>
+    /// Resolves the requested key generation strategy to an effective strategy.
+    /// If ARequestedStrategy is kgsAuto, returns the DBMS-specific default strategy.
+    /// Otherwise, returns ARequestedStrategy unchanged.
+    /// </summary>
+    function ResolveKeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategy): TioKeyGenerationStrategy;
 
     // ==========================================================
     // ALTER TABLE CAPABILITY METHODS

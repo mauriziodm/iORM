@@ -102,7 +102,7 @@ type
     function BuildSQL_AddSequence(const ASequenceName: String): string; override;
     function BuildSQL_DropSequence(const ASequenceName: string): string; override;
     function BuildSQL_SequenceExists(const ASequenceName: string): string; override;
-    function GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategy; override;
+    function ResolveKeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategy): TioKeyGenerationStrategy; override;
     function Supports_Identity: Boolean; override;
     function Supports_Sequence: Boolean; override;
 
@@ -670,10 +670,16 @@ begin
   Result := True;
 end;
 
-function TioDBBuilderSqlGenFirebird.GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategy;
+function TioDBBuilderSqlGenFirebird.ResolveKeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategy): TioKeyGenerationStrategy;
 begin
-  // Firebird default: use Sequence for backward compatibility
-  Result := kgsSequence;
+  // Resolves kgsAuto to the DBMS-specific default strategy.
+  // Firebird default is kgsSequence (generators) for backward compatibility,
+  // even though Firebird 3.0+ also supports Identity columns.
+  // If a specific strategy is requested, it is returned unchanged.
+  if ARequestedStrategy = kgsAuto then
+    Result := kgsSequence
+  else
+    Result := ARequestedStrategy;
 end;
 
 function TioDBBuilderSqlGenFirebird.Supports_AlterNotNull: Boolean;

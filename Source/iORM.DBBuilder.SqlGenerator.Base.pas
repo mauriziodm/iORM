@@ -147,8 +147,12 @@ type
     function BuildSQL_DropSequence(const ASequenceName: string): string; virtual; abstract;
     /// <summary>Generates SQL to check if a sequence exists</summary>
     function BuildSQL_SequenceExists(const ASequenceName: string): string; virtual; abstract;
-    /// <summary>Returns the default key generation strategy for this database</summary>
-    function GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategy; virtual; abstract;
+    /// <summary>
+    /// Resolves the requested key generation strategy to an effective strategy.
+    /// If ARequestedStrategy is kgsAuto, returns the DBMS-specific default strategy.
+    /// Otherwise, returns ARequestedStrategy unchanged.
+    /// </summary>
+    function ResolveKeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategy): TioKeyGenerationStrategy; virtual; abstract;
     /// <summary>Returns True if the database supports IDENTITY columns</summary>
     function Supports_Identity: Boolean; virtual; abstract;
     /// <summary>Returns True if the database supports SEQUENCE objects</summary>
