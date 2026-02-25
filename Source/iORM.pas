@@ -284,6 +284,15 @@ type
   TioShowWaitProc = iORM.CommonTypes.TioShowWaitProc;
   TioTypeOfCollection = iORM.CommonTypes.TioTypeOfCollection;
 
+  // Event handler types
+  TioCanExecuteEvent = iORM.CommonTypes.TioCanExecuteEvent;
+  TioCloseQueryEvent = iORM.CommonTypes.TioCloseQueryEvent;
+  TioStdActionNewInstanceAsInterfaceEvent = iORM.CommonTypes.TioStdActionNewInstanceAsInterfaceEvent;
+  TioStdActionNewInstanceAsObjectEvent = iORM.CommonTypes.TioStdActionNewInstanceAsObjectEvent;
+  TioStdAction_ETM_AfterRevertEvent = iORM.CommonTypes.TioStdAction_ETM_AfterRevertEvent;
+  TioStdAction_ETM_BeforeRevertEvent = iORM.CommonTypes.TioStdAction_ETM_BeforeRevertEvent;
+  TioSynchronizationBeforeAfterEvent = iORM.CommonTypes.TioSynchronizationBeforeAfterEvent;
+
   IioWhere = iORM.Where.Interfaces.IioWhere;
   IioProperty = iORM.Context.Properties.Interfaces.IioProperty;
 
