@@ -1,4 +1,4 @@
-{
+﻿{
   ****************************************************************************
   *                                                                          *
   *           iORM - (interfaced ORM)                                        *
@@ -83,6 +83,11 @@ const
   ltFromBSReload = iORM.CommonTypes.TioLoadType.ltFromBSReload;
   ltFromBSReloadNewInstance = iORM.CommonTypes.TioLoadType.ltFromBSReloadNewInstance;
   ltAuto = iORM.CommonTypes.TioLoadType.ltAuto;
+
+  // TioKeyGenerationStrategyType = (kgsAuto, kgsIdentity, kgsSequence)
+  kgsAuto = iORM.CommonTypes.TioKeyGenerationStrategyType.kgsAuto;
+  kgsIdentity = iORM.CommonTypes.TioKeyGenerationStrategyType.kgsIdentity;
+  kgsSequence = iORM.CommonTypes.TioKeyGenerationStrategyType.kgsSequence;
 
   // TioObjStatus = (osDirty = 0, osClean, osDeleted)
   osDirty = iORM.CommonTypes.TioObjStatus.osDirty;
@@ -282,6 +287,7 @@ type
   IioWhere = iORM.Where.Interfaces.IioWhere;
   IioProperty = iORM.Context.Properties.Interfaces.IioProperty;
 
+  TioKeyGenerationStrategyType = iORM.CommonTypes.TioKeyGenerationStrategyType;
   TioMapModeType = iORM.Attributes.TioMapModeType;
   TioTrueClassMode = iORM.Attributes.TioTrueClassMode;
 
