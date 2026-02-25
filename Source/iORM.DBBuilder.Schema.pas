@@ -105,7 +105,7 @@ end;
 function TioDBBuilderSchema.FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
 var
   LTableName: String;
-  LKeyGenStrategy: TioKeyGenerationStrategy;
+  LKeyGenStrategy: TioKeyGenerationStrategyType;
 begin
   LTableName := AMap.GetTable.TableName;
   if not FTables.ContainsKey(LTableName) then

@@ -165,7 +165,7 @@ type
   TioLoadType = (ltManual, ltCreate, ltFromBSAsIs, ltFromBSReload, ltFromBSReloadNewInstance, ltAuto);
 
   // Key generation strategy for primary key fields
-  TioKeyGenerationStrategy = (
+  TioKeyGenerationStrategyType = (
     kgsAuto,      // Use database default behavior
     kgsIdentity,  // Use IDENTITY/AUTOINCREMENT column
     kgsSequence   // Use explicit SEQUENCE/GENERATOR

@@ -48,7 +48,7 @@ type
     FForeignKeys: TioDBBuilderSchemaForeignKeys;
     FIndexes: TioDBBuilderSchemaIndexes;
     FIsTrueClass: Boolean;
-    FKeyGenerationStrategy: TioKeyGenerationStrategy;
+    FKeyGenerationStrategy: TioKeyGenerationStrategyType;
     FPrimaryKeyField: IioDBBuilderSchemaField;
     FStatus: TioDBBuilderStatus;
     FChanges: TioDBBuilderTableChanges;
@@ -61,7 +61,7 @@ type
     procedure SetStatus(const AValue: TioDBBuilderStatus);
     function GetChanges: TioDBBuilderTableChanges;
   public
-    constructor Create(const AContextTable: IioTable; const AKeyGenerationStrategy: TioKeyGenerationStrategy);
+    constructor Create(const AContextTable: IioTable; const AKeyGenerationStrategy: TioKeyGenerationStrategyType);
     destructor Destroy; override;
 
     procedure AddChange(const AChange: TioDBBuilderTableChange);
@@ -72,7 +72,7 @@ type
     function GetFields: TioDBBuilderSchemaFields;
     function GetForeignKeys: TioDBBuilderSchemaForeignKeys;
     function GetContextTable: IioTable;
-    function GetKeyGenerationStrategy: TioKeyGenerationStrategy;
+    function GetKeyGenerationStrategy: TioKeyGenerationStrategyType;
     function GetSequenceName: String;
     function UsesSequenceForKeyGeneration: Boolean;
     function UsesIdentityForKeyGeneration: Boolean;
@@ -87,7 +87,7 @@ type
     property ForeignKeys: TioDBBuilderSchemaForeignKeys read GetForeignKeys;
     property Indexes: TioDBBuilderSchemaIndexes read GetIndexes;
     property IsTrueClass: Boolean read GetIsTrueClass write SetIsTrueClass;
-    property KeyGenerationStrategy: TioKeyGenerationStrategy read GetKeyGenerationStrategy;
+    property KeyGenerationStrategy: TioKeyGenerationStrategyType read GetKeyGenerationStrategy;
     property Name: string read GetName;
     property SqlName: string read GetSqlName;
     property PrimaryKeyField: IioDBBuilderSchemaField read GetPrimaryKeyField;
@@ -118,7 +118,7 @@ begin
 end;
 
 constructor TioDBBuilderSchemaTable.Create(const AContextTable: IioTable;
-  const AKeyGenerationStrategy: TioKeyGenerationStrategy);
+  const AKeyGenerationStrategy: TioKeyGenerationStrategyType);
 begin
   FChanges := [];
   FStatus := stClean;
@@ -206,7 +206,7 @@ begin
   Result := FContextTable;
 end;
 
-function TioDBBuilderSchemaTable.GetKeyGenerationStrategy: TioKeyGenerationStrategy;
+function TioDBBuilderSchemaTable.GetKeyGenerationStrategy: TioKeyGenerationStrategyType;
 begin
   Result := FKeyGenerationStrategy;
 end;

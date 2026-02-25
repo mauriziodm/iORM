@@ -96,7 +96,7 @@ type
     function GetGroupBy: IioGroupBy;
     function GetJoin: IioJoins;
     function GetKeyGenerator: String;
-    function GetKeyGenerationStrategy: TioKeyGenerationStrategy;
+    function GetKeyGenerationStrategy: TioKeyGenerationStrategyType;
     function GetMapMode: TioMapModeType;
     function GetQualifiedClassName: String;
     function GetRttiType: TRttiInstanceType;

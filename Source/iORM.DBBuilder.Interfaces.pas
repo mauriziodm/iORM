@@ -220,7 +220,7 @@ type
     function GetFields: TioDBBuilderSchemaFields;
     function GetForeignKeys: TioDBBuilderSchemaForeignKeys;
     function GetContextTable: IioTable;
-    function GetKeyGenerationStrategy: TioKeyGenerationStrategy;
+    function GetKeyGenerationStrategy: TioKeyGenerationStrategyType;
     function GetSequenceName: String;
     function UsesSequenceForKeyGeneration: Boolean;
     function UsesIdentityForKeyGeneration: Boolean;
@@ -250,7 +250,7 @@ type
     property IsTrueClass: boolean read GetIsTrueClass write SetIsTrueClass;
     property Name: string read GetName;
     property SqlName: string read GetSqlName;
-    property KeyGenerationStrategy: TioKeyGenerationStrategy read GetKeyGenerationStrategy;
+    property KeyGenerationStrategy: TioKeyGenerationStrategyType read GetKeyGenerationStrategy;
     property PrimaryKeyField: IioDBBuilderSchemaField read GetPrimaryKeyField;
     property SequenceName: string read GetSequenceName;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
@@ -541,7 +541,7 @@ type
     /// If ARequestedStrategy is kgsAuto, returns the DBMS-specific default strategy.
     /// Otherwise, returns ARequestedStrategy unchanged.
     /// </summary>
-    function ResolveKeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategy): TioKeyGenerationStrategy;
+    function ResolveKeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType;
 
     // ==========================================================
     // ALTER TABLE CAPABILITY METHODS

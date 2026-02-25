@@ -1,4 +1,4 @@
-{
+﻿{
   ****************************************************************************
   *                                                                          *
   *           iORM - (interfaced ORM)                                        *
@@ -137,7 +137,7 @@ type
     FIndexList: TioIndexList;
     FJoins: IioJoins;
     FKeyGenerator: String;
-    FKeyGenerationStrategy: TioKeyGenerationStrategy;
+    FKeyGenerationStrategy: TioKeyGenerationStrategyType;
     FMapMode: TioMapModeType;
     FRttiType: TRttiInstanceType;
     FTrueClass: IioTrueClass;
@@ -155,7 +155,7 @@ type
     procedure SetEtmTraceOnlyOnConnectionName(const AConnectionName: String);
     function GetEtmTraceOnlyOnConnectionName: String;
   public
-    constructor Create(const ASqlText, AKeyGenerator: String; const AKeyGenerationStrategy: TioKeyGenerationStrategy;
+    constructor Create(const ASqlText, AKeyGenerator: String; const AKeyGenerationStrategy: TioKeyGenerationStrategyType;
       const ATrueClass: IioTrueClass; const AJoins: IioJoins; const AGroupBy: IioGroupBy;
       const AConnectionDefName: String; const AMapMode: TioMapModeType; const ARttiType: TRttiInstanceType); reintroduce; overload;
     destructor Destroy; override;
@@ -167,7 +167,7 @@ type
     function GetGroupBy: IioGroupBy;
     function GetJoin: IioJoins;
     function GetKeyGenerator: String;
-    function GetKeyGenerationStrategy: TioKeyGenerationStrategy;
+    function GetKeyGenerationStrategy: TioKeyGenerationStrategyType;
     function GetMapMode: TioMapModeType;
     function GetQualifiedClassName: String;
     function GetRttiType: TRttiInstanceType;
@@ -209,7 +209,7 @@ uses
 
 { TioContextTable }
 
-constructor TioTable.Create(const ASqlText, AKeyGenerator: String; const AKeyGenerationStrategy: TioKeyGenerationStrategy;
+constructor TioTable.Create(const ASqlText, AKeyGenerator: String; const AKeyGenerationStrategy: TioKeyGenerationStrategyType;
       const ATrueClass: IioTrueClass; const AJoins: IioJoins; const AGroupBy: IioGroupBy;
       const AConnectionDefName: String; const AMapMode: TioMapModeType; const ARttiType: TRttiInstanceType);
 begin
@@ -370,7 +370,7 @@ begin
   Result := IfThen(FKeyGenerator.IsEmpty, TableName, FKeyGenerator);
 end;
 
-function TioTable.GetKeyGenerationStrategy: TioKeyGenerationStrategy;
+function TioTable.GetKeyGenerationStrategy: TioKeyGenerationStrategyType;
 begin
   Result := FKeyGenerationStrategy;
 end;

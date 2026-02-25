@@ -62,7 +62,7 @@ type
     class function NewSchemaIndex(const AIndex: ioIndex; const AConnectionDefName: String): IioDBBuilderSchemaIndex;
     class function NewSchemaRDBMSInfo(const AName, ARaw, AVersion: String; const AMajorVersion, AMinorVersion: Integer): IioDBBuilderSchemaRDBMSInfo;
     class function NewSchemaTable(const AContextTable: IioTable;
-      const AKeyGenerationStrategy: TioKeyGenerationStrategy): IioDBBuilderSchemaTable;
+      const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
     class function NewSqlGenerator(const AConnectionDefName: String): IioDBBuilderSqlGenerator;
     class function NewSqlScript: IioDBBuilderSqlScript;
     class function NewSqlText(const AAddLinePrefix: String = ''): IioDBBuilderSqlText;
@@ -148,7 +148,7 @@ begin
 end;
 
 class function TioDBBuilderFactory.NewSchemaTable(const AContextTable: IioTable;
-  const AKeyGenerationStrategy: TioKeyGenerationStrategy): IioDBBuilderSchemaTable;
+  const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
 begin
   Result := TioDBBuilderSchemaTable.Create(AContextTable, AKeyGenerationStrategy);
 end;

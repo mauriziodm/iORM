@@ -1,4 +1,4 @@
-{
+﻿{
   ****************************************************************************
   *                                                                          *
   *           iORM - (interfaced ORM)                                        *
@@ -743,7 +743,7 @@ class function TioContextFactory.Table(const Typ: TRttiInstanceType): IioTable;
 var
   LAttr: TCustomAttribute;
   LTableName, LConnectionName, LKeyGenerator: String;
-  LKeyGenerationStrategy: TioKeyGenerationStrategy;
+  LKeyGenerationStrategy: TioKeyGenerationStrategyType;
   LTrueClass: IioTrueClass;
   LJoins: IioJoins;
   LGroupBy: IioGroupBy;
