@@ -1,4 +1,4 @@
-{
+﻿{
   ****************************************************************************
   *                                                                          *
   *           iORM - (interfaced ORM)                                        *
@@ -254,9 +254,12 @@ type
     class procedure GenerateSqlDelete(const AQuery: IioQuery; const AContext: IioContext); virtual;
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); virtual; abstract;
     class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
-    class procedure GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext); virtual;
-    /// <summary>Generates the RETURNING clause for INSERT statements to retrieve generated ID</summary>
-    class function GenerateSqlReturningClause(const AContext: IioContext): String; virtual; abstract;
+    /// <summary>
+    /// Generates an INSERT statement. When AReturningGeneratedID is True, includes
+    /// database-specific clause to retrieve the generated ID (RETURNING for SQLite/Firebird,
+    /// OUTPUT for SQL Server).
+    /// </summary>
+    class procedure GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext; const AReturningGeneratedID: Boolean = False); virtual;
     class procedure GenerateSqlMax(const AQuery: IioQuery; const AContext: IioContext; const AProperty: IioProperty); virtual;
     class procedure GenerateSqlMin(const AQuery: IioQuery; const AContext: IioContext; const AProperty: IioProperty); virtual;
     class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
@@ -482,7 +485,7 @@ begin
   // -----------------------------------------------------------------
 end;
 
-class procedure TioSqlGenerator.GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext);
+class procedure TioSqlGenerator.GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext; const AReturningGeneratedID: Boolean);
 var
   LInsertFields, LInsertValues: String;
   LComma: String;
@@ -517,6 +520,10 @@ begin
   if AContext.IsTrueClass then
     AQuery.SQL.Add(',:' + AContext.GetTrueClass.GetSqlParamName);
   AQuery.SQL.Add(')');
+  // -----------------------------------------------------------------
+  // Add RETURNING clause to retrieve generated ID (for SQLite and Firebird)
+  if AReturningGeneratedID then
+    AQuery.SQL.Add(' RETURNING ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName);
   // -----------------------------------------------------------------
 end;
 

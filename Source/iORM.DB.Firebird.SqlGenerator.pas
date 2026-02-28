@@ -1,4 +1,4 @@
-{
+﻿{
   ****************************************************************************
   *                                                                          *
   *           iORM - (interfaced ORM)                                        *
@@ -53,7 +53,6 @@ type
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); override;
     class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); override;
     class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); override;
-    class function GenerateSqlReturningClause(const AContext: IioContext): String; override;
     class procedure GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext); override;
   end;
 
@@ -193,12 +192,6 @@ begin
   // -----------------------------------------------------------------
   AQuery.SQL.Add('SELECT GEN_ID(' + AContext.GetTable.GetKeyGenerator + ',1) FROM RDB$DATABASE');
   // -----------------------------------------------------------------
-end;
-
-class function TioSqlGeneratorFirebird.GenerateSqlReturningClause(const AContext: IioContext): String;
-begin
-  // Firebird supports RETURNING clause from version 2.0+
-  Result := ' RETURNING ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName;
 end;
 
 class procedure TioSqlGeneratorFirebird.GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext);

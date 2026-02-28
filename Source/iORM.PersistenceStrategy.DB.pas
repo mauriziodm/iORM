@@ -382,7 +382,6 @@ class procedure TioPersistenceStrategyDB.InsertObject_Internal(const AContext: I
 var
   LQuery: IioQuery;
   LNeedsGeneratedID: Boolean;
-  LReturningClause: String;
 begin
   inherited;
   // -----------------------------------------------------------
@@ -403,33 +402,17 @@ begin
   // Note: Obviously if a new ID is assigned by SynchroStrategy this will disable the normal ID generation (if generated ID is not NULL)
   AContext.SynchroStrategy_GenerateLocalID;
   // -----------------------------------------------------------
-  // For tables using Sequence for ID generation (Firebird default), we need to get the ID
-  // BEFORE the INSERT because there is no automatic ID generation in the INSERT itself.
-  // The ID MUST always be assigned (if null), otherwise the object would persist with ID zero.
-  if (AContext.GetTable.GetKeyGenerationStrategy = kgsSequence) and AContext.IDIsNull then
-  begin
-    LQuery := TioDBFactory.QueryEngine.GetQueryNextID(AContext);
-    try
-      LQuery.Open;
-      AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, LQuery.Fields[0].AsInteger);
-    finally
-      LQuery.Close;
-    end;
-  end;
+  // Determine if we need to retrieve a generated ID from the database.
+  // This applies to both Identity and Sequence strategies when the ID is null and we need to update the object.
+  // Note: For Sequence strategy, the ID is automatically assigned via DEFAULT NEXT VALUE FOR in the column definition.
+  LNeedsGeneratedID := AContext.IDIsNull and
+    (AContext.BlindLevel_Do_AutoUpdateProps or AContext.GetProperties.ContainsHasManyOrHasOneProperties);
   // -----------------------------------------------------------
-  // Determine if we need to retrieve a generated ID from the database (for Identity columns)
-  // This only applies when using Identity strategy (not Sequence, which was handled above)
-  LNeedsGeneratedID := (AContext.GetTable.GetKeyGenerationStrategy <> kgsSequence) and
-    AContext.IDIsNull and (AContext.BlindLevel_Do_AutoUpdateProps or AContext.GetProperties.ContainsHasManyOrHasOneProperties);
-  // -----------------------------------------------------------
-  // Create insert query
-  LQuery := TioDBFactory.QueryEngine.GetQueryInsert(AContext);
-  // If we need a generated ID (Identity strategy), append RETURNING clause and execute as query that returns data
+  // Create insert query (with or without RETURNING/OUTPUT clause for ID retrieval)
+  LQuery := TioDBFactory.QueryEngine.GetQueryInsert(AContext, LNeedsGeneratedID);
+  // Execute the query
   if LNeedsGeneratedID then
   begin
-    // Get the RETURNING clause from the SqlGenerator
-    LReturningClause := TioDBFactory.SqlGenerator(AContext.GetConnectionNameResolved).GenerateSqlReturningClause(AContext);
-    LQuery.SQL.Add(LReturningClause);
     try
       LQuery.Open;
       // Retrieve the generated ID from the result set
@@ -440,7 +423,7 @@ begin
   end
   else
   begin
-    // No generated ID needed (ID already set or Sequence strategy used), execute as normal INSERT
+    // No generated ID needed (ID already set), execute as normal INSERT
     LQuery.ExecSQL;
   end;
   // -----------------------------------------------------------

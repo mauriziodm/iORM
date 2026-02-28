@@ -50,7 +50,6 @@ type
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); override;
     class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); override;
     class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); override;
-    class function GenerateSqlReturningClause(const AContext: IioContext): String; override;
     class procedure GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext); override;
   end;
 
@@ -136,13 +135,6 @@ end;
 class procedure TioSqlGeneratorSqLite.GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext);
 begin
   AQuery.SQL.Add('SELECT last_insert_rowid()');
-end;
-
-class function TioSqlGeneratorSqLite.GenerateSqlReturningClause(const AContext: IioContext): String;
-begin
-  // SQLite supports RETURNING clause from version 3.35+ (2021-03-12)
-  // For older versions, the PersistenceStrategy will use last_insert_rowid() as fallback
-  Result := ' RETURNING ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName;
 end;
 
 class procedure TioSqlGeneratorSqLite.GenerateSqlSelect(const AQuery: IioQuery; const AContext: IioContext);

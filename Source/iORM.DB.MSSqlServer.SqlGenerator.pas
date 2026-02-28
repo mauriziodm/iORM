@@ -51,13 +51,16 @@ type
     class procedure GenerateSqlCurrentTimestamp(const AQuery: IioQuery); override;
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); override;
     class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); override;
+    class procedure GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext;
+      const AReturningGeneratedID: Boolean = False); override;
     class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); override;
   end;
 
 implementation
 
 uses
-  iORM.SqlTranslator;
+  iORM.SqlTranslator,
+  iORM.Context.Properties.Interfaces;
 
 { TioSqlGeneratorMSSqlServer }
 
@@ -83,6 +86,48 @@ begin
   AQuery.SQL.Add('SELECT CAST(CASE WHEN EXISTS (SELECT * FROM ' + AContext.GetTable.GetSql + ' WHERE ' +
     AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlWhereParamName +
     ') THEN 1 ELSE 0 END AS INTEGER)');
+  // -----------------------------------------------------------------
+end;
+
+class procedure TioSqlGeneratorMSSqlServer.GenerateSqlInsert(const AQuery: IioQuery;
+  const AContext: IioContext; const AReturningGeneratedID: Boolean);
+var
+  LInsertFields, LInsertValues: String;
+  LComma: String;
+  LIDIsNull: Boolean;
+  LProp: IioProperty;
+begin
+  // Prepare fields and values
+  LComma := '';
+  LInsertFields := '';
+  LInsertValues := '';
+  LIDIsNull := AContext.IdIsNull;
+  for LProp in AContext.GetProperties do
+    if LProp.IsSqlInsertRequestCompliant(LIDIsNull) then
+    begin
+      LInsertFields := LInsertFields + LComma + LProp.GetSqlFieldName;
+      LInsertValues := LInsertValues + LComma + ':' + LProp.GetSqlParamName;
+      LComma := ', ';
+    end;
+  // Build the query text
+  // -----------------------------------------------------------------
+  AQuery.SQL.Add('INSERT INTO ' + AContext.GetTable.GetSQL);
+  // SQL Server requires OUTPUT clause BEFORE the field list
+  if AReturningGeneratedID then
+    AQuery.SQL.Add('OUTPUT INSERTED.' + AContext.GetProperties.GetIdProperty.GetSqlFieldName);
+  AQuery.SQL.Add('(');
+  // Add field list (TrueClass if enabled)
+  AQuery.SQL.Add(LInsertFields);
+  if AContext.IsTrueClass then
+    AQuery.SQL.Add(',' + AContext.GetTrueClass.GetSqlFieldName);
+  // -----------------------------------------------------------------
+  AQuery.SQL.Add(') VALUES (');
+  // -----------------------------------------------------------------
+  // Add values (TrueClass if enabled)
+  AQuery.SQL.Add(LInsertValues);
+  if AContext.IsTrueClass then
+    AQuery.SQL.Add(',:' + AContext.GetTrueClass.GetSqlParamName);
+  AQuery.SQL.Add(')');
   // -----------------------------------------------------------------
 end;
 
