@@ -61,7 +61,7 @@ type
     class function GetQueryDelete(const AContext: IioContext; const AForceCacheable: Boolean): IioQuery;
     class function GetQueryDropIndex(const AContext: IioContext; const AIndexName: String): IioQuery;
     class function GetQueryExists(const AContext: IioContext): IioQuery;
-    class function GetQueryInsert(const AContext: IioContext; const AReturningGeneratedID: Boolean = False): IioQuery;
+    class function GetQueryInsert(const AContext: IioContext): IioQuery;
     class function GetQueryMax(const AContext: IioContext; const AProperty: IioProperty): IioQuery;
     class function GetQueryMin(const AContext: IioContext; const AProperty: IioProperty): IioQuery;
     class function GetQueryNextID(const AContext: IioContext): IioQuery;
@@ -167,8 +167,7 @@ begin
   LQuery.WhereParamObjID_SetValue(AContext);
 end;
 
-class function TioQueryEngine.GetQueryInsert(const AContext: IioContext;
-  const AReturningGeneratedID: Boolean): IioQuery;
+class function TioQueryEngine.GetQueryInsert(const AContext: IioContext): IioQuery;
 var
   LProp: IioProperty;
   LQuery: IioQuery;
@@ -176,11 +175,9 @@ var
   LQueryIdentity: String;
 begin
   LIDIsNull := AContext.IdIsNull;
-  // Compose query identity
-  // Note: INS_RET is a separate identity for INSERT with RETURNING clause (different SQL)
-  if AReturningGeneratedID then
-    LQueryIdentity := ComposeQueryIdentity(AContext, 'INS_RET', True)
-  else if LIDIsNull then
+  // Compose query identity: INS (without ID) or INS_ID (with ID)
+  // Note: Both always include RETURNING/OUTPUT clause
+  if LIDIsNull then
     LQueryIdentity := ComposeQueryIdentity(AContext, 'INS', True)
   else
     LQueryIdentity := ComposeQueryIdentity(AContext, 'INS_ID', True);
@@ -189,7 +186,7 @@ begin
   LQuery := TioDbFactory.Query(AContext.GetConnectionNameResolved, LQueryIdentity);
   Result := LQuery;
   if LQuery.IsSqlEmpty then
-    TioDbFactory.SqlGenerator(AContext.GetConnectionNameResolved).GenerateSqlInsert(LQuery, AContext, AReturningGeneratedID);
+    TioDbFactory.SqlGenerator(AContext.GetConnectionNameResolved).GenerateSqlInsert(LQuery, AContext);
   // Iterate for all properties
   for LProp in AContext.GetProperties do
   begin

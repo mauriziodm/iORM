@@ -255,11 +255,9 @@ type
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); virtual; abstract;
     class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
     /// <summary>
-    /// Generates an INSERT statement. When AReturningGeneratedID is True, includes
-    /// database-specific clause to retrieve the generated ID (RETURNING for SQLite/Firebird,
-    /// OUTPUT for SQL Server).
+    /// Generates an INSERT statement with RETURNING/OUTPUT clause to retrieve the ID.
     /// </summary>
-    class procedure GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext; const AReturningGeneratedID: Boolean = False); virtual;
+    class procedure GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext); virtual;
     class procedure GenerateSqlMax(const AQuery: IioQuery; const AContext: IioContext; const AProperty: IioProperty); virtual;
     class procedure GenerateSqlMin(const AQuery: IioQuery; const AContext: IioContext; const AProperty: IioProperty); virtual;
     class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
@@ -485,7 +483,7 @@ begin
   // -----------------------------------------------------------------
 end;
 
-class procedure TioSqlGenerator.GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext; const AReturningGeneratedID: Boolean);
+class procedure TioSqlGenerator.GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext);
 var
   LInsertFields, LInsertValues: String;
   LComma: String;
@@ -521,9 +519,8 @@ begin
     AQuery.SQL.Add(',:' + AContext.GetTrueClass.GetSqlParamName);
   AQuery.SQL.Add(')');
   // -----------------------------------------------------------------
-  // Add RETURNING clause to retrieve generated ID (for SQLite and Firebird)
-  if AReturningGeneratedID then
-    AQuery.SQL.Add(' RETURNING ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName);
+  // Always add RETURNING clause to retrieve the ID (for SQLite and Firebird)
+  AQuery.SQL.Add(' RETURNING ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName);
   // -----------------------------------------------------------------
 end;
 

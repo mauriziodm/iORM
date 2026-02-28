@@ -381,7 +381,6 @@ end;
 class procedure TioPersistenceStrategyDB.InsertObject_Internal(const AContext: IioContext);
 var
   LQuery: IioQuery;
-  LNeedsGeneratedID: Boolean;
 begin
   inherited;
   // -----------------------------------------------------------
@@ -402,29 +401,14 @@ begin
   // Note: Obviously if a new ID is assigned by SynchroStrategy this will disable the normal ID generation (if generated ID is not NULL)
   AContext.SynchroStrategy_GenerateLocalID;
   // -----------------------------------------------------------
-  // Determine if we need to retrieve a generated ID from the database.
-  // This applies to both Identity and Sequence strategies when the ID is null and we need to update the object.
-  // Note: For Sequence strategy, the ID is automatically assigned via DEFAULT NEXT VALUE FOR in the column definition.
-  LNeedsGeneratedID := AContext.IDIsNull and
-    (AContext.BlindLevel_Do_AutoUpdateProps or AContext.GetProperties.ContainsHasManyOrHasOneProperties);
-  // -----------------------------------------------------------
-  // Create insert query (with or without RETURNING/OUTPUT clause for ID retrieval)
-  LQuery := TioDBFactory.QueryEngine.GetQueryInsert(AContext, LNeedsGeneratedID);
-  // Execute the query
-  if LNeedsGeneratedID then
-  begin
-    try
-      LQuery.Open;
-      // Retrieve the generated ID from the result set
-      AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, LQuery.Fields[0].AsInteger);
-    finally
-      LQuery.Close;
-    end;
-  end
-  else
-  begin
-    // No generated ID needed (ID already set), execute as normal INSERT
-    LQuery.ExecSQL;
+  // Create and execute insert query (always with RETURNING/OUTPUT clause to retrieve ID)
+  LQuery := TioDBFactory.QueryEngine.GetQueryInsert(AContext);
+  try
+    LQuery.Open;
+    // Always retrieve the ID from the result set (works for both generated and pre-assigned IDs)
+    AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, LQuery.Fields[0].AsInteger);
+  finally
+    LQuery.Close;
   end;
   // -----------------------------------------------------------
   // Set the version/created/updated of the entity (Intercepted by crudInterceptors)

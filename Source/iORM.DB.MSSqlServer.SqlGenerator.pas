@@ -51,8 +51,7 @@ type
     class procedure GenerateSqlCurrentTimestamp(const AQuery: IioQuery); override;
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); override;
     class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); override;
-    class procedure GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext;
-      const AReturningGeneratedID: Boolean = False); override;
+    class procedure GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext); override;
     class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); override;
   end;
 
@@ -90,7 +89,7 @@ begin
 end;
 
 class procedure TioSqlGeneratorMSSqlServer.GenerateSqlInsert(const AQuery: IioQuery;
-  const AContext: IioContext; const AReturningGeneratedID: Boolean);
+  const AContext: IioContext);
 var
   LInsertFields, LInsertValues: String;
   LComma: String;
@@ -112,9 +111,8 @@ begin
   // Build the query text
   // -----------------------------------------------------------------
   AQuery.SQL.Add('INSERT INTO ' + AContext.GetTable.GetSQL);
-  // SQL Server requires OUTPUT clause BEFORE the field list
-  if AReturningGeneratedID then
-    AQuery.SQL.Add('OUTPUT INSERTED.' + AContext.GetProperties.GetIdProperty.GetSqlFieldName);
+  // SQL Server requires OUTPUT clause BEFORE the field list (always add it to retrieve ID)
+  AQuery.SQL.Add('OUTPUT INSERTED.' + AContext.GetProperties.GetIdProperty.GetSqlFieldName);
   AQuery.SQL.Add('(');
   // Add field list (TrueClass if enabled)
   AQuery.SQL.Add(LInsertFields);
