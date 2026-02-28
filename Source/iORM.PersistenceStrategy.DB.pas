@@ -1,4 +1,4 @@
-{
+﻿{
   ****************************************************************************
   *                                                                          *
   *           iORM - (interfaced ORM)                                        *
@@ -420,8 +420,7 @@ begin
   // Determine if we need to retrieve a generated ID from the database (for Identity columns)
   // This only applies when using Identity strategy (not Sequence, which was handled above)
   LNeedsGeneratedID := (AContext.GetTable.GetKeyGenerationStrategy <> kgsSequence) and
-    AContext.IDIsNull and
-    (AContext.BlindLevel_Do_AutoUpdateProps or AContext.GetProperties.ContainsHasManyOrHasOneProperties);
+    AContext.IDIsNull and (AContext.BlindLevel_Do_AutoUpdateProps or AContext.GetProperties.ContainsHasManyOrHasOneProperties);
   // -----------------------------------------------------------
   // Create insert query
   LQuery := TioDBFactory.QueryEngine.GetQueryInsert(AContext);
@@ -450,11 +449,11 @@ begin
   begin
     AContext.ObjVersion := AContext.ObjNextVersion;
     AContext.ObjCreated := LQuery.Connection.LastTransactionTimestamp;
-    AContext.ObjCreatedUserID := AContext.PSREquest.UsrOID;
-    AContext.ObjCreatedUserName := AContext.PSREquest.Usr;
+    AContext.ObjCreatedUserID := AContext.PSRequest.UsrOID;
+    AContext.ObjCreatedUserName := AContext.PSRequest.Usr;
     AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;
-    AContext.ObjUpdatedUserID := AContext.PSREquest.UsrOID;
-    AContext.ObjUpdatedUserName := AContext.PSREquest.Usr;
+    AContext.ObjUpdatedUserID := AContext.PSRequest.UsrOID;
+    AContext.ObjUpdatedUserName := AContext.PSRequest.Usr;
   end;
   // -----------------------------------------------------------
   AContext.ObjStatus := osClean;
