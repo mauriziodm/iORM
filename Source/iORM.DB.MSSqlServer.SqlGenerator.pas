@@ -53,6 +53,7 @@ type
     class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); override;
     class procedure GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext); override;
     class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); override;
+    class function GenerateSqlReturningClause(const AContext: IioContext): String; override;
   end;
 
 implementation
@@ -88,8 +89,7 @@ begin
   // -----------------------------------------------------------------
 end;
 
-class procedure TioSqlGeneratorMSSqlServer.GenerateSqlInsert(const AQuery: IioQuery;
-  const AContext: IioContext);
+class procedure TioSqlGeneratorMSSqlServer.GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext);
 var
   LInsertFields, LInsertValues: String;
   LComma: String;
@@ -111,7 +111,7 @@ begin
   // Build the query text
   // -----------------------------------------------------------------
   AQuery.SQL.Add('INSERT INTO ' + AContext.GetTable.GetSQL);
-  // SQL Server requires OUTPUT clause BEFORE the field list (always add it to retrieve ID)
+  // SQL Server requires OUTPUT clause BEFORE the field list (always include it for ID retrieval)
   AQuery.SQL.Add('OUTPUT INSERTED.' + AContext.GetProperties.GetIdProperty.GetSqlFieldName);
   AQuery.SQL.Add('(');
   // Add field list (TrueClass if enabled)
@@ -127,12 +127,21 @@ begin
     AQuery.SQL.Add(',:' + AContext.GetTrueClass.GetSqlParamName);
   AQuery.SQL.Add(')');
   // -----------------------------------------------------------------
+  // Note: OUTPUT clause is already included above (SQL Server specific position)
 end;
 
 class procedure TioSqlGeneratorMSSqlServer.GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext);
 begin
   // Build the query text
   AQuery.SQL.Add('select @@IDENTITY');
+end;
+
+class function TioSqlGeneratorMSSqlServer.GenerateSqlReturningClause(const AContext: IioContext): String;
+begin
+  // SQL Server uses OUTPUT clause which is already included in GenerateSqlInsert
+  // (OUTPUT must be placed BEFORE VALUES, not after like RETURNING)
+  // Return empty string so that adding it to the query doesn't change anything
+  Result := '';
 end;
 
 class procedure TioSqlGeneratorMSSqlServer.GenerateSqlCreateIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String;

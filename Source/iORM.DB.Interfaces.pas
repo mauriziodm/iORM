@@ -1,4 +1,4 @@
-﻿{
+{
   ****************************************************************************
   *                                                                          *
   *           iORM - (interfaced ORM)                                        *
@@ -254,10 +254,9 @@ type
     class procedure GenerateSqlDelete(const AQuery: IioQuery; const AContext: IioContext); virtual;
     class procedure GenerateSqlDropIndex(const AQuery: IioQuery; const AContext: IioContext; AIndexName: String); virtual; abstract;
     class procedure GenerateSqlExists(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
-    /// <summary>
-    /// Generates an INSERT statement with RETURNING/OUTPUT clause to retrieve the ID.
-    /// </summary>
     class procedure GenerateSqlInsert(const AQuery: IioQuery; const AContext: IioContext); virtual;
+    /// <summary>Generates the RETURNING clause for INSERT statements to retrieve generated ID</summary>
+    class function GenerateSqlReturningClause(const AContext: IioContext): String; virtual; abstract;
     class procedure GenerateSqlMax(const AQuery: IioQuery; const AContext: IioContext; const AProperty: IioProperty); virtual;
     class procedure GenerateSqlMin(const AQuery: IioQuery; const AContext: IioContext; const AProperty: IioProperty); virtual;
     class procedure GenerateSqlNextID(const AQuery: IioQuery; const AContext: IioContext); virtual; abstract;
@@ -518,9 +517,6 @@ begin
   if AContext.IsTrueClass then
     AQuery.SQL.Add(',:' + AContext.GetTrueClass.GetSqlParamName);
   AQuery.SQL.Add(')');
-  // -----------------------------------------------------------------
-  // Always add RETURNING clause to retrieve the ID (for SQLite and Firebird)
-  AQuery.SQL.Add(' RETURNING ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName);
   // -----------------------------------------------------------------
 end;
 

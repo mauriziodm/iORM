@@ -175,8 +175,7 @@ var
   LQueryIdentity: String;
 begin
   LIDIsNull := AContext.IdIsNull;
-  // Compose query identity: INS (without ID) or INS_ID (with ID)
-  // Note: Both always include RETURNING/OUTPUT clause
+  // Compose query identity
   if LIDIsNull then
     LQueryIdentity := ComposeQueryIdentity(AContext, 'INS', True)
   else
