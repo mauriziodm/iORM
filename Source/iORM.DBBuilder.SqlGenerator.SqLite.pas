@@ -57,9 +57,7 @@ type
     // ==========================================================
     // TABLE RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_BeginAlterTable(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
-    function BuildSQL_EndAlterTable(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_TableExists(const ATableName: string): string; override;
 
@@ -180,17 +178,6 @@ begin
   // If this exception is raised, it indicates a logic error in the Strategy layer.
   raise EioDBBuilderException.Create(ClassName, 'BuildSQL_AlterField',
     'SQLite does not support altering column definitions. '#13#13'Column modifications are not supported by SQLite.');
-end;
-
-function TioDBBuilderSqlGenSQLite.BuildSQL_EndAlterTable(const ATable: IioDBBuilderSchemaTable): string;
-begin
-  // Note: TioDBBuilderStrategySqLite should NEVER call this method.
-  // SQLite does not support ALTER TABLE in the traditional sense and uses table recreation instead.
-  // This method exists only to satisfy the abstract interface contract.
-  // If this exception is raised, it indicates a logic error in the Strategy layer.
-  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_EndAlterTable',
-    'SQLite does not support ALTER TABLE. '#13#13 +
-    'Table modifications require the rename-create-copy pattern handled by the Strategy layer.');
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string;
@@ -374,17 +361,6 @@ begin
   raise EioDBBuilderException.Create(ClassName, 'BuildSQL_DropFKbyName',
     'SQLite does not support dropping foreign keys directly. '#13#13 +
     'Foreign keys can only be modified by recreating the table using the rename-create-copy pattern.');
-end;
-
-function TioDBBuilderSqlGenSQLite.BuildSQL_BeginAlterTable(const ATable: IioDBBuilderSchemaTable): string;
-begin
-  // Note: TioDBBuilderStrategySqLite should NEVER call this method.
-  // SQLite does not support ALTER TABLE in the traditional sense and uses table recreation instead.
-  // This method exists only to satisfy the abstract interface contract.
-  // If this exception is raised, it indicates a logic error in the Strategy layer.
-  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_BeginAlterTable',
-    'SQLite does not support ALTER TABLE. '#13#13 +
-    'Table modifications require the rename-create-copy pattern handled by the Strategy layer.');
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string;

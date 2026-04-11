@@ -63,11 +63,19 @@ type
     procedure CreateOrAlterTables; virtual;
     procedure CreateTable(const ATable: IioDBBuilderSchemaTable); virtual;
     function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
+
+
+
+
     // Fields
     procedure AddOrAlterFields(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure CreateTableIndexes(const ATable: IioDBBuilderSchemaTable); overload; virtual;
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
+
+
+
+
     // Field change detection methods (common to all databases)
     function GetInvalidTypeConversions: string; virtual; abstract;
     function IsFieldTypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String): Boolean; virtual;
@@ -265,17 +273,9 @@ begin
   begin
     case LField.Status of
       stCreate:
-        begin
-          Script.Body.Add(SqlGenerator.BuildSQL_BeginAlterTable(ATable));
-          Script.Body.IncIndent;
-          Script.Body.Add(SqlGenerator.BuildSQL_AddField(ATable, LField));
-          Script.Body.DecIndent;
-          Script.Body.Add(SqlGenerator.BuildSQL_EndAlterTable(ATable));
-        end;
+        Script.Body.Add(SqlGenerator.BuildSQL_AddField(ATable, LField));
       stUpdate:
-        begin
-          Script.Body.Add(SqlGenerator.BuildSQL_AlterField(ATable, LField));
-        end;
+        Script.Body.Add(SqlGenerator.BuildSQL_AlterField(ATable, LField));
     end;
   end;
 end;

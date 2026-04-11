@@ -60,9 +60,7 @@ type
     // ==========================================================
     // TABLE RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_BeginAlterTable(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
-    function BuildSQL_EndAlterTable(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_TableExists(const ATableName: string): string; override;
     function Supports_AlterNotNull: Boolean; override;
@@ -175,7 +173,7 @@ end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_AddField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
 begin
-  Result := Format('ADD %s', [_BuildSQL_CreateOrAddField(ATable, AField)]);
+  Result := Format('ALTER TABLE %s ADD %s;', [ATable.SqlName, _BuildSQL_CreateOrAddField(ATable, AField)]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
@@ -277,11 +275,6 @@ begin
   end;
 
   Result := LSqlText.Text;
-end;
-
-function TioDBBuilderSqlGenFirebird.BuildSQL_BeginAlterTable(const ATable: IioDBBuilderSchemaTable): string;
-begin
-  Result := Format('ALTER TABLE %s', [ATable.SqlName]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string;
@@ -506,10 +499,6 @@ begin
   Result := Format('DROP SEQUENCE %s;', [LSequenceName]);
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildSQL_EndAlterTable(const ATable: IioDBBuilderSchemaTable): string;
-begin
-  Result := ';';
-end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string;
 begin

@@ -64,9 +64,7 @@ type
     // ==========================================================
     // TABLE RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_BeginAlterTable(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
-    function BuildSQL_EndAlterTable(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     function BuildSQL_TableExists(const ATableName: string): string; virtual; abstract;
     /// <summary>Returns True if the database supports ALTER COLUMN SET/DROP NOT NULL</summary>

@@ -354,23 +354,11 @@ type
     // TABLE RELATED METHODS
     // ----------------------------------------------------------
     /// <summary>
-    /// Generates the opening SQL statement for ALTER TABLE command.
-    /// </summary>
-    /// <param name="ATable">The table schema to alter</param>
-    /// <returns>Opening SQL fragment (e.g., "ALTER TABLE tablename")</returns>
-    function BuildSQL_BeginAlterTable(const ATable: IioDBBuilderSchemaTable): string;
-    /// <summary>
     /// Generates the opening SQL statement for CREATE TABLE command.
     /// </summary>
     /// <param name="ATable">The table schema to create</param>
     /// <returns>Opening SQL fragment (e.g., "CREATE TABLE tablename (")</returns>
     function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string;
-    /// <summary>
-    /// Generates the closing SQL statement for ALTER TABLE command.
-    /// </summary>
-    /// <param name="ATable">The table schema being altered</param>
-    /// <returns>Closing SQL fragment (may be empty for some databases)</returns>
-    function BuildSQL_EndAlterTable(const ATable: IioDBBuilderSchemaTable): string;
     /// <summary>
     /// Generates the closing SQL statement for CREATE TABLE command.
     /// </summary>
