@@ -407,7 +407,7 @@ begin
 
   if Create then
   begin
-    CreateTables;
+    CreateOrAlterTables;
 
     if Schema.IndexesEnabled then
       CreateIndexes;

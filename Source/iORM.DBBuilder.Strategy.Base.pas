@@ -62,7 +62,6 @@ type
     procedure AlterTable(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure CreateOrAlterTables; virtual;
     procedure CreateTable(const ATable: IioDBBuilderSchemaTable); virtual;
-    procedure CreateTables; virtual;
     function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
     // Fields
     procedure AddOrAlterFields(const ATable: IioDBBuilderSchemaTable); virtual;
@@ -178,14 +177,6 @@ end;
 
 procedure TioDBBuilderStrategyBase.AlterTable(const ATable: IioDBBuilderSchemaTable);
 begin
-  // Skip tables that do not need structural changes.
-  // Note: foreign key changes (taForeignKeys) are excluded here because FKs are
-  // always handled separately by CreateForeignKeys/CreateTableForeignKeys, regardless
-  // of whether the table is being created or altered. If the only change detected on
-  // this table is a FK change, there is nothing to ALTER TABLE for, so we exit early.
-  if (ATable.Status <> stUpdate) or (ATable.Changes = [taForeignKeys]) then
-    exit;
-
   Script.Body.AddTitle(Format('Altering table ''%s''', [ATable.Name]));
 end;
 
@@ -299,7 +290,10 @@ begin
       stCreate:
         CreateTable(LTable);
       stUpdate:
-        AlterTable(LTable);
+        // FK-only changes are skipped: foreign keys are always handled separately
+        // by CreateForeignKeys/AddOrAlterForeignKeys, regardless of table status.
+        if LTable.Changes <> [taForeignKeys] then
+          AlterTable(LTable);
     end;
   end;
 end;
@@ -307,14 +301,6 @@ end;
 procedure TioDBBuilderStrategyBase.CreateTable(const ATable: IioDBBuilderSchemaTable);
 begin
   Script.Body.AddTitle(Format('Creating table ''%s''', [ATable.Name]));
-end;
-
-procedure TioDBBuilderStrategyBase.CreateTables;
-var
-  LTable: IioDBBuilderSchemaTable;
-begin
-  for LTable in Schema.Tables.Values do
-    CreateTable(LTable);
 end;
 
 procedure TioDBBuilderStrategyBase.DropForeignKeys;

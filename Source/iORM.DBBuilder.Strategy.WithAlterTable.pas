@@ -371,7 +371,7 @@ begin
 
   if Create then
   begin
-    CreateTables;
+    CreateOrAlterTables;
 
     // Foreignkeys are created at the end so all referenced tables are already created
     if Schema.ForeignKeysEnabled then
