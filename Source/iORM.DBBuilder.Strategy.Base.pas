@@ -178,9 +178,11 @@ end;
 
 procedure TioDBBuilderStrategyBase.AlterTable(const ATable: IioDBBuilderSchemaTable);
 begin
-  if not Assigned(ATable) then
-    raise EioInvalidArgumentException.Create(ClassName, 'AlterTable', 'ATable is not assigned.');
-
+  // Skip tables that do not need structural changes.
+  // Note: foreign key changes (taForeignKeys) are excluded here because FKs are
+  // always handled separately by CreateForeignKeys/CreateTableForeignKeys, regardless
+  // of whether the table is being created or altered. If the only change detected on
+  // this table is a FK change, there is nothing to ALTER TABLE for, so we exit early.
   if (ATable.Status <> stUpdate) or (ATable.Changes = [taForeignKeys]) then
     exit;
 
@@ -230,9 +232,6 @@ procedure TioDBBuilderStrategyBase.CreateTableForeignKeys(const ATable: IioDBBui
 var
   LForeignKey: IioDBBuilderSchemaFK;
 begin
-  if not Assigned(ATable) then
-    raise EioInvalidArgumentException.Create(ClassName, 'CreateTableForeignKeys', 'ATable is not assigned.');
-
   for LForeignKey in ATable.ForeignKeys.Values do
     Script.Body.Add(SqlGenerator.BuildSQL_AddFK(ATable, LForeignKey));
 end;
@@ -307,9 +306,6 @@ end;
 
 procedure TioDBBuilderStrategyBase.CreateTable(const ATable: IioDBBuilderSchemaTable);
 begin
-  if not Assigned(ATable) then
-    raise EioInvalidArgumentException.Create(ClassName, 'CreateTable', 'ATable is not assigned.');
-
   Script.Body.AddTitle(Format('Creating table ''%s''', [ATable.Name]));
 end;
 
@@ -341,9 +337,6 @@ procedure TioDBBuilderStrategyBase.DropTableIndexes(const ATable: IioDBBuilderSc
 var
   LIndex: IioDBBuilderSchemaIndex;
 begin
-  if not Assigned(ATable) then
-    raise EioInvalidArgumentException.Create(ClassName, 'DropTableIndexes', 'ATable is not assigned.');
-
   for LIndex in ATable.Indexes.Values do
     Script.Body.Add(SqlGenerator.BuildSQL_DropIndex(ATable, LIndex));
 end;

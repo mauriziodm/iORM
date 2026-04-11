@@ -198,11 +198,11 @@ end;
 
 procedure TioDBBuilderEngine.BuildCreateOrUpdateDBSqlScript(const AScript: IioDBBuilderSqlScript);
 begin
-  if not Analyzed then
-    raise EioDBBuilderException.Create(ClassName, 'BuildCreateOrUpdateDBSqlScript', 'Unable to build SQL script: schema not analyzed');
-
   if not Assigned(AScript) then
     raise EioInvalidArgumentException.Create(ClassName, 'BuildCreateOrUpdateDBSqlScript', 'AScript is not assigned.');
+
+  if not Analyzed then
+    raise EioDBBuilderException.Create(ClassName, 'BuildCreateOrUpdateDBSqlScript', 'Unable to build SQL script: schema not analyzed');
 
   case Schema.Status of
     stCreate: TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateCreateDatabaseScript;
