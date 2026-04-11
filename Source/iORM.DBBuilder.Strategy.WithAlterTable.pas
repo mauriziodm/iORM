@@ -65,7 +65,7 @@ type
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
     // Field change detection methods - abstract for RDBMS-specific invalid conversions
-    function GetInvalidTypeConversions: string; override; abstract;
+    function GetInvalidFieldTypeConversions: string; override; abstract;
     function IsFieldLengthChanged(const AOldFieldLength, ANewFieldLength: Smallint; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
     function IsFieldPrecisionChanged(const AOldFieldPrecision, ANewFieldPrecision: Smallint; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
     function IsFieldDecimalsChanged(const AOldFieldDecimals, ANewFieldDecimals: Smallint; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
@@ -311,7 +311,7 @@ begin
   // Verify if blob subtype is changed
   // Check if BLOB subtype changes are permitted by this RDBMS
   if LNewFieldType.StartsWith('BLOB') then
-    Result := Result or IsBlobSubtypeChanged(LOldFieldSubtype, LNewFieldSubtype, AField, ATable, SqlGenerator.Supports_AlterBlobSubtype);
+    Result := Result or IsFieldBlobSubtypeChanged(LOldFieldSubtype, LNewFieldSubtype, AField, ATable, SqlGenerator.Supports_AlterBlobSubtype);
 end;
 
 function TioDBBuilderStrategyWithAlterTable.ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;

@@ -25,7 +25,7 @@ type
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
     // Field change detection methods
-    function GetInvalidTypeConversions: string; override;
+    function GetInvalidFieldTypeConversions: string; override;
     // Indexes
     procedure DropIndexes; override;
     function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
@@ -63,7 +63,7 @@ const
 
 { TioDBBuilderSqLite }
 
-function TioDBBuilderStrategySqLite.GetInvalidTypeConversions: string;
+function TioDBBuilderStrategySqLite.GetInvalidFieldTypeConversions: string;
 begin
   Result := INVALID_FIELDTYPE_CONVERSIONS;
 end;

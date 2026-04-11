@@ -63,13 +63,8 @@ type
     procedure CreateOrAlterTables; virtual;
     procedure CreateTable(const ATable: IioDBBuilderSchemaTable); virtual;
     function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
-
-
-
-
     // Fields
     procedure AddOrAlterFields(const ATable: IioDBBuilderSchemaTable); virtual;
-    procedure CreateTableIndexes(const ATable: IioDBBuilderSchemaTable); overload; virtual;
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
 
@@ -77,13 +72,18 @@ type
 
 
     // Field change detection methods (common to all databases)
-    function GetInvalidTypeConversions: string; virtual; abstract;
+    function GetInvalidFieldTypeConversions: string; virtual; abstract;
     function IsFieldTypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String): Boolean; virtual;
     function IsFieldNotNullChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AIsPermitted: Boolean): Boolean; virtual;
-    function IsBlobSubtypeChanged(const AOldBlobSubtype, ANewBlobSubtype: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean; virtual;
+    function IsFieldBlobSubtypeChanged(const AOldBlobSubtype, ANewBlobSubtype: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean; virtual;
+
+
+
+
     // Indexes
     procedure AddOrAlterIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure CreateIndexes; overload; virtual;
+    procedure CreateTableIndexes(const ATable: IioDBBuilderSchemaTable); overload; virtual;
     procedure DropIndexes; virtual;
     procedure DropTableIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
     function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; overload; virtual; abstract;
@@ -97,7 +97,7 @@ type
     function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
     function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
     // Warnings
-    procedure WarningTypeAffinity(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String; const AInvalidTypeConversions: string); virtual;
+    procedure WarningInvalidFieldTypeConversion(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String; const AInvalidTypeConversions: string); virtual;
     procedure WarningValueChanged(const AValueName, AOldValue, ANewValue: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
     // Hook methods
     /// <summary>
@@ -364,7 +364,7 @@ begin
   Result := FSqlGenerator;
 end;
 
-procedure TioDBBuilderStrategyBase.WarningTypeAffinity(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
+procedure TioDBBuilderStrategyBase.WarningInvalidFieldTypeConversion(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
   const AOldFieldType, ANewFieldType: String; const AInvalidTypeConversions: string);
 var
   LRequiredConversion: String;
@@ -396,7 +396,7 @@ begin
   if Result then
   begin
     AField.AddAltered(alFieldType);
-    WarningTypeAffinity(ATable, AField, AOldFieldType, ANewFieldType, GetInvalidTypeConversions);
+    WarningInvalidFieldTypeConversion(ATable, AField, AOldFieldType, ANewFieldType, GetInvalidFieldTypeConversions);
   end;
 end;
 
@@ -413,7 +413,7 @@ begin
     begin
       // If the field is now NOT NULL but wasn't before, and no default value is specified,
       // add a hint to alert the user about the potential data impact
-      if AField.FieldNotNull and (not AOldFieldNotNull) and (not AField.FieldDefaultExists) then
+      if ANewFieldNotNull and not AField.FieldDefaultExists then
         Script.Hints.Add
           (Format('Table ''%s'' field ''%s'' --> The not null setting is changed from FALSE to TRUE and a DEFAULT value has not been specified',
           [ATable.Name, AField.FieldName]));
@@ -424,7 +424,7 @@ begin
   end;
 end;
 
-function TioDBBuilderStrategyBase.IsBlobSubtypeChanged(const AOldBlobSubtype, ANewBlobSubtype: String;
+function TioDBBuilderStrategyBase.IsFieldBlobSubtypeChanged(const AOldBlobSubtype, ANewBlobSubtype: String;
   const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean;
 begin
   Result := AOldBlobSubtype <> ANewBlobSubtype;

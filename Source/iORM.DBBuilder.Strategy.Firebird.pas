@@ -51,7 +51,7 @@ type
   TioDBBuilderStrategyFirebird = class(TioDBBuilderStrategyWithAlterTable)
   protected
     // RDBMS-specific invalid type conversions
-    function GetInvalidTypeConversions: string; override;
+    function GetInvalidFieldTypeConversions: string; override;
     // Hook override for Firebird-specific key generation compatibility check
     procedure DoCheckKeyGenerationCompatibility; override;
   end;
@@ -75,7 +75,7 @@ const
 
 { TioDBBuilderStrategyFirebird }
 
-function TioDBBuilderStrategyFirebird.GetInvalidTypeConversions: string;
+function TioDBBuilderStrategyFirebird.GetInvalidFieldTypeConversions: string;
 begin
   Result := INVALID_FIELDTYPE_CONVERSIONS;
 end;
