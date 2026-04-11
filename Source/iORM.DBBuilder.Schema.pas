@@ -102,6 +102,12 @@ begin
   inherited;
 end;
 
+// This method implements a "find or create" (lazy registry) pattern on the FTables dictionary.
+// It is called once per mapped class during schema building: each class contributes its fields,
+// indexes and foreign keys to the corresponding SchemaTable object.
+// When multiple classes share the same physical table (e.g. single-table inheritance / TrueClass),
+// the first call creates the SchemaTable entry; subsequent calls for other classes mapped to the
+// same table simply retrieve the existing entry and enrich it.
 function TioDBBuilderSchema.FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
 var
   LTableName: String;
@@ -110,14 +116,19 @@ begin
   LTableName := AMap.GetTable.TableName;
   if not FTables.ContainsKey(LTableName) then
   begin
-    // Resolve the key generation strategy: if kgsAuto is specified in the map,
-    // it will be resolved to the DBMS-specific default strategy by the SqlGenerator.
+    // The table does not exist yet in the schema: create it.
+    // Resolve the key generation strategy first: if the map declares kgsAuto,
+    // the SqlGenerator translates it into the concrete DBMS-specific strategy
+    // (e.g. Autoincrement for SQLite, Identity/Sequence for Firebird 3+, etc.).
     LKeyGenStrategy := FSqlGenerator.ResolveKeyGenerationStrategy(AMap.GetTable.GetKeyGenerationStrategy);
     FTables.Add(LTableName, TioDBBuilderFactory.NewSchemaTable(AMap.GetTable, LKeyGenStrategy));
   end;
   Result := FTables.Items[LTableName];
-  // NB: Se anche una sola classe mappata su questa tabella e' TrueClass allora IsTrueClass deve essere true
-  // (vedi setter nella classe)
+  // Update the IsTrueClass flag on the SchemaTable.
+  // In single-table inheritance multiple classes share the same table, but only the
+  // "true" class (the one that owns the discriminator field) has IsTrueClass = True.
+  // The setter uses an OR-like logic: once set to True it never goes back to False,
+  // so if at least one of the mapped classes is the TrueClass the flag stays True.
   Result.IsTrueClass := AMap.GetTable.IsTrueClass;
 end;
 
