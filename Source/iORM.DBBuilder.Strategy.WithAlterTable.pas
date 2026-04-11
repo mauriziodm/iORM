@@ -311,7 +311,7 @@ begin
   // Verify if blob subtype is changed
   // Check if BLOB subtype changes are permitted by this RDBMS
   if LNewFieldType.StartsWith('BLOB') then
-    Result := Result or IsFieldBlobSubtypeChanged(LOldFieldSubtype, LNewFieldSubtype, AField, ATable, SqlGenerator.Supports_AlterBlobSubtype);
+    Result := Result or IsFieldBlobSubtypeChanged(ATable, AField, LOldFieldSubtype, LNewFieldSubtype, SqlGenerator.Supports_AlterBlobSubtype);
 end;
 
 function TioDBBuilderStrategyWithAlterTable.ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;

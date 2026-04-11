@@ -67,15 +67,11 @@ type
     procedure AddOrAlterFields(const ATable: IioDBBuilderSchemaTable); virtual;
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
-
-
-
-
     // Field change detection methods (common to all databases)
     function GetInvalidFieldTypeConversions: string; virtual; abstract;
     function IsFieldTypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String): Boolean; virtual;
     function IsFieldNotNullChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AIsPermitted: Boolean): Boolean; virtual;
-    function IsFieldBlobSubtypeChanged(const AOldBlobSubtype, ANewBlobSubtype: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean; virtual;
+    function IsFieldBlobSubtypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldBlobSubtype, ANewBlobSubtype: String; const AIsPermitted: Boolean): Boolean; virtual;
 
 
 
@@ -89,6 +85,10 @@ type
     function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; overload; virtual; abstract;
     function IndexExists(const AIndexName: string): boolean; overload; virtual;
     function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; virtual; abstract;
+
+
+
+
     // ForeignKeys
     procedure AddOrAlterForeignKeys; virtual;
     procedure CreateForeignKeys; overload; virtual;
@@ -392,7 +392,7 @@ end;
 function TioDBBuilderStrategyBase.IsFieldTypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
   const AOldFieldType, ANewFieldType: String): Boolean;
 begin
-  Result := not SameText(AOldFieldType, ANewFieldType);
+  Result := not SameText(AOldFieldType, ANewFieldType); // case-insensitive comparison
   if Result then
   begin
     AField.AddAltered(alFieldType);
@@ -424,10 +424,10 @@ begin
   end;
 end;
 
-function TioDBBuilderStrategyBase.IsFieldBlobSubtypeChanged(const AOldBlobSubtype, ANewBlobSubtype: String;
-  const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable; const AIsPermitted: Boolean): Boolean;
+function TioDBBuilderStrategyBase.IsFieldBlobSubtypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
+  const AOldBlobSubtype, ANewBlobSubtype: String; const AIsPermitted: Boolean): Boolean;
 begin
-  Result := AOldBlobSubtype <> ANewBlobSubtype;
+  Result := not SameText(AOldBlobSubtype, ANewBlobSubtype); // case-insensitive comparison
   if Result then
   begin
     AField.AddAltered(alFieldType);
