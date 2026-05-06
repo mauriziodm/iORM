@@ -1375,13 +1375,16 @@ begin
       TioDBFactory.QueryEngine.GetQueryUpdate(AContext).ExecSQL;
     end;
   end;
-  // If there is no conflict or there is a conflict but it has been resolved�
-  if AContext.BlindLevel_Do_AutoUpdateProps and ((not AContext.ConflictDetected) or (AContext.ConflictState <= csResolved)) then
+  // If there is no conflict or there is a conflict but it has been resolved
+  if (not AContext.ConflictDetected) or (AContext.ConflictState <= csResolved) then
   begin
-    AContext.ObjVersion := AContext.ObjNextVersion;
-    AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;;
-    AContext.ObjUpdatedUserID := AContext.PSREquest.UsrOID;
-    AContext.ObjUpdatedUserName := AContext.PSREquest.Usr;
+    if AContext.BlindLevel_Do_AutoUpdateProps then
+    begin
+      AContext.ObjVersion := AContext.ObjNextVersion;
+      AContext.ObjUpdated := LQuery.Connection.LastTransactionTimestamp;;
+      AContext.ObjUpdatedUserID := AContext.PSREquest.UsrOID;
+      AContext.ObjUpdatedUserName := AContext.PSREquest.Usr;
+    end;
     AContext.ObjStatus := osClean;
   end;
 end;
