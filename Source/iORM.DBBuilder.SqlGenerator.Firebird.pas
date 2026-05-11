@@ -100,7 +100,7 @@ type
     function BuildSQL_CreateSequence(const ASequenceName: String): string; override;
     function BuildSQL_DropSequence(const ASequenceName: string): string; override;
     function BuildSQL_SequenceExists(const ASequenceName: string): string; override;
-    function ResolveKeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType; override;
+    function Resolve_KeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType; override;
     function Supports_Identity: Boolean; override;
     function Supports_Sequence: Boolean; override;
 
@@ -132,7 +132,9 @@ uses
 
 
 const
-  MAX_IDENTIFIER_NAME_LENGTH = 31;
+  // Firebird 1.x - 2.5: max 31 chars, Firebird 3.0+: max 63 chars
+  MAX_IDENTIFIER_LENGTH_FB2 = 31;
+  MAX_IDENTIFIER_LENGTH_FB3 = 63;
 
 
 { TioDBBuilderSqlGenFirebird }
@@ -466,7 +468,10 @@ end;
 
 function TioDBBuilderSqlGenFirebird.GetMaxSqlIdentifierLength: integer;
 begin
-  Result := MAX_IDENTIFIER_NAME_LENGTH;
+  if DBMSInfo.MajorVersion >= 3 then
+    Result := MAX_IDENTIFIER_LENGTH_FB3
+  else
+    Result := MAX_IDENTIFIER_LENGTH_FB2;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
@@ -659,7 +664,7 @@ begin
   Result := True;
 end;
 
-function TioDBBuilderSqlGenFirebird.ResolveKeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType;
+function TioDBBuilderSqlGenFirebird.Resolve_KeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType;
 begin
   // Resolves kgsAuto to the DBMS-specific default strategy.
   // Firebird default is kgsSequence (generators) for backward compatibility,
