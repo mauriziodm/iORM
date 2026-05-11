@@ -371,8 +371,6 @@ type
     // ==========================================================
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
-    /// <summary>Generates SQL fragment to add a field in ALTER TABLE context</summary>
-    function BuildSQL_AddField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     /// <summary>
     /// Generates SQL to alter an existing field based on detected changes.
     /// Uses DBMSInfo property internally for version-specific behavior.
@@ -381,8 +379,10 @@ type
     /// <param name="AField">Field to alter with change flags set</param>
     /// <returns>ALTER TABLE SQL statement</returns>
     function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
-    /// <summary>Generates SQL fragment to define a field in CREATE TABLE context</summary>
+    /// <summary>Generates SQL to create a field in ALTER TABLE context</summary>
     function BuildSQL_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
+    /// <summary>Generates SQL fragment to define a field in CREATE TABLE context</summary>
+    function BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     /// <summary>Generates SQL to check if a specific field exists in a table</summary>
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     /// <summary>
@@ -419,9 +419,9 @@ type
     /// <param name="ATable">The table schema</param>
     /// <param name="AIndex">The index schema with field list and options</param>
     /// <returns>CREATE INDEX SQL statement</returns>
-    function BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
-    /// <summary>Generates SQL to add primary key constraint to a table</summary>
-    function BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string;
+    function BuildSQL_CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
+    /// <summary>Generates SQL to create primary key constraint on a table</summary>
+    function BuildSQL_CreatePK(const ATable: IioDBBuilderSchemaTable): string;
     /// <summary>
     /// Generates SQL to drop an index from a table.
     /// </summary>
@@ -431,6 +431,12 @@ type
     function BuildSQL_DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
     /// <summary>Generates SQL to drop an index by name</summary>
     function BuildSQL_DropIndexByName(const AIndexName: string): string;
+    /// <summary>
+    /// Returns SQL to retrieve detailed info about an index (list of fields with position/order).
+    /// </summary>
+    /// <param name="AIndexName">The index name to get details for</param>
+    /// <returns>SQL query to retrieve index details</returns>
+    function BuildSQL_IndexDetails(const AIndexName: string): string;
     /// <summary>Generates SQL to check if an index exists on a table</summary>
     function BuildSQL_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
     /// <summary>Generates SQL to check if an index exists by name</summary>
@@ -445,12 +451,6 @@ type
     /// <returns>SQL query to retrieve index list</returns>
     function BuildSQL_IndexList(const ATableName: string = ''): string;
     /// <summary>
-    /// Returns SQL to retrieve detailed info about an index (list of fields with position/order).
-    /// </summary>
-    /// <param name="AIndexName">The index name to get details for</param>
-    /// <returns>SQL query to retrieve index details</returns>
-    function BuildSQL_IndexDetails(const AIndexName: string): string;
-    /// <summary>
     /// Generates the index name from table and index schema information.
     /// Handles both explicit names and auto-generated names with prefixes/suffixes.
     /// </summary>
@@ -463,7 +463,7 @@ type
     // ==========================================================
     // FOREIGN KEY RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
+    function BuildSQL_CreateFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
     /// <summary>
     /// Generates SQL to drop a foreign key constraint.
     /// </summary>
@@ -543,7 +543,7 @@ type
     // SEQUENCE RELATED METHODS
     // ----------------------------------------------------------
     /// <summary>Generates SQL to create a sequence</summary>
-    function BuildSQL_AddSequence(const ASequenceName: String): string;
+    function BuildSQL_CreateSequence(const ASequenceName: String): string;
     /// <summary>Generates SQL to drop a sequence</summary>
     function BuildSQL_DropSequence(const ASequenceName: string): string;
     /// <summary>Generates SQL to check if a sequence exists</summary>

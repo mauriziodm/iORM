@@ -109,7 +109,7 @@ begin
   inherited;
 
   if taFields in ATable.Changes then
-    AddOrAlterFields(ATable);
+    CreateOrAlterFields(ATable);
 end;
 
 procedure TioDBBuilderStrategyWithAlterTable.CreateSequences;
@@ -125,7 +125,7 @@ begin
   begin
     // Check if sequence exists, then create it
     if (Schema.Status = stCreate) or (not SequenceExists(LSequence)) then
-      Script.Body.Add(SqlGenerator.BuildSQL_AddSequence(LSequence));
+      Script.Body.Add(SqlGenerator.BuildSQL_CreateSequence(LSequence));
   end;
 end;
 
@@ -149,14 +149,14 @@ begin
   LComma := '  ';
   for LField in ATable.Fields do
   begin
-    Script.Body.AddLine(LComma + SqlGenerator.BuildSQL_CreateField(ATable, LField));
+    Script.Body.AddLine(LComma + SqlGenerator.BuildSQL_FieldDefinition(ATable, LField));
     LComma := ', ';
   end;
 
   Script.Body.DecIndent;
   Script.Body.Add(SqlGenerator.BuildSQL_EndCreateTable(ATable));
   Script.Body.AddEmpty;
-  Script.Body.Add(SqlGenerator.BuildSQL_AddPK(ATable));
+  Script.Body.Add(SqlGenerator.BuildSQL_CreatePK(ATable));
 end;
 
 procedure TioDBBuilderStrategyWithAlterTable.CreateTableSequence(const ATable: IioDBBuilderSchemaTable);
@@ -170,7 +170,7 @@ begin
 
   // Check if sequence exists, then create it
   if (ATable.Status = stCreate) or (not SequenceExists(ATable.GetSequenceName)) then
-    Script.Body.Add(SqlGenerator.BuildSQL_AddSequence(ATable.GetSequenceName));
+    Script.Body.Add(SqlGenerator.BuildSQL_CreateSequence(ATable.GetSequenceName));
 end;
 
 procedure TioDBBuilderStrategyWithAlterTable.DropForeignKeys;
@@ -372,7 +372,7 @@ begin
     if Schema.Status = stCreate then
       CreateIndexes
     else
-      AddOrAlterIndexes;
+      CreateOrAlterIndexes;
   end;
 
   // Foreign keys are processed last so all referenced tables are already created.
@@ -383,7 +383,7 @@ begin
     if Schema.Status = stCreate then
       CreateForeignKeys
     else
-      AddOrAlterForeignKeys;
+      CreateOrAlterForeignKeys;
   end;
 end;
 

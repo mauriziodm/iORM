@@ -49,7 +49,7 @@ uses
 type
   TioDBBuilderSqlGenFirebird = class(TioDBBuilderSqlGenBase)
   private
-    function _BuildSQL_CreateOrAddField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): String;
+    function _BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): String;
   protected
     // ==========================================================
     // DATABASE RELATED METHODS
@@ -63,15 +63,15 @@ type
     function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_TableExists(const ATableName: string): string; override;
-    function Supports_AlterNotNull: Boolean; override;
     function Supports_AlterBlobSubtype: Boolean; override;
+    function Supports_AlterNotNull: Boolean; override;
 
     // ==========================================================
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_AddField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
+    function BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; override;
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; override;
@@ -79,25 +79,25 @@ type
     // ==========================================================
     // INDEX RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
-    function BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string; override;
+    function BuildSQL_CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
+    function BuildSQL_CreatePK(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_DropIndexByName(const AIndexName: string): string; override;
+    function BuildSQL_IndexDetails(const AIndexName: string): string; override;
     function BuildSQL_IndexExistsByName(const AIndexName: string): string; override;
     function BuildSQL_IndexList(const ATableName: string = ''): string; override;
-    function BuildSQL_IndexDetails(const AIndexName: string): string; override;
     function Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String; override;
 
     // ==========================================================
     // FOREIGN KEY RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
+    function BuildSQL_CreateFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string; override;
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; override;
 
     // ==========================================================
     // KEY GENERATION RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_AddSequence(const ASequenceName: String): string; override;
+    function BuildSQL_CreateSequence(const ASequenceName: String): string; override;
     function BuildSQL_DropSequence(const ASequenceName: string): string; override;
     function BuildSQL_SequenceExists(const ASequenceName: string): string; override;
     function ResolveKeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType; override;
@@ -171,12 +171,12 @@ begin
   end;
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildSQL_AddField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
 begin
-  Result := Format('ALTER TABLE %s ADD %s;', [ATable.SqlName, _BuildSQL_CreateOrAddField(ATable, AField)]);
+  Result := Format('ALTER TABLE %s ADD %s;', [ATable.SqlName, _BuildSQL_FieldDefinition(ATable, AField)]);
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_CreateFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
 var
   LSqlText: IioDBBuilderSqlText;
 begin
@@ -205,7 +205,7 @@ begin
   Result := LSqlText.Text;
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
 var
   LIndexName, LFieldList, LUnique, LOrientation: String;
 begin
@@ -219,14 +219,14 @@ begin
   Result := Format('CREATE%s%s INDEX %s ON %s (%s);', [LUnique, LOrientation, LIndexName, ATable.SqlName, LFieldList]);
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_CreatePK(const ATable: IioDBBuilderSchemaTable): string;
 begin
   // Note: PK_%s uses raw name for constraint naming, SqlName for table reference
   Result := Format('ALTER TABLE %s ADD CONSTRAINT PK_%s PRIMARY KEY (%s);', [ATable.SqlName, ATable.Name,
     ATable.PrimaryKeyField.SqlFieldName]);
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildSQL_AddSequence(const ASequenceName: String): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_CreateSequence(const ASequenceName: String): string;
 var
   LSequenceName: string;
 begin
@@ -469,9 +469,9 @@ begin
   Result := MAX_IDENTIFIER_NAME_LENGTH;
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildSQL_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
 begin
-  Result := _BuildSQL_CreateOrAddField(ATable, AField);
+  Result := _BuildSQL_FieldDefinition(ATable, AField);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string;
@@ -505,7 +505,7 @@ begin
   Result := ');';
 end;
 
-function TioDBBuilderSqlGenFirebird._BuildSQL_CreateOrAddField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): String;
+function TioDBBuilderSqlGenFirebird._BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): String;
 var
   LDefault: string;
   LNotNull: string;

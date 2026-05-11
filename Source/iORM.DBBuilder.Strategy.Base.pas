@@ -64,7 +64,7 @@ type
     procedure CreateTable(const ATable: IioDBBuilderSchemaTable); virtual;
     function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
     // Fields
-    procedure AddOrAlterFields(const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure CreateOrAlterFields(const ATable: IioDBBuilderSchemaTable); virtual;
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
     // Field change detection methods (common to all databases)
@@ -77,8 +77,8 @@ type
 
 
     // Indexes
-    procedure AddOrAlterIndexes; overload; virtual;
-    procedure AddOrAlterIndexes(const ATable: IioDBBuilderSchemaTable); overload; virtual;
+    procedure CreateOrAlterIndexes; overload; virtual;
+    procedure CreateOrAlterIndexes(const ATable: IioDBBuilderSchemaTable); overload; virtual;
     procedure CreateIndexes; overload; virtual;
     procedure CreateTableIndexes(const ATable: IioDBBuilderSchemaTable); overload; virtual;
     procedure DropIndexes; virtual;
@@ -91,7 +91,7 @@ type
 
 
     // ForeignKeys
-    procedure AddOrAlterForeignKeys; virtual;
+    procedure CreateOrAlterForeignKeys; virtual;
     procedure CreateForeignKeys; overload; virtual;
     procedure CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable); overload; virtual;
     procedure DropForeignKeys; virtual;
@@ -135,7 +135,7 @@ uses
 
 { TioDBBuilderStrategyBase }
 
-procedure TioDBBuilderStrategyBase.AddOrAlterForeignKeys;
+procedure TioDBBuilderStrategyBase.CreateOrAlterForeignKeys;
 var
   LTable: IioDBBuilderSchemaTable;
   LFK: IioDBBuilderSchemaFK;
@@ -151,12 +151,12 @@ begin
         case LFK.Status of
           stCreate:
             begin
-              Script.Body.Add(SqlGenerator.BuildSQL_AddFK(LTable, LFK));
+              Script.Body.Add(SqlGenerator.BuildSQL_CreateFK(LTable, LFK));
             end;
           stUpdate:
             begin
               Script.Body.Add(SqlGenerator.BuildSQL_DropFK(LTable, LFK));
-              Script.Body.Add(SqlGenerator.BuildSQL_AddFK(LTable, LFK));
+              Script.Body.Add(SqlGenerator.BuildSQL_CreateFK(LTable, LFK));
             end;
         end;
       end;
@@ -164,18 +164,18 @@ begin
   end;
 end;
 
-procedure TioDBBuilderStrategyBase.AddOrAlterIndexes;
+procedure TioDBBuilderStrategyBase.CreateOrAlterIndexes;
 var
   LTable: IioDBBuilderSchemaTable;
 begin
   for LTable in Schema.Tables.Values do
   begin
     if taIndexes in LTable.Changes then
-      AddOrAlterIndexes(LTable);
+      CreateOrAlterIndexes(LTable);
   end;
 end;
 
-procedure TioDBBuilderStrategyBase.AddOrAlterIndexes(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.CreateOrAlterIndexes(const ATable: IioDBBuilderSchemaTable);
 var
   LIndex: IioDBBuilderSchemaIndex;
 begin
@@ -184,12 +184,12 @@ begin
     case LIndex.Status of
       stCreate:
         begin
-          Script.Body.Add(SqlGenerator.BuildSQL_AddIndex(ATable, LIndex));
+          Script.Body.Add(SqlGenerator.BuildSQL_CreateIndex(ATable, LIndex));
         end;
       stUpdate:
         begin
           Script.Body.Add(SqlGenerator.BuildSQL_DropIndex(ATable, LIndex));
-          Script.Body.Add(SqlGenerator.BuildSQL_AddIndex(ATable, LIndex));
+          Script.Body.Add(SqlGenerator.BuildSQL_CreateIndex(ATable, LIndex));
         end;
     end;
   end;
@@ -244,7 +244,7 @@ var
   LForeignKey: IioDBBuilderSchemaFK;
 begin
   for LForeignKey in ATable.ForeignKeys.Values do
-    Script.Body.Add(SqlGenerator.BuildSQL_AddFK(ATable, LForeignKey));
+    Script.Body.Add(SqlGenerator.BuildSQL_CreateFK(ATable, LForeignKey));
 end;
 
 procedure TioDBBuilderStrategyBase.CreateIndexes;
@@ -273,11 +273,11 @@ begin
       Script.Body.Add(SqlGenerator.BuildSQL_DropIndex(ATable, LIndex));
 
     if (ATable.Status = stCreate) or (LIndex.Status in [stCreate, stUpdate]) then
-      Script.Body.Add(SqlGenerator.BuildSQL_AddIndex(ATable, LIndex));
+      Script.Body.Add(SqlGenerator.BuildSQL_CreateIndex(ATable, LIndex));
   end;
 end;
 
-procedure TioDBBuilderStrategyBase.AddOrAlterFields(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.CreateOrAlterFields(const ATable: IioDBBuilderSchemaTable);
 var
   LField: IioDBBuilderSchemaField;
 begin
@@ -285,7 +285,7 @@ begin
   begin
     case LField.Status of
       stCreate:
-        Script.Body.Add(SqlGenerator.BuildSQL_AddField(ATable, LField));
+        Script.Body.Add(SqlGenerator.BuildSQL_CreateField(ATable, LField));
       stUpdate:
         Script.Body.Add(SqlGenerator.BuildSQL_AlterField(ATable, LField));
     end;

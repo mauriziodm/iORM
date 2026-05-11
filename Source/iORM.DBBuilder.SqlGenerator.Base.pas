@@ -75,9 +75,9 @@ type
     // ==========================================================
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_AddField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildSQL_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
+    function BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; virtual; abstract;
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; virtual; abstract;
@@ -86,14 +86,14 @@ type
     // ==========================================================
     // INDEX RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual; abstract;
-    function BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
+    function BuildSQL_CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual; abstract;
+    function BuildSQL_CreatePK(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
     function BuildSQL_DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual;
     function BuildSQL_DropIndexByName(const AIndexName: string): string; virtual; abstract;
+    function BuildSQL_IndexDetails(const AIndexName: string): string; virtual; abstract;
     function BuildSQL_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual;
     function BuildSQL_IndexExistsByName(const AIndexName: string): string; virtual; abstract;
     function BuildSQL_IndexList(const ATableName: string = ''): string; virtual; abstract;
-    function BuildSQL_IndexDetails(const AIndexName: string): string; virtual; abstract;
     /// <summary>
     /// Translates an index schema to a comma-separated list of field names with orientation.
     /// </summary>
@@ -129,7 +129,7 @@ type
     // ==========================================================
     // FOREIGN KEY RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual; abstract;
+    function BuildSQL_CreateFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual; abstract;
     function BuildSQL_DropFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; overload; virtual;
     function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string; overload; virtual; abstract;
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; virtual; abstract;
@@ -140,7 +140,7 @@ type
     // KEY GENERATION RELATED METHODS
     // ----------------------------------------------------------
     /// <summary>Generates SQL to create a sequence</summary>
-    function BuildSQL_AddSequence(const ASequenceName: String): string; virtual; abstract;
+    function BuildSQL_CreateSequence(const ASequenceName: String): string; virtual; abstract;
     /// <summary>Generates SQL to drop a sequence</summary>
     function BuildSQL_DropSequence(const ASequenceName: string): string; virtual; abstract;
     /// <summary>Generates SQL to check if a sequence exists</summary>

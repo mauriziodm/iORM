@@ -64,9 +64,9 @@ type
     // ==========================================================
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_AddField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
+    function BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; override;
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; override;
@@ -74,24 +74,24 @@ type
     // ==========================================================
     // INDEX RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
-    function BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string; override;
+    function BuildSQL_CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
+    function BuildSQL_CreatePK(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_DropIndexByName(const AIndexName: string): string; override;
+    function BuildSQL_IndexDetails(const AIndexName: string): string; override;
     function BuildSQL_IndexExistsByName(const AIndexName: string): string; override;
     function BuildSQL_IndexList(const ATableName: string = ''): string; override;
-    function BuildSQL_IndexDetails(const AIndexName: string): string; override;
 
     // ==========================================================
     // FOREIGN KEY RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
+    function BuildSQL_CreateFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; override;
     function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string; override;
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; override;
 
     // ==========================================================
     // KEY GENERATION RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_AddSequence(const ASequenceName: String): string; override;
+    function BuildSQL_CreateSequence(const ASequenceName: String): string; override;
     function BuildSQL_DropSequence(const ASequenceName: string): string; override;
     function BuildSQL_SequenceExists(const ASequenceName: string): string; override;
     function ResolveKeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType; override;
@@ -136,7 +136,7 @@ begin
   Result := FileExists(TioConnectionManager.GetDatabaseFileName(ConnectionDefName));
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildSQL_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
 var
   LDefault: string;
   LNotNull: string;
@@ -156,7 +156,7 @@ begin
     Result := Format('%s %s%s%s', [AField.SqlFieldName, Translate_SchemaField_To_FieldType(AField, False), LDefault, LNotNull]);  // False = does not include attributes
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildSQL_AddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
 var
   LIndexName, LFieldList, LUnique: String;
 begin
@@ -248,13 +248,13 @@ begin
   Result := Format('PRAGMA foreign_key_list(''%s'')', [EscapeSQLStringLiteral(ATableName)]);
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildSQL_AddPK(const ATable: IioDBBuilderSchemaTable): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_CreatePK(const ATable: IioDBBuilderSchemaTable): string;
 begin
   // Note: TioDBBuilderStrategySqLite should NEVER call this method.
   // SQLite defines PRIMARY KEY inline in CREATE TABLE statement.
   // This method exists only to satisfy the abstract interface contract.
   // If this exception is raised, it indicates a logic error in the Strategy layer.
-  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_AddPK',
+  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_CreatePK',
     'SQLite does not support adding PRIMARY KEY after table creation. ' +
     'Primary keys must be defined inline in the CREATE TABLE statement.');
 end;
@@ -308,17 +308,17 @@ begin
   end;
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildSQL_AddField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
 begin
   // Note: TioDBBuilderStrategySqLite should NEVER call this method.
   // SQLite has very limited ALTER TABLE support and does not support adding new columns in certain contexts.
   // This method exists only to satisfy the abstract interface contract.
   // If this exception is raised, it indicates a logic error in the Strategy layer.
-  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_AddField',
+  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_CreateField',
     'SQLite does not support adding columns via ALTER TABLE in this context. '#13#13'Column additions are not supported by SQLite.');
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildSQL_AddFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_CreateFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
 var
   LSqlText: IioDBBuilderSqlText;
 begin
@@ -431,10 +431,10 @@ begin
     Result := ARequestedStrategy;
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildSQL_AddSequence(const ASequenceName: String): string;
+function TioDBBuilderSqlGenSQLite.BuildSQL_CreateSequence(const ASequenceName: String): string;
 begin
   // SQLite does not support sequences
-  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_AddSequence',
+  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_CreateSequence',
     'SQLite does not support sequences.');
 end;
 
