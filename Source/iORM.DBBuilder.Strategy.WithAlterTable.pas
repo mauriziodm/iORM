@@ -109,16 +109,7 @@ begin
   inherited;
 
   if taFields in ATable.Changes then
-  begin
     AddOrAlterFields(ATable);
-  end;
-
-  if Schema.IndexesEnabled and (taIndexes in ATable.Changes) then
-  begin
-    Script.Body.AddEmpty;
-    AddOrAlterIndexes(ATable);
-    Script.Body.AddEmpty;
-  end;
 end;
 
 procedure TioDBBuilderStrategyWithAlterTable.CreateSequences;
@@ -166,12 +157,6 @@ begin
   Script.Body.Add(SqlGenerator.BuildSQL_EndCreateTable(ATable));
   Script.Body.AddEmpty;
   Script.Body.Add(SqlGenerator.BuildSQL_AddPK(ATable));
-
-  if Schema.IndexesEnabled then
-  begin
-    Script.Body.AddEmpty;
-    CreateTableIndexes(ATable);
-  end;
 end;
 
 procedure TioDBBuilderStrategyWithAlterTable.CreateTableSequence(const ATable: IioDBBuilderSchemaTable);
@@ -367,18 +352,28 @@ end;
 /// <summary>
 /// Generates all database objects (tables, indexes, sequences, and foreign keys)
 /// based on the current Schema.Status (stCreate or stUpdate).
-/// Tables are created or altered first, then foreign keys are processed last
-/// to ensure all referenced tables already exist.
-/// When creating a new database (stCreate), all FKs are created unconditionally;
-/// when updating (stUpdate), only new or modified FKs are processed.
+/// Tables are created or altered first (fields and sequences only), then indexes
+/// and foreign keys are processed as separate explicit steps.
+/// When creating a new database (stCreate), all objects are created unconditionally;
+/// when updating (stUpdate), only new or modified objects are processed.
+/// Foreign keys are always processed last to ensure all referenced tables already exist.
 /// </summary>
 procedure TioDBBuilderStrategyWithAlterTable.GenerateDatabaseObjects;
 begin
   // Check key generation strategy compatibility with RDBMS version
   DoCheckKeyGenerationCompatibility;
 
-  // Create new tables or alter existing ones (includes fields, indexes, and sequences)
+  // Create new tables or alter existing ones (fields and sequences only)
   CreateOrAlterTables;
+
+  // Indexes: create all (stCreate) or only add/alter modified ones (stUpdate)
+  if Schema.IndexesEnabled then
+  begin
+    if Schema.Status = stCreate then
+      CreateIndexes
+    else
+      AddOrAlterIndexes;
+  end;
 
   // Foreign keys are processed last so all referenced tables are already created.
   // stCreate: create all FKs unconditionally (new database).

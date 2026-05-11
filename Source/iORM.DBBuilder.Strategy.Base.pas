@@ -77,7 +77,8 @@ type
 
 
     // Indexes
-    procedure AddOrAlterIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure AddOrAlterIndexes; overload; virtual;
+    procedure AddOrAlterIndexes(const ATable: IioDBBuilderSchemaTable); overload; virtual;
     procedure CreateIndexes; overload; virtual;
     procedure CreateTableIndexes(const ATable: IioDBBuilderSchemaTable); overload; virtual;
     procedure DropIndexes; virtual;
@@ -160,6 +161,17 @@ begin
         end;
       end;
     end;
+  end;
+end;
+
+procedure TioDBBuilderStrategyBase.AddOrAlterIndexes;
+var
+  LTable: IioDBBuilderSchemaTable;
+begin
+  for LTable in Schema.Tables.Values do
+  begin
+    if taIndexes in LTable.Changes then
+      AddOrAlterIndexes(LTable);
   end;
 end;
 
@@ -290,9 +302,9 @@ begin
       stCreate:
         CreateTable(LTable);
       stUpdate:
-        // FK-only changes are skipped: foreign keys are always handled separately
-        // by CreateForeignKeys/AddOrAlterForeignKeys, regardless of table status.
-        if LTable.Changes <> [taForeignKeys] then
+        // Index-only and FK-only changes are skipped: indexes and foreign keys
+        // are always handled separately in GenerateDatabaseObjects.
+        if not (LTable.Changes <= [taIndexes, taForeignKeys]) then
           AlterTable(LTable);
     end;
   end;
