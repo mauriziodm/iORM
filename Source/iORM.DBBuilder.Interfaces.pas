@@ -529,7 +529,7 @@ type
     /// If ARequestedStrategy is kgsAuto, returns the DBMS-specific default strategy.
     /// Otherwise, returns ARequestedStrategy unchanged.
     /// </summary>
-    function ResolveKeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType;
+    function Resolve_KeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType;
 
     // ==========================================================
     // ALTER TABLE CAPABILITY METHODS

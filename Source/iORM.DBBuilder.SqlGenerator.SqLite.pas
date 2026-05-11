@@ -94,7 +94,7 @@ type
     function BuildSQL_CreateSequence(const ASequenceName: String): string; override;
     function BuildSQL_DropSequence(const ASequenceName: string): string; override;
     function BuildSQL_SequenceExists(const ASequenceName: string): string; override;
-    function ResolveKeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType; override;
+    function Resolve_KeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType; override;
     function Supports_Identity: Boolean; override;
     function Supports_Sequence: Boolean; override;
 
@@ -420,7 +420,7 @@ begin
   Result := False;
 end;
 
-function TioDBBuilderSqlGenSQLite.ResolveKeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType;
+function TioDBBuilderSqlGenSQLite.Resolve_KeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType;
 begin
   // Resolves kgsAuto to the DBMS-specific default strategy.
   // SQLite default is kgsIdentity (INTEGER PRIMARY KEY acts as auto-increment rowid).

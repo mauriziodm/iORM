@@ -150,7 +150,7 @@ type
     /// If ARequestedStrategy is kgsAuto, returns the DBMS-specific default strategy.
     /// Otherwise, returns ARequestedStrategy unchanged.
     /// </summary>
-    function ResolveKeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType; virtual; abstract;
+    function Resolve_KeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType; virtual; abstract;
     /// <summary>Returns True if the database supports IDENTITY columns</summary>
     function Supports_Identity: Boolean; virtual; abstract;
     /// <summary>Returns True if the database supports SEQUENCE objects</summary>

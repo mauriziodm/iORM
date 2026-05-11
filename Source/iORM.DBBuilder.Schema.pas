@@ -120,7 +120,7 @@ begin
     // Resolve the key generation strategy first: if the map declares kgsAuto,
     // the SqlGenerator translates it into the concrete DBMS-specific strategy
     // (e.g. Autoincrement for SQLite, Identity/Sequence for Firebird 3+, etc.).
-    LKeyGenStrategy := FSqlGenerator.ResolveKeyGenerationStrategy(AMap.GetTable.GetKeyGenerationStrategy);
+    LKeyGenStrategy := FSqlGenerator.Resolve_KeyGenerationStrategy(AMap.GetTable.GetKeyGenerationStrategy);
     FTables.Add(LTableName, TioDBBuilderFactory.NewSchemaTable(AMap.GetTable, LKeyGenStrategy));
   end;
   Result := FTables.Items[LTableName];
