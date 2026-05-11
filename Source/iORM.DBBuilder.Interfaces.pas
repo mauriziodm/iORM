@@ -346,9 +346,9 @@ type
     // DATABASE RELATED METHODS
     // ----------------------------------------------------------
     /// <summary>Creates the database</summary>
-    procedure CreateDatabase;
+    procedure Command_CreateDatabase;
     /// <summary>Checks if database exists</summary>
-    function DatabaseExists: Boolean;
+    function Command_DatabaseExists: Boolean;
 
     // ==========================================================
     // TABLE RELATED METHODS

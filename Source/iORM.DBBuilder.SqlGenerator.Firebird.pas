@@ -54,8 +54,8 @@ type
     // ==========================================================
     // DATABASE RELATED METHODS
     // ----------------------------------------------------------
-    procedure CreateDatabase; override;
-    function DatabaseExists: Boolean; override;
+    procedure Command_CreateDatabase; override;
+    function Command_DatabaseExists: Boolean; override;
 
     // ==========================================================
     // TABLE RELATED METHODS
@@ -137,7 +137,7 @@ const
 
 { TioDBBuilderSqlGenFirebird }
 
-procedure TioDBBuilderSqlGenFirebird.CreateDatabase;
+procedure TioDBBuilderSqlGenFirebird.Command_CreateDatabase;
 begin
   // Use FireDAC OpenMode parameter to auto-create database if not exists
   TioDbFactory.ConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.Values['OpenMode'] := 'Create';
@@ -147,7 +147,7 @@ begin
   TioDbFactory.ConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.Values['OpenMode'] := 'Open';
 end;
 
-function TioDBBuilderSqlGenFirebird.DatabaseExists: Boolean;
+function TioDBBuilderSqlGenFirebird.Command_DatabaseExists: Boolean;
 var
   LOldOpenMode: string;
 begin

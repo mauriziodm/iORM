@@ -58,8 +58,8 @@ type
     // ==========================================================
     // DATABASE RELATED METHODS
     // ----------------------------------------------------------
-    procedure CreateDatabase; virtual; abstract;
-    function DatabaseExists: Boolean; virtual; abstract;
+    procedure Command_CreateDatabase; virtual; abstract;
+    function Command_DatabaseExists: Boolean; virtual; abstract;
 
     // ==========================================================
     // TABLE RELATED METHODS

@@ -221,12 +221,12 @@ end;
 
 procedure TioDBBuilderStrategyBase.CreateDatabase;
 begin
-  SqlGenerator.CreateDatabase;
+  SqlGenerator.Command_CreateDatabase;
 end;
 
 function TioDBBuilderStrategyBase.DatabaseExists: Boolean;
 begin
-  Result := SqlGenerator.DatabaseExists;
+  Result := SqlGenerator.Command_DatabaseExists;
 end;
 
 procedure TioDBBuilderStrategyBase.CreateForeignKeys;

@@ -51,8 +51,8 @@ type
     // ==========================================================
     // DATABASE RELATED METHODS
     // ----------------------------------------------------------
-    procedure CreateDatabase; override;
-    function DatabaseExists: Boolean; override;
+    procedure Command_CreateDatabase; override;
+    function Command_DatabaseExists: Boolean; override;
 
     // ==========================================================
     // TABLE RELATED METHODS
@@ -125,13 +125,13 @@ uses
 
 { TioDBBuilderSqlGenSQLite }
 
-procedure TioDBBuilderSqlGenSQLite.CreateDatabase;
+procedure TioDBBuilderSqlGenSQLite.Command_CreateDatabase;
 begin
   // SQLite creates the database file automatically when a connection is opened
   TioDbFactory.Connection(ConnectionDefName);
 end;
 
-function TioDBBuilderSqlGenSQLite.DatabaseExists: Boolean;
+function TioDBBuilderSqlGenSQLite.Command_DatabaseExists: Boolean;
 begin
   Result := FileExists(TioConnectionManager.GetDatabaseFileName(ConnectionDefName));
 end;
