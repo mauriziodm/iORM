@@ -106,7 +106,7 @@ type
     /// </summary>
     procedure DoCheckKeyGenerationCompatibility; virtual;
 
-    procedure GenerateDatabaseObjects(const Create: boolean); virtual; abstract;
+    procedure GenerateDatabaseObjects; virtual; abstract;
 
     property ConnectionDefName: string read GetConnectionDefName;
     property Schema: IioDBBuilderSchema read GetSchema;
@@ -333,7 +333,7 @@ begin
 
   Script.ScriptBegin(ConnectionDefName, SqlGenerator.DBMSInfo);
 
-  GenerateDatabaseObjects(True);
+  GenerateDatabaseObjects;
 
   Script.ScriptEnd;
 end;
@@ -344,7 +344,7 @@ begin
 
   Script.ScriptBegin(ConnectionDefName, SqlGenerator.DBMSInfo);
 
-  GenerateDatabaseObjects(False);
+  GenerateDatabaseObjects;
 
   Script.ScriptEnd;
 end;

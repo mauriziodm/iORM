@@ -81,7 +81,7 @@ type
     // Warnings
     procedure WarningNewValueLessThanTheOldOne(const AValueName: String; const AOldValue, ANewValue: Integer; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
     // Main generation
-    procedure GenerateDatabaseObjects(const Create: boolean); override;
+    procedure GenerateDatabaseObjects; override;
 
   public
 
@@ -364,27 +364,30 @@ begin
     Exit(True);
 end;
 
-procedure TioDBBuilderStrategyWithAlterTable.GenerateDatabaseObjects(const Create: boolean);
+/// <summary>
+/// Generates all database objects (tables, indexes, sequences, and foreign keys)
+/// based on the current Schema.Status (stCreate or stUpdate).
+/// Tables are created or altered first, then foreign keys are processed last
+/// to ensure all referenced tables already exist.
+/// When creating a new database (stCreate), all FKs are created unconditionally;
+/// when updating (stUpdate), only new or modified FKs are processed.
+/// </summary>
+procedure TioDBBuilderStrategyWithAlterTable.GenerateDatabaseObjects;
 begin
   // Check key generation strategy compatibility with RDBMS version
   DoCheckKeyGenerationCompatibility;
 
-  if Create then
-  begin
-    CreateOrAlterTables;
+  // Create new tables or alter existing ones (includes fields, indexes, and sequences)
+  CreateOrAlterTables;
 
-    // Foreignkeys are created at the end so all referenced tables are already created
-    if Schema.ForeignKeysEnabled then
-      CreateForeignKeys;
-  end
-  else
+  // Foreign keys are processed last so all referenced tables are already created.
+  // stCreate: create all FKs unconditionally (new database).
+  // stUpdate: only add new or alter modified FKs (existing database).
+  if Schema.ForeignKeysEnabled then
   begin
-    Script.Body.AddEmpty;
-    CreateOrAlterTables;
-    Script.Body.AddEmpty;
-
-    // Foreignkeys are created at the end so all referenced tables are already created
-    if Schema.ForeignKeysEnabled then
+    if Schema.Status = stCreate then
+      CreateForeignKeys
+    else
       AddOrAlterForeignKeys;
   end;
 end;

@@ -34,7 +34,7 @@ type
     function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
     function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
 
-    procedure GenerateDatabaseObjects(const Create: boolean); override;
+    procedure GenerateDatabaseObjects; override;
   public
 
   end;
@@ -399,34 +399,38 @@ begin
   Result := False;
 end;
 
-procedure TioDBBuilderStrategySqLite.GenerateDatabaseObjects(const Create: boolean);
+/// <summary>
+/// Generates all database objects (tables, indexes, and foreign keys) for SQLite.
+/// In SQLite, foreign keys are defined inline in the CREATE TABLE statement,
+/// so they are automatically handled during table creation (no separate FK step needed).
+/// When updating (stUpdate), SQLite cannot ALTER columns, so the strategy is:
+/// drop indexes, rename existing tables to "_old", create new tables, recreate indexes,
+/// and finally copy data from old tables to new ones.
+/// </summary>
+procedure TioDBBuilderStrategySqLite.GenerateDatabaseObjects;
 begin
   Script.Body.AddEmpty;
   Script.Body.AddComment('Before we start: defer foreign key checks to avoid errors during table rebuild');
   Script.Body.Add('PRAGMA defer_foreign_keys=on;');
 
-  if Create then
-  begin
-    CreateOrAlterTables;
-
-    if Schema.IndexesEnabled then
-      CreateIndexes;
-  end
-  else
+  // When updating, drop indexes and rename existing tables to "_old" before recreating them
+  // (SQLite does not support ALTER COLUMN, so tables must be fully recreated)
+  if Schema.Status = stUpdate then
   begin
     DropIndexes;
-
-    if Schema.Status = stUpdate then
-      RenameAllTablesToOld;
-
-    CreateOrAlterTables;
-
-    if Schema.IndexesEnabled then
-      CreateIndexes;
-
-    if Schema.Status = stUpdate then
-      CopyDataFromOldToNewTables;
+    RenameAllTablesToOld;
   end;
+
+  // Create tables (stCreate) or recreate modified tables (stUpdate)
+  // Note: foreign keys are defined inline in the CREATE TABLE statement
+  CreateOrAlterTables;
+
+  if Schema.IndexesEnabled then
+    CreateIndexes;
+
+  // When updating, copy data from renamed "_old" tables into the newly created ones
+  if Schema.Status = stUpdate then
+    CopyDataFromOldToNewTables;
 
   Script.Body.AddEmpty;
   Script.Body.AddComment('At the end: restore normal foreign key checks');
