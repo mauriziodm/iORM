@@ -76,6 +76,7 @@ type
     function GetSequenceName: String;
     function UsesSequenceForKeyGeneration: Boolean;
     function UsesIdentityForKeyGeneration: Boolean;
+    function IsKeyGenerationStrategyFallback: Boolean;
     function GetIndexes: TioDBBuilderSchemaIndexes;
     function GetPrimaryKeyField: IioDBBuilderSchemaField;
     function GetName: String;
@@ -229,6 +230,12 @@ begin
   Result := FStatus;
 end;
 
+// --- Key generation strategy query methods ---
+// These methods query the *resolved* strategy (FKeyGenerationStrategy) which was determined
+// by Resolve_KeyGenerationStrategy at schema build time. The resolution applies fallback logic:
+// if the entity requests a strategy unsupported by this DBMS, the DBMS default is used instead.
+// Therefore UsesSequenceForKeyGeneration/UsesIdentityForKeyGeneration always reflect what will
+// actually be generated in the DDL, not necessarily what the entity attribute originally requested.
 function TioDBBuilderSchemaTable.UsesSequenceForKeyGeneration: Boolean;
 begin
   Result := GetKeyGenerationStrategy = kgsSequence;
@@ -237,6 +244,15 @@ end;
 function TioDBBuilderSchemaTable.UsesIdentityForKeyGeneration: Boolean;
 begin
   Result := GetKeyGenerationStrategy = kgsIdentity;
+end;
+
+// Returns True if the entity explicitly requested a specific strategy (not kgsAuto) but the
+// resolved strategy differs (i.e., fallback was applied). Used by DoCheckKeyGenerationCompatibility
+// to emit an informative hint to the user.
+function TioDBBuilderSchemaTable.IsKeyGenerationStrategyFallback: Boolean;
+begin
+  Result := (FContextTable.GetKeyGenerationStrategy <> kgsAuto) and
+            (FContextTable.GetKeyGenerationStrategy <> FKeyGenerationStrategy);
 end;
 
 procedure TioDBBuilderSchemaTable.SetIsTrueClass(const AValue: Boolean);

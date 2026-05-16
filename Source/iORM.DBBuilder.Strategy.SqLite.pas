@@ -4,22 +4,18 @@ interface
 
 uses
   iORM.DBBuilder.Interfaces,
-  iORM.DBBuilder.Strategy.Base
+  iORM.DBBuilder.Strategy.WithoutAlterTable
 
   ;
 
 
 type
-  TioDBBuilderStrategySqLite = class(TioDBBuilderStrategyBase)
-  private
-    procedure CopyDataFromOldToNewTables;
-    procedure CopyDataFromOldToNewTable(const ATable: IioDBBuilderSchemaTable);
-    procedure RenameAllTablesToOld; // For SQLite, if the DB is to be modified (not created) it renames all tables with "_old"
-    function Table2OldTableName(const ATable: IioDBBuilderSchemaTable): String;
+  TioDBBuilderStrategySqLite = class(TioDBBuilderStrategyWithoutAlterTable)
   protected
+    // Constraint deferral hooks
+    procedure BeginDeferConstraints; override;
+    procedure EndDeferConstraints; override;
     // Tables
-    procedure AlterTable(const ATable: IioDBBuilderSchemaTable); override;
-    procedure CreateOrAlterTables; override;
     procedure CreateTable(const ATable: IioDBBuilderSchemaTable); override;
     // Fields
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
@@ -33,8 +29,6 @@ type
     // ForeignKeys
     function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
     function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
-
-    procedure GenerateDatabaseObjects; override;
   public
 
   end;
@@ -48,8 +42,8 @@ uses
 
   iORM.Attributes,
   iORM.DB.Interfaces,
-  iORM.DB.ConnectionContainer,
-  iORM.DB.QueryEngine, iORM.CommonTypes, iORM.Exceptions
+  iORM.DB.QueryEngine,
+  iORM.CommonTypes
 
   ;
 
@@ -63,96 +57,24 @@ const
 
 { TioDBBuilderSqLite }
 
-function TioDBBuilderStrategySqLite.GetInvalidFieldTypeConversions: string;
+procedure TioDBBuilderStrategySqLite.BeginDeferConstraints;
 begin
-  Result := INVALID_FIELDTYPE_CONVERSIONS;
+  Script.Body.AddEmpty;
+  Script.Body.AddComment('Before we start: defer foreign key checks to avoid errors during table rebuild');
+  Script.Body.Add('PRAGMA defer_foreign_keys=on;');
 end;
 
-procedure TioDBBuilderStrategySqLite.AlterTable(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategySqLite.EndDeferConstraints;
 begin
-  // Note: This method should NEVER be called for SQLite.
-  // SQLite does not support ALTER TABLE in the traditional sense.
-  // Instead, CreateOrAlterTables override always calls CreateTable for both stCreate and stUpdate.
-  // This method exists only to satisfy the virtual method contract from the base class.
-  // If this exception is raised, it indicates a logic error in the Strategy layer.
-  raise EioDBBuilderException.Create(ClassName, 'AlterTable',
-    'SQLite does not support ALTER TABLE. '#13#13 +
-    'Table modifications require the rename-create-copy pattern, which is handled by CreateOrAlterTables override.');
-end;
-
-procedure TioDBBuilderStrategySqLite.CopyDataFromOldToNewTable(const ATable: IioDBBuilderSchemaTable);
-var
-  LField: IioDBBuilderSchemaField;
-  LComma: string;
-begin
-  Script.Body.AddComment(Format('Copying data from "%s" to "%s"', [Table2OldTableName(ATable), ATable.Name]));
-  // Insert into
-  Script.Body.Add(Format('INSERT INTO %s (', [ATable.Name]));
-  Script.Body.IncIndent;
-
-  LComma := '  ';
-
-  for LField in ATable.Fields do
-  begin
-    if LField.Status = stCreate then
-      Continue;
-
-    Script.Body.Add(Format('%s%s', [LComma, LField.FieldName]));
-    LComma := ', ';
-  end;
-
-  Script.Body.DecIndent;
-
-  // Select from
-  Script.Body.Add(') SELECT');
-  Script.Body.IncIndent;
-
-  LComma := '  ';
-
-  for LField in ATable.Fields do
-  begin
-    if LField.Status = stCreate then
-      Continue;
-
-    Script.Body.Add(Format('%s%s', [LComma, LField.FieldName]));
-    LComma := ', ';
-  end;
-
-  Script.Body.DecIndent;
-
-  Script.Body.Add(Format('FROM %s', [Table2OldTableName(ATable)]));
-  Script.Body.Add(';');
+  Script.Body.AddEmpty;
+  Script.Body.AddComment('At the end: restore normal foreign key checks');
+  Script.Body.Add('PRAGMA defer_foreign_keys=off;');
   Script.Body.AddEmpty;
 end;
 
-procedure TioDBBuilderStrategySqLite.CopyDataFromOldToNewTables;
-var
-  LTable: IioDBBuilderSchemaTable;
+function TioDBBuilderStrategySqLite.GetInvalidFieldTypeConversions: string;
 begin
-  Script.Body.AddTitle('Copying data from "_old" tables.');
-
-  for LTable in Schema.Tables.Values do
-  begin
-    if LTable.Status <> stUpdate then
-      Continue;
-
-    CopyDataFromOldToNewTable(LTable);
-  end;
-end;
-
-procedure TioDBBuilderStrategySqLite.CreateOrAlterTables;
-var
-  LTable: IioDBBuilderSchemaTable;
-begin
-  // SQLite does not support ALTER TABLE like other databases.
-  // Instead, it always recreates tables using the rename-create-copy pattern
-  // (see GenerateDatabaseObjects method for the full workflow).
-  // Therefore, both stCreate and stUpdate use CreateTable.
-  for LTable in Schema.Tables.Values do
-  begin
-    if LTable.Status in [stCreate, stUpdate] then
-      CreateTable(LTable);
-  end;
+  Result := INVALID_FIELDTYPE_CONVERSIONS;
 end;
 
 procedure TioDBBuilderStrategySqLite.CreateTable(const ATable: IioDBBuilderSchemaTable);
@@ -397,68 +319,6 @@ begin
 
   // FK not found - shouldn't happen if ForeignKeyExists was called first
   Result := False;
-end;
-
-/// <summary>
-/// Generates all database objects (tables, indexes, and foreign keys) for SQLite.
-/// In SQLite, foreign keys are defined inline in the CREATE TABLE statement,
-/// so they are automatically handled during table creation (no separate FK step needed).
-/// When updating (stUpdate), SQLite cannot ALTER columns, so the strategy is:
-/// drop indexes, rename existing tables to "_old", create new tables, recreate indexes,
-/// and finally copy data from old tables to new ones.
-/// </summary>
-procedure TioDBBuilderStrategySqLite.GenerateDatabaseObjects;
-begin
-  Script.Body.AddEmpty;
-  Script.Body.AddComment('Before we start: defer foreign key checks to avoid errors during table rebuild');
-  Script.Body.Add('PRAGMA defer_foreign_keys=on;');
-
-  // When updating, drop indexes and rename existing tables to "_old" before recreating them
-  // (SQLite does not support ALTER COLUMN, so tables must be fully recreated)
-  if Schema.Status = stUpdate then
-  begin
-    DropIndexes;
-    RenameAllTablesToOld;
-  end;
-
-  // Create tables (stCreate) or recreate modified tables (stUpdate)
-  // Note: foreign keys are defined inline in the CREATE TABLE statement
-  CreateOrAlterTables;
-
-  if Schema.IndexesEnabled then
-    CreateIndexes;
-
-  // When updating, copy data from renamed "_old" tables into the newly created ones
-  if Schema.Status = stUpdate then
-    CopyDataFromOldToNewTables;
-
-  Script.Body.AddEmpty;
-  Script.Body.AddComment('At the end: restore normal foreign key checks');
-  Script.Body.Add('PRAGMA defer_foreign_keys=off;');
-  Script.Body.AddEmpty;
-end;
-
-procedure TioDBBuilderStrategySqLite.RenameAllTablesToOld;
-var
-  LTable: IioDBBuilderSchemaTable;
-begin
-  Script.Body.AddTitle('Renaming table names to "_old"');
-
-  for LTable in Schema.Tables.Values do
-  begin
-    if LTable.Status <> stUpdate then
-      Continue;
-
-    Script.Body.AddComment(Format('Renaming from "%s" to "%s"', [LTable.Name, Table2OldTableName(LTable)]));
-    Script.Body.Add(Format('DROP TABLE IF EXISTS %s;', [Table2OldTableName(LTable)]));
-    Script.Body.Add(Format('ALTER TABLE %s RENAME TO %s;', [LTable.Name, Table2OldTableName(LTable)]));
-    Script.Body.AddEmpty;
-  end;
-end;
-
-function TioDBBuilderStrategySqLite.Table2OldTableName(const ATable: IioDBBuilderSchemaTable): String;
-begin
-  Result := Format('_%s_old', [ATable.Name.ToLower]);
 end;
 
 end.

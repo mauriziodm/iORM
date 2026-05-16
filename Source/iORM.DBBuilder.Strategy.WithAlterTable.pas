@@ -43,20 +43,13 @@ interface
 uses
   iORM.Attributes,
   iORM.DBBuilder.Interfaces,
-  iORM.DBBuilder.Strategy.Base,
-  iORM.Exceptions
+  iORM.DBBuilder.Strategy.Base
 
   ;
 
 
 type
   TioDBBuilderStrategyWithAlterTable = class(TioDBBuilderStrategyBase)
-  private
-    // Sequences
-    procedure CreateSequences;
-    procedure CreateTableSequence(const ATable: IioDBBuilderSchemaTable);
-    procedure DropSequence(const ASequenceName: string);
-    function SequenceExists(const ASequenceName: string): boolean;
   protected
     // Tables
     procedure AlterTable(const ATable: IioDBBuilderSchemaTable); override;
@@ -95,7 +88,6 @@ uses
   System.StrUtils,
 
   iORM.CommonTypes,
-  iORM.DB.Factory,
   iORM.DB.Interfaces,
   iORM.DB.QueryEngine
 
@@ -112,23 +104,6 @@ begin
     CreateOrAlterFields(ATable);
 end;
 
-procedure TioDBBuilderStrategyWithAlterTable.CreateSequences;
-var
-  LSequence: String;
-begin
-  if Schema.Sequences.Count = 0 then
-    Exit;
-
-  Script.Body.AddTitle('Creating sequences (if empty, no sequence needs to be created)');
-
-  for LSequence in Schema.Sequences do
-  begin
-    // Check if sequence exists, then create it
-    if (Schema.Status = stCreate) or (not SequenceExists(LSequence)) then
-      Script.Body.Add(SqlGenerator.BuildSQL_CreateSequence(LSequence));
-  end;
-end;
-
 procedure TioDBBuilderStrategyWithAlterTable.CreateTable(const ATable: IioDBBuilderSchemaTable);
 var
   LComma: string;
@@ -136,10 +111,7 @@ var
 begin
   inherited;
 
-  // Create sequence only if the table uses Sequence for key generation
-  if ATable.UsesSequenceForKeyGeneration then
-    if (Schema.Status = stCreate) or not SequenceExists(ATable.GetSequenceName) then
-      CreateTableSequence(ATable);
+  CreateTableSequence(ATable);
 
   Script.Body.AddEmpty;
   Script.Body.Add(SqlGenerator.BuildSQL_BeginCreateTable(ATable));
@@ -157,20 +129,6 @@ begin
   Script.Body.Add(SqlGenerator.BuildSQL_EndCreateTable(ATable));
   Script.Body.AddEmpty;
   Script.Body.Add(SqlGenerator.BuildSQL_CreatePK(ATable));
-end;
-
-procedure TioDBBuilderStrategyWithAlterTable.CreateTableSequence(const ATable: IioDBBuilderSchemaTable);
-begin
-  // Only create sequence if the table uses Sequence for key generation
-  if not ATable.UsesSequenceForKeyGeneration then
-    Exit;
-
-  if ATable.GetSequenceName.IsEmpty then
-    Exit;
-
-  // Check if sequence exists, then create it
-  if (ATable.Status = stCreate) or (not SequenceExists(ATable.GetSequenceName)) then
-    Script.Body.Add(SqlGenerator.BuildSQL_CreateSequence(ATable.GetSequenceName));
 end;
 
 procedure TioDBBuilderStrategyWithAlterTable.DropForeignKeys;
@@ -198,16 +156,6 @@ begin
     Script.Body.Add(SqlGenerator.BuildSQL_DropIndexByName(LQuery.Fields[0].AsString));
     LQuery.Next;
   end;
-end;
-
-procedure TioDBBuilderStrategyWithAlterTable.DropSequence(const ASequenceName: string);
-var
-  LQuery: IioQuery;
-begin
-  if ASequenceName.IsEmpty then
-    raise EioInvalidArgumentException.Create(ClassName, 'DropSequence', 'ASequenceName is not specified.');
-
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_DropSequence(ASequenceName), True);
 end;
 
 function TioDBBuilderStrategyWithAlterTable.FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
@@ -505,17 +453,6 @@ begin
 
     WarningNewValueLessThanTheOldOne('field PRECISION', AOldFieldPrecision, ANewFieldPrecision, AField, ATable);
   end;
-end;
-
-function TioDBBuilderStrategyWithAlterTable.SequenceExists(const ASequenceName: string): boolean;
-var
-  LQuery: IioQuery;
-begin
-  if ASequenceName.IsEmpty then
-    raise EioInvalidArgumentException.Create(ClassName, 'SequenceExists', 'ASequenceName is not specified.');
-
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_SequenceExists(ASequenceName), True);
-  Result := LQuery.Fields[0].AsInteger > 0;
 end;
 
 procedure TioDBBuilderStrategyWithAlterTable.WarningNewValueLessThanTheOldOne(const AValueName: String; const AOldValue, ANewValue: Integer;

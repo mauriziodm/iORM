@@ -224,6 +224,7 @@ type
     function GetSequenceName: String;
     function UsesSequenceForKeyGeneration: Boolean;
     function UsesIdentityForKeyGeneration: Boolean;
+    function IsKeyGenerationStrategyFallback: Boolean;
     // function IDField: IioDBBuilderSchemaField;
     function GetIndexes: TioDBBuilderSchemaIndexes;
     function GetPrimaryKeyField: IioDBBuilderSchemaField;

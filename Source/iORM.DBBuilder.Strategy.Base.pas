@@ -90,6 +90,9 @@ type
 
 
 
+    // Sequences
+    function SequenceExists(const ASequenceName: string): Boolean; virtual;
+    procedure CreateTableSequence(const ATable: IioDBBuilderSchemaTable); virtual;
     // ForeignKeys
     procedure CreateOrAlterForeignKeys; virtual;
     procedure CreateForeignKeys; overload; virtual;
@@ -102,8 +105,14 @@ type
     procedure WarningValueChanged(const AValueName, AOldValue, ANewValue: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
     // Hook methods
     /// <summary>
-    /// Hook method to check key generation strategy compatibility with RDBMS version.
-    /// Override in derived classes to add warnings for incompatible configurations.
+    /// Hook method called during script generation to notify the user about key generation
+    /// strategy fallbacks. If an entity explicitly requests a strategy (e.g. kgsSequence) that
+    /// this DBMS does not support, the fallback was already applied silently by
+    /// Resolve_KeyGenerationStrategy during schema building. This method detects such cases
+    /// via IsKeyGenerationStrategyFallback and emits an informative hint (not a warning,
+    /// which would block script execution).
+    /// Override in derived classes to add DBMS-specific warnings (e.g. Firebird checks
+    /// Identity support based on server version).
     /// </summary>
     procedure DoCheckKeyGenerationCompatibility; virtual;
 
@@ -128,12 +137,37 @@ uses
   System.Classes,
 
   iORM.Exceptions,
+  iORM.Utilities,
+  iORM.CommonTypes,
   iORM.DB.ConnectionContainer,
   iORM.DB.QueryEngine
 
   ;
 
 { TioDBBuilderStrategyBase }
+
+function TioDBBuilderStrategyBase.SequenceExists(const ASequenceName: string): Boolean;
+var
+  LQuery: IioQuery;
+begin
+  if ASequenceName.IsEmpty then
+    raise EioInvalidArgumentException.Create(ClassName, 'SequenceExists', 'ASequenceName is not specified.');
+
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_SequenceExists(ASequenceName), True);
+  Result := LQuery.Fields[0].AsInteger > 0;
+end;
+
+procedure TioDBBuilderStrategyBase.CreateTableSequence(const ATable: IioDBBuilderSchemaTable);
+begin
+  if not ATable.UsesSequenceForKeyGeneration then
+    Exit;
+
+  if ATable.GetSequenceName.IsEmpty then
+    Exit;
+
+  if (Schema.Status = stCreate) or not SequenceExists(ATable.GetSequenceName) then
+    Script.Body.Add(SqlGenerator.BuildSQL_CreateSequence(ATable.GetSequenceName));
+end;
 
 procedure TioDBBuilderStrategyBase.CreateOrAlterForeignKeys;
 var
@@ -396,9 +430,16 @@ begin
 end;
 
 procedure TioDBBuilderStrategyBase.DoCheckKeyGenerationCompatibility;
+var
+  LTable: IioDBBuilderSchemaTable;
 begin
-  // Default implementation: do nothing
-  // Override in derived classes to add warnings for incompatible key generation strategies
+  for LTable in Schema.Tables.Values do
+    if LTable.IsKeyGenerationStrategyFallback then
+      Script.Hints.Add(Format(
+        'Table ''%s'' requests %s key generation but this DBMS does not support it. Using %s instead.',
+        [LTable.Name,
+         TioUtilities.EnumToString<TioKeyGenerationStrategyType>(LTable.GetContextTable.GetKeyGenerationStrategy),
+         TioUtilities.EnumToString<TioKeyGenerationStrategyType>(LTable.KeyGenerationStrategy)]));
 end;
 
 function TioDBBuilderStrategyBase.IsFieldTypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;

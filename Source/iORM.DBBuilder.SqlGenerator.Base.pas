@@ -139,22 +139,29 @@ type
     // ==========================================================
     // KEY GENERATION RELATED METHODS
     // ----------------------------------------------------------
-    /// <summary>Generates SQL to create a sequence</summary>
-    function BuildSQL_CreateSequence(const ASequenceName: String): string; virtual; abstract;
-    /// <summary>Generates SQL to drop a sequence</summary>
-    function BuildSQL_DropSequence(const ASequenceName: string): string; virtual; abstract;
-    /// <summary>Generates SQL to check if a sequence exists</summary>
-    function BuildSQL_SequenceExists(const ASequenceName: string): string; virtual; abstract;
+    /// <summary>Generates SQL to create a sequence. Default raises exception (not supported).</summary>
+    function BuildSQL_CreateSequence(const ASequenceName: String): string; virtual;
+    /// <summary>Generates SQL to drop a sequence. Default raises exception (not supported).</summary>
+    function BuildSQL_DropSequence(const ASequenceName: string): string; virtual;
+    /// <summary>Generates SQL to check if a sequence exists. Default raises exception (not supported).</summary>
+    function BuildSQL_SequenceExists(const ASequenceName: string): string; virtual;
+    /// <summary>
+    /// Returns the default key generation strategy for this DBMS.
+    /// Base returns kgsIdentity. Override in derived classes (e.g. Firebird returns kgsSequence).
+    /// </summary>
+    function GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategyType; virtual;
     /// <summary>
     /// Resolves the requested key generation strategy to an effective strategy.
-    /// If ARequestedStrategy is kgsAuto, returns the DBMS-specific default strategy.
-    /// Otherwise, returns ARequestedStrategy unchanged.
+    /// Called once during schema building (FindOrCreateTable). The resolved strategy is stored
+    /// in the SchemaTable and used later by UsesSequenceForKeyGeneration/UsesIdentityForKeyGeneration
+    /// to decide how to generate the DDL.
+    /// If kgsAuto or unsupported by this DBMS, falls back to GetDefaultKeyGenerationStrategy.
     /// </summary>
-    function Resolve_KeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType; virtual; abstract;
+    function Resolve_KeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType; virtual;
     /// <summary>Returns True if the database supports IDENTITY columns</summary>
     function Supports_Identity: Boolean; virtual; abstract;
-    /// <summary>Returns True if the database supports SEQUENCE objects</summary>
-    function Supports_Sequence: Boolean; virtual; abstract;
+    /// <summary>Returns True if the database supports SEQUENCE objects (default: False)</summary>
+    function Supports_Sequence: Boolean; virtual;
     // ==========================================================
 
     // ==========================================================
@@ -461,6 +468,42 @@ begin
   // Generates SQL to drop a foreign key (delegates to BuildSQL_DropFKbyName after translating schema FK to FK name)
   LFKName := Translate_SchemaTableAndFK_To_FKName(ATable, AForeignKey);
   Result := BuildSQL_DropFKbyName(ATable.Name, LFKName);
+end;
+
+function TioDBBuilderSqlGenBase.BuildSQL_CreateSequence(const ASequenceName: String): string;
+begin
+  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_CreateSequence', 'Sequences are not supported by this DBMS.');
+end;
+
+function TioDBBuilderSqlGenBase.BuildSQL_DropSequence(const ASequenceName: string): string;
+begin
+  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_DropSequence', 'Sequences are not supported by this DBMS.');
+end;
+
+function TioDBBuilderSqlGenBase.BuildSQL_SequenceExists(const ASequenceName: string): string;
+begin
+  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_SequenceExists', 'Sequences are not supported by this DBMS.');
+end;
+
+function TioDBBuilderSqlGenBase.GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategyType;
+begin
+  Result := kgsIdentity;
+end;
+
+function TioDBBuilderSqlGenBase.Resolve_KeyGenerationStrategy(
+  const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType;
+begin
+  if (ARequestedStrategy = kgsAuto)
+    or ((ARequestedStrategy = kgsSequence) and not Supports_Sequence)
+    or ((ARequestedStrategy = kgsIdentity) and not Supports_Identity) then
+    Result := GetDefaultKeyGenerationStrategy
+  else
+    Result := ARequestedStrategy;
+end;
+
+function TioDBBuilderSqlGenBase.Supports_Sequence: Boolean;
+begin
+  Result := False;
 end;
 
 function TioDBBuilderSqlGenBase.Supports_AlterNotNull: Boolean;

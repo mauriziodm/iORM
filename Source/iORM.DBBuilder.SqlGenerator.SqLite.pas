@@ -91,12 +91,7 @@ type
     // ==========================================================
     // KEY GENERATION RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_CreateSequence(const ASequenceName: String): string; override;
-    function BuildSQL_DropSequence(const ASequenceName: string): string; override;
-    function BuildSQL_SequenceExists(const ASequenceName: string): string; override;
-    function Resolve_KeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType; override;
     function Supports_Identity: Boolean; override;
-    function Supports_Sequence: Boolean; override;
 
     // ==========================================================
     // SQL GENERATOR UTILITIES
@@ -412,44 +407,6 @@ function TioDBBuilderSqlGenSQLite.Supports_Identity: Boolean;
 begin
   // SQLite uses INTEGER PRIMARY KEY which is an alias for rowid (auto-increment)
   Result := True;
-end;
-
-function TioDBBuilderSqlGenSQLite.Supports_Sequence: Boolean;
-begin
-  // SQLite does not support sequences
-  Result := False;
-end;
-
-function TioDBBuilderSqlGenSQLite.Resolve_KeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType;
-begin
-  // Resolves kgsAuto to the DBMS-specific default strategy.
-  // SQLite default is kgsIdentity (INTEGER PRIMARY KEY acts as auto-increment rowid).
-  // If a specific strategy is requested, it is returned unchanged.
-  if ARequestedStrategy = kgsAuto then
-    Result := kgsIdentity
-  else
-    Result := ARequestedStrategy;
-end;
-
-function TioDBBuilderSqlGenSQLite.BuildSQL_CreateSequence(const ASequenceName: String): string;
-begin
-  // SQLite does not support sequences
-  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_CreateSequence',
-    'SQLite does not support sequences.');
-end;
-
-function TioDBBuilderSqlGenSQLite.BuildSQL_DropSequence(const ASequenceName: string): string;
-begin
-  // SQLite does not support sequences
-  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_DropSequence',
-    'SQLite does not support sequences.');
-end;
-
-function TioDBBuilderSqlGenSQLite.BuildSQL_SequenceExists(const ASequenceName: string): string;
-begin
-  // SQLite does not support sequences
-  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_SequenceExists',
-    'SQLite does not support sequences.');
 end;
 
 end.
