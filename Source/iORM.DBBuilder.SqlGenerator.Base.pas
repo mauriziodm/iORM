@@ -49,24 +49,36 @@ uses
 
 type
 
+  /// <summary>
+  /// Base class for all DBMS-specific SQL generators.
+  /// Uses the "exception-default" pattern: all virtual methods have a base implementation
+  /// that raises an exception via RaiseNotImplemented. Derived classes override only the
+  /// methods that their DBMS actually supports. This provides:
+  /// - Consistency: one uniform convention instead of mixing abstract and virtual methods
+  /// - Clarity: looking at a derived class immediately shows what that DBMS supports
+  /// - Extensibility: adding a new DBMS requires only the relevant overrides
+  /// - Clear runtime errors: calling an unsupported operation produces an exception
+  ///   that identifies both the DBMS (via ClassName) and the operation (via method name)
+  /// </summary>
   TioDBBuilderSqlGenBase = class(TInterfacedObject, IioDBBuilderSqlGenerator)
   private
     FConnectionDefName: string;
     FDataConverter: TioSqlDataConverterRef;
     FDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
+    procedure RaiseNotImplemented(const AMethodName: string);
   protected
     // ==========================================================
     // DATABASE RELATED METHODS
     // ----------------------------------------------------------
-    procedure Command_CreateDatabase; virtual; abstract;
-    function Command_DatabaseExists: Boolean; virtual; abstract;
+    procedure Command_CreateDatabase; virtual;
+    function Command_DatabaseExists: Boolean; virtual;
 
     // ==========================================================
     // TABLE RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
-    function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
-    function BuildSQL_TableExists(const ATableName: string): string; virtual; abstract;
+    function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string; virtual;
+    function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string; virtual;
+    function BuildSQL_TableExists(const ATableName: string): string; virtual;
     /// <summary>Returns True if the database supports ALTER COLUMN SET/DROP NOT NULL</summary>
     function Supports_AlterNotNull: Boolean; virtual;
     /// <summary>Returns True if the database permits BLOB subtype changes via ALTER COLUMN</summary>
@@ -75,25 +87,25 @@ type
     // ==========================================================
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
-    function BuildSQL_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
-    function BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
-    function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual; abstract;
-    function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; virtual; abstract;
-    function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; virtual; abstract;
+    function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual;
+    function BuildSQL_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual;
+    function BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual;
+    function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual;
+    function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; virtual;
+    function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; virtual;
     function Translate_SchemaField_To_DefaultValue(const AField: IioDBBuilderSchemaField): string; virtual;
 
     // ==========================================================
     // INDEX RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual; abstract;
-    function BuildSQL_CreatePK(const ATable: IioDBBuilderSchemaTable): string; virtual; abstract;
+    function BuildSQL_CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual;
+    function BuildSQL_CreatePK(const ATable: IioDBBuilderSchemaTable): string; virtual;
     function BuildSQL_DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual;
-    function BuildSQL_DropIndexByName(const AIndexName: string): string; virtual; abstract;
-    function BuildSQL_IndexDetails(const AIndexName: string): string; virtual; abstract;
+    function BuildSQL_DropIndexByName(const AIndexName: string): string; virtual;
+    function BuildSQL_IndexDetails(const AIndexName: string): string; virtual;
     function BuildSQL_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual;
-    function BuildSQL_IndexExistsByName(const AIndexName: string): string; virtual; abstract;
-    function BuildSQL_IndexList(const ATableName: string = ''): string; virtual; abstract;
+    function BuildSQL_IndexExistsByName(const AIndexName: string): string; virtual;
+    function BuildSQL_IndexList(const ATableName: string = ''): string; virtual;
     /// <summary>
     /// Translates an index schema to a comma-separated list of field names with orientation.
     /// </summary>
@@ -129,10 +141,10 @@ type
     // ==========================================================
     // FOREIGN KEY RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_CreateFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual; abstract;
-    function BuildSQL_DropFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; overload; virtual;
-    function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string; overload; virtual; abstract;
-    function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; virtual; abstract;
+    function BuildSQL_CreateFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual;
+    function BuildSQL_DropFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual;
+    function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string; virtual;
+    function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; virtual;
     function Translate_SchemaFK_To_FKvalue(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String; virtual;
     function Translate_SchemaTableAndFK_To_FKName(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual;
 
@@ -159,7 +171,7 @@ type
     /// </summary>
     function Resolve_KeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType; virtual;
     /// <summary>Returns True if the database supports IDENTITY columns</summary>
-    function Supports_Identity: Boolean; virtual; abstract;
+    function Supports_Identity: Boolean; virtual;
     /// <summary>Returns True if the database supports SEQUENCE objects (default: False)</summary>
     function Supports_Sequence: Boolean; virtual;
     // ==========================================================
@@ -189,7 +201,7 @@ type
     /// <summary>
     /// Loads DBMS info from database. Called internally by GetDBMSInfo.
     /// </summary>
-    function LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo; virtual; abstract;
+    function LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo; virtual;
     /// <summary>
     /// Shortens an identifier name to fit within the specified maximum length by generating a hash.
     /// If the name is already within the limit, it is returned unchanged.
@@ -242,6 +254,14 @@ const
   IDX_PREFIX = 'IDX_';
 
 { TioDBBuilderSqlGenBase }
+
+// Central helper for the exception-default pattern.
+// ClassName resolves at runtime to the actual derived class (e.g. TioDBBuilderSqlGenMSSqlServer),
+// so the error message clearly identifies which DBMS and which operation is unsupported.
+procedure TioDBBuilderSqlGenBase.RaiseNotImplemented(const AMethodName: string);
+begin
+  raise EioDBBuilderException.Create(ClassName, AMethodName, 'Not supported by this DBMS.');
+end;
 
 function TioDBBuilderSqlGenBase.Translate_SchemaFK_To_FKvalue(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
 begin
@@ -460,29 +480,144 @@ begin
   Result := StringReplace(AStringLiteral, '''', '''''', [rfReplaceAll]);
 end;
 
+// ==========================================================
+// Exception-default implementations
+// These methods raise an exception if called without being overridden.
+// Derived classes override only the methods supported by their DBMS.
+// ==========================================================
+
+procedure TioDBBuilderSqlGenBase.Command_CreateDatabase;
+begin
+  RaiseNotImplemented('Command_CreateDatabase');
+end;
+
+function TioDBBuilderSqlGenBase.Command_DatabaseExists: Boolean;
+begin
+  RaiseNotImplemented('Command_DatabaseExists');
+end;
+
+function TioDBBuilderSqlGenBase.BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string;
+begin
+  RaiseNotImplemented('BuildSQL_BeginCreateTable');
+end;
+
+function TioDBBuilderSqlGenBase.BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string;
+begin
+  RaiseNotImplemented('BuildSQL_EndCreateTable');
+end;
+
+function TioDBBuilderSqlGenBase.BuildSQL_TableExists(const ATableName: string): string;
+begin
+  RaiseNotImplemented('BuildSQL_TableExists');
+end;
+
+function TioDBBuilderSqlGenBase.BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
+begin
+  RaiseNotImplemented('BuildSQL_AlterField');
+end;
+
+function TioDBBuilderSqlGenBase.BuildSQL_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
+begin
+  RaiseNotImplemented('BuildSQL_CreateField');
+end;
+
+function TioDBBuilderSqlGenBase.BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
+begin
+  RaiseNotImplemented('BuildSQL_FieldDefinition');
+end;
+
+function TioDBBuilderSqlGenBase.BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
+begin
+  RaiseNotImplemented('BuildSQL_FieldExists');
+end;
+
+function TioDBBuilderSqlGenBase.BuildSQL_FieldList(const ATableName: string; const AFieldName: string): string;
+begin
+  RaiseNotImplemented('BuildSQL_FieldList');
+end;
+
+function TioDBBuilderSqlGenBase.Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String;
+begin
+  RaiseNotImplemented('Translate_SchemaField_To_FieldType');
+end;
+
+function TioDBBuilderSqlGenBase.BuildSQL_CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
+begin
+  RaiseNotImplemented('BuildSQL_CreateIndex');
+end;
+
+function TioDBBuilderSqlGenBase.BuildSQL_CreatePK(const ATable: IioDBBuilderSchemaTable): string;
+begin
+  RaiseNotImplemented('BuildSQL_CreatePK');
+end;
+
+function TioDBBuilderSqlGenBase.BuildSQL_DropIndexByName(const AIndexName: string): string;
+begin
+  RaiseNotImplemented('BuildSQL_DropIndexByName');
+end;
+
+function TioDBBuilderSqlGenBase.BuildSQL_IndexDetails(const AIndexName: string): string;
+begin
+  RaiseNotImplemented('BuildSQL_IndexDetails');
+end;
+
+function TioDBBuilderSqlGenBase.BuildSQL_IndexExistsByName(const AIndexName: string): string;
+begin
+  RaiseNotImplemented('BuildSQL_IndexExistsByName');
+end;
+
+function TioDBBuilderSqlGenBase.BuildSQL_IndexList(const ATableName: string): string;
+begin
+  RaiseNotImplemented('BuildSQL_IndexList');
+end;
+
+function TioDBBuilderSqlGenBase.BuildSQL_CreateFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
+begin
+  RaiseNotImplemented('BuildSQL_CreateFK');
+end;
+
 function TioDBBuilderSqlGenBase.BuildSQL_DropFK(const ATable: IioDBBuilderSchemaTable;
   const AForeignKey: IioDBBuilderSchemaFK): string;
 var
   LFKName: string;
 begin
-  // Generates SQL to drop a foreign key (delegates to BuildSQL_DropFKbyName after translating schema FK to FK name)
   LFKName := Translate_SchemaTableAndFK_To_FKName(ATable, AForeignKey);
   Result := BuildSQL_DropFKbyName(ATable.Name, LFKName);
 end;
 
+function TioDBBuilderSqlGenBase.BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string;
+begin
+  RaiseNotImplemented('BuildSQL_DropFKbyName');
+end;
+
+function TioDBBuilderSqlGenBase.BuildSQL_FKList(const ATableName: string; const AFKName: string): string;
+begin
+  RaiseNotImplemented('BuildSQL_FKList');
+end;
+
 function TioDBBuilderSqlGenBase.BuildSQL_CreateSequence(const ASequenceName: String): string;
 begin
-  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_CreateSequence', 'Sequences are not supported by this DBMS.');
+  RaiseNotImplemented('BuildSQL_CreateSequence');
 end;
 
 function TioDBBuilderSqlGenBase.BuildSQL_DropSequence(const ASequenceName: string): string;
 begin
-  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_DropSequence', 'Sequences are not supported by this DBMS.');
+  RaiseNotImplemented('BuildSQL_DropSequence');
 end;
 
 function TioDBBuilderSqlGenBase.BuildSQL_SequenceExists(const ASequenceName: string): string;
 begin
-  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_SequenceExists', 'Sequences are not supported by this DBMS.');
+  RaiseNotImplemented('BuildSQL_SequenceExists');
+end;
+
+function TioDBBuilderSqlGenBase.Supports_Identity: Boolean;
+begin
+  RaiseNotImplemented('Supports_Identity');
+end;
+
+function TioDBBuilderSqlGenBase.LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
+begin
+  RaiseNotImplemented('LoadDBMSInfo');
 end;
 
 function TioDBBuilderSqlGenBase.GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategyType;

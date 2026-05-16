@@ -471,9 +471,9 @@ type
     /// <param name="ATable">The table schema (must not be nil)</param>
     /// <param name="AForeignKey">The foreign key schema (must not be nil)</param>
     /// <returns>SQL statement to drop the foreign key</returns>
-    function BuildSQL_DropFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; overload;
+    function BuildSQL_DropFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
     /// <summary>Generates SQL to drop a foreign key constraint by name</summary>
-    function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string; overload;
+    function BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string;
     /// <summary>
     /// Generates SQL to retrieve foreign key constraints from database.
     /// </summary>

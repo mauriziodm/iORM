@@ -36,26 +36,15 @@ unit iORM.DBBuilder.SqlGenerator.MSSqlServer;
 interface
 
 uses
-  iORM.DBBuilder.SqlGenerator.Base, iORM.DBBuilder.Interfaces, iORM.Attributes,
-  iORM.CommonTypes;
+  iORM.DBBuilder.SqlGenerator.Base, iORM.DBBuilder.Interfaces;
 
 const
   CONNECTION_NAME_MSSQL_MASTER = 'MSSQL_MASTER';
-
-  INVALID_FIELDTYPE_CONVERSIONS = '[datetime->decimal][datetime->numeric][datetime->int][date->decimal][date->numeric][date->int]' +
-    '[time->numeric][time->decimal][time->int][varchar->decimal][varchar->int][varchar->date][varchar->time][varchar->datetime]' +
-    '[nvarchar->decimal][nvarchar->int][nvarchar->date][nvarchar->time][nvarchar->datetime] [char->decimal][char->int][char->date]+' +
-    '[char->time][char->datetime][nchar->decimal][nchar->int][nchar->date][nchar->time][nchar->datetime]';
 
 type
 
   TioDBBuilderSqlGenMSSqlServer = class(TioDBBuilderSqlGenBase, IioDBBuilderSqlGenerator)
   protected
-    // ==========================================================
-    // FIELD RELATED METHODS
-    // ----------------------------------------------------------
-    function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
-
     // ==========================================================
     // KEY GENERATION CAPABILITY METHODS
     // ----------------------------------------------------------
@@ -74,8 +63,7 @@ uses
   System.SysUtils,
   iORM.DB.Interfaces,
   iORM.DB.QueryEngine,
-  iORM.DBBuilder.Factory,
-  iORM.Exceptions;
+  iORM.DBBuilder.Factory;
 
 { TioDBBuilderSqlGenMSSqlServer }
 
@@ -128,14 +116,6 @@ begin
     LMajorVersion,
     LMinorVersion
   );
-end;
-
-function TioDBBuilderSqlGenMSSqlServer.BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable;
-  const AField: IioDBBuilderSchemaField): string;
-begin
-  // TODO: MS SQL Server BuildSQL_AlterField implementation not yet complete
-  raise EioDBBuilderException.Create(ClassName, 'BuildSQL_AlterField',
-    'MS SQL Server ALTER FIELD is not yet implemented in DBBuilder');
 end;
 
 function TioDBBuilderSqlGenMSSqlServer.Supports_Identity: Boolean;
