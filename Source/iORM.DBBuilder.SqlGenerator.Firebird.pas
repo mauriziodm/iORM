@@ -232,11 +232,7 @@ function TioDBBuilderSqlGenFirebird.BuildSQL_CreateSequence(const ASequenceName:
 var
   LSequenceName: string;
 begin
-  LSequenceName := ASequenceName.ToUpper;
-
-  // Validate and shorten if necessary (Firebird max identifier length = 31 characters)
-  if IsSqlIdentifierTooLong(LSequenceName) then
-    LSequenceName := ShortenIdentifierName(LSequenceName, MaxSqlIdentifierLength);
+  LSequenceName := EnsureIdentifierLength(ASequenceName.ToUpper);
 
   Result := Format('CREATE SEQUENCE %s;', [LSequenceName]);
 end;
@@ -449,11 +445,7 @@ function TioDBBuilderSqlGenFirebird.BuildSQL_SequenceExists(const ASequenceName:
 var
   LSequenceName: string;
 begin
-  LSequenceName := ASequenceName.ToUpper;
-
-  // Validate and shorten if necessary (Firebird max identifier length = 31 characters)
-  if IsSqlIdentifierTooLong(LSequenceName) then
-    LSequenceName := ShortenIdentifierName(LSequenceName, MaxSqlIdentifierLength);
+  LSequenceName := EnsureIdentifierLength(ASequenceName.ToUpper);
 
   // Carlo Marona (2024-10-15): Added condition to exclude system generators
   Result := Format('select count(*) from rdb$generators where (UPPER(rdb$generator_name) = UPPER(''%s'')) and (RDB$SYSTEM_FLAG = 0)', [EscapeSQLStringLiteral(LSequenceName)]);
@@ -495,11 +487,7 @@ function TioDBBuilderSqlGenFirebird.BuildSQL_DropSequence(const ASequenceName: s
 var
   LSequenceName: string;
 begin
-  LSequenceName := ASequenceName.ToUpper;
-
-  // Validate and shorten if necessary (Firebird max identifier length = 31 characters)
-  if IsSqlIdentifierTooLong(LSequenceName) then
-    LSequenceName := ShortenIdentifierName(LSequenceName, MaxSqlIdentifierLength);
+  LSequenceName := EnsureIdentifierLength(ASequenceName.ToUpper);
 
   Result := Format('DROP SEQUENCE %s;', [LSequenceName]);
 end;

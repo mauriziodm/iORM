@@ -199,6 +199,10 @@ type
     /// <returns>True if the name is too long, False otherwise</returns>
     function IsSqlIdentifierTooLong(const AIdentifierName: string): boolean; virtual;
     /// <summary>
+    /// Returns the identifier shortened if it exceeds MaxSqlIdentifierLength, unchanged otherwise.
+    /// </summary>
+    function EnsureIdentifierLength(const AIdentifierName: string): string;
+    /// <summary>
     /// Loads DBMS info from database. Called internally by GetDBMSInfo.
     /// </summary>
     function LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo; virtual;
@@ -469,6 +473,14 @@ function TioDBBuilderSqlGenBase.IsSqlIdentifierTooLong(const AIdentifierName: st
 begin
   // If MaxSqlIdentifierLength is 0 there's no limit to the identifier length
   Result := (MaxSqlIdentifierLength > 0) and (Length(AIdentifierName) > MaxSqlIdentifierLength);
+end;
+
+function TioDBBuilderSqlGenBase.EnsureIdentifierLength(const AIdentifierName: string): string;
+begin
+  if IsSqlIdentifierTooLong(AIdentifierName) then
+    Result := ShortenIdentifierName(AIdentifierName, MaxSqlIdentifierLength)
+  else
+    Result := AIdentifierName;
 end;
 
 function TioDBBuilderSqlGenBase.EscapeSQLStringLiteral(const AStringLiteral: string): string;
