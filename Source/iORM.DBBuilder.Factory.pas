@@ -52,7 +52,7 @@ type
   TioDBBuilderFactory = class
   public
     class function NewEngine(const AConnectionDefName: String; const AAddIndexes: Boolean = True; const AAddForeignKeys: Boolean = True): IioDBBuilderEngine;
-    class function NewDBAnalyzer(const AConnectionDefname: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AForceCreateNewDB: Boolean): IioDBBuilderDBAnalyzer;
+    class function NewDBAnalyzer(const AConnectionDefname: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderDBAnalyzer;
     class function NewSchema(const AConnectionDefName: String; const AIndexesEnabled, AForeignKeysEnabled: Boolean;
       const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchema;
     class function NewSchemaBuilder: TioDBBuilderSchemaBuilderRef;
@@ -86,9 +86,9 @@ uses
 
 { TioDBBuilderFactory }
 
-class function TioDBBuilderFactory.NewDBAnalyzer(const AConnectionDefname: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AForceCreateNewDB: Boolean): IioDBBuilderDBAnalyzer;
+class function TioDBBuilderFactory.NewDBAnalyzer(const AConnectionDefname: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderDBAnalyzer;
 begin
-  Result := TioDBBuilderDBAnalyzer.Create(AConnectionDefName, ASchema, ASqlGenerator, AForceCreateNewDB);
+  Result := TioDBBuilderDBAnalyzer.Create(AConnectionDefName, ASchema, ASqlGenerator);
 end;
 
 class function TioDBBuilderFactory.NewEngine(const AConnectionDefName: String; const AAddIndexes: Boolean;

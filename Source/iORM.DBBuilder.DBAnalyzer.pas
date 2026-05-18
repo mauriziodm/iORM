@@ -44,12 +44,10 @@ type
   TioDBBuilderDBAnalyzer = class(TInterfacedObject, IioDBBuilderDBAnalyzer)
   private
     FConnectionDefName: string;
-    FForceCreateNewDB: Boolean;
     FSchema: IioDBBuilderSchema;
     FSqlGenerator: IioDBBuilderSqlGenerator;
     FStrategy: IioDBBuilderStrategy;
     function GetConnectionDefName: string;
-    function GetForceToCreateNewDB: Boolean;
     function GetSchema: IioDBBuilderSchema;
     function GetSqlGenerator: IioDBBuilderSqlGenerator;
     function GetStrategy: IioDBBuilderStrategy;
@@ -64,7 +62,7 @@ type
     property SqlGenerator: IioDBBuilderSqlGenerator read GetSqlGenerator;
     property Strategy: IioDBBuilderStrategy read GetStrategy;
   public
-    constructor Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AForceCreateNewDB: Boolean);
+    constructor Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator);
 
     procedure Analyze; virtual;
   end;
@@ -82,10 +80,9 @@ uses
 
 { TioDBBuilderDBAnalyzer }
 
-constructor TioDBBuilderDBAnalyzer.Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AForceCreateNewDB: Boolean);
+constructor TioDBBuilderDBAnalyzer.Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator);
 begin
   FConnectionDefName := AConnectionDefName;
-  FForceCreateNewDB := AForceCreateNewDB;
   FSchema := ASchema;
   FSqlGenerator := ASqlGenerator;
   FStrategy := TioDBBuilderFactory.NewStrategy(AConnectionDefName, ASchema, ASqlGenerator);
@@ -94,11 +91,6 @@ end;
 function TioDBBuilderDBAnalyzer.GetConnectionDefName: string;
 begin
   Result := FConnectionDefName;
-end;
-
-function TioDBBuilderDBAnalyzer.GetForceToCreateNewDB: Boolean;
-begin
-  Result := FForceCreateNewDB;
 end;
 
 function TioDBBuilderDBAnalyzer.GetSchema: IioDBBuilderSchema;
@@ -118,8 +110,8 @@ end;
 
 procedure TioDBBuilderDBAnalyzer.Analyze;
 begin
-  // Analyze if the database exists and set  it's status
-  if FForceCreateNewDB or not FStrategy.DatabaseExists then
+  // Analyze if the database exists and set its status
+  if not FStrategy.DatabaseExists then
     Schema.Status := stCreate;
 
   // Start the transaction (if the DB already exists otherwise an error would occur)
