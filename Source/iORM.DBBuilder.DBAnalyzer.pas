@@ -173,17 +173,16 @@ procedure TioDBBuilderDBAnalyzer.AnalyzeForeignKeys(const ATable: IioDBBuilderSc
 var
   LFK: IioDBBuilderSchemaFK;
 begin
-  // Loops all foreign keys in the table
   for LFK in ATable.ForeignKeys.Values do
   begin
-    if not FStrategy.ForeignKeyExists(ATable, LFK) then
+    // When the table is new, all its foreign keys must be created — no DB query needed
+    if ATable.Status = stCreate then
       LFK.Status := stCreate
-    else
-    if FStrategy.ForeignKeyModified(ATable, LFK) then
+    else if not FStrategy.ForeignKeyExists(ATable, LFK) then
+      LFK.Status := stCreate
+    else if FStrategy.ForeignKeyModified(ATable, LFK) then
       LFK.Status := stUpdate;
 
-    // If the foreign key status is not stClean (foreign key changed modified) then
-    //  table status became stUpdate
     if LFK.Status > stClean then
     begin
       ATable.AddChange(taForeignKeys);

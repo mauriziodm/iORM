@@ -37,12 +37,10 @@ begin
     if (Schema.Status = stCreate) or not Strategy.TableExists(LTable) then
       LTable.Status := stCreate
     else
-    begin
       AnalyzeFields(LTable);
-      AnalyzeForeignKeys(LTable);
-    end;
-    // Always called — handles stCreate tables internally without DB queries
+    // Always called — handle stCreate tables internally without DB queries
     AnalyzeIndexes(LTable);
+    AnalyzeForeignKeys(LTable);
 
     // If the table status is not stClean (and DB status is not stCreate) then the schema status became stUpdate
     if (LTable.Status > stClean) and (Schema.Status <> stCreate) then
