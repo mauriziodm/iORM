@@ -559,7 +559,7 @@ type
     procedure CreateForeignKeys;
     procedure CreateIndexes;
     procedure CreateTable(const ATable: IioDBBuilderSchemaTable);
-    procedure CreateTableIndexes(const ATable: IioDBBuilderSchemaTable);
+    procedure CreateOrAlterTableIndexes(const ATable: IioDBBuilderSchemaTable);
     procedure CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable);
     function DatabaseExists: Boolean;
     procedure DropForeignKeys;

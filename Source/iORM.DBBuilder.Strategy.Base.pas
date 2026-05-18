@@ -77,10 +77,13 @@ type
 
 
     // Indexes
-    procedure CreateOrAlterIndexes; overload; virtual;
-    procedure CreateOrAlterIndexes(const ATable: IioDBBuilderSchemaTable); overload; virtual;
-    procedure CreateIndexes; overload; virtual;
-    procedure CreateTableIndexes(const ATable: IioDBBuilderSchemaTable); overload; virtual;
+
+    procedure CreateOrAlterIndexes; virtual;
+
+    procedure CreateIndexes; virtual;
+
+    procedure CreateOrAlterTableIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
+
     procedure DropIndexes; virtual;
     procedure DropTableIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
     function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; overload; virtual; abstract;
@@ -205,27 +208,7 @@ begin
   for LTable in Schema.Tables.Values do
   begin
     if taIndexes in LTable.Changes then
-      CreateOrAlterIndexes(LTable);
-  end;
-end;
-
-procedure TioDBBuilderStrategyBase.CreateOrAlterIndexes(const ATable: IioDBBuilderSchemaTable);
-var
-  LIndex: IioDBBuilderSchemaIndex;
-begin
-  for LIndex in ATable.Indexes.Values do
-  begin
-    case LIndex.Status of
-      stCreate:
-        begin
-          Script.Body.Add(SqlGenerator.BuildSQL_CreateIndex(ATable, LIndex));
-        end;
-      stUpdate:
-        begin
-          Script.Body.Add(SqlGenerator.BuildSQL_DropIndex(ATable, LIndex));
-          Script.Body.Add(SqlGenerator.BuildSQL_CreateIndex(ATable, LIndex));
-        end;
-    end;
+      CreateOrAlterTableIndexes(LTable);
   end;
 end;
 
@@ -290,22 +273,27 @@ begin
   Script.Body.IncIndent;
 
   for LTable in Schema.Tables.Values do
-    CreateTableIndexes(LTable);
+    CreateOrAlterTableIndexes(LTable);
 
   Script.Body.DecIndent;
 end;
 
-procedure TioDBBuilderStrategyBase.CreateTableIndexes(const ATable: IioDBBuilderSchemaTable);
+/// <summary>
+/// Generates the SQL statements to create or recreate the indexes of a single table.
+/// When the table is new (stCreate), all its indexes are created unconditionally.
+/// When the table already exists, only indexes marked as stCreate or stUpdate are
+/// processed; updated indexes are dropped first and then recreated.
+/// </summary>
+procedure TioDBBuilderStrategyBase.CreateOrAlterTableIndexes(const ATable: IioDBBuilderSchemaTable);
 var
   LIndex: IioDBBuilderSchemaIndex;
 begin
   for LIndex in ATable.Indexes.Values do
   begin
-    // Carlo Marona (2025-10-16): Check if index already exists before create. If exists skip it.
+    // Drop the old index first when it needs to be recreated with changes
     if LIndex.Status = stUpdate then
-      // If the index was changed, drops the old one then recreate it with updates
       Script.Body.Add(SqlGenerator.BuildSQL_DropIndex(ATable, LIndex));
-
+    // Create the index: unconditionally for new tables, or only for new/modified indexes on existing tables
     if (ATable.Status = stCreate) or (LIndex.Status in [stCreate, stUpdate]) then
       Script.Body.Add(SqlGenerator.BuildSQL_CreateIndex(ATable, LIndex));
   end;
