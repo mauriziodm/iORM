@@ -149,18 +149,16 @@ procedure TioDBBuilderDBAnalyzer.AnalyzeFields(const ATable: IioDBBuilderSchemaT
 var
   LField: IioDBBuilderSchemaField;
 begin
-  // Loop for all fields in the table
   for LField in ATable.Fields do
   begin
-    // Analyze the field and set it's status
-    if not FStrategy.FieldExists(ATable, LField) then
+    // When the table is new, all its fields must be created — no DB query needed
+    if ATable.Status = stCreate then
       LField.Status := stCreate
-    else
-    if FStrategy.FieldModified(ATable, LField) then
+    else if not FStrategy.FieldExists(ATable, LField) then
+      LField.Status := stCreate
+    else if FStrategy.FieldModified(ATable, LField) then
       LField.Status := stUpdate;
 
-    // If the field status is not stClean (field modified) then
-    //  table status became stUpdate
     if LField.Status > stClean then
     begin
       ATable.AddChange(taFields);
