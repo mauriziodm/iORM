@@ -556,7 +556,6 @@ type
     ['{4187C897-A5C6-4807-87D0-C466D3EE34CE}']
     procedure AlterTable(const ATable: IioDBBuilderSchemaTable);
     procedure CreateDatabase;
-    procedure CreateForeignKeys;
     procedure CreateTable(const ATable: IioDBBuilderSchemaTable);
     procedure CreateOrAlterTableIndexes(const ATable: IioDBBuilderSchemaTable);
     procedure CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable);

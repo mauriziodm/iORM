@@ -321,15 +321,8 @@ begin
     CreateOrAlterIndexes;
 
   // Foreign keys are processed last so all referenced tables are already created.
-  // stCreate: create all FKs unconditionally (new database).
-  // stUpdate: only add new or alter modified FKs (existing database).
   if Schema.ForeignKeysEnabled then
-  begin
-    if Schema.Status = stCreate then
-      CreateForeignKeys
-    else
-      CreateOrAlterForeignKeys;
-  end;
+    CreateOrAlterForeignKeys;
 end;
 
 function TioDBBuilderStrategyWithAlterTable.IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;

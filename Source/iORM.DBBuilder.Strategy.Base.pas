@@ -94,8 +94,8 @@ type
     procedure CreateTableSequence(const ATable: IioDBBuilderSchemaTable); virtual;
     // ForeignKeys
     procedure CreateOrAlterForeignKeys; virtual;
-    procedure CreateForeignKeys; overload; virtual;
-    procedure CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable); overload; virtual;
+    procedure CreateOrAlterTableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure DropForeignKeys; virtual;
     function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
     function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
@@ -165,29 +165,34 @@ end;
 procedure TioDBBuilderStrategyBase.CreateOrAlterForeignKeys;
 var
   LTable: IioDBBuilderSchemaTable;
-  LFK: IioDBBuilderSchemaFK;
 begin
   for LTable in Schema.Tables.Values do
   begin
     if taForeignKeys in LTable.Changes then
-    begin
-      Script.Body.AddTitle(Format('Foreign keys for table ''%s''', [LTable.Name]));
+      CreateOrAlterTableForeignKeys(LTable);
+  end;
+end;
 
-      for LFK in LTable.ForeignKeys.Values do
-      begin
-        case LFK.Status of
-          stCreate:
-            begin
-              Script.Body.Add(SqlGenerator.BuildSQL_CreateFK(LTable, LFK));
-            end;
-          stUpdate:
-            begin
-              Script.Body.Add(SqlGenerator.BuildSQL_DropFK(LTable, LFK));
-              Script.Body.Add(SqlGenerator.BuildSQL_CreateFK(LTable, LFK));
-            end;
-        end;
-      end;
-    end;
+/// <summary>
+/// Generates the SQL statements to create or recreate the foreign keys of a single table.
+/// Only FKs marked as stCreate or stUpdate are processed; modified FKs (stUpdate) are
+/// dropped first and then recreated. FKs of new tables already have stCreate status
+/// because the analyzer sets it without querying the DB.
+/// </summary>
+procedure TioDBBuilderStrategyBase.CreateOrAlterTableForeignKeys(const ATable: IioDBBuilderSchemaTable);
+var
+  LFK: IioDBBuilderSchemaFK;
+begin
+  for LFK in ATable.ForeignKeys.Values do
+  begin
+    // Skip unchanged FKs
+    if LFK.Status = stClean then
+      Continue;
+    // Drop the existing FK first when it needs to be recreated with changes
+    if LFK.Status = stUpdate then
+      Script.Body.Add(SqlGenerator.BuildSQL_DropFK(ATable, LFK));
+    // Create the FK (both for new and modified ones)
+    Script.Body.Add(SqlGenerator.BuildSQL_CreateFK(ATable, LFK));
   end;
 end;
 
@@ -241,16 +246,6 @@ begin
   Result := SqlGenerator.Command_DatabaseExists;
 end;
 
-procedure TioDBBuilderStrategyBase.CreateForeignKeys;
-var
-  LTable: IioDBBuilderSchemaTable;
-begin
-  Script.Body.AddTitle('Creating foreign keys');
-
-  for LTable in Schema.Tables.Values do
-    CreateTableForeignKeys(LTable);
-end;
-
 procedure TioDBBuilderStrategyBase.CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable);
 var
   LForeignKey: IioDBBuilderSchemaFK;
@@ -261,8 +256,8 @@ end;
 
 /// <summary>
 /// Generates the SQL statements to create or recreate the indexes of a single table.
-/// Only indexes marked as stCreate or stUpdate are processed; updated indexes are
-/// dropped first and then recreated. Indexes of new tables already have stCreate
+/// Only indexes marked as stCreate or stUpdate are processed; modified indexes (stUpdate)
+/// are dropped first and then recreated. Indexes of new tables already have stCreate
 /// status because the analyzer sets it without querying the DB.
 /// </summary>
 procedure TioDBBuilderStrategyBase.CreateOrAlterTableIndexes(const ATable: IioDBBuilderSchemaTable);
@@ -271,12 +266,14 @@ var
 begin
   for LIndex in ATable.Indexes.Values do
   begin
-    // Drop the old index first when it needs to be recreated with changes
+    // Skip unchanged indexes
+    if LIndex.Status = stClean then
+      Continue;
+    // Drop the existing index first when it needs to be recreated with changes
     if LIndex.Status = stUpdate then
       Script.Body.Add(SqlGenerator.BuildSQL_DropIndex(ATable, LIndex));
-    // Create new or modified indexes
-    if LIndex.Status in [stCreate, stUpdate] then
-      Script.Body.Add(SqlGenerator.BuildSQL_CreateIndex(ATable, LIndex));
+    // Create the index (both for new and modified ones)
+    Script.Body.Add(SqlGenerator.BuildSQL_CreateIndex(ATable, LIndex));
   end;
 end;
 
