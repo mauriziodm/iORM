@@ -1,4 +1,4 @@
-{
+﻿{
   ****************************************************************************
   *                                                                          *
   *           iORM - (interfaced ORM)                                        *
@@ -57,7 +57,7 @@ type
     procedure AnalyzeFields(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure AnalyzeForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure AnalyzeIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
-    procedure AnalyzeTables; virtual; abstract;
+    procedure AnalyzeTables; virtual;
 
     property ConnectionDefName: string read GetConnectionDefName;
     property Schema: IioDBBuilderSchema read GetSchema;
@@ -144,6 +144,26 @@ begin
   end;
 end;
 
+
+procedure TioDBBuilderDBAnalyzer.AnalyzeTables;
+var
+  LTable: IioDBBuilderSchemaTable;
+begin
+  for LTable in Schema.Tables.Values do
+  begin
+    // If the DB is new or the table doesn't exist, mark it as stCreate
+    if (Schema.Status = stCreate) or not FStrategy.TableExists(LTable) then
+      LTable.Status := stCreate;
+    // Always called — handle stCreate tables internally without DB queries
+    AnalyzeFields(LTable);
+    AnalyzeIndexes(LTable);
+    AnalyzeForeignKeys(LTable);
+
+    // If the table has changes and the DB already exists, mark the schema as stUpdate
+    if (LTable.Status > stClean) and (Schema.Status <> stCreate) then
+      Schema.Status := stUpdate;
+  end;
+end;
 
 procedure TioDBBuilderDBAnalyzer.AnalyzeFields(const ATable: IioDBBuilderSchemaTable);
 var

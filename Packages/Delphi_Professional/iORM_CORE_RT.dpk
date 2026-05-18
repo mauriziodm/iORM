@@ -247,8 +247,6 @@ contains
   iORM.DB.Consts in '..\..\Source\iORM.DB.Consts.pas',
   iORM.DBBuilder.Strategy.SqLite in '..\..\Source\iORM.DBBuilder.Strategy.SqLite.pas',
   iORM.DBBuilder.Strategy.Firebird in '..\..\Source\iORM.DBBuilder.Strategy.Firebird.pas',
-  iORM.DBBuilder.DBAnalyzer.Firebird in '..\..\Source\iORM.DBBuilder.DBAnalyzer.Firebird.pas',
-  iORM.DBBuilder.DBAnalyzer.SqLite in '..\..\Source\iORM.DBBuilder.DBAnalyzer.SqLite.pas',
   iORM.DBBuilder.Strategy.WithAlterTable in '..\..\Source\iORM.DBBuilder.Strategy.WithAlterTable.pas',
   iORM.DBBuilder.Strategy.WithoutAlterTable in '..\..\Source\iORM.DBBuilder.Strategy.WithoutAlterTable.pas',
   iORM.DBBuilder.Schema.Index in '..\..\Source\iORM.DBBuilder.Schema.Index.pas',
@@ -268,7 +266,6 @@ contains
   iORM.DBBuilder.Strategy.MSSqlServer in '..\..\Source\iORM.DBBuilder.Strategy.MSSqlServer.pas',
   iORM.DB.MSSqlServer.SqlDataConverter in '..\..\Source\iORM.DB.MSSqlServer.SqlDataConverter.pas',
   iORM.DB.MSSqlServer.SqlGenerator in '..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas',
-  iORM.DBBuilder.DBAnalyzer.MSSqlServer in '..\..\Source\iORM.DBBuilder.DBAnalyzer.MSSqlServer.pas',
   iORM.DBBuilder.SqlGenerator.MSSqlServer in '..\..\Source\iORM.DBBuilder.SqlGenerator.MSSqlServer.pas';
 
 end.

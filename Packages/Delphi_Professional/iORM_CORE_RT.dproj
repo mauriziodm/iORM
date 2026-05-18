@@ -380,8 +380,6 @@
         <DCCReference Include="..\..\Source\iORM.DB.Consts.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Strategy.SqLite.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Strategy.Firebird.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.DBAnalyzer.Firebird.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.DBAnalyzer.SqLite.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Strategy.WithAlterTable.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Index.pas"/>
         <DCCReference Include="..\..\Source\iORM.Abstraction.Factory.pas"/>
@@ -400,7 +398,6 @@
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Strategy.MSSqlServer.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.MSSqlServer.SqlDataConverter.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.MSSqlServer.SqlGenerator.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.DBAnalyzer.MSSqlServer.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlGenerator.MSSqlServer.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
