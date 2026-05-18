@@ -196,17 +196,16 @@ procedure TioDBBuilderDBAnalyzer.AnalyzeIndexes(const ATable: IioDBBuilderSchema
 var
   LIndex: IioDBBuilderSchemaIndex;
 begin
-  // Loops all indexes in the table
   for LIndex in ATable.Indexes.Values do
   begin
-    if not FStrategy.IndexExists(ATable, LIndex) then
+    // When the table is new, all its indexes must be created — no DB query needed
+    if ATable.Status = stCreate then
       LIndex.Status := stCreate
-    else
-    if FStrategy.IndexModified(ATable, LIndex) then
+    else if not FStrategy.IndexExists(ATable, LIndex) then
+      LIndex.Status := stCreate
+    else if FStrategy.IndexModified(ATable, LIndex) then
       LIndex.Status := stUpdate;
 
-    // If the index status is not stClean (index modified) then
-    //  table status became stUpdate
     if LIndex.Status > stClean then
     begin
       ATable.AddChange(taIndexes);

@@ -39,9 +39,10 @@ begin
     else
     begin
       AnalyzeFields(LTable);
-      AnalyzeIndexes(LTable);
       AnalyzeForeignKeys(LTable);
     end;
+    // Always called — handles stCreate tables internally without DB queries
+    AnalyzeIndexes(LTable);
 
     // If the table status is not stClean (and DB status is not stCreate) then the schema status became stUpdate
     if (LTable.Status > stClean) and (Schema.Status <> stCreate) then

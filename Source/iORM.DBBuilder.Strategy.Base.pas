@@ -199,9 +199,9 @@ begin
 end;
 
 /// <summary>
-/// Generates index SQL for all tables that need it: new tables (stCreate) get all
-/// their indexes created unconditionally, existing tables only if they have index
-/// changes (taIndexes in Changes). Delegates per-table work to CreateOrAlterTableIndexes.
+/// Generates index SQL for all tables that have index changes (taIndexes in Changes).
+/// This covers both new tables (whose indexes are set to stCreate by the analyzer)
+/// and existing tables with new or modified indexes.
 /// </summary>
 procedure TioDBBuilderStrategyBase.CreateOrAlterIndexes;
 var
@@ -209,7 +209,7 @@ var
 begin
   for LTable in Schema.Tables.Values do
   begin
-    if (LTable.Status = stCreate) or (taIndexes in LTable.Changes) then
+    if taIndexes in LTable.Changes then
       CreateOrAlterTableIndexes(LTable);
   end;
 end;
@@ -270,7 +270,7 @@ end;
 /// Generates the SQL statements to create or recreate the indexes of a single table.
 /// Only indexes marked as stCreate or stUpdate are processed; updated indexes are
 /// dropped first and then recreated. Indexes of new tables already have stCreate
-/// status because SchemaTable.SetStatus propagates it automatically to all indexes.
+/// status because the analyzer sets it without querying the DB.
 /// </summary>
 procedure TioDBBuilderStrategyBase.CreateOrAlterTableIndexes(const ATable: IioDBBuilderSchemaTable);
 var
