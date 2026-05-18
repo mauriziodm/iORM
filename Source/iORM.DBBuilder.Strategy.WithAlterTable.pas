@@ -135,6 +135,8 @@ procedure TioDBBuilderStrategyWithAlterTable.DropForeignKeys;
 var
   LQuery: IioQuery;
 begin
+  inherited;
+
   LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FKList, True);
 
   while not LQuery.Eof do

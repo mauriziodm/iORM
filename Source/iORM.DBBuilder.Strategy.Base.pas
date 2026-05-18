@@ -317,9 +317,6 @@ end;
 
 procedure TioDBBuilderStrategyBase.DropForeignKeys;
 begin
-  if Schema.Status = stCreate then
-    Exit;
-
   Script.Body.AddTitle('Dropping foreign keys');
 end;
 

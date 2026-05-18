@@ -603,9 +603,6 @@ type
     /// </summary>
     procedure BuildCreateDBSqlScript(const AScript: IioDBBuilderSqlScript);
 
-    procedure BuildDropIndexesSqlScript(const AScript: IioDBBuilderSqlScript);
-
-    procedure BuildDropForeignKeysSqlScript(const AScript: IioDBBuilderSqlScript);
     /// <summary>
     ///  Build update database SQL script regardless of schema status.
     /// <param name="AScript">The script where sql instructions will be returned.</param>
