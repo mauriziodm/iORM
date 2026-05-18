@@ -32,8 +32,8 @@ begin
   // Loop for all tables
   for LTable in Schema.Tables.Values do
   begin
-    // Analyze the table and set it's status
-    // Note: If the schema status is dbsCreate then all the tables must be dbsCreate (obviously)
+    // Analyze the table and set its status
+    // Note: If the schema status is stCreate then all the tables must be stCreate (obviously)
     if (Schema.Status = stCreate) or not Strategy.TableExists(LTable) then
       LTable.Status := stCreate
     else

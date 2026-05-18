@@ -268,9 +268,9 @@ end;
 
 /// <summary>
 /// Generates the SQL statements to create or recreate the indexes of a single table.
-/// When the table is new (stCreate), all its indexes are created unconditionally.
-/// When the table already exists, only indexes marked as stCreate or stUpdate are
-/// processed; updated indexes are dropped first and then recreated.
+/// Only indexes marked as stCreate or stUpdate are processed; updated indexes are
+/// dropped first and then recreated. Indexes of new tables already have stCreate
+/// status because SchemaTable.SetStatus propagates it automatically to all indexes.
 /// </summary>
 procedure TioDBBuilderStrategyBase.CreateOrAlterTableIndexes(const ATable: IioDBBuilderSchemaTable);
 var
@@ -281,8 +281,8 @@ begin
     // Drop the old index first when it needs to be recreated with changes
     if LIndex.Status = stUpdate then
       Script.Body.Add(SqlGenerator.BuildSQL_DropIndex(ATable, LIndex));
-    // Create the index: unconditionally for new tables, or only for new/modified indexes on existing tables
-    if (ATable.Status = stCreate) or (LIndex.Status in [stCreate, stUpdate]) then
+    // Create new or modified indexes
+    if LIndex.Status in [stCreate, stUpdate] then
       Script.Body.Add(SqlGenerator.BuildSQL_CreateIndex(ATable, LIndex));
   end;
 end;

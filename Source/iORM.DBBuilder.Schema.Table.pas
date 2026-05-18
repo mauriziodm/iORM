@@ -262,9 +262,19 @@ begin
 end;
 
 procedure TioDBBuilderSchemaTable.SetStatus(const AValue: TioDBBuilderStatus);
+var
+  LIndex: IioDBBuilderSchemaIndex;
 begin
   if AValue > FStatus then
+  begin
     FStatus := AValue;
+    // When the table is new, propagate stCreate to all indexes so their status
+    // reflects reality (AnalyzeIndexes is not called for new tables since there
+    // is nothing to compare on DB)
+    if AValue = stCreate then
+      for LIndex in FIndexes.Values do
+        LIndex.Status := stCreate;
+  end;
 end;
 
 end.
