@@ -100,20 +100,37 @@ begin
   Script.Body.Add(SqlGenerator.BuildSQL_EndCreateTable(ATable));
 end;
 
+/// <summary>
+/// Drops all indexes for tables that need to be rebuilt (stUpdate).
+/// Unlike iterating schema indexes (which would miss indexes removed from the schema),
+/// this method queries the actual database via BuildSQL_IndexList to discover all
+/// existing indexes per table. This ensures that orphaned indexes (e.g. an index whose
+/// [ioIndex] attribute was removed from an entity) are also dropped and don't remain
+/// indefinitely in the database.
+/// Tables that are unchanged (stClean) or new (stCreate) are skipped.
+/// Note: tables are not dropped when absent from the schema because that would cause
+/// data loss; indexes, being derived objects, can safely be dropped and recreated.
+/// </summary>
 procedure TioDBBuilderStrategySqLite.DropIndexes;
 var
   LTable: IioDBBuilderSchemaTable;
+  LQuery: IioQuery;
 begin
   inherited;
 
-  // Drop only indexes of tables that need to be rebuilt (stUpdate)
-  // Don't drop indexes of tables that remain unchanged (stClean) or are new (stCreate)
   for LTable in Schema.Tables.Values do
   begin
     if LTable.Status <> stUpdate then
       Continue;
 
-    DropTableIndexes(LTable);
+    // Query the database for all real indexes on this table, not the schema,
+    // so that indexes no longer defined in the schema are also dropped.
+    LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexList(LTable.Name), True);
+    while not LQuery.Eof do
+    begin
+      Script.Body.Add(SqlGenerator.BuildSQL_DropIndexByName(LQuery.Fields[0].AsString));
+      LQuery.Next;
+    end;
   end;
 end;
 
