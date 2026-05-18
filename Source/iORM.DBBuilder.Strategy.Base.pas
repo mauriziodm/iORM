@@ -83,8 +83,7 @@ type
     procedure DropIndexes; virtual;
 
     procedure DropTableIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
-    function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; overload; virtual; abstract;
-    function IndexExists(const AIndexName: string): boolean; overload; virtual;
+    function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; virtual; abstract;
     function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; virtual; abstract;
 
 
@@ -150,9 +149,6 @@ function TioDBBuilderStrategyBase.SequenceExists(const ASequenceName: string): B
 var
   LQuery: IioQuery;
 begin
-  if ASequenceName.IsEmpty then
-    raise EioInvalidArgumentException.Create(ClassName, 'SequenceExists', 'ASequenceName is not specified.');
-
   LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_SequenceExists(ASequenceName), True);
   Result := LQuery.Fields[0].AsInteger > 0;
 end;
@@ -162,10 +158,7 @@ begin
   if not ATable.UsesSequenceForKeyGeneration then
     Exit;
 
-  if ATable.GetSequenceName.IsEmpty then
-    Exit;
-
-  if (Schema.Status = stCreate) or not SequenceExists(ATable.GetSequenceName) then
+  if not SequenceExists(ATable.GetSequenceName) then
     Script.Body.Add(SqlGenerator.BuildSQL_CreateSequence(ATable.GetSequenceName));
 end;
 
@@ -473,16 +466,6 @@ end;
 function TioDBBuilderStrategyBase.TableExists(const ATable: IioDBBuilderSchemaTable): Boolean;
 begin
   Result := _ExecuteExistsQuery(SqlGenerator.BuildSQL_TableExists(ATable.Name));
-end;
-
-function TioDBBuilderStrategyBase.IndexExists(const AIndexName: string): boolean;
-begin
-  Result := False;
-
-  if AIndexName.IsEmpty then
-    Exit;
-
-  Result := _ExecuteExistsQuery(SqlGenerator.BuildSQL_IndexExistsByName(AIndexName));
 end;
 
 end.
