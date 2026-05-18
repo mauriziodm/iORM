@@ -127,7 +127,7 @@ begin
   CreateOrAlterTables;
 
   if Schema.IndexesEnabled then
-    CreateIndexes;
+    CreateOrAlterIndexes;
 
   // When updating, copy data from renamed "_old" tables into the newly created ones
   if Schema.Status = stUpdate then

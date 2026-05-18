@@ -104,10 +104,10 @@ procedure TioDBBuilderStrategySqLite.DropIndexes;
 var
   LTable: IioDBBuilderSchemaTable;
 begin
+  inherited;
+
   // Drop only indexes of tables that need to be rebuilt (stUpdate)
   // Don't drop indexes of tables that remain unchanged (stClean) or are new (stCreate)
-  Script.Body.AddTitle('Dropping indexes for tables to be rebuilt');
-
   for LTable in Schema.Tables.Values do
   begin
     if LTable.Status <> stUpdate then

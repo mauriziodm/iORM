@@ -77,14 +77,11 @@ type
 
 
     // Indexes
-
     procedure CreateOrAlterIndexes; virtual;
-
-    procedure CreateIndexes; virtual;
-
     procedure CreateOrAlterTableIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
 
     procedure DropIndexes; virtual;
+
     procedure DropTableIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
     function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; overload; virtual; abstract;
     function IndexExists(const AIndexName: string): boolean; overload; virtual;
@@ -201,13 +198,18 @@ begin
   end;
 end;
 
+/// <summary>
+/// Generates index SQL for all tables that need it: new tables (stCreate) get all
+/// their indexes created unconditionally, existing tables only if they have index
+/// changes (taIndexes in Changes). Delegates per-table work to CreateOrAlterTableIndexes.
+/// </summary>
 procedure TioDBBuilderStrategyBase.CreateOrAlterIndexes;
 var
   LTable: IioDBBuilderSchemaTable;
 begin
   for LTable in Schema.Tables.Values do
   begin
-    if taIndexes in LTable.Changes then
+    if (LTable.Status = stCreate) or (taIndexes in LTable.Changes) then
       CreateOrAlterTableIndexes(LTable);
   end;
 end;
@@ -262,20 +264,6 @@ var
 begin
   for LForeignKey in ATable.ForeignKeys.Values do
     Script.Body.Add(SqlGenerator.BuildSQL_CreateFK(ATable, LForeignKey));
-end;
-
-procedure TioDBBuilderStrategyBase.CreateIndexes;
-var
-  LTable: IioDBBuilderSchemaTable;
-begin
-  Script.Body.AddTitle('Creating indexes');
-
-  Script.Body.IncIndent;
-
-  for LTable in Schema.Tables.Values do
-    CreateOrAlterTableIndexes(LTable);
-
-  Script.Body.DecIndent;
 end;
 
 /// <summary>
@@ -347,9 +335,6 @@ end;
 
 procedure TioDBBuilderStrategyBase.DropIndexes;
 begin
-  if Schema.Status = stCreate then
-    Exit;
-
   Script.Body.AddTitle('Dropping indexes');
 end;
 

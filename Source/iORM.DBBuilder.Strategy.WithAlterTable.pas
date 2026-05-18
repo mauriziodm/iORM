@@ -149,6 +149,8 @@ procedure TioDBBuilderStrategyWithAlterTable.DropIndexes;
 var
   LQuery: IioQuery;
 begin
+  inherited;
+
   LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexList(''), True);
 
   while not LQuery.Eof do
@@ -316,12 +318,7 @@ begin
 
   // Indexes: create all (stCreate) or only add/alter modified ones (stUpdate)
   if Schema.IndexesEnabled then
-  begin
-    if Schema.Status = stCreate then
-      CreateIndexes
-    else
-      CreateOrAlterIndexes;
-  end;
+    CreateOrAlterIndexes;
 
   // Foreign keys are processed last so all referenced tables are already created.
   // stCreate: create all FKs unconditionally (new database).

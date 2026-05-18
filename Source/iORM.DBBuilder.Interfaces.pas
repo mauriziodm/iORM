@@ -557,7 +557,6 @@ type
     procedure AlterTable(const ATable: IioDBBuilderSchemaTable);
     procedure CreateDatabase;
     procedure CreateForeignKeys;
-    procedure CreateIndexes;
     procedure CreateTable(const ATable: IioDBBuilderSchemaTable);
     procedure CreateOrAlterTableIndexes(const ATable: IioDBBuilderSchemaTable);
     procedure CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable);
