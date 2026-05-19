@@ -68,7 +68,6 @@ type
     function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
     function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
     // ForeignKeys
-    procedure DropForeignKeys; override;
     function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
     function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
     // Warnings
@@ -129,22 +128,6 @@ begin
   Script.Body.Add(SqlGenerator.BuildSQL_EndCreateTable(ATable));
   Script.Body.AddEmpty;
   Script.Body.Add(SqlGenerator.BuildSQL_CreatePK(ATable));
-end;
-
-procedure TioDBBuilderStrategyWithAlterTable.DropForeignKeys;
-var
-  LQuery: IioQuery;
-begin
-  inherited;
-
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FKList, True);
-
-  while not LQuery.Eof do
-  begin
-    Script.Body.Add(SqlGenerator.BuildSQL_DropFKbyName(LQuery.Fields.FieldByName('table_name').AsString,
-      LQuery.Fields.FieldByName('constraint_name').AsString));
-    LQuery.Next;
-  end;
 end;
 
 procedure TioDBBuilderStrategyWithAlterTable.DropIndexes;

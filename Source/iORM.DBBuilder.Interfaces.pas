@@ -560,7 +560,6 @@ type
     procedure CreateOrAlterTableIndexes(const ATable: IioDBBuilderSchemaTable);
     procedure CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable);
     function DatabaseExists: Boolean;
-    procedure DropForeignKeys;
     procedure DropIndexes;
     procedure DropTableIndexes(const ATable: IioDBBuilderSchemaTable);
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;

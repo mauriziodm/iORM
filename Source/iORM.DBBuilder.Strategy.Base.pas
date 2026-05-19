@@ -96,7 +96,6 @@ type
     procedure CreateOrAlterForeignKeys; virtual;
     procedure CreateOrAlterTableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
-    procedure DropForeignKeys; virtual;
     function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
     function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
     // Warnings
@@ -313,11 +312,6 @@ end;
 procedure TioDBBuilderStrategyBase.CreateTable(const ATable: IioDBBuilderSchemaTable);
 begin
   Script.Body.AddTitle(Format('Creating table ''%s''', [ATable.Name]));
-end;
-
-procedure TioDBBuilderStrategyBase.DropForeignKeys;
-begin
-  Script.Body.AddTitle('Dropping foreign keys');
 end;
 
 procedure TioDBBuilderStrategyBase.DropIndexes;
