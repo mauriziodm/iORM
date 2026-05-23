@@ -117,7 +117,7 @@ begin
     LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexList(LTable.Name), True);
     while not LQuery.Eof do
     begin
-      Script.Body.Add(SqlGenerator.BuildSQL_DropIndexByName(LQuery.Fields[0].AsString));
+      DropIndexByName(LQuery.Fields[0].AsString);
       LQuery.Next;
     end;
   end;

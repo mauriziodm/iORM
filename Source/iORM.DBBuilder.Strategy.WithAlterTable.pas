@@ -130,17 +130,24 @@ begin
   Script.Body.Add(SqlGenerator.BuildSQL_CreatePK(ATable));
 end;
 
+/// <summary>
+/// Drops all indexes from the database by querying the actual DB catalog.
+/// Querying the DB (not the schema) ensures that orphaned indexes — those no
+/// longer defined in the schema — are also dropped.
+/// Called during GenerateUpdateDatabaseScript before recreating indexes.
+/// </summary>
 procedure TioDBBuilderStrategyWithAlterTable.DropIndexes;
 var
   LQuery: IioQuery;
 begin
   inherited;
 
+  // Query all indexes currently in the database
   LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexList(''), True);
 
   while not LQuery.Eof do
   begin
-    Script.Body.Add(SqlGenerator.BuildSQL_DropIndexByName(LQuery.Fields[0].AsString));
+    DropIndexByName(LQuery.Fields[0].AsString);
     LQuery.Next;
   end;
 end;

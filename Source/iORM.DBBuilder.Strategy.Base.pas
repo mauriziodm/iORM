@@ -77,9 +77,12 @@ type
 
 
     // Indexes
+    procedure CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex); virtual;
     procedure CreateOrAlterIndexes; virtual;
     procedure CreateOrAlterTableIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
 
+    procedure DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex); virtual;
+    procedure DropIndexByName(const AIndexName: string); virtual;
     procedure DropIndexes; virtual;
 
     procedure DropTableIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
@@ -270,9 +273,9 @@ begin
       Continue;
     // Drop the existing index first when it needs to be recreated with changes
     if LIndex.Status = stUpdate then
-      Script.Body.Add(SqlGenerator.BuildSQL_DropIndex(ATable, LIndex));
+      DropIndex(ATable, LIndex);
     // Create the index (both for new and modified ones)
-    Script.Body.Add(SqlGenerator.BuildSQL_CreateIndex(ATable, LIndex));
+    CreateIndex(ATable, LIndex);
   end;
 end;
 
@@ -314,6 +317,21 @@ begin
   Script.Body.AddTitle(Format('Creating table ''%s''', [ATable.Name]));
 end;
 
+procedure TioDBBuilderStrategyBase.CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex);
+begin
+  Script.Body.Add(SqlGenerator.BuildSQL_CreateIndex(ATable, AIndex));
+end;
+
+procedure TioDBBuilderStrategyBase.DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex);
+begin
+  DropIndexByName(SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex));
+end;
+
+procedure TioDBBuilderStrategyBase.DropIndexByName(const AIndexName: string);
+begin
+  Script.Body.Add(SqlGenerator.BuildSQL_DropIndexByName(AIndexName));
+end;
+
 procedure TioDBBuilderStrategyBase.DropIndexes;
 begin
   Script.Body.AddTitle('Dropping indexes');
@@ -324,7 +342,10 @@ var
   LIndex: IioDBBuilderSchemaIndex;
 begin
   for LIndex in ATable.Indexes.Values do
-    Script.Body.Add(SqlGenerator.BuildSQL_DropIndex(ATable, LIndex));
+  begin
+    if IndexExists(ATable, LIndex) then
+      DropIndex(ATable, LIndex);
+  end;
 end;
 
 procedure TioDBBuilderStrategyBase.GenerateCreateDatabaseScript;
