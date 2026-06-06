@@ -286,24 +286,32 @@ begin
   // Check key generation strategy compatibility with RDBMS version
   DoCheckKeyGenerationCompatibility;
 
-  // Strict mode: drop every index/FK from the DB for each stUpdate table.
-  // This removes orphaned objects (including manually-added ones) and ensures
+  // Strict mode (indexes): drop every index from the DB for each stUpdate table.
+  // This removes orphaned indexes (including manually-added ones) and ensures
   // a clean slate before the schema-driven recreation.
-  if (Schema.IndexesMode = ifmEnabledStrict) or (Schema.ForeignKeysMode = ifmEnabledStrict) then
+  // We call the Force* mechanic directly instead of routing through the
+  // mode-aware public DropTableIndexes: the sync flow already knows by
+  // construction that the desired behavior here is the FromDB drop, so going
+  // through the dispatcher would be redundant indirection. The Force* naming
+  // makes the bypass intent explicit. Indexes and FKs are kept in two distinct
+  // blocks because they are independent concerns (separate mode parameter for
+  // each), and the separation keeps each path immediately readable.
+  if Schema.IndexesMode = ifmEnabledStrict then
   begin
-    if Schema.IndexesMode = ifmEnabledStrict then
-      Script.Body.AddTitle('Dropping indexes (strict mode)');
-    if Schema.ForeignKeysMode = ifmEnabledStrict then
-      Script.Body.AddTitle('Dropping foreign keys (strict mode)');
+    Script.Body.AddTitle('Dropping indexes (strict mode)');
     for LTable in Schema.Tables.Values do
-    begin
-      if LTable.Status <> stUpdate then
-        Continue;
-      if Schema.IndexesMode = ifmEnabledStrict then
-        DropTableIndexesFromDB(LTable);
-      if Schema.ForeignKeysMode = ifmEnabledStrict then
-        DropTableForeignKeysFromDB(LTable);
-    end;
+      if LTable.Status = stUpdate then
+        ForceDropTableIndexesFromDB(LTable);
+  end;
+
+  // Strict mode (foreign keys): same approach as the indexes block above,
+  // independent because ForeignKeysMode is a separate parameter.
+  if Schema.ForeignKeysMode = ifmEnabledStrict then
+  begin
+    Script.Body.AddTitle('Dropping foreign keys (strict mode)');
+    for LTable in Schema.Tables.Values do
+      if LTable.Status = stUpdate then
+        ForceDropTableForeignKeysFromDB(LTable);
   end;
 
   // Create new tables or alter existing ones (fields and sequences only)

@@ -133,15 +133,17 @@ begin
   BeginDeferConstraints;
 
   // When updating, drop indexes and rename existing tables to "_old" before recreating them.
-  // Index drop is always done via the DB catalog (FromDB variant) because we need every
-  // index gone before rename — including orphans and manually-added ones — otherwise their
-  // names would collide when CreateOrAlterIndexes runs on the new tables.
+  // We call the Force* mechanic that bypasses IndexesMode: rename-create-copy
+  // requires every index to be dropped regardless of the user's mode setting
+  // (including ifmDisabled), otherwise index names would collide when
+  // CreateOrAlterIndexes runs on the new tables. The 'Force' prefix makes this
+  // intentional bypass of the configured mode explicit.
   if Schema.Status = stUpdate then
   begin
     Script.Body.AddTitle('Dropping indexes');
     for LTable in Schema.Tables.Values do
       if LTable.Status = stUpdate then
-        DropTableIndexesFromDB(LTable);
+        ForceDropTableIndexesFromDB(LTable);
     RenameAllTablesToOld;
   end;
 

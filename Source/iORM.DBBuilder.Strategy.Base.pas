@@ -81,21 +81,42 @@ type
     procedure CreateOrAlterIndexes; virtual;
     procedure CreateOrAlterTableIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
 
+    /// <summary>
+    /// Mode-aware drop of all indexes of a single table.
+    /// Dispatches to the appropriate Force* mechanic based on Schema.IndexesMode:
+    ///   ifmDisabled: raises EioDBBuilderException — index management is disabled
+    ///     by configuration, an explicit drop request is a configuration conflict.
+    ///   ifmEnabled (conservative): calls ForceDropTableIndexesFromSchema —
+    ///     drops only indexes still defined in the schema, leaves orphans untouched.
+    ///   ifmEnabledStrict: calls ForceDropTableIndexesFromDB —
+    ///     drops every index physically present in the DB for this table,
+    ///     including orphans and manually-added ones.
+    /// Intended as the public API for callers that want the configured mode to
+    /// govern the operation. Internal sync flows that know which mechanic they
+    /// need can call the Force* methods directly instead.
+    /// </summary>
+    procedure DropTableIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
+
     procedure DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex); virtual;
     procedure DropIndexByName(const AIndexName: string); virtual;
     /// <summary>
     /// Drops the indexes of a single table based on the schema definitions
-    /// (only indexes still present in the schema are dropped).
-    /// Conservative variant: indexes not in the schema (orphans, manually added)
-    /// are left untouched.
+    /// (only indexes still present in the schema are dropped) and marks them
+    /// as stCreate so they get recreated by CreateOrAlterIndexes.
+    /// Force variant: this method does NOT consult Schema.IndexesMode — it
+    /// always operates. Orphans (indexes in DB but not in schema) and manually
+    /// added indexes are left untouched.
     /// </summary>
-    procedure DropTableIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure ForceDropTableIndexesFromSchema(const ATable: IioDBBuilderSchemaTable); virtual;
     /// <summary>
-    /// Drops the indexes of a single table by querying the actual DB catalog.
-    /// Strict variant: every index physically present on the table is dropped,
+    /// Drops the indexes of a single table by querying the actual DB catalog
+    /// and marks all schema indexes for the table as stCreate so they get
+    /// recreated by CreateOrAlterIndexes.
+    /// Force variant: this method does NOT consult Schema.IndexesMode — it
+    /// always operates. Every index physically present on the table is dropped,
     /// including orphans (no longer in the schema) and manually added ones.
     /// </summary>
-    procedure DropTableIndexesFromDB(const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure ForceDropTableIndexesFromDB(const ATable: IioDBBuilderSchemaTable); virtual;
     function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; virtual; abstract;
     function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; virtual; abstract;
 
@@ -110,19 +131,39 @@ type
     procedure CreateOrAlterTableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
     /// <summary>
-    /// Drops the foreign keys of a single table based on the schema definitions
-    /// (only FKs still present in the schema are dropped).
-    /// Conservative variant: FKs not in the schema (orphans, manually added)
-    /// are left untouched.
+    /// Mode-aware drop of all foreign keys of a single table.
+    /// Dispatches to the appropriate Force* mechanic based on Schema.ForeignKeysMode:
+    ///   ifmDisabled: raises EioDBBuilderException — FK management is disabled
+    ///     by configuration, an explicit drop request is a configuration conflict.
+    ///   ifmEnabled (conservative): calls ForceDropTableForeignKeysFromSchema —
+    ///     drops only FKs still defined in the schema, leaves orphans untouched.
+    ///   ifmEnabledStrict: calls ForceDropTableForeignKeysFromDB —
+    ///     drops every FK physically present in the DB for this table,
+    ///     including orphans and manually-added ones.
+    /// Intended as the public API for callers that want the configured mode to
+    /// govern the operation. Internal sync flows that know which mechanic they
+    /// need can call the Force* methods directly instead.
     /// </summary>
     procedure DropTableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
     /// <summary>
-    /// Drops the foreign keys of a single table by querying the actual DB catalog.
-    /// Strict variant: every FK physically present on the table is dropped,
+    /// Drops the FKs of a single table based on the schema definitions
+    /// (only FKs still present in the schema are dropped) and marks them as
+    /// stCreate so they get recreated by CreateOrAlterForeignKeys.
+    /// Force variant: this method does NOT consult Schema.ForeignKeysMode — it
+    /// always operates. Orphans (FKs in DB but not in schema) and manually
+    /// added FKs are left untouched.
+    /// </summary>
+    procedure ForceDropTableForeignKeysFromSchema(const ATable: IioDBBuilderSchemaTable); virtual;
+    /// <summary>
+    /// Drops the FKs of a single table by querying the actual DB catalog and
+    /// marks all schema FKs for the table as stCreate so they get recreated
+    /// by CreateOrAlterForeignKeys.
+    /// Force variant: this method does NOT consult Schema.ForeignKeysMode — it
+    /// always operates. Every FK physically present on the table is dropped,
     /// including orphans (FKs whose structural properties changed and produced
     /// a new hash name) and manually added ones.
     /// </summary>
-    procedure DropTableForeignKeysFromDB(const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure ForceDropTableForeignKeysFromDB(const ATable: IioDBBuilderSchemaTable); virtual;
     function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
     function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
     // Warnings
@@ -200,25 +241,56 @@ begin
 end;
 
 procedure TioDBBuilderStrategyBase.DropTableForeignKeys(const ATable: IioDBBuilderSchemaTable);
-var
-  LFK: IioDBBuilderSchemaFK;
 begin
-  for LFK in ATable.ForeignKeys.Values do
-  begin
-    if ForeignKeyExists(ATable, LFK) then
-      Script.Body.Add(SqlGenerator.BuildSQL_DropFK(ATable, LFK));
+  // Mode-aware dispatcher: routes to the Force* mechanic appropriate for the
+  // current Schema.ForeignKeysMode. The Force* methods bypass mode checks and
+  // do the actual work; this entry point preserves the contract that the mode
+  // configured on TioDBBuilderProperty governs externally visible behavior.
+  case Schema.ForeignKeysMode of
+    ifmDisabled:
+      // Drop is incompatible with the configured intent ("do not manage FKs").
+      // Raise rather than silently no-op so the caller gets immediate feedback.
+      raise EioDBBuilderException.Create(ClassName, 'DropTableForeignKeys',
+        'Foreign key management is disabled (ForeignKeysMode = ifmDisabled), ' +
+        'cannot perform DropTableForeignKeys on table ''' + ATable.Name + '''.');
+    ifmEnabled:
+      ForceDropTableForeignKeysFromSchema(ATable);
+    ifmEnabledStrict:
+      ForceDropTableForeignKeysFromDB(ATable);
   end;
 end;
 
-procedure TioDBBuilderStrategyBase.DropTableForeignKeysFromDB(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.ForceDropTableForeignKeysFromSchema(const ATable: IioDBBuilderSchemaTable);
+var
+  LFK: IioDBBuilderSchemaFK;
+begin
+  // Bypass of ForeignKeysMode: this method always operates. Drops only the FKs
+  // that are still defined in the schema; orphans (FKs in DB but not in schema)
+  // and manually added FKs are left untouched — that is the conservative
+  // semantic when this mechanic is selected.
+  for LFK in ATable.ForeignKeys.Values do
+  begin
+    if ForeignKeyExists(ATable, LFK) then
+    begin
+      Script.Body.Add(SqlGenerator.BuildSQL_DropFK(ATable, LFK));
+      // Mark dropped FKs as stCreate so CreateOrAlterForeignKeys recreates them.
+      LFK.Status := stCreate;
+    end;
+  end;
+end;
+
+procedure TioDBBuilderStrategyBase.ForceDropTableForeignKeysFromDB(const ATable: IioDBBuilderSchemaTable);
 var
   LQuery: IioQuery;
   LFK: IioDBBuilderSchemaFK;
 begin
-  // Query the DB catalog for every FK currently defined on this table, then
-  // drop them all by their actual DB name. BuildSQL_FKList columns:
-  // [0]=table_name, [1]=constraint_name, [2]=on_update, [3]=on_delete.
-  // .Trim is needed because some RDBMS (e.g. Firebird) right-pads CHAR columns.
+  // Bypass of ForeignKeysMode: this method always operates. Queries the DB
+  // catalog for every FK currently defined on this table, then drops them all
+  // by their actual DB name. Catches orphans (FKs whose structural properties
+  // changed and produced a new hash name) and manually added FKs as well.
+  // BuildSQL_FKList columns: [0]=table_name, [1]=constraint_name,
+  // [2]=on_update, [3]=on_delete. .Trim handles RDBMS that right-pad CHAR
+  // columns (e.g. Firebird).
   LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FKList(ATable.Name), True);
   while not LQuery.Eof do
   begin
@@ -389,24 +461,53 @@ begin
 end;
 
 procedure TioDBBuilderStrategyBase.DropTableIndexes(const ATable: IioDBBuilderSchemaTable);
-var
-  LIndex: IioDBBuilderSchemaIndex;
 begin
-  for LIndex in ATable.Indexes.Values do
-  begin
-    if IndexExists(ATable, LIndex) then
-      DropIndex(ATable, LIndex);
+  // Mode-aware dispatcher: routes to the Force* mechanic appropriate for the
+  // current Schema.IndexesMode. The Force* methods bypass mode checks and do
+  // the actual work; this entry point preserves the contract that the mode
+  // configured on TioDBBuilderProperty governs externally visible behavior.
+  case Schema.IndexesMode of
+    ifmDisabled:
+      // Drop is incompatible with the configured intent ("do not manage indexes").
+      // Raise rather than silently no-op so the caller gets immediate feedback.
+      raise EioDBBuilderException.Create(ClassName, 'DropTableIndexes',
+        'Index management is disabled (IndexesMode = ifmDisabled), ' +
+        'cannot perform DropTableIndexes on table ''' + ATable.Name + '''.');
+    ifmEnabled:
+      ForceDropTableIndexesFromSchema(ATable);
+    ifmEnabledStrict:
+      ForceDropTableIndexesFromDB(ATable);
   end;
 end;
 
-procedure TioDBBuilderStrategyBase.DropTableIndexesFromDB(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.ForceDropTableIndexesFromSchema(const ATable: IioDBBuilderSchemaTable);
+var
+  LIndex: IioDBBuilderSchemaIndex;
+begin
+  // Bypass of IndexesMode: this method always operates. Drops only the indexes
+  // that are still defined in the schema; orphans (indexes in DB but not in
+  // schema) and manually added indexes are left untouched — that is the
+  // conservative semantic when this mechanic is selected.
+  for LIndex in ATable.Indexes.Values do
+  begin
+    if IndexExists(ATable, LIndex) then
+    begin
+      DropIndex(ATable, LIndex);
+      // Mark dropped indexes as stCreate so CreateOrAlterIndexes recreates them.
+      LIndex.Status := stCreate;
+    end;
+  end;
+end;
+
+procedure TioDBBuilderStrategyBase.ForceDropTableIndexesFromDB(const ATable: IioDBBuilderSchemaTable);
 var
   LQuery: IioQuery;
   LIndex: IioDBBuilderSchemaIndex;
 begin
-  // Query the DB catalog for every index currently defined on this table, then
-  // drop them all by their actual DB name. This catches orphans (indexes whose
-  // [ioIndex] attribute was removed) and manually added indexes alike.
+  // Bypass of IndexesMode: this method always operates. Queries the DB catalog
+  // for every index currently defined on this table, then drops them all by
+  // their actual DB name. Catches orphans (indexes whose [ioIndex] attribute
+  // was removed) and manually added indexes alike.
   LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexList(ATable.Name), True);
   while not LQuery.Eof do
   begin
