@@ -51,9 +51,9 @@ type
 
   TioDBBuilderFactory = class
   public
-    class function NewEngine(const AConnectionDefName: String; const AAddIndexes: Boolean = True; const AAddForeignKeys: Boolean = True): IioDBBuilderEngine;
+    class function NewEngine(const AConnectionDefName: String; const AIndexesMode: TioDBBuilderIndexesAndFKMode = ifmEnabled; const AForeignKeysMode: TioDBBuilderIndexesAndFKMode = ifmEnabled): IioDBBuilderEngine;
     class function NewDBAnalyzer(const AConnectionDefname: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderDBAnalyzer;
-    class function NewSchema(const AConnectionDefName: String; const AIndexesEnabled, AForeignKeysEnabled: Boolean;
+    class function NewSchema(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode;
       const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchema;
     class function NewSchemaBuilder: TioDBBuilderSchemaBuilderRef;
     class function NewSchemaField(const AContextProperty: IioProperty): IioDBBuilderSchemaField;
@@ -91,16 +91,16 @@ begin
   Result := TioDBBuilderDBAnalyzer.Create(AConnectionDefName, ASchema, ASqlGenerator);
 end;
 
-class function TioDBBuilderFactory.NewEngine(const AConnectionDefName: String; const AAddIndexes: Boolean;
-  const AAddForeignKeys: Boolean): IioDBBuilderEngine;
+class function TioDBBuilderFactory.NewEngine(const AConnectionDefName: String; const AIndexesMode: TioDBBuilderIndexesAndFKMode;
+  const AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderEngine;
 begin
-  Result := TioDBBuilderEngine.Create(AConnectionDefName, AAddIndexes, AAddForeignKeys);
+  Result := TioDBBuilderEngine.Create(AConnectionDefName, AIndexesMode, AForeignKeysMode);
 end;
 
-class function TioDBBuilderFactory.NewSchema(const AConnectionDefName: String; const AIndexesEnabled,
-  AForeignKeysEnabled: Boolean; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchema;
+class function TioDBBuilderFactory.NewSchema(const AConnectionDefName: String; const AIndexesMode,
+  AForeignKeysMode: TioDBBuilderIndexesAndFKMode; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchema;
 begin
-  Result := TioDBBuilderSchema.Create(AIndexesEnabled, AForeignKeysEnabled, ASqlGenerator);
+  Result := TioDBBuilderSchema.Create(AIndexesMode, AForeignKeysMode, ASqlGenerator);
   NewSchemaBuilder.BuildSchema(AConnectionDefName, Result);
 end;
 

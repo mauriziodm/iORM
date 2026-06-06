@@ -63,8 +63,6 @@ type
     // Hook methods for constraint deferral (override in derived classes for DBMS-specific syntax)
     procedure BeginDeferConstraints; virtual;
     procedure EndDeferConstraints; virtual;
-    // Indexes
-    procedure DropIndexes; override;
     // Tables
     procedure AlterTable(const ATable: IioDBBuilderSchemaTable); override;
     procedure CreateOrAlterTables; override;
@@ -80,48 +78,12 @@ implementation
 uses
   System.SysUtils,
 
-  iORM.Exceptions,
-  iORM.DB.Interfaces,
-  iORM.DB.QueryEngine
+  iORM.Exceptions
 
   ;
 
 
 { TioDBBuilderStrategyWithoutAlterTable }
-
-/// <summary>
-/// Drops all indexes for tables that need to be rebuilt (stUpdate).
-/// Unlike iterating schema indexes (which would miss indexes removed from the schema),
-/// this method queries the actual database via BuildSQL_IndexList to discover all
-/// existing indexes per table. This ensures that orphaned indexes (e.g. an index whose
-/// [ioIndex] attribute was removed from an entity) are also dropped and don't remain
-/// indefinitely in the database.
-/// Tables that are unchanged (stClean) or new (stCreate) are skipped.
-/// Note: tables are not dropped when absent from the schema because that would cause
-/// data loss; indexes, being derived objects, can safely be dropped and recreated.
-/// </summary>
-procedure TioDBBuilderStrategyWithoutAlterTable.DropIndexes;
-var
-  LTable: IioDBBuilderSchemaTable;
-  LQuery: IioQuery;
-begin
-  inherited;
-
-  for LTable in Schema.Tables.Values do
-  begin
-    if LTable.Status <> stUpdate then
-      Continue;
-
-    // Query the database for all real indexes on this table, not the schema,
-    // so that indexes no longer defined in the schema are also dropped.
-    LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexList(LTable.Name), True);
-    while not LQuery.Eof do
-    begin
-      DropIndexByName(LQuery.Fields[0].AsString);
-      LQuery.Next;
-    end;
-  end;
-end;
 
 procedure TioDBBuilderStrategyWithoutAlterTable.AlterTable(const ATable: IioDBBuilderSchemaTable);
 begin
@@ -147,24 +109,48 @@ begin
   end;
 end;
 
+/// <summary>
+/// Generates the full database update script for RDBMS without ALTER TABLE support.
+/// Workflow when updating an existing DB:
+///   1. Drop every index of each stUpdate table (queried from the DB, not the schema)
+///      so that index names do not collide when the new tables are created.
+///   2. Rename each stUpdate table to "_old".
+///   3. Create the new tables.
+///   4. Recreate indexes from the schema (unless ifmDisabled).
+///   5. Copy data from the "_old" tables.
+/// Foreign keys are handled inline by the CREATE TABLE statement (see derived strategies).
+/// Note: ifmEnabled and ifmEnabledStrict behave identically here because the rename-create-copy
+/// pattern already recreates everything from scratch and the index drop always queries the DB.
+/// Only ifmDisabled prevents index recreation on the new tables.
+/// </summary>
 procedure TioDBBuilderStrategyWithoutAlterTable.GenerateDatabaseObjects;
+var
+  LTable: IioDBBuilderSchemaTable;
 begin
   // Check key generation strategy compatibility with DBMS
   DoCheckKeyGenerationCompatibility;
 
   BeginDeferConstraints;
 
-  // When updating, drop indexes and rename existing tables to "_old" before recreating them
+  // When updating, drop indexes and rename existing tables to "_old" before recreating them.
+  // Index drop is always done via the DB catalog (FromDB variant) because we need every
+  // index gone before rename — including orphans and manually-added ones — otherwise their
+  // names would collide when CreateOrAlterIndexes runs on the new tables.
   if Schema.Status = stUpdate then
   begin
-    DropIndexes;
+    Script.Body.AddTitle('Dropping indexes');
+    for LTable in Schema.Tables.Values do
+      if LTable.Status = stUpdate then
+        DropTableIndexesFromDB(LTable);
     RenameAllTablesToOld;
   end;
 
   // Create tables (stCreate) or recreate modified tables (stUpdate)
   CreateOrAlterTables;
 
-  if Schema.IndexesEnabled then
+  // Indexes: ifmEnabled and ifmEnabledStrict are equivalent here because the rename-create-copy
+  // pattern already starts from a clean slate. Only ifmDisabled skips recreation.
+  if Schema.IndexesMode <> ifmDisabled then
     CreateOrAlterIndexes;
 
   // When updating, copy data from renamed "_old" tables into the newly created ones

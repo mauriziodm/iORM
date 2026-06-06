@@ -58,6 +58,21 @@ type
   TioDBBuilderTableChange = (taFields, taIndexes, taForeignKeys);
   TioDBBuilderTableChanges = set of TioDBBuilderTableChange;
 
+  /// <summary>
+  /// Controls how the DBBuilder manages indexes and foreign keys.
+  ///   ifmDisabled: indexes/FKs are not managed at all (not created, not dropped).
+  ///   ifmEnabled: conservative mode — creates new and updates modified indexes/FKs,
+  ///     but does NOT remove orphaned ones (those present in the DB but not in the schema).
+  ///     This protects manually added indexes/FKs (e.g. client-specific optimizations).
+  ///   ifmEnabledStrict: strict mode — drops ALL existing indexes/FKs from the DB for
+  ///     updated tables and recreates them from the schema. The schema is authoritative;
+  ///     any index/FK not in the schema is removed.
+  /// Note: for WithoutAlterTable databases (e.g. SQLite), ifmEnabled and ifmEnabledStrict
+  /// behave identically because the rename-create-copy pattern already recreates everything
+  /// from scratch. The distinction only matters for WithAlterTable databases (Firebird, MSSql).
+  /// </summary>
+  TioDBBuilderIndexesAndFKMode = (ifmDisabled, ifmEnabled, ifmEnabledStrict);
+
   // Forward declarations
   IioDBBuilderSqlScript = interface;
   IioDBBuilderSchemaRDBMSInfo = interface;
@@ -262,8 +277,8 @@ type
 
   IioDBBuilderSchema = interface
     ['{1AEDB134-1ECB-490E-A53A-973BEDE509E5}']
-    function GetForeignKeysEnabled: boolean;
-    function GetIndexesEnabled: boolean;
+    function GetForeignKeysMode: TioDBBuilderIndexesAndFKMode;
+    function GetIndexesMode: TioDBBuilderIndexesAndFKMode;
     function GetScript: IioDBBuilderSqlScript;
     function GetSequences: TioDBBuilderSchemaSequences;
     function GetSqlGenerator: IioDBBuilderSqlGenerator;
@@ -276,8 +291,8 @@ type
     function FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
     procedure SequenceAddIfNotExists(const ASequenceName: String);
 
-    property ForeignKeysEnabled: boolean read GetForeignKeysEnabled;
-    property IndexesEnabled: boolean read GetIndexesEnabled;
+    property ForeignKeysMode: TioDBBuilderIndexesAndFKMode read GetForeignKeysMode;
+    property IndexesMode: TioDBBuilderIndexesAndFKMode read GetIndexesMode;
     property Script: IioDBBuilderSqlScript read GetScript;
     property Sequences: TioDBBuilderSchemaSequences read GetSequences;
     property SqlGenerator: IioDBBuilderSqlGenerator read GetSqlGenerator;
@@ -560,8 +575,6 @@ type
     procedure CreateOrAlterTableIndexes(const ATable: IioDBBuilderSchemaTable);
     procedure CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable);
     function DatabaseExists: Boolean;
-    procedure DropIndexes;
-    procedure DropTableIndexes(const ATable: IioDBBuilderSchemaTable);
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
     function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;

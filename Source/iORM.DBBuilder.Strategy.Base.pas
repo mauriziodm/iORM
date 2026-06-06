@@ -83,9 +83,19 @@ type
 
     procedure DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex); virtual;
     procedure DropIndexByName(const AIndexName: string); virtual;
-    procedure DropIndexes; virtual;
-
+    /// <summary>
+    /// Drops the indexes of a single table based on the schema definitions
+    /// (only indexes still present in the schema are dropped).
+    /// Conservative variant: indexes not in the schema (orphans, manually added)
+    /// are left untouched.
+    /// </summary>
     procedure DropTableIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
+    /// <summary>
+    /// Drops the indexes of a single table by querying the actual DB catalog.
+    /// Strict variant: every index physically present on the table is dropped,
+    /// including orphans (no longer in the schema) and manually added ones.
+    /// </summary>
+    procedure DropTableIndexesFromDB(const ATable: IioDBBuilderSchemaTable); virtual;
     function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; virtual; abstract;
     function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; virtual; abstract;
 
@@ -99,6 +109,20 @@ type
     procedure CreateOrAlterForeignKeys; virtual;
     procedure CreateOrAlterTableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
+    /// <summary>
+    /// Drops the foreign keys of a single table based on the schema definitions
+    /// (only FKs still present in the schema are dropped).
+    /// Conservative variant: FKs not in the schema (orphans, manually added)
+    /// are left untouched.
+    /// </summary>
+    procedure DropTableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
+    /// <summary>
+    /// Drops the foreign keys of a single table by querying the actual DB catalog.
+    /// Strict variant: every FK physically present on the table is dropped,
+    /// including orphans (FKs whose structural properties changed and produced
+    /// a new hash name) and manually added ones.
+    /// </summary>
+    procedure DropTableForeignKeysFromDB(const ATable: IioDBBuilderSchemaTable); virtual;
     function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
     function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
     // Warnings
@@ -173,6 +197,38 @@ begin
     if taForeignKeys in LTable.Changes then
       CreateOrAlterTableForeignKeys(LTable);
   end;
+end;
+
+procedure TioDBBuilderStrategyBase.DropTableForeignKeys(const ATable: IioDBBuilderSchemaTable);
+var
+  LFK: IioDBBuilderSchemaFK;
+begin
+  for LFK in ATable.ForeignKeys.Values do
+  begin
+    if ForeignKeyExists(ATable, LFK) then
+      Script.Body.Add(SqlGenerator.BuildSQL_DropFK(ATable, LFK));
+  end;
+end;
+
+procedure TioDBBuilderStrategyBase.DropTableForeignKeysFromDB(const ATable: IioDBBuilderSchemaTable);
+var
+  LQuery: IioQuery;
+  LFK: IioDBBuilderSchemaFK;
+begin
+  // Query the DB catalog for every FK currently defined on this table, then
+  // drop them all by their actual DB name. BuildSQL_FKList columns:
+  // [0]=table_name, [1]=constraint_name, [2]=on_update, [3]=on_delete.
+  // .Trim is needed because some RDBMS (e.g. Firebird) right-pads CHAR columns.
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FKList(ATable.Name), True);
+  while not LQuery.Eof do
+  begin
+    Script.Body.Add(SqlGenerator.BuildSQL_DropFKbyName(ATable.Name, LQuery.Fields[1].AsString.Trim));
+    LQuery.Next;
+  end;
+
+  // Mark all schema FKs as stCreate so they get recreated by CreateOrAlterForeignKeys.
+  for LFK in ATable.ForeignKeys.Values do
+    LFK.Status := stCreate;
 end;
 
 /// <summary>
@@ -332,11 +388,6 @@ begin
   Script.Body.Add(SqlGenerator.BuildSQL_DropIndexByName(AIndexName));
 end;
 
-procedure TioDBBuilderStrategyBase.DropIndexes;
-begin
-  Script.Body.AddTitle('Dropping indexes');
-end;
-
 procedure TioDBBuilderStrategyBase.DropTableIndexes(const ATable: IioDBBuilderSchemaTable);
 var
   LIndex: IioDBBuilderSchemaIndex;
@@ -346,6 +397,26 @@ begin
     if IndexExists(ATable, LIndex) then
       DropIndex(ATable, LIndex);
   end;
+end;
+
+procedure TioDBBuilderStrategyBase.DropTableIndexesFromDB(const ATable: IioDBBuilderSchemaTable);
+var
+  LQuery: IioQuery;
+  LIndex: IioDBBuilderSchemaIndex;
+begin
+  // Query the DB catalog for every index currently defined on this table, then
+  // drop them all by their actual DB name. This catches orphans (indexes whose
+  // [ioIndex] attribute was removed) and manually added indexes alike.
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexList(ATable.Name), True);
+  while not LQuery.Eof do
+  begin
+    DropIndexByName(LQuery.Fields[0].AsString);
+    LQuery.Next;
+  end;
+
+  // Mark all schema indexes as stCreate so they get recreated by CreateOrAlterIndexes.
+  for LIndex in ATable.Indexes.Values do
+    LIndex.Status := stCreate;
 end;
 
 procedure TioDBBuilderStrategyBase.GenerateCreateDatabaseScript;

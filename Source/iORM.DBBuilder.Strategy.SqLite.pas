@@ -90,7 +90,9 @@ begin
     LComma := ', ';
   end;
 
-  if Schema.ForeignKeysEnabled then
+  // Note: for SQLite, FKs are inline in the CREATE TABLE statement.
+  // ifmEnabled and ifmEnabledStrict behave identically here.
+  if Schema.ForeignKeysMode <> ifmDisabled then
     CreateTableForeignKeys(ATable);
 
   Script.Body.DecIndent;

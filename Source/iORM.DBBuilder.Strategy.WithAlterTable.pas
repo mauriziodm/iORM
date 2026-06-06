@@ -1,4 +1,4 @@
-{
+﻿{
   ****************************************************************************
   *                                                                          *
   *           iORM - (interfaced ORM)                                        *
@@ -64,7 +64,6 @@ type
     function IsFieldDecimalsChanged(const AOldFieldDecimals, ANewFieldDecimals: Smallint; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
     function IsFieldDefaultChanged(const AOldFieldDefault, ANewFieldDefault: String; const AField: IioDBBuilderSchemaField): Boolean; virtual;
     // Indexes
-    procedure DropIndexes; override;
     function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
     function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
     // ForeignKeys
@@ -128,28 +127,6 @@ begin
   Script.Body.Add(SqlGenerator.BuildSQL_EndCreateTable(ATable));
   Script.Body.AddEmpty;
   Script.Body.Add(SqlGenerator.BuildSQL_CreatePK(ATable));
-end;
-
-/// <summary>
-/// Drops all indexes from the database by querying the actual DB catalog.
-/// Querying the DB (not the schema) ensures that orphaned indexes — those no
-/// longer defined in the schema — are also dropped.
-/// Called during GenerateUpdateDatabaseScript before recreating indexes.
-/// </summary>
-procedure TioDBBuilderStrategyWithAlterTable.DropIndexes;
-var
-  LQuery: IioQuery;
-begin
-  inherited;
-
-  // Query all indexes currently in the database
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexList(''), True);
-
-  while not LQuery.Eof do
-  begin
-    DropIndexByName(LQuery.Fields[0].AsString);
-    LQuery.Next;
-  end;
 end;
 
 function TioDBBuilderStrategyWithAlterTable.FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
@@ -292,28 +269,52 @@ begin
 end;
 
 /// <summary>
-/// Generates all database objects (tables, indexes, sequences, and foreign keys)
-/// based on the current Schema.Status (stCreate or stUpdate).
-/// Tables are created or altered first (fields and sequences only), then indexes
-/// and foreign keys are processed as separate explicit steps.
-/// When creating a new database (stCreate), all objects are created unconditionally;
-/// when updating (stUpdate), only new or modified objects are processed.
+/// Generates the full database update script for RDBMS that support ALTER TABLE.
+/// The generation flow depends on the IndexesMode and ForeignKeysMode settings:
+///   ifmDisabled: indexes/FKs are not managed at all.
+///   ifmEnabled (conservative): creates new and updates modified indexes/FKs only.
+///     Orphaned indexes/FKs (present in DB but not in schema) are left untouched.
+///   ifmEnabledStrict: for every updated table, drops ALL existing indexes/FKs from the
+///     DB by querying the catalog, then recreates them from the schema.
+///     The schema becomes authoritative and orphans are removed.
 /// Foreign keys are always processed last to ensure all referenced tables already exist.
 /// </summary>
 procedure TioDBBuilderStrategyWithAlterTable.GenerateDatabaseObjects;
+var
+  LTable: IioDBBuilderSchemaTable;
 begin
   // Check key generation strategy compatibility with RDBMS version
   DoCheckKeyGenerationCompatibility;
 
+  // Strict mode: drop every index/FK from the DB for each stUpdate table.
+  // This removes orphaned objects (including manually-added ones) and ensures
+  // a clean slate before the schema-driven recreation.
+  if (Schema.IndexesMode = ifmEnabledStrict) or (Schema.ForeignKeysMode = ifmEnabledStrict) then
+  begin
+    if Schema.IndexesMode = ifmEnabledStrict then
+      Script.Body.AddTitle('Dropping indexes (strict mode)');
+    if Schema.ForeignKeysMode = ifmEnabledStrict then
+      Script.Body.AddTitle('Dropping foreign keys (strict mode)');
+    for LTable in Schema.Tables.Values do
+    begin
+      if LTable.Status <> stUpdate then
+        Continue;
+      if Schema.IndexesMode = ifmEnabledStrict then
+        DropTableIndexesFromDB(LTable);
+      if Schema.ForeignKeysMode = ifmEnabledStrict then
+        DropTableForeignKeysFromDB(LTable);
+    end;
+  end;
+
   // Create new tables or alter existing ones (fields and sequences only)
   CreateOrAlterTables;
 
-  // Indexes: create all (stCreate) or only add/alter modified ones (stUpdate)
-  if Schema.IndexesEnabled then
+  // Indexes: create/alter based on mode (skipped if disabled)
+  if Schema.IndexesMode >= ifmEnabled then
     CreateOrAlterIndexes;
 
   // Foreign keys are processed last so all referenced tables are already created.
-  if Schema.ForeignKeysEnabled then
+  if Schema.ForeignKeysMode >= ifmEnabled then
     CreateOrAlterForeignKeys;
 end;
 

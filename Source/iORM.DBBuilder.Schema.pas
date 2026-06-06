@@ -42,14 +42,14 @@ type
 
   TioDBBuilderSchema = class(TInterfacedObject, IioDBBuilderSchema)
   private
-    FIndexesEnabled, FForeignKeysEnabled: Boolean;
+    FIndexesMode, FForeignKeysMode: TioDBBuilderIndexesAndFKMode;
     FScript: IioDBBuilderSqlScript;
     FSequences: TioDBBuilderSchemaSequences;
     FSqlGenerator: IioDBBuilderSqlGenerator;
     FStatus: TioDBBuilderStatus;
     FTables: TioDBBuilderSchemaTables;
-    function GetForeignKeysEnabled: Boolean;
-    function GetIndexesEnabled: Boolean;
+    function GetForeignKeysMode: TioDBBuilderIndexesAndFKMode;
+    function GetIndexesMode: TioDBBuilderIndexesAndFKMode;
     function GetScript: IioDBBuilderSqlScript;
     function GetSequences: TioDBBuilderSchemaSequences;
     function GetSqlGenerator: IioDBBuilderSqlGenerator;
@@ -58,7 +58,7 @@ type
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const AValue: TioDBBuilderStatus);
   public
-    constructor Create(const AIndexesEnabled, AForeignKeysEnabled: Boolean;
+    constructor Create(const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode;
       const ASqlGenerator: IioDBBuilderSqlGenerator);
     destructor Destroy; override;
 
@@ -66,8 +66,8 @@ type
     function FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
     procedure SequenceAddIfNotExists(const ASequenceName: String);
 
-    property ForeignKeysEnabled: boolean read GetForeignKeysEnabled;
-    property IndexesEnabled: boolean read GetIndexesEnabled;
+    property ForeignKeysMode: TioDBBuilderIndexesAndFKMode read GetForeignKeysMode;
+    property IndexesMode: TioDBBuilderIndexesAndFKMode read GetIndexesMode;
     property Script: IioDBBuilderSqlScript read GetScript;
     property Sequences: TioDBBuilderSchemaSequences read GetSequences;
     property SqlGenerator: IioDBBuilderSqlGenerator read GetSqlGenerator;
@@ -83,13 +83,13 @@ uses
 
 { TioDBBuilderSchema }
 
-constructor TioDBBuilderSchema.Create(const AIndexesEnabled, AForeignKeysEnabled: Boolean;
+constructor TioDBBuilderSchema.Create(const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode;
   const ASqlGenerator: IioDBBuilderSqlGenerator);
 begin
   FScript := TioDBBuilderFactory.NewSqlScript;
   FSequences := TioDBBuilderSchemaSequences.Create;
-  FIndexesEnabled := AIndexesEnabled;
-  FForeignKeysEnabled := AForeignKeysEnabled;
+  FIndexesMode := AIndexesMode;
+  FForeignKeysMode := AForeignKeysMode;
   FSqlGenerator := ASqlGenerator;
   FStatus := stClean;
   FTables := TioDBBuilderSchemaTables.Create;
@@ -145,9 +145,9 @@ begin
   end;
 end;
 
-function TioDBBuilderSchema.GetForeignKeysEnabled: Boolean;
+function TioDBBuilderSchema.GetForeignKeysMode: TioDBBuilderIndexesAndFKMode;
 begin
-  Result := FForeignKeysEnabled;
+  Result := FForeignKeysMode;
 end;
 
 function TioDBBuilderSchema.GetStatus: TioDBBuilderStatus;
@@ -155,9 +155,9 @@ begin
   Result := FStatus;
 end;
 
-function TioDBBuilderSchema.GetIndexesEnabled: Boolean;
+function TioDBBuilderSchema.GetIndexesMode: TioDBBuilderIndexesAndFKMode;
 begin
-  Result := FIndexesEnabled;
+  Result := FIndexesMode;
 end;
 
 procedure TioDBBuilderSchema.SequenceAddIfNotExists(const ASequenceName: String);
