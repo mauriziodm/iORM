@@ -230,9 +230,10 @@ end;
 
 procedure TioDBBuilderStrategyBase.CreateTableSequence(const ATable: IioDBBuilderSchemaTable);
 begin
-  if not ATable.UsesSequenceForKeyGeneration then
-    Exit;
-
+  // Precondition: ATable.UsesSequenceForKeyGeneration must be True. The caller
+  // is responsible for that check — consistent with how BuildSchemaTable in
+  // Schema.Builder gates SequenceAddIfNotExists. Calling this method on an
+  // Identity-keyed table would raise EioDBBuilderException via GetSequenceName.
   if not SequenceExists(ATable.GetSequenceName) then
     Script.Body.Add(SqlGenerator.BuildSQL_CreateSequence(ATable.GetSequenceName));
 end;

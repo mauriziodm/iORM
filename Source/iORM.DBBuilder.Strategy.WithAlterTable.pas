@@ -109,7 +109,9 @@ var
 begin
   inherited;
 
-  CreateTableSequence(ATable);
+  // Add sequence only if the table uses Sequence for key generation
+  if ATable.UsesSequenceForKeyGeneration then
+    CreateTableSequence(ATable);
 
   Script.Body.AddEmpty;
   Script.Body.Add(SqlGenerator.BuildSQL_BeginCreateTable(ATable));
