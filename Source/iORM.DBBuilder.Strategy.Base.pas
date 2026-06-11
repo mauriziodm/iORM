@@ -1,4 +1,4 @@
-{
+﻿{
   ****************************************************************************
   *                                                                          *
   *           iORM - (interfaced ORM)                                        *
@@ -55,15 +55,23 @@ type
     // Helper method for existence queries (common pattern)
     function _ExecuteExistsQuery(const ASql: string): Boolean;
   protected
-    // Database
+    // ==========================================================
+    // DATABASE RELATED METHODS
+    // ----------------------------------------------------------
     procedure CreateDatabase; virtual;
     function DatabaseExists: Boolean; virtual;
-    // Tables
+
+    // ==========================================================
+    // TABLE RELATED METHODS
+    // ----------------------------------------------------------
     procedure AlterTable(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure CreateOrAlterTables; virtual;
     procedure CreateTable(const ATable: IioDBBuilderSchemaTable); virtual;
     function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
-    // Fields
+
+    // ==========================================================
+    // FIELD RELATED METHODS
+    // ----------------------------------------------------------
     procedure CreateOrAlterFields(const ATable: IioDBBuilderSchemaTable); virtual;
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
@@ -73,14 +81,12 @@ type
     function IsFieldNotNullChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AIsPermitted: Boolean): Boolean; virtual;
     function IsFieldBlobSubtypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldBlobSubtype, ANewBlobSubtype: String; const AIsPermitted: Boolean): Boolean; virtual;
 
-
-
-
-    // Indexes
+    // ==========================================================
+    // INDEX RELATED METHODS
+    // ----------------------------------------------------------
     procedure CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex); virtual;
     procedure CreateOrAlterIndexes; virtual;
     procedure CreateOrAlterTableIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
-
     /// <summary>
     /// Mode-aware drop of all indexes of a single table.
     /// Dispatches to the appropriate Force* mechanic based on Schema.IndexesMode:
@@ -96,7 +102,6 @@ type
     /// need can call the Force* methods directly instead.
     /// </summary>
     procedure DropTableIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
-
     procedure DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex); virtual;
     procedure DropIndexByName(const AIndexName: string); virtual;
     /// <summary>
@@ -126,6 +131,9 @@ type
     // Sequences
     function SequenceExists(const ASequenceName: string): Boolean; virtual;
     procedure CreateTableSequence(const ATable: IioDBBuilderSchemaTable); virtual;
+
+
+
     // ForeignKeys
     procedure CreateOrAlterForeignKeys; virtual;
     procedure CreateOrAlterTableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
