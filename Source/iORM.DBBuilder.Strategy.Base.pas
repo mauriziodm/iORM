@@ -125,19 +125,21 @@ type
     function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; virtual; abstract;
     function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; virtual; abstract;
 
-
-
-
-    // Sequences
+    // ==========================================================
+    // SEQUENCE RELATED METHODS
+    // ----------------------------------------------------------
     function SequenceExists(const ASequenceName: string): Boolean; virtual;
     procedure CreateTableSequence(const ATable: IioDBBuilderSchemaTable); virtual;
 
-
-
-    // ForeignKeys
+    // ==========================================================
+    // FOREIGN KEY RELATED METHODS
+    // ----------------------------------------------------------
+    procedure CreateForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK); virtual;
     procedure CreateOrAlterForeignKeys; virtual;
     procedure CreateOrAlterTableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure DropForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK); virtual;
+    procedure DropForeignKeyByName(const ATableName, AForeignKeyName: string); virtual;
     /// <summary>
     /// Mode-aware drop of all foreign keys of a single table.
     /// Dispatches to the appropriate Force* mechanic based on Schema.ForeignKeysMode:
@@ -174,6 +176,7 @@ type
     procedure ForceDropTableForeignKeysFromDB(const ATable: IioDBBuilderSchemaTable); virtual;
     function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
     function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
+
     // Warnings
     procedure WarningInvalidFieldTypeConversion(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String; const AInvalidTypeConversions: string); virtual;
     procedure WarningValueChanged(const AValueName, AOldValue, ANewValue: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
@@ -281,7 +284,7 @@ begin
   begin
     if ForeignKeyExists(ATable, LFK) then
     begin
-      Script.Body.Add(SqlGenerator.BuildSQL_DropFK(ATable, LFK));
+      DropForeignKey(ATable, LFK);
       // Mark dropped FKs as stCreate so CreateOrAlterForeignKeys recreates them.
       LFK.Status := stCreate;
     end;
@@ -303,7 +306,7 @@ begin
   LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FKList(ATable.Name), True);
   while not LQuery.Eof do
   begin
-    Script.Body.Add(SqlGenerator.BuildSQL_DropFKbyName(ATable.Name, LQuery.Fields[1].AsString.Trim));
+    DropForeignKeyByName(ATable.Name, LQuery.Fields[1].AsString.Trim);
     LQuery.Next;
   end;
 
@@ -329,9 +332,9 @@ begin
       Continue;
     // Drop the existing FK first when it needs to be recreated with changes
     if LFK.Status = stUpdate then
-      Script.Body.Add(SqlGenerator.BuildSQL_DropFK(ATable, LFK));
+      DropForeignKey(ATable, LFK);
     // Create the FK (both for new and modified ones)
-    Script.Body.Add(SqlGenerator.BuildSQL_CreateFK(ATable, LFK));
+    CreateForeignKey(ATable, LFK);
   end;
 end;
 
@@ -390,7 +393,22 @@ var
   LForeignKey: IioDBBuilderSchemaFK;
 begin
   for LForeignKey in ATable.ForeignKeys.Values do
-    Script.Body.Add(SqlGenerator.BuildSQL_CreateFK(ATable, LForeignKey));
+    CreateForeignKey(ATable, LForeignKey);
+end;
+
+procedure TioDBBuilderStrategyBase.CreateForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK);
+begin
+  Script.Body.Add(SqlGenerator.BuildSQL_CreateFK(ATable, AForeignKey));
+end;
+
+procedure TioDBBuilderStrategyBase.DropForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK);
+begin
+  Script.Body.Add(SqlGenerator.BuildSQL_DropFK(ATable, AForeignKey));
+end;
+
+procedure TioDBBuilderStrategyBase.DropForeignKeyByName(const ATableName, AForeignKeyName: string);
+begin
+  Script.Body.Add(SqlGenerator.BuildSQL_DropFKbyName(ATableName, AForeignKeyName));
 end;
 
 /// <summary>
