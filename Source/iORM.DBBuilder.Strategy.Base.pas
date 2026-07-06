@@ -181,11 +181,10 @@ type
 
 
 
-
     // Warnings
-    procedure WarningInvalidFieldTypeConversion(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String; const AInvalidTypeConversions: string); virtual;
-    procedure WarningValueChanged(const AValueName, AOldValue, ANewValue: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
-    procedure WarningNewValueLessThanTheOldOne(const AValueName: String; const AOldValue, ANewValue: Integer; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure Warning_InvalidFieldTypeConversion(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String; const AInvalidTypeConversions: string); virtual;
+    procedure Warning_NewValueLessThanTheOldOne(const AValueName: String; const AOldValue, ANewValue: Integer; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure Warning_ValueChanged(const AValueName, AOldValue, ANewValue: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
 
 
 
@@ -595,7 +594,7 @@ begin
   Result := FSqlGenerator;
 end;
 
-procedure TioDBBuilderStrategyBase.WarningInvalidFieldTypeConversion(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
+procedure TioDBBuilderStrategyBase.Warning_InvalidFieldTypeConversion(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
   const AOldFieldType, ANewFieldType: String; const AInvalidTypeConversions: string);
 var
   LRequiredConversion: String;
@@ -606,14 +605,14 @@ begin
       [ATable.Name, AField.FieldName, AOldFieldType, ANewFieldType]));
 end;
 
-procedure TioDBBuilderStrategyBase.WarningValueChanged(const AValueName, AOldValue, ANewValue: String;
+procedure TioDBBuilderStrategyBase.Warning_ValueChanged(const AValueName, AOldValue, ANewValue: String;
   const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
 begin
   Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> Changing the %s is not allowed (old = ''%s'', new = ''%s'')',
     [ATable.Name, AField.FieldName, AValueName, AOldValue, ANewValue]));
 end;
 
-procedure TioDBBuilderStrategyBase.WarningNewValueLessThanTheOldOne(const AValueName: String; const AOldValue, ANewValue: Integer;
+procedure TioDBBuilderStrategyBase.Warning_NewValueLessThanTheOldOne(const AValueName: String; const AOldValue, ANewValue: Integer;
   const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
 begin
   if ANewValue < AOldValue then
@@ -641,7 +640,7 @@ begin
   if Result then
   begin
     AField.AddAltered(alFieldType);
-    WarningInvalidFieldTypeConversion(ATable, AField, AOldFieldType, ANewFieldType, GetInvalidFieldTypeConversions);
+    Warning_InvalidFieldTypeConversion(ATable, AField, AOldFieldType, ANewFieldType, GetInvalidFieldTypeConversions);
   end;
 end;
 
@@ -677,7 +676,7 @@ begin
   begin
     AField.AddAltered(alFieldType);
     if not AIsPermitted then
-      WarningValueChanged('blob sub-type', AOldBlobSubtype, ANewBlobSubtype, AField, ATable);
+      Warning_ValueChanged('blob sub-type', AOldBlobSubtype, ANewBlobSubtype, AField, ATable);
   end;
 end;
 
