@@ -177,13 +177,43 @@ type
     function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
     function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
 
+    // ==========================================================
+    // WARNINGS RELATED METHODS
+    // ----------------------------------------------------------
+    // These helpers append a human-readable message to Script.Warnings during
+    // the DBBuilder analysis phase. Warnings are non-blocking: they surface a
+    // schema change that iORM detected but will NOT (or cannot) apply
+    // automatically, so the developer can review/handle it manually before the
+    // create-or-alter script is run. They are the counterpart of Script.Hints
+    // (purely informational) and are always emitted through these methods to
+    // keep the message wording consistent across every RDBMS strategy.
 
-
-
-
-    // Warnings
+    /// <summary>
+    /// Emits a warning when a field's type is changing from AOldFieldType to
+    /// ANewFieldType AND that specific conversion is blacklisted by the current
+    /// RDBMS. AInvalidTypeConversions is the DBMS-provided list of forbidden
+    /// conversions (formatted as '[old->new]' tokens); the warning is added only
+    /// when the '[AOldFieldType->ANewFieldType]' token is found in that list,
+    /// signalling a conversion the database cannot perform safely/automatically.
+    /// Called by IsFieldTypeChanged.
+    /// </summary>
     procedure Warning_InvalidFieldTypeConversion(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String; const AInvalidTypeConversions: string); virtual;
+    /// <summary>
+    /// Emits a warning when a numeric field attribute (identified by AValueName,
+    /// e.g. 'field LENGTH', 'field PRECISION', 'field DECIMALS') is being shrunk,
+    /// i.e. ANewValue &lt; AOldValue. A reduction risks data truncation, so the
+    /// change is flagged for manual review; nothing is added when the value grows
+    /// or stays the same. Called by the field length/precision/decimals checks in
+    /// the WithAlterTable strategy.
+    /// </summary>
     procedure Warning_NewValueLessThanTheOldOne(const AValueName: String; const AOldValue, ANewValue: Integer; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
+    /// <summary>
+    /// Emits a warning stating that a field attribute (named by AValueName, e.g.
+    /// 'blob sub-type') changed from AOldValue to ANewValue but the change is NOT
+    /// allowed and will not be applied automatically. This is the generic
+    /// "attribute cannot be altered" notice; the caller decides when the change
+    /// is disallowed (e.g. IsFieldBlobSubtypeChanged when AIsPermitted is False).
+    /// </summary>
     procedure Warning_ValueChanged(const AValueName, AOldValue, ANewValue: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
 
 
