@@ -177,9 +177,20 @@ type
     function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
     function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
 
+
+
+
+
+
     // Warnings
     procedure WarningInvalidFieldTypeConversion(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String; const AInvalidTypeConversions: string); virtual;
     procedure WarningValueChanged(const AValueName, AOldValue, ANewValue: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure WarningNewValueLessThanTheOldOne(const AValueName: String; const AOldValue, ANewValue: Integer; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
+
+
+
+
+
     // Hook methods
     /// <summary>
     /// Hook method called during script generation to notify the user about key generation
@@ -598,8 +609,15 @@ end;
 procedure TioDBBuilderStrategyBase.WarningValueChanged(const AValueName, AOldValue, ANewValue: String;
   const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
 begin
-  if ANewValue <> AOldValue then
-    Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> Changing the %s is not allowed (old = ''%s'', new = ''%s'')',
+  Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> Changing the %s is not allowed (old = ''%s'', new = ''%s'')',
+    [ATable.Name, AField.FieldName, AValueName, AOldValue, ANewValue]));
+end;
+
+procedure TioDBBuilderStrategyBase.WarningNewValueLessThanTheOldOne(const AValueName: String; const AOldValue, ANewValue: Integer;
+  const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
+begin
+  if ANewValue < AOldValue then
+    Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> The new %s value becomes smaller than the old one (old = %d, new = %d)',
       [ATable.Name, AField.FieldName, AValueName, AOldValue, ANewValue]));
 end;
 

@@ -69,8 +69,6 @@ type
     // ForeignKeys
     function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
     function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
-    // Warnings
-    procedure WarningNewValueLessThanTheOldOne(const AValueName: String; const AOldValue, ANewValue: Integer; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
     // Main generation
     procedure GenerateDatabaseObjects; override;
 
@@ -446,14 +444,6 @@ begin
 
     WarningNewValueLessThanTheOldOne('field PRECISION', AOldFieldPrecision, ANewFieldPrecision, AField, ATable);
   end;
-end;
-
-procedure TioDBBuilderStrategyWithAlterTable.WarningNewValueLessThanTheOldOne(const AValueName: String; const AOldValue, ANewValue: Integer;
-  const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
-begin
-  if ANewValue < AOldValue then
-    Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> The new %s value becomes smaller than the old one (old = %d, new = %d)',
-      [ATable.Name, AField.FieldName, AValueName, AOldValue, ANewValue]));
 end;
 
 end.
