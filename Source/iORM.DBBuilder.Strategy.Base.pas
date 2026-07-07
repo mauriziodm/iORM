@@ -191,13 +191,13 @@ type
     /// <summary>
     /// Emits a warning when a field's type is changing from AOldFieldType to
     /// ANewFieldType AND that specific conversion is blacklisted by the current
-    /// RDBMS. AInvalidTypeConversions is the DBMS-provided list of forbidden
-    /// conversions (formatted as '[old->new]' tokens); the warning is added only
+    /// RDBMS. The list of forbidden conversions (formatted as '[old->new]' tokens)
+    /// is obtained from GetInvalidFieldTypeConversions; the warning is added only
     /// when the '[AOldFieldType->ANewFieldType]' token is found in that list,
     /// signalling a conversion the database cannot perform safely/automatically.
     /// Called by IsFieldTypeChanged.
     /// </summary>
-    procedure Warning_InvalidFieldTypeConversion(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String; const AInvalidTypeConversions: string); virtual;
+    procedure Warning_UnsafeTypeConversion(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String);
     /// <summary>
     /// Emits a warning when a numeric field attribute (identified by AValueName,
     /// e.g. 'field LENGTH', 'field PRECISION', 'field DECIMALS') is being shrunk,
@@ -206,7 +206,7 @@ type
     /// or stays the same. Called by the field length/precision/decimals checks in
     /// the WithAlterTable strategy.
     /// </summary>
-    procedure Warning_NewValueLessThanTheOldOne(const AValueName: String; const AOldValue, ANewValue: Integer; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure Warning_PotentialDataTruncation(const AValueName: String; const AOldValue, ANewValue: Integer; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
     /// <summary>
     /// Emits a warning stating that a field attribute (named by AValueName, e.g.
     /// 'blob sub-type') changed from AOldValue to ANewValue but the change is NOT
@@ -214,7 +214,19 @@ type
     /// "attribute cannot be altered" notice; the caller decides when the change
     /// is disallowed (e.g. IsFieldBlobSubtypeChanged when AIsPermitted is False).
     /// </summary>
-    procedure Warning_ValueChanged(const AValueName, AOldValue, ANewValue: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure Warning_ChangeNotAllowed(const AValueName, AOldValue, ANewValue: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
+    /// <summary>
+    /// Emits a hint noting that a table requested a key generation strategy the
+    /// current DBMS does not support, and that the fallback strategy is used
+    /// instead. Called by DoCheckKeyGenerationCompatibility.
+    /// </summary>
+    procedure Hint_KeyGenerationStrategyFallback(const ATable: IioDBBuilderSchemaTable);
+    /// <summary>
+    /// Emits a hint noting that a field's NOT NULL setting changed from FALSE to
+    /// TRUE without a DEFAULT value being specified, which may impact existing
+    /// data. Called by IsFieldNotNullChanged.
+    /// </summary>
+    procedure Hint_NotNullPotentialDataImpact(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
 
 
 
@@ -624,30 +636,45 @@ begin
   Result := FSqlGenerator;
 end;
 
-procedure TioDBBuilderStrategyBase.Warning_InvalidFieldTypeConversion(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
-  const AOldFieldType, ANewFieldType: String; const AInvalidTypeConversions: string);
+procedure TioDBBuilderStrategyBase.Warning_UnsafeTypeConversion(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
+  const AOldFieldType, ANewFieldType: String);
 var
   LRequiredConversion: String;
 begin
   LRequiredConversion := Format('[%s->%s]', [AOldFieldType, ANewFieldType]);
-  if ContainsText(AInvalidTypeConversions, LRequiredConversion) then
+  if ContainsText(GetInvalidFieldTypeConversions, LRequiredConversion) then
     Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> Invalid conversion from ''%s'' to ''%s''',
       [ATable.Name, AField.FieldName, AOldFieldType, ANewFieldType]));
 end;
 
-procedure TioDBBuilderStrategyBase.Warning_ValueChanged(const AValueName, AOldValue, ANewValue: String;
+procedure TioDBBuilderStrategyBase.Warning_ChangeNotAllowed(const AValueName, AOldValue, ANewValue: String;
   const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
 begin
   Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> Changing the %s is not allowed (old = ''%s'', new = ''%s'')',
     [ATable.Name, AField.FieldName, AValueName, AOldValue, ANewValue]));
 end;
 
-procedure TioDBBuilderStrategyBase.Warning_NewValueLessThanTheOldOne(const AValueName: String; const AOldValue, ANewValue: Integer;
+procedure TioDBBuilderStrategyBase.Warning_PotentialDataTruncation(const AValueName: String; const AOldValue, ANewValue: Integer;
   const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
 begin
   if ANewValue < AOldValue then
     Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> The new %s value becomes smaller than the old one (old = %d, new = %d)',
       [ATable.Name, AField.FieldName, AValueName, AOldValue, ANewValue]));
+end;
+
+procedure TioDBBuilderStrategyBase.Hint_KeyGenerationStrategyFallback(const ATable: IioDBBuilderSchemaTable);
+begin
+  Script.Hints.Add(Format(
+    'Table ''%s'' requests %s key generation but this DBMS does not support it. Using %s instead.',
+    [ATable.Name,
+     TioUtilities.EnumToString<TioKeyGenerationStrategyType>(ATable.GetContextTable.GetKeyGenerationStrategy),
+     TioUtilities.EnumToString<TioKeyGenerationStrategyType>(ATable.KeyGenerationStrategy)]));
+end;
+
+procedure TioDBBuilderStrategyBase.Hint_NotNullPotentialDataImpact(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
+begin
+  Script.Hints.Add(Format('Table ''%s'' field ''%s'' --> The not null setting is changed from FALSE to TRUE and a DEFAULT value has not been specified',
+    [ATable.Name, AField.FieldName]));
 end;
 
 procedure TioDBBuilderStrategyBase.DoCheckKeyGenerationCompatibility;
@@ -656,11 +683,7 @@ var
 begin
   for LTable in Schema.Tables.Values do
     if LTable.IsKeyGenerationStrategyFallback then
-      Script.Hints.Add(Format(
-        'Table ''%s'' requests %s key generation but this DBMS does not support it. Using %s instead.',
-        [LTable.Name,
-         TioUtilities.EnumToString<TioKeyGenerationStrategyType>(LTable.GetContextTable.GetKeyGenerationStrategy),
-         TioUtilities.EnumToString<TioKeyGenerationStrategyType>(LTable.KeyGenerationStrategy)]));
+      Hint_KeyGenerationStrategyFallback(LTable);
 end;
 
 function TioDBBuilderStrategyBase.IsFieldTypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
@@ -670,7 +693,7 @@ begin
   if Result then
   begin
     AField.AddAltered(alFieldType);
-    Warning_InvalidFieldTypeConversion(ATable, AField, AOldFieldType, ANewFieldType, GetInvalidFieldTypeConversions);
+    Warning_UnsafeTypeConversion(ATable, AField, AOldFieldType, ANewFieldType);
   end;
 end;
 
@@ -688,9 +711,7 @@ begin
       // If the field is now NOT NULL but wasn't before, and no default value is specified,
       // add a hint to alert the user about the potential data impact
       if ANewFieldNotNull and not AField.FieldDefaultExists then
-        Script.Hints.Add
-          (Format('Table ''%s'' field ''%s'' --> The not null setting is changed from FALSE to TRUE and a DEFAULT value has not been specified',
-          [ATable.Name, AField.FieldName]));
+        Hint_NotNullPotentialDataImpact(ATable, AField);
     end
     else
       // If the NOT NULL change is not permitted, add a warning to indicate it cannot be automatically changed
@@ -706,7 +727,7 @@ begin
   begin
     AField.AddAltered(alFieldType);
     if not AIsPermitted then
-      Warning_ValueChanged('blob sub-type', AOldBlobSubtype, ANewBlobSubtype, AField, ATable);
+      Warning_ChangeNotAllowed('blob sub-type', AOldBlobSubtype, ANewBlobSubtype, AField, ATable);
   end;
 end;
 

@@ -411,7 +411,7 @@ begin
   if Result then
   begin
     AField.AddAltered(alFieldType);
-    Warning_NewValueLessThanTheOldOne('field DECIMALS', AOldFieldDecimals, ANewFieldDecimals, AField, ATable);
+    Warning_PotentialDataTruncation('field DECIMALS', AOldFieldDecimals, ANewFieldDecimals, AField, ATable);
   end;
 end;
 
@@ -426,7 +426,7 @@ begin
     else
     begin
       AField.AddAltered(alFieldLengthDecreased);
-      Warning_NewValueLessThanTheOldOne('field LENGTH', AOldFieldLength, ANewFieldLength, AField, ATable);
+      Warning_PotentialDataTruncation('field LENGTH', AOldFieldLength, ANewFieldLength, AField, ATable);
     end;
   end;
 end;
@@ -442,7 +442,7 @@ begin
     else
       AField.AddAltered(alFieldPrecisionDecreased);
 
-    Warning_NewValueLessThanTheOldOne('field PRECISION', AOldFieldPrecision, ANewFieldPrecision, AField, ATable);
+    Warning_PotentialDataTruncation('field PRECISION', AOldFieldPrecision, ANewFieldPrecision, AField, ATable);
   end;
 end;
 
