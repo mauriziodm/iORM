@@ -52,6 +52,12 @@ type
   protected
     // RDBMS-specific invalid type conversions
     function GetInvalidFieldTypeConversions: string; override;
+    /// <summary>
+    /// Emits a warning noting that a table uses Identity key generation, which
+    /// requires Firebird 3.0+, on a server that does not support it. Called by
+    /// DoCheckKeyGenerationCompatibility. Firebird-specific (uses DBMSInfo).
+    /// </summary>
+    procedure Warning_IdentityRequiresFirebird3(const ATable: IioDBBuilderSchemaTable);
     // Hook override for Firebird-specific key generation compatibility check
     procedure DoCheckKeyGenerationCompatibility; override;
   end;
@@ -91,10 +97,15 @@ begin
   if not SqlGenerator.Supports_Identity then
     for LTable in Schema.Tables.Values do
       if LTable.UsesIdentityForKeyGeneration then
-        Script.Warnings.Add(Format(
-          'Table ''%s'' uses Identity key generation which requires Firebird 3.0+. ' +
-          'Detected version: %s. Consider using [ioKeySequence] attribute or upgrade Firebird.',
-          [LTable.Name, SqlGenerator.DBMSInfo.ToString]));
+        Warning_IdentityRequiresFirebird3(LTable);
+end;
+
+procedure TioDBBuilderStrategyFirebird.Warning_IdentityRequiresFirebird3(const ATable: IioDBBuilderSchemaTable);
+begin
+  Script.Warnings.Add(Format(
+    'Table ''%s'' uses Identity key generation which requires Firebird 3.0+. ' +
+    'Detected version: %s. Consider using [ioKeySequence] attribute or upgrade Firebird.',
+    [ATable.Name, SqlGenerator.DBMSInfo.ToString]));
 end;
 
 end.

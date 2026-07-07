@@ -238,6 +238,12 @@ type
     /// Called by IsFieldTypeChanged.
     /// </summary>
     procedure Warning_UnsafeTypeConversion(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String);
+    /// <summary>
+    /// Emits a warning stating that a field's NOT NULL setting changed but the
+    /// change cannot be applied automatically by this RDBMS strategy. Called by
+    /// IsFieldNotNullChanged when the change is not permitted (AIsPermitted False).
+    /// </summary>
+    procedure Warning_NotNullChangeNotAllowed(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
 
 
 
@@ -673,6 +679,11 @@ begin
       [ATable.Name, AField.FieldName, AValueName, AOldValue, ANewValue]));
 end;
 
+procedure TioDBBuilderStrategyBase.Warning_NotNullChangeNotAllowed(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
+begin
+  Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> The NOT NULL setting cannot be changed automatically', [ATable.Name, AField.FieldName]));
+end;
+
 procedure TioDBBuilderStrategyBase.Hint_KeyGenerationStrategyFallback(const ATable: IioDBBuilderSchemaTable);
 begin
   Script.Hints.Add(Format(
@@ -726,7 +737,7 @@ begin
     end
     else
       // If the NOT NULL change is not permitted, add a warning to indicate it cannot be automatically changed
-      Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> The NOT NULL setting cannot be changed automatically', [ATable.Name, AField.FieldName]));
+      Warning_NotNullChangeNotAllowed(ATable, AField);
   end;
 end;
 
