@@ -170,10 +170,26 @@ type
     /// If kgsAuto or unsupported by this DBMS, falls back to GetDefaultKeyGenerationStrategy.
     /// </summary>
     function Resolve_KeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType; virtual;
+    /// <summary>
+    /// Emits key-generation-strategy diagnostics into ASchema.Script for fallbacks already applied
+    /// by Resolve_KeyGenerationStrategy. Base implementation emits an informational Hint for every
+    /// table whose requested strategy was overridden. Override to add DBMS-specific Warnings.
+    /// </summary>
+    procedure CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema); virtual;
+    /// <summary>
+    /// Appends the standard "requested X key generation but this DBMS uses Y instead" hint to the
+    /// script. Centralized here so the wording stays consistent across every RDBMS generator.
+    /// </summary>
+    procedure Hint_KeyGenerationStrategyFallback(const ASchema: IioDBBuilderSchema; const ATable: IioDBBuilderSchemaTable);
     /// <summary>Returns True if the database supports IDENTITY columns</summary>
     function Supports_Identity: Boolean; virtual;
     /// <summary>Returns True if the database supports SEQUENCE objects (default: False)</summary>
     function Supports_Sequence: Boolean; virtual;
+    /// <summary>
+    /// Returns the DBMS-specific list of forbidden field-type conversions as '[old->new]' tokens.
+    /// Base returns '' (no restrictions); override per DBMS. Consumed by Strategy diagnostics.
+    /// </summary>
+    function GetInvalidFieldTypeConversions: string; virtual;
     // ==========================================================
 
     // ==========================================================
@@ -248,6 +264,7 @@ uses
   iORM.DB.ConnectionContainer,
   iORM.SqlTranslator,
   iORM.Exceptions,
+  iORM.Utilities,
   iORM.DBBuilder.Factory
 
   ;
@@ -651,6 +668,34 @@ end;
 function TioDBBuilderSqlGenBase.Supports_Sequence: Boolean;
 begin
   Result := False;
+end;
+
+function TioDBBuilderSqlGenBase.GetInvalidFieldTypeConversions: string;
+begin
+  // Base: no DBMS-specific forbidden conversions. Override per RDBMS.
+  Result := '';
+end;
+
+procedure TioDBBuilderSqlGenBase.CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema);
+var
+  LTable: IioDBBuilderSchemaTable;
+begin
+  // Generic pass: for every table whose requested strategy was overridden by
+  // Resolve_KeyGenerationStrategy, emit an informational hint. DBMS generators override this
+  // method (calling inherited first) to add version-specific warnings.
+  for LTable in ASchema.Tables.Values do
+    if LTable.IsKeyGenerationStrategyFallback then
+      Hint_KeyGenerationStrategyFallback(ASchema, LTable);
+end;
+
+procedure TioDBBuilderSqlGenBase.Hint_KeyGenerationStrategyFallback(const ASchema: IioDBBuilderSchema;
+  const ATable: IioDBBuilderSchemaTable);
+begin
+  ASchema.Script.Hints.Add(Format(
+    'Table ''%s'' requests %s key generation but this DBMS does not support it. Using %s instead.',
+    [ATable.Name,
+     TioUtilities.EnumToString<TioKeyGenerationStrategyType>(ATable.RequestedKeyGenerationStrategy),
+     TioUtilities.EnumToString<TioKeyGenerationStrategyType>(ATable.KeyGenerationStrategy)]));
 end;
 
 function TioDBBuilderSqlGenBase.Supports_AlterNotNull: Boolean;

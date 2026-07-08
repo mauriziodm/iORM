@@ -76,7 +76,10 @@ type
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
     // Field change detection methods (common to all databases)
-    function GetInvalidFieldTypeConversions: string; virtual; abstract;
+    // Thin bridge to the DBMS trait that now lives on the SqlGenerator axis. Kept as a concrete
+    // virtual (not abstract) so RDBMS strategies that still carry their own list can override it
+    // (e.g. the frozen MSSQL strategy), while Firebird/SQLite fall through to the SqlGenerator.
+    function GetInvalidFieldTypeConversions: string; virtual;
     function IsFieldTypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String): Boolean; virtual;
     function IsFieldNotNullChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AIsPermitted: Boolean): Boolean; virtual;
     function IsFieldBlobSubtypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldBlobSubtype, ANewBlobSubtype: String; const AIsPermitted: Boolean): Boolean; virtual;
@@ -189,12 +192,6 @@ type
     // automatically) and are always emitted through these methods to keep the
     // message wording consistent across every RDBMS strategy.
     /// <summary>
-    /// Emits a hint noting that a table requested a key generation strategy the
-    /// current DBMS does not support, and that the fallback strategy is used
-    /// instead. Called by DoCheckKeyGenerationCompatibility.
-    /// </summary>
-    procedure Hint_KeyGenerationStrategyFallback(const ATable: IioDBBuilderSchemaTable);
-    /// <summary>
     /// Emits a hint noting that a field's NOT NULL setting changed from FALSE to
     /// TRUE without a DEFAULT value being specified, which may impact existing
     /// data. Called by IsFieldNotNullChanged.
@@ -248,19 +245,6 @@ type
 
 
 
-
-    // Hook methods
-    /// <summary>
-    /// Hook method called during script generation to notify the user about key generation
-    /// strategy fallbacks. If an entity explicitly requests a strategy (e.g. kgsSequence) that
-    /// this DBMS does not support, the fallback was already applied silently by
-    /// Resolve_KeyGenerationStrategy during schema building. This method detects such cases
-    /// via IsKeyGenerationStrategyFallback and emits an informative hint (not a warning,
-    /// which would block script execution).
-    /// Override in derived classes to add DBMS-specific warnings (e.g. Firebird checks
-    /// Identity support based on server version).
-    /// </summary>
-    procedure DoCheckKeyGenerationCompatibility; virtual;
 
     procedure GenerateDatabaseObjects; virtual; abstract;
 
@@ -684,28 +668,18 @@ begin
   Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> The NOT NULL setting cannot be changed automatically', [ATable.Name, AField.FieldName]));
 end;
 
-procedure TioDBBuilderStrategyBase.Hint_KeyGenerationStrategyFallback(const ATable: IioDBBuilderSchemaTable);
+function TioDBBuilderStrategyBase.GetInvalidFieldTypeConversions: string;
 begin
-  Script.Hints.Add(Format(
-    'Table ''%s'' requests %s key generation but this DBMS does not support it. Using %s instead.',
-    [ATable.Name,
-     TioUtilities.EnumToString<TioKeyGenerationStrategyType>(ATable.GetContextTable.GetKeyGenerationStrategy),
-     TioUtilities.EnumToString<TioKeyGenerationStrategyType>(ATable.KeyGenerationStrategy)]));
+  // The invalid-conversions list is a DBMS trait owned by the SqlGenerator. Strategies that do
+  // not override this method delegate to it; the frozen MSSQL strategy still overrides with its
+  // own list until its DBBuilder is reworked.
+  Result := SqlGenerator.GetInvalidFieldTypeConversions;
 end;
 
 procedure TioDBBuilderStrategyBase.Hint_NotNullPotentialDataImpact(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
 begin
   Script.Hints.Add(Format('Table ''%s'' field ''%s'' --> The not null setting is changed from FALSE to TRUE and a DEFAULT value has not been specified',
     [ATable.Name, AField.FieldName]));
-end;
-
-procedure TioDBBuilderStrategyBase.DoCheckKeyGenerationCompatibility;
-var
-  LTable: IioDBBuilderSchemaTable;
-begin
-  for LTable in Schema.Tables.Values do
-    if LTable.IsKeyGenerationStrategyFallback then
-      Hint_KeyGenerationStrategyFallback(LTable);
 end;
 
 function TioDBBuilderStrategyBase.IsFieldTypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;

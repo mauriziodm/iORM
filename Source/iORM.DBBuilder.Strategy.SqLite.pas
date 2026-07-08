@@ -20,8 +20,6 @@ type
     // Fields
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
-    // Field change detection methods
-    function GetInvalidFieldTypeConversions: string; override;
     // Indexes
     function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
     function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
@@ -45,13 +43,6 @@ uses
   ;
 
 
-const
-  INVALID_FIELDTYPE_CONVERSIONS =
-    '[text->integer][text->real][text->numeric][text->blob][real->integer][real->blob]' +
-    '[numeric->integer][numeric->blob][blob->real][blob->numeric][blob->integer][blob->text]';
-
-
-
 { TioDBBuilderSqLite }
 
 procedure TioDBBuilderStrategySqLite.BeginDeferConstraints;
@@ -67,11 +58,6 @@ begin
   Script.Body.AddComment('At the end: restore normal foreign key checks');
   Script.Body.Add('PRAGMA defer_foreign_keys=off;');
   Script.Body.AddEmpty;
-end;
-
-function TioDBBuilderStrategySqLite.GetInvalidFieldTypeConversions: string;
-begin
-  Result := INVALID_FIELDTYPE_CONVERSIONS;
 end;
 
 procedure TioDBBuilderStrategySqLite.CreateTable(const ATable: IioDBBuilderSchemaTable);

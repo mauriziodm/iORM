@@ -236,6 +236,9 @@ type
     function GetForeignKeys: TioDBBuilderSchemaForeignKeys;
     function GetContextTable: IioTable;
     function GetKeyGenerationStrategy: TioKeyGenerationStrategyType;
+    // Returns the strategy the entity originally requested (before Resolve_KeyGenerationStrategy
+    // applied any DBMS-specific fallback). GetKeyGenerationStrategy returns the *resolved* one.
+    function GetRequestedKeyGenerationStrategy: TioKeyGenerationStrategyType;
     function GetSequenceName: String;
     function UsesSequenceForKeyGeneration: Boolean;
     function UsesIdentityForKeyGeneration: Boolean;
@@ -267,6 +270,7 @@ type
     property Name: string read GetName;
     property SqlName: string read GetSqlName;
     property KeyGenerationStrategy: TioKeyGenerationStrategyType read GetKeyGenerationStrategy;
+    property RequestedKeyGenerationStrategy: TioKeyGenerationStrategyType read GetRequestedKeyGenerationStrategy;
     property PrimaryKeyField: IioDBBuilderSchemaField read GetPrimaryKeyField;
     property SequenceName: string read GetSequenceName;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
@@ -546,6 +550,15 @@ type
     /// Otherwise, returns ARequestedStrategy unchanged.
     /// </summary>
     function Resolve_KeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType;
+    /// <summary>
+    /// Inspects the resolved schema and emits key-generation-strategy diagnostics into
+    /// ASchema.Script (informational Hints and, for version-limited DBMS, Warnings) about
+    /// fallbacks already applied by Resolve_KeyGenerationStrategy at schema-build time.
+    /// Lives here (not on the Strategy) because compatibility is a DBMS-capability concern,
+    /// which is exactly what the SqlGenerator + DBMSInfo already model. Override in derived
+    /// generators for DBMS-specific checks (e.g. Firebird: Identity requires 3.0+).
+    /// </summary>
+    procedure CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema);
 
     // ==========================================================
     // ALTER TABLE CAPABILITY METHODS
@@ -554,6 +567,13 @@ type
     function Supports_AlterNotNull: Boolean;
     /// <summary>Returns True if the database permits BLOB subtype changes via ALTER COLUMN</summary>
     function Supports_AlterBlobSubtype: Boolean;
+    /// <summary>
+    /// Returns the DBMS-specific list of forbidden field-type conversions, formatted as
+    /// '[old->new]' tokens (e.g. '[varchar->integer]'). Empty when the DBMS declares none.
+    /// This is a DBMS trait: it belongs to the SqlGenerator, alongside the other Supports_*/
+    /// capability data. Consumed by Strategy.Base.Warning_UnsafeTypeConversion.
+    /// </summary>
+    function GetInvalidFieldTypeConversions: string;
 
     // ==========================================================
     // SEQUENCE RELATED METHODS

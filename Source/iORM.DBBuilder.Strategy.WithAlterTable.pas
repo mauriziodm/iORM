@@ -57,8 +57,6 @@ type
     // Fields
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
-    // Field change detection methods - abstract for RDBMS-specific invalid conversions
-    function GetInvalidFieldTypeConversions: string; override; abstract;
     function IsFieldLengthChanged(const AOldFieldLength, ANewFieldLength: Smallint; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
     function IsFieldPrecisionChanged(const AOldFieldPrecision, ANewFieldPrecision: Smallint; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
     function IsFieldDecimalsChanged(const AOldFieldDecimals, ANewFieldDecimals: Smallint; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
@@ -283,8 +281,9 @@ procedure TioDBBuilderStrategyWithAlterTable.GenerateDatabaseObjects;
 var
   LTable: IioDBBuilderSchemaTable;
 begin
-  // Check key generation strategy compatibility with RDBMS version
-  DoCheckKeyGenerationCompatibility;
+  // Check key generation strategy compatibility with RDBMS version.
+  // The diagnostic lives on the SqlGenerator (DBMS-capability axis), not on the Strategy.
+  SqlGenerator.CheckKeyGenerationCompatibility(Schema);
 
   // Strict mode (indexes): drop every index from the DB for each stUpdate table.
   // This removes orphaned indexes (including manually-added ones) and ensures

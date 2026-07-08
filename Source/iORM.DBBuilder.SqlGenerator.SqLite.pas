@@ -67,6 +67,7 @@ type
     function BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; override;
+    function GetInvalidFieldTypeConversions: string; override;
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; override;
 
     // ==========================================================
@@ -114,7 +115,18 @@ uses
 
   ;
 
+const
+  // SQLite-specific field-type conversions that cannot be applied safely/automatically.
+  INVALID_FIELDTYPE_CONVERSIONS =
+    '[text->integer][text->real][text->numeric][text->blob][real->integer][real->blob]' +
+    '[numeric->integer][numeric->blob][blob->real][blob->numeric][blob->integer][blob->text]';
+
 { TioDBBuilderSqlGenSQLite }
+
+function TioDBBuilderSqlGenSQLite.GetInvalidFieldTypeConversions: string;
+begin
+  Result := INVALID_FIELDTYPE_CONVERSIONS;
+end;
 
 procedure TioDBBuilderSqlGenSQLite.Command_CreateDatabase;
 begin

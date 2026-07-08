@@ -127,8 +127,9 @@ procedure TioDBBuilderStrategyWithoutAlterTable.GenerateDatabaseObjects;
 var
   LTable: IioDBBuilderSchemaTable;
 begin
-  // Check key generation strategy compatibility with DBMS
-  DoCheckKeyGenerationCompatibility;
+  // Check key generation strategy compatibility with DBMS.
+  // The diagnostic lives on the SqlGenerator (DBMS-capability axis), not on the Strategy.
+  SqlGenerator.CheckKeyGenerationCompatibility(Schema);
 
   BeginDeferConstraints;
 

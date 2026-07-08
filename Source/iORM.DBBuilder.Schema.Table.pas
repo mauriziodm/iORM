@@ -73,6 +73,7 @@ type
     function GetForeignKeys: TioDBBuilderSchemaForeignKeys;
     function GetContextTable: IioTable;
     function GetKeyGenerationStrategy: TioKeyGenerationStrategyType;
+    function GetRequestedKeyGenerationStrategy: TioKeyGenerationStrategyType;
     function GetSequenceName: String;
     function UsesSequenceForKeyGeneration: Boolean;
     function UsesIdentityForKeyGeneration: Boolean;
@@ -89,6 +90,7 @@ type
     property Indexes: TioDBBuilderSchemaIndexes read GetIndexes;
     property IsTrueClass: Boolean read GetIsTrueClass write SetIsTrueClass;
     property KeyGenerationStrategy: TioKeyGenerationStrategyType read GetKeyGenerationStrategy;
+    property RequestedKeyGenerationStrategy: TioKeyGenerationStrategyType read GetRequestedKeyGenerationStrategy;
     property Name: string read GetName;
     property SqlName: string read GetSqlName;
     property PrimaryKeyField: IioDBBuilderSchemaField read GetPrimaryKeyField;
@@ -246,13 +248,22 @@ begin
   Result := GetKeyGenerationStrategy = kgsIdentity;
 end;
 
+// The strategy the entity originally requested, before Resolve_KeyGenerationStrategy applied
+// any DBMS-specific fallback. Notification/diagnostic code must read THIS (not the resolved
+// GetKeyGenerationStrategy) to reason about what the developer asked for, otherwise it looks at
+// a value the resolver may have already overwritten.
+function TioDBBuilderSchemaTable.GetRequestedKeyGenerationStrategy: TioKeyGenerationStrategyType;
+begin
+  Result := FContextTable.GetKeyGenerationStrategy;
+end;
+
 // Returns True if the entity explicitly requested a specific strategy (not kgsAuto) but the
-// resolved strategy differs (i.e., fallback was applied). Used by DoCheckKeyGenerationCompatibility
-// to emit an informative hint to the user.
+// resolved strategy differs (i.e., fallback was applied). Used by
+// SqlGenerator.CheckKeyGenerationCompatibility to emit an informative hint to the user.
 function TioDBBuilderSchemaTable.IsKeyGenerationStrategyFallback: Boolean;
 begin
-  Result := (FContextTable.GetKeyGenerationStrategy <> kgsAuto) and
-            (FContextTable.GetKeyGenerationStrategy <> FKeyGenerationStrategy);
+  Result := (GetRequestedKeyGenerationStrategy <> kgsAuto) and
+            (GetRequestedKeyGenerationStrategy <> FKeyGenerationStrategy);
 end;
 
 procedure TioDBBuilderSchemaTable.SetIsTrueClass(const AValue: Boolean);
