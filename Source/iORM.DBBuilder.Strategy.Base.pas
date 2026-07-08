@@ -76,10 +76,6 @@ type
     function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
     function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
     // Field change detection methods (common to all databases)
-    // Thin bridge to the DBMS trait that now lives on the SqlGenerator axis. Kept as a concrete
-    // virtual (not abstract) so RDBMS strategies that still carry their own list can override it
-    // (e.g. the frozen MSSQL strategy), while Firebird/SQLite fall through to the SqlGenerator.
-    function GetInvalidFieldTypeConversions: string; virtual;
     function IsFieldTypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String): Boolean; virtual;
     function IsFieldNotNullChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AIsPermitted: Boolean): Boolean; virtual;
     function IsFieldBlobSubtypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldBlobSubtype, ANewBlobSubtype: String; const AIsPermitted: Boolean): Boolean; virtual;
@@ -229,7 +225,7 @@ type
     /// Emits a warning when a field's type is changing from AOldFieldType to
     /// ANewFieldType AND that specific conversion is blacklisted by the current
     /// RDBMS. The list of forbidden conversions (formatted as '[old->new]' tokens)
-    /// is obtained from GetInvalidFieldTypeConversions; the warning is added only
+    /// is obtained from SqlGenerator.GetInvalidFieldTypeConversions; the warning is added only
     /// when the '[AOldFieldType->ANewFieldType]' token is found in that list,
     /// signalling a conversion the database cannot perform safely/automatically.
     /// Called by IsFieldTypeChanged.
@@ -643,7 +639,7 @@ var
   LRequiredConversion: String;
 begin
   LRequiredConversion := Format('[%s->%s]', [AOldFieldType, ANewFieldType]);
-  if ContainsText(GetInvalidFieldTypeConversions, LRequiredConversion) then
+  if ContainsText(SqlGenerator.GetInvalidFieldTypeConversions, LRequiredConversion) then
     Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> Invalid conversion from ''%s'' to ''%s''',
       [ATable.Name, AField.FieldName, AOldFieldType, ANewFieldType]));
 end;
@@ -666,14 +662,6 @@ end;
 procedure TioDBBuilderStrategyBase.Warning_NotNullChangeNotAllowed(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
 begin
   Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> The NOT NULL setting cannot be changed automatically', [ATable.Name, AField.FieldName]));
-end;
-
-function TioDBBuilderStrategyBase.GetInvalidFieldTypeConversions: string;
-begin
-  // The invalid-conversions list is a DBMS trait owned by the SqlGenerator. Strategies that do
-  // not override this method delegate to it; the frozen MSSQL strategy still overrides with its
-  // own list until its DBBuilder is reworked.
-  Result := SqlGenerator.GetInvalidFieldTypeConversions;
 end;
 
 procedure TioDBBuilderStrategyBase.Hint_NotNullPotentialDataImpact(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);

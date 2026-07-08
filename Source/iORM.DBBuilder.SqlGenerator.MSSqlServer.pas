@@ -46,6 +46,11 @@ type
   TioDBBuilderSqlGenMSSqlServer = class(TioDBBuilderSqlGenBase, IioDBBuilderSqlGenerator)
   protected
     // ==========================================================
+    // FIELD RELATED METHODS
+    // ----------------------------------------------------------
+    function GetInvalidFieldTypeConversions: string; override;
+
+    // ==========================================================
     // KEY GENERATION CAPABILITY METHODS
     // ----------------------------------------------------------
     function Supports_Identity: Boolean; override;
@@ -65,7 +70,20 @@ uses
   iORM.DB.QueryEngine,
   iORM.DBBuilder.Factory;
 
+const
+  // MS SQL Server-specific field-type conversions that cannot be applied safely/automatically.
+  INVALID_FIELDTYPE_CONVERSIONS =
+    '[datetime->decimal][datetime->numeric][datetime->int][date->decimal][date->numeric][date->int]' +
+    '[time->numeric][time->decimal][time->int][varchar->decimal][varchar->int][varchar->date][varchar->time][varchar->datetime]' +
+    '[nvarchar->decimal][nvarchar->int][nvarchar->date][nvarchar->time][nvarchar->datetime][char->decimal][char->int][char->date]' +
+    '[char->time][char->datetime][nchar->decimal][nchar->int][nchar->date][nchar->time][nchar->datetime]';
+
 { TioDBBuilderSqlGenMSSqlServer }
+
+function TioDBBuilderSqlGenMSSqlServer.GetInvalidFieldTypeConversions: string;
+begin
+  Result := INVALID_FIELDTYPE_CONVERSIONS;
+end;
 
 function TioDBBuilderSqlGenMSSqlServer.LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
 var

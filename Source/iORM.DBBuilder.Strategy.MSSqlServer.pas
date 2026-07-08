@@ -7,25 +7,12 @@ uses
 
 type
 
+  // All MS SQL Server DBMS traits (invalid field-type conversions, key-generation compatibility)
+  // now live on the SqlGenerator axis (TioDBBuilderSqlGenMSSqlServer). This class has no overrides
+  // of its own; kept as a named placeholder for symmetry with the Firebird/SQLite strategies.
   TioDBBuilderStrategyMSSqlServer = class(TioDBBuilderStrategyWithAlterTable)
-  protected
-    function GetInvalidFieldTypeConversions: string; override;
   end;
 
 implementation
-
-const
-  INVALID_FIELDTYPE_CONVERSIONS =
-    '[datetime->decimal][datetime->numeric][datetime->int][date->decimal][date->numeric][date->int]' +
-    '[time->numeric][time->decimal][time->int][varchar->decimal][varchar->int][varchar->date][varchar->time][varchar->datetime]' +
-    '[nvarchar->decimal][nvarchar->int][nvarchar->date][nvarchar->time][nvarchar->datetime][char->decimal][char->int][char->date]' +
-    '[char->time][char->datetime][nchar->decimal][nchar->int][nchar->date][nchar->time][nchar->datetime]';
-
-{ TioDBBuilderStrategyMSSqlServer }
-
-function TioDBBuilderStrategyMSSqlServer.GetInvalidFieldTypeConversions: string;
-begin
-  Result := INVALID_FIELDTYPE_CONVERSIONS;
-end;
 
 end.
