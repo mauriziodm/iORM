@@ -172,10 +172,11 @@ type
     function Resolve_KeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType; virtual;
     /// <summary>
     /// Emits key-generation-strategy diagnostics into ASchema.Script for fallbacks already applied
-    /// by Resolve_KeyGenerationStrategy. Base implementation emits an informational Hint for every
-    /// table whose requested strategy was overridden. Override to add DBMS-specific Warnings.
+    /// by Resolve_KeyGenerationStrategy: a single informational Hint for every table whose requested
+    /// strategy was overridden. Uniform for every DBMS and intentionally non-blocking (Warnings gate
+    /// the create/alter flow in the Engine, and a safe auto-applied fallback must not block it).
     /// </summary>
-    procedure CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema); virtual;
+    procedure CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema);
     /// <summary>
     /// Appends the standard "requested X key generation but this DBMS uses Y instead" hint to the
     /// script. Centralized here so the wording stays consistent across every RDBMS generator.

@@ -552,11 +552,10 @@ type
     function Resolve_KeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType;
     /// <summary>
     /// Inspects the resolved schema and emits key-generation-strategy diagnostics into
-    /// ASchema.Script (informational Hints and, for version-limited DBMS, Warnings) about
-    /// fallbacks already applied by Resolve_KeyGenerationStrategy at schema-build time.
-    /// Lives here (not on the Strategy) because compatibility is a DBMS-capability concern,
-    /// which is exactly what the SqlGenerator + DBMSInfo already model. Override in derived
-    /// generators for DBMS-specific checks (e.g. Firebird: Identity requires 3.0+).
+    /// ASchema.Script (informational, non-blocking Hints) about fallbacks already applied by
+    /// Resolve_KeyGenerationStrategy at schema-build time. Lives here (not on the Strategy) because
+    /// compatibility is a DBMS-capability concern, which is exactly what the SqlGenerator + DBMSInfo
+    /// already model.
     /// </summary>
     procedure CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema);
 

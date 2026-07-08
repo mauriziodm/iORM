@@ -50,11 +50,6 @@ type
   TioDBBuilderSqlGenFirebird = class(TioDBBuilderSqlGenBase)
   private
     function _BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): String;
-    /// <summary>
-    /// Emits a warning noting that a table requests Identity key generation which requires
-    /// Firebird 3.0+, on a server that does not support it. Firebird-specific (uses DBMSInfo).
-    /// </summary>
-    procedure Warning_IdentityRequiresFirebird3(const ASchema: IioDBBuilderSchema; const ATable: IioDBBuilderSchemaTable);
   protected
     // ==========================================================
     // DATABASE RELATED METHODS
@@ -105,7 +100,6 @@ type
     function BuildSQL_CreateSequence(const ASequenceName: String): string; override;
     function BuildSQL_DropSequence(const ASequenceName: string): string; override;
     function BuildSQL_SequenceExists(const ASequenceName: string): string; override;
-    procedure CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema); override;
     function GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategyType; override;
     function Supports_Identity: Boolean; override;
     function Supports_Sequence: Boolean; override;
@@ -675,31 +669,6 @@ end;
 function TioDBBuilderSqlGenFirebird.GetInvalidFieldTypeConversions: string;
 begin
   Result := INVALID_FIELDTYPE_CONVERSIONS;
-end;
-
-procedure TioDBBuilderSqlGenFirebird.CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema);
-var
-  LTable: IioDBBuilderSchemaTable;
-begin
-  // Generic fallback hints first (Identity->Sequence downgrade etc.).
-  inherited;
-  // Firebird-specific: a table that *requested* Identity on a server that does not support it
-  // (Firebird < 3.0) deserves a stronger warning than the generic hint. We key this off the
-  // REQUESTED strategy, not the resolved one: Resolve_KeyGenerationStrategy has already downgraded
-  // Identity to Sequence, so reading the resolved value here would never see the Identity request.
-  if not Supports_Identity then
-    for LTable in ASchema.Tables.Values do
-      if LTable.RequestedKeyGenerationStrategy = kgsIdentity then
-        Warning_IdentityRequiresFirebird3(ASchema, LTable);
-end;
-
-procedure TioDBBuilderSqlGenFirebird.Warning_IdentityRequiresFirebird3(const ASchema: IioDBBuilderSchema;
-  const ATable: IioDBBuilderSchemaTable);
-begin
-  ASchema.Script.Warnings.Add(Format(
-    'Table ''%s'' uses Identity key generation which requires Firebird 3.0+. ' +
-    'Detected version: %s. Consider using [ioKeySequence] attribute or upgrade Firebird.',
-    [ATable.Name, DBMSInfo.ToString]));
 end;
 
 function TioDBBuilderSqlGenFirebird.Supports_AlterNotNull: Boolean;
