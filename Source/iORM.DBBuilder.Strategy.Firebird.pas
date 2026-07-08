@@ -31,28 +31,25 @@
   *                                                                          *
   ****************************************************************************
 }
-/// <summary>
-/// Firebird-specific implementation of DBBuilder Strategy.
-/// Inherits the common ALTER TABLE logic from TioDBBuilderStrategyWithAlterTable.
-/// All Firebird-specific DBMS traits (invalid type conversions, key-generation compatibility
-/// checks) now live on the SqlGenerator axis (TioDBBuilderSqlGenFirebird), so this class has no
-/// overrides of its own. It is kept as a named placeholder for symmetry with the SQLite/MSSQL
-/// strategies and as a future hook should Firebird ever need DDL-mechanic-specific behavior.
-/// </summary>
 unit iORM.DBBuilder.Strategy.Firebird;
 
 interface
 
 uses
-  iORM.DBBuilder.Strategy.WithAlterTable
-
-  ;
-
+  iORM.DBBuilder.Strategy.WithAlterTable;
 
 type
+
+  /// <summary>
+  /// Firebird-specific DBBuilder strategy. Inherits the common ALTER TABLE DDL mechanics from
+  /// TioDBBuilderStrategyWithAlterTable and adds nothing of its own: every Firebird-specific trait
+  /// (invalid field-type conversions, key-generation compatibility) lives on the SqlGenerator axis
+  /// (TioDBBuilderSqlGenFirebird), where DBMS capability knowledge belongs. Kept as an empty, named
+  /// placeholder for symmetry with the other per-DBMS strategies and as the seam to reintroduce
+  /// should Firebird ever need DDL-mechanic-specific behavior.
+  /// </summary>
   TioDBBuilderStrategyFirebird = class(TioDBBuilderStrategyWithAlterTable)
   end;
-
 
 implementation
 

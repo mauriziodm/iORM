@@ -7,9 +7,14 @@ uses
 
 type
 
-  // All MS SQL Server DBMS traits (invalid field-type conversions, key-generation compatibility)
-  // now live on the SqlGenerator axis (TioDBBuilderSqlGenMSSqlServer). This class has no overrides
-  // of its own; kept as a named placeholder for symmetry with the Firebird/SQLite strategies.
+  /// <summary>
+  /// MS SQL Server-specific DBBuilder strategy. Inherits the common ALTER TABLE DDL mechanics from
+  /// TioDBBuilderStrategyWithAlterTable and adds nothing of its own: every MS SQL Server-specific
+  /// trait (invalid field-type conversions, key-generation compatibility) lives on the SqlGenerator
+  /// axis (TioDBBuilderSqlGenMSSqlServer), where DBMS capability knowledge belongs. Kept as an empty,
+  /// named placeholder for symmetry with the other per-DBMS strategies and as the seam to reintroduce
+  /// should MS SQL Server ever need DDL-mechanic-specific behavior.
+  /// </summary>
   TioDBBuilderStrategyMSSqlServer = class(TioDBBuilderStrategyWithAlterTable)
   end;
 
