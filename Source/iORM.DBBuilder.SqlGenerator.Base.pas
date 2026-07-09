@@ -67,6 +67,19 @@ type
     FDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
     procedure RaiseNotImplemented(const AMethodName: string);
   protected
+    { Naming convention (group banners mirror IioDBBuilderSqlGenerator - single source of truth)
+      -------------------------------------------------------------------------------------------
+      Contract methods (those declared in IioDBBuilderSqlGenerator) carry a domain prefix that
+      encodes intent:
+        Command_*                        executes DDL against the database (side-effect)
+        BuildSQL_*                       returns a SQL string, no side-effect
+        Supports_*                       boolean DBMS capability flag
+        Translate_<Source>_To_<Target>   maps a schema element to a SQL fragment / identifier
+      Internal protected helpers (NOT part of the interface) intentionally carry no domain prefix
+      and follow standard Delphi verb naming (Get* / Is* / Ensure* / Load* / Shorten* / Escape*).
+      The missing prefix is what marks them as internal - it is deliberate, not an omission.
+      Methods are ordered alphabetically within each group. }
+
     // ==========================================================
     // DATABASE RELATED METHODS
     // ----------------------------------------------------------
@@ -79,10 +92,6 @@ type
     function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string; virtual;
     function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string; virtual;
     function BuildSQL_TableExists(const ATableName: string): string; virtual;
-    /// <summary>Returns True if the database supports ALTER COLUMN SET/DROP NOT NULL</summary>
-    function Supports_AlterNotNull: Boolean; virtual;
-    /// <summary>Returns True if the database permits BLOB subtype changes via ALTER COLUMN</summary>
-    function Supports_AlterBlobSubtype: Boolean; virtual;
 
     // ==========================================================
     // FIELD RELATED METHODS
@@ -149,27 +158,20 @@ type
     function Translate_SchemaTableAndFK_To_FKName(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string; virtual;
 
     // ==========================================================
-    // KEY GENERATION RELATED METHODS
+    // DBMS INFO METHODS
     // ----------------------------------------------------------
-    /// <summary>Generates SQL to create a sequence. Default raises exception (not supported).</summary>
-    function BuildSQL_CreateSequence(const ASequenceName: String): string; virtual;
-    /// <summary>Generates SQL to drop a sequence. Default raises exception (not supported).</summary>
-    function BuildSQL_DropSequence(const ASequenceName: string): string; virtual;
-    /// <summary>Generates SQL to check if a sequence exists. Default raises exception (not supported).</summary>
-    function BuildSQL_SequenceExists(const ASequenceName: string): string; virtual;
     /// <summary>
-    /// Returns the default key generation strategy for this DBMS.
-    /// Base returns kgsIdentity. Override in derived classes (e.g. Firebird returns kgsSequence).
+    /// Returns DBMS version info with lazy loading (loads on first access).
     /// </summary>
-    function GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategyType; virtual;
+    function GetDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
     /// <summary>
-    /// Resolves the requested key generation strategy to an effective strategy.
-    /// Called once during schema building (FindOrCreateTable). The resolved strategy is stored
-    /// in the SchemaTable and used later by UsesSequenceForKeyGeneration/UsesIdentityForKeyGeneration
-    /// to decide how to generate the DDL.
-    /// If kgsAuto or unsupported by this DBMS, falls back to GetDefaultKeyGenerationStrategy.
+    /// Loads DBMS info from database. Called internally by GetDBMSInfo.
     /// </summary>
-    function Resolve_KeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType; virtual;
+    function LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo; virtual;
+
+    // ==========================================================
+    // KEY GENERATION CAPABILITY METHODS
+    // ----------------------------------------------------------
     /// <summary>
     /// Emits key-generation-strategy diagnostics into ASchema.Script for fallbacks already applied
     /// by Resolve_KeyGenerationStrategy: a single informational Hint for every table whose requested
@@ -178,28 +180,69 @@ type
     /// </summary>
     procedure CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema);
     /// <summary>
+    /// Returns the default key generation strategy for this DBMS.
+    /// Base returns kgsIdentity. Override in derived classes (e.g. Firebird returns kgsSequence).
+    /// </summary>
+    function GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategyType; virtual;
+    /// <summary>
     /// Appends the standard "requested X key generation but this DBMS uses Y instead" hint to the
     /// script. Centralized here so the wording stays consistent across every RDBMS generator.
     /// </summary>
     procedure Hint_KeyGenerationStrategyFallback(const ASchema: IioDBBuilderSchema; const ATable: IioDBBuilderSchemaTable);
+    /// <summary>
+    /// Resolves the requested key generation strategy to an effective strategy.
+    /// Called once during schema building (FindOrCreateTable). The resolved strategy is stored
+    /// in the SchemaTable and used later by UsesSequenceForKeyGeneration/UsesIdentityForKeyGeneration
+    /// to decide how to generate the DDL.
+    /// If kgsAuto or unsupported by this DBMS, falls back to GetDefaultKeyGenerationStrategy.
+    /// </summary>
+    function Resolve_KeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType; virtual;
     /// <summary>Returns True if the database supports IDENTITY columns</summary>
     function Supports_Identity: Boolean; virtual;
     /// <summary>Returns True if the database supports SEQUENCE objects (default: False)</summary>
     function Supports_Sequence: Boolean; virtual;
+
+    // ==========================================================
+    // ALTER TABLE CAPABILITY METHODS
+    // ----------------------------------------------------------
     /// <summary>
     /// Returns the DBMS-specific list of forbidden field-type conversions as '[old->new]' tokens.
     /// Base returns '' (no restrictions); override per DBMS. Consumed by Strategy diagnostics.
     /// </summary>
     function GetInvalidFieldTypeConversions: string; virtual;
-    // ==========================================================
+    /// <summary>Returns True if the database permits BLOB subtype changes via ALTER COLUMN</summary>
+    function Supports_AlterBlobSubtype: Boolean; virtual;
+    /// <summary>Returns True if the database supports ALTER COLUMN SET/DROP NOT NULL</summary>
+    function Supports_AlterNotNull: Boolean; virtual;
 
     // ==========================================================
-    // SQL GENERATOR UTILITIES
+    // SEQUENCE RELATED METHODS
+    // ----------------------------------------------------------
+    /// <summary>Generates SQL to create a sequence. Default raises exception (not supported).</summary>
+    function BuildSQL_CreateSequence(const ASequenceName: String): string; virtual;
+    /// <summary>Generates SQL to drop a sequence. Default raises exception (not supported).</summary>
+    function BuildSQL_DropSequence(const ASequenceName: string): string; virtual;
+    /// <summary>Generates SQL to check if a sequence exists. Default raises exception (not supported).</summary>
+    function BuildSQL_SequenceExists(const ASequenceName: string): string; virtual;
+
+    // ==========================================================
+    // SQL IDENTIFIER / LITERAL UTILITIES (internal helpers, not part of IioDBBuilderSqlGenerator)
     // ----------------------------------------------------------
     /// <summary>
-    /// Returns DBMS version info with lazy loading (loads on first access).
+    /// Returns the identifier shortened if it exceeds MaxSqlIdentifierLength, unchanged otherwise.
     /// </summary>
-    function GetDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
+    function EnsureIdentifierLength(const AIdentifierName: string): string;
+    /// <summary>
+    /// Escapes single quotes in SQL string literals by doubling them (standard SQL escaping).
+    /// Used when embedding string values in SQL queries (e.g., WHERE name = 'value').
+    /// NOT for SQL identifiers (table/column names) - those use database-specific delimiters.
+    /// </summary>
+    /// <param name="AStringLiteral">The string value to escape</param>
+    /// <returns>Escaped string safe for embedding in SQL queries</returns>
+    /// <example>
+    /// "Table'Name" becomes "Table''Name"
+    /// </example>
+    function EscapeSQLStringLiteral(const AStringLiteral: string): string; virtual;
     /// <summary>
     /// Returns the maximum allowed length for SQL identifiers (table names, column names, etc.) for this database.
     /// Base implementation returns 0 (no limit). Derived classes should override to enforce database-specific limits.
@@ -216,14 +259,6 @@ type
     /// <returns>True if the name is too long, False otherwise</returns>
     function IsSqlIdentifierTooLong(const AIdentifierName: string): boolean; virtual;
     /// <summary>
-    /// Returns the identifier shortened if it exceeds MaxSqlIdentifierLength, unchanged otherwise.
-    /// </summary>
-    function EnsureIdentifierLength(const AIdentifierName: string): string;
-    /// <summary>
-    /// Loads DBMS info from database. Called internally by GetDBMSInfo.
-    /// </summary>
-    function LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo; virtual;
-    /// <summary>
     /// Shortens an identifier name to fit within the specified maximum length by generating a hash.
     /// If the name is already within the limit, it is returned unchanged.
     /// </summary>
@@ -232,17 +267,6 @@ type
     /// <returns>The shortened identifier name (or original if already within limit)</returns>
     /// <exception cref="EioGenericException">Raised if AIdentifierName is empty or AMaxLength is not positive</exception>
     function ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
-    /// <summary>
-    /// Escapes single quotes in SQL string literals by doubling them (standard SQL escaping).
-    /// Used when embedding string values in SQL queries (e.g., WHERE name = 'value').
-    /// NOT for SQL identifiers (table/column names) - those use database-specific delimiters.
-    /// </summary>
-    /// <param name="AStringLiteral">The string value to escape</param>
-    /// <returns>Escaped string safe for embedding in SQL queries</returns>
-    /// <example>
-    /// "Table'Name" becomes "Table''Name"
-    /// </example>
-    function EscapeSQLStringLiteral(const AStringLiteral: string): string; virtual;
 
     // Properties
     property ConnectionDefName: string read FConnectionDefName;
