@@ -413,6 +413,12 @@ type
     /// <returns>SQL query to fetch field metadata (type, length, precision, scale, default value, etc.)</returns>
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string;
     /// <summary>
+    /// Translates a schema field's default value to its SQL representation.
+    /// </summary>
+    /// <param name="AField">The field schema containing the default value</param>
+    /// <returns>SQL representation of the default value, or empty string if no default exists</returns>
+    function Translate_SchemaField_To_DefaultValue(const AField: IioDBBuilderSchemaField): String;
+    /// <summary>
     /// Translates an iORM field type to the database-specific SQL type name.
     /// </summary>
     /// <param name="AField">The field metadata to translate.</param>
@@ -423,12 +429,6 @@ type
     /// </param>
     /// <returns>The database-specific type name or full type specification.</returns>
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String;
-    /// <summary>
-    /// Translates a schema field's default value to its SQL representation.
-    /// </summary>
-    /// <param name="AField">The field schema containing the default value</param>
-    /// <returns>SQL representation of the default value, or empty string if no default exists</returns>
-    function Translate_SchemaField_To_DefaultValue(const AField: IioDBBuilderSchemaField): String;
 
     // ==========================================================
     // INDEX RELATED METHODS
@@ -501,14 +501,6 @@ type
     /// <returns>SQL query to retrieve FK list with full details</returns>
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string;
     /// <summary>
-    /// Generates the foreign key constraint name from table and FK schema information.
-    /// </summary>
-    /// <param name="ATable">The table schema (must not be nil)</param>
-    /// <param name="AForeignKey">The foreign key schema (must not be nil)</param>
-    /// <returns>The FK constraint name (uppercase)</returns>
-    /// <exception cref="EioGenericException">Raised if ATable or AForeignKey is nil</exception>
-    function Translate_SchemaTableAndFK_To_FKName(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
-    /// <summary>
     /// Translates a foreign key action enum to its SQL representation.
     /// </summary>
     /// <param name="AForeignKey">The foreign key schema</param>
@@ -516,6 +508,14 @@ type
     /// <returns>SQL action string (e.g., "CASCADE", "SET NULL", "NO ACTION")</returns>
     /// <exception cref="EioGenericException">Raised if AFKAction has an unexpected value</exception>
     function Translate_SchemaFK_To_FKvalue(const AForeignKey: IioDBBuilderSchemaFK; const AFKAction: TioFKAction): String;
+    /// <summary>
+    /// Generates the foreign key constraint name from table and FK schema information.
+    /// </summary>
+    /// <param name="ATable">The table schema (must not be nil)</param>
+    /// <param name="AForeignKey">The foreign key schema (must not be nil)</param>
+    /// <returns>The FK constraint name (uppercase)</returns>
+    /// <exception cref="EioGenericException">Raised if ATable or AForeignKey is nil</exception>
+    function Translate_SchemaTableAndFK_To_FKName(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
 
     // ==========================================================
     // DBMS INFO METHODS
@@ -540,16 +540,6 @@ type
     // ==========================================================
     // KEY GENERATION CAPABILITY METHODS
     // ----------------------------------------------------------
-    /// <summary>Returns True if the database supports IDENTITY columns</summary>
-    function Supports_Identity: Boolean;
-    /// <summary>Returns True if the database supports SEQUENCE objects</summary>
-    function Supports_Sequence: Boolean;
-    /// <summary>
-    /// Resolves the requested key generation strategy to an effective strategy.
-    /// If ARequestedStrategy is kgsAuto, returns the DBMS-specific default strategy.
-    /// Otherwise, returns ARequestedStrategy unchanged.
-    /// </summary>
-    function Resolve_KeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType;
     /// <summary>
     /// Inspects the resolved schema and emits key-generation-strategy diagnostics into
     /// ASchema.Script (informational, non-blocking Hints) about fallbacks already applied by
@@ -558,14 +548,20 @@ type
     /// already model.
     /// </summary>
     procedure CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema);
+    /// <summary>
+    /// Resolves the requested key generation strategy to an effective strategy.
+    /// If ARequestedStrategy is kgsAuto, returns the DBMS-specific default strategy.
+    /// Otherwise, returns ARequestedStrategy unchanged.
+    /// </summary>
+    function Resolve_KeyGenerationStrategy(const ARequestedStrategy: TioKeyGenerationStrategyType): TioKeyGenerationStrategyType;
+    /// <summary>Returns True if the database supports IDENTITY columns</summary>
+    function Supports_Identity: Boolean;
+    /// <summary>Returns True if the database supports SEQUENCE objects</summary>
+    function Supports_Sequence: Boolean;
 
     // ==========================================================
     // ALTER TABLE CAPABILITY METHODS
     // ----------------------------------------------------------
-    /// <summary>Returns True if the database supports ALTER COLUMN SET/DROP NOT NULL</summary>
-    function Supports_AlterNotNull: Boolean;
-    /// <summary>Returns True if the database permits BLOB subtype changes via ALTER COLUMN</summary>
-    function Supports_AlterBlobSubtype: Boolean;
     /// <summary>
     /// Returns the DBMS-specific list of forbidden field-type conversions, formatted as
     /// '[old->new]' tokens (e.g. '[varchar->integer]'). Empty when the DBMS declares none.
@@ -573,6 +569,10 @@ type
     /// capability data. Consumed by Strategy.Base.Warning_UnsafeTypeConversion.
     /// </summary>
     function GetInvalidFieldTypeConversions: string;
+    /// <summary>Returns True if the database permits BLOB subtype changes via ALTER COLUMN</summary>
+    function Supports_AlterBlobSubtype: Boolean;
+    /// <summary>Returns True if the database supports ALTER COLUMN SET/DROP NOT NULL</summary>
+    function Supports_AlterNotNull: Boolean;
 
     // ==========================================================
     // SEQUENCE RELATED METHODS

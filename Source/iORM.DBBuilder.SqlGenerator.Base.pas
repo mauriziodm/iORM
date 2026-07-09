@@ -104,8 +104,8 @@ type
     function BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual;
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; virtual;
-    function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; virtual;
     function Translate_SchemaField_To_DefaultValue(const AField: IioDBBuilderSchemaField): string; virtual;
+    function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; virtual;
 
     // ==========================================================
     // INDEX RELATED METHODS
@@ -118,6 +118,12 @@ type
     function BuildSQL_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual;
     function BuildSQL_IndexExistsByName(const AIndexName: string): string; virtual;
     function BuildSQL_IndexList(const ATableName: string = ''): string; virtual;
+    /// <summary>
+    /// Translates the index orientation to a suffix for auto-generated index names.
+    /// </summary>
+    /// <param name="AOrientation">The index orientation</param>
+    /// <returns>"_A" for ascending, "_D" for descending</returns>
+    function Translate_Orientation_To_OrientationSuffixForIndexName(const AOrientation: TioIndexOrientation): string; virtual;
     /// <summary>
     /// Translates an index schema to a comma-separated list of field names with orientation.
     /// </summary>
@@ -143,12 +149,6 @@ type
     /// <param name="Unique">True if index is unique</param>
     /// <returns>"_U" if unique, empty string otherwise</returns>
     function Translate_Unique_To_UniqueSuffixForIndexName(const Unique: boolean): string; virtual;
-    /// <summary>
-    /// Translates the index orientation to a suffix for auto-generated index names.
-    /// </summary>
-    /// <param name="AOrientation">The index orientation</param>
-    /// <returns>"_A" for ascending, "_D" for descending</returns>
-    function Translate_Orientation_To_OrientationSuffixForIndexName(const AOrientation: TioIndexOrientation): string; virtual;
 
     // ==========================================================
     // FOREIGN KEY RELATED METHODS
