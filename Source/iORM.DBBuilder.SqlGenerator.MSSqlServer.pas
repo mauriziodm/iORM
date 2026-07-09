@@ -43,7 +43,7 @@ const
 
 type
 
-  TioDBBuilderSqlGenMSSqlServer = class(TioDBBuilderSqlGenBase, IioDBBuilderSqlGenerator)
+  TioDBBuilderSqlGenMSSqlServer = class(TioDBBuilderSqlGenBase)
   protected
     // ==========================================================
     // DBMS INFO METHODS
