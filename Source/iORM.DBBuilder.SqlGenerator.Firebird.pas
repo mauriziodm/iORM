@@ -63,8 +63,6 @@ type
     function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_TableExists(const ATableName: string): string; override;
-    function Supports_AlterBlobSubtype: Boolean; override;
-    function Supports_AlterNotNull: Boolean; override;
 
     // ==========================================================
     // FIELD RELATED METHODS
@@ -95,21 +93,35 @@ type
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; override;
 
     // ==========================================================
-    // KEY GENERATION RELATED METHODS
+    // DBMS INFO METHODS
+    // ----------------------------------------------------------
+    function LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo; override;
+
+    // ==========================================================
+    // KEY GENERATION CAPABILITY METHODS
+    // ----------------------------------------------------------
+    function GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategyType; override;
+    function Supports_Identity: Boolean; override;
+    function Supports_Sequence: Boolean; override;
+
+    // ==========================================================
+    // ALTER TABLE CAPABILITY METHODS
+    // ----------------------------------------------------------
+    function GetInvalidFieldTypeConversions: string; override;
+    function Supports_AlterBlobSubtype: Boolean; override;
+    function Supports_AlterNotNull: Boolean; override;
+
+    // ==========================================================
+    // SEQUENCE RELATED METHODS
     // ----------------------------------------------------------
     function BuildSQL_CreateSequence(const ASequenceName: String): string; override;
     function BuildSQL_DropSequence(const ASequenceName: string): string; override;
     function BuildSQL_SequenceExists(const ASequenceName: string): string; override;
-    function GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategyType; override;
-    function Supports_Identity: Boolean; override;
-    function Supports_Sequence: Boolean; override;
-    function GetInvalidFieldTypeConversions: string; override;
 
     // ==========================================================
-    // SQL GENERATOR UTILITIES
+    // SQL IDENTIFIER / LITERAL UTILITIES (internal helpers, not part of IioDBBuilderSqlGenerator)
     // ----------------------------------------------------------
     function GetMaxSqlIdentifierLength: integer; override;
-    function LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo; override;
   end;
 
 implementation

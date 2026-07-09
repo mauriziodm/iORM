@@ -67,7 +67,6 @@ type
     function BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; override;
-    function GetInvalidFieldTypeConversions: string; override;
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; override;
 
     // ==========================================================
@@ -86,14 +85,19 @@ type
     function BuildSQL_FKList(const ATableName: string = ''; const AFKName: string = ''): string; override;
 
     // ==========================================================
-    // KEY GENERATION RELATED METHODS
+    // DBMS INFO METHODS
+    // ----------------------------------------------------------
+    function LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo; override;
+
+    // ==========================================================
+    // KEY GENERATION CAPABILITY METHODS
     // ----------------------------------------------------------
     function Supports_Identity: Boolean; override;
 
     // ==========================================================
-    // SQL GENERATOR UTILITIES
+    // ALTER TABLE CAPABILITY METHODS
     // ----------------------------------------------------------
-    function LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo; override;
+    function GetInvalidFieldTypeConversions: string; override;
   end;
 
 implementation

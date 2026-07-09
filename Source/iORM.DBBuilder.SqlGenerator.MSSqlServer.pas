@@ -46,9 +46,9 @@ type
   TioDBBuilderSqlGenMSSqlServer = class(TioDBBuilderSqlGenBase, IioDBBuilderSqlGenerator)
   protected
     // ==========================================================
-    // FIELD RELATED METHODS
+    // DBMS INFO METHODS
     // ----------------------------------------------------------
-    function GetInvalidFieldTypeConversions: string; override;
+    function LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo; override;
 
     // ==========================================================
     // KEY GENERATION CAPABILITY METHODS
@@ -57,9 +57,9 @@ type
     function Supports_Sequence: Boolean; override;
 
     // ==========================================================
-    // SQL GENERATOR UTILITIES
+    // ALTER TABLE CAPABILITY METHODS
     // ----------------------------------------------------------
-    function LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo; override;
+    function GetInvalidFieldTypeConversions: string; override;
   end;
 
 implementation
