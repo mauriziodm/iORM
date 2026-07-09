@@ -69,16 +69,19 @@ type
   protected
     { Naming convention (group banners mirror IioDBBuilderSqlGenerator - single source of truth)
       -------------------------------------------------------------------------------------------
-      Contract methods (those declared in IioDBBuilderSqlGenerator) carry a domain prefix that
-      encodes intent:
+      A method's prefix encodes its ROLE, independently of whether it is exposed on the interface:
         Command_*                        executes DDL against the database (side-effect)
         BuildSQL_*                       returns a SQL string, no side-effect
         Supports_*                       boolean DBMS capability flag
         Translate_<Source>_To_<Target>   maps a schema element to a SQL fragment / identifier
-      Internal protected helpers (NOT part of the interface) intentionally carry no domain prefix
-      and follow standard Delphi verb naming (Get* / Is* / Ensure* / Load* / Shorten* / Escape*).
-      The missing prefix is what marks them as internal - it is deliberate, not an omission.
-      Methods are ordered alphabetically within each group. }
+      Methods whose role fits none of the above use plain Delphi verb naming (Get* / Is* /
+      Ensure* / Load* / Shorten* / Escape*) - e.g. GetDBMSInfo / LoadDBMSInfo (interface
+      accessors) and the identifier/literal helpers in the last group.
+      Interface membership is orthogonal to the prefix: a base-only helper may still carry a
+      domain prefix when its role matches (the internal Translate_* index helpers, Hint_*), and
+      an interface method may be prefix-free when it is a plain accessor.
+      Group banners below match IioDBBuilderSqlGenerator 1:1; the trailing group holds base-only
+      internal helpers with no interface counterpart. Methods are alphabetical within each group. }
 
     // ==========================================================
     // DATABASE RELATED METHODS
