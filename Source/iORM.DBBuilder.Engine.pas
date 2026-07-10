@@ -179,7 +179,7 @@ begin
   if not Analyzed then
     raise EioDBBuilderException.Create(ClassName, 'BuildCreateDBSqlScript', 'Unable to build SQL script: schema not analyzed');
 
-  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).ForceGenerateCreateDatabaseScript;
+  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateScript_ForceCreate;
   AScript.Lines.Assign(FSchema.Script.Lines);
 end;
 
@@ -193,7 +193,7 @@ begin
 
   // Status-driven: the strategy generates a create or an update script according to the status
   // determined by the DBAnalyzer.
-  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateDatabaseScript;
+  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateScript_Sync;
   AScript.Lines.Assign(FSchema.Script.Lines);
 end;
 
@@ -416,7 +416,7 @@ procedure TioDBBuilderEngine_New.RebuildScript;
 begin
   FSchema.Script.Clear;
   // Status-driven: create or update script according to the status determined by the DBAnalyzer.
-  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateDatabaseScript;
+  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateScript_Sync;
   FScript := FSchema.Script;
 end;
 

@@ -613,14 +613,14 @@ type
     ///  (creates a new database or updates the existing one accordingly). Trusts the analyzed
     ///  status: it does NOT force it.
     /// </summary>
-    procedure GenerateDatabaseScript;
+    procedure GenerateScript_Sync;
     /// <summary>
     ///  Forces the generation of a full "create from scratch" SQL script regardless of the actual
     ///  database state, by marking the whole schema (tables, fields, indexes, foreign keys) as
     ///  stCreate before generating. Intended for documentation/baseline purposes only: the resulting
     ///  script must NOT be executed against an existing database.
     /// </summary>
-    procedure ForceGenerateCreateDatabaseScript;
+    procedure GenerateScript_ForceCreate;
   end;
 
   IioDBBuilderDBAnalyzer = interface
