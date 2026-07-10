@@ -68,7 +68,7 @@ type
     function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
     function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
     // Main generation
-    procedure GenerateDatabaseObjects; override;
+    procedure GenerateScript; override;
 
   public
 
@@ -277,7 +277,7 @@ end;
 ///     The schema becomes authoritative and orphans are removed.
 /// Foreign keys are always processed last to ensure all referenced tables already exist.
 /// </summary>
-procedure TioDBBuilderStrategyWithAlterTable.GenerateDatabaseObjects;
+procedure TioDBBuilderStrategyWithAlterTable.GenerateScript;
 var
   LTable: IioDBBuilderSchemaTable;
 begin

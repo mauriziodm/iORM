@@ -67,7 +67,7 @@ type
     procedure AlterTable(const ATable: IioDBBuilderSchemaTable); override;
     procedure CreateOrAlterTables; override;
     // Main generation
-    procedure GenerateDatabaseObjects; override;
+    procedure GenerateScript; override;
   public
 
   end;
@@ -100,7 +100,7 @@ var
   LTable: IioDBBuilderSchemaTable;
 begin
   // Databases without ALTER TABLE support always recreate tables using the
-  // rename-create-copy pattern (see GenerateDatabaseObjects for the full workflow).
+  // rename-create-copy pattern (see GenerateScript for the full workflow).
   // Therefore, both stCreate and stUpdate use CreateTable.
   for LTable in Schema.Tables.Values do
   begin
@@ -123,7 +123,7 @@ end;
 /// pattern already recreates everything from scratch and the index drop always queries the DB.
 /// Only ifmDisabled prevents index recreation on the new tables.
 /// </summary>
-procedure TioDBBuilderStrategyWithoutAlterTable.GenerateDatabaseObjects;
+procedure TioDBBuilderStrategyWithoutAlterTable.GenerateScript;
 var
   LTable: IioDBBuilderSchemaTable;
 begin

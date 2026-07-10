@@ -242,7 +242,7 @@ type
 
 
 
-    procedure GenerateDatabaseObjects; virtual; abstract;
+    procedure GenerateScript; virtual; abstract;
 
     property ConnectionDefName: string read GetConnectionDefName;
     property Schema: IioDBBuilderSchema read GetSchema;
@@ -509,7 +509,7 @@ begin
         CreateTable(LTable);
       stUpdate:
         // Index-only and FK-only changes are skipped: indexes and foreign keys
-        // are always handled separately in GenerateDatabaseObjects.
+        // are always handled separately in GenerateScript.
         if not (LTable.Changes <= [taIndexes, taForeignKeys]) then
           AlterTable(LTable);
     end;
@@ -602,7 +602,7 @@ begin
 
   Script.ScriptBegin(ConnectionDefName, SqlGenerator.DBMSInfo);
 
-  GenerateDatabaseObjects;
+  GenerateScript;
 
   Script.ScriptEnd;
 end;
@@ -613,7 +613,7 @@ begin
 
   Script.ScriptBegin(ConnectionDefName, SqlGenerator.DBMSInfo);
 
-  GenerateDatabaseObjects;
+  GenerateScript;
 
   Script.ScriptEnd;
 end;
