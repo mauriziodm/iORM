@@ -238,10 +238,6 @@ type
     /// </summary>
     procedure Warning_NotNullChangeNotAllowed(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
 
-
-
-
-
     procedure GenerateScript; virtual; abstract;
 
     property ConnectionDefName: string read GetConnectionDefName;
@@ -251,8 +247,8 @@ type
   public
     constructor Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator);
 
-    procedure GenerateCreateDatabaseScript; virtual;
-    procedure GenerateUpdateDatabaseScript; virtual;
+    procedure GenerateDatabaseScript; virtual;
+    procedure ForceGenerateCreateDatabaseScript; virtual;
   end;
 
 implementation
@@ -596,10 +592,11 @@ begin
     LIndex.Status := stCreate;
 end;
 
-procedure TioDBBuilderStrategyBase.GenerateCreateDatabaseScript;
+procedure TioDBBuilderStrategyBase.GenerateDatabaseScript;
 begin
-  Schema.Status := stCreate;
-
+  // Status-driven: does NOT touch Schema.Status, it trusts what the DBAnalyzer determined
+  // (stCreate for a brand-new DB, stUpdate for an existing one with changes). GenerateScript
+  // branches internally on Schema.Status, so this single entry point covers both cases.
   Script.ScriptBegin(ConnectionDefName, SqlGenerator.DBMSInfo);
 
   GenerateScript;
@@ -607,9 +604,13 @@ begin
   Script.ScriptEnd;
 end;
 
-procedure TioDBBuilderStrategyBase.GenerateUpdateDatabaseScript;
+procedure TioDBBuilderStrategyBase.ForceGenerateCreateDatabaseScript;
 begin
-  Schema.Status := stUpdate;
+  // Force variant: ignores the analyzed status and produces a coherent full "create from scratch"
+  // script by marking the whole schema tree (schema + tables + fields + indexes + FKs) as stCreate,
+  // mirroring what the DBAnalyzer does on a non-existent DB. For documentation/baseline only: the
+  // resulting script must NOT be executed against an existing database.
+  Schema.MarkAllForCreation;
 
   Script.ScriptBegin(ConnectionDefName, SqlGenerator.DBMSInfo);
 
