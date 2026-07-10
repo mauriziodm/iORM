@@ -51,8 +51,8 @@ type
     // ==========================================================
     // DATABASE RELATED METHODS
     // ----------------------------------------------------------
+    function Check_DatabaseExists: Boolean; override;
     procedure Command_CreateDatabase; override;
-    function Command_DatabaseExists: Boolean; override;
 
     // ==========================================================
     // TABLE RELATED METHODS
@@ -138,7 +138,7 @@ begin
   TioDbFactory.Connection(ConnectionDefName);
 end;
 
-function TioDBBuilderSqlGenSQLite.Command_DatabaseExists: Boolean;
+function TioDBBuilderSqlGenSQLite.Check_DatabaseExists: Boolean;
 begin
   Result := FileExists(TioConnectionManager.GetDatabaseFileName(ConnectionDefName));
 end;

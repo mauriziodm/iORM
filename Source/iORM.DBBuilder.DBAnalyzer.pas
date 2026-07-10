@@ -111,7 +111,7 @@ end;
 procedure TioDBBuilderDBAnalyzer.Analyze;
 begin
   // Analyze if the database exists and set its status
-  if not FStrategy.DatabaseExists then
+  if not FStrategy.Check_DatabaseExists then
     Schema.Status := stCreate;
 
   // Start the transaction (if the DB already exists otherwise an error would occur)
@@ -144,7 +144,7 @@ begin
   for LTable in Schema.Tables.Values do
   begin
     // If the DB is new or the table doesn't exist, mark it as stCreate
-    if (Schema.Status = stCreate) or not FStrategy.TableExists(LTable) then
+    if (Schema.Status = stCreate) or not FStrategy.Check_TableExists(LTable) then
       LTable.Status := stCreate;
     // Always called — handle stCreate tables internally without DB queries
     AnalyzeFields(LTable);
@@ -166,9 +166,9 @@ begin
     // When the table is new, all its fields must be created — no DB query needed
     if ATable.Status = stCreate then
       LField.Status := stCreate
-    else if not FStrategy.FieldExists(ATable, LField) then
+    else if not FStrategy.Check_FieldExists(ATable, LField) then
       LField.Status := stCreate
-    else if FStrategy.FieldModified(ATable, LField) then
+    else if FStrategy.Check_FieldModified(ATable, LField) then
       LField.Status := stUpdate;
 
     if LField.Status > stClean then
@@ -188,9 +188,9 @@ begin
     // When the table is new, all its foreign keys must be created — no DB query needed
     if ATable.Status = stCreate then
       LFK.Status := stCreate
-    else if not FStrategy.ForeignKeyExists(ATable, LFK) then
+    else if not FStrategy.Check_ForeignKeyExists(ATable, LFK) then
       LFK.Status := stCreate
-    else if FStrategy.ForeignKeyModified(ATable, LFK) then
+    else if FStrategy.Check_ForeignKeyModified(ATable, LFK) then
       LFK.Status := stUpdate;
 
     if LFK.Status > stClean then
@@ -210,9 +210,9 @@ begin
     // When the table is new, all its indexes must be created — no DB query needed
     if ATable.Status = stCreate then
       LIndex.Status := stCreate
-    else if not FStrategy.IndexExists(ATable, LIndex) then
+    else if not FStrategy.Check_IndexExists(ATable, LIndex) then
       LIndex.Status := stCreate
-    else if FStrategy.IndexModified(ATable, LIndex) then
+    else if FStrategy.Check_IndexModified(ATable, LIndex) then
       LIndex.Status := stUpdate;
 
     if LIndex.Status > stClean then

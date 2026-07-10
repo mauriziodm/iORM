@@ -214,7 +214,7 @@ begin
     raise EioDBBuilderException.Create(ClassName, 'CreateDatabase', 'Unable to create database: schema not analyzed');
 
   LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator);
-  LStrategy.CreateDatabase;
+  LStrategy.ScriptWrite_CreateDatabase;
 end;
 
 procedure TioDBBuilderEngine.CreateOrUpdateDB(const Force: Boolean; const AScript: IioDBBuilderSqlScript);
@@ -282,10 +282,10 @@ begin
   FSchema.Script.Clear;
   LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator);
 
-  LStrategy.CreateTable(ATable);
+  LStrategy.ScriptWrite_CreateTable(ATable);
 
   if AddForeignKeys then
-    LStrategy.CreateTableForeignKeys(ATable);
+    LStrategy.ScriptWrite_CreateTableForeignKeys(ATable);
 
   TioDBFactory.Script(FConnectionDefName, FSchema.Script.Lines).Execute;
 end;
@@ -304,7 +304,7 @@ begin
   FSchema.Script.Clear;
   LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator);
 
-  LStrategy.AlterTable(ATable);
+  LStrategy.ScriptWrite_AlterTable(ATable);
   TioDBFactory.Script(FConnectionDefName, FSchema.Script.Lines).Execute;
 end;
 
@@ -337,7 +337,7 @@ end;
 
 procedure TioDBBuilderEngine_New.CreateDatabasePhys;
 begin
-  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).CreateDatabase;
+  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).ScriptWrite_CreateDatabase;
 end;
 
 procedure TioDBBuilderEngine_New.CreateOrUpdateDB(const AForce: Boolean);
@@ -369,9 +369,9 @@ begin
 
   case LTable.Status of
     stUpdate:
-      LStrategy.CreateTable(LTable);
+      LStrategy.ScriptWrite_CreateTable(LTable);
     stCreate:
-      LStrategy.AlterTable(LTable);
+      LStrategy.ScriptWrite_AlterTable(LTable);
   end;
 
   TioDBFactory.Script(FConnectionDefName, FSchema.Script.Lines).Execute;

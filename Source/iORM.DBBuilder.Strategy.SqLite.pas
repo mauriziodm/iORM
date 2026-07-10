@@ -12,20 +12,34 @@ uses
 type
   TioDBBuilderStrategySqLite = class(TioDBBuilderStrategyWithoutAlterTable)
   protected
-    // Constraint deferral hooks
-    procedure BeginDeferConstraints; override;
-    procedure EndDeferConstraints; override;
-    // Tables
-    procedure CreateTable(const ATable: IioDBBuilderSchemaTable); override;
-    // Fields
-    function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
-    function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
-    // Indexes
-    function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
-    function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
-    // ForeignKeys
-    function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
-    function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
+    // ==========================================================
+    // CONSTRAINT DEFERRAL HOOKS
+    // ----------------------------------------------------------
+    procedure ScriptWrite_BeginDeferConstraints; override;
+    procedure ScriptWrite_EndDeferConstraints; override;
+
+    // ==========================================================
+    // TABLE RELATED METHODS
+    // ----------------------------------------------------------
+    procedure ScriptWrite_CreateTable(const ATable: IioDBBuilderSchemaTable); override;
+
+    // ==========================================================
+    // FIELD RELATED METHODS
+    // ----------------------------------------------------------
+    function Check_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
+    function Check_FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
+
+    // ==========================================================
+    // INDEX RELATED METHODS
+    // ----------------------------------------------------------
+    function Check_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
+    function Check_IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
+
+    // ==========================================================
+    // FOREIGN KEY RELATED METHODS
+    // ----------------------------------------------------------
+    function Check_ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
+    function Check_ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
   public
 
   end;
@@ -45,14 +59,14 @@ uses
 
 { TioDBBuilderSqLite }
 
-procedure TioDBBuilderStrategySqLite.BeginDeferConstraints;
+procedure TioDBBuilderStrategySqLite.ScriptWrite_BeginDeferConstraints;
 begin
   Script.Body.AddEmpty;
   Script.Body.AddComment('Before we start: defer foreign key checks to avoid errors during table rebuild');
   Script.Body.Add('PRAGMA defer_foreign_keys=on;');
 end;
 
-procedure TioDBBuilderStrategySqLite.EndDeferConstraints;
+procedure TioDBBuilderStrategySqLite.ScriptWrite_EndDeferConstraints;
 begin
   Script.Body.AddEmpty;
   Script.Body.AddComment('At the end: restore normal foreign key checks');
@@ -60,7 +74,7 @@ begin
   Script.Body.AddEmpty;
 end;
 
-procedure TioDBBuilderStrategySqLite.CreateTable(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategySqLite.ScriptWrite_CreateTable(const ATable: IioDBBuilderSchemaTable);
 var
   LComma: string;
   LField: IioDBBuilderSchemaField;
@@ -79,13 +93,13 @@ begin
   // Note: for SQLite, FKs are inline in the CREATE TABLE statement.
   // ifmEnabled and ifmEnabledStrict behave identically here.
   if Schema.ForeignKeysMode <> ifmDisabled then
-    CreateTableForeignKeys(ATable);
+    ScriptWrite_CreateTableForeignKeys(ATable);
 
   Script.Body.DecIndent;
   Script.Body.Add(SqlGenerator.BuildSQL_EndCreateTable(ATable));
 end;
 
-function TioDBBuilderStrategySqLite.FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
+function TioDBBuilderStrategySqLite.Check_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
 var
   LQuery: IioQuery;
 begin
@@ -104,7 +118,7 @@ begin
   end;
 end;
 
-function TioDBBuilderStrategySqLite.FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
+function TioDBBuilderStrategySqLite.Check_FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
 var
   LQuery: IioQuery;
   LNewFieldName: string;
@@ -133,10 +147,10 @@ begin
       LNewFieldType := SqlGenerator.Translate_SchemaField_To_FieldType(AField, False);
 
       // Verify if fieldType has been changed and check type affinity
-      Result := Result or IsFieldTypeChanged(ATable, AField, LOldFieldType, LNewFieldType);
+      Result := Result or Check_FieldTypeChanged(ATable, AField, LOldFieldType, LNewFieldType);
 
       // Verify if NotNull is changed
-      Result := Result or IsFieldNotNullChanged(ATable, AField, LOldFieldNotNull, AField.FieldNotNull, True);
+      Result := Result or Check_FieldNotNullChanged(ATable, AField, LOldFieldNotNull, AField.FieldNotNull, True);
 
       // Exit
       Exit;
@@ -145,7 +159,7 @@ begin
   end;
 end;
 
-function TioDBBuilderStrategySqLite.IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
+function TioDBBuilderStrategySqLite.Check_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
 var
   LQuery: IioQuery;
 begin
@@ -153,7 +167,7 @@ begin
   Result := not LQuery.Eof;
 end;
 
-function TioDBBuilderStrategySqLite.IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
+function TioDBBuilderStrategySqLite.Check_IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
 var
   LQueryIndexList: IioQuery;
   LQueryIndexDetails: IioQuery;
@@ -219,7 +233,7 @@ begin
   end;
 end;
 
-function TioDBBuilderStrategySqLite.ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
+function TioDBBuilderStrategySqLite.Check_ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
 var
   LQuery: IioQuery;
 begin
@@ -242,7 +256,7 @@ begin
   end;
 end;
 
-function TioDBBuilderStrategySqLite.ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
+function TioDBBuilderStrategySqLite.Check_ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
 var
   LQuery: IioQuery;
   LOldOnUpdate, LOldOnDelete: string;
@@ -285,7 +299,7 @@ begin
     LQuery.Next;
   end;
 
-  // FK not found - shouldn't happen if ForeignKeyExists was called first
+  // FK not found - shouldn't happen if Check_ForeignKeyExists was called first
   Result := False;
 end;
 

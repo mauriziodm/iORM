@@ -52,6 +52,25 @@ Build order: Runtime (RT) packages first, then Design-Time (DT) packages.
   - `SqlGenerator.*` - SQL generation per database
   - `Strategy.*` - Implementation strategy per database
 
+  **DBBuilder method naming & layout convention** (applies to the `SqlGenerator.*` and
+  `Strategy.*` families — apply it automatically to any new/edited method, no need to be asked):
+  - A method's **prefix encodes its ROLE**.
+    - SqlGenerator: `Command_` (executes DDL), `Check_` (runtime catalog/existence query → Boolean),
+      `BuildSQL_` (returns a SQL string, no side effect), `Supports_` (capability flag),
+      `Translate_<Src>_To_<Tgt>` (schema element → SQL fragment/identifier).
+    - Strategy: `Process_` (orchestration / mode dispatch), `ScriptWrite_` (emits one DDL/DML
+      statement into `Script.Body`), `Force_` (drop that bypasses the configured mode), `Check_`
+      (catalog/change query → Boolean), `Warning_`/`Hint_` (diagnostics), `GenerateScript_`
+      (public entry point).
+  - Boolean predicates and plain accessors are sanctioned exceptions (`Get*`, `Is*`, `Load*`, etc.).
+  - **Layout**: methods are grouped under domain banners
+    (`DATABASE`/`TABLE`/`FIELD`/`INDEX`/`SEQUENCE`/`FOREIGN KEY`/…) and kept **alphabetical within
+    each group**, in the interfaces AND every class declaration section (derived classes use the
+    same full `// ===` banners). This governs declarations only — implementation order is free.
+  - **Authoritative source**: the `{ Naming convention ... }` banner at the top of the `protected`
+    section in `iORM.DBBuilder.SqlGenerator.Base.pas` and `iORM.DBBuilder.Strategy.Base.pas`. Keep
+    those two banners and this note in sync when the convention evolves.
+
 - **ETM (Entity Tracking Manager)** (`iORM.ETM.*`): Audit trail and change tracking
 
 - **MVVM** (`iORM.MVVM.*`): ViewModels, Views, Model binding, VM actions

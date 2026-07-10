@@ -371,10 +371,10 @@ type
     // ==========================================================
     // DATABASE RELATED METHODS
     // ----------------------------------------------------------
+    /// <summary>Checks if database exists</summary>
+    function Check_DatabaseExists: Boolean;
     /// <summary>Creates the database</summary>
     procedure Command_CreateDatabase;
-    /// <summary>Checks if database exists</summary>
-    function Command_DatabaseExists: Boolean;
 
     // ==========================================================
     // TABLE RELATED METHODS
@@ -594,26 +594,41 @@ type
 
   IioDBBuilderStrategy = interface
     ['{4187C897-A5C6-4807-87D0-C466D3EE34CE}']
-    procedure AlterTable(const ATable: IioDBBuilderSchemaTable);
-    procedure CreateDatabase;
-    procedure CreateTable(const ATable: IioDBBuilderSchemaTable);
-    procedure CreateOrAlterTableIndexes(const ATable: IioDBBuilderSchemaTable);
-    procedure CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable);
-    function DatabaseExists: Boolean;
-    function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
-    function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
-    function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
-    function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
-    function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
-    function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
-    function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean;
+    // ==========================================================
+    // DATABASE RELATED METHODS
+    // ----------------------------------------------------------
+    function Check_DatabaseExists: Boolean;
+    procedure ScriptWrite_CreateDatabase;
 
-    /// <summary>
-    ///  Generates the SQL script based on the schema status determined by the DBAnalyzer
-    ///  (creates a new database or updates the existing one accordingly). Trusts the analyzed
-    ///  status: it does NOT force it.
-    /// </summary>
-    procedure GenerateScript_Sync;
+    // ==========================================================
+    // TABLE RELATED METHODS
+    // ----------------------------------------------------------
+    function Check_TableExists(const ATable: IioDBBuilderSchemaTable): Boolean;
+    procedure ScriptWrite_AlterTable(const ATable: IioDBBuilderSchemaTable);
+    procedure ScriptWrite_CreateTable(const ATable: IioDBBuilderSchemaTable);
+
+    // ==========================================================
+    // FIELD RELATED METHODS
+    // ----------------------------------------------------------
+    function Check_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
+    function Check_FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
+
+    // ==========================================================
+    // INDEX RELATED METHODS
+    // ----------------------------------------------------------
+    function Check_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
+    function Check_IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
+
+    // ==========================================================
+    // FOREIGN KEY RELATED METHODS
+    // ----------------------------------------------------------
+    function Check_ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
+    function Check_ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
+    procedure ScriptWrite_CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable);
+
+    // ==========================================================
+    // ENTRY POINTS
+    // ----------------------------------------------------------
     /// <summary>
     ///  Forces the generation of a full "create from scratch" SQL script regardless of the actual
     ///  database state, by marking the whole schema (tables, fields, indexes, foreign keys) as
@@ -621,6 +636,12 @@ type
     ///  script must NOT be executed against an existing database.
     /// </summary>
     procedure GenerateScript_ForceCreate;
+    /// <summary>
+    ///  Generates the SQL script based on the schema status determined by the DBAnalyzer
+    ///  (creates a new database or updates the existing one accordingly). Trusts the analyzed
+    ///  status: it does NOT force it.
+    /// </summary>
+    procedure GenerateScript_Sync;
   end;
 
   IioDBBuilderDBAnalyzer = interface

@@ -71,6 +71,7 @@ type
       -------------------------------------------------------------------------------------------
       A method's prefix encodes its ROLE, independently of whether it is exposed on the interface:
         Command_*                        executes DDL against the database (side-effect)
+        Check_*                          interrogates the DB catalog at runtime, returns Boolean
         BuildSQL_*                       returns a SQL string, no side-effect
         Supports_*                       boolean DBMS capability flag
         Translate_<Source>_To_<Target>   maps a schema element to a SQL fragment / identifier
@@ -86,8 +87,8 @@ type
     // ==========================================================
     // DATABASE RELATED METHODS
     // ----------------------------------------------------------
+    function Check_DatabaseExists: Boolean; virtual;
     procedure Command_CreateDatabase; virtual;
-    function Command_DatabaseExists: Boolean; virtual;
 
     // ==========================================================
     // TABLE RELATED METHODS
@@ -271,7 +272,9 @@ type
     /// <exception cref="EioGenericException">Raised if AIdentifierName is empty or AMaxLength is not positive</exception>
     function ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
 
-    // Properties
+    // ==========================================================
+    // PROPERTIES
+    // ----------------------------------------------------------
     property ConnectionDefName: string read FConnectionDefName;
     property DataConverter: TioSqlDataConverterRef read FDataConverter;
     property DBMSInfo: IioDBBuilderSchemaRDBMSInfo read GetDBMSInfo;
@@ -548,9 +551,9 @@ begin
   RaiseNotImplemented('Command_CreateDatabase');
 end;
 
-function TioDBBuilderSqlGenBase.Command_DatabaseExists: Boolean;
+function TioDBBuilderSqlGenBase.Check_DatabaseExists: Boolean;
 begin
-  RaiseNotImplemented('Command_DatabaseExists');
+  RaiseNotImplemented('Check_DatabaseExists');
 end;
 
 function TioDBBuilderSqlGenBase.BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string;

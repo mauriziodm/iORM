@@ -54,8 +54,8 @@ type
     // ==========================================================
     // DATABASE RELATED METHODS
     // ----------------------------------------------------------
+    function Check_DatabaseExists: Boolean; override;
     procedure Command_CreateDatabase; override;
-    function Command_DatabaseExists: Boolean; override;
 
     // ==========================================================
     // TABLE RELATED METHODS
@@ -168,7 +168,7 @@ begin
   TioDbFactory.ConnectionManager.GetConnectionDefByName(ConnectionDefName).Params.Values['OpenMode'] := 'Open';
 end;
 
-function TioDBBuilderSqlGenFirebird.Command_DatabaseExists: Boolean;
+function TioDBBuilderSqlGenFirebird.Check_DatabaseExists: Boolean;
 var
   LOldOpenMode: string;
 begin

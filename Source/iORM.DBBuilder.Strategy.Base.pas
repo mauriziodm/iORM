@@ -55,126 +55,141 @@ type
     // Helper method for existence queries (common pattern)
     function _ExecuteExistsQuery(const ASql: string): Boolean;
   protected
+    { Naming convention (role-based prefixes, mirrors the SqlGenerator family - see
+      iORM.DBBuilder.SqlGenerator.Base). A method's prefix encodes its ROLE within the
+      DB-sync workflow, independently of whether it is exposed on IioDBBuilderStrategy:
+        GenerateScript_*     public entry point (Sync / ForceCreate)
+        Process_*            orchestration: iterates the schema or dispatches by mode
+        ScriptWrite_*        emits a single DDL/DML statement into Script.Body
+        Force_*              drop mechanic that bypasses the configured Indexes/FK mode
+        Check_*              interrogates the DB catalog / detects a change, returns Boolean
+        Warning_* / Hint_*   diagnostics appended to Script.Warnings / Script.Hints
+      Plain accessors and private helpers are sanctioned exceptions and keep plain Delphi
+      verb naming (Get*, _ExecuteExistsQuery). Interface membership is orthogonal to the prefix.
+      Layout (mirrors the SqlGenerator family): methods are grouped under domain banners
+      (DATABASE / TABLE / FIELD / INDEX / SEQUENCE / FOREIGN KEY / ...) and kept alphabetical
+      within each group. This applies to the declarations (IioDBBuilderStrategy + every class
+      section: derived strategies use the same banners); implementations are not ordered. }
+
     // ==========================================================
     // DATABASE RELATED METHODS
     // ----------------------------------------------------------
-    procedure CreateDatabase; virtual;
-    function DatabaseExists: Boolean; virtual;
+    function Check_DatabaseExists: Boolean; virtual;
+    procedure ScriptWrite_CreateDatabase; virtual;
 
     // ==========================================================
     // TABLE RELATED METHODS
     // ----------------------------------------------------------
-    procedure AlterTable(const ATable: IioDBBuilderSchemaTable); virtual;
-    procedure CreateOrAlterTables; virtual;
-    procedure CreateTable(const ATable: IioDBBuilderSchemaTable); virtual;
-    function TableExists(const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
+    function Check_TableExists(const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
+    procedure Process_Tables; virtual;
+    procedure ScriptWrite_AlterTable(const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure ScriptWrite_CreateTable(const ATable: IioDBBuilderSchemaTable); virtual;
 
     // ==========================================================
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
-    procedure CreateOrAlterFields(const ATable: IioDBBuilderSchemaTable); virtual;
-    function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
-    function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
-    // Field change detection methods (common to all databases)
-    function IsFieldTypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String): Boolean; virtual;
-    function IsFieldNotNullChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AIsPermitted: Boolean): Boolean; virtual;
-    function IsFieldBlobSubtypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldBlobSubtype, ANewBlobSubtype: String; const AIsPermitted: Boolean): Boolean; virtual;
+    function Check_FieldBlobSubtypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldBlobSubtype, ANewBlobSubtype: String; const AIsPermitted: Boolean): Boolean; virtual;
+    function Check_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
+    function Check_FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; virtual; abstract;
+    function Check_FieldNotNullChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AIsPermitted: Boolean): Boolean; virtual;
+    function Check_FieldTypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String): Boolean; virtual;
+    procedure Process_Fields(const ATable: IioDBBuilderSchemaTable); virtual;
 
     // ==========================================================
     // INDEX RELATED METHODS
     // ----------------------------------------------------------
-    procedure CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex); virtual;
-    procedure CreateOrAlterIndexes; virtual;
-    procedure CreateOrAlterTableIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
+    function Check_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; virtual; abstract;
+    function Check_IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; virtual; abstract;
+    /// <summary>
+    /// Drops the indexes of a single table by querying the actual DB catalog
+    /// and marks all schema indexes for the table as stCreate so they get
+    /// recreated by Process_Indexes.
+    /// Force variant: this method does NOT consult Schema.IndexesMode — it
+    /// always operates. Every index physically present on the table is dropped,
+    /// including orphans (no longer in the schema) and manually added ones.
+    /// </summary>
+    procedure Force_DropTableIndexesFromDB(const ATable: IioDBBuilderSchemaTable); virtual;
+    /// <summary>
+    /// Drops the indexes of a single table based on the schema definitions
+    /// (only indexes still present in the schema are dropped) and marks them
+    /// as stCreate so they get recreated by Process_Indexes.
+    /// Force variant: this method does NOT consult Schema.IndexesMode — it
+    /// always operates. Orphans (indexes in DB but not in schema) and manually
+    /// added indexes are left untouched.
+    /// </summary>
+    procedure Force_DropTableIndexesFromSchema(const ATable: IioDBBuilderSchemaTable); virtual;
     /// <summary>
     /// Mode-aware drop of all indexes of a single table.
     /// Dispatches to the appropriate Force* mechanic based on Schema.IndexesMode:
     ///   ifmDisabled: raises EioDBBuilderException — index management is disabled
     ///     by configuration, an explicit drop request is a configuration conflict.
-    ///   ifmEnabled (conservative): calls ForceDropTableIndexesFromSchema —
+    ///   ifmEnabled (conservative): calls Force_DropTableIndexesFromSchema —
     ///     drops only indexes still defined in the schema, leaves orphans untouched.
-    ///   ifmEnabledStrict: calls ForceDropTableIndexesFromDB —
+    ///   ifmEnabledStrict: calls Force_DropTableIndexesFromDB —
     ///     drops every index physically present in the DB for this table,
     ///     including orphans and manually-added ones.
     /// Intended as the public API for callers that want the configured mode to
     /// govern the operation. Internal sync flows that know which mechanic they
     /// need can call the Force* methods directly instead.
     /// </summary>
-    procedure DropTableIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
-    procedure DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex); virtual;
-    procedure DropIndexByName(const AIndexName: string); virtual;
-    /// <summary>
-    /// Drops the indexes of a single table based on the schema definitions
-    /// (only indexes still present in the schema are dropped) and marks them
-    /// as stCreate so they get recreated by CreateOrAlterIndexes.
-    /// Force variant: this method does NOT consult Schema.IndexesMode — it
-    /// always operates. Orphans (indexes in DB but not in schema) and manually
-    /// added indexes are left untouched.
-    /// </summary>
-    procedure ForceDropTableIndexesFromSchema(const ATable: IioDBBuilderSchemaTable); virtual;
-    /// <summary>
-    /// Drops the indexes of a single table by querying the actual DB catalog
-    /// and marks all schema indexes for the table as stCreate so they get
-    /// recreated by CreateOrAlterIndexes.
-    /// Force variant: this method does NOT consult Schema.IndexesMode — it
-    /// always operates. Every index physically present on the table is dropped,
-    /// including orphans (no longer in the schema) and manually added ones.
-    /// </summary>
-    procedure ForceDropTableIndexesFromDB(const ATable: IioDBBuilderSchemaTable); virtual;
-    function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; virtual; abstract;
-    function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; virtual; abstract;
+    procedure Process_DropTableIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure Process_Indexes; virtual;
+    procedure Process_TableIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure ScriptWrite_CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex); virtual;
+    procedure ScriptWrite_DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex); virtual;
+    procedure ScriptWrite_DropIndexByName(const AIndexName: string); virtual;
 
     // ==========================================================
     // SEQUENCE RELATED METHODS
     // ----------------------------------------------------------
-    function SequenceExists(const ASequenceName: string): Boolean; virtual;
-    procedure CreateTableSequence(const ATable: IioDBBuilderSchemaTable); virtual;
+    function Check_SequenceExists(const ASequenceName: string): Boolean; virtual;
+    procedure ScriptWrite_CreateTableSequence(const ATable: IioDBBuilderSchemaTable); virtual;
 
     // ==========================================================
     // FOREIGN KEY RELATED METHODS
     // ----------------------------------------------------------
-    procedure CreateForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK); virtual;
-    procedure CreateOrAlterForeignKeys; virtual;
-    procedure CreateOrAlterTableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
-    procedure CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
-    procedure DropForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK); virtual;
-    procedure DropForeignKeyByName(const ATableName, AForeignKeyName: string); virtual;
+    function Check_ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
+    function Check_ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
+    /// <summary>
+    /// Drops the FKs of a single table by querying the actual DB catalog and
+    /// marks all schema FKs for the table as stCreate so they get recreated
+    /// by Process_ForeignKeys.
+    /// Force variant: this method does NOT consult Schema.ForeignKeysMode — it
+    /// always operates. Every FK physically present on the table is dropped,
+    /// including orphans (FKs whose structural properties changed and produced
+    /// a new hash name) and manually added ones.
+    /// </summary>
+    procedure Force_DropTableForeignKeysFromDB(const ATable: IioDBBuilderSchemaTable); virtual;
+    /// <summary>
+    /// Drops the FKs of a single table based on the schema definitions
+    /// (only FKs still present in the schema are dropped) and marks them as
+    /// stCreate so they get recreated by Process_ForeignKeys.
+    /// Force variant: this method does NOT consult Schema.ForeignKeysMode — it
+    /// always operates. Orphans (FKs in DB but not in schema) and manually
+    /// added FKs are left untouched.
+    /// </summary>
+    procedure Force_DropTableForeignKeysFromSchema(const ATable: IioDBBuilderSchemaTable); virtual;
     /// <summary>
     /// Mode-aware drop of all foreign keys of a single table.
     /// Dispatches to the appropriate Force* mechanic based on Schema.ForeignKeysMode:
     ///   ifmDisabled: raises EioDBBuilderException — FK management is disabled
     ///     by configuration, an explicit drop request is a configuration conflict.
-    ///   ifmEnabled (conservative): calls ForceDropTableForeignKeysFromSchema —
+    ///   ifmEnabled (conservative): calls Force_DropTableForeignKeysFromSchema —
     ///     drops only FKs still defined in the schema, leaves orphans untouched.
-    ///   ifmEnabledStrict: calls ForceDropTableForeignKeysFromDB —
+    ///   ifmEnabledStrict: calls Force_DropTableForeignKeysFromDB —
     ///     drops every FK physically present in the DB for this table,
     ///     including orphans and manually-added ones.
     /// Intended as the public API for callers that want the configured mode to
     /// govern the operation. Internal sync flows that know which mechanic they
     /// need can call the Force* methods directly instead.
     /// </summary>
-    procedure DropTableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
-    /// <summary>
-    /// Drops the FKs of a single table based on the schema definitions
-    /// (only FKs still present in the schema are dropped) and marks them as
-    /// stCreate so they get recreated by CreateOrAlterForeignKeys.
-    /// Force variant: this method does NOT consult Schema.ForeignKeysMode — it
-    /// always operates. Orphans (FKs in DB but not in schema) and manually
-    /// added FKs are left untouched.
-    /// </summary>
-    procedure ForceDropTableForeignKeysFromSchema(const ATable: IioDBBuilderSchemaTable); virtual;
-    /// <summary>
-    /// Drops the FKs of a single table by querying the actual DB catalog and
-    /// marks all schema FKs for the table as stCreate so they get recreated
-    /// by CreateOrAlterForeignKeys.
-    /// Force variant: this method does NOT consult Schema.ForeignKeysMode — it
-    /// always operates. Every FK physically present on the table is dropped,
-    /// including orphans (FKs whose structural properties changed and produced
-    /// a new hash name) and manually added ones.
-    /// </summary>
-    procedure ForceDropTableForeignKeysFromDB(const ATable: IioDBBuilderSchemaTable); virtual;
-    function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
-    function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
+    procedure Process_DropTableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure Process_ForeignKeys; virtual;
+    procedure Process_TableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure ScriptWrite_CreateForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK); virtual;
+    procedure ScriptWrite_CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure ScriptWrite_DropForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK); virtual;
+    procedure ScriptWrite_DropForeignKeyByName(const ATableName, AForeignKeyName: string); virtual;
 
     // ==========================================================
     // HINTS RELATED METHODS
@@ -190,7 +205,7 @@ type
     /// <summary>
     /// Emits a hint noting that a field's NOT NULL setting changed from FALSE to
     /// TRUE without a DEFAULT value being specified, which may impact existing
-    /// data. Called by IsFieldNotNullChanged.
+    /// data. Called by Check_FieldNotNullChanged.
     /// </summary>
     procedure Hint_NotNullPotentialDataImpact(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
 
@@ -209,9 +224,15 @@ type
     /// 'blob sub-type') changed from AOldValue to ANewValue but the change is NOT
     /// allowed and will not be applied automatically. This is the generic
     /// "attribute cannot be altered" notice; the caller decides when the change
-    /// is disallowed (e.g. IsFieldBlobSubtypeChanged when AIsPermitted is False).
+    /// is disallowed (e.g. Check_FieldBlobSubtypeChanged when AIsPermitted is False).
     /// </summary>
     procedure Warning_ChangeNotAllowed(const AValueName, AOldValue, ANewValue: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
+    /// <summary>
+    /// Emits a warning stating that a field's NOT NULL setting changed but the
+    /// change cannot be applied automatically by this RDBMS strategy. Called by
+    /// Check_FieldNotNullChanged when the change is not permitted (AIsPermitted False).
+    /// </summary>
+    procedure Warning_NotNullChangeNotAllowed(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
     /// <summary>
     /// Emits a warning when a numeric field attribute (identified by AValueName,
     /// e.g. 'field LENGTH', 'field PRECISION', 'field DECIMALS') is being shrunk,
@@ -228,18 +249,18 @@ type
     /// is obtained from SqlGenerator.GetInvalidFieldTypeConversions; the warning is added only
     /// when the '[AOldFieldType->ANewFieldType]' token is found in that list,
     /// signalling a conversion the database cannot perform safely/automatically.
-    /// Called by IsFieldTypeChanged.
+    /// Called by Check_FieldTypeChanged.
     /// </summary>
     procedure Warning_UnsafeTypeConversion(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String);
-    /// <summary>
-    /// Emits a warning stating that a field's NOT NULL setting changed but the
-    /// change cannot be applied automatically by this RDBMS strategy. Called by
-    /// IsFieldNotNullChanged when the change is not permitted (AIsPermitted False).
-    /// </summary>
-    procedure Warning_NotNullChangeNotAllowed(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
 
+    // ==========================================================
+    // MAIN GENERATION
+    // ----------------------------------------------------------
     procedure GenerateScript; virtual; abstract;
 
+    // ==========================================================
+    // PROPERTIES
+    // ----------------------------------------------------------
     property ConnectionDefName: string read GetConnectionDefName;
     property Schema: IioDBBuilderSchema read GetSchema;
     property Script: IioDBBuilderSqlScript read GetScript;
@@ -247,8 +268,11 @@ type
   public
     constructor Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator);
 
-    procedure GenerateScript_Sync;
+    // ==========================================================
+    // ENTRY POINTS
+    // ----------------------------------------------------------
     procedure GenerateScript_ForceCreate;
+    procedure GenerateScript_Sync;
   end;
 
 implementation
@@ -268,7 +292,7 @@ uses
 
 { TioDBBuilderStrategyBase }
 
-function TioDBBuilderStrategyBase.SequenceExists(const ASequenceName: string): Boolean;
+function TioDBBuilderStrategyBase.Check_SequenceExists(const ASequenceName: string): Boolean;
 var
   LQuery: IioQuery;
 begin
@@ -276,28 +300,28 @@ begin
   Result := LQuery.Fields[0].AsInteger > 0;
 end;
 
-procedure TioDBBuilderStrategyBase.CreateTableSequence(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.ScriptWrite_CreateTableSequence(const ATable: IioDBBuilderSchemaTable);
 begin
   // Precondition: ATable.UsesSequenceForKeyGeneration must be True. The caller
   // is responsible for that check — consistent with how BuildSchemaTable in
   // Schema.Builder gates SequenceAddIfNotExists. Calling this method on an
   // Identity-keyed table would raise EioDBBuilderException via GetSequenceName.
-  if not SequenceExists(ATable.GetSequenceName) then
+  if not Check_SequenceExists(ATable.GetSequenceName) then
     Script.Body.Add(SqlGenerator.BuildSQL_CreateSequence(ATable.GetSequenceName));
 end;
 
-procedure TioDBBuilderStrategyBase.CreateOrAlterForeignKeys;
+procedure TioDBBuilderStrategyBase.Process_ForeignKeys;
 var
   LTable: IioDBBuilderSchemaTable;
 begin
   for LTable in Schema.Tables.Values do
   begin
     if taForeignKeys in LTable.Changes then
-      CreateOrAlterTableForeignKeys(LTable);
+      Process_TableForeignKeys(LTable);
   end;
 end;
 
-procedure TioDBBuilderStrategyBase.DropTableForeignKeys(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.Process_DropTableForeignKeys(const ATable: IioDBBuilderSchemaTable);
 begin
   // Mode-aware dispatcher: routes to the Force* mechanic appropriate for the
   // current Schema.ForeignKeysMode. The Force* methods bypass mode checks and
@@ -307,17 +331,17 @@ begin
     ifmDisabled:
       // Drop is incompatible with the configured intent ("do not manage FKs").
       // Raise rather than silently no-op so the caller gets immediate feedback.
-      raise EioDBBuilderException.Create(ClassName, 'DropTableForeignKeys',
+      raise EioDBBuilderException.Create(ClassName, 'Process_DropTableForeignKeys',
         'Foreign key management is disabled (ForeignKeysMode = ifmDisabled), ' +
-        'cannot perform DropTableForeignKeys on table ''' + ATable.Name + '''.');
+        'cannot perform Process_DropTableForeignKeys on table ''' + ATable.Name + '''.');
     ifmEnabled:
-      ForceDropTableForeignKeysFromSchema(ATable);
+      Force_DropTableForeignKeysFromSchema(ATable);
     ifmEnabledStrict:
-      ForceDropTableForeignKeysFromDB(ATable);
+      Force_DropTableForeignKeysFromDB(ATable);
   end;
 end;
 
-procedure TioDBBuilderStrategyBase.ForceDropTableForeignKeysFromSchema(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.Force_DropTableForeignKeysFromSchema(const ATable: IioDBBuilderSchemaTable);
 var
   LFK: IioDBBuilderSchemaFK;
 begin
@@ -327,16 +351,16 @@ begin
   // semantic when this mechanic is selected.
   for LFK in ATable.ForeignKeys.Values do
   begin
-    if ForeignKeyExists(ATable, LFK) then
+    if Check_ForeignKeyExists(ATable, LFK) then
     begin
-      DropForeignKey(ATable, LFK);
-      // Mark dropped FKs as stCreate so CreateOrAlterForeignKeys recreates them.
+      ScriptWrite_DropForeignKey(ATable, LFK);
+      // Mark dropped FKs as stCreate so Process_ForeignKeys recreates them.
       LFK.Status := stCreate;
     end;
   end;
 end;
 
-procedure TioDBBuilderStrategyBase.ForceDropTableForeignKeysFromDB(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.Force_DropTableForeignKeysFromDB(const ATable: IioDBBuilderSchemaTable);
 var
   LQuery: IioQuery;
   LFK: IioDBBuilderSchemaFK;
@@ -351,11 +375,11 @@ begin
   LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FKList(ATable.Name), True);
   while not LQuery.Eof do
   begin
-    DropForeignKeyByName(ATable.Name, LQuery.Fields[1].AsString.Trim);
+    ScriptWrite_DropForeignKeyByName(ATable.Name, LQuery.Fields[1].AsString.Trim);
     LQuery.Next;
   end;
 
-  // Mark all schema FKs as stCreate so they get recreated by CreateOrAlterForeignKeys.
+  // Mark all schema FKs as stCreate so they get recreated by Process_ForeignKeys.
   for LFK in ATable.ForeignKeys.Values do
     LFK.Status := stCreate;
 end;
@@ -366,7 +390,7 @@ end;
 /// dropped first and then recreated. FKs of new tables already have stCreate status
 /// because the analyzer sets it without querying the DB.
 /// </summary>
-procedure TioDBBuilderStrategyBase.CreateOrAlterTableForeignKeys(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.Process_TableForeignKeys(const ATable: IioDBBuilderSchemaTable);
 var
   LFK: IioDBBuilderSchemaFK;
 begin
@@ -377,9 +401,9 @@ begin
       Continue;
     // Drop the existing FK first when it needs to be recreated with changes
     if LFK.Status = stUpdate then
-      DropForeignKey(ATable, LFK);
+      ScriptWrite_DropForeignKey(ATable, LFK);
     // Create the FK (both for new and modified ones)
-    CreateForeignKey(ATable, LFK);
+    ScriptWrite_CreateForeignKey(ATable, LFK);
   end;
 end;
 
@@ -388,18 +412,18 @@ end;
 /// This covers both new tables (whose indexes are set to stCreate by the analyzer)
 /// and existing tables with new or modified indexes.
 /// </summary>
-procedure TioDBBuilderStrategyBase.CreateOrAlterIndexes;
+procedure TioDBBuilderStrategyBase.Process_Indexes;
 var
   LTable: IioDBBuilderSchemaTable;
 begin
   for LTable in Schema.Tables.Values do
   begin
     if taIndexes in LTable.Changes then
-      CreateOrAlterTableIndexes(LTable);
+      Process_TableIndexes(LTable);
   end;
 end;
 
-procedure TioDBBuilderStrategyBase.AlterTable(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.ScriptWrite_AlterTable(const ATable: IioDBBuilderSchemaTable);
 begin
   Script.Body.AddTitle(Format('Altering table ''%s''', [ATable.Name]));
 end;
@@ -423,35 +447,35 @@ begin
   Result := Schema.Script;
 end;
 
-procedure TioDBBuilderStrategyBase.CreateDatabase;
+procedure TioDBBuilderStrategyBase.ScriptWrite_CreateDatabase;
 begin
   SqlGenerator.Command_CreateDatabase;
 end;
 
-function TioDBBuilderStrategyBase.DatabaseExists: Boolean;
+function TioDBBuilderStrategyBase.Check_DatabaseExists: Boolean;
 begin
-  Result := SqlGenerator.Command_DatabaseExists;
+  Result := SqlGenerator.Check_DatabaseExists;
 end;
 
-procedure TioDBBuilderStrategyBase.CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.ScriptWrite_CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable);
 var
   LForeignKey: IioDBBuilderSchemaFK;
 begin
   for LForeignKey in ATable.ForeignKeys.Values do
-    CreateForeignKey(ATable, LForeignKey);
+    ScriptWrite_CreateForeignKey(ATable, LForeignKey);
 end;
 
-procedure TioDBBuilderStrategyBase.CreateForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK);
+procedure TioDBBuilderStrategyBase.ScriptWrite_CreateForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK);
 begin
   Script.Body.Add(SqlGenerator.BuildSQL_CreateFK(ATable, AForeignKey));
 end;
 
-procedure TioDBBuilderStrategyBase.DropForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK);
+procedure TioDBBuilderStrategyBase.ScriptWrite_DropForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK);
 begin
   Script.Body.Add(SqlGenerator.BuildSQL_DropFK(ATable, AForeignKey));
 end;
 
-procedure TioDBBuilderStrategyBase.DropForeignKeyByName(const ATableName, AForeignKeyName: string);
+procedure TioDBBuilderStrategyBase.ScriptWrite_DropForeignKeyByName(const ATableName, AForeignKeyName: string);
 begin
   Script.Body.Add(SqlGenerator.BuildSQL_DropFKbyName(ATableName, AForeignKeyName));
 end;
@@ -462,7 +486,7 @@ end;
 /// are dropped first and then recreated. Indexes of new tables already have stCreate
 /// status because the analyzer sets it without querying the DB.
 /// </summary>
-procedure TioDBBuilderStrategyBase.CreateOrAlterTableIndexes(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.Process_TableIndexes(const ATable: IioDBBuilderSchemaTable);
 var
   LIndex: IioDBBuilderSchemaIndex;
 begin
@@ -473,13 +497,13 @@ begin
       Continue;
     // Drop the existing index first when it needs to be recreated with changes
     if LIndex.Status = stUpdate then
-      DropIndex(ATable, LIndex);
+      ScriptWrite_DropIndex(ATable, LIndex);
     // Create the index (both for new and modified ones)
-    CreateIndex(ATable, LIndex);
+    ScriptWrite_CreateIndex(ATable, LIndex);
   end;
 end;
 
-procedure TioDBBuilderStrategyBase.CreateOrAlterFields(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.Process_Fields(const ATable: IioDBBuilderSchemaTable);
 var
   LField: IioDBBuilderSchemaField;
 begin
@@ -494,7 +518,7 @@ begin
   end;
 end;
 
-procedure TioDBBuilderStrategyBase.CreateOrAlterTables;
+procedure TioDBBuilderStrategyBase.Process_Tables;
 var
   LTable: IioDBBuilderSchemaTable;
 begin
@@ -502,37 +526,37 @@ begin
   begin
     case LTable.Status of
       stCreate:
-        CreateTable(LTable);
+        ScriptWrite_CreateTable(LTable);
       stUpdate:
         // Index-only and FK-only changes are skipped: indexes and foreign keys
         // are always handled separately in GenerateScript.
         if not (LTable.Changes <= [taIndexes, taForeignKeys]) then
-          AlterTable(LTable);
+          ScriptWrite_AlterTable(LTable);
     end;
   end;
 end;
 
-procedure TioDBBuilderStrategyBase.CreateTable(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.ScriptWrite_CreateTable(const ATable: IioDBBuilderSchemaTable);
 begin
   Script.Body.AddTitle(Format('Creating table ''%s''', [ATable.Name]));
 end;
 
-procedure TioDBBuilderStrategyBase.CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex);
+procedure TioDBBuilderStrategyBase.ScriptWrite_CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex);
 begin
   Script.Body.Add(SqlGenerator.BuildSQL_CreateIndex(ATable, AIndex));
 end;
 
-procedure TioDBBuilderStrategyBase.DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex);
+procedure TioDBBuilderStrategyBase.ScriptWrite_DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex);
 begin
-  DropIndexByName(SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex));
+  ScriptWrite_DropIndexByName(SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex));
 end;
 
-procedure TioDBBuilderStrategyBase.DropIndexByName(const AIndexName: string);
+procedure TioDBBuilderStrategyBase.ScriptWrite_DropIndexByName(const AIndexName: string);
 begin
   Script.Body.Add(SqlGenerator.BuildSQL_DropIndexByName(AIndexName));
 end;
 
-procedure TioDBBuilderStrategyBase.DropTableIndexes(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.Process_DropTableIndexes(const ATable: IioDBBuilderSchemaTable);
 begin
   // Mode-aware dispatcher: routes to the Force* mechanic appropriate for the
   // current Schema.IndexesMode. The Force* methods bypass mode checks and do
@@ -542,17 +566,17 @@ begin
     ifmDisabled:
       // Drop is incompatible with the configured intent ("do not manage indexes").
       // Raise rather than silently no-op so the caller gets immediate feedback.
-      raise EioDBBuilderException.Create(ClassName, 'DropTableIndexes',
+      raise EioDBBuilderException.Create(ClassName, 'Process_DropTableIndexes',
         'Index management is disabled (IndexesMode = ifmDisabled), ' +
-        'cannot perform DropTableIndexes on table ''' + ATable.Name + '''.');
+        'cannot perform Process_DropTableIndexes on table ''' + ATable.Name + '''.');
     ifmEnabled:
-      ForceDropTableIndexesFromSchema(ATable);
+      Force_DropTableIndexesFromSchema(ATable);
     ifmEnabledStrict:
-      ForceDropTableIndexesFromDB(ATable);
+      Force_DropTableIndexesFromDB(ATable);
   end;
 end;
 
-procedure TioDBBuilderStrategyBase.ForceDropTableIndexesFromSchema(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.Force_DropTableIndexesFromSchema(const ATable: IioDBBuilderSchemaTable);
 var
   LIndex: IioDBBuilderSchemaIndex;
 begin
@@ -562,16 +586,16 @@ begin
   // conservative semantic when this mechanic is selected.
   for LIndex in ATable.Indexes.Values do
   begin
-    if IndexExists(ATable, LIndex) then
+    if Check_IndexExists(ATable, LIndex) then
     begin
-      DropIndex(ATable, LIndex);
-      // Mark dropped indexes as stCreate so CreateOrAlterIndexes recreates them.
+      ScriptWrite_DropIndex(ATable, LIndex);
+      // Mark dropped indexes as stCreate so Process_Indexes recreates them.
       LIndex.Status := stCreate;
     end;
   end;
 end;
 
-procedure TioDBBuilderStrategyBase.ForceDropTableIndexesFromDB(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.Force_DropTableIndexesFromDB(const ATable: IioDBBuilderSchemaTable);
 var
   LQuery: IioQuery;
   LIndex: IioDBBuilderSchemaIndex;
@@ -583,11 +607,11 @@ begin
   LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexList(ATable.Name), True);
   while not LQuery.Eof do
   begin
-    DropIndexByName(LQuery.Fields[0].AsString);
+    ScriptWrite_DropIndexByName(LQuery.Fields[0].AsString);
     LQuery.Next;
   end;
 
-  // Mark all schema indexes as stCreate so they get recreated by CreateOrAlterIndexes.
+  // Mark all schema indexes as stCreate so they get recreated by Process_Indexes.
   for LIndex in ATable.Indexes.Values do
     LIndex.Status := stCreate;
 end;
@@ -666,7 +690,7 @@ begin
     [ATable.Name, AField.FieldName]));
 end;
 
-function TioDBBuilderStrategyBase.IsFieldTypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
+function TioDBBuilderStrategyBase.Check_FieldTypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
   const AOldFieldType, ANewFieldType: String): Boolean;
 begin
   Result := not SameText(AOldFieldType, ANewFieldType); // case-insensitive comparison
@@ -677,7 +701,7 @@ begin
   end;
 end;
 
-function TioDBBuilderStrategyBase.IsFieldNotNullChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
+function TioDBBuilderStrategyBase.Check_FieldNotNullChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
   const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AIsPermitted: Boolean): Boolean;
 begin
   // Check if the NOT NULL constraint has changed between the old and new field definitions
@@ -699,7 +723,7 @@ begin
   end;
 end;
 
-function TioDBBuilderStrategyBase.IsFieldBlobSubtypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
+function TioDBBuilderStrategyBase.Check_FieldBlobSubtypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
   const AOldBlobSubtype, ANewBlobSubtype: String; const AIsPermitted: Boolean): Boolean;
 begin
   Result := not SameText(AOldBlobSubtype, ANewBlobSubtype); // case-insensitive comparison
@@ -719,7 +743,7 @@ begin
   Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
 end;
 
-function TioDBBuilderStrategyBase.TableExists(const ATable: IioDBBuilderSchemaTable): Boolean;
+function TioDBBuilderStrategyBase.Check_TableExists(const ATable: IioDBBuilderSchemaTable): Boolean;
 begin
   Result := _ExecuteExistsQuery(SqlGenerator.BuildSQL_TableExists(ATable.Name));
 end;

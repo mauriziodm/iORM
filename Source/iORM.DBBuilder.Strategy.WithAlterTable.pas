@@ -51,23 +51,37 @@ uses
 type
   TioDBBuilderStrategyWithAlterTable = class(TioDBBuilderStrategyBase)
   protected
-    // Tables
-    procedure AlterTable(const ATable: IioDBBuilderSchemaTable); override;
-    procedure CreateTable(const ATable: IioDBBuilderSchemaTable); override;
-    // Fields
-    function FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
-    function FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
-    function IsFieldLengthChanged(const AOldFieldLength, ANewFieldLength: Smallint; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
-    function IsFieldPrecisionChanged(const AOldFieldPrecision, ANewFieldPrecision: Smallint; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
-    function IsFieldDecimalsChanged(const AOldFieldDecimals, ANewFieldDecimals: Smallint; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
-    function IsFieldDefaultChanged(const AOldFieldDefault, ANewFieldDefault: String; const AField: IioDBBuilderSchemaField): Boolean; virtual;
-    // Indexes
-    function IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
-    function IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
-    // ForeignKeys
-    function ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
-    function ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
-    // Main generation
+    // ==========================================================
+    // TABLE RELATED METHODS
+    // ----------------------------------------------------------
+    procedure ScriptWrite_AlterTable(const ATable: IioDBBuilderSchemaTable); override;
+    procedure ScriptWrite_CreateTable(const ATable: IioDBBuilderSchemaTable); override;
+
+    // ==========================================================
+    // FIELD RELATED METHODS
+    // ----------------------------------------------------------
+    function Check_FieldDecimalsChanged(const AOldFieldDecimals, ANewFieldDecimals: Smallint; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
+    function Check_FieldDefaultChanged(const AOldFieldDefault, ANewFieldDefault: String; const AField: IioDBBuilderSchemaField): Boolean; virtual;
+    function Check_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
+    function Check_FieldLengthChanged(const AOldFieldLength, ANewFieldLength: Smallint; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
+    function Check_FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean; override;
+    function Check_FieldPrecisionChanged(const AOldFieldPrecision, ANewFieldPrecision: Smallint; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
+
+    // ==========================================================
+    // INDEX RELATED METHODS
+    // ----------------------------------------------------------
+    function Check_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
+    function Check_IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; override;
+
+    // ==========================================================
+    // FOREIGN KEY RELATED METHODS
+    // ----------------------------------------------------------
+    function Check_ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
+    function Check_ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; override;
+
+    // ==========================================================
+    // MAIN GENERATION
+    // ----------------------------------------------------------
     procedure GenerateScript; override;
 
   public
@@ -90,15 +104,15 @@ uses
 
 { TioDBBuilderStrategyWithAlterTable }
 
-procedure TioDBBuilderStrategyWithAlterTable.AlterTable(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyWithAlterTable.ScriptWrite_AlterTable(const ATable: IioDBBuilderSchemaTable);
 begin
   inherited;
 
   if taFields in ATable.Changes then
-    CreateOrAlterFields(ATable);
+    Process_Fields(ATable);
 end;
 
-procedure TioDBBuilderStrategyWithAlterTable.CreateTable(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyWithAlterTable.ScriptWrite_CreateTable(const ATable: IioDBBuilderSchemaTable);
 var
   LComma: string;
   LField: IioDBBuilderSchemaField;
@@ -107,7 +121,7 @@ begin
 
   // Add sequence only if the table uses Sequence for key generation
   if ATable.UsesSequenceForKeyGeneration then
-    CreateTableSequence(ATable);
+    ScriptWrite_CreateTableSequence(ATable);
 
   Script.Body.AddEmpty;
   Script.Body.Add(SqlGenerator.BuildSQL_BeginCreateTable(ATable));
@@ -127,7 +141,7 @@ begin
   Script.Body.Add(SqlGenerator.BuildSQL_CreatePK(ATable));
 end;
 
-function TioDBBuilderStrategyWithAlterTable.FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
+function TioDBBuilderStrategyWithAlterTable.Check_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
 var
   LQuery: IioQuery;
 begin
@@ -135,7 +149,7 @@ begin
   Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
 end;
 
-function TioDBBuilderStrategyWithAlterTable.FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
+function TioDBBuilderStrategyWithAlterTable.Check_FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
 var
   LQuery: IioQuery;
 
@@ -189,34 +203,34 @@ begin
     LOldFieldDefault := LOldFieldDefault.Substring(8).Trim;
 
   // Verify if fieldType has been changed and check type affinity
-  Result := Result or IsFieldTypeChanged(ATable, AField, LOldFieldType, LNewFieldType);
+  Result := Result or Check_FieldTypeChanged(ATable, AField, LOldFieldType, LNewFieldType);
 
   // Verify if FieldLength is changed
   if 'VARCHAR,CHAR'.Contains(LNewFieldType) or 'VARCHAR,CHAR'.Contains(LOldFieldType) then
-    Result := Result or IsFieldLengthChanged(LOldFieldLength, LNewFieldLength, AField, ATable);
+    Result := Result or Check_FieldLengthChanged(LOldFieldLength, LNewFieldLength, AField, ATable);
 
   if IsDecimalOrNumeric then
   begin
     // Verify if something has been changed in FieldPrecision
-    Result := Result or IsFieldPrecisionChanged(LOldFieldPrecision, LNewFieldPrecision, AField, ATable);
+    Result := Result or Check_FieldPrecisionChanged(LOldFieldPrecision, LNewFieldPrecision, AField, ATable);
     // Verify if something has been changed in FieldDecimals (scale)
-    Result := Result or IsFieldDecimalsChanged(LOldFieldDecimals, LNewFieldDecimals, AField, ATable);
+    Result := Result or Check_FieldDecimalsChanged(LOldFieldDecimals, LNewFieldDecimals, AField, ATable);
   end;
 
   // Verify if DEFAULT setting of the field is changed
-  Result := Result or IsFieldDefaultChanged(LOldFieldDefault, LNewFieldDefault, AField);
+  Result := Result or Check_FieldDefaultChanged(LOldFieldDefault, LNewFieldDefault, AField);
 
   // Verify if NotNull is changed
   // Check if NOT NULL changes are supported by this RDBMS version
-  Result := Result or IsFieldNotNullChanged(ATable, AField, LOldFieldNotNull, AField.FieldNotNull, SqlGenerator.Supports_AlterNotNull);
+  Result := Result or Check_FieldNotNullChanged(ATable, AField, LOldFieldNotNull, AField.FieldNotNull, SqlGenerator.Supports_AlterNotNull);
 
   // Verify if blob subtype is changed
   // Check if BLOB subtype changes are permitted by this RDBMS
   if LNewFieldType.StartsWith('BLOB') then
-    Result := Result or IsFieldBlobSubtypeChanged(ATable, AField, LOldFieldSubtype, LNewFieldSubtype, SqlGenerator.Supports_AlterBlobSubtype);
+    Result := Result or Check_FieldBlobSubtypeChanged(ATable, AField, LOldFieldSubtype, LNewFieldSubtype, SqlGenerator.Supports_AlterBlobSubtype);
 end;
 
-function TioDBBuilderStrategyWithAlterTable.ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
+function TioDBBuilderStrategyWithAlterTable.Check_ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
 var
   LQuery: IioQuery;
 begin
@@ -230,7 +244,7 @@ begin
   Result := not LQuery.Eof;
 end;
 
-function TioDBBuilderStrategyWithAlterTable.ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
+function TioDBBuilderStrategyWithAlterTable.Check_ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
 var
   LQuery: IioQuery;
   LFKName: string;
@@ -248,7 +262,7 @@ begin
   LFKName := SqlGenerator.Translate_SchemaTableAndFK_To_FKName(ATable, AForeignKey);
 
   // Query by FK name: if no record is found, the FK name changed (meaning the structural
-  // properties changed), so we exit and let ForeignKeyExists handle it as a new FK.
+  // properties changed), so we exit and let Check_ForeignKeyExists handle it as a new FK.
   LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FKList(ATable.Name, LFKName), True);
   if LQuery.Eof then
     Exit;
@@ -289,7 +303,7 @@ begin
   // This removes orphaned indexes (including manually-added ones) and ensures
   // a clean slate before the schema-driven recreation.
   // We call the Force* mechanic directly instead of routing through the
-  // mode-aware public DropTableIndexes: the sync flow already knows by
+  // mode-aware public Process_DropTableIndexes: the sync flow already knows by
   // construction that the desired behavior here is the FromDB drop, so going
   // through the dispatcher would be redundant indirection. The Force* naming
   // makes the bypass intent explicit. Indexes and FKs are kept in two distinct
@@ -300,7 +314,7 @@ begin
     Script.Body.AddTitle('Dropping indexes (strict mode)');
     for LTable in Schema.Tables.Values do
       if LTable.Status = stUpdate then
-        ForceDropTableIndexesFromDB(LTable);
+        Force_DropTableIndexesFromDB(LTable);
   end;
 
   // Strict mode (foreign keys): same approach as the indexes block above,
@@ -310,22 +324,22 @@ begin
     Script.Body.AddTitle('Dropping foreign keys (strict mode)');
     for LTable in Schema.Tables.Values do
       if LTable.Status = stUpdate then
-        ForceDropTableForeignKeysFromDB(LTable);
+        Force_DropTableForeignKeysFromDB(LTable);
   end;
 
   // Create new tables or alter existing ones (fields and sequences only)
-  CreateOrAlterTables;
+  Process_Tables;
 
   // Indexes: create/alter based on mode (skipped if disabled)
   if Schema.IndexesMode >= ifmEnabled then
-    CreateOrAlterIndexes;
+    Process_Indexes;
 
   // Foreign keys are processed last so all referenced tables are already created.
   if Schema.ForeignKeysMode >= ifmEnabled then
-    CreateOrAlterForeignKeys;
+    Process_ForeignKeys;
 end;
 
-function TioDBBuilderStrategyWithAlterTable.IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
+function TioDBBuilderStrategyWithAlterTable.Check_IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
 var
   LQueryIndexList: IioQuery;
   LQueryIndexDetails: IioQuery;
@@ -385,7 +399,7 @@ begin
   Result := AIndex.Changes <> [];
 end;
 
-function TioDBBuilderStrategyWithAlterTable.IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
+function TioDBBuilderStrategyWithAlterTable.Check_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
 var
   LQuery: IioQuery;
 begin
@@ -395,7 +409,7 @@ begin
   Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
 end;
 
-function TioDBBuilderStrategyWithAlterTable.IsFieldDefaultChanged(const AOldFieldDefault, ANewFieldDefault: String;
+function TioDBBuilderStrategyWithAlterTable.Check_FieldDefaultChanged(const AOldFieldDefault, ANewFieldDefault: String;
   const AField: IioDBBuilderSchemaField): Boolean;
 begin
   Result := not SameText(AOldFieldDefault, ANewFieldDefault);
@@ -403,7 +417,7 @@ begin
     AField.AddAltered(alFieldDefault);
 end;
 
-function TioDBBuilderStrategyWithAlterTable.IsFieldDecimalsChanged(const AOldFieldDecimals, ANewFieldDecimals: Smallint;
+function TioDBBuilderStrategyWithAlterTable.Check_FieldDecimalsChanged(const AOldFieldDecimals, ANewFieldDecimals: Smallint;
   const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean;
 begin
   Result := AOldFieldDecimals <> ANewFieldDecimals;
@@ -414,7 +428,7 @@ begin
   end;
 end;
 
-function TioDBBuilderStrategyWithAlterTable.IsFieldLengthChanged(const AOldFieldLength, ANewFieldLength: Smallint;
+function TioDBBuilderStrategyWithAlterTable.Check_FieldLengthChanged(const AOldFieldLength, ANewFieldLength: Smallint;
   const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean;
 begin
   Result := ANewFieldLength <> AOldFieldLength;
@@ -430,7 +444,7 @@ begin
   end;
 end;
 
-function TioDBBuilderStrategyWithAlterTable.IsFieldPrecisionChanged(const AOldFieldPrecision, ANewFieldPrecision: Smallint;
+function TioDBBuilderStrategyWithAlterTable.Check_FieldPrecisionChanged(const AOldFieldPrecision, ANewFieldPrecision: Smallint;
   const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable): Boolean;
 begin
   Result := AOldFieldPrecision <> ANewFieldPrecision;
