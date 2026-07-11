@@ -133,7 +133,18 @@ type
     /// need can call the Force* methods directly instead.
     /// </summary>
     procedure Process_DropTableIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
+    /// <summary>
+    /// Generates index SQL for all tables that have index changes (taIndexes in Changes).
+    /// This covers both new tables (whose indexes are set to stCreate by the analyzer)
+    /// and existing tables with new or modified indexes.
+    /// </summary>
     procedure Process_Indexes; virtual;
+    /// <summary>
+    /// Generates the SQL statements to create or recreate the indexes of a single table.
+    /// Only indexes marked as stCreate or stUpdate are processed; modified indexes (stUpdate)
+    /// are dropped first and then recreated. Indexes of new tables already have stCreate
+    /// status because the analyzer sets it without querying the DB.
+    /// </summary>
     procedure Process_TableIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure ScriptWrite_CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex); virtual;
     procedure ScriptWrite_DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex); virtual;
@@ -185,6 +196,12 @@ type
     /// </summary>
     procedure Process_DropTableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure Process_ForeignKeys; virtual;
+    /// <summary>
+    /// Generates the SQL statements to create or recreate the foreign keys of a single table.
+    /// Only FKs marked as stCreate or stUpdate are processed; modified FKs (stUpdate) are
+    /// dropped first and then recreated. FKs of new tables already have stCreate status
+    /// because the analyzer sets it without querying the DB.
+    /// </summary>
     procedure Process_TableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure ScriptWrite_CreateForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK); virtual;
     procedure ScriptWrite_CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
@@ -384,12 +401,6 @@ begin
     LFK.Status := stCreate;
 end;
 
-/// <summary>
-/// Generates the SQL statements to create or recreate the foreign keys of a single table.
-/// Only FKs marked as stCreate or stUpdate are processed; modified FKs (stUpdate) are
-/// dropped first and then recreated. FKs of new tables already have stCreate status
-/// because the analyzer sets it without querying the DB.
-/// </summary>
 procedure TioDBBuilderStrategyBase.Process_TableForeignKeys(const ATable: IioDBBuilderSchemaTable);
 var
   LFK: IioDBBuilderSchemaFK;
@@ -407,11 +418,6 @@ begin
   end;
 end;
 
-/// <summary>
-/// Generates index SQL for all tables that have index changes (taIndexes in Changes).
-/// This covers both new tables (whose indexes are set to stCreate by the analyzer)
-/// and existing tables with new or modified indexes.
-/// </summary>
 procedure TioDBBuilderStrategyBase.Process_Indexes;
 var
   LTable: IioDBBuilderSchemaTable;
@@ -480,12 +486,6 @@ begin
   Script.Body.Add(SqlGenerator.BuildSQL_DropFKbyName(ATableName, AForeignKeyName));
 end;
 
-/// <summary>
-/// Generates the SQL statements to create or recreate the indexes of a single table.
-/// Only indexes marked as stCreate or stUpdate are processed; modified indexes (stUpdate)
-/// are dropped first and then recreated. Indexes of new tables already have stCreate
-/// status because the analyzer sets it without querying the DB.
-/// </summary>
 procedure TioDBBuilderStrategyBase.Process_TableIndexes(const ATable: IioDBBuilderSchemaTable);
 var
   LIndex: IioDBBuilderSchemaIndex;

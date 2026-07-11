@@ -82,6 +82,17 @@ type
     // ==========================================================
     // MAIN GENERATION
     // ----------------------------------------------------------
+    /// <summary>
+    /// Generates the full database update script for RDBMS that support ALTER TABLE.
+    /// The generation flow depends on the IndexesMode and ForeignKeysMode settings:
+    ///   ifmDisabled: indexes/FKs are not managed at all.
+    ///   ifmEnabled (conservative): creates new and updates modified indexes/FKs only.
+    ///     Orphaned indexes/FKs (present in DB but not in schema) are left untouched.
+    ///   ifmEnabledStrict: for every updated table, drops ALL existing indexes/FKs from the
+    ///     DB by querying the catalog, then recreates them from the schema.
+    ///     The schema becomes authoritative and orphans are removed.
+    /// Foreign keys are always processed last to ensure all referenced tables already exist.
+    /// </summary>
     procedure GenerateScript; override;
 
   public
@@ -280,17 +291,6 @@ begin
     Exit(True);
 end;
 
-/// <summary>
-/// Generates the full database update script for RDBMS that support ALTER TABLE.
-/// The generation flow depends on the IndexesMode and ForeignKeysMode settings:
-///   ifmDisabled: indexes/FKs are not managed at all.
-///   ifmEnabled (conservative): creates new and updates modified indexes/FKs only.
-///     Orphaned indexes/FKs (present in DB but not in schema) are left untouched.
-///   ifmEnabledStrict: for every updated table, drops ALL existing indexes/FKs from the
-///     DB by querying the catalog, then recreates them from the schema.
-///     The schema becomes authoritative and orphans are removed.
-/// Foreign keys are always processed last to ensure all referenced tables already exist.
-/// </summary>
 procedure TioDBBuilderStrategyWithAlterTable.GenerateScript;
 var
   LTable: IioDBBuilderSchemaTable;

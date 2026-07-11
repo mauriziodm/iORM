@@ -79,6 +79,20 @@ type
     // ==========================================================
     // MAIN GENERATION
     // ----------------------------------------------------------
+    /// <summary>
+    /// Generates the full database update script for RDBMS without ALTER TABLE support.
+    /// Workflow when updating an existing DB:
+    ///   1. Drop every index of each stUpdate table (queried from the DB, not the schema)
+    ///      so that index names do not collide when the new tables are created.
+    ///   2. Rename each stUpdate table to "_old".
+    ///   3. Create the new tables.
+    ///   4. Recreate indexes from the schema (unless ifmDisabled).
+    ///   5. Copy data from the "_old" tables.
+    /// Foreign keys are handled inline by the CREATE TABLE statement (see derived strategies).
+    /// Note: ifmEnabled and ifmEnabledStrict behave identically here because the rename-create-copy
+    /// pattern already recreates everything from scratch and the index drop always queries the DB.
+    /// Only ifmDisabled prevents index recreation on the new tables.
+    /// </summary>
     procedure GenerateScript; override;
   public
 
@@ -121,20 +135,6 @@ begin
   end;
 end;
 
-/// <summary>
-/// Generates the full database update script for RDBMS without ALTER TABLE support.
-/// Workflow when updating an existing DB:
-///   1. Drop every index of each stUpdate table (queried from the DB, not the schema)
-///      so that index names do not collide when the new tables are created.
-///   2. Rename each stUpdate table to "_old".
-///   3. Create the new tables.
-///   4. Recreate indexes from the schema (unless ifmDisabled).
-///   5. Copy data from the "_old" tables.
-/// Foreign keys are handled inline by the CREATE TABLE statement (see derived strategies).
-/// Note: ifmEnabled and ifmEnabledStrict behave identically here because the rename-create-copy
-/// pattern already recreates everything from scratch and the index drop always queries the DB.
-/// Only ifmDisabled prevents index recreation on the new tables.
-/// </summary>
 procedure TioDBBuilderStrategyWithoutAlterTable.GenerateScript;
 var
   LTable: IioDBBuilderSchemaTable;
