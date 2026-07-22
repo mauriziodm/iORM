@@ -323,7 +323,14 @@ begin
   // is responsible for that check — consistent with how BuildSchemaTable in
   // Schema.Builder gates SequenceAddIfNotExists. Calling this method on an
   // Identity-keyed table would raise EioDBBuilderException via GetSequenceName.
-  if not Check_SequenceExists(ATable.GetSequenceName) then
+  //
+  // When the whole DB is being created from scratch (Schema.Status = stCreate: either a brand-new
+  // empty DB or a force-create documentation/baseline script via MarkAllForCreation) the sequence
+  // cannot pre-exist, so emit it unconditionally: this keeps the create-from-scratch script complete
+  // AND avoids a pointless catalog round-trip. The Check_SequenceExists guard is only needed on the
+  // incremental path (Schema.Status = stUpdate: a new table added to an already existing DB), where
+  // a sequence with the same name might already be present.
+  if (Schema.Status = stCreate) or not Check_SequenceExists(ATable.GetSequenceName) then
     Script.Body.Add(SqlGenerator.BuildSQL_CreateSequence(ATable.GetSequenceName));
 end;
 
