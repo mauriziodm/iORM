@@ -100,8 +100,8 @@ end;
 class function TioDBBuilderFactory.NewSchema(const AConnectionDefName: String; const AIndexesMode,
   AForeignKeysMode: TioDBBuilderIndexesAndFKMode; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchema;
 begin
-  Result := TioDBBuilderSchema.Create(AIndexesMode, AForeignKeysMode, ASqlGenerator);
-  NewSchemaBuilder.BuildSchema(AConnectionDefName, Result);
+  Result := TioDBBuilderSchema.Create(AIndexesMode, AForeignKeysMode);
+  NewSchemaBuilder.BuildSchema(AConnectionDefName, Result, ASqlGenerator);
 end;
 
 class function TioDBBuilderFactory.NewSchemaBuilder: TioDBBuilderSchemaBuilderRef;

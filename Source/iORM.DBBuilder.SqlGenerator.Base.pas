@@ -195,7 +195,7 @@ type
     procedure Hint_KeyGenerationStrategyFallback(const ASchema: IioDBBuilderSchema; const ATable: IioDBBuilderSchemaTable);
     /// <summary>
     /// Resolves the requested key generation strategy to an effective strategy.
-    /// Called once during schema building (FindOrCreateTable). The resolved strategy is stored
+    /// Called once per table during schema building (by the SchemaBuilder). The resolved strategy is stored
     /// in the SchemaTable and used later by UsesSequenceForKeyGeneration/UsesIdentityForKeyGeneration
     /// to decide how to generate the DDL.
     /// If kgsAuto or unsupported by this DBMS, falls back to GetDefaultKeyGenerationStrategy.

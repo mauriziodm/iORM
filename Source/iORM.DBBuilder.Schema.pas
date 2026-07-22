@@ -36,7 +36,7 @@ unit iORM.DBBuilder.Schema;
 interface
 
 uses
-  iORM.DBBuilder.Interfaces, System.Classes, iORM.Context.Map.Interfaces;
+  iORM.DBBuilder.Interfaces, System.Classes, iORM.Context.Map.Interfaces, iORM.CommonTypes;
 
 type
 
@@ -45,24 +45,21 @@ type
     FIndexesMode, FForeignKeysMode: TioDBBuilderIndexesAndFKMode;
     FScript: IioDBBuilderSqlScript;
     FSequences: TioDBBuilderSchemaSequences;
-    FSqlGenerator: IioDBBuilderSqlGenerator;
     FStatus: TioDBBuilderStatus;
     FTables: TioDBBuilderSchemaTables;
     function GetForeignKeysMode: TioDBBuilderIndexesAndFKMode;
     function GetIndexesMode: TioDBBuilderIndexesAndFKMode;
     function GetScript: IioDBBuilderSqlScript;
     function GetSequences: TioDBBuilderSchemaSequences;
-    function GetSqlGenerator: IioDBBuilderSqlGenerator;
     function GetTables: TioDBBuilderSchemaTables;
     // Status
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const AValue: TioDBBuilderStatus);
   public
-    constructor Create(const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode;
-      const ASqlGenerator: IioDBBuilderSqlGenerator);
+    constructor Create(const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
     destructor Destroy; override;
 
-    function FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
+    function FindOrCreateTable(const AMap: IioMap; const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
     function FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
     procedure SequenceAddIfNotExists(const ASequenceName: String);
     procedure MarkAllForCreation;
@@ -71,7 +68,6 @@ type
     property IndexesMode: TioDBBuilderIndexesAndFKMode read GetIndexesMode;
     property Script: IioDBBuilderSqlScript read GetScript;
     property Sequences: TioDBBuilderSchemaSequences read GetSequences;
-    property SqlGenerator: IioDBBuilderSqlGenerator read GetSqlGenerator;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
     property Tables: TioDBBuilderSchemaTables read GetTables;
   end;
@@ -79,19 +75,16 @@ type
 implementation
 
 uses
-  iORM.DBBuilder.Factory, iORM.Exceptions, System.SysUtils, iORM.DB.ConnectionContainer, iORM.DB.Factory,
-  iORM.CommonTypes;
+  iORM.DBBuilder.Factory, iORM.Exceptions, System.SysUtils, iORM.DB.ConnectionContainer, iORM.DB.Factory;
 
 { TioDBBuilderSchema }
 
-constructor TioDBBuilderSchema.Create(const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode;
-  const ASqlGenerator: IioDBBuilderSqlGenerator);
+constructor TioDBBuilderSchema.Create(const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
 begin
   FScript := TioDBBuilderFactory.NewSqlScript;
   FSequences := TioDBBuilderSchemaSequences.Create;
   FIndexesMode := AIndexesMode;
   FForeignKeysMode := AForeignKeysMode;
-  FSqlGenerator := ASqlGenerator;
   FStatus := stClean;
   FTables := TioDBBuilderSchemaTables.Create;
 end;
@@ -109,21 +102,17 @@ end;
 // When multiple classes share the same physical table (e.g. single-table inheritance / TrueClass),
 // the first call creates the SchemaTable entry; subsequent calls for other classes mapped to the
 // same table simply retrieve the existing entry and enrich it.
-function TioDBBuilderSchema.FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
+function TioDBBuilderSchema.FindOrCreateTable(const AMap: IioMap; const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
 var
   LTableName: String;
-  LKeyGenStrategy: TioKeyGenerationStrategyType;
 begin
   LTableName := AMap.GetTable.TableName;
   if not FTables.ContainsKey(LTableName) then
-  begin
-    // The table does not exist yet in the schema: create it.
-    // Resolve the key generation strategy first: if the map declares kgsAuto,
-    // the SqlGenerator translates it into the concrete DBMS-specific strategy
-    // (e.g. Autoincrement for SQLite, Identity/Sequence for Firebird 3+, etc.).
-    LKeyGenStrategy := FSqlGenerator.Resolve_KeyGenerationStrategy(AMap.GetTable.GetKeyGenerationStrategy);
-    FTables.Add(LTableName, TioDBBuilderFactory.NewSchemaTable(AMap.GetTable, LKeyGenStrategy));
-  end;
+    // The table does not exist yet in the schema: create it. The key generation strategy has
+    // already been resolved by the SchemaBuilder (which owns the SqlGenerator): if the map declared
+    // kgsAuto it has been translated into the concrete DBMS-specific strategy (e.g. Autoincrement for
+    // SQLite, Identity/Sequence for Firebird 3+, etc.).
+    FTables.Add(LTableName, TioDBBuilderFactory.NewSchemaTable(AMap.GetTable, AKeyGenerationStrategy));
   Result := FTables.Items[LTableName];
   // Update the IsTrueClass flag on the SchemaTable.
   // In single-table inheritance multiple classes share the same table, but only the
@@ -195,11 +184,6 @@ end;
 function TioDBBuilderSchema.GetSequences: TioDBBuilderSchemaSequences;
 begin
   Result := FSequences;
-end;
-
-function TioDBBuilderSchema.GetSqlGenerator: IioDBBuilderSqlGenerator;
-begin
-  Result := FSqlGenerator;
 end;
 
 procedure TioDBBuilderSchema.SetStatus(const AValue: TioDBBuilderStatus);

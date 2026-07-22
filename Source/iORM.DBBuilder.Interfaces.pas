@@ -285,13 +285,12 @@ type
     function GetIndexesMode: TioDBBuilderIndexesAndFKMode;
     function GetScript: IioDBBuilderSqlScript;
     function GetSequences: TioDBBuilderSchemaSequences;
-    function GetSqlGenerator: IioDBBuilderSqlGenerator;
     function GetTables: TioDBBuilderSchemaTables;
     // Status
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const Value: TioDBBuilderStatus);
 
-    function FindOrCreateTable(const AMap: IioMap): IioDBBuilderSchemaTable;
+    function FindOrCreateTable(const AMap: IioMap; const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
     function FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
     procedure SequenceAddIfNotExists(const ASequenceName: String);
     /// <summary>
@@ -305,7 +304,6 @@ type
     property IndexesMode: TioDBBuilderIndexesAndFKMode read GetIndexesMode;
     property Script: IioDBBuilderSqlScript read GetScript;
     property Sequences: TioDBBuilderSchemaSequences read GetSequences;
-    property SqlGenerator: IioDBBuilderSqlGenerator read GetSqlGenerator;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
     property Tables: TioDBBuilderSchemaTables read GetTables;
   end;
@@ -362,7 +360,7 @@ type
 
   TioDBBuilderSchemaBuilderIntf = class abstract
   public
-    class procedure BuildSchema(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema); virtual; abstract;
+    class procedure BuildSchema(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator); virtual; abstract;
   end;
 
   IioDBBuilderSqlGenerator = interface
