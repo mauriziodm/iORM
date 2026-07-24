@@ -283,7 +283,6 @@ type
     ['{1AEDB134-1ECB-490E-A53A-973BEDE509E5}']
     function GetForeignKeysMode: TioDBBuilderIndexesAndFKMode;
     function GetIndexesMode: TioDBBuilderIndexesAndFKMode;
-    function GetScript: IioDBBuilderSqlScript;
     function GetSequences: TioDBBuilderSchemaSequences;
     function GetTables: TioDBBuilderSchemaTables;
     // Status
@@ -302,7 +301,6 @@ type
 
     property ForeignKeysMode: TioDBBuilderIndexesAndFKMode read GetForeignKeysMode;
     property IndexesMode: TioDBBuilderIndexesAndFKMode read GetIndexesMode;
-    property Script: IioDBBuilderSqlScript read GetScript;
     property Sequences: TioDBBuilderSchemaSequences read GetSequences;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
     property Tables: TioDBBuilderSchemaTables read GetTables;
@@ -546,12 +544,12 @@ type
     // ----------------------------------------------------------
     /// <summary>
     /// Inspects the resolved schema and emits key-generation-strategy diagnostics into
-    /// ASchema.Script (informational, non-blocking Hints) about fallbacks already applied by
+    /// AScript (informational, non-blocking Hints) about fallbacks already applied by
     /// Resolve_KeyGenerationStrategy at schema-build time. Lives here (not on the Strategy) because
     /// compatibility is a DBMS-capability concern, which is exactly what the SqlGenerator + DBMSInfo
     /// already model.
     /// </summary>
-    procedure CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema);
+    procedure CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema; const AScript: IioDBBuilderSqlScript);
     /// <summary>
     /// Resolves the requested key generation strategy to an effective strategy.
     /// If ARequestedStrategy is kgsAuto, returns the DBMS-specific default strategy.

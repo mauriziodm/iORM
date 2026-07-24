@@ -141,7 +141,7 @@ var
 begin
   // Check key generation strategy compatibility with DBMS.
   // The diagnostic lives on the SqlGenerator (DBMS-capability axis), not on the Strategy.
-  SqlGenerator.CheckKeyGenerationCompatibility(Schema);
+  SqlGenerator.CheckKeyGenerationCompatibility(Schema, Script);
 
   ScriptWrite_BeginDeferConstraints;
 

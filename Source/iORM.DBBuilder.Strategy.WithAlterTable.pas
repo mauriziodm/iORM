@@ -297,7 +297,7 @@ var
 begin
   // Check key generation strategy compatibility with RDBMS version.
   // The diagnostic lives on the SqlGenerator (DBMS-capability axis), not on the Strategy.
-  SqlGenerator.CheckKeyGenerationCompatibility(Schema);
+  SqlGenerator.CheckKeyGenerationCompatibility(Schema, Script);
 
   // Strict mode (indexes): drop every index from the DB for each stUpdate table.
   // This removes orphaned indexes (including manually-added ones) and ensures

@@ -85,6 +85,7 @@ type
     FAnalyzed: boolean;
     FConnectionDefName: string;
     FSchema: IioDBBuilderSchema;
+    FScript: IioDBBuilderSqlScript;
     FSqlGenerator: IioDBBuilderSqlGenerator;
     procedure CreateDatabase;
     function GetWarnings: TStrings;
@@ -167,7 +168,7 @@ function TioDBBuilderEngine.Analyze: TioDBBuilderStatus;
 var
   LDBAnalyzer: IioDBBuilderDBAnalyzer;
 begin
-  LDBAnalyzer := TioDBBuilderFactory.NewDBAnalyzer(FConnectionDefName, FSchema, FSqlGenerator);
+  LDBAnalyzer := TioDBBuilderFactory.NewDBAnalyzer(FConnectionDefName, FSchema, FSqlGenerator, FScript);
   LDBAnalyzer.Analyze;
   FAnalyzed := True;
 
@@ -184,8 +185,8 @@ begin
   // tree as stCreate, so any analyzed status would just be overwritten. The only residual DB touch is
   // the lazy DBMSInfo version query, required to emit version-correct DDL. This avoids the O(tables +
   // fields + indexes + FKs) catalog introspection that Analyze would otherwise perform pointlessly.
-  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateScript_ForceCreate;
-  AScript.Lines.Assign(FSchema.Script.Lines);
+  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, FScript).GenerateScript_ForceCreate;
+  AScript.Lines.Assign(FScript.Lines);
 end;
 
 procedure TioDBBuilderEngine.BuildCreateOrUpdateDBSqlScript(const AScript: IioDBBuilderSqlScript);
@@ -198,8 +199,8 @@ begin
 
   // Status-driven: the strategy generates a create or an update script according to the status
   // determined by the DBAnalyzer.
-  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateScript_Sync;
-  AScript.Lines.Assign(FSchema.Script.Lines);
+  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, FScript).GenerateScript_Sync;
+  AScript.Lines.Assign(FScript.Lines);
 end;
 
 constructor TioDBBuilderEngine.Create(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
@@ -209,6 +210,7 @@ begin
   // SqlGenerator must be created BEFORE Schema so that kgsAuto can be resolved
   FSqlGenerator := TioDBBuilderFactory.NewSqlGenerator(FConnectionDefName);
   FSchema := TioDBBuilderFactory.NewSchema(FConnectionDefName, AIndexesMode, AForeignKeysMode, FSqlGenerator);
+  FScript := TioDBBuilderFactory.NewSqlScript;
 end;
 
 procedure TioDBBuilderEngine.CreateDatabase;
@@ -218,7 +220,7 @@ begin
   if not Analyzed then
     raise EioDBBuilderException.Create(ClassName, 'CreateDatabase', 'Unable to create database: schema not analyzed');
 
-  LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator);
+  LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, FScript);
   LStrategy.ScriptWrite_CreateDatabase;
 end;
 
@@ -237,10 +239,10 @@ begin
 
   if (LStatus > stClean) or Force then
   begin
-    if FSchema.Script.Warnings.Lines.Count > 0 then
+    if FScript.Warnings.Lines.Count > 0 then
       raise EioDBBuilderException.Create(ClassName, 'CreateOrUpdateDB',
         'Database must be updated but WARNINGS exists.' + sLineBreak +
-        FSchema.Script.Warnings.Lines.Text
+        FScript.Warnings.Lines.Text
       );
 
     if LBuildScript then
@@ -284,15 +286,15 @@ begin
   if ATable.Status <> stCreate then
     exit;
 
-  FSchema.Script.Clear;
-  LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator);
+  FScript.Clear;
+  LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, FScript);
 
   LStrategy.ScriptWrite_CreateTable(ATable);
 
   if AddForeignKeys then
     LStrategy.ScriptWrite_CreateTableForeignKeys(ATable);
 
-  TioDBFactory.Script(FConnectionDefName, FSchema.Script.Lines).Execute;
+  TioDBFactory.Script(FConnectionDefName, FScript.Lines).Execute;
 end;
 
 procedure TioDBBuilderEngine.UpdateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes: Boolean;
@@ -306,11 +308,11 @@ begin
   if ATable.Status <> stCreate then
     exit;
 
-  FSchema.Script.Clear;
-  LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator);
+  FScript.Clear;
+  LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, FScript);
 
   LStrategy.ScriptWrite_AlterTable(ATable);
-  TioDBFactory.Script(FConnectionDefName, FSchema.Script.Lines).Execute;
+  TioDBFactory.Script(FConnectionDefName, FScript.Lines).Execute;
 end;
 
 function TioDBBuilderEngine.GetAnalyzed: boolean;
@@ -325,7 +327,7 @@ end;
 
 function TioDBBuilderEngine.GetWarnings: TStrings;
 begin
-  Result := FSchema.Script.Warnings.Lines;
+  Result := FScript.Warnings.Lines;
 end;
 
 { TioDBBuilderEngine_New }
@@ -336,21 +338,22 @@ begin
   FConnectionDefName := AConnectionDefName;
 
   FSqlGenerator := TioDBBuilderFactory.NewSqlGenerator(AConnectionDefName);
+  FScript := TioDBBuilderFactory.NewSqlScript;
   RebuildSchema;
   RebuildScript;
 end;
 
 procedure TioDBBuilderEngine_New.CreateDatabasePhys;
 begin
-  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).ScriptWrite_CreateDatabase;
+  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, FScript).ScriptWrite_CreateDatabase;
 end;
 
 procedure TioDBBuilderEngine_New.CreateOrUpdateDB(const AForce: Boolean);
 begin
   if (FSchema.Status > stClean) or AForce then
   begin
-    if FSchema.Script.Warnings.Lines.Count > 0 then
-      raise EioDBBuilderException.Create(ClassName, 'CreateOrUpdateDB', 'Database must be updated but WARNINGS exists.' + sLineBreak + FSchema.Script.Warnings.Lines.Text);
+    if FScript.Warnings.Lines.Count > 0 then
+      raise EioDBBuilderException.Create(ClassName, 'CreateOrUpdateDB', 'Database must be updated but WARNINGS exists.' + sLineBreak + FScript.Warnings.Lines.Text);
 
     if FSchema.Status = stCreate then
       CreateDatabasePhys;
@@ -368,9 +371,9 @@ var
   LStrategy: IioDBBuilderStrategy;
   LTable: IioDBBuilderSchemaTable;
 begin
-  FSchema.Script.Clear;
+  FScript.Clear;
   LTable := FSchema.FindTable(ATableName);
-  LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator);
+  LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, FScript);
 
   case LTable.Status of
     stUpdate:
@@ -379,7 +382,7 @@ begin
       LStrategy.ScriptWrite_AlterTable(LTable);
   end;
 
-  TioDBFactory.Script(FConnectionDefName, FSchema.Script.Lines).Execute;
+  TioDBFactory.Script(FConnectionDefName, FScript.Lines).Execute;
 
   // Rebuilds schema and script to keep them consistent with the new situation
   RebuildSchema;
@@ -408,21 +411,20 @@ end;
 
 function TioDBBuilderEngine_New.GetWarnings: TStrings;
 begin
-  Result := FSchema.Script.Warnings.Lines;
+  Result := FScript.Warnings.Lines;
 end;
 
 procedure TioDBBuilderEngine_New.RebuildSchema;
 begin
   FSchema := TioDBBuilderFactory.NewSchema(FConnectionDefName, FIndexesMode, FForeignKeysMode, FSqlGenerator);
-  TioDBBuilderFactory.NewDBAnalyzer(FConnectionDefName, FSchema, FSqlGenerator).Analyze;
+  TioDBBuilderFactory.NewDBAnalyzer(FConnectionDefName, FSchema, FSqlGenerator, FScript).Analyze;
 end;
 
 procedure TioDBBuilderEngine_New.RebuildScript;
 begin
-  FSchema.Script.Clear;
+  FScript.Clear;
   // Status-driven: create or update script according to the status determined by the DBAnalyzer.
-  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator).GenerateScript_Sync;
-  FScript := FSchema.Script;
+  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, FScript).GenerateScript_Sync;
 end;
 
 end.

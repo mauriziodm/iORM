@@ -177,12 +177,12 @@ type
     // KEY GENERATION CAPABILITY METHODS
     // ----------------------------------------------------------
     /// <summary>
-    /// Emits key-generation-strategy diagnostics into ASchema.Script for fallbacks already applied
+    /// Emits key-generation-strategy diagnostics into AScript for fallbacks already applied
     /// by Resolve_KeyGenerationStrategy: a single informational Hint for every table whose requested
     /// strategy was overridden. Uniform for every DBMS and intentionally non-blocking (Warnings gate
     /// the create/alter flow in the Engine, and a safe auto-applied fallback must not block it).
     /// </summary>
-    procedure CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema);
+    procedure CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema; const AScript: IioDBBuilderSqlScript);
     /// <summary>
     /// Returns the default key generation strategy for this DBMS.
     /// Base returns kgsIdentity. Override in derived classes (e.g. Firebird returns kgsSequence).
@@ -192,7 +192,7 @@ type
     /// Appends the standard "requested X key generation but this DBMS uses Y instead" hint to the
     /// script. Centralized here so the wording stays consistent across every RDBMS generator.
     /// </summary>
-    procedure Hint_KeyGenerationStrategyFallback(const ASchema: IioDBBuilderSchema; const ATable: IioDBBuilderSchemaTable);
+    procedure Hint_KeyGenerationStrategyFallback(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
     /// <summary>
     /// Resolves the requested key generation strategy to an effective strategy.
     /// Called once per table during schema building (by the SchemaBuilder). The resolved strategy is stored
@@ -707,7 +707,7 @@ begin
   Result := '';
 end;
 
-procedure TioDBBuilderSqlGenBase.CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema);
+procedure TioDBBuilderSqlGenBase.CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema; const AScript: IioDBBuilderSqlScript);
 var
   LTable: IioDBBuilderSchemaTable;
 begin
@@ -716,13 +716,13 @@ begin
   // method (calling inherited first) to add version-specific warnings.
   for LTable in ASchema.Tables.Values do
     if LTable.IsKeyGenerationStrategyFallback then
-      Hint_KeyGenerationStrategyFallback(ASchema, LTable);
+      Hint_KeyGenerationStrategyFallback(AScript, LTable);
 end;
 
-procedure TioDBBuilderSqlGenBase.Hint_KeyGenerationStrategyFallback(const ASchema: IioDBBuilderSchema;
+procedure TioDBBuilderSqlGenBase.Hint_KeyGenerationStrategyFallback(const AScript: IioDBBuilderSqlScript;
   const ATable: IioDBBuilderSchemaTable);
 begin
-  ASchema.Script.Hints.Add(Format(
+  AScript.Hints.Add(Format(
     'Table ''%s'' requests %s key generation but this DBMS does not support it. Using %s instead.',
     [ATable.Name,
      TioUtilities.EnumToString<TioKeyGenerationStrategyType>(ATable.RequestedKeyGenerationStrategy),

@@ -46,6 +46,7 @@ type
   private
     FConnectionDefName: string;
     FSchema: IioDBBuilderSchema;
+    FScript: IioDBBuilderSqlScript;
     FSqlGenerator: IioDBBuilderSqlGenerator;
 
     function GetConnectionDefName: string;
@@ -283,7 +284,7 @@ type
     property Script: IioDBBuilderSqlScript read GetScript;
     property SqlGenerator: IioDBBuilderSqlGenerator read GetSqlGenerator;
   public
-    constructor Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator);
+    constructor Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderSqlScript);
 
     // ==========================================================
     // ENTRY POINTS
@@ -442,7 +443,7 @@ begin
 end;
 
 constructor TioDBBuilderStrategyBase.Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema;
-  const ASqlGenerator: IioDBBuilderSqlGenerator);
+  const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderSqlScript);
 begin
   if not Assigned(ASchema) then
     raise EioInvalidArgumentException.Create(ClassName, 'Create', 'ASchema is not assigned.');
@@ -450,14 +451,18 @@ begin
   if not Assigned(ASqlGenerator) then
     raise EioInvalidArgumentException.Create(ClassName, 'Create', 'ASqlGenerator is not assigned.');
 
+  if not Assigned(AScript) then
+    raise EioInvalidArgumentException.Create(ClassName, 'Create', 'AScript is not assigned.');
+
   FConnectionDefName := AConnectionDefName;
   FSchema := ASchema;
+  FScript := AScript;
   FSqlGenerator := ASqlGenerator;
 end;
 
 function TioDBBuilderStrategyBase.GetScript: IioDBBuilderSqlScript;
 begin
-  Result := Schema.Script;
+  Result := FScript;
 end;
 
 procedure TioDBBuilderStrategyBase.ScriptWrite_CreateDatabase;

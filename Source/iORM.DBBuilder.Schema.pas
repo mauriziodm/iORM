@@ -43,13 +43,11 @@ type
   TioDBBuilderSchema = class(TInterfacedObject, IioDBBuilderSchema)
   private
     FIndexesMode, FForeignKeysMode: TioDBBuilderIndexesAndFKMode;
-    FScript: IioDBBuilderSqlScript;
     FSequences: TioDBBuilderSchemaSequences;
     FStatus: TioDBBuilderStatus;
     FTables: TioDBBuilderSchemaTables;
     function GetForeignKeysMode: TioDBBuilderIndexesAndFKMode;
     function GetIndexesMode: TioDBBuilderIndexesAndFKMode;
-    function GetScript: IioDBBuilderSqlScript;
     function GetSequences: TioDBBuilderSchemaSequences;
     function GetTables: TioDBBuilderSchemaTables;
     // Status
@@ -66,7 +64,6 @@ type
 
     property ForeignKeysMode: TioDBBuilderIndexesAndFKMode read GetForeignKeysMode;
     property IndexesMode: TioDBBuilderIndexesAndFKMode read GetIndexesMode;
-    property Script: IioDBBuilderSqlScript read GetScript;
     property Sequences: TioDBBuilderSchemaSequences read GetSequences;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
     property Tables: TioDBBuilderSchemaTables read GetTables;
@@ -75,13 +72,12 @@ type
 implementation
 
 uses
-  iORM.DBBuilder.Factory, iORM.Exceptions, System.SysUtils, iORM.DB.ConnectionContainer, iORM.DB.Factory;
+  iORM.Exceptions, System.SysUtils, iORM.DBBuilder.Factory;
 
 { TioDBBuilderSchema }
 
 constructor TioDBBuilderSchema.Create(const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
 begin
-  FScript := TioDBBuilderFactory.NewSqlScript;
   FSequences := TioDBBuilderSchemaSequences.Create;
   FIndexesMode := AIndexesMode;
   FForeignKeysMode := AForeignKeysMode;
@@ -190,11 +186,6 @@ procedure TioDBBuilderSchema.SetStatus(const AValue: TioDBBuilderStatus);
 begin
 //  if AValue > FStatus then  // Carlo Marona (2025-10-20): Why?
   FStatus := AValue;
-end;
-
-function TioDBBuilderSchema.GetScript: IioDBBuilderSqlScript;
-begin
-  Result := FScript;
 end;
 
 function TioDBBuilderSchema.GetTables: TioDBBuilderSchemaTables;
