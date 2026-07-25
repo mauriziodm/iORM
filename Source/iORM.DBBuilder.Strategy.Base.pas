@@ -633,7 +633,7 @@ begin
   // Status-driven: does NOT touch Schema.Status, it trusts what the DBAnalyzer determined
   // (stCreate for a brand-new DB, stUpdate for an existing one with changes). GenerateScript
   // branches internally on Schema.Status, so this single entry point covers both cases.
-  Script.ScriptBegin(ConnectionDefName, SqlGenerator.DBMSInfo);
+  Script.ScriptBegin(SqlGenerator.DBMSInfo);
   GenerateScript;
   Script.ScriptEnd;
 end;
@@ -645,7 +645,7 @@ begin
   // mirroring what the DBAnalyzer does on a non-existent DB. For documentation/baseline only: the
   // resulting script must NOT be executed against an existing database.
   Schema.MarkAllForCreation;
-  Script.ScriptBegin(ConnectionDefName, SqlGenerator.DBMSInfo);
+  Script.ScriptBegin(SqlGenerator.DBMSInfo);
   GenerateScript;
   Script.ScriptEnd;
 end;
