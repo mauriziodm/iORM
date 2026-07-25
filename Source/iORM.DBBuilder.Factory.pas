@@ -52,7 +52,7 @@ type
   TioDBBuilderFactory = class
   public
     class function NewEngine(const AConnectionDefName: String; const AIndexesMode: TioDBBuilderIndexesAndFKMode = ifmEnabled; const AForeignKeysMode: TioDBBuilderIndexesAndFKMode = ifmEnabled): IioDBBuilderEngine;
-    class function NewDBAnalyzer(const AConnectionDefname: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderSqlScript): IioDBBuilderDBAnalyzer;
+    class function NewDBAnalyzer(const AConnectionDefname: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderScript): IioDBBuilderDBAnalyzer;
     class function NewSchema(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode;
       const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchema;
     class function NewSchemaBuilder: TioDBBuilderSchemaBuilderRef;
@@ -64,9 +64,9 @@ type
     class function NewSchemaTable(const AContextTable: IioTable;
       const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
     class function NewSqlGenerator(const AConnectionDefName: String): IioDBBuilderSqlGenerator;
-    class function NewSqlScript(const AConnectionDefName: String): IioDBBuilderSqlScript;
+    class function NewScript(const AConnectionDefName: String): IioDBBuilderScript;
     class function NewSqlText(const AAddLinePrefix: String = ''): IioDBBuilderSqlText;
-    class function NewStrategy(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderSqlScript): IioDBBuilderStrategy;
+    class function NewStrategy(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderScript): IioDBBuilderStrategy;
   end;
 
 implementation
@@ -86,7 +86,7 @@ uses
 
 { TioDBBuilderFactory }
 
-class function TioDBBuilderFactory.NewDBAnalyzer(const AConnectionDefname: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderSqlScript): IioDBBuilderDBAnalyzer;
+class function TioDBBuilderFactory.NewDBAnalyzer(const AConnectionDefname: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderScript): IioDBBuilderDBAnalyzer;
 begin
   Result := TioDBBuilderDBAnalyzer.Create(AConnectionDefName, ASchema, ASqlGenerator, AScript);
 end;
@@ -157,9 +157,9 @@ begin
   end;
 end;
 
-class function TioDBBuilderFactory.NewSqlScript(const AConnectionDefName: String): IioDBBuilderSqlScript;
+class function TioDBBuilderFactory.NewScript(const AConnectionDefName: String): IioDBBuilderScript;
 begin
-  Result := TioDBBuilderSqlScript.Create(AConnectionDefName);
+  Result := TioDBBuilderScript.Create(AConnectionDefName);
 end;
 
 class function TioDBBuilderFactory.NewSqlText(const AAddLinePrefix: String = ''): IioDBBuilderSqlText;
@@ -168,7 +168,7 @@ begin
 end;
 
 class function TioDBBuilderFactory.NewStrategy(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema;
-  const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderSqlScript): IioDBBuilderStrategy;
+  const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderScript): IioDBBuilderStrategy;
 begin
   case TioConnectionManager.GetConnectionInfo(AConnectionDefName).ConnectionType of
     ctSQLServer:

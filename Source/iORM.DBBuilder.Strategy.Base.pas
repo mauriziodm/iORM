@@ -46,12 +46,12 @@ type
   private
     FConnectionDefName: string;
     FSchema: IioDBBuilderSchema;
-    FScript: IioDBBuilderSqlScript;
+    FScript: IioDBBuilderScript;
     FSqlGenerator: IioDBBuilderSqlGenerator;
 
     function GetConnectionDefName: string;
     function GetSchema: IioDBBuilderSchema;
-    function GetScript: IioDBBuilderSqlScript;
+    function GetScript: IioDBBuilderScript;
     function GetSqlGenerator: IioDBBuilderSqlGenerator;
     // Helper method for existence queries (common pattern)
     function _ExecuteExistsQuery(const ASql: string): Boolean;
@@ -281,10 +281,10 @@ type
     // ----------------------------------------------------------
     property ConnectionDefName: string read GetConnectionDefName;
     property Schema: IioDBBuilderSchema read GetSchema;
-    property Script: IioDBBuilderSqlScript read GetScript;
+    property Script: IioDBBuilderScript read GetScript;
     property SqlGenerator: IioDBBuilderSqlGenerator read GetSqlGenerator;
   public
-    constructor Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderSqlScript);
+    constructor Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderScript);
 
     // ==========================================================
     // ENTRY POINTS
@@ -443,7 +443,7 @@ begin
 end;
 
 constructor TioDBBuilderStrategyBase.Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema;
-  const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderSqlScript);
+  const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderScript);
 begin
   if not Assigned(ASchema) then
     raise EioInvalidArgumentException.Create(ClassName, 'Create', 'ASchema is not assigned.');
@@ -460,7 +460,7 @@ begin
   FSqlGenerator := ASqlGenerator;
 end;
 
-function TioDBBuilderStrategyBase.GetScript: IioDBBuilderSqlScript;
+function TioDBBuilderStrategyBase.GetScript: IioDBBuilderScript;
 begin
   Result := FScript;
 end;

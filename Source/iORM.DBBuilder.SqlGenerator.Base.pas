@@ -182,7 +182,7 @@ type
     /// strategy was overridden. Uniform for every DBMS and intentionally non-blocking (Warnings gate
     /// the create/alter flow in the Engine, and a safe auto-applied fallback must not block it).
     /// </summary>
-    procedure CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema; const AScript: IioDBBuilderSqlScript);
+    procedure CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema; const AScript: IioDBBuilderScript);
     /// <summary>
     /// Returns the default key generation strategy for this DBMS.
     /// Base returns kgsIdentity. Override in derived classes (e.g. Firebird returns kgsSequence).
@@ -192,7 +192,7 @@ type
     /// Appends the standard "requested X key generation but this DBMS uses Y instead" hint to the
     /// script. Centralized here so the wording stays consistent across every RDBMS generator.
     /// </summary>
-    procedure Hint_KeyGenerationStrategyFallback(const AScript: IioDBBuilderSqlScript; const ATable: IioDBBuilderSchemaTable);
+    procedure Hint_KeyGenerationStrategyFallback(const AScript: IioDBBuilderScript; const ATable: IioDBBuilderSchemaTable);
     /// <summary>
     /// Resolves the requested key generation strategy to an effective strategy.
     /// Called once per table during schema building (by the SchemaBuilder). The resolved strategy is stored
@@ -707,7 +707,7 @@ begin
   Result := '';
 end;
 
-procedure TioDBBuilderSqlGenBase.CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema; const AScript: IioDBBuilderSqlScript);
+procedure TioDBBuilderSqlGenBase.CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema; const AScript: IioDBBuilderScript);
 var
   LTable: IioDBBuilderSchemaTable;
 begin
@@ -719,7 +719,7 @@ begin
       Hint_KeyGenerationStrategyFallback(AScript, LTable);
 end;
 
-procedure TioDBBuilderSqlGenBase.Hint_KeyGenerationStrategyFallback(const AScript: IioDBBuilderSqlScript;
+procedure TioDBBuilderSqlGenBase.Hint_KeyGenerationStrategyFallback(const AScript: IioDBBuilderScript;
   const ATable: IioDBBuilderSchemaTable);
 begin
   AScript.Hints.Add(Format(

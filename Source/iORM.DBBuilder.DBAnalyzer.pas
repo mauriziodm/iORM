@@ -45,7 +45,7 @@ type
   private
     FConnectionDefName: string;
     FSchema: IioDBBuilderSchema;
-    FScript: IioDBBuilderSqlScript;
+    FScript: IioDBBuilderScript;
     FStrategy: IioDBBuilderStrategy;
   protected
     procedure AnalyzeFields(const ATable: IioDBBuilderSchemaTable); virtual;
@@ -53,7 +53,7 @@ type
     procedure AnalyzeIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure AnalyzeTables; virtual;
   public
-    constructor Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderSqlScript);
+    constructor Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderScript);
 
     procedure Analyze; virtual;
   end;
@@ -71,7 +71,7 @@ uses
 
 { TioDBBuilderDBAnalyzer }
 
-constructor TioDBBuilderDBAnalyzer.Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderSqlScript);
+constructor TioDBBuilderDBAnalyzer.Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderScript);
 begin
   FConnectionDefName := AConnectionDefName;
   FSchema := ASchema;

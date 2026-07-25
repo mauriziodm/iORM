@@ -320,7 +320,7 @@ var
   LAbort: Boolean;
   LReRaise: Boolean;
   LDBBuilderEngine: IioDBBuilderEngine;
-  LScript: IioDBBuilderSqlScript;
+  LScript: IioDBBuilderScript;
   LStatus: TioDBBuilderStatus;
 begin
   LAbort := False;
@@ -328,8 +328,8 @@ begin
   LDBBuilderEngine := TioDBBuilderFactory.NewEngine(Name, FAutoCreateDB.Indexes, FAutoCreateDB.ForeignKeys);
   LStatus := LDBBuilderEngine.Analyze;
 
-  LScript := TioDBBuilderFactory.NewSqlScript(Name);
-  LDBBuilderEngine.BuildCreateOrUpdateDBSqlScript(LScript);
+  LScript := TioDBBuilderFactory.NewScript(Name);
+  LDBBuilderEngine.BuildCreateOrUpdateDBScript(LScript);
 
   // Carlo Marona
   if Assigned(FBeforeDBBuild) then
