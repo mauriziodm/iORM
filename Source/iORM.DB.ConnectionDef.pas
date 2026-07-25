@@ -328,7 +328,7 @@ begin
   LDBBuilderEngine := TioDBBuilderFactory.NewEngine(Name, FAutoCreateDB.Indexes, FAutoCreateDB.ForeignKeys);
   LStatus := LDBBuilderEngine.Analyze;
 
-  LScript := TioDBBuilderFactory.NewSqlScript;
+  LScript := TioDBBuilderFactory.NewSqlScript(Name);
   LDBBuilderEngine.BuildCreateOrUpdateDBSqlScript(LScript);
 
   // Carlo Marona

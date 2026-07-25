@@ -48,6 +48,7 @@ type
 
   TioDBBuilderSqlScript = class(TInterfacedObject, IioDBBuilderSqlScript)
   private
+    FConnectionDefName: string;
     FFullScript: TStringList;
     FScriptBody: IioDBBuilderSqlText;
     FScriptFooter: IioDBBuilderSqlText;
@@ -62,11 +63,12 @@ type
     function GetLines: TStringList;
     function GetWarnings: IioDBBuilderSqlText;
   public
-    constructor Create;
+    constructor Create(const AConnectionDefName: string);
     destructor Destroy; override;
 
     // Full script clear
     procedure Clear;
+    procedure Execute;
     procedure SaveToFile(const AFileName: string);
     // This method works on header section
     procedure ScriptBegin(const AConnectionDefName: string; const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo); virtual;
@@ -89,7 +91,8 @@ implementation
 uses
   System.SysUtils,
 
-  iORM.DB.ConnectionContainer
+  iORM.DB.ConnectionContainer,
+  iORM.DB.Factory
 
   ;
 
@@ -214,10 +217,10 @@ begin
   Footer.Clear;
 end;
 
-constructor TioDBBuilderSqlScript.Create;
+constructor TioDBBuilderSqlScript.Create(const AConnectionDefName: string);
 begin
   inherited Create;
-
+  FConnectionDefName := AConnectionDefName;
   FFullScript := TStringList.Create;
   FScriptHeader := TioDBBuilderFactory.NewSqlText;
   FScriptWarnings := TioDBBuilderFactory.NewSqlText('WARNING: ');
@@ -291,6 +294,11 @@ begin
   FFullScript.AddStrings(FScriptFooter.Lines);
 
   Result := FFullScript;
+end;
+
+procedure TioDBBuilderSqlScript.Execute;
+begin
+  TioDBFactory.Script(FConnectionDefName, Lines).Execute;
 end;
 
 procedure TioDBBuilderSqlScript.SaveToFile(const AFileName: string);

@@ -157,7 +157,6 @@ uses
   iORM.DBBuilder.Factory,
   iORM.DBBuilder.Schema,
   iORM.DB.Consts,
-  iORM.DB.Factory,
   iORM.Exceptions
 
   ;
@@ -210,7 +209,7 @@ begin
   // SqlGenerator must be created BEFORE Schema so that kgsAuto can be resolved
   FSqlGenerator := TioDBBuilderFactory.NewSqlGenerator(FConnectionDefName);
   FSchema := TioDBBuilderFactory.NewSchema(FConnectionDefName, AIndexesMode, AForeignKeysMode, FSqlGenerator);
-  FScript := TioDBBuilderFactory.NewSqlScript;
+  FScript := TioDBBuilderFactory.NewSqlScript(FConnectionDefName);
 end;
 
 procedure TioDBBuilderEngine.CreateDatabase;
@@ -246,7 +245,7 @@ begin
       );
 
     if LBuildScript then
-      LScript := TioDBBuilderFactory.NewSqlScript
+      LScript := TioDBBuilderFactory.NewSqlScript(FConnectionDefName)
     else
       LScript := AScript;
 
@@ -259,7 +258,7 @@ begin
     if LBuildScript then
       BuildCreateOrUpdateDBSqlScript(LScript);
 
-    TioDBFactory.Script(FConnectionDefName, LScript.Lines).Execute;
+    LScript.Execute;
   end;
 end;
 
@@ -294,7 +293,7 @@ begin
   if AddForeignKeys then
     LStrategy.ScriptWrite_CreateTableForeignKeys(ATable);
 
-  TioDBFactory.Script(FConnectionDefName, FScript.Lines).Execute;
+  FScript.Execute;
 end;
 
 procedure TioDBBuilderEngine.UpdateTable(const ATable: IioDBBuilderSchemaTable; const AddIndexes: Boolean;
@@ -312,7 +311,7 @@ begin
   LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, FScript);
 
   LStrategy.ScriptWrite_AlterTable(ATable);
-  TioDBFactory.Script(FConnectionDefName, FScript.Lines).Execute;
+  FScript.Execute;
 end;
 
 function TioDBBuilderEngine.GetAnalyzed: boolean;
@@ -338,7 +337,7 @@ begin
   FConnectionDefName := AConnectionDefName;
 
   FSqlGenerator := TioDBBuilderFactory.NewSqlGenerator(AConnectionDefName);
-  FScript := TioDBBuilderFactory.NewSqlScript;
+  FScript := TioDBBuilderFactory.NewSqlScript(FConnectionDefName);
   RebuildSchema;
   RebuildScript;
 end;
@@ -358,7 +357,7 @@ begin
     if FSchema.Status = stCreate then
       CreateDatabasePhys;
 
-    TioDBFactory.Script(FConnectionDefName, FScript.Lines).Execute;
+    FScript.Execute;
 
     // Rebuilds schema and script to keep them consistent with the new situation
     RebuildSchema;
@@ -382,7 +381,7 @@ begin
       LStrategy.ScriptWrite_AlterTable(LTable);
   end;
 
-  TioDBFactory.Script(FConnectionDefName, FScript.Lines).Execute;
+  FScript.Execute;
 
   // Rebuilds schema and script to keep them consistent with the new situation
   RebuildSchema;

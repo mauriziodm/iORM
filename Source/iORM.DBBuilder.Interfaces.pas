@@ -339,6 +339,7 @@ type
 
     // Full script clear
     procedure Clear;
+    procedure Execute;
     procedure SaveToFile(const AFileName: string);
     // This method works on header section
     procedure ScriptBegin(const AConnectionDefName: string; const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo);
