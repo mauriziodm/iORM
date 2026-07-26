@@ -260,6 +260,24 @@ type
     procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
     procedure AddIndex(const AIndexAttr: ioIndex);
+    /// <summary>
+    ///  Forces every index of this table to stCreate, overriding whatever the entity-map-vs-DB
+    ///  comparison would have produced. Used both standalone (Strategy's strict-mode index drop)
+    ///  and as part of ForceCreateStatus's table-wide cascade.
+    /// </summary>
+    procedure ForceIndexesCreateStatus;
+    /// <summary>
+    ///  Forces every foreign key of this table to stCreate, overriding whatever the entity-map-vs-DB
+    ///  comparison would have produced. Used both standalone (Strategy's strict-mode FK drop) and as
+    ///  part of ForceCreateStatus's table-wide cascade.
+    /// </summary>
+    procedure ForceForeignKeysCreateStatus;
+    /// <summary>
+    ///  Forces this table, its fields, its indexes and its foreign keys to stCreate, overriding
+    ///  whatever the entity-map-vs-DB comparison would have produced. Delegates the indexes/FKs
+    ///  part to ForceIndexesCreateStatus/ForceForeignKeysCreateStatus.
+    /// </summary>
+    procedure ForceCreateStatus;
 
     property ContextTable: IioTable read GetContextTable;
     property Changes: TioDBBuilderTableChanges read GetChanges;
@@ -293,11 +311,13 @@ type
     function FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
     procedure SequenceAddIfNotExists(const ASequenceName: String);
     /// <summary>
-    ///  Marks the whole schema tree (schema, tables, fields, indexes and foreign keys) as stCreate,
-    ///  mirroring what the DBAnalyzer does on a non-existent database. Used to force a coherent
-    ///  full "create from scratch" script regardless of the actual database state.
+    ///  Forces the whole schema tree (schema, tables, fields, indexes and foreign keys) to stCreate,
+    ///  overriding whatever the entity-map-vs-DB comparison would have produced (mirrors what the
+    ///  DBAnalyzer does on a non-existent database). Used to force a coherent full "create from
+    ///  scratch" script regardless of the actual database state. Delegates to each table's own
+    ///  ForceCreateStatus.
     /// </summary>
-    procedure MarkAllForCreation;
+    procedure ForceCreateStatus;
 
     property ForeignKeysMode: TioDBBuilderIndexesAndFKMode read GetForeignKeysMode;
     property IndexesMode: TioDBBuilderIndexesAndFKMode read GetIndexesMode;

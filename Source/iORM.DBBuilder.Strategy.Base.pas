@@ -62,7 +62,10 @@ type
         GenerateScript_*     public entry point (Sync / ForceCreate)
         Process_*            orchestration: iterates the schema or dispatches by mode
         ScriptWrite_*        emits a single DDL/DML statement into Script.Body
-        Force_*              drop mechanic that bypasses the configured Indexes/FK mode
+        Force_*              forces a Status value on schema elements directly, overriding
+                              whatever the entity-map-vs-DB comparison would have produced
+                              (here always paired with a drop mechanic that also bypasses
+                              the configured Indexes/FK mode)
         Check_*              interrogates the DB catalog / detects a change, returns Boolean
         Warning_* / Hint_*   diagnostics appended to Script.Warnings / Script.Hints
       Plain accessors and private helpers are sanctioned exceptions and keep plain Delphi
@@ -70,7 +73,11 @@ type
       Layout (mirrors the SqlGenerator family): methods are grouped under domain banners
       (DATABASE / TABLE / FIELD / INDEX / SEQUENCE / FOREIGN KEY / ...) and kept alphabetical
       within each group. This applies to the declarations (IioDBBuilderStrategy + every class
-      section: derived strategies use the same banners); implementations are not ordered. }
+      section: derived strategies use the same banners); implementations are not ordered.
+      The same "Force = imposed Status, not derived" concept is reused, in plain-verb form
+      (no underscore prefix, matching that unit's own style), by IioDBBuilderSchema/
+      IioDBBuilderSchemaTable's ForceCreateStatus/ForceIndexesCreateStatus/
+      ForceForeignKeysCreateStatus. }
 
     // ==========================================================
     // DATABASE RELATED METHODS
@@ -326,7 +333,7 @@ begin
   // Identity-keyed table would raise EioDBBuilderException via GetSequenceName.
   //
   // When the whole DB is being created from scratch (Schema.Status = stCreate: either a brand-new
-  // empty DB or a force-create documentation/baseline script via MarkAllForCreation) the sequence
+  // empty DB or a force-create documentation/baseline script via Schema.ForceCreateStatus) the sequence
   // cannot pre-exist, so emit it unconditionally: this keeps the create-from-scratch script complete
   // AND avoids a pointless catalog round-trip. The Check_SequenceExists guard is only needed on the
   // incremental path (Schema.Status = stUpdate: a new table added to an already existing DB), where
@@ -388,7 +395,6 @@ end;
 procedure TioDBBuilderStrategyBase.Force_DropTableForeignKeysFromDB(const ATable: IioDBBuilderSchemaTable);
 var
   LQuery: IioQuery;
-  LFK: IioDBBuilderSchemaFK;
 begin
   // Bypass of ForeignKeysMode: this method always operates. Queries the DB
   // catalog for every FK currently defined on this table, then drops them all
@@ -404,9 +410,8 @@ begin
     LQuery.Next;
   end;
 
-  // Mark all schema FKs as stCreate so they get recreated by Process_ForeignKeys.
-  for LFK in ATable.ForeignKeys.Values do
-    LFK.Status := stCreate;
+  // Force all schema FKs to stCreate so they get recreated by Process_ForeignKeys.
+  ATable.ForceForeignKeysCreateStatus;
 end;
 
 procedure TioDBBuilderStrategyBase.Process_TableForeignKeys(const ATable: IioDBBuilderSchemaTable);
@@ -610,7 +615,6 @@ end;
 procedure TioDBBuilderStrategyBase.Force_DropTableIndexesFromDB(const ATable: IioDBBuilderSchemaTable);
 var
   LQuery: IioQuery;
-  LIndex: IioDBBuilderSchemaIndex;
 begin
   // Bypass of IndexesMode: this method always operates. Queries the DB catalog
   // for every index currently defined on this table, then drops them all by
@@ -623,9 +627,8 @@ begin
     LQuery.Next;
   end;
 
-  // Mark all schema indexes as stCreate so they get recreated by Process_Indexes.
-  for LIndex in ATable.Indexes.Values do
-    LIndex.Status := stCreate;
+  // Force all schema indexes to stCreate so they get recreated by Process_Indexes.
+  ATable.ForceIndexesCreateStatus;
 end;
 
 procedure TioDBBuilderStrategyBase.GenerateScript_Sync;
@@ -644,7 +647,7 @@ begin
   // script by marking the whole schema tree (schema + tables + fields + indexes + FKs) as stCreate,
   // mirroring what the DBAnalyzer does on a non-existent DB. For documentation/baseline only: the
   // resulting script must NOT be executed against an existing database.
-  Schema.MarkAllForCreation;
+  Schema.ForceCreateStatus;
   Script.ScriptBegin(SqlGenerator.DBMSInfo);
   GenerateScript;
   Script.ScriptEnd;

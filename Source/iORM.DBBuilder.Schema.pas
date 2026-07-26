@@ -60,7 +60,7 @@ type
     function FindOrCreateTable(const AMap: IioMap; const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
     function FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
     procedure SequenceAddIfNotExists(const ASequenceName: String);
-    procedure MarkAllForCreation;
+    procedure ForceCreateStatus;
 
     property ForeignKeysMode: TioDBBuilderIndexesAndFKMode read GetForeignKeysMode;
     property IndexesMode: TioDBBuilderIndexesAndFKMode read GetIndexesMode;
@@ -146,27 +146,17 @@ begin
   Result := FIndexesMode;
 end;
 
-procedure TioDBBuilderSchema.MarkAllForCreation;
+// Mirror of what the DBAnalyzer does on a non-existent database: forces the whole schema tree to
+// stCreate so GenerateScript emits a coherent full "create from scratch" script regardless of the
+// actual database state. For documentation/baseline only. Delegates the per-table cascade (fields,
+// indexes, FKs) to each SchemaTable instead of reaching into its internal composition from here.
+procedure TioDBBuilderSchema.ForceCreateStatus;
 var
   LTable: IioDBBuilderSchemaTable;
-  LField: IioDBBuilderSchemaField;
-  LIndex: IioDBBuilderSchemaIndex;
-  LFK: IioDBBuilderSchemaFK;
 begin
-  // Mirror of what the DBAnalyzer does on a non-existent database: mark the whole schema tree
-  // as stCreate so GenerateScript emits a coherent full "create from scratch" script regardless
-  // of the actual database state. For documentation/baseline only.
   FStatus := stCreate;
   for LTable in FTables.Values do
-  begin
-    LTable.Status := stCreate;
-    for LField in LTable.Fields do
-      LField.Status := stCreate;
-    for LIndex in LTable.Indexes.Values do
-      LIndex.Status := stCreate;
-    for LFK in LTable.ForeignKeys.Values do
-      LFK.Status := stCreate;
-  end;
+    LTable.ForceCreateStatus;
 end;
 
 procedure TioDBBuilderSchema.SequenceAddIfNotExists(const ASequenceName: String);
