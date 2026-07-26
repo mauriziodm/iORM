@@ -102,9 +102,9 @@ uses
 constructor TioDBBuilderSqlText.Create(const AAddLinePrefix: String);
 begin
   inherited Create;
+  FAddLinePrefix := AAddLinePrefix;
   FIndentLevel := 0;
   FLines := TStringList.Create;
-  FAddLinePrefix := AAddLinePrefix;
 end;
 
 destructor TioDBBuilderSqlText.Destroy;
