@@ -261,6 +261,11 @@ type
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
     procedure AddIndex(const AIndexAttr: ioIndex);
     /// <summary>
+    ///  Forces every field of this table to stCreate, overriding whatever the entity-map-vs-DB
+    ///  comparison would have produced. Used as part of ForceCreateStatus's table-wide cascade.
+    /// </summary>
+    procedure ForceFieldsCreateStatus;
+    /// <summary>
     ///  Forces every index of this table to stCreate, overriding whatever the entity-map-vs-DB
     ///  comparison would have produced. Used both standalone (Strategy's strict-mode index drop)
     ///  and as part of ForceCreateStatus's table-wide cascade.
@@ -274,8 +279,8 @@ type
     procedure ForceForeignKeysCreateStatus;
     /// <summary>
     ///  Forces this table, its fields, its indexes and its foreign keys to stCreate, overriding
-    ///  whatever the entity-map-vs-DB comparison would have produced. Delegates the indexes/FKs
-    ///  part to ForceIndexesCreateStatus/ForceForeignKeysCreateStatus.
+    ///  whatever the entity-map-vs-DB comparison would have produced. Delegates to
+    ///  ForceFieldsCreateStatus/ForceIndexesCreateStatus/ForceForeignKeysCreateStatus.
     /// </summary>
     procedure ForceCreateStatus;
 

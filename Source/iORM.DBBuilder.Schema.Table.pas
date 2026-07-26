@@ -69,6 +69,7 @@ type
     procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
     procedure AddIndex(const AIndexAttr: ioIndex);
+    procedure ForceFieldsCreateStatus;
     procedure ForceIndexesCreateStatus;
     procedure ForceForeignKeysCreateStatus;
     procedure ForceCreateStatus;
@@ -187,6 +188,14 @@ begin
   Result := FIndexes;
 end;
 
+procedure TioDBBuilderSchemaTable.ForceFieldsCreateStatus;
+var
+  LField: IioDBBuilderSchemaField;
+begin
+  for LField in FFields do
+    LField.Status := stCreate;
+end;
+
 procedure TioDBBuilderSchemaTable.ForceIndexesCreateStatus;
 var
   LIndex: IioDBBuilderSchemaIndex;
@@ -204,15 +213,12 @@ begin
 end;
 
 // Forces this table, its fields, its indexes and its foreign keys to stCreate, overriding whatever
-// the entity-map-vs-DB comparison would have produced. Delegates the indexes/FKs part instead of
-// duplicating their loops, so the single-collection logic stays in one place.
+// the entity-map-vs-DB comparison would have produced. Delegates each part instead of duplicating
+// the collection loops, so the single-collection logic stays in one place.
 procedure TioDBBuilderSchemaTable.ForceCreateStatus;
-var
-  LField: IioDBBuilderSchemaField;
 begin
   Status := stCreate;
-  for LField in FFields do
-    LField.Status := stCreate;
+  ForceFieldsCreateStatus;
   ForceIndexesCreateStatus;
   ForceForeignKeysCreateStatus;
 end;
