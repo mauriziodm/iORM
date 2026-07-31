@@ -42,16 +42,16 @@ type
 
   TioDBBuilderSchemaRDBMSInfo = class(TInterfacedObject, IioDBBuilderSchemaRDBMSInfo)
   private
+    FMajorVersion: Integer;
+    FMinorVersion: Integer;
     FName: String;
     FRaw: String;
     FVersion: String;
-    FMajorVersion: Integer;
-    FMinorVersion: Integer;
+    function GetMajorVersion: Integer;
+    function GetMinorVersion: Integer;
     function GetName: String;
     function GetRaw: String;
     function GetVersion: String;
-    function GetMajorVersion: Integer;
-    function GetMinorVersion: Integer;
   public
     constructor Create(const AName, ARaw, AVersion: String; const AMajorVersion, AMinorVersion: Integer);
     function IsAtLeast(const AMajor, AMinor: Integer): Boolean;

@@ -43,6 +43,7 @@ type
 
   TioDBBuilderSchemaTable = class(TInterfacedObject, IioDBBuilderSchemaTable)
   private
+    FChanges: TioDBBuilderTableChanges;
     FContextTable: IioTable;
     FFields: TioDBBuilderSchemaFields;
     FForeignKeys: TioDBBuilderSchemaForeignKeys;
@@ -51,54 +52,50 @@ type
     FKeyGenerationStrategy: TioKeyGenerationStrategyType;
     FPrimaryKeyField: IioDBBuilderSchemaField;
     FStatus: TioDBBuilderStatus;
-    FChanges: TioDBBuilderTableChanges;
     function FieldExists(const AFieldName: String): boolean;
-    // IsTrueClass
-    function GetIsTrueClass: Boolean;
-    procedure SetIsTrueClass(const AValue: Boolean);
-    // Status
-    function GetStatus: TioDBBuilderStatus;
-    procedure SetStatus(const AValue: TioDBBuilderStatus);
     function GetChanges: TioDBBuilderTableChanges;
+    function GetIsTrueClass: Boolean;
+    function GetStatus: TioDBBuilderStatus;
+    procedure SetIsTrueClass(const AValue: Boolean);
+    procedure SetStatus(const AValue: TioDBBuilderStatus);
   public
     constructor Create(const AContextTable: IioTable; const AKeyGenerationStrategy: TioKeyGenerationStrategyType);
     destructor Destroy; override;
-
     procedure AddChange(const AChange: TioDBBuilderTableChange);
     procedure AddField(ASchemaField: IioDBBuilderSchemaField);
     procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
     procedure AddIndex(const AIndexAttr: ioIndex);
-    procedure ForceFieldsCreateStatus;
-    procedure ForceIndexesCreateStatus;
-    procedure ForceForeignKeysCreateStatus;
     procedure ForceCreateStatus;
+    procedure ForceFieldsCreateStatus;
+    procedure ForceForeignKeysCreateStatus;
+    procedure ForceIndexesCreateStatus;
+    function GetContextTable: IioTable;
     function GetFields: TioDBBuilderSchemaFields;
     function GetForeignKeys: TioDBBuilderSchemaForeignKeys;
-    function GetContextTable: IioTable;
+    function GetIndexes: TioDBBuilderSchemaIndexes;
     function GetKeyGenerationStrategy: TioKeyGenerationStrategyType;
+    function GetName: String;
+    function GetPrimaryKeyField: IioDBBuilderSchemaField;
     function GetRequestedKeyGenerationStrategy: TioKeyGenerationStrategyType;
     function GetSequenceName: String;
-    function UsesSequenceForKeyGeneration: Boolean;
-    function UsesIdentityForKeyGeneration: Boolean;
-    function IsKeyGenerationStrategyFallback: Boolean;
-    function GetIndexes: TioDBBuilderSchemaIndexes;
-    function GetPrimaryKeyField: IioDBBuilderSchemaField;
-    function GetName: String;
     function GetSqlName: String;
+    function IsKeyGenerationStrategyFallback: Boolean;
+    function UsesIdentityForKeyGeneration: Boolean;
+    function UsesSequenceForKeyGeneration: Boolean;
 
-    property ContextTable: IioTable read GetContextTable;
     property Changes: TioDBBuilderTableChanges read GetChanges;
+    property ContextTable: IioTable read GetContextTable;
     property Fields: TioDBBuilderSchemaFields read GetFields;
     property ForeignKeys: TioDBBuilderSchemaForeignKeys read GetForeignKeys;
     property Indexes: TioDBBuilderSchemaIndexes read GetIndexes;
     property IsTrueClass: Boolean read GetIsTrueClass write SetIsTrueClass;
     property KeyGenerationStrategy: TioKeyGenerationStrategyType read GetKeyGenerationStrategy;
-    property RequestedKeyGenerationStrategy: TioKeyGenerationStrategyType read GetRequestedKeyGenerationStrategy;
     property Name: string read GetName;
-    property SqlName: string read GetSqlName;
     property PrimaryKeyField: IioDBBuilderSchemaField read GetPrimaryKeyField;
+    property RequestedKeyGenerationStrategy: TioKeyGenerationStrategyType read GetRequestedKeyGenerationStrategy;
     property SequenceName: string read GetSequenceName;
+    property SqlName: string read GetSqlName;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 

@@ -48,42 +48,36 @@ type
     FOnUpdateAction: TioFKAction;
     FReferenceMap: IioMap;
     FStatus: TioDBBuilderStatus;
-    // Raw names (case normalized, no delimiters)
-    function GetDependentTableName: String;
     function GetDependentFieldName: String;
+    function GetDependentTableName: String;
     function GetName: String;
-    function GetReferenceTableName: String;
-    function GetReferenceFieldName: String;
-    // SQL names (case normalized + delimiters)
-    function GetSqlDependentTableName: String;
-    function GetSqlDependentFieldName: String;
-    function GetSqlName: String;
-    function GetSqlReferenceTableName: String;
-    function GetSqlReferenceFieldName: String;
-    // Other
     function GetOnDeleteAction: TioFKAction;
     function GetOnUpdateAction: TioFKAction;
+    function GetReferenceFieldName: String;
+    function GetReferenceTableName: String;
+    function GetSqlDependentFieldName: String;
+    function GetSqlDependentTableName: String;
+    function GetSqlName: String;
+    function GetSqlReferenceFieldName: String;
+    function GetSqlReferenceTableName: String;
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const Value: TioDBBuilderStatus);
   public
     constructor Create(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
 
-    // Raw properties
-    property DependentTableName: String read GetDependentTableName;
     property DependentFieldName: String read GetDependentFieldName;
+    property DependentTableName: String read GetDependentTableName;
     property Name: String read GetName;
-    property ReferenceTableName: String read GetReferenceTableName;
-    property ReferenceFieldName: String read GetReferenceFieldName;
-    // SQL properties
-    property SqlName: String read GetSqlName;
-    property SqlDependentTableName: String read GetSqlDependentTableName;
-    property SqlDependentFieldName: String read GetSqlDependentFieldName;
-    property SqlReferenceTableName: String read GetSqlReferenceTableName;
-    property SqlReferenceFieldName: String read GetSqlReferenceFieldName;
-    // Other
     property OnDeleteAction: TioFKAction read GetOnDeleteAction;
     property OnUpdateAction: TioFKAction read GetOnUpdateAction;
+    property ReferenceFieldName: String read GetReferenceFieldName;
+    property ReferenceTableName: String read GetReferenceTableName;
+    property SqlDependentFieldName: String read GetSqlDependentFieldName;
+    property SqlDependentTableName: String read GetSqlDependentTableName;
+    property SqlName: String read GetSqlName;
+    property SqlReferenceFieldName: String read GetSqlReferenceFieldName;
+    property SqlReferenceTableName: String read GetSqlReferenceTableName;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 

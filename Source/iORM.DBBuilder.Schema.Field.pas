@@ -42,36 +42,34 @@ type
 
   TioDBBuilderSchemaField = class(TInterfacedObject, IioDBBuilderSchemaField)
   private
+    FAltered: TioDBBuilderFieldAlter;
     FContextProperty: IioProperty;
     FStatus: TioDBBuilderStatus;
-    FAltered: TioDBBuilderFieldAlter;
     function GetFieldCustomType: string;
     function GetFieldDefault: TValue;
     function GetFieldDefaultExists: Boolean;
     function GetFieldLength: integer;
+    function GetFieldName: String;
+    function GetFieldNotNull: Boolean;
     function GetFieldPrecision: integer;
     function GetFieldScale: integer;
     function GetFieldSubtype: string;
     function GetFieldType: TioMetadataFieldType;
     function GetFieldUnicode: boolean;
-    function GetFieldNotNull: Boolean;
-    function GetFieldName: String;
-    function GetSqlFieldName: String;
+    function GetIsAltered: Boolean;
+    function GetIsFieldDefaultAltered: Boolean;
+    function GetIsFieldLengthAltered: Boolean;
+    function GetIsFieldLengthDecreased: Boolean;
+    function GetIsFieldLengthIncreased: Boolean;
+    function GetIsFieldNotNullAltered: Boolean;
+    function GetIsFieldPrecisionAltered: Boolean;
+    function GetIsFieldPrecisionDecreased: Boolean;
+    function GetIsFieldPrecisionIncreased: Boolean;
+    function GetIsFieldTypeAltered: Boolean;
     function GetPrimaryKey: Boolean;
-    // Status
+    function GetSqlFieldName: String;
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const Value: TioDBBuilderStatus);
-    // Alteration status getters
-    function GetIsAltered: Boolean;
-    function GetIsFieldTypeAltered: Boolean;
-    function GetIsFieldDefaultAltered: Boolean;
-    function GetIsFieldNotNullAltered: Boolean;
-    function GetIsFieldLengthAltered: Boolean;
-    function GetIsFieldLengthIncreased: Boolean;
-    function GetIsFieldLengthDecreased: Boolean;
-    function GetIsFieldPrecisionAltered: Boolean;
-    function GetIsFieldPrecisionIncreased: Boolean;
-    function GetIsFieldPrecisionDecreased: Boolean;
   public
     constructor Create(const AContextProperty: IioProperty);
     procedure AddAltered(const AAltered: TioDBBuilderFieldAlterStatus);
@@ -81,26 +79,25 @@ type
     property FieldDefaultExists: Boolean read GetFieldDefaultExists;
     property FieldLength: integer read GetFieldLength;
     property FieldName: String read GetFieldName;
-    property SqlFieldName: String read GetSqlFieldName;
+    property FieldNotNull: boolean read GetFieldNotNull;
     property FieldPrecision: integer read GetFieldPrecision;
     property FieldScale: integer read GetFieldScale;
     property FieldSubtype: string read GetFieldSubtype;
     property FieldType: TioMetadataFieldType read GetFieldType;
     property FieldUnicode: boolean read GetFieldUnicode;
-    property FieldNotNull: boolean read GetFieldNotNull;
-    property PrimaryKey: boolean read GetPrimaryKey;
-    property Status: TioDBBuilderStatus read GetStatus write SetStatus;
-    // Alteration status properties
     property IsAltered: Boolean read GetIsAltered;
-    property IsFieldTypeAltered: Boolean read GetIsFieldTypeAltered;
     property IsFieldDefaultAltered: Boolean read GetIsFieldDefaultAltered;
-    property IsFieldNotNullAltered: Boolean read GetIsFieldNotNullAltered;
     property IsFieldLengthAltered: Boolean read GetIsFieldLengthAltered;
-    property IsFieldLengthIncreased: Boolean read GetIsFieldLengthIncreased;
     property IsFieldLengthDecreased: Boolean read GetIsFieldLengthDecreased;
+    property IsFieldLengthIncreased: Boolean read GetIsFieldLengthIncreased;
+    property IsFieldNotNullAltered: Boolean read GetIsFieldNotNullAltered;
     property IsFieldPrecisionAltered: Boolean read GetIsFieldPrecisionAltered;
-    property IsFieldPrecisionIncreased: Boolean read GetIsFieldPrecisionIncreased;
     property IsFieldPrecisionDecreased: Boolean read GetIsFieldPrecisionDecreased;
+    property IsFieldPrecisionIncreased: Boolean read GetIsFieldPrecisionIncreased;
+    property IsFieldTypeAltered: Boolean read GetIsFieldTypeAltered;
+    property PrimaryKey: boolean read GetPrimaryKey;
+    property SqlFieldName: String read GetSqlFieldName;
+    property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
 implementation

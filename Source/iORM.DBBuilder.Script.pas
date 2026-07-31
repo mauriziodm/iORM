@@ -19,29 +19,26 @@ const
 type
   TioDBBuilderSqlText = class(TInterfacedObject, IioDBBuilderSqlText)
   private
+    FAddLinePrefix: String;
     FIndentLevel: Integer;
     FLines: TStringList;
-    FAddLinePrefix: String;
+    function GetIndentationChars: string;
     function GetLines: TStringList;
     function GetText: string;
-    function GetIndentationChars: string;
   public
     constructor Create(const AAddLinePrefix: String);
     destructor Destroy; override;
 
-    procedure Clear;
-
-    // Fluent interface methods (return Self)
     function Add(const AText: String): IioDBBuilderSqlText; virtual;      // Append inline to last line
     function AddComment(const AText: String): IioDBBuilderSqlText; virtual;
-    function AddLine(const AText: string): IioDBBuilderSqlText; virtual;
     function AddEmpty: IioDBBuilderSqlText;
+    function AddLine(const AText: string): IioDBBuilderSqlText; virtual;
     function AddSeparator: IioDBBuilderSqlText; virtual;
     function AddTitle(const AText: String): IioDBBuilderSqlText; virtual;
+    procedure Clear;
     function DecIndent: IioDBBuilderSqlText;
     function IncIndent: IioDBBuilderSqlText;
 
-    // Properties
     property Lines: TStringList read GetLines;
     property Text: string read GetText;
   end;

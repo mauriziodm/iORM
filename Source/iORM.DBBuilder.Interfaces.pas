@@ -80,144 +80,128 @@ type
 
   IioDBBuilderSchemaRDBMSInfo = interface
     ['{A7D3E8F1-B2C4-4D5E-9F6A-1B2C3D4E5F6A}']
+    function GetMajorVersion: Integer;
+    function GetMinorVersion: Integer;
     function GetName: String;
     function GetRaw: String;
     function GetVersion: String;
-    function GetMajorVersion: Integer;
-    function GetMinorVersion: Integer;
     function IsAtLeast(const AMajor, AMinor: Integer): Boolean;
     function ToString: String;
 
+    property MajorVersion: Integer read GetMajorVersion;
+    property MinorVersion: Integer read GetMinorVersion;
     property Name: String read GetName;
     property Raw: String read GetRaw;
     property Version: String read GetVersion;
-    property MajorVersion: Integer read GetMajorVersion;
-    property MinorVersion: Integer read GetMinorVersion;
   end;
 
   IioDBBuilderSchemaFK = interface
     ['{1F653F52-570B-4381-930D-FB3945025DA2}']
-    // Raw names (case normalized, no delimiters) - for FK name construction
-    function GetName: String;
-    function GetReferenceTableName: String;
-    function GetReferenceFieldName: String;
-    function GetDependentTableName: String;
     function GetDependentFieldName: String;
-    // SQL names (case normalized + delimiters) - for SQL generation
-    function GetSqlName: String;
-    function GetSqlReferenceTableName: String;
-    function GetSqlReferenceFieldName: String;
-    function GetSqlDependentTableName: String;
-    function GetSqlDependentFieldName: String;
-    // Other
+    function GetDependentTableName: String;
+    function GetName: String;
     function GetOnDeleteAction: TioFKAction;
     function GetOnUpdateAction: TioFKAction;
+    function GetReferenceFieldName: String;
+    function GetReferenceTableName: String;
+    function GetSqlDependentFieldName: String;
+    function GetSqlDependentTableName: String;
+    function GetSqlName: String;
+    function GetSqlReferenceFieldName: String;
+    function GetSqlReferenceTableName: String;
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const Value: TioDBBuilderStatus);
 
-    // Raw properties
-    property DependentTableName: String read GetDependentTableName;
     property DependentFieldName: String read GetDependentFieldName;
+    property DependentTableName: String read GetDependentTableName;
     property Name: String read GetName;
-    property ReferenceTableName: String read GetReferenceTableName;
-    property ReferenceFieldName: String read GetReferenceFieldName;
-    // SQL properties
-    property SqlName: String read GetSqlName;
-    property SqlDependentTableName: String read GetSqlDependentTableName;
-    property SqlDependentFieldName: String read GetSqlDependentFieldName;
-    property SqlReferenceTableName: String read GetSqlReferenceTableName;
-    property SqlReferenceFieldName: String read GetSqlReferenceFieldName;
-    // Other properties
     property OnDeleteAction: TioFKAction read GetOnDeleteAction;
     property OnUpdateAction: TioFKAction read GetOnUpdateAction;
+    property ReferenceFieldName: String read GetReferenceFieldName;
+    property ReferenceTableName: String read GetReferenceTableName;
+    property SqlDependentFieldName: String read GetSqlDependentFieldName;
+    property SqlDependentTableName: String read GetSqlDependentTableName;
+    property SqlName: String read GetSqlName;
+    property SqlReferenceFieldName: String read GetSqlReferenceFieldName;
+    property SqlReferenceTableName: String read GetSqlReferenceTableName;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
   IioDBBuilderSchemaField = interface
     ['{D06F09FD-7252-46E3-A955-E6C2A3095E77}']
-    // Status
-    function GetStatus: TioDBBuilderStatus;
-    procedure SetStatus(const Value: TioDBBuilderStatus);
-
     procedure AddAltered(const AAltered: TioDBBuilderFieldAlterStatus);
-    // Alteration status getters
-    function GetIsAltered: Boolean;
-    function GetIsFieldTypeAltered: Boolean;
-    function GetIsFieldDefaultAltered: Boolean;
-    function GetIsFieldNotNullAltered: Boolean;
-    function GetIsFieldLengthAltered: Boolean;
-    function GetIsFieldLengthIncreased: Boolean;
-    function GetIsFieldLengthDecreased: Boolean;
-    function GetIsFieldPrecisionAltered: Boolean;
-    function GetIsFieldPrecisionIncreased: Boolean;
-    function GetIsFieldPrecisionDecreased: Boolean;
-
     function GetFieldCustomType: string;
     function GetFieldDefault: TValue;
     function GetFieldDefaultExists: Boolean;
     function GetFieldLength: integer;
     function GetFieldName: String;
-    function GetSqlFieldName: String;
+    function GetFieldNotNull: boolean;
     function GetFieldPrecision: integer;
     function GetFieldScale: integer;
     function GetFieldSubtype: string;
     function GetFieldType: TioMetadataFieldType;
     function GetFieldUnicode: boolean;
-    function GetFieldNotNull: boolean;
+    function GetIsAltered: Boolean;
+    function GetIsFieldDefaultAltered: Boolean;
+    function GetIsFieldLengthAltered: Boolean;
+    function GetIsFieldLengthDecreased: Boolean;
+    function GetIsFieldLengthIncreased: Boolean;
+    function GetIsFieldNotNullAltered: Boolean;
+    function GetIsFieldPrecisionAltered: Boolean;
+    function GetIsFieldPrecisionDecreased: Boolean;
+    function GetIsFieldPrecisionIncreased: Boolean;
+    function GetIsFieldTypeAltered: Boolean;
     function GetPrimaryKey: boolean;
+    function GetSqlFieldName: String;
+    function GetStatus: TioDBBuilderStatus;
+    procedure SetStatus(const Value: TioDBBuilderStatus);
 
     property FieldCustomType: string read GetFieldCustomType;
     property FieldDefault: TValue read GetFieldDefault;
     property FieldDefaultExists: Boolean read GetFieldDefaultExists;
     property FieldLength: integer read GetFieldLength;
     property FieldName: String read GetFieldName;
-    property SqlFieldName: String read GetSqlFieldName;
+    property FieldNotNull: boolean read GetFieldNotNull;
     property FieldPrecision: integer read GetFieldPrecision;
     property FieldScale: integer read GetFieldScale;
     property FieldSubtype: string read GetFieldSubtype;
     property FieldType: TioMetadataFieldType read GetFieldType;
     property FieldUnicode: boolean read GetFieldUnicode;
-    property FieldNotNull: boolean read GetFieldNotNull;
-    property PrimaryKey: boolean read GetPrimaryKey;
-    property Status: TioDBBuilderStatus read GetStatus write SetStatus;
-    // Alteration status properties
     property IsAltered: Boolean read GetIsAltered;
-    property IsFieldTypeAltered: Boolean read GetIsFieldTypeAltered;
     property IsFieldDefaultAltered: Boolean read GetIsFieldDefaultAltered;
-    property IsFieldNotNullAltered: Boolean read GetIsFieldNotNullAltered;
     property IsFieldLengthAltered: Boolean read GetIsFieldLengthAltered;
-    property IsFieldLengthIncreased: Boolean read GetIsFieldLengthIncreased;
     property IsFieldLengthDecreased: Boolean read GetIsFieldLengthDecreased;
+    property IsFieldLengthIncreased: Boolean read GetIsFieldLengthIncreased;
+    property IsFieldNotNullAltered: Boolean read GetIsFieldNotNullAltered;
     property IsFieldPrecisionAltered: Boolean read GetIsFieldPrecisionAltered;
-    property IsFieldPrecisionIncreased: Boolean read GetIsFieldPrecisionIncreased;
     property IsFieldPrecisionDecreased: Boolean read GetIsFieldPrecisionDecreased;
+    property IsFieldPrecisionIncreased: Boolean read GetIsFieldPrecisionIncreased;
+    property IsFieldTypeAltered: Boolean read GetIsFieldTypeAltered;
+    property PrimaryKey: boolean read GetPrimaryKey;
+    property SqlFieldName: String read GetSqlFieldName;
+    property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
   IioDBBuilderSchemaIndex = interface
     ['{35DBA528-3DE3-4515-B809-5FE42ABF1CBB}']
     procedure AddChange(const AChange: TioDBBuilderIndexChange);
-
     function GetChanges: TioDBBuilderIndexChanges;
-    // Raw names (case normalized, no delimiters)
     function GetCommaSepFieldList: String;
+    function GetHasExplicitName: boolean;
     function GetName: String;
-    // SQL names (case normalized + delimiters)
+    function GetOrientation: TioIndexOrientation;
     function GetSqlCommaSepFieldList: String;
     function GetSqlName: String;
-    // Other
-    function GetHasExplicitName: boolean;
-    function GetOrientation: TioIndexOrientation;
     function GetStatus: TioDBBuilderStatus;
     function GetUnique: Boolean;
-
     procedure SetStatus(const Value: TioDBBuilderStatus);
 
     property Changes: TioDBBuilderIndexChanges read GetChanges;
     property CommaSepFieldList: String read GetCommaSepFieldList;
-    property SqlCommaSepFieldList: String read GetSqlCommaSepFieldList;
     property HasExplicitName: boolean read GetHasExplicitName;
-    property Orientation: TioIndexOrientation read GetOrientation;
     property Name: String read GetName;
+    property Orientation: TioIndexOrientation read GetOrientation;
+    property SqlCommaSepFieldList: String read GetSqlCommaSepFieldList;
     property SqlName: String read GetSqlName;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
     property Unique: Boolean read GetUnique;
@@ -231,46 +215,22 @@ type
   IioDBBuilderSchemaTable = interface
     ['{2AFBE991-7E33-42DB-892E-01F8C98A5B8F}']
 
-    function GetChanges: TioDBBuilderTableChanges;
-    function GetFields: TioDBBuilderSchemaFields;
-    function GetForeignKeys: TioDBBuilderSchemaForeignKeys;
-    function GetContextTable: IioTable;
-    function GetKeyGenerationStrategy: TioKeyGenerationStrategyType;
-    // Returns the strategy the entity originally requested (before Resolve_KeyGenerationStrategy
-    // applied any DBMS-specific fallback). GetKeyGenerationStrategy returns the *resolved* one.
-    function GetRequestedKeyGenerationStrategy: TioKeyGenerationStrategyType;
-    function GetSequenceName: String;
-    function UsesSequenceForKeyGeneration: Boolean;
-    function UsesIdentityForKeyGeneration: Boolean;
-    function IsKeyGenerationStrategyFallback: Boolean;
-    // function IDField: IioDBBuilderSchemaField;
-    function GetIndexes: TioDBBuilderSchemaIndexes;
-    function GetPrimaryKeyField: IioDBBuilderSchemaField;
-    function GetName: String;
-    function GetSqlName: String;
-    // IsTrueClass
-    procedure SetIsTrueClass(const AValue: boolean);
-    function GetIsTrueClass: boolean;
-    // Status
-    function GetStatus: TioDBBuilderStatus;
-    procedure SetStatus(const AValue: TioDBBuilderStatus);
-
     procedure AddChange(const AChange: TioDBBuilderTableChange);
     procedure AddField(ASchemaField: IioDBBuilderSchemaField);
     procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
     procedure AddIndex(const AIndexAttr: ioIndex);
     /// <summary>
+    ///  Forces this table, its fields, its indexes and its foreign keys to stCreate, overriding
+    ///  whatever the entity-map-vs-DB comparison would have produced. Delegates to
+    ///  ForceFieldsCreateStatus/ForceIndexesCreateStatus/ForceForeignKeysCreateStatus.
+    /// </summary>
+    procedure ForceCreateStatus;
+    /// <summary>
     ///  Forces every field of this table to stCreate, overriding whatever the entity-map-vs-DB
     ///  comparison would have produced. Used as part of ForceCreateStatus's table-wide cascade.
     /// </summary>
     procedure ForceFieldsCreateStatus;
-    /// <summary>
-    ///  Forces every index of this table to stCreate, overriding whatever the entity-map-vs-DB
-    ///  comparison would have produced. Used both standalone (Strategy's strict-mode index drop)
-    ///  and as part of ForceCreateStatus's table-wide cascade.
-    /// </summary>
-    procedure ForceIndexesCreateStatus;
     /// <summary>
     ///  Forces every foreign key of this table to stCreate, overriding whatever the entity-map-vs-DB
     ///  comparison would have produced. Used both standalone (Strategy's strict-mode FK drop) and as
@@ -278,24 +238,44 @@ type
     /// </summary>
     procedure ForceForeignKeysCreateStatus;
     /// <summary>
-    ///  Forces this table, its fields, its indexes and its foreign keys to stCreate, overriding
-    ///  whatever the entity-map-vs-DB comparison would have produced. Delegates to
-    ///  ForceFieldsCreateStatus/ForceIndexesCreateStatus/ForceForeignKeysCreateStatus.
+    ///  Forces every index of this table to stCreate, overriding whatever the entity-map-vs-DB
+    ///  comparison would have produced. Used both standalone (Strategy's strict-mode index drop)
+    ///  and as part of ForceCreateStatus's table-wide cascade.
     /// </summary>
-    procedure ForceCreateStatus;
+    procedure ForceIndexesCreateStatus;
+    function GetChanges: TioDBBuilderTableChanges;
+    function GetContextTable: IioTable;
+    function GetFields: TioDBBuilderSchemaFields;
+    function GetForeignKeys: TioDBBuilderSchemaForeignKeys;
+    function GetIndexes: TioDBBuilderSchemaIndexes;
+    function GetIsTrueClass: boolean;
+    function GetKeyGenerationStrategy: TioKeyGenerationStrategyType;
+    function GetName: String;
+    function GetPrimaryKeyField: IioDBBuilderSchemaField;
+    // Returns the strategy the entity originally requested (before Resolve_KeyGenerationStrategy
+    // applied any DBMS-specific fallback). GetKeyGenerationStrategy returns the *resolved* one.
+    function GetRequestedKeyGenerationStrategy: TioKeyGenerationStrategyType;
+    function GetSequenceName: String;
+    function GetSqlName: String;
+    function GetStatus: TioDBBuilderStatus;
+    function IsKeyGenerationStrategyFallback: Boolean;
+    procedure SetIsTrueClass(const AValue: boolean);
+    procedure SetStatus(const AValue: TioDBBuilderStatus);
+    function UsesIdentityForKeyGeneration: Boolean;
+    function UsesSequenceForKeyGeneration: Boolean;
 
-    property ContextTable: IioTable read GetContextTable;
     property Changes: TioDBBuilderTableChanges read GetChanges;
+    property ContextTable: IioTable read GetContextTable;
     property Fields: TioDBBuilderSchemaFields read GetFields;
     property ForeignKeys: TioDBBuilderSchemaForeignKeys read GetForeignKeys;
     property Indexes: TioDBBuilderSchemaIndexes read GetIndexes;
     property IsTrueClass: boolean read GetIsTrueClass write SetIsTrueClass;
-    property Name: string read GetName;
-    property SqlName: string read GetSqlName;
     property KeyGenerationStrategy: TioKeyGenerationStrategyType read GetKeyGenerationStrategy;
-    property RequestedKeyGenerationStrategy: TioKeyGenerationStrategyType read GetRequestedKeyGenerationStrategy;
+    property Name: string read GetName;
     property PrimaryKeyField: IioDBBuilderSchemaField read GetPrimaryKeyField;
+    property RequestedKeyGenerationStrategy: TioKeyGenerationStrategyType read GetRequestedKeyGenerationStrategy;
     property SequenceName: string read GetSequenceName;
+    property SqlName: string read GetSqlName;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
@@ -304,17 +284,8 @@ type
 
   IioDBBuilderSchema = interface
     ['{1AEDB134-1ECB-490E-A53A-973BEDE509E5}']
-    function GetForeignKeysMode: TioDBBuilderIndexesAndFKMode;
-    function GetIndexesMode: TioDBBuilderIndexesAndFKMode;
-    function GetSequences: TioDBBuilderSchemaSequences;
-    function GetTables: TioDBBuilderSchemaTables;
-    // Status
-    function GetStatus: TioDBBuilderStatus;
-    procedure SetStatus(const Value: TioDBBuilderStatus);
-
     function FindOrCreateTable(const AMap: IioMap; const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
     function FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
-    procedure SequenceAddIfNotExists(const ASequenceName: String);
     /// <summary>
     ///  Forces the whole schema tree (schema, tables, fields, indexes and foreign keys) to stCreate,
     ///  overriding whatever the entity-map-vs-DB comparison would have produced (mirrors what the
@@ -323,6 +294,13 @@ type
     ///  ForceCreateStatus.
     /// </summary>
     procedure ForceCreateStatus;
+    function GetForeignKeysMode: TioDBBuilderIndexesAndFKMode;
+    function GetIndexesMode: TioDBBuilderIndexesAndFKMode;
+    function GetSequences: TioDBBuilderSchemaSequences;
+    function GetStatus: TioDBBuilderStatus;
+    function GetTables: TioDBBuilderSchemaTables;
+    procedure SequenceAddIfNotExists(const ASequenceName: String);
+    procedure SetStatus(const Value: TioDBBuilderStatus);
 
     property ForeignKeysMode: TioDBBuilderIndexesAndFKMode read GetForeignKeysMode;
     property IndexesMode: TioDBBuilderIndexesAndFKMode read GetIndexesMode;
@@ -333,18 +311,16 @@ type
 
   IioDBBuilderSqlText = interface
     ['{DF2D64EF-3576-49CF-B803-3D10D7A93816}']
-    procedure Clear;
-    function GetLines: TStringList;
-    function GetText: string;
-
-    // Fluent interface methods (return Self)
     function Add(const AText: String): IioDBBuilderSqlText; // Append inline to last line
     function AddComment(const AText: String): IioDBBuilderSqlText;
     function AddEmpty: IioDBBuilderSqlText;
     function AddLine(const AText: string): IioDBBuilderSqlText;
     function AddSeparator: IioDBBuilderSqlText;
     function AddTitle(const AText: String): IioDBBuilderSqlText;
+    procedure Clear;
     function DecIndent: IioDBBuilderSqlText;
+    function GetLines: TStringList;
+    function GetText: string;
     function IncIndent: IioDBBuilderSqlText;
 
     property Lines: TStringList read GetLines;

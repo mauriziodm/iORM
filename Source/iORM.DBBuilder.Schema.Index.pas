@@ -23,33 +23,27 @@ type
     FOrientation: TioIndexOrientation;
     FStatus: TioDBBuilderStatus;
     FUnique: Boolean;
-    // Status
     function GetChanges: TioDBBuilderIndexChanges;
-    // Raw names (case normalized, no delimiters)
     function GetCommaSepFieldList: String;
+    function GetHasExplicitName: boolean;
     function GetName: String;
-    // SQL names (case normalized + delimiters)
+    function GetOrientation: TioIndexOrientation;
     function GetSqlCommaSepFieldList: String;
     function GetSqlName: String;
-    // Other
-    function GetOrientation: TioIndexOrientation;
     function GetStatus: TioDBBuilderStatus;
     function GetUnique: Boolean;
-    function GetHasExplicitName: boolean;
-
     procedure SetStatus(const Value: TioDBBuilderStatus);
   public
     constructor Create(const AIndexAttr: ioIndex; const AConnectionDefName: String);
-
     procedure AddChange(const AChange: TioDBBuilderIndexChange);
 
     property Changes: TioDBBuilderIndexChanges read GetChanges;
     property CommaSepFieldList: String read GetCommaSepFieldList;
-    property SqlCommaSepFieldList: String read GetSqlCommaSepFieldList;
     property HasExplicitName: boolean read GetHasExplicitName;
     property Name: String read GetName;
-    property SqlName: String read GetSqlName;
     property Orientation: TioIndexOrientation read GetOrientation;
+    property SqlCommaSepFieldList: String read GetSqlCommaSepFieldList;
+    property SqlName: String read GetSqlName;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
     property Unique: Boolean read GetUnique;
   end;

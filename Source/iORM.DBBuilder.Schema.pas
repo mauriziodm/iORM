@@ -42,25 +42,23 @@ type
 
   TioDBBuilderSchema = class(TInterfacedObject, IioDBBuilderSchema)
   private
-    FIndexesMode, FForeignKeysMode: TioDBBuilderIndexesAndFKMode;
+    FForeignKeysMode, FIndexesMode: TioDBBuilderIndexesAndFKMode;
     FSequences: TioDBBuilderSchemaSequences;
     FStatus: TioDBBuilderStatus;
     FTables: TioDBBuilderSchemaTables;
     function GetForeignKeysMode: TioDBBuilderIndexesAndFKMode;
     function GetIndexesMode: TioDBBuilderIndexesAndFKMode;
     function GetSequences: TioDBBuilderSchemaSequences;
-    function GetTables: TioDBBuilderSchemaTables;
-    // Status
     function GetStatus: TioDBBuilderStatus;
+    function GetTables: TioDBBuilderSchemaTables;
     procedure SetStatus(const AValue: TioDBBuilderStatus);
   public
     constructor Create(const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
     destructor Destroy; override;
-
     function FindOrCreateTable(const AMap: IioMap; const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
     function FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
-    procedure SequenceAddIfNotExists(const ASequenceName: String);
     procedure ForceCreateStatus;
+    procedure SequenceAddIfNotExists(const ASequenceName: String);
 
     property ForeignKeysMode: TioDBBuilderIndexesAndFKMode read GetForeignKeysMode;
     property IndexesMode: TioDBBuilderIndexesAndFKMode read GetIndexesMode;
