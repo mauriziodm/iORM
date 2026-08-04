@@ -266,7 +266,7 @@ type
 implementation
 
 uses
-  System.IOUtils, iORM.DB.ConnectionContainer, iORM, iORM.DBBuilder.Factory,
+  System.IOUtils, iORM.DB.ConnectionContainer, iORM,
   iORM.Abstraction;
 
 { TioCustomConnectionDef }
@@ -321,33 +321,27 @@ var
   LReRaise: Boolean;
   LDBBuilderEngine: IioDBBuilderEngine;
   LScript: IioDBBuilderScript;
-  LStatus: TioDBBuilderStatus;
 begin
   LAbort := False;
   LReRaise := True;
-  LDBBuilderEngine := TioDBBuilderFactory.NewEngine(Name, FAutoCreateDB.Indexes, FAutoCreateDB.ForeignKeys);
-  LStatus := LDBBuilderEngine.Analyze;
+  LDBBuilderEngine := io.DBBuilder(Name, FAutoCreateDB.Indexes, FAutoCreateDB.ForeignKeys);
+  LScript := LDBBuilderEngine.BuildScript_SyncDBStruct;
 
-  LScript := TioDBBuilderFactory.NewScript(Name);
-  LDBBuilderEngine.BuildCreateOrUpdateDBScript(LScript);
-
-  // Carlo Marona
   if Assigned(FBeforeDBBuild) then
-    FBeforeDBBuild(Self, LStatus, LScript.Lines, LDBBuilderEngine.Warnings, LAbort);
+    FBeforeDBBuild(Self, LDBBuilderEngine.Schema.Status, LScript.Lines, LScript.Warnings.Lines, LAbort);
 
   if not LAbort then
   begin
     try
-      LDBBuilderEngine.CreateOrUpdateDB(AForce, LScript);
+      LDBBuilderEngine.SyncDBStruct(AForce, LScript);
 
-      // Carlo Marona
-    	if Assigned(FAfterDBBuild) then
-        FAfterDBBuild(Self, LStatus, LScript.Lines, LDBBuilderEngine.Warnings);
+      if Assigned(FAfterDBBuild) then
+        FAfterDBBuild(Self, LDBBuilderEngine.Schema.Status, LScript.Lines, LScript.Warnings.Lines);
     except
       on E: Exception do
       begin
         if Assigned(FOnDBBuildException) then
-          FOnDBBuildException(Self, LStatus, LScript.Lines, LDBBuilderEngine.Warnings, E, LReRaise);
+          FOnDBBuildException(Self, LDBBuilderEngine.Schema.Status, LScript.Lines, LScript.Warnings.Lines, E, LReRaise);
 
         if LReRaise then
           raise;
