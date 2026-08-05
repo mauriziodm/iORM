@@ -655,8 +655,7 @@ type
     class function SQL(const ASQL: TStrings; const AOwns: boolean = False): IioSQLDestination; overload;
     class function SQL(const ASQLDestination: IioSQLDestination): IioSQLDestination; overload;
 
-    class function DBBuilder(const AIndexesMode: TioDBBuilderIndexesAndFKMode = ifmEnabled; const AForeignKeysMode: TioDBBuilderIndexesAndFKMode = ifmEnabled): IioDBBuilderEngine; overload;
-    class function DBBuilder(const AConnectionDefName: String; const AIndexesMode: TioDBBuilderIndexesAndFKMode = ifmEnabled; const AForeignKeysMode: TioDBBuilderIndexesAndFKMode = ifmEnabled): IioDBBuilderEngine; overload;
+    class function DBBuilder: IioDBBuilderEngine;
 
     // Dependency Injection Container (DIC)
     class function di: TioDependencyInjectionRef;
@@ -1833,14 +1832,9 @@ begin
   _FreeObjAfterPersistOrDelete(AObj, AFree);
 end;
 
-class function io.DBBuilder(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderEngine;
+class function io.DBBuilder: IioDBBuilderEngine;
 begin
-  Result := GlobalFactory.DBBuilderFactory.NewEngine(AConnectionDefName, AIndexesMode, AForeignKeysMode);
-end;
-
-class function io.DBBuilder(const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderEngine;
-begin
-  Result := GlobalFactory.DBBuilderFactory.NewEngine('', AIndexesMode, AForeignKeysMode);
+  Result := GlobalFactory.DBBuilderFactory.NewEngine;
 end;
 
 class function io.DefaultVCProvider: TioViewContextProvider;

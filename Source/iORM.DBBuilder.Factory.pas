@@ -51,7 +51,7 @@ type
 
   TioDBBuilderFactory = class
   public
-    class function NewEngine(const AConnectionDefName: String; const AIndexesMode: TioDBBuilderIndexesAndFKMode = ifmEnabled; const AForeignKeysMode: TioDBBuilderIndexesAndFKMode = ifmEnabled): IioDBBuilderEngine;
+    class function NewEngine: IioDBBuilderEngine;
     class function NewDBAnalyzer(const AConnectionDefname: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderScript): IioDBBuilderDBAnalyzer;
     class function NewSchema(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode;
       const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchema;
@@ -64,7 +64,7 @@ type
     class function NewSchemaTable(const AContextTable: IioTable;
       const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
     class function NewSqlGenerator(const AConnectionDefName: String): IioDBBuilderSqlGenerator;
-    class function NewScript(const AConnectionDefName: String): IioDBBuilderScript;
+    class function NewScript(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema): IioDBBuilderScript;
     class function NewSqlText(const AAddLinePrefix: String = ''): IioDBBuilderSqlText;
     class function NewStrategy(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderScript): IioDBBuilderStrategy;
   end;
@@ -91,10 +91,9 @@ begin
   Result := TioDBBuilderDBAnalyzer.Create(AConnectionDefName, ASchema, ASqlGenerator, AScript);
 end;
 
-class function TioDBBuilderFactory.NewEngine(const AConnectionDefName: String; const AIndexesMode: TioDBBuilderIndexesAndFKMode;
-  const AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderEngine;
+class function TioDBBuilderFactory.NewEngine: IioDBBuilderEngine;
 begin
-  Result := TioDBBuilderEngine.Create(AConnectionDefName, AIndexesMode, AForeignKeysMode);
+  Result := TioDBBuilderEngine.Create;
 end;
 
 class function TioDBBuilderFactory.NewSchema(const AConnectionDefName: String; const AIndexesMode,
@@ -157,9 +156,9 @@ begin
   end;
 end;
 
-class function TioDBBuilderFactory.NewScript(const AConnectionDefName: String): IioDBBuilderScript;
+class function TioDBBuilderFactory.NewScript(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema): IioDBBuilderScript;
 begin
-  Result := TioDBBuilderScript.Create(AConnectionDefName);
+  Result := TioDBBuilderScript.Create(AConnectionDefName, ASchema);
 end;
 
 class function TioDBBuilderFactory.NewSqlText(const AAddLinePrefix: String = ''): IioDBBuilderSqlText;

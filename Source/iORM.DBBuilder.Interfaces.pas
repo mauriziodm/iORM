@@ -336,11 +336,21 @@ type
     function GetHeader: IioDBBuilderSqlText;
     function GetHints: IioDBBuilderSqlText;
     function GetLines: TStringList;
+    function GetSchema: IioDBBuilderSchema;
     function GetWarnings: IioDBBuilderSqlText;
 
     // Full script clear
     procedure Clear;
-    procedure Execute;
+    /// <summary>
+    ///  Executes the script against the database identified by the ConnectionDefName this script
+    ///  was built for.
+    /// </summary>
+    /// <remarks>
+    ///  If Schema.Status = stCreate, the database itself is physically created first (file created
+    ///  for SQLite, "CREATE DATABASE"-equivalent for Firebird) before the script lines run. Raises
+    ///  EioDBBuilderException if Warnings is non-empty, unless AForce = True.
+    /// </remarks>
+    procedure Execute(const AForce: Boolean = False);
     procedure SaveToFile(const AFileName: string);
     // This method works on header section
     procedure ScriptBegin(const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo);
@@ -352,6 +362,7 @@ type
     property Header: IioDBBuilderSqlText read GetHeader;
     property Hints: IioDBBuilderSqlText read GetHints;
     property Lines: TStringList read GetLines;
+    property Schema: IioDBBuilderSchema read GetSchema;
     property Warnings: IioDBBuilderSqlText read GetWarnings;
   end;
 
@@ -652,16 +663,16 @@ type
 
     { Naming convention (Engine layer - mirrors the SqlGenerator/Strategy families documented in
       CLAUDE.md and in the banners of iORM.DBBuilder.SqlGenerator.Base / iORM.DBBuilder.Strategy.Base):
-        BuildScript_*   public entry point; fully self-contained (builds the schema, analyzes it
-                         against the live DB or forces it, as appropriate - no external Analyze()
-                         call needed, no Analyzed flag). Returns a NOT-yet-executed IioDBBuilderScript;
-                         populates Schema as a side effect (Schema.Status reflects the outcome).
-                         Each engine instance is intended for exactly ONE BuildScript_* call.
-        Plain verb      convenience orchestration built on top of a BuildScript_* method: adds the
-        (SyncDBStruct)  warnings guard, the physical "create the database" step, and Execute.
+        BuildScript_*   the engine's only public entry points. Each is fully self-contained and
+                         stateless: it builds a fresh SqlGenerator, Schema and Script locally from
+                         the ConnectionDefName/mode parameters passed in, and returns a NOT-yet-
+                         executed IioDBBuilderScript. The returned Script exposes the Schema it was
+                         built against via Script.Schema (Schema.Status reflects the outcome). The
+                         Engine itself holds no per-call state and instances may be reused/discarded
+                         freely.
+      Execute/guard behavior (warnings guard, physical database creation, actual execution) lives on
+      IioDBBuilderScript.Execute, not here - see its doc comment.
       Layout: grouped under domain banners, alphabetical within each group (project-wide convention). }
-
-    function GetSchema: IioDBBuilderSchema;
 
     // ==========================================================
     // DATABASE RELATED METHODS
@@ -672,21 +683,15 @@ type
     ///  lazy DBMSInfo version query touches the DB). The resulting script must NOT be executed
     ///  against an existing database.
     /// </summary>
-    function BuildScript_ForceCreateDB: IioDBBuilderScript;
+    function BuildScript_ForceCreateDB(const AConnectionDefName: String;
+      const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderScript;
     /// <summary>
     ///  Self-contained: builds the schema from the entity maps, analyzes it against the live
     ///  database catalog, and produces a create-or-update SQL script driven by the resulting
-    ///  status. Populates Schema (Schema.Status) as a side effect.
+    ///  status. The returned Script's Schema.Status reflects the outcome.
     /// </summary>
-    function BuildScript_SyncDBStruct: IioDBBuilderScript;
-    /// <summary>
-    ///  Convenience: builds (via BuildScript_SyncDBStruct, unless AScript is supplied) and executes
-    ///  a sync script in one call - guards against pending warnings, physically creates the database
-    ///  first when needed, then executes. If AScript is supplied it MUST be the script produced by an
-    ///  earlier BuildScript_SyncDBStruct call on THIS SAME engine instance (Schema.Status, populated
-    ///  by that call, drives the guard/physical-create decision).
-    /// </summary>
-    procedure SyncDBStruct(const AForce: Boolean = False; const AScript: IioDBBuilderScript = nil);
+    function BuildScript_SyncDBStruct(const AConnectionDefName: String;
+      const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderScript;
 
     // ==========================================================
     // INDEX RELATED METHODS  (backlog - placeholder only, not implemented yet)
@@ -696,8 +701,6 @@ type
     // NOTE: SqlGenerator.BuildSQL_CreateIndex/BuildSQL_DropIndexByName are unimplemented for
     //       MSSqlServer (raise "not implemented") - this backlog item needs SqlGenerator.MSSqlServer
     //       work too, not just an Engine-level addition.
-
-    property Schema: IioDBBuilderSchema read GetSchema;
   end;
 
 

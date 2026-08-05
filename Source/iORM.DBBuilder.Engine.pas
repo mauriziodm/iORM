@@ -48,101 +48,60 @@ uses
 type
 
   TioDBBuilderEngine = class(TInterfacedObject, IioDBBuilderEngine)
-  private
-    FConnectionDefName: string;
-    FSchema: IioDBBuilderSchema;
-    FScript: IioDBBuilderScript;
-    FSqlGenerator: IioDBBuilderSqlGenerator;
-    procedure CreateDatabase;
-    function GetSchema: IioDBBuilderSchema;
   public
-    constructor Create(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
-
     // ==========================================================
     // DATABASE RELATED METHODS
     // ----------------------------------------------------------
-    function BuildScript_ForceCreateDB: IioDBBuilderScript;
-    function BuildScript_SyncDBStruct: IioDBBuilderScript;
-    procedure SyncDBStruct(const AForce: Boolean = False; const AScript: IioDBBuilderScript = nil);
-
-    property Schema: IioDBBuilderSchema read GetSchema;
+    function BuildScript_ForceCreateDB(const AConnectionDefName: String;
+      const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderScript;
+    function BuildScript_SyncDBStruct(const AConnectionDefName: String;
+      const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderScript;
   end;
 
 implementation
 
 uses
-  System.SysUtils,
-
-  iORM.DBBuilder.Factory,
-  iORM.Exceptions
+  iORM.DBBuilder.Factory
 
   ;
 
 { TioDBBuilderEngine }
 
-function TioDBBuilderEngine.BuildScript_ForceCreateDB: IioDBBuilderScript;
-begin
-  // Self-contained: FSchema is already fully populated from the class/entity maps (constructor
-  // -> NewSchema -> BuildSchema, no DB access). GenerateScript_ForceCreate marks the whole tree
-  // as stCreate. Result must NOT be executed against an existing database.
-  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, FScript).GenerateScript_ForceCreate;
-  Result := FScript;
-end;
-
-function TioDBBuilderEngine.BuildScript_SyncDBStruct: IioDBBuilderScript;
-begin
-  TioDBBuilderFactory.NewDBAnalyzer(FConnectionDefName, FSchema, FSqlGenerator, FScript).Analyze;
-  // Status-driven: create or update, according to the status the DBAnalyzer just determined.
-  TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, FScript).GenerateScript_Sync;
-  Result := FScript;
-end;
-
-constructor TioDBBuilderEngine.Create(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
-begin
-  FConnectionDefName := AConnectionDefName;
-  // SqlGenerator must be created BEFORE Schema so that kgsAuto can be resolved
-  FSqlGenerator := TioDBBuilderFactory.NewSqlGenerator(FConnectionDefName);
-  FSchema := TioDBBuilderFactory.NewSchema(FConnectionDefName, AIndexesMode, AForeignKeysMode, FSqlGenerator);
-  FScript := TioDBBuilderFactory.NewScript(FConnectionDefName);
-end;
-
-procedure TioDBBuilderEngine.CreateDatabase;
+function TioDBBuilderEngine.BuildScript_ForceCreateDB(const AConnectionDefName: String;
+  const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderScript;
 var
-  LStrategy: IioDBBuilderStrategy;
-begin
-  LStrategy := TioDBBuilderFactory.NewStrategy(FConnectionDefName, FSchema, FSqlGenerator, FScript);
-  LStrategy.ScriptWrite_CreateDatabase;
-end;
-
-function TioDBBuilderEngine.GetSchema: IioDBBuilderSchema;
-begin
-  Result := FSchema;
-end;
-
-procedure TioDBBuilderEngine.SyncDBStruct(const AForce: Boolean; const AScript: IioDBBuilderScript);
-var
+  LSchema: IioDBBuilderSchema;
   LScript: IioDBBuilderScript;
+  LSqlGenerator: IioDBBuilderSqlGenerator;
 begin
-  if Assigned(AScript) then
-    LScript := AScript
-  else
-    LScript := BuildScript_SyncDBStruct;
+  // SqlGenerator must be created BEFORE Schema so that kgsAuto can be resolved
+  LSqlGenerator := TioDBBuilderFactory.NewSqlGenerator(AConnectionDefName);
+  LSchema := TioDBBuilderFactory.NewSchema(AConnectionDefName, AIndexesMode, AForeignKeysMode, LSqlGenerator);
+  LScript := TioDBBuilderFactory.NewScript(AConnectionDefName, LSchema);
 
-  if (FSchema.Status > stClean) or AForce then
-  begin
-    if LScript.Warnings.Lines.Count > 0 then
-      raise EioDBBuilderException.Create(ClassName, 'SyncDBStruct',
-        'Database must be updated but WARNINGS exists.' + sLineBreak +
-        LScript.Warnings.Lines.Text
-      );
+  // Self-contained: LSchema is already fully populated from the class/entity maps (NewSchema ->
+  // BuildSchema, no DB access). GenerateScript_ForceCreate marks the whole tree as stCreate.
+  // Result must NOT be executed against an existing database.
+  TioDBBuilderFactory.NewStrategy(AConnectionDefName, LSchema, LSqlGenerator, LScript).GenerateScript_ForceCreate;
+  Result := LScript;
+end;
 
-    // Physically create the database (on the server or as a file, depending on database type) only
-    // when the analyzed status says it does not exist yet.
-    if FSchema.Status = stCreate then
-      CreateDatabase;
+function TioDBBuilderEngine.BuildScript_SyncDBStruct(const AConnectionDefName: String;
+  const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderScript;
+var
+  LSchema: IioDBBuilderSchema;
+  LScript: IioDBBuilderScript;
+  LSqlGenerator: IioDBBuilderSqlGenerator;
+begin
+  // SqlGenerator must be created BEFORE Schema so that kgsAuto can be resolved
+  LSqlGenerator := TioDBBuilderFactory.NewSqlGenerator(AConnectionDefName);
+  LSchema := TioDBBuilderFactory.NewSchema(AConnectionDefName, AIndexesMode, AForeignKeysMode, LSqlGenerator);
+  LScript := TioDBBuilderFactory.NewScript(AConnectionDefName, LSchema);
 
-    LScript.Execute;
-  end;
+  TioDBBuilderFactory.NewDBAnalyzer(AConnectionDefName, LSchema, LSqlGenerator, LScript).Analyze;
+  // Status-driven: create or update, according to the status the DBAnalyzer just determined.
+  TioDBBuilderFactory.NewStrategy(AConnectionDefName, LSchema, LSqlGenerator, LScript).GenerateScript_Sync;
+  Result := LScript;
 end;
 
 end.

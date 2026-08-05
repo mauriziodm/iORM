@@ -47,6 +47,7 @@ type
   private
     FConnectionDefName: string;
     FFullScript: TStringList;
+    FSchema: IioDBBuilderSchema;
     FScriptBody: IioDBBuilderSqlText;
     FScriptFooter: IioDBBuilderSqlText;
     FScriptHeader: IioDBBuilderSqlText;
@@ -58,14 +59,15 @@ type
     function GetHeader: IioDBBuilderSqlText;
     function GetHints: IioDBBuilderSqlText;
     function GetLines: TStringList;
+    function GetSchema: IioDBBuilderSchema;
     function GetWarnings: IioDBBuilderSqlText;
   public
-    constructor Create(const AConnectionDefName: string);
+    constructor Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema);
     destructor Destroy; override;
 
     // Full script clear
     procedure Clear;
-    procedure Execute;
+    procedure Execute(const AForce: Boolean = False);
     procedure SaveToFile(const AFileName: string);
     // This method works on header section
     procedure ScriptBegin(const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo); virtual;
@@ -77,6 +79,7 @@ type
     property Header: IioDBBuilderSqlText read GetHeader;
     property Hints: IioDBBuilderSqlText read GetHints;
     property Lines: TStringList read GetLines;
+    property Schema: IioDBBuilderSchema read GetSchema;
     property Warnings: IioDBBuilderSqlText read GetWarnings;
   end;
 
@@ -89,7 +92,8 @@ uses
   System.SysUtils,
 
   iORM.DB.ConnectionContainer,
-  iORM.DB.Factory
+  iORM.DB.Factory,
+  iORM.Exceptions
 
   ;
 
@@ -214,10 +218,11 @@ begin
   Footer.Clear;
 end;
 
-constructor TioDBBuilderScript.Create(const AConnectionDefName: string);
+constructor TioDBBuilderScript.Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema);
 begin
   inherited Create;
   FConnectionDefName := AConnectionDefName;
+  FSchema := ASchema;
   FFullScript := TStringList.Create;
   FScriptHeader := TioDBBuilderFactory.NewSqlText;
   FScriptWarnings := TioDBBuilderFactory.NewSqlText('WARNING: ');
@@ -251,6 +256,11 @@ end;
 function TioDBBuilderScript.GetHints: IioDBBuilderSqlText;
 begin
   Result := FScriptHints;
+end;
+
+function TioDBBuilderScript.GetSchema: IioDBBuilderSchema;
+begin
+  Result := FSchema;
 end;
 
 function TioDBBuilderScript.GetWarnings: IioDBBuilderSqlText;
@@ -293,8 +303,29 @@ begin
   Result := FFullScript;
 end;
 
-procedure TioDBBuilderScript.Execute;
+procedure TioDBBuilderScript.Execute(const AForce: Boolean);
 begin
+  // Warnings signal a change the DBAnalyzer could not resolve safely on its own (e.g. an unsafe
+  // type conversion) - block execution unless the caller explicitly overrides via AForce, since by
+  // this point the script may already contain destructive DDL (ALTER/DROP) based on that change.
+  if (FScriptWarnings.Lines.Count > 0) and not AForce then
+    raise EioDBBuilderException.Create(ClassName, 'Execute',
+      'Database must be updated but WARNINGS exists.' + sLineBreak +
+      FScriptWarnings.Lines.Text
+    );
+
+  // Physically create the database (on the server or as a file, depending on database type) only
+  // when the analyzed status says it does not exist yet. This is NOT SQL text: for SQLite it's the
+  // driver auto-creating the file on connect, for Firebird it's a temporary FireDAC OpenMode flip -
+  // neither can be expressed in the script Body, so it happens here as a side effect before Execute
+  // sends the rest of the script.
+  if FSchema.Status = stCreate then
+    TioDBBuilderFactory.NewSqlGenerator(FConnectionDefName).Command_CreateDatabase;
+
+  // Runs unconditionally from here, even when Schema.Status = stClean (nothing to do): Body is then
+  // empty/near-empty, so this is a harmless no-op round trip rather than a guarded early-out - kept
+  // simple on purpose, since the caller already inspected Schema/Warnings before deciding to call
+  // Execute at all.
   TioDBFactory.Script(FConnectionDefName, Lines).Execute;
 end;
 
