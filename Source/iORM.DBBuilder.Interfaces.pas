@@ -675,18 +675,13 @@ type
     // ENTRY POINTS
     // ----------------------------------------------------------
     /// <summary>
-    ///  Forces the generation of a full "create from scratch" SQL script regardless of the actual
-    ///  database state, by marking the whole schema (tables, fields, indexes, foreign keys) as
-    ///  stCreate before generating. Intended for documentation/baseline purposes only: the resulting
-    ///  script must NOT be executed against an existing database.
+    ///  The single public entry point: wraps GenerateScript_Body between Context.Script.ScriptBegin
+    ///  and Context.Script.ScriptEnd. Trusts Context.Schema.Status as given - it neither forces it
+    ///  nor emits any mode-related warning. Mode selection (forcing the whole schema to stCreate for
+    ///  a documentation/baseline script, flagging the result so Context.Execute refuses to run it
+    ///  without AForce = True) is Engine's job, done on Context before this is called.
     /// </summary>
-    procedure GenerateScript_ForceCreate;
-    /// <summary>
-    ///  Generates the SQL script based on the schema status determined by the DBAnalyzer
-    ///  (creates a new database or updates the existing one accordingly). Trusts the analyzed
-    ///  status: it does NOT force it.
-    /// </summary>
-    procedure GenerateScript_Sync;
+    procedure GenerateScript;
   end;
 
   IioDBBuilderDBAnalyzer = interface

@@ -51,7 +51,7 @@ type
     procedure AnalyzeIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure AnalyzeTables; virtual;
   public
-    constructor Create(const AContext: IioDBBuilderContext);
+    constructor Create(const AContext: IioDBBuilderContext; const AStrategy: IioDBBuilderStrategy);
 
     procedure Analyze; virtual;
   end;
@@ -62,17 +62,19 @@ uses
   iORM,
   iORM.DB.Factory,
   iORM.DB.Interfaces,
-  iORM.DB.ConnectionContainer,
-  iORM.DBBuilder.Factory
+  iORM.DB.ConnectionContainer
 
   ;
 
 { TioDBBuilderDBAnalyzer }
 
-constructor TioDBBuilderDBAnalyzer.Create(const AContext: IioDBBuilderContext);
+constructor TioDBBuilderDBAnalyzer.Create(const AContext: IioDBBuilderContext; const AStrategy: IioDBBuilderStrategy);
 begin
   FContext := AContext;
-  FStrategy := TioDBBuilderFactory.NewStrategy(AContext);
+  // Injected rather than self-built: Engine already needs a Strategy for this same Context to
+  // generate the script afterwards, so it builds ONE and shares it here instead of two
+  // dialect-specific instances doing the same Check_*/catalog work being created for one call.
+  FStrategy := AStrategy;
 end;
 
 procedure TioDBBuilderDBAnalyzer.Analyze;

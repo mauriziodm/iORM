@@ -60,8 +60,11 @@ Build order: Runtime (RT) packages first, then Design-Time (DT) packages.
       `Translate_<Src>_To_<Tgt>` (schema element → SQL fragment/identifier).
     - Strategy: `Process_` (orchestration / mode dispatch), `ScriptWrite_` (emits one DDL/DML
       statement into `Script.Body`), `Force_` (drop that bypasses the configured mode), `Check_`
-      (catalog/change query → Boolean), `Warning_`/`Hint_` (diagnostics), `GenerateScript_`
-      (public entry point).
+      (catalog/change query → Boolean), `Warning_`/`Hint_` (diagnostics). `GenerateScript` (bare)
+      is the single public entry point (wraps `Script.ScriptBegin`/`ScriptEnd`); `GenerateScript_Body`
+      is its protected abstract dialect-specific counterpart, overridden by each concrete Strategy.
+      Mode selection (forcing the schema to `stCreate`, emitting the force-create warning) is
+      Engine's job, done on `Context` before `GenerateScript` is called.
   - Boolean predicates and plain accessors are sanctioned exceptions (`Get*`, `Is*`, `Load*`, etc.).
   - **Layout**: methods are grouped under domain banners
     (`DATABASE`/`TABLE`/`FIELD`/`INDEX`/`SEQUENCE`/`FOREIGN KEY`/…) and kept **alphabetical within

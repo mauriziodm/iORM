@@ -75,9 +75,14 @@ begin
   LContext := TioDBBuilderFactory.NewContext(AConnectionDefName, AIndexesMode, AForeignKeysMode);
 
   // Self-contained: LContext.Schema is already fully populated from the class/entity maps (NewSchema
-  // -> BuildSchema, no DB access). GenerateScript_ForceCreate marks the whole tree as stCreate.
-  // Result must NOT be executed against an existing database.
-  TioDBBuilderFactory.NewStrategy(LContext).GenerateScript_ForceCreate;
+  // -> BuildSchema, no DB access). Force the whole tree to stCreate, mirroring what the DBAnalyzer
+  // does on a non-existent DB, and flag the result so Context.Execute refuses to run it unless the
+  // caller explicitly passes AForce = True: it must NOT be executed against an existing database.
+  LContext.Script.Warnings.Add('ATTENTION: This script was generated in FORCE-CREATE mode, the actual state ' +
+    'of the target database was NOT analyzed and is ignored. Review it carefully before running it against an ' +
+    'existing database.');
+  LContext.Schema.ForceCreateStatus;
+  TioDBBuilderFactory.NewStrategy(LContext).GenerateScript;
   Result := LContext;
 end;
 
@@ -85,12 +90,16 @@ function TioDBBuilderEngine.BuildScript_SyncDBStruct(const AConnectionDefName: S
   const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
 var
   LContext: IioDBBuilderContext;
+  LStrategy: IioDBBuilderStrategy;
 begin
   LContext := TioDBBuilderFactory.NewContext(AConnectionDefName, AIndexesMode, AForeignKeysMode);
 
-  TioDBBuilderFactory.NewDBAnalyzer(LContext).Analyze;
+  // Built once and shared: the DBAnalyzer's catalog Check_* queries and the eventual script
+  // generation both need the same dialect-specific Strategy for this Context.
+  LStrategy := TioDBBuilderFactory.NewStrategy(LContext);
+  TioDBBuilderFactory.NewDBAnalyzer(LContext, LStrategy).Analyze;
   // Status-driven: create or update, according to the status the DBAnalyzer just determined.
-  TioDBBuilderFactory.NewStrategy(LContext).GenerateScript_Sync;
+  LStrategy.GenerateScript;
   Result := LContext;
 end;
 

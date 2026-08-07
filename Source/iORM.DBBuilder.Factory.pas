@@ -53,7 +53,7 @@ type
   public
     class function NewEngine: IioDBBuilderEngine;
     class function NewContext(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
-    class function NewDBAnalyzer(const AContext: IioDBBuilderContext): IioDBBuilderDBAnalyzer;
+    class function NewDBAnalyzer(const AContext: IioDBBuilderContext; const AStrategy: IioDBBuilderStrategy): IioDBBuilderDBAnalyzer;
     class function NewSchema(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode;
       const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchema;
     class function NewSchemaBuilder: TioDBBuilderSchemaBuilderRef;
@@ -92,9 +92,9 @@ begin
   Result := TioDBBuilderContext.Create(AConnectionDefName, AIndexesMode, AForeignKeysMode);
 end;
 
-class function TioDBBuilderFactory.NewDBAnalyzer(const AContext: IioDBBuilderContext): IioDBBuilderDBAnalyzer;
+class function TioDBBuilderFactory.NewDBAnalyzer(const AContext: IioDBBuilderContext; const AStrategy: IioDBBuilderStrategy): IioDBBuilderDBAnalyzer;
 begin
-  Result := TioDBBuilderDBAnalyzer.Create(AContext);
+  Result := TioDBBuilderDBAnalyzer.Create(AContext, AStrategy);
 end;
 
 class function TioDBBuilderFactory.NewEngine: IioDBBuilderEngine;

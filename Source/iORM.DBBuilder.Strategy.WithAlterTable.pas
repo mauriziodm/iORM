@@ -93,7 +93,7 @@ type
     ///     The schema becomes authoritative and orphans are removed.
     /// Foreign keys are always processed last to ensure all referenced tables already exist.
     /// </summary>
-    procedure GenerateScript; override;
+    procedure GenerateScript_Body; override;
 
   public
 
@@ -291,7 +291,7 @@ begin
     Exit(True);
 end;
 
-procedure TioDBBuilderStrategyWithAlterTable.GenerateScript;
+procedure TioDBBuilderStrategyWithAlterTable.GenerateScript_Body;
 var
   LTable: IioDBBuilderSchemaTable;
 begin

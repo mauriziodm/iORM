@@ -53,7 +53,13 @@ type
     { Naming convention (role-based prefixes, mirrors the Context.SqlGenerator family - see
       iORM.DBBuilder.Context.SqlGenerator.Base). A method's prefix encodes its ROLE within the
       DB-sync workflow, independently of whether it is exposed on IioDBBuilderStrategy:
-        GenerateScript_*     public entry point (Sync / ForceCreate)
+        GenerateScript       the single public entry point: wraps GenerateScript_Body between
+                             Context.Script.ScriptBegin/ScriptEnd. Mode selection (forcing the whole
+                             schema to stCreate, emitting the force-create warning) is an Engine-level
+                             orchestration decision, made on Context before this is called - neither
+                             this method nor GenerateScript_Body branch on it.
+        GenerateScript_Body  protected abstract: the actual dialect-specific generation flow,
+                             implemented by each concrete Strategy (WithAlterTable/WithoutAlterTable).
         Process_*            orchestration: iterates the schema or dispatches by mode
         ScriptWrite_*        emits a single DDL/DML statement into Context.Script.Body
         Force_*              forces a Status value on schema elements directly, overriding
@@ -262,16 +268,6 @@ type
     /// </summary>
     procedure Warning_PotentialDataTruncation(const AValueName: String; const AOldValue, ANewValue: Integer; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
     /// <summary>
-    /// Emits a warning stating that the whole script was generated in force-create
-    /// mode (GenerateScript_ForceCreate), i.e. without consulting the actual state
-    /// of the target database. Unlike the other Warning_* helpers, this one is not
-    /// tied to a single table/field or to an analysis finding: it is emitted
-    /// unconditionally, once per force-create script, so that Context.Execute's
-    /// HasWarnings guard blocks a stray run unless the caller explicitly passes
-    /// AForce = True.
-    /// </summary>
-    procedure Warning_ScriptIgnoresActualDBState;
-    /// <summary>
     /// Emits a warning when a field's type is changing from AOldFieldType to
     /// ANewFieldType AND that specific conversion is blacklisted by the current
     /// RDBMS. The list of forbidden conversions (formatted as '[old->new]' tokens)
@@ -285,7 +281,7 @@ type
     // ==========================================================
     // MAIN GENERATION
     // ----------------------------------------------------------
-    procedure GenerateScript; virtual; abstract;
+    procedure GenerateScript_Body; virtual; abstract;
 
     // ==========================================================
     // PROPERTIES
@@ -297,8 +293,7 @@ type
     // ==========================================================
     // ENTRY POINTS
     // ----------------------------------------------------------
-    procedure GenerateScript_ForceCreate;
-    procedure GenerateScript_Sync;
+    procedure GenerateScript;
   end;
 
 implementation
@@ -537,7 +532,7 @@ begin
         ScriptWrite_CreateTable(LTable);
       stUpdate:
         // Index-only and FK-only changes are skipped: indexes and foreign keys
-        // are always handled separately in GenerateScript.
+        // are always handled separately in GenerateScript_Body.
         if not (LTable.Changes <= [taIndexes, taForeignKeys]) then
           ScriptWrite_AlterTable(LTable);
     end;
@@ -622,35 +617,15 @@ begin
   ATable.ForceIndexesCreateStatus;
 end;
 
-procedure TioDBBuilderStrategyBase.GenerateScript_Sync;
+procedure TioDBBuilderStrategyBase.GenerateScript;
 begin
-  // Status-driven: does NOT touch Context.Schema.Status, it trusts what the DBAnalyzer determined
-  // (stCreate for a brand-new DB, stUpdate for an existing one with changes). GenerateScript
-  // branches internally on Context.Schema.Status, so this single entry point covers both cases.
+  // Status-driven: does NOT touch Context.Schema.Status, trusts it as given by the caller (Engine),
+  // whether analyzed by the DBAnalyzer or forced via Context.Schema.ForceCreateStatus.
+  // GenerateScript_Body branches internally on Context.Schema.Status, so this single entry point
+  // covers both the sync and the force-create case.
   Context.Script.ScriptBegin(Context.SqlGenerator.DBMSInfo);
-  GenerateScript;
+  GenerateScript_Body;
   Context.Script.ScriptEnd;
-end;
-
-procedure TioDBBuilderStrategyBase.GenerateScript_ForceCreate;
-begin
-  // Force variant: ignores the analyzed status and produces a coherent full "create from scratch"
-  // script by marking the whole schema tree (schema + tables + fields + indexes + FKs) as stCreate,
-  // mirroring what the DBAnalyzer does on a non-existent DB. The resulting script must NOT be
-  // executed against an existing database: Warning_ScriptIgnoresActualDBState flags this so
-  // Context.Execute refuses to run it unless the caller explicitly passes AForce = True.
-  Warning_ScriptIgnoresActualDBState;
-  Context.Schema.ForceCreateStatus;
-  Context.Script.ScriptBegin(Context.SqlGenerator.DBMSInfo);
-  GenerateScript;
-  Context.Script.ScriptEnd;
-end;
-
-procedure TioDBBuilderStrategyBase.Warning_ScriptIgnoresActualDBState;
-begin
-  Context.Script.Warnings.Add('ATTENTION: This script was generated in FORCE-CREATE mode, the actual state ' +
-    'of the target database was NOT analyzed and is ignored. Review it carefully before running it against an ' +
-    'existing database.');
 end;
 
 procedure TioDBBuilderStrategyBase.Warning_UnsafeTypeConversion(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
