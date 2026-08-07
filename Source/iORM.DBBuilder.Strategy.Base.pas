@@ -1,4 +1,4 @@
-{
+﻿{
   ****************************************************************************
   *                                                                          *
   *           iORM - (interfaced ORM)                                        *
@@ -261,6 +261,16 @@ type
     /// the WithAlterTable strategy.
     /// </summary>
     procedure Warning_PotentialDataTruncation(const AValueName: String; const AOldValue, ANewValue: Integer; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
+    /// <summary>
+    /// Emits a warning stating that the whole script was generated in force-create
+    /// mode (GenerateScript_ForceCreate), i.e. without consulting the actual state
+    /// of the target database. Unlike the other Warning_* helpers, this one is not
+    /// tied to a single table/field or to an analysis finding: it is emitted
+    /// unconditionally, once per force-create script, so that Context.Execute's
+    /// HasWarnings guard blocks a stray run unless the caller explicitly passes
+    /// AForce = True.
+    /// </summary>
+    procedure Warning_ScriptIgnoresActualDBState;
     /// <summary>
     /// Emits a warning when a field's type is changing from AOldFieldType to
     /// ANewFieldType AND that specific conversion is blacklisted by the current
@@ -626,12 +636,21 @@ procedure TioDBBuilderStrategyBase.GenerateScript_ForceCreate;
 begin
   // Force variant: ignores the analyzed status and produces a coherent full "create from scratch"
   // script by marking the whole schema tree (schema + tables + fields + indexes + FKs) as stCreate,
-  // mirroring what the DBAnalyzer does on a non-existent DB. For documentation/baseline only: the
-  // resulting script must NOT be executed against an existing database.
+  // mirroring what the DBAnalyzer does on a non-existent DB. The resulting script must NOT be
+  // executed against an existing database: Warning_ScriptIgnoresActualDBState flags this so
+  // Context.Execute refuses to run it unless the caller explicitly passes AForce = True.
+  Warning_ScriptIgnoresActualDBState;
   Context.Schema.ForceCreateStatus;
   Context.Script.ScriptBegin(Context.SqlGenerator.DBMSInfo);
   GenerateScript;
   Context.Script.ScriptEnd;
+end;
+
+procedure TioDBBuilderStrategyBase.Warning_ScriptIgnoresActualDBState;
+begin
+  Context.Script.Warnings.Add('ATTENTION: This script was generated in FORCE-CREATE mode, the actual state ' +
+    'of the target database was NOT analyzed and is ignored. Review it carefully before running it against an ' +
+    'existing database.');
 end;
 
 procedure TioDBBuilderStrategyBase.Warning_UnsafeTypeConversion(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
