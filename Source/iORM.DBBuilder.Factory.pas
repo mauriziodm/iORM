@@ -52,7 +52,8 @@ type
   TioDBBuilderFactory = class
   public
     class function NewEngine: IioDBBuilderEngine;
-    class function NewDBAnalyzer(const AConnectionDefname: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderScript): IioDBBuilderDBAnalyzer;
+    class function NewContext(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
+    class function NewDBAnalyzer(const AContext: IioDBBuilderContext): IioDBBuilderDBAnalyzer;
     class function NewSchema(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode;
       const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchema;
     class function NewSchemaBuilder: TioDBBuilderSchemaBuilderRef;
@@ -64,9 +65,9 @@ type
     class function NewSchemaTable(const AContextTable: IioTable;
       const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
     class function NewSqlGenerator(const AConnectionDefName: String): IioDBBuilderSqlGenerator;
-    class function NewScript(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema): IioDBBuilderScript;
+    class function NewScript(const AConnectionDefName: String): IioDBBuilderScript;
     class function NewSqlText(const AAddLinePrefix: String = ''): IioDBBuilderSqlText;
-    class function NewStrategy(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderScript): IioDBBuilderStrategy;
+    class function NewStrategy(const AContext: IioDBBuilderContext): IioDBBuilderStrategy;
   end;
 
 implementation
@@ -75,7 +76,7 @@ uses
   iORM.DBBuilder.Schema, iORM.DBBuilder.Schema.Table, iORM.DBBuilder.Schema.Field, iORM.DBBuilder.Schema.FK,
   iORM.DBBuilder.Schema.Builder, iORM.DB.ConnectionContainer, iORM.DB.Interfaces, iORM.DBBuilder.SqlGenerator.Firebird,
   iORM.DBBuilder.SqlGenerator.SqLite, iORM.DBBuilder.Strategy.SqLite, iORM.DBBuilder.Strategy.Firebird,
-  iORM.Exceptions, iORM.DBBuilder.DBAnalyzer, iORM.DBBuilder.Engine, iORM.DBBuilder.Script,
+  iORM.Exceptions, iORM.DBBuilder.Context, iORM.DBBuilder.DBAnalyzer, iORM.DBBuilder.Engine, iORM.DBBuilder.Script,
   iORM.DBBuilder.Schema.Index,
   iORM.DBBuilder.SqlGenerator.MSSqlServer,
   iORM.DBBuilder.Schema.Field.ClassInfo,
@@ -86,9 +87,14 @@ uses
 
 { TioDBBuilderFactory }
 
-class function TioDBBuilderFactory.NewDBAnalyzer(const AConnectionDefname: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderScript): IioDBBuilderDBAnalyzer;
+class function TioDBBuilderFactory.NewContext(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
 begin
-  Result := TioDBBuilderDBAnalyzer.Create(AConnectionDefName, ASchema, ASqlGenerator, AScript);
+  Result := TioDBBuilderContext.Create(AConnectionDefName, AIndexesMode, AForeignKeysMode);
+end;
+
+class function TioDBBuilderFactory.NewDBAnalyzer(const AContext: IioDBBuilderContext): IioDBBuilderDBAnalyzer;
+begin
+  Result := TioDBBuilderDBAnalyzer.Create(AContext);
 end;
 
 class function TioDBBuilderFactory.NewEngine: IioDBBuilderEngine;
@@ -156,9 +162,9 @@ begin
   end;
 end;
 
-class function TioDBBuilderFactory.NewScript(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema): IioDBBuilderScript;
+class function TioDBBuilderFactory.NewScript(const AConnectionDefName: String): IioDBBuilderScript;
 begin
-  Result := TioDBBuilderScript.Create(AConnectionDefName, ASchema);
+  Result := TioDBBuilderScript.Create(AConnectionDefName);
 end;
 
 class function TioDBBuilderFactory.NewSqlText(const AAddLinePrefix: String = ''): IioDBBuilderSqlText;
@@ -166,16 +172,15 @@ begin
   Result := TioDBBuilderSqlText.Create(AAddLinePrefix);
 end;
 
-class function TioDBBuilderFactory.NewStrategy(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema;
-  const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderScript): IioDBBuilderStrategy;
+class function TioDBBuilderFactory.NewStrategy(const AContext: IioDBBuilderContext): IioDBBuilderStrategy;
 begin
-  case TioConnectionManager.GetConnectionInfo(AConnectionDefName).ConnectionType of
+  case TioConnectionManager.GetConnectionInfo(AContext.ConnectionDefName).ConnectionType of
     ctSQLServer:
-      Result := TioDBBuilderStrategyMSSqlServer.Create(AConnectionDefName, ASchema, ASqlGenerator, AScript);
+      Result := TioDBBuilderStrategyMSSqlServer.Create(AContext);
     ctFirebird:
-      Result := TioDBBuilderStrategyFirebird.Create(AConnectionDefName, ASchema, ASqlGenerator, AScript);
+      Result := TioDBBuilderStrategyFirebird.Create(AContext);
     ctSQLite:
-      Result := TioDBBuilderStrategySqLite.Create(AConnectionDefName, ASchema, ASqlGenerator, AScript);
+      Result := TioDBBuilderStrategySqLite.Create(AContext);
   else
     raise EioDBBuilderException.Create(ClassName, 'NewStrategy', 'Connection type not found');
   end;

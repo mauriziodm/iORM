@@ -303,6 +303,7 @@
         <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlGenerator.SqLite.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlGenerator.Base.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlGenerator.Firebird.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DBBuilder.Context.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.DBAnalyzer.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Engine.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Field.ClassInfo.pas"/>

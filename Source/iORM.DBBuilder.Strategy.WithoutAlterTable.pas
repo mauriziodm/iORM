@@ -128,7 +128,7 @@ begin
   // Databases without ALTER TABLE support always recreate tables using the
   // rename-create-copy pattern (see GenerateScript for the full workflow).
   // Therefore, both stCreate and stUpdate use ScriptWrite_CreateTable.
-  for LTable in Schema.Tables.Values do
+  for LTable in Context.Schema.Tables.Values do
   begin
     if LTable.Status in [stCreate, stUpdate] then
       ScriptWrite_CreateTable(LTable);
@@ -140,8 +140,8 @@ var
   LTable: IioDBBuilderSchemaTable;
 begin
   // Check key generation strategy compatibility with DBMS.
-  // The diagnostic lives on the SqlGenerator (DBMS-capability axis), not on the Strategy.
-  SqlGenerator.CheckKeyGenerationCompatibility(Schema, Script);
+  // The diagnostic lives on the Context.SqlGenerator (DBMS-capability axis), not on the Strategy.
+  Context.SqlGenerator.CheckKeyGenerationCompatibility(Context.Schema, Context.Script);
 
   ScriptWrite_BeginDeferConstraints;
 
@@ -151,10 +151,10 @@ begin
   // (including ifmDisabled), otherwise index names would collide when
   // Process_Indexes runs on the new tables. The 'Force' prefix makes this
   // intentional bypass of the configured mode explicit.
-  if Schema.Status = stUpdate then
+  if Context.Schema.Status = stUpdate then
   begin
-    Script.Body.AddTitle('Dropping indexes');
-    for LTable in Schema.Tables.Values do
+    Context.Script.Body.AddTitle('Dropping indexes');
+    for LTable in Context.Schema.Tables.Values do
       if LTable.Status = stUpdate then
         Force_DropTableIndexesFromDB(LTable);
     ScriptWrite_RenameAllTablesToOld;
@@ -165,11 +165,11 @@ begin
 
   // Indexes: ifmEnabled and ifmEnabledStrict are equivalent here because the rename-create-copy
   // pattern already starts from a clean slate. Only ifmDisabled skips recreation.
-  if Schema.IndexesMode <> ifmDisabled then
+  if Context.Schema.IndexesMode <> ifmDisabled then
     Process_Indexes;
 
   // When updating, copy data from renamed "_old" tables into the newly created ones
-  if Schema.Status = stUpdate then
+  if Context.Schema.Status = stUpdate then
     Process_CopyDataFromOldToNew;
 
   ScriptWrite_EndDeferConstraints;
@@ -189,17 +189,17 @@ procedure TioDBBuilderStrategyWithoutAlterTable.ScriptWrite_RenameAllTablesToOld
 var
   LTable: IioDBBuilderSchemaTable;
 begin
-  Script.Body.AddTitle('Renaming table names to "_old"');
+  Context.Script.Body.AddTitle('Renaming table names to "_old"');
 
-  for LTable in Schema.Tables.Values do
+  for LTable in Context.Schema.Tables.Values do
   begin
     if LTable.Status <> stUpdate then
       Continue;
 
-    Script.Body.AddComment(Format('Renaming from "%s" to "%s"', [LTable.Name, Table2OldTableName(LTable)]));
-    Script.Body.Add(Format('DROP TABLE IF EXISTS %s;', [Table2OldTableName(LTable)]));
-    Script.Body.Add(Format('ALTER TABLE %s RENAME TO %s;', [LTable.Name, Table2OldTableName(LTable)]));
-    Script.Body.AddEmpty;
+    Context.Script.Body.AddComment(Format('Renaming from "%s" to "%s"', [LTable.Name, Table2OldTableName(LTable)]));
+    Context.Script.Body.Add(Format('DROP TABLE IF EXISTS %s;', [Table2OldTableName(LTable)]));
+    Context.Script.Body.Add(Format('ALTER TABLE %s RENAME TO %s;', [LTable.Name, Table2OldTableName(LTable)]));
+    Context.Script.Body.AddEmpty;
   end;
 end;
 
@@ -207,9 +207,9 @@ procedure TioDBBuilderStrategyWithoutAlterTable.Process_CopyDataFromOldToNew;
 var
   LTable: IioDBBuilderSchemaTable;
 begin
-  Script.Body.AddTitle('Copying data from "_old" tables.');
+  Context.Script.Body.AddTitle('Copying data from "_old" tables.');
 
-  for LTable in Schema.Tables.Values do
+  for LTable in Context.Schema.Tables.Values do
   begin
     if LTable.Status <> stUpdate then
       Continue;
@@ -223,10 +223,10 @@ var
   LField: IioDBBuilderSchemaField;
   LComma: string;
 begin
-  Script.Body.AddComment(Format('Copying data from "%s" to "%s"', [Table2OldTableName(ATable), ATable.Name]));
+  Context.Script.Body.AddComment(Format('Copying data from "%s" to "%s"', [Table2OldTableName(ATable), ATable.Name]));
   // Insert into
-  Script.Body.Add(Format('INSERT INTO %s (', [ATable.Name]));
-  Script.Body.IncIndent;
+  Context.Script.Body.Add(Format('INSERT INTO %s (', [ATable.Name]));
+  Context.Script.Body.IncIndent;
 
   LComma := '  ';
 
@@ -235,15 +235,15 @@ begin
     if LField.Status = stCreate then
       Continue;
 
-    Script.Body.Add(Format('%s%s', [LComma, LField.FieldName]));
+    Context.Script.Body.Add(Format('%s%s', [LComma, LField.FieldName]));
     LComma := ', ';
   end;
 
-  Script.Body.DecIndent;
+  Context.Script.Body.DecIndent;
 
   // Select from
-  Script.Body.Add(') SELECT');
-  Script.Body.IncIndent;
+  Context.Script.Body.Add(') SELECT');
+  Context.Script.Body.IncIndent;
 
   LComma := '  ';
 
@@ -252,15 +252,15 @@ begin
     if LField.Status = stCreate then
       Continue;
 
-    Script.Body.Add(Format('%s%s', [LComma, LField.FieldName]));
+    Context.Script.Body.Add(Format('%s%s', [LComma, LField.FieldName]));
     LComma := ', ';
   end;
 
-  Script.Body.DecIndent;
+  Context.Script.Body.DecIndent;
 
-  Script.Body.Add(Format('FROM %s', [Table2OldTableName(ATable)]));
-  Script.Body.Add(';');
-  Script.Body.AddEmpty;
+  Context.Script.Body.Add(Format('FROM %s', [Table2OldTableName(ATable)]));
+  Context.Script.Body.Add(';');
+  Context.Script.Body.AddEmpty;
 end;
 
 function TioDBBuilderStrategyWithoutAlterTable.Table2OldTableName(const ATable: IioDBBuilderSchemaTable): String;

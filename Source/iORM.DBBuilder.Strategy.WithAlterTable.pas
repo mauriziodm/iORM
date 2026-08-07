@@ -1,4 +1,4 @@
-﻿{
+{
   ****************************************************************************
   *                                                                          *
   *           iORM - (interfaced ORM)                                        *
@@ -134,29 +134,29 @@ begin
   if ATable.UsesSequenceForKeyGeneration then
     ScriptWrite_CreateTableSequence(ATable);
 
-  Script.Body.AddEmpty;
-  Script.Body.Add(SqlGenerator.BuildSQL_BeginCreateTable(ATable));
-  Script.Body.IncIndent;
+  Context.Script.Body.AddEmpty;
+  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_BeginCreateTable(ATable));
+  Context.Script.Body.IncIndent;
 
   // Inline field creation
   LComma := '  ';
   for LField in ATable.Fields do
   begin
-    Script.Body.AddLine(LComma + SqlGenerator.BuildSQL_FieldDefinition(ATable, LField));
+    Context.Script.Body.AddLine(LComma + Context.SqlGenerator.BuildSQL_FieldDefinition(ATable, LField));
     LComma := ', ';
   end;
 
-  Script.Body.DecIndent;
-  Script.Body.Add(SqlGenerator.BuildSQL_EndCreateTable(ATable));
-  Script.Body.AddEmpty;
-  Script.Body.Add(SqlGenerator.BuildSQL_CreatePK(ATable));
+  Context.Script.Body.DecIndent;
+  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_EndCreateTable(ATable));
+  Context.Script.Body.AddEmpty;
+  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_CreatePK(ATable));
 end;
 
 function TioDBBuilderStrategyWithAlterTable.Check_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
 var
   LQuery: IioQuery;
 begin
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FieldExists(ATable, AField), True);
+  LQuery := TioQueryEngine.GetRawQuery(Context.ConnectionDefName, Context.SqlGenerator.BuildSQL_FieldExists(ATable, AField), True);
   Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
 end;
 
@@ -188,15 +188,15 @@ var
 begin
   Result := False;
   // Load some new field informations
-  LNewFieldType := SqlGenerator.Translate_SchemaField_To_FieldType(AField, False);  // False = do NOT include attributes (only base type)
+  LNewFieldType := Context.SqlGenerator.Translate_SchemaField_To_FieldType(AField, False);  // False = do NOT include attributes (only base type)
   LNewFieldSubtype := IfThen(AField.FieldSubtype.IsEmpty, '0', AField.FieldSubtype);
   LNewFieldLength := AField.FieldLength;
   LNewFieldPrecision := AField.FieldPrecision;
   LNewFieldDecimals := AField.FieldScale;
-  LNewFieldDefault := SqlGenerator.Translate_SchemaField_To_DefaultValue(AField);
+  LNewFieldDefault := Context.SqlGenerator.Translate_SchemaField_To_DefaultValue(AField);
 
   // Create and open the query for old field informations
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FieldList(ATable.Name, AField.FieldName), True);
+  LQuery := TioQueryEngine.GetRawQuery(Context.ConnectionDefName, Context.SqlGenerator.BuildSQL_FieldList(ATable.Name, AField.FieldName), True);
 
   // Field not found
   if LQuery.Eof then
@@ -233,12 +233,12 @@ begin
 
   // Verify if NotNull is changed
   // Check if NOT NULL changes are supported by this RDBMS version
-  Result := Result or Check_FieldNotNullChanged(ATable, AField, LOldFieldNotNull, AField.FieldNotNull, SqlGenerator.Supports_AlterNotNull);
+  Result := Result or Check_FieldNotNullChanged(ATable, AField, LOldFieldNotNull, AField.FieldNotNull, Context.SqlGenerator.Supports_AlterNotNull);
 
   // Verify if blob subtype is changed
   // Check if BLOB subtype changes are permitted by this RDBMS
   if LNewFieldType.StartsWith('BLOB') then
-    Result := Result or Check_FieldBlobSubtypeChanged(ATable, AField, LOldFieldSubtype, LNewFieldSubtype, SqlGenerator.Supports_AlterBlobSubtype);
+    Result := Result or Check_FieldBlobSubtypeChanged(ATable, AField, LOldFieldSubtype, LNewFieldSubtype, Context.SqlGenerator.Supports_AlterBlobSubtype);
 end;
 
 function TioDBBuilderStrategyWithAlterTable.Check_ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
@@ -248,9 +248,9 @@ begin
   Result := False;
 
   // BuildSQL_FKList returns only the specific FK (or empty result if not exists)
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName,
-    SqlGenerator.BuildSQL_FKList(ATable.Name,
-    SqlGenerator.Translate_SchemaTableAndFK_To_FKName(ATable, AForeignKey)),
+  LQuery := TioQueryEngine.GetRawQuery(Context.ConnectionDefName,
+    Context.SqlGenerator.BuildSQL_FKList(ATable.Name,
+    Context.SqlGenerator.Translate_SchemaTableAndFK_To_FKName(ATable, AForeignKey)),
     True);
   Result := not LQuery.Eof;
 end;
@@ -269,24 +269,24 @@ begin
   // same input properties always produce the same hash, so a different hash means different properties.
   Result := False;
 
-  // Build FK name using SqlGenerator's method
-  LFKName := SqlGenerator.Translate_SchemaTableAndFK_To_FKName(ATable, AForeignKey);
+  // Build FK name using Context.SqlGenerator's method
+  LFKName := Context.SqlGenerator.Translate_SchemaTableAndFK_To_FKName(ATable, AForeignKey);
 
   // Query by FK name: if no record is found, the FK name changed (meaning the structural
   // properties changed), so we exit and let Check_ForeignKeyExists handle it as a new FK.
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FKList(ATable.Name, LFKName), True);
+  LQuery := TioQueryEngine.GetRawQuery(Context.ConnectionDefName, Context.SqlGenerator.BuildSQL_FKList(ATable.Name, LFKName), True);
   if LQuery.Eof then
     Exit;
 
   // Check ON UPDATE action
   LOldOnUpdate := LQuery.Fields.FieldByName('on_update').AsString.Trim.ToUpper;
-  LNewOnUpdate := SqlGenerator.Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnUpdateAction).ToUpper;
+  LNewOnUpdate := Context.SqlGenerator.Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnUpdateAction).ToUpper;
   if not SameText(LOldOnUpdate, LNewOnUpdate) then
     Exit(True);
 
   // Check ON DELETE action
   LOldOnDelete := LQuery.Fields.FieldByName('on_delete').AsString.Trim.ToUpper;
-  LNewOnDelete := SqlGenerator.Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnDeleteAction).ToUpper;
+  LNewOnDelete := Context.SqlGenerator.Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnDeleteAction).ToUpper;
   if not SameText(LOldOnDelete, LNewOnDelete) then
     Exit(True);
 end;
@@ -296,8 +296,8 @@ var
   LTable: IioDBBuilderSchemaTable;
 begin
   // Check key generation strategy compatibility with RDBMS version.
-  // The diagnostic lives on the SqlGenerator (DBMS-capability axis), not on the Strategy.
-  SqlGenerator.CheckKeyGenerationCompatibility(Schema, Script);
+  // The diagnostic lives on the Context.SqlGenerator (DBMS-capability axis), not on the Strategy.
+  Context.SqlGenerator.CheckKeyGenerationCompatibility(Context.Schema, Context.Script);
 
   // Strict mode (indexes): drop every index from the DB for each stUpdate table.
   // This removes orphaned indexes (including manually-added ones) and ensures
@@ -309,20 +309,20 @@ begin
   // makes the bypass intent explicit. Indexes and FKs are kept in two distinct
   // blocks because they are independent concerns (separate mode parameter for
   // each), and the separation keeps each path immediately readable.
-  if Schema.IndexesMode = ifmEnabledStrict then
+  if Context.Schema.IndexesMode = ifmEnabledStrict then
   begin
-    Script.Body.AddTitle('Dropping indexes (strict mode)');
-    for LTable in Schema.Tables.Values do
+    Context.Script.Body.AddTitle('Dropping indexes (strict mode)');
+    for LTable in Context.Schema.Tables.Values do
       if LTable.Status = stUpdate then
         Force_DropTableIndexesFromDB(LTable);
   end;
 
   // Strict mode (foreign keys): same approach as the indexes block above,
   // independent because ForeignKeysMode is a separate parameter.
-  if Schema.ForeignKeysMode = ifmEnabledStrict then
+  if Context.Schema.ForeignKeysMode = ifmEnabledStrict then
   begin
-    Script.Body.AddTitle('Dropping foreign keys (strict mode)');
-    for LTable in Schema.Tables.Values do
+    Context.Script.Body.AddTitle('Dropping foreign keys (strict mode)');
+    for LTable in Context.Schema.Tables.Values do
       if LTable.Status = stUpdate then
         Force_DropTableForeignKeysFromDB(LTable);
   end;
@@ -331,11 +331,11 @@ begin
   Process_Tables;
 
   // Indexes: create/alter based on mode (skipped if disabled)
-  if Schema.IndexesMode >= ifmEnabled then
+  if Context.Schema.IndexesMode >= ifmEnabled then
     Process_Indexes;
 
   // Foreign keys are processed last so all referenced tables are already created.
-  if Schema.ForeignKeysMode >= ifmEnabled then
+  if Context.Schema.ForeignKeysMode >= ifmEnabled then
     Process_ForeignKeys;
 end;
 
@@ -348,10 +348,10 @@ var
   LNewFieldList: string;
 begin
   Result := False;
-  LIndexName := SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
+  LIndexName := Context.SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
 
   // Get basic info (unique flag, orientation) for all indexes in the table
-  LQueryIndexList := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexList(ATable.Name), True);
+  LQueryIndexList := TioQueryEngine.GetRawQuery(Context.ConnectionDefName, Context.SqlGenerator.BuildSQL_IndexList(ATable.Name), True);
 
   // Find the specific index in the result set
   while not LQueryIndexList.Eof do
@@ -378,7 +378,7 @@ begin
     Exit;
 
   // Get fields info
-  LQueryIndexDetails := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexDetails(LIndexName), True);
+  LQueryIndexDetails := TioQueryEngine.GetRawQuery(Context.ConnectionDefName, Context.SqlGenerator.BuildSQL_IndexDetails(LIndexName), True);
 
   // Build old field list from database
   LOldFieldList := '';
@@ -405,7 +405,7 @@ var
 begin
   Result := False;
 
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexExists(ATable, AIndex), True);
+  LQuery := TioQueryEngine.GetRawQuery(Context.ConnectionDefName, Context.SqlGenerator.BuildSQL_IndexExists(ATable, AIndex), True);
   Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
 end;
 

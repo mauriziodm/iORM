@@ -74,6 +74,7 @@ type
   TioDBBuilderIndexesAndFKMode = (ifmDisabled, ifmEnabled, ifmEnabledStrict);
 
   // Forward declarations
+  IioDBBuilderContext = interface;
   IioDBBuilderScript = interface;
   IioDBBuilderSchemaRDBMSInfo = interface;
   IioDBBuilderSqlGenerator = interface;
@@ -319,10 +320,12 @@ type
     function AddTitle(const AText: String): IioDBBuilderSqlText;
     procedure Clear;
     function DecIndent: IioDBBuilderSqlText;
+    function GetIsEmpty: Boolean;
     function GetLines: TStringList;
     function GetText: string;
     function IncIndent: IioDBBuilderSqlText;
 
+    property IsEmpty: Boolean read GetIsEmpty;
     property Lines: TStringList read GetLines;
     property Text: string read GetText;
   end;
@@ -336,21 +339,10 @@ type
     function GetHeader: IioDBBuilderSqlText;
     function GetHints: IioDBBuilderSqlText;
     function GetLines: TStringList;
-    function GetSchema: IioDBBuilderSchema;
     function GetWarnings: IioDBBuilderSqlText;
 
     // Full script clear
     procedure Clear;
-    /// <summary>
-    ///  Executes the script against the database identified by the ConnectionDefName this script
-    ///  was built for.
-    /// </summary>
-    /// <remarks>
-    ///  If Schema.Status = stCreate, the database itself is physically created first (file created
-    ///  for SQLite, "CREATE DATABASE"-equivalent for Firebird) before the script lines run. Raises
-    ///  EioDBBuilderException if Warnings is non-empty, unless AForce = True.
-    /// </remarks>
-    procedure Execute(const AForce: Boolean = False);
     procedure SaveToFile(const AFileName: string);
     // This method works on header section
     procedure ScriptBegin(const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo);
@@ -362,7 +354,51 @@ type
     property Header: IioDBBuilderSqlText read GetHeader;
     property Hints: IioDBBuilderSqlText read GetHints;
     property Lines: TStringList read GetLines;
+    property Warnings: IioDBBuilderSqlText read GetWarnings;
+  end;
+
+  /// <summary>
+  ///  Collects everything a single DBBuilder operation needs and produces: the ConnectionDefName,
+  ///  SqlGenerator and Schema it was built with, and the Script it writes into. Strategy and
+  ///  DBAnalyzer read from a Context (constructor-injected, then unpacked into their own fields -
+  ///  they do not hold a live Context reference); Context itself never references them back.
+  ///  Status/HasWarnings/HasHints are flattened shortcuts to Schema.Status/Script.Warnings/
+  ///  Script.Hints for the external caller, which only ever sees this object as an opaque handle.
+  /// </summary>
+  IioDBBuilderContext = interface
+    ['{7C1E9A44-3B27-4F6D-8E1A-5D2C9B4A6F31}']
+
+    function GetConnectionDefName: string;
+    function GetHasHints: Boolean;
+    function GetHasWarnings: Boolean;
+    function GetHints: IioDBBuilderSqlText;
+    function GetLines: TStringList;
+    function GetSchema: IioDBBuilderSchema;
+    function GetScript: IioDBBuilderScript;
+    function GetSqlGenerator: IioDBBuilderSqlGenerator;
+    function GetStatus: TioDBBuilderStatus;
+    function GetWarnings: IioDBBuilderSqlText;
+
+    /// <summary>
+    ///  Executes the script against the database identified by ConnectionDefName.
+    /// </summary>
+    /// <remarks>
+    ///  If Status = stCreate, the database itself is physically created first (file created for
+    ///  SQLite, "CREATE DATABASE"-equivalent for Firebird) before the script lines run, reusing the
+    ///  SqlGenerator this Context was built with. Raises EioDBBuilderException if HasWarnings,
+    ///  unless AForce = True.
+    /// </remarks>
+    procedure Execute(const AForce: Boolean = False);
+
+    property ConnectionDefName: string read GetConnectionDefName;
+    property HasHints: Boolean read GetHasHints;
+    property HasWarnings: Boolean read GetHasWarnings;
+    property Hints: IioDBBuilderSqlText read GetHints;
+    property Lines: TStringList read GetLines;
     property Schema: IioDBBuilderSchema read GetSchema;
+    property Script: IioDBBuilderScript read GetScript;
+    property SqlGenerator: IioDBBuilderSqlGenerator read GetSqlGenerator;
+    property Status: TioDBBuilderStatus read GetStatus;
     property Warnings: IioDBBuilderSqlText read GetWarnings;
   end;
 
@@ -665,13 +701,12 @@ type
       CLAUDE.md and in the banners of iORM.DBBuilder.SqlGenerator.Base / iORM.DBBuilder.Strategy.Base):
         BuildScript_*   the engine's only public entry points. Each is fully self-contained and
                          stateless: it builds a fresh SqlGenerator, Schema and Script locally from
-                         the ConnectionDefName/mode parameters passed in, and returns a NOT-yet-
-                         executed IioDBBuilderScript. The returned Script exposes the Schema it was
-                         built against via Script.Schema (Schema.Status reflects the outcome). The
-                         Engine itself holds no per-call state and instances may be reused/discarded
-                         freely.
+                         the ConnectionDefName/mode parameters passed in, wraps them in a Context
+                         and returns it (Script not-yet-executed). Context.Status reflects the
+                         outcome. The Engine itself holds no per-call state and instances may be
+                         reused/discarded freely.
       Execute/guard behavior (warnings guard, physical database creation, actual execution) lives on
-      IioDBBuilderScript.Execute, not here - see its doc comment.
+      IioDBBuilderContext.Execute, not here - see its doc comment.
       Layout: grouped under domain banners, alphabetical within each group (project-wide convention). }
 
     // ==========================================================
@@ -684,14 +719,14 @@ type
     ///  against an existing database.
     /// </summary>
     function BuildScript_ForceCreateDB(const AConnectionDefName: String;
-      const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderScript;
+      const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
     /// <summary>
     ///  Self-contained: builds the schema from the entity maps, analyzes it against the live
     ///  database catalog, and produces a create-or-update SQL script driven by the resulting
-    ///  status. The returned Script's Schema.Status reflects the outcome.
+    ///  status. The returned Context's Status reflects the outcome.
     /// </summary>
     function BuildScript_SyncDBStruct(const AConnectionDefName: String;
-      const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderScript;
+      const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
 
     // ==========================================================
     // INDEX RELATED METHODS  (backlog - placeholder only, not implemented yet)

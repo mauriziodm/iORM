@@ -61,17 +61,17 @@ uses
 
 procedure TioDBBuilderStrategySqLite.ScriptWrite_BeginDeferConstraints;
 begin
-  Script.Body.AddEmpty;
-  Script.Body.AddComment('Before we start: defer foreign key checks to avoid errors during table rebuild');
-  Script.Body.Add('PRAGMA defer_foreign_keys=on;');
+  Context.Script.Body.AddEmpty;
+  Context.Script.Body.AddComment('Before we start: defer foreign key checks to avoid errors during table rebuild');
+  Context.Script.Body.Add('PRAGMA defer_foreign_keys=on;');
 end;
 
 procedure TioDBBuilderStrategySqLite.ScriptWrite_EndDeferConstraints;
 begin
-  Script.Body.AddEmpty;
-  Script.Body.AddComment('At the end: restore normal foreign key checks');
-  Script.Body.Add('PRAGMA defer_foreign_keys=off;');
-  Script.Body.AddEmpty;
+  Context.Script.Body.AddEmpty;
+  Context.Script.Body.AddComment('At the end: restore normal foreign key checks');
+  Context.Script.Body.Add('PRAGMA defer_foreign_keys=off;');
+  Context.Script.Body.AddEmpty;
 end;
 
 procedure TioDBBuilderStrategySqLite.ScriptWrite_CreateTable(const ATable: IioDBBuilderSchemaTable);
@@ -79,24 +79,24 @@ var
   LComma: string;
   LField: IioDBBuilderSchemaField;
 begin
-  Script.Body.Add(SqlGenerator.BuildSQL_BeginCreateTable(ATable));
-  Script.Body.IncIndent;
+  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_BeginCreateTable(ATable));
+  Context.Script.Body.IncIndent;
 
   // Inline field creation
   LComma := '  ';
   for LField in ATable.Fields do
   begin
-    Script.Body.AddLine(LComma + SqlGenerator.BuildSQL_FieldDefinition(ATable, LField));
+    Context.Script.Body.AddLine(LComma + Context.SqlGenerator.BuildSQL_FieldDefinition(ATable, LField));
     LComma := ', ';
   end;
 
   // Note: for SQLite, FKs are inline in the CREATE TABLE statement.
   // ifmEnabled and ifmEnabledStrict behave identically here.
-  if Schema.ForeignKeysMode <> ifmDisabled then
+  if Context.Schema.ForeignKeysMode <> ifmDisabled then
     ScriptWrite_CreateTableForeignKeys(ATable);
 
-  Script.Body.DecIndent;
-  Script.Body.Add(SqlGenerator.BuildSQL_EndCreateTable(ATable));
+  Context.Script.Body.DecIndent;
+  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_EndCreateTable(ATable));
 end;
 
 function TioDBBuilderStrategySqLite.Check_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
@@ -106,7 +106,7 @@ begin
   // SQLite limitation: PRAGMA table_info returns ALL columns - must filter manually
   // Execute query (returns all fields from the table)
   Result := False;
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FieldExists(ATable, AField), True);
+  LQuery := TioQueryEngine.GetRawQuery(Context.ConnectionDefName, Context.SqlGenerator.BuildSQL_FieldExists(ATable, AField), True);
 
   // Manual filtering: loop through all columns and find matching field name
   while not LQuery.Eof do
@@ -130,7 +130,7 @@ begin
   // SQLite limitation: PRAGMA table_info returns ALL columns - must filter manually
   // Execute query (returns all fields from the table)
   Result := False;
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FieldList(ATable.Name), True);
+  LQuery := TioQueryEngine.GetRawQuery(Context.ConnectionDefName, Context.SqlGenerator.BuildSQL_FieldList(ATable.Name), True);
 
   // Manual filtering: loop through all columns to find the target field
   while not LQuery.Eof do
@@ -144,7 +144,7 @@ begin
       LOldFieldType := LQuery.Fields.FieldByName('type').AsString;
       LOldFieldNotNull := (LQuery.Fields.FieldByName('notnull').AsInteger <> 0);
       // Note: For SQLite, the second parameter is irrelevant (SQLite doesn't support type attributes like length/precision/scale)
-      LNewFieldType := SqlGenerator.Translate_SchemaField_To_FieldType(AField, False);
+      LNewFieldType := Context.SqlGenerator.Translate_SchemaField_To_FieldType(AField, False);
 
       // Verify if fieldType has been changed and check type affinity
       Result := Result or Check_FieldTypeChanged(ATable, AField, LOldFieldType, LNewFieldType);
@@ -163,7 +163,7 @@ function TioDBBuilderStrategySqLite.Check_IndexExists(const ATable: IioDBBuilder
 var
   LQuery: IioQuery;
 begin
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexExists(ATable, AIndex), True);
+  LQuery := TioQueryEngine.GetRawQuery(Context.ConnectionDefName, Context.SqlGenerator.BuildSQL_IndexExists(ATable, AIndex), True);
   Result := not LQuery.Eof;
 end;
 
@@ -179,14 +179,14 @@ var
   LOldOrientation: TioIndexOrientation;
 begin
   Result := False;
-  LIndexName := SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
+  LIndexName := Context.SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
 
   // Query sqlite_master for index info including SQL definition
   // Extract unique and orientation from the CREATE INDEX statement in sqlite_master.sql
   // We parse the SQL definition because PRAGMA index_list doesn't provide orientation info
   // Note: iORM applies the same orientation to all fields (no mixed ASC/DESC per field)
   // Example SQL: "CREATE UNIQUE INDEX idx_name ON table (field1 DESC, field2 DESC)"
-  LQueryIndexList := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexList(ATable.Name), True);
+  LQueryIndexList := TioQueryEngine.GetRawQuery(Context.ConnectionDefName, Context.SqlGenerator.BuildSQL_IndexList(ATable.Name), True);
 
   while not LQueryIndexList.Eof do
   begin
@@ -208,7 +208,7 @@ begin
         AIndex.AddChange(icOrientation);
 
       // Get field list using BuildSQL_IndexDetails (PRAGMA index_info)
-      LQueryIndexDetails := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_IndexDetails(LIndexName), True);
+      LQueryIndexDetails := TioQueryEngine.GetRawQuery(Context.ConnectionDefName, Context.SqlGenerator.BuildSQL_IndexDetails(LIndexName), True);
       LOldFieldList := '';
 
       // Note: PRAGMA index_info guarantees results ordered by seqno (field position in index)
@@ -242,7 +242,7 @@ begin
   // SQLite limitation: PRAGMA foreign_key_list cannot filter by FK name
   // We pass only the table name - BuildSQL_FKList returns ALL FKs for the table
   // PRAGMA foreign_key_list returns: id, seq, table, from, to, on_update, on_delete, match
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FKList(ATable.Name), True);
+  LQuery := TioQueryEngine.GetRawQuery(Context.ConnectionDefName, Context.SqlGenerator.BuildSQL_FKList(ATable.Name), True);
 
   // Manual filtering: loop through all FKs and match by dependent field + reference table
   while not LQuery.Eof do
@@ -267,7 +267,7 @@ begin
   // SQLite limitation: PRAGMA foreign_key_list cannot filter by FK name
   // We pass only the table name - BuildSQL_FKList returns ALL FKs for the table
   // PRAGMA foreign_key_list returns: id, seq, table, from, to, on_update, on_delete, match
-  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, SqlGenerator.BuildSQL_FKList(ATable.Name), True);
+  LQuery := TioQueryEngine.GetRawQuery(Context.ConnectionDefName, Context.SqlGenerator.BuildSQL_FKList(ATable.Name), True);
 
   // Manual filtering: loop through all FKs and find the matching one
   while not LQuery.Eof do
@@ -283,14 +283,14 @@ begin
       // Check ON UPDATE action
       // Note: PRAGMA foreign_key_list returns actions as: NO ACTION, RESTRICT, CASCADE, SET NULL, SET DEFAULT
       LOldOnUpdate := LQuery.Fields.FieldByName('on_update').AsString.ToUpper;
-      LNewOnUpdate := SqlGenerator.Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnUpdateAction).ToUpper;
+      LNewOnUpdate := Context.SqlGenerator.Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnUpdateAction).ToUpper;
       if not SameText(LOldOnUpdate, LNewOnUpdate) then
         Exit(True);
 
       // Check ON DELETE action
       // Note: PRAGMA foreign_key_list returns actions as: NO ACTION, RESTRICT, CASCADE, SET NULL, SET DEFAULT
       LOldOnDelete := LQuery.Fields.FieldByName('on_delete').AsString.ToUpper;
-      LNewOnDelete := SqlGenerator.Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnDeleteAction).ToUpper;
+      LNewOnDelete := Context.SqlGenerator.Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnDeleteAction).ToUpper;
       if not SameText(LOldOnDelete, LNewOnDelete) then
         Exit(True);
 

@@ -43,9 +43,7 @@ type
 
   TioDBBuilderDBAnalyzer = class(TInterfacedObject, IioDBBuilderDBAnalyzer)
   private
-    FConnectionDefName: string;
-    FSchema: IioDBBuilderSchema;
-    FScript: IioDBBuilderScript;
+    FContext: IioDBBuilderContext;
     FStrategy: IioDBBuilderStrategy;
   protected
     procedure AnalyzeFields(const ATable: IioDBBuilderSchemaTable); virtual;
@@ -53,7 +51,7 @@ type
     procedure AnalyzeIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure AnalyzeTables; virtual;
   public
-    constructor Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderScript);
+    constructor Create(const AContext: IioDBBuilderContext);
 
     procedure Analyze; virtual;
   end;
@@ -71,38 +69,36 @@ uses
 
 { TioDBBuilderDBAnalyzer }
 
-constructor TioDBBuilderDBAnalyzer.Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderScript);
+constructor TioDBBuilderDBAnalyzer.Create(const AContext: IioDBBuilderContext);
 begin
-  FConnectionDefName := AConnectionDefName;
-  FSchema := ASchema;
-  FScript := AScript;
-  FStrategy := TioDBBuilderFactory.NewStrategy(AConnectionDefName, ASchema, ASqlGenerator, AScript);
+  FContext := AContext;
+  FStrategy := TioDBBuilderFactory.NewStrategy(AContext);
 end;
 
 procedure TioDBBuilderDBAnalyzer.Analyze;
 begin
   // Analyze if the database exists and set its status
   if not FStrategy.Check_DatabaseExists then
-    FSchema.Status := stCreate;
+    FContext.Schema.Status := stCreate;
 
   // Start the transaction (if the DB already exists otherwise an error would occur)
   // note: Maintain the transaction because the lifecycle of the physical connection
   //        to the DB coincides with the lifecycle of the transaction, thus avoiding
   //        the continuous creation and destruction of the connection
-  if FSchema.Status <> stCreate then
-    io.StartTransaction(FConnectionDefName);
+  if FContext.Schema.Status <> stCreate then
+    io.StartTransaction(FContext.ConnectionDefName);
 
   try
     // Analyze all tables (virtual method implemented by descendants)
     AnalyzeTables;
 
     // Commit the transaction (if in transaction)
-    if FSchema.Status <> stCreate then
-      io.CommitTransaction(FConnectionDefName);
+    if FContext.Schema.Status <> stCreate then
+      io.CommitTransaction(FContext.ConnectionDefName);
   except
     // Rollback the transaction (if in transaction)
-    if FSchema.Status <> stCreate then
-      io.RollbackTransaction(FConnectionDefName);
+    if FContext.Schema.Status <> stCreate then
+      io.RollbackTransaction(FContext.ConnectionDefName);
     raise;
   end;
 end;
@@ -112,10 +108,10 @@ procedure TioDBBuilderDBAnalyzer.AnalyzeTables;
 var
   LTable: IioDBBuilderSchemaTable;
 begin
-  for LTable in FSchema.Tables.Values do
+  for LTable in FContext.Schema.Tables.Values do
   begin
     // If the DB is new or the table doesn't exist, mark it as stCreate
-    if (FSchema.Status = stCreate) or not FStrategy.Check_TableExists(LTable) then
+    if (FContext.Schema.Status = stCreate) or not FStrategy.Check_TableExists(LTable) then
       LTable.Status := stCreate;
     // Always called — handle stCreate tables internally without DB queries
     AnalyzeFields(LTable);
@@ -123,8 +119,8 @@ begin
     AnalyzeForeignKeys(LTable);
 
     // If the table has changes and the DB already exists, mark the schema as stUpdate
-    if (LTable.Status > stClean) and (FSchema.Status <> stCreate) then
-      FSchema.Status := stUpdate;
+    if (LTable.Status > stClean) and (FContext.Schema.Status <> stCreate) then
+      FContext.Schema.Status := stUpdate;
   end;
 end;
 

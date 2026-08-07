@@ -319,27 +319,27 @@ procedure TioCustomConnectionDef.CreateOrAlterDB(const AForce: Boolean = False);
 var
   LAbort: Boolean;
   LReRaise: Boolean;
-  LScript: IioDBBuilderScript;
+  LContext: IioDBBuilderContext;
 begin
   LAbort := False;
   LReRaise := True;
-  LScript := io.DBBuilder.BuildScript_SyncDBStruct(Name, FAutoCreateDB.Indexes, FAutoCreateDB.ForeignKeys);
+  LContext := io.DBBuilder.BuildScript_SyncDBStruct(Name, FAutoCreateDB.Indexes, FAutoCreateDB.ForeignKeys);
 
   if Assigned(FBeforeDBBuild) then
-    FBeforeDBBuild(Self, LScript.Schema.Status, LScript.Lines, LScript.Warnings.Lines, LAbort);
+    FBeforeDBBuild(Self, LContext.Status, LContext.Lines, LContext.Warnings.Lines, LAbort);
 
   if not LAbort then
   begin
     try
-      LScript.Execute(AForce);
+      LContext.Execute(AForce);
 
       if Assigned(FAfterDBBuild) then
-        FAfterDBBuild(Self, LScript.Schema.Status, LScript.Lines, LScript.Warnings.Lines);
+        FAfterDBBuild(Self, LContext.Status, LContext.Lines, LContext.Warnings.Lines);
     except
       on E: Exception do
       begin
         if Assigned(FOnDBBuildException) then
-          FOnDBBuildException(Self, LScript.Schema.Status, LScript.Lines, LScript.Warnings.Lines, E, LReRaise);
+          FOnDBBuildException(Self, LContext.Status, LContext.Lines, LContext.Warnings.Lines, E, LReRaise);
 
         if LReRaise then
           raise;

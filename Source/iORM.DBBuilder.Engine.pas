@@ -53,9 +53,9 @@ type
     // DATABASE RELATED METHODS
     // ----------------------------------------------------------
     function BuildScript_ForceCreateDB(const AConnectionDefName: String;
-      const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderScript;
+      const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
     function BuildScript_SyncDBStruct(const AConnectionDefName: String;
-      const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderScript;
+      const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
   end;
 
 implementation
@@ -68,40 +68,30 @@ uses
 { TioDBBuilderEngine }
 
 function TioDBBuilderEngine.BuildScript_ForceCreateDB(const AConnectionDefName: String;
-  const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderScript;
+  const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
 var
-  LSchema: IioDBBuilderSchema;
-  LScript: IioDBBuilderScript;
-  LSqlGenerator: IioDBBuilderSqlGenerator;
+  LContext: IioDBBuilderContext;
 begin
-  // SqlGenerator must be created BEFORE Schema so that kgsAuto can be resolved
-  LSqlGenerator := TioDBBuilderFactory.NewSqlGenerator(AConnectionDefName);
-  LSchema := TioDBBuilderFactory.NewSchema(AConnectionDefName, AIndexesMode, AForeignKeysMode, LSqlGenerator);
-  LScript := TioDBBuilderFactory.NewScript(AConnectionDefName, LSchema);
+  LContext := TioDBBuilderFactory.NewContext(AConnectionDefName, AIndexesMode, AForeignKeysMode);
 
-  // Self-contained: LSchema is already fully populated from the class/entity maps (NewSchema ->
-  // BuildSchema, no DB access). GenerateScript_ForceCreate marks the whole tree as stCreate.
+  // Self-contained: LContext.Schema is already fully populated from the class/entity maps (NewSchema
+  // -> BuildSchema, no DB access). GenerateScript_ForceCreate marks the whole tree as stCreate.
   // Result must NOT be executed against an existing database.
-  TioDBBuilderFactory.NewStrategy(AConnectionDefName, LSchema, LSqlGenerator, LScript).GenerateScript_ForceCreate;
-  Result := LScript;
+  TioDBBuilderFactory.NewStrategy(LContext).GenerateScript_ForceCreate;
+  Result := LContext;
 end;
 
 function TioDBBuilderEngine.BuildScript_SyncDBStruct(const AConnectionDefName: String;
-  const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderScript;
+  const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
 var
-  LSchema: IioDBBuilderSchema;
-  LScript: IioDBBuilderScript;
-  LSqlGenerator: IioDBBuilderSqlGenerator;
+  LContext: IioDBBuilderContext;
 begin
-  // SqlGenerator must be created BEFORE Schema so that kgsAuto can be resolved
-  LSqlGenerator := TioDBBuilderFactory.NewSqlGenerator(AConnectionDefName);
-  LSchema := TioDBBuilderFactory.NewSchema(AConnectionDefName, AIndexesMode, AForeignKeysMode, LSqlGenerator);
-  LScript := TioDBBuilderFactory.NewScript(AConnectionDefName, LSchema);
+  LContext := TioDBBuilderFactory.NewContext(AConnectionDefName, AIndexesMode, AForeignKeysMode);
 
-  TioDBBuilderFactory.NewDBAnalyzer(AConnectionDefName, LSchema, LSqlGenerator, LScript).Analyze;
+  TioDBBuilderFactory.NewDBAnalyzer(LContext).Analyze;
   // Status-driven: create or update, according to the status the DBAnalyzer just determined.
-  TioDBBuilderFactory.NewStrategy(AConnectionDefName, LSchema, LSqlGenerator, LScript).GenerateScript_Sync;
-  Result := LScript;
+  TioDBBuilderFactory.NewStrategy(LContext).GenerateScript_Sync;
+  Result := LContext;
 end;
 
 end.
