@@ -71,8 +71,10 @@ function TioDBBuilderEngine.BuildScript_ForceCreateDB(const AConnectionDefName: 
   const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
 var
   LContext: IioDBBuilderContext;
+  LStrategy: IioDBBuilderStrategy;
 begin
   LContext := TioDBBuilderFactory.NewContext(AConnectionDefName, AIndexesMode, AForeignKeysMode);
+  LStrategy := TioDBBuilderFactory.NewStrategy(LContext);
 
   // Self-contained: LContext.Schema is already fully populated from the class/entity maps (NewSchema
   // -> BuildSchema, no DB access). Force the whole tree to stCreate, mirroring what the DBAnalyzer
@@ -82,7 +84,7 @@ begin
     'of the target database was NOT analyzed and is ignored. Review it carefully before running it against an ' +
     'existing database.');
   LContext.Schema.ForceCreateStatus;
-  TioDBBuilderFactory.NewStrategy(LContext).GenerateScript;
+  LStrategy.GenerateScript;
   Result := LContext;
 end;
 
