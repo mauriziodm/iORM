@@ -62,14 +62,14 @@ uses
 class procedure TioDBBuilderSchemaBuilder.BuildSchema(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema;
   const ASqlGenerator: IioDBBuilderSqlGenerator);
 var
-  AContextSlot: TioMapSlot;
+  LContextSlot: TioMapSlot;
 begin
   // Loop for all entities and build table list
-  for AContextSlot in TioMapContainer.GetContainer.Values do
-    BuildSchemaTable(AConnectionDefName, ASchema, AContextSlot.GetMap, ASqlGenerator);
+  for LContextSlot in TioMapContainer.GetContainer.Values do
+    BuildSchemaTable(AConnectionDefName, ASchema, LContextSlot.GetMap, ASqlGenerator);
   // Loop for all entities and build FK list
-  for AContextSlot in TioMapContainer.GetContainer.Values do
-    BuildSchemaFK(ASchema, AContextSlot.GetMap);
+  for LContextSlot in TioMapContainer.GetContainer.Values do
+    BuildSchemaFK(ASchema, LContextSlot.GetMap);
 end;
 
 class procedure TioDBBuilderSchemaBuilder.BuildSchemaFK(const ASchema: IioDBBuilderSchema; const AMap: IioMap);
