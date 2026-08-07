@@ -135,7 +135,8 @@ begin
     // When the table is new, all its fields must be created — no DB query needed
     if (ATable.Status = stCreate) or not FStrategy.Check_FieldExists(ATable, LField) then
       LField.Status := stCreate
-    else if FStrategy.Check_FieldModified(ATable, LField) then
+    else
+    if FStrategy.Check_FieldModified(ATable, LField) then
       LField.Status := stUpdate;
 
     if LField.Status > stClean then
@@ -155,7 +156,8 @@ begin
     // When the table is new, all its foreign keys must be created — no DB query needed
     if (ATable.Status = stCreate) or not FStrategy.Check_ForeignKeyExists(ATable, LFK) then
       LFK.Status := stCreate
-    else if FStrategy.Check_ForeignKeyModified(ATable, LFK) then
+    else
+    if FStrategy.Check_ForeignKeyModified(ATable, LFK) then
       LFK.Status := stUpdate;
 
     if LFK.Status > stClean then
@@ -175,7 +177,8 @@ begin
     // When the table is new, all its indexes must be created — no DB query needed
     if (ATable.Status = stCreate) or not FStrategy.Check_IndexExists(ATable, LIndex) then
       LIndex.Status := stCreate
-    else if FStrategy.Check_IndexModified(ATable, LIndex) then
+    else
+    if FStrategy.Check_IndexModified(ATable, LIndex) then
       LIndex.Status := stUpdate;
 
     if LIndex.Status > stClean then
