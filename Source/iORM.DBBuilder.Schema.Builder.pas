@@ -36,14 +36,14 @@ unit iORM.DBBuilder.Schema.Builder;
 interface
 
 uses
-  iORM.DBBuilder.Interfaces, iORM.COntext.Map.Interfaces;
+  iORM.DBBuilder.Interfaces, iORM.Context.Map.Interfaces;
 
 type
 
   TioDBBuilderSchemaBuilder = class(TioDBBuilderSchemaBuilderIntf)
   private
-    class procedure BuildIndexList(const ASchemaTable: IioDBBuilderSchemaTable; const AMap: IioMap);
-    class procedure BuildSchemaFK(const ASchema: IioDBBuilderSchema; const AMap: IioMap);
+    class procedure BuildSchemaFK(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const AMap: IioMap);
+    class procedure BuildSchemaIndexes(const ASchemaTable: IioDBBuilderSchemaTable; const AMap: IioMap);
     class procedure BuildSchemaTable(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const AMap: IioMap;
       const ASqlGenerator: IioDBBuilderSqlGenerator);
   public
@@ -54,7 +54,7 @@ type
 implementation
 
 uses
-  iORM.COntext.Container, iORM.COntext.Properties.Interfaces, iORM.Attributes, iORM.DBBuilder.Factory,
+  iORM.Context.Container, iORM.Context.Properties.Interfaces, iORM.Attributes, iORM.DBBuilder.Factory,
   iORM.Resolver.Factory, iORM.Resolver.Interfaces, iORM.Exceptions, System.SysUtils, iORM.CommonTypes;
 
 { TioDBBuilderSchemaBuilder }
@@ -69,19 +69,24 @@ begin
     BuildSchemaTable(AConnectionDefName, ASchema, LContextSlot.GetMap, ASqlGenerator);
   // Loop for all entities and build FK list
   for LContextSlot in TioMapContainer.GetContainer.Values do
-    BuildSchemaFK(ASchema, LContextSlot.GetMap);
+    BuildSchemaFK(AConnectionDefName, ASchema, LContextSlot.GetMap);
 end;
 
-class procedure TioDBBuilderSchemaBuilder.BuildSchemaFK(const ASchema: IioDBBuilderSchema; const AMap: IioMap);
+class procedure TioDBBuilderSchemaBuilder.BuildSchemaFK(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema;
+  const AMap: IioMap);
 var
-  // LSchemaTable: IioDBBuilderSchemaTable;
-  LProperty: IioProperty;
+  LDependentMap: IioMap;
   LDependentProperty: IioProperty;
+  LProperty: IioProperty;
+  LReferenceMap: IioMap;
   LResolvedChildTypeList: IioResolvedTypeList;
-  LResolvedChildTypeName: String;
   LResolvedChildTypeMap: IioMap;
+  LResolvedChildTypeName: String;
   LSchemaTable: IioDBBuilderSchemaTable;
 begin
+  // Check if the class/table must be skipped or not (same guard as BuildSchemaTable)
+  if AMap.GetTable.IsNotPersistedEntity or not AMap.GetTable.IsForThisConnection(AConnectionDefName) then
+    Exit;
   for LProperty in AMap.GetProperties do
   begin
     if (LProperty.GetRelationType in [rtNone, rtEmbeddedHasOne, rtEmbeddedHasMany]) or (LProperty.GetMetadata_FKCreate = fkDoNotCreate) then
@@ -94,39 +99,44 @@ begin
     begin
       // Get the map for the current ResolverTypeName (Child)
       LResolvedChildTypeMap := TioMapContainer.GetMap(LResolvedChildTypeName);
-      // If FK is between two classes mapped to two different ConnectionDefNames then skip it
-      // If one of the twi classes involved in the FK is a NotPersisted entity then skip it
-      if AMap.GetTable.IsNotPersistedEntity or LResolvedChildTypeMap.GetTable.IsNotPersistedEntity
-      or (AMap.GetTable.GetTableConnectionName <> LResolvedChildTypeMap.GetTable.GetTableConnectionName) then
+      // Skip the FK if the child class is a NotPersisted entity or is not for this connection:
+      // a FK is created only when both classes involved live on the connection being built
+      if LResolvedChildTypeMap.GetTable.IsNotPersistedEntity or not LResolvedChildTypeMap.GetTable.IsForThisConnection(AConnectionDefName) then
         Continue;
-      if LProperty.GetRelationType in [rtBelongsTo] then
+      // The reference side is the master table of the relation, the dependent side is the table
+      // holding the FK field: the current map itself for BelongsTo, the resolved child map for
+      // HasMany/HasOne. The OnDelete/OnUpdate actions always come from the property being iterated.
+      if LProperty.GetRelationType = rtBelongsTo then
       begin
-// ----------------------- ALLA FINE HO DECISO DI NON METTERLO ----------------------------------
-//        if LResolvedTypeList.Count > 1 then
-//          raise EioException.Create(ClassName, 'BuildSchemaFK', Format('Hi, I''m iORM.' +
-//            #13#13'Trying to define the DB schema I realized that in class "%s" (mapped on table "%s", connection "%s") there is property "%s" (mapped on field "%s" on the DB) on which there is a BelongsTo relationship with the type "%s".' +
-//            #13#13'The problem is that this type is mapped to more than one table and it is not possible to set referential integrity constraints to multiple tables at once, it would almost never work correctly.' +
-//            #13#13'You can disable the creation of the Foreign Key for this property by decorating it with the attribute "[ioForeignKey (fkDoNotCreate)]"' +
-//            'or completely disable the automatic creation of ForeignKeys for the entire database by setting the property "AutoCreateDB.ForeignKeys" to False in the ConnectionDef component.' +
-//            #13#13'I hope this information can be useful to you.',
-//            [AMap.GetClassName, AMap.GetTable.TableName, AMap.GetTable.GetConnectionDefName, LProperty.GetName, LProperty.GetSqlFieldName(True), LProperty.GetRelationChildTypeName]));
-// ----------------------- ALLA FINE HO DECISO DI NON METTERLO ----------------------------------
+        LReferenceMap := LResolvedChildTypeMap;
+        LDependentMap := AMap;
         LDependentProperty := LProperty;
-        LSchemaTable := ASchema.FindTable(AMap.GetTable.TableName, False);
-        if LSchemaTable <> nil then
-          LSchemaTable.AddForeignKey(LResolvedChildTypeMap, AMap, LProperty, LDependentProperty.GetMetadata_FKOnDeleteAction,
-            LDependentProperty.GetMetadata_FKOnUpdateAction);
       end
       else
       begin
+        LReferenceMap := AMap;
+        LDependentMap := LResolvedChildTypeMap;
         LDependentProperty := LResolvedChildTypeMap.GetProperties.GetPropertyByName(LProperty.GetRelationChildPropertyName);
-        LSchemaTable := ASchema.FindTable(LResolvedChildTypeMap.GetTable.TableName, False);
-        if LSchemaTable <> nil then
-          LSchemaTable.AddForeignKey(AMap, LResolvedChildTypeMap, LDependentProperty, LProperty.GetMetadata_FKOnDeleteAction,
-            LProperty.GetMetadata_FKOnUpdateAction);
       end;
+      // Safety belt: beyond the IsForThisConnection guards above, the FK is added only if its
+      // dependent table actually made it into this connection's schema (BuildSchemaTable applies
+      // the same connection filter), so a nil here silently discards the FK.
+      LSchemaTable := ASchema.FindTable(LDependentMap.GetTable.TableName, False);
+      if LSchemaTable <> nil then
+        LSchemaTable.AddForeignKey(LReferenceMap, LDependentMap, LDependentProperty, LProperty.GetMetadata_FKOnDeleteAction,
+          LProperty.GetMetadata_FKOnUpdateAction);
     end;
   end;
+end;
+
+class procedure TioDBBuilderSchemaBuilder.BuildSchemaIndexes(const ASchemaTable: IioDBBuilderSchemaTable; const AMap: IioMap);
+var
+  LIndexAttr: ioIndex;
+begin
+  // If some explicit index is present then add it to the list
+  if AMap.GetTable.IndexListExists then
+    for LIndexAttr in AMap.GetTable.GetIndexList(False) do
+      ASchemaTable.AddIndex(LIndexAttr);
 end;
 
 class procedure TioDBBuilderSchemaBuilder.BuildSchemaTable(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema;
@@ -153,20 +163,10 @@ begin
   if LSchemaTable.IsTrueClass then
     LSchemaTable.AddField(TioDBBuilderFactory.NewSchemaFieldClassInfo(AConnectionDefName));
   // Add indexes
-  BuildIndexList(LSchemaTable, AMap);
+  BuildSchemaIndexes(LSchemaTable, AMap);
   // Add sequence only if the table uses Sequence for key generation
   if LSchemaTable.UsesSequenceForKeyGeneration then
     ASchema.SequenceAddIfNotExists(LSchemaTable.GetSequenceName);
-end;
-
-class procedure TioDBBuilderSchemaBuilder.BuildIndexList(const ASchemaTable: IioDBBuilderSchemaTable; const AMap: IioMap);
-var
-  LIndexAttr: ioIndex;
-begin
-  // If some explicit index is present then add it to the list
-  if AMap.GetTable.IndexListExists then
-    for LIndexAttr in AMap.GetTable.GetIndexList(False) do
-      ASchemaTable.AddIndex(LIndexAttr);
 end;
 
 end.

@@ -48,6 +48,8 @@ uses
 type
 
   TioDBBuilderEngine = class(TInterfacedObject, IioDBBuilderEngine)
+  private
+    procedure Warning_MultipleFKsOnSameField(const AContext: IioDBBuilderContext);
   public
     // ==========================================================
     // DATABASE RELATED METHODS
@@ -61,11 +63,55 @@ type
 implementation
 
 uses
+  System.Generics.Collections,
+  System.SysUtils,
+
   iORM.DBBuilder.Factory
 
   ;
 
 { TioDBBuilderEngine }
+
+// A relation whose child type resolves to more than one table (e.g. a BelongsTo towards an interface
+// or a base class implemented by several classes mapped on distinct tables) produces one FK per
+// resolved table, all on the same field. On most DBMS this means the field value should exist in ALL
+// the referenced tables at the same time, which almost never works correctly at runtime. The script
+// is generated anyway but the user is warned (with the escape hatches) instead of failing or staying
+// silent. Detection is a post-scan of the (data-only) schema so the SchemaBuilder stays untouched.
+procedure TioDBBuilderEngine.Warning_MultipleFKsOnSameField(const AContext: IioDBBuilderContext);
+var
+  LFieldKey: String;
+  LFKsByField: TObjectDictionary<String, TStringList>; // dependent "Table.Field" -> referenced table names
+  LForeignKey: IioDBBuilderSchemaFK;
+  LReferencedTables: TStringList;
+  LTable: IioDBBuilderSchemaTable;
+begin
+  LFKsByField := TObjectDictionary<String, TStringList>.Create([doOwnsValues]);
+  try
+    for LTable in AContext.Schema.Tables.Values do
+      for LForeignKey in LTable.ForeignKeys.Values do
+      begin
+        LFieldKey := Format('%s.%s', [LForeignKey.DependentTableName, LForeignKey.DependentFieldName]);
+        if not LFKsByField.TryGetValue(LFieldKey, LReferencedTables) then
+        begin
+          LReferencedTables := TStringList.Create;
+          LFKsByField.Add(LFieldKey, LReferencedTables);
+        end;
+        LReferencedTables.Add(LForeignKey.ReferenceTableName);
+      end;
+    for LFieldKey in LFKsByField.Keys do
+      if LFKsByField[LFieldKey].Count > 1 then
+        AContext.Script.Warnings.Add(Format('Field "%s" has %d foreign key constraints, one for each of the referenced tables (%s). ' +
+          'This usually happens when a BelongsTo relation points to a type mapped on more than one table (e.g. an interface or a base class): ' +
+          'referential integrity constraints to multiple tables at once almost never work correctly because the field value should exist ' +
+          'in all the referenced tables at the same time. You can disable the creation of the foreign key for the single property by ' +
+          'decorating it with the attribute "[ioForeignKey(fkDoNotCreate)]", or completely disable the automatic creation of foreign keys ' +
+          'by setting the property "AutoCreateDB.ForeignKeys" to False in the ConnectionDef component.',
+          [LFieldKey, LFKsByField[LFieldKey].Count, LFKsByField[LFieldKey].CommaText]));
+  finally
+    LFKsByField.Free;
+  end;
+end;
 
 function TioDBBuilderEngine.BuildScript_ForceCreateDB(const AConnectionDefName: String;
   const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
@@ -83,6 +129,7 @@ begin
   LContext.Script.Warnings.Add('ATTENTION: This script was generated in FORCE-CREATE mode, the actual state ' +
     'of the target database was NOT analyzed and is ignored. Review it carefully before running it against an ' +
     'existing database.');
+  Warning_MultipleFKsOnSameField(LContext);
   LContext.Schema.ForceCreateStatus;
   LStrategy.GenerateScript;
   Result := LContext;
@@ -95,6 +142,7 @@ var
   LStrategy: IioDBBuilderStrategy;
 begin
   LContext := TioDBBuilderFactory.NewContext(AConnectionDefName, AIndexesMode, AForeignKeysMode);
+  Warning_MultipleFKsOnSameField(LContext);
 
   // Built once and shared: the DBAnalyzer's catalog Check_* queries and the eventual script
   // generation both need the same dialect-specific Strategy for this Context.
