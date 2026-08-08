@@ -262,8 +262,6 @@ var
   LOldOnUpdate, LOldOnDelete: string;
   LNewOnUpdate, LNewOnDelete: string;
 begin
-  Result := False;
-
   // SQLite limitation: PRAGMA foreign_key_list cannot filter by FK name
   // We pass only the table name - BuildSQL_FKList returns ALL FKs for the table
   // PRAGMA foreign_key_list returns: id, seq, table, from, to, on_update, on_delete, match

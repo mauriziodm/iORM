@@ -245,8 +245,6 @@ function TioDBBuilderStrategyWithAlterTable.Check_ForeignKeyExists(const ATable:
 var
   LQuery: IioQuery;
 begin
-  Result := False;
-
   // BuildSQL_FKList returns only the specific FK (or empty result if not exists)
   LQuery := TioQueryEngine.GetRawQuery(Context.ConnectionDefName,
     Context.SqlGenerator.BuildSQL_FKList(ATable.Name,
@@ -403,8 +401,6 @@ function TioDBBuilderStrategyWithAlterTable.Check_IndexExists(const ATable: IioD
 var
   LQuery: IioQuery;
 begin
-  Result := False;
-
   LQuery := TioQueryEngine.GetRawQuery(Context.ConnectionDefName, Context.SqlGenerator.BuildSQL_IndexExists(ATable, AIndex), True);
   Result := not (LQuery.Eof or LQuery.Fields[0].IsNull);
 end;
