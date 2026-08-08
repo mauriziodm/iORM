@@ -101,7 +101,7 @@ begin
       end;
     for LFieldKey in LFKsByField.Keys do
       if LFKsByField[LFieldKey].Count > 1 then
-        AContext.Script.Warnings.Add(Format('Field "%s" has %d foreign key constraints, one for each of the referenced tables (%s). ' +
+        AContext.Script.Warnings.AddLine(Format('Field "%s" has %d foreign key constraints, one for each of the referenced tables (%s). ' +
           'This usually happens when a BelongsTo relation points to a type mapped on more than one table (e.g. an interface or a base class): ' +
           'referential integrity constraints to multiple tables at once almost never work correctly because the field value should exist ' +
           'in all the referenced tables at the same time. You can disable the creation of the foreign key for the single property by ' +
@@ -126,7 +126,7 @@ begin
   // -> BuildSchema, no DB access). Force the whole tree to stCreate, mirroring what the DBAnalyzer
   // does on a non-existent DB, and flag the result so Context.Execute refuses to run it unless the
   // caller explicitly passes AForce = True: it must NOT be executed against an existing database.
-  LContext.Script.Warnings.Add('ATTENTION: This script was generated in FORCE-CREATE mode, the actual state ' +
+  LContext.Script.Warnings.AddLine('ATTENTION: This script was generated in FORCE-CREATE mode, the actual state ' +
     'of the target database was NOT analyzed and is ignored. Review it carefully before running it against an ' +
     'existing database.');
   Warning_MultipleFKsOnSameField(LContext);

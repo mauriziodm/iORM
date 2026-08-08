@@ -635,14 +635,14 @@ var
 begin
   LRequiredConversion := Format('[%s->%s]', [AOldFieldType, ANewFieldType]);
   if ContainsText(Context.SqlGenerator.GetInvalidFieldTypeConversions, LRequiredConversion) then
-    Context.Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> Invalid conversion from ''%s'' to ''%s''',
+    Context.Script.Warnings.AddLine(Format('Table ''%s'' field ''%s'' --> Invalid conversion from ''%s'' to ''%s''',
       [ATable.Name, AField.FieldName, AOldFieldType, ANewFieldType]));
 end;
 
 procedure TioDBBuilderStrategyBase.Warning_ChangeNotAllowed(const AValueName, AOldValue, ANewValue: String;
   const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
 begin
-  Context.Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> Changing the %s is not allowed (old = ''%s'', new = ''%s'')',
+  Context.Script.Warnings.AddLine(Format('Table ''%s'' field ''%s'' --> Changing the %s is not allowed (old = ''%s'', new = ''%s'')',
     [ATable.Name, AField.FieldName, AValueName, AOldValue, ANewValue]));
 end;
 
@@ -650,18 +650,18 @@ procedure TioDBBuilderStrategyBase.Warning_PotentialDataTruncation(const AValueN
   const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
 begin
   if ANewValue < AOldValue then
-    Context.Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> The new %s value becomes smaller than the old one (old = %d, new = %d)',
+    Context.Script.Warnings.AddLine(Format('Table ''%s'' field ''%s'' --> The new %s value becomes smaller than the old one (old = %d, new = %d)',
       [ATable.Name, AField.FieldName, AValueName, AOldValue, ANewValue]));
 end;
 
 procedure TioDBBuilderStrategyBase.Warning_NotNullChangeNotAllowed(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
 begin
-  Context.Script.Warnings.Add(Format('Table ''%s'' field ''%s'' --> The NOT NULL setting cannot be changed automatically', [ATable.Name, AField.FieldName]));
+  Context.Script.Warnings.AddLine(Format('Table ''%s'' field ''%s'' --> The NOT NULL setting cannot be changed automatically', [ATable.Name, AField.FieldName]));
 end;
 
 procedure TioDBBuilderStrategyBase.Hint_NotNullPotentialDataImpact(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
 begin
-  Context.Script.Hints.Add(Format('Table ''%s'' field ''%s'' --> The not null setting is changed from FALSE to TRUE and a DEFAULT value has not been specified',
+  Context.Script.Hints.AddLine(Format('Table ''%s'' field ''%s'' --> The not null setting is changed from FALSE to TRUE and a DEFAULT value has not been specified',
     [ATable.Name, AField.FieldName]));
 end;
 

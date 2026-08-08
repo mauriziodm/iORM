@@ -262,6 +262,8 @@ begin
 end;
 
 function TioDBBuilderScript.GetLines: TStringList;
+var
+  LLine: string;
 begin
   FFullScript.Clear;
   FFullScript.AddStrings(FScriptHeader.Lines);
@@ -274,7 +276,12 @@ begin
     FFullScript.Add('-- W A R N I N G S !!!        W A R N I N G S !!!        W A R N I N G S !!!');
     FFullScript.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
     FFullScript.Add('');
-    FFullScript.AddStrings(FScriptWarnings.Lines);
+    // Emit each warning as a SQL comment line: the script stays human-readable AND
+    // safely (re)executable, since the script runner strips lines starting with '--'
+    // (see iORM.DB.Script.LoadScriptAndCleanFromComments). Warnings/Hints must NEVER
+    // reach the DBMS as SQL text.
+    for LLine in FScriptWarnings.Lines do
+      FFullScript.Add('-- ' + LLine);
     FFullScript.Add('');
   end;
 
@@ -286,7 +293,9 @@ begin
     FFullScript.Add('-- H I N T S');
     FFullScript.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
     FFullScript.Add('');
-    FFullScript.AddStrings(FScriptHints.Lines);
+    // Same as warnings above: hints are informational and must not be executed as SQL.
+    for LLine in FScriptHints.Lines do
+      FFullScript.Add('-- ' + LLine);
     FFullScript.Add('');
   end;
 

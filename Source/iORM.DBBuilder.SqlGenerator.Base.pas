@@ -724,7 +724,7 @@ end;
 procedure TioDBBuilderSqlGenBase.Hint_KeyGenerationStrategyFallback(const AScript: IioDBBuilderScript;
   const ATable: IioDBBuilderSchemaTable);
 begin
-  AScript.Hints.Add(Format(
+  AScript.Hints.AddLine(Format(
     'Table ''%s'' requests %s key generation but this DBMS does not support it. Using %s instead.',
     [ATable.Name,
      TioUtilities.EnumToString<TioKeyGenerationStrategyType>(ATable.RequestedKeyGenerationStrategy),
