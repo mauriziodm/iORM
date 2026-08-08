@@ -142,9 +142,8 @@ type
     /// </summary>
     procedure Process_DropTableIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
     /// <summary>
-    /// Generates index SQL for all tables that have index changes (taIndexes in Changes).
-    /// This covers both new tables (whose indexes are set to stCreate by the analyzer)
-    /// and existing tables with new or modified indexes.
+    /// Generates index SQL for every table (Process_TableIndexes skips per-element stClean indexes).
+    /// This covers new tables, existing tables with new/modified indexes, and forced-stCreate indexes.
     /// </summary>
     procedure Process_Indexes; virtual;
     /// <summary>
@@ -342,11 +341,10 @@ procedure TioDBBuilderStrategyBase.Process_ForeignKeys;
 var
   LTable: IioDBBuilderSchemaTable;
 begin
+  // Status-driven: Process_TableForeignKeys skips stClean FKs per element, so the FK Status is the
+  // single source of truth (covers both analyzer-driven and forced-stCreate FKs).
   for LTable in Context.Schema.Tables.Values do
-  begin
-    if taForeignKeys in LTable.Changes then
-      Process_TableForeignKeys(LTable);
-  end;
+    Process_TableForeignKeys(LTable);
 end;
 
 procedure TioDBBuilderStrategyBase.Process_DropTableForeignKeys(const ATable: IioDBBuilderSchemaTable);
@@ -415,27 +413,28 @@ var
   LFK: IioDBBuilderSchemaFK;
 begin
   for LFK in ATable.ForeignKeys.Values do
-  begin
-    // Skip unchanged FKs
-    if LFK.Status = stClean then
-      Continue;
-    // Drop the existing FK first when it needs to be recreated with changes
-    if LFK.Status = stUpdate then
-      ScriptWrite_DropForeignKey(ATable, LFK);
-    // Create the FK (both for new and modified ones)
-    ScriptWrite_CreateForeignKey(ATable, LFK);
-  end;
+    // stClean FKs fall through (no branch) and are left untouched.
+    case LFK.Status of
+      // New FK: just create it.
+      stCreate:
+        ScriptWrite_CreateForeignKey(ATable, LFK);
+      // Modified FK: drop the existing one first, then recreate it with the new definition.
+      stUpdate:
+        begin
+          ScriptWrite_DropForeignKey(ATable, LFK);
+          ScriptWrite_CreateForeignKey(ATable, LFK);
+        end;
+    end;
 end;
 
 procedure TioDBBuilderStrategyBase.Process_Indexes;
 var
   LTable: IioDBBuilderSchemaTable;
 begin
+  // Status-driven: Process_TableIndexes skips stClean indexes per element, so the index Status is the
+  // single source of truth (covers both analyzer-driven and forced-stCreate indexes).
   for LTable in Context.Schema.Tables.Values do
-  begin
-    if taIndexes in LTable.Changes then
-      Process_TableIndexes(LTable);
-  end;
+    Process_TableIndexes(LTable);
 end;
 
 procedure TioDBBuilderStrategyBase.ScriptWrite_AlterTable(const ATable: IioDBBuilderSchemaTable);
@@ -494,16 +493,18 @@ var
   LIndex: IioDBBuilderSchemaIndex;
 begin
   for LIndex in ATable.Indexes.Values do
-  begin
-    // Skip unchanged indexes
-    if LIndex.Status = stClean then
-      Continue;
-    // Drop the existing index first when it needs to be recreated with changes
-    if LIndex.Status = stUpdate then
-      ScriptWrite_DropIndex(ATable, LIndex);
-    // Create the index (both for new and modified ones)
-    ScriptWrite_CreateIndex(ATable, LIndex);
-  end;
+    // stClean indexes fall through (no branch) and are left untouched.
+    case LIndex.Status of
+      // New index: just create it.
+      stCreate:
+        ScriptWrite_CreateIndex(ATable, LIndex);
+      // Modified index: drop the existing one first, then recreate it with the new definition.
+      stUpdate:
+        begin
+          ScriptWrite_DropIndex(ATable, LIndex);
+          ScriptWrite_CreateIndex(ATable, LIndex);
+        end;
+    end;
 end;
 
 procedure TioDBBuilderStrategyBase.Process_Fields(const ATable: IioDBBuilderSchemaTable);
@@ -531,9 +532,9 @@ begin
       stCreate:
         ScriptWrite_CreateTable(LTable);
       stUpdate:
-        // Index-only and FK-only changes are skipped: indexes and foreign keys
-        // are always handled separately in GenerateScript_Body.
-        if not (LTable.Changes <= [taIndexes, taForeignKeys]) then
+        // Emit an ALTER only when a field changed; index-only / FK-only changes are handled
+        // separately in GenerateScript_Body. Field Status is the source of truth (HasFieldChanges).
+        if LTable.HasFieldChanges then
           ScriptWrite_AlterTable(LTable);
     end;
   end;

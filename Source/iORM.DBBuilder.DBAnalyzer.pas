@@ -140,10 +140,7 @@ begin
       LField.Status := stUpdate;
 
     if LField.Status > stClean then
-    begin
-      ATable.AddChange(taFields);
       ATable.Status := stUpdate;
-    end;
   end;
 end;
 
@@ -161,10 +158,7 @@ begin
       LFK.Status := stUpdate;
 
     if LFK.Status > stClean then
-    begin
-      ATable.AddChange(taForeignKeys);
       ATable.Status := stUpdate;
-    end;
   end;
 end;
 
@@ -182,10 +176,7 @@ begin
       LIndex.Status := stUpdate;
 
     if LIndex.Status > stClean then
-    begin
-      ATable.AddChange(taIndexes);
       ATable.Status := stUpdate;
-    end;
   end;
 end;
 

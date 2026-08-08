@@ -119,7 +119,7 @@ procedure TioDBBuilderStrategyWithAlterTable.ScriptWrite_AlterTable(const ATable
 begin
   inherited;
 
-  if taFields in ATable.Changes then
+  if ATable.HasFieldChanges then
     Process_Fields(ATable);
 end;
 

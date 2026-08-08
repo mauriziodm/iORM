@@ -43,7 +43,6 @@ type
 
   TioDBBuilderSchemaTable = class(TInterfacedObject, IioDBBuilderSchemaTable)
   private
-    FChanges: TioDBBuilderTableChanges;
     FContextTable: IioTable;
     FFields: TioDBBuilderSchemaFields;
     FForeignKeys: TioDBBuilderSchemaForeignKeys;
@@ -53,7 +52,6 @@ type
     FPrimaryKeyField: IioDBBuilderSchemaField;
     FStatus: TioDBBuilderStatus;
     function FieldExists(const AFieldName: String): boolean;
-    function GetChanges: TioDBBuilderTableChanges;
     function GetIsTrueClass: Boolean;
     function GetStatus: TioDBBuilderStatus;
     procedure SetIsTrueClass(const AValue: Boolean);
@@ -61,7 +59,6 @@ type
   public
     constructor Create(const AContextTable: IioTable; const AKeyGenerationStrategy: TioKeyGenerationStrategyType);
     destructor Destroy; override;
-    procedure AddChange(const AChange: TioDBBuilderTableChange);
     procedure AddField(ASchemaField: IioDBBuilderSchemaField);
     procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
@@ -80,11 +77,11 @@ type
     function GetRequestedKeyGenerationStrategy: TioKeyGenerationStrategyType;
     function GetSequenceName: String;
     function GetSqlName: String;
+    function HasFieldChanges: Boolean;
     function IsKeyGenerationStrategyFallback: Boolean;
     function UsesIdentityForKeyGeneration: Boolean;
     function UsesSequenceForKeyGeneration: Boolean;
 
-    property Changes: TioDBBuilderTableChanges read GetChanges;
     property ContextTable: IioTable read GetContextTable;
     property Fields: TioDBBuilderSchemaFields read GetFields;
     property ForeignKeys: TioDBBuilderSchemaForeignKeys read GetForeignKeys;
@@ -106,11 +103,6 @@ uses
 
 { TioDBBuilderSchemaTable }
 
-procedure TioDBBuilderSchemaTable.AddChange(const AChange: TioDBBuilderTableChange);
-begin
-  Include(FChanges, AChange);
-end;
-
 procedure TioDBBuilderSchemaTable.AddField(ASchemaField: IioDBBuilderSchemaField);
 begin
   // Add field if not already exists
@@ -124,7 +116,6 @@ end;
 constructor TioDBBuilderSchemaTable.Create(const AContextTable: IioTable;
   const AKeyGenerationStrategy: TioKeyGenerationStrategyType);
 begin
-  FChanges := [];
   FStatus := stClean;
   FContextTable := AContextTable;
   FIsTrueClass := AContextTable.IsTrueClass;
@@ -148,6 +139,18 @@ var
 begin
   for LField in FFields do
     if LField.FieldName.Equals(AFieldName) then
+      Exit(True);
+  Result := False;
+end;
+
+function TioDBBuilderSchemaTable.HasFieldChanges: Boolean;
+var
+  LField: IioDBBuilderSchemaField;
+begin
+  // Field Status is the single source of truth for "does this table need an ALTER for its fields":
+  // any field marked stCreate/stUpdate (by the analyzer or by a Force* path) counts.
+  for LField in FFields do
+    if LField.Status > stClean then
       Exit(True);
   Result := False;
 end;
@@ -244,11 +247,6 @@ end;
 function TioDBBuilderSchemaTable.GetSqlName: String;
 begin
   Result := FContextTable.GetSql;  // Case normalized + delimiters
-end;
-
-function TioDBBuilderSchemaTable.GetChanges: TioDBBuilderTableChanges;
-begin
-  Result := FChanges;
 end;
 
 function TioDBBuilderSchemaTable.GetContextTable: IioTable;

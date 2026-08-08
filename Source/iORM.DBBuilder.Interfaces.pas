@@ -55,8 +55,6 @@ type
 
 
   TioDBBuilderStatus = (stClean, stUpdate, stCreate);
-  TioDBBuilderTableChange = (taFields, taIndexes, taForeignKeys);
-  TioDBBuilderTableChanges = set of TioDBBuilderTableChange;
 
   /// <summary>
   /// Controls how the DBBuilder manages indexes and foreign keys.
@@ -212,7 +210,6 @@ type
   IioDBBuilderSchemaTable = interface
     ['{2AFBE991-7E33-42DB-892E-01F8C98A5B8F}']
 
-    procedure AddChange(const AChange: TioDBBuilderTableChange);
     procedure AddField(ASchemaField: IioDBBuilderSchemaField);
     procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
@@ -240,7 +237,6 @@ type
     ///  and as part of ForceCreateStatus's table-wide cascade.
     /// </summary>
     procedure ForceIndexesCreateStatus;
-    function GetChanges: TioDBBuilderTableChanges;
     function GetContextTable: IioTable;
     function GetFields: TioDBBuilderSchemaFields;
     function GetForeignKeys: TioDBBuilderSchemaForeignKeys;
@@ -255,13 +251,18 @@ type
     function GetSequenceName: String;
     function GetSqlName: String;
     function GetStatus: TioDBBuilderStatus;
+    /// <summary>
+    ///  True if at least one field of this table has a pending change (Status &gt; stClean), i.e. it
+    ///  must be created or altered. Replaces the former taFields flag of the removed table-level
+    ///  Changes set: field Status is the single source of truth.
+    /// </summary>
+    function HasFieldChanges: Boolean;
     function IsKeyGenerationStrategyFallback: Boolean;
     procedure SetIsTrueClass(const AValue: boolean);
     procedure SetStatus(const AValue: TioDBBuilderStatus);
     function UsesIdentityForKeyGeneration: Boolean;
     function UsesSequenceForKeyGeneration: Boolean;
 
-    property Changes: TioDBBuilderTableChanges read GetChanges;
     property ContextTable: IioTable read GetContextTable;
     property Fields: TioDBBuilderSchemaFields read GetFields;
     property ForeignKeys: TioDBBuilderSchemaForeignKeys read GetForeignKeys;
