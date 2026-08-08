@@ -168,7 +168,11 @@ var
   LIndexName, LFieldList, LUnique: String;
 begin
   // Generates: CREATE [UNIQUE] INDEX IF NOT EXISTS <name> ON <table> (<fields>);
-  LIndexName := AIndex.SqlName;  // Already includes delimiters
+  // Use the computed index name (the same source BuildSQL_IndexExists/BuildSQL_DropIndex use via
+  // Translate_SchemaTableAndIndex_To_IndexName) so CREATE, EXISTS and DROP always agree on the name.
+  // AIndex.SqlName must NOT be used here: for auto-named indexes (ioIndex without a name) it is empty,
+  // whereas the check/drop path uses the generated IDX_<table>_<fields> name.
+  LIndexName := Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
   LUnique := Translate_SchemaIndex_To_Unique(AIndex);  // Returns ' UNIQUE' or '' (with leading space if present)
   LFieldList := Translate_SchemaIndex_To_CommaSepListOfFieldNames(AIndex);
 
@@ -301,10 +305,14 @@ begin
   // Note: SQLite FK constraints are added within CREATE TABLE, not via ALTER TABLE
   LSqlText := TioDBBuilderFactory.NewSqlText;
 
-  // Build the main FK constraint structure using Sql* properties for SQL generation
+  // Build the main FK constraint structure using Sql* properties for SQL generation.
+  // Constraint NAME from Translate_SchemaTableAndFK_To_FKName (single source of the FK name, shared
+  // with the check/drop path), not from AForeignKey.SqlName. On SQLite the FK name is cosmetic
+  // (Check_ForeignKeyExists matches structurally by field+reference table, FKs are rebuilt inline),
+  // but this keeps the name consistent with Firebird/WithAlterTable and with DROP-by-name.
   LSqlText.Add(
     Format(', CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)', [
-      AForeignKey.SqlName,
+      Translate_SchemaTableAndFK_To_FKName(ATable, AForeignKey),
       AForeignKey.SqlDependentFieldName,
       AForeignKey.SqlReferenceTableName,
       AForeignKey.SqlReferenceFieldName

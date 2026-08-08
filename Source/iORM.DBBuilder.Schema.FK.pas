@@ -57,7 +57,6 @@ type
     function GetReferenceTableName: String;
     function GetSqlDependentFieldName: String;
     function GetSqlDependentTableName: String;
-    function GetSqlName: String;
     function GetSqlReferenceFieldName: String;
     function GetSqlReferenceTableName: String;
     function GetStatus: TioDBBuilderStatus;
@@ -75,7 +74,6 @@ type
     property ReferenceTableName: String read GetReferenceTableName;
     property SqlDependentFieldName: String read GetSqlDependentFieldName;
     property SqlDependentTableName: String read GetSqlDependentTableName;
-    property SqlName: String read GetSqlName;
     property SqlReferenceFieldName: String read GetSqlReferenceFieldName;
     property SqlReferenceTableName: String read GetSqlReferenceTableName;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
@@ -84,7 +82,7 @@ type
 implementation
 
 uses
-  System.SysUtils, iORM.DB.Factory;
+  System.SysUtils;
 
 { TioDBBuilderSchemaFK }
 
@@ -130,13 +128,6 @@ end;
 function TioDBBuilderSchemaFK.GetSqlDependentTableName: String;
 begin
   Result := FDependentMap.GetTable.GetSql;  // Already case normalized + delimiters (FASE 3)
-end;
-
-function TioDBBuilderSchemaFK.GetSqlName: String;
-begin
-  // The raw name is already case normalized, just add delimiters
-  Result := TioDbFactory.SqlDataConverter(FDependentMap.GetTable.GetTableConnectionName)
-    .NormalizeSqlIdentifier(GetName, True);
 end;
 
 function TioDBBuilderSchemaFK.GetSqlReferenceFieldName: String;

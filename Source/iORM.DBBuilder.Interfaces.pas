@@ -107,7 +107,6 @@ type
     function GetReferenceTableName: String;
     function GetSqlDependentFieldName: String;
     function GetSqlDependentTableName: String;
-    function GetSqlName: String;
     function GetSqlReferenceFieldName: String;
     function GetSqlReferenceTableName: String;
     function GetStatus: TioDBBuilderStatus;
@@ -122,7 +121,6 @@ type
     property ReferenceTableName: String read GetReferenceTableName;
     property SqlDependentFieldName: String read GetSqlDependentFieldName;
     property SqlDependentTableName: String read GetSqlDependentTableName;
-    property SqlName: String read GetSqlName;
     property SqlReferenceFieldName: String read GetSqlReferenceFieldName;
     property SqlReferenceTableName: String read GetSqlReferenceTableName;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
@@ -192,7 +190,6 @@ type
     function GetName: String;
     function GetOrientation: TioIndexOrientation;
     function GetSqlCommaSepFieldList: String;
-    function GetSqlName: String;
     function GetStatus: TioDBBuilderStatus;
     function GetUnique: Boolean;
     procedure SetStatus(const Value: TioDBBuilderStatus);
@@ -203,7 +200,6 @@ type
     property Name: String read GetName;
     property Orientation: TioIndexOrientation read GetOrientation;
     property SqlCommaSepFieldList: String read GetSqlCommaSepFieldList;
-    property SqlName: String read GetSqlName;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
     property Unique: Boolean read GetUnique;
   end;

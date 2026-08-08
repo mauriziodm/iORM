@@ -204,11 +204,15 @@ begin
   // Generates: ALTER TABLE <table> ADD CONSTRAINT <name> FOREIGN KEY (...) REFERENCES (...) [ON UPDATE ...] [ON DELETE ...]
   LSqlText := TioDBBuilderFactory.NewSqlText;
 
-  // Build the main FK constraint structure using Sql* properties for SQL generation
+  // Build the main FK constraint structure using Sql* properties for SQL generation.
+  // The constraint NAME must come from Translate_SchemaTableAndFK_To_FKName (the same source used by
+  // Check_ForeignKeyExists/BuildSQL_DropFK), NOT from AForeignKey.SqlName: the latter lacks the 'FK_'
+  // prefix and the shortening applied by the check/drop path, so CREATE and EXISTS/DROP would never
+  // agree on the name and every re-sync would try to recreate an already existing FK.
   LSqlText.
     AddLine(Format('ALTER TABLE %s', [AForeignKey.SqlDependentTableName])).
     IncIndent.
-    AddLine(Format('ADD CONSTRAINT %s', [AForeignKey.SqlName])).
+    AddLine(Format('ADD CONSTRAINT %s', [Translate_SchemaTableAndFK_To_FKName(ATable, AForeignKey)])).
     AddLine(Format('FOREIGN KEY (%s)', [AForeignKey.SqlDependentFieldName])).
     AddLine(Format('REFERENCES %s (%s)', [AForeignKey.SqlReferenceTableName, AForeignKey.SqlReferenceFieldName]));
 
@@ -231,7 +235,11 @@ var
   LIndexName, LFieldList, LUnique, LOrientation: String;
 begin
   // Generates: CREATE [UNIQUE] [ASC|DESC] INDEX <name> ON <table> (<fields>);
-  LIndexName := AIndex.SqlName;  // Already includes delimiters
+  // Use the computed index name (the same source BuildSQL_IndexExists/BuildSQL_DropIndex use via
+  // Translate_SchemaTableAndIndex_To_IndexName) so CREATE, EXISTS and DROP always agree on the name.
+  // AIndex.SqlName must NOT be used here: for auto-named indexes (ioIndex without a name) it is empty,
+  // whereas the check/drop path uses the generated IDX_<table>_<fields> name.
+  LIndexName := Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
   LOrientation := Translate_SchemaIndex_To_Orientation(AIndex);  // Returns ' ASC' or ' DESC' (with leading space)
   LUnique := Translate_SchemaIndex_To_Unique(AIndex);  // Returns ' UNIQUE' or '' (with leading space if present)
   LFieldList := Translate_SchemaIndex_To_CommaSepListOfFieldNames(AIndex);

@@ -27,7 +27,6 @@ type
     function GetName: String;
     function GetOrientation: TioIndexOrientation;
     function GetSqlCommaSepFieldList: String;
-    function GetSqlName: String;
     function GetStatus: TioDBBuilderStatus;
     function GetUnique: Boolean;
     procedure SetStatus(const Value: TioDBBuilderStatus);
@@ -41,7 +40,6 @@ type
     property Name: String read GetName;
     property Orientation: TioIndexOrientation read GetOrientation;
     property SqlCommaSepFieldList: String read GetSqlCommaSepFieldList;
-    property SqlName: String read GetSqlName;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
     property Unique: Boolean read GetUnique;
   end;
@@ -129,13 +127,6 @@ begin
         .NormalizeSqlIdentifier(LField.Trim, True);  // Case + delimiters
     LComma := ', ';
   end;
-end;
-
-function TioDBBuilderSchemaIndex.GetSqlName: String;
-begin
-  // Normalize case + add delimiters to the name
-  Result := TioDbFactory.SqlDataConverter(FConnectionDefName)
-    .NormalizeSqlIdentifier(FName, True);
 end;
 
 // ============================================================

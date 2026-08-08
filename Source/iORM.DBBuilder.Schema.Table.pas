@@ -158,10 +158,21 @@ begin
 end;
 
 procedure TioDBBuilderSchemaTable.AddIndex(const AIndexAttr: ioIndex);
+var
+  LKey: String;
 begin
-  // Add index if not already exists
-  if not FIndexes.ContainsKey(AIndexAttr.Name) then
-    FIndexes.Add(AIndexAttr.Name, TioDBBuilderFactory.NewSchemaIndex(AIndexAttr, FContextTable.GetTableConnectionName));
+  // The dictionary key must uniquely identify the index. For explicitly named indexes the name is
+  // the identity. Auto-named indexes (ioIndex overloads without a name) all have an empty Name, so
+  // keying by name would collapse every auto-named index of the table onto the '' key and silently
+  // drop all but the first: fall back to the index signature (fields + orientation + unique) in that
+  // case, so distinct auto-named indexes are all kept.
+  if AIndexAttr.Name.IsEmpty then
+    LKey := Format('%s|%d|%d', [AIndexAttr.CommaSepFieldList, Ord(AIndexAttr.Orientation), Ord(AIndexAttr.Unique)])
+  else
+    LKey := AIndexAttr.Name;
+  // Add index if not already present
+  if not FIndexes.ContainsKey(LKey) then
+    FIndexes.Add(LKey, TioDBBuilderFactory.NewSchemaIndex(AIndexAttr, FContextTable.GetTableConnectionName));
 end;
 
 procedure TioDBBuilderSchemaTable.AddForeignKey(const AReferenceMap, ADependentMap: IioMap;
