@@ -7,7 +7,6 @@ uses
 
   iORM.Attributes,
   iORM.CommonTypes,
-  iORM.Context.Properties.Interfaces,
   iORM.DBBuilder.Interfaces;
 
 type
@@ -17,7 +16,6 @@ type
     FChanges: TioDBBuilderIndexChanges;
     FCommaSepFieldList: String;
     FConnectionDefName: String;
-    FContextProperty: IioProperty;
     FHasExplicitName: boolean;
     FName: String;
     FOrientation: TioIndexOrientation;
