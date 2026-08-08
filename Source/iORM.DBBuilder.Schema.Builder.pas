@@ -40,15 +40,18 @@ uses
 
 type
 
-  TioDBBuilderSchemaBuilder = class(TioDBBuilderSchemaBuilderIntf)
+  TioDBBuilderSchemaBuilder = class(TInterfacedObject, IioDBBuilderSchemaBuilder)
   private
-    class procedure BuildSchemaFK(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const AMap: IioMap);
-    class procedure BuildSchemaIndexes(const ASchemaTable: IioDBBuilderSchemaTable; const AMap: IioMap);
-    class procedure BuildSchemaTable(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const AMap: IioMap;
-      const ASqlGenerator: IioDBBuilderSqlGenerator);
+    FConnectionDefName: string;
+    FSchema: IioDBBuilderSchema;
+    FSqlGenerator: IioDBBuilderSqlGenerator;
+    procedure BuildSchemaFK(const AMap: IioMap);
+    procedure BuildSchemaIndexes(const ASchemaTable: IioDBBuilderSchemaTable; const AMap: IioMap);
+    procedure BuildSchemaTable(const AMap: IioMap);
   public
-    class procedure BuildSchema(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema;
-      const ASqlGenerator: IioDBBuilderSqlGenerator); override;
+    constructor Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema;
+      const ASqlGenerator: IioDBBuilderSqlGenerator);
+    procedure BuildSchema;
   end;
 
 implementation
@@ -59,21 +62,19 @@ uses
 
 { TioDBBuilderSchemaBuilder }
 
-class procedure TioDBBuilderSchemaBuilder.BuildSchema(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema;
-  const ASqlGenerator: IioDBBuilderSqlGenerator);
+procedure TioDBBuilderSchemaBuilder.BuildSchema;
 var
-  LContextSlot: TioMapSlot;
+  LMapSlot: TioMapSlot;
 begin
   // Loop for all entities and build table list
-  for LContextSlot in TioMapContainer.GetContainer.Values do
-    BuildSchemaTable(AConnectionDefName, ASchema, LContextSlot.GetMap, ASqlGenerator);
+  for LMapSlot in TioMapContainer.GetContainer.Values do
+    BuildSchemaTable(LMapSlot.GetMap);
   // Loop for all entities and build FK list
-  for LContextSlot in TioMapContainer.GetContainer.Values do
-    BuildSchemaFK(AConnectionDefName, ASchema, LContextSlot.GetMap);
+  for LMapSlot in TioMapContainer.GetContainer.Values do
+    BuildSchemaFK(LMapSlot.GetMap);
 end;
 
-class procedure TioDBBuilderSchemaBuilder.BuildSchemaFK(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema;
-  const AMap: IioMap);
+procedure TioDBBuilderSchemaBuilder.BuildSchemaFK(const AMap: IioMap);
 var
   LDependentMap: IioMap;
   LDependentProperty: IioProperty;
@@ -85,7 +86,7 @@ var
   LSchemaTable: IioDBBuilderSchemaTable;
 begin
   // Check if the class/table must be skipped or not (same guard as BuildSchemaTable)
-  if AMap.GetTable.IsNotPersistedEntity or not AMap.GetTable.IsForThisConnection(AConnectionDefName) then
+  if AMap.GetTable.IsNotPersistedEntity or not AMap.GetTable.IsForThisConnection(FConnectionDefName) then
     Exit;
   for LProperty in AMap.GetProperties do
   begin
@@ -101,7 +102,7 @@ begin
       LResolvedChildTypeMap := TioMapContainer.GetMap(LResolvedChildTypeName);
       // Skip the FK if the child class is a NotPersisted entity or is not for this connection:
       // a FK is created only when both classes involved live on the connection being built
-      if LResolvedChildTypeMap.GetTable.IsNotPersistedEntity or not LResolvedChildTypeMap.GetTable.IsForThisConnection(AConnectionDefName) then
+      if LResolvedChildTypeMap.GetTable.IsNotPersistedEntity or not LResolvedChildTypeMap.GetTable.IsForThisConnection(FConnectionDefName) then
         Continue;
       // The reference side is the master table of the relation, the dependent side is the table
       // holding the FK field: the current map itself for BelongsTo, the resolved child map for
@@ -121,7 +122,7 @@ begin
       // Safety belt: beyond the IsForThisConnection guards above, the FK is added only if its
       // dependent table actually made it into this connection's schema (BuildSchemaTable applies
       // the same connection filter), so a nil here silently discards the FK.
-      LSchemaTable := ASchema.FindTable(LDependentMap.GetTable.TableName, False);
+      LSchemaTable := FSchema.FindTable(LDependentMap.GetTable.TableName, False);
       if LSchemaTable <> nil then
         LSchemaTable.AddForeignKey(LReferenceMap, LDependentMap, LDependentProperty, LProperty.GetMetadata_FKOnDeleteAction,
           LProperty.GetMetadata_FKOnUpdateAction);
@@ -129,7 +130,7 @@ begin
   end;
 end;
 
-class procedure TioDBBuilderSchemaBuilder.BuildSchemaIndexes(const ASchemaTable: IioDBBuilderSchemaTable; const AMap: IioMap);
+procedure TioDBBuilderSchemaBuilder.BuildSchemaIndexes(const ASchemaTable: IioDBBuilderSchemaTable; const AMap: IioMap);
 var
   LIndexAttr: ioIndex;
 begin
@@ -139,34 +140,42 @@ begin
       ASchemaTable.AddIndex(LIndexAttr);
 end;
 
-class procedure TioDBBuilderSchemaBuilder.BuildSchemaTable(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema;
-  const AMap: IioMap; const ASqlGenerator: IioDBBuilderSqlGenerator);
+procedure TioDBBuilderSchemaBuilder.BuildSchemaTable(const AMap: IioMap);
 var
   LSchemaTable: IioDBBuilderSchemaTable;
   LProperty: IioProperty;
   LKeyGenStrategy: TioKeyGenerationStrategyType;
 begin
   // Check if the class/table must be skipped or not
-  if AMap.GetTable.IsNotPersistedEntity or not AMap.GetTable.IsForThisConnection(AConnectionDefName) then
+  if AMap.GetTable.IsNotPersistedEntity or not AMap.GetTable.IsForThisConnection(FConnectionDefName) then
     Exit;
   // Resolve the key generation strategy: if the map declares kgsAuto, the SqlGenerator translates it
   // into the concrete DBMS-specific strategy (e.g. Autoincrement for SQLite, Identity/Sequence for
   // Firebird 3+, etc.). The resolved strategy is then handed to the (data-only) schema.
-  LKeyGenStrategy := ASqlGenerator.Resolve_KeyGenerationStrategy(AMap.GetTable.GetKeyGenerationStrategy);
+  LKeyGenStrategy := FSqlGenerator.Resolve_KeyGenerationStrategy(AMap.GetTable.GetKeyGenerationStrategy);
   // Build or get the SchemaTable
-  LSchemaTable := ASchema.FindOrCreateTable(AMap, LKeyGenStrategy);
+  LSchemaTable := FSchema.FindOrCreateTable(AMap, LKeyGenStrategy);
   // Add fields
   for LProperty in AMap.GetProperties do
     if not (LProperty.IsTransient or (LProperty.GetRelationType = rtHasMany) or (LProperty.GetRelationType = rtHasOne)) then
       LSchemaTable.AddField(TioDBBuilderFactory.NewSchemaField(LProperty));
   // Add the ClassInfo field if necessary
   if LSchemaTable.IsTrueClass then
-    LSchemaTable.AddField(TioDBBuilderFactory.NewSchemaFieldClassInfo(AConnectionDefName));
+    LSchemaTable.AddField(TioDBBuilderFactory.NewSchemaFieldClassInfo(FConnectionDefName));
   // Add indexes
   BuildSchemaIndexes(LSchemaTable, AMap);
   // Add sequence only if the table uses Sequence for key generation
   if LSchemaTable.UsesSequenceForKeyGeneration then
-    ASchema.SequenceAddIfNotExists(LSchemaTable.GetSequenceName);
+    FSchema.SequenceAddIfNotExists(LSchemaTable.GetSequenceName);
+end;
+
+constructor TioDBBuilderSchemaBuilder.Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema;
+  const ASqlGenerator: IioDBBuilderSqlGenerator);
+begin
+  inherited Create;
+  FConnectionDefName := AConnectionDefName;
+  FSchema := ASchema;
+  FSqlGenerator := ASqlGenerator;
 end;
 
 end.

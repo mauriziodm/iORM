@@ -56,7 +56,8 @@ type
     class function NewDBBuilder: IioDBBuilder;
     class function NewSchema(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode;
       const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchema;
-    class function NewSchemaBuilder: TioDBBuilderSchemaBuilderRef;
+    class function NewSchemaBuilder(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema;
+      const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchemaBuilder;
     class function NewSchemaField(const AContextProperty: IioProperty): IioDBBuilderSchemaField;
     class function NewSchemaFieldClassInfo(const AConnectionDefName: String): IioDBBuilderSchemaField;
     class function NewSchemaFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty; const AOnDeleteAction, AOnUpdateAction: TioFKAction): IioDBBuilderSchemaFK;
@@ -106,12 +107,13 @@ class function TioDBBuilderFactory.NewSchema(const AConnectionDefName: String; c
   AForeignKeysMode: TioDBBuilderIndexesAndFKMode; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchema;
 begin
   Result := TioDBBuilderSchema.Create(AIndexesMode, AForeignKeysMode);
-  NewSchemaBuilder.BuildSchema(AConnectionDefName, Result, ASqlGenerator);
+  NewSchemaBuilder(AConnectionDefName, Result, ASqlGenerator).BuildSchema;
 end;
 
-class function TioDBBuilderFactory.NewSchemaBuilder: TioDBBuilderSchemaBuilderRef;
+class function TioDBBuilderFactory.NewSchemaBuilder(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema;
+  const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchemaBuilder;
 begin
-  Result := TioDBBuilderSchemaBuilder;
+  Result := TioDBBuilderSchemaBuilder.Create(AConnectionDefName, ASchema, ASqlGenerator);
 end;
 
 class function TioDBBuilderFactory.NewSchemaField(const AContextProperty: IioProperty): IioDBBuilderSchemaField;

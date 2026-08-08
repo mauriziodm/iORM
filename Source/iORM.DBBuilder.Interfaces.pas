@@ -402,12 +402,9 @@ type
     property Warnings: IioDBBuilderSqlText read GetWarnings;
   end;
 
-  // DBBuilder reference
-  TioDBBuilderSchemaBuilderRef = class of TioDBBuilderSchemaBuilderIntf;
-
-  TioDBBuilderSchemaBuilderIntf = class abstract
-  public
-    class procedure BuildSchema(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema; const ASqlGenerator: IioDBBuilderSqlGenerator); virtual; abstract;
+  IioDBBuilderSchemaBuilder = interface
+    ['{CDA1FF92-9166-48E5-BEE1-3D26EF895424}']
+    procedure BuildSchema;
   end;
 
   IioDBBuilderSqlGenerator = interface
