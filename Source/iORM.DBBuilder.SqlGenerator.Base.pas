@@ -554,6 +554,7 @@ end;
 function TioDBBuilderSqlGenBase.Check_DatabaseExists: Boolean;
 begin
   RaiseNotImplemented('Check_DatabaseExists');
+  Result := False; // Unreachable: silences W1035 (the compiler cannot know the raise above never returns)
 end;
 
 function TioDBBuilderSqlGenBase.BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string;
@@ -673,6 +674,7 @@ end;
 function TioDBBuilderSqlGenBase.Supports_Identity: Boolean;
 begin
   RaiseNotImplemented('Supports_Identity');
+  Result := False; // Unreachable: silences W1035 (the compiler cannot know the raise above never returns)
 end;
 
 function TioDBBuilderSqlGenBase.LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
