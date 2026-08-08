@@ -679,7 +679,7 @@ type
     ///  and Context.Script.ScriptEnd. Trusts Context.Schema.Status as given - it neither forces it
     ///  nor emits any mode-related warning. Mode selection (forcing the whole schema to stCreate for
     ///  a documentation/baseline script, flagging the result so Context.Execute refuses to run it
-    ///  without AForce = True) is Engine's job, done on Context before this is called.
+    ///  without AForce = True) is the DBBuilder's job, done on Context before this is called.
     /// </summary>
     procedure GenerateScript;
   end;
@@ -689,16 +689,16 @@ type
     procedure Analyze;
   end;
 
-  IioDBBuilderEngine = interface
+  IioDBBuilder = interface
     ['{6B1F3A0D-6C6E-4E1A-9F0C-2A6B7E0F9C2D}']
 
-    { Naming convention (Engine layer - mirrors the SqlGenerator/Strategy families documented in
-      CLAUDE.md and in the banners of iORM.DBBuilder.SqlGenerator.Base / iORM.DBBuilder.Strategy.Base):
-        BuildScript_*   the engine's only public entry points. Each is fully self-contained and
+    { Naming convention (DBBuilder entry point - mirrors the SqlGenerator/Strategy families documented
+      in CLAUDE.md and in the banners of iORM.DBBuilder.SqlGenerator.Base / iORM.DBBuilder.Strategy.Base):
+        Prepare_*       the DBBuilder's only public entry points. Each is fully self-contained and
                          stateless: it builds a fresh SqlGenerator, Schema and Script locally from
                          the ConnectionDefName/mode parameters passed in, wraps them in a Context
                          and returns it (Script not-yet-executed). Context.Status reflects the
-                         outcome. The Engine itself holds no per-call state and instances may be
+                         outcome. The DBBuilder itself holds no per-call state and instances may be
                          reused/discarded freely.
       Execute/guard behavior (warnings guard, physical database creation, actual execution) lives on
       IioDBBuilderContext.Execute, not here - see its doc comment.
@@ -713,24 +713,24 @@ type
     ///  lazy DBMSInfo version query touches the DB). The resulting script must NOT be executed
     ///  against an existing database.
     /// </summary>
-    function BuildScript_ForceCreateDB(const AConnectionDefName: String;
+    function Prepare_ForceCreateDB(const AConnectionDefName: String;
       const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
     /// <summary>
     ///  Self-contained: builds the schema from the entity maps, analyzes it against the live
     ///  database catalog, and produces a create-or-update SQL script driven by the resulting
     ///  status. The returned Context's Status reflects the outcome.
     /// </summary>
-    function BuildScript_SyncDBStruct(const AConnectionDefName: String;
+    function Prepare_SyncDBStruct(const AConnectionDefName: String;
       const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
 
     // ==========================================================
     // INDEX RELATED METHODS  (backlog - placeholder only, not implemented yet)
     // ----------------------------------------------------------
-    // function BuildScript_ForceAddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): IioDBBuilderScript;
-    // function BuildScript_ForceDropIndex(const ATable: IioDBBuilderSchemaTable; const AIndexName: String): IioDBBuilderScript;
+    // function Prepare_ForceAddIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): IioDBBuilderScript;
+    // function Prepare_ForceDropIndex(const ATable: IioDBBuilderSchemaTable; const AIndexName: String): IioDBBuilderScript;
     // NOTE: SqlGenerator.BuildSQL_CreateIndex/BuildSQL_DropIndexByName are unimplemented for
     //       MSSqlServer (raise "not implemented") - this backlog item needs SqlGenerator.MSSqlServer
-    //       work too, not just an Engine-level addition.
+    //       work too, not just a DBBuilder-level addition.
   end;
 
 

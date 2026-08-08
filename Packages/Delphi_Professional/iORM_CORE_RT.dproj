@@ -305,7 +305,7 @@
         <DCCReference Include="..\..\Source\iORM.DBBuilder.SqlGenerator.Firebird.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Context.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.DBAnalyzer.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.Engine.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DBBuilder.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Field.ClassInfo.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Strategy.Base.pas"/>
         <DCCReference Include="..\..\Source\iORM.DB.Script.pas"/>

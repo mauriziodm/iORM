@@ -655,7 +655,7 @@ type
     class function SQL(const ASQL: TStrings; const AOwns: boolean = False): IioSQLDestination; overload;
     class function SQL(const ASQLDestination: IioSQLDestination): IioSQLDestination; overload;
 
-    class function DBBuilder: IioDBBuilderEngine;
+    class function DBBuilder: IioDBBuilder;
 
     // Dependency Injection Container (DIC)
     class function di: TioDependencyInjectionRef;
@@ -1832,9 +1832,9 @@ begin
   _FreeObjAfterPersistOrDelete(AObj, AFree);
 end;
 
-class function io.DBBuilder: IioDBBuilderEngine;
+class function io.DBBuilder: IioDBBuilder;
 begin
-  Result := GlobalFactory.DBBuilderFactory.NewEngine;
+  Result := GlobalFactory.DBBuilderFactory.NewDBBuilder;
 end;
 
 class function io.DefaultVCProvider: TioViewContextProvider;

@@ -31,7 +31,7 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.DBBuilder.Engine;
+unit iORM.DBBuilder;
 
 interface
 
@@ -47,16 +47,16 @@ uses
 
 type
 
-  TioDBBuilderEngine = class(TInterfacedObject, IioDBBuilderEngine)
+  TioDBBuilder = class(TInterfacedObject, IioDBBuilder)
   private
     procedure Warning_MultipleFKsOnSameField(const AContext: IioDBBuilderContext);
   public
     // ==========================================================
     // DATABASE RELATED METHODS
     // ----------------------------------------------------------
-    function BuildScript_ForceCreateDB(const AConnectionDefName: String;
+    function Prepare_ForceCreateDB(const AConnectionDefName: String;
       const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
-    function BuildScript_SyncDBStruct(const AConnectionDefName: String;
+    function Prepare_SyncDBStruct(const AConnectionDefName: String;
       const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
   end;
 
@@ -70,7 +70,7 @@ uses
 
   ;
 
-{ TioDBBuilderEngine }
+{ TioDBBuilder }
 
 // A relation whose child type resolves to more than one table (e.g. a BelongsTo towards an interface
 // or a base class implemented by several classes mapped on distinct tables) produces one FK per
@@ -78,7 +78,7 @@ uses
 // the referenced tables at the same time, which almost never works correctly at runtime. The script
 // is generated anyway but the user is warned (with the escape hatches) instead of failing or staying
 // silent. Detection is a post-scan of the (data-only) schema so the SchemaBuilder stays untouched.
-procedure TioDBBuilderEngine.Warning_MultipleFKsOnSameField(const AContext: IioDBBuilderContext);
+procedure TioDBBuilder.Warning_MultipleFKsOnSameField(const AContext: IioDBBuilderContext);
 var
   LFieldKey: String;
   LFKsByField: TObjectDictionary<String, TStringList>; // dependent "Table.Field" -> referenced table names
@@ -113,7 +113,7 @@ begin
   end;
 end;
 
-function TioDBBuilderEngine.BuildScript_ForceCreateDB(const AConnectionDefName: String;
+function TioDBBuilder.Prepare_ForceCreateDB(const AConnectionDefName: String;
   const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
 var
   LContext: IioDBBuilderContext;
@@ -135,7 +135,7 @@ begin
   Result := LContext;
 end;
 
-function TioDBBuilderEngine.BuildScript_SyncDBStruct(const AConnectionDefName: String;
+function TioDBBuilder.Prepare_SyncDBStruct(const AConnectionDefName: String;
   const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
 var
   LContext: IioDBBuilderContext;

@@ -323,7 +323,7 @@ var
 begin
   LAbort := False;
   LReRaise := True;
-  LContext := io.DBBuilder.BuildScript_SyncDBStruct(Name, FAutoCreateDB.Indexes, FAutoCreateDB.ForeignKeys);
+  LContext := io.DBBuilder.Prepare_SyncDBStruct(Name, FAutoCreateDB.Indexes, FAutoCreateDB.ForeignKeys);
 
   if Assigned(FBeforeDBBuild) then
     FBeforeDBBuild(Self, LContext.Status, LContext.Lines, LContext.Warnings.Lines, LAbort);
