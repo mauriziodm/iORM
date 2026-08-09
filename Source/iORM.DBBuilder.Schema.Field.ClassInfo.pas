@@ -187,7 +187,9 @@ end;
 
 procedure TioDBBuilderSchemaFieldClassInfo.SetStatus(const Value: TioDBBuilderStatus);
 begin
-  FStatus := Value;
+  // Monotonic (see TioDBBuilderSchemaTable.SetStatus): Status only escalates, never downgrades.
+  if Value > FStatus then
+    FStatus := Value;
 end;
 
 function TioDBBuilderSchemaFieldClassInfo.GetIsAltered: Boolean;

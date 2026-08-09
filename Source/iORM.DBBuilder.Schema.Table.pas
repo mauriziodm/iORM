@@ -319,6 +319,11 @@ end;
 
 procedure TioDBBuilderSchemaTable.SetStatus(const AValue: TioDBBuilderStatus);
 begin
+  // Monotonic: Status only escalates (stClean -> stUpdate -> stCreate) and never downgrades.
+  // Load-bearing: for a new table (stCreate), AnalyzeFields/Indexes/ForeignKeys still call
+  // Status := stUpdate for each changed member; without this guard that would downgrade the table
+  // from stCreate to stUpdate and it would be ALTERed instead of CREATEd. Every Schema* entity
+  // shares this same monotonic rule.
   if AValue > FStatus then
     FStatus := AValue;
 end;

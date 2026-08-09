@@ -172,8 +172,11 @@ end;
 
 procedure TioDBBuilderSchema.SetStatus(const AValue: TioDBBuilderStatus);
 begin
-//  if AValue > FStatus then  // Carlo Marona (2025-10-20): Why?
-  FStatus := AValue;
+  // Monotonic (see TioDBBuilderSchemaTable.SetStatus): Status only escalates, so a per-table
+  // stUpdate can never downgrade a schema already marked stCreate. This is the guard Carlo Marona
+  // had commented out asking "Why?": this is why.
+  if AValue > FStatus then
+    FStatus := AValue;
 end;
 
 function TioDBBuilderSchema.GetTables: TioDBBuilderSchemaTables;
