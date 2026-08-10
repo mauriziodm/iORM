@@ -36,12 +36,12 @@ unit iORM.DBBuilder.Schema.Table;
 interface
 
 uses
-  iORM.DBBuilder.Interfaces, iORM.Context.Table.Interfaces, iORM.Context.Map.Interfaces, iORM.Context.Properties.Interfaces,
-  iORM.Attributes, iORM.CommonTypes;
+  iORM.DBBuilder.Interfaces, iORM.DBBuilder.Schema.Base, iORM.Context.Table.Interfaces, iORM.Context.Map.Interfaces,
+  iORM.Context.Properties.Interfaces, iORM.Attributes, iORM.CommonTypes;
 
 type
 
-  TioDBBuilderSchemaTable = class(TInterfacedObject, IioDBBuilderSchemaTable)
+  TioDBBuilderSchemaTable = class(TioDBBuilderSchemaBaseObject, IioDBBuilderSchemaTable)
   private
     FContextTable: IioTable;
     FFields: TioDBBuilderSchemaFields;
@@ -50,12 +50,9 @@ type
     FIsTrueClass: Boolean;
     FKeyGenerationStrategy: TioKeyGenerationStrategyType;
     FPrimaryKeyField: IioDBBuilderSchemaField;
-    FStatus: TioDBBuilderStatus;
     function FieldExists(const AFieldName: String): boolean;
     function GetIsTrueClass: Boolean;
-    function GetStatus: TioDBBuilderStatus;
     procedure SetIsTrueClass(const AValue: Boolean);
-    procedure SetStatus(const AValue: TioDBBuilderStatus);
   public
     constructor Create(const AContextTable: IioTable; const AKeyGenerationStrategy: TioKeyGenerationStrategyType);
     destructor Destroy; override;
@@ -272,11 +269,6 @@ begin
   Result := FContextTable.GetKeyGenerator;
 end;
 
-function TioDBBuilderSchemaTable.GetStatus: TioDBBuilderStatus;
-begin
-  Result := FStatus;
-end;
-
 // --- Key generation strategy query methods ---
 // These methods query the *resolved* strategy (FKeyGenerationStrategy) which was determined
 // by Resolve_KeyGenerationStrategy at schema build time. The resolution applies fallback logic:
@@ -315,17 +307,6 @@ procedure TioDBBuilderSchemaTable.SetIsTrueClass(const AValue: Boolean);
 begin
   // Una volta a true rimane sempre a true
   FIsTrueClass := AValue or FIsTrueClass;
-end;
-
-procedure TioDBBuilderSchemaTable.SetStatus(const AValue: TioDBBuilderStatus);
-begin
-  // Monotonic: Status only escalates (stClean -> stUpdate -> stCreate) and never downgrades.
-  // Load-bearing: for a new table (stCreate), AnalyzeFields/Indexes/ForeignKeys still call
-  // Status := stUpdate for each changed member; without this guard that would downgrade the table
-  // from stCreate to stUpdate and it would be ALTERed instead of CREATEd. Every Schema* entity
-  // shares this same monotonic rule.
-  if AValue > FStatus then
-    FStatus := AValue;
 end;
 
 end.

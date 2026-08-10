@@ -36,18 +36,18 @@ unit iORM.DBBuilder.Schema.FK;
 interface
 
 uses
-  iORM.Context.Map.Interfaces, iORM.Context.Properties.Interfaces, iORM.DBBuilder.Interfaces, iORM.Attributes;
+  iORM.Context.Map.Interfaces, iORM.Context.Properties.Interfaces, iORM.DBBuilder.Interfaces,
+  iORM.DBBuilder.Schema.Base, iORM.Attributes;
 
 type
 
-  TioDBBuilderSchemaFK = class(TInterfacedObject, IioDBBuilderSchemaFK)
+  TioDBBuilderSchemaFK = class(TioDBBuilderSchemaBaseObject, IioDBBuilderSchemaFK)
   private
     FDependentMap: IioMap;
     FDependentProperty: IioProperty;
     FOnDeleteAction: TioFKAction;
     FOnUpdateAction: TioFKAction;
     FReferenceMap: IioMap;
-    FStatus: TioDBBuilderStatus;
     function GetDependentFieldName: String;
     function GetDependentTableName: String;
     function GetName: String;
@@ -59,8 +59,6 @@ type
     function GetSqlDependentTableName: String;
     function GetSqlReferenceFieldName: String;
     function GetSqlReferenceTableName: String;
-    function GetStatus: TioDBBuilderStatus;
-    procedure SetStatus(const Value: TioDBBuilderStatus);
   public
     constructor Create(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
@@ -163,18 +161,6 @@ begin
   FDependentProperty := ADependentProperty;
   FOnDeleteAction := AOnDeleteAction;
   FOnUpdateAction := AOnUpdateAction;
-end;
-
-function TioDBBuilderSchemaFK.GetStatus: TioDBBuilderStatus;
-begin
-  Result := FStatus;
-end;
-
-procedure TioDBBuilderSchemaFK.SetStatus(const Value: TioDBBuilderStatus);
-begin
-  // Monotonic (see TioDBBuilderSchemaTable.SetStatus): Status only escalates, never downgrades.
-  if Value > FStatus then
-    FStatus := Value;
 end;
 
 end.

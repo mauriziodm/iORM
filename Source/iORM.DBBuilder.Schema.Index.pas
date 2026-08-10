@@ -7,11 +7,12 @@ uses
 
   iORM.Attributes,
   iORM.CommonTypes,
-  iORM.DBBuilder.Interfaces;
+  iORM.DBBuilder.Interfaces,
+  iORM.DBBuilder.Schema.Base;
 
 type
 
-  TioDBBuilderSchemaIndex = class(TInterfacedObject, IioDBBuilderSchemaIndex)
+  TioDBBuilderSchemaIndex = class(TioDBBuilderSchemaBaseObject, IioDBBuilderSchemaIndex)
   private
     FChanges: TioDBBuilderIndexChanges;
     FCommaSepFieldList: String;
@@ -19,7 +20,6 @@ type
     FHasExplicitName: boolean;
     FName: String;
     FOrientation: TioIndexOrientation;
-    FStatus: TioDBBuilderStatus;
     FUnique: Boolean;
     function GetChanges: TioDBBuilderIndexChanges;
     function GetCommaSepFieldList: String;
@@ -27,9 +27,7 @@ type
     function GetName: String;
     function GetOrientation: TioIndexOrientation;
     function GetSqlCommaSepFieldList: String;
-    function GetStatus: TioDBBuilderStatus;
     function GetUnique: Boolean;
-    procedure SetStatus(const Value: TioDBBuilderStatus);
   public
     constructor Create(const AIndexAttr: ioIndex; const AConnectionDefName: String);
     procedure AddChange(const AChange: TioDBBuilderIndexChange);
@@ -143,21 +141,9 @@ begin
   Result := FOrientation
 end;
 
-function TioDBBuilderSchemaIndex.GetStatus: TioDBBuilderStatus;
-begin
-  Result := FStatus;
-end;
-
 function TioDBBuilderSchemaIndex.GetUnique: Boolean;
 begin
   Result := FUnique;
-end;
-
-procedure TioDBBuilderSchemaIndex.SetStatus(const Value: TioDBBuilderStatus);
-begin
-  // Monotonic (see TioDBBuilderSchemaTable.SetStatus): Status only escalates, never downgrades.
-  if Value > FStatus then
-    FStatus := Value;
 end;
 
 end.

@@ -36,26 +36,35 @@ unit iORM.DBBuilder.Schema.Field;
 interface
 
 uses
-  iORM.Context.Properties.Interfaces, iORM.DBBuilder.Interfaces, System.Rtti;
+  iORM.Context.Properties.Interfaces, iORM.DBBuilder.Interfaces, iORM.DBBuilder.Schema.Base, System.Rtti;
 
 type
 
-  TioDBBuilderSchemaField = class(TInterfacedObject, IioDBBuilderSchemaField)
-  private
+  /// <summary>
+  ///  Abstract base for every IioDBBuilderSchemaField implementation. Owns the parts that are
+  ///  identical across all field kinds - the change Status (monotonic) and the "altered" tracking -
+  ///  and leaves the value-source getters (GetFieldName, GetFieldType, GetFieldLength, ...) abstract,
+  ///  to be provided by each concrete descendant (a mapped-property-backed field, the synthetic
+  ///  TrueClass/ClassInfo column, etc.).
+  /// </summary>
+  TioDBBuilderSchemaFieldBase = class(TioDBBuilderSchemaBaseObject, IioDBBuilderSchemaField)
+  protected
     FAltered: TioDBBuilderFieldAlter;
-    FContextProperty: IioProperty;
-    FStatus: TioDBBuilderStatus;
-    function GetFieldCustomType: string;
-    function GetFieldDefault: TValue;
+    // --- Value-source getters: abstract, implemented by each concrete field kind ---
+    function GetFieldCustomType: string; virtual; abstract;
+    function GetFieldDefault: TValue; virtual; abstract;
+    function GetFieldLength: integer; virtual; abstract;
+    function GetFieldName: String; virtual; abstract;
+    function GetFieldNotNull: Boolean; virtual; abstract;
+    function GetFieldPrecision: integer; virtual; abstract;
+    function GetFieldScale: integer; virtual; abstract;
+    function GetFieldSubtype: string; virtual; abstract;
+    function GetFieldType: TioMetadataFieldType; virtual; abstract;
+    function GetFieldUnicode: boolean; virtual; abstract;
+    function GetPrimaryKey: Boolean; virtual; abstract;
+    function GetSqlFieldName: String; virtual; abstract;
+    // --- Shared implementation (Status + altered tracking) ---
     function GetFieldDefaultExists: Boolean;
-    function GetFieldLength: integer;
-    function GetFieldName: String;
-    function GetFieldNotNull: Boolean;
-    function GetFieldPrecision: integer;
-    function GetFieldScale: integer;
-    function GetFieldSubtype: string;
-    function GetFieldType: TioMetadataFieldType;
-    function GetFieldUnicode: boolean;
     function GetIsAltered: Boolean;
     function GetIsFieldDefaultAltered: Boolean;
     function GetIsFieldLengthAltered: Boolean;
@@ -66,12 +75,7 @@ type
     function GetIsFieldPrecisionDecreased: Boolean;
     function GetIsFieldPrecisionIncreased: Boolean;
     function GetIsFieldTypeAltered: Boolean;
-    function GetPrimaryKey: Boolean;
-    function GetSqlFieldName: String;
-    function GetStatus: TioDBBuilderStatus;
-    procedure SetStatus(const Value: TioDBBuilderStatus);
   public
-    constructor Create(const AContextProperty: IioProperty);
     procedure AddAltered(const AAltered: TioDBBuilderFieldAlterStatus);
 
     property FieldCustomType: string read GetFieldCustomType;
@@ -100,21 +104,102 @@ type
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
+  /// <summary>
+  ///  Schema field backed by a mapped entity property (IioProperty): every value getter reads its
+  ///  metadata from the property.
+  /// </summary>
+  TioDBBuilderSchemaField = class(TioDBBuilderSchemaFieldBase)
+  private
+    FContextProperty: IioProperty;
+  protected
+    function GetFieldCustomType: string; override;
+    function GetFieldDefault: TValue; override;
+    function GetFieldLength: integer; override;
+    function GetFieldName: String; override;
+    function GetFieldNotNull: Boolean; override;
+    function GetFieldPrecision: integer; override;
+    function GetFieldScale: integer; override;
+    function GetFieldSubtype: string; override;
+    function GetFieldType: TioMetadataFieldType; override;
+    function GetFieldUnicode: boolean; override;
+    function GetPrimaryKey: Boolean; override;
+    function GetSqlFieldName: String; override;
+  public
+    constructor Create(const AContextProperty: IioProperty);
+  end;
+
 implementation
 
 uses
   iORM.CommonTypes;
 
-{ TioDBBuilderSchemaField }
+{ TioDBBuilderSchemaFieldBase }
 
-procedure TioDBBuilderSchemaField.AddAltered(const AAltered: TioDBBuilderFieldAlterStatus);
+procedure TioDBBuilderSchemaFieldBase.AddAltered(const AAltered: TioDBBuilderFieldAlterStatus);
 begin
   Include(FAltered, AAltered);
 end;
 
+function TioDBBuilderSchemaFieldBase.GetFieldDefaultExists: Boolean;
+begin
+  Result := not GetFieldDefault.IsEmpty;
+end;
+
+function TioDBBuilderSchemaFieldBase.GetIsAltered: Boolean;
+begin
+  Result := FAltered <> [];
+end;
+
+function TioDBBuilderSchemaFieldBase.GetIsFieldDefaultAltered: Boolean;
+begin
+  Result := alFieldDefault in FAltered;
+end;
+
+function TioDBBuilderSchemaFieldBase.GetIsFieldLengthAltered: Boolean;
+begin
+  Result := (alFieldLengthIncreased in FAltered) or (alFieldLengthDecreased in FAltered);
+end;
+
+function TioDBBuilderSchemaFieldBase.GetIsFieldLengthDecreased: Boolean;
+begin
+  Result := alFieldLengthDecreased in FAltered;
+end;
+
+function TioDBBuilderSchemaFieldBase.GetIsFieldLengthIncreased: Boolean;
+begin
+  Result := alFieldLengthIncreased in FAltered;
+end;
+
+function TioDBBuilderSchemaFieldBase.GetIsFieldNotNullAltered: Boolean;
+begin
+  Result := alFieldNotNull in FAltered;
+end;
+
+function TioDBBuilderSchemaFieldBase.GetIsFieldPrecisionAltered: Boolean;
+begin
+  Result := (alFieldPrecisionIncreased in FAltered) or (alFieldPrecisionDecreased in FAltered);
+end;
+
+function TioDBBuilderSchemaFieldBase.GetIsFieldPrecisionDecreased: Boolean;
+begin
+  Result := alFieldPrecisionDecreased in FAltered;
+end;
+
+function TioDBBuilderSchemaFieldBase.GetIsFieldPrecisionIncreased: Boolean;
+begin
+  Result := alFieldPrecisionIncreased in FAltered;
+end;
+
+function TioDBBuilderSchemaFieldBase.GetIsFieldTypeAltered: Boolean;
+begin
+  Result := alFieldType in FAltered;
+end;
+
+{ TioDBBuilderSchemaField }
+
 constructor TioDBBuilderSchemaField.Create(const AContextProperty: IioProperty);
 begin
-  FStatus := stClean;
+  inherited Create;
   FContextProperty := AContextProperty;
 end;
 
@@ -128,11 +213,6 @@ begin
   Result := FContextProperty.GetMetadata_Default;
 end;
 
-function TioDBBuilderSchemaField.GetFieldDefaultExists: Boolean;
-begin
-  Result := not GetFieldDefault.IsEmpty;
-end;
-
 function TioDBBuilderSchemaField.GetFieldLength: integer;
 begin
   Result := FContextProperty.GetMetadata_FieldLength;
@@ -143,9 +223,9 @@ begin
   Result := FContextProperty.GetSqlFieldName(False);  // Case normalized, no delimiters
 end;
 
-function TioDBBuilderSchemaField.GetSqlFieldName: String;
+function TioDBBuilderSchemaField.GetFieldNotNull: Boolean;
 begin
-  Result := FContextProperty.GetSqlFieldName(True);   // Case normalized + delimiters
+  Result := FContextProperty.GetMetadata_FieldNotNull;
 end;
 
 function TioDBBuilderSchemaField.GetFieldPrecision: integer;
@@ -173,76 +253,14 @@ begin
   Result := FContextProperty.GetMetadata_FieldUnicode;
 end;
 
-function TioDBBuilderSchemaField.GetStatus: TioDBBuilderStatus;
-begin
-  Result := FStatus;
-end;
-
 function TioDBBuilderSchemaField.GetPrimaryKey: Boolean;
 begin
   Result := (FContextProperty.PropertyRole = prObjID);
 end;
 
-function TioDBBuilderSchemaField.GetFieldNotNull: Boolean;
+function TioDBBuilderSchemaField.GetSqlFieldName: String;
 begin
-  Result := FContextProperty.GetMetadata_FieldNotNull;
-end;
-
-procedure TioDBBuilderSchemaField.SetStatus(const Value: TioDBBuilderStatus);
-begin
-  // Monotonic (see TioDBBuilderSchemaTable.SetStatus): Status only escalates, never downgrades.
-  if Value > FStatus then
-    FStatus := Value;
-end;
-
-function TioDBBuilderSchemaField.GetIsAltered: Boolean;
-begin
-  Result := FAltered <> [];
-end;
-
-function TioDBBuilderSchemaField.GetIsFieldTypeAltered: Boolean;
-begin
-  Result := alFieldType in FAltered;
-end;
-
-function TioDBBuilderSchemaField.GetIsFieldDefaultAltered: Boolean;
-begin
-  Result := alFieldDefault in FAltered;
-end;
-
-function TioDBBuilderSchemaField.GetIsFieldNotNullAltered: Boolean;
-begin
-  Result := alFieldNotNull in FAltered;
-end;
-
-function TioDBBuilderSchemaField.GetIsFieldLengthAltered: Boolean;
-begin
-  Result := (alFieldLengthIncreased in FAltered) or (alFieldLengthDecreased in FAltered);
-end;
-
-function TioDBBuilderSchemaField.GetIsFieldLengthIncreased: Boolean;
-begin
-  Result := alFieldLengthIncreased in FAltered;
-end;
-
-function TioDBBuilderSchemaField.GetIsFieldLengthDecreased: Boolean;
-begin
-  Result := alFieldLengthDecreased in FAltered;
-end;
-
-function TioDBBuilderSchemaField.GetIsFieldPrecisionAltered: Boolean;
-begin
-  Result := (alFieldPrecisionIncreased in FAltered) or (alFieldPrecisionDecreased in FAltered);
-end;
-
-function TioDBBuilderSchemaField.GetIsFieldPrecisionIncreased: Boolean;
-begin
-  Result := alFieldPrecisionIncreased in FAltered;
-end;
-
-function TioDBBuilderSchemaField.GetIsFieldPrecisionDecreased: Boolean;
-begin
-  Result := alFieldPrecisionDecreased in FAltered;
+  Result := FContextProperty.GetSqlFieldName(True);   // Case normalized + delimiters
 end;
 
 end.

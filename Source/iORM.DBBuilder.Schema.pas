@@ -36,22 +36,19 @@ unit iORM.DBBuilder.Schema;
 interface
 
 uses
-  iORM.DBBuilder.Interfaces, System.Classes, iORM.Context.Map.Interfaces, iORM.CommonTypes;
+  iORM.DBBuilder.Interfaces, iORM.DBBuilder.Schema.Base, System.Classes, iORM.Context.Map.Interfaces, iORM.CommonTypes;
 
 type
 
-  TioDBBuilderSchema = class(TInterfacedObject, IioDBBuilderSchema)
+  TioDBBuilderSchema = class(TioDBBuilderSchemaBaseObject, IioDBBuilderSchema)
   private
     FForeignKeysMode, FIndexesMode: TioDBBuilderIndexesAndFKMode;
     FSequences: TioDBBuilderSchemaSequences;
-    FStatus: TioDBBuilderStatus;
     FTables: TioDBBuilderSchemaTables;
     function GetForeignKeysMode: TioDBBuilderIndexesAndFKMode;
     function GetIndexesMode: TioDBBuilderIndexesAndFKMode;
     function GetSequences: TioDBBuilderSchemaSequences;
-    function GetStatus: TioDBBuilderStatus;
     function GetTables: TioDBBuilderSchemaTables;
-    procedure SetStatus(const AValue: TioDBBuilderStatus);
   public
     constructor Create(const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
     destructor Destroy; override;
@@ -134,11 +131,6 @@ begin
   Result := FForeignKeysMode;
 end;
 
-function TioDBBuilderSchema.GetStatus: TioDBBuilderStatus;
-begin
-  Result := FStatus;
-end;
-
 function TioDBBuilderSchema.GetIndexesMode: TioDBBuilderIndexesAndFKMode;
 begin
   Result := FIndexesMode;
@@ -168,15 +160,6 @@ end;
 function TioDBBuilderSchema.GetSequences: TioDBBuilderSchemaSequences;
 begin
   Result := FSequences;
-end;
-
-procedure TioDBBuilderSchema.SetStatus(const AValue: TioDBBuilderStatus);
-begin
-  // Monotonic (see TioDBBuilderSchemaTable.SetStatus): Status only escalates, so a per-table
-  // stUpdate can never downgrade a schema already marked stCreate. This is the guard Carlo Marona
-  // had commented out asking "Why?": this is why.
-  if AValue > FStatus then
-    FStatus := AValue;
 end;
 
 function TioDBBuilderSchema.GetTables: TioDBBuilderSchemaTables;
