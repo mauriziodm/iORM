@@ -102,12 +102,14 @@ uses
 
 procedure TioDBBuilderSchemaTable.AddField(ASchemaField: IioDBBuilderSchemaField);
 begin
-  // Add field if not already exists
+  // Add field only if not already exists; keep the primary-key pointer bound to a
+  // field that is actually in FFields (a discarded duplicate must not hijack it)
   if not FieldExists(ASchemaField.FieldName) then
+  begin
     FFields.Add(ASchemaField);
-  // If this field is the primary key field
-  if ASchemaField.PrimaryKey then
-    FPrimaryKeyField := ASchemaField;
+    if ASchemaField.PrimaryKey then
+      FPrimaryKeyField := ASchemaField;
+  end;
 end;
 
 constructor TioDBBuilderSchemaTable.Create(const AContextTable: IioTable;
