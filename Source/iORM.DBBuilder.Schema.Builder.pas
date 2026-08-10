@@ -69,9 +69,13 @@ begin
   // Loop for all entities and build table list
   for LMapSlot in TioMapContainer.GetContainer.Values do
     BuildSchemaTable(LMapSlot.GetMap);
-  // Loop for all entities and build FK list
-  for LMapSlot in TioMapContainer.GetContainer.Values do
-    BuildSchemaFK(LMapSlot.GetMap);
+  // Loop for all entities and build FK list.
+  // Skipped entirely when FK management is disabled: with ifmDisabled no FK DDL is ever generated,
+  // so building the SchemaFK objects would only waste analyzer catalog queries (AnalyzeForeignKeys)
+  // and could mark tables as stUpdate for FK-only differences that will never be applied.
+  if FSchema.ForeignKeysMode <> ifmDisabled then
+    for LMapSlot in TioMapContainer.GetContainer.Values do
+      BuildSchemaFK(LMapSlot.GetMap);
 end;
 
 procedure TioDBBuilderSchemaBuilder.BuildSchemaFK(const AMap: IioMap);
@@ -134,6 +138,12 @@ procedure TioDBBuilderSchemaBuilder.BuildSchemaIndexes(const ASchemaTable: IioDB
 var
   LIndexAttr: ioIndex;
 begin
+  // Skipped entirely when index management is disabled (mirrors the FK handling in BuildSchema):
+  // with ifmDisabled no index DDL is ever generated, so building the SchemaIndex objects would only
+  // waste analyzer catalog queries (AnalyzeIndexes) and could mark tables as stUpdate for index-only
+  // differences that will never be applied.
+  if FSchema.IndexesMode = ifmDisabled then
+    Exit;
   // If some explicit index is present then add it to the list
   if AMap.GetTable.IndexListExists then
     for LIndexAttr in AMap.GetTable.GetIndexList(False) do
