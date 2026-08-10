@@ -109,6 +109,12 @@ type
     function Check_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; virtual; abstract;
     function Check_IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean; virtual; abstract;
     /// <summary>
+    /// True if the DB catalog reports at least one (explicit) index on the given table. Used to warn -
+    /// only when there really are indexes - before a rename-create-copy rebuild that will drop them
+    /// without recreating them (IndexesMode = ifmDisabled).
+    /// </summary>
+    function Check_TableHasIndexesInDB(const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
+    /// <summary>
     /// Drops the indexes of a single table by querying the actual DB catalog
     /// and marks all schema indexes for the table as stCreate so they get
     /// recreated by Process_Indexes.
@@ -168,6 +174,12 @@ type
     // ----------------------------------------------------------
     function Check_ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
     function Check_ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean; virtual; abstract;
+    /// <summary>
+    /// True if the DB catalog reports at least one foreign key on the given table. Used to warn - only
+    /// when there really are FKs - before a rename-create-copy rebuild that recreates the table without
+    /// its foreign keys (ForeignKeysMode = ifmDisabled).
+    /// </summary>
+    function Check_TableHasForeignKeysInDB(const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
     /// <summary>
     /// Drops the FKs of a single table by querying the actual DB catalog and
     /// marks all schema FKs for the table as stCreate so they get recreated
@@ -267,6 +279,18 @@ type
     /// </summary>
     procedure Warning_PotentialDataTruncation(const AValueName: String; const AOldValue, ANewValue: Integer; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
     /// <summary>
+    /// Emits a warning (only if the table actually has FKs in the DB) that a rename-create-copy rebuild
+    /// recreates the table WITHOUT its existing foreign keys because ForeignKeysMode = ifmDisabled, so
+    /// they are silently lost unless recreated manually / FK management is enabled.
+    /// </summary>
+    procedure Warning_RebuildDropsUnmanagedForeignKeys(const ATable: IioDBBuilderSchemaTable);
+    /// <summary>
+    /// Emits a warning (only if the table actually has indexes in the DB) that a rename-create-copy
+    /// rebuild drops its existing indexes WITHOUT recreating them because IndexesMode = ifmDisabled, so
+    /// they are silently lost unless recreated manually / index management is enabled.
+    /// </summary>
+    procedure Warning_RebuildDropsUnmanagedIndexes(const ATable: IioDBBuilderSchemaTable);
+    /// <summary>
     /// Emits a warning when a field's type is changing from AOldFieldType to
     /// ANewFieldType AND that specific conversion is blacklisted by the current
     /// RDBMS. The list of forbidden conversions (formatted as '[old->new]' tokens)
@@ -318,6 +342,22 @@ var
 begin
   LQuery := TioQueryEngine.GetRawQuery(Context.ConnectionDefName, Context.SqlGenerator.BuildSQL_SequenceExists(ASequenceName), True);
   Result := LQuery.Fields[0].AsInteger > 0;
+end;
+
+function TioDBBuilderStrategyBase.Check_TableHasIndexesInDB(const ATable: IioDBBuilderSchemaTable): Boolean;
+var
+  LQuery: IioQuery;
+begin
+  LQuery := TioQueryEngine.GetRawQuery(Context.ConnectionDefName, Context.SqlGenerator.BuildSQL_IndexList(ATable.Name), True);
+  Result := not LQuery.Eof;
+end;
+
+function TioDBBuilderStrategyBase.Check_TableHasForeignKeysInDB(const ATable: IioDBBuilderSchemaTable): Boolean;
+var
+  LQuery: IioQuery;
+begin
+  LQuery := TioQueryEngine.GetRawQuery(Context.ConnectionDefName, Context.SqlGenerator.BuildSQL_FKList(ATable.Name), True);
+  Result := not LQuery.Eof;
 end;
 
 procedure TioDBBuilderStrategyBase.ScriptWrite_CreateTableSequence(const ATable: IioDBBuilderSchemaTable);
@@ -653,6 +693,22 @@ begin
   if ANewValue < AOldValue then
     Context.Script.Warnings.AddLine(Format('Table ''%s'' field ''%s'' --> The new %s value becomes smaller than the old one (old = %d, new = %d)',
       [ATable.Name, AField.FieldName, AValueName, AOldValue, ANewValue]));
+end;
+
+procedure TioDBBuilderStrategyBase.Warning_RebuildDropsUnmanagedForeignKeys(const ATable: IioDBBuilderSchemaTable);
+begin
+  if Check_TableHasForeignKeysInDB(ATable) then
+    Context.Script.Warnings.AddLine(Format('Table ''%s'' must be rebuilt (structural change) but ForeignKeysMode = ifmDisabled: ' +
+      'the rebuilt table is recreated WITHOUT its existing foreign keys, which are therefore lost. ' +
+      'Recreate them manually or enable foreign key management.', [ATable.Name]));
+end;
+
+procedure TioDBBuilderStrategyBase.Warning_RebuildDropsUnmanagedIndexes(const ATable: IioDBBuilderSchemaTable);
+begin
+  if Check_TableHasIndexesInDB(ATable) then
+    Context.Script.Warnings.AddLine(Format('Table ''%s'' must be rebuilt (structural change) but IndexesMode = ifmDisabled: ' +
+      'its existing indexes are dropped and NOT recreated, and are therefore lost. ' +
+      'Recreate them manually or enable index management.', [ATable.Name]));
 end;
 
 procedure TioDBBuilderStrategyBase.Warning_NotNullChangeNotAllowed(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);

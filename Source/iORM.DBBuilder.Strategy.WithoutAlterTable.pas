@@ -59,6 +59,18 @@ type
     // RENAME-CREATE-COPY PATTERN HELPERS
     // ----------------------------------------------------------
     procedure Process_CopyDataFromOldToNew; virtual;
+    /// <summary>
+    /// Drops every existing index of the tables being rebuilt, queried from the DB catalog (Force*
+    /// mechanic, bypassing IndexesMode) so their names are free before the new tables/indexes are
+    /// created. Runs regardless of mode - the rename-create-copy always needs a clean slate.
+    /// </summary>
+    procedure Process_DropIndexesFromDB; virtual;
+    /// <summary>
+    /// Warns (blocking, so Execute stops) that a structural rebuild will drop the existing indexes
+    /// (and recreate tables without their FKs) WITHOUT recreating them, when index/FK management is
+    /// disabled - only for the stUpdate tables that actually have such objects in the catalog.
+    /// </summary>
+    procedure Process_WarnUnmanagedRebuildLosses; virtual;
     procedure ScriptWrite_CopyDataFromOldToNewTable(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure ScriptWrite_RenameAllTablesToOld; virtual;
     function Table2OldTableName(const ATable: IioDBBuilderSchemaTable): String; virtual;
@@ -135,9 +147,34 @@ begin
   end;
 end;
 
-procedure TioDBBuilderStrategyWithoutAlterTable.GenerateScript_Body;
+procedure TioDBBuilderStrategyWithoutAlterTable.Process_WarnUnmanagedRebuildLosses;
 var
   LTable: IioDBBuilderSchemaTable;
+begin
+  for LTable in Context.Schema.Tables.Values do
+    if LTable.Status = stUpdate then
+    begin
+      if Context.Schema.IndexesMode = ifmDisabled then
+        Warning_RebuildDropsUnmanagedIndexes(LTable);
+      if Context.Schema.ForeignKeysMode = ifmDisabled then
+        Warning_RebuildDropsUnmanagedForeignKeys(LTable);
+    end;
+end;
+
+procedure TioDBBuilderStrategyWithoutAlterTable.Process_DropIndexesFromDB;
+var
+  LTable: IioDBBuilderSchemaTable;
+begin
+  // Drop every existing index of each table being rebuilt, queried straight from the DB catalog
+  // (Force* mechanic, bypasses IndexesMode): the rename-create-copy needs the names free before the
+  // new tables/indexes are created, regardless of the configured mode.
+  Context.Script.Body.AddTitle('Dropping indexes');
+  for LTable in Context.Schema.Tables.Values do
+    if LTable.Status = stUpdate then
+      Force_DropTableIndexesFromDB(LTable);
+end;
+
+procedure TioDBBuilderStrategyWithoutAlterTable.GenerateScript_Body;
 begin
   // Check key generation strategy compatibility with DBMS.
   // The diagnostic lives on the Context.SqlGenerator (DBMS-capability axis), not on the Strategy.
@@ -145,18 +182,12 @@ begin
 
   ScriptWrite_BeginDeferConstraints;
 
-  // When updating, drop indexes and rename existing tables to "_old" before recreating them.
-  // We call the Force* mechanic that bypasses IndexesMode: rename-create-copy
-  // requires every index to be dropped regardless of the user's mode setting
-  // (including ifmDisabled), otherwise index names would collide when
-  // Process_Indexes runs on the new tables. The 'Force' prefix makes this
-  // intentional bypass of the configured mode explicit.
+  // When updating: warn about unmanaged losses, drop the existing indexes, and rename tables to "_old"
+  // before recreating them (details in each step's method).
   if Context.Schema.Status = stUpdate then
   begin
-    Context.Script.Body.AddTitle('Dropping indexes');
-    for LTable in Context.Schema.Tables.Values do
-      if LTable.Status = stUpdate then
-        Force_DropTableIndexesFromDB(LTable);
+    Process_WarnUnmanagedRebuildLosses;
+    Process_DropIndexesFromDB;
     ScriptWrite_RenameAllTablesToOld;
   end;
 

@@ -507,7 +507,13 @@ type
     /// <summary>Generates SQL to check if an index exists by name</summary>
     function BuildSQL_IndexExistsByName(const AIndexName: string): string;
     /// <summary>
-    /// Returns SQL to retrieve list of indexes with basic info (name, unique, orientation).
+    /// Returns SQL to retrieve the list of indexes with basic info (name, unique, orientation).
+    /// CONTRACT: it must return ONLY the standalone indexes that iORM manages and that can be dropped
+    /// with a plain DROP INDEX - it must EXCLUDE the indexes that back a PK/UNIQUE/FK constraint (those
+    /// cannot be dropped directly on most DBMS and are removed together with their constraint). Each
+    /// dialect expresses the exclusion in its own catalog terms (SQLite: sql IS NOT NULL; Firebird:
+    /// NOT EXISTS on RDB$RELATION_CONSTRAINTS; etc.). The drop/check callers
+    /// (Force_DropTableIndexesFromDB, Check_IndexModified, Check_TableHasIndexesInDB) rely on this.
     /// </summary>
     /// <param name="ATableName">
     /// Optional table name filter. If empty, returns all indexes from DB.

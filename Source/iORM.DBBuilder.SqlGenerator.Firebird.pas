@@ -439,13 +439,18 @@ begin
   LSqlText := TioDBBuilderFactory.NewSqlText;
 
   LSqlText.
-    AddLine('SELECT RDB$INDEX_NAME, RDB$UNIQUE_FLAG, RDB$INDEX_TYPE ').
-    AddLine('FROM RDB$INDICES ').
-    AddLine('WHERE RDB$SYSTEM_FLAG = 0');
+    AddLine('SELECT i.RDB$INDEX_NAME, i.RDB$UNIQUE_FLAG, i.RDB$INDEX_TYPE ').
+    AddLine('FROM RDB$INDICES i ').
+    AddLine('WHERE i.RDB$SYSTEM_FLAG = 0').
+    // Contract of BuildSQL_IndexList: only the standalone indexes droppable with a plain DROP INDEX.
+    // Exclude the indexes that back a PK/UNIQUE/FK constraint: Firebird refuses DROP INDEX on them
+    // (they are removed together with their constraint). A standalone CREATE [UNIQUE] INDEX has no
+    // row in RDB$RELATION_CONSTRAINTS, so it is correctly kept.
+    AddLine('  AND NOT EXISTS (SELECT 1 FROM RDB$RELATION_CONSTRAINTS rc WHERE rc.RDB$INDEX_NAME = i.RDB$INDEX_NAME)');
 
   // Add table filter if specified
   if not ATableName.IsEmpty then
-    LSqlText.AddLine(Format(' AND UPPER(RDB$RELATION_NAME) = UPPER(''%s'')', [EscapeSQLStringLiteral(ATableName)]));
+    LSqlText.AddLine(Format(' AND UPPER(i.RDB$RELATION_NAME) = UPPER(''%s'')', [EscapeSQLStringLiteral(ATableName)]));
 
   Result := LSqlText.Text;
 end;
