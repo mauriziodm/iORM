@@ -132,6 +132,14 @@ type
     /// <returns>Comma-separated field list (e.g., "Field1 ASC, Field2 DESC")</returns>
     function Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
     /// <summary>
+    /// Translates an index schema to the suffix block appended to auto-generated index
+    /// names (orientation + unique). Single source of truth for the suffix composition,
+    /// so the index name and its shortened/hashed form always agree on the suffixes.
+    /// </summary>
+    /// <param name="AIndex">The index schema</param>
+    /// <returns>Concatenated suffixes (e.g., "_A", "_D_U", or "")</returns>
+    function Translate_SchemaIndex_To_IndexNameSuffixes(const AIndex: IioDBBuilderSchemaIndex): String; virtual;
+    /// <summary>
     /// Translates an index orientation to SQL keyword with leading space.
     /// </summary>
     /// <param name="AIndex">The index schema</param>
@@ -399,6 +407,7 @@ var
   LFieldNameArray: TArray<string>;
   LField,
   LCoreIndexName,
+  LSuffixes,
   LFullIndexName: string;
 begin
   // Input validation
@@ -421,15 +430,14 @@ begin
       LCoreIndexName := LCoreIndexName + '_' + LField.Trim;
 
     // Build full index name with prefix and suffixes
-    LFullIndexName := IDX_PREFIX
-      + LCoreIndexName
-      + Translate_Orientation_To_OrientationSuffixForIndexName(AIndex.Orientation)
-      + Translate_Unique_To_UniqueSuffixForIndexName(AIndex.Unique);
+    LSuffixes := Translate_SchemaIndex_To_IndexNameSuffixes(AIndex);
+    LFullIndexName := IDX_PREFIX + LCoreIndexName + LSuffixes;
 
-    // If name exceeds max length, use hash of fields part only (without suffixes)
+    // If name exceeds max length, hash the core+suffixes: the orientation/unique
+    // suffixes MUST stay in the hash input, otherwise two indexes on the same fields
+    // differing only by orientation/unique would collapse to the same shortened name
     if IsSqlIdentifierTooLong(LFullIndexName) then
-      // Hash only the fields part, then add only the prefix (no suffixes needed with hash)
-      LFullIndexName := IDX_PREFIX + ShortenIdentifierName(LCoreIndexName, MaxSqlIdentifierLength - Length(IDX_PREFIX));
+      LFullIndexName := IDX_PREFIX + ShortenIdentifierName(LCoreIndexName + LSuffixes, MaxSqlIdentifierLength - Length(IDX_PREFIX));
   end;
 
   Result := LFullIndexName.ToUpper;
@@ -495,6 +503,12 @@ begin
     Result := '_U'
   else
     Result := '';
+end;
+
+function TioDBBuilderSqlGenBase.Translate_SchemaIndex_To_IndexNameSuffixes(const AIndex: IioDBBuilderSchemaIndex): String;
+begin
+  Result := Translate_Orientation_To_OrientationSuffixForIndexName(AIndex.Orientation)
+    + Translate_Unique_To_UniqueSuffixForIndexName(AIndex.Unique);
 end;
 
 function TioDBBuilderSqlGenBase.GetMaxSqlIdentifierLength: integer;
