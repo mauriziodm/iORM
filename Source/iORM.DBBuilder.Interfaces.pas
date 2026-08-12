@@ -64,7 +64,12 @@ type
 
 
 
-  TioDBBuilderStatus = (stClean, stUpdate, stCreate);
+  /// <summary>
+  ///  An element's position relative to the OTHER schema branch (Mapped vs Physical), stamped by the
+  ///  PlanBuilder: stCreate = only in Mapped (must be created), stDrop = only in Physical (orphan, must
+  ///  be dropped), stUpdate = in both but differing, stClean = in both and identical.
+  /// </summary>
+  TioDBBuilderStatus = (stClean, stUpdate, stCreate, stDrop);
 
   /// <summary>
   /// Controls how the DBBuilder manages indexes and foreign keys.
@@ -325,6 +330,7 @@ type
   /// </summary>
   IioDBBuilderPlanOperation = interface
     ['{6E2C9A17-3D4B-4F8A-9C1E-7B6F5A2D3C41}']
+    function GetDescription: String;
     function GetKind: TioDBBuilderPlanOpKind;
     function GetSchemaField: IioDBBuilderSchemaField;
     function GetSchemaField_Changes: TioDBBuilderFieldChanges;
@@ -333,6 +339,8 @@ type
     function GetSchemaTable: IioDBBuilderSchemaTable;
     function GetSequenceName: String;
 
+    /// <summary>Human-readable, dialect-independent summary of the operation (for logs/UI grids), e.g. "Add field 'AGE' to 'CLIENTI'".</summary>
+    property Description: String read GetDescription;
     property Kind: TioDBBuilderPlanOpKind read GetKind;
     property SchemaField: IioDBBuilderSchemaField read GetSchemaField;
     property SchemaField_Changes: TioDBBuilderFieldChanges read GetSchemaField_Changes;

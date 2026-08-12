@@ -57,6 +57,7 @@ type
     FSchemaTable: IioDBBuilderSchemaTable;
     FSequenceName: String;
   protected
+    function GetDescription: String;
     function GetKind: TioDBBuilderPlanOpKind;
     function GetSchemaField: IioDBBuilderSchemaField;
     function GetSchemaField_Changes: TioDBBuilderFieldChanges;
@@ -109,6 +110,9 @@ type
 
 implementation
 
+uses
+  System.SysUtils;
+
 { TioDBBuilderPlanOperation }
 
 constructor TioDBBuilderPlanOperation.Create(const AKind: TioDBBuilderPlanOpKind; const ATable: IioDBBuilderSchemaTable;
@@ -123,6 +127,24 @@ begin
   FSchemaForeignKey := AForeignKey;
   FSchemaField_Changes := ASchemaField_Changes;
   FSequenceName := ASequenceName;
+end;
+
+function TioDBBuilderPlanOperation.GetDescription: String;
+begin
+  // Dialect-independent, human-readable summary built from iORM's standard metadata (no SqlGenerator).
+  case FKind of
+    opCreateTable:      Result := Format('Create table %s', [QuotedStr(FSchemaTable.Name)]);
+    opCreateField:      Result := Format('Add field %s to %s', [QuotedStr(FSchemaField.FieldName), QuotedStr(FSchemaTable.Name)]);
+    opAlterField:       Result := Format('Alter field %s on %s', [QuotedStr(FSchemaField.FieldName), QuotedStr(FSchemaTable.Name)]);
+    opCreateIndex:      Result := Format('Create index on %s (%s)', [QuotedStr(FSchemaTable.Name), FSchemaIndex.CommaSepFieldList]);
+    opDropIndex:        Result := Format('Drop index on %s (%s)', [QuotedStr(FSchemaTable.Name), FSchemaIndex.CommaSepFieldList]);
+    opCreateForeignKey: Result := Format('Create foreign key on %s referencing %s', [QuotedStr(FSchemaTable.Name), QuotedStr(FSchemaForeignKey.ReferenceTableName)]);
+    opDropForeignKey:   Result := Format('Drop foreign key %s on %s', [QuotedStr(FSchemaForeignKey.Name), QuotedStr(FSchemaTable.Name)]);
+    opCreateSequence:   Result := Format('Create sequence %s', [QuotedStr(FSequenceName)]);
+    opDropSequence:     Result := Format('Drop sequence %s', [QuotedStr(FSequenceName)]);
+  else
+    Result := '';
+  end;
 end;
 
 function TioDBBuilderPlanOperation.GetKind: TioDBBuilderPlanOpKind;
