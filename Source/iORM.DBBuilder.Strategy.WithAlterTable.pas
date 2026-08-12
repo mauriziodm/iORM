@@ -410,7 +410,7 @@ function TioDBBuilderStrategyWithAlterTable.Check_FieldDefaultChanged(const AOld
 begin
   Result := not SameText(AOldFieldDefault, ANewFieldDefault);
   if Result then
-    AField.AddAltered(alFieldDefault);
+    AField.AddAltered(fcDefault);
 end;
 
 function TioDBBuilderStrategyWithAlterTable.Check_FieldDecimalsChanged(const AOldFieldDecimals, ANewFieldDecimals: Smallint;
@@ -419,7 +419,7 @@ begin
   Result := AOldFieldDecimals <> ANewFieldDecimals;
   if Result then
   begin
-    AField.AddAltered(alFieldType);
+    AField.AddAltered(fcType);
     Warning_PotentialDataTruncation('field DECIMALS', AOldFieldDecimals, ANewFieldDecimals, AField, ATable);
   end;
 end;
@@ -431,10 +431,10 @@ begin
   if Result then
   begin
     if ANewFieldLength > AOldFieldLength then
-      AField.AddAltered(alFieldLengthIncreased)
+      AField.AddAltered(fcLengthIncreased)
     else
     begin
-      AField.AddAltered(alFieldLengthDecreased);
+      AField.AddAltered(fcLengthDecreased);
       Warning_PotentialDataTruncation('field LENGTH', AOldFieldLength, ANewFieldLength, AField, ATable);
     end;
   end;
@@ -447,9 +447,9 @@ begin
   if Result then
   begin
     if ANewFieldPrecision > AOldFieldPrecision then
-      AField.AddAltered(alFieldPrecisionIncreased)
+      AField.AddAltered(fcPrecisionIncreased)
     else
-      AField.AddAltered(alFieldPrecisionDecreased);
+      AField.AddAltered(fcPrecisionDecreased);
 
     Warning_PotentialDataTruncation('field PRECISION', AOldFieldPrecision, ANewFieldPrecision, AField, ATable);
   end;

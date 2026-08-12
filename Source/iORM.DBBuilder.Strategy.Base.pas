@@ -728,7 +728,7 @@ begin
   Result := not SameText(AOldFieldType, ANewFieldType); // case-insensitive comparison
   if Result then
   begin
-    AField.AddAltered(alFieldType);
+    AField.AddAltered(fcType);
     Warning_UnsafeTypeConversion(ATable, AField, AOldFieldType, ANewFieldType);
   end;
 end;
@@ -741,7 +741,7 @@ begin
   if Result then
   begin
     // Mark the field as having its NOT NULL constraint altered
-    AField.AddAltered(alFieldNotNull);
+    AField.AddAltered(fcNotNull);
     if AIsPermitted then
     begin
       // If the field is now NOT NULL but wasn't before, and no default value is specified,
@@ -761,7 +761,7 @@ begin
   Result := not SameText(AOldBlobSubtype, ANewBlobSubtype); // case-insensitive comparison
   if Result then
   begin
-    AField.AddAltered(alFieldType);
+    AField.AddAltered(fcType);
     if not AIsPermitted then
       Warning_ChangeNotAllowed('blob sub-type', AOldBlobSubtype, ANewBlobSubtype, AField, ATable);
   end;

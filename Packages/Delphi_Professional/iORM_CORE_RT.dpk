@@ -160,6 +160,7 @@ contains
   iORM.Abstraction in '..\..\Source\iORM.Abstraction.pas',
   iORM.LiveBindings.CommonBSABehavior in '..\..\Source\iORM.LiveBindings.CommonBSABehavior.pas',
   iORM.DBBuilder.Interfaces in '..\..\Source\iORM.DBBuilder.Interfaces.pas',
+  iORM.DBBuilder.Plan in '..\..\Source\iORM.DBBuilder.Plan.pas',
   iORM.DBBuilder.Schema.Base in '..\..\Source\iORM.DBBuilder.Schema.Base.pas',
   iORM.DBBuilder.Schema.Field in '..\..\Source\iORM.DBBuilder.Schema.Field.pas',
   iORM.DBBuilder.Schema.Table in '..\..\Source\iORM.DBBuilder.Schema.Table.pas',

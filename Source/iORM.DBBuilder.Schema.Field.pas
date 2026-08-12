@@ -49,7 +49,7 @@ type
   /// </summary>
   TioDBBuilderSchemaFieldBase = class(TioDBBuilderSchemaBaseObject, IioDBBuilderSchemaField)
   protected
-    FAltered: TioDBBuilderFieldAlter;
+    FAltered: TioDBBuilderFieldChanges;
     // --- Value-source getters: abstract, implemented by each concrete field kind ---
     function GetFieldCustomType: string; virtual; abstract;
     function GetFieldDefault: TValue; virtual; abstract;
@@ -76,7 +76,7 @@ type
     function GetIsFieldPrecisionIncreased: Boolean;
     function GetIsFieldTypeAltered: Boolean;
   public
-    procedure AddAltered(const AAltered: TioDBBuilderFieldAlterStatus);
+    procedure AddAltered(const AAltered: TioDBBuilderFieldChange);
 
     property FieldCustomType: string read GetFieldCustomType;
     property FieldDefault: TValue read GetFieldDefault;
@@ -135,7 +135,7 @@ uses
 
 { TioDBBuilderSchemaFieldBase }
 
-procedure TioDBBuilderSchemaFieldBase.AddAltered(const AAltered: TioDBBuilderFieldAlterStatus);
+procedure TioDBBuilderSchemaFieldBase.AddAltered(const AAltered: TioDBBuilderFieldChange);
 begin
   Include(FAltered, AAltered);
 end;
@@ -152,47 +152,47 @@ end;
 
 function TioDBBuilderSchemaFieldBase.GetIsFieldDefaultAltered: Boolean;
 begin
-  Result := alFieldDefault in FAltered;
+  Result := fcDefault in FAltered;
 end;
 
 function TioDBBuilderSchemaFieldBase.GetIsFieldLengthAltered: Boolean;
 begin
-  Result := (alFieldLengthIncreased in FAltered) or (alFieldLengthDecreased in FAltered);
+  Result := (fcLengthIncreased in FAltered) or (fcLengthDecreased in FAltered);
 end;
 
 function TioDBBuilderSchemaFieldBase.GetIsFieldLengthDecreased: Boolean;
 begin
-  Result := alFieldLengthDecreased in FAltered;
+  Result := fcLengthDecreased in FAltered;
 end;
 
 function TioDBBuilderSchemaFieldBase.GetIsFieldLengthIncreased: Boolean;
 begin
-  Result := alFieldLengthIncreased in FAltered;
+  Result := fcLengthIncreased in FAltered;
 end;
 
 function TioDBBuilderSchemaFieldBase.GetIsFieldNotNullAltered: Boolean;
 begin
-  Result := alFieldNotNull in FAltered;
+  Result := fcNotNull in FAltered;
 end;
 
 function TioDBBuilderSchemaFieldBase.GetIsFieldPrecisionAltered: Boolean;
 begin
-  Result := (alFieldPrecisionIncreased in FAltered) or (alFieldPrecisionDecreased in FAltered);
+  Result := (fcPrecisionIncreased in FAltered) or (fcPrecisionDecreased in FAltered);
 end;
 
 function TioDBBuilderSchemaFieldBase.GetIsFieldPrecisionDecreased: Boolean;
 begin
-  Result := alFieldPrecisionDecreased in FAltered;
+  Result := fcPrecisionDecreased in FAltered;
 end;
 
 function TioDBBuilderSchemaFieldBase.GetIsFieldPrecisionIncreased: Boolean;
 begin
-  Result := alFieldPrecisionIncreased in FAltered;
+  Result := fcPrecisionIncreased in FAltered;
 end;
 
 function TioDBBuilderSchemaFieldBase.GetIsFieldTypeAltered: Boolean;
 begin
-  Result := alFieldType in FAltered;
+  Result := fcType in FAltered;
 end;
 
 { TioDBBuilderSchemaField }

@@ -1,4 +1,4 @@
-{
+﻿{
   ****************************************************************************
   *                                                                          *
   *           iORM - (interfaced ORM)                                        *
@@ -41,10 +41,20 @@ uses
 
 type
 
-  TioDBBuilderFieldAlterStatus = (alFieldType, alFieldDefault, alFieldNotNull, alFieldPrecisionIncreased, alFieldPrecisionDecreased, alFieldLengthIncreased, alFieldLengthDecreased);
-  TioDBBuilderFieldAlter = set of TioDBBuilderFieldAlterStatus;
+  TioDBBuilderFieldChange = (fcType, fcDefault, fcNotNull, fcPrecisionIncreased, fcPrecisionDecreased, fcLengthIncreased, fcLengthDecreased);
+  TioDBBuilderFieldChanges = set of TioDBBuilderFieldChange;
   TioDBBuilderIndexChange = (icFields, icOrientation, icUnique);
   TioDBBuilderIndexChanges = set of TioDBBuilderIndexChange;
+
+  /// <summary>
+  ///  The Plan operation vocabulary: the dialect-independent *intent* of a single schema change,
+  ///  produced by the (future) PlanBuilder from the Desired-vs-Actual diff and realized into SQL by
+  ///  each Strategy/SqlGenerator. Names mirror the existing ScriptWrite_/BuildSQL_ translator families
+  ///  (e.g. opCreateTable -> ScriptWrite_CreateTable). Destructive orphan drops (a DropTable/DropField)
+  ///  are intentionally out of the first cut.
+  /// </summary>
+  TioDBBuilderPlanOpKind = (opCreateTable, opCreateField, opAlterField, opCreateIndex, opDropIndex,
+    opCreateForeignKey, opDropForeignKey, opCreateSequence, opDropSequence);
   // irmDropAndRecreateAllTables (safe, default), irmDropAndRecreateModifiedTablesOnly (faster), irmIgnoreIndexes (disabled, fully manual)
 
 
@@ -126,7 +136,7 @@ type
 
   IioDBBuilderSchemaField = interface
     ['{D06F09FD-7252-46E3-A955-E6C2A3095E77}']
-    procedure AddAltered(const AAltered: TioDBBuilderFieldAlterStatus);
+    procedure AddAltered(const AAltered: TioDBBuilderFieldChange);
     function GetFieldCustomType: string;
     function GetFieldDefault: TValue;
     function GetFieldDefaultExists: Boolean;
@@ -305,6 +315,69 @@ type
     property Sequences: TioDBBuilderSchemaSequences read GetSequences;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
     property Tables: TioDBBuilderSchemaTables read GetTables;
+  end;
+
+  /// <summary>
+  ///  A single schema-change operation: a plain data record of *what* must change, carrying references
+  ///  to the Schema node(s) it concerns and (for opAlterField) the set of altered attributes. It holds
+  ///  no knowledge of *how* to render itself - that is the dialect's job. Built only through
+  ///  IioDBBuilderPlan's typed factories, so its slots are always coherent with its Kind.
+  /// </summary>
+  IioDBBuilderPlanOperation = interface
+    ['{6E2C9A17-3D4B-4F8A-9C1E-7B6F5A2D3C41}']
+    function GetKind: TioDBBuilderPlanOpKind;
+    function GetSchemaField: IioDBBuilderSchemaField;
+    function GetSchemaField_Changes: TioDBBuilderFieldChanges;
+    function GetSchemaForeignKey: IioDBBuilderSchemaFK;
+    function GetSchemaIndex: IioDBBuilderSchemaIndex;
+    function GetSchemaTable: IioDBBuilderSchemaTable;
+    function GetSequenceName: String;
+
+    property Kind: TioDBBuilderPlanOpKind read GetKind;
+    property SchemaField: IioDBBuilderSchemaField read GetSchemaField;
+    property SchemaField_Changes: TioDBBuilderFieldChanges read GetSchemaField_Changes;
+    property SchemaForeignKey: IioDBBuilderSchemaFK read GetSchemaForeignKey;
+    property SchemaIndex: IioDBBuilderSchemaIndex read GetSchemaIndex;
+    property SchemaTable: IioDBBuilderSchemaTable read GetSchemaTable;
+    property SequenceName: String read GetSequenceName;
+  end;
+
+  TioDBBuilderPlanOperations = TList<IioDBBuilderPlanOperation>;
+
+  /// <summary>
+  ///  The ordered, dialect-independent list of schema-change operations: the "Plan" of the
+  ///  Desired/Actual/Plan reconciliation. Operations are appended through typed factory methods (the
+  ///  ONLY way to add them - callers never touch the raw operation slots, so a malformed operation
+  ///  cannot be constructed). Insertion order IS execution order; producing that order (dependency
+  ///  sequencing) is the PlanBuilder's responsibility, not this container's.
+  /// </summary>
+  IioDBBuilderPlan = interface
+    ['{C4D5E6F7-8A9B-4C0D-B1E2-3F4A5B6C7D82}']
+    // Layout: grouped under domain banners, alphabetical within each group (project-wide convention).
+    // TABLE
+    function AddCreateTable(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
+    // FIELD
+    function AddAlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
+      const ASchemaField_Changes: TioDBBuilderFieldChanges): IioDBBuilderPlanOperation;
+    function AddCreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): IioDBBuilderPlanOperation;
+    // INDEX
+    function AddCreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): IioDBBuilderPlanOperation;
+    function AddDropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): IioDBBuilderPlanOperation;
+    // FOREIGN KEY
+    function AddCreateForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;
+    function AddDropForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;
+    // SEQUENCE
+    function AddCreateSequence(const ASequenceName: String): IioDBBuilderPlanOperation;
+    function AddDropSequence(const ASequenceName: String): IioDBBuilderPlanOperation;
+    // PLAN-WIDE
+    procedure Clear;
+    function GetCount: Integer;
+    function GetIsEmpty: Boolean;
+    function GetOperations: TioDBBuilderPlanOperations;
+
+    property Count: Integer read GetCount;
+    property IsEmpty: Boolean read GetIsEmpty;
+    property Operations: TioDBBuilderPlanOperations read GetOperations;
   end;
 
   IioDBBuilderSqlText = interface

@@ -293,6 +293,7 @@
         <DCCReference Include="..\..\Source\iORM.Abstraction.pas"/>
         <DCCReference Include="..\..\Source\iORM.LiveBindings.CommonBSABehavior.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Interfaces.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DBBuilder.Plan.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Base.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Field.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Table.pas"/>
