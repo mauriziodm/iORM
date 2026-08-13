@@ -295,7 +295,7 @@ var
 begin
   // Check key generation strategy compatibility with RDBMS version.
   // The diagnostic lives on the Context.SqlGenerator (DBMS-capability axis), not on the Strategy.
-  Context.SqlGenerator.CheckKeyGenerationCompatibility(Context.Schema, Context.Script);
+  Context.SqlGenerator.CheckKeyGenerationCompatibility(Context.Reconciliation.MappedSchema, Context.Script);
 
   // Strict mode (indexes): drop every index from the DB for each stUpdate table.
   // This removes orphaned indexes (including manually-added ones) and ensures
@@ -307,20 +307,20 @@ begin
   // makes the bypass intent explicit. Indexes and FKs are kept in two distinct
   // blocks because they are independent concerns (separate mode parameter for
   // each), and the separation keeps each path immediately readable.
-  if Context.Schema.IndexesMode = ifmEnabledStrict then
+  if Context.Reconciliation.MappedSchema.IndexesMode = ifmEnabledStrict then
   begin
     Context.Script.Body.AddTitle('Dropping indexes (strict mode)');
-    for LTable in Context.Schema.Tables.Values do
+    for LTable in Context.Reconciliation.MappedSchema.Tables.Values do
       if LTable.Status = stUpdate then
         Force_DropTableIndexesFromDB(LTable);
   end;
 
   // Strict mode (foreign keys): same approach as the indexes block above,
   // independent because ForeignKeysMode is a separate parameter.
-  if Context.Schema.ForeignKeysMode = ifmEnabledStrict then
+  if Context.Reconciliation.MappedSchema.ForeignKeysMode = ifmEnabledStrict then
   begin
     Context.Script.Body.AddTitle('Dropping foreign keys (strict mode)');
-    for LTable in Context.Schema.Tables.Values do
+    for LTable in Context.Reconciliation.MappedSchema.Tables.Values do
       if LTable.Status = stUpdate then
         Force_DropTableForeignKeysFromDB(LTable);
   end;
@@ -329,11 +329,11 @@ begin
   Process_Tables;
 
   // Indexes: create/alter based on mode (skipped if disabled)
-  if Context.Schema.IndexesMode >= ifmEnabled then
+  if Context.Reconciliation.MappedSchema.IndexesMode >= ifmEnabled then
     Process_Indexes;
 
   // Foreign keys are processed last so all referenced tables are already created.
-  if Context.Schema.ForeignKeysMode >= ifmEnabled then
+  if Context.Reconciliation.MappedSchema.ForeignKeysMode >= ifmEnabled then
     Process_ForeignKeys;
 end;
 

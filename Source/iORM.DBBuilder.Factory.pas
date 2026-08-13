@@ -54,6 +54,9 @@ type
     class function NewContext(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
     class function NewDBAnalyzer(const AContext: IioDBBuilderContext; const AStrategy: IioDBBuilderStrategy): IioDBBuilderDBAnalyzer;
     class function NewDBBuilder: IioDBBuilder;
+    class function NewPlan: IioDBBuilderPlan;
+    class function NewReconciliation(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode;
+      const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderReconciliation;
     class function NewSchema(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode;
       const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchema;
     class function NewSchemaBuilder(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema;
@@ -82,7 +85,9 @@ uses
   iORM.DBBuilder.SqlGenerator.MSSqlServer,
   iORM.DBBuilder.Schema.Field.ClassInfo,
   iORM.DBBuilder.Strategy.MSSqlServer,
-  iORM.DBBuilder.Schema.RDBMSInfo
+  iORM.DBBuilder.Schema.RDBMSInfo,
+  iORM.DBBuilder.Plan,
+  iORM.DBBuilder.Reconciliation
 
   ;
 
@@ -101,6 +106,20 @@ end;
 class function TioDBBuilderFactory.NewDBBuilder: IioDBBuilder;
 begin
   Result := TioDBBuilder.Create;
+end;
+
+class function TioDBBuilderFactory.NewPlan: IioDBBuilderPlan;
+begin
+  Result := TioDBBuilderPlan.Create;
+end;
+
+class function TioDBBuilderFactory.NewReconciliation(const AConnectionDefName: String; const AIndexesMode,
+  AForeignKeysMode: TioDBBuilderIndexesAndFKMode; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderReconciliation;
+begin
+  // Physical is left nil here - the Introspector fills it in a later phase.
+  Result := TioDBBuilderReconciliation.Create(
+    NewSchema(AConnectionDefName, AIndexesMode, AForeignKeysMode, ASqlGenerator),
+    NewPlan);
 end;
 
 class function TioDBBuilderFactory.NewSchema(const AConnectionDefName: String; const AIndexesMode,

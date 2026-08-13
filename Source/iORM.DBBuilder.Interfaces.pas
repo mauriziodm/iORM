@@ -388,6 +388,24 @@ type
     property Operations: TioDBBuilderPlanOperations read GetOperations;
   end;
 
+  /// <summary>
+  ///  The container of the Desired/Actual/Plan reconciliation: Mapped (schema built from the ORM
+  ///  entity maps), Physical (schema introspected from the live DB), and Plan (the ordered operations
+  ///  that converge Physical to Mapped). Physical is filled by the Introspector, so it may be nil
+  ///  until then.
+  /// </summary>
+  IioDBBuilderReconciliation = interface
+    ['{3F5A9C21-7E4D-4B6A-9F12-8C3D5E7A1B60}']
+    function GetMappedSchema: IioDBBuilderSchema;
+    function GetPhysicalSchema: IioDBBuilderSchema;
+    function GetPlan: IioDBBuilderPlan;
+    procedure SetPhysicalSchema(const AValue: IioDBBuilderSchema);
+
+    property MappedSchema: IioDBBuilderSchema read GetMappedSchema;
+    property PhysicalSchema: IioDBBuilderSchema read GetPhysicalSchema write SetPhysicalSchema;
+    property Plan: IioDBBuilderPlan read GetPlan;
+  end;
+
   IioDBBuilderSqlText = interface
     ['{DF2D64EF-3576-49CF-B803-3D10D7A93816}']
     function Add(const AText: String): IioDBBuilderSqlText; // Append inline to last line
@@ -451,7 +469,7 @@ type
     function GetHasWarnings: Boolean;
     function GetHints: IioDBBuilderSqlText;
     function GetLines: TStringList;
-    function GetSchema: IioDBBuilderSchema;
+    function GetReconciliation: IioDBBuilderReconciliation;
     function GetScript: IioDBBuilderScript;
     function GetSqlGenerator: IioDBBuilderSqlGenerator;
     function GetStatus: TioDBBuilderStatus;
@@ -473,7 +491,7 @@ type
     property HasWarnings: Boolean read GetHasWarnings;
     property Hints: IioDBBuilderSqlText read GetHints;
     property Lines: TStringList read GetLines;
-    property Schema: IioDBBuilderSchema read GetSchema;
+    property Reconciliation: IioDBBuilderReconciliation read GetReconciliation;
     property Script: IioDBBuilderScript read GetScript;
     property SqlGenerator: IioDBBuilderSqlGenerator read GetSqlGenerator;
     property Status: TioDBBuilderStatus read GetStatus;
@@ -757,7 +775,7 @@ type
     // ----------------------------------------------------------
     /// <summary>
     ///  The single public entry point: wraps GenerateScript_Body between Context.Script.ScriptBegin
-    ///  and Context.Script.ScriptEnd. Trusts Context.Schema.Status as given - it neither forces it
+    ///  and Context.Script.ScriptEnd. Trusts Context.Reconciliation.MappedSchema.Status as given - it neither forces it
     ///  nor emits any mode-related warning. Mode selection (forcing the whole schema to stCreate for
     ///  a documentation/baseline script, flagging the result so Context.Execute refuses to run it
     ///  without AForce = True) is the DBBuilder's job, done on Context before this is called.

@@ -92,7 +92,7 @@ begin
 
   // Note: for SQLite, FKs are inline in the CREATE TABLE statement.
   // ifmEnabled and ifmEnabledStrict behave identically here.
-  if Context.Schema.ForeignKeysMode <> ifmDisabled then
+  if Context.Reconciliation.MappedSchema.ForeignKeysMode <> ifmDisabled then
     ScriptWrite_CreateTableForeignKeys(ATable);
 
   Context.Script.Body.DecIndent;

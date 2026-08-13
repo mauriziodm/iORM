@@ -118,7 +118,7 @@ type
     /// Drops the indexes of a single table by querying the actual DB catalog
     /// and marks all schema indexes for the table as stCreate so they get
     /// recreated by Process_Indexes.
-    /// Force variant: this method does NOT consult Context.Schema.IndexesMode — it
+    /// Force variant: this method does NOT consult Context.Reconciliation.MappedSchema.IndexesMode — it
     /// always operates. Every index physically present on the table is dropped,
     /// including orphans (no longer in the schema) and manually added ones.
     /// </summary>
@@ -127,14 +127,14 @@ type
     /// Drops the indexes of a single table based on the schema definitions
     /// (only indexes still present in the schema are dropped) and marks them
     /// as stCreate so they get recreated by Process_Indexes.
-    /// Force variant: this method does NOT consult Context.Schema.IndexesMode — it
+    /// Force variant: this method does NOT consult Context.Reconciliation.MappedSchema.IndexesMode — it
     /// always operates. Orphans (indexes in DB but not in schema) and manually
     /// added indexes are left untouched.
     /// </summary>
     procedure Force_DropTableIndexesFromSchema(const ATable: IioDBBuilderSchemaTable); virtual;
     /// <summary>
     /// Mode-aware drop of all indexes of a single table.
-    /// Dispatches to the appropriate Force* mechanic based on Context.Schema.IndexesMode:
+    /// Dispatches to the appropriate Force* mechanic based on Context.Reconciliation.MappedSchema.IndexesMode:
     ///   ifmDisabled: raises EioDBBuilderException — index management is disabled
     ///     by configuration, an explicit drop request is a configuration conflict.
     ///   ifmEnabled (conservative): calls Force_DropTableIndexesFromSchema —
@@ -184,7 +184,7 @@ type
     /// Drops the FKs of a single table by querying the actual DB catalog and
     /// marks all schema FKs for the table as stCreate so they get recreated
     /// by Process_ForeignKeys.
-    /// Force variant: this method does NOT consult Context.Schema.ForeignKeysMode — it
+    /// Force variant: this method does NOT consult Context.Reconciliation.MappedSchema.ForeignKeysMode — it
     /// always operates. Every FK physically present on the table is dropped,
     /// including orphans (FKs whose structural properties changed and produced
     /// a new hash name) and manually added ones.
@@ -194,14 +194,14 @@ type
     /// Drops the FKs of a single table based on the schema definitions
     /// (only FKs still present in the schema are dropped) and marks them as
     /// stCreate so they get recreated by Process_ForeignKeys.
-    /// Force variant: this method does NOT consult Context.Schema.ForeignKeysMode — it
+    /// Force variant: this method does NOT consult Context.Reconciliation.MappedSchema.ForeignKeysMode — it
     /// always operates. Orphans (FKs in DB but not in schema) and manually
     /// added FKs are left untouched.
     /// </summary>
     procedure Force_DropTableForeignKeysFromSchema(const ATable: IioDBBuilderSchemaTable); virtual;
     /// <summary>
     /// Mode-aware drop of all foreign keys of a single table.
-    /// Dispatches to the appropriate Force* mechanic based on Context.Schema.ForeignKeysMode:
+    /// Dispatches to the appropriate Force* mechanic based on Context.Reconciliation.MappedSchema.ForeignKeysMode:
     ///   ifmDisabled: raises EioDBBuilderException — FK management is disabled
     ///     by configuration, an explicit drop request is a configuration conflict.
     ///   ifmEnabled (conservative): calls Force_DropTableForeignKeysFromSchema —
@@ -364,16 +364,16 @@ procedure TioDBBuilderStrategyBase.ScriptWrite_CreateTableSequence(const ATable:
 begin
   // Precondition: ATable.UsesSequenceForKeyGeneration must be True. The caller
   // is responsible for that check — consistent with how BuildSchemaTable in
-  // Context.Schema.Builder gates SequenceAddIfNotExists. Calling this method on an
+  // Context.Reconciliation.MappedSchema.Builder gates SequenceAddIfNotExists. Calling this method on an
   // Identity-keyed table would raise EioDBBuilderException via GetSequenceName.
   //
-  // When the whole DB is being created from scratch (Context.Schema.Status = stCreate: either a brand-new
-  // empty DB or a force-create documentation/baseline script via Context.Schema.ForceCreateStatus) the sequence
+  // When the whole DB is being created from scratch (Context.Reconciliation.MappedSchema.Status = stCreate: either a brand-new
+  // empty DB or a force-create documentation/baseline script via Context.Reconciliation.MappedSchema.ForceCreateStatus) the sequence
   // cannot pre-exist, so emit it unconditionally: this keeps the create-from-scratch script complete
   // AND avoids a pointless catalog round-trip. The Check_SequenceExists guard is only needed on the
-  // incremental path (Context.Schema.Status = stUpdate: a new table added to an already existing DB), where
+  // incremental path (Context.Reconciliation.MappedSchema.Status = stUpdate: a new table added to an already existing DB), where
   // a sequence with the same name might already be present.
-  if (Context.Schema.Status = stCreate) or not Check_SequenceExists(ATable.GetSequenceName) then
+  if (Context.Reconciliation.MappedSchema.Status = stCreate) or not Check_SequenceExists(ATable.GetSequenceName) then
     Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_CreateSequence(ATable.GetSequenceName));
 end;
 
@@ -383,17 +383,17 @@ var
 begin
   // Status-driven: Process_TableForeignKeys skips stClean FKs per element, so the FK Status is the
   // single source of truth (covers both analyzer-driven and forced-stCreate FKs).
-  for LTable in Context.Schema.Tables.Values do
+  for LTable in Context.Reconciliation.MappedSchema.Tables.Values do
     Process_TableForeignKeys(LTable);
 end;
 
 procedure TioDBBuilderStrategyBase.Process_DropTableForeignKeys(const ATable: IioDBBuilderSchemaTable);
 begin
   // Mode-aware dispatcher: routes to the Force* mechanic appropriate for the
-  // current Context.Schema.ForeignKeysMode. The Force* methods bypass mode checks and
+  // current Context.Reconciliation.MappedSchema.ForeignKeysMode. The Force* methods bypass mode checks and
   // do the actual work; this entry point preserves the contract that the mode
   // configured on TioDBBuilderProperty governs externally visible behavior.
-  case Context.Schema.ForeignKeysMode of
+  case Context.Reconciliation.MappedSchema.ForeignKeysMode of
     ifmDisabled:
       // Drop is incompatible with the configured intent ("do not manage FKs").
       // Raise rather than silently no-op so the caller gets immediate feedback.
@@ -473,7 +473,7 @@ var
 begin
   // Status-driven: Process_TableIndexes skips stClean indexes per element, so the index Status is the
   // single source of truth (covers both analyzer-driven and forced-stCreate indexes).
-  for LTable in Context.Schema.Tables.Values do
+  for LTable in Context.Reconciliation.MappedSchema.Tables.Values do
     Process_TableIndexes(LTable);
 end;
 
@@ -566,7 +566,7 @@ procedure TioDBBuilderStrategyBase.Process_Tables;
 var
   LTable: IioDBBuilderSchemaTable;
 begin
-  for LTable in Context.Schema.Tables.Values do
+  for LTable in Context.Reconciliation.MappedSchema.Tables.Values do
   begin
     case LTable.Status of
       stCreate:
@@ -603,10 +603,10 @@ end;
 procedure TioDBBuilderStrategyBase.Process_DropTableIndexes(const ATable: IioDBBuilderSchemaTable);
 begin
   // Mode-aware dispatcher: routes to the Force* mechanic appropriate for the
-  // current Context.Schema.IndexesMode. The Force* methods bypass mode checks and do
+  // current Context.Reconciliation.MappedSchema.IndexesMode. The Force* methods bypass mode checks and do
   // the actual work; this entry point preserves the contract that the mode
   // configured on TioDBBuilderProperty governs externally visible behavior.
-  case Context.Schema.IndexesMode of
+  case Context.Reconciliation.MappedSchema.IndexesMode of
     ifmDisabled:
       // Drop is incompatible with the configured intent ("do not manage indexes").
       // Raise rather than silently no-op so the caller gets immediate feedback.
@@ -660,9 +660,9 @@ end;
 
 procedure TioDBBuilderStrategyBase.GenerateScript;
 begin
-  // Status-driven: does NOT touch Context.Schema.Status, trusts it as given by the caller (Engine),
-  // whether analyzed by the DBAnalyzer or forced via Context.Schema.ForceCreateStatus.
-  // GenerateScript_Body branches internally on Context.Schema.Status, so this single entry point
+  // Status-driven: does NOT touch Context.Reconciliation.MappedSchema.Status, trusts it as given by the caller (Engine),
+  // whether analyzed by the DBAnalyzer or forced via Context.Reconciliation.MappedSchema.ForceCreateStatus.
+  // GenerateScript_Body branches internally on Context.Reconciliation.MappedSchema.Status, so this single entry point
   // covers both the sync and the force-create case.
   Context.Script.ScriptBegin(Context.SqlGenerator.DBMSInfo);
   GenerateScript_Body;

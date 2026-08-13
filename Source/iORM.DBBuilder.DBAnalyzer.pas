@@ -81,13 +81,13 @@ procedure TioDBBuilderDBAnalyzer.Analyze;
 begin
   // Analyze if the database exists and set its status
   if not FStrategy.Check_DatabaseExists then
-    FContext.Schema.Status := stCreate;
+    FContext.Reconciliation.MappedSchema.Status := stCreate;
 
   // Start the transaction (if the DB already exists otherwise an error would occur)
   // note: Maintain the transaction because the lifecycle of the physical connection
   //        to the DB coincides with the lifecycle of the transaction, thus avoiding
   //        the continuous creation and destruction of the connection
-  if FContext.Schema.Status <> stCreate then
+  if FContext.Reconciliation.MappedSchema.Status <> stCreate then
     io.StartTransaction(FContext.ConnectionDefName);
 
   try
@@ -95,11 +95,11 @@ begin
     AnalyzeTables;
 
     // Commit the transaction (if in transaction)
-    if FContext.Schema.Status <> stCreate then
+    if FContext.Reconciliation.MappedSchema.Status <> stCreate then
       io.CommitTransaction(FContext.ConnectionDefName);
   except
     // Rollback the transaction (if in transaction)
-    if FContext.Schema.Status <> stCreate then
+    if FContext.Reconciliation.MappedSchema.Status <> stCreate then
       io.RollbackTransaction(FContext.ConnectionDefName);
     raise;
   end;
@@ -110,10 +110,10 @@ procedure TioDBBuilderDBAnalyzer.AnalyzeTables;
 var
   LTable: IioDBBuilderSchemaTable;
 begin
-  for LTable in FContext.Schema.Tables.Values do
+  for LTable in FContext.Reconciliation.MappedSchema.Tables.Values do
   begin
     // If the DB is new or the table doesn't exist, mark it as stCreate
-    if (FContext.Schema.Status = stCreate) or not FStrategy.Check_TableExists(LTable) then
+    if (FContext.Reconciliation.MappedSchema.Status = stCreate) or not FStrategy.Check_TableExists(LTable) then
       LTable.Status := stCreate;
     // Always called — handle stCreate tables internally without DB queries
     AnalyzeFields(LTable);
@@ -121,8 +121,8 @@ begin
     AnalyzeForeignKeys(LTable);
 
     // If the table has changes and the DB already exists, mark the schema as stUpdate
-    if (LTable.Status > stClean) and (FContext.Schema.Status <> stCreate) then
-      FContext.Schema.Status := stUpdate;
+    if (LTable.Status > stClean) and (FContext.Reconciliation.MappedSchema.Status <> stCreate) then
+      FContext.Reconciliation.MappedSchema.Status := stUpdate;
   end;
 end;
 

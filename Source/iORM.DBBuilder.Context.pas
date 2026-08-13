@@ -47,7 +47,7 @@ type
   TioDBBuilderContext = class(TInterfacedObject, IioDBBuilderContext)
   private
     FConnectionDefName: string;
-    FSchema: IioDBBuilderSchema;
+    FReconciliation: IioDBBuilderReconciliation;
     FScript: IioDBBuilderScript;
     FSqlGenerator: IioDBBuilderSqlGenerator;
 
@@ -56,7 +56,7 @@ type
     function GetHasWarnings: Boolean;
     function GetHints: IioDBBuilderSqlText;
     function GetLines: TStringList;
-    function GetSchema: IioDBBuilderSchema;
+    function GetReconciliation: IioDBBuilderReconciliation;
     function GetScript: IioDBBuilderScript;
     function GetSqlGenerator: IioDBBuilderSqlGenerator;
     function GetStatus: TioDBBuilderStatus;
@@ -87,7 +87,7 @@ begin
   FConnectionDefName := AConnectionDefName;
   // SqlGenerator must be created BEFORE Schema so that kgsAuto can be resolved
   FSqlGenerator := TioDBBuilderFactory.NewSqlGenerator(AConnectionDefName);
-  FSchema := TioDBBuilderFactory.NewSchema(AConnectionDefName, AIndexesMode, AForeignKeysMode, FSqlGenerator);
+  FReconciliation := TioDBBuilderFactory.NewReconciliation(AConnectionDefName, AIndexesMode, AForeignKeysMode, FSqlGenerator);
   FScript := TioDBBuilderFactory.NewScript(AConnectionDefName);
 end;
 
@@ -108,7 +108,7 @@ begin
   // neither can be expressed in the script Body, so it happens here as a side effect before Execute
   // sends the rest of the script. Reuses the SqlGenerator this Context was built with instead of
   // creating a new one.
-  if FSchema.Status = stCreate then
+  if FReconciliation.MappedSchema.Status = stCreate then
     FSqlGenerator.Command_CreateDatabase;
 
   // Runs unconditionally from here, even when Status = stClean (nothing to do): Lines is then
@@ -143,9 +143,9 @@ begin
   Result := FScript.Lines;
 end;
 
-function TioDBBuilderContext.GetSchema: IioDBBuilderSchema;
+function TioDBBuilderContext.GetReconciliation: IioDBBuilderReconciliation;
 begin
-  Result := FSchema;
+  Result := FReconciliation;
 end;
 
 function TioDBBuilderContext.GetScript: IioDBBuilderScript;
@@ -160,7 +160,7 @@ end;
 
 function TioDBBuilderContext.GetStatus: TioDBBuilderStatus;
 begin
-  Result := FSchema.Status;
+  Result := FReconciliation.MappedSchema.Status;
 end;
 
 function TioDBBuilderContext.GetWarnings: IioDBBuilderSqlText;

@@ -88,7 +88,7 @@ var
 begin
   LFKsByField := TObjectDictionary<String, TStringList>.Create([doOwnsValues]);
   try
-    for LTable in AContext.Schema.Tables.Values do
+    for LTable in AContext.Reconciliation.MappedSchema.Tables.Values do
       for LForeignKey in LTable.ForeignKeys.Values do
       begin
         LFieldKey := Format('%s.%s', [LForeignKey.DependentTableName, LForeignKey.DependentFieldName]);
@@ -122,7 +122,7 @@ begin
   LContext := TioDBBuilderFactory.NewContext(AConnectionDefName, AIndexesMode, AForeignKeysMode);
   LStrategy := TioDBBuilderFactory.NewStrategy(LContext);
 
-  // Self-contained: LContext.Schema is already fully populated from the class/entity maps (NewSchema
+  // Self-contained: LContext.Reconciliation.MappedSchema is already fully populated from the class/entity maps (NewSchema
   // -> BuildSchema, no DB access). Force the whole tree to stCreate, mirroring what the DBAnalyzer
   // does on a non-existent DB, and flag the result so Context.Execute refuses to run it unless the
   // caller explicitly passes AForce = True: it must NOT be executed against an existing database.
@@ -130,7 +130,7 @@ begin
     'of the target database was NOT analyzed and is ignored. Review it carefully before running it against an ' +
     'existing database.');
   Warning_MultipleFKsOnSameField(LContext);
-  LContext.Schema.ForceCreateStatus;
+  LContext.Reconciliation.MappedSchema.ForceCreateStatus;
   LStrategy.GenerateScript;
   Result := LContext;
 end;

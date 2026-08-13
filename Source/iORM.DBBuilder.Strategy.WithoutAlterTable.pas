@@ -140,7 +140,7 @@ begin
   // Databases without ALTER TABLE support always recreate tables using the
   // rename-create-copy pattern (see GenerateScript_Body for the full workflow).
   // Therefore, both stCreate and stUpdate use ScriptWrite_CreateTable.
-  for LTable in Context.Schema.Tables.Values do
+  for LTable in Context.Reconciliation.MappedSchema.Tables.Values do
   begin
     if LTable.Status in [stCreate, stUpdate] then
       ScriptWrite_CreateTable(LTable);
@@ -151,12 +151,12 @@ procedure TioDBBuilderStrategyWithoutAlterTable.Process_WarnUnmanagedRebuildLoss
 var
   LTable: IioDBBuilderSchemaTable;
 begin
-  for LTable in Context.Schema.Tables.Values do
+  for LTable in Context.Reconciliation.MappedSchema.Tables.Values do
     if LTable.Status = stUpdate then
     begin
-      if Context.Schema.IndexesMode = ifmDisabled then
+      if Context.Reconciliation.MappedSchema.IndexesMode = ifmDisabled then
         Warning_RebuildDropsUnmanagedIndexes(LTable);
-      if Context.Schema.ForeignKeysMode = ifmDisabled then
+      if Context.Reconciliation.MappedSchema.ForeignKeysMode = ifmDisabled then
         Warning_RebuildDropsUnmanagedForeignKeys(LTable);
     end;
 end;
@@ -169,7 +169,7 @@ begin
   // (Force* mechanic, bypasses IndexesMode): the rename-create-copy needs the names free before the
   // new tables/indexes are created, regardless of the configured mode.
   Context.Script.Body.AddTitle('Dropping indexes');
-  for LTable in Context.Schema.Tables.Values do
+  for LTable in Context.Reconciliation.MappedSchema.Tables.Values do
     if LTable.Status = stUpdate then
       Force_DropTableIndexesFromDB(LTable);
 end;
@@ -178,13 +178,13 @@ procedure TioDBBuilderStrategyWithoutAlterTable.GenerateScript_Body;
 begin
   // Check key generation strategy compatibility with DBMS.
   // The diagnostic lives on the Context.SqlGenerator (DBMS-capability axis), not on the Strategy.
-  Context.SqlGenerator.CheckKeyGenerationCompatibility(Context.Schema, Context.Script);
+  Context.SqlGenerator.CheckKeyGenerationCompatibility(Context.Reconciliation.MappedSchema, Context.Script);
 
   ScriptWrite_BeginDeferConstraints;
 
   // When updating: warn about unmanaged losses, drop the existing indexes, and rename tables to "_old"
   // before recreating them (details in each step's method).
-  if Context.Schema.Status = stUpdate then
+  if Context.Reconciliation.MappedSchema.Status = stUpdate then
   begin
     Process_WarnUnmanagedRebuildLosses;
     Process_DropIndexesFromDB;
@@ -196,11 +196,11 @@ begin
 
   // Indexes: ifmEnabled and ifmEnabledStrict are equivalent here because the rename-create-copy
   // pattern already starts from a clean slate. Only ifmDisabled skips recreation.
-  if Context.Schema.IndexesMode <> ifmDisabled then
+  if Context.Reconciliation.MappedSchema.IndexesMode <> ifmDisabled then
     Process_Indexes;
 
   // When updating, copy data from renamed "_old" tables into the newly created ones
-  if Context.Schema.Status = stUpdate then
+  if Context.Reconciliation.MappedSchema.Status = stUpdate then
     Process_CopyDataFromOldToNew;
 
   ScriptWrite_EndDeferConstraints;
@@ -222,7 +222,7 @@ var
 begin
   Context.Script.Body.AddTitle('Renaming table names to "_old"');
 
-  for LTable in Context.Schema.Tables.Values do
+  for LTable in Context.Reconciliation.MappedSchema.Tables.Values do
   begin
     if LTable.Status <> stUpdate then
       Continue;
@@ -240,7 +240,7 @@ var
 begin
   Context.Script.Body.AddTitle('Copying data from "_old" tables.');
 
-  for LTable in Context.Schema.Tables.Values do
+  for LTable in Context.Reconciliation.MappedSchema.Tables.Values do
   begin
     if LTable.Status <> stUpdate then
       Continue;
