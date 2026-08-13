@@ -297,6 +297,12 @@ type
 
   IioDBBuilderSchema = interface
     ['{1AEDB134-1ECB-490E-A53A-973BEDE509E5}']
+    /// <summary>
+    ///  Inserts an already-built table node into the schema, keyed by its Name. Used by the Introspector
+    ///  to populate the Physical branch with catalog-backed table nodes (the Mapped branch is built the
+    ///  ORM-driven way via FindOrCreateTable instead).
+    /// </summary>
+    procedure AddTable(const ATable: IioDBBuilderSchemaTable);
     function FindOrCreateTable(const AMap: IioMap; const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
     function FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
     /// <summary>
@@ -531,6 +537,11 @@ type
     function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string;
     /// <summary>Generates SQL to check if a table exists</summary>
     function BuildSQL_TableExists(const ATableName: string): string;
+    /// <summary>
+    /// Generates SQL to list all user tables (system tables excluded).
+    /// Used by the Introspector to enumerate the physical schema.
+    /// </summary>
+    function BuildSQL_TableList: string;
 
     // ==========================================================
     // FIELD RELATED METHODS

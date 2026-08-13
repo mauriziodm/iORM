@@ -52,6 +52,7 @@ type
   public
     constructor Create(const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
     destructor Destroy; override;
+    procedure AddTable(const ATable: IioDBBuilderSchemaTable);
     function FindOrCreateTable(const AMap: IioMap; const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
     function FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
     procedure ForceCreateStatus;
@@ -70,6 +71,16 @@ uses
   iORM.Exceptions, System.SysUtils, iORM.DBBuilder.Factory;
 
 { TioDBBuilderSchema }
+
+// Inserts an already-built table node into the schema, keyed by its Name (used by the Introspector to
+// populate the Physical branch). Unlike FindOrCreateTable it does not consult the ORM: the node is taken
+// as-is. Raises if a table with the same name is already present (the catalog never lists duplicates).
+procedure TioDBBuilderSchema.AddTable(const ATable: IioDBBuilderSchemaTable);
+begin
+  if FTables.ContainsKey(ATable.Name) then
+    raise EioDBBuilderException.Create(ClassName, 'AddTable', Format('SchemaTable "%s" already exists.', [ATable.Name]));
+  FTables.Add(ATable.Name, ATable);
+end;
 
 constructor TioDBBuilderSchema.Create(const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
 begin

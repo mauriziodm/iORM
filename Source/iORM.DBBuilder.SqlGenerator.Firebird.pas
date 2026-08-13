@@ -63,6 +63,7 @@ type
     function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_TableExists(const ATableName: string): string; override;
+    function BuildSQL_TableList: string; override;
 
     // ==========================================================
     // FIELD RELATED METHODS
@@ -488,6 +489,14 @@ begin
   // Carlo Marona (2024-10-15): Added condition to exclude system relations
   Result := Format('select RDB$RELATION_NAME from RDB$RELATIONS where (UPPER(RDB$RELATION_NAME) = UPPER(''%s'')) and (RDB$SYSTEM_FLAG = 0)',
     [EscapeSQLStringLiteral(ATableName)]);
+end;
+
+function TioDBBuilderSqlGenFirebird.BuildSQL_TableList: string;
+begin
+  // All user tables: exclude views (RDB$VIEW_BLR is null keeps only real tables) and
+  // system relations (RDB$SYSTEM_FLAG = 0, mirrors BuildSQL_TableExists). The Introspector
+  // must .Trim the returned name (Firebird right-pads CHAR identifier columns).
+  Result := 'select RDB$RELATION_NAME from RDB$RELATIONS where (RDB$VIEW_BLR is null) and (RDB$SYSTEM_FLAG = 0)';
 end;
 
 function TioDBBuilderSqlGenFirebird.GetMaxSqlIdentifierLength: integer;

@@ -60,6 +60,7 @@ type
     function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_TableExists(const ATableName: string): string; override;
+    function BuildSQL_TableList: string; override;
 
     // ==========================================================
     // FIELD RELATED METHODS
@@ -257,6 +258,12 @@ end;
 function TioDBBuilderSqlGenSQLite.BuildSQL_TableExists(const ATableName: string): string;
 begin
   Result := Format('pragma table_info(''%s'')', [EscapeSQLStringLiteral(ATableName)]);
+end;
+
+function TioDBBuilderSqlGenSQLite.BuildSQL_TableList: string;
+begin
+  // All user tables. Exclude SQLite's internal tables (name prefixed 'sqlite_', e.g. sqlite_sequence).
+  Result := 'SELECT name FROM sqlite_master WHERE type = ''table'' AND name NOT LIKE ''sqlite_%''';
 end;
 
 /// <remarks>

@@ -58,6 +58,7 @@ type
     FFieldScale: Integer;
     FFieldSubtype: String;
     FFieldType: TioMetadataFieldType;
+    FFieldTypeRaw: String;  // Raw type string as reported by the DB catalog (e.g. 'VARCHAR', 'INTEGER') - the (1) comparison basis
     FFieldUnicode: Boolean;
     FPrimaryKey: Boolean;
   protected
@@ -74,10 +75,15 @@ type
     function GetPrimaryKey: Boolean; override;
     function GetSqlFieldName: String; override;
   public
-    constructor Create(const AConnectionDefName, AFieldName: String; const AFieldType: TioMetadataFieldType;
+    constructor Create(const AConnectionDefName, AFieldName, AFieldTypeRaw: String; const AFieldType: TioMetadataFieldType;
       const AFieldLength, AFieldPrecision, AFieldScale: Integer; const AFieldNotNull: Boolean;
       const AFieldDefault: TValue; const AFieldSubtype, AFieldCustomType: String;
       const AFieldUnicode, APrimaryKey: Boolean);
+
+    // Raw type string as read from the DB catalog. With reconciliation approach (1) this is the primary
+    // basis for the per-dialect field-type comparison (the Mapped side renders its type to a dialect
+    // string and compares against this), so it is exposed even though it has no Mapped-side counterpart.
+    property FieldTypeRaw: String read FFieldTypeRaw;
   end;
 
 implementation
@@ -87,7 +93,7 @@ uses
 
 { TioDBBuilderSchemaFieldPhysical }
 
-constructor TioDBBuilderSchemaFieldPhysical.Create(const AConnectionDefName, AFieldName: String;
+constructor TioDBBuilderSchemaFieldPhysical.Create(const AConnectionDefName, AFieldName, AFieldTypeRaw: String;
   const AFieldType: TioMetadataFieldType; const AFieldLength, AFieldPrecision, AFieldScale: Integer;
   const AFieldNotNull: Boolean; const AFieldDefault: TValue; const AFieldSubtype, AFieldCustomType: String;
   const AFieldUnicode, APrimaryKey: Boolean);
@@ -95,6 +101,7 @@ begin
   inherited Create;
   FConnectionDefName := AConnectionDefName;
   FFieldName := AFieldName;
+  FFieldTypeRaw := AFieldTypeRaw;
   FFieldType := AFieldType;
   FFieldLength := AFieldLength;
   FFieldPrecision := AFieldPrecision;

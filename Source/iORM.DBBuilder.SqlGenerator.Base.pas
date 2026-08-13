@@ -96,6 +96,7 @@ type
     function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string; virtual;
     function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string; virtual;
     function BuildSQL_TableExists(const ATableName: string): string; virtual;
+    function BuildSQL_TableList: string; virtual;
 
     // ==========================================================
     // FIELD RELATED METHODS
@@ -584,6 +585,11 @@ end;
 function TioDBBuilderSqlGenBase.BuildSQL_TableExists(const ATableName: string): string;
 begin
   RaiseNotImplemented('BuildSQL_TableExists');
+end;
+
+function TioDBBuilderSqlGenBase.BuildSQL_TableList: string;
+begin
+  RaiseNotImplemented('BuildSQL_TableList');
 end;
 
 function TioDBBuilderSqlGenBase.BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
