@@ -29,7 +29,11 @@ type
     function GetSqlCommaSepFieldList: String;
     function GetUnique: Boolean;
   public
-    constructor Create(const AIndexAttr: ioIndex; const AConnectionDefName: String);
+    constructor Create(const AIndexAttr: ioIndex; const AConnectionDefName: String); overload;
+    // Value-based constructor for the Physical branch: the Introspector passes the catalog values
+    // directly (there is no ioIndex attribute behind a catalog index).
+    constructor Create(const AName, ACommaSepFieldList: String; const AUnique: Boolean;
+      const AOrientation: TioIndexOrientation; const AConnectionDefName: String); overload;
     procedure AddChange(const AChange: TioDBBuilderIndexChange);
 
     property Changes: TioDBBuilderIndexChanges read GetChanges;
@@ -73,6 +77,23 @@ begin
   FCommaSepFieldList := AIndexAttr.CommaSepFieldList;
   FUnique := AIndexAttr.Unique;
   FOrientation := AIndexAttr.Orientation;
+end;
+
+constructor TioDBBuilderSchemaIndex.Create(const AName, ACommaSepFieldList: String; const AUnique: Boolean;
+  const AOrientation: TioIndexOrientation; const AConnectionDefName: String);
+begin
+  inherited Create;
+
+  if ACommaSepFieldList.IsEmpty then
+    raise EioDBBuilderException.Create(Self.ClassName, 'Create', 'Cannot create index: no fields list specified.');
+
+  FStatus := stClean;
+  FConnectionDefName := AConnectionDefName;
+  FHasExplicitName := True;  // a physical (catalog) index always has a concrete name
+  FName := AName;
+  FCommaSepFieldList := ACommaSepFieldList;
+  FUnique := AUnique;
+  FOrientation := AOrientation;
 end;
 
 function TioDBBuilderSchemaIndex.GetChanges: TioDBBuilderIndexChanges;
