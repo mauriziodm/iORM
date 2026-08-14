@@ -313,6 +313,9 @@
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Introspector.Base.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Introspector.SqLite.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Introspector.Firebird.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DBBuilder.PlanBuilder.Base.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DBBuilder.PlanBuilder.SqLite.pas"/>
+        <DCCReference Include="..\..\Source\iORM.DBBuilder.PlanBuilder.Firebird.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Base.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Field.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Table.pas"/>

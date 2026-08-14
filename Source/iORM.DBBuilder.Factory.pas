@@ -57,6 +57,7 @@ type
     class function NewEmptySchema(const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderSchema;
     class function NewIntrospector(const AContext: IioDBBuilderContext; const AStrategy: IioDBBuilderStrategy): IioDBBuilderIntrospector;
     class function NewPlan: IioDBBuilderPlan;
+    class function NewPlanBuilder(const AContext: IioDBBuilderContext): IioDBBuilderPlanBuilder;
     class function NewReconciliation(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode;
       const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderReconciliation;
     class function NewSchema(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode;
@@ -91,7 +92,9 @@ uses
   iORM.DBBuilder.Plan,
   iORM.DBBuilder.Reconciliation,
   iORM.DBBuilder.Introspector.SqLite,
-  iORM.DBBuilder.Introspector.Firebird
+  iORM.DBBuilder.Introspector.Firebird,
+  iORM.DBBuilder.PlanBuilder.SqLite,
+  iORM.DBBuilder.PlanBuilder.Firebird
 
   ;
 
@@ -134,6 +137,18 @@ end;
 class function TioDBBuilderFactory.NewPlan: IioDBBuilderPlan;
 begin
   Result := TioDBBuilderPlan.Create;
+end;
+
+class function TioDBBuilderFactory.NewPlanBuilder(const AContext: IioDBBuilderContext): IioDBBuilderPlanBuilder;
+begin
+  case TioConnectionManager.GetConnectionInfo(AContext.ConnectionDefName).ConnectionType of
+    ctFirebird:
+      Result := TioDBBuilderPlanBuilderFirebird.Create(AContext);
+    ctSQLite:
+      Result := TioDBBuilderPlanBuilderSqLite.Create(AContext);
+  else
+    raise EioDBBuilderException.Create(ClassName, 'NewPlanBuilder', 'Connection type not supported by the plan builder yet.');
+  end;
 end;
 
 class function TioDBBuilderFactory.NewReconciliation(const AConnectionDefName: String; const AIndexesMode,

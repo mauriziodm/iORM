@@ -48,12 +48,13 @@ type
 
   /// <summary>
   ///  The Plan operation vocabulary: the dialect-independent *intent* of a single schema change,
-  ///  produced by the (future) PlanBuilder from the Desired-vs-Actual diff and realized into SQL by
-  ///  each Strategy/SqlGenerator. Names mirror the existing ScriptWrite_/BuildSQL_ translator families
-  ///  (e.g. opCreateTable -> ScriptWrite_CreateTable). Destructive orphan drops (a DropTable/DropField)
-  ///  are intentionally out of the first cut.
+  ///  produced by the PlanBuilder from the Desired-vs-Actual diff and realized into SQL by each
+  ///  Strategy/SqlGenerator. Names mirror the existing ScriptWrite_/BuildSQL_ translator families
+  ///  (e.g. opCreateTable -> ScriptWrite_CreateTable). opDropTable is the one destructive op: it targets
+  ///  an orphan table (present in the DB but not in the ORM maps) and is always realized as a commented,
+  ///  non-executed statement plus a warning - iORM never silently drops a table.
   /// </summary>
-  TioDBBuilderPlanOpKind = (opCreateTable, opCreateField, opAlterField, opCreateIndex, opDropIndex,
+  TioDBBuilderPlanOpKind = (opCreateTable, opDropTable, opCreateField, opAlterField, opCreateIndex, opDropIndex,
     opCreateForeignKey, opDropForeignKey, opCreateSequence, opDropSequence);
   // irmDropAndRecreateAllTables (safe, default), irmDropAndRecreateModifiedTablesOnly (faster), irmIgnoreIndexes (disabled, fully manual)
 
@@ -370,6 +371,7 @@ type
     // Layout: grouped under domain banners, alphabetical within each group (project-wide convention).
     // TABLE
     function AddCreateTable(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
+    function AddDropTable(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
     // FIELD
     function AddAlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
       const ASchemaField_Changes: TioDBBuilderFieldChanges): IioDBBuilderPlanOperation;
@@ -808,6 +810,19 @@ type
   IioDBBuilderIntrospector = interface
     ['{2B7E9C64-1A3D-4E58-9F0B-6D2C5A8E4F13}']
     function Introspect: IioDBBuilderSchema;
+  end;
+
+  /// <summary>
+  ///  Diffs the MappedSchema (desired) against the PhysicalSchema (actual) and produces the Plan: the
+  ///  ordered list of operations that converge the database to the ORM maps. Sole writer of the nodes'
+  ///  Status (informational: stCreate/stDrop/stUpdate/stClean), but the Plan - not the Status - is what
+  ///  the Strategy consumes. Reads only the two in-memory schemas plus the SqlGenerator (for the dialect
+  ///  name computations), never the database, so it is testable without a live connection. Per-dialect
+  ///  (the field-modified and foreign-key-matching decisions differ by DBMS).
+  /// </summary>
+  IioDBBuilderPlanBuilder = interface
+    ['{7A1D3E52-9C4B-4F60-8A2D-5E6F1B3C9D74}']
+    function Build: IioDBBuilderPlan;
   end;
 
   IioDBBuilder = interface

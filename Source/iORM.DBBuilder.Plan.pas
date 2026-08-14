@@ -85,6 +85,7 @@ type
   protected
     // TABLE
     function AddCreateTable(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
+    function AddDropTable(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
     // FIELD
     function AddAlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
       const ASchemaField_Changes: TioDBBuilderFieldChanges): IioDBBuilderPlanOperation;
@@ -134,6 +135,7 @@ begin
   // Dialect-independent, human-readable summary built from iORM's standard metadata (no SqlGenerator).
   case FKind of
     opCreateTable:      Result := Format('Create table %s', [QuotedStr(FSchemaTable.Name)]);
+    opDropTable:        Result := Format('Drop orphan table %s', [QuotedStr(FSchemaTable.Name)]);
     opCreateField:      Result := Format('Add field %s to %s', [QuotedStr(FSchemaField.FieldName), QuotedStr(FSchemaTable.Name)]);
     opAlterField:       Result := Format('Alter field %s on %s', [QuotedStr(FSchemaField.FieldName), QuotedStr(FSchemaTable.Name)]);
     opCreateIndex:      Result := Format('Create index on %s (%s)', [QuotedStr(FSchemaTable.Name), FSchemaIndex.CommaSepFieldList]);
@@ -205,6 +207,11 @@ end;
 function TioDBBuilderPlan.AddCreateTable(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
 begin
   Result := AddOp(TioDBBuilderPlanOperation.Create(opCreateTable, ATable));
+end;
+
+function TioDBBuilderPlan.AddDropTable(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
+begin
+  Result := AddOp(TioDBBuilderPlanOperation.Create(opDropTable, ATable));
 end;
 
 function TioDBBuilderPlan.AddAlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
