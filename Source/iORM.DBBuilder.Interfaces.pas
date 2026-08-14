@@ -799,6 +799,17 @@ type
     procedure Analyze;
   end;
 
+  /// <summary>
+  ///  Reads the live database catalog and builds the Physical branch of the reconciliation: a schema
+  ///  whose table/field/index/foreign-key nodes mirror what actually exists in the database (never the
+  ///  ORM maps). It stamps no Status - that is the PlanBuilder's job (single-writer). If the database
+  ///  does not exist yet the returned schema is empty. Per-dialect (SQLite, Firebird).
+  /// </summary>
+  IioDBBuilderIntrospector = interface
+    ['{2B7E9C64-1A3D-4E58-9F0B-6D2C5A8E4F13}']
+    function Introspect: IioDBBuilderSchema;
+  end;
+
   IioDBBuilder = interface
     ['{6B1F3A0D-6C6E-4E1A-9F0C-2A6B7E0F9C2D}']
 

@@ -340,7 +340,8 @@ begin
   // For BOOLEAN (type 23, Firebird 3.0+): we map it to INTEGER for ORM compatibility.
   LSqlText := TioDBBuilderFactory.NewSqlText;
   LSqlText
-    .AddLine('SELECT rf.RDB$NULL_FLAG AS field_not_null,')
+    .AddLine('SELECT rf.RDB$FIELD_NAME AS field_name,')
+    .AddLine('  rf.RDB$NULL_FLAG AS field_not_null,')
     .AddLine('  f.RDB$CHARACTER_LENGTH AS field_length,')
     .AddLine('  f.RDB$FIELD_PRECISION AS field_precision,')
     .AddLine('  ABS(f.RDB$FIELD_SCALE) AS field_scale,')

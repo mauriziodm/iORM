@@ -54,6 +54,8 @@ type
     class function NewContext(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
     class function NewDBAnalyzer(const AContext: IioDBBuilderContext; const AStrategy: IioDBBuilderStrategy): IioDBBuilderDBAnalyzer;
     class function NewDBBuilder: IioDBBuilder;
+    class function NewEmptySchema(const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderSchema;
+    class function NewIntrospector(const AContext: IioDBBuilderContext; const AStrategy: IioDBBuilderStrategy): IioDBBuilderIntrospector;
     class function NewPlan: IioDBBuilderPlan;
     class function NewReconciliation(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode;
       const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderReconciliation;
@@ -87,7 +89,9 @@ uses
   iORM.DBBuilder.Strategy.MSSqlServer,
   iORM.DBBuilder.Schema.RDBMSInfo,
   iORM.DBBuilder.Plan,
-  iORM.DBBuilder.Reconciliation
+  iORM.DBBuilder.Reconciliation,
+  iORM.DBBuilder.Introspector.SqLite,
+  iORM.DBBuilder.Introspector.Firebird
 
   ;
 
@@ -106,6 +110,25 @@ end;
 class function TioDBBuilderFactory.NewDBBuilder: IioDBBuilder;
 begin
   Result := TioDBBuilder.Create;
+end;
+
+// A bare schema (no SchemaBuilder / no ORM build): used for the Physical branch, which the Introspector
+// fills with catalog-backed table nodes via AddTable.
+class function TioDBBuilderFactory.NewEmptySchema(const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderSchema;
+begin
+  Result := TioDBBuilderSchema.Create(AIndexesMode, AForeignKeysMode);
+end;
+
+class function TioDBBuilderFactory.NewIntrospector(const AContext: IioDBBuilderContext; const AStrategy: IioDBBuilderStrategy): IioDBBuilderIntrospector;
+begin
+  case TioConnectionManager.GetConnectionInfo(AContext.ConnectionDefName).ConnectionType of
+    ctFirebird:
+      Result := TioDBBuilderIntrospectorFirebird.Create(AContext, AStrategy);
+    ctSQLite:
+      Result := TioDBBuilderIntrospectorSqLite.Create(AContext, AStrategy);
+  else
+    raise EioDBBuilderException.Create(ClassName, 'NewIntrospector', 'Connection type not supported by the introspector yet.');
+  end;
 end;
 
 class function TioDBBuilderFactory.NewPlan: IioDBBuilderPlan;
