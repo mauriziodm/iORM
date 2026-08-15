@@ -98,9 +98,10 @@ var
   LQuery: IioQuery;
   LName: String;
 begin
-  // BuildSQL_FKList: table_name, constraint_name, on_update, on_delete. The dependent/reference columns
-  // are intentionally left blank: Firebird matches FKs by their deterministic constraint name (the hash
-  // encodes the structural properties), so the name plus the actions is all the comparison needs.
+  // BuildSQL_FKList: constraint_name, on_update, on_delete plus the structural columns dependent_field,
+  // reference_table, reference_field. Both the name AND the structural fields are populated so the
+  // PlanBuilder can match this FK generically (by dependent field + reference table, the same key SQLite
+  // uses) without a per-dialect matcher.
   LQuery := GetRawQuery(FContext.SqlGenerator.BuildSQL_FKList(ATableName));
   while not LQuery.Eof do
   begin
@@ -109,7 +110,9 @@ begin
       FContext.ConnectionDefName,
       LName,
       ATableName,
-      '', '', '',  // dependent field, reference table, reference field: see note above
+      LQuery.Fields.FieldByName('dependent_field').AsString.Trim,
+      LQuery.Fields.FieldByName('reference_table').AsString.Trim,
+      LQuery.Fields.FieldByName('reference_field').AsString.Trim,
       RawToFKAction(LQuery.Fields.FieldByName('on_delete').AsString),
       RawToFKAction(LQuery.Fields.FieldByName('on_update').AsString)));
     LQuery.Next;

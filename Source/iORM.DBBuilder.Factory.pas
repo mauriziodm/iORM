@@ -93,8 +93,7 @@ uses
   iORM.DBBuilder.Reconciliation,
   iORM.DBBuilder.Introspector.SqLite,
   iORM.DBBuilder.Introspector.Firebird,
-  iORM.DBBuilder.PlanBuilder.SqLite,
-  iORM.DBBuilder.PlanBuilder.Firebird
+  iORM.DBBuilder.PlanBuilder
 
   ;
 
@@ -141,14 +140,9 @@ end;
 
 class function TioDBBuilderFactory.NewPlanBuilder(const AContext: IioDBBuilderContext): IioDBBuilderPlanBuilder;
 begin
-  case TioConnectionManager.GetConnectionInfo(AContext.ConnectionDefName).ConnectionType of
-    ctFirebird:
-      Result := TioDBBuilderPlanBuilderFirebird.Create(AContext);
-    ctSQLite:
-      Result := TioDBBuilderPlanBuilderSqLite.Create(AContext);
-  else
-    raise EioDBBuilderException.Create(ClassName, 'NewPlanBuilder', 'Connection type not supported by the plan builder yet.');
-  end;
+  // Single, dialect-independent class: the dialect-specific work lives in the Introspector (catalog reads)
+  // and the SqlGenerator (type/index comparison, name computation), not here.
+  Result := TioDBBuilderPlanBuilder.Create(AContext);
 end;
 
 class function TioDBBuilderFactory.NewReconciliation(const AConnectionDefName: String; const AIndexesMode,

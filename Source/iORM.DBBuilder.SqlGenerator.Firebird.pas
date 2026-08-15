@@ -395,7 +395,12 @@ begin
   //   A. All FKs in database (ATableName = '', AFKName = '')
   //   B. All FKs for a table (ATableName specified, AFKName = '')
   //   C. Specific FK (ATableName specified, AFKName specified)
-  // Always returns: table_name, constraint_name, on_update, on_delete
+  // Always returns: table_name, constraint_name, on_update, on_delete, dependent_field, reference_table,
+  // reference_field. The structural columns (added for the reconciliation's generic FK matching) come from
+  // the FK index segment and the referenced unique constraint's index segment. LEFT JOINs preserve the FK
+  // row and keep the legacy callers (which read only the first four aliases) unaffected.
+  // Assumption: single-field foreign keys (iORM does not generate composite FKs), so exactly one segment
+  // row per FK - a composite FK would multiply rows here.
   LSqlText := TioDBBuilderFactory.NewSqlText;
 
   LSqlText.
@@ -403,9 +408,15 @@ begin
     AddLine('  rc.RDB$RELATION_NAME AS table_name, ').
     AddLine('  rc.RDB$CONSTRAINT_NAME AS constraint_name, ').
     AddLine('  refc.RDB$UPDATE_RULE AS on_update, ').
-    AddLine('  refc.RDB$DELETE_RULE AS on_delete ').
+    AddLine('  refc.RDB$DELETE_RULE AS on_delete, ').
+    AddLine('  seg.RDB$FIELD_NAME AS dependent_field, ').
+    AddLine('  rc_uq.RDB$RELATION_NAME AS reference_table, ').
+    AddLine('  seg_uq.RDB$FIELD_NAME AS reference_field ').
     AddLine('FROM RDB$RELATION_CONSTRAINTS rc ').
     AddLine('LEFT JOIN RDB$REF_CONSTRAINTS refc ON rc.RDB$CONSTRAINT_NAME = refc.RDB$CONSTRAINT_NAME ').
+    AddLine('LEFT JOIN RDB$INDEX_SEGMENTS seg ON seg.RDB$INDEX_NAME = rc.RDB$INDEX_NAME ').
+    AddLine('LEFT JOIN RDB$RELATION_CONSTRAINTS rc_uq ON rc_uq.RDB$CONSTRAINT_NAME = refc.RDB$CONST_NAME_UQ ').
+    AddLine('LEFT JOIN RDB$INDEX_SEGMENTS seg_uq ON seg_uq.RDB$INDEX_NAME = rc_uq.RDB$INDEX_NAME ').
     AddLine('WHERE rc.RDB$CONSTRAINT_TYPE = ''FOREIGN KEY'' ');
 
   // Add table filter if specified (scenarios B/C)

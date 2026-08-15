@@ -31,7 +31,7 @@
   *                                                                          *
   ****************************************************************************
 }
-unit iORM.DBBuilder.PlanBuilder.Base;
+unit iORM.DBBuilder.PlanBuilder;
 
 interface
 
@@ -41,15 +41,17 @@ uses
 type
 
   /// <summary>
-  ///  Base of the PlanBuilder: owns the dialect-independent structural diff (Mapped vs Physical) and the
-  ///  phase ordering (tables+fields -> indexes -> foreign keys -> orphan drops, mirroring the current
-  ///  GenerateScript_Body so that referenced tables always exist before their FKs). It is the sole writer
-  ///  of the nodes' Status, kept purely as information. This first cut (phase C3a) plans only the
-  ///  STRUCTURAL delta: create-from-scratch, create of missing fields/indexes/foreign keys, and orphan
-  ///  table drops. Detection of *modified* fields/indexes/foreign keys (Alter / drop+recreate) and strict
-  ///  mode land in C3b - matched objects are treated as clean here.
+  ///  Diffs MappedSchema against PhysicalSchema and produces the Plan. It is a SINGLE, dialect-independent
+  ///  class: every genuinely dialect-specific decision lives elsewhere - catalog reading in the
+  ///  Introspector, type/index comparison and name computation in the SqlGenerator - so this class only
+  ///  orchestrates. Phase order mirrors GenerateScript_Body (tables+fields -> indexes -> foreign keys ->
+  ///  orphan drops) so referenced tables always exist before their FKs. Sole writer of the nodes' Status
+  ///  (kept purely as information). This first cut (phase C3a/C3b-1) plans only the STRUCTURAL delta:
+  ///  create-from-scratch, create of missing fields/indexes/foreign keys, and orphan table drops.
+  ///  Detection of *modified* objects (Alter / drop+recreate) and strict mode land in C3b - matched
+  ///  objects are treated as clean here.
   /// </summary>
-  TioDBBuilderPlanBuilderBase = class(TInterfacedObject, IioDBBuilderPlanBuilder)
+  TioDBBuilderPlanBuilder = class(TInterfacedObject, IioDBBuilderPlanBuilder)
   protected
     FContext: IioDBBuilderContext;
     // Cross-branch lookups. Matching is case-insensitive (SameText): the two branches key their tables
@@ -59,15 +61,19 @@ type
     function FindTableByName(const ASchema: IioDBBuilderSchema; const AName: String): IioDBBuilderSchemaTable;
     function IndexExistsPhysically(const AMappedTable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex;
       const APhysicalTable: IioDBBuilderSchemaTable): Boolean;
-    // Per-dialect: locate the physical foreign key matching a mapped one (nil = absent). SQLite matches by
-    // dependent field + reference table (FKs are unnamed); Firebird by the deterministic constraint name.
-    function FindPhysicalFK(const AMappedTable: IioDBBuilderSchemaTable; const AMappedFK: IioDBBuilderSchemaFK;
-      const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaFK; virtual; abstract;
+    // Locate the physical foreign key matching a mapped one (nil = absent). Generic structural match by
+    // dependent field + reference table: both dialects now populate those (SQLite from PRAGMA, Firebird
+    // via the RDB$ joins added for Direction 2), so no per-dialect matcher is needed. This is behaviourally
+    // equivalent to Firebird's former by-name match (the deterministic hash name encodes the same
+    // structure) and it deliberately avoids reconstructing the FK name (which depends on the ORM class,
+    // absent on the Physical side - reconstructing it would reopen the F13 name-divergence bug class).
+    function FindPhysicalFK(const AMappedFK: IioDBBuilderSchemaFK;
+      const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaFK;
     // Diff phases (each iterates every mapped table so the resulting order is create-safe).
-    procedure Plan_TablesAndFields(const APlan: IioDBBuilderPlan; const AMapped, APhysical: IioDBBuilderSchema);
-    procedure Plan_Indexes(const APlan: IioDBBuilderPlan; const AMapped, APhysical: IioDBBuilderSchema);
-    procedure Plan_ForeignKeys(const APlan: IioDBBuilderPlan; const AMapped, APhysical: IioDBBuilderSchema);
-    procedure Plan_OrphanTables(const APlan: IioDBBuilderPlan; const AMapped, APhysical: IioDBBuilderSchema);
+    procedure Plan_TablesAndFields(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
+    procedure Plan_Indexes(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
+    procedure Plan_ForeignKeys(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
+    procedure Plan_OrphanTables(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
   public
     constructor Create(const AContext: IioDBBuilderContext);
     function Build: IioDBBuilderPlan;
@@ -78,37 +84,37 @@ implementation
 uses
   System.SysUtils;
 
-{ TioDBBuilderPlanBuilderBase }
+{ TioDBBuilderPlanBuilder }
 
-constructor TioDBBuilderPlanBuilderBase.Create(const AContext: IioDBBuilderContext);
+constructor TioDBBuilderPlanBuilder.Create(const AContext: IioDBBuilderContext);
 begin
   FContext := AContext;
 end;
 
-function TioDBBuilderPlanBuilderBase.Build: IioDBBuilderPlan;
+function TioDBBuilderPlanBuilder.Build: IioDBBuilderPlan;
 var
-  LMapped, LPhysical: IioDBBuilderSchema;
+  LMappedSchema, LPhysicalSchema: IioDBBuilderSchema;
   LPlan: IioDBBuilderPlan;
 begin
-  LMapped := FContext.Reconciliation.MappedSchema;
+  LMappedSchema := FContext.Reconciliation.MappedSchema;
   // May be nil when the Introspector has not run (e.g. a non-existent DB): treated as "nothing exists yet".
-  LPhysical := FContext.Reconciliation.PhysicalSchema;
+  LPhysicalSchema := FContext.Reconciliation.PhysicalSchema;
   LPlan := FContext.Reconciliation.Plan;
   LPlan.Clear;
 
   // Phase order mirrors GenerateScript_Body: tables/fields first, then indexes, then FKs (so every
   // referenced table already exists), then the orphan drops. Indexes/FKs honour their configured mode.
-  Plan_TablesAndFields(LPlan, LMapped, LPhysical);
-  if LMapped.IndexesMode >= ifmEnabled then
-    Plan_Indexes(LPlan, LMapped, LPhysical);
-  if LMapped.ForeignKeysMode >= ifmEnabled then
-    Plan_ForeignKeys(LPlan, LMapped, LPhysical);
-  Plan_OrphanTables(LPlan, LMapped, LPhysical);
+  Plan_TablesAndFields(LPlan, LMappedSchema, LPhysicalSchema);
+  if LMappedSchema.IndexesMode >= ifmEnabled then
+    Plan_Indexes(LPlan, LMappedSchema, LPhysicalSchema);
+  if LMappedSchema.ForeignKeysMode >= ifmEnabled then
+    Plan_ForeignKeys(LPlan, LMappedSchema, LPhysicalSchema);
+  Plan_OrphanTables(LPlan, LMappedSchema, LPhysicalSchema);
 
   Result := LPlan;
 end;
 
-function TioDBBuilderPlanBuilderBase.FieldExistsPhysically(const APhysicalTable: IioDBBuilderSchemaTable;
+function TioDBBuilderPlanBuilder.FieldExistsPhysically(const APhysicalTable: IioDBBuilderSchemaTable;
   const AFieldName: String): Boolean;
 var
   LField: IioDBBuilderSchemaField;
@@ -119,7 +125,19 @@ begin
       Exit(True);
 end;
 
-function TioDBBuilderPlanBuilderBase.FindTableByName(const ASchema: IioDBBuilderSchema;
+function TioDBBuilderPlanBuilder.FindPhysicalFK(const AMappedFK: IioDBBuilderSchemaFK;
+  const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaFK;
+var
+  LPhysicalFK: IioDBBuilderSchemaFK;
+begin
+  Result := nil;
+  for LPhysicalFK in APhysicalTable.ForeignKeys.Values do
+    if SameText(LPhysicalFK.DependentFieldName, AMappedFK.DependentFieldName) and
+       SameText(LPhysicalFK.ReferenceTableName, AMappedFK.ReferenceTableName) then
+      Exit(LPhysicalFK);
+end;
+
+function TioDBBuilderPlanBuilder.FindTableByName(const ASchema: IioDBBuilderSchema;
   const AName: String): IioDBBuilderSchemaTable;
 var
   LTable: IioDBBuilderSchemaTable;
@@ -132,7 +150,7 @@ begin
       Exit(LTable);
 end;
 
-function TioDBBuilderPlanBuilderBase.IndexExistsPhysically(const AMappedTable: IioDBBuilderSchemaTable;
+function TioDBBuilderPlanBuilder.IndexExistsPhysically(const AMappedTable: IioDBBuilderSchemaTable;
   const AIndex: IioDBBuilderSchemaIndex; const APhysicalTable: IioDBBuilderSchemaTable): Boolean;
 var
   LMappedIndexName: String;
@@ -147,15 +165,15 @@ begin
       Exit(True);
 end;
 
-procedure TioDBBuilderPlanBuilderBase.Plan_TablesAndFields(const APlan: IioDBBuilderPlan;
-  const AMapped, APhysical: IioDBBuilderSchema);
+procedure TioDBBuilderPlanBuilder.Plan_TablesAndFields(const APlan: IioDBBuilderPlan;
+  const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
 var
   LMappedTable, LPhysicalTable: IioDBBuilderSchemaTable;
   LField: IioDBBuilderSchemaField;
 begin
-  for LMappedTable in AMapped.Tables.Values do
+  for LMappedTable in AMappedSchema.Tables.Values do
   begin
-    LPhysicalTable := FindTableByName(APhysical, LMappedTable.Name);
+    LPhysicalTable := FindTableByName(APhysicalSchema, LMappedTable.Name);
     if LPhysicalTable = nil then
     begin
       // New table: the CreateTable translator emits the fields (and PK) inline, so no per-field ops here.
@@ -179,15 +197,15 @@ begin
   end;
 end;
 
-procedure TioDBBuilderPlanBuilderBase.Plan_Indexes(const APlan: IioDBBuilderPlan;
-  const AMapped, APhysical: IioDBBuilderSchema);
+procedure TioDBBuilderPlanBuilder.Plan_Indexes(const APlan: IioDBBuilderPlan;
+  const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
 var
   LMappedTable, LPhysicalTable: IioDBBuilderSchemaTable;
   LIndex: IioDBBuilderSchemaIndex;
 begin
-  for LMappedTable in AMapped.Tables.Values do
+  for LMappedTable in AMappedSchema.Tables.Values do
   begin
-    LPhysicalTable := FindTableByName(APhysical, LMappedTable.Name);
+    LPhysicalTable := FindTableByName(APhysicalSchema, LMappedTable.Name);
     for LIndex in LMappedTable.Indexes.Values do
       if (LPhysicalTable = nil) or not IndexExistsPhysically(LMappedTable, LIndex, LPhysicalTable) then
       begin
@@ -197,17 +215,17 @@ begin
   end;
 end;
 
-procedure TioDBBuilderPlanBuilderBase.Plan_ForeignKeys(const APlan: IioDBBuilderPlan;
-  const AMapped, APhysical: IioDBBuilderSchema);
+procedure TioDBBuilderPlanBuilder.Plan_ForeignKeys(const APlan: IioDBBuilderPlan;
+  const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
 var
   LMappedTable, LPhysicalTable: IioDBBuilderSchemaTable;
   LFK: IioDBBuilderSchemaFK;
 begin
-  for LMappedTable in AMapped.Tables.Values do
+  for LMappedTable in AMappedSchema.Tables.Values do
   begin
-    LPhysicalTable := FindTableByName(APhysical, LMappedTable.Name);
+    LPhysicalTable := FindTableByName(APhysicalSchema, LMappedTable.Name);
     for LFK in LMappedTable.ForeignKeys.Values do
-      if (LPhysicalTable = nil) or (FindPhysicalFK(LMappedTable, LFK, LPhysicalTable) = nil) then
+      if (LPhysicalTable = nil) or (FindPhysicalFK(LFK, LPhysicalTable) = nil) then
       begin
         LFK.Status := stCreate;
         APlan.AddCreateForeignKey(LMappedTable, LFK);
@@ -215,17 +233,17 @@ begin
   end;
 end;
 
-procedure TioDBBuilderPlanBuilderBase.Plan_OrphanTables(const APlan: IioDBBuilderPlan;
-  const AMapped, APhysical: IioDBBuilderSchema);
+procedure TioDBBuilderPlanBuilder.Plan_OrphanTables(const APlan: IioDBBuilderPlan;
+  const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
 var
   LPhysicalTable: IioDBBuilderSchemaTable;
 begin
-  if APhysical = nil then
+  if APhysicalSchema = nil then
     Exit;
   // A table present in the DB but absent from the ORM maps: mark it for drop. The translation (C4) renders
   // it as a commented-out, non-executed statement plus a warning - iORM never silently drops a table.
-  for LPhysicalTable in APhysical.Tables.Values do
-    if FindTableByName(AMapped, LPhysicalTable.Name) = nil then
+  for LPhysicalTable in APhysicalSchema.Tables.Values do
+    if FindTableByName(AMappedSchema, LPhysicalTable.Name) = nil then
     begin
       LPhysicalTable.Status := stDrop;
       APlan.AddDropTable(LPhysicalTable);
