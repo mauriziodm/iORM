@@ -570,6 +570,13 @@ type
     /// <returns>SQL query to fetch field metadata (type, length, precision, scale, default value, etc.)</returns>
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string;
     /// <summary>
+    /// Compares a mapped field (desired) against its physical counterpart (actual) and returns the set of
+    /// attributes that differ. Pure (no node mutation, no warnings - those are emitted at translation time
+    /// from the returned change-set). Per-dialect: the comparison policy differs by DBMS (e.g. SQLite
+    /// ignores length/precision because of type affinity). Empty set = the field is unchanged.
+    /// </summary>
+    function Compare_Field(const AMappedField, APhysicalField: IioDBBuilderSchemaField): TioDBBuilderFieldChanges;
+    /// <summary>
     /// Translates a schema field's default value to its SQL representation.
     /// </summary>
     /// <param name="AField">The field schema containing the default value</param>
@@ -633,6 +640,13 @@ type
     /// </param>
     /// <returns>SQL query to retrieve index list</returns>
     function BuildSQL_IndexList(const ATableName: string = ''): string;
+    /// <summary>
+    /// Compares a mapped index (desired) against its physical counterpart (actual) and returns the set of
+    /// attributes that differ (unique / orientation / field list). Generic across dialects: the physical
+    /// index has already been normalized into a node by the Introspector, so this is a plain node-vs-node
+    /// comparison. Empty set = the index is unchanged.
+    /// </summary>
+    function Compare_Index(const AMappedIndex, APhysicalIndex: IioDBBuilderSchemaIndex): TioDBBuilderIndexChanges;
     /// <summary>
     /// Generates the index name from table and index schema information.
     /// Handles both explicit names and auto-generated names with prefixes/suffixes.

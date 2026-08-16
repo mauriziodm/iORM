@@ -75,6 +75,7 @@ begin
       FContext.ConnectionDefName,
       LQuery.Fields.FieldByName('name').AsString,
       LFieldTypeRaw,
+      '',  // default (raw): SQLite does not reconcile the field default
       RawTypeToMetadataFieldType(LFieldTypeRaw),
       0, 0, 0,  // length/precision/scale: N/A for SQLite (type affinity)
       LQuery.Fields.FieldByName('notnull').AsInteger <> 0,

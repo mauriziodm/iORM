@@ -79,6 +79,7 @@ begin
       FContext.ConnectionDefName,
       LQuery.Fields.FieldByName('field_name').AsString.Trim,
       LFieldTypeRaw,
+      LQuery.Fields.FieldByName('field_default').AsString.Trim,  // raw default expression from the catalog
       RawTypeToMetadataFieldType(LFieldTypeRaw),
       LQuery.Fields.FieldByName('field_length').AsInteger,
       LQuery.Fields.FieldByName('field_precision').AsInteger,

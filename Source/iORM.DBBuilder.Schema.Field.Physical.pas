@@ -51,6 +51,7 @@ type
     FConnectionDefName: String;  // Required for SqlDataConverter to apply database-specific normalization
     FFieldCustomType: String;
     FFieldDefault: TValue;
+    FFieldDefaultRaw: String;  // Raw default expression as reported by the DB catalog - the (1) default-comparison basis
     FFieldLength: Integer;
     FFieldName: String;
     FFieldNotNull: Boolean;
@@ -75,14 +76,17 @@ type
     function GetPrimaryKey: Boolean; override;
     function GetSqlFieldName: String; override;
   public
-    constructor Create(const AConnectionDefName, AFieldName, AFieldTypeRaw: String; const AFieldType: TioMetadataFieldType;
-      const AFieldLength, AFieldPrecision, AFieldScale: Integer; const AFieldNotNull: Boolean;
-      const AFieldDefault: TValue; const AFieldSubtype, AFieldCustomType: String;
+    constructor Create(const AConnectionDefName, AFieldName, AFieldTypeRaw, AFieldDefaultRaw: String;
+      const AFieldType: TioMetadataFieldType; const AFieldLength, AFieldPrecision, AFieldScale: Integer;
+      const AFieldNotNull: Boolean; const AFieldDefault: TValue; const AFieldSubtype, AFieldCustomType: String;
       const AFieldUnicode, APrimaryKey: Boolean);
 
-    // Raw type string as read from the DB catalog. With reconciliation approach (1) this is the primary
-    // basis for the per-dialect field-type comparison (the Mapped side renders its type to a dialect
-    // string and compares against this), so it is exposed even though it has no Mapped-side counterpart.
+    // Raw type string / raw default expression as read from the DB catalog. With reconciliation approach (1)
+    // these are the basis for the per-dialect field type/default comparison (the Mapped side renders itself
+    // to a dialect string and compares against them), so they are exposed even though they have no
+    // Mapped-side counterpart. Compare_Field reaches them by casting to this concrete class (tactical: it
+    // disappears when the node model is unified - see the schema-node-model-revisit note).
+    property FieldDefaultRaw: String read FFieldDefaultRaw;
     property FieldTypeRaw: String read FFieldTypeRaw;
   end;
 
@@ -93,7 +97,7 @@ uses
 
 { TioDBBuilderSchemaFieldPhysical }
 
-constructor TioDBBuilderSchemaFieldPhysical.Create(const AConnectionDefName, AFieldName, AFieldTypeRaw: String;
+constructor TioDBBuilderSchemaFieldPhysical.Create(const AConnectionDefName, AFieldName, AFieldTypeRaw, AFieldDefaultRaw: String;
   const AFieldType: TioMetadataFieldType; const AFieldLength, AFieldPrecision, AFieldScale: Integer;
   const AFieldNotNull: Boolean; const AFieldDefault: TValue; const AFieldSubtype, AFieldCustomType: String;
   const AFieldUnicode, APrimaryKey: Boolean);
@@ -102,6 +106,7 @@ begin
   FConnectionDefName := AConnectionDefName;
   FFieldName := AFieldName;
   FFieldTypeRaw := AFieldTypeRaw;
+  FFieldDefaultRaw := AFieldDefaultRaw;
   FFieldType := AFieldType;
   FFieldLength := AFieldLength;
   FFieldPrecision := AFieldPrecision;

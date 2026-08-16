@@ -68,6 +68,7 @@ type
     function BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; override;
+    function Compare_Field(const AMappedField, APhysicalField: IioDBBuilderSchemaField): TioDBBuilderFieldChanges; override;
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; override;
 
     // ==========================================================
@@ -116,7 +117,8 @@ uses
   iORM.Exceptions,
   iORM.SqlTranslator,
   iORM.DB.SqLite.SqlDataConverter,
-  iORM.DBBuilder.Factory
+  iORM.DBBuilder.Factory,
+  iORM.DBBuilder.Schema.Field.Physical
 
   ;
 
@@ -264,6 +266,20 @@ function TioDBBuilderSqlGenSQLite.BuildSQL_TableList: string;
 begin
   // All user tables. Exclude SQLite's internal tables (name prefixed 'sqlite_', e.g. sqlite_sequence).
   Result := 'SELECT name FROM sqlite_master WHERE type = ''table'' AND name NOT LIKE ''sqlite_%''';
+end;
+
+function TioDBBuilderSqlGenSQLite.Compare_Field(const AMappedField, APhysicalField: IioDBBuilderSchemaField): TioDBBuilderFieldChanges;
+var
+  LPhysical: TioDBBuilderSchemaFieldPhysical;
+begin
+  // SQLite reconciles only the field type and the NOT NULL constraint: type affinity makes length/
+  // precision/scale irrelevant. The raw catalog type lives on the concrete physical node (cast).
+  Result := [];
+  LPhysical := APhysicalField as TioDBBuilderSchemaFieldPhysical;
+  if not SameText(LPhysical.FieldTypeRaw, Translate_SchemaField_To_FieldType(AMappedField, False)) then
+    Include(Result, fcType);
+  if APhysicalField.FieldNotNull <> AMappedField.FieldNotNull then
+    Include(Result, fcNotNull);
 end;
 
 /// <remarks>

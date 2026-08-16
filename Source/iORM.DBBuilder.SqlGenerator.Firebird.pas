@@ -73,6 +73,7 @@ type
     function BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; override;
+    function Compare_Field(const AMappedField, APhysicalField: IioDBBuilderSchemaField): TioDBBuilderFieldChanges; override;
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; override;
 
     // ==========================================================
@@ -140,6 +141,7 @@ uses
   iORM.DB.Firebird.SqlDataConverter,
   iORM.DB.Consts,
   iORM.DBBuilder.Factory,
+  iORM.DBBuilder.Schema.Field.Physical,
   System.Classes
 
   ;
@@ -509,6 +511,62 @@ begin
   // system relations (RDB$SYSTEM_FLAG = 0, mirrors BuildSQL_TableExists). The Introspector
   // must .Trim the returned name (Firebird right-pads CHAR identifier columns).
   Result := 'select RDB$RELATION_NAME from RDB$RELATIONS where (RDB$VIEW_BLR is null) and (RDB$SYSTEM_FLAG = 0)';
+end;
+
+function TioDBBuilderSqlGenFirebird.Compare_Field(const AMappedField, APhysicalField: IioDBBuilderSchemaField): TioDBBuilderFieldChanges;
+var
+  LPhysical: TioDBBuilderSchemaFieldPhysical;
+  LOldType, LNewType, LOldDefault, LNewDefault: String;
+begin
+  // Faithful port of Check_FieldModified, made pure: returns the change-set, no AddAltered, no warnings
+  // (those are emitted at translation time from this set). The raw catalog type/default live on the
+  // concrete physical node (cast); the other old values come from the physical node via the interface.
+  Result := [];
+  LPhysical := APhysicalField as TioDBBuilderSchemaFieldPhysical;
+  LOldType := LPhysical.FieldTypeRaw;
+  LNewType := Translate_SchemaField_To_FieldType(AMappedField, False);
+
+  // Type
+  if not SameText(LOldType, LNewType) then
+    Include(Result, fcType);
+
+  // Length (VARCHAR/CHAR only, new or old type)
+  if 'VARCHAR,CHAR'.Contains(LNewType) or 'VARCHAR,CHAR'.Contains(LOldType) then
+    if AMappedField.FieldLength <> APhysicalField.FieldLength then
+      if AMappedField.FieldLength > APhysicalField.FieldLength then
+        Include(Result, fcLengthIncreased)
+      else
+        Include(Result, fcLengthDecreased);
+
+  // Precision + scale (only when the existing column is DECIMAL/NUMERIC)
+  if (LOldType = 'DECIMAL') or (LOldType = 'NUMERIC') then
+  begin
+    if AMappedField.FieldPrecision <> APhysicalField.FieldPrecision then
+      if AMappedField.FieldPrecision > APhysicalField.FieldPrecision then
+        Include(Result, fcPrecisionIncreased)
+      else
+        Include(Result, fcPrecisionDecreased);
+    // A scale change is rendered as a full type change (mirrors Check_FieldDecimalsChanged -> fcType).
+    if AMappedField.FieldScale <> APhysicalField.FieldScale then
+      Include(Result, fcType);
+  end;
+
+  // Default (string-based; strip the leading 'DEFAULT ' the catalog keeps)
+  LOldDefault := LPhysical.FieldDefaultRaw;
+  if LOldDefault.ToUpper.StartsWith('DEFAULT ') then
+    LOldDefault := LOldDefault.Substring(8).Trim;
+  LNewDefault := Translate_SchemaField_To_DefaultValue(AMappedField);
+  if not SameText(LOldDefault, LNewDefault) then
+    Include(Result, fcDefault);
+
+  // NOT NULL
+  if APhysicalField.FieldNotNull <> AMappedField.FieldNotNull then
+    Include(Result, fcNotNull);
+
+  // BLOB sub-type (rendered as a type change)
+  if LNewType.StartsWith('BLOB') then
+    if not SameText(APhysicalField.FieldSubtype, IfThen(AMappedField.FieldSubtype.IsEmpty, '0', AMappedField.FieldSubtype)) then
+      Include(Result, fcType);
 end;
 
 function TioDBBuilderSqlGenFirebird.GetMaxSqlIdentifierLength: integer;

@@ -106,6 +106,7 @@ type
     function BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual;
     function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual;
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; virtual;
+    function Compare_Field(const AMappedField, APhysicalField: IioDBBuilderSchemaField): TioDBBuilderFieldChanges; virtual;
     function Translate_SchemaField_To_DefaultValue(const AField: IioDBBuilderSchemaField): string; virtual;
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; virtual;
 
@@ -120,6 +121,7 @@ type
     function BuildSQL_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual;
     function BuildSQL_IndexExistsByName(const AIndexName: string): string; virtual;
     function BuildSQL_IndexList(const ATableName: string = ''): string; virtual;
+    function Compare_Index(const AMappedIndex, APhysicalIndex: IioDBBuilderSchemaIndex): TioDBBuilderIndexChanges; virtual;
     /// <summary>
     /// Translates the index orientation to a suffix for auto-generated index names.
     /// </summary>
@@ -617,6 +619,12 @@ begin
   RaiseNotImplemented('BuildSQL_FieldList');
 end;
 
+function TioDBBuilderSqlGenBase.Compare_Field(const AMappedField, APhysicalField: IioDBBuilderSchemaField): TioDBBuilderFieldChanges;
+begin
+  // Dialect-specific comparison policy - each dialect overrides.
+  RaiseNotImplemented('Compare_Field');
+end;
+
 function TioDBBuilderSqlGenBase.Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String;
 begin
   RaiseNotImplemented('Translate_SchemaField_To_FieldType');
@@ -650,6 +658,20 @@ end;
 function TioDBBuilderSqlGenBase.BuildSQL_IndexList(const ATableName: string): string;
 begin
   RaiseNotImplemented('BuildSQL_IndexList');
+end;
+
+function TioDBBuilderSqlGenBase.Compare_Index(const AMappedIndex, APhysicalIndex: IioDBBuilderSchemaIndex): TioDBBuilderIndexChanges;
+begin
+  // Generic node-vs-node comparison: the Introspector already normalized the physical index into a node,
+  // so both dialects compare the same way. Field lists are compared case-insensitively and ignoring
+  // spaces, mirroring the current Check_IndexModified (both SQLite and Firebird also compare orientation).
+  Result := [];
+  if AMappedIndex.Unique <> APhysicalIndex.Unique then
+    Include(Result, icUnique);
+  if AMappedIndex.Orientation <> APhysicalIndex.Orientation then
+    Include(Result, icOrientation);
+  if AMappedIndex.CommaSepFieldList.ToUpper.Replace(' ', '') <> APhysicalIndex.CommaSepFieldList.ToUpper.Replace(' ', '') then
+    Include(Result, icFields);
 end;
 
 function TioDBBuilderSqlGenBase.BuildSQL_CreateFK(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): string;
