@@ -50,8 +50,9 @@ type
   TioDBBuilderPlanOperation = class(TInterfacedObject, IioDBBuilderPlanOperation)
   private
     FKind: TioDBBuilderPlanOpKind;
-    FSchemaField: IioDBBuilderSchemaField;
     FSchemaField_Changes: TioDBBuilderFieldChanges;
+    FSchemaField_Mapped: IioDBBuilderSchemaField;
+    FSchemaField_Physical: IioDBBuilderSchemaField;
     FSchemaForeignKey: IioDBBuilderSchemaFK;
     FSchemaIndex: IioDBBuilderSchemaIndex;
     FSchemaTable: IioDBBuilderSchemaTable;
@@ -59,8 +60,9 @@ type
   protected
     function GetDescription: String;
     function GetKind: TioDBBuilderPlanOpKind;
-    function GetSchemaField: IioDBBuilderSchemaField;
     function GetSchemaField_Changes: TioDBBuilderFieldChanges;
+    function GetSchemaField_Mapped: IioDBBuilderSchemaField;
+    function GetSchemaField_Physical: IioDBBuilderSchemaField;
     function GetSchemaForeignKey: IioDBBuilderSchemaFK;
     function GetSchemaIndex: IioDBBuilderSchemaIndex;
     function GetSchemaTable: IioDBBuilderSchemaTable;
@@ -69,7 +71,7 @@ type
     constructor Create(const AKind: TioDBBuilderPlanOpKind; const ATable: IioDBBuilderSchemaTable = nil;
       const AField: IioDBBuilderSchemaField = nil; const AIndex: IioDBBuilderSchemaIndex = nil;
       const AForeignKey: IioDBBuilderSchemaFK = nil; const ASchemaField_Changes: TioDBBuilderFieldChanges = [];
-      const ASequenceName: String = '');
+      const ASequenceName: String = ''; const AField_Physical: IioDBBuilderSchemaField = nil);
   end;
 
   /// <summary>
@@ -87,7 +89,7 @@ type
     function AddCreateTable(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
     function AddDropTable(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
     // FIELD
-    function AddAlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
+    function AddAlterField(const ATable: IioDBBuilderSchemaTable; const AMappedField, APhysicalField: IioDBBuilderSchemaField;
       const ASchemaField_Changes: TioDBBuilderFieldChanges): IioDBBuilderPlanOperation;
     function AddCreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): IioDBBuilderPlanOperation;
     // INDEX
@@ -118,12 +120,13 @@ uses
 
 constructor TioDBBuilderPlanOperation.Create(const AKind: TioDBBuilderPlanOpKind; const ATable: IioDBBuilderSchemaTable;
   const AField: IioDBBuilderSchemaField; const AIndex: IioDBBuilderSchemaIndex; const AForeignKey: IioDBBuilderSchemaFK;
-  const ASchemaField_Changes: TioDBBuilderFieldChanges; const ASequenceName: String);
+  const ASchemaField_Changes: TioDBBuilderFieldChanges; const ASequenceName: String; const AField_Physical: IioDBBuilderSchemaField);
 begin
   inherited Create;
   FKind := AKind;
   FSchemaTable := ATable;
-  FSchemaField := AField;
+  FSchemaField_Mapped := AField;
+  FSchemaField_Physical := AField_Physical;
   FSchemaIndex := AIndex;
   FSchemaForeignKey := AForeignKey;
   FSchemaField_Changes := ASchemaField_Changes;
@@ -136,8 +139,8 @@ begin
   case FKind of
     opCreateTable:      Result := Format('Create table %s', [QuotedStr(FSchemaTable.Name)]);
     opDropTable:        Result := Format('Drop orphan table %s', [QuotedStr(FSchemaTable.Name)]);
-    opCreateField:      Result := Format('Add field %s to %s', [QuotedStr(FSchemaField.FieldName), QuotedStr(FSchemaTable.Name)]);
-    opAlterField:       Result := Format('Alter field %s on %s', [QuotedStr(FSchemaField.FieldName), QuotedStr(FSchemaTable.Name)]);
+    opCreateField:      Result := Format('Add field %s to %s', [QuotedStr(FSchemaField_Mapped.FieldName), QuotedStr(FSchemaTable.Name)]);
+    opAlterField:       Result := Format('Alter field %s on %s', [QuotedStr(FSchemaField_Mapped.FieldName), QuotedStr(FSchemaTable.Name)]);
     opCreateIndex:      Result := Format('Create index on %s (%s)', [QuotedStr(FSchemaTable.Name), FSchemaIndex.CommaSepFieldList]);
     opDropIndex:        Result := Format('Drop index on %s (%s)', [QuotedStr(FSchemaTable.Name), FSchemaIndex.CommaSepFieldList]);
     opCreateForeignKey: Result := Format('Create foreign key on %s referencing %s', [QuotedStr(FSchemaTable.Name), QuotedStr(FSchemaForeignKey.ReferenceTableName)]);
@@ -154,14 +157,19 @@ begin
   Result := FKind;
 end;
 
-function TioDBBuilderPlanOperation.GetSchemaField: IioDBBuilderSchemaField;
-begin
-  Result := FSchemaField;
-end;
-
 function TioDBBuilderPlanOperation.GetSchemaField_Changes: TioDBBuilderFieldChanges;
 begin
   Result := FSchemaField_Changes;
+end;
+
+function TioDBBuilderPlanOperation.GetSchemaField_Mapped: IioDBBuilderSchemaField;
+begin
+  Result := FSchemaField_Mapped;
+end;
+
+function TioDBBuilderPlanOperation.GetSchemaField_Physical: IioDBBuilderSchemaField;
+begin
+  Result := FSchemaField_Physical;
 end;
 
 function TioDBBuilderPlanOperation.GetSchemaForeignKey: IioDBBuilderSchemaFK;
@@ -214,10 +222,10 @@ begin
   Result := AddOp(TioDBBuilderPlanOperation.Create(opDropTable, ATable));
 end;
 
-function TioDBBuilderPlan.AddAlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
+function TioDBBuilderPlan.AddAlterField(const ATable: IioDBBuilderSchemaTable; const AMappedField, APhysicalField: IioDBBuilderSchemaField;
   const ASchemaField_Changes: TioDBBuilderFieldChanges): IioDBBuilderPlanOperation;
 begin
-  Result := AddOp(TioDBBuilderPlanOperation.Create(opAlterField, ATable, AField, nil, nil, ASchemaField_Changes));
+  Result := AddOp(TioDBBuilderPlanOperation.Create(opAlterField, ATable, AMappedField, nil, nil, ASchemaField_Changes, '', APhysicalField));
 end;
 
 function TioDBBuilderPlan.AddCreateField(const ATable: IioDBBuilderSchemaTable;

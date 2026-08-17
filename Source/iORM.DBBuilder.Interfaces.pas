@@ -333,14 +333,17 @@ type
   ///  A single schema-change operation: a plain data record of *what* must change, carrying references
   ///  to the Schema node(s) it concerns and (for opAlterField) the set of altered attributes. It holds
   ///  no knowledge of *how* to render itself - that is the dialect's job. Built only through
-  ///  IioDBBuilderPlan's typed factories, so its slots are always coherent with its Kind.
+  ///  IioDBBuilderPlan's typed factories, so its slots are always coherent with its Kind. Which branch a
+  ///  slot holds depends on the Kind: "create" ops carry the Mapped element, "drop" ops the Physical one;
+  ///  only opAlterField carries both branches of the field (SchemaField_Mapped + SchemaField_Physical).
   /// </summary>
   IioDBBuilderPlanOperation = interface
     ['{6E2C9A17-3D4B-4F8A-9C1E-7B6F5A2D3C41}']
     function GetDescription: String;
     function GetKind: TioDBBuilderPlanOpKind;
-    function GetSchemaField: IioDBBuilderSchemaField;
     function GetSchemaField_Changes: TioDBBuilderFieldChanges;
+    function GetSchemaField_Mapped: IioDBBuilderSchemaField;
+    function GetSchemaField_Physical: IioDBBuilderSchemaField;
     function GetSchemaForeignKey: IioDBBuilderSchemaFK;
     function GetSchemaIndex: IioDBBuilderSchemaIndex;
     function GetSchemaTable: IioDBBuilderSchemaTable;
@@ -349,8 +352,11 @@ type
     /// <summary>Human-readable, dialect-independent summary of the operation (for logs/UI grids), e.g. "Add field 'AGE' to 'CLIENTI'".</summary>
     property Description: String read GetDescription;
     property Kind: TioDBBuilderPlanOpKind read GetKind;
-    property SchemaField: IioDBBuilderSchemaField read GetSchemaField;
     property SchemaField_Changes: TioDBBuilderFieldChanges read GetSchemaField_Changes;
+    property SchemaField_Mapped: IioDBBuilderSchemaField read GetSchemaField_Mapped;
+    /// <summary>The physical (old/actual) field, carried by opAlterField so translation (C4) can render the
+    /// old->new warnings; nil for every other op kind.</summary>
+    property SchemaField_Physical: IioDBBuilderSchemaField read GetSchemaField_Physical;
     property SchemaForeignKey: IioDBBuilderSchemaFK read GetSchemaForeignKey;
     property SchemaIndex: IioDBBuilderSchemaIndex read GetSchemaIndex;
     property SchemaTable: IioDBBuilderSchemaTable read GetSchemaTable;
@@ -373,7 +379,7 @@ type
     function AddCreateTable(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
     function AddDropTable(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
     // FIELD
-    function AddAlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
+    function AddAlterField(const ATable: IioDBBuilderSchemaTable; const AMappedField, APhysicalField: IioDBBuilderSchemaField;
       const ASchemaField_Changes: TioDBBuilderFieldChanges): IioDBBuilderPlanOperation;
     function AddCreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): IioDBBuilderPlanOperation;
     // INDEX
