@@ -130,10 +130,8 @@ var
 begin
   inherited;
 
-  // Add sequence only if the table uses Sequence for key generation
-  if ATable.UsesSequenceForKeyGeneration then
-    ScriptWrite_CreateTableSequence(ATable);
-
+  // Note: the sequence is a separate opCreateSequence in the Plan (emitted before this opCreateTable), so
+  // it is NOT created here anymore - that would double-create it.
   Context.Script.Body.AddEmpty;
   Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_BeginCreateTable(ATable));
   Context.Script.Body.IncIndent;
@@ -291,50 +289,27 @@ end;
 
 procedure TioDBBuilderStrategyWithAlterTable.GenerateScript_Body;
 var
-  LTable: IioDBBuilderSchemaTable;
+  LOp: IioDBBuilderPlanOperation;
 begin
-  // Check key generation strategy compatibility with RDBMS version.
-  // The diagnostic lives on the Context.SqlGenerator (DBMS-capability axis), not on the Strategy.
+  // Check key generation strategy compatibility with RDBMS version (diagnostic on the SqlGenerator).
   Context.SqlGenerator.CheckKeyGenerationCompatibility(Context.Reconciliation.MappedSchema, Context.Script);
 
-  // Strict mode (indexes): drop every index from the DB for each stUpdate table.
-  // This removes orphaned indexes (including manually-added ones) and ensures
-  // a clean slate before the schema-driven recreation.
-  // We call the Force* mechanic directly instead of routing through the
-  // mode-aware public Process_DropTableIndexes: the sync flow already knows by
-  // construction that the desired behavior here is the FromDB drop, so going
-  // through the dispatcher would be redundant indirection. The Force* naming
-  // makes the bypass intent explicit. Indexes and FKs are kept in two distinct
-  // blocks because they are independent concerns (separate mode parameter for
-  // each), and the separation keeps each path immediately readable.
-  if Context.Reconciliation.MappedSchema.IndexesMode = ifmEnabledStrict then
-  begin
-    Context.Script.Body.AddTitle('Dropping indexes (strict mode)');
-    for LTable in Context.Reconciliation.MappedSchema.Tables.Values do
-      if LTable.Status = stUpdate then
-        Force_DropTableIndexesFromDB(LTable);
-  end;
-
-  // Strict mode (foreign keys): same approach as the indexes block above,
-  // independent because ForeignKeysMode is a separate parameter.
-  if Context.Reconciliation.MappedSchema.ForeignKeysMode = ifmEnabledStrict then
-  begin
-    Context.Script.Body.AddTitle('Dropping foreign keys (strict mode)');
-    for LTable in Context.Reconciliation.MappedSchema.Tables.Values do
-      if LTable.Status = stUpdate then
-        Force_DropTableForeignKeysFromDB(LTable);
-  end;
-
-  // Create new tables or alter existing ones (fields and sequences only)
-  Process_Tables;
-
-  // Indexes: create/alter based on mode (skipped if disabled)
-  if Context.Reconciliation.MappedSchema.IndexesMode >= ifmEnabled then
-    Process_Indexes;
-
-  // Foreign keys are processed last so all referenced tables are already created.
-  if Context.Reconciliation.MappedSchema.ForeignKeysMode >= ifmEnabled then
-    Process_ForeignKeys;
+  // Plan-driven: the PlanBuilder already produced the operations in a create-safe order (strict drops ->
+  // tables+fields -> indexes -> foreign keys -> orphan drops) and already applied the index/FK modes, so
+  // this is a straight translate-each-op loop. The dialect lives in the ScriptWrite_/BuildSQL_ each op
+  // dispatches to. WithoutAlterTable dialects override this with the rebuild flow instead.
+  for LOp in Context.Reconciliation.Plan.Operations do
+    case LOp.Kind of
+      opCreateSequence:   ScriptWrite_CreateSequence(LOp.SequenceName);
+      opCreateTable:      ScriptWrite_CreateTable(LOp.SchemaTable);
+      opCreateField:      ScriptWrite_CreateField(LOp.SchemaTable, LOp.SchemaField_Mapped);
+      opAlterField:       ScriptWrite_AlterField(LOp.SchemaTable, LOp.SchemaField_Mapped, LOp.SchemaField_Physical, LOp.SchemaField_Changes);
+      opCreateIndex:      ScriptWrite_CreateIndex(LOp.SchemaTable, LOp.SchemaIndex);
+      opDropIndex:        ScriptWrite_DropIndex(LOp.SchemaTable, LOp.SchemaIndex);
+      opCreateForeignKey: ScriptWrite_CreateForeignKey(LOp.SchemaTable, LOp.SchemaForeignKey);
+      opDropForeignKey:   ScriptWrite_DropForeignKey(LOp.SchemaTable, LOp.SchemaForeignKey);
+      opDropTable:        ScriptWrite_DropTable(LOp.SchemaTable);
+    end;
 end;
 
 function TioDBBuilderStrategyWithAlterTable.Check_IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;

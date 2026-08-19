@@ -131,6 +131,9 @@ begin
     'existing database.');
   Warning_MultipleFKsOnSameField(LContext);
   LContext.Reconciliation.MappedSchema.ForceCreateStatus;
+  // Build the Plan of all-create operations (Physical schema left nil, so everything is "new") for the
+  // op-driven WithAlterTable generation. WithoutAlterTable ignores the Plan and works off the forced Status.
+  TioDBBuilderFactory.NewPlanBuilder(LContext).Build;
   LStrategy.GenerateScript;
   Result := LContext;
 end;
@@ -144,11 +147,20 @@ begin
   LContext := TioDBBuilderFactory.NewContext(AConnectionDefName, AIndexesMode, AForeignKeysMode);
   Warning_MultipleFKsOnSameField(LContext);
 
-  // Built once and shared: the DBAnalyzer's catalog Check_* queries and the eventual script
-  // generation both need the same dialect-specific Strategy for this Context.
+  // Built once and shared: the Introspector's Check_DatabaseExists and the eventual script generation
+  // both need the same dialect-specific Strategy for this Context.
   LStrategy := TioDBBuilderFactory.NewStrategy(LContext);
-  TioDBBuilderFactory.NewDBAnalyzer(LContext, LStrategy).Analyze;
-  // Status-driven: create or update, according to the status the DBAnalyzer just determined.
+
+  // Reconciliation: when the DB exists, introspect it into the Physical schema; when it does not, force a
+  // full create-from-scratch (Physical stays nil). Then build the Plan from the diff (which also stamps
+  // the nodes' Status, the coarse view WithoutAlterTable reads) - with a nil Physical everything is a
+  // create, so the fresh-DB case produces an all-create Plan.
+  if not LStrategy.Check_DatabaseExists then
+    LContext.Reconciliation.MappedSchema.ForceCreateStatus
+  else
+    LContext.Reconciliation.PhysicalSchema := TioDBBuilderFactory.NewIntrospector(LContext, LStrategy).Introspect;
+  TioDBBuilderFactory.NewPlanBuilder(LContext).Build;
+
   LStrategy.GenerateScript;
   Result := LContext;
 end;
