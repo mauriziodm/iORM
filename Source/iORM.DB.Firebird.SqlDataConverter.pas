@@ -48,8 +48,7 @@ type
   public
     class function TValueToSql(const AValue:TValue): String; override;
     class procedure SetQueryParamByContext(const AQuery:IioQuery; const AProp:IioProperty;const AContext:IioContext); override;
-    class function NormalizeSqlIdentifier(const AIdentifier: string;
-      const AIncludeDelimiters: Boolean = True): string; override;
+    class function NormalizeSqlIdentifier(const AIdentifier: string; const AIncludeDelimiters: Boolean = True): string; override;
   end;
 
 implementation
