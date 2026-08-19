@@ -308,8 +308,8 @@ type
     function FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
     /// <summary>
     ///  Forces the whole schema tree (schema, tables, fields, indexes and foreign keys) to stCreate,
-    ///  overriding whatever the entity-map-vs-DB comparison would have produced (mirrors what the
-    ///  DBAnalyzer does on a non-existent database). Used to force a coherent full "create from
+    ///  overriding whatever the entity-map-vs-DB comparison would have produced (the create-from-scratch
+    ///  path, as when the target database does not exist). Used to force a coherent full "create from
     ///  scratch" script regardless of the actual database state. Delegates to each table's own
     ///  ForceCreateStatus.
     /// </summary>
@@ -469,8 +469,8 @@ type
 
   /// <summary>
   ///  Collects everything a single DBBuilder operation needs and produces: the ConnectionDefName,
-  ///  SqlGenerator and Schema it was built with, and the Script it writes into. Strategy and
-  ///  DBAnalyzer read from a Context (constructor-injected, then unpacked into their own fields -
+  ///  SqlGenerator and Schema it was built with, and the Script it writes into. Strategy, Introspector
+  ///  and PlanBuilder read from a Context (constructor-injected, then unpacked into their own fields -
   ///  they do not hold a live Context reference); Context itself never references them back.
   ///  Status/HasWarnings/HasHints are flattened shortcuts to Schema.Status/Script.Warnings/
   ///  Script.Hints for the external caller, which only ever sees this object as an opaque handle.
@@ -543,8 +543,6 @@ type
     /// <param name="ATable">The table schema being created</param>
     /// <returns>Closing SQL fragment (e.g., ")")</returns>
     function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string;
-    /// <summary>Generates SQL to check if a table exists</summary>
-    function BuildSQL_TableExists(const ATableName: string): string;
     /// <summary>
     /// Generates SQL to list all user tables (system tables excluded).
     /// Used by the Introspector to enumerate the physical schema.
@@ -566,8 +564,6 @@ type
     function BuildSQL_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     /// <summary>Generates SQL fragment to define a field in CREATE TABLE context</summary>
     function BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
-    /// <summary>Generates SQL to check if a specific field exists in a table</summary>
-    function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
     /// <summary>
     /// Generates SQL to retrieve detailed field metadata from the database.
     /// </summary>
@@ -627,10 +623,6 @@ type
     /// <param name="AIndexName">The index name to get details for</param>
     /// <returns>SQL query to retrieve index details</returns>
     function BuildSQL_IndexDetails(const AIndexName: string): string;
-    /// <summary>Generates SQL to check if an index exists on a table</summary>
-    function BuildSQL_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
-    /// <summary>Generates SQL to check if an index exists by name</summary>
-    function BuildSQL_IndexExistsByName(const AIndexName: string): string;
     /// <summary>
     /// Returns SQL to retrieve the list of indexes with basic info (name, unique, orientation).
     /// CONTRACT: it must return ONLY the standalone indexes that iORM manages and that can be dropped
@@ -638,7 +630,7 @@ type
     /// cannot be dropped directly on most DBMS and are removed together with their constraint). Each
     /// dialect expresses the exclusion in its own catalog terms (SQLite: sql IS NOT NULL; Firebird:
     /// NOT EXISTS on RDB$RELATION_CONSTRAINTS; etc.). The drop/check callers
-    /// (Force_DropTableIndexesFromDB, Check_IndexModified, Check_TableHasIndexesInDB) rely on this.
+    /// (Force_DropTableIndexesFromDB, Check_TableHasIndexesInDB) and the Introspector rely on this.
     /// </summary>
     /// <param name="ATableName">
     /// Optional table name filter. If empty, returns all indexes from DB.
@@ -775,32 +767,15 @@ type
     // DATABASE RELATED METHODS
     // ----------------------------------------------------------
     function Check_DatabaseExists: Boolean;
-    procedure ScriptWrite_CreateDatabase;
 
     // ==========================================================
     // TABLE RELATED METHODS
     // ----------------------------------------------------------
-    function Check_TableExists(const ATable: IioDBBuilderSchemaTable): Boolean;
-    procedure ScriptWrite_AlterTable(const ATable: IioDBBuilderSchemaTable);
     procedure ScriptWrite_CreateTable(const ATable: IioDBBuilderSchemaTable);
-
-    // ==========================================================
-    // FIELD RELATED METHODS
-    // ----------------------------------------------------------
-    function Check_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
-    function Check_FieldModified(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): boolean;
-
-    // ==========================================================
-    // INDEX RELATED METHODS
-    // ----------------------------------------------------------
-    function Check_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
-    function Check_IndexModified(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): boolean;
 
     // ==========================================================
     // FOREIGN KEY RELATED METHODS
     // ----------------------------------------------------------
-    function Check_ForeignKeyExists(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
-    function Check_ForeignKeyModified(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): boolean;
     procedure ScriptWrite_CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable);
 
     // ==========================================================
@@ -814,11 +789,6 @@ type
     ///  without AForce = True) is the DBBuilder's job, done on Context before this is called.
     /// </summary>
     procedure GenerateScript;
-  end;
-
-  IioDBBuilderDBAnalyzer = interface
-    ['{8F82C20B-5D51-42FE-80D2-96F818F3B555}']
-    procedure Analyze;
   end;
 
   /// <summary>

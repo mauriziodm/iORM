@@ -95,7 +95,6 @@ type
     // ----------------------------------------------------------
     function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string; virtual;
     function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string; virtual;
-    function BuildSQL_TableExists(const ATableName: string): string; virtual;
     function BuildSQL_TableList: string; virtual;
 
     // ==========================================================
@@ -104,7 +103,6 @@ type
     function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual;
     function BuildSQL_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual;
     function BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual;
-    function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; virtual;
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; virtual;
     function Compare_Field(const AMappedField, APhysicalField: IioDBBuilderSchemaField): TioDBBuilderFieldChanges; virtual;
     function Translate_SchemaField_To_DefaultValue(const AField: IioDBBuilderSchemaField): string; virtual;
@@ -118,8 +116,6 @@ type
     function BuildSQL_DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual;
     function BuildSQL_DropIndexByName(const AIndexName: string): string; virtual;
     function BuildSQL_IndexDetails(const AIndexName: string): string; virtual;
-    function BuildSQL_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; virtual;
-    function BuildSQL_IndexExistsByName(const AIndexName: string): string; virtual;
     function BuildSQL_IndexList(const ATableName: string = ''): string; virtual;
     function Compare_Index(const AMappedIndex, APhysicalIndex: IioDBBuilderSchemaIndex): TioDBBuilderIndexChanges; virtual;
     /// <summary>
@@ -382,12 +378,6 @@ begin
   Result := LFKName.ToUpper;
 end;
 
-function TioDBBuilderSqlGenBase.BuildSQL_IndexExists(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string;
-begin
-  // Generates SQL to check if an index exists (delegates to BuildSQL_IndexExistsByName after translating schema index to index name)
-  Result := BuildSQL_IndexExistsByName(Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex));
-end;
-
 function TioDBBuilderSqlGenBase.Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String;
 var
   LField, LOrientation, LComma: String;
@@ -584,11 +574,6 @@ begin
   RaiseNotImplemented('BuildSQL_EndCreateTable');
 end;
 
-function TioDBBuilderSqlGenBase.BuildSQL_TableExists(const ATableName: string): string;
-begin
-  RaiseNotImplemented('BuildSQL_TableExists');
-end;
-
 function TioDBBuilderSqlGenBase.BuildSQL_TableList: string;
 begin
   RaiseNotImplemented('BuildSQL_TableList');
@@ -607,11 +592,6 @@ end;
 function TioDBBuilderSqlGenBase.BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
 begin
   RaiseNotImplemented('BuildSQL_FieldDefinition');
-end;
-
-function TioDBBuilderSqlGenBase.BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
-begin
-  RaiseNotImplemented('BuildSQL_FieldExists');
 end;
 
 function TioDBBuilderSqlGenBase.BuildSQL_FieldList(const ATableName: string; const AFieldName: string): string;
@@ -650,11 +630,6 @@ begin
   RaiseNotImplemented('BuildSQL_IndexDetails');
 end;
 
-function TioDBBuilderSqlGenBase.BuildSQL_IndexExistsByName(const AIndexName: string): string;
-begin
-  RaiseNotImplemented('BuildSQL_IndexExistsByName');
-end;
-
 function TioDBBuilderSqlGenBase.BuildSQL_IndexList(const ATableName: string): string;
 begin
   RaiseNotImplemented('BuildSQL_IndexList');
@@ -664,7 +639,7 @@ function TioDBBuilderSqlGenBase.Compare_Index(const AMappedIndex, APhysicalIndex
 begin
   // Generic node-vs-node comparison: the Introspector already normalized the physical index into a node,
   // so both dialects compare the same way. Field lists are compared case-insensitively and ignoring
-  // spaces, mirroring the current Check_IndexModified (both SQLite and Firebird also compare orientation).
+  // spaces, mirroring the former Check_IndexModified (both SQLite and Firebird also compare orientation).
   Result := [];
   if AMappedIndex.Unique <> APhysicalIndex.Unique then
     Include(Result, icUnique);

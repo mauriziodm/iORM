@@ -123,8 +123,8 @@ begin
   LStrategy := TioDBBuilderFactory.NewStrategy(LContext);
 
   // Self-contained: LContext.Reconciliation.MappedSchema is already fully populated from the class/entity maps (NewSchema
-  // -> BuildSchema, no DB access). Force the whole tree to stCreate, mirroring what the DBAnalyzer
-  // does on a non-existent DB, and flag the result so Context.Execute refuses to run it unless the
+  // -> BuildSchema, no DB access). Force the whole tree to stCreate (the create-from-scratch path, as
+  // when the target DB does not exist), and flag the result so Context.Execute refuses to run it unless the
   // caller explicitly passes AForce = True: it must NOT be executed against an existing database.
   LContext.Script.Warnings.AddLine('ATTENTION: This script was generated in FORCE-CREATE mode, the actual state ' +
     'of the target database was NOT analyzed and is ignored. Review it carefully before running it against an ' +

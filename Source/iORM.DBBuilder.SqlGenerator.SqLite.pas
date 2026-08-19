@@ -59,14 +59,12 @@ type
     // ----------------------------------------------------------
     function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
-    function BuildSQL_TableExists(const ATableName: string): string; override;
     function BuildSQL_TableList: string; override;
 
     // ==========================================================
     // FIELD RELATED METHODS
     // ----------------------------------------------------------
     function BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
-    function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; override;
     function Compare_Field(const AMappedField, APhysicalField: IioDBBuilderSchemaField): TioDBBuilderFieldChanges; override;
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; override;
@@ -77,7 +75,6 @@ type
     function BuildSQL_CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): string; override;
     function BuildSQL_DropIndexByName(const AIndexName: string): string; override;
     function BuildSQL_IndexDetails(const AIndexName: string): string; override;
-    function BuildSQL_IndexExistsByName(const AIndexName: string): string; override;
     function BuildSQL_IndexList(const ATableName: string = ''): string; override;
 
     // ==========================================================
@@ -171,10 +168,10 @@ var
   LIndexName, LFieldList, LUnique: String;
 begin
   // Generates: CREATE [UNIQUE] INDEX IF NOT EXISTS <name> ON <table> (<fields>);
-  // Use the computed index name (the same source BuildSQL_IndexExists/BuildSQL_DropIndex use via
-  // Translate_SchemaTableAndIndex_To_IndexName) so CREATE, EXISTS and DROP always agree on the name.
+  // Use the computed index name (the same source BuildSQL_DropIndex uses via
+  // Translate_SchemaTableAndIndex_To_IndexName) so CREATE and DROP always agree on the name.
   // AIndex.SqlName must NOT be used here: for auto-named indexes (ioIndex without a name) it is empty,
-  // whereas the check/drop path uses the generated IDX_<table>_<fields> name.
+  // whereas the drop path uses the generated IDX_<table>_<fields> name.
   LIndexName := Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
   LUnique := Translate_SchemaIndex_To_Unique(AIndex);  // Returns ' UNIQUE' or '' (with leading space if present)
   LFieldList := Translate_SchemaIndex_To_CommaSepListOfFieldNames(AIndex);
@@ -188,14 +185,6 @@ begin
   Result := ');';
 end;
 
-function TioDBBuilderSqlGenSQLite.BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
-begin
-  // SQLite limitation: PRAGMA table_info returns ALL columns for a table - cannot filter by column name
-  // The AField parameter is accepted for interface consistency but IGNORED in the query
-  // Strategy layer must manually filter results to find the specific field by name
-  Result := Format('pragma table_info(''%s'')', [EscapeSQLStringLiteral(ATable.Name)]);
-end;
-
 function TioDBBuilderSqlGenSQLite.BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string;
 begin
   // Returns SQL to retrieve detailed field metadata from the database
@@ -206,12 +195,6 @@ begin
   // Note: AFieldName parameter is IGNORED because SQLite doesn't support field name filtering
   //       PRAGMA always returns ALL fields for the table, Strategy must filter manually
   Result := Format('PRAGMA table_info(''%s'')', [EscapeSQLStringLiteral(ATableName)]);
-end;
-
-function TioDBBuilderSqlGenSQLite.BuildSQL_IndexExistsByName(const AIndexName: string): string;
-begin
-  // Generates: SELECT query to check if an index exists by name
-  Result := Format('SELECT 1 FROM sqlite_master WHERE type = ''index'' AND name = ''%s''', [EscapeSQLStringLiteral(AIndexName)]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_IndexList(const ATableName: string): string;
@@ -255,11 +238,6 @@ function TioDBBuilderSqlGenSQLite.BuildSQL_DropIndexByName(const AIndexName: str
 begin
   // Generates: DROP INDEX IF EXISTS <index_name>;
   Result := Format('DROP INDEX IF EXISTS %s;', [AIndexName]);
-end;
-
-function TioDBBuilderSqlGenSQLite.BuildSQL_TableExists(const ATableName: string): string;
-begin
-  Result := Format('pragma table_info(''%s'')', [EscapeSQLStringLiteral(ATableName)]);
 end;
 
 function TioDBBuilderSqlGenSQLite.BuildSQL_TableList: string;

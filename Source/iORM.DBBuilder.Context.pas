@@ -93,7 +93,7 @@ end;
 
 procedure TioDBBuilderContext.Execute(const AForce: Boolean);
 begin
-  // Warnings signal a change the DBAnalyzer could not resolve safely on its own (e.g. an unsafe
+  // Warnings signal a change the reconciliation could not resolve safely on its own (e.g. an unsafe
   // type conversion) - block execution unless the caller explicitly overrides via AForce, since by
   // this point the script may already contain destructive DDL (ALTER/DROP) based on that change.
   if GetHasWarnings and not AForce then

@@ -181,7 +181,6 @@ contains
   iORM.DBBuilder.Strategy.WithoutAlterTable in '..\..\Source\iORM.DBBuilder.Strategy.WithoutAlterTable.pas',
   iORM.DBBuilder.Strategy.WithAlterTable in '..\..\Source\iORM.DBBuilder.Strategy.WithAlterTable.pas',
   iORM.DBBuilder.Context in '..\..\Source\iORM.DBBuilder.Context.pas',
-  iORM.DBBuilder.DBAnalyzer in '..\..\Source\iORM.DBBuilder.DBAnalyzer.pas',
   iORM.DBBuilder in '..\..\Source\iORM.DBBuilder.pas',
   iORM.DBBuilder.Schema.Field.ClassInfo in '..\..\Source\iORM.DBBuilder.Schema.Field.ClassInfo.pas',
   iORM.DBBuilder.Strategy.Base in '..\..\Source\iORM.DBBuilder.Strategy.Base.pas',

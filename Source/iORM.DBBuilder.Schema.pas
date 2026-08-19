@@ -147,7 +147,7 @@ begin
   Result := FIndexesMode;
 end;
 
-// Mirror of what the DBAnalyzer does on a non-existent database: forces the whole schema tree to
+// The create-from-scratch path (as when the target database does not exist): forces the whole schema tree to
 // stCreate so GenerateScript emits a coherent full "create from scratch" script regardless of the
 // actual database state. For documentation/baseline only. Delegates the per-table cascade (fields,
 // indexes, FKs) to each SchemaTable instead of reaching into its internal composition from here.

@@ -52,7 +52,6 @@ type
   TioDBBuilderFactory = class
   public
     class function NewContext(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
-    class function NewDBAnalyzer(const AContext: IioDBBuilderContext; const AStrategy: IioDBBuilderStrategy): IioDBBuilderDBAnalyzer;
     class function NewDBBuilder: IioDBBuilder;
     class function NewEmptySchema(const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderSchema;
     class function NewIntrospector(const AContext: IioDBBuilderContext; const AStrategy: IioDBBuilderStrategy): IioDBBuilderIntrospector;
@@ -83,7 +82,7 @@ uses
   iORM.DBBuilder.Schema, iORM.DBBuilder.Schema.Table, iORM.DBBuilder.Schema.Field, iORM.DBBuilder.Schema.FK,
   iORM.DBBuilder.Schema.Builder, iORM.DB.ConnectionContainer, iORM.DB.Interfaces, iORM.DBBuilder.SqlGenerator.Firebird,
   iORM.DBBuilder.SqlGenerator.SqLite, iORM.DBBuilder.Strategy.SqLite, iORM.DBBuilder.Strategy.Firebird,
-  iORM.Exceptions, iORM.DBBuilder, iORM.DBBuilder.Context, iORM.DBBuilder.DBAnalyzer, iORM.DBBuilder.Script,
+  iORM.Exceptions, iORM.DBBuilder, iORM.DBBuilder.Context, iORM.DBBuilder.Script,
   iORM.DBBuilder.Schema.Index,
   iORM.DBBuilder.SqlGenerator.MSSqlServer,
   iORM.DBBuilder.Schema.Field.ClassInfo,
@@ -102,11 +101,6 @@ uses
 class function TioDBBuilderFactory.NewContext(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
 begin
   Result := TioDBBuilderContext.Create(AConnectionDefName, AIndexesMode, AForeignKeysMode);
-end;
-
-class function TioDBBuilderFactory.NewDBAnalyzer(const AContext: IioDBBuilderContext; const AStrategy: IioDBBuilderStrategy): IioDBBuilderDBAnalyzer;
-begin
-  Result := TioDBBuilderDBAnalyzer.Create(AContext, AStrategy);
 end;
 
 class function TioDBBuilderFactory.NewDBBuilder: IioDBBuilder;

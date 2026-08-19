@@ -62,7 +62,6 @@ type
     // ----------------------------------------------------------
     function BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_EndCreateTable(const ATable: IioDBBuilderSchemaTable): string; override;
-    function BuildSQL_TableExists(const ATableName: string): string; override;
     function BuildSQL_TableList: string; override;
 
     // ==========================================================
@@ -71,7 +70,6 @@ type
     function BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldDefinition(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
-    function BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string; override;
     function BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string; override;
     function Compare_Field(const AMappedField, APhysicalField: IioDBBuilderSchemaField): TioDBBuilderFieldChanges; override;
     function Translate_SchemaField_To_FieldType(const AField: IioDBBuilderSchemaField; const AIncludeTypeAttributes: boolean): String; override;
@@ -83,7 +81,6 @@ type
     function BuildSQL_CreatePK(const ATable: IioDBBuilderSchemaTable): string; override;
     function BuildSQL_DropIndexByName(const AIndexName: string): string; override;
     function BuildSQL_IndexDetails(const AIndexName: string): string; override;
-    function BuildSQL_IndexExistsByName(const AIndexName: string): string; override;
     function BuildSQL_IndexList(const ATableName: string = ''): string; override;
     function Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String; override;
 
@@ -238,10 +235,10 @@ var
   LIndexName, LFieldList, LUnique, LOrientation: String;
 begin
   // Generates: CREATE [UNIQUE] [ASC|DESC] INDEX <name> ON <table> (<fields>);
-  // Use the computed index name (the same source BuildSQL_IndexExists/BuildSQL_DropIndex use via
-  // Translate_SchemaTableAndIndex_To_IndexName) so CREATE, EXISTS and DROP always agree on the name.
+  // Use the computed index name (the same source BuildSQL_DropIndex uses via
+  // Translate_SchemaTableAndIndex_To_IndexName) so CREATE and DROP always agree on the name.
   // AIndex.SqlName must NOT be used here: for auto-named indexes (ioIndex without a name) it is empty,
-  // whereas the check/drop path uses the generated IDX_<table>_<fields> name.
+  // whereas the drop path uses the generated IDX_<table>_<fields> name.
   LIndexName := Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex);
   LOrientation := Translate_SchemaIndex_To_Orientation(AIndex);  // Returns ' ASC' or ' DESC' (with leading space)
   LUnique := Translate_SchemaIndex_To_Unique(AIndex);  // Returns ' UNIQUE' or '' (with leading space if present)
@@ -308,22 +305,6 @@ end;
 function TioDBBuilderSqlGenFirebird.BuildSQL_BeginCreateTable(const ATable: IioDBBuilderSchemaTable): string;
 begin
   Result := Format('CREATE TABLE %s (', [ATable.SqlName]);
-end;
-
-function TioDBBuilderSqlGenFirebird.BuildSQL_FieldExists(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): string;
-var
-  LSqlText: IioDBBuilderSqlText;
-begin
-  LSqlText := TioDBBuilderFactory.NewSqlText;
-
-  LSqlText.
-    AddLine('SELECT 1').
-    AddLine('FROM RDB$RELATION_FIELDS').
-    AddLine(Format('WHERE UPPER(RDB$RELATION_NAME) = UPPER(''%s'')', [EscapeSQLStringLiteral(ATable.Name)])).
-    AddLine(Format('  AND UPPER(RDB$FIELD_NAME) = UPPER(''%s'')', [EscapeSQLStringLiteral(AField.FieldName)])).
-    Add('  AND RDB$SYSTEM_FLAG = 0');
-
-  Result := LSqlText.Text;
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_FieldList(const ATableName: string; const AFieldName: string = ''): string;
@@ -432,12 +413,6 @@ begin
   Result := LSqlText.Text;
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildSQL_IndexExistsByName(const AIndexName: string): string;
-begin
-  // Generates: SELECT query to check if an index exists by name
-  Result := Format('SELECT 1 FROM RDB$INDICES WHERE UPPER(RDB$INDEX_NAME) = UPPER(''%s'')', [EscapeSQLStringLiteral(AIndexName)]);
-end;
-
 function TioDBBuilderSqlGenFirebird.Translate_SchemaIndex_To_CommaSepListOfFieldNames(const AIndex: IioDBBuilderSchemaIndex): String;
 begin
   // Firebird does not support ASC/DESC orientation in field list
@@ -498,17 +473,10 @@ begin
   Result := Format('select count(*) from rdb$generators where (UPPER(rdb$generator_name) = UPPER(''%s'')) and (RDB$SYSTEM_FLAG = 0)', [EscapeSQLStringLiteral(LSequenceName)]);
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildSQL_TableExists(const ATableName: string): string;
-begin
-  // Carlo Marona (2024-10-15): Added condition to exclude system relations
-  Result := Format('select RDB$RELATION_NAME from RDB$RELATIONS where (UPPER(RDB$RELATION_NAME) = UPPER(''%s'')) and (RDB$SYSTEM_FLAG = 0)',
-    [EscapeSQLStringLiteral(ATableName)]);
-end;
-
 function TioDBBuilderSqlGenFirebird.BuildSQL_TableList: string;
 begin
   // All user tables: exclude views (RDB$VIEW_BLR is null keeps only real tables) and
-  // system relations (RDB$SYSTEM_FLAG = 0, mirrors BuildSQL_TableExists). The Introspector
+  // system relations (RDB$SYSTEM_FLAG = 0). The Introspector
   // must .Trim the returned name (Firebird right-pads CHAR identifier columns).
   Result := 'select RDB$RELATION_NAME from RDB$RELATIONS where (RDB$VIEW_BLR is null) and (RDB$SYSTEM_FLAG = 0)';
 end;

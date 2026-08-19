@@ -106,9 +106,9 @@ begin
   if not FStrategy.Check_DatabaseExists then
     Exit;
 
-  // Keep the physical connection alive across all the reads via a single transaction (same rationale as
-  // the DBAnalyzer). Snapshot the table names first, then read each table's structure: this avoids
-  // holding the table-list cursor open while the per-table reads open their own nested cursors.
+  // Keep the physical connection alive across all the reads via a single transaction. Snapshot the table
+  // names first, then read each table's structure: this avoids holding the table-list cursor open while
+  // the per-table reads open their own nested cursors.
   io.StartTransaction(FContext.ConnectionDefName);
   try
     LTableNames := TList<String>.Create;

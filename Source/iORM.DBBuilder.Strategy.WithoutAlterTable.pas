@@ -85,8 +85,7 @@ type
     // ==========================================================
     // TABLE RELATED METHODS
     // ----------------------------------------------------------
-    procedure Process_Tables; override;
-    procedure ScriptWrite_AlterTable(const ATable: IioDBBuilderSchemaTable); override;
+    procedure Process_Tables;
 
     // ==========================================================
     // MAIN GENERATION
@@ -114,24 +113,12 @@ type
 implementation
 
 uses
-  System.SysUtils,
-
-  iORM.Exceptions
+  System.SysUtils
 
   ;
 
 
 { TioDBBuilderStrategyWithoutAlterTable }
-
-procedure TioDBBuilderStrategyWithoutAlterTable.ScriptWrite_AlterTable(const ATable: IioDBBuilderSchemaTable);
-begin
-  // This method should NEVER be called for databases without ALTER TABLE support.
-  // Instead, Process_Tables override always calls ScriptWrite_CreateTable for both stCreate and stUpdate.
-  // If this exception is raised, it indicates a logic error in the Strategy layer.
-  raise EioDBBuilderException.Create(ClassName, 'ScriptWrite_AlterTable',
-    'This DBMS does not support ALTER TABLE. ' +
-    'Table modifications require the rename-create-copy pattern, which is handled by Process_Tables override.');
-end;
 
 procedure TioDBBuilderStrategyWithoutAlterTable.Process_Tables;
 var
