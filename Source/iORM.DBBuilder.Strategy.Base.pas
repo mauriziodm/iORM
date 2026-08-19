@@ -358,18 +358,26 @@ end;
 
 function TioDBBuilderStrategyBase.Check_TableHasIndexesInDB(const ATable: IioDBBuilderSchemaTable): Boolean;
 var
-  LQuery: IioQuery;
+  LPhysicalTable: IioDBBuilderSchemaTable;
 begin
-  LQuery := TioQueryEngine.GetRawQuery(Context.ConnectionDefName, Context.SqlGenerator.BuildSQL_IndexList(ATable.Name), True);
-  Result := not LQuery.Eof;
+  // "In the DB" is now read from the introspected PhysicalSchema (no live catalog query).
+  Result := False;
+  if Context.Reconciliation.PhysicalSchema = nil then
+    Exit;
+  LPhysicalTable := Context.Reconciliation.PhysicalSchema.FindTable(ATable.Name, False);
+  Result := (LPhysicalTable <> nil) and (LPhysicalTable.Indexes.Count > 0);
 end;
 
 function TioDBBuilderStrategyBase.Check_TableHasForeignKeysInDB(const ATable: IioDBBuilderSchemaTable): Boolean;
 var
-  LQuery: IioQuery;
+  LPhysicalTable: IioDBBuilderSchemaTable;
 begin
-  LQuery := TioQueryEngine.GetRawQuery(Context.ConnectionDefName, Context.SqlGenerator.BuildSQL_FKList(ATable.Name), True);
-  Result := not LQuery.Eof;
+  // "In the DB" is now read from the introspected PhysicalSchema (no live catalog query).
+  Result := False;
+  if Context.Reconciliation.PhysicalSchema = nil then
+    Exit;
+  LPhysicalTable := Context.Reconciliation.PhysicalSchema.FindTable(ATable.Name, False);
+  Result := (LPhysicalTable <> nil) and (LPhysicalTable.ForeignKeys.Count > 0);
 end;
 
 procedure TioDBBuilderStrategyBase.ScriptWrite_CreateTableSequence(const ATable: IioDBBuilderSchemaTable);
@@ -697,17 +705,18 @@ end;
 
 procedure TioDBBuilderStrategyBase.Force_DropTableIndexesFromDB(const ATable: IioDBBuilderSchemaTable);
 var
-  LQuery: IioQuery;
+  LPhysicalTable: IioDBBuilderSchemaTable;
+  LIndex: IioDBBuilderSchemaIndex;
 begin
-  // Bypass of IndexesMode: this method always operates. Queries the DB catalog
-  // for every index currently defined on this table, then drops them all by
-  // their actual DB name. Catches orphans (indexes whose [ioIndex] attribute
-  // was removed) and manually added indexes alike.
-  LQuery := TioQueryEngine.GetRawQuery(Context.ConnectionDefName, Context.SqlGenerator.BuildSQL_IndexList(ATable.Name), True);
-  while not LQuery.Eof do
+  // Bypass of IndexesMode: this method always operates. Drops every index the Introspector read on this
+  // table (orphans - whose [ioIndex] attribute was removed - and manually added ones alike) by its actual
+  // catalog name. Sourced from the introspected PhysicalSchema instead of a live catalog query.
+  if Context.Reconciliation.PhysicalSchema <> nil then
   begin
-    ScriptWrite_DropIndexByName(LQuery.Fields[0].AsString);
-    LQuery.Next;
+    LPhysicalTable := Context.Reconciliation.PhysicalSchema.FindTable(ATable.Name, False);
+    if LPhysicalTable <> nil then
+      for LIndex in LPhysicalTable.Indexes.Values do
+        ScriptWrite_DropIndexByName(LIndex.Name);
   end;
 
   // Force all schema indexes to stCreate so they get recreated by Process_Indexes.
