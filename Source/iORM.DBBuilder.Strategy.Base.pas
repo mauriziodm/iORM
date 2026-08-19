@@ -92,6 +92,7 @@ type
     procedure Process_Tables; virtual;
     procedure ScriptWrite_AlterTable(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure ScriptWrite_CreateTable(const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure ScriptWrite_DropTable(const ATable: IioDBBuilderSchemaTable); virtual;
 
     // ==========================================================
     // FIELD RELATED METHODS
@@ -102,6 +103,8 @@ type
     function Check_FieldNotNullChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldNotNull, ANewFieldNotNull: Boolean; const AIsPermitted: Boolean): Boolean; virtual;
     function Check_FieldTypeChanged(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String): Boolean; virtual;
     procedure Process_Fields(const ATable: IioDBBuilderSchemaTable); virtual;
+    procedure ScriptWrite_AlterField(const ATable: IioDBBuilderSchemaTable; const AMappedField, APhysicalField: IioDBBuilderSchemaField; const AChanges: TioDBBuilderFieldChanges); virtual;
+    procedure ScriptWrite_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField); virtual;
 
     // ==========================================================
     // INDEX RELATED METHODS
@@ -167,6 +170,7 @@ type
     // SEQUENCE RELATED METHODS
     // ----------------------------------------------------------
     function Check_SequenceExists(const ASequenceName: string): Boolean; virtual;
+    procedure ScriptWrite_CreateSequence(const ASequenceName: String); virtual;
     procedure ScriptWrite_CreateTableSequence(const ATable: IioDBBuilderSchemaTable); virtual;
 
     // ==========================================================
@@ -264,6 +268,13 @@ type
     /// </summary>
     procedure Warning_ChangeNotAllowed(const AValueName, AOldValue, ANewValue: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
     /// <summary>
+    /// Re-derives and emits all the alter-field warnings/hints (unsafe type conversion, potential
+    /// truncation on length/precision/scale, NOT NULL, blob sub-type) by comparing the physical (old) and
+    /// mapped (new) field. Called at translation time by ScriptWrite_AlterField: the collapsed change-set
+    /// cannot distinguish type/scale/blob, so the warnings are re-derived from the actual old/new values.
+    /// </summary>
+    procedure Warning_FieldAlterations(const ATable: IioDBBuilderSchemaTable; const AMappedField, APhysicalField: IioDBBuilderSchemaField);
+    /// <summary>
     /// Emits a warning stating that a field's NOT NULL setting changed but the
     /// change cannot be applied automatically by this RDBMS strategy. Called by
     /// Check_FieldNotNullChanged when the change is not permitted (AIsPermitted False).
@@ -330,7 +341,8 @@ uses
   iORM.Utilities,
   iORM.CommonTypes,
   iORM.DB.ConnectionContainer,
-  iORM.DB.QueryEngine
+  iORM.DB.QueryEngine,
+  iORM.DBBuilder.Schema.Field.Physical
 
   ;
 
@@ -375,6 +387,16 @@ begin
   // a sequence with the same name might already be present.
   if (Context.Reconciliation.MappedSchema.Status = stCreate) or not Check_SequenceExists(ATable.GetSequenceName) then
     Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_CreateSequence(ATable.GetSequenceName));
+end;
+
+// Plan-op translator (opCreateSequence): create a sequence by name. Same guard as
+// ScriptWrite_CreateTableSequence - on a create-from-scratch (schema stCreate) the sequence cannot
+// pre-exist AND the DB may not exist yet (skip the catalog query); on the incremental path guard against
+// an already-present sequence.
+procedure TioDBBuilderStrategyBase.ScriptWrite_CreateSequence(const ASequenceName: String);
+begin
+  if (Context.Reconciliation.MappedSchema.Status = stCreate) or not Check_SequenceExists(ASequenceName) then
+    Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_CreateSequence(ASequenceName));
 end;
 
 procedure TioDBBuilderStrategyBase.Process_ForeignKeys;
@@ -562,6 +584,28 @@ begin
   end;
 end;
 
+// Plan-op translator (opCreateField): add a single column to an existing table.
+procedure TioDBBuilderStrategyBase.ScriptWrite_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
+begin
+  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_CreateField(ATable, AField));
+end;
+
+// Plan-op translator (opAlterField): alter a single column and, at translation time, emit the old->new
+// warnings. The op carries the change-set, which drives the ALTER SQL; the warnings are re-derived from
+// the old (physical) / new (mapped) values (see Warning_FieldAlterations).
+procedure TioDBBuilderStrategyBase.ScriptWrite_AlterField(const ATable: IioDBBuilderSchemaTable;
+  const AMappedField, APhysicalField: IioDBBuilderSchemaField; const AChanges: TioDBBuilderFieldChanges);
+var
+  LChange: TioDBBuilderFieldChange;
+begin
+  // Stamp the change-set onto the mapped field so BuildSQL_AlterField (which reads the Is*Altered flags)
+  // emits the right ALTER statements.
+  for LChange in AChanges do
+    AMappedField.AddAltered(LChange);
+  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_AlterField(ATable, AMappedField));
+  Warning_FieldAlterations(ATable, AMappedField, APhysicalField);
+end;
+
 procedure TioDBBuilderStrategyBase.Process_Tables;
 var
   LTable: IioDBBuilderSchemaTable;
@@ -583,6 +627,18 @@ end;
 procedure TioDBBuilderStrategyBase.ScriptWrite_CreateTable(const ATable: IioDBBuilderSchemaTable);
 begin
   Context.Script.Body.AddTitle(Format('Creating table ''%s''', [ATable.Name]));
+end;
+
+// Plan-op translator (opDropTable): an orphan table (in the DB, not mapped) is NEVER dropped
+// automatically - the DROP is emitted as a comment (not executed) plus a warning, so the developer can
+// run it manually if that is really the intent.
+procedure TioDBBuilderStrategyBase.ScriptWrite_DropTable(const ATable: IioDBBuilderSchemaTable);
+begin
+  Context.Script.Body.AddEmpty;
+  Context.Script.Body.AddComment(Format('Orphan table ''%s'' (exists in the DB, not mapped) - drop it manually if intended:', [ATable.Name]));
+  Context.Script.Body.AddComment(Format('DROP TABLE %s;', [ATable.SqlName]));
+  Context.Script.Warnings.AddLine(Format('Table ''%s'' exists in the database but is not mapped by any entity: a DROP TABLE ' +
+    'statement was generated as a comment (NOT executed). Review and run it manually if you want to remove it.', [ATable.Name]));
 end;
 
 procedure TioDBBuilderStrategyBase.ScriptWrite_CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex);
@@ -678,6 +734,56 @@ begin
   if ContainsText(Context.SqlGenerator.GetInvalidFieldTypeConversions, LRequiredConversion) then
     Context.Script.Warnings.AddLine(Format('Table ''%s'' field ''%s'' --> Invalid conversion from ''%s'' to ''%s''',
       [ATable.Name, AField.FieldName, AOldFieldType, ANewFieldType]));
+end;
+
+procedure TioDBBuilderStrategyBase.Warning_FieldAlterations(const ATable: IioDBBuilderSchemaTable;
+  const AMappedField, APhysicalField: IioDBBuilderSchemaField);
+var
+  LPhysical: TioDBBuilderSchemaFieldPhysical;
+  LOldType, LNewType, LNewSubtype: String;
+begin
+  // Re-derives the alter warnings from the actual old/new values (the change-set collapses type/scale/blob
+  // into fcType, so it cannot drive them). Faithful port of the warning half of the former
+  // Check_FieldModified. The raw catalog type lives on the concrete physical node (cast).
+  LPhysical := APhysicalField as TioDBBuilderSchemaFieldPhysical;
+  LOldType := LPhysical.FieldTypeRaw;
+  LNewType := Context.SqlGenerator.Translate_SchemaField_To_FieldType(AMappedField, False);
+
+  // Type: unsafe (blacklisted) conversion. Self-filters (only warns when old->new is in the invalid list),
+  // so a scale/blob-only change - where old type = new type - produces no spurious warning.
+  if not SameText(LOldType, LNewType) then
+    Warning_UnsafeTypeConversion(ATable, AMappedField, LOldType, LNewType);
+
+  // Length (VARCHAR/CHAR): Warning_PotentialDataTruncation self-filters (warns only when new < old).
+  if 'VARCHAR,CHAR'.Contains(LNewType) or 'VARCHAR,CHAR'.Contains(LOldType) then
+    Warning_PotentialDataTruncation('field LENGTH', APhysicalField.FieldLength, AMappedField.FieldLength, AMappedField, ATable);
+
+  // Precision + scale (DECIMAL/NUMERIC): both self-filter.
+  if (LOldType = 'DECIMAL') or (LOldType = 'NUMERIC') then
+  begin
+    Warning_PotentialDataTruncation('field PRECISION', APhysicalField.FieldPrecision, AMappedField.FieldPrecision, AMappedField, ATable);
+    Warning_PotentialDataTruncation('field DECIMALS', APhysicalField.FieldScale, AMappedField.FieldScale, AMappedField, ATable);
+  end;
+
+  // NOT NULL: a Hint if it becomes NOT NULL without a default; a Warning if the DBMS cannot alter it.
+  if APhysicalField.FieldNotNull <> AMappedField.FieldNotNull then
+  begin
+    if Context.SqlGenerator.Supports_AlterNotNull then
+    begin
+      if AMappedField.FieldNotNull and not AMappedField.FieldDefaultExists then
+        Hint_NotNullPotentialDataImpact(ATable, AMappedField);
+    end
+    else
+      Warning_NotNullChangeNotAllowed(ATable, AMappedField);
+  end;
+
+  // BLOB sub-type: warn if it changed and the DBMS cannot alter it.
+  if LNewType.StartsWith('BLOB') and not Context.SqlGenerator.Supports_AlterBlobSubtype then
+  begin
+    LNewSubtype := IfThen(AMappedField.FieldSubtype.IsEmpty, '0', AMappedField.FieldSubtype);
+    if not SameText(APhysicalField.FieldSubtype, LNewSubtype) then
+      Warning_ChangeNotAllowed('blob sub-type', APhysicalField.FieldSubtype, LNewSubtype, AMappedField, ATable);
+  end;
 end;
 
 procedure TioDBBuilderStrategyBase.Warning_ChangeNotAllowed(const AValueName, AOldValue, ANewValue: String;
