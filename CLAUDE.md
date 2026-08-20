@@ -67,9 +67,9 @@ Build order: Runtime (RT) packages first, then Design-Time (DT) packages.
       Engine's job, done on `Context` before `GenerateScript` is called.
   - Boolean predicates and plain accessors are sanctioned exceptions (`Get*`, `Is*`, `Load*`, etc.).
   - **Layout**: methods are grouped under domain banners
-    (`DATABASE`/`TABLE`/`FIELD`/`INDEX`/`SEQUENCE`/`FOREIGN KEY`/…) and kept **alphabetical within
-    each group**, in the interfaces AND every class declaration section (derived classes use the
-    same full `// ===` banners). This governs declarations only — implementation order is free.
+    (`DATABASE`/`TABLE`/`FIELD`/`INDEX`/`SEQUENCE`/`FOREIGN KEY`/…), in the interfaces AND every
+    class declaration section (derived classes use the same full `// ===` banners). Ordering within
+    each group follows the general **Member ordering** convention below.
   - **Authoritative source**: the `{ Naming convention ... }` banner at the top of the `protected`
     section in `iORM.DBBuilder.SqlGenerator.Base.pas` and `iORM.DBBuilder.Strategy.Base.pas`. Keep
     those two banners and this note in sync when the convention evolves.
@@ -95,6 +95,18 @@ Build order: Runtime (RT) packages first, then Design-Time (DT) packages.
 - **Source code**: `Source/` directory (~200 .pas files)
 - **External dependencies**: `ExtLibs/djson/` (JSON serialization)
 - **Include files**: `Source/ioGlobalDef.inc`, `Source/ioFireDAC_uses.inc`
+
+**Member ordering.** Within any declaration section (interface or class — methods, fields, and
+properties alike), keep members in alphabetical order. When a section is further grouped — by domain
+banner as in the DBBuilder `SqlGenerator.*`/`Strategy.*` families (`DATABASE`/`TABLE`/`FIELD`/…), or
+simply by the Delphi visibility sections themselves (`private`/`protected`/`public`, as in the
+`Schema.*` family, which uses no domain banners) — alphabetical order applies **within each group**,
+not across the whole section: grouping and total ordering are mutually exclusive by definition, so
+the constraint always scopes to whichever grouping is present, down to "no grouping" meaning the
+whole section is one group. This is a general convention, not specific to any one family of classes,
+and governs declarations only — implementation order is free. Forward-looking: apply it when a
+declaration section is touched anyway (new members, or a section already being edited for another
+reason), not as a retroactive reordering sweep of the existing codebase.
 
 ## Interface & Class Conventions
 
@@ -134,6 +146,39 @@ purpose is to own that invariant, so it structurally cannot drift; no split need
 class's job is script-generation orchestration, Context is just an ingredient it needs, so any method
 added while focused on that real job risks touching the raw field by mistake; split it into a
 dedicated carrier class so that mistake becomes a compile error instead of a silent bug.
+
+**Method visibility.** The same criterion behind field visibility extends from properties to methods,
+including the methods a class implements to satisfy an interface: default to `private`, and widen
+only on demonstrated need. Method dispatch through an interface reference resolves via the
+interface's own VMT, independent of the Delphi-level visibility of the implementing method in the
+concrete class — so even a `private` method correctly satisfies and dispatches through the interface
+contract; there is no technical floor of `protected`. Widen a method to `protected` only when a
+descendant class genuinely calls or overrides it — observable need, not "might be useful to a
+subclass someday." Only constructors (and any public destructor) stay `public`; everything else
+starts `private` and escalates one step at a time only as real callers demand it. This is a
+forward-looking convention: apply it when a class is touched anyway (new code, or a class already
+being reworked for another reason), not as a retroactive sweep of the existing codebase.
+
+*Delphi gotcha: overriding across units.* Plain `private` is scoped to the *unit*, not the class. A
+descendant declared in the *same* unit can still reach a `private` ancestor member, but a descendant
+in *another* unit cannot even see it, let alone write `override` on it. If a method must be
+overridable by a descendant that lives in a different unit, it needs `protected`, not `private` —
+`private` only stays viable when the whole hierarchy that touches the member lives in one unit.
+
+*Testing.* Prefer testing every class exclusively through the interface it implements (`IioXxx`) —
+the same discipline production code follows. That covers the overwhelming majority of cases and
+means `private`/`protected` on internal methods never gets in a test's way. If some internal method
+is complex enough to deserve isolated, targeted testing outside the class's full public behavior,
+that is usually a sign it deserves to be its own small class with its own interface — extract it,
+and it becomes independently testable through that interface like everything else, no visibility
+exception required. Only when extraction genuinely is not practical, use the same interface
+segregation trick already applied elsewhere in the codebase (e.g.
+`TioDBBuilderStrategyContextSegregation`): declare a narrow, test-only interface exposing just the
+internal member(s) under test, have the class implement it alongside its main interface, and cast to
+it in the test (`(LObj as IioXxxTestSeam).InternalMethod`) — no class references, no subclassing.
+Declare that seam interface in a unit production code never imports (e.g. a test-support unit), never
+next to the main interface: if it sat there, nothing would stop production code from doing the same
+cast and quietly reaching into internals, defeating the whole point of this convention.
 
 **Delphi gotcha when the carrier class lives in the same unit as the class inheriting from it**
 (the common case, to avoid a whole extra file for one field): plain `private` in Delphi is scoped to
