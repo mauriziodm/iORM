@@ -18,7 +18,7 @@ const
 
 type
   TioDBBuilderSqlText = class(TInterfacedObject, IioDBBuilderSqlText)
-  private
+  strict private
     FAddLinePrefix: String;
     FIndentLevel: Integer;
     FLines: TStringList;
@@ -39,21 +39,17 @@ type
     procedure Clear;
     function DecIndent: IioDBBuilderSqlText;
     function IncIndent: IioDBBuilderSqlText;
-
-    property IsEmpty: Boolean read GetIsEmpty;
-    property Lines: TStringList read GetLines;
-    property Text: string read GetText;
   end;
 
   TioDBBuilderScript = class(TInterfacedObject, IioDBBuilderScript)
-  private
+  strict private
+    FBody: IioDBBuilderSqlText;
     FConnectionDefName: string;
+    FFooter: IioDBBuilderSqlText;
     FFullScript: TStringList;
-    FScriptBody: IioDBBuilderSqlText;
-    FScriptFooter: IioDBBuilderSqlText;
-    FScriptHeader: IioDBBuilderSqlText;
-    FScriptHints: IioDBBuilderSqlText;
-    FScriptWarnings: IioDBBuilderSqlText;
+    FHeader: IioDBBuilderSqlText;
+    FHints: IioDBBuilderSqlText;
+    FWarnings: IioDBBuilderSqlText;
 
     function GetBody: IioDBBuilderSqlText;
     function GetFooter: IioDBBuilderSqlText;
@@ -72,13 +68,6 @@ type
     procedure ScriptBegin(const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo); virtual;
     // This method works on footer section
     procedure ScriptEnd; virtual;
-
-    property Body: IioDBBuilderSqlText read GetBody;
-    property Footer: IioDBBuilderSqlText read GetFooter;
-    property Header: IioDBBuilderSqlText read GetHeader;
-    property Hints: IioDBBuilderSqlText read GetHints;
-    property Lines: TStringList read GetLines;
-    property Warnings: IioDBBuilderSqlText read GetWarnings;
   end;
 
 
@@ -210,11 +199,11 @@ end;
 
 procedure TioDBBuilderScript.Clear;
 begin
-  Header.Clear;
-  Warnings.Clear;
-  Hints.Clear;
-  Body.Clear;
-  Footer.Clear;
+  FHeader.Clear;
+  FWarnings.Clear;
+  FHints.Clear;
+  FBody.Clear;
+  FFooter.Clear;
 end;
 
 constructor TioDBBuilderScript.Create(const AConnectionDefName: string);
@@ -222,11 +211,11 @@ begin
   inherited Create;
   FConnectionDefName := AConnectionDefName;
   FFullScript := TStringList.Create;
-  FScriptHeader := TioDBBuilderFactory.NewSqlText;
-  FScriptWarnings := TioDBBuilderFactory.NewSqlText('WARNING: ');
-  FScriptHints := TioDBBuilderFactory.NewSqlText('Hint: ');
-  FScriptBody := TioDBBuilderFactory.NewSqlText;
-  FScriptFooter := TioDBBuilderFactory.NewSqlText;
+  FHeader := TioDBBuilderFactory.NewSqlText;
+  FWarnings := TioDBBuilderFactory.NewSqlText('WARNING: ');
+  FHints := TioDBBuilderFactory.NewSqlText('Hint: ');
+  FBody := TioDBBuilderFactory.NewSqlText;
+  FFooter := TioDBBuilderFactory.NewSqlText;
 end;
 
 destructor TioDBBuilderScript.Destroy;
@@ -238,27 +227,27 @@ end;
 
 function TioDBBuilderScript.GetFooter: IioDBBuilderSqlText;
 begin
-  Result := FScriptFooter;
+  Result := FFooter;
 end;
 
 function TioDBBuilderScript.GetHeader: IioDBBuilderSqlText;
 begin
-  Result := FScriptHeader;
+  Result := FHeader;
 end;
 
 function TioDBBuilderScript.GetBody: IioDBBuilderSqlText;
 begin
-  Result := FScriptBody;
+  Result := FBody;
 end;
 
 function TioDBBuilderScript.GetHints: IioDBBuilderSqlText;
 begin
-  Result := FScriptHints;
+  Result := FHints;
 end;
 
 function TioDBBuilderScript.GetWarnings: IioDBBuilderSqlText;
 begin
-  Result := FScriptWarnings;
+  Result := FWarnings;
 end;
 
 function TioDBBuilderScript.GetLines: TStringList;
@@ -266,10 +255,10 @@ var
   LLine: string;
 begin
   FFullScript.Clear;
-  FFullScript.AddStrings(FScriptHeader.Lines);
+  FFullScript.AddStrings(FHeader.Lines);
 
   // Add warnings section with title
-  if not FScriptWarnings.IsEmpty then
+  if not FWarnings.IsEmpty then
   begin
     FFullScript.Add('');
     FFullScript.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
@@ -280,13 +269,13 @@ begin
     // safely (re)executable, since the script runner strips lines starting with '--'
     // (see iORM.DB.Script.LoadScriptAndCleanFromComments). Warnings/Hints must NEVER
     // reach the DBMS as SQL text.
-    for LLine in FScriptWarnings.Lines do
+    for LLine in FWarnings.Lines do
       FFullScript.Add('-- ' + LLine);
     FFullScript.Add('');
   end;
 
   // Add hints section with title
-  if not FScriptHints.IsEmpty then
+  if not FHints.IsEmpty then
   begin
     FFullScript.Add('');
     FFullScript.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
@@ -294,38 +283,38 @@ begin
     FFullScript.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
     FFullScript.Add('');
     // Same as warnings above: hints are informational and must not be executed as SQL.
-    for LLine in FScriptHints.Lines do
+    for LLine in FHints.Lines do
       FFullScript.Add('-- ' + LLine);
     FFullScript.Add('');
   end;
 
-  FFullScript.AddStrings(FScriptBody.Lines);
-  FFullScript.AddStrings(FScriptFooter.Lines);
+  FFullScript.AddStrings(FBody.Lines);
+  FFullScript.AddStrings(FFooter.Lines);
 
   Result := FFullScript;
 end;
 
 procedure TioDBBuilderScript.SaveToFile(const AFileName: string);
 begin
-  Lines.SaveToFile(AFileName);
+  GetLines.SaveToFile(AFileName);
 end;
 
 procedure TioDBBuilderScript.ScriptBegin(const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo);
 begin
-  Header.AddSeparator;
-  Header.AddComment('Start of the script generated by iORM');
-  Header.AddSeparator;
-  Header.AddComment('Date - time....: ' + FormatDateTime('d mmm yyyy - hh:nn:ss', Now));
-  Header.AddComment('Connection name: ' + FConnectionDefName);
-  Header.AddComment('DBMS...........: ' + ARDBMSInfo.ToString);
-  Header.AddSeparator;
+  FHeader.AddSeparator;
+  FHeader.AddComment('Start of the script generated by iORM');
+  FHeader.AddSeparator;
+  FHeader.AddComment('Date - time....: ' + FormatDateTime('d mmm yyyy - hh:nn:ss', Now));
+  FHeader.AddComment('Connection name: ' + FConnectionDefName);
+  FHeader.AddComment('DBMS...........: ' + ARDBMSInfo.ToString);
+  FHeader.AddSeparator;
 end;
 
 procedure TioDBBuilderScript.ScriptEnd;
 begin
-  Footer.AddSeparator;
-  Footer.AddComment('End of the script generated by iORM');
-  Footer.AddSeparator;
+  FFooter.AddSeparator;
+  FFooter.AddComment('End of the script generated by iORM');
+  FFooter.AddSeparator;
 end;
 
 end.

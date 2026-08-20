@@ -50,6 +50,41 @@ uses
 type
 
   /// <summary>
+  ///  Segregates the generator-wide dependencies (ConnectionDefName, DataConverter, DBMSInfo):
+  ///  each field is private to this class alone, so none of TioDBBuilderSqlGenBase's own methods
+  ///  (and it has dozens, across four dialect files) can ever touch them directly, bypassing the
+  ///  properties - only this class's own Get* methods do. Same pattern as
+  ///  TioDBBuilderStrategyContextSegregation (see iORM.DBBuilder.Strategy.Base) and the "Field
+  ///  visibility" note in CLAUDE.md. LoadDBMSInfo is redeclared here (abstract) purely so
+  ///  GetDBMSInfo's lazy-load can call it via virtual dispatch; TioDBBuilderSqlGenBase still
+  ///  provides its concrete "exception-default" override, unchanged.
+  /// </summary>
+  TioDBBuilderSqlGenDependenciesSegregation = class(TInterfacedObject)
+  strict private
+    // strict private, not plain private: plain private in Delphi is unit-scoped, so any other class
+    // declared in this same unit would still see these fields directly - defeating the whole point
+    // of this class. strict private is scoped to this exact class.
+    FConnectionDefName: string;
+    FDataConverter: TioSqlDataConverterRef;
+    FDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
+
+    function GetConnectionDefName: string;
+    function GetDataConverter: TioSqlDataConverterRef;
+  strict protected
+    // GetDBMSInfo must be at least strict protected (not strict private): it implements
+    // IioDBBuilderSqlGenerator.GetDBMSInfo, and an interface method's implementation has to be
+    // visible to the descendant (TioDBBuilderSqlGenBase) that declares the interface.
+    function GetDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
+    function LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo; virtual; abstract;
+
+    property ConnectionDefName: string read GetConnectionDefName;
+    property DataConverter: TioSqlDataConverterRef read GetDataConverter;
+    property DBMSInfo: IioDBBuilderSchemaRDBMSInfo read GetDBMSInfo;
+  public
+    constructor Create(const AConnectionDefName: string);
+  end;
+
+  /// <summary>
   /// Base class for all DBMS-specific SQL generators.
   /// Uses the "exception-default" pattern: all virtual methods have a base implementation
   /// that raises an exception via RaiseNotImplemented. Derived classes override only the
@@ -60,11 +95,8 @@ type
   /// - Clear runtime errors: calling an unsupported operation produces an exception
   ///   that identifies both the DBMS (via ClassName) and the operation (via method name)
   /// </summary>
-  TioDBBuilderSqlGenBase = class(TInterfacedObject, IioDBBuilderSqlGenerator)
+  TioDBBuilderSqlGenBase = class(TioDBBuilderSqlGenDependenciesSegregation, IioDBBuilderSqlGenerator)
   private
-    FConnectionDefName: string;
-    FDataConverter: TioSqlDataConverterRef;
-    FDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
     procedure RaiseNotImplemented(const AMethodName: string);
   protected
     { Naming convention (group banners mirror IioDBBuilderSqlGenerator - single source of truth)
@@ -76,8 +108,9 @@ type
         Supports_*                       boolean DBMS capability flag
         Translate_<Source>_To_<Target>   maps a schema element to a SQL fragment / identifier
       Methods whose role fits none of the above use plain Delphi verb naming (Get* / Is* /
-      Ensure* / Load* / Shorten* / Escape*) - e.g. GetDBMSInfo / LoadDBMSInfo (interface
-      accessors) and the identifier/literal helpers in the last group.
+      Ensure* / Load* / Shorten* / Escape*) - e.g. LoadDBMSInfo (interface accessor; its
+      sibling GetDBMSInfo is inherited from TioDBBuilderSqlGenDependenciesSegregation, not
+      declared here) and the identifier/literal helpers in the last group.
       Interface membership is orthogonal to the prefix: a base-only helper may still carry a
       domain prefix when its role matches (the internal Translate_* index helpers, Hint_*), and
       an interface method may be prefix-free when it is a plain accessor.
@@ -172,13 +205,10 @@ type
     // DBMS INFO METHODS
     // ----------------------------------------------------------
     /// <summary>
-    /// Returns DBMS version info with lazy loading (loads on first access).
+    /// Loads DBMS info from database. Called internally by (inherited) GetDBMSInfo for lazy
+    /// loading. Overrides the abstract declaration on TioDBBuilderSqlGenDependenciesSegregation.
     /// </summary>
-    function GetDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
-    /// <summary>
-    /// Loads DBMS info from database. Called internally by GetDBMSInfo.
-    /// </summary>
-    function LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo; virtual;
+    function LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo; override;
 
     // ==========================================================
     // KEY GENERATION CAPABILITY METHODS
@@ -282,12 +312,7 @@ type
     // ==========================================================
     // PROPERTIES
     // ----------------------------------------------------------
-    property ConnectionDefName: string read FConnectionDefName;
-    property DataConverter: TioSqlDataConverterRef read FDataConverter;
-    property DBMSInfo: IioDBBuilderSchemaRDBMSInfo read GetDBMSInfo;
     property MaxSqlIdentifierLength: integer read GetMaxSqlIdentifierLength;
-  public
-    constructor Create(const AConnectionDefName: string); virtual;
   end;
 
 implementation
@@ -311,6 +336,33 @@ const
   // Prefixes for identifier names
   FK_PREFIX = 'FK_';
   IDX_PREFIX = 'IDX_';
+
+{ TioDBBuilderSqlGenDependenciesSegregation }
+
+constructor TioDBBuilderSqlGenDependenciesSegregation.Create(const AConnectionDefName: string);
+begin
+  inherited Create;
+  FConnectionDefName := AConnectionDefName;
+  FDataConverter := TioDbFactory.SqlDataConverter(AConnectionDefName);
+  FDBMSInfo := nil;
+end;
+
+function TioDBBuilderSqlGenDependenciesSegregation.GetConnectionDefName: string;
+begin
+  Result := FConnectionDefName;
+end;
+
+function TioDBBuilderSqlGenDependenciesSegregation.GetDataConverter: TioSqlDataConverterRef;
+begin
+  Result := FDataConverter;
+end;
+
+function TioDBBuilderSqlGenDependenciesSegregation.GetDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
+begin
+  if not Assigned(FDBMSInfo) then
+    FDBMSInfo := LoadDBMSInfo;
+  Result := FDBMSInfo;
+end;
 
 { TioDBBuilderSqlGenBase }
 
@@ -456,21 +508,6 @@ begin
     Exit('');
 end;
 
-
-constructor TioDBBuilderSqlGenBase.Create(const AConnectionDefName: string);
-begin
-  inherited Create;
-  FConnectionDefName := AConnectionDefName;
-  FDataConverter := TioDbFactory.SqlDataConverter(AConnectionDefName);
-  FDBMSInfo := nil;
-end;
-
-function TioDBBuilderSqlGenBase.GetDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
-begin
-  if not Assigned(FDBMSInfo) then
-    FDBMSInfo := LoadDBMSInfo;
-  Result := FDBMSInfo;
-end;
 
 function TioDBBuilderSqlGenBase.Translate_SchemaField_To_DefaultValue(const AField: IioDBBuilderSchemaField): string;
 begin
