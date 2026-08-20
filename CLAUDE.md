@@ -96,6 +96,31 @@ Build order: Runtime (RT) packages first, then Design-Time (DT) packages.
 - **External dependencies**: `ExtLibs/djson/` (JSON serialization)
 - **Include files**: `Source/ioGlobalDef.inc`, `Source/ioFireDAC_uses.inc`
 
+## Interface & Class Conventions
+
+**Interface/class property mirroring.** iORM's core pattern is interfaced objects: every `TioXxx`
+class implements an `IioXxx` interface, and outside its own constructor/Factory, code holds
+`IioXxx`-typed references exclusively — the concrete class name never appears as a
+variable/field/parameter type elsewhere. Given this discipline, **a class must not redeclare a
+`property` that only mirrors one already present on the interface it implements** — no legitimate
+caller can ever reach it (nobody holds a class-typed reference to invoke it on), so it is dead code
+by construction. The interface's own `GetX`/`SetX` methods must still be implemented (they satisfy
+the interface contract) — only the class-level `property` wrapper is what to omit. A property/field
+on the class *is* legitimate when it serves a need the interface does not cover — typically internal
+use by the class or (if `protected`) by its descendants.
+
+**Field visibility.** Declare fields `private` by default. If a field's value must be accessed by a
+descendant class, do **not** widen the field itself to `protected` — instead keep the field
+`private` and add a `protected` property (`property X: T read GetX write SetX;`) wrapping it, even
+when `GetX`/`SetX` do nothing but return/assign the field today. The criterion is observable, not
+speculative: does any code outside the declaring class (i.e. a descendant) touch this value? If yes,
+route it through a property, unconditionally — a bare `protected` field can always be bypassed by a
+descendant writing straight to it (skipping whatever invariant the property's setter is supposed to
+enforce, now or once one is added later), which silently defeats the point of centralizing that logic
+in one place. The raw field is touched in exactly one place: its own `GetX`/`SetX`. Everywhere else —
+including the declaring class's own other methods — access it through the property name, not the
+field, so there is never a per-call judgment call about whether to type the `F` prefix.
+
 ## Supported Databases
 
 | Database | Professional | Enterprise |

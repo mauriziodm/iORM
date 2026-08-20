@@ -77,31 +77,6 @@ type
     function GetIsFieldTypeAltered: Boolean;
   public
     procedure AddAltered(const AAltered: TioDBBuilderFieldChange);
-
-    property FieldCustomType: string read GetFieldCustomType;
-    property FieldDefault: TValue read GetFieldDefault;
-    property FieldDefaultExists: Boolean read GetFieldDefaultExists;
-    property FieldLength: integer read GetFieldLength;
-    property FieldName: String read GetFieldName;
-    property FieldNotNull: boolean read GetFieldNotNull;
-    property FieldPrecision: integer read GetFieldPrecision;
-    property FieldScale: integer read GetFieldScale;
-    property FieldSubtype: string read GetFieldSubtype;
-    property FieldType: TioMetadataFieldType read GetFieldType;
-    property FieldUnicode: boolean read GetFieldUnicode;
-    property IsAltered: Boolean read GetIsAltered;
-    property IsFieldDefaultAltered: Boolean read GetIsFieldDefaultAltered;
-    property IsFieldLengthAltered: Boolean read GetIsFieldLengthAltered;
-    property IsFieldLengthDecreased: Boolean read GetIsFieldLengthDecreased;
-    property IsFieldLengthIncreased: Boolean read GetIsFieldLengthIncreased;
-    property IsFieldNotNullAltered: Boolean read GetIsFieldNotNullAltered;
-    property IsFieldPrecisionAltered: Boolean read GetIsFieldPrecisionAltered;
-    property IsFieldPrecisionDecreased: Boolean read GetIsFieldPrecisionDecreased;
-    property IsFieldPrecisionIncreased: Boolean read GetIsFieldPrecisionIncreased;
-    property IsFieldTypeAltered: Boolean read GetIsFieldTypeAltered;
-    property PrimaryKey: boolean read GetPrimaryKey;
-    property SqlFieldName: String read GetSqlFieldName;
-    property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
   /// <summary>

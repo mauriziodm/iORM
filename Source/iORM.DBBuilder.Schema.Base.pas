@@ -46,15 +46,24 @@ type
   ///  across entities: Status only ever escalates (stClean -> stUpdate -> stCreate) and never
   ///  downgrades. This is load-bearing for tables in particular - a new table (stCreate) is set
   ///  Status := stUpdate once per changed member by the analyzer, and without the guard that would
-  ///  downgrade it to stUpdate and it would be ALTERed instead of CREATEd. The GetStatus/SetStatus
-  ///  are protected: they satisfy the Status member of each concrete IioDBBuilderSchema* interface
-  ///  by inheritance.
+  ///  downgrade it to stUpdate and it would be ALTERed instead of CREATEd. FStatus is private: the
+  ///  guard would be bypassable if a descendant could write the field directly, so even descendants
+  ///  go exclusively through the protected Status property. The GetStatus/SetStatus are protected:
+  ///  they also satisfy the Status member of each concrete IioDBBuilderSchema* interface by
+  ///  inheritance.
   /// </summary>
   TioDBBuilderSchemaBaseObject = class(TInterfacedObject)
-  protected
+  private
     FStatus: TioDBBuilderStatus;
+  protected
     function GetStatus: TioDBBuilderStatus;
     procedure SetStatus(const AValue: TioDBBuilderStatus);
+
+    // Protected, not public: this does NOT mirror any descendant's own public interface (it is
+    // declared once here, for the whole family, purely for internal/descendant convenience - see
+    // the "Interface & Class Conventions" note in CLAUDE.md). Descendants use it as Status := X /
+    // X := Status instead of calling GetStatus/SetStatus directly.
+    property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
 implementation

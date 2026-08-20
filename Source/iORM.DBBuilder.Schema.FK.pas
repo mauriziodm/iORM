@@ -62,19 +62,6 @@ type
   public
     constructor Create(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
-
-    property DependentFieldName: String read GetDependentFieldName;
-    property DependentTableName: String read GetDependentTableName;
-    property Name: String read GetName;
-    property OnDeleteAction: TioFKAction read GetOnDeleteAction;
-    property OnUpdateAction: TioFKAction read GetOnUpdateAction;
-    property ReferenceFieldName: String read GetReferenceFieldName;
-    property ReferenceTableName: String read GetReferenceTableName;
-    property SqlDependentFieldName: String read GetSqlDependentFieldName;
-    property SqlDependentTableName: String read GetSqlDependentTableName;
-    property SqlReferenceFieldName: String read GetSqlReferenceFieldName;
-    property SqlReferenceTableName: String read GetSqlReferenceTableName;
-    property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
 implementation
@@ -101,7 +88,7 @@ end;
 function TioDBBuilderSchemaFK.GetName: String;
 begin
   // Built from raw names (case normalized, no delimiters)
-  Result := Format('%s_%s_%s_%s', [DependentTableName, DependentFieldName, ReferenceTableName, ReferenceFieldName]);
+  Result := Format('%s_%s_%s_%s', [GetDependentTableName, GetDependentFieldName, GetReferenceTableName, GetReferenceFieldName]);
 end;
 
 function TioDBBuilderSchemaFK.GetReferenceFieldName: String;
@@ -155,7 +142,7 @@ end;
 constructor TioDBBuilderSchemaFK.Create(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
 begin
-  FStatus := stClean;
+  Status := stClean;
   FReferenceMap := AReferenceMap;
   FDependentMap := ADependentMap;
   FDependentProperty := ADependentProperty;

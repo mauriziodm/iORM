@@ -35,15 +35,6 @@ type
     constructor Create(const AName, ACommaSepFieldList: String; const AUnique: Boolean;
       const AOrientation: TioIndexOrientation; const AConnectionDefName: String); overload;
     procedure AddChange(const AChange: TioDBBuilderIndexChange);
-
-    property Changes: TioDBBuilderIndexChanges read GetChanges;
-    property CommaSepFieldList: String read GetCommaSepFieldList;
-    property HasExplicitName: boolean read GetHasExplicitName;
-    property Name: String read GetName;
-    property Orientation: TioIndexOrientation read GetOrientation;
-    property SqlCommaSepFieldList: String read GetSqlCommaSepFieldList;
-    property Status: TioDBBuilderStatus read GetStatus write SetStatus;
-    property Unique: Boolean read GetUnique;
   end;
 
 implementation
@@ -70,7 +61,7 @@ begin
   if AIndexAttr.CommaSepFieldList.IsEmpty then
     raise EioDBBuilderException.Create(Self.ClassName, 'Create', 'Cannot create index: no fields list specified.');
 
-  FStatus := stClean;
+  Status := stClean;
   FConnectionDefName := AConnectionDefName;
   FHasExplicitName := AIndexAttr.HasExplicitName;
   FName := AIndexAttr.Name;
@@ -87,7 +78,7 @@ begin
   if ACommaSepFieldList.IsEmpty then
     raise EioDBBuilderException.Create(Self.ClassName, 'Create', 'Cannot create index: no fields list specified.');
 
-  FStatus := stClean;
+  Status := stClean;
   FConnectionDefName := AConnectionDefName;
   FHasExplicitName := True;  // a physical (catalog) index always has a concrete name
   FName := AName;

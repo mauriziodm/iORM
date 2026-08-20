@@ -57,12 +57,6 @@ type
     function FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
     procedure ForceCreateStatus;
     procedure SequenceAddIfNotExists(const ASequenceName: String);
-
-    property ForeignKeysMode: TioDBBuilderIndexesAndFKMode read GetForeignKeysMode;
-    property IndexesMode: TioDBBuilderIndexesAndFKMode read GetIndexesMode;
-    property Sequences: TioDBBuilderSchemaSequences read GetSequences;
-    property Status: TioDBBuilderStatus read GetStatus write SetStatus;
-    property Tables: TioDBBuilderSchemaTables read GetTables;
   end;
 
 implementation
@@ -87,7 +81,7 @@ begin
   FSequences := TioDBBuilderSchemaSequences.Create;
   FIndexesMode := AIndexesMode;
   FForeignKeysMode := AForeignKeysMode;
-  FStatus := stClean;
+  Status := stClean;
   FTables := TioDBBuilderSchemaTables.Create;
 end;
 
@@ -155,7 +149,7 @@ procedure TioDBBuilderSchema.ForceCreateStatus;
 var
   LTable: IioDBBuilderSchemaTable;
 begin
-  FStatus := stCreate;
+  Status := stCreate;
   for LTable in FTables.Values do
     LTable.ForceCreateStatus;
 end;

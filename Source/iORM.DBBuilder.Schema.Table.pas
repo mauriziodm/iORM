@@ -78,19 +78,6 @@ type
     function IsKeyGenerationStrategyFallback: Boolean;
     function UsesIdentityForKeyGeneration: Boolean;
     function UsesSequenceForKeyGeneration: Boolean;
-
-    property ContextTable: IioTable read GetContextTable;
-    property Fields: TioDBBuilderSchemaFields read GetFields;
-    property ForeignKeys: TioDBBuilderSchemaForeignKeys read GetForeignKeys;
-    property Indexes: TioDBBuilderSchemaIndexes read GetIndexes;
-    property IsTrueClass: Boolean read GetIsTrueClass write SetIsTrueClass;
-    property KeyGenerationStrategy: TioKeyGenerationStrategyType read GetKeyGenerationStrategy;
-    property Name: string read GetName;
-    property PrimaryKeyField: IioDBBuilderSchemaField read GetPrimaryKeyField;
-    property RequestedKeyGenerationStrategy: TioKeyGenerationStrategyType read GetRequestedKeyGenerationStrategy;
-    property SequenceName: string read GetSequenceName;
-    property SqlName: string read GetSqlName;
-    property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   end;
 
 implementation
@@ -115,7 +102,7 @@ end;
 constructor TioDBBuilderSchemaTable.Create(const AContextTable: IioTable;
   const AKeyGenerationStrategy: TioKeyGenerationStrategyType);
 begin
-  FStatus := stClean;
+  Status := stClean;
   FContextTable := AContextTable;
   FIsTrueClass := AContextTable.IsTrueClass;
   FKeyGenerationStrategy := AKeyGenerationStrategy;
@@ -267,7 +254,7 @@ function TioDBBuilderSchemaTable.GetSequenceName: String;
 begin
   if not UsesSequenceForKeyGeneration then
     raise EioDBBuilderException.Create(ClassName, 'GetSequenceName',
-      Format('Table "%s" uses Identity for key generation, not Sequence.', [Name]));
+      Format('Table "%s" uses Identity for key generation, not Sequence.', [GetName]));
   Result := FContextTable.GetKeyGenerator;
 end;
 

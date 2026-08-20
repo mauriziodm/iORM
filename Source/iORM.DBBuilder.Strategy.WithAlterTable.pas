@@ -90,22 +90,22 @@ begin
 
   // Note: the sequence is a separate opCreateSequence in the Plan (emitted before this opCreateTable), so
   // it is NOT created here anymore - that would double-create it.
-  FContext.Script.Body.AddEmpty;
-  FContext.Script.Body.Add(FContext.SqlGenerator.BuildSQL_BeginCreateTable(ATable));
-  FContext.Script.Body.IncIndent;
+  Context.Script.Body.AddEmpty;
+  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_BeginCreateTable(ATable));
+  Context.Script.Body.IncIndent;
 
   // Inline field creation
   LComma := '  ';
   for LField in ATable.Fields do
   begin
-    FContext.Script.Body.AddLine(LComma + FContext.SqlGenerator.BuildSQL_FieldDefinition(ATable, LField));
+    Context.Script.Body.AddLine(LComma + Context.SqlGenerator.BuildSQL_FieldDefinition(ATable, LField));
     LComma := ', ';
   end;
 
-  FContext.Script.Body.DecIndent;
-  FContext.Script.Body.Add(FContext.SqlGenerator.BuildSQL_EndCreateTable(ATable));
-  FContext.Script.Body.AddEmpty;
-  FContext.Script.Body.Add(FContext.SqlGenerator.BuildSQL_CreatePK(ATable));
+  Context.Script.Body.DecIndent;
+  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_EndCreateTable(ATable));
+  Context.Script.Body.AddEmpty;
+  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_CreatePK(ATable));
 end;
 
 procedure TioDBBuilderStrategyWithAlterTable.GenerateScript_Body;
@@ -113,13 +113,13 @@ var
   LOp: IioDBBuilderPlanOperation;
 begin
   // Check key generation strategy compatibility with RDBMS version (diagnostic on the SqlGenerator).
-  FContext.SqlGenerator.CheckKeyGenerationCompatibility(FContext.Reconciliation.MappedSchema, FContext.Script);
+  Context.SqlGenerator.CheckKeyGenerationCompatibility(Context.Reconciliation.MappedSchema, Context.Script);
 
   // Plan-driven: the PlanBuilder already produced the operations in a create-safe order (strict drops ->
   // tables+fields -> indexes -> foreign keys -> orphan drops) and already applied the index/FK modes, so
   // this is a straight translate-each-op loop. The dialect lives in the ScriptWrite_/BuildSQL_ each op
   // dispatches to. WithoutAlterTable dialects override this with the rebuild flow instead.
-  for LOp in FContext.Reconciliation.Plan.Operations do
+  for LOp in Context.Reconciliation.Plan.Operations do
     case LOp.Kind of
       opCreateSequence:   ScriptWrite_CreateSequence(LOp.SequenceName);
       opCreateTable:      ScriptWrite_CreateTable(LOp.SchemaTable);
