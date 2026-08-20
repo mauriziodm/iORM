@@ -1,4 +1,4 @@
-{
+﻿{
   ****************************************************************************
   *                                                                          *
   *           iORM - (interfaced ORM)                                        *
@@ -41,11 +41,29 @@ uses
 
 type
 
-  TioDBBuilderStrategyBase = class(TInterfacedObject, IioDBBuilderStrategy)
-  private
+  /// <summary>
+  ///  Segregates the Context reference: FContext is private to this class alone, so none of
+  ///  TioDBBuilderStrategyBase's own methods (and it has dozens, across five files) can ever touch it
+  ///  directly, bypassing the Context property - only this class's own GetContext does. See the
+  ///  "Field visibility" note in CLAUDE.md: worth the extra class specifically because
+  ///  TioDBBuilderStrategyBase is large and gets edited often, so a stray FContext.X typed by habit
+  ///  would compile silently if the field were merely protected instead.
+  /// </summary>
+  TioDBBuilderStrategyContextSegregation = class(TInterfacedObject)
+  strict private
+    // strict private, not plain private: plain private in Delphi is unit-scoped, so any other class
+    // declared in this same unit (TioDBBuilderStrategyBase included) would still see FContext/GetContext
+    // directly - defeating the whole point of this class. strict private is scoped to this exact class.
     FContext: IioDBBuilderContext;
 
     function GetContext: IioDBBuilderContext;
+  strict protected
+    property Context: IioDBBuilderContext read GetContext;
+  public
+    constructor Create(const AContext: IioDBBuilderContext);
+  end;
+
+  TioDBBuilderStrategyBase = class(TioDBBuilderStrategyContextSegregation, IioDBBuilderStrategy)
   protected
     { Naming convention (role-based prefixes, mirrors the SqlGenerator family - see
       iORM.DBBuilder.SqlGenerator.Base). A method's prefix encodes its ROLE within the
@@ -230,16 +248,9 @@ type
     // MAIN GENERATION
     // ----------------------------------------------------------
     procedure GenerateScript_Body; virtual; abstract;
-
-    // ==========================================================
-    // PROPERTIES
-    // ----------------------------------------------------------
-    // Protected, not public: not part of IioDBBuilderStrategy - purely for internal/descendant use
-    // (see the "Interface & Class Conventions" note in CLAUDE.md). FContext itself is private:
-    // descendants go exclusively through this property, never through the raw field.
-    property Context: IioDBBuilderContext read GetContext;
   public
-    constructor Create(const AContext: IioDBBuilderContext);
+    // Create is inherited from TioDBBuilderStrategyContextSegregation unchanged: it already does
+    // everything a Strategy's constructor needs (validate + store AContext).
 
     // ==========================================================
     // ENTRY POINTS
@@ -258,6 +269,23 @@ uses
   iORM.DBBuilder.Schema.Field.Physical
 
   ;
+
+{ TioDBBuilderStrategyContextSegregation }
+
+constructor TioDBBuilderStrategyContextSegregation.Create(const AContext: IioDBBuilderContext);
+begin
+  inherited Create;
+
+  if not Assigned(AContext) then
+    raise EioInvalidArgumentException.Create(ClassName, 'Create', 'AContext is not assigned.');
+
+  FContext := AContext;
+end;
+
+function TioDBBuilderStrategyContextSegregation.GetContext: IioDBBuilderContext;
+begin
+  Result := FContext;
+end;
 
 { TioDBBuilderStrategyBase }
 
@@ -310,19 +338,6 @@ begin
   // single source of truth (covers both analyzer-driven and forced-stCreate indexes).
   for LTable in Context.Reconciliation.MappedSchema.Tables.Values do
     Process_TableIndexes(LTable);
-end;
-
-constructor TioDBBuilderStrategyBase.Create(const AContext: IioDBBuilderContext);
-begin
-  if not Assigned(AContext) then
-    raise EioInvalidArgumentException.Create(ClassName, 'Create', 'AContext is not assigned.');
-
-  FContext := AContext;
-end;
-
-function TioDBBuilderStrategyBase.GetContext: IioDBBuilderContext;
-begin
-  Result := FContext;
 end;
 
 function TioDBBuilderStrategyBase.Check_DatabaseExists: Boolean;

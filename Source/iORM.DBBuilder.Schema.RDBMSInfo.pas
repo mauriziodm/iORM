@@ -56,12 +56,6 @@ type
     constructor Create(const AName, ARaw, AVersion: String; const AMajorVersion, AMinorVersion: Integer);
     function IsAtLeast(const AMajor, AMinor: Integer): Boolean;
     function ToString: String; override;
-
-    property MajorVersion: Integer read GetMajorVersion;
-    property MinorVersion: Integer read GetMinorVersion;
-    property Name: String read GetName;
-    property Raw: String read GetRaw;
-    property Version: String read GetVersion;
   end;
 
 implementation

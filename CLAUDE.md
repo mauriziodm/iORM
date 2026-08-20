@@ -121,6 +121,26 @@ in one place. The raw field is touched in exactly one place: its own `GetX`/`Set
 including the declaring class's own other methods — access it through the property name, not the
 field, so there is never a per-call judgment call about whether to type the `F` prefix.
 
+Within the *declaring* class itself, this still leaves a gap: a private field is directly reachable
+by any method later added to that same class, so the property can be silently bypassed there too — no
+compiler error, just a stray `FX` typed out of habit. Closing that gap means moving the field (and its
+`GetX`/`SetX`) into a small dedicated ancestor class the "real" class inherits from instead of
+declaring them itself, so it never has private access to its own guarded state. Whether that split is
+worth it is a matter of the class's *role*, not its size: does the protected value describe *why the
+class exists* (its whole reason for being), or is it a dependency the class merely *carries* to do
+some other job? `TioDBBuilderSchemaBaseObject.Status` is the former — the class's only documented
+purpose is to own that invariant, so it structurally cannot drift; no split needed.
+`TioDBBuilderStrategyContextSegregation` / `TioDBBuilderStrategyBase.Context` is the latter — the
+class's job is script-generation orchestration, Context is just an ingredient it needs, so any method
+added while focused on that real job risks touching the raw field by mistake; split it into a
+dedicated carrier class so that mistake becomes a compile error instead of a silent bug.
+
+**Delphi gotcha when the carrier class lives in the same unit as the class inheriting from it**
+(the common case, to avoid a whole extra file for one field): plain `private` in Delphi is scoped to
+the *unit*, not the *class* — any other class declared in that same unit can still see it, silently
+reopening the exact gap the split was meant to close. Declare the carrier's field (and its `GetX`/
+`SetX`) `strict private`, not `private`, so visibility is truly limited to the carrier class itself.
+
 ## Supported Databases
 
 | Database | Professional | Enterprise |
