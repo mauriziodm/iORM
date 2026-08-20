@@ -42,32 +42,30 @@ uses
 type
 
   TioDBBuilderStrategyBase = class(TInterfacedObject, IioDBBuilderStrategy)
-  private
+  protected
     FContext: IioDBBuilderContext;
 
-    function GetContext: IioDBBuilderContext;
-  protected
-    { Naming convention (role-based prefixes, mirrors the Context.SqlGenerator family - see
-      iORM.DBBuilder.Context.SqlGenerator.Base). A method's prefix encodes its ROLE within the
+    { Naming convention (role-based prefixes, mirrors the SqlGenerator family - see
+      iORM.DBBuilder.SqlGenerator.Base). A method's prefix encodes its ROLE within the
       DB-sync workflow, independently of whether it is exposed on IioDBBuilderStrategy:
         GenerateScript       the single public entry point: wraps GenerateScript_Body between
-                             Context.Script.ScriptBegin/ScriptEnd. Mode selection (forcing the whole
+                             FContext.Script.ScriptBegin/ScriptEnd. Mode selection (forcing the whole
                              schema to stCreate, emitting the force-create warning) is an Engine-level
                              orchestration decision, made on Context before this is called - neither
                              this method nor GenerateScript_Body branch on it.
         GenerateScript_Body  protected abstract: the actual dialect-specific generation flow,
                              implemented by each concrete Strategy (WithAlterTable/WithoutAlterTable).
         Process_*            orchestration: iterates the schema or dispatches by mode
-        ScriptWrite_*        emits a single DDL/DML statement into Context.Script.Body
+        ScriptWrite_*        emits a single DDL/DML statement into FContext.Script.Body
         Force_*              forces a Status value on schema elements directly, overriding
                               whatever the entity-map-vs-DB comparison would have produced
                               (here always paired with a drop mechanic that also bypasses
                               the configured Indexes/FK mode)
         Check_*              interrogates the DB catalog / detects a change, returns Boolean
-        Warning_* / Hint_*   diagnostics appended to Context.Script.Warnings / Context.Script.Hints
+        Warning_* / Hint_*   diagnostics appended to FContext.Script.Warnings / FContext.Script.Hints
       Plain accessors and private helpers are sanctioned exceptions and keep plain Delphi
       verb naming (Get*). Interface membership is orthogonal to the prefix.
-      Layout (mirrors the Context.SqlGenerator family): methods are grouped under domain banners
+      Layout (mirrors the SqlGenerator family): methods are grouped under domain banners
       (DATABASE / TABLE / FIELD / INDEX / SEQUENCE / FOREIGN KEY / ...) and kept alphabetical
       within each group. This applies to the declarations (IioDBBuilderStrategy + every class
       section: derived strategies use the same banners); implementations are not ordered.
@@ -106,7 +104,7 @@ type
     /// Drops the indexes of a single table by querying the actual DB catalog
     /// and marks all schema indexes for the table as stCreate so they get
     /// recreated by Process_Indexes.
-    /// Force variant: this method does NOT consult Context.Reconciliation.MappedSchema.IndexesMode — it
+    /// Force variant: this method does NOT consult FContext.Reconciliation.MappedSchema.IndexesMode — it
     /// always operates. Every index physically present on the table is dropped,
     /// including orphans (no longer in the schema) and manually added ones.
     /// </summary>
@@ -149,12 +147,12 @@ type
     // ==========================================================
     // HINTS RELATED METHODS
     // ----------------------------------------------------------
-    // These helpers append a human-readable message to Context.Script.Hints during the
+    // These helpers append a human-readable message to FContext.Script.Hints during the
     // DBBuilder analysis phase. Hints are purely informational and non-blocking:
     // they surface a schema change that iORM detected and WILL apply, but whose
     // side effects (e.g. a fallback key generation strategy, a potential impact
     // on existing data) the developer should be aware of. They are the
-    // counterpart of Context.Script.Warnings (which flag changes NOT applied
+    // counterpart of FContext.Script.Warnings (which flag changes NOT applied
     // automatically) and are always emitted through these methods to keep the
     // message wording consistent across every RDBMS strategy.
     /// <summary>
@@ -167,11 +165,11 @@ type
     // ==========================================================
     // WARNINGS RELATED METHODS
     // ----------------------------------------------------------
-    // These helpers append a human-readable message to Context.Script.Warnings during
+    // These helpers append a human-readable message to FContext.Script.Warnings during
     // the DBBuilder analysis phase. Warnings are non-blocking: they surface a
     // schema change that iORM detected but will NOT (or cannot) apply
     // automatically, so the developer can review/handle it manually before the
-    // create-or-alter script is run. They are the counterpart of Context.Script.Hints
+    // create-or-alter script is run. They are the counterpart of FContext.Script.Hints
     // (purely informational) and are always emitted through these methods to
     // keep the message wording consistent across every RDBMS strategy.
     /// <summary>
@@ -219,7 +217,7 @@ type
     /// Emits a warning when a field's type is changing from AOldFieldType to
     /// ANewFieldType AND that specific conversion is blacklisted by the current
     /// RDBMS. The list of forbidden conversions (formatted as '[old->new]' tokens)
-    /// is obtained from Context.SqlGenerator.GetInvalidFieldTypeConversions; the warning is added only
+    /// is obtained from FContext.SqlGenerator.GetInvalidFieldTypeConversions; the warning is added only
     /// when the '[AOldFieldType->ANewFieldType]' token is found in that list,
     /// signalling a conversion the database cannot perform safely/automatically.
     /// Called by Warning_FieldAlterations.
@@ -230,11 +228,6 @@ type
     // MAIN GENERATION
     // ----------------------------------------------------------
     procedure GenerateScript_Body; virtual; abstract;
-
-    // ==========================================================
-    // PROPERTIES
-    // ----------------------------------------------------------
-    property Context: IioDBBuilderContext read GetContext;
   public
     constructor Create(const AContext: IioDBBuilderContext);
 
@@ -262,7 +255,7 @@ function TioDBBuilderStrategyBase.Check_SequenceExists(const ASequenceName: stri
 var
   LQuery: IioQuery;
 begin
-  LQuery := TioQueryEngine.GetRawQuery(Context.ConnectionDefName, Context.SqlGenerator.BuildSQL_SequenceExists(ASequenceName), True);
+  LQuery := TioQueryEngine.GetRawQuery(FContext.ConnectionDefName, FContext.SqlGenerator.BuildSQL_SequenceExists(ASequenceName), True);
   Result := LQuery.Fields[0].AsInteger > 0;
 end;
 
@@ -272,9 +265,9 @@ var
 begin
   // "In the DB" is now read from the introspected PhysicalSchema (no live catalog query).
   Result := False;
-  if Context.Reconciliation.PhysicalSchema = nil then
+  if FContext.Reconciliation.PhysicalSchema = nil then
     Exit;
-  LPhysicalTable := Context.Reconciliation.PhysicalSchema.FindTable(ATable.Name, False);
+  LPhysicalTable := FContext.Reconciliation.PhysicalSchema.FindTable(ATable.Name, False);
   Result := (LPhysicalTable <> nil) and (LPhysicalTable.Indexes.Count > 0);
 end;
 
@@ -284,9 +277,9 @@ var
 begin
   // "In the DB" is now read from the introspected PhysicalSchema (no live catalog query).
   Result := False;
-  if Context.Reconciliation.PhysicalSchema = nil then
+  if FContext.Reconciliation.PhysicalSchema = nil then
     Exit;
-  LPhysicalTable := Context.Reconciliation.PhysicalSchema.FindTable(ATable.Name, False);
+  LPhysicalTable := FContext.Reconciliation.PhysicalSchema.FindTable(ATable.Name, False);
   Result := (LPhysicalTable <> nil) and (LPhysicalTable.ForeignKeys.Count > 0);
 end;
 
@@ -295,8 +288,8 @@ end;
 // incremental path guard against an already-present sequence.
 procedure TioDBBuilderStrategyBase.ScriptWrite_CreateSequence(const ASequenceName: String);
 begin
-  if (Context.Reconciliation.MappedSchema.Status = stCreate) or not Check_SequenceExists(ASequenceName) then
-    Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_CreateSequence(ASequenceName));
+  if (FContext.Reconciliation.MappedSchema.Status = stCreate) or not Check_SequenceExists(ASequenceName) then
+    FContext.Script.Body.Add(FContext.SqlGenerator.BuildSQL_CreateSequence(ASequenceName));
 end;
 
 procedure TioDBBuilderStrategyBase.Process_Indexes;
@@ -305,7 +298,7 @@ var
 begin
   // Status-driven: Process_TableIndexes skips stClean indexes per element, so the index Status is the
   // single source of truth (covers both analyzer-driven and forced-stCreate indexes).
-  for LTable in Context.Reconciliation.MappedSchema.Tables.Values do
+  for LTable in FContext.Reconciliation.MappedSchema.Tables.Values do
     Process_TableIndexes(LTable);
 end;
 
@@ -317,14 +310,9 @@ begin
   FContext := AContext;
 end;
 
-function TioDBBuilderStrategyBase.GetContext: IioDBBuilderContext;
-begin
-  Result := FContext;
-end;
-
 function TioDBBuilderStrategyBase.Check_DatabaseExists: Boolean;
 begin
-  Result := Context.SqlGenerator.Check_DatabaseExists;
+  Result := FContext.SqlGenerator.Check_DatabaseExists;
 end;
 
 procedure TioDBBuilderStrategyBase.ScriptWrite_CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable);
@@ -337,12 +325,12 @@ end;
 
 procedure TioDBBuilderStrategyBase.ScriptWrite_CreateForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK);
 begin
-  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_CreateFK(ATable, AForeignKey));
+  FContext.Script.Body.Add(FContext.SqlGenerator.BuildSQL_CreateFK(ATable, AForeignKey));
 end;
 
 procedure TioDBBuilderStrategyBase.ScriptWrite_DropForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK);
 begin
-  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_DropFK(ATable, AForeignKey));
+  FContext.Script.Body.Add(FContext.SqlGenerator.BuildSQL_DropFK(ATable, AForeignKey));
 end;
 
 procedure TioDBBuilderStrategyBase.Process_TableIndexes(const ATable: IioDBBuilderSchemaTable);
@@ -367,7 +355,7 @@ end;
 // Plan-op translator (opCreateField): add a single column to an existing table.
 procedure TioDBBuilderStrategyBase.ScriptWrite_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
 begin
-  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_CreateField(ATable, AField));
+  FContext.Script.Body.Add(FContext.SqlGenerator.BuildSQL_CreateField(ATable, AField));
 end;
 
 // Plan-op translator (opAlterField): alter a single column and, at translation time, emit the old->new
@@ -382,13 +370,13 @@ begin
   // emits the right ALTER statements.
   for LChange in AChanges do
     AMappedField.AddAltered(LChange);
-  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_AlterField(ATable, AMappedField));
+  FContext.Script.Body.Add(FContext.SqlGenerator.BuildSQL_AlterField(ATable, AMappedField));
   Warning_FieldAlterations(ATable, AMappedField, APhysicalField);
 end;
 
 procedure TioDBBuilderStrategyBase.ScriptWrite_CreateTable(const ATable: IioDBBuilderSchemaTable);
 begin
-  Context.Script.Body.AddTitle(Format('Creating table ''%s''', [ATable.Name]));
+  FContext.Script.Body.AddTitle(Format('Creating table ''%s''', [ATable.Name]));
 end;
 
 // Plan-op translator (opDropTable): an orphan table (in the DB, not mapped) is NEVER dropped
@@ -396,26 +384,26 @@ end;
 // run it manually if that is really the intent.
 procedure TioDBBuilderStrategyBase.ScriptWrite_DropTable(const ATable: IioDBBuilderSchemaTable);
 begin
-  Context.Script.Body.AddEmpty;
-  Context.Script.Body.AddComment(Format('Orphan table ''%s'' (exists in the DB, not mapped) - drop it manually if intended:', [ATable.Name]));
-  Context.Script.Body.AddComment(Format('DROP TABLE %s;', [ATable.SqlName]));
-  Context.Script.Warnings.AddLine(Format('Table ''%s'' exists in the database but is not mapped by any entity: a DROP TABLE ' +
+  FContext.Script.Body.AddEmpty;
+  FContext.Script.Body.AddComment(Format('Orphan table ''%s'' (exists in the DB, not mapped) - drop it manually if intended:', [ATable.Name]));
+  FContext.Script.Body.AddComment(Format('DROP TABLE %s;', [ATable.SqlName]));
+  FContext.Script.Warnings.AddLine(Format('Table ''%s'' exists in the database but is not mapped by any entity: a DROP TABLE ' +
     'statement was generated as a comment (NOT executed). Review and run it manually if you want to remove it.', [ATable.Name]));
 end;
 
 procedure TioDBBuilderStrategyBase.ScriptWrite_CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex);
 begin
-  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_CreateIndex(ATable, AIndex));
+  FContext.Script.Body.Add(FContext.SqlGenerator.BuildSQL_CreateIndex(ATable, AIndex));
 end;
 
 procedure TioDBBuilderStrategyBase.ScriptWrite_DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex);
 begin
-  ScriptWrite_DropIndexByName(Context.SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex));
+  ScriptWrite_DropIndexByName(FContext.SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex));
 end;
 
 procedure TioDBBuilderStrategyBase.ScriptWrite_DropIndexByName(const AIndexName: string);
 begin
-  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_DropIndexByName(AIndexName));
+  FContext.Script.Body.Add(FContext.SqlGenerator.BuildSQL_DropIndexByName(AIndexName));
 end;
 
 procedure TioDBBuilderStrategyBase.Force_DropTableIndexesFromDB(const ATable: IioDBBuilderSchemaTable);
@@ -426,9 +414,9 @@ begin
   // Bypass of IndexesMode: this method always operates. Drops every index the Introspector read on this
   // table (orphans - whose [ioIndex] attribute was removed - and manually added ones alike) by its actual
   // catalog name. Sourced from the introspected PhysicalSchema instead of a live catalog query.
-  if Context.Reconciliation.PhysicalSchema <> nil then
+  if FContext.Reconciliation.PhysicalSchema <> nil then
   begin
-    LPhysicalTable := Context.Reconciliation.PhysicalSchema.FindTable(ATable.Name, False);
+    LPhysicalTable := FContext.Reconciliation.PhysicalSchema.FindTable(ATable.Name, False);
     if LPhysicalTable <> nil then
       for LIndex in LPhysicalTable.Indexes.Values do
         ScriptWrite_DropIndexByName(LIndex.Name);
@@ -440,13 +428,13 @@ end;
 
 procedure TioDBBuilderStrategyBase.GenerateScript;
 begin
-  // Status-driven: does NOT touch Context.Reconciliation.MappedSchema.Status, trusts it as given by the caller (Engine),
-  // whether reconciled from the introspected physical schema or forced via Context.Reconciliation.MappedSchema.ForceCreateStatus.
-  // GenerateScript_Body branches internally on Context.Reconciliation.MappedSchema.Status, so this single entry point
+  // Status-driven: does NOT touch FContext.Reconciliation.MappedSchema.Status, trusts it as given by the caller (Engine),
+  // whether reconciled from the introspected physical schema or forced via FContext.Reconciliation.MappedSchema.ForceCreateStatus.
+  // GenerateScript_Body branches internally on FContext.Reconciliation.MappedSchema.Status, so this single entry point
   // covers both the sync and the force-create case.
-  Context.Script.ScriptBegin(Context.SqlGenerator.DBMSInfo);
+  FContext.Script.ScriptBegin(FContext.SqlGenerator.DBMSInfo);
   GenerateScript_Body;
-  Context.Script.ScriptEnd;
+  FContext.Script.ScriptEnd;
 end;
 
 procedure TioDBBuilderStrategyBase.Warning_UnsafeTypeConversion(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
@@ -455,8 +443,8 @@ var
   LRequiredConversion: String;
 begin
   LRequiredConversion := Format('[%s->%s]', [AOldFieldType, ANewFieldType]);
-  if ContainsText(Context.SqlGenerator.GetInvalidFieldTypeConversions, LRequiredConversion) then
-    Context.Script.Warnings.AddLine(Format('Table ''%s'' field ''%s'' --> Invalid conversion from ''%s'' to ''%s''',
+  if ContainsText(FContext.SqlGenerator.GetInvalidFieldTypeConversions, LRequiredConversion) then
+    FContext.Script.Warnings.AddLine(Format('Table ''%s'' field ''%s'' --> Invalid conversion from ''%s'' to ''%s''',
       [ATable.Name, AField.FieldName, AOldFieldType, ANewFieldType]));
 end;
 
@@ -471,7 +459,7 @@ begin
   // Check_FieldModified. The raw catalog type lives on the concrete physical node (cast).
   LPhysical := APhysicalField as TioDBBuilderSchemaFieldPhysical;
   LOldType := LPhysical.FieldTypeRaw;
-  LNewType := Context.SqlGenerator.Translate_SchemaField_To_FieldType(AMappedField, False);
+  LNewType := FContext.SqlGenerator.Translate_SchemaField_To_FieldType(AMappedField, False);
 
   // Type: unsafe (blacklisted) conversion. Self-filters (only warns when old->new is in the invalid list),
   // so a scale/blob-only change - where old type = new type - produces no spurious warning.
@@ -492,7 +480,7 @@ begin
   // NOT NULL: a Hint if it becomes NOT NULL without a default; a Warning if the DBMS cannot alter it.
   if APhysicalField.FieldNotNull <> AMappedField.FieldNotNull then
   begin
-    if Context.SqlGenerator.Supports_AlterNotNull then
+    if FContext.SqlGenerator.Supports_AlterNotNull then
     begin
       if AMappedField.FieldNotNull and not AMappedField.FieldDefaultExists then
         Hint_NotNullPotentialDataImpact(ATable, AMappedField);
@@ -502,7 +490,7 @@ begin
   end;
 
   // BLOB sub-type: warn if it changed and the DBMS cannot alter it.
-  if LNewType.StartsWith('BLOB') and not Context.SqlGenerator.Supports_AlterBlobSubtype then
+  if LNewType.StartsWith('BLOB') and not FContext.SqlGenerator.Supports_AlterBlobSubtype then
   begin
     LNewSubtype := IfThen(AMappedField.FieldSubtype.IsEmpty, '0', AMappedField.FieldSubtype);
     if not SameText(APhysicalField.FieldSubtype, LNewSubtype) then
@@ -513,7 +501,7 @@ end;
 procedure TioDBBuilderStrategyBase.Warning_ChangeNotAllowed(const AValueName, AOldValue, ANewValue: String;
   const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
 begin
-  Context.Script.Warnings.AddLine(Format('Table ''%s'' field ''%s'' --> Changing the %s is not allowed (old = ''%s'', new = ''%s'')',
+  FContext.Script.Warnings.AddLine(Format('Table ''%s'' field ''%s'' --> Changing the %s is not allowed (old = ''%s'', new = ''%s'')',
     [ATable.Name, AField.FieldName, AValueName, AOldValue, ANewValue]));
 end;
 
@@ -521,14 +509,14 @@ procedure TioDBBuilderStrategyBase.Warning_PotentialDataTruncation(const AValueN
   const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
 begin
   if ANewValue < AOldValue then
-    Context.Script.Warnings.AddLine(Format('Table ''%s'' field ''%s'' --> The new %s value becomes smaller than the old one (old = %d, new = %d)',
+    FContext.Script.Warnings.AddLine(Format('Table ''%s'' field ''%s'' --> The new %s value becomes smaller than the old one (old = %d, new = %d)',
       [ATable.Name, AField.FieldName, AValueName, AOldValue, ANewValue]));
 end;
 
 procedure TioDBBuilderStrategyBase.Warning_RebuildDropsUnmanagedForeignKeys(const ATable: IioDBBuilderSchemaTable);
 begin
   if Check_TableHasForeignKeysInDB(ATable) then
-    Context.Script.Warnings.AddLine(Format('Table ''%s'' must be rebuilt (structural change) but ForeignKeysMode = ifmDisabled: ' +
+    FContext.Script.Warnings.AddLine(Format('Table ''%s'' must be rebuilt (structural change) but ForeignKeysMode = ifmDisabled: ' +
       'the rebuilt table is recreated WITHOUT its existing foreign keys, which are therefore lost. ' +
       'Recreate them manually or enable foreign key management.', [ATable.Name]));
 end;
@@ -536,19 +524,19 @@ end;
 procedure TioDBBuilderStrategyBase.Warning_RebuildDropsUnmanagedIndexes(const ATable: IioDBBuilderSchemaTable);
 begin
   if Check_TableHasIndexesInDB(ATable) then
-    Context.Script.Warnings.AddLine(Format('Table ''%s'' must be rebuilt (structural change) but IndexesMode = ifmDisabled: ' +
+    FContext.Script.Warnings.AddLine(Format('Table ''%s'' must be rebuilt (structural change) but IndexesMode = ifmDisabled: ' +
       'its existing indexes are dropped and NOT recreated, and are therefore lost. ' +
       'Recreate them manually or enable index management.', [ATable.Name]));
 end;
 
 procedure TioDBBuilderStrategyBase.Warning_NotNullChangeNotAllowed(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
 begin
-  Context.Script.Warnings.AddLine(Format('Table ''%s'' field ''%s'' --> The NOT NULL setting cannot be changed automatically', [ATable.Name, AField.FieldName]));
+  FContext.Script.Warnings.AddLine(Format('Table ''%s'' field ''%s'' --> The NOT NULL setting cannot be changed automatically', [ATable.Name, AField.FieldName]));
 end;
 
 procedure TioDBBuilderStrategyBase.Hint_NotNullPotentialDataImpact(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
 begin
-  Context.Script.Hints.AddLine(Format('Table ''%s'' field ''%s'' --> The not null setting is changed from FALSE to TRUE and a DEFAULT value has not been specified',
+  FContext.Script.Hints.AddLine(Format('Table ''%s'' field ''%s'' --> The not null setting is changed from FALSE to TRUE and a DEFAULT value has not been specified',
     [ATable.Name, AField.FieldName]));
 end;
 
