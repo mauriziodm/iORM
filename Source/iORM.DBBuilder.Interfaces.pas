@@ -472,15 +472,13 @@ type
   ///  SqlGenerator and Schema it was built with, and the Script it writes into. Strategy, Introspector
   ///  and PlanBuilder read from a Context (constructor-injected, then unpacked into their own fields -
   ///  they do not hold a live Context reference); Context itself never references them back.
-  ///  Status/HasWarnings/HasHints are flattened shortcuts to Schema.Status/Script.Warnings/
-  ///  Script.Hints for the external caller, which only ever sees this object as an opaque handle.
+  ///  Status is a flattened shortcut to Schema.Status for the external caller, which only ever sees
+  ///  this object as an opaque handle.
   /// </summary>
   IioDBBuilderContext = interface
     ['{7C1E9A44-3B27-4F6D-8E1A-5D2C9B4A6F31}']
 
     function GetConnectionDefName: string;
-    function GetHasHints: Boolean;
-    function GetHasWarnings: Boolean;
     function GetHints: IioDBBuilderSqlText;
     function GetLines: TStringList;
     function GetReconciliation: IioDBBuilderReconciliation;
@@ -495,14 +493,12 @@ type
     /// <remarks>
     ///  If Status = stCreate, the database itself is physically created first (file created for
     ///  SQLite, "CREATE DATABASE"-equivalent for Firebird) before the script lines run, reusing the
-    ///  SqlGenerator this Context was built with. Raises EioDBBuilderException if HasWarnings,
-    ///  unless AForce = True.
+    ///  SqlGenerator this Context was built with. Raises EioDBBuilderException if Warnings is not
+    ///  empty, unless AForce = True.
     /// </remarks>
     procedure Execute(const AForce: Boolean = False);
 
     property ConnectionDefName: string read GetConnectionDefName;
-    property HasHints: Boolean read GetHasHints;
-    property HasWarnings: Boolean read GetHasWarnings;
     property Hints: IioDBBuilderSqlText read GetHints;
     property Lines: TStringList read GetLines;
     property Reconciliation: IioDBBuilderReconciliation read GetReconciliation;
