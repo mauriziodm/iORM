@@ -41,26 +41,6 @@ uses
 type
 
   /// <summary>
-  ///  Segregates the Context reference: FContext is private to this class alone, so none of
-  ///  TioDBBuilderPlanBuilder's own methods (a dozen, all doing diff/comparison work) can ever touch it
-  ///  directly, bypassing the Context property - only this class's own GetContext does. Same pattern as
-  ///  TioDBBuilderStrategySegregation (see iORM.DBBuilder.Strategy.Base) and the "Field
-  ///  visibility" note in CLAUDE.md.
-  /// </summary>
-  TioDBBuilderPlanBuilderSegregation = class(TInterfacedObject)
-  strict private
-    // strict private, not plain private: plain private in Delphi is unit-scoped, so any other class
-    // declared in this same unit (TioDBBuilderPlanBuilder included) would still see FContext/GetContext
-    // directly - defeating the whole point of this class. strict private is scoped to this exact class.
-    FContext: IioDBBuilderContext;
-    function GetContext: IioDBBuilderContext;
-  strict protected
-    property Context: IioDBBuilderContext read GetContext;
-  public
-    constructor Create(const AContext: IioDBBuilderContext);
-  end;
-
-  /// <summary>
   ///  Diffs MappedSchema against PhysicalSchema and produces the Plan. It is a SINGLE, dialect-independent
   ///  class: every genuinely dialect-specific decision lives elsewhere - catalog reading in the
   ///  Introspector, type/index comparison and name computation in the SqlGenerator - so this class only
@@ -75,8 +55,10 @@ type
   ///  authoritative. WithoutAlterTable dialects (SQLite) ignore these ops and rebuild the whole table off
   ///  the table Status; only WithAlterTable dialects act on them.
   /// </summary>
-  TioDBBuilderPlanBuilder = class(TioDBBuilderPlanBuilderSegregation, IioDBBuilderPlanBuilder)
+  TioDBBuilderPlanBuilder = class(TInterfacedObject, IioDBBuilderPlanBuilder)
   private
+    FContext: IioDBBuilderContext;
+
     function Build: IioDBBuilderPlan;
     // Whether a matched foreign key differs. Compares the FULL structure (dependent table+field, reference
     // table+field, on-delete/on-update actions) rather than only the attributes that can still differ: it
@@ -99,6 +81,7 @@ type
     function Find_PhysicalIndex(const AMappedTable: IioDBBuilderSchemaTable; const AMappedIndex: IioDBBuilderSchemaIndex;
       const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaIndex;
     function Find_TableByName(const ASchema: IioDBBuilderSchema; const AName: String): IioDBBuilderSchemaTable;
+    function GetContext: IioDBBuilderContext;
     // Diff phases (each iterates every mapped table so the resulting order is create-safe).
     procedure Plan_StrictDropIndexes(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
     procedure Plan_StrictDropForeignKeys(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
@@ -107,26 +90,15 @@ type
     procedure Plan_ForeignKeys(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
     procedure Plan_OrphanTables(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
   protected
+    property Context: IioDBBuilderContext read GetContext;
   public
+    constructor Create(const AContext: IioDBBuilderContext);
   end;
 
 implementation
 
 uses
   System.SysUtils, iORM.Attributes;
-
-{ TioDBBuilderPlanBuilderSegregation }
-
-constructor TioDBBuilderPlanBuilderSegregation.Create(const AContext: IioDBBuilderContext);
-begin
-  inherited Create;
-  FContext := AContext;
-end;
-
-function TioDBBuilderPlanBuilderSegregation.GetContext: IioDBBuilderContext;
-begin
-  Result := FContext;
-end;
 
 { TioDBBuilderPlanBuilder }
 
@@ -233,6 +205,17 @@ begin
   for LTable in ASchema.Tables.Values do
     if SameText(LTable.Name, AName) then
       Exit(LTable);
+end;
+
+constructor TioDBBuilderPlanBuilder.Create(const AContext: IioDBBuilderContext);
+begin
+  inherited Create;
+  FContext := AContext;
+end;
+
+function TioDBBuilderPlanBuilder.GetContext: IioDBBuilderContext;
+begin
+  Result := FContext;
 end;
 
 function TioDBBuilderPlanBuilder.Check_ForeignKeyModified(const AMappedFK, APhysicalFK: IioDBBuilderSchemaFK): Boolean;

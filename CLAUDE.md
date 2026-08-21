@@ -108,6 +108,15 @@ and governs declarations only — implementation order is free. Forward-looking:
 declaration section is touched anyway (new members, or a section already being edited for another
 reason), not as a retroactive reordering sweep of the existing codebase.
 
+**Field/method/property split.** Within a visibility section that has no domain banner, when more
+than one kind of member is present (fields, methods, properties), lay them out as up to three
+sub-groups in that order — fields, then methods, then properties — separated by a single blank line
+between any two adjacent non-empty kinds; alphabetical order still applies within each sub-group, per
+the member-ordering rule above. A section with domain banners (`SqlGenerator.*`/`Strategy.*`) already
+groups by banner instead — methods per banner, properties collected under their own trailing
+`PROPERTIES` banner — so this split does not additionally apply there. Same forward-looking scope as
+member ordering: apply when a section is touched anyway, not as a retroactive sweep.
+
 ## Interface & Class Conventions
 
 **Interface/class property mirroring.** iORM's core pattern is interfaced objects: every `TioXxx`
@@ -150,8 +159,8 @@ carrier class so that mistake becomes a compile error instead of a silent bug.
 **Carrier class naming.** Name the carrier class `<DerivingClassName>Segregation`, where
 `<DerivingClassName>` is the name of the concrete class that inherits from it, with any trailing
 `Base` suffix dropped first (avoids the redundant `...BaseSegregation`) — e.g.
-`TioDBBuilderStrategyBase` → `TioDBBuilderStrategySegregation`; `TioDBBuilderPlanBuilder` (no `Base`
-suffix) → `TioDBBuilderPlanBuilderSegregation`. Don't name it after *what* it carries
+`TioDBBuilderStrategyBase` → `TioDBBuilderStrategySegregation`. A class with no `Base` suffix keeps
+its full name, e.g. a hypothetical `TioDBBuilderFoo` → `TioDBBuilderFooSegregation`. Don't name it after *what* it carries
 (`...ContextSegregation`, `...DependenciesSegregation`) — the carried field(s) are visible in the
 class body one line below, and a single mechanical rule is easier to apply consistently than picking
 a descriptive word each time.
