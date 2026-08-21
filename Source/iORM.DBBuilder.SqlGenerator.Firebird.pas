@@ -121,6 +121,7 @@ type
     // SQL IDENTIFIER / LITERAL UTILITIES (internal helpers, not part of IioDBBuilderSqlGenerator)
     // ----------------------------------------------------------
     function GetMaxSqlIdentifierLength: integer; override;
+  public
   end;
 
 implementation

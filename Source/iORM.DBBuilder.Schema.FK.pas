@@ -59,6 +59,7 @@ type
     function GetSqlDependentTableName: String;
     function GetSqlReferenceFieldName: String;
     function GetSqlReferenceTableName: String;
+  protected
   public
     constructor Create(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);

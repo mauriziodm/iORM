@@ -59,12 +59,9 @@ type
     FIndexes: TioDBBuilderSchemaIndexes;
     FName: String;
     FPrimaryKeyField: IioDBBuilderSchemaField;
-    function FieldExists(const AFieldName: String): Boolean;
-  public
-    constructor Create(const AConnectionDefName, AName: String);
-    destructor Destroy; override;
     // --- Comparable core (meaningful on a Physical table) ---
     procedure AddField(ASchemaField: IioDBBuilderSchemaField);
+    function FieldExists(const AFieldName: String): Boolean;
     function GetFields: TioDBBuilderSchemaFields;
     function GetForeignKeys: TioDBBuilderSchemaForeignKeys;
     function GetIndexes: TioDBBuilderSchemaIndexes;
@@ -90,6 +87,10 @@ type
     procedure ForceForeignKeysCreateStatus;
     procedure ForceIndexesCreateStatus;
     function HasFieldChanges: Boolean;
+  protected
+  public
+    constructor Create(const AConnectionDefName, AName: String);
+    destructor Destroy; override;
   end;
 
 implementation

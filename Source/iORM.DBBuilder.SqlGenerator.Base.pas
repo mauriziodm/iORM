@@ -54,12 +54,12 @@ type
   ///  each field is private to this class alone, so none of TioDBBuilderSqlGenBase's own methods
   ///  (and it has dozens, across four dialect files) can ever touch them directly, bypassing the
   ///  properties - only this class's own Get* methods do. Same pattern as
-  ///  TioDBBuilderStrategyContextSegregation (see iORM.DBBuilder.Strategy.Base) and the "Field
+  ///  TioDBBuilderStrategySegregation (see iORM.DBBuilder.Strategy.Base) and the "Field
   ///  visibility" note in CLAUDE.md. LoadDBMSInfo is redeclared here (abstract) purely so
   ///  GetDBMSInfo's lazy-load can call it via virtual dispatch; TioDBBuilderSqlGenBase still
   ///  provides its concrete "exception-default" override, unchanged.
   /// </summary>
-  TioDBBuilderSqlGenDependenciesSegregation = class(TInterfacedObject)
+  TioDBBuilderSqlGenSegregation = class(TInterfacedObject)
   strict private
     // strict private, not plain private: plain private in Delphi is unit-scoped, so any other class
     // declared in this same unit would still see these fields directly - defeating the whole point
@@ -95,9 +95,31 @@ type
   /// - Clear runtime errors: calling an unsupported operation produces an exception
   ///   that identifies both the DBMS (via ClassName) and the operation (via method name)
   /// </summary>
-  TioDBBuilderSqlGenBase = class(TioDBBuilderSqlGenDependenciesSegregation, IioDBBuilderSqlGenerator)
+  TioDBBuilderSqlGenBase = class(TioDBBuilderSqlGenSegregation, IioDBBuilderSqlGenerator)
   private
+    /// <summary>
+    /// Emits key-generation-strategy diagnostics into AScript for fallbacks already applied
+    /// by Resolve_KeyGenerationStrategy: a single informational Hint for every table whose requested
+    /// strategy was overridden. Uniform for every DBMS and intentionally non-blocking (Warnings gate
+    /// the create/alter flow in the Engine, and a safe auto-applied fallback must not block it).
+    /// Called only via IioDBBuilderSqlGenerator (Context.SqlGenerator) - no descendant overrides it.
+    /// </summary>
+    procedure CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema; const AScript: IioDBBuilderScript);
+    /// <summary>
+    /// Appends the standard "requested X key generation but this DBMS uses Y instead" hint to the
+    /// script. Centralized here so the wording stays consistent across every RDBMS generator.
+    /// </summary>
+    procedure Hint_KeyGenerationStrategyFallback(const AScript: IioDBBuilderScript; const ATable: IioDBBuilderSchemaTable);
     procedure RaiseNotImplemented(const AMethodName: string);
+    /// <summary>
+    /// Shortens an identifier name to fit within the specified maximum length by generating a hash.
+    /// If the name is already within the limit, it is returned unchanged.
+    /// </summary>
+    /// <param name="AIdentifierName">The identifier name to shorten (must not be empty)</param>
+    /// <param name="AMaxLength">The maximum allowed length (must be positive)</param>
+    /// <returns>The shortened identifier name (or original if already within limit)</returns>
+    /// <exception cref="EioGenericException">Raised if AIdentifierName is empty or AMaxLength is not positive</exception>
+    function ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
   protected
     { Naming convention (group banners mirror IioDBBuilderSqlGenerator - single source of truth)
       -------------------------------------------------------------------------------------------
@@ -109,7 +131,7 @@ type
         Translate_<Source>_To_<Target>   maps a schema element to a SQL fragment / identifier
       Methods whose role fits none of the above use plain Delphi verb naming (Get* / Is* /
       Ensure* / Load* / Shorten* / Escape*) - e.g. LoadDBMSInfo (interface accessor; its
-      sibling GetDBMSInfo is inherited from TioDBBuilderSqlGenDependenciesSegregation, not
+      sibling GetDBMSInfo is inherited from TioDBBuilderSqlGenSegregation, not
       declared here) and the identifier/literal helpers in the last group.
       Interface membership is orthogonal to the prefix: a base-only helper may still carry a
       domain prefix when its role matches (the internal Translate_* index helpers, Hint_*), and
@@ -206,7 +228,7 @@ type
     // ----------------------------------------------------------
     /// <summary>
     /// Loads DBMS info from database. Called internally by (inherited) GetDBMSInfo for lazy
-    /// loading. Overrides the abstract declaration on TioDBBuilderSqlGenDependenciesSegregation.
+    /// loading. Overrides the abstract declaration on TioDBBuilderSqlGenSegregation.
     /// </summary>
     function LoadDBMSInfo: IioDBBuilderSchemaRDBMSInfo; override;
 
@@ -214,22 +236,10 @@ type
     // KEY GENERATION CAPABILITY METHODS
     // ----------------------------------------------------------
     /// <summary>
-    /// Emits key-generation-strategy diagnostics into AScript for fallbacks already applied
-    /// by Resolve_KeyGenerationStrategy: a single informational Hint for every table whose requested
-    /// strategy was overridden. Uniform for every DBMS and intentionally non-blocking (Warnings gate
-    /// the create/alter flow in the Engine, and a safe auto-applied fallback must not block it).
-    /// </summary>
-    procedure CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema; const AScript: IioDBBuilderScript);
-    /// <summary>
     /// Returns the default key generation strategy for this DBMS.
     /// Base returns kgsIdentity. Override in derived classes (e.g. Firebird returns kgsSequence).
     /// </summary>
     function GetDefaultKeyGenerationStrategy: TioKeyGenerationStrategyType; virtual;
-    /// <summary>
-    /// Appends the standard "requested X key generation but this DBMS uses Y instead" hint to the
-    /// script. Centralized here so the wording stays consistent across every RDBMS generator.
-    /// </summary>
-    procedure Hint_KeyGenerationStrategyFallback(const AScript: IioDBBuilderScript; const ATable: IioDBBuilderSchemaTable);
     /// <summary>
     /// Resolves the requested key generation strategy to an effective strategy.
     /// Called once per table during schema building (by the SchemaBuilder). The resolved strategy is stored
@@ -299,20 +309,12 @@ type
     /// <param name="AIdentifierName">The identifier name to check</param>
     /// <returns>True if the name is too long, False otherwise</returns>
     function IsSqlIdentifierTooLong(const AIdentifierName: string): boolean; virtual;
-    /// <summary>
-    /// Shortens an identifier name to fit within the specified maximum length by generating a hash.
-    /// If the name is already within the limit, it is returned unchanged.
-    /// </summary>
-    /// <param name="AIdentifierName">The identifier name to shorten (must not be empty)</param>
-    /// <param name="AMaxLength">The maximum allowed length (must be positive)</param>
-    /// <returns>The shortened identifier name (or original if already within limit)</returns>
-    /// <exception cref="EioGenericException">Raised if AIdentifierName is empty or AMaxLength is not positive</exception>
-    function ShortenIdentifierName(const AIdentifierName: string; const AMaxLength: integer): string;
 
     // ==========================================================
     // PROPERTIES
     // ----------------------------------------------------------
     property MaxSqlIdentifierLength: integer read GetMaxSqlIdentifierLength;
+  public
   end;
 
 implementation
@@ -337,9 +339,9 @@ const
   FK_PREFIX = 'FK_';
   IDX_PREFIX = 'IDX_';
 
-{ TioDBBuilderSqlGenDependenciesSegregation }
+{ TioDBBuilderSqlGenSegregation }
 
-constructor TioDBBuilderSqlGenDependenciesSegregation.Create(const AConnectionDefName: string);
+constructor TioDBBuilderSqlGenSegregation.Create(const AConnectionDefName: string);
 begin
   inherited Create;
   FConnectionDefName := AConnectionDefName;
@@ -347,17 +349,17 @@ begin
   FDBMSInfo := nil;
 end;
 
-function TioDBBuilderSqlGenDependenciesSegregation.GetConnectionDefName: string;
+function TioDBBuilderSqlGenSegregation.GetConnectionDefName: string;
 begin
   Result := FConnectionDefName;
 end;
 
-function TioDBBuilderSqlGenDependenciesSegregation.GetDataConverter: TioSqlDataConverterRef;
+function TioDBBuilderSqlGenSegregation.GetDataConverter: TioSqlDataConverterRef;
 begin
   Result := FDataConverter;
 end;
 
-function TioDBBuilderSqlGenDependenciesSegregation.GetDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
+function TioDBBuilderSqlGenSegregation.GetDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
 begin
   if not Assigned(FDBMSInfo) then
     FDBMSInfo := LoadDBMSInfo;

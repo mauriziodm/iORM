@@ -49,8 +49,6 @@ type
 
   TioDBBuilder = class(TInterfacedObject, IioDBBuilder)
   private
-    procedure Warning_MultipleFKsOnSameField(const AContext: IioDBBuilderContext);
-  public
     // ==========================================================
     // DATABASE RELATED METHODS
     // ----------------------------------------------------------
@@ -58,6 +56,9 @@ type
       const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
     function Prepare_SyncDBStruct(const AConnectionDefName: String;
       const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
+    procedure Warning_MultipleFKsOnSameField(const AContext: IioDBBuilderContext);
+  protected
+  public
   end;
 
 implementation
@@ -117,10 +118,12 @@ function TioDBBuilder.Prepare_ForceCreateDB(const AConnectionDefName: String;
   const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
 var
   LContext: IioDBBuilderContext;
+  LPlanBuilder: IioDBBuilderPlanBuilder;
   LStrategy: IioDBBuilderStrategy;
 begin
   LContext := TioDBBuilderFactory.NewContext(AConnectionDefName, AIndexesMode, AForeignKeysMode);
   LStrategy := TioDBBuilderFactory.NewStrategy(LContext);
+  LPlanBuilder := TioDBBuilderFactory.NewPlanBuilder(LContext);
 
   // Self-contained: LContext.Reconciliation.MappedSchema is already fully populated from the class/entity maps (NewSchema
   // -> BuildSchema, no DB access). Force the whole tree to stCreate (the create-from-scratch path, as
@@ -133,7 +136,7 @@ begin
   LContext.Reconciliation.MappedSchema.ForceCreateStatus;
   // Build the Plan of all-create operations (Physical schema left nil, so everything is "new") for the
   // op-driven WithAlterTable generation. WithoutAlterTable ignores the Plan and works off the forced Status.
-  TioDBBuilderFactory.NewPlanBuilder(LContext).Build;
+  LPlanBuilder.Build;
   LStrategy.GenerateScript;
   Result := LContext;
 end;
@@ -142,9 +145,12 @@ function TioDBBuilder.Prepare_SyncDBStruct(const AConnectionDefName: String;
   const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
 var
   LContext: IioDBBuilderContext;
+  LPlanBuilder: IioDBBuilderPlanBuilder;
   LStrategy: IioDBBuilderStrategy;
 begin
   LContext := TioDBBuilderFactory.NewContext(AConnectionDefName, AIndexesMode, AForeignKeysMode);
+  LPlanBuilder := TioDBBuilderFactory.NewPlanBuilder(LContext);
+
   Warning_MultipleFKsOnSameField(LContext);
 
   // Built once and shared: the Introspector's Check_DatabaseExists and the eventual script generation
@@ -159,7 +165,8 @@ begin
     LContext.Reconciliation.MappedSchema.ForceCreateStatus
   else
     LContext.Reconciliation.PhysicalSchema := TioDBBuilderFactory.NewIntrospector(LContext, LStrategy).Introspect;
-  TioDBBuilderFactory.NewPlanBuilder(LContext).Build;
+
+  LPlanBuilder.Build;
 
   LStrategy.GenerateScript;
   Result := LContext;

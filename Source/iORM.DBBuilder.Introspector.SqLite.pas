@@ -47,10 +47,12 @@ type
   ///  foreign keys are unnamed, so they are matched (and keyed) by dependent field.
   /// </summary>
   TioDBBuilderIntrospectorSqLite = class(TioDBBuilderIntrospectorBase)
+  private
   protected
     procedure ReadFields(const ATable: IioDBBuilderSchemaTable; const ATableName: String); override;
     procedure ReadForeignKeys(const ATable: IioDBBuilderSchemaTable; const ATableName: String); override;
     procedure ReadIndexes(const ATable: IioDBBuilderSchemaTable; const ATableName: String); override;
+  public
   end;
 
 implementation
@@ -67,12 +69,12 @@ var
   LFieldTypeRaw: String;
 begin
   // PRAGMA table_info: [name, type, notnull, dflt_value, pk] (plus cid).
-  LQuery := GetRawQuery(FContext.SqlGenerator.BuildSQL_FieldList(ATableName));
+  LQuery := GetRawQuery(Context.SqlGenerator.BuildSQL_FieldList(ATableName));
   while not LQuery.Eof do
   begin
     LFieldTypeRaw := LQuery.Fields.FieldByName('type').AsString;
     ATable.AddField(TioDBBuilderSchemaFieldPhysical.Create(
-      FContext.ConnectionDefName,
+      Context.ConnectionDefName,
       LQuery.Fields.FieldByName('name').AsString,
       LFieldTypeRaw,
       '',  // default (raw): SQLite does not reconcile the field default
@@ -94,12 +96,12 @@ var
 begin
   // PRAGMA foreign_key_list: [id, seq, table, from, to, on_update, on_delete, match]. SQLite FKs are
   // unnamed; a column carries at most one FK, so the dependent field ('from') is a safe collection key.
-  LQuery := GetRawQuery(FContext.SqlGenerator.BuildSQL_FKList(ATableName));
+  LQuery := GetRawQuery(Context.SqlGenerator.BuildSQL_FKList(ATableName));
   while not LQuery.Eof do
   begin
     LDependentField := LQuery.Fields.FieldByName('from').AsString;
     ATable.ForeignKeys.Add(LDependentField, TioDBBuilderSchemaFKPhysical.Create(
-      FContext.ConnectionDefName,
+      Context.ConnectionDefName,
       '',  // Name: SQLite foreign keys have no constraint name
       ATableName,
       LDependentField,
@@ -120,7 +122,7 @@ var
 begin
   // sqlite_master gives the CREATE INDEX text (sql IS NOT NULL excludes constraint-backed indexes);
   // UNIQUE and orientation are parsed from it, the field list from PRAGMA index_info.
-  LQueryList := GetRawQuery(FContext.SqlGenerator.BuildSQL_IndexList(ATableName));
+  LQueryList := GetRawQuery(Context.SqlGenerator.BuildSQL_IndexList(ATableName));
   while not LQueryList.Eof do
   begin
     LIndexName := LQueryList.Fields.FieldByName('name').AsString;
@@ -133,7 +135,7 @@ begin
 
     // PRAGMA index_info: field list ordered by position in the index.
     LFieldList := '';
-    LQueryDetails := GetRawQuery(FContext.SqlGenerator.BuildSQL_IndexDetails(LIndexName));
+    LQueryDetails := GetRawQuery(Context.SqlGenerator.BuildSQL_IndexDetails(LIndexName));
     while not LQueryDetails.Eof do
     begin
       if not LFieldList.IsEmpty then
@@ -143,7 +145,7 @@ begin
     end;
 
     ATable.Indexes.Add(LIndexName, TioDBBuilderSchemaIndex.Create(LIndexName, LFieldList, LUnique, LOrientation,
-      FContext.ConnectionDefName));
+      Context.ConnectionDefName));
     LQueryList.Next;
   end;
 end;

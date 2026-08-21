@@ -50,16 +50,11 @@ type
     FIsTrueClass: Boolean;
     FKeyGenerationStrategy: TioKeyGenerationStrategyType;
     FPrimaryKeyField: IioDBBuilderSchemaField;
-    function FieldExists(const AFieldName: String): boolean;
-    function GetIsTrueClass: Boolean;
-    procedure SetIsTrueClass(const AValue: Boolean);
-  public
-    constructor Create(const AContextTable: IioTable; const AKeyGenerationStrategy: TioKeyGenerationStrategyType);
-    destructor Destroy; override;
     procedure AddField(ASchemaField: IioDBBuilderSchemaField);
     procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
     procedure AddIndex(const AIndexAttr: ioIndex);
+    function FieldExists(const AFieldName: String): boolean;
     procedure ForceCreateStatus;
     procedure ForceFieldsCreateStatus;
     procedure ForceForeignKeysCreateStatus;
@@ -68,6 +63,7 @@ type
     function GetFields: TioDBBuilderSchemaFields;
     function GetForeignKeys: TioDBBuilderSchemaForeignKeys;
     function GetIndexes: TioDBBuilderSchemaIndexes;
+    function GetIsTrueClass: Boolean;
     function GetKeyGenerationStrategy: TioKeyGenerationStrategyType;
     function GetName: String;
     function GetPrimaryKeyField: IioDBBuilderSchemaField;
@@ -76,8 +72,13 @@ type
     function GetSqlName: String;
     function HasFieldChanges: Boolean;
     function IsKeyGenerationStrategyFallback: Boolean;
+    procedure SetIsTrueClass(const AValue: Boolean);
     function UsesIdentityForKeyGeneration: Boolean;
     function UsesSequenceForKeyGeneration: Boolean;
+  protected
+  public
+    constructor Create(const AContextTable: IioTable; const AKeyGenerationStrategy: TioKeyGenerationStrategyType);
+    destructor Destroy; override;
   end;
 
 implementation

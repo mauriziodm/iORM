@@ -64,6 +64,7 @@ type
     // the "Interface & Class Conventions" note in CLAUDE.md). Descendants use it as Status := X /
     // X := Status instead of calling GetStatus/SetStatus directly.
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
+  public
   end;
 
 implementation

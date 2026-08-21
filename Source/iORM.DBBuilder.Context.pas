@@ -51,9 +51,8 @@ type
     FScript: IioDBBuilderScript;
     FSqlGenerator: IioDBBuilderSqlGenerator;
 
+    procedure Execute(const AForce: Boolean = False);
     function GetConnectionDefName: string;
-    function GetHasHints: Boolean;
-    function GetHasWarnings: Boolean;
     function GetHints: IioDBBuilderSqlText;
     function GetLines: TStringList;
     function GetReconciliation: IioDBBuilderReconciliation;
@@ -61,10 +60,9 @@ type
     function GetSqlGenerator: IioDBBuilderSqlGenerator;
     function GetStatus: TioDBBuilderStatus;
     function GetWarnings: IioDBBuilderSqlText;
+  protected
   public
     constructor Create(const AConnectionDefName: string; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
-
-    procedure Execute(const AForce: Boolean = False);
   end;
 
 implementation
@@ -96,7 +94,7 @@ begin
   // Warnings signal a change the reconciliation could not resolve safely on its own (e.g. an unsafe
   // type conversion) - block execution unless the caller explicitly overrides via AForce, since by
   // this point the script may already contain destructive DDL (ALTER/DROP) based on that change.
-  if GetHasWarnings and not AForce then
+  if not FScript.Warnings.IsEmpty and not AForce then
     raise EioDBBuilderException.Create(ClassName, 'Execute',
       'Database must be updated but WARNINGS exists.' + sLineBreak +
       FScript.Warnings.Lines.Text
@@ -121,16 +119,6 @@ end;
 function TioDBBuilderContext.GetConnectionDefName: string;
 begin
   Result := FConnectionDefName;
-end;
-
-function TioDBBuilderContext.GetHasHints: Boolean;
-begin
-  Result := not FScript.Hints.IsEmpty;
-end;
-
-function TioDBBuilderContext.GetHasWarnings: Boolean;
-begin
-  Result := not FScript.Warnings.IsEmpty;
 end;
 
 function TioDBBuilderContext.GetHints: IioDBBuilderSqlText;

@@ -49,10 +49,12 @@ type
   ///  (name + actions) is sufficient and the dependent/reference columns are left blank.
   /// </summary>
   TioDBBuilderIntrospectorFirebird = class(TioDBBuilderIntrospectorBase)
+  private
   protected
     procedure ReadFields(const ATable: IioDBBuilderSchemaTable; const ATableName: String); override;
     procedure ReadForeignKeys(const ATable: IioDBBuilderSchemaTable; const ATableName: String); override;
     procedure ReadIndexes(const ATable: IioDBBuilderSchemaTable; const ATableName: String); override;
+  public
   end;
 
 implementation
@@ -71,12 +73,12 @@ begin
   // BuildSQL_FieldList (with empty field-name filter) returns every field with aliased columns:
   // field_name, field_not_null, field_length, field_precision, field_scale, field_type, field_subtype,
   // field_default. .Trim throughout because Firebird right-pads CHAR columns.
-  LQuery := GetRawQuery(FContext.SqlGenerator.BuildSQL_FieldList(ATableName));
+  LQuery := GetRawQuery(Context.SqlGenerator.BuildSQL_FieldList(ATableName));
   while not LQuery.Eof do
   begin
     LFieldTypeRaw := LQuery.Fields.FieldByName('field_type').AsString.Trim;
     ATable.AddField(TioDBBuilderSchemaFieldPhysical.Create(
-      FContext.ConnectionDefName,
+      Context.ConnectionDefName,
       LQuery.Fields.FieldByName('field_name').AsString.Trim,
       LFieldTypeRaw,
       LQuery.Fields.FieldByName('field_default').AsString.Trim,  // raw default expression from the catalog
@@ -103,12 +105,12 @@ begin
   // reference_table, reference_field. Both the name AND the structural fields are populated so the
   // PlanBuilder can match this FK generically (by dependent field + reference table, the same key SQLite
   // uses) without a per-dialect matcher.
-  LQuery := GetRawQuery(FContext.SqlGenerator.BuildSQL_FKList(ATableName));
+  LQuery := GetRawQuery(Context.SqlGenerator.BuildSQL_FKList(ATableName));
   while not LQuery.Eof do
   begin
     LName := LQuery.Fields.FieldByName('constraint_name').AsString.Trim;
     ATable.ForeignKeys.Add(LName, TioDBBuilderSchemaFKPhysical.Create(
-      FContext.ConnectionDefName,
+      Context.ConnectionDefName,
       LName,
       ATableName,
       LQuery.Fields.FieldByName('dependent_field').AsString.Trim,
@@ -130,7 +132,7 @@ begin
   // BuildSQL_IndexList: RDB$INDEX_NAME, RDB$UNIQUE_FLAG, RDB$INDEX_TYPE (0/NULL=ASC, 1=DESC). It already
   // excludes constraint-backed indexes. The field list comes from BuildSQL_IndexDetails (RDB$FIELD_NAME
   // ordered by position).
-  LQueryList := GetRawQuery(FContext.SqlGenerator.BuildSQL_IndexList(ATableName));
+  LQueryList := GetRawQuery(Context.SqlGenerator.BuildSQL_IndexList(ATableName));
   while not LQueryList.Eof do
   begin
     LIndexName := LQueryList.Fields.FieldByName('RDB$INDEX_NAME').AsString.Trim;
@@ -141,7 +143,7 @@ begin
       LOrientation := ioAscending;
 
     LFieldList := '';
-    LQueryDetails := GetRawQuery(FContext.SqlGenerator.BuildSQL_IndexDetails(LIndexName));
+    LQueryDetails := GetRawQuery(Context.SqlGenerator.BuildSQL_IndexDetails(LIndexName));
     while not LQueryDetails.Eof do
     begin
       if not LFieldList.IsEmpty then
@@ -151,7 +153,7 @@ begin
     end;
 
     ATable.Indexes.Add(LIndexName, TioDBBuilderSchemaIndex.Create(LIndexName, LFieldList, LUnique, LOrientation,
-      FContext.ConnectionDefName));
+      Context.ConnectionDefName));
     LQueryList.Next;
   end;
 end;

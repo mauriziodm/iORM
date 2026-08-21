@@ -49,7 +49,7 @@ type
   ///  TioDBBuilderStrategyBase is large and gets edited often, so a stray FContext.X typed by habit
   ///  would compile silently if the field were merely protected instead.
   /// </summary>
-  TioDBBuilderStrategyContextSegregation = class(TInterfacedObject)
+  TioDBBuilderStrategySegregation = class(TInterfacedObject)
   strict private
     // strict private, not plain private: plain private in Delphi is unit-scoped, so any other class
     // declared in this same unit (TioDBBuilderStrategyBase included) would still see FContext/GetContext
@@ -63,12 +63,70 @@ type
     constructor Create(const AContext: IioDBBuilderContext);
   end;
 
-  TioDBBuilderStrategyBase = class(TioDBBuilderStrategyContextSegregation, IioDBBuilderStrategy)
+  TioDBBuilderStrategyBase = class(TioDBBuilderStrategySegregation, IioDBBuilderStrategy)
+  private
+    // ==========================================================
+    // ENTRY POINTS (local only: no descendant calls this directly)
+    // ----------------------------------------------------------
+    procedure GenerateScript;
+
+    // ==========================================================
+    // HINTS / WARNINGS RELATED METHODS (local only: no descendant calls these directly)
+    // ----------------------------------------------------------
+    // These helpers append a human-readable message to Context.Script.Hints/Warnings during the
+    // DBBuilder analysis phase - see the naming-convention banner on the protected section below for
+    // the Hint_/Warning_ distinction. Not virtual: kept at the lowest class that owns the behaviour.
+    /// <summary>
+    /// Emits a hint noting that a field's NOT NULL setting changed from FALSE to
+    /// TRUE without a DEFAULT value being specified, which may impact existing
+    /// data. Called by Warning_FieldAlterations.
+    /// </summary>
+    procedure Hint_NotNullPotentialDataImpact(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
+    /// <summary>
+    /// Emits a warning stating that a field attribute (named by AValueName, e.g.
+    /// 'blob sub-type') changed from AOldValue to ANewValue but the change is NOT
+    /// allowed and will not be applied automatically. This is the generic
+    /// "attribute cannot be altered" notice; the caller decides when the change
+    /// is disallowed (e.g. a blob sub-type change the RDBMS cannot apply).
+    /// </summary>
+    procedure Warning_ChangeNotAllowed(const AValueName, AOldValue, ANewValue: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
+    /// <summary>
+    /// Re-derives and emits all the alter-field warnings/hints (unsafe type conversion, potential
+    /// truncation on length/precision/scale, NOT NULL, blob sub-type) by comparing the physical (old) and
+    /// mapped (new) field. Called at translation time by ScriptWrite_AlterField: the collapsed change-set
+    /// cannot distinguish type/scale/blob, so the warnings are re-derived from the actual old/new values.
+    /// </summary>
+    procedure Warning_FieldAlterations(const ATable: IioDBBuilderSchemaTable; const AMappedField, APhysicalField: IioDBBuilderSchemaField);
+    /// <summary>
+    /// Emits a warning stating that a field's NOT NULL setting changed but the
+    /// change cannot be applied automatically by this RDBMS strategy. Called by
+    /// Warning_FieldAlterations when the RDBMS cannot alter the NOT NULL setting.
+    /// </summary>
+    procedure Warning_NotNullChangeNotAllowed(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
+    /// <summary>
+    /// Emits a warning when a numeric field attribute (identified by AValueName,
+    /// e.g. 'field LENGTH', 'field PRECISION', 'field DECIMALS') is being shrunk,
+    /// i.e. ANewValue &lt; AOldValue. A reduction risks data truncation, so the
+    /// change is flagged for manual review; nothing is added when the value grows
+    /// or stays the same. Called by Warning_FieldAlterations for length/precision/scale reductions.
+    /// </summary>
+    procedure Warning_PotentialDataTruncation(const AValueName: String; const AOldValue, ANewValue: Integer; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
+    /// <summary>
+    /// Emits a warning when a field's type is changing from AOldFieldType to
+    /// ANewFieldType AND that specific conversion is blacklisted by the current
+    /// RDBMS. The list of forbidden conversions (formatted as '[old->new]' tokens)
+    /// is obtained from Context.SqlGenerator.GetInvalidFieldTypeConversions; the warning is added only
+    /// when the '[AOldFieldType->ANewFieldType]' token is found in that list,
+    /// signalling a conversion the database cannot perform safely/automatically.
+    /// Called by Warning_FieldAlterations.
+    /// </summary>
+    procedure Warning_UnsafeTypeConversion(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String);
   protected
     { Naming convention (role-based prefixes, mirrors the SqlGenerator family - see
       iORM.DBBuilder.SqlGenerator.Base). A method's prefix encodes its ROLE within the
       DB-sync workflow, independently of whether it is exposed on IioDBBuilderStrategy:
-        GenerateScript       the single public entry point: wraps GenerateScript_Body between
+        GenerateScript       the single entry point (the only IioDBBuilderStrategy member, private -
+                             called exclusively via the interface): wraps GenerateScript_Body between
                              Context.Script.ScriptBegin/ScriptEnd. Mode selection (forcing the whole
                              schema to stCreate, emitting the force-create warning) is an Engine-level
                              orchestration decision, made on Context before this is called - neither
@@ -165,62 +223,8 @@ type
     procedure ScriptWrite_DropForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK); virtual;
 
     // ==========================================================
-    // HINTS RELATED METHODS
+    // WARNINGS RELATED METHODS (used by a descendant - see WithoutAlterTable)
     // ----------------------------------------------------------
-    // These helpers append a human-readable message to Context.Script.Hints during the
-    // DBBuilder analysis phase. Hints are purely informational and non-blocking:
-    // they surface a schema change that iORM detected and WILL apply, but whose
-    // side effects (e.g. a fallback key generation strategy, a potential impact
-    // on existing data) the developer should be aware of. They are the
-    // counterpart of Context.Script.Warnings (which flag changes NOT applied
-    // automatically) and are always emitted through these methods to keep the
-    // message wording consistent across every RDBMS strategy.
-    /// <summary>
-    /// Emits a hint noting that a field's NOT NULL setting changed from FALSE to
-    /// TRUE without a DEFAULT value being specified, which may impact existing
-    /// data. Called by Warning_FieldAlterations.
-    /// </summary>
-    procedure Hint_NotNullPotentialDataImpact(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
-
-    // ==========================================================
-    // WARNINGS RELATED METHODS
-    // ----------------------------------------------------------
-    // These helpers append a human-readable message to Context.Script.Warnings during
-    // the DBBuilder analysis phase. Warnings are non-blocking: they surface a
-    // schema change that iORM detected but will NOT (or cannot) apply
-    // automatically, so the developer can review/handle it manually before the
-    // create-or-alter script is run. They are the counterpart of Context.Script.Hints
-    // (purely informational) and are always emitted through these methods to
-    // keep the message wording consistent across every RDBMS strategy.
-    /// <summary>
-    /// Emits a warning stating that a field attribute (named by AValueName, e.g.
-    /// 'blob sub-type') changed from AOldValue to ANewValue but the change is NOT
-    /// allowed and will not be applied automatically. This is the generic
-    /// "attribute cannot be altered" notice; the caller decides when the change
-    /// is disallowed (e.g. a blob sub-type change the RDBMS cannot apply).
-    /// </summary>
-    procedure Warning_ChangeNotAllowed(const AValueName, AOldValue, ANewValue: String; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
-    /// <summary>
-    /// Re-derives and emits all the alter-field warnings/hints (unsafe type conversion, potential
-    /// truncation on length/precision/scale, NOT NULL, blob sub-type) by comparing the physical (old) and
-    /// mapped (new) field. Called at translation time by ScriptWrite_AlterField: the collapsed change-set
-    /// cannot distinguish type/scale/blob, so the warnings are re-derived from the actual old/new values.
-    /// </summary>
-    procedure Warning_FieldAlterations(const ATable: IioDBBuilderSchemaTable; const AMappedField, APhysicalField: IioDBBuilderSchemaField);
-    /// <summary>
-    /// Emits a warning stating that a field's NOT NULL setting changed but the
-    /// change cannot be applied automatically by this RDBMS strategy. Called by
-    /// Warning_FieldAlterations when the RDBMS cannot alter the NOT NULL setting.
-    /// </summary>
-    procedure Warning_NotNullChangeNotAllowed(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
-    /// <summary>
-    /// Emits a warning when a numeric field attribute (identified by AValueName,
-    /// e.g. 'field LENGTH', 'field PRECISION', 'field DECIMALS') is being shrunk,
-    /// i.e. ANewValue &lt; AOldValue. A reduction risks data truncation, so the
-    /// change is flagged for manual review; nothing is added when the value grows
-    /// or stays the same. Called by Warning_FieldAlterations for length/precision/scale reductions.
-    /// </summary>
-    procedure Warning_PotentialDataTruncation(const AValueName: String; const AOldValue, ANewValue: Integer; const AField: IioDBBuilderSchemaField; const ATable: IioDBBuilderSchemaTable);
     /// <summary>
     /// Emits a warning (only if the table actually has FKs in the DB) that a rename-create-copy rebuild
     /// recreates the table WITHOUT its existing foreign keys because ForeignKeysMode = ifmDisabled, so
@@ -233,29 +237,12 @@ type
     /// they are silently lost unless recreated manually / index management is enabled.
     /// </summary>
     procedure Warning_RebuildDropsUnmanagedIndexes(const ATable: IioDBBuilderSchemaTable);
-    /// <summary>
-    /// Emits a warning when a field's type is changing from AOldFieldType to
-    /// ANewFieldType AND that specific conversion is blacklisted by the current
-    /// RDBMS. The list of forbidden conversions (formatted as '[old->new]' tokens)
-    /// is obtained from Context.SqlGenerator.GetInvalidFieldTypeConversions; the warning is added only
-    /// when the '[AOldFieldType->ANewFieldType]' token is found in that list,
-    /// signalling a conversion the database cannot perform safely/automatically.
-    /// Called by Warning_FieldAlterations.
-    /// </summary>
-    procedure Warning_UnsafeTypeConversion(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField; const AOldFieldType, ANewFieldType: String);
 
     // ==========================================================
     // MAIN GENERATION
     // ----------------------------------------------------------
     procedure GenerateScript_Body; virtual; abstract;
   public
-    // Create is inherited from TioDBBuilderStrategyContextSegregation unchanged: it already does
-    // everything a Strategy's constructor needs (validate + store AContext).
-
-    // ==========================================================
-    // ENTRY POINTS
-    // ----------------------------------------------------------
-    procedure GenerateScript;
   end;
 
 implementation
@@ -270,9 +257,9 @@ uses
 
   ;
 
-{ TioDBBuilderStrategyContextSegregation }
+{ TioDBBuilderStrategySegregation }
 
-constructor TioDBBuilderStrategyContextSegregation.Create(const AContext: IioDBBuilderContext);
+constructor TioDBBuilderStrategySegregation.Create(const AContext: IioDBBuilderContext);
 begin
   inherited Create;
 
@@ -282,7 +269,7 @@ begin
   FContext := AContext;
 end;
 
-function TioDBBuilderStrategyContextSegregation.GetContext: IioDBBuilderContext;
+function TioDBBuilderStrategySegregation.GetContext: IioDBBuilderContext;
 begin
   Result := FContext;
 end;

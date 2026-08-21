@@ -41,16 +41,41 @@ uses
 type
 
   /// <summary>
+  ///  Segregates the injected dependencies (Context, Strategy): each field is private to this class
+  ///  alone, so none of TioDBBuilderIntrospectorBase's own methods (and its dialect-specific
+  ///  descendants, across two files) can ever touch them directly, bypassing the Context/Strategy
+  ///  properties - only this class's own Get* methods do. Both are ingredients the Introspector needs
+  ///  to do its real job (read the catalog), not its reason for being, so - same criterion as
+  ///  TioDBBuilderStrategySegregation (see iORM.DBBuilder.Strategy.Base) and the "Field
+  ///  visibility" note in CLAUDE.md - they belong in a dedicated carrier, not bare protected fields.
+  /// </summary>
+  TioDBBuilderIntrospectorSegregation = class(TInterfacedObject)
+  strict private
+    // strict private, not plain private: plain private in Delphi is unit-scoped, so any other class
+    // declared in this same unit (TioDBBuilderIntrospectorBase included) would still see these fields
+    // directly - defeating the whole point of this class. strict private is scoped to this exact class.
+    FContext: IioDBBuilderContext;
+    FStrategy: IioDBBuilderStrategy;
+    function GetContext: IioDBBuilderContext;
+    function GetStrategy: IioDBBuilderStrategy;
+  strict protected
+    property Context: IioDBBuilderContext read GetContext;
+    property Strategy: IioDBBuilderStrategy read GetStrategy;
+  public
+    constructor Create(const AContext: IioDBBuilderContext; const AStrategy: IioDBBuilderStrategy);
+  end;
+
+  /// <summary>
   ///  Base of the catalog Introspector: owns the dialect-independent skeleton (enumerate the physical
   ///  tables, wrap the reads in a transaction, assemble the Physical schema) and delegates the actual
   ///  catalog reads to the per-dialect ReadFields/ReadIndexes/ReadForeignKeys. The Strategy is injected
   ///  only for Check_DatabaseExists. No Status is ever stamped here (single-writer: the PlanBuilder owns
   ///  Status).
   /// </summary>
-  TioDBBuilderIntrospectorBase = class(TInterfacedObject, IioDBBuilderIntrospector)
+  TioDBBuilderIntrospectorBase = class(TioDBBuilderIntrospectorSegregation, IioDBBuilderIntrospector)
+  private
+    function Introspect: IioDBBuilderSchema;
   protected
-    FContext: IioDBBuilderContext;
-    FStrategy: IioDBBuilderStrategy;
     // Shared query execution (same raw-query mechanic the Strategy uses for its Check_* probes).
     function GetRawQuery(const ASQL: String): IioQuery;
     // Best-effort mapping of a raw catalog type string to the ORM metadata enum. NOT the comparison
@@ -65,8 +90,6 @@ type
     procedure ReadForeignKeys(const ATable: IioDBBuilderSchemaTable; const ATableName: String); virtual; abstract;
     procedure ReadIndexes(const ATable: IioDBBuilderSchemaTable; const ATableName: String); virtual; abstract;
   public
-    constructor Create(const AContext: IioDBBuilderContext; const AStrategy: IioDBBuilderStrategy);
-    function Introspect: IioDBBuilderSchema;
   end;
 
 implementation
@@ -75,19 +98,32 @@ uses
   System.SysUtils, System.Generics.Collections, iORM, iORM.DB.QueryEngine, iORM.DBBuilder.Factory,
   iORM.DBBuilder.Schema.Table.Physical;
 
-{ TioDBBuilderIntrospectorBase }
+{ TioDBBuilderIntrospectorSegregation }
 
-constructor TioDBBuilderIntrospectorBase.Create(const AContext: IioDBBuilderContext; const AStrategy: IioDBBuilderStrategy);
+constructor TioDBBuilderIntrospectorSegregation.Create(const AContext: IioDBBuilderContext; const AStrategy: IioDBBuilderStrategy);
 begin
+  inherited Create;
   FContext := AContext;
   // Injected rather than self-built: the Engine already owns a Strategy for this Context, and the only
   // thing needed here is its dialect-specific Check_DatabaseExists.
   FStrategy := AStrategy;
 end;
 
+function TioDBBuilderIntrospectorSegregation.GetContext: IioDBBuilderContext;
+begin
+  Result := FContext;
+end;
+
+function TioDBBuilderIntrospectorSegregation.GetStrategy: IioDBBuilderStrategy;
+begin
+  Result := FStrategy;
+end;
+
+{ TioDBBuilderIntrospectorBase }
+
 function TioDBBuilderIntrospectorBase.GetRawQuery(const ASQL: String): IioQuery;
 begin
-  Result := TioQueryEngine.GetRawQuery(FContext.ConnectionDefName, ASQL, True);
+  Result := TioQueryEngine.GetRawQuery(Context.ConnectionDefName, ASQL, True);
 end;
 
 function TioDBBuilderIntrospectorBase.Introspect: IioDBBuilderSchema;
@@ -99,21 +135,21 @@ var
 begin
   // The Physical branch is a bare schema (no ORM build): the modes are irrelevant to it, but are taken
   // from the Mapped schema so both branches carry the same configuration.
-  Result := TioDBBuilderFactory.NewEmptySchema(FContext.Reconciliation.MappedSchema.IndexesMode,
-    FContext.Reconciliation.MappedSchema.ForeignKeysMode);
+  Result := TioDBBuilderFactory.NewEmptySchema(Context.Reconciliation.MappedSchema.IndexesMode,
+    Context.Reconciliation.MappedSchema.ForeignKeysMode);
 
   // No database yet: nothing to introspect (everything will be created), leave the Physical schema empty.
-  if not FStrategy.Check_DatabaseExists then
+  if not Strategy.Check_DatabaseExists then
     Exit;
 
   // Keep the physical connection alive across all the reads via a single transaction. Snapshot the table
   // names first, then read each table's structure: this avoids holding the table-list cursor open while
   // the per-table reads open their own nested cursors.
-  io.StartTransaction(FContext.ConnectionDefName);
+  io.StartTransaction(Context.ConnectionDefName);
   try
     LTableNames := TList<String>.Create;
     try
-      LQuery := GetRawQuery(FContext.SqlGenerator.BuildSQL_TableList);
+      LQuery := GetRawQuery(Context.SqlGenerator.BuildSQL_TableList);
       while not LQuery.Eof do
       begin
         LTableNames.Add(LQuery.Fields[0].AsString.Trim);  // .Trim: Firebird right-pads CHAR identifiers
@@ -122,7 +158,7 @@ begin
 
       for LTableName in LTableNames do
       begin
-        LTable := TioDBBuilderSchemaTablePhysical.Create(FContext.ConnectionDefName, LTableName);
+        LTable := TioDBBuilderSchemaTablePhysical.Create(Context.ConnectionDefName, LTableName);
         ReadFields(LTable, LTableName);
         ReadIndexes(LTable, LTableName);
         ReadForeignKeys(LTable, LTableName);
@@ -132,9 +168,9 @@ begin
       LTableNames.Free;
     end;
 
-    io.CommitTransaction(FContext.ConnectionDefName);
+    io.CommitTransaction(Context.ConnectionDefName);
   except
-    io.RollbackTransaction(FContext.ConnectionDefName);
+    io.RollbackTransaction(Context.ConnectionDefName);
     raise;
   end;
 end;

@@ -52,10 +52,11 @@ type
     function GetName: String;
     function GetRaw: String;
     function GetVersion: String;
-  public
-    constructor Create(const AName, ARaw, AVersion: String; const AMajorVersion, AMinorVersion: Integer);
     function IsAtLeast(const AMajor, AMinor: Integer): Boolean;
     function ToString: String; override;
+  protected
+  public
+    constructor Create(const AName, ARaw, AVersion: String; const AMajorVersion, AMinorVersion: Integer);
   end;
 
 implementation

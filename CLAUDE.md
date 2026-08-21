@@ -142,10 +142,19 @@ worth it is a matter of the class's *role*, not its size: does the protected val
 class exists* (its whole reason for being), or is it a dependency the class merely *carries* to do
 some other job? `TioDBBuilderSchemaBaseObject.Status` is the former — the class's only documented
 purpose is to own that invariant, so it structurally cannot drift; no split needed.
-`TioDBBuilderStrategyContextSegregation` / `TioDBBuilderStrategyBase.Context` is the latter — the
-class's job is script-generation orchestration, Context is just an ingredient it needs, so any method
-added while focused on that real job risks touching the raw field by mistake; split it into a
-dedicated carrier class so that mistake becomes a compile error instead of a silent bug.
+`TioDBBuilderStrategySegregation` / `TioDBBuilderStrategyBase.Context` is the latter — the class's
+job is script-generation orchestration, Context is just an ingredient it needs, so any method added
+while focused on that real job risks touching the raw field by mistake; split it into a dedicated
+carrier class so that mistake becomes a compile error instead of a silent bug.
+
+**Carrier class naming.** Name the carrier class `<DerivingClassName>Segregation`, where
+`<DerivingClassName>` is the name of the concrete class that inherits from it, with any trailing
+`Base` suffix dropped first (avoids the redundant `...BaseSegregation`) — e.g.
+`TioDBBuilderStrategyBase` → `TioDBBuilderStrategySegregation`; `TioDBBuilderPlanBuilder` (no `Base`
+suffix) → `TioDBBuilderPlanBuilderSegregation`. Don't name it after *what* it carries
+(`...ContextSegregation`, `...DependenciesSegregation`) — the carried field(s) are visible in the
+class body one line below, and a single mechanical rule is easier to apply consistently than picking
+a descriptive word each time.
 
 **Method visibility.** The same criterion behind field visibility extends from properties to methods,
 including the methods a class implements to satisfy an interface: default to `private`, and widen
@@ -173,7 +182,7 @@ that is usually a sign it deserves to be its own small class with its own interf
 and it becomes independently testable through that interface like everything else, no visibility
 exception required. Only when extraction genuinely is not practical, use the same interface
 segregation trick already applied elsewhere in the codebase (e.g.
-`TioDBBuilderStrategyContextSegregation`): declare a narrow, test-only interface exposing just the
+`TioDBBuilderStrategySegregation`): declare a narrow, test-only interface exposing just the
 internal member(s) under test, have the class implement it alongside its main interface, and cast to
 it in the test (`(LObj as IioXxxTestSeam).InternalMethod`) — no class references, no subclassing.
 Declare that seam interface in a unit production code never imports (e.g. a test-support unit), never
@@ -185,6 +194,19 @@ cast and quietly reaching into internals, defeating the whole point of this conv
 the *unit*, not the *class* — any other class declared in that same unit can still see it, silently
 reopening the exact gap the split was meant to close. Declare the carrier's field (and its `GetX`/
 `SetX`) `strict private`, not `private`, so visibility is truly limited to the carrier class itself.
+
+**Explicit empty visibility sections.** Every class declaration that declares at least one member
+must include `private` (or `strict private`), `protected` (or `strict protected`), and `public`
+explicitly, in that canonical order, even when a section has nothing in it — `published` stays
+optional. The payoff is a fixed landmark: scrolling through a large class, hitting an empty
+`protected:` (or `public:`) tells you unambiguously that everything above, back to the last section
+header, belonged to the previous section, without having to scroll back up to find it. Exempt:
+classes deriving (directly or indirectly) from `Exception` — see `iORM.Exceptions.pas`, where dozens
+of tiny exception classes sit one banner-separated line apart, some with just a `constructor Create`
+overload; forcing empty `private`/`protected` sections onto each would be pure noise in a hierarchy
+that stays small by nature. Forward-looking, same as member ordering and method visibility above:
+apply when a class declaration is touched anyway, not as a retroactive sweep of the existing
+codebase.
 
 ## Supported Databases
 

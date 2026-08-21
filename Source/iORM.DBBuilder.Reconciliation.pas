@@ -55,6 +55,7 @@ type
     function GetPhysicalSchema: IioDBBuilderSchema;
     function GetPlan: IioDBBuilderPlan;
     procedure SetPhysicalSchema(const AValue: IioDBBuilderSchema);
+  protected
   public
     constructor Create(const AMappedSchema: IioDBBuilderSchema; const APlan: IioDBBuilderPlan);
   end;

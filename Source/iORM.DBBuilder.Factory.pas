@@ -50,6 +50,8 @@ uses
 type
 
   TioDBBuilderFactory = class
+  private
+  protected
   public
     class function NewContext(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
     class function NewDBBuilder: IioDBBuilder;

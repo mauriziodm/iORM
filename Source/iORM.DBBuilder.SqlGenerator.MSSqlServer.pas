@@ -44,6 +44,7 @@ const
 type
 
   TioDBBuilderSqlGenMSSqlServer = class(TioDBBuilderSqlGenBase)
+  private
   protected
     // ==========================================================
     // DBMS INFO METHODS
@@ -60,6 +61,7 @@ type
     // ALTER TABLE CAPABILITY METHODS
     // ----------------------------------------------------------
     function GetInvalidFieldTypeConversions: string; override;
+  public
   end;
 
 implementation

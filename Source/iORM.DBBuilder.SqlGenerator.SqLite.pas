@@ -47,6 +47,7 @@ uses
 
 type
   TioDBBuilderSqlGenSQLite = class(TioDBBuilderSqlGenBase)
+  private
   protected
     // ==========================================================
     // DATABASE RELATED METHODS
@@ -97,6 +98,7 @@ type
     // ALTER TABLE CAPABILITY METHODS
     // ----------------------------------------------------------
     function GetInvalidFieldTypeConversions: string; override;
+  public
   end;
 
 implementation

@@ -41,6 +41,26 @@ uses
 type
 
   /// <summary>
+  ///  Segregates the Context reference: FContext is private to this class alone, so none of
+  ///  TioDBBuilderPlanBuilder's own methods (a dozen, all doing diff/comparison work) can ever touch it
+  ///  directly, bypassing the Context property - only this class's own GetContext does. Same pattern as
+  ///  TioDBBuilderStrategySegregation (see iORM.DBBuilder.Strategy.Base) and the "Field
+  ///  visibility" note in CLAUDE.md.
+  /// </summary>
+  TioDBBuilderPlanBuilderSegregation = class(TInterfacedObject)
+  strict private
+    // strict private, not plain private: plain private in Delphi is unit-scoped, so any other class
+    // declared in this same unit (TioDBBuilderPlanBuilder included) would still see FContext/GetContext
+    // directly - defeating the whole point of this class. strict private is scoped to this exact class.
+    FContext: IioDBBuilderContext;
+    function GetContext: IioDBBuilderContext;
+  strict protected
+    property Context: IioDBBuilderContext read GetContext;
+  public
+    constructor Create(const AContext: IioDBBuilderContext);
+  end;
+
+  /// <summary>
   ///  Diffs MappedSchema against PhysicalSchema and produces the Plan. It is a SINGLE, dialect-independent
   ///  class: every genuinely dialect-specific decision lives elsewhere - catalog reading in the
   ///  Introspector, type/index comparison and name computation in the SqlGenerator - so this class only
@@ -55,30 +75,30 @@ type
   ///  authoritative. WithoutAlterTable dialects (SQLite) ignore these ops and rebuild the whole table off
   ///  the table Status; only WithAlterTable dialects act on them.
   /// </summary>
-  TioDBBuilderPlanBuilder = class(TInterfacedObject, IioDBBuilderPlanBuilder)
-  protected
-    FContext: IioDBBuilderContext;
+  TioDBBuilderPlanBuilder = class(TioDBBuilderPlanBuilderSegregation, IioDBBuilderPlanBuilder)
+  private
+    function Build: IioDBBuilderPlan;
+    // Whether a matched foreign key differs. Compares the FULL structure (dependent table+field, reference
+    // table+field, on-delete/on-update actions) rather than only the attributes that can still differ: it
+    // keeps the method self-contained and correct even if Find_PhysicalForeignKey's match key changes. The
+    // redundant checks (dependent field + reference table are already equal by the match; dependent table
+    // is the same matched table) are simply always false. Generic across dialects (both branches carry the
+    // structural fields). NB: a change to the DEPENDENT FIELD is not detected here anyway - Find_PhysicalForeignKey
+    // would not match, so the mapped FK becomes new and the old physical one an orphan (dropped only in strict).
+    function Check_ForeignKeyModified(const AMappedFK, APhysicalFK: IioDBBuilderSchemaFK): Boolean;
+    // Whether an existing table has any mapped-side difference (a field/index/FK added or modified). Used
+    // by strict mode to decide which tables to clear, BEFORE the create phases emit their ops.
+    function Check_TableModified(const AMappedTable, APhysicalTable: IioDBBuilderSchemaTable): Boolean;
     // Cross-branch lookups. Matching is case-insensitive (SameText): both branches normalize identifiers
     // via the same SqlDataConverter, so the keys already align - the case-insensitivity is just belt-and-
     // suspenders (and mirrors SQLite's native case-insensitive identifier matching). Each returns the
     // physical node, or nil = absent.
-    function FindPhysicalFK(const AMappedFK: IioDBBuilderSchemaFK;
+    function Find_PhysicalField(const APhysicalTable: IioDBBuilderSchemaTable; const AFieldName: String): IioDBBuilderSchemaField;
+    function Find_PhysicalForeignKey(const AMappedFK: IioDBBuilderSchemaFK;
       const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaFK;
-    function FindPhysicalField(const APhysicalTable: IioDBBuilderSchemaTable; const AFieldName: String): IioDBBuilderSchemaField;
-    function FindPhysicalIndex(const AMappedTable: IioDBBuilderSchemaTable; const AMappedIndex: IioDBBuilderSchemaIndex;
+    function Find_PhysicalIndex(const AMappedTable: IioDBBuilderSchemaTable; const AMappedIndex: IioDBBuilderSchemaIndex;
       const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaIndex;
-    function FindTableByName(const ASchema: IioDBBuilderSchema; const AName: String): IioDBBuilderSchemaTable;
-    // Whether a matched foreign key differs. Compares the FULL structure (dependent table+field, reference
-    // table+field, on-delete/on-update actions) rather than only the attributes that can still differ: it
-    // keeps the method self-contained and correct even if FindPhysicalFK's match key changes. The
-    // redundant checks (dependent field + reference table are already equal by the match; dependent table
-    // is the same matched table) are simply always false. Generic across dialects (both branches carry the
-    // structural fields). NB: a change to the DEPENDENT FIELD is not detected here anyway - FindPhysicalFK
-    // would not match, so the mapped FK becomes new and the old physical one an orphan (dropped only in strict).
-    function ForeignKeyModified(const AMappedFK, APhysicalFK: IioDBBuilderSchemaFK): Boolean;
-    // Whether an existing table has any mapped-side difference (a field/index/FK added or modified). Used
-    // by strict mode to decide which tables to clear, BEFORE the create phases emit their ops.
-    function TableIsModified(const AMappedTable, APhysicalTable: IioDBBuilderSchemaTable): Boolean;
+    function Find_TableByName(const ASchema: IioDBBuilderSchema; const AName: String): IioDBBuilderSchemaTable;
     // Diff phases (each iterates every mapped table so the resulting order is create-safe).
     procedure Plan_StrictDropIndexes(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
     procedure Plan_StrictDropForeignKeys(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
@@ -86,9 +106,8 @@ type
     procedure Plan_Indexes(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
     procedure Plan_ForeignKeys(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
     procedure Plan_OrphanTables(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
+  protected
   public
-    constructor Create(const AContext: IioDBBuilderContext);
-    function Build: IioDBBuilderPlan;
   end;
 
 implementation
@@ -96,12 +115,20 @@ implementation
 uses
   System.SysUtils, iORM.Attributes;
 
-{ TioDBBuilderPlanBuilder }
+{ TioDBBuilderPlanBuilderSegregation }
 
-constructor TioDBBuilderPlanBuilder.Create(const AContext: IioDBBuilderContext);
+constructor TioDBBuilderPlanBuilderSegregation.Create(const AContext: IioDBBuilderContext);
 begin
+  inherited Create;
   FContext := AContext;
 end;
+
+function TioDBBuilderPlanBuilderSegregation.GetContext: IioDBBuilderContext;
+begin
+  Result := FContext;
+end;
+
+{ TioDBBuilderPlanBuilder }
 
 function TioDBBuilderPlanBuilder.Build: IioDBBuilderPlan;
 var
@@ -110,10 +137,10 @@ var
   LMappedTable, LPhysicalTable: IioDBBuilderSchemaTable;
   LStrictIndexes, LStrictForeignKeys: Boolean;
 begin
-  LMappedSchema := FContext.Reconciliation.MappedSchema;
+  LMappedSchema := Context.Reconciliation.MappedSchema;
   // May be nil when the Introspector has not run (e.g. a non-existent DB): treated as "nothing exists yet".
-  LPhysicalSchema := FContext.Reconciliation.PhysicalSchema;
-  LPlan := FContext.Reconciliation.Plan;
+  LPhysicalSchema := Context.Reconciliation.PhysicalSchema;
+  LPlan := Context.Reconciliation.Plan;
   LPlan.Clear;
 
   LStrictIndexes := LMappedSchema.IndexesMode = ifmEnabledStrict;
@@ -125,8 +152,8 @@ begin
   if LStrictIndexes or LStrictForeignKeys then
     for LMappedTable in LMappedSchema.Tables.Values do
     begin
-      LPhysicalTable := FindTableByName(LPhysicalSchema, LMappedTable.Name);
-      if (LPhysicalTable <> nil) and TableIsModified(LMappedTable, LPhysicalTable) then
+      LPhysicalTable := Find_TableByName(LPhysicalSchema, LMappedTable.Name);
+      if (LPhysicalTable <> nil) and Check_TableModified(LMappedTable, LPhysicalTable) then
         LMappedTable.Status := stUpdate;
     end;
 
@@ -157,7 +184,7 @@ begin
   Result := LPlan;
 end;
 
-function TioDBBuilderPlanBuilder.FindPhysicalFK(const AMappedFK: IioDBBuilderSchemaFK;
+function TioDBBuilderPlanBuilder.Find_PhysicalForeignKey(const AMappedFK: IioDBBuilderSchemaFK;
   const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaFK;
 var
   LPhysicalFK: IioDBBuilderSchemaFK;
@@ -169,7 +196,7 @@ begin
       Exit(LPhysicalFK);
 end;
 
-function TioDBBuilderPlanBuilder.FindPhysicalField(const APhysicalTable: IioDBBuilderSchemaTable;
+function TioDBBuilderPlanBuilder.Find_PhysicalField(const APhysicalTable: IioDBBuilderSchemaTable;
   const AFieldName: String): IioDBBuilderSchemaField;
 var
   LField: IioDBBuilderSchemaField;
@@ -180,7 +207,7 @@ begin
       Exit(LField);
 end;
 
-function TioDBBuilderPlanBuilder.FindPhysicalIndex(const AMappedTable: IioDBBuilderSchemaTable;
+function TioDBBuilderPlanBuilder.Find_PhysicalIndex(const AMappedTable: IioDBBuilderSchemaTable;
   const AMappedIndex: IioDBBuilderSchemaIndex; const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaIndex;
 var
   LMappedIndexName: String;
@@ -189,13 +216,13 @@ begin
   Result := nil;
   // The mapped index has no catalog name of its own: compute the name it WOULD have (dialect rule) and
   // look for it among the physical indexes.
-  LMappedIndexName := FContext.SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(AMappedTable, AMappedIndex);
+  LMappedIndexName := Context.SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(AMappedTable, AMappedIndex);
   for LPhysicalIndex in APhysicalTable.Indexes.Values do
     if SameText(LPhysicalIndex.Name, LMappedIndexName) then
       Exit(LPhysicalIndex);
 end;
 
-function TioDBBuilderPlanBuilder.FindTableByName(const ASchema: IioDBBuilderSchema;
+function TioDBBuilderPlanBuilder.Find_TableByName(const ASchema: IioDBBuilderSchema;
   const AName: String): IioDBBuilderSchemaTable;
 var
   LTable: IioDBBuilderSchemaTable;
@@ -208,7 +235,7 @@ begin
       Exit(LTable);
 end;
 
-function TioDBBuilderPlanBuilder.ForeignKeyModified(const AMappedFK, APhysicalFK: IioDBBuilderSchemaFK): Boolean;
+function TioDBBuilderPlanBuilder.Check_ForeignKeyModified(const AMappedFK, APhysicalFK: IioDBBuilderSchemaFK): Boolean;
 begin
   // Full structural comparison (see the declaration note): self-contained, no reliance on the match key.
   Result := (not SameText(AMappedFK.DependentTableName, APhysicalFK.DependentTableName))
@@ -219,7 +246,7 @@ begin
     or (AMappedFK.OnUpdateAction <> APhysicalFK.OnUpdateAction);
 end;
 
-function TioDBBuilderPlanBuilder.TableIsModified(const AMappedTable, APhysicalTable: IioDBBuilderSchemaTable): Boolean;
+function TioDBBuilderPlanBuilder.Check_TableModified(const AMappedTable, APhysicalTable: IioDBBuilderSchemaTable): Boolean;
 var
   LField: IioDBBuilderSchemaField;
   LIndex: IioDBBuilderSchemaIndex;
@@ -231,20 +258,20 @@ begin
   Result := True;  // exit True on the first difference found
   for LField in AMappedTable.Fields do
   begin
-    LPhysicalField := FindPhysicalField(APhysicalTable, LField.FieldName);
-    if (LPhysicalField = nil) or (FContext.SqlGenerator.Compare_Field(LField, LPhysicalField) <> []) then
+    LPhysicalField := Find_PhysicalField(APhysicalTable, LField.FieldName);
+    if (LPhysicalField = nil) or (Context.SqlGenerator.Compare_Field(LField, LPhysicalField) <> []) then
       Exit;
   end;
   for LIndex in AMappedTable.Indexes.Values do
   begin
-    LPhysicalIndex := FindPhysicalIndex(AMappedTable, LIndex, APhysicalTable);
-    if (LPhysicalIndex = nil) or (FContext.SqlGenerator.Compare_Index(LIndex, LPhysicalIndex) <> []) then
+    LPhysicalIndex := Find_PhysicalIndex(AMappedTable, LIndex, APhysicalTable);
+    if (LPhysicalIndex = nil) or (Context.SqlGenerator.Compare_Index(LIndex, LPhysicalIndex) <> []) then
       Exit;
   end;
   for LFK in AMappedTable.ForeignKeys.Values do
   begin
-    LPhysicalFK := FindPhysicalFK(LFK, APhysicalTable);
-    if (LPhysicalFK = nil) or ForeignKeyModified(LFK, LPhysicalFK) then
+    LPhysicalFK := Find_PhysicalForeignKey(LFK, APhysicalTable);
+    if (LPhysicalFK = nil) or Check_ForeignKeyModified(LFK, LPhysicalFK) then
       Exit;
   end;
   Result := False;
@@ -263,7 +290,7 @@ begin
   begin
     if LMappedTable.Status <> stUpdate then
       Continue;
-    LPhysicalTable := FindTableByName(APhysicalSchema, LMappedTable.Name);
+    LPhysicalTable := Find_TableByName(APhysicalSchema, LMappedTable.Name);
     if LPhysicalTable = nil then
       Continue;
     for LPhysicalIndex in LPhysicalTable.Indexes.Values do
@@ -285,7 +312,7 @@ begin
   begin
     if LMappedTable.Status <> stUpdate then
       Continue;
-    LPhysicalTable := FindTableByName(APhysicalSchema, LMappedTable.Name);
+    LPhysicalTable := Find_TableByName(APhysicalSchema, LMappedTable.Name);
     if LPhysicalTable = nil then
       Continue;
     for LPhysicalFK in LPhysicalTable.ForeignKeys.Values do
@@ -305,7 +332,7 @@ var
 begin
   for LMappedTable in AMappedSchema.Tables.Values do
   begin
-    LPhysicalTable := FindTableByName(APhysicalSchema, LMappedTable.Name);
+    LPhysicalTable := Find_TableByName(APhysicalSchema, LMappedTable.Name);
     if LPhysicalTable = nil then
     begin
       // New table: the CreateTable translator emits the fields (and PK) inline, so no per-field ops here.
@@ -322,7 +349,7 @@ begin
       // table stUpdate never downgrades a new table's stCreate.
       for LField in LMappedTable.Fields do
       begin
-        LPhysicalField := FindPhysicalField(LPhysicalTable, LField.FieldName);
+        LPhysicalField := Find_PhysicalField(LPhysicalTable, LField.FieldName);
         if LPhysicalField = nil then
         begin
           LField.Status := stCreate;
@@ -331,7 +358,7 @@ begin
         end
         else
         begin
-          LChanges := FContext.SqlGenerator.Compare_Field(LField, LPhysicalField);
+          LChanges := Context.SqlGenerator.Compare_Field(LField, LPhysicalField);
           if LChanges <> [] then
           begin
             LField.Status := stUpdate;
@@ -351,7 +378,7 @@ var
 begin
   for LMappedTable in AMappedSchema.Tables.Values do
   begin
-    LPhysicalTable := FindTableByName(APhysicalSchema, LMappedTable.Name);
+    LPhysicalTable := Find_TableByName(APhysicalSchema, LMappedTable.Name);
     for LIndex in LMappedTable.Indexes.Values do
     begin
       if AStrict and (LMappedTable.Status = stUpdate) then
@@ -364,14 +391,14 @@ begin
       if LPhysicalTable = nil then
         LPhysicalIndex := nil
       else
-        LPhysicalIndex := FindPhysicalIndex(LMappedTable, LIndex, LPhysicalTable);
+        LPhysicalIndex := Find_PhysicalIndex(LMappedTable, LIndex, LPhysicalTable);
       if LPhysicalIndex = nil then
       begin
         LIndex.Status := stCreate;
         LMappedTable.Status := stUpdate;  // monotonic: harmless on a brand-new (stCreate) table
         APlan.AddCreateIndex(LMappedTable, LIndex);
       end
-      else if FContext.SqlGenerator.Compare_Index(LIndex, LPhysicalIndex) <> [] then
+      else if Context.SqlGenerator.Compare_Index(LIndex, LPhysicalIndex) <> [] then
       begin
         // Modified index: drop the physical one, recreate the mapped one (Firebird ALTER-style; SQLite
         // ignores these and rebuilds the whole table off the table Status).
@@ -393,7 +420,7 @@ var
 begin
   for LMappedTable in AMappedSchema.Tables.Values do
   begin
-    LPhysicalTable := FindTableByName(APhysicalSchema, LMappedTable.Name);
+    LPhysicalTable := Find_TableByName(APhysicalSchema, LMappedTable.Name);
     for LFK in LMappedTable.ForeignKeys.Values do
     begin
       if AStrict and (LMappedTable.Status = stUpdate) then
@@ -406,14 +433,14 @@ begin
       if LPhysicalTable = nil then
         LPhysicalFK := nil
       else
-        LPhysicalFK := FindPhysicalFK(LFK, LPhysicalTable);
+        LPhysicalFK := Find_PhysicalForeignKey(LFK, LPhysicalTable);
       if LPhysicalFK = nil then
       begin
         LFK.Status := stCreate;
         LMappedTable.Status := stUpdate;  // monotonic: harmless on a brand-new (stCreate) table
         APlan.AddCreateForeignKey(LMappedTable, LFK);
       end
-      else if ForeignKeyModified(LFK, LPhysicalFK) then
+      else if Check_ForeignKeyModified(LFK, LPhysicalFK) then
       begin
         // Modified FK: drop the physical one, recreate the mapped one.
         LPhysicalFK.Status := stDrop;
@@ -436,7 +463,7 @@ begin
   // A table present in the DB but absent from the ORM maps: mark it for drop. The translation (C4) renders
   // it as a commented-out, non-executed statement plus a warning - iORM never silently drops a table.
   for LPhysicalTable in APhysicalSchema.Tables.Values do
-    if FindTableByName(AMappedSchema, LPhysicalTable.Name) = nil then
+    if Find_TableByName(AMappedSchema, LPhysicalTable.Name) = nil then
     begin
       LPhysicalTable.Status := stDrop;
       APlan.AddDropTable(LPhysicalTable);

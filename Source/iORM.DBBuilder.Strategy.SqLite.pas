@@ -11,6 +11,7 @@ uses
 
 type
   TioDBBuilderStrategySqLite = class(TioDBBuilderStrategyWithoutAlterTable)
+  private
   protected
     // ==========================================================
     // CONSTRAINT DEFERRAL HOOKS

@@ -48,8 +48,13 @@ type
   ///  TrueClass/ClassInfo column, etc.).
   /// </summary>
   TioDBBuilderSchemaFieldBase = class(TioDBBuilderSchemaBaseObject, IioDBBuilderSchemaField)
-  protected
+  strict private
+    // strict private, not plain private: plain private in Delphi is unit-scoped, so
+    // TioDBBuilderSchemaField (declared further down in this same unit) would still see FAltered
+    // directly, bypassing AddAltered. strict private is scoped to this exact class.
     FAltered: TioDBBuilderFieldChanges;
+    procedure AddAltered(const AAltered: TioDBBuilderFieldChange);
+  strict protected
     // --- Value-source getters: abstract, implemented by each concrete field kind ---
     function GetFieldCustomType: string; virtual; abstract;
     function GetFieldDefault: TValue; virtual; abstract;
@@ -76,7 +81,6 @@ type
     function GetIsFieldPrecisionIncreased: Boolean;
     function GetIsFieldTypeAltered: Boolean;
   public
-    procedure AddAltered(const AAltered: TioDBBuilderFieldChange);
   end;
 
   /// <summary>

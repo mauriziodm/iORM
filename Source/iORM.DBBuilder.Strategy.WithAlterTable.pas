@@ -49,6 +49,7 @@ uses
 
 type
   TioDBBuilderStrategyWithAlterTable = class(TioDBBuilderStrategyBase)
+  private
   protected
     // ==========================================================
     // TABLE RELATED METHODS

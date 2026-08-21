@@ -45,18 +45,19 @@ type
     FForeignKeysMode, FIndexesMode: TioDBBuilderIndexesAndFKMode;
     FSequences: TioDBBuilderSchemaSequences;
     FTables: TioDBBuilderSchemaTables;
-    function GetForeignKeysMode: TioDBBuilderIndexesAndFKMode;
-    function GetIndexesMode: TioDBBuilderIndexesAndFKMode;
-    function GetSequences: TioDBBuilderSchemaSequences;
-    function GetTables: TioDBBuilderSchemaTables;
-  public
-    constructor Create(const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
-    destructor Destroy; override;
     procedure AddTable(const ATable: IioDBBuilderSchemaTable);
     function FindOrCreateTable(const AMap: IioMap; const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
     function FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
     procedure ForceCreateStatus;
+    function GetForeignKeysMode: TioDBBuilderIndexesAndFKMode;
+    function GetIndexesMode: TioDBBuilderIndexesAndFKMode;
+    function GetSequences: TioDBBuilderSchemaSequences;
+    function GetTables: TioDBBuilderSchemaTables;
     procedure SequenceAddIfNotExists(const ASequenceName: String);
+  protected
+  public
+    constructor Create(const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
+    destructor Destroy; override;
   end;
 
 implementation

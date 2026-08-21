@@ -21,6 +21,7 @@ type
     FName: String;
     FOrientation: TioIndexOrientation;
     FUnique: Boolean;
+    procedure AddChange(const AChange: TioDBBuilderIndexChange);
     function GetChanges: TioDBBuilderIndexChanges;
     function GetCommaSepFieldList: String;
     function GetHasExplicitName: boolean;
@@ -28,13 +29,13 @@ type
     function GetOrientation: TioIndexOrientation;
     function GetSqlCommaSepFieldList: String;
     function GetUnique: Boolean;
+  protected
   public
     constructor Create(const AIndexAttr: ioIndex; const AConnectionDefName: String); overload;
     // Value-based constructor for the Physical branch: the Introspector passes the catalog values
     // directly (there is no ioIndex attribute behind a catalog index).
     constructor Create(const AName, ACommaSepFieldList: String; const AUnique: Boolean;
       const AOrientation: TioIndexOrientation; const AConnectionDefName: String); overload;
-    procedure AddChange(const AChange: TioDBBuilderIndexChange);
   end;
 
 implementation

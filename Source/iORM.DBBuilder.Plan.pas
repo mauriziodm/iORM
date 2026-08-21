@@ -57,7 +57,6 @@ type
     FSchemaIndex: IioDBBuilderSchemaIndex;
     FSchemaTable: IioDBBuilderSchemaTable;
     FSequenceName: String;
-  protected
     function GetDescription: String;
     function GetKind: TioDBBuilderPlanOpKind;
     function GetSchemaField_Changes: TioDBBuilderFieldChanges;
@@ -67,6 +66,7 @@ type
     function GetSchemaIndex: IioDBBuilderSchemaIndex;
     function GetSchemaTable: IioDBBuilderSchemaTable;
     function GetSequenceName: String;
+  protected
   public
     constructor Create(const AKind: TioDBBuilderPlanOpKind; const ATable: IioDBBuilderSchemaTable = nil;
       const AField: IioDBBuilderSchemaField = nil; const AIndex: IioDBBuilderSchemaIndex = nil;
@@ -84,7 +84,6 @@ type
   private
     FOperations: TioDBBuilderPlanOperations;
     function AddOp(const AOperation: IioDBBuilderPlanOperation): IioDBBuilderPlanOperation;
-  protected
     // TABLE
     function AddCreateTable(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
     function AddDropTable(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
@@ -106,6 +105,7 @@ type
     function GetCount: Integer;
     function GetIsEmpty: Boolean;
     function GetOperations: TioDBBuilderPlanOperations;
+  protected
   public
     constructor Create;
     destructor Destroy; override;

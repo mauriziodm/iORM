@@ -45,13 +45,15 @@ type
     FConnectionDefName: string;
     FSchema: IioDBBuilderSchema;
     FSqlGenerator: IioDBBuilderSqlGenerator;
+    procedure BuildSchema;
     procedure BuildSchemaFK(const AMap: IioMap);
     procedure BuildSchemaIndexes(const ASchemaTable: IioDBBuilderSchemaTable; const AMap: IioMap);
     procedure BuildSchemaTable(const AMap: IioMap);
+    function IsSchemaEligible(const AMap: IioMap): Boolean;
+  protected
   public
     constructor Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema;
       const ASqlGenerator: IioDBBuilderSqlGenerator);
-    procedure BuildSchema;
   end;
 
 implementation
@@ -90,7 +92,7 @@ var
   LSchemaTable: IioDBBuilderSchemaTable;
 begin
   // Check if the class/table must be skipped or not (same guard as BuildSchemaTable)
-  if AMap.GetTable.IsNotPersistedEntity or not AMap.GetTable.IsForThisConnection(FConnectionDefName) then
+  if not IsSchemaEligible(AMap) then
     Exit;
   for LProperty in AMap.GetProperties do
   begin
@@ -106,7 +108,7 @@ begin
       LResolvedChildTypeMap := TioMapContainer.GetMap(LResolvedChildTypeName);
       // Skip the FK if the child class is a NotPersisted entity or is not for this connection:
       // a FK is created only when both classes involved live on the connection being built
-      if LResolvedChildTypeMap.GetTable.IsNotPersistedEntity or not LResolvedChildTypeMap.GetTable.IsForThisConnection(FConnectionDefName) then
+      if not IsSchemaEligible(LResolvedChildTypeMap) then
         Continue;
       // The reference side is the master table of the relation, the dependent side is the table
       // holding the FK field: the current map itself for BelongsTo, the resolved child map for
@@ -152,12 +154,12 @@ end;
 
 procedure TioDBBuilderSchemaBuilder.BuildSchemaTable(const AMap: IioMap);
 var
-  LSchemaTable: IioDBBuilderSchemaTable;
-  LProperty: IioProperty;
   LKeyGenStrategy: TioKeyGenerationStrategyType;
+  LProperty: IioProperty;
+  LSchemaTable: IioDBBuilderSchemaTable;
 begin
   // Check if the class/table must be skipped or not
-  if AMap.GetTable.IsNotPersistedEntity or not AMap.GetTable.IsForThisConnection(FConnectionDefName) then
+  if not IsSchemaEligible(AMap) then
     Exit;
   // Resolve the key generation strategy: if the map declares kgsAuto, the SqlGenerator translates it
   // into the concrete DBMS-specific strategy (e.g. Autoincrement for SQLite, Identity/Sequence for
@@ -167,7 +169,7 @@ begin
   LSchemaTable := FSchema.FindOrCreateTable(AMap, LKeyGenStrategy);
   // Add fields
   for LProperty in AMap.GetProperties do
-    if not (LProperty.IsTransient or (LProperty.GetRelationType = rtHasMany) or (LProperty.GetRelationType = rtHasOne)) then
+    if not (LProperty.IsTransient or (LProperty.GetRelationType in [rtHasMany, rtHasOne])) then
       LSchemaTable.AddField(TioDBBuilderFactory.NewSchemaField(LProperty));
   // Add the ClassInfo field if necessary
   if LSchemaTable.IsTrueClass then
@@ -186,6 +188,14 @@ begin
   FConnectionDefName := AConnectionDefName;
   FSchema := ASchema;
   FSqlGenerator := ASqlGenerator;
+end;
+
+function TioDBBuilderSchemaBuilder.IsSchemaEligible(const AMap: IioMap): Boolean;
+begin
+  // A class/table takes part in the schema of this connection only if it is a persisted entity
+  // and it is mapped for the connection being built. Shared guard used by BuildSchemaTable and
+  // BuildSchemaFK (on both the current map and each resolved child map).
+  Result := AMap.GetTable.IsForThisConnection(FConnectionDefName) and not AMap.GetTable.IsNotPersistedEntity;
 end;
 
 end.

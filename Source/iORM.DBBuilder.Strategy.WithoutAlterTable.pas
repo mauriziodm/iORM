@@ -54,6 +54,11 @@ uses
 
 type
   TioDBBuilderStrategyWithoutAlterTable = class(TioDBBuilderStrategyBase)
+  private
+    // ==========================================================
+    // TABLE RELATED METHODS
+    // ----------------------------------------------------------
+    procedure Process_Tables;
   protected
     // ==========================================================
     // RENAME-CREATE-COPY PATTERN HELPERS
@@ -83,11 +88,6 @@ type
     procedure ScriptWrite_EndDeferConstraints; virtual;
 
     // ==========================================================
-    // TABLE RELATED METHODS
-    // ----------------------------------------------------------
-    procedure Process_Tables;
-
-    // ==========================================================
     // MAIN GENERATION
     // ----------------------------------------------------------
     /// <summary>
@@ -106,7 +106,6 @@ type
     /// </summary>
     procedure GenerateScript_Body; override;
   public
-
   end;
 
 

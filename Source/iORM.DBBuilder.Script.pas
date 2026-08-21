@@ -22,23 +22,23 @@ type
     FAddLinePrefix: String;
     FIndentLevel: Integer;
     FLines: TStringList;
+    function Add(const AText: String): IioDBBuilderSqlText;      // Append inline to last line
+    function AddComment(const AText: String): IioDBBuilderSqlText;
+    function AddEmpty: IioDBBuilderSqlText;
+    function AddLine(const AText: string): IioDBBuilderSqlText;
+    function AddSeparator: IioDBBuilderSqlText;
+    function AddTitle(const AText: String): IioDBBuilderSqlText;
+    procedure Clear;
+    function DecIndent: IioDBBuilderSqlText;
     function GetIndentationChars: string;
     function GetIsEmpty: Boolean;
     function GetLines: TStringList;
     function GetText: string;
+    function IncIndent: IioDBBuilderSqlText;
+  protected
   public
     constructor Create(const AAddLinePrefix: String);
     destructor Destroy; override;
-
-    function Add(const AText: String): IioDBBuilderSqlText; virtual;      // Append inline to last line
-    function AddComment(const AText: String): IioDBBuilderSqlText; virtual;
-    function AddEmpty: IioDBBuilderSqlText;
-    function AddLine(const AText: string): IioDBBuilderSqlText; virtual;
-    function AddSeparator: IioDBBuilderSqlText; virtual;
-    function AddTitle(const AText: String): IioDBBuilderSqlText; virtual;
-    procedure Clear;
-    function DecIndent: IioDBBuilderSqlText;
-    function IncIndent: IioDBBuilderSqlText;
   end;
 
   TioDBBuilderScript = class(TInterfacedObject, IioDBBuilderScript)
@@ -51,23 +51,23 @@ type
     FHints: IioDBBuilderSqlText;
     FWarnings: IioDBBuilderSqlText;
 
+    // Full script clear
+    procedure Clear;
     function GetBody: IioDBBuilderSqlText;
     function GetFooter: IioDBBuilderSqlText;
     function GetHeader: IioDBBuilderSqlText;
     function GetHints: IioDBBuilderSqlText;
     function GetLines: TStringList;
     function GetWarnings: IioDBBuilderSqlText;
+    procedure SaveToFile(const AFileName: string);
+    // This method works on header section
+    procedure ScriptBegin(const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo);
+    // This method works on footer section
+    procedure ScriptEnd;
+  protected
   public
     constructor Create(const AConnectionDefName: string);
     destructor Destroy; override;
-
-    // Full script clear
-    procedure Clear;
-    procedure SaveToFile(const AFileName: string);
-    // This method works on header section
-    procedure ScriptBegin(const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo); virtual;
-    // This method works on footer section
-    procedure ScriptEnd; virtual;
   end;
 
 
