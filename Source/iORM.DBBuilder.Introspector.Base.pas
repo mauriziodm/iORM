@@ -56,6 +56,7 @@ type
     // directly - defeating the whole point of this class. strict private is scoped to this exact class.
     FContext: IioDBBuilderContext;
     FStrategy: IioDBBuilderStrategy;
+
     function GetContext: IioDBBuilderContext;
     function GetStrategy: IioDBBuilderStrategy;
   strict protected
