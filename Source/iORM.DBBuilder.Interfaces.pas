@@ -36,7 +36,7 @@ unit iORM.DBBuilder.Interfaces;
 interface
 
 uses
-  System.Generics.Collections, iORM.Context.Table.Interfaces, iORM.Context.Properties.Interfaces, System.Classes,
+  System.Generics.Collections, iORM.Context.Properties.Interfaces, System.Classes,
   iORM.Context.Map.Interfaces, iORM.Attributes, System.Rtti, iORM.CommonTypes, iORM.DB.Interfaces;
 
 type
@@ -260,7 +260,10 @@ type
     ///  comparison would have produced. Used as part of ForceCreateStatus's table-wide cascade.
     /// </summary>
     procedure ForceIndexesCreateStatus;
-    function GetContextTable: IioTable;
+    // The IioTable.ClassName the Mapped branch was built from, frozen at construction; '' on the
+    // Physical branch (not applicable - a catalog table has no ORM class). Kept as a plain string
+    // (not the live IioTable) so SqlGenerator/PlanBuilder never reach into the ORM object itself.
+    function GetContextClassName: String;
     function GetFields: TioDBBuilderSchemaFields;
     function GetForeignKeys: TioDBBuilderSchemaForeignKeys;
     function GetIndexes: TioDBBuilderSchemaIndexes;
@@ -286,7 +289,7 @@ type
     function UsesIdentityForKeyGeneration: Boolean;
     function UsesSequenceForKeyGeneration: Boolean;
 
-    property ContextTable: IioTable read GetContextTable;
+    property ContextClassName: String read GetContextClassName;
     property Fields: TioDBBuilderSchemaFields read GetFields;
     property ForeignKeys: TioDBBuilderSchemaForeignKeys read GetForeignKeys;
     property Indexes: TioDBBuilderSchemaIndexes read GetIndexes;

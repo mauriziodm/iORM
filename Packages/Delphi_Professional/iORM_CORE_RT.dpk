@@ -174,7 +174,6 @@ contains
   iORM.DBBuilder.Schema.FK in '..\..\Source\iORM.DBBuilder.Schema.FK.pas',
   iORM.DBBuilder.Schema.Field.Physical in '..\..\Source\iORM.DBBuilder.Schema.Field.Physical.pas',
   iORM.DBBuilder.Schema.FK.Physical in '..\..\Source\iORM.DBBuilder.Schema.FK.Physical.pas',
-  iORM.DBBuilder.Schema.Table.Physical in '..\..\Source\iORM.DBBuilder.Schema.Table.Physical.pas',
   iORM.DBBuilder.Schema in '..\..\Source\iORM.DBBuilder.Schema.pas',
   iORM.DBBuilder.Schema.Builder in '..\..\Source\iORM.DBBuilder.Schema.Builder.pas',
   iORM.DBBuilder.Schema.RDBMSInfo in '..\..\Source\iORM.DBBuilder.Schema.RDBMSInfo.pas',

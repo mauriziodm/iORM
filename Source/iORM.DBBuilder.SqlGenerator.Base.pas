@@ -427,7 +427,7 @@ begin
 
   // Build FK name
   LFKName := FK_PREFIX + AForeignKey.Name;
-  LFKName := TioSqlTranslator.Translate(LFKName, ATable.GetContextTable.GetClassName, False);
+  LFKName := TioSqlTranslator.Translate(LFKName, ATable.ContextClassName, False);
 
   // If name exceeds max length, recalculate using shortening algorithm
   if IsSqlIdentifierTooLong(LFKName) then
@@ -477,7 +477,7 @@ begin
   // Otherwise, build a name from table and field names with prefix/suffixes.
   // If the generated name exceeds max length, use a shortened hash version.
   if AIndex.HasExplicitName then
-    LFullIndexName := TioSqlTranslator.Translate(AIndex.Name, ATable.GetContextTable.GetClassName, False)
+    LFullIndexName := TioSqlTranslator.Translate(AIndex.Name, ATable.ContextClassName, False)
   else
   begin
     // Build fields part (table + fields without spaces)

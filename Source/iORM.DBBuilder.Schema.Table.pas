@@ -41,15 +41,29 @@ uses
 
 type
 
+  /// <summary>
+  ///  A table node of either branch of the schema diff. One class, one shape, two constructors:
+  ///  CreateMapped populates it from the ORM map at schema-build time, CreatePhysical from the DB
+  ///  catalog at introspect time. Name/SqlName/ContextClassName are frozen to plain values at
+  ///  construction (not lazy getters onto a live IioTable) so nothing outside this unit ever reaches
+  ///  into the ORM object - SqlGenerator and PlanBuilder only ever see values. The ORM-only members
+  ///  (AddForeignKey/AddIndex with map-shaped args, key-generation family, IsTrueClass) are only ever
+  ///  exercised on a Mapped-built instance: the Introspector populates ForeignKeys/Indexes directly via
+  ///  their collections and never calls them, so no guard against calling them on a Physical-built
+  ///  instance is needed - nothing in the codebase does.
+  /// </summary>
   TioDBBuilderSchemaTable = class(TioDBBuilderSchemaBaseObject, IioDBBuilderSchemaTable)
   private
+    FContextClassName: String;
     FContextTable: IioTable;
     FFields: TioDBBuilderSchemaFields;
     FForeignKeys: TioDBBuilderSchemaForeignKeys;
     FIndexes: TioDBBuilderSchemaIndexes;
     FIsTrueClass: Boolean;
     FKeyGenerationStrategy: TioKeyGenerationStrategyType;
+    FName: String;
     FPrimaryKeyField: IioDBBuilderSchemaField;
+    FSqlName: String;
     procedure AddField(ASchemaField: IioDBBuilderSchemaField);
     procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
@@ -60,7 +74,7 @@ type
     procedure ForceFieldsCreateStatus;
     procedure ForceForeignKeysCreateStatus;
     procedure ForceIndexesCreateStatus;
-    function GetContextTable: IioTable;
+    function GetContextClassName: String;
     function GetFields: TioDBBuilderSchemaFields;
     function GetForeignKeys: TioDBBuilderSchemaForeignKeys;
     function GetIndexes: TioDBBuilderSchemaIndexes;
@@ -78,14 +92,23 @@ type
     function UsesSequenceForKeyGeneration: Boolean;
   protected
   public
-    constructor Create(const AContextTable: IioTable; const AKeyGenerationStrategy: TioKeyGenerationStrategyType);
+    // Mapped branch: built from the ORM map at schema-build time. Name/SqlName/ContextClassName are
+    // frozen from AContextTable here; ForeignKeys/Indexes are populated afterwards via AddForeignKey/
+    // AddIndex (map-shaped args), Fields via AddField.
+    constructor CreateMapped(const AContextTable: IioTable; const AKeyGenerationStrategy: TioKeyGenerationStrategyType);
+    // Physical branch: built from the DB catalog at introspect time. No ORM class behind it - the
+    // ORM-only members (ContextClassName, key-generation family, IsTrueClass) stay at their type
+    // default (empty/False/Low). Fields/ForeignKeys/Indexes are populated afterwards by the
+    // Introspector, straight into the exposed collections for ForeignKeys/Indexes and via AddField
+    // for Fields (also used by the Mapped branch, and it tracks the primary-key field).
+    constructor CreatePhysical(const AConnectionDefName, AName: String);
     destructor Destroy; override;
   end;
 
 implementation
 
 uses
-  System.SysUtils, iORM.DBBuilder.Factory, iORM.Exceptions;
+  System.SysUtils, iORM.DBBuilder.Factory, iORM.Exceptions, iORM.DB.Factory;
 
 { TioDBBuilderSchemaTable }
 
@@ -101,13 +124,26 @@ begin
   end;
 end;
 
-constructor TioDBBuilderSchemaTable.Create(const AContextTable: IioTable;
+constructor TioDBBuilderSchemaTable.CreateMapped(const AContextTable: IioTable;
   const AKeyGenerationStrategy: TioKeyGenerationStrategyType);
 begin
   Status := stClean;
   FContextTable := AContextTable;
+  FContextClassName := AContextTable.GetClassName;
   FIsTrueClass := AContextTable.IsTrueClass;
   FKeyGenerationStrategy := AKeyGenerationStrategy;
+  FName := AContextTable.TableName;  // Case normalized, no delimiters
+  FSqlName := AContextTable.GetSql;  // Case normalized + delimiters
+  FFields := TioDBBuilderSchemaFields.Create;
+  FForeignKeys := TioDBBuilderSchemaForeignKeys.Create;
+  FIndexes := TioDBBuilderSchemaIndexes.Create;
+end;
+
+constructor TioDBBuilderSchemaTable.CreatePhysical(const AConnectionDefName, AName: String);
+begin
+  Status := stClean;
+  FName := TioDbFactory.SqlDataConverter(AConnectionDefName).NormalizeSqlIdentifier(AName, False);
+  FSqlName := TioDbFactory.SqlDataConverter(AConnectionDefName).NormalizeSqlIdentifier(AName, True);
   FFields := TioDBBuilderSchemaFields.Create;
   FForeignKeys := TioDBBuilderSchemaForeignKeys.Create;
   FIndexes := TioDBBuilderSchemaIndexes.Create;
@@ -126,10 +162,7 @@ begin
   Result := FindField(AFieldName) <> nil;
 end;
 
-// Case-insensitive: field names are normalized identifiers (mirrors the former PlanBuilder
-// Find_MappedField/Find_PhysicalField, now unified here since both were the same lookup on this
-// table's own Fields collection - the Mapped/Physical distinction lived only in the caller's variable
-// name, not in the algorithm).
+// Case-insensitive: field names are normalized identifiers.
 function TioDBBuilderSchemaTable.FindField(const AFieldName: String): IioDBBuilderSchemaField;
 var
   LField: IioDBBuilderSchemaField;
@@ -238,17 +271,17 @@ end;
 
 function TioDBBuilderSchemaTable.GetName: String;
 begin
-  Result := FContextTable.TableName;  // Case normalized, no delimiters
+  Result := FName;
 end;
 
 function TioDBBuilderSchemaTable.GetSqlName: String;
 begin
-  Result := FContextTable.GetSql;  // Case normalized + delimiters
+  Result := FSqlName;
 end;
 
-function TioDBBuilderSchemaTable.GetContextTable: IioTable;
+function TioDBBuilderSchemaTable.GetContextClassName: String;
 begin
-  Result := FContextTable;
+  Result := FContextClassName;
 end;
 
 function TioDBBuilderSchemaTable.GetKeyGenerationStrategy: TioKeyGenerationStrategyType;

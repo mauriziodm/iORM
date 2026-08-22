@@ -96,8 +96,7 @@ type
 implementation
 
 uses
-  System.SysUtils, System.Generics.Collections, iORM, iORM.DB.QueryEngine, iORM.DBBuilder.Factory,
-  iORM.DBBuilder.Schema.Table.Physical;
+  System.SysUtils, System.Generics.Collections, iORM, iORM.DB.QueryEngine, iORM.DBBuilder.Factory;
 
 { TioDBBuilderIntrospectorSegregation }
 
@@ -159,7 +158,7 @@ begin
 
       for LTableName in LTableNames do
       begin
-        LTable := TioDBBuilderSchemaTablePhysical.Create(Context.ConnectionDefName, LTableName);
+        LTable := TioDBBuilderFactory.NewPhysicalSchemaTable(Context.ConnectionDefName, LTableName);
         ReadFields(LTable, LTableName);
         ReadIndexes(LTable, LTableName);
         ReadForeignKeys(LTable, LTableName);

@@ -57,6 +57,9 @@ type
     class function NewDBBuilder: IioDBBuilder;
     class function NewEmptySchema(const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderSchema;
     class function NewIntrospector(const AContext: IioDBBuilderContext; const AStrategy: IioDBBuilderStrategy): IioDBBuilderIntrospector;
+    class function NewMappedSchemaTable(const AContextTable: IioTable;
+      const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
+    class function NewPhysicalSchemaTable(const AConnectionDefName, AName: String): IioDBBuilderSchemaTable;
     class function NewPlan: IioDBBuilderPlan;
     class function NewPlanBuilder(const AContext: IioDBBuilderContext): IioDBBuilderPlanBuilder;
     class function NewReconciliation(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode;
@@ -70,8 +73,6 @@ type
     class function NewSchemaFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty; const AOnDeleteAction, AOnUpdateAction: TioFKAction): IioDBBuilderSchemaFK;
     class function NewSchemaIndex(const AIndex: ioIndex; const AConnectionDefName: String): IioDBBuilderSchemaIndex;
     class function NewSchemaRDBMSInfo(const AName, ARaw, AVersion: String; const AMajorVersion, AMinorVersion: Integer): IioDBBuilderSchemaRDBMSInfo;
-    class function NewSchemaTable(const AContextTable: IioTable;
-      const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
     class function NewSqlGenerator(const AConnectionDefName: String): IioDBBuilderSqlGenerator;
     class function NewScript(const AConnectionDefName: String): IioDBBuilderScript;
     class function NewSqlText(const AAddLinePrefix: String = ''): IioDBBuilderSqlText;
@@ -128,6 +129,17 @@ begin
   else
     raise EioDBBuilderException.Create(ClassName, 'NewIntrospector', 'Connection type not supported by the introspector yet.');
   end;
+end;
+
+class function TioDBBuilderFactory.NewMappedSchemaTable(const AContextTable: IioTable;
+  const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
+begin
+  Result := TioDBBuilderSchemaTable.CreateMapped(AContextTable, AKeyGenerationStrategy);
+end;
+
+class function TioDBBuilderFactory.NewPhysicalSchemaTable(const AConnectionDefName, AName: String): IioDBBuilderSchemaTable;
+begin
+  Result := TioDBBuilderSchemaTable.CreatePhysical(AConnectionDefName, AName);
 end;
 
 class function TioDBBuilderFactory.NewPlan: IioDBBuilderPlan;
@@ -194,12 +206,6 @@ class function TioDBBuilderFactory.NewSchemaRDBMSInfo(const AName, ARaw, AVersio
   const AMajorVersion, AMinorVersion: Integer): IioDBBuilderSchemaRDBMSInfo;
 begin
   Result := TioDBBuilderSchemaRDBMSInfo.Create(AName, ARaw, AVersion, AMajorVersion, AMinorVersion);
-end;
-
-class function TioDBBuilderFactory.NewSchemaTable(const AContextTable: IioTable;
-  const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
-begin
-  Result := TioDBBuilderSchemaTable.Create(AContextTable, AKeyGenerationStrategy);
 end;
 
 class function TioDBBuilderFactory.NewSqlGenerator(const AConnectionDefName: String): IioDBBuilderSqlGenerator;
