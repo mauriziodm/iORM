@@ -62,6 +62,7 @@ type
     // --- Comparable core (meaningful on a Physical table) ---
     procedure AddField(ASchemaField: IioDBBuilderSchemaField);
     function FieldExists(const AFieldName: String): Boolean;
+    function FindField(const AFieldName: String): IioDBBuilderSchemaField;
     function GetFields: TioDBBuilderSchemaFields;
     function GetForeignKeys: TioDBBuilderSchemaForeignKeys;
     function GetIndexes: TioDBBuilderSchemaIndexes;
@@ -129,13 +130,18 @@ begin
 end;
 
 function TioDBBuilderSchemaTablePhysical.FieldExists(const AFieldName: String): Boolean;
+begin
+  Result := FindField(AFieldName) <> nil;
+end;
+
+function TioDBBuilderSchemaTablePhysical.FindField(const AFieldName: String): IioDBBuilderSchemaField;
 var
   LField: IioDBBuilderSchemaField;
 begin
+  Result := nil;
   for LField in FFields do
-    if LField.FieldName.Equals(AFieldName) then
-      Exit(True);
-  Result := False;
+    if SameText(LField.FieldName, AFieldName) then
+      Exit(LField);
 end;
 
 function TioDBBuilderSchemaTablePhysical.GetFields: TioDBBuilderSchemaFields;

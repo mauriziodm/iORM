@@ -145,19 +145,19 @@ begin
   Result := True;  // exit True on the first difference found
   for LField in AMappedTable.Fields do
   begin
-    LPhysicalField := Find_PhysicalField(APhysicalTable, LField.FieldName);
+    LPhysicalField := APhysicalTable.FindField(LField.FieldName);
     if (LPhysicalField = nil) or (Context.SqlGenerator.Compare_Field(LField, LPhysicalField) <> []) then
       Exit;
   end;
   for LIndex in AMappedTable.Indexes.Values do
   begin
-    LPhysicalIndex := Find_PhysicalIndex(AMappedTable, LIndex, APhysicalTable);
+    LPhysicalIndex := Match_PhysicalIndex(AMappedTable, LIndex, APhysicalTable);
     if (LPhysicalIndex = nil) or (Context.SqlGenerator.Compare_Index(LIndex, LPhysicalIndex) <> []) then
       Exit;
   end;
   for LFK in AMappedTable.ForeignKeys.Values do
   begin
-    LPhysicalFK := Find_PhysicalForeignKey(LFK, APhysicalTable);
+    LPhysicalFK := Match_PhysicalForeignKey(LFK, APhysicalTable);
     if (LPhysicalFK = nil) or Check_ForeignKeyModified(LFK, LPhysicalFK) then
       Exit;
   end;
@@ -236,7 +236,7 @@ begin
       // table stUpdate never downgrades a new table's stCreate.
       for LField in LMappedTable.Fields do
       begin
-        LPhysicalField := Find_PhysicalField(LPhysicalTable, LField.FieldName);
+        LPhysicalField := LPhysicalTable.FindField(LField.FieldName);
         if LPhysicalField = nil then
         begin
           LField.Status := stCreate;
@@ -278,7 +278,7 @@ begin
       if LPhysicalTable = nil then
         LPhysicalIndex := nil
       else
-        LPhysicalIndex := Find_PhysicalIndex(LMappedTable, LIndex, LPhysicalTable);
+        LPhysicalIndex := Match_PhysicalIndex(LMappedTable, LIndex, LPhysicalTable);
       if LPhysicalIndex = nil then
       begin
         LIndex.Status := stCreate;
@@ -319,7 +319,7 @@ begin
       if LPhysicalTable = nil then
         LPhysicalFK := nil
       else
-        LPhysicalFK := Find_PhysicalForeignKey(LFK, LPhysicalTable);
+        LPhysicalFK := Match_PhysicalForeignKey(LFK, LPhysicalTable);
       if LPhysicalFK = nil then
       begin
         LFK.Status := stCreate;
@@ -356,7 +356,7 @@ begin
     if LPhysicalTable = nil then
       Continue;
     for LPhysicalField in LPhysicalTable.Fields do
-      if Find_MappedField(LMappedTable, LPhysicalField.FieldName) = nil then
+      if LMappedTable.FindField(LPhysicalField.FieldName) = nil then
       begin
         LPhysicalField.Status := stDrop;
         APlan.AddDropField(LMappedTable, LPhysicalField);

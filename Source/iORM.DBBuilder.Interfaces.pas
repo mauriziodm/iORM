@@ -236,6 +236,10 @@ type
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
     procedure AddIndex(const AIndexAttr: ioIndex);
     /// <summary>
+    ///  Case-insensitive lookup of a field of this table by name, or nil if absent.
+    /// </summary>
+    function FindField(const AFieldName: String): IioDBBuilderSchemaField;
+    /// <summary>
     ///  Forces this table, its fields, its indexes and its foreign keys to stCreate, overriding
     ///  whatever the entity-map-vs-DB comparison would have produced. Delegates to
     ///  ForceFieldsCreateStatus/ForceIndexesCreateStatus/ForceForeignKeysCreateStatus.
@@ -391,7 +395,7 @@ type
     // INDEX
     function AddCreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): IioDBBuilderPlanOperation;
     // Drops a physical index by its actual catalog name (AIndex is a Physical node, e.g. as found by
-    // Find_PhysicalIndex or enumerated wholesale in strict/rebuild mode).
+    // Match_PhysicalIndex or enumerated wholesale in strict/rebuild mode).
     function AddDropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): IioDBBuilderPlanOperation;
     // FOREIGN KEY
     function AddCreateForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;

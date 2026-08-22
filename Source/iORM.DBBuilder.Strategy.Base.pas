@@ -371,7 +371,7 @@ begin
   Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_CreateIndex(ATable, AIndex));
 end;
 
-// AIndex here is always a Physical node (read by the Introspector via Find_PhysicalIndex or, in strict
+// AIndex here is always a Physical node (read by the Introspector via Match_PhysicalIndex or, in strict
 // mode, enumerated directly): its Name is already the real catalog name, so drop by that name directly -
 // recomputing it via Translate_SchemaTableAndIndex_To_IndexName would force an uppercase iORM-convention
 // name onto an index iORM may not have created (e.g. a manually-added one dropped wholesale in strict

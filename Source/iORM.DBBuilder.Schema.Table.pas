@@ -55,6 +55,7 @@ type
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
     procedure AddIndex(const AIndexAttr: ioIndex);
     function FieldExists(const AFieldName: String): boolean;
+    function FindField(const AFieldName: String): IioDBBuilderSchemaField;
     procedure ForceCreateStatus;
     procedure ForceFieldsCreateStatus;
     procedure ForceForeignKeysCreateStatus;
@@ -121,13 +122,22 @@ begin
 end;
 
 function TioDBBuilderSchemaTable.FieldExists(const AFieldName: String): boolean;
+begin
+  Result := FindField(AFieldName) <> nil;
+end;
+
+// Case-insensitive: field names are normalized identifiers (mirrors the former PlanBuilder
+// Find_MappedField/Find_PhysicalField, now unified here since both were the same lookup on this
+// table's own Fields collection - the Mapped/Physical distinction lived only in the caller's variable
+// name, not in the algorithm).
+function TioDBBuilderSchemaTable.FindField(const AFieldName: String): IioDBBuilderSchemaField;
 var
   LField: IioDBBuilderSchemaField;
 begin
+  Result := nil;
   for LField in FFields do
-    if LField.FieldName.Equals(AFieldName) then
-      Exit(True);
-  Result := False;
+    if SameText(LField.FieldName, AFieldName) then
+      Exit(LField);
 end;
 
 function TioDBBuilderSchemaTable.HasFieldChanges: Boolean;

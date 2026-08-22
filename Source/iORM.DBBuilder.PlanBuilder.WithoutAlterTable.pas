@@ -103,13 +103,13 @@ begin
       // Mark the fields absent from the physical table stCreate so the data-copy op skips them: they have
       // no source column in the "_old" shadow table (every other field is copied across).
       for LField in LMappedTable.Fields do
-        if Find_PhysicalField(LPhysicalTable, LField.FieldName) = nil then
+        if LPhysicalTable.FindField(LField.FieldName) = nil then
           LField.Status := stCreate;
       // Orphan physical fields (in the DB, not mapped) have no dedicated op here - unlike WithAlterTable's
       // opDropField, the rebuild simply never copies them into the recreated table, so their data is lost
       // silently unless we warn about it now, at plan time.
       for LField in LPhysicalTable.Fields do
-        if Find_MappedField(LMappedTable, LField.FieldName) = nil then
+        if LMappedTable.FindField(LField.FieldName) = nil then
           Context.Script.Warnings.AddLine(Format('Field ''%s'' on table ''%s'' exists in the database but is not mapped by any entity: ' +
             'it will be PERMANENTLY LOST when the table is rebuilt (this dialect cannot ALTER a table in place).',
             [LField.FieldName, LMappedTable.Name]));
@@ -181,7 +181,7 @@ begin
   // Fields: always compared - a field add/change always forces a whole-table rebuild.
   for LField in AMappedTable.Fields do
   begin
-    LPhysicalField := Find_PhysicalField(APhysicalTable, LField.FieldName);
+    LPhysicalField := APhysicalTable.FindField(LField.FieldName);
     if (LPhysicalField = nil) or (Context.SqlGenerator.Compare_Field(LField, LPhysicalField) <> []) then
       Exit;
   end;
@@ -190,7 +190,7 @@ begin
   if Context.Reconciliation.MappedSchema.IndexesMode >= ifmEnabled then
     for LIndex in AMappedTable.Indexes.Values do
     begin
-      LPhysicalIndex := Find_PhysicalIndex(AMappedTable, LIndex, APhysicalTable);
+      LPhysicalIndex := Match_PhysicalIndex(AMappedTable, LIndex, APhysicalTable);
       if (LPhysicalIndex = nil) or (Context.SqlGenerator.Compare_Index(LIndex, LPhysicalIndex) <> []) then
         Exit;
     end;
@@ -198,7 +198,7 @@ begin
   if Context.Reconciliation.MappedSchema.ForeignKeysMode >= ifmEnabled then
     for LFK in AMappedTable.ForeignKeys.Values do
     begin
-      LPhysicalFK := Find_PhysicalForeignKey(LFK, APhysicalTable);
+      LPhysicalFK := Match_PhysicalForeignKey(LFK, APhysicalTable);
       if (LPhysicalFK = nil) or Check_ForeignKeyModified(LFK, LPhysicalFK) then
         Exit;
     end;

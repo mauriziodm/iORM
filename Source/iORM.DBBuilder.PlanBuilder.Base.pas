@@ -78,21 +78,24 @@ type
     function Build: IioDBBuilderPlan; virtual; abstract;
     // Whether a matched foreign key differs. Compares the FULL structure (dependent table+field, reference
     // table+field, on-delete/on-update actions) rather than only the attributes that can still differ: it
-    // keeps the method self-contained and correct even if Find_PhysicalForeignKey's match key changes. The
+    // keeps the method self-contained and correct even if Match_PhysicalForeignKey's match key changes. The
     // redundant checks (dependent field + reference table are already equal by the match; dependent table
     // is the same matched table) are simply always false. Generic across dialects (both branches carry the
-    // structural fields). NB: a change to the DEPENDENT FIELD is not detected here anyway - Find_PhysicalForeignKey
+    // structural fields). NB: a change to the DEPENDENT FIELD is not detected here anyway - Match_PhysicalForeignKey
     // would not match, so the mapped FK becomes new and the old physical one an orphan (dropped only in strict).
     function Check_ForeignKeyModified(const AMappedFK, APhysicalFK: IioDBBuilderSchemaFK): Boolean;
-    // Cross-branch lookups. Matching is case-insensitive (SameText): both branches normalize identifiers
-    // via the same SqlDataConverter, so the keys already align - the case-insensitivity is just belt-and-
-    // suspenders (and mirrors SQLite's native case-insensitive identifier matching). Each returns the
-    // physical node, or nil = absent.
-    function Find_MappedField(const AMappedTable: IioDBBuilderSchemaTable; const AFieldName: String): IioDBBuilderSchemaField;
-    function Find_PhysicalField(const APhysicalTable: IioDBBuilderSchemaTable; const AFieldName: String): IioDBBuilderSchemaField;
-    function Find_PhysicalForeignKey(const AMappedFK: IioDBBuilderSchemaFK;
+    // Cross-branch structural matchers: unlike a plain name lookup (see IioDBBuilderSchemaTable.FindField),
+    // these compute the physical counterpart of a mapped FK/index from attributes OTHER than a shared name
+    // key, because no such key exists (this is not "does a foreign key/index with this name exist").
+    // Match_PhysicalForeignKey compares structural attributes (dependent field + reference table);
+    // Match_PhysicalIndex first translates the mapped index to the catalog name it WOULD have (dialect
+    // rule), then looks that up. Matching is case-insensitive (SameText): both branches
+    // normalize identifiers via the same SqlDataConverter, so the keys already align - the case-insensitivity
+    // is just belt-and-suspenders (and mirrors SQLite's native case-insensitive identifier matching). Each
+    // returns the physical node, or nil = absent.
+    function Match_PhysicalForeignKey(const AMappedFK: IioDBBuilderSchemaFK;
       const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaFK;
-    function Find_PhysicalIndex(const AMappedTable: IioDBBuilderSchemaTable; const AMappedIndex: IioDBBuilderSchemaIndex;
+    function Match_PhysicalIndex(const AMappedTable: IioDBBuilderSchemaTable; const AMappedIndex: IioDBBuilderSchemaIndex;
       const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaIndex;
     function Find_TableByName(const ASchema: IioDBBuilderSchema; const AName: String): IioDBBuilderSchemaTable;
   public
@@ -133,29 +136,7 @@ begin
     or (AMappedFK.OnUpdateAction <> APhysicalFK.OnUpdateAction);
 end;
 
-function TioDBBuilderPlanBuilderBase.Find_MappedField(const AMappedTable: IioDBBuilderSchemaTable;
-  const AFieldName: String): IioDBBuilderSchemaField;
-var
-  LField: IioDBBuilderSchemaField;
-begin
-  Result := nil;
-  for LField in AMappedTable.Fields do
-    if SameText(LField.FieldName, AFieldName) then
-      Exit(LField);
-end;
-
-function TioDBBuilderPlanBuilderBase.Find_PhysicalField(const APhysicalTable: IioDBBuilderSchemaTable;
-  const AFieldName: String): IioDBBuilderSchemaField;
-var
-  LField: IioDBBuilderSchemaField;
-begin
-  Result := nil;
-  for LField in APhysicalTable.Fields do
-    if SameText(LField.FieldName, AFieldName) then
-      Exit(LField);
-end;
-
-function TioDBBuilderPlanBuilderBase.Find_PhysicalForeignKey(const AMappedFK: IioDBBuilderSchemaFK;
+function TioDBBuilderPlanBuilderBase.Match_PhysicalForeignKey(const AMappedFK: IioDBBuilderSchemaFK;
   const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaFK;
 var
   LPhysicalFK: IioDBBuilderSchemaFK;
@@ -167,7 +148,7 @@ begin
       Exit(LPhysicalFK);
 end;
 
-function TioDBBuilderPlanBuilderBase.Find_PhysicalIndex(const AMappedTable: IioDBBuilderSchemaTable;
+function TioDBBuilderPlanBuilderBase.Match_PhysicalIndex(const AMappedTable: IioDBBuilderSchemaTable;
   const AMappedIndex: IioDBBuilderSchemaIndex; const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaIndex;
 var
   LMappedIndexName: String;
