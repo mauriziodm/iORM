@@ -135,7 +135,7 @@ var
 begin
   // The Physical branch is a bare schema (no ORM build): the modes are irrelevant to it, but are taken
   // from the Mapped schema so both branches carry the same configuration.
-  Result := TioDBBuilderFactory.NewEmptySchema(Context.Reconciliation.MappedSchema.IndexesMode,
+  Result := TioDBBuilderFactory.NewSchema(Context.Reconciliation.MappedSchema.IndexesMode,
     Context.Reconciliation.MappedSchema.ForeignKeysMode);
 
   // No database yet: nothing to introspect (everything will be created), leave the Physical schema empty.
@@ -158,7 +158,7 @@ begin
 
       for LTableName in LTableNames do
       begin
-        LTable := TioDBBuilderFactory.NewPhysicalSchemaTable(Context.ConnectionDefName, LTableName);
+        LTable := TioDBBuilderFactory.NewSchemaTable_Physical(Context.ConnectionDefName, LTableName);
         ReadFields(LTable, LTableName);
         ReadIndexes(LTable, LTableName);
         ReadForeignKeys(LTable, LTableName);

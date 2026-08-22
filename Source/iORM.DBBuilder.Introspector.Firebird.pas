@@ -60,8 +60,8 @@ type
 implementation
 
 uses
-  System.Rtti, System.SysUtils, iORM.CommonTypes, iORM.DB.Interfaces,
-  iORM.DBBuilder.Schema.Field.Physical, iORM.DBBuilder.Schema.FK.Physical, iORM.DBBuilder.Schema.Index;
+  System.Rtti, System.SysUtils, iORM.CommonTypes, iORM.DB.Interfaces, iORM.DBBuilder.Factory,
+  iORM.DBBuilder.Schema.FK.Physical, iORM.DBBuilder.Schema.Index;
 
 { TioDBBuilderIntrospectorFirebird }
 
@@ -77,7 +77,7 @@ begin
   while not LQuery.Eof do
   begin
     LFieldTypeRaw := LQuery.Fields.FieldByName('field_type').AsString.Trim;
-    ATable.AddField(TioDBBuilderSchemaFieldPhysical.Create(
+    ATable.AddField(TioDBBuilderFactory.NewSchemaField_Physical(
       Context.ConnectionDefName,
       LQuery.Fields.FieldByName('field_name').AsString.Trim,
       LFieldTypeRaw,

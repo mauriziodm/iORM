@@ -117,8 +117,7 @@ uses
   iORM.Exceptions,
   iORM.SqlTranslator,
   iORM.DB.SqLite.SqlDataConverter,
-  iORM.DBBuilder.Factory,
-  iORM.DBBuilder.Schema.Field.Physical
+  iORM.DBBuilder.Factory
 
   ;
 
@@ -250,14 +249,12 @@ begin
 end;
 
 function TioDBBuilderSqlGenSQLite.Compare_Field(const AMappedField, APhysicalField: IioDBBuilderSchemaField): TioDBBuilderFieldChanges;
-var
-  LPhysical: TioDBBuilderSchemaFieldPhysical;
 begin
   // SQLite reconciles only the field type and the NOT NULL constraint: type affinity makes length/
-  // precision/scale irrelevant. The raw catalog type lives on the concrete physical node (cast).
+  // precision/scale irrelevant. FieldTypeRaw is frozen on both sides at construction (see
+  // TioDBBuilderSchemaField), so no cast to the concrete node is needed.
   Result := [];
-  LPhysical := APhysicalField as TioDBBuilderSchemaFieldPhysical;
-  if not SameText(LPhysical.FieldTypeRaw, Translate_SchemaField_To_FieldType(AMappedField, False)) then
+  if not SameText(APhysicalField.FieldTypeRaw, AMappedField.FieldTypeRaw) then
     Include(Result, fcType);
   if APhysicalField.FieldNotNull <> AMappedField.FieldNotNull then
     Include(Result, fcNotNull);

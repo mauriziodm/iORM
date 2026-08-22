@@ -139,7 +139,6 @@ uses
   iORM.DB.Firebird.SqlDataConverter,
   iORM.DB.Consts,
   iORM.DBBuilder.Factory,
-  iORM.DBBuilder.Schema.Field.Physical,
   System.Classes
 
   ;
@@ -484,16 +483,14 @@ end;
 
 function TioDBBuilderSqlGenFirebird.Compare_Field(const AMappedField, APhysicalField: IioDBBuilderSchemaField): TioDBBuilderFieldChanges;
 var
-  LPhysical: TioDBBuilderSchemaFieldPhysical;
   LOldType, LNewType, LOldDefault, LNewDefault: String;
 begin
   // Faithful port of Check_FieldModified, made pure: returns the change-set, no AddAltered, no warnings
-  // (those are emitted at translation time from this set). The raw catalog type/default live on the
-  // concrete physical node (cast); the other old values come from the physical node via the interface.
+  // (those are emitted at translation time from this set). FieldTypeRaw/FieldDefaultRaw are frozen on
+  // both sides at construction (see TioDBBuilderSchemaField), so no cast to the concrete node is needed.
   Result := [];
-  LPhysical := APhysicalField as TioDBBuilderSchemaFieldPhysical;
-  LOldType := LPhysical.FieldTypeRaw;
-  LNewType := Translate_SchemaField_To_FieldType(AMappedField, False);
+  LOldType := APhysicalField.FieldTypeRaw;
+  LNewType := AMappedField.FieldTypeRaw;
 
   // Type
   if not SameText(LOldType, LNewType) then
@@ -521,10 +518,10 @@ begin
   end;
 
   // Default (string-based; strip the leading 'DEFAULT ' the catalog keeps)
-  LOldDefault := LPhysical.FieldDefaultRaw;
+  LOldDefault := APhysicalField.FieldDefaultRaw;
   if LOldDefault.ToUpper.StartsWith('DEFAULT ') then
     LOldDefault := LOldDefault.Substring(8).Trim;
-  LNewDefault := Translate_SchemaField_To_DefaultValue(AMappedField);
+  LNewDefault := AMappedField.FieldDefaultRaw;
   if not SameText(LOldDefault, LNewDefault) then
     Include(Result, fcDefault);
 

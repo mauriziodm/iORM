@@ -109,7 +109,7 @@ begin
     // already been resolved by the SchemaBuilder (which owns the SqlGenerator): if the map declared
     // kgsAuto it has been translated into the concrete DBMS-specific strategy (e.g. Autoincrement for
     // SQLite, Identity/Sequence for Firebird 3+, etc.).
-    FTables.Add(LTableName, TioDBBuilderFactory.NewMappedSchemaTable(AMap.GetTable, AKeyGenerationStrategy));
+    FTables.Add(LTableName, TioDBBuilderFactory.NewSchemaTable_Mapped(AMap.GetTable, AKeyGenerationStrategy));
   Result := FTables.Items[LTableName];
   // Update the IsTrueClass flag on the SchemaTable.
   // In single-table inheritance multiple classes share the same table, but only the

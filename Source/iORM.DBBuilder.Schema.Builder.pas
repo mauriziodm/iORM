@@ -170,10 +170,10 @@ begin
   // Add fields
   for LProperty in AMap.GetProperties do
     if not (LProperty.IsTransient or (LProperty.GetRelationType in [rtHasMany, rtHasOne])) then
-      LSchemaTable.AddField(TioDBBuilderFactory.NewSchemaField(LProperty));
+      LSchemaTable.AddField(TioDBBuilderFactory.NewSchemaField_Mapped(LProperty, FSqlGenerator));
   // Add the ClassInfo field if necessary
   if LSchemaTable.IsTrueClass then
-    LSchemaTable.AddField(TioDBBuilderFactory.NewSchemaFieldClassInfo(FConnectionDefName));
+    LSchemaTable.AddField(TioDBBuilderFactory.NewSchemaField_ClassInfo(FConnectionDefName, FSqlGenerator));
   // Add indexes
   BuildSchemaIndexes(LSchemaTable, AMap);
   // Add sequence only if the table uses Sequence for key generation

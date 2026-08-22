@@ -151,6 +151,11 @@ type
     function GetFieldCustomType: string;
     function GetFieldDefault: TValue;
     function GetFieldDefaultExists: Boolean;
+    // Raw default expression as it would appear in this dialect's DDL - the (1) comparison basis:
+    // frozen at construction on every branch (Mapped renders itself via the SqlGenerator, Physical
+    // stores the raw catalog string, ClassInfo has none so it stays ''). See TioDBBuilderSchemaField's
+    // class doc comment for why the Mapped/ClassInfo freeze happens in the Factory, not the constructor.
+    function GetFieldDefaultRaw: String;
     function GetFieldLength: integer;
     function GetFieldName: String;
     function GetFieldNotNull: boolean;
@@ -158,6 +163,9 @@ type
     function GetFieldScale: integer;
     function GetFieldSubtype: string;
     function GetFieldType: TioMetadataFieldType;
+    // Raw type string as it would appear in this dialect's DDL (e.g. 'VARCHAR', 'INTEGER') - the (1)
+    // comparison basis. Same freeze story as GetFieldDefaultRaw.
+    function GetFieldTypeRaw: String;
     function GetFieldUnicode: boolean;
     function GetIsAltered: Boolean;
     function GetIsFieldDefaultAltered: Boolean;
@@ -177,6 +185,7 @@ type
     property FieldCustomType: string read GetFieldCustomType;
     property FieldDefault: TValue read GetFieldDefault;
     property FieldDefaultExists: Boolean read GetFieldDefaultExists;
+    property FieldDefaultRaw: String read GetFieldDefaultRaw;
     property FieldLength: integer read GetFieldLength;
     property FieldName: String read GetFieldName;
     property FieldNotNull: boolean read GetFieldNotNull;
@@ -184,6 +193,7 @@ type
     property FieldScale: integer read GetFieldScale;
     property FieldSubtype: string read GetFieldSubtype;
     property FieldType: TioMetadataFieldType read GetFieldType;
+    property FieldTypeRaw: String read GetFieldTypeRaw;
     property FieldUnicode: boolean read GetFieldUnicode;
     property IsAltered: Boolean read GetIsAltered;
     property IsFieldDefaultAltered: Boolean read GetIsFieldDefaultAltered;

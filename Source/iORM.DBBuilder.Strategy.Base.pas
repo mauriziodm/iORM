@@ -227,8 +227,7 @@ uses
   System.StrUtils,
 
   iORM.Exceptions,
-  iORM.DB.QueryEngine,
-  iORM.DBBuilder.Schema.Field.Physical
+  iORM.DB.QueryEngine
 
   ;
 
@@ -412,15 +411,14 @@ end;
 procedure TioDBBuilderStrategyBase.Warning_FieldAlterations(const ATable: IioDBBuilderSchemaTable;
   const AMappedField, APhysicalField: IioDBBuilderSchemaField);
 var
-  LPhysical: TioDBBuilderSchemaFieldPhysical;
   LOldType, LNewType, LNewSubtype: String;
 begin
   // Re-derives the alter warnings from the actual old/new values (the change-set collapses type/scale/blob
   // into fcType, so it cannot drive them). Faithful port of the warning half of the former
-  // Check_FieldModified. The raw catalog type lives on the concrete physical node (cast).
-  LPhysical := APhysicalField as TioDBBuilderSchemaFieldPhysical;
-  LOldType := LPhysical.FieldTypeRaw;
-  LNewType := Context.SqlGenerator.Translate_SchemaField_To_FieldType(AMappedField, False);
+  // Check_FieldModified. FieldTypeRaw is frozen on both sides at construction (see
+  // TioDBBuilderSchemaField), so no cast to the concrete node is needed.
+  LOldType := APhysicalField.FieldTypeRaw;
+  LNewType := AMappedField.FieldTypeRaw;
 
   // Type: unsafe (blacklisted) conversion. Self-filters (only warns when old->new is in the invalid list),
   // so a scale/blob-only change - where old type = new type - produces no spurious warning.
