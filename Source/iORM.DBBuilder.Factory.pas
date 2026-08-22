@@ -71,7 +71,9 @@ type
       const AFieldType: TioMetadataFieldType; const AFieldLength, AFieldPrecision, AFieldScale: Integer;
       const AFieldNotNull: Boolean; const AFieldDefault: TValue; const AFieldSubtype, AFieldCustomType: String;
       const AFieldUnicode, APrimaryKey: Boolean): IioDBBuilderSchemaField;
-    class function NewSchemaFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty; const AOnDeleteAction, AOnUpdateAction: TioFKAction): IioDBBuilderSchemaFK;
+    class function NewSchemaFK_Mapped(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty; const AOnDeleteAction, AOnUpdateAction: TioFKAction): IioDBBuilderSchemaFK;
+    class function NewSchemaFK_Physical(const AConnectionDefName, AName, ADependentTableName, ADependentFieldName,
+      AReferenceTableName, AReferenceFieldName: String; const AOnDeleteAction, AOnUpdateAction: TioFKAction): IioDBBuilderSchemaFK;
     class function NewSchemaIndex(const AIndex: ioIndex; const AConnectionDefName: String): IioDBBuilderSchemaIndex;
     class function NewSchemaRDBMSInfo(const AName, ARaw, AVersion: String; const AMajorVersion, AMinorVersion: Integer): IioDBBuilderSchemaRDBMSInfo;
     class function NewSchemaTable_Mapped(const AContextTable: IioTable;
@@ -204,10 +206,17 @@ begin
     AFieldCustomType, AFieldUnicode, APrimaryKey);
 end;
 
-class function TioDBBuilderFactory.NewSchemaFK(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
+class function TioDBBuilderFactory.NewSchemaFK_Mapped(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
   const AOnDeleteAction, AOnUpdateAction: TioFKAction): IioDBBuilderSchemaFK;
 begin
-  Result := TioDBBuilderSchemaFK.Create(AReferenceMap, ADependentMap, ADependentProperty, AOnDeleteAction, AOnUpdateAction);
+  Result := TioDBBuilderSchemaFK.CreateMapped(AReferenceMap, ADependentMap, ADependentProperty, AOnDeleteAction, AOnUpdateAction);
+end;
+
+class function TioDBBuilderFactory.NewSchemaFK_Physical(const AConnectionDefName, AName, ADependentTableName, ADependentFieldName,
+  AReferenceTableName, AReferenceFieldName: String; const AOnDeleteAction, AOnUpdateAction: TioFKAction): IioDBBuilderSchemaFK;
+begin
+  Result := TioDBBuilderSchemaFK.CreatePhysical(AConnectionDefName, AName, ADependentTableName, ADependentFieldName,
+    AReferenceTableName, AReferenceFieldName, AOnDeleteAction, AOnUpdateAction);
 end;
 
 class function TioDBBuilderFactory.NewSchemaIndex(const AIndex: ioIndex; const AConnectionDefName: String): IioDBBuilderSchemaIndex;

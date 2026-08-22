@@ -59,7 +59,7 @@ implementation
 
 uses
   System.Rtti, System.SysUtils, iORM.CommonTypes, iORM.DB.Interfaces, iORM.DBBuilder.Factory,
-  iORM.DBBuilder.Schema.FK.Physical, iORM.DBBuilder.Schema.Index;
+  iORM.DBBuilder.Schema.Index;
 
 { TioDBBuilderIntrospectorSqLite }
 
@@ -100,7 +100,7 @@ begin
   while not LQuery.Eof do
   begin
     LDependentField := LQuery.Fields.FieldByName('from').AsString;
-    ATable.ForeignKeys.Add(LDependentField, TioDBBuilderSchemaFKPhysical.Create(
+    ATable.ForeignKeys.Add(LDependentField, TioDBBuilderFactory.NewSchemaFK_Physical(
       Context.ConnectionDefName,
       '',  // Name: SQLite foreign keys have no constraint name
       ATableName,

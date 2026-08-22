@@ -214,7 +214,7 @@ var
   LForeignKey: IioDBBuilderSchemaFK;
 begin
   // Add tne FK if not already exists
-  LForeignKey := TioDBBuilderFactory.NewSchemaFK(AReferenceMap, ADependentMap, ADependentProperty, AOnDeleteAction, AOnUpdateAction);
+  LForeignKey := TioDBBuilderFactory.NewSchemaFK_Mapped(AReferenceMap, ADependentMap, ADependentProperty, AOnDeleteAction, AOnUpdateAction);
   if not FForeignKeys.ContainsKey(LForeignKey.Name) then
     FForeignKeys.Add(LForeignKey.Name, LForeignKey);
 end;

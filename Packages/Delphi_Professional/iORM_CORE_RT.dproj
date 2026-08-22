@@ -305,7 +305,6 @@
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Field.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Table.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.FK.pas"/>
-        <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.FK.Physical.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.Builder.pas"/>
         <DCCReference Include="..\..\Source\iORM.DBBuilder.Schema.RDBMSInfo.pas"/>

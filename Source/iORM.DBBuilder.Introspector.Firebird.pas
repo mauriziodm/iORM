@@ -61,7 +61,7 @@ implementation
 
 uses
   System.Rtti, System.SysUtils, iORM.CommonTypes, iORM.DB.Interfaces, iORM.DBBuilder.Factory,
-  iORM.DBBuilder.Schema.FK.Physical, iORM.DBBuilder.Schema.Index;
+  iORM.DBBuilder.Schema.Index;
 
 { TioDBBuilderIntrospectorFirebird }
 
@@ -109,7 +109,7 @@ begin
   while not LQuery.Eof do
   begin
     LName := LQuery.Fields.FieldByName('constraint_name').AsString.Trim;
-    ATable.ForeignKeys.Add(LName, TioDBBuilderSchemaFKPhysical.Create(
+    ATable.ForeignKeys.Add(LName, TioDBBuilderFactory.NewSchemaFK_Physical(
       Context.ConnectionDefName,
       LName,
       ATableName,
