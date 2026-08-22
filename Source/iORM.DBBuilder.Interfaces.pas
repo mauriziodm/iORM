@@ -50,20 +50,25 @@ type
   ///  The Plan operation vocabulary: the dialect-independent *intent* of a single schema change,
   ///  produced by the PlanBuilder from the Desired-vs-Actual diff and realized into SQL by each
   ///  Strategy/SqlGenerator. Names mirror the existing ScriptWrite_/BuildSQL_ translator families
-  ///  (e.g. opCreateTable -> ScriptWrite_CreateTable). opDropTable is the one destructive op: it targets
-  ///  an orphan table (present in the DB but not in the ORM maps) and is always realized as a commented,
-  ///  non-executed statement plus a warning - iORM never silently drops a table.
+  ///  (e.g. opCreateTable -> ScriptWrite_CreateTable). opDropTable and opDropField are the destructive
+  ///  ops: they target an orphan table/field (present in the DB but not in the ORM maps) and are always
+  ///  realized as a commented, non-executed statement plus a warning - iORM never silently drops a
+  ///  table or a field.
+  ///  The last two are the rename-create-copy rebuild ops, produced only by the PlanBuilder's rebuild
+  ///  shape (Build_Rebuild) and consumed only by WithoutAlterTable dialects (e.g. SQLite), which cannot
+  ///  ALTER a table in place: opRenameTableToOld renames a table to its "_old" shadow, opCopyData copies
+  ///  the rows from that shadow into the freshly recreated table. opDropIndex (dropping a physical index
+  ///  by its actual catalog name) is shared by both PlanBuilder shapes - the rebuild shape uses it too,
+  ///  unconditionally, to free every physical index of a rebuilt table before recreating it. Orphan fields
+  ///  need no dedicated op there: the rebuild recreates the table from the mapped fields only, so an
+  ///  unmapped column is simply not carried over.
   /// </summary>
-  TioDBBuilderPlanOpKind = (opCreateTable, opDropTable, opCreateField, opAlterField, opCreateIndex, opDropIndex,
-    opCreateForeignKey, opDropForeignKey, opCreateSequence, opDropSequence);
-  // irmDropAndRecreateAllTables (safe, default), irmDropAndRecreateModifiedTablesOnly (faster), irmIgnoreIndexes (disabled, fully manual)
+  TioDBBuilderPlanOpKind = (opCreateTable, opDropTable, opCreateField, opAlterField, opDropField, opCreateIndex,
+    opDropIndex, opCreateForeignKey, opDropForeignKey, opCreateSequence, opDropSequence,
+    opRenameTableToOld, opCopyData);
 
-
-
-//  TioDBBuilderIndexRebuildMode = (irmDropAndRecreateIndexes, irmAlterIndexes, irmIgnoreIndexes);
+  // irmDropAndRecreateForAllTables (safe, default), irmDropAndRecreateForModifiedTablesOnly (faster), irmIgnoreIndexes (disabled, fully manual)
   TioDBBuilderIndexRebuildMode = (irmDropAndRecreateForAllTables, irmDropAndRecreateForModifiedTablesOnly, irmIgnoreIndexes);
-
-
 
   /// <summary>
   ///  An element's position relative to the OTHER schema branch (Mapped vs Physical), stamped by the
@@ -243,14 +248,12 @@ type
     procedure ForceFieldsCreateStatus;
     /// <summary>
     ///  Forces every foreign key of this table to stCreate, overriding whatever the entity-map-vs-DB
-    ///  comparison would have produced. Used both standalone (Strategy's strict-mode FK drop) and as
-    ///  part of ForceCreateStatus's table-wide cascade.
+    ///  comparison would have produced. Used as part of ForceCreateStatus's table-wide cascade.
     /// </summary>
     procedure ForceForeignKeysCreateStatus;
     /// <summary>
     ///  Forces every index of this table to stCreate, overriding whatever the entity-map-vs-DB
-    ///  comparison would have produced. Used both standalone (Strategy's strict-mode index drop)
-    ///  and as part of ForceCreateStatus's table-wide cascade.
+    ///  comparison would have produced. Used as part of ForceCreateStatus's table-wide cascade.
     /// </summary>
     procedure ForceIndexesCreateStatus;
     function GetContextTable: IioTable;
@@ -376,14 +379,19 @@ type
     ['{C4D5E6F7-8A9B-4C0D-B1E2-3F4A5B6C7D82}']
     // Layout: grouped under domain banners, alphabetical within each group (project-wide convention).
     // TABLE
+    function AddCopyData(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
     function AddCreateTable(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
     function AddDropTable(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
+    function AddRenameTableToOld(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
     // FIELD
     function AddAlterField(const ATable: IioDBBuilderSchemaTable; const AMappedField, APhysicalField: IioDBBuilderSchemaField;
       const ASchemaField_Changes: TioDBBuilderFieldChanges): IioDBBuilderPlanOperation;
     function AddCreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): IioDBBuilderPlanOperation;
+    function AddDropField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField): IioDBBuilderPlanOperation;
     // INDEX
     function AddCreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): IioDBBuilderPlanOperation;
+    // Drops a physical index by its actual catalog name (AIndex is a Physical node, e.g. as found by
+    // Find_PhysicalIndex or enumerated wholesale in strict/rebuild mode).
     function AddDropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): IioDBBuilderPlanOperation;
     // FOREIGN KEY
     function AddCreateForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;
@@ -444,15 +452,13 @@ type
   IioDBBuilderScript = interface
     ['{714A36B3-A44C-4D1D-A046-BC6222DCE2B7}']
 
+    procedure Clear;
     function GetBody: IioDBBuilderSqlText;
     function GetFooter: IioDBBuilderSqlText;
     function GetHeader: IioDBBuilderSqlText;
     function GetHints: IioDBBuilderSqlText;
     function GetLines: TStringList;
     function GetWarnings: IioDBBuilderSqlText;
-
-    // Full script clear
-    procedure Clear;
     procedure SaveToFile(const AFileName: string);
     // This method works on header section
     procedure ScriptBegin(const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo);
@@ -478,15 +484,6 @@ type
   IioDBBuilderContext = interface
     ['{7C1E9A44-3B27-4F6D-8E1A-5D2C9B4A6F31}']
 
-    function GetConnectionDefName: string;
-    function GetHints: IioDBBuilderSqlText;
-    function GetLines: TStringList;
-    function GetReconciliation: IioDBBuilderReconciliation;
-    function GetScript: IioDBBuilderScript;
-    function GetSqlGenerator: IioDBBuilderSqlGenerator;
-    function GetStatus: TioDBBuilderStatus;
-    function GetWarnings: IioDBBuilderSqlText;
-
     /// <summary>
     ///  Executes the script against the database identified by ConnectionDefName.
     /// </summary>
@@ -497,6 +494,14 @@ type
     ///  empty, unless AForce = True.
     /// </remarks>
     procedure Execute(const AForce: Boolean = False);
+    function GetConnectionDefName: string;
+    function GetHints: IioDBBuilderSqlText;
+    function GetLines: TStringList;
+    function GetReconciliation: IioDBBuilderReconciliation;
+    function GetScript: IioDBBuilderScript;
+    function GetSqlGenerator: IioDBBuilderSqlGenerator;
+    function GetStatus: TioDBBuilderStatus;
+    function GetWarnings: IioDBBuilderSqlText;
 
     property ConnectionDefName: string read GetConnectionDefName;
     property Hints: IioDBBuilderSqlText read GetHints;
@@ -625,8 +630,8 @@ type
     /// with a plain DROP INDEX - it must EXCLUDE the indexes that back a PK/UNIQUE/FK constraint (those
     /// cannot be dropped directly on most DBMS and are removed together with their constraint). Each
     /// dialect expresses the exclusion in its own catalog terms (SQLite: sql IS NOT NULL; Firebird:
-    /// NOT EXISTS on RDB$RELATION_CONSTRAINTS; etc.). The drop/check callers
-    /// (Force_DropTableIndexesFromDB, Check_TableHasIndexesInDB) and the Introspector rely on this.
+    /// NOT EXISTS on RDB$RELATION_CONSTRAINTS; etc.). The Introspector (which populates the physical
+    /// index nodes the rebuild drops by name) and Check_TableHasIndexesInDB rely on this.
     /// </summary>
     /// <param name="ATableName">
     /// Optional table name filter. If empty, returns all indexes from DB.
@@ -718,7 +723,7 @@ type
     /// compatibility is a DBMS-capability concern, which is exactly what the SqlGenerator + DBMSInfo
     /// already model.
     /// </summary>
-    procedure CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema; const AScript: IioDBBuilderScript);
+    procedure Hint_KeyGenerationCompatibility(const ASchema: IioDBBuilderSchema; const AScript: IioDBBuilderScript);
     /// <summary>
     /// Resolves the requested key generation strategy to an effective strategy.
     /// If ARequestedStrategy is kgsAuto, returns the DBMS-specific default strategy.
@@ -744,6 +749,13 @@ type
     function Supports_AlterBlobSubtype: Boolean;
     /// <summary>Returns True if the database supports ALTER COLUMN SET/DROP NOT NULL</summary>
     function Supports_AlterNotNull: Boolean;
+    /// <summary>
+    /// True if the DBMS can restructure a table in place with ALTER TABLE (Firebird, MS SQL Server, ...);
+    /// False if it cannot and needs the rename-create-copy rebuild for any structural change (SQLite).
+    /// This is the DBMS-capability axis that selects the PlanBuilder shape (incremental vs rebuild) and
+    /// mirrors the WithAlterTable/WithoutAlterTable Strategy split.
+    /// </summary>
+    function Supports_AlterTable: Boolean;
 
     // ==========================================================
     // SEQUENCE RELATED METHODS
@@ -803,8 +815,12 @@ type
   ///  ordered list of operations that converge the database to the ORM maps. Sole writer of the nodes'
   ///  Status (informational: stCreate/stDrop/stUpdate/stClean), but the Plan - not the Status - is what
   ///  the Strategy consumes. Reads only the two in-memory schemas plus the SqlGenerator (for the dialect
-  ///  name computations), never the database, so it is testable without a live connection. Per-dialect
-  ///  (the field-modified and foreign-key-matching decisions differ by DBMS).
+  ///  name computations and the Supports_AlterTable capability), never the database, so it is testable
+  ///  without a live connection. An abstract base (TioDBBuilderPlanBuilderBase, holding the shared diff
+  ///  primitives Find_*/Check_ForeignKeyModified) with two concrete shapes selected by Supports_AlterTable,
+  ///  mirroring the WithAlterTable/WithoutAlterTable Strategy split: the INCREMENTAL shape emits fine-grained
+  ///  ops (create/alter field, create/drop index, ...) for DBMS that can ALTER a table in place; the REBUILD
+  ///  shape emits rename-create-copy ops for DBMS that cannot (SQLite).
   /// </summary>
   IioDBBuilderPlanBuilder = interface
     ['{7A1D3E52-9C4B-4F60-8A2D-5E6F1B3C9D74}']

@@ -104,7 +104,7 @@ type
     /// the create/alter flow in the Engine, and a safe auto-applied fallback must not block it).
     /// Called only via IioDBBuilderSqlGenerator (Context.SqlGenerator) - no descendant overrides it.
     /// </summary>
-    procedure CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema; const AScript: IioDBBuilderScript);
+    procedure Hint_KeyGenerationCompatibility(const ASchema: IioDBBuilderSchema; const AScript: IioDBBuilderScript);
     /// <summary>
     /// Appends the standard "requested X key generation but this DBMS uses Y instead" hint to the
     /// script. Centralized here so the wording stays consistent across every RDBMS generator.
@@ -129,6 +129,10 @@ type
         BuildSQL_*                       returns a SQL string, no side-effect
         Supports_*                       boolean DBMS capability flag
         Translate_<Source>_To_<Target>   maps a schema element to a SQL fragment / identifier
+        Compare_*                        pure node-vs-node comparison (Mapped vs Physical),
+                                          returns a change-set, no DB access, no side-effect
+        Hint_*                           emits an informational, non-blocking diagnostic into
+                                          the Script (e.g. Hint_KeyGenerationCompatibility)
       Methods whose role fits none of the above use plain Delphi verb naming (Get* / Is* /
       Ensure* / Load* / Shorten* / Escape*) - e.g. LoadDBMSInfo (interface accessor; its
       sibling GetDBMSInfo is inherited from TioDBBuilderSqlGenSegregation, not
@@ -265,6 +269,12 @@ type
     function Supports_AlterBlobSubtype: Boolean; virtual;
     /// <summary>Returns True if the database supports ALTER COLUMN SET/DROP NOT NULL</summary>
     function Supports_AlterNotNull: Boolean; virtual;
+    /// <summary>
+    /// True if the DBMS can restructure a table in place with ALTER TABLE. Base returns True (the common
+    /// case: Firebird, MS SQL Server, ...); override to False for DBMS that need the rename-create-copy
+    /// rebuild for any structural change (SQLite). Selects the PlanBuilder shape (incremental vs rebuild).
+    /// </summary>
+    function Supports_AlterTable: Boolean; virtual;
 
     // ==========================================================
     // SEQUENCE RELATED METHODS
@@ -765,7 +775,7 @@ begin
   Result := '';
 end;
 
-procedure TioDBBuilderSqlGenBase.CheckKeyGenerationCompatibility(const ASchema: IioDBBuilderSchema; const AScript: IioDBBuilderScript);
+procedure TioDBBuilderSqlGenBase.Hint_KeyGenerationCompatibility(const ASchema: IioDBBuilderSchema; const AScript: IioDBBuilderScript);
 var
   LTable: IioDBBuilderSchemaTable;
 begin
@@ -798,6 +808,13 @@ function TioDBBuilderSqlGenBase.Supports_AlterBlobSubtype: Boolean;
 begin
   // Default: BLOB subtype changes via ALTER COLUMN are permitted
   // Override in derived classes if RDBMS doesn't support this
+  Result := True;
+end;
+
+function TioDBBuilderSqlGenBase.Supports_AlterTable: Boolean;
+begin
+  // Default: the DBMS can restructure tables in place with ALTER TABLE (Firebird, MS SQL Server, ...).
+  // Override to False for DBMS that need the rename-create-copy rebuild (SQLite).
   Result := True;
 end;
 

@@ -94,7 +94,8 @@ uses
   iORM.DBBuilder.Reconciliation,
   iORM.DBBuilder.Introspector.SqLite,
   iORM.DBBuilder.Introspector.Firebird,
-  iORM.DBBuilder.PlanBuilder
+  iORM.DBBuilder.PlanBuilder.WithAlterTable,
+  iORM.DBBuilder.PlanBuilder.WithoutAlterTable
 
   ;
 
@@ -136,9 +137,13 @@ end;
 
 class function TioDBBuilderFactory.NewPlanBuilder(const AContext: IioDBBuilderContext): IioDBBuilderPlanBuilder;
 begin
-  // Single, dialect-independent class: the dialect-specific work lives in the Introspector (catalog reads)
-  // and the SqlGenerator (type/index comparison, name computation), not here.
-  Result := TioDBBuilderPlanBuilder.Create(AContext);
+  // Pick the build shape by DBMS capability (mirrors NewStrategy's WithAlterTable/WithoutAlterTable split):
+  // in-place ALTER -> fine-grained ops; no ALTER -> rename-create-copy rebuild ops. The dialect-specific
+  // work still lives in the Introspector (catalog reads) and the SqlGenerator (comparison, name computation).
+  if AContext.SqlGenerator.Supports_AlterTable then
+    Result := TioDBBuilderPlanBuilderWithAlterTable.Create(AContext)
+  else
+    Result := TioDBBuilderPlanBuilderWithoutAlterTable.Create(AContext);
 end;
 
 class function TioDBBuilderFactory.NewReconciliation(const AConnectionDefName: String; const AIndexesMode,

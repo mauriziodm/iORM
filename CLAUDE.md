@@ -57,7 +57,9 @@ Build order: Runtime (RT) packages first, then Design-Time (DT) packages.
   - A method's **prefix encodes its ROLE**.
     - SqlGenerator: `Command_` (executes DDL), `Check_` (runtime catalog/existence query → Boolean),
       `BuildSQL_` (returns a SQL string, no side effect), `Supports_` (capability flag),
-      `Translate_<Src>_To_<Tgt>` (schema element → SQL fragment/identifier).
+      `Translate_<Src>_To_<Tgt>` (schema element → SQL fragment/identifier), `Compare_` (pure
+      node-vs-node comparison, Mapped vs Physical, returns a change-set — no DB access, no side
+      effect), `Hint_` (emits an informational, non-blocking diagnostic into the Script).
     - Strategy: `Process_` (orchestration / mode dispatch), `ScriptWrite_` (emits one DDL/DML
       statement into `Script.Body`), `Force_` (drop that bypasses the configured mode), `Check_`
       (catalog/change query → Boolean), `Warning_`/`Hint_` (diagnostics). `GenerateScript` (bare)

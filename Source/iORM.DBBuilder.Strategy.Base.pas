@@ -133,13 +133,9 @@ type
                              this method nor GenerateScript_Body branch on it.
         GenerateScript_Body  protected abstract: the actual dialect-specific generation flow,
                              implemented by each concrete Strategy (WithAlterTable/WithoutAlterTable).
-        Process_*            orchestration: iterates the schema or dispatches by mode
-        ScriptWrite_*        emits a single DDL/DML statement into Context.Script.Body
-        Force_*              forces a Status value on schema elements directly, overriding
-                              whatever the entity-map-vs-DB comparison would have produced
-                              (here always paired with a drop mechanic that also bypasses
-                              the configured Indexes/FK mode)
-        Check_*              interrogates the DB catalog / detects a change, returns Boolean
+                             Now Plan-driven in both: a translate-each-op loop over Context.Reconciliation.Plan.
+        ScriptWrite_*        translates a single Plan operation into DDL/DML on Context.Script.Body
+        Check_*              interrogates the (introspected) physical schema / detects a change, returns Boolean
         Warning_* / Hint_*   diagnostics appended to Context.Script.Warnings / Context.Script.Hints
       Plain accessors and private helpers are sanctioned exceptions and keep plain Delphi
       verb naming (Get*). Interface membership is orthogonal to the prefix.
@@ -147,10 +143,9 @@ type
       (DATABASE / TABLE / FIELD / INDEX / SEQUENCE / FOREIGN KEY / ...) and kept alphabetical
       within each group. This applies to the declarations (IioDBBuilderStrategy + every class
       section: derived strategies use the same banners); implementations are not ordered.
-      The same "Force = imposed Status, not derived" concept is reused, in plain-verb form
-      (no underscore prefix, matching that unit's own style), by IioDBBuilderSchema/
-      IioDBBuilderSchemaTable's ForceCreateStatus/ForceIndexesCreateStatus/
-      ForceForeignKeysCreateStatus. }
+      The "Force = imposed Status, not derived" concept lives (in plain-verb form, no underscore
+      prefix) on IioDBBuilderSchema/IioDBBuilderSchemaTable's ForceCreateStatus/
+      ForceIndexesCreateStatus/ForceForeignKeysCreateStatus, used by the fresh-DB create path. }
 
     // ==========================================================
     // DATABASE RELATED METHODS
@@ -168,6 +163,7 @@ type
     // ----------------------------------------------------------
     procedure ScriptWrite_AlterField(const ATable: IioDBBuilderSchemaTable; const AMappedField, APhysicalField: IioDBBuilderSchemaField; const AChanges: TioDBBuilderFieldChanges); virtual;
     procedure ScriptWrite_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField); virtual;
+    procedure ScriptWrite_DropField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField); virtual;
 
     // ==========================================================
     // INDEX RELATED METHODS
@@ -178,27 +174,6 @@ type
     /// without recreating them (IndexesMode = ifmDisabled).
     /// </summary>
     function Check_TableHasIndexesInDB(const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
-    /// <summary>
-    /// Drops the indexes of a single table by querying the actual DB catalog
-    /// and marks all schema indexes for the table as stCreate so they get
-    /// recreated by Process_Indexes.
-    /// Force variant: this method does NOT consult Context.Reconciliation.MappedSchema.IndexesMode — it
-    /// always operates. Every index physically present on the table is dropped,
-    /// including orphans (no longer in the schema) and manually added ones.
-    /// </summary>
-    procedure Force_DropTableIndexesFromDB(const ATable: IioDBBuilderSchemaTable); virtual;
-    /// <summary>
-    /// Generates index SQL for every table (Process_TableIndexes skips per-element stClean indexes).
-    /// This covers new tables, existing tables with new/modified indexes, and forced-stCreate indexes.
-    /// </summary>
-    procedure Process_Indexes; virtual;
-    /// <summary>
-    /// Generates the SQL statements to create or recreate the indexes of a single table.
-    /// Only indexes marked as stCreate or stUpdate are processed; modified indexes (stUpdate)
-    /// are dropped first and then recreated. Indexes of new tables already have stCreate
-    /// status because the analyzer sets it without querying the DB.
-    /// </summary>
-    procedure Process_TableIndexes(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure ScriptWrite_CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex); virtual;
     procedure ScriptWrite_DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex); virtual;
     procedure ScriptWrite_DropIndexByName(const AIndexName: string); virtual;
@@ -317,16 +292,6 @@ begin
     Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_CreateSequence(ASequenceName));
 end;
 
-procedure TioDBBuilderStrategyBase.Process_Indexes;
-var
-  LTable: IioDBBuilderSchemaTable;
-begin
-  // Status-driven: Process_TableIndexes skips stClean indexes per element, so the index Status is the
-  // single source of truth (covers both analyzer-driven and forced-stCreate indexes).
-  for LTable in Context.Reconciliation.MappedSchema.Tables.Values do
-    Process_TableIndexes(LTable);
-end;
-
 function TioDBBuilderStrategyBase.Check_DatabaseExists: Boolean;
 begin
   Result := Context.SqlGenerator.Check_DatabaseExists;
@@ -348,25 +313,6 @@ end;
 procedure TioDBBuilderStrategyBase.ScriptWrite_DropForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK);
 begin
   Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_DropFK(ATable, AForeignKey));
-end;
-
-procedure TioDBBuilderStrategyBase.Process_TableIndexes(const ATable: IioDBBuilderSchemaTable);
-var
-  LIndex: IioDBBuilderSchemaIndex;
-begin
-  for LIndex in ATable.Indexes.Values do
-    // stClean indexes fall through (no branch) and are left untouched.
-    case LIndex.Status of
-      // New index: just create it.
-      stCreate:
-        ScriptWrite_CreateIndex(ATable, LIndex);
-      // Modified index: drop the existing one first, then recreate it with the new definition.
-      stUpdate:
-        begin
-          ScriptWrite_DropIndex(ATable, LIndex);
-          ScriptWrite_CreateIndex(ATable, LIndex);
-        end;
-    end;
 end;
 
 // Plan-op translator (opCreateField): add a single column to an existing table.
@@ -391,6 +337,18 @@ begin
   Warning_FieldAlterations(ATable, AMappedField, APhysicalField);
 end;
 
+// Plan-op translator (opDropField): an orphan field (in the DB, not mapped) is NEVER dropped
+// automatically - the DROP is emitted as a comment (not executed) plus a warning, so the developer can
+// run it manually if that is really the intent.
+procedure TioDBBuilderStrategyBase.ScriptWrite_DropField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
+begin
+  Context.Script.Body.AddEmpty;
+  Context.Script.Body.AddComment(Format('Orphan field ''%s'' on table ''%s'' (exists in the DB, not mapped) - drop it manually if intended:', [AField.FieldName, ATable.Name]));
+  Context.Script.Body.AddComment(Format('ALTER TABLE %s DROP COLUMN %s;', [ATable.SqlName, AField.SqlFieldName]));
+  Context.Script.Warnings.AddLine(Format('Field ''%s'' on table ''%s'' exists in the database but is not mapped by any entity: an ALTER TABLE ' +
+    'DROP COLUMN statement was generated as a comment (NOT executed). Review and run it manually if you want to remove it.', [AField.FieldName, ATable.Name]));
+end;
+
 procedure TioDBBuilderStrategyBase.ScriptWrite_CreateTable(const ATable: IioDBBuilderSchemaTable);
 begin
   Context.Script.Body.AddTitle(Format('Creating table ''%s''', [ATable.Name]));
@@ -413,34 +371,20 @@ begin
   Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_CreateIndex(ATable, AIndex));
 end;
 
+// AIndex here is always a Physical node (read by the Introspector via Find_PhysicalIndex or, in strict
+// mode, enumerated directly): its Name is already the real catalog name, so drop by that name directly -
+// recomputing it via Translate_SchemaTableAndIndex_To_IndexName would force an uppercase iORM-convention
+// name onto an index iORM may not have created (e.g. a manually-added one dropped wholesale in strict
+// mode), which can silently target a name that does not exist. Also used by WithoutAlterTable's rebuild
+// shape to free every physical index of a rebuilt table unconditionally, before recreating it.
 procedure TioDBBuilderStrategyBase.ScriptWrite_DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex);
 begin
-  ScriptWrite_DropIndexByName(Context.SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(ATable, AIndex));
+  ScriptWrite_DropIndexByName(AIndex.Name);
 end;
 
 procedure TioDBBuilderStrategyBase.ScriptWrite_DropIndexByName(const AIndexName: string);
 begin
   Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_DropIndexByName(AIndexName));
-end;
-
-procedure TioDBBuilderStrategyBase.Force_DropTableIndexesFromDB(const ATable: IioDBBuilderSchemaTable);
-var
-  LPhysicalTable: IioDBBuilderSchemaTable;
-  LIndex: IioDBBuilderSchemaIndex;
-begin
-  // Bypass of IndexesMode: this method always operates. Drops every index the Introspector read on this
-  // table (orphans - whose [ioIndex] attribute was removed - and manually added ones alike) by its actual
-  // catalog name. Sourced from the introspected PhysicalSchema instead of a live catalog query.
-  if Context.Reconciliation.PhysicalSchema <> nil then
-  begin
-    LPhysicalTable := Context.Reconciliation.PhysicalSchema.FindTable(ATable.Name, False);
-    if LPhysicalTable <> nil then
-      for LIndex in LPhysicalTable.Indexes.Values do
-        ScriptWrite_DropIndexByName(LIndex.Name);
-  end;
-
-  // Force all schema indexes to stCreate so they get recreated by Process_Indexes.
-  ATable.ForceIndexesCreateStatus;
 end;
 
 procedure TioDBBuilderStrategyBase.GenerateScript;

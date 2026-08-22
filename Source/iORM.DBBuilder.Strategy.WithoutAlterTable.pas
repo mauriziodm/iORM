@@ -39,7 +39,9 @@
 /// 3. Create new tables with the updated schema
 /// 4. Recreate indexes
 /// 5. Copy data from old tables to new ones
-/// SQLite inherits from this class.
+/// Like WithAlterTable, this is now Plan-driven: the PlanBuilder's rebuild shape (Build_Rebuild) emits the
+/// rebuild ops in a rebuild-safe order and GenerateScript_Body is a straight translate-each-op loop,
+/// wrapped by the constraint-deferral prologue/epilogue. SQLite inherits from this class.
 /// </summary>
 unit iORM.DBBuilder.Strategy.WithoutAlterTable;
 
@@ -55,29 +57,17 @@ uses
 type
   TioDBBuilderStrategyWithoutAlterTable = class(TioDBBuilderStrategyBase)
   private
-    // ==========================================================
-    // TABLE RELATED METHODS
-    // ----------------------------------------------------------
-    procedure Process_Tables;
   protected
     // ==========================================================
-    // RENAME-CREATE-COPY PATTERN HELPERS
+    // RENAME-CREATE-COPY PATTERN HELPERS (Plan-op translators)
     // ----------------------------------------------------------
-    procedure Process_CopyDataFromOldToNew; virtual;
-    /// <summary>
-    /// Drops every existing index of the tables being rebuilt, queried from the DB catalog (Force*
-    /// mechanic, bypassing IndexesMode) so their names are free before the new tables/indexes are
-    /// created. Runs regardless of mode - the rename-create-copy always needs a clean slate.
-    /// </summary>
-    procedure Process_DropIndexesFromDB; virtual;
-    /// <summary>
-    /// Warns (blocking, so Execute stops) that a structural rebuild will drop the existing indexes
-    /// (and recreate tables without their FKs) WITHOUT recreating them, when index/FK management is
-    /// disabled - only for the stUpdate tables that actually have such objects in the catalog.
-    /// </summary>
-    procedure Process_WarnUnmanagedRebuildLosses; virtual;
+    /// <summary>Translates opCopyData: INSERT INTO the rebuilt table SELECT-ing every field that already
+    /// existed (Status &lt;&gt; stCreate) from its "_old" shadow.</summary>
     procedure ScriptWrite_CopyDataFromOldToNewTable(const ATable: IioDBBuilderSchemaTable); virtual;
-    procedure ScriptWrite_RenameAllTablesToOld; virtual;
+    /// <summary>Translates opRenameTableToOld: rename the table to its "_old" shadow. Also emits the
+    /// rebuild-loss warnings here (index/FK management disabled) since this is the op that starts the
+    /// rebuild that would drop them.</summary>
+    procedure ScriptWrite_RenameTableToOld(const ATable: IioDBBuilderSchemaTable); virtual;
     function Table2OldTableName(const ATable: IioDBBuilderSchemaTable): String; virtual;
 
     // ==========================================================
@@ -91,18 +81,14 @@ type
     // MAIN GENERATION
     // ----------------------------------------------------------
     /// <summary>
-    /// Generates the full database update script for RDBMS without ALTER TABLE support.
-    /// Workflow when updating an existing DB:
-    ///   1. Drop every index of each stUpdate table (queried from the DB, not the schema)
-    ///      so that index names do not collide when the new tables are created.
-    ///   2. Rename each stUpdate table to "_old".
-    ///   3. Create the new tables.
-    ///   4. Recreate indexes from the schema (unless ifmDisabled).
-    ///   5. Copy data from the "_old" tables.
-    /// Foreign keys are handled inline by the CREATE TABLE statement (see derived strategies).
-    /// Note: ifmEnabled and ifmEnabledStrict behave identically here because the rename-create-copy
-    /// pattern already recreates everything from scratch and the index drop always queries the DB.
-    /// Only ifmDisabled prevents index recreation on the new tables.
+    /// Generates the full database update script for RDBMS without ALTER TABLE support. Plan-driven: the
+    /// PlanBuilder's rebuild shape (Build_Rebuild) already produced the ops in a rebuild-safe order
+    /// (drop indexes from DB -> rename to "_old" -> create tables -> create indexes -> copy data), so this
+    /// is a straight translate-each-op loop wrapped by the constraint-deferral prologue/epilogue. The
+    /// key-generation-compatibility diagnostic is emitted first (same as WithAlterTable). Foreign keys are
+    /// inline in CREATE TABLE for these dialects, so there are no FK ops. Note: ifmEnabled and
+    /// ifmEnabledStrict behave identically here (the rebuild recreates everything from scratch); only
+    /// ifmDisabled prevents index recreation on the new tables (the PlanBuilder omits the create-index ops).
     /// </summary>
     procedure GenerateScript_Body; override;
   public
@@ -119,76 +105,31 @@ uses
 
 { TioDBBuilderStrategyWithoutAlterTable }
 
-procedure TioDBBuilderStrategyWithoutAlterTable.Process_Tables;
-var
-  LTable: IioDBBuilderSchemaTable;
-begin
-  // Databases without ALTER TABLE support always recreate tables using the
-  // rename-create-copy pattern (see GenerateScript_Body for the full workflow).
-  // Therefore, both stCreate and stUpdate use ScriptWrite_CreateTable.
-  for LTable in Context.Reconciliation.MappedSchema.Tables.Values do
-  begin
-    if LTable.Status in [stCreate, stUpdate] then
-      ScriptWrite_CreateTable(LTable);
-  end;
-end;
-
-procedure TioDBBuilderStrategyWithoutAlterTable.Process_WarnUnmanagedRebuildLosses;
-var
-  LTable: IioDBBuilderSchemaTable;
-begin
-  for LTable in Context.Reconciliation.MappedSchema.Tables.Values do
-    if LTable.Status = stUpdate then
-    begin
-      if Context.Reconciliation.MappedSchema.IndexesMode = ifmDisabled then
-        Warning_RebuildDropsUnmanagedIndexes(LTable);
-      if Context.Reconciliation.MappedSchema.ForeignKeysMode = ifmDisabled then
-        Warning_RebuildDropsUnmanagedForeignKeys(LTable);
-    end;
-end;
-
-procedure TioDBBuilderStrategyWithoutAlterTable.Process_DropIndexesFromDB;
-var
-  LTable: IioDBBuilderSchemaTable;
-begin
-  // Drop every existing index of each table being rebuilt, queried straight from the DB catalog
-  // (Force* mechanic, bypasses IndexesMode): the rename-create-copy needs the names free before the
-  // new tables/indexes are created, regardless of the configured mode.
-  Context.Script.Body.AddTitle('Dropping indexes');
-  for LTable in Context.Reconciliation.MappedSchema.Tables.Values do
-    if LTable.Status = stUpdate then
-      Force_DropTableIndexesFromDB(LTable);
-end;
-
 procedure TioDBBuilderStrategyWithoutAlterTable.GenerateScript_Body;
+var
+  LOp: IioDBBuilderPlanOperation;
 begin
   // Check key generation strategy compatibility with DBMS.
   // The diagnostic lives on the Context.SqlGenerator (DBMS-capability axis), not on the Strategy.
-  Context.SqlGenerator.CheckKeyGenerationCompatibility(Context.Reconciliation.MappedSchema, Context.Script);
+  Context.SqlGenerator.Hint_KeyGenerationCompatibility(Context.Reconciliation.MappedSchema, Context.Script);
 
+  // Dialect prologue: defer the constraints for the whole rebuild (see derived strategies).
   ScriptWrite_BeginDeferConstraints;
 
-  // When updating: warn about unmanaged losses, drop the existing indexes, and rename tables to "_old"
-  // before recreating them (details in each step's method).
-  if Context.Reconciliation.MappedSchema.Status = stUpdate then
-  begin
-    Process_WarnUnmanagedRebuildLosses;
-    Process_DropIndexesFromDB;
-    ScriptWrite_RenameAllTablesToOld;
-  end;
+  // Plan-driven: the PlanBuilder's rebuild shape already produced the ops in a rebuild-safe order
+  // (drop indexes from DB -> rename to "_old" -> create tables -> create indexes -> copy data), so this is
+  // a straight translate-each-op loop. The dialect lives in the ScriptWrite_/BuildSQL_ each op dispatches
+  // to. FKs are inline in CREATE TABLE for these dialects, so there are no FK ops here.
+  for LOp in Context.Reconciliation.Plan.Operations do
+    case LOp.Kind of
+      opDropIndex:        ScriptWrite_DropIndex(LOp.SchemaTable, LOp.SchemaIndex);
+      opRenameTableToOld: ScriptWrite_RenameTableToOld(LOp.SchemaTable);
+      opCreateTable:      ScriptWrite_CreateTable(LOp.SchemaTable);
+      opCreateIndex:      ScriptWrite_CreateIndex(LOp.SchemaTable, LOp.SchemaIndex);
+      opCopyData:         ScriptWrite_CopyDataFromOldToNewTable(LOp.SchemaTable);
+    end;
 
-  // Create tables (stCreate) or recreate modified tables (stUpdate)
-  Process_Tables;
-
-  // Indexes: ifmEnabled and ifmEnabledStrict are equivalent here because the rename-create-copy
-  // pattern already starts from a clean slate. Only ifmDisabled skips recreation.
-  if Context.Reconciliation.MappedSchema.IndexesMode <> ifmDisabled then
-    Process_Indexes;
-
-  // When updating, copy data from renamed "_old" tables into the newly created ones
-  if Context.Reconciliation.MappedSchema.Status = stUpdate then
-    Process_CopyDataFromOldToNew;
-
+  // Dialect epilogue: restore normal constraint checking.
   ScriptWrite_EndDeferConstraints;
 end;
 
@@ -202,37 +143,20 @@ begin
   // Default: no-op. Override in derived classes for DBMS-specific constraint deferral.
 end;
 
-procedure TioDBBuilderStrategyWithoutAlterTable.ScriptWrite_RenameAllTablesToOld;
-var
-  LTable: IioDBBuilderSchemaTable;
+procedure TioDBBuilderStrategyWithoutAlterTable.ScriptWrite_RenameTableToOld(const ATable: IioDBBuilderSchemaTable);
 begin
-  Context.Script.Body.AddTitle('Renaming table names to "_old"');
+  // Rebuild-loss warnings: emitted here, on the op that starts the rebuild. When index/FK management is
+  // disabled the rebuilt table loses its existing indexes/FKs (dropped/not recreated), so warn - but only
+  // if the table actually has such objects in the DB (the Warning_* helpers self-filter).
+  if Context.Reconciliation.MappedSchema.IndexesMode = ifmDisabled then
+    Warning_RebuildDropsUnmanagedIndexes(ATable);
+  if Context.Reconciliation.MappedSchema.ForeignKeysMode = ifmDisabled then
+    Warning_RebuildDropsUnmanagedForeignKeys(ATable);
 
-  for LTable in Context.Reconciliation.MappedSchema.Tables.Values do
-  begin
-    if LTable.Status <> stUpdate then
-      Continue;
-
-    Context.Script.Body.AddComment(Format('Renaming from "%s" to "%s"', [LTable.Name, Table2OldTableName(LTable)]));
-    Context.Script.Body.Add(Format('DROP TABLE IF EXISTS %s;', [Table2OldTableName(LTable)]));
-    Context.Script.Body.Add(Format('ALTER TABLE %s RENAME TO %s;', [LTable.Name, Table2OldTableName(LTable)]));
-    Context.Script.Body.AddEmpty;
-  end;
-end;
-
-procedure TioDBBuilderStrategyWithoutAlterTable.Process_CopyDataFromOldToNew;
-var
-  LTable: IioDBBuilderSchemaTable;
-begin
-  Context.Script.Body.AddTitle('Copying data from "_old" tables.');
-
-  for LTable in Context.Reconciliation.MappedSchema.Tables.Values do
-  begin
-    if LTable.Status <> stUpdate then
-      Continue;
-
-    ScriptWrite_CopyDataFromOldToNewTable(LTable);
-  end;
+  Context.Script.Body.AddComment(Format('Renaming from "%s" to "%s"', [ATable.Name, Table2OldTableName(ATable)]));
+  Context.Script.Body.Add(Format('DROP TABLE IF EXISTS %s;', [Table2OldTableName(ATable)]));
+  Context.Script.Body.Add(Format('ALTER TABLE %s RENAME TO %s;', [ATable.Name, Table2OldTableName(ATable)]));
+  Context.Script.Body.AddEmpty;
 end;
 
 procedure TioDBBuilderStrategyWithoutAlterTable.ScriptWrite_CopyDataFromOldToNewTable(const ATable: IioDBBuilderSchemaTable);

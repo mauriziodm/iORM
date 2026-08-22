@@ -98,6 +98,7 @@ type
     // ALTER TABLE CAPABILITY METHODS
     // ----------------------------------------------------------
     function GetInvalidFieldTypeConversions: string; override;
+    function Supports_AlterTable: Boolean; override;
   public
   end;
 
@@ -386,6 +387,13 @@ function TioDBBuilderSqlGenSQLite.Supports_Identity: Boolean;
 begin
   // SQLite uses INTEGER PRIMARY KEY which is an alias for rowid (auto-increment)
   Result := True;
+end;
+
+function TioDBBuilderSqlGenSQLite.Supports_AlterTable: Boolean;
+begin
+  // SQLite cannot restructure a table in place: any structural change goes through the
+  // rename-create-copy rebuild, so the PlanBuilder emits its rebuild shape for SQLite.
+  Result := False;
 end;
 
 end.

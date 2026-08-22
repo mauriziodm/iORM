@@ -53,10 +53,13 @@ type
     function GetRaw: String;
     function GetVersion: String;
     function IsAtLeast(const AMajor, AMinor: Integer): Boolean;
-    function ToString: String; override;
   protected
   public
     constructor Create(const AName, ARaw, AVersion: String; const AMajorVersion, AMinorVersion: Integer);
+    // Public (not private, unlike every other member here): overrides TObject.ToString, a public virtual
+    // method - keeping it private would silently narrow that visibility (the H2269 hint this avoids), not
+    // an interface-implementation concern the private-by-default convention is about.
+    function ToString: String; override;
   end;
 
 implementation

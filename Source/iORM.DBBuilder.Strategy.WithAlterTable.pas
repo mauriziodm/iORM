@@ -114,7 +114,7 @@ var
   LOp: IioDBBuilderPlanOperation;
 begin
   // Check key generation strategy compatibility with RDBMS version (diagnostic on the SqlGenerator).
-  Context.SqlGenerator.CheckKeyGenerationCompatibility(Context.Reconciliation.MappedSchema, Context.Script);
+  Context.SqlGenerator.Hint_KeyGenerationCompatibility(Context.Reconciliation.MappedSchema, Context.Script);
 
   // Plan-driven: the PlanBuilder already produced the operations in a create-safe order (strict drops ->
   // tables+fields -> indexes -> foreign keys -> orphan drops) and already applied the index/FK modes, so
@@ -126,6 +126,7 @@ begin
       opCreateTable:      ScriptWrite_CreateTable(LOp.SchemaTable);
       opCreateField:      ScriptWrite_CreateField(LOp.SchemaTable, LOp.SchemaField_Mapped);
       opAlterField:       ScriptWrite_AlterField(LOp.SchemaTable, LOp.SchemaField_Mapped, LOp.SchemaField_Physical, LOp.SchemaField_Changes);
+      opDropField:        ScriptWrite_DropField(LOp.SchemaTable, LOp.SchemaField_Physical);
       opCreateIndex:      ScriptWrite_CreateIndex(LOp.SchemaTable, LOp.SchemaIndex);
       opDropIndex:        ScriptWrite_DropIndex(LOp.SchemaTable, LOp.SchemaIndex);
       opCreateForeignKey: ScriptWrite_CreateForeignKey(LOp.SchemaTable, LOp.SchemaForeignKey);

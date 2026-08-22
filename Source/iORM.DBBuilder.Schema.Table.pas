@@ -286,7 +286,7 @@ end;
 
 // Returns True if the entity explicitly requested a specific strategy (not kgsAuto) but the
 // resolved strategy differs (i.e., fallback was applied). Used by
-// SqlGenerator.CheckKeyGenerationCompatibility to emit an informative hint to the user.
+// SqlGenerator.Hint_KeyGenerationCompatibility to emit an informative hint to the user.
 function TioDBBuilderSchemaTable.IsKeyGenerationStrategyFallback: Boolean;
 begin
   Result := (GetRequestedKeyGenerationStrategy <> kgsAuto) and
