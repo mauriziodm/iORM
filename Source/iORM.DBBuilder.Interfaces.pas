@@ -334,16 +334,12 @@ type
     ///  ForceCreateStatus.
     /// </summary>
     procedure ForceCreateStatus;
-    function GetForeignKeysMode: TioDBBuilderIndexesAndFKMode;
-    function GetIndexesMode: TioDBBuilderIndexesAndFKMode;
     function GetSequences: TioDBBuilderSchemaSequences;
     function GetStatus: TioDBBuilderStatus;
     function GetTables: TioDBBuilderSchemaTables;
     procedure SequenceAddIfNotExists(const ASequenceName: String);
     procedure SetStatus(const Value: TioDBBuilderStatus);
 
-    property ForeignKeysMode: TioDBBuilderIndexesAndFKMode read GetForeignKeysMode;
-    property IndexesMode: TioDBBuilderIndexesAndFKMode read GetIndexesMode;
     property Sequences: TioDBBuilderSchemaSequences read GetSequences;
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
     property Tables: TioDBBuilderSchemaTables read GetTables;
@@ -435,11 +431,15 @@ type
   /// </summary>
   IioDBBuilderReconciliation = interface
     ['{3F5A9C21-7E4D-4B6A-9F12-8C3D5E7A1B60}']
+    function GetForeignKeysMode: TioDBBuilderIndexesAndFKMode;
+    function GetIndexesMode: TioDBBuilderIndexesAndFKMode;
     function GetMappedSchema: IioDBBuilderSchema;
     function GetPhysicalSchema: IioDBBuilderSchema;
     function GetPlan: IioDBBuilderPlan;
     procedure SetPhysicalSchema(const AValue: IioDBBuilderSchema);
 
+    property ForeignKeysMode: TioDBBuilderIndexesAndFKMode read GetForeignKeysMode;
+    property IndexesMode: TioDBBuilderIndexesAndFKMode read GetIndexesMode;
     property MappedSchema: IioDBBuilderSchema read GetMappedSchema;
     property PhysicalSchema: IioDBBuilderSchema read GetPhysicalSchema write SetPhysicalSchema;
     property Plan: IioDBBuilderPlan read GetPlan;

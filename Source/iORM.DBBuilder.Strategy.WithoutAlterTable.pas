@@ -148,9 +148,9 @@ begin
   // Rebuild-loss warnings: emitted here, on the op that starts the rebuild. When index/FK management is
   // disabled the rebuilt table loses its existing indexes/FKs (dropped/not recreated), so warn - but only
   // if the table actually has such objects in the DB (the Warning_* helpers self-filter).
-  if Context.Reconciliation.MappedSchema.IndexesMode = ifmDisabled then
+  if Context.Reconciliation.IndexesMode = ifmDisabled then
     Warning_RebuildDropsUnmanagedIndexes(ATable);
-  if Context.Reconciliation.MappedSchema.ForeignKeysMode = ifmDisabled then
+  if Context.Reconciliation.ForeignKeysMode = ifmDisabled then
     Warning_RebuildDropsUnmanagedForeignKeys(ATable);
 
   Context.Script.Body.AddComment(Format('Renaming from "%s" to "%s"', [ATable.Name, Table2OldTableName(ATable)]));

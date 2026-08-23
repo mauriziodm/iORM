@@ -62,9 +62,9 @@ type
       const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderReconciliation;
     // A bare schema (no SchemaBuilder / no ORM build): used for the Physical branch, which the
     // Introspector fills with catalog-backed table nodes via AddTable.
-    class function NewSchema(const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderSchema;
+    class function NewSchema: IioDBBuilderSchema;
     class function NewSchemaBuilder(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema;
-      const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchemaBuilder;
+      const ASqlGenerator: IioDBBuilderSqlGenerator; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderSchemaBuilder;
     class function NewSchemaField_ClassInfo(const AConnectionDefName: String; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchemaField;
     class function NewSchemaField_Mapped(const AContextProperty: IioProperty; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchemaField;
     class function NewSchemaField_Physical(const AConnectionDefName, AFieldName, AFieldTypeRaw, AFieldDefaultRaw: String;
@@ -151,22 +151,22 @@ var
   LMappedSchema: IioDBBuilderSchema;
 begin
   // Physical is left nil here - the Introspector fills it in a later phase.
-  LMappedSchema := NewSchema(AIndexesMode, AForeignKeysMode);
-  NewSchemaBuilder(AConnectionDefName, LMappedSchema, ASqlGenerator).BuildSchema;
-  Result := TioDBBuilderReconciliation.Create(LMappedSchema, NewPlan);
+  LMappedSchema := NewSchema;
+  NewSchemaBuilder(AConnectionDefName, LMappedSchema, ASqlGenerator, AIndexesMode, AForeignKeysMode).BuildSchema;
+  Result := TioDBBuilderReconciliation.Create(LMappedSchema, NewPlan, AIndexesMode, AForeignKeysMode);
 end;
 
 // A bare schema (no SchemaBuilder / no ORM build): used for the Physical branch, which the Introspector
 // fills with catalog-backed table nodes via AddTable.
-class function TioDBBuilderFactory.NewSchema(const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderSchema;
+class function TioDBBuilderFactory.NewSchema: IioDBBuilderSchema;
 begin
-  Result := TioDBBuilderSchema.Create(AIndexesMode, AForeignKeysMode);
+  Result := TioDBBuilderSchema.Create;
 end;
 
 class function TioDBBuilderFactory.NewSchemaBuilder(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema;
-  const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchemaBuilder;
+  const ASqlGenerator: IioDBBuilderSqlGenerator; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderSchemaBuilder;
 begin
-  Result := TioDBBuilderSchemaBuilder.Create(AConnectionDefName, ASchema, ASqlGenerator);
+  Result := TioDBBuilderSchemaBuilder.Create(AConnectionDefName, ASchema, ASqlGenerator, AIndexesMode, AForeignKeysMode);
 end;
 
 // ConnectionDefName is required to apply database-specific identifier normalization. FieldTypeRaw/

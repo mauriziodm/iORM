@@ -133,10 +133,9 @@ var
   LTableName: String;
   LTable: IioDBBuilderSchemaTable;
 begin
-  // The Physical branch is a bare schema (no ORM build): the modes are irrelevant to it, but are taken
-  // from the Mapped schema so both branches carry the same configuration.
-  Result := TioDBBuilderFactory.NewSchema(Context.Reconciliation.MappedSchema.IndexesMode,
-    Context.Reconciliation.MappedSchema.ForeignKeysMode);
+  // The Physical branch is a bare schema (no ORM build): IndexesMode/ForeignKeysMode live on
+  // Reconciliation now, a single source shared by both branches.
+  Result := TioDBBuilderFactory.NewSchema;
 
   // No database yet: nothing to introspect (everything will be created), leave the Physical schema empty.
   if not Strategy.Check_DatabaseExists then

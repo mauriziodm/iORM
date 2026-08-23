@@ -43,6 +43,8 @@ type
   TioDBBuilderSchemaBuilder = class(TInterfacedObject, IioDBBuilderSchemaBuilder)
   private
     FConnectionDefName: string;
+    FForeignKeysMode: TioDBBuilderIndexesAndFKMode;
+    FIndexesMode: TioDBBuilderIndexesAndFKMode;
     FSchema: IioDBBuilderSchema;
     FSqlGenerator: IioDBBuilderSqlGenerator;
     procedure BuildSchema;
@@ -53,7 +55,7 @@ type
   protected
   public
     constructor Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema;
-      const ASqlGenerator: IioDBBuilderSqlGenerator);
+      const ASqlGenerator: IioDBBuilderSqlGenerator; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
   end;
 
 implementation
@@ -75,7 +77,7 @@ begin
   // Skipped entirely when FK management is disabled: with ifmDisabled no FK DDL is ever generated,
   // so building the SchemaFK objects would only waste analyzer catalog queries (AnalyzeForeignKeys)
   // and could mark tables as stUpdate for FK-only differences that will never be applied.
-  if FSchema.ForeignKeysMode <> ifmDisabled then
+  if FForeignKeysMode <> ifmDisabled then
     for LMapSlot in TioMapContainer.GetContainer.Values do
       BuildSchemaFK(LMapSlot.GetMap);
 end;
@@ -144,7 +146,7 @@ begin
   // with ifmDisabled no index DDL is ever generated, so building the SchemaIndex objects would only
   // waste analyzer catalog queries (AnalyzeIndexes) and could mark tables as stUpdate for index-only
   // differences that will never be applied.
-  if FSchema.IndexesMode = ifmDisabled then
+  if FIndexesMode = ifmDisabled then
     Exit;
   // If some explicit index is present then add it to the list
   if AMap.GetTable.IndexListExists then
@@ -182,12 +184,14 @@ begin
 end;
 
 constructor TioDBBuilderSchemaBuilder.Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema;
-  const ASqlGenerator: IioDBBuilderSqlGenerator);
+  const ASqlGenerator: IioDBBuilderSqlGenerator; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
 begin
   inherited Create;
   FConnectionDefName := AConnectionDefName;
   FSchema := ASchema;
   FSqlGenerator := ASqlGenerator;
+  FIndexesMode := AIndexesMode;
+  FForeignKeysMode := AForeignKeysMode;
 end;
 
 function TioDBBuilderSchemaBuilder.IsSchemaEligible(const AMap: IioMap): Boolean;

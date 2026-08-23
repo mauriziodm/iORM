@@ -42,21 +42,18 @@ type
 
   TioDBBuilderSchema = class(TioDBBuilderSchemaBaseObject, IioDBBuilderSchema)
   private
-    FForeignKeysMode, FIndexesMode: TioDBBuilderIndexesAndFKMode;
     FSequences: TioDBBuilderSchemaSequences;
     FTables: TioDBBuilderSchemaTables;
     procedure AddTable(const ATable: IioDBBuilderSchemaTable);
     function FindOrCreateTable(const AMap: IioMap; const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
     function FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
     procedure ForceCreateStatus;
-    function GetForeignKeysMode: TioDBBuilderIndexesAndFKMode;
-    function GetIndexesMode: TioDBBuilderIndexesAndFKMode;
     function GetSequences: TioDBBuilderSchemaSequences;
     function GetTables: TioDBBuilderSchemaTables;
     procedure SequenceAddIfNotExists(const ASequenceName: String);
   protected
   public
-    constructor Create(const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
+    constructor Create;
     destructor Destroy; override;
   end;
 
@@ -77,11 +74,9 @@ begin
   FTables.Add(ATable.Name, ATable);
 end;
 
-constructor TioDBBuilderSchema.Create(const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
+constructor TioDBBuilderSchema.Create;
 begin
   FSequences := TioDBBuilderSchemaSequences.Create;
-  FIndexesMode := AIndexesMode;
-  FForeignKeysMode := AForeignKeysMode;
   Status := stClean;
   FTables := TioDBBuilderSchemaTables.Create;
 end;
@@ -130,16 +125,6 @@ begin
     else
       Result := nil;
   end;
-end;
-
-function TioDBBuilderSchema.GetForeignKeysMode: TioDBBuilderIndexesAndFKMode;
-begin
-  Result := FForeignKeysMode;
-end;
-
-function TioDBBuilderSchema.GetIndexesMode: TioDBBuilderIndexesAndFKMode;
-begin
-  Result := FIndexesMode;
 end;
 
 // The create-from-scratch path (as when the target database does not exist): forces the whole schema tree to

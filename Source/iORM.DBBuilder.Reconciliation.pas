@@ -48,28 +48,47 @@ type
   /// </summary>
   TioDBBuilderReconciliation = class(TInterfacedObject, IioDBBuilderReconciliation)
   private
+    FForeignKeysMode: TioDBBuilderIndexesAndFKMode;
+    FIndexesMode: TioDBBuilderIndexesAndFKMode;
     FMappedSchema: IioDBBuilderSchema;
     FPhysicalSchema: IioDBBuilderSchema;
     FPlan: IioDBBuilderPlan;
+
+    function GetForeignKeysMode: TioDBBuilderIndexesAndFKMode;
+    function GetIndexesMode: TioDBBuilderIndexesAndFKMode;
     function GetMappedSchema: IioDBBuilderSchema;
     function GetPhysicalSchema: IioDBBuilderSchema;
     function GetPlan: IioDBBuilderPlan;
     procedure SetPhysicalSchema(const AValue: IioDBBuilderSchema);
   protected
   public
-    constructor Create(const AMappedSchema: IioDBBuilderSchema; const APlan: IioDBBuilderPlan);
+    constructor Create(const AMappedSchema: IioDBBuilderSchema; const APlan: IioDBBuilderPlan;
+      const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
   end;
 
 implementation
 
 { TioDBBuilderReconciliation }
 
-constructor TioDBBuilderReconciliation.Create(const AMappedSchema: IioDBBuilderSchema; const APlan: IioDBBuilderPlan);
+constructor TioDBBuilderReconciliation.Create(const AMappedSchema: IioDBBuilderSchema; const APlan: IioDBBuilderPlan;
+  const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
 begin
   inherited Create;
   FMappedSchema := AMappedSchema;
   FPlan := APlan;
+  FIndexesMode := AIndexesMode;
+  FForeignKeysMode := AForeignKeysMode;
   // FPhysicalSchema stays nil until the Introspector builds it in a later phase.
+end;
+
+function TioDBBuilderReconciliation.GetForeignKeysMode: TioDBBuilderIndexesAndFKMode;
+begin
+  Result := FForeignKeysMode;
+end;
+
+function TioDBBuilderReconciliation.GetIndexesMode: TioDBBuilderIndexesAndFKMode;
+begin
+  Result := FIndexesMode;
 end;
 
 function TioDBBuilderReconciliation.GetMappedSchema: IioDBBuilderSchema;

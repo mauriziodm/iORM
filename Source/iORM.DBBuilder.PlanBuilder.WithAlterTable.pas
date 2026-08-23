@@ -91,8 +91,8 @@ begin
   LPlan := Context.Reconciliation.Plan;
   LPlan.Clear;
 
-  LStrictIndexes := LMappedSchema.IndexesMode = ifmEnabledStrict;
-  LStrictForeignKeys := LMappedSchema.ForeignKeysMode = ifmEnabledStrict;
+  LStrictIndexes := Context.Reconciliation.IndexesMode = ifmEnabledStrict;
+  LStrictForeignKeys := Context.Reconciliation.ForeignKeysMode = ifmEnabledStrict;
 
   // Strict pre-pass: mark the existing modified tables stUpdate NOW, so the strict "drop all physical
   // indexes/FKs" ops can be emitted ahead of the recreations (drops-before-creates) and the create phases
@@ -113,9 +113,9 @@ begin
   // Create-safe order: tables/fields first, then indexes, then FKs (referenced tables already exist),
   // then the orphan field/table drops. Indexes/FKs honour their configured mode.
   Plan_TablesAndFields(LPlan, LMappedSchema, LPhysicalSchema);
-  if LMappedSchema.IndexesMode >= ifmEnabled then
+  if Context.Reconciliation.IndexesMode >= ifmEnabled then
     Plan_Indexes(LPlan, LMappedSchema, LPhysicalSchema, LStrictIndexes);
-  if LMappedSchema.ForeignKeysMode >= ifmEnabled then
+  if Context.Reconciliation.ForeignKeysMode >= ifmEnabled then
     Plan_ForeignKeys(LPlan, LMappedSchema, LPhysicalSchema, LStrictForeignKeys);
   Plan_OrphanFields(LPlan, LMappedSchema, LPhysicalSchema);
   Plan_OrphanTables(LPlan, LMappedSchema, LPhysicalSchema);

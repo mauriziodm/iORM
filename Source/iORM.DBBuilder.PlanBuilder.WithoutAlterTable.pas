@@ -145,7 +145,7 @@ begin
 
   // 2d. Recreate the indexes (unless index management is disabled). ifmEnabled and ifmEnabledStrict are
   //     equivalent here: the rebuild already starts from a clean slate.
-  if LMappedSchema.IndexesMode <> ifmDisabled then
+  if Context.Reconciliation.IndexesMode <> ifmDisabled then
     for LMappedTable in LMappedSchema.Tables.Values do
       if LMappedTable.Status in [stCreate, stUpdate] then
         for LMappedIndex in LMappedTable.Indexes.Values do
@@ -187,7 +187,7 @@ begin
   end;
   // Indexes: only when index management is enabled (mirrors the incremental Plan_Indexes guard, so a
   // disabled index axis never triggers a rebuild).
-  if Context.Reconciliation.MappedSchema.IndexesMode >= ifmEnabled then
+  if Context.Reconciliation.IndexesMode >= ifmEnabled then
     for LIndex in AMappedTable.Indexes.Values do
     begin
       LPhysicalIndex := Match_PhysicalIndex(AMappedTable, LIndex, APhysicalTable);
@@ -195,7 +195,7 @@ begin
         Exit;
     end;
   // Foreign keys: only when FK management is enabled (mirrors the incremental Plan_ForeignKeys guard).
-  if Context.Reconciliation.MappedSchema.ForeignKeysMode >= ifmEnabled then
+  if Context.Reconciliation.ForeignKeysMode >= ifmEnabled then
     for LFK in AMappedTable.ForeignKeys.Values do
     begin
       LPhysicalFK := Match_PhysicalForeignKey(LFK, APhysicalTable);
