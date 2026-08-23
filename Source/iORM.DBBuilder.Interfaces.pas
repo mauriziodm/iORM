@@ -478,7 +478,8 @@ type
     function GetWarnings: IioDBBuilderSqlText;
     procedure SaveToFile(const AFileName: string);
     // This method works on header section
-    procedure ScriptBegin(const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo);
+    procedure ScriptBegin(const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
+      const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
     // This method works on footer section
     procedure ScriptEnd;
 

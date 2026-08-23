@@ -392,7 +392,7 @@ begin
   // whether reconciled from the introspected physical schema or forced via Context.Reconciliation.MappedSchema.ForceCreateStatus.
   // GenerateScript_Body branches internally on Context.Reconciliation.MappedSchema.Status, so this single entry point
   // covers both the sync and the force-create case.
-  Context.Script.ScriptBegin(Context.SqlGenerator.DBMSInfo);
+  Context.Script.ScriptBegin(Context.SqlGenerator.DBMSInfo, Context.Reconciliation.IndexesMode, Context.Reconciliation.ForeignKeysMode);
   GenerateScript_Body;
   Context.Script.ScriptEnd;
 end;
