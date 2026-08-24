@@ -62,7 +62,7 @@ type
     function GetWarnings: IioDBBuilderSqlText;
   protected
   public
-    constructor Create(const AConnectionDefName: string; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
+    constructor Create(const AConnectionDefName: string; const AIndexesMode, AForeignKeysMode: TioDBBuilderMode);
   end;
 
 implementation
@@ -78,7 +78,7 @@ uses
 
 { TioDBBuilderContext }
 
-constructor TioDBBuilderContext.Create(const AConnectionDefName: string; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
+constructor TioDBBuilderContext.Create(const AConnectionDefName: string; const AIndexesMode, AForeignKeysMode: TioDBBuilderMode);
 begin
   inherited Create;
 

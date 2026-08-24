@@ -50,7 +50,7 @@ type
     FHeader: IioDBBuilderSqlText;
     FHints: IioDBBuilderSqlText;
     FPlan: IioDBBuilderSqlText;
-    FPlanRenderMode: TioDBBuilderPlanRenderMode;
+    FPlanRenderMode: TioDBBuilderMode;
     FWarnings: IioDBBuilderSqlText;
 
     // Full script clear
@@ -61,15 +61,15 @@ type
     function GetHints: IioDBBuilderSqlText;
     function GetLines: TStringList;
     function GetPlan: IioDBBuilderSqlText;
-    function GetPlanRenderMode: TioDBBuilderPlanRenderMode;
+    function GetPlanRenderMode: TioDBBuilderMode;
     function GetWarnings: IioDBBuilderSqlText;
     procedure SaveToFile(const AFileName: string);
     // This method works on header section
     procedure ScriptBegin(const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
-      const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
+      const AIndexesMode, AForeignKeysMode: TioDBBuilderMode);
     // This method works on footer section
     procedure ScriptEnd;
-    procedure SetPlanRenderMode(const AValue: TioDBBuilderPlanRenderMode);
+    procedure SetPlanRenderMode(const AValue: TioDBBuilderMode);
   protected
   public
     constructor Create(const AConnectionDefName: string);
@@ -220,7 +220,7 @@ begin
   FFullScript := TStringList.Create;
   FHeader := TioDBBuilderFactory.NewSqlText;
   FPlan := TioDBBuilderFactory.NewSqlText;
-  FPlanRenderMode := prmSmart;
+  FPlanRenderMode := ifmEnabled;
   FWarnings := TioDBBuilderFactory.NewSqlText('WARNING: ');
   FHints := TioDBBuilderFactory.NewSqlText('Hint: ');
   FBody := TioDBBuilderFactory.NewSqlText;
@@ -259,7 +259,7 @@ begin
   Result := FPlan;
 end;
 
-function TioDBBuilderScript.GetPlanRenderMode: TioDBBuilderPlanRenderMode;
+function TioDBBuilderScript.GetPlanRenderMode: TioDBBuilderMode;
 begin
   Result := FPlanRenderMode;
 end;
@@ -332,11 +332,11 @@ begin
 end;
 
 procedure TioDBBuilderScript.ScriptBegin(const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
-  const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
+  const AIndexesMode, AForeignKeysMode: TioDBBuilderMode);
 
   // Dialect-free, human-readable label for the header - mirrors the rendering style of
   // IioDBBuilderPlanOperation.Description (Plan.pas).
-  function IndexesAndFKModeToLabel(const AMode: TioDBBuilderIndexesAndFKMode): String;
+  function IndexesAndFKModeToLabel(const AMode: TioDBBuilderMode): String;
   begin
     case AMode of
       ifmDisabled:      Result := 'Disabled';
@@ -347,12 +347,12 @@ procedure TioDBBuilderScript.ScriptBegin(const ARDBMSInfo: IioDBBuilderSchemaRDB
     end;
   end;
 
-  function PlanRenderModeToLabel(const AMode: TioDBBuilderPlanRenderMode): String;
+  function PlanRenderModeToLabel(const AMode: TioDBBuilderMode): String;
   begin
     case AMode of
-      prmDisabled: Result := 'Disabled';
-      prmSmart:    Result := 'Smart';
-      prmFull:     Result := 'Full';
+      ifmDisabled:      Result := 'Disabled';
+      ifmEnabled:       Result := 'Smart';
+      ifmEnabledStrict: Result := 'Full';
     else
       Result := '';
     end;
@@ -378,7 +378,7 @@ begin
   FFooter.AddSeparator;
 end;
 
-procedure TioDBBuilderScript.SetPlanRenderMode(const AValue: TioDBBuilderPlanRenderMode);
+procedure TioDBBuilderScript.SetPlanRenderMode(const AValue: TioDBBuilderMode);
 begin
   FPlanRenderMode := AValue;
 end;

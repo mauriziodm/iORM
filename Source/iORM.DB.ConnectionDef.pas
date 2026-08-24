@@ -58,15 +58,15 @@ type
   TioDBBuilderProperty = class(TPersistent)
   strict private
     FEnabled: Boolean;
-    FForeignKeys: TioDBBuilderIndexesAndFKMode;
-    FIndexes: TioDBBuilderIndexesAndFKMode;
+    FForeignKeys: TioDBBuilderMode;
+    FIndexes: TioDBBuilderMode;
   published
     constructor Create;
     // Properties
     // NB: DBBuilder related events are on ConnectionDef component, not in this class
     property Enabled: Boolean read FEnabled write FEnabled default False;
-    property Indexes: TioDBBuilderIndexesAndFKMode read FIndexes write FIndexes default ifmEnabled;
-    property ForeignKeys: TioDBBuilderIndexesAndFKMode read FForeignKeys write FForeignKeys default ifmEnabled;
+    property Indexes: TioDBBuilderMode read FIndexes write FIndexes default ifmEnabled;
+    property ForeignKeys: TioDBBuilderMode read FForeignKeys write FForeignKeys default ifmEnabled;
   end;
 
   // Base class for all ConnectionDef components

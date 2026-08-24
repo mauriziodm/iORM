@@ -78,30 +78,27 @@ type
   TioDBBuilderStatus = (stClean, stUpdate, stCreate, stDrop);
 
   /// <summary>
-  /// Controls how the DBBuilder manages indexes and foreign keys.
-  ///   ifmDisabled: indexes/FKs are not managed at all (not created, not dropped).
-  ///   ifmEnabled: conservative mode — creates new and updates modified indexes/FKs,
-  ///     but does NOT remove orphaned ones (those present in the DB but not in the schema).
-  ///     This protects manually added indexes/FKs (e.g. client-specific optimizations).
-  ///   ifmEnabledStrict: strict mode — drops ALL existing indexes/FKs from the DB for
-  ///     updated tables and recreates them from the schema. The schema is authoritative;
-  ///     any index/FK not in the schema is removed.
-  /// Note: for WithoutAlterTable databases (e.g. SQLite), ifmEnabled and ifmEnabledStrict
-  /// behave identically because the rename-create-copy pattern already recreates everything
-  /// from scratch. The distinction only matters for WithAlterTable databases (Firebird, MSSql).
+  /// Shared off/conservative/exhaustive tri-state, reused by unrelated DBBuilder settings that happen to
+  /// follow the same progression. Each property using it documents its own meaning for the three values:
+  ///   - Reconciliation.IndexesMode / ForeignKeysMode: how indexes/FKs are managed.
+  ///       ifmDisabled: not managed at all (not created, not dropped).
+  ///       ifmEnabled: conservative — creates new and updates modified indexes/FKs, but does NOT remove
+  ///         orphaned ones (those present in the DB but not in the schema). Protects manually added
+  ///         indexes/FKs (e.g. client-specific optimizations).
+  ///       ifmEnabledStrict: drops ALL existing indexes/FKs from the DB for updated tables and recreates
+  ///         them from the schema. The schema is authoritative; any index/FK not in the schema is removed.
+  ///       Note: for WithoutAlterTable databases (e.g. SQLite), ifmEnabled and ifmEnabledStrict behave
+  ///       identically because the rename-create-copy pattern already recreates everything from scratch.
+  ///       The distinction only matters for WithAlterTable databases (Firebird, MSSql).
+  ///   - Script.PlanRenderMode: whether/how the script's PLAN section (a human-readable, non-executed
+  ///     comment listing of the Plan's operations) is rendered.
+  ///       ifmDisabled: no PLAN section at all.
+  ///       ifmEnabled: lists every operation EXCEPT the index/FK creations that belong to a table being
+  ///         created from scratch (Status = stCreate) - "Create table X" already implies them, so listing
+  ///         each one adds noise without new information.
+  ///       ifmEnabledStrict: lists every operation of the Plan, unfiltered.
   /// </summary>
-  TioDBBuilderIndexesAndFKMode = (ifmDisabled, ifmEnabled, ifmEnabledStrict);
-
-  /// <summary>
-  /// Controls whether/how the script's PLAN section (a human-readable, non-executed comment listing
-  /// of the Plan's operations) is rendered.
-  ///   prmDisabled: no PLAN section at all.
-  ///   prmSmart: lists every operation EXCEPT the index/FK creations that belong to a table being
-  ///     created from scratch (Status = stCreate) - "Create table X" already implies them, so listing
-  ///     each one adds noise without new information.
-  ///   prmFull: lists every operation of the Plan, unfiltered.
-  /// </summary>
-  TioDBBuilderPlanRenderMode = (prmDisabled, prmSmart, prmFull);
+  TioDBBuilderMode = (ifmDisabled, ifmEnabled, ifmEnabledStrict);
 
   // Forward declarations
   IioDBBuilderContext = interface;
@@ -430,9 +427,9 @@ type
     function GetIsEmpty: Boolean;
     function GetOperations: TioDBBuilderPlanOperations;
     /// <summary>Renders this Plan's operations as human-readable, non-executed comment lines into ASink,
-    /// filtered per AMode (see TioDBBuilderPlanRenderMode). Dialect-independent: uses each operation's
+    /// filtered per AMode (see TioDBBuilderMode). Dialect-independent: uses each operation's
     /// own Description, never touches the SqlGenerator.</summary>
-    procedure Render(const ASink: IioDBBuilderSqlText; const AMode: TioDBBuilderPlanRenderMode);
+    procedure Render(const ASink: IioDBBuilderSqlText; const AMode: TioDBBuilderMode);
 
     property Count: Integer read GetCount;
     property IsEmpty: Boolean read GetIsEmpty;
@@ -447,15 +444,15 @@ type
   /// </summary>
   IioDBBuilderReconciliation = interface
     ['{3F5A9C21-7E4D-4B6A-9F12-8C3D5E7A1B60}']
-    function GetForeignKeysMode: TioDBBuilderIndexesAndFKMode;
-    function GetIndexesMode: TioDBBuilderIndexesAndFKMode;
+    function GetForeignKeysMode: TioDBBuilderMode;
+    function GetIndexesMode: TioDBBuilderMode;
     function GetMappedSchema: IioDBBuilderSchema;
     function GetPhysicalSchema: IioDBBuilderSchema;
     function GetPlan: IioDBBuilderPlan;
     procedure SetPhysicalSchema(const AValue: IioDBBuilderSchema);
 
-    property ForeignKeysMode: TioDBBuilderIndexesAndFKMode read GetForeignKeysMode;
-    property IndexesMode: TioDBBuilderIndexesAndFKMode read GetIndexesMode;
+    property ForeignKeysMode: TioDBBuilderMode read GetForeignKeysMode;
+    property IndexesMode: TioDBBuilderMode read GetIndexesMode;
     property MappedSchema: IioDBBuilderSchema read GetMappedSchema;
     property PhysicalSchema: IioDBBuilderSchema read GetPhysicalSchema write SetPhysicalSchema;
     property Plan: IioDBBuilderPlan read GetPlan;
@@ -492,15 +489,15 @@ type
     function GetHints: IioDBBuilderSqlText;
     function GetLines: TStringList;
     function GetPlan: IioDBBuilderSqlText;
-    function GetPlanRenderMode: TioDBBuilderPlanRenderMode;
+    function GetPlanRenderMode: TioDBBuilderMode;
     function GetWarnings: IioDBBuilderSqlText;
     procedure SaveToFile(const AFileName: string);
     // This method works on header section
     procedure ScriptBegin(const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
-      const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
+      const AIndexesMode, AForeignKeysMode: TioDBBuilderMode);
     // This method works on footer section
     procedure ScriptEnd;
-    procedure SetPlanRenderMode(const AValue: TioDBBuilderPlanRenderMode);
+    procedure SetPlanRenderMode(const AValue: TioDBBuilderMode);
 
     property Body: IioDBBuilderSqlText read GetBody;
     property Footer: IioDBBuilderSqlText read GetFooter;
@@ -511,7 +508,7 @@ type
     /// operations, filtered per PlanRenderMode. Populated by Strategy.Base.GenerateScript, the single
     /// shared point that sees both the Plan and PlanRenderMode.</summary>
     property Plan: IioDBBuilderSqlText read GetPlan;
-    property PlanRenderMode: TioDBBuilderPlanRenderMode read GetPlanRenderMode write SetPlanRenderMode;
+    property PlanRenderMode: TioDBBuilderMode read GetPlanRenderMode write SetPlanRenderMode;
     property Warnings: IioDBBuilderSqlText read GetWarnings;
   end;
 
@@ -894,14 +891,14 @@ type
     ///  against an existing database.
     /// </summary>
     function Prepare_ForceCreateDB(const AConnectionDefName: String;
-      const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
+      const AIndexesMode, AForeignKeysMode: TioDBBuilderMode): IioDBBuilderContext;
     /// <summary>
     ///  Self-contained: builds the schema from the entity maps, analyzes it against the live
     ///  database catalog, and produces a create-or-update SQL script driven by the resulting
     ///  status. The returned Context's Status reflects the outcome.
     /// </summary>
     function Prepare_SyncDBStruct(const AConnectionDefName: String;
-      const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
+      const AIndexesMode, AForeignKeysMode: TioDBBuilderMode): IioDBBuilderContext;
 
     // ==========================================================
     // INDEX RELATED METHODS  (backlog - placeholder only, not implemented yet)

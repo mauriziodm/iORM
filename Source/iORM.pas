@@ -89,10 +89,10 @@ const
   kgsIdentity = iORM.CommonTypes.TioKeyGenerationStrategyType.kgsIdentity;
   kgsSequence = iORM.CommonTypes.TioKeyGenerationStrategyType.kgsSequence;
 
-  // TioDBBuilderIndexesAndFKMode = (ifmDisabled, ifmEnabled, ifmEnabledStrict)
-  ifmDisabled = iORM.DBBuilder.Interfaces.TioDBBuilderIndexesAndFKMode.ifmDisabled;
-  ifmEnabled = iORM.DBBuilder.Interfaces.TioDBBuilderIndexesAndFKMode.ifmEnabled;
-  ifmEnabledStrict = iORM.DBBuilder.Interfaces.TioDBBuilderIndexesAndFKMode.ifmEnabledStrict;
+  // TioDBBuilderMode = (ifmDisabled, ifmEnabled, ifmEnabledStrict)
+  ifmDisabled = iORM.DBBuilder.Interfaces.TioDBBuilderMode.ifmDisabled;
+  ifmEnabled = iORM.DBBuilder.Interfaces.TioDBBuilderMode.ifmEnabled;
+  ifmEnabledStrict = iORM.DBBuilder.Interfaces.TioDBBuilderMode.ifmEnabledStrict;
 
   // TioObjStatus = (osDirty = 0, osClean, osDeleted)
   osDirty = iORM.CommonTypes.TioObjStatus.osDirty;
@@ -302,7 +302,7 @@ type
   IioProperty = iORM.Context.Properties.Interfaces.IioProperty;
 
   TioKeyGenerationStrategyType = iORM.CommonTypes.TioKeyGenerationStrategyType;
-  TioDBBuilderIndexesAndFKMode = iORM.DBBuilder.Interfaces.TioDBBuilderIndexesAndFKMode;
+  TioDBBuilderMode = iORM.DBBuilder.Interfaces.TioDBBuilderMode;
   TioMapModeType = iORM.Attributes.TioMapModeType;
   TioTrueClassMode = iORM.Attributes.TioTrueClassMode;
 

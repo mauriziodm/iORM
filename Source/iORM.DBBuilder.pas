@@ -53,9 +53,9 @@ type
     // DATABASE RELATED METHODS
     // ----------------------------------------------------------
     function Prepare_ForceCreateDB(const AConnectionDefName: String;
-      const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
+      const AIndexesMode, AForeignKeysMode: TioDBBuilderMode): IioDBBuilderContext;
     function Prepare_SyncDBStruct(const AConnectionDefName: String;
-      const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
+      const AIndexesMode, AForeignKeysMode: TioDBBuilderMode): IioDBBuilderContext;
     procedure Warning_MultipleFKsOnSameField(const AContext: IioDBBuilderContext);
   protected
   public
@@ -115,7 +115,7 @@ begin
 end;
 
 function TioDBBuilder.Prepare_ForceCreateDB(const AConnectionDefName: String;
-  const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
+  const AIndexesMode, AForeignKeysMode: TioDBBuilderMode): IioDBBuilderContext;
 var
   LContext: IioDBBuilderContext;
   LPlanBuilder: IioDBBuilderPlanBuilder;
@@ -142,7 +142,7 @@ begin
 end;
 
 function TioDBBuilder.Prepare_SyncDBStruct(const AConnectionDefName: String;
-  const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
+  const AIndexesMode, AForeignKeysMode: TioDBBuilderMode): IioDBBuilderContext;
 var
   LContext: IioDBBuilderContext;
   LPlanBuilder: IioDBBuilderPlanBuilder;

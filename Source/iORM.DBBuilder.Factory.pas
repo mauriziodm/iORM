@@ -53,18 +53,18 @@ type
   private
   protected
   public
-    class function NewContext(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
+    class function NewContext(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderMode): IioDBBuilderContext;
     class function NewDBBuilder: IioDBBuilder;
     class function NewIntrospector(const AContext: IioDBBuilderContext; const AStrategy: IioDBBuilderStrategy): IioDBBuilderIntrospector;
     class function NewPlan: IioDBBuilderPlan;
     class function NewPlanBuilder(const AContext: IioDBBuilderContext): IioDBBuilderPlanBuilder;
-    class function NewReconciliation(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode;
+    class function NewReconciliation(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderMode;
       const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderReconciliation;
     // A bare schema (no SchemaBuilder / no ORM build): used for the Physical branch, which the
     // Introspector fills with catalog-backed table nodes via AddTable.
     class function NewSchema: IioDBBuilderSchema;
     class function NewSchemaBuilder(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema;
-      const ASqlGenerator: IioDBBuilderSqlGenerator; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderSchemaBuilder;
+      const ASqlGenerator: IioDBBuilderSqlGenerator; const AIndexesMode, AForeignKeysMode: TioDBBuilderMode): IioDBBuilderSchemaBuilder;
     class function NewSchemaField_ClassInfo(const AConnectionDefName: String; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchemaField;
     class function NewSchemaField_Mapped(const AContextProperty: IioProperty; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchemaField;
     class function NewSchemaField_Physical(const AConnectionDefName, AFieldName, AFieldTypeRaw, AFieldDefaultRaw: String;
@@ -107,7 +107,7 @@ uses
 
 { TioDBBuilderFactory }
 
-class function TioDBBuilderFactory.NewContext(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderContext;
+class function TioDBBuilderFactory.NewContext(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderMode): IioDBBuilderContext;
 begin
   Result := TioDBBuilderContext.Create(AConnectionDefName, AIndexesMode, AForeignKeysMode);
 end;
@@ -146,7 +146,7 @@ begin
 end;
 
 class function TioDBBuilderFactory.NewReconciliation(const AConnectionDefName: String; const AIndexesMode,
-  AForeignKeysMode: TioDBBuilderIndexesAndFKMode; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderReconciliation;
+  AForeignKeysMode: TioDBBuilderMode; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderReconciliation;
 var
   LMappedSchema: IioDBBuilderSchema;
 begin
@@ -164,7 +164,7 @@ begin
 end;
 
 class function TioDBBuilderFactory.NewSchemaBuilder(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema;
-  const ASqlGenerator: IioDBBuilderSqlGenerator; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode): IioDBBuilderSchemaBuilder;
+  const ASqlGenerator: IioDBBuilderSqlGenerator; const AIndexesMode, AForeignKeysMode: TioDBBuilderMode): IioDBBuilderSchemaBuilder;
 begin
   Result := TioDBBuilderSchemaBuilder.Create(AConnectionDefName, ASchema, ASqlGenerator, AIndexesMode, AForeignKeysMode);
 end;

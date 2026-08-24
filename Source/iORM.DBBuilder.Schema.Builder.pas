@@ -43,8 +43,8 @@ type
   TioDBBuilderSchemaBuilder = class(TInterfacedObject, IioDBBuilderSchemaBuilder)
   private
     FConnectionDefName: string;
-    FForeignKeysMode: TioDBBuilderIndexesAndFKMode;
-    FIndexesMode: TioDBBuilderIndexesAndFKMode;
+    FForeignKeysMode: TioDBBuilderMode;
+    FIndexesMode: TioDBBuilderMode;
     FSchema: IioDBBuilderSchema;
     FSqlGenerator: IioDBBuilderSqlGenerator;
     procedure BuildSchema;
@@ -55,7 +55,7 @@ type
   protected
   public
     constructor Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema;
-      const ASqlGenerator: IioDBBuilderSqlGenerator; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
+      const ASqlGenerator: IioDBBuilderSqlGenerator; const AIndexesMode, AForeignKeysMode: TioDBBuilderMode);
   end;
 
 implementation
@@ -184,7 +184,7 @@ begin
 end;
 
 constructor TioDBBuilderSchemaBuilder.Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema;
-  const ASqlGenerator: IioDBBuilderSqlGenerator; const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
+  const ASqlGenerator: IioDBBuilderSqlGenerator; const AIndexesMode, AForeignKeysMode: TioDBBuilderMode);
 begin
   inherited Create;
   FConnectionDefName := AConnectionDefName;
