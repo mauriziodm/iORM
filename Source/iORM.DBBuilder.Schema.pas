@@ -76,8 +76,8 @@ end;
 
 constructor TioDBBuilderSchema.Create;
 begin
+  inherited Create;
   FSequences := TioDBBuilderSchemaSequences.Create;
-  Status := stClean;
   FTables := TioDBBuilderSchemaTables.Create;
 end;
 

@@ -127,7 +127,7 @@ end;
 constructor TioDBBuilderSchemaTable.CreateMapped(const AContextTable: IioTable;
   const AKeyGenerationStrategy: TioKeyGenerationStrategyType);
 begin
-  Status := stClean;
+  inherited Create;
   FContextTable := AContextTable;
   FContextClassName := AContextTable.GetClassName;
   FIsTrueClass := AContextTable.IsTrueClass;
@@ -141,7 +141,7 @@ end;
 
 constructor TioDBBuilderSchemaTable.CreatePhysical(const AConnectionDefName, AName: String);
 begin
-  Status := stClean;
+  inherited Create;
   FName := TioDbFactory.SqlDataConverter(AConnectionDefName).NormalizeSqlIdentifier(AName, False);
   FSqlName := TioDbFactory.SqlDataConverter(AConnectionDefName).NormalizeSqlIdentifier(AName, True);
   FFields := TioDBBuilderSchemaFields.Create;

@@ -50,7 +50,10 @@ type
   ///  guard would be bypassable if a descendant could write the field directly, so even descendants
   ///  go exclusively through the protected Status property. The GetStatus/SetStatus are protected:
   ///  they also satisfy the Status member of each concrete IioDBBuilderSchema* interface by
-  ///  inheritance.
+  ///  inheritance. The initial value (stClean) is set here too, in the constructor, rather than
+  ///  left to each descendant to repeat (or, worse, to the zero-initialization of FStatus's
+  ///  underlying ordinal happening to coincide with stClean) - every descendant constructor must
+  ///  call "inherited Create" to get it.
   /// </summary>
   TioDBBuilderSchemaBaseObject = class(TInterfacedObject)
   private
@@ -65,11 +68,18 @@ type
     // X := Status instead of calling GetStatus/SetStatus directly.
     property Status: TioDBBuilderStatus read GetStatus write SetStatus;
   public
+    constructor Create;
   end;
 
 implementation
 
 { TioDBBuilderSchemaBaseObject }
+
+constructor TioDBBuilderSchemaBaseObject.Create;
+begin
+  inherited Create;
+  FStatus := stClean;
+end;
 
 function TioDBBuilderSchemaBaseObject.GetStatus: TioDBBuilderStatus;
 begin
