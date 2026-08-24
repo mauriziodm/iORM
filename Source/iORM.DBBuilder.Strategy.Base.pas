@@ -393,6 +393,9 @@ begin
   // GenerateScript_Body branches internally on Context.Reconciliation.MappedSchema.Status, so this single entry point
   // covers both the sync and the force-create case.
   Context.Script.ScriptBegin(Context.SqlGenerator.DBMSInfo, Context.Reconciliation.IndexesMode, Context.Reconciliation.ForeignKeysMode);
+  // The Plan renders itself (dialect-independent, uses only its operations' own Description) - Strategy
+  // doesn't need to know its filtering rules, just where it goes (Context.Script.Plan) and how (PlanRenderMode).
+  Context.Reconciliation.Plan.Render(Context.Script.Plan, Context.Script.PlanRenderMode);
   GenerateScript_Body;
   Context.Script.ScriptEnd;
 end;

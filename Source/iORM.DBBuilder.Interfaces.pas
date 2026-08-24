@@ -92,11 +92,23 @@ type
   /// </summary>
   TioDBBuilderIndexesAndFKMode = (ifmDisabled, ifmEnabled, ifmEnabledStrict);
 
+  /// <summary>
+  /// Controls whether/how the script's PLAN section (a human-readable, non-executed comment listing
+  /// of the Plan's operations) is rendered.
+  ///   prmDisabled: no PLAN section at all.
+  ///   prmSmart: lists every operation EXCEPT the index/FK creations that belong to a table being
+  ///     created from scratch (Status = stCreate) - "Create table X" already implies them, so listing
+  ///     each one adds noise without new information.
+  ///   prmFull: lists every operation of the Plan, unfiltered.
+  /// </summary>
+  TioDBBuilderPlanRenderMode = (prmDisabled, prmSmart, prmFull);
+
   // Forward declarations
   IioDBBuilderContext = interface;
   IioDBBuilderScript = interface;
   IioDBBuilderSchemaRDBMSInfo = interface;
   IioDBBuilderSqlGenerator = interface;
+  IioDBBuilderSqlText = interface;
 
   IioDBBuilderSchemaRDBMSInfo = interface
     ['{A7D3E8F1-B2C4-4D5E-9F6A-1B2C3D4E5F6A}']
@@ -417,6 +429,10 @@ type
     function GetCount: Integer;
     function GetIsEmpty: Boolean;
     function GetOperations: TioDBBuilderPlanOperations;
+    /// <summary>Renders this Plan's operations as human-readable, non-executed comment lines into ASink,
+    /// filtered per AMode (see TioDBBuilderPlanRenderMode). Dialect-independent: uses each operation's
+    /// own Description, never touches the SqlGenerator.</summary>
+    procedure Render(const ASink: IioDBBuilderSqlText; const AMode: TioDBBuilderPlanRenderMode);
 
     property Count: Integer read GetCount;
     property IsEmpty: Boolean read GetIsEmpty;
@@ -475,6 +491,8 @@ type
     function GetHeader: IioDBBuilderSqlText;
     function GetHints: IioDBBuilderSqlText;
     function GetLines: TStringList;
+    function GetPlan: IioDBBuilderSqlText;
+    function GetPlanRenderMode: TioDBBuilderPlanRenderMode;
     function GetWarnings: IioDBBuilderSqlText;
     procedure SaveToFile(const AFileName: string);
     // This method works on header section
@@ -482,12 +500,18 @@ type
       const AIndexesMode, AForeignKeysMode: TioDBBuilderIndexesAndFKMode);
     // This method works on footer section
     procedure ScriptEnd;
+    procedure SetPlanRenderMode(const AValue: TioDBBuilderPlanRenderMode);
 
     property Body: IioDBBuilderSqlText read GetBody;
     property Footer: IioDBBuilderSqlText read GetFooter;
     property Header: IioDBBuilderSqlText read GetHeader;
     property Hints: IioDBBuilderSqlText read GetHints;
     property Lines: TStringList read GetLines;
+    /// <summary>The PLAN section: a human-readable, non-executed comment listing of the Plan's
+    /// operations, filtered per PlanRenderMode. Populated by Strategy.Base.GenerateScript, the single
+    /// shared point that sees both the Plan and PlanRenderMode.</summary>
+    property Plan: IioDBBuilderSqlText read GetPlan;
+    property PlanRenderMode: TioDBBuilderPlanRenderMode read GetPlanRenderMode write SetPlanRenderMode;
     property Warnings: IioDBBuilderSqlText read GetWarnings;
   end;
 

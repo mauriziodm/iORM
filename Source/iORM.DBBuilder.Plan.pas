@@ -109,6 +109,7 @@ type
     function GetCount: Integer;
     function GetIsEmpty: Boolean;
     function GetOperations: TioDBBuilderPlanOperations;
+    procedure Render(const ASink: IioDBBuilderSqlText; const AMode: TioDBBuilderPlanRenderMode);
   strict protected
   public
     constructor Create;
@@ -310,6 +311,25 @@ end;
 function TioDBBuilderPlan.GetOperations: TioDBBuilderPlanOperations;
 begin
   Result := FOperations;
+end;
+
+procedure TioDBBuilderPlan.Render(const ASink: IioDBBuilderSqlText; const AMode: TioDBBuilderPlanRenderMode);
+var
+  LOp: IioDBBuilderPlanOperation;
+  LSkip: Boolean;
+begin
+  if AMode = prmDisabled then
+    Exit;
+  for LOp in FOperations do
+  begin
+    // prmSmart: a table being created from scratch (Status = stCreate) already implies its index/FK
+    // creations via its own "Create table X" line, so listing each one adds noise without new
+    // information. opCreateSequence has no SchemaTable (see AddCreateSequence) so it is never filtered.
+    LSkip := (AMode = prmSmart) and (LOp.Kind in [opCreateIndex, opCreateForeignKey]) and
+      (LOp.SchemaTable <> nil) and (LOp.SchemaTable.Status = stCreate);
+    if not LSkip then
+      ASink.AddComment(LOp.Description);
+  end;
 end;
 
 end.
