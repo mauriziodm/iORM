@@ -41,37 +41,33 @@ uses
 type
 
   /// <summary>
-  ///  Segregates the injected dependencies (Context, Strategy): each field is private to this class
-  ///  alone, so none of TioDBBuilderIntrospectorBase's own methods (and its dialect-specific
-  ///  descendants, across two files) can ever touch them directly, bypassing the Context/Strategy
-  ///  properties - only this class's own Get* methods do. Both are ingredients the Introspector needs
-  ///  to do its real job (read the catalog), not its reason for being, so - same criterion as
-  ///  TioDBBuilderStrategySegregation (see iORM.DBBuilder.Strategy.Base) and the "Field
-  ///  visibility" note in CLAUDE.md - they belong in a dedicated carrier, not bare protected fields.
+  ///  Segregates the injected Context dependency: FContext is private to this class alone, so none of
+  ///  TioDBBuilderIntrospectorBase's own methods (and its dialect-specific descendants, across two
+  ///  files) can ever touch it directly, bypassing the Context property - only this class's own
+  ///  GetContext does. Same criterion as TioDBBuilderStrategySegregation (see
+  ///  iORM.DBBuilder.Strategy.Base) and the "Field visibility" note in CLAUDE.md.
   /// </summary>
   TioDBBuilderIntrospectorSegregation = class(TInterfacedObject)
   strict private
     // strict private, not plain private: plain private in Delphi is unit-scoped, so any other class
-    // declared in this same unit (TioDBBuilderIntrospectorBase included) would still see these fields
+    // declared in this same unit (TioDBBuilderIntrospectorBase included) would still see this field
     // directly - defeating the whole point of this class. strict private is scoped to this exact class.
     FContext: IioDBBuilderContext;
-    FStrategy: IioDBBuilderStrategy;
 
     function GetContext: IioDBBuilderContext;
-    function GetStrategy: IioDBBuilderStrategy;
   strict protected
     property Context: IioDBBuilderContext read GetContext;
-    property Strategy: IioDBBuilderStrategy read GetStrategy;
   public
-    constructor Create(const AContext: IioDBBuilderContext; const AStrategy: IioDBBuilderStrategy);
+    constructor Create(const AContext: IioDBBuilderContext);
   end;
 
   /// <summary>
   ///  Base of the catalog Introspector: owns the dialect-independent skeleton (enumerate the physical
   ///  tables, wrap the reads in a transaction, assemble the Physical schema) and delegates the actual
-  ///  catalog reads to the per-dialect ReadFields/ReadIndexes/ReadForeignKeys. The Strategy is injected
-  ///  only for Check_DatabaseExists. No Status is ever stamped here (single-writer: the PlanBuilder owns
-  ///  Status).
+  ///  catalog reads to the per-dialect ReadFields/ReadIndexes/ReadForeignKeys. Check_DatabaseExists is
+  ///  asked directly of Context.SqlGenerator (Strategy.Check_DatabaseExists is itself only a pass-through
+  ///  to the same call, so depending on the whole Strategy for it would be a dead indirection). No Status
+  ///  is ever stamped here (single-writer: the PlanBuilder owns Status).
   /// </summary>
   TioDBBuilderIntrospectorBase = class(TioDBBuilderIntrospectorSegregation, IioDBBuilderIntrospector)
   private
@@ -100,23 +96,15 @@ uses
 
 { TioDBBuilderIntrospectorSegregation }
 
-constructor TioDBBuilderIntrospectorSegregation.Create(const AContext: IioDBBuilderContext; const AStrategy: IioDBBuilderStrategy);
+constructor TioDBBuilderIntrospectorSegregation.Create(const AContext: IioDBBuilderContext);
 begin
   inherited Create;
   FContext := AContext;
-  // Injected rather than self-built: the Engine already owns a Strategy for this Context, and the only
-  // thing needed here is its dialect-specific Check_DatabaseExists.
-  FStrategy := AStrategy;
 end;
 
 function TioDBBuilderIntrospectorSegregation.GetContext: IioDBBuilderContext;
 begin
   Result := FContext;
-end;
-
-function TioDBBuilderIntrospectorSegregation.GetStrategy: IioDBBuilderStrategy;
-begin
-  Result := FStrategy;
 end;
 
 { TioDBBuilderIntrospectorBase }
@@ -138,7 +126,7 @@ begin
   Result := TioDBBuilderFactory.NewSchema;
 
   // No database yet: nothing to introspect (everything will be created), leave the Physical schema empty.
-  if not Strategy.Check_DatabaseExists then
+  if not Context.SqlGenerator.Check_DatabaseExists then
     Exit;
 
   // Keep the physical connection alive across all the reads via a single transaction. Snapshot the table

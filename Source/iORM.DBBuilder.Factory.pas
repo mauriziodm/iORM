@@ -55,7 +55,7 @@ type
   public
     class function NewContext(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderMode): IioDBBuilderContext;
     class function NewDBBuilder: IioDBBuilder;
-    class function NewIntrospector(const AContext: IioDBBuilderContext; const AStrategy: IioDBBuilderStrategy): IioDBBuilderIntrospector;
+    class function NewIntrospector(const AContext: IioDBBuilderContext): IioDBBuilderIntrospector;
     class function NewPlan: IioDBBuilderPlan;
     class function NewPlanBuilder(const AContext: IioDBBuilderContext): IioDBBuilderPlanBuilder;
     class function NewReconciliation(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderMode;
@@ -117,13 +117,13 @@ begin
   Result := TioDBBuilder.Create;
 end;
 
-class function TioDBBuilderFactory.NewIntrospector(const AContext: IioDBBuilderContext; const AStrategy: IioDBBuilderStrategy): IioDBBuilderIntrospector;
+class function TioDBBuilderFactory.NewIntrospector(const AContext: IioDBBuilderContext): IioDBBuilderIntrospector;
 begin
   case TioConnectionManager.GetConnectionInfo(AContext.ConnectionDefName).ConnectionType of
     ctFirebird:
-      Result := TioDBBuilderIntrospectorFirebird.Create(AContext, AStrategy);
+      Result := TioDBBuilderIntrospectorFirebird.Create(AContext);
     ctSQLite:
-      Result := TioDBBuilderIntrospectorSqLite.Create(AContext, AStrategy);
+      Result := TioDBBuilderIntrospectorSqLite.Create(AContext);
   else
     raise EioDBBuilderException.Create(ClassName, 'NewIntrospector', 'Connection type not supported by the introspector yet.');
   end;

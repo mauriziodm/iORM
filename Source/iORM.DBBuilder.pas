@@ -153,8 +153,8 @@ begin
 
   Warning_MultipleFKsOnSameField(LContext);
 
-  // Built once and shared: the Introspector's Check_DatabaseExists and the eventual script generation
-  // both need the same dialect-specific Strategy for this Context.
+  // Built once and shared: only the eventual script generation needs this dialect-specific Strategy for
+  // this Context (the Introspector asks Context.SqlGenerator directly for Check_DatabaseExists).
   LStrategy := TioDBBuilderFactory.NewStrategy(LContext);
 
   // Reconciliation: when the DB exists, introspect it into the Physical schema; when it does not, force a
@@ -164,7 +164,7 @@ begin
   if not LStrategy.Check_DatabaseExists then
     LContext.Reconciliation.MappedSchema.ForceCreateStatus
   else
-    LContext.Reconciliation.PhysicalSchema := TioDBBuilderFactory.NewIntrospector(LContext, LStrategy).Introspect;
+    LContext.Reconciliation.PhysicalSchema := TioDBBuilderFactory.NewIntrospector(LContext).Introspect;
 
   LPlanBuilder.Build;
 
