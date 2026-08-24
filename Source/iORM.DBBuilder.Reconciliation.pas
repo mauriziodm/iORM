@@ -53,12 +53,14 @@ type
     FMappedSchema: IioDBBuilderSchema;
     FPhysicalSchema: IioDBBuilderSchema;
     FPlan: IioDBBuilderPlan;
+    FPlanRenderMode: TioDBBuilderMode;
 
     function GetForeignKeysMode: TioDBBuilderMode;
     function GetIndexesMode: TioDBBuilderMode;
     function GetMappedSchema: IioDBBuilderSchema;
     function GetPhysicalSchema: IioDBBuilderSchema;
     function GetPlan: IioDBBuilderPlan;
+    function GetPlanRenderMode: TioDBBuilderMode;
     procedure SetPhysicalSchema(const AValue: IioDBBuilderSchema);
   protected
   public
@@ -78,6 +80,9 @@ begin
   FPlan := APlan;
   FIndexesMode := AIndexesMode;
   FForeignKeysMode := AForeignKeysMode;
+  // Not yet a user-facing setting (no caller varies it) - defaulted here rather than exposed as a
+  // constructor parameter until something real needs to pass a different value.
+  FPlanRenderMode := ifmEnabled;
   // FPhysicalSchema stays nil until the Introspector builds it in a later phase.
 end;
 
@@ -104,6 +109,11 @@ end;
 function TioDBBuilderReconciliation.GetPlan: IioDBBuilderPlan;
 begin
   Result := FPlan;
+end;
+
+function TioDBBuilderReconciliation.GetPlanRenderMode: TioDBBuilderMode;
+begin
+  Result := FPlanRenderMode;
 end;
 
 procedure TioDBBuilderReconciliation.SetPhysicalSchema(const AValue: IioDBBuilderSchema);

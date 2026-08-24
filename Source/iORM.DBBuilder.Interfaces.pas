@@ -90,7 +90,7 @@ type
   ///       Note: for WithoutAlterTable databases (e.g. SQLite), ifmEnabled and ifmEnabledStrict behave
   ///       identically because the rename-create-copy pattern already recreates everything from scratch.
   ///       The distinction only matters for WithAlterTable databases (Firebird, MSSql).
-  ///   - Script.PlanRenderMode: whether/how the script's PLAN section (a human-readable, non-executed
+  ///   - Reconciliation.PlanRenderMode: whether/how the script's PLAN section (a human-readable, non-executed
   ///     comment listing of the Plan's operations) is rendered.
   ///       ifmDisabled: no PLAN section at all.
   ///       ifmEnabled: lists every operation EXCEPT the index/FK creations that belong to a table being
@@ -449,6 +449,7 @@ type
     function GetMappedSchema: IioDBBuilderSchema;
     function GetPhysicalSchema: IioDBBuilderSchema;
     function GetPlan: IioDBBuilderPlan;
+    function GetPlanRenderMode: TioDBBuilderMode;
     procedure SetPhysicalSchema(const AValue: IioDBBuilderSchema);
 
     property ForeignKeysMode: TioDBBuilderMode read GetForeignKeysMode;
@@ -456,6 +457,13 @@ type
     property MappedSchema: IioDBBuilderSchema read GetMappedSchema;
     property PhysicalSchema: IioDBBuilderSchema read GetPhysicalSchema write SetPhysicalSchema;
     property Plan: IioDBBuilderPlan read GetPlan;
+    /// <summary>Whether/how the script's PLAN section is rendered - see TioDBBuilderMode. Consumed only
+    /// at script-rendering time (Strategy.Base.GenerateScript); it does not affect this reconciliation's
+    /// Plan. Read-only like IndexesMode/ForeignKeysMode, but not yet a constructor parameter: not a
+    /// user-facing setting yet (no caller varies it), so TioDBBuilderReconciliation.Create defaults it
+    /// to ifmEnabled internally. Positioned here rather than on Script so that whenever it does become
+    /// configurable, it slots into the same construction path as IndexesMode/ForeignKeysMode.</summary>
+    property PlanRenderMode: TioDBBuilderMode read GetPlanRenderMode;
   end;
 
   IioDBBuilderSqlText = interface
@@ -489,15 +497,13 @@ type
     function GetHints: IioDBBuilderSqlText;
     function GetLines: TStringList;
     function GetPlan: IioDBBuilderSqlText;
-    function GetPlanRenderMode: TioDBBuilderMode;
     function GetWarnings: IioDBBuilderSqlText;
     procedure SaveToFile(const AFileName: string);
     // This method works on header section
     procedure ScriptBegin(const ARDBMSInfo: IioDBBuilderSchemaRDBMSInfo;
-      const AIndexesMode, AForeignKeysMode: TioDBBuilderMode);
+      const AIndexesMode, AForeignKeysMode, APlanRenderMode: TioDBBuilderMode);
     // This method works on footer section
     procedure ScriptEnd;
-    procedure SetPlanRenderMode(const AValue: TioDBBuilderMode);
 
     property Body: IioDBBuilderSqlText read GetBody;
     property Footer: IioDBBuilderSqlText read GetFooter;
@@ -505,10 +511,9 @@ type
     property Hints: IioDBBuilderSqlText read GetHints;
     property Lines: TStringList read GetLines;
     /// <summary>The PLAN section: a human-readable, non-executed comment listing of the Plan's
-    /// operations, filtered per PlanRenderMode. Populated by Strategy.Base.GenerateScript, the single
-    /// shared point that sees both the Plan and PlanRenderMode.</summary>
+    /// operations, filtered per Reconciliation.PlanRenderMode. Populated by Strategy.Base.GenerateScript,
+    /// the single shared point that sees both the Plan and PlanRenderMode.</summary>
     property Plan: IioDBBuilderSqlText read GetPlan;
-    property PlanRenderMode: TioDBBuilderMode read GetPlanRenderMode write SetPlanRenderMode;
     property Warnings: IioDBBuilderSqlText read GetWarnings;
   end;
 
