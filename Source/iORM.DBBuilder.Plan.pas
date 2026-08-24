@@ -328,7 +328,7 @@ begin
     LSkip := (AMode = ifmEnabled) and (LOp.Kind in [opCreateIndex, opCreateForeignKey]) and
       (LOp.SchemaTable <> nil) and (LOp.SchemaTable.Status = stCreate);
     if not LSkip then
-      ASink.AddComment(LOp.Description);
+      ASink.AddLine(LOp.Description);
   end;
 end;
 

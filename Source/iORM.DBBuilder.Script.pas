@@ -261,55 +261,36 @@ begin
 end;
 
 function TioDBBuilderScript.GetLines: TStringList;
-var
-  LLine: string;
+
+  // Renders one optional section (PLAN/WARNINGS/HINTS) as "<title-band>" + content + trailing blank
+  // line, reusing AddTitle/AddComment instead of hand-building separators/prefixes. AContent's lines
+  // (populated elsewhere via AddLine, e.g. FPlan/FWarnings/FHints) are plain text: the '--' comment
+  // prefix is applied here, uniformly, because it's this section - the one turning content into a
+  // SQL script - that knows the script runner strips lines starting with '--' (see
+  // iORM.DB.Script.LoadScriptAndCleanFromComments) and PLAN/WARNINGS/HINTS must NEVER reach the DBMS
+  // as executable SQL text. Upstream producers (e.g. TioDBBuilderPlan.Render) stay unaware of this.
+  procedure AddSection(const ATitle: String; const AContent: IioDBBuilderSqlText);
+  var
+    LSection: IioDBBuilderSqlText;
+    LLine: string;
+  begin
+    if AContent.IsEmpty then
+      Exit;
+    LSection := TioDBBuilderFactory.NewSqlText;
+    LSection.AddTitle(ATitle);
+    for LLine in AContent.Lines do
+      LSection.AddComment(LLine);
+    LSection.AddEmpty;
+    FFullScript.AddStrings(LSection.Lines);
+  end;
+
 begin
   FFullScript.Clear;
   FFullScript.AddStrings(FHeader.Lines);
 
-  // Add plan section with title. Unlike warnings/hints below, FPlan's lines are already full SQL
-  // comments (populated via AddComment, not AddLine) so they are added as-is, with no extra '-- ' prefix.
-  if not FPlan.IsEmpty then
-  begin
-    FFullScript.Add('');
-    FFullScript.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
-    FFullScript.Add('-- P L A N');
-    FFullScript.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
-    FFullScript.Add('');
-    FFullScript.AddStrings(FPlan.Lines);
-    FFullScript.Add('');
-  end;
-
-  // Add warnings section with title
-  if not FWarnings.IsEmpty then
-  begin
-    FFullScript.Add('');
-    FFullScript.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
-    FFullScript.Add('-- W A R N I N G S !!!        W A R N I N G S !!!        W A R N I N G S !!!');
-    FFullScript.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
-    FFullScript.Add('');
-    // Emit each warning as a SQL comment line: the script stays human-readable AND
-    // safely (re)executable, since the script runner strips lines starting with '--'
-    // (see iORM.DB.Script.LoadScriptAndCleanFromComments). Warnings/Hints must NEVER
-    // reach the DBMS as SQL text.
-    for LLine in FWarnings.Lines do
-      FFullScript.Add('-- ' + LLine);
-    FFullScript.Add('');
-  end;
-
-  // Add hints section with title
-  if not FHints.IsEmpty then
-  begin
-    FFullScript.Add('');
-    FFullScript.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
-    FFullScript.Add('-- H I N T S');
-    FFullScript.Add(StringOfChar('-', SCRIPT_SEPARATOR_LENGTH));
-    FFullScript.Add('');
-    // Same as warnings above: hints are informational and must not be executed as SQL.
-    for LLine in FHints.Lines do
-      FFullScript.Add('-- ' + LLine);
-    FFullScript.Add('');
-  end;
+  AddSection('P L A N', FPlan);
+  AddSection('W A R N I N G S !!!        W A R N I N G S !!!        W A R N I N G S !!!', FWarnings);
+  AddSection('H I N T S', FHints);
 
   FFullScript.AddStrings(FBody.Lines);
   FFullScript.AddStrings(FFooter.Lines);

@@ -426,9 +426,10 @@ type
     function GetCount: Integer;
     function GetIsEmpty: Boolean;
     function GetOperations: TioDBBuilderPlanOperations;
-    /// <summary>Renders this Plan's operations as human-readable, non-executed comment lines into ASink,
+    /// <summary>Renders this Plan's operations as human-readable description lines into ASink,
     /// filtered per AMode (see TioDBBuilderMode). Dialect-independent: uses each operation's
-    /// own Description, never touches the SqlGenerator.</summary>
+    /// own Description, never touches the SqlGenerator. Unaware of how ASink's caller will present
+    /// these lines (e.g. as SQL comments) - that's the caller's concern.</summary>
     procedure Render(const ASink: IioDBBuilderSqlText; const AMode: TioDBBuilderMode);
 
     property Count: Integer read GetCount;
