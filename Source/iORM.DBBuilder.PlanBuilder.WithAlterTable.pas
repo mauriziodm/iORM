@@ -359,6 +359,7 @@ begin
       if LMappedTable.FindField(LPhysicalField.FieldName) = nil then
       begin
         LPhysicalField.Status := stDrop;
+        LPhysicalTable.CascadeFieldDropStatus(LPhysicalField.FieldName);
         APlan.AddDropField(LMappedTable, LPhysicalField);
       end;
   end;
@@ -376,7 +377,7 @@ begin
   for LPhysicalTable in APhysicalSchema.Tables.Values do
     if Find_TableByName(AMappedSchema, LPhysicalTable.Name) = nil then
     begin
-      LPhysicalTable.Status := stDrop;
+      LPhysicalTable.CascadeTableDropStatus;
       APlan.AddDropTable(LPhysicalTable);
     end;
 end;

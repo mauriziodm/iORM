@@ -68,6 +68,8 @@ type
     procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
     procedure AddIndex(const AIndexAttr: ioIndex);
+    procedure CascadeFieldDropStatus(const AFieldName: String);
+    procedure CascadeTableDropStatus;
     function FieldExists(const AFieldName: String): boolean;
     function FindField(const AFieldName: String): IioDBBuilderSchemaField;
     procedure ForceCreateStatus;
@@ -262,6 +264,50 @@ begin
   ForceFieldsCreateStatus;
   ForceIndexesCreateStatus;
   ForceForeignKeysCreateStatus;
+end;
+
+// Propagates stDrop to this table and its own fields, indexes and foreign keys (the FKs where this
+// table is the dependent/owning side), keeping the informational Status tree consistent when the
+// PlanBuilder finds this table orphaned (present in the DB, absent from the ORM maps). Does NOT reach
+// foreign keys owned by OTHER tables that merely reference this one - that is a cross-table concern
+// (a graph edge, not a possession relationship) the PlanBuilder does not resolve yet.
+procedure TioDBBuilderSchemaTable.CascadeTableDropStatus;
+var
+  LField: IioDBBuilderSchemaField;
+  LIndex: IioDBBuilderSchemaIndex;
+  LFK: IioDBBuilderSchemaFK;
+begin
+  Status := stDrop;
+  for LField in FFields do
+    LField.Status := stDrop;
+  for LIndex in FIndexes.Values do
+    LIndex.Status := stDrop;
+  for LFK in FForeignKeys.Values do
+    LFK.Status := stDrop;
+end;
+
+// Propagates stDrop to this table's own indexes and foreign keys that reference AFieldName by name
+// (index CommaSepFieldList, FK DependentFieldName), keeping the informational Status tree consistent
+// when the PlanBuilder finds AFieldName orphaned. Does not set AFieldName's own field Status - the
+// caller already holds that field and sets it directly. Same cross-table limitation as
+// CascadeTableDropStatus: a foreign key of another table that references AFieldName as its
+// ReferenceFieldName is not reached from here.
+procedure TioDBBuilderSchemaTable.CascadeFieldDropStatus(const AFieldName: String);
+var
+  LIndex: IioDBBuilderSchemaIndex;
+  LIndexField: String;
+  LFK: IioDBBuilderSchemaFK;
+begin
+  for LIndex in FIndexes.Values do
+    for LIndexField in LIndex.CommaSepFieldList.Split([',']) do
+      if SameText(LIndexField.Trim, AFieldName) then
+      begin
+        LIndex.Status := stDrop;
+        Break;
+      end;
+  for LFK in FForeignKeys.Values do
+    if SameText(LFK.DependentFieldName, AFieldName) then
+      LFK.Status := stDrop;
 end;
 
 function TioDBBuilderSchemaTable.GetPrimaryKeyField: IioDBBuilderSchemaField;

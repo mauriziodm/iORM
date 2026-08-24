@@ -255,6 +255,22 @@ type
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
     procedure AddIndex(const AIndexAttr: ioIndex);
     /// <summary>
+    ///  Propagates stDrop to this table's own indexes and foreign keys that reference AFieldName by
+    ///  name (index CommaSepFieldList, FK DependentFieldName). Does not set AFieldName's own field
+    ///  Status - the caller already holds that field and sets it directly. Does not reach a foreign
+    ///  key of ANOTHER table that references AFieldName as its ReferenceFieldName (cross-table, a
+    ///  graph edge rather than a possession relationship - out of scope here).
+    /// </summary>
+    procedure CascadeFieldDropStatus(const AFieldName: String);
+    /// <summary>
+    ///  Propagates stDrop to this table and its own fields, indexes and foreign keys (the FKs where
+    ///  this table is the dependent/owning side), keeping the informational Status tree consistent
+    ///  when this table is found orphaned (present in the DB, absent from the ORM maps). Does not
+    ///  reach a foreign key owned by ANOTHER table that merely references this one (cross-table, out
+    ///  of scope here - see CascadeFieldDropStatus).
+    /// </summary>
+    procedure CascadeTableDropStatus;
+    /// <summary>
     ///  Case-insensitive lookup of a field of this table by name, or nil if absent.
     /// </summary>
     function FindField(const AFieldName: String): IioDBBuilderSchemaField;
