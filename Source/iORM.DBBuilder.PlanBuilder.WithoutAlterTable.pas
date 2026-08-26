@@ -47,7 +47,9 @@ type
   ///  rebuild ops in a rebuild-safe order: drop indexes from DB -> rename to "_old" -> create tables ->
   ///  create indexes -> copy data. Foreign keys are inline in CREATE TABLE for these dialects, so no FK ops
   ///  are emitted. Because the rebuild recreates everything from scratch, ifmEnabled and ifmEnabledStrict
-  ///  are equivalent here; only ifmDisabled prevents index recreation.
+  ///  are equivalent here; only ifmDisabled prevents index recreation. A table present in the DB but absent
+  ///  from the ORM maps is left untouched by the rebuild ops (nothing to recreate) but still flagged as an
+  ///  orphan, same as WithAlterTable's Plan_OrphanTables.
   ///  The fresh whole-DB create (schema stCreate + CREATE DATABASE, via MappedSchema.ForceCreateStatus) is
   ///  decided upstream (the DBBuilder, when the database does not exist) - not here; with a nil
   ///  PhysicalSchema everything is simply "new".
@@ -161,6 +163,19 @@ begin
   for LMappedTable in LMappedSchema.Tables.Values do
     if LMappedTable.Status = stUpdate then
       LPlan.AddCopyData(LMappedTable);
+
+  // 3. Orphan tables: present in the DB but absent from the ORM maps. Nothing to rebuild for a table
+  //    iORM doesn't manage, but flagged the same way WithAlterTable's Plan_OrphanTables does: cascade
+  //    stDrop to keep the informational Status tree consistent, warn about any live FK that would
+  //    dangle, and emit a DROP TABLE the Strategy renders as a comment (never auto-executed).
+  if LPhysicalSchema <> nil then
+    for LPhysicalTable in LPhysicalSchema.Tables.Values do
+      if Find_TableByName(LMappedSchema, LPhysicalTable.Name) = nil then
+      begin
+        LPhysicalTable.CascadeTableDropStatus;
+        Warn_DanglingForeignKeys(LMappedSchema, LPhysicalTable.Name, '');
+        LPlan.AddDropTable(LPhysicalTable);
+      end;
 
   // Coarse (schema-level) view: the schema needs work if any table does (monotonic: never downgrades a
   // schema already forced to stCreate by the fresh-DB path).

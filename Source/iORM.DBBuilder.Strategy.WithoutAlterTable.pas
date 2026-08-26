@@ -127,6 +127,7 @@ begin
       opCreateTable:      ScriptWrite_CreateTable(LOp.SchemaTable);
       opCreateIndex:      ScriptWrite_CreateIndex(LOp.SchemaTable, LOp.SchemaIndex);
       opCopyData:         ScriptWrite_CopyDataFromOldToNewTable(LOp.SchemaTable);
+      opDropTable:        ScriptWrite_DropTable(LOp.SchemaTable);
     end;
 
   // Dialect epilogue: restore normal constraint checking.
