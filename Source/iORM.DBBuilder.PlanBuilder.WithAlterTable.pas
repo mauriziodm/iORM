@@ -58,10 +58,15 @@ type
     // by strict mode to decide which tables to clear, BEFORE the create phases emit their ops. Checks
     // fields/indexes/FKs unconditionally (strict implies index/FK management is enabled).
     function Check_TableModified(const AMappedTable, APhysicalTable: IioDBBuilderSchemaTable): Boolean;
+    // Reverse of the base's Match_PhysicalIndex: does APhysicalIndex correspond to any index mapped on
+    // AMappedTable? Used to tell an orphan physical index (no mapped counterpart at all) apart from one
+    // that is simply out of date (Plan_Indexes/Plan_StrictDropIndexes already handle the latter).
+    function Match_MappedIndex(const AMappedTable: IioDBBuilderSchemaTable; const APhysicalIndex: IioDBBuilderSchemaIndex): IioDBBuilderSchemaIndex;
     // Diff phases (each iterates every mapped table so the resulting order is create-safe).
     procedure Plan_ForeignKeys(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
     procedure Plan_Indexes(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
     procedure Plan_OrphanFields(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
+    procedure Plan_OrphanIndexes(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
     procedure Plan_OrphanTables(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
     procedure Plan_StrictDropForeignKeys(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
     procedure Plan_StrictDropIndexes(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
@@ -111,10 +116,13 @@ begin
     Plan_StrictDropForeignKeys(LPlan, LMappedSchema, LPhysicalSchema);
 
   // Create-safe order: tables/fields first, then indexes, then FKs (referenced tables already exist),
-  // then the orphan field/table drops. Indexes/FKs honour their configured mode.
+  // then the orphan field/index/table drops. Indexes/FKs honour their configured mode.
   Plan_TablesAndFields(LPlan, LMappedSchema, LPhysicalSchema);
   if Context.Reconciliation.IndexesMode >= ifmEnabled then
+  begin
     Plan_Indexes(LPlan, LMappedSchema, LPhysicalSchema, LStrictIndexes);
+    Plan_OrphanIndexes(LPlan, LMappedSchema, LPhysicalSchema, LStrictIndexes);
+  end;
   if Context.Reconciliation.ForeignKeysMode >= ifmEnabled then
     Plan_ForeignKeys(LPlan, LMappedSchema, LPhysicalSchema, LStrictForeignKeys);
   Plan_OrphanFields(LPlan, LMappedSchema, LPhysicalSchema);
@@ -162,6 +170,17 @@ begin
       Exit;
   end;
   Result := False;
+end;
+
+function TioDBBuilderPlanBuilderWithAlterTable.Match_MappedIndex(const AMappedTable: IioDBBuilderSchemaTable;
+  const APhysicalIndex: IioDBBuilderSchemaIndex): IioDBBuilderSchemaIndex;
+var
+  LMappedIndex: IioDBBuilderSchemaIndex;
+begin
+  Result := nil;
+  for LMappedIndex in AMappedTable.Indexes.Values do
+    if SameText(Context.SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(AMappedTable, LMappedIndex), APhysicalIndex.Name) then
+      Exit(LMappedIndex);
 end;
 
 procedure TioDBBuilderPlanBuilderWithAlterTable.Plan_StrictDropIndexes(const APlan: IioDBBuilderPlan;
@@ -295,6 +314,34 @@ begin
         APlan.AddCreateIndex(LMappedTable, LIndex);
       end;
     end;
+  end;
+end;
+
+procedure TioDBBuilderPlanBuilderWithAlterTable.Plan_OrphanIndexes(const APlan: IioDBBuilderPlan;
+  const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
+var
+  LMappedTable, LPhysicalTable: IioDBBuilderSchemaTable;
+  LPhysicalIndex: IioDBBuilderSchemaIndex;
+begin
+  if APhysicalSchema = nil then
+    Exit;
+  // A physical index matching no mapped index (Match_MappedIndex): mark it for drop. Strict mode already
+  // wiped every physical index of a modified table for real (Plan_StrictDropIndexes) - skip those tables
+  // here to avoid reporting the same index twice. Conservative mode never drops orphans for real, so this
+  // pass covers ALL its tables, modified or not (mirrors Plan_OrphanFields/Plan_OrphanTables).
+  for LMappedTable in AMappedSchema.Tables.Values do
+  begin
+    if AStrict and (LMappedTable.Status = stUpdate) then
+      Continue;
+    LPhysicalTable := Find_TableByName(APhysicalSchema, LMappedTable.Name);
+    if LPhysicalTable = nil then
+      Continue;
+    for LPhysicalIndex in LPhysicalTable.Indexes.Values do
+      if Match_MappedIndex(LMappedTable, LPhysicalIndex) = nil then
+      begin
+        LPhysicalIndex.Status := stDrop;
+        APlan.AddDropOrphanIndex(LMappedTable, LPhysicalIndex);
+      end;
   end;
 end;
 

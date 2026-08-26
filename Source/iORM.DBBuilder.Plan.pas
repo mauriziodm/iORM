@@ -98,6 +98,7 @@ type
     // INDEX
     function AddCreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): IioDBBuilderPlanOperation;
     function AddDropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): IioDBBuilderPlanOperation;
+    function AddDropOrphanIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): IioDBBuilderPlanOperation;
     // FOREIGN KEY
     function AddCreateForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;
     function AddDropForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;
@@ -150,6 +151,8 @@ begin
     opCreateIndex:      Result := Format('Create index on %s (%s)', [QuotedStr(FSchemaTable.Name), FSchemaIndex.CommaSepFieldList]);
     // AIndex is always a Physical node here (see AddDropIndex), so .Name is always the real catalog name.
     opDropIndex:        Result := Format('Drop existing index %s on %s', [QuotedStr(FSchemaIndex.Name), QuotedStr(FSchemaTable.Name)]);
+    // AIndex is always a Physical node here too (see AddDropOrphanIndex).
+    opDropOrphanIndex:  Result := Format('Drop orphan index %s on %s', [QuotedStr(FSchemaIndex.Name), QuotedStr(FSchemaTable.Name)]);
     opCreateForeignKey: Result := Format('Create foreign key on %s referencing %s', [QuotedStr(FSchemaTable.Name), QuotedStr(FSchemaForeignKey.ReferenceTableName)]);
     opDropForeignKey:   Result := Format('Drop foreign key %s on %s', [QuotedStr(FSchemaForeignKey.Name), QuotedStr(FSchemaTable.Name)]);
     opCreateSequence:   Result := Format('Create sequence %s', [QuotedStr(FSequenceName)]);
@@ -269,6 +272,12 @@ function TioDBBuilderPlan.AddDropIndex(const ATable: IioDBBuilderSchemaTable;
   const AIndex: IioDBBuilderSchemaIndex): IioDBBuilderPlanOperation;
 begin
   Result := AddOp(TioDBBuilderPlanOperation.Create(opDropIndex, ATable, nil, AIndex));
+end;
+
+function TioDBBuilderPlan.AddDropOrphanIndex(const ATable: IioDBBuilderSchemaTable;
+  const AIndex: IioDBBuilderSchemaIndex): IioDBBuilderPlanOperation;
+begin
+  Result := AddOp(TioDBBuilderPlanOperation.Create(opDropOrphanIndex, ATable, nil, AIndex));
 end;
 
 function TioDBBuilderPlan.AddCreateForeignKey(const ATable: IioDBBuilderSchemaTable;

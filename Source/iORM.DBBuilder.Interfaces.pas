@@ -50,10 +50,14 @@ type
   ///  The Plan operation vocabulary: the dialect-independent *intent* of a single schema change,
   ///  produced by the PlanBuilder from the Desired-vs-Actual diff and realized into SQL by each
   ///  Strategy/SqlGenerator. Names mirror the existing ScriptWrite_/BuildSQL_ translator families
-  ///  (e.g. opCreateTable -> ScriptWrite_CreateTable). opDropTable and opDropField are the destructive
-  ///  ops: they target an orphan table/field (present in the DB but not in the ORM maps) and are always
-  ///  realized as a commented, non-executed statement plus a warning - iORM never silently drops a
-  ///  table or a field.
+  ///  (e.g. opCreateTable -> ScriptWrite_CreateTable). opDropTable, opDropField and opDropOrphanIndex
+  ///  are the destructive ops: they target an orphan table/field/index (present in the DB but not in
+  ///  the ORM maps) and are always realized as a commented, non-executed statement plus a warning -
+  ///  iORM never silently drops a table, a field or an index it does not know about.
+  ///  opDropIndex (dropping a physical index by its actual catalog name, executed for real) is used
+  ///  instead where the drop is an intentional, requested action rather than an unmanaged orphan: strict
+  ///  index-mode's wholesale clear of a modified table, and the rebuild shape's unconditional index
+  ///  clear (see below) both target indexes the caller already means to remove.
   ///  The last two are the rename-create-copy rebuild ops, produced only by the PlanBuilder's rebuild
   ///  shape (Build_Rebuild) and consumed only by WithoutAlterTable dialects (e.g. SQLite), which cannot
   ///  ALTER a table in place: opRenameTableToOld renames a table to its "_old" shadow, opCopyData copies
@@ -64,7 +68,7 @@ type
   ///  unmapped column is simply not carried over.
   /// </summary>
   TioDBBuilderPlanOpKind = (opCreateTable, opDropTable, opCreateField, opAlterField, opDropField, opCreateIndex,
-    opDropIndex, opCreateForeignKey, opDropForeignKey, opCreateSequence, opDropSequence,
+    opDropIndex, opDropOrphanIndex, opCreateForeignKey, opDropForeignKey, opCreateSequence, opDropSequence,
     opRenameTableToOld, opCopyData);
 
   // irmDropAndRecreateForAllTables (safe, default), irmDropAndRecreateForModifiedTablesOnly (faster), irmIgnoreIndexes (disabled, fully manual)
@@ -431,6 +435,9 @@ type
     // Drops a physical index by its actual catalog name (AIndex is a Physical node, e.g. as found by
     // Match_PhysicalIndex or enumerated wholesale in strict/rebuild mode).
     function AddDropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): IioDBBuilderPlanOperation;
+    // An orphan physical index (present in the DB, matching no mapped index) on a table IndexesMode still
+    // manages: NEVER dropped for real, realized as a commented statement plus a warning (mirrors AddDropTable/AddDropField).
+    function AddDropOrphanIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex): IioDBBuilderPlanOperation;
     // FOREIGN KEY
     function AddCreateForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;
     function AddDropForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;

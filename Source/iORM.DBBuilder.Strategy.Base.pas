@@ -177,6 +177,7 @@ type
     procedure ScriptWrite_CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex); virtual;
     procedure ScriptWrite_DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex); virtual;
     procedure ScriptWrite_DropIndexByName(const AIndexName: string); virtual;
+    procedure ScriptWrite_DropOrphanIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex); virtual;
 
     // ==========================================================
     // SEQUENCE RELATED METHODS
@@ -384,6 +385,18 @@ end;
 procedure TioDBBuilderStrategyBase.ScriptWrite_DropIndexByName(const AIndexName: string);
 begin
   Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_DropIndexByName(AIndexName));
+end;
+
+// Plan-op translator (opDropOrphanIndex): an orphan index (in the DB, matching no mapped index) is NEVER
+// dropped automatically - the DROP is emitted as a comment (not executed) plus a warning, so the developer
+// can run it manually if that is really the intent (mirrors ScriptWrite_DropField/ScriptWrite_DropTable).
+procedure TioDBBuilderStrategyBase.ScriptWrite_DropOrphanIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex);
+begin
+  Context.Script.Body.AddEmpty;
+  Context.Script.Body.AddComment(Format('Orphan index ''%s'' on table ''%s'' (exists in the DB, not mapped) - drop it manually if intended:', [AIndex.Name, ATable.Name]));
+  Context.Script.Body.AddComment(Context.SqlGenerator.BuildSQL_DropIndexByName(AIndex.Name));
+  Context.Script.Warnings.AddLine(Format('Index ''%s'' on table ''%s'' exists in the database but is not mapped by any entity: a DROP INDEX ' +
+    'statement was generated as a comment (NOT executed). Review and run it manually if you want to remove it.', [AIndex.Name, ATable.Name]));
 end;
 
 procedure TioDBBuilderStrategyBase.GenerateScript;

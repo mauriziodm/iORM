@@ -129,6 +129,7 @@ begin
       opDropField:        ScriptWrite_DropField(LOp.SchemaTable, LOp.SchemaField_Physical);
       opCreateIndex:      ScriptWrite_CreateIndex(LOp.SchemaTable, LOp.SchemaIndex);
       opDropIndex:        ScriptWrite_DropIndex(LOp.SchemaTable, LOp.SchemaIndex);
+      opDropOrphanIndex:  ScriptWrite_DropOrphanIndex(LOp.SchemaTable, LOp.SchemaIndex);
       opCreateForeignKey: ScriptWrite_CreateForeignKey(LOp.SchemaTable, LOp.SchemaForeignKey);
       opDropForeignKey:   ScriptWrite_DropForeignKey(LOp.SchemaTable, LOp.SchemaForeignKey);
       opDropTable:        ScriptWrite_DropTable(LOp.SchemaTable);
