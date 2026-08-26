@@ -60,10 +60,10 @@ type
 
   /// <summary>
   ///  Abstract base of the PlanBuilder family: it holds the diff PRIMITIVES shared by both build shapes
-  ///  (the cross-branch Find_* lookups and the Check_ForeignKeyModified structural comparison), the
-  ///  Plan_Orphan* phases shared verbatim by both (reporting objects present in the DB but absent from the
-  ///  ORM maps), plus the Context plumbing, and declares the single IioDBBuilderPlanBuilder entry point
-  ///  Build as abstract.
+  ///  (the cross-branch Find_* lookups, the Check_ForeignKeyModified structural comparison and the
+  ///  Check_TableModified table-level diff), the Plan_Orphan* phases shared verbatim by both (reporting
+  ///  objects present in the DB but absent from the ORM maps), plus the Context plumbing, and declares the
+  ///  single IioDBBuilderPlanBuilder entry point Build as abstract.
   ///  It never instantiates: the Factory picks a concrete shape by the DBMS capability
   ///  SqlGenerator.Supports_AlterTable, mirroring the WithAlterTable/WithoutAlterTable Strategy split -
   ///    * TioDBBuilderPlanBuilderWithAlterTable (True: Firebird, MS SQL Server) emits fine-grained ops;
@@ -86,6 +86,19 @@ type
     // structural fields). NB: a change to the DEPENDENT FIELD is not detected here anyway - Match_PhysicalForeignKey
     // would not match, so the mapped FK becomes new and the old physical one an orphan (dropped only in strict).
     function Check_ForeignKeyModified(const AMappedFK, APhysicalFK: IioDBBuilderSchemaFK): Boolean;
+    // Whether an existing table has any mapped-side difference worth acting on. Pure detection - it says
+    // a table CHANGED, never what to do about it (that is entirely the caller's call: WithAlterTable's
+    // strict drop-all vs. incremental ALTER, WithoutAlterTable's whole-table rebuild). Field differences
+    // always count (an add/change is always a modification); index/FK differences count only when the
+    // caller says the axis is managed (ACheckIndexes/ACheckForeignKeys) - an unmanaged axis's differences
+    // are none of iORM's business. Shared by both build shapes, which previously carried their own
+    // near-identical copy (WithAlterTable's own Check_TableModified / WithoutAlterTable's
+    // Check_TableNeedsRebuild): the former checked index/FK unconditionally, which could mark a table
+    // stUpdate - and so trigger Plan_StrictDropIndexes/Plan_StrictDropForeignKeys - from a diff on an axis
+    // that isn't even managed. Unifying on the mode-aware WithoutAlterTable version fixes that as a side
+    // effect.
+    function Check_TableModified(const AMappedTable, APhysicalTable: IioDBBuilderSchemaTable;
+      const ACheckIndexes, ACheckForeignKeys: Boolean): Boolean;
     // Cross-branch structural matchers: unlike a plain name lookup (see IioDBBuilderSchemaTable.FindField),
     // these compute the physical counterpart of a mapped FK/index from attributes OTHER than a shared name
     // key, because no such key exists (this is not "does a foreign key/index with this name exist").
@@ -97,8 +110,8 @@ type
     // returns the physical node, or nil = absent. Match_MappedIndex/Match_MappedForeignKey are the reverse
     // direction (given a PHYSICAL index/FK, is there a mapped one that would match it?) - used by both
     // build shapes to tell an orphan physical index/FK (no mapped counterpart at all) apart from one that
-    // is simply out of date (the incremental Plan_Indexes/Plan_ForeignKeys/Check_TableModified/
-    // Check_TableNeedsRebuild already handle that case via Match_PhysicalIndex/Match_PhysicalForeignKey).
+    // is simply out of date (the incremental Plan_Indexes/Plan_ForeignKeys/Check_TableModified already
+    // handle that case via Match_PhysicalIndex/Match_PhysicalForeignKey).
     function Match_MappedForeignKey(const AMappedTable: IioDBBuilderSchemaTable;
       const APhysicalFK: IioDBBuilderSchemaFK): IioDBBuilderSchemaFK;
     function Match_MappedIndex(const AMappedTable: IioDBBuilderSchemaTable;
@@ -163,6 +176,43 @@ begin
     or (not SameText(AMappedFK.ReferenceFieldName, APhysicalFK.ReferenceFieldName))
     or (AMappedFK.OnDeleteAction <> APhysicalFK.OnDeleteAction)
     or (AMappedFK.OnUpdateAction <> APhysicalFK.OnUpdateAction);
+end;
+
+function TioDBBuilderPlanBuilderBase.Check_TableModified(const AMappedTable, APhysicalTable: IioDBBuilderSchemaTable;
+  const ACheckIndexes, ACheckForeignKeys: Boolean): Boolean;
+var
+  LField: IioDBBuilderSchemaField;
+  LIndex: IioDBBuilderSchemaIndex;
+  LFK: IioDBBuilderSchemaFK;
+  LPhysicalField: IioDBBuilderSchemaField;
+  LPhysicalIndex: IioDBBuilderSchemaIndex;
+  LPhysicalFK: IioDBBuilderSchemaFK;
+begin
+  Result := True;  // exit True on the first difference found
+  // Fields: always compared - a field add/change is always a modification.
+  for LField in AMappedTable.Fields do
+  begin
+    LPhysicalField := APhysicalTable.FindField(LField.FieldName);
+    if (LPhysicalField = nil) or (Context.SqlGenerator.Compare_Field(LField, LPhysicalField) <> []) then
+      Exit;
+  end;
+  // Indexes: only when the caller says the axis is managed.
+  if ACheckIndexes then
+    for LIndex in AMappedTable.Indexes.Values do
+    begin
+      LPhysicalIndex := Match_PhysicalIndex(AMappedTable, LIndex, APhysicalTable);
+      if (LPhysicalIndex = nil) or (Context.SqlGenerator.Compare_Index(LIndex, LPhysicalIndex) <> []) then
+        Exit;
+    end;
+  // Foreign keys: only when the caller says the axis is managed.
+  if ACheckForeignKeys then
+    for LFK in AMappedTable.ForeignKeys.Values do
+    begin
+      LPhysicalFK := Match_PhysicalForeignKey(LFK, APhysicalTable);
+      if (LPhysicalFK = nil) or Check_ForeignKeyModified(LFK, LPhysicalFK) then
+        Exit;
+    end;
+  Result := False;
 end;
 
 function TioDBBuilderPlanBuilderBase.Match_MappedForeignKey(const AMappedTable: IioDBBuilderSchemaTable;

@@ -59,11 +59,6 @@ type
   /// </summary>
   TioDBBuilderPlanBuilderWithoutAlterTable = class(TioDBBuilderPlanBuilderBase)
   private
-    // Whether an existing table must be fully rebuilt. Like the incremental Check_TableModified but
-    // MODE-AWARE: index/FK differences count only when their axis is managed (IndexesMode/ForeignKeysMode
-    // >= ifmEnabled), so a disabled axis never triggers a rebuild - mirroring the incremental Plan_Indexes/
-    // Plan_ForeignKeys guards. A field add/change always forces a rebuild.
-    function Check_TableNeedsRebuild(const AMappedTable, APhysicalTable: IioDBBuilderSchemaTable): Boolean;
   protected
     function Build: IioDBBuilderPlan; override;
   public
@@ -102,7 +97,8 @@ begin
       for LField in LMappedTable.Fields do
         LField.Status := stCreate;
     end
-    else if Check_TableNeedsRebuild(LMappedTable, LPhysicalTable) then
+    else if Check_TableModified(LMappedTable, LPhysicalTable, Context.Reconciliation.IndexesMode >= ifmEnabled,
+      Context.Reconciliation.ForeignKeysMode >= ifmEnabled) then
     begin
       LMappedTable.Status := stUpdate;
       // Mark the fields absent from the physical table stCreate so the data-copy op skips them: they have
@@ -175,7 +171,7 @@ begin
   // rebuilt table (stUpdate) already had every physical index dropped for real in 2a, orphans included, so
   // reporting them again here would duplicate that. Unlike orphan fields, no version gate is needed: DROP
   // INDEX is always available (unlike DROP COLUMN, SQLite 3.35+ only), so the comment is unconditional.
-  // ifmEnabled/ifmEnabledStrict are equivalent here (see Check_TableNeedsRebuild), so a single check
+  // ifmEnabled/ifmEnabledStrict are equivalent here (see Check_TableModified), so a single check
   // suffices, and AStrict = True (shared PlanBuilder.Base.Plan_OrphanIndexes) mirrors that equivalence:
   // it skips exactly the tables already cleared for real in 2a.
   if Context.Reconciliation.IndexesMode >= ifmEnabled then
@@ -200,40 +196,6 @@ begin
     end;
 
   Result := LPlan;
-end;
-
-function TioDBBuilderPlanBuilderWithoutAlterTable.Check_TableNeedsRebuild(const AMappedTable, APhysicalTable: IioDBBuilderSchemaTable): Boolean;
-var
-  LField, LPhysicalField: IioDBBuilderSchemaField;
-  LIndex, LPhysicalIndex: IioDBBuilderSchemaIndex;
-  LFK, LPhysicalFK: IioDBBuilderSchemaFK;
-begin
-  Result := True;  // exit True on the first difference found
-  // Fields: always compared - a field add/change always forces a whole-table rebuild.
-  for LField in AMappedTable.Fields do
-  begin
-    LPhysicalField := APhysicalTable.FindField(LField.FieldName);
-    if (LPhysicalField = nil) or (Context.SqlGenerator.Compare_Field(LField, LPhysicalField) <> []) then
-      Exit;
-  end;
-  // Indexes: only when index management is enabled (mirrors the incremental Plan_Indexes guard, so a
-  // disabled index axis never triggers a rebuild).
-  if Context.Reconciliation.IndexesMode >= ifmEnabled then
-    for LIndex in AMappedTable.Indexes.Values do
-    begin
-      LPhysicalIndex := Match_PhysicalIndex(AMappedTable, LIndex, APhysicalTable);
-      if (LPhysicalIndex = nil) or (Context.SqlGenerator.Compare_Index(LIndex, LPhysicalIndex) <> []) then
-        Exit;
-    end;
-  // Foreign keys: only when FK management is enabled (mirrors the incremental Plan_ForeignKeys guard).
-  if Context.Reconciliation.ForeignKeysMode >= ifmEnabled then
-    for LFK in AMappedTable.ForeignKeys.Values do
-    begin
-      LPhysicalFK := Match_PhysicalForeignKey(LFK, APhysicalTable);
-      if (LPhysicalFK = nil) or Check_ForeignKeyModified(LFK, LPhysicalFK) then
-        Exit;
-    end;
-  Result := False;
 end;
 
 end.

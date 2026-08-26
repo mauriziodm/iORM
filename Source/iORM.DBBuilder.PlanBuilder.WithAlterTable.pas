@@ -54,10 +54,6 @@ type
   /// </summary>
   TioDBBuilderPlanBuilderWithAlterTable = class(TioDBBuilderPlanBuilderBase)
   private
-    // Whether an existing table has any mapped-side difference (a field/index/FK added or modified). Used
-    // by strict mode to decide which tables to clear, BEFORE the create phases emit their ops. Checks
-    // fields/indexes/FKs unconditionally (strict implies index/FK management is enabled).
-    function Check_TableModified(const AMappedTable, APhysicalTable: IioDBBuilderSchemaTable): Boolean;
     // Diff phases (each iterates every mapped table so the resulting order is create-safe).
     procedure Plan_ForeignKeys(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
     procedure Plan_Indexes(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
@@ -81,7 +77,7 @@ var
   LMappedSchema, LPhysicalSchema: IioDBBuilderSchema;
   LPlan: IioDBBuilderPlan;
   LMappedTable, LPhysicalTable: IioDBBuilderSchemaTable;
-  LStrictIndexes, LStrictForeignKeys: Boolean;
+  LStrictIndexes, LStrictForeignKeys, LIndexesEnabled, LForeignKeysEnabled: Boolean;
 begin
   LMappedSchema := Context.Reconciliation.MappedSchema;
   // May be nil when the Introspector has not run (e.g. a non-existent DB): treated as "nothing exists yet".
@@ -91,15 +87,21 @@ begin
 
   LStrictIndexes := Context.Reconciliation.IndexesMode = ifmEnabledStrict;
   LStrictForeignKeys := Context.Reconciliation.ForeignKeysMode = ifmEnabledStrict;
+  LIndexesEnabled := Context.Reconciliation.IndexesMode >= ifmEnabled;
+  LForeignKeysEnabled := Context.Reconciliation.ForeignKeysMode >= ifmEnabled;
 
   // Strict pre-pass: mark the existing modified tables stUpdate NOW, so the strict "drop all physical
   // indexes/FKs" ops can be emitted ahead of the recreations (drops-before-creates) and the create phases
   // know which tables to fully recreate. SetStatus is monotonic; the create phases stamp the same later.
+  // Check_TableModified is passed each axis's REAL enabled state (not the strict flags): a strict axis is
+  // always enabled, but the OTHER axis here may be enabled-non-strict or disabled - and a disabled axis's
+  // differences must not count, or an unmanaged FK/index change could mark the table stUpdate and trigger
+  // a strict drop-all on the axis that IS strict for a change that axis never made.
   if LStrictIndexes or LStrictForeignKeys then
     for LMappedTable in LMappedSchema.Tables.Values do
     begin
       LPhysicalTable := Find_TableByName(LPhysicalSchema, LMappedTable.Name);
-      if (LPhysicalTable <> nil) and Check_TableModified(LMappedTable, LPhysicalTable) then
+      if (LPhysicalTable <> nil) and Check_TableModified(LMappedTable, LPhysicalTable, LIndexesEnabled, LForeignKeysEnabled) then
         LMappedTable.Status := stUpdate;
     end;
 
@@ -135,37 +137,6 @@ begin
     end;
 
   Result := LPlan;
-end;
-
-function TioDBBuilderPlanBuilderWithAlterTable.Check_TableModified(const AMappedTable, APhysicalTable: IioDBBuilderSchemaTable): Boolean;
-var
-  LField: IioDBBuilderSchemaField;
-  LIndex: IioDBBuilderSchemaIndex;
-  LFK: IioDBBuilderSchemaFK;
-  LPhysicalField: IioDBBuilderSchemaField;
-  LPhysicalIndex: IioDBBuilderSchemaIndex;
-  LPhysicalFK: IioDBBuilderSchemaFK;
-begin
-  Result := True;  // exit True on the first difference found
-  for LField in AMappedTable.Fields do
-  begin
-    LPhysicalField := APhysicalTable.FindField(LField.FieldName);
-    if (LPhysicalField = nil) or (Context.SqlGenerator.Compare_Field(LField, LPhysicalField) <> []) then
-      Exit;
-  end;
-  for LIndex in AMappedTable.Indexes.Values do
-  begin
-    LPhysicalIndex := Match_PhysicalIndex(AMappedTable, LIndex, APhysicalTable);
-    if (LPhysicalIndex = nil) or (Context.SqlGenerator.Compare_Index(LIndex, LPhysicalIndex) <> []) then
-      Exit;
-  end;
-  for LFK in AMappedTable.ForeignKeys.Values do
-  begin
-    LPhysicalFK := Match_PhysicalForeignKey(LFK, APhysicalTable);
-    if (LPhysicalFK = nil) or Check_ForeignKeyModified(LFK, LPhysicalFK) then
-      Exit;
-  end;
-  Result := False;
 end;
 
 procedure TioDBBuilderPlanBuilderWithAlterTable.Plan_StrictDropIndexes(const APlan: IioDBBuilderPlan;
