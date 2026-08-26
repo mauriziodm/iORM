@@ -78,6 +78,17 @@ type
     procedure ScriptWrite_EndDeferConstraints; virtual;
 
     // ==========================================================
+    // VERSION-GATED FIELD DROP
+    // ----------------------------------------------------------
+    // The inherited ScriptWrite_DropField's commented ALTER TABLE ... DROP COLUMN is only valid SQLite
+    // syntax from 3.35.0 onward (older engines have no lightweight way to drop a single column - the
+    // PlanBuilder deliberately never forces the full rebuild just for an orphan field, see the orphan
+    // fields step in TioDBBuilderPlanBuilderWithoutAlterTable.Build). Checked against the actually
+    // connected engine (Context.SqlGenerator.DBMSInfo), not a compile-time assumption, so the offered
+    // statement is never misleading.
+    procedure ScriptWrite_DropField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField); override;
+
+    // ==========================================================
     // MAIN GENERATION
     // ----------------------------------------------------------
     /// <summary>
@@ -128,6 +139,7 @@ begin
       opCreateIndex:      ScriptWrite_CreateIndex(LOp.SchemaTable, LOp.SchemaIndex);
       opCopyData:         ScriptWrite_CopyDataFromOldToNewTable(LOp.SchemaTable);
       opDropTable:        ScriptWrite_DropTable(LOp.SchemaTable);
+      opDropField:        ScriptWrite_DropField(LOp.SchemaTable, LOp.SchemaField_Physical);
     end;
 
   // Dialect epilogue: restore normal constraint checking.
@@ -208,6 +220,22 @@ end;
 function TioDBBuilderStrategyWithoutAlterTable.Table2OldTableName(const ATable: IioDBBuilderSchemaTable): String;
 begin
   Result := Format('_%s_old', [ATable.Name.ToLower]);
+end;
+
+procedure TioDBBuilderStrategyWithoutAlterTable.ScriptWrite_DropField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
+begin
+  if Context.SqlGenerator.DBMSInfo.IsAtLeast(3, 35) then
+    inherited
+  else
+  begin
+    Context.Script.Body.AddEmpty;
+    Context.Script.Body.AddComment(Format('Orphan field ''%s'' on table ''%s'' (exists in the DB, not mapped): this SQLite engine (%s) does not ' +
+      'support ALTER TABLE DROP COLUMN (requires 3.35.0+) - remove it manually via a full table rebuild if intended.',
+      [AField.FieldName, ATable.Name, Context.SqlGenerator.DBMSInfo.Version]));
+    Context.Script.Warnings.AddLine(Format('Field ''%s'' on table ''%s'' exists in the database but is not mapped by any entity: no DROP COLUMN ' +
+      'statement was offered because this SQLite engine (%s) is older than 3.35.0. Removing it requires rebuilding the table manually.',
+      [AField.FieldName, ATable.Name, Context.SqlGenerator.DBMSInfo.Version]));
+  end;
 end;
 
 end.

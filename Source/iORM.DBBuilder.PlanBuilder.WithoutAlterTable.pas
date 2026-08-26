@@ -47,9 +47,11 @@ type
   ///  rebuild ops in a rebuild-safe order: drop indexes from DB -> rename to "_old" -> create tables ->
   ///  create indexes -> copy data. Foreign keys are inline in CREATE TABLE for these dialects, so no FK ops
   ///  are emitted. Because the rebuild recreates everything from scratch, ifmEnabled and ifmEnabledStrict
-  ///  are equivalent here; only ifmDisabled prevents index recreation. A table present in the DB but absent
-  ///  from the ORM maps is left untouched by the rebuild ops (nothing to recreate) but still flagged as an
-  ///  orphan, same as WithAlterTable's Plan_OrphanTables.
+  ///  are equivalent here; only ifmDisabled prevents index recreation. A table, or a field on an otherwise
+  ///  untouched table, present in the DB but absent from the ORM maps is left alone by the rebuild ops
+  ///  (nothing to recreate, and an orphan alone must never force a rebuild - that would destroy exactly
+  ///  the data being flagged) but still surfaced as an orphan, same as WithAlterTable's Plan_OrphanTables/
+  ///  Plan_OrphanFields.
   ///  The fresh whole-DB create (schema stCreate + CREATE DATABASE, via MappedSchema.ForceCreateStatus) is
   ///  decided upstream (the DBBuilder, when the database does not exist) - not here; with a nil
   ///  PhysicalSchema everything is simply "new".
@@ -107,17 +109,6 @@ begin
       for LField in LMappedTable.Fields do
         if LPhysicalTable.FindField(LField.FieldName) = nil then
           LField.Status := stCreate;
-      // Orphan physical fields (in the DB, not mapped) have no dedicated op here - unlike WithAlterTable's
-      // opDropField, the rebuild simply never copies them into the recreated table, so their data is lost
-      // silently unless we warn about it now, at plan time.
-      for LField in LPhysicalTable.Fields do
-        if LMappedTable.FindField(LField.FieldName) = nil then
-        begin
-          Context.Script.Warnings.AddLine(Format('Field ''%s'' on table ''%s'' exists in the database but is not mapped by any entity: ' +
-            'it will be PERMANENTLY LOST when the table is rebuilt (this dialect cannot ALTER a table in place).',
-            [LField.FieldName, LMappedTable.Name]));
-          Warn_DanglingForeignKeys(LMappedSchema, LMappedTable.Name, LField.FieldName);
-        end;
     end;
   end;
 
@@ -164,10 +155,30 @@ begin
     if LMappedTable.Status = stUpdate then
       LPlan.AddCopyData(LMappedTable);
 
-  // 3. Orphan tables: present in the DB but absent from the ORM maps. Nothing to rebuild for a table
-  //    iORM doesn't manage, but flagged the same way WithAlterTable's Plan_OrphanTables does: cascade
-  //    stDrop to keep the informational Status tree consistent, warn about any live FK that would
-  //    dangle, and emit a DROP TABLE the Strategy renders as a comment (never auto-executed).
+  // 3. Orphans: present in the DB but absent from the ORM maps. Independent of the rebuild detection
+  //    above - an orphan alone must never trigger a rebuild, since that would destroy exactly the data
+  //    this warns about - and independent of each other, so both run directly against the two schemas.
+
+  // 3a. Orphan fields on tables that are still mapped. Cascade stDrop to keep the informational Status
+  //     tree consistent, warn about any live FK that would dangle, and add an opDropField the Strategy
+  //     renders as a comment - version-gated on SQLite (Strategy.WithoutAlterTable.ScriptWrite_DropField)
+  //     because dropping a single column needs the very rebuild this must not trigger.
+  for LMappedTable in LMappedSchema.Tables.Values do
+  begin
+    LPhysicalTable := Find_TableByName(LPhysicalSchema, LMappedTable.Name);
+    if LPhysicalTable = nil then
+      Continue;
+    for LField in LPhysicalTable.Fields do
+      if LMappedTable.FindField(LField.FieldName) = nil then
+      begin
+        LField.Status := stDrop;
+        LPhysicalTable.CascadeFieldDropStatus(LField.FieldName);
+        Warn_DanglingForeignKeys(LMappedSchema, LMappedTable.Name, LField.FieldName);
+        LPlan.AddDropField(LMappedTable, LField);
+      end;
+  end;
+
+  // 3b. Orphan tables. Same treatment: cascade, warn, add the (commented) drop.
   if LPhysicalSchema <> nil then
     for LPhysicalTable in LPhysicalSchema.Tables.Values do
       if Find_TableByName(LMappedSchema, LPhysicalTable.Name) = nil then
