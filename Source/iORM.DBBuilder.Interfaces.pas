@@ -405,8 +405,11 @@ type
     /// <summary>The physical (old/actual) field, carried by opAlterField so translation (C4) can render the
     /// old->new warnings; nil for every other op kind.</summary>
     property SchemaField_Physical: IioDBBuilderSchemaField read GetSchemaField_Physical;
+    /// <summary>Mapped for opCreateForeignKey; physical for opDropForeignKey/opDropOrphanForeignKey (see Kind).</summary>
     property SchemaForeignKey: IioDBBuilderSchemaFK read GetSchemaForeignKey;
+    /// <summary>Mapped for opCreateIndex; physical for opDropIndex/opDropOrphanIndex (see Kind).</summary>
     property SchemaIndex: IioDBBuilderSchemaIndex read GetSchemaIndex;
+    /// <summary>Mapped for opCreateTable/opCopyData/opRenameTableToOld; physical for opDropTable (see Kind).</summary>
     property SchemaTable: IioDBBuilderSchemaTable read GetSchemaTable;
     property SequenceName: String read GetSequenceName;
   end;
