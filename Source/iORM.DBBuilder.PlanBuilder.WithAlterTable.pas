@@ -61,7 +61,7 @@ type
     procedure Plan_StrictDropIndexes(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
     procedure Plan_TablesAndFields(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
   protected
-    function Build: IioDBBuilderPlan; override;
+    function BuildPlan: IioDBBuilderPlan; override;
   public
   end;
 
@@ -72,7 +72,7 @@ uses
 
 { TioDBBuilderPlanBuilderWithAlterTable }
 
-function TioDBBuilderPlanBuilderWithAlterTable.Build: IioDBBuilderPlan;
+function TioDBBuilderPlanBuilderWithAlterTable.BuildPlan: IioDBBuilderPlan;
 var
   LMappedSchema, LPhysicalSchema: IioDBBuilderSchema;
   LPlan: IioDBBuilderPlan;

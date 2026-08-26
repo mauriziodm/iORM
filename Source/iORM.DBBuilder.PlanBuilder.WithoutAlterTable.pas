@@ -60,7 +60,7 @@ type
   TioDBBuilderPlanBuilderWithoutAlterTable = class(TioDBBuilderPlanBuilderBase)
   private
   protected
-    function Build: IioDBBuilderPlan; override;
+    function BuildPlan: IioDBBuilderPlan; override;
   public
   end;
 
@@ -71,7 +71,7 @@ uses
 
 { TioDBBuilderPlanBuilderWithoutAlterTable }
 
-function TioDBBuilderPlanBuilderWithoutAlterTable.Build: IioDBBuilderPlan;
+function TioDBBuilderPlanBuilderWithoutAlterTable.BuildPlan: IioDBBuilderPlan;
 var
   LMappedSchema, LPhysicalSchema: IioDBBuilderSchema;
   LPlan: IioDBBuilderPlan;

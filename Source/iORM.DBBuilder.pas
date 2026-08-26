@@ -136,7 +136,7 @@ begin
   LContext.Reconciliation.MappedSchema.ForceCreateStatus;
   // Build the Plan of all-create operations (Physical schema left nil, so everything is "new") for the
   // op-driven WithAlterTable generation. WithoutAlterTable ignores the Plan and works off the forced Status.
-  LPlanBuilder.Build;
+  LPlanBuilder.BuildPlan;
   LStrategy.GenerateScript;
   Result := LContext;
 end;
@@ -166,7 +166,7 @@ begin
   else
     LContext.Reconciliation.PhysicalSchema := TioDBBuilderFactory.NewIntrospector(LContext).Introspect;
 
-  LPlanBuilder.Build;
+  LPlanBuilder.BuildPlan;
 
   LStrategy.GenerateScript;
   Result := LContext;

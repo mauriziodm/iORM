@@ -63,7 +63,7 @@ type
   ///  (the cross-branch Find_* lookups, the Check_ForeignKeyModified structural comparison and the
   ///  Check_TableModified table-level diff), the Plan_Orphan* phases shared verbatim by both (reporting
   ///  objects present in the DB but absent from the ORM maps), plus the Context plumbing, and declares the
-  ///  single IioDBBuilderPlanBuilder entry point Build as abstract.
+  ///  single IioDBBuilderPlanBuilder entry point BuildPlan as abstract.
   ///  It never instantiates: the Factory picks a concrete shape by the DBMS capability
   ///  SqlGenerator.Supports_AlterTable, mirroring the WithAlterTable/WithoutAlterTable Strategy split -
   ///    * TioDBBuilderPlanBuilderWithAlterTable (True: Firebird, MS SQL Server) emits fine-grained ops;
@@ -77,7 +77,7 @@ type
   private
   protected
     // The single entry point (IioDBBuilderPlanBuilder), implemented by each concrete build shape.
-    function Build: IioDBBuilderPlan; virtual; abstract;
+    function BuildPlan: IioDBBuilderPlan; virtual; abstract;
     // Whether a matched foreign key differs. Compares the FULL structure (dependent table+field, reference
     // table+field, on-delete/on-update actions) rather than only the attributes that can still differ: it
     // keeps the method self-contained and correct even if Match_PhysicalForeignKey's match key changes. The

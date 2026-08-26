@@ -898,7 +898,7 @@ type
   /// </summary>
   IioDBBuilderPlanBuilder = interface
     ['{7A1D3E52-9C4B-4F60-8A2D-5E6F1B3C9D74}']
-    function Build: IioDBBuilderPlan;
+    function BuildPlan: IioDBBuilderPlan;
   end;
 
   IioDBBuilder = interface

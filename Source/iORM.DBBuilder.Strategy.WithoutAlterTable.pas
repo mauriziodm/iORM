@@ -83,7 +83,7 @@ type
     // The inherited ScriptWrite_DropField's commented ALTER TABLE ... DROP COLUMN is only valid SQLite
     // syntax from 3.35.0 onward (older engines have no lightweight way to drop a single column - the
     // PlanBuilder deliberately never forces the full rebuild just for an orphan field, see the orphan
-    // fields step in TioDBBuilderPlanBuilderWithoutAlterTable.Build). Checked against the actually
+    // fields step in TioDBBuilderPlanBuilderWithoutAlterTable.BuildPlan). Checked against the actually
     // connected engine (Context.SqlGenerator.DBMSInfo), not a compile-time assumption, so the offered
     // statement is never misleading.
     procedure ScriptWrite_DropField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField); override;
@@ -94,7 +94,7 @@ type
     // Unlike ScriptWrite_DropField (version-gated: newer SQLite CAN drop a single column), there is no
     // SQLite version that supports ALTER TABLE ... DROP CONSTRAINT for a foreign key - the constraint is
     // baked into the CREATE TABLE and the only way to remove one is the very rebuild an orphan alone must
-    // not trigger (see the orphan FKs step in TioDBBuilderPlanBuilderWithoutAlterTable.Build). So this
+    // not trigger (see the orphan FKs step in TioDBBuilderPlanBuilderWithoutAlterTable.BuildPlan). So this
     // override never attempts a SQL statement (BuildSQL_DropFKbyName is not even implemented for SQLite) -
     // a warning is the only faithful realization of "orphan FK, drop it manually" on this dialect.
     procedure ScriptWrite_DropOrphanForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK); override;
