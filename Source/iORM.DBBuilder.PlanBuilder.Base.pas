@@ -92,11 +92,13 @@ type
     // rule), then looks that up. Matching is case-insensitive (SameText): both branches
     // normalize identifiers via the same SqlDataConverter, so the keys already align - the case-insensitivity
     // is just belt-and-suspenders (and mirrors SQLite's native case-insensitive identifier matching). Each
-    // returns the physical node, or nil = absent. Match_MappedIndex is the reverse direction (given a
-    // PHYSICAL index, is there a mapped one that would translate to its catalog name?) - used by both build
-    // shapes to tell an orphan physical index (no mapped counterpart at all) apart from one that is simply
-    // out of date (the incremental Plan_Indexes/Check_TableModified/Check_TableNeedsRebuild already handle
-    // that case via Match_PhysicalIndex).
+    // returns the physical node, or nil = absent. Match_MappedIndex/Match_MappedForeignKey are the reverse
+    // direction (given a PHYSICAL index/FK, is there a mapped one that would match it?) - used by both
+    // build shapes to tell an orphan physical index/FK (no mapped counterpart at all) apart from one that
+    // is simply out of date (the incremental Plan_Indexes/Plan_ForeignKeys/Check_TableModified/
+    // Check_TableNeedsRebuild already handle that case via Match_PhysicalIndex/Match_PhysicalForeignKey).
+    function Match_MappedForeignKey(const AMappedTable: IioDBBuilderSchemaTable;
+      const APhysicalFK: IioDBBuilderSchemaFK): IioDBBuilderSchemaFK;
     function Match_MappedIndex(const AMappedTable: IioDBBuilderSchemaTable;
       const APhysicalIndex: IioDBBuilderSchemaIndex): IioDBBuilderSchemaIndex;
     function Match_PhysicalForeignKey(const AMappedFK: IioDBBuilderSchemaFK;
@@ -149,6 +151,18 @@ begin
     or (not SameText(AMappedFK.ReferenceFieldName, APhysicalFK.ReferenceFieldName))
     or (AMappedFK.OnDeleteAction <> APhysicalFK.OnDeleteAction)
     or (AMappedFK.OnUpdateAction <> APhysicalFK.OnUpdateAction);
+end;
+
+function TioDBBuilderPlanBuilderBase.Match_MappedForeignKey(const AMappedTable: IioDBBuilderSchemaTable;
+  const APhysicalFK: IioDBBuilderSchemaFK): IioDBBuilderSchemaFK;
+var
+  LMappedFK: IioDBBuilderSchemaFK;
+begin
+  Result := nil;
+  for LMappedFK in AMappedTable.ForeignKeys.Values do
+    if SameText(LMappedFK.DependentFieldName, APhysicalFK.DependentFieldName) and
+       SameText(LMappedFK.ReferenceTableName, APhysicalFK.ReferenceTableName) then
+      Exit(LMappedFK);
 end;
 
 function TioDBBuilderPlanBuilderBase.Match_MappedIndex(const AMappedTable: IioDBBuilderSchemaTable;

@@ -102,6 +102,7 @@ type
     // FOREIGN KEY
     function AddCreateForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;
     function AddDropForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;
+    function AddDropOrphanForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;
     // SEQUENCE
     function AddCreateSequence(const ASequenceName: String): IioDBBuilderPlanOperation;
     function AddDropSequence(const ASequenceName: String): IioDBBuilderPlanOperation;
@@ -155,6 +156,8 @@ begin
     opDropOrphanIndex:  Result := Format('Drop orphan index %s on %s', [QuotedStr(FSchemaIndex.Name), QuotedStr(FSchemaTable.Name)]);
     opCreateForeignKey: Result := Format('Create foreign key on %s referencing %s', [QuotedStr(FSchemaTable.Name), QuotedStr(FSchemaForeignKey.ReferenceTableName)]);
     opDropForeignKey:   Result := Format('Drop foreign key %s on %s', [QuotedStr(FSchemaForeignKey.Name), QuotedStr(FSchemaTable.Name)]);
+    // AForeignKey is always a Physical node here (see AddDropOrphanForeignKey), so .Name is always the real catalog name.
+    opDropOrphanForeignKey: Result := Format('Drop orphan foreign key %s on %s', [QuotedStr(FSchemaForeignKey.Name), QuotedStr(FSchemaTable.Name)]);
     opCreateSequence:   Result := Format('Create sequence %s', [QuotedStr(FSequenceName)]);
     opDropSequence:     Result := Format('Drop sequence %s', [QuotedStr(FSequenceName)]);
     opRenameTableToOld: Result := Format('Rename table %s to its temporary shadow (rebuild)', [QuotedStr(FSchemaTable.Name)]);
@@ -290,6 +293,12 @@ function TioDBBuilderPlan.AddDropForeignKey(const ATable: IioDBBuilderSchemaTabl
   const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;
 begin
   Result := AddOp(TioDBBuilderPlanOperation.Create(opDropForeignKey, ATable, nil, nil, AForeignKey));
+end;
+
+function TioDBBuilderPlan.AddDropOrphanForeignKey(const ATable: IioDBBuilderSchemaTable;
+  const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;
+begin
+  Result := AddOp(TioDBBuilderPlanOperation.Create(opDropOrphanForeignKey, ATable, nil, nil, AForeignKey));
 end;
 
 function TioDBBuilderPlan.AddCreateSequence(const ASequenceName: String): IioDBBuilderPlanOperation;

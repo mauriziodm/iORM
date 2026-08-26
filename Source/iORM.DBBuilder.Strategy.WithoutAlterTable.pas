@@ -89,6 +89,17 @@ type
     procedure ScriptWrite_DropField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField); override;
 
     // ==========================================================
+    // UNSUPPORTED ORPHAN FK DROP
+    // ----------------------------------------------------------
+    // Unlike ScriptWrite_DropField (version-gated: newer SQLite CAN drop a single column), there is no
+    // SQLite version that supports ALTER TABLE ... DROP CONSTRAINT for a foreign key - the constraint is
+    // baked into the CREATE TABLE and the only way to remove one is the very rebuild an orphan alone must
+    // not trigger (see the orphan FKs step in TioDBBuilderPlanBuilderWithoutAlterTable.Build). So this
+    // override never attempts a SQL statement (BuildSQL_DropFKbyName is not even implemented for SQLite) -
+    // a warning is the only faithful realization of "orphan FK, drop it manually" on this dialect.
+    procedure ScriptWrite_DropOrphanForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK); override;
+
+    // ==========================================================
     // MAIN GENERATION
     // ----------------------------------------------------------
     /// <summary>
@@ -97,9 +108,11 @@ type
     /// (drop indexes from DB -> rename to "_old" -> create tables -> create indexes -> copy data), so this
     /// is a straight translate-each-op loop wrapped by the constraint-deferral prologue/epilogue. The
     /// key-generation-compatibility diagnostic is emitted first (same as WithAlterTable). Foreign keys are
-    /// inline in CREATE TABLE for these dialects, so there are no FK ops. Note: ifmEnabled and
-    /// ifmEnabledStrict behave identically here (the rebuild recreates everything from scratch); only
-    /// ifmDisabled prevents index recreation on the new tables (the PlanBuilder omits the create-index ops).
+    /// inline in CREATE TABLE for these dialects, so there is no opCreateForeignKey (an orphan
+    /// opDropOrphanForeignKey can still appear, warning-only - see ScriptWrite_DropOrphanForeignKey). Note:
+    /// ifmEnabled and ifmEnabledStrict behave identically here (the rebuild recreates everything from
+    /// scratch); only ifmDisabled prevents index recreation on the new tables (the PlanBuilder omits the
+    /// create-index ops).
     /// </summary>
     procedure GenerateScript_Body; override;
   public
@@ -130,17 +143,18 @@ begin
   // Plan-driven: the PlanBuilder's rebuild shape already produced the ops in a rebuild-safe order
   // (drop indexes from DB -> rename to "_old" -> create tables -> create indexes -> copy data), so this is
   // a straight translate-each-op loop. The dialect lives in the ScriptWrite_/BuildSQL_ each op dispatches
-  // to. FKs are inline in CREATE TABLE for these dialects, so there are no FK ops here.
+  // to. FKs are inline in CREATE TABLE for these dialects, so there is no opCreateForeignKey here.
   for LOp in Context.Reconciliation.Plan.Operations do
     case LOp.Kind of
-      opDropIndex:        ScriptWrite_DropIndex(LOp.SchemaTable, LOp.SchemaIndex);
-      opDropOrphanIndex:  ScriptWrite_DropOrphanIndex(LOp.SchemaTable, LOp.SchemaIndex);
-      opRenameTableToOld: ScriptWrite_RenameTableToOld(LOp.SchemaTable);
-      opCreateTable:      ScriptWrite_CreateTable(LOp.SchemaTable);
-      opCreateIndex:      ScriptWrite_CreateIndex(LOp.SchemaTable, LOp.SchemaIndex);
-      opCopyData:         ScriptWrite_CopyDataFromOldToNewTable(LOp.SchemaTable);
-      opDropTable:        ScriptWrite_DropTable(LOp.SchemaTable);
-      opDropField:        ScriptWrite_DropField(LOp.SchemaTable, LOp.SchemaField_Physical);
+      opDropIndex:            ScriptWrite_DropIndex(LOp.SchemaTable, LOp.SchemaIndex);
+      opDropOrphanIndex:      ScriptWrite_DropOrphanIndex(LOp.SchemaTable, LOp.SchemaIndex);
+      opDropOrphanForeignKey: ScriptWrite_DropOrphanForeignKey(LOp.SchemaTable, LOp.SchemaForeignKey);
+      opRenameTableToOld:     ScriptWrite_RenameTableToOld(LOp.SchemaTable);
+      opCreateTable:          ScriptWrite_CreateTable(LOp.SchemaTable);
+      opCreateIndex:          ScriptWrite_CreateIndex(LOp.SchemaTable, LOp.SchemaIndex);
+      opCopyData:             ScriptWrite_CopyDataFromOldToNewTable(LOp.SchemaTable);
+      opDropTable:            ScriptWrite_DropTable(LOp.SchemaTable);
+      opDropField:            ScriptWrite_DropField(LOp.SchemaTable, LOp.SchemaField_Physical);
     end;
 
   // Dialect epilogue: restore normal constraint checking.
@@ -237,6 +251,13 @@ begin
       'statement was offered because this SQLite engine (%s) is older than 3.35.0. Removing it requires rebuilding the table manually.',
       [AField.FieldName, ATable.Name, Context.SqlGenerator.DBMSInfo.Version]));
   end;
+end;
+
+procedure TioDBBuilderStrategyWithoutAlterTable.ScriptWrite_DropOrphanForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK);
+begin
+  Context.Script.Warnings.AddLine(Format('Foreign key ''%s'' on table ''%s'' exists in the database but is not mapped by any entity: no DROP ' +
+    'statement was offered because SQLite does not support dropping a single foreign key constraint. Removing it requires rebuilding the table manually.',
+    [AForeignKey.Name, ATable.Name]));
 end;
 
 end.

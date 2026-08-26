@@ -45,13 +45,14 @@ type
   ///  PlanBuilder shape for DBMS that cannot ALTER a table in place (Supports_AlterTable = False: SQLite).
   ///  ANY structural difference means recreating the whole table via rename-create-copy, so this emits the
   ///  rebuild ops in a rebuild-safe order: drop indexes from DB -> rename to "_old" -> create tables ->
-  ///  create indexes -> copy data. Foreign keys are inline in CREATE TABLE for these dialects, so no FK ops
-  ///  are emitted. Because the rebuild recreates everything from scratch, ifmEnabled and ifmEnabledStrict
-  ///  are equivalent here; only ifmDisabled prevents index recreation. A table, a field, or an index on an
-  ///  otherwise untouched table, present in the DB but absent from the ORM maps is left alone by the
+  ///  create indexes -> copy data. Foreign keys are inline in CREATE TABLE for these dialects, so no
+  ///  opCreateForeignKey is ever emitted (an orphan opDropOrphanForeignKey still can be, see below).
+  ///  Because the rebuild recreates everything from scratch, ifmEnabled and ifmEnabledStrict are
+  ///  equivalent here; only ifmDisabled prevents index/FK recreation. A table, a field, an index, or an FK
+  ///  on an otherwise untouched table, present in the DB but absent from the ORM maps is left alone by the
   ///  rebuild ops (nothing to recreate, and an orphan alone must never force a rebuild - that would destroy
   ///  exactly the data being flagged) but still surfaced as an orphan, same as WithAlterTable's
-  ///  Plan_OrphanTables/Plan_OrphanFields/Plan_OrphanIndexes.
+  ///  Plan_OrphanTables/Plan_OrphanFields/Plan_OrphanIndexes/Plan_OrphanForeignKeys.
   ///  The fresh whole-DB create (schema stCreate + CREATE DATABASE, via MappedSchema.ForceCreateStatus) is
   ///  decided upstream (the DBBuilder, when the database does not exist) - not here; with a nil
   ///  PhysicalSchema everything is simply "new".
@@ -81,6 +82,7 @@ var
   LPlan: IioDBBuilderPlan;
   LMappedTable, LPhysicalTable: IioDBBuilderSchemaTable;
   LMappedIndex, LPhysicalIndex: IioDBBuilderSchemaIndex;
+  LPhysicalFK: IioDBBuilderSchemaFK;
   LField: IioDBBuilderSchemaField;
 begin
   LMappedSchema := Context.Reconciliation.MappedSchema;
@@ -206,6 +208,27 @@ begin
         begin
           LPhysicalIndex.Status := stDrop;
           LPlan.AddDropOrphanIndex(LMappedTable, LPhysicalIndex);
+        end;
+    end;
+
+  // 3d. Orphan foreign keys on tables that are NOT being rebuilt, same reasoning as 3c: a rebuilt table's
+  // FKs are recreated inline from the mapped schema by its own CREATE TABLE, orphans included, so this only
+  // needs to cover tables left alone. Unlike indexes, SQLite has no ALTER TABLE ... DROP CONSTRAINT at all
+  // (not a version gate, a hard dialect limitation - the only way to remove one FK is a full table rebuild),
+  // so Strategy.WithoutAlterTable overrides ScriptWrite_DropOrphanForeignKey to warn only, no SQL comment.
+  if Context.Reconciliation.ForeignKeysMode >= ifmEnabled then
+    for LMappedTable in LMappedSchema.Tables.Values do
+    begin
+      if LMappedTable.Status = stUpdate then
+        Continue;
+      LPhysicalTable := Find_TableByName(LPhysicalSchema, LMappedTable.Name);
+      if LPhysicalTable = nil then
+        Continue;
+      for LPhysicalFK in LPhysicalTable.ForeignKeys.Values do
+        if Match_MappedForeignKey(LMappedTable, LPhysicalFK) = nil then
+        begin
+          LPhysicalFK.Status := stDrop;
+          LPlan.AddDropOrphanForeignKey(LMappedTable, LPhysicalFK);
         end;
     end;
 

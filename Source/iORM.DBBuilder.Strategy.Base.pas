@@ -197,6 +197,7 @@ type
     procedure ScriptWrite_CreateForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK); virtual;
     procedure ScriptWrite_CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure ScriptWrite_DropForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK); virtual;
+    procedure ScriptWrite_DropOrphanForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK); virtual;
 
     // ==========================================================
     // WARNINGS RELATED METHODS (used by a descendant - see WithoutAlterTable)
@@ -313,6 +314,21 @@ end;
 procedure TioDBBuilderStrategyBase.ScriptWrite_DropForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK);
 begin
   Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_DropFK(ATable, AForeignKey));
+end;
+
+// Plan-op translator (opDropOrphanForeignKey): an orphan FK (in the DB, matching no mapped FK) is NEVER
+// dropped automatically - the DROP is emitted as a comment (not executed) plus a warning, so the developer
+// can run it manually if that is really the intent (mirrors ScriptWrite_DropOrphanIndex). AForeignKey is
+// always a Physical node here, so drop by its own catalog Name directly - via BuildSQL_DropFKbyName, NOT
+// BuildSQL_DropFK (which re-derives a name from iORM's naming convention, wrong for an FK iORM may not have
+// created, e.g. a manually-added one).
+procedure TioDBBuilderStrategyBase.ScriptWrite_DropOrphanForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK);
+begin
+  Context.Script.Body.AddEmpty;
+  Context.Script.Body.AddComment(Format('Orphan foreign key ''%s'' on table ''%s'' (exists in the DB, not mapped) - drop it manually if intended:', [AForeignKey.Name, ATable.Name]));
+  Context.Script.Body.AddComment(Context.SqlGenerator.BuildSQL_DropFKbyName(ATable.Name, AForeignKey.Name));
+  Context.Script.Warnings.AddLine(Format('Foreign key ''%s'' on table ''%s'' exists in the database but is not mapped by any entity: a DROP CONSTRAINT ' +
+    'statement was generated as a comment (NOT executed). Review and run it manually if you want to remove it.', [AForeignKey.Name, ATable.Name]));
 end;
 
 // Plan-op translator (opCreateField): add a single column to an existing table.

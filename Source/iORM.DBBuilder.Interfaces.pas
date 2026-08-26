@@ -50,14 +50,17 @@ type
   ///  The Plan operation vocabulary: the dialect-independent *intent* of a single schema change,
   ///  produced by the PlanBuilder from the Desired-vs-Actual diff and realized into SQL by each
   ///  Strategy/SqlGenerator. Names mirror the existing ScriptWrite_/BuildSQL_ translator families
-  ///  (e.g. opCreateTable -> ScriptWrite_CreateTable). opDropTable, opDropField and opDropOrphanIndex
-  ///  are the destructive ops: they target an orphan table/field/index (present in the DB but not in
-  ///  the ORM maps) and are always realized as a commented, non-executed statement plus a warning -
-  ///  iORM never silently drops a table, a field or an index it does not know about.
-  ///  opDropIndex (dropping a physical index by its actual catalog name, executed for real) is used
-  ///  instead where the drop is an intentional, requested action rather than an unmanaged orphan: strict
-  ///  index-mode's wholesale clear of a modified table, and the rebuild shape's unconditional index
-  ///  clear (see below) both target indexes the caller already means to remove.
+  ///  (e.g. opCreateTable -> ScriptWrite_CreateTable). opDropTable, opDropField, opDropOrphanIndex and
+  ///  opDropOrphanForeignKey are the destructive ops: they target an orphan table/field/index/foreign key
+  ///  (present in the DB but not in the ORM maps) and are always realized as a commented, non-executed
+  ///  statement plus a warning - iORM never silently drops a table, a field, an index or a foreign key it
+  ///  does not know about (WithoutAlterTable dialects that cannot express a single DROP CONSTRAINT at all,
+  ///  e.g. SQLite, fall back to a warning with no statement - see ScriptWrite_DropOrphanForeignKey).
+  ///  opDropIndex/opDropForeignKey (dropping a physical index/FK by its actual catalog name, executed for
+  ///  real) are used instead where the drop is an intentional, requested action rather than an unmanaged
+  ///  orphan: strict mode's wholesale clear of a modified table, a modified FK/index's drop-then-recreate,
+  ///  and the rebuild shape's unconditional index clear (see below) all target indexes/FKs the caller
+  ///  already means to remove.
   ///  The last two are the rename-create-copy rebuild ops, produced only by the PlanBuilder's rebuild
   ///  shape (Build_Rebuild) and consumed only by WithoutAlterTable dialects (e.g. SQLite), which cannot
   ///  ALTER a table in place: opRenameTableToOld renames a table to its "_old" shadow, opCopyData copies
@@ -68,8 +71,8 @@ type
   ///  unmapped column is simply not carried over.
   /// </summary>
   TioDBBuilderPlanOpKind = (opCreateTable, opDropTable, opCreateField, opAlterField, opDropField, opCreateIndex,
-    opDropIndex, opDropOrphanIndex, opCreateForeignKey, opDropForeignKey, opCreateSequence, opDropSequence,
-    opRenameTableToOld, opCopyData);
+    opDropIndex, opDropOrphanIndex, opCreateForeignKey, opDropForeignKey, opDropOrphanForeignKey, opCreateSequence,
+    opDropSequence, opRenameTableToOld, opCopyData);
 
   // irmDropAndRecreateForAllTables (safe, default), irmDropAndRecreateForModifiedTablesOnly (faster), irmIgnoreIndexes (disabled, fully manual)
   TioDBBuilderIndexRebuildMode = (irmDropAndRecreateForAllTables, irmDropAndRecreateForModifiedTablesOnly, irmIgnoreIndexes);
@@ -441,6 +444,9 @@ type
     // FOREIGN KEY
     function AddCreateForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;
     function AddDropForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;
+    // An orphan physical FK (present in the DB, matching no mapped FK) on a table ForeignKeysMode still
+    // manages: NEVER dropped for real, realized as a commented statement plus a warning (mirrors AddDropOrphanIndex).
+    function AddDropOrphanForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;
     // SEQUENCE
     function AddCreateSequence(const ASequenceName: String): IioDBBuilderPlanOperation;
     function AddDropSequence(const ASequenceName: String): IioDBBuilderPlanOperation;

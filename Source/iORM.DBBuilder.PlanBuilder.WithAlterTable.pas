@@ -62,6 +62,7 @@ type
     procedure Plan_ForeignKeys(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
     procedure Plan_Indexes(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
     procedure Plan_OrphanFields(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
+    procedure Plan_OrphanForeignKeys(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
     procedure Plan_OrphanIndexes(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
     procedure Plan_OrphanTables(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
     procedure Plan_StrictDropForeignKeys(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
@@ -120,7 +121,10 @@ begin
     Plan_OrphanIndexes(LPlan, LMappedSchema, LPhysicalSchema, LStrictIndexes);
   end;
   if Context.Reconciliation.ForeignKeysMode >= ifmEnabled then
+  begin
     Plan_ForeignKeys(LPlan, LMappedSchema, LPhysicalSchema, LStrictForeignKeys);
+    Plan_OrphanForeignKeys(LPlan, LMappedSchema, LPhysicalSchema, LStrictForeignKeys);
+  end;
   Plan_OrphanFields(LPlan, LMappedSchema, LPhysicalSchema);
   Plan_OrphanTables(LPlan, LMappedSchema, LPhysicalSchema);
 
@@ -368,6 +372,34 @@ begin
         APlan.AddCreateForeignKey(LMappedTable, LFK);
       end;
     end;
+  end;
+end;
+
+procedure TioDBBuilderPlanBuilderWithAlterTable.Plan_OrphanForeignKeys(const APlan: IioDBBuilderPlan;
+  const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
+var
+  LMappedTable, LPhysicalTable: IioDBBuilderSchemaTable;
+  LPhysicalFK: IioDBBuilderSchemaFK;
+begin
+  if APhysicalSchema = nil then
+    Exit;
+  // A physical FK matching no mapped FK (Match_MappedForeignKey): mark it for drop. Strict mode already
+  // wiped every physical FK of a modified table for real (Plan_StrictDropForeignKeys) - skip those tables
+  // here to avoid reporting the same FK twice. Conservative mode never drops orphans for real, so this
+  // pass covers ALL its tables, modified or not (mirrors Plan_OrphanIndexes).
+  for LMappedTable in AMappedSchema.Tables.Values do
+  begin
+    if AStrict and (LMappedTable.Status = stUpdate) then
+      Continue;
+    LPhysicalTable := Find_TableByName(APhysicalSchema, LMappedTable.Name);
+    if LPhysicalTable = nil then
+      Continue;
+    for LPhysicalFK in LPhysicalTable.ForeignKeys.Values do
+      if Match_MappedForeignKey(LMappedTable, LPhysicalFK) = nil then
+      begin
+        LPhysicalFK.Status := stDrop;
+        APlan.AddDropOrphanForeignKey(LMappedTable, LPhysicalFK);
+      end;
   end;
 end;
 

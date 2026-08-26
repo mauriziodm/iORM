@@ -122,17 +122,18 @@ begin
   // dispatches to. WithoutAlterTable dialects override this with the rebuild flow instead.
   for LOp in Context.Reconciliation.Plan.Operations do
     case LOp.Kind of
-      opCreateSequence:   ScriptWrite_CreateSequence(LOp.SequenceName);
-      opCreateTable:      ScriptWrite_CreateTable(LOp.SchemaTable);
-      opCreateField:      ScriptWrite_CreateField(LOp.SchemaTable, LOp.SchemaField_Mapped);
-      opAlterField:       ScriptWrite_AlterField(LOp.SchemaTable, LOp.SchemaField_Mapped, LOp.SchemaField_Physical, LOp.SchemaField_Changes);
-      opDropField:        ScriptWrite_DropField(LOp.SchemaTable, LOp.SchemaField_Physical);
-      opCreateIndex:      ScriptWrite_CreateIndex(LOp.SchemaTable, LOp.SchemaIndex);
-      opDropIndex:        ScriptWrite_DropIndex(LOp.SchemaTable, LOp.SchemaIndex);
-      opDropOrphanIndex:  ScriptWrite_DropOrphanIndex(LOp.SchemaTable, LOp.SchemaIndex);
-      opCreateForeignKey: ScriptWrite_CreateForeignKey(LOp.SchemaTable, LOp.SchemaForeignKey);
-      opDropForeignKey:   ScriptWrite_DropForeignKey(LOp.SchemaTable, LOp.SchemaForeignKey);
-      opDropTable:        ScriptWrite_DropTable(LOp.SchemaTable);
+      opCreateSequence:       ScriptWrite_CreateSequence(LOp.SequenceName);
+      opCreateTable:          ScriptWrite_CreateTable(LOp.SchemaTable);
+      opCreateField:          ScriptWrite_CreateField(LOp.SchemaTable, LOp.SchemaField_Mapped);
+      opAlterField:           ScriptWrite_AlterField(LOp.SchemaTable, LOp.SchemaField_Mapped, LOp.SchemaField_Physical, LOp.SchemaField_Changes);
+      opDropField:            ScriptWrite_DropField(LOp.SchemaTable, LOp.SchemaField_Physical);
+      opCreateIndex:          ScriptWrite_CreateIndex(LOp.SchemaTable, LOp.SchemaIndex);
+      opDropIndex:            ScriptWrite_DropIndex(LOp.SchemaTable, LOp.SchemaIndex);
+      opDropOrphanIndex:      ScriptWrite_DropOrphanIndex(LOp.SchemaTable, LOp.SchemaIndex);
+      opCreateForeignKey:     ScriptWrite_CreateForeignKey(LOp.SchemaTable, LOp.SchemaForeignKey);
+      opDropForeignKey:       ScriptWrite_DropForeignKey(LOp.SchemaTable, LOp.SchemaForeignKey);
+      opDropOrphanForeignKey: ScriptWrite_DropOrphanForeignKey(LOp.SchemaTable, LOp.SchemaForeignKey);
+      opDropTable:            ScriptWrite_DropTable(LOp.SchemaTable);
     end;
 end;
 
