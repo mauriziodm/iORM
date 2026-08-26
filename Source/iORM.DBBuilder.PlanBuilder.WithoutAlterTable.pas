@@ -110,9 +110,12 @@ begin
       // silently unless we warn about it now, at plan time.
       for LField in LPhysicalTable.Fields do
         if LMappedTable.FindField(LField.FieldName) = nil then
+        begin
           Context.Script.Warnings.AddLine(Format('Field ''%s'' on table ''%s'' exists in the database but is not mapped by any entity: ' +
             'it will be PERMANENTLY LOST when the table is rebuilt (this dialect cannot ALTER a table in place).',
             [LField.FieldName, LMappedTable.Name]));
+          Warn_DanglingForeignKeys(LMappedSchema, LMappedTable.Name, LField.FieldName);
+        end;
     end;
   end;
 

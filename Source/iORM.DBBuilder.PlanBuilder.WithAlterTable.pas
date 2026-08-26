@@ -66,11 +66,6 @@ type
     procedure Plan_StrictDropForeignKeys(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
     procedure Plan_StrictDropIndexes(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
     procedure Plan_TablesAndFields(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
-    // Warns (never drops, never blocks) when a foreign key on a still-mapped table references
-    // AReferenceTableName (and, if given, AReferenceFieldName) - a table/field about to be orphaned.
-    // Called from Plan_OrphanTables/Plan_OrphanFields once they find the orphan; scans only
-    // AMappedSchema, since an already-orphaned table has no need for a second warning about itself.
-    procedure Warn_DanglingForeignKeys(const AMappedSchema: IioDBBuilderSchema; const AReferenceTableName, AReferenceFieldName: String);
   protected
     function Build: IioDBBuilderPlan; override;
   public
@@ -387,25 +382,6 @@ begin
       Warn_DanglingForeignKeys(AMappedSchema, LPhysicalTable.Name, '');
       APlan.AddDropTable(LPhysicalTable);
     end;
-end;
-
-// AReferenceFieldName empty means "any field of AReferenceTableName" (whole-table orphan); non-empty
-// narrows to that specific field (field orphan). Never emits a Plan op or touches Status - iORM already
-// never auto-executes the DROP TABLE/DROP FIELD this warns about (see ScriptWrite_DropTable/DropField),
-// so this is purely preventive: it tells the developer, before they uncomment and run that DROP by hand,
-// which FK elsewhere would break.
-procedure TioDBBuilderPlanBuilderWithAlterTable.Warn_DanglingForeignKeys(const AMappedSchema: IioDBBuilderSchema;
-  const AReferenceTableName, AReferenceFieldName: String);
-var
-  LTable: IioDBBuilderSchemaTable;
-  LFK: IioDBBuilderSchemaFK;
-begin
-  for LTable in AMappedSchema.Tables.Values do
-    for LFK in LTable.ForeignKeys.Values do
-      if SameText(LFK.ReferenceTableName, AReferenceTableName)
-        and (AReferenceFieldName.IsEmpty or SameText(LFK.ReferenceFieldName, AReferenceFieldName)) then
-        Context.Script.Warnings.AddLine(Format('Foreign key ''%s'' on table ''%s'' references ''%s'', which will be orphaned: ' +
-          'this FK will become invalid if the drop is applied. Review the mapping.', [LFK.Name, LTable.Name, AReferenceTableName]));
 end;
 
 end.

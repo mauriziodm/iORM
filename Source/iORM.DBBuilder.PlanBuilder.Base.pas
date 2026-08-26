@@ -98,6 +98,15 @@ type
     function Match_PhysicalIndex(const AMappedTable: IioDBBuilderSchemaTable; const AMappedIndex: IioDBBuilderSchemaIndex;
       const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaIndex;
     function Find_TableByName(const ASchema: IioDBBuilderSchema; const AName: String): IioDBBuilderSchemaTable;
+    // Warns (never drops, never blocks, never touches Status or the Plan) when a foreign key on a
+    // still-mapped table references AReferenceTableName (and, if given, AReferenceFieldName) - a
+    // table/field about to be orphaned. AReferenceFieldName empty means "any field of
+    // AReferenceTableName" (whole-table orphan); non-empty narrows to that field (field orphan).
+    // Shared by both build shapes: each already surfaces its own warning about why the table/field is
+    // going away (a commented-out DROP for WithAlterTable, silent data loss on rebuild for
+    // WithoutAlterTable) - this adds the cross-table consequence a same-table warning cannot see. Scans
+    // only AMappedSchema, since an already-orphaned table has no need for a second warning about itself.
+    procedure Warn_DanglingForeignKeys(const AMappedSchema: IioDBBuilderSchema; const AReferenceTableName, AReferenceFieldName: String);
   public
   end;
 
@@ -174,6 +183,20 @@ begin
   for LTable in ASchema.Tables.Values do
     if SameText(LTable.Name, AName) then
       Exit(LTable);
+end;
+
+procedure TioDBBuilderPlanBuilderBase.Warn_DanglingForeignKeys(const AMappedSchema: IioDBBuilderSchema;
+  const AReferenceTableName, AReferenceFieldName: String);
+var
+  LTable: IioDBBuilderSchemaTable;
+  LFK: IioDBBuilderSchemaFK;
+begin
+  for LTable in AMappedSchema.Tables.Values do
+    for LFK in LTable.ForeignKeys.Values do
+      if SameText(LFK.ReferenceTableName, AReferenceTableName)
+        and (AReferenceFieldName.IsEmpty or SameText(LFK.ReferenceFieldName, AReferenceFieldName)) then
+        Context.Script.Warnings.AddLine(Format('Foreign key ''%s'' on table ''%s'' references ''%s'', which will be orphaned: ' +
+          'this FK will become invalid if the drop is applied. Review the mapping.', [LFK.Name, LTable.Name, AReferenceTableName]));
 end;
 
 end.
