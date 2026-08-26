@@ -60,8 +60,10 @@ type
 
   /// <summary>
   ///  Abstract base of the PlanBuilder family: it holds the diff PRIMITIVES shared by both build shapes
-  ///  (the cross-branch Find_* lookups and the Check_ForeignKeyModified structural comparison) plus the
-  ///  Context plumbing, and declares the single IioDBBuilderPlanBuilder entry point Build as abstract.
+  ///  (the cross-branch Find_* lookups and the Check_ForeignKeyModified structural comparison), the
+  ///  Plan_Orphan* phases shared verbatim by both (reporting objects present in the DB but absent from the
+  ///  ORM maps), plus the Context plumbing, and declares the single IioDBBuilderPlanBuilder entry point
+  ///  Build as abstract.
   ///  It never instantiates: the Factory picks a concrete shape by the DBMS capability
   ///  SqlGenerator.Supports_AlterTable, mirroring the WithAlterTable/WithoutAlterTable Strategy split -
   ///    * TioDBBuilderPlanBuilderWithAlterTable (True: Firebird, MS SQL Server) emits fine-grained ops;
@@ -115,6 +117,16 @@ type
     // WithoutAlterTable) - this adds the cross-table consequence a same-table warning cannot see. Scans
     // only AMappedSchema, since an already-orphaned table has no need for a second warning about itself.
     procedure Warn_DanglingForeignKeys(const AMappedSchema: IioDBBuilderSchema; const AReferenceTableName, AReferenceFieldName: String);
+    // Orphan-emission phases shared by both build shapes: WithAlterTable's incremental diff and
+    // WithoutAlterTable's rebuild both need to report objects present in the DB but absent from the ORM
+    // maps, and do so identically (mark the physical node stDrop, cascade/warn, append the Plan op) - only
+    // the caller-side skip conditions differ, and those are expressed via AStrict. WithoutAlterTable always
+    // passes AStrict = True for the index/FK phases: its rebuild always clears a table's physical
+    // indexes/FKs wholesale, exactly like WithAlterTable's strict mode (see the call sites' comments).
+    procedure Plan_OrphanFields(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
+    procedure Plan_OrphanForeignKeys(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
+    procedure Plan_OrphanIndexes(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
+    procedure Plan_OrphanTables(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
   public
   end;
 
@@ -228,6 +240,109 @@ begin
         and (AReferenceFieldName.IsEmpty or SameText(LFK.ReferenceFieldName, AReferenceFieldName)) then
         Context.Script.Warnings.AddLine(Format('Foreign key ''%s'' on table ''%s'' references ''%s'', which will be orphaned: ' +
           'this FK will become invalid if the drop is applied. Review the mapping.', [LFK.Name, LTable.Name, AReferenceTableName]));
+end;
+
+procedure TioDBBuilderPlanBuilderBase.Plan_OrphanFields(const APlan: IioDBBuilderPlan;
+  const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
+var
+  LMappedTable, LPhysicalTable: IioDBBuilderSchemaTable;
+  LPhysicalField: IioDBBuilderSchemaField;
+begin
+  if APhysicalSchema = nil then
+    Exit;
+  // A field present in the DB but absent from the ORM map of an otherwise-mapped table: mark it for
+  // drop. The translation (Strategy) renders it as a commented-out, non-executed statement plus a
+  // warning - iORM never silently drops a field (mirrors Plan_OrphanTables).
+  for LMappedTable in AMappedSchema.Tables.Values do
+  begin
+    LPhysicalTable := Find_TableByName(APhysicalSchema, LMappedTable.Name);
+    if LPhysicalTable = nil then
+      Continue;
+    for LPhysicalField in LPhysicalTable.Fields do
+      if LMappedTable.FindField(LPhysicalField.FieldName) = nil then
+      begin
+        LPhysicalField.Status := stDrop;
+        LPhysicalTable.CascadeFieldDropStatus(LPhysicalField.FieldName);
+        Warn_DanglingForeignKeys(AMappedSchema, LMappedTable.Name, LPhysicalField.FieldName);
+        APlan.AddDropField(LMappedTable, LPhysicalField);
+      end;
+  end;
+end;
+
+procedure TioDBBuilderPlanBuilderBase.Plan_OrphanForeignKeys(const APlan: IioDBBuilderPlan;
+  const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
+var
+  LMappedTable, LPhysicalTable: IioDBBuilderSchemaTable;
+  LPhysicalFK: IioDBBuilderSchemaFK;
+begin
+  if APhysicalSchema = nil then
+    Exit;
+  // A physical FK matching no mapped FK (Match_MappedForeignKey): mark it for drop. Strict mode (or a
+  // WithoutAlterTable rebuild, which always passes AStrict = True) already wiped every physical FK of a
+  // modified/rebuilt table for real - skip those tables here to avoid reporting the same FK twice.
+  // Conservative mode never drops orphans for real, so this pass covers ALL its tables, modified or not
+  // (mirrors Plan_OrphanIndexes).
+  for LMappedTable in AMappedSchema.Tables.Values do
+  begin
+    if AStrict and (LMappedTable.Status = stUpdate) then
+      Continue;
+    LPhysicalTable := Find_TableByName(APhysicalSchema, LMappedTable.Name);
+    if LPhysicalTable = nil then
+      Continue;
+    for LPhysicalFK in LPhysicalTable.ForeignKeys.Values do
+      if Match_MappedForeignKey(LMappedTable, LPhysicalFK) = nil then
+      begin
+        LPhysicalFK.Status := stDrop;
+        APlan.AddDropOrphanForeignKey(LMappedTable, LPhysicalFK);
+      end;
+  end;
+end;
+
+procedure TioDBBuilderPlanBuilderBase.Plan_OrphanIndexes(const APlan: IioDBBuilderPlan;
+  const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
+var
+  LMappedTable, LPhysicalTable: IioDBBuilderSchemaTable;
+  LPhysicalIndex: IioDBBuilderSchemaIndex;
+begin
+  if APhysicalSchema = nil then
+    Exit;
+  // A physical index matching no mapped index (Match_MappedIndex): mark it for drop. Strict mode (or a
+  // WithoutAlterTable rebuild, which always passes AStrict = True) already wiped every physical index of a
+  // modified/rebuilt table for real - skip those tables here to avoid reporting the same index twice.
+  // Conservative mode never drops orphans for real, so this pass covers ALL its tables, modified or not
+  // (mirrors Plan_OrphanForeignKeys).
+  for LMappedTable in AMappedSchema.Tables.Values do
+  begin
+    if AStrict and (LMappedTable.Status = stUpdate) then
+      Continue;
+    LPhysicalTable := Find_TableByName(APhysicalSchema, LMappedTable.Name);
+    if LPhysicalTable = nil then
+      Continue;
+    for LPhysicalIndex in LPhysicalTable.Indexes.Values do
+      if Match_MappedIndex(LMappedTable, LPhysicalIndex) = nil then
+      begin
+        LPhysicalIndex.Status := stDrop;
+        APlan.AddDropOrphanIndex(LMappedTable, LPhysicalIndex);
+      end;
+  end;
+end;
+
+procedure TioDBBuilderPlanBuilderBase.Plan_OrphanTables(const APlan: IioDBBuilderPlan;
+  const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
+var
+  LPhysicalTable: IioDBBuilderSchemaTable;
+begin
+  if APhysicalSchema = nil then
+    Exit;
+  // A table present in the DB but absent from the ORM maps: mark it for drop. The translation (Strategy)
+  // renders it as a commented-out, non-executed statement plus a warning - iORM never silently drops a table.
+  for LPhysicalTable in APhysicalSchema.Tables.Values do
+    if Find_TableByName(AMappedSchema, LPhysicalTable.Name) = nil then
+    begin
+      LPhysicalTable.CascadeTableDropStatus;
+      Warn_DanglingForeignKeys(AMappedSchema, LPhysicalTable.Name, '');
+      APlan.AddDropTable(LPhysicalTable);
+    end;
 end;
 
 end.

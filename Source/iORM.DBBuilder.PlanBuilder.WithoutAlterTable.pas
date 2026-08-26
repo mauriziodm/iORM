@@ -82,7 +82,6 @@ var
   LPlan: IioDBBuilderPlan;
   LMappedTable, LPhysicalTable: IioDBBuilderSchemaTable;
   LMappedIndex, LPhysicalIndex: IioDBBuilderSchemaIndex;
-  LPhysicalFK: IioDBBuilderSchemaFK;
   LField: IioDBBuilderSchemaField;
 begin
   LMappedSchema := Context.Reconciliation.MappedSchema;
@@ -164,73 +163,32 @@ begin
   // 3a. Orphan fields on tables that are still mapped. Cascade stDrop to keep the informational Status
   //     tree consistent, warn about any live FK that would dangle, and add an opDropField the Strategy
   //     renders as a comment - version-gated on SQLite (Strategy.WithoutAlterTable.ScriptWrite_DropField)
-  //     because dropping a single column needs the very rebuild this must not trigger.
-  for LMappedTable in LMappedSchema.Tables.Values do
-  begin
-    LPhysicalTable := Find_TableByName(LPhysicalSchema, LMappedTable.Name);
-    if LPhysicalTable = nil then
-      Continue;
-    for LField in LPhysicalTable.Fields do
-      if LMappedTable.FindField(LField.FieldName) = nil then
-      begin
-        LField.Status := stDrop;
-        LPhysicalTable.CascadeFieldDropStatus(LField.FieldName);
-        Warn_DanglingForeignKeys(LMappedSchema, LMappedTable.Name, LField.FieldName);
-        LPlan.AddDropField(LMappedTable, LField);
-      end;
-  end;
+  //     because dropping a single column needs the very rebuild this must not trigger. Shared with
+  //     WithAlterTable (PlanBuilder.Base.Plan_OrphanFields): identical logic on both shapes.
+  Plan_OrphanFields(LPlan, LMappedSchema, LPhysicalSchema);
 
-  // 3b. Orphan tables. Same treatment: cascade, warn, add the (commented) drop.
-  if LPhysicalSchema <> nil then
-    for LPhysicalTable in LPhysicalSchema.Tables.Values do
-      if Find_TableByName(LMappedSchema, LPhysicalTable.Name) = nil then
-      begin
-        LPhysicalTable.CascadeTableDropStatus;
-        Warn_DanglingForeignKeys(LMappedSchema, LPhysicalTable.Name, '');
-        LPlan.AddDropTable(LPhysicalTable);
-      end;
+  // 3b. Orphan tables. Same treatment: cascade, warn, add the (commented) drop. Shared with WithAlterTable
+  //     (PlanBuilder.Base.Plan_OrphanTables).
+  Plan_OrphanTables(LPlan, LMappedSchema, LPhysicalSchema);
 
   // 3c. Orphan indexes on tables that are NOT being rebuilt (Status still stClean at this point): a
   // rebuilt table (stUpdate) already had every physical index dropped for real in 2a, orphans included, so
   // reporting them again here would duplicate that. Unlike orphan fields, no version gate is needed: DROP
   // INDEX is always available (unlike DROP COLUMN, SQLite 3.35+ only), so the comment is unconditional.
-  // ifmEnabled/ifmEnabledStrict are equivalent here (see Check_TableNeedsRebuild), so a single check suffices.
+  // ifmEnabled/ifmEnabledStrict are equivalent here (see Check_TableNeedsRebuild), so a single check
+  // suffices, and AStrict = True (shared PlanBuilder.Base.Plan_OrphanIndexes) mirrors that equivalence:
+  // it skips exactly the tables already cleared for real in 2a.
   if Context.Reconciliation.IndexesMode >= ifmEnabled then
-    for LMappedTable in LMappedSchema.Tables.Values do
-    begin
-      if LMappedTable.Status = stUpdate then
-        Continue;
-      LPhysicalTable := Find_TableByName(LPhysicalSchema, LMappedTable.Name);
-      if LPhysicalTable = nil then
-        Continue;
-      for LPhysicalIndex in LPhysicalTable.Indexes.Values do
-        if Match_MappedIndex(LMappedTable, LPhysicalIndex) = nil then
-        begin
-          LPhysicalIndex.Status := stDrop;
-          LPlan.AddDropOrphanIndex(LMappedTable, LPhysicalIndex);
-        end;
-    end;
+    Plan_OrphanIndexes(LPlan, LMappedSchema, LPhysicalSchema, True);
 
   // 3d. Orphan foreign keys on tables that are NOT being rebuilt, same reasoning as 3c: a rebuilt table's
   // FKs are recreated inline from the mapped schema by its own CREATE TABLE, orphans included, so this only
-  // needs to cover tables left alone. Unlike indexes, SQLite has no ALTER TABLE ... DROP CONSTRAINT at all
-  // (not a version gate, a hard dialect limitation - the only way to remove one FK is a full table rebuild),
-  // so Strategy.WithoutAlterTable overrides ScriptWrite_DropOrphanForeignKey to warn only, no SQL comment.
+  // needs to cover tables left alone (AStrict = True, shared PlanBuilder.Base.Plan_OrphanForeignKeys).
+  // Unlike indexes, SQLite has no ALTER TABLE ... DROP CONSTRAINT at all (not a version gate, a hard
+  // dialect limitation - the only way to remove one FK is a full table rebuild), so Strategy.WithoutAlterTable
+  // overrides ScriptWrite_DropOrphanForeignKey to warn only, no SQL comment.
   if Context.Reconciliation.ForeignKeysMode >= ifmEnabled then
-    for LMappedTable in LMappedSchema.Tables.Values do
-    begin
-      if LMappedTable.Status = stUpdate then
-        Continue;
-      LPhysicalTable := Find_TableByName(LPhysicalSchema, LMappedTable.Name);
-      if LPhysicalTable = nil then
-        Continue;
-      for LPhysicalFK in LPhysicalTable.ForeignKeys.Values do
-        if Match_MappedForeignKey(LMappedTable, LPhysicalFK) = nil then
-        begin
-          LPhysicalFK.Status := stDrop;
-          LPlan.AddDropOrphanForeignKey(LMappedTable, LPhysicalFK);
-        end;
-    end;
+    Plan_OrphanForeignKeys(LPlan, LMappedSchema, LPhysicalSchema, True);
 
   // Coarse (schema-level) view: the schema needs work if any table does (monotonic: never downgrades a
   // schema already forced to stCreate by the fresh-DB path).

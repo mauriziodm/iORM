@@ -61,10 +61,6 @@ type
     // Diff phases (each iterates every mapped table so the resulting order is create-safe).
     procedure Plan_ForeignKeys(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
     procedure Plan_Indexes(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
-    procedure Plan_OrphanFields(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
-    procedure Plan_OrphanForeignKeys(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
-    procedure Plan_OrphanIndexes(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
-    procedure Plan_OrphanTables(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
     procedure Plan_StrictDropForeignKeys(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
     procedure Plan_StrictDropIndexes(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
     procedure Plan_TablesAndFields(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
@@ -306,34 +302,6 @@ begin
   end;
 end;
 
-procedure TioDBBuilderPlanBuilderWithAlterTable.Plan_OrphanIndexes(const APlan: IioDBBuilderPlan;
-  const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
-var
-  LMappedTable, LPhysicalTable: IioDBBuilderSchemaTable;
-  LPhysicalIndex: IioDBBuilderSchemaIndex;
-begin
-  if APhysicalSchema = nil then
-    Exit;
-  // A physical index matching no mapped index (Match_MappedIndex): mark it for drop. Strict mode already
-  // wiped every physical index of a modified table for real (Plan_StrictDropIndexes) - skip those tables
-  // here to avoid reporting the same index twice. Conservative mode never drops orphans for real, so this
-  // pass covers ALL its tables, modified or not (mirrors Plan_OrphanFields/Plan_OrphanTables).
-  for LMappedTable in AMappedSchema.Tables.Values do
-  begin
-    if AStrict and (LMappedTable.Status = stUpdate) then
-      Continue;
-    LPhysicalTable := Find_TableByName(APhysicalSchema, LMappedTable.Name);
-    if LPhysicalTable = nil then
-      Continue;
-    for LPhysicalIndex in LPhysicalTable.Indexes.Values do
-      if Match_MappedIndex(LMappedTable, LPhysicalIndex) = nil then
-      begin
-        LPhysicalIndex.Status := stDrop;
-        APlan.AddDropOrphanIndex(LMappedTable, LPhysicalIndex);
-      end;
-  end;
-end;
-
 procedure TioDBBuilderPlanBuilderWithAlterTable.Plan_ForeignKeys(const APlan: IioDBBuilderPlan;
   const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
 var
@@ -373,79 +341,6 @@ begin
       end;
     end;
   end;
-end;
-
-procedure TioDBBuilderPlanBuilderWithAlterTable.Plan_OrphanForeignKeys(const APlan: IioDBBuilderPlan;
-  const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
-var
-  LMappedTable, LPhysicalTable: IioDBBuilderSchemaTable;
-  LPhysicalFK: IioDBBuilderSchemaFK;
-begin
-  if APhysicalSchema = nil then
-    Exit;
-  // A physical FK matching no mapped FK (Match_MappedForeignKey): mark it for drop. Strict mode already
-  // wiped every physical FK of a modified table for real (Plan_StrictDropForeignKeys) - skip those tables
-  // here to avoid reporting the same FK twice. Conservative mode never drops orphans for real, so this
-  // pass covers ALL its tables, modified or not (mirrors Plan_OrphanIndexes).
-  for LMappedTable in AMappedSchema.Tables.Values do
-  begin
-    if AStrict and (LMappedTable.Status = stUpdate) then
-      Continue;
-    LPhysicalTable := Find_TableByName(APhysicalSchema, LMappedTable.Name);
-    if LPhysicalTable = nil then
-      Continue;
-    for LPhysicalFK in LPhysicalTable.ForeignKeys.Values do
-      if Match_MappedForeignKey(LMappedTable, LPhysicalFK) = nil then
-      begin
-        LPhysicalFK.Status := stDrop;
-        APlan.AddDropOrphanForeignKey(LMappedTable, LPhysicalFK);
-      end;
-  end;
-end;
-
-procedure TioDBBuilderPlanBuilderWithAlterTable.Plan_OrphanFields(const APlan: IioDBBuilderPlan;
-  const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
-var
-  LMappedTable, LPhysicalTable: IioDBBuilderSchemaTable;
-  LPhysicalField: IioDBBuilderSchemaField;
-begin
-  if APhysicalSchema = nil then
-    Exit;
-  // A field present in the DB but absent from the ORM map of an otherwise-mapped table: mark it for
-  // drop. The translation (Strategy) renders it as a commented-out, non-executed statement plus a
-  // warning - iORM never silently drops a field (mirrors Plan_OrphanTables).
-  for LMappedTable in AMappedSchema.Tables.Values do
-  begin
-    LPhysicalTable := Find_TableByName(APhysicalSchema, LMappedTable.Name);
-    if LPhysicalTable = nil then
-      Continue;
-    for LPhysicalField in LPhysicalTable.Fields do
-      if LMappedTable.FindField(LPhysicalField.FieldName) = nil then
-      begin
-        LPhysicalField.Status := stDrop;
-        LPhysicalTable.CascadeFieldDropStatus(LPhysicalField.FieldName);
-        Warn_DanglingForeignKeys(AMappedSchema, LMappedTable.Name, LPhysicalField.FieldName);
-        APlan.AddDropField(LMappedTable, LPhysicalField);
-      end;
-  end;
-end;
-
-procedure TioDBBuilderPlanBuilderWithAlterTable.Plan_OrphanTables(const APlan: IioDBBuilderPlan;
-  const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
-var
-  LPhysicalTable: IioDBBuilderSchemaTable;
-begin
-  if APhysicalSchema = nil then
-    Exit;
-  // A table present in the DB but absent from the ORM maps: mark it for drop. The translation (C4) renders
-  // it as a commented-out, non-executed statement plus a warning - iORM never silently drops a table.
-  for LPhysicalTable in APhysicalSchema.Tables.Values do
-    if Find_TableByName(AMappedSchema, LPhysicalTable.Name) = nil then
-    begin
-      LPhysicalTable.CascadeTableDropStatus;
-      Warn_DanglingForeignKeys(AMappedSchema, LPhysicalTable.Name, '');
-      APlan.AddDropTable(LPhysicalTable);
-    end;
 end;
 
 end.
