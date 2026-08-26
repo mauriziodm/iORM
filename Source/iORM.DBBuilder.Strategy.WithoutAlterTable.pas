@@ -134,6 +134,7 @@ begin
   for LOp in Context.Reconciliation.Plan.Operations do
     case LOp.Kind of
       opDropIndex:        ScriptWrite_DropIndex(LOp.SchemaTable, LOp.SchemaIndex);
+      opDropOrphanIndex:  ScriptWrite_DropOrphanIndex(LOp.SchemaTable, LOp.SchemaIndex);
       opRenameTableToOld: ScriptWrite_RenameTableToOld(LOp.SchemaTable);
       opCreateTable:      ScriptWrite_CreateTable(LOp.SchemaTable);
       opCreateIndex:      ScriptWrite_CreateIndex(LOp.SchemaTable, LOp.SchemaIndex);

@@ -92,7 +92,13 @@ type
     // rule), then looks that up. Matching is case-insensitive (SameText): both branches
     // normalize identifiers via the same SqlDataConverter, so the keys already align - the case-insensitivity
     // is just belt-and-suspenders (and mirrors SQLite's native case-insensitive identifier matching). Each
-    // returns the physical node, or nil = absent.
+    // returns the physical node, or nil = absent. Match_MappedIndex is the reverse direction (given a
+    // PHYSICAL index, is there a mapped one that would translate to its catalog name?) - used by both build
+    // shapes to tell an orphan physical index (no mapped counterpart at all) apart from one that is simply
+    // out of date (the incremental Plan_Indexes/Check_TableModified/Check_TableNeedsRebuild already handle
+    // that case via Match_PhysicalIndex).
+    function Match_MappedIndex(const AMappedTable: IioDBBuilderSchemaTable;
+      const APhysicalIndex: IioDBBuilderSchemaIndex): IioDBBuilderSchemaIndex;
     function Match_PhysicalForeignKey(const AMappedFK: IioDBBuilderSchemaFK;
       const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaFK;
     function Match_PhysicalIndex(const AMappedTable: IioDBBuilderSchemaTable; const AMappedIndex: IioDBBuilderSchemaIndex;
@@ -143,6 +149,17 @@ begin
     or (not SameText(AMappedFK.ReferenceFieldName, APhysicalFK.ReferenceFieldName))
     or (AMappedFK.OnDeleteAction <> APhysicalFK.OnDeleteAction)
     or (AMappedFK.OnUpdateAction <> APhysicalFK.OnUpdateAction);
+end;
+
+function TioDBBuilderPlanBuilderBase.Match_MappedIndex(const AMappedTable: IioDBBuilderSchemaTable;
+  const APhysicalIndex: IioDBBuilderSchemaIndex): IioDBBuilderSchemaIndex;
+var
+  LMappedIndex: IioDBBuilderSchemaIndex;
+begin
+  Result := nil;
+  for LMappedIndex in AMappedTable.Indexes.Values do
+    if SameText(Context.SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(AMappedTable, LMappedIndex), APhysicalIndex.Name) then
+      Exit(LMappedIndex);
 end;
 
 function TioDBBuilderPlanBuilderBase.Match_PhysicalForeignKey(const AMappedFK: IioDBBuilderSchemaFK;

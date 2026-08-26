@@ -58,10 +58,6 @@ type
     // by strict mode to decide which tables to clear, BEFORE the create phases emit their ops. Checks
     // fields/indexes/FKs unconditionally (strict implies index/FK management is enabled).
     function Check_TableModified(const AMappedTable, APhysicalTable: IioDBBuilderSchemaTable): Boolean;
-    // Reverse of the base's Match_PhysicalIndex: does APhysicalIndex correspond to any index mapped on
-    // AMappedTable? Used to tell an orphan physical index (no mapped counterpart at all) apart from one
-    // that is simply out of date (Plan_Indexes/Plan_StrictDropIndexes already handle the latter).
-    function Match_MappedIndex(const AMappedTable: IioDBBuilderSchemaTable; const APhysicalIndex: IioDBBuilderSchemaIndex): IioDBBuilderSchemaIndex;
     // Diff phases (each iterates every mapped table so the resulting order is create-safe).
     procedure Plan_ForeignKeys(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
     procedure Plan_Indexes(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
@@ -79,7 +75,7 @@ type
 implementation
 
 uses
-  System.SysUtils, iORM.Attributes;
+  iORM.Attributes;
 
 { TioDBBuilderPlanBuilderWithAlterTable }
 
@@ -170,17 +166,6 @@ begin
       Exit;
   end;
   Result := False;
-end;
-
-function TioDBBuilderPlanBuilderWithAlterTable.Match_MappedIndex(const AMappedTable: IioDBBuilderSchemaTable;
-  const APhysicalIndex: IioDBBuilderSchemaIndex): IioDBBuilderSchemaIndex;
-var
-  LMappedIndex: IioDBBuilderSchemaIndex;
-begin
-  Result := nil;
-  for LMappedIndex in AMappedTable.Indexes.Values do
-    if SameText(Context.SqlGenerator.Translate_SchemaTableAndIndex_To_IndexName(AMappedTable, LMappedIndex), APhysicalIndex.Name) then
-      Exit(LMappedIndex);
 end;
 
 procedure TioDBBuilderPlanBuilderWithAlterTable.Plan_StrictDropIndexes(const APlan: IioDBBuilderPlan;

@@ -47,11 +47,11 @@ type
   ///  rebuild ops in a rebuild-safe order: drop indexes from DB -> rename to "_old" -> create tables ->
   ///  create indexes -> copy data. Foreign keys are inline in CREATE TABLE for these dialects, so no FK ops
   ///  are emitted. Because the rebuild recreates everything from scratch, ifmEnabled and ifmEnabledStrict
-  ///  are equivalent here; only ifmDisabled prevents index recreation. A table, or a field on an otherwise
-  ///  untouched table, present in the DB but absent from the ORM maps is left alone by the rebuild ops
-  ///  (nothing to recreate, and an orphan alone must never force a rebuild - that would destroy exactly
-  ///  the data being flagged) but still surfaced as an orphan, same as WithAlterTable's Plan_OrphanTables/
-  ///  Plan_OrphanFields.
+  ///  are equivalent here; only ifmDisabled prevents index recreation. A table, a field, or an index on an
+  ///  otherwise untouched table, present in the DB but absent from the ORM maps is left alone by the
+  ///  rebuild ops (nothing to recreate, and an orphan alone must never force a rebuild - that would destroy
+  ///  exactly the data being flagged) but still surfaced as an orphan, same as WithAlterTable's
+  ///  Plan_OrphanTables/Plan_OrphanFields/Plan_OrphanIndexes.
   ///  The fresh whole-DB create (schema stCreate + CREATE DATABASE, via MappedSchema.ForceCreateStatus) is
   ///  decided upstream (the DBBuilder, when the database does not exist) - not here; with a nil
   ///  PhysicalSchema everything is simply "new".
@@ -187,6 +187,27 @@ begin
         Warn_DanglingForeignKeys(LMappedSchema, LPhysicalTable.Name, '');
         LPlan.AddDropTable(LPhysicalTable);
       end;
+
+  // 3c. Orphan indexes on tables that are NOT being rebuilt (Status still stClean at this point): a
+  // rebuilt table (stUpdate) already had every physical index dropped for real in 2a, orphans included, so
+  // reporting them again here would duplicate that. Unlike orphan fields, no version gate is needed: DROP
+  // INDEX is always available (unlike DROP COLUMN, SQLite 3.35+ only), so the comment is unconditional.
+  // ifmEnabled/ifmEnabledStrict are equivalent here (see Check_TableNeedsRebuild), so a single check suffices.
+  if Context.Reconciliation.IndexesMode >= ifmEnabled then
+    for LMappedTable in LMappedSchema.Tables.Values do
+    begin
+      if LMappedTable.Status = stUpdate then
+        Continue;
+      LPhysicalTable := Find_TableByName(LPhysicalSchema, LMappedTable.Name);
+      if LPhysicalTable = nil then
+        Continue;
+      for LPhysicalIndex in LPhysicalTable.Indexes.Values do
+        if Match_MappedIndex(LMappedTable, LPhysicalIndex) = nil then
+        begin
+          LPhysicalIndex.Status := stDrop;
+          LPlan.AddDropOrphanIndex(LMappedTable, LPhysicalIndex);
+        end;
+    end;
 
   // Coarse (schema-level) view: the schema needs work if any table does (monotonic: never downgrades a
   // schema already forced to stCreate by the fresh-DB path).
