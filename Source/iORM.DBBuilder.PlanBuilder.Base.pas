@@ -129,7 +129,7 @@ type
     // going away (a commented-out DROP for WithAlterTable, silent data loss on rebuild for
     // WithoutAlterTable) - this adds the cross-table consequence a same-table warning cannot see. Scans
     // only AMappedSchema, since an already-orphaned table has no need for a second warning about itself.
-    procedure Warn_DanglingForeignKeys(const AMappedSchema: IioDBBuilderSchema; const AReferenceTableName, AReferenceFieldName: String);
+    procedure Warning_DanglingForeignKeys(const AMappedSchema: IioDBBuilderSchema; const AReferenceTableName, AReferenceFieldName: String);
     // Orphan-emission phases shared by both build shapes: WithAlterTable's incremental diff and
     // WithoutAlterTable's rebuild both need to report objects present in the DB but absent from the ORM
     // maps, and do so identically (mark the physical node stDrop, cascade/warn, append the Plan op) - only
@@ -278,7 +278,7 @@ begin
       Exit(LTable);
 end;
 
-procedure TioDBBuilderPlanBuilderBase.Warn_DanglingForeignKeys(const AMappedSchema: IioDBBuilderSchema;
+procedure TioDBBuilderPlanBuilderBase.Warning_DanglingForeignKeys(const AMappedSchema: IioDBBuilderSchema;
   const AReferenceTableName, AReferenceFieldName: String);
 var
   LTable: IioDBBuilderSchemaTable;
@@ -313,7 +313,7 @@ begin
       begin
         LPhysicalField.Status := stDrop;
         LPhysicalTable.CascadeFieldDropStatus(LPhysicalField.FieldName);
-        Warn_DanglingForeignKeys(AMappedSchema, LMappedTable.Name, LPhysicalField.FieldName);
+        Warning_DanglingForeignKeys(AMappedSchema, LMappedTable.Name, LPhysicalField.FieldName);
         APlan.AddDropField(LMappedTable, LPhysicalField);
       end;
   end;
@@ -390,7 +390,7 @@ begin
     if Find_TableByName(AMappedSchema, LPhysicalTable.Name) = nil then
     begin
       LPhysicalTable.CascadeTableDropStatus;
-      Warn_DanglingForeignKeys(AMappedSchema, LPhysicalTable.Name, '');
+      Warning_DanglingForeignKeys(AMappedSchema, LPhysicalTable.Name, '');
       APlan.AddDropTable(LPhysicalTable);
     end;
 end;
