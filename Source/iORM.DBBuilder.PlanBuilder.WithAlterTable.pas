@@ -199,14 +199,14 @@ begin
       APlan.AddCreateTable(LMappedTable);
     end
     else
-      // Existing table: add missing fields and alter modified ones. SetStatus is monotonic, so marking the
-      // table stUpdate never downgrades a new table's stCreate.
+    begin
+      // Existing table: add missing fields and alter modified ones.
       for LField in LMappedTable.Fields do
       begin
         LPhysicalField := LPhysicalTable.FindField(LField.FieldName);
         if LPhysicalField = nil then
         begin
-          LMappedTable.EscalateFieldStatus(LField, stCreate);
+          LField.Status := stCreate;
           APlan.AddCreateField(LMappedTable, LField);
         end
         else
@@ -214,11 +214,17 @@ begin
           LChanges := Context.SqlGenerator.Compare_Field(LField, LPhysicalField);
           if LChanges <> [] then
           begin
-            LMappedTable.EscalateFieldStatus(LField, stUpdate);
+            LField.Status := stUpdate;
             APlan.AddAlterField(LMappedTable, LField, LPhysicalField, LChanges);
           end;
         end;
       end;
+      // Detection kept separate from the action (same split as Check_TableModified): escalate the
+      // table once, after every field has been marked, instead of at each branch above. SetStatus is
+      // monotonic, so this never downgrades a table already stCreate.
+      if LMappedTable.HasFieldChanges then
+        LMappedTable.Status := stUpdate;
+    end;
   end;
 end;
 
@@ -246,18 +252,22 @@ begin
         LPhysicalIndex := Match_PhysicalIndex(LMappedTable, LIndex, LPhysicalTable);
       if LPhysicalIndex = nil then
       begin
-        LMappedTable.EscalateIndexStatus(LIndex, stCreate);
+        LIndex.Status := stCreate;
         APlan.AddCreateIndex(LMappedTable, LIndex);
       end
       else if Context.SqlGenerator.Compare_Index(LIndex, LPhysicalIndex) <> [] then
       begin
         // Modified index: drop the physical one, recreate the mapped one.
         LPhysicalIndex.Status := stDrop;
-        LMappedTable.EscalateIndexStatus(LIndex, stUpdate);
+        LIndex.Status := stUpdate;
         APlan.AddDropIndex(LMappedTable, LPhysicalIndex);
         APlan.AddCreateIndex(LMappedTable, LIndex);
       end;
     end;
+    // Detection kept separate from the action (same split as Check_TableModified/Plan_TablesAndFields):
+    // escalate the table once, after every index has been marked.
+    if LMappedTable.HasIndexChanges then
+      LMappedTable.Status := stUpdate;
   end;
 end;
 
@@ -285,18 +295,22 @@ begin
         LPhysicalFK := Match_PhysicalForeignKey(LFK, LPhysicalTable);
       if LPhysicalFK = nil then
       begin
-        LMappedTable.EscalateForeignKeyStatus(LFK, stCreate);
+        LFK.Status := stCreate;
         APlan.AddCreateForeignKey(LMappedTable, LFK);
       end
       else if Check_ForeignKeyModified(LFK, LPhysicalFK) then
       begin
         // Modified FK: drop the physical one, recreate the mapped one.
         LPhysicalFK.Status := stDrop;
-        LMappedTable.EscalateForeignKeyStatus(LFK, stUpdate);
+        LFK.Status := stUpdate;
         APlan.AddDropForeignKey(LMappedTable, LPhysicalFK);
         APlan.AddCreateForeignKey(LMappedTable, LFK);
       end;
     end;
+    // Detection kept separate from the action (same split as Check_TableModified/Plan_TablesAndFields):
+    // escalate the table once, after every foreign key has been marked.
+    if LMappedTable.HasForeignKeyChanges then
+      LMappedTable.Status := stUpdate;
   end;
 end;
 

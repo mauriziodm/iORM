@@ -278,26 +278,6 @@ type
     /// </summary>
     procedure CascadeTableDropStatus;
     /// <summary>
-    ///  Marks AField with AStatus and escalates this table to at least stUpdate - the reverse
-    ///  direction of CascadeFieldDropStatus/CascadeTableDropStatus (which propagate FROM this table
-    ///  DOWN to its children): here a child's own change is what drives the table's Status UP. One
-    ///  named method per child kind (EscalateFieldStatus/EscalateForeignKeyStatus/EscalateIndexStatus),
-    ///  not an overload: this file never overloads by subject (see Match_PhysicalIndex/
-    ///  Match_PhysicalForeignKey, Plan_OrphanFields/Plan_OrphanIndexes/Plan_OrphanForeignKeys, the
-    ///  Force*CreateStatus family), each writes the subject into the name instead. Safe to call on a
-    ///  table already stCreate (a brand-new table): Status is monotonic (TioDBBuilderSchemaBaseObject),
-    ///  so escalating it to stUpdate is then a no-op.
-    /// </summary>
-    procedure EscalateFieldStatus(const AField: IioDBBuilderSchemaField; const AStatus: TioDBBuilderStatus);
-    /// <summary>
-    ///  Marks AFK with AStatus and escalates this table to at least stUpdate. See EscalateFieldStatus.
-    /// </summary>
-    procedure EscalateForeignKeyStatus(const AFK: IioDBBuilderSchemaFK; const AStatus: TioDBBuilderStatus);
-    /// <summary>
-    ///  Marks AIndex with AStatus and escalates this table to at least stUpdate. See EscalateFieldStatus.
-    /// </summary>
-    procedure EscalateIndexStatus(const AIndex: IioDBBuilderSchemaIndex; const AStatus: TioDBBuilderStatus);
-    /// <summary>
     ///  Case-insensitive lookup of a field of this table by name, or nil if absent.
     /// </summary>
     function FindField(const AFieldName: String): IioDBBuilderSchemaField;
@@ -342,9 +322,22 @@ type
     /// <summary>
     ///  True if at least one field of this table has a pending change (Status &gt; stClean), i.e. it
     ///  must be created or altered. Replaces the former taFields flag of the removed table-level
-    ///  Changes set: field Status is the single source of truth.
+    ///  Changes set: field Status is the single source of truth. Called by the PlanBuilder once per
+    ///  table at the end of its field phase to decide whether to escalate this table's own Status to
+    ///  stUpdate - detection kept separate from the action, same split as Check_TableModified. See
+    ///  also HasForeignKeyChanges/HasIndexChanges, the same check for the other two child collections.
     /// </summary>
     function HasFieldChanges: Boolean;
+    /// <summary>
+    ///  True if at least one foreign key of this table has a pending change (Status &gt; stClean). See
+    ///  HasFieldChanges.
+    /// </summary>
+    function HasForeignKeyChanges: Boolean;
+    /// <summary>
+    ///  True if at least one index of this table has a pending change (Status &gt; stClean). See
+    ///  HasFieldChanges.
+    /// </summary>
+    function HasIndexChanges: Boolean;
     function IsKeyGenerationStrategyFallback: Boolean;
     procedure SetIsTrueClass(const AValue: boolean);
     procedure SetStatus(const AValue: TioDBBuilderStatus);
