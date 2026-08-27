@@ -278,6 +278,26 @@ type
     /// </summary>
     procedure CascadeTableDropStatus;
     /// <summary>
+    ///  Marks AField with AStatus and escalates this table to at least stUpdate - the reverse
+    ///  direction of CascadeFieldDropStatus/CascadeTableDropStatus (which propagate FROM this table
+    ///  DOWN to its children): here a child's own change is what drives the table's Status UP. One
+    ///  named method per child kind (EscalateFieldStatus/EscalateForeignKeyStatus/EscalateIndexStatus),
+    ///  not an overload: this file never overloads by subject (see Match_PhysicalIndex/
+    ///  Match_PhysicalForeignKey, Plan_OrphanFields/Plan_OrphanIndexes/Plan_OrphanForeignKeys, the
+    ///  Force*CreateStatus family), each writes the subject into the name instead. Safe to call on a
+    ///  table already stCreate (a brand-new table): Status is monotonic (TioDBBuilderSchemaBaseObject),
+    ///  so escalating it to stUpdate is then a no-op.
+    /// </summary>
+    procedure EscalateFieldStatus(const AField: IioDBBuilderSchemaField; const AStatus: TioDBBuilderStatus);
+    /// <summary>
+    ///  Marks AFK with AStatus and escalates this table to at least stUpdate. See EscalateFieldStatus.
+    /// </summary>
+    procedure EscalateForeignKeyStatus(const AFK: IioDBBuilderSchemaFK; const AStatus: TioDBBuilderStatus);
+    /// <summary>
+    ///  Marks AIndex with AStatus and escalates this table to at least stUpdate. See EscalateFieldStatus.
+    /// </summary>
+    procedure EscalateIndexStatus(const AIndex: IioDBBuilderSchemaIndex; const AStatus: TioDBBuilderStatus);
+    /// <summary>
     ///  Case-insensitive lookup of a field of this table by name, or nil if absent.
     /// </summary>
     function FindField(const AFieldName: String): IioDBBuilderSchemaField;

@@ -70,6 +70,9 @@ type
     procedure AddIndex(const AIndexAttr: ioIndex);
     procedure CascadeFieldDropStatus(const AFieldName: String);
     procedure CascadeTableDropStatus;
+    procedure EscalateFieldStatus(const AField: IioDBBuilderSchemaField; const AStatus: TioDBBuilderStatus);
+    procedure EscalateForeignKeyStatus(const AFK: IioDBBuilderSchemaFK; const AStatus: TioDBBuilderStatus);
+    procedure EscalateIndexStatus(const AIndex: IioDBBuilderSchemaIndex; const AStatus: TioDBBuilderStatus);
     function FieldExists(const AFieldName: String): boolean;
     function FindField(const AFieldName: String): IioDBBuilderSchemaField;
     procedure ForceCreateStatus;
@@ -308,6 +311,27 @@ begin
   for LFK in FForeignKeys.Values do
     if SameText(LFK.DependentFieldName, AFieldName) then
       LFK.Status := stDrop;
+end;
+
+// Reverse direction of CascadeFieldDropStatus/CascadeTableDropStatus (parent-to-children): a child's
+// own change escalates this table's Status. Status is monotonic (TioDBBuilderSchemaBaseObject), so
+// escalating an already stCreate table (brand-new) to stUpdate here is a harmless no-op.
+procedure TioDBBuilderSchemaTable.EscalateFieldStatus(const AField: IioDBBuilderSchemaField; const AStatus: TioDBBuilderStatus);
+begin
+  AField.Status := AStatus;
+  Status := stUpdate;
+end;
+
+procedure TioDBBuilderSchemaTable.EscalateForeignKeyStatus(const AFK: IioDBBuilderSchemaFK; const AStatus: TioDBBuilderStatus);
+begin
+  AFK.Status := AStatus;
+  Status := stUpdate;
+end;
+
+procedure TioDBBuilderSchemaTable.EscalateIndexStatus(const AIndex: IioDBBuilderSchemaIndex; const AStatus: TioDBBuilderStatus);
+begin
+  AIndex.Status := AStatus;
+  Status := stUpdate;
 end;
 
 function TioDBBuilderSchemaTable.GetPrimaryKeyField: IioDBBuilderSchemaField;

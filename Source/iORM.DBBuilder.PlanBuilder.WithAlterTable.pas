@@ -214,8 +214,7 @@ begin
         LPhysicalField := LPhysicalTable.FindField(LField.FieldName);
         if LPhysicalField = nil then
         begin
-          LField.Status := stCreate;
-          LMappedTable.Status := stUpdate;
+          LMappedTable.EscalateFieldStatus(LField, stCreate);
           APlan.AddCreateField(LMappedTable, LField);
         end
         else
@@ -223,8 +222,7 @@ begin
           LChanges := Context.SqlGenerator.Compare_Field(LField, LPhysicalField);
           if LChanges <> [] then
           begin
-            LField.Status := stUpdate;
-            LMappedTable.Status := stUpdate;
+            LMappedTable.EscalateFieldStatus(LField, stUpdate);
             APlan.AddAlterField(LMappedTable, LField, LPhysicalField, LChanges);
           end;
         end;
@@ -256,16 +254,14 @@ begin
         LPhysicalIndex := Match_PhysicalIndex(LMappedTable, LIndex, LPhysicalTable);
       if LPhysicalIndex = nil then
       begin
-        LIndex.Status := stCreate;
-        LMappedTable.Status := stUpdate;  // monotonic: harmless on a brand-new (stCreate) table
+        LMappedTable.EscalateIndexStatus(LIndex, stCreate);
         APlan.AddCreateIndex(LMappedTable, LIndex);
       end
       else if Context.SqlGenerator.Compare_Index(LIndex, LPhysicalIndex) <> [] then
       begin
         // Modified index: drop the physical one, recreate the mapped one.
         LPhysicalIndex.Status := stDrop;
-        LIndex.Status := stUpdate;
-        LMappedTable.Status := stUpdate;
+        LMappedTable.EscalateIndexStatus(LIndex, stUpdate);
         APlan.AddDropIndex(LMappedTable, LPhysicalIndex);
         APlan.AddCreateIndex(LMappedTable, LIndex);
       end;
@@ -297,16 +293,14 @@ begin
         LPhysicalFK := Match_PhysicalForeignKey(LFK, LPhysicalTable);
       if LPhysicalFK = nil then
       begin
-        LFK.Status := stCreate;
-        LMappedTable.Status := stUpdate;  // monotonic: harmless on a brand-new (stCreate) table
+        LMappedTable.EscalateForeignKeyStatus(LFK, stCreate);
         APlan.AddCreateForeignKey(LMappedTable, LFK);
       end
       else if Check_ForeignKeyModified(LFK, LPhysicalFK) then
       begin
         // Modified FK: drop the physical one, recreate the mapped one.
         LPhysicalFK.Status := stDrop;
-        LFK.Status := stUpdate;
-        LMappedTable.Status := stUpdate;
+        LMappedTable.EscalateForeignKeyStatus(LFK, stUpdate);
         APlan.AddDropForeignKey(LMappedTable, LPhysicalFK);
         APlan.AddCreateForeignKey(LMappedTable, LFK);
       end;
