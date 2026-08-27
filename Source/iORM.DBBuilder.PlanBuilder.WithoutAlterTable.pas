@@ -186,14 +186,7 @@ begin
   if Context.Reconciliation.ForeignKeysMode >= ifmEnabled then
     Plan_OrphanForeignKeys(LPlan, LMappedSchema, LPhysicalSchema, True);
 
-  // Coarse (schema-level) view: the schema needs work if any table does (monotonic: never downgrades a
-  // schema already forced to stCreate by the fresh-DB path).
-  for LMappedTable in LMappedSchema.Tables.Values do
-    if LMappedTable.Status > stClean then
-    begin
-      LMappedSchema.Status := stUpdate;
-      Break;
-    end;
+  Escalate_SchemaStatus(LMappedSchema);
 
   Result := LPlan;
 end;

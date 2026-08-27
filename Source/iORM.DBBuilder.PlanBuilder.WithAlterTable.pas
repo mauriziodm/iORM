@@ -126,15 +126,7 @@ begin
   Plan_OrphanFields(LPlan, LMappedSchema, LPhysicalSchema);
   Plan_OrphanTables(LPlan, LMappedSchema, LPhysicalSchema);
 
-  // Coarse (table-level) view of the diff: the schema needs work if any mapped table does. SetStatus is
-  // monotonic, so this never downgrades a schema already forced to stCreate (the fresh-DB case handled
-  // upstream).
-  for LMappedTable in LMappedSchema.Tables.Values do
-    if LMappedTable.Status > stClean then
-    begin
-      LMappedSchema.Status := stUpdate;
-      Break;
-    end;
+  Escalate_SchemaStatus(LMappedSchema);
 
   Result := LPlan;
 end;

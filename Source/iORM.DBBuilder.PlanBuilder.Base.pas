@@ -99,6 +99,13 @@ type
     // effect.
     function Check_TableModified(const AMappedTable, APhysicalTable: IioDBBuilderSchemaTable;
       const ACheckIndexes, ACheckForeignKeys: Boolean): Boolean;
+    /// <summary>
+    ///  Escalates AMappedSchema to at least stUpdate if any of its mapped tables has a pending change
+    ///  (Status > stClean). The coarse (schema-level) view of the diff, shared verbatim by both build
+    ///  shapes at the end of BuildPlan - Status is monotonic (TioDBBuilderSchemaBaseObject), so this
+    ///  never downgrades a schema already forced to stCreate (the fresh-DB path decided upstream).
+    /// </summary>
+    procedure Escalate_SchemaStatus(const AMappedSchema: IioDBBuilderSchema);
     // Cross-branch structural matchers: unlike a plain name lookup (see IioDBBuilderSchemaTable.FindField),
     // these compute the physical counterpart of a mapped FK/index from attributes OTHER than a shared name
     // key, because no such key exists (this is not "does a foreign key/index with this name exist").
@@ -213,6 +220,18 @@ begin
         Exit;
     end;
   Result := False;
+end;
+
+procedure TioDBBuilderPlanBuilderBase.Escalate_SchemaStatus(const AMappedSchema: IioDBBuilderSchema);
+var
+  LMappedTable: IioDBBuilderSchemaTable;
+begin
+  for LMappedTable in AMappedSchema.Tables.Values do
+    if LMappedTable.Status > stClean then
+    begin
+      AMappedSchema.Status := stUpdate;
+      Break;
+    end;
 end;
 
 function TioDBBuilderPlanBuilderBase.Match_MappedForeignKey(const AMappedTable: IioDBBuilderSchemaTable;
