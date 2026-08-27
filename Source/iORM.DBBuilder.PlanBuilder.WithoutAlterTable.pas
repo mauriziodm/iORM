@@ -186,7 +186,7 @@ begin
   if Context.Reconciliation.ForeignKeysMode >= ifmEnabled then
     Plan_OrphanForeignKeys(LPlan, LMappedSchema, LPhysicalSchema, True);
 
-  Escalate_SchemaStatus(LMappedSchema);
+  Escalate_PendingStatuses(LMappedSchema);
 
   Result := LPlan;
 end;

@@ -126,7 +126,7 @@ begin
   Plan_OrphanFields(LPlan, LMappedSchema, LPhysicalSchema);
   Plan_OrphanTables(LPlan, LMappedSchema, LPhysicalSchema);
 
-  Escalate_SchemaStatus(LMappedSchema);
+  Escalate_PendingStatuses(LMappedSchema);
 
   Result := LPlan;
 end;
@@ -199,8 +199,8 @@ begin
       APlan.AddCreateTable(LMappedTable);
     end
     else
-    begin
-      // Existing table: add missing fields and alter modified ones.
+      // Existing table: add missing fields and alter modified ones. Table-level escalation is not
+      // decided here - see Escalate_PendingStatuses, called once at the end of BuildPlan.
       for LField in LMappedTable.Fields do
       begin
         LPhysicalField := LPhysicalTable.FindField(LField.FieldName);
@@ -219,12 +219,6 @@ begin
           end;
         end;
       end;
-      // Detection kept separate from the action (same split as Check_TableModified): escalate the
-      // table once, after every field has been marked, instead of at each branch above. SetStatus is
-      // monotonic, so this never downgrades a table already stCreate.
-      if LMappedTable.HasFieldChanges then
-        LMappedTable.Status := stUpdate;
-    end;
   end;
 end;
 
@@ -264,10 +258,6 @@ begin
         APlan.AddCreateIndex(LMappedTable, LIndex);
       end;
     end;
-    // Detection kept separate from the action (same split as Check_TableModified/Plan_TablesAndFields):
-    // escalate the table once, after every index has been marked.
-    if LMappedTable.HasIndexChanges then
-      LMappedTable.Status := stUpdate;
   end;
 end;
 
@@ -307,10 +297,6 @@ begin
         APlan.AddCreateForeignKey(LMappedTable, LFK);
       end;
     end;
-    // Detection kept separate from the action (same split as Check_TableModified/Plan_TablesAndFields):
-    // escalate the table once, after every foreign key has been marked.
-    if LMappedTable.HasForeignKeyChanges then
-      LMappedTable.Status := stUpdate;
   end;
 end;
 

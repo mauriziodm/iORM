@@ -100,12 +100,19 @@ type
     function Check_TableModified(const AMappedTable, APhysicalTable: IioDBBuilderSchemaTable;
       const ACheckIndexes, ACheckForeignKeys: Boolean): Boolean;
     /// <summary>
-    ///  Escalates AMappedSchema to at least stUpdate if any of its mapped tables has a pending change
-    ///  (Status > stClean). The coarse (schema-level) view of the diff, shared verbatim by both build
-    ///  shapes at the end of BuildPlan - Status is monotonic (TioDBBuilderSchemaBaseObject), so this
-    ///  never downgrades a schema already forced to stCreate (the fresh-DB path decided upstream).
+    ///  Single bottom-up rollup, called once at the end of BuildPlan (shared verbatim by both build
+    ///  shapes): for every mapped table, escalates it to at least stUpdate if any of its fields,
+    ///  indexes, or foreign keys has a pending change (HasFieldChanges/HasIndexChanges/
+    ///  HasForeignKeyChanges), then escalates AMappedSchema itself if the table ends up with a pending
+    ///  change. Not needed mid-BuildPlan: every strict-mode read of a table's Status (Plan_StrictDrop*,
+    ///  the recreate-all branches in Plan_Indexes/Plan_ForeignKeys, the AStrict skip in
+    ///  Plan_OrphanIndexes/Plan_OrphanForeignKeys) is already satisfied by the strict pre-pass's
+    ///  Check_TableModified, which compares the same fields/indexes/FKs directly - so a table/field/
+    ///  index/FK can be marked as the diff is found, deferring ONLY the roll-up to here. Status is
+    ///  monotonic (TioDBBuilderSchemaBaseObject), so this never downgrades a table/schema already
+    ///  forced to stCreate (the fresh-DB path decided upstream).
     /// </summary>
-    procedure Escalate_SchemaStatus(const AMappedSchema: IioDBBuilderSchema);
+    procedure Escalate_PendingStatuses(const AMappedSchema: IioDBBuilderSchema);
     // Cross-branch structural matchers: unlike a plain name lookup (see IioDBBuilderSchemaTable.FindField),
     // these compute the physical counterpart of a mapped FK/index from attributes OTHER than a shared name
     // key, because no such key exists (this is not "does a foreign key/index with this name exist").
@@ -222,16 +229,17 @@ begin
   Result := False;
 end;
 
-procedure TioDBBuilderPlanBuilderBase.Escalate_SchemaStatus(const AMappedSchema: IioDBBuilderSchema);
+procedure TioDBBuilderPlanBuilderBase.Escalate_PendingStatuses(const AMappedSchema: IioDBBuilderSchema);
 var
   LMappedTable: IioDBBuilderSchemaTable;
 begin
   for LMappedTable in AMappedSchema.Tables.Values do
+  begin
+    if LMappedTable.HasFieldChanges or LMappedTable.HasIndexChanges or LMappedTable.HasForeignKeyChanges then
+      LMappedTable.Status := stUpdate;
     if LMappedTable.Status > stClean then
-    begin
       AMappedSchema.Status := stUpdate;
-      Break;
-    end;
+  end;
 end;
 
 function TioDBBuilderPlanBuilderBase.Match_MappedForeignKey(const AMappedTable: IioDBBuilderSchemaTable;
