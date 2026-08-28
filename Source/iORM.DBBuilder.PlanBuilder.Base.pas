@@ -148,8 +148,9 @@ type
     // WithoutAlterTable's rebuild both need to report objects present in the DB but absent from the ORM
     // maps, and do so identically (mark the physical node stDrop, cascade/warn, append the Plan op).
     // Tables and fields share one shape - no AStrict, matched by name (Find_TableByName/FindField): a
-    // table/field is always managed, never an optional axis like indexes/FKs - so they are walked
-    // together, table-then-its-own-fields, in Plan_OrphanTablesAndFields. Indexes/FKs are the two
+    // table/field is always managed, never an optional axis like indexes/FKs - so they are detected
+    // together in Plan_OrphanTablesAndFields (two passes there, tables before fields, most severe loss
+    // first). Indexes/FKs are the two
     // optional, mode-gated axes (IndexesMode/ForeignKeysMode) and match structurally rather than by
     // name, so they stay their own pair: the caller-side skip conditions there differ and are expressed
     // via AStrict. WithoutAlterTable always passes AStrict = True for the index/FK phases: its rebuild
@@ -331,21 +332,23 @@ var
 begin
   if APhysicalSchema = nil then
     Exit;
-  // Walk the physical side: a table present in the DB but absent from the ORM maps is itself the
-  // orphan (whole-table drop, cascaded to its own fields/indexes/FKs) - otherwise, only ITS fields are
-  // checked for the finer-grained case (a field present in the DB but absent from this still-mapped
-  // table's own map). The translation (Strategy) renders both as a commented-out, non-executed
-  // statement plus a warning - iORM never silently drops a table or a field.
+  // Two passes over the physical side, most severe first: losing a whole table is a bigger deal than
+  // losing one of its columns, so the report groups every orphan table before any orphan field instead
+  // of interleaving them in physical-schema order (which table sorts next to which is incidental, not a
+  // severity signal). The Strategy renders both as a commented-out, non-executed statement plus a
+  // warning - iORM never silently drops a table or a field.
   for LPhysicalTable in APhysicalSchema.Tables.Values do
-  begin
-    LMappedTable := Find_TableByName(AMappedSchema, LPhysicalTable.Name);
-    if LMappedTable = nil then
+    if Find_TableByName(AMappedSchema, LPhysicalTable.Name) = nil then
     begin
       LPhysicalTable.CascadeTableDropStatus;
       Warning_DanglingForeignKeys(AMappedSchema, LPhysicalTable.Name, '');
       APlan.AddDropTable(LPhysicalTable);
-      Continue;
     end;
+  for LPhysicalTable in APhysicalSchema.Tables.Values do
+  begin
+    LMappedTable := Find_TableByName(AMappedSchema, LPhysicalTable.Name);
+    if LMappedTable = nil then
+      Continue;
     for LPhysicalField in LPhysicalTable.Fields do
       if LMappedTable.FindField(LPhysicalField.FieldName) = nil then
       begin
