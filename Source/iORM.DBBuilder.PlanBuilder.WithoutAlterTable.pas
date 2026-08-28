@@ -52,7 +52,7 @@ type
   ///  on an otherwise untouched table, present in the DB but absent from the ORM maps is left alone by the
   ///  rebuild ops (nothing to recreate, and an orphan alone must never force a rebuild - that would destroy
   ///  exactly the data being flagged) but still surfaced as an orphan, same as WithAlterTable's
-  ///  Plan_OrphanTables/Plan_OrphanFields/Plan_OrphanIndexes/Plan_OrphanForeignKeys.
+  ///  Plan_OrphanTablesAndFields/Plan_OrphanIndexes/Plan_OrphanForeignKeys.
   ///  The fresh whole-DB create (schema stCreate + CREATE DATABASE, via MappedSchema.ForceCreateStatus) is
   ///  decided upstream (the DBBuilder, when the database does not exist) - not here; with a nil
   ///  PhysicalSchema everything is simply "new".
@@ -156,16 +156,13 @@ begin
   //    above - an orphan alone must never trigger a rebuild, since that would destroy exactly the data
   //    this warns about - and independent of each other, so both run directly against the two schemas.
 
-  // 3a. Orphan fields on tables that are still mapped. Cascade stDrop to keep the informational Status
-  //     tree consistent, warn about any live FK that would dangle, and add an opDropField the Strategy
-  //     renders as a comment - version-gated on SQLite (Strategy.WithoutAlterTable.ScriptWrite_DropField)
-  //     because dropping a single column needs the very rebuild this must not trigger. Shared with
-  //     WithAlterTable (PlanBuilder.Base.Plan_OrphanFields): identical logic on both shapes.
-  Plan_OrphanFields(LPlan, LMappedSchema, LPhysicalSchema);
-
-  // 3b. Orphan tables. Same treatment: cascade, warn, add the (commented) drop. Shared with WithAlterTable
-  //     (PlanBuilder.Base.Plan_OrphanTables).
-  Plan_OrphanTables(LPlan, LMappedSchema, LPhysicalSchema);
+  // 3a/3b. Orphan tables and fields on tables that are still mapped. Cascade stDrop to keep the
+  //     informational Status tree consistent, warn about any live FK that would dangle, and add the
+  //     (commented) drop - opDropField is version-gated on SQLite (Strategy.WithoutAlterTable.
+  //     ScriptWrite_DropField) because dropping a single column needs the very rebuild this must not
+  //     trigger. Shared with WithAlterTable (PlanBuilder.Base.Plan_OrphanTablesAndFields): identical
+  //     logic on both shapes.
+  Plan_OrphanTablesAndFields(LPlan, LMappedSchema, LPhysicalSchema);
 
   // 3c. Orphan indexes on tables that are NOT being rebuilt (Status still stClean at this point): a
   // rebuilt table (stUpdate) already had every physical index dropped for real in 2a, orphans included, so

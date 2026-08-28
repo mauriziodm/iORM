@@ -123,8 +123,7 @@ begin
     Plan_ForeignKeys(LPlan, LMappedSchema, LPhysicalSchema, LStrictForeignKeys);
     Plan_OrphanForeignKeys(LPlan, LMappedSchema, LPhysicalSchema, LStrictForeignKeys);
   end;
-  Plan_OrphanFields(LPlan, LMappedSchema, LPhysicalSchema);
-  Plan_OrphanTables(LPlan, LMappedSchema, LPhysicalSchema);
+  Plan_OrphanTablesAndFields(LPlan, LMappedSchema, LPhysicalSchema);
 
   Escalate_PendingStatuses(LMappedSchema);
 
