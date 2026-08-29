@@ -266,6 +266,9 @@ var
   LMappedTable, LPhysicalTable: IioDBBuilderSchemaTable;
   LFK, LPhysicalFK: IioDBBuilderSchemaFK;
 begin
+  // For every mapped FK: create it if no matching physical FK exists, or if strict mode already dropped
+  // all of this table's physical FKs upfront (see Plan_StrictDropForeignKeys); drop+recreate it if a
+  // matching physical FK exists but differs; otherwise leave it alone (unchanged, matched FK).
   for LMappedTable in AMappedSchema.Tables.Values do
   begin
     LPhysicalTable := Find_TableByName(APhysicalSchema, LMappedTable.Name);
@@ -278,6 +281,7 @@ begin
         APlan.AddCreateForeignKey(LMappedTable, LFK);
         Continue;
       end;
+      // Match by structure (not by name): a name-based match would risk false matches (see F13).
       if LPhysicalTable = nil then
         LPhysicalFK := nil
       else
