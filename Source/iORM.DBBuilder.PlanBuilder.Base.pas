@@ -297,6 +297,13 @@ begin
       Exit(LPhysicalIndex);
 end;
 
+// The reconciliation-side table lookup: an intentional, case-INSENSITIVE scan (SameText), kept separate
+// from Schema.FindTable. The dictionary lookup there is exact/case-sensitive and correct for the registry
+// (keys are already case-normalized, and a CI dictionary would be wrong on SQLite, whose table names ARE
+// case-sensitive); here the physical DB name can have drifted in case (hand-written DDL, another tool, an
+// older app version), so the scan is the safety net. Deliberately NOT merged into Schema.FindTable and NOT
+// re-exposed as a boolean "TableExists" (2026-08-29): both would blur the registry/diff-primitive layer
+// split. See FindTable's comment for the mirror side.
 function TioDBBuilderPlanBuilderBase.Find_TableByName(const ASchema: IioDBBuilderSchema;
   const AName: String): IioDBBuilderSchemaTable;
 var
