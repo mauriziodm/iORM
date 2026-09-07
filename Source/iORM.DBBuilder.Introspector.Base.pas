@@ -73,7 +73,7 @@ type
   private
     function Introspect: IioDBBuilderSchema;
   protected
-    // Shared query execution (same raw-query mechanic the Strategy uses for its Check_* probes).
+    // Shared query execution (same raw-query mechanic the SqlGenerator uses for its Check_* probes).
     function GetRawQuery(const ASQL: String): IioQuery;
     // Best-effort mapping of a raw catalog type string to the ORM metadata enum. NOT the comparison
     // basis under reconciliation approach (1) - the raw string (FieldTypeRaw) is; this only fills the

@@ -285,6 +285,13 @@ type
     function BuildSQL_DropSequence(const ASequenceName: string): string; virtual;
     /// <summary>Generates SQL to check if a sequence exists. Default raises exception (not supported).</summary>
     function BuildSQL_SequenceExists(const ASequenceName: string): string; virtual;
+    /// <summary>
+    /// Checks if a sequence exists, running the catalog query produced by BuildSQL_SequenceExists.
+    /// Generic across dialects (delegates to the virtual BuildSQL_SequenceExists, exactly as
+    /// BuildSQL_DropFK delegates to BuildSQL_DropFKbyName); dialects that do not support sequences
+    /// reach the BuildSQL_SequenceExists RaiseNotImplemented.
+    /// </summary>
+    function Check_SequenceExists(const ASequenceName: string): Boolean; virtual;
 
     // ==========================================================
     // SQL IDENTIFIER / LITERAL UTILITIES (internal helpers, not part of IioDBBuilderSqlGenerator)
@@ -337,6 +344,7 @@ uses
 
   iORM.DB.Factory,
   iORM.DB.ConnectionContainer,
+  iORM.DB.QueryEngine,
   iORM.SqlTranslator,
   iORM.Exceptions,
   iORM.Utilities,
@@ -715,6 +723,14 @@ end;
 function TioDBBuilderSqlGenBase.BuildSQL_DropFKbyName(const ATableName, AForeignKeyName: string): string;
 begin
   RaiseNotImplemented('BuildSQL_DropFKbyName');
+end;
+
+function TioDBBuilderSqlGenBase.Check_SequenceExists(const ASequenceName: string): Boolean;
+var
+  LQuery: IioQuery;
+begin
+  LQuery := TioQueryEngine.GetRawQuery(ConnectionDefName, BuildSQL_SequenceExists(ASequenceName), True);
+  Result := LQuery.Fields[0].AsInteger > 0;
 end;
 
 function TioDBBuilderSqlGenBase.BuildSQL_FKList(const ATableName: string; const AFKName: string): string;

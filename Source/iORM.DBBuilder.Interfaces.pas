@@ -856,6 +856,8 @@ type
     function BuildSQL_DropSequence(const ASequenceName: string): string;
     /// <summary>Generates SQL to check if a sequence exists</summary>
     function BuildSQL_SequenceExists(const ASequenceName: string): string;
+    /// <summary>Checks if a sequence exists</summary>
+    function Check_SequenceExists(const ASequenceName: string): Boolean;
     // ==========================================================
   end;
 

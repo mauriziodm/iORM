@@ -182,7 +182,6 @@ type
     // ==========================================================
     // SEQUENCE RELATED METHODS
     // ----------------------------------------------------------
-    function Check_SequenceExists(const ASequenceName: string): Boolean; virtual;
     procedure ScriptWrite_CreateSequence(const ASequenceName: String); virtual;
 
     // ==========================================================
@@ -228,8 +227,7 @@ uses
   System.SysUtils,
   System.StrUtils,
 
-  iORM.Exceptions,
-  iORM.DB.QueryEngine
+  iORM.Exceptions
 
   ;
 
@@ -251,14 +249,6 @@ begin
 end;
 
 { TioDBBuilderStrategyBase }
-
-function TioDBBuilderStrategyBase.Check_SequenceExists(const ASequenceName: string): Boolean;
-var
-  LQuery: IioQuery;
-begin
-  LQuery := TioQueryEngine.GetRawQuery(Context.ConnectionDefName, Context.SqlGenerator.BuildSQL_SequenceExists(ASequenceName), True);
-  Result := LQuery.Fields[0].AsInteger > 0;
-end;
 
 function TioDBBuilderStrategyBase.Check_TableHasIndexesInDB(const ATable: IioDBBuilderSchemaTable): Boolean;
 var
@@ -286,10 +276,13 @@ end;
 
 // Plan-op translator (opCreateSequence): create a sequence by name. On a create-from-scratch (schema
 // stCreate) the sequence cannot pre-exist AND the DB may not exist yet (skip the catalog query); on the
-// incremental path guard against an already-present sequence.
+// incremental path guard against an already-present sequence. The check itself lives on the SqlGenerator
+// (Check_SequenceExists, sibling of Check_DatabaseExists): the Strategy translates, it does not run
+// catalog queries (same pass-through-removal rationale as the Introspector asking Context.SqlGenerator
+// directly - see iORM.DBBuilder.Introspector.Base).
 procedure TioDBBuilderStrategyBase.ScriptWrite_CreateSequence(const ASequenceName: String);
 begin
-  if (Context.Reconciliation.MappedSchema.Status = stCreate) or not Check_SequenceExists(ASequenceName) then
+  if (Context.Reconciliation.MappedSchema.Status = stCreate) or not Context.SqlGenerator.Check_SequenceExists(ASequenceName) then
     Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_CreateSequence(ASequenceName));
 end;
 
