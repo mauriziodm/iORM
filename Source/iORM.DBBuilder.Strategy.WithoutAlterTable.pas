@@ -115,6 +115,12 @@ type
     /// create-index ops).
     /// </summary>
     procedure GenerateScript_Body; override;
+    /// <summary>
+    /// Translates the ops only this shape's Plan adds on top of the base's shared dispatch
+    /// (ScriptWrite_PlanOperation): the rename-create-copy ops (the ALTER TABLE shape never renames
+    /// tables or copies data). Everything else chains to inherited.
+    /// </summary>
+    procedure ScriptWrite_PlanOperation(const AOp: IioDBBuilderPlanOperation); override;
   public
   end;
 
@@ -130,35 +136,31 @@ uses
 { TioDBBuilderStrategyWithoutAlterTable }
 
 procedure TioDBBuilderStrategyWithoutAlterTable.GenerateScript_Body;
-var
-  LOp: IioDBBuilderPlanOperation;
 begin
-  // Check key generation strategy compatibility with DBMS.
-  // The diagnostic lives on the Context.SqlGenerator (DBMS-capability axis), not on the Strategy.
-  Context.SqlGenerator.Hint_KeyGenerationCompatibility(Context.Reconciliation.MappedSchema, Context.Script);
-
   // Dialect prologue: defer the constraints for the whole rebuild (see derived strategies).
   ScriptWrite_BeginDeferConstraints;
 
   // Plan-driven: the PlanBuilder's rebuild shape already produced the ops in a rebuild-safe order
-  // (drop indexes from DB -> rename to "_old" -> create tables -> create indexes -> copy data), so this is
-  // a straight translate-each-op loop. The dialect lives in the ScriptWrite_/BuildSQL_ each op dispatches
-  // to. FKs are inline in CREATE TABLE for these dialects, so there is no opCreateForeignKey here.
-  for LOp in Context.Reconciliation.Plan.Operations do
-    case LOp.Kind of
-      opDropIndex:            ScriptWrite_DropIndex(LOp.SchemaTable, LOp.SchemaIndex);
-      opDropOrphanIndex:      ScriptWrite_DropOrphanIndex(LOp.SchemaTable, LOp.SchemaIndex);
-      opDropOrphanForeignKey: ScriptWrite_DropOrphanForeignKey(LOp.SchemaTable, LOp.SchemaForeignKey);
-      opRenameTableToOld:     ScriptWrite_RenameTableToOld(LOp.SchemaTable);
-      opCreateTable:          ScriptWrite_CreateTable(LOp.SchemaTable);
-      opCreateIndex:          ScriptWrite_CreateIndex(LOp.SchemaTable, LOp.SchemaIndex);
-      opCopyData:             ScriptWrite_CopyDataFromOldToNewTable(LOp.SchemaTable);
-      opDropTable:            ScriptWrite_DropTable(LOp.SchemaTable);
-      opDropField:            ScriptWrite_DropField(LOp.SchemaTable, LOp.SchemaField_Physical);
-    end;
+  // (drop indexes from DB -> rename to "_old" -> create tables -> create indexes -> copy data), so the
+  // shared ScriptWrite_Plan is a straight translate-each-op loop - the dialect lives in the
+  // ScriptWrite_/BuildSQL_ each op dispatches to. FKs are inline in CREATE TABLE for these dialects, so
+  // there is no opCreateForeignKey here.
+  ScriptWrite_Plan;
 
   // Dialect epilogue: restore normal constraint checking.
   ScriptWrite_EndDeferConstraints;
+end;
+
+// The ops this shape adds on top of the base's shared dispatch (ScriptWrite_PlanOperation): the
+// rename-create-copy ops, emitted only by the WithoutAlterTable PlanBuilder shape.
+procedure TioDBBuilderStrategyWithoutAlterTable.ScriptWrite_PlanOperation(const AOp: IioDBBuilderPlanOperation);
+begin
+  case AOp.Kind of
+    opRenameTableToOld: ScriptWrite_RenameTableToOld(AOp.SchemaTable);
+    opCopyData:         ScriptWrite_CopyDataFromOldToNewTable(AOp.SchemaTable);
+  else
+    inherited;
+  end;
 end;
 
 procedure TioDBBuilderStrategyWithoutAlterTable.ScriptWrite_BeginDeferConstraints;

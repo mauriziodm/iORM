@@ -71,6 +71,13 @@ type
     /// Foreign keys are always processed last to ensure all referenced tables already exist.
     /// </summary>
     procedure GenerateScript_Body; override;
+    /// <summary>
+    /// Translates the ops only this shape's Plan adds on top of the base's shared dispatch
+    /// (ScriptWrite_PlanOperation): sequences, in-place field create/alter, and explicit FK create/drop
+    /// (the rebuild shape recreates tables wholesale and keeps FKs inline in CREATE TABLE).
+    /// Everything else chains to inherited.
+    /// </summary>
+    procedure ScriptWrite_PlanOperation(const AOp: IioDBBuilderPlanOperation); override;
 
   public
 
@@ -110,31 +117,29 @@ begin
 end;
 
 procedure TioDBBuilderStrategyWithAlterTable.GenerateScript_Body;
-var
-  LOp: IioDBBuilderPlanOperation;
 begin
-  // Check key generation strategy compatibility with RDBMS version (diagnostic on the SqlGenerator).
-  Context.SqlGenerator.Hint_KeyGenerationCompatibility(Context.Reconciliation.MappedSchema, Context.Script);
-
   // Plan-driven: the PlanBuilder already produced the operations in a create-safe order (strict drops ->
   // tables+fields -> indexes -> foreign keys -> orphan drops) and already applied the index/FK modes, so
-  // this is a straight translate-each-op loop. The dialect lives in the ScriptWrite_/BuildSQL_ each op
-  // dispatches to. WithoutAlterTable dialects override this with the rebuild flow instead.
-  for LOp in Context.Reconciliation.Plan.Operations do
-    case LOp.Kind of
-      opCreateSequence:       ScriptWrite_CreateSequence(LOp.SequenceName);
-      opCreateTable:          ScriptWrite_CreateTable(LOp.SchemaTable);
-      opCreateField:          ScriptWrite_CreateField(LOp.SchemaTable, LOp.SchemaField_Mapped);
-      opAlterField:           ScriptWrite_AlterField(LOp.SchemaTable, LOp.SchemaField_Mapped, LOp.SchemaField_Physical, LOp.SchemaField_Changes);
-      opDropField:            ScriptWrite_DropField(LOp.SchemaTable, LOp.SchemaField_Physical);
-      opCreateIndex:          ScriptWrite_CreateIndex(LOp.SchemaTable, LOp.SchemaIndex);
-      opDropIndex:            ScriptWrite_DropIndex(LOp.SchemaTable, LOp.SchemaIndex);
-      opDropOrphanIndex:      ScriptWrite_DropOrphanIndex(LOp.SchemaTable, LOp.SchemaIndex);
-      opCreateForeignKey:     ScriptWrite_CreateForeignKey(LOp.SchemaTable, LOp.SchemaForeignKey);
-      opDropForeignKey:       ScriptWrite_DropForeignKey(LOp.SchemaTable, LOp.SchemaForeignKey);
-      opDropOrphanForeignKey: ScriptWrite_DropOrphanForeignKey(LOp.SchemaTable, LOp.SchemaForeignKey);
-      opDropTable:            ScriptWrite_DropTable(LOp.SchemaTable);
-    end;
+  // the shared ScriptWrite_Plan is a straight translate-each-op loop - the dialect lives in the
+  // ScriptWrite_/BuildSQL_ each op dispatches to. WithoutAlterTable dialects override this with the
+  // rebuild flow instead.
+  ScriptWrite_Plan;
+end;
+
+// The ops this shape adds on top of the base's shared dispatch (ScriptWrite_PlanOperation): the WithAlterTable
+// PlanBuilder shape is the only one that emits sequence ops, in-place field create/alter, and explicit FK
+// create/drop (the rebuild shape recreates tables wholesale and keeps FKs inline in CREATE TABLE).
+procedure TioDBBuilderStrategyWithAlterTable.ScriptWrite_PlanOperation(const AOp: IioDBBuilderPlanOperation);
+begin
+  case AOp.Kind of
+    opCreateSequence:   ScriptWrite_CreateSequence(AOp.SequenceName);
+    opCreateField:      ScriptWrite_CreateField(AOp.SchemaTable, AOp.SchemaField_Mapped);
+    opAlterField:       ScriptWrite_AlterField(AOp.SchemaTable, AOp.SchemaField_Mapped, AOp.SchemaField_Physical, AOp.SchemaField_Changes);
+    opCreateForeignKey: ScriptWrite_CreateForeignKey(AOp.SchemaTable, AOp.SchemaForeignKey);
+    opDropForeignKey:   ScriptWrite_DropForeignKey(AOp.SchemaTable, AOp.SchemaForeignKey);
+  else
+    inherited;
+  end;
 end;
 
 end.

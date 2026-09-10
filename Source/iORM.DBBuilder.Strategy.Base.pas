@@ -131,9 +131,11 @@ type
                              schema to stCreate, emitting the force-create warning) is an Engine-level
                              orchestration decision, made on Context before this is called - neither
                              this method nor GenerateScript_Body branch on it.
-        GenerateScript_Body  protected abstract: the actual dialect-specific generation flow,
-                             implemented by each concrete Strategy (WithAlterTable/WithoutAlterTable).
-                             Now Plan-driven in both: a translate-each-op loop over Context.Reconciliation.Plan.
+        GenerateScript_Body  protected abstract: the shape-specific generation flow, implemented by
+                             each shape Strategy (WithAlterTable/WithoutAlterTable). Now Plan-driven in
+                             both: each body calls the shared ScriptWrite_Plan, which loops the Plan and
+                             dispatches each op to the virtual ScriptWrite_PlanOperation (the base handles
+                             the ops both shapes share; the shapes override to add their own).
         ScriptWrite_*        translates a single Plan operation into DDL/DML on Context.Script.Body
         Check_*              interrogates the (introspected) physical schema / detects a change, returns Boolean
         Warning_* / Hint_*   diagnostics appended to Context.Script.Warnings / Context.Script.Hints
@@ -218,6 +220,19 @@ type
     // MAIN GENERATION
     // ----------------------------------------------------------
     procedure GenerateScript_Body; virtual; abstract;
+    /// <summary>
+    /// Translates the whole Plan, shared by both shapes' GenerateScript_Body: emits the
+    /// key-generation-compatibility diagnostic (which lives on the SqlGenerator, DBMS-capability axis)
+    /// and then translates every operation in Plan order. The WithoutAlterTable shape wraps the call
+    /// with its constraint-deferral prologue/epilogue.
+    /// </summary>
+    procedure ScriptWrite_Plan;
+    /// <summary>
+    /// Translates a single Plan operation into dialect DDL/DML: the ops both strategy shapes translate
+    /// identically. WithAlterTable/WithoutAlterTable override to add their shape-specific ops (sequence/
+    /// field/FK ops vs the rename-create-copy ops) and chain the rest to inherited.
+    /// </summary>
+    procedure ScriptWrite_PlanOperation(const AOp: IioDBBuilderPlanOperation); virtual;
   public
   end;
 
@@ -421,6 +436,37 @@ begin
   Context.Reconciliation.Plan.Render(Context.Script.Plan, Context.Reconciliation.PlanRenderMode);
   GenerateScript_Body;
   Context.Script.ScriptEnd;
+end;
+
+// The Plan translation shared by both shapes' GenerateScript_Body: the key-generation-compatibility
+// diagnostic (on the SqlGenerator, DBMS-capability axis) plus the translate-each-op loop. The PlanBuilder
+// already produced the ops in a safe order (create-safe / rebuild-safe per shape) and applied the index/FK
+// modes, so this is a straight loop - the dialect lives in the ScriptWrite_/BuildSQL_ each op dispatches to.
+procedure TioDBBuilderStrategyBase.ScriptWrite_Plan;
+var
+  LOp: IioDBBuilderPlanOperation;
+begin
+  Context.SqlGenerator.Hint_KeyGenerationCompatibility(Context.Reconciliation.MappedSchema, Context.Script);
+
+  for LOp in Context.Reconciliation.Plan.Operations do
+    ScriptWrite_PlanOperation(LOp);
+end;
+
+// The ops both strategy shapes translate identically (same op -> same ScriptWrite_* -> same arguments).
+// The shape-specific ops (opCreateSequence/opCreateField/opAlterField/opCreateForeignKey/opDropForeignKey
+// for WithAlterTable; opRenameTableToOld/opCopyData for WithoutAlterTable) are handled by the overrides,
+// which chain everything else here.
+procedure TioDBBuilderStrategyBase.ScriptWrite_PlanOperation(const AOp: IioDBBuilderPlanOperation);
+begin
+  case AOp.Kind of
+    opCreateTable:          ScriptWrite_CreateTable(AOp.SchemaTable);
+    opDropField:            ScriptWrite_DropField(AOp.SchemaTable, AOp.SchemaField_Physical);
+    opCreateIndex:          ScriptWrite_CreateIndex(AOp.SchemaTable, AOp.SchemaIndex);
+    opDropIndex:            ScriptWrite_DropIndex(AOp.SchemaTable, AOp.SchemaIndex);
+    opDropOrphanIndex:      ScriptWrite_DropOrphanIndex(AOp.SchemaTable, AOp.SchemaIndex);
+    opDropOrphanForeignKey: ScriptWrite_DropOrphanForeignKey(AOp.SchemaTable, AOp.SchemaForeignKey);
+    opDropTable:            ScriptWrite_DropTable(AOp.SchemaTable);
+  end;
 end;
 
 procedure TioDBBuilderStrategyBase.Warning_UnsafeTypeConversion(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField;
