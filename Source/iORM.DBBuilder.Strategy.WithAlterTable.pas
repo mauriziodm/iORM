@@ -54,7 +54,8 @@ type
     // ==========================================================
     // TABLE RELATED METHODS
     // ----------------------------------------------------------
-    procedure ScriptWrite_CreateTable(const ATable: IioDBBuilderSchemaTable); override;
+    /// <summary>The PK is a separate statement after CREATE TABLE (BuildSQL_CreatePK).</summary>
+    procedure ScriptWrite_CreateTableSeparateConstraints(const ATable: IioDBBuilderSchemaTable); override;
 
     // ==========================================================
     // MAIN GENERATION
@@ -89,29 +90,10 @@ implementation
 
 { TioDBBuilderStrategyWithAlterTable }
 
-procedure TioDBBuilderStrategyWithAlterTable.ScriptWrite_CreateTable(const ATable: IioDBBuilderSchemaTable);
-var
-  LComma: string;
-  LField: IioDBBuilderSchemaField;
+// opCreateTable translation sub-fragment (separate-constraints slot of the base template): the PK is a
+// separate statement after CREATE TABLE (BuildSQL_CreatePK).
+procedure TioDBBuilderStrategyWithAlterTable.ScriptWrite_CreateTableSeparateConstraints(const ATable: IioDBBuilderSchemaTable);
 begin
-  inherited;
-
-  // Note: the sequence is a separate opCreateSequence in the Plan (emitted before this opCreateTable), so
-  // it is NOT created here anymore - that would double-create it.
-  Context.Script.Body.AddEmpty;
-  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_BeginCreateTable(ATable));
-  Context.Script.Body.IncIndent;
-
-  // Inline field creation
-  LComma := '  ';
-  for LField in ATable.Fields do
-  begin
-    Context.Script.Body.AddLine(LComma + Context.SqlGenerator.BuildSQL_FieldDefinition(ATable, LField));
-    LComma := ', ';
-  end;
-
-  Context.Script.Body.DecIndent;
-  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_EndCreateTable(ATable));
   Context.Script.Body.AddEmpty;
   Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_CreatePK(ATable));
 end;

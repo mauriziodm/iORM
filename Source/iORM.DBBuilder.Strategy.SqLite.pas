@@ -22,7 +22,8 @@ type
     // ==========================================================
     // TABLE RELATED METHODS
     // ----------------------------------------------------------
-    procedure ScriptWrite_CreateTable(const ATable: IioDBBuilderSchemaTable); override;
+    /// <summary>FKs are inline in the CREATE TABLE statement (SQLite has no ALTER TABLE ADD CONSTRAINT).</summary>
+    procedure ScriptWrite_CreateTableInlineConstraints(const ATable: IioDBBuilderSchemaTable); override;
   public
 
   end;
@@ -48,29 +49,13 @@ begin
   Context.Script.Body.AddEmpty;
 end;
 
-procedure TioDBBuilderStrategySqLite.ScriptWrite_CreateTable(const ATable: IioDBBuilderSchemaTable);
-var
-  LComma: string;
-  LField: IioDBBuilderSchemaField;
+// opCreateTable translation sub-fragment (inline-constraints slot of the base template): SQLite bakes
+// FKs inline in the CREATE TABLE statement (no ALTER TABLE ADD CONSTRAINT). ifmEnabled and
+// ifmEnabledStrict behave identically here; ifmDisabled skips them.
+procedure TioDBBuilderStrategySqLite.ScriptWrite_CreateTableInlineConstraints(const ATable: IioDBBuilderSchemaTable);
 begin
-  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_BeginCreateTable(ATable));
-  Context.Script.Body.IncIndent;
-
-  // Inline field creation
-  LComma := '  ';
-  for LField in ATable.Fields do
-  begin
-    Context.Script.Body.AddLine(LComma + Context.SqlGenerator.BuildSQL_FieldDefinition(ATable, LField));
-    LComma := ', ';
-  end;
-
-  // Note: for SQLite, FKs are inline in the CREATE TABLE statement.
-  // ifmEnabled and ifmEnabledStrict behave identically here.
   if Context.Reconciliation.ForeignKeysMode <> ifmDisabled then
     ScriptWrite_CreateTableForeignKeys(ATable);
-
-  Context.Script.Body.DecIndent;
-  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_EndCreateTable(ATable));
 end;
 
 end.

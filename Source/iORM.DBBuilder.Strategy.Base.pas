@@ -157,7 +157,25 @@ type
     // ==========================================================
     // TABLE RELATED METHODS
     // ----------------------------------------------------------
+    /// <summary>
+    /// Translates opCreateTable as a template shared by all dialects: title, CREATE TABLE with the
+    /// inline field definitions, then the two constraint hooks - constraints baked inline in the
+    /// statement (ScriptWrite_CreateTableInlineConstraints, e.g. SQLite FKs) or emitted as separate
+    /// statements after it (ScriptWrite_CreateTableSeparateConstraints, e.g. the WithAlterTable PK).
+    /// </summary>
     procedure ScriptWrite_CreateTable(const ATable: IioDBBuilderSchemaTable); virtual;
+    /// <summary>
+    /// opCreateTable translation sub-fragment (called from ScriptWrite_CreateTable, inside the CREATE
+    /// TABLE parentheses): constraint definitions this dialect bakes inline in the statement (SQLite
+    /// FKs). Default: none.
+    /// </summary>
+    procedure ScriptWrite_CreateTableInlineConstraints(const ATable: IioDBBuilderSchemaTable); virtual;
+    /// <summary>
+    /// opCreateTable translation sub-fragment (called from ScriptWrite_CreateTable, after the closing
+    /// statement): constraint statements this dialect emits separately after CREATE TABLE (the
+    /// WithAlterTable PK). Default: none.
+    /// </summary>
+    procedure ScriptWrite_CreateTableSeparateConstraints(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure ScriptWrite_DropTable(const ATable: IioDBBuilderSchemaTable); virtual;
 
     // ==========================================================
@@ -373,9 +391,46 @@ begin
     'DROP COLUMN statement was generated as a comment (NOT executed). Review and run it manually if you want to remove it.', [AField.FieldName, ATable.Name]));
 end;
 
+// Plan-op translator (opCreateTable) - template shared by all dialects: title, CREATE TABLE with the
+// inline field definitions, and the two constraint hooks (constraints baked inline in the statement vs
+// emitted as separate statements after it). The sequence is a separate opCreateSequence in the Plan
+// (emitted before this opCreateTable), so it is NOT created here - that would double-create it.
 procedure TioDBBuilderStrategyBase.ScriptWrite_CreateTable(const ATable: IioDBBuilderSchemaTable);
+var
+  LComma: string;
+  LField: IioDBBuilderSchemaField;
 begin
   Context.Script.Body.AddTitle(Format('Creating table ''%s''', [ATable.Name]));
+  Context.Script.Body.AddEmpty;
+  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_BeginCreateTable(ATable));
+  Context.Script.Body.IncIndent;
+
+  // Inline field creation
+  LComma := '  ';
+  for LField in ATable.Fields do
+  begin
+    Context.Script.Body.AddLine(LComma + Context.SqlGenerator.BuildSQL_FieldDefinition(ATable, LField));
+    LComma := ', ';
+  end;
+
+  // Constraints this dialect bakes inline in the CREATE TABLE statement (e.g. SQLite FKs).
+  ScriptWrite_CreateTableInlineConstraints(ATable);
+
+  Context.Script.Body.DecIndent;
+  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_EndCreateTable(ATable));
+
+  // Constraint statements this dialect emits separately after CREATE TABLE (e.g. the WithAlterTable PK).
+  ScriptWrite_CreateTableSeparateConstraints(ATable);
+end;
+
+procedure TioDBBuilderStrategyBase.ScriptWrite_CreateTableInlineConstraints(const ATable: IioDBBuilderSchemaTable);
+begin
+  // Default: this dialect bakes no constraints inline in the CREATE TABLE statement.
+end;
+
+procedure TioDBBuilderStrategyBase.ScriptWrite_CreateTableSeparateConstraints(const ATable: IioDBBuilderSchemaTable);
+begin
+  // Default: this dialect emits no separate constraint statements after CREATE TABLE.
 end;
 
 // Plan-op translator (opDropTable): an orphan table (in the DB, not mapped) is NEVER dropped
