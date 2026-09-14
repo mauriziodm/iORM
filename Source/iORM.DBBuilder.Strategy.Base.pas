@@ -315,8 +315,12 @@ end;
 // directly - see iORM.DBBuilder.Introspector.Base).
 procedure TioDBBuilderStrategyBase.ScriptWrite_CreateSequence(const ASequenceName: String);
 begin
+  // AddLine, not Add: the statement must own its line. Add appends to the previous one, and if that is a
+  // comment line (e.g. an orphan op's trailing comment) TioScript.LoadScriptAndCleanFromComments drops
+  // '--' lines whole - the statement would be silently stripped. The multi-statement ops already self-guard
+  // by opening with AddEmpty/AddTitle; the single-shot ops follow the same discipline here.
   if (Context.Reconciliation.MappedSchema.Status = stCreate) or not Context.SqlGenerator.Check_SequenceExists(ASequenceName) then
-    Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_CreateSequence(ASequenceName));
+    Context.Script.Body.AddLine(Context.SqlGenerator.BuildSQL_CreateSequence(ASequenceName));
 end;
 
 function TioDBBuilderStrategyBase.Check_DatabaseExists: Boolean;
@@ -334,12 +338,17 @@ end;
 
 procedure TioDBBuilderStrategyBase.ScriptWrite_CreateForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK);
 begin
-  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_CreateFK(ATable, AForeignKey));
+  // AddLine, not Add: the opCreateForeignKey dispatch must own its line (see ScriptWrite_CreateSequence).
+  // The other caller - the SQLite inline-constraints slot of ScriptWrite_CreateTable - stays valid on its
+  // own line: that BuildSQL_CreateFK returns a leading-comma fragment, so the clause still follows the
+  // last field definition.
+  Context.Script.Body.AddLine(Context.SqlGenerator.BuildSQL_CreateFK(ATable, AForeignKey));
 end;
 
 procedure TioDBBuilderStrategyBase.ScriptWrite_DropForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK);
 begin
-  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_DropFK(ATable, AForeignKey));
+  // AddLine, not Add: the statement must own its line (see ScriptWrite_CreateSequence).
+  Context.Script.Body.AddLine(Context.SqlGenerator.BuildSQL_DropFK(ATable, AForeignKey));
 end;
 
 // Plan-op translator (opDropOrphanForeignKey): an orphan FK (in the DB, matching no mapped FK) is NEVER
@@ -360,7 +369,8 @@ end;
 // Plan-op translator (opCreateField): add a single column to an existing table.
 procedure TioDBBuilderStrategyBase.ScriptWrite_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
 begin
-  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_CreateField(ATable, AField));
+  // AddLine, not Add: the statement must own its line (see ScriptWrite_CreateSequence).
+  Context.Script.Body.AddLine(Context.SqlGenerator.BuildSQL_CreateField(ATable, AField));
 end;
 
 // Plan-op translator (opAlterField): alter a single column and, at translation time, emit the old->new
@@ -375,7 +385,8 @@ begin
   // emits the right ALTER statements.
   for LChange in AChanges do
     AMappedField.AddAltered(LChange);
-  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_AlterField(ATable, AMappedField));
+  // AddLine, not Add: the statement must own its line (see ScriptWrite_CreateSequence).
+  Context.Script.Body.AddLine(Context.SqlGenerator.BuildSQL_AlterField(ATable, AMappedField));
   Warning_FieldAlterations(ATable, AMappedField, APhysicalField);
 end;
 
@@ -447,7 +458,8 @@ end;
 
 procedure TioDBBuilderStrategyBase.ScriptWrite_CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex);
 begin
-  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_CreateIndex(ATable, AIndex));
+  // AddLine, not Add: the statement must own its line (see ScriptWrite_CreateSequence).
+  Context.Script.Body.AddLine(Context.SqlGenerator.BuildSQL_CreateIndex(ATable, AIndex));
 end;
 
 // AIndex here is always a Physical node (read by the Introspector via Match_PhysicalIndex or, in strict
@@ -463,7 +475,8 @@ end;
 
 procedure TioDBBuilderStrategyBase.ScriptWrite_DropIndexByName(const AIndexName: string);
 begin
-  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_DropIndexByName(AIndexName));
+  // AddLine, not Add: the statement must own its line (see ScriptWrite_CreateSequence).
+  Context.Script.Body.AddLine(Context.SqlGenerator.BuildSQL_DropIndexByName(AIndexName));
 end;
 
 // Plan-op translator (opDropOrphanIndex): an orphan index (in the DB, matching no mapped index) is NEVER
