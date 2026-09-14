@@ -22,12 +22,12 @@ type
     FAddLinePrefix: String;
     FIndentLevel: Integer;
     FLines: TStringList;
-    function Add(const AText: String): IioDBBuilderSqlText;      // Append inline to last line
     function AddComment(const AText: String): IioDBBuilderSqlText;
     function AddEmpty: IioDBBuilderSqlText;
     function AddLine(const AText: string): IioDBBuilderSqlText;
     function AddSeparator: IioDBBuilderSqlText;
     function AddTitle(const AText: String): IioDBBuilderSqlText;
+    function AddToCurrentLine(const AText: String): IioDBBuilderSqlText; // Append to the current line, no newline
     procedure Clear;
     function DecIndent: IioDBBuilderSqlText;
     function GetIndentationChars: string;
@@ -122,8 +122,8 @@ begin
   Result := StringOfChar(SCRIPT_INDENTATION_CHAR, FIndentLevel * SCRIPT_INDENTATION_WIDTH);
 end;
 
-// Add() - Append inline to last line (no newline, no indent)
-function TioDBBuilderSqlText.Add(const AText: String): IioDBBuilderSqlText;
+// AddToCurrentLine() - Append to the current line without a newline (no indent either); AddLine() starts a new line
+function TioDBBuilderSqlText.AddToCurrentLine(const AText: String): IioDBBuilderSqlText;
 var
   LLastIndex: Integer;
 begin

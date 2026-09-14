@@ -225,7 +225,7 @@ begin
     LSqlText.AddLine(Format('ON DELETE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnDeleteAction)]));
 
   LSqlText.
-    Add(';');
+    AddToCurrentLine(';');
 
   Result := LSqlText.Text;
 end;
@@ -458,7 +458,7 @@ begin
     AddLine('  RDB$FIELD_POSITION').
     AddLine('FROM RDB$INDEX_SEGMENTS').
     AddLine(Format('WHERE UPPER(RDB$INDEX_NAME) = UPPER(''%s'')', [EscapeSQLStringLiteral(AIndexName)])).
-    Add('ORDER BY RDB$FIELD_POSITION');
+    AddToCurrentLine('ORDER BY RDB$FIELD_POSITION');
 
   Result := LSqlText.Text;
 end;

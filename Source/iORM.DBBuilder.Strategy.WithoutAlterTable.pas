@@ -184,8 +184,9 @@ begin
     Warning_RebuildDropsUnmanagedForeignKeys(ATable);
 
   Context.Script.Body.AddComment(Format('Renaming from "%s" to "%s"', [ATable.Name, Table2OldTableName(ATable)]));
-  // AddLine, not Add: Add would glue both statements onto the comment line above, and TioScript drops
-  // '--' lines whole - the rename would be silently stripped and the rebuild would fail.
+  // AddLine, not AddToCurrentLine: AddToCurrentLine would glue both statements onto the comment line
+  // above, and TioScript drops '--' lines whole - the rename would be silently stripped and the rebuild
+  // would fail.
   Context.Script.Body.AddLine(Format('DROP TABLE IF EXISTS %s;', [Table2OldTableName(ATable)]));
   Context.Script.Body.AddLine(Format('ALTER TABLE %s RENAME TO %s;', [ATable.Name, Table2OldTableName(ATable)]));
   Context.Script.Body.AddEmpty;
@@ -199,9 +200,9 @@ procedure TioDBBuilderStrategyWithoutAlterTable.ScriptWrite_CopyDataFromOldToNew
   // selection), promote WriteFieldList to a protected method - non-virtual first: a shared utility, not an
   // override point - deciding virtual/non-virtual against the real requirement. Precedent for nested
   // helpers: iORM.DBBuilder.Script (TioDBBuilderScript.GetLines, TioDBBuilderScript.ScriptBegin).
-  // The statement is emitted with AddLine, not Add: Add appends to the previous line, so the first
-  // statement would land on the comment line above - and TioScript drops '--' lines whole - silently
-  // stripping the entire copy.
+  // The statement is emitted with AddLine, not AddToCurrentLine: AddToCurrentLine appends to the
+  // previous line, so the first statement would land on the comment line above - and TioScript drops
+  // '--' lines whole - silently stripping the entire copy.
   procedure WriteFieldList;
   var
     LField: IioDBBuilderSchemaField;

@@ -311,7 +311,7 @@ begin
   // with the check/drop path), not from AForeignKey.SqlName. On SQLite the FK name is cosmetic
   // (Check_ForeignKeyExists matches structurally by field+reference table, FKs are rebuilt inline),
   // but this keeps the name consistent with Firebird/WithAlterTable and with DROP-by-name.
-  LSqlText.Add(
+  LSqlText.AddToCurrentLine(
     Format(', CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)', [
       Translate_SchemaTableAndFK_To_FKName(ATable, AForeignKey),
       AForeignKey.SqlDependentFieldName,
@@ -322,15 +322,15 @@ begin
 
   // Add optional ON UPDATE clause if specified
   if AForeignKey.OnUpdateAction > fkUnspecified then
-    LSqlText.Add(Format(' ON UPDATE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnUpdateAction)]));
+    LSqlText.AddToCurrentLine(Format(' ON UPDATE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnUpdateAction)]));
 
   // Add optional ON DELETE clause if specified
   if AForeignKey.OnDeleteAction > fkUnspecified then
-    LSqlText.Add(Format(' ON DELETE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnDeleteAction)]));
+    LSqlText.AddToCurrentLine(Format(' ON DELETE %s', [Translate_SchemaFK_To_FKvalue(AForeignKey, AForeignKey.OnDeleteAction)]));
 
   // SQLite-specific: make FK constraint deferrable to avoid constraint violations during complex updates
   LSqlText.
-    Add(' DEFERRABLE INITIALLY DEFERRED');
+    AddToCurrentLine(' DEFERRABLE INITIALLY DEFERRED');
 
   Result := LSqlText.Text;
 end;

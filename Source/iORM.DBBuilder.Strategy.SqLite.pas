@@ -38,8 +38,8 @@ procedure TioDBBuilderStrategySqLite.ScriptWrite_BeginDeferConstraints;
 begin
   Context.Script.Body.AddEmpty;
   Context.Script.Body.AddComment('Before we start: defer foreign key checks to avoid errors during table rebuild');
-  // AddLine, not Add: Add appends to the previous line - here the comment - and TioScript drops
-  // '--' lines whole, so the PRAGMA would be silently stripped and never executed.
+  // AddLine, not AddToCurrentLine: AddToCurrentLine appends to the previous line - here the comment -
+  // and TioScript drops '--' lines whole, so the PRAGMA would be silently stripped and never executed.
   Context.Script.Body.AddLine('PRAGMA defer_foreign_keys=on;');
 end;
 
@@ -47,8 +47,8 @@ procedure TioDBBuilderStrategySqLite.ScriptWrite_EndDeferConstraints;
 begin
   Context.Script.Body.AddEmpty;
   Context.Script.Body.AddComment('At the end: restore normal foreign key checks');
-  // AddLine, not Add: same line discipline as ScriptWrite_BeginDeferConstraints - a PRAGMA glued to
-  // the comment line above would be silently stripped by TioScript.
+  // AddLine, not AddToCurrentLine: same line discipline as ScriptWrite_BeginDeferConstraints - a PRAGMA
+  // glued to the comment line above would be silently stripped by TioScript.
   Context.Script.Body.AddLine('PRAGMA defer_foreign_keys=off;');
   Context.Script.Body.AddEmpty;
 end;

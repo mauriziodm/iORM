@@ -95,7 +95,7 @@ implementation
 procedure TioDBBuilderStrategyWithAlterTable.ScriptWrite_CreateTableSeparateConstraints(const ATable: IioDBBuilderSchemaTable);
 begin
   Context.Script.Body.AddEmpty;
-  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_CreatePK(ATable));
+  Context.Script.Body.AddToCurrentLine(Context.SqlGenerator.BuildSQL_CreatePK(ATable));
 end;
 
 procedure TioDBBuilderStrategyWithAlterTable.GenerateScript_Body;

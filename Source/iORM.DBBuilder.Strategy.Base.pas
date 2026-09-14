@@ -315,10 +315,11 @@ end;
 // directly - see iORM.DBBuilder.Introspector.Base).
 procedure TioDBBuilderStrategyBase.ScriptWrite_CreateSequence(const ASequenceName: String);
 begin
-  // AddLine, not Add: the statement must own its line. Add appends to the previous one, and if that is a
-  // comment line (e.g. an orphan op's trailing comment) TioScript.LoadScriptAndCleanFromComments drops
-  // '--' lines whole - the statement would be silently stripped. The multi-statement ops already self-guard
-  // by opening with AddEmpty/AddTitle; the single-shot ops follow the same discipline here.
+  // AddLine, not AddToCurrentLine: the statement must own its line. AddToCurrentLine appends to the
+  // previous one, and if that is a comment line (e.g. an orphan op's trailing comment)
+  // TioScript.LoadScriptAndCleanFromComments drops '--' lines whole - the statement would be silently
+  // stripped. The multi-statement ops already self-guard by opening with AddEmpty/AddTitle; the
+  // single-shot ops follow the same discipline here.
   if (Context.Reconciliation.MappedSchema.Status = stCreate) or not Context.SqlGenerator.Check_SequenceExists(ASequenceName) then
     Context.Script.Body.AddLine(Context.SqlGenerator.BuildSQL_CreateSequence(ASequenceName));
 end;
@@ -338,7 +339,7 @@ end;
 
 procedure TioDBBuilderStrategyBase.ScriptWrite_CreateForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK);
 begin
-  // AddLine, not Add: the opCreateForeignKey dispatch must own its line (see ScriptWrite_CreateSequence).
+  // AddLine, not AddToCurrentLine: the opCreateForeignKey dispatch must own its line (see ScriptWrite_CreateSequence).
   // The other caller - the SQLite inline-constraints slot of ScriptWrite_CreateTable - stays valid on its
   // own line: that BuildSQL_CreateFK returns a leading-comma fragment, so the clause still follows the
   // last field definition.
@@ -347,7 +348,7 @@ end;
 
 procedure TioDBBuilderStrategyBase.ScriptWrite_DropForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK);
 begin
-  // AddLine, not Add: the statement must own its line (see ScriptWrite_CreateSequence).
+  // AddLine, not AddToCurrentLine: the statement must own its line (see ScriptWrite_CreateSequence).
   Context.Script.Body.AddLine(Context.SqlGenerator.BuildSQL_DropFK(ATable, AForeignKey));
 end;
 
@@ -369,7 +370,7 @@ end;
 // Plan-op translator (opCreateField): add a single column to an existing table.
 procedure TioDBBuilderStrategyBase.ScriptWrite_CreateField(const ATable: IioDBBuilderSchemaTable; const AField: IioDBBuilderSchemaField);
 begin
-  // AddLine, not Add: the statement must own its line (see ScriptWrite_CreateSequence).
+  // AddLine, not AddToCurrentLine: the statement must own its line (see ScriptWrite_CreateSequence).
   Context.Script.Body.AddLine(Context.SqlGenerator.BuildSQL_CreateField(ATable, AField));
 end;
 
@@ -385,7 +386,7 @@ begin
   // emits the right ALTER statements.
   for LChange in AChanges do
     AMappedField.AddAltered(LChange);
-  // AddLine, not Add: the statement must own its line (see ScriptWrite_CreateSequence).
+  // AddLine, not AddToCurrentLine: the statement must own its line (see ScriptWrite_CreateSequence).
   Context.Script.Body.AddLine(Context.SqlGenerator.BuildSQL_AlterField(ATable, AMappedField));
   Warning_FieldAlterations(ATable, AMappedField, APhysicalField);
 end;
@@ -413,7 +414,7 @@ var
 begin
   Context.Script.Body.AddTitle(Format('Creating table ''%s''', [ATable.Name]));
   Context.Script.Body.AddEmpty;
-  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_BeginCreateTable(ATable));
+  Context.Script.Body.AddToCurrentLine(Context.SqlGenerator.BuildSQL_BeginCreateTable(ATable));
   Context.Script.Body.IncIndent;
 
   // Inline field creation
@@ -428,7 +429,8 @@ begin
   ScriptWrite_CreateTableInlineConstraints(ATable);
 
   Context.Script.Body.DecIndent;
-  Context.Script.Body.Add(Context.SqlGenerator.BuildSQL_EndCreateTable(ATable));
+  // AddToCurrentLine on purpose: the closing ');' glues onto the last field line (formatting, not semantics).
+  Context.Script.Body.AddToCurrentLine(Context.SqlGenerator.BuildSQL_EndCreateTable(ATable));
 
   // Constraint statements this dialect emits separately after CREATE TABLE (e.g. the WithAlterTable PK).
   ScriptWrite_CreateTableSeparateConstraints(ATable);
@@ -458,7 +460,7 @@ end;
 
 procedure TioDBBuilderStrategyBase.ScriptWrite_CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex);
 begin
-  // AddLine, not Add: the statement must own its line (see ScriptWrite_CreateSequence).
+  // AddLine, not AddToCurrentLine: the statement must own its line (see ScriptWrite_CreateSequence).
   Context.Script.Body.AddLine(Context.SqlGenerator.BuildSQL_CreateIndex(ATable, AIndex));
 end;
 
@@ -475,7 +477,7 @@ end;
 
 procedure TioDBBuilderStrategyBase.ScriptWrite_DropIndexByName(const AIndexName: string);
 begin
-  // AddLine, not Add: the statement must own its line (see ScriptWrite_CreateSequence).
+  // AddLine, not AddToCurrentLine: the statement must own its line (see ScriptWrite_CreateSequence).
   Context.Script.Body.AddLine(Context.SqlGenerator.BuildSQL_DropIndexByName(AIndexName));
 end;
 

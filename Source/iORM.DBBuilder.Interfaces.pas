@@ -514,12 +514,12 @@ type
 
   IioDBBuilderSqlText = interface
     ['{DF2D64EF-3576-49CF-B803-3D10D7A93816}']
-    function Add(const AText: String): IioDBBuilderSqlText; // Append inline to last line
     function AddComment(const AText: String): IioDBBuilderSqlText;
     function AddEmpty: IioDBBuilderSqlText;
     function AddLine(const AText: string): IioDBBuilderSqlText;
     function AddSeparator: IioDBBuilderSqlText;
     function AddTitle(const AText: String): IioDBBuilderSqlText;
+    function AddToCurrentLine(const AText: String): IioDBBuilderSqlText; // Appends to the current line, no newline (AddLine starts a new one)
     procedure Clear;
     function DecIndent: IioDBBuilderSqlText;
     function GetIsEmpty: Boolean;
