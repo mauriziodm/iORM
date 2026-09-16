@@ -260,7 +260,8 @@ uses
   System.SysUtils,
   System.StrUtils,
 
-  iORM.Exceptions
+  iORM.Exceptions,
+  iORM.Utilities
 
   ;
 
@@ -536,6 +537,16 @@ begin
     opDropOrphanIndex:      ScriptWrite_DropOrphanIndex(AOp.SchemaTable, AOp.SchemaIndex);
     opDropOrphanForeignKey: ScriptWrite_DropOrphanForeignKey(AOp.SchemaTable, AOp.SchemaForeignKey);
     opDropTable:            ScriptWrite_DropTable(AOp.SchemaTable);
+  else
+    // Loud guard, not a fallback: an op with no arm here or in a shape override means a PlanBuilder emitted
+    // an op the translation layer cannot realize - a producer/translator pairing bug that must fail now, not
+    // ship as a script that silently omits a statement its own Plan section advertises. opDropSequence is
+    // today the only untranslatable member: a reserved building block with no producer yet (see the
+    // TioDBBuilderPlanOpKind summary and IioDBBuilderPlan.AddDropSequence).
+    raise EioDBBuilderException.Create(ClassName, 'ScriptWrite_PlanOperation',
+      Format('Plan op %s has no translator arm in this strategy: every Plan op must be realizable by the ' +
+        'strategy that consumes the Plan - add its ScriptWrite_ arm (base or shape) before any PlanBuilder ' +
+        'emits it.', [TioUtilities.EnumToString<TioDBBuilderPlanOpKind>(AOp.Kind)]));
   end;
 end;
 

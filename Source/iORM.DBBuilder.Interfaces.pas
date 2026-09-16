@@ -69,6 +69,13 @@ type
   ///  unconditionally, to free every physical index of a rebuilt table before recreating it. Orphan fields
   ///  need no dedicated op there: the rebuild recreates the table from the mapped fields only, so an
   ///  unmapped column is simply not carried over.
+  ///  The sequence pair: opCreateSequence is emitted by the PlanBuilder for new tables, always before the
+  ///  table's opCreateTable (the sequence is NOT recreated inside the CREATE - that would double-create it).
+  ///  opDropSequence is a reserved building block, not a live op: its surface exists (producer API, Firebird
+  ///  BuildSQL_DropSequence, Description arm) but no PlanBuilder emits it and no strategy translates it yet -
+  ///  the dispatch else-raise (Strategy.ScriptWrite_PlanOperation) fails loudly until that pairing is
+  ///  completed. It belongs to the intentional-drop family above (drop by name, executed for real): a future
+  ///  orphan-sequence diff will add its own opDropOrphanSequence per the orphan invariant, not reuse this.
   /// </summary>
   TioDBBuilderPlanOpKind = (opCreateTable, opDropTable, opCreateField, opAlterField, opDropField, opCreateIndex,
     opDropIndex, opDropOrphanIndex, opCreateForeignKey, opDropForeignKey, opDropOrphanForeignKey, opCreateSequence,
@@ -465,6 +472,8 @@ type
     function AddDropOrphanForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;
     // SEQUENCE
     function AddCreateSequence(const ASequenceName: String): IioDBBuilderPlanOperation;
+    // Reserved building block (see the TioDBBuilderPlanOpKind summary): no PlanBuilder emits opDropSequence
+    // and no strategy translates it yet - calling this today yields an op the dispatch else-raise rejects.
     function AddDropSequence(const ASequenceName: String): IioDBBuilderPlanOperation;
     // PLAN-WIDE
     procedure Clear;
@@ -852,7 +861,8 @@ type
     // ----------------------------------------------------------
     /// <summary>Generates SQL to create a sequence</summary>
     function BuildSQL_CreateSequence(const ASequenceName: String): string;
-    /// <summary>Generates SQL to drop a sequence</summary>
+    /// <summary>Generates SQL to drop a sequence by name. Reserved for the future opDropSequence translator
+    /// (no consumer today); Firebird implements it, other dialects raise (base default).</summary>
     function BuildSQL_DropSequence(const ASequenceName: string): string;
     /// <summary>Generates SQL to check if a sequence exists</summary>
     function BuildSQL_SequenceExists(const ASequenceName: string): string;
