@@ -105,7 +105,7 @@ type
     function AddDropOrphanForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;
     // SEQUENCE
     function AddCreateSequence(const ASequenceName: String): IioDBBuilderPlanOperation;
-    function AddDropSequence(const ASequenceName: String): IioDBBuilderPlanOperation;
+    function AddDropOrphanSequence(const ASequenceName: String): IioDBBuilderPlanOperation;
     // PLAN-WIDE
     procedure Clear;
     function GetCount: Integer;
@@ -159,7 +159,7 @@ begin
     // AForeignKey is always a Physical node here (see AddDropOrphanForeignKey), so .Name is always the real catalog name.
     opDropOrphanForeignKey: Result := Format('Drop orphan foreign key %s on %s', [QuotedStr(FSchemaForeignKey.Name), QuotedStr(FSchemaTable.Name)]);
     opCreateSequence:   Result := Format('Create sequence %s', [QuotedStr(FSequenceName)]);
-    opDropSequence:     Result := Format('Drop sequence %s', [QuotedStr(FSequenceName)]);
+    opDropOrphanSequence: Result := Format('Drop orphan sequence %s', [QuotedStr(FSequenceName)]);
     opRenameTableToOld: Result := Format('Rename table %s to its temporary shadow (rebuild)', [QuotedStr(FSchemaTable.Name)]);
     opCopyData:         Result := Format('Copy data into rebuilt table %s', [QuotedStr(FSchemaTable.Name)]);
   else
@@ -306,9 +306,9 @@ begin
   Result := AddOp(TioDBBuilderPlanOperation.Create(opCreateSequence, nil, nil, nil, nil, [], ASequenceName));
 end;
 
-function TioDBBuilderPlan.AddDropSequence(const ASequenceName: String): IioDBBuilderPlanOperation;
+function TioDBBuilderPlan.AddDropOrphanSequence(const ASequenceName: String): IioDBBuilderPlanOperation;
 begin
-  Result := AddOp(TioDBBuilderPlanOperation.Create(opDropSequence, nil, nil, nil, nil, [], ASequenceName));
+  Result := AddOp(TioDBBuilderPlanOperation.Create(opDropOrphanSequence, nil, nil, nil, nil, [], ASequenceName));
 end;
 
 procedure TioDBBuilderPlan.Clear;

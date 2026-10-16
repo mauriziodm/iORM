@@ -540,9 +540,9 @@ begin
   else
     // Loud guard, not a fallback: an op with no arm here or in a shape override means a PlanBuilder emitted
     // an op the translation layer cannot realize - a producer/translator pairing bug that must fail now, not
-    // ship as a script that silently omits a statement its own Plan section advertises. opDropSequence is
-    // today the only untranslatable member: a reserved building block with no producer yet (see the
-    // TioDBBuilderPlanOpKind summary and IioDBBuilderPlan.AddDropSequence).
+    // ship as a script that silently omits a statement its own Plan section advertises. opDropOrphanSequence
+    // is today the only untranslatable member: not wired yet, no producer either (see the
+    // TioDBBuilderPlanOpKind summary and IioDBBuilderPlan.AddDropOrphanSequence).
     raise EioDBBuilderException.Create(ClassName, 'ScriptWrite_PlanOperation',
       Format('Plan op %s has no translator arm in this strategy: every Plan op must be realizable by the ' +
         'strategy that consumes the Plan - add its ScriptWrite_ arm (base or shape) before any PlanBuilder ' +

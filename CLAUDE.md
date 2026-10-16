@@ -76,6 +76,21 @@ Build order: Runtime (RT) packages first, then Design-Time (DT) packages.
     section in `iORM.DBBuilder.SqlGenerator.Base.pas` and `iORM.DBBuilder.Strategy.Base.pas`. Keep
     those two banners and this note in sync when the convention evolves.
 
+  **DBBuilder orphan & sequence-drop policy** (design invariants — do not "complete" them away):
+  - An **orphan** is a physical object (table, field, index, foreign key, sequence) present in the
+    database but matched by nothing in the ORM maps. Orphans are **never dropped for real**: the
+    PlanBuilder emits an orphan op (`opDropTable`, `opDropField`, `opDropOrphanIndex`,
+    `opDropOrphanForeignKey`, `opDropOrphanSequence`) that the Strategy realizes as a commented-out,
+    non-executed statement plus a warning. The decision to actually drop stays with the user.
+  - Executed drops exist only for objects the caller intentionally removes and that are **pure
+    structure**, so drop-then-recreate is lossless: `opDropIndex`, `opDropForeignKey`.
+  - There is deliberately **no executed sequence drop**. A sequence carries state (its counter):
+    dropping and recreating it restarts the counter, and new keys collide with primary keys already in
+    the table. So the only sequence-drop op is `opDropOrphanSequence` (comment + warning). Do not add an
+    executed `opDropSequence`. A future rename/relocate need must be a different, counter-preserving op,
+    never drop + create. Full rationale: the `TioDBBuilderPlanOpKind` summary in
+    `iORM.DBBuilder.Interfaces.pas`.
+
 - **ETM (Entity Tracking Manager)** (`iORM.ETM.*`): Audit trail and change tracking
 
 - **MVVM** (`iORM.MVVM.*`): ViewModels, Views, Model binding, VM actions

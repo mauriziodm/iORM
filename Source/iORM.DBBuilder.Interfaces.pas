@@ -71,15 +71,24 @@ type
   ///  unmapped column is simply not carried over.
   ///  The sequence pair: opCreateSequence is emitted by the PlanBuilder for new tables, always before the
   ///  table's opCreateTable (the sequence is NOT recreated inside the CREATE - that would double-create it).
-  ///  opDropSequence is a reserved building block, not a live op: its surface exists (producer API, Firebird
-  ///  BuildSQL_DropSequence, Description arm) but no PlanBuilder emits it and no strategy translates it yet -
-  ///  the dispatch else-raise (Strategy.ScriptWrite_PlanOperation) fails loudly until that pairing is
-  ///  completed. It belongs to the intentional-drop family above (drop by name, executed for real): a future
-  ///  orphan-sequence diff will add its own opDropOrphanSequence per the orphan invariant, not reuse this.
+  ///  opDropOrphanSequence belongs to the orphan family above (a physical sequence no mapped table uses:
+  ///  commented statement plus a warning, never executed). It is not wired yet: no PlanBuilder emits it and
+  ///  no strategy translates it, so the dispatch else-raise (Strategy.ScriptWrite_PlanOperation) fails loudly
+  ///  until the orphan-sequence diff lands.
+  ///  DESIGN DECISION - there is deliberately NO intentional (executed) sequence drop, i.e. no sequence
+  ///  counterpart of opDropIndex/opDropForeignKey; do not add one. An index or FK is pure structure: dropping
+  ///  and recreating it is lossless, so an executed drop-then-recreate is safe. A sequence is not: it carries
+  ///  state (its current counter value), and dropping it throws that state away - a recreated sequence
+  ///  restarts from its initial value and hands out keys that collide with the primary keys already stored in
+  ///  the table. So the only sequence-drop op is the orphan one, and it is never executed. (This op was
+  ///  formerly opDropSequence, a reserved intentional-drop building block with no producer: it was renamed in
+  ///  place rather than flanked by a new orphan op, keeping the vocabulary dense - every member has both a
+  ///  producer and a translator arm once the orphan-sequence diff lands.) Should a future need arise to
+  ///  rename or relocate a sequence, it must be a different, counter-preserving op, never a drop + create.
   /// </summary>
   TioDBBuilderPlanOpKind = (opCreateTable, opDropTable, opCreateField, opAlterField, opDropField, opCreateIndex,
     opDropIndex, opDropOrphanIndex, opCreateForeignKey, opDropForeignKey, opDropOrphanForeignKey, opCreateSequence,
-    opDropSequence, opRenameTableToOld, opCopyData);
+    opDropOrphanSequence, opRenameTableToOld, opCopyData);
 
   // irmDropAndRecreateForAllTables (safe, default), irmDropAndRecreateForModifiedTablesOnly (faster), irmIgnoreIndexes (disabled, fully manual)
   TioDBBuilderIndexRebuildMode = (irmDropAndRecreateForAllTables, irmDropAndRecreateForModifiedTablesOnly, irmIgnoreIndexes);
@@ -472,9 +481,10 @@ type
     function AddDropOrphanForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;
     // SEQUENCE
     function AddCreateSequence(const ASequenceName: String): IioDBBuilderPlanOperation;
-    // Reserved building block (see the TioDBBuilderPlanOpKind summary): no PlanBuilder emits opDropSequence
-    // and no strategy translates it yet - calling this today yields an op the dispatch else-raise rejects.
-    function AddDropSequence(const ASequenceName: String): IioDBBuilderPlanOperation;
+    // An orphan physical sequence (present in the DB, used by no mapped table): NEVER dropped for real,
+    // realized as a commented statement plus a warning (mirrors AddDropOrphanIndex). Not wired yet (see the
+    // TioDBBuilderPlanOpKind summary): calling this today yields an op the dispatch else-raise rejects.
+    function AddDropOrphanSequence(const ASequenceName: String): IioDBBuilderPlanOperation;
     // PLAN-WIDE
     procedure Clear;
     function GetCount: Integer;
@@ -861,8 +871,9 @@ type
     // ----------------------------------------------------------
     /// <summary>Generates SQL to create a sequence</summary>
     function BuildSQL_CreateSequence(const ASequenceName: String): string;
-    /// <summary>Generates SQL to drop a sequence by name. Reserved for the future opDropSequence translator
-    /// (no consumer today); Firebird implements it, other dialects raise (base default).</summary>
+    /// <summary>Generates SQL to drop a sequence by name. Reserved for the future opDropOrphanSequence translator,
+    /// as the text of its commented-out statement (no consumer today); Firebird implements it, other dialects
+    /// raise (base default).</summary>
     function BuildSQL_DropSequence(const ASequenceName: string): string;
     /// <summary>Generates SQL to check if a sequence exists</summary>
     function BuildSQL_SequenceExists(const ASequenceName: string): string;
