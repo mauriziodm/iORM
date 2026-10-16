@@ -64,7 +64,8 @@ type
   /// <summary>
   ///  Base of the catalog Introspector: owns the dialect-independent skeleton (enumerate the physical
   ///  tables, wrap the reads in a transaction, assemble the Physical schema) and delegates the actual
-  ///  catalog reads to the per-dialect ReadFields/ReadIndexes/ReadForeignKeys. Check_DatabaseExists is
+  ///  catalog reads to the per-dialect ReadFields/ReadIndexes/ReadForeignKeys (per table) and
+  ///  the generic ReadSequences (per schema, gated on Supports_Sequence). Check_DatabaseExists is
   ///  asked directly of Context.SqlGenerator (Strategy.Check_DatabaseExists is itself only a pass-through
   ///  to the same call, so depending on the whole Strategy for it would be a dead indirection). No Status
   ///  is ever stamped here (single-writer: the PlanBuilder owns Status).
@@ -72,16 +73,20 @@ type
   TioDBBuilderIntrospectorBase = class(TioDBBuilderIntrospectorSegregation, IioDBBuilderIntrospector)
   private
     function Introspect: IioDBBuilderSchema;
+    // Schema-level catalog read: populates ASchema.Sequences from the live catalog. Dialect-independent
+    // (single-column result, only the SQL varies - and that is BuildSQL_SequenceList's job), gated on
+    // Supports_Sequence; so no per-dialect override, unlike the per-table Read* below.
+    procedure ReadSequences(const ASchema: IioDBBuilderSchema);
   protected
     // Shared query execution (same raw-query mechanic the SqlGenerator uses for its Check_* probes).
     function GetRawQuery(const ASQL: String): IioQuery;
+    // Maps a catalog ON UPDATE / ON DELETE action string to TioFKAction. iORM only ever generates the
+    // four modelled actions; anything else (e.g. RESTRICT, which iORM never emits) maps to fkUnspecified.
+    function RawToFKAction(const ARawAction: String): TioFKAction;
     // Best-effort mapping of a raw catalog type string to the ORM metadata enum. NOT the comparison
     // basis under reconciliation approach (1) - the raw string (FieldTypeRaw) is; this only fills the
     // node's enum for completeness/inspection, so an approximate token match is acceptable.
     function RawTypeToMetadataFieldType(const ARawType: String): TioMetadataFieldType;
-    // Maps a catalog ON UPDATE / ON DELETE action string to TioFKAction. iORM only ever generates the
-    // four modelled actions; anything else (e.g. RESTRICT, which iORM never emits) maps to fkUnspecified.
-    function RawToFKAction(const ARawAction: String): TioFKAction;
     // Per-dialect catalog reads: populate ATable from the live catalog (ATableName is the raw name).
     procedure ReadFields(const ATable: IioDBBuilderSchemaTable; const ATableName: String); virtual; abstract;
     procedure ReadForeignKeys(const ATable: IioDBBuilderSchemaTable; const ATableName: String); virtual; abstract;
@@ -155,6 +160,8 @@ begin
       LTableNames.Free;
     end;
 
+    ReadSequences(Result);
+
     io.CommitTransaction(Context.ConnectionDefName);
   except
     io.RollbackTransaction(Context.ConnectionDefName);
@@ -210,6 +217,24 @@ begin
     Result := ioMdBinary
   else
     Result := ioMdCustomFieldType;
+end;
+
+procedure TioDBBuilderIntrospectorBase.ReadSequences(const ASchema: IioDBBuilderSchema);
+var
+  LQuery: IioQuery;
+begin
+  // No sequence model on this dialect (e.g. SQLite): nothing to read.
+  if not Context.SqlGenerator.Supports_Sequence then
+    Exit;
+  // Deliberately NOT a silent virtual no-op: a dialect declaring Supports_Sequence without providing
+  // BuildSQL_SequenceList fails loudly (RaiseNotImplemented) instead of leaving Sequences empty, which
+  // the sequence diff would misread as "every mapped sequence is missing" and re-create them all.
+  LQuery := GetRawQuery(Context.SqlGenerator.BuildSQL_SequenceList);
+  while not LQuery.Eof do
+  begin
+    ASchema.SequenceAddIfNotExists(LQuery.Fields[0].AsString.Trim);  // .Trim: Firebird right-pads CHAR identifiers
+    LQuery.Next;
+  end;
 end;
 
 end.

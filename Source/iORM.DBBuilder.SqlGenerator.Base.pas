@@ -285,6 +285,8 @@ type
     function BuildSQL_DropSequence(const ASequenceName: string): string; virtual;
     /// <summary>Generates SQL to check if a sequence exists. Default raises exception (not supported).</summary>
     function BuildSQL_SequenceExists(const ASequenceName: string): string; virtual;
+    /// <summary>Generates SQL listing every user sequence name. Default raises exception (not supported).</summary>
+    function BuildSQL_SequenceList: string; virtual;
     /// <summary>
     /// Checks if a sequence exists, running the catalog query produced by BuildSQL_SequenceExists.
     /// Generic across dialects (delegates to the virtual BuildSQL_SequenceExists, exactly as
@@ -751,6 +753,11 @@ end;
 function TioDBBuilderSqlGenBase.BuildSQL_SequenceExists(const ASequenceName: string): string;
 begin
   RaiseNotImplemented('BuildSQL_SequenceExists');
+end;
+
+function TioDBBuilderSqlGenBase.BuildSQL_SequenceList: string;
+begin
+  RaiseNotImplemented('BuildSQL_SequenceList');
 end;
 
 function TioDBBuilderSqlGenBase.Supports_Identity: Boolean;

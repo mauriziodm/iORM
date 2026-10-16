@@ -116,6 +116,7 @@ type
     function BuildSQL_CreateSequence(const ASequenceName: String): string; override;
     function BuildSQL_DropSequence(const ASequenceName: string): string; override;
     function BuildSQL_SequenceExists(const ASequenceName: string): string; override;
+    function BuildSQL_SequenceList: string; override;
 
     // ==========================================================
     // SQL IDENTIFIER / LITERAL UTILITIES (internal helpers, not part of IioDBBuilderSqlGenerator)
@@ -471,6 +472,15 @@ begin
 
   // Carlo Marona (2024-10-15): Added condition to exclude system generators
   Result := Format('select count(*) from rdb$generators where (UPPER(rdb$generator_name) = UPPER(''%s'')) and (RDB$SYSTEM_FLAG = 0)', [EscapeSQLStringLiteral(LSequenceName)]);
+end;
+
+function TioDBBuilderSqlGenFirebird.BuildSQL_SequenceList: string;
+begin
+  // All user sequences: RDB$SYSTEM_FLAG = 0 excludes the system generators AND (Firebird 3+) the ones
+  // backing IDENTITY columns (flagged 6), which are owned by their column, not by iORM's sequence model -
+  // same filter as BuildSQL_SequenceExists. The Introspector must .Trim the returned name (Firebird
+  // right-pads CHAR identifier columns).
+  Result := 'select RDB$GENERATOR_NAME from RDB$GENERATORS where (RDB$SYSTEM_FLAG = 0)';
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_TableList: string;

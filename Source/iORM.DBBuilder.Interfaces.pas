@@ -866,6 +866,9 @@ type
     function BuildSQL_DropSequence(const ASequenceName: string): string;
     /// <summary>Generates SQL to check if a sequence exists</summary>
     function BuildSQL_SequenceExists(const ASequenceName: string): string;
+    /// <summary>Generates SQL listing the names of every user (non-system) sequence, one per row in the
+    /// first column; the catalog read the Introspector uses to populate the Physical schema's Sequences.</summary>
+    function BuildSQL_SequenceList: string;
     /// <summary>Checks if a sequence exists</summary>
     function Check_SequenceExists(const ASequenceName: string): Boolean;
     // ==========================================================
