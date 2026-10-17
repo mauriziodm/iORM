@@ -36,7 +36,7 @@ unit iORM.DBBuilder.Schema.Builder;
 interface
 
 uses
-  iORM.DBBuilder.Interfaces, iORM.Context.Map.Interfaces;
+  iORM.DBBuilder.Interfaces, iORM.Context.Map.Interfaces, iORM.CommonTypes;
 
 type
 
@@ -47,10 +47,12 @@ type
     FIndexesMode: TioDBBuilderMode;
     FSchema: IioDBBuilderSchema;
     FSqlGenerator: IioDBBuilderSqlGenerator;
+
     procedure BuildSchema;
     procedure BuildSchemaFK(const AMap: IioMap);
     procedure BuildSchemaIndexes(const ASchemaTable: IioDBBuilderSchemaTable; const AMap: IioMap);
     procedure BuildSchemaTable(const AMap: IioMap);
+    function FindOrCreateSchemaTable(const AMap: IioMap; const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
     function IsSchemaEligible(const AMap: IioMap): Boolean;
   protected
   public
@@ -62,7 +64,7 @@ implementation
 
 uses
   iORM.Context.Container, iORM.Context.Properties.Interfaces, iORM.Attributes, iORM.DBBuilder.Factory,
-  iORM.Resolver.Factory, iORM.Resolver.Interfaces, iORM.Exceptions, System.SysUtils, iORM.CommonTypes;
+  iORM.Resolver.Factory, iORM.Resolver.Interfaces, iORM.Exceptions, System.SysUtils;
 
 { TioDBBuilderSchemaBuilder }
 
@@ -165,10 +167,10 @@ begin
     Exit;
   // Resolve the key generation strategy: if the map declares kgsAuto, the SqlGenerator translates it
   // into the concrete DBMS-specific strategy (e.g. Autoincrement for SQLite, Identity/Sequence for
-  // Firebird 3+, etc.). The resolved strategy is then handed to the (data-only) schema.
+  // Firebird 3+, etc.). The resolved strategy is then handed to FindOrCreateSchemaTable, which stores it on a new node.
   LKeyGenStrategy := FSqlGenerator.Resolve_KeyGenerationStrategy(AMap.GetTable.GetKeyGenerationStrategy);
   // Build or get the SchemaTable
-  LSchemaTable := FSchema.FindOrCreateTable(AMap, LKeyGenStrategy);
+  LSchemaTable := FindOrCreateSchemaTable(AMap, LKeyGenStrategy);
   // Add fields
   for LProperty in AMap.GetProperties do
     if not (LProperty.IsTransient or (LProperty.GetRelationType in [rtHasMany, rtHasOne])) then
@@ -180,7 +182,30 @@ begin
   BuildSchemaIndexes(LSchemaTable, AMap);
   // Add sequence only if the table uses Sequence for key generation
   if LSchemaTable.UsesSequenceForKeyGeneration then
-    FSchema.SequenceAddIfNotExists(TioDBBuilderFactory.NewSchemaSequence(FConnectionDefName, LSchemaTable.GetSequenceName));
+    FSchema.AddSequenceIfNotExists(TioDBBuilderFactory.NewSchemaSequence(FConnectionDefName, LSchemaTable.GetSequenceName));
+end;
+
+// "Find or create" (lazy registry) on the schema's tables, called once per mapped class: each class
+// contributes its fields, indexes and foreign keys to the corresponding SchemaTable. When several classes
+// share one physical table (e.g. single-table inheritance / TrueClass), the first call creates the node and
+// the next ones retrieve and enrich it. Lives here, not on the schema: it is ORM-aware construction (map,
+// Factory, IsTrueClass), while the schema stays a pure data structure (FindTable + AddTable).
+function TioDBBuilderSchemaBuilder.FindOrCreateSchemaTable(const AMap: IioMap;
+  const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
+begin
+  Result := FSchema.FindTable(AMap.GetTable.TableName, False);
+  if Result = nil then
+  begin
+    // AKeyGenerationStrategy is already resolved (BuildSchemaTable): if the map declared kgsAuto it has
+    // been translated into the concrete DBMS-specific strategy (e.g. Autoincrement for SQLite,
+    // Identity/Sequence for Firebird 3+, etc.).
+    Result := TioDBBuilderFactory.NewSchemaTable_Mapped(AMap.GetTable, AKeyGenerationStrategy);
+    FSchema.AddTable(Result);
+  end;
+  // In single-table inheritance several classes share the table, but only the "true" class (the one owning
+  // the discriminator field) has IsTrueClass = True. The setter is OR-like (once True it never goes back to
+  // False), so the flag stays True if at least one of the mapped classes is the TrueClass.
+  Result.IsTrueClass := AMap.GetTable.IsTrueClass;
 end;
 
 constructor TioDBBuilderSchemaBuilder.Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema;

@@ -36,22 +36,27 @@ unit iORM.DBBuilder.Schema;
 interface
 
 uses
-  iORM.DBBuilder.Interfaces, iORM.DBBuilder.Schema.Base, System.Classes, iORM.Context.Map.Interfaces, iORM.CommonTypes;
+  iORM.DBBuilder.Interfaces, iORM.DBBuilder.Schema.Base;
 
 type
 
+  /// <summary>
+  ///  The root of a schema branch (Mapped or Physical): a pure data structure that owns its tables and
+  ///  sequences and the invariants on them (no duplicates, the case policy documented on FindTable). It
+  ///  never builds a node itself - the Mapped nodes are built by the SchemaBuilder (ORM-aware), the
+  ///  Physical ones by the Introspector (catalog-aware) - so it depends on neither the ORM nor the DB.
+  /// </summary>
   TioDBBuilderSchema = class(TioDBBuilderSchemaBaseObject, IioDBBuilderSchema)
   private
     FSequences: TioDBBuilderSchemaSequences;
     FTables: TioDBBuilderSchemaTables;
 
+    procedure AddSequenceIfNotExists(const ASequence: IioDBBuilderSchemaSequence);
     procedure AddTable(const ATable: IioDBBuilderSchemaTable);
-    function FindOrCreateTable(const AMap: IioMap; const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
     function FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
     procedure ForceCreateStatus;
     function GetSequences: TioDBBuilderSchemaSequences;
     function GetTables: TioDBBuilderSchemaTables;
-    procedure SequenceAddIfNotExists(const ASequence: IioDBBuilderSchemaSequence);
   protected
   public
     constructor Create;
@@ -61,13 +66,21 @@ type
 implementation
 
 uses
-  iORM.Exceptions, System.SysUtils, iORM.DBBuilder.Factory;
+  iORM.Exceptions, System.SysUtils;
 
 { TioDBBuilderSchema }
 
-// Inserts an already-built table node into the schema, keyed by its Name (used by the Introspector to
-// populate the Physical branch). Unlike FindOrCreateTable it does not consult the ORM: the node is taken
-// as-is. Raises if a table with the same name is already present (the catalog never lists duplicates).
+// Keyed by the node's already-case-normalized Name, case-sensitive like FTables (see FindTable): two
+// tables sharing one sequence offer nodes with the same Name, the second is discarded.
+procedure TioDBBuilderSchema.AddSequenceIfNotExists(const ASequence: IioDBBuilderSchemaSequence);
+begin
+  if not FSequences.ContainsKey(ASequence.Name) then
+    FSequences.Add(ASequence.Name, ASequence);
+end;
+
+// Inserts an already-built table node into the schema, keyed by its Name, taken as-is. Raises if a table
+// with the same name is already present: the catalog never lists duplicates, and the SchemaBuilder only
+// adds after its own FindTable miss.
 procedure TioDBBuilderSchema.AddTable(const ATable: IioDBBuilderSchemaTable);
 begin
   if FTables.ContainsKey(ATable.Name) then
@@ -87,32 +100,6 @@ begin
   FTables.Free;
   FSequences.Free;
   inherited;
-end;
-
-// This method implements a "find or create" (lazy registry) pattern on the FTables dictionary.
-// It is called once per mapped class during schema building: each class contributes its fields,
-// indexes and foreign keys to the corresponding SchemaTable object.
-// When multiple classes share the same physical table (e.g. single-table inheritance / TrueClass),
-// the first call creates the SchemaTable entry; subsequent calls for other classes mapped to the
-// same table simply retrieve the existing entry and enrich it.
-function TioDBBuilderSchema.FindOrCreateTable(const AMap: IioMap; const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
-var
-  LTableName: String;
-begin
-  LTableName := AMap.GetTable.TableName;
-  if not FTables.ContainsKey(LTableName) then
-    // The table does not exist yet in the schema: create it. The key generation strategy has
-    // already been resolved by the SchemaBuilder (which owns the SqlGenerator): if the map declared
-    // kgsAuto it has been translated into the concrete DBMS-specific strategy (e.g. Autoincrement for
-    // SQLite, Identity/Sequence for Firebird 3+, etc.).
-    FTables.Add(LTableName, TioDBBuilderFactory.NewSchemaTable_Mapped(AMap.GetTable, AKeyGenerationStrategy));
-  Result := FTables.Items[LTableName];
-  // Update the IsTrueClass flag on the SchemaTable.
-  // In single-table inheritance multiple classes share the same table, but only the
-  // "true" class (the one that owns the discriminator field) has IsTrueClass = True.
-  // The setter uses an OR-like logic: once set to True it never goes back to False,
-  // so if at least one of the mapped classes is the TrueClass the flag stays True.
-  Result.IsTrueClass := AMap.GetTable.IsTrueClass;
 end;
 
 // Exact-match O(1) registry lookup: the dictionary is keyed by the table's already-case-normalized Name,
@@ -151,14 +138,6 @@ begin
     LSequence.Status := stCreate;
   for LTable in FTables.Values do
     LTable.ForceCreateStatus;
-end;
-
-// Keyed by the node's already-case-normalized Name, case-sensitive like FTables (see FindTable): two
-// tables sharing one sequence offer nodes with the same Name, the second is discarded.
-procedure TioDBBuilderSchema.SequenceAddIfNotExists(const ASequence: IioDBBuilderSchemaSequence);
-begin
-  if not FSequences.ContainsKey(ASequence.Name) then
-    FSequences.Add(ASequence.Name, ASequence);
 end;
 
 function TioDBBuilderSchema.GetSequences: TioDBBuilderSchemaSequences;

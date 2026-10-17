@@ -404,12 +404,19 @@ type
   IioDBBuilderSchema = interface
     ['{1AEDB134-1ECB-490E-A53A-973BEDE509E5}']
     /// <summary>
-    ///  Inserts an already-built table node into the schema, keyed by its Name. Used by the Introspector
-    ///  to populate the Physical branch with catalog-backed table nodes (the Mapped branch is built the
-    ///  ORM-driven way via FindOrCreateTable instead).
+    ///  Adds ASequence unless a sequence with the same Name is already present (then ASequence is simply
+    ///  discarded). The "if not exists" is load-bearing on the Mapped branch: several tables may share one
+    ///  sequence ([ioKeySequence]), and each of them offers it.
+    /// </summary>
+    procedure AddSequenceIfNotExists(const ASequence: IioDBBuilderSchemaSequence);
+    /// <summary>
+    ///  Inserts an already-built table node into the schema, keyed by its Name; raises if a table with the
+    ///  same Name is already present. Used by both branches: the Introspector adds catalog-backed nodes
+    ///  (Physical), the SchemaBuilder adds ORM-backed nodes after its own FindTable miss (Mapped). The schema
+    ///  itself never builds a node: it is a pure data structure, the ORM-aware construction lives in the
+    ///  SchemaBuilder.
     /// </summary>
     procedure AddTable(const ATable: IioDBBuilderSchemaTable);
-    function FindOrCreateTable(const AMap: IioMap; const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
     function FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
     /// <summary>
     ///  Forces the whole schema tree (schema, sequences, tables, fields, indexes and foreign keys) to
@@ -422,12 +429,6 @@ type
     function GetSequences: TioDBBuilderSchemaSequences;
     function GetStatus: TioDBBuilderStatus;
     function GetTables: TioDBBuilderSchemaTables;
-    /// <summary>
-    ///  Adds ASequence unless a sequence with the same Name is already present (then ASequence is simply
-    ///  discarded). The "if not exists" is load-bearing on the Mapped branch: several tables may share one
-    ///  sequence ([ioKeySequence]), and each of them offers it.
-    /// </summary>
-    procedure SequenceAddIfNotExists(const ASequence: IioDBBuilderSchemaSequence);
     procedure SetStatus(const Value: TioDBBuilderStatus);
 
     property Sequences: TioDBBuilderSchemaSequences read GetSequences;

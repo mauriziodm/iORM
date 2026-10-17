@@ -233,7 +233,7 @@ begin
   while not LQuery.Eof do
   begin
     // .Trim: Firebird right-pads CHAR identifiers.
-    ASchema.SequenceAddIfNotExists(TioDBBuilderFactory.NewSchemaSequence(Context.ConnectionDefName, LQuery.Fields[0].AsString.Trim));
+    ASchema.AddSequenceIfNotExists(TioDBBuilderFactory.NewSchemaSequence(Context.ConnectionDefName, LQuery.Fields[0].AsString.Trim));
     LQuery.Next;
   end;
 end;
