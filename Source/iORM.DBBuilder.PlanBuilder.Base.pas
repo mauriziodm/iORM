@@ -106,7 +106,8 @@ type
     ///  indexes, or foreign keys has a pending change (HasFieldChanges/HasIndexChanges/
     ///  HasForeignKeyChanges), then escalates AMappedSchema itself if the table ends up with a pending
     ///  change; it does the same for every mapped sequence (a sequence belongs to the schema, not to a
-    ///  table, so a missing one must flag the schema on its own). Not needed mid-BuildPlan: every strict-mode read of a table's Status (Plan_StrictDrop*,
+    ///  table, so a missing one must flag the schema on its own). Not needed mid-BuildPlan: every
+    ///  strict-mode read of a table's Status (Plan_StrictDrop*,
     ///  the recreate-all branches in Plan_Indexes/Plan_ForeignKeys, the AStrict skip in
     ///  Plan_OrphanIndexes/Plan_OrphanForeignKeys) is already satisfied by the strict pre-pass's
     ///  Check_TableModified, which compares the same fields/indexes/FKs directly - so a table/field/
