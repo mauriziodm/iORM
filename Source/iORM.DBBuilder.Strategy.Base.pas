@@ -309,12 +309,11 @@ begin
   Result := (LPhysicalTable <> nil) and (LPhysicalTable.ForeignKeys.Count > 0);
 end;
 
-// Plan-op translator (opCreateSequence): create a sequence by name. On a create-from-scratch (schema
-// stCreate) the sequence cannot pre-exist AND the DB may not exist yet (skip the catalog query); on the
-// incremental path guard against an already-present sequence. The check itself lives on the SqlGenerator
-// (Check_SequenceExists, sibling of Check_DatabaseExists): the Strategy translates, it does not run
-// catalog queries (same pass-through-removal rationale as the Introspector asking Context.SqlGenerator
-// directly - see iORM.DBBuilder.Introspector.Base).
+// Plan-op translator (opCreateSequence): create the sequence, unconditionally. Whether it is missing was
+// already decided by PlanBuilder.Base.Plan_Sequences against the introspected Physical schema, exactly as
+// for every other op - the Strategy translates, it does not re-check the catalog. (It used to: a
+// translation-time Check_SequenceExists guard, the last diff-by-probe residue, removed once the sequence
+// diff moved into the PlanBuilder.)
 procedure TioDBBuilderStrategyBase.ScriptWrite_CreateSequence(const ASequence: IioDBBuilderSchemaSequence);
 begin
   // AddLine, not AddToCurrentLine: the statement must own its line. AddToCurrentLine appends to the
@@ -322,8 +321,7 @@ begin
   // TioScript.LoadScriptAndCleanFromComments drops '--' lines whole - the statement would be silently
   // stripped. The multi-statement ops already self-guard by opening with AddEmpty/AddTitle; the
   // single-shot ops follow the same discipline here.
-  if (Context.Reconciliation.MappedSchema.Status = stCreate) or not Context.SqlGenerator.Check_SequenceExists(ASequence.Name) then
-    Context.Script.Body.AddLine(Context.SqlGenerator.BuildSQL_CreateSequence(ASequence));
+  Context.Script.Body.AddLine(Context.SqlGenerator.BuildSQL_CreateSequence(ASequence));
 end;
 
 function TioDBBuilderStrategyBase.Check_DatabaseExists: Boolean;

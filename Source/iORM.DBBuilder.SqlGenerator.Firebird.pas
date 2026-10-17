@@ -115,7 +115,6 @@ type
     // ----------------------------------------------------------
     function BuildSQL_CreateSequence(const ASequence: IioDBBuilderSchemaSequence): string; override;
     function BuildSQL_DropSequence(const ASequence: IioDBBuilderSchemaSequence): string; override;
-    function BuildSQL_SequenceExists(const ASequenceName: string): string; override;
     function BuildSQL_SequenceList: string; override;
 
     // ==========================================================
@@ -462,24 +461,13 @@ begin
   Result := LSqlText.Text;
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildSQL_SequenceExists(const ASequenceName: string): string;
-var
-  LSequenceName: string;
-begin
-  // Upper-cased, never shortened: the runtime asks for the sequence by its original name (see
-  // TioDBBuilderSchemaSequence) - an over-long name is rejected by the DB, like an over-long table name.
-  LSequenceName := ASequenceName.ToUpper;
-
-  // Carlo Marona (2024-10-15): Added condition to exclude system generators
-  Result := Format('select count(*) from rdb$generators where (UPPER(rdb$generator_name) = UPPER(''%s'')) and (RDB$SYSTEM_FLAG = 0)', [EscapeSQLStringLiteral(LSequenceName)]);
-end;
-
 function TioDBBuilderSqlGenFirebird.BuildSQL_SequenceList: string;
 begin
   // All user sequences: RDB$SYSTEM_FLAG = 0 excludes the system generators AND (Firebird 3+) the ones
-  // backing IDENTITY columns (flagged 6), which are owned by their column, not by iORM's sequence model -
-  // same filter as BuildSQL_SequenceExists. The Introspector must .Trim the returned name (Firebird
-  // right-pads CHAR identifier columns).
+  // backing IDENTITY columns (flagged 6), which are owned by their column, not by iORM's sequence model.
+  // Same filter the former BuildSQL_SequenceExists used (Carlo Marona, 2024-10-15: "Added condition to
+  // exclude system generators"), removed together with the translation-time Check_SequenceExists guard.
+  // The Introspector must .Trim the returned name (Firebird right-pads CHAR identifier columns).
   Result := 'select RDB$GENERATOR_NAME from RDB$GENERATORS where (RDB$SYSTEM_FLAG = 0)';
 end;
 
