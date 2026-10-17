@@ -127,6 +127,9 @@ begin
     Plan_OrphanForeignKeys(LPlan, LMappedSchema, LPhysicalSchema, LStrictForeignKeys);
   end;
   Plan_OrphanTablesAndFields(LPlan, LMappedSchema, LPhysicalSchema);
+  // Last: never executed (commented DROP + warning) and it touches no table data, so it ranks lowest in the
+  // "most severe first" orphan report.
+  Plan_OrphanSequences(LPlan, LMappedSchema, LPhysicalSchema);
 
   Escalate_PendingStatuses(LMappedSchema);
 

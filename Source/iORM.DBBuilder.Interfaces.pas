@@ -73,9 +73,10 @@ type
   ///  Plan, once per mapped sequence missing from the DB - for new and existing tables alike, and once per
   ///  sequence even when several tables share it (the CREATE TABLE never creates it inline).
   ///  opDropOrphanSequence belongs to the orphan family above (a physical sequence no mapped table uses:
-  ///  commented statement plus a warning, never executed). It is not wired yet: no PlanBuilder emits it and
-  ///  no strategy translates it, so the dispatch else-raise (Strategy.ScriptWrite_PlanOperation) fails loudly
-  ///  until the orphan-sequence diff lands.
+  ///  commented statement plus a warning, never executed). It is emitted by PlanBuilder.Base.
+  ///  Plan_OrphanSequences, after every other orphan op, and translated by Strategy.Base.
+  ///  ScriptWrite_DropOrphanSequence. "Orphan" includes a sequence used outside iORM (hand-written triggers,
+  ///  another application on the same DB), which the warning says explicitly.
   ///  DESIGN DECISION - there is deliberately NO intentional (executed) sequence drop, i.e. no sequence
   ///  counterpart of opDropIndex/opDropForeignKey; do not add one. An index or FK is pure structure: dropping
   ///  and recreating it is lossless, so an executed drop-then-recreate is safe. A sequence is not: it carries
@@ -84,7 +85,7 @@ type
   ///  the table. So the only sequence-drop op is the orphan one, and it is never executed. (This op was
   ///  formerly opDropSequence, a reserved intentional-drop building block with no producer: it was renamed in
   ///  place rather than flanked by a new orphan op, keeping the vocabulary dense - every member has both a
-  ///  producer and a translator arm once the orphan-sequence diff lands.) Should a future need arise to
+  ///  producer and a translator arm.) Should a future need arise to
   ///  rename or relocate a sequence, it must be a different, counter-preserving op, never a drop + create.
   /// </summary>
   TioDBBuilderPlanOpKind = (opCreateTable, opDropTable, opCreateField, opAlterField, opDropField, opCreateIndex,
@@ -512,9 +513,9 @@ type
     // A mapped sequence missing from the DB (ASequence is a Mapped node). Emitted only by Plan_Sequences,
     // for new and existing tables alike.
     function AddCreateSequence(const ASequence: IioDBBuilderSchemaSequence): IioDBBuilderPlanOperation;
-    // An orphan physical sequence (present in the DB, used by no mapped table): NEVER dropped for real,
-    // realized as a commented statement plus a warning (mirrors AddDropOrphanIndex). Not wired yet (see the
-    // TioDBBuilderPlanOpKind summary): calling this today yields an op the dispatch else-raise rejects.
+    // An orphan physical sequence (present in the DB, used by no mapped table; ASequence is a Physical node):
+    // NEVER dropped for real, realized as a commented statement plus a warning (mirrors AddDropOrphanIndex).
+    // Emitted only by Plan_OrphanSequences.
     function AddDropOrphanSequence(const ASequence: IioDBBuilderSchemaSequence): IioDBBuilderPlanOperation;
     // PLAN-WIDE
     procedure Clear;
@@ -903,9 +904,9 @@ type
     /// <summary>Generates SQL to create a sequence (uses ASequence.SqlName, like the table DDL uses the
     /// table's SqlName)</summary>
     function BuildSQL_CreateSequence(const ASequence: IioDBBuilderSchemaSequence): string;
-    /// <summary>Generates SQL to drop a sequence. Reserved for the future opDropOrphanSequence translator,
-    /// as the text of its commented-out statement (no consumer today); Firebird implements it, other dialects
-    /// raise (base default).</summary>
+    /// <summary>Generates SQL to drop a sequence. Its only consumer is the opDropOrphanSequence translator,
+    /// which writes it as a commented-out statement (iORM never drops a sequence for real); Firebird
+    /// implements it, other dialects raise (base default).</summary>
     function BuildSQL_DropSequence(const ASequence: IioDBBuilderSchemaSequence): string;
     /// <summary>Generates SQL to check if a sequence exists</summary>
     function BuildSQL_SequenceExists(const ASequenceName: string): string;

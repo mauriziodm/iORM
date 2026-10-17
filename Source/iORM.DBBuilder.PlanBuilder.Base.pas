@@ -151,6 +151,11 @@ type
     // (see the call sites' comments).
     procedure Plan_OrphanForeignKeys(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
     procedure Plan_OrphanIndexes(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
+    // Orphan sequences: Physical.Sequences minus Mapped.Sequences (the mirror of Plan_Sequences), marked
+    // stDrop and emitted as opDropOrphanSequence - a commented DROP plus a warning, never executed. No
+    // AStrict and no mode: sequences are never dropped for real, in strict mode or otherwise (see the
+    // TioDBBuilderPlanOpKind summary), and there is no SequencesMode axis. Gated on Supports_Sequence.
+    procedure Plan_OrphanSequences(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
     procedure Plan_OrphanTablesAndFields(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
     // The single creation point for sequences, shared by both build shapes and called first in BuildPlan:
     // emits opCreateSequence for every mapped sequence missing from the DB (Mapped.Sequences minus
@@ -443,6 +448,24 @@ begin
         APlan.AddDropOrphanIndex(LMappedTable, LPhysicalIndex);
       end;
   end;
+end;
+
+procedure TioDBBuilderPlanBuilderBase.Plan_OrphanSequences(const APlan: IioDBBuilderPlan;
+  const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
+var
+  LPhysicalSequence: IioDBBuilderSchemaSequence;
+begin
+  if (not Context.SqlGenerator.Supports_Sequence) or (APhysicalSchema = nil) then
+    Exit;
+  // Same set difference as Plan_Sequences, the other way round. "Orphan" here means any user sequence
+  // iORM does not map - including one used by hand-written triggers or by another application on the same
+  // DB - which is exactly why the Strategy only ever comments the DROP out and warns.
+  for LPhysicalSequence in APhysicalSchema.Sequences.Values do
+    if not AMappedSchema.Sequences.ContainsKey(LPhysicalSequence.Name) then
+    begin
+      LPhysicalSequence.Status := stDrop;
+      APlan.AddDropOrphanSequence(LPhysicalSequence);
+    end;
 end;
 
 procedure TioDBBuilderPlanBuilderBase.Plan_Sequences(const APlan: IioDBBuilderPlan;

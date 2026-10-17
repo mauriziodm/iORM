@@ -189,6 +189,10 @@ begin
   if Context.Reconciliation.ForeignKeysMode >= ifmEnabled then
     Plan_OrphanForeignKeys(LPlan, LMappedSchema, LPhysicalSchema, True);
 
+  // 3e. Orphan sequences (shared PlanBuilder.Base.Plan_OrphanSequences): a no-op on today's
+  //     WithoutAlterTable dialects (no sequences), kept for the same reason as step 2- (Plan_Sequences).
+  Plan_OrphanSequences(LPlan, LMappedSchema, LPhysicalSchema);
+
   Escalate_PendingStatuses(LMappedSchema);
 
   Result := LPlan;

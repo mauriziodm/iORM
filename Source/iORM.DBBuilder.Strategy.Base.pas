@@ -203,6 +203,7 @@ type
     // SEQUENCE RELATED METHODS
     // ----------------------------------------------------------
     procedure ScriptWrite_CreateSequence(const ASequence: IioDBBuilderSchemaSequence); virtual;
+    procedure ScriptWrite_DropOrphanSequence(const ASequence: IioDBBuilderSchemaSequence); virtual;
 
     // ==========================================================
     // FOREIGN KEY RELATED METHODS
@@ -494,6 +495,23 @@ begin
     'statement was generated as a comment (NOT executed). Review and run it manually if you want to remove it.', [AIndex.Name, ATable.Name]));
 end;
 
+// Plan-op translator (opDropOrphanSequence): an orphan sequence (in the DB, used by no mapped table) is NEVER
+// dropped automatically - the DROP is emitted as a comment (not executed) plus a warning (mirrors
+// ScriptWrite_DropOrphanIndex). For a sequence this is more than the conservative orphan policy: it may still
+// be used outside iORM (hand-written triggers, stored procedures, another application on the same DB), and a
+// drop throws its counter away for good - see the TioDBBuilderPlanOpKind summary for why iORM never drops a
+// sequence for real. ASequence is always a Physical node here, so its Name is the real catalog name.
+procedure TioDBBuilderStrategyBase.ScriptWrite_DropOrphanSequence(const ASequence: IioDBBuilderSchemaSequence);
+begin
+  Context.Script.Body.AddEmpty;
+  Context.Script.Body.AddComment(Format('Orphan sequence ''%s'' (exists in the DB, not used by any mapped entity) - drop it manually ' +
+    'only if nothing else uses it:', [ASequence.Name]));
+  Context.Script.Body.AddComment(Context.SqlGenerator.BuildSQL_DropSequence(ASequence));
+  Context.Script.Warnings.AddLine(Format('Sequence ''%s'' exists in the database but is not used by any mapped entity: a DROP SEQUENCE ' +
+    'statement was generated as a comment (NOT executed). It may still be used outside iORM (triggers, stored procedures, other ' +
+    'applications) and dropping it loses its current value: run it manually only if you are sure it is unused.', [ASequence.Name]));
+end;
+
 procedure TioDBBuilderStrategyBase.GenerateScript;
 begin
   // Status-driven: does NOT touch Context.Reconciliation.MappedSchema.Status, trusts it as given by the caller (Engine),
@@ -538,13 +556,15 @@ begin
     opDropIndex:            ScriptWrite_DropIndex(AOp.SchemaTable, AOp.SchemaIndex);
     opDropOrphanIndex:      ScriptWrite_DropOrphanIndex(AOp.SchemaTable, AOp.SchemaIndex);
     opDropOrphanForeignKey: ScriptWrite_DropOrphanForeignKey(AOp.SchemaTable, AOp.SchemaForeignKey);
+    opDropOrphanSequence:   ScriptWrite_DropOrphanSequence(AOp.SchemaSequence);
     opDropTable:            ScriptWrite_DropTable(AOp.SchemaTable);
   else
     // Loud guard, not a fallback: an op with no arm here or in a shape override means a PlanBuilder emitted
     // an op the translation layer cannot realize - a producer/translator pairing bug that must fail now, not
-    // ship as a script that silently omits a statement its own Plan section advertises. opDropOrphanSequence
-    // is today the only untranslatable member: not wired yet, no producer either (see the
-    // TioDBBuilderPlanOpKind summary and IioDBBuilderPlan.AddDropOrphanSequence).
+    // ship as a script that silently omits a statement its own Plan section advertises. Today every member
+    // has both a producer and an arm in the strategy that consumes its shape's Plan, so this is pure
+    // future-proofing: its last permanent exception (the reserved opDropSequence, now opDropOrphanSequence)
+    // is wired (see the TioDBBuilderPlanOpKind summary).
     raise EioDBBuilderException.Create(ClassName, 'ScriptWrite_PlanOperation',
       Format('Plan op %s has no translator arm in this strategy: every Plan op must be realizable by the ' +
         'strategy that consumes the Plan - add its ScriptWrite_ arm (base or shape) before any PlanBuilder ' +
