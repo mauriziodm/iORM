@@ -44,13 +44,14 @@ type
   private
     FSequences: TioDBBuilderSchemaSequences;
     FTables: TioDBBuilderSchemaTables;
+
     procedure AddTable(const ATable: IioDBBuilderSchemaTable);
     function FindOrCreateTable(const AMap: IioMap; const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
     function FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
     procedure ForceCreateStatus;
     function GetSequences: TioDBBuilderSchemaSequences;
     function GetTables: TioDBBuilderSchemaTables;
-    procedure SequenceAddIfNotExists(const ASequenceName: String);
+    procedure SequenceAddIfNotExists(const ASequence: IioDBBuilderSchemaSequence);
   protected
   public
     constructor Create;
@@ -139,21 +140,25 @@ end;
 // stCreate so GenerateScript emits a coherent full "create from scratch" script regardless of the
 // actual database state. For documentation/baseline only. Delegates the per-table cascade (fields,
 // indexes, FKs) to each SchemaTable instead of reaching into its internal composition from here.
+// Sequences are leaf nodes owned by the schema itself, so they are stamped directly.
 procedure TioDBBuilderSchema.ForceCreateStatus;
 var
+  LSequence: IioDBBuilderSchemaSequence;
   LTable: IioDBBuilderSchemaTable;
 begin
   Status := stCreate;
+  for LSequence in FSequences.Values do
+    LSequence.Status := stCreate;
   for LTable in FTables.Values do
     LTable.ForceCreateStatus;
 end;
 
-procedure TioDBBuilderSchema.SequenceAddIfNotExists(const ASequenceName: String);
+// Keyed by the node's already-case-normalized Name, case-sensitive like FTables (see FindTable): two
+// tables sharing one sequence offer nodes with the same Name, the second is discarded.
+procedure TioDBBuilderSchema.SequenceAddIfNotExists(const ASequence: IioDBBuilderSchemaSequence);
 begin
-  if ASequenceName.Trim.IsEmpty then
-    raise EioDBBuilderException.Create(ClassName, 'SequenceAddIfNotExists', Format('Invalid sequence name "%s"', [ASequenceName]));
-  if FSequences.IndexOf(ASequenceName) = -1 then
-    FSequences.Add(ASequenceName);
+  if not FSequences.ContainsKey(ASequence.Name) then
+    FSequences.Add(ASequence.Name, ASequence);
 end;
 
 function TioDBBuilderSchema.GetSequences: TioDBBuilderSchemaSequences;

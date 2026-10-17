@@ -76,6 +76,8 @@ type
       AReferenceTableName, AReferenceFieldName: String; const AOnDeleteAction, AOnUpdateAction: TioFKAction): IioDBBuilderSchemaFK;
     class function NewSchemaIndex(const AIndex: ioIndex; const AConnectionDefName: String): IioDBBuilderSchemaIndex;
     class function NewSchemaRDBMSInfo(const AName, ARaw, AVersion: String; const AMajorVersion, AMinorVersion: Integer): IioDBBuilderSchemaRDBMSInfo;
+    // Single constructor, no _Mapped/_Physical variants: both branches carry the same data (just a name).
+    class function NewSchemaSequence(const AConnectionDefName, AName: String): IioDBBuilderSchemaSequence;
     class function NewSchemaTable_Mapped(const AContextTable: IioTable;
       const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
     class function NewSchemaTable_Physical(const AConnectionDefName, AName: String): IioDBBuilderSchemaTable;
@@ -93,6 +95,7 @@ uses
   iORM.DBBuilder.SqlGenerator.SqLite, iORM.DBBuilder.Strategy.SqLite, iORM.DBBuilder.Strategy.Firebird,
   iORM.Exceptions, iORM.DBBuilder, iORM.DBBuilder.Context, iORM.DBBuilder.Script,
   iORM.DBBuilder.Schema.Index,
+  iORM.DBBuilder.Schema.Sequence,
   iORM.DBBuilder.SqlGenerator.MSSqlServer,
   iORM.DBBuilder.Strategy.MSSqlServer,
   iORM.DBBuilder.Schema.RDBMSInfo,
@@ -228,6 +231,11 @@ class function TioDBBuilderFactory.NewSchemaRDBMSInfo(const AName, ARaw, AVersio
   const AMajorVersion, AMinorVersion: Integer): IioDBBuilderSchemaRDBMSInfo;
 begin
   Result := TioDBBuilderSchemaRDBMSInfo.Create(AName, ARaw, AVersion, AMajorVersion, AMinorVersion);
+end;
+
+class function TioDBBuilderFactory.NewSchemaSequence(const AConnectionDefName, AName: String): IioDBBuilderSchemaSequence;
+begin
+  Result := TioDBBuilderSchemaSequence.Create(AConnectionDefName, AName);
 end;
 
 class function TioDBBuilderFactory.NewSchemaTable_Mapped(const AContextTable: IioTable;

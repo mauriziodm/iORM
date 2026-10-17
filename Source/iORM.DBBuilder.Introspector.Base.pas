@@ -232,7 +232,8 @@ begin
   LQuery := GetRawQuery(Context.SqlGenerator.BuildSQL_SequenceList);
   while not LQuery.Eof do
   begin
-    ASchema.SequenceAddIfNotExists(LQuery.Fields[0].AsString.Trim);  // .Trim: Firebird right-pads CHAR identifiers
+    // .Trim: Firebird right-pads CHAR identifiers.
+    ASchema.SequenceAddIfNotExists(TioDBBuilderFactory.NewSchemaSequence(Context.ConnectionDefName, LQuery.Fields[0].AsString.Trim));
     LQuery.Next;
   end;
 end;

@@ -299,10 +299,6 @@ type
     // SQL IDENTIFIER / LITERAL UTILITIES (internal helpers, not part of IioDBBuilderSqlGenerator)
     // ----------------------------------------------------------
     /// <summary>
-    /// Returns the identifier shortened if it exceeds MaxSqlIdentifierLength, unchanged otherwise.
-    /// </summary>
-    function EnsureIdentifierLength(const AIdentifierName: string): string;
-    /// <summary>
     /// Escapes single quotes in SQL string literals by doubling them (standard SQL escaping).
     /// Used when embedding string values in SQL queries (e.g., WHERE name = 'value').
     /// NOT for SQL identifiers (table/column names) - those use database-specific delimiters.
@@ -587,14 +583,6 @@ function TioDBBuilderSqlGenBase.IsSqlIdentifierTooLong(const AIdentifierName: st
 begin
   // If MaxSqlIdentifierLength is 0 there's no limit to the identifier length
   Result := (MaxSqlIdentifierLength > 0) and (Length(AIdentifierName) > MaxSqlIdentifierLength);
-end;
-
-function TioDBBuilderSqlGenBase.EnsureIdentifierLength(const AIdentifierName: string): string;
-begin
-  if IsSqlIdentifierTooLong(AIdentifierName) then
-    Result := ShortenIdentifierName(AIdentifierName, MaxSqlIdentifierLength)
-  else
-    Result := AIdentifierName;
 end;
 
 function TioDBBuilderSqlGenBase.EscapeSQLStringLiteral(const AStringLiteral: string): string;

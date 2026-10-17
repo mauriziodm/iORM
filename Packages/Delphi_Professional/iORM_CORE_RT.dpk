@@ -258,6 +258,7 @@ contains
   iORM.DBBuilder.Strategy.WithAlterTable in '..\..\Source\iORM.DBBuilder.Strategy.WithAlterTable.pas',
   iORM.DBBuilder.Strategy.WithoutAlterTable in '..\..\Source\iORM.DBBuilder.Strategy.WithoutAlterTable.pas',
   iORM.DBBuilder.Schema.Index in '..\..\Source\iORM.DBBuilder.Schema.Index.pas',
+  iORM.DBBuilder.Schema.Sequence in '..\..\Source\iORM.DBBuilder.Schema.Sequence.pas',
   iORM.Abstraction.Factory in '..\..\Source\iORM.Abstraction.Factory.pas',
   iORM.Abstraction.SessionData.Interfaces in '..\..\Source\iORM.Abstraction.SessionData.Interfaces.pas',
   iORM.Abstraction.SessionData in '..\..\Source\iORM.Abstraction.SessionData.pas',

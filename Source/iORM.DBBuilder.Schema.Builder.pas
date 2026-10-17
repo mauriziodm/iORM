@@ -180,7 +180,7 @@ begin
   BuildSchemaIndexes(LSchemaTable, AMap);
   // Add sequence only if the table uses Sequence for key generation
   if LSchemaTable.UsesSequenceForKeyGeneration then
-    FSchema.SequenceAddIfNotExists(LSchemaTable.GetSequenceName);
+    FSchema.SequenceAddIfNotExists(TioDBBuilderFactory.NewSchemaSequence(FConnectionDefName, LSchemaTable.GetSequenceName));
 end;
 
 constructor TioDBBuilderSchemaBuilder.Create(const AConnectionDefName: string; const ASchema: IioDBBuilderSchema;

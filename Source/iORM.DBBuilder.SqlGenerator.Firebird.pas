@@ -260,7 +260,9 @@ function TioDBBuilderSqlGenFirebird.BuildSQL_CreateSequence(const ASequenceName:
 var
   LSequenceName: string;
 begin
-  LSequenceName := EnsureIdentifierLength(ASequenceName.ToUpper);
+  // Upper-cased, never shortened: the runtime asks for the sequence by its original name (see
+  // TioDBBuilderSchemaSequence) - an over-long name is rejected by the DB, like an over-long table name.
+  LSequenceName := ASequenceName.ToUpper;
 
   Result := Format('CREATE SEQUENCE %s;', [LSequenceName]);
 end;
@@ -468,7 +470,9 @@ function TioDBBuilderSqlGenFirebird.BuildSQL_SequenceExists(const ASequenceName:
 var
   LSequenceName: string;
 begin
-  LSequenceName := EnsureIdentifierLength(ASequenceName.ToUpper);
+  // Upper-cased, never shortened: the runtime asks for the sequence by its original name (see
+  // TioDBBuilderSchemaSequence) - an over-long name is rejected by the DB, like an over-long table name.
+  LSequenceName := ASequenceName.ToUpper;
 
   // Carlo Marona (2024-10-15): Added condition to exclude system generators
   Result := Format('select count(*) from rdb$generators where (UPPER(rdb$generator_name) = UPPER(''%s'')) and (RDB$SYSTEM_FLAG = 0)', [EscapeSQLStringLiteral(LSequenceName)]);
@@ -574,7 +578,9 @@ function TioDBBuilderSqlGenFirebird.BuildSQL_DropSequence(const ASequenceName: s
 var
   LSequenceName: string;
 begin
-  LSequenceName := EnsureIdentifierLength(ASequenceName.ToUpper);
+  // Upper-cased, never shortened: the runtime asks for the sequence by its original name (see
+  // TioDBBuilderSchemaSequence) - an over-long name is rejected by the DB, like an over-long table name.
+  LSequenceName := ASequenceName.ToUpper;
 
   Result := Format('DROP SEQUENCE %s;', [LSequenceName]);
 end;

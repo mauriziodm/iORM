@@ -265,6 +265,27 @@ type
     property Unique: Boolean read GetUnique;
   end;
 
+  /// <summary>
+  ///  A sequence (generator) node of either branch of the schema diff. Only the name matters: a sequence
+  ///  has no attribute iORM compares, so Mapped and Physical nodes carry the same data. Name (case
+  ///  normalized, no delimiters - the comparison key) and SqlName (case normalized + delimiters - for SQL)
+  ///  are frozen at construction, exactly like a table's, and a sequence name is treated like a table name:
+  ///  never shortened (the runtime asks for the sequence by its original name, see TioDBBuilderSchemaSequence).
+  ///  Status is the same build Status every other schema node carries, so a pending sequence change rolls up
+  ///  into the schema Status like a pending table change does.
+  /// </summary>
+  IioDBBuilderSchemaSequence = interface
+    ['{A90B9A06-B10B-49B0-9D8C-FC5C1BA019FF}']
+    function GetName: String;
+    function GetSqlName: String;
+    function GetStatus: TioDBBuilderStatus;
+    procedure SetStatus(const AValue: TioDBBuilderStatus);
+
+    property Name: String read GetName;
+    property SqlName: String read GetSqlName;
+    property Status: TioDBBuilderStatus read GetStatus write SetStatus;
+  end;
+
   TioDBBuilderSchemaFields = TList<IioDBBuilderSchemaField>;
   TioDBBuilderSchemaIndexes = TDictionary<String, IioDBBuilderSchemaIndex>;
 //  TioDBBuilderSchemaIndexes = TioIndexList;
@@ -375,7 +396,8 @@ type
   end;
 
   TioDBBuilderSchemaTables = TDictionary<String, IioDBBuilderSchemaTable>;
-  TioDBBuilderSchemaSequences = TStringList;
+  // Keyed by the sequence node's Name (case normalized, no delimiters), like TioDBBuilderSchemaTables.
+  TioDBBuilderSchemaSequences = TDictionary<String, IioDBBuilderSchemaSequence>;
 
   IioDBBuilderSchema = interface
     ['{1AEDB134-1ECB-490E-A53A-973BEDE509E5}']
@@ -388,17 +410,22 @@ type
     function FindOrCreateTable(const AMap: IioMap; const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
     function FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
     /// <summary>
-    ///  Forces the whole schema tree (schema, tables, fields, indexes and foreign keys) to stCreate,
-    ///  overriding whatever the entity-map-vs-DB comparison would have produced (the create-from-scratch
-    ///  path, as when the target database does not exist). Used to force a coherent full "create from
-    ///  scratch" script regardless of the actual database state. Delegates to each table's own
-    ///  ForceCreateStatus.
+    ///  Forces the whole schema tree (schema, sequences, tables, fields, indexes and foreign keys) to
+    ///  stCreate, overriding whatever the entity-map-vs-DB comparison would have produced (the
+    ///  create-from-scratch path, as when the target database does not exist). Used to force a coherent
+    ///  full "create from scratch" script regardless of the actual database state. Delegates to each
+    ///  table's own ForceCreateStatus.
     /// </summary>
     procedure ForceCreateStatus;
     function GetSequences: TioDBBuilderSchemaSequences;
     function GetStatus: TioDBBuilderStatus;
     function GetTables: TioDBBuilderSchemaTables;
-    procedure SequenceAddIfNotExists(const ASequenceName: String);
+    /// <summary>
+    ///  Adds ASequence unless a sequence with the same Name is already present (then ASequence is simply
+    ///  discarded). The "if not exists" is load-bearing on the Mapped branch: several tables may share one
+    ///  sequence ([ioKeySequence]), and each of them offers it.
+    /// </summary>
+    procedure SequenceAddIfNotExists(const ASequence: IioDBBuilderSchemaSequence);
     procedure SetStatus(const Value: TioDBBuilderStatus);
 
     property Sequences: TioDBBuilderSchemaSequences read GetSequences;
