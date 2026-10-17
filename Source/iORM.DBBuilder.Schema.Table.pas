@@ -64,13 +64,13 @@ type
     FName: String;
     FPrimaryKeyField: IioDBBuilderSchemaField;
     FSqlName: String;
+
     procedure AddField(ASchemaField: IioDBBuilderSchemaField);
     procedure AddForeignKey(const AReferenceMap, ADependentMap: IioMap; const ADependentProperty: IioProperty;
       const AOnDeleteAction, AOnUpdateAction: TioFKAction);
     procedure AddIndex(const AIndexAttr: ioIndex);
     procedure CascadeFieldDropStatus(const AFieldName: String);
     procedure CascadeTableDropStatus;
-    function FieldExists(const AFieldName: String): boolean;
     function FindField(const AFieldName: String): IioDBBuilderSchemaField;
     procedure ForceCreateStatus;
     procedure ForceFieldsCreateStatus;
@@ -120,7 +120,7 @@ procedure TioDBBuilderSchemaTable.AddField(ASchemaField: IioDBBuilderSchemaField
 begin
   // Add field only if not already exists; keep the primary-key pointer bound to a
   // field that is actually in FFields (a discarded duplicate must not hijack it)
-  if not FieldExists(ASchemaField.FieldName) then
+  if FindField(ASchemaField.FieldName) = nil then
   begin
     FFields.Add(ASchemaField);
     if ASchemaField.PrimaryKey then
@@ -159,11 +159,6 @@ begin
   FForeignKeys.Free;
   FIndexes.Free;
   inherited;
-end;
-
-function TioDBBuilderSchemaTable.FieldExists(const AFieldName: String): boolean;
-begin
-  Result := FindField(AFieldName) <> nil;
 end;
 
 // Case-insensitive: field names are normalized identifiers.
