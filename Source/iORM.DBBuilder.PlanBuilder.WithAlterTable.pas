@@ -43,7 +43,7 @@ type
 
   /// <summary>
   ///  PlanBuilder shape for DBMS that can ALTER a table in place (Supports_AlterTable = True: Firebird,
-  ///  MS SQL Server). Emits fine-grained ops in a create-safe order (strict drops -> tables+fields ->
+  ///  MS SQL Server). Emits fine-grained ops in a create-safe order (strict drops -> sequences -> tables+fields ->
   ///  indexes -> foreign keys -> orphan drops) so referenced tables exist before their FKs and physical
   ///  indexes/FKs are cleared before the recreations. Strict mode (ifmEnabledStrict): for every modified
   ///  table, drop ALL its physical indexes/foreign keys (orphans and manually-added ones included) and
@@ -110,8 +110,11 @@ begin
   if LStrictForeignKeys then
     Plan_StrictDropForeignKeys(LPlan, LMappedSchema, LPhysicalSchema);
 
-  // Create-safe order: tables/fields first, then indexes, then FKs (referenced tables already exist),
-  // then the orphan field/index/table drops. Indexes/FKs honour their configured mode.
+  // Create-safe order: sequences, then tables/fields, then indexes, then FKs (referenced tables already
+  // exist), then the orphan field/index/table drops. Indexes/FKs honour their configured mode. Sequences
+  // come from the shared PlanBuilder.Base.Plan_Sequences, the single place they are created (no longer
+  // interleaved before each new table inside Plan_TablesAndFields).
+  Plan_Sequences(LPlan, LMappedSchema, LPhysicalSchema);
   Plan_TablesAndFields(LPlan, LMappedSchema, LPhysicalSchema);
   if Context.Reconciliation.IndexesMode >= ifmEnabled then
   begin
@@ -189,12 +192,10 @@ begin
     if LPhysicalTable = nil then
     begin
       // New table: the CreateTable translator emits the fields (and PK) inline, so no per-field ops here.
-      // The sequence, if any, is created first so it exists before the table that uses it.
+      // Its sequence, if any, is not created here: Plan_Sequences (called just before) already emitted it.
       LMappedTable.Status := stCreate;
       for LField in LMappedTable.Fields do
         LField.Status := stCreate;
-      if LMappedTable.UsesSequenceForKeyGeneration then
-        APlan.AddCreateSequence(LMappedTable.GetSequenceName);
       APlan.AddCreateTable(LMappedTable);
     end
     else

@@ -69,8 +69,9 @@ type
   ///  unconditionally, to free every physical index of a rebuilt table before recreating it. Orphan fields
   ///  need no dedicated op there: the rebuild recreates the table from the mapped fields only, so an
   ///  unmapped column is simply not carried over.
-  ///  The sequence pair: opCreateSequence is emitted by the PlanBuilder for new tables, always before the
-  ///  table's opCreateTable (the sequence is NOT recreated inside the CREATE - that would double-create it).
+  ///  The sequence pair: opCreateSequence is emitted by PlanBuilder.Base.Plan_Sequences, at the start of the
+  ///  Plan, once per mapped sequence missing from the DB - for new and existing tables alike, and once per
+  ///  sequence even when several tables share it (the CREATE TABLE never creates it inline).
   ///  opDropOrphanSequence belongs to the orphan family above (a physical sequence no mapped table uses:
   ///  commented statement plus a warning, never executed). It is not wired yet: no PlanBuilder emits it and
   ///  no strategy translates it, so the dispatch else-raise (Strategy.ScriptWrite_PlanOperation) fails loudly
@@ -450,8 +451,8 @@ type
     function GetSchemaField_Physical: IioDBBuilderSchemaField;
     function GetSchemaForeignKey: IioDBBuilderSchemaFK;
     function GetSchemaIndex: IioDBBuilderSchemaIndex;
+    function GetSchemaSequence: IioDBBuilderSchemaSequence;
     function GetSchemaTable: IioDBBuilderSchemaTable;
-    function GetSequenceName: String;
 
     /// <summary>Human-readable, dialect-independent summary of the operation (for logs/UI grids), e.g. "Add field 'AGE' to 'CLIENTI'".</summary>
     property Description: String read GetDescription;
@@ -465,9 +466,10 @@ type
     property SchemaForeignKey: IioDBBuilderSchemaFK read GetSchemaForeignKey;
     /// <summary>Mapped for opCreateIndex; physical for opDropIndex/opDropOrphanIndex (see Kind).</summary>
     property SchemaIndex: IioDBBuilderSchemaIndex read GetSchemaIndex;
+    /// <summary>Mapped for opCreateSequence; physical for opDropOrphanSequence (see Kind).</summary>
+    property SchemaSequence: IioDBBuilderSchemaSequence read GetSchemaSequence;
     /// <summary>Mapped for opCreateTable/opCopyData/opRenameTableToOld; physical for opDropTable (see Kind).</summary>
     property SchemaTable: IioDBBuilderSchemaTable read GetSchemaTable;
-    property SequenceName: String read GetSequenceName;
   end;
 
   TioDBBuilderPlanOperations = TList<IioDBBuilderPlanOperation>;
@@ -507,11 +509,13 @@ type
     // manages: NEVER dropped for real, realized as a commented statement plus a warning (mirrors AddDropOrphanIndex).
     function AddDropOrphanForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;
     // SEQUENCE
-    function AddCreateSequence(const ASequenceName: String): IioDBBuilderPlanOperation;
+    // A mapped sequence missing from the DB (ASequence is a Mapped node). Emitted only by Plan_Sequences,
+    // for new and existing tables alike.
+    function AddCreateSequence(const ASequence: IioDBBuilderSchemaSequence): IioDBBuilderPlanOperation;
     // An orphan physical sequence (present in the DB, used by no mapped table): NEVER dropped for real,
     // realized as a commented statement plus a warning (mirrors AddDropOrphanIndex). Not wired yet (see the
     // TioDBBuilderPlanOpKind summary): calling this today yields an op the dispatch else-raise rejects.
-    function AddDropOrphanSequence(const ASequenceName: String): IioDBBuilderPlanOperation;
+    function AddDropOrphanSequence(const ASequence: IioDBBuilderSchemaSequence): IioDBBuilderPlanOperation;
     // PLAN-WIDE
     procedure Clear;
     function GetCount: Integer;
@@ -896,12 +900,13 @@ type
     // ==========================================================
     // SEQUENCE RELATED METHODS
     // ----------------------------------------------------------
-    /// <summary>Generates SQL to create a sequence</summary>
-    function BuildSQL_CreateSequence(const ASequenceName: String): string;
-    /// <summary>Generates SQL to drop a sequence by name. Reserved for the future opDropOrphanSequence translator,
+    /// <summary>Generates SQL to create a sequence (uses ASequence.SqlName, like the table DDL uses the
+    /// table's SqlName)</summary>
+    function BuildSQL_CreateSequence(const ASequence: IioDBBuilderSchemaSequence): string;
+    /// <summary>Generates SQL to drop a sequence. Reserved for the future opDropOrphanSequence translator,
     /// as the text of its commented-out statement (no consumer today); Firebird implements it, other dialects
     /// raise (base default).</summary>
-    function BuildSQL_DropSequence(const ASequenceName: string): string;
+    function BuildSQL_DropSequence(const ASequence: IioDBBuilderSchemaSequence): string;
     /// <summary>Generates SQL to check if a sequence exists</summary>
     function BuildSQL_SequenceExists(const ASequenceName: string): string;
     /// <summary>Generates SQL listing the names of every user (non-system) sequence, one per row in the

@@ -55,8 +55,8 @@ type
     FSchemaField_Physical: IioDBBuilderSchemaField;
     FSchemaForeignKey: IioDBBuilderSchemaFK;
     FSchemaIndex: IioDBBuilderSchemaIndex;
+    FSchemaSequence: IioDBBuilderSchemaSequence;
     FSchemaTable: IioDBBuilderSchemaTable;
-    FSequenceName: String;
     function GetDescription: String;
     function GetKind: TioDBBuilderPlanOpKind;
     function GetSchemaField_Changes: TioDBBuilderFieldChanges;
@@ -64,14 +64,14 @@ type
     function GetSchemaField_Physical: IioDBBuilderSchemaField;
     function GetSchemaForeignKey: IioDBBuilderSchemaFK;
     function GetSchemaIndex: IioDBBuilderSchemaIndex;
+    function GetSchemaSequence: IioDBBuilderSchemaSequence;
     function GetSchemaTable: IioDBBuilderSchemaTable;
-    function GetSequenceName: String;
   strict protected
   public
     constructor Create(const AKind: TioDBBuilderPlanOpKind; const ATable: IioDBBuilderSchemaTable = nil;
       const AField: IioDBBuilderSchemaField = nil; const AIndex: IioDBBuilderSchemaIndex = nil;
       const AForeignKey: IioDBBuilderSchemaFK = nil; const ASchemaField_Changes: TioDBBuilderFieldChanges = [];
-      const ASequenceName: String = ''; const AField_Physical: IioDBBuilderSchemaField = nil);
+      const ASequence: IioDBBuilderSchemaSequence = nil; const AField_Physical: IioDBBuilderSchemaField = nil);
   end;
 
   /// <summary>
@@ -104,8 +104,8 @@ type
     function AddDropForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;
     function AddDropOrphanForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;
     // SEQUENCE
-    function AddCreateSequence(const ASequenceName: String): IioDBBuilderPlanOperation;
-    function AddDropOrphanSequence(const ASequenceName: String): IioDBBuilderPlanOperation;
+    function AddCreateSequence(const ASequence: IioDBBuilderSchemaSequence): IioDBBuilderPlanOperation;
+    function AddDropOrphanSequence(const ASequence: IioDBBuilderSchemaSequence): IioDBBuilderPlanOperation;
     // PLAN-WIDE
     procedure Clear;
     function GetCount: Integer;
@@ -127,7 +127,7 @@ uses
 
 constructor TioDBBuilderPlanOperation.Create(const AKind: TioDBBuilderPlanOpKind; const ATable: IioDBBuilderSchemaTable;
   const AField: IioDBBuilderSchemaField; const AIndex: IioDBBuilderSchemaIndex; const AForeignKey: IioDBBuilderSchemaFK;
-  const ASchemaField_Changes: TioDBBuilderFieldChanges; const ASequenceName: String; const AField_Physical: IioDBBuilderSchemaField);
+  const ASchemaField_Changes: TioDBBuilderFieldChanges; const ASequence: IioDBBuilderSchemaSequence; const AField_Physical: IioDBBuilderSchemaField);
 begin
   inherited Create;
   FKind := AKind;
@@ -137,7 +137,7 @@ begin
   FSchemaIndex := AIndex;
   FSchemaForeignKey := AForeignKey;
   FSchemaField_Changes := ASchemaField_Changes;
-  FSequenceName := ASequenceName;
+  FSchemaSequence := ASequence;
 end;
 
 function TioDBBuilderPlanOperation.GetDescription: String;
@@ -158,8 +158,9 @@ begin
     opDropForeignKey:   Result := Format('Drop foreign key %s on %s', [QuotedStr(FSchemaForeignKey.Name), QuotedStr(FSchemaTable.Name)]);
     // AForeignKey is always a Physical node here (see AddDropOrphanForeignKey), so .Name is always the real catalog name.
     opDropOrphanForeignKey: Result := Format('Drop orphan foreign key %s on %s', [QuotedStr(FSchemaForeignKey.Name), QuotedStr(FSchemaTable.Name)]);
-    opCreateSequence:   Result := Format('Create sequence %s', [QuotedStr(FSequenceName)]);
-    opDropOrphanSequence: Result := Format('Drop orphan sequence %s', [QuotedStr(FSequenceName)]);
+    opCreateSequence:   Result := Format('Create sequence %s', [QuotedStr(FSchemaSequence.Name)]);
+    // ASequence is always a Physical node here (see AddDropOrphanSequence), so .Name is the real catalog name.
+    opDropOrphanSequence: Result := Format('Drop orphan sequence %s', [QuotedStr(FSchemaSequence.Name)]);
     opRenameTableToOld: Result := Format('Rename table %s to its temporary shadow (rebuild)', [QuotedStr(FSchemaTable.Name)]);
     opCopyData:         Result := Format('Copy data into rebuilt table %s', [QuotedStr(FSchemaTable.Name)]);
   else
@@ -197,14 +198,14 @@ begin
   Result := FSchemaIndex;
 end;
 
+function TioDBBuilderPlanOperation.GetSchemaSequence: IioDBBuilderSchemaSequence;
+begin
+  Result := FSchemaSequence;
+end;
+
 function TioDBBuilderPlanOperation.GetSchemaTable: IioDBBuilderSchemaTable;
 begin
   Result := FSchemaTable;
-end;
-
-function TioDBBuilderPlanOperation.GetSequenceName: String;
-begin
-  Result := FSequenceName;
 end;
 
 { TioDBBuilderPlan }
@@ -250,7 +251,7 @@ end;
 function TioDBBuilderPlan.AddAlterField(const ATable: IioDBBuilderSchemaTable; const AMappedField, APhysicalField: IioDBBuilderSchemaField;
   const ASchemaField_Changes: TioDBBuilderFieldChanges): IioDBBuilderPlanOperation;
 begin
-  Result := AddOp(TioDBBuilderPlanOperation.Create(opAlterField, ATable, AMappedField, nil, nil, ASchemaField_Changes, '', APhysicalField));
+  Result := AddOp(TioDBBuilderPlanOperation.Create(opAlterField, ATable, AMappedField, nil, nil, ASchemaField_Changes, nil, APhysicalField));
 end;
 
 function TioDBBuilderPlan.AddCreateField(const ATable: IioDBBuilderSchemaTable;
@@ -262,7 +263,7 @@ end;
 function TioDBBuilderPlan.AddDropField(const ATable: IioDBBuilderSchemaTable;
   const AField: IioDBBuilderSchemaField): IioDBBuilderPlanOperation;
 begin
-  Result := AddOp(TioDBBuilderPlanOperation.Create(opDropField, ATable, nil, nil, nil, [], '', AField));
+  Result := AddOp(TioDBBuilderPlanOperation.Create(opDropField, ATable, nil, nil, nil, [], nil, AField));
 end;
 
 function TioDBBuilderPlan.AddCreateIndex(const ATable: IioDBBuilderSchemaTable;
@@ -301,14 +302,14 @@ begin
   Result := AddOp(TioDBBuilderPlanOperation.Create(opDropOrphanForeignKey, ATable, nil, nil, AForeignKey));
 end;
 
-function TioDBBuilderPlan.AddCreateSequence(const ASequenceName: String): IioDBBuilderPlanOperation;
+function TioDBBuilderPlan.AddCreateSequence(const ASequence: IioDBBuilderSchemaSequence): IioDBBuilderPlanOperation;
 begin
-  Result := AddOp(TioDBBuilderPlanOperation.Create(opCreateSequence, nil, nil, nil, nil, [], ASequenceName));
+  Result := AddOp(TioDBBuilderPlanOperation.Create(opCreateSequence, nil, nil, nil, nil, [], ASequence));
 end;
 
-function TioDBBuilderPlan.AddDropOrphanSequence(const ASequenceName: String): IioDBBuilderPlanOperation;
+function TioDBBuilderPlan.AddDropOrphanSequence(const ASequence: IioDBBuilderSchemaSequence): IioDBBuilderPlanOperation;
 begin
-  Result := AddOp(TioDBBuilderPlanOperation.Create(opDropOrphanSequence, nil, nil, nil, nil, [], ASequenceName));
+  Result := AddOp(TioDBBuilderPlanOperation.Create(opDropOrphanSequence, nil, nil, nil, nil, [], ASequence));
 end;
 
 procedure TioDBBuilderPlan.Clear;

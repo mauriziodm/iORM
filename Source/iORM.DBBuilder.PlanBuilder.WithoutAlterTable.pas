@@ -112,6 +112,12 @@ begin
   // 2. Emit the rebuild ops, phase-grouped so the whole script is rebuild-safe. Insertion order IS
   //    execution order (the Strategy just translates each op in turn).
 
+  // 2-. Sequences first (shared PlanBuilder.Base.Plan_Sequences). A no-op on today's WithoutAlterTable
+  //     dialects (SQLite has no sequences: Supports_Sequence = False), kept so that a future dialect that
+  //     cannot ALTER a table but does support sequences gets them created: the gate is the capability, not
+  //     the build shape.
+  Plan_Sequences(LPlan, LMappedSchema, LPhysicalSchema);
+
   // 2a. Drop every existing index of each rebuilt table, sourced from the introspected physical schema and
   //     dropped by its ACTUAL catalog name (opDropIndex - AIndex is the Physical node here). Runs
   //     regardless of IndexesMode: the rename-create-copy needs the index names free before the new

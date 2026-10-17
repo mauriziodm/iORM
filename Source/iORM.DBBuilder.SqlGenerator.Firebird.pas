@@ -113,8 +113,8 @@ type
     // ==========================================================
     // SEQUENCE RELATED METHODS
     // ----------------------------------------------------------
-    function BuildSQL_CreateSequence(const ASequenceName: String): string; override;
-    function BuildSQL_DropSequence(const ASequenceName: string): string; override;
+    function BuildSQL_CreateSequence(const ASequence: IioDBBuilderSchemaSequence): string; override;
+    function BuildSQL_DropSequence(const ASequence: IioDBBuilderSchemaSequence): string; override;
     function BuildSQL_SequenceExists(const ASequenceName: string): string; override;
     function BuildSQL_SequenceList: string; override;
 
@@ -256,15 +256,11 @@ begin
     ATable.PrimaryKeyField.SqlFieldName]);
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildSQL_CreateSequence(const ASequenceName: String): string;
-var
-  LSequenceName: string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_CreateSequence(const ASequence: IioDBBuilderSchemaSequence): string;
 begin
-  // Upper-cased, never shortened: the runtime asks for the sequence by its original name (see
-  // TioDBBuilderSchemaSequence) - an over-long name is rejected by the DB, like an over-long table name.
-  LSequenceName := ASequenceName.ToUpper;
-
-  Result := Format('CREATE SEQUENCE %s;', [LSequenceName]);
+  // SqlName: upper-cased + delimited, never shortened (see TioDBBuilderSchemaSequence) - an over-long name
+  // is rejected by the DB, like an over-long table name.
+  Result := Format('CREATE SEQUENCE %s;', [ASequence.SqlName]);
 end;
 
 function TioDBBuilderSqlGenFirebird.BuildSQL_AlterField(const ATable: IioDBBuilderSchemaTable;
@@ -574,15 +570,10 @@ begin
   Result := Format('DROP INDEX %s;', [AIndexName]);
 end;
 
-function TioDBBuilderSqlGenFirebird.BuildSQL_DropSequence(const ASequenceName: string): string;
-var
-  LSequenceName: string;
+function TioDBBuilderSqlGenFirebird.BuildSQL_DropSequence(const ASequence: IioDBBuilderSchemaSequence): string;
 begin
-  // Upper-cased, never shortened: the runtime asks for the sequence by its original name (see
-  // TioDBBuilderSchemaSequence) - an over-long name is rejected by the DB, like an over-long table name.
-  LSequenceName := ASequenceName.ToUpper;
-
-  Result := Format('DROP SEQUENCE %s;', [LSequenceName]);
+  // SqlName: upper-cased + delimited, never shortened (see TioDBBuilderSchemaSequence).
+  Result := Format('DROP SEQUENCE %s;', [ASequence.SqlName]);
 end;
 
 

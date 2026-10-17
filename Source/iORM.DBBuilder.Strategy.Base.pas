@@ -202,7 +202,7 @@ type
     // ==========================================================
     // SEQUENCE RELATED METHODS
     // ----------------------------------------------------------
-    procedure ScriptWrite_CreateSequence(const ASequenceName: String); virtual;
+    procedure ScriptWrite_CreateSequence(const ASequence: IioDBBuilderSchemaSequence); virtual;
 
     // ==========================================================
     // FOREIGN KEY RELATED METHODS
@@ -314,15 +314,15 @@ end;
 // (Check_SequenceExists, sibling of Check_DatabaseExists): the Strategy translates, it does not run
 // catalog queries (same pass-through-removal rationale as the Introspector asking Context.SqlGenerator
 // directly - see iORM.DBBuilder.Introspector.Base).
-procedure TioDBBuilderStrategyBase.ScriptWrite_CreateSequence(const ASequenceName: String);
+procedure TioDBBuilderStrategyBase.ScriptWrite_CreateSequence(const ASequence: IioDBBuilderSchemaSequence);
 begin
   // AddLine, not AddToCurrentLine: the statement must own its line. AddToCurrentLine appends to the
   // previous one, and if that is a comment line (e.g. an orphan op's trailing comment)
   // TioScript.LoadScriptAndCleanFromComments drops '--' lines whole - the statement would be silently
   // stripped. The multi-statement ops already self-guard by opening with AddEmpty/AddTitle; the
   // single-shot ops follow the same discipline here.
-  if (Context.Reconciliation.MappedSchema.Status = stCreate) or not Context.SqlGenerator.Check_SequenceExists(ASequenceName) then
-    Context.Script.Body.AddLine(Context.SqlGenerator.BuildSQL_CreateSequence(ASequenceName));
+  if (Context.Reconciliation.MappedSchema.Status = stCreate) or not Context.SqlGenerator.Check_SequenceExists(ASequence.Name) then
+    Context.Script.Body.AddLine(Context.SqlGenerator.BuildSQL_CreateSequence(ASequence));
 end;
 
 function TioDBBuilderStrategyBase.Check_DatabaseExists: Boolean;
@@ -524,12 +524,14 @@ begin
 end;
 
 // The ops both strategy shapes translate identically (same op -> same ScriptWrite_* -> same arguments).
-// The shape-specific ops (opCreateSequence/opCreateField/opAlterField/opCreateForeignKey/opDropForeignKey
-// for WithAlterTable; opRenameTableToOld/opCopyData for WithoutAlterTable) are handled by the overrides,
-// which chain everything else here.
+// The shape-specific ops (opCreateField/opAlterField/opCreateForeignKey/opDropForeignKey for
+// WithAlterTable; opRenameTableToOld/opCopyData for WithoutAlterTable) are handled by the overrides,
+// which chain everything else here. opCreateSequence lives here, not in a shape: it is emitted by
+// PlanBuilder.Base.Plan_Sequences for either shape (gated on Supports_Sequence, not on ALTER TABLE).
 procedure TioDBBuilderStrategyBase.ScriptWrite_PlanOperation(const AOp: IioDBBuilderPlanOperation);
 begin
   case AOp.Kind of
+    opCreateSequence:       ScriptWrite_CreateSequence(AOp.SchemaSequence);
     opCreateTable:          ScriptWrite_CreateTable(AOp.SchemaTable);
     opDropField:            ScriptWrite_DropField(AOp.SchemaTable, AOp.SchemaField_Physical);
     opCreateIndex:          ScriptWrite_CreateIndex(AOp.SchemaTable, AOp.SchemaIndex);

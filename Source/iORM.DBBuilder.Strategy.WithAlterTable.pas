@@ -74,7 +74,7 @@ type
     procedure GenerateScript_Body; override;
     /// <summary>
     /// Translates the ops only this shape's Plan adds on top of the base's shared dispatch
-    /// (ScriptWrite_PlanOperation): sequences, in-place field create/alter, and explicit FK create/drop
+    /// (ScriptWrite_PlanOperation): in-place field create/alter and explicit FK create/drop
     /// (the rebuild shape recreates tables wholesale and keeps FKs inline in CREATE TABLE).
     /// Everything else chains to inherited.
     /// </summary>
@@ -101,7 +101,7 @@ end;
 procedure TioDBBuilderStrategyWithAlterTable.GenerateScript_Body;
 begin
   // Plan-driven: the PlanBuilder already produced the operations in a create-safe order (strict drops ->
-  // tables+fields -> indexes -> foreign keys -> orphan drops) and already applied the index/FK modes, so
+  // sequences -> tables+fields -> indexes -> foreign keys -> orphan drops) and already applied the index/FK modes, so
   // the shared ScriptWrite_Plan is a straight translate-each-op loop - the dialect lives in the
   // ScriptWrite_/BuildSQL_ each op dispatches to. WithoutAlterTable dialects override this with the
   // rebuild flow instead.
@@ -109,13 +109,13 @@ begin
 end;
 
 // The ops this shape adds on top of the base's shared dispatch (ScriptWrite_PlanOperation): the WithAlterTable
-// PlanBuilder shape is the only one that emits sequence ops, in-place field create/alter, and explicit FK
-// create/drop (the rebuild shape recreates tables wholesale and keeps FKs inline in CREATE TABLE).
+// PlanBuilder shape is the only one that emits in-place field create/alter and explicit FK create/drop (the
+// rebuild shape recreates tables wholesale and keeps FKs inline in CREATE TABLE). Sequence ops are not
+// shape-specific any more: they are translated by the base dispatch.
 procedure TioDBBuilderStrategyWithAlterTable.ScriptWrite_PlanOperation(const AOp: IioDBBuilderPlanOperation);
 begin
   case AOp.Kind of
-    opCreateSequence:   ScriptWrite_CreateSequence(AOp.SequenceName);
-    opCreateField:      ScriptWrite_CreateField(AOp.SchemaTable, AOp.SchemaField_Mapped);
+    opCreateField:     ScriptWrite_CreateField(AOp.SchemaTable, AOp.SchemaField_Mapped);
     opAlterField:       ScriptWrite_AlterField(AOp.SchemaTable, AOp.SchemaField_Mapped, AOp.SchemaField_Physical, AOp.SchemaField_Changes);
     opCreateForeignKey: ScriptWrite_CreateForeignKey(AOp.SchemaTable, AOp.SchemaForeignKey);
     opDropForeignKey:   ScriptWrite_DropForeignKey(AOp.SchemaTable, AOp.SchemaForeignKey);

@@ -62,7 +62,8 @@ type
   ///  Abstract base of the PlanBuilder family: it holds the diff PRIMITIVES shared by both build shapes
   ///  (the cross-branch Find_* lookups, the Check_ForeignKeyModified structural comparison and the
   ///  Check_TableModified table-level diff), the Plan_Orphan* phases shared verbatim by both (reporting
-  ///  objects present in the DB but absent from the ORM maps), plus the Context plumbing, and declares the
+  ///  objects present in the DB but absent from the ORM maps), Plan_Sequences (the single creation point
+  ///  for sequences, shape-independent), plus the Context plumbing, and declares the
   ///  single IioDBBuilderPlanBuilder entry point BuildPlan as abstract.
   ///  It never instantiates: the Factory picks a concrete shape by the DBMS capability
   ///  SqlGenerator.Supports_AlterTable, mirroring the WithAlterTable/WithoutAlterTable Strategy split -
@@ -104,7 +105,8 @@ type
     ///  shapes): for every mapped table, escalates it to at least stUpdate if any of its fields,
     ///  indexes, or foreign keys has a pending change (HasFieldChanges/HasIndexChanges/
     ///  HasForeignKeyChanges), then escalates AMappedSchema itself if the table ends up with a pending
-    ///  change. Not needed mid-BuildPlan: every strict-mode read of a table's Status (Plan_StrictDrop*,
+    ///  change; it does the same for every mapped sequence (a sequence belongs to the schema, not to a
+    ///  table, so a missing one must flag the schema on its own). Not needed mid-BuildPlan: every strict-mode read of a table's Status (Plan_StrictDrop*,
     ///  the recreate-all branches in Plan_Indexes/Plan_ForeignKeys, the AStrict skip in
     ///  Plan_OrphanIndexes/Plan_OrphanForeignKeys) is already satisfied by the strict pre-pass's
     ///  Check_TableModified, which compares the same fields/indexes/FKs directly - so a table/field/
@@ -113,6 +115,7 @@ type
     ///  forced to stCreate (the fresh-DB path decided upstream).
     /// </summary>
     procedure Escalate_PendingStatuses(const AMappedSchema: IioDBBuilderSchema);
+    function Find_TableByName(const ASchema: IioDBBuilderSchema; const AName: String): IioDBBuilderSchemaTable;
     // Cross-branch structural matchers: unlike a plain name lookup (see IioDBBuilderSchemaTable.FindField),
     // these compute the physical counterpart of a mapped FK/index from attributes OTHER than a shared name
     // key, because no such key exists (this is not "does a foreign key/index with this name exist").
@@ -134,16 +137,6 @@ type
       const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaFK;
     function Match_PhysicalIndex(const AMappedTable: IioDBBuilderSchemaTable; const AMappedIndex: IioDBBuilderSchemaIndex;
       const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaIndex;
-    function Find_TableByName(const ASchema: IioDBBuilderSchema; const AName: String): IioDBBuilderSchemaTable;
-    // Warns (never drops, never blocks, never touches Status or the Plan) when a foreign key on a
-    // still-mapped table references AReferenceTableName (and, if given, AReferenceFieldName) - a
-    // table/field about to be orphaned. AReferenceFieldName empty means "any field of
-    // AReferenceTableName" (whole-table orphan); non-empty narrows to that field (field orphan).
-    // Shared by both build shapes: each already surfaces its own warning about why the table/field is
-    // going away (a commented-out DROP for WithAlterTable, silent data loss on rebuild for
-    // WithoutAlterTable) - this adds the cross-table consequence a same-table warning cannot see. Scans
-    // only AMappedSchema, since an already-orphaned table has no need for a second warning about itself.
-    procedure Warning_DanglingForeignKeys(const AMappedSchema: IioDBBuilderSchema; const AReferenceTableName, AReferenceFieldName: String);
     // Orphan-emission phases shared by both build shapes: WithAlterTable's incremental diff and
     // WithoutAlterTable's rebuild both need to report objects present in the DB but absent from the ORM
     // maps, and do so identically (mark the physical node stDrop, cascade/warn, append the Plan op).
@@ -159,6 +152,25 @@ type
     procedure Plan_OrphanForeignKeys(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
     procedure Plan_OrphanIndexes(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema; const AStrict: Boolean);
     procedure Plan_OrphanTablesAndFields(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
+    // The single creation point for sequences, shared by both build shapes and called first in BuildPlan:
+    // emits opCreateSequence for every mapped sequence missing from the DB (Mapped.Sequences minus
+    // Physical.Sequences; a nil Physical schema means all of them) and stamps it stCreate, so
+    // Escalate_PendingStatuses rolls it up into the schema Status. Covers new and existing tables alike -
+    // including a sequence dropped by hand under an untouched (stClean) table - and emits a sequence shared
+    // by several tables ([ioKeySequence]) exactly once, since Mapped.Sequences is already deduplicated.
+    // Gated on Supports_Sequence, not on the build shape. Ordering: the sequences come before the tables,
+    // although nothing requires it - a CREATE TABLE never references its generator (the runtime uses it
+    // only at INSERT time, via SELECT GEN_ID), so the sequence only has to exist once the script has run.
+    procedure Plan_Sequences(const APlan: IioDBBuilderPlan; const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
+    // Warns (never drops, never blocks, never touches Status or the Plan) when a foreign key on a
+    // still-mapped table references AReferenceTableName (and, if given, AReferenceFieldName) - a
+    // table/field about to be orphaned. AReferenceFieldName empty means "any field of
+    // AReferenceTableName" (whole-table orphan); non-empty narrows to that field (field orphan).
+    // Shared by both build shapes: each already surfaces its own warning about why the table/field is
+    // going away (a commented-out DROP for WithAlterTable, silent data loss on rebuild for
+    // WithoutAlterTable) - this adds the cross-table consequence a same-table warning cannot see. Scans
+    // only AMappedSchema, since an already-orphaned table has no need for a second warning about itself.
+    procedure Warning_DanglingForeignKeys(const AMappedSchema: IioDBBuilderSchema; const AReferenceTableName, AReferenceFieldName: String);
   public
   end;
 
@@ -236,6 +248,7 @@ end;
 
 procedure TioDBBuilderPlanBuilderBase.Escalate_PendingStatuses(const AMappedSchema: IioDBBuilderSchema);
 var
+  LMappedSequence: IioDBBuilderSchemaSequence;
   LMappedTable: IioDBBuilderSchemaTable;
 begin
   for LMappedTable in AMappedSchema.Tables.Values do
@@ -245,6 +258,13 @@ begin
     if LMappedTable.Status > stClean then
       AMappedSchema.Status := stUpdate;
   end;
+  // Sequences hang off the schema directly, not off a table: a missing sequence under otherwise clean
+  // tables (stamped stCreate by Plan_Sequences) must still flag the schema, or Context.Status - what the
+  // ConnectionDef's BeforeDBBuild/AfterDBBuild events receive - would say "nothing to do" while the
+  // script holds a CREATE SEQUENCE.
+  for LMappedSequence in AMappedSchema.Sequences.Values do
+    if LMappedSequence.Status > stClean then
+      AMappedSchema.Status := stUpdate;
 end;
 
 function TioDBBuilderPlanBuilderBase.Match_MappedForeignKey(const AMappedTable: IioDBBuilderSchemaTable;
@@ -423,6 +443,26 @@ begin
         APlan.AddDropOrphanIndex(LMappedTable, LPhysicalIndex);
       end;
   end;
+end;
+
+procedure TioDBBuilderPlanBuilderBase.Plan_Sequences(const APlan: IioDBBuilderPlan;
+  const AMappedSchema, APhysicalSchema: IioDBBuilderSchema);
+var
+  LMappedSequence: IioDBBuilderSchemaSequence;
+begin
+  if not Context.SqlGenerator.Supports_Sequence then
+    Exit;
+  // A plain set difference on the node Name: both branches build their nodes through the same
+  // NormalizeSqlIdentifier (TioDBBuilderSchemaSequence), so the keys align by construction - and the name
+  // is never shortened on either side, so the key also equals what CREATE SEQUENCE writes. Table status is
+  // deliberately not consulted: whether the owning table is new, modified or clean, a missing sequence is
+  // missing.
+  for LMappedSequence in AMappedSchema.Sequences.Values do
+    if (APhysicalSchema = nil) or not APhysicalSchema.Sequences.ContainsKey(LMappedSequence.Name) then
+    begin
+      LMappedSequence.Status := stCreate;
+      APlan.AddCreateSequence(LMappedSequence);
+    end;
 end;
 
 end.

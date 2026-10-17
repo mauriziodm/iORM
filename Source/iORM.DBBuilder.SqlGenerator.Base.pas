@@ -280,9 +280,9 @@ type
     // SEQUENCE RELATED METHODS
     // ----------------------------------------------------------
     /// <summary>Generates SQL to create a sequence. Default raises exception (not supported).</summary>
-    function BuildSQL_CreateSequence(const ASequenceName: String): string; virtual;
+    function BuildSQL_CreateSequence(const ASequence: IioDBBuilderSchemaSequence): string; virtual;
     /// <summary>Generates SQL to drop a sequence. Default raises exception (not supported).</summary>
-    function BuildSQL_DropSequence(const ASequenceName: string): string; virtual;
+    function BuildSQL_DropSequence(const ASequence: IioDBBuilderSchemaSequence): string; virtual;
     /// <summary>Generates SQL to check if a sequence exists. Default raises exception (not supported).</summary>
     function BuildSQL_SequenceExists(const ASequenceName: string): string; virtual;
     /// <summary>Generates SQL listing every user sequence name. Default raises exception (not supported).</summary>
@@ -728,12 +728,12 @@ begin
   RaiseNotImplemented('BuildSQL_FKList');
 end;
 
-function TioDBBuilderSqlGenBase.BuildSQL_CreateSequence(const ASequenceName: String): string;
+function TioDBBuilderSqlGenBase.BuildSQL_CreateSequence(const ASequence: IioDBBuilderSchemaSequence): string;
 begin
   RaiseNotImplemented('BuildSQL_CreateSequence');
 end;
 
-function TioDBBuilderSqlGenBase.BuildSQL_DropSequence(const ASequenceName: string): string;
+function TioDBBuilderSqlGenBase.BuildSQL_DropSequence(const ASequence: IioDBBuilderSchemaSequence): string;
 begin
   RaiseNotImplemented('BuildSQL_DropSequence');
 end;
