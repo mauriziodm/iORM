@@ -52,6 +52,7 @@ type
     procedure BuildSchemaFK(const AMap: IioMap);
     procedure BuildSchemaIndexes(const ASchemaTable: IioDBBuilderSchemaTable; const AMap: IioMap);
     procedure BuildSchemaTable(const AMap: IioMap);
+    procedure FindOrCreateSchemaSequence(const ASequenceName: String);
     function FindOrCreateSchemaTable(const AMap: IioMap; const AKeyGenerationStrategy: TioKeyGenerationStrategyType): IioDBBuilderSchemaTable;
     function IsSchemaEligible(const AMap: IioMap): Boolean;
   protected
@@ -182,7 +183,22 @@ begin
   BuildSchemaIndexes(LSchemaTable, AMap);
   // Add sequence only if the table uses Sequence for key generation
   if LSchemaTable.UsesSequenceForKeyGeneration then
-    FSchema.AddSequenceIfNotExists(TioDBBuilderFactory.NewSchemaSequence(FConnectionDefName, LSchemaTable.GetSequenceName));
+    FindOrCreateSchemaSequence(LSchemaTable.GetSequenceName);
+end;
+
+// The sequence twin of FindOrCreateSchemaTable: several tables may share one sequence ([ioKeySequence]),
+// just as several classes may share one table, and both kinds of sharing are an ORM concern resolved here
+// (the schema's Add* raise on a duplicate). The node is built BEFORE the lookup on purpose: the name coming
+// from the mapping is raw, and its normalization lives only in the TioDBBuilderSchemaSequence constructor -
+// looking up LSequence.Name keeps that rule in one place. When the sequence is already there (shared), the
+// fresh node is simply dropped: it carries nothing but the same name.
+procedure TioDBBuilderSchemaBuilder.FindOrCreateSchemaSequence(const ASequenceName: String);
+var
+  LSequence: IioDBBuilderSchemaSequence;
+begin
+  LSequence := TioDBBuilderFactory.NewSchemaSequence(FConnectionDefName, ASequenceName);
+  if FSchema.FindSequence(LSequence.Name, False) = nil then
+    FSchema.AddSequence(LSequence);
 end;
 
 // "Find or create" (lazy registry) on the schema's tables, called once per mapped class: each class

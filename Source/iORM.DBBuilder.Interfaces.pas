@@ -404,11 +404,12 @@ type
   IioDBBuilderSchema = interface
     ['{1AEDB134-1ECB-490E-A53A-973BEDE509E5}']
     /// <summary>
-    ///  Adds ASequence unless a sequence with the same Name is already present (then ASequence is simply
-    ///  discarded). The "if not exists" is load-bearing on the Mapped branch: several tables may share one
-    ///  sequence ([ioKeySequence]), and each of them offers it.
+    ///  Inserts an already-built sequence node into the schema, keyed by its Name; raises if a sequence with
+    ///  the same Name is already present - the same contract as AddTable. A sequence shared by several
+    ///  tables ([ioKeySequence]) is an ORM concern, handled by the SchemaBuilder (FindSequence first, like
+    ///  for a table shared by several classes), not by a silent discard here.
     /// </summary>
-    procedure AddSequenceIfNotExists(const ASequence: IioDBBuilderSchemaSequence);
+    procedure AddSequence(const ASequence: IioDBBuilderSchemaSequence);
     /// <summary>
     ///  Inserts an already-built table node into the schema, keyed by its Name; raises if a table with the
     ///  same Name is already present. Used by both branches: the Introspector adds catalog-backed nodes
@@ -417,6 +418,11 @@ type
     ///  SchemaBuilder.
     /// </summary>
     procedure AddTable(const ATable: IioDBBuilderSchemaTable);
+    /// <summary>
+    ///  Exact-match lookup of a sequence by its (already-case-normalized) Name, same contract and case policy
+    ///  as FindTable: raises if absent, or returns nil when ARaiseIfNotFound = False.
+    /// </summary>
+    function FindSequence(const ASequenceName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaSequence;
     function FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
     /// <summary>
     ///  Forces the whole schema tree (schema, sequences, tables, fields, indexes and foreign keys) to

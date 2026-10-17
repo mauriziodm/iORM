@@ -42,7 +42,8 @@ type
 
   /// <summary>
   ///  The root of a schema branch (Mapped or Physical): a pure data structure that owns its tables and
-  ///  sequences and the invariants on them (no duplicates, the case policy documented on FindTable). It
+  ///  sequences and the invariants on them (no duplicates - every Add* raises on one - and the case policy
+  ///  documented on FindTable). It
   ///  never builds a node itself - the Mapped nodes are built by the SchemaBuilder (ORM-aware), the
   ///  Physical ones by the Introspector (catalog-aware) - so it depends on neither the ORM nor the DB.
   /// </summary>
@@ -51,8 +52,9 @@ type
     FSequences: TioDBBuilderSchemaSequences;
     FTables: TioDBBuilderSchemaTables;
 
-    procedure AddSequenceIfNotExists(const ASequence: IioDBBuilderSchemaSequence);
+    procedure AddSequence(const ASequence: IioDBBuilderSchemaSequence);
     procedure AddTable(const ATable: IioDBBuilderSchemaTable);
+    function FindSequence(const ASequenceName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaSequence;
     function FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
     procedure ForceCreateStatus;
     function GetSequences: TioDBBuilderSchemaSequences;
@@ -70,12 +72,15 @@ uses
 
 { TioDBBuilderSchema }
 
-// Keyed by the node's already-case-normalized Name, case-sensitive like FTables (see FindTable): two
-// tables sharing one sequence offer nodes with the same Name, the second is discarded.
-procedure TioDBBuilderSchema.AddSequenceIfNotExists(const ASequence: IioDBBuilderSchemaSequence);
+// Inserts an already-built sequence node, keyed by its already-case-normalized Name (case-sensitive like
+// FTables, see FindTable). Raises on a duplicate, like AddTable: the SchemaBuilder looks a shared sequence
+// up before adding it, and on the Physical branch a duplicate can only mean two catalog generators that
+// normalize to the same Name (e.g. a quoted lower-case one next to an unquoted one) - surfaced, not hidden.
+procedure TioDBBuilderSchema.AddSequence(const ASequence: IioDBBuilderSchemaSequence);
 begin
-  if not FSequences.ContainsKey(ASequence.Name) then
-    FSequences.Add(ASequence.Name, ASequence);
+  if FSequences.ContainsKey(ASequence.Name) then
+    raise EioDBBuilderException.Create(ClassName, 'AddSequence', Format('SchemaSequence "%s" already exists.', [ASequence.Name]));
+  FSequences.Add(ASequence.Name, ASequence);
 end;
 
 // Inserts an already-built table node into the schema, keyed by its Name, taken as-is. Raises if a table
@@ -117,7 +122,23 @@ begin
   else
   begin
     if ARaiseIfNotFound then
-      raise EioDBBuilderException.Create(ClassName, 'GetTableStatus', Format('SchemaTable not found "%s".', [ATableName]))
+      raise EioDBBuilderException.Create(ClassName, 'FindTable', Format('SchemaTable not found "%s".', [ATableName]))
+    else
+      Result := nil;
+  end;
+end;
+
+// Same contract and case policy as FindTable (exact match on the already-case-normalized Name): both
+// branches build their sequence nodes through the same normalization, so no case-insensitive safety net
+// is needed here.
+function TioDBBuilderSchema.FindSequence(const ASequenceName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaSequence;
+begin
+  if FSequences.ContainsKey(ASequenceName) then
+    Result := FSequences.Items[ASequenceName]
+  else
+  begin
+    if ARaiseIfNotFound then
+      raise EioDBBuilderException.Create(ClassName, 'FindSequence', Format('SchemaSequence not found "%s".', [ASequenceName]))
     else
       Result := nil;
   end;

@@ -462,7 +462,7 @@ begin
   // iORM does not map - including one used by hand-written triggers or by another application on the same
   // DB - which is exactly why the Strategy only ever comments the DROP out and warns.
   for LPhysicalSequence in APhysicalSchema.Sequences.Values do
-    if not AMappedSchema.Sequences.ContainsKey(LPhysicalSequence.Name) then
+    if AMappedSchema.FindSequence(LPhysicalSequence.Name, False) = nil then
     begin
       LPhysicalSequence.Status := stDrop;
       APlan.AddDropOrphanSequence(LPhysicalSequence);
@@ -482,7 +482,7 @@ begin
   // deliberately not consulted: whether the owning table is new, modified or clean, a missing sequence is
   // missing.
   for LMappedSequence in AMappedSchema.Sequences.Values do
-    if (APhysicalSchema = nil) or not APhysicalSchema.Sequences.ContainsKey(LMappedSequence.Name) then
+    if (APhysicalSchema = nil) or (APhysicalSchema.FindSequence(LMappedSequence.Name, False) = nil) then
     begin
       LMappedSequence.Status := stCreate;
       APlan.AddCreateSequence(LMappedSequence);
