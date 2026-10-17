@@ -91,6 +91,17 @@ Build order: Runtime (RT) packages first, then Design-Time (DT) packages.
     never drop + create. Full rationale: the `TioDBBuilderPlanOpKind` summary in
     `iORM.DBBuilder.Interfaces.pas`.
 
+  **DBBuilder nil-check idioms** (scope: `iORM.DBBuilder.*` only; the rest of iORM uses `Assigned`
+  more freely and is not bound by this):
+  - **Lookup results** (`Find*`, `Match_*`): compare with nil, `if FindField(X) = nil then` /
+    `<> nil`. Not `Assigned(...)`: the common DBBuilder case is "not found" (orphans, missing
+    sequences, new fields), and `= nil` reads left to right without a negation plus nested parentheses.
+  - **Defensive checks** on parameters and fields: `if not Assigned(AContext) then raise ...`.
+  - No `*Exists` lookup APIs (`TableExists`, `SequenceExists`, `FieldExists`): one API per question,
+    the existence idiom is `Find...(..., False) = nil` (decision 2026-08-29, see
+    `TioDBBuilderSchema.FindTable`). Not affected: `Check_DatabaseExists` (a real catalog query, role
+    prefix `Check_`) and `GetFieldDefaultExists` (a field property, not a lookup).
+
 - **ETM (Entity Tracking Manager)** (`iORM.ETM.*`): Audit trail and change tracking
 
 - **MVVM** (`iORM.MVVM.*`): ViewModels, Views, Model binding, VM actions
