@@ -100,7 +100,7 @@ begin
   if LStrictIndexes or LStrictForeignKeys then
     for LMappedTable in LMappedSchema.Tables.Values do
     begin
-      LPhysicalTable := Find_TableByName(LPhysicalSchema, LMappedTable.Name);
+      LPhysicalTable := Match_PhysicalTable(LMappedTable, LPhysicalSchema);
       if (LPhysicalTable <> nil) and Check_TableModified(LMappedTable, LPhysicalTable, LIndexesEnabled, LForeignKeysEnabled) then
         LMappedTable.Status := stUpdate;
     end;
@@ -149,7 +149,7 @@ begin
   begin
     if LMappedTable.Status <> stUpdate then
       Continue;
-    LPhysicalTable := Find_TableByName(APhysicalSchema, LMappedTable.Name);
+    LPhysicalTable := Match_PhysicalTable(LMappedTable, APhysicalSchema);
     if LPhysicalTable = nil then
       Continue;
     for LPhysicalIndex in LPhysicalTable.Indexes.Values do
@@ -171,7 +171,7 @@ begin
   begin
     if LMappedTable.Status <> stUpdate then
       Continue;
-    LPhysicalTable := Find_TableByName(APhysicalSchema, LMappedTable.Name);
+    LPhysicalTable := Match_PhysicalTable(LMappedTable, APhysicalSchema);
     if LPhysicalTable = nil then
       Continue;
     for LPhysicalFK in LPhysicalTable.ForeignKeys.Values do
@@ -191,7 +191,7 @@ var
 begin
   for LMappedTable in AMappedSchema.Tables.Values do
   begin
-    LPhysicalTable := Find_TableByName(APhysicalSchema, LMappedTable.Name);
+    LPhysicalTable := Match_PhysicalTable(LMappedTable, APhysicalSchema);
     if LPhysicalTable = nil then
     begin
       // New table: the CreateTable translator emits the fields (and PK) inline, so no per-field ops here.
@@ -233,7 +233,7 @@ var
 begin
   for LMappedTable in AMappedSchema.Tables.Values do
   begin
-    LPhysicalTable := Find_TableByName(APhysicalSchema, LMappedTable.Name);
+    LPhysicalTable := Match_PhysicalTable(LMappedTable, APhysicalSchema);
     for LIndex in LMappedTable.Indexes.Values do
     begin
       if AStrict and (LMappedTable.Status = stUpdate) then
@@ -275,7 +275,7 @@ begin
   // matching physical FK exists but differs; otherwise leave it alone (unchanged, matched FK).
   for LMappedTable in AMappedSchema.Tables.Values do
   begin
-    LPhysicalTable := Find_TableByName(APhysicalSchema, LMappedTable.Name);
+    LPhysicalTable := Match_PhysicalTable(LMappedTable, APhysicalSchema);
     for LFK in LMappedTable.ForeignKeys.Values do
     begin
       if AStrict and (LMappedTable.Status = stUpdate) then

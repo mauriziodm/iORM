@@ -90,7 +90,7 @@ begin
   //    absent-in-DB -> stCreate (fresh), present-but-different -> stUpdate (rebuild), identical -> stClean.
   for LMappedTable in LMappedSchema.Tables.Values do
   begin
-    LPhysicalTable := Find_TableByName(LPhysicalSchema, LMappedTable.Name);
+    LPhysicalTable := Match_PhysicalTable(LMappedTable, LPhysicalSchema);
     if LPhysicalTable = nil then
     begin
       LMappedTable.Status := stCreate;
@@ -125,7 +125,7 @@ begin
   for LMappedTable in LMappedSchema.Tables.Values do
     if LMappedTable.Status = stUpdate then
     begin
-      LPhysicalTable := Find_TableByName(LPhysicalSchema, LMappedTable.Name);
+      LPhysicalTable := Match_PhysicalTable(LMappedTable, LPhysicalSchema);
       if LPhysicalTable <> nil then
         for LPhysicalIndex in LPhysicalTable.Indexes.Values do
           LPlan.AddDropIndex(LMappedTable, LPhysicalIndex);

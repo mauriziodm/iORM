@@ -60,7 +60,7 @@ type
 
   /// <summary>
   ///  Abstract base of the PlanBuilder family: it holds the diff PRIMITIVES shared by both build shapes
-  ///  (the cross-branch Find_* lookups, the Check_ForeignKeyModified structural comparison and the
+  ///  (the cross-branch Match_* matchers, the Check_ForeignKeyModified structural comparison and the
   ///  Check_TableModified table-level diff), the Plan_Orphan* phases shared verbatim by both (reporting
   ///  objects present in the DB but absent from the ORM maps), Plan_Sequences (the single creation point
   ///  for sequences, shape-independent), plus the Context plumbing, and declares the
@@ -79,6 +79,11 @@ type
     // The by-name lookup shared by both directions of the sequence matchers (Match_MappedSequence /
     // Match_PhysicalSequence): nil when ASchema is nil (no Physical schema yet) or holds no such Name.
     function Find_SequenceByName(const ASchema: IioDBBuilderSchema; const AName: String): IioDBBuilderSchemaSequence;
+    // The by-name lookup shared by both directions of the table matchers (Match_MappedTable /
+    // Match_PhysicalTable): nil-schema safe, and case-INsensitive (SameText) on purpose - a physical table
+    // name can have drifted in case (hand-written DDL, another tool, an older app version); the schema's own
+    // FindTable stays exact, see TioDBBuilderSchema.FindTable for why the safety net lives here.
+    function Find_TableByName(const ASchema: IioDBBuilderSchema; const AName: String): IioDBBuilderSchemaTable;
   protected
     // The single entry point (IioDBBuilderPlanBuilder), implemented by each concrete build shape.
     function BuildPlan: IioDBBuilderPlan; virtual; abstract;
@@ -119,7 +124,6 @@ type
     ///  forced to stCreate (the fresh-DB path decided upstream).
     /// </summary>
     procedure Escalate_PendingStatuses(const AMappedSchema: IioDBBuilderSchema);
-    function Find_TableByName(const ASchema: IioDBBuilderSchema; const AName: String): IioDBBuilderSchemaTable;
     // Cross-branch matchers (Match_*): given a node of one branch, return its counterpart in the OTHER
     // branch, or nil = none. Each element has a pair, named after the branch searched: Match_Physical<X>
     // takes a mapped node and searches the physical side (the create/alter passes: "does it exist in the
@@ -129,6 +133,8 @@ type
     // touching any caller. Where it is symmetric, both directions share one private function.
     //  - Sequences: by Name, normalized on both branches by the TioDBBuilderSchemaSequence constructor.
     //    Symmetric: both directions go through the private Find_SequenceByName (nil-schema safe).
+    //  - Tables: by Name, case-insensitive (a physical name may have drifted in case). Symmetric: both
+    //    directions go through the private Find_TableByName (nil-schema safe).
     //  - Indexes: Match_PhysicalIndex first translates the mapped index to the catalog name it WOULD have
     //    (dialect rule), then looks that up - asymmetric, there is no shared name key.
     //  - Foreign keys: structural attributes (dependent field + reference table), no name key either.
@@ -145,16 +151,20 @@ type
       const APhysicalIndex: IioDBBuilderSchemaIndex): IioDBBuilderSchemaIndex;
     function Match_MappedSequence(const AMappedSchema: IioDBBuilderSchema;
       const APhysicalSequence: IioDBBuilderSchemaSequence): IioDBBuilderSchemaSequence;
+    function Match_MappedTable(const AMappedSchema: IioDBBuilderSchema;
+      const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaTable;
     function Match_PhysicalForeignKey(const AMappedFK: IioDBBuilderSchemaFK;
       const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaFK;
     function Match_PhysicalIndex(const AMappedTable: IioDBBuilderSchemaTable; const AMappedIndex: IioDBBuilderSchemaIndex;
       const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaIndex;
     function Match_PhysicalSequence(const AMappedSequence: IioDBBuilderSchemaSequence;
       const APhysicalSchema: IioDBBuilderSchema): IioDBBuilderSchemaSequence;
+    function Match_PhysicalTable(const AMappedTable: IioDBBuilderSchemaTable;
+      const APhysicalSchema: IioDBBuilderSchema): IioDBBuilderSchemaTable;
     // Orphan-emission phases shared by both build shapes: WithAlterTable's incremental diff and
     // WithoutAlterTable's rebuild both need to report objects present in the DB but absent from the ORM
     // maps, and do so identically (mark the physical node stDrop, cascade/warn, append the Plan op).
-    // Tables and fields share one shape - no AStrict, matched by name (Find_TableByName/FindField): a
+    // Tables and fields share one shape - no AStrict, matched by name (Match_MappedTable/FindField): a
     // table/field is always managed, never an optional axis like indexes/FKs - so they are detected
     // together in Plan_OrphanTablesAndFields (two passes there, tables before fields, most severe loss
     // first). Indexes/FKs are the two
@@ -363,6 +373,18 @@ begin
   Result := Find_SequenceByName(APhysicalSchema, AMappedSequence.Name);
 end;
 
+function TioDBBuilderPlanBuilderBase.Match_MappedTable(const AMappedSchema: IioDBBuilderSchema;
+  const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaTable;
+begin
+  Result := Find_TableByName(AMappedSchema, APhysicalTable.Name);
+end;
+
+function TioDBBuilderPlanBuilderBase.Match_PhysicalTable(const AMappedTable: IioDBBuilderSchemaTable;
+  const APhysicalSchema: IioDBBuilderSchema): IioDBBuilderSchemaTable;
+begin
+  Result := Find_TableByName(APhysicalSchema, AMappedTable.Name);
+end;
+
 function TioDBBuilderPlanBuilderBase.Find_TableByName(const ASchema: IioDBBuilderSchema;
   const AName: String): IioDBBuilderSchemaTable;
 var
@@ -404,7 +426,7 @@ begin
   // severity signal). The Strategy renders both as a commented-out, non-executed statement plus a
   // warning - iORM never silently drops a table or a field.
   for LPhysicalTable in APhysicalSchema.Tables.Values do
-    if Find_TableByName(AMappedSchema, LPhysicalTable.Name) = nil then
+    if Match_MappedTable(AMappedSchema, LPhysicalTable) = nil then
     begin
       LPhysicalTable.CascadeTableDropStatus;
       Warning_DanglingForeignKeys(AMappedSchema, LPhysicalTable.Name, '');
@@ -412,7 +434,7 @@ begin
     end;
   for LPhysicalTable in APhysicalSchema.Tables.Values do
   begin
-    LMappedTable := Find_TableByName(AMappedSchema, LPhysicalTable.Name);
+    LMappedTable := Match_MappedTable(AMappedSchema, LPhysicalTable);
     if LMappedTable = nil then
       Continue;
     for LPhysicalField in LPhysicalTable.Fields do
@@ -443,7 +465,7 @@ begin
   begin
     if AStrict and (LMappedTable.Status = stUpdate) then
       Continue;
-    LPhysicalTable := Find_TableByName(APhysicalSchema, LMappedTable.Name);
+    LPhysicalTable := Match_PhysicalTable(LMappedTable, APhysicalSchema);
     if LPhysicalTable = nil then
       Continue;
     for LPhysicalFK in LPhysicalTable.ForeignKeys.Values do
@@ -472,7 +494,7 @@ begin
   begin
     if AStrict and (LMappedTable.Status = stUpdate) then
       Continue;
-    LPhysicalTable := Find_TableByName(APhysicalSchema, LMappedTable.Name);
+    LPhysicalTable := Match_PhysicalTable(LMappedTable, APhysicalSchema);
     if LPhysicalTable = nil then
       Continue;
     for LPhysicalIndex in LPhysicalTable.Indexes.Values do

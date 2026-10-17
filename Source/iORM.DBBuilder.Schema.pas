@@ -111,8 +111,9 @@ end;
 // so a direct hit is authoritative. Two deliberate NON-choices, kept together on purpose (2026-08-29):
 //  (1) No dedicated boolean "TableExists" API - the existence-check idiom is FindTable(AName, False) <> nil.
 //  (2) This stays case-SENSITIVE. The case-insensitive reconciliation safety net deliberately lives on the
-//      PlanBuilder side (Find_TableByName), where a physical DB name can have drifted in case (hand-written
-//      DDL, another tool, an older app version). Making this lookup or the dictionary case-insensitive
+//      PlanBuilder side (the private Find_TableByName behind Match_PhysicalTable/Match_MappedTable), where
+//      a physical DB name can have drifted in case (hand-written DDL, another tool, an older app
+//      version). Making this lookup or the dictionary case-insensitive
 //      would be wrong on SQLite, whose table names ARE case-sensitive (names differing only in case are
 //      legal and distinct -> a CI dictionary would collide and trip AddTable's duplicate guard).
 function TioDBBuilderSchema.FindTable(const ATableName: String; const ARaiseIfNotFound: Boolean = True): IioDBBuilderSchemaTable;
