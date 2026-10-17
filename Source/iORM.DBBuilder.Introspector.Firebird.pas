@@ -44,9 +44,9 @@ type
   ///  Firebird catalog reads via the RDB$ system tables. Notes on Firebird specifics: BuildSQL_FieldList
   ///  already normalizes RDB$FIELD_TYPE into iORM-flavoured tokens (VARCHAR/INTEGER/...) and exposes
   ///  length/precision/scale/subtype; standalone indexes (BuildSQL_IndexList already excludes the ones
-  ///  backing a constraint) carry unique/orientation flags; foreign keys are matched (and keyed) by their
-  ///  deterministic constraint name - the hash encodes the structural properties - so BuildSQL_FKList
-  ///  (name + actions) is sufficient and the dependent/reference columns are left blank.
+  ///  backing a constraint) carry unique/orientation flags; foreign keys are keyed by their constraint
+  ///  name and carry the structural columns too (dependent field, reference table/field, actions), so the
+  ///  PlanBuilder matches them structurally (Match_PhysicalForeignKey), the same way as on SQLite.
   /// </summary>
   TioDBBuilderIntrospectorFirebird = class(TioDBBuilderIntrospectorBase)
   private

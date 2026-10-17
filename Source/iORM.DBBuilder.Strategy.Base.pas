@@ -137,7 +137,9 @@ type
                              dispatches each op to the virtual ScriptWrite_PlanOperation (the base handles
                              the ops both shapes share; the shapes override to add their own).
         ScriptWrite_*        translates a single Plan operation into DDL/DML on Context.Script.Body
-        Check_*              interrogates the (introspected) physical schema / detects a change, returns Boolean
+        Check_*              queries the live database, returns Boolean (today only Check_DatabaseExists, a
+                             pass-through to the SqlGenerator). Never a lookup on the Physical schema:
+                             what a translator needs from the Physical side arrives on the Plan op.
         Warning_* / Hint_*   diagnostics appended to Context.Script.Warnings / Context.Script.Hints
       Plain accessors and private helpers are sanctioned exceptions and keep plain Delphi
       verb naming (Get*). Interface membership is orthogonal to the prefix.

@@ -56,6 +56,12 @@ type
   ///  statement plus a warning - iORM never silently drops a table, a field, an index or a foreign key it
   ///  does not know about (WithoutAlterTable dialects that cannot express a single DROP CONSTRAINT at all,
   ///  e.g. SQLite, fall back to a warning with no statement - see ScriptWrite_DropOrphanForeignKey).
+  ///  Naming note: opDropTable/opDropField are orphan-only too but carry no "Orphan" prefix - they predate
+  ///  the convention, and no intentional table/field drop exists to tell them apart from. The prefix is
+  ///  there where it disambiguates (opDropOrphanIndex/opDropOrphanForeignKey vs the executed opDropIndex/
+  ///  opDropForeignKey) and on opDropOrphanSequence, where the intentional counterpart is deliberately
+  ///  absent (see below). Renaming the two into opDropOrphanTable/opDropOrphanField was considered and
+  ///  parked: worth it only if an intentional table/field drop ever appears.
   ///  opDropIndex/opDropForeignKey (dropping a physical index/FK by its actual catalog name, executed for
   ///  real) are used instead where the drop is an intentional, requested action rather than an unmanaged
   ///  orphan: strict mode's wholesale clear of a modified table, a modified FK/index's drop-then-recreate,

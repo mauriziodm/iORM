@@ -46,11 +46,18 @@ Build order: Runtime (RT) packages first, then Design-Time (DT) packages.
 
 ### Key Subsystems
 
-- **DBBuilder** (`iORM.DBBuilder.*`): Automatic schema generation from Delphi classes
-  - `DBAnalyzer.*` - Database introspection (base + per-RDBMS variants)
-  - `Schema.*` - Schema representation (Table, Field, Index, FK)
+- **DBBuilder** (`iORM.DBBuilder.*`): Automatic schema generation and migration from Delphi classes.
+  Pipeline: `Schema.Builder` builds the **Mapped** schema from the entity maps (no DB access) →
+  `Introspector.*` reads the live catalog into the **Physical** schema → `PlanBuilder.*` diffs the two
+  into a dialect-independent **Plan** of operations → `Strategy.*` translates each operation into the
+  `Script`, using `SqlGenerator.*` for the dialect SQL. Entry points: `TioDBBuilder.Prepare_SyncDBStruct`
+  / `Prepare_ForceCreateDB`, each returning a Context whose `Execute` runs the script.
+  - `Schema.*` - Schema nodes (Schema, Table, Field, Index, FK, Sequence), shared by both branches
+  - `Introspector.*` - Catalog reading (base + per-RDBMS: SQLite, Firebird)
+  - `PlanBuilder.*` - Mapped-vs-Physical diff → Plan (`WithAlterTable` / `WithoutAlterTable` shapes)
+  - `Plan` - The ordered operations (`TioDBBuilderPlanOpKind`), built only via its `Add*` factories
   - `SqlGenerator.*` - SQL generation per database
-  - `Strategy.*` - Implementation strategy per database
+  - `Strategy.*` - Plan translation per database (`WithAlterTable` / `WithoutAlterTable`)
 
   **DBBuilder method naming & layout convention** (applies to the `SqlGenerator.*` and
   `Strategy.*` families — apply it automatically to any new/edited method, no need to be asked):
@@ -60,11 +67,14 @@ Build order: Runtime (RT) packages first, then Design-Time (DT) packages.
       `Translate_<Src>_To_<Tgt>` (schema element → SQL fragment/identifier), `Compare_` (pure
       node-vs-node comparison, Mapped vs Physical, returns a change-set — no DB access, no side
       effect), `Hint_` (emits an informational, non-blocking diagnostic into the Script).
-    - Strategy: `Process_` (orchestration / mode dispatch), `ScriptWrite_` (emits one DDL/DML
-      statement into `Script.Body`), `Force_` (drop that bypasses the configured mode), `Check_`
-      (catalog/change query → Boolean), `Warning_`/`Hint_` (diagnostics). `GenerateScript` (bare)
-      is the single public entry point (wraps `Script.ScriptBegin`/`ScriptEnd`); `GenerateScript_Body`
-      is its protected abstract dialect-specific counterpart, overridden by each concrete Strategy.
+    - Strategy: `ScriptWrite_` (translates one Plan operation into DDL/DML on `Script.Body`),
+      `Check_` (live-database query → Boolean; today only `Check_DatabaseExists`, a pass-through to
+      the SqlGenerator), `Warning_`/`Hint_` (diagnostics). `GenerateScript` (bare) is the single
+      public entry point (wraps `Script.ScriptBegin`/`ScriptEnd`); `GenerateScript_Body` is its
+      protected abstract shape-specific counterpart, overridden by `WithAlterTable`/`WithoutAlterTable`.
+      The Strategy never looks anything up across branches: what it needs from the Physical side
+      arrives on the Plan operation (see "DBBuilder cross-branch matching" below). The former
+      `Process_`/`Force_` roles disappeared with the probe-based model.
       Mode selection (forcing the schema to `stCreate`, emitting the force-create warning) is
       Engine's job, done on `Context` before `GenerateScript` is called.
   - Boolean predicates and plain accessors are sanctioned exceptions (`Get*`, `Is*`, `Load*`, etc.).
@@ -268,7 +278,7 @@ Each database has dedicated modules:
 - Connection definition: `iORM.DB.ConnectionDef.*.pas`
 - SQL generator: `iORM.DB.*.SqlGenerator.pas`
 - Data converter: `iORM.DB.*.SqlDataConverter.pas`
-- DBBuilder analyzer: `iORM.DBBuilder.DBAnalyzer.*.pas`
+- DBBuilder introspector: `iORM.DBBuilder.Introspector.*.pas`
 - DBBuilder SQL generator: `iORM.DBBuilder.SqlGenerator.*.pas`
 - DBBuilder strategy: `iORM.DBBuilder.Strategy.*.pas`
 
