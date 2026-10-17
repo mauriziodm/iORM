@@ -76,6 +76,9 @@ type
   /// </summary>
   TioDBBuilderPlanBuilderBase = class(TioDBBuilderPlanBuilderSegregation, IioDBBuilderPlanBuilder)
   private
+    // The by-name lookup shared by both directions of the sequence matchers (Match_MappedSequence /
+    // Match_PhysicalSequence): nil when ASchema is nil (no Physical schema yet) or holds no such Name.
+    function Find_SequenceByName(const ASchema: IioDBBuilderSchema; const AName: String): IioDBBuilderSchemaSequence;
   protected
     // The single entry point (IioDBBuilderPlanBuilder), implemented by each concrete build shape.
     function BuildPlan: IioDBBuilderPlan; virtual; abstract;
@@ -117,27 +120,37 @@ type
     /// </summary>
     procedure Escalate_PendingStatuses(const AMappedSchema: IioDBBuilderSchema);
     function Find_TableByName(const ASchema: IioDBBuilderSchema; const AName: String): IioDBBuilderSchemaTable;
-    // Cross-branch structural matchers: unlike a plain name lookup (see IioDBBuilderSchemaTable.FindField),
-    // these compute the physical counterpart of a mapped FK/index from attributes OTHER than a shared name
-    // key, because no such key exists (this is not "does a foreign key/index with this name exist").
-    // Match_PhysicalForeignKey compares structural attributes (dependent field + reference table);
-    // Match_PhysicalIndex first translates the mapped index to the catalog name it WOULD have (dialect
-    // rule), then looks that up. Matching is case-insensitive (SameText): both branches
-    // normalize identifiers via the same SqlDataConverter, so the keys already align - the case-insensitivity
-    // is just belt-and-suspenders (and mirrors SQLite's native case-insensitive identifier matching). Each
-    // returns the physical node, or nil = absent. Match_MappedIndex/Match_MappedForeignKey are the reverse
-    // direction (given a PHYSICAL index/FK, is there a mapped one that would match it?) - used by both
-    // build shapes to tell an orphan physical index/FK (no mapped counterpart at all) apart from one that
-    // is simply out of date (the incremental Plan_Indexes/Plan_ForeignKeys/Check_TableModified already
-    // handle that case via Match_PhysicalIndex/Match_PhysicalForeignKey).
+    // Cross-branch matchers (Match_*): given a node of one branch, return its counterpart in the OTHER
+    // branch, or nil = none. Each element has a pair, named after the branch searched: Match_Physical<X>
+    // takes a mapped node and searches the physical side (the create/alter passes: "does it exist in the
+    // DB?"); Match_Mapped<X> takes a physical node and searches the mapped side (the orphan passes: "is it
+    // still mapped?"). The caller passes the node and never learns HOW the counterpart is found: that rule
+    // is encapsulated here and may differ per element and per direction, and may change over time without
+    // touching any caller. Where it is symmetric, both directions share one private function.
+    //  - Sequences: by Name, normalized on both branches by the TioDBBuilderSchemaSequence constructor.
+    //    Symmetric: both directions go through the private Find_SequenceByName (nil-schema safe).
+    //  - Indexes: Match_PhysicalIndex first translates the mapped index to the catalog name it WOULD have
+    //    (dialect rule), then looks that up - asymmetric, there is no shared name key.
+    //  - Foreign keys: structural attributes (dependent field + reference table), no name key either.
+    // Index/FK matching is case-insensitive (SameText): both branches normalize identifiers via the same
+    // SqlDataConverter, so the keys already align - the case-insensitivity is belt-and-suspenders (and
+    // mirrors SQLite's native case-insensitive identifier matching). The Mapped direction is what tells an
+    // orphan physical index/FK (no mapped counterpart at all) apart from one that is simply out of date (the
+    // incremental Plan_Indexes/Plan_ForeignKeys/Check_TableModified handle that case via the Physical one).
+    // Not to be confused with the schema's own FindSequence/FindTable/FindField: a by-name lookup WITHIN
+    // one branch, for whoever builds the nodes and for the internals of these matchers.
     function Match_MappedForeignKey(const AMappedTable: IioDBBuilderSchemaTable;
       const APhysicalFK: IioDBBuilderSchemaFK): IioDBBuilderSchemaFK;
     function Match_MappedIndex(const AMappedTable: IioDBBuilderSchemaTable;
       const APhysicalIndex: IioDBBuilderSchemaIndex): IioDBBuilderSchemaIndex;
+    function Match_MappedSequence(const AMappedSchema: IioDBBuilderSchema;
+      const APhysicalSequence: IioDBBuilderSchemaSequence): IioDBBuilderSchemaSequence;
     function Match_PhysicalForeignKey(const AMappedFK: IioDBBuilderSchemaFK;
       const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaFK;
     function Match_PhysicalIndex(const AMappedTable: IioDBBuilderSchemaTable; const AMappedIndex: IioDBBuilderSchemaIndex;
       const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaIndex;
+    function Match_PhysicalSequence(const AMappedSequence: IioDBBuilderSchemaSequence;
+      const APhysicalSchema: IioDBBuilderSchema): IioDBBuilderSchemaSequence;
     // Orphan-emission phases shared by both build shapes: WithAlterTable's incremental diff and
     // WithoutAlterTable's rebuild both need to report objects present in the DB but absent from the ORM
     // maps, and do so identically (mark the physical node stDrop, cascade/warn, append the Plan op).
@@ -330,6 +343,26 @@ end;
 // older app version), so the scan is the safety net. Deliberately NOT merged into Schema.FindTable and NOT
 // re-exposed as a boolean "TableExists" (2026-08-29): both would blur the registry/diff-primitive layer
 // split. See FindTable's comment for the mirror side.
+function TioDBBuilderPlanBuilderBase.Find_SequenceByName(const ASchema: IioDBBuilderSchema;
+  const AName: String): IioDBBuilderSchemaSequence;
+begin
+  if ASchema = nil then
+    Exit(nil);
+  Result := ASchema.FindSequence(AName, False);
+end;
+
+function TioDBBuilderPlanBuilderBase.Match_MappedSequence(const AMappedSchema: IioDBBuilderSchema;
+  const APhysicalSequence: IioDBBuilderSchemaSequence): IioDBBuilderSchemaSequence;
+begin
+  Result := Find_SequenceByName(AMappedSchema, APhysicalSequence.Name);
+end;
+
+function TioDBBuilderPlanBuilderBase.Match_PhysicalSequence(const AMappedSequence: IioDBBuilderSchemaSequence;
+  const APhysicalSchema: IioDBBuilderSchema): IioDBBuilderSchemaSequence;
+begin
+  Result := Find_SequenceByName(APhysicalSchema, AMappedSequence.Name);
+end;
+
 function TioDBBuilderPlanBuilderBase.Find_TableByName(const ASchema: IioDBBuilderSchema;
   const AName: String): IioDBBuilderSchemaTable;
 var
@@ -458,11 +491,11 @@ var
 begin
   if (not Context.SqlGenerator.Supports_Sequence) or (APhysicalSchema = nil) then
     Exit;
-  // Same set difference as Plan_Sequences, the other way round. "Orphan" here means any user sequence
-  // iORM does not map - including one used by hand-written triggers or by another application on the same
-  // DB - which is exactly why the Strategy only ever comments the DROP out and warns.
+  // Same set difference as Plan_Sequences, the other way round (Match_MappedSequence). "Orphan" here
+  // means any user sequence iORM does not map - including one used by hand-written triggers or by another
+  // application on the same DB - which is exactly why the Strategy only ever comments the DROP out and warns.
   for LPhysicalSequence in APhysicalSchema.Sequences.Values do
-    if AMappedSchema.FindSequence(LPhysicalSequence.Name, False) = nil then
+    if Match_MappedSequence(AMappedSchema, LPhysicalSequence) = nil then
     begin
       LPhysicalSequence.Status := stDrop;
       APlan.AddDropOrphanSequence(LPhysicalSequence);
@@ -476,13 +509,11 @@ var
 begin
   if not Context.SqlGenerator.Supports_Sequence then
     Exit;
-  // A plain set difference on the node Name: both branches build their nodes through the same
-  // NormalizeSqlIdentifier (TioDBBuilderSchemaSequence), so the keys align by construction - and the name
-  // is never shortened on either side, so the key also equals what CREATE SEQUENCE writes. Table status is
-  // deliberately not consulted: whether the owning table is new, modified or clean, a missing sequence is
-  // missing.
+  // A set difference through Match_PhysicalSequence, which owns the matching rule (see the Match_* notes)
+  // and copes with a nil Physical schema. Table status is deliberately not consulted: whether the owning
+  // table is new, modified or clean, a missing sequence is missing.
   for LMappedSequence in AMappedSchema.Sequences.Values do
-    if (APhysicalSchema = nil) or (APhysicalSchema.FindSequence(LMappedSequence.Name, False) = nil) then
+    if Match_PhysicalSequence(LMappedSequence, APhysicalSchema) = nil then
     begin
       LMappedSequence.Status := stCreate;
       APlan.AddCreateSequence(LMappedSequence);
