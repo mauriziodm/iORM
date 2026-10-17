@@ -44,8 +44,11 @@ type
   ///  A single schema-change operation: a plain data record of *what* must change. It carries only
   ///  references to the Schema node(s) it concerns plus (for opAlterField) the altered-attribute set,
   ///  and holds no knowledge of *how* to render itself - realization is the dialect's job. Constructed
-  ///  only through TioDBBuilderPlan's typed factory methods, which pass exactly the slots each Kind
-  ///  needs and leave the rest empty.
+  ///  only through TioDBBuilderPlan's typed factory methods (the Add* family). There is one named
+  ///  constructor per schema element (CreateFor<Element>), each taking only the slots that element's ops
+  ///  can fill, with the _Mapped/_Physical pair of the same type always adjacent and named after its
+  ///  branch: no positional chain of nil defaults, so a node cannot silently land in the wrong slot (two
+  ///  slots of the same type never sit apart in one long argument list). Every slot not set stays nil.
   /// </summary>
   TioDBBuilderPlanOperation = class(TInterfacedObject, IioDBBuilderPlanOperation)
   strict private
@@ -70,11 +73,14 @@ type
     function GetSchemaTable_Physical: IioDBBuilderSchemaTable;
   strict protected
   public
-    constructor Create(const AKind: TioDBBuilderPlanOpKind; const ATable_Mapped: IioDBBuilderSchemaTable = nil;
-      const AField: IioDBBuilderSchemaField = nil; const AIndex: IioDBBuilderSchemaIndex = nil;
-      const AForeignKey: IioDBBuilderSchemaFK = nil; const ASchemaField_Changes: TioDBBuilderFieldChanges = [];
-      const ASequence: IioDBBuilderSchemaSequence = nil; const AField_Physical: IioDBBuilderSchemaField = nil;
-      const ATable_Physical: IioDBBuilderSchemaTable = nil);
+    constructor CreateForField(const AKind: TioDBBuilderPlanOpKind; const ATable_Mapped: IioDBBuilderSchemaTable;
+      const AField_Mapped, AField_Physical: IioDBBuilderSchemaField; const AField_Changes: TioDBBuilderFieldChanges);
+    constructor CreateForForeignKey(const AKind: TioDBBuilderPlanOpKind; const ATable_Mapped: IioDBBuilderSchemaTable;
+      const AForeignKey: IioDBBuilderSchemaFK);
+    constructor CreateForIndex(const AKind: TioDBBuilderPlanOpKind; const ATable_Mapped: IioDBBuilderSchemaTable;
+      const AIndex: IioDBBuilderSchemaIndex);
+    constructor CreateForSequence(const AKind: TioDBBuilderPlanOpKind; const ASequence: IioDBBuilderSchemaSequence);
+    constructor CreateForTable(const AKind: TioDBBuilderPlanOpKind; const ATable_Mapped, ATable_Physical: IioDBBuilderSchemaTable);
   end;
 
   /// <summary>
@@ -128,20 +134,50 @@ uses
 
 { TioDBBuilderPlanOperation }
 
-constructor TioDBBuilderPlanOperation.Create(const AKind: TioDBBuilderPlanOpKind; const ATable_Mapped: IioDBBuilderSchemaTable;
-  const AField: IioDBBuilderSchemaField; const AIndex: IioDBBuilderSchemaIndex; const AForeignKey: IioDBBuilderSchemaFK;
-  const ASchemaField_Changes: TioDBBuilderFieldChanges; const ASequence: IioDBBuilderSchemaSequence; const AField_Physical: IioDBBuilderSchemaField;
-  const ATable_Physical: IioDBBuilderSchemaTable);
+constructor TioDBBuilderPlanOperation.CreateForField(const AKind: TioDBBuilderPlanOpKind;
+  const ATable_Mapped: IioDBBuilderSchemaTable; const AField_Mapped, AField_Physical: IioDBBuilderSchemaField;
+  const AField_Changes: TioDBBuilderFieldChanges);
 begin
   inherited Create;
   FKind := AKind;
   FSchemaTable_Mapped := ATable_Mapped;
-  FSchemaField_Mapped := AField;
+  FSchemaField_Mapped := AField_Mapped;
   FSchemaField_Physical := AField_Physical;
-  FSchemaIndex := AIndex;
+  FSchemaField_Changes := AField_Changes;
+end;
+
+constructor TioDBBuilderPlanOperation.CreateForForeignKey(const AKind: TioDBBuilderPlanOpKind;
+  const ATable_Mapped: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK);
+begin
+  inherited Create;
+  FKind := AKind;
+  FSchemaTable_Mapped := ATable_Mapped;
   FSchemaForeignKey := AForeignKey;
-  FSchemaField_Changes := ASchemaField_Changes;
+end;
+
+constructor TioDBBuilderPlanOperation.CreateForIndex(const AKind: TioDBBuilderPlanOpKind;
+  const ATable_Mapped: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex);
+begin
+  inherited Create;
+  FKind := AKind;
+  FSchemaTable_Mapped := ATable_Mapped;
+  FSchemaIndex := AIndex;
+end;
+
+constructor TioDBBuilderPlanOperation.CreateForSequence(const AKind: TioDBBuilderPlanOpKind;
+  const ASequence: IioDBBuilderSchemaSequence);
+begin
+  inherited Create;
+  FKind := AKind;
   FSchemaSequence := ASequence;
+end;
+
+constructor TioDBBuilderPlanOperation.CreateForTable(const AKind: TioDBBuilderPlanOpKind;
+  const ATable_Mapped, ATable_Physical: IioDBBuilderSchemaTable);
+begin
+  inherited Create;
+  FKind := AKind;
+  FSchemaTable_Mapped := ATable_Mapped;
   FSchemaTable_Physical := ATable_Physical;
 end;
 
@@ -240,86 +276,86 @@ end;
 
 function TioDBBuilderPlan.AddCopyData(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
 begin
-  Result := AddOp(TioDBBuilderPlanOperation.Create(opCopyData, ATable));
+  Result := AddOp(TioDBBuilderPlanOperation.CreateForTable(opCopyData, ATable, nil));
 end;
 
 function TioDBBuilderPlan.AddCreateTable(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
 begin
-  Result := AddOp(TioDBBuilderPlanOperation.Create(opCreateTable, ATable));
+  Result := AddOp(TioDBBuilderPlanOperation.CreateForTable(opCreateTable, ATable, nil));
 end;
 
 function TioDBBuilderPlan.AddDropTable(const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
 begin
-  Result := AddOp(TioDBBuilderPlanOperation.Create(opDropTable, nil, nil, nil, nil, [], nil, nil, APhysicalTable));
+  Result := AddOp(TioDBBuilderPlanOperation.CreateForTable(opDropTable, nil, APhysicalTable));
 end;
 
 function TioDBBuilderPlan.AddRenameTableToOld(const AMappedTable, APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
 begin
-  Result := AddOp(TioDBBuilderPlanOperation.Create(opRenameTableToOld, AMappedTable, nil, nil, nil, [], nil, nil, APhysicalTable));
+  Result := AddOp(TioDBBuilderPlanOperation.CreateForTable(opRenameTableToOld, AMappedTable, APhysicalTable));
 end;
 
 function TioDBBuilderPlan.AddAlterField(const ATable: IioDBBuilderSchemaTable; const AMappedField, APhysicalField: IioDBBuilderSchemaField;
   const ASchemaField_Changes: TioDBBuilderFieldChanges): IioDBBuilderPlanOperation;
 begin
-  Result := AddOp(TioDBBuilderPlanOperation.Create(opAlterField, ATable, AMappedField, nil, nil, ASchemaField_Changes, nil, APhysicalField));
+  Result := AddOp(TioDBBuilderPlanOperation.CreateForField(opAlterField, ATable, AMappedField, APhysicalField, ASchemaField_Changes));
 end;
 
 function TioDBBuilderPlan.AddCreateField(const ATable: IioDBBuilderSchemaTable;
   const AField: IioDBBuilderSchemaField): IioDBBuilderPlanOperation;
 begin
-  Result := AddOp(TioDBBuilderPlanOperation.Create(opCreateField, ATable, AField));
+  Result := AddOp(TioDBBuilderPlanOperation.CreateForField(opCreateField, ATable, AField, nil, []));
 end;
 
 function TioDBBuilderPlan.AddDropField(const ATable: IioDBBuilderSchemaTable;
   const AField: IioDBBuilderSchemaField): IioDBBuilderPlanOperation;
 begin
-  Result := AddOp(TioDBBuilderPlanOperation.Create(opDropField, ATable, nil, nil, nil, [], nil, AField));
+  Result := AddOp(TioDBBuilderPlanOperation.CreateForField(opDropField, ATable, nil, AField, []));
 end;
 
 function TioDBBuilderPlan.AddCreateIndex(const ATable: IioDBBuilderSchemaTable;
   const AIndex: IioDBBuilderSchemaIndex): IioDBBuilderPlanOperation;
 begin
-  Result := AddOp(TioDBBuilderPlanOperation.Create(opCreateIndex, ATable, nil, AIndex));
+  Result := AddOp(TioDBBuilderPlanOperation.CreateForIndex(opCreateIndex, ATable, AIndex));
 end;
 
 function TioDBBuilderPlan.AddDropIndex(const ATable: IioDBBuilderSchemaTable;
   const AIndex: IioDBBuilderSchemaIndex): IioDBBuilderPlanOperation;
 begin
-  Result := AddOp(TioDBBuilderPlanOperation.Create(opDropIndex, ATable, nil, AIndex));
+  Result := AddOp(TioDBBuilderPlanOperation.CreateForIndex(opDropIndex, ATable, AIndex));
 end;
 
 function TioDBBuilderPlan.AddDropOrphanIndex(const ATable: IioDBBuilderSchemaTable;
   const AIndex: IioDBBuilderSchemaIndex): IioDBBuilderPlanOperation;
 begin
-  Result := AddOp(TioDBBuilderPlanOperation.Create(opDropOrphanIndex, ATable, nil, AIndex));
+  Result := AddOp(TioDBBuilderPlanOperation.CreateForIndex(opDropOrphanIndex, ATable, AIndex));
 end;
 
 function TioDBBuilderPlan.AddCreateForeignKey(const ATable: IioDBBuilderSchemaTable;
   const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;
 begin
-  Result := AddOp(TioDBBuilderPlanOperation.Create(opCreateForeignKey, ATable, nil, nil, AForeignKey));
+  Result := AddOp(TioDBBuilderPlanOperation.CreateForForeignKey(opCreateForeignKey, ATable, AForeignKey));
 end;
 
 function TioDBBuilderPlan.AddDropForeignKey(const ATable: IioDBBuilderSchemaTable;
   const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;
 begin
-  Result := AddOp(TioDBBuilderPlanOperation.Create(opDropForeignKey, ATable, nil, nil, AForeignKey));
+  Result := AddOp(TioDBBuilderPlanOperation.CreateForForeignKey(opDropForeignKey, ATable, AForeignKey));
 end;
 
 function TioDBBuilderPlan.AddDropOrphanForeignKey(const ATable: IioDBBuilderSchemaTable;
   const AForeignKey: IioDBBuilderSchemaFK): IioDBBuilderPlanOperation;
 begin
-  Result := AddOp(TioDBBuilderPlanOperation.Create(opDropOrphanForeignKey, ATable, nil, nil, AForeignKey));
+  Result := AddOp(TioDBBuilderPlanOperation.CreateForForeignKey(opDropOrphanForeignKey, ATable, AForeignKey));
 end;
 
 function TioDBBuilderPlan.AddCreateSequence(const ASequence: IioDBBuilderSchemaSequence): IioDBBuilderPlanOperation;
 begin
-  Result := AddOp(TioDBBuilderPlanOperation.Create(opCreateSequence, nil, nil, nil, nil, [], ASequence));
+  Result := AddOp(TioDBBuilderPlanOperation.CreateForSequence(opCreateSequence, ASequence));
 end;
 
 function TioDBBuilderPlan.AddDropOrphanSequence(const ASequence: IioDBBuilderSchemaSequence): IioDBBuilderPlanOperation;
 begin
-  Result := AddOp(TioDBBuilderPlanOperation.Create(opDropOrphanSequence, nil, nil, nil, nil, [], ASequence));
+  Result := AddOp(TioDBBuilderPlanOperation.CreateForSequence(opDropOrphanSequence, ASequence));
 end;
 
 procedure TioDBBuilderPlan.Clear;
