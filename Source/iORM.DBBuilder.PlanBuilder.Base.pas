@@ -135,6 +135,8 @@ type
     //    Symmetric: both directions go through the private Find_SequenceByName (nil-schema safe).
     //  - Tables: by Name, case-insensitive (a physical name may have drifted in case). Symmetric: both
     //    directions go through the private Find_TableByName (nil-schema safe).
+    //  - Fields: by FieldName, case-insensitive. Symmetric: both directions call the owning table's own
+    //    FindField, which already is the shared function (the table is never nil at these call sites).
     //  - Indexes: Match_PhysicalIndex first translates the mapped index to the catalog name it WOULD have
     //    (dialect rule), then looks that up - asymmetric, there is no shared name key.
     //  - Foreign keys: structural attributes (dependent field + reference table), no name key either.
@@ -145,6 +147,8 @@ type
     // incremental Plan_Indexes/Plan_ForeignKeys/Check_TableModified handle that case via the Physical one).
     // Not to be confused with the schema's own FindSequence/FindTable/FindField: a by-name lookup WITHIN
     // one branch, for whoever builds the nodes and for the internals of these matchers.
+    function Match_MappedField(const AMappedTable: IioDBBuilderSchemaTable;
+      const APhysicalField: IioDBBuilderSchemaField): IioDBBuilderSchemaField;
     function Match_MappedForeignKey(const AMappedTable: IioDBBuilderSchemaTable;
       const APhysicalFK: IioDBBuilderSchemaFK): IioDBBuilderSchemaFK;
     function Match_MappedIndex(const AMappedTable: IioDBBuilderSchemaTable;
@@ -153,6 +157,8 @@ type
       const APhysicalSequence: IioDBBuilderSchemaSequence): IioDBBuilderSchemaSequence;
     function Match_MappedTable(const AMappedSchema: IioDBBuilderSchema;
       const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaTable;
+    function Match_PhysicalField(const AMappedField: IioDBBuilderSchemaField;
+      const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaField;
     function Match_PhysicalForeignKey(const AMappedFK: IioDBBuilderSchemaFK;
       const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaFK;
     function Match_PhysicalIndex(const AMappedTable: IioDBBuilderSchemaTable; const AMappedIndex: IioDBBuilderSchemaIndex;
@@ -164,7 +170,7 @@ type
     // Orphan-emission phases shared by both build shapes: WithAlterTable's incremental diff and
     // WithoutAlterTable's rebuild both need to report objects present in the DB but absent from the ORM
     // maps, and do so identically (mark the physical node stDrop, cascade/warn, append the Plan op).
-    // Tables and fields share one shape - no AStrict, matched by name (Match_MappedTable/FindField): a
+    // Tables and fields share one shape - no AStrict, matched by name (Match_MappedTable/Match_MappedField): a
     // table/field is always managed, never an optional axis like indexes/FKs - so they are detected
     // together in Plan_OrphanTablesAndFields (two passes there, tables before fields, most severe loss
     // first). Indexes/FKs are the two
@@ -252,7 +258,7 @@ begin
   // Fields: always compared - a field add/change is always a modification.
   for LField in AMappedTable.Fields do
   begin
-    LPhysicalField := APhysicalTable.FindField(LField.FieldName);
+    LPhysicalField := Match_PhysicalField(LField, APhysicalTable);
     if (LPhysicalField = nil) or (Context.SqlGenerator.Compare_Field(LField, LPhysicalField) <> []) then
       Exit;
   end;
@@ -373,6 +379,18 @@ begin
   Result := Find_SequenceByName(APhysicalSchema, AMappedSequence.Name);
 end;
 
+function TioDBBuilderPlanBuilderBase.Match_MappedField(const AMappedTable: IioDBBuilderSchemaTable;
+  const APhysicalField: IioDBBuilderSchemaField): IioDBBuilderSchemaField;
+begin
+  Result := AMappedTable.FindField(APhysicalField.FieldName);
+end;
+
+function TioDBBuilderPlanBuilderBase.Match_PhysicalField(const AMappedField: IioDBBuilderSchemaField;
+  const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaField;
+begin
+  Result := APhysicalTable.FindField(AMappedField.FieldName);
+end;
+
 function TioDBBuilderPlanBuilderBase.Match_MappedTable(const AMappedSchema: IioDBBuilderSchema;
   const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderSchemaTable;
 begin
@@ -438,7 +456,7 @@ begin
     if LMappedTable = nil then
       Continue;
     for LPhysicalField in LPhysicalTable.Fields do
-      if LMappedTable.FindField(LPhysicalField.FieldName) = nil then
+      if Match_MappedField(LMappedTable, LPhysicalField) = nil then
       begin
         LPhysicalField.Status := stDrop;
         LPhysicalTable.CascadeFieldDropStatus(LPhysicalField.FieldName);

@@ -102,6 +102,17 @@ Build order: Runtime (RT) packages first, then Design-Time (DT) packages.
     `TioDBBuilderSchema.FindTable`). Not affected: `Check_DatabaseExists` (a real catalog query, role
     prefix `Check_`) and `GetFieldDefaultExists` (a field property, not a lookup).
 
+  **DBBuilder cross-branch matching** (PlanBuilder): to find a node's counterpart in the OTHER branch
+  (Mapped vs Physical), call the element's `Match_*` pair, never a by-name lookup on the other branch:
+  `Match_Physical<X>(mappedNode, physicalContainer)` (create/alter passes: "does it exist in the DB?") and
+  `Match_Mapped<X>(mappedContainer, physicalNode)` (orphan passes: "is it still mapped?"). Every schema
+  element has one: tables, fields, indexes, foreign keys, sequences. The matching rule (by name, by
+  computed name, structural; case policy) is encapsulated in the matcher, so it can differ per element
+  and per direction and change without touching callers; where it is symmetric, both directions share
+  one private function. The schema's own `FindTable`/`FindField`/`FindSequence` are by-name lookups
+  WITHIN one branch, for whoever builds the nodes and for the matchers' internals. Rationale and
+  per-element rules: the `Match_*` note in `iORM.DBBuilder.PlanBuilder.Base.pas`.
+
 - **ETM (Entity Tracking Manager)** (`iORM.ETM.*`): Audit trail and change tracking
 
 - **MVVM** (`iORM.MVVM.*`): ViewModels, Views, Model binding, VM actions

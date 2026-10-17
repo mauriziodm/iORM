@@ -206,7 +206,7 @@ begin
       // decided here - see Escalate_PendingStatuses, called once at the end of BuildPlan.
       for LField in LMappedTable.Fields do
       begin
-        LPhysicalField := LPhysicalTable.FindField(LField.FieldName);
+        LPhysicalField := Match_PhysicalField(LField, LPhysicalTable);
         if LPhysicalField = nil then
         begin
           LField.Status := stCreate;

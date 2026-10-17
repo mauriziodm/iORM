@@ -104,7 +104,7 @@ begin
       // Mark the fields absent from the physical table stCreate so the data-copy op skips them: they have
       // no source column in the "_old" shadow table (every other field is copied across).
       for LField in LMappedTable.Fields do
-        if LPhysicalTable.FindField(LField.FieldName) = nil then
+        if Match_PhysicalField(LField, LPhysicalTable) = nil then
           LField.Status := stCreate;
     end;
   end;
