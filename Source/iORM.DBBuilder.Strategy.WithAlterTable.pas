@@ -115,10 +115,10 @@ end;
 procedure TioDBBuilderStrategyWithAlterTable.ScriptWrite_PlanOperation(const AOp: IioDBBuilderPlanOperation);
 begin
   case AOp.Kind of
-    opCreateField:     ScriptWrite_CreateField(AOp.SchemaTable, AOp.SchemaField_Mapped);
-    opAlterField:       ScriptWrite_AlterField(AOp.SchemaTable, AOp.SchemaField_Mapped, AOp.SchemaField_Physical, AOp.SchemaField_Changes);
-    opCreateForeignKey: ScriptWrite_CreateForeignKey(AOp.SchemaTable, AOp.SchemaForeignKey);
-    opDropForeignKey:   ScriptWrite_DropForeignKey(AOp.SchemaTable, AOp.SchemaForeignKey);
+    opCreateField:     ScriptWrite_CreateField(AOp.SchemaTable_Mapped, AOp.SchemaField_Mapped);
+    opAlterField:       ScriptWrite_AlterField(AOp.SchemaTable_Mapped, AOp.SchemaField_Mapped, AOp.SchemaField_Physical, AOp.SchemaField_Changes);
+    opCreateForeignKey: ScriptWrite_CreateForeignKey(AOp.SchemaTable_Mapped, AOp.SchemaForeignKey);
+    opDropForeignKey:   ScriptWrite_DropForeignKey(AOp.SchemaTable_Mapped, AOp.SchemaForeignKey);
   else
     inherited;
   end;

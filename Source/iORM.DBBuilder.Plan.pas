@@ -56,7 +56,8 @@ type
     FSchemaForeignKey: IioDBBuilderSchemaFK;
     FSchemaIndex: IioDBBuilderSchemaIndex;
     FSchemaSequence: IioDBBuilderSchemaSequence;
-    FSchemaTable: IioDBBuilderSchemaTable;
+    FSchemaTable_Mapped: IioDBBuilderSchemaTable;
+    FSchemaTable_Physical: IioDBBuilderSchemaTable;
     function GetDescription: String;
     function GetKind: TioDBBuilderPlanOpKind;
     function GetSchemaField_Changes: TioDBBuilderFieldChanges;
@@ -65,13 +66,15 @@ type
     function GetSchemaForeignKey: IioDBBuilderSchemaFK;
     function GetSchemaIndex: IioDBBuilderSchemaIndex;
     function GetSchemaSequence: IioDBBuilderSchemaSequence;
-    function GetSchemaTable: IioDBBuilderSchemaTable;
+    function GetSchemaTable_Mapped: IioDBBuilderSchemaTable;
+    function GetSchemaTable_Physical: IioDBBuilderSchemaTable;
   strict protected
   public
-    constructor Create(const AKind: TioDBBuilderPlanOpKind; const ATable: IioDBBuilderSchemaTable = nil;
+    constructor Create(const AKind: TioDBBuilderPlanOpKind; const ATable_Mapped: IioDBBuilderSchemaTable = nil;
       const AField: IioDBBuilderSchemaField = nil; const AIndex: IioDBBuilderSchemaIndex = nil;
       const AForeignKey: IioDBBuilderSchemaFK = nil; const ASchemaField_Changes: TioDBBuilderFieldChanges = [];
-      const ASequence: IioDBBuilderSchemaSequence = nil; const AField_Physical: IioDBBuilderSchemaField = nil);
+      const ASequence: IioDBBuilderSchemaSequence = nil; const AField_Physical: IioDBBuilderSchemaField = nil;
+      const ATable_Physical: IioDBBuilderSchemaTable = nil);
   end;
 
   /// <summary>
@@ -88,8 +91,8 @@ type
     // TABLE
     function AddCopyData(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
     function AddCreateTable(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
-    function AddDropTable(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
-    function AddRenameTableToOld(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
+    function AddDropTable(const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
+    function AddRenameTableToOld(const AMappedTable, APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
     // FIELD
     function AddAlterField(const ATable: IioDBBuilderSchemaTable; const AMappedField, APhysicalField: IioDBBuilderSchemaField;
       const ASchemaField_Changes: TioDBBuilderFieldChanges): IioDBBuilderPlanOperation;
@@ -125,44 +128,46 @@ uses
 
 { TioDBBuilderPlanOperation }
 
-constructor TioDBBuilderPlanOperation.Create(const AKind: TioDBBuilderPlanOpKind; const ATable: IioDBBuilderSchemaTable;
+constructor TioDBBuilderPlanOperation.Create(const AKind: TioDBBuilderPlanOpKind; const ATable_Mapped: IioDBBuilderSchemaTable;
   const AField: IioDBBuilderSchemaField; const AIndex: IioDBBuilderSchemaIndex; const AForeignKey: IioDBBuilderSchemaFK;
-  const ASchemaField_Changes: TioDBBuilderFieldChanges; const ASequence: IioDBBuilderSchemaSequence; const AField_Physical: IioDBBuilderSchemaField);
+  const ASchemaField_Changes: TioDBBuilderFieldChanges; const ASequence: IioDBBuilderSchemaSequence; const AField_Physical: IioDBBuilderSchemaField;
+  const ATable_Physical: IioDBBuilderSchemaTable);
 begin
   inherited Create;
   FKind := AKind;
-  FSchemaTable := ATable;
+  FSchemaTable_Mapped := ATable_Mapped;
   FSchemaField_Mapped := AField;
   FSchemaField_Physical := AField_Physical;
   FSchemaIndex := AIndex;
   FSchemaForeignKey := AForeignKey;
   FSchemaField_Changes := ASchemaField_Changes;
   FSchemaSequence := ASequence;
+  FSchemaTable_Physical := ATable_Physical;
 end;
 
 function TioDBBuilderPlanOperation.GetDescription: String;
 begin
   // Dialect-independent, human-readable summary built from iORM's standard metadata (no SqlGenerator).
   case FKind of
-    opCreateTable:      Result := Format('Create table %s', [QuotedStr(FSchemaTable.Name)]);
-    opDropTable:        Result := Format('Drop orphan table %s', [QuotedStr(FSchemaTable.Name)]);
-    opCreateField:      Result := Format('Add field %s to %s', [QuotedStr(FSchemaField_Mapped.FieldName), QuotedStr(FSchemaTable.Name)]);
-    opAlterField:       Result := Format('Alter field %s on %s', [QuotedStr(FSchemaField_Mapped.FieldName), QuotedStr(FSchemaTable.Name)]);
-    opDropField:        Result := Format('Drop orphan field %s from %s', [QuotedStr(FSchemaField_Physical.FieldName), QuotedStr(FSchemaTable.Name)]);
-    opCreateIndex:      Result := Format('Create index on %s (%s)', [QuotedStr(FSchemaTable.Name), FSchemaIndex.CommaSepFieldList]);
+    opCreateTable:      Result := Format('Create table %s', [QuotedStr(FSchemaTable_Mapped.Name)]);
+    opDropTable:        Result := Format('Drop orphan table %s', [QuotedStr(FSchemaTable_Physical.Name)]);
+    opCreateField:      Result := Format('Add field %s to %s', [QuotedStr(FSchemaField_Mapped.FieldName), QuotedStr(FSchemaTable_Mapped.Name)]);
+    opAlterField:       Result := Format('Alter field %s on %s', [QuotedStr(FSchemaField_Mapped.FieldName), QuotedStr(FSchemaTable_Mapped.Name)]);
+    opDropField:        Result := Format('Drop orphan field %s from %s', [QuotedStr(FSchemaField_Physical.FieldName), QuotedStr(FSchemaTable_Mapped.Name)]);
+    opCreateIndex:      Result := Format('Create index on %s (%s)', [QuotedStr(FSchemaTable_Mapped.Name), FSchemaIndex.CommaSepFieldList]);
     // AIndex is always a Physical node here (see AddDropIndex), so .Name is always the real catalog name.
-    opDropIndex:        Result := Format('Drop existing index %s on %s', [QuotedStr(FSchemaIndex.Name), QuotedStr(FSchemaTable.Name)]);
+    opDropIndex:        Result := Format('Drop existing index %s on %s', [QuotedStr(FSchemaIndex.Name), QuotedStr(FSchemaTable_Mapped.Name)]);
     // AIndex is always a Physical node here too (see AddDropOrphanIndex).
-    opDropOrphanIndex:  Result := Format('Drop orphan index %s on %s', [QuotedStr(FSchemaIndex.Name), QuotedStr(FSchemaTable.Name)]);
-    opCreateForeignKey: Result := Format('Create foreign key on %s referencing %s', [QuotedStr(FSchemaTable.Name), QuotedStr(FSchemaForeignKey.ReferenceTableName)]);
-    opDropForeignKey:   Result := Format('Drop foreign key %s on %s', [QuotedStr(FSchemaForeignKey.Name), QuotedStr(FSchemaTable.Name)]);
+    opDropOrphanIndex:  Result := Format('Drop orphan index %s on %s', [QuotedStr(FSchemaIndex.Name), QuotedStr(FSchemaTable_Mapped.Name)]);
+    opCreateForeignKey: Result := Format('Create foreign key on %s referencing %s', [QuotedStr(FSchemaTable_Mapped.Name), QuotedStr(FSchemaForeignKey.ReferenceTableName)]);
+    opDropForeignKey:   Result := Format('Drop foreign key %s on %s', [QuotedStr(FSchemaForeignKey.Name), QuotedStr(FSchemaTable_Mapped.Name)]);
     // AForeignKey is always a Physical node here (see AddDropOrphanForeignKey), so .Name is always the real catalog name.
-    opDropOrphanForeignKey: Result := Format('Drop orphan foreign key %s on %s', [QuotedStr(FSchemaForeignKey.Name), QuotedStr(FSchemaTable.Name)]);
+    opDropOrphanForeignKey: Result := Format('Drop orphan foreign key %s on %s', [QuotedStr(FSchemaForeignKey.Name), QuotedStr(FSchemaTable_Mapped.Name)]);
     opCreateSequence:   Result := Format('Create sequence %s', [QuotedStr(FSchemaSequence.Name)]);
     // ASequence is always a Physical node here (see AddDropOrphanSequence), so .Name is the real catalog name.
     opDropOrphanSequence: Result := Format('Drop orphan sequence %s', [QuotedStr(FSchemaSequence.Name)]);
-    opRenameTableToOld: Result := Format('Rename table %s to its temporary shadow (rebuild)', [QuotedStr(FSchemaTable.Name)]);
-    opCopyData:         Result := Format('Copy data into rebuilt table %s', [QuotedStr(FSchemaTable.Name)]);
+    opRenameTableToOld: Result := Format('Rename table %s to its temporary shadow (rebuild)', [QuotedStr(FSchemaTable_Mapped.Name)]);
+    opCopyData:         Result := Format('Copy data into rebuilt table %s', [QuotedStr(FSchemaTable_Mapped.Name)]);
   else
     Result := '';
   end;
@@ -203,9 +208,14 @@ begin
   Result := FSchemaSequence;
 end;
 
-function TioDBBuilderPlanOperation.GetSchemaTable: IioDBBuilderSchemaTable;
+function TioDBBuilderPlanOperation.GetSchemaTable_Mapped: IioDBBuilderSchemaTable;
 begin
-  Result := FSchemaTable;
+  Result := FSchemaTable_Mapped;
+end;
+
+function TioDBBuilderPlanOperation.GetSchemaTable_Physical: IioDBBuilderSchemaTable;
+begin
+  Result := FSchemaTable_Physical;
 end;
 
 { TioDBBuilderPlan }
@@ -238,14 +248,14 @@ begin
   Result := AddOp(TioDBBuilderPlanOperation.Create(opCreateTable, ATable));
 end;
 
-function TioDBBuilderPlan.AddDropTable(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
+function TioDBBuilderPlan.AddDropTable(const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
 begin
-  Result := AddOp(TioDBBuilderPlanOperation.Create(opDropTable, ATable));
+  Result := AddOp(TioDBBuilderPlanOperation.Create(opDropTable, nil, nil, nil, nil, [], nil, nil, APhysicalTable));
 end;
 
-function TioDBBuilderPlan.AddRenameTableToOld(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
+function TioDBBuilderPlan.AddRenameTableToOld(const AMappedTable, APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
 begin
-  Result := AddOp(TioDBBuilderPlanOperation.Create(opRenameTableToOld, ATable));
+  Result := AddOp(TioDBBuilderPlanOperation.Create(opRenameTableToOld, AMappedTable, nil, nil, nil, [], nil, nil, APhysicalTable));
 end;
 
 function TioDBBuilderPlan.AddAlterField(const ATable: IioDBBuilderSchemaTable; const AMappedField, APhysicalField: IioDBBuilderSchemaField;
@@ -343,9 +353,9 @@ begin
   begin
     // ifmEnabled: a table being created from scratch (Status = stCreate) already implies its index/FK
     // creations via its own "Create table X" line, so listing each one adds noise without new
-    // information. opCreateSequence has no SchemaTable (see AddCreateSequence) so it is never filtered.
+    // information. opCreateSequence has no SchemaTable_Mapped (see AddCreateSequence) so it is never filtered.
     LSkip := (AMode = ifmEnabled) and (LOp.Kind in [opCreateIndex, opCreateForeignKey]) and
-      (LOp.SchemaTable <> nil) and (LOp.SchemaTable.Status = stCreate);
+      (LOp.SchemaTable_Mapped <> nil) and (LOp.SchemaTable_Mapped.Status = stCreate);
     if not LSkip then
       ASink.AddLine(LOp.Description);
   end;

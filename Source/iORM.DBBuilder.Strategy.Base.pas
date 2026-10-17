@@ -188,12 +188,6 @@ type
     // ==========================================================
     // INDEX RELATED METHODS
     // ----------------------------------------------------------
-    /// <summary>
-    /// True if the DB catalog reports at least one (explicit) index on the given table. Used to warn -
-    /// only when there really are indexes - before a rename-create-copy rebuild that will drop them
-    /// without recreating them (IndexesMode = ifmDisabled).
-    /// </summary>
-    function Check_TableHasIndexesInDB(const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
     procedure ScriptWrite_CreateIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex); virtual;
     procedure ScriptWrite_DropIndex(const ATable: IioDBBuilderSchemaTable; const AIndex: IioDBBuilderSchemaIndex); virtual;
     procedure ScriptWrite_DropIndexByName(const AIndexName: string); virtual;
@@ -208,12 +202,6 @@ type
     // ==========================================================
     // FOREIGN KEY RELATED METHODS
     // ----------------------------------------------------------
-    /// <summary>
-    /// True if the DB catalog reports at least one foreign key on the given table. Used to warn - only
-    /// when there really are FKs - before a rename-create-copy rebuild that recreates the table without
-    /// its foreign keys (ForeignKeysMode = ifmDisabled).
-    /// </summary>
-    function Check_TableHasForeignKeysInDB(const ATable: IioDBBuilderSchemaTable): Boolean; virtual;
     procedure ScriptWrite_CreateForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK); virtual;
     procedure ScriptWrite_CreateTableForeignKeys(const ATable: IioDBBuilderSchemaTable); virtual;
     procedure ScriptWrite_DropForeignKey(const ATable: IioDBBuilderSchemaTable; const AForeignKey: IioDBBuilderSchemaFK); virtual;
@@ -225,15 +213,18 @@ type
     /// <summary>
     /// Emits a warning (only if the table actually has FKs in the DB) that a rename-create-copy rebuild
     /// recreates the table WITHOUT its existing foreign keys because ForeignKeysMode = ifmDisabled, so
-    /// they are silently lost unless recreated manually / FK management is enabled.
+    /// they are silently lost unless recreated manually / FK management is enabled. "In the DB" is read
+    /// from APhysicalTable, the counterpart the PlanBuilder resolved and handed over on the op
+    /// (SchemaTable_Physical) - never looked up here, so the matching rule stays in Match_PhysicalTable.
     /// </summary>
-    procedure Warning_RebuildDropsUnmanagedForeignKeys(const ATable: IioDBBuilderSchemaTable);
+    procedure Warning_RebuildDropsUnmanagedForeignKeys(const ATable, APhysicalTable: IioDBBuilderSchemaTable);
     /// <summary>
     /// Emits a warning (only if the table actually has indexes in the DB) that a rename-create-copy
     /// rebuild drops its existing indexes WITHOUT recreating them because IndexesMode = ifmDisabled, so
-    /// they are silently lost unless recreated manually / index management is enabled.
+    /// they are silently lost unless recreated manually / index management is enabled. "In the DB" is
+    /// read from APhysicalTable, as in Warning_RebuildDropsUnmanagedForeignKeys.
     /// </summary>
-    procedure Warning_RebuildDropsUnmanagedIndexes(const ATable: IioDBBuilderSchemaTable);
+    procedure Warning_RebuildDropsUnmanagedIndexes(const ATable, APhysicalTable: IioDBBuilderSchemaTable);
 
     // ==========================================================
     // MAIN GENERATION
@@ -284,30 +275,6 @@ begin
 end;
 
 { TioDBBuilderStrategyBase }
-
-function TioDBBuilderStrategyBase.Check_TableHasIndexesInDB(const ATable: IioDBBuilderSchemaTable): Boolean;
-var
-  LPhysicalTable: IioDBBuilderSchemaTable;
-begin
-  // "In the DB" is now read from the introspected PhysicalSchema (no live catalog query).
-  Result := False;
-  if Context.Reconciliation.PhysicalSchema = nil then
-    Exit;
-  LPhysicalTable := Context.Reconciliation.PhysicalSchema.FindTable(ATable.Name, False);
-  Result := (LPhysicalTable <> nil) and (LPhysicalTable.Indexes.Count > 0);
-end;
-
-function TioDBBuilderStrategyBase.Check_TableHasForeignKeysInDB(const ATable: IioDBBuilderSchemaTable): Boolean;
-var
-  LPhysicalTable: IioDBBuilderSchemaTable;
-begin
-  // "In the DB" is now read from the introspected PhysicalSchema (no live catalog query).
-  Result := False;
-  if Context.Reconciliation.PhysicalSchema = nil then
-    Exit;
-  LPhysicalTable := Context.Reconciliation.PhysicalSchema.FindTable(ATable.Name, False);
-  Result := (LPhysicalTable <> nil) and (LPhysicalTable.ForeignKeys.Count > 0);
-end;
 
 // Plan-op translator (opCreateSequence): create the sequence, unconditionally. Whether it is missing was
 // already decided by PlanBuilder.Base.Plan_Sequences against the introspected Physical schema, exactly as
@@ -548,14 +515,14 @@ procedure TioDBBuilderStrategyBase.ScriptWrite_PlanOperation(const AOp: IioDBBui
 begin
   case AOp.Kind of
     opCreateSequence:       ScriptWrite_CreateSequence(AOp.SchemaSequence);
-    opCreateTable:          ScriptWrite_CreateTable(AOp.SchemaTable);
-    opDropField:            ScriptWrite_DropField(AOp.SchemaTable, AOp.SchemaField_Physical);
-    opCreateIndex:          ScriptWrite_CreateIndex(AOp.SchemaTable, AOp.SchemaIndex);
-    opDropIndex:            ScriptWrite_DropIndex(AOp.SchemaTable, AOp.SchemaIndex);
-    opDropOrphanIndex:      ScriptWrite_DropOrphanIndex(AOp.SchemaTable, AOp.SchemaIndex);
-    opDropOrphanForeignKey: ScriptWrite_DropOrphanForeignKey(AOp.SchemaTable, AOp.SchemaForeignKey);
+    opCreateTable:          ScriptWrite_CreateTable(AOp.SchemaTable_Mapped);
+    opDropField:            ScriptWrite_DropField(AOp.SchemaTable_Mapped, AOp.SchemaField_Physical);
+    opCreateIndex:          ScriptWrite_CreateIndex(AOp.SchemaTable_Mapped, AOp.SchemaIndex);
+    opDropIndex:            ScriptWrite_DropIndex(AOp.SchemaTable_Mapped, AOp.SchemaIndex);
+    opDropOrphanIndex:      ScriptWrite_DropOrphanIndex(AOp.SchemaTable_Mapped, AOp.SchemaIndex);
+    opDropOrphanForeignKey: ScriptWrite_DropOrphanForeignKey(AOp.SchemaTable_Mapped, AOp.SchemaForeignKey);
     opDropOrphanSequence:   ScriptWrite_DropOrphanSequence(AOp.SchemaSequence);
-    opDropTable:            ScriptWrite_DropTable(AOp.SchemaTable);
+    opDropTable:            ScriptWrite_DropTable(AOp.SchemaTable_Physical);
   else
     // Loud guard, not a fallback: an op with no arm here or in a shape override means a PlanBuilder emitted
     // an op the translation layer cannot realize - a producer/translator pairing bug that must fail now, not
@@ -645,17 +612,17 @@ begin
       [ATable.Name, AField.FieldName, AValueName, AOldValue, ANewValue]));
 end;
 
-procedure TioDBBuilderStrategyBase.Warning_RebuildDropsUnmanagedForeignKeys(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.Warning_RebuildDropsUnmanagedForeignKeys(const ATable, APhysicalTable: IioDBBuilderSchemaTable);
 begin
-  if Check_TableHasForeignKeysInDB(ATable) then
+  if APhysicalTable.ForeignKeys.Count > 0 then
     Context.Script.Warnings.AddLine(Format('Table ''%s'' must be rebuilt (structural change) but ForeignKeysMode = ifmDisabled: ' +
       'the rebuilt table is recreated WITHOUT its existing foreign keys, which are therefore lost. ' +
       'Recreate them manually or enable foreign key management.', [ATable.Name]));
 end;
 
-procedure TioDBBuilderStrategyBase.Warning_RebuildDropsUnmanagedIndexes(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyBase.Warning_RebuildDropsUnmanagedIndexes(const ATable, APhysicalTable: IioDBBuilderSchemaTable);
 begin
-  if Check_TableHasIndexesInDB(ATable) then
+  if APhysicalTable.Indexes.Count > 0 then
     Context.Script.Warnings.AddLine(Format('Table ''%s'' must be rebuilt (structural change) but IndexesMode = ifmDisabled: ' +
       'its existing indexes are dropped and NOT recreated, and are therefore lost. ' +
       'Recreate them manually or enable index management.', [ATable.Name]));

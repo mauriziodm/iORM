@@ -446,9 +446,13 @@ type
   ///  A single schema-change operation: a plain data record of *what* must change, carrying references
   ///  to the Schema node(s) it concerns and (for opAlterField) the set of altered attributes. It holds
   ///  no knowledge of *how* to render itself - that is the dialect's job. Built only through
-  ///  IioDBBuilderPlan's typed factories, so its slots are always coherent with its Kind. Which branch a
-  ///  slot holds depends on the Kind: "create" ops carry the Mapped element, "drop" ops the Physical one;
-  ///  only opAlterField carries both branches of the field (SchemaField_Mapped + SchemaField_Physical).
+  ///  IioDBBuilderPlan's typed factories, so its slots are always coherent with its Kind.
+  ///  Slot rule: an element gets a fixed-branch PAIR of slots (<X>_Mapped + <X>_Physical) only when some op
+  ///  carries both of its branches - fields (opAlterField) and tables (opRenameTableToOld, plus the owning
+  ///  table every field/index/FK op carries); each slot of a pair always holds that branch, and is nil when
+  ///  the op has none (e.g. opDropTable/opDropField fill only the _Physical one). Every other element
+  ///  (index, FK, sequence) has a SINGLE slot whose branch is fixed by the Kind: "create" ops carry the
+  ///  Mapped node, "drop" ops the Physical one - a pair would always leave one slot empty.
   /// </summary>
   IioDBBuilderPlanOperation = interface
     ['{6E2C9A17-3D4B-4F8A-9C1E-7B6F5A2D3C41}']
@@ -460,15 +464,17 @@ type
     function GetSchemaForeignKey: IioDBBuilderSchemaFK;
     function GetSchemaIndex: IioDBBuilderSchemaIndex;
     function GetSchemaSequence: IioDBBuilderSchemaSequence;
-    function GetSchemaTable: IioDBBuilderSchemaTable;
+    function GetSchemaTable_Mapped: IioDBBuilderSchemaTable;
+    function GetSchemaTable_Physical: IioDBBuilderSchemaTable;
 
     /// <summary>Human-readable, dialect-independent summary of the operation (for logs/UI grids), e.g. "Add field 'AGE' to 'CLIENTI'".</summary>
     property Description: String read GetDescription;
     property Kind: TioDBBuilderPlanOpKind read GetKind;
     property SchemaField_Changes: TioDBBuilderFieldChanges read GetSchemaField_Changes;
+    /// <summary>The mapped field: opCreateField/opAlterField; nil for every other op kind.</summary>
     property SchemaField_Mapped: IioDBBuilderSchemaField read GetSchemaField_Mapped;
-    /// <summary>The physical (old/actual) field, carried by opAlterField so translation (C4) can render the
-    /// old->new warnings; nil for every other op kind.</summary>
+    /// <summary>The physical (old/actual) field: opAlterField (so the translator can render the old->new
+    /// warnings) and opDropField (the orphan field); nil for every other op kind.</summary>
     property SchemaField_Physical: IioDBBuilderSchemaField read GetSchemaField_Physical;
     /// <summary>Mapped for opCreateForeignKey; physical for opDropForeignKey/opDropOrphanForeignKey (see Kind).</summary>
     property SchemaForeignKey: IioDBBuilderSchemaFK read GetSchemaForeignKey;
@@ -476,8 +482,13 @@ type
     property SchemaIndex: IioDBBuilderSchemaIndex read GetSchemaIndex;
     /// <summary>Mapped for opCreateSequence; physical for opDropOrphanSequence (see Kind).</summary>
     property SchemaSequence: IioDBBuilderSchemaSequence read GetSchemaSequence;
-    /// <summary>Mapped for opCreateTable/opCopyData/opRenameTableToOld; physical for opDropTable (see Kind).</summary>
-    property SchemaTable: IioDBBuilderSchemaTable read GetSchemaTable;
+    /// <summary>The mapped table: the subject of opCreateTable/opCopyData/opRenameTableToOld, and the owning
+    /// table of every field/index/FK op; nil for opDropTable (orphan: no mapped table) and the sequence ops.</summary>
+    property SchemaTable_Mapped: IioDBBuilderSchemaTable read GetSchemaTable_Mapped;
+    /// <summary>The physical table: opDropTable (the orphan table) and opRenameTableToOld (the counterpart of
+    /// the rebuilt table, resolved by the PlanBuilder via Match_PhysicalTable, so the translator can tell what
+    /// the rebuild loses without looking the table up itself); nil for every other op kind.</summary>
+    property SchemaTable_Physical: IioDBBuilderSchemaTable read GetSchemaTable_Physical;
   end;
 
   TioDBBuilderPlanOperations = TList<IioDBBuilderPlanOperation>;
@@ -495,8 +506,8 @@ type
     // TABLE
     function AddCopyData(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
     function AddCreateTable(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
-    function AddDropTable(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
-    function AddRenameTableToOld(const ATable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
+    function AddDropTable(const APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
+    function AddRenameTableToOld(const AMappedTable, APhysicalTable: IioDBBuilderSchemaTable): IioDBBuilderPlanOperation;
     // FIELD
     function AddAlterField(const ATable: IioDBBuilderSchemaTable; const AMappedField, APhysicalField: IioDBBuilderSchemaField;
       const ASchemaField_Changes: TioDBBuilderFieldChanges): IioDBBuilderPlanOperation;
@@ -779,7 +790,7 @@ type
     /// cannot be dropped directly on most DBMS and are removed together with their constraint). Each
     /// dialect expresses the exclusion in its own catalog terms (SQLite: sql IS NOT NULL; Firebird:
     /// NOT EXISTS on RDB$RELATION_CONSTRAINTS; etc.). The Introspector (which populates the physical
-    /// index nodes the rebuild drops by name) and Check_TableHasIndexesInDB rely on this.
+    /// index nodes the rebuild drops by name, and whose count the rebuild-loss warning reads) relies on this.
     /// </summary>
     /// <param name="ATableName">
     /// Optional table name filter. If empty, returns all indexes from DB.

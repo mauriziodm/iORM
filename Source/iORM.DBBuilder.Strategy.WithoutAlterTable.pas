@@ -66,8 +66,9 @@ type
     procedure ScriptWrite_CopyDataFromOldToNewTable(const ATable: IioDBBuilderSchemaTable); virtual;
     /// <summary>Translates opRenameTableToOld: rename the table to its "_old" shadow. Also emits the
     /// rebuild-loss warnings here (index/FK management disabled) since this is the op that starts the
-    /// rebuild that would drop them.</summary>
-    procedure ScriptWrite_RenameTableToOld(const ATable: IioDBBuilderSchemaTable); virtual;
+    /// rebuild that would drop them. APhysicalTable is the counterpart the PlanBuilder resolved (op
+    /// SchemaTable_Physical): what the rebuild loses is read from it, never looked up here.</summary>
+    procedure ScriptWrite_RenameTableToOld(const ATable, APhysicalTable: IioDBBuilderSchemaTable); virtual;
     function Table2OldTableName(const ATable: IioDBBuilderSchemaTable): String; virtual;
 
     // ==========================================================
@@ -156,8 +157,8 @@ end;
 procedure TioDBBuilderStrategyWithoutAlterTable.ScriptWrite_PlanOperation(const AOp: IioDBBuilderPlanOperation);
 begin
   case AOp.Kind of
-    opRenameTableToOld: ScriptWrite_RenameTableToOld(AOp.SchemaTable);
-    opCopyData:         ScriptWrite_CopyDataFromOldToNewTable(AOp.SchemaTable);
+    opRenameTableToOld: ScriptWrite_RenameTableToOld(AOp.SchemaTable_Mapped, AOp.SchemaTable_Physical);
+    opCopyData:         ScriptWrite_CopyDataFromOldToNewTable(AOp.SchemaTable_Mapped);
   else
     inherited;
   end;
@@ -173,15 +174,15 @@ begin
   // Default: no-op. Override in derived classes for DBMS-specific constraint deferral.
 end;
 
-procedure TioDBBuilderStrategyWithoutAlterTable.ScriptWrite_RenameTableToOld(const ATable: IioDBBuilderSchemaTable);
+procedure TioDBBuilderStrategyWithoutAlterTable.ScriptWrite_RenameTableToOld(const ATable, APhysicalTable: IioDBBuilderSchemaTable);
 begin
   // Rebuild-loss warnings: emitted here, on the op that starts the rebuild. When index/FK management is
   // disabled the rebuilt table loses its existing indexes/FKs (dropped/not recreated), so warn - but only
-  // if the table actually has such objects in the DB (the Warning_* helpers self-filter).
+  // if the table actually has such objects in the DB (the Warning_* helpers self-filter, reading APhysicalTable).
   if Context.Reconciliation.IndexesMode = ifmDisabled then
-    Warning_RebuildDropsUnmanagedIndexes(ATable);
+    Warning_RebuildDropsUnmanagedIndexes(ATable, APhysicalTable);
   if Context.Reconciliation.ForeignKeysMode = ifmDisabled then
-    Warning_RebuildDropsUnmanagedForeignKeys(ATable);
+    Warning_RebuildDropsUnmanagedForeignKeys(ATable, APhysicalTable);
 
   Context.Script.Body.AddComment(Format('Renaming from "%s" to "%s"', [ATable.Name, Table2OldTableName(ATable)]));
   // AddLine, not AddToCurrentLine: AddToCurrentLine would glue both statements onto the comment line

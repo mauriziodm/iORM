@@ -131,10 +131,13 @@ begin
           LPlan.AddDropIndex(LMappedTable, LPhysicalIndex);
     end;
 
-  // 2b. Rename each rebuilt table to its "_old" shadow.
+  // 2b. Rename each rebuilt table to its "_old" shadow. The op also carries the physical counterpart: the
+  //     translator needs it to warn about what the rebuild loses (indexes/FKs when their management is
+  //     disabled) and must not look the table up itself - the matching rule lives in Match_PhysicalTable.
+  //     Never nil here: only a table found in the DB and then detected as modified is stUpdate (step 1).
   for LMappedTable in LMappedSchema.Tables.Values do
     if LMappedTable.Status = stUpdate then
-      LPlan.AddRenameTableToOld(LMappedTable);
+      LPlan.AddRenameTableToOld(LMappedTable, Match_PhysicalTable(LMappedTable, LPhysicalSchema));
 
   // 2c. Create the new/rebuilt tables (fields and, for these dialects, inline FKs are emitted by the
   //     CREATE TABLE translator).
