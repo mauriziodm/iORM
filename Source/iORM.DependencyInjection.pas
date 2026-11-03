@@ -1146,6 +1146,8 @@ begin
     Result := FContainer.Items[AKey].GetItem(ASubKey)
   else
   begin
+    // Not registered: maybe because the map container build failed, which registers the attributed classes
+    TioMapContainer._RaiseIfBuildFailed;
     // ViewModel
     if AKey.StartsWith(DI_VIEWMODEL_KEY_PREFIX) then
     begin
@@ -1222,11 +1224,15 @@ class function TioDIContainer.GetInterfaceImplementers(AKey: TioDIContainerKey):
 begin
   AKey := Uppercase(AKey);
   if not ImplementersExists(AKey) then
+  begin
+    // Not registered: maybe because the map container build failed, which registers the attributed classes
+    TioMapContainer._RaiseIfBuildFailed;
     raise EioGenericException.Create(ClassName, 'Get', Format('Hi, I''m the iORM Dependency Injection Container.' +
       #13#13'I was looking for a list of all registered classes implementing "%s" but couldn''t find any.' +
       #13#13'I remind you that you can register a class as an implementer of an interface by decorating it with the attribute "[diImplements (%s)]" or you can write some code like: "io.di.RegisterClass<TMyClass, %s>.Execute".' +
       #13#13'If you decide to use the attribute, make sure you put "iORM" and/or "iORM.Attributes" in the "uses" section of the unit.' +
       #13#13'I hope this information will be useful to you.', [AKey, AKey, AKey]));
+  end;
   Result := FContainer.Items[AKey];
 end;
 

@@ -66,6 +66,7 @@ type
   strict private
     class var FInternalContainer: TioMapContainerInstance;
     class var FAutodetectedHasManyRelationCollection: TList<IioProperty>;
+    class var FBuildErrorMessage: String;
     /// This method is the starting point from where iORM, at the start of the application,
     ///  begins to detect and register the classes (both the entities but not only the classes
     ///  that must only be registered in the Dependency Injection Container) to be able to perform its functions
@@ -84,6 +85,8 @@ type
     /// This method creates the internal container instance and initiates its initialization
     class procedure _Build;
     class procedure _CleanUp;
+    /// Raises the exception that made _Build fail, if any (see _Build): called on every "not found" path
+    class procedure _RaiseIfBuildFailed;
     class procedure AddClassRef(const AClassRef: TioClassRef);
     /// This function create and add (to the MapContainer) the TrueTypeVirtualMap for the base class map received as parameter
     ///  and return it as result
@@ -187,10 +190,29 @@ begin
   end;
 end;
 
+// Runs in the initialization section of the iORM unit. An exception escaping from there is reported by the
+// RTL as a bare "Runtime error 217", with no class and no message, outside the IDE: an error in the mapping
+// of a class (e.g. an invalid attribute) became a mystery to investigate. So the exception is caught here,
+// and its class and message are kept: the container is left EMPTY (not nil, not partially built, so no
+// access violation and no half-mapped model that would e.g. let the DBBuilder build a partial schema), and
+// the first use of iORM that looks something up re-raises it with the original message (see
+// _RaiseIfBuildFailed), outside the initialization section. The build stays eager and the container
+// immutable after it, so the lookups need no lock: on the success path nothing changes, the check is made
+// only where a lookup has found nothing (Exist, GetContainer, and the "not registered" paths of the
+// DI container, which _Build also populates).
 class procedure TioMapContainer._Build;
 begin
   FInternalContainer := TioMapContainerInstance.Create([doOwnsValues]);
-  TioMapContainer.Init;
+  try
+    TioMapContainer.Init;
+  except
+    on E: Exception do
+    begin
+      FBuildErrorMessage := Format('%s: %s', [E.ClassName, E.Message]);
+      FInternalContainer.Free;
+      FInternalContainer := TioMapContainerInstance.Create([doOwnsValues]);
+    end;
+  end;
 end;
 
 class procedure TioMapContainer.BuildTrueClassVirtualMapsAndRegisterAsDescendant;
@@ -246,6 +268,9 @@ end;
 class function TioMapContainer.Exist(const AClassName: String): Boolean;
 begin
   Result := FInternalContainer.ContainsKey(AClassName.ToUpper);
+  // Not found: maybe because the build failed (see _Build)
+  if not Result then
+    _RaiseIfBuildFailed;
 end;
 
 class function TioMapContainer.GetAutodetectedHasManyRelationCollection: TList<IioProperty>;
@@ -271,6 +296,8 @@ end;
 
 class function TioMapContainer.GetContainer: TioMapContainerInstance;
 begin
+  // Whoever walks the whole container must not get an empty one silently (see _Build)
+  _RaiseIfBuildFailed;
   Result := FInternalContainer;
 end;
 
@@ -288,6 +315,17 @@ begin
       #13#13'In this case you can solve the problem by inserting the {$STRONGLINKTYPES ON} directive somewhere in the code (project file is fine) or a fake reference to the class, for this purpose iORM provides the ' +
       '"io.KeepClass(const AClass: TClass)" method in the "iORM" unit.' +
       #13#13'Check and try again please, it will work.', [AClassName]));
+end;
+
+class procedure TioMapContainer._RaiseIfBuildFailed;
+begin
+  if not FBuildErrorMessage.IsEmpty then
+    raise EioGenericException.Create(ClassName, '_Build', Format('Oops!'#13#13'Hi, I''m iORM, I''m sorry but there is a problem.' +
+      #13#13'At the start of the application I could not complete the mapping of the classes/entities, so I cannot work until it is fixed.' +
+      #13#13'This is the error I got while mapping them:' +
+      #13#13'%s' +
+      #13#13'It usually comes from the attributes of one of your classes: check the class named in the error, fix it and try again please, it will work.',
+      [FBuildErrorMessage]));
 end;
 
 /// This method is the starting point from where iORM, at the start of the application,
