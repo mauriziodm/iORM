@@ -85,8 +85,11 @@ begin
   FConnectionDefName := AConnectionDefName;
   // SqlGenerator must be created BEFORE Schema so that kgsAuto can be resolved
   FSqlGenerator := TioDBBuilderFactory.NewSqlGenerator(AConnectionDefName);
-  FReconciliation := TioDBBuilderFactory.NewReconciliation(AConnectionDefName, AIndexesMode, AForeignKeysMode, FSqlGenerator);
+  // Script must be created BEFORE Reconciliation: building the Mapped schema already writes into it the
+  // shared-table diagnostics (field, primary-key and key-generation conflicts, as Warnings).
+  // ScriptBegin does not clear Warnings/Hints, so they survive the later script generation.
   FScript := TioDBBuilderFactory.NewScript(AConnectionDefName);
+  FReconciliation := TioDBBuilderFactory.NewReconciliation(AConnectionDefName, AIndexesMode, AForeignKeysMode, FSqlGenerator, FScript);
 end;
 
 procedure TioDBBuilderContext.Execute(const AForce: Boolean);

@@ -77,6 +77,11 @@ Build order: Runtime (RT) packages first, then Design-Time (DT) packages.
       `Process_`/`Force_` roles disappeared with the probe-based model.
       Mode selection (forcing the schema to `stCreate`, emitting the force-create warning) is
       Engine's job, done on `Context` before `GenerateScript` is called.
+    - Outside these two families the same role prefixes apply where the role recurs (e.g. the
+      `Schema.Builder` emits `Warning_SharedTable*` diagnostics). One extra role lives there:
+      `Describe_` (returns a human-readable description of a schema element for diagnostic messages,
+      no side effect, e.g. `Describe_SchemaField` → `VARCHAR(50) NOT NULL`). It is a sibling of
+      `Translate_`, whose output goes to the DBMS, while `Describe_` output goes to a person.
   - Boolean predicates and plain accessors are sanctioned exceptions (`Get*`, `Is*`, `Load*`, etc.).
   - **Layout**: methods are grouped under domain banners
     (`DATABASE`/`TABLE`/`FIELD`/`INDEX`/`SEQUENCE`/`FOREIGN KEY`/…), in the interfaces AND every

@@ -59,12 +59,13 @@ type
     class function NewPlan: IioDBBuilderPlan;
     class function NewPlanBuilder(const AContext: IioDBBuilderContext): IioDBBuilderPlanBuilder;
     class function NewReconciliation(const AConnectionDefName: String; const AIndexesMode, AForeignKeysMode: TioDBBuilderMode;
-      const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderReconciliation;
+      const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderScript): IioDBBuilderReconciliation;
     // A bare schema (no SchemaBuilder / no ORM build): used for the Physical branch, which the
     // Introspector fills with catalog-backed table nodes via AddTable.
     class function NewSchema: IioDBBuilderSchema;
     class function NewSchemaBuilder(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema;
-      const ASqlGenerator: IioDBBuilderSqlGenerator; const AIndexesMode, AForeignKeysMode: TioDBBuilderMode): IioDBBuilderSchemaBuilder;
+      const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderScript;
+      const AIndexesMode, AForeignKeysMode: TioDBBuilderMode): IioDBBuilderSchemaBuilder;
     class function NewSchemaField_ClassInfo(const AConnectionDefName: String; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchemaField;
     class function NewSchemaField_Mapped(const AContextProperty: IioProperty; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderSchemaField;
     class function NewSchemaField_Physical(const AConnectionDefName, AFieldName, AFieldTypeRaw, AFieldDefaultRaw: String;
@@ -149,13 +150,15 @@ begin
 end;
 
 class function TioDBBuilderFactory.NewReconciliation(const AConnectionDefName: String; const AIndexesMode,
-  AForeignKeysMode: TioDBBuilderMode; const ASqlGenerator: IioDBBuilderSqlGenerator): IioDBBuilderReconciliation;
+  AForeignKeysMode: TioDBBuilderMode; const ASqlGenerator: IioDBBuilderSqlGenerator;
+  const AScript: IioDBBuilderScript): IioDBBuilderReconciliation;
 var
   LMappedSchema: IioDBBuilderSchema;
 begin
-  // Physical is left nil here - the Introspector fills it in a later phase.
+  // Physical is left nil here - the Introspector fills it in a later phase. AScript receives the
+  // build-time diagnostics (shared-table conflicts), so it must already exist.
   LMappedSchema := NewSchema;
-  NewSchemaBuilder(AConnectionDefName, LMappedSchema, ASqlGenerator, AIndexesMode, AForeignKeysMode).BuildSchema;
+  NewSchemaBuilder(AConnectionDefName, LMappedSchema, ASqlGenerator, AScript, AIndexesMode, AForeignKeysMode).BuildSchema;
   Result := TioDBBuilderReconciliation.Create(LMappedSchema, NewPlan, AIndexesMode, AForeignKeysMode);
 end;
 
@@ -167,9 +170,10 @@ begin
 end;
 
 class function TioDBBuilderFactory.NewSchemaBuilder(const AConnectionDefName: String; const ASchema: IioDBBuilderSchema;
-  const ASqlGenerator: IioDBBuilderSqlGenerator; const AIndexesMode, AForeignKeysMode: TioDBBuilderMode): IioDBBuilderSchemaBuilder;
+  const ASqlGenerator: IioDBBuilderSqlGenerator; const AScript: IioDBBuilderScript;
+  const AIndexesMode, AForeignKeysMode: TioDBBuilderMode): IioDBBuilderSchemaBuilder;
 begin
-  Result := TioDBBuilderSchemaBuilder.Create(AConnectionDefName, ASchema, ASqlGenerator, AIndexesMode, AForeignKeysMode);
+  Result := TioDBBuilderSchemaBuilder.Create(AConnectionDefName, ASchema, ASqlGenerator, AScript, AIndexesMode, AForeignKeysMode);
 end;
 
 // ConnectionDefName is required to apply database-specific identifier normalization. FieldTypeRaw/
