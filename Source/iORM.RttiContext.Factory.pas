@@ -56,32 +56,32 @@ uses
   iORM.Exceptions, System.SysUtils, System.TypInfo;
 
 var
-  ARttiContext: TRttiContext;
+  GRttiContext: TRttiContext;
 
   { TioRttiContextFactory }
 
 class function TioRttiFactory.GetRttiContext: TRttiContext;
 begin
-  Result := ARttiContext;
+  Result := GRttiContext;
 end;
 
 class function TioRttiFactory.GetRttiTypeByClass(const AClass: TClass): TRttiType;
 begin
-  Result := ARttiContext.GetType(AClass);
+  Result := GRttiContext.GetType(AClass);
   if Result = nil then
     raise EioGenericException.Create(ClassName, 'GetRttiTypeByClass', Format('RttiType not found for "%s" class', [AClass.ClassName]));
 end;
 
 class function TioRttiFactory.GetRttiTypeByTypeInfo(const ATypeInfo: Pointer): TRttiType;
 begin
-  Result := ARttiContext.GetType(ATypeInfo);
+  Result := GRttiContext.GetType(ATypeInfo);
   if Result = nil then
     raise EioGenericException.Create(ClassName, 'GetRttiTypeByTypeInfo', Format('RttiType not found for type "%s"', [TTypeInfo(ATypeInfo^).Name]));
 end;
 
 class function TioRttiFactory.GetRttiTypeByTypeName(const AQualifiedTypeNme: String): TRttiType;
 begin
-  Result := ARttiContext.FindType(AQualifiedTypeNme);
+  Result := GRttiContext.FindType(AQualifiedTypeNme);
   if Result = nil then
     raise EioGenericException.Create(ClassName, 'GetRttiTypeByTypeName', Format('RttiType not found for type "%s"', [AQualifiedTypeNme]));
 end;
@@ -104,12 +104,12 @@ end;
 initialization
 
   // Create the unique global instance of RttiContext
-  ARttiContext := TRttiContext.Create;
-  ARttiContext.FindType(''); // Workaround for thread safe: https://quality.embarcadero.com/browse/RSP-9815
+  GRttiContext := TRttiContext.Create;
+  GRttiContext.FindType(''); // Workaround for thread safe: https://quality.embarcadero.com/browse/RSP-9815
 
 finalization
 
   // GlobalRttiContext cleanup
-  ARttiContext.Free;
+  GRttiContext.Free;
 
 end.
