@@ -50,6 +50,7 @@ type
   // Properties builder
   TioContextFactory = class
   private
+    class procedure CheckWritingPropertiesColumns(const Typ: TRttiInstanceType; const AProperties: IioProperties);
     class function GetMetadata_FieldTypeByTypeKind(const ATypeKind: TTypeKind; const AQualifiedName: string): TioMetadataFieldType;
     class function Table(const Typ: TRttiInstanceType): IioTable;
     class function Properties(const Typ: TRttiInstanceType; const ATable: IioTable): IioProperties;
@@ -736,6 +737,49 @@ begin
   begin
     LMembers := TArray<System.Rtti.TRttiMember>(TObject(Typ.AsInstance.GetProperties));
     ExtractMembersInfo(ATable.GetMapMode = mmHybrid);
+  end;
+  // No two properties writing on the same column (after both passes, so that hybrid maps and the Obj* properties are covered)
+  CheckWritingPropertiesColumns(Typ, Result);
+end;
+
+// Two properties of the same class writing on the same column (typically an ioField copied from another property
+// and not changed) would both be listed by every INSERT and UPDATE: the column twice in the same statement, which
+// the database may reject only at the first save, and in any case two values with nobody deciding which one is
+// saved. Reading is not a problem, so only the writing properties are checked (IsDBWriteEnabled: not transient,
+// not load-only), without HasMany and HasOne (no column on this table, the same filter as the DBBuilder). Raised
+// here, at map build: the error is in the mapping, so it surfaces at the start of the application (reported by
+// TioMapContainer._Build) instead of at the first save, wherever it happens.
+//  - The key is the column as declared (GetQualifiedFieldName, table + field): the maps are built in the
+//    initialization section, before any connection is registered, so the normalized names (GetSqlFieldName, which
+//    needs the connection) are not available. Compared case-insensitively, as the default normalization (uppercase)
+//    would. The table is part of the key because ioField may name a column of a joined table: same field name on
+//    two different tables is not the same column.
+//  - The TrueClass virtual maps never get here (their properties are copies, see TioMap.CopyPropertiesToTrueClassVirtualMap),
+//    and there two classes on the same column is the normal case, so they are excluded by construction.
+class procedure TioContextFactory.CheckWritingPropertiesColumns(const Typ: TRttiInstanceType; const AProperties: IioProperties);
+var
+  LColumns: TDictionary<String, IioProperty>;
+  LKey: String;
+  LOtherProperty: IioProperty;
+  LProperty: IioProperty;
+begin
+  LColumns := TDictionary<String, IioProperty>.Create;
+  try
+    for LProperty in AProperties do
+    begin
+      if (not LProperty.IsDBWriteEnabled) or (LProperty.GetRelationType in [rtHasMany, rtHasOne]) then
+        Continue;
+      LKey := UpperCase(LProperty.GetQualifiedFieldName);
+      if LColumns.TryGetValue(LKey, LOtherProperty) then
+        raise EioGenericException.Create(ClassName, 'Properties', Format('Oops!'#13#13'Hi, I''m iORM, I''m sorry but there is a problem.' +
+          #13#13'The class "%s" has two properties, "%s" and "%s", that both write on the same column "%s".' +
+          #13#13'Both of them would be written by every insert and update, so the column would be listed twice and nobody could tell which of the two values is saved.' +
+          #13#13'Please decide which one writes the column and mark the other one as load only (attribute "[ioLoadOnly]"), or map it on a different column (attribute "[ioField]").' +
+          #13#13'It will work.', [Typ.Name, LOtherProperty.GetName, LProperty.GetName, LProperty.GetQualifiedFieldName]));
+      LColumns.Add(LKey, LProperty);
+    end;
+  finally
+    LColumns.Free;
   end;
 end;
 

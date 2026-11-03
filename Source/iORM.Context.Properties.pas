@@ -106,6 +106,7 @@ type
     function GetWhereSkip: Boolean;
     function GetWhereTargetPropName: String;
     function GetPropertyRole: TioPropertyRole;
+    function GetQualifiedFieldName: String;
   strict protected
     FPropertyRole: TioPropertyRole;
     constructor Create(const ATable: IioTable; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String; const ATransient, AIsID: Boolean;
@@ -646,6 +647,13 @@ end;
 function TioProperty.GetSqlFieldTableName: String;
 begin
   Result := FSqlFieldTableName;
+end;
+
+// The raw twin of GetSqlQualifiedFieldName (see the interface): the same two parts and the same "Table.Field" format,
+// as declared, without the SqlDataConverter of the connection
+function TioProperty.GetQualifiedFieldName: String;
+begin
+  Result := GetSqlFieldTableName + '.' + FSqlFieldName;
 end;
 
 function TioProperty.GetSqlQualifiedFieldName: String;

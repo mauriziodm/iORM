@@ -61,6 +61,17 @@ type
     function GetLoadSql: String;
     function LoadSqlExist: Boolean;
     function GetName: string;
+    /// <summary>The table and field of the column, as declared ("Table.Field"): not normalized, no delimiters</summary>
+    /// <remarks>
+    /// The raw twin of GetSqlQualifiedFieldName: the table and field names exactly as they come from the mapping (the
+    /// member name, or the ioField attribute, which may also name a joined table), without the normalization of the
+    /// connection's SqlDataConverter. It needs no connection, so it can be used while the maps are being built (in the
+    /// initialization section, before any connection is registered), e.g. to tell whether two properties are on the
+    /// same column. Do not use it to build SQL: use GetSqlQualifiedFieldName for that.
+    /// </remarks>
+    function GetQualifiedFieldName: String;
+    /// <summary>The table and field of the column, normalized and delimited for the SQL of the connection</summary>
+    /// <remarks>Needs the connection to be registered. Raw version, as declared: GetQualifiedFieldName.</remarks>
     function GetSqlQualifiedFieldName: String;
     function GetSqlFullQualifiedFieldName: String;
     function GetSqlFieldName(const AIncludeDelimiters: Boolean = True): String;
