@@ -81,7 +81,7 @@ implementation
 
 uses
   iORM.Context.Container, iORM.Context.Properties.Interfaces, iORM.Attributes, iORM.DBBuilder.Factory,
-  iORM.Resolver.Factory, iORM.Resolver.Interfaces, iORM.Exceptions, iORM.Utilities, System.Classes, System.SysUtils,
+  iORM.Resolver.Factory, iORM.Resolver.Interfaces, iORM.Exceptions, iORM.Utilities, System.SysUtils,
   System.Generics.Collections, System.Generics.Defaults;
 
 { TioDBBuilderSchemaBuilder }
@@ -100,9 +100,9 @@ uses
 // stable when unrelated classes are added, but arbitrary, acceptable only because Execute is blocked unless
 // forced (Execute(True)). A discarded definition never moves the table's primary key.
 // Identical definitions (the common case: TrueClass subclasses inheriting the same property) produce no
-// diagnostic, and neither does a TrueClass virtual map (see Warning_SharedTableConflict). Called only for
-// the first property of a map on each column: BuildSchemaTablePersistedFields skips silently a column the
-// same map already contributed, so the comparison is always between different maps.
+// diagnostic, and neither does a TrueClass virtual map (see Warning_SharedTableConflict). A real map brings
+// each column at most once (two writing properties on one column are rejected at map build, see
+// BuildSchemaTablePersistedFields), so for real maps the comparison is always between different maps.
 procedure TioDBBuilderSchemaBuilder.AddOrCheckSchemaField(const ASchemaTable: IioDBBuilderSchemaTable;
   const ASchemaField: IioDBBuilderSchemaField; const AMap: IioMap);
 var
@@ -314,31 +314,20 @@ end;
 // property is still persisted into its column). Each one is added, or checked against the definition of
 // another class sharing the table (see AddOrCheckSchemaField). Only a persisted property defines a column:
 // the load-only ones come later, in BuildSchemaTableLoadOnlyFields. IsDBWriteEnabled already excludes the
-// transient properties. A column this same map already contributed (two persisted properties on one
-// column) is skipped silently, as AddField always did: classification and diagnostics apply only between
-// different maps.
+// transient properties. Two persisted properties of one real class on the same column cannot get here: the
+// map build rejects them (TioContextFactory.CheckWritingPropertiesColumns), so each column comes at most once
+// per real map and the comparison in AddOrCheckSchemaField is between different maps. A TrueClass virtual
+// map may bring the same column more than once (copies from different subclasses): an identical copy adds
+// nothing, a different one is a conflict whose Warning is suppressed for these maps (see
+// Warning_SharedTableConflict), and the existing node is kept either way.
 procedure TioDBBuilderSchemaBuilder.BuildSchemaTablePersistedFields(const ASchemaTable: IioDBBuilderSchemaTable;
   const AMap: IioMap);
 var
-  LAddedFieldNames: TStringList;
   LProperty: IioProperty;
-  LSchemaField: IioDBBuilderSchemaField;
 begin
-  LAddedFieldNames := TStringList.Create;  // CaseSensitive = False, same rule as FindField
-  try
-    for LProperty in AMap.GetProperties do
-      if LProperty.IsDBWriteEnabled and not (LProperty.GetRelationType in [rtHasMany, rtHasOne]) then
-      begin
-        LSchemaField := TioDBBuilderFactory.NewSchemaField_Mapped(LProperty, FSqlGenerator);
-        if LAddedFieldNames.IndexOf(LSchemaField.FieldName) = -1 then
-        begin
-          LAddedFieldNames.Add(LSchemaField.FieldName);
-          AddOrCheckSchemaField(ASchemaTable, LSchemaField, AMap);
-        end;
-      end;
-  finally
-    LAddedFieldNames.Free;
-  end;
+  for LProperty in AMap.GetProperties do
+    if LProperty.IsDBWriteEnabled and not (LProperty.GetRelationType in [rtHasMany, rtHasOne]) then
+      AddOrCheckSchemaField(ASchemaTable, TioDBBuilderFactory.NewSchemaField_Mapped(LProperty, FSqlGenerator), AMap);
 end;
 
 // The sequence twin of FindOrCreateSchemaTable: several tables may share one sequence ([ioKeySequence]),
