@@ -54,6 +54,7 @@ type
     procedure BuildSchema;
     procedure BuildSchemaFK(const AMap: IioMap);
     procedure BuildSchemaIndexes(const ASchemaTable: IioDBBuilderSchemaTable; const AMap: IioMap);
+    procedure BuildSchemaLoadOnlyFields(const AMap: IioMap);
     procedure BuildSchemaTable(const AMap: IioMap);
     function Describe_SchemaField(const ASchemaField: IioDBBuilderSchemaField): String;
     function Describe_SchemaFieldDifferences(const AExistingField, AIncomingField: IioDBBuilderSchemaField): String;
@@ -153,9 +154,13 @@ var
 begin
   // Sorted once, used by both loops (see GetSortedMaps)
   LSortedMaps := GetSortedMaps;
-  // Loop for all entities and build table list
+  // Loop for all entities and build table list, with the columns of the properties that write them
   for LMap in LSortedMaps do
     BuildSchemaTable(LMap);
+  // Then the columns that are only read (load-only properties): only after every class has contributed
+  // the columns it writes, see BuildSchemaLoadOnlyFields
+  for LMap in LSortedMaps do
+    BuildSchemaLoadOnlyFields(LMap);
   // Loop for all entities and build FK list.
   // Skipped entirely when FK management is disabled: with ifmDisabled no FK DDL is ever generated,
   // so building the SchemaFK objects would only waste analyzer catalog queries (AnalyzeForeignKeys)
@@ -237,6 +242,40 @@ begin
       ASchemaTable.AddIndex(LIndexAttr);
 end;
 
+// Second pass of BuildSchema, after every class has added the columns its properties write. A load-only
+// property never defines a column that something writes: the definition comes from the writing property,
+// of this class or of another class sharing the table, whatever the declaration or map order. Before this
+// pass existed, a load-only property met first (often with no DB attributes, so e.g. VARCHAR(250) NULL)
+// defined the column and the writing property, with the real attributes, was discarded silently.
+// So here a load-only property only fills the gap:
+//  - with a LoadSql it reads an expression, not a column: no column at all;
+//  - without a LoadSql it reads a real column (e.g. one filled by a DB default or a trigger): the column is
+//    added only if nothing has added it yet. Never compared, never a Warning: a reader does not define
+//    the column, so a different declaration is not a conflict. Between two load-only properties on the
+//    same missing column the first one wins (deterministic: sorted maps, RTTI order).
+// A load-only primary key is not added when the table already has a primary key (same guard as
+// AddOrCheckSchemaField, without the Warning).
+procedure TioDBBuilderSchemaBuilder.BuildSchemaLoadOnlyFields(const AMap: IioMap);
+var
+  LProperty: IioProperty;
+  LSchemaField: IioDBBuilderSchemaField;
+  LSchemaTable: IioDBBuilderSchemaTable;
+begin
+  if not IsSchemaEligible(AMap) then
+    Exit;
+  // Always found: BuildSchemaTable has already run for every eligible map
+  LSchemaTable := FSchema.FindTable(AMap.GetTable.TableName, False);
+  for LProperty in AMap.GetProperties do
+    if LProperty.IsDBReadEnabled and not LProperty.IsDBWriteEnabled and not LProperty.LoadSqlExist
+      and not (LProperty.GetRelationType in [rtHasMany, rtHasOne]) then
+    begin
+      LSchemaField := TioDBBuilderFactory.NewSchemaField_Mapped(LProperty, FSqlGenerator);
+      if (LSchemaTable.FindField(LSchemaField.FieldName) = nil)
+        and not (LSchemaField.PrimaryKey and (LSchemaTable.PrimaryKeyField <> nil)) then
+        LSchemaTable.AddField(LSchemaField);
+    end;
+end;
+
 procedure TioDBBuilderSchemaBuilder.BuildSchemaTable(const AMap: IioMap);
 var
   LAddedFieldNames: TStringList;
@@ -254,14 +293,17 @@ begin
   LKeyGenStrategy := FSqlGenerator.Resolve_KeyGenerationStrategy(AMap.GetTable.GetKeyGenerationStrategy);
   // Build or get the SchemaTable
   LSchemaTable := FindOrCreateSchemaTable(AMap, LKeyGenStrategy);
-  // Add fields (or check them against the definition of another class sharing the table - see
-  // AddOrCheckSchemaField). A column this same map already contributed (two properties on one column,
-  // e.g. a load-only/persist-only pair) is skipped silently, as AddField always did: classification and
-  // diagnostics apply only between different maps.
+  // Add the fields of the properties that write their column (LoadAndPersist, PersistOnly - also with a
+  // LoadSql: [ioLoadSql] changes only how the value is read, the property is still persisted into its
+  // column), or check them against the definition of another class sharing the table (see
+  // AddOrCheckSchemaField). Only a writing property defines a column: the load-only ones come later, in
+  // BuildSchemaLoadOnlyFields. IsDBWriteEnabled already excludes the transient properties. A column this
+  // same map already contributed (two writing properties on one column) is skipped silently, as AddField
+  // always did: classification and diagnostics apply only between different maps.
   LAddedFieldNames := TStringList.Create;  // CaseSensitive = False, same rule as FindField
   try
     for LProperty in AMap.GetProperties do
-      if not (LProperty.IsTransient or (LProperty.GetRelationType in [rtHasMany, rtHasOne])) then
+      if LProperty.IsDBWriteEnabled and not (LProperty.GetRelationType in [rtHasMany, rtHasOne]) then
       begin
         LSchemaField := TioDBBuilderFactory.NewSchemaField_Mapped(LProperty, FSqlGenerator);
         if LAddedFieldNames.IndexOf(LSchemaField.FieldName) = -1 then
