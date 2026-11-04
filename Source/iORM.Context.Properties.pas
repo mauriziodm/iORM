@@ -107,6 +107,7 @@ type
     function GetWhereTargetPropName: String;
     function GetPropertyRole: TioPropertyRole;
     function GetQualifiedFieldName: String;
+    function IsJoined: Boolean;
   strict protected
     FPropertyRole: TioPropertyRole;
     constructor Create(const ATable: IioTable; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType: String; const ATransient, AIsID: Boolean;
@@ -793,6 +794,14 @@ end;
 function TioProperty.IsWritable: Boolean;
 begin
   Result := FRttiProperty.IsWritable;
+end;
+
+// The table of the column (SetFieldData: the table prefix of the ioField attribute, translated by TioSqlTranslator
+// into the TableName of that class's table, or the TableName of the own table when there is no prefix) is not the
+// own table. Case-insensitive: a literal prefix may be written in any case.
+function TioProperty.IsJoined: Boolean;
+begin
+  Result := not SameText(FSqlFieldTableName, FTable.TableName);
 end;
 
 function TioProperty.IsDBWriteEnabled: Boolean;

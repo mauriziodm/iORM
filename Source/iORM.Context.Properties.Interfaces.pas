@@ -80,6 +80,15 @@ type
     function GetSqlWhereParamName: String;
     function GetFieldType: String;
     function IsBlob: Boolean;
+    /// <summary>True if the property is mapped on a column of a joined table, not of the table of its own class</summary>
+    /// <remarks>
+    /// A class with an ioJoin attribute takes some values from the joined table: the properties receiving them
+    /// declare it with the table prefix in their ioField attribute (e.g. ioField('[TCostGeneric].TravelID')). The
+    /// ioJoin attribute is on the class and does not say which properties come from the joined table: this does.
+    /// Such a column belongs to the joined table, so it can only be read (see TioContextFactory.CheckWritingPropertiesColumns)
+    /// and the DBBuilder never adds it to the table of the class.
+    /// </remarks>
+    function IsJoined: Boolean;
     function IsStream: Boolean;
     function GetValue(const Instance: Pointer): TValue;
     function GetValueAsObject(const Instance: Pointer): TObject;

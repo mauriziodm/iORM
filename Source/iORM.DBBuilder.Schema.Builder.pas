@@ -213,6 +213,12 @@ begin
         LDependentMap := LResolvedChildTypeMap;
         LDependentProperty := LResolvedChildTypeMap.GetProperties.GetPropertyByName(LProperty.GetRelationChildPropertyName);
       end;
+      // A dependent property on a column of a joined table (IsJoined, load-only by the map build rules): the
+      // column belongs to another table, not to the dependent table, and it never becomes a field node there
+      // (see BuildSchemaTableLoadOnlyFields), so no FK on it. A FK on that column, if wanted, comes from the
+      // class mapped on the joined table.
+      if LDependentProperty.IsJoined then
+        Continue;
       // Safety belt: beyond the IsForThisConnection guards above, the FK is added only if its
       // dependent table actually made it into this connection's schema (GetSortedMapsByTable applies
       // the same connection filter), so a nil here silently discards the FK.
@@ -252,7 +258,10 @@ end;
 //    the column, so a different declaration is not a conflict. Between two load-only properties on the
 //    same missing column the first one wins (deterministic: sorted maps, RTTI order).
 // A load-only primary key is not added when the table already has a primary key (same guard as
-// AddOrCheckSchemaField, without the Warning).
+// AddOrCheckSchemaField, without the Warning). A load-only property on a column of a joined table (IsJoined)
+// reads a column of ANOTHER table: skipped, it never belongs to this one. Before this guard, the gap filling
+// above created a phantom column with its name in this table (the field node is built from the field name
+// only), even for a correctly mapped join. The joined table gets its columns from its own class.
 procedure TioDBBuilderSchemaBuilder.BuildSchemaTableLoadOnlyFields(const ASchemaTable: IioDBBuilderSchemaTable;
   const AMap: IioMap);
 var
@@ -261,7 +270,7 @@ var
 begin
   for LProperty in AMap.GetProperties do
     if LProperty.IsDBReadEnabled and not LProperty.IsDBWriteEnabled and not LProperty.LoadSqlExist
-      and not (LProperty.GetRelationType in [rtHasMany, rtHasOne]) then
+      and not LProperty.IsJoined and not (LProperty.GetRelationType in [rtHasMany, rtHasOne]) then
     begin
       LSchemaField := TioDBBuilderFactory.NewSchemaField_Mapped(LProperty, FSqlGenerator);
       if (ASchemaTable.FindField(LSchemaField.FieldName) = nil)
@@ -314,7 +323,9 @@ end;
 // property is still persisted into its column). Each one is added, or checked against the definition of
 // another class sharing the table (see AddOrCheckSchemaField). Only a persisted property defines a column:
 // the load-only ones come later, in BuildSchemaTableLoadOnlyFields. IsDBWriteEnabled already excludes the
-// transient properties. Two persisted properties of one real class on the same column cannot get here: the
+// transient properties. A persisted property on a column of a joined table (IsJoined) cannot get here either:
+// the map build rejects it (TioContextFactory.CheckWritingPropertiesColumns), so every persisted column is on
+// this table. Two persisted properties of one real class on the same column cannot get here: the
 // map build rejects them (TioContextFactory.CheckWritingPropertiesColumns), so each column comes at most once
 // per real map and the comparison in AddOrCheckSchemaField is between different maps. A TrueClass virtual
 // map may bring the same column more than once (copies from different subclasses): an identical copy adds
