@@ -54,6 +54,7 @@ type
     FTypeAlias: String;
     FFieldDefinitionString, FSqlFieldTableName, FSqlFieldName, FSqlFieldAlias: String;
     FFieldDataPending: Boolean;
+    FFieldDataResolving: Boolean;
     FLoadSql: String;
     FFieldType: String;
     FRelationType: TioRelationType;
@@ -107,6 +108,7 @@ type
     function GetWhereNullValue: TValue;
     function GetWhereSkip: Boolean;
     function GetWhereTargetPropName: String;
+    function GetFieldName: String;
     function GetPropertyRole: TioPropertyRole;
     function GetQualifiedFieldName: String;
     function IsJoined: Boolean;
@@ -348,7 +350,7 @@ uses
   iORM.DB.Factory, iORM.Exceptions, System.SysUtils, iORM.SqlTranslator,
   System.StrUtils, iORM.Utilities,
   iORM.DB.ConnectionContainer, iORM.DB.Interfaces, iORM.Context.Container,
-  iORM.RttiContext.Factory, iORM.Context.Map.Interfaces, System.RegularExpressions;
+  iORM.RttiContext.Factory, iORM.Context.Map.Interfaces;
 
 { TioProperty }
 
@@ -666,6 +668,12 @@ begin
   Result := FSqlFieldAlias;
 end;
 
+// The raw twin of GetSqlFieldName (see the interface)
+function TioProperty.GetFieldName: String;
+begin
+  Result := FSqlFieldName;
+end;
+
 function TioProperty.GetSqlFieldName(const AIncludeDelimiters: Boolean): String;
 begin
   Result := TioDbFactory.SqlDataConverter(FTable.GetTableConnectionName)
@@ -889,30 +897,40 @@ begin
     FPropertyRole := prObjCreatedUserName;
 end;
 
-// Second pass of the field data (see SetFieldData): called once for every property after all the maps are
-// registered, does nothing if the definition has no tags. Only a class tag can appear in an ioField, naming the
-// table of a joined class ('[TCostGeneric].TravelID'): the field is written outside the tag. A tag with a property
-// ('[TOther.Prop]', or '[.Prop]' for the class itself) would need the connection, to normalize the field name, and
-// no connection is registered while the maps are built: it is rejected with a clear message.
+// Second pass of the field data (see SetFieldData): does nothing if the definition has no tags or is already
+// resolved. The tags are translated with the names as declared (TioSqlTranslator.TranslateRaw), not normalized:
+// the field data of every property are kept as declared, and normalized only when the SQL is built
+// (GetSqlFieldName, GetSqlQualifiedFieldName), so no connection is needed, and none is registered while the maps
+// are built. So all the forms work, the class-and-property one being the natural one for an ORM:
+//  - '[TCostGeneric.TravelID]': table of the class, column of its property (it follows the mapping of TravelID);
+//  - '[TCostGeneric].TravelID': table of the class, column written by hand;
+//  - '[.Prop]' (or '[Self.Prop]'): a column of the own table, through another property.
+// A tag can refer to a property that has a tag of its own: TranslateRaw resolves it first (it calls this method
+// on it), so the order of the maps does not matter. A circular reference (two properties referring to each other,
+// directly or not) would recurse forever: FFieldDataResolving stops it with a clear message.
 procedure TioProperty.ResolveTaggedFieldData;
 begin
   if not FFieldDataPending then
     Exit;
-  if TRegEx.IsMatch(FFieldDefinitionString, '\[[^\]]*\.[^\]]*\]') then
+  if FFieldDataResolving then
     raise EioGenericException.Create(ClassName, 'ResolveTaggedFieldData', Format('Oops!'#13#13'Hi, I''m iORM, I''m sorry but there is a problem.' +
-      #13#13'The property "%s" of the class "%s" has the attribute "[ioField(''%s'')]", with a property inside a tag.' +
-      #13#13'In the "ioField" attribute a tag can only name a class, to get the table of a joined class (attribute "[ioJoin]" on the class), and the field goes outside the tag, for example "[ioField(''[TCostGeneric].TravelID'')]".' +
-      #13#13'Please fix the attribute.' +
+      #13#13'The property "%s" of the class "%s" has the attribute "[ioField(''%s'')]", whose tag refers back to the property itself, directly or through other properties.' +
+      #13#13'Please make the tag refer to a property mapped on a column of its own.' +
       #13#13'It will work.', [GetName, FTable.GetClassName, FFieldDefinitionString]));
-  ParseFieldDefinition(TioSqlTranslator.Translate(FFieldDefinitionString, FTable.GetClassName));
-  FFieldDataPending := False;
+  FFieldDataResolving := True;
+  try
+    ParseFieldDefinition(TioSqlTranslator.TranslateRaw(FFieldDefinitionString, FTable.GetClassName));
+    FFieldDataPending := False;
+  finally
+    FFieldDataResolving := False;
+  end;
 end;
 
 // The field data come from the ioField attribute (FFieldDefinitionString: "[Table.]Field[ AS Alias]").
 // A definition without tags (nearly all of them, also the default one, the member name) is parsed here, in the
-// constructor. A definition with a [TClass] tag (a joined column, e.g. '[TCostGeneric].TravelID') needs the map of
-// that class to know its table, and while the maps are being built that class may not be registered yet (they are
-// registered one at a time, in the order of the RTTI types): so it is left pending, and resolved by
+// constructor. A definition with a tag (a joined column, e.g. '[TCostGeneric.TravelID]') needs the map of that
+// class to know its table (and the field of its property), and while the maps are being built that class may not
+// be registered yet (they are registered one at a time, in the order of the RTTI types): so it is left pending, and resolved by
 // ResolveTaggedFieldData in a second pass after all the maps exist (TioContextFactory.CompletePropertiesFieldData).
 // The field data are not resolved at every use instead: the alias depends on the table and is read for every row
 // and every property while loading the objects, and the map build itself needs the table (IsJoined).

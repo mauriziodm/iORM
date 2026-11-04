@@ -152,7 +152,7 @@ end;
 
 // Second pass of the map build, after all the maps are registered (TioMapContainer.Init), before the TrueClass
 // virtual maps are built (they share the same property objects, so they get the resolved data too):
-//  - resolves the field data of the properties whose ioField has a class tag (IioProperty.ResolveTaggedFieldData):
+//  - resolves the field data of the properties whose ioField has a tag (IioProperty.ResolveTaggedFieldData):
 //    the tagged class may have been registered after the class using it, so it cannot be done while building
 //    each map;
 //  - then checks the columns of the writing properties (CheckWritingPropertiesColumns), which needs the table of

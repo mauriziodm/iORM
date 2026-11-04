@@ -74,6 +74,13 @@ type
     /// <remarks>Needs the connection to be registered. Raw version, as declared: GetQualifiedFieldName.</remarks>
     function GetSqlQualifiedFieldName: String;
     function GetSqlFullQualifiedFieldName: String;
+    /// <summary>The field of the column, as declared: not normalized, no delimiters</summary>
+    /// <remarks>
+    /// The raw twin of GetSqlFieldName, as GetQualifiedFieldName is of GetSqlQualifiedFieldName: it needs no
+    /// connection, so it can be used while the maps are built (e.g. TioSqlTranslator.TranslateRaw). Do not use it
+    /// to build SQL: use GetSqlFieldName for that.
+    /// </remarks>
+    function GetFieldName: String;
     function GetSqlFieldName(const AIncludeDelimiters: Boolean = True): String;
     function GetSqlFieldAlias: String;
     function GetSqlParamName: String;
@@ -90,11 +97,12 @@ type
     /// </remarks>
     function IsJoined: Boolean;
     function IsStream: Boolean;
-    /// <summary>Resolves the field data of an ioField definition with a class tag (e.g. '[TCostGeneric].TravelID')</summary>
+    /// <summary>Resolves the field data of an ioField definition with a tag (e.g. '[TCostGeneric.TravelID]')</summary>
     /// <remarks>
-    /// Map build only: called once for every property after all the maps are registered
-    /// (TioContextFactory.CompletePropertiesFieldData), does nothing for a definition without tags. Until then the
-    /// table, field and alias of a tagged property are not set, so nothing may read them before that pass.
+    /// Map build only: called for every property after all the maps are registered
+    /// (TioContextFactory.CompletePropertiesFieldData), and by TioSqlTranslator.TranslateRaw for a property
+    /// referenced by a tag; does nothing for a definition without tags or already resolved. Until then the table,
+    /// field and alias of a tagged property are not set, so nothing may read them before that pass.
     /// </remarks>
     procedure ResolveTaggedFieldData;
     function GetValue(const Instance: Pointer): TValue;

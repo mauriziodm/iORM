@@ -44,14 +44,25 @@ type
   protected
     FSelfClassName: String;
     FQualifiedFieldName: Boolean;
+    FRawNames: Boolean;
     function RemoveDelimiters(const AValue:string): String;
     function GetClassName(const AValue:string): String;
     function GetPropertyName(const AValue:String): String;
     function ReplaceEval(const Match: TMatch): string;
     function TranslateInternal(const AValue:String): String;
   public
-    constructor Create(const ASelfClassName: String; const AQualifiedFieldName: Boolean);
+    constructor Create(const ASelfClassName: String; const AQualifiedFieldName, ARawNames: Boolean);
     class function Translate(const AValue, ASelfClassName:String; const AQualifiedFieldName:Boolean=True): String;
+    /// <summary>Translates the tags with the names as declared in the mapping, not normalized: for the map build only</summary>
+    /// <remarks>
+    /// The normal Translate gives the field names normalized for the connection (GetSqlFieldName), so a property tag
+    /// needs the connection, which is not registered yet while the maps are built (initialization section). This
+    /// version gives the field names as declared (IioProperty.GetFieldName), like the table names (TableName), so it
+    /// needs no connection: it is meant for the mapping data, which iORM keeps as declared and normalizes when it
+    /// builds the SQL (e.g. the ioField attribute, see TioProperty.ResolveTaggedFieldData). Not for SQL text.
+    /// A referenced property must have a column of its own on the table of its class.
+    /// </remarks>
+    class function TranslateRaw(const AValue, ASelfClassName: String): String;
   end;
 
 implementation
@@ -59,15 +70,16 @@ implementation
 uses
   System.SysUtils,
   iORM.Context.Container, iORM.Context.Map.Interfaces,
-  iORM.Exceptions;
+  iORM.Exceptions, iORM.Context.Properties.Interfaces, iORM.Attributes;
 
 { TioSqlTranslator }
 
-constructor TioSqlTranslator.Create(const ASelfClassName: String; const AQualifiedFieldName: Boolean);
+constructor TioSqlTranslator.Create(const ASelfClassName: String; const AQualifiedFieldName, ARawNames: Boolean);
 begin
   inherited Create;
   FSelfClassName := ASelfClassName;
   FQualifiedFieldName := AQualifiedFieldName;
+  FRawNames := ARawNames;
 end;
 
 function TioSqlTranslator.GetClassName(const AValue: string): String;
@@ -108,8 +120,9 @@ end;
 
 function TioSqlTranslator.ReplaceEval(const Match: TMatch): string;
 var
-  LSqlTag, LClassName, LPropName: String;
+  LSqlTag, LClassName, LPropName, LFieldName: String;
   LMap: IioMap;
+  LProperty: IioProperty;
 begin
   LSqlTag := Self.RemoveDelimiters(Match.Value);
   LClassName := Self.GetClassName(LSqlTag);
@@ -118,10 +131,27 @@ begin
   Result := LMap.GetTable.TableName;
   if LPropName <> '' then
   begin
-    if FQualifiedFieldName then
-      Result := Result + '.' + LMap.GetProperties.GetPropertyByName(LPropName).GetSqlFieldName(False)
+    LProperty := LMap.GetProperties.GetPropertyByName(LPropName);
+    if FRawNames then
+    begin
+      // Map build (see TranslateRaw): the referenced property may itself have a tag still to be resolved
+      LProperty.ResolveTaggedFieldData;
+      // The tag gives "table of the class . column of the property": the property must have a column of its own
+      // on that table
+      if LProperty.IsJoined or LProperty.LoadSqlExist or (LProperty.GetRelationType in [rtHasMany, rtHasOne]) then
+        raise EioGenericException.Create(ClassName, 'TranslateRaw', Format('Oops!'#13#13'Hi, I''m iORM, I''m sorry but there is a problem.' +
+          #13#13'The tag "%s" refers to the property "%s" of the class "%s", but that property has no column of its own on the table "%s":' +
+          ' it is a column of a joined table (attribute "[ioJoin]"), or an expression (attribute "[ioLoadSql]"), or a HasMany/HasOne relation.' +
+          #13#13'Please refer to a property mapped on a column of the table of its class.' +
+          #13#13'It will work.', [Match.Value, LProperty.GetName, LMap.GetClassName, Result]));
+      LFieldName := LProperty.GetFieldName;
+    end
     else
-      Result := LMap.GetProperties.GetPropertyByName(LPropName).GetSqlFieldName(False);
+      LFieldName := LProperty.GetSqlFieldName(False);
+    if FQualifiedFieldName then
+      Result := Result + '.' + LFieldName
+    else
+      Result := LFieldName;
   end;
 end;
 
@@ -129,7 +159,19 @@ class function TioSqlTranslator.Translate(const AValue, ASelfClassName:String; c
 var
   LSqlTranslator: TioSqlTranslator;
 begin
-  LSqlTranslator := Self.Create(ASelfClassName, AQualifiedFieldName);
+  LSqlTranslator := Self.Create(ASelfClassName, AQualifiedFieldName, False);
+  try
+    Result := LSqlTranslator.TranslateInternal(AValue);
+  finally
+    LSqlTranslator.Free;
+  end;
+end;
+
+class function TioSqlTranslator.TranslateRaw(const AValue, ASelfClassName: String): String;
+var
+  LSqlTranslator: TioSqlTranslator;
+begin
+  LSqlTranslator := Self.Create(ASelfClassName, True, True);
   try
     Result := LSqlTranslator.TranslateInternal(AValue);
   finally
