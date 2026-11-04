@@ -341,6 +341,9 @@ begin
     RegisterClassesInDependencyInjectionContainerByAttributes;
     // This method map all entities in the MapContainer
     RegisterClassesInMapContainer;
+    // Second pass on the properties, now that all the maps exist: resolves the field data with a class tag in
+    //  ioField and checks the columns of the writing properties
+    TioContextFactory.CompletePropertiesFieldData;
     // Generate childs virtual properties related to autodetected HasMany relations
     TioContextFactory.GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
     // This method build all TrueClassVirtualMaps for all entities

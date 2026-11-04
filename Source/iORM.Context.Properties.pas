@@ -53,6 +53,7 @@ type
     FRttiProperty: TRttiProperty;
     FTypeAlias: String;
     FFieldDefinitionString, FSqlFieldTableName, FSqlFieldName, FSqlFieldAlias: String;
+    FFieldDataPending: Boolean;
     FLoadSql: String;
     FFieldType: String;
     FRelationType: TioRelationType;
@@ -87,8 +88,9 @@ type
     FMetadata_FKOnDeleteAction: TioFKAction;
     FMetadata_FKOnUpdateAction: TioFKAction;
     procedure SetRelationChildNameAndPath(const AQualifiedChildPropertyName: String);
+    procedure ParseFieldDefinition(const AFieldDefinition: String);
+    procedure ResolveTaggedFieldData;
     procedure SetFieldData;
-    procedure SetLoadSqlData;
     procedure SetWhereCompareOp(const Value: TioCompareOp);
     procedure SetWhereGroupLogicOp(const Value: TioLogicOp);
     procedure SetWhereGroupName(const Value: String);
@@ -346,7 +348,7 @@ uses
   iORM.DB.Factory, iORM.Exceptions, System.SysUtils, iORM.SqlTranslator,
   System.StrUtils, iORM.Utilities,
   iORM.DB.ConnectionContainer, iORM.DB.Interfaces, iORM.Context.Container,
-  iORM.RttiContext.Factory, iORM.Context.Map.Interfaces;
+  iORM.RttiContext.Factory, iORM.Context.Map.Interfaces, System.RegularExpressions;
 
 { TioProperty }
 
@@ -423,8 +425,28 @@ begin
   // Propriet�: >>>>>>>> [ioField('[TCostGeneric].TravelID')]  <<<<<<<<<
   // --------------------------------
   SetFieldData;
-  // Translate the LoadSQLData statement if needed
-  SetLoadSqlData;
+end;
+
+// Splits a field definition without tags ("[Table.]Field[ AS Alias]") into table, field and alias
+procedure TioProperty.ParseFieldDefinition(const AFieldDefinition: String);
+var
+  LDotPos, LAsPos: Smallint;
+begin
+  // Retrieve the markers position
+  LDotPos := Pos('.', AFieldDefinition);
+  LAsPos := Pos(' AS ', AFieldDefinition, LDotPos);
+  if LAsPos = 0 then
+    LAsPos := AFieldDefinition.Length + 1;
+  // Retrieve Table reference
+  FSqlFieldTableName := LeftStr(AFieldDefinition, LDotPos - 1);
+  if FSqlFieldTableName = '' then
+    FSqlFieldTableName := FTable.TableName;
+  // Retrieve FieldName
+  FSqlFieldName := MidStr(AFieldDefinition, LDotPos + 1, LAsPos - LDotPos - 1);
+  // Retrieve Field Alias
+  FSqlFieldAlias := MidStr(AFieldDefinition, LAsPos + 4, AFieldDefinition.Length);
+  if FSqlFieldAlias = '' then
+    FSqlFieldAlias := FSqlFieldTableName + '_' + FSqlFieldName;
 end;
 
 function TioProperty.GetFieldType: String;
@@ -475,9 +497,14 @@ begin
   Result := FRttiProperty;
 end;
 
+// FLoadSql keeps the statement as declared: its tags are translated here, at every use, never during the map build.
+// During the map build a tag can name a class not registered yet ([TOther]), the class being built ([.Prop]) or a
+// property ([TOther.Prop], which needs the connection to normalize the field name): here every map and the
+// connections exist, so all the tag forms work. No lazy cache: the maps are immutable after the build and read
+// without locks, and writing a string field on first use from several threads would be a race.
 function TioProperty.GetLoadSql: String;
 begin
-  Result := '(' + Self.FLoadSql + ') AS ' + Self.GetSqlFieldAlias;
+  Result := '(' + TioSqlTranslator.Translate(FLoadSql, FTable.GetClassName) + ') AS ' + Self.GetSqlFieldAlias;
 end;
 
 function TioProperty.GetMetadata_CustomFieldType: string;
@@ -862,10 +889,34 @@ begin
     FPropertyRole := prObjCreatedUserName;
 end;
 
+// Second pass of the field data (see SetFieldData): called once for every property after all the maps are
+// registered, does nothing if the definition has no tags. Only a class tag can appear in an ioField, naming the
+// table of a joined class ('[TCostGeneric].TravelID'): the field is written outside the tag. A tag with a property
+// ('[TOther.Prop]', or '[.Prop]' for the class itself) would need the connection, to normalize the field name, and
+// no connection is registered while the maps are built: it is rejected with a clear message.
+procedure TioProperty.ResolveTaggedFieldData;
+begin
+  if not FFieldDataPending then
+    Exit;
+  if TRegEx.IsMatch(FFieldDefinitionString, '\[[^\]]*\.[^\]]*\]') then
+    raise EioGenericException.Create(ClassName, 'ResolveTaggedFieldData', Format('Oops!'#13#13'Hi, I''m iORM, I''m sorry but there is a problem.' +
+      #13#13'The property "%s" of the class "%s" has the attribute "[ioField(''%s'')]", with a property inside a tag.' +
+      #13#13'In the "ioField" attribute a tag can only name a class, to get the table of a joined class (attribute "[ioJoin]" on the class), and the field goes outside the tag, for example "[ioField(''[TCostGeneric].TravelID'')]".' +
+      #13#13'Please fix the attribute.' +
+      #13#13'It will work.', [GetName, FTable.GetClassName, FFieldDefinitionString]));
+  ParseFieldDefinition(TioSqlTranslator.Translate(FFieldDefinitionString, FTable.GetClassName));
+  FFieldDataPending := False;
+end;
+
+// The field data come from the ioField attribute (FFieldDefinitionString: "[Table.]Field[ AS Alias]").
+// A definition without tags (nearly all of them, also the default one, the member name) is parsed here, in the
+// constructor. A definition with a [TClass] tag (a joined column, e.g. '[TCostGeneric].TravelID') needs the map of
+// that class to know its table, and while the maps are being built that class may not be registered yet (they are
+// registered one at a time, in the order of the RTTI types): so it is left pending, and resolved by
+// ResolveTaggedFieldData in a second pass after all the maps exist (TioContextFactory.CompletePropertiesFieldData).
+// The field data are not resolved at every use instead: the alias depends on the table and is read for every row
+// and every property while loading the objects, and the map build itself needs the table (IsJoined).
 procedure TioProperty.SetFieldData;
-var
-  LDotPos, LAsPos: Smallint;
-  LValue: String;
 begin
   // --------------------------------
   // Quando si fa un Join in una classe (attributo ioJoin) poi nelle propriet� che ricevono il valore dai campi della
@@ -875,31 +926,9 @@ begin
   // Classe: [ioJoin(jtInner, TCostGeneric, '[TCostGeneric.CostType] = [TCostType.ID]')]
   // Propriet�: >>>>>>>> [ioField('[TCostGeneric].TravelID')]  <<<<<<<<<
   // --------------------------------
-  LValue := FFieldDefinitionString;
-  // Translate (if contains tags)
-  LValue := TioSqlTranslator.Translate(LValue, FTable.GetClassName);
-  // Retrieve the markers position
-  LDotPos := Pos('.', LValue);
-  LAsPos := Pos(' AS ', LValue, LDotPos);
-  if LAsPos = 0 then
-    LAsPos := LValue.Length + 1;
-  // Retrieve Table reference
-  FSqlFieldTableName := LeftStr(LValue, LDotPos - 1);
-  if FSqlFieldTableName = '' then
-    FSqlFieldTableName := FTable.TableName;
-  // Retrieve FieldName
-  FSqlFieldName := MidStr(LValue, LDotPos + 1, LAsPos - LDotPos - 1);
-  // Retrieve Field Alias
-  FSqlFieldAlias := MidStr(LValue, LAsPos + 4, LValue.Length);
-  if FSqlFieldAlias = '' then
-    FSqlFieldAlias := FSqlFieldTableName + '_' + FSqlFieldName;
-end;
-
-procedure TioProperty.SetLoadSqlData;
-begin
-  // Set LoadSql statement (if exist)
-  if Self.FLoadSql <> '' then
-    FLoadSql := TioSqlTranslator.Translate(FLoadSql, FTable.GetClassName);
+  FFieldDataPending := FFieldDefinitionString.Contains('[');
+  if not FFieldDataPending then
+    ParseFieldDefinition(FFieldDefinitionString);
 end;
 
 procedure TioProperty.SetMetadata_CustomFieldType(const AMetadata_CustomFieldType: string);

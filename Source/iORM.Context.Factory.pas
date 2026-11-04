@@ -71,6 +71,7 @@ type
     class function Context_PSRequest(const APSRequest: IioPersistenceStrategyRequest; const AClassName: String): IioContext;
     class function Context_Simple(const AIntent: TioPersistenceIntentType; const ABlindLevel: Byte; AClassName: String; const AWhere: IioWhere;
       const ADataObject: TObject; const AMasterBSPersistence: TioBSPersistence; const AMasterPropertyName, AMasterPropertyPath: String): IioContext;
+    class procedure CompletePropertiesFieldData;
     class procedure GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
     class function Map(const AClassRef: TioClassRef): IioMap;
     class function TrueClassVirtualContextIfEnabled(const APSRequest: IioPersistenceStrategyRequest; const AClassName: String): IioContext;
@@ -147,6 +148,28 @@ begin
   end
   else
     Result := TioContext_PSRequest.Create_PSRequest(APSRequest, LMap);
+end;
+
+// Second pass of the map build, after all the maps are registered (TioMapContainer.Init), before the TrueClass
+// virtual maps are built (they share the same property objects, so they get the resolved data too):
+//  - resolves the field data of the properties whose ioField has a class tag (IioProperty.ResolveTaggedFieldData):
+//    the tagged class may have been registered after the class using it, so it cannot be done while building
+//    each map;
+//  - then checks the columns of the writing properties (CheckWritingPropertiesColumns), which needs the table of
+//    every column (IsJoined, GetQualifiedFieldName).
+class procedure TioContextFactory.CompletePropertiesFieldData;
+var
+  LMap: IioMap;
+  LMapSlot: TioMapSlot;
+  LProperty: IioProperty;
+begin
+  for LMapSlot in TioMapContainer.GetContainer.Values do
+  begin
+    LMap := LMapSlot.GetMap;
+    for LProperty in LMap.GetProperties do
+      LProperty.ResolveTaggedFieldData;
+    CheckWritingPropertiesColumns(LMap.RttiType, LMap.GetProperties);
+  end;
 end;
 
 class procedure TioContextFactory.GenerateAutodetectedHasManyRelationVirtualPropertyOnDetails;
@@ -738,14 +761,14 @@ begin
     LMembers := TArray<System.Rtti.TRttiMember>(TObject(Typ.AsInstance.GetProperties));
     ExtractMembersInfo(ATable.GetMapMode = mmHybrid);
   end;
-  // The columns of the writing properties: none on a joined table, no two on the same column (after both passes,
-  // so that hybrid maps and the Obj* properties are covered)
-  CheckWritingPropertiesColumns(Typ, Result);
+  // NB: the columns of the writing properties are checked later, after the tagged field data are resolved
+  //  (CompletePropertiesFieldData)
 end;
 
 // Two rules on the columns of the writing properties of a class. Reading is not a problem, so only the writing
 // properties are checked (IsDBWriteEnabled: not transient, not load-only), without HasMany and HasOne (no column on
-// this table, the same filter as the DBBuilder). Raised here, at map build: the error is in the mapping, so it
+// this table, the same filter as the DBBuilder). Called by CompletePropertiesFieldData, once the field data of every
+// property are resolved. Raised at map build: the error is in the mapping, so it
 // surfaces at the start of the application (reported by TioMapContainer._Build) instead of at the first save,
 // wherever it happens.
 //  1. No column of a joined table (IsJoined: ioJoin on the class, the table prefix in the ioField of the property).

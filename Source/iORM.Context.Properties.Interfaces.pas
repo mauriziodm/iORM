@@ -90,6 +90,13 @@ type
     /// </remarks>
     function IsJoined: Boolean;
     function IsStream: Boolean;
+    /// <summary>Resolves the field data of an ioField definition with a class tag (e.g. '[TCostGeneric].TravelID')</summary>
+    /// <remarks>
+    /// Map build only: called once for every property after all the maps are registered
+    /// (TioContextFactory.CompletePropertiesFieldData), does nothing for a definition without tags. Until then the
+    /// table, field and alias of a tagged property are not set, so nothing may read them before that pass.
+    /// </remarks>
+    procedure ResolveTaggedFieldData;
     function GetValue(const Instance: Pointer): TValue;
     function GetValueAsObject(const Instance: Pointer): TObject;
     procedure SetValue(const Instance: Pointer; const AValue: TValue);
